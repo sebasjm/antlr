@@ -348,7 +348,7 @@ ebnf returns [StringTemplate code=null]
 }
     :   {dfa = #ebnf.getLookaheadDFA();}
         code=block["block", dfa]
-    |   {dfa = #b.getLookaheadDFA();}
+    |   {dfa = #ebnf.getLookaheadDFA();}
         #( OPTIONAL code=block["optionalBlock", dfa] )
     |   {dfa = #eob.getLookaheadDFA();}
         #( CLOSURE code=block["closureBlock", dfa] )

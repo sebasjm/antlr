@@ -282,7 +282,7 @@ ebnf returns [StateCluster g=null]
         int d = grammar.assignDecisionNumber( g.left );
 		grammar.setDecisionNFA(d, g.left);
         grammar.setDecisionOptions(d, #blk.getOptions());
-        g.left.setDecisionASTNode(#blk);
+        g.left.setDecisionASTNode(#ebnf);
     	}
     |   #( CLOSURE #( BLOCK b=block eob:EOB ) )
         {
@@ -295,7 +295,7 @@ ebnf returns [StateCluster g=null]
         b.right.setDecisionASTNode(#eob);
         // make block entry state also have same decision for interpreting grammar
         NFAState altBlockState = (NFAState)g.left.transition(0).target;
-        altBlockState.setDecisionASTNode(#BLOCK);
+        altBlockState.setDecisionASTNode(#ebnf);
         altBlockState.setDecisionNumber(d);
     	}
     |   #( POSITIVE_CLOSURE #( blk2:BLOCK b=block eob3:EOB ) )
@@ -310,7 +310,7 @@ ebnf returns [StateCluster g=null]
         b.right.setDecisionASTNode(#eob3);
         // make block entry state also have same decision for interpreting grammar
         NFAState altBlockState = (NFAState)g.left.transition(0).target;
-        altBlockState.setDecisionASTNode(#blk2);
+        altBlockState.setDecisionASTNode(#ebnf);
         altBlockState.setDecisionNumber(d);
         }
     ;
