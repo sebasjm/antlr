@@ -6,6 +6,7 @@ import org.antlr.tool.ErrorManager;
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.Socket;
 import java.util.StringTokenizer;
 
@@ -16,6 +17,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	int port;
 	Socket channel = null;
 	DataInputStream din = null;
+	PrintStream out;
 
 	public static class ProxyToken extends Token {
 		int index;
@@ -82,6 +84,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			while ( line!=null ) {
 				System.out.println(line);
 				dispatch(line);
+				ack();
 				line = din.readLine();
 			}
 			din.close(); din = null;
@@ -109,10 +112,15 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		channel = new Socket(machine, port);
 		InputStream in = channel.getInputStream();
 		din = new DataInputStream(in);
+		out = new PrintStream(channel.getOutputStream());
 		String line = din.readLine();
 		if ( line!=null ) {
 			System.out.println("handshake: "+line);
 		}
+	}
+
+	protected void ack() {
+        out.println("ack");
 	}
 
 	protected void dispatch(String line) {
