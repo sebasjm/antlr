@@ -374,6 +374,27 @@ public class DFAState extends State {
         return alt;
     }
 
+	/** When more than one alternative can match the same input, the first
+	 *  alternative is chosen to resolve the conflict.  The other alts
+	 *  are "turned off" by setting the "resolved" flag in the NFA
+	 *  configurations.  Return the set of disabled alternatives.  For
+	 *
+	 *  a : A | A | A ;
+	 *
+	 *  this method returns {2,3} as disabled.
+	 */
+	public Set getDisabledAlternatives() {
+		Set disabled = new LinkedHashSet();
+		Iterator iter = nfaConfigurations.iterator();
+		NFAConfiguration configuration;
+		while (iter.hasNext()) {
+			configuration = (NFAConfiguration) iter.next();
+			if ( configuration.resolved ) {
+				disabled.add(new Integer(configuration.alt));
+			}
+		}
+		return disabled;
+	}
 
     /** Walk each NFA configuration in this DFA state looking for a conflict
      *  where (s|i|ctx) and (s|j|ctx) exist, indicating that state s with

@@ -263,8 +263,11 @@ public class DFA {
             d.setAcceptStateReachable(REACHABLE_YES);
         }
         else {
+			if ( d.getNumberOfTransitions()==0 ) {
+				probe.reportDanglingState(d);
+			}
             d.setAcceptStateReachable(REACHABLE_NO);
-            reduced = false;
+			reduced = false;
         }
         return anEdgeReachesAcceptState;
     }

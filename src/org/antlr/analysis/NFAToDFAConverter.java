@@ -800,9 +800,9 @@ public class NFAToDFAConverter {
 
 		boolean resolved =
 			tryToResolveWithSemanticPredicates(d, nondeterministicAlts);
-		dfa.probe.reportNondeterminismResolvedWithSemanticPredicate(d,resolved);
 		if ( resolved ) {
 			d.resolvedWithPredicates = true;
+			dfa.probe.reportNondeterminismResolvedWithSemanticPredicate(d);
 			return;
 		}
 

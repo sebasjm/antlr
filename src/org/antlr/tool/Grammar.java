@@ -435,6 +435,12 @@ public class Grammar {
 							   re);
 		}
 		//System.out.println("NFA has "+factory.getNumberOfStates()+" states");
+		try {
+			new DOTGenerator(this).writeDOTFilesForAllRuleNFAs();
+		}
+		catch (IOException ioe) {
+			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE);
+		}
 	}
 
 	/** For each decision in this grammar, compute a single DFA using the
@@ -461,11 +467,10 @@ public class Grammar {
                 DFA lookaheadDFA = new DFA(decisionStartState);
                 long stop = System.currentTimeMillis();
 				setLookaheadDFA(decision, lookaheadDFA);
-				lookaheadDFA.verify();
 				System.out.println("DFA (d="+lookaheadDFA.getDecisionNumber()+") cost: "+lookaheadDFA.getNumberOfStates()+
 								   " states, "+(int)(stop-start)+" ms; descr="+decisionStartState.getDescription());
 				// TURN OFF DOT GEN FOR NOW
-				if ( false ) {
+				if ( true ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.getGrammar());
 					String dot = dotGenerator.getDOT( lookaheadDFA.getStartState() );
 					String dotFileName = "/tmp/dec-"+decision;
