@@ -127,6 +127,12 @@ public class Grammar {
     /** Map a token type to its token name.  Must subtract MIN_TOKEN_TYPE from index. */
     protected Vector typeToTokenList = new Vector();
 
+	/** For interpreting and testing, you sometimes want to import token
+	 *  definitions from another grammar (instead of reading token defs from
+	 *  a file).
+	 */
+	protected Grammar importTokenVocabularyFromGrammar;
+
     /** Be able to assign a number to every decision in grammar;
      *  decisions in 1..n
      */
@@ -371,27 +377,6 @@ public class Grammar {
         tokenNameToTypeMap.put("<EOF>", new Integer(Label.EOF));
     }
 
-	/** Pull your token definitions from an existing grammar in memory.
-	 *  You must use Grammar() ctor then this method then setGrammarContent()
-	 *  to make this work.  This is useful primarily for testing and
-	 *  interpreting grammars.
-	 */
-	public void importTokenVocabulary(Grammar g) {
-		Set importedTokenNames = g.getTokenNames();
-		int maxTokenType = 0;
-		for (Iterator it = importedTokenNames.iterator(); it.hasNext();) {
-			String tokenName = (String) it.next();
-			int tokenType = g.getTokenType(tokenName);
-			maxTokenType = Math.max(maxTokenType,tokenType);
-			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
-				defineToken(tokenName, tokenType);
-			}
-		}
-		if ( maxTokenType>0 ) {
-			this.maxTokenType = maxTokenType+1; // next type is defined above imported
-		}
-	}
-
     /** Walk the list of options, altering this Grammar object according
      *  to any I recognize.
     protected void processOptions() {
@@ -479,7 +464,7 @@ public class Grammar {
      *  operation to set up tokens with specific values.
      */
     public void defineToken(String text, int tokenType) {
-        System.out.println("defining token "+text+" at type="+tokenType);
+        //System.out.println("defining token "+text+" at type="+tokenType);
         int index = Label.NUM_FAUX_LABELS+(tokenType)-Label.MIN_TOKEN_TYPE;
         if ( text.charAt(0)=='"' ) {
             stringLiteralToTypeMap.put(text, new Integer(tokenType));
@@ -652,7 +637,15 @@ public class Grammar {
 		return IntervalSet.of(Label.MIN_TOKEN_TYPE, getMaxTokenType());
 	}
 
-    public String getTokenName(int ttype) {
+	public void importTokenVocabulary(Grammar g) {
+		importTokenVocabularyFromGrammar = g;
+	}
+
+    public Grammar getGrammarWithTokenVocabularyToImport() {
+		return importTokenVocabularyFromGrammar;
+	}
+
+	public String getTokenName(int ttype) {
 		// inside char range and lexer grammar?
 		if ( this.type==LEXER && ttype >= Label.MIN_LABEL_VALUE && ttype <= '\uFFFF' ) {
 			return getUnicodeEscapeString(ttype);

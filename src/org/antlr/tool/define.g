@@ -130,11 +130,11 @@ rules
 
 rule
 {
-String modifier=null;
+String mod=null;
 String name=null;
 Map opts=null;
 }
-    :   #( RULE id:ID (modifier)? (opts=optionsSpec)? b:block EOR )
+    :   #( RULE id:ID (mod=modifier)? (opts=optionsSpec)? b:block EOR )
 		{
 		name = #id.getText();
 		if ( Character.isUpperCase(name.charAt(0)) &&
@@ -149,12 +149,15 @@ Map opts=null;
 			grammar.defineLexerRuleFoundInParser(name, ruleText);
 		}
 		else {
-			grammar.defineRule(#id.getToken(), modifier, opts, #rule);
+			grammar.defineRule(#id.getToken(), mod, opts, #rule);
 		}
 		}
     ;
 
-modifier
+modifier returns [String mod]
+{
+mod = #modifier.getText();
+}
 	:	"protected"
 	|	"public"
 	|	"private"

@@ -125,7 +125,7 @@ public class Interpreter implements TokenSource {
 			return;
 		}
 		CharStream input = (CharStream)this.input;
-		System.out.println("scan("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
+		//System.out.println("scan("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
 			if ( grammar.getType()==Grammar.LEXER ) {
@@ -154,7 +154,7 @@ public class Interpreter implements TokenSource {
 	public void parse(String startRule, InterpreterActions actions)
 		throws RecognitionException
 	{
-		System.out.println("parse("+startRule+")");
+		//System.out.println("parse("+startRule+")");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
 			if ( grammar.getType()==Grammar.LEXER ) {
@@ -345,7 +345,7 @@ public class Interpreter implements TokenSource {
 
 	/** Exec an action limited to assignments like ( ${ ( = channel 99 ; ) ) */
 	public void executeLexerAction(Token token, GrammarAST code) {
-		System.out.println("action "+code.toString());
+		System.out.println("action "+code.toStringTree());
 		ActionInterpreter interp = new ActionInterpreter();
 		try {
 			interp.lexer_action(code,token);

@@ -227,7 +227,6 @@ protected void assignTypes() {
 		Set s = stringLiterals.keySet();
 		for (Iterator it = s.iterator(); it.hasNext();) {
 			String lit = (String) it.next();
-			System.out.println("lit="+lit);
 			Integer oldTypeI = (Integer)stringLiterals.get(lit);
 			int oldType = oldTypeI.intValue();
 			if ( oldType<Label.MIN_TOKEN_TYPE ) {
@@ -306,6 +305,28 @@ protected void assignTypes() {
 		}
 	}
 
+	/** Pull your token definitions from an existing grammar in memory.
+	 *  You must use Grammar() ctor then this method then setGrammarContent()
+	 *  to make this work.  This is useful primarily for testing and
+	 *  interpreting grammars.
+	 */
+	protected void importTokenVocabulary(Grammar g) {
+		int maxTokenType=0;
+		Set importedTokenNames = g.getTokenNames();
+		for (Iterator it = importedTokenNames.iterator(); it.hasNext();) {
+			String tokenName = (String) it.next();
+			int tokenType = g.getTokenType(tokenName);
+			maxTokenType = Math.max(maxTokenType,tokenType);
+			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
+				//System.out.println("import token from grammar "+tokenName+"="+tokenType);
+				defineToken(tokenName, tokenType);
+			}
+		}
+		if ( maxTokenType>0 ) {
+			this.tokenType = maxTokenType+1; // next type is defined above imported
+		}
+	}
+
 	protected void importTokenVocab(String vocabName) {
 		int maxTokenType = -1;
 		try {
@@ -337,7 +358,7 @@ protected void assignTypes() {
 				}
 				String tokenTypeS=tokenizer.nextToken();
 				int tokenType = Integer.parseInt(tokenTypeS);
-				System.out.println("import "+tokenName+"="+tokenType);
+				// System.out.println("import "+tokenName+"="+tokenType);
 				maxTokenType = Math.max(maxTokenType,tokenType);
 				defineToken(tokenName, tokenType);
 				line = br.readLine();
@@ -364,10 +385,20 @@ protected void assignTypes() {
 			this.tokenType = maxTokenType+1; // next type is defined above imported
 		}
 	}
+
+	protected void init(Grammar g) {
+		this.grammar = g;
+		Grammar importG = grammar.getGrammarWithTokenVocabularyToImport();
+		if ( importG!=null ) {
+			importTokenVocabulary(importG);
+		}
+	}
 }
 
 grammar[Grammar g]
-{this.grammar = g;}
+{
+	init(g);
+}
     :   (headerSpec)*
 	    ( #( LEXER_GRAMMAR 	  {grammar.setType(Grammar.LEXER);} 	  grammarSpec )
 	    | #( PARSER_GRAMMAR   {grammar.setType(Grammar.PARSER);}      grammarSpec )
