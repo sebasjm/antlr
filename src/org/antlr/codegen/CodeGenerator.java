@@ -520,7 +520,8 @@ public class CodeGenerator {
             }
         }
 
-        if ( grammar.getType()==Grammar.LEXER ) {
+        /*
+		if ( grammar.getType()==Grammar.LEXER ) {
             // make a literals hash table or whatever target requires for literals
             Iterator stringLiterals = grammar.getStringLiterals().iterator();
             while (stringLiterals.hasNext()) {
@@ -529,15 +530,13 @@ public class CodeGenerator {
                 code.setAttribute("literals.{name,type}", literal, new Integer(tokenType));
             }
         }
+		*/
     }
 
-    /** Generate a token vocab file with all the token names, string/char
-     *  literals.  For example:
-     *  "long"=80040
-     *  D=77777
-     *  ';'=22
+    /** Generate a token vocab file with all the token names/types.  For example:
+     *  ID=7
+	 *  FOR=8
 	 *  This is independent of the target language; used by antlr internally
-	 *  TODO: strings/toketypelabel should be on same line
      */
     public StringTemplate genTokenVocabOutput() {
         StringTemplate vocabFileST =
@@ -553,13 +552,15 @@ public class CodeGenerator {
             }
         }
 
-        // make a literals hash table or whatever target requires for literals
+        /*
+		// make a literals hash table or whatever target requires for literals
         Iterator stringLiterals = grammar.getStringLiterals().iterator();
         while (stringLiterals.hasNext()) {
             String literal = (String) stringLiterals.next();
             int tokenType = grammar.getTokenType(literal);
             vocabFileST.setAttribute("literals.{name,type}", literal, new Integer(tokenType));
         }
+		*/
         return vocabFileST;
     }
 

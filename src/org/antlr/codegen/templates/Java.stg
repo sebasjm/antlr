@@ -20,7 +20,7 @@ headerFile(name, tokens, rules, cyclicDFAs) ::= <<
 <rules:{extern void <it.name>(<it.args>);<\n>}>
 >>
 
-lexer(name, tokens, literals, rules, cyclicDFAs) ::= <<
+lexer(name, tokens, rules, cyclicDFAs) ::= <<
 class <name> extends Lexer {
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
     public <name>(CharStream input) {
@@ -154,13 +154,11 @@ charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 matchSet(s) ::= <<
 if ( !(<s>) ) System.err.println("set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
-text.append((char)input.LA(1));
 input.consume();
 >>
 
 matchNotSet(s) ::= <<
 if ( <s> ) System.err.println("~set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
-text.append((char)input.LA(1));
 input.consume();
 >>
 

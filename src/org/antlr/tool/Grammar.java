@@ -378,7 +378,7 @@ public class Grammar {
 				if ( line.length()==0 ){
 					continue; // ignore blank lines
 				}
-				StringTokenizer tokenizer = new StringTokenizer(line);
+				StringTokenizer tokenizer = new StringTokenizer(line, "=", true);
 				if ( !tokenizer.hasMoreTokens() ) {
 					System.err.println("error line "+n+" reading vocab file "+vocabName+".tokens: "+
 									   "missing token name");
@@ -398,6 +398,8 @@ public class Grammar {
 				//System.out.println("import "+tokenName+"="+tokenType);
 				maxTokenType = Math.max(maxTokenType,tokenType);
 				defineToken(tokenName, tokenType);
+				line = br.readLine();
+				n++;
 			}
 			br.close();
 			fr.close();
