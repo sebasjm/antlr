@@ -30,6 +30,9 @@ package org.antlr.runtime;
 import org.antlr.misc.IntSet;
 
 public class MismatchedNotSetException extends MismatchedSetException {
+	public MismatchedNotSetException() {
+	}
+
 	public MismatchedNotSetException(IntSet expecting, IntStream input) {
 		super(expecting, input);
 	}

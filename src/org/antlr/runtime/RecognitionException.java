@@ -62,6 +62,9 @@ public class RecognitionException extends Exception {
 	/** What token/char were we looking at when the error occurred? */
 	public int index;
 
+	public RecognitionException() {
+	}
+
 	public RecognitionException(IntStream input) {
 		this.index = input.index();
 	}

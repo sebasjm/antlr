@@ -64,11 +64,13 @@ public class CommonTokenStream implements TokenStream {
 
 	public CommonTokenStream(TokenSource tokenSource) {
 		this.tokenSource = tokenSource;
+		fillBuffer();
 	}
 
 	public CommonTokenStream(TokenSource tokenSource, int channel) {
 		this.tokenSource = tokenSource;
 		this.channel = channel;
+		fillBuffer();
 	}
 
 	/** Load all tokens from the token source and put in tokens.
@@ -169,9 +171,11 @@ public class CommonTokenStream implements TokenStream {
 	 *  first symbol of lookahead.
 	 */
 	public Token LT(int k) {
+		/*
 		if ( tokens==null ) {
 			fillBuffer();
 		}
+		*/
 		if ( k==0 ) {
 			return null;
 		}
@@ -196,9 +200,11 @@ public class CommonTokenStream implements TokenStream {
 
 	/** Look backwards k tokens on-channel tokens */
 	protected Token LB(int k) {
+		/*
 		if ( tokens==null ) {
 			fillBuffer();
 		}
+		*/
 		if ( k==0 ) {
 			return null;
 		}
@@ -284,9 +290,11 @@ public class CommonTokenStream implements TokenStream {
 	}
 
 	public String toString() {
+		/*
 		if ( tokens==null ) {
 			fillBuffer();
 		}
+		*/
  		StringBuffer buf = new StringBuffer();
 		for (int i = 0; tokens!=null && i < tokens.size(); i++) {
 			Token t = (Token)tokens.get(i);

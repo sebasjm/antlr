@@ -32,7 +32,7 @@ import org.antlr.runtime.*;
 public class DebugTokenStream implements TokenStream {
 	protected DebugEventListener dbg;
 	protected TokenStream input;
-	protected boolean firstConsume = true;
+	protected boolean initialStreamState = true;
 
 	public DebugTokenStream(TokenStream input, DebugEventListener dbg) {
 		this.input = input;
@@ -44,13 +44,8 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public void consume() {
-		if ( firstConsume ) {
-			// consume all initial off channel tokens
-			int firstOnChannelTokenIndex = input.index();
-			for (int i=0; i<firstOnChannelTokenIndex; i++) {
-				dbg.consumeHiddenToken(input.get(i));
-			}
-			firstConsume = false;
+		if ( initialStreamState ) {
+			consumeInitialHiddenTokens();
 		}
 		int a = input.index();
 		Token t = input.LT(1);
@@ -65,7 +60,28 @@ public class DebugTokenStream implements TokenStream {
 		}
 	}
 
+	/* consume all initial off-channel tokens */
+	protected void consumeInitialHiddenTokens() {
+		System.out.println("consumeInitialHiddenTokens @"+input.index());
+		int firstOnChannelTokenIndex = input.index();
+		for (int i=0; i<firstOnChannelTokenIndex; i++) {
+			dbg.consumeHiddenToken(input.get(i));
+		}
+		initialStreamState = false;
+	}
+
+	public Token LT(int i) {
+		if ( initialStreamState ) {
+			consumeInitialHiddenTokens();
+		}
+		dbg.LT(i, input.LT(i));
+		return input.LT(i);
+	}
+
 	public int LA(int i) {
+		if ( initialStreamState ) {
+			consumeInitialHiddenTokens();
+		}
 		dbg.LT(i, input.LT(i));
 		return input.LA(i);
 	}
@@ -91,11 +107,6 @@ public class DebugTokenStream implements TokenStream {
 
 	public int size() {
 		return input.size();
-	}
-
-	public Token LT(int i) {
-		dbg.LT(i, input.LT(i));
-		return input.LT(i);
 	}
 
 	public TokenSource getTokenSource() {

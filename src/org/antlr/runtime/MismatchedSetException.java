@@ -33,6 +33,9 @@ public class MismatchedSetException extends RecognitionException {
 	public IntSet expecting;
 	public int found;
 
+	public MismatchedSetException() {
+	}
+
 	public MismatchedSetException(IntSet expecting, IntStream input) {
 		super(input);
 		this.expecting = expecting;

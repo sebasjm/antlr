@@ -33,6 +33,9 @@ public class NoViableAltException extends RecognitionException {
 	public int stateNumber;
 	public int found;
 
+	public NoViableAltException() {
+	}
+
 	public NoViableAltException(String grammarDecisionDescription,
 								int decisionNumber,
 								int stateNumber,

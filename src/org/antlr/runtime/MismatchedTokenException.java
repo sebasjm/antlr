@@ -32,6 +32,9 @@ public class MismatchedTokenException extends RecognitionException {
 	/** Track the mismatched token in case stream is not buffered */
 	public int found;
 
+	public MismatchedTokenException() {
+	}
+
 	public MismatchedTokenException(int expecting, IntStream input) {
 		super(input);
 		this.expecting = expecting;

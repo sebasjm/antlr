@@ -216,12 +216,15 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			}
 			catch (ClassNotFoundException cnfe) {
 				System.err.println("can't find class "+cnfe);
+				cnfe.printStackTrace(System.err);
 			}
 			catch (InstantiationException ie) {
 				System.err.println("can't instantiate class "+ie);
+				ie.printStackTrace(System.err);
 			}
-			catch (IllegalAccessException ie) {
-				System.err.println("can't access class "+ie);				
+			catch (IllegalAccessException iae) {
+				System.err.println("can't access class "+iae);
+				iae.printStackTrace(System.err);
 			}
 		}
 		else if ( elements[0].equals("recovered") ) {
