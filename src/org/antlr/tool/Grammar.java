@@ -1220,6 +1220,66 @@ if ( sl.member(Label.EOF) ) {
 		return tset;
 	}
 
+	/** an experimental method to generate random phrases for a given
+	 *  grammar given a start rule.
+	 */
+	protected void randomPhrase(String startRule) {
+		NFAState state = getRuleStartState(startRule);
+		NFAState stopState = getRuleStopState(startRule);
+
+		// Build NFAs from the grammar AST
+		createNFAs();
+
+		// Create the DFA predictors for each decision
+		createLookaheadDFAs();
+
+		Stack ruleInvocationStack = new Stack();
+		while ( true ) {
+			if ( state==stopState && ruleInvocationStack.size()==0 ) {
+				break;
+			}
+			// System.out.println("state "+state);
+			if ( state.getNumberOfTransitions()==0 ) {
+				//System.out.println("dangling state: "+state);
+				return;
+			}
+			// end of rule node
+			if ( state.isAcceptState() ) {
+				NFAState invokingState = (NFAState)ruleInvocationStack.pop();
+				//System.out.println("pop invoking state "+invokingState);
+				RuleClosureTransition invokingTransition =
+					(RuleClosureTransition)invokingState.transition(0);
+				// move to node after state that invoked this rule
+				state = invokingTransition.getFollowState();
+				continue;
+			}
+			if ( state.getNumberOfTransitions()==1 ) {
+				// no branching, just take this path
+				Transition t0 = state.transition(0);
+				if ( t0 instanceof RuleClosureTransition ) {
+					ruleInvocationStack.push(state);
+					// System.out.println("push state "+state);
+				}
+				else if ( !t0.label.isEpsilon() ) {
+					System.out.println(t0.label.toString(this));
+				}
+				state = (NFAState)t0.target;
+				continue;
+			}
+			// 2 possible paths, choose randomly; <=0.5 choose path 0, else path 1
+			double r = Math.random();
+			System.out.println("r = "+(r*100));
+			Transition t = state.transition(0);
+			if ( r>0.5 ) {
+				t = state.transition(1);
+			}
+			if ( !t.label.isEpsilon() ) {
+				System.out.println(t.label.toString(this));
+			}
+			state = (NFAState)t.target;
+		}
+	}
+
     public void setCodeGenerator(CodeGenerator generator) {
         this.generator = generator;
     }

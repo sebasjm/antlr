@@ -53,7 +53,6 @@ public class Tool {
 
     protected String grammarFileName;
     protected String outputDir = ".";
-	protected String genphrase = null;
 	protected boolean debug = false;
 
     public static void main(String[] args) {
@@ -90,15 +89,6 @@ public class Tool {
 			}
 			else if (args[i].equals("-verbose")) {
 				DecisionProbe.verbose=true;
-			}
-			else if (args[i].equals("-genphrase")) {
-				if (i + 1 >= args.length) {
-					System.err.println("missing arg on genphrase");
-				}
-				else {
-					i++;
-					genphrase=args[i];
-				}
 			}
 			else if (args[i].equals("-nfa")) {
 				GENERATE_NFA_DOT=true;
@@ -175,23 +165,7 @@ public class Tool {
 				grammar.addArtificialMatchTokensRule();
 			}
 
-			if ( genphrase!=null ) {
-				// Build NFAs from the grammar AST
-				grammar.createNFAs();
-
-				// Create the DFA predictors for each decision
-				grammar.createLookaheadDFAs();
-
-				String firstRule = genphrase;
-				randomPhrase(
-					grammar,
-					grammar.getRuleStartState(firstRule),
-					grammar.getRuleStopState(firstRule)
-					);
-			}
-			else {
-				generator.genRecognizer();
-			}
+			generator.genRecognizer();
 		}
 	}
 
@@ -216,58 +190,6 @@ public class Tool {
 
 	public String getOutputDirectory() {
 		return outputDir;
-	}
-
-	/** an experimental method to generate phrases from an NFA state */
-	protected static void randomPhrase(Grammar g,
-									   NFAState state,
-									   NFAState stopState)
-	{
-		Stack ruleInvocationStack = new Stack();
-		while ( true ) {
-			if ( state==stopState && ruleInvocationStack.size()==0 ) {
-				break;
-			}
-			// System.out.println("state "+state);
-			if ( state.getNumberOfTransitions()==0 ) {
-				System.out.println("dangling state: "+state);
-				return;
-			}
-			// end of rule node
-			if ( state.isAcceptState() ) {
-				NFAState invokingState = (NFAState)ruleInvocationStack.pop();
-				//System.out.println("pop invoking state "+invokingState);
-				RuleClosureTransition invokingTransition =
-					(RuleClosureTransition)invokingState.transition(0);
-				// move to node after state that invoked this rule
-				state = invokingTransition.getFollowState();
-				continue;
-			}
-			if ( state.getNumberOfTransitions()==1 ) {
-				// no branching, just take this path
-				Transition t0 = state.transition(0);
-				if ( t0 instanceof RuleClosureTransition ) {
-					ruleInvocationStack.push(state);
-					// System.out.println("push state "+state);
-				}
-				else if ( !t0.label.isEpsilon() ) {
-					System.out.println(t0.label.toString(g));
-				}
-				state = (NFAState)t0.target;
-				continue;
-			}
-			// 2 possible paths, choose randomly; <=0.5 choose path 0, else path 1
-			double r = Math.random();
-			System.out.println("r = "+(r*100));
-			Transition t = state.transition(0);
-			if ( r>0.5 ) {
-				t = state.transition(1);
-			}
-			if ( !t.label.isEpsilon() ) {
-				System.out.println(t.label.toString(g));
-			}
-			state = (NFAState)t.target;
-		}
 	}
 
 }
