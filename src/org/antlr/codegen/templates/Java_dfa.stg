@@ -1,0 +1,80 @@
+group Java_dfa;
+
+dfaDecision(decisionNumber,description) ::=
+  "alt<decisionNumber> = DFA.DFA<decisionNumber>(input);"
+
+allCyclicDFAs(DFAs) ::= <<
+<DFAs>
+>>
+
+cyclicDFA(decision,states,description) ::= <<
+.method DFA<decision> (LIntegerStream;)I
+    aload 0
+    iconst 1
+    invokeinterface IntegerStream.LA 2
+    istore 1
+    goto s0
+<states>
+>>
+
+cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
+s<stateNumber>:
+<edges>
+    <if(needErrorClause)>
+    goto errorState
+    return 0;
+    <endif>
+>>
+
+cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
+s<stateNumber>:
+    iconst <predictAlt>
+    ireturn
+>>
+
+cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber) ::= <<
+edge<stateNumber>_<edgeNumber>:
+<labelExpr>
+    aload 0
+    invokeinterface IntegerStream.consume() 1
+    goto s<targetStateNumber>
+skip<stateNumber>_<edgeNumber>:
+>>
+
+eotDFAEdge(targetStateNumber) ::= <<
+    goto s<targetStateNumber>
+>>
+
+// D F A  E X P R E S S I O N S
+
+andPredicates(left,right) ::= "(<left>&&<right>)"
+
+orPredicates(left,right) ::= "(<left>||<right>)"
+
+notPredicate(pred) ::= "!(<pred>)"
+
+lookaheadTest(atom,k,atomAsInt) ::= <<
+    iload 1
+    iconst <atomAsInt>
+    if_icmpne skip<stateNumber>_<edgeNumber>
+>>
+
+lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
+range<stateNumber>_<rangeNumber>:
+;	(i>=<lowerAsInt> && i\<=<upperAsInt>)
+    iload 1
+    iconst <lowerAsInt>
+    if_icmplt false<stateNumber>_<rangeNumber>
+    iload 1
+    iconst <upperAsInt>
+    if_icmpgt false<stateNumber>_<rangeNumber>
+    iconst 1
+    goto endRange<stateNumber>_<rangeNumber>:
+false<stateNumber>_<rangeNumber>:
+    iconst 0
+endRange<stateNumber>_<rangeNumber>:
+	iconst 0
+    if_icmp skip<stateNumber>_<edgeNumber>
+>>
+
+setTest(ranges) ::= "<ranges; separator=\"||\">"
