@@ -4,7 +4,6 @@ import org.antlr.runtime.*;
 import org.antlr.runtime.tree.ParseTree;
 import org.antlr.analysis.*;
 import org.antlr.analysis.DFA;
-import antlr.RecognitionException;
 
 import java.util.Stack;
 
@@ -19,7 +18,12 @@ public class Interpreter implements TokenSource {
 	protected Grammar grammar;
 	protected IntStream input;
 
-	class LexerActionGetTokenType implements ANTLRRecognizerListener {
+	/** A lexer listener that just creates token objects as they
+	 *  are matched.  scan() use this listener to get a single object.
+	 *  To get a stream of tokens, you must call scan() multiple times,
+	 *  recording the token object result after each call.
+	 */
+	class LexerActionGetTokenType implements ANTLRDebugInterface {
 		public CommonToken token;
 		Grammar g;
 		public LexerActionGetTokenType(Grammar g) {
@@ -30,21 +34,19 @@ public class Interpreter implements TokenSource {
 				int type = g.getTokenType(ruleName);
 				int channel = Token.DEFAULT_CHANNEL;
 				token = new CommonToken(type,channel,0,0);
-				/*
-				GrammarAST t = g.getLexerRuleAction(ruleName);
-				if ( t!=null ) {
-					executeLexerAction(token, t);
-				}
-				*/
 			}
 		}
 		public void enterRule(String ruleName) {}
 		public void matchElement(int type) {}
-		public void mismatchedElement(String msg) {}
-		public void noViableAlt(String msg) {}
+		public void mismatchedElement(MismatchedTokenException e) {}
+		public void mismatchedSet(MismatchedSetException e) {}
+		public void noViableAlt(NoViableAltException e) {}
 	}
 
-	static class BuildParseTree implements ANTLRRecognizerListener {
+	/** This parser listener tracks rule entry/exit and token matches
+	 *  to build a simple parse tree using the standard ANTLR Tree interface
+	 */
+	static class BuildParseTree implements ANTLRDebugInterface {
 		Grammar g;
 		Stack callStack = new Stack();
 		public BuildParseTree(Grammar g) {
@@ -69,8 +71,21 @@ public class Interpreter implements TokenSource {
 			ParseTree elementNode = new ParseTree(g.getTokenName(type));
 			ruleNode.addChild(elementNode);
 		}
-		public void mismatchedElement(String msg) {}
-		public void noViableAlt(String msg) {}
+		public void mismatchedElement(MismatchedTokenException e) {
+			ParseTree ruleNode = (ParseTree)callStack.peek();
+			ParseTree errorNode = new ParseTree(e);
+			ruleNode.addChild(errorNode);
+		}
+		public void mismatchedSet(MismatchedSetException e) {
+			ParseTree ruleNode = (ParseTree)callStack.peek();
+			ParseTree errorNode = new ParseTree(e);
+			ruleNode.addChild(errorNode);
+		}
+		public void noViableAlt(NoViableAltException e) {
+			ParseTree ruleNode = (ParseTree)callStack.peek();
+			ParseTree errorNode = new ParseTree(e);
+			ruleNode.addChild(errorNode);
+		}
 	}
 
 	public Interpreter(Grammar grammar, IntStream input) {
@@ -100,7 +115,7 @@ public class Interpreter implements TokenSource {
 				continue loop;
 			}
 		}
-		// the scan can only set type and channel (if a ${...} action found)
+		// the scan can only set type
 		// we must set the line, and other junk here to make it a complete token
 		int stop = input.index()-1;
 		token.setLine(((CharStream)input).getLine());
@@ -124,7 +139,7 @@ public class Interpreter implements TokenSource {
 	 *
 	 *  Return the token type associated with the final rule end state.
 	 */
-	public void scan(String startRule, ANTLRRecognizerListener actions)
+	public void scan(String startRule, ANTLRDebugInterface actions)
 		throws RecognitionException
 	{
 		if ( grammar.type!=Grammar.LEXER ) {
@@ -157,7 +172,7 @@ public class Interpreter implements TokenSource {
 		return actions.token;
 	}
 
-	public void parse(String startRule, ANTLRRecognizerListener actions)
+	public void parse(String startRule, ANTLRDebugInterface actions)
 		throws RecognitionException
 	{
 		//System.out.println("parse("+startRule+")");
@@ -181,7 +196,14 @@ public class Interpreter implements TokenSource {
 		throws RecognitionException
 	{
 		BuildParseTree actions = new BuildParseTree(grammar);
-		parse(startRule, actions);
+		try {
+			parse(startRule, actions);
+		}
+		catch (RecognitionException re) {
+			// Errors are tracked via the ANTLRDebugInterface
+			// Exceptions are used just to blast out of the parse engine
+			// The error will be in the parse tree.
+		}
 		return actions.getTree();
 	}
 
@@ -190,7 +212,7 @@ public class Interpreter implements TokenSource {
 							   NFAState stop,
 							   IntStream input,
 							   Stack ruleInvocationStack,
-							   ANTLRRecognizerListener actions)
+							   ANTLRDebugInterface actions)
 		throws RecognitionException
 	{
 		if ( actions!=null ) {
@@ -207,13 +229,17 @@ public class Interpreter implements TokenSource {
 				int m = input.mark();
 				int predictedAlt = predict(dfa);
 				if ( predictedAlt == NFA.INVALID_ALT_NUMBER ) {
-					int position = input.index();
+					String description = dfa.getNFADecisionStartState().getDescription();
+					NoViableAltException nvae =
+						new NoViableAltException(description,
+												 dfa.getDecisionNumber(),
+												 s.stateNumber,
+												 input.LA(1),
+												 input.index());
 					if ( actions!=null ) {
-						actions.noViableAlt("parsing error: no viable alternative at position="+position+
-										" input symbol: "+grammar.getTokenName(t));
+						actions.noViableAlt(nvae);
 					}
-					throw new RecognitionException("parsing error: no viable alternative at position="+position+
-										" input symbol: "+grammar.getTokenName(t));
+					throw nvae;
 				}
 				input.rewind(m);
 				if ( s.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
@@ -285,13 +311,27 @@ public class Interpreter implements TokenSource {
 
 			// CASE 5: error condition; label is inconsistent with input
 			else {
-				int position = input.index();
-				if ( actions!=null ) {
-					actions.mismatchedElement("parsing error at position="+position+
-					" input symbol: "+grammar.getTokenName(t));
+				if ( label.isAtom() ) {
+					MismatchedTokenException mte =
+						new MismatchedTokenException(label.getAtom(), input.LA(1), input.index());
+					if ( actions!=null ) {
+						actions.mismatchedElement(mte);
+					}
+					throw mte;
 				}
-				throw new RecognitionException("parsing error at position="+position+
-					" input symbol: "+grammar.getTokenName(t));
+				else if ( label.isSet() ) {
+					MismatchedSetException mse =
+						new MismatchedSetException(label.getSet(),
+												   input.LA(1),
+												   input.index());
+					if ( actions!=null ) {
+						actions.mismatchedSet(mse);
+					}
+					throw mse;
+				}
+				else {
+					throw new RecognitionException(); // unknown error
+				}
 			}
 		}
 		//System.out.println("hit stop state for "+stop.getEnclosingRule());
@@ -335,9 +375,11 @@ public class Interpreter implements TokenSource {
 				s = (DFAState)eotTransition.target;
 				continue dfaLoop;
 			}
+			/*
 			ErrorManager.error(ErrorManager.MSG_NO_VIABLE_DFA_ALT,
 							   s,
 							   dfa.nfa.grammar.getTokenName(c));
+			*/
 			return NFA.INVALID_ALT_NUMBER;
 		}
 		// woohoo!  We know which alt to predict

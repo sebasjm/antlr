@@ -29,8 +29,16 @@ package org.antlr.runtime;
 
 public class MismatchedTokenException extends RecognitionException {
 	public int expecting;
+	public int found;
+	public int index;
 
-	public MismatchedTokenException(int expecting) {
+	public MismatchedTokenException(int expecting, int found, int index) {
 		this.expecting = expecting;
+		this.found = found;
+		this.index = index;
+	}
+
+	public String toString() {
+		return "MismatchedTokenException("+found+"!="+expecting+")";
 	}
 }

@@ -35,33 +35,6 @@ import org.antlr.runtime.tree.ParseTree;
 
 public class TestInterpretedParsing extends TestSuite {
 
-	static class DebugActions implements ANTLRRecognizerListener {
-		Grammar g;
-		public DebugActions(Grammar g) {
-			this.g = g;
-		}
-		public void enterRule(String ruleName) {
-			System.out.println("enterRule("+ruleName+")");
-		}
-
-		public void exitRule(String ruleName) {
-			System.out.println("exitRule("+ruleName+")");
-		}
-
-		public void matchElement(int type) {
-			System.out.println("matchElement("+g.getTokenName(type)+")");
-		}
-
-		public void mismatchedElement(String msg) {
-			System.out.println("mismatchedElement("+msg+")");
-		}
-
-		public void noViableAlt(String msg) {
-			System.out.println("noViableAlt("+msg+")");
-		}
-	}
-
-
     /** Public default constructor used by TestRig */
     public TestInterpretedParsing() {
     }
@@ -97,6 +70,108 @@ public class TestInterpretedParsing extends TestSuite {
 		String result = t.toString();
 		String expecting =
 			"(<grammar p> (prog WHILE ID LCURLY (assign ID ASSIGN (expr INT) SEMI) (assign ID ASSIGN (expr FLOAT) SEMI) (assign ID ASSIGN (expr ID) SEMI) RCURLY))";
+		assertEqual(result, expecting);
+	}
+
+	public void testMismatchedTokenError() throws Exception {
+		Grammar pg = new Grammar(
+			"parser grammar p;\n"+
+			"prog : WHILE ID LCURLY (assign)* RCURLY;\n" +
+			"assign : ID ASSIGN expr SEMI ;\n" +
+			"expr : INT | FLOAT | ID ;\n");
+		Grammar g = new Grammar();
+		g.importTokenVocabulary(pg);
+		g.setGrammarContent(
+			"lexer grammar t;\n"+
+			"WHILE : \"while\";\n"+
+			"LCURLY : '{';\n"+
+			"RCURLY : '}';\n"+
+			"ASSIGN : '=';\n"+
+			"SEMI : ';';\n"+
+			"ID : ('a'..'z')+ ;\n"+
+			"INT : (DIGIT)+ ;\n"+
+			"FLOAT : (DIGIT)+ '.' (DIGIT)* ;\n"+
+			"fragment DIGIT : '0'..'9';\n" +
+			"WS : (' ')+ ;\n");
+		CharStream input = new ANTLRStringStream("while x { i=1 y=3.42; z=y; }");
+		Interpreter lexEngine = new Interpreter(g, input);
+
+		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		tokens.setTokenTypeChannel(g.getTokenType("WS"), 99);
+		//System.out.println("tokens="+tokens.toString());
+		Interpreter parseEngine = new Interpreter(pg, tokens);
+		ParseTree t = parseEngine.parse("prog");
+		String result = t.toString();
+		String expecting =
+			"(<grammar p> (prog WHILE ID LCURLY (assign ID ASSIGN (expr INT) MismatchedTokenException(3!=7))))";
+		assertEqual(result, expecting);
+	}
+
+	public void testMismatchedSetError() throws Exception {
+		Grammar pg = new Grammar(
+			"parser grammar p;\n"+
+			"prog : WHILE ID LCURLY (assign)* RCURLY;\n" +
+			"assign : ID ASSIGN expr SEMI ;\n" +
+			"expr : INT | FLOAT | ID ;\n");
+		Grammar g = new Grammar();
+		g.importTokenVocabulary(pg);
+		g.setGrammarContent(
+			"lexer grammar t;\n"+
+			"WHILE : \"while\";\n"+
+			"LCURLY : '{';\n"+
+			"RCURLY : '}';\n"+
+			"ASSIGN : '=';\n"+
+			"SEMI : ';';\n"+
+			"ID : ('a'..'z')+ ;\n"+
+			"INT : (DIGIT)+ ;\n"+
+			"FLOAT : (DIGIT)+ '.' (DIGIT)* ;\n"+
+			"fragment DIGIT : '0'..'9';\n" +
+			"WS : (' ')+ ;\n");
+		CharStream input = new ANTLRStringStream("while x { i=; y=3.42; z=y; }");
+		Interpreter lexEngine = new Interpreter(g, input);
+
+		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		tokens.setTokenTypeChannel(g.getTokenType("WS"), 99);
+		//System.out.println("tokens="+tokens.toString());
+		Interpreter parseEngine = new Interpreter(pg, tokens);
+		ParseTree t = parseEngine.parse("prog");
+		String result = t.toString();
+		String expecting =
+			"(<grammar p> (prog WHILE ID LCURLY (assign ID ASSIGN (expr MismatchedSetException(7!={3, 8..9})))))";
+		assertEqual(result, expecting);
+	}
+
+	public void testNoViableAltError() throws Exception {
+		Grammar pg = new Grammar(
+			"parser grammar p;\n"+
+			"prog : WHILE ID LCURLY (assign)* RCURLY;\n" +
+			"assign : ID ASSIGN expr SEMI ;\n" +
+			"expr : {;}INT | FLOAT | ID ;\n");
+		Grammar g = new Grammar();
+		g.importTokenVocabulary(pg);
+		g.setGrammarContent(
+			"lexer grammar t;\n"+
+			"WHILE : \"while\";\n"+
+			"LCURLY : '{';\n"+
+			"RCURLY : '}';\n"+
+			"ASSIGN : '=';\n"+
+			"SEMI : ';';\n"+
+			"ID : ('a'..'z')+ ;\n"+
+			"INT : (DIGIT)+ ;\n"+
+			"FLOAT : (DIGIT)+ '.' (DIGIT)* ;\n"+
+			"fragment DIGIT : '0'..'9';\n" +
+			"WS : (' ')+ ;\n");
+		CharStream input = new ANTLRStringStream("while x { i=; y=3.42; z=y; }");
+		Interpreter lexEngine = new Interpreter(g, input);
+
+		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		tokens.setTokenTypeChannel(g.getTokenType("WS"), 99);
+		//System.out.println("tokens="+tokens.toString());
+		Interpreter parseEngine = new Interpreter(pg, tokens);
+		ParseTree t = parseEngine.parse("prog");
+		String result = t.toString();
+		String expecting =
+			"(<grammar p> (prog WHILE ID LCURLY (assign ID ASSIGN (expr NoViableAltException(7!=[4:1: expr : ({;} INT | FLOAT | ID );])))))";
 		assertEqual(result, expecting);
 	}
 

@@ -75,7 +75,8 @@ public class Parser {
 			errorRecovery = false;
 			return;
 		}
-		MismatchedTokenException mte = new MismatchedTokenException(ttype);
+		MismatchedTokenException mte =
+			new MismatchedTokenException(ttype, input.LA(1), input.index());
 		recoverFromMismatchedToken(mte, ttype, follow);
 		errorRecovery = true;
 		return;
@@ -128,7 +129,7 @@ public class Parser {
 							   "; expecting set "+mse.expecting);
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
-			MismatchedSetException mse = (MismatchedSetException)e;
+			MismatchedNotSetException mse = (MismatchedNotSetException)e;
 			System.err.println("mismatched token: "+
 							   input.LT(1).toString(getCharStream())+
 							   "; expecting set "+mse.expecting);

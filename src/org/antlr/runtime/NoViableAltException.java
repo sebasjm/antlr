@@ -31,13 +31,23 @@ public class NoViableAltException extends RecognitionException {
 	public String grammarDecisionDescription;
 	public int decisionNumber;
 	public int stateNumber;
+	public int found;
+	public int index;
 
 	public NoViableAltException(String grammarDecisionDescription,
 								int decisionNumber,
-								int stateNumber)
+								int stateNumber,
+								int found,
+								int index)
 	{
 		this.grammarDecisionDescription = grammarDecisionDescription;
 		this.decisionNumber = decisionNumber;
 		this.stateNumber = stateNumber;
+		this.found = found;
+		this.index = index;
+	}
+
+	public String toString() {
+		return "NoViableAltException("+found+"!=["+grammarDecisionDescription+"])";
 	}
 }

@@ -110,7 +110,7 @@ public class ErrorManager {
 	public static final int MSG_CANNOT_COMPUTE_SAMPLE_INPUT_SEQ = 24;
 
 	// grammar interpretation errors
-	public static final int MSG_NO_VIABLE_DFA_ALT = 30;
+	//public static final int MSG_NO_VIABLE_DFA_ALT = 30;
 
 	// bytecode generation problems
 	public static final int MSG_BYTECODE_UNKNOWN_INSTR = 40;

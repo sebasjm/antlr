@@ -59,7 +59,7 @@ public abstract class Lexer implements TokenSource {
         int i = 0;
         while ( i<s.length() ) {
             if ( input.LA(1)!=s.charAt(i) ) {
-				throw new MismatchedTokenException(s.charAt(i));
+				throw new MismatchedTokenException(s.charAt(i), input.LA(1), input.index());
             }
             i++;
             input.consume();
@@ -72,7 +72,7 @@ public abstract class Lexer implements TokenSource {
 
     public void match(int c) throws MismatchedTokenException {
         if ( input.LA(1)!=c ) {
-			throw new MismatchedTokenException(c);
+			throw new MismatchedTokenException(c, input.LA(1), input.index());
         }
         input.consume();
     }

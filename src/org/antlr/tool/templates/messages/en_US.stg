@@ -37,8 +37,10 @@ CANNOT_COMPUTE_SAMPLE_INPUT_SEQ() ::=
 	"cannot generate a sample input sequence from lookahead DFA"
 
 // grammar interpretation errors
+/*
 NO_VIABLE_DFA_ALT(arg,arg2) ::=
 	"no viable transition from state <arg> on <arg2> while interpreting DFA"
+*/
 
 // bytecode problems
 BYTECODE_UNKNOWN_INSTR(arg) ::= "unknown instruction '<arg>'"

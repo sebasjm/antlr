@@ -27,11 +27,20 @@
 */
 package org.antlr.runtime;
 
-public class MismatchedSetException extends RecognitionException {
-	/** For now, a string of code used to match the set */
-	public String expecting;
+import org.antlr.misc.IntSet;
 
-	public MismatchedSetException(String expecting) {
+public class MismatchedSetException extends RecognitionException {
+	public IntSet expecting;
+	public int found;
+	public int index;
+
+	public MismatchedSetException(IntSet expecting, int found, int index) {
 		this.expecting = expecting;
+		this.found = found;
+		this.index = index;
+	}
+
+	public String toString() {
+		return "MismatchedSetException("+found+"!="+expecting+")";
 	}
 }

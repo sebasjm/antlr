@@ -258,13 +258,13 @@ charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 matchSet(s,label) ::= <<
 <if(label)><label>=input.LT(1);<endif>
 if ( <s> ) input.consume();
-else throw new MismatchedSetException("<s>");<\n>
+else throw new MismatchedSetException(null,input.LA(1), input.index());<\n>
 >>
 
 matchNotSet(s,label) ::= <<
 <if(label)><label>=input.LT(1);<endif>
 if ( !(<s>) ) input.consume();
-else throw new MismatchedNotSetException("");<\n>
+else throw new MismatchedNotSetException(null,input.LA(1), input.index());<\n>
 >>
 
 lexerStringRef(string) ::= "match(<string>);"
@@ -301,7 +301,7 @@ else {
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
-    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>);<\n>
+    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input.LA(1), input.index());<\n>
 <endif>
 }
 >>
@@ -336,7 +336,7 @@ default:
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
-    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>);<\n>
+    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input.LA(1), input.index());<\n>
 <endif>
 }<\n>
 >>

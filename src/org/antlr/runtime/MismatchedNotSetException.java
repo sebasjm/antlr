@@ -27,8 +27,14 @@
 */
 package org.antlr.runtime;
 
+import org.antlr.misc.IntSet;
+
 public class MismatchedNotSetException extends MismatchedSetException {
-	public MismatchedNotSetException(String expecting) {
-		super(expecting);
+	public MismatchedNotSetException(IntSet expecting, int found, int index) {
+		super(expecting, found, index);
+	}
+
+	public String toString() {
+		return "MismatchedNotSetException("+found+"!="+expecting+")";
 	}
 }

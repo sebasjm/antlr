@@ -31,11 +31,11 @@ import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
 import org.antlr.runtime.*;
-import org.antlr.runtime.tree.ParseTree;
 
 public class TestInterpretedLexing extends TestSuite {
 
-	static class DebugActions implements ANTLRRecognizerListener {
+	/*
+	static class Tracer implements ANTLRDebugInterface {
 		Grammar g;
 		public DebugActions(Grammar g) {
 			this.g = g;
@@ -52,15 +52,22 @@ public class TestInterpretedLexing extends TestSuite {
 			System.out.println("matchElement("+g.getTokenName(type)+")");
 		}
 
-		public void mismatchedElement(String msg) {
-			System.out.println("mismatchedElement("+msg+")");
+		public void mismatchedElement(MismatchedTokenException e) {
+			System.out.println(e);
+			e.printStackTrace(System.out);
 		}
 
-		public void noViableAlt(String msg) {
-			System.out.println("noViableAlt("+msg+")");
+		public void mismatchedSet(MismatchedSetException e) {
+			System.out.println(e);
+			e.printStackTrace(System.out);
+		}
+
+		public void noViableAlt(NoViableAltException e) {
+			System.out.println(e);
+			e.printStackTrace(System.out);
 		}
 	}
-
+    */
 
     /** Public default constructor used by TestRig */
     public TestInterpretedLexing() {
@@ -98,7 +105,6 @@ public class TestInterpretedLexing extends TestSuite {
 				"fragment DIGIT : '0'..'9';\n");
 		final int INTtype = g.getTokenType("INT");
 		Interpreter engine = new Interpreter(g, new ANTLRStringStream("12x")); // should ignore the x
-		DebugActions debugActions = new DebugActions(g);
 		Token result = engine.scan("INT");
 		assertEqual(result.getType(), INTtype);
 		engine = new Interpreter(g, new ANTLRStringStream("1234"));

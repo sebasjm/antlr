@@ -50,13 +50,13 @@ package org.antlr.runtime;
  *  under this hierarchy.
  *
  *  In general, the recognition exceptions track where in a grammar an
- *  problem occurred and/or what was the expected input.  The parser
- *  knows its state (such as current input symbol and line info) so
- *  this information is left out of the exception and left to the reporting
- *  method(s) to fill in.  You might want to have an error report an
- *  entire line of input not just a single token, for example.  Better to
- *  just say the recognizer had a problem and then let the parser report
- *  where the heck it was.
+ *  problem occurred and/or what was the expected input.  While the parser
+ *  knows its state (such as current input symbol and line info) that
+ *  state can change before the exception is reported so current token index
+ *  is computed and stored at exception time.  From this info, you can
+ *  perhaps print an entire line of input not just a single token, for example.
+ *  Better to just say the recognizer had a problem and then let the parser
+ *  figure out a fancy report.
  */
 public class RecognitionException extends Exception {
 }
