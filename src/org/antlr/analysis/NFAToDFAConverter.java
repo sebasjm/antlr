@@ -794,7 +794,6 @@ public class NFAToDFAConverter {
 			Set allAlts = d.getAltSet();
 			if ( allAlts.size()>1 ) {
 				nondeterministicAlts = allAlts;
-				/*
 				int decision = d.dfa.getDecisionNumber();
 				NFAState tokensRuleStartState =
 					dfa.getNFA().getGrammar().getRuleStartState(Grammar.TOKEN_RULENAME);
@@ -805,7 +804,6 @@ public class NFAToDFAConverter {
 					dfa.probe.reportLexerRuleNondeterminism(d,allAlts);
 					conflictingLexerRules = true;
 				}
-				*/
 			}
 		}
 
