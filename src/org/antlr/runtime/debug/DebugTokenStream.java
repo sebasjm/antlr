@@ -37,6 +37,9 @@ public class DebugTokenStream implements TokenStream {
 	public DebugTokenStream(TokenStream input, DebugEventListener dbg) {
 		this.input = input;
 		setDebugListener(dbg);
+		// force TokenStream to get at least first valid token
+		// so we know if there are any hidden tokens first in the stream
+		input.LT(1);
 	}
 
 	public void setDebugListener(DebugEventListener dbg) {
@@ -62,7 +65,6 @@ public class DebugTokenStream implements TokenStream {
 
 	/* consume all initial off-channel tokens */
 	protected void consumeInitialHiddenTokens() {
-		System.out.println("consumeInitialHiddenTokens @"+input.index());
 		int firstOnChannelTokenIndex = input.index();
 		for (int i=0; i<firstOnChannelTokenIndex; i++) {
 			dbg.consumeHiddenToken(input.get(i));
