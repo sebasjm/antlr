@@ -199,8 +199,6 @@ public class NFAToDFAConverter {
 		// for each label that could possibly emanate from NFAStates of d
 		int numberOfEdgesEmanating = 0;
 		Map targetToLabelMap = new HashMap();
-		//int previousTarget=0; // cache last target
-		//System.out.println("find new states from DFA state "+d.stateNumber);
 		for (int i=0; i<labels.size(); i++) {
 			Label label = (Label)labels.get(i);
 			DFAState t = reach(d, label);
@@ -220,44 +218,8 @@ public class NFAToDFAConverter {
 			*/
 			DFAState targetState = addDFAState(t); // add if not in DFA yet
 
-			System.out.println(d.stateNumber+"-"+label.toString(dfa.nfa.grammar)+"->"+targetState.stateNumber);
-			if ( COLLAPSE_ALL_INCIDENT_EDGES ) {
-				// TODO: heh, might need to add pred transitions! do this later?
-				// track which targets we've hit
-				Integer tI = new Integer(targetState.stateNumber);
-				Transition oldTransition = (Transition)targetToLabelMap.get(tI);
-				if ( oldTransition!=null ) {
-					System.out.println("extra transition to "+tI+" upon "+label.toString(dfa.nfa.grammar));
-					// already seen state d to target transition, just add label
-					// to old label
-					if ( label.getAtom()==Label.EOT ) {
-						// still need the transition, but don't merge
-						numberOfEdgesEmanating++;
-						d.addTransition(targetState, label);
-					}
-					else {
-						// must not alter labels obtained from the NFA; clone, add
-						//oldTransition.label = (Label)oldLabel.clone();
-						oldTransition.label.add(label);
-						System.out.println("label updated to be "+oldTransition.label.toString(dfa.nfa.grammar));
-					}
-				}
-				else {
-					// make a transition from d to t upon 'a'
-					numberOfEdgesEmanating++;
-					label = (Label)label.clone(); // clone in case we alter later
-					int transitionIndex = d.addTransition(targetState, label);
-					Transition trans = d.getTransition(transitionIndex);
-					// track target/transition pairs
-					if ( label.getAtom()!=Label.EOT ) {
-						targetToLabelMap.put(tI, trans);
-					}
-				}
-			}
-			else {
-				numberOfEdgesEmanating++;
-				d.addTransition(targetState, label);
-			}
+			numberOfEdgesEmanating +=
+				addTransition(d, label, targetState, targetToLabelMap);
 		}
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
@@ -269,6 +231,117 @@ public class NFAToDFAConverter {
 		if ( d.isResolvedWithPredicates() ) {
 			addPredicateTransitions(d);
 		}
+	}
+
+	/** Add a transition from state d to targetState with label in normal case.
+	 *  if COLLAPSE_ALL_INCIDENT_EDGES, however, try to merge all edges from
+	 *  d to targetState; this means merging their labels.  Another optimization
+	 *  is to reduce to a single EOT edge any set of edges from d to targetState
+	 *  where there exists an EOT state.  EOT is like the wildcard so don't
+	 *  bother to test any other edges.  Example:
+	 *
+	 *  NUM_INT
+	 *    : '1'..'9' ('0'..'9')* ('l'|'L')?
+     *    | '0' ('x'|'X') ('0'..'9'|'a'..'f'|'A'..'F')+ ('l'|'L')?
+     *    | '0' ('0'..'7')* ('l'|'L')?
+	 *    ;
+	 *
+	 *  The normal decision to predict alts 1, 2, 3 is:
+	 *
+	 *  if ( (input.LA(1)>='1' && input.LA(1)<='9') ) {
+     *       alt7=1;
+     *  }
+     *  else if ( input.LA(1)=='0' ) {
+     *      if ( input.LA(2)=='X'||input.LA(2)=='x' ) {
+     *          alt7=2;
+     *      }
+     *      else if ( (input.LA(2)>='0' && input.LA(2)<='7') ) {
+     *           alt7=3;
+     *      }
+     *      else if ( input.LA(2)=='L'||input.LA(2)=='l' ) {
+     *           alt7=3;
+     *      }
+     *      else {
+     *           alt7=3;
+     *      }
+     *  }
+     *  else error
+	 *
+     *  Clearly, alt 3 is predicted with extra work since it tests 0..7
+	 *  and [lL] before finally realizing that any character is actually
+	 *  ok at k=2.
+	 *
+	 *  A better decision is as follows:
+     * 
+	 *  if ( (input.LA(1)>='1' && input.LA(1)<='9') ) {
+	 *      alt7=1;
+	 *  }
+	 *  else if ( input.LA(1)=='0' ) {
+	 *      if ( input.LA(2)=='X'||input.LA(2)=='x' ) {
+	 *          alt7=2;
+	 *      }
+	 *      else {
+	 *          alt7=3;
+	 *      }
+	 *  }
+	 *
+	 *  The DFA originally has 3 edges going to the state the predicts alt 3, 
+	 *  but upon seeing the EOT edge (the "else"-clause), this method
+	 *  replaces the old merged label (which would have (0..7|l|L)) with EOT.
+	 *  The code generator then leaves alt 3 predicted with a simple else-
+	 *  clause. :)
+	 *
+	 *  The only time the EOT optimization makes no sense is in the Tokens
+	 *  rule.  We want EOT to truly mean you have matched an entire token
+	 *  so don't bother actually rewinding to execute that rule unless there
+	 *  are actions in that rule.  For now, since I am not preventing
+	 *  backtracking from Tokens rule, I will simply allow the optimization.
+	 *
+	 *  TODO: heh, might need to add pred transitions! do this code after?
+	 */
+	protected int addTransition(DFAState d,
+								Label label,
+								DFAState targetState,
+								Map targetToLabelMap)
+	{
+		int n = 0;
+		System.out.println(d.stateNumber+"-"+label.toString(dfa.nfa.grammar)+"->"+targetState.stateNumber);
+		if ( COLLAPSE_ALL_INCIDENT_EDGES ) {
+			// track which targets we've hit
+			Integer tI = new Integer(targetState.stateNumber);
+			Transition oldTransition = (Transition)targetToLabelMap.get(tI);
+			if ( oldTransition!=null ) {
+				System.out.println("extra transition to "+tI+" upon "+label.toString(dfa.nfa.grammar));
+				// already seen state d to target transition, just add label
+				// to old label unless EOT
+				if ( label.getAtom()==Label.EOT ) {
+					// merge with EOT means old edge can go away
+					oldTransition.label = new Label(Label.EOT);
+				}
+				else {
+					// don't add anything to EOT, it's essentially the wildcard
+					if ( oldTransition.label.getAtom()!=Label.EOT ) {
+						// ok, not EOT, add in this label to old label
+						oldTransition.label.add(label);
+					}
+					System.out.println("label updated to be "+oldTransition.label.toString(dfa.nfa.grammar));
+				}
+			}
+			else {
+				// make a transition from d to t upon 'a'
+				n = 1;
+				label = (Label)label.clone(); // clone in case we alter later
+				int transitionIndex = d.addTransition(targetState, label);
+				Transition trans = d.getTransition(transitionIndex);
+				// track target/transition pairs
+				targetToLabelMap.put(tI, trans);
+			}
+		}
+		else {
+			n = 1;
+			d.addTransition(targetState, label);
+		}
+		return n;
 	}
 
 	/** For all NFA states (configurations) merged in d,
