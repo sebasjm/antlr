@@ -32,7 +32,7 @@ public interface TokenStream extends IntStream {
     /** Get Token at current input pointer + i ahead where i=1 is next Token */
     public Token LT(int k);
 
-	/** Get a token at an absolute index i */
+	/** Get a token at an absolute index i; 0..n-1 */
 	public Token get(int i);
 
 	/** Where is this stream pulling tokens from?  This is not the name, but

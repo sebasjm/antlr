@@ -32,6 +32,7 @@ import org.antlr.runtime.*;
 public class DebugTokenStream implements TokenStream {
 	protected DebugEventListener dbg;
 	protected TokenStream input;
+	protected boolean firstConsume = true;
 
 	public DebugTokenStream(TokenStream input, DebugEventListener dbg) {
 		this.input = input;
@@ -43,6 +44,14 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public void consume() {
+		if ( firstConsume ) {
+			// consume all initial off channel tokens
+			int firstOnChannelTokenIndex = input.index();
+			for (int i=0; i<firstOnChannelTokenIndex; i++) {
+				dbg.consumeToken(input.get(i));
+			}
+			firstConsume = false;
+		}
 		int a = input.index();
 		Token t = input.LT(1);
 		input.consume();
