@@ -296,7 +296,7 @@ public class Grammar {
 		*/
 
 		// ASSIGN TOKEN TYPES
-		System.out.println("### assign types");
+		//System.out.println("### assign types");
 		AssignTokenTypesWalker ttypesWalker = new AssignTokenTypesWalker();
 		ttypesWalker.setASTNodeClass("org.antlr.tool.GrammarAST");
 		try {
@@ -308,7 +308,7 @@ public class Grammar {
 		}
 
 		// DEFINE RULES
-		System.out.println("### define rules");
+		//System.out.println("### define rules");
 		DefineGrammarItemsWalker defineItemsWalker = new DefineGrammarItemsWalker();
 		defineItemsWalker.setASTNodeClass("org.antlr.tool.GrammarAST");
 		try {
@@ -417,7 +417,7 @@ public class Grammar {
      */
 
     public void createNFAs() {
-		System.out.println("### create NFAs");
+		//System.out.println("### create NFAs");
 		nfa = new NFA(this); // create NFA that TreeToNFAConverter'll fill in
 		NFAFactory factory = new NFAFactory(nfa);
 		TreeToNFAConverter nfaBuilder = new TreeToNFAConverter(this, nfa, factory);
@@ -452,7 +452,7 @@ public class Grammar {
      *  Grammar without doing the expensive analysis.
      */
     public void createLookaheadDFAs() {
-		System.out.println("### create DFAs");
+		//System.out.println("### create DFAs");
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
             NFAState decisionStartState = getDecisionNFAStartState(decision);
             if ( decisionStartState.getNumberOfTransitions()>1 ) {

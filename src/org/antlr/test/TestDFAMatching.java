@@ -45,9 +45,10 @@ public class TestDFAMatching extends TestSuite {
 
     public void testSimpleAltCharTest() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
-                "a : 'a' | 'b' | 'c';");
-        g.createLookaheadDFAs();
+                "lexer grammar t;\n"+
+                "A : {;}'a' | 'b' | 'c';");
+		g.createNFAs();
+		g.createLookaheadDFAs();
         DFA dfa = g.getLookaheadDFA(1);
         checkPrediction(dfa,"a",1);
         checkPrediction(dfa,"b",2);
@@ -57,8 +58,9 @@ public class TestDFAMatching extends TestSuite {
 
     public void testSets() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
-                "a : 'a'..'z' | ';' | '0'..'9' ;");
+                "lexer grammar t;\n"+
+                "A : {;}'a'..'z' | ';' | '0'..'9' ;");
+		g.createNFAs();
         g.createLookaheadDFAs();
         DFA dfa = g.getLookaheadDFA(1);
         checkPrediction(dfa,"a",1);
@@ -70,8 +72,9 @@ public class TestDFAMatching extends TestSuite {
 
     public void testFiniteCommonLeftPrefixes() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
-                "a : 'a' 'b' | 'a' 'c' | 'd' 'e' ;");
+                "lexer grammar t;\n"+
+                "A : 'a' 'b' | 'a' 'c' | 'd' 'e' ;");
+		g.createNFAs();
         g.createLookaheadDFAs();
         DFA dfa = g.getLookaheadDFA(1);
         checkPrediction(dfa,"ab",1);
@@ -82,9 +85,10 @@ public class TestDFAMatching extends TestSuite {
 
     public void testSimpleLoops() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
-                "a : (digit)+ '.' digit | (digit)+ ;\n" +
-                "digit : '0'..'9' ;\n");
+                "lexer grammar t;\n"+
+                "A : (DIGIT)+ '.' DIGIT | (DIGIT)+ ;\n" +
+                "DIGIT : '0'..'9' ;\n");
+		g.createNFAs();
         g.createLookaheadDFAs();
         DFA dfa = g.getLookaheadDFA(3);
         checkPrediction(dfa,"32",2);
