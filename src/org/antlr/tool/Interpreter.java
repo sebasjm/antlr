@@ -19,7 +19,7 @@ public class Interpreter implements TokenSource {
 	protected Grammar grammar;
 	protected IntStream input;
 
-	class LexerActionGetTokenType implements InterpreterActions {
+	class LexerActionGetTokenType implements ANTLRRecognizerListener {
 		public CommonToken token;
 		Grammar g;
 		public LexerActionGetTokenType(Grammar g) {
@@ -30,10 +30,12 @@ public class Interpreter implements TokenSource {
 				int type = g.getTokenType(ruleName);
 				int channel = Token.DEFAULT_CHANNEL;
 				token = new CommonToken(type,channel,0,0);
+				/*
 				GrammarAST t = g.getLexerRuleAction(ruleName);
 				if ( t!=null ) {
 					executeLexerAction(token, t);
 				}
+				*/
 			}
 		}
 		public void enterRule(String ruleName) {}
@@ -42,7 +44,7 @@ public class Interpreter implements TokenSource {
 		public void noViableAlt(String msg) {}
 	}
 
-	static class BuildParseTree implements InterpreterActions {
+	static class BuildParseTree implements ANTLRRecognizerListener {
 		Grammar g;
 		Stack callStack = new Stack();
 		public BuildParseTree(Grammar g) {
@@ -122,7 +124,7 @@ public class Interpreter implements TokenSource {
 	 *
 	 *  Return the token type associated with the final rule end state.
 	 */
-	public void scan(String startRule, InterpreterActions actions)
+	public void scan(String startRule, ANTLRRecognizerListener actions)
 		throws RecognitionException
 	{
 		if ( grammar.type!=Grammar.LEXER ) {
@@ -155,7 +157,7 @@ public class Interpreter implements TokenSource {
 		return actions.token;
 	}
 
-	public void parse(String startRule, InterpreterActions actions)
+	public void parse(String startRule, ANTLRRecognizerListener actions)
 		throws RecognitionException
 	{
 		//System.out.println("parse("+startRule+")");
@@ -188,7 +190,7 @@ public class Interpreter implements TokenSource {
 							   NFAState stop,
 							   IntStream input,
 							   Stack ruleInvocationStack,
-							   InterpreterActions actions)
+							   ANTLRRecognizerListener actions)
 		throws RecognitionException
 	{
 		if ( actions!=null ) {
@@ -348,6 +350,7 @@ public class Interpreter implements TokenSource {
 	}
 
 	/** Exec an action limited to assignments like ( ${ ( = channel 99 ; ) ) */
+	/*
 	public void executeLexerAction(Token token, GrammarAST code) {
 		System.out.println("action "+code.toStringTree());
 		ActionInterpreter interp = new ActionInterpreter();
@@ -360,6 +363,7 @@ public class Interpreter implements TokenSource {
 							   re);
 		}
 	}
+	*/
 
 	public void reportScanError(RecognitionException re) {
 		CharStream cs = (CharStream)input;

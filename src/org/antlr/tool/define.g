@@ -325,22 +325,8 @@ element
     |   tree
     |   #( SYNPRED block ) 
     |   ACTION
-    |	lexer_action
     |   SEMPRED
     |   EPSILON 
-    ;
-
-lexer_action
-	:	#( LEXER_ACTION (lexer_assignment)+ )
-	;
-
-lexer_assignment
-	:	#( ASSIGN ID lexer_expr )
-	;
-
-lexer_expr
-	:	INT
-	|	ID
     ;
 
 ebnf:   block 

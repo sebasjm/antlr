@@ -30,13 +30,6 @@ package org.antlr.test;
 import org.antlr.test.unit.TestSuite;
 import org.antlr.test.unit.FailedAssertionException;
 import org.antlr.tool.Grammar;
-import org.antlr.tool.Interpreter;
-import org.antlr.tool.InterpreterActions;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.tree.ParseTree;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.Tool;
 

@@ -30,16 +30,12 @@ package org.antlr.test;
 import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
-import org.antlr.tool.InterpreterActions;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.*;
 import org.antlr.runtime.tree.ParseTree;
 
 public class TestInterpretedParsing extends TestSuite {
 
-	static class DebugActions implements InterpreterActions {
+	static class DebugActions implements ANTLRRecognizerListener {
 		Grammar g;
 		public DebugActions(Grammar g) {
 			this.g = g;
@@ -89,11 +85,12 @@ public class TestInterpretedParsing extends TestSuite {
 			"INT : (DIGIT)+ ;\n"+
 			"FLOAT : (DIGIT)+ '.' (DIGIT)* ;\n"+
 			"fragment DIGIT : '0'..'9';\n" +
-			"WS : (' ')+ ${channel=99;} ;\n");
+			"WS : (' ')+ ;\n");
 		CharStream input = new ANTLRStringStream("while x { i=1; y=3.42; z=y; }");
 		Interpreter lexEngine = new Interpreter(g, input);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		tokens.setTokenTypeChannel(g.getTokenType("WS"), 99);
 		//System.out.println("tokens="+tokens.toString());
 		Interpreter parseEngine = new Interpreter(pg, tokens);
 		ParseTree t = parseEngine.parse("prog");

@@ -357,8 +357,6 @@ elementNoOptionSpec
 
 	|   a:ACTION
 
-	|   la:lexer_action
-
 	|   p:SEMPRED
 
 	|   t3:tree
@@ -379,21 +377,6 @@ setElement
     |   {gtype!=LEXER_GRAMMAR}? TOKEN_REF
     |   {gtype!=LEXER_GRAMMAR}? STRING_LITERAL
     |   range
-    ;
-
-lexer_action
-	:	LEXER_ACTION^
-		( lexer_assignment )+
-		RCURLY!
-	;
-
-lexer_assignment
-	:	idToken ASSIGN^ lexer_expr SEMI
-	;
-
-lexer_expr
-	:	INT
-	|	idToken
     ;
 
 tree :

@@ -268,10 +268,6 @@ element returns [StateCluster g=null]
     |   tree
     |   #( SYNPRED block )
     |   ACTION
-
-    	// track only the last action found for interpreter mode
-    |	la:LEXER_ACTION  {grammar.setLexerRuleAction(currentRuleName, #la);}
-
     |   pred:SEMPRED {g = factory.build_SemanticPredicate(#pred);}
     |   EPSILON {g = factory.build_Epsilon();}
     ;

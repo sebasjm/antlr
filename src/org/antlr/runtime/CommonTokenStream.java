@@ -31,6 +31,8 @@ import org.antlr.tool.Grammar;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /** The most common stream of tokens is one where every token is buffered up
  *  and tokens are prefiltered for a certain channel (the parser will only
@@ -53,20 +55,44 @@ public class CommonTokenStream implements TokenStream {
 	 */
 	protected List filteredTokens;
 
+	/** Map<tokentype, channel> to override some Tokens' channel numbers */
+	protected Map channelOverrideMap;
+
 	/** Skip tokens on any channel but this one; this is how we skip whitespace... */
 	protected int channel = Token.DEFAULT_CHANNEL;
     protected int p = 0;
 
-    public CommonTokenStream(TokenSource tokenSource) {
+	public CommonTokenStream(TokenSource tokenSource) {
+		this.tokenSource = tokenSource;
+	}
+
+	public CommonTokenStream(TokenSource tokenSource, int channel) {
+		this.tokenSource = tokenSource;
+		this.channel = channel;
+	}
+
+	/** Load all tokens from the token source and put in filteredTokens.
+	 *  Fill on demand so we can alter things like channel overrides after ctor
+	 *  called but before buffer is filled.
+	 */
+	protected void fillBuffer() {
 		tokens = new ArrayList(500);
 		filteredTokens = new ArrayList(500);
-        this.tokenSource = tokenSource;
 		int index = 0;
         // suck in all the input tokens
         Token t = tokenSource.nextToken();
         while ( t!=null && t.getType()!=CharStream.EOF ) {
 			t.setTokenIndex(index);
             tokens.add(t);
+			// is there a channel override for token type?
+			if ( channelOverrideMap!=null ) {
+				Integer channelI = (Integer)
+					channelOverrideMap.get(new Integer(t.getType()));
+				if ( channelI!=null ) {
+					t.setChannel(channelI.intValue());
+				}
+			}
+			// ignore tokens on different channel
 			if ( t.getChannel()==channel ) {
 				filteredTokens.add(t);
 			}
@@ -88,8 +114,17 @@ public class CommonTokenStream implements TokenStream {
         }
     }
 
-	public void tuneToChannel(int channel) {
-		this.channel = channel;
+	/** A simple filter mechanism whereby you can tell this token stream
+	 *  to force all tokens of type ttype to be on channel.  For example,
+	 *  when interpreting, we cannot exec actions so we need to tell
+	 *  the stream to force all WS and NEWLINE to be a different, ignored
+	 *  channel.
+	 */
+	public void setTokenTypeChannel(int ttype, int channel) {
+		if ( channelOverrideMap==null ) {
+			channelOverrideMap = new HashMap();
+		}
+        channelOverrideMap.put(new Integer(ttype), new Integer(channel));
 	}
 
 	/** Get the ith token from the current position 1..n where i=1 is the
@@ -115,6 +150,9 @@ public class CommonTokenStream implements TokenStream {
 	 *  assertTrue(atom==input.lookahead(m, 1));
 	 */
     public Token LT(int marker, int i) {
+		if ( filteredTokens==null ) {
+			fillBuffer();
+		}
         if ( marker+i-1 >= filteredTokens.size() ) {
             return Token.EOFToken;
         }

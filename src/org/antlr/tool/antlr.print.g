@@ -215,22 +215,8 @@ element
     |   tree
     |   #( SYNPRED block[true] ) {out("=>");}
     |   a:ACTION  {out("{"); out(a.getText()); out("}");}
-    |	lexer_action
     |   SEMPRED
     |   EPSILON {out(" epsilon ");}
-    ;
-
-lexer_action
-	:	#( LEXER_ACTION (lexer_assignment)+ )
-	;
-
-lexer_assignment
-	:	#( ASSIGN ID lexer_expr )
-	;
-
-lexer_expr
-	:	INT
-	|	ID
     ;
 
 ebnf:   block[false] {out(" ");}
