@@ -90,6 +90,10 @@ public class CommonTokenStream implements TokenStream {
         return index();
     }
 
+	public int size() {
+		return tokens.size();
+	}
+	
     public int index() {
         return p;
     }

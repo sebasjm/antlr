@@ -70,6 +70,7 @@ protected void init() {
         NFAState ruleEndState = factory.newState();
         ruleEndState.setDescription("rule "+ruleName+" end");
         ruleEndState.setAcceptState(true);
+		ruleEndState.setEnclosingRuleName(ruleName);
         grammar.setRuleStopState(ruleName, ruleEndState);
     }
 }
@@ -265,7 +266,7 @@ ebnf returns [StateCluster g=null]
         b.right().setDecisionASTNode(#eob);
         // make block entry state also have same decision for interpreting grammar
         NFAState altBlockState = (NFAState)g.left().transition(0).getTarget();
-        altBlockState.setDecisionASTNode(#eob);
+        altBlockState.setDecisionASTNode(#BLOCK);
         altBlockState.setDecisionNumber(d);
     	}
     |   #( POSITIVE_CLOSURE #( BLOCK b=block eob3:EOB ) )
@@ -280,7 +281,7 @@ ebnf returns [StateCluster g=null]
         b.right().setDecisionASTNode(#eob3);
         // make block entry state also have same decision for interpreting grammar
         NFAState altBlockState = (NFAState)g.left().transition(0).getTarget();
-        altBlockState.setDecisionASTNode(#eob3);
+        altBlockState.setDecisionASTNode(#BLOCK);
         altBlockState.setDecisionNumber(d);
         }
     ;

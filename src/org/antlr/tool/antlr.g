@@ -207,7 +207,7 @@ rule!
 	:	p1:"protected"
 	|	p2:"public"		
 	|	p3:"private"
-	|	p4:"local"
+	|	p4:"fragment"
 	|	{modifier=null;}
 	)
 	ruleName:id

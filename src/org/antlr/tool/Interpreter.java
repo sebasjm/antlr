@@ -5,6 +5,8 @@ import org.antlr.analysis.*;
 import antlr.RecognitionException;
 
 import java.util.Stack;
+import java.util.HashMap;
+import java.util.Map;
 
 /** The recognition interpreter/engine for grammars.  Separated
  *  out of Grammar as it's related, but technically not a Grammar function.
@@ -22,14 +24,14 @@ public class Interpreter {
 	 *  predict which alternative will succeed.  This is exactly what the
 	 *  generated parser will do.
 	 *
-	 *  This only does lexer grammars for now.  Will probably have to
-	 *  change the name or something later when I can do parsing/lexing
-	 *  via this interpreter.
+	 *  This only does lexer grammars.
+	 *
+	 *  Return the token type associated with the final rule end state.
 	 */
-	public void parse(String startRule, CharStream input)
-			throws Exception
+	public int parse(String startRule, CharStream input)
+		throws Exception
 	{
-		System.out.println("parse("+startRule+",'"+input.substring(0,input.size()-1)+"')");
+		System.out.println("parse("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
 			if ( grammar.getType()==Grammar.LEXER ) {
@@ -41,9 +43,8 @@ public class Interpreter {
 			catch (RecognitionException re) {
 				System.err.println("problems creating NFAs from grammar AST for "+
 								   grammar.getName());
-				return;
+				return 0;
 			}
-			new DOTGenerator(grammar).writeDOTFilesForAllRuleNFAs();
 			// Create the DFA predictors for each decision
 			grammar.createLookaheadDFAs();
 		}
@@ -51,19 +52,34 @@ public class Interpreter {
 		// do the parse
 		Stack ruleInvocationStack = new Stack();
 		NFAState start = grammar.getRuleStartState(startRule);
-		parseEngine(start, input, ruleInvocationStack);
+		NFAState stop = grammar.getRuleStopState(startRule);
+		return parseEngine(start, stop, input, ruleInvocationStack);
 	}
 
-	protected void parseEngine(NFAState start,
-							   CharStream input,
-							   Stack ruleInvocationStack)
+	public void parse(String startRule, Grammar lexer)
+		throws Exception
+	{
+		System.out.println("parse("+startRule+")");
+		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
+		if ( grammar.getRuleStartState(startRule)==null ) {
+		}
+		// do the parse
+		Stack ruleInvocationStack = new Stack();
+		NFAState start = grammar.getRuleStartState(startRule);
+		NFAState stop = grammar.getRuleStopState(startRule);
+		//parseEngine(start, stop, input, ruleInvocationStack);
+	}
+
+	protected int parseEngine(NFAState start,
+							  NFAState stop,
+							  CharStream input,
+							  Stack ruleInvocationStack)
 		throws Exception
 	{
 		NFAState s = start;
 		int t = input.LA(1);
-		while ( t!=CharStream.EOF ) {
-			System.out.println("parse state "+s.getStateNumber()+" input="+
-					grammar.getTokenName(t));
+		while ( s!=stop ) {
+			//System.out.println("parse state "+s.getStateNumber()+" input="+grammar.getTokenName(t));
 			// CASE 1: decision state
 			if ( s.getDecisionNumber()>0 ) {
 				// decision point, must predict and jump to alt
@@ -73,19 +89,23 @@ public class Interpreter {
 				if ( predictedAlt == NFA.INVALID_ALT_NUMBER ) {
 					int position = input.index();
 					throw new Exception("parsing error: no viable alternative at position="+position+
-						" input symbol: "+grammar.getTokenName(t));
+										" input symbol: "+grammar.getTokenName(t));
 				}
 				input.rewind(m);
-				if ( s.getDecisionASTNode().getType()==ANTLRParser.EOB &&
-					 predictedAlt==grammar.getNumberOfAltsForDecisionNFA(s) )
-				{
-					// special case; loop end decisions have exit as
-					// # block alts + 1; getNumberOfAltsForDecisionNFA() has
-					// both block alts and exit branch.  So, any predicted alt
-					// equal to number of alts is the exit alt.  The NFA
-					// sees that as alt 1
-					// TODO: HIDEOUS
-					predictedAlt = 1;
+				if ( s.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
+					if ( predictedAlt==grammar.getNumberOfAltsForDecisionNFA(s) )
+					{
+						// special case; loop end decisions have exit as
+						// # block alts + 1; getNumberOfAltsForDecisionNFA() has
+						// both block alts and exit branch.  So, any predicted alt
+						// equal to number of alts is the exit alt.  The NFA
+						// sees that as alt 1
+						predictedAlt = 1;
+					}
+					else {
+						// exit branch is really first transition, so skip
+						predictedAlt = predictedAlt+1;
+					}
 				}
 				NFAState alt = grammar.getNFAStateForAltOfDecision(s, predictedAlt);
 				s = (NFAState)alt.transition(0).getTarget();
@@ -95,7 +115,9 @@ public class Interpreter {
 			// CASE 2: finished matching a rule
 			if ( s.isAcceptState() ) { // end of rule node
 				if ( ruleInvocationStack.empty() ) {
-					return; // done parsing.  Hit the start state.
+					// done parsing.  Hit the start state.
+					System.out.println("stack empty in stop state for "+s.getEnclosingRule());
+					return grammar.getTokenType(s.getEnclosingRule());
 				}
 				// pop invoking state off the stack to know where to return to
 				NFAState invokingState = (NFAState)ruleInvocationStack.pop();
@@ -132,7 +154,8 @@ public class Interpreter {
 					" input symbol: "+grammar.getTokenName(t));
 			}
 		}
-		//IntSet closure = s.
+		System.out.println("hit stop state for "+stop.getEnclosingRule());
+		return grammar.getTokenType(stop.getEnclosingRule());
 	}
 
 	/** Given an input stream, return the unique alternative predicted by
@@ -147,8 +170,10 @@ public class Interpreter {
 		Transition eotTransition = null;
 	dfaLoop:
 		while ( !s.isAcceptState() ) {
+			/*
 			System.out.println("DFA.predict("+s.getStateNumber()+", "+
 					dfa.getNFA().getGrammar().getTokenName(c)+")");
+			*/
 			// for each edge of s, look for intersection with current char
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {
 				Transition t = s.transition(i);
@@ -174,9 +199,19 @@ public class Interpreter {
 		}
 		// woohoo!  We know which alt to predict
 		// nothing emanates from a stop state; must terminate anyway
+		/*
 		System.out.println("DFA stop state "+s.getStateNumber()+" predicts "+
 				s.getUniquelyPredictedAlt());
+		*/
 		return s.getUniquelyPredictedAlt();
 	}
 
+	/*
+	Map busy = new HashMap();
+	public boolean closureHasAcceptState(NFAState p) {
+		if ( p.isAcceptState() )
+		Transition transition0 = p.transition(0);
+
+	}
+	*/
 }

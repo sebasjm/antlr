@@ -47,6 +47,9 @@ public class NFAState extends State {
     /** What's its decision number from 1..n? */
     protected int decisionNumber = 0;
 
+	/** What rule do we live in?  I currently only set on accept states */
+	protected String enclosingRule;
+
     /** During debugging and for nondeterminism warnings, it's useful
      *  to know what relationship this node has to the original grammar.
      *  For example, "start of alt 1 of rule a".
@@ -134,6 +137,14 @@ public class NFAState extends State {
     public void setDecisionNumber(int decisionNumber) {
         this.decisionNumber = decisionNumber;
     }
+
+	public void setEnclosingRuleName(String rule) {
+		this.enclosingRule = rule;
+	}
+
+	public String getEnclosingRule() {
+		return enclosingRule;
+	}
 
     public boolean isEOTState() {
         return EOTState;

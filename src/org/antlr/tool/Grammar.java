@@ -33,7 +33,8 @@ import antlr.RecognitionException;
 import java.io.*;
 import java.util.*;
 import org.antlr.analysis.*;
-import org.antlr.runtime.CharStream;
+import org.antlr.analysis.DFA;
+import org.antlr.runtime.*;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.codegen.CodeGenerator;
@@ -423,12 +424,41 @@ public class Grammar {
         }
     }
 
-	public void parse(String startRule, CharStream input)
+	/** Match a lexer rule using input and return the token type matched */
+	public int parse(String startRule, CharStream input)
+		throws Exception
+	{
+		if ( getType()!=LEXER ) {
+			return 0;
+		}
+		Interpreter engine = new Interpreter(this);
+		return engine.parse(startRule,input);
+	}
+
+	public void parse(String startRule, Grammar lexer)
+		throws Exception
+	{
+		if ( getType()!=PARSER ) {
+			return;
+		}
+		Interpreter engine = new Interpreter(this);
+		engine.parse(startRule,lexer);
+	}
+
+	public Token nextToken(CharStream input)
 			throws Exception
 	{
-		// delegate to the Interpreter
-		Interpreter engine = new Interpreter(this);
-		engine.parse(startRule,input);
+		if ( getType()!=LEXER ) {
+			return null;
+		}
+		if ( input.LA(1)==CharStream.EOF ) {
+			return Token.EOFToken;
+		}
+		int start = input.index();
+		int type = parse(Grammar.TOKEN_RULENAME,input);
+		int stop = input.index()-1;
+		Token token = new CommonToken(type,Lexer.DEFAULT_CHANNEL,start,stop);
+		return token;
 	}
 
 	/** Define either a token at a particular token type value.  Blast an

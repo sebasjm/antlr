@@ -2,15 +2,78 @@ group C;
 
 // G R A M M A R  E L E M E N T S
 
-outputFile(LEXER,PARSER,TREE_PARSER, streamType, headerAction, docComment, recognizer) ::=
+outputFile(LEXER, PARSER, TREE_PARSER, headerAction, docComment, recognizer,
+	name, literals, tokens, rules, cyclicDFAs ) ::=
 <<
 <headerAction>
 
+#include \<sys/types.h\>
+#include \<sys/stat.h\>
+#include \<unistd.h\>
+#include \<fcntl.h\>
 #include \<stdio.h\>
 #include \<string.h\>
 #include \<stdlib.h\>
 #include \<errno.h\>
 #include \<assert.h\>
+#include \<sys/mman.h\>
+
+#include "<name>.h"
+
+<docComment>
+<recognizer>
+>>
+
+headerFile(name, literals, tokens, rules, cyclicDFAs) ::= <<
+#ifndef __<name>_H__
+#define __<name>_H__
+
+// Return value definitions
+// the whole error handling needs a much closer look
+enum {
+	ANTLR_OK = 0,
+	ANTLR_MISMATCH = 1,
+	ANTLR_UNEXPECTED_EOF = 2,
+	ANTLR_NO_VIABLE_ALT = 3,
+	ANTLR_STREAM_ERROR = 4,
+	ANTLR_OUT_OF_MEMORY = 5
+};
+
+#define TOKEN_EOF (unsigned int)EOF
+<tokens:{#define TOKEN_<attr.name> <attr.type>U}; separator="\n">
+
+/* define a token like this for now
+ * - line/column/file tracking?
+ *   maybe this can be done by loading an extra template or something?
+ *   define a template bit in the .g file ?
+ * - token text? (it's available (see the main routine)
+ */
+typedef struct Token {
+	unsigned int tokenType;
+} TOKEN;
+
+extern const TOKEN EOFToken;
+
+typedef struct LexerContext {
+	char* input;				/* input stream (mmaped) */
+	size_t size;				/* size of input */
+	size_t offset;				/* where are we reading wise */
+
+	char* tokenBuffer;		/* collect current token text here */
+	char* tokenBufferEnd;	/* end sentinel */
+	char* tokenBufferPtr;	/* where we're at */
+	unsigned tokenType;
+	int skipToken;
+	unsigned line;
+} LEXER_CONTEXT;
+
+<rules:{extern int m<it.name>( LEXER_CONTEXT* ctx<if(it.args)>,<endif> <it.args>);}; separator="\n">
+
+#endif
+>>
+
+lexer(name, tokens, literals, rules, cyclicDFAs) ::= <<
+/* Lexer code generated for <name> */
 
 /* FIXME:
  * the hash table stuff probably needs some extra thought to get things
@@ -94,17 +157,15 @@ int hash_value( char *string, unsigned int value )
 	return hash_count;
 }
 
-int hash_lookup( const char* string )
+int hash_lookup( const char* string, size_t length )
 {
 	int index;
 	int current;
 	TABLE_ENTRY *t;
 
-	size_t len = strlen(string);
-
-	index = len == 0 ? 0 :	/* hash */
+	index = length == 0 ? 0 :	/* hash */
 		((int)string[0] +
-		 (int)string[len - 1] * 11 + len * 26) &
+		 (int)string[length - 1] * 11 + length * 26) &
 		 (HASH_TABLE_SIZE - 1);
 
 	current = hash_table[index];
@@ -113,7 +174,7 @@ int hash_lookup( const char* string )
 	{
 		t = &string_table[current];
 
-		if((t->len == len) && (t->string != NULL) && (strcmp(t->string, string) == 0))
+		if((t->len == length) && (t->string != NULL) && (strcmp(t->string, string) == 0))
 		{
 			return t->value;
 		}
@@ -170,62 +231,38 @@ int init_hash_string( void )
 }
 /*}}}*/
 
-<docComment>
-<recognizer>
->>
-
-lexer(name, tokens, literals, rules, DFAs) ::= <<
-/* Lexer code generated for <name> */
-
-/* define a token like this for now
- * - line/column/file tracking?
- *   maybe this can be done by loading an extra template or something?
- *   define a template bit in the .g file ?
- * - token text? (it's available (see the main routine)
- */
-typedef struct Token {
-	unsigned tokenType;
-} TOKEN;
-
 const TOKEN EOFToken = { EOF };
-
-typedef struct <name>Context {
-	FILE* input;				/* input stream */
-	char* tokenBuffer;		/* collect current token text here */
-	char* tokenBufferEnd;	/* end sentinel */
-	char* tokenBufferPtr;	/* where we're at */
-	unsigned tokenType;
-	int skipToken;
-	unsigned line;
-} CONTEXT;
-
-// Return value definitions
-// the whole error handling needs a much closer look
-enum {
-	ANTLR_OK = 0,
-	ANTLR_MISMATCH = 1,
-	ANTLR_UNEXPECTED_EOF = 2,
-	ANTLR_NO_VIABLE_ALT = 3,
-	ANTLR_STREAM_ERROR = 4,
-	ANTLR_OUT_OF_MEMORY = 5
-};
 
 #define INIT_TOKEN_BUFSIZE 1024
 
 /* prototype for the internal tokens rule */
-int mTokens( CONTEXT* ctx );
+int mTokens( LEXER_CONTEXT* ctx );
 
 /* define stuff for now with real support code this might need some tweakage
  */
 #define skip() ctx->skipToken = 1
 #define newline() ctx->line++
 #define setType(x) ctx->tokenType = x
+#define literalCheck() { int tt = hash_lookup(ctx->tokenBuffer, ctx->tokenBufferPtr - ctx->tokenBuffer); if( tt > 0 ) setType(tt); }
+
+void consume( LEXER_CONTEXT* ctx )
+{
+	ctx->offset++;
+}
+
+int LA( LEXER_CONTEXT* ctx, unsigned int i )
+{
+	size_t offset = ctx->offset+i-1;
+	if( offset >= ctx->size )
+		return EOF;
+	return ctx->input[offset];
+}
 
 /* append ch to the tokenBuffer in the context
  * return 0 (OK) if success
  * also takes care of reallocating the buffer it's not big enough
  */
-int append( CONTEXT* ctx, int ch )
+int append( LEXER_CONTEXT* ctx, int ch )
 {
 	assert(ch != EOF);
 
@@ -254,15 +291,16 @@ int append( CONTEXT* ctx, int ch )
 	}
 	// add character
 	*ctx->tokenBufferPtr++ = ch;
+	consume(ctx);
 	return ANTLR_OK;
 }
 
-int matchChar( CONTEXT* ctx, unsigned int c )
+int matchChar( LEXER_CONTEXT* ctx, unsigned int c )
 {
-	int ch = fgetc(ctx->input);
+	int ch = LA(ctx,1);
 	if( ch == EOF )
 		return ANTLR_UNEXPECTED_EOF;
-	if ( (unsigned)ch != c )
+	if ( (unsigned int)ch != c )
 	{
 		fprintf(stderr,"mismatched char: %c expected %c\r\n", ch, c );
 		return ANTLR_MISMATCH;
@@ -270,13 +308,13 @@ int matchChar( CONTEXT* ctx, unsigned int c )
 	return append( ctx, ch );
 }
 
-int matchString( CONTEXT* ctx, const char* s )
+int matchString( LEXER_CONTEXT* ctx, const char* s )
 {
 	int ret = ANTLR_OK;
 	const char* p = s;
 	while( *p != '\0' && ret == ANTLR_OK )
 	{
-		int ch = fgetc(ctx->input);
+		int ch = LA(ctx,1);
 		if( ch == EOF )
 			return ANTLR_UNEXPECTED_EOF;
 		if( *p != ch )
@@ -287,9 +325,9 @@ int matchString( CONTEXT* ctx, const char* s )
 	return ret;
 }
 
-int matchRange( CONTEXT* ctx, unsigned int low, unsigned int high )
+int matchRange( LEXER_CONTEXT* ctx, unsigned int low, unsigned int high )
 {
-	int ch = fgetc(ctx->input);
+	int ch = LA(ctx,1);
 
 	assert(low \< high);
 
@@ -300,37 +338,33 @@ int matchRange( CONTEXT* ctx, unsigned int low, unsigned int high )
 	return append( ctx, ch );
 }
 
-int matchAny( CONTEXT* ctx )
+int matchAny( LEXER_CONTEXT* ctx )
 {
-	int ch = fgetc(ctx->input);
+	int ch = LA(ctx,1);
 	if( ch == EOF )
 		return ANTLR_UNEXPECTED_EOF;
 	return append( ctx, ch );
 }
 
 /* Token definitions */
-<tokens:{#define <attr.name> <attr.type>U}; separator="\n">
+#define TOKEN_EOF (unsigned int)EOF
+<tokens:{#define TOKEN_<attr.name> <attr.type>U}; separator="\n">
 
 void <name>_init( void ) {
 	<literals:{hash_value(<attr.name>, <attr.type>);}; separator="\n">
 }
 
-int <name>NextToken( CONTEXT* ctx, TOKEN* token ) {
+int <name>NextToken( LEXER_CONTEXT* ctx, TOKEN* token ) {
 	int ret = ANTLR_OK;
 	for(;;)
 	{
-		int ch;
 		ctx->skipToken = 0;
 
-		// this is ugly...
-		ch = fgetc(ctx->input);
-		if( ch == EOF )
+		if( ctx->offset >= ctx->size )
 		{
-			token->tokenType = EOF;
+			token->tokenType = TOKEN_EOF;
 			return ANTLR_OK;
 		}
-		ungetc( ch, ctx->input );
-
 		ctx->tokenBufferPtr = ctx->tokenBuffer;
 
 		if( (ret = mTokens(ctx)) != ANTLR_OK )
@@ -350,7 +384,9 @@ int <name>NextToken( CONTEXT* ctx, TOKEN* token ) {
 /* test stub */
 int main( int argc, char** argv )
 {
-	CONTEXT context;
+	LEXER_CONTEXT context;
+	int fd;
+	struct stat st;
 
 	init_hash_string();
 	<name>_init();
@@ -361,9 +397,25 @@ int main( int argc, char** argv )
 		return 1;
 	}
 
-	if( (context.input = fopen(argv[1],"r")) == NULL )
+	if( (fd = open(argv[1], O_RDONLY)) == -1 )
 	{
 		fprintf( stderr, "Error opening: %s - %s\n\r",argv[1], strerror(errno) );
+		return 1;
+	}
+	if( fstat(fd,&st) != 0 )
+	{
+		fprintf( stderr, "Error stat-ing: %s - %s\n\r",argv[1], strerror(errno) );
+		close(fd);
+		return 1;
+	}
+
+	context.size = st.st_size;
+	context.offset = 0;
+
+	if( (context.input = mmap(0,st.st_size,PROT_READ,MAP_PRIVATE,fd,0) ) == MAP_FAILED )
+	{
+		fprintf( stderr, "Error mmap-ing: %s - %s\n\r",argv[1], strerror(errno) );
+		close(fd);
 		return 1;
 	}
 
@@ -377,18 +429,20 @@ int main( int argc, char** argv )
 		int ret;
 
 		ret = <name>NextToken( &context, &tok );
-		if( tok.tokenType == (unsigned int)EOF )
+		if( tok.tokenType == TOKEN_EOF )
 			break;
 		if( ret != ANTLR_OK )
 			break;
 		context.tokenBufferPtr[0] = '\0';
 		printf( "Found tokentype %d - %s\r\n", tok.tokenType, context.tokenBuffer );
 	}
+	munmap(context.input,st.st_size);
+	close(fd);
 	return 0;
 }
 
 /* DFA's */
-<DFAs>
+<cyclicDFAs>
 
 /* rules */
 <rules; separator="\n">
@@ -396,19 +450,94 @@ int main( int argc, char** argv )
 /* End of lexer definition for <name> */
 >>
 
-parser(name, tokens, rules, DFAs) ::= <<
-/* Token definitions */
-<tokens:{#define <attr.name> <attr.type>U}; separator="\n">
+parser(name, tokens, rules, cyclicDFAs) ::= <<
+
+typedef struct Token {
+	unsigned int tokenType;
+} TOKEN;
+
+typedef struct LexerContext {
+	char* input;				/* input stream (mmaped) */
+	size_t size;				/* size of input */
+	size_t offset;				/* where are we reading wise */
+
+	char* tokenBuffer;		/* collect current token text here */
+	char* tokenBufferEnd;	/* end sentinel */
+	char* tokenBufferPtr;	/* where we're at */
+	unsigned tokenType;
+	int skipToken;
+	unsigned line;
+} LEXER_CONTEXT;
+
+// Return value definitions
+// the whole error handling needs a much closer look
+enum {
+	ANTLR_OK = 0,
+	ANTLR_MISMATCH = 1,
+	ANTLR_UNEXPECTED_EOF = 2,
+	ANTLR_NO_VIABLE_ALT = 3,
+	ANTLR_STREAM_ERROR = 4,
+	ANTLR_OUT_OF_MEMORY = 5
+};
+
+#define INIT_TOKEN_BUFFER_SIZE 10
+
+typedef struct TokenBuffer {
+	LEXER_CONTEXT* lctx;
+	TOKEN (*next_token)( LEXER_CONTEXT* ctx );		/* our lexer */
+	TOKEN* buffer;			/* the buffer */
+	size_t size;			/* size of the buffer */
+	size_t offset;			/* read offset */
+	size_t count;			/* number of elements in buffer */
+} TOKEN_BUFFER;
 
 typedef struct ParserContext {
-	TOKEN (*token)( CONTEXT* ctx );		/* our lexer */
+	TOKEN_BUFFER *input;
 } PARSER_CONTEXT;
 
-int <name>Parser( PARSER_CONTEXT* ctx )
+void fillTokenBuffer( TOKEN_BUFFER* tb, size_t n )
 {
-	/* stuff */
+	while( tb->count \< n )
+	{
+		if( tb->count == tb->size )		// get new buffer if overflow
+		{
+			TOKEN* nb = (TOKEN*)calloc(tb->size*2,sizeof(TOKEN));
+			memcpy(nb, tb->buffer, tb->size*sizeof(TOKEN));
+			free(tb->buffer);
+			tb->buffer = nb;
+			tb->size = tb->size*2;
+		}
+		tb->buffer[tb->offset+tb->count % tb->size] = tb->next_token(tb->lctx);
+		tb->count++;
+	}
 }
-<DFAs>
+
+void consume( PARSER_CONTEXT* ctx )
+{
+	ctx->input->offset = (ctx->input->offset+1)%ctx->input->size;
+}
+
+unsigned int LA( PARSER_CONTEXT* ctx, unsigned int i )
+{
+	TOKEN_BUFFER* tb = ctx->input;
+	fillTokenBuffer( tb, i );
+	return tb->buffer[tb->offset+i].tokenType;
+}
+
+/* Token definitions */
+#define TOKEN_EOF (unsigned int)EOF
+<tokens:{#define TOKEN_<attr.name> <attr.type>U}; separator="\n">
+
+int <name>Parser( PARSER_CONTEXT* ctx, LEXER_CONTEXT* lctx )
+{
+	TOKEN_BUFFER* tb = ctx->input = (TOKEN_BUFFER*)malloc(sizeof(TOKEN_BUFFER));
+	tb->lctx = lctx;
+	tb->buffer = (TOKEN*)calloc(INIT_TOKEN_BUFFER_SIZE,sizeof(TOKEN));
+	tb->size = INIT_TOKEN_BUFFER_SIZE;
+	tb->offset = 0;
+	tb->count = 0;
+}
+<cyclicDFAs>
 
 <rules; separator="\n">
 
@@ -426,17 +555,22 @@ int <name>( PARSER_CONTEXT* ctx<if(args)>,<endif> <args>)
 	<exitAction>
 <endif>
 	return ret;
-}	
+}
 >>
 
-lexerRule(name,args,block,enterAction,exitAction) ::= <<
-int m<name>( CONTEXT* ctx<if(args)>,<endif> <args>)
+lexerRule(name,isTokenRuleName,args,block,enterAction,exitAction) ::= <<
+int m<name>( LEXER_CONTEXT* ctx<if(args)>,<endif> <args>) /* <isTokenRuleName> */
 {
 	int ret = ANTLR_OK;
 <if(enterAction)>
 	<enterAction>
 <endif>
+<if(isTokenRuleName)>
 	<block>
+<else>
+	<block>
+	ctx->tokenType = TOKEN_<name>;
+<endif>
 <if(enterAction)>
 	<exitAction>
 <endif>
@@ -457,13 +591,6 @@ block(alts,decls,decision,decisionNumber,preamble,maxK) ::= <<if( ret == ANTLR_O
 	<preamble>
 	unsigned int alt<decisionNumber>;
 
-	fpos_t streamPos;
-	LA_TYPE la[<maxK>+1];
-	fgetpos(ctx->input, &streamPos);
-	for(alt<decisionNumber> = 1; alt<decisionNumber> \<= <maxK>; alt<decisionNumber>++ )
-		la[alt<decisionNumber>] = fgetc(ctx->input);
-	fsetpos(ctx->input, &streamPos);
-
 	alt<decisionNumber> = 0;
 	<decls>
 	<decision>
@@ -479,15 +606,9 @@ block(alts,decls,decision,decisionNumber,preamble,maxK) ::= <<if( ret == ANTLR_O
 positiveClosureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<if( ret == ANTLR_OK )
 {
 	unsigned int cnt<decisionNumber> = 0;
+	unsigned int alt<decisionNumber> = 0;
 	<decls>
 	for(;;) {
-		unsigned int alt<decisionNumber>;
-		fpos_t streamPos;
-		LA_TYPE la[<maxK>+1];
-		fgetpos(ctx->input, &streamPos);
-		for(alt<decisionNumber> = 1; alt<decisionNumber> \<= <maxK>; alt<decisionNumber>++ )
-			la[alt<decisionNumber>] = fgetc(ctx->input);
-		fsetpos(ctx->input, &streamPos);
 		alt<decisionNumber> = 0;
 		<decision>
 		if( ret != ANTLR_OK )
@@ -499,15 +620,15 @@ positiveClosureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<if( ret == A
 			if ( cnt<decisionNumber> >= 1 )
 				goto endLoop<decisionNumber>;
 			<if(LEXER)>else
-				fprintf(stderr,"line %d: no viable alt in decision <decisionNumber> LA(1)==%c\r\n",ctx->line, la[1] );
+				fprintf(stderr,"line %d: no viable alt in decision <decisionNumber> LA(1)==%c\r\n",ctx->line, LA(ctx,1) );
 			<else>else
-				fprintf(stderr,"no viable alt in decision <decisionNumber> LT(1)==%d\r\n",LT(1));
+				fprintf(stderr,"no viable alt in decision <decisionNumber> LT(1)==%d\r\n", LA(ctx,1) );
 			<endif>
 		}
 	cnt<decisionNumber>++;
 	}
+endLoop<decisionNumber>: ;
 }
-endLoop<decisionNumber>:
 >>
 
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
@@ -518,12 +639,6 @@ closureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<if( ret == ANTLR_OK 
 	for(;;)
 	{
 		unsigned int alt<decisionNumber>;
-		LA_TYPE la[<maxK>+1];
-		fpos_t streamPos;
-		fgetpos(ctx->input, &streamPos);
-		for(alt<decisionNumber> = 1; alt<decisionNumber> \<= <maxK>; alt<decisionNumber>++ )
-			la[alt<decisionNumber>] = fgetc(ctx->input);
-		fsetpos(ctx->input, &streamPos);
 		alt<decisionNumber> = 0;
 		<decision>
 		if( ret != ANTLR_OK )
@@ -535,8 +650,8 @@ closureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<if( ret == ANTLR_OK 
 			goto loop<decisionNumber>;
 		}
 	}
+loop<decisionNumber>: ;
 }
-loop<decisionNumber>:
 >>
 
 closureBlockSingleAlt ::= closureBlock
@@ -551,49 +666,39 @@ case <i> :
 	break;
 >>
 
-dfaDecision(decisionNumber,description) ::=
-	"alt<decisionNumber> = predictDFA<decisionNumber>(ctx);"
-
 alt(elements) ::= "<elements; separator=\"\n\">"
 
-tokenRef(token) ::= "match(<token>);"
+tokenRef(token) ::= "match(TOKEN_<token>);"
 
 charRef(char) ::= "ret = matchChar( ctx, <char> );"
 
 charRangeRef(a,b) ::= "ret = matchRange( ctx, <a>,<b> );"
 
-matchSet(s) ::= <<{
-LA_TYPE la[1];
-la[1]	= fgetc(ctx->input);
-if ( !(<s>) )
+matchSet(s) ::= << /* matchSet */
+if ( !<s> )
 {
-	if( la[1] >= ' ' && la[1] \< 255 )
-		fprintf( stderr, "line %d: set mismatch '%c'\r\n", ctx->line, la[1] );
+	if( LA(ctx,1) >= ' ' && LA(ctx,1) \< 255 )
+		fprintf( stderr, "line %d: set mismatch '%c'\r\n", ctx->line, LA(ctx,1) );
 	else
-		fprintf( stderr, "line %d: set mismatch %d\r\n", ctx->line, la[1] );
-	ungetc( la[1], ctx->input );
+		fprintf( stderr, "line %d: set mismatch %d\r\n", ctx->line, LA(ctx,1) );
 	ret = ANTLR_MISMATCH;
 }
 else
-	ret = append( ctx, la[1] );
-}
+	ret = append( ctx, LA(ctx,1) );
 >>
 
-matchNotSet(s) ::= <<{
-LA_TYPE la[1];
-la[1]	= fgetc(ctx->input);
+matchNotSet(s) ::= <<
+/* match not */
 if ( <s> )
 {
-	if( la[1] >= ' ' && la[1] \< 255 )
-		fprintf( stderr, "line %d: ~set mismatch '%c'\r\n", ctx->line, la[1] );
+	if( LA(ctx,1) >= ' ' && LA(ctx,1) \< 255 )
+		fprintf( stderr, "line %d: ~set mismatch '%c'\r\n", ctx->line, LA(ctx,1) );
 	else
-		fprintf( stderr, "line %d: ~set mismatch %d\r\n", ctx->line, la[1] );
-	ungetc( la[1], ctx->input );
+		fprintf( stderr, "line %d: ~set mismatch %d\r\n", ctx->line, LA(ctx,1) );
 	ret = ANTLR_MISMATCH;
 }
 else
-	ret = append( ctx, la[1] );
-}
+	ret = append( ctx, LA(ctx,1) );
 >>
 
 lexerStringRef(string) ::= "ret = matchString( ctx, <string> );"
@@ -606,27 +711,75 @@ ruleRef(rule,args) ::= "<rule>( ctx<if(args)>, <endif><args> ); /* ruleRef */"
 
 lexerRuleRef(rule,args) ::= "ret = m<rule>( ctx<if(args)>,<endif> <args> );"
 
-// A C T I O N S
+// F i x e d  D F A  s t u f f
 
-emit(type) ::= "emit(<type>);"
+dfaDecision(decisionNumber,description) ::=
+	"alt<decisionNumber> = predictDFA<decisionNumber>(ctx);"
 
-setType(type) ::= "ctx->tokenType = <type>;"
+allCyclicDFAs(cyclicDFAs) ::= <<
+.method \<init> ()V 1
+        aload 0
+        invokespecial java/lang/Object.\<init>()V
+        return
+<cyclicDFAs>
+>>
 
-// D F A S
+cyclicDFA(decision,states,description) ::= <<
+
+static int DFA<decision>( <if(LEXER)>LEXER_CONTEXT<endif><if(PARSER)>PARSER_CONTEXT<endif>* ctx )
+{
+	goto s0;
+	<states>
+}
+
+static int predictDFA<decision>( <if(LEXER)>LEXER_CONTEXT<endif><if(PARSER)>PARSER_CONTEXT<endif>* ctx )
+{
+	size_t offset_save = ctx->offset;	/* mark */
+	int ret = DFA<decision>(ctx);
+	ctx->offset = offset_save;				/* rewind */
+	return ret;
+}
+
+>>
+
+cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<s<stateNumber>:
+	<edges>
+	<if(needErrorClause)><if(LEXER)>fprintf( stderr, "line %d: no viable alt c=%c", ctx->line, LA(ctx,1) );
+	<else>fprintf(stderr,"line %d: <description> - no viable alt token=",ctx->line, LT(ctx,1) );
+	<endif>
+	return ANTLR_NO_VIABLE_ALT;<endif>
+>>
+
+cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
+s<stateNumber>:
+	return <predictAlt>;
+>>
+
+cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber) ::= <<
+if ( <labelExpr> )	/* unused edgenumber? : <edgeNumber> */
+{
+	consume(ctx);
+	goto s<targetStateNumber>;
+}
+>>
+
+eotDFAEdge(targetStateNumber,edgeNumber) ::= <<
+goto s<targetStateNumber>;
+>>
 
 dfaState(edges,defaultClause,eotPredictsAlt,description) ::= <<
 <edges; separator="else ">else
 {
 <if(eotPredictsAlt)>
-    alt<decisionNumber> = <eotPredictsAlt>;
+    alt<decisionNumber> = <eotPredictsAlt>; /* dfaState */
 <else>
 <if(LEXER)>
-	fprintf(stderr,"line %d: <description> - no viable alt for c='%c'\r\n",ctx->line,la[1]);
+	fprintf(stderr,"line %d: no viable alt for c='%c'\r\n",ctx->line,LA(ctx,1));
 	ret = ANTLR_NO_VIABLE_ALT;
 <else>
-	fprintf(stderr,"line %d: <description> - no viable alt token=%d\r\n",LT(1));
+	fprintf(stderr,"line %d: no viable alt token=%d\r\n",LA(ctx,1));
 <endif>
-	/* input.consume(); */
+	consume(ctx);
 <endif>
 }
 >>
@@ -639,50 +792,6 @@ dfaEdge(labelExpr, targetState) ::= <<if ( <labelExpr> )
 }
 >>
 
-cyclicDFA(decision,states,description) ::= <<
-
-int doPredictDFA<decision>( <if(LEXER)>CONTEXT<endif><if(PARSER)>PARSER_CONTEXT<endif>* ctx )
-{
-	LA_TYPE la[2];
-	goto s0;
-
-	<states>
-}
-
-int predictDFA<decision>( <if(LEXER)>CONTEXT<endif><if(PARSER)>PARSER_CONTEXT<endif>* ctx )
-{
-	int alt;
-	fpos_t streamPos;
-	fgetpos(ctx->input, &streamPos);
-	alt = doPredictDFA<decision>(ctx);
-	fsetpos(ctx->input, &streamPos);
-	return alt;
-}
->>
-
-cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<s<stateNumber>:
-	la[1] = fgetc(ctx->input);
-	<edges>
-	<if(needErrorClause)><if(LEXER)>fprintf( stderr, "line %d: no viable alt c=%c", ctx->line, la[1] );
-	<else>fprintf(stderr,"line %d: <description> - no viable alt token=",ctx->line, LT(1) );
-	<endif>
-	return 1;	/* this is strange.... */<endif>
->>
-
-cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
-s<stateNumber>:
-	return <predictAlt>;
->>
-
-cyclicDFAEdge(labelExpr, targetStateNumber) ::= <<
-if ( <labelExpr> )
-	goto s<targetStateNumber>;
->>
-
-eotDFAEdge(targetStateNumber) ::= <<
-goto s<targetStateNumber>;
->>
-
 // D F A  E X P R E S S I O N S
 
 andPredicates(left,right) ::= "( <left> && <right> )"
@@ -691,17 +800,19 @@ orPredicates(left,right) ::= "( <left> || <right> )"
 
 notPredicate(pred) ::= "!( <pred> )"
 
-lookaheadTest(atom,k) ::= "la[<k>] == <atom>"
+lookaheadTest(atom,k,atomAsInt) ::= "LA(ctx,<k>) == <atom> /* latest <atomAsInt> */"
 
-lookaheadRangeTest(lower,upper,k) ::=
-	"( la[<k>] >= <lower> && la[<k>] \<= <upper> )"
+lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::=
+	"( LA(ctx,<k>) >= <lower> && LA(ctx,<k>) \<= <upper> )"
 
 setTest(ranges) ::= "<ranges; separator=\" || \">"
+
+// A C T I O N S
+
+emit(type) ::= "emit(<type>);"
+
+setType(type) ::= "ctx->tokenType = TOKEN_<type>;"
 
 // M I S C
 
 codeFileExtension() ::= ".c"
-
-lexerStreamType() ::= "IntegerStream"
-
-parserStreamType() ::= "IntegerStream"

@@ -30,6 +30,8 @@ package org.antlr.test;
 import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.CharStream;
 
 public class TestInterpretedLexing extends TestSuite {
 
@@ -58,7 +60,7 @@ public class TestInterpretedLexing extends TestSuite {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "INT : (DIGIT)+ ;\n"+
-				"local DIGIT : '0'..'9';\n");
+				"fragment DIGIT : '0'..'9';\n");
 		g.parse("INT", new ANTLRStringStream("12x")); // should ignore the x
 		g.parse("INT", new ANTLRStringStream("1234"));
     }
@@ -75,11 +77,28 @@ public class TestInterpretedLexing extends TestSuite {
         g.parse("A", new ANTLRStringStream("baa"));
     }
 
-    public void testSimpleLoops() throws Exception {
-        Grammar g = new Grammar(
-                "lexer grammar t;\n"+
-                "A : ('0'..'9')+ '.' ('0'..'9')* | ('0'..'9')+ ;\n");
-        g.parse("A", new ANTLRStringStream("1234.5"));
-    }
+	public void testSimpleLoops() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"A : ('0'..'9')+ '.' ('0'..'9')* | ('0'..'9')+ ;\n");
+		g.parse("A", new ANTLRStringStream("1234.5"));
+	}
+
+	public void testTokensRules() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"INT : (DIGIT)+ ;\n"+
+			"FLOAT : (DIGIT)+ '.' (DIGIT)* ;\n"+
+			"fragment DIGIT : '0'..'9';\n" +
+			"WS : (' ')+ ;\n");
+		//Grammar pg = new Grammar("grammar p; a : (INT|FLOAT|WS)+;");
+		//pg.parse("a", g);
+		CharStream input = new ANTLRStringStream("123 139.52");
+		Token t = g.nextToken(input);
+		while ( t.getType()!=Token.EOF ) {
+			System.out.println(t.toString(input));
+			t = g.nextToken(input);
+		}
+	}
 
 }
