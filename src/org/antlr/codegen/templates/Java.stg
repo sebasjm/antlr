@@ -70,6 +70,7 @@ public void <ruleName>(<args>) throws RecognitionException {
     }
     catch (RecognitionException re) {
         reportError(re);
+        errorRecovery = true;
         recover(re);
     }
 <if(exitAction)>
