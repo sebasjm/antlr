@@ -202,18 +202,29 @@ public class GrammarAST extends BaseAST {
     }
 
     /** Get the ith child from 0 */
-    public GrammarAST getChild(int i) {
-        int n = 0;
-        AST t = getFirstChild();
-        while ( t!=null ) {
-            if ( n==i ) {
-                return (GrammarAST)t;
-            }
-            n++;
-            t = (GrammarAST)t.getNextSibling();
-        }
-        return null;
-    }
+	public GrammarAST getChild(int i) {
+		int n = 0;
+		AST t = getFirstChild();
+		while ( t!=null ) {
+			if ( n==i ) {
+				return (GrammarAST)t;
+			}
+			n++;
+			t = (GrammarAST)t.getNextSibling();
+		}
+		return null;
+	}
+
+	public GrammarAST getFirstChildWithType(int ttype) {
+		AST t = getFirstChild();
+		while ( t!=null ) {
+			if ( t.getType()==ttype ) {
+				return (GrammarAST)t;
+			}
+			t = (GrammarAST)t.getNextSibling();
+		}
+		return null;
+	}
 
     public GrammarAST[] getChildrenAsArray() {
         AST t = getFirstChild();

@@ -47,10 +47,10 @@ public interface IntStream {
 	int index();
 
 	/** Reset the stream so that next call to index would return marker. */
-	public void rewind(int marker);
+	void rewind(int marker);
 
 	/** Only makes sense for streams that buffer everything up probably, but
 	 *  might be useful to display the entire stream or for testing.
 	 */
-	public int size();
+	int size();
 }

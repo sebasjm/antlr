@@ -153,12 +153,12 @@ charRef(char) ::= "match(<char>);"
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 matchSet(s) ::= <<
-if ( !(<s>) ) System.err.println("set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
+if ( !(<s>) ) System.err.println("rule <ruleName> set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
 input.consume();<\n>
 >>
 
 matchNotSet(s) ::= <<
-if ( <s> ) System.err.println("~set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
+if ( <s> ) System.err.println("rule <ruleName> ~set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
 input.consume();
 >>
 
@@ -178,16 +178,16 @@ lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
 dfaDecision(decisionNumber,description) ::=
   "alt<decisionNumber> = DFA<decisionNumber>.predict(input);"
 
-dfaState(edges,defaultClause,eotPredictsAlt,description) ::= <<
+dfaState(edges,defaultClause,eotPredictsAlt,description,stateNumber) ::= <<
 <edges; separator="else ">
 else {
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
 <if(LEXER)>
-    System.err.println("<description>: no viable alt line "+getLine()+" c='"+(char)input.LA(1)+"'");<\n>
+    System.err.println("<description>: state <stateNumber> no viable alt line "+getLine()+" c='"+(char)input.LA(1)+"'");<\n>
 <else>
-    System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1).toString(((CommonTokenStream)input).getTokenSource().getCharStream()));<\n>
+    System.err.println("<description>: state <stateNumber> no viable alt line token="+((TokenStream)input).LT(1).toString(((CommonTokenStream)input).getTokenSource().getCharStream()));<\n>
 <endif>
     input.consume();<\n>
 <endif>

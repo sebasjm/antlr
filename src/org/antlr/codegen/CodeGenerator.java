@@ -107,6 +107,11 @@ public class CodeGenerator {
 	 */
 	protected StringTemplateGroup cyclicDFATemplates;
 
+	/** The generated cyclic DFAs; need to be able to access from outside
+	 *  to check bytecode gen for Java etc...
+	 */
+	protected StringTemplate cyclicDFAST = null;
+
     /** A reference to the ANTLR tool so we can learn about output directories
      *  and such.
      */
@@ -256,8 +261,7 @@ public class CodeGenerator {
 		// CYCLIC DFAs
 		// Cyclic DFAs go into main recognizer ST by default
 
-		StringTemplate cyclicDFAST =
-			getCyclicDFATemplates().getInstanceOf("allCyclicDFAs");
+		cyclicDFAST = getCyclicDFATemplates().getInstanceOf("allCyclicDFAs");
 		cyclicDFAST = target.chooseWhereCyclicDFAsGo(tool,
 													 this,
 													 grammar,
@@ -354,9 +358,11 @@ public class CodeGenerator {
             maxK = k;
         }
         StringTemplate dfaST = templates.getInstanceOf("dfaState");
+		dfaST.setAttribute("stateNumber", new Integer(s.getStateNumber()));
         String description = dfa.getNFADecisionStartState().getDescription();
         if ( description!=null ) {
-            dfaST.setAttribute("description", Utils.replace(description,"\"", "\\\""));
+			description = Utils.replace(description,"\"", "\\\"");
+            //dfaST.setAttribute("description", description);
         }
         int EOTPredicts = NFA.INVALID_ALT_NUMBER;
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {
@@ -568,6 +574,16 @@ public class CodeGenerator {
 
 	public StringTemplateGroup getTemplates() {
 		return templates;
+	}
+
+	/** If cyclic DFAs generate bytecode, this will return the ST with the
+	 *  generated code if genRecognizer() has been invoked previously.
+	 */
+	public StringTemplate getCyclicDFAByteCodeST() {
+		if ( cyclicDFATemplates!=null ) {
+			return cyclicDFAST;
+		}
+		return null;
 	}
 
 	public StringTemplateGroup getCyclicDFATemplates() {

@@ -2,9 +2,13 @@ group Java_dfa;
 
 dfaDecision(decisionNumber,description) ::= <<
 int m<decisionNumber> = input.mark();
+int line<decisionNumber> = input.getLine();
+int pos<decisionNumber> = input.getCharPositionInLine();
 <! the <name> attribute is inherited via the parser, lexer, ... !>
 alt<decisionNumber> = <name>_DFA.DFA<decisionNumber>(input);
-input.rewind(m<decisionNumber>);<\n>
+input.rewind(m<decisionNumber>);
+input.setLine(line<decisionNumber>);
+input.setCharPositionInLine(pos<decisionNumber>);<\n>
 >>
 
 allCyclicDFAs(cyclicDFAs) ::= <<
@@ -18,9 +22,9 @@ allCyclicDFAs(cyclicDFAs) ::= <<
 cyclicDFA(decision,states,description) ::= <<
 ; public static int DFA<decision>(IntStream); // maxstack=2, locals+param=2
 .method DFA<decision> (Lorg/antlr/runtime/IntStream;)I 2 2
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    ldc "enter DFA"
-    invokevirtual java/io/PrintStream.println(Ljava/lang/String;)V
+;    getstatic java/lang/System.err Ljava/io/PrintStream;
+;    ldc "enter DFA"
+;    invokevirtual java/io/PrintStream.println(Ljava/lang/String;)V
     goto s0
 errorState:
     getstatic java/lang/System.err Ljava/io/PrintStream;
@@ -37,12 +41,12 @@ errorState:
 cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
 s<stateNumber>:
 ; print your state
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    ldc "DFA state "
-    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    iconst <stateNumber> 
-    invokevirtual java/io/PrintStream.println(I)V
+;    getstatic java/lang/System.err Ljava/io/PrintStream;
+;    ldc "DFA state "
+;    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
+;    getstatic java/lang/System.err Ljava/io/PrintStream;
+;    iconst <stateNumber> 
+;    invokevirtual java/io/PrintStream.println(I)V
 ; load lookahead into a local in every state
     aload 0
     iconst 1
@@ -62,18 +66,18 @@ s<stateNumber>:
 
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber) ::= <<
 s<stateNumber>e<edgeNumber>:
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    ldc "edge "
-    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    iconst <edgeNumber>
-    invokevirtual java/io/PrintStream.print(I)V
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    ldc " c="
-    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    iload 1
-    invokevirtual java/io/PrintStream.println(I)V
+;    getstatic java/lang/System.err Ljava/io/PrintStream;
+;    ldc "edge "
+;    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
+;    getstatic java/lang/System.err Ljava/io/PrintStream;
+;    iconst <edgeNumber>
+;    invokevirtual java/io/PrintStream.print(I)V
+;    getstatic java/lang/System.err Ljava/io/PrintStream;
+;    ldc " c="
+;    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
+;    getstatic java/lang/System.err Ljava/io/PrintStream;
+;    iload 1
+;    invokevirtual java/io/PrintStream.println(I)V
 <labelExpr>
     goto s<stateNumber>e<edgeNumber>_skip
 s<stateNumber>e<edgeNumber>_go:

@@ -49,9 +49,14 @@ public interface CharStream extends IntStream {
 
 	public String substring(int start, int stop);
 
-	// ANTLR lexers no longer track the line, char pos; it is done automatically
-	
-	public int getLine();
 
-	public int getCharPositionInLine();
+	/** ANTLR tracks the line information automatically */
+	int getLine();
+
+	/** Because this stream can rewind, we need to be able to reset the line */
+	void setLine(int line);
+
+	void setCharPositionInLine(int pos);
+
+	int getCharPositionInLine();
 }

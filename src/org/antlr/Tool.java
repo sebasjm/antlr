@@ -32,6 +32,7 @@ import org.antlr.tool.Grammar;
 import org.antlr.tool.ErrorManager;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.analysis.DecisionProbe;
 
 import java.io.*;
 
@@ -68,17 +69,20 @@ public class Tool {
         System.exit(0);
     }
 
-    protected void processArgs(String[] args) {
+    public void processArgs(String[] args) {
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-o")) {
-                if (i + 1 >= args.length) {
-                    System.err.println("missing output directory with -o option; ignoring");
-                }
-                else {
-                    i++;
-                    outputDir = args[i];
-                }
-            }
+			if (args[i].equals("-o")) {
+				if (i + 1 >= args.length) {
+					System.err.println("missing output directory with -o option; ignoring");
+				}
+				else {
+					i++;
+					outputDir = args[i];
+				}
+			}
+			else if (args[i].equals("-verbose")) {
+				DecisionProbe.verbose=true;
+			}
             else {
                 if (args[i].charAt(0) != '-') {
                     // Must be the grammar file

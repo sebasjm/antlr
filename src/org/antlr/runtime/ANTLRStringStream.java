@@ -95,4 +95,12 @@ public class ANTLRStringStream implements CharStream {
 	public int getCharPositionInLine() {
 		return charPositionInLine;
 	}
+
+	public void setLine(int line) {
+		this.line = line;
+	}
+
+	public void setCharPositionInLine(int pos) {
+		this.charPositionInLine = pos;
+	}	
 }

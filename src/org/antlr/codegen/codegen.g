@@ -184,8 +184,8 @@ rule returns [StringTemplate code=null]
     else {
         code = templates.getInstanceOf("rule");
     }
-    // get the dfa for the BLOCK
-    DFA dfa = #rule.getChild(1).getLookaheadDFA();
+	// get the dfa for the BLOCK
+    DFA dfa=#rule.getFirstChildWithType(BLOCK).getLookaheadDFA();
 }
     :   #( RULE id:ID {r=#id.getText();}
 			( #(OPTIONS .) )?
@@ -271,6 +271,7 @@ element returns [StringTemplate code=null]
 }
     :   code=atom
     |   #(  n:NOT
+            {code = templates.getInstanceOf("matchNotSet");}
             (  c:CHAR_LITERAL
 	           {
 	           int ttype = Grammar.getCharValueFromLiteral(c.getText());
@@ -283,7 +284,10 @@ element returns [StringTemplate code=null]
 	           elements = grammar.complement(ttype);
 	           }
             |  st:SET
-               {elements = grammar.complement(st.getSetValue());} 
+               {
+               // do not complement elements; we're using matchNotSet
+               elements = st.getSetValue();
+               }
             )
             {
             code = templates.getInstanceOf("matchNotSet");
@@ -363,7 +367,7 @@ atom returns [StringTemplate code=null]
     |   c:CHAR_LITERAL  {
                             if ( grammar.getType()==Grammar.LEXER ) {
                                 code = templates.getInstanceOf("charRef");
-                                code.setAttribute("char", c.getText());
+                                code.setAttribute("char", grammar.getUnicodeEscape(c.getText());
                             }
                             else { // else it's a token type reference
                                 code = templates.getInstanceOf("tokenRef");

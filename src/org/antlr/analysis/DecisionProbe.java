@@ -80,7 +80,7 @@ public class DecisionProbe {
 	 */
 	protected Set setOfIncompletelyCoveredAlts = new HashSet();
 
-	protected boolean verbose = false;
+	public static boolean verbose = false;
 
 	public DecisionProbe(DFA dfa) {
 		this.dfa = dfa;

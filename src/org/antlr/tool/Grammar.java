@@ -684,7 +684,8 @@ public class Grammar {
 
     public String getTokenTypeAsLabel(int ttype) {
         String name = getTokenName(ttype);
-        if ( name.charAt(0)=='"' || name.charAt(0)=='\'' ) {
+		// if it's not a lexer, then can't use char value, must have token type name
+        if ( getType()!=LEXER && (name.charAt(0)=='"' || name.charAt(0)=='\'') ) {
             return String.valueOf(ttype);
         }
         if ( ttype==Label.EOF ) {
@@ -1047,7 +1048,7 @@ public class Grammar {
     }
 
     /** Given a literal like 'a', return the int value of 'a'.
-     *  For '\\n', return int 10 ('\n').  Handles 16-bit char only.
+     *  For "'\n'", return int 10 ('\n').  Handles 16-bit char only.
      */
     public static int getCharValueFromLiteral(String literal) {
         //System.out.println("getCharValueFromLiteral: "+literal+"; len="+literal.length());

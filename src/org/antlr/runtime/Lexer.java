@@ -45,6 +45,7 @@ public abstract class Lexer implements TokenSource {
 					 int line, int charPosition,
 					 int channel,
 					 int start, int stop) {
+		//System.out.println("line: "+line+" '"+input.substring(start,stop)+"'");
 		Token token = new CommonToken(tokenType, channel, start, stop);
 		token.setLine(line);
 		token.setCharPositionInLine(charPosition);

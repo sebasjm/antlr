@@ -35,7 +35,7 @@ import java.io.BufferedReader;
 // TODO: this should be special case of ANTLRStringStream right?
 public class ANTLRFileStream implements CharStream {
     protected int p=0;
-    String fileName;
+    protected String fileName;
 
 	/** line number 1..n within the input */
 	protected int line = 1;
@@ -43,7 +43,7 @@ public class ANTLRFileStream implements CharStream {
 	/** The index of the character relative to the beginning of the line 0..n-1 */
 	protected int charPositionInLine = 0;
 
-    char[] data;
+    protected char[] data;
 
 	public ANTLRFileStream() {
 	}
@@ -75,13 +75,19 @@ public class ANTLRFileStream implements CharStream {
 	}
 
     public void consume() {
+		//System.out.println("prev p="+p+", c="+(char)data[p]);
         if ( p < data.length ) {
 			charPositionInLine++;
 			if ( data[p]=='\n' ) {
+				/*
+				System.out.println("newline char found on line: "+line+
+								   "@ pos="+charPositionInLine);
+				*/
 				line++;
 				charPositionInLine=0;
 			}
             p++;
+			//System.out.println("p moves to "+p+" (c='"+(char)data[p]+"')");
         }
     }
 
@@ -127,5 +133,13 @@ public class ANTLRFileStream implements CharStream {
 
 	public int getCharPositionInLine() {
 		return charPositionInLine;
+	}
+
+	public void setLine(int line) {
+		this.line = line;
+	}
+
+	public void setCharPositionInLine(int pos) {
+		this.charPositionInLine = pos;
 	}
 }

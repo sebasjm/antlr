@@ -117,7 +117,7 @@ grammarSpec[String gtype]
     ;
 
 optionsSpec
-    :   #( OPTIONS (option {out(" ");} )+ )
+    :   #( OPTIONS (option {out(" ");} )+ {out(" : ");} )
     ;
 
 option
