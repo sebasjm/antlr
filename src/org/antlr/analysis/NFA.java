@@ -41,7 +41,7 @@ public class NFA {
     public static final int INVALID_ALT_NUMBER = -1;
 
     /** This NFA represents which grammar? */
-    protected Grammar g;
+    public Grammar grammar;
 
     /** The NFA states in this NFA.  Maps state number to NFAState object.
      *  This is a Vector instead of a List because I need to be able to grow
@@ -54,7 +54,7 @@ public class NFA {
     protected NFAFactory factory = null;
 
     public NFA(Grammar g) {
-        this.g = g;
+        this.grammar = g;
     }
 
     public void addState(NFAState state) {
@@ -64,11 +64,6 @@ public class NFA {
 
     public NFAState getState(int s) {
         return (NFAState)numberToStateList.get(s);
-    }
-
-    /** Return the grammar this NFA represents. */
-    public Grammar getGrammar() {
-        return g;
     }
 
     public NFAFactory getFactory() {

@@ -66,7 +66,7 @@ public class TestCyclicDFAByteCode extends TestSuite {
 		antlr.processArgs(new String[] {"-o",System.getProperty("java.io.tmpdir")});
 		CodeGenerator generator = new CodeGenerator(antlr, g, language);
 		g.setCodeGenerator(generator);
-		if ( g.getType()==Grammar.LEXER ) {
+		if ( g.type==Grammar.LEXER ) {
 			g.addArtificialMatchTokensRule();
 		}
 		generator.genRecognizer();

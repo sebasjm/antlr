@@ -117,9 +117,9 @@ public class Tool {
 			// now handle the lexer if one was created for a merged spec
 
 			String lexerGrammarStr = grammar.getLexerGrammar();
-			if ( grammar.getType()==Grammar.COMBINED && lexerGrammarStr!=null ) {
-				System.out.println("writing lexer to ./"+grammar.getName()+".lexer.g");
-				FileWriter fw = getOutputFile(grammar.getName()+".lexer.g");
+			if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
+				System.out.println("writing lexer to ./"+grammar.name+".lexer.g");
+				FileWriter fw = getOutputFile(grammar.name+".lexer.g");
 				fw.write(lexerGrammarStr);
 				fw.close();
 				StringReader sr = new StringReader(lexerGrammarStr);
@@ -144,7 +144,7 @@ public class Tool {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);
 			grammar.setCodeGenerator(generator);
 
-			if ( grammar.getType()==Grammar.LEXER ) {
+			if ( grammar.type==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();
 			}
 

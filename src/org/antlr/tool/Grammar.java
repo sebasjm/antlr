@@ -77,10 +77,10 @@ public class Grammar {
 	}
 
 	/** What name did the user provide for this grammar? */
-	protected String name;
+	public String name;
 
     /** What type of grammar is this: lexer, parser, tree walker */
-    protected int type;
+    public int type;
 
     /** A list of options specified at the grammar level such as language=Java.
      *  The value can be an AST for complicated values such as character sets.
@@ -307,7 +307,7 @@ public class Grammar {
 			// if no rules, return nothing
 			return null;
 		}
-		lexerGrammarST.setAttribute("name", getName());
+		lexerGrammarST.setAttribute("name", name);
 		return lexerGrammarST.toString();
 	}
 
@@ -404,7 +404,7 @@ public class Grammar {
 		}
 		catch (RecognitionException re) {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
-							   getName(),
+							   name,
 							   re);
 		}
 		//System.out.println("NFA has "+factory.getNumberOfStates()+" states");
@@ -448,8 +448,8 @@ public class Grammar {
 								   " states, "+(int)(stop-start)+" ms");
 				*/
 				if ( true ) {
-					DOTGenerator dotGenerator = new DOTGenerator(nfa.getGrammar());
-					String dot = dotGenerator.getDOT( lookaheadDFA.getStartState() );
+					DOTGenerator dotGenerator = new DOTGenerator(nfa.grammar);
+					String dot = dotGenerator.getDOT( lookaheadDFA.startState );
 					String dotFileName = "/tmp/dec-"+decision;
 					try {
 						dotGenerator.writeDOTFile(dotFileName, dot);
@@ -643,7 +643,7 @@ public class Grammar {
 
     /** Return a set of all possible token/char types for this grammar */
 	public IntSet getTokenTypes() {
-		if ( getType()==LEXER ) {
+		if ( type==LEXER ) {
 			return charVocabulary;
 		}
 		return IntervalSet.of(Label.MIN_TOKEN_TYPE, getMaxTokenType());
@@ -688,7 +688,7 @@ public class Grammar {
     public String getTokenTypeAsLabel(int ttype) {
         String name = getTokenName(ttype);
 		// if it's not a lexer, then can't use char value, must have token type name
-        if ( getType()!=LEXER && (name.charAt(0)=='"' || name.charAt(0)=='\'') ) {
+        if ( type!=LEXER && (name.charAt(0)=='"' || name.charAt(0)=='\'') ) {
             return String.valueOf(ttype);
         }
         if ( ttype==Label.EOF ) {
@@ -906,7 +906,7 @@ public class Grammar {
         NFAState p = decisionState;
         while ( p.transition(1)!=null ) {
             n++;
-            p = (NFAState)p.transition(1).getTarget();
+            p = (NFAState)p.transition(1).target;
         }
         return n;
     }
@@ -925,13 +925,13 @@ public class Grammar {
         NFAState p = blk;
         while ( p!=null ) {
             // look for right end (just before end block)
-            NFAState q = (NFAState)p.transition(0).getTarget();
+            NFAState q = (NFAState)p.transition(0).target;
             while ( q.transition(0)!=null ) {
-                q = (NFAState)p.transition(0).getTarget();
+                q = (NFAState)p.transition(0).target;
             }
             alts.add( p.transition(0) );
             if ( p.transition(1)!=null ) {
-                p = (NFAState)p.transition(1).getTarget();
+                p = (NFAState)p.transition(1).target;
             }
             else {
                 p = null;
@@ -959,7 +959,7 @@ public class Grammar {
             Transition next = p.transition(1);
             p = null;
             if ( next!=null ) {
-                p = (NFAState)next.getTarget();
+                p = (NFAState)next.target;
             }
         }
         return null;
@@ -973,28 +973,8 @@ public class Grammar {
         return generator;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public NFA getNFA() {
-        return nfa;
-    }
-
     public GrammarAST getGrammarTree() {
         return grammarTree;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
 	/** given a token type and the text of the literal, come up with a

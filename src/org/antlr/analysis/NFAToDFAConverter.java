@@ -60,7 +60,7 @@ public class NFAToDFAConverter {
 		this.dfa = dfa;
 		NFAState nfaStartState = dfa.getNFADecisionStartState();
 		int nAlts =
-			dfa.nfa.getGrammar().getNumberOfAltsForDecisionNFA(nfaStartState);
+			dfa.nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStartState);
 		initContextTrees(nAlts);
 	}
 
@@ -100,7 +100,7 @@ public class NFAToDFAConverter {
 	 *  from it the accept state.
 	 */
 	protected DFAState getStartState() {
-		NFAState alt = dfa.getDecisionNFAStartState();
+		NFAState alt = dfa.decisionNFAStartState;
 		DFAState startState = dfa.newState();
 		int i = 0;
 		int altNum = 1;
@@ -113,10 +113,10 @@ public class NFAToDFAConverter {
 			// if first alt is derived from exit branch of loop,
 			// make alt=n+1 for n alts not 1
 			if ( i==0 && dfa.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
-				int numAltsIncludingExitBranch = dfa.nfa.getGrammar()
-						.getNumberOfAltsForDecisionNFA(dfa.getDecisionNFAStartState());
+				int numAltsIncludingExitBranch = dfa.nfa.grammar
+						.getNumberOfAltsForDecisionNFA(dfa.decisionNFAStartState);
 				altNum = numAltsIncludingExitBranch;
-				closure((NFAState)alt.transition(0).getTarget(),
+				closure((NFAState)alt.transition(0).target,
 						altNum,
 						initialContext,
 						initialContext,
@@ -126,7 +126,7 @@ public class NFAToDFAConverter {
 				altNum = 1; // make next alt the first
 			}
 			else {
-				closure((NFAState)alt.transition(0).getTarget(),
+				closure((NFAState)alt.transition(0).target,
 						altNum,
 						initialContext,
 						initialContext,
@@ -141,7 +141,7 @@ public class NFAToDFAConverter {
 			if ( alt.transition(1)==null ) {
 				break;
 			}
-			alt = (NFAState)alt.transition(1).getTarget();
+			alt = (NFAState)alt.transition(1).target;
 		}
 
 		// now DFA start state has the complete closure for the decision
@@ -201,7 +201,7 @@ public class NFAToDFAConverter {
 			DFAState t = reach(d, label);
 			if ( debug ) {
 				System.out.println("DFA state after reach "+d+"-" +
-								   label.toString(dfa.nfa.getGrammar())+"->"+t);
+								   label.toString(dfa.nfa.grammar)+"->"+t);
 			}
 			if ( t.getNFAConfigurations().size()==0 ) {
 				// nothing was reached by label due to conflict resolution
@@ -352,16 +352,16 @@ public class NFAToDFAConverter {
 			// System.out.print("invoking rule "+nfa.getGrammar().getRuleName(ref.getRuleIndex()));
 			// System.out.println(" context="+context);
 			// traverse epsilon edge to new rule
-			NFAState ruleTarget = (NFAState)ref.getTarget();
+			NFAState ruleTarget = (NFAState)ref.target;
 			closure(ruleTarget, alt, newContext, initialContext, semanticContext, d, collectPredicates);
 		}
 		// Case 2: end of rule state, context (i.e., an invoker) exists
-		else if ( p.isAcceptState() && context.getParent()!=null ) {
-			NFAState whichStateInvokedRule = context.getInvokingState();
+		else if ( p.isAcceptState() && context.parent!=null ) {
+			NFAState whichStateInvokedRule = context.invokingState;
 			RuleClosureTransition edgeToRule =
 				(RuleClosureTransition)whichStateInvokedRule.transition(0);
 			NFAState continueState = edgeToRule.getFollowState();
-			NFAContext newContext = context.getParent(); // "pop" invoking state
+			NFAContext newContext = context.parent; // "pop" invoking state
 			// we must move the initial context for this overall closure
 			initialContext = newContext; // mv stack top
 			closure(continueState, alt, newContext, initialContext, semanticContext, d, collectPredicates);
@@ -372,7 +372,7 @@ public class NFAToDFAConverter {
 		else {
 			// recurse down any epsilon transitions
 			if ( transition0!=null && transition0.isEpsilon() ) {
-				closure((NFAState)transition0.getTarget(),
+				closure((NFAState)transition0.target,
 						alt,
 						context,
 						initialContext,
@@ -386,11 +386,11 @@ public class NFAToDFAConverter {
 				if ( collectPredicates ) {
 					// AND the previous semantic context with new pred
 					SemanticContext labelContext =
-						transition0.getLabel().getSemanticContext();
+						transition0.label.getSemanticContext();
 					newSemanticContext = SemanticContext.and(semanticContext,
 													 labelContext);
 				}
-				closure((NFAState)transition0.getTarget(),
+				closure((NFAState)transition0.target,
 						alt,
 						context,
 						initialContext,
@@ -400,7 +400,7 @@ public class NFAToDFAConverter {
 			}
 			Transition transition1 = p.transition(1);
 			if ( transition1!=null && transition1.isEpsilon() ) {
-				closure((NFAState)transition1.getTarget(),
+				closure((NFAState)transition1.target,
 						alt,
 						context,
 						initialContext,
@@ -603,7 +603,7 @@ public class NFAToDFAConverter {
 			}
 			// Labels not unique at this point (not until addReachableLabels)
 			// so try simple int label match before general set intersection
-			Label edgeLabel = edge.getLabel();
+			Label edgeLabel = edge.label;
 			//System.out.println("comparing "+edgeLabel+" with "+label);
 			boolean matched =
 				(!label.isSet()&&edgeLabel.getAtom()==intLabel)||
@@ -612,7 +612,7 @@ public class NFAToDFAConverter {
 				// found a transition with label;
 				// add NFA target to (potentially) new DFA state
 				labelDFATarget.addNFAConfiguration(
-					(NFAState)edge.getTarget(),
+					(NFAState)edge.target,
 					c.alt,
 					c.context,
 					c.semanticContext);
@@ -644,7 +644,7 @@ public class NFAToDFAConverter {
 			}
 			NFAState p = dfa.nfa.getState(c.state);
 			Transition edge = p.transition(0);
-			Label edgeLabel = edge.getLabel();
+			Label edgeLabel = edge.label;
 			if ( edgeLabel.equals(eot) ) {
 				System.out.println("config with EOT: "+c);
 				d.setAcceptState(true);
@@ -845,9 +845,9 @@ public class NFAToDFAConverter {
 				nondeterministicAlts = allAlts;
 				int decision = d.dfa.getDecisionNumber();
 				NFAState tokensRuleStartState =
-					dfa.nfa.getGrammar().getRuleStartState(Grammar.TOKEN_RULENAME);
+					dfa.nfa.grammar.getRuleStartState(Grammar.TOKEN_RULENAME);
 				NFAState decisionState =
-					(NFAState)tokensRuleStartState.transition(0).getTarget();
+					(NFAState)tokensRuleStartState.transition(0).target;
 				// track lexer rule issues differently than other decisions
 				if ( decisionState.getDecisionNumber() == decision ) {
 					dfa.probe.reportLexerRuleNondeterminism(d,allAlts);

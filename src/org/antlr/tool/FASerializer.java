@@ -111,7 +111,7 @@ public class FASerializer {
         // visit nodes pointed to by each transition;
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {
             Transition edge = (Transition) s.transition(i);
-            walkFANormalizingStateNumbers(edge.getTarget()); // keep walkin'
+            walkFANormalizingStateNumbers(edge.target); // keep walkin'
             // if this transition is a rule reference, the node "following" this state
             // will not be found and appear to be not in graph.  Must explicitly jump
             // to it, but don't "draw" an edge.
@@ -142,20 +142,20 @@ public class FASerializer {
                 buf.append("->");
             }
             else if ( edge.isSemanticPredicate() ) {
-                buf.append("-"+edge.getLabel().getSemanticContext()+"->");
+                buf.append("-"+edge.label.getSemanticContext()+"->");
             }
             else {
-                buf.append("-"+edge.getLabel().toString(grammar)+"->");
+                buf.append("-"+edge.label.toString(grammar)+"->");
             }
             Integer normalizedTargetStateNumberI =
-                    (Integer)stateNumberTranslator.get(edge.getTarget());
+                    (Integer)stateNumberTranslator.get(edge.target);
             int normalizedTargetStateNumber = normalizedTargetStateNumberI.intValue();
-            buf.append(getStateString(normalizedTargetStateNumber, edge.getTarget()));
+            buf.append(getStateString(normalizedTargetStateNumber, edge.target));
             buf.append("\n");
             lines.add(buf.toString());
 
             // walk this transition
-            walkSerializingFA(lines, edge.getTarget());
+            walkSerializingFA(lines, edge.target);
 
             // if this transition is a rule reference, the node "following" this state
             // will not be found and appear to be not in graph.  Must explicitly jump

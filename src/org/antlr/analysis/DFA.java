@@ -38,10 +38,10 @@ import java.util.*;
  */
 public class DFA {
     /** What's the start state for this DFA? */
-    protected DFAState startState;
+    public DFAState startState;
 
     /** From what NFAState did we create the DFA? */
-    protected NFAState decisionNFAStartState;
+    public NFAState decisionNFAStartState;
 
     /** Unique state numbers */
     protected int stateCounter = 0;
@@ -119,8 +119,8 @@ public class DFA {
         this.decisionNFAStartState = decisionStartState;
         nfa = decisionStartState.getNFA();
         int nAlts =
-            nfa.getGrammar().getNumberOfAltsForDecisionNFA(decisionStartState);
-        setOptions( nfa.getGrammar().getDecisionOptions(getDecisionNumber()) );
+            nfa.grammar.getNumberOfAltsForDecisionNFA(decisionStartState);
+        setOptions( nfa.grammar.getDecisionOptions(getDecisionNumber()) );
         initUnreachableAlts(nAlts);
 
         nfaConverter = new NFAToDFAConverter(this);
@@ -138,7 +138,7 @@ public class DFA {
     }
 
 	public int predict(IntStream input) {
-		Interpreter interp = new Interpreter(nfa.getGrammar(), input);
+		Interpreter interp = new Interpreter(nfa.grammar, input);
 		return interp.predict(this);
 	}
 
@@ -204,7 +204,7 @@ public class DFA {
 	 *  4. if sem preds, nondeterministic alts must be sufficiently covered
 	 */
 	public void verify() {
-		doesStateReachAcceptState(getStartState());
+		doesStateReachAcceptState(startState);
 	}
 
     /** figure out if this state eventually reaches an accept state and
@@ -244,7 +244,7 @@ public class DFA {
 		// all transitions must be traversed to set status of each DFA state.
 		for (int i=0; i<d.getNumberOfTransitions(); i++) {
             Transition t = d.transition(i);
-            DFAState edgeTarget = (DFAState)t.getTarget();
+            DFAState edgeTarget = (DFAState)t.target;
             int targetStatus = edgeTarget.getAcceptStateReachable();
             if ( targetStatus==REACHABLE_BUSY ) { // avoid cycles; they say nothing
                 cyclic = true;
@@ -277,10 +277,6 @@ public class DFA {
 			reduced = false;
         }
         return anEdgeReachesAcceptState;
-    }
-
-    public DFAState getStartState() {
-        return startState;
     }
 
     public NFAState getNFADecisionStartState() {
@@ -326,10 +322,6 @@ public class DFA {
     public int getNumberOfStates() {
         return numberOfStates;
     }
-
-	public NFAState getDecisionNFAStartState() {
-		return decisionNFAStartState;
-	}
 
     protected void initUnreachableAlts(int numberOfAlts) {
         unreachableAlts = new LinkedList();

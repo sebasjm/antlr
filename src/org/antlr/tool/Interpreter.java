@@ -47,7 +47,7 @@ public class Interpreter implements TokenSource {
 		Stack callStack = new Stack();
 		public BuildParseTree(Grammar g) {
 			this.g = g;
-			ParseTree root = new ParseTree("<grammar "+g.getName()+">");
+			ParseTree root = new ParseTree("<grammar "+g.name+">");
 			callStack.push(root);
 		}
 		public ParseTree getTree() {
@@ -79,7 +79,7 @@ public class Interpreter implements TokenSource {
 	public Token nextToken()
 		throws TokenStreamException
 	{
-		if ( grammar.getType()!=Grammar.LEXER ) {
+		if ( grammar.type!=Grammar.LEXER ) {
 			return null;
 		}
 		if ( input.LA(1)==CharStream.EOF ) {
@@ -121,14 +121,14 @@ public class Interpreter implements TokenSource {
 	public void scan(String startRule, InterpreterActions actions)
 		throws RecognitionException
 	{
-		if ( grammar.getType()!=Grammar.LEXER ) {
+		if ( grammar.type!=Grammar.LEXER ) {
 			return;
 		}
 		CharStream input = (CharStream)this.input;
 		//System.out.println("scan("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
-			if ( grammar.getType()==Grammar.LEXER ) {
+			if ( grammar.type==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();
 			}
 			grammar.createNFAs();
@@ -157,7 +157,7 @@ public class Interpreter implements TokenSource {
 		//System.out.println("parse("+startRule+")");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
-			if ( grammar.getType()==Grammar.LEXER ) {
+			if ( grammar.type==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();
 			}
 			grammar.createNFAs();
@@ -226,7 +226,7 @@ public class Interpreter implements TokenSource {
 					}
 				}
 				NFAState alt = grammar.getNFAStateForAltOfDecision(s, predictedAlt);
-				s = (NFAState)alt.transition(0).getTarget();
+				s = (NFAState)alt.transition(0).target;
 				continue;
 			}
 
@@ -250,20 +250,20 @@ public class Interpreter implements TokenSource {
 			}
 
 			Transition trans = s.transition(0);
-			Label label = trans.getLabel();
+			Label label = trans.label;
 			// CASE 3: epsilon transition
 			if ( label.isEpsilon() ) {
 				// CASE 3a: rule invocation state
 				if ( trans instanceof RuleClosureTransition ) {
 					ruleInvocationStack.push(s);
-					s = (NFAState)trans.getTarget();
+					s = (NFAState)trans.target;
 					if ( actions!=null ) {
 						actions.enterRule(s.getEnclosingRule());
 					}
 				}
 				// CASE 3b: plain old epsilon transition, just move
 				else {
-					s = (NFAState)trans.getTarget();
+					s = (NFAState)trans.target;
 				}
 			}
 
@@ -272,7 +272,7 @@ public class Interpreter implements TokenSource {
 				if ( actions!=null ) {
 					actions.matchElement(t);
 				}
-				s = (NFAState)s.transition(0).getTarget();
+				s = (NFAState)s.transition(0).target;
 				input.consume();
 				t = input.LA(1);
 			}
@@ -301,7 +301,7 @@ public class Interpreter implements TokenSource {
 	 *  predicting with.
 	 */
 	public int predict(DFA dfa) {
-		DFAState s = dfa.getStartState();
+		DFAState s = dfa.startState;
 		int c = input.LA(1);
 		Transition eotTransition = null;
 	dfaLoop:
@@ -314,24 +314,24 @@ public class Interpreter implements TokenSource {
 			for (int i=0; i<s.getNumberOfTransitions(); i++) {
 				Transition t = s.transition(i);
 				// special case: EOT matches any char
-				if ( t.getLabel().matches(c) ) {
+				if ( t.label.matches(c) ) {
 					// take transition i
-					s = (DFAState)t.getTarget();
+					s = (DFAState)t.target;
 					input.consume();
 					c = input.LA(1);
 					continue dfaLoop;
 				}
-				if ( t.getLabel().getAtom()==Label.EOT ) {
+				if ( t.label.getAtom()==Label.EOT ) {
 					eotTransition = t;
 				}
 			}
 			if ( eotTransition!=null ) {
-				s = (DFAState)eotTransition.getTarget();
+				s = (DFAState)eotTransition.target;
 				continue dfaLoop;
 			}
 			ErrorManager.error(ErrorManager.MSG_NO_VIABLE_DFA_ALT,
 							   s,
-							   dfa.nfa.getGrammar().getTokenName(c));
+							   dfa.nfa.grammar.getTokenName(c));
 			return NFA.INVALID_ALT_NUMBER;
 		}
 		// woohoo!  We know which alt to predict

@@ -66,7 +66,7 @@ public class DFAState extends State {
     /** We are part of what DFA?  Use this ref to get access to the
      *  context trees for an alt.
      */
-    protected DFA dfa;
+    public DFA dfa;
 
     /** Track the transitions emanating from this DFA state.  The List
      *  elements are Transition objects.
@@ -179,7 +179,7 @@ public class DFAState extends State {
 
         // update reachableLabels
         if ( state.transition(0)!=null ) {
-            Label label = state.transition(0).getLabel();
+            Label label = state.transition(0).label;
             if ( !(label.isEpsilon()||label.isSemanticPredicate()) ) {
                 if ( state.transition(1)==null ) {
                     c.singleAtomTransitionEmanating = true;

@@ -194,7 +194,7 @@ rules
 				// DOC_COMMENT TOKEN_REF, but that's an impossible sequence
 				warnWhenFollowAmbig=false;
 			}
-		:	//{g.getType()==PARSER}? (aliasLexerRule)=>aliasLexerRule |
+		:	//{g.type==PARSER}? (aliasLexerRule)=>aliasLexerRule |
 			rule
 		)+
     ;

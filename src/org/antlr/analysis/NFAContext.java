@@ -44,12 +44,12 @@ package org.antlr.analysis;
  *  on the path from this node thru the parent pointers to the root.
  */
 public class NFAContext {
-    protected NFAContext parent;
+    public NFAContext parent;
 
     /** The NFA state that invoked another rule's start state is recorded
      *  on the rule invocation context stack.
      */
-    protected NFAState invokingState;
+    public NFAState invokingState;
 
     /** Computing the hashCode is very expensive and closureBusy()
      *  uses it to track when it's seen a state|ctx before to avoid
@@ -71,14 +71,6 @@ public class NFAContext {
         if ( parent!=null ) {
             this.cachedHashCode += parent.cachedHashCode;
         }
-    }
-
-    public NFAContext getParent() {
-        return parent;
-    }
-
-    public NFAState getInvokingState() {
-        return invokingState;
     }
 
     /** Two contexts are equals() if both have

@@ -242,12 +242,12 @@ public class CodeGenerator {
 
 		// RECOGNIZER
 		StringTemplate recognizerST;
-		if ( grammar.getType()==Grammar.LEXER ) {
+		if ( grammar.type==Grammar.LEXER ) {
 			recognizerST = templates.getInstanceOf("lexer");
 			outputFileST.setAttribute("LEXER", "true");
 		}
-		else if ( grammar.getType()==Grammar.PARSER ||
-			      grammar.getType()==Grammar.COMBINED )
+		else if ( grammar.type==Grammar.PARSER ||
+			      grammar.type==Grammar.COMBINED )
 		{
 			recognizerST = templates.getInstanceOf("parser");
 			outputFileST.setAttribute("PARSER", "true");
@@ -339,7 +339,7 @@ public class CodeGenerator {
     public StringTemplate genFixedLookaheadDecision(StringTemplateGroup templates,
                                                     DFA dfa)
     {
-        return walkFixedDFACreatingEdges(templates, dfa, dfa.getStartState(), 1);
+        return walkFixedDFACreatingEdges(templates, dfa, dfa.startState, 1);
     }
 
     protected StringTemplate walkFixedDFACreatingEdges(
@@ -367,19 +367,19 @@ public class CodeGenerator {
         int EOTPredicts = NFA.INVALID_ALT_NUMBER;
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {
             Transition edge = (Transition) s.transition(i);
-            if ( edge.getLabel().getAtom()==Label.EOT ) {
+            if ( edge.label.getAtom()==Label.EOT ) {
                 // don't generate a real edge for EOT; track what EOT predicts
-                DFAState target = (DFAState)edge.getTarget();
+                DFAState target = (DFAState)edge.target;
                 EOTPredicts = target.getUniquelyPredictedAlt();
                 continue;
             }
             StringTemplate edgeST = templates.getInstanceOf("dfaEdge");
             edgeST.setAttribute("labelExpr",
-                                genLabelExpr(templates,edge.getLabel(),k));
+                                genLabelExpr(templates,edge.label,k));
             StringTemplate targetST =
                     walkFixedDFACreatingEdges(templates,
                                               dfa,
-                                              (DFAState)edge.getTarget(),
+                                              (DFAState)edge.target,
                                               k+1);
             edgeST.setAttribute("targetState", targetST);
             dfaST.setAttribute("edges", edgeST);
@@ -397,7 +397,7 @@ public class CodeGenerator {
         int d = dfa.getDecisionNumber();
         dfaST.setAttribute("decision", new Integer(d));
         visited = new BitSet(dfa.getNumberOfStates());
-        walkCyclicDFACreatingStates(templates, dfaST, dfa.getStartState());
+        walkCyclicDFACreatingStates(templates, dfaST, dfa.startState);
         return dfaST;
     }
 
@@ -426,7 +426,7 @@ public class CodeGenerator {
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {
             Transition edge = (Transition) s.transition(i);
             StringTemplate edgeST;
-            if ( edge.getLabel().getAtom()==Label.EOT ) {
+            if ( edge.label.getAtom()==Label.EOT ) {
                 // this is the default clause; must be last
                 edgeST = templates.getInstanceOf("eotDFAEdge");
                 stateST.removeAttribute("needErrorClause");
@@ -435,18 +435,18 @@ public class CodeGenerator {
             else {
                 edgeST = templates.getInstanceOf("cyclicDFAEdge");
                 edgeST.setAttribute("labelExpr",
-                        genLabelExpr(templates,edge.getLabel(),1));
+                        genLabelExpr(templates,edge.label,1));
             }
 			edgeST.setAttribute("edgeNumber", new Integer(i+1));
             edgeST.setAttribute("targetStateNumber",
-                                 new Integer(edge.getTarget().stateNumber));
-            if ( edge.getLabel().getAtom()!=Label.EOT ) {
+                                 new Integer(edge.target.stateNumber));
+            if ( edge.label.getAtom()!=Label.EOT ) {
                 stateST.setAttribute("edges", edgeST);
             }
             // now check other states
             walkCyclicDFACreatingStates(templates,
                                   dfaST,
-                                  (DFAState)edge.getTarget());
+                                  (DFAState)edge.target);
         }
         if ( eotST!=null ) {
             stateST.setAttribute("edges", eotST);
@@ -595,11 +595,11 @@ public class CodeGenerator {
 
 	public String getRecognizerFileName() {
 		StringTemplate extST = templates.getInstanceOf("codeFileExtension");
-		return grammar.getName()+extST.toString();
+		return grammar.name+extST.toString();
 	}
 
     public String getVocabFileName() {
-        return grammar.getName()+VOCAB_FILE_EXTENSION;
+        return grammar.name+VOCAB_FILE_EXTENSION;
     }
 
 	public void write(StringTemplate code, String fileName) throws IOException {

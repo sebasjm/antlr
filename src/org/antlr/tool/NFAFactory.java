@@ -99,12 +99,12 @@ public class NFAFactory {
      *  result, that is.  Get set and complement, replace old with complement.
      */
     public StateCluster build_AlternativeBlockComplement(StateCluster blk) {
-        State s0 = blk.left();
+        State s0 = blk.left;
         IntSet set = getCollapsedBlockAsSet(s0);
         if ( set!=null ) {
             // if set is available, then structure known and blk is a set
             set = set.complement();
-            Label label = s0.transition(0).getTarget().transition(0).getLabel();
+            Label label = s0.transition(0).target.transition(0).label;
             label.setSet(set);
         }
         return blk;
@@ -152,7 +152,7 @@ public class NFAFactory {
      *  for n characters.
      */
     public StateCluster build_StringLiteralAtom(String stringLiteral) {
-        if ( nfa.getGrammar().getType()==Grammar.LEXER ) {
+        if ( nfa.grammar.type==Grammar.LEXER ) {
             // first remove the double-quotes
             stringLiteral = stringLiteral.substring(1,stringLiteral.length()-1);
             NFAState first = newState();
@@ -169,7 +169,7 @@ public class NFAFactory {
         }
 
         // a simple token reference in non-Lexers
-        int tokenType = nfa.getGrammar().getTokenType(stringLiteral);
+        int tokenType = nfa.grammar.getTokenType(stringLiteral);
         return build_Atom(tokenType);
     }
 
@@ -233,7 +233,7 @@ public class NFAFactory {
         for (Iterator iterator = rules.iterator(); iterator.hasNext();) {
 			Grammar.Rule r = (Grammar.Rule) iterator.next();
 			String ruleName = r.getName();
-			NFAState endNFAState = nfa.getGrammar().getRuleStopState(ruleName);
+			NFAState endNFAState = nfa.grammar.getRuleStopState(ruleName);
             // Is this rule a start symbol?  (no follow links)
             if ( endNFAState.transition(0)==null ) {
                 // if so, then don't let algorithm fall off the end of
@@ -249,10 +249,10 @@ public class NFAFactory {
      */
     private void build_EOFState(NFAState endNFAState) {
         int label = Label.EOF;
-        if ( nfa.getGrammar().getType()==Grammar.LEXER ) {
+        if ( nfa.grammar.type==Grammar.LEXER ) {
             label = Label.EOT;
         }
-        // System.out.println("build "+nfa.getGrammar().getTokenName(label)+" loop on end of state "+endNFAState.getDescription());
+        // System.out.println("build "+nfa.grammar.getTokenName(label)+" loop on end of state "+endNFAState.getDescription());
         NFAState end = newState();
         end.setEOTState(true);
         Transition toEnd = new Transition(label, end);
@@ -271,8 +271,8 @@ public class NFAFactory {
         if ( B==null ) {
             return A;
         }
-        transitionBetweenStates(A.right(), B.left(), Label.EPSILON);
-        StateCluster g = new StateCluster(A.left(), B.right());
+        transitionBetweenStates(A.right, B.left, Label.EPSILON);
+        StateCluster g = new StateCluster(A.left, B.right);
         return g;
     }
 
@@ -321,8 +321,8 @@ public class NFAFactory {
             // add begin NFAState for this alt connected by epsilon
             NFAState left = newState();
             left.setDescription("alt "+altNum+" of ()");
-            transitionBetweenStates(left, g.left(), Label.EPSILON);
-            transitionBetweenStates(g.right(), blockEndNFAState, Label.EPSILON);
+            transitionBetweenStates(left, g.left, Label.EPSILON);
+            transitionBetweenStates(g.right, blockEndNFAState, Label.EPSILON);
             // Are we the first alternative?
             if ( firstAlt==null ) {
                 firstAlt = left; // track extreme left node of StateCluster
@@ -354,7 +354,7 @@ public class NFAFactory {
      */
     public StateCluster build_Aoptional(StateCluster A) {
         StateCluster g = null;
-        int n = nfa.getGrammar().getNumberOfAltsForDecisionNFA(A.left());
+        int n = nfa.grammar.getNumberOfAltsForDecisionNFA(A.left);
         if ( n==1 ) {
             // no decision, just wrap in an optional path
             NFAState emptyAlt = newState();
@@ -363,20 +363,20 @@ public class NFAFactory {
             emptyAlt.setDescription("epsilon path of ()? block");
             NFAState blockEndNFAState = newState();
             blockEndNFAState.setDescription("end ()? block");
-            transitionBetweenStates(realAlt, A.left(), Label.EPSILON);
+            transitionBetweenStates(realAlt, A.left, Label.EPSILON);
             transitionBetweenStates(realAlt, emptyAlt, Label.EPSILON);
             transitionBetweenStates(emptyAlt, blockEndNFAState, Label.EPSILON);
-            transitionBetweenStates(A.right(), blockEndNFAState, Label.EPSILON);
+            transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
             g = new StateCluster(realAlt, blockEndNFAState);
         }
         else {
             // a decision block, add an empty alt
             NFAState lastRealAlt =
-                    nfa.getGrammar().getNFAStateForAltOfDecision(A.left(), n);
+                    nfa.grammar.getNFAStateForAltOfDecision(A.left, n);
             NFAState emptyAlt = newState();
             emptyAlt.setDescription("epsilon path of ()? block");
             transitionBetweenStates(lastRealAlt, emptyAlt, Label.EPSILON);
-            transitionBetweenStates(emptyAlt, A.right(), Label.EPSILON);
+            transitionBetweenStates(emptyAlt, A.right, Label.EPSILON);
             g = A; // return same block, but now with optional last path
         }
 
@@ -400,10 +400,10 @@ public class NFAFactory {
         NFAState left = newState();
         NFAState blockEndNFAState = newState();
 		// turn A's block end into a loopback (acts like alt 2)
-		A.right().setDescription("()+ loopback");
-        transitionBetweenStates(A.right(), blockEndNFAState, Label.EPSILON); // follow is Transition 1
-		transitionBetweenStates(A.right(), A.left(), Label.EPSILON); // loop back Transition 2
-		transitionBetweenStates(left, A.left(), Label.EPSILON);
+		A.right.setDescription("()+ loopback");
+        transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON); // follow is Transition 1
+		transitionBetweenStates(A.right, A.left, Label.EPSILON); // loop back Transition 2
+		transitionBetweenStates(left, A.left, Label.EPSILON);
 
         StateCluster g = new StateCluster(left, blockEndNFAState);
         return g;
@@ -443,16 +443,16 @@ public class NFAFactory {
         optionalAlt.setDescription("epsilon path of ()* block");
         NFAState blockEndNFAState = newState();
 		// convert A's end block to loopback
-		A.right().setDescription("()* loopback");
+		A.right.setDescription("()* loopback");
         // Transition 1 to actual block of stuff
-        transitionBetweenStates(realAlt, A.left(), Label.EPSILON);
+        transitionBetweenStates(realAlt, A.left, Label.EPSILON);
         // Transition 2 optional to bypass
         transitionBetweenStates(realAlt, optionalAlt, Label.EPSILON);
 		transitionBetweenStates(optionalAlt, blockEndNFAState, Label.EPSILON);
         // Transition 1 of end block exits
-        transitionBetweenStates(A.right(), blockEndNFAState, Label.EPSILON);
+        transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
         // Transition 2 of end block loops
-        transitionBetweenStates(A.right(), A.left(), Label.EPSILON);
+        transitionBetweenStates(A.right, A.left, Label.EPSILON);
 
         StateCluster g = new StateCluster(realAlt, blockEndNFAState);
         return g;
@@ -484,19 +484,19 @@ public class NFAFactory {
         int altNum = 1;
         NFAState firstAlt = null; // the start state for the "rule"
         NFAState prevAlternative = null;
-        Iterator iter = nfa.getGrammar().getRules().iterator();
+        Iterator iter = nfa.grammar.getRules().iterator();
 		// TODO: add a single decision node/state for good description
         while (iter.hasNext()) {
 			Grammar.Rule r = (Grammar.Rule) iter.next();
             String ruleName = r.getName();
-			String modifier = nfa.getGrammar().getRuleModifier(ruleName);
+			String modifier = nfa.grammar.getRuleModifier(ruleName);
             if ( ruleName.equals(Grammar.TOKEN_RULENAME) ||
 				 (modifier!=null &&
 				  modifier.equals(Grammar.FRAGMENT_RULE_MODIFIER)) )
 			{
                 continue; // don't loop to yourself or do nontoken rules
             }
-            NFAState ruleStartState = nfa.getGrammar().getRuleStartState(ruleName);;
+            NFAState ruleStartState = nfa.grammar.getRuleStartState(ruleName);;
             NFAState left = newState();
             left.setDescription("alt "+altNum+" of artificial rule "+Grammar.TOKEN_RULENAME);
             transitionBetweenStates(left, ruleStartState, Label.EPSILON);
@@ -519,11 +519,11 @@ public class NFAFactory {
         NFAState left = newState();
         NFAState right = newState();
         Label label = null;
-        if ( nfa.getGrammar().getType()==Grammar.LEXER ) {
+        if ( nfa.grammar.type==Grammar.LEXER ) {
             label = new Label(Label.ALLCHAR);
         }
         else {
-            label = new Label(nfa.getGrammar().getTokenTypes()); 
+            label = new Label(nfa.grammar.getTokenTypes());
         }
         Transition e = new Transition(label,right);
         left.addTransition(e);
@@ -561,10 +561,10 @@ public class NFAFactory {
         for (int i = 0; i < alts.size(); i++) {
             StateCluster alt = (StateCluster)alts.get(i);
             // if left doesn't point at right directly, can't be just a token
-            if ( alt.left().transition(0).getTarget()!=alt.right() ) {
+            if ( alt.left.transition(0).target!=alt.right ) {
                 return null;
             }
-            Label label = alt.left().transition(0).getLabel();
+            Label label = alt.left.transition(0).label;
             if ( label.isAtom() ) {
                 set.add(label.getAtom());
             }
@@ -584,9 +584,9 @@ public class NFAFactory {
     protected IntSet getCollapsedBlockAsSet(State blk) {
         State s0 = blk;
         if ( s0!=null && s0.transition(0)!=null ) {
-            State s1 = s0.transition(0).getTarget();
+            State s1 = s0.transition(0).target;
             if ( s1!=null && s1.transition(0)!=null ) {
-                Label label = s1.transition(0).getLabel();
+                Label label = s1.transition(0).label;
                 if ( label.isSet() ) {
                     return label.getSet();
                 }
@@ -603,27 +603,27 @@ public class NFAFactory {
         if ( s0!=null && s0.transition(0)!=null &&
              s0.transition(1)==null )
         {
-            State s1 = s0.transition(0).getTarget();
+            State s1 = s0.transition(0).target;
             if ( s1!=null && s1.transition(0)!=null &&
                  s1.transition(1)==null )
             {
-                State s2 = s1.transition(0).getTarget();
+                State s2 = s1.transition(0).target;
                 if ( s2!=null && s2.transition(0)!=null &&
                      s2.transition(1)==null &&
-                     s2.transition(0).getLabel().isSet() )
+                     s2.transition(0).label.isSet() )
                 {
-                    State s3 = s2.transition(0).getTarget();
+                    State s3 = s2.transition(0).target;
                     if ( s3!=null && s3.transition(0)!=null &&
                          s3.transition(1)==null )
                     {
-                        State s4 = s3.transition(0).getTarget();
+                        State s4 = s3.transition(0).target;
                         if ( s4!=null && s4.transition(0)!=null &&
                              s4.transition(1)==null )
                         {
-                            State s5 = s4.transition(0).getTarget();
+                            State s5 = s4.transition(0).target;
                             if ( s5!=null && s5.isAcceptState() ) {
                                 // rule is definitely a simple single set match
-                                return s2.transition(0).getLabel().getSet();
+                                return s2.transition(0).label.getSet();
                             }
                         }
                     }
@@ -734,7 +734,7 @@ public class NFAFactory {
 		}
 
 		// must be a token name, look it up to get int label
-		int ttype = nfa.getGrammar().getTokenType(transition);
+		int ttype = nfa.grammar.getTokenType(transition);
 		return ttype;
     }
     */

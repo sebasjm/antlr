@@ -178,7 +178,7 @@ rule returns [StringTemplate code=null]
 {
     String r;
     StringTemplate b;
-    if ( grammar.getType()==Grammar.LEXER ) {
+    if ( grammar.type==Grammar.LEXER ) {
         code = templates.getInstanceOf("lexerRule");
     }
     else {
@@ -194,20 +194,20 @@ rule returns [StringTemplate code=null]
          )
         // do not generate lexer rules in combined grammar
         {
-        if ( grammar.getType()==Grammar.COMBINED &&
+        if ( grammar.type==Grammar.COMBINED &&
              Character.isUpperCase(r.charAt(0)) )
         {
         	code = null; // kill this
         }
         else {
-			if ( grammar.getType()==Grammar.LEXER ) {
+			if ( grammar.type==Grammar.LEXER ) {
 		    	boolean naked =
 		    		r.equals(Grammar.TOKEN_RULENAME) ||
 		    	    (mod!=null&&mod.getText().equals(Grammar.FRAGMENT_RULE_MODIFIER));
 		    	code.setAttribute("nakedBlock", new Boolean(naked));
 			}
 			String trace = (String)grammar.getOption("trace");
-			if ( grammar.getType()!=Grammar.LEXER &&
+			if ( grammar.type!=Grammar.LEXER &&
 				 trace!=null && trace.equals("true") )
 			{ // TODO: use option for now not cmd-line; HIDEOUS, fix this with ST composition
 				code.setAttribute("enterAction",
@@ -356,7 +356,7 @@ atom returns [StringTemplate code=null]
     :   r:RULE_REF     {code = templates.getInstanceOf("ruleRef");
                         code.setAttribute("rule", r.getText());}
     |   t:TOKEN_REF    {
-                       if ( grammar.getType()==Grammar.LEXER ) {
+                       if ( grammar.type==Grammar.LEXER ) {
                            code = templates.getInstanceOf("lexerRuleRef");
                            code.setAttribute("rule", t.getText());
                        }
@@ -367,7 +367,7 @@ atom returns [StringTemplate code=null]
                        }
 
     |   c:CHAR_LITERAL  {
-                            if ( grammar.getType()==Grammar.LEXER ) {
+                            if ( grammar.type==Grammar.LEXER ) {
                                 code = templates.getInstanceOf("charRef");
                                 code.setAttribute("char", c.getText());
                             }
@@ -379,7 +379,7 @@ atom returns [StringTemplate code=null]
                         }
 
     |   s:STRING_LITERAL{
-                        if ( grammar.getType()==Grammar.LEXER ) {
+                        if ( grammar.type==Grammar.LEXER ) {
                             code = templates.getInstanceOf("lexerStringRef");
                             code.setAttribute("string", s.getText());
                         }
@@ -391,7 +391,7 @@ atom returns [StringTemplate code=null]
                         }
 
     |   w:WILDCARD      {
-                        if ( grammar.getType()==Grammar.LEXER ) {
+                        if ( grammar.type==Grammar.LEXER ) {
                             code = templates.getInstanceOf("wildcardChar");
                         }
                         else { // else it's a token type reference

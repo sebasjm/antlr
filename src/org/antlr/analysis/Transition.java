@@ -36,10 +36,10 @@ package org.antlr.analysis;
  */
 public class Transition implements Comparable {
     /** What label must be consumed to transition to target */
-    protected Label label;
+    public Label label;
 
     /** The target of this transition */
-    protected State target;
+    public State target;
 
     public Transition(Label label, State target) {
         this.label = label;
@@ -57,14 +57,6 @@ public class Transition implements Comparable {
 
     public boolean isSemanticPredicate() {
         return label.isSemanticPredicate();
-    }
-
-    public State getTarget() {
-        return target;
-    }
-
-    public Label getLabel() {
-        return label;
     }
 
     public int hashCode() {

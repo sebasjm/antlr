@@ -150,7 +150,7 @@ protected void trackTokenRule(GrammarAST t,
 							  GrammarAST block)
 {
 	// imported token names might exist, only add if new
-	if ( grammar.getType()==Grammar.LEXER || grammar.getType()==Grammar.COMBINED ) {
+	if ( grammar.type==Grammar.LEXER || grammar.type==Grammar.COMBINED ) {
 		if ( !Character.isUpperCase(t.getText().charAt(0)) ) {
 			return;
 		}
@@ -257,7 +257,7 @@ protected void assignTypes() {
 	}
 
 	protected void aliasTokenNamesAndLiterals() {
-		if ( grammar.getType()!=Grammar.COMBINED ) {
+		if ( grammar.type!=Grammar.COMBINED ) {
 			return; // strings/chars are never token types 'cept in combined
 		}
 		// walk aliases if any and assign types to aliased literals if literal
@@ -402,10 +402,10 @@ grammar[Grammar g]
 	init(g);
 }
     :   (headerSpec)*
-	    ( #( LEXER_GRAMMAR 	  {grammar.setType(Grammar.LEXER);} 	  grammarSpec )
-	    | #( PARSER_GRAMMAR   {grammar.setType(Grammar.PARSER);}      grammarSpec )
-	    | #( TREE_GRAMMAR     {grammar.setType(Grammar.TREE_PARSER);} grammarSpec )
-	    | #( COMBINED_GRAMMAR {grammar.setType(Grammar.COMBINED);}    grammarSpec )
+	    ( #( LEXER_GRAMMAR 	  {grammar.type = Grammar.LEXER;} 	  grammarSpec )
+	    | #( PARSER_GRAMMAR   {grammar.type = Grammar.PARSER;}      grammarSpec )
+	    | #( TREE_GRAMMAR     {grammar.type = Grammar.TREE_PARSER;} grammarSpec )
+	    | #( COMBINED_GRAMMAR {grammar.type = Grammar.COMBINED;}    grammarSpec )
 	    )
         {assignTypes();}
     ;
@@ -416,7 +416,7 @@ headerSpec
 
 grammarSpec
 {Map opts=null;}
-	:	id:ID {grammar.setName(#id.getText());}
+	:	id:ID {grammar.name = #id.getText();}
 		(cmt:DOC_COMMENT)?
         (opts=optionsSpec {grammar.setOptions(opts);})?
         (tokensSpec)?

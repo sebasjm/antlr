@@ -31,27 +31,11 @@ package org.antlr.analysis;
  *  state machine.  Used to build NFAs.
  */
 public class StateCluster {
-    NFAState _left;
-    NFAState _right;
+    public NFAState left;
+    public NFAState right;
 
     public StateCluster(NFAState left, NFAState right) {
-        this._left = left;
-        this._right = right;
-    }
-
-    public NFAState left() {
-        return _left;
-    }
-
-    public NFAState right() {
-        return _right;
-    }
-
-    public void setLeft(NFAState left) {
-        this._left = left;
-    }
-
-    public void setRight(NFAState right) {
-        this._right = right;
+        this.left = left;
+        this.right = right;
     }
 }

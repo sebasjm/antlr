@@ -13,7 +13,7 @@ public class CTarget extends Target {
 										   StringTemplate headerFileST)
 		throws IOException
 	{
-		generator.write(headerFileST, grammar.getName()+".h");
+		generator.write(headerFileST, grammar.name+".h");
 	}
 }
 

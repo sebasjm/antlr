@@ -82,7 +82,7 @@ protected void addFollowTransition(String ruleName, NFAState following) {
      // find last link in FOLLOW chain emanating from rule
      NFAState end = grammar.getRuleStopState(ruleName);
      while ( end.transition(1)!=null ) {
-         end = (NFAState)end.transition(1).getTarget();
+         end = (NFAState)end.transition(1).target;
      }
      if ( end.transition(0)!=null ) {
          // already points to a following node
@@ -164,24 +164,24 @@ rule
            }
            else {
 				if ( Character.isLowerCase(r.charAt(0)) ||
-					 grammar.getType()==Grammar.LEXER )
+					 grammar.type==Grammar.LEXER )
 				{
 					// attach start node to block for this rule
 					NFAState start = grammar.getRuleStartState(r);
-					start.addTransition(new Transition(Label.EPSILON, b.left()));
+					start.addTransition(new Transition(Label.EPSILON, b.left));
 
 					// track decision if > 1 alts
-					if ( grammar.getNumberOfAltsForDecisionNFA(b.left())>1 ) {
-						b.left().setDescription(grammar.grammarTreeToString(#rule));
-						b.left().setDecisionASTNode(#BLOCK);
-						int d = grammar.assignDecisionNumber( b.left() );
-						grammar.setDecisionNFA( d, b.left() );
+					if ( grammar.getNumberOfAltsForDecisionNFA(b.left)>1 ) {
+						b.left.setDescription(grammar.grammarTreeToString(#rule));
+						b.left.setDecisionASTNode(#BLOCK);
+						int d = grammar.assignDecisionNumber( b.left );
+						grammar.setDecisionNFA( d, b.left );
 						grammar.setDecisionOptions(d, #BLOCK.getOptions());
 					}
 
 					// hook to end of rule node
 					NFAState end = grammar.getRuleStopState(r);
-					b.right().addTransition(new Transition(Label.EPSILON,end));
+					b.right.addTransition(new Transition(Label.EPSILON,end));
 				}
            }
            }
@@ -265,11 +265,11 @@ ebnf returns [StateCluster g=null]
     :   #( BLOCK b=block EOB )
         {
         // track decision if > 1 alts
-        if ( grammar.getNumberOfAltsForDecisionNFA(b.left())>1 ) {
-            b.left().setDescription(grammar.grammarTreeToString(#BLOCK));
-            b.left().setDecisionASTNode(#BLOCK);
-            int d = grammar.assignDecisionNumber( b.left() );
-            grammar.setDecisionNFA( d, b.left() );
+        if ( grammar.getNumberOfAltsForDecisionNFA(b.left)>1 ) {
+            b.left.setDescription(grammar.grammarTreeToString(#BLOCK));
+            b.left.setDecisionASTNode(#BLOCK);
+            int d = grammar.assignDecisionNumber( b.left );
+            grammar.setDecisionNFA( d, b.left );
             grammar.setDecisionOptions(d, #BLOCK.getOptions());
         }
         g = b;
@@ -277,24 +277,24 @@ ebnf returns [StateCluster g=null]
     |   #( OPTIONAL #( blk:BLOCK b=block EOB ) )
         {
         g = factory.build_Aoptional(b);
-    	g.left().setDescription(grammar.grammarTreeToString(#ebnf));
+    	g.left.setDescription(grammar.grammarTreeToString(#ebnf));
         // there is always at least one alt even if block has just 1 alt
-        int d = grammar.assignDecisionNumber( g.left() );
-		grammar.setDecisionNFA(d, g.left());
+        int d = grammar.assignDecisionNumber( g.left );
+		grammar.setDecisionNFA(d, g.left);
         grammar.setDecisionOptions(d, #blk.getOptions());
-        g.left().setDecisionASTNode(#blk);
+        g.left.setDecisionASTNode(#blk);
     	}
     |   #( CLOSURE #( BLOCK b=block eob:EOB ) )
         {
         g = factory.build_Astar(b);
 		// track the loop back / exit decision point
-    	b.right().setDescription("()* loopback of "+grammar.grammarTreeToString(#ebnf));
-        int d = grammar.assignDecisionNumber( b.right() );
-		grammar.setDecisionNFA(d, b.right());
+    	b.right.setDescription("()* loopback of "+grammar.grammarTreeToString(#ebnf));
+        int d = grammar.assignDecisionNumber( b.right );
+		grammar.setDecisionNFA(d, b.right);
         grammar.setDecisionOptions(d, #BLOCK.getOptions());
-        b.right().setDecisionASTNode(#eob);
+        b.right.setDecisionASTNode(#eob);
         // make block entry state also have same decision for interpreting grammar
-        NFAState altBlockState = (NFAState)g.left().transition(0).getTarget();
+        NFAState altBlockState = (NFAState)g.left.transition(0).target;
         altBlockState.setDecisionASTNode(#BLOCK);
         altBlockState.setDecisionNumber(d);
     	}
@@ -303,13 +303,13 @@ ebnf returns [StateCluster g=null]
         g = factory.build_Aplus(b);
         // don't make a decision on left edge, can reuse loop end decision
 		// track the loop back / exit decision point
-    	b.right().setDescription("()+ loopback of "+grammar.grammarTreeToString(#ebnf));
-        int d = grammar.assignDecisionNumber( b.right() );
-		grammar.setDecisionNFA(d, b.right());
+    	b.right.setDescription("()+ loopback of "+grammar.grammarTreeToString(#ebnf));
+        int d = grammar.assignDecisionNumber( b.right );
+		grammar.setDecisionNFA(d, b.right);
         grammar.setDecisionOptions(d, #blk2.getOptions());
-        b.right().setDecisionASTNode(#eob3);
+        b.right.setDecisionASTNode(#eob3);
         // make block entry state also have same decision for interpreting grammar
-        NFAState altBlockState = (NFAState)g.left().transition(0).getTarget();
+        NFAState altBlockState = (NFAState)g.left.transition(0).target;
         altBlockState.setDecisionASTNode(#blk2);
         altBlockState.setDecisionNumber(d);
         }
@@ -325,8 +325,8 @@ atom returns [StateCluster g=null]
         if ( start!=null ) {
             int ruleIndex = grammar.getRuleIndex(r.getText());
             g = factory.build_RuleRef(ruleIndex, start);
-            if ( g.left().transition(0) instanceof RuleClosureTransition ) {
-                addFollowTransition(r.getText(), g.right());
+            if ( g.left.transition(0) instanceof RuleClosureTransition ) {
+                addFollowTransition(r.getText(), g.right);
             }
             // else rule ref got inlined to a set
         }
@@ -334,16 +334,16 @@ atom returns [StateCluster g=null]
 
     |   t:TOKEN_REF
         {
-        if ( grammar.getType()==Grammar.LEXER ) {
+        if ( grammar.type==Grammar.LEXER ) {
             NFAState start = grammar.getRuleStartState(t.getText());
             if ( start!=null ) {
                 int ruleIndex = grammar.getRuleIndex(t.getText());
                 g = factory.build_RuleRef(ruleIndex, start);
-                //addFollowTransition(t.getText(), g.right());
+                //addFollowTransition(t.getText(), g.right);
                 // don't hook up follow links back into Tokens rule
                 // we need to see EOT on ends of token rules
                 if ( !currentRuleName.equals(Grammar.TOKEN_RULENAME) ) {
-                    addFollowTransition(t.getText(), g.right());
+                    addFollowTransition(t.getText(), g.right);
                 }
             }
         }
@@ -355,7 +355,7 @@ atom returns [StateCluster g=null]
 
     |   c:CHAR_LITERAL
     	{
-    	if ( grammar.getType()==Grammar.LEXER ) {
+    	if ( grammar.type==Grammar.LEXER ) {
     		g = factory.build_CharLiteralAtom(c.getText());
     	}
     	else {
@@ -366,7 +366,7 @@ atom returns [StateCluster g=null]
 
     |   s:STRING_LITERAL
     	{
-     	if ( grammar.getType()==Grammar.LEXER ) {
+     	if ( grammar.type==Grammar.LEXER ) {
      		g = factory.build_StringLiteralAtom(s.getText());
      	}
      	else {

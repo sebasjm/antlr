@@ -279,7 +279,7 @@ public class TestSemanticPredicates extends TestSuite {
     {
         // mimic actions of org.antlr.Tool first time for grammar g
         if ( g.getNumberOfDecisions()==0 ) {
-            if ( g.getType()==Grammar.LEXER ) {
+            if ( g.type==Grammar.LEXER ) {
                 g.addArtificialMatchTokensRule();
             }
             g.createNFAs();
@@ -288,7 +288,7 @@ public class TestSemanticPredicates extends TestSuite {
 
         DFA dfa = g.getLookaheadDFA(decision);
         FASerializer serializer = new FASerializer(g);
-        String result = serializer.serialize(dfa.getStartState());
+        String result = serializer.serialize(dfa.startState);
         //System.out.print(result);
         List nonDetAlts = dfa.getUnreachableAlts();
 

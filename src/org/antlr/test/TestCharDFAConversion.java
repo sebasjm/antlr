@@ -216,7 +216,7 @@ public class TestCharDFAConversion extends TestSuite {
         if ( g.getCodeGenerator()==null ) {
             CodeGenerator generator = new CodeGenerator(null, g, "Java");
             g.setCodeGenerator(generator);
-            if ( g.getType()==Grammar.LEXER ) {
+            if ( g.type==Grammar.LEXER ) {
                 g.addArtificialMatchTokensRule();
             }
             g.createNFAs();
@@ -226,7 +226,7 @@ public class TestCharDFAConversion extends TestSuite {
         DFA dfa = g.getLookaheadDFA(decision);
 		assertTrue(dfa!=null, "unknown decision #"+decision);
         FASerializer serializer = new FASerializer(g);
-        String result = serializer.serialize(dfa.getStartState());
+        String result = serializer.serialize(dfa.startState);
         //System.out.print(result);
         List nonDetAlts = dfa.getUnreachableAlts();
         //System.out.println("alts w/o predict state="+nonDetAlts);

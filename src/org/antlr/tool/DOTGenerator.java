@@ -125,11 +125,11 @@ public class DOTGenerator {
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {
             Transition edge = (Transition) s.transition(i);
             st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
-            st.setAttribute("label", getEdgeLabel(edge.getLabel().toString(grammar)));
+            st.setAttribute("label", getEdgeLabel(edge.label.toString(grammar)));
             st.setAttribute("src", getStateLabel(s));
-            st.setAttribute("target", getStateLabel(edge.getTarget()));
+            st.setAttribute("target", getStateLabel(edge.target));
             dot.setAttribute("edges", st);
-            walkCreatingDOT(dot, edge.getTarget()); // keep walkin'
+            walkCreatingDOT(dot, edge.target); // keep walkin'
         }
     }
 
@@ -173,7 +173,7 @@ public class DOTGenerator {
             while ( alt!=null ) {
                 st.setAttribute("states", getStateLabel(alt));
                 if ( alt.transition(1)!=null ) {
-                    alt = (NFAState)alt.transition(1).getTarget();
+                    alt = (NFAState)alt.transition(1).target;
                 }
                 else {
                     alt=null;
@@ -197,11 +197,11 @@ public class DOTGenerator {
                 continue;
             }
             st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
-            st.setAttribute("label", getEdgeLabel(edge.getLabel().toString(grammar)));
+            st.setAttribute("label", getEdgeLabel(edge.label.toString(grammar)));
             st.setAttribute("src", getStateLabel(s));
-            st.setAttribute("target", getStateLabel(edge.getTarget()));
+            st.setAttribute("target", getStateLabel(edge.target));
             dot.setAttribute("edges", st);
-            walkRuleNFACreatingDOT(dot, edge.getTarget()); // keep walkin'
+            walkRuleNFACreatingDOT(dot, edge.target); // keep walkin'
         }
     }
 
@@ -225,7 +225,7 @@ public class DOTGenerator {
     public void writeDOTFilesForAllDecisionDFAs() throws IOException {
         // for debugging, create a DOT file for each decision in
         // a directory named for the grammar.
-        File grammarDir = new File(grammar.getName()+"_DFAs");
+        File grammarDir = new File(grammar.name+"_DFAs");
         grammarDir.mkdirs();
         List decisionList = grammar.getDecisionNFAStartStateList();
         if ( decisionList==null ) {
@@ -237,7 +237,7 @@ public class DOTGenerator {
             NFAState decisionState = (NFAState)iter.next();
             DFA dfa = decisionState.getDecisionASTNode().getLookaheadDFA();
             if ( dfa!=null ) {
-                String dot = getDOT( dfa.getStartState() );
+                String dot = getDOT( dfa.startState );
                 writeDOTFile(grammarDir+"/dec-"+i, dot);
             }
             i++;

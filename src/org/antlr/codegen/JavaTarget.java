@@ -23,10 +23,10 @@ public class JavaTarget extends Target {
 									StringTemplate cyclicDFAST)
 		throws IOException
 	{
-		generator.write(cyclicDFAST, grammar.getName()+".bytecode");
+		generator.write(cyclicDFAST, grammar.name+".bytecode");
 		ClassFile code = new ClassFile(tool,
 									   null, // TODO: how to get package?
-									   grammar.getName()+"_DFA",
+									   grammar.name+"_DFA",
 									   "java/lang/Object",
 									   tool.getOutputDirectory(),
 									   cyclicDFAST.toString());

@@ -22,7 +22,7 @@ import java.io.IOException;
  *  Only one thread should really need to access one DecisionProbe anyway.
  */
 public class DecisionProbe {
-	protected DFA dfa;
+	public DFA dfa;
 
 	/** Track for each DFA state the set of nondeterministic alternatives.
 	 *  By reaching the same DFA state, a path through the NFA for some input
@@ -184,7 +184,7 @@ public class DecisionProbe {
 				DFAState d = (DFAState) it.next();
 				stateReachable = new HashMap();
 				Set dfaStates = new HashSet();
-				boolean reaches = reachesState(dfa.getStartState(), d, dfaStates);
+				boolean reaches = reachesState(dfa.startState, d, dfaStates);
 				if ( !reaches ) {
 					System.err.println("whoa!  no path from start to "+d.stateNumber);
 				}
@@ -209,7 +209,7 @@ public class DecisionProbe {
 				DFAState d = (DFAState) it.next();
 				stateReachable = new HashMap();
 				Set dfaStates = new HashSet();
-				boolean reaches = reachesState(dfa.getStartState(), d, dfaStates);
+				boolean reaches = reachesState(dfa.startState, d, dfaStates);
 				if ( !reaches ) {
 					System.err.println("whoa!  no path from start to "+d.stateNumber);
 				}
@@ -226,7 +226,7 @@ public class DecisionProbe {
 				}
 				statesVisitedDuringSampleSequence = new HashSet();
 				List labels = new ArrayList(); // may access ith element; use array
-				getSampleInputSequenceUsingStateSet(dfa.getStartState(),
+				getSampleInputSequenceUsingStateSet(dfa.startState,
 													d,
 													dfaStates,
 													labels);
@@ -239,7 +239,7 @@ public class DecisionProbe {
 					// those states associated with this nondeterminism
 					List path = new LinkedList();
 					NFAState nfaStart = dfa.getNFADecisionStartState();
-					Grammar g = dfa.nfa.getGrammar();
+					Grammar g = dfa.nfa.grammar;
 					if ( nfaStart.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
 						if ( alt==g.getNumberOfAltsForDecisionNFA(nfaStart) ) {
 							// TODO ugh: fix this weirdness!
@@ -258,7 +258,7 @@ public class DecisionProbe {
 					// convert all possible NFA states list for this alt into
 					// an exact path for input 'labels'; more useful.
 					NFAState altStart = g.getNFAStateForAltOfDecision(nfaStart,alt);
-					altStart = (NFAState)altStart.transition(0).getTarget();
+					altStart = (NFAState)altStart.transition(0).target;
 					statesVisited = new HashMap();
 					Set nfaStates =
 						getNFAStatesFromDFAStatesForAlt(dfaStates,altI.intValue());
@@ -344,7 +344,7 @@ public class DecisionProbe {
 		// at most one path to any DFA state with conflicting predictions
 		for (int i=0; i<startState.getNumberOfTransitions(); i++) {
 			Transition t = startState.transition(i);
-			DFAState edgeTarget = (DFAState)t.getTarget();
+			DFAState edgeTarget = (DFAState)t.target;
 			Integer targetStatus = (Integer)stateReachable.get(edgeTarget);
 			if ( targetStatus==REACHABLE_BUSY ) { // avoid cycles; they say nothing
 				continue;
@@ -406,11 +406,11 @@ public class DecisionProbe {
 		// pick the first edge in states as the one to traverse
 		for (int i=0; i<startState.getNumberOfTransitions(); i++) {
 			Transition t = startState.transition(i);
-			DFAState edgeTarget = (DFAState)t.getTarget();
+			DFAState edgeTarget = (DFAState)t.target;
 			if ( states.contains(edgeTarget) &&
 				 !statesVisitedDuringSampleSequence.contains(edgeTarget) )
 			{
-				labels.add(t.getLabel()); // traverse edge and track label
+				labels.add(t.label); // traverse edge and track label
 				if ( edgeTarget!=targetState ) {
 					// get more labels if not at target
 					getSampleInputSequenceUsingStateSet(edgeTarget,
@@ -447,7 +447,7 @@ public class DecisionProbe {
 		// pick the first edge in states and with label as the one to traverse
 		for (int i=0; i<s.getNumberOfTransitions(); i++) {
 			Transition t = s.transition(i);
-			NFAState edgeTarget = (NFAState)t.getTarget();
+			NFAState edgeTarget = (NFAState)t.target;
 			Integer targetStateNumI = new Integer(edgeTarget.stateNumber);
 			Integer previousLabelIndexAtThisState =
 				(Integer)statesVisited.get(edgeTarget);
@@ -461,7 +461,7 @@ public class DecisionProbe {
 								   label.toString(dfa.nfa.getGrammar())+"->"+
 								   edgeTarget.getStateNumber());
 				*/
-				if ( t.getLabel().isEpsilon() ) {
+				if ( t.label.isEpsilon() ) {
 					// nondeterministically backtrack down epsilon edges
 					path.add(edgeTarget);
 					boolean found =
@@ -472,7 +472,7 @@ public class DecisionProbe {
 					path.remove(path.size()-1); // remove; didn't work out
 					continue; // look at the next edge
 				}
-				if ( t.getLabel().matches(label) ) {
+				if ( t.label.matches(label) ) {
 					path.add(edgeTarget);
 					/*
 					System.out.println("found label "+
@@ -515,12 +515,12 @@ public class DecisionProbe {
 	 *  for lexers and parsers, for example.
 	 */
 	public String getInputSequenceDisplay(List labels) {
-        Grammar g = dfa.nfa.getGrammar();
+        Grammar g = dfa.nfa.grammar;
 		StringBuffer buf = new StringBuffer();
 		for (Iterator it = labels.iterator(); it.hasNext();) {
 			Label label = (Label) it.next();
 			buf.append(label.toString(g));
-			if ( it.hasNext() && g.getType()!=Grammar.LEXER ) {
+			if ( it.hasNext() && g.type!=Grammar.LEXER ) {
 				buf.append(' ');
 			}
 		}

@@ -38,13 +38,13 @@ import java.util.HashSet;
  */
 public class NFAConfiguration {
     /** The NFA state associated with this configuration */
-    protected int state;
+    public int state;
 
     /** What alt is predicted by this configuration */
-    protected int alt;
+    public int alt;
 
     /** What is the stack of rule invocations that got us to state? */
-    protected NFAContext context;
+    public NFAContext context;
 
     /** The set of semantic predicates associated with this NFA
      *  configuration.  The predicates were found on the way to
@@ -55,7 +55,7 @@ public class NFAConfiguration {
      *  the equals() method will correctly show {pred1,pred2} as equals()
      *  to {pred2,pred1}.
      */
-    protected SemanticContext semanticContext = SemanticContext.EMPTY_SEMANTIC_CONTEXT;
+    public SemanticContext semanticContext = SemanticContext.EMPTY_SEMANTIC_CONTEXT;
 
     /** Indicate that this configuration has been resolved and no further
      *  DFA processing should occur with it.  Essentially, this is used

@@ -57,7 +57,7 @@ protected List lexerRules = new LinkedList();
 
 	/** Remove any lexer rules from a COMBINED; already passed to lexer */
 	protected void trimGrammar() {
-		if ( grammar.getType()!=Grammar.COMBINED ) {
+		if ( grammar.type!=Grammar.COMBINED ) {
 			return;
 		}
 		// form is ( grammar ID ... ( rule ... ) ( rule ... ) ... )
@@ -92,10 +92,10 @@ grammar = g;
 root = #grammar;
 }
     :   (headerSpec)*
-	    ( #( LEXER_GRAMMAR 	  {grammar.setType(Grammar.LEXER);} 	  grammarSpec )
-	    | #( PARSER_GRAMMAR   {grammar.setType(Grammar.PARSER);}      grammarSpec )
-	    | #( TREE_GRAMMAR     {grammar.setType(Grammar.TREE_PARSER);} grammarSpec )
-	    | #( COMBINED_GRAMMAR {grammar.setType(Grammar.COMBINED);}    grammarSpec )
+	    ( #( LEXER_GRAMMAR 	  {grammar.type = Grammar.LEXER;} 	  grammarSpec )
+	    | #( PARSER_GRAMMAR   {grammar.type = Grammar.PARSER;}      grammarSpec )
+	    | #( TREE_GRAMMAR     {grammar.type = Grammar.TREE_PARSER;} grammarSpec )
+	    | #( COMBINED_GRAMMAR {grammar.type = Grammar.COMBINED;}    grammarSpec )
 	    )
 	    {trimGrammar();}
     ;
@@ -174,7 +174,7 @@ Map opts=null;
 		{
 		name = #id.getText();
 		if ( Character.isUpperCase(name.charAt(0)) &&
-			 grammar.getType()==Grammar.COMBINED )
+			 grammar.type==Grammar.COMBINED )
 		{
 			// a merged grammar spec, track lexer rules and send to another grammar
 			//System.out.println("rule tree is:\n"+#rule.toStringTree());
