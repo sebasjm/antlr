@@ -2,7 +2,8 @@ group Java;
 
 // G R A M M A R  E L E M E N T S
 
-outputFile(LEXER,PARSER,TREE_PARSER, streamType, headerAction, docComment, recognizer) ::=
+outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
+           name, tokens, rules, cyclicDFAs) ::=
 <<
 <headerAction>
 
@@ -13,7 +14,13 @@ import java.util.*;
 <recognizer>
 >>
 
-lexer(name, tokens, literals, rules, DFAs) ::= <<
+headerFile(name, tokens, rules, cyclicDFAs) ::= <<
+// header for <name>
+<tokens:{const int <attr.name>=<attr.type>;<\n>}>
+<rules:{extern void <it.name>(<it.args>);<\n>}>
+>>
+
+lexer(name, tokens, literals, rules, cyclicDFAs) ::= <<
 class <name> extends Lexer implements TokenSource {
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
     public static Map literals = new HashMap();
@@ -44,20 +51,16 @@ class <name> extends Lexer implements TokenSource {
     }
 
     <rules; separator="\n">
-
-    <DFAs>
 }
 >>
 
-parser(name, tokens, rules, DFAs) ::= <<
+parser(name, tokens, rules, cyclicDFAs) ::= <<
 class <name> extends Parser {
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
     public <name>(TokenStream input) {
         super(input);
     }
     <rules; separator="\n">
-
-    <DFAs>
 }
 >>
 
@@ -242,10 +245,6 @@ emit(type) ::= "emit(<type>);"
 setType(type) ::= "setType(<type>);"
 
 
-// M I S C
+// M I S C (properties, etc...)
 
 codeFileExtension() ::= ".java"
-
-lexerStreamType() ::= "IntegerStream"
-
-parserStreamType() ::= "IntegerStream"

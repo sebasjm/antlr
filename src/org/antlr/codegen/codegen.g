@@ -73,8 +73,11 @@ options {
      */
     protected StringTemplate recognizerST;
 
+    protected StringTemplate outputFileST;
+    protected StringTemplate headerFileST;
+
     /** DFAs might be in different file, have separate pointer */
-    protected StringTemplate dfaST;
+    protected StringTemplate cyclicDFAST;
 
     protected void init(Grammar g) {
         this.grammar = g;
@@ -85,24 +88,32 @@ options {
 
 grammar[Grammar g,
         StringTemplate recognizerST,
-        StringTemplate dfaST,  // in case DFAs go in separate file
-        StringTemplate outputFileST]
+        StringTemplate cyclicDFAST,  // in case DFAs go in separate file
+        StringTemplate outputFileST,
+        StringTemplate headerFileST]
 {
     String name;
     init(g);
     this.recognizerST = recognizerST;
-    this.dfaST = dfaST;
+    this.outputFileST = outputFileST;
+    this.headerFileST = headerFileST;
+    this.cyclicDFAST = cyclicDFAST;
+    if ( cyclicDFAST==null ) {
+    	this.cyclicDFAST = recognizerST;
+    }
 }
     :   (headerSpec[outputFileST])*
         #( "grammar"
             (cmt:DOC_COMMENT {outputFileST.setAttribute("docComment", #cmt.getText());} )?
-            name=id {recognizerST.setAttribute("name", name);}
+            name=id
+            {
+            recognizerST.setAttribute("name", name);
+            outputFileST.setAttribute("name", name);
+            headerFileST.setAttribute("name", name);
+            }
             ( #(OPTIONS .) )?
             rules[recognizerST]
          )
-        {
-        generator.genTokenTypeDefinitions(recognizerST);
-        }
     ;
 
 headerSpec[StringTemplate outputFileST]
@@ -113,7 +124,13 @@ rules[StringTemplate recognizerST]
 {
 StringTemplate rST;
 }
-    :   ( rST=rule {recognizerST.setAttribute("rules", rST);} )+
+    :   (	rST=rule
+    		{
+    		recognizerST.setAttribute("rules", rST);
+    		outputFileST.setAttribute("rules", rST);
+    		headerFileST.setAttribute("rules", rST);
+    		}
+   		)+
     ;
 
 rule returns [StringTemplate code=null]
@@ -161,7 +178,7 @@ block[String blockTemplateName, DFA dfa]
     */
     if ( dfa!=null ) {
         code = templates.getInstanceOf(blockTemplateName);
-        decision = generator.genLookaheadDecision(dfaST,dfa);
+        decision = generator.genLookaheadDecision(cyclicDFAST,dfa);
         code.setAttribute("decision", decision);
         code.setAttribute("decisionNumber", dfa.getDecisionNumber());
 		code.setAttribute("maxK",generator.maxK);

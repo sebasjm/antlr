@@ -2,16 +2,17 @@ group Java_dfa;
 
 dfaDecision(decisionNumber,description) ::= <<
 int m<decisionNumber> = input.mark();
-alt<decisionNumber> = DFA.DFA<decisionNumber>(input);
+<! the <name> attribute is inherited via the parser, lexer, ... !>
+alt<decisionNumber> = <name>_DFA.DFA<decisionNumber>(input);
 input.rewind(m<decisionNumber>);
 >>
 
-allCyclicDFAs(DFAs) ::= <<
+allCyclicDFAs(cyclicDFAs) ::= <<
 .method \<init> ()V 1
 	aload 0
 	invokespecial java/lang/Object.\<init>()V
 	return
-<DFAs>
+<cyclicDFAs>
 >>
 
 cyclicDFA(decision,states,description) ::= <<

@@ -53,6 +53,32 @@ import antlr.RecognitionException;
  *  Some computations are done that are unused by a particular language.
  *  This generator just computes and sets the values into the templates;
  *  the templates are free to use or not use the information.
+ *
+ *  To make a new code generation target, define X.stg for language X
+ *  by copying from existing Y.stg most closely releated to your language;
+ *  e.g., to do CSharp.stg copy Java.stg.  The template group file has a
+ *  bunch of templates that are needed by the code generator.  You can add
+ *  a new target w/o even recompiling ANTLR itself.  The language=X option
+ *  in a grammar file dictates which templates get loaded/used.
+ *
+ *  Some language need to handle cyclic DFAs differently than acyclic DFAs
+ *  such as Java because it lacks a goto.  I had to build a set of templates
+ *  that spit out bytecodes instead of Java (then I had to build the
+ *  org.antlr.codegen.bytecode.* classes).  If you need to do them differently,
+ *  define X_cyclicdfa.stg and the CodeGenerator will load that too else
+ *  the cyclicDFATemplates just points at the normal templates.  There is
+ *  a bit of overlap in the template names such as lookaheadTest.  The same
+ *  code generation logic generations the edges for cyclic and acyclic DFAs
+ *  so the X_cyclicdfa.stg file overrides those templates.  The CodeGenerator
+ *  sets up X_cyclicdfa as a subgroup of X.
+ *
+ *  Some language like C need both parser files and header files.  Java needs
+ *  to have a separate file for the cyclic DFA as ANTLR generates bytecodes
+ *  directly (which cannot be in the generated parser Java file).  To facilitate
+ *  this,
+ *
+ * cyclic can be in same file, but header, output must be searpate.  recognizer
+ *  is in outptufile.
  */
 public class CodeGenerator {
 	// TODO move this and the templates to a separate file?
@@ -63,6 +89,11 @@ public class CodeGenerator {
      */
     protected Grammar grammar;
 
+	/** The target specifies how to write out files and do other language
+	 *  specific actions.
+	 */
+	protected Target target = null;
+
 	/** Where are the templates this generator should use to generate code? */
 	protected StringTemplateGroup templates;
 
@@ -70,6 +101,8 @@ public class CodeGenerator {
 	 *  use to generate code?  We separate out the cyclic ones because
 	 *  they could be very much more complicated than fixed lookahead.
 	 *  For example, the java target generates bytecodes directly.
+	 *  This group is set up as a subgroup of templates so you can override
+	 *  just the templates that are different.
 	 */
 	protected StringTemplateGroup cyclicDFATemplates;
 
@@ -78,7 +111,8 @@ public class CodeGenerator {
      */
     protected Tool tool;
 
-    protected final String vocabFilePattern =
+	// TODO move to separate file
+	protected final String vocabFilePattern =
             "<tokens:{<attr.name>=<attr.type>\n}>" +
             "<literals:{<attr.name>=<attr.type>\n}>";
 
@@ -95,8 +129,37 @@ public class CodeGenerator {
     public CodeGenerator(Tool tool, Grammar grammar, String language) {
         this.tool = tool;
         this.grammar = grammar;
-        ClassLoader cl = this.getClass().getClassLoader();
-		// load the main language.stg template group file
+		loadLanguageTarget(language);
+        loadTemplates(language);
+		loadCyclicDFATemplates(language);
+		if ( templates==null || templates.getInstanceOf("outputFile")==null ) {
+			System.err.println("missing templates");
+		}
+		if ( cyclicDFATemplates.getInstanceOf("cyclicDFA")==null ) {
+			System.err.println("error: no cyclic DFA definitions in stg file");
+		}
+	}
+
+	protected void loadLanguageTarget(String language) {
+		String targetName = "org.antlr.codegen."+language+"Target";
+		try {
+			Class c = Class.forName(targetName);
+			target = (Target)c.newInstance();
+		}
+		catch (ClassNotFoundException cnfe) {
+			target = new Target(); // use default
+		}
+		catch (InstantiationException cnfe) {
+			System.err.println("cannot create "+targetName);
+		}
+		catch (IllegalAccessException cnfe) {
+			System.err.println("cannot create "+targetName+" (illegal access)");
+		}
+	}
+
+	/** load the main language.stg template group file */
+	protected void loadTemplates(String language) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		InputStream is = cl.getResourceAsStream("org/antlr/codegen/templates/"+language+".stg");
 		if ( is==null ) {
 			System.err.println("can't load '"+"org/antlr/codegen/templates/"+language+".stg"+"' as resource");
@@ -112,15 +175,20 @@ public class CodeGenerator {
 		catch (IOException ioe) {
 			System.err.println("Cannot close template group file");
 		}
+	}
 
-		// now load language_dfa.stg if available
-		is = cl.getResourceAsStream("org/antlr/codegen/templates/"+language+"_dfa.stg");
+	protected void loadCyclicDFATemplates(String language) {
+		// now load language_dfa.stg if available, else just use main .stg
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		InputStream is = cl.getResourceAsStream("org/antlr/codegen/templates/"+language+"_cyclicdfa.stg");
 		if ( is!=null ) {
-			br = new BufferedReader(new InputStreamReader(is));
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			cyclicDFATemplates = new StringTemplateGroup(br,
 												AngleBracketTemplateLexer.class,
 												null);
-			System.out.println("got cyclicDFATemplates");
+			// cyclic inherits from main X.stg templates so you can define
+			// just the templates that are different
+			cyclicDFATemplates.setSuperGroup(templates); // who's your daddy? ;)
 			try {
 				br.close();
 			}
@@ -129,109 +197,111 @@ public class CodeGenerator {
 			}
 		}
 		else {
-			if ( templates.getInstanceOf("cyclicDFA")==null ) {
-				System.err.println("error: no DFA definitions in stg file");
-			}
+			cyclicDFATemplates = templates;
 		}
-    }
+	}
 
     /** Given the grammar to which we are attached, walk the AST associated
      *  with that grammar to create NFAs.  Then create the DFAs for all
      *  decision points in the grammar by converting the NFAs to DFAs.
-     *  Finally, walk the AST again to generate code.  Result is a StringTemplate
-     *  that is written out to a file.
+     *  Finally, walk the AST again to generate code.
+	 *
+	 *  Either 1, 2, or 3 files are written:
+	 *
+	 * 		recognizer: the main parser/lexer/treewalker item
+	 * 		header file: language like C/C++ need extern definitions
+	 * 		cyclic DFAs: might need cyclic DFAs in separate file; e.g., Java
+	 * 				     generates bytecode directly to access goto instr.
+	 *
+	 *  The target, such as JavaTarget, dictates which files get written.
      */
     public void genRecognizer() {
-        StringTemplate outputFileST = templates.getInstanceOf("outputFile");
-        StringTemplate recognizerST;
-        if ( grammar.getType()==Grammar.LEXER ) {
-            recognizerST = templates.getInstanceOf("lexer");
-            outputFileST.setAttribute("LEXER", "true");
-            outputFileST.setAttribute("streamType", "lexerStreamType");
-        }
-        else if ( grammar.getType()==Grammar.PARSER ) {
-            recognizerST = templates.getInstanceOf("parser");
-            outputFileST.setAttribute("PARSER", "true");
-            outputFileST.setAttribute("streamType", "parserStreamType");
-        }
-        else {
-            recognizerST = templates.getInstanceOf("treeParser");
-            outputFileST.setAttribute("TREE_PARSER", "true");
-        }
-        outputFileST.setAttribute("recognizer", recognizerST);
+		target.performGrammarAnalysis(this, grammar);
 
-        // Build NFAs from the grammar AST
-        try {
-            grammar.createNFAs();
-        }
-        catch (RecognitionException re) {
-            System.err.println("problems creating NFAs from grammar AST for "+
-                    grammar.getName());
-            return;
-        }
+		// OUTPUT FILE (contains recognizerST)
+		StringTemplate outputFileST = templates.getInstanceOf("outputFile");
 
-        // Create the DFA predictors for each decision
-        grammar.createLookaheadDFAs();
+		// RECOGNIZER
+		StringTemplate recognizerST;
+		if ( grammar.getType()==Grammar.LEXER ) {
+			recognizerST = templates.getInstanceOf("lexer");
+			outputFileST.setAttribute("LEXER", "true");
+		}
+		else if ( grammar.getType()==Grammar.PARSER ) {
+			recognizerST = templates.getInstanceOf("parser");
+			outputFileST.setAttribute("PARSER", "true");
+		}
+		else {
+			recognizerST = templates.getInstanceOf("treeParser");
+			outputFileST.setAttribute("TREE_PARSER", "true");
+		}
+		outputFileST.setAttribute("recognizer", recognizerST);
 
-        // Walk the AST again, this time generating code
-        // Decisions are generated by using the precomputed DFAs
-        CodeGenTreeWalker gen = new CodeGenTreeWalker();
-        try {
-			// Testing DFA output in another file!
-			StringTemplate dfaST = getCyclicDFATemplates().getInstanceOf("allCyclicDFAs");
-            gen.grammar((AST)grammar.getGrammarTree(),
+		// CYCLIC DFAs
+		// Cyclic DFAs go into main recognizer ST by default
+
+		StringTemplate cyclicDFAST =
+			getCyclicDFATemplates().getInstanceOf("allCyclicDFAs");
+		cyclicDFAST = target.chooseWhereCyclicDFAsGo(recognizerST,cyclicDFAST);
+
+		// HEADER FILE
+		StringTemplate headerFileST = templates.getInstanceOf("headerFile");
+
+		// Walk the AST holding the input grammar, this time generating code
+		// Decisions are generated by using the precomputed DFAs
+		// Fill in the various templates with data
+		CodeGenTreeWalker gen = new CodeGenTreeWalker();
+		try {
+			gen.grammar((AST)grammar.getGrammarTree(),
 						grammar,
 						recognizerST,
-						dfaST,
-						outputFileST);
-            String fileName = getRecognizerFileName();
-            StringTemplate.setLintMode(true);
-			System.out.println("DFAs: "+dfaST);
+						cyclicDFAST, // might point at recognizerST
+						outputFileST,
+						headerFileST);
+		}
+		catch (RecognitionException re) {
+			System.err.println("problems walking tree to generate code for "+
+							   grammar.getName()+":"+re);
+		}
+		genTokenTypeDefinitions(recognizerST);
+		genTokenTypeDefinitions(outputFileST);
+		genTokenTypeDefinitions(headerFileST);
 
-			ClassFile code = new ClassFile(tool,
-										   null,
-										   "DFA",
-										   "java/lang/Object",
-										   "/tmp",
-										   dfaST.toString());
-			code.write();
+		try {
+			target.genRecognizerFile(tool,this,grammar,outputFileST);
+			target.genRecognizerHeaderFile(tool,this,grammar,headerFileST);
+			target.genCyclicDFAFile(tool, this, grammar, cyclicDFAST);
+			// write out the vocab interchange file; used by antlr,
+			// does not change per target
+			StringTemplate tokenVocabSerialization = genTokenVocabOutput();
+			write(tokenVocabSerialization, getVocabFileName());
+		}
+		catch (IOException ioe) {
+			System.err.println("could not write generated code for "+
+							   grammar.getName()+":"+ioe);
+		}
+	}
 
-            // do actual write of code to the output
-            write(outputFileST, fileName);
-            // write out the vocab interchange file
-            write(genTokenVocabOutput(), getVocabFileName());
-        }
-        catch (IOException ioe) {
-            System.err.println("could not write generated code for "+
-                    grammar.getName()+":"+ioe);
-        }
-        catch (RecognitionException re) {
-            System.err.println("problems walking tree to generate code for "+
-                    grammar.getName()+":"+re);
-        }
-    }
+	// L O O K A H E A D  D E C I S I O N  G E N E R A T I O N
 
-    public void write(StringTemplate code, String fileName) throws IOException {
-        System.out.println("writing "+fileName);
-        FileWriter fw = tool.getOutputFile(fileName);
-        fw.write(code.toString());
-        fw.close();
-    }
-
-    public StringTemplate genLookaheadDecision(StringTemplate recognizerTemplate,
+    /** Generate code that computes the predicted alt given a DFA.  The
+	 *  cyclicDFATemplate can be either the main generated recognizerTemplate
+	 *  for storage in the main parser file or a separate file.  It's up to
+	 *  the code that ultimately invokes the codegen.g grammar rule (you pass
+	 *  in where you want all cyclic DFAs to be stored).
+	 */
+	public StringTemplate genLookaheadDecision(StringTemplate cyclicDFATemplate,
                                                DFA dfa)
     {
-		StringTemplateGroup templates = null;
         maxK = 1;
         StringTemplate decisionST;
         if ( !dfa.isCyclic() /* TODO: or too big */ ) {
-			templates = getTemplates();
-            decisionST = genFixedLookaheadDecision(templates, dfa);
+            decisionST = genFixedLookaheadDecision(getTemplates(), dfa);
         }
         else {
-			templates = getCyclicDFATemplates();
-            StringTemplate dfaST = genCyclicLookaheadDecision(templates, dfa);
-            recognizerTemplate.setAttribute("DFAs", dfaST);
+            StringTemplate dfaST =
+				genCyclicLookaheadDecision(getCyclicDFATemplates(), dfa);
+            cyclicDFATemplate.setAttribute("cyclicDFAs", dfaST);
             decisionST = templates.getInstanceOf("dfaDecision");
             decisionST.setAttribute("description",
                                     dfa.getNFADecisionStartState().getDescription());
@@ -433,7 +503,13 @@ public class CodeGenerator {
         return setST;
     }
 
-    public void genTokenTypeDefinitions(StringTemplate code) {
+    // T O K E N  D E F I N I T I O N  G E N E R A T I O N
+
+	/** Set attributes tokens and literals attributes in the incoming
+	 *  code template.  This is not the token vocab interchange file, but
+	 *  rather a list of tokens/literals possibly needed by the recognizer.
+	 */
+	public void genTokenTypeDefinitions(StringTemplate code) {
         // make constants for the token names
         Iterator tokenNames = grammar.getTokenNames().iterator();
         while (tokenNames.hasNext()) {
@@ -460,6 +536,8 @@ public class CodeGenerator {
      *  "long"=80040
      *  D=77777
      *  ';'=22
+	 *  This is independent of the target language; used by antlr internally
+	 *  TODO: strings/toketypelabel should be on same line
      */
     public StringTemplate genTokenVocabOutput() {
         StringTemplate vocabFileST =
@@ -485,6 +563,8 @@ public class CodeGenerator {
         return vocabFileST;
     }
 
+	// M I S C
+
 	public StringTemplateGroup getTemplates() {
 		return templates;
 	}
@@ -496,12 +576,20 @@ public class CodeGenerator {
 		return getTemplates(); // return main template lib if no special dfa one
 	}
 
-    public String getRecognizerFileName() {
-        StringTemplate extST = templates.getInstanceOf("codeFileExtension");
-        return grammar.getName()+extST.toString();
-    }
+	public String getRecognizerFileName() {
+		StringTemplate extST = templates.getInstanceOf("codeFileExtension");
+		return grammar.getName()+extST.toString();
+	}
 
     public String getVocabFileName() {
         return grammar.getName()+VOCAB_FILE_EXTENSION;
     }
+
+	public void write(StringTemplate code, String fileName) throws IOException {
+        System.out.println("writing "+fileName);
+        FileWriter fw = tool.getOutputFile(fileName);
+        fw.write(code.toString());
+        fw.close();
+    }
+
 }

@@ -380,6 +380,8 @@ public class Grammar {
      *
      *  This is a separate method because you might want to create a
      *  Grammar without doing the expensive analysis.
+	 *
+	 *  TODO: generate NFA as option or another method
      */
     public void createLookaheadDFAs() {
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {

@@ -27,17 +27,12 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.misc.BitSet;
 import org.antlr.misc.IntervalSet;
 import org.antlr.misc.IntSet;
 import org.antlr.tool.Grammar;
-import org.antlr.tool.GrammarAST;
-import org.antlr.codegen.CodeGenerator;
 
 import java.util.List;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
 
 import antlr.collections.AST;
 

@@ -29,15 +29,10 @@ package org.antlr;
 
 import org.antlr.tool.DOTGenerator;
 import org.antlr.tool.Grammar;
-import org.antlr.tool.DOTGenerator;
-import org.antlr.codegen.CodeGenTreeWalker;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.misc.BitSet;
 import org.antlr.stringtemplate.StringTemplate;
 
 import java.io.*;
-
-import antlr.collections.AST;
 
 /** The main ANTLR entry point.  Read a grammar and generate a parser. */
 public class Tool {
@@ -105,6 +100,7 @@ public class Tool {
 
     protected void process()  {
         try {
+			StringTemplate.setLintMode(true);
             FileReader fr = new FileReader(grammarFileName);
             BufferedReader br = new BufferedReader(fr);
             Grammar grammar = new Grammar(br);
