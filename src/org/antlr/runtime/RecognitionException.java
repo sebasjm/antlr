@@ -34,7 +34,7 @@ package org.antlr.runtime;
  *  but rather the information necessary to generate an error.  Then
  *  the various reporting methods in Parser and Lexer can be overridden
  *  to generate a localized error message.  For example, MismatchedToken
- *  exceptions are built with the found token and expected token types.
+ *  exceptions are built with the expected token type.
  *  So, don't expect getMessage() to return anything.
  *
  *  Note that as of Java 1.4, you can access the stack trace, which means
