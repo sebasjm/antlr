@@ -1,4 +1,4 @@
-package org.antlr.runtime;
+package org.antlr.runtime.debug;
 
 public interface ANTLRDebugInterface {
 	/** The parser has just entered a rule.  No decision has been made about
