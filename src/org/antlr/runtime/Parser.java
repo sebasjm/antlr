@@ -42,6 +42,9 @@ public class Parser {
 	 */
 	protected Stack following = new Stack();
 
+	protected boolean errorRecovery = false;
+
+
     public Parser(TokenStream input) {
         this.input = input;
     }
@@ -65,8 +68,10 @@ public class Parser {
 	{
 		if ( input.LA(1)==ttype ) {
 			input.consume();
+			errorRecovery = false;
 			return;
 		}
+		errorRecovery = true;
 		MismatchedTokenException mte = new MismatchedTokenException(ttype);
 		recoverFromMismatchedToken(mte, ttype, follow);
 		return;
@@ -209,10 +214,12 @@ public class Parser {
 		BitSet followSet = new BitSet();
 		for (int i=top; i>=0; i--) {
 			BitSet localFollowSet = (BitSet) following.get(i);
+			/*
 			System.out.println("local follow depth "+i+"="+
 							   localFollowSet.toString(getTokenNames())+")");
+			*/
 			followSet.orInPlace(localFollowSet);
-			if ( exact && !followSet.member(Token.EOR_TOKEN_TYPE) ) {
+			if ( exact && !localFollowSet.member(Token.EOR_TOKEN_TYPE) ) {
 				break;
 			}
 		}
@@ -237,11 +244,15 @@ public class Parser {
 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
 			BitSet viableTokensFollowingThisRule = computeViableTokens();
 			follow = follow.or(viableTokensFollowingThisRule);
+			follow.remove(Token.EOR_TOKEN_TYPE);
 		}
 		// if current token is consistent with what could come after ttype
 		// then it is ok to "insert" the missing token, else throw exception
-		if ( follow.member(ttype) ) {
-			reportError(mte);
+		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
+		if ( follow.member(input.LA(1)) ) {
+			if ( !errorRecovery ) {
+				reportError(mte);
+			}
 			System.err.println("inserting "+getTokenNames()[ttype]);
 			return;
 		}
