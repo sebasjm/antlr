@@ -193,7 +193,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		}
 		else if ( elements[0].equals("consumeHiddenToken") ) {
 			Token t = deserializeToken(elements, 1);
-			listener.consumeToken(t);
+			listener.consumeHiddenToken(t);
 		}
 		else if ( elements[0].equals("LT") ) {
 			Token t = deserializeToken(elements, 2);
