@@ -32,7 +32,7 @@ import org.antlr.runtime.*;
 public class DebugParser extends Parser {
 
 	/** The default debugger mimics the traceParser behavior of ANTLR 2.x */
-	class TraceDebugger implements DebugEventListener {
+	public class TraceDebugger implements DebugEventListener {
 		protected int level = 0;
 		public void enterRule(String ruleName) {
 			for (int i=1; i<=level; i++) {System.out.print(" ");}
