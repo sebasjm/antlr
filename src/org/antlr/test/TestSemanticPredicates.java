@@ -29,19 +29,46 @@ package org.antlr.test;
 
 import org.antlr.test.unit.TestSuite;
 import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.Grammar;
-import org.antlr.tool.FASerializer;
+import org.antlr.tool.*;
 import org.antlr.analysis.State;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.DecisionProbe;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.BitSet;
+import org.antlr.misc.Utils;
 
 import java.util.List;
+import java.util.LinkedList;
 
 import antlr.RecognitionException;
 
 public class TestSemanticPredicates extends TestSuite {
+
+	static class ErrorQueue implements ANTLRErrorListener {
+		List infos = new LinkedList();
+		List errors = new LinkedList();
+		List warnings = new LinkedList();
+
+		public void info(String msg) {
+			infos.add(msg);
+		}
+
+		public void error(Message msg) {
+			errors.add(msg);
+		}
+
+		public void warning(Message msg) {
+			warnings.add(msg);
+		}
+
+		public void error(ToolMessage msg) {
+			errors.add(msg);
+		}
+
+		public int size() {
+			return infos.size() + errors.size() + warnings.size();
+		}
+	};
 
     /** Public default constructor used by TestRig */
     public TestSemanticPredicates() {
@@ -54,7 +81,7 @@ public class TestSemanticPredicates extends TestSuite {
         String expecting =
                 ".s0-A->:s1=>1\n" +
                 ".s0-B->:s2=>2\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testLL_1_Pred() throws Exception {
@@ -65,7 +92,7 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s0-A->.s1\n" +
                 ".s1-{p1}?->:s2=>1\n" +
                 ".s1-{p2}?->:s3=>2\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testLL_2_Pred() throws Exception {
@@ -77,7 +104,7 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s1-B->.s2\n" +
                 ".s2-{p1}?->:s3=>1\n" +
                 ".s2-{p2}?->:s4=>2\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testPredicatedLoop() throws Exception {
@@ -89,7 +116,7 @@ public class TestSemanticPredicates extends TestSuite {
 			".s0-A->.s2\n" +
 			".s2-{p1}?->:s3=>1\n" +
 			".s2-{p2}?->:s4=>2\n";
-		checkDecision(g, 1, expecting, null);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testPredicatedToStayInLoop() throws Exception {
@@ -110,7 +137,7 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s0-A->.s1\n" +
                 ".s1-{(p1&&p1a)}?->:s2=>1\n" +
                 ".s1-{p2}?->:s3=>2\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testOrPredicates() throws Exception {
@@ -122,7 +149,7 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s0-A->.s1\n" +
                 ".s1-{(p1||p1a)}?->:s2=>1\n" +
                 ".s1-{p2}?->:s3=>2\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testIgnoresHoistingDepthGreaterThanZero() throws Exception {
@@ -131,7 +158,8 @@ public class TestSemanticPredicates extends TestSuite {
             "a : A {p1}? | A {p2}?;");
         String expecting =
                 ".s0-A->:s1=>1\n";
-        checkDecision(g, 1, expecting, new int[] {2});
+        checkDecision(g, 1, expecting, new int[] {2},
+					  new int[] {1,2}, "A", null, null, 2);
     }
 
     public void testHoist2() throws Exception {
@@ -144,7 +172,7 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s0-A->.s1\n" +
                 ".s1-{p1}?->:s3=>1\n" +
                 ".s1-{p2}?->:s2=>2\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testHoistCorrectContext() throws Exception {
@@ -157,7 +185,7 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s0-INT->:s4=>1\n" +
                 ".s1-{p1}?->:s2=>1\n" +
                 ".s1-{p2}?->:s3=>2\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testDefaultPred() throws Exception {
@@ -170,7 +198,7 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s0-INT->:s4=>1\n" +
                 ".s1-{!(p1)}?->:s3=>2\n" +
                 ".s1-{p1}?->:s2=>1\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testLeftRecursivePred() throws Exception {
@@ -181,7 +209,7 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s0-ID->.s1\n" +
                 ".s1-{!(p1)}?->:s3=>2\n" +
                 ".s1-{p1}?->:s2=>1\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testIgnorePredFromLL2Alt() throws Exception {
@@ -202,7 +230,7 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s1-{!((p3||p2))}?->:s5=>5\n" +
                 ".s1-{p2}?->:s4=>3\n" +
                 ".s1-{p3}?->:s6=>4\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     public void testPredGets2SymbolSyntacticContext() throws Exception {
@@ -216,20 +244,23 @@ public class TestSemanticPredicates extends TestSuite {
                 ".s1-B->.s2\n" +
                 ".s2-{!(p1)}?->:s4=>2\n" +
                 ".s2-{p1}?->:s3=>1\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     /** The following grammar should yield an error that rule 'a' has
      *  insufficient semantic info pulled from 'b'.
      */
     public void testIncompleteSemanticHoistedContext() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
         Grammar g = new Grammar(
                 "parser grammar t;\n"+
                 "a : b | B;\n" +
                 "b : {p1}? B | B ;");
         String expecting =
                 ".s0-B->:s1=>1\n";
-        checkDecision(g, 1, expecting, new int[] {2});
+        checkDecision(g, 1, expecting, new int[] {2},
+					  new int[] {1,2}, "B", new int[] {1}, null, 3);
     }
 
     /** The following grammar should yield an error that rule 'a' has
@@ -243,13 +274,17 @@ public class TestSemanticPredicates extends TestSuite {
      *  prediction because we resolve the ambiguity by choosing alt 1.
      */
 	public void testIncompleteSemanticHoistedContext2() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 				"parser grammar t;\n"+
 				"a : b | B;\n" +
 				"b : {p1}? B | B D ;");
 		String expecting =
 				".s0-B->:s1=>1\n";
-		checkDecision(g, 1, expecting, new int[] {2});
+		checkDecision(g, 1, expecting, new int[] {2},
+					  new int[] {1,2}, "B", new int[] {1},
+					  null, 3);
 	}
 
 	public void testTooFewSemanticPredicates() throws Exception {
@@ -258,7 +293,9 @@ public class TestSemanticPredicates extends TestSuite {
 				"a : {p1}? A | A | A ;");
 		String expecting =
 				".s0-A->:s1=>1\n";
-		checkDecision(g, 1, expecting, new int[] {2,3});
+		checkDecision(g, 1, expecting, new int[] {2,3},
+					  new int[] {1,2,3}, "A",
+					  null, null, 2);
 	}
 
     // S U P P O R T
@@ -269,15 +306,23 @@ public class TestSemanticPredicates extends TestSuite {
                 "a : A | B;");
         String expecting =
                 "\n";
-        checkDecision(g, 1, expecting, null);
+        checkDecision(g, 1, expecting, null, null, null, null, null, 0);
     }
 
     protected void checkDecision(Grammar g,
-                                 int decision,
-                                 String expecting,
-                                 int[] expectingUnreachableAlts)
+								 int decision,
+								 String expecting,
+								 int[] expectingUnreachableAlts,
+								 int[] expectingNonDetAlts,
+								 String expectingAmbigInput,
+								 int[] expectingInsufficientPredAlts,
+								 int[] expectingDanglingAlts,
+								 int expectingNumWarnings)
             throws FailedAssertionException
     {
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
         // mimic actions of org.antlr.Tool first time for grammar g
         if ( g.getNumberOfDecisions()==0 ) {
             if ( g.type==Grammar.LEXER ) {
@@ -287,29 +332,93 @@ public class TestSemanticPredicates extends TestSuite {
             g.createLookaheadDFAs();
         }
 
-		DecisionProbe.verbose=true; // make sure we get all error info
+		if ( equeue.size()!=expectingNumWarnings ) {
+			System.err.println("Warnings issued: "+equeue.warnings);
+		}
+
+		assertTrue(equeue.size()==expectingNumWarnings,
+				   "unexpected number of expected problems: "+equeue.size()+
+				   "; expecting "+expectingNumWarnings);
 
         DFA dfa = g.getLookaheadDFA(decision);
         FASerializer serializer = new FASerializer(g);
         String result = serializer.serialize(dfa.startState);
         //System.out.print(result);
-        List nonDetAlts = dfa.getUnreachableAlts();
+        List unreachableAlts = dfa.getUnreachableAlts();
 
-        // first make sure nondeterministic alts are as expected
-        if ( expectingUnreachableAlts==null ) {
-            BitSet s = new BitSet();
-            s.addAll(expectingUnreachableAlts);
-            assertTrue(nonDetAlts.size()==0,
-                    "unreachable alts mismatch; expecting="+
-                    s.toString()+" found "+nonDetAlts);
+        // make sure unreachable alts are as expected
+        if ( expectingUnreachableAlts!=null ) {
+			BitSet s = new BitSet();
+			s.addAll(expectingUnreachableAlts);
+			BitSet s2 = new BitSet();
+			s2.addAll(unreachableAlts);
+			assertTrue(s.equals(s2), "unreachable alts mismatch; expecting "+s+
+									 " found "+s2);
         }
         else {
-            for (int i=0; i<expectingUnreachableAlts.length; i++) {
-                assertTrue(nonDetAlts.contains(new Integer(expectingUnreachableAlts[i])),
-                        "unreachable alts mismatch");
-            }
+			assertTrue(unreachableAlts.size()==0,
+					"unreachable alts mismatch; expecting none found "+
+					unreachableAlts);
         }
+
+		// check conflicting input
+		if ( expectingAmbigInput!=null ) {
+			// first, find nondet message
+			Message msg = (Message)equeue.warnings.get(0);
+			assertTrue(msg instanceof GrammarNonDeterminismMessage,
+					   "expecting nondeterminism; found "+msg.getClass().getName());
+			GrammarNonDeterminismMessage nondetMsg =
+				getNonDeterminismMessage(equeue.warnings);
+			List labels =
+				nondetMsg.probe.getSampleNonDeterministicInputSequence(nondetMsg.problemState);
+			String input = nondetMsg.probe.getInputSequenceDisplay(labels);
+			assertEqual(input, expectingAmbigInput);
+		}
+
+		// check nondet alts
+		if ( expectingNonDetAlts!=null ) {
+			GrammarNonDeterminismMessage nondetMsg =
+				getNonDeterminismMessage(equeue.warnings);
+			assertTrue(nondetMsg!=null, "found no nondet alts; expecting: "+
+										str(expectingNonDetAlts));
+			List nonDetAlts =
+				nondetMsg.probe.getNonDeterministicAltsForState(nondetMsg.problemState);
+            // compare nonDetAlts with expectingNonDetAlts
+			BitSet s = new BitSet();
+			s.addAll(expectingNonDetAlts);
+			BitSet s2 = new BitSet();
+			s2.addAll(nonDetAlts);
+			assertTrue(s.equals(s2), "nondet alts mismatch; expecting "+s+" found "+s2);
+		}
+		else {
+			// not expecting any nondet alts, make sure there are none
+			GrammarNonDeterminismMessage nondetMsg =
+				getNonDeterminismMessage(equeue.warnings);
+			assertTrue(nondetMsg==null, "found nondet alts, but expecting none");
+		}
+
         assertEqual(result, expecting);
     }
 
+	protected GrammarNonDeterminismMessage getNonDeterminismMessage(List warnings) {
+		for (int i = 0; i < warnings.size(); i++) {
+			Message m = (Message) warnings.get(i);
+			if ( m instanceof GrammarNonDeterminismMessage ) {
+				return (GrammarNonDeterminismMessage)m;
+			}
+		}
+		return null;
+	}
+
+	protected String str(int[] elements) {
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < elements.length; i++) {
+			if ( i>0 ) {
+				buf.append(", ");
+			}
+			int element = elements[i];
+			buf.append(element);
+		}
+		return buf.toString();
+	}
 }

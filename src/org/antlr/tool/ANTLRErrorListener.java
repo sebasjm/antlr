@@ -39,5 +39,4 @@ public interface ANTLRErrorListener {
 	public void error(Message msg);
 	public void warning(Message msg);
 	public void error(ToolMessage msg);
-	public void warning(AmbiguityWarning msg);
 }

@@ -179,10 +179,6 @@ public class ErrorManager {
 		public void error(ToolMessage msg) {
 			System.err.println(msg);
 		}
-
-		public void warning(AmbiguityWarning msg) {
-			System.err.println(msg);
-		}
 	};
 
 	/** Handle all ST error listeners here (code gen, Grammar, and this class
@@ -347,7 +343,7 @@ public class ErrorManager {
 	public static void nondeterminism(DecisionProbe probe,
 									  DFAState d)
 	{
-		getErrorListener().error(
+		getErrorListener().warning(
 			new GrammarNonDeterminismMessage(probe,d)
 		);
 	}
@@ -355,7 +351,7 @@ public class ErrorManager {
 	public static void danglingState(DecisionProbe probe,
 									 DFAState d)
 	{
-		getErrorListener().error(
+		getErrorListener().warning(
 			new GrammarDanglingStateMessage(probe,d)
 		);
 	}
@@ -363,15 +359,15 @@ public class ErrorManager {
 	public static void unreachableAlts(DecisionProbe probe,
 									   List alts)
 	{
-		getErrorListener().error(
+		getErrorListener().warning(
 			new GrammarUnreachableAltsMessage(probe,alts)
 		);
 	}
 
 	public static void insufficientPredicates(DecisionProbe probe,
-									   List alts)
+											  List alts)
 	{
-		getErrorListener().error(
+		getErrorListener().warning(
 			new GrammarInsufficientPredicatesMessage(probe,alts)
 		);
 	}

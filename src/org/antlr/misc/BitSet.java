@@ -112,15 +112,29 @@ public class BitSet implements IntSet, Cloneable {
 		}
     }
 
-    public void addAll(int[] elements) {
-        if ( elements==null ) {
-            return;
-        }
-        for (int i = 0; i < elements.length; i++) {
-            int e = elements[i];
-            add(e);
-        }
-    }
+	public void addAll(int[] elements) {
+		if ( elements==null ) {
+			return;
+		}
+		for (int i = 0; i < elements.length; i++) {
+			int e = elements[i];
+			add(e);
+		}
+	}
+
+	public void addAll(List elements) {
+		if ( elements==null ) {
+			return;
+		}
+		for (int i = 0; i < elements.size(); i++) {
+			Object o = elements.get(i);
+			if ( !(o instanceof Integer) ) {
+				throw new IllegalArgumentException();
+			}
+			Integer eI = (Integer)o;
+			add(eI.intValue());
+		}
+	}
 
     public IntSet and(IntSet a) {
         BitSet s = (BitSet)this.clone();

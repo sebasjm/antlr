@@ -58,10 +58,6 @@ public class TestSymbolDefinitions extends TestSuite {
 		public void error(ToolMessage msg) {
 			errors.add(msg);
 		}
-
-		public void warning(AmbiguityWarning msg) {
-			warnings.add(msg);
-		}
 	};
 
     /** Public default constructor used by TestRig */
@@ -286,10 +282,10 @@ public class TestSymbolDefinitions extends TestSuite {
 							  GrammarSemanticsMessage expectedMessage)
 		throws FailedAssertionException
 	{
+		/*
 		System.out.println(equeue.infos);
 		System.out.println(equeue.warnings);
 		System.out.println(equeue.errors);
-		/*
 		assertTrue(equeue.errors.size()==n,
 				   "number of errors mismatch; expecting "+n+"; found "+
 				   equeue.errors.size());
