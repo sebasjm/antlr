@@ -83,22 +83,33 @@ public class TestRig {
                 }
                 catch (NoSuchMethodException nsme) {
                     // else just call runTest on all methods with "test" prefix
-                    Method methods[] = c.getMethods();
-                    for (int i = 0; i < methods.length; i++) {
-                        Method testMethod = methods[i];
-                        if ( testMethod.getName().startsWith("test") ) {
-                            test.runTest(testMethod.getName());
-                        }
-                    }
-                }
+					runAllTests(c);
+				}
 			}
         }
         catch (Exception e) {
-            System.out.println("Exception during test "+test.testName);
+            System.err.println("Exception during test "+test.testName);
             e.printStackTrace();
         }
         System.out.println();
         System.out.println("successes: "+test.getSuccesses());
         System.out.println("failures: "+test.getFailures());
     }
+
+	public static void runAllTests(Class c) {
+		try {
+			Method methods[] = c.getMethods();
+			TestSuite test = (TestSuite)c.newInstance();
+			for (int i = 0; i < methods.length; i++) {
+				Method testMethod = methods[i];
+				if ( testMethod.getName().startsWith("test") ) {
+					test.runTest(testMethod.getName());
+				}
+			}
+		}
+		catch (Exception e) {
+			System.err.println("Exception during test of class "+c.getName());
+			e.printStackTrace();
+		}
+	}
 }
