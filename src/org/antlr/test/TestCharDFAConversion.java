@@ -152,7 +152,6 @@ public class TestCharDFAConversion extends TestSuite {
 			".s0-{'a'..'h', 'j'..'z'}->:s4=>2\n" +
 			".s1-'f'->.s2\n" +
 			".s1-<EOT>->:s4=>2\n" +
-			".s1-{'a'..'e', 'g'..'z'}->:s4=>2\n" +
 			".s2-'a'..'z'->:s4=>2\n" +
 			".s2-<EOT>->:s3=>1\n";
 		checkDecision(g, 2, expecting, null);
@@ -167,9 +166,8 @@ public class TestCharDFAConversion extends TestSuite {
 		String expecting =
 			".s0-'*'->.s1\n" +
 			".s0-{'\\u0000'..')', '+'..'\\uFFFE'}->:s3=>1\n" +
-			".s1-'*'->:s3=>1\n" +
 			".s1-'/'->:s2=>2\n" +
-			".s1-{'\\u0000'..')', '+'..'.', '0'..'\\uFFFE'}->:s3=>1\n";
+			".s1-{'\\u0000'..'.', '0'..'\\uFFFE'}->:s3=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
