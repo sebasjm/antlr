@@ -43,13 +43,25 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public void consume() {
+		int a = input.index();
 		Token t = input.LT(1);
 		input.consume();
+		int b = input.index();
 		dbg.consumeToken(t);
+		if ( b>a+1 ) {
+			// then we consumed more than one token; must be off channel tokens
+			for (int i=a+1; i<b; i++) {
+				dbg.consumeToken(input.get(i));
+			}
+		}
 	}
 
 	public int LA(int i) {
 		return input.LA(i);
+	}
+
+	public Token get(int i) {
+		return input.get(i);
 	}
 
 	public int mark() {
@@ -74,10 +86,6 @@ public class DebugTokenStream implements TokenStream {
 	public Token LT(int i) {
 		dbg.LT(i);
 		return input.LT(i);
-	}
-
-	public Token LT(int marker, int i) {
-		return input.LT(marker, i);
 	}
 
 	public TokenSource getTokenSource() {

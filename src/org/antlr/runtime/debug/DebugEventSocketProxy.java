@@ -95,7 +95,12 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		buf.append(t.getChannel()); buf.append(' ');
 		buf.append(t.getLine()); buf.append(' ');
 		buf.append(t.getCharPositionInLine()); buf.append(" \"");
-		buf.append(t.getText());
+		String txt = t.getText();
+		if ( txt==null ) {
+			txt = "";
+		}
+		txt = txt.replaceAll("\n"," ");
+		buf.append(txt);
 		transmit("consumeToken "+buf);
 	}
 

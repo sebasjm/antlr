@@ -53,7 +53,7 @@ public class CommonTokenStream implements TokenStream {
 	 *  specific channel.  (seems to cost a list to track this extra array;
 	 *  like 10% tokenizing a 5000 line java program w/o parsing).
 	 */
-	protected List filteredTokens;
+	//protected List filteredTokens;
 
 	/** Map<tokentype, channel> to override some Tokens' channel numbers */
 	protected Map channelOverrideMap;
@@ -71,12 +71,30 @@ public class CommonTokenStream implements TokenStream {
 		this.channel = channel;
 	}
 
-	/** Load all tokens from the token source and put in filteredTokens.
-	 *  Fill on demand so we can alter things like channel overrides after ctor
-	 *  called but before buffer is filled.
+	/** Load all tokens from the token source and put in tokens.
 	 */
 	protected void fillBuffer() {
 		tokens = new ArrayList(500);
+		int index = 0;
+		Token t = tokenSource.nextToken();
+		while ( t!=null && t.getType()!=CharStream.EOF ) {
+			t.setTokenIndex(index);
+			tokens.add(t);
+			// is there a channel override for token type?
+			if ( channelOverrideMap!=null ) {
+				Integer channelI = (Integer)
+					channelOverrideMap.get(new Integer(t.getType()));
+				if ( channelI!=null ) {
+					t.setChannel(channelI.intValue());
+				}
+			}
+			t = tokenSource.nextToken();
+			index++;
+		}
+		// leave p pointing at first token on channel
+		p = 0;
+		p = skipOffTokenChannels(p);
+		/*
 		filteredTokens = new ArrayList(500);
 		int index = 0;
         // suck in all the input tokens
@@ -99,20 +117,34 @@ public class CommonTokenStream implements TokenStream {
             t = tokenSource.nextToken();
 			index++;
         }
+		*/
     }
 
 	/** Move the input pointer to the next incoming token.  The stream
-	 *  must become active with lookahead(1) available.  consume() simply
-	 *  moves the input pointer so that lookahead(1) points at the next
+	 *  must become active with LT(1) available.  consume() simply
+	 *  moves the input pointer so that LT(1) points at the next
 	 *  input symbol. Consume at least one token.
 	 *
 	 *  Walk past any token not on the channel the parser is listening to.
 	 */
 	public void consume() {
-		if ( p<filteredTokens.size() ) {
+		if ( p<tokens.size() ) {
             p++;
+			p = skipOffTokenChannels(p); // leave p on valid token
         }
     }
+
+	/** Given a starting index, return the index of the first on-channel
+	 *  token.
+	 */
+	protected int skipOffTokenChannels(int i) {
+		while ( i<tokens.size() &&
+				((Token)tokens.get(i)).getChannel()!=channel )
+		{
+			i++;
+		}
+		return i;
+	}
 
 	/** A simple filter mechanism whereby you can tell this token stream
 	 *  to force all tokens of type ttype to be on channel.  For example,
@@ -127,13 +159,36 @@ public class CommonTokenStream implements TokenStream {
         channelOverrideMap.put(new Integer(ttype), new Integer(channel));
 	}
 
-	/** Get the ith token from the current position 1..n where i=1 is the
+	/** Get the ith token from the current position 1..n where k=1 is the
 	 *  first symbol of lookahead.
 	 */
-	public Token LT(int i) {
-        //System.out.println("LT("+i+")="+LT(p, i));
-        return LT(p, i);
+	public Token LT(int k) {
+		if ( tokens==null ) {
+			fillBuffer();
+		}
+		//System.out.print("LT(p="+p+","+k+")=");
+        if ( (p+k) >= tokens.size() ) {
+			//System.out.println("<EOF>");
+            return Token.EOFToken;
+        }
+		//System.out.println(tokens.get(p+k-1));
+		int i = p;
+		int n = 1;
+		// find n good tokens
+		while ( n<k ) {
+			// skip off-channel tokens
+			i = skipOffTokenChannels(i+1); // leave p on valid token
+			n++;
+		}
+        return (Token)tokens.get(i);
     }
+
+	/** Return absolute token i; ignore which channel the tokens are on;
+	 *  that is, count all tokens not just on-channel tokens.
+	 */
+	public Token get(int i) {
+		return (Token)tokens.get(i);
+	}
 
 	/** Get Token at current input marker + i ahead where i=1 is next Token.
 	 *  This is primarily used for evaluating semantic predicates which
@@ -142,14 +197,15 @@ public class CommonTokenStream implements TokenStream {
 	 *  however, as we check syntax first and then semantic predicates.
 	 *
 	 *  int m = input.mark();
-	 *  Token atom = input.lookahead(1);
-	 *  input.next();
-	 *  input.next();
+	 *  Token atom = input.LT(1);
+	 *  input.consume();
+	 *  input.consume();
 	 *  ...
-	 *  input.next();
-	 *  assertTrue(atom==input.lookahead(m, 1));
+	 *  input.consume();
+	 *  assertTrue(atom==input.LT(m, 1));
 	 */
-    public Token LT(int marker, int i) {
+    /*
+	public Token LT(int marker, int i) {
 		if ( filteredTokens==null ) {
 			fillBuffer();
 		}
@@ -158,25 +214,24 @@ public class CommonTokenStream implements TokenStream {
         }
         return (Token)filteredTokens.get(marker+i-1);
     }
+	*/
 
     public int LA(int i) {
         return LT(i).getType();
     }
 
-    public int LA(int marker, int i) {
+    /*
+	public int LA(int marker, int i) {
         return LT(marker, i).getType();
     }
+	*/
 
     public int mark() {
         return index();
     }
 
 	public int size() {
-		return filteredTokens.size();
-	}
-
-	public int getFilteredSize() {
-		return filteredTokens.size();
+		return tokens.size();
 	}
 
     public int index() {
@@ -192,7 +247,7 @@ public class CommonTokenStream implements TokenStream {
 	}
 
 	public String toString() {
-		if ( filteredTokens==null ) {
+		if ( tokens==null ) {
 			fillBuffer();
 		}
  		StringBuffer buf = new StringBuffer();

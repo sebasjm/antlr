@@ -67,6 +67,13 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		public void setTokenIndex(int index) {
 			this.index = index;
 		}
+		public String toString() {
+			String channelStr = "";
+			if ( channel>0 ) {
+				channelStr=",channel="+channel;
+			}
+			return "["+getText()+"/<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+		}
 	}
 
 	public RemoteDebugEventSocketListener(DebugEventListener listener,
@@ -130,7 +137,12 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	}
 
 	protected void dispatch(String line) {
+		System.out.println("event: "+line);
 		String[] elements = getEventElements(line);
+		if ( elements==null || elements[0]==null ) {
+			System.err.println("unknown debug event: "+line);
+			return;
+		}
 		if ( elements[0].equals("enterRule") ) {
 			listener.enterRule(elements[1]);
 		}

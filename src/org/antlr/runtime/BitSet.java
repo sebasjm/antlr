@@ -170,6 +170,9 @@ public class BitSet implements Cloneable {
     }
 
     public boolean member(int el) {
+		if ( el<0 ) {
+			return false;
+		}
         int n = wordNumber(el);
         if (n >= bits.length) return false;
         return (bits[n] & bitMask(el)) != 0;

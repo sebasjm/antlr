@@ -64,6 +64,9 @@ public class CommonToken extends Token {
 	}
 
     public String getText() {
+		if ( input==null ) {
+			return null;
+		}
         return input.substring(start,stop);
     }
 

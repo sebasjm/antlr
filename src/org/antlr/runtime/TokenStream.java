@@ -30,10 +30,10 @@ package org.antlr.runtime;
 /** A stream of tokens accessing tokens from a TokenSource */
 public interface TokenStream extends IntStream {
     /** Get Token at current input pointer + i ahead where i=1 is next Token */
-    public Token LT(int i);
+    public Token LT(int k);
 
-	/** Get Token at current input marker + i ahead where i=1 is next Token. */
-    public Token LT(int marker, int i);
+	/** Get a token at an absolute index i */
+	public Token get(int i);
 
 	/** Where is this stream pulling tokens from?  This is not the name, but
 	 *  the object that provides Token objects.
