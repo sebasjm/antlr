@@ -63,10 +63,6 @@ public class TestNonDeterminism extends TestSuite {
 		public void error(ToolMessage msg) {
 			errors.add(msg);
 		}
-
-		public void warning(AmbiguityWarning msg) {
-			warnings.add(msg);
-		}
 	};
 
     /** Public default constructor used by TestRig */
