@@ -206,11 +206,23 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			listener.rewind(Integer.parseInt(elements[1]));
 		}
 		else if ( elements[0].equals("exception") ) {
-			RecognitionException e = null;
-			if ( elements[1].equals("RecognitionException") ) {
-				e = new RecognitionException(null);
+			String excName = elements[1];
+			Class excClass = null;
+			try {
+				excClass = Class.forName(excName);
+				RecognitionException e =
+					(RecognitionException)excClass.newInstance();
+				listener.recognitionException(e);
 			}
-			listener.recognitionException(e);
+			catch (ClassNotFoundException cnfe) {
+				System.err.println("can't find class "+cnfe);
+			}
+			catch (InstantiationException ie) {
+				System.err.println("can't instantiate class "+ie);
+			}
+			catch (IllegalAccessException ie) {
+				System.err.println("can't access class "+ie);				
+			}
 		}
 		else if ( elements[0].equals("recovered") ) {
 			listener.recovered();
