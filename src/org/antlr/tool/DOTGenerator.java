@@ -77,7 +77,7 @@ public class DOTGenerator {
 
         markedStates = new HashSet();
         dot.setAttribute("startState",
-                new Integer(startState.getStateNumber()));
+                new Integer(startState.stateNumber));
         walkCreatingDOT(dot, startState);
         return dot.toString();
     }
@@ -92,7 +92,7 @@ public class DOTGenerator {
 
         markedStates = new HashSet();
         dot.setAttribute("startState",
-                new Integer(startState.getStateNumber()));
+                new Integer(startState.stateNumber));
         walkRuleNFACreatingDOT(dot, startState);
         return dot.toString();
     }
@@ -257,12 +257,12 @@ public class DOTGenerator {
         if ( s==null ) {
             return "null";
         }
-        String stateLabel = String.valueOf(s.getStateNumber());
+        String stateLabel = String.valueOf(s.stateNumber);
 		if ( s instanceof DFAState ) {
             StringBuffer buf = new StringBuffer(250);
             Set configurations = ((DFAState)s).getNFAConfigurations();
             int n = 0;
-			buf.append(s.getStateNumber());
+			buf.append(s.stateNumber);
 			/*
 			buf.append(": ");
             for (Iterator it = configurations.iterator(); it.hasNext();) {

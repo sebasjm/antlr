@@ -58,8 +58,8 @@ public class NFA {
     }
 
     public void addState(NFAState state) {
-        numberToStateList.setSize(state.getStateNumber()+1); // make sure we have room
-        numberToStateList.set(state.getStateNumber(), state);
+        numberToStateList.setSize(state.stateNumber+1); // make sure we have room
+        numberToStateList.set(state.stateNumber, state);
     }
 
     public NFAState getState(int s) {

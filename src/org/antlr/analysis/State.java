@@ -33,7 +33,7 @@ import java.util.List;
 public abstract class State {
     public static final int INVALID_STATE_NUMBER = -1;
 
-    protected int stateNumber = INVALID_STATE_NUMBER;
+    public int stateNumber = INVALID_STATE_NUMBER;
 
     /** An accept state is an end of rule state for lexers and
      *  parser grammar rules.
@@ -48,19 +48,11 @@ public abstract class State {
 
     public abstract List getTransitions();
 
-    public int getStateNumber() {
-        return stateNumber;
-    }
+	public boolean isAcceptState() {
+		return acceptState;
+	}
 
-    public void setStateNumber(int stateNumber) {
-        this.stateNumber = stateNumber;
-    }
-
-    public boolean isAcceptState() {
-        return acceptState;
-    }
-
-    public void setAcceptState(boolean acceptState) {
-        this.acceptState = acceptState;
-    }
+	public void setAcceptState(boolean acceptState) {
+		this.acceptState = acceptState;
+	}
 }

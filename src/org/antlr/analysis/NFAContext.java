@@ -66,7 +66,7 @@ public class NFAContext {
         this.parent = parent;
         this.invokingState = invokingState;
         if ( invokingState!=null ) {
-            this.cachedHashCode = invokingState.getStateNumber();
+            this.cachedHashCode = invokingState.stateNumber;
         }
         if ( parent!=null ) {
             this.cachedHashCode += parent.cachedHashCode;
@@ -123,7 +123,7 @@ public class NFAContext {
     public boolean contains(int state, NFAContext initialContext) {
         NFAContext sp = this;
         while ( sp.parent!=null && sp.parent!=initialContext ) {
-            if ( sp.invokingState.getStateNumber() == state ) {
+            if ( sp.invokingState.stateNumber == state ) {
                 return true;
             }
             sp = sp.parent;
@@ -149,7 +149,7 @@ public class NFAContext {
         NFAContext sp = this;
         buf.append("[");
         while ( sp.parent!=null ) {
-            buf.append(sp.invokingState.getStateNumber());
+            buf.append(sp.invokingState.stateNumber);
             buf.append(" ");
             sp = sp.parent;
         }

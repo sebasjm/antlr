@@ -155,7 +155,7 @@ public class NFAState extends State {
     }
 
 	public String toString() {
-		return String.valueOf(getStateNumber());
+		return String.valueOf(stateNumber);
 	}
 
 }

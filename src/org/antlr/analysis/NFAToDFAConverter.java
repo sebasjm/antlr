@@ -73,7 +73,7 @@ public class NFAToDFAConverter {
 		while ( !terminate && work.size()>0 ) {
 			DFAState d = (DFAState) work.get(0);
 			if ( debug ) {
-				System.out.println("convert DFA state "+d.getStateNumber()+
+				System.out.println("convert DFA state "+d.stateNumber+
 								   " ("+d.getNFAConfigurations().size()+" nfa states)");
 			}
 			findNewDFAStatesAndAddDFATransitions(d);
@@ -317,7 +317,7 @@ public class NFAToDFAConverter {
 						boolean collectPredicates)
 	{
 		if ( debug ) {
-			System.out.println("closure at NFA state "+p.getStateNumber()+"|"+
+			System.out.println("closure at NFA state "+p.stateNumber+"|"+
 							   alt+" filling DFA state "+d+" with context "+context+
 							   "(initial context="+initialContext+")");
 		}
@@ -326,7 +326,7 @@ public class NFAToDFAConverter {
 		// If we've seen this configuration before during closure, stop
 		if ( closureIsBusy(d,p,alt,context,initialContext,semanticContext) ) {
 			if ( debug ) {
-				System.out.println("avoid infinite closure computation to state "+p.getStateNumber()+
+				System.out.println("avoid infinite closure computation to state "+p.stateNumber+
 								   " from context "+context+" alt="+alt+" semctx="+semanticContext+
 								   " (initial context="+initialContext+")");
 				System.out.println("state is "+d);
@@ -539,7 +539,7 @@ public class NFAToDFAConverter {
 	{
 		// case (1) : epsilon cycle (same state, same context)
 		NFAConfiguration c =
-				new NFAConfiguration(p.getStateNumber(),
+				new NFAConfiguration(p.stateNumber,
 						alt,
 						context,
 						semContext);
@@ -548,7 +548,7 @@ public class NFAToDFAConverter {
 		}
 
 		// case (2) : recursive (same state, state visited before)
-		if ( context.contains(p.getStateNumber(), initialContext) ) {
+		if ( context.contains(p.stateNumber, initialContext) ) {
 			return true;
 		}
 		return false;
@@ -561,7 +561,7 @@ public class NFAToDFAConverter {
 								 SemanticContext semContext)
 	{
 		NFAConfiguration c =
-				new NFAConfiguration(p.getStateNumber(),
+				new NFAConfiguration(p.stateNumber,
 									 alt,
 									 context,
 									 semContext);

@@ -186,7 +186,7 @@ public class DecisionProbe {
 				Set dfaStates = new HashSet();
 				boolean reaches = reachesState(dfa.getStartState(), d, dfaStates);
 				if ( !reaches ) {
-					System.err.println("whoa!  no path from start to "+d.getStateNumber());
+					System.err.println("whoa!  no path from start to "+d.stateNumber);
 				}
 				System.err.println("the decision cannot distinguish between alternatives "+
 								   d.getAltSet()+" for at least one input sequence");
@@ -211,7 +211,7 @@ public class DecisionProbe {
 				Set dfaStates = new HashSet();
 				boolean reaches = reachesState(dfa.getStartState(), d, dfaStates);
 				if ( !reaches ) {
-					System.err.println("whoa!  no path from start to "+d.getStateNumber());
+					System.err.println("whoa!  no path from start to "+d.stateNumber);
 				}
 				//System.out.println("dfa states="+dfaStates);
 				// NOW GET NFA STATES FROM DFA SET OF CONFIGS FOR NONDET ALTS
@@ -448,7 +448,7 @@ public class DecisionProbe {
 		for (int i=0; i<s.getNumberOfTransitions(); i++) {
 			Transition t = s.transition(i);
 			NFAState edgeTarget = (NFAState)t.getTarget();
-			Integer targetStateNumI = new Integer(edgeTarget.getStateNumber());
+			Integer targetStateNumI = new Integer(edgeTarget.stateNumber);
 			Integer previousLabelIndexAtThisState =
 				(Integer)statesVisited.get(edgeTarget);
 			if ( states.contains(targetStateNumI) &&

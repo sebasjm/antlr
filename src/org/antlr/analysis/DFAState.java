@@ -163,7 +163,7 @@ public class DFAState extends State {
                                     int alt,
                                     NFAContext context,
                                     SemanticContext semanticContext) {
-        NFAConfiguration c = new NFAConfiguration(state.getStateNumber(),
+        NFAConfiguration c = new NFAConfiguration(state.stateNumber,
                                                   alt,
                                                   context,
                                                   semanticContext);
@@ -508,7 +508,7 @@ public class DFAState extends State {
     /** Print all NFA states plus what alts they predict */
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(getStateNumber()+":{");
+        buf.append(stateNumber+":{");
         Iterator iter = nfaConfigurations.iterator();
         int i = 1;
         while (iter.hasNext()) {

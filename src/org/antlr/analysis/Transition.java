@@ -68,7 +68,7 @@ public class Transition implements Comparable {
     }
 
     public int hashCode() {
-        return label.hashCode() + target.getStateNumber();
+        return label.hashCode() + target.stateNumber;
     }
 
     public boolean equals(Object o) {
@@ -83,6 +83,6 @@ public class Transition implements Comparable {
     }
 
     public String toString() {
-        return label+"->"+target.getStateNumber();
+        return label+"->"+target.stateNumber;
     }
 }

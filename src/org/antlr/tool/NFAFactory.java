@@ -61,7 +61,7 @@ public class NFAFactory {
     public NFAState newState() {
         NFAState n = new NFAState(nfa);
         int state = stateCounter;
-        n.setStateNumber(state);
+        n.stateNumber = state;
         stateCounter++;
         nfa.addState(n);
         return n;

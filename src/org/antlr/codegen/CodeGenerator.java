@@ -358,7 +358,7 @@ public class CodeGenerator {
             maxK = k;
         }
         StringTemplate dfaST = templates.getInstanceOf("dfaState");
-		dfaST.setAttribute("stateNumber", new Integer(s.getStateNumber()));
+		dfaST.setAttribute("stateNumber", new Integer(s.stateNumber));
         String description = dfa.getNFADecisionStartState().getDescription();
         if ( description!=null ) {
 			description = Utils.replace(description,"\"", "\\\"");
@@ -406,10 +406,10 @@ public class CodeGenerator {
             StringTemplate dfaST,
             DFAState s)
     {
-        if ( visited.member(s.getStateNumber()) ) {
+        if ( visited.member(s.stateNumber) ) {
             return; // already visited
         }
-        visited.add(s.getStateNumber());
+        visited.add(s.stateNumber);
 
         StringTemplate stateST;
         if ( s.isAcceptState() ) {
@@ -421,7 +421,7 @@ public class CodeGenerator {
             stateST = templates.getInstanceOf("cyclicDFAState");
             stateST.setAttribute("needErrorClause", new Boolean(true));
         }
-        stateST.setAttribute("stateNumber", new Integer(s.getStateNumber()));
+        stateST.setAttribute("stateNumber", new Integer(s.stateNumber));
         StringTemplate eotST = null;
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {
             Transition edge = (Transition) s.transition(i);
@@ -439,7 +439,7 @@ public class CodeGenerator {
             }
 			edgeST.setAttribute("edgeNumber", new Integer(i+1));
             edgeST.setAttribute("targetStateNumber",
-                                 new Integer(edge.getTarget().getStateNumber()));
+                                 new Integer(edge.getTarget().stateNumber));
             if ( edge.getLabel().getAtom()!=Label.EOT ) {
                 stateST.setAttribute("edges", edgeST);
             }
