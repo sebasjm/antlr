@@ -34,6 +34,8 @@ CODE_GEN_TEMPLATES_INCOMPLETE() ::=
 	"at least one code generation template missing for language <arg>"
 CANNOT_CREATE_TARGET_GENERATOR(arg,exception) ::= 
 	"cannot create target <arg> code generator: <exception>"
+CANNOT_COMPUTE_SAMPLE_INPUT_SEQ() ::= 
+	"cannot generate a sample input sequence from lookahead DFA"
 
 // grammar interpretation errors
 NO_VIABLE_DFA_ALT(arg,arg2) ::=

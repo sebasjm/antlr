@@ -460,16 +460,19 @@ public class Grammar {
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
             NFAState decisionStartState = getDecisionNFAStartState(decision);
             if ( decisionStartState.getNumberOfTransitions()>1 ) {
-                System.out.println("--------------------\nbuilding lookahead DFA (d="
+                /*
+				System.out.println("--------------------\nbuilding lookahead DFA (d="
                         +decisionStartState.getDecisionNumber()+") for "+
                         decisionStartState.getDescription());
-                long start = System.currentTimeMillis();
+                */
+				long start = System.currentTimeMillis();
                 DFA lookaheadDFA = new DFA(decisionStartState);
                 long stop = System.currentTimeMillis();
 				setLookaheadDFA(decision, lookaheadDFA);
+				/*
 				System.out.println("DFA (d="+lookaheadDFA.getDecisionNumber()+") cost: "+lookaheadDFA.getNumberOfStates()+
 								   " states, "+(int)(stop-start)+" ms; descr="+decisionStartState.getDescription());
-				// TURN OFF DOT GEN FOR NOW
+				*/
 				if ( true ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.getGrammar());
 					String dot = dotGenerator.getDOT( lookaheadDFA.getStartState() );
@@ -941,8 +944,7 @@ public class Grammar {
 
     /** Get the ith alternative (1..n) from a decision; return null when
      *  an invalid alt is requested.  I must count in to find the right
-     *  alternative number because the alt num stored in the states is
-     *  not what I want for loopback decisions.
+     *  alternative number.
      */
     public NFAState getNFAStateForAltOfDecision(NFAState decisionState, int alt) {
         if ( decisionState==null || alt<=0 ) {

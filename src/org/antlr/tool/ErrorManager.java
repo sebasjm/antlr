@@ -107,6 +107,7 @@ public class ErrorManager {
 	public static final int MSG_MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES = 21;
 	public static final int MSG_CODE_GEN_TEMPLATES_INCOMPLETE = 22;
 	public static final int MSG_CANNOT_CREATE_TARGET_GENERATOR = 23;
+	public static final int MSG_CANNOT_COMPUTE_SAMPLE_INPUT_SEQ = 24;
 
 	// grammar interpretation errors
 	public static final int MSG_NO_VIABLE_DFA_ALT = 30;
@@ -236,6 +237,7 @@ public class ErrorManager {
 
 	/** We really only need a single locale for entire running ANTLR code
 	 *  in a single VM.
+	 *  TODO: add "closest match" functionality.  E.g., use fr_FR if canadian fr not available
 	 */
 	public static void setLocale(Locale locale) {
 		ErrorManager.locale = locale;

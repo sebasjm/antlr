@@ -39,6 +39,10 @@ import antlr.collections.AST;
 
 /** Routines to construct StateClusters from EBNF grammar constructs.
  *  No optimization is done to remove unnecessary epsilon edges.
+ *
+ *  TODO: add an optimization that reduces number of states and transitions
+ *  will help with speed of conversion and make it easier to view NFA.  For
+ *  example, o-A->o-->o-B->o should be o-A->o-B->o
  */
 public class NFAFactory {
 	/** This factory is attached to a specifc NFA that it is building.

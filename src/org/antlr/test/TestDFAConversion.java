@@ -512,6 +512,38 @@ public class TestDFAConversion extends TestSuite {
         checkDecision(g, 2, expecting, null);
     }
 
+	public void testMultipleSequenceCollision() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"a : (A{;}|B)\n" +
+				"  | (A{;}|B)\n" +
+				"  | A\n" +
+				"  ;");
+		// nondeterministic from left edge; no stop state
+		String expecting =
+				"";
+		checkDecision(g, 1, expecting, new int[] {2,3});
+	}
+
+	public void testMultipleAltsSameSequenceCollision() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"a : type ID \n" +
+				"  | type ID\n" +
+				"  | type ID\n" +
+				"  | type ID\n" +
+				"  ;\n" +
+				"\n" +
+				"type : I | F;");
+		// nondeterministic from left edge; no stop state
+		String expecting =
+				".s0-F->.s3\n" +
+			".s0-I->.s1\n" +
+			".s1-ID->:s2=>1\n" +
+			".s3-ID->:s2=>1\n";
+		checkDecision(g, 1, expecting, new int[] {2,3,4});
+	}
+
     // S U P P O R T
 
     public void _template() throws Exception {

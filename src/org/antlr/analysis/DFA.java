@@ -129,7 +129,9 @@ public class DFA {
 		// figure out if there are problems with decision
 		verify();
 		
-		probe.reportErrors();
+		if ( !probe.isDeterministic() ) {
+			probe.reportErrors();
+		}
     }
 
 	public int predict(IntStream input) {
