@@ -65,24 +65,15 @@ public class BitSet implements Cloneable {
         bits = new long[((nbits - 1) >> LOG_BITS) + 1];
     }
 
-    /*
-	public BitSet and(BitSet a) {
-        BitSet s = (BitSet)this.clone();
-        s.andInPlace((BitSet)a);
-        return s;
-    }
-
-    public void andInPlace(BitSet a) {
-        int min = Math.min(bits.length, a.bits.length);
-        for (int i = min - 1; i >= 0; i--) {
-            bits[i] &= a.bits[i];
-        }
-        // clear all bits in this not present in a (if this bigger than a).
-        for (int i = min; i < bits.length; i++) {
-            bits[i] = 0;
-        }
-    }
-	*/
+	/** return this | a in a new set */
+	public BitSet or(BitSet a) {
+		if ( a==null ) {
+			return this;
+		}
+		BitSet s = (BitSet)this.clone();
+		s.orInPlace(a);
+		return s;
+	}
 
 	public void orInPlace(BitSet a) {
 		if ( a==null ) {
@@ -183,6 +174,14 @@ public class BitSet implements Cloneable {
         if (n >= bits.length) return false;
         return (bits[n] & bitMask(el)) != 0;
     }
+
+	// remove this element from this set
+	public void remove(int el) {
+		int n = wordNumber(el);
+		if (n < bits.length) {
+			bits[n] &= ~bitMask(el);
+		}
+	}
 
     public boolean isNil() {
         for (int i = bits.length - 1; i >= 0; i--) {

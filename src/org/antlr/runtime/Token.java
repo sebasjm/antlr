@@ -28,6 +28,8 @@
 package org.antlr.runtime;
 
 public abstract class Token {
+	public static final int EOR_TOKEN_TYPE = 1;
+
     public static final int EOF = CharStream.EOF;
     public static final Token EOFToken = new CommonToken(EOF);
 	public static final int DEFAULT_CHANNEL = 0;

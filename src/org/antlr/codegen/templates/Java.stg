@@ -45,7 +45,7 @@ retry:
 parser(name, tokens, tokenNames, rules, cyclicDFAs, bitsets) ::= <<
 class <name> extends Parser {
     public static final String[] tokenNames = new String[] {
-        "\<invalid>", <tokenNames; separator=", ">
+        "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
     };
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
     public <name>(TokenStream input) { super(input); }
@@ -163,7 +163,8 @@ case <i> :
 
 alt(elements) ::= "<elements; separator=\"\n\">"
 
-tokenRef(token) ::= "match(<token>);"
+tokenRef(token,elementIndex) ::=
+  "match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);"
 
 charRef(char) ::= "match(<char>);"
 
@@ -186,9 +187,9 @@ wildcard() ::= "matchAny();"
 
 wildcardChar() ::= "matchAny();"
 
-ruleRef(rule,tokenIndex,args) ::= <<
+ruleRef(rule,elementIndex,args) ::= <<
 <if(!LEXER)>
-following.push(FOLLOW_<rule>_in_<ruleName><tokenIndex>);
+following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <rule>(<args>);
 following.pop();
 <else>

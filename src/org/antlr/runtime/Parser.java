@@ -37,9 +37,6 @@ import java.util.Stack;
 public class Parser {
     protected TokenStream input;
 
-	/** How deep are we nested in rule invocations? 0..n-1 */
-	//protected int ruleDepth=0;
-
 	/** Track the set of token types that can follow any rule invocation.
 	 *  List<BitSet>.
 	 */
@@ -63,14 +60,16 @@ public class Parser {
 	 *  exception catch (at the end of the method) by just throwing
 	 *  MismatchedTokenException upon input.LA(1)!=ttype.
 	 */
-	public void match(int ttype) throws MismatchedTokenException {
-		if ( input.LA(1)!=ttype ) {
-			RecognitionException re = new MismatchedTokenException(ttype);
-			reportError(re);
-			recoverFromMismatchedToken(re, ttype);
+	public void match(int ttype, org.antlr.runtime.BitSet follow)
+		throws MismatchedTokenException
+	{
+		if ( input.LA(1)==ttype ) {
+			input.consume();
 			return;
 		}
-		input.consume();
+		MismatchedTokenException mte = new MismatchedTokenException(ttype);
+		recoverFromMismatchedToken(mte, ttype, follow);
+		return;
 	}
 
 	public void matchAny() {
@@ -127,24 +126,127 @@ public class Parser {
 	}
 
 	public void recover(RecognitionException re) {
-		// compute FOLLOW set by walking stack, combining sets
-		BitSet followSet = new BitSet();
-		for (int i = 0; i < following.size(); i++) {
-			BitSet localFollowSet = (BitSet) following.get(i);
-			followSet.orInPlace(localFollowSet);
-		}
+		BitSet followSet = computeRuleFollow();
 		consumeUntil(followSet);
 	}
 
-	public void recoverFromMismatchedToken(RecognitionException re, int ttype) {
+	/*  Compute the context-sensitive FOLLOW set for current rule.
+	 *  During rule invocation, the parser pushes the set of tokens
+	 *  that can follow that rule reference on the stack; this amounts
+	 *  to computing FIRST of what follows the rule reference in the
+	 *  rule.  We can consider this the local follow.  The local
+	 *  follow set only includes tokens from within the enclosing
+	 *  rule; i.e., the FIRST computation done by ANTLR stops at the
+	 *  end of a rule.
+	 *
+	 *  This computation returns the union of all of these local
+	 *  follow sets.  It is important to note that the set is not
+	 *  limited to any particular lookahead depth.
+	 *
+	 *  For SLL(k) parsers, such as those built by ANTLR, you can only
+	 *  compute the "global" FOLLOW statically.  The global FOLLOW is
+	 *  the set of tokens that can follow a rule reference in *any*
+	 *  context.  In our case, since we are computing the combined set
+	 *  at run time, we know which particular single context and can
+	 *  compute an exact FOLLOW.
+	 *
+	 *  EXAMPLE
+	 *
+	 *  When you find a "no viable alt exception", the input is not
+	 *  consistent with any of the alternatives for rule r.  The best
+	 *  thing to do is to consume tokens until you see something that
+	 *  can legally follow a call to r or any rule that called r.  You
+	 *  don't want the exact set of viable next tokens because the
+	 *  input might just be missing a token--you could consume the
+	 *  rest of the input looking for one of those tokens.
+	 *
+	 *  For example, consider grammar:
+	 *
+	 *  stat : ID '=' expr ';'
+	 *       | "return" expr '.'
+	 *       ;
+	 *  expr : atom ('+' atom)* ;
+	 *  atom : INT
+	 *       | '(' expr ')'
+	 *       ;
+	 *
+	 *  For input "i = (;" the parser will enter
+	 *
+	 *  stat -> expr -> atom -> expr -> atom
+	 *
+	 *  and then discover ';' doesn't start an atom.  The FOLLOW of
+	 *  atom is set {'+',')',';'}.  Notice that it does not include
+	 *  '.'  because that token is contributed from a different
+	 *  context (that of having called expr from the 2nd alt of stat
+	 *  rather than the first as in our case).  The FOLLOW set is
+	 *  computed by walking back up the call chain and combining sets
+	 *  from the local follow for each rule.
+	 *
+	 *  Anyway, the parser should not consume anything as LA(1)==';'.
+	 *  Consider the difference between FOLLOW(atom) and the set of
+	 *  viable tokens for what follows a reference to atom: {'+',')'}.
+	 *  If you used this set instead of the FOLLOW, you'd consume the
+	 *  ';' and probably far into the future looking for a + or ')'.
+	 */
+	protected BitSet computeRuleFollow() {
+		return combineFollows(false);
+	}
+
+	/** Compute the set of token types that can come next after a
+	 *  token reference.  You get the set of viable tokens that can
+	 *  possibly come next at lookahead depth 1.  You want the exact
+	 *  viable token set when recovering from a token mismatch.  If
+	 *  LA(1) is member of exact set, then you know there is most
+	 *  likely a missing token in the input stream.  "Insert" one by
+	 *  just not throwing an exception.
+	 */
+	protected BitSet computeViableTokens() {
+		return combineFollows(true);
+	}
+
+	protected BitSet combineFollows(boolean exact) {
+		int top = following.size()-1;
+		BitSet followSet = new BitSet();
+		for (int i=top; i>=0; i--) {
+			BitSet localFollowSet = (BitSet) following.get(i);
+			System.out.println("local follow depth "+i+"="+
+							   localFollowSet.toString(getTokenNames())+")");
+			followSet.orInPlace(localFollowSet);
+			if ( exact && !followSet.member(Token.EOR_TOKEN_TYPE) ) {
+				break;
+			}
+		}
+		followSet.remove(Token.EOR_TOKEN_TYPE);
+		return followSet;
+	}
+
+	public void recoverFromMismatchedToken(MismatchedTokenException mte,
+										   int ttype,
+										   org.antlr.runtime.BitSet follow)
+		throws MismatchedTokenException
+	{
 		// if next token is what we are looking for then "delete" this token
 		if ( input.LA(2)==ttype ) {
+			reportError(mte);
 			System.err.println("deleting "+input.LT(1).toString(getCharStream()));
-			input.consume();
+			input.consume(); // delete extra token
+			input.consume(); // move past ttype token as if all were ok
 			return;
 		}
-		// if next token is not what we are looking for then "insert" ttype
-		System.err.println("inserting "+getTokenNames()[ttype]);
+		// compute what can follow this token reference
+		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
+			BitSet viableTokensFollowingThisRule = computeViableTokens();
+			follow = follow.or(viableTokensFollowingThisRule);
+		}
+		// if current token is consistent with what could come after ttype
+		// then it is ok to "insert" the missing token, else throw exception
+		if ( follow.member(ttype) ) {
+			reportError(mte);
+			System.err.println("inserting "+getTokenNames()[ttype]);
+			return;
+		}
+		System.err.println("nothing to do; throw exception");
+		throw mte;
 	}
 
 	public void consumeUntil(int tokenType) {

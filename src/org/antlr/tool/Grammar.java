@@ -104,9 +104,8 @@ public class Grammar {
      *  -1 (EOF) to \uFFFE.  For example, 0 could be a binary byte you
      *  want to lexer.  Labels of DFA/NFA transitions can be both tokens
      *  and characters.  I use negative numbers for bookkeeping labels
-     *  like EPSILON. Token types are above the max char '\uFFFF' so
-     *  that char literals and token types can exist in the same space
-     *  and not step on each other.
+     *  like EPSILON. Char literals and token types overlap in the same
+	 *  space, however.
      */
     protected int maxTokenType = Label.MIN_TOKEN_TYPE-1;
 
@@ -172,7 +171,7 @@ public class Grammar {
     protected CodeGenerator generator;
 
 	/** Used during LOOK to detect computation cycles */
-	protected Set lookBusy;
+	protected Set lookBusy = new HashSet();
 
 	/** For merged lexer/parsers, we must construct a separate lexer spec.
 	 *  This is the template for lexer; put the literals first then the
@@ -679,16 +678,16 @@ public class Grammar {
 		String tokenName = null;
 		int index=0;
 		// inside char range and lexer grammar?
-		if ( this.type==LEXER && ttype >= Label.MIN_LABEL_VALUE && ttype <= '\uFFFE' ) {
+		if ( this.type==LEXER && ttype >= Label.MIN_CHAR_VALUE && ttype <= Label.MAX_CHAR_VALUE ) {
 			tokenName = getUnicodeEscapeString(ttype);
 		}
 		// faux label?
-		else if ( ttype<Label.MIN_LABEL_VALUE ) {
+		else if ( ttype<0 ) {
 			tokenName = (String)typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
 		}
 		else {
 			index = ttype-Label.MIN_TOKEN_TYPE; // normalize index to 0..n
-			index += Label.NUM_FAUX_LABELS;         // jump over faux tokens
+			index += Label.NUM_FAUX_LABELS;     // jump over faux tokens
 
 			if ( index<typeToTokenList.size() ) {
 				tokenName = (String)typeToTokenList.get(index);
@@ -983,26 +982,24 @@ public class Grammar {
         return null;
     }
 
+	/** From an NFA state, s, find the set of all labels reachable from s.
+	 *  This computes FIRST, FOLLOW and any other lookahead computation
+	 *  depending on where s is.
+	 *
+	 *  Record, with EOR_TOKEN_TYPE, if you hit the end of a rule so we can
+	 *  know at runtime (when these sets are used) to start walking up the
+	 *  follow chain to compute the real, correct follow set.
+	 *
+	 *  This routine will only be used on parser and tree parser grammars.
+	 */
 	public LookaheadSet LOOK(NFAState s) {
-		lookBusy = new HashSet();
+		lookBusy.clear();
 		return _LOOK(s);
 	}
 
-	public LookaheadSet FOLLOW(String ruleName) {
-		return LOOK(getRuleStopState(ruleName));
-	}
-
-	/** From an NFA state, s, find the set of all labels reachable from s.
-	 *  This computes FIRST, FOLLOW and any other lookahead computation
-	 *  depending on where s is.  For example, if s is the end of rule node,
-	 *  this will return the FOLLOW set.  Use BitSet implementation as this
-	 *  will only be used on parser and tree parser grammars.
-	 *
-	 *  DOING LOCAL FOLLOW NOW for rule refs
-	 */
 	protected LookaheadSet _LOOK(NFAState s) {
 		if ( s.isAcceptState() ) {
-			return new LookaheadSet();
+			return new LookaheadSet(Label.EOR_TOKEN_TYPE);
 		}
 
 		if ( lookBusy.contains(s) ) {

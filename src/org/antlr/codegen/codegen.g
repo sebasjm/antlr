@@ -363,8 +363,8 @@ tree:   #(TREE_BEGIN atom (element)*)
 atom returns [StringTemplate code=null]
     :   r:RULE_REF     {code = templates.getInstanceOf("ruleRef");
                         code.setAttribute("rule", r.getText());
-                        code.setAttribute("tokenIndex", ((TokenWithIndex)r.getToken()).getIndex());
-                        generator.generateLocalFOLLOW(#r,r.getText(),currentRuleName);
+                        code.setAttribute("elementIndex", ((TokenWithIndex)r.getToken()).getIndex());
+                        generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName);
                        }
     |   t:TOKEN_REF    {
                        if ( grammar.type==Grammar.LEXER ) {
@@ -374,6 +374,8 @@ atom returns [StringTemplate code=null]
                        else {
                            code = templates.getInstanceOf("tokenRef");
                            code.setAttribute("token", t.getText());
+                           code.setAttribute("elementIndex", ((TokenWithIndex)#t.getToken()).getIndex());
+                           generator.generateLocalFOLLOW(#t,#t.getText(),currentRuleName);
                        }
                        }
 
@@ -386,6 +388,10 @@ atom returns [StringTemplate code=null]
                                 code = templates.getInstanceOf("tokenRef");
                                 code.setAttribute("token",
                                                  new Integer(grammar.getTokenType(c.getText())));
+                           code.setAttribute("elementIndex", ((TokenWithIndex)#c.getToken()).getIndex());
+	                            generator.generateLocalFOLLOW(#c,
+	                                String.valueOf(grammar.getTokenType(#c.getText())),
+	                                currentRuleName);
                             }
                         }
 
@@ -398,6 +404,10 @@ atom returns [StringTemplate code=null]
                             code = templates.getInstanceOf("tokenRef");
                             code.setAttribute("token",
                                              new Integer(grammar.getTokenType(s.getText())));
+                            code.setAttribute("elementIndex", ((TokenWithIndex)#s.getToken()).getIndex());
+	                        generator.generateLocalFOLLOW(#s,
+	                            String.valueOf(grammar.getTokenType(#s.getText())),
+	                            currentRuleName);
                         }
                         }
 

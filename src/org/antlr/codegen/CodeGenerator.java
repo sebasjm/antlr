@@ -383,40 +383,38 @@ public class CodeGenerator {
 	 *  Like Grosch I implemented local FOLLOW sets that are combined at run-time
 	 *  upon error to avoid parsing overhead.
 	 */
-	public void generateLocalFOLLOW(GrammarAST ruleRefNode,
-									String referencedRulename,
+	public void generateLocalFOLLOW(GrammarAST referencedElementNode,
+									String referencedElementName,
 									String enclosingRuleName)
 	{
-		NFAState followingNFAState = ruleRefNode.followingNFAState;
-		int i = ((TokenWithIndex)ruleRefNode.getToken()).getIndex();
-		System.out.print("compute FOLLOW of "+referencedRulename+"#"+i+" in "+
+		NFAState followingNFAState = referencedElementNode.followingNFAState;
+		int i = ((TokenWithIndex)referencedElementNode.getToken()).getIndex();
+		System.out.print("compute FOLLOW "+referencedElementNode.toString()+
+						 " for "+referencedElementName+"#"+i+" in "+
 						 enclosingRuleName);
 		LookaheadSet follow = grammar.LOOK(followingNFAState);
 		System.out.println(" "+follow);
 
-		// TODO: not sending in EOF for FOLLOW sets! (might not need;
-		// consume until will know to stop at EOF)
 		long[] words = null;
 		if ( follow.tokenTypeSet==null ) {
 			words = new long[1];
 		}
 		else {
 			BitSet bits = BitSet.of(follow.tokenTypeSet);
-			//bits.remove(Label.EOF);
 			words = bits.toPackedArray();
 		}
 		recognizerST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
-								  referencedRulename,
+								  referencedElementName,
 								  enclosingRuleName,
 								  words,
 								  new Integer(i));
 		outputFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
-								  referencedRulename,
+								  referencedElementName,
 								  enclosingRuleName,
 								  words,
 								  new Integer(i));
 		headerFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
-								  referencedRulename,
+								  referencedElementName,
 								  enclosingRuleName,
 								  words,
 								  new Integer(i));
@@ -679,8 +677,9 @@ public class CodeGenerator {
 	 *  name: either the label like INT or the literal like "begin".
 	 */
 	protected void genTokenTypeNames(StringTemplate code) {
-		for (int t=1; t<=grammar.getMaxTokenType(); t++) {
+		for (int t=Label.MIN_TOKEN_TYPE; t<=grammar.getMaxTokenType(); t++) {
 			String tokenName = grammar.getTokenName(t);
+			System.out.println("type "+t+"="+tokenName);
 			if ( tokenName.charAt(0)=='\"' ) {
 				tokenName = Utils.replace(tokenName,"\"", "\\\"");
 			}

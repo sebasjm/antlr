@@ -351,6 +351,7 @@ atom returns [StateCluster g=null]
         else {
             int tokenType = grammar.getTokenType(t.getText());
             g = factory.build_Atom(tokenType);
+            t.followingNFAState = g.right;
         }
         }
 
@@ -362,6 +363,7 @@ atom returns [StateCluster g=null]
     	else {
             int tokenType = grammar.getTokenType(c.getText());
             g = factory.build_Atom(tokenType);
+            c.followingNFAState = g.right;
     	}
     	}
 
@@ -373,6 +375,7 @@ atom returns [StateCluster g=null]
      	else {
              int tokenType = grammar.getTokenType(s.getText());
              g = factory.build_Atom(tokenType);
+             s.followingNFAState = g.right;
      	}
      	}
 
