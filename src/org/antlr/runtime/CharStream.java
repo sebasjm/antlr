@@ -64,5 +64,10 @@ public interface CharStream {
 
 	public String substring(int start, int stop);
 
+	/** Only makes sense for streams that buffer everything up probably, but
+	 *  might be useful to display the entire stream or for testing lexing.
+	 */
+	public int size();
+
     public void rewind(int marker);
 }

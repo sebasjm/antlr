@@ -76,7 +76,14 @@ public class FASerializer {
         stateNumberTranslator = new HashMap();
         walkFANormalizingStateNumbers(s);
         List lines = new ArrayList();
-        walkSerializingFA(lines, s);
+        if ( s.getNumberOfTransitions()>0 ) {
+			walkSerializingFA(lines, s);
+		}
+		else {
+			// special case: s0 is an accept
+			String s0 = getStateString(0, s);
+			lines.add(s0+"\n");
+		}
         StringBuffer buf = new StringBuffer(0);
         // sort lines to normalize; makes states come out ordered
         // and then ordered by edge labels then by target state number :)
@@ -114,7 +121,7 @@ public class FASerializer {
         }
     }
 
-    protected void walkSerializingFA(/*StringBuffer buf*/List lines, State s) {
+    protected void walkSerializingFA(List lines, State s) {
         if ( markedStates.contains(s) ) {
             return; // already visited this node
         }

@@ -111,6 +111,12 @@ public class DFA {
      *
      *  Otherwise, greedy loop version would consume until EOF.
      *
+	 *  Loops will always just do the right thing I believe.  The DFA
+	 *  conversion will continue until it finds either a unique char sequence
+	 *  that predicts exiting the loop or it will hit EOT, which acts like
+	 *  a unique char.  The greedy=false just lets the DFA be smaller as it
+	 *  can stop when it finds a DFA state with an EOT transition.
+	 *
      *  This is a cached value of what's in the options table.
      */
     protected boolean greedy = true;
@@ -158,12 +164,12 @@ public class DFA {
      *  number, indicating which alt is predicted.
      *
      *  If this DFA is derived from an loop back NFA state, then the first
-     *  alt is actually the exit branch of the loop.  Rather than make this
-     *  alternative one, let's make this alt n+1 where n is the number of
-     *  alts in this block.  Unless, that is, the DFA is greedy.  Then, we
-     *  want exit alt to be 1 so that any nondeterminisms resolve in favor
-     *  of the exit branch.  Cool!  Simple.  Actually, looking back on this
-     *  I'm going to handle nongreedy in findNewDFAStatesAndAddDFATransitions
+     *  transition is actually the exit branch of the loop.  Rather than make
+     *  this alternative one, let's make this alt n+1 where n is the number of
+     *  alts in this block.  This is nice to keep the alts of the block 1..n;
+	 *  helps with error messages.
+	 *
+	 *  I handle nongreedy in findNewDFAStatesAndAddDFATransitions
      *  when nongreedy and EOT transition.  Make state with EOT emanating
      *  from it the accept state.
      */
@@ -190,7 +196,7 @@ public class DFA {
                         SemanticContext.EMPTY_SEMANTIC_CONTEXT,
                         startState,
                         true);
-                altNum = 1;
+                altNum = 1; // make next alt the first
             }
             else {
                 closure((NFAState)alt.transition(0).getTarget(),
@@ -230,7 +236,31 @@ public class DFA {
                 labels.size()/(float)d.getNFAConfigurations().size());
         */
 
-        if ( !isGreedy() && labels.containsKey(new Label(Label.EOT)) ) {
+        // normally EOT is the "default" clause and decisions just
+		// choose that last clause when nothing else matches.  DFA conversion
+		// continues searching for a unique sequence that predicts the
+		// various alts or until it finds EOT.  So this rule
+		//
+		// DUH : ('x'|'y')* "xy!";
+        //
+		// does not need a greedy indicator.  The following rule works fine too
+		//
+		// A : ('x')+ ;
+		//
+		// When the follow branch could match what is in the loop, by default,
+		// the nondeterminism is resolved in favor of the loop.  You don't
+		// get a warning because the only way to get this condition is if
+		// the DFA conversion hits the end of the token.  In that case,
+		// we're not *sure* what will happen next, but it could be anything.
+		// Anyway, EOT is the default case which means it will never be matched
+		// as resolution goes to the lowest alt number.  Exit branches are
+		// always alt n+1 for n alts in a block.
+		//
+		// When a loop is nongreedy and we find an EOT transition, the DFA
+		// state should become an accept state, predicting exit of loop.  It's
+		// just reversing the resolution of ambiguity.
+		// TODO: should this be done in the resolveAmbig method?
+		if ( !isGreedy() && labels.containsKey(new Label(Label.EOT)) ) {
             convertToEOTAcceptState(d);
             return; // no more work to do on this accept state
         }
@@ -239,11 +269,6 @@ public class DFA {
         int numberOfEdgesEmanating = 0;
         for (int i=0; i<labels.size(); i++) {
             Label label = (Label)labels.get(i);
-            /*
-            if ( ignoreNonEOT && !label.equals(eot) ) {
-                continue;
-            }
-            */
             DFAState t = reach(d, label);
             /*
             System.out.println("DFA state after reach "+d+"-" +
@@ -284,7 +309,7 @@ public class DFA {
      *  TODO: can there be more than one config with EOT transition?
      *  That would mean that two NFA configurations could reach the
      *  end of the token with possibly different predicted alts.
-     *  Seems like that would rare or impossible.  Perhaps convert
+     *  Seems like that would be rare or impossible.  Perhaps convert
      *  this routine to find all such configs and give error if >1.
      */
     protected void convertToEOTAcceptState(DFAState d) {
@@ -800,13 +825,15 @@ public class DFA {
     public int predict(CharStream input) {
         DFAState s = getStartState();
         int c = input.LA(1);
+		Transition eotTransition = null;
     dfaLoop:
         while ( !s.isAcceptState() ) {
-            System.out.println("DFA.matches("+s.getStateNumber()+", "+
+            System.out.println("DFA.predict("+s.getStateNumber()+", "+
                     nfa.getGrammar().getTokenName(c)+")");
             // for each edge of s, look for intersection with current char
             for (int i=0; i<s.getNumberOfTransitions(); i++) {
                 Transition t = s.transition(i);
+				// special case: EOT matches any char
                 if ( t.getLabel().matches(c) ) {
                     // take transition i
                     s = (DFAState)t.getTarget();
@@ -814,7 +841,14 @@ public class DFA {
                     c = input.LA(1);
                     continue dfaLoop;
                 }
+				if ( t.getLabel().getAtom()==Label.EOT ) {
+					eotTransition = t;
+				}
             }
+			if ( eotTransition!=null ) {
+				s = (DFAState)eotTransition.getTarget();
+				continue dfaLoop;
+			}
             System.err.println("unexpected label '"+
                     nfa.getGrammar().getTokenName(c)+"' in dfa state "+s);
             return NFA.INVALID_ALT_NUMBER;

@@ -56,7 +56,7 @@ s<stateNumber>e<edgeNumber>_go:
 s<stateNumber>e<edgeNumber>_skip:
 >>
 
-eotDFAEdge(targetStateNumber) ::= <<
+eotDFAEdge(targetStateNumber,edgeNumber) ::= <<
     goto s<targetStateNumber>
 >>
 

@@ -209,6 +209,17 @@ public class TestDFAConversion extends TestSuite {
         checkDecision(g, 1, expecting, null); // loopback decision
     }
 
+	public void testAPlusNonGreedyWhenDeterministic() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : (greedy=false:A)+ ;\n");
+		// should look the same as A+ since no ambiguity
+		String expecting =
+			".s0-<EOF>->:s1=>2\n" +
+			".s0-A->:s2=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
     public void testAorBorCPlus() throws Exception {
         Grammar g = new Grammar(
                 "grammar t;\n"+
@@ -431,12 +442,12 @@ public class TestDFAConversion extends TestSuite {
         Grammar g = new Grammar(
             "grammar P;\n"+
             "a : ( {p1}? A | {p2}? A )+;");
-        String expecting =                   // loop back
-                ".s0-<EOF>->:s1=>3\n" +
-                ".s0-A->.s2\n" +
-                ".s2-{p1}?->:s3=>1\n" +
-                ".s2-{p2}?->:s4=>2\n";
-        checkDecision(g, 1, expecting, null);
+		String expecting =                   // loop back
+			".s0-<EOF>->:s1=>3\n" +
+			".s0-A->.s2\n" +
+			".s2-{p1}?->:s3=>1\n" +
+			".s2-{p2}?->:s4=>2\n";
+		checkDecision(g, 1, expecting, null);
     }
 
     public void testPredicatedToStayInLoop() throws Exception {
@@ -668,17 +679,26 @@ public class TestDFAConversion extends TestSuite {
         checkDecision(g, 1, expecting, null);
     }
 
-    public void testNonWildcardNonGreedy() throws Exception {
-        Grammar g = new Grammar(
-                "lexer grammar t;\n"+
-                "DUH : (greedy=false:'x'|'y')* \"xy\" ;");
-        String expecting =
-                ".s0-'x'->.s1\n" +
-                ".s0-'y'->:s4=>2\n" +
-                ".s1-'x'->:s3=>1\n" +
-                ".s1-'y'->:s2=>3\n";
-        checkDecision(g, 1, expecting, null);
-    }
+	public void testNonWildcardNonGreedy() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"DUH : (greedy=false:'x'|'y')* \"xy\" ;");
+		String expecting =
+				".s0-'x'->.s1\n" +
+				".s0-'y'->:s4=>2\n" +
+				".s1-'x'->:s3=>1\n" +
+				".s1-'y'->:s2=>3\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testNonGreedyLoopThatNeverLoops() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"DUH : (greedy=false:'x')+ ;");
+		String expecting =
+				":s0=>2\n";
+		checkDecision(g, 1, expecting, new int[] {1});
+	}
 
     public void testKeywordVersusID() throws Exception {
         Grammar g = new Grammar(
@@ -689,14 +709,14 @@ public class TestDFAConversion extends TestSuite {
                 ".s0-'a'..'z'->:s2=>1\n" +
                 ".s0-<EOT>->:s1=>2\n";
         checkDecision(g, 1, expecting, null);
-        expecting =
-                ".s0-'i'->.s1\n" +
-                ".s0-{'a'..'h', 'j'..'z'}->:s4=>2\n" +
-                ".s1-'f'->.s2\n" +
-                ".s1-<EOT>->:s5=>2\n" +
-                ".s1-{'a'..'e', 'g'..'z'}->:s4=>2\n" +
-                ".s2-'a'..'z'->:s4=>2\n" +
-                ".s2-<EOT>->:s3=>1\n";
+		expecting =
+			".s0-'i'->.s1\n" +
+			".s0-{'a'..'h', 'j'..'z'}->:s4=>2\n" +
+			".s1-'f'->.s2\n" +
+			".s1-<EOT>->:s5=>2\n" +
+			".s1-{'a'..'e', 'g'..'z'}->:s4=>2\n" +
+			".s2-'a'..'z'->:s4=>2\n" +
+			".s2-<EOT>->:s3=>1\n";
         checkDecision(g, 2, expecting, null);
     }
 
@@ -718,9 +738,7 @@ public class TestDFAConversion extends TestSuite {
             throws FailedAssertionException
     {
         // mimic actions of org.antlr.Tool first time for grammar g
-        if ( g.getCodeGenerator()==null ) {
-            CodeGenerator generator = new CodeGenerator(null, g, "Java");
-            g.setCodeGenerator(generator);
+        if ( g.getNumberOfDecisions()==0 ) {
             if ( g.getType()==Grammar.LEXER ) {
                 g.addArtificialMatchTokensRule();
             }
@@ -737,7 +755,7 @@ public class TestDFAConversion extends TestSuite {
         DFA dfa = g.getLookaheadDFA(decision);
         FASerializer serializer = new FASerializer(g);
         String result = serializer.serialize(dfa.getStartState());
-        System.out.print(result);
+        //System.out.print(result);
         List nonDetAlts = dfa.getUnreachableAlts();
 
         // first make sure nondeterministic alts are as expected

@@ -248,7 +248,7 @@ ebnf returns [StateCluster g=null]
         {
         g = factory.build_Aoptional(b);
     	g.left().setDescription(grammar.grammarTreeToString(#ebnf));
-        // there is always at least one alt now even if block has just 1 alt
+        // there is always at least one alt even if block has just 1 alt
         int d = grammar.assignDecisionNumber( g.left() );
 		grammar.setDecisionNFA(d, g.left());
         grammar.setDecisionOptions(d, #BLOCK.getOptions());
@@ -256,11 +256,10 @@ ebnf returns [StateCluster g=null]
     	}
     |   #( CLOSURE #( BLOCK b=block eob:EOB ) )
         {
-        int d = 0;
         g = factory.build_Astar(b);
 		// track the loop back / exit decision point
     	b.right().setDescription("()* loopback of "+grammar.grammarTreeToString(#ebnf));
-        d = grammar.assignDecisionNumber( b.right() );
+        int d = grammar.assignDecisionNumber( b.right() );
 		grammar.setDecisionNFA(d, b.right());
         grammar.setDecisionOptions(d, #BLOCK.getOptions());
         b.right().setDecisionASTNode(#eob);
@@ -268,10 +267,10 @@ ebnf returns [StateCluster g=null]
     |   #( POSITIVE_CLOSURE #( BLOCK b=block eob3:EOB ) )
         {
         g = factory.build_Aplus(b);
-        int d = 0;
+        // don't make a decision on left edge, can reuse loop end decision
 		// track the loop back / exit decision point
     	b.right().setDescription("()+ loopback of "+grammar.grammarTreeToString(#ebnf));
-        d = grammar.assignDecisionNumber( b.right() );
+        int d = grammar.assignDecisionNumber( b.right() );
 		grammar.setDecisionNFA(d, b.right());
         grammar.setDecisionOptions(d, #BLOCK.getOptions());
         b.right().setDecisionASTNode(#eob3);
@@ -304,6 +303,7 @@ atom returns [StateCluster g=null]
                 g = factory.build_RuleRef(ruleIndex, start);
                 //addFollowTransition(t.getText(), g.right());
                 // don't hook up follow links back into Tokens rule
+                // we need to see EOT on ends of token rules
                 if ( !currentRuleName.equals(Grammar.TOKEN_RULENAME) ) {
                     addFollowTransition(t.getText(), g.right());
                 }

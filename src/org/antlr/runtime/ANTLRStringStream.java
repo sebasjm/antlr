@@ -65,6 +65,10 @@ public class ANTLRStringStream implements CharStream {
         return p;
     }
 
+	public int size() {
+		return input.length();
+	}
+
     public void rewind(int marker) {
         p = marker;
     }

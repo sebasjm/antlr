@@ -209,8 +209,10 @@ public class Grammar {
                     AngleBracketTemplateLexer.class);
 
         // Add literals first as they are a special case of anything afterwards
-        Set charLiterals = charLiteralToTypeMap.keySet();
-        Iterator iter = charLiterals.iterator();
+		/*
+		// TODO: no more literals, right?  Just dump rules in order
+		Set charLiterals = charLiteralToTypeMap.keySet();
+		Iterator iter = charLiterals.iterator();
         while (iter.hasNext()) {
             String literal = (String) iter.next();
             StringTemplate emitST = generator.getTemplates().getInstanceOf("emit");
@@ -218,10 +220,11 @@ public class Grammar {
             String charRef = literal+" {"+emitST.toString()+"}";
             matchTokenRuleST.setAttribute("rules", charRef);
         }
+        */
 
         // Now add token rule references
         Set ruleNames = getRules();
-        iter = ruleNames.iterator();
+        Iterator iter = ruleNames.iterator();
         while (iter.hasNext()) {
             String name = (String) iter.next();
             matchTokenRuleST.setAttribute("rules", name);
@@ -232,6 +235,7 @@ public class Grammar {
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
         try {
             parser.rule();
+			System.out.println("Tokens rule: "+parser.getAST().toStringList());
             grammarTree.addChild(parser.getAST());
         }
         catch (Exception e) {
@@ -368,12 +372,11 @@ public class Grammar {
     public void createNFAs()
         throws antlr.RecognitionException
     {
-        System.out.println("building NFAs");
         nfa = new NFA(this); // create NFA that TreeToNFAConverter'll fill in
         NFAFactory factory = new NFAFactory(nfa);
         TreeToNFAConverter nfaBuilder = new TreeToNFAConverter(this, nfa, factory);
         nfaBuilder.grammar(grammarTree);
-        System.out.println("NFA has "+factory.getNumberOfStates()+" states");
+        //System.out.println("NFA has "+factory.getNumberOfStates()+" states");
     }
 
     /** For each decision in this grammar, compute a single DFA using the
@@ -448,10 +451,40 @@ public class Grammar {
         return (DFA)decisionLookaheadDFAList.get(decision-1);
     }
 
-    public void parse(String startRule, CharStream input)
+    /** For a given input char stream, try to match against the NFA
+	 *  starting at startRule.  This is a deterministic parse even though
+	 *  it is using an NFA because it uses DFAs at each decision point to
+	 *  predict which alternative will succeed.  This is exactly what the
+	 *  generated parser will do.
+	 *
+	 *  This only does lexer grammars for now.  Will probably have to
+	 *  change the name or something later when I can do parsing/lexing
+	 *  via this interpreter.
+	 */
+	public void parse(String startRule, CharStream input)
             throws Exception
     {
-        Stack ruleInvocationStack = new Stack();
+		System.out.println("parse("+startRule+",'"+input.substring(0,input.size()-1)+"')");
+		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
+		if ( ruleToStartStateMap.size()==0 ) {
+			if ( getType()==Grammar.LEXER ) {
+				addArtificialMatchTokensRule();
+			}
+			try {
+				createNFAs();
+			}
+			catch (RecognitionException re) {
+				System.err.println("problems creating NFAs from grammar AST for "+
+								   getName());
+				return;
+			}
+			new DOTGenerator(this).writeDOTFilesForAllRuleNFAs();
+			// Create the DFA predictors for each decision
+			createLookaheadDFAs();
+		}
+
+		// do the parse
+		Stack ruleInvocationStack = new Stack();
         NFAState start = getRuleStartState(startRule);
         parseEngine(start, input, ruleInvocationStack);
     }
@@ -478,7 +511,18 @@ public class Grammar {
                         " input symbol: "+getTokenName(t));
                 }
                 input.rewind(m);
-                NFAState alt = getNFAStateForAltOfDecision(s, predictedAlt);
+				if ( s.getDecisionASTNode().getType()==ANTLRParser.EOB &&
+					 predictedAlt==getNumberOfAltsForDecisionNFA(s) )
+				{
+					// special case; loop end decisions have exit as
+					// # block alts + 1; getNumberOfAltsForDecisionNFA() has
+					// both block alts and exit branch.  So, any predicted alt
+					// equal to number of alts is the exit alt.  The NFA
+					// sees that as alt 1
+					// TODO: HIDEOUS
+					predictedAlt = 1;
+				}
+				NFAState alt = getNFAStateForAltOfDecision(s, predictedAlt);
                 s = (NFAState)alt.transition(0).getTarget();
                 continue;
             }
@@ -530,7 +574,7 @@ public class Grammar {
      *  operation to set up tokens with specific values.
      */
     public void defineToken(String text, int tokenType) {
-        System.out.println("defining token "+text+" at type="+tokenType);
+        //System.out.println("defining token "+text+" at type="+tokenType);
         // There is a hole between the faux labels (negative numbers)
         // and the first token type.  We skip over the valid 16-bit char values.
         int index = Label.NUM_FAUX_LABELS+(tokenType)-Label.MIN_TOKEN_TYPE;
@@ -645,18 +689,13 @@ public class Grammar {
     }
 
     public String getTokenName(int ttype) {
-        // inside char range and lexer grammar?
-        if ( this.type==LEXER ) {
-			if ( ttype >= Label.MIN_LABEL_VALUE && ttype <= '\uFFFF' ) {
-            	return getUnicodeEscapeString(ttype);
-			}
-			else {
-				return "<invalid char "+ttype+">";
-			}
-        }
-        // faux label?
-        if ( ttype<Label.MIN_LABEL_VALUE ) {
-            return (String)typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
+		// inside char range and lexer grammar?
+		if ( this.type==LEXER && ttype >= Label.MIN_LABEL_VALUE && ttype <= '\uFFFF' ) {
+			return getUnicodeEscapeString(ttype);
+		}
+		// faux label?
+		if ( ttype<Label.MIN_LABEL_VALUE ) {
+			return (String)typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
         }
         int index = ttype-Label.MIN_TOKEN_TYPE; // normalize index to 0..n
         index += Label.NUM_FAUX_LABELS;         // jump over faux tokens
@@ -733,10 +772,6 @@ public class Grammar {
 
     public Collection getRuleStopStates() {
         return ruleToStopStateMap.values();
-    }
-
-    public Collection getRuleStartStates() {
-        return ruleToStartStateMap.values();
     }
 
     public int assignDecisionNumber(NFAState state) {

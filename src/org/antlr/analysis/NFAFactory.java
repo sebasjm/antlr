@@ -394,19 +394,15 @@ public class NFAFactory {
      *
      *  Meaning that the last NFAState in A points back to A's left Transition NFAState
      *  and we add a new begin/end NFAState.  A can be single alternative or
-     *  multiple.  We create 2 new NFAStates here.
+     *  multiple.
 	 *
-	 *  If you look at the end NFAState (of A not of this optional block) as
-	 *  the first alt of a decision block then
-	 *  the follow looks like the first alt and the first real alt looks like
-	 *  the second.  Aids in analysis to compare follow with all alts rather than
-	 *  lumping them together--you can say "exit branch conflicts with alt i" rather
-	 *  than "exit branch conflicts with 1 or more alts".
+	 *  During analysis we'll call the follow link (transition 1) alt n+1 for
+	 *  an n-alt A block.
      */
     public StateCluster build_Aplus(StateCluster A) {
         NFAState left = newState();
         NFAState blockEndNFAState = newState();
-		// turn A's block end into a loopback (acts like alt 1)
+		// turn A's block end into a loopback (acts like alt 2)
 		A.right().setDescription("()+ loopback");
         transitionBetweenStates(A.right(), blockEndNFAState, Label.EPSILON); // follow is Transition 1
 		transitionBetweenStates(A.right(), A.left(), Label.EPSILON); // loop back Transition 2

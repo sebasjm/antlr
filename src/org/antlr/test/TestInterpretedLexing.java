@@ -31,17 +31,16 @@ import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 import org.antlr.runtime.ANTLRStringStream;
 
-public class TestGrammarParsing extends TestSuite {
+public class TestInterpretedLexing extends TestSuite {
 
     /** Public default constructor used by TestRig */
-    public TestGrammarParsing() {
+    public TestInterpretedLexing() {
     }
 
     public void testSimpleAltCharTest() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : 'a' | 'b' | 'c';");
-        g.createLookaheadDFAs();
         g.parse("A", new ANTLRStringStream("a"));
         g.parse("A", new ANTLRStringStream("b"));
         g.parse("A", new ANTLRStringStream("c"));
@@ -52,7 +51,6 @@ public class TestGrammarParsing extends TestSuite {
                 "lexer grammar t;\n"+
                 "A : 'a' B 'c' ;\n" +
                 "B : 'b' ;\n");
-        g.createLookaheadDFAs();
         g.parse("A", new ANTLRStringStream("abc"));
     }
 
@@ -60,17 +58,16 @@ public class TestGrammarParsing extends TestSuite {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : ('0'..'9')+ ;\n");
-        g.createLookaheadDFAs();
-        g.parse("A", new ANTLRStringStream("1234"));
+		g.parse("A", new ANTLRStringStream("12x")); // should ignore the x
+		g.parse("A", new ANTLRStringStream("1234"));
     }
 
     public void testMultAltLoop() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : ('0'..'9'|'a'|'b')+ ;\n");
-        g.createLookaheadDFAs();
-        g.parse("A", new ANTLRStringStream("1234"));
         g.parse("A", new ANTLRStringStream("a"));
+		g.parse("A", new ANTLRStringStream("1234"));
         g.parse("A", new ANTLRStringStream("aaa"));
         g.parse("A", new ANTLRStringStream("aaaa9"));
         g.parse("A", new ANTLRStringStream("b"));
@@ -80,9 +77,7 @@ public class TestGrammarParsing extends TestSuite {
     public void testSimpleLoops() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "A : (DIGIT)+ '.' DIGIT | (DIGIT)+ ;\n" +
-                "DIGIT : '0'..'9' ;\n");
-        g.createLookaheadDFAs();
+                "A : ('0'..'9')+ '.' ('0'..'9')* | ('0'..'9')+ ;\n");
         g.parse("A", new ANTLRStringStream("1234.5"));
     }
 

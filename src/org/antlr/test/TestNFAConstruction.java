@@ -80,22 +80,22 @@ public class TestNFAConstruction extends TestSuite {
          */
         String expecting =
                 ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2-A->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4->:s5\n" +
-                ":s5-<EOF>->.s6\n" +
-                ".s1->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8-B->.s9\n" +
-                ".s9->.s4\n";
+			".s1->.s2\n" +
+			".s1->.s7\n" +
+			".s2-A->.s3\n" +
+			".s3->.s4\n" +
+			".s4->:s5\n" +
+			".s7->.s8\n" +
+			".s8-B->.s9\n" +
+			".s9->.s4\n" +
+			":s5-<EOF>->.s6\n";
         checkRule(g, "a", expecting);
     }
 
-	public void testrangeOrRange() throws Exception {
+	public void testRangeOrRange() throws Exception {
 		Grammar g = new Grammar(
-				"grammar P;\n"+
-				"a : ('a'..'c' 'h' | 'q' 'j'..'l') ;"
+				"lexer grammar P;\n"+
+				"A : ('a'..'c' 'h' | 'q' 'j'..'l') ;"
 		);
 		/* expecting
 		(0)--Ep-->(1)-->(2)-->(3)--'a'..'c'-->(4)-->(5)--'h'-->(6)-->(7)-->(8)-->(9,end)
@@ -105,28 +105,28 @@ public class TestNFAConstruction extends TestSuite {
 		 */
         String expecting =
                 ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3-'a'..'c'->.s4\n" +
-                ".s4->.s5\n" +
-                ".s5-'h'->.s6\n" +
-                ".s6->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8->:s9\n" +
-                ":s9-<EOF>->.s10\n" +
-                ".s2->.s11\n" +
-                ".s11->.s12\n" +
-                ".s12-'q'->.s13\n" +
-                ".s13->.s14\n" +
-                ".s14-'j'..'l'->.s15\n" +
-                ".s15->.s7\n";
-        checkRule(g, "a", expecting);
+			".s1->.s2\n" +
+			".s11->.s12\n" +
+			".s12-'q'->.s13\n" +
+			".s13->.s14\n" +
+			".s14-'j'..'l'->.s15\n" +
+			".s15->.s7\n" +
+			".s2->.s11\n" +
+			".s2->.s3\n" +
+			".s3-'a'..'c'->.s4\n" +
+			".s4->.s5\n" +
+			".s5-'h'->.s6\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOT>->.s10\n";
+        checkRule(g, "A", expecting);
 	}
 
-	public void testrange() throws Exception {
+	public void testRange() throws Exception {
 		Grammar g = new Grammar(
-				"grammar P;\n"+
-				"a : 'a'..'c' ;"
+				"lexer grammar P;\n"+
+				"A : 'a'..'c' ;"
 		);
 		/* expecting
 		          (0)--Ep-->(1)--Ep-->(2)--'a'..'c'-->(3)--Ep--->(5,end)
@@ -137,8 +137,8 @@ public class TestNFAConstruction extends TestSuite {
                 ".s2-'a'..'c'->.s3\n" +
                 ".s3->.s4\n" +
                 ".s4->:s5\n" +
-                ":s5-<EOF>->.s6\n";
-        checkRule(g, "a", expecting);
+                ":s5-<EOT>->.s6\n";
+        checkRule(g, "A", expecting);
 	}
 
 	public void testABorCD() throws Exception {
@@ -152,19 +152,19 @@ public class TestNFAConstruction extends TestSuite {
 			 */
         String expecting =
                 ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2-A->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4-B->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6->:s7\n" +
-                ":s7-<EOF>->.s8\n" +
-                ".s1->.s9\n" +
-                ".s9->.s10\n" +
-                ".s10-C->.s11\n" +
-                ".s11->.s12\n" +
-                ".s12-D->.s13\n" +
-                ".s13->.s6\n";
+			".s1->.s2\n" +
+			".s1->.s9\n" +
+			".s10-C->.s11\n" +
+			".s11->.s12\n" +
+			".s12-D->.s13\n" +
+			".s13->.s6\n" +
+			".s2-A->.s3\n" +
+			".s3->.s4\n" +
+			".s4-B->.s5\n" +
+			".s5->.s6\n" +
+			".s6->:s7\n" +
+			".s9->.s10\n" +
+			":s7-<EOF>->.s8\n";
         checkRule(g, "a", expecting);
     }
 
@@ -179,21 +179,21 @@ public class TestNFAConstruction extends TestSuite {
               /                   |-------------------
         b: (6)--Ep-->(7)--B-->(8)--Ep-->(9,end)--Ep--|
         */
-        String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4->.s5\n" +
-                ".s5-B->.s6\n" +
-                ".s6->.s7\n" +
-                ".s7->:s8\n" +
-                ":s8->.s9\n" +
-                ".s9->.s10\n" +
-                ".s10-A->.s11\n" +
-                ".s11->.s12\n" +
-                ".s12->:s13\n" +
-                ":s13-<EOF>->.s14\n";
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s10-A->.s11\n" +
+			".s11->.s12\n" +
+			".s12->:s13\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4->.s5\n" +
+			".s5-B->.s6\n" +
+			".s6->.s7\n" +
+			".s7->:s8\n" +
+			".s9->.s10\n" +
+			":s13-<EOF>->.s14\n" +
+			":s8->.s9\n";
         checkRule(g, "a", expecting);
     }
 
@@ -218,26 +218,26 @@ public class TestNFAConstruction extends TestSuite {
         */
         String expecting =
                 ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4->.s5\n" +
-                ".s5-B->.s6\n" +
-                ".s6->.s7\n" +
-                ".s7->:s8\n" +
-                ":s8->.s9\n" +
-                ".s9->.s10\n" +
-                ".s10-A->.s11\n" +
-                ".s11->.s12\n" +
-                ".s12->:s13\n" +
-                ":s13-<EOF>->.s14\n" +
-                ":s8->.s15\n" +
-                ".s15->.s16\n" +
-                ".s16->.s17\n" +
-                ".s17-C->.s18\n" +
-                ".s18->.s19\n" +
-                ".s19->:s20\n" +
-                ":s20-<EOF>->.s21\n";
+			".s1->.s2\n" +
+			".s10-A->.s11\n" +
+			".s11->.s12\n" +
+			".s12->:s13\n" +
+			".s15->.s16\n" +
+			".s16->.s17\n" +
+			".s17-C->.s18\n" +
+			".s18->.s19\n" +
+			".s19->:s20\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4->.s5\n" +
+			".s5-B->.s6\n" +
+			".s6->.s7\n" +
+			".s7->:s8\n" +
+			".s9->.s10\n" +
+			":s13-<EOF>->.s14\n" +
+			":s20-<EOF>->.s21\n" +
+			":s8->.s15\n" +
+			":s8->.s9\n";
         checkRule(g, "a", expecting);
     }
 
@@ -249,17 +249,17 @@ public class TestNFAConstruction extends TestSuite {
                                 |                            ^
                                (6)--Ep-->(7)--Ep-->(8)-------|
          */
-        String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2-A->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4->:s5\n" +
-                ":s5-<EOF>->.s6\n" +
-                ".s1->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8->.s9\n" +
-                ".s9->.s4\n";
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s1->.s7\n" +
+			".s2-A->.s3\n" +
+			".s3->.s4\n" +
+			".s4->:s5\n" +
+			".s7->.s8\n" +
+			".s8->.s9\n" +
+			".s9->.s4\n" +
+			":s5-<EOF>->.s6\n";
         checkRule(g, "a", expecting);
     }
 
@@ -268,18 +268,18 @@ public class TestNFAConstruction extends TestSuite {
                 "grammar P;\n"+
                 "a : (A)?;");
         String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4-A->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8->:s9\n" +
-                ":s9-<EOF>->.s10\n" +
-                ".s2->.s11\n" +
-                ".s11->.s7\n";
+            ".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s11->.s7\n" +
+			".s2->.s11\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
         checkRule(g, "a", expecting);
     }
 
@@ -304,25 +304,44 @@ public class TestNFAConstruction extends TestSuite {
 		                     v        |
         (0)--Ep-->(1)--Ep-->(2)--A-->(3)--Ep-->(4)--Ep-->(5,end)
          */
-        String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4-A->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8->:s9\n" +
-                ":s9-<EOF>->.s10\n" +
-                ".s6->.s3\n";
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s3\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
         checkRule(g, "a", expecting);
     }
+
+	public void testAplusNonGreedy() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"A : (greedy=false:'0'..'9')+ ;\n");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4-'0'..'9'->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s3\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOT>->.s10\n";
+		checkRule(g, "A", expecting);
+	}
 
     public void testAorBplus() throws Exception {
         Grammar g = new Grammar(
                 "grammar P;\n"+
-                "a : (A | B)+ ;");
+                "a : (A | B{action})+ ;");
         /* expecting
                              |----------------------------|
                              v                            |
@@ -330,22 +349,22 @@ public class TestNFAConstruction extends TestSuite {
                              |                            ^
                             (8)--Ep-->(9)--B-->(10)-------|
          */
-        String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4-A->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8->:s9\n" +
-                ":s9-<EOF>->.s10\n" +
-                ".s6->.s3\n" +
-                ".s3->.s11\n" +
-                ".s11->.s12\n" +
-                ".s12-B->.s13\n" +
-                ".s13->.s6\n";
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s11->.s12\n" +
+			".s12-B->.s13\n" +
+			".s13->.s6\n" +
+			".s2->.s3\n" +
+			".s3->.s11\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s3\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
         checkRule(g, "a", expecting);
     }
 
@@ -363,25 +382,25 @@ public class TestNFAConstruction extends TestSuite {
                             (11)--Ep->(12)--Ep-->(13)-----|
          */
         String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4-A->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8->:s9\n" +
-                ":s9-<EOF>->.s10\n" +
-                ".s6->.s3\n" +
-                ".s3->.s11\n" +
-                ".s11->.s12\n" +
-                ".s12-B->.s13\n" +
-                ".s13->.s6\n" +
-                ".s11->.s14\n" +
-                ".s14->.s15\n" +
-                ".s15->.s16\n" +
-                ".s16->.s6\n";
+            ".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s11->.s12\n" +
+			".s11->.s14\n" +
+			".s12-B->.s13\n" +
+			".s13->.s6\n" +
+			".s14->.s15\n" +
+			".s15->.s16\n" +
+			".s16->.s6\n" +
+			".s2->.s3\n" +
+			".s3->.s11\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s3\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
         checkRule(g, "a", expecting);
     }
 
@@ -389,45 +408,45 @@ public class TestNFAConstruction extends TestSuite {
         Grammar g = new Grammar(
                 "grammar P;\n"+
                 "a : (A)*;");
-        String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4-A->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8->:s9\n" +
-                ":s9-<EOF>->.s10\n" +
-                ".s6->.s3\n" +
-                ".s2->.s11\n" +
-                ".s11->.s7\n";
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s11->.s7\n" +
+			".s2->.s11\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s3\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
         checkRule(g, "a", expecting);
     }
 
     public void testAorBstar() throws Exception {
         Grammar g = new Grammar(
                 "grammar P;\n"+
-                "a : (A | B)* ;");
-        String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4-A->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8->:s9\n" +
-                ":s9-<EOF>->.s10\n" +
-                ".s6->.s3\n" +
-                ".s3->.s11\n" +
-                ".s11->.s12\n" +
-                ".s12-B->.s13\n" +
-                ".s13->.s6\n" +
-                ".s2->.s14\n" +
-                ".s14->.s7\n";
+                "a : (A | B{action})* ;");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s11->.s12\n" +
+			".s12-B->.s13\n" +
+			".s13->.s6\n" +
+			".s14->.s7\n" +
+			".s2->.s14\n" +
+			".s2->.s3\n" +
+			".s3->.s11\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s3\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
         checkRule(g, "a", expecting);
     }
 
@@ -436,20 +455,18 @@ public class TestNFAConstruction extends TestSuite {
                 "grammar P;\n"+
                 "a : ( A | B )? ;");
         String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2->.s3\n" +
-                ".s3-A->.s4\n" +
-                ".s4->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6->:s7\n" +
-                ":s7-<EOF>->.s8\n" +
-                ".s2->.s9\n" +
-                ".s9->.s10\n" +
-                ".s10-B->.s11\n" +
-                ".s11->.s5\n" +
-                ".s9->.s12\n" +
-                ".s12->.s5\n";
+            ".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s11->.s7\n" +
+			".s2->.s11\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A..B->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
         checkRule(g, "a", expecting);
     }
 
@@ -457,21 +474,21 @@ public class TestNFAConstruction extends TestSuite {
         Grammar g = new Grammar(
                 "grammar P;\n"+
                 "a : {p1}? A | {p2}? B ;");
-        String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2-{p1}?->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4-A->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6->:s7\n" +
-                ":s7-<EOF>->.s8\n" +
-                ".s1->.s9\n" +
-                ".s9->.s10\n" +
-                ".s10-{p2}?->.s11\n" +
-                ".s11->.s12\n" +
-                ".s12-B->.s13\n" +
-                ".s13->.s6\n";
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s1->.s9\n" +
+			".s10-{p2}?->.s11\n" +
+			".s11->.s12\n" +
+			".s12-B->.s13\n" +
+			".s13->.s6\n" +
+			".s2-{p1}?->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s6\n" +
+			".s6->:s7\n" +
+			".s9->.s10\n" +
+			":s7-<EOF>->.s8\n";
         checkRule(g, "a", expecting);
     }
 
@@ -480,35 +497,35 @@ public class TestNFAConstruction extends TestSuite {
                 "grammar P;\n"+
                 "a : {p1}? {p1a}? A | {p2}? B | {p3} b;\n" +
                 "b : {p4}? B ;");
-        String expecting =
-                ".s0->.s1\n" +
-                ".s1->.s2\n" +
-                ".s2-{p1}?->.s3\n" +
-                ".s3->.s4\n" +
-                ".s4-{p1a}?->.s5\n" +
-                ".s5->.s6\n" +
-                ".s6-A->.s7\n" +
-                ".s7->.s8\n" +
-                ".s8->:s9\n" +
-                ":s9-<EOF>->.s10\n" +
-                ".s1->.s11\n" +
-                ".s11->.s12\n" +
-                ".s12-{p2}?->.s13\n" +
-                ".s13->.s14\n" +
-                ".s14-B->.s15\n" +
-                ".s15->.s8\n" +
-                ".s11->.s16\n" +
-                ".s16->.s17\n" +
-                ".s17->.s18\n" +
-                ".s18->.s19\n" +
-                ".s19->.s20\n" +
-                ".s20-{p4}?->.s21\n" +
-                ".s21->.s22\n" +
-                ".s22-B->.s23\n" +
-                ".s23->.s24\n" +
-                ".s24->:s25\n" +
-                ":s25->.s26\n" +
-                ".s26->.s8\n";
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s11\n" +
+			".s1->.s2\n" +
+			".s11->.s12\n" +
+			".s11->.s16\n" +
+			".s12-{p2}?->.s13\n" +
+			".s13->.s14\n" +
+			".s14-B->.s15\n" +
+			".s15->.s8\n" +
+			".s16->.s17\n" +
+			".s17->.s18\n" +
+			".s18->.s19\n" +
+			".s19->.s20\n" +
+			".s2-{p1}?->.s3\n" +
+			".s20-{p4}?->.s21\n" +
+			".s21->.s22\n" +
+			".s22-B->.s23\n" +
+			".s23->.s24\n" +
+			".s24->:s25\n" +
+			".s26->.s8\n" +
+			".s3->.s4\n" +
+			".s4-{p1a}?->.s5\n" +
+			".s5->.s6\n" +
+			".s6-A->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s25->.s26\n" +
+			":s9-<EOF>->.s10\n";
         checkRule(g, "a", expecting);
     }
 
@@ -525,7 +542,7 @@ public class TestNFAConstruction extends TestSuite {
         FASerializer serializer = new FASerializer(g);
         String result = serializer.serialize(startState);
 
-        System.out.print(result);
+        //System.out.print(result);
         assertEqual(result, expecting);
     }
 

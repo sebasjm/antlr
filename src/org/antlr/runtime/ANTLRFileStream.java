@@ -88,6 +88,10 @@ public class ANTLRFileStream implements CharStream {
         return p;
     }
 
+	public int size() {
+		return data.length();
+	}
+
     public void rewind(int marker) {
         p = marker;
     }

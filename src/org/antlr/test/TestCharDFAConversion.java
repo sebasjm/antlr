@@ -183,9 +183,9 @@ public class TestCharDFAConversion extends TestSuite {
         DFA dfa = g.getLookaheadDFA(decision);
         FASerializer serializer = new FASerializer(g);
         String result = serializer.serialize(dfa.getStartState());
-        System.out.print(result);
+        //System.out.print(result);
         List nonDetAlts = dfa.getUnreachableAlts();
-        System.out.println("alts w/o predict state="+nonDetAlts);
+        //System.out.println("alts w/o predict state="+nonDetAlts);
 
         // first make sure nondeterministic alts are as expected
         if ( expectingUnreachableAlts==null ) {
