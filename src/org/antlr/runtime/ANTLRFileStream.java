@@ -43,32 +43,41 @@ public class ANTLRFileStream implements CharStream {
 	/** The index of the character relative to the beginning of the line 0..n-1 */
 	protected int charPositionInLine = 0;
 
-    StringBuffer data = new StringBuffer(1000);
+    char[] data;
 
-    public ANTLRFileStream(String fileName) throws IOException {
-        this.fileName = fileName;
-        System.out.println("opening file "+fileName);
-        FileReader fr = new FileReader(fileName);
-        BufferedReader br = new BufferedReader(fr);
-        try {
-            int c = br.read();
-            // todo: slow reading char by char, but read(char[]) requires
-            // extra move :(
-            while ( c!=-1 ) {
-                data.append((char)c);
-                c = br.read();
-            }
-        }
-        finally {
-            br.close();
-            fr.close();
-        }
+	public ANTLRFileStream() {
+	}
+
+	public ANTLRFileStream(String fileName) throws IOException {
+		load(fileName);
+	}
+
+	public void load(String fileName) throws IOException {
+		//System.out.println("loading "+fileName);
+		this.fileName = fileName;
+		FileReader fr = null;
+		try {
+			File f = new File(fileName);
+			data = new char[(int)f.length()];
+			fr = new FileReader(fileName);
+			fr.read(data);
+		}
+		finally {
+			if ( fr!=null ) {
+				fr.close();
+			}
+		}
     }
 
+	public void reset() {
+		line = 1;
+		charPositionInLine = 0;
+	}
+
     public void consume() {
-        if ( p < data.length() ) {
+        if ( p < data.length ) {
 			charPositionInLine++;
-			if ( data.charAt(p)=='\n' ) {
+			if ( data[p]=='\n' ) {
 				line++;
 				charPositionInLine=0;
 			}
@@ -77,16 +86,16 @@ public class ANTLRFileStream implements CharStream {
     }
 
     public int LA(int i) {
-        if ( (p+i-1) >= data.length() ) {
+        if ( (p+i-1) >= data.length ) {
             //System.out.println("char LA("+i+")=EOF; p="+p);
             return CharStream.EOF;
         }
         //System.out.println("char LA("+i+")="+data.charAt(p+i-1)+"; p="+p);
-        return data.charAt(p+i-1);
+        return data[p+i-1];
     }
 
     public int LA(int marker, int i) {
-        return data.charAt(marker+i-1);
+        return data[marker+i-1];
     }
 
     public int mark() {
@@ -101,7 +110,7 @@ public class ANTLRFileStream implements CharStream {
     }
 
 	public int size() {
-		return data.length();
+		return data.length;
 	}
 
     public void rewind(int marker) {
@@ -109,7 +118,7 @@ public class ANTLRFileStream implements CharStream {
     }
 
 	public String substring(int start, int stop) {
-		return data.substring(start,stop+1);
+		return new String(data,start,stop-start+1);
 	}
 
 	public int getLine() {

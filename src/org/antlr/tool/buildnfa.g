@@ -61,9 +61,10 @@ public TreeToNFAConverter(Grammar g, NFA nfa, NFAFactory factory) {
 
 protected void init() {
     // define all the rule begin/end NFAStates to solve forward reference issues
-    Set ruleSet = grammar.getRules();
-    for (Iterator itr = ruleSet.iterator(); itr.hasNext();) {
-        String ruleName = (String) itr.next();
+    Collection rules = grammar.getRules();
+    for (Iterator itr = rules.iterator(); itr.hasNext();) {
+		Grammar.Rule r = (Grammar.Rule) itr.next();
+        String ruleName = r.name;
         NFAState ruleBeginState = factory.newState();
         ruleBeginState.setDescription("rule "+ruleName+" start");
 		ruleBeginState.setEnclosingRuleName(ruleName);

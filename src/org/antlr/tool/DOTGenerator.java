@@ -206,9 +206,10 @@ public class DOTGenerator {
     }
 
     public void writeDOTFilesForAllRuleNFAs() throws IOException {
-        Set ruleSet = grammar.getRules();
-        for (Iterator itr = ruleSet.iterator(); itr.hasNext();) {
-            String ruleName = (String) itr.next();
+        Collection rules = grammar.getRules();
+        for (Iterator itr = rules.iterator(); itr.hasNext();) {
+			Grammar.Rule r = (Grammar.Rule) itr.next();
+            String ruleName = r.name;
             writeDOTFile(
                     ruleName,
                     getRuleNFADOT(grammar.getRuleStartState(ruleName)));

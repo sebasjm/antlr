@@ -129,8 +129,10 @@ public class Grammar {
     /** Rules are uniquely labeled from 1..n */
     protected int ruleIndex = 1;
 
-	/** Map a rule to it's Rule object */
-	protected Map nameToRuleMap = new HashMap();
+	/** Map a rule to it's Rule object
+	 *  TODO 1.4 depedency.
+	 */
+	protected LinkedHashMap nameToRuleMap = new LinkedHashMap();
 
 	/** Map a rule index to its name; use a Vector on purpose as new
 	 *  collections stuff won't let me setSize and make it grow.  :(
@@ -229,16 +231,15 @@ public class Grammar {
                     AngleBracketTemplateLexer.class);
 
         // Now add token rule references
-        Set ruleNames = getRules();
+        Collection ruleNames = getRules();
         Iterator iter = ruleNames.iterator();
         while (iter.hasNext()) {
-            String name = (String) iter.next();
-			Rule r = getRule(name);
+            Rule r = (Rule) iter.next();
 			// only add real token rules to Tokens rule
 			if ( r.modifier==null ||
 				 !r.modifier.equals(NONTOKEN_LEXER_RULE_MODIFIER) )
 			{
-            	matchTokenRuleST.setAttribute("rules", name);
+            	matchTokenRuleST.setAttribute("rules", r.name);
 			}
         }
 		System.out.println("rule: "+matchTokenRuleST.toString());
@@ -471,16 +472,18 @@ public class Grammar {
                     System.err.println("nonreduced DFA for "+
                             decisionStartState.getDescription());
                 }
-                System.out.println("DFA (d="+lookaheadDFA.getDecisionNumber()+") cost: "+lookaheadDFA.getNumberOfStates()+
-                        " states, "+(int)(stop-start)+" ms; descr="+decisionStartState.getDescription());
-                DOTGenerator dotGenerator = new DOTGenerator(nfa.getGrammar());
-                String dot = dotGenerator.getDOT( lookaheadDFA.getStartState() );
-                try {
-                    dotGenerator.writeDOTFile("/tmp/dec-"+decision, dot);
-                }
-                catch(IOException ioe) {
-                    System.err.println("Cannot gen DOT");
-                }
+				System.out.println("DFA (d="+lookaheadDFA.getDecisionNumber()+") cost: "+lookaheadDFA.getNumberOfStates()+
+								   " states, "+(int)(stop-start)+" ms; descr="+decisionStartState.getDescription());
+				if ( false ) {
+					DOTGenerator dotGenerator = new DOTGenerator(nfa.getGrammar());
+					String dot = dotGenerator.getDOT( lookaheadDFA.getStartState() );
+					try {
+						dotGenerator.writeDOTFile("/tmp/dec-"+decision, dot);
+					}
+					catch(IOException ioe) {
+						System.err.println("Cannot gen DOT");
+					}
+				}
                 setLookaheadDFA(decision, lookaheadDFA);
                 List nonDetAlts = lookaheadDFA.getUnreachableAlts();
                 if ( nonDetAlts.size()>0 ) {
@@ -701,8 +704,8 @@ public class Grammar {
         return defaultOptions.get(key);
     }
 
-    public Set getRules() {
-        return nameToRuleMap.keySet();
+    public Collection getRules() {
+        return nameToRuleMap.values();
     }
 
     public void setRuleAST(String ruleName, GrammarAST t) {
