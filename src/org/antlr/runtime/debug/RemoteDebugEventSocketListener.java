@@ -1,10 +1,8 @@
 package org.antlr.runtime.debug;
 
 import org.antlr.runtime.*;
-import org.antlr.tool.ErrorManager;
 
 import java.io.DataInputStream;
-import java.io.InputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
@@ -95,36 +93,59 @@ public class RemoteDebugEventSocketListener implements Runnable {
 				event = in.readLine();
 			}
 			listener.terminate(); // make sure GUI gets terminate
-			in.close(); in = null;
-			out.close(); out = null;
-			channel.close(); channel=null;
 		}
 		catch (Exception e) {
 			System.err.println(e);
 			e.printStackTrace(System.err);
 		}
 		finally {
-			if ( in!=null ) {
-				try {in.close();} catch (IOException ioe) {
-					System.err.println(ioe);
-				}
-			}
-			if ( out!=null ) {
-				out.close();
-			}
-			if ( channel!=null ) {
-				try {channel.close();} catch (IOException ioe) {
-					System.err.println(ioe);
-				}
-			}
+            closeConnection();
 		}
 	}
 
+    protected boolean openConnection() {
+        boolean success = false;
+        try {
+            channel = new Socket(machine, port);
+            channel.setTcpNoDelay(true);
+            in = new DataInputStream(channel.getInputStream());
+            out = new PrintStream(channel.getOutputStream());
+            success = true;
+        } catch(Exception e) {
+            System.err.println(e);
+        }
+        return success;
+    }
+
+    protected void closeConnection() {
+        try {
+            in.close(); in = null;
+            out.close(); out = null;
+            channel.close(); channel=null;
+        }
+        catch (Exception e) {
+            System.err.println(e);
+            e.printStackTrace(System.err);
+        }
+        finally {
+            if ( in!=null ) {
+                try {in.close();} catch (IOException ioe) {
+                    System.err.println(ioe);
+                }
+            }
+            if ( out!=null ) {
+                out.close();
+            }
+            if ( channel!=null ) {
+                try {channel.close();} catch (IOException ioe) {
+                    System.err.println(ioe);
+                }
+            }
+        }
+
+    }
+
 	protected void handshake() throws IOException {
-		channel = new Socket(machine, port);
-		channel.setTcpNoDelay(true);
-		in = new DataInputStream(channel.getInputStream());
-		out = new PrintStream(channel.getOutputStream());
 		String line = in.readLine();
 		// TODO: check ANTLR and version and grammar file?
 		ack();
@@ -205,9 +226,15 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	}
 
 	/** Create a thread to listen to the remote running recognizer */
-	public void start() {
+	public boolean start() {
+
+        if( !openConnection() )
+            return false;
+
 		Thread t = new Thread(this);
 		t.start();
+
+        return true;
 	}
 
 	public void run() {

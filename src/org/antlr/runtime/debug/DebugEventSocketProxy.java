@@ -121,7 +121,7 @@ public class DebugEventSocketProxy implements DebugEventListener {
 	}
 
 	public void recognitionException(RecognitionException e) {
-		transmit("exception");
+		transmit("exception "+e.getClass().getName());
 	}
 
 	public void recovered() {
