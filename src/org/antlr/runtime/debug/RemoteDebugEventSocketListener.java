@@ -87,6 +87,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 				ack();
 				event = in.readLine();
 			}
+			listener.terminate(); // make sure GUI gets terminate
 			in.close(); in = null;
 			out.close(); out = null;
 			channel.close(); channel=null;
