@@ -150,18 +150,6 @@ public class Grammar {
      *  elements in this list are NFAState objects.
      */
 	protected Vector indexToDecision = new Vector(INITIAL_DECISION_LIST_SIZE);
-	//protected Vector decisionNFAStartStateList = new Vector(INITIAL_DECISION_LIST_SIZE);
-
-    /** Subrules may have options.  These options apply to any and all decisions
-     *  associated with the subrule.
-     */
-    //protected Vector decisionOptionsList = new Vector(INITIAL_DECISION_LIST_SIZE);
-
-    /** Track the DFA for the decision points.
-	 *  Use Vector as List can't increase size
-     *  without add and I need to set/get via an index. :(
-     */
-    //protected Vector decisionLookaheadDFAList;
 
     /** If non-null, this is the code generator we will use to generate
      *  recognizers in the target language.
