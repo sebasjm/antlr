@@ -1,13 +1,9 @@
 package org.antlr.analysis;
 
-import org.antlr.tool.DOTGenerator;
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
-import org.antlr.tool.ANTLRParser;
-import org.antlr.misc.IntSet;
 
 import java.util.*;
-import java.io.IOException;
 
 /** Collection of information about what is wrong with a decision as
  *  discovered while building the DFA predictor.

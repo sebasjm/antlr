@@ -149,6 +149,9 @@ public class CodeGenerator {
      */
     protected Tool tool;
 
+	/** Where all output (nfa,dfa,.java,...) go */
+	protected String outputDirectory = ".";
+
 	protected boolean debug;
 
 	/** I have factored out the generation of acyclic DFAs to separate class */
@@ -873,6 +876,10 @@ public class CodeGenerator {
 		return null;
 	}
 
+	public void setOutputDirectory(String o) {
+		outputDirectory = o;
+	}
+
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 	}
@@ -900,7 +907,8 @@ public class CodeGenerator {
 
 	public void write(StringTemplate code, String fileName) throws IOException {
         System.out.println("writing "+fileName);
-        FileWriter fw = tool.getOutputFile(fileName);
+        FileWriter fw =
+			tool.getOutputFile(outputDirectory+File.separator+fileName);
         fw.write(code.toString());
         fw.close();
     }

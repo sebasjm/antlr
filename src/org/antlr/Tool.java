@@ -27,23 +27,18 @@
 */
 package org.antlr;
 
-import org.antlr.tool.DOTGenerator;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.ErrorManager;
+import org.antlr.tool.DOTGenerator;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.analysis.*;
 
 import java.io.*;
-import java.util.Set;
-import java.util.Stack;
+import java.util.Collection;
+import java.util.Iterator;
 
 /** The main ANTLR entry point.  Read a grammar and generate a parser. */
 public class Tool {
-	// TODO: static is bad; can't have multiple instances of ANTLR in memory
-	public static boolean GENERATE_DFA_DOT = false;
-	public static boolean GENERATE_NFA_DOT = false;
-
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
@@ -52,7 +47,9 @@ public class Tool {
     // Input parameters / option
 
     protected String grammarFileName;
-    protected String outputDir = ".";
+	protected boolean generate_NFA_dot = false;
+	protected boolean generate_DFA_dot = false;
+    protected String outputDirectory = ".";
 	protected boolean debug = false;
 
     public static void main(String[] args) {
@@ -84,17 +81,23 @@ public class Tool {
 				}
 				else {
 					i++;
-					outputDir = args[i];
+					outputDirectory = args[i];
+					if ( outputDirectory.endsWith("/") ||
+						 outputDirectory.endsWith("\\") )
+					{
+						outputDirectory =
+							outputDirectory.substring(0,outputDirectory.length()-1);
+					}
 				}
 			}
 			else if (args[i].equals("-verbose")) {
 				DecisionProbe.verbose=true;
 			}
 			else if (args[i].equals("-nfa")) {
-				GENERATE_NFA_DOT=true;
+				generate_NFA_dot=true;
 			}
 			else if (args[i].equals("-dfa")) {
-				GENERATE_DFA_DOT=true;
+				generate_DFA_dot=true;
 			}
 			else if (args[i].equals("-debug")) {
 				debug=true;
@@ -146,6 +149,13 @@ public class Tool {
 				sr.close();
 				processGrammar(lexerGrammar);
 			}
+
+			if ( generate_NFA_dot ) {
+				generateNFAs(grammar);
+			}
+			if ( generate_DFA_dot ) {
+				generateDFAs(grammar);
+			}
 		}
         catch (Exception e) {
             ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
@@ -158,6 +168,7 @@ public class Tool {
 		String language = (String)grammar.getOption("language");
 		if ( language!=null ) {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);
+			generator.setOutputDirectory(outputDirectory);
 			grammar.setCodeGenerator(generator);
 			generator.setDebug(debug);
 
@@ -167,6 +178,46 @@ public class Tool {
 
 			generator.genRecognizer();
 		}
+	}
+
+	protected void generateDFAs(Grammar g) {
+		for (int d=1; d<=g.getNumberOfDecisions(); d++) {
+			DFA dfa = g.getLookaheadDFA(d);
+			DOTGenerator dotGenerator = new DOTGenerator(g);
+			String dot = dotGenerator.getDOT( dfa.startState );
+			String dotFileName = g.name+"_dec-"+d;
+			try {
+				writeDOTFile(dotFileName, dot);
+			}
+			catch(IOException ioe) {
+				ErrorManager.error(ErrorManager.MSG_CANNOT_GEN_DOT_FILE,
+								   dotFileName,
+								   ioe);
+			}
+		}
+	}
+
+	protected void generateNFAs(Grammar g) {
+		DOTGenerator dotGenerator = new DOTGenerator(g);
+		Collection rules = g.getRules();
+		for (Iterator itr = rules.iterator(); itr.hasNext();) {
+			Grammar.Rule r = (Grammar.Rule) itr.next();
+			String ruleName = r.name;
+			try {
+				writeDOTFile(
+					ruleName,
+					dotGenerator.getDOT(g.getRuleStartState(ruleName)));
+			}
+			catch (IOException ioe) {
+				ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE, ioe);
+			}
+		}
+	}
+
+	protected void writeDOTFile(String name, String dot) throws IOException {
+		FileWriter fw = getOutputFile(outputDirectory+File.separator+name+".dot");
+		fw.write(dot);
+		fw.close();
 	}
 
 	private static void help() {
@@ -179,17 +230,15 @@ public class Tool {
      *  files. If the outputDir set by -o is not present it will be created.
      */
     public FileWriter getOutputFile(String fileName) throws IOException {
-        if( !outputDir.equals(".") ) {
-            File outDir = new File(outputDir);
-            if( !outDir.exists() ) {
-                outDir.mkdirs();
-            }
-        }
-        return new FileWriter(outputDir + "/"+ fileName);
+		File outDir = new File(fileName).getParentFile();
+		if( !outDir.exists() ) {
+			outDir.mkdirs();
+		}
+        return new FileWriter(fileName);
     }
 
 	public String getOutputDirectory() {
-		return outputDir;
+		return outputDirectory;
 	}
 
 }

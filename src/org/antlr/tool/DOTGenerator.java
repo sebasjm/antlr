@@ -59,9 +59,9 @@ public class DOTGenerator {
     protected Grammar grammar;
 
     /** This aspect is associated with a grammar */
-    public DOTGenerator(Grammar grammar) {
-        this.grammar = grammar;
-    }
+	public DOTGenerator(Grammar grammar) {
+		this.grammar = grammar;
+	}
 
     /** Return a String containing a DOT description that, when displayed,
      *  will show the incoming state machine visually.  All nodes reachable
@@ -87,7 +87,6 @@ public class DOTGenerator {
     /** Return a String containing a DOT description that, when displayed,
      *  will show the incoming state machine visually.  All nodes reachable
      *  from startState will be included.
-     */
     public String getRuleNFADOT(State startState) {
         // The output DOT graph for visualization
         StringTemplate dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/nfa");
@@ -98,6 +97,7 @@ public class DOTGenerator {
         walkRuleNFACreatingDOT(dot, startState);
         return dot.toString();
     }
+	 */
 
     /** Do a depth-first walk of the state machine graph and
      *  fill a DOT description template.  Keep filling the
@@ -214,7 +214,8 @@ public class DOTGenerator {
         }
     }
 
-    public void writeDOTFilesForAllRuleNFAs() throws IOException {
+    /*
+	public void writeDOTFilesForAllRuleNFAs() throws IOException {
         Collection rules = grammar.getRules();
         for (Iterator itr = rules.iterator(); itr.hasNext();) {
 			Grammar.Rule r = (Grammar.Rule) itr.next();
@@ -224,14 +225,10 @@ public class DOTGenerator {
                     getRuleNFADOT(grammar.getRuleStartState(ruleName)));
         }
     }
+    */
 
-    public void writeDOTFile(String name, String dot) throws IOException {
-        FileWriter fw = new FileWriter(name+".dot");
-        fw.write(dot);
-        fw.close();
-    }
-
-    public void writeDOTFilesForAllDecisionDFAs() throws IOException {
+    /*
+	public void writeDOTFilesForAllDecisionDFAs() throws IOException {
         // for debugging, create a DOT file for each decision in
         // a directory named for the grammar.
         File grammarDir = new File(grammar.name+"_DFAs");
@@ -252,6 +249,7 @@ public class DOTGenerator {
             i++;
         }
     }
+    */
 
     /** Fix edge strings so they print out in DOT properly */
     protected String getEdgeLabel(String label) {
@@ -272,6 +270,7 @@ public class DOTGenerator {
             Set configurations = ((DFAState)s).getNFAConfigurations();
             int n = 0;
 			buf.append(s.stateNumber);
+			/*
 			buf.append(": ");
             for (Iterator it = configurations.iterator(); it.hasNext();) {
                 NFAConfiguration configuration = (NFAConfiguration) it.next();
@@ -284,6 +283,7 @@ public class DOTGenerator {
                     buf.append(", ");
                 }
             }
+			*/
             stateLabel = buf.toString();
         }
 		if ( (s instanceof NFAState) && ((NFAState)s).getDecisionASTNode()!=null ) {
