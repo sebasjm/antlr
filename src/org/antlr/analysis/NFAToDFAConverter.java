@@ -1003,7 +1003,7 @@ public class NFAToDFAConverter {
 		// it looks like state has no problem
 		if ( anyState.isEOTState() ) {
 			Set allAlts = d.getAltSet();
-			if ( allAlts.size()>1 ) {
+			if ( allAlts!=null && allAlts.size()>1 ) {
 				nondeterministicAlts = allAlts;
 				int decision = d.dfa.getDecisionNumber();
 				NFAState tokensRuleStartState =
