@@ -120,14 +120,10 @@ public class Tool {
                     grammar.addArtificialMatchTokensRule();
                 }
 
-                //System.out.println(grammar.getGrammarTree().toStringList());
-                //System.out.println(grammar.toString());
-
                 generator.genRecognizer();
             }
 
             new DOTGenerator(grammar).writeDOTFilesForAllRuleNFAs();
-            //new DOTGenerator(grammar).writeDOTFilesForAllDecisionDFAs();
         }
         catch (Exception e) {
             toolError("error processing file", e);

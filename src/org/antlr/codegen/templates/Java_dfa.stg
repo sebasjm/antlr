@@ -4,25 +4,35 @@ dfaDecision(decisionNumber,description) ::=
   "alt<decisionNumber> = DFA.DFA<decisionNumber>(input);"
 
 allCyclicDFAs(DFAs) ::= <<
+.method \<init> ()V 1
+	aload 0
+	invokespecial java/lang/Object.\<init>()V
+	return
 <DFAs>
 >>
 
 cyclicDFA(decision,states,description) ::= <<
-.method DFA<decision> (LIntegerStream;)I
-    aload 0
-    iconst 1
-    invokeinterface IntegerStream.LA 2
-    istore 1
+.method DFA<decision> (Lorg/antlr/runtime/IntegerStream;)I 2
     goto s0
+errorState:
+    getstatic java/lang/System.err Ljava/io/PrintStream;
+	ldc "DFA match error!"
+	invokevirtual java/io/PrintStream.println(Ljava/lang/String;)V
+    iconst 0
+    ireturn
 <states>
 >>
 
 cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
 s<stateNumber>:
+; load lookahead into a local in every state
+    aload 0
+    iconst 1
+    invokeinterface org/antlr/runtime/IntegerStream.LA(I)I 2
+    istore 1
 <edges>
 <if(needErrorClause)>
     goto errorState
-    return 0;
 <endif>
 >>
 
@@ -37,7 +47,7 @@ s<stateNumber>e<edgeNumber>:
 <labelExpr>
 s<stateNumber>e<edgeNumber>_go:
     aload 0
-    invokeinterface IntegerStream.consume 1
+    invokeinterface org/antlr/runtime/IntegerStream.consume()V 1
     goto s<targetStateNumber>
 s<stateNumber>e<edgeNumber>_skip:
 >>

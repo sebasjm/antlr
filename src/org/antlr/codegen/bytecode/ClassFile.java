@@ -27,6 +27,8 @@
 */
 package org.antlr.codegen.bytecode;
 
+import org.antlr.Tool;
+
 import java.io.*;
 import java.util.*;
 
@@ -46,6 +48,8 @@ import java.util.*;
  *  I deviate from jasmin syntax in a few ways.  For example, my .method
  *  def has the maxStack value in it rather than using a separate instruction.
  *  Further, I use iconst for all sizes and then gen "ldc int" if necessary.
+ *  I only allow single line ";..." comments; can't put a comment on end of
+ *  an instruction.  Must be ';' in column 1 else conflicts with type names.
  *
  *  I don't intend this to be a general assembler mechanism as I do very
  *  little error checking.  I intend this to quickly and easily assemble
@@ -79,7 +83,7 @@ public class ClassFile {
 		protected Map labels = new HashMap();
 		int[] code;
 		int maxStack = 0;
-		int maxLocals = 1;
+		int maxLocals = 2;
 		public String toString() {
 			return "method "+name+" "+signature;
 		}
@@ -169,42 +173,68 @@ public class ClassFile {
 
 	protected List dfaMethods = new LinkedList();
 
-    public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
 		String dfaAssemblyCode =
 			".method <init> ()V 1\n" +
 			"aload 0\n" +
 			"invokespecial java/lang/Object.<init>()V\n"+
 			"return\n"+
-			".method dfa1 (LIntegerStream;)I 2\n"+
-			"getstatic java/lang/System.out Ljava/io/PrintStream;\n" +
-			"ldc \"Hello World!\"\n" +
-			"invokevirtual java/io/PrintStream.println(Ljava/lang/String;)V\n"+
-/*
-			"istore 1\n" +
-			"iload 1\n" +
-			"iconst 97\n" +
-			"if_icmplt x\n" +
-			"aload 0\n"+
-			"invokeinterface IntegerStream.consume 1\n"+
-            "iload 1\n"+
-			"ireturn\n"+
-			"x:\n" +
-			"iconst -1\n" +
-*/
-			"aload 0\n" +
-			"iconst 1\n" +
-			"invokeinterface IntegerStream.LA(I)I 2\n" +
-			"ireturn\n"
-			/*
-			".method dfa2 (LIntegerStream;)I 1\n"+
-			"iconst 66000\n" +
-			"ireturn\n"+
-			".method dfa3 (LIntegerStream;)I 1\n"+
-			"iconst 1\n" +
-			"ireturn\n";
-			*/
+			".method DFA3 (Lorg/antlr/runtime/IntegerStream;)I 2\n" +
+			"    iconst 0\n" +
+			"    istore 1\n" +
+			"    goto s0\n" +
+			"errorState:\n" +
+			"    getstatic java/lang/System.err Ljava/io/PrintStream;\n" +
+			"        ldc \"DFA match error!\"\n" +
+			"        invokevirtual java/io/PrintStream.println(Ljava/lang/String;)V\n" +
+			"    iconst 0\n" +
+			"    ireturn\n" +
+			"s2:\n" +
+			"    iconst 1\n" +
+			"    ireturn\n" +
+			"s3:\n" +
+			"    iconst 2\n" +
+			"    ireturn\n" +
+			"s1:\n" +
+			"    iconst 2\n" +
+			"    ireturn\n" +
+			"s0:\n" +
+			"; load lookahead into a local in every state\n" +
+			"    aload 0\n" +
+			"    iconst 1\n" +
+			"    invokeinterface org/antlr/runtime/IntegerStream.LA(I)I 2\n" +
+			"    istore 1\n" +
+			"s0e1:\n" +
+			"    iload 1\n" +
+			"    iconst 97\n" +
+			"    if_icmpne s0e1_skip\n" +
+			"s0e1_go:\n" +
+			"    aload 0\n" +
+			"    invokeinterface org/antlr/runtime/IntegerStream.consume()V 1\n" +
+			"    goto s1\n" +
+			"s0e1_skip:\n" +
+			"s0e2:\n" +
+			"    iload 1\n" +
+			"    iconst 98\n" +
+			"    if_icmpne s0e2_skip\n" +
+			"s0e2_go:\n" +
+			"    aload 0\n" +
+			"    invokeinterface org/antlr/runtime/IntegerStream.consume()V 1\n" +
+			"    goto s2\n" +
+			"s0e2_skip:\n" +
+			"s0e3:\n" +
+			"    iload 1\n" +
+			"    iconst 99\n" +
+			"    if_icmpne s0e3_skip\n" +
+			"s0e3_go:\n" +
+			"    aload 0\n" +
+			"    invokeinterface org/antlr/runtime/IntegerStream.consume()V 1\n" +
+			"    goto s3\n" +
+			"s0e3_skip:\n" +
+			"    goto errorState\n"
 		;
 		ClassFile code = new ClassFile(null,
+									   null,
 									   "DFA",
 									   "java/lang/Object",
 									   "/tmp",
@@ -212,7 +242,8 @@ public class ClassFile {
 		code.write();
 	}
 
-	public ClassFile(String package_,
+	public ClassFile(Tool tool,
+					 String package_,
 					 String className,
 					 String superClassName,
 					 String outputDirectory,
@@ -248,13 +279,15 @@ public class ClassFile {
 	 * 	Pull out any constants that need to go into the constant pool.  For
 	 *  example:
 	 *
-	 *  .method name typesig
+	 *  .method name typesig 2
 	 *  iconst anInt
 	 *  ldc "a string"
-	 *  invokevirtual java/io/PrintStream.println 2
+	 *  invokevirtual java/io/PrintStream.println(LString;)V 2
 	 *
 	 *  would pull out name, typesig, anInt, "a string", and
 	 *  java/io/PrintStream.
+	 *
+	 *  Strip blank lines and the comment lines here too.
      */
 	protected void splitAssemblyIntoMethodsAndUpdateConstantPool() {
 		if ( assemblyCode==null ) {
@@ -263,19 +296,24 @@ public class ClassFile {
 		try {
 			StringReader sr = new StringReader(assemblyCode);
 			BufferedReader br = new BufferedReader(sr);
-			List lines = null; // = new ArrayList(INITIAL_LINES_PER_METHOD);
+			List lines = null;
 			// skip until first .method
 			String line = br.readLine();
 			while ( line!=null && !line.startsWith(".method ") ) {
 				line = br.readLine();
 			}
 			while ( line!=null ) {
+				// ignore blank lines and single-line comments
+				if ( line.length()==0 || line.indexOf(';')==0 ) {
+					line = br.readLine();
+					continue;
+				}
 				String[] elements = MethodAssembler.getInstructionElements(line);
 				String op = elements[0];
 				if ( op.equals(".method") ) {
 					Method method = new Method();
 					methodDescriptor(line, method);
-                    lines = new ArrayList(INITIAL_LINES_PER_METHOD);
+					lines = new ArrayList(INITIAL_LINES_PER_METHOD);
 					method.assemblyCodeLines = lines;
 					dfaMethods.add(method);
 				}
@@ -508,15 +546,15 @@ public class ClassFile {
 		}
 		st.nextToken(); // skip .method
 		if ( !st.hasMoreTokens() ) {
-			System.err.println("missing method name");
+			System.err.println("missing method's name");
 		}
 		method.name = st.nextToken();
 		if ( !st.hasMoreTokens() ) {
-			System.err.println("missing method signature");
+			System.err.println("missing method's signature");
 		}
 		method.signature = st.nextToken();
 		if ( !st.hasMoreTokens() ) {
-			System.err.println("missing method maxStack");
+			System.err.println("missing method's maxStack");
 		}
 		method.maxStack = Integer.parseInt(st.nextToken());
 		constantPoolStrings.add(method.name);
@@ -529,6 +567,10 @@ public class ClassFile {
 											  String sig)
 		throws IOException
 	{
+		String fullyQualifiedFieldName = className+"."+fieldName;
+		if ( indexOfField(fullyQualifiedFieldName)>0 ) {
+			return indexOfField(fullyQualifiedFieldName);
+		}
 		int classIndex = constantPoolClassDescriptor(out,className);
 		int sigIndex = constantPoolNameAndType(out,fieldName, sig);
 		poolCount++;
@@ -536,7 +578,8 @@ public class ClassFile {
 		out.writeByte(FIELD);
 		out.writeShort(classIndex);
 		out.writeShort(sigIndex);
-		fieldNameToConstantPoolIndex.put(className+"."+fieldName, new Integer(poolIndex));
+		fieldNameToConstantPoolIndex.put(fullyQualifiedFieldName,
+										 new Integer(poolIndex));
 		return poolIndex;
 	}
 
@@ -559,6 +602,10 @@ public class ClassFile {
 											   String sig)
 		throws IOException
 	{
+		String fullyQualifiedMethodName = className+"."+methodName+sig;
+		if ( indexOfMethod(fullyQualifiedMethodName)>0 ) {
+			return indexOfMethod(fullyQualifiedMethodName);
+		}
 		int classIndex = constantPoolClassDescriptor(out,className);
 		int sigIndex = constantPoolNameAndType(out,methodName, sig);
 		poolCount++;
@@ -566,7 +613,7 @@ public class ClassFile {
 		out.writeByte(METHOD);
 		out.writeShort(classIndex);
 		out.writeShort(sigIndex);
-		methodNameToConstantPoolIndex.put(className+"."+methodName+sig, new Integer(poolIndex));
+		methodNameToConstantPoolIndex.put(fullyQualifiedMethodName, new Integer(poolIndex));
 		return poolIndex;
 	}
 
@@ -577,6 +624,10 @@ public class ClassFile {
 		String sig)
 		throws IOException
 	{
+		String fullyQualifiedMethodName = className+"."+methodName+sig;
+		if ( indexOfMethod(fullyQualifiedMethodName)>0 ) {
+			return indexOfMethod(fullyQualifiedMethodName);
+		}
 		int classIndex = constantPoolClassDescriptor(out,className);
 		int sigIndex = constantPoolNameAndType(out,methodName, sig);
 		poolCount++;
@@ -584,7 +635,7 @@ public class ClassFile {
 		out.writeByte(INTERFACE_METHOD);
 		out.writeShort(classIndex);
 		out.writeShort(sigIndex);
-		methodNameToConstantPoolIndex.put(className+"."+methodName+sig, new Integer(poolIndex));
+		methodNameToConstantPoolIndex.put(fullyQualifiedMethodName, new Integer(poolIndex));
 		return poolIndex;
 	}
 

@@ -216,9 +216,10 @@ public class MethodAssembler {
 	}
 
 	protected Label labelInstruction(String assemblyCode) {
-		String labelName = getFirstWord(assemblyCode);
+		String[] elements = getInstructionElements(assemblyCode);
+		String labelName = elements[0];
 		labelName = labelName.substring(0,labelName.length()-1); // kill ':'
-		System.out.println("Found def of label "+labelName+"@"+pc);
+		//System.out.println("Found def of label "+labelName+"@"+pc);
 		Label label = defineLabel(labelName);
 		return label;
 	}
@@ -227,11 +228,15 @@ public class MethodAssembler {
 	{
 		String assemblyCode = instr.assemblyCode;
 		int[] code = null;
-		String instrName = getFirstWord(assemblyCode);
-		int numOperands = getNumberOfOperands(assemblyCode);
-		if ( numOperands==0 ) {
+		String[] elements = getInstructionElements(assemblyCode);
+		String instrName = elements[0];
+		if ( elements[1]==null ) {
 			// easy 1-to-1 translation if no operands
-			return new int[] {getOpcode(instrName)};
+			int opcode = getOpcode(instrName);
+			if ( opcode==-1 ) {
+				System.err.println("unknown bytecode instruction: "+assemblyCode);
+			}
+			return new int[] {opcode};
 		}
 		// don't bother being efficient; small list and small amount to compile
 		if ( instrName.equals("iconst") ) {code = iconst(instr);}
@@ -361,7 +366,6 @@ public class MethodAssembler {
 		// goto offset is computed relative to byte 0 of the if_cmpXX instr
 		int offset = label.address - pc;
 
-		int fieldIndex = classFile.indexOfField(operand);
 		int opcode = getOpcode(opcodeStr);
 		if ( opcodeStr.equals("goto") ) {
 			// always use 32 bit signed offset since compiler will not
@@ -374,8 +378,8 @@ public class MethodAssembler {
 		}
 		else {
 			code = new int[] {opcode,
-							  secondHighByte(fieldIndex),
-							  lowByte(fieldIndex)};
+							  secondHighByte(offset),
+							  lowByte(offset)};
 		}
 
 		return code;
@@ -384,7 +388,7 @@ public class MethodAssembler {
 	protected int[] getstatic(Instruction instr) {
 		String assemblyCode = instr.assemblyCode;
 		String[] elements = getInstructionElements(assemblyCode);
-		String operand = elements[0];
+		String operand = elements[1];
 		int fieldIndex = classFile.indexOfField(operand);
 		int[] code = new int[] {getOpcode("getstatic"),
 						  secondHighByte(fieldIndex),
@@ -477,19 +481,22 @@ public class MethodAssembler {
 		return label;
 	}
 
-	private void patchForwardLabelReferences(int[] code) {
+	protected void patchForwardLabelReferences(int[] code) {
 		// walk all labels, if any have unresolved forward references, patch
 		Collection labelObjects = labels.values();
 		for (Iterator it = labelObjects.iterator(); it.hasNext();) {
 			Label label = (Label) it.next();
-			System.out.println("patching label "+label.name);
+			if ( !label.defined ) {
+				System.err.println("undefined label: "+label.name);
+				continue;
+			}
 			if ( label.forwardReferences!=null ) {
 				for (int i = 0; i < label.forwardReferences.size(); i++) {
 					Instruction instr = (Instruction) label.forwardReferences.get(i);
 					int instructionStart = instr.address; // works for goto
 					int offset = label.address - instructionStart;
-					System.out.println("offset is "+offset);
-					System.out.println("label ref at "+instr.address);
+					//System.out.println("offset is "+offset);
+					//System.out.println("label ref at "+instr.address);
 					if ( instr.opcode==GOTO_W ) {
 						writeInt(code, instr.address+1, offset);
 					}
@@ -510,28 +517,6 @@ public class MethodAssembler {
 			return -1;
 		}
 		return opcodeI.intValue();
-	}
-
-	protected String getFirstWord(String assemblyCode) {
-		StringTokenizer st = new StringTokenizer(assemblyCode, " ", false);
-		if ( st.hasMoreTokens() ) {
-			return st.nextToken();
-		}
-		return null;
-	}
-
-	protected int getNumberOfOperands(String assemblyCode) {
-		StringTokenizer st = new StringTokenizer(assemblyCode, " ", false);
-		if ( !st.hasMoreTokens() ) {
-			return 0;
-		}
-		st.nextToken(); // skip over instruction
-		int n = 0;
-		while ( st.hasMoreTokens() ) {
-			n++;
-			st.nextToken();
-		}
-		return n;
 	}
 
 	public static int highByte(int v) {
@@ -594,12 +579,15 @@ public class MethodAssembler {
 		return bs;
 	}
 
+	/** Break up a label or regular instruction into opcode, operands.
+	 *  This amounts to the lexer for the assembler.
+	 */
 	public static String[] getInstructionElements(String instr) {
 		String[] elements = new String[4]; // 4 is max number of elements
 		int firstQuoteIndex = instr.indexOf('"');
 		if ( firstQuoteIndex>=0 ) {
 			// treat specially; has a string argument like ldc "foo"
-			StringTokenizer st = new StringTokenizer(instr, " ", false);
+			StringTokenizer st = new StringTokenizer(instr, " \t", false);
 			if ( st.hasMoreTokens() ) {
 				elements[0] = st.nextToken();
 			}
@@ -611,7 +599,7 @@ public class MethodAssembler {
 			elements[1] = instr.substring(firstQuoteIndex,lastQuoteIndex);
 		}
 		else {
-			StringTokenizer st = new StringTokenizer(instr, " ", false);
+			StringTokenizer st = new StringTokenizer(instr, " \t", false);
 			int i = 0;
 			while ( st.hasMoreTokens() ) {
 				elements[i] = st.nextToken();

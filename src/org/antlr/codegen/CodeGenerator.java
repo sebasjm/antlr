@@ -41,6 +41,7 @@ import org.antlr.analysis.*;
 import org.antlr.tool.Grammar;
 import org.antlr.misc.*;
 import org.antlr.Tool;
+import org.antlr.codegen.bytecode.ClassFile;
 import antlr.collections.AST;
 import antlr.RecognitionException;
 
@@ -112,7 +113,7 @@ public class CodeGenerator {
 			System.err.println("Cannot close template group file");
 		}
 
-		// now load language.dfa.stg if available
+		// now load language_dfa.stg if available
 		is = cl.getResourceAsStream("org/antlr/codegen/templates/"+language+"_dfa.stg");
 		if ( is!=null ) {
 			br = new BufferedReader(new InputStreamReader(is));
@@ -186,6 +187,15 @@ public class CodeGenerator {
             String fileName = getRecognizerFileName();
             StringTemplate.setLintMode(true);
 			System.out.println("DFAs: "+dfaST);
+
+			ClassFile code = new ClassFile(tool,
+										   null,
+										   "DFA",
+										   "java/lang/Object",
+										   "/tmp",
+										   dfaST.toString());
+			code.write();
+
             // do actual write of code to the output
             write(outputFileST, fileName);
             // write out the vocab interchange file
