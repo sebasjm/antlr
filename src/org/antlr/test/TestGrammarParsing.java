@@ -39,42 +39,42 @@ public class TestGrammarParsing extends TestSuite {
 
     public void testSimpleAltCharTest() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
-                "a : 'a' | 'b' | 'c';");
+                "lexer grammar t;\n"+
+                "A : 'a' | 'b' | 'c';");
         g.createLookaheadDFAs();
-        g.parse("a", new ANTLRStringStream("a"));
-        g.parse("a", new ANTLRStringStream("b"));
-        g.parse("a", new ANTLRStringStream("c"));
+        g.parse("A", new ANTLRStringStream("a"));
+        g.parse("A", new ANTLRStringStream("b"));
+        g.parse("A", new ANTLRStringStream("c"));
     }
 
     public void testSingleRuleRef() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
-                "a : 'a' b 'c' ;\n" +
-                "b : 'b' ;\n");
+                "lexer grammar t;\n"+
+                "A : 'a' B 'c' ;\n" +
+                "B : 'b' ;\n");
         g.createLookaheadDFAs();
-        g.parse("a", new ANTLRStringStream("abc"));
+        g.parse("A", new ANTLRStringStream("abc"));
     }
 
     public void testSimpleLoop() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
-                "a : ('0'..'9')+ ;\n");
+                "lexer grammar t;\n"+
+                "A : ('0'..'9')+ ;\n");
         g.createLookaheadDFAs();
-        g.parse("a", new ANTLRStringStream("1234"));
+        g.parse("A", new ANTLRStringStream("1234"));
     }
 
     public void testMultAltLoop() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
-                "a : ('0'..'9'|'a'|'b')+ ;\n");
+                "lexer grammar t;\n"+
+                "A : ('0'..'9'|'a'|'b')+ ;\n");
         g.createLookaheadDFAs();
-        g.parse("a", new ANTLRStringStream("1234"));
-        g.parse("a", new ANTLRStringStream("a"));
-        g.parse("a", new ANTLRStringStream("aaa"));
-        g.parse("a", new ANTLRStringStream("aaaa9"));
-        g.parse("a", new ANTLRStringStream("b"));
-        g.parse("a", new ANTLRStringStream("baa"));
+        g.parse("A", new ANTLRStringStream("1234"));
+        g.parse("A", new ANTLRStringStream("a"));
+        g.parse("A", new ANTLRStringStream("aaa"));
+        g.parse("A", new ANTLRStringStream("aaaa9"));
+        g.parse("A", new ANTLRStringStream("b"));
+        g.parse("A", new ANTLRStringStream("baa"));
     }
 
     public void testSimpleLoops() throws Exception {
