@@ -31,12 +31,20 @@ public interface DebugEventListener {
 	 */
 	public void consumeToken(Token t);
 
+	/** An off-channel input token was consumed.
+	 *  Trigger after the token was matched by things like match(), matchAny().
+	 *  (unless of course the hidden token is first stuff in the input stream).
+	 */
+	public void consumeHiddenToken(Token t);
+
 	/** Somebody (anybody) looked ahead.  Note that this actually gets
 	 *  triggered by both LA and LT calls.  The debugger will want to know
-	 *  which Token object was examined.  Actually, most of the time, LA
-	 *  will call LT which is how LA triggers this event.
+	 *  which Token object was examined.  Like consumeToken, this indicates
+	 *  what token was seen at that depth.  A remote debugger cannot look
+	 *  ahead into a file it doesn't have so LT events must pass the token
+	 *  even if the info is redundant.
 	 */
-	public void LT(int i);
+	public void LT(int i, Token t);
 
 	/** The parser is going to look arbitrarily ahead starting with token i. */
 	public void mark(int i);

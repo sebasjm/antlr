@@ -89,23 +89,17 @@ public class DebugEventSocketProxy implements DebugEventListener {
 	}
 
 	public void consumeToken(Token t) {
-		StringBuffer buf = new StringBuffer(50);
-		buf.append(t.getTokenIndex()); buf.append(' ');
-		buf.append(t.getType()); buf.append(' ');
-		buf.append(t.getChannel()); buf.append(' ');
-		buf.append(t.getLine()); buf.append(' ');
-		buf.append(t.getCharPositionInLine()); buf.append(" \"");
-		String txt = t.getText();
-		if ( txt==null ) {
-			txt = "";
-		}
-		txt = txt.replaceAll("\n"," ");
-		buf.append(txt);
+		String buf = serializeToken(t);
 		transmit("consumeToken "+buf);
 	}
 
-	public void LT(int i) {
-		transmit("LT "+i);
+	public void consumeHiddenToken(Token t) {
+		String buf = serializeToken(t);
+		transmit("consumeHiddenToken "+buf);
+	}
+
+	public void LT(int i, Token t) {
+		transmit("LT "+i+" "+serializeToken(t));
 	}
 
 	public void mark(int i) {
@@ -127,5 +121,22 @@ public class DebugEventSocketProxy implements DebugEventListener {
 	public void recovered() {
 		transmit("recovered");
 	}
+
+	protected String serializeToken(Token t) {
+		StringBuffer buf = new StringBuffer(50);
+		buf.append(t.getTokenIndex()); buf.append(' ');
+		buf.append(t.getType()); buf.append(' ');
+		buf.append(t.getChannel()); buf.append(' ');
+		buf.append(t.getLine()); buf.append(' ');
+		buf.append(t.getCharPositionInLine()); buf.append(" \"");
+		String txt = t.getText();
+		if ( txt==null ) {
+			txt = "";
+		}
+		txt = txt.replaceAll("\n"," ");
+		buf.append(txt);
+		return buf.toString();
+	}
+
 }
 

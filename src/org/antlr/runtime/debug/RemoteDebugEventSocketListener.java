@@ -10,7 +10,7 @@ import java.net.ConnectException;
 import java.util.StringTokenizer;
 
 public class RemoteDebugEventSocketListener implements Runnable {
-	static final int MAX_EVENT_ELEMENTS = 7;
+	static final int MAX_EVENT_ELEMENTS = 8;
 	DebugEventListener listener;
 	String machine;
 	int port;
@@ -188,23 +188,16 @@ public class RemoteDebugEventSocketListener implements Runnable {
 							  Integer.parseInt(elements[2]));
 		}
 		else if ( elements[0].equals("consumeToken") ) {
-			String indexS = elements[1];
-			String typeS = elements[2];
-			String channelS = elements[3];
-			String lineS = elements[4];
-			String posS = elements[5];
-			String text = elements[6];
-			ProxyToken t =
-				new ProxyToken(Integer.parseInt(indexS),
-							   Integer.parseInt(typeS),
-							   Integer.parseInt(channelS),
-							   Integer.parseInt(lineS),
-							   Integer.parseInt(posS),
-							   text);
+			Token t = deserializeToken(elements, 1);
+			listener.consumeToken(t);
+		}
+		else if ( elements[0].equals("consumeHiddenToken") ) {
+			Token t = deserializeToken(elements, 1);
 			listener.consumeToken(t);
 		}
 		else if ( elements[0].equals("LT") ) {
-			listener.LT(Integer.parseInt(elements[1]));
+			Token t = deserializeToken(elements, 2);
+			listener.LT(Integer.parseInt(elements[1]), t);
 		}
 		else if ( elements[0].equals("mark") ) {
 			listener.mark(Integer.parseInt(elements[1]));
@@ -228,6 +221,25 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		else {
 			System.err.println("unknown debug event: "+line);
 		}
+	}
+
+	protected ProxyToken deserializeToken(String[] elements,
+										  int offset)
+	{
+		String indexS = elements[offset+0];
+		String typeS = elements[offset+1];
+		String channelS = elements[offset+2];
+		String lineS = elements[offset+3];
+		String posS = elements[offset+4];
+		String text = elements[offset+5];
+		ProxyToken t =
+			new ProxyToken(Integer.parseInt(indexS),
+						   Integer.parseInt(typeS),
+						   Integer.parseInt(channelS),
+						   Integer.parseInt(lineS),
+						   Integer.parseInt(posS),
+						   text);
+		return t;
 	}
 
 	/** Create a thread to listen to the remote running recognizer */

@@ -51,7 +51,8 @@ public class DebugParser extends Parser {
 		public void exitSubRule(int decisionNumber) {}
 		public void location(int line, int pos) {}
 		public void consumeToken(Token token) {}
-		public void LT(int i) {}
+		public void consumeHiddenToken(Token token) {}
+		public void LT(int i, Token t) {}
 		public void mark(int i) {}
 		public void rewind(int i) {}
 		public void recognitionException(RecognitionException e) {}

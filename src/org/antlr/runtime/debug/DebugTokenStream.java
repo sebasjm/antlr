@@ -48,7 +48,7 @@ public class DebugTokenStream implements TokenStream {
 			// consume all initial off channel tokens
 			int firstOnChannelTokenIndex = input.index();
 			for (int i=0; i<firstOnChannelTokenIndex; i++) {
-				dbg.consumeToken(input.get(i));
+				dbg.consumeHiddenToken(input.get(i));
 			}
 			firstConsume = false;
 		}
@@ -60,13 +60,13 @@ public class DebugTokenStream implements TokenStream {
 		if ( b>a+1 ) {
 			// then we consumed more than one token; must be off channel tokens
 			for (int i=a+1; i<b; i++) {
-				dbg.consumeToken(input.get(i));
+				dbg.consumeHiddenToken(input.get(i));
 			}
 		}
 	}
 
 	public int LA(int i) {
-		dbg.LT(i);
+		dbg.LT(i, input.LT(i));
 		return input.LA(i);
 	}
 
@@ -94,7 +94,7 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public Token LT(int i) {
-		dbg.LT(i);
+		dbg.LT(i, input.LT(i));
 		return input.LT(i);
 	}
 
