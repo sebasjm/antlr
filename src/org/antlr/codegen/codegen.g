@@ -35,6 +35,7 @@ header {
     import java.io.InputStream;
     import java.io.BufferedReader;
     import java.io.InputStreamReader;
+    import antlr.TokenWithIndex;
 }
 
 /** Walk a grammar and generate code by gradually building up
@@ -56,6 +57,8 @@ options {
 }
 
 {
+    protected String currentRuleName = null;
+
     public void reportError(RecognitionException ex) {
         System.out.println("codegen: "+ex.toString());
     }
@@ -178,28 +181,32 @@ rule returns [StringTemplate code=null]
 {
     String r;
     StringTemplate b;
-    if ( grammar.type==Grammar.LEXER ) {
-        code = templates.getInstanceOf("lexerRule");
-    }
-    else {
-        code = templates.getInstanceOf("rule");
-    }
 	// get the dfa for the BLOCK
     DFA dfa=#rule.getFirstChildWithType(BLOCK).getLookaheadDFA();
 }
-    :   #( RULE id:ID {r=#id.getText();}
+    :   #( RULE id:ID {r=#id.getText(); currentRuleName = r;}
 			( #(OPTIONS .) )?
 			(mod:modifier)?
 	     	b=block["block", dfa] EOR
          )
         // do not generate lexer rules in combined grammar
         {
-        if ( grammar.type==Grammar.COMBINED &&
-             Character.isUpperCase(r.charAt(0)) )
-        {
-        	code = null; // kill this
-        }
-        else {
+		if ( grammar.type==Grammar.LEXER ) {
+			if ( r.equals(Grammar.TOKEN_RULENAME) ) {
+				code = templates.getInstanceOf("tokensRule");
+			}
+			else {
+				code = templates.getInstanceOf("lexerRule");
+			}
+		}
+		else {
+			if ( !(grammar.type==Grammar.COMBINED &&
+				 Character.isUpperCase(r.charAt(0))) )
+			{
+				code = templates.getInstanceOf("rule");
+			}
+		}
+        if ( code!=null ) {
 			if ( grammar.type==Grammar.LEXER ) {
 		    	boolean naked =
 		    		r.equals(Grammar.TOKEN_RULENAME) ||
@@ -309,7 +316,7 @@ element returns [StringTemplate code=null]
     |   act:ACTION
         {
         String actText = #act.getText();
-        actText = actText.substring(1,actText.length()-1); // strip {...}
+        //actText = actText.substring(1,actText.length()-1); // strip {...}
         code = new StringTemplate(templates, actText);
         }
 
@@ -354,7 +361,10 @@ tree:   #(TREE_BEGIN atom (element)*)
 
 atom returns [StringTemplate code=null]
     :   r:RULE_REF     {code = templates.getInstanceOf("ruleRef");
-                        code.setAttribute("rule", r.getText());}
+                        code.setAttribute("rule", r.getText());
+                        code.setAttribute("tokenIndex", ((TokenWithIndex)r.getToken()).getIndex());
+                        generator.generateLocalFOLLOW(#r,r.getText(),currentRuleName);
+                       }
     |   t:TOKEN_REF    {
                        if ( grammar.type==Grammar.LEXER ) {
                            code = templates.getInstanceOf("lexerRuleRef");

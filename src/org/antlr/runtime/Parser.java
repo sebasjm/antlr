@@ -28,12 +28,22 @@
 package org.antlr.runtime;
 
 import org.antlr.misc.IntSet;
+import org.antlr.misc.IntervalSet;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Parser {
     protected TokenStream input;
+
+	/** How deep are we nested in rule invocations? 0..n-1 */
+	//protected int ruleDepth=0;
+
+	/** Track the set of token types that can follow any rule invocation.
+	 *  List<BitSet>.
+	 */
+	protected Stack following = new Stack();
 
     public Parser(TokenStream input) {
         this.input = input;
@@ -67,7 +77,7 @@ public class Parser {
 	public void reportError(RecognitionException e) {
 		String parserClassName = getClass().getName();
 		System.err.print(getRuleInvocationStack(e, parserClassName)+
-						 ": line "+input.getTokenSource().getCharStream().getLine()+" ");
+						 ": line "+input.LT(1).getLine()+" ");
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			System.err.println("mismatched token: "+
@@ -103,8 +113,18 @@ public class Parser {
 		}
 	}
 
-	public void recover(org.antlr.runtime.BitSet follow) {
+	public void recover(RecognitionException re, org.antlr.runtime.BitSet follow) {
 		consumeUntil(follow);
+	}
+
+	public void recover(RecognitionException re) {
+		// compute FOLLOW set by walk stack, combining sets
+		BitSet followSet = new BitSet();
+		for (int i = 0; i < following.size(); i++) {
+			BitSet localFollowSet = (BitSet) following.get(i);
+			followSet.orInPlace(localFollowSet);
+		}
+		consumeUntil(followSet);
 	}
 
 	public void consumeUntil(int tokenType) {
@@ -115,12 +135,15 @@ public class Parser {
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(BitSet set) {
-		//System.out.println("consumeUntil("+set.toString()+")");
+		System.out.println("consumeUntil("+set.toString()+")");
+		/*
+		System.out.println("LT(1)="+
+						   input.LT(1).toString(input.getTokenSource().getCharStream()));
+		input.consume(); // always consume at least one token; inoptimal but safe
+		*/
 		while (input.LA(1) != Token.EOF && !set.member(input.LA(1)) ) {
-			/*
 			System.out.println("LT(1)="+
 							   input.LT(1).toString(input.getTokenSource().getCharStream()));
-			*/
 			input.consume();
 		}
 	}

@@ -51,6 +51,12 @@ public class GrammarAST extends BaseAST {
     /** What NFA was built from this node? */
     protected NFAState NFAStartState = null;
 
+	/** Rule ref nodes (and possibly token refs later) need to track their
+	 *  location in the generated NFA so that FOLLOW sets can be computed during
+	 *  code gen for automatic error recovery.
+	 */
+	public NFAState followingNFAState = null;
+
     /** If this is a SET node, what are the elements? */
     protected IntSet setValue = null;
 

@@ -740,10 +740,12 @@ NESTED_ARG_ACTION :
 ACTION
 {int actionLine=getLine(); int actionColumn = getColumn(); }
 	:	NESTED_ACTION
-		(	'?'	{_ttype = SEMPRED;} )?
+		(	'?'! {_ttype = SEMPRED;} )?
 		{
 			Token t = makeToken(_ttype);
-			t.setText($getText);
+			String action = $getText;
+			action = action.substring(1,action.length()-1);
+			t.setText(action);
 			t.setLine(actionLine);			// set action line to start
 			t.setColumn(actionColumn);
 			$setToken(t);

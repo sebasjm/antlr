@@ -42,6 +42,7 @@ import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.*;
 import org.antlr.misc.BitSet;
+import org.antlr.Tool;
 
 /** Represents a grammar in memory. */
 public class Grammar {
@@ -410,11 +411,13 @@ public class Grammar {
 							   re);
 		}
 		//System.out.println("NFA has "+factory.getNumberOfStates()+" states");
-		try {
-			new DOTGenerator(this).writeDOTFilesForAllRuleNFAs();
-		}
-		catch (IOException ioe) {
-			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE, ioe);
+		if ( Tool.GENERATE_NFA_DOT ) {
+			try {
+				new DOTGenerator(this).writeDOTFilesForAllRuleNFAs();
+			}
+			catch (IOException ioe) {
+				ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE, ioe);
+			}
 		}
 	}
 
@@ -428,8 +431,6 @@ public class Grammar {
      *
      *  This is a separate method because you might want to create a
      *  Grammar without doing the expensive analysis.
-	 *
-	 *  TODO: generate NFA as option or another method
      */
     public void createLookaheadDFAs() {
 		System.out.println("### create DFAs");
@@ -440,19 +441,20 @@ public class Grammar {
 				System.out.println("--------------------\nbuilding lookahead DFA (d="
                         +decisionStartState.getDecisionNumber()+") for "+
                         decisionStartState.getDescription());
-				*/
 				long start = System.currentTimeMillis();
-                DFA lookaheadDFA = new DFA(decisionStartState);
-                long stop = System.currentTimeMillis();
+				*/
+				DFA lookaheadDFA = new DFA(decisionStartState);
+				long stop = System.currentTimeMillis();
 				setLookaheadDFA(decision, lookaheadDFA);
 				/*
 				System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
-								   " states, "+(int)(stop-start)+" ms");
+					" states, "+(int)(stop-start)+" ms");
 				*/
-				if ( true ) {
+
+				if ( Tool.GENERATE_DFA_DOT ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.grammar);
 					String dot = dotGenerator.getDOT( lookaheadDFA.startState );
-					String dotFileName = "/tmp/dec-"+decision;
+					String dotFileName = "/tmp/"+name+"_dec-"+decision;
 					try {
 						dotGenerator.writeDOTFile(dotFileName, dot);
 					}
@@ -462,12 +464,30 @@ public class Grammar {
 										   ioe);
 					}
 				}
-            }
-        }
-    }
+
+				/*
+				DFAMinimizer minimizer = new DFAMinimizer(lookaheadDFA);
+				DFA minDFA = minimizer.minimize();
+				if ( false ) {
+					DOTGenerator dotGenerator = new DOTGenerator(nfa.grammar);
+					String dot = dotGenerator.getDOT( minDFA.startState );
+					String dotFileName = "/tmp/dec-"+decision+"-min";
+					try {
+						dotGenerator.writeDOTFile(dotFileName, dot);
+					}
+					catch(IOException ioe) {
+						ErrorManager.error(ErrorManager.MSG_CANNOT_GEN_DOT_FILE,
+										   dotFileName,
+										   ioe);
+					}
+				}
+				*/
+			}
+		}
+	}
 
 	/** Define either a token at a particular token type value.  Blast an
-     *  old value with a new one.  This is called directly during import vocab
+	 *  old value with a new one.  This is called directly during import vocab
      *  operation to set up tokens with specific values.
      */
     public void defineToken(String text, int tokenType) {
@@ -969,7 +989,7 @@ public class Grammar {
 
 	public LookaheadSet LOOK(NFAState s) {
 		lookBusy = new HashSet();
-		return reachable(s);
+		return _LOOK(s);
 	}
 
 	public LookaheadSet FOLLOW(String ruleName) {
@@ -981,11 +1001,17 @@ public class Grammar {
 	 *  depending on where s is.  For example, if s is the end of rule node,
 	 *  this will return the FOLLOW set.  Use BitSet implementation as this
 	 *  will only be used on parser and tree parser grammars.
+	 *
+	 *  DOING LOCAL FOLLOW NOW for rule refs
 	 */
-	protected LookaheadSet reachable(NFAState s) {
+	protected LookaheadSet _LOOK(NFAState s) {
+		if ( s.isAcceptState() ) {
+			return new LookaheadSet();
+		}
+
 		if ( lookBusy.contains(s) ) {
 			// return a copy of an empty set; we may modify set inline
-			return new LookaheadSet(new BitSet());
+			return new LookaheadSet();
 		}
 		lookBusy.add(s);
 		Transition transition0 = s.transition(0);
@@ -998,16 +1024,27 @@ public class Grammar {
 			if ( atom==Label.EOF ) {
 				return LookaheadSet.EOF();
 			}
-			return new LookaheadSet(BitSet.of(atom));
+			return new LookaheadSet(atom);
 		}
 		if ( transition0.label.isSet() ) {
-			return new LookaheadSet(BitSet.of(transition0.label.getSet()));
+			IntSet sl = transition0.label.getSet();
+			return new LookaheadSet(sl);
+/*
+if ( sl.member(Label.EOF) ) {
+				System.err.println("uh oh; set has EOF: "+sl.toString(this));
+				LookaheadSet e = LookaheadSet.EOF();
+				sl.remove(Label.EOF);
+				e.tokenTypeSet = new Lookah ead.of(sl);
+				return e;
+			}
+			return new LookaheadSet(BitSet.of(sl));
+			*/
 		}
-        LookaheadSet tset = reachable((NFAState)transition0.target);
+        LookaheadSet tset = _LOOK((NFAState)transition0.target);
 
 		Transition transition1 = s.transition(1);
 		if ( transition1!=null ) {
-			LookaheadSet tset1 = reachable((NFAState)transition1.target);
+			LookaheadSet tset1 = _LOOK((NFAState)transition1.target);
 			tset.orInPlace(tset1);
 		}
 		return tset;

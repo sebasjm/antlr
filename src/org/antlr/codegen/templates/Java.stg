@@ -24,11 +24,21 @@ class <name> extends Lexer {
             return Token.EOFToken;
         }
         token=null;
-        mTokens();
+retry:
+        while (true) {
+            try {
+                mTokens();
+                break retry;
+            }
+            catch (RecognitionException re) {
+                reportError(re);
+		recover(re);
+            }
+        }
         return token;
     }
 
-    <rules; separator="\n">
+    <rules; separator="\n\n">
 }
 >>
 
@@ -38,37 +48,43 @@ class <name> extends Parser {
     public <name>(TokenStream input) {
         super(input);
     }
-    <rules; separator="\n">
-    <bitsets:bitset(prefix="FOLLOW_", name=it.name, words64=it.bits)>
+    <rules; separator="\n\n">
+    <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
 }
 >>
 
-bitset(prefix, name, words64) ::= <<
-public static final BitSet <prefix><name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
+bitset(name, words64) ::= <<
+public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
 >>
 
 rule(ruleName,args,block,enterAction,exitAction) ::= <<
-public void <ruleName>(<args>) {   
-    try {
+public void <ruleName>(<args>) throws RecognitionException {   
 <if(enterAction)>
-        <enterAction>
-        <block>
-        <exitAction><\n>
-<else>
-        <block>
+    <enterAction><\n>
 <endif>
+    try {
+        <block>
     }
     catch (RecognitionException re) {
         reportError(re);
-        recover(FOLLOW_<ruleName>);
+        recover(re);
     }
+<if(exitAction)>
+    finally {
+        <exitAction><\n>
+    }<\n>
+<endif>
+}
+>>
+
+tokensRule(ruleName,nakedBlock,args,block,enterAction,exitAction) ::= <<
+public void mTokens() throws RecognitionException {
+    <block><\n>
 }
 >>
 
 lexerRule(ruleName,nakedBlock,args,block,enterAction,exitAction) ::= <<
-public void m<ruleName>(<args>)
-{
-    try {
+public void m<ruleName>(<args>) throws RecognitionException {
 <if(nakedBlock)>
     <block><\n>
 <else>
@@ -80,11 +96,6 @@ public void m<ruleName>(<args>)
     <block>
     if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}<\n>
 <endif>
-    }
-    catch (RecognitionException re) {
-        reportError(re);
-        recover();
-    }
 }
 >>
 
@@ -163,7 +174,7 @@ else throw new MismatchedSetException("<s>");<\n>
 
 matchNotSet(s) ::= <<
 if ( !(<s>) ) input.consume();
-else throw new MismatchedNotSetException("<s>");<\n>
+else throw new MismatchedNotSetException("");<\n>
 >>
 
 lexerStringRef(string) ::= "match(<string>);"
@@ -172,7 +183,15 @@ wildcard() ::= "matchAny();"
 
 wildcardChar() ::= "matchAny();"
 
-ruleRef(rule,args) ::= "<rule>(<args>);"
+ruleRef(rule,tokenIndex,args) ::= <<
+<if(!LEXER)>
+following.push(FOLLOW_<rule>_in_<ruleName><tokenIndex>);
+<rule>(<args>);
+following.pop();
+<else>
+<rule>(<args>);<\n>
+<endif>
+>>
 
 lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
 

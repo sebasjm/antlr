@@ -41,11 +41,13 @@ import org.antlr.analysis.*;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.LookaheadSet;
+import org.antlr.tool.GrammarAST;
 import org.antlr.misc.*;
 import org.antlr.Tool;
 import org.antlr.codegen.bytecode.ClassFile;
 import antlr.collections.AST;
 import antlr.RecognitionException;
+import antlr.TokenWithIndex;
 
 /** ANTLR's code generator.
  *
@@ -112,6 +114,10 @@ public class CodeGenerator {
 	 *  to check bytecode gen for Java etc...
 	 */
 	protected StringTemplate cyclicDFAST = null;
+
+	protected StringTemplate recognizerST;
+	protected StringTemplate outputFileST;
+	protected StringTemplate headerFileST;
 
     /** A reference to the ANTLR tool so we can learn about output directories
      *  and such.
@@ -239,10 +245,9 @@ public class CodeGenerator {
 		target.performGrammarAnalysis(this, grammar);
 
 		// OUTPUT FILE (contains recognizerST)
-		StringTemplate outputFileST = templates.getInstanceOf("outputFile");
+		outputFileST = templates.getInstanceOf("outputFile");
 
 		// RECOGNIZER
-		StringTemplate recognizerST;
 		if ( grammar.type==Grammar.LEXER ) {
 			recognizerST = templates.getInstanceOf("lexer");
 			outputFileST.setAttribute("LEXER", "true");
@@ -269,7 +274,6 @@ public class CodeGenerator {
 													 cyclicDFAST);
 
 		// HEADER FILE
-		StringTemplate headerFileST = null;
 		if ( templates.isDefined("headerFile") ) {
 			headerFileST = templates.getInstanceOf("headerFile");
 		}
@@ -302,7 +306,7 @@ public class CodeGenerator {
 
 		// CREATE FOLLOW SETS needed for automatic error recovery
 		if ( grammar.type!=Grammar.LEXER ) {
-			fillFOLLOWSets(recognizerST,outputFileST,headerFileST);
+			//fillFOLLOWSets(recognizerST,outputFileST,headerFileST);
 		}
 
 		// WRITE FILES
@@ -329,23 +333,80 @@ public class CodeGenerator {
 		long start = System.currentTimeMillis();
 		for (Iterator itr = grammar.getRules().iterator(); itr.hasNext();) {
 			Grammar.Rule r = (Grammar.Rule) itr.next();
+			/*  hmm...FOLLOW in lexer doesn't seem to help
+			// if a lexer grammar, only do fragment rules
+			if ( grammar.type==Grammar.LEXER &&
+				 (r.modifier==null ||
+				 !r.modifier.equals(Grammar.FRAGMENT_RULE_MODIFIER)) )
+			{
+				continue;
+			}
+			*/
 			LookaheadSet follow = grammar.FOLLOW(r.name);
+			//LookaheadSet follow = new LookaheadSet();
+			System.out.println("FOLLOW("+r.name+")="+follow.toString(grammar));
 			// TODO: not sending in EOF for FOLLOW sets! (might not need;
 			// consume until will know to stop at EOF)
-			recognizerST.setAttribute("bitsets.{name,bits}",
+			long[] words = null;
+			if ( follow.tokenTypeSet==null ) {
+				words = new long[1];
+			}
+			else {
+				BitSet bits = BitSet.of(follow.tokenTypeSet);
+				//bits.remove(Label.EOF);
+				words = bits.toPackedArray();
+			}
+			recognizerST.setAttribute("bitsets.{name,inName,bits}",
 									  r.name,
-									  follow.tokenTypeSet.toPackedArray());
-			outputFileST.setAttribute("bitsets.{name,bits}",
+									  words);
+			outputFileST.setAttribute("bitsets.{name,inName,bits}",
 									  r.name,
-									  follow.tokenTypeSet.toPackedArray());
-			headerFileST.setAttribute("bitsets.{name,bits}",
+									  words);
+			headerFileST.setAttribute("bitsets.{name,inName,bits}",
 									  r.name,
-									  follow.tokenTypeSet.toPackedArray());
-			System.out.println("FOLLOW("+r.name+")="+
-							   follow.toString(grammar));
+									  words);
 		}
 		long stop = System.currentTimeMillis();
-		//System.out.println("FOLLOW sets computed in "+(int)(stop-start)+" ms");
+		System.out.println("FOLLOW sets computed in "+(int)(stop-start)+" ms");
+	}
+
+	public void generateLocalFOLLOW(GrammarAST ruleRefNode,
+									String referencedRulename,
+									String enclosingRuleName)
+	{
+		NFAState followingNFAState = ruleRefNode.followingNFAState;
+		int i = ((TokenWithIndex)ruleRefNode.getToken()).getIndex();
+		System.out.print("compute FOLLOW of "+referencedRulename+"#"+i+" in "+
+						 enclosingRuleName);
+		LookaheadSet follow = grammar.LOOK(followingNFAState);
+		System.out.println(" "+follow);
+
+		// TODO: not sending in EOF for FOLLOW sets! (might not need;
+		// consume until will know to stop at EOF)
+		long[] words = null;
+		if ( follow.tokenTypeSet==null ) {
+			words = new long[1];
+		}
+		else {
+			BitSet bits = BitSet.of(follow.tokenTypeSet);
+			//bits.remove(Label.EOF);
+			words = bits.toPackedArray();
+		}
+		recognizerST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
+								  referencedRulename,
+								  enclosingRuleName,
+								  words,
+								  new Integer(i));
+		outputFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
+								  referencedRulename,
+								  enclosingRuleName,
+								  words,
+								  new Integer(i));
+		headerFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
+								  referencedRulename,
+								  enclosingRuleName,
+								  words,
+								  new Integer(i));
 	}
 
 	// L O O K A H E A D  D E C I S I O N  G E N E R A T I O N
@@ -369,8 +430,11 @@ public class CodeGenerator {
 				genCyclicLookaheadDecision(getCyclicDFATemplates(), dfa);
             cyclicDFATemplate.setAttribute("cyclicDFAs", dfaST);
             decisionST = cyclicDFATemplates.getInstanceOf("dfaDecision");
-			decisionST.setAttribute("description",
-                                    dfa.getNFADecisionStartState().getDescription());
+			String description = dfa.getNFADecisionStartState().getDescription();
+			if ( description!=null ) {
+				description = Utils.replace(description,"\"", "\\\"");
+				decisionST.setAttribute("description", description);
+			}
             decisionST.setAttribute("decisionNumber",
                                     new Integer(dfa.getDecisionNumber()));
         }

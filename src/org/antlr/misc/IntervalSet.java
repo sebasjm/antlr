@@ -187,8 +187,13 @@ public class IntervalSet implements IntSet {
     }
 
     public void addAll(IntSet set) {
+		if ( set==null ) {
+			return;
+		}
         if ( !(set instanceof IntSet) ) {
-            throw new IllegalArgumentException("can't add non BitSet to BitSet");
+            throw new IllegalArgumentException("can't add non IntSet ("+
+											   set.getClass().getName()+
+											   ") to IntervalSet");
         }
         IntervalSet other = (IntervalSet)set;
         // walk set and add each interval

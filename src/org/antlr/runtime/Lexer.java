@@ -45,7 +45,6 @@ public abstract class Lexer implements TokenSource {
 					 int line, int charPosition,
 					 int channel,
 					 int start, int stop) {
-		//System.out.println("line: "+line+" '"+input.substring(start,stop)+"'");
 		Token token = new CommonToken(tokenType, channel, start, stop);
 		token.setLine(line);
 		token.setCharPositionInLine(charPosition);
@@ -119,7 +118,7 @@ public abstract class Lexer implements TokenSource {
 			System.err.println(nvae.grammarDecisionDescription+
 							   " state "+nvae.stateNumber+
 							   " (decision="+nvae.decisionNumber+
-							   ") no viable alt line "+getLine()+"; char='"+
+							   ") no viable alt line "+getLine()+":"+getCharPositionInLine()+"; char='"+
 							   (char)input.LA(1)+"'");
 		}
 		else if ( e instanceof EarlyExitException ) {
@@ -127,7 +126,7 @@ public abstract class Lexer implements TokenSource {
 			System.err.println("required (...)+ loop (decision="+
 							   eee.decisionNumber+
 							   ") did not match anything; on line "+
-							   getLine()+" char="+
+							   getLine()+":"+getCharPositionInLine()+" char="+
 							   (char)input.LA(1)+"'");
 		}
 		else if ( e instanceof MismatchedSetException ) {
@@ -135,6 +134,7 @@ public abstract class Lexer implements TokenSource {
 			System.err.println("mismatched char: '"+
 							   (char)input.LA(1)+
 							   "' on line "+getLine()+
+							   ":"+getCharPositionInLine()+
 							   "; expecting set "+mse.expecting);
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
@@ -142,6 +142,7 @@ public abstract class Lexer implements TokenSource {
 			System.err.println("mismatched char: '"+
 							   (char)input.LA(1)+
 							   "' on line "+getLine()+
+							   ":"+getCharPositionInLine()+
 							   "; expecting set "+mse.expecting);
 		}
 		else if ( e instanceof MismatchedRangeException ) {
@@ -149,6 +150,7 @@ public abstract class Lexer implements TokenSource {
 			System.err.println("mismatched char: '"+
 							   (char)input.LA(1)+
 							   "' on line "+getLine()+
+							   ":"+getCharPositionInLine()+
 							   "; expecting set '"+(char)mre.a+"'..'"+
 							   (char)mre.b+"'");
 		}
@@ -159,7 +161,8 @@ public abstract class Lexer implements TokenSource {
 	 *  it all works out.  You can instead use the rule invocation stack
 	 *  to do sophisticated error recovery if you are in a fragment rule.
 	 */
-	public void recover() {
+	public void recover(RecognitionException re) {
+		System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
 		input.consume();
 	}
 }

@@ -38,6 +38,10 @@ import java.io.*;
 
 /** The main ANTLR entry point.  Read a grammar and generate a parser. */
 public class Tool {
+	// TODO: static is bad; can't have multiple instances of ANTLR in memory
+	public static boolean GENERATE_DFA_DOT = false;
+	public static boolean GENERATE_NFA_DOT = false;
+
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
@@ -82,6 +86,12 @@ public class Tool {
 			}
 			else if (args[i].equals("-verbose")) {
 				DecisionProbe.verbose=true;
+			}
+			else if (args[i].equals("-nfa")) {
+				GENERATE_NFA_DOT=true;
+			}
+			else if (args[i].equals("-dfa")) {
+				GENERATE_DFA_DOT=true;
 			}
             else {
                 if (args[i].charAt(0) != '-') {

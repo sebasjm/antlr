@@ -92,12 +92,14 @@ public class NFAState extends State {
         return transition[i];
     }
 
-    public List getTransitions() {
+    /*
+	public List getTransitions() {
         List t = new ArrayList();
         t.add(transition[0]);
         t.add(transition[1]);
         return t;
     }
+	*/
 
     // Setter/Getters
 
@@ -105,7 +107,7 @@ public class NFAState extends State {
         return decisionASTNode;
     }
 
-    /** What AST node is associated with this grammar AST node?  When you
+    /** What AST node is associated with this NFAState?  When you
      *  set the AST node, I set the node to point back to this NFA state.
      */
     public void setDecisionASTNode(GrammarAST decisionASTNode) {

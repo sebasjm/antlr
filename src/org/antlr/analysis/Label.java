@@ -37,7 +37,7 @@ import antlr.collections.AST;
  *  tokens.  It can be an epsilon transition.  It can be a semantic predicate
  *  (which assumes an epsilon transition) or a tree of predicates (in a DFA).
  */
-public class Label implements Comparable {
+public class Label implements Comparable, Cloneable {
     public static final int INVALID = -6;
 
     public static final int EPSILON = -5;
@@ -107,6 +107,7 @@ public class Label implements Comparable {
     protected SemanticContext semanticContext;
 
     /** A set of token types or character codes if label==SET */
+	// TODO: make sure to use BitSEt for aprsers and IntervalSet for lexers
     protected IntSet labelSet;
 
     public Label(int label) {
@@ -136,6 +137,59 @@ public class Label implements Comparable {
         this.label = SET;
         this.labelSet = labelSet;
     }
+
+	public Object clone() {
+		Label l;
+		try {
+			l = (Label)super.clone();
+			l.label = this.label;
+            l.labelSet = new IntervalSet();
+			l.labelSet.addAll(this.labelSet);
+		}
+		catch (CloneNotSupportedException e) {
+			throw new InternalError();
+		}
+		return l;
+	}
+
+	/* not used?
+	public Label(Label l) {
+		this.label = l.label;
+		this.labelSet = l.labelSet;
+		this.labelSet = new IntervalSet();
+		this.labelSet.addAll(labelSet);
+	}
+	*/
+
+	public void add(Label a) {
+		if ( isAtom() ) {
+			labelSet = IntervalSet.of(label);
+			label=SET;
+			if ( a.isAtom() ) {
+				labelSet.add(a.getAtom());
+			}
+			else if ( a.isSet() ) {
+				labelSet.addAll(a.getSet());
+			}
+			else {
+				throw new IllegalStateException("can't add element to Label of type "+label);
+			}
+			return;
+		}
+		if ( isSet() ) {
+			if ( a.isAtom() ) {
+				labelSet.add(a.getAtom());
+			}
+			else if ( a.isSet() ) {
+				labelSet.addAll(a.getSet());
+			}
+			else {
+				throw new IllegalStateException("can't add element to Label of type "+label);
+			}
+			return;
+		}
+		throw new IllegalStateException("can't add element to Label of type "+label);
+	}
 
     public boolean isAtom() {
         return label>=MIN_ATOM_VALUE;

@@ -191,7 +191,7 @@ element
     |   ebnf
     |   tree
     |   #( SYNPRED block[true] ) {out("=>");}
-    |   a:ACTION  {out(a.getText());}
+    |   a:ACTION  {out("{"); out(a.getText()); out("}");}
     |	lexer_action
     |   SEMPRED
     |   EPSILON {out(" epsilon ");}

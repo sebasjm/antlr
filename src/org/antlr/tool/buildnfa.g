@@ -325,6 +325,7 @@ atom returns [StateCluster g=null]
         if ( start!=null ) {
             int ruleIndex = grammar.getRuleIndex(r.getText());
             g = factory.build_RuleRef(ruleIndex, start);
+            r.followingNFAState = g.right;
             if ( g.left.transition(0) instanceof RuleClosureTransition ) {
                 addFollowTransition(r.getText(), g.right);
             }

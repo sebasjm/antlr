@@ -27,8 +27,6 @@
 */
 package org.antlr.analysis;
 
-import java.util.List;
-
 /** A generic state machine state. */
 public abstract class State {
     public static final int INVALID_STATE_NUMBER = -1;
@@ -45,8 +43,6 @@ public abstract class State {
     public abstract void addTransition(Transition e);
 
     public abstract Transition transition(int i);
-
-    public abstract List getTransitions();
 
 	public boolean isAcceptState() {
 		return acceptState;

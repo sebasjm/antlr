@@ -1,6 +1,8 @@
 package org.antlr.tool;
 
 import org.antlr.misc.BitSet;
+import org.antlr.misc.IntervalSet;
+import org.antlr.misc.IntSet;
 
 /** An LL(1) lookahead set; contains a set of token types and a "hasEOF"
  *  condition when the set contains EOF.  Since EOF is -1 everywhere and -1
@@ -8,23 +10,24 @@ import org.antlr.misc.BitSet;
  *  reasons in the future to abstract a LookaheadSet over a raw BitSet.
  */
 public class LookaheadSet {
-	public BitSet tokenTypeSet;
+	public IntSet tokenTypeSet;
 	public boolean hasEOF;
 
 	public LookaheadSet() {
+		tokenTypeSet = new IntervalSet();
 	}
 
-	public LookaheadSet(BitSet s) {
-		tokenTypeSet = s;
+	public LookaheadSet(IntSet s) {
+		this();
+		tokenTypeSet.addAll(s);
+	}
+
+	public LookaheadSet(int atom) {
+		tokenTypeSet = IntervalSet.of(atom);
 	}
 
 	public void orInPlace(LookaheadSet other) {
-		if ( this.tokenTypeSet==null ) {
-			this.tokenTypeSet = other.tokenTypeSet;
-		}
-		else {
-			this.tokenTypeSet.orInPlace(other.tokenTypeSet);
-		}
+		this.tokenTypeSet.addAll(other.tokenTypeSet);
 		this.hasEOF = this.hasEOF || other.hasEOF;
 	}
 

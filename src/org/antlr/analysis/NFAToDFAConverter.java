@@ -36,6 +36,9 @@ import java.util.*;
 
 /** Code that embodies the NFA conversion to DFA. */
 public class NFAToDFAConverter {
+	public static boolean COLLAPSE_ALL_INCIDENT_EDGES = false;
+	public static boolean MERGE_STOP_STATES = false;
+
 	/** A list of DFA states we still need to process during NFA conversion */
 	protected List work = new LinkedList();
 
@@ -66,8 +69,7 @@ public class NFAToDFAConverter {
 
 	public void convert(NFAState blockStart) {
 		// create the DFA start state
-		DFAState startState = getStartState();
-		dfa.setStartState(startState);
+		dfa.startState = computeStartState();
 
 		// while more DFA states to check, process them
 		while ( !terminate && work.size()>0 ) {
@@ -99,7 +101,7 @@ public class NFAToDFAConverter {
 	 *  when nongreedy and EOT transition.  Make state with EOT emanating
 	 *  from it the accept state.
 	 */
-	protected DFAState getStartState() {
+	protected DFAState computeStartState() {
 		NFAState alt = dfa.decisionNFAStartState;
 		DFAState startState = dfa.newState();
 		int i = 0;
@@ -196,6 +198,9 @@ public class NFAToDFAConverter {
 
 		// for each label that could possibly emanate from NFAStates of d
 		int numberOfEdgesEmanating = 0;
+		Map targetToLabelMap = new HashMap();
+		//int previousTarget=0; // cache last target
+		//System.out.println("find new states from DFA state "+d.stateNumber);
 		for (int i=0; i<labels.size(); i++) {
 			Label label = (Label)labels.get(i);
 			DFAState t = reach(d, label);
@@ -210,13 +215,45 @@ public class NFAToDFAConverter {
 			closure(t);  // add any NFA states reachable via epsilon
 			/*
 			System.out.println("DFA state after closure "+d+"-"+
-					label.toString(nfa.getGrammar())+
-					"->"+t);
+							   label.toString(dfa.nfa.grammar)+
+							   "->"+t);
 			*/
 			DFAState targetState = addDFAState(t); // add if not in DFA yet
-			numberOfEdgesEmanating++;
-			// make a transition from d to t upon 'a'
-			d.addTransition(targetState, label);
+
+			//System.out.println(d.stateNumber+"-"+label.toString(dfa.nfa.grammar)+"->"+targetState.stateNumber);
+			if ( COLLAPSE_ALL_INCIDENT_EDGES ) {
+				// TODO: heh, might need to add pred transitions! do this later?
+				// track which targets we've hit
+				Integer tI = new Integer(targetState.stateNumber);
+				Transition oldTransition = (Transition)targetToLabelMap.get(tI);
+				if ( oldTransition!=null ) {
+					Label oldLabel = oldTransition.label;
+					//System.out.println("extra transition to "+tI+" upon "+label.toString(dfa.nfa.grammar));
+					// already seen state d to target transition, just add label
+					// to old label
+					if ( label.getAtom()!=Label.EOT ) {
+						// must not alter labels obtained from the NFA; clone, add
+						//oldTransition.label = (Label)oldLabel.clone();
+						oldTransition.label.add(label);
+						System.out.println("label updated to be "+oldLabel.toString(dfa.nfa.grammar));
+					}
+				}
+				else {
+					// make a transition from d to t upon 'a'
+					numberOfEdgesEmanating++;
+					label = (Label)label.clone(); // clone in case we alter later
+					int transitionIndex = d.addTransition(targetState, label);
+					Transition trans = d.getTransition(transitionIndex);
+					// track target/transition pairs
+					if ( label.getAtom()!=Label.EOT ) {
+						targetToLabelMap.put(tI, trans);
+					}
+				}
+			}
+			else {
+				numberOfEdgesEmanating++;
+				d.addTransition(targetState, label);
+			}
 		}
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
@@ -677,16 +714,31 @@ public class NFAToDFAConverter {
         resolveNonDeterminisms(d);
 
         // If deterministic, don't add this state; it's an accept state
-        // for further processing--just return as a valid DFA state
-        if ( d.getUniquelyPredictedAlt()!=NFA.INVALID_ALT_NUMBER ) {
-            // everything is cool
-            d.setAcceptState(true);
-            /*
-            System.out.println("state "+d.getStateNumber()+" uniquely predicts alt "+
-                    d.getUniquelyPredictedAlt());
-                    */
-        }
-        else {
+        // Just return as a valid DFA state
+		int alt = d.getUniquelyPredictedAlt();
+		if ( alt!=NFA.INVALID_ALT_NUMBER ) {
+			if ( MERGE_STOP_STATES ) {
+				// check to see if we already have an accept state for this alt
+				// [must do this after we resolve nondeterminisms in general]
+				DFAState acceptStateForAlt = dfa.getAcceptState(alt);
+				if ( acceptStateForAlt!=null ) {
+					dfa.removeState(d);    // oops; remove this state from DFA
+					d = acceptStateForAlt; // use old accept state; throw this one out
+				}
+				else {
+					d.setAcceptState(true); // new accept state for alt
+					dfa.setAcceptState(alt, d);
+				}
+			}
+			else {
+				d.setAcceptState(true); // new accept state for alt
+			}
+			/*
+			System.out.println("state "+d.getStateNumber()+" uniquely predicts alt "+
+			d.getUniquelyPredictedAlt());
+			*/
+		}
+		else {
             // unresolved, add to work list to continue NFA conversion
             work.add(d);
         }

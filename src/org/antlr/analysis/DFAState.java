@@ -62,6 +62,7 @@ import java.util.*;
  */
 public class DFAState extends State {
     public static final int INITIAL_NUM_TRANSITIONS = 8;
+	public static final int PREDICTED_ALT_UNSET = NFA.INVALID_ALT_NUMBER-1;
 
     /** We are part of what DFA?  Use this ref to get access to the
      *  context trees for an alt.
@@ -97,6 +98,8 @@ public class DFAState extends State {
      *  are added as it's monotonically increasing list of configurations.
      */
     protected int cachedHashCode;
+
+	protected int cachedUniquelyPredicatedAlt = PREDICTED_ALT_UNSET;
 
     /** The set of NFA configurations (state,alt,context) for this DFA state */
     protected Set nfaConfigurations = new HashSet();
@@ -134,12 +137,16 @@ public class DFAState extends State {
         transitions.add(t);
     }
 
-    public void addTransition(DFAState target, Label label) {
+	/** Add a transition from this state to target with label.  Return
+	 *  the transition number from 0..n-1.
+	 */
+    public int addTransition(DFAState target, Label label) {
         transitions.add( new Transition(label, target) );
+		return transitions.size()-1;
     }
 
-    public List getTransitions() {
-        return transitions;
+    public Transition getTransition(int trans) {
+        return (Transition)transitions.get(trans);
     }
 
     /** Add an NFA configuration to this DFA node.  Add uniquely
@@ -333,6 +340,7 @@ public class DFAState extends State {
         Iterator iter = this.nfaConfigurations.iterator();
         while (iter.hasNext()) {
             NFAConfiguration myConfig = (NFAConfiguration) iter.next();
+			// TODO: remove this string cat
             myPairs.add(myConfig.state+"|"+myConfig.alt);
         }
         iter = other.nfaConfigurations.iterator();
@@ -353,6 +361,9 @@ public class DFAState extends State {
      *  emanating from it.
      */
     public int getUniquelyPredictedAlt() {
+		if ( cachedUniquelyPredicatedAlt!=PREDICTED_ALT_UNSET ) {
+			return cachedUniquelyPredicatedAlt;
+		}
         int alt = NFA.INVALID_ALT_NUMBER;
         Iterator iter = nfaConfigurations.iterator();
         NFAConfiguration configuration;
@@ -371,6 +382,7 @@ public class DFAState extends State {
                 return NFA.INVALID_ALT_NUMBER;
             }
         }
+		this.cachedUniquelyPredicatedAlt = alt;
         return alt;
     }
 

@@ -77,6 +77,11 @@ public class DFA {
      */
     protected List unreachableAlts;
 
+	/** We only want one accept state per predicted alt; track here */
+	protected DFAState[] altToAcceptState;
+
+	protected int nAlts = 0;
+
     /** Which NFA are we converting (well, which piece of the NFA)? */
     public NFA nfa;
 
@@ -118,10 +123,9 @@ public class DFA {
     public DFA(NFAState decisionStartState) {
         this.decisionNFAStartState = decisionStartState;
         nfa = decisionStartState.getNFA();
-        int nAlts =
-            nfa.grammar.getNumberOfAltsForDecisionNFA(decisionStartState);
+        nAlts = nfa.grammar.getNumberOfAltsForDecisionNFA(decisionStartState);
         setOptions( nfa.grammar.getDecisionOptions(getDecisionNumber()) );
-        initUnreachableAlts(nAlts);
+        initAltRelatedInfo();
 
         nfaConverter = new NFAToDFAConverter(this);
 		nfaConverter.convert(decisionStartState);
@@ -142,10 +146,6 @@ public class DFA {
 		return interp.predict(this);
 	}
 
-	public void setStartState(DFAState startState) {
-		this.startState = startState;
-	}
-
 	/** Add a new DFA state to this DFA if not already present.
      *  If the DFA state uniquely predicts a single alternative, it
      *  becomes a stop state; don't add to work list.  Further, if
@@ -164,6 +164,17 @@ public class DFA {
         states.put(d,d);
         numberOfStates++;
 		return d;
+	}
+
+	public void removeState(DFAState d) {
+		DFAState it = (DFAState)states.remove(d);
+		if ( it!=null ) {
+			numberOfStates--;
+		}
+	}
+
+	public Map getStates() {
+		return states;
 	}
 
 	/** Is the DFA reduced?  I.e., does every state have a path to an accept
@@ -283,7 +294,15 @@ public class DFA {
         return decisionNFAStartState;
     }
 
-    public int getDecisionNumber() {
+	public DFAState getAcceptState(int alt) {
+		return altToAcceptState[alt];
+	}
+
+	public void setAcceptState(int alt, DFAState acceptState) {
+		altToAcceptState[alt] = acceptState;
+	}
+
+	public int getDecisionNumber() {
         return decisionNFAStartState.getDecisionNumber();
     }
 
@@ -323,11 +342,12 @@ public class DFA {
         return numberOfStates;
     }
 
-    protected void initUnreachableAlts(int numberOfAlts) {
+    protected void initAltRelatedInfo() {
         unreachableAlts = new LinkedList();
-        for (int i = 1; i <= numberOfAlts; i++) {
+        for (int i = 1; i <= nAlts; i++) {
             unreachableAlts.add(new Integer(i));
         }
+		altToAcceptState = new DFAState[nAlts+1];
     }
 
 	/** EOT (end of token) is a label that indicates when the DFA conversion

@@ -65,7 +65,8 @@ public class BitSet implements Cloneable {
         bits = new long[((nbits - 1) >> LOG_BITS) + 1];
     }
 
-    public BitSet and(BitSet a) {
+    /*
+	public BitSet and(BitSet a) {
         BitSet s = (BitSet)this.clone();
         s.andInPlace((BitSet)a);
         return s;
@@ -81,6 +82,32 @@ public class BitSet implements Cloneable {
             bits[i] = 0;
         }
     }
+	*/
+
+	public void orInPlace(BitSet a) {
+		if ( a==null ) {
+			return;
+		}
+		// If this is smaller than a, grow this first
+		if (a.bits.length > bits.length) {
+			setSize(a.bits.length);
+		}
+		int min = Math.min(bits.length, a.bits.length);
+		for (int i = min - 1; i >= 0; i--) {
+			bits[i] |= a.bits[i];
+		}
+	}
+
+	/**
+	 * Sets the size of a set.
+	 * @param nwords how many words the new set should be
+	 */
+	private void setSize(int nwords) {
+		long newbits[] = new long[nwords];
+		int n = Math.min(nwords, bits.length);
+		System.arraycopy(bits, 0, newbits, 0, n);
+		bits = newbits;
+	}
 
     private final static long bitMask(int bitNumber) {
         int bitPosition = bitNumber & MOD_MASK; // bitNumber mod BITS
@@ -180,10 +207,12 @@ public class BitSet implements Cloneable {
     }
 
     /**Is this contained within a? */
-    public boolean subset(BitSet a) {
+    /*
+	public boolean subset(BitSet a) {
         if (a == null || !(a instanceof BitSet)) return false;
         return this.and(a).equals(this);
     }
+	*/
 
     public int[] toArray() {
         int[] elems = new int[size()];
