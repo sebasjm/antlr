@@ -66,6 +66,10 @@ PARSER_RULES_NOT_ALLOWED(arg) ::=
 	"<loc()>parser rule <arg> not allowed in lexer"
 CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL(arg) ::=
 	"cannot find an attribute name in attribute declaration"
+NO_TOKEN_DEFINITION(file,line,col,arg) ::= 
+	"<loc()>no lexer rule corresponding to token: <arg>"
+UNDEFINED_RULE_REF(file,line,col,arg) ::= 
+	"<loc()>reference to undefined rule: <arg>"
 
 // GRAMMAR WARNINGS
 GRAMMAR_AMBIGUITY() ::= "grammar ambig"
@@ -74,5 +78,3 @@ GRAMMAR_AMBIGUITY() ::= "grammar ambig"
  * enclosing template; don't manually pass stuff in.
  */
 loc() ::= "<file>:<line>:<col>: "
-
-
