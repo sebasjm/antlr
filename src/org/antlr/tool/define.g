@@ -41,6 +41,10 @@ options {
 }
 
 {
+protected Grammar grammar;
+protected GrammarAST root;
+protected List lexerRules = new LinkedList();
+
 	/** Parser error-reporting function can be overridden in subclass */
 	public void reportError(RecognitionException ex) {
 		System.out.println("define rules: "+ex.toString());
@@ -51,17 +55,49 @@ options {
 		System.out.println("define rules: error: " + s);
 	}
 
-protected Grammar grammar;
+	/** Remove any lexer rules from a COMBINED; already passed to lexer */
+	protected void trimGrammar() {
+		if ( grammar.getType()!=Grammar.COMBINED ) {
+			return;
+		}
+		// form is ( grammar ID ... ( rule ... ) ( rule ... ) ... )
+		GrammarAST p = (GrammarAST)root.getFirstChild();
+		// look for first RULE def
+		GrammarAST prev = p; // points to the ID (grammar name)
+		p = (GrammarAST)p.getNextSibling(); // either first rule or options etc ...
+		while ( p.getType()!=RULE ) {
+			prev = p;
+			p = (GrammarAST)p.getNextSibling();
+		}
+		// prev points at last node before first rule subtree at this point
+		while ( p!=null ) {
+			String ruleName = p.getFirstChild().getText();
+			System.out.println("rule "+ruleName+" prev="+prev.getText());
+			if ( Character.isUpperCase(ruleName.charAt(0)) ) {
+				// remove lexer rule
+				prev.setNextSibling(p.getNextSibling());
+			}
+			else {
+				prev = p; // non-lexer rule; move on
+			}
+			p = (GrammarAST)p.getNextSibling();
+		}
+		//System.out.println("root after removal is: "+root.toStringList());
+	}
 }
 
 grammar[Grammar g]
-{this.grammar = g;}
+{
+grammar = g;
+root = #grammar;
+}
     :   (headerSpec)*
 	    ( #( LEXER_GRAMMAR 	  {grammar.setType(Grammar.LEXER);} 	  grammarSpec )
 	    | #( PARSER_GRAMMAR   {grammar.setType(Grammar.PARSER);}      grammarSpec )
 	    | #( TREE_GRAMMAR     {grammar.setType(Grammar.TREE_PARSER);} grammarSpec )
 	    | #( COMBINED_GRAMMAR {grammar.setType(Grammar.COMBINED);}    grammarSpec )
 	    )
+	    {trimGrammar();}
     ;
 
 headerSpec
@@ -141,12 +177,13 @@ Map opts=null;
 			 grammar.getType()==Grammar.COMBINED )
 		{
 			// a merged grammar spec, track lexer rules and send to another grammar
-			System.out.println("rule tree is:\n"+#rule.toStringTree());
+			//System.out.println("rule tree is:\n"+#rule.toStringTree());
 			ANTLRTreePrinter printer = new ANTLRTreePrinter();
 			printer.setASTNodeClass("org.antlr.tool.GrammarAST");
 			String ruleText = printer.toString(#rule);
-			System.out.println("rule text is:\n"+ruleText);
+			//System.out.println("rule text is:\n"+ruleText);
 			grammar.defineLexerRuleFoundInParser(name, ruleText);
+			lexerRules.add(#rule); // track rules to remove from parser later
 		}
 		else {
 			grammar.defineRule(#id.getToken(), mod, opts, #rule);

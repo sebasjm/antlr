@@ -49,7 +49,7 @@ public class Grammar {
     public static final int INVALID_RULE_INDEX = -1;
 
     public static final String TOKEN_RULENAME = "Tokens";
-	public static final String NONTOKEN_LEXER_RULE_MODIFIER = "fragment";
+	public static final String FRAGMENT_RULE_MODIFIER = "fragment";
 
     public static final int LEXER = 1;
     public static final int PARSER = 2;
@@ -332,12 +332,12 @@ public class Grammar {
             Rule r = (Rule) iter.next();
 			// only add real token rules to Tokens rule
 			if ( r.modifier==null ||
-				 !r.modifier.equals(NONTOKEN_LEXER_RULE_MODIFIER) )
+				 !r.modifier.equals(FRAGMENT_RULE_MODIFIER) )
 			{
             	matchTokenRuleST.setAttribute("rules", r.name);
 			}
         }
-		System.out.println("tokens rule: "+matchTokenRuleST.toString());
+		//System.out.println("tokens rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
@@ -392,6 +392,7 @@ public class Grammar {
      */
 
     public void createNFAs() {
+		System.out.println("### create NFAs");
 		nfa = new NFA(this); // create NFA that TreeToNFAConverter'll fill in
 		NFAFactory factory = new NFAFactory(nfa);
 		TreeToNFAConverter nfaBuilder = new TreeToNFAConverter(this, nfa, factory);
@@ -426,6 +427,7 @@ public class Grammar {
 	 *  TODO: generate NFA as option or another method
      */
     public void createLookaheadDFAs() {
+		System.out.println("### create DFAs");
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
             NFAState decisionStartState = getDecisionNFAStartState(decision);
             if ( decisionStartState.getNumberOfTransitions()>1 ) {
@@ -464,20 +466,24 @@ public class Grammar {
      *  operation to set up tokens with specific values.
      */
     public void defineToken(String text, int tokenType) {
-        //System.out.println("defining token "+text+" at type="+tokenType);
-        int index = Label.NUM_FAUX_LABELS+(tokenType)-Label.MIN_TOKEN_TYPE;
+		// the index in the typeToTokenList table is actually shifted by
+		// NUM_FAUX_LABELS as you cannot have negative indices.
+		// For example, EOT is 6+-2-1 == 4
         if ( text.charAt(0)=='"' ) {
             stringLiteralToTypeMap.put(text, new Integer(tokenType));
         }
         else if ( text.charAt(0)=='\'' ) {
             charLiteralToTypeMap.put(text, new Integer(tokenType));
-            index = tokenType; // for char, token type is as sent in
         }
         else { // must be a label like ID
             tokenNameToTypeMap.put(text, new Integer(tokenType));
         }
+		int index = Label.NUM_FAUX_LABELS+(tokenType)-Label.MIN_TOKEN_TYPE;
+		//System.out.println("defining token "+text+" at type="+tokenType+", index="+index);
 		this.maxTokenType = Math.max(this.maxTokenType, tokenType);
-        typeToTokenList.setSize(index+1);
+        if ( index>=typeToTokenList.size() ) {
+			typeToTokenList.setSize(index+1);
+		}
         typeToTokenList.set(index, text);
     }
 
@@ -523,9 +529,11 @@ public class Grammar {
 						  GrammarAST tree)
 	{
 		String ruleName = ruleToken.getText();
-        System.out.println("defineRule("+ruleName+",modifier="+modifier+
+		/*
+		System.out.println("defineRule("+ruleName+",modifier="+modifier+
 						   "): index="+ruleIndex);
-        /*
+		*/
+		/*
 		if ( getRule(ruleName)!=null ) {
             ErrorManager.grammarError(ErrorManager.MSG_RULE_REDEFINITION,
 									  this,
@@ -577,7 +585,7 @@ public class Grammar {
 									computeTokenNameFromLiteral(tokenType,literal),
 									new Integer(tokenType),
 									literal);
-		defineToken(computeTokenNameFromLiteral(tokenType, literal), tokenType);
+		//defineToken(computeTokenNameFromLiteral(tokenType, literal), tokenType);
 	}
 
 	public void defineLexerRuleForCharLiteral(String literal, int tokenType) {
@@ -585,7 +593,7 @@ public class Grammar {
 									computeTokenNameFromLiteral(tokenType,literal),
 									new Integer(tokenType),
 									literal);
-		defineToken(computeTokenNameFromLiteral(tokenType, literal), tokenType);
+		//defineToken(computeTokenNameFromLiteral(tokenType, literal), tokenType);
 	}
 
 	protected Rule getRule(String ruleName) {
@@ -622,6 +630,7 @@ public class Grammar {
             I = (Integer)tokenNameToTypeMap.get(tokenName);
         }
         int i = (I!=null)?I.intValue():Label.INVALID;
+		//System.out.println("grammar type "+getType()+" "+tokenName+"->"+i);
         return i;
     }
 
@@ -646,30 +655,36 @@ public class Grammar {
 	}
 
 	public String getTokenName(int ttype) {
+		String tokenName = null;
+		int index=0;
 		// inside char range and lexer grammar?
-		if ( this.type==LEXER && ttype >= Label.MIN_LABEL_VALUE && ttype <= '\uFFFF' ) {
-			return getUnicodeEscapeString(ttype);
+		if ( this.type==LEXER && ttype >= Label.MIN_LABEL_VALUE && ttype <= '\uFFFE' ) {
+			tokenName = getUnicodeEscapeString(ttype);
 		}
 		// faux label?
-		if ( ttype<Label.MIN_LABEL_VALUE ) {
-			return (String)typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
-        }
-        int index = ttype-Label.MIN_TOKEN_TYPE; // normalize index to 0..n
-        index += Label.NUM_FAUX_LABELS;         // jump over faux tokens
+		else if ( ttype<Label.MIN_LABEL_VALUE ) {
+			tokenName = (String)typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
+		}
+		else {
+			index = ttype-Label.MIN_TOKEN_TYPE; // normalize index to 0..n
+			index += Label.NUM_FAUX_LABELS;         // jump over faux tokens
 
-        String tokenName = null;
-        if ( index<typeToTokenList.size() ) {
-            tokenName = (String)typeToTokenList.get(index);
-        }
-        else {
-            tokenName = String.valueOf(ttype);
-        }
-        return tokenName;
-    }
+			if ( index<typeToTokenList.size() ) {
+				tokenName = (String)typeToTokenList.get(index);
+			}
+			else {
+				tokenName = String.valueOf(ttype);
+			}
+		}
+		ErrorManager.assertTrue(tokenName!=null,
+								"null token name; ttype="+ttype+" tokens="+typeToTokenList);
+		//System.out.println("ttype="+ttype+", index="+index+", name="+tokenName);
+		return tokenName;
+	}
 
     public String getTokenTypeAsLabel(int ttype) {
         String name = getTokenName(ttype);
-        if ( name.charAt(0)=='"' ) {
+        if ( name.charAt(0)=='"' || name.charAt(0)=='\'' ) {
             return String.valueOf(ttype);
         }
         if ( ttype==Label.EOF ) {

@@ -33,20 +33,20 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class CommonTokenStream implements TokenStream {
-    protected TokenSource input;
+    protected TokenSource tokenSource;
     protected List tokens;
 	/** Skip tokens on any channel but this one; this is how we skip whitespace... */
 	protected int channel = Token.DEFAULT_CHANNEL;
     protected int p = 0;
 
-    public CommonTokenStream(TokenSource input) throws TokenStreamException {
+    public CommonTokenStream(TokenSource tokenSource) throws TokenStreamException {
         tokens = new ArrayList();
-        this.input = input;
+        this.tokenSource = tokenSource;
         // suck in all the input tokens
-        Token t = input.nextToken();
+        Token t = tokenSource.nextToken();
         while ( t!=null && t.getType()!=CharStream.EOF ) {
             tokens.add(t);
-            t = input.nextToken();
+            t = tokenSource.nextToken();
         }
     }
 
@@ -121,6 +121,10 @@ public class CommonTokenStream implements TokenStream {
         p = marker;
     }
 
+	public TokenSource getTokenSource() {
+		return tokenSource;
+	}
+
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < tokens.size(); i++) {
@@ -128,7 +132,7 @@ public class CommonTokenStream implements TokenStream {
 			if ( i>0 ) {
 				buf.append(' ');
 			}
-			buf.append(t.toString(input.getCharStream()));
+			buf.append(t.toString(tokenSource.getCharStream()));
 		}
 		return buf.toString();
 	}

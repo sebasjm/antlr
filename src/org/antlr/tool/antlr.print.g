@@ -156,12 +156,15 @@ rules
     ;
 
 rule
-    :   #( RULE id:ID {out(#id.getText()+" : ");}
-           (modifier)? (optionsSpec)? b:block[false] EOR {out(";\n");}
+    :   #( RULE id:ID
+           (modifier)?
+           {out(#id.getText()+" : ");}
+           (optionsSpec)? b:block[false] EOR {out(";\n");}
          )
     ;
 
 modifier
+{out(#modifier.getText()); out(" ");}
 	:	"protected"
 	|	"public"
 	|	"private"

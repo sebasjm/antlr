@@ -84,7 +84,7 @@ public class ClassFile {
 		protected Map labels = new HashMap();
 		int[] code;
 		int maxStack = 0;
-		int maxLocals = 2;
+		int maxLocals = 2; // one local (int c) and one parameter (IntStream)
 		public String toString() {
 			return "method "+name+" "+signature;
 		}
@@ -234,6 +234,23 @@ public class ClassFile {
 			"s0e3_skip:\n" +
 			"    goto errorState\n"
 		;
+		dfaAssemblyCode =
+			".method <init> ()V 1\n" +
+			"aload 0\n" +
+			"invokespecial java/lang/Object.<init>()V\n"+
+			"return\n"+
+			".method DFA3 (Lorg/antlr/runtime/CharStream;)I 2\n" +
+			"back:" +
+			"    iload 1\n" +
+			"    iconst 48\n" +
+			"    if_icmplt F\n" +
+			"    iload 1\n" +
+			"    iconst 57\n" +
+			"    if_icmpgt F\n" +
+			"    goto back\n" +
+			"F:\n" +
+			"\n" +
+			"    return\n";
 		ClassFile code = new ClassFile(null,
 									   null,
 									   "DFA",
@@ -329,8 +346,7 @@ public class ClassFile {
 		catch (IOException ioe) {
 			// can't be called since strings aren't doing IO
 			// better print a warning anyhoo
-			ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR,
-							   ioe);
+			ErrorManager.internalError("IO error in StringReader?", ioe);
 		}
 	}
 

@@ -164,7 +164,7 @@ rule
            }
            else {
 				if ( Character.isLowerCase(r.charAt(0)) ||
-					 grammar.getType()!=Grammar.COMBINED )
+					 grammar.getType()==Grammar.LEXER )
 				{
 					// attach start node to block for this rule
 					NFAState start = grammar.getRuleStartState(r);
@@ -353,9 +353,27 @@ atom returns [StateCluster g=null]
         }
         }
 
-    |   c:CHAR_LITERAL   {g = factory.build_CharLiteralAtom(c.getText());}
+    |   c:CHAR_LITERAL
+    	{
+    	if ( grammar.getType()==Grammar.LEXER ) {
+    		g = factory.build_CharLiteralAtom(c.getText());
+    	}
+    	else {
+            int tokenType = grammar.getTokenType(c.getText());
+            g = factory.build_Atom(tokenType);
+    	}
+    	}
 
-    |   s:STRING_LITERAL {g = factory.build_StringLiteralAtom(s.getText());}
+    |   s:STRING_LITERAL
+    	{
+     	if ( grammar.getType()==Grammar.LEXER ) {
+     		g = factory.build_StringLiteralAtom(s.getText());
+     	}
+     	else {
+             int tokenType = grammar.getTokenType(s.getText());
+             g = factory.build_Atom(tokenType);
+     	}
+     	}
 
     |   WILDCARD         {g = factory.build_Wildcard();}
 

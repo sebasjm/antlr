@@ -492,7 +492,7 @@ public class NFAFactory {
 			String modifier = nfa.getGrammar().getRuleModifier(ruleName);
             if ( ruleName.equals(Grammar.TOKEN_RULENAME) ||
 				 (modifier!=null &&
-				  modifier.equals(Grammar.NONTOKEN_LEXER_RULE_MODIFIER)) )
+				  modifier.equals(Grammar.FRAGMENT_RULE_MODIFIER)) )
 			{
                 continue; // don't loop to yourself or do nontoken rules
             }

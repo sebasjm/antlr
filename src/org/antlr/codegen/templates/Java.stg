@@ -64,10 +64,10 @@ public void <ruleName>(<args>)
 <endif>
 >>
 
-lexerRule(ruleName,isTokenRuleName,args,block,enterAction,exitAction) ::= <<
+lexerRule(ruleName,nakedBlock,args,block,enterAction,exitAction) ::= <<
 public void m<ruleName>(<args>)
 {
-<if(isTokenRuleName)>
+<if(nakedBlock)>
 	<block><\n>
 <else>
     int type = <ruleName>;
@@ -109,7 +109,7 @@ loop<decisionNumber>:
                 <if(LEXER)>
 		else System.err.println("line "+getLine()+": no viable alt in decision <decisionNumber> LA(1)=="+(char)input.LA(1));<\n>
                 <else>
-		else System.err.println("no viable alt in decision <decisionNumber> LT(1)=="+((TokenStream)input).LT(1));<\n>
+		else System.err.println("no viable alt in decision <decisionNumber> LT(1)=="+((TokenStream)input).LT(1).toString(((CommonTokenStream)input).getTokenSource().getCharStream()));<\n>
                 <endif>
         }
         cnt<decisionNumber>++;
@@ -187,7 +187,7 @@ else {
 <if(LEXER)>
     System.err.println("<description>: no viable alt line "+getLine()+" c='"+(char)input.LA(1)+"'");<\n>
 <else>
-    System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));<\n>
+    System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1).toString(((CommonTokenStream)input).getTokenSource().getCharStream()));<\n>
 <endif>
     input.consume();<\n>
 <endif>

@@ -20,8 +20,11 @@ cyclicDFA(decision,states,description) ::= <<
     goto s0
 errorState:
     getstatic java/lang/System.err Ljava/io/PrintStream;
-	ldc "DFA match error!"
-	invokevirtual java/io/PrintStream.println(Ljava/lang/String;)V
+    ldc "DFA match error c="
+    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
+    getstatic java/lang/System.err Ljava/io/PrintStream;
+    iload 1
+    invokevirtual java/io/PrintStream.println(I)V
     iconst 0
     ireturn
 <states>
@@ -78,12 +81,12 @@ lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
 ;	(i>=<lowerAsInt> && i\<=<upperAsInt>)
     iload 1
     iconst <lowerAsInt>
-    if_icmplt s<stateNumber>r<rangeNumber>_false
+    if_icmplt s<stateNumber>e<edgeNumber>r<rangeNumber>_false
     iload 1
     iconst <upperAsInt>
-    if_icmpgt s<stateNumber>r<rangeNumber>_false
-    goto s<stateNumber>e<edgeNumber>_transition
-s<stateNumber>r<rangeNumber>_false:<\n>
+    if_icmpgt s<stateNumber>e<edgeNumber>r<rangeNumber>_false
+    goto s<stateNumber>e<edgeNumber>_go
+s<stateNumber>e<edgeNumber>r<rangeNumber>_false:<\n>
 >>
 
 setTest(ranges) ::= <<

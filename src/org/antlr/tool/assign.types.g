@@ -120,25 +120,17 @@ protected int getNewTokenType() {
 	return type;
 }
 
+/** Track characters in any non-lexer rule */
 protected void trackChar(GrammarAST t) {
-	if ( grammar.getType()==Grammar.COMBINED &&
-	     Character.isLowerCase(currentRuleName.charAt(0)) )
-    {
+	if ( Character.isLowerCase(currentRuleName.charAt(0)) ) {
 		charLiterals.put(t.getText(), UNASSIGNED_IN_PARSER_RULE);
-	}
-	if ( grammar.getType()!=Grammar.LEXER ) {
-		charLiterals.put(t.getText(), UNASSIGNED);
 	}
 }
 
+/** Track string literals in any non-lexer rule */
 protected void trackString(GrammarAST t) {
-	if ( grammar.getType()==Grammar.COMBINED &&
-	     Character.isLowerCase(currentRuleName.charAt(0)) )
-    {
+	if ( Character.isLowerCase(currentRuleName.charAt(0)) ) {
 		stringLiterals.put(t.getText(), UNASSIGNED_IN_PARSER_RULE);
-	}
-	if ( grammar.getType()!=Grammar.LEXER ) {
-		stringLiterals.put(t.getText(), UNASSIGNED);
 	}
 }
 
@@ -149,7 +141,10 @@ protected void trackToken(GrammarAST t) {
 	}
 }
 
-protected void trackTokenRule(GrammarAST t, GrammarAST block) {
+protected void trackTokenRule(GrammarAST t,
+							  GrammarAST modifier,
+							  GrammarAST block)
+{
 	// imported token names might exist, only add if new
 	if ( grammar.getType()==Grammar.LEXER || grammar.getType()==Grammar.COMBINED ) {
 		if ( !Character.isUpperCase(t.getText().charAt(0)) ) {
@@ -258,16 +253,19 @@ protected void assignTypes() {
 	}
 
 	protected void aliasTokenNamesAndLiterals() {
-		Set s;
-		// walk aliases if any and assign types to aliased literals
-		s = aliases.keySet();
+		if ( grammar.getType()!=Grammar.COMBINED ) {
+			return; // strings/chars are never token types 'cept in combined
+		}
+		// walk aliases if any and assign types to aliased literals if literal
+		// was referenced
+		Set s = aliases.keySet();
 		for (Iterator it = s.iterator(); it.hasNext();) {
 			String tokenName = (String) it.next();
 			String literal = (String)aliases.get(tokenName);
-			if ( literal.charAt(0)=='"' ) {
+			if ( literal.charAt(0)=='"' && stringLiterals.get(literal)!=null ) {
 				stringLiterals.put(literal, tokens.get(tokenName));
 			}
-			else if ( literal.charAt(0)=='\'' ) {
+			else if ( literal.charAt(0)=='\'' && charLiterals.get(literal)!=null ) {
 				charLiterals.put(literal, tokens.get(tokenName));
 			}
 		}
@@ -478,8 +476,11 @@ rules
     ;
 
 rule
-    :   #( RULE id:ID {currentRuleName=#id.getText();} (optionsSpec)? (modifier)?
-           b:block EOR {trackTokenRule(id,b);}
+    :   #( RULE id:ID {currentRuleName=#id.getText();}
+           (m:modifier)?
+           (optionsSpec)?
+           b:block EOR
+           {trackTokenRule(#id,#m,#b);}
          )
     ;
 

@@ -165,9 +165,11 @@ StringTemplate rST;
 }
     :   (	rST=rule
     		{
-    		recognizerST.setAttribute("rules", rST);
-    		outputFileST.setAttribute("rules", rST);
-    		headerFileST.setAttribute("rules", rST);
+    		if ( rST!=null ) {
+				recognizerST.setAttribute("rules", rST);
+				outputFileST.setAttribute("rules", rST);
+				headerFileST.setAttribute("rules", rST);
+			}
     		}
    		)+
     ;
@@ -186,24 +188,36 @@ rule returns [StringTemplate code=null]
     DFA dfa = #rule.getChild(1).getLookaheadDFA();
 }
     :   #( RULE id:ID {r=#id.getText();}
-	( #(OPTIONS .) )?
-	(modifier)?
-	   b=block["block", dfa] EOR
+			( #(OPTIONS .) )?
+			(mod:modifier)?
+	     	b=block["block", dfa] EOR
          )
+        // do not generate lexer rules in combined grammar
         {
-        if ( grammar.getType()==Grammar.LEXER ) {
-        	code.setAttribute("isTokenRuleName",
-        	                  new Boolean(r.equals(Grammar.TOKEN_RULENAME)));
+        if ( grammar.getType()==Grammar.COMBINED &&
+             Character.isUpperCase(r.charAt(0)) )
+        {
+        	code = null; // kill this
         }
-        String trace = (String)grammar.getOption("trace");
-        if ( grammar.getType()!=Grammar.LEXER &&
-             trace!=null && trace.equals("true") )
-        { // use option for now not cmd-line; HIDEOUS, fix this with ST composition
-            code.setAttribute("enterAction", "System.out.println(\"enter "+r+"; LT(1)==\"+input.LT(1));");
-            code.setAttribute("exitAction", "System.out.println(\"exit "+r+"; LT(1)==\"+input.LT(1));");
+        else {
+			if ( grammar.getType()==Grammar.LEXER ) {
+		    	boolean naked =
+		    		r.equals(Grammar.TOKEN_RULENAME) ||
+		    	    (mod!=null&&mod.getText().equals(Grammar.FRAGMENT_RULE_MODIFIER));
+		    	code.setAttribute("nakedBlock", new Boolean(naked));
+			}
+			String trace = (String)grammar.getOption("trace");
+			if ( grammar.getType()!=Grammar.LEXER &&
+				 trace!=null && trace.equals("true") )
+			{ // TODO: use option for now not cmd-line; HIDEOUS, fix this with ST composition
+				code.setAttribute("enterAction",
+					"System.out.println(\"enter "+r+"; LT(1)==\"+input.LT(1));");
+				code.setAttribute("exitAction",
+					"System.out.println(\"exit "+r+"; LT(1)==\"+input.LT(1));");
+			}
+			code.setAttribute("ruleName", r);
+			code.setAttribute("block", b);
         }
-        code.setAttribute("ruleName", r);
-        code.setAttribute("block", b);
         }
     ;
 

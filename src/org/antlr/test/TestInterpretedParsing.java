@@ -94,7 +94,7 @@ public class TestInterpretedParsing extends TestSuite {
 		Interpreter lexEngine = new Interpreter(g, input);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
-		System.out.println("tokens="+tokens.toString());
+		//System.out.println("tokens="+tokens.toString());
 		Interpreter parseEngine = new Interpreter(pg, tokens);
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toString();

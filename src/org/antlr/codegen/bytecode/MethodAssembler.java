@@ -364,10 +364,12 @@ public class MethodAssembler {
 		int[] code = null;
 		String opcodeStr = elements[0];
 		String operand = elements[1];
+		/*
 		Label label = (Label)labels.get(operand);
 		if ( label==null ) {
-			label = referenceLabel(instr, operand, pc+1);
 		}
+		*/
+		Label label = referenceLabel(instr, operand, pc+1);
 
 		// goto offset is computed relative to byte 0 of the if_cmpXX instr
 		int offset = label.address - pc;
@@ -450,7 +452,7 @@ public class MethodAssembler {
 	protected Label defineLabel(String labelName) {
 		Label prevLabel = (Label)labels.get(labelName);
 		Label label = null;
-		if ( prevLabel==null ) { // note seen before
+		if ( prevLabel==null ) { // not seen before
 			label = new Label(labelName, pc);
 			labels.put(labelName, label);
 		}
@@ -475,16 +477,17 @@ public class MethodAssembler {
 	{
 		//System.out.println("Found ref of label "+labelName+"@"+pc);
 		Label label = (Label)labels.get(labelName);
-		if ( label!=null ) {
+		if ( label!=null && label.defined ) {
 			return label;
 		}
-		label = defineLabel(labelName);
+		if ( label==null ) {
+			label = defineLabel(labelName);
+		}
 		label.defined = false;
 		if ( label.forwardReferences==null ) {
 			label.forwardReferences = new LinkedList();
 		}
 		label.forwardReferences.add(instr);
-		//label.forwardReferences.add(new Integer(location));
 		return label;
 	}
 
@@ -499,12 +502,13 @@ public class MethodAssembler {
 				continue;
 			}
 			if ( label.forwardReferences!=null ) {
+				//System.out.println("forward refs for "+label+"="+label.forwardReferences);
 				for (int i = 0; i < label.forwardReferences.size(); i++) {
 					Instruction instr = (Instruction) label.forwardReferences.get(i);
 					int instructionStart = instr.address; // works for goto
+					//System.out.println("label ref in instr @ "+instr.address);
 					int offset = label.address - instructionStart;
 					//System.out.println("offset is "+offset);
-					//System.out.println("label ref at "+instr.address);
 					if ( instr.opcode==GOTO_W ) {
 						writeInt(code, instr.address+1, offset);
 					}
@@ -618,9 +622,9 @@ public class MethodAssembler {
 			}
 		}
 		catch (Exception e) {
-			ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR,
-							   "problem assembling bytecodes for '"+instr+"'",
-							   e);
+			ErrorManager.internalError(
+				"problem assembling bytecodes for '"+instr+"'",
+				e);
 		}
 		return elements;
 	}

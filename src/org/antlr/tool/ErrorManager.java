@@ -364,6 +364,41 @@ public class ErrorManager {
 		grammarError(msgID,g,parser,token,null,null);
 	}
 
+	public static void internalError(Object error, Throwable e) {
+		StackTraceElement location = getLastNonErrorManagerCodeLocation(e);
+		String msg = "Exception "+e+"@"+location+": "+error;
+		error(MSG_INTERNAL_ERROR, msg);
+	}
+
+	public static void internalError(Object error) {
+		StackTraceElement location =
+			getLastNonErrorManagerCodeLocation(new Exception());
+		String msg = location+": "+error;
+		error(MSG_INTERNAL_ERROR, msg);
+	}
+
+	/** Return first non ErrorManager code location for generating messages */
+	private static StackTraceElement getLastNonErrorManagerCodeLocation(Throwable e) {
+		StackTraceElement[] stack = e.getStackTrace();
+		int i = 0;
+		for (; i < stack.length; i++) {
+			StackTraceElement t = stack[i];
+			if ( t.toString().indexOf("ErrorManager")<0 ) {
+				break;
+			}
+		}
+		StackTraceElement location = stack[i];
+		return location;
+	}
+
+	// A S S E R T I O N  C O D E
+
+	public static void assertTrue(boolean condition, String message) {
+		if ( !condition ) {
+			internalError(message);
+		}
+	}
+
 	// S U P P O R T  C O D E
 
 	protected static boolean initIdToMessageNameMapping() {
