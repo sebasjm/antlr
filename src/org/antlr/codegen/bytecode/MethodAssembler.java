@@ -106,6 +106,7 @@ public class MethodAssembler {
 		nameToOpcode.put("goto", new Integer(167));
 		nameToOpcode.put("jsr", new Integer(168));
 		nameToOpcode.put("ret", new Integer(169));
+		nameToOpcode.put("lookupswitch", new Integer(171));
 		nameToOpcode.put("ireturn", new Integer(172));
 		nameToOpcode.put("return", new Integer(177));
 		nameToOpcode.put("getstatic", new Integer(178));
@@ -234,6 +235,10 @@ public class MethodAssembler {
 	protected int[] assembleSingleInstruction(Instruction instr)
 	{
 		String assemblyCode = instr.assemblyCode;
+		// special case: lookupswitch can be huge
+		if ( assemblyCode.indexOf("lookupswitch")>=0 ) {
+			return lookupswitch(instr);
+		}
 		int[] code = null;
 		String[] elements = getInstructionElements(assemblyCode);
 		String instrName = elements[0];
@@ -373,7 +378,7 @@ public class MethodAssembler {
 		int[] code = null;
 		String opcodeStr = elements[0];
 		String operand = elements[1];
-		Label label = referenceLabel(instr, operand, pc+1);
+		Label label = referenceLabel(instr, operand);
 
 		// goto offset is computed relative to byte 0 of the if_cmpXX instr
 		int offset = label.address - pc;
@@ -463,6 +468,46 @@ public class MethodAssembler {
 		return code;
 	}
 
+	/** lookupswitch s1_default 46/s1e3_go 59/s1e1_go 120/s1e2_go */
+	protected int[] lookupswitch(Instruction instr) {
+		int lookupSwitchPC = pc;
+		// FIRST: compute instruction size
+		// need default offset to be 4-byte (word) aligned relative to
+		// method start.  Pad after opcode with 0..3 bytes.
+		int padding = (4-1) - lookupSwitchPC%4;
+		int numCases = 0;
+		for (int c=0; c<instr.assemblyCode.length(); c++) {
+			if ( instr.assemblyCode.charAt(c)=='/' ) {
+				numCases++;
+			}
+		}
+		System.out.println("there are "+numCases+" cases");
+		int[] code = new int[(1+padding)+4+4+(2*4)*numCases];
+		// SECOND: parse instruction to get the value:label pairs
+		StringTokenizer tokenizer = new StringTokenizer(instr.assemblyCode," \t/");
+		tokenizer.nextToken(); // skip opcode
+		int a = 0;
+		code[a] = getOpcode("lookupswitch");
+		a += 1;
+		a += padding;
+		String defaultLabel = tokenizer.nextToken();
+		// write default branch address (relative jump)
+		writeInt(code, a, lookupAddress(defaultLabel)-lookupSwitchPC);
+		a += 4;
+		writeInt(code, a, numCases);
+		a += 4;
+		while ( tokenizer.hasMoreTokens() ) {
+			String value = tokenizer.nextToken();
+			String labelName = tokenizer.nextToken();
+			System.out.println(value+":"+labelName);
+			writeInt(code, a, Integer.parseInt(value));
+			a += 4;
+			writeInt(code, a, lookupAddress(labelName)-lookupSwitchPC);
+			a += 4;
+		}
+		return code;
+	}
+
 	// L A B E L S
 
 	protected Label defineLabel(String labelName) {
@@ -488,8 +533,7 @@ public class MethodAssembler {
 	}
 
 	protected Label referenceLabel(Instruction instr,
-								   String labelName,
-								   int location)
+								   String labelName)
 	{
 		//System.out.println("Found ref of label "+labelName+"@"+pc);
 		Label label = (Label)labels.get(labelName);
@@ -536,6 +580,17 @@ public class MethodAssembler {
 			}
 		}
 	}
+
+	public int lookupAddress(String labelName) {
+		Label label = (Label)labels.get(labelName);
+		if ( label!=null && label.defined ) {
+			return label.address;
+		}
+		ErrorManager.error(ErrorManager.MSG_BYTECODE_UNDEFINED_LABEL,
+						   labelName);
+		return 0;
+	}
+
 
 	// S U P P O R T
 

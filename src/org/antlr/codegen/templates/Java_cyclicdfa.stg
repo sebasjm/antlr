@@ -4,6 +4,7 @@ dfaDecision(decisionNumber,description) ::= <<
 int m<decisionNumber> = input.mark();
 <! the <name> attribute is inherited via the parser, lexer, ... !>
 alt<decisionNumber> = <name>_DFA.DFA<decisionNumber>(input);
+input.rewind(m<decisionNumber>);
 >>
 
 allCyclicDFAs(cyclicDFAs) ::= <<
@@ -25,12 +26,6 @@ cyclicDFA(decision,states,description) ::= <<
 ;    invokevirtual java/io/PrintStream.println(I)V
     goto s0
 errorState:
-;    getstatic java/lang/System.err Ljava/io/PrintStream;
-;    ldc "DFA match error c "
-;    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
-;    getstatic java/lang/System.err Ljava/io/PrintStream;
-;    iload 1
-;    invokevirtual java/io/PrintStream.println(I)V
     iconst 0
     ireturn
 <states>
@@ -102,6 +97,52 @@ s<stateNumber>e<edgeNumber>_skip:<\n>
 >>
 
 eotDFAEdge(targetStateNumber,edgeNumber) ::= <<
+    goto s<targetStateNumber><\n>
+>>
+
+// L O O K U P S W I T C H  (faster than if-then-else chain)
+
+cyclicDFAStateSwitch(stateNumber,labels,edges,
+                     needErrorClause,EOTTargetStateNumber) ::= <<
+s<stateNumber>:
+; edges have to come first so labels are defined; jump over to switch
+    goto s<stateNumber>_switch
+<edges>
+s<stateNumber>_default:
+<if(needErrorClause)>
+    getstatic java/lang/System.err Ljava/io/PrintStream;
+    ldc "DFA match error input="
+    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
+    getstatic java/lang/System.err Ljava/io/PrintStream;
+    aload 0
+    iconst 1
+    invokeinterface org/antlr/runtime/IntStream.LA(I)I 2
+    invokevirtual java/io/PrintStream.println(I)V
+    new org/antlr/runtime/NoViableAltException
+    dup
+    ldc "<description>"
+    iconst <decision>
+    iconst <stateNumber>
+    aload 0
+    invokespecial org/antlr/runtime/NoViableAltException.\<init>(Ljava/lang/String;IILorg/antlr/runtime/IntStream;)V
+    athrow
+    goto errorState<\n>
+<else>
+; when EOT is an edge label, can't have an error.  This is the default clause
+    goto s<EOTTargetStateNumber><\n>
+<endif>
+s<stateNumber>_switch:
+; jump to one of the previous edge labels based upon input.LA(1)
+    aload 0
+    iconst 1
+    invokeinterface org/antlr/runtime/IntStream.LA(I)I 2
+    lookupswitch s<stateNumber>_default <labels:{<it.value>/s<stateNumber>e<it.edgeNumber>_go}; separator=" "><\n>
+>>
+
+cyclicDFAEdgeSwitch(targetStateNumber, edgeNumber) ::= <<
+s<stateNumber>e<edgeNumber>_go:
+    aload 0
+    invokeinterface org/antlr/runtime/IntStream.consume()V 1
     goto s<targetStateNumber><\n>
 >>
 

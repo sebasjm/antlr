@@ -876,4 +876,25 @@ public class CodeGenerator {
         fw.close();
     }
 
+	/** You can generate a switch rather than if-then-else for a DFA state
+	 *  if there are no semantic predicates and the number of edge label
+	 *  values is small enough; e.g., don't generate a switch for a state
+	 *  containing an edge label such as 20..52330 (the resulting byte codes
+	 *  would overflow the method 65k limit probably).
+	 */
+	protected boolean canGenerateSwitch(DFAState s) {
+		int size = 0;
+		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
+			Transition edge = (Transition) s.transition(i);
+			if ( edge.label.isSemanticPredicate() ) {
+				return false;
+			}
+			size += edge.label.getSet().size();
+		}
+		if ( size>=MAX_SWITCH_CASE_LABELS ) {
+			return false;
+		}
+        return true;
+	}
+
 }

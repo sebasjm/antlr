@@ -327,9 +327,9 @@ public class ClassFile {
 					line = br.readLine();
 					continue;
 				}
-				String[] elements = MethodAssembler.getInstructionElements(line);
-				String op = elements[0];
-				if ( op.equals(".method") ) {
+				if ( line.indexOf("lookupswitch")>=0 ) {
+				}
+				else if ( line.indexOf(".method")>=0 ) {
 					Method method = new Method();
 					methodDescriptor(line, method);
 					lines = new ArrayList(INITIAL_LINES_PER_METHOD);
@@ -337,6 +337,7 @@ public class ClassFile {
 					dfaMethods.add(method);
 				}
 				else {
+					String[] elements = MethodAssembler.getInstructionElements(line);
 					extractConstantPoolItems(elements);
 				}
 				lines.add(line);

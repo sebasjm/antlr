@@ -35,12 +35,12 @@ public class ACyclicDFACodeGenerator {
 		}
 
 		// the default templates for generating a state and its edges
-		// usually this is an if-then-else structure
+		// can be an if-then-else structure or a switch
 		String dfaStateName = "dfaState";
 		String dfaLoopbackStateName = "dfaLoopbackState";
 		String dfaOptionalBlockStateName = "dfaOptionalBlockState";
 		String dfaEdgeName = "dfaEdge";
-		if ( canGenerateSwitch(s) ) {
+		if ( parent.canGenerateSwitch(s) ) {
 			dfaStateName = "dfaStateSwitch";
 			dfaLoopbackStateName = "dfaLoopbackStateSwitch";
 			dfaOptionalBlockStateName = "dfaOptionalBlockStateSwitch";
@@ -106,27 +106,6 @@ public class ACyclicDFACodeGenerator {
 			dfaST.setAttribute("eotPredictsAlt", new Integer(EOTPredicts));
 		}
 		return dfaST;
-	}
-
-	/** You can generate a switch rather than if-then-else for a state
-	 *  if there are no semantic predicates and the number of edge label
-	 *  values is small enough; e.g., don't generate a switch for a state
-	 *  containing an edge label such as 20..52330 (the resulting byte codes
-	 *  would overflow the method 65k limit probably).
-	 */
-	protected boolean canGenerateSwitch(DFAState s) {
-		int size = 0;
-		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
-			Transition edge = (Transition) s.transition(i);
-			if ( edge.label.isSemanticPredicate() ) {
-				return false;
-			}
-			size += edge.label.getSet().size();
-		}
-		if ( size>=parent.MAX_SWITCH_CASE_LABELS ) {
-			return false;
-		}
-        return true;
 	}
 }
 

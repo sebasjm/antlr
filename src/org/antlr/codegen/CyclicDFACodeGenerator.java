@@ -9,6 +9,10 @@ import org.antlr.analysis.Label;
 import org.antlr.misc.BitSet;
 import org.antlr.misc.IntSet;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class CyclicDFACodeGenerator {
 	protected CodeGenerator parent;
 
@@ -28,13 +32,13 @@ public class CyclicDFACodeGenerator {
 		int d = dfa.getDecisionNumber();
 		dfaST.setAttribute("decision", new Integer(d));
 		visited = new BitSet(dfa.getNumberOfStates());
-		walkFixedDFAGeneratingStateMachine(templates, dfaST, dfa.startState);
+		walkCyclicDFAGeneratingStateMachine(templates, dfaST, dfa.startState);
 		parent.decisionToMaxLookaheadDepth[dfa.getDecisionNumber()]
 			= Integer.MAX_VALUE;
 		return dfaST;
 	}
 
-	protected void walkFixedDFAGeneratingStateMachine(
+	protected void walkCyclicDFAGeneratingStateMachine(
 			StringTemplateGroup templates,
 			StringTemplate dfaST,
 			DFAState s)
@@ -51,10 +55,88 @@ public class CyclicDFACodeGenerator {
 								 new Integer(s.getUniquelyPredictedAlt()));
 		}
 		else {
-			stateST = templates.getInstanceOf("cyclicDFAState");
+			if ( parent.canGenerateSwitch(s) ) {
+				stateST = templates.getInstanceOf("cyclicDFAStateSwitch");
+			}
+			else {
+				stateST = templates.getInstanceOf("cyclicDFAState");
+			}
 			stateST.setAttribute("needErrorClause", new Boolean(true));
 		}
 		stateST.setAttribute("stateNumber", new Integer(s.stateNumber));
+		if ( parent.canGenerateSwitch(s) ) {
+			walkEdgesGeneratingComputedGoto(s, templates, stateST, dfaST);
+		}
+		else {
+			walkEdgesGeneratingIfThenElse(s, templates, stateST, dfaST);
+		}
+		dfaST.setAttribute("states", stateST);
+	}
+
+	public static class LabelEdgeNumberPair implements Comparable {
+		public int value;
+		public int edgeNumber;
+		public LabelEdgeNumberPair(int value, int edgeNumber) {
+			this.value = value;
+			this.edgeNumber = edgeNumber;
+		}
+		public int compareTo(Object o) {
+			LabelEdgeNumberPair other = (LabelEdgeNumberPair)o;
+			return this.value-other.value;
+		}
+		public boolean equals(Object o) {
+			LabelEdgeNumberPair other = (LabelEdgeNumberPair)o;
+			return this.value==other.value;
+		}
+	}
+
+	protected void walkEdgesGeneratingComputedGoto(DFAState s,
+												   StringTemplateGroup templates,
+												   StringTemplate stateST,
+												   StringTemplate dfaST)
+	{
+		List labels = new ArrayList(50);
+		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
+			Transition edge = (Transition) s.transition(i);
+			int edgeNumber = i+1;
+			Integer edgeNumberI = new Integer(edgeNumber);
+			StringTemplate edgeST;
+			if ( edge.label.getAtom()==Label.EOT ) {
+				stateST.removeAttribute("needErrorClause");
+				stateST.setAttribute("EOTTargetStateNumber",
+									 new Integer(edge.target.stateNumber));
+			}
+			else {
+				edgeST = templates.getInstanceOf("cyclicDFAEdgeSwitch");
+				edgeST.setAttribute("edgeNumber", edgeNumberI);
+				edgeST.setAttribute("targetStateNumber",
+									new Integer(edge.target.stateNumber));
+				stateST.setAttribute("edges", edgeST);
+			}
+			List edgeLabels = edge.label.getSet().toList();
+			for (int j = 0; j < edgeLabels.size(); j++) {
+				Integer vI = (Integer) edgeLabels.get(j);
+				if ( vI.intValue()!=Label.EOT ) {
+	                labels.add(new LabelEdgeNumberPair(vI.intValue(), edgeNumber));
+				}
+			}
+			// now gen code for other states
+			walkCyclicDFAGeneratingStateMachine(templates,
+											   dfaST,
+											   (DFAState)edge.target);
+		}
+		// now sort the edge case values
+		if ( !s.isAcceptState() ) {
+			Collections.sort( labels );
+			stateST.setAttribute("labels", labels);
+		}
+	}
+
+	protected void walkEdgesGeneratingIfThenElse(DFAState s,
+												 StringTemplateGroup templates,
+												 StringTemplate stateST,
+												 StringTemplate dfaST)
+	{
 		StringTemplate eotST = null;
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
@@ -77,14 +159,13 @@ public class CyclicDFACodeGenerator {
 				stateST.setAttribute("edges", edgeST);
 			}
 			// now check other states
-			walkFixedDFAGeneratingStateMachine(templates,
+			walkCyclicDFAGeneratingStateMachine(templates,
 											   dfaST,
 											   (DFAState)edge.target);
 		}
 		if ( eotST!=null ) {
 			stateST.setAttribute("edges", eotST);
 		}
-		dfaST.setAttribute("states", stateST);
 	}
 
 }
