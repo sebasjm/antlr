@@ -420,7 +420,7 @@ public class ClassFile {
 		int numConstants = poolCount;
         out.writeShort(numConstants+1);
 		out.write(constPool);
-		System.out.println("wrote "+numConstants+" constants");
+		//System.out.println("wrote "+numConstants+" constants");
     }
 
 
@@ -436,7 +436,6 @@ public class ClassFile {
 			// now it's ok to assemble; constant pool is complete
 			MethodAssembler assembler = new MethodAssembler(this, m);
 			assembler.getCode();
-			System.out.println("assembly method "+m);
 			if ( m.name.equals("<init>") ) {
 				ctor(m);
 			}
@@ -493,7 +492,7 @@ public class ClassFile {
 		if ( op.equals("iconst") ) {
 			int v = Integer.parseInt(elements[1]);
 			if ( v>0 && v>0xFFFF ) {
-				System.out.println(v+" is too big for short");
+				//System.out.println(v+" is too big for short");
 				// must add to constant pool
 				constantPoolIntegers.add(new Integer(v));
 			}
@@ -718,7 +717,6 @@ public class ClassFile {
 
     protected int indexOfMethod(String methodName) {
         Integer I = (Integer)methodNameToConstantPoolIndex.get(methodName);
-		System.out.println(I);
         if ( I==null ) {
             return 0;
         }
