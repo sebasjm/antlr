@@ -90,6 +90,7 @@ public class CodeGenerator {
 	 *  vocabulary environment would generate a SWITCH with 65000 labels.
 	 */
 	public int MAX_SWITCH_CASE_LABELS = 300;
+	public static final boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true; 
 
 	public static int escapedCharValue[] = new int[255];
 	public static String charValueEscape[] = new String[255];
@@ -883,6 +884,9 @@ public class CodeGenerator {
 	 *  would overflow the method 65k limit probably).
 	 */
 	protected boolean canGenerateSwitch(DFAState s) {
+		if ( !GENERATE_SWITCHES_WHEN_POSSIBLE ) {
+			return false;
+		}
 		int size = 0;
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
