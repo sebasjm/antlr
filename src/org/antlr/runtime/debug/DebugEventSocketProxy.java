@@ -29,19 +29,22 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		if ( serverSocket==null ) {
 			serverSocket = new ServerSocket(port);
 			socket = serverSocket.accept();
+			socket.setTcpNoDelay(true);
 			out = new PrintStream(socket.getOutputStream());
 			in = new DataInputStream(socket.getInputStream());
-			out.println("ANTLR 3.0 parser");
+			transmit("ANTLR 3.0 parser");
 		}
 	}
 
 	public void terminate() {
+		out.println("terminate");
+		ack();
 		out.close();
 		try {
 			socket.close();
 		}
 		catch (IOException ioe) {
-			System.err.println(ioe);
+			ioe.printStackTrace(System.err);
 		}
 	}
 
@@ -50,34 +53,35 @@ public class DebugEventSocketProxy implements DebugEventListener {
 			String ack = in.readLine();
 		}
 		catch (IOException ioe) {
-			System.err.println("didn't receive ack");
+			ioe.printStackTrace(System.err);
 		}
 
 	}
 
-	public void enterRule(String ruleName) {
-		out.println("enterRule "+ruleName);
+	protected void transmit(String event) {
+		out.println(event);
+		out.flush();
 		ack();
+	}
+
+	public void enterRule(String ruleName) {
+		transmit("enterRule "+ruleName);
 	}
 
 	public void enterAlt(int alt) {
-		out.println("enterAlt "+alt);
-		ack();
+		transmit("enterAlt "+alt);
 	}
 
 	public void exitRule(String ruleName) {
-		out.println("exitRule "+ruleName);
-		ack();
+		transmit("exitRule "+ruleName);
 	}
 
 	public void enterSubRule(int decisionNumber) {
-		out.println("enterSubRule "+decisionNumber);
-		ack();
+		transmit("enterSubRule "+decisionNumber);
 	}
 
 	public void exitSubRule(int decisionNumber) {
-		out.println("exitSubRule "+decisionNumber);
-		ack();
+		transmit("exitSubRule "+decisionNumber);
 	}
 
 	public void consumeToken(Token t) {
@@ -88,38 +92,31 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		buf.append(t.getLine()); buf.append(' ');
 		buf.append(t.getCharPositionInLine()); buf.append(" \"");
 		buf.append(t.getText());
-		out.println("consumeToken "+buf);
-		ack();
+		transmit("consumeToken "+buf);
 	}
 
 	public void LT(int i) {
-		out.println("LT "+i);
-		ack();
+		transmit("LT "+i);
 	}
 
 	public void mark(int i) {
-		out.println("mark "+i);
-		ack();
+		transmit("mark "+i);
 	}
 
 	public void rewind(int i) {
-		out.println("rewind "+i);
-		ack();
+		transmit("rewind "+i);
 	}
 
 	public void location(int line, int pos) {
-		out.println("location "+line+" "+pos);
-		ack();
+		transmit("location "+line+" "+pos);
 	}
 
 	public void recognitionException(RecognitionException e) {
-		out.println("exception");
-		ack();
+		transmit("exception");
 	}
 
 	public void recovered() {
-		out.println("recovered");
-		ack();
+		transmit("recovered");
 	}
 }
 

@@ -38,6 +38,7 @@ public interface IntStream {
 
 	/** Tell the stream to start buffering if it hasn't already.  Return
      *  current input position, index().
+	 *  TODO: problem in that lexer stream returns not index but some marker 
      */
 	int mark();
 

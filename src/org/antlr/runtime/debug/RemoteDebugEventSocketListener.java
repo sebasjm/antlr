@@ -16,8 +16,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	String machine;
 	int port;
 	Socket channel = null;
-	DataInputStream din = null;
+	DataInputStream in = null;
 	PrintStream out;
+	String event;
 
 	public static class ProxyToken extends Token {
 		int index;
@@ -80,14 +81,14 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	protected void eventHandler() {
 		try {
 			handshake();
-			String line = din.readLine();
-			while ( line!=null ) {
-				System.out.println(line);
-				dispatch(line);
+			event = in.readLine();
+			while ( event!=null ) {
+				dispatch(event);
 				ack();
-				line = din.readLine();
+				event = in.readLine();
 			}
-			din.close(); din = null;
+			in.close(); in = null;
+			out.close(); out = null;
 			channel.close(); channel=null;
 		}
 		catch (Exception e) {
@@ -95,10 +96,13 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			e.printStackTrace(System.err);
 		}
 		finally {
-			if ( din!=null ) {
-				try {din.close();} catch (IOException ioe) {
+			if ( in!=null ) {
+				try {in.close();} catch (IOException ioe) {
 					System.err.println(ioe);
 				}
+			}
+			if ( out!=null ) {
+				out.close();
 			}
 			if ( channel!=null ) {
 				try {channel.close();} catch (IOException ioe) {
@@ -110,17 +114,17 @@ public class RemoteDebugEventSocketListener implements Runnable {
 
 	protected void handshake() throws IOException {
 		channel = new Socket(machine, port);
-		InputStream in = channel.getInputStream();
-		din = new DataInputStream(in);
+		channel.setTcpNoDelay(true);
+		in = new DataInputStream(channel.getInputStream());
 		out = new PrintStream(channel.getOutputStream());
-		String line = din.readLine();
-		if ( line!=null ) {
-			System.out.println("handshake: "+line);
-		}
+		String line = in.readLine();
+		// TODO: check ANTLR and version and grammar file?
+		ack();
 	}
 
 	protected void ack() {
         out.println("ack");
+		out.flush();
 	}
 
 	protected void dispatch(String line) {
@@ -178,6 +182,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		}
 		else if ( elements[0].equals("recovered") ) {
 			listener.recovered();
+		}
+		else if ( elements[0].equals("terminate") ) {
+			listener.terminate();
 		}
 		else {
 			System.err.println("unknown debug event: "+line);
