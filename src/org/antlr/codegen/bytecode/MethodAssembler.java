@@ -27,6 +27,8 @@
 */
 package org.antlr.codegen.bytecode;
 
+import org.antlr.tool.ErrorManager;
+
 import java.util.*;
 import java.io.StringReader;
 import java.io.BufferedReader;
@@ -234,7 +236,8 @@ public class MethodAssembler {
 			// easy 1-to-1 translation if no operands
 			int opcode = getOpcode(instrName);
 			if ( opcode==-1 ) {
-				System.err.println("unknown bytecode instruction: "+assemblyCode);
+				ErrorManager.error(ErrorManager.MSG_BYTECODE_UNKNOWN_INSTR,
+								   assemblyCode);
 			}
 			return new int[] {opcode};
 		}
@@ -251,7 +254,8 @@ public class MethodAssembler {
 		else if ( instrName.equals("invokespecial") ) {code = invokespecial(instr);}
 		else if ( instrName.equals("ldc") ) {code = ldc(instr);}
 		else {
-			System.err.println("unknown bytecode instruction: "+assemblyCode);
+			ErrorManager.error(ErrorManager.MSG_BYTECODE_UNKNOWN_INSTR,
+							   assemblyCode);
 			return null;
 		}
 		return code;
@@ -302,7 +306,8 @@ public class MethodAssembler {
 			code = new int[] {getOpcode(opcodeStr), v};
 		}
 		else {
-			System.err.println("Ooops...can't handle general iload/istore "+operand);
+			ErrorManager.error(ErrorManager.MSG_BYTECODE_CANNOT_HANDLE_ILOAD_ISTORE_OPND,
+							   operand);
 		}
 		return code;
 	}
@@ -322,7 +327,8 @@ public class MethodAssembler {
 			code = new int[] {getOpcode("aload"), v};
 		}
 		else {
-			System.err.println("Ooops...can't handle general aload "+operand);
+			ErrorManager.error(ErrorManager.MSG_BYTECODE_CANNOT_HANDLE_ALOAD_OPND,
+							   operand);
 		}
 		return code;
 	}
@@ -347,7 +353,8 @@ public class MethodAssembler {
 			}
 		}
 		else {
-			System.err.println("Ooops...can't handle general ldc "+operand);
+			ErrorManager.error(ErrorManager.MSG_BYTECODE_CANNOT_HANDLE_LDC_OPND,
+							   operand);
 		}
 		return code;
 	}
@@ -455,7 +462,8 @@ public class MethodAssembler {
 				prevLabel.define(pc);
 			}
 			else {
-				System.err.println("duplicate label def: "+labelName+"; ignored");
+				ErrorManager.error(ErrorManager.MSG_BYTECODE_DUP_LABEL,
+								   labelName);
 			}
 
 		}
@@ -487,7 +495,8 @@ public class MethodAssembler {
 		for (Iterator it = labelObjects.iterator(); it.hasNext();) {
 			Label label = (Label) it.next();
 			if ( !label.defined ) {
-				System.err.println("undefined label: "+label.name);
+				ErrorManager.error(ErrorManager.MSG_BYTECODE_UNDEFINED_LABEL,
+								   label.name);
 				continue;
 			}
 			if ( label.forwardReferences!=null ) {
@@ -593,7 +602,8 @@ public class MethodAssembler {
 			}
 			int lastQuoteIndex = instr.lastIndexOf('"');
 			if ( lastQuoteIndex==firstQuoteIndex ) {
-				System.err.println("missing final quote in string; instr="+instr);
+				ErrorManager.error(ErrorManager.MSG_BYTECODE_OPND_MISSING_QUOTE,
+								   instr);
 			}
 			// get the string including quotes
 			elements[1] = instr.substring(firstQuoteIndex,lastQuoteIndex);

@@ -111,6 +111,19 @@ public class ErrorManager {
 	// grammar interpretation errors
 	public static final int MSG_NO_VIABLE_DFA_ALT = 30;
 
+	// bytecode generation problems
+	public static final int MSG_BYTECODE_UNKNOWN_INSTR = 40;
+	public static final int MSG_BYTECODE_CANNOT_HANDLE_ILOAD_ISTORE_OPND = 41;
+	public static final int MSG_BYTECODE_CANNOT_HANDLE_ALOAD_OPND = 42;
+	public static final int MSG_BYTECODE_CANNOT_HANDLE_LDC_OPND = 43;
+	public static final int MSG_BYTECODE_DUP_LABEL = 44;
+	public static final int MSG_BYTECODE_UNDEFINED_LABEL = 45;
+	public static final int MSG_BYTECODE_OPND_MISSING_QUOTE = 46;
+	public static final int MSG_BYTECODE_MISSING_METHOD = 47;
+	public static final int MSG_BYTECODE_MISSING_METHOD_NAME = 48;
+	public static final int MSG_BYTECODE_MISSING_METHOD_SIG = 49;
+	public static final int MSG_BYTECODE_MISSING_METHOD_MAXSTACK = 50;
+
 	// GRAMMAR ERRORS
 	public static final int MSG_SYNTAX_ERROR = 100;
 	public static final int MSG_RULE_REDEFINITION = 101;

@@ -144,7 +144,7 @@ public class Tool {
 			generator.genRecognizer();
 		}
 
-		new DOTGenerator(grammar).writeDOTFilesForAllRuleNFAs();
+		//new DOTGenerator(grammar).writeDOTFilesForAllRuleNFAs();
 	}
 
 	private static void help() {

@@ -460,12 +460,11 @@ public class Grammar {
                 long start = System.currentTimeMillis();
                 DFA lookaheadDFA = new DFA(decisionStartState);
                 long stop = System.currentTimeMillis();
-                if ( !lookaheadDFA.isReduced() ) {
-                    System.err.println("nonreduced DFA for "+
-                            decisionStartState.getDescription());
-                }
+				setLookaheadDFA(decision, lookaheadDFA);
+				lookaheadDFA.verify();
 				System.out.println("DFA (d="+lookaheadDFA.getDecisionNumber()+") cost: "+lookaheadDFA.getNumberOfStates()+
 								   " states, "+(int)(stop-start)+" ms; descr="+decisionStartState.getDescription());
+				// TURN OFF DOT GEN FOR NOW
 				if ( false ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.getGrammar());
 					String dot = dotGenerator.getDOT( lookaheadDFA.getStartState() );
@@ -479,11 +478,6 @@ public class Grammar {
 										   ioe);
 					}
 				}
-                setLookaheadDFA(decision, lookaheadDFA);
-                List nonDetAlts = lookaheadDFA.getUnreachableAlts();
-                if ( nonDetAlts.size()>0 ) {
-                    System.err.println("alts w/o predict state="+nonDetAlts);
-                }
             }
         }
     }

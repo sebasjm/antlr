@@ -108,6 +108,13 @@ public class DFA {
 
 	protected NFAToDFAConverter nfaConverter;
 
+	/** This probe tells you a lot about a decision and is useful even
+	 *  when there is no error such as when a syntactic nondeterminism
+	 *  is solved via semantic predicates.  Perhaps a GUI would want
+	 *  the ability to show that.
+	 */
+	protected DecisionProbe probe = new DecisionProbe(this);
+
     public DFA(NFAState decisionStartState) {
         this.decisionNFAStartState = decisionStartState;
         nfa = decisionStartState.getNFA();
@@ -118,6 +125,11 @@ public class DFA {
 
         nfaConverter = new NFAToDFAConverter(this);
 		nfaConverter.convert(decisionStartState);
+
+		// figure out if there are problems with decision
+		verify();
+		
+		probe.reportErrors();
     }
 
 	public int predict(IntStream input) {
@@ -152,10 +164,9 @@ public class DFA {
 	/** Is the DFA reduced?  I.e., does every state have a path to an accept
      *  state?  If not, don't delete as we need to generate an error indicating
      *  which paths are "dead ends".  Also tracks list of alts with no accept
-     *  state in the DFA.
+     *  state in the DFA.  Must call verify() first before this makes sense.
      */
     public boolean isReduced() {
-        doesStateReachAcceptState(getStartState());
         return reduced;
     }
 
@@ -171,12 +182,25 @@ public class DFA {
 
     /** Return a list of Integer alt numbers for which no lookahead could
      *  be computed or for which no single DFA accept state predicts those
-     *  alts.
+     *  alts.  Must call verify() first before this makes sense.
      */
     public List getUnreachableAlts() {
-        isReduced(); // make sure computation is performed
         return unreachableAlts;
     }
+
+	/** Once this DFA has been built, need to verify that:
+	 *
+	 *  1. it's reduced
+	 *  2. all alts have an accept state
+	 *
+	 *  Elsewhere, in the NFA converter, we need to verify that:
+	 *
+	 *  3. alts i and j have disjoint lookahead if no sem preds
+	 *  4. if sem preds, nondeterministic alts must be sufficiently covered
+	 */
+	public void verify() {
+		doesStateReachAcceptState(getStartState());
+	}
 
     /** figure out if this state eventually reaches an accept state and
      *  modify the instance variable 'reduced' to indicate if we find
@@ -186,6 +210,9 @@ public class DFA {
      *
      *  The algorithm also tracks which alternatives have no accept state,
      *  indicating a nondeterminism.
+	 *
+	 *  Also computes whether the DFA is cyclic.
+	 *
      *  TODO: I call getUniquelyPredicatedAlt too much; cache predicted alt
      */
     protected boolean doesStateReachAcceptState(DFAState d) {

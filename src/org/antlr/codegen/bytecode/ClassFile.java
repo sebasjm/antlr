@@ -28,6 +28,7 @@
 package org.antlr.codegen.bytecode;
 
 import org.antlr.Tool;
+import org.antlr.tool.ErrorManager;
 
 import java.io.*;
 import java.util.*;
@@ -328,7 +329,8 @@ public class ClassFile {
 		catch (IOException ioe) {
 			// can't be called since strings aren't doing IO
 			// better print a warning anyhoo
-			System.err.println("error in splitIntoLines: "+ioe);
+			ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR,
+							   ioe);
 		}
 	}
 
@@ -541,19 +543,19 @@ public class ClassFile {
 	protected void methodDescriptor(String descriptor, Method method) {
 		StringTokenizer st = new StringTokenizer(descriptor, " ", false);
 		if ( !st.hasMoreTokens() ) {
-			System.err.println("missing .method instruction");
+			ErrorManager.error(ErrorManager.MSG_BYTECODE_MISSING_METHOD);
 		}
 		st.nextToken(); // skip .method
 		if ( !st.hasMoreTokens() ) {
-			System.err.println("missing method's name");
+			ErrorManager.error(ErrorManager.MSG_BYTECODE_MISSING_METHOD_NAME);
 		}
 		method.name = st.nextToken();
 		if ( !st.hasMoreTokens() ) {
-			System.err.println("missing method's signature");
+			ErrorManager.error(ErrorManager.MSG_BYTECODE_MISSING_METHOD_SIG);
 		}
 		method.signature = st.nextToken();
 		if ( !st.hasMoreTokens() ) {
-			System.err.println("missing method's maxStack");
+			ErrorManager.error(ErrorManager.MSG_BYTECODE_MISSING_METHOD_MAXSTACK);
 		}
 		method.maxStack = Integer.parseInt(st.nextToken());
 		constantPoolStrings.add(method.name);

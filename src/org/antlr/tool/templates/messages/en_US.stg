@@ -39,6 +39,22 @@ CANNOT_CREATE_TARGET_GENERATOR(arg,exception) ::=
 NO_VIABLE_DFA_ALT(arg,arg2) ::=
 	"no viable transition from state <arg> on <arg2> while interpreting DFA"
 
+// bytecode problems
+BYTECODE_UNKNOWN_INSTR(arg) ::= "unknown instruction '<arg>'"
+BYTECODE_CANNOT_HANDLE_ILOAD_ISTORE_OPND(arg) ::= 
+	"can't handle general iload/istore operand '<arg>'"
+BYTECODE_CANNOT_HANDLE_ALOAD_OPND(arg) ::= 
+	"can't handle general aload operand '<arg>'"
+BYTECODE_CANNOT_HANDLE_LDC_OPND(arg) ::= 
+	"can't handle general ldc operand '<arg>'"
+BYTECODE_DUP_LABEL(arg) ::= "duplicate label ignored: '<arg>'"
+BYTECODE_UNDEFINED_LABEL(arg) ::= "undefined label: '<arg>'"
+BYTECODE_OPND_MISSING_QUOTE(arg) ::= "missing operand quote: '<arg>'"
+BYTECODE_MISSING_METHOD(arg) ::= "missing .method instruction"
+BYTECODE_MISSING_METHOD_NAME(arg) ::= "missing .method name"
+BYTECODE_MISSING_METHOD_SIG(arg) ::= "missing .method signature"
+BYTECODE_MISSING_METHOD_MAXSTACK(arg) ::= "missing .method maxstack value"
+
 // GRAMMAR ERRORS
 SYNTAX_ERROR() ::= "syntax error"
 RULE_REDEFINITION(file,line,col,arg) ::= 
