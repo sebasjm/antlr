@@ -191,10 +191,6 @@ public class CommonTokenStream implements TokenStream {
 		return tokenSource;
 	}
 
-	public String getSourceName() {
-		return tokenSource.getCharStream().getSourceName();
-	}
-
 	public String toString() {
 		if ( filteredTokens==null ) {
 			fillBuffer();
@@ -205,7 +201,7 @@ public class CommonTokenStream implements TokenStream {
 			if ( i>0 ) {
 				buf.append(' ');
 			}
-			buf.append(t.toString(tokenSource.getCharStream()));
+			buf.append(t.toString());
 		}
 		return buf.toString();
 	}

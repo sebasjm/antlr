@@ -50,18 +50,19 @@ public abstract class Token {
 		predefinedTokenProperties.add("channel");
 	}
 
-    public abstract int getType();
-    public abstract String getText(CharStream input);
+	/** Get the text of the token */
+	public abstract String getText();
+
+	public abstract int getType();
     public abstract int getLine();
     public abstract void setLine(int line);
 
 	/** The index of the character relative to the beginning of the line 0..n-1 */
 	public abstract int getCharPositionInLine();
-	public abstract void setCharPositionInLine(int index);
+	public abstract void setCharPositionInLine(int pos);
 
 	public abstract int getChannel();
 	public abstract void setChannel(int channel);
 	public abstract int getTokenIndex();
 	public abstract void setTokenIndex(int index);
-	public abstract String toString(CharStream input);
 }

@@ -22,9 +22,9 @@ public interface DebugEventListener {
 	public void exitRule(String ruleName);
 
 	/** Track entry into any (...) subrule other EBNF construct */
-	public void enterSubRule();
+	public void enterSubRule(int decisionNumber);
 
-	public void exitSubRule();
+	public void exitSubRule(int decisionNumber);
 
 	/** An input token was consumed; matched by any kind of element.
 	 *  Trigger after the token was matched by things like match(), matchAny().
@@ -37,6 +37,15 @@ public interface DebugEventListener {
 	 *  will call LT which is how LA triggers this event.
 	 */
 	public void LT(int i);
+
+	/** The parser is going to look arbitrarily ahead starting with token i. */
+	public void mark(int i);
+
+	/** After an arbitrairly long lookahead as with a cyclic DFA (or with
+	 *  any backtrack), this informs the debugger that the current token
+	 *  is now rewound to index i.
+	 */
+	public void rewind(int i);
 
 	/** To watch a parser move through the grammar, the parser needs to
 	 *  inform the debugger what line/charPos it is passing in the grammar.
@@ -60,5 +69,12 @@ public interface DebugEventListener {
 	 *  but not matched to anything in grammar.  Anything between an exception
 	 *  and recovered() was tossed out by the parser.
 	 */
-	public void recovered(Token t);
+	public void recovered();
+
+	/** Parsing is over; successfully or not.  Mostly useful for telling
+	 *  remote debugging listeners that it's time to quit.  The invoker
+	 *  of the parser must call this not the parser because any rule
+	 *  can be a start symbol.
+	 */
+	public void terminate();
 }

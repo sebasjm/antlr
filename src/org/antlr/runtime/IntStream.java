@@ -56,6 +56,6 @@ public interface IntStream {
 
 	/** A string describing where these ints are coming from; most of the
 	 *  time this will be a file name.
-	 */
 	String getSourceName();
+	 */
 }

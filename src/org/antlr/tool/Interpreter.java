@@ -34,18 +34,21 @@ public class Interpreter implements TokenSource {
 			if ( !ruleName.equals(Grammar.TOKEN_RULENAME) ){
 				int type = g.getTokenType(ruleName);
 				int channel = Token.DEFAULT_CHANNEL;
-				token = new CommonToken(type,channel,0,0);
+				token = new CommonToken((CharStream)input,type,channel,0,0);
 			}
 		}
 		public void enterAlt(int alt) {}
 		public void enterRule(String ruleName) {}
-		public void enterSubRule() {}
-		public void exitSubRule() {}
+		public void enterSubRule(int decisionNumber) {}
+		public void exitSubRule(int decisionNumber) {}
 		public void location(int line, int pos) {}
 		public void consumeToken(Token token) {}
 		public void LT(int i) {}
+		public void mark(int i) {}
+		public void rewind(int i) {}
 		public void recognitionException(RecognitionException e) {}
-		public void recovered(Token t) {}
+		public void recovered() {}
+		public void terminate() {}
 	}
 
 	/** This parser listener tracks rule entry/exit and token matches
@@ -69,32 +72,28 @@ public class Interpreter implements TokenSource {
 			callStack.push(ruleNode);
 		}
 		public void enterAlt(int alt) {}
-		public void enterSubRule() {}
-		public void exitSubRule() {}
+		public void enterSubRule(int decisionNumber) {}
+		public void exitSubRule(int decisionNumber) {}
 		public void location(int line, int pos) {}
 		public void exitRule(String ruleName) {
 			callStack.pop();
 		}
 		public void consumeToken(Token token) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
-			CharStream cs = null ;
-			if ( input instanceof CharStream ) {
-				cs = (CharStream)input;
-			}
-			else {
-				cs = ((TokenStream)input).getTokenSource().getCharStream();
-			}
 			ParseTree elementNode =
-				new ParseTree(token.getText(cs)/*+"<"+g.getTokenName(token.getType())+">"*/);
+				new ParseTree(token.getText()/*+"<"+g.getTokenName(token.getType())+">"*/);
 			ruleNode.addChild(elementNode);
 		}
 		public void LT(int i) {}
+		public void mark(int i) {}
+		public void rewind(int i) {}
 		public void recognitionException(RecognitionException e) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
 			ParseTree errorNode = new ParseTree(e);
 			ruleNode.addChild(errorNode);
 		}
-		public void recovered(Token t) {}
+		public void recovered() {}
+		public void terminate() {}
 	}
 
 	public Interpreter(Grammar grammar, IntStream input) {
@@ -132,10 +131,6 @@ public class Interpreter implements TokenSource {
 		token.setStopIndex(stop);
 		token.setCharPositionInLine(charPos);
 		return token;
-	}
-
-	public CharStream getCharStream() {
-		return (CharStream)input;
 	}
 
 	/** For a given input char stream, try to match against the NFA

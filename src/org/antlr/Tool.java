@@ -51,6 +51,7 @@ public class Tool {
 	protected boolean generate_DFA_dot = false;
     protected String outputDirectory = ".";
 	protected boolean debug = false;
+	protected boolean trace = false;
 
     public static void main(String[] args) {
         ErrorManager.info("ANTLR Parser Generator   Version " +
@@ -101,6 +102,9 @@ public class Tool {
 			}
 			else if (args[i].equals("-debug")) {
 				debug=true;
+			}
+			else if (args[i].equals("-trace")) {
+				trace=true;
 			}
             else {
                 if (args[i].charAt(0) != '-') {

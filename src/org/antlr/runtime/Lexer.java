@@ -37,15 +37,11 @@ public abstract class Lexer implements TokenSource {
 		this.input = input;
 	}
 
-	public CharStream getCharStream() {
-		return input;
-	}
-	
 	public void emit(int tokenType,
 					 int line, int charPosition,
 					 int channel,
 					 int start, int stop) {
-		Token token = new CommonToken(tokenType, channel, start, stop);
+		Token token = new CommonToken(input, tokenType, channel, start, stop);
 		token.setLine(line);
 		token.setCharPositionInLine(charPosition);
 		emit(token);

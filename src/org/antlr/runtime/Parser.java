@@ -53,10 +53,6 @@ public class Parser {
         this.input = input;
     }
 
-	public CharStream getCharStream() {
-		return input.getTokenSource().getCharStream();
-	}
-
     public TokenStream getTokenStream() {
 		return input;
 	}
@@ -104,7 +100,7 @@ public class Parser {
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			System.err.println("mismatched token: "+
-							   input.LT(1).toString(getCharStream())+
+							   input.LT(1)+
 							   "; expecting type "+getTokenNames()[mte.expecting]);
 		}
 		else if ( e instanceof NoViableAltException ) {
@@ -113,25 +109,25 @@ public class Parser {
 							   " state "+nvae.stateNumber+
 							   " (decision="+nvae.decisionNumber+
 							   ") no viable alt; token="+
-							   input.LT(1).toString(getCharStream()));
+							   input.LT(1));
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;
 			System.err.println("required (...)+ loop (decision="+
 							   eee.decisionNumber+
 							   ") did not match anything; token="+
-							   input.LT(1).toString(getCharStream()));
+							   input.LT(1));
 		}
 		else if ( e instanceof MismatchedSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
 			System.err.println("mismatched token: "+
-							   input.LT(1).toString(getCharStream())+
+							   input.LT(1)+
 							   "; expecting set "+mse.expecting);
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
 			MismatchedNotSetException mse = (MismatchedNotSetException)e;
 			System.err.println("mismatched token: "+
-							   input.LT(1).toString(getCharStream())+
+							   input.LT(1)+
 							   "; expecting set "+mse.expecting);
 		}
 	}
@@ -351,7 +347,7 @@ public class Parser {
 		// if next token is what we are looking for then "delete" this token
 		if ( input.LA(2)==ttype ) {
 			reportError(mte);
-			System.err.println("deleting "+input.LT(1).toString(getCharStream()));
+			System.err.println("deleting "+input.LT(1));
 			input.consume(); // delete extra token
 			input.consume(); // move past ttype token as if all were ok
 			return;
@@ -390,8 +386,7 @@ public class Parser {
 		input.consume(); // always consume at least one token; inoptimal but safe
 		*/
 		while (input.LA(1) != Token.EOF && !set.member(input.LA(1)) ) {
-			System.out.println("LT(1)="+
-							   input.LT(1).toString(input.getTokenSource().getCharStream()));
+			System.out.println("LT(1)="+input.LT(1));
 			input.consume();
 		}
 	}

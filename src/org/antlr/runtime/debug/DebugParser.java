@@ -29,6 +29,8 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.*;
 
+import java.io.IOException;
+
 public class DebugParser extends Parser {
 
 	/** The default debugger mimics the traceParser behavior of ANTLR 2.x */
@@ -36,24 +38,25 @@ public class DebugParser extends Parser {
 		protected int level = 0;
 		public void enterRule(String ruleName) {
 			for (int i=1; i<=level; i++) {System.out.print(" ");}
-			CharStream cs = input.getTokenSource().getCharStream();
-			System.out.println("> "+ruleName+" LT(1)="+input.LT(1).toString(cs));
+			System.out.println("> "+ruleName+" LT(1)="+input.LT(1).toString());
 			level++;
 		}
 		public void exitRule(String ruleName) {
 			level--;
 			for (int i=1; i<=level; i++) {System.out.print(" ");}
-			CharStream cs = input.getTokenSource().getCharStream();
-			System.out.println("< "+ruleName+" LT(1)="+input.LT(1).toString(cs));
+			System.out.println("< "+ruleName+" LT(1)="+input.LT(1).toString());
 		}
 		public void enterAlt(int alt) {}
-		public void enterSubRule() {}
-		public void exitSubRule() {}
+		public void enterSubRule(int decisionNumber) {}
+		public void exitSubRule(int decisionNumber) {}
 		public void location(int line, int pos) {}
 		public void consumeToken(Token token) {}
 		public void LT(int i) {}
+		public void mark(int i) {}
+		public void rewind(int i) {}
 		public void recognitionException(RecognitionException e) {}
-		public void recovered(Token t) {}
+		public void recovered() {}
+		public void terminate() {}
 	}
 
 	/** Who to notify when events in the parser occur. */
@@ -68,8 +71,23 @@ public class DebugParser extends Parser {
 	}
 
 	public DebugParser(TokenStream input) {
-		super(input);
-		setDebugListener(new TraceDebugger());
+		this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT);
+	}
+
+	/** Create a proxy to marshall events across socket to another
+	 *  listener.  This constructor returns after handshaking with
+	 *  debugger so programmer does not have to manually invoke handshake.
+	 */
+	public DebugParser(TokenStream input, int port) {
+		super(new DebugTokenStream(input,null));
+		DebugEventSocketProxy proxy = new DebugEventSocketProxy(port);
+		setDebugListener(proxy);
+		try {
+			proxy.handshake();
+		}
+		catch (IOException ioe) {
+			reportError(ioe);
+		}
 	}
 
 	/** Provide a new debug event listener for this parser.  Notify the
@@ -89,7 +107,7 @@ public class DebugParser extends Parser {
 		boolean after = this.errorRecovery;
 		// if was in recovery and is not now, trigger recovered event
 		if ( before && !after ) {
-			dbg.recovered(t);
+			dbg.recovered();
 		}
 	}
 
@@ -98,4 +116,8 @@ public class DebugParser extends Parser {
 		dbg.recognitionException(e);
 	}
 
+	public void reportError(IOException e) {
+		System.err.println("problem with debugger: "+e);
+		e.printStackTrace(System.err);
+	}
 }

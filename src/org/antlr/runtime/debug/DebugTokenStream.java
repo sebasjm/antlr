@@ -43,7 +43,7 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public void consume() {
-		Token t = LT(1);
+		Token t = input.LT(1);
 		input.consume();
 		dbg.consumeToken(t);
 	}
@@ -53,6 +53,8 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public int mark() {
+		int m = input.index();
+		dbg.mark(m);
 		return input.mark();
 	}
 
@@ -61,15 +63,12 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public void rewind(int marker) {
+		dbg.mark(marker);
 		input.rewind(marker);
 	}
 
 	public int size() {
 		return input.size();
-	}
-
-	public String getSourceName() {
-		return input.getSourceName();
 	}
 
 	public Token LT(int i) {

@@ -9,6 +9,9 @@ outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
 <headerAction>
 
 import org.antlr.runtime.*;
+<if(debug)>
+import org.antlr.runtime.debug.*;
+<endif>
 import java.util.Stack;
 
 <docComment>
@@ -56,11 +59,18 @@ class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isGlobal)><attributeScope(scope=it)><endif>}>
-    public <name>(TokenStream input) { super(input); }
 <if(debug)>
-    public <name>(TokenStream input, ANTLRDebugInterface dbg) {
+    public <name>(TokenStream input) {
+	super(input);
+    }
+    public <name>(TokenStream input, DebugEventListener dbg) {
         super(input,dbg);
     }<\n>
+    public <name>(TokenStream input, int port) {
+        super(input,port);
+    }<\n>
+<else>
+    public <name>(TokenStream input) { super(input); }
 <endif>
     public String[] getTokenNames() { return tokenNames; }
 
@@ -216,14 +226,14 @@ block(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int alt<decisionNumber>=<maxAlt>;
 <decls>
 <if(debug)>
-dbg.enterSubRule();<\n>
+dbg.enterSubRule(<decisionNumber>);<\n>
 <endif>
 <decision>
 switch (alt<decisionNumber>) {
     <alts:altSwitchCase()>
 }
 <if(debug)>
-dbg.exitSubRule();<\n>
+dbg.exitSubRule(<decisionNumber>);<\n>
 <endif>
 >>
 
@@ -242,7 +252,7 @@ positiveClosureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int cnt<decisionNumber>=0;
 <decls>
 <if(debug)>
-dbg.enterSubRule();<\n>
+dbg.enterSubRule(<decisionNumber>);<\n>
 <endif>
 loop<decisionNumber>:
 do {
@@ -257,7 +267,7 @@ do {
     cnt<decisionNumber>++;
 } while (true);
 <if(debug)>
-dbg.exitSubRule();<\n>
+dbg.exitSubRule(<decisionNumber>);<\n>
 <endif>
 >>
 
@@ -266,7 +276,7 @@ positiveClosureBlockSingleAlt ::= positiveClosureBlock
 closureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 <decls>
 <if(debug)>
-dbg.enterSubRule();<\n>
+dbg.enterSubRule(<decisionNumber>);<\n>
 <endif>
 loop<decisionNumber>:
 do {
@@ -279,7 +289,7 @@ do {
     }
 } while (true);
 <if(debug)>
-dbg.exitSubRule();<\n>
+dbg.exitSubRule(<decisionNumber>);<\n>
 <endif>
 >>
 
