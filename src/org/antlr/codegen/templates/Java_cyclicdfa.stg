@@ -26,8 +26,25 @@ cyclicDFA(decision,states,description) ::= <<
 ;    invokevirtual java/io/PrintStream.println(I)V
     goto s0
 errorState:
-    iconst 0
-    ireturn
+; first print error
+    getstatic java/lang/System.err Ljava/io/PrintStream;
+    ldc "DFA match error input="
+    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
+    getstatic java/lang/System.err Ljava/io/PrintStream;
+    aload 0
+    iconst 1
+    invokeinterface org/antlr/runtime/IntStream.LA(I)I 2
+    invokevirtual java/io/PrintStream.println(I)V
+; throw NoViableAltException
+    new org/antlr/runtime/NoViableAltException
+    dup
+    ldc "<description>"
+    iconst <decision>
+; don't know error state at this point; use -1
+    iconst -1
+    aload 0
+    invokespecial org/antlr/runtime/NoViableAltException.\<init>(Ljava/lang/String;IILorg/antlr/runtime/IntStream;)V
+    athrow
 <states>
 >>
 
@@ -47,22 +64,6 @@ s<stateNumber>:
     istore 1
 <edges>
 <if(needErrorClause)>
-; first print error
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    ldc "DFA match error input="
-    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    iload 1
-    invokevirtual java/io/PrintStream.println(I)V
-; throw NoViableAltException
-    new org/antlr/runtime/NoViableAltException
-    dup
-    ldc "<description>"
-    iconst <decision>
-    iconst <stateNumber>
-    aload 0
-    invokespecial org/antlr/runtime/NoViableAltException.\<init>(Ljava/lang/String;IILorg/antlr/runtime/IntStream;)V
-    athrow
     goto errorState<\n>
 <endif>
 >>
@@ -110,22 +111,6 @@ s<stateNumber>:
 <edges>
 s<stateNumber>_default:
 <if(needErrorClause)>
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    ldc "DFA match error input="
-    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
-    getstatic java/lang/System.err Ljava/io/PrintStream;
-    aload 0
-    iconst 1
-    invokeinterface org/antlr/runtime/IntStream.LA(I)I 2
-    invokevirtual java/io/PrintStream.println(I)V
-    new org/antlr/runtime/NoViableAltException
-    dup
-    ldc "<description>"
-    iconst <decision>
-    iconst <stateNumber>
-    aload 0
-    invokespecial org/antlr/runtime/NoViableAltException.\<init>(Ljava/lang/String;IILorg/antlr/runtime/IntStream;)V
-    athrow
     goto errorState<\n>
 <else>
 ; when EOT is an edge label, can't have an error.  This is the default clause
