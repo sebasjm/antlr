@@ -434,13 +434,17 @@ public class DFAState extends State {
      *  where (s|i|ctx) and (s|j|ctx) exist, indicating that state s with
      *  context ctx predicts alts i and j.  Return an Integer set of the
      *  alternative numbers that conflict.
+	 *
+	 *  TODO: update comment and talk about [28|2|[18 $], 28|1] as ambig
      *
      *  Use a hash table to record state/ctx pairs as they are encountered.
      *  When the same pair is seen again, the alt number must be the same
      *  to avoid a conflict.
      */
     protected Set getNondeterministicAlts() {
-		Set nondeterministicAlts = null; // only create if have to
+		// TODO this is called multiple times: cache result
+		//System.out.println("getNondetAlts for DFA state "+stateNumber);
+ 		Set nondeterministicAlts = new HashSet();
 
 		// If only 1 NFA conf then no way it can be nondeterministic;
 		// save the overhead.  There are many o-a->o NFA transitions
@@ -449,35 +453,156 @@ public class DFAState extends State {
 		if ( nfaConfigurations.size()<=1 ) {
 			return null;
 		}
-        Iterator iter = nfaConfigurations.iterator();
-        Map statePlusContextToAltMap = new HashMap();
-        NFAConfiguration configuration;
+
+		// First get a list of configurations for each state.
+		// Most of the time, each state will have one associated configuration
+		Iterator iter = nfaConfigurations.iterator();
+		Map stateToConfigListMap = new HashMap();
+		NFAConfiguration configuration;
+		while (iter.hasNext()) {
+			configuration = (NFAConfiguration) iter.next();
+			Integer stateI = new Integer(configuration.state);
+			List prevConfigs = (List)stateToConfigListMap.get(stateI);
+			if ( prevConfigs==null ) {
+				prevConfigs = new ArrayList();
+				stateToConfigListMap.put(stateI, prevConfigs);
+			}
+			prevConfigs.add(configuration);
+		}
+
+		// potential conflicts are states with > 1 configuration and diff alts
+		Set states = stateToConfigListMap.keySet();
+		int numPotentialConflicts = 0;
+		for (Iterator it = states.iterator(); it.hasNext();) {
+			Integer stateI = (Integer) it.next();
+			boolean thisStateHasPotentialProblem = false;
+			List configsForState = (List)stateToConfigListMap.get(stateI);
+			int alt=0;
+			for (int i = 0; i < configsForState.size() && configsForState.size()>1 ; i++) {
+				NFAConfiguration c = (NFAConfiguration) configsForState.get(i);
+				if ( alt==0 ) {
+					alt = c.alt;
+				}
+				else if ( c.alt!=alt ) {
+					//System.out.println("potential conflict in state "+stateI+" configs: "+configsForState);
+					numPotentialConflicts++;
+					thisStateHasPotentialProblem = true;
+				}
+			}
+			if ( !thisStateHasPotentialProblem ) {
+				// remove NFA state's configurations from
+				// further checking; no issues with it
+				stateToConfigListMap.put(stateI, null);
+			}
+		}
+
+		// a fast check for potential issues; most states have none
+		if ( numPotentialConflicts==0 ) {
+			return null;
+		}
+
+		// we have a potential problem, so now go through config lists again
+		// looking for different alts (only states with potential issues
+		// are left in the states set).  For example, the list of configs
+		// for NFA state 3 in some DFA state might be:
+		//   [3|2|[28 18 $], 3|1|[28 $], 3|1, 3|2]
+		// I want to create a map from context to alts looking for overlap:
+		//   [28 18 $] -> 2
+		//   [28 $] -> 1
+		//   [$] -> 1,2
+		// Indeed a conflict exists as same state 3, same context [$], predicts
+		// alts 1 and 2.
+		// walk each state with potential conflicting configurations
+		for (Iterator it = states.iterator(); it.hasNext();) {
+			Integer stateI = (Integer) it.next();
+			List configsForState = (List)stateToConfigListMap.get(stateI);
+			// compare each configuration pair s, t to ensure:
+			// s.ctx different than t.ctx if s.alt != t.alt
+			for (int i = 0; configsForState!=null && i < configsForState.size(); i++) {
+				NFAConfiguration s = (NFAConfiguration) configsForState.get(i);
+				for (int j = i+1; j < configsForState.size(); j++) {
+					NFAConfiguration t = (NFAConfiguration)configsForState.get(j);
+					// conflicts means s.ctx==t.ctx or s.ctx is a stack
+					// suffix of t.ctx or vice versa (if alts differ).
+					if ( s.alt != t.alt && s.context.conflictsWith(t.context) ) {
+						nondeterministicAlts.add(new Integer(s.alt));
+						nondeterministicAlts.add(new Integer(t.alt));
+					}
+				}
+			}
+			/*
+			Map contextToAltMap = new HashMap();
+			Set alts = new HashSet();
+			boolean hasEmptyContext = false;
+			// walk each configuration for this state mapping context to alt
+			for (int i = 0;
+				 configsForState!=null &&
+				 configsForState.size()>1 &&
+				 i < configsForState.size();
+				 i++)
+			{
+				NFAConfiguration c = (NFAConfiguration) configsForState.get(i);
+				if ( c.context.isEmpty() ) {
+					hasEmptyContext = true;
+				}
+				Integer altI = new Integer(c.alt);
+				alts.add(altI);
+				// TODO: optimization: ignore configurations for alts already
+				// known to be nondeterministic
+				Integer prevAlt = (Integer)contextToAltMap.get(c.context);
+				if ( prevAlt==null ) {
+					contextToAltMap.put(c.context, altI);
+				}
+				else {
+					// these alts are in conflict; record this fact
+					nondeterministicAlts.add(prevAlt);
+					nondeterministicAlts.add(altI);
+				}
+			}
+
+			if ( hasEmptyContext && alts.size()>0 ) {
+				// empty context matches any context so it conflicts with any
+				// other alts associated with this NFA state
+				//System.out.println("configs ambig due to empty context: "+configsForState);
+				nondeterministicAlts.addAll(alts);
+			}
+			*/
+		}
+
+
+       /* This is pre-realization that (s,i,ctx1) and (s,j,ctx2) are same
+	    context if either context is empty.
+	    iter = nfaConfigurations.iterator();
+		Map statePlusContextToConfigMap = new HashMap();
         while (iter.hasNext()) {
             configuration = (NFAConfiguration) iter.next();
-            String key = new StringBuffer().append(configuration.state)
+			String key = new StringBuffer().append(configuration.state)
 				.append(configuration.context.toString()).toString();
-            NFAConfiguration previous =
-                    (NFAConfiguration)statePlusContextToAltMap.get(key);
-            if ( previous==null ) {
-                // new state + context pair; no previousAlt defined; define it
-                statePlusContextToAltMap.put(key,configuration);
-            }
-            else {
-                // state + context pair exists, check to ensure previousAlt is same
-                if ( configuration.alt!=previous.alt ) {
-                    /*
-                    System.out.println("config "+key+" ambig for alts "+
-                            configuration.alt+","+previous.alt);
-                    */
-                    // these alts are in conflict; record this fact
+			NFAConfiguration previousConfig = null;
+			previousConfig = (NFAConfiguration)statePlusContextToConfigMap.get(key);
+			if ( previousConfig==null ) {
+				// new state + context pair; no previousAlt defined; define it
+				statePlusContextToConfigMap.put(key,configuration);
+			}
+			else {
+				// state + context pair exists, check to ensure previousAlt is same
+				if ( configuration.alt!=previousConfig.alt ) {
+					System.out.println("config "+key+" ambig for alts "+
+									   configuration.alt+","+previousConfig.alt);
+					// these alts are in conflict; record this fact
 					if ( nondeterministicAlts==null ) {
 						nondeterministicAlts = new HashSet();
 					}
-                    nondeterministicAlts.add(new Integer(previous.alt));
+                    nondeterministicAlts.add(new Integer(previousConfig.alt));
                     nondeterministicAlts.add(new Integer(configuration.alt));
                 }
             }
         }
+		*/
+
+		if ( nondeterministicAlts.size()==0 ) {
+			return null;
+		}
         return nondeterministicAlts;
     }
 

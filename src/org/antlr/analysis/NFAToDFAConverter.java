@@ -156,6 +156,7 @@ public class NFAToDFAConverter {
 	 *  state in DFA state d.
 	 */
 	protected void findNewDFAStatesAndAddDFATransitions(DFAState d) {
+		//System.out.println("work on DFA state "+d);
 		OrderedHashMap labels = d.getReachableLabels();
 		/*
 		System.out.println("reachable="+labels.toString());

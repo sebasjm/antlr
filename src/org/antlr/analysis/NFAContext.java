@@ -73,36 +73,65 @@ public class NFAContext {
         }
     }
 
-    /** Two contexts are equals() if both have
-     *  same call stack; walk upwards to the root.
-     *  Recall that the root sentinel node has no invokingStates and no parent.
-     *  Note that you may be comparing contexts in different alt trees.
-     *
-     *  The hashCode is now cheap as it's computed once upon each context
-     *  push on the stack.  Use it to make equals() more efficient.
-     */
-    public boolean equals(Object o) {
-        NFAContext other = ((NFAContext)o);
-        if ( this.cachedHashCode != other.cachedHashCode ) {
-            return false; // can't be same if hash is different
-        }
-        if ( this==other ) {
-            return true;
-        }
-        // System.out.println("comparing "+this+" with "+other);
-        NFAContext sp = this;
-        while ( sp.parent!=null && other.parent!=null ) {
-            if ( sp.invokingState != other.invokingState ) {
-                return false;
-            }
-            sp = sp.parent;
-            other = other.parent;
-        }
-        if ( !(sp.parent==null && other.parent==null) ) {
-            return false; // both pointers must be at their roots after walk
-        }
-        return true;
-    }
+	/** Two contexts are equals() if both have
+	 *  same call stack; walk upwards to the root.
+	 *  Recall that the root sentinel node has no invokingStates and no parent.
+	 *  Note that you may be comparing contexts in different alt trees.
+	 *
+	 *  The hashCode is now cheap as it's computed once upon each context
+	 *  push on the stack.  Use it to make equals() more efficient.
+	 */
+	public boolean equals(Object o) {
+		NFAContext other = ((NFAContext)o);
+		if ( this.cachedHashCode != other.cachedHashCode ) {
+			return false; // can't be same if hash is different
+		}
+		if ( this==other ) {
+			return true;
+		}
+		// System.out.println("comparing "+this+" with "+other);
+		NFAContext sp = this;
+		while ( sp.parent!=null && other.parent!=null ) {
+			if ( sp.invokingState != other.invokingState ) {
+				return false;
+			}
+			sp = sp.parent;
+			other = other.parent;
+		}
+		if ( !(sp.parent==null && other.parent==null) ) {
+			return false; // both pointers must be at their roots after walk
+		}
+		return true;
+	}
+
+	/** Two contexts conflict() if they are equals() or one is a stack suffix
+	 *  of the other.  For example, contexts [21 12 $] and [21 9 $] do not
+	 *  conflict, but [21 $] and [21 12 $] do conflict.  Note that I should
+	 *  probably not show the $ in this case.  There is a dummy node for each
+	 *  stack that just means empty; $ is a marker that's all.
+	 */
+	public boolean conflictsWith(Object o) {
+		NFAContext other = ((NFAContext)o);
+		return this.equals(other) || this.suffix(other);
+	}
+
+	/** [21 $] suffix [21 12 $]
+	 *  [21 12 $] suffix [21 $]
+	 *  [21 18 $] suffix [21 18 12 9 $]
+	 *  [21 18 12 9 $] suffix [21 18 $]
+	 *  [21 12 $] not suffix [21 9 $]
+	 */
+	protected boolean suffix(NFAContext other) {
+		NFAContext sp = this;
+		while ( sp.parent!=null && other.parent!=null ) {
+			if ( sp.invokingState != other.invokingState ) {
+				return false;
+			}
+			sp = sp.parent;
+			other = other.parent;
+		}
+		return true;
+	}
 
     /** Walk upwards to the root of the call stack context looking
      *  for a particular invoking state.  Only look til before
@@ -135,6 +164,13 @@ public class NFAContext {
         return h;
         */
     }
+
+	/** A context is empty if there is no parent; meaning nobody pushed
+	 *  anything on the call stack.
+	 */
+	public boolean isEmpty() {
+		return parent==null;
+	}
 
     public String toString() {
         StringBuffer buf = new StringBuffer();

@@ -272,6 +272,7 @@ public class DOTGenerator {
             Set configurations = ((DFAState)s).getNFAConfigurations();
             int n = 0;
 			buf.append(s.stateNumber);
+			/*
 			buf.append(": ");
             for (Iterator it = configurations.iterator(); it.hasNext();) {
                 NFAConfiguration configuration = (NFAConfiguration) it.next();
@@ -284,6 +285,7 @@ public class DOTGenerator {
                     buf.append(", ");
                 }
             }
+			*/
             stateLabel = buf.toString();
         }
 		if ( (s instanceof NFAState) && ((NFAState)s).getDecisionASTNode()!=null ) {
