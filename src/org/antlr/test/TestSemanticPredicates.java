@@ -33,6 +33,7 @@ import org.antlr.tool.Grammar;
 import org.antlr.tool.FASerializer;
 import org.antlr.analysis.State;
 import org.antlr.analysis.DFA;
+import org.antlr.analysis.DecisionProbe;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.BitSet;
 
@@ -48,7 +49,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testPredsButSyntaxResolves() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : {p1}? A | {p2}? B ;");
         String expecting =
                 ".s0-A->:s1=>1\n" +
@@ -58,7 +59,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testLL_1_Pred() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : {p1}? A | {p2}? A ;");
         String expecting =
                 ".s0-A->.s1\n" +
@@ -69,7 +70,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testLL_2_Pred() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : {p1}? A B | {p2}? A B ;");
         String expecting =
                 ".s0-A->.s1\n" +
@@ -81,7 +82,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testPredicatedLoop() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : ( {p1}? A | {p2}? A )+;");
 		String expecting =                   // loop back
 			".s0-<EOF>->:s1=>3\n" +
@@ -93,7 +94,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testPredicatedToStayInLoop() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : ( {p1}? A )+ (A)+;");
         String expecting =
                 ".s0-A->.s1\n" +
@@ -103,7 +104,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testAndPredicates() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : {p1}? {p1a}? A | {p2}? A ;");
         String expecting =
                 ".s0-A->.s1\n" +
@@ -114,7 +115,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testOrPredicates() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : b | {p2}? A ;\n" +
             "b : {p1}? A | {p1a}? A ;");
         String expecting =
@@ -126,7 +127,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testIgnoresHoistingDepthGreaterThanZero() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : A {p1}? | A {p2}?;");
         String expecting =
                 ".s0-A->:s1=>1\n";
@@ -135,7 +136,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testHoist2() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : b | c ;\n" +
             "b : {p1}? A ;\n" +
             "c : {p2}? A ;\n");
@@ -148,7 +149,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testHoistCorrectContext() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : b | {p2}? ID ;\n" +
             "b : {p1}? ID | INT ;\n");
         String expecting =  // only tests after ID, not INT :)
@@ -161,7 +162,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testDefaultPred() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : b | ID ;\n" +
             "b : {p1}? ID | INT ;\n");
         String expecting =
@@ -174,7 +175,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testLeftRecursivePred() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : {p1}? a | ID ;\n");
         String expecting =
                 ".s0-ID->.s1\n" +
@@ -185,7 +186,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testIgnorePredFromLL2Alt() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : {p1}? A B | A C | {p2}? A | {p3}? A | A ;\n");
         // two situations of note:
         // 1. A B syntax is enough to predict that alt, so p1 is not used
@@ -206,7 +207,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void testPredGets2SymbolSyntacticContext() throws Exception {
         Grammar g = new Grammar(
-            "grammar P;\n"+
+            "parser grammar P;\n"+
             "a : b | A B | C ;\n" +
             "b : {p1}? A B ;\n");
         String expecting =
@@ -223,7 +224,7 @@ public class TestSemanticPredicates extends TestSuite {
      */
     public void testIncompleteSemanticHoistedContext() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
+                "parser grammar t;\n"+
                 "a : b | B;\n" +
                 "b : {p1}? B | B ;");
         String expecting =
@@ -243,7 +244,7 @@ public class TestSemanticPredicates extends TestSuite {
      */
 	public void testIncompleteSemanticHoistedContext2() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n"+
+				"parser grammar t;\n"+
 				"a : b | B;\n" +
 				"b : {p1}? B | B D ;");
 		String expecting =
@@ -253,7 +254,7 @@ public class TestSemanticPredicates extends TestSuite {
 
 	public void testTooFewSemanticPredicates() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n"+
+				"parser grammar t;\n"+
 				"a : {p1}? A | A | A ;");
 		String expecting =
 				".s0-A->:s1=>1\n";
@@ -264,7 +265,7 @@ public class TestSemanticPredicates extends TestSuite {
 
     public void _template() throws Exception {
         Grammar g = new Grammar(
-                "grammar t;\n"+
+                "parser grammar t;\n"+
                 "a : A | B;");
         String expecting =
                 "\n";
@@ -285,6 +286,8 @@ public class TestSemanticPredicates extends TestSuite {
             g.createNFAs();
             g.createLookaheadDFAs();
         }
+
+		DecisionProbe.verbose=true; // make sure we get all error info
 
         DFA dfa = g.getLookaheadDFA(decision);
         FASerializer serializer = new FASerializer(g);

@@ -8,8 +8,9 @@ CANNOT_FIND_TOKENS_FILE(arg) ::= "cannot find tokens file <arg>"
 ERROR_READING_TOKENS_FILE(arg,exception) ::= 
 	"problem reading token vocabulary file <arg>: <exception>"
 
-INTERNAL_ERROR(arg,exception) ::= <<
-internal error: <arg><if(exception)>: <exception><endif>
+INTERNAL_ERROR(arg,arg2,exception,stackTrace) ::= <<
+internal error: <arg> <arg2><if(exception)>: <exception><endif>
+<stackTrace; separator="\n">
 >>
 INTERNAL_WARNING(arg) ::= "internal warning: <arg>"
 ERROR_CREATING_ARTIFICIAL_RULE(exception) ::=
@@ -70,9 +71,15 @@ NO_TOKEN_DEFINITION(file,line,col,arg) ::=
 	"<loc()>no lexer rule corresponding to token: <arg>"
 UNDEFINED_RULE_REF(file,line,col,arg) ::= 
 	"<loc()>reference to undefined rule: <arg>"
+LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE(file,line,col,arg) ::=
+	"<loc()>literal has no associated lexer rule: <arg>"
+CANNOT_ALIAS_TOKENS_IN_LEXER(file,line,col,arg) ::=
+	"<loc()>literals are illegal in lexer tokens{} section: <arg>"
 
 // GRAMMAR WARNINGS
-GRAMMAR_AMBIGUITY() ::= "grammar ambig"
+GRAMMAR_NONDETERMINISM(file,line,col) ::= "<loc()>nondeterministic decision"
+DUPLICATE_SET_ENTRY(file,line,col,arg) ::= 
+	"<loc()>duplicate token type <arg> when collapsing subrule into set"
 
 /* This factors out file location formatting; file,line,col inherited from
  * enclosing template; don't manually pass stuff in.

@@ -170,9 +170,6 @@ charSetElement
 	|   c2:CHAR_LITERAL RANGE^ c3:CHAR_LITERAL
 	;
 
-/** A list of token types (later I'll add options on tokens).  No longer
- *  do we allow string literals.
- */
 tokensSpec
 	:	TOKENS^
 			( tokenSpec	)+
@@ -576,10 +573,7 @@ COMMENT :
 protected
 SL_COMMENT :
 	"//"
-	( options {greedy=false;} : . )*
-	(
-		('\r')? '\n'
-	)
+	( options {greedy=false;} : . )* '\n'
 	{ newline(); }
 	;
 

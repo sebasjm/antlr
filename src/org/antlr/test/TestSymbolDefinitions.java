@@ -78,23 +78,31 @@ public class TestSymbolDefinitions extends TestSuite {
 		checkSymbols(g, rules, tokenNames);
 	}
 
-	public void testParserCharLiterals() throws Exception {
+	public void testParserTokensSection() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar t;\n"+
-				"a : '(' b ')';\n" +
+				"parser grammar t;\n" +
+				"tokens {\n" +
+				"  C;\n" +
+				"  D;" +
+				"}\n"+
+				"a : A | B;\n" +
 				"b : C ;");
 		String rules = "a, b";
-		String tokenNames = "C, '(', ')'";
+		String tokenNames = "A, B, C, D";
 		checkSymbols(g, rules, tokenNames);
 	}
 
-	public void testParserStringLiterals() throws Exception {
+	public void testLexerTokensSection() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar t;\n"+
-				"a : \"begin\" b \"end\";\n" +
-				"b : C ;");
-		String rules = "a, b";
-		String tokenNames = "C, \"begin\", \"end\"";
+				"lexer grammar t;\n" +
+				"tokens {\n" +
+				"  C;\n" +
+				"  D;" +
+				"}\n"+
+				"A : 'a';\n" +
+				"C : 'c' ;");
+		String rules = "A, C";
+		String tokenNames = "A, C, D";
 		checkSymbols(g, rules, tokenNames);
 	}
 
@@ -113,6 +121,84 @@ public class TestSymbolDefinitions extends TestSuite {
 
 	// T E S T  E R R O R S
 
+	public void testParserStringLiterals() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"parser grammar t;\n"+
+				"a : \"begin\" b ;\n" +
+				"b : C ;");
+		Object expectedArg = "\"begin\"";
+		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testParserCharLiterals() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"parser grammar t;\n"+
+				"a : '(' b ;\n" +
+				"b : C ;");
+		Object expectedArg = "'('";
+		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testStringLiteralInParserTokensSection() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+				"parser grammar t;\n" +
+				"tokens {\n" +
+				"  B=\"begin\";\n" +
+				"}\n"+
+				"a : A B;\n" +
+				"b : C ;");
+		Object expectedArg = "\"begin\"";
+		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testCharLiteralInParserTokensSection() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+				"parser grammar t;\n" +
+				"tokens {\n" +
+				"  B='(';\n" +
+				"}\n"+
+				"a : A B;\n" +
+				"b : C ;");
+		Object expectedArg = "'('";
+		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testCharLiteralInLexerTokensSection() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+				"lexer grammar t;\n" +
+				"tokens {\n" +
+				"  B='(';\n" +
+				"}\n"+
+				"ID : 'a';\n");
+		Object expectedArg = "'('";
+		int expectedMsgID = ErrorManager.MSG_CANNOT_ALIAS_TOKENS_IN_LEXER;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
 	public void testRuleRedefinition() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
@@ -123,8 +209,8 @@ public class TestSymbolDefinitions extends TestSuite {
 
 		Object expectedArg = "a";
 		int expectedMsgID = ErrorManager.MSG_RULE_REDEFINITION;
-		GrammarMessage expectedMessage =
-			new GrammarMessage(expectedMsgID, g, null, expectedArg);
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
 		checkError(equeue, expectedMessage);
 	}
 
@@ -138,8 +224,8 @@ public class TestSymbolDefinitions extends TestSuite {
 
 		Object expectedArg = "ID";
 		int expectedMsgID = ErrorManager.MSG_RULE_REDEFINITION;
-		GrammarMessage expectedMessage =
-			new GrammarMessage(expectedMsgID, g, null, expectedArg);
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
 		checkError(equeue, expectedMessage);
 	}
 
@@ -154,8 +240,8 @@ public class TestSymbolDefinitions extends TestSuite {
 
 		Object expectedArg = "x";
 		int expectedMsgID = ErrorManager.MSG_RULE_REDEFINITION;
-		GrammarMessage expectedMessage =
-			new GrammarMessage(expectedMsgID, g, null, expectedArg);
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
 		checkError(equeue, expectedMessage);
 	}
 
@@ -168,8 +254,8 @@ public class TestSymbolDefinitions extends TestSuite {
 
 		Object expectedArg = "ID";
 		int expectedMsgID = ErrorManager.MSG_NO_TOKEN_DEFINITION;
-		GrammarMessage expectedMessage =
-			new GrammarMessage(expectedMsgID, g, null, expectedArg);
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
 		checkError(equeue, expectedMessage);
 	}
 
@@ -191,13 +277,13 @@ public class TestSymbolDefinitions extends TestSuite {
 
 		Object expectedArg = "r";
 		int expectedMsgID = ErrorManager.MSG_UNDEFINED_RULE_REF;
-		GrammarMessage expectedMessage =
-			new GrammarMessage(expectedMsgID, g, null, expectedArg);
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
 		checkError(equeue, expectedMessage);
 	}
 
 	protected void checkError(ErrorQueue equeue,
-							  GrammarMessage expectedMessage)
+							  GrammarSemanticsMessage expectedMessage)
 		throws FailedAssertionException
 	{
 		System.out.println(equeue.infos);
@@ -216,8 +302,8 @@ public class TestSymbolDefinitions extends TestSuite {
 			}
 		}
 		assertTrue(foundMsg!=null, "error "+expectedMessage.msgID+" expected");
-		assertTrue(foundMsg instanceof GrammarMessage,
-				   "error is not a GrammarMessage");
+		assertTrue(foundMsg instanceof GrammarSemanticsMessage,
+				   "error is not a GrammarSemanticsMessage");
 		assertEqual(foundMsg.arg, expectedMessage.arg);
 	}
 

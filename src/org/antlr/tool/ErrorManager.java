@@ -28,6 +28,7 @@
 package org.antlr.tool;
 
 import org.antlr.Tool;
+import org.antlr.analysis.DecisionProbe;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplateErrorListener;
@@ -134,12 +135,15 @@ public class ErrorManager {
 	public static final int MSG_CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL = 104;
 	public static final int MSG_NO_TOKEN_DEFINITION = 105;
 	public static final int MSG_UNDEFINED_RULE_REF = 106;
+	public static final int MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE = 107;
+	public static final int MSG_CANNOT_ALIAS_TOKENS_IN_LEXER = 108;
 
 
 	// GRAMMAR WARNINGS
-	public static final int MSG_GRAMMAR_AMBIGUITY = 200;
+	public static final int MSG_GRAMMAR_NONDETERMINISM = 200;
+	public static final int MSG_DUPLICATE_SET_ENTRY = 201;
 
-	public static final int MAX_MESSAGE_NUMBER = 200;
+	public static final int MAX_MESSAGE_NUMBER = 201;
 
 	/** Messages should be sensitive to the locale. */
 	private static Locale locale;
@@ -345,7 +349,15 @@ public class ErrorManager {
 									Object arg2)
 	{
 		getErrorListener().error(
-			new GrammarMessage(msgID,g,token,arg,arg2)
+			new GrammarSemanticsMessage(msgID,g,token,arg,arg2)
+		);
+	}
+
+	public static void nondeterminism(int msgID,
+									  DecisionProbe probe)
+	{
+		getErrorListener().error(
+			new GrammarNonDeterminismMessage(msgID,probe)
 		);
 	}
 

@@ -791,7 +791,12 @@ public class NFAToDFAConverter {
         // Just return as a valid DFA state
 		int alt = d.getUniquelyPredictedAlt();
 		if ( alt!=NFA.INVALID_ALT_NUMBER ) {
-			if ( DFAOptimizer.MERGE_STOP_STATES ) {
+			// only merge stop states if they are deterministic.
+			// later, the error reporting may want to trace the path from
+			// the start state to the nondet state
+			if ( DFAOptimizer.MERGE_STOP_STATES &&
+				 d.getNondeterministicAlts()==null )
+			{
 				// check to see if we already have an accept state for this alt
 				// [must do this after we resolve nondeterminisms in general]
 				DFAState acceptStateForAlt = dfa.getAcceptState(alt);
@@ -986,7 +991,7 @@ public class NFAToDFAConverter {
 		}
 
 		if ( !conflictingLexerRules ) {
-			dfa.probe.reportNondeterminism(d,nondeterministicAlts);
+			dfa.probe.reportNondeterminism(d);
 		}
 
 		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
@@ -1200,16 +1205,19 @@ public class NFAToDFAConverter {
 
 		// remove any predicates from incompletely covered alts
 		iter = altToIncompletePredicateContextMap.iterator();
+		List incompletelyCoveredAlts = new ArrayList();
 		while (iter.hasNext()) {
 			Integer alt = (Integer) iter.next();
 			SemanticContext insufficientPred =(SemanticContext)
 					altToPredicateContextMap.get(alt);
 			if ( insufficientPred!=null ) {
-				dfa.probe.reportIncompletelyCoveredAlts(d,
-														alt.intValue(),
-														insufficientPred);
+				incompletelyCoveredAlts.add(alt);
 			}
 			altToPredicateContextMap.remove(alt);
+		}
+		if ( incompletelyCoveredAlts.size()>0 ) {
+			dfa.probe.reportIncompletelyCoveredAlts(d,
+													incompletelyCoveredAlts);
 		}
 
 		return altToPredicateContextMap;

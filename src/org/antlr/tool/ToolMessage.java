@@ -32,7 +32,7 @@ public class ToolMessage extends Message {
 		this.e = e;
 	}
 	public String toString() {
-		StringTemplate st = getMessage();
+		StringTemplate st = getMessageTemplate();
 		if ( arg!=null ) {
 			st.setAttribute("arg", arg);
 		}
@@ -41,6 +41,7 @@ public class ToolMessage extends Message {
 		}
 		if ( e!=null ) {
 			st.setAttribute("exception", e);
+			st.setAttribute("stackTrace", e.getStackTrace());
 		}
 		return st.toString();
 	}

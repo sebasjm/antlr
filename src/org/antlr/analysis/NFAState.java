@@ -129,10 +129,6 @@ public class NFAState extends State {
         this.description = description;
     }
 
-    public NFA getNFA() {
-        return nfa;
-    }
-
     public int getDecisionNumber() {
         return decisionNumber;
     }

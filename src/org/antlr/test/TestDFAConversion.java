@@ -33,6 +33,7 @@ import org.antlr.tool.Grammar;
 import org.antlr.tool.FASerializer;
 import org.antlr.analysis.State;
 import org.antlr.analysis.DFA;
+import org.antlr.analysis.DecisionProbe;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.BitSet;
 
@@ -48,7 +49,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testA() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A C | B;");
 		String expecting =
 			".s0-A->:s1=>1\n" +
@@ -58,7 +59,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAB_or_AC() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A B | A C;");
 		String expecting =
 			".s0-A->.s1\n" +
@@ -69,7 +70,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testselfRecurseNonDet() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A a X | A a Y;");
 		// nondeterministic from left edge; no stop state
 		String expecting =
@@ -81,7 +82,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testselfRecurseNonDet2() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : P a P | P;");
 		// nondeterministic from left edge; no stop state
 		String expecting =
@@ -92,7 +93,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testifThenElse() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"s : IF s (E s)? | B;\n" +
 			"slist: s SEMI ;");
 		String expecting =
@@ -107,7 +108,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testinvokeRule() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : b A\n" +
 			"  | b B\n" +
 			"  | C\n" +
@@ -124,7 +125,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testDoubleInvokeRuleLeftEdge() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : b X\n" +
 			"  | b Y\n" +
 			"  ;\n" +
@@ -149,7 +150,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testimmediateTailRecursion() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A a | A B;");
 		String expecting =
 			".s0-A->.s1\n" +
@@ -160,7 +161,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAStar_immediateTailRecursion() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A a | ;");
 		String expecting =
 			".s0-A->:s1=>1\n";
@@ -169,7 +170,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testimmediateLeftRecursion() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : a A | B;");
 		String expecting =
 			".s0-B->:s1=>1\n";
@@ -180,7 +181,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAStar() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : ( A )* ;");
 		String expecting =
 			".s0-<EOF>->:s1=>2\n" +
@@ -190,7 +191,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAorBorCStar() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : ( A | B | C )* ;");
 		String expecting =
 			".s0-<EOF>->:s1=>2\n" +
@@ -200,7 +201,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAPlus() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : ( A )+ ;");
 		String expecting =
 			".s0-<EOF>->:s1=>2\n" +
@@ -210,7 +211,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAPlusNonGreedyWhenDeterministic() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : (options {greedy=false;}:A)+ ;\n");
 		// should look the same as A+ since no ambiguity
 		String expecting =
@@ -221,7 +222,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAorBorCPlus() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : ( A | B | C )+ ;");
 		String expecting =
 			".s0-<EOF>->:s1=>2\n" +
@@ -231,7 +232,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAOptional() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : ( A )? B ;");
 		String expecting =
 			".s0-A->:s1=>1\n" +
@@ -241,7 +242,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAorBorCOptional() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : ( A | B | C )? Z ;");
 		String expecting =
 			".s0-A..C->:s1=>1\n" +
@@ -253,7 +254,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAStarBOrAStarC() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : (A)* B | (A)* C;");
 		String expecting =
 			".s0-A->:s2=>1\n" +
@@ -276,7 +277,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAStarBOrAPlusC() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : (A)* B | (A)+ C;");
 		String expecting =
 			".s0-A->:s2=>1\n" +
@@ -298,7 +299,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testAOrBPlusOrAPlus() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : (A|B)* X | (A)+ Y;");
 		String expecting =
 			".s0-A..B->:s2=>1\n" +
@@ -319,7 +320,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testLoopbackAndExit() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : (A|B)+ B;");
 		String expecting =
 			".s0-A->:s2=>1\n" +
@@ -331,7 +332,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testOptionalAltAndBypass() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : (A|B)? B;");
 		String expecting =
 			".s0-A->:s2=>1\n" +
@@ -345,7 +346,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testResolveLL1ByChoosingFirst() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A C | A C;");
 		String expecting =
 			".s0-A->.s1\n" +
@@ -355,7 +356,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testResolveLL2ByChoosingFirst() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A B | A B;");
 		String expecting =
 			".s0-A->.s1\n" +
@@ -365,7 +366,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testResolveLL2MixAlt() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A B | A C | A B | Z;");
 		String expecting =
 			".s0-A->.s1\n" +
@@ -385,7 +386,7 @@ public class TestDFAConversion extends TestSuite {
 		// where state 27 is the first alt of (c)+ and 8 is the first alt
 		// of the (cg)* loop.
 		Grammar g = new Grammar(
-			"grammar t;\n" +
+			"parser grammar t;\n" +
 			"s : LCURLY ( cg )* RCURLY | E SEMI  ;\n" +
 			"cg : (c)+ (s)* ;\n" +
 			"c : CASE E ;\n");
@@ -400,7 +401,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testComplement() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : ~(A | B | C) | C;\n" +
 			"b : X Y Z ;");
 		String expecting =
@@ -411,7 +412,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testComplementToken() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : ~C | C;\n" +
 			"b : X Y Z ;");
 		String expecting =
@@ -442,7 +443,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testNoSetCollapseWithActions() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : (A | B {foo}) | C;");
 		String expecting =
 			".s0-A->:s1=>1\n" +
@@ -452,7 +453,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testRuleAltsSetCollapse() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A | B | C ;"
 		);
 		String expecting =
@@ -475,19 +476,20 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testMultipleSequenceCollision() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n" +
+			"parser grammar t;\n" +
 			"a : (A{;}|B)\n" +
 			"  | (A{;}|B)\n" +
 			"  | A\n" +
 			"  ;");
 		String expecting =
-			".s0-A..B->:s1=>1\n"; // after optimization
+			".s0-A->:s1=>1\n" +
+			".s0-B->:s2=>1\n"; // not optimized because states are nondet
 		checkDecision(g, 3, expecting, new int[] {2,3});
 	}
 
 	public void testMultipleAltsSameSequenceCollision() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n" +
+			"parser grammar t;\n" +
 			"a : type ID \n" +
 			"  | type ID\n" +
 			"  | type ID\n" +
@@ -507,7 +509,7 @@ public class TestDFAConversion extends TestSuite {
 		// loop in sl.  Note that D07 is matched by ~(R|SLASH).  No good
 		// way to write that grammar I guess
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"sl : L ( esc | ~(R|SLASH) )* R ;\n" +
 			"\n" +
 			"esc : SLASH ( N | D03 (D07)? ) ;");
@@ -522,7 +524,7 @@ public class TestDFAConversion extends TestSuite {
 	public void testSelfRecursionAmbigAlts() throws Exception {
 		// ambiguous grammar for "L ID R" (alts 1,2 of a)
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a   :   L ID R\n" +
 			"    |   L a R\n" + // disabled for L ID R
 			"    |   b\n" +
@@ -584,7 +586,7 @@ public class TestDFAConversion extends TestSuite {
 
 	public void _template() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"parser grammar t;\n"+
 			"a : A | B;");
 		String expecting =
 			"\n";
@@ -605,6 +607,8 @@ public class TestDFAConversion extends TestSuite {
 			g.createNFAs();
 			g.createLookaheadDFAs();
 		}
+
+		DecisionProbe.verbose=true; // make sure we get all error info
 
 		DFA dfa = g.getLookaheadDFA(decision);
 		assertTrue(dfa!=null, "no DFA for decision "+decision);

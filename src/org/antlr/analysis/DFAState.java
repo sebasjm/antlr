@@ -397,7 +397,10 @@ public class DFAState extends State {
 	 *
 	 *  a : A | A | A ;
 	 *
-	 *  this method returns {2,3} as disabled.
+	 *  this method returns {2,3} as disabled.  This does not mean that
+	 *  the alternative is totally unreachable, it just means that for this
+	 *  DFA state, that alt is disabled.  There may be other accept states
+	 *  for that alt.
 	 */
 	public Set getDisabledAlternatives() {
 		Set disabled = new LinkedHashSet();

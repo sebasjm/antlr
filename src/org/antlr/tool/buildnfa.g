@@ -415,16 +415,34 @@ setElement[IntSet elements]
     :   c:CHAR_LITERAL
         {
         ttype = Grammar.getCharValueFromLiteral(c.getText());
+        if ( elements.member(ttype) ) {
+			ErrorManager.grammarError(ErrorManager.MSG_DUPLICATE_SET_ENTRY,
+									  grammar,
+									  #c.token,
+									  #c.getText());
+        }
         elements.add(ttype);
         }
     |   t:TOKEN_REF
         {
         ttype = grammar.getTokenType(t.getText());
+        if ( elements.member(ttype) ) {
+			ErrorManager.grammarError(ErrorManager.MSG_DUPLICATE_SET_ENTRY,
+									  grammar,
+									  #t.token,
+									  #t.getText());
+        }
         elements.add(ttype);
         }
     |   s:STRING_LITERAL
         {
         ttype = grammar.getTokenType(s.getText());
+        if ( elements.member(ttype) ) {
+			ErrorManager.grammarError(ErrorManager.MSG_DUPLICATE_SET_ENTRY,
+									  grammar,
+									  #s.token,
+									  #s.getText());
+        }
         elements.add(ttype);
         }
     |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)

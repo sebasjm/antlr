@@ -122,7 +122,7 @@ public class DFA {
 
     public DFA(NFAState decisionStartState) {
         this.decisionNFAStartState = decisionStartState;
-        nfa = decisionStartState.getNFA();
+        nfa = decisionStartState.nfa;
         nAlts = nfa.grammar.getNumberOfAltsForDecisionNFA(decisionStartState);
         setOptions( nfa.grammar.getDecisionOptions(getDecisionNumber()) );
         initAltRelatedInfo();
@@ -131,13 +131,15 @@ public class DFA {
 		nfaConverter.convert(decisionStartState);
 
 		// figure out if there are problems with decision
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		verify();
 		
 		if ( !probe.isDeterministic() ) {
-			probe.reportErrors();
+			ErrorManager.nondeterminism(ErrorManager.MSG_GRAMMAR_NONDETERMINISM,
+										probe);
+			probe.computeErrors();
 		}
-		long stop = System.currentTimeMillis();
+		//long stop = System.currentTimeMillis();
 		//System.out.println("verify cost: "+(int)(stop-start)+" ms");
     }
 

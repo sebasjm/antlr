@@ -37,9 +37,8 @@ header {
  *  within.
  *
  *  CASE 1 : pure parser grammar
- *	a) Any char or string literal gets a token type.
- *  b) Any reference to a token gets a token type.
- *  c) The tokens section may alias a token name to a string or char (n/a yet?)
+ *	a) Any reference to a token gets a token type.
+ *  b) The tokens section may alias a token name to a string or char
  *
  *  CASE 2 : pure lexer grammar
  *  a) Import token vocabulary if available. Set token types for any new tokens
@@ -51,21 +50,12 @@ header {
  *	a) Any char or string literal gets a token type in a parser rule
  *  b) Any reference to a token gets a token type if not referencing
  *     a fragment lexer rule
- *  c) The tokens section may alias a token name to a string or char (n/a yet?)
+ *  c) The tokens section may alias a token name to a string or char
  *     which must add a rule to the lexer
  *  d) token rule definitions get token types if not already defined
  *  e) token rule definitions may also alias a token name to a literal.
  *     E.g., Rule 'FOR : "for";' will alias FOR to "for" in the sense that
  *     references to either in the parser grammar will yield the token type
- *
- *  Errors/warnings
- *  a) References to undefined token names in the lexer are a problem.
- *  b) For merged lexers/parsers references to undefined token names in
- *     any rule is a problem.  Further, any reference to a literal in a
- *     parser rule that is not defined in the lexer causes an error.
- *  c) Unaliased literals in a pure parser cannot ever be matched as
- *     there is no connection to a lexer's token types.
- *  d) no tokens section allowed only in parser or merged spec
  *
  *  What this pass does:
  *
@@ -122,8 +112,25 @@ protected int getNewTokenType() {
 	return type;
 }
 
-/** Track characters in any non-lexer rule */
+/** Track characters in any non-lexer rule (could be in tokens{} section) */
 protected void trackChar(GrammarAST t) {
+	// if lexer don't allow aliasing in tokens section
+	if ( currentRuleName==null && grammar.type==Grammar.LEXER ) {
+		ErrorManager.grammarError(ErrorManager.MSG_CANNOT_ALIAS_TOKENS_IN_LEXER,
+								  grammar,
+								  t.token,
+								  t.getText());
+		return;
+	}
+	// if not in a combined grammar rule or lexer rule, cannot reference literals
+	if ( grammar.type!=Grammar.COMBINED && grammar.type!=Grammar.LEXER ) {
+		ErrorManager.grammarError(ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE,
+								  grammar,
+								  t.token,
+								  t.getText());
+	}
+	// otherwise add literal to token types if referenced from parser rule
+	// or in the tokens{} section
 	if ( currentRuleName==null ||
 	     Character.isLowerCase(currentRuleName.charAt(0)) )
 	{
@@ -131,10 +138,27 @@ protected void trackChar(GrammarAST t) {
 	}
 }
 
-/** Track string literals in any non-lexer rule */
+/** Track string literals in any non-lexer rule (could be in tokens{} section) */
 protected void trackString(GrammarAST t) {
+	// if lexer don't allow aliasing in tokens section
+	if ( currentRuleName==null && grammar.type==Grammar.LEXER ) {
+		ErrorManager.grammarError(ErrorManager.MSG_CANNOT_ALIAS_TOKENS_IN_LEXER,
+								  grammar,
+								  t.token,
+								  t.getText());
+		return;
+	}
+	// if not in a combined grammar rule or lexer rule, cannot reference literals
+	if ( grammar.type!=Grammar.COMBINED && grammar.type!=Grammar.LEXER ) {
+		ErrorManager.grammarError(ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE,
+								  grammar,
+								  t.token,
+								  t.getText());
+	}
+	// otherwise add literal to token types if referenced from parser rule
+	// or in the tokens{} section
 	if ( currentRuleName==null ||
-             Character.isLowerCase(currentRuleName.charAt(0)) )
+         Character.isLowerCase(currentRuleName.charAt(0)) )
 	{
 		stringLiterals.put(t.getText(), UNASSIGNED_IN_PARSER_RULE);
 	}
@@ -237,9 +261,9 @@ protected void assignTypes() {
 			if ( oldType<Label.MIN_TOKEN_TYPE ) {
 				Integer typeI = new Integer(getNewTokenType());
 				stringLiterals.put(lit, typeI);
-				if ( oldTypeI == UNASSIGNED_IN_PARSER_RULE ) {
-					grammar.defineLexerRuleForStringLiteral(lit, typeI.intValue());
-				}
+				// if string referenced in combined grammar parser rule,
+				// automatically define in the generated lexer
+				grammar.defineLexerRuleForStringLiteral(lit, typeI.intValue());
 			}
 		}
 	}
