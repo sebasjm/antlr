@@ -160,9 +160,6 @@ case <i> :
     break;
 >>
 
-dfaDecision(decisionNumber,description) ::=
-  "alt<decisionNumber> = DFA<decisionNumber>.predict(input);"
-
 alt(elements) ::= "<elements; separator=\"\n\">"
 
 tokenRef(token) ::= "match(<token>);"
@@ -194,14 +191,10 @@ ruleRef(rule,args) ::= "<rule>(<args>);"
 lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
 
 
-// A C T I O N S
+// F i x e d  D F A  s t u f f
 
-emit(type) ::= "emit(<type>);"
-
-setType(type) ::= "setType(<type>);"
-
-
-// D F A S
+dfaDecision(decisionNumber,description) ::=
+  "alt<decisionNumber> = DFA<decisionNumber>.predict(input);"
 
 dfaState(edges,defaultClause,eotPredictsAlt,description) ::= <<
 <edges; separator="else ">
@@ -227,43 +220,6 @@ if ( <labelExpr> ) {
 }
 >>
 
-cyclicDFA(decision,states,description) ::= <<
-static class DFA<decision> extends DFA {
-    public static int predict(<(streamType)()> input) {
-        return predict(input, s0);
-    }
-    <states>
-}
->>
-
-cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
-static DFA.State s<stateNumber> = new DFA.State() {
-    public DFA.State transition(<(streamType)()> input) {
-        <edges>
-        <if(needErrorClause)>
-        <if(LEXER)>
-        System.err.println("no viable alt line "+getLine()+" c='"+(char)input.LA(1)+"'");
-        <else>
-        System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));
-        <endif>
-        return null;
-        <endif>
-    }
-};
->>
-
-cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
-static DFA.State s<stateNumber> = new DFA.State() {{alt=<predictAlt>;}};
->>
-
-cyclicDFAEdge(labelExpr, targetStateNumber) ::= <<
-if ( <labelExpr> ) {return s<targetStateNumber>;}
->>
-
-eotDFAEdge(targetStateNumber) ::= <<
-return s<targetStateNumber>;
->>
-
 // D F A  E X P R E S S I O N S
 
 andPredicates(left,right) ::= "(<left>&&<right>)"
@@ -272,12 +228,18 @@ orPredicates(left,right) ::= "(<left>||<right>)"
 
 notPredicate(pred) ::= "!(<pred>)"
 
-lookaheadTest(atom,k) ::= "input.LA(<k>)==<atom>"
+lookaheadTest(atom,k,atomAsInt) ::= "input.LA(<k>)==<atom>"
 
-lookaheadRangeTest(lower,upper,k) ::=
+lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::=
 	"(input.LA(<k>)>=<lower> && input.LA(<k>)\<=<upper>)"
 
 setTest(ranges) ::= "<ranges; separator=\"||\">"
+
+// A C T I O N S
+
+emit(type) ::= "emit(<type>);"
+
+setType(type) ::= "setType(<type>);"
 
 
 // M I S C

@@ -73,6 +73,9 @@ options {
      */
     protected StringTemplate recognizerST;
 
+    /** DFAs might be in different file, have separate pointer */
+    protected StringTemplate dfaST;
+
     protected void init(Grammar g) {
         this.grammar = g;
         this.generator = grammar.getCodeGenerator();
@@ -80,11 +83,15 @@ options {
     }
 }
 
-grammar[Grammar g, StringTemplate recognizerST, StringTemplate outputFileST]
+grammar[Grammar g,
+        StringTemplate recognizerST,
+        StringTemplate dfaST,  // in case DFAs go in separate file
+        StringTemplate outputFileST]
 {
     String name;
     init(g);
     this.recognizerST = recognizerST;
+    this.dfaST = dfaST;
 }
     :   (headerSpec[outputFileST])*
         #( "grammar"
@@ -102,11 +109,11 @@ headerSpec[StringTemplate outputFileST]
     :   #( "header" a:ACTION {outputFileST.setAttribute("headerAction", #a.getText());} )
     ;
 
-rules[StringTemplate grammarST]
+rules[StringTemplate recognizerST]
 {
 StringTemplate rST;
 }
-    :   ( rST=rule {grammarST.setAttribute("rules", rST);} )+
+    :   ( rST=rule {recognizerST.setAttribute("rules", rST);} )+
     ;
 
 rule returns [StringTemplate code=null]
@@ -154,7 +161,7 @@ block[String blockTemplateName, DFA dfa]
     */
     if ( dfa!=null ) {
         code = templates.getInstanceOf(blockTemplateName);
-        decision = generator.genLookaheadDecision(templates,recognizerST,dfa);
+        decision = generator.genLookaheadDecision(dfaST,dfa);
         code.setAttribute("decision", decision);
         code.setAttribute("decisionNumber", dfa.getDecisionNumber());
 		code.setAttribute("maxK",generator.maxK);

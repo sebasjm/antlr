@@ -261,6 +261,8 @@ public class DOTGenerator {
             StringBuffer buf = new StringBuffer(250);
             Set configurations = ((DFAState)s).getNFAConfigurations();
             int n = 0;
+			buf.append(s.getStateNumber());
+			buf.append(": ");
             for (Iterator it = configurations.iterator(); it.hasNext();) {
                 NFAConfiguration configuration = (NFAConfiguration) it.next();
                 n++;
