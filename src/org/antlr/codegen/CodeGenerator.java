@@ -90,7 +90,8 @@ public class CodeGenerator {
 	 *  vocabulary environment would generate a SWITCH with 65000 labels.
 	 */
 	public int MAX_SWITCH_CASE_LABELS = 300;
-	public static final boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true; 
+	public int MIN_SWITCH_ALTS = 3;
+	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
 
 	public static int escapedCharValue[] = new int[255];
 	public static String charValueEscape[] = new String[255];
@@ -157,6 +158,15 @@ public class CodeGenerator {
 	/** I have factored out the generation of cyclic DFAs to separate class */
 	protected CyclicDFACodeGenerator cyclicDFAGenerator =
 		new CyclicDFACodeGenerator(this);
+
+	/** When generating code for DFAs (cyclic or otherwise), sometimes
+	 *  semantic predicates are required to predict alternatives.  Predicates
+	 *  in acyclic DFAs are evaluated in-line but cyclic DFAs are generated
+	 *  in bytecodes for the Java target.  The predicates need to be compiled
+	 *  somewhere so I put them in the recognizer as methods for the bytecodes
+	 *  to call.
+	 */
+	protected List semanticPredicateMethodsFromCyclicDFAs = new ArrayList();
 
 	// TODO move to separate file
 	protected final String vocabFilePattern =
@@ -295,21 +305,21 @@ public class CodeGenerator {
 		// RECOGNIZER
 		if ( grammar.type==Grammar.LEXER ) {
 			recognizerST = templates.getInstanceOf("lexer");
-			outputFileST.setAttribute("LEXER", "true");
-			headerFileST.setAttribute("LEXER", "true");
+			outputFileST.setAttribute("LEXER", new Boolean(true));
+			headerFileST.setAttribute("LEXER", new Boolean(true));
 		}
 		else if ( grammar.type==Grammar.PARSER ||
 			      grammar.type==Grammar.COMBINED )
 		{
 			recognizerST = templates.getInstanceOf("parser");
-			outputFileST.setAttribute("PARSER", "true");
-			headerFileST.setAttribute("PARSER", "true");
+			outputFileST.setAttribute("PARSER", new Boolean(true));
+			headerFileST.setAttribute("PARSER", new Boolean(true));
 			outputFileST.setAttribute("debug", new Boolean(debug));
 		}
 		else {
 			recognizerST = templates.getInstanceOf("treeParser");
-			outputFileST.setAttribute("TREE_PARSER", "true");
-			headerFileST.setAttribute("TREE_PARSER", "true");
+			outputFileST.setAttribute("TREE_PARSER", new Boolean(true));
+			headerFileST.setAttribute("TREE_PARSER", new Boolean(true));
 		}
 		outputFileST.setAttribute("recognizer", recognizerST);
 
@@ -339,6 +349,12 @@ public class CodeGenerator {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
+		recognizerST.setAttribute("predicates",
+								  semanticPredicateMethodsFromCyclicDFAs);
+		headerFileST.setAttribute("predicates",
+								  semanticPredicateMethodsFromCyclicDFAs);
+		outputFileST.setAttribute("predicates",
+								  semanticPredicateMethodsFromCyclicDFAs);
 		genTokenTypeConstants(recognizerST);
 		genTokenTypeConstants(outputFileST);
 		genTokenTypeConstants(headerFileST);
@@ -494,14 +510,14 @@ public class CodeGenerator {
     }
 
     protected StringTemplate genLabelExpr(StringTemplateGroup templates,
-                                          Label label,
-                                          int k)
+										  Label label,
+										  int k)
     {
         if ( label.isSemanticPredicate() ) {
             return genSemanticPredicateExpr(templates, label);
         }
         if ( label.isSet() ) {
-            return genSetExpr(templates, label.getSet(), k);
+            return genSetExpr(templates, label.getSet(), k, true);
         }
         // must be simple label
         StringTemplate eST = templates.getInstanceOf("lookaheadTest");
@@ -523,7 +539,8 @@ public class CodeGenerator {
      */
     public StringTemplate genSetExpr(StringTemplateGroup templates,
                                      IntSet set,
-                                     int k)
+                                     int k,
+									 boolean partOfDFA)
     {
         IntervalSet iset = (IntervalSet)set;
         if ( !(iset instanceof IntervalSet) ) {
@@ -532,6 +549,12 @@ public class CodeGenerator {
         if ( iset.getIntervals()==null || iset.getIntervals().size()==0 ) {
             return new StringTemplate(templates, "");
         }
+		String testSTName = "lookaheadTest";
+		String testRangeSTName = "lookaheadRangeTest";
+		if ( !partOfDFA ) {
+			testSTName = "isolatedLookaheadTest";
+			testRangeSTName = "isolatedLookaheadRangeTest";
+		}
         StringTemplate setST = templates.getInstanceOf("setTest");
         Iterator iter = iset.getIntervals().iterator();
         int rangeNumber = 1;
@@ -541,13 +564,13 @@ public class CodeGenerator {
             int b = I.b;
 			StringTemplate eST;
             if ( a==b ) {
-                eST = templates.getInstanceOf("lookaheadTest");
+                eST = templates.getInstanceOf(testSTName);
 				eST.setAttribute("atom", grammar.getTokenTypeAsLabel(a));
 				eST.setAttribute("atomAsInt", new Integer(a));
                 //eST.setAttribute("k",new Integer(k));
             }
             else {
-                eST = templates.getInstanceOf("lookaheadRangeTest");
+                eST = templates.getInstanceOf(testRangeSTName);
                 eST.setAttribute("lower",grammar.getTokenTypeAsLabel(a));
 				eST.setAttribute("lowerAsInt", new Integer(a));
 				eST.setAttribute("upper",grammar.getTokenTypeAsLabel(b));
@@ -870,6 +893,11 @@ public class CodeGenerator {
         return grammar.name+VOCAB_FILE_EXTENSION;
     }
 
+	/** TODO: add the package to the name; language sensitive? */
+	public String getClassName() {
+		return grammar.name;
+	}
+
 	public void write(StringTemplate code, String fileName) throws IOException {
         System.out.println("writing "+fileName);
         FileWriter fw = tool.getOutputFile(fileName);
@@ -895,7 +923,7 @@ public class CodeGenerator {
 			}
 			size += edge.label.getSet().size();
 		}
-		if ( size>=MAX_SWITCH_CASE_LABELS ) {
+		if ( s.getNumberOfTransitions()<MIN_SWITCH_ALTS || size>MAX_SWITCH_CASE_LABELS ) {
 			return false;
 		}
         return true;

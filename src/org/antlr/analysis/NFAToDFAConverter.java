@@ -1230,18 +1230,28 @@ public class NFAToDFAConverter {
 	{
 		// map alt to combined SemanticContext
 		Map altToPredicateContextMap = new HashMap();
-		// track tautologies like p1||true
-		Set altToIncompletePredicateContextMap = new HashSet();
+		// init the alt to predicate set map
+		Map altToSetOfContextsMap = new HashMap();
+		for (Iterator it = nondeterministicAlts.iterator(); it.hasNext();) {
+			Integer altI = (Integer) it.next();
+			altToSetOfContextsMap.put(altI, new HashSet());
+		}
+		Set altToIncompletePredicateContextSet = new HashSet();
 		Iterator iter = d.nfaConfigurations.iterator();
 		NFAConfiguration configuration;
+		// for each configuration, create a unique set of predicates
+		// Also, track the alts with at least one uncovered configuration
+		// (one w/o a predicate); tracks tautologies like p1||true
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
+			Integer altI = new Integer(configuration.alt);
 			// if alt is nondeterministic, combine its predicates
-			if ( nondeterministicAlts.contains(new Integer(configuration.alt)) ) {
+			if ( nondeterministicAlts.contains(altI) ) {
 				// if there is a predicate for this NFA configuration, OR in
 				if ( configuration.semanticContext !=
 					 SemanticContext.EMPTY_SEMANTIC_CONTEXT )
 				{
+					/*
 					SemanticContext altsExistingPred =(SemanticContext)
 							altToPredicateContextMap.get(new Integer(configuration.alt));
 					if ( altsExistingPred!=null ) {
@@ -1250,11 +1260,9 @@ public class NFAToDFAConverter {
 								SemanticContext.or(
 										altsExistingPred,
 										configuration.semanticContext);
-						/*
 						System.out.println(altsExistingPred+" OR "+
 										   configuration.semanticContext+
 										   "="+combinedContext);
-						*/
 						altToPredicateContextMap.put(
 								new Integer(configuration.alt),
 								combinedContext
@@ -1267,20 +1275,48 @@ public class NFAToDFAConverter {
 								configuration.semanticContext
 						);
 					}
+					*/
+					Set predSet = (Set)altToSetOfContextsMap.get(altI);
+					predSet.add(configuration.semanticContext);
 				}
 				else {
 					// if no predicate, but it's part of nondeterministic alt
 					// then at least one path exists not covered by a predicate.
 					// must remove predicate for this alt; track incomplete alts
-					altToIncompletePredicateContextMap.add(
-							new Integer(configuration.alt)
-					);
+					altToIncompletePredicateContextSet.add(altI);
 				}
 			}
 		}
 
+		// For each alt, OR together all unique predicates associated with
+		// all configurations
+		// Also, track the list of incompletely covered alts: those alts
+		// with at least 1 predicate and at least one configuration w/o a
+		// predicate. We want this in order to report to the decision probe.
+		List incompletelyCoveredAlts = new ArrayList();
+		for (Iterator it = nondeterministicAlts.iterator(); it.hasNext();) {
+			Integer altI = (Integer) it.next();
+			Set predSet = (Set)altToSetOfContextsMap.get(altI);
+			if ( altToIncompletePredicateContextSet.contains(altI) ) {
+				SemanticContext insufficientPred =(SemanticContext)
+						altToPredicateContextMap.get(altI);
+				if ( predSet.size()>0 ) {
+					incompletelyCoveredAlts.add(altI);
+				}
+				continue;
+			}
+			SemanticContext combinedContext = null;
+			for (Iterator itrSet = predSet.iterator(); itrSet.hasNext();) {
+				SemanticContext ctx = (SemanticContext) itrSet.next();
+				combinedContext =
+						SemanticContext.or(combinedContext,ctx);
+			}
+			altToPredicateContextMap.put(altI, combinedContext);
+		}
+
 		// remove any predicates from incompletely covered alts
-		iter = altToIncompletePredicateContextMap.iterator();
+		/*
+		iter = altToIncompletePredicateContextSet.iterator();
 		List incompletelyCoveredAlts = new ArrayList();
 		while (iter.hasNext()) {
 			Integer alt = (Integer) iter.next();
@@ -1291,6 +1327,8 @@ public class NFAToDFAConverter {
 			}
 			altToPredicateContextMap.remove(alt);
 		}
+		*/
+
 		if ( incompletelyCoveredAlts.size()>0 ) {
 			dfa.probe.reportIncompletelyCoveredAlts(d,
 													incompletelyCoveredAlts);

@@ -98,7 +98,9 @@ public abstract class SemanticContext {
         }
 
         public StringTemplate genExpr(StringTemplateGroup templates) {
-            return new StringTemplate(this.toString());
+			StringTemplate eST = templates.getInstanceOf("singlePredicate");
+			eST.setAttribute("pred", this.toString());
+            return eST;
         }
 
         public String toString() {
@@ -116,7 +118,6 @@ public abstract class SemanticContext {
             this.right = b;
         }
         public SemanticContext reduce() {
-            // (p1a||p1b)||p1a => p1a||p1b where a=(p1a||p1b) and b=p1a
             left.reduce();
             right.reduce();
             return this;
@@ -152,7 +153,7 @@ public abstract class SemanticContext {
             // (p1a||p1b)||p1a => p1a||p1b where a=(p1a||p1b) and b=p1a
             left.reduce();
             right.reduce();
-            if ( left instanceof OR && right instanceof Predicate ) {
+			if ( left instanceof OR && right instanceof Predicate ) {
                 OR leftOr = (OR)left;
                 Predicate p = (Predicate)right;
                 if ( leftOr.left.equals(p) || leftOr.right.equals(p) ) {
@@ -219,10 +220,10 @@ public abstract class SemanticContext {
     }
 
     public static SemanticContext and(SemanticContext a, SemanticContext b) {
-        if ( a==EMPTY_SEMANTIC_CONTEXT ) {
+        if ( a==EMPTY_SEMANTIC_CONTEXT || a==null ) {
             return b;
         }
-        if ( b==EMPTY_SEMANTIC_CONTEXT ) {
+        if ( b==EMPTY_SEMANTIC_CONTEXT || b==null ) {
             return a;
         }
         if ( a.equals(b) ) {
@@ -232,10 +233,10 @@ public abstract class SemanticContext {
     }
 
     public static SemanticContext or(SemanticContext a, SemanticContext b) {
-        if ( a==EMPTY_SEMANTIC_CONTEXT ) {
+        if ( a==EMPTY_SEMANTIC_CONTEXT || a==null ) {
             return b;
         }
-        if ( b==EMPTY_SEMANTIC_CONTEXT ) {
+        if ( b==EMPTY_SEMANTIC_CONTEXT || b==null ) {
             return a;
         }
         if ( a.equals(b) ) {

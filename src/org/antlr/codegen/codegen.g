@@ -304,7 +304,6 @@ element returns [StringTemplate code=null]
 }
     :   code=atom[null]
     |   #(  n:NOT
-            {code = templates.getInstanceOf("matchNotSet");}
             (  c:CHAR_LITERAL
 	           {
 	           int ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
@@ -324,7 +323,7 @@ element returns [StringTemplate code=null]
             )
             {
             code = templates.getInstanceOf("matchNotSet");
-            code.setAttribute("s", generator.genSetExpr(templates,elements,1));
+            code.setAttribute("s", generator.genSetExpr(templates,elements,1,false));
             }
          )
 
@@ -349,24 +348,9 @@ element returns [StringTemplate code=null]
                                   generator.translateAction(currentRuleName,#act.getText()));
         }
 
-    |	lexer_action
-
     |   SEMPRED
 
     |   EPSILON
-    ;
-
-lexer_action
-	:	#( LEXER_ACTION (lexer_assignment)+ )
-	;
-
-lexer_assignment
-	:	#( ASSIGN ID lexer_expr )
-	;
-
-lexer_expr
-	:	INT
-	|	ID
     ;
 
 ebnf returns [StringTemplate code=null]
@@ -470,7 +454,7 @@ set[String label] returns [StringTemplate code=null]
 	:   s:SET
         {
         code = templates.getInstanceOf("matchSet");
-        code.setAttribute("s", generator.genSetExpr(templates,#s.getSetValue(),1));
+        code.setAttribute("s", generator.genSetExpr(templates,#s.getSetValue(),1,false));
         if ( label!=null ) {code.setAttribute("label", label);}
         }
     ;

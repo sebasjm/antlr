@@ -347,6 +347,39 @@ public class TestSemanticPredicates extends TestSuite {
 	}
 
 
+	/** For a DFA state with lots of configurations that have the same
+	 *  predicate, don't just OR them all together as it's a waste to
+	 *  test a||a||b||a||a etc...  ANTLR makes a unique set and THEN
+	 *  OR's them together.
+	 */
+	public void testUniquePredicateOR() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar v;\n" +
+			"\n" +
+			"a : {a}? b\n" +
+			"  | {b}? b\n" +
+			"  ;\n" +
+			"\n" +
+			"b : {c}? (X)+ ;\n" +
+			"\n" +
+			"c : a\n" +
+			"  | b\n" +
+			"  ;\n");
+		String expecting =
+			".s0-X->.s1\n" +
+			".s1-{((b&&c)||(a&&c))}?->:s2=>1\n" +
+			".s1-{c}?->:s3=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] insufficientPredAlts = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 3, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, insufficientPredAlts,
+					  danglingAlts, numWarnings);
+	}
+
 	// S U P P O R T
 
 	public void _template() throws Exception {

@@ -3,7 +3,7 @@ group C;
 // G R A M M A R  E L E M E N T S
 
 outputFile(LEXER, PARSER, TREE_PARSER, headerAction, docComment, recognizer,
-	name, literals, tokens, rules, cyclicDFAs ) ::=
+	name, literals, tokens, rules, cyclicDFAs, predicates ) ::=
 <<
 <headerAction>
 
@@ -24,7 +24,7 @@ outputFile(LEXER, PARSER, TREE_PARSER, headerAction, docComment, recognizer,
 <recognizer>
 >>
 
-headerFile(name, literals, tokens, rules, cyclicDFAs) ::= <<
+headerFile(name, literals, tokens, rules, cyclicDFAs, predicates) ::= <<
 #ifndef __<name>_H__
 #define __<name>_H__
 
@@ -72,7 +72,7 @@ typedef struct LexerContext {
 #endif
 >>
 
-lexer(name, tokens, literals, rules, cyclicDFAs) ::= <<
+lexer(name, tokens, literals, rules, cyclicDFAs, predicates) ::= <<
 /* Lexer code generated for <name> */
 
 /* FIXME:
@@ -443,7 +443,7 @@ int main( int argc, char** argv )
 /* End of lexer definition for <name> */
 >>
 
-parser(name, tokens, rules, cyclicDFAs) ::= <<
+parser(name, tokens, rules, cyclicDFAs, predicates) ::= <<
 
 typedef struct Token {
 	unsigned int tokenType;

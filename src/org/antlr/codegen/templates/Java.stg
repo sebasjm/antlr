@@ -3,7 +3,8 @@ group Java;
 // G R A M M A R  E L E M E N T S
 
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
-           name, tokens, tokenNames, rules, cyclicDFAs, bitsets, debug) ::=
+           name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
+           debug, predicates) ::=
 <<
 <headerAction>
 
@@ -14,7 +15,7 @@ import java.util.Stack;
 <recognizer><\n>
 >>
 
-lexer(name, tokens, globalAction, rules, cyclicDFAs) ::= <<
+lexer(name, tokens, globalAction, rules, cyclicDFAs, predicates) ::= <<
 class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <globalAction>
@@ -41,10 +42,11 @@ retry:
     }
 
     <rules; separator="\n\n">
+    <predicates; separator="\n">
 }
 >>
 
-parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets) ::= <<
+parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates) ::= <<
 class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
@@ -60,7 +62,11 @@ class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
     public String[] getTokenNames() { return tokenNames; }
 
     <globalAction>
+
     <rules; separator="\n\n">
+
+    <predicates; separator="\n">
+
     <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
 }
 >>
@@ -341,10 +347,13 @@ lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
 
 // F i x e d  D F A  (if-then-else)
 
+/*
 dfaDecision(decisionNumber,description) ::=
   "alt<decisionNumber> = DFA<decisionNumber>.predict(input);"
+*/
 
 dfaState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
 <edges; separator="\nelse ">
 else {
 <if(eotPredictsAlt)>
@@ -356,10 +365,12 @@ else {
 >>
 
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
 <edges; separator="\nelse ">
 >>
 
 dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
 <edges; separator="\nelse "><\n>
 <if(eotPredictsAlt)>
 else {
@@ -421,10 +432,28 @@ orPredicates(left,right) ::= "(<left>||<right>)"
 
 notPredicate(pred) ::= "!(<pred>)"
 
-lookaheadTest(atom,k,atomAsInt) ::= "input.LA(<k>)==<atom>"
+singlePredicate(pred) ::= "<pred>"
 
-lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::=
-	"(input.LA(<k>)>=<lower> && input.LA(<k>)\<=<upper>)"
+/** because generation of pred code and reference to it may be different,
+ *  have a way to invoke predicates; they could be placed in methods
+ *  somewhere, for example.  For acyclic DFAs, this method just directly
+ *  evals the pred inline.
+ */
+invokePredicate(pred) ::= "<pred>"
+
+/** If this template exists, then build methods for acylic DFAs
+singlePredicateMethod(decision,stateNumber,edgeNumber,pred) ::= "...";
+ */
+
+lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
+
+isolatedLookaheadTest(atom,k,atomAsInt) ::= "input.LA(<k>)==<atom>"
+
+lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
+(LA<decisionNumber>_<stateNumber>\>=<lower> && LA<decisionNumber>_<stateNumber>\<=<upper>)
+>>
+
+isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "(input.LA(<k>)\>=<lower> && input.LA(<k>)\<=<upper>)"
 
 setTest(ranges) ::= "<ranges; separator=\"||\">"
 

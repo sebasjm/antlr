@@ -2,10 +2,7 @@ package org.antlr.codegen;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.analysis.DFA;
-import org.antlr.analysis.DFAState;
-import org.antlr.analysis.Transition;
-import org.antlr.analysis.Label;
+import org.antlr.analysis.*;
 import org.antlr.misc.BitSet;
 import org.antlr.misc.IntSet;
 
@@ -20,6 +17,7 @@ public class CyclicDFACodeGenerator {
 	 *  resulting from cycles int the DFA.  This is a set of int state #s.
 	 */
 	protected IntSet visited;
+	protected DFA dfa;
 
 	public CyclicDFACodeGenerator(CodeGenerator parent) {
 		this.parent = parent;
@@ -28,9 +26,11 @@ public class CyclicDFACodeGenerator {
 	public StringTemplate genCyclicLookaheadDecision(StringTemplateGroup templates,
 													 DFA dfa)
 	{
+		this.dfa = dfa;
 		StringTemplate dfaST = templates.getInstanceOf("cyclicDFA");
 		int d = dfa.getDecisionNumber();
 		dfaST.setAttribute("decision", new Integer(d));
+		dfaST.setAttribute("className", parent.getClassName());
 		visited = new BitSet(dfa.getNumberOfStates());
 		walkCyclicDFAGeneratingStateMachine(templates, dfaST, dfa.startState);
 		parent.decisionToMaxLookaheadDepth[dfa.getDecisionNumber()]
@@ -149,8 +149,29 @@ public class CyclicDFACodeGenerator {
 			}
 			else {
 				edgeST = templates.getInstanceOf("cyclicDFAEdge");
-				edgeST.setAttribute("labelExpr",
-						parent.genLabelExpr(templates,edge.label,1));
+				StringTemplate exprST =
+					parent.genLabelExpr(templates,edge.label,1);
+				// If this is a predicate edge and the code gen templates have
+				// a template called singlePredicateMethod, it indicates
+				// they want to build a method for predicates
+				if ( edge.label.isSemanticPredicate() &&
+					 templates.isDefinedInThisGroup("singlePredicateMethod") )
+				{
+					SemanticContext semCtx = edge.label.getSemanticContext();
+					StringTemplate predMethodST =
+						templates.getInstanceOf("singlePredicateMethod");
+					predMethodST.setAttribute("decision", dfa.getDecisionNumber());
+					predMethodST.setAttribute("stateNumber", s.stateNumber);
+					predMethodST.setAttribute("edgeNumber", i+1);
+					StringTemplate predEvalST = semCtx.genExpr(templates);
+					predMethodST.setAttribute("pred", predEvalST);
+					parent.semanticPredicateMethodsFromCyclicDFAs.add(predMethodST);
+					// we've computed a method to eval pred, now dump bytecodes
+					// to invoke method
+					exprST = templates.getInstanceOf("invokePredicate");
+					exprST.setAttribute("pred", predEvalST);
+				}
+				edgeST.setAttribute("labelExpr", exprST);
 			}
 			edgeST.setAttribute("edgeNumber", new Integer(i+1));
 			edgeST.setAttribute("targetStateNumber",
