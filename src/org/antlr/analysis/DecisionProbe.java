@@ -96,13 +96,14 @@ public class DecisionProbe {
 	public static final Integer REACHABLE_NO = new Integer(0);
 	public static final Integer REACHABLE_YES = new Integer(1);
 
-	/** Used while finding edge labels in various recursive routines such
-	 *  as getSampleInputSequenceUsingStateSet().  Tracks the input position
+	/** Used while finding a path through an NFA whose edge labels match
+	 *  an input sequence.  Tracks the input position
 	 *  we were at the last time at this node.  If same input position, then
 	 *  we'd have reached same state without consuming input...probably an
-	 *  infinite loop.  Stop.  Map<Integer>.
+	 *  infinite loop.  Stop.  Set<String>.  The strings look like
+	 *  stateNumber_labelIndex.
 	 */
-	protected Map statesVisited;
+	protected Set statesVisitedAtInputDepth;
 
 	protected Set statesVisitedDuringSampleSequence;
 
@@ -264,14 +265,13 @@ public class DecisionProbe {
 		NFAState nfaStart = dfa.getNFADecisionStartState();
 		NFAState altStart = dfa.nfa.grammar.getNFAStateForAltOfDecision(nfaStart,alt);
 		altStart = (NFAState)altStart.transition(0).target;
-		statesVisited = new HashMap();
-		Set dfaStates = getDFAPathStatesToTarget(targetState);
-		Set nfaStates = getNFAStatesFromDFAStatesForAlt(dfaStates,alt);
+		statesVisitedAtInputDepth = new HashSet();
+		//Set dfaStates = getDFAPathStatesToTarget(targetState);
+		//Set nfaStates = getNFAStatesFromDFAStatesForAlt(dfaStates,alt);
 		List path = new LinkedList();
 		path.add(altStart);
 		getNFAPath(altStart,
 				   0,
-				   nfaStates,
 				   labels,
 				   path);
         return path;
@@ -498,71 +498,96 @@ public class DecisionProbe {
 	 *  while matching a list of labels.  This cannot use the usual
 	 *  interpreter, which does a deterministic walk.  We need to be able to
 	 *  take paths that are turned off during nondeterminism resolution. So,
-	 *  just do a depth-first walk restricting yourself to a set of states and
-	 *  only traversing edges labeled with the current label.  Return true
-	 *  if a path was found emanating from state s.
+	 *  just do a depth-first walk traversing edges labeled with the current
+	 *  label.  Return true if a path was found emanating from state s.
 	 */
 	protected boolean getNFAPath(NFAState s,     // starting where?
 								 int labelIndex, // 0..labels.size()-1
-								 Set states,     // legal NFA states; Set<Integer>
+								 //Set states,     // legal NFA states; Set<Integer>
 								 List labels,    // input sequence
 								 List path)      // output list of NFA states
 	{
-		//System.out.println("getNFAPath start "+s.getStateNumber());
-		statesVisited.put(s, new Integer(labelIndex));
+		/*
+		if ( !states.contains(new Integer(s.stateNumber)) ) {
+			return false; // the DFA doesn't have this NFA state in a config
+		}
+		*/
+		// track a visit to state s at input index labelIndex if not seen
+		String thisStateKey = getStateLabelIndexKey(s.stateNumber,labelIndex);
+		if ( statesVisitedAtInputDepth.contains(thisStateKey) ) {
+			System.out.println("### already visited "+s.stateNumber+" previously at index "+
+						   labelIndex);
+			return false;
+		}
+		statesVisitedAtInputDepth.add(thisStateKey);
 
-		// pick the first edge in states and with label as the one to traverse
+		/*
+		System.out.println("enter state "+s.stateNumber+" visited states: "+
+						   statesVisitedAtInputDepth);
+        */
+
+		// pick the first edge whose target is in states and whose
+		// label is labels[labelIndex]
 		for (int i=0; i<s.getNumberOfTransitions(); i++) {
 			Transition t = s.transition(i);
 			NFAState edgeTarget = (NFAState)t.target;
-			Integer targetStateNumI = new Integer(edgeTarget.stateNumber);
-			Integer previousLabelIndexAtThisState =
-				(Integer)statesVisited.get(edgeTarget);
-			if ( states.contains(targetStateNumI) &&
-				 (previousLabelIndexAtThisState==null||
-				  !previousLabelIndexAtThisState.equals(targetStateNumI)) )
-			{
-				Label label = (Label)labels.get(labelIndex);
+			Label label = (Label)labels.get(labelIndex);
+			/*
+			System.out.println(s.stateNumber+"-"+
+							   t.label.toString(dfa.nfa.grammar)+"->"+
+							   edgeTarget.stateNumber+" =="+
+							   label.toString(dfa.nfa.grammar)+"?");
+			*/
+			if ( t.label.isEpsilon() ) {
+				// nondeterministically backtrack down epsilon edges
+				path.add(edgeTarget);
+				boolean found =
+					getNFAPath(edgeTarget, labelIndex, labels, path);
+				if ( found ) {
+					statesVisitedAtInputDepth.remove(thisStateKey);
+					return true; // return to "calling" state
+				}
+				path.remove(path.size()-1); // remove; didn't work out
+				continue; // look at the next edge
+			}
+			if ( t.label.matches(label) ) {
+				path.add(edgeTarget);
 				/*
-				System.out.println(s.getStateNumber()+"-"+
-								   label.toString(dfa.nfa.getGrammar())+"->"+
-								   edgeTarget.getStateNumber());
+				System.out.println("found label "+
+								   t.label.toString(dfa.nfa.grammar)+
+								   " at state "+s.stateNumber+"; labelIndex="+labelIndex);
 				*/
-				if ( t.label.isEpsilon() ) {
-					// nondeterministically backtrack down epsilon edges
-					path.add(edgeTarget);
-					boolean found =
-						getNFAPath(edgeTarget, labelIndex, states, labels, path);
-					if ( found ) {
-						return true; // return to "calling" state
-					}
-					path.remove(path.size()-1); // remove; didn't work out
-					continue; // look at the next edge
+				if ( labelIndex==labels.size()-1 ) {
+					// found last label; done!
+					statesVisitedAtInputDepth.remove(thisStateKey);
+					return true;
 				}
-				if ( t.label.matches(label) ) {
-					path.add(edgeTarget);
-					/*
-					System.out.println("found label "+
-									   t.getLabel().toString(dfa.nfa.getGrammar())+
-									   " at state "+s.getStateNumber());
-					*/
-					if ( labelIndex==labels.size()-1 ) {
-						// found last label; done!
-						return true;
-					}
-					// otherwise try to match remaining input
-					boolean found =
-						getNFAPath(edgeTarget, labelIndex+1, states, labels, path);
-					if ( found ) {
-						return true;
-					}
-					path.remove(path.size()-1); // remove; didn't work out
-					continue; // keep looking for a path for labels
+				// otherwise try to match remaining input
+				boolean found =
+					getNFAPath(edgeTarget, labelIndex+1, labels, path);
+				if ( found ) {
+					statesVisitedAtInputDepth.remove(thisStateKey);
+					return true;
 				}
+				/*
+				System.out.println("backtrack; path from "+s.stateNumber+"->"+
+								   t.label.toString(dfa.nfa.grammar)+" didn't work");
+				*/
+				path.remove(path.size()-1); // remove; didn't work out
+				continue; // keep looking for a path for labels
 			}
 		}
+		//System.out.println("no epsilon or matching edge; removing "+thisStateKey);
 		// no edge was found matching label; is ok, some state will have it
+		statesVisitedAtInputDepth.remove(thisStateKey);
 		return false;
 	}
 
+	protected String getStateLabelIndexKey(int s, int i) {
+		StringBuffer buf = new StringBuffer();
+		buf.append(s);
+		buf.append('_');
+		buf.append(i);
+		return buf.toString();
+	}
 }

@@ -400,9 +400,8 @@ public class NFAFactory {
     public StateCluster build_Aplus(StateCluster A) {
         NFAState left = newState();
         NFAState blockEndNFAState = newState();
-		// turn A's block end into a loopback (acts like alt 2)
-		A.right.setDescription("()+ loopback");
         transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON); // follow is Transition 1
+		// turn A's block end into a loopback (acts like alt 2)
 		transitionBetweenStates(A.right, A.left, Label.EPSILON); // loop back Transition 2
 		transitionBetweenStates(left, A.left, Label.EPSILON);
 

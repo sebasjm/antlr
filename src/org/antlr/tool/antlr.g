@@ -278,7 +278,12 @@ block
 		a1:alternative ( OR! a2:alternative )*
 
         RPAREN!
-        {#block.addChild(#[EOB,"<end-of-block>"]);}
+        {
+        GrammarAST eob = #[EOB,"<end-of-block>"];
+        eob.setLine(lp.getLine());
+        eob.setColumn(lp.getColumn());
+        #block.addChild(eob);
+        }
     ;
 
 altList

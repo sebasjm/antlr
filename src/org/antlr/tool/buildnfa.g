@@ -238,7 +238,7 @@ element returns [StateCluster g=null]
     |   #(  n:NOT
             (  c:CHAR_LITERAL
 	           {
-	           int ttype = Grammar.getCharValueFromLiteral(c.getText());
+	           int ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
 	           g=factory.build_Set(grammar.complement(ttype));
 	           }
             |  t:TOKEN_REF
@@ -414,7 +414,7 @@ setElement[IntSet elements]
 }
     :   c:CHAR_LITERAL
         {
-        ttype = Grammar.getCharValueFromLiteral(c.getText());
+        ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
         if ( elements.member(ttype) ) {
 			ErrorManager.grammarError(ErrorManager.MSG_DUPLICATE_SET_ENTRY,
 									  grammar,
@@ -447,8 +447,8 @@ setElement[IntSet elements]
         }
     |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
     	{
-        int a = Grammar.getCharValueFromLiteral(c1.getText());
-        int b = Grammar.getCharValueFromLiteral(c2.getText());
+        int a = Grammar.getCharValueFromANTLRGrammarLiteral(c1.getText());
+        int b = Grammar.getCharValueFromANTLRGrammarLiteral(c2.getText());
     	elements.addAll(IntervalSet.of(a,b));
     	}
     ;

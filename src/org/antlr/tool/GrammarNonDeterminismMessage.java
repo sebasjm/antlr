@@ -51,14 +51,16 @@ public class GrammarNonDeterminismMessage extends Message {
 			NFAState nfaStart = probe.dfa.getNFADecisionStartState();
 			int displayAlt = altI.intValue();
 			if ( nfaStart.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
-				if ( displayAlt==probe.dfa.nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStart) ) {
+				if ( displayAlt==
+					 probe.dfa.nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStart) )
+				{
 					// special case; loop end decisions have exit as
 					// # block alts + 1; getNumberOfAltsForDecisionNFA() has
-					// both block alts and exit branch.  So, any predicted displayAlt
-					// equal to number of alts is the exit displayAlt.  The NFA
-					// sees that as displayAlt 1.  Yes, this is gross, but
-					// I have searched for months for a better solution
-					// without success. :(
+					// both block alts and exit branch.  So, any predicted
+					// displayAlt equal to number of alts is the exit
+					// displayAlt.  The NFA sees that as displayAlt 1.
+					// Yes, this is gross, but I have searched for months
+					// for a better solution without success. :(
 					displayAlt = 1;
 				}
 				else {
@@ -68,8 +70,10 @@ public class GrammarNonDeterminismMessage extends Message {
 			}
 			if ( DecisionProbe.verbose ) {
 				List path =
-					probe.getNFAPathStatesForAlt(problemState,altI.intValue(),labels);
-				st.setAttribute("paths.{alt,states}", new Integer(displayAlt), path);
+					probe.getNFAPathStatesForAlt(problemState,altI.intValue(),
+												 labels);
+				st.setAttribute("paths.{alt,states}",
+								new Integer(displayAlt), path);
 			}
 			else {
 				st.setAttribute("conflictingAlts", displayAlt);
