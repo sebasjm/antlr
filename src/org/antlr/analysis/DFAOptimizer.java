@@ -5,6 +5,9 @@ import org.antlr.tool.Grammar;
 import org.antlr.misc.BitSet;
 import org.antlr.misc.IntSet;
 
+import java.util.Set;
+import java.util.HashSet;
+
 /** A module to perform optimizations on DFAs.
  *
  *  For now only EBNF exit branches are removed.
@@ -78,7 +81,7 @@ public class DFAOptimizer {
 	/** Used by DFA state machine generator to avoid infinite recursion
 	 *  resulting from cycles int the DFA.  This is a set of int state #s.
 	 */
-	protected IntSet visited;
+	protected Set visited = new HashSet();
 
     protected Grammar grammar;
 
@@ -102,7 +105,7 @@ public class DFAOptimizer {
 						   " num states="+dfa.getNumberOfStates());
 		long start = System.currentTimeMillis();
 		if ( PRUNE_EBNF_EXIT_BRANCHES ) {
-			visited = new BitSet(dfa.getNumberOfStates());
+			visited.clear();
 			int decisionType =
 				dfa.getNFADecisionStartState().getDecisionASTNode().getType();
 			if ( dfa.isGreedy() && !dfa.isCyclic() &&
@@ -117,10 +120,11 @@ public class DFAOptimizer {
     }
 
 	protected void optimizeExitBranches(DFAState d) {
-		if ( visited.member(d.stateNumber) ) {
+		Integer sI = new Integer(d.stateNumber);
+		if ( visited.contains(sI) ) {
 			return; // already visited
 		}
-		visited.add(d.stateNumber);
+		visited.add(sI);
 		int nAlts = d.dfa.getNumberOfAlts();
 		for (int i = 0; i < d.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) d.transition(i);
@@ -134,6 +138,7 @@ public class DFAOptimizer {
 				System.out.println("ignoring transition "+i+" to max alt "+
 								   d.dfa.getNumberOfAlts());
 				d.removeTransition(i);
+				i--; // back up one so that i++ of loop iteration stays at i
 			}
 			optimizeExitBranches(edgeTarget);
 		}
