@@ -234,7 +234,10 @@ public class DFA {
         d.setAcceptStateReachable(REACHABLE_BUSY);
 
         boolean anEdgeReachesAcceptState = false;
-        for (int i=0; i<d.getNumberOfTransitions(); i++) {
+        // Visit every transition, track if at least one edge reaches stop state
+		// Cannot terminate when we know this state reaches stop state since
+		// all transitions must be traversed to set status of each DFA state.
+		for (int i=0; i<d.getNumberOfTransitions(); i++) {
             Transition t = d.transition(i);
             DFAState edgeTarget = (DFAState)t.getTarget();
             int targetStatus = edgeTarget.getAcceptStateReachable();
@@ -249,6 +252,7 @@ public class DFA {
             if ( targetStatus==REACHABLE_NO ) {  // avoid unnecessary work
                 continue;
             }
+			// target must be REACHABLE_UNKNOWN (i.e., unvisited)
             if ( doesStateReachAcceptState(edgeTarget) ) {
                 anEdgeReachesAcceptState = true;
                 // have to keep looking so don't break loop
