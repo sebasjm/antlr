@@ -227,7 +227,7 @@ public class IntervalSet implements IntSet {
     /** return a new set containing all elements in this but not in other.
      *  Intervals may have to be broken up when ranges in this overlap
      *  with ranges in other.  other is assumed to be a subset of this;
-     *  anything that is in other but not in this will be ignored.
+     *  anything that is in other but not in this will be ignored.
      */
     public IntSet subtract(IntSet other) {
         if ( other==null || !(other instanceof IntervalSet) ) {

@@ -152,7 +152,7 @@ public class Grammar {
      */
     protected Vector ruleIndexToRuleList = new Vector();
 
-    /** If non-null,Êthis is the code generator we will use to generate
+    /** If non-null, this is the code generator we will use to generate
      *  recognizers in the target language.
      */
     protected CodeGenerator generator;
@@ -553,8 +553,8 @@ public class Grammar {
      *  Return the new token type value or Label.INVALID.
      */
     public int defineToken(String text) {
-        int ttype = Label.INVALID;
-        if ( getTokenType(text)==Label.INVALID ) {
+        int ttype = getTokenType(text);
+        if ( ttype==Label.INVALID ) {
             //System.out.println("defineToken("+text+")");
             if ( (text.charAt(0)=='"'&&stringLiteralToTypeMap.get(text)==null) ||
                  tokenNameToTypeMap.get(text)==null )

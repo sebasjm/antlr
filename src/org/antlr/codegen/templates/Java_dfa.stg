@@ -20,10 +20,10 @@ cyclicDFA(decision,states,description) ::= <<
 cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
 s<stateNumber>:
 <edges>
-    <if(needErrorClause)>
+<if(needErrorClause)>
     goto errorState
     return 0;
-    <endif>
+<endif>
 >>
 
 cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
@@ -33,12 +33,13 @@ s<stateNumber>:
 >>
 
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber) ::= <<
-edge<stateNumber>_<edgeNumber>:
+s<stateNumber>e<edgeNumber>:
 <labelExpr>
+s<stateNumber>e<edgeNumber>_go:
     aload 0
     invokeinterface IntegerStream.consume() 1
     goto s<targetStateNumber>
-skip<stateNumber>_<edgeNumber>:
+s<stateNumber>e<edgeNumber>_skip:
 >>
 
 eotDFAEdge(targetStateNumber) ::= <<
@@ -56,25 +57,22 @@ notPredicate(pred) ::= "!(<pred>)"
 lookaheadTest(atom,k,atomAsInt) ::= <<
     iload 1
     iconst <atomAsInt>
-    if_icmpne skip<stateNumber>_<edgeNumber>
+    if_icmpne s<stateNumber>e<edgeNumber>_skip
 >>
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
-range<stateNumber>_<rangeNumber>:
 ;	(i>=<lowerAsInt> && i\<=<upperAsInt>)
     iload 1
     iconst <lowerAsInt>
-    if_icmplt false<stateNumber>_<rangeNumber>
+    if_icmplt s<stateNumber>r<rangeNumber>_false
     iload 1
     iconst <upperAsInt>
-    if_icmpgt false<stateNumber>_<rangeNumber>
-    iconst 1
-    goto endRange<stateNumber>_<rangeNumber>:
-false<stateNumber>_<rangeNumber>:
-    iconst 0
-endRange<stateNumber>_<rangeNumber>:
-	iconst 0
-    if_icmp skip<stateNumber>_<edgeNumber>
+    if_icmpgt s<stateNumber>r<rangeNumber>_false
+    goto s<stateNumber>e<edgeNumber>_transition
+s<stateNumber>r<rangeNumber>_false:
 >>
 
-setTest(ranges) ::= "<ranges; separator=\"||\">"
+setTest(ranges) ::= <<
+<ranges>
+    goto s<stateNumber>e<edgeNumber>_skip
+>>
