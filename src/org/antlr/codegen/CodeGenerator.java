@@ -486,7 +486,7 @@ public class CodeGenerator {
                 eST = templates.getInstanceOf("lookaheadTest");
 				eST.setAttribute("atom", grammar.getTokenTypeAsLabel(a));
 				eST.setAttribute("atomAsInt", new Integer(a));
-                eST.setAttribute("k",new Integer(k));
+                //eST.setAttribute("k",new Integer(k));
             }
             else {
                 eST = templates.getInstanceOf("lookaheadRangeTest");
