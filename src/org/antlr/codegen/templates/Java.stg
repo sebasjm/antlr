@@ -452,10 +452,8 @@ allCyclicDFAs(cyclicDFAs) ::= <<
 >>
 
 dfaDecision(decisionNumber,description) ::= <<
-int m<decisionNumber> = input.mark();
 <! the <name> attribute is inherited via the parser, lexer, ... !>
 alt<decisionNumber> = DFA<decisionNumber>.predict(input);
-input.rewind(m<decisionNumber>);
 >>
 
 cyclicDFA(className,decisionNumber,states,description) ::= <<

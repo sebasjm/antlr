@@ -43,7 +43,6 @@ public class DFA {
 	{
         int mark = input.mark();
         State s = start;
-        //while ( /* input.LA(1)!=CharStream.EOF &&*/ s.alt<=0 ) {
         while ( true ) {
             s = s.transition(input);
             if ( s==null ) {
@@ -55,7 +54,6 @@ public class DFA {
             input.consume();
         }
         input.rewind(mark);
-        //System.out.println("predicting alt "+s.alt);
         return s.alt;
     }
 }
