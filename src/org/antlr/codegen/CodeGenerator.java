@@ -280,20 +280,32 @@ public class CodeGenerator {
 		// OUTPUT FILE (contains recognizerST)
 		outputFileST = templates.getInstanceOf("outputFile");
 
+		// HEADER FILE
+		if ( templates.isDefined("headerFile") ) {
+			headerFileST = templates.getInstanceOf("headerFile");
+		}
+		else {
+			// create a dummy to avoid null-checks all over code generator
+			headerFileST = new StringTemplate(templates,"");
+		}
+
 		// RECOGNIZER
 		if ( grammar.type==Grammar.LEXER ) {
 			recognizerST = templates.getInstanceOf("lexer");
 			outputFileST.setAttribute("LEXER", "true");
+			headerFileST.setAttribute("LEXER", "true");
 		}
 		else if ( grammar.type==Grammar.PARSER ||
 			      grammar.type==Grammar.COMBINED )
 		{
 			recognizerST = templates.getInstanceOf("parser");
 			outputFileST.setAttribute("PARSER", "true");
+			headerFileST.setAttribute("PARSER", "true");
 		}
 		else {
 			recognizerST = templates.getInstanceOf("treeParser");
 			outputFileST.setAttribute("TREE_PARSER", "true");
+			headerFileST.setAttribute("TREE_PARSER", "true");
 		}
 		outputFileST.setAttribute("recognizer", recognizerST);
 
@@ -305,15 +317,6 @@ public class CodeGenerator {
 													 grammar,
 													 recognizerST,
 													 cyclicDFAST);
-
-		// HEADER FILE
-		if ( templates.isDefined("headerFile") ) {
-			headerFileST = templates.getInstanceOf("headerFile");
-		}
-		else {
-			// create a dummy to avoid null-checks all over code generator
-			headerFileST = new StringTemplate(templates,"");
-		}
 
 		// GENERATE RECOGNIZER
 		// Walk the AST holding the input grammar, this time generating code
