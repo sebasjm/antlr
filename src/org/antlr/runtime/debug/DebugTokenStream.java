@@ -63,7 +63,7 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public void rewind(int marker) {
-		dbg.mark(marker);
+		dbg.rewind(marker);
 		input.rewind(marker);
 	}
 
