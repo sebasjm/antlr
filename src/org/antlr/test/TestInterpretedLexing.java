@@ -57,9 +57,10 @@ public class TestInterpretedLexing extends TestSuite {
     public void testSimpleLoop() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "A : ('0'..'9')+ ;\n");
-		g.parse("A", new ANTLRStringStream("12x")); // should ignore the x
-		g.parse("A", new ANTLRStringStream("1234"));
+                "INT : (DIGIT)+ ;\n"+
+				"local DIGIT : '0'..'9';\n");
+		g.parse("INT", new ANTLRStringStream("12x")); // should ignore the x
+		g.parse("INT", new ANTLRStringStream("1234"));
     }
 
     public void testMultAltLoop() throws Exception {

@@ -25,11 +25,12 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.analysis;
+package org.antlr.tool;
 
 import org.antlr.misc.IntervalSet;
 import org.antlr.misc.IntSet;
 import org.antlr.tool.Grammar;
+import org.antlr.analysis.*;
 
 import java.util.List;
 import java.util.Iterator;
@@ -226,11 +227,8 @@ public class NFAFactory {
      */
     public void build_EOFStates(List rules) {
         for (Iterator iterator = rules.iterator(); iterator.hasNext();) {
-            NFAState endNFAState = (NFAState) iterator.next();
-            /*
-            System.out.println("checking for follow links on state: "+
-                    endNFAState.getDescription());
-            */
+			String ruleName = (String) iterator.next();
+			NFAState endNFAState = nfa.getGrammar().getRuleStopState(ruleName);
             // Is this rule a start symbol?  (no follow links)
             if ( endNFAState.transition(0)==null ) {
                 // if so, then don't let algorithm fall off the end of
@@ -331,12 +329,6 @@ public class NFAFactory {
             prevAlternative = left;
             altNum++;
         }
-        /*
-        if ( nfa.getGrammar().getNumberOfAltsForDecisionNFA(firstAlt)>1 ) {
-            int d = nfa.getGrammar().assignDecisionNumber( firstAlt );
-            nfa.getGrammar().setDecisionNFA( d, firstAlt );
-        }
-        */
 
         if ( altsAsSet==null ) {
             // return StateCluster pointing representing entire block
@@ -479,16 +471,24 @@ public class NFAFactory {
      *   ...
      *   |
      *   o->(Z)
+	 *
+	 *  This is the NFA created for the artificial rule created in
+	 *  Grammar.addArtificialMatchTokensRule().
      */
     public NFAState build_ArtificialMatchTokensRuleNFA() {
         int altNum = 1;
         NFAState firstAlt = null; // the start state for the "rule"
         NFAState prevAlternative = null;
         Iterator iter = nfa.getGrammar().getRules().iterator();
+		// TODO: add a single decision node/state for good description
         while (iter.hasNext()) {
             String ruleName = (String) iter.next();
-            if ( ruleName.equals(Grammar.TOKEN_RULENAME) ) {
-                continue; // don't loop to yourself.
+			String modifier = nfa.getGrammar().getRuleModifier(ruleName);
+            if ( ruleName.equals(Grammar.TOKEN_RULENAME) ||
+				 (modifier!=null &&
+				  modifier.equals(Grammar.NONTOKEN_LEXER_RULE_MODIFIER)) )
+			{
+                continue; // don't loop to yourself or do nontoken rules
             }
             NFAState ruleStartState = nfa.getGrammar().getRuleStartState(ruleName);;
             NFAState left = newState();

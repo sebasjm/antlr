@@ -66,11 +66,11 @@ protected void init() {
         String ruleName = (String) itr.next();
         NFAState ruleBeginState = factory.newState();
         ruleBeginState.setDescription("rule "+ruleName+" start");
-        grammar.defineRuleStartState(ruleName, ruleBeginState);
+        grammar.setRuleStartState(ruleName, ruleBeginState);
         NFAState ruleEndState = factory.newState();
         ruleEndState.setDescription("rule "+ruleName+" end");
         ruleEndState.setAcceptState(true);
-        grammar.defineRuleStopState(ruleName, ruleEndState);
+        grammar.setRuleStopState(ruleName, ruleEndState);
     }
 }
 
@@ -95,7 +95,7 @@ protected void addFollowTransition(String ruleName, NFAState following) {
 
 protected void finish() {
     List rules = new LinkedList();
-    rules.addAll(grammar.getRuleStopStates());
+    rules.addAll(grammar.getRules());
     factory.build_EOFStates(rules);
 }
 
@@ -141,8 +141,8 @@ rule
            {
            if ( r.equals(Grammar.TOKEN_RULENAME) ) {
                 NFAState ruleState = factory.build_ArtificialMatchTokensRuleNFA();
-                ruleState.setDecisionASTNode(#BLOCK); // always track ast node
                 if ( grammar.getNumberOfAltsForDecisionNFA(ruleState)>1 ) {
+	                ruleState.setDecisionASTNode(#BLOCK); // always track ast node
                     int d = grammar.assignDecisionNumber( ruleState );
                     grammar.setDecisionNFA( d, ruleState );
                     grammar.setDecisionOptions(d, #BLOCK.getOptions());

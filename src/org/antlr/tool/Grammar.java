@@ -29,7 +29,6 @@ package org.antlr.tool;
 
 import antlr.collections.AST;
 import antlr.RecognitionException;
-import antlr.TokenStreamException;
 
 import java.io.*;
 import java.util.*;
@@ -47,10 +46,30 @@ public class Grammar {
     public static final int INVALID_RULE_INDEX = -1;
 
     public static final String TOKEN_RULENAME = "Tokens";
+	public static final String NONTOKEN_LEXER_RULE_MODIFIER = "local";
 
     public static final int LEXER = 1;
     public static final int PARSER = 2;
     public static final int TREE_PARSER = 3;
+
+	/** Combine the info associated with a rule; I'm using like a struct */
+	protected class Rule {
+		String name;
+		int index;
+		String modifier;
+		Map options;
+		NFAState startState;
+		NFAState stopState;
+		AST tree;
+	}
+
+	protected class Decision {
+		int decision;
+		NFAState startState;
+		Map options;
+		DFA dfa;
+		//AST tree;
+	}
 
     /** What name did the user provide for this grammar? */
     protected String name;
@@ -109,14 +128,15 @@ public class Grammar {
     /** Rules are uniquely labeled from 1..n */
     protected int ruleIndex = 1;
 
-    /** Map a rule name to its index */
-    protected Map ruleToIndexMap = new HashMap();
+	/** Map a rule to it's Rule object */
+	protected Map nameToRuleMap = new HashMap();
 
-    /** Map a rule name to its start state in this NFA. */
-    protected Map ruleToStartStateMap = new HashMap();
-
-    /** Map a rule name to its stop state in this NFA. */
-    protected Map ruleToStopStateMap = new HashMap();
+	/** Map a rule index to its name; use a Vector on purpose as new
+	 *  collections stuff won't let me setSize and make it grow.  :(
+	 *  I need a specific guaranteed index, which the Collections stuff
+	 *  won't let me have.
+	 */
+	protected Vector ruleIndexToRuleList = new Vector();
 
     /** An AST that records entire input grammar with all rules.  A simple
      *  grammar with one rule, "grammar t; a : A | B ;", looks like:
@@ -124,33 +144,24 @@ public class Grammar {
      */
     protected GrammarAST grammarTree = null;
 
-    /** Map a rule name to the AST created for it.  Points into
-     *  the AST pointed at by grammarTree.
-     */
-    protected Map ruleToTreeMap = new HashMap();
-
     /** Each subrule/rule is a decision point and we must track them so we
      *  can go back later and build DFA predictors for them.  This includes
      *  all the rules, subrules, optional blocks, ()+, ()* etc...  The
      *  elements in this list are NFAState objects.
      */
-    protected Vector decisionNFAStartStateList = new Vector(INITIAL_DECISION_LIST_SIZE);
+	protected Vector indexToDecision = new Vector(INITIAL_DECISION_LIST_SIZE);
+	//protected Vector decisionNFAStartStateList = new Vector(INITIAL_DECISION_LIST_SIZE);
 
     /** Subrules may have options.  These options apply to any and all decisions
      *  associated with the subrule.
      */
-    protected Vector decisionOptionsList = new Vector(INITIAL_DECISION_LIST_SIZE);
+    //protected Vector decisionOptionsList = new Vector(INITIAL_DECISION_LIST_SIZE);
 
-    /** Track the DFA for the decision points.  Create after we know how
-     *  many decisions there are.  use Vector as List can't increase size
+    /** Track the DFA for the decision points.
+	 *  Use Vector as List can't increase size
      *  without add and I need to set/get via an index. :(
      */
-    protected Vector decisionLookaheadDFAList;
-
-    /** Map a rule index to its name; use a Vector on purpose as new
-     *  collections stuff won't let me setSize and make it grow.  :(
-     */
-    protected Vector ruleIndexToRuleList = new Vector();
+    //protected Vector decisionLookaheadDFAList;
 
     /** If non-null, this is the code generator we will use to generate
      *  recognizers in the target language.
@@ -201,6 +212,11 @@ public class Grammar {
      *  rules like this: "Tokens : ID | INT | SEMI ;"  nextToken() will invoke
      *  this to set the current token.  Add char literals before
      *  the rule references.
+	 *
+	 *  Note: the NFA created for this is specially built by
+	 *  NFAFactory.build_ArtificialMatchTokensRuleNFA() not the usual
+	 *  mechanism.  So, this creates the rule definition and associated tree,
+	 *  but the NFA is created by the NFAFactory.
      */
     public void addArtificialMatchTokensRule() {
         StringTemplate matchTokenRuleST =
@@ -208,39 +224,33 @@ public class Grammar {
                     TOKEN_RULENAME+" : <rules; separator=\"|\">;",
                     AngleBracketTemplateLexer.class);
 
-        // Add literals first as they are a special case of anything afterwards
-		/*
-		// TODO: no more literals, right?  Just dump rules in order
-		Set charLiterals = charLiteralToTypeMap.keySet();
-		Iterator iter = charLiterals.iterator();
-        while (iter.hasNext()) {
-            String literal = (String) iter.next();
-            StringTemplate emitST = generator.getTemplates().getInstanceOf("emit");
-            emitST.setAttribute("type", charLiteralToTypeMap.get(literal));
-            String charRef = literal+" {"+emitST.toString()+"}";
-            matchTokenRuleST.setAttribute("rules", charRef);
-        }
-        */
-
         // Now add token rule references
         Set ruleNames = getRules();
         Iterator iter = ruleNames.iterator();
         while (iter.hasNext()) {
             String name = (String) iter.next();
-            matchTokenRuleST.setAttribute("rules", name);
+			Rule r = getRule(name);
+			System.out.println("rule "+r.name+" modifier="+r.modifier);
+			// only add real token rules to Tokens rule
+			if ( r.modifier==null ||
+				 !r.modifier.equals(NONTOKEN_LEXER_RULE_MODIFIER) )
+			{
+            	matchTokenRuleST.setAttribute("rules", name);
+			}
         }
+		System.out.println("rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
         ANTLRParser parser = new ANTLRParser(lexer, this);
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
         try {
             parser.rule();
-			System.out.println("Tokens rule: "+parser.getAST().toStringList());
             grammarTree.addChild(parser.getAST());
         }
         catch (Exception e) {
             System.err.println("problems adding artificial rule");
         }
+		System.out.println("Rules after adding Tokens rule: "+grammarTree.toStringList());
     }
 
     protected void initTokenSymbolTables() {
@@ -425,32 +435,6 @@ public class Grammar {
         }
     }
 
-    /** Set the lookahead DFA for a particular decision.  This means
-     *  that the appropriate AST node must updated to have the new lookahead
-     *  DFA.  This method could be used to properly set the DFAs without
-     *  using the createLookaheadDFAs() method.  You could do this
-     *
-     *    Grammar g = new Grammar("...");
-     *    g.setLookahead(1, dfa1);
-     *    g.setLookahead(2, dfa2);
-     *    ...
-     */
-    public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
-        if ( decisionLookaheadDFAList==null ) {
-            decisionLookaheadDFAList =
-                    new Vector(getNumberOfDecisions());
-            decisionLookaheadDFAList.setSize(getNumberOfDecisions());
-        }
-        NFAState decisionStartState = getDecisionNFAStartState(decision);
-        GrammarAST ast = decisionStartState.getDecisionASTNode();
-        ast.setLookaheadDFA(lookaheadDFA);
-        decisionLookaheadDFAList.set(decision-1, lookaheadDFA);
-    }
-
-    public DFA getLookaheadDFA(int decision) {
-        return (DFA)decisionLookaheadDFAList.get(decision-1);
-    }
-
     /** For a given input char stream, try to match against the NFA
 	 *  starting at startRule.  This is a deterministic parse even though
 	 *  it is using an NFA because it uses DFAs at each decision point to
@@ -466,7 +450,7 @@ public class Grammar {
     {
 		System.out.println("parse("+startRule+",'"+input.substring(0,input.size()-1)+"')");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
-		if ( ruleToStartStateMap.size()==0 ) {
+		if ( getRuleStartState(startRule)==null ) {
 			if ( getType()==Grammar.LEXER ) {
 				addArtificialMatchTokensRule();
 			}
@@ -622,9 +606,9 @@ public class Grammar {
     /** Define a new rule.  A new rule index is created by incrementing
      *  ruleIndex.
      */
-    public int defineRule(String ruleName) {
-        //System.out.println("defineRule("+ruleName+"): index="+ruleIndex);
-        if ( ruleToIndexMap.get(ruleName)!=null ) {
+    public int defineRule(String ruleName, String modifier, Map options) {
+        //System.out.println("defineRule("+ruleName+",modifier="+modifier+"): index="+ruleIndex);
+        if ( getRule(ruleName)!=null ) {
             // rule redefinition
             System.err.println("redefinition of "+ruleName);
             return INVALID_RULE_INDEX;
@@ -641,18 +625,29 @@ public class Grammar {
             // rules are also tokens in lexers
             defineToken(ruleName);
         }
-        Integer rI = new Integer(ruleIndex);
-        ruleToIndexMap.put(ruleName, rI);
+		Rule r = new Rule();
+		r.index = ruleIndex;
+		r.name = ruleName;
+		r.modifier = modifier;
+		r.options = options;
+        nameToRuleMap.put(ruleName, r);
         ruleIndexToRuleList.setSize(ruleIndex+1);
         ruleIndexToRuleList.set(ruleIndex, ruleName);
         ruleIndex++;
-        return rI.intValue();
+        return ruleIndex;
     }
 
+	protected Rule getRule(String ruleName) {
+		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		return r;
+	}
+
     public int getRuleIndex(String ruleName) {
-        Integer I = (Integer)ruleToIndexMap.get(ruleName);
-        int i = (I!=null)?I.intValue():0;
-        return i;
+		Rule r = getRule(ruleName);
+		if ( r!=null ) {
+			return r.index;
+		}
+        return INVALID_RULE_INDEX;
     }
 
     public String getRuleName(int ruleIndex) {
@@ -747,31 +742,52 @@ public class Grammar {
     }
 
     public Set getRules() {
-        return ruleToIndexMap.keySet();
+        return nameToRuleMap.keySet();
     }
 
-    public void mapRuleToTree(String ruleName, GrammarAST t) {
-        ruleToTreeMap.put(ruleName, t);
+    public void setRuleAST(String ruleName, GrammarAST t) {
+		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		if ( r!=null ) {
+        	r.tree = t;
+		}
     }
 
-    public void defineRuleStartState(String ruleName, NFAState startState) {
-        ruleToStartStateMap.put(ruleName, startState);
+    public void setRuleStartState(String ruleName, NFAState startState) {
+		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		if ( r!=null ) {
+	        r.startState = startState;
+		}
     }
 
-    public void defineRuleStopState(String ruleName, NFAState startState) {
-        ruleToStopStateMap.put(ruleName, startState);
+    public void setRuleStopState(String ruleName, NFAState stopState) {
+		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		if ( r!=null ) {
+	        r.stopState = stopState;
+		}
     }
 
-    public NFAState getRuleStartState(String ruleName) {
-        return (NFAState)ruleToStartStateMap.get(ruleName);
-    }
+	public NFAState getRuleStartState(String ruleName) {
+		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		if ( r!=null ) {
+			return r.startState;
+		}
+		return null;
+	}
+
+	public String getRuleModifier(String ruleName) {
+		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		if ( r!=null ) {
+			return r.modifier;
+		}
+		return null;
+	}
 
     public NFAState getRuleStopState(String ruleName) {
-        return (NFAState)ruleToStopStateMap.get(ruleName);
-    }
-
-    public Collection getRuleStopStates() {
-        return ruleToStopStateMap.values();
+		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		if ( r!=null ) {
+			return r.stopState;
+		}
+		return null;
     }
 
     public int assignDecisionNumber(NFAState state) {
@@ -780,31 +796,90 @@ public class Grammar {
         return decisionNumber;
     }
 
+	protected Decision getDecision(int decision) {
+		int index = decision-1;
+		if ( index >= indexToDecision.size() ) {
+			return null;
+		}
+		Decision d = (Decision)indexToDecision.get(index);
+		return d;
+	}
+
+	protected Decision createDecision(int decision) {
+		int index = decision-1;
+		if ( index < indexToDecision.size() ) {
+			return getDecision(decision); // don't recreate
+		}
+		Decision d = new Decision();
+		d.decision = decision;
+        indexToDecision.setSize(getNumberOfDecisions());
+        indexToDecision.set(index, d);
+		return d;
+	}
+
     public List getDecisionNFAStartStateList() {
-        return decisionNFAStartStateList;
+		List states = new ArrayList(100);
+		for (int d = 0; d < indexToDecision.size(); d++) {
+			Decision dec = (Decision) indexToDecision.elementAt(d);
+			states.add(dec.startState);
+		}
+        return states;
     }
 
     public NFAState getDecisionNFAStartState(int decision) {
-        return (NFAState)decisionNFAStartStateList.get(decision-1);
+        Decision d = getDecision(decision);
+		if ( d==null ) {
+			return null;
+		}
+		return d.startState;
     }
 
-    public void setDecisionNFA(int decision, NFAState state) {
-        decisionNFAStartStateList.setSize(getNumberOfDecisions());
-        decisionNFAStartStateList.set(decision-1, state);
-    }
-
-    public void setDecisionOptions(int decision, Map options) {
-        decisionOptionsList.setSize(getNumberOfDecisions());
-        decisionOptionsList.set(decision-1, options);
-    }
+	public DFA getLookaheadDFA(int decision) {
+		Decision d = getDecision(decision);
+		if ( d==null ) {
+			return null;
+		}
+		return d.dfa;
+	}
 
     public Map getDecisionOptions(int decision) {
-        return (Map)decisionOptionsList.get(decision-1);
+		Decision d = getDecision(decision);
+		if ( d==null ) {
+			return null;
+		}
+		return d.options;
     }
 
     public int getNumberOfDecisions() {
         return decisionNumber;
     }
+
+	/** Set the lookahead DFA for a particular decision.  This means
+	 *  that the appropriate AST node must updated to have the new lookahead
+	 *  DFA.  This method could be used to properly set the DFAs without
+	 *  using the createLookaheadDFAs() method.  You could do this
+	 *
+	 *    Grammar g = new Grammar("...");
+	 *    g.setLookahead(1, dfa1);
+	 *    g.setLookahead(2, dfa2);
+	 *    ...
+	 */
+	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
+		Decision d = createDecision(decision);
+		d.dfa = lookaheadDFA;
+		GrammarAST ast = d.startState.getDecisionASTNode();
+		ast.setLookaheadDFA(lookaheadDFA);
+	}
+
+	public void setDecisionNFA(int decision, NFAState state) {
+		Decision d = createDecision(decision);
+		d.startState = state;
+	}
+
+	public void setDecisionOptions(int decision, Map options) {
+		Decision d = createDecision(decision);
+		d.options = options;
+	}
 
     /** How many token types have been allocated so far? */
     public int getNumberOfTokenTypes() {

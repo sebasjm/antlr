@@ -197,17 +197,20 @@ rules
 
 rule!
 {
-    int ruleIndex=0;
-    HashMap opts = null;
+	String modifier=null;
+    Map opts = null;
 }
 	:
 	(	d:DOC_COMMENT	
 	)?
-	(	p1:"protected"	
+	(	{modifier=LT(1).getText();}
+	:	p1:"protected"
 	|	p2:"public"		
-	|	p3:"private"	
-	)?
-	ruleName:id    {ruleIndex = g.defineRule(#ruleName.getText());}
+	|	p3:"private"
+	|	p4:"local"
+	|	{modifier=null;}
+	)
+	ruleName:id
 	( BANG  )?
 	( aa:ARG_ACTION )?
 	( "returns" rt:ARG_ACTION  )?
@@ -217,11 +220,12 @@ rule!
 	COLON b:altList SEMI
 	( exceptionGroup )?
     {
+   	int ruleIndex = g.defineRule(#ruleName.getText(), modifier, opts);
     if ( ruleIndex!=Grammar.INVALID_RULE_INDEX ) {
         GrammarAST eor = #[EOR,"<end-of-rule>"];
         eor.setEnclosingRule(#ruleName.getText());
         #rule = #(#[RULE,"rule"],#ruleName,#b,eor);
-        g.mapRuleToTree(#ruleName.getText(), #rule);
+        g.setRuleAST(#ruleName.getText(), #rule);
     }
     }
 	;

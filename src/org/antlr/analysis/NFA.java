@@ -28,6 +28,7 @@
 package org.antlr.analysis;
 
 import org.antlr.tool.Grammar;
+import org.antlr.tool.NFAFactory;
 
 import java.util.Vector;
 
