@@ -183,6 +183,12 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		else if ( elements[0].equals("exitSubRule") ) {
 			listener.exitSubRule(Integer.parseInt(elements[1]));
 		}
+		else if ( elements[0].equals("enterDecision") ) {
+			listener.enterDecision(Integer.parseInt(elements[1]));
+		}
+		else if ( elements[0].equals("exitDecision") ) {
+			listener.exitDecision(Integer.parseInt(elements[1]));
+		}
 		else if ( elements[0].equals("location") ) {
 			listener.location(Integer.parseInt(elements[1]),
 							  Integer.parseInt(elements[2]));
