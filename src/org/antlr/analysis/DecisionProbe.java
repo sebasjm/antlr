@@ -205,6 +205,14 @@ public class DecisionProbe {
 		return sorted;
 	}
 
+	/** Return all DFA states in this DFA that have NFA configurations that
+	 *  conflict.  You must report a problem for each state in this set
+	 *  because each state represents a different input sequence.
+	 */
+	public Set getDFAStatesWithSyntacticallyAmbiguousAlts() {
+		return statesWithSyntacticallyAmbiguousAltsSet;
+	}
+
 	/** Which alts were specifically turned off to resolve nondeterminisms?
 	 *  This is different than the unreachable alts.  Disabled doesn't mean that
 	 *  the alternative is totally unreachable necessarily, it just means
@@ -286,12 +294,45 @@ public class DecisionProbe {
 	}
 
 	/** Return a list of alts whose predicate context was insufficient to
-	 *  resolve a nondeterminism.
-	 * @return
+	 *  resolve a nondeterminism for state d.
 	 */
     public List getIncompletelyCoveredAlts(DFAState d) {
 		return (List)stateToIncompletelyCoveredAltsMap.get(d);
 	}
+
+	public void issueWarnings() {
+		// generate a separate message for each problem state in DFA
+		Set resolvedStates = getNondeterministicStatesResolvedWithSemanticPredicate();
+		Set problemStates = getDFAStatesWithSyntacticallyAmbiguousAlts();
+		if ( problemStates.size()>0 ) {
+			Iterator it =
+				problemStates.iterator();
+			while (	it.hasNext() ) {
+				DFAState d = (DFAState) it.next();
+				// don't report problem if resolved
+				if ( resolvedStates==null || !resolvedStates.contains(d) ) {
+					ErrorManager.nondeterminism(this,d);
+				}
+				List insufficientAlts = getIncompletelyCoveredAlts(d);
+				if ( insufficientAlts!=null && insufficientAlts.size()>0 ) {
+					ErrorManager.insufficientPredicates(this,insufficientAlts);
+				}
+			}
+		}
+		Set danglingStates = getDanglingStates();
+		if ( danglingStates.size()>0 ) {
+			//System.err.println("no emanating edges for states: "+danglingStates);
+			for (Iterator it = danglingStates.iterator(); it.hasNext();) {
+				DFAState d = (DFAState) it.next();
+				ErrorManager.danglingState(this,d);
+			}
+		}
+		List unreachableAlts = dfa.getUnreachableAlts();
+		if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
+			ErrorManager.unreachableAlts(this,unreachableAlts);
+		}
+	}
+
 
 	// T R A C K I N G  M E T H O D S
 
@@ -335,95 +376,6 @@ public class DecisionProbe {
 	}
 
 	// S U P P O R T
-
-	public void computeErrors() {
-		System.out.println("--------------------\nnondeterministic decision (d="
-				+dfa.getDecisionNumber()+") for "+
-				dfa.getNFADecisionStartState().getDescription());
-
-		if ( danglingStates.size()>0 ) { // same as !isReduced()?
-			//System.err.println("no emanating edges for states: "+danglingStates);
-			for (Iterator it = danglingStates.iterator(); it.hasNext();) {
-				DFAState d = (DFAState) it.next();
-				System.err.println("the decision cannot distinguish between alternatives "+
-								   d.getAltSet()+
-								   " for at least one input sequence");
-			}
-		}
-		if ( statesWithSyntacticallyAmbiguousAltsSet.size()>0 ) {
-			Iterator it =
-				statesWithSyntacticallyAmbiguousAltsSet.iterator();
-			while (	it.hasNext() ) {
-				DFAState d = (DFAState) it.next();
-				if ( statesResolvedWithSemanticPredicatesSet.contains(d) ) {
-					// don't report problem if resolved
-					continue;
-				}
-				List nondetAlts = getNonDeterministicAltsForState(d);
-				if ( !verbose ) {
-					System.err.println("decision predicts multiple alternatives: "+
-									   nondetAlts+" for the same lookahead");
-					break;
-				}
-				List labels = getSampleNonDeterministicInputSequence(d);
-				String input = getInputSequenceDisplay(labels);
-				Set dfaStates = getDFAPathStatesToTarget(d);
-				System.err.println("Decision can match input such as \""+input+"\" using multiple alternatives:");
-				// For each nondet alt, compute path of NFA states
-				for (Iterator iter = nondetAlts.iterator(); iter.hasNext();) {
-					Integer altI = (Integer) iter.next();
-					// now get path take for an input sequence limited to
-					// those states associated with this nondeterminism
-					NFAState nfaStart = dfa.getNFADecisionStartState();
-					Grammar g = dfa.nfa.grammar;
-					// convert all possible NFA states list for this displayAlt into
-					// an exact path for input 'labels'; more useful.
-					List path = getNFAPathStatesForAlt(d,altI.intValue(),labels);
-					// compute the proper displayable alt number (ick)
-					int displayAlt = altI.intValue();
-					if ( nfaStart.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
-						if ( displayAlt==g.getNumberOfAltsForDecisionNFA(nfaStart) ) {
-							// special case; loop end decisions have exit as
-							// # block alts + 1; getNumberOfAltsForDecisionNFA() has
-							// both block alts and exit branch.  So, any predicted displayAlt
-							// equal to number of alts is the exit displayAlt.  The NFA
-							// sees that as displayAlt 1.  Yes, this is gross, but
-							// I have searched for months for a better solution
-							// without success. :(
-							displayAlt = 1;
-						}
-						else {
-							// exit branch is really first transition, so skip
-							displayAlt = displayAlt+1;
-						}
-					}
-					System.err.println("  alt "+altI+" via NFA path "+path);
-				}
-				if ( verbose ) {
-					Set disabled = d.getDisabledAlternatives();
-					System.err.println("As a result, alternative(s) "+disabled+" were disabled for that input");
-				}
-			}
-		}
-		List unreachableAlts = dfa.getUnreachableAlts();
-		if ( unreachableAlts.size()>0 ) {
-			System.err.println("The following alternatives are unreachable: "+
-							   unreachableAlts);
-		}
-		if ( stateToAltSetWithSemanticPredicatesMap.size()>0 ) {
-			System.err.println("state to alts-with-predicate: "+
-							   stateToAltSetWithSemanticPredicatesMap);
-		}
-		if ( stateToIncompletelyCoveredAltsMap.size()>0 ) {
-			System.err.println("alts with insufficient predicates: "+
-							   stateToIncompletelyCoveredAltsMap);
-		}
-		if ( statesResolvedWithSemanticPredicatesSet.size()>0 ) {
-			System.err.println("states resolved with sem pred map: "+
-							   statesResolvedWithSemanticPredicatesSet);
-			//System.err.println("nondeterminism NOT resolved with sem preds");
-		}
-	}
 
 	/** Given a start state and a target state, return true if start can reach
 	 *  target state.  Also, compute the set of DFA states

@@ -135,9 +135,7 @@ public class DFA {
 		verify();
 		
 		if ( !probe.isDeterministic() ) {
-			ErrorManager.nondeterminism(ErrorManager.MSG_GRAMMAR_NONDETERMINISM,
-										probe);
-			probe.computeErrors();
+			probe.issueWarnings();
 		}
 		//long stop = System.currentTimeMillis();
 		//System.out.println("verify cost: "+(int)(stop-start)+" ms");

@@ -29,6 +29,7 @@ package org.antlr.tool;
 
 import org.antlr.Tool;
 import org.antlr.analysis.DecisionProbe;
+import org.antlr.analysis.DFAState;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplateErrorListener;
@@ -38,9 +39,7 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Locale;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 import java.lang.reflect.Field;
 
 import antlr.LLkParser;
@@ -140,10 +139,13 @@ public class ErrorManager {
 
 
 	// GRAMMAR WARNINGS
-	public static final int MSG_GRAMMAR_NONDETERMINISM = 200;
-	public static final int MSG_DUPLICATE_SET_ENTRY = 201;
+	public static final int MSG_GRAMMAR_NONDETERMINISM = 200; // A predicts alts 1,2
+	public static final int MSG_UNREACHABLE_ALTS = 201;       // nothing predicts alt i
+	public static final int MSG_DANGLING_STATE = 202;        // no edges out of state
+	public static final int MSG_INSUFFICIENT_PREDICATES = 203;
+	public static final int MSG_DUPLICATE_SET_ENTRY = 204;    // (A|A)
 
-	public static final int MAX_MESSAGE_NUMBER = 201;
+	public static final int MAX_MESSAGE_NUMBER = 204;
 
 	/** Messages should be sensitive to the locale. */
 	private static Locale locale;
@@ -342,6 +344,38 @@ public class ErrorManager {
 		getErrorListener().warning(new ToolMessage(msgID, arg));
 	}
 
+	public static void nondeterminism(DecisionProbe probe,
+									  DFAState d)
+	{
+		getErrorListener().error(
+			new GrammarNonDeterminismMessage(probe,d)
+		);
+	}
+
+	public static void danglingState(DecisionProbe probe,
+									 DFAState d)
+	{
+		getErrorListener().error(
+			new GrammarDanglingStateMessage(probe,d)
+		);
+	}
+
+	public static void unreachableAlts(DecisionProbe probe,
+									   List alts)
+	{
+		getErrorListener().error(
+			new GrammarUnreachableAltsMessage(probe,alts)
+		);
+	}
+
+	public static void insufficientPredicates(DecisionProbe probe,
+									   List alts)
+	{
+		getErrorListener().error(
+			new GrammarInsufficientPredicatesMessage(probe,alts)
+		);
+	}
+
 	public static void grammarError(int msgID,
 									Grammar g,
 									Token token,
@@ -350,14 +384,6 @@ public class ErrorManager {
 	{
 		getErrorListener().error(
 			new GrammarSemanticsMessage(msgID,g,token,arg,arg2)
-		);
-	}
-
-	public static void nondeterminism(int msgID,
-									  DecisionProbe probe)
-	{
-		getErrorListener().error(
-			new GrammarNonDeterminismMessage(msgID,probe)
 		);
 	}
 
