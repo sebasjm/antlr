@@ -27,8 +27,8 @@
 */
 package org.antlr.runtime;
 
-/** A source of characters or token types for an ANTLR recognizer */
-public interface IntegerStream {
+/** A source of characters for an ANTLR lexer */
+public interface CharStream {
     public static final int EOF = -1;
 
     public void consume();
@@ -61,6 +61,8 @@ public interface IntegerStream {
      *  last symbol has been read.
      */
     public int index();
+
+	public String substring(int start, int stop);
 
     public void rewind(int marker);
 }
