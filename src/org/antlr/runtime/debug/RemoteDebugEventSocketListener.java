@@ -121,6 +121,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		String line = in.readLine();
 		// TODO: check ANTLR and version and grammar file?
 		ack();
+		listener.commence(); // inform listener after handshake
 	}
 
 	protected void ack() {

@@ -48,6 +48,7 @@ public class Interpreter implements TokenSource {
 		public void rewind(int i) {}
 		public void recognitionException(RecognitionException e) {}
 		public void recovered() {}
+		public void commence() {}
 		public void terminate() {}
 	}
 
@@ -93,6 +94,7 @@ public class Interpreter implements TokenSource {
 			ruleNode.addChild(errorNode);
 		}
 		public void recovered() {}
+		public void commence() {}
 		public void terminate() {}
 	}
 

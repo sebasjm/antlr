@@ -71,6 +71,13 @@ public interface DebugEventListener {
 	 */
 	public void recovered();
 
+	/** Announce that parsing has begun.  Not strictly useful except for
+	 *  sending events over a socket.  A GUI for example will launch a thread
+	 *  to connect and communicate with a remote parser.  The thread will want
+	 *  to notify the GUI when a connection is made.
+	 */
+	public void commence();
+
 	/** Parsing is over; successfully or not.  Mostly useful for telling
 	 *  remote debugging listeners that it's time to quit.  The invoker
 	 *  of the parser must call this not the parser because any rule

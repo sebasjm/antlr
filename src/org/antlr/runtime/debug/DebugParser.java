@@ -56,6 +56,7 @@ public class DebugParser extends Parser {
 		public void rewind(int i) {}
 		public void recognitionException(RecognitionException e) {}
 		public void recovered() {}
+		public void commence() {}
 		public void terminate() {}
 	}
 

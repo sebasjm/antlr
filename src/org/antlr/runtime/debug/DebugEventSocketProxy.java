@@ -36,6 +36,10 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		}
 	}
 
+	public void commence() {
+		// don't bother sending event; listener will trigger upon connection
+	}
+
 	public void terminate() {
 		out.println("terminate");
 		ack();
