@@ -42,6 +42,9 @@ public class DFA {
 	public static final int REACHABLE_NO = 0;
 	public static final int REACHABLE_YES = 1;
 
+	/** Prevent explosion of DFA states during conversion. */
+	public static final int MAX_STATES_PER_DFA = 3000;
+
     /** What's the start state for this DFA? */
     public DFAState startState;
 
@@ -139,7 +142,7 @@ public class DFA {
 		//long start = System.currentTimeMillis();
 		verify();
 		
-		if ( !probe.isDeterministic() ) {
+		if ( !probe.isDeterministic() || !probe.analysisAborted() ) {
 			probe.issueWarnings();
 		}
 		//long stop = System.currentTimeMillis();
@@ -346,10 +349,14 @@ public class DFA {
 
     public void setOptions(Map options) {
         this.options = options;
-        if ( options==null ) {
-            return;
-        }
     }
+
+	public void setOption(String name, Object value) {
+		if ( options==null ) {
+			options = new HashMap();
+		}
+		options.put(name, value);
+	}
 
 	public Object getOption(String name) {
 		if ( options==null ) {
@@ -373,6 +380,10 @@ public class DFA {
 
 	public int getNumberOfAlts() {
 		return nAlts;
+	}
+
+	public boolean analysisAborted() {
+		return probe.analysisAborted();
 	}
 
     protected void initAltRelatedInfo() {

@@ -218,6 +218,15 @@ public class NFAToDFAConverter {
 				continue;
 			}
 			closure(t);  // add any NFA states reachable via epsilon
+
+			// FAILSAFE: so we cannot hit an exponentiality in
+			// the NFA conversion
+			if ( t.stateNumber>DFA.MAX_STATES_PER_DFA ) {
+				terminate = true;
+				dfa.probe.reportEarlyTermination();
+				break;
+			}
+
 			/*
 			System.out.println("DFA state after closure "+d+"-"+
 							   label.toString(dfa.nfa.grammar)+
@@ -233,16 +242,16 @@ public class NFAToDFAConverter {
 		}
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
-			System.out.println("dangling state: "+d.stateNumber);
+			// TODO: can fixed lookahead hit a dangling state case?
+			System.err.println("dangling state: "+d.stateNumber);
 			dfa.probe.reportDanglingState(d);
-			/*
+			dfa.probe.reportEarlyTermination();
 			// turn off all configurations except for those associated with
 			// min alt number; somebody has to win else some input will not
 			// predict any alt.
 			int minAlt = resolveByPickingMinAlt(d, null);
 			convertToAcceptState(d, minAlt); // force it to be an accept state
 			terminate = true; // might as well stop now
-			*/
 		}
 
 		// Check to see if we need to add any semantic predicate transitions
@@ -806,7 +815,7 @@ public class NFAToDFAConverter {
 			return potentiallyExistingState;
 		}
 
-		// if not there, then check new state.
+		// if not there, then examine new state.
 
 		// resolve syntactic conflicts by choosing a single alt or
         // by using semantic predicates if present.

@@ -90,6 +90,9 @@ public class DecisionProbe {
 	 */
 	protected Set altsWithProblem = new HashSet();
 
+	/** Did ANTLR have to terminate early on the analysis of this decision? */
+	protected boolean terminated = false;
+
 	/** Used to find paths through syntactically ambiguous DFA. */
 	protected Map stateReachable;
 	public static final Integer REACHABLE_BUSY = new Integer(-1);
@@ -154,6 +157,11 @@ public class DecisionProbe {
 			return true;
 		}
 		return false;
+	}
+
+	/** Did the analysis complete it's work? */
+	public boolean analysisAborted() {
+		return terminated;
 	}
 
 	/** Return k if decision is LL(k) for some k else return max int */
@@ -301,6 +309,11 @@ public class DecisionProbe {
 	}
 
 	public void issueWarnings() {
+		if ( analysisAborted() ) {
+			ErrorManager.analysisAborted(this);
+			return;
+		}
+
 		// generate a separate message for each problem state in DFA
 		Set resolvedStates = getNondeterministicStatesResolvedWithSemanticPredicate();
 		Set problemStates = getDFAStatesWithSyntacticallyAmbiguousAlts();
@@ -342,6 +355,10 @@ public class DecisionProbe {
      */
 	public void reportDanglingState(DFAState d) {
 		danglingStates.add(d);
+	}
+
+	public void reportEarlyTermination() {
+		terminated = true;
 	}
 
 	public void reportNondeterminism(DFAState d) {

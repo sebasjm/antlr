@@ -144,8 +144,9 @@ public class ErrorManager {
 	public static final int MSG_DANGLING_STATE = 202;        // no edges out of state
 	public static final int MSG_INSUFFICIENT_PREDICATES = 203;
 	public static final int MSG_DUPLICATE_SET_ENTRY = 204;    // (A|A)
+	public static final int MSG_ANALYSIS_ABORTED = 205;
 
-	public static final int MAX_MESSAGE_NUMBER = 204;
+	public static final int MAX_MESSAGE_NUMBER = 205;
 
 	/** Messages should be sensitive to the locale. */
 	private static Locale locale;
@@ -353,6 +354,13 @@ public class ErrorManager {
 	{
 		getErrorListener().warning(
 			new GrammarDanglingStateMessage(probe,d)
+		);
+	}
+
+	public static void analysisAborted(DecisionProbe probe)
+	{
+		getErrorListener().warning(
+			new GrammarAnalysisAbortedMessage(probe)
 		);
 	}
 

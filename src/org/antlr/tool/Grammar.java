@@ -463,12 +463,18 @@ public class Grammar {
 				long start = System.currentTimeMillis();
 				*/
 				DFA lookaheadDFA = new DFA(decisionStartState);
+				if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
+					Map options = getDecisionOptions(decision);
+					options.put("k", new Integer(1)); // set k=1 option and try again
+					lookaheadDFA = new DFA(decisionStartState);
+				}
+
 				setLookaheadDFA(decision, lookaheadDFA);
 				/*
 				long stop = System.currentTimeMillis();
 				System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
 					" states, "+(int)(stop-start)+" ms");
-                */
+				*/
 				if ( Tool.GENERATE_DFA_DOT ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.grammar);
 					String dot = dotGenerator.getDOT( lookaheadDFA.startState );
@@ -482,24 +488,6 @@ public class Grammar {
 										   ioe);
 					}
 				}
-
-				/*
-				DFAMinimizer minimizer = new DFAMinimizer(lookaheadDFA);
-				DFA minDFA = minimizer.minimize();
-				if ( false ) {
-					DOTGenerator dotGenerator = new DOTGenerator(nfa.grammar);
-					String dot = dotGenerator.getDOT( minDFA.startState );
-					String dotFileName = "/tmp/dec-"+decision+"-min";
-					try {
-						dotGenerator.writeDOTFile(dotFileName, dot);
-					}
-					catch(IOException ioe) {
-						ErrorManager.error(ErrorManager.MSG_CANNOT_GEN_DOT_FILE,
-										   dotFileName,
-										   ioe);
-					}
-				}
-				*/
 			}
 		}
 	}

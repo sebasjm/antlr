@@ -106,6 +106,10 @@ INSUFFICIENT_PREDICATES(file,line,col,alts) ::= <<
 DUPLICATE_SET_ENTRY(file,line,col,arg) ::= 
 	"<loc()>duplicate token type <arg> when collapsing subrule into set"
 
+ANALYSIS_ABORTED(file,line,col) ::= <<
+<loc()>ANTLR could not analyze this decision probably due to a true ambiguity in the grammar.  ANTLR re-analyzed the decision with a fixed lookahead of k=1.
+>>
+
 /* This factors out file location formatting; file,line,col inherited from
  * enclosing template; don't manually pass stuff in.
  */
