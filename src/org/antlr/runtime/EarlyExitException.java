@@ -29,9 +29,11 @@ package org.antlr.runtime;
 
 public class EarlyExitException extends RecognitionException {
 	public int decisionNumber;
+	/** What token were we looking at when the (...)+ exited early? */
+	public int index;
 
-	public EarlyExitException(int decisionNumber)
-	{
+	public EarlyExitException(int decisionNumber, IntStream input) {
 		this.decisionNumber = decisionNumber;
+		this.index = input.index();
 	}
 }

@@ -239,8 +239,7 @@ public class Interpreter implements TokenSource {
 						new NoViableAltException(description,
 												 dfa.getDecisionNumber(),
 												 s.stateNumber,
-												 input.LA(1),
-												 input.index());
+												 input);
 					if ( actions!=null ) {
 						actions.noViableAlt(nvae);
 					}
@@ -326,7 +325,7 @@ public class Interpreter implements TokenSource {
 			else {
 				if ( label.isAtom() ) {
 					MismatchedTokenException mte =
-						new MismatchedTokenException(label.getAtom(), input.LA(1), input.index());
+						new MismatchedTokenException(label.getAtom(), input);
 					if ( actions!=null ) {
 						actions.mismatchedElement(mte);
 					}
@@ -334,9 +333,7 @@ public class Interpreter implements TokenSource {
 				}
 				else if ( label.isSet() ) {
 					MismatchedSetException mse =
-						new MismatchedSetException(label.getSet(),
-												   input.LA(1),
-												   input.index());
+						new MismatchedSetException(label.getSet(), input);
 					if ( actions!=null ) {
 						actions.mismatchedSet(mse);
 					}

@@ -37,14 +37,13 @@ public class NoViableAltException extends RecognitionException {
 	public NoViableAltException(String grammarDecisionDescription,
 								int decisionNumber,
 								int stateNumber,
-								int found,
-								int index)
+								IntStream input)
 	{
 		this.grammarDecisionDescription = grammarDecisionDescription;
 		this.decisionNumber = decisionNumber;
 		this.stateNumber = stateNumber;
-		this.found = found;
-		this.index = index;
+		this.found = input.LA(1);
+		this.index = input.index();
 	}
 
 	public String toString() {

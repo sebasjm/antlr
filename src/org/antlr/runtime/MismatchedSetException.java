@@ -34,10 +34,10 @@ public class MismatchedSetException extends RecognitionException {
 	public int found;
 	public int index;
 
-	public MismatchedSetException(IntSet expecting, int found, int index) {
+	public MismatchedSetException(IntSet expecting, IntStream input) {
 		this.expecting = expecting;
-		this.found = found;
-		this.index = index;
+		this.found = input.LA(1);
+		this.index = input.index();
 	}
 
 	public String toString() {

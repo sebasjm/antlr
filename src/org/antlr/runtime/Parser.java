@@ -76,7 +76,7 @@ public class Parser {
 			return;
 		}
 		MismatchedTokenException mte =
-			new MismatchedTokenException(ttype, input.LA(1), input.index());
+			new MismatchedTokenException(ttype, input);
 		recoverFromMismatchedToken(mte, ttype, follow);
 		errorRecovery = true;
 		return;
