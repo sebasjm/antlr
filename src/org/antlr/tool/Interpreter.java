@@ -101,7 +101,7 @@ public class Interpreter implements TokenSource {
 			return Token.EOFToken;
 		}
 		int start = input.index();
-		int type = 0;
+		int charPos = ((CharStream)input).getCharPositionInLine();
 		CommonToken token = null;
 		loop:
 		while (true) {
@@ -121,7 +121,7 @@ public class Interpreter implements TokenSource {
 		token.setLine(((CharStream)input).getLine());
 		token.setStartIndex(start);
 		token.setStopIndex(stop);
-		token.setCharPositionInLine(((CharStream)input).getCharPositionInLine());
+		token.setCharPositionInLine(charPos);
 		return token;
 	}
 
@@ -146,7 +146,7 @@ public class Interpreter implements TokenSource {
 			return;
 		}
 		CharStream input = (CharStream)this.input;
-		System.out.println("scan("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
+		//System.out.println("scan("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
 			if ( grammar.type==Grammar.LEXER ) {
@@ -221,14 +221,16 @@ public class Interpreter implements TokenSource {
 		NFAState s = start;
 		int t = input.LA(1);
 		while ( s!=stop ) {
-			System.out.println("parse state "+s.stateNumber+" input="+grammar.getTokenName(t));
+			//System.out.println("parse state "+s.stateNumber+" input="+grammar.getTokenName(t));
 			// CASE 1: decision state
 			if ( s.getDecisionNumber()>0 && grammar.getNumberOfAltsForDecisionNFA(s)>1 ) {
 				// decision point, must predict and jump to alt
 				DFA dfa = grammar.getLookaheadDFA(s.getDecisionNumber());
+				/*
 				System.out.println("decision: "+
 								   dfa.getNFADecisionStartState().getDescription()+
 								   " input="+grammar.getTokenName(t));
+				*/
 				int m = input.mark();
 				int predictedAlt = predict(dfa);
 				if ( predictedAlt == NFA.INVALID_ALT_NUMBER ) {
@@ -245,8 +247,13 @@ public class Interpreter implements TokenSource {
 					throw nvae;
 				}
 				input.rewind(m);
-				System.out.println("predicted alt "+predictedAlt+" of "+
-								   grammar.getNumberOfAltsForDecisionNFA(s));
+				int parseAlt =
+					s.translateDisplayAltToWalkAlt(predictedAlt);
+				/*
+				System.out.println("predicted alt "+predictedAlt+", parseAlt "+
+								   parseAlt);
+				*/
+				/*
 				if ( s.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
 					if ( predictedAlt==grammar.getNumberOfAltsForDecisionNFA(s) )
 					{
@@ -262,7 +269,8 @@ public class Interpreter implements TokenSource {
 						predictedAlt = predictedAlt+1;
 					}
 				}
-				NFAState alt = grammar.getNFAStateForAltOfDecision(s, predictedAlt);
+				*/
+				NFAState alt = grammar.getNFAStateForAltOfDecision(s, parseAlt);
 				s = (NFAState)alt.transition(0).target;
 				continue;
 			}

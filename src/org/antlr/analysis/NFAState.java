@@ -35,6 +35,12 @@ import java.util.Collections;
 
 /** A state within an NFA. At most 2 transitions emanate from any NFA state. */
 public class NFAState extends State {
+	// I need to distinguish between NFA decision states for (...)* and (...)+
+	// during NFA interpretation.
+	public static final int LOOPBACK = 1;
+	public static final int BLOCK_START = 2;
+	public static final int BYPASS = 3;
+
     public static final int MAX_TRANSITIONS = 2;
 
     /** How many transitions; 0, 1, or 2 transitions */
@@ -51,24 +57,20 @@ public class NFAState extends State {
 	 *  the NFA created for them.  They both have a loop-exit-or-stay-in
 	 *  decision node (the loop back node).  They both have a normal
 	 *  alternative block decision node at the left edge.  The (...)* is
-	 *  worst as it even has a bypass decision (2 alts: stay in or bypass)
+	 *  worse as it even has a bypass decision (2 alts: stay in or bypass)
 	 *  node at the extreme left edge.  This is not how they get generated
 	 *  in code as a while-loop or whatever deals nicely with either.  For
 	 *  error messages (where I need to print the nondeterministic alts)
 	 *  and for interpretation, I need to use the single DFA that is created
 	 *  (for efficiency) but interpret the results differently depending
 	 *  on which of the 2 or 3 decision states uses the DFA.  For example,
-	 *  the DFA will always report alt 1 as the exit branch so I need to
-	 *  translate that depending on the decision state.
+	 *  the DFA will always report alt n+1 as the exit branch for n real
+	 *  alts, so I need to translate that depending on the decision state.
 	 *
-	 *  For the actual loop-back NFA state, the altTranslationMap is
-	 *  an identity translation.
-	 *
-	 *  If decisionNumber>0 then this map tells you how to translate the
-	 *  alt number coming from the DFA.  Alt n for n alts is returned as
-	 *  the exit branch.
+	 *  If decisionNumber>0 then this var tells you what kind of decision
+	 *  state it is.
 	 */
-	//protected int[] altTranslationMap;
+	public int decisionStateType;
 
 	/** What rule do we live in?  I currently only set on rule start/stop states */
 	protected String enclosingRule;
@@ -129,14 +131,61 @@ public class NFAState extends State {
         return transition[i];
     }
 
-    /*
-	public List getTransitions() {
-        List t = new ArrayList();
-        t.add(transition[0]);
-        t.add(transition[1]);
-        return t;
-    }
-	*/
+	/** The DFA decision for this NFA decision state always has
+	 *  an exit path for loops as n+1 for n alts in the loop.
+	 *  That is really useful for displaying nondeterministic alts
+	 *  and so on, but for walking the NFA to get a sequence of edge
+	 *  labels or for actually parsing, we need to get the real alt
+	 *  number.  The real alt number for exiting a loop is always 1
+	 *  as transition 0 points at the exit branch (we compute DFAs
+	 *  always for loops at the loopback state).
+	 *
+	 *  For walking/parsing the loopback state:
+	 * 		1 2 3 display alt (for human consumption)
+	 * 		2 3 1 walk alt
+	 *
+	 *  For walking the block start:
+	 * 		1 2 3 display alt
+	 * 		1 2 3
+	 *
+	 *  For walking the bypass state of a (...)* loop:
+	 * 		1 2 3 display alt
+	 * 		1 1 2 all block alts map to entering loop exit means take bypass
+	 *
+	 *  Non loop EBNF do not need to be translated; they are ignored by
+	 *  this method as decisionStateType==0.
+	 *
+	 *  Return same alt if we can't translate.
+	 */
+	public int translateDisplayAltToWalkAlt(int displayAlt) {
+		if ( decisionNumber==0 || decisionStateType==0 ) {
+			return displayAlt;
+		}
+		int walkAlt = 0;
+		// find the NFA loopback state associated with this DFA
+		// and count number of alts (all alt numbers are computed
+		// based upon the loopback's NFA state.
+		DFA dfa = nfa.grammar.getLookaheadDFA(decisionNumber);
+		NFAState nfaStart = dfa.getNFADecisionStartState();
+		int nAlts = nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStart);
+		switch ( decisionStateType ) {
+			case LOOPBACK :
+				walkAlt = displayAlt % nAlts + 1; // rotate right mod 1..3
+				break;
+			case BLOCK_START :
+				walkAlt = displayAlt; // identity transformation
+				break;
+			case BYPASS :
+				if ( displayAlt == nAlts ) {
+					walkAlt = 2; // bypass
+				}
+				else {
+					walkAlt = 1; // any non exit branch alt predicts entering
+				}
+				break;
+		}
+		return walkAlt;
+	}
 
     // Setter/Getters
 
@@ -148,12 +197,6 @@ public class NFAState extends State {
 	 *  set the AST node, I set the node to point back to this NFA state.
 	 */
 	public void setDecisionASTNode(GrammarAST decisionASTNode) {
-		/*
-		System.out.println("setting ast "+
-						   nfa.grammar.grammarTreeToString(decisionASTNode)+
-						   " AST="+decisionASTNode.toStringTree()+
-						   " for "+this.toString());
-		*/
 		decisionASTNode.setNFAStartState(this);
 		this.decisionASTNode = decisionASTNode;
 	}

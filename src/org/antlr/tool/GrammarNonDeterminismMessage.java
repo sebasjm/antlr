@@ -48,35 +48,39 @@ public class GrammarNonDeterminismMessage extends Message {
 		List nondetAlts = probe.getNonDeterministicAltsForState(problemState);
 		for (Iterator iter = nondetAlts.iterator(); iter.hasNext();) {
 			Integer displayAltI = (Integer) iter.next();
-			NFAState nfaStart = probe.dfa.getNFADecisionStartState();
-			int alt = displayAltI.intValue();
-			if ( nfaStart.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
-				if ( alt==
-					 probe.dfa.nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStart) )
+			if ( DecisionProbe.verbose ) {
+				NFAState nfaStart = probe.dfa.getNFADecisionStartState();
+				int tracePathAlt =
+					nfaStart.translateDisplayAltToWalkAlt(displayAltI.intValue());
+				/*
+				int tracePathAlt = displayAltI.intValue();
+				if ( nfaStart.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
+				if ( tracePathAlt==
+				probe.dfa.nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStart) )
 				{
-					// special case; loop end decisions have exit as
-					// # block alts + 1; getNumberOfAltsForDecisionNFA() has
-					// both block alts and exit branch.  So, any predicted
-					// alt equal to number of alts is the exit
-					// alt.  The NFA sees that as alt 1.
-					// Yes, this is gross, but I have searched for months
-					// for a better solution without success. :(
-					alt = 1;
+				// special case; loop end decisions have exit as
+				// # block alts + 1; getNumberOfAltsForDecisionNFA() has
+				// both block alts and exit branch.  So, any predicted
+				// tracePathAlt equal to number of alts is the exit
+				// tracePathAlt.  The NFA sees that as tracePathAlt 1.
+				// Yes, this is gross, but I have searched for months
+				// for a better solution without success. :(
+				tracePathAlt = 1;
 				}
 				else {
-					// exit branch is really first transition, so skip
-					alt = alt+1;
+				// exit branch is really first transition, so skip
+				tracePathAlt = tracePathAlt+1;
 				}
-			}
-			if ( DecisionProbe.verbose ) {
+				}
+				*/
 				List path =
-					probe.getNFAPathStatesForAlt(problemState,alt,
+					probe.getNFAPathStatesForAlt(problemState,tracePathAlt,
 												 labels);
 				st.setAttribute("paths.{alt,states}",
 								displayAltI, path);
 			}
 			else {
-				st.setAttribute("conflictingAlts", alt);
+				st.setAttribute("conflictingAlts", displayAltI);
 			}
 		}
 		return st.toString();

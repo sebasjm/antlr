@@ -58,5 +58,6 @@ public interface CharStream extends IntStream {
 
 	void setCharPositionInLine(int pos);
 
+	/** The index of the character relative to the beginning of the line 0..n-1 */
 	int getCharPositionInLine();
 }

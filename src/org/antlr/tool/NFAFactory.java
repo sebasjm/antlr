@@ -482,8 +482,8 @@ public class NFAFactory {
 
     /** From (A)+ build
 	 *
-     *     |---|    (Transition 2 from block end points at alt 1; follow is Transition 1)
-	 *     v   |
+     *     |---|    (Transition 2 from A.right points at alt 1)
+	 *     v   |    (follow of loop is Transition 1)
      *  o->o-A-o->o
      *
      *  Meaning that the last NFAState in A points back to A's left Transition NFAState
@@ -500,6 +500,9 @@ public class NFAFactory {
 		// turn A's block end into a loopback (acts like alt 2)
 		transitionBetweenStates(A.right, A.left, Label.EPSILON); // loop back Transition 2
 		transitionBetweenStates(left, A.left, Label.EPSILON);
+
+		A.right.decisionStateType = NFAState.LOOPBACK;
+		A.left.decisionStateType = NFAState.BLOCK_START;
 
 		// set EOB markers for Jean
 		A.left.endOfBlockStateNumber = A.right.stateNumber;
@@ -552,6 +555,10 @@ public class NFAFactory {
         transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
         // Transition 2 of end block loops
         transitionBetweenStates(A.right, A.left, Label.EPSILON);
+
+		bypassDecisionState.decisionStateType = NFAState.BYPASS;
+		A.left.decisionStateType = NFAState.BLOCK_START;
+		A.right.decisionStateType = NFAState.LOOPBACK;
 
 		// set EOB markers for Jean
 		A.left.endOfBlockStateNumber = A.right.stateNumber;
