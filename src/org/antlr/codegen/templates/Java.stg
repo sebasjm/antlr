@@ -22,19 +22,19 @@ class <name> extends Lexer {
         super(input);
     }
     public Token nextToken() {
-        if ( input.LA(1)==CharStream.EOF ) {
-            return Token.EOFToken;
-        }
         token=null;
 retry:
         while (true) {
+	        if ( input.LA(1)==CharStream.EOF ) {
+        	    return Token.EOFToken;
+	        }	
             try {
                 mTokens();
                 break retry;
             }
             catch (RecognitionException re) {
                 reportError(re);
-		recover(re);
+				recover(re);
             }
         }
         return token;

@@ -96,6 +96,7 @@ public class MethodAssembler {
 		nameToOpcode.put("astore_1", new Integer(76));
 		nameToOpcode.put("astore_2", new Integer(77));
 		nameToOpcode.put("astore_3", new Integer(78));
+		nameToOpcode.put("dup", new Integer(89));
 		nameToOpcode.put("if_icmpeq", new Integer(159));
 		nameToOpcode.put("if_icmpne", new Integer(160));
 		nameToOpcode.put("if_icmplt", new Integer(161));
@@ -112,6 +113,8 @@ public class MethodAssembler {
 		nameToOpcode.put("invokespecial", new Integer(183));
 		nameToOpcode.put("invokestatic", new Integer(184));
 		nameToOpcode.put("invokeinterface", new Integer(185));
+		nameToOpcode.put("new", new Integer(187));
+		nameToOpcode.put("athrow", new Integer(191));
 		nameToOpcode.put("goto_w", new Integer(200));
 	}
 
@@ -255,6 +258,7 @@ public class MethodAssembler {
 		else if ( instrName.equals("invokevirtual") ) {code = invokevirtual(instr);}
 		else if ( instrName.equals("invokespecial") ) {code = invokespecial(instr);}
 		else if ( instrName.equals("ldc") ) {code = ldc(instr);}
+		else if ( instrName.equals("new") ) {code = new_(instr);}
 		else {
 			ErrorManager.error(ErrorManager.MSG_BYTECODE_UNKNOWN_INSTR,
 							   assemblyCode);
@@ -268,9 +272,8 @@ public class MethodAssembler {
 	protected int[] iconst(Instruction instr) {
 		String assemblyCode = instr.assemblyCode;
 		int[] code = null;
-		StringTokenizer st = new StringTokenizer(assemblyCode, " ", false);
-		st.nextToken(); // skip instr name
-		String operand = st.nextToken();
+		String[] elements = getInstructionElements(assemblyCode);
+		String operand = elements[1];
 		int v = Integer.parseInt(operand);
 		if ( v==-1 ) {
 			code = new int[] {getOpcode("iconst_m1")};
@@ -299,9 +302,9 @@ public class MethodAssembler {
 	protected int[] iload_or_store(Instruction instr) {
 		String assemblyCode = instr.assemblyCode;
 		int[] code = null;
-		StringTokenizer st = new StringTokenizer(assemblyCode, " ", false);
-		String opcodeStr = st.nextToken();
-		String operand = st.nextToken();
+		String[] elements = getInstructionElements(assemblyCode);
+		String opcodeStr = elements[0];
+		String operand = elements[1];
 		int v = Integer.parseInt(operand);
 		if ( v>=0 && v<=3 ) {
 			code = new int[] {getOpcode(opcodeStr+"_"+v)};
@@ -319,9 +322,8 @@ public class MethodAssembler {
 	protected int[] aload(Instruction instr) {
 		String assemblyCode = instr.assemblyCode;
 		int[] code = null;
-		StringTokenizer st = new StringTokenizer(assemblyCode, " ", false);
-		st.nextToken(); // skip instr name
-		String operand = st.nextToken();
+		String[] elements = getInstructionElements(assemblyCode);
+		String operand = elements[1];
 		int v = Integer.parseInt(operand);
 		if ( v>=0 && v<=3 ) {
 			code = new int[] {getOpcode("aload_"+v)};
@@ -371,11 +373,6 @@ public class MethodAssembler {
 		int[] code = null;
 		String opcodeStr = elements[0];
 		String operand = elements[1];
-		/*
-		Label label = (Label)labels.get(operand);
-		if ( label==null ) {
-		}
-		*/
 		Label label = referenceLabel(instr, operand, pc+1);
 
 		// goto offset is computed relative to byte 0 of the if_cmpXX instr
@@ -404,6 +401,8 @@ public class MethodAssembler {
 		String assemblyCode = instr.assemblyCode;
 		String[] elements = getInstructionElements(assemblyCode);
 		String operand = elements[1];
+		// note: there are two operands, but that just fills the constant pool
+		// the name of the static variable is the first operand
 		int fieldIndex = classFile.indexOfField(operand);
 		int[] code = new int[] {getOpcode("getstatic"),
 						  secondHighByte(fieldIndex),
@@ -414,12 +413,11 @@ public class MethodAssembler {
 	protected int[] invokeinterface(Instruction instr) {
 		String assemblyCode = instr.assemblyCode;
 		int[] code = null;
-		StringTokenizer st = new StringTokenizer(assemblyCode, " ", false);
-		st.nextToken(); // skip instr name
-		String operand = st.nextToken();
-		int methodIndex = classFile.indexOfMethod(operand);
-		operand = st.nextToken();
-		int numArgs = Integer.parseInt(operand);
+		String[] elements = getInstructionElements(assemblyCode);
+		String method = elements[1];
+		String numArgsS = elements[2];
+		int methodIndex = classFile.indexOfMethod(method);
+		int numArgs = Integer.parseInt(numArgsS);
 		code = new int[] {getOpcode("invokeinterface"),
 						  secondHighByte(methodIndex),
 						  lowByte(methodIndex),
@@ -431,9 +429,8 @@ public class MethodAssembler {
 	protected int[] invokevirtual(Instruction instr) {
 		String assemblyCode = instr.assemblyCode;
 		int[] code = null;
-		StringTokenizer st = new StringTokenizer(assemblyCode, " ", false);
-		st.nextToken(); // skip instr name
-		String operand = st.nextToken();
+		String[] elements = getInstructionElements(assemblyCode);
+		String operand = elements[1];
 		int methodIndex = classFile.indexOfMethod(operand);
 		code = new int[] {getOpcode("invokevirtual"),
 						  secondHighByte(methodIndex),
@@ -444,13 +441,25 @@ public class MethodAssembler {
 	protected int[] invokespecial(Instruction instr) {
 		String assemblyCode = instr.assemblyCode;
 		int[] code = null;
-		StringTokenizer st = new StringTokenizer(assemblyCode, " ", false);
-		st.nextToken(); // skip instr name
-		String operand = st.nextToken();
+		String[] elements = getInstructionElements(assemblyCode);
+		String operand = elements[1];
 		int methodIndex = classFile.indexOfMethod(operand);
 		code = new int[] {getOpcode("invokespecial"),
 						  secondHighByte(methodIndex),
 						  lowByte(methodIndex)};
+		return code;
+	}
+
+	protected int[] new_(Instruction instr) {
+		String assemblyCode = instr.assemblyCode;
+		String[] elements = getInstructionElements(assemblyCode);
+		String operand = elements[1];
+		int fieldIndex = classFile.indexOfClass(operand);
+		int[] code = new int[] {
+							   getOpcode("new"),
+							   secondHighByte(fieldIndex),
+							   lowByte(fieldIndex)
+							   };
 		return code;
 	}
 
@@ -599,7 +608,7 @@ public class MethodAssembler {
 	}
 
 	/** Break up a label or regular instruction into opcode, operands.
-	 *  This amounts to the lexer for the assembler.
+	 *  This amounts to the lexer for the assembler.  The opcode is element[0].
 	 */
 	public static String[] getInstructionElements(String instr) {
 		String[] elements = new String[MAX_INSTR_ELEMENTS];
