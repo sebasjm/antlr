@@ -108,7 +108,7 @@ public class NFAFactory {
 					/*
 					System.out.println("### opt "+s.stateNumber+"->"+
 									   epsilonTarget.transition(0).target.stateNumber);
-					*/									   
+					*/
 				}
 			}
 			s = (NFAState)t.target;
@@ -439,6 +439,7 @@ public class NFAFactory {
 			NFAState emptyAlt = newState();
             emptyAlt.setDescription("epsilon path of ()? block");
             NFAState blockEndNFAState = null;
+			/*
 			if ( A.right.getNumberOfTransitions()==0 ) {
 				blockEndNFAState = A.right;
 				// System.out.println("### opt saved block end in (...)?");
@@ -448,6 +449,9 @@ public class NFAFactory {
 				blockEndNFAState = newState();
 				transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
 			}
+			*/
+			blockEndNFAState = newState();
+			transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
 			blockEndNFAState.setDescription("end ()? block");
             transitionBetweenStates(decisionState, A.left, Label.EPSILON);
             transitionBetweenStates(decisionState, emptyAlt, Label.EPSILON);

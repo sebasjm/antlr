@@ -408,7 +408,7 @@ IntSet elements=new IntervalSet();
 #set.setSetValue(elements); // track set for use by code gen
 }
 	:	#(SET (setElement[elements])+) {g = factory.build_Set(elements);}
-		{System.out.println("set elements="+elements.toString(grammar));}
+		//{System.out.println("set elements="+elements.toString(grammar));}
     ;
 
 setElement[IntSet elements]
