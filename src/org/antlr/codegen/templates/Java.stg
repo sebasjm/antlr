@@ -147,7 +147,7 @@ public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separ
 rule(ruleName,ruleDescriptor,initAction,block) ::= <<
 <ruleDescriptor.ruleScope:attributeScope(scope=it)>
 <ruleDescriptor.returnScope:returnScope(scope=it)>
-// $ANTLR start compilationUnit
+// $ANTLR start <ruleName>
 public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <ruleDescriptor.useScopes:{stack_<it>.push(new scope_<it>());}; separator="\n">
     <ruleDescriptor.ruleScope:{stack_<it.name>.push(new scope_<it.name>());}; separator="\n">
@@ -179,7 +179,7 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
     return retval;<\n>
 <endif>
 }
-// $ANTLR end compilationUnit
+// $ANTLR end <ruleName>
 >>
 
 tokensRule(ruleName,nakedBlock,args,block) ::= <<
