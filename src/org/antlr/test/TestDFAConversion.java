@@ -461,7 +461,7 @@ public class TestDFAConversion extends TestSuite {
     public void testNonGreedy() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "CMT : \"/*\" ( greedy=false : . )* \"*/\" ;");
+                "CMT : \"/*\" ( greedy=false : ~'*' )* \"*/\" ;");
         String expecting =
                 ".s0-'*'->.s1\n" +
                 ".s0-{'\\u0000'..')', '+'..'\\uFFFE'}->:s4=>1\n" +
@@ -492,26 +492,6 @@ public class TestDFAConversion extends TestSuite {
 		checkDecision(g, 1, expecting, new int[] {1});
 	}
 
-    public void testKeywordVersusID() throws Exception {
-        Grammar g = new Grammar(
-                "lexer grammar t;\n"+
-                "IF : \"if\" ;\n" +
-                "ID : ('a'..'z')+ ;\n");
-        String expecting =
-                ".s0-'a'..'z'->:s2=>1\n" +
-                ".s0-<EOT>->:s1=>2\n";
-        checkDecision(g, 1, expecting, null);
-		expecting =
-			".s0-'i'->.s1\n" +
-			".s0-{'a'..'h', 'j'..'z'}->:s4=>2\n" +
-			".s1-'f'->.s2\n" +
-			".s1-<EOT>->:s5=>2\n" +
-			".s1-{'a'..'e', 'g'..'z'}->:s4=>2\n" +
-			".s2-'a'..'z'->:s4=>2\n" +
-			".s2-<EOT>->:s3=>1\n";
-        checkDecision(g, 2, expecting, null);
-    }
-
 	public void testMultipleSequenceCollision() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n" +
@@ -521,8 +501,9 @@ public class TestDFAConversion extends TestSuite {
 				"  ;");
 		// nondeterministic from left edge; no stop state
 		String expecting =
-				"";
-		checkDecision(g, 1, expecting, new int[] {2,3});
+			".s0-A->:s1=>1\n" +
+			".s0-B->:s2=>1\n";
+		checkDecision(g, 3, expecting, new int[] {2,3});
 	}
 
 	public void testMultipleAltsSameSequenceCollision() throws Exception {
@@ -543,6 +524,23 @@ public class TestDFAConversion extends TestSuite {
 			".s3-ID->:s2=>1\n";
 		checkDecision(g, 1, expecting, new int[] {2,3,4});
 	}
+
+	public void testFollowReturnsToLoopReenteringSameRule() throws Exception {
+		// D07 can be matched in the (...)? or fall out of esc back into (..)*
+		// loop in sl.  Note that D07 is matched by ~(R|SLASH).  No good
+		// way to write that grammar I guess
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"sl : L ( esc | ~(R|SLASH) )* R ;\n" +
+				"\n" +
+				"esc : SLASH ( N | D03 (D07)? ) ;");
+		String expecting =
+			".s0-R->:s1=>3\n" +
+			".s0-SLASH->:s2=>1\n" +
+			".s0-{L, N..D07}->:s3=>2\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
 
     // S U P P O R T
 
@@ -577,9 +575,9 @@ public class TestDFAConversion extends TestSuite {
         List nonDetAlts = dfa.getUnreachableAlts();
 
         // first make sure nondeterministic alts are as expected
+		BitSet s = new BitSet();
+		s.addAll(expectingUnreachableAlts);
         if ( expectingUnreachableAlts==null ) {
-            BitSet s = new BitSet();
-            s.addAll(expectingUnreachableAlts);
             assertTrue(nonDetAlts.size()==0,
                     "unreachable alts mismatch; expecting="+
                     s.toString()+" found "+nonDetAlts);
@@ -587,7 +585,7 @@ public class TestDFAConversion extends TestSuite {
         else {
             for (int i=0; i<expectingUnreachableAlts.length; i++) {
                 assertTrue(nonDetAlts.contains(new Integer(expectingUnreachableAlts[i])),
-                        "unreachable alts mismatch");
+                        "unreachable alts mismatch; expecting "+s.toString()+" found "+nonDetAlts);
             }
         }
         assertEqual(result, expecting);

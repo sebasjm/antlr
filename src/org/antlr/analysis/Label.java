@@ -177,15 +177,37 @@ public class Label implements Comparable {
         return semanticContext;
     }
 
-    public boolean matches(int atom) {
-        if ( label==atom ) {
-            return true; // handle the single atom case efficiently
-        }
-        if ( label==SET ) {
-            return labelSet.member(atom);
-        }
-        return false;
-    }
+	public boolean matches(int atom) {
+		if ( label==atom ) {
+			return true; // handle the single atom case efficiently
+		}
+		if ( isSet() ) {
+			return labelSet.member(atom);
+		}
+		return false;
+	}
+
+	public boolean matches(IntSet set) {
+		if ( isAtom() ) {
+			return set.member(getAtom());
+		}
+		if ( isSet() ) {
+			// matches if intersection non-nil
+			return !getSet().and(set).isNil();
+		}
+		return false;
+	}
+
+
+	public boolean matches(Label other) {
+		if ( other.isSet() ) {
+			return matches(other.getSet());
+		}
+		if ( other.isAtom() ) {
+			return matches(other.getAtom());
+		}
+		return false;
+	}
 
     public int hashCode() {
         switch (label) {

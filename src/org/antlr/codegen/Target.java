@@ -58,7 +58,10 @@ public class Target {
 		// cyclic DFAs go into recognizerST by default
 	}
 
-	protected StringTemplate chooseWhereCyclicDFAsGo(StringTemplate recognizerST,
+	protected StringTemplate chooseWhereCyclicDFAsGo(Tool tool,
+													 CodeGenerator generator,
+													 Grammar grammar,
+													 StringTemplate recognizerST,
 													 StringTemplate cyclicDFAST)
 	{
 		return recognizerST; // by default cyclic DFAs go in recognizer itself

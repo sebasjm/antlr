@@ -73,7 +73,6 @@ public class Grammar {
 		NFAState startState;
 		Map options;
 		DFA dfa;
-		//AST tree;
 	}
 
     /** What name did the user provide for this grammar? */
@@ -174,7 +173,7 @@ public class Grammar {
 			"lexer grammar <name>Lexer;\n" +
 			"\n" +
 			"<literals:{<it.ruleName> : <it.literal> ;\n}>\n" +
-			"<rules>",
+			"<rules; separator=\"\n\n\">",
 			AngleBracketTemplateLexer.class
 		);
 
@@ -245,6 +244,10 @@ public class Grammar {
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
 		TokenStreamRewriteEngine tokenBuffer =
 			new TokenStreamRewriteEngine(lexer);
+		tokenBuffer.discard(ANTLRParser.WS);
+		tokenBuffer.discard(ANTLRParser.ML_COMMENT);
+		tokenBuffer.discard(ANTLRParser.COMMENT);
+		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
 		ANTLRParser parser = new ANTLRParser(tokenBuffer, this);
 		parser.setFilename(this.getFileName());
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
@@ -294,12 +297,16 @@ public class Grammar {
             	matchTokenRuleST.setAttribute("rules", r.name);
 			}
         }
-		//System.out.println("rule: "+matchTokenRuleST.toString());
+		System.out.println("tokens rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
 		TokenStreamRewriteEngine tokenBuffer =
 			new TokenStreamRewriteEngine(lexer);
+		tokenBuffer.discard(ANTLRParser.WS);
+		tokenBuffer.discard(ANTLRParser.ML_COMMENT);
+		tokenBuffer.discard(ANTLRParser.COMMENT);
+		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
         ANTLRParser parser = new ANTLRParser(tokenBuffer, this);
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
         try {
@@ -439,7 +446,7 @@ public class Grammar {
 			new DOTGenerator(this).writeDOTFilesForAllRuleNFAs();
 		}
 		catch (IOException ioe) {
-			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE);
+			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE, ioe);
 		}
 	}
 
@@ -460,18 +467,18 @@ public class Grammar {
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
             NFAState decisionStartState = getDecisionNFAStartState(decision);
             if ( decisionStartState.getNumberOfTransitions()>1 ) {
-                /*
+				/*
 				System.out.println("--------------------\nbuilding lookahead DFA (d="
                         +decisionStartState.getDecisionNumber()+") for "+
                         decisionStartState.getDescription());
-                */
+				*/
 				long start = System.currentTimeMillis();
                 DFA lookaheadDFA = new DFA(decisionStartState);
                 long stop = System.currentTimeMillis();
 				setLookaheadDFA(decision, lookaheadDFA);
 				/*
-				System.out.println("DFA (d="+lookaheadDFA.getDecisionNumber()+") cost: "+lookaheadDFA.getNumberOfStates()+
-								   " states, "+(int)(stop-start)+" ms; descr="+decisionStartState.getDescription());
+				System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
+								   " states, "+(int)(stop-start)+" ms");
 				*/
 				if ( true ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.getGrammar());
@@ -544,7 +551,7 @@ public class Grammar {
         return ttype;
     }
 
-    /** Define a new rule.  A new rule index is created by incrementing
+	/** Define a new rule.  A new rule index is created by incrementing
      *  ruleIndex. Pass in the parser and token info so we can pass the
 	 *  info on to the error manager if there is a problem.
      */

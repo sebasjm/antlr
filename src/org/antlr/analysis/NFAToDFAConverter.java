@@ -2,6 +2,7 @@ package org.antlr.analysis;
 
 import org.antlr.misc.*;
 import org.antlr.tool.ANTLRParser;
+import org.antlr.tool.Grammar;
 
 import java.util.*;
 import java.util.BitSet;
@@ -623,7 +624,7 @@ public class NFAToDFAConverter {
 
 		// if not there, then check new state.
 
-        // resolve syntactic conflicts by choosing a single alt or
+		// resolve syntactic conflicts by choosing a single alt or
         // by using semantic predicates if present.
         resolveNonDeterminisms(d);
 
@@ -775,26 +776,46 @@ public class NFAToDFAConverter {
 	 *  in the EOF state (one for ID and one each for the identical rules).
 	 */
 	public void resolveNonDeterminisms(DFAState d) {
-		Set nondeterministicAlts = null;
+		boolean conflictingLexerRules = false;
+		Set nondeterministicAlts = d.getNondeterministicAlts();
 
-		// AMBIGUOUS EOT (if |alts|>1 and EOT state, resolve)
-		// TODO: not sure if this grab first element is right?  why not all?
-		Set alts = d.getAltSet();
+		// CHECK FOR AMBIGUOUS EOT (if |allAlts|>1 and EOT state, resolve)
+
+		// grab any config to see if EOT state; any other configs must
+		// transition on EOT to get to this DFA state as well
 		NFAConfiguration anyConfig;
-		Iterator itr = d.nfaConfigurations.iterator(); // grab any config
+		Iterator itr = d.nfaConfigurations.iterator();
 		anyConfig = (NFAConfiguration)itr.next();
 		NFAState anyState = dfa.getNFA().getState(anyConfig.state);
-		if ( alts.size()>1 && anyState.isEOTState() ) {
-			nondeterministicAlts = alts;
-		}
-		else {
-			nondeterministicAlts = d.getNondeterministicAlts();
+		// if d is target of EOT and more than one predicted alt
+		// indicate that d is nondeterministic on all alts otherwise
+		// it looks like state has no problem
+		if ( anyState.isEOTState() ) {
+			Set allAlts = d.getAltSet();
+			if ( allAlts.size()>1 ) {
+				nondeterministicAlts = allAlts;
+				/*
+				int decision = d.dfa.getDecisionNumber();
+				NFAState tokensRuleStartState =
+					dfa.getNFA().getGrammar().getRuleStartState(Grammar.TOKEN_RULENAME);
+				NFAState decisionState =
+					(NFAState)tokensRuleStartState.transition(0).getTarget();
+				// track lexer rule issues differently than other decisions
+				if ( decisionState.getDecisionNumber() == decision ) {
+					dfa.probe.reportLexerRuleNondeterminism(d,allAlts);
+					conflictingLexerRules = true;
+				}
+				*/
+			}
 		}
 
 		if ( nondeterministicAlts==null ) {
 			return; // no problems, return
 		}
-		dfa.probe.reportNondeterminism(d,nondeterministicAlts);
+
+		if ( !conflictingLexerRules ) {
+			dfa.probe.reportNondeterminism(d,nondeterministicAlts);
+		}
 
 		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
 
@@ -808,12 +829,10 @@ public class NFAToDFAConverter {
 
 		// RESOLVE SYNTACTIC CONFLICT BY REMOVING ALL BUT MIN ALT
 
-		// make a copy of the nondet alts as probe has a copy and I
-		// want a list of the nondet alts before removal of an alt
-		// to resolve the nondeterminism.
-		Set foo = new HashSet();
-		foo.addAll(nondeterministicAlts);
-		nondeterministicAlts = foo;
+        resolveByPickingMinAlt(d,nondeterministicAlts);
+	}
+
+	protected void resolveByPickingMinAlt(DFAState d, Set nondeterministicAlts) {
 		Iterator iter = nondeterministicAlts.iterator();
 		int min = Integer.MAX_VALUE;
 		while (iter.hasNext()) {
@@ -823,20 +842,18 @@ public class NFAToDFAConverter {
 				min = alt;
 			}
 		}
-		// remove the one we pick to resolve conflict yielding list to turn off
-		nondeterministicAlts.remove(new Integer(min));
-		dfa.probe.reportDisabledAlternatives(d,nondeterministicAlts);
 
 		// turn off all states associated with alts other than the good one
+		// (as long as they are one of the nondeterministic ones)
 		iter = d.nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
-			if ( nondeterministicAlts.contains(new Integer(configuration.alt)) ) {
+			if ( configuration.alt!=min &&
+				 nondeterministicAlts.contains(new Integer(configuration.alt)) ) {
 				configuration.resolved = true;
 			}
 		}
-		//System.out.println("after resolution: "+this.toString());
 	}
 
 	/** See if a set of nondeterministic alternatives can be disambiguated

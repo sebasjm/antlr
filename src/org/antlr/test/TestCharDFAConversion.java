@@ -146,6 +146,26 @@ public class TestCharDFAConversion extends TestSuite {
         checkDecision(g, 1, expecting, null);
     }
 
+	public void testKeywordVersusID() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"IF : \"if\" ;\n" +
+				"ID : ('a'..'z')+ ;\n");
+		String expecting =
+				".s0-'a'..'z'->:s2=>1\n" +
+				".s0-<EOT>->:s1=>2\n";
+		checkDecision(g, 1, expecting, null);
+		expecting =
+			".s0-'i'->.s1\n" +
+			".s0-{'a'..'h', 'j'..'z'}->:s4=>2\n" +
+			".s1-'f'->.s2\n" +
+			".s1-<EOT>->:s5=>2\n" +
+			".s1-{'a'..'e', 'g'..'z'}->:s4=>2\n" +
+			".s2-'a'..'z'->:s4=>2\n" +
+			".s2-<EOT>->:s3=>1\n";
+		checkDecision(g, 2, expecting, null);
+	}
+
     // S U P P O R T
 
     public void _template() throws Exception {

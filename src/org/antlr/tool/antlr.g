@@ -74,11 +74,13 @@ tokens {
 }
 
 {
-Grammar g = null;
+protected String currentMethodName;
+protected Grammar g = null;
 TokenStreamRewriteEngine tokenBuffer = null;
 
     public void reportError(RecognitionException ex) {
         System.out.println("buildast: "+ex.toString());
+        ex.printStackTrace(System.out);
     }
 
     public void reportError(String s) {
@@ -204,9 +206,69 @@ rules
 				// DOC_COMMENT TOKEN_REF, but that's an impossible sequence
 				warnWhenFollowAmbig=false;
 			}
-		:	rule
+		:	//{g.getType()==PARSER}? (aliasLexerRule)=>aliasLexerRule |
+			rule
 		)+
     ;
+
+/*
+aliasLexerRule!
+{
+	String modifier=null;
+    Map opts = null;
+    int start=((TokenWithIndex)LT(1)).getIndex(), stop;
+}
+	:
+	(	d:DOC_COMMENT
+	)?
+	(	{modifier=LT(1).getText();}
+	:	p1:"protected"
+	|	p2:"public"
+	|	p3:"private"
+	|	p4:"fragment"
+	|	{modifier=null;}
+	)
+	ruleToken:TOKEN_REF
+	( BANG  )?
+	( aa:ARG_ACTION )?
+	( "returns" rt:ARG_ACTION  )?
+	( throwsSpec )?
+	( opts=optionList )?
+	(a:ACTION )?
+	COLON
+	{String literal=LT(1).getText();}
+	(	CHAR_LITERAL
+	|	STRING_LITERAL
+	)
+	SEMI
+	( exceptionGroup )?
+    {
+    String ruleName = ruleToken.getText();
+    stop = ((TokenWithIndex)LT(1)).getIndex()-1;
+    if ( g.getType()==Grammar.PARSER ) {
+    	// a merged grammar spec
+    	// For lexer "RULE : <literal>;" found in parser, must define
+    	// token type for RULE and set token type of <literal> to same value.
+		int ttype = getTokenType(literal);
+    	if ( ttype==Label.INVALID ) {
+    		ttype = g.defineToken(ruleName);
+    	}
+    	g.defineToken(literal, ttype); // make the literal have the same ttype
+    	// track lexer rules and send to another grammar
+    	g.defineLexerRuleFoundInParser(currentMethodName, tokenBuffer.toOriginalString(start,stop));
+    }
+   	else {
+   		int ruleIndex = g.defineRule(this, #ruleName.getToken(), modifier, opts);
+	    if ( ruleIndex!=Grammar.INVALID_RULE_INDEX ) {
+    	    GrammarAST eor = #[EOR,"<end-of-rule>"];
+        	eor.setEnclosingRule(#ruleName.getText());
+        	#rule = #(#[RULE,"rule"],#ruleName,#b,eor);
+        	g.setRuleAST(#ruleName.getText(), #rule);
+    	}
+    }
+    }
+	;
+*/
 
 rule!
 {
@@ -224,7 +286,7 @@ rule!
 	|	p4:"fragment"
 	|	{modifier=null;}
 	)
-	ruleName:id
+	ruleName:id {currentMethodName = #ruleName.getText();}
 	( BANG  )?
 	( aa:ARG_ACTION )?
 	( "returns" rt:ARG_ACTION  )?
@@ -235,10 +297,11 @@ rule!
 	( exceptionGroup )?
     {
     stop = ((TokenWithIndex)LT(1)).getIndex()-1;
-    String name = #ruleName.getText();
-    if ( Character.isUpperCase(name.charAt(0)) && g.getType()==Grammar.PARSER ) {
+    if ( Character.isUpperCase(currentMethodName.charAt(0)) &&
+         g.getType()==Grammar.PARSER )
+    {
     	// a merged grammar spec, track lexer rules and send to another grammar
-    	g.defineLexerRuleFoundInParser(name, tokenBuffer.toOriginalString(start,stop));
+    	g.defineLexerRuleFoundInParser(currentMethodName, tokenBuffer.toOriginalString(start,stop));
     }
    	else {
    		int ruleIndex = g.defineRule(this, #ruleName.getToken(), modifier, opts);
@@ -455,7 +518,7 @@ ebnf!
 			|	PLUS	    {#ebnf=#([POSITIVE_CLOSURE,"+"],b);}
 			)
 			( BANG )?
-		|   IMPLIES	        {#b.setType(SYNPRED); #ebnf=#b;}
+//		|   IMPLIES	        {#b.setType(SYNPRED); #ebnf=#b;}
         |                   {#ebnf = #b;}
 		)
 		{#ebnf.setLine(line); #ebnf.setColumn(col);}
@@ -473,15 +536,19 @@ range!
 	;
 
 terminal
-    :   cl:CHAR_LITERAL ( BANG! )? {g.defineToken(cl.getText());}
+    :   cl:CHAR_LITERAL ( BANG! )?
+    	{g.defineToken(cl.getText());}
 
 	|   tr:TOKEN_REF {g.defineToken(tr.getText());}
 		ast_type_spec!
 		// Args are only valid for lexer
 		( ARG_ACTION! )?
 
-	|   sl:STRING_LITERAL {g.defineToken(sl.getText());}
+	|   sl:STRING_LITERAL
 		ast_type_spec!
+		{
+		g.defineToken(sl.getText());
+		}
 
 	|   wi:WILDCARD ast_type_spec!
 	;
@@ -608,31 +675,18 @@ WS	:	(	/*	'\r' '\n' can be matched in one alternative or by matching
 		|	'\r'		{newline();}
 		|	'\n'		{newline();}
 		)
-		{ $setType(Token.SKIP); }
 	;
 
 COMMENT :
 	( SL_COMMENT | t:ML_COMMENT {$setType(t.getType());} )
-	{if ( _ttype != DOC_COMMENT ) $setType(Token.SKIP);}
 	;
 
 protected
 SL_COMMENT :
 	"//"
-	( ~('\n'|'\r') )*
+	( options {greedy=false;} : . )*
 	(
-		/*	'\r' '\n' can be matched in one alternative or by matching
-			'\r' and then in the next token.  The language
-			that allows both "\r\n" and "\r" and "\n" to all be valid
-			newline is ambiguous.  Consequently, the resulting grammar
-			must be ambiguous.  I'm shutting this warning off.
-		 */
-			options {
-				generateAmbigWarnings=false;
-			}
-		:	'\r' '\n'
-		|	'\r'
-		|	'\n'
+		('\r')? '\n'
 	)
 	{ newline(); }
 	;
@@ -807,7 +861,7 @@ NESTED_ARG_ACTION :
 ACTION
 {int actionLine=getLine(); int actionColumn = getColumn(); }
 	:	NESTED_ACTION
-		(	'?'!	{_ttype = SEMPRED;} )?
+		(	'?'	{_ttype = SEMPRED;} )?
 		{
 			Token t = makeToken(_ttype);
 			t.setText($getText);
@@ -819,7 +873,7 @@ ACTION
 
 protected
 NESTED_ACTION :
-	'{'!
+	'{'
 	(
 		options {
 			greedy = false; // exit upon '}'
@@ -839,7 +893,7 @@ NESTED_ACTION :
 	|	STRING_LITERAL
 	|	.
 	)*
-	'}'!
+	'}'
    ;
 
 TOKEN_REF

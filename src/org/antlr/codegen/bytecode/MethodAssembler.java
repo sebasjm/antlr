@@ -192,7 +192,7 @@ public class MethodAssembler {
 			loc += instr.code.length;
 		}
 		patchForwardLabelReferences(code);
-		dump(code,0,code.length);
+		//dump(code,0,code.length);
 		method.code = code;
 		return code;
 	}
@@ -209,7 +209,7 @@ public class MethodAssembler {
 			Instruction instr = new Instruction(pc, line);
 			int[] code = instr.assemble();
 			if ( code!=null ) {
-				System.out.println(pc+": "+instr);
+				//System.out.println(pc+": "+instr);
 				instr.opcode = code[0];
 				instructions.add(instr);
 				pc += code.length;
@@ -319,7 +319,6 @@ public class MethodAssembler {
 		st.nextToken(); // skip instr name
 		String operand = st.nextToken();
 		int v = Integer.parseInt(operand);
-		System.out.println("aload operand "+v);
 		if ( v>=0 && v<=3 ) {
 			code = new int[] {getOpcode("aload_"+v)};
 		}
@@ -593,28 +592,35 @@ public class MethodAssembler {
 	 */
 	public static String[] getInstructionElements(String instr) {
 		String[] elements = new String[4]; // 4 is max number of elements
-		int firstQuoteIndex = instr.indexOf('"');
-		if ( firstQuoteIndex>=0 ) {
-			// treat specially; has a string argument like ldc "foo"
-			StringTokenizer st = new StringTokenizer(instr, " \t", false);
-			if ( st.hasMoreTokens() ) {
-				elements[0] = st.nextToken();
+		try {
+			int firstQuoteIndex = instr.indexOf('"');
+			if ( firstQuoteIndex>=0 ) {
+				// treat specially; has a string argument like ldc "foo"
+				StringTokenizer st = new StringTokenizer(instr, " \t", false);
+				if ( st.hasMoreTokens() ) {
+					elements[0] = st.nextToken();
+				}
+				int lastQuoteIndex = instr.lastIndexOf('"');
+				if ( lastQuoteIndex==firstQuoteIndex ) {
+					ErrorManager.error(ErrorManager.MSG_BYTECODE_OPND_MISSING_QUOTE,
+									   instr);
+				}
+				// get the string including quotes
+				elements[1] = instr.substring(firstQuoteIndex,lastQuoteIndex);
 			}
-			int lastQuoteIndex = instr.lastIndexOf('"');
-			if ( lastQuoteIndex==firstQuoteIndex ) {
-				ErrorManager.error(ErrorManager.MSG_BYTECODE_OPND_MISSING_QUOTE,
-								   instr);
+			else {
+				StringTokenizer st = new StringTokenizer(instr, " \t", false);
+				int i = 0;
+				while ( st.hasMoreTokens() ) {
+					elements[i] = st.nextToken();
+					i++;
+				}
 			}
-			// get the string including quotes
-			elements[1] = instr.substring(firstQuoteIndex,lastQuoteIndex);
 		}
-		else {
-			StringTokenizer st = new StringTokenizer(instr, " \t", false);
-			int i = 0;
-			while ( st.hasMoreTokens() ) {
-				elements[i] = st.nextToken();
-				i++;
-			}
+		catch (Exception e) {
+			ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR,
+							   "problem assembling bytecodes for '"+instr+"'",
+							   e);
 		}
 		return elements;
 	}

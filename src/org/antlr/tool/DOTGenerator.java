@@ -258,7 +258,7 @@ public class DOTGenerator {
             return "null";
         }
         String stateLabel = String.valueOf(s.getStateNumber());
-        if ( s instanceof DFAState ) {
+		if ( s instanceof DFAState ) {
             StringBuffer buf = new StringBuffer(250);
             Set configurations = ((DFAState)s).getNFAConfigurations();
             int n = 0;
@@ -275,7 +275,6 @@ public class DOTGenerator {
                     buf.append(", ");
                 }
             }
-            //stateLabel = configurations.toString();
             stateLabel = buf.toString();
         }
         if ( (s instanceof NFAState) && ((NFAState)s).getDecisionASTNode()!=null ) {

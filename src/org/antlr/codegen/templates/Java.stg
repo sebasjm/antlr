@@ -49,8 +49,8 @@ class <name> extends Parser {
 }
 >>
 
-rule(name,args,block,enterAction,exitAction) ::= <<
-public void <name>(<args>)
+rule(ruleName,args,block,enterAction,exitAction) ::= <<
+public void <ruleName>(<args>)
 <if(enterAction)>
 {
     <enterAction>
@@ -64,13 +64,13 @@ public void <name>(<args>)
 <endif>
 >>
 
-lexerRule(name,isTokenRuleName,args,block,enterAction,exitAction) ::= <<
-public void m<name>(<args>)
+lexerRule(ruleName,isTokenRuleName,args,block,enterAction,exitAction) ::= <<
+public void m<ruleName>(<args>)
 {
 <if(isTokenRuleName)>
 	<block><\n>
 <else>
-    int type = <name>;
+    int type = <ruleName>;
     int start = getCharIndex();
     int line = getLine();
     int charPosition = getCharPositionInLine();

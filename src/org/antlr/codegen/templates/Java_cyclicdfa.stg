@@ -4,7 +4,7 @@ dfaDecision(decisionNumber,description) ::= <<
 int m<decisionNumber> = input.mark();
 <! the <name> attribute is inherited via the parser, lexer, ... !>
 alt<decisionNumber> = <name>_DFA.DFA<decisionNumber>(input);
-input.rewind(m<decisionNumber>);
+input.rewind(m<decisionNumber>);<\n>
 >>
 
 allCyclicDFAs(cyclicDFAs) ::= <<
@@ -16,7 +16,7 @@ allCyclicDFAs(cyclicDFAs) ::= <<
 >>
 
 cyclicDFA(decision,states,description) ::= <<
-.method DFA<decision> (Lorg/antlr/runtime/CharStream;)I 2
+.method DFA<decision> (Lorg/antlr/runtime/IntStream;)I 2
     goto s0
 errorState:
     getstatic java/lang/System.err Ljava/io/PrintStream;
@@ -32,18 +32,18 @@ s<stateNumber>:
 ; load lookahead into a local in every state
     aload 0
     iconst 1
-    invokeinterface org/antlr/runtime/CharStream.LA(I)I 2
+    invokeinterface org/antlr/runtime/IntStream.LA(I)I 2
     istore 1
 <edges>
 <if(needErrorClause)>
-    goto errorState
+    goto errorState<\n>
 <endif>
 >>
 
 cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
 s<stateNumber>:
     iconst <predictAlt>
-    ireturn
+    ireturn<\n>
 >>
 
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber) ::= <<
@@ -51,13 +51,13 @@ s<stateNumber>e<edgeNumber>:
 <labelExpr>
 s<stateNumber>e<edgeNumber>_go:
     aload 0
-    invokeinterface org/antlr/runtime/CharStream.consume()V 1
+    invokeinterface org/antlr/runtime/IntStream.consume()V 1
     goto s<targetStateNumber>
-s<stateNumber>e<edgeNumber>_skip:
+s<stateNumber>e<edgeNumber>_skip:<\n>
 >>
 
 eotDFAEdge(targetStateNumber,edgeNumber) ::= <<
-    goto s<targetStateNumber>
+    goto s<targetStateNumber><\n>
 >>
 
 // D F A  E X P R E S S I O N S
@@ -71,7 +71,7 @@ notPredicate(pred) ::= "!(<pred>)"
 lookaheadTest(atom,k,atomAsInt) ::= <<
     iload 1
     iconst <atomAsInt>
-    if_icmpne s<stateNumber>e<edgeNumber>_skip
+    if_icmpne s<stateNumber>e<edgeNumber>_skip<\n>
 >>
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
@@ -83,10 +83,10 @@ lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
     iconst <upperAsInt>
     if_icmpgt s<stateNumber>r<rangeNumber>_false
     goto s<stateNumber>e<edgeNumber>_transition
-s<stateNumber>r<rangeNumber>_false:
+s<stateNumber>r<rangeNumber>_false:<\n>
 >>
 
 setTest(ranges) ::= <<
 <ranges>
-    goto s<stateNumber>e<edgeNumber>_skip
+    goto s<stateNumber>e<edgeNumber>_skip<\n>
 >>

@@ -159,7 +159,7 @@ rule returns [StringTemplate code=null]
             code.setAttribute("enterAction", "System.out.println(\"enter "+r+"; LT(1)==\"+input.LT(1));");
             code.setAttribute("exitAction", "System.out.println(\"exit "+r+"; LT(1)==\"+input.LT(1));");
         }
-        code.setAttribute("name", r);
+        code.setAttribute("ruleName", r);
         code.setAttribute("block", b);
         }
     ;
@@ -234,7 +234,12 @@ element returns [StringTemplate code=null]
     |   #( SYNPRED block["block",null] )
 
         // TODO: wrap in {...} for some targets?
-    |   act:ACTION {code = new StringTemplate(templates, #act.getText());}
+    |   act:ACTION
+        {
+        String a = #act.getText();
+        a = a.substring(1,a.length()-1); // strip {...}
+        code = new StringTemplate(templates, a);
+        }
 
     |	lexer_action
 

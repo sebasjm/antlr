@@ -396,6 +396,21 @@ public class DFAState extends State {
 		return disabled;
 	}
 
+	/** */
+	public int getNumberOfEOTNFAStates() {
+		int n = 0;
+		Iterator iter = nfaConfigurations.iterator();
+		NFAConfiguration configuration;
+		while (iter.hasNext()) {
+			configuration = (NFAConfiguration) iter.next();
+			NFAState s = dfa.getNFA().getState(configuration.state);
+			if ( s.isEOTState() ) {
+				n++;
+			}
+		}
+		return n;
+	}
+
     /** Walk each NFA configuration in this DFA state looking for a conflict
      *  where (s|i|ctx) and (s|j|ctx) exist, indicating that state s with
      *  context ctx predicts alts i and j.  Return an Integer set of the
@@ -447,19 +462,35 @@ public class DFAState extends State {
         return nondeterministicAlts;
     }
 
-    /** Get the set of all alts mentioned by all NFA configurations in this
-     *  DFA state.
-     */
-    protected Set getAltSet() {
-        Set alts = new HashSet();
-        Iterator iter = nfaConfigurations.iterator();
-        NFAConfiguration configuration;
-        while (iter.hasNext()) {
-            configuration = (NFAConfiguration) iter.next();
-            alts.add(new Integer(configuration.alt));
-        }
-        return alts;
-    }
+	/** Get the set of all alts mentioned by all NFA configurations in this
+	 *  DFA state.
+	 */
+	public Set getAltSet() {
+		Set alts = new HashSet();
+		Iterator iter = nfaConfigurations.iterator();
+		NFAConfiguration configuration;
+		while (iter.hasNext()) {
+			configuration = (NFAConfiguration) iter.next();
+			alts.add(new Integer(configuration.alt));
+		}
+		return alts;
+	}
+
+	/** Get the set of all states mentioned by all NFA configurations in this
+	 *  DFA state associated with alt.
+	 */
+	public Set getNFAStatesForAlt(int alt) {
+		Set alts = new HashSet();
+		Iterator iter = nfaConfigurations.iterator();
+		NFAConfiguration configuration;
+		while (iter.hasNext()) {
+			configuration = (NFAConfiguration) iter.next();
+			if ( configuration.alt == alt ) {
+				alts.add(new Integer(configuration.state));
+			}
+		}
+		return alts;
+	}
 
     /** Is an accept state reachable from this state? */
     public int getAcceptStateReachable() {

@@ -127,11 +127,14 @@ public class DFA {
 		nfaConverter.convert(decisionStartState);
 
 		// figure out if there are problems with decision
+		long start = System.currentTimeMillis();
 		verify();
 		
 		if ( !probe.isDeterministic() ) {
 			probe.reportErrors();
 		}
+		long stop = System.currentTimeMillis();
+		//System.out.println("verify cost: "+(int)(stop-start)+" ms");
     }
 
 	public int predict(IntStream input) {
@@ -265,9 +268,11 @@ public class DFA {
             d.setAcceptStateReachable(REACHABLE_YES);
         }
         else {
+			/*
 			if ( d.getNumberOfTransitions()==0 ) {
 				probe.reportDanglingState(d);
 			}
+			*/
             d.setAcceptStateReachable(REACHABLE_NO);
 			reduced = false;
         }

@@ -46,6 +46,9 @@ public class ToolMessage extends Message {
 		if ( arg2!=null ) {
 			st.setAttribute("arg2", arg2);
 		}
+		if ( e!=null ) {
+			st.setAttribute("exception", e);
+		}
 		return st.toString();
 	}
 }

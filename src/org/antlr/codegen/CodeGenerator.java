@@ -256,7 +256,11 @@ public class CodeGenerator {
 
 		StringTemplate cyclicDFAST =
 			getCyclicDFATemplates().getInstanceOf("allCyclicDFAs");
-		cyclicDFAST = target.chooseWhereCyclicDFAsGo(recognizerST,cyclicDFAST);
+		cyclicDFAST = target.chooseWhereCyclicDFAsGo(tool,
+													 this,
+													 grammar,
+													 recognizerST,
+													 cyclicDFAST);
 
 		// HEADER FILE
 		StringTemplate headerFileST = templates.getInstanceOf("headerFile");
@@ -318,8 +322,8 @@ public class CodeGenerator {
             StringTemplate dfaST =
 				genCyclicLookaheadDecision(getCyclicDFATemplates(), dfa);
             cyclicDFATemplate.setAttribute("cyclicDFAs", dfaST);
-            decisionST = templates.getInstanceOf("dfaDecision");
-            decisionST.setAttribute("description",
+            decisionST = cyclicDFATemplates.getInstanceOf("dfaDecision");
+			decisionST.setAttribute("description",
                                     dfa.getNFADecisionStartState().getDescription());
             decisionST.setAttribute("decisionNumber",
                                     new Integer(dfa.getDecisionNumber()));

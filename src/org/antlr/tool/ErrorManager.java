@@ -83,6 +83,8 @@ import antlr.Token;
  *  StringTemplate knows how to pay attention to the default encoding so it
  *  should probably just work unless a GUI sets the local to some chinese
  *  variation but System.getProperty("file.encoding") is US.  Hmm...
+ *
+ *  TODO: get antlr.g etc.. parsing errors to come here.
  */
 public class ErrorManager {
 	// TOOL ERRORS

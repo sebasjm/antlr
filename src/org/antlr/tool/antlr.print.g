@@ -177,7 +177,7 @@ element
     |   ebnf
     |   tree
     |   #( SYNPRED block ) {out("=>");}
-    |   a:ACTION  {out("{"+a.getText()+"}");}
+    |   a:ACTION  {out(a.getText());}
     |	lexer_action
     |   SEMPRED
     |   EPSILON {out(" epsilon ");}

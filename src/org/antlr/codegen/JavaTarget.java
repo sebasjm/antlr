@@ -8,17 +8,27 @@ import org.antlr.tool.Grammar;
 import java.io.IOException;
 
 public class JavaTarget extends Target {
+	protected StringTemplate chooseWhereCyclicDFAsGo(Tool tool,
+													 CodeGenerator generator,
+													 Grammar grammar,
+													 StringTemplate recognizerST,
+													 StringTemplate cyclicDFAST)
+	{
+		return cyclicDFAST;
+	}
+
 	protected void genCyclicDFAFile(Tool tool,
 									CodeGenerator generator,
 									Grammar grammar,
 									StringTemplate cyclicDFAST)
 		throws IOException
 	{
+		generator.write(cyclicDFAST, grammar.getName()+".bytecode");
 		ClassFile code = new ClassFile(tool,
 									   null, // TODO: how to get package?
 									   grammar.getName()+"_DFA",
 									   "java/lang/Object",
-									   "/tmp", // TODO: make sensitive to -o option
+									   tool.getOutputDirectory(),
 									   cyclicDFAST.toString());
 		code.write();
 	}

@@ -114,7 +114,10 @@ public class Tool {
 
 			String lexerGrammarStr = grammar.getLexerGrammar();
 			if ( lexerGrammarStr!=null ) {
-				System.out.println("lexer="+lexerGrammarStr);
+				System.out.println("writing lexer to ./"+grammar.getName()+".lexer.g");
+				FileWriter fw = getOutputFile(grammar.getName()+".lexer.g");
+				fw.write(lexerGrammarStr);
+				fw.close();
 				StringReader sr = new StringReader(lexerGrammarStr);
 				Grammar lexerGrammar = new Grammar();
 				lexerGrammar.setFileName("<internally-generated-lexer>");
@@ -143,8 +146,6 @@ public class Tool {
 
 			generator.genRecognizer();
 		}
-
-		//new DOTGenerator(grammar).writeDOTFilesForAllRuleNFAs();
 	}
 
 	private static void help() {
@@ -165,6 +166,10 @@ public class Tool {
         }
         return new FileWriter(outputDir + "/"+ fileName);
     }
+
+	public String getOutputDirectory() {
+		return outputDir;
+	}
 
     // E R R O R  R O U T I N E S
 

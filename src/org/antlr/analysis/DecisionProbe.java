@@ -17,6 +17,9 @@ import java.io.IOException;
  *  the fact that this object tracks it all for later perusing to make an
  *  excellent error message instead of lots of imprecise on-the-fly warnings
  *  (during conversion).
+ *
+ *  This class is not thread safe due to shared use of visited maps etc...
+ *  Only one thread should really need to access one DecisionProbe anyway.
  */
 public class DecisionProbe {
 	protected DFA dfa;
@@ -29,6 +32,14 @@ public class DecisionProbe {
 	 *  Map<DFAState, Set<int>>
 	 */
 	protected Map stateToSyntacticallyAmbiguousAltsMap = new HashMap();
+
+	/** Track just like stateToSyntacticallyAmbiguousAltsMap, but only
+	 *  for nondeterminisms that arise in the Tokens rule such as keyword vs
+	 *  ID rule.  The state maps to the list of Tokens rule alts that are
+	 *  in conflict.
+	 *  Map<DFAState, Set<int>>
+	 */
+	protected Map stateToSyntacticallyAmbiguousTokensRuleAltsMap = new HashMap();
 
 	/** Was a syntactic ambiguity resolved with predicates?  Any DFA
 	 *  state that predicts more than one alternative, must be resolved
@@ -55,14 +66,21 @@ public class DecisionProbe {
 	public static final Integer REACHABLE_YES = new Integer(1);
 
 	/** Used while finding edge labels in various recursive routines such
-	 *  as getSampleInputSequenceUsingStateSet()
+	 *  as getSampleInputSequenceUsingStateSet().  Tracks the input position
+	 *  we were at the last time at this node.  If same input position, then
+	 *  we'd have reached same state without consuming input...probably an
+	 *  infinite loop.  Stop.  Map<Integer>.
 	 */
-	protected Set statesVisited;
+	protected Map statesVisited;
+
+	protected Set statesVisitedDuringSampleSequence;
 
 	/** Map<DFAState,Set<in>> Tracks alts insufficiently covered.
 	 *  For example, p1||true gets reduced to true so leaves whole alt uncovered
 	 */
 	protected Set setOfIncompletelyCoveredAlts = new HashSet();
+
+	protected boolean verbose = false;
 
 	public DecisionProbe(DFA dfa) {
 		this.dfa = dfa;
@@ -91,6 +109,10 @@ public class DecisionProbe {
 	public void reportNondeterminism(DFAState d, Set nondeterministicAlts) {
 		//System.out.println(d.getStateNumber()+".nondet alts="+nondeterministicAlts);
 		stateToSyntacticallyAmbiguousAltsMap.put(d,nondeterministicAlts);
+	}
+
+	public void reportLexerRuleNondeterminism(DFAState d, Set nondeterministicAlts) {
+		stateToSyntacticallyAmbiguousTokensRuleAltsMap.put(d,nondeterministicAlts);
 	}
 
 	public void reportNondeterminismResolvedWithSemanticPredicate(DFAState d)
@@ -122,12 +144,6 @@ public class DecisionProbe {
 		setOfIncompletelyCoveredAlts.add(new Integer(alt));
 	}
 
-	public void reportDisabledAlternatives(DFAState d,
-										   Set nondeterministicAlts)
-	{
-		// don't track for now; might be too much detail
-	}
-
 	/** If no states are dead-ends, no alts are unreachable, there are
 	 *  no nondeterminisms unresolved by syn preds, all is ok with decision.
 	 */
@@ -142,6 +158,7 @@ public class DecisionProbe {
 		System.out.println("--------------------\nnondeterministic decision (d="
 				+dfa.getDecisionNumber()+") for "+
 				dfa.getNFADecisionStartState().getDescription());
+		/*
 		DOTGenerator dotGenerator = new DOTGenerator(dfa.getNFA().getGrammar());
 		String dot = dotGenerator.getDOT( dfa.getStartState() );
 		String dotFileName = "/tmp/dec-"+dfa.getDecisionNumber();
@@ -153,6 +170,7 @@ public class DecisionProbe {
 							   dotFileName,
 							   ioe);
 		}
+        */
 
 		List unreachableAlts = dfa.getUnreachableAlts();
 		/*
@@ -170,28 +188,16 @@ public class DecisionProbe {
 				if ( !reaches ) {
 					System.err.println("whoa!  no path from start to "+d.getStateNumber());
 				}
+				System.err.println("the decision cannot distinguish between alternatives "+
+								   d.getAltSet()+" for at least one input sequence");
+				/*
 				//System.out.println("path="+path);
 				Set nfaStates =
 					getNFAStatesFromDFAStatesForAlt(dfaStates,0);
 				System.err.println("The decision cannot distinguish between alternatives "+
 								   d.getAltSet()+" for at least one input sequence derived from these NFA states: "+
 								   nfaStates);
-				/*
-				List unreachableDueToDanglingState = new LinkedList();
-				if ( unreachableAlts.size()>0 ) {
-					Iterator iter = d.getAltSet().iterator();
-					while (iter.hasNext()) {
-						Integer I = (Integer) iter.next();
-						if ( unreachableAlts.contains(I) ) {
-							unreachableDueToDanglingState.add(I);
-							unreachableAlts.remove(I); // don't report this one later
-						}
-					}
-				}
-				if ( unreachableDueToDanglingState.size()>0 ) {
-					System.err.println("leaving alternative(s) "+unreachableDueToDanglingState+" totally unreachable");
-				}
-				*/
+								   */
 			}
 		}
 		if ( stateToSyntacticallyAmbiguousAltsMap.size()>0 )
@@ -208,29 +214,27 @@ public class DecisionProbe {
 					System.err.println("whoa!  no path from start to "+d.getStateNumber());
 				}
 				//System.out.println("dfa states="+dfaStates);
-				statesVisited = new HashSet();
+				// NOW GET NFA STATES FROM DFA SET OF CONFIGS FOR NONDET ALTS
+				Set nondetAlts = (Set)stateToSyntacticallyAmbiguousAltsMap.get(d);
+				List sorted = new LinkedList();
+				sorted.addAll(nondetAlts);
+				Collections.sort(sorted); // make sure it's 1, 2, ...
+				if ( !verbose ) {
+					System.err.println("decision predicts multiple alternatives: "+
+									   sorted+" for the same lookahead");
+					break;
+				}
+				statesVisitedDuringSampleSequence = new HashSet();
 				List labels = new ArrayList(); // may access ith element; use array
 				getSampleInputSequenceUsingStateSet(dfa.getStartState(),
 													d,
 													dfaStates,
 													labels);
 				String input = getInputSequenceDisplay(labels);
-				// NOW GET NFA STATES FROM DFA SET OF CONFIGS FOR NONDET ALTS
-				Set nondetAlts = (Set)stateToSyntacticallyAmbiguousAltsMap.get(d);
 				System.err.println("Decision can match input such as \""+input+"\" using multiple alternatives:");
-				List sorted = new LinkedList();
-				sorted.addAll(nondetAlts);
-				Collections.sort(sorted); // make sure it's 1, 2, ...
 				for (Iterator iter = sorted.iterator(); iter.hasNext();) {
 					Integer altI = (Integer) iter.next();
 					int alt = altI.intValue();
-					Set nfaStates =
-						getNFAStatesFromDFAStatesForAlt(dfaStates,altI.intValue());
-					/*
-					List sortedNFAStates = new LinkedList();
-					sortedNFAStates.addAll(nfaStates);
-					Collections.sort(sortedNFAStates); // make sure it's 1, 2, ...
-					*/
 					// now get path take for an input sequence limited to
 					// those states associated with this nondeterminism
 					List path = new LinkedList();
@@ -255,13 +259,25 @@ public class DecisionProbe {
 					// an exact path for input 'labels'; more useful.
 					NFAState altStart = g.getNFAStateForAltOfDecision(nfaStart,alt);
 					altStart = (NFAState)altStart.transition(0).getTarget();
-					statesVisited = new HashSet();
+					statesVisited = new HashMap();
+					Set nfaStates =
+						getNFAStatesFromDFAStatesForAlt(dfaStates,altI.intValue());
+					/*
+					List sortedNFAStates = new LinkedList();
+					sortedNFAStates.addAll(nfaStates);
+					Collections.sort(sortedNFAStates); // make sure it's 1, 2, ...
+                    */
+					path.add(altStart);
 					getNFAPath(altStart,
 							   0,
 							   nfaStates,
 							   labels,
 							   path);
 					System.err.println("  alt "+altI+" via NFA path "+path);
+				}
+				if ( verbose ) {
+					Set disabled = d.getDisabledAlternatives();
+					System.err.println("As a result, alternative(s) "+disabled+" were disabled for that input");
 				}
 				// syntactic nondet resolved?  If so, give unreachable warning
 				/*
@@ -289,17 +305,21 @@ public class DecisionProbe {
 							   unreachableAlts);
 		}
 		if ( stateToAltSetWithSemanticPredicatesMap.size()>0 ) {
+			/*
 			System.err.println("state to alts-with-predicate: "+
 							   stateToAltSetWithSemanticPredicatesMap);
+							   */
 		}
 		if ( setOfIncompletelyCoveredAlts.size()>0 ) {
 			System.err.println("alts with insufficient predicates: "+
 							   setOfIncompletelyCoveredAlts);
 		}
 		if ( stateToResolvedWithSemanticPredicatesMap.size()>0 ) {
+			/*
 			System.err.println("state to nondet alts resolved with sem pred map: "+
 							   stateToResolvedWithSemanticPredicatesMap);
 			//System.err.println("nondeterminism NOT resolved with sem preds");
+			*/
 		}
 	}
 
@@ -381,14 +401,14 @@ public class DecisionProbe {
 													Set states,
 													List labels)
 	{
-		statesVisited.add(startState);
+		statesVisitedDuringSampleSequence.add(startState);
 
 		// pick the first edge in states as the one to traverse
 		for (int i=0; i<startState.getNumberOfTransitions(); i++) {
 			Transition t = startState.transition(i);
 			DFAState edgeTarget = (DFAState)t.getTarget();
 			if ( states.contains(edgeTarget) &&
-				 !statesVisited.contains(edgeTarget) )
+				 !statesVisitedDuringSampleSequence.contains(edgeTarget) )
 			{
 				labels.add(t.getLabel()); // traverse edge and track label
 				if ( edgeTarget!=targetState ) {
@@ -422,27 +442,38 @@ public class DecisionProbe {
 							  List path)      // output list of NFA states
 	{
 		//System.out.println("getNFAPath start "+s.getStateNumber());
-		statesVisited.add(s);
-		path.add(s);
+		statesVisited.put(s, new Integer(labelIndex));
 
 		// pick the first edge in states and with label as the one to traverse
 		for (int i=0; i<s.getNumberOfTransitions(); i++) {
 			Transition t = s.transition(i);
 			NFAState edgeTarget = (NFAState)t.getTarget();
 			Integer targetStateNumI = new Integer(edgeTarget.getStateNumber());
+			Integer previousLabelIndexAtThisState =
+				(Integer)statesVisited.get(edgeTarget);
 			if ( states.contains(targetStateNumI) &&
-				!statesVisited.contains(edgeTarget) )
+				 (previousLabelIndexAtThisState==null||
+				  !previousLabelIndexAtThisState.equals(targetStateNumI)) )
 			{
+				Label label = (Label)labels.get(labelIndex);
+				/*
+				System.out.println(s.getStateNumber()+"-"+
+								   label.toString(dfa.getNFA().getGrammar())+"->"+
+								   edgeTarget.getStateNumber());
+				*/
 				if ( t.getLabel().isEpsilon() ) {
 					// nondeterministically backtrack down epsilon edges
+					path.add(edgeTarget);
 					boolean found =
 						getNFAPath(edgeTarget, labelIndex, states, labels, path);
 					if ( found ) {
 						return true; // return to "calling" state
 					}
+					path.remove(path.size()-1); // remove; didn't work out
 					continue; // look at the next edge
 				}
-				if ( labels.get(labelIndex).equals(t.getLabel()) ) {
+				if ( t.getLabel().matches(label) ) {
+					path.add(edgeTarget);
 					/*
 					System.out.println("found label "+
 									   t.getLabel().toString(dfa.getNFA().getGrammar())+
@@ -450,17 +481,16 @@ public class DecisionProbe {
 					*/
 					if ( labelIndex==labels.size()-1 ) {
 						// found last label; done!
-						path.add(edgeTarget);
 						return true;
 					}
 					// otherwise try to match remaining input
 					boolean found =
 						getNFAPath(edgeTarget, labelIndex+1, states, labels, path);
-					if ( !found ) {
-						System.err.println("no path for input sequence!!!! --> "
-										   +labels);
+					if ( found ) {
+						return true;
 					}
-					return true;
+					path.remove(path.size()-1); // remove; didn't work out
+					continue; // keep looking for a path for labels
 				}
 			}
 		}
@@ -474,7 +504,7 @@ public class DecisionProbe {
 			return Integer.MAX_VALUE;
 		}
 		// find max k value as their might be multiple depths for different alts
-		// ...
+		// TODO: add functionality
 		return Integer.MAX_VALUE;
 	}
 
@@ -495,5 +525,10 @@ public class DecisionProbe {
 			}
 		}
 		return buf.toString();
+	}
+
+	/** TODO: */
+	public int getNumberOfStates() {
+		return dfa.getNumberOfStates();
 	}
 }
