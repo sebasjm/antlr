@@ -147,7 +147,7 @@ public abstract class SemanticContext {
             this.left = a;
             this.right = b;
         }
-        /** Interestingly, I only see to need OR's reduce */
+        /** Interestingly, I only seem to need OR's reduce */
         public SemanticContext reduce() {
             // (p1a||p1b)||p1a => p1a||p1b where a=(p1a||p1b) and b=p1a
             left.reduce();
