@@ -138,7 +138,7 @@ public class Tool {
 			String lexerGrammarStr = grammar.getLexerGrammar();
 			if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
 				System.out.println("writing lexer to ./"+grammar.name+".lexer.g");
-				FileWriter fw = getOutputFile(grammar.name+".lexer.g");
+				FileWriter fw = getOutputFile(outputDirectory+File.separator+grammar.name+".lexer.g");
 				fw.write(lexerGrammarStr);
 				fw.close();
 				StringReader sr = new StringReader(lexerGrammarStr);
