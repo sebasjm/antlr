@@ -263,7 +263,7 @@ public class Grammar {
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
-		//System.out.println(grammarTree.toStringList());
+		System.out.println(grammarTree.toStringList());
 
 		/*
 		System.out.println("### print grammar");
@@ -354,6 +354,7 @@ public class Grammar {
         try {
             parser.rule();
             grammarTree.addChild(parser.getAST());
+			System.out.println("ast="+parser.getAST().toStringTree());
         }
         catch (Exception e) {
             ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,e);

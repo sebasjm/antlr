@@ -446,15 +446,38 @@ public class TestDFAConversion extends TestSuite {
         checkDecision(g, 1, expecting, null);
     }
 
-    public void testNoSetCollapseWithActions() throws Exception {
-        Grammar g = new Grammar(
-                "grammar t;\n"+
-                "a : (A | B {foo}) | C;");
-        String expecting =
-                ".s0-A->:s1=>1\n" +
-                ".s0-B->:s2=>2\n";
-        checkDecision(g, 1, expecting, null);
-    }
+	public void testNoSetCollapseWithActions() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : (A | B {foo}) | C;");
+		String expecting =
+				".s0-A->:s1=>1\n" +
+				".s0-B->:s2=>2\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testRuleAltsSetCollapse() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : A | B | C ;"
+		);
+		String expecting =
+				" ( grammar t ( rule a ( BLOCK ( ALT ( SET A B C ) EOA ) EOB ) <end-of-rule> ) )";
+		assertEqual(g.getGrammarTree().toStringTree(),
+					expecting);
+	}
+
+	public void testTokensRuleAltsDoNotCollapse() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"A : 'a';" +
+				"B : 'b';\n"
+		);
+		String expecting =
+			".s0-'a'->:s1=>1\n" +
+			".s0-'b'->:s2=>2\n";
+		checkDecision(g, 1, expecting, null);
+	}
 
 	public void testMultipleSequenceCollision() throws Exception {
 		Grammar g = new Grammar(
@@ -482,10 +505,8 @@ public class TestDFAConversion extends TestSuite {
 				"type : I | F;");
 		// nondeterministic from left edge; no stop state
 		String expecting =
-				".s0-F->.s3\n" +
-			".s0-I->.s1\n" +
-			".s1-ID->:s2=>1\n" +
-			".s3-ID->:s2=>1\n";
+			".s0-I..F->.s1\n" +
+			".s1-ID->:s2=>1\n";
 		checkDecision(g, 1, expecting, new int[] {2,3,4});
 	}
 
@@ -536,7 +557,7 @@ public class TestDFAConversion extends TestSuite {
 		// I added a check to see what the initial stack looks like and it
 		// seems to work now.
 		Grammar g = new Grammar(
-				"grammar t;\n"+
+				"parser grammar t;\n"+
 				"a   :   L ID R\n" +
 				"    |   b\n" +
 				"    ;\n" +
@@ -550,6 +571,20 @@ public class TestDFAConversion extends TestSuite {
 			".s1-ID->.s3\n" +
 			".s1-L->:s2=>2\n" +
 			".s3-R->:s4=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testNoSetForTokenRefsInLexer() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"A : (B | C) ;\n"+
+			"fragment B : 'b' ;\n" +
+			"fragment C : 'c' ;\n"
+		);
+		String expecting =
+			".s0-'b'->:s1=>1\n" +  // must not collapse set!
+			".s0-'c'->:s2=>2\n";
+		// no decision if (B|C) collapses; must not collapse
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -580,6 +615,7 @@ public class TestDFAConversion extends TestSuite {
         }
 
         DFA dfa = g.getLookaheadDFA(decision);
+		assertTrue(dfa!=null, "no DFA for decision "+decision);
         FASerializer serializer = new FASerializer(g);
         String result = serializer.serialize(dfa.getStartState());
         //System.out.print(result);

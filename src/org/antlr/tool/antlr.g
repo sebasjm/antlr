@@ -77,6 +77,9 @@ tokens {
 }
 
 {
+	protected int gtype = 0;
+	protected String currentRuleName = null;
+
 	protected GrammarAST setToBlockWithSet(GrammarAST b) {
 		return #(#[BLOCK,"BLOCK"],
 		           #(#[ALT,"ALT"],
@@ -118,13 +121,12 @@ headerSpec
 	;
 
 grammarType
-{int t = 0;}
-    :   (	"lexer"!  {t=LEXER_GRAMMAR;}    // pure lexer
-    	|   "parser"! {t=PARSER_GRAMMAR;}   // pure parser
-    	|   "tree"!   {t=TREE_GRAMMAR;}     // a tree parser
-    	|			  {t=COMBINED_GRAMMAR;} // merged parser/lexer
+    :   (	"lexer"!  {gtype=LEXER_GRAMMAR;}    // pure lexer
+    	|   "parser"! {gtype=PARSER_GRAMMAR;}   // pure parser
+    	|   "tree"!   {gtype=TREE_GRAMMAR;}     // a tree parser
+    	|			  {gtype=COMBINED_GRAMMAR;} // merged parser/lexer
     	)
-    	gr:"grammar" {#gr.setType(t);}
+    	gr:"grammar" {#gr.setType(gtype);}
     ;
 
 grammarOptionsSpec
@@ -210,13 +212,19 @@ GrammarAST modifier=null;
 	|	p4:"fragment"	{modifier=#p4;}
 	)?
 	ruleName:id
+	{currentRuleName=#ruleName.getText();}
 	( BANG  )?
 	( aa:ARG_ACTION )?
 	( "returns" rt:ARG_ACTION  )?
 	( throwsSpec )?
 	( opts:optionList )?
 	(a:ACTION )?
-	COLON b:altList SEMI
+	COLON
+	(	(setNoParens SEMI) => s:setNoParens
+		{#b=#(#[BLOCK,"BLOCK"],#(#[ALT,"ALT"],#s,#[EOA,"EOA"]),#[EOB,"EOB"]);}
+	|	b:altList
+	)
+	SEMI
 	( exceptionGroup )?
     {
     GrammarAST eor = #[EOR,"<end-of-rule>"];
@@ -346,16 +354,19 @@ elementNoOptionSpec!
 	;
 
 /** Match two or more set elements */
-set
-    :   LPAREN^ {#LPAREN.setType(SET); #LPAREN.setText("SET");}
-        setElement (OR! setElement)+
-        RPAREN!
+set	:   LPAREN! setNoParens RPAREN!
+    ;
+
+setNoParens
+    :   {!currentRuleName.equals(Grammar.TOKEN_RULENAME)}?
+    	setElement (OR! setElement)+
+        {#setNoParens = #(#[SET,"SET"], #setNoParens);}
     ;
 
 setElement
     :   CHAR_LITERAL
-    |   TOKEN_REF
-    |   STRING_LITERAL
+    |   {gtype!=LEXER_GRAMMAR}? TOKEN_REF
+    |   {gtype!=LEXER_GRAMMAR}? STRING_LITERAL
     |   range
     ;
 
