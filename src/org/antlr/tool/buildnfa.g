@@ -311,6 +311,8 @@ ebnf returns [StateCluster g=null]
         NFAState altBlockState = (NFAState)g.left.transition(0).target;
         altBlockState.setDecisionASTNode(#ebnf);
         altBlockState.setDecisionNumber(d);
+        g.left.setDecisionNumber(d); // this is the bypass decision (2 alts)
+        g.left.setDecisionASTNode(#ebnf);
     	}
     |   #( POSITIVE_CLOSURE #( blk2:BLOCK b=block eob3:EOB ) )
         {

@@ -196,9 +196,12 @@ public class CommonTokenStream implements TokenStream {
 	}
 
 	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < tokens.size(); i++) {
-			Token t = (Token) tokens.get(i);
+		if ( filteredTokens==null ) {
+			fillBuffer();
+		}
+ 		StringBuffer buf = new StringBuffer();
+		for (int i = 0; tokens!=null && i < tokens.size(); i++) {
+			Token t = (Token)tokens.get(i);
 			if ( i>0 ) {
 				buf.append(' ');
 			}

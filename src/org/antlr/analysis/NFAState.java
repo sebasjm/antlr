@@ -47,6 +47,29 @@ public class NFAState extends State {
     /** What's its decision number from 1..n? */
     protected int decisionNumber = 0;
 
+	/** Subrules (...)* and (...)+ have more than one decision point in
+	 *  the NFA created for them.  They both have a loop-exit-or-stay-in
+	 *  decision node (the loop back node).  They both have a normal
+	 *  alternative block decision node at the left edge.  The (...)* is
+	 *  worst as it even has a bypass decision (2 alts: stay in or bypass)
+	 *  node at the extreme left edge.  This is not how they get generated
+	 *  in code as a while-loop or whatever deals nicely with either.  For
+	 *  error messages (where I need to print the nondeterministic alts)
+	 *  and for interpretation, I need to use the single DFA that is created
+	 *  (for efficiency) but interpret the results differently depending
+	 *  on which of the 2 or 3 decision states uses the DFA.  For example,
+	 *  the DFA will always report alt 1 as the exit branch so I need to
+	 *  translate that depending on the decision state.
+	 *
+	 *  For the actual loop-back NFA state, the altTranslationMap is
+	 *  an identity translation.
+	 *
+	 *  If decisionNumber>0 then this map tells you how to translate the
+	 *  alt number coming from the DFA.  Alt n for n alts is returned as
+	 *  the exit branch.
+	 */
+	//protected int[] altTranslationMap;
+
 	/** What rule do we live in?  I currently only set on rule start/stop states */
 	protected String enclosingRule;
 
