@@ -46,7 +46,7 @@ public class Grammar {
     public static final int INVALID_RULE_INDEX = -1;
 
     public static final String TOKEN_RULENAME = "Tokens";
-	public static final String NONTOKEN_LEXER_RULE_MODIFIER = "local";
+	public static final String NONTOKEN_LEXER_RULE_MODIFIER = "fragment";
 
     public static final int LEXER = 1;
     public static final int PARSER = 2;
@@ -401,7 +401,7 @@ public class Grammar {
                 DFA lookaheadDFA = new DFA(decisionStartState);
                 long stop = System.currentTimeMillis();
                 if ( !lookaheadDFA.isReduced() ) {
-                    System.err.println("problems with DFA for "+
+                    System.err.println("nonreduced DFA for "+
                             decisionStartState.getDescription());
                 }
                 System.out.println("DFA (d="+lookaheadDFA.getDecisionNumber()+") cost: "+lookaheadDFA.getNumberOfStates()+
@@ -423,125 +423,15 @@ public class Grammar {
         }
     }
 
-    /** For a given input char stream, try to match against the NFA
-	 *  starting at startRule.  This is a deterministic parse even though
-	 *  it is using an NFA because it uses DFAs at each decision point to
-	 *  predict which alternative will succeed.  This is exactly what the
-	 *  generated parser will do.
-	 *
-	 *  This only does lexer grammars for now.  Will probably have to
-	 *  change the name or something later when I can do parsing/lexing
-	 *  via this interpreter.
-	 */
 	public void parse(String startRule, CharStream input)
-            throws Exception
-    {
-		System.out.println("parse("+startRule+",'"+input.substring(0,input.size()-1)+"')");
-		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
-		if ( getRuleStartState(startRule)==null ) {
-			if ( getType()==Grammar.LEXER ) {
-				addArtificialMatchTokensRule();
-			}
-			try {
-				createNFAs();
-			}
-			catch (RecognitionException re) {
-				System.err.println("problems creating NFAs from grammar AST for "+
-								   getName());
-				return;
-			}
-			new DOTGenerator(this).writeDOTFilesForAllRuleNFAs();
-			// Create the DFA predictors for each decision
-			createLookaheadDFAs();
-		}
+			throws Exception
+	{
+		// delegate to the Interpreter
+		Interpreter engine = new Interpreter(this);
+		engine.parse(startRule,input);
+	}
 
-		// do the parse
-		Stack ruleInvocationStack = new Stack();
-        NFAState start = getRuleStartState(startRule);
-        parseEngine(start, input, ruleInvocationStack);
-    }
-
-    protected void parseEngine(NFAState start,
-                               CharStream input,
-                               Stack ruleInvocationStack)
-        throws Exception
-    {
-        NFAState s = start;
-        int t = input.LA(1);
-        while ( t!=CharStream.EOF ) {
-            System.out.println("parse state "+s.getStateNumber()+" input="+
-                    getTokenName(t));
-            // CASE 1: decision state
-            if ( s.getDecisionNumber()>0 ) {
-                // decision point, must predict and jump to alt
-                DFA dfa = getLookaheadDFA(s.getDecisionNumber());
-                int m = input.mark();
-                int predictedAlt = dfa.predict(input);
-                if ( predictedAlt == NFA.INVALID_ALT_NUMBER ) {
-                    int position = input.index();
-                    throw new Exception("parsing error: no viable alternative at position="+position+
-                        " input symbol: "+getTokenName(t));
-                }
-                input.rewind(m);
-				if ( s.getDecisionASTNode().getType()==ANTLRParser.EOB &&
-					 predictedAlt==getNumberOfAltsForDecisionNFA(s) )
-				{
-					// special case; loop end decisions have exit as
-					// # block alts + 1; getNumberOfAltsForDecisionNFA() has
-					// both block alts and exit branch.  So, any predicted alt
-					// equal to number of alts is the exit alt.  The NFA
-					// sees that as alt 1
-					// TODO: HIDEOUS
-					predictedAlt = 1;
-				}
-				NFAState alt = getNFAStateForAltOfDecision(s, predictedAlt);
-                s = (NFAState)alt.transition(0).getTarget();
-                continue;
-            }
-
-            // CASE 2: finished matching a rule
-            if ( s.isAcceptState() ) { // end of rule node
-                if ( ruleInvocationStack.empty() ) {
-                    return; // done parsing.  Hit the start state.
-                }
-                // pop invoking state off the stack to know where to return to
-                NFAState invokingState = (NFAState)ruleInvocationStack.pop();
-                RuleClosureTransition invokingTransition =
-                        (RuleClosureTransition)invokingState.transition(0);
-                // move to node after state that invoked this rule
-                s = invokingTransition.getFollowState();
-                continue;
-            }
-
-            Transition trans = s.transition(0);
-            Label label = trans.getLabel();
-            // CASE 3: epsilon transition
-            if ( label.isEpsilon() ) {
-                // CASE 3a: rule invocation state
-                if ( trans instanceof RuleClosureTransition ) {
-                    ruleInvocationStack.push(s);
-                }
-                // CASE 3b: plain old epsilon transition, just move
-                s = (NFAState)trans.getTarget();
-            }
-
-            // CASE 4: match label on transition
-            else if ( label.matches(t) ) {
-                s = (NFAState)s.transition(0).getTarget();
-                input.consume();
-                t = input.LA(1);
-            }
-
-            // CASE 5: error condition; label is inconsistent with input
-            else {
-                int position = input.index();
-                throw new Exception("parsing error at position="+position+
-                    " input symbol: "+getTokenName(t));
-            }
-        }
-    }
-
-    /** Define either a token at a particular token type value.  Blast an
+	/** Define either a token at a particular token type value.  Blast an
      *  old value with a new one.  This is called directly during import vocab
      *  operation to set up tokens with specific values.
      */

@@ -263,6 +263,10 @@ ebnf returns [StateCluster g=null]
 		grammar.setDecisionNFA(d, b.right());
         grammar.setDecisionOptions(d, #BLOCK.getOptions());
         b.right().setDecisionASTNode(#eob);
+        // make block entry state also have same decision for interpreting grammar
+        NFAState altBlockState = (NFAState)g.left().transition(0).getTarget();
+        altBlockState.setDecisionASTNode(#eob);
+        altBlockState.setDecisionNumber(d);
     	}
     |   #( POSITIVE_CLOSURE #( BLOCK b=block eob3:EOB ) )
         {
@@ -274,6 +278,10 @@ ebnf returns [StateCluster g=null]
 		grammar.setDecisionNFA(d, b.right());
         grammar.setDecisionOptions(d, #BLOCK.getOptions());
         b.right().setDecisionASTNode(#eob3);
+        // make block entry state also have same decision for interpreting grammar
+        NFAState altBlockState = (NFAState)g.left().transition(0).getTarget();
+        altBlockState.setDecisionASTNode(#eob3);
+        altBlockState.setDecisionNumber(d);
         }
     ;
 
