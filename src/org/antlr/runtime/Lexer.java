@@ -28,8 +28,6 @@
 package org.antlr.runtime;
 
 public abstract class Lexer implements TokenSource {
-	public static final int DEFAULT_CHANNEL = 0;
-
     protected CharStream input;
     protected Token token;
 

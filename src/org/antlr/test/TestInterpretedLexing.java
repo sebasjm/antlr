@@ -77,11 +77,11 @@ public class TestInterpretedLexing extends TestSuite {
 		final int Atype = g.getTokenType("A");
         Interpreter engine = new Interpreter(g, new ANTLRStringStream("a"));
         engine = new Interpreter(g, new ANTLRStringStream("b"));
-		int result = engine.scan("A");
-		assertEqual(result, Atype);
+		Token result = engine.scan("A");
+		assertEqual(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("c"));
 		result = engine.scan("A");
-		assertEqual(result, Atype);
+		assertEqual(result.getType(), Atype);
     }
 
     public void testSingleRuleRef() throws Exception {
@@ -91,8 +91,8 @@ public class TestInterpretedLexing extends TestSuite {
                 "B : 'b' ;\n");
 		final int Atype = g.getTokenType("A");
 		Interpreter engine = new Interpreter(g, new ANTLRStringStream("abc")); // should ignore the x
-		int result = engine.scan("A");
-		assertEqual(result, Atype);
+		Token result = engine.scan("A");
+		assertEqual(result.getType(), Atype);
     }
 
     public void testSimpleLoop() throws Exception {
@@ -103,11 +103,11 @@ public class TestInterpretedLexing extends TestSuite {
 		final int INTtype = g.getTokenType("INT");
 		Interpreter engine = new Interpreter(g, new ANTLRStringStream("12x")); // should ignore the x
 		DebugActions debugActions = new DebugActions(g);
-		int result = engine.scan("INT");
-		assertEqual(result, INTtype);
+		Token result = engine.scan("INT");
+		assertEqual(result.getType(), INTtype);
 		engine = new Interpreter(g, new ANTLRStringStream("1234"));
 		result = engine.scan("INT");
-		assertEqual(result, INTtype);
+		assertEqual(result.getType(), INTtype);
     }
 
     public void testMultAltLoop() throws Exception {
@@ -116,25 +116,25 @@ public class TestInterpretedLexing extends TestSuite {
                 "A : ('0'..'9'|'a'|'b')+ ;\n");
 		final int Atype = g.getTokenType("A");
 		Interpreter engine = new Interpreter(g, new ANTLRStringStream("a"));
-		int result = engine.scan("A");
+		Token result = engine.scan("A");
         engine = new Interpreter(g, new ANTLRStringStream("a"));
 		result = engine.scan("A");
-		assertEqual(result, Atype);
+		assertEqual(result.getType(), Atype);
 		engine = new Interpreter(g, new ANTLRStringStream("1234"));
 		result = engine.scan("A");
-		assertEqual(result, Atype);
+		assertEqual(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("aaa"));
 		result = engine.scan("A");
-		assertEqual(result, Atype);
+		assertEqual(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("aaaa9"));
 		result = engine.scan("A");
-		assertEqual(result, Atype);
+		assertEqual(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("b"));
 		result = engine.scan("A");
-		assertEqual(result, Atype);
+		assertEqual(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("baa"));
 		result = engine.scan("A");
-		assertEqual(result, Atype);
+		assertEqual(result.getType(), Atype);
     }
 
 	public void testSimpleLoops() throws Exception {
@@ -144,8 +144,8 @@ public class TestInterpretedLexing extends TestSuite {
 		final int Atype = g.getTokenType("A");
 		CharStream input = new ANTLRStringStream("1234.5");
 		Interpreter engine = new Interpreter(g, input);
-		int result = engine.scan("A");
-		assertEqual(result, Atype);
+		Token result = engine.scan("A");
+		assertEqual(result.getType(), Atype);
 	}
 
 	public void testTokensRules() throws Exception {
@@ -159,15 +159,15 @@ public class TestInterpretedLexing extends TestSuite {
 			"INT : (DIGIT)+ ;\n"+
 			"FLOAT : (DIGIT)+ '.' (DIGIT)* ;\n"+
 			"fragment DIGIT : '0'..'9';\n" +
-			"WS : (' ')+ ;\n");
+			"WS : (' ')+ ${channel=99;};\n");
 		CharStream input = new ANTLRStringStream("123 139.52");
 		Interpreter lexEngine = new Interpreter(g, input);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
-		System.out.println("stream="+tokens.toString());
-		Interpreter parseEngine = new Interpreter(pg, tokens);
-		ParseTree t = parseEngine.parse("a");
-		System.out.println(t);
+		String result = tokens.toString();
+		System.out.println(result);
+		String expecting = "[123/<1>,1:9] [ /<3>,channel=99,1:12] [139.52/<2>,1:28]";
+		assertEqual(result,expecting);
 	}
 
 }

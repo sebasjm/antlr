@@ -69,6 +69,7 @@ tokens {
     OPTIONS;
     CHARSET;
     SET;
+    ID;
 }
 
 {
@@ -391,10 +392,27 @@ elementNoOptionSpec!
 
 	|   a:ACTION  	            {#elementNoOptionSpec = #a;}
 
+	|   la:lexer_action         {#elementNoOptionSpec = #la;}
+
 	|   p:SEMPRED 	            {#elementNoOptionSpec = #p;}
 
 	|   t3:tree                 {#elementNoOptionSpec = #t3;}
 	;
+
+lexer_action
+	:	LEXER_ACTION^
+		( lexer_assignment )+
+		RCURLY!
+	;
+
+lexer_assignment
+	:	idToken ASSIGN^ lexer_expr SEMI
+	;
+
+lexer_expr
+	:	INT
+	|	idToken
+    ;
 
 tree :
 	TREE_BEGIN^
@@ -472,6 +490,12 @@ id returns [String r]
 	|	RULE_REF
 	;
 
+/** Match anything that looks like an ID and return tree as token type ID */
+idToken
+    :	TOKEN_REF {#idToken.setType(ID);}
+	|	RULE_REF  {#idToken.setType(ID);}
+	;
+
 class ANTLRLexer extends Lexer;
 options {
 	k=2;
@@ -487,6 +511,7 @@ tokens {
 
 {
 	/**Convert 'c' to an integer char value. */
+	// TODO move this to better location
 	public static int escapeCharValue(String cs) {
 		//System.out.println("escapeCharValue("+cs+")");
 		if ( cs.charAt(1)!='\\' ) return 0;
@@ -723,6 +748,16 @@ XDIGIT :
 	;
 
 INT	:	('0'..'9')+
+	;
+
+/** ${...} is a lexer action */
+LEXER_ACTION
+	:   "${"
+	;
+
+/** ^{...} is a tree action */
+TREE_ACTION
+	:   "^{"
 	;
 
 ARG_ACTION

@@ -178,8 +178,22 @@ element
     |   tree
     |   #( SYNPRED block ) {out("=>");}
     |   a:ACTION  {out("{"+a.getText()+"}");}
+    |	lexer_action
     |   SEMPRED
     |   EPSILON {out(" epsilon ");}
+    ;
+
+lexer_action
+	:	#( LEXER_ACTION (lexer_assignment)+ )
+	;
+
+lexer_assignment
+	:	#( ASSIGN ID lexer_expr )
+	;
+
+lexer_expr
+	:	INT
+	|	ID
     ;
 
 ebnf:   block {out(" ");}

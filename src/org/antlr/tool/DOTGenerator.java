@@ -209,7 +209,7 @@ public class DOTGenerator {
         Collection rules = grammar.getRules();
         for (Iterator itr = rules.iterator(); itr.hasNext();) {
 			Grammar.Rule r = (Grammar.Rule) itr.next();
-            String ruleName = r.name;
+            String ruleName = r.getName();
             writeDOTFile(
                     ruleName,
                     getRuleNFADOT(grammar.getRuleStartState(ruleName)));

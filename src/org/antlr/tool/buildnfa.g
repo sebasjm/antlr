@@ -64,7 +64,7 @@ protected void init() {
     Collection rules = grammar.getRules();
     for (Iterator itr = rules.iterator(); itr.hasNext();) {
 		Grammar.Rule r = (Grammar.Rule) itr.next();
-        String ruleName = r.name;
+        String ruleName = r.getName();
         NFAState ruleBeginState = factory.newState();
         ruleBeginState.setDescription("rule "+ruleName+" start");
 		ruleBeginState.setEnclosingRuleName(ruleName);
@@ -226,6 +226,10 @@ element returns [StateCluster g=null]
     |   tree
     |   #( SYNPRED block )
     |   ACTION
+
+    	// track only the last action found for interpreter mode
+    |	la:LEXER_ACTION  {grammar.setLexerRuleAction(currentRuleName, #la);}
+
     |   pred:SEMPRED {g = factory.build_SemanticPredicate(#pred);}
     |   s:SET {g = factory.build_Set(s.getSetValue());}
     |   EPSILON {g = factory.build_Epsilon();}

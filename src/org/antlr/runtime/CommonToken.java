@@ -31,7 +31,7 @@ public class CommonToken extends Token {
     protected int type;
 	protected int line;
 	protected int charPositionInLine;
-	protected int channel;
+	protected int channel=DEFAULT_CHANNEL;
     /** The char position into the input buffer where this token starts */
 	protected int start;
 	/** The char position into the input buffer where this token stops */
@@ -84,7 +84,27 @@ public class CommonToken extends Token {
         this.type = type;
     }
 
+	public int getStartIndex() {
+		return start;
+	}
+
+	public void setStartIndex(int start) {
+		this.start = start;
+	}
+
+	public int getStopIndex() {
+		return stop;
+	}
+
+	public void setStopIndex(int stop) {
+		this.stop = stop;
+	}
+
     public String toString(CharStream input) {
-        return "["+getText(input)+"/"+type+","+line+":"+getCharPositionInLine()+"]";
+		String channelStr = "";
+		if ( channel>0 ) {
+			channelStr=",channel="+channel;
+		}
+        return "["+getText(input)+"/<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
     }
 }

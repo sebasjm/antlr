@@ -19,15 +19,21 @@ public class Interpreter implements TokenSource {
 	protected Grammar grammar;
 	protected IntStream input;
 
-	static class LexerActionGetTokenType implements InterpreterActions {
-		public int tokenType;
+	class LexerActionGetTokenType implements InterpreterActions {
+		public CommonToken token;
 		Grammar g;
 		public LexerActionGetTokenType(Grammar g) {
 			this.g = g;
 		}
 		public void exitRule(String ruleName) {
 			if ( !ruleName.equals(Grammar.TOKEN_RULENAME) ){
-				tokenType = g.getTokenType(ruleName);
+				int type = g.getTokenType(ruleName);
+				int channel = Token.DEFAULT_CHANNEL;
+				token = new CommonToken(type,channel,0,0);
+				GrammarAST t = g.getLexerRuleAction(ruleName);
+				if ( t!=null ) {
+					executeLexerAction(token, t);
+				}
 			}
 		}
 		public void enterRule(String ruleName) {}
@@ -81,15 +87,19 @@ public class Interpreter implements TokenSource {
 		}
 		int start = input.index();
 		int type = 0;
+		CommonToken token = null;
 		try {
-			type = scan(Grammar.TOKEN_RULENAME);
+			token = scan(Grammar.TOKEN_RULENAME);
 		}
 		catch (RecognitionException re) {
 			throw new TokenStreamException(re);
 		}
+		// the scan can only set type and channel (if a ${...} action found)
+		// we must set the line, and other junk here to make it a complete token
 		int stop = input.index()-1;
-		Token token = new CommonToken(type,Lexer.DEFAULT_CHANNEL,start,stop);
 		token.setLine(((CharStream)input).getLine());
+		token.setStartIndex(start);
+		token.setStopIndex(stop);
 		token.setCharPositionInLine(((CharStream)input).getCharPositionInLine());
 		return token;
 	}
@@ -140,12 +150,12 @@ public class Interpreter implements TokenSource {
 		parseEngine(startRule, start, stop, input, ruleInvocationStack, actions);
 	}
 
-	public int scan(String startRule)
+	public CommonToken scan(String startRule)
 		throws RecognitionException
 	{
 		LexerActionGetTokenType actions = new LexerActionGetTokenType(grammar);
 		scan(startRule, actions);
-		return actions.tokenType;
+		return actions.token;
 	}
 
 	public void parse(String startRule, InterpreterActions actions)
@@ -346,12 +356,16 @@ public class Interpreter implements TokenSource {
 		return s.getUniquelyPredictedAlt();
 	}
 
-	/*
-	Map busy = new HashMap();
-	public boolean closureHasAcceptState(NFAState p) {
-		if ( p.isAcceptState() )
-		Transition transition0 = p.transition(0);
-
+	/** Exec an action limited to assignments like ( ${ ( = channel 99 ; ) ) */
+	public void executeLexerAction(Token token, GrammarAST code) {
+		System.out.println("action "+code.toString());
+		ActionInterpreter interp = new ActionInterpreter();
+		try {
+			interp.lexer_action(code,token);
+		}
+		catch (RecognitionException re) {
+			System.err.println("cannot exec action: "+code.toString());
+		}
 	}
-	*/
+
 }

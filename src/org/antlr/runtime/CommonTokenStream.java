@@ -36,7 +36,7 @@ public class CommonTokenStream implements TokenStream {
     protected TokenSource input;
     protected List tokens;
 	/** Skip tokens on any channel but this one; this is how we skip whitespace... */
-	protected int channel = Lexer.DEFAULT_CHANNEL;
+	protected int channel = Token.DEFAULT_CHANNEL;
     protected int p = 0;
 
     public CommonTokenStream(TokenSource input) throws TokenStreamException {

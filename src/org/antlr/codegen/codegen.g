@@ -235,6 +235,9 @@ element returns [StringTemplate code=null]
 
         // TODO: wrap in {...} for some targets?
     |   act:ACTION {code = new StringTemplate(templates, #act.getText());}
+
+    |	lexer_action
+
     |   SEMPRED
     |   s:SET
         {
@@ -242,6 +245,19 @@ element returns [StringTemplate code=null]
         code.setAttribute("s", generator.genSetExpr(templates,s.getSetValue(),1));
         }
     |   EPSILON 
+    ;
+
+lexer_action
+	:	#( LEXER_ACTION (lexer_assignment)+ )
+	;
+
+lexer_assignment
+	:	#( ASSIGN ID lexer_expr )
+	;
+
+lexer_expr
+	:	INT
+	|	ID
     ;
 
 ebnf returns [StringTemplate code=null]

@@ -61,7 +61,9 @@ public class Grammar {
 		Map options;
 		NFAState startState;
 		NFAState stopState;
-		AST tree;
+		GrammarAST tree;
+		GrammarAST lexerAction;
+		public String getName() {return name;}
 	}
 
 	protected class Decision {
@@ -281,12 +283,17 @@ public class Grammar {
 	 */
 	public void importTokenVocabulary(Grammar g) {
 		Set importedTokenNames = g.getTokenNames();
+		int maxTokenType = 0;
 		for (Iterator it = importedTokenNames.iterator(); it.hasNext();) {
 			String tokenName = (String) it.next();
 			int tokenType = g.getTokenType(tokenName);
+			maxTokenType = Math.max(maxTokenType,tokenType);
 			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
 				defineToken(tokenName, tokenType);
 			}
+		}
+		if ( maxTokenType>0 ) {
+			tokenType = maxTokenType+1; // next type is defined above imported
 		}
 	}
 
@@ -549,20 +556,25 @@ public class Grammar {
      *  a parser.  Do not define char literals as tokens in the
      *  lexer either unless they are imported.
      *
-     *  Return the new token type value or Label.INVALID.
-     */
-    public int defineToken(String text) {
-        int ttype = getTokenType(text);
-        if ( ttype==Label.INVALID ) {
-            //System.out.println("defineToken("+text+")");
-            if ( (text.charAt(0)=='"'&&stringLiteralToTypeMap.get(text)==null) ||
-                 tokenNameToTypeMap.get(text)==null )
-            {
-                ttype = this.tokenType;
-                defineToken(text, this.tokenType);
-                this.tokenType++;
-            }
-        }
+	 *  Return the new token type value or Label.INVALID.
+	 *
+	 *  Token rule fragments are assigned token types; you never know
+	 *  when it will be useful and I assign token types during a single
+	 *  pass--I cannot see ahead to see which token rules will be fragments.
+	 */
+	public int defineToken(String text) {
+		int ttype = getTokenType(text);
+		if ( ttype==Label.INVALID ) {
+			//System.out.println("defineToken("+text+")");
+			if ( (text.charAt(0)=='"'&&stringLiteralToTypeMap.get(text)==null) ||
+				tokenNameToTypeMap.get(text)==null )
+			{
+				ttype = this.tokenType;
+				defineToken(text, this.tokenType);
+				this.tokenType++;
+			}
+
+		}
         return ttype;
     }
 
@@ -603,6 +615,11 @@ public class Grammar {
 	protected Rule getRule(String ruleName) {
 		Rule r = (Rule)nameToRuleMap.get(ruleName);
 		return r;
+	}
+
+	public GrammarAST getLexerRuleAction(String ruleName) {
+		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		return r.lexerAction;
 	}
 
     public int getRuleIndex(String ruleName) {
@@ -708,12 +725,23 @@ public class Grammar {
         return nameToRuleMap.values();
     }
 
-    public void setRuleAST(String ruleName, GrammarAST t) {
+	public void setRuleAST(String ruleName, GrammarAST t) {
 		Rule r = (Rule)nameToRuleMap.get(ruleName);
 		if ( r!=null ) {
-        	r.tree = t;
+			r.tree = t;
 		}
-    }
+	}
+
+	/** When interpreting a lexer grammar, one wants to be able exec
+	 *  lexer actions to set the channel and token type.  For now,
+	 *  only the last action found is tracked per rule.
+	 */
+	public void setLexerRuleAction(String ruleName, GrammarAST t) {
+		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		if ( r!=null ) {
+			r.lexerAction = t;
+		}
+	}
 
     public void setRuleStartState(String ruleName, NFAState startState) {
 		Rule r = (Rule)nameToRuleMap.get(ruleName);

@@ -228,7 +228,7 @@ public class NFAFactory {
     public void build_EOFStates(List rules) {
         for (Iterator iterator = rules.iterator(); iterator.hasNext();) {
 			Grammar.Rule r = (Grammar.Rule) iterator.next();
-			String ruleName = r.name;
+			String ruleName = r.getName();
 			NFAState endNFAState = nfa.getGrammar().getRuleStopState(ruleName);
             // Is this rule a start symbol?  (no follow links)
             if ( endNFAState.transition(0)==null ) {
@@ -484,7 +484,7 @@ public class NFAFactory {
 		// TODO: add a single decision node/state for good description
         while (iter.hasNext()) {
 			Grammar.Rule r = (Grammar.Rule) iter.next();
-            String ruleName = r.name;
+            String ruleName = r.getName();
 			String modifier = nfa.getGrammar().getRuleModifier(ruleName);
             if ( ruleName.equals(Grammar.TOKEN_RULENAME) ||
 				 (modifier!=null &&
