@@ -29,8 +29,7 @@ package org.antlr.test;
 
 import org.antlr.test.unit.TestSuite;
 import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.Grammar;
-import org.antlr.tool.FASerializer;
+import org.antlr.tool.*;
 import org.antlr.analysis.State;
 import org.antlr.analysis.DFA;
 import org.antlr.codegen.CodeGenerator;
@@ -124,7 +123,7 @@ public class TestCharDFAConversion extends TestSuite {
 		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
 		// into 0..8
 		String expecting =
-			".s0-'0'..'8'->:s7=>5\n" +
+			".s0-'0'..'8'->:s8=>5\n" +
 			".s0-'9'->.s6\n" +
 			".s0-'k'->.s1\n" +
 			".s0-'p'->.s4\n" +
@@ -133,8 +132,8 @@ public class TestCharDFAConversion extends TestSuite {
 			".s1-'@'->:s3=>1\n" +
 			".s4-'$'->:s5=>4\n" +
 			".s4-'@'->:s3=>1\n" +
-			".s6-'$'->:s8=>3\n" +
-			".s6-'@'->:s7=>5\n";
+			".s6-'$'->:s7=>3\n" +
+			".s6-'@'->:s8=>5\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -186,10 +185,23 @@ public class TestCharDFAConversion extends TestSuite {
 	public void testNonGreedyLoopThatNeverLoops() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"DUH : (options {greedy=false;}:'x')+ ;");
+			"DUH : (options {greedy=false;}:'x')+ ;"); // loop never matched
 		String expecting =
 			":s0=>2\n";
+
+		TestSemanticPredicates.ErrorQueue equeue = new TestSemanticPredicates.ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
 		checkDecision(g, 1, expecting, new int[] {1});
+
+		assertTrue(equeue.size()==1,
+				   "unexpected number of expected problems: "+equeue.size()+
+				   "; expecting "+1);
+		Message msg = (Message)equeue.warnings.get(0);
+		assertTrue(msg instanceof GrammarUnreachableAltsMessage,
+				   "warning must be an unreachable alt");
+		GrammarUnreachableAltsMessage u = (GrammarUnreachableAltsMessage)msg;
+		assertEqual(u.alts.toString(), "[1]");
 	}
 
 	// S U P P O R T
@@ -210,6 +222,7 @@ public class TestCharDFAConversion extends TestSuite {
 								 int[] expectingUnreachableAlts)
 		throws FailedAssertionException
 	{
+
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getCodeGenerator()==null ) {
 			CodeGenerator generator = new CodeGenerator(null, g, "Java");
