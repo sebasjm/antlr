@@ -27,16 +27,18 @@
 */
 package org.antlr.runtime.debug;
 
+import org.antlr.runtime.*;
+
 public class DebugTokenStream implements TokenStream {
-	protected ANTLRDebugInterface dbg;
+	protected DebugEventListener dbg;
 	protected TokenStream input;
 
-	public DebugTokenStream(TokenStream input, ANTLRDebugInterface dbg) {
+	public DebugTokenStream(TokenStream input, DebugEventListener dbg) {
 		this.input = input;
 		setDebugListener(dbg);
 	}
 
-	public void setDebugListener(ANTLRDebugInterface dbg) {
+	public void setDebugListener(DebugEventListener dbg) {
 		this.dbg = dbg;
 	}
 

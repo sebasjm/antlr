@@ -27,10 +27,12 @@
 */
 package org.antlr.runtime.debug;
 
+import org.antlr.runtime.*;
+
 public class DebugParser extends Parser {
 
 	/** The default debugger mimics the traceParser behavior of ANTLR 2.x */
-	class TraceDebugger implements ANTLRDebugInterface {
+	class TraceDebugger implements DebugEventListener {
 		protected int level = 0;
 		public void enterRule(String ruleName) {
 			for (int i=1; i<=level; i++) {System.out.print(" ");}
@@ -55,12 +57,12 @@ public class DebugParser extends Parser {
 	}
 
 	/** Who to notify when events in the parser occur. */
-	protected ANTLRDebugInterface dbg = null;
+	protected DebugEventListener dbg = null;
 
 	/** Create a normal parser except wrap the token stream in a debug
 	 *  proxy that fires consume events.
 	 */
-	public DebugParser(TokenStream input, ANTLRDebugInterface dbg) {
+	public DebugParser(TokenStream input, DebugEventListener dbg) {
 		super(new DebugTokenStream(input,dbg));
 		setDebugListener(dbg);
 	}
@@ -73,7 +75,7 @@ public class DebugParser extends Parser {
 	/** Provide a new debug event listener for this parser.  Notify the
 	 *  input stream too that it should send events to this listener.
 	 */
-	public void setDebugListener(ANTLRDebugInterface dbg) {
+	public void setDebugListener(DebugEventListener dbg) {
 		if ( input instanceof DebugTokenStream ) {
 			((DebugTokenStream)input).setDebugListener(dbg);
 		}

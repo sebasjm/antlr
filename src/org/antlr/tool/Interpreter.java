@@ -1,6 +1,7 @@
 package org.antlr.tool;
 
 import org.antlr.runtime.*;
+import org.antlr.runtime.debug.*;
 import org.antlr.runtime.tree.ParseTree;
 import org.antlr.analysis.*;
 import org.antlr.analysis.DFA;
@@ -23,7 +24,7 @@ public class Interpreter implements TokenSource {
 	 *  To get a stream of tokens, you must call scan() multiple times,
 	 *  recording the token object result after each call.
 	 */
-	class LexerActionGetTokenType implements ANTLRDebugInterface {
+	class LexerActionGetTokenType implements DebugEventListener {
 		public CommonToken token;
 		Grammar g;
 		public LexerActionGetTokenType(Grammar g) {
@@ -50,7 +51,7 @@ public class Interpreter implements TokenSource {
 	/** This parser listener tracks rule entry/exit and token matches
 	 *  to build a simple parse tree using the standard ANTLR Tree interface
 	 */
-	class BuildParseTree implements ANTLRDebugInterface {
+	class BuildParseTree implements DebugEventListener {
 		Grammar g;
 		Stack callStack = new Stack();
 		public BuildParseTree(Grammar g) {
@@ -147,7 +148,7 @@ public class Interpreter implements TokenSource {
 	 *
 	 *  Return the token type associated with the final rule end state.
 	 */
-	public void scan(String startRule, ANTLRDebugInterface actions)
+	public void scan(String startRule, DebugEventListener actions)
 		throws RecognitionException
 	{
 		if ( grammar.type!=Grammar.LEXER ) {
@@ -180,7 +181,7 @@ public class Interpreter implements TokenSource {
 		return actions.token;
 	}
 
-	public void parse(String startRule, ANTLRDebugInterface actions)
+	public void parse(String startRule, DebugEventListener actions)
 		throws RecognitionException
 	{
 		//System.out.println("parse("+startRule+")");
@@ -220,7 +221,7 @@ public class Interpreter implements TokenSource {
 							   NFAState stop,
 							   IntStream input,
 							   Stack ruleInvocationStack,
-							   ANTLRDebugInterface actions)
+							   DebugEventListener actions)
 		throws RecognitionException
 	{
 		if ( actions!=null ) {
