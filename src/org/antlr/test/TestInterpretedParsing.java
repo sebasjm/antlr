@@ -72,7 +72,7 @@ public class TestInterpretedParsing extends TestSuite {
 
 	public void testSimpleParse() throws Exception {
 		Grammar pg = new Grammar(
-			"grammar p;\n"+
+			"parser grammar p;\n"+
 			"prog : WHILE ID LCURLY (assign)* RCURLY;\n" +
 			"assign : ID ASSIGN expr SEMI ;\n" +
 			"expr : INT | FLOAT | ID ;\n");
