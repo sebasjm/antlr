@@ -36,9 +36,6 @@ import java.util.*;
 
 /** Code that embodies the NFA conversion to DFA. */
 public class NFAToDFAConverter {
-	public static boolean COLLAPSE_ALL_INCIDENT_EDGES = true;
-	public static boolean MERGE_STOP_STATES = true;
-
 	/** A list of DFA states we still need to process during NFA conversion */
 	protected List work = new LinkedList();
 
@@ -304,9 +301,9 @@ public class NFAToDFAConverter {
 								DFAState targetState,
 								Map targetToLabelMap)
 	{
+		//System.out.println(d.stateNumber+"-"+label.toString(dfa.nfa.grammar)+"->"+targetState.stateNumber);
 		int n = 0;
-		System.out.println(d.stateNumber+"-"+label.toString(dfa.nfa.grammar)+"->"+targetState.stateNumber);
-		if ( COLLAPSE_ALL_INCIDENT_EDGES ) {
+		if ( DFAOptimizer.COLLAPSE_ALL_PARALLEL_EDGES ) {
 			// track which targets we've hit
 			Integer tI = new Integer(targetState.stateNumber);
 			Transition oldTransition = (Transition)targetToLabelMap.get(tI);
@@ -794,7 +791,7 @@ public class NFAToDFAConverter {
         // Just return as a valid DFA state
 		int alt = d.getUniquelyPredictedAlt();
 		if ( alt!=NFA.INVALID_ALT_NUMBER ) {
-			if ( MERGE_STOP_STATES ) {
+			if ( DFAOptimizer.MERGE_STOP_STATES ) {
 				// check to see if we already have an accept state for this alt
 				// [must do this after we resolve nondeterminisms in general]
 				DFAState acceptStateForAlt = dfa.getAcceptState(alt);

@@ -338,9 +338,13 @@ public class DFA {
         return n;
     }
 
-    public int getNumberOfStates() {
-        return numberOfStates;
-    }
+	public int getNumberOfStates() {
+		return numberOfStates;
+	}
+
+	public int getNumberOfAlts() {
+		return nAlts;
+	}
 
     protected void initAltRelatedInfo() {
         unreachableAlts = new LinkedList();

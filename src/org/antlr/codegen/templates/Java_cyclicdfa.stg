@@ -4,7 +4,7 @@ dfaDecision(decisionNumber,description) ::= <<
 int m<decisionNumber> = input.mark();
 <if(LEXER)>
 int line<decisionNumber> = input.getLine();
-int pos<decisionNumber> = input.getCharPositionInLine();
+int pos<decisionNumber> = input.getCharPositionInLine();<\n>
 <endif>
 <! the <name> attribute is inherited via the parser, lexer, ... !>
 alt<decisionNumber> = <name>_DFA.DFA<decisionNumber>(input);

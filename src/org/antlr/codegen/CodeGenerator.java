@@ -38,10 +38,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.misc.StringTemplateTreeView;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.analysis.*;
-import org.antlr.tool.Grammar;
-import org.antlr.tool.ErrorManager;
-import org.antlr.tool.LookaheadSet;
-import org.antlr.tool.GrammarAST;
+import org.antlr.tool.*;
 import org.antlr.misc.*;
 import org.antlr.Tool;
 import org.antlr.codegen.bytecode.ClassFile;
@@ -242,7 +239,12 @@ public class CodeGenerator {
 	 *  The target, such as JavaTarget, dictates which files get written.
      */
     public void genRecognizer() {
+		// CREATE NFA FROM GRAMMAR, CREATE DFA FROM NFA
 		target.performGrammarAnalysis(this, grammar);
+
+		// OPTIMIZE DFA
+        DFAOptimizer optimizer = new DFAOptimizer(grammar);
+		optimizer.optimize();
 
 		// OUTPUT FILE (contains recognizerST)
 		outputFileST = templates.getInstanceOf("outputFile");
@@ -299,14 +301,14 @@ public class CodeGenerator {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
-		genTokenTypeDefinitions(recognizerST);
-		genTokenTypeDefinitions(outputFileST);
-		genTokenTypeDefinitions(headerFileST);
+		genTokenTypeConstants(recognizerST);
+		genTokenTypeConstants(outputFileST);
+		genTokenTypeConstants(headerFileST);
 
-
-		// CREATE FOLLOW SETS needed for automatic error recovery
 		if ( grammar.type!=Grammar.LEXER ) {
-			//fillFOLLOWSets(recognizerST,outputFileST,headerFileST);
+			genTokenTypeNames(recognizerST);
+			genTokenTypeNames(outputFileST);
+			genTokenTypeNames(headerFileST);
 		}
 
 		// WRITE FILES
@@ -326,6 +328,7 @@ public class CodeGenerator {
 		}
 	}
 
+	/*
 	protected void fillFOLLOWSets(StringTemplate recognizerST,
 								  StringTemplate outputFileST,
 								  StringTemplate headerFileST)
@@ -333,15 +336,6 @@ public class CodeGenerator {
 		long start = System.currentTimeMillis();
 		for (Iterator itr = grammar.getRules().iterator(); itr.hasNext();) {
 			Grammar.Rule r = (Grammar.Rule) itr.next();
-			/*  hmm...FOLLOW in lexer doesn't seem to help
-			// if a lexer grammar, only do fragment rules
-			if ( grammar.type==Grammar.LEXER &&
-				 (r.modifier==null ||
-				 !r.modifier.equals(Grammar.FRAGMENT_RULE_MODIFIER)) )
-			{
-				continue;
-			}
-			*/
 			LookaheadSet follow = grammar.FOLLOW(r.name);
 			//LookaheadSet follow = new LookaheadSet();
 			System.out.println("FOLLOW("+r.name+")="+follow.toString(grammar));
@@ -369,7 +363,26 @@ public class CodeGenerator {
 		long stop = System.currentTimeMillis();
 		System.out.println("FOLLOW sets computed in "+(int)(stop-start)+" ms");
 	}
+    */
 
+	/** Error recovery in ANTLR recognizers.
+	 *
+	 *  Based upon original ideas:
+	 *
+	 *  Algorithms + Data Structures = Programs by Niklaus Wirth
+	 *
+	 *  and
+	 *
+	 *  A note on error recovery in recursive descent parsers:
+	 *  http://portal.acm.org/citation.cfm?id=947902.947905
+	 *
+	 *  Later, Josef Grosch had some good ideas:
+	 *  Efficient and Comfortable Error Recovery in Recursive Descent Parsers:
+	 *  ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
+	 *
+	 *  Like Grosch I implemented local FOLLOW sets that are combined at run-time
+	 *  upon error to avoid parsing overhead.
+	 */
 	public void generateLocalFOLLOW(GrammarAST ruleRefNode,
 									String referencedRulename,
 									String enclosingRuleName)
@@ -462,9 +475,18 @@ public class CodeGenerator {
             // track max, but don't count the accept state...
             maxK = k;
         }
+		GrammarAST decisionASTNode =
+			dfa.getNFADecisionStartState().getDecisionASTNode();
         StringTemplate dfaST = templates.getInstanceOf("dfaState");
+		if ( decisionASTNode.getType()==ANTLRParser.EOB ) {
+			dfaST = templates.getInstanceOf("dfaLoopbackState");
+		}
+		else if ( decisionASTNode.getType()==ANTLRParser.OPTIONAL ) {
+			dfaST = templates.getInstanceOf("dfaOptionalBlockState");			
+		}
 		dfaST.setAttribute("stateNumber", new Integer(s.stateNumber));
         String description = dfa.getNFADecisionStartState().getDescription();
+		System.out.println("DFA: "+description+" associated with AST "+decisionASTNode);
         if ( description!=null ) {
 			description = Utils.replace(description,"\"", "\\\"");
             dfaST.setAttribute("description", description);
@@ -478,7 +500,7 @@ public class CodeGenerator {
                 EOTPredicts = target.getUniquelyPredictedAlt();
                 continue;
             }
-            StringTemplate edgeST = templates.getInstanceOf("dfaEdge");
+			StringTemplate edgeST = templates.getInstanceOf("dfaEdge");
             edgeST.setAttribute("labelExpr",
                                 genLabelExpr(templates,edge.label,k));
             StringTemplate targetST =
@@ -532,7 +554,7 @@ public class CodeGenerator {
             Transition edge = (Transition) s.transition(i);
             StringTemplate edgeST;
             if ( edge.label.getAtom()==Label.EOT ) {
-                // this is the default clause; must be last
+                // this is the default clause; has to held until last
                 edgeST = templates.getInstanceOf("eotDFAEdge");
                 stateST.removeAttribute("needErrorClause");
                 eotST = edgeST;
@@ -639,26 +661,40 @@ public class CodeGenerator {
 
 	/** Set attributes tokens and literals attributes in the incoming
 	 *  code template.  This is not the token vocab interchange file, but
-	 *  rather a list of tokens/literals possibly needed by the recognizer.
+	 *  rather a list of token type ID needed by the recognizer.
 	 */
-	public void genTokenTypeDefinitions(StringTemplate code) {
-        // make constants for the token names
-        Iterator tokenNames = grammar.getTokenNames().iterator();
-        while (tokenNames.hasNext()) {
-            String tokenName = (String) tokenNames.next();
-            int tokenType = grammar.getTokenType(tokenName);
-            if ( tokenType>=Label.MIN_TOKEN_TYPE ) { // don't do FAUX labels
-                code.setAttribute("tokens.{name,type}", tokenName, new Integer(tokenType));
-            }
-        }
-    }
+	protected void genTokenTypeConstants(StringTemplate code) {
+		// make constants for the token types
+		Iterator tokenIDs = grammar.getTokenNames().iterator();
+		while (tokenIDs.hasNext()) {
+			String tokenID = (String) tokenIDs.next();
+			int tokenType = grammar.getTokenType(tokenID);
+			if ( tokenType>=Label.MIN_TOKEN_TYPE ) { // don't do FAUX labels
+				code.setAttribute("tokens.{name,type}", tokenID, new Integer(tokenType));
+			}
+		}
+	}
+
+	/** Generate a token names table that maps token type to a printable
+	 *  name: either the label like INT or the literal like "begin".
+	 */
+	protected void genTokenTypeNames(StringTemplate code) {
+		for (int t=1; t<=grammar.getMaxTokenType(); t++) {
+			String tokenName = grammar.getTokenName(t);
+			if ( tokenName.charAt(0)=='\"' ) {
+				tokenName = Utils.replace(tokenName,"\"", "\\\"");
+			}
+			tokenName = '\"'+tokenName+'\"';
+			code.setAttribute("tokenNames", tokenName);
+		}
+	}
 
     /** Generate a token vocab file with all the token names/types.  For example:
      *  ID=7
 	 *  FOR=8
 	 *  This is independent of the target language; used by antlr internally
      */
-    public StringTemplate genTokenVocabOutput() {
+    protected StringTemplate genTokenVocabOutput() {
         StringTemplate vocabFileST =
                 new StringTemplate(vocabFilePattern,
                                    AngleBracketTemplateLexer.class);

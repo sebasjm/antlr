@@ -57,9 +57,18 @@ public class Parser {
 		return input;
 	}
 
+	/** Match current input symbol against ttype.  Upon error, do one token
+	 *  insertion or deletion if possible.  You can override to not recover
+	 *  here and bail out of the current production to the normal error
+	 *  exception catch (at the end of the method) by just throwing
+	 *  MismatchedTokenException upon input.LA(1)!=ttype.
+	 */
 	public void match(int ttype) throws MismatchedTokenException {
 		if ( input.LA(1)!=ttype ) {
-			throw new MismatchedTokenException(ttype);
+			RecognitionException re = new MismatchedTokenException(ttype);
+			reportError(re);
+			recoverFromMismatchedToken(re, ttype);
+			return;
 		}
 		input.consume();
 	}
@@ -82,7 +91,7 @@ public class Parser {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			System.err.println("mismatched token: "+
 							   input.LT(1).toString(getCharStream())+
-							   "; expecting type "+mte.expecting);
+							   "; expecting type "+getTokenNames()[mte.expecting]);
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;
@@ -118,13 +127,24 @@ public class Parser {
 	}
 
 	public void recover(RecognitionException re) {
-		// compute FOLLOW set by walk stack, combining sets
+		// compute FOLLOW set by walking stack, combining sets
 		BitSet followSet = new BitSet();
 		for (int i = 0; i < following.size(); i++) {
 			BitSet localFollowSet = (BitSet) following.get(i);
 			followSet.orInPlace(localFollowSet);
 		}
 		consumeUntil(followSet);
+	}
+
+	public void recoverFromMismatchedToken(RecognitionException re, int ttype) {
+		// if next token is what we are looking for then "delete" this token
+		if ( input.LA(2)==ttype ) {
+			System.err.println("deleting "+input.LT(1).toString(getCharStream()));
+			input.consume();
+			return;
+		}
+		// if next token is not what we are looking for then "insert" ttype
+		System.err.println("inserting "+getTokenNames()[ttype]);
 	}
 
 	public void consumeUntil(int tokenType) {
@@ -135,7 +155,7 @@ public class Parser {
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(BitSet set) {
-		System.out.println("consumeUntil("+set.toString()+")");
+		System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
 		/*
 		System.out.println("LT(1)="+
 						   input.LT(1).toString(input.getTokenSource().getCharStream()));
@@ -188,5 +208,9 @@ public class Parser {
             rules.add(t.getMethodName());
 		}
 		return rules;
+	}
+
+	public String[] getTokenNames() {
+		return null;
 	}
 }

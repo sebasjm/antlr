@@ -3,7 +3,7 @@ group Java;
 // G R A M M A R  E L E M E N T S
 
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
-           name, tokens, rules, cyclicDFAs, bitsets) ::=
+           name, tokens, tokenNames, rules, cyclicDFAs, bitsets) ::=
 <<
 <headerAction>
 
@@ -42,12 +42,15 @@ retry:
 }
 >>
 
-parser(name, tokens, rules, cyclicDFAs, bitsets) ::= <<
+parser(name, tokens, tokenNames, rules, cyclicDFAs, bitsets) ::= <<
 class <name> extends Parser {
+    public static final String[] tokenNames = new String[] {
+        "\<invalid>", <tokenNames; separator=", ">
+    };
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
-    public <name>(TokenStream input) {
-        super(input);
-    }
+    public <name>(TokenStream input) { super(input); }
+    public String[] getTokenNames() { return tokenNames; }
+
     <rules; separator="\n\n">
     <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
 }
@@ -103,9 +106,9 @@ blockSingleAlt(alts,decls,decision,decisionNumber,preamble) ::= <<
 <preamble><decls><alts>
 >>
 
-block(alts,decls,decision,decisionNumber,preamble,maxK) ::= <<
+block(alts,decls,decision,decisionNumber,preamble,maxK,maxAlt) ::= <<
 <preamble>
-int alt<decisionNumber>=0;
+int alt<decisionNumber>=<maxAlt>;
 <decls>
 <decision>
 switch (alt<decisionNumber>) {
@@ -113,12 +116,12 @@ switch (alt<decisionNumber>) {
 }
 >>
 
-positiveClosureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<
+positiveClosureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int cnt<decisionNumber>=0;
 <decls>
 loop<decisionNumber>:
 do {
-    int alt<decisionNumber>=0;
+    int alt<decisionNumber>=<maxAlt>;
     <decision>
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
@@ -132,11 +135,11 @@ do {
 
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
-closureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<
+closureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 <decls>
 loop<decisionNumber>:
 do {
-    int alt<decisionNumber>=0;
+    int alt<decisionNumber>=<maxAlt>;
     <decision>
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
@@ -201,8 +204,8 @@ lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
 dfaDecision(decisionNumber,description) ::=
   "alt<decisionNumber> = DFA<decisionNumber>.predict(input);"
 
-dfaState(edges,defaultClause,eotPredictsAlt,description,stateNumber) ::= <<
-<edges; separator="else ">
+dfaState(edges,eotPredictsAlt,description,stateNumber) ::= <<
+<edges; separator="\nelse ">
 else {
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
@@ -210,6 +213,19 @@ else {
     throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>);<\n>
 <endif>
 }
+>>
+
+dfaOptionalBlockState(edges,eotPredictsAlt,description,stateNumber) ::= <<
+<edges; separator="\nelse ">
+>>
+
+dfaLoopbackState(edges,eotPredictsAlt,description,stateNumber) ::= <<
+<edges; separator="\nelse "><\n>
+<if(eotPredictsAlt)>
+else {
+    alt<decisionNumber>=<eotPredictsAlt>;
+}<\n>
+<endif>
 >>
 
 dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>;"

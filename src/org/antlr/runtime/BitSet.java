@@ -229,11 +229,15 @@ public class BitSet implements Cloneable {
         return bits;
     }
 
-    private final static int wordNumber(int bit) {
-        return bit >> LOG_BITS; // bit / BITS
-    }
+	private final static int wordNumber(int bit) {
+		return bit >> LOG_BITS; // bit / BITS
+	}
 
 	public String toString() {
+		return toString(null);
+	}
+
+	public String toString(String[] tokenNames) {
 		StringBuffer buf = new StringBuffer();
 		String separator = ",";
 		boolean havePrintedAnElement = false;
@@ -244,7 +248,12 @@ public class BitSet implements Cloneable {
 				if (i > 0 && havePrintedAnElement ) {
 					buf.append(separator);
 				}
-				buf.append(i);
+				if ( tokenNames!=null ) {
+					buf.append(tokenNames[i]);
+				}
+				else {
+					buf.append(i);
+				}
 				havePrintedAnElement = true;
 			}
 		}

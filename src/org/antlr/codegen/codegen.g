@@ -252,6 +252,7 @@ block[String blockTemplateName, DFA dfa]
         code.setAttribute("decision", decision);
         code.setAttribute("decisionNumber", dfa.getDecisionNumber());
 		code.setAttribute("maxK",generator.maxK);
+		code.setAttribute("maxAlt",dfa.getNumberOfAlts());
     }
     else {
         code = templates.getInstanceOf(blockTemplateName+"SingleAlt");

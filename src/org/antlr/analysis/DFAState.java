@@ -149,6 +149,10 @@ public class DFAState extends State {
         return (Transition)transitions.get(trans);
     }
 
+	public void removeTransition(int trans) {
+		transitions.remove(trans);
+	}
+
     /** Add an NFA configuration to this DFA node.  Add uniquely
      *  an NFA state/alt/syntactic&semantic context (chain of invoking state(s)
      *  and semantic predicate contexts).

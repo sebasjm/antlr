@@ -108,19 +108,20 @@ public class NFAState extends State {
     }
 
     /** What AST node is associated with this NFAState?  When you
-     *  set the AST node, I set the node to point back to this NFA state.
-     */
-    public void setDecisionASTNode(GrammarAST decisionASTNode) {
-        /*
-        System.out.println("setting ast "+
-                nfa.getGrammar().grammarTreeToString(decisionASTNode)+
-                " for "+this.toString());
-        */
-        decisionASTNode.setNFAStartState(this);
-        this.decisionASTNode = decisionASTNode;
-    }
+	 *  set the AST node, I set the node to point back to this NFA state.
+	 */
+	public void setDecisionASTNode(GrammarAST decisionASTNode) {
+		/*
+		System.out.println("setting ast "+
+						   nfa.grammar.grammarTreeToString(decisionASTNode)+
+						   " AST="+decisionASTNode.toStringTree()+
+						   " for "+this.toString());
+		*/
+		decisionASTNode.setNFAStartState(this);
+		this.decisionASTNode = decisionASTNode;
+	}
 
-    public String getDescription() {
+	public String getDescription() {
         return description;
     }
 
