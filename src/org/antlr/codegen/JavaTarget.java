@@ -15,10 +15,10 @@ public class JavaTarget extends Target {
 		throws IOException
 	{
 		ClassFile code = new ClassFile(tool,
-									   null,
+									   null, // TODO: how to get package?
 									   grammar.getName()+"_DFA",
 									   "java/lang/Object",
-									   "/tmp",
+									   "/tmp", // TODO: make sensitive to -o option
 									   cyclicDFAST.toString());
 		code.write();
 	}
