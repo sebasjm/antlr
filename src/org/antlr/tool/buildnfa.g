@@ -123,14 +123,20 @@ grammar
     ;
 
 headerSpec
-    :   #( "header" ACTION )
+    :   #( "header" (ID)? ACTION )
     ;
+
+attrScope
+	:	#( "scope" ID ACTION )
+	;
 
 grammarSpec
 	:	ID
 		(cmt:DOC_COMMENT)?
         ( #(OPTIONS .) )?
         ( #(TOKENS .) )?
+        (attrScope)*
+        (ACTION)?
         rules
 	;
 
@@ -147,7 +153,10 @@ rule
     :   #( RULE id:ID {r=#id.getText();}
 		{currentRuleName = r;}
 		(modifier)?
+        (ARG (ARG_ACTION)?)
+        (RET (ARG_ACTION)?)
 		( OPTIONS )?
+		( ruleScopeSpec )?
            #(BLOCK b=block EOB) EOR
            {
            if ( r.equals(Grammar.TOKEN_RULENAME) ) {
@@ -194,6 +203,10 @@ modifier
 	|	"private"
 	|	"fragment"
 	;
+
+ruleScopeSpec
+ 	:	#( "scope" (ACTION)? ( ID )* )
+ 	;
 
 block returns [StateCluster g = null]
 {

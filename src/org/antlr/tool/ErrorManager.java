@@ -131,6 +131,8 @@ public class ErrorManager {
 	public static final int MSG_RULE_REDEFINITION = 101;
 	public static final int MSG_LEXER_RULES_NOT_ALLOWED = 102;
 	public static final int MSG_PARSER_RULES_NOT_ALLOWED = 103;
+	public static final int MSG_CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL = 104;
+
 
 	// GRAMMAR WARNINGS
 	public static final int MSG_GRAMMAR_AMBIGUITY = 200;

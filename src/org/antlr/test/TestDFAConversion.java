@@ -143,8 +143,7 @@ public class TestDFAConversion extends TestSuite {
 		expecting =
 			".s0-C->.s1\n" +
 			".s1-B->:s3=>1\n" +
-			".s1-X->:s2=>2\n" +
-			".s1-Y->:s2=>2\n";
+			".s1-X..Y->:s2=>2\n";
 		checkDecision(g, 2, expecting, null);
 	}
 
@@ -311,11 +310,9 @@ public class TestDFAConversion extends TestSuite {
 		checkDecision(g, 2, expecting, null); // loopback (A)+
 		expecting =
 			".s0-A->.s1\n" +
-			".s0-B->:s2=>1\n" +
-			".s0-X->:s2=>1\n" +
+			".s0-B..X->:s2=>1\n" +
 			".s1-A->.s1\n" +
-			".s1-B->:s2=>1\n" +
-			".s1-X->:s2=>1\n" +
+			".s1-B..X->:s2=>1\n" +
 			".s1-Y->:s3=>2\n";
 		checkDecision(g, 3, expecting, null); // rule
 	}
@@ -328,8 +325,7 @@ public class TestDFAConversion extends TestSuite {
 			".s0-A->:s2=>1\n" +
 			".s0-B->.s1\n" +
 			".s1-<EOF>->:s3=>2\n" +
-			".s1-A->:s2=>1\n" +
-			".s1-B->:s2=>1\n"; // sees A|B as a set
+			".s1-A..B->:s2=>1\n"; // sees A|B as a set
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -395,9 +391,7 @@ public class TestDFAConversion extends TestSuite {
 			"c : CASE E ;\n");
 		String expecting =
 			".s0-CASE->.s2\n" +
-			".s0-E->:s1=>2\n" +
-			".s0-LCURLY->:s1=>2\n" +
-			".s0-RCURLY->:s1=>2\n" +
+			".s0-LCURLY..E->:s1=>2\n" +
 			".s2-E->:s3=>1\n";
 		checkDecision(g, 3, expecting, null);
 	}
@@ -486,10 +480,8 @@ public class TestDFAConversion extends TestSuite {
 			"  | (A{;}|B)\n" +
 			"  | A\n" +
 			"  ;");
-		// nondeterministic from left edge; no stop state
 		String expecting =
-			".s0-A->:s1=>1\n" +
-			".s0-B->:s1=>1\n";
+			".s0-A..B->:s1=>1\n"; // after optimization
 		checkDecision(g, 3, expecting, new int[] {2,3});
 	}
 

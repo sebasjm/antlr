@@ -389,11 +389,13 @@ public class CodeGenerator {
 	{
 		NFAState followingNFAState = referencedElementNode.followingNFAState;
 		int i = ((TokenWithIndex)referencedElementNode.getToken()).getIndex();
+		/*
 		System.out.print("compute FOLLOW "+referencedElementNode.toString()+
 						 " for "+referencedElementName+"#"+i+" in "+
 						 enclosingRuleName);
+		*/
 		LookaheadSet follow = grammar.LOOK(followingNFAState);
-		System.out.println(" "+follow);
+		//System.out.println(" "+follow);
 
 		long[] words = null;
 		if ( follow.tokenTypeSet==null ) {
@@ -679,7 +681,6 @@ public class CodeGenerator {
 	protected void genTokenTypeNames(StringTemplate code) {
 		for (int t=Label.MIN_TOKEN_TYPE; t<=grammar.getMaxTokenType(); t++) {
 			String tokenName = grammar.getTokenName(t);
-			System.out.println("type "+t+"="+tokenName);
 			if ( tokenName.charAt(0)=='\"' ) {
 				tokenName = Utils.replace(tokenName,"\"", "\\\"");
 			}

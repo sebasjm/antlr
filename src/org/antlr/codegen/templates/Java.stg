@@ -8,6 +8,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
 <headerAction>
 
 import org.antlr.runtime.*;
+import java.util.Stack;
 
 <docComment>
 <recognizer><\n>
@@ -42,18 +43,29 @@ retry:
 }
 >>
 
-parser(name, tokens, tokenNames, rules, cyclicDFAs, bitsets) ::= <<
+parser(name, scopes, tokens, tokenNames, rules, cyclicDFAs, bitsets) ::= <<
 class <name> extends Parser {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
     };
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
+    <scopes:attributeScope(scope=it)>
     public <name>(TokenStream input) { super(input); }
     public String[] getTokenNames() { return tokenNames; }
 
     <rules; separator="\n\n">
     <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
 }
+>>
+
+attributeScope(scope) ::= <<
+
+// scope <scope.name>
+<scope.attributes:{<if(it.isStatic)><it.decl>;<endif>}; separator="\n">
+protected static class scope_<scope.name> {
+    <scope.attributes:{<if(!it.isStatic)><it.decl>;<endif>}; separator="\n">
+};
+protected Stack <scope.name> = new Stack();<\n>
 >>
 
 bitset(name, words64) ::= <<

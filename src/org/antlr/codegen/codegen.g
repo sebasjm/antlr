@@ -146,19 +146,26 @@ grammar[Grammar g,
     ;
 
 headerSpec[StringTemplate outputFileST]
-    :   #( "header" a:ACTION {outputFileST.setAttribute("headerAction", #a.getText());} )
+    :   #( "header" (ID)? a:ACTION {outputFileST.setAttribute("headerAction", #a.getText());} )
     ;
+
+attrScope
+	:	#( "scope" ID ACTION )
+	;
 
 grammarSpec
 	:   name:ID
 		(cmt:DOC_COMMENT {outputFileST.setAttribute("docComment", #cmt.getText());} )?
 		{
 		recognizerST.setAttribute("name", #name.getText());
+		recognizerST.setAttribute("scopes", grammar.getScopes());
 		outputFileST.setAttribute("name", #name.getText());
 		headerFileST.setAttribute("name", #name.getText());
 		}
 		( #(OPTIONS .) )?
 		( #(TOKENS .) )?
+        (attrScope)*
+        (ACTION)?
 		rules[recognizerST]
 	;
 
@@ -185,8 +192,11 @@ rule returns [StringTemplate code=null]
     DFA dfa=#rule.getFirstChildWithType(BLOCK).getLookaheadDFA();
 }
     :   #( RULE id:ID {r=#id.getText(); currentRuleName = r;}
+		    (mod:modifier)?
+            (ARG (ARG_ACTION)?)
+            (RET (ARG_ACTION)?)
 			( #(OPTIONS .) )?
-			(mod:modifier)?
+			(ruleScopeSpec)?
 	     	b=block["block", dfa] EOR
          )
         // do not generate lexer rules in combined grammar
@@ -236,6 +246,10 @@ modifier
 	|	"private"
 	|	"fragment"
 	;
+
+ruleScopeSpec
+ 	:	#( "scope" (ACTION)? ( ID )* )
+ 	;
 
 block[String blockTemplateName, DFA dfa]
      returns [StringTemplate code=null]

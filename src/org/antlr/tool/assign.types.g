@@ -420,7 +420,13 @@ grammarSpec
 		(cmt:DOC_COMMENT)?
         (opts=optionsSpec {grammar.setOptions(opts);})?
         (tokensSpec)?
+        (attrScope)*
+        (ACTION)?
         rules
+	;
+
+attrScope
+	:	#( "scope" ID ACTION )
 	;
 
 optionsSpec returns [Map opts=new HashMap()]
@@ -482,7 +488,10 @@ rules
 rule
     :   #( RULE id:ID {currentRuleName=#id.getText();}
            (m:modifier)?
+           (ARG (ARG_ACTION)?)
+           (RET (ARG_ACTION)?)
            (optionsSpec)?
+           (ruleScopeSpec)?
            b:block EOR
            {trackTokenRule(#id,#m,#b);}
          )
@@ -494,6 +503,10 @@ modifier
 	|	"private"
 	|	"fragment"
 	;
+
+ruleScopeSpec
+ 	:	#( "scope" (ACTION)? ( ID )* )
+ 	;
 
 block
     :   #(  BLOCK

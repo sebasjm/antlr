@@ -141,9 +141,13 @@ public class Grammar {
     protected int ruleIndex = 1;
 
 	/** Map a rule to it's Rule object
-	 *  TODO 1.4 depedency.
 	 */
 	protected LinkedHashMap nameToRuleMap = new LinkedHashMap();
+
+	/** Track the scopes defined outside of rules and the scopes associated
+	 *  with all rules (even if empty).
+	 */
+	protected Map scopes = new HashMap();
 
 	/** Map a rule index to its name; use a Vector on purpose as new
 	 *  collections stuff won't let me setSize and make it grow.  :(
@@ -265,7 +269,7 @@ public class Grammar {
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
-		//System.out.println(grammarTree.toStringList());
+		System.out.println(grammarTree.toStringList());
 
 		/*
 		System.out.println("### print grammar");
@@ -297,6 +301,7 @@ public class Grammar {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
+		System.out.println("Scopes: "+scopes);
 	}
 
 	/** If the grammar is a merged grammar, return the text of the implicit
@@ -637,6 +642,24 @@ public class Grammar {
     public String getRuleName(int ruleIndex) {
         return (String)ruleIndexToRuleList.get(ruleIndex);
     }
+
+	public void defineScope(String name, AttributeScope scope) {
+		scopes.put(name,scope);
+	}
+
+	public AttributeScope defineScope(String name) {
+		AttributeScope scope = new AttributeScope(name);
+		scopes.put(name,scope);
+		return scope;
+	}
+
+	public AttributeScope getScope(String name) {
+		return (AttributeScope)scopes.get(name);
+	}
+
+	public Map getScopes() {
+		return scopes;
+	}
 
     public int getTokenType(String tokenName) {
         Integer I = null;

@@ -101,8 +101,16 @@ root = #grammar;
     ;
 
 headerSpec
-    :   #( "header" a:ACTION )
+    :   #( "header" (ID)? ACTION )
     ;
+
+attrScope
+	:	#( "scope" name:ID attrs:ACTION )
+		{
+		AttributeScope scope = grammar.defineScope(name.getText());
+		scope.addAttributes(attrs.getText(), ";");
+		}
+	;
 
 grammarSpec
 {Map opts=null;}
@@ -110,6 +118,8 @@ grammarSpec
 		(cmt:DOC_COMMENT)?
         (#(OPTIONS .))? // already parsed these in assign.types.g
         (tokensSpec)?
+        (attrScope)*
+        (ACTION)?
         rules
 	;
 
@@ -170,7 +180,19 @@ String mod=null;
 String name=null;
 Map opts=null;
 }
-    :   #( RULE id:ID (mod=modifier)? (opts=optionsSpec)? b:block EOR )
+    :   #( RULE id:ID
+           {AttributeScope ruleScope = grammar.defineScope(id.getText());}
+           (mod=modifier)?
+           ( ARG
+             (args:ARG_ACTION {ruleScope.addAttributes(args.getText(), ",");})?
+           )
+           ( RET
+             (ret:ARG_ACTION {ruleScope.addAttributes(ret.getText(), ",");})?
+           )
+           (opts=optionsSpec)?
+           (ruleScopeSpec[ruleScope])?
+           b:block EOR
+         )
 		{
 		name = #id.getText();
 		if ( Character.isUpperCase(name.charAt(0)) &&
@@ -200,6 +222,13 @@ mod = #modifier.getText();
 	|	"private"
 	|	"fragment"
 	;
+
+ruleScopeSpec[AttributeScope ruleScope]
+ 	:	#( "scope"
+ 	       (attrs:ACTION {ruleScope.addAttributes(attrs.getText(), ";");})?
+ 	       ( ID )*
+ 	     )
+ 	;
 
 block
 {Map opts=null;}

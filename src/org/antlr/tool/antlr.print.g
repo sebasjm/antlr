@@ -105,14 +105,20 @@ grammar
      ;
 
 headerSpec
-    :   #( "header" a:ACTION {out("header {"+#a.getText()+"}\n");} )
+    :   #( "header" (ID)? a:ACTION {out("header {"+#a.getText()+"}\n");} )
     ;
+
+attrScope
+	:	#( "scope" ID ACTION )
+	;
 
 grammarSpec[String gtype]
 	:	 id:ID {out(gtype+"grammar "+#id.getText());}
         (cmt:DOC_COMMENT {out(#cmt.getText()+"\n");} )?
         (optionsSpec)? {out(";\n");}
         (tokensSpec)?
+        (attrScope)*
+        (ACTION)?
         rules
     ;
 
@@ -158,8 +164,12 @@ rules
 rule
     :   #( RULE id:ID
            (modifier)?
+           (ARG (arg:ARG_ACTION)? {out("["+#arg.getText()+"]");} )
+           (RET (ret:ARG_ACTION)? {out("returns ["+#ret.getText()+"]");} )
            {out(#id.getText()+" : ");}
-           (optionsSpec)? b:block[false] EOR {out(";\n");}
+           (optionsSpec)?
+           (ruleScopeSpec)?
+           b:block[false] EOR {out(";\n");}
          )
     ;
 
@@ -170,6 +180,10 @@ modifier
 	|	"private"
 	|	"fragment"
 	;
+
+ruleScopeSpec
+ 	:	#( "scope" (ACTION)? ( ID )* )
+ 	;
 
 block[boolean forceParens]
     :   #(  BLOCK {if ( forceParens||#block.getNumberOfChildren()>2 ) out(" (");}

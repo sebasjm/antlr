@@ -70,6 +70,8 @@ tokens {
     CHARSET;
     SET;
     ID;
+    ARG;
+    RET;
     LEXER_GRAMMAR;
     PARSER_GRAMMAR;
     TREE_GRAMMAR;
@@ -101,21 +103,21 @@ tokens {
 
 grammar!
    :    hdr:headerSpec
-        ( a:ACTION )?
+        ( ACTION )?
 	    ( cmt:DOC_COMMENT  )?
         gr:grammarType gid:id (opt:grammarOptionsSpec)? SEMI
 		    (ts:tokensSpec!)?
-		    ( ACTION! )?
+        	scopes:attrScopes
+		    ( a:ACTION! )?
 	        r:rules
         EOF
         {
-        #grammar = #(null, #hdr, #(#gr, #gid, #cmt, #a, #opt, #ts, #r));
+        #grammar = #(null, #hdr, #(#gr, #gid, #cmt, #a, #opt, #ts, #scopes, #r));
         }
 	;
 
 headerSpec
-    :   ( 	"header"^
-	 	    (n:STRING_LITERAL)?
+    :   ( 	"header"^ (id)?
 	 	    ACTION
 	    )*
 	;
@@ -134,6 +136,10 @@ grammarOptionsSpec
             optionList
         RPAREN!
     ;
+
+optionsSpec
+	:	OPTIONS^ (option SEMI!)+ RCURLY!
+	;
 
 optionList
     :   option (COMMA! option)*
@@ -187,6 +193,14 @@ tokensSpecOptions
 	;
 */
 
+attrScopes
+	:	(attrScope)*
+	;
+
+attrScope
+	:	"scope"^ id ACTION
+	;
+
 rules
     :   (
 			options {
@@ -217,8 +231,9 @@ GrammarAST modifier=null;
 	( aa:ARG_ACTION )?
 	( "returns" rt:ARG_ACTION  )?
 	( throwsSpec )?
-	( opts:optionList )?
-	(a:ACTION )?
+	( opts:optionsSpec )?
+	( scopes:ruleScopeSpec )?
+	( "init" a:ACTION )?
 	COLON
 	(	(setNoParens SEMI) => s:setNoParens
 		{#b=#(#[BLOCK,"BLOCK"],#(#[ALT,"ALT"],#s,#[EOA,"EOA"]),#[EOB,"EOB"]);}
@@ -229,13 +244,20 @@ GrammarAST modifier=null;
     {
     GrammarAST eor = #[EOR,"<end-of-rule>"];
    	eor.setEnclosingRule(#ruleName.getText());
-    #rule = #(#[RULE,"rule"],#ruleName,modifier,#opts,#b,eor);
+    #rule = #(#[RULE,"rule"],
+              #ruleName,modifier,#(#[ARG,"ARG"],#aa),#(#[RET,"RET"],#rt),
+              #opts,#scopes,#b,eor);
     }
 	;
 
 throwsSpec
 	:	"throws" id ( COMMA id )*
 		
+	;
+
+ruleScopeSpec
+	:	"scope"^ ACTION ( ( COMMA! id )* SEMI )?
+	|	"scope"^ id ( COMMA! id )* SEMI
 	;
 
 /** Build #(BLOCK ( #(ALT ...) EOB )+ ) */
@@ -251,7 +273,7 @@ block
 				warnWhenFollowAmbig = false;
 			}
 		:
-			optionList ( ACTION )? COLON!
+			optionsSpec ( "init" ACTION )? COLON!
 		|	ACTION COLON!
 		)?
 
@@ -320,22 +342,8 @@ elementNoOptionSpec!
 {
     IntSet elements=null;
 }
-	:	id
-		ASSIGN
-		( id COLON )?
-		(	rr:RULE_REF {#elementNoOptionSpec = #rr;}
-			( ARG_ACTION  )?
-			( BANG  )?
-		|	// this syntax only valid for lexer
-			tr:TOKEN_REF {#elementNoOptionSpec = #tr;}
-			( ARG_ACTION  )?
-		)
-	|
-		(id COLON)?
-		(	r2:RULE_REF {#elementNoOptionSpec = #r2;}
-			( ARG_ACTION  )?
-			( BANG  )?
-		|   r:range {#elementNoOptionSpec = #r;}
+	:	(id ASSIGN)?
+		(   r:range {#elementNoOptionSpec = #r;}
 		|   t:terminal  {#elementNoOptionSpec = #t;}
 		|	NOT
 			(	nt:notTerminal  {#elementNoOptionSpec = #(#[NOT,"~"],#nt);}
@@ -429,11 +437,15 @@ range!
 	;
 
 terminal
-    :   cl:CHAR_LITERAL ( BANG! )?
+    :   cl:CHAR_LITERAL ast_type_spec!
 
 	|   tr:TOKEN_REF
 		ast_type_spec!
 		// Args are only valid for lexer
+		( ARG_ACTION! )?
+
+    |   RULE_REF
+        ( BANG )?
 		( ARG_ACTION! )?
 
 	|   sl:STRING_LITERAL
@@ -718,7 +730,7 @@ ARG_ACTION
 
 protected
 NESTED_ARG_ACTION :
-	'['
+	'['!
 	(
 		/*	'\r' '\n' can be matched in one alternative or by matching
 			'\r' and then '\n' in the next iteration.
@@ -734,7 +746,7 @@ NESTED_ARG_ACTION :
 	|	STRING_LITERAL
 	|	~']'
 	)*
-	']'
+	']'!
 	;
 
 ACTION
@@ -772,6 +784,7 @@ NESTED_ACTION :
 	|	CHAR_LITERAL
 	|	COMMENT
 	|	STRING_LITERAL
+//	|	ATTR_REF
 	|	.
 	)*
 	'}'
@@ -801,6 +814,15 @@ RULE_REF
 		)
 	;
 
+/*
+protected
+ATTR_REF
+	:	'@' scope:INTERNAL_ID
+		(options {warnWhenFollowAmbig=false;}:'.' attr:INTERNAL_ID )?
+		{System.out.println("found "+scope.getText()+"."+attr);}
+	;
+*/
+
 protected
 WS_LOOP
 	:	(	// grab as much WS as you can
@@ -828,6 +850,17 @@ INTERNAL_RULE_REF returns [int t]
 		)*
 		{t = testLiteralsTable(t);}
 	;
+
+/*
+protected
+INTERNAL_ID
+	:	('a'..'z'|'A'..'Z'|'_')
+		(	options {warnWhenFollowAmbig=false;}
+		:
+			'a'..'z'|'A'..'Z'|'_'|'0'..'9'
+		)*
+	;
+*/
 
 protected
 WS_OPT :
