@@ -3,12 +3,22 @@ package org.antlr.runtime.tree;
 import java.util.List;
 import java.util.ArrayList;
 
-/** A generic tree with no data inside.  Subclass to add data fields. */
+/** A generic tree. */
 public class CommonTree implements Tree {
 	protected Tree parent;
 	protected List children;
 
+	protected Object payload;
+
 	public CommonTree() {;}
+
+	public CommonTree(Object payload) {
+		this.payload = payload;
+	}
+
+	public Object getPayload() {
+		return payload;
+	}
 
 	public Tree getParent() {
 		return parent;
@@ -21,47 +31,11 @@ public class CommonTree implements Tree {
 		return (Tree)children.get(i);
 	}
 
-	public Tree getDown() {
-		return getChild(0);
-	}
-
-	public Tree getRight() {
-		Tree p = getParent();
-		if ( p==null ) {
-			return null; // no sibling if you have no parent; you're root
-		}
-		int i = p.getIndexOfChild(this);
-		return p.getChild(i+1);
-	}
-
-	public Tree getLeft() {
-		Tree p = getParent();
-		if ( p==null ) {
-			return null; // no sibling if you have no parent; you're root
-		}
-		int i = p.getIndexOfChild(this);
-		return p.getChild(i-1);
-	}
-
-	public Tree getUp() {
-		return getParent();
-	}
-
-	public int getNumberOfChildren() {
+	public int getChildCount() {
 		if ( children==null ) {
 			return 0;
 		}
 		return children.size();
-	}
-
-	/** Return an index 0..n-1 of t's index within its parents children.
-	 *  Return -1 if no such tree or t==null.
-	 */
-	public int getIndexOfChild(Tree t) {
-		if ( t==null || children==null ) {
-			return -1;
-		}
-		return children.indexOf(t);
 	}
 
 	public void setParent(Tree t) {
@@ -94,5 +68,21 @@ public class CommonTree implements Tree {
 	/** Override in a subclass to change the impl of children list */
 	protected void createChildrenList() {
 		children = new ArrayList();
+	}
+
+	public String toString() {
+		if ( children==null || children.size()==0 ) {
+			return payload.toString();
+		}
+		StringBuffer buf = new StringBuffer();
+		buf.append("(");
+		buf.append(payload.toString());
+		for (int i = 0; i < children.size(); i++) {
+			Tree t = (Tree) children.get(i);
+			buf.append(' ');
+			buf.append(t.toString());
+		}
+		buf.append(")");
+		return buf.toString();
 	}
 }

@@ -47,7 +47,7 @@ public class NFAState extends State {
     /** What's its decision number from 1..n? */
     protected int decisionNumber = 0;
 
-	/** What rule do we live in?  I currently only set on accept states */
+	/** What rule do we live in?  I currently only set on rule start/stop states */
 	protected String enclosingRule;
 
     /** During debugging and for nondeterminism warnings, it's useful

@@ -48,4 +48,10 @@ public interface CharStream extends IntStream {
     public int LA(int marker, int i);
 
 	public String substring(int start, int stop);
+
+	// ANTLR lexers no longer track the line, char pos; it is done automatically
+	
+	public int getLine();
+
+	public int getCharPositionInLine();
 }

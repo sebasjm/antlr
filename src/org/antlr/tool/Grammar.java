@@ -173,11 +173,15 @@ public class Grammar {
         charValueEscape['\f'] = "\\f";
     }
 
-    public Grammar(String grammarString)
-            throws antlr.RecognitionException, antlr.TokenStreamException
-    {
+	public Grammar() {
+		initTokenSymbolTables();
+	}
+
+	public Grammar(String grammarString)
+			throws antlr.RecognitionException, antlr.TokenStreamException
+	{
 		this(new StringReader(grammarString));
-    }
+	}
 
     /** Create a grammar from a Reader.  Parse the grammar, building a tree
      *  and loading a symbol table of sorts here in Grammar.  Then create
@@ -187,15 +191,26 @@ public class Grammar {
     public Grammar(Reader r)
             throws antlr.RecognitionException, antlr.TokenStreamException
     {
-        initTokenSymbolTables();
+        this();
+		setGrammarContent(r);
+	}
 
-        // BUILD AST FROM GRAMMAR
-        ANTLRLexer lexer = new ANTLRLexer(r);
-        ANTLRParser parser = new ANTLRParser(lexer, this);
-        parser.setASTNodeClass("org.antlr.tool.GrammarAST");
-        parser.grammar();
-        grammarTree = (GrammarAST)parser.getAST();
-    }
+	public void setGrammarContent(String grammarString)
+		throws antlr.RecognitionException, antlr.TokenStreamException
+	{
+		setGrammarContent(new StringReader(grammarString));
+	}
+
+	public void setGrammarContent(Reader r)
+		throws antlr.RecognitionException, antlr.TokenStreamException
+	{
+		// BUILD AST FROM GRAMMAR
+		ANTLRLexer lexer = new ANTLRLexer(r);
+		ANTLRParser parser = new ANTLRParser(lexer, this);
+		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
+		parser.grammar();
+		grammarTree = (GrammarAST)parser.getAST();
+	}
 
     /** Parse a rule we add artificially that is a list of the other lexer
      *  rules like this: "Tokens : ID | INT | SEMI ;"  nextToken() will invoke
@@ -219,7 +234,6 @@ public class Grammar {
         while (iter.hasNext()) {
             String name = (String) iter.next();
 			Rule r = getRule(name);
-			System.out.println("rule "+r.name+" modifier="+r.modifier);
 			// only add real token rules to Tokens rule
 			if ( r.modifier==null ||
 				 !r.modifier.equals(NONTOKEN_LEXER_RULE_MODIFIER) )
@@ -259,30 +273,29 @@ public class Grammar {
         tokenNameToTypeMap.put("<EOF>", new Integer(Label.EOF));
     }
 
+	/** Pull your token definitions from an existing grammar in memory.
+	 *  You must use Grammar() ctor then this method then setGrammarContent()
+	 *  to make this work.  This is useful primarily for testing and
+	 *  interpreting grammars.
+	 */
+	public void importTokenVocabulary(Grammar g) {
+		Set importedTokenNames = g.getTokenNames();
+		for (Iterator it = importedTokenNames.iterator(); it.hasNext();) {
+			String tokenName = (String) it.next();
+			int tokenType = g.getTokenType(tokenName);
+			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
+				defineToken(tokenName, tokenType);
+			}
+		}
+	}
+
     /** Look in the current directory for vocabName.tokens and load any
      *  definitions in there into the tokenNameToTypeMap.  The format of
-     *  the file is a simple token=type for the most part:
+     *  the file is a simple token=type:
      *
-     *     "begin"=4
-     *     LEXER=5
-     *     ...
-     *
-     *  though sometimes you will see double assignments like:
-     *
-     *     BEGIN="begin"=342
-     *
-     *  indicating that the token has both a name and a literal string value.
-     *  Also, you will see characters such as:
-     *
-     *     '0'=48
-     *     '\u00FF'=255
-     *
-     *  which are available so that a lexer can import the vocab and
-     *  match the appropriate chars as token types.
-     *
-     *  TODO: the double assign doesn't work yet
-	 *  TODO: actually remove ability to push strings across
-     */
+     *     FOR=5
+     *     ID=7
+	 *     ...
     protected void importTokenVocab(String vocabName) {
 		int maxTokenType = -1;
         try {
@@ -324,7 +337,7 @@ public class Grammar {
                                                 st.sval);
                         }
                         int tokenType = (int)st.nval;
-                        System.out.println("import "+tokenName+"="+tokenType);
+                        //System.out.println("import "+tokenName+"="+tokenType);
 						maxTokenType = Math.max(maxTokenType,tokenType);
                         defineToken(tokenName, tokenType);
                         token = st.nextToken(); // move to next assignment
@@ -353,6 +366,57 @@ public class Grammar {
 			tokenType = maxTokenType+1; // next type is defined above imported
 		}
     }
+	 */
+	protected void importTokenVocab(String vocabName) {
+		int maxTokenType = -1;
+		try {
+			FileReader fr = new FileReader(vocabName+".tokens");
+			BufferedReader br = new BufferedReader(fr);
+			String line = br.readLine();
+			int n = 1;
+			while ( line!=null ) {
+				if ( line.length()==0 ){
+					continue; // ignore blank lines
+				}
+				StringTokenizer tokenizer = new StringTokenizer(line);
+				if ( !tokenizer.hasMoreTokens() ) {
+					System.err.println("error line "+n+" reading vocab file "+vocabName+".tokens: "+
+									   "missing token name");
+				}
+				String tokenName=tokenizer.nextToken();
+				if ( !tokenizer.hasMoreTokens() ) {
+					System.err.println("error line "+n+" reading vocab file "+vocabName+".tokens: "+
+									   "missing '='");
+				}
+				tokenizer.nextToken(); // skip '='
+				if ( !tokenizer.hasMoreTokens() ) {
+					System.err.println("error line "+n+" reading vocab file "+vocabName+".tokens: "+
+									   "missing token type number");
+				}
+				String tokenTypeS=tokenizer.nextToken();
+				int tokenType = Integer.parseInt(tokenTypeS);
+				//System.out.println("import "+tokenName+"="+tokenType);
+				maxTokenType = Math.max(maxTokenType,tokenType);
+				defineToken(tokenName, tokenType);
+			}
+			br.close();
+			fr.close();
+		}
+		catch (FileNotFoundException fnfe) {
+			System.err.println("can't find vocab file "+vocabName+".tokens");
+		}
+		catch (IOException ioe) {
+			System.err.println("error reading vocab file "+vocabName+".tokens: "+
+					ioe.toString());
+		}
+		catch (Exception e) {
+			System.err.println("error reading vocab file "+vocabName+".tokens: "+
+					e.toString());
+		}
+		if ( maxTokenType>0 ) {
+			tokenType = maxTokenType+1; // next type is defined above imported
+		}
+	}
 
     /** Walk the list of options, altering this Grammar object according
      *  to any I recognize.

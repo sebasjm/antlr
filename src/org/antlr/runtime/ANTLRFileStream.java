@@ -32,10 +32,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 
+// TODO: this should be special case of ANTLRStringStream right?
 public class ANTLRFileStream implements CharStream {
     protected int p=0;
     String fileName;
-    // todo: doesn't handle supplemental unicode codes
+
+	/** line number 1..n within the input */
+	protected int line = 1;
+
+	/** The index of the character relative to the beginning of the line 0..n-1 */
+	protected int charPositionInLine = 0;
+
     StringBuffer data = new StringBuffer(1000);
 
     public ANTLRFileStream(String fileName) throws IOException {
@@ -60,6 +67,11 @@ public class ANTLRFileStream implements CharStream {
 
     public void consume() {
         if ( p < data.length() ) {
+			charPositionInLine++;
+			if ( data.charAt(p)=='\n' ) {
+				line++;
+				charPositionInLine=0;
+			}
             p++;
         }
     }
@@ -98,5 +110,13 @@ public class ANTLRFileStream implements CharStream {
 
 	public String substring(int start, int stop) {
 		return data.substring(start,stop+1);
+	}
+
+	public int getLine() {
+		return line;
+	}
+
+	public int getCharPositionInLine() {
+		return charPositionInLine;
 	}
 }

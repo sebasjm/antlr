@@ -30,25 +30,58 @@ package org.antlr.test;
 import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
+import org.antlr.tool.InterpreterActions;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.tree.ParseTree;
 
 public class TestInterpretedLexing extends TestSuite {
+
+	static class DebugActions implements InterpreterActions {
+		Grammar g;
+		public DebugActions(Grammar g) {
+			this.g = g;
+		}
+		public void enterRule(String ruleName) {
+			System.out.println("enterRule("+ruleName+")");
+		}
+
+		public void exitRule(String ruleName) {
+			System.out.println("exitRule("+ruleName+")");
+		}
+
+		public void matchElement(int type) {
+			System.out.println("matchElement("+g.getTokenName(type)+")");
+		}
+
+		public void mismatchedElement(String msg) {
+			System.out.println("mismatchedElement("+msg+")");
+		}
+
+		public void noViableAlt(String msg) {
+			System.out.println("noViableAlt("+msg+")");
+		}
+	}
+
 
     /** Public default constructor used by TestRig */
     public TestInterpretedLexing() {
     }
 
-    /*
 	public void testSimpleAltCharTest() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : 'a' | 'b' | 'c';");
-        g.parse("A", new ANTLRStringStream("a"));
-        g.parse("A", new ANTLRStringStream("b"));
-        g.parse("A", new ANTLRStringStream("c"));
+		final int Atype = g.getTokenType("A");
+        Interpreter engine = new Interpreter(g, new ANTLRStringStream("a"));
+        engine = new Interpreter(g, new ANTLRStringStream("b"));
+		int result = engine.scan("A");
+		assertEqual(result, Atype);
+        engine = new Interpreter(g, new ANTLRStringStream("c"));
+		result = engine.scan("A");
+		assertEqual(result, Atype);
     }
 
     public void testSingleRuleRef() throws Exception {
@@ -56,7 +89,10 @@ public class TestInterpretedLexing extends TestSuite {
                 "lexer grammar t;\n"+
                 "A : 'a' B 'c' ;\n" +
                 "B : 'b' ;\n");
-        g.parse("A", new ANTLRStringStream("abc"));
+		final int Atype = g.getTokenType("A");
+		Interpreter engine = new Interpreter(g, new ANTLRStringStream("abc")); // should ignore the x
+		int result = engine.scan("A");
+		assertEqual(result, Atype);
     }
 
     public void testSimpleLoop() throws Exception {
@@ -64,33 +100,61 @@ public class TestInterpretedLexing extends TestSuite {
                 "lexer grammar t;\n"+
                 "INT : (DIGIT)+ ;\n"+
 				"fragment DIGIT : '0'..'9';\n");
-		g.parse("INT", new ANTLRStringStream("12x")); // should ignore the x
-		g.parse("INT", new ANTLRStringStream("1234"));
+		final int INTtype = g.getTokenType("INT");
+		Interpreter engine = new Interpreter(g, new ANTLRStringStream("12x")); // should ignore the x
+		DebugActions debugActions = new DebugActions(g);
+		int result = engine.scan("INT");
+		assertEqual(result, INTtype);
+		engine = new Interpreter(g, new ANTLRStringStream("1234"));
+		result = engine.scan("INT");
+		assertEqual(result, INTtype);
     }
 
     public void testMultAltLoop() throws Exception {
-        Grammar g = new Grammar(
+		Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : ('0'..'9'|'a'|'b')+ ;\n");
-        g.parse("A", new ANTLRStringStream("a"));
-		g.parse("A", new ANTLRStringStream("1234"));
-        g.parse("A", new ANTLRStringStream("aaa"));
-        g.parse("A", new ANTLRStringStream("aaaa9"));
-        g.parse("A", new ANTLRStringStream("b"));
-        g.parse("A", new ANTLRStringStream("baa"));
+		final int Atype = g.getTokenType("A");
+		Interpreter engine = new Interpreter(g, new ANTLRStringStream("a"));
+		int result = engine.scan("A");
+        engine = new Interpreter(g, new ANTLRStringStream("a"));
+		result = engine.scan("A");
+		assertEqual(result, Atype);
+		engine = new Interpreter(g, new ANTLRStringStream("1234"));
+		result = engine.scan("A");
+		assertEqual(result, Atype);
+        engine = new Interpreter(g, new ANTLRStringStream("aaa"));
+		result = engine.scan("A");
+		assertEqual(result, Atype);
+        engine = new Interpreter(g, new ANTLRStringStream("aaaa9"));
+		result = engine.scan("A");
+		assertEqual(result, Atype);
+        engine = new Interpreter(g, new ANTLRStringStream("b"));
+		result = engine.scan("A");
+		assertEqual(result, Atype);
+        engine = new Interpreter(g, new ANTLRStringStream("baa"));
+		result = engine.scan("A");
+		assertEqual(result, Atype);
     }
-    */
+
 	public void testSimpleLoops() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
 				"A : ('0'..'9')+ '.' ('0'..'9')* | ('0'..'9')+ ;\n");
+		final int Atype = g.getTokenType("A");
 		CharStream input = new ANTLRStringStream("1234.5");
 		Interpreter engine = new Interpreter(g, input);
 		int result = engine.scan("A");
+		assertEqual(result, Atype);
 	}
 
 	public void testTokensRules() throws Exception {
-		Grammar g = new Grammar(
+		Grammar pg = new Grammar(
+			"grammar p;\n"+
+			"a : (INT|FLOAT|WS)+;\n");
+		Grammar g = new Grammar();
+		g.importTokenVocabulary(pg);
+		g.setGrammarContent(
 			"lexer grammar t;\n"+
 			"INT : (DIGIT)+ ;\n"+
 			"FLOAT : (DIGIT)+ '.' (DIGIT)* ;\n"+
@@ -100,21 +164,10 @@ public class TestInterpretedLexing extends TestSuite {
 		Interpreter lexEngine = new Interpreter(g, input);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
-		// TODO: doesn't work yet.  it sees:
-		// unexpected label '4' in dfa state 0:{13|4, 6|3, 4|2, 14|4, 2|1, 1|4}
-		// probably 4 is the token type and can't match against the dfa?
-		Grammar pg = new Grammar("grammar p; a : (INT|FLOAT|WS)+;\n");
+		System.out.println("stream="+tokens.toString());
 		Interpreter parseEngine = new Interpreter(pg, tokens);
-		parseEngine.parse("a");
-		//pg.parse("a", g);
-
-		/*
-		Token t = lexEngine.nextToken();
-		while ( t.getType()!=Token.EOF ) {
-			System.out.println(t.toString(input));
-			t = lexEngine.nextToken();
-		}
-		*/
+		ParseTree t = parseEngine.parse("a");
+		System.out.println(t);
 	}
 
 }

@@ -101,7 +101,10 @@ GrammarAST c=null;
 		    ( ACTION! )?
 	        r:rules
         EOF
-        {#grammar = #(null, #hdr, #(#gr, #cmt, #gid, #a, #opt, #r));}
+        {
+        #grammar = #(null, #hdr, #(#gr, #cmt, #gid, #a, #opt, #r));
+        g.setName(#gid.getText());
+        }
 	;
 
 headerSpec

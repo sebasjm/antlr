@@ -1,6 +1,7 @@
 package org.antlr.tool;
 
 import org.antlr.runtime.*;
+import org.antlr.runtime.tree.ParseTree;
 import org.antlr.analysis.*;
 import org.antlr.analysis.DFA;
 import antlr.RecognitionException;
@@ -17,6 +18,52 @@ import java.util.Stack;
 public class Interpreter implements TokenSource {
 	protected Grammar grammar;
 	protected IntStream input;
+
+	static class LexerActionGetTokenType implements InterpreterActions {
+		public int tokenType;
+		Grammar g;
+		public LexerActionGetTokenType(Grammar g) {
+			this.g = g;
+		}
+		public void exitRule(String ruleName) {
+			if ( !ruleName.equals(Grammar.TOKEN_RULENAME) ){
+				tokenType = g.getTokenType(ruleName);
+			}
+		}
+		public void enterRule(String ruleName) {}
+		public void matchElement(int type) {}
+		public void mismatchedElement(String msg) {}
+		public void noViableAlt(String msg) {}
+	}
+
+	static class BuildParseTree implements InterpreterActions {
+		Grammar g;
+		Stack callStack = new Stack();
+		public BuildParseTree(Grammar g) {
+			this.g = g;
+			ParseTree root = new ParseTree("<grammar "+g.getName()+">");
+			callStack.push(root);
+		}
+		public ParseTree getTree() {
+			return (ParseTree)callStack.elementAt(0);
+		}
+		public void enterRule(String ruleName) {
+			ParseTree parentRuleNode = (ParseTree)callStack.peek();
+			ParseTree ruleNode = new ParseTree(ruleName);
+			parentRuleNode.addChild(ruleNode);
+			callStack.push(ruleNode);
+		}
+		public void exitRule(String ruleName) {
+			callStack.pop();
+		}
+		public void matchElement(int type) {
+			ParseTree ruleNode = (ParseTree)callStack.peek();
+			ParseTree elementNode = new ParseTree(g.getTokenName(type));
+			ruleNode.addChild(elementNode);
+		}
+		public void mismatchedElement(String msg) {}
+		public void noViableAlt(String msg) {}
+	}
 
 	public Interpreter(Grammar grammar, IntStream input) {
 		this.grammar = grammar;
@@ -42,11 +89,13 @@ public class Interpreter implements TokenSource {
 		}
 		int stop = input.index()-1;
 		Token token = new CommonToken(type,Lexer.DEFAULT_CHANNEL,start,stop);
+		token.setLine(((CharStream)input).getLine());
+		token.setCharPositionInLine(((CharStream)input).getCharPositionInLine());
 		return token;
 	}
 
 	public CharStream getCharStream() {
-		return null;
+		return (CharStream)input;
 	}
 
 	/** For a given input char stream, try to match against the NFA
@@ -59,11 +108,11 @@ public class Interpreter implements TokenSource {
 	 *
 	 *  Return the token type associated with the final rule end state.
 	 */
-	public int scan(String startRule)
+	public void scan(String startRule, InterpreterActions actions)
 		throws RecognitionException
 	{
 		if ( grammar.getType()!=Grammar.LEXER ) {
-			return 0;
+			return;
 		}
 		CharStream input = (CharStream)this.input;
 		System.out.println("scan("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
@@ -78,7 +127,7 @@ public class Interpreter implements TokenSource {
 			catch (RecognitionException re) {
 				System.err.println("problems creating NFAs from grammar AST for "+
 								   grammar.getName());
-				return 0;
+				return;
 			}
 			// Create the DFA predictors for each decision
 			grammar.createLookaheadDFAs();
@@ -88,10 +137,18 @@ public class Interpreter implements TokenSource {
 		Stack ruleInvocationStack = new Stack();
 		NFAState start = grammar.getRuleStartState(startRule);
 		NFAState stop = grammar.getRuleStopState(startRule);
-		return parseEngine(start, stop, input, ruleInvocationStack);
+		parseEngine(startRule, start, stop, input, ruleInvocationStack, actions);
 	}
 
-	public void parse(String startRule)
+	public int scan(String startRule)
+		throws RecognitionException
+	{
+		LexerActionGetTokenType actions = new LexerActionGetTokenType(grammar);
+		scan(startRule, actions);
+		return actions.tokenType;
+	}
+
+	public void parse(String startRule, InterpreterActions actions)
 		throws RecognitionException
 	{
 		System.out.println("parse("+startRule+")");
@@ -115,15 +172,28 @@ public class Interpreter implements TokenSource {
 		Stack ruleInvocationStack = new Stack();
 		NFAState start = grammar.getRuleStartState(startRule);
 		NFAState stop = grammar.getRuleStopState(startRule);
-		parseEngine(start, stop, input, ruleInvocationStack);
+		parseEngine(startRule, start, stop, input, ruleInvocationStack, actions);
 	}
 
-	protected int parseEngine(NFAState start,
-							  NFAState stop,
-							  IntStream input,
-							  Stack ruleInvocationStack)
+	public ParseTree parse(String startRule)
 		throws RecognitionException
 	{
+		BuildParseTree actions = new BuildParseTree(grammar);
+		parse(startRule, actions);
+		return actions.getTree();
+	}
+
+	protected void parseEngine(String startRule,
+							   NFAState start,
+							   NFAState stop,
+							   IntStream input,
+							   Stack ruleInvocationStack,
+							   InterpreterActions actions)
+		throws RecognitionException
+	{
+		if ( actions!=null ) {
+			actions.enterRule(start.getEnclosingRule());
+		}
 		NFAState s = start;
 		int t = input.LA(1);
 		while ( s!=stop ) {
@@ -136,6 +206,10 @@ public class Interpreter implements TokenSource {
 				int predictedAlt = predict(dfa);
 				if ( predictedAlt == NFA.INVALID_ALT_NUMBER ) {
 					int position = input.index();
+					if ( actions!=null ) {
+						actions.noViableAlt("parsing error: no viable alternative at position="+position+
+										" input symbol: "+grammar.getTokenName(t));
+					}
 					throw new RecognitionException("parsing error: no viable alternative at position="+position+
 										" input symbol: "+grammar.getTokenName(t));
 				}
@@ -162,10 +236,13 @@ public class Interpreter implements TokenSource {
 
 			// CASE 2: finished matching a rule
 			if ( s.isAcceptState() ) { // end of rule node
+				if ( actions!=null ) {
+					actions.exitRule(s.getEnclosingRule());
+				}
 				if ( ruleInvocationStack.empty() ) {
 					// done parsing.  Hit the start state.
-					System.out.println("stack empty in stop state for "+s.getEnclosingRule());
-					return grammar.getTokenType(s.getEnclosingRule());
+					//System.out.println("stack empty in stop state for "+s.getEnclosingRule());
+					break;
 				}
 				// pop invoking state off the stack to know where to return to
 				NFAState invokingState = (NFAState)ruleInvocationStack.pop();
@@ -183,13 +260,22 @@ public class Interpreter implements TokenSource {
 				// CASE 3a: rule invocation state
 				if ( trans instanceof RuleClosureTransition ) {
 					ruleInvocationStack.push(s);
+					s = (NFAState)trans.getTarget();
+					if ( actions!=null ) {
+						actions.enterRule(s.getEnclosingRule());
+					}
 				}
 				// CASE 3b: plain old epsilon transition, just move
-				s = (NFAState)trans.getTarget();
+				else {
+					s = (NFAState)trans.getTarget();
+				}
 			}
 
 			// CASE 4: match label on transition
 			else if ( label.matches(t) ) {
+				if ( actions!=null ) {
+					actions.matchElement(t);
+				}
 				s = (NFAState)s.transition(0).getTarget();
 				input.consume();
 				t = input.LA(1);
@@ -198,12 +284,18 @@ public class Interpreter implements TokenSource {
 			// CASE 5: error condition; label is inconsistent with input
 			else {
 				int position = input.index();
+				if ( actions!=null ) {
+					actions.mismatchedElement("parsing error at position="+position+
+					" input symbol: "+grammar.getTokenName(t));
+				}
 				throw new RecognitionException("parsing error at position="+position+
 					" input symbol: "+grammar.getTokenName(t));
 			}
 		}
-		System.out.println("hit stop state for "+stop.getEnclosingRule());
-		return grammar.getTokenType(stop.getEnclosingRule());
+		//System.out.println("hit stop state for "+stop.getEnclosingRule());
+		if ( actions!=null ) {
+			actions.exitRule(stop.getEnclosingRule());
+		}
 	}
 
 	/** Given an input stream, return the unique alternative predicted by

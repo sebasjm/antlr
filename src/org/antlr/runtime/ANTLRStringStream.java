@@ -31,13 +31,24 @@ public class ANTLRStringStream implements CharStream {
     protected String input;
     protected int p=0;
 
+	/** line number 1..n within the input */
+	protected int line = 1;
+
+	/** The index of the character relative to the beginning of the line 0..n-1 */
+	protected int charPositionInLine = 0;
+
     public ANTLRStringStream(String input) {
         this.input = input;
     }
 
     public void consume() {
         if ( p< input.length() ) {
-            p++;
+			charPositionInLine++;
+			if ( input.charAt(p)=='\n' ) {
+				line++;
+				charPositionInLine=0;
+			}
+			p++;
         }
     }
 
@@ -75,5 +86,13 @@ public class ANTLRStringStream implements CharStream {
 
 	public String substring(int start, int stop) {
 		return input.substring(start,stop+1);
+	}
+
+	public int getLine() {
+		return line;
+	}
+
+	public int getCharPositionInLine() {
+		return charPositionInLine;
 	}
 }

@@ -66,6 +66,7 @@ protected void init() {
         String ruleName = (String) itr.next();
         NFAState ruleBeginState = factory.newState();
         ruleBeginState.setDescription("rule "+ruleName+" start");
+		ruleBeginState.setEnclosingRuleName(ruleName);
         grammar.setRuleStartState(ruleName, ruleBeginState);
         NFAState ruleEndState = factory.newState();
         ruleEndState.setDescription("rule "+ruleName+" end");
@@ -114,8 +115,8 @@ grammar
         (headerSpec)*
         #( "grammar"
            (DOC_COMMENT)?
-           ( t:TOKEN_REF {grammar.setName(#t.getText());}
-           | r:RULE_REF  {grammar.setName(#r.getText());}
+           ( t:TOKEN_REF
+           | r:RULE_REF
            )
            ( #(OPTIONS .) )?
            rules

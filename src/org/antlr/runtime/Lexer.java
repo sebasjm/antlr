@@ -35,12 +35,6 @@ public abstract class Lexer implements TokenSource {
 
 	protected StringBuffer inputBuffer;
 
-    /** line number 1..n within the input */
-	protected int line = 1;
-
-	/** The index of the character relative to the beginning of the line 0..n-1 */
-    protected int charPositionInLine = 0;
-
 	public Lexer(CharStream input) {
 		this.input = input;
 	}
@@ -72,13 +66,11 @@ public abstract class Lexer implements TokenSource {
             }
             i++;
             input.consume();
-			charPositionInLine++;
         }
     }
 
     public void matchAny() {
         input.consume();
-		charPositionInLine++;
     }
 
     public void match(int c) {
@@ -87,7 +79,6 @@ public abstract class Lexer implements TokenSource {
                     (char)input.LA(1)+"; expecting "+(char)c+"'");
         }
         input.consume();
-		charPositionInLine++;
     }
 
     public void matchRange(int x, int y) {
@@ -96,20 +87,14 @@ public abstract class Lexer implements TokenSource {
                     x+".."+y);
         }
         input.consume();
-		charPositionInLine++;
-    }
-
-    public void newline() {
-        line++;
-		charPositionInLine=0;
     }
 
     public int getLine() {
-        return line;
+        return input.getLine();
     }
 
     public int getCharPositionInLine() {
-        return charPositionInLine;
+        return input.getCharPositionInLine();
     }
 
 	/** What is the index of the current character of lookahead? */

@@ -4,8 +4,7 @@ import org.antlr.runtime.Token;
 
 /** A leaf node of a parse tree. */
 public class ParseTreeToken extends ParseTree {
-	protected Token token;
 	public ParseTreeToken(Token token) {
-		this.token = token;
+		super(token);
 	}
 }

@@ -70,7 +70,8 @@ public class CommonTokenStream implements TokenStream {
 		this.channel = channel;
 	}
 
-    public Token LT(int i) {
+    // TODO: does not filter!!!
+	public Token LT(int i) {
         //System.out.println("LT("+i+")="+LT(p, i));
         return LT(p, i);
     }
@@ -119,4 +120,16 @@ public class CommonTokenStream implements TokenStream {
     public void rewind(int marker) {
         p = marker;
     }
+
+	public String toString() {
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < tokens.size(); i++) {
+			Token t = (Token) tokens.get(i);
+			if ( i>0 ) {
+				buf.append(' ');
+			}
+			buf.append(t.toString(input.getCharStream()));
+		}
+		return buf.toString();
+	}
 }

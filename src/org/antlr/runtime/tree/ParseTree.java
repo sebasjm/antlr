@@ -5,4 +5,7 @@ package org.antlr.runtime.tree;
  *  All the work is done in the subclass ParseTreeRule and ParseTreeToken.
  */
 public class ParseTree extends CommonTree {
+	public ParseTree(Object label) {
+		super(label);
+	}
 }
