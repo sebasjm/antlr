@@ -29,6 +29,7 @@ package org.antlr.tool;
 
 import antlr.collections.AST;
 import antlr.RecognitionException;
+import antlr.TokenStreamRewriteEngine;
 
 import java.io.*;
 import java.util.*;
@@ -161,6 +162,19 @@ public class Grammar {
      */
     protected CodeGenerator generator;
 
+	/** For merged lexer/parsers, we must construct a separate lexer spec.
+	 *  This is the template for lexer; put the literals first then the
+	 *  regular rules.
+	 */
+	protected StringTemplate lexerGrammarST =
+		new StringTemplate(
+			"lexer grammar <name>Lexer(tokenVocab=<name>);\n" +
+			"\n" +
+			"<literals:{<it.ruleName> : <it.literal> ;\n}>\n" +
+			"<rules>",
+			AngleBracketTemplateLexer.class
+		);
+
     protected static int escapedCharValue[] = new int[255];
     protected static String charValueEscape[] = new String[255];
 
@@ -210,10 +224,30 @@ public class Grammar {
 	{
 		// BUILD AST FROM GRAMMAR
 		ANTLRLexer lexer = new ANTLRLexer(r);
-		ANTLRParser parser = new ANTLRParser(lexer, this);
+		// use the rewrite engine because we want to buffer up all tokens
+		// in case they have a merged lexer/parser, send lexer rules to
+		// new grammar.
+		lexer.setTokenObjectClass("antlr.TokenWithIndex");
+		TokenStreamRewriteEngine tokenBuffer =
+			new TokenStreamRewriteEngine(lexer);
+		ANTLRParser parser = new ANTLRParser(tokenBuffer, this);
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
+	}
+
+	/** If the grammar is a merged grammar, return the text of the implicit
+	 *  lexer grammar.
+	 */
+	public String getLexerGrammar() {
+		if ( lexerGrammarST.getAttribute("literals")==null &&
+			 lexerGrammarST.getAttribute("rules")==null )
+		{
+			// if no rules, return nothing
+			return null;
+		}
+		lexerGrammarST.setAttribute("name", getName());
+		return lexerGrammarST.toString();
 	}
 
     /** Parse a rule we add artificially that is a list of the other lexer
@@ -247,7 +281,10 @@ public class Grammar {
 		System.out.println("rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
-        ANTLRParser parser = new ANTLRParser(lexer, this);
+		lexer.setTokenObjectClass("antlr.TokenWithIndex");
+		TokenStreamRewriteEngine tokenBuffer =
+			new TokenStreamRewriteEngine(lexer);
+        ANTLRParser parser = new ANTLRParser(tokenBuffer, this);
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
         try {
             parser.rule();
@@ -529,15 +566,15 @@ public class Grammar {
      */
     public void defineToken(String text, int tokenType) {
         //System.out.println("defining token "+text+" at type="+tokenType);
-        // There is a hole between the faux labels (negative numbers)
-        // and the first token type.  We skip over the valid 16-bit char values.
         int index = Label.NUM_FAUX_LABELS+(tokenType)-Label.MIN_TOKEN_TYPE;
         if ( text.charAt(0)=='"' ) {
             stringLiteralToTypeMap.put(text, new Integer(tokenType));
+			defineLexerRuleForStringLiteral(text, tokenType);
         }
         else if ( text.charAt(0)=='\'' ) {
             charLiteralToTypeMap.put(text, new Integer(tokenType));
             index = tokenType; // for char, token type is as sent in
+			defineLexerRuleForCharLiteral(text, tokenType);
         }
         else { // must be a label like ID
             tokenNameToTypeMap.put(text, new Integer(tokenType));
@@ -549,7 +586,7 @@ public class Grammar {
     /** Define a new token name, string or char literal token.
      *  A new token type is created by incrementing tokenType.
      *  Do nothing though if we've seen this token before or
-     *  if the token is a string and we are in a lexer grammar.
+     *  if the token is a string/char and we are in a lexer grammar.
      *  In a lexer, strings are simply matched and do not define
      *  a new token type.  Strings have token types in the lexer
      *  only when they are imported from another grammar such as
@@ -566,14 +603,13 @@ public class Grammar {
 		int ttype = getTokenType(text);
 		if ( ttype==Label.INVALID ) {
 			//System.out.println("defineToken("+text+")");
-			if ( (text.charAt(0)=='"'&&stringLiteralToTypeMap.get(text)==null) ||
-				tokenNameToTypeMap.get(text)==null )
-			{
+			// if not in the lexer, then literals become token types
+			boolean isLiteral = text.charAt(0)=='"'||text.charAt(0)=='\'';
+			if ( getType()!=LEXER || !isLiteral ) {
 				ttype = this.tokenType;
 				defineToken(text, this.tokenType);
 				this.tokenType++;
 			}
-
 		}
         return ttype;
     }
@@ -610,7 +646,27 @@ public class Grammar {
         ruleIndexToRuleList.set(ruleIndex, ruleName);
         ruleIndex++;
         return ruleIndex;
-    }
+	}
+
+	public void defineLexerRuleFoundInParser(String ruleName, String ruleText) {
+		lexerGrammarST.setAttribute("rules", ruleText);
+	}
+
+	public void defineLexerRuleForStringLiteral(String literal, int tokenType) {
+		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
+									computeTokenNameFromLiteral(tokenType,literal),
+									new Integer(tokenType),
+									literal);
+		defineToken(computeTokenNameFromLiteral(tokenType, literal), tokenType);
+	}
+
+	public void defineLexerRuleForCharLiteral(String literal, int tokenType) {
+		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
+									computeTokenNameFromLiteral(tokenType,literal),
+									new Integer(tokenType),
+									literal);
+		defineToken(computeTokenNameFromLiteral(tokenType, literal), tokenType);
+	}
 
 	protected Rule getRule(String ruleName) {
 		Rule r = (Rule)nameToRuleMap.get(ruleName);
@@ -651,10 +707,6 @@ public class Grammar {
 
     public Set getTokenNames() {
         return tokenNameToTypeMap.keySet();
-    }
-
-    public Set getStringLiterals() {
-        return stringLiteralToTypeMap.keySet();
     }
 
     /** Return a set of all possible token types for this grammar */
@@ -999,6 +1051,13 @@ public class Grammar {
     public void setType(int type) {
         this.type = type;
     }
+
+	/** given a token type and the text of the literal, come up with a
+	 *  decent token type label.  For now it's just T<type>.
+	 */
+	public String computeTokenNameFromLiteral(int tokenType, String literal) {
+		return "T"+tokenType;
+	}
 
     public String toString() {
         return grammarTreeToString(grammarTree);

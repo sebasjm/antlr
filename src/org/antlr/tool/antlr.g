@@ -31,6 +31,7 @@ import java.util.*;
 import java.io.*;
 import org.antlr.analysis.*;
 import org.antlr.misc.*;
+import antlr.*;
 }
 
 /** Read in an ANTLR grammar and build an AST.  For now, I'm ignoring
@@ -74,6 +75,7 @@ tokens {
 
 {
 Grammar g = null;
+TokenStreamRewriteEngine tokenBuffer = null;
 
     public void reportError(RecognitionException ex) {
         System.out.println("buildast: "+ex.toString());
@@ -85,6 +87,7 @@ Grammar g = null;
 
 public ANTLRParser(TokenStream in, Grammar g) {
     this(in);
+	tokenBuffer = (TokenStreamRewriteEngine)in;
     this.g = g;
 }
 }
@@ -163,9 +166,14 @@ charSetElement
 	|   c2:CHAR_LITERAL RANGE^ c3:CHAR_LITERAL
 	;
 
+/** A list of token types (later I'll add options on tokens).  No longer
+ *  do we allow string literals.
+ */
 tokensSpec
 	:	TOKENS
-			(	(	t1:TOKEN_REF
+			(	t:TOKEN_REF {g.defineToken(t.getText());}
+				/*
+				(	t1:TOKEN_REF
 					( ASSIGN s1:STRING_LITERAL )? // (tokensSpecOptions)?
                     {
                     int ttype = g.defineToken(t1.getText());
@@ -174,6 +182,7 @@ tokensSpec
 				|	s3:STRING_LITERAL // (tokensSpecOptions)?
                     {g.defineToken(s3.getText());}
 				)
+				*/
 				SEMI
 			)+
 		RCURLY
@@ -203,6 +212,7 @@ rule!
 {
 	String modifier=null;
     Map opts = null;
+    int start=((TokenWithIndex)LT(1)).getIndex(), stop;
 }
 	:
 	(	d:DOC_COMMENT	
@@ -224,12 +234,20 @@ rule!
 	COLON b:altList SEMI
 	( exceptionGroup )?
     {
-   	int ruleIndex = g.defineRule(#ruleName.getText(), modifier, opts);
-    if ( ruleIndex!=Grammar.INVALID_RULE_INDEX ) {
-        GrammarAST eor = #[EOR,"<end-of-rule>"];
-        eor.setEnclosingRule(#ruleName.getText());
-        #rule = #(#[RULE,"rule"],#ruleName,#b,eor);
-        g.setRuleAST(#ruleName.getText(), #rule);
+    stop = ((TokenWithIndex)LT(1)).getIndex()-1;
+    String name = #ruleName.getText();
+    if ( Character.isUpperCase(name.charAt(0)) && g.getType()==Grammar.PARSER ) {
+    	// a merged grammar spec, track lexer rules and send to another grammar
+    	g.defineLexerRuleFoundInParser(name, tokenBuffer.toOriginalString(start,stop));
+    }
+   	else {
+   		int ruleIndex = g.defineRule(#ruleName.getText(), modifier, opts);
+	    if ( ruleIndex!=Grammar.INVALID_RULE_INDEX ) {
+    	    GrammarAST eor = #[EOR,"<end-of-rule>"];
+        	eor.setEnclosingRule(#ruleName.getText());
+        	#rule = #(#[RULE,"rule"],#ruleName,#b,eor);
+        	g.setRuleAST(#ruleName.getText(), #rule);
+    	}
     }
     }
 	;
@@ -455,14 +473,14 @@ range!
 	;
 
 terminal
-    :   cl:CHAR_LITERAL ( BANG! )?
+    :   cl:CHAR_LITERAL ( BANG! )? {g.defineToken(cl.getText());}
 
 	|   tr:TOKEN_REF {g.defineToken(tr.getText());}
 		ast_type_spec!
 		// Args are only valid for lexer
 		( ARG_ACTION! )?
 
-	|   sl:STRING_LITERAL {if (g.getType()!=Grammar.LEXER) {g.defineToken(sl.getText());}}
+	|   sl:STRING_LITERAL {g.defineToken(sl.getText());}
 		ast_type_spec!
 
 	|   wi:WILDCARD ast_type_spec!
@@ -791,7 +809,8 @@ ACTION
 	:	NESTED_ACTION
 		(	'?'!	{_ttype = SEMPRED;} )?
 		{
-			CommonToken t = new CommonToken(_ttype,$getText);
+			Token t = makeToken(_ttype);
+			t.setText($getText);
 			t.setLine(actionLine);			// set action line to start
 			t.setColumn(actionColumn);
 			$setToken(t);

@@ -74,7 +74,7 @@ public void m<name>(<args>)
     int start = getCharIndex();
     int line = getLine();
     int charPosition = getCharPositionInLine();
-    int channel = DEFAULT_CHANNEL;
+    int channel = Token.DEFAULT_CHANNEL;
 	<block>
     if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}<\n>
 <endif>

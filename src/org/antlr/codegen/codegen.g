@@ -293,8 +293,17 @@ atom returns [StringTemplate code=null]
                        }
                        }
 
-    |   c:CHAR_LITERAL  {code = templates.getInstanceOf("charRef");
-                         code.setAttribute("char", c.getText());}
+    |   c:CHAR_LITERAL  {
+                            if ( grammar.getType()==Grammar.LEXER ) {
+                                code = templates.getInstanceOf("charRef");
+                                code.setAttribute("char", c.getText());
+                            }
+                            else { // else it's a token type reference
+                                code = templates.getInstanceOf("tokenRef");
+                                code.setAttribute("token",
+                                                 new Integer(grammar.getTokenType(c.getText())));
+                            }
+                        }
 
     |   s:STRING_LITERAL{
                         if ( grammar.getType()==Grammar.LEXER ) {

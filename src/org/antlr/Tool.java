@@ -107,26 +107,41 @@ public class Tool {
             br.close();
             fr.close();
 
-            String language = (String)grammar.getOption("language");
-            if ( language!=null ) {
-                CodeGenerator generator = new CodeGenerator(this, grammar, language);
-                grammar.setCodeGenerator(generator);
+			processGrammar(grammar);
 
-                if ( grammar.getType()==Grammar.LEXER ) {
-                    grammar.addArtificialMatchTokensRule();
-                }
+			// now handle the lexer if one was created for a merged spec
 
-                generator.genRecognizer();
-            }
-
-            new DOTGenerator(grammar).writeDOTFilesForAllRuleNFAs();
-        }
+			String lexerGrammarStr = grammar.getLexerGrammar();
+			if ( lexerGrammarStr!=null ) {
+				System.out.println("lexer="+lexerGrammarStr);
+				StringReader sr = new StringReader(lexerGrammarStr);
+				Grammar lexerGrammar = new Grammar(sr);
+				sr.close();
+				processGrammar(lexerGrammar);
+			}
+		}
         catch (Exception e) {
-            toolError("error processing file", e);
+            toolError("error processing file "+grammarFileName, e);
         }
     }
 
-    private static void help() {
+	protected void processGrammar(Grammar grammar) throws IOException {
+		String language = (String)grammar.getOption("language");
+		if ( language!=null ) {
+			CodeGenerator generator = new CodeGenerator(this, grammar, language);
+			grammar.setCodeGenerator(generator);
+
+			if ( grammar.getType()==Grammar.LEXER ) {
+				grammar.addArtificialMatchTokensRule();
+			}
+
+			generator.genRecognizer();
+		}
+
+		new DOTGenerator(grammar).writeDOTFilesForAllRuleNFAs();
+	}
+
+	private static void help() {
         System.err.println("usage: java org.antlr.Tool [args] file.g");
         System.err.println("  -o outputDir       specify output directory where all output generated.");
         System.err.println("  -glib inputDir     specify location of token files, grammars");
