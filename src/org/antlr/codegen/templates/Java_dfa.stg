@@ -1,7 +1,10 @@
 group Java_dfa;
 
-dfaDecision(decisionNumber,description) ::=
-  "alt<decisionNumber> = DFA.DFA<decisionNumber>(input);"
+dfaDecision(decisionNumber,description) ::= <<
+int m<decisionNumber> = input.mark();
+alt<decisionNumber> = DFA.DFA<decisionNumber>(input);
+input.rewind(m<decisionNumber>);
+>>
 
 allCyclicDFAs(DFAs) ::= <<
 .method \<init> ()V 1
