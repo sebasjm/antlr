@@ -23,14 +23,14 @@ allCyclicDFAs(cyclicDFAs) ::= <<
 
  no "this" as it's static.
 */
-cyclicDFA(className,decision,states,description) ::= <<
-; public static int DFA<decision>(IntStream,Parser); // maxstack=6, locals+param=4
-.method DFA<decision> (Lorg/antlr/runtime/IntStream;L<className>;)I 6 4
+cyclicDFA(className,decisionNumber,states,description) ::= <<
+; public static int DFA<decisionNumber>(IntStream,Parser); // maxstack=6, locals+param=4
+.method DFA<decisionNumber> (Lorg/antlr/runtime/IntStream;L<className>;)I 6 4
 ;    getstatic java/lang/System.err Ljava/io/PrintStream;
 ;    ldc "enter DFA "
 ;    invokevirtual java/io/PrintStream.print(Ljava/lang/String;)V
 ;    getstatic java/lang/System.err Ljava/io/PrintStream;
-;    iconst <decision> 
+;    iconst <decisionNumber> 
 ;    invokevirtual java/io/PrintStream.println(I)V
     goto s0
 errorState:
@@ -47,7 +47,7 @@ errorState:
     new org/antlr/runtime/NoViableAltException
     dup
     ldc "<description>"
-    iconst <decision>
+    iconst <decisionNumber>
 ; error state recorded in local var at error site
     iload 3
     aload 0
@@ -159,13 +159,13 @@ singlePredicate(pred) ::= "<pred>"
 invokePredicate(pred) ::= <<
 ; predicate: <pred>
     aload 1
-    invokevirtual <className>.pred_DFA<decision>s<stateNumber>e<edgeNumber>()Z
+    invokevirtual <className>.pred_DFA<decisionNumber>s<stateNumber>e<edgeNumber>()Z
     iconst 1
     if_icmpeq s<stateNumber>e<edgeNumber>_go
 >>
 
-singlePredicateMethod(decision,stateNumber,edgeNumber,pred) ::= <<
-public boolean pred_DFA<decision>s<stateNumber>e<edgeNumber>() {return <pred>;}
+singlePredicateMethod(decisionNumber,stateNumber,edgeNumber,pred) ::= <<
+public boolean pred_DFA<decisionNumber>s<stateNumber>e<edgeNumber>() {return <pred>;}
 >>
 
 lookaheadTest(atom,k,atomAsInt) ::= <<
