@@ -57,6 +57,8 @@ import java.io.IOException;
  *  This only handles bytecodes necessary for my DFA code generation.
  */
 public class MethodAssembler {
+	public static final int MAX_INSTR_ELEMENTS = 5; // size of .method instr
+
 	// bytecode instructions
 	public static final int GOTO_W = 200;
 	protected static Map nameToOpcode = new HashMap();
@@ -276,11 +278,13 @@ public class MethodAssembler {
 		else if ( v>=0 && v<=5 ) {
             code = new int[] {getOpcode("iconst_"+v)};
 		}
-		else if ( v>5 && v<=0xFF ) {
+		else if ( v>=-128 && v<=127 ) { // 8-bit signed int
 			code = new int[] {getOpcode("bipush"),v};
 		}
-		else if ( v>5 && v<=0xFFFF ) {
-			code = new int[] {getOpcode("sipush"),v};
+		else if ( v>=-32768 && v<=32767 ) { // 16-bit signed int
+			code = new int[] {getOpcode("sipush"),
+							  secondHighByte(v),
+							  lowByte(v)};
 		}
 		else {
 			// generic integer constant; ref constant pool
@@ -340,8 +344,11 @@ public class MethodAssembler {
 		if ( operand.indexOf('"')>=0 ) {
 			// it's a "push string" operation; must look up in constant pool
 			// first remove quotes
-			operand = operand.substring(1,operand.length()-1);
+			operand = operand.substring(1,operand.length());
 			int literalIndex = classFile.indexOfLiteral(operand);
+			if ( literalIndex==0 ) {
+				ErrorManager.internalError("ldc <string> can't find '"+operand+"'");
+			}
 			if ( literalIndex>=0 && literalIndex<Byte.MAX_VALUE ) {
 				code = new int[] {getOpcode("ldc"), literalIndex};
 			}
@@ -595,7 +602,7 @@ public class MethodAssembler {
 	 *  This amounts to the lexer for the assembler.
 	 */
 	public static String[] getInstructionElements(String instr) {
-		String[] elements = new String[4]; // 4 is max number of elements
+		String[] elements = new String[MAX_INSTR_ELEMENTS];
 		try {
 			int firstQuoteIndex = instr.indexOf('"');
 			if ( firstQuoteIndex>=0 ) {

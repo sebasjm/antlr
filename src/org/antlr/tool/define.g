@@ -72,7 +72,7 @@ protected List lexerRules = new LinkedList();
 		// prev points at last node before first rule subtree at this point
 		while ( p!=null ) {
 			String ruleName = p.getFirstChild().getText();
-			System.out.println("rule "+ruleName+" prev="+prev.getText());
+			//System.out.println("rule "+ruleName+" prev="+prev.getText());
 			if ( Character.isUpperCase(ruleName.charAt(0)) ) {
 				// remove lexer rule
 				prev.setNextSibling(p.getNextSibling());

@@ -124,6 +124,7 @@ public class ErrorManager {
 	public static final int MSG_BYTECODE_MISSING_METHOD_NAME = 48;
 	public static final int MSG_BYTECODE_MISSING_METHOD_SIG = 49;
 	public static final int MSG_BYTECODE_MISSING_METHOD_MAXSTACK = 50;
+	public static final int MSG_BYTECODE_MISSING_METHOD_MAXLOCALS = 51;
 
 	// GRAMMAR ERRORS
 	public static final int MSG_SYNTAX_ERROR = 100;

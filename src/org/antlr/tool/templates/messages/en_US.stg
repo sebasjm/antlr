@@ -54,6 +54,7 @@ BYTECODE_MISSING_METHOD(arg) ::= "missing .method instruction"
 BYTECODE_MISSING_METHOD_NAME(arg) ::= "missing .method name"
 BYTECODE_MISSING_METHOD_SIG(arg) ::= "missing .method signature"
 BYTECODE_MISSING_METHOD_MAXSTACK(arg) ::= "missing .method maxstack value"
+BYTECODE_MISSING_METHOD_MAXLOCALS(arg) ::= "missing .method locals value"
 
 // GRAMMAR ERRORS
 SYNTAX_ERROR() ::= "syntax error"

@@ -517,7 +517,7 @@ public class ClassFile {
 		}
 		else if ( op.equals("ldc") ) {
 			if ( elements[1]!=null && elements[1].charAt(0)=='"' ) {
-				String lit = elements[1].substring(1,elements[1].length()-1);
+				String lit = elements[1].substring(1,elements[1].length());
 				constantPoolLiterals.add(lit);
 			}
 		}
@@ -574,6 +574,10 @@ public class ClassFile {
 			ErrorManager.error(ErrorManager.MSG_BYTECODE_MISSING_METHOD_MAXSTACK);
 		}
 		method.maxStack = Integer.parseInt(st.nextToken());
+		if ( !st.hasMoreTokens() ) {
+			ErrorManager.error(ErrorManager.MSG_BYTECODE_MISSING_METHOD_MAXLOCALS);
+		}
+		method.maxLocals = Integer.parseInt(st.nextToken());
 		constantPoolStrings.add(method.name);
 		constantPoolStrings.add(method.signature);
 	}

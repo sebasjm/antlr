@@ -337,7 +337,7 @@ public class Grammar {
             	matchTokenRuleST.setAttribute("rules", r.name);
 			}
         }
-		//System.out.println("tokens rule: "+matchTokenRuleST.toString());
+		System.out.println("tokens rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
