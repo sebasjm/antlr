@@ -37,7 +37,7 @@ s<stateNumber>e<edgeNumber>:
 <labelExpr>
 s<stateNumber>e<edgeNumber>_go:
     aload 0
-    invokeinterface IntegerStream.consume() 1
+    invokeinterface IntegerStream.consume 1
     goto s<targetStateNumber>
 s<stateNumber>e<edgeNumber>_skip:
 >>
