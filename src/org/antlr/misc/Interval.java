@@ -29,14 +29,10 @@ package org.antlr.misc;
 
 /** An immutable inclusive interval a..b */
 public class Interval {
-    private int a;
-    private int b;
+    public int a;
+    public int b;
 
     public Interval(int a, int b) { this.a=a; this.b=b; }
-
-    public int getA() { return a; }
-
-    public int getB() { return b; }
 
     public boolean equals(Object o) {
         Interval other = (Interval)o;
@@ -99,13 +95,13 @@ public class Interval {
         Interval diff = null;
         // other.a to left of this.a (or same)
         if ( other.startsBeforeNonDisjoint(this) ) {
-            diff = new Interval(Math.max(this.getA(),other.getB()+1),
-                                this.getB());
+            diff = new Interval(Math.max(this.a,other.b+1),
+                                this.b);
         }
 
         // other.a to right of this.a
         else if ( other.startsAfterNonDisjoint(this) ) {
-            diff = new Interval(this.getA(), other.getA()-1);
+            diff = new Interval(this.a, other.a-1);
         }
         return diff;
     }

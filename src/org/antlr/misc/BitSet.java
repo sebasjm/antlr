@@ -50,6 +50,8 @@ import org.antlr.tool.Grammar;
  * @author Terence Parr
  */
 public class BitSet implements IntSet, Cloneable {
+	public static final BitSet empty = new BitSet();
+
     protected final static int BITS = 64;    // number of bits / long
     protected final static int NIBBLE = 4;
     protected final static int LOG_BITS = 6; // 2^6 == 64
@@ -97,7 +99,15 @@ public class BitSet implements IntSet, Cloneable {
         if ( set instanceof BitSet ) {
             this.orInPlace((BitSet)set);
         }
-        throw new IllegalArgumentException("can't add non BitSet to BitSet");
+		if ( set instanceof IntervalSet ) {
+			IntervalSet other = (IntervalSet)set;
+			// walk set and add each interval
+			for (Iterator iter = other.intervals.iterator(); iter.hasNext();) {
+				Interval I = (Interval) iter.next();
+				this.orInPlace(BitSet.range(I.a,I.b));
+			}
+		}
+		throw new IllegalArgumentException("can't add "+set.getClass().getName()+" to BitSet");
     }
 
     public void addAll(int[] elements) {
@@ -296,6 +306,18 @@ public class BitSet implements IntSet, Cloneable {
         }
         return s;
     }
+
+	public static BitSet of(IntSet set) {
+		if ( set instanceof BitSet ) {
+			return (BitSet)set;
+		}
+		if ( set instanceof IntervalSet ) {
+			BitSet s = new BitSet();
+			s.addAll(set);
+			return s;
+		}
+		throw new IllegalArgumentException("can't create BitSet from "+set.getClass().getName());
+	}
 
     public static BitSet of(Map elements) {
         BitSet s = new BitSet();

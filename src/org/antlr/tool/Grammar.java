@@ -34,14 +34,15 @@ import antlr.TokenWithIndex;
 
 import java.io.*;
 import java.util.*;
+import java.util.BitSet;
+
 import org.antlr.analysis.*;
 import org.antlr.analysis.DFA;
 import org.antlr.runtime.*;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.misc.IntSet;
-import org.antlr.misc.IntervalSet;
+import org.antlr.misc.*;
 
 /** Represents a grammar in memory. */
 public class Grammar {
@@ -413,6 +414,12 @@ public class Grammar {
 		}
 		catch (IOException ioe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE, ioe);
+		}
+
+		for (Iterator itr = getRules().iterator(); itr.hasNext();) {
+			Grammar.Rule r = (Grammar.Rule) itr.next();
+			System.out.println("FOLLOW("+r.name+")="+
+							   reachable(r.stopState).toString());
 		}
 	}
 
@@ -964,6 +971,44 @@ public class Grammar {
         }
         return null;
     }
+
+	Set reachableBusy;
+	public org.antlr.misc.BitSet reachable(NFAState s) {
+		reachableBusy = new HashSet();
+		return _reachable(s);
+	}
+
+	/** From an NFA state, s, find the set of all labels reachable from s.
+	 *  This computes FIRST, FOLLOW and any other lookahead computation
+	 *  depending on where s is.  For example, if s is the end of rule node,
+	 *  this will return the FOLLOW set.  Use BitSet implementation as this
+	 *  will only be used on parser and tree parser grammars.
+	 */
+	protected org.antlr.misc.BitSet _reachable(NFAState s) {
+		if ( reachableBusy.contains(s) ) {
+			return org.antlr.misc.BitSet.empty;
+		}
+		reachableBusy.add(s);
+		Transition transition0 = s.transition(0);
+		if ( transition0==null ) {
+			return null;
+		}
+
+		if ( transition0.label.isAtom() ) {
+			return org.antlr.misc.BitSet.of(transition0.label.getAtom());
+		}
+		if ( transition0.label.isSet() ) {
+			return org.antlr.misc.BitSet.of(transition0.label.getSet());
+		}
+        org.antlr.misc.BitSet tset = reachable((NFAState)transition0.target);
+
+		Transition transition1 = s.transition(1);
+		if ( transition1!=null ) {
+			org.antlr.misc.BitSet tset1 = reachable((NFAState)transition1.target);
+			tset.orInPlace(tset1);
+		}
+		return tset;
+	}
 
     public void setCodeGenerator(CodeGenerator generator) {
         this.generator = generator;

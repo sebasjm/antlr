@@ -513,8 +513,8 @@ public class CodeGenerator {
         int rangeNumber = 1;
 		while (iter.hasNext()) {
             Interval I = (Interval) iter.next();
-            int a = I.getA();
-            int b = I.getB();
+            int a = I.a;
+            int b = I.b;
 			StringTemplate eST;
             if ( a==b ) {
                 eST = templates.getInstanceOf("lookaheadTest");

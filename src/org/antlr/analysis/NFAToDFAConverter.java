@@ -28,11 +28,11 @@
 package org.antlr.analysis;
 
 import org.antlr.misc.*;
+import org.antlr.misc.BitSet;
 import org.antlr.tool.ANTLRParser;
 import org.antlr.tool.Grammar;
 
 import java.util.*;
-import java.util.BitSet;
 
 /** Code that embodies the NFA conversion to DFA. */
 public class NFAToDFAConverter {
@@ -620,7 +620,6 @@ public class NFAToDFAConverter {
 		}
 		return labelDFATarget;
 	}
-
 
 	/** Walk the configurations of this DFA state d looking for the
 	 *  configuration, c, that has a transition on EOT.  State d should

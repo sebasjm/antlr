@@ -52,6 +52,7 @@ import java.util.Iterator;
  *  The ranges are ordered and disjoint so that 2..6 appears before 101..103.
  */
 public class IntervalSet implements IntSet {
+    public static final IntervalSet empty = new IntervalSet();
 
     /** The list of sorted, disjoint intervals. */
     protected List intervals;
@@ -127,7 +128,7 @@ public class IntervalSet implements IntSet {
 
     protected void add(Interval addition) {
         //System.out.println("add "+addition+" to "+intervals.toString());
-        if ( addition.getB()<addition.getA() ) {
+        if ( addition.b<addition.a ) {
             return;
         }
         // find position in list
@@ -193,7 +194,7 @@ public class IntervalSet implements IntSet {
         // walk set and add each interval
         for (Iterator iter = other.intervals.iterator(); iter.hasNext();) {
             Interval I = (Interval) iter.next();
-            this.add(I);
+            this.add(I.a,I.b);
         }
     }
 
@@ -284,12 +285,12 @@ public class IntervalSet implements IntSet {
                 // CASE 2: theirs breaks mine into two chunks
                 if ( mine.properlyContains(theirs) ) {
                     // must add two intervals: stuff to left and stuff to right
-                    diff.add(mine.getA(), theirs.getA()-1);
+                    diff.add(mine.a, theirs.a-1);
                     // don't actually add stuff to right yet as next 'theirs'
                     // might overlap with it
                     // The stuff to the right might overlap with next "theirs".
                     // so it is considered next
-                    Interval right = new Interval(theirs.getB()+1, mine.getB());
+                    Interval right = new Interval(theirs.b+1, mine.b);
                     mine = right;
                     // move theirs forward
                     theirs = null;
@@ -315,7 +316,7 @@ public class IntervalSet implements IntSet {
                     // update iterators
                     boolean moveTheirs = true;
                     if ( mine.startsBeforeNonDisjoint(theirs) ||
-                         theirs.getB() > mine.getB() )
+                         theirs.b > mine.b )
                     {
                         // uh oh, right of theirs extends past right of mine
                         // therefore could overlap with next of mine so don't
@@ -339,7 +340,8 @@ public class IntervalSet implements IntSet {
         return diff;
     }
 
-    public IntSet or(IntSet a) {
+    /** TODO: implement this! */
+	public IntSet or(IntSet a) {
         return null;
     }
 
@@ -419,10 +421,10 @@ public class IntervalSet implements IntSet {
     public boolean member(int el) {
         for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
             Interval I = (Interval) iter.next();
-            if ( el<I.getA() ) {
+            if ( el<I.a ) {
                 break; // list is sorted and el is before this interval; not here
             }
-            if ( el>=I.getA() && el<=I.getB() ) {
+            if ( el>=I.a && el<=I.b ) {
                 return true; // found in this interval
             }
         }
@@ -438,8 +440,8 @@ public class IntervalSet implements IntSet {
     public int getSingleElement() {
         if ( intervals!=null && intervals.size()==1 ) {
             Interval I = (Interval)intervals.get(0);
-            if ( I.getA() == I.getB() ) {
-                return I.getA();
+            if ( I.a == I.b ) {
+                return I.a;
             }
         }
         return Label.INVALID;
@@ -478,8 +480,8 @@ public class IntervalSet implements IntSet {
         Iterator iter = this.intervals.iterator();
         while (iter.hasNext()) {
             Interval I = (Interval) iter.next();
-            int a = I.getA();
-            int b = I.getB();
+            int a = I.a;
+            int b = I.b;
             if ( a==b ) {
                 if ( g!=null ) {
                     buf.append(g.getTokenName(a));
