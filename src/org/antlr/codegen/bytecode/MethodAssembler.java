@@ -468,7 +468,12 @@ public class MethodAssembler {
 		return code;
 	}
 
-	/** lookupswitch s1_default 46/s1e3_go 59/s1e1_go 120/s1e2_go */
+	/** lookupswitch s1_default 46/s1e3_go 59/s1e1_go 120/s1e2_go.
+	 *  Limitation: can only use labels that are previously defined;
+	 *  no forward references.  Easy to fix probably by calling
+	 *  referenceLabel, but I didn't want to figure out if it would
+	 *  work for this complicated instruction vs a branch.
+	 */
 	protected int[] lookupswitch(Instruction instr) {
 		int lookupSwitchPC = pc;
 		// FIRST: compute instruction size
@@ -481,7 +486,6 @@ public class MethodAssembler {
 				numCases++;
 			}
 		}
-		System.out.println("there are "+numCases+" cases");
 		int[] code = new int[(1+padding)+4+4+(2*4)*numCases];
 		// SECOND: parse instruction to get the value:label pairs
 		StringTokenizer tokenizer = new StringTokenizer(instr.assemblyCode," \t/");
@@ -499,7 +503,7 @@ public class MethodAssembler {
 		while ( tokenizer.hasMoreTokens() ) {
 			String value = tokenizer.nextToken();
 			String labelName = tokenizer.nextToken();
-			System.out.println(value+":"+labelName);
+			//System.out.println(value+":"+labelName);
 			writeInt(code, a, Integer.parseInt(value));
 			a += 4;
 			writeInt(code, a, lookupAddress(labelName)-lookupSwitchPC);
