@@ -50,6 +50,8 @@ public class NFAFactory {
      */
 	NFA nfa = null;
 
+	String currentRuleName = null;
+
     /** Used to assign state numbers */
     protected int stateCounter = 0;
 
@@ -64,6 +66,7 @@ public class NFAFactory {
         n.stateNumber = state;
         stateCounter++;
         nfa.addState(n);
+		n.setEnclosingRuleName(currentRuleName);
         return n;
     }
 

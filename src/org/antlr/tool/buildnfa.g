@@ -151,7 +151,7 @@ rule
     String r=null;
 }
     :   #( RULE id:ID {r=#id.getText();}
-		{currentRuleName = r;}
+		{currentRuleName = r; factory.currentRuleName = r;}
 		(modifier)?
         (ARG (ARG_ACTION)?)
         (RET (ARG_ACTION)?)
