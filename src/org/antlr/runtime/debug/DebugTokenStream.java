@@ -57,6 +57,7 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public int LA(int i) {
+		dbg.LT(i);
 		return input.LA(i);
 	}
 
