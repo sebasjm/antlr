@@ -74,10 +74,12 @@ public class DFAState extends State {
      */
     protected List transitions = new ArrayList(INITIAL_NUM_TRANSITIONS);
 
-    /** Does this DFA state represent a stop state that predicts which
-     *  alternative to choose?
-    protected boolean acceptState = false;
-     */
+	/** When doing an acyclic DFA, this is the number of lookahead symbols
+	 *  consumed to reach this state.  This value may be nonzero for most
+	 *  dfa states, but it is only a valid value if the user has specified
+	 *  a max fixed lookahead.
+	 */
+    public int k;
 
     /** The NFA->DFA algorithm may terminate leaving some states
      *  without a path to an accept state, implying that upon certain
@@ -430,6 +432,18 @@ public class DFAState extends State {
 		return n;
 	}
 
+	protected Set getNondeterministicAlts() {
+		int maxk = dfa.getUserMaxLookahead();
+		if ( maxk>0 && maxk==k ) {
+			// if fixed lookahead, then more than 1 alt is a nondeterminism
+			// if we have hit the max lookahead
+			return getAltSet();
+		}
+		else {
+			return getConflictingAlts();
+		}
+	}
+
     /** Walk each NFA configuration in this DFA state looking for a conflict
      *  where (s|i|ctx) and (s|j|ctx) exist, indicating that state s with
      *  context ctx predicts alts i and j.  Return an Integer set of the
@@ -441,7 +455,7 @@ public class DFAState extends State {
      *  When the same pair is seen again, the alt number must be the same
      *  to avoid a conflict.
      */
-    protected Set getNondeterministicAlts() {
+    protected Set getConflictingAlts() {
 		// TODO this is called multiple times: cache result
 		//System.out.println("getNondetAlts for DFA state "+stateNumber);
  		Set nondeterministicAlts = new HashSet();
@@ -616,6 +630,9 @@ public class DFAState extends State {
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
 			alts.add(new Integer(configuration.alt));
+		}
+		if ( alts.size()==0 ) {
+			return null;
 		}
 		return alts;
 	}

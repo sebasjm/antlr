@@ -37,17 +37,16 @@ import java.util.*;
  *  of recognizers (lexers, parsers, tree walkers).
  */
 public class DFA {
+	public static final int REACHABLE_UNKNOWN = -2;
+	public static final int REACHABLE_BUSY = -1; // in process of computing
+	public static final int REACHABLE_NO = 0;
+	public static final int REACHABLE_YES = 1;
+
     /** What's the start state for this DFA? */
     public DFAState startState;
 
     /** From what NFAState did we create the DFA? */
     public NFAState decisionNFAStartState;
-
-    /** Unique state numbers */
-    protected int stateCounter = 0;
-
-    /** count only new states not states that were rejected as already present */
-    protected int numberOfStates = 0;
 
     /** A set of all DFA states.  Maps hash of nfa configurations
      *  to the actual DFAState object.  We use this to detect
@@ -55,10 +54,16 @@ public class DFA {
      */
     protected Map states = new HashMap();
 
-    public static final int REACHABLE_UNKNOWN = -2;
-    public static final int REACHABLE_BUSY = -1; // in process of computing
-    public static final int REACHABLE_NO = 0;
-    public static final int REACHABLE_YES = 1;
+	/** Unique state numbers */
+	protected int stateCounter = 0;
+
+	/** count only new states not states that were rejected as already present */
+	protected int numberOfStates = 0;
+
+	/** User specified max fixed lookahead.  If 0, nothing specified.  -1
+	 *  implies we have not looked at the options table yet to set k.
+	 */
+	protected int k = -1;
 
     /** Is this DFA reduced?  I.e., can all states lead to an accept state? */
     protected boolean reduced = true;
@@ -102,8 +107,8 @@ public class DFA {
 	 *  can stop when it finds a DFA state with an EOT transition.
 	 *
      *  This is a cached value of what's in the options table.
-     */
     protected boolean greedy = true;
+	 */
 
     /** Subrules have options that will apply to any decisions built from
      *  that subrule.  This points to the options created during antlr.g
@@ -147,13 +152,14 @@ public class DFA {
 	}
 
 	/** Add a new DFA state to this DFA if not already present.
-     *  If the DFA state uniquely predicts a single alternative, it
-     *  becomes a stop state; don't add to work list.  Further, if
-     *  there exists an NFA state predicted by > 1 different alternatives
-     *  and with the same syn and sem context, the DFA is nondeterministic for
-     *  at least one input sequence reaching that NFA state.
+     *  To force an acyclic, fixed maximum depth DFA, just always
+	 *  return the incoming state.  By not reusing old states,
+	 *  no cycles can be created.
      */
     protected DFAState addState(DFAState d) {
+		if ( getUserMaxLookahead()>0 ) {
+			return d;
+		}
 		DFAState existing = (DFAState)states.get(d);
 		if ( existing != null ) {
 			// already there...get the existing DFA state
@@ -193,8 +199,24 @@ public class DFA {
      *  to distinguish between alternatives.
      */
     public boolean isCyclic() {
-        return cyclic;
+        return cyclic && getUserMaxLookahead()==0;
     }
+
+	/** The user may specify a max, acyclic lookahead for any decision.  No
+	 *  DFA cycles are created when this value, k, is greater than 0.
+	 */
+	public int getUserMaxLookahead() {
+		if ( k>=0 ) {
+			return k;
+		}
+		Integer kI = (Integer)getOption("k");
+		if ( kI==null ) {
+			k=0;
+			return 0;
+		}
+		k = kI.intValue();
+		return k;
+	}
 
     /** Return a list of Integer alt numbers for which no lookahead could
      *  be computed or for which no single DFA accept state predicts those
@@ -315,20 +337,27 @@ public class DFA {
     }
 
     public boolean isGreedy() {
-        return greedy;
+		String v = (String)getOption("greedy");
+		if ( v!=null && v.equals("false") ) {
+			return false;
+		}
+        return true;
     }
 
     public void setOptions(Map options) {
-        greedy=true; // reset options
         this.options = options;
         if ( options==null ) {
             return;
         }
-        String v = (String)options.get("greedy");
-        if ( v!=null && v.equals("false") ) {
-            greedy=false;
-        }
     }
+
+	public Object getOption(String name) {
+		if ( options==null ) {
+			return null;
+		}
+		Object v = options.get(name);
+		return v;
+	}
 
     public DFAState newState() {
         DFAState n = new DFAState(this);

@@ -263,6 +263,7 @@ Map opts=null;
            (ruleScopeSpec[r])?
            #( INITACTION (ACTION)? )
            b:block EOR
+           {#b.setOptions(opts);}
          )
     ;
 

@@ -75,7 +75,16 @@ public class NFAToDFAConverter {
 				System.out.println("convert DFA state "+d.stateNumber+
 								   " ("+d.getNFAConfigurations().size()+" nfa states)");
 			}
-			findNewDFAStatesAndAddDFATransitions(d);
+			int k = dfa.getUserMaxLookahead();
+			if ( k>0 && k==d.k ) {
+				// we've hit max lookahead, make this a stop state
+				System.out.println("stop state @k="+k+" (terminated early)");
+				resolveNonDeterminisms(d);
+				d.setAcceptState(true); // must convert to accept state at k
+			}
+			else {
+				findNewDFAStatesAndAddDFATransitions(d);
+			}
 			work.remove(0); // done with it; remove from work list
 		}
 	}
@@ -214,10 +223,13 @@ public class NFAToDFAConverter {
 							   label.toString(dfa.nfa.grammar)+
 							   "->"+t);
 			*/
-			DFAState targetState = addDFAState(t); // add if not in DFA yet
+			DFAState targetState = addDFAStateToWorkList(t); // add if not in DFA yet
 
 			numberOfEdgesEmanating +=
 				addTransition(d, label, targetState, targetToLabelMap);
+
+			// lookahead of target must be one larger than d's k
+			targetState.k = d.k + 1;
 		}
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
@@ -231,7 +243,6 @@ public class NFAToDFAConverter {
 			convertToAcceptState(d, minAlt); // force it to be an accept state
 			terminate = true; // might as well stop now
 			*/
-			terminate = true; // might as well stop now
 		}
 
 		// Check to see if we need to add any semantic predicate transitions
@@ -548,7 +559,10 @@ public class NFAToDFAConverter {
 	 *
 	 *      a : A a | B ;
 	 *
-	 *      the context will be $ (empty stack).  We have to check
+	 *      the context will be $ (empty stack).
+	 * TODO: put the if-then-else in
+	 *
+	 *      We have to check
 	 *      larger context stacks because of (...)+ loops.  For
 	 *      example, the context of a (...)+ can be nonempty if the
 	 *      surrounding rule is invoked by another rule:
@@ -566,6 +580,7 @@ public class NFAToDFAConverter {
 	 *      strings satisfies this condition.  This condition catches
 	 *      cycles derived from tail recursion explicitly or
 	 *      implicitly with (...)+ loops.
+	 * TODO: looks accurate as of 3-8-2005 still
 	 *
 	 *  (2) Whenever closure reaches a configuration where the state
 	 *      is present in its own context stack.  This means that this
@@ -784,7 +799,7 @@ public class NFAToDFAConverter {
      *  and with the same syn and sem context, the DFA is nondeterministic for
      *  at least one input sequence reaching that NFA state.
      */
-    protected DFAState addDFAState(DFAState d) {
+    protected DFAState addDFAStateToWorkList(DFAState d) {
         DFAState potentiallyExistingState = dfa.addState(d);
 		if ( d != potentiallyExistingState ) {
 			// already there...get the existing DFA state
@@ -835,12 +850,14 @@ public class NFAToDFAConverter {
 		}
 		else {
 			d.setAcceptState(true); // new accept state for alt
+			dfa.setAcceptState(alt, d);
 		}
 		return d;
 	}
 
 	/** If > 1 NFA configurations within this DFA state have identical
 	 *  NFA state and context, but differ in their predicted
+	 *  TODO update for new context suffix stuff 3-9-2005
 	 *  alternative then a single input sequence predicts multiple alts.
 	 *  The NFA decision is therefore syntactically indistinguishable
 	 *  from the left edge upon at least one input sequence.  We may

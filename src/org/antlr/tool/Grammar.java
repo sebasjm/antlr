@@ -460,8 +460,8 @@ public class Grammar {
 				System.out.println("--------------------\nbuilding lookahead DFA (d="
                         +decisionStartState.getDecisionNumber()+") for "+
                         decisionStartState.getDescription());
-				*/
 				long start = System.currentTimeMillis();
+				*/
 				DFA lookaheadDFA = new DFA(decisionStartState);
 				setLookaheadDFA(decision, lookaheadDFA);
 				/*

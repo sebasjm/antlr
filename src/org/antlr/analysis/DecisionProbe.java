@@ -515,8 +515,10 @@ public class DecisionProbe {
 		// track a visit to state s at input index labelIndex if not seen
 		String thisStateKey = getStateLabelIndexKey(s.stateNumber,labelIndex);
 		if ( statesVisitedAtInputDepth.contains(thisStateKey) ) {
+			/*
 			System.out.println("### already visited "+s.stateNumber+" previously at index "+
 						   labelIndex);
+			*/
 			return false;
 		}
 		statesVisitedAtInputDepth.add(thisStateKey);
