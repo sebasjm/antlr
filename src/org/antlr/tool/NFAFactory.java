@@ -370,7 +370,7 @@ public class NFAFactory {
             transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
 
 			// set EOB markers for Jean
-			realAlt.endOfBlockStateNumber = A.right.stateNumber;
+			realAlt.endOfBlockStateNumber = blockEndNFAState.stateNumber;
 
             g = new StateCluster(realAlt, blockEndNFAState);
         }
