@@ -26,6 +26,16 @@ public interface DebugEventListener {
 
 	public void exitSubRule(int decisionNumber);
 
+	/** Every decision, fixed k or arbitrary, has an enter/exit event
+	 *  so that a GUI can easily track what LT/consume events are
+	 *  associated with prediction.  You will see a single enter/exit
+	 *  subrule but multiple enter/exit decision events, one for each
+	 *  loop iteration.
+	 */ 
+	public void enterDecision(int decisionNumber);
+
+	public void exitDecision(int decisionNumber);
+
 	/** An input token was consumed; matched by any kind of element.
 	 *  Trigger after the token was matched by things like match(), matchAny().
 	 */

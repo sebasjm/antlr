@@ -88,6 +88,14 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		transmit("exitSubRule "+decisionNumber);
 	}
 
+	public void enterDecision(int decisionNumber) {
+		transmit("enterDecision "+decisionNumber);
+	}
+
+	public void exitDecision(int decisionNumber) {
+		transmit("exitDecision "+decisionNumber);
+	}
+
 	public void consumeToken(Token t) {
 		String buf = serializeToken(t);
 		transmit("consumeToken "+buf);

@@ -225,10 +225,10 @@ dbg.enterAlt(1);<\n>
 block(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int alt<decisionNumber>=<maxAlt>;
 <decls>
-<if(debug)>
-dbg.enterSubRule(<decisionNumber>);<\n>
-<endif>
+<if(debug)>dbg.enterSubRule(<decisionNumber>);<\n><endif>
+<if(debug)>dbg.enterDecision(<decisionNumber>);<\n><endif>
 <decision>
+<if(debug)>dbg.exitDecision(<decisionNumber>);<\n><endif>
 switch (alt<decisionNumber>) {
     <alts:altSwitchCase()>
 }
@@ -242,7 +242,9 @@ ruleBlockSingleAlt ::= blockSingleAlt
 ruleBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int alt<decisionNumber>=<maxAlt>;
 <decls>
+<if(debug)>dbg.enterDecision(<decisionNumber>);<\n><endif>
 <decision>
+<if(debug)>dbg.exitDecision(<decisionNumber>);<\n><endif>
 switch (alt<decisionNumber>) {
     <alts:altSwitchCase()>
 }
@@ -257,7 +259,9 @@ dbg.enterSubRule(<decisionNumber>);<\n>
 loop<decisionNumber>:
 do {
     int alt<decisionNumber>=<maxAlt>;
+<if(debug)>dbg.enterDecision(<decisionNumber>);<\n><endif>
     <decision>
+<if(debug)>dbg.exitDecision(<decisionNumber>);<\n><endif>
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
 	default :
@@ -281,7 +285,9 @@ dbg.enterSubRule(<decisionNumber>);<\n>
 loop<decisionNumber>:
 do {
     int alt<decisionNumber>=<maxAlt>;
+<if(debug)>dbg.enterDecision(<decisionNumber>);<\n><endif>
     <decision>
+<if(debug)>dbg.exitDecision(<decisionNumber>);<\n><endif>
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
 	default :
@@ -519,9 +525,11 @@ cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
     return s<targetStateNumber>;<\n>
 >>
 
+/*
 singlePredicateMethod(decision,stateNumber,edgeNumber,pred) ::= <<
 public boolean pred_DFA<decision>s<stateNumber>e<edgeNumber>() {return <pred>;}
 >>
+*/
 
 // D F A  E X P R E S S I O N S
 

@@ -41,6 +41,8 @@ public class Interpreter implements TokenSource {
 		public void enterRule(String ruleName) {}
 		public void enterSubRule(int decisionNumber) {}
 		public void exitSubRule(int decisionNumber) {}
+		public void enterDecision(int decisionNumber) {}
+		public void exitDecision(int decisionNumber) {}
 		public void location(int line, int pos) {}
 		public void consumeToken(Token token) {}
 		public void consumeHiddenToken(Token token) {}
@@ -76,6 +78,8 @@ public class Interpreter implements TokenSource {
 		public void enterAlt(int alt) {}
 		public void enterSubRule(int decisionNumber) {}
 		public void exitSubRule(int decisionNumber) {}
+		public void enterDecision(int decisionNumber) {}
+		public void exitDecision(int decisionNumber) {}
 		public void location(int line, int pos) {}
 		public void exitRule(String ruleName) {
 			callStack.pop();
