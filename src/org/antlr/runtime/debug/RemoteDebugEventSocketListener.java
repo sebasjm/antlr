@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.net.ConnectException;
 import java.util.StringTokenizer;
 
 public class RemoteDebugEventSocketListener implements Runnable {
@@ -76,11 +77,15 @@ public class RemoteDebugEventSocketListener implements Runnable {
 
 	public RemoteDebugEventSocketListener(DebugEventListener listener,
 										  String machine,
-										  int port)
+										  int port) throws IOException
 	{
 		this.listener = listener;
 		this.machine = machine;
 		this.port = port;
+
+        if( !openConnection() ) {
+            throw new ConnectException();
+        }
 	}
 
 	protected void eventHandler() {
@@ -202,10 +207,10 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			listener.LT(Integer.parseInt(elements[1]));
 		}
 		else if ( elements[0].equals("mark") ) {
-			listener.LT(Integer.parseInt(elements[1]));
+			listener.mark(Integer.parseInt(elements[1]));
 		}
 		else if ( elements[0].equals("rewind") ) {
-			listener.LT(Integer.parseInt(elements[1]));
+			listener.rewind(Integer.parseInt(elements[1]));
 		}
 		else if ( elements[0].equals("exception") ) {
 			RecognitionException e = null;
@@ -226,15 +231,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	}
 
 	/** Create a thread to listen to the remote running recognizer */
-	public boolean start() {
-
-        if( !openConnection() )
-            return false;
-
+	public void start() {
 		Thread t = new Thread(this);
 		t.start();
-
-        return true;
 	}
 
 	public void run() {
