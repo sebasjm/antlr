@@ -138,10 +138,16 @@ public class CommonTokenStream implements TokenStream {
 	 *  token.
 	 */
 	protected int skipOffTokenChannels(int i) {
-		while ( i<tokens.size() &&
-				((Token)tokens.get(i)).getChannel()!=channel )
-		{
+		int n = tokens.size();
+		while ( i<n && ((Token)tokens.get(i)).getChannel()!=channel ) {
 			i++;
+		}
+		return i;
+	}
+
+	protected int skipOffTokenChannelsReverse(int i) {
+		while ( i>=0 && ((Token)tokens.get(i)).getChannel()!=channel ) {
+			i--;
 		}
 		return i;
 	}
@@ -166,15 +172,20 @@ public class CommonTokenStream implements TokenStream {
 		if ( tokens==null ) {
 			fillBuffer();
 		}
+		if ( k==0 ) {
+			return null;
+		}
+		if ( k<0 ) {
+			return LB(-k);
+		}
 		//System.out.print("LT(p="+p+","+k+")=");
-        if ( (p+k) >= tokens.size() ) {
-			//System.out.println("<EOF>");
-            return Token.EOFToken;
-        }
+		if ( (p+k-1) >= tokens.size() ) {
+			return Token.EOFToken;
+		}
 		//System.out.println(tokens.get(p+k-1));
 		int i = p;
 		int n = 1;
-		// find n good tokens
+		// find k good tokens
 		while ( n<k ) {
 			// skip off-channel tokens
 			i = skipOffTokenChannels(i+1); // leave p on valid token
@@ -182,6 +193,32 @@ public class CommonTokenStream implements TokenStream {
 		}
         return (Token)tokens.get(i);
     }
+
+	/** Look backwards k tokens on-channel tokens */
+	protected Token LB(int k) {
+		if ( tokens==null ) {
+			fillBuffer();
+		}
+		if ( k==0 ) {
+			return null;
+		}
+		if ( (p-k)<0 ) {
+			return null;
+		}
+
+		int i = p;
+		int n = 1;
+		// find k good tokens looking backwards
+		while ( n<=k ) {
+			// skip off-channel tokens
+			i = skipOffTokenChannelsReverse(i-1); // leave p on valid token
+			n++;
+		}
+		if ( i<0 ) {
+			return null;
+		}
+		return (Token)tokens.get(i);
+	}
 
 	/** Return absolute token i; ignore which channel the tokens are on;
 	 *  that is, count all tokens not just on-channel tokens.

@@ -180,7 +180,7 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
     finally {
         <ruleDescriptor.useScopes:{stack_<it>.pop();}; separator="\n">
         <ruleDescriptor.ruleScope:{stack_<it.name>.pop();}; separator="\n">
-        retval.stop = input.LT(0);
+        retval.stop = input.LT(-1);
     }<\n>
 <if(debug)>
     dbg.exitRule("<ruleName>");<\n>

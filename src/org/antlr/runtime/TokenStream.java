@@ -29,10 +29,15 @@ package org.antlr.runtime;
 
 /** A stream of tokens accessing tokens from a TokenSource */
 public interface TokenStream extends IntStream {
-    /** Get Token at current input pointer + i ahead where i=1 is next Token */
+    /** Get Token at current input pointer + i ahead where i=1 is next Token.
+	 *  i<0 indicates tokens in the past.  So -1 is previous token and -2 is
+	 *  two tokens ago. LT(0) is undefined.  For i>=n, return Token.EOFToken.
+	 *  Return null for LT(0) and any index that results in an absolute address
+	 *  that is negative.
+	 */
     public Token LT(int k);
 
-	/** Get a token at an absolute index i; 0..n-1 */
+	/** Get a token at an absolute index i; 0..n-1. */
 	public Token get(int i);
 
 	/** Where is this stream pulling tokens from?  This is not the name, but

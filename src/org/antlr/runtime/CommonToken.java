@@ -123,6 +123,6 @@ public class CommonToken extends Token {
 		if ( channel>0 ) {
 			channelStr=",channel="+channel;
 		}
-        return "["+getText()+"/<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+        return "["+getTokenIndex()+":"+getText()+",<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
     }
 }

@@ -70,17 +70,19 @@ public class DOTGenerator {
     public String getDOT(State startState) {
         // The output DOT graph for visualization
         StringTemplate dot = null;
+		markedStates = new HashSet();
         if ( startState instanceof DFAState ) {
             dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/dfa");
+			dot.setAttribute("startState",
+					new Integer(startState.stateNumber));
+			walkCreatingDOT(dot, startState);
         }
         else {
             dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/nfa");
+			dot.setAttribute("startState",
+					new Integer(startState.stateNumber));
+			walkRuleNFACreatingDOT(dot, startState);
         }
-
-        markedStates = new HashSet();
-        dot.setAttribute("startState",
-                new Integer(startState.stateNumber));
-        walkCreatingDOT(dot, startState);
         return dot.toString();
     }
 

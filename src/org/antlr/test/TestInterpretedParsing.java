@@ -69,7 +69,7 @@ public class TestInterpretedParsing extends TestSuite {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toString();
 		String expecting =
-			"(<grammar p> (prog while x { (assign i = (expr 1) ;) (assign y = (expr 3.42) ;) (assign z = (expr y) ;) }))";
+			"(<grammar p> (prog [0:while,<2>,1:0] [2:x,<3>,1:6] [4:{,<4>,1:8] (assign [6:i,<3>,1:10] [7:=,<6>,1:11] (expr [8:1,<8>,1:12]) [9:;,<7>,1:13]) (assign [11:y,<3>,1:15] [12:=,<6>,1:16] (expr [13:3.42,<9>,1:17]) [14:;,<7>,1:21]) (assign [16:z,<3>,1:23] [17:=,<6>,1:24] (expr [18:y,<3>,1:25]) [19:;,<7>,1:26]) [21:},<5>,1:28]))";
 		assertEqual(result, expecting);
 	}
 
@@ -103,7 +103,7 @@ public class TestInterpretedParsing extends TestSuite {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toString();
 		String expecting =
-			"(<grammar p> (prog while x { (assign i = (expr 1) MismatchedTokenException(3!=7))))";
+			"(<grammar p> (prog [0:while,<2>,1:0] [2:x,<3>,1:6] [4:{,<4>,1:8] (assign [6:i,<3>,1:10] [7:=,<6>,1:11] (expr [8:1,<8>,1:12]) MismatchedTokenException(3!=7))))";
 		assertEqual(result, expecting);
 	}
 
@@ -137,7 +137,7 @@ public class TestInterpretedParsing extends TestSuite {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toString();
 		String expecting =
-			"(<grammar p> (prog while x { (assign i = (expr MismatchedSetException(7!={3, 8..9})))))";
+			"(<grammar p> (prog [0:while,<2>,1:0] [2:x,<3>,1:6] [4:{,<4>,1:8] (assign [6:i,<3>,1:10] [7:=,<6>,1:11] (expr MismatchedSetException(7!={3, 8..9})))))";
 		assertEqual(result, expecting);
 	}
 
@@ -171,7 +171,7 @@ public class TestInterpretedParsing extends TestSuite {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toString();
 		String expecting =
-			"(<grammar p> (prog while x { (assign i = (expr NoViableAltException(7!=[4:1: expr : ({;} INT | FLOAT | ID );])))))";
+			"(<grammar p> (prog [0:while,<2>,1:0] [2:x,<3>,1:6] [4:{,<4>,1:8] (assign [6:i,<3>,1:10] [7:=,<6>,1:11] (expr NoViableAltException(7!=[4:1: expr : ({;} INT | FLOAT | ID );])))))";
 		assertEqual(result, expecting);
 	}
 
