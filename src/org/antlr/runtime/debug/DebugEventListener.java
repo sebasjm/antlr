@@ -1,6 +1,8 @@
 package org.antlr.runtime.debug;
 
-public interface ANTLRDebugInterface {
+import org.antlr.runtime.*;
+
+public interface DebugEventListener {
 	/** The parser has just entered a rule.  No decision has been made about
 	 *  which alt is predicted.  This is fired AFTER init actions have been
 	 *  executed.  Attributes are defined and available etc...
