@@ -32,10 +32,7 @@ import org.antlr.tool.Grammar;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplate;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Iterator;
+import java.util.*;
 
 /** A set of integers that relies on ranges being common to do
  *  "run-length-encoded" like compression (if you view an IntSet like
@@ -514,11 +511,29 @@ public class IntervalSet implements IntSet {
     }
 
     public int size() {
-        throw new NoSuchMethodError("IntervalSet.size() unimplemented");
+		int n = 0;
+		Iterator iter = this.intervals.iterator();
+		while (iter.hasNext()) {
+			Interval I = (Interval) iter.next();
+			int a = I.a;
+			int b = I.b;
+			n += (b-a+1);
+		}
+		return n;
     }
 
-    public int[] toArray() {
-        throw new NoSuchMethodError("IntervalSet.toArray() unimplemented");
+    public List toList() {
+		List values = new ArrayList();
+		Iterator iter = this.intervals.iterator();
+		while (iter.hasNext()) {
+			Interval I = (Interval) iter.next();
+			int a = I.a;
+			int b = I.b;
+			for (int v=a; v<=b; v++) {
+				values.add(new Integer(v));
+			}
+		}
+		return values;
     }
 
     public void remove(int el) {

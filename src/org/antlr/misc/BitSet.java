@@ -436,6 +436,10 @@ public class BitSet implements IntSet, Cloneable {
         return s;
     }
 
+	public List toList() {
+		throw new NoSuchMethodError("BitSet.toList() unimplemented");
+	}
+
     public int[] toArray() {
         int[] elems = new int[size()];
         int en = 0;

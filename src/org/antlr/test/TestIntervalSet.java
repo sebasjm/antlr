@@ -30,6 +30,11 @@ package org.antlr.test;
 import org.antlr.test.unit.TestSuite;
 import org.antlr.misc.IntervalSet;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
+
 public class TestIntervalSet extends TestSuite {
 
     /** Public default constructor used by TestRig */
@@ -310,12 +315,31 @@ public class TestIntervalSet extends TestSuite {
         assertEqual(result, expecting);
     }
 
-    public void testMergeWithDoubleOverlap() throws Exception {
-        IntervalSet s = IntervalSet.of(1,10);
-        s.add(20,30);
-        s.add(5,25); // overlaps two!
-        String expecting = "1..30";
-        String result = s.toString();
-        assertEqual(result, expecting);
-    }
+	public void testMergeWithDoubleOverlap() throws Exception {
+		IntervalSet s = IntervalSet.of(1,10);
+		s.add(20,30);
+		s.add(5,25); // overlaps two!
+		String expecting = "1..30";
+		String result = s.toString();
+		assertEqual(result, expecting);
+	}
+
+	public void testSize() throws Exception {
+		IntervalSet s = IntervalSet.of(20,30);
+		s.add(50,55);
+		s.add(5,19);
+		String expecting = "32";
+		String result = String.valueOf(s.size());
+		assertEqual(result, expecting);
+	}
+
+	public void testToList() throws Exception {
+		IntervalSet s = IntervalSet.of(20,25);
+		s.add(50,55);
+		s.add(5,5);
+		String expecting = "[5, 20, 21, 22, 23, 24, 25, 50, 51, 52, 53, 54, 55]";
+		List foo = new ArrayList();
+		String result = String.valueOf(s.toList());
+		assertEqual(result, expecting);
+	}
 }

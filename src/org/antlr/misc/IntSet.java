@@ -30,6 +30,8 @@ package org.antlr.misc;
 import antlr.CharFormatter;
 import org.antlr.tool.Grammar;
 
+import java.util.List;
+
 /** A generic set of ints that has an efficient implementation, BitSet,
  *  which is a compressed bitset and is useful for ints that
  *  are small, for example less than 500 or so, and w/o many ranges.  For
@@ -77,7 +79,7 @@ public interface IntSet {
     /** remove this element from this set */
     void remove(int el);
 
-    int[] toArray();
+    List toList();
 
     String toString();
 

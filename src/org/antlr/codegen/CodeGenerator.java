@@ -27,10 +27,7 @@
 */
 package org.antlr.codegen;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.io.*;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -40,6 +37,7 @@ import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.analysis.*;
 import org.antlr.tool.*;
 import org.antlr.misc.*;
+import org.antlr.misc.BitSet;
 import org.antlr.Tool;
 import org.antlr.runtime.Token;
 import org.antlr.codegen.bytecode.ClassFile;
@@ -85,6 +83,13 @@ import antlr.TokenWithIndex;
 public class CodeGenerator {
 	// TODO move this and the templates to a separate file?
     public static final String VOCAB_FILE_EXTENSION = ".tokens";
+
+	/** When generating SWITCH statements, some targets might need to limit
+	 *  the size (based upon the number of case labels).  Generally, this
+	 *  limit will be hit only for lexers where wildcard in a UNICODE
+	 *  vocabulary environment would generate a SWITCH with 65000 labels.
+	 */
+	public int MAX_SWITCH_CASE_LABELS = 300;
 
 	public static int escapedCharValue[] = new int[255];
 	public static String charValueEscape[] = new String[255];
@@ -142,20 +147,23 @@ public class CodeGenerator {
      */
     protected Tool tool;
 
+	/** I have factored out the generation of acyclic DFAs to separate class */
+	protected ACyclicDFACodeGenerator acyclicDFAGenerator =
+		new ACyclicDFACodeGenerator(this);
+
+	/** I have factored out the generation of cyclic DFAs to separate class */
+	protected CyclicDFACodeGenerator cyclicDFAGenerator =
+		new CyclicDFACodeGenerator(this);
+
 	// TODO move to separate file
 	protected final String vocabFilePattern =
             "<tokens:{<attr.name>=<attr.type>\n}>" +
             "<literals:{<attr.name>=<attr.type>\n}>";
 
-    /** Used by DFA state machine generator to avoid infinite recursion
-     *  resulting from cycles int the DFA.  This is a set of int state #s.
-     */
-    protected IntSet visited;
-
-    /** Used by the DFA state machine generator to get the max lookahead in
-     *  the generated DFA for acyclic DFAs.
-     */
-    public int maxK;
+	/** For every decision, track the maximum lookahead needed if fixed.
+	 *  Set to Integer.MAX_VALUE if cyclic DFA.
+	 */
+	protected int[] decisionToMaxLookaheadDepth;
 
     public CodeGenerator(Tool tool, Grammar grammar, String language) {
         this.tool = tool;
@@ -266,6 +274,8 @@ public class CodeGenerator {
 		// OPTIMIZE DFA
         DFAOptimizer optimizer = new DFAOptimizer(grammar);
 		optimizer.optimize();
+
+		decisionToMaxLookaheadDepth = new int[grammar.getNumberOfDecisions()+1];
 
 		// OUTPUT FILE (contains recognizerST)
 		outputFileST = templates.getInstanceOf("outputFile");
@@ -454,14 +464,15 @@ public class CodeGenerator {
 	public StringTemplate genLookaheadDecision(StringTemplate cyclicDFATemplate,
                                                DFA dfa)
     {
-        maxK = 1;
         StringTemplate decisionST;
         if ( !dfa.isCyclic() /* TODO: or too big */ ) {
-            decisionST = genFixedLookaheadDecision(getTemplates(), dfa);
+            decisionST =
+				acyclicDFAGenerator.genFixedLookaheadDecision(getTemplates(), dfa);
         }
         else {
             StringTemplate dfaST =
-				genCyclicLookaheadDecision(getCyclicDFATemplates(), dfa);
+				cyclicDFAGenerator.genCyclicLookaheadDecision(getCyclicDFATemplates(),
+															  dfa);
             cyclicDFATemplate.setAttribute("cyclicDFAs", dfaST);
             decisionST = cyclicDFATemplates.getInstanceOf("dfaDecision");
 			String description = dfa.getNFADecisionStartState().getDescription();
@@ -475,133 +486,6 @@ public class CodeGenerator {
         return decisionST;
     }
 
-    public StringTemplate genFixedLookaheadDecision(StringTemplateGroup templates,
-                                                    DFA dfa)
-    {
-        return walkFixedDFACreatingEdges(templates, dfa, dfa.startState, 1);
-    }
-
-    protected StringTemplate walkFixedDFACreatingEdges(
-            StringTemplateGroup templates,
-            DFA dfa,
-            DFAState s,
-            int k)
-    {
-        if ( s.isAcceptState() ) {
-            StringTemplate dfaST = templates.getInstanceOf("dfaAcceptState");
-            dfaST.setAttribute("alt", new Integer(s.getUniquelyPredictedAlt()));
-            return dfaST;
-        }
-        if( k > maxK ) {
-            // track max, but don't count the accept state...
-            maxK = k;
-        }
-		GrammarAST decisionASTNode =
-			dfa.getNFADecisionStartState().getDecisionASTNode();
-        StringTemplate dfaST = templates.getInstanceOf("dfaState");
-		if ( decisionASTNode.getType()==ANTLRParser.EOB ) {
-			dfaST = templates.getInstanceOf("dfaLoopbackState");
-		}
-		else if ( decisionASTNode.getType()==ANTLRParser.OPTIONAL ) {
-			dfaST = templates.getInstanceOf("dfaOptionalBlockState");			
-		}
-		dfaST.setAttribute("stateNumber", new Integer(s.stateNumber));
-        String description = dfa.getNFADecisionStartState().getDescription();
-		//System.out.println("DFA: "+description+" associated with AST "+decisionASTNode);
-        if ( description!=null ) {
-			description = Utils.replace(description,"\"", "\\\"");
-            dfaST.setAttribute("description", description);
-        }
-        int EOTPredicts = NFA.INVALID_ALT_NUMBER;
-        for (int i = 0; i < s.getNumberOfTransitions(); i++) {
-            Transition edge = (Transition) s.transition(i);
-            if ( edge.label.getAtom()==Label.EOT ) {
-                // don't generate a real edge for EOT; track what EOT predicts
-                DFAState target = (DFAState)edge.target;
-                EOTPredicts = target.getUniquelyPredictedAlt();
-                continue;
-            }
-			StringTemplate edgeST = templates.getInstanceOf("dfaEdge");
-            edgeST.setAttribute("labelExpr",
-                                genLabelExpr(templates,edge.label,k));
-            StringTemplate targetST =
-                    walkFixedDFACreatingEdges(templates,
-                                              dfa,
-                                              (DFAState)edge.target,
-                                              k+1);
-            edgeST.setAttribute("targetState", targetST);
-            dfaST.setAttribute("edges", edgeST);
-        }
-        if ( EOTPredicts!=NFA.INVALID_ALT_NUMBER ) {
-            dfaST.setAttribute("eotPredictsAlt", new Integer(EOTPredicts));
-        }
-        return dfaST;
-    }
-
-    public StringTemplate genCyclicLookaheadDecision(StringTemplateGroup templates,
-													 DFA dfa)
-    {
-		StringTemplate dfaST = templates.getInstanceOf("cyclicDFA");
-        int d = dfa.getDecisionNumber();
-        dfaST.setAttribute("decision", new Integer(d));
-        visited = new BitSet(dfa.getNumberOfStates());
-        walkCyclicDFACreatingStates(templates, dfaST, dfa.startState);
-        return dfaST;
-    }
-
-    protected void walkCyclicDFACreatingStates(
-            StringTemplateGroup templates,
-            StringTemplate dfaST,
-            DFAState s)
-    {
-        if ( visited.member(s.stateNumber) ) {
-            return; // already visited
-        }
-        visited.add(s.stateNumber);
-
-        StringTemplate stateST;
-        if ( s.isAcceptState() ) {
-            stateST = templates.getInstanceOf("cyclicDFAAcceptState");
-            stateST.setAttribute("predictAlt",
-								 new Integer(s.getUniquelyPredictedAlt()));
-        }
-        else {
-            stateST = templates.getInstanceOf("cyclicDFAState");
-            stateST.setAttribute("needErrorClause", new Boolean(true));
-        }
-        stateST.setAttribute("stateNumber", new Integer(s.stateNumber));
-        StringTemplate eotST = null;
-        for (int i = 0; i < s.getNumberOfTransitions(); i++) {
-            Transition edge = (Transition) s.transition(i);
-            StringTemplate edgeST;
-            if ( edge.label.getAtom()==Label.EOT ) {
-                // this is the default clause; has to held until last
-                edgeST = templates.getInstanceOf("eotDFAEdge");
-                stateST.removeAttribute("needErrorClause");
-                eotST = edgeST;
-            }
-            else {
-                edgeST = templates.getInstanceOf("cyclicDFAEdge");
-                edgeST.setAttribute("labelExpr",
-                        genLabelExpr(templates,edge.label,1));
-            }
-			edgeST.setAttribute("edgeNumber", new Integer(i+1));
-            edgeST.setAttribute("targetStateNumber",
-                                 new Integer(edge.target.stateNumber));
-            if ( edge.label.getAtom()!=Label.EOT ) {
-                stateST.setAttribute("edges", edgeST);
-            }
-            // now check other states
-            walkCyclicDFACreatingStates(templates,
-                                  dfaST,
-                                  (DFAState)edge.target);
-        }
-        if ( eotST!=null ) {
-            stateST.setAttribute("edges", eotST);
-        }
-        dfaST.setAttribute("states", stateST);
-    }
-
     protected StringTemplate genLabelExpr(StringTemplateGroup templates,
                                           Label label,
                                           int k)
@@ -610,7 +494,7 @@ public class CodeGenerator {
             return genSemanticPredicateExpr(templates, label);
         }
         if ( label.isSet() ) {
-            return genSetExpr(templates, label, k);
+            return genSetExpr(templates, label.getSet(), k);
         }
         // must be simple label
         StringTemplate eST = templates.getInstanceOf("lookaheadTest");
@@ -625,14 +509,6 @@ public class CodeGenerator {
     {
         SemanticContext semCtx = label.getSemanticContext();
         return semCtx.genExpr(templates);
-    }
-
-    public StringTemplate genSetExpr(StringTemplateGroup templates,
-                                     Label label,
-                                     int k)
-    {
-        IntSet set = label.getSet();
-        return genSetExpr(templates, set, k);
     }
 
     /** For intervals such as [3..3, 30..35], generate an expression that
@@ -919,6 +795,10 @@ public class CodeGenerator {
 	 *  method is more reusable.
      */
     public static String getJavaUnicodeEscapeString(int c) {
+		if ( c<Label.MIN_CHAR_VALUE ) {
+			ErrorManager.internalError("invalid char value "+c);
+			return "<INVALID>";
+		}
         if ( c<charValueEscape.length && charValueEscape[c]!=null ) {
             return charValueEscape[c];
         }
@@ -941,6 +821,13 @@ public class CodeGenerator {
 
 
 	// M I S C
+
+	public int getMaxLookaheadDepth(int decision) {
+		if ( decision<decisionToMaxLookaheadDepth.length ) {
+			return decisionToMaxLookaheadDepth[decision];
+		}
+		return 0;
+	}
 
 	public StringTemplateGroup getTemplates() {
 		return templates;

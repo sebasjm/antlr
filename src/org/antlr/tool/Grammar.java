@@ -825,24 +825,12 @@ public class Grammar {
      *  Escaped stuff is already converted to single char in single-quotes.
      */
     public static int getCharValueFromANTLRGrammarLiteral(String literal) {
-        //System.out.println("getCharValueFromLiteral: "+literal+"; len="+literal.length());
         if ( literal.length()==3 ) {
             // no escape
             return literal.charAt(1);
         }
-        /*
-        if ( literal.equals("'\\\\'") ) { // if string is '\\', that's just \
-            return '\\';
-        }
-        if ( literal.length()==4 ) {
-            int special = escapedCharValue[literal.charAt(2)];
-            if ( special>0 ) {
-                return special;
-            }
-            // must be an escape regular char, return x in '\x'.
-            return literal.charAt(2);
-        }
-		*/
+		ErrorManager.internalError("getCharValueFromANTLRGrammarLiteral: "+
+								   literal+"; len="+literal.length());
         return Label.INVALID;
     }
 
@@ -893,6 +881,7 @@ public class Grammar {
 		return tokenName;
 	}
 
+	/** Get a meaningful name for a token type useful during code generation. */
     public String getTokenTypeAsLabel(int ttype) {
         String name = getTokenName(ttype);
 		// if it's not a lexer, then can't use char value, must have token type name

@@ -278,7 +278,7 @@ block[String blockTemplateName, DFA dfa]
         decision = generator.genLookaheadDecision(cyclicDFAST,dfa);
         code.setAttribute("decision", decision);
         code.setAttribute("decisionNumber", dfa.getDecisionNumber());
-		code.setAttribute("maxK",generator.maxK);
+		code.setAttribute("maxK",generator.getMaxLookaheadDepth(dfa.getDecisionNumber()));
 		code.setAttribute("maxAlt",dfa.getNumberOfAlts());
     }
     else {
@@ -436,7 +436,7 @@ atom[String label] returns [StringTemplate code=null]
                         if ( grammar.type==Grammar.LEXER ) {
                             code = templates.getInstanceOf("lexerStringRef");
                             code.setAttribute("string",
-                               CodeGenerator.getJavaEscapedCharFromANTLRLiteral(s.getText()));
+                               CodeGenerator.getJavaEscapedStringFromANTLRLiteral(s.getText()));
                         }
                         else { // else it's a token type reference
                             code = templates.getInstanceOf("tokenRef");

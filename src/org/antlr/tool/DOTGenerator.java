@@ -44,6 +44,8 @@ import java.io.File;
  *  TODO: move templates out of test!
  */
 public class DOTGenerator {
+	public static final boolean STRIP_NONREDUCED_STATES = false;
+
     /** Library of output templates; use <attrname> format */
     public static StringTemplateGroup stlib =
             new StringTemplateGroup("toollib", AngleBracketTemplateLexer.class);
@@ -122,8 +124,15 @@ public class DOTGenerator {
         dot.setAttribute("states", st);
 
         // make a DOT edge for each transition
-        for (int i = 0; i < s.getNumberOfTransitions(); i++) {
-            Transition edge = (Transition) s.transition(i);
+		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
+			Transition edge = (Transition) s.transition(i);
+			if ( STRIP_NONREDUCED_STATES ) {
+				if ( edge.target instanceof DFAState &&
+					((DFAState)edge.target).getAcceptStateReachable()!=DFA.REACHABLE_YES )
+				{
+					continue; // don't generate nodes for terminal states
+				}
+			}
             st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
             st.setAttribute("label", getEdgeLabel(edge.label.toString(grammar)));
             st.setAttribute("src", getStateLabel(s));

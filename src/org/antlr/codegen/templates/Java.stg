@@ -290,12 +290,12 @@ following.pop();
 lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
 
 
-// F i x e d  D F A  s t u f f
+// F i x e d  D F A  (if-then-else)
 
 dfaDecision(decisionNumber,description) ::=
   "alt<decisionNumber> = DFA<decisionNumber>.predict(input);"
 
-dfaState(edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 <edges; separator="\nelse ">
 else {
 <if(eotPredictsAlt)>
@@ -306,11 +306,11 @@ else {
 }
 >>
 
-dfaOptionalBlockState(edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 <edges; separator="\nelse ">
 >>
 
-dfaLoopbackState(edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 <edges; separator="\nelse "><\n>
 <if(eotPredictsAlt)>
 else {
@@ -325,6 +325,43 @@ dfaEdge(labelExpr, targetState) ::= <<
 if ( <labelExpr> ) {
     <targetState>
 }
+>>
+
+// F i x e d  D F A  (switch case)
+
+dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+switch ( input.LA(<k>) ) {
+<edges; separator="\n">
+default:
+<if(eotPredictsAlt)>
+    alt<decisionNumber>=<eotPredictsAlt>;
+<else>
+    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>);<\n>
+<endif>
+}<\n>
+>>
+
+dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+switch ( input.LA(<k>) ) {
+    <edges; separator="\n">
+}<\n>
+>>
+
+dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber) ::= <<
+switch ( input.LA(<k>) ) {
+<edges; separator="\n"><\n>
+<if(eotPredictsAlt)>
+default:
+    alt<decisionNumber>=<eotPredictsAlt>;
+    break;<\n>
+<endif>
+}<\n>
+>>
+
+dfaEdgeSwitch(labels, targetState) ::= <<
+<labels:{case <it>:}; separator="\n">
+    <targetState>
+    break;
 >>
 
 // D F A  E X P R E S S I O N S
