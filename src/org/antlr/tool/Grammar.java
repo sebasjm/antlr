@@ -30,6 +30,7 @@ package org.antlr.tool;
 import antlr.collections.AST;
 import antlr.RecognitionException;
 import antlr.TokenStreamRewriteEngine;
+import antlr.LLkParser;
 
 import java.io.*;
 import java.util.*;
@@ -164,16 +165,20 @@ public class Grammar {
 
 	/** For merged lexer/parsers, we must construct a separate lexer spec.
 	 *  This is the template for lexer; put the literals first then the
-	 *  regular rules.
+	 *  regular rules.  We don't need to specify a token vocab import as
+	 *  I make the new grammar import from the old all in memory; don't want
+	 *  to force it to read from the disk.
 	 */
 	protected StringTemplate lexerGrammarST =
 		new StringTemplate(
-			"lexer grammar <name>Lexer(tokenVocab=<name>);\n" +
+			"lexer grammar <name>Lexer;\n" +
 			"\n" +
 			"<literals:{<it.ruleName> : <it.literal> ;\n}>\n" +
 			"<rules>",
 			AngleBracketTemplateLexer.class
 		);
+
+	protected String fileName;
 
     protected static int escapedCharValue[] = new int[255];
     protected static String charValueEscape[] = new String[255];
@@ -198,7 +203,7 @@ public class Grammar {
 	public Grammar(String grammarString)
 			throws antlr.RecognitionException, antlr.TokenStreamException
 	{
-		this(new StringReader(grammarString));
+		this("<string>",new StringReader(grammarString));
 	}
 
     /** Create a grammar from a Reader.  Parse the grammar, building a tree
@@ -206,11 +211,20 @@ public class Grammar {
      *  an NFA and associated factory.  Walk the AST representing the grammar,
      *  building the state clusters of the NFA.
      */
-    public Grammar(Reader r)
+    public Grammar(String fileName, Reader r)
             throws antlr.RecognitionException, antlr.TokenStreamException
     {
         this();
+		this.fileName = fileName;
 		setGrammarContent(r);
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getFileName() {
+		return fileName;
 	}
 
 	public void setGrammarContent(String grammarString)
@@ -224,6 +238,7 @@ public class Grammar {
 	{
 		// BUILD AST FROM GRAMMAR
 		ANTLRLexer lexer = new ANTLRLexer(r);
+		lexer.setFilename(this.getFileName());
 		// use the rewrite engine because we want to buffer up all tokens
 		// in case they have a merged lexer/parser, send lexer rules to
 		// new grammar.
@@ -231,6 +246,7 @@ public class Grammar {
 		TokenStreamRewriteEngine tokenBuffer =
 			new TokenStreamRewriteEngine(lexer);
 		ANTLRParser parser = new ANTLRParser(tokenBuffer, this);
+		parser.setFilename(this.getFileName());
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
@@ -278,7 +294,7 @@ public class Grammar {
             	matchTokenRuleST.setAttribute("rules", r.name);
 			}
         }
-		System.out.println("rule: "+matchTokenRuleST.toString());
+		//System.out.println("rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
@@ -291,9 +307,8 @@ public class Grammar {
             grammarTree.addChild(parser.getAST());
         }
         catch (Exception e) {
-            System.err.println("problems adding artificial rule");
+            ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,e);
         }
-		System.out.println("Rules after adding Tokens rule: "+grammarTree.toStringList());
     }
 
     protected void initTokenSymbolTables() {
@@ -334,84 +349,6 @@ public class Grammar {
 		}
 	}
 
-    /** Look in the current directory for vocabName.tokens and load any
-     *  definitions in there into the tokenNameToTypeMap.  The format of
-     *  the file is a simple token=type:
-     *
-     *     FOR=5
-     *     ID=7
-	 *     ...
-    protected void importTokenVocab(String vocabName) {
-		int maxTokenType = -1;
-        try {
-            FileReader fr = new FileReader(vocabName+".tokens");
-            BufferedReader br = new BufferedReader(fr);
-            //StringTokenizer tokenizer = new StringTokenizer()
-            StreamTokenizer st = new StreamTokenizer(br);
-            st.parseNumbers();
-            st.wordChars('A', 'Z');
-            st.wordChars('a', 'z');
-            st.wordChars('_', '_');
-            st.ordinaryChar('=');
-            st.ordinaryChar(',');
-            st.slashSlashComments(true);
-
-            int token = st.nextToken();
-            loop:
-            while (token != StreamTokenizer.TT_EOF) {
-                switch (token) {
-                    case StreamTokenizer.TT_WORD:
-                    case '"':
-                    case '\'':
-                        // get name or literal
-                        String tokenName = st.sval;
-                        if ( token=='"' ) {
-                            tokenName = '"'+tokenName+'"';
-                        }
-                        else if ( token=='\'' ) {
-                            tokenName = '\''+tokenName+'\'';
-                        }
-                        token = st.nextToken(); // get '='
-                        if ( token!='=' ) {
-                            throw new Exception("line "+st.lineno()+": missing '='");
-                        }
-                        token = st.nextToken(); // get type value
-                        if ( token!=StreamTokenizer.TT_NUMBER ) {
-                            throw new Exception("line "+st.lineno()+
-                                                ": missing token type value at "+
-                                                st.sval);
-                        }
-                        int tokenType = (int)st.nval;
-                        //System.out.println("import "+tokenName+"="+tokenType);
-						maxTokenType = Math.max(maxTokenType,tokenType);
-                        defineToken(tokenName, tokenType);
-                        token = st.nextToken(); // move to next assignment
-                        break;
-                    default:
-                        char ch = (char)st.ttype;
-                        throw new Exception("line "+st.lineno()+": unexpected char: '"+ch+"'");
-                }
-            }
-            br.close();
-            fr.close();
-        }
-        catch (FileNotFoundException fnfe) {
-            System.err.println("can't find vocab file "+vocabName+".tokens");
-        }
-        catch (IOException ioe) {
-            System.err.println("error reading vocab file "+vocabName+".tokens: "+
-                    ioe.toString());
-        }
-        catch (Exception e) {
-            System.err.println("error reading vocab file "+vocabName+".tokens: "+
-                    e.toString());
-            e.printStackTrace(System.err);
-        }
-		if ( maxTokenType>0 ) {
-			tokenType = maxTokenType+1; // next type is defined above imported
-		}
-    }
-	 */
 	protected void importTokenVocab(String vocabName) {
 		int maxTokenType = -1;
 		try {
@@ -425,18 +362,21 @@ public class Grammar {
 				}
 				StringTokenizer tokenizer = new StringTokenizer(line, "=", true);
 				if ( !tokenizer.hasMoreTokens() ) {
-					System.err.println("error line "+n+" reading vocab file "+vocabName+".tokens: "+
-									   "missing token name");
+					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
+									   vocabName+".tokens",
+									   new Integer(n));
 				}
 				String tokenName=tokenizer.nextToken();
 				if ( !tokenizer.hasMoreTokens() ) {
-					System.err.println("error line "+n+" reading vocab file "+vocabName+".tokens: "+
-									   "missing '='");
+					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
+									   vocabName+".tokens",
+									   new Integer(n));
 				}
 				tokenizer.nextToken(); // skip '='
 				if ( !tokenizer.hasMoreTokens() ) {
-					System.err.println("error line "+n+" reading vocab file "+vocabName+".tokens: "+
-									   "missing token type number");
+					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
+									   vocabName+".tokens",
+									   new Integer(n));
 				}
 				String tokenTypeS=tokenizer.nextToken();
 				int tokenType = Integer.parseInt(tokenTypeS);
@@ -450,15 +390,18 @@ public class Grammar {
 			fr.close();
 		}
 		catch (FileNotFoundException fnfe) {
-			System.err.println("can't find vocab file "+vocabName+".tokens");
+			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_TOKENS_FILE,
+							   vocabName+".tokens");
 		}
 		catch (IOException ioe) {
-			System.err.println("error reading vocab file "+vocabName+".tokens: "+
-					ioe.toString());
+			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
+							   vocabName+".tokens",
+							   ioe);
 		}
 		catch (Exception e) {
-			System.err.println("error reading vocab file "+vocabName+".tokens: "+
-					e.toString());
+			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
+							   vocabName+".tokens",
+							   e);
 		}
 		if ( maxTokenType>0 ) {
 			tokenType = maxTokenType+1; // next type is defined above imported
@@ -479,17 +422,22 @@ public class Grammar {
     }
      */
 
-    public void createNFAs()
-        throws antlr.RecognitionException
-    {
-        nfa = new NFA(this); // create NFA that TreeToNFAConverter'll fill in
-        NFAFactory factory = new NFAFactory(nfa);
-        TreeToNFAConverter nfaBuilder = new TreeToNFAConverter(this, nfa, factory);
-        nfaBuilder.grammar(grammarTree);
-        //System.out.println("NFA has "+factory.getNumberOfStates()+" states");
-    }
+    public void createNFAs() {
+		nfa = new NFA(this); // create NFA that TreeToNFAConverter'll fill in
+		NFAFactory factory = new NFAFactory(nfa);
+		TreeToNFAConverter nfaBuilder = new TreeToNFAConverter(this, nfa, factory);
+		try {
+			nfaBuilder.grammar(grammarTree);
+		}
+		catch (RecognitionException re) {
+			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE_DURING_BUILDNFA,
+							   getName(),
+							   re);
+		}
+		//System.out.println("NFA has "+factory.getNumberOfStates()+" states");
+	}
 
-    /** For each decision in this grammar, compute a single DFA using the
+	/** For each decision in this grammar, compute a single DFA using the
      *  NFA states associated with the decision.  The DFA construction
      *  determines whether or not the alternatives in the decision are
      *  separable using a regular lookahead language.
@@ -521,44 +469,24 @@ public class Grammar {
 				if ( false ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.getGrammar());
 					String dot = dotGenerator.getDOT( lookaheadDFA.getStartState() );
+					String dotFileName = "/tmp/dec-"+decision;
 					try {
-						dotGenerator.writeDOTFile("/tmp/dec-"+decision, dot);
+						dotGenerator.writeDOTFile(dotFileName, dot);
 					}
 					catch(IOException ioe) {
-						System.err.println("Cannot gen DOT");
+						ErrorManager.error(ErrorManager.MSG_CANNOT_GEN_DOT_FILE,
+										   dotFileName,
+										   ioe);
 					}
 				}
                 setLookaheadDFA(decision, lookaheadDFA);
                 List nonDetAlts = lookaheadDFA.getUnreachableAlts();
                 if ( nonDetAlts.size()>0 ) {
-                    System.out.println("alts w/o predict state="+nonDetAlts);
+                    System.err.println("alts w/o predict state="+nonDetAlts);
                 }
             }
         }
     }
-
-	/** Match a lexer rule using input and return the token type matched */
-	/*
-	public int parse(String startRule, CharStream input)
-		throws Exception
-	{
-		if ( getType()!=LEXER ) {
-			return 0;
-		}
-		Interpreter engine = new Interpreter(this);
-		return engine.parse(startRule,input);
-	}
-
-	public void parse(String startRule, Grammar lexer)
-		throws Exception
-	{
-		if ( getType()!=PARSER ) {
-			return;
-		}
-		Interpreter engine = new Interpreter(this);
-		engine.parse(startRule,lexer);
-	}
-    */
 
 	/** Define either a token at a particular token type value.  Blast an
      *  old value with a new one.  This is called directly during import vocab
@@ -615,21 +543,38 @@ public class Grammar {
     }
 
     /** Define a new rule.  A new rule index is created by incrementing
-     *  ruleIndex.
+     *  ruleIndex. Pass in the parser and token info so we can pass the
+	 *  info on to the error manager if there is a problem.
      */
-    public int defineRule(String ruleName, String modifier, Map options) {
+    public int defineRule(LLkParser parser,
+						  antlr.Token ruleToken,
+						  String modifier,
+						  Map options)
+	{
+		String ruleName = ruleToken.getText();
         //System.out.println("defineRule("+ruleName+",modifier="+modifier+"): index="+ruleIndex);
         if ( getRule(ruleName)!=null ) {
-            // rule redefinition
-            System.err.println("redefinition of "+ruleName);
+            ErrorManager.grammarError(ErrorManager.MSG_RULE_REDEFINITION,
+									  this,
+									  parser,
+									  ruleToken,
+									  ruleName);
             return INVALID_RULE_INDEX;
         }
         if ( type==PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
-            System.err.println("lexer rules not allowed in parser: "+ruleName);
+			ErrorManager.grammarError(ErrorManager.MSG_LEXER_RULES_NOT_ALLOWED,
+									  this,
+									  parser,
+									  ruleToken,
+									  ruleName);
             return INVALID_RULE_INDEX;
         }
         if ( type==LEXER && Character.isLowerCase(ruleName.charAt(0)) ) {
-            System.err.println("parser rules not allowed in lexer: "+ruleName);
+			ErrorManager.grammarError(ErrorManager.MSG_PARSER_RULES_NOT_ALLOWED,
+									  this,
+									  parser,
+									  ruleToken,
+									  ruleName);
             return INVALID_RULE_INDEX;
         }
         if ( type==LEXER && !ruleName.equals(TOKEN_RULENAME)) {
@@ -1070,8 +1015,9 @@ public class Grammar {
             s += new ANTLRTreePrinter().toString((AST)t);
         }
         catch (Exception e) {
-            System.err.println("Problems printing tree: "+t);
-            e.printStackTrace(System.err);
+            ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE_DURING_PRINTING,
+							   t,
+							   e);
         }
         return s;
     }

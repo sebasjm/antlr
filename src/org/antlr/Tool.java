@@ -29,6 +29,7 @@ package org.antlr;
 
 import org.antlr.tool.DOTGenerator;
 import org.antlr.tool.Grammar;
+import org.antlr.tool.ErrorManager;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.stringtemplate.StringTemplate;
 
@@ -47,7 +48,7 @@ public class Tool {
     protected String outputDir = ".";
 
     public static void main(String[] args) {
-        System.err.println("ANTLR Parser Generator   Version " +
+        ErrorManager.info("ANTLR Parser Generator   Version " +
                 Version + "   1989-2004");
         try {
             Tool antlr = new Tool();
@@ -100,10 +101,10 @@ public class Tool {
 
     protected void process()  {
         try {
-			StringTemplate.setLintMode(true);
+			//StringTemplate.setLintMode(true);
             FileReader fr = new FileReader(grammarFileName);
             BufferedReader br = new BufferedReader(fr);
-            Grammar grammar = new Grammar(br);
+            Grammar grammar = new Grammar(grammarFileName,br);
             br.close();
             fr.close();
 
@@ -115,7 +116,10 @@ public class Tool {
 			if ( lexerGrammarStr!=null ) {
 				System.out.println("lexer="+lexerGrammarStr);
 				StringReader sr = new StringReader(lexerGrammarStr);
-				Grammar lexerGrammar = new Grammar(sr);
+				Grammar lexerGrammar = new Grammar();
+				lexerGrammar.setFileName("<internally-generated-lexer>");
+				lexerGrammar.importTokenVocabulary(grammar);
+				lexerGrammar.setGrammarContent(sr);
 				sr.close();
 				processGrammar(lexerGrammar);
 			}
@@ -125,7 +129,9 @@ public class Tool {
         }
     }
 
-	protected void processGrammar(Grammar grammar) throws IOException {
+	protected void processGrammar(Grammar grammar)
+		throws IOException
+	{
 		String language = (String)grammar.getOption("language");
 		if ( language!=null ) {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);

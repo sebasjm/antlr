@@ -39,6 +39,7 @@ import org.antlr.stringtemplate.misc.StringTemplateTreeView;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.analysis.*;
 import org.antlr.tool.Grammar;
+import org.antlr.tool.ErrorManager;
 import org.antlr.misc.*;
 import org.antlr.Tool;
 import org.antlr.codegen.bytecode.ClassFile;
@@ -132,12 +133,6 @@ public class CodeGenerator {
 		loadLanguageTarget(language);
         loadTemplates(language);
 		loadCyclicDFATemplates(language);
-		if ( templates==null || templates.getInstanceOf("outputFile")==null ) {
-			System.err.println("missing templates");
-		}
-		if ( cyclicDFATemplates.getInstanceOf("cyclicDFA")==null ) {
-			System.err.println("error: no cyclic DFA definitions in stg file");
-		}
 	}
 
 	protected void loadLanguageTarget(String language) {
@@ -149,43 +144,57 @@ public class CodeGenerator {
 		catch (ClassNotFoundException cnfe) {
 			target = new Target(); // use default
 		}
-		catch (InstantiationException cnfe) {
-			System.err.println("cannot create "+targetName);
+		catch (InstantiationException ie) {
+			ErrorManager.error(ErrorManager.MSG_CANNOT_CREATE_TARGET_GENERATOR,
+							   targetName,
+							   ie);
 		}
 		catch (IllegalAccessException cnfe) {
-			System.err.println("cannot create "+targetName+" (illegal access)");
+			ErrorManager.error(ErrorManager.MSG_CANNOT_CREATE_TARGET_GENERATOR,
+							   targetName,
+							   cnfe);
 		}
 	}
 
 	/** load the main language.stg template group file */
 	protected void loadTemplates(String language) {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		InputStream is = cl.getResourceAsStream("org/antlr/codegen/templates/"+language+".stg");
+		String templateFileName = "org/antlr/codegen/templates/"+language+".stg";
+		InputStream is = cl.getResourceAsStream(templateFileName);
 		if ( is==null ) {
-			System.err.println("can't load '"+"org/antlr/codegen/templates/"+language+".stg"+"' as resource");
+			ErrorManager.error(ErrorManager.MSG_MISSING_CODE_GEN_TEMPLATES,
+							   language);
 			return;
 		}
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		templates = new StringTemplateGroup(br,
 				AngleBracketTemplateLexer.class,
-				null);
+				ErrorManager.getStringTemplateErrorListener());
+		if ( !templates.isDefined("outputFile") ) {
+			ErrorManager.error(ErrorManager.MSG_CODE_GEN_TEMPLATES_INCOMPLETE,
+							   language);
+		}
 		try {
 			br.close();
 		}
 		catch (IOException ioe) {
-			System.err.println("Cannot close template group file");
+			ErrorManager.error(ErrorManager.MSG_CANNOT_CLOSE_FILE,
+							   templateFileName,
+							   ioe);
 		}
 	}
 
 	protected void loadCyclicDFATemplates(String language) {
 		// now load language_dfa.stg if available, else just use main .stg
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		InputStream is = cl.getResourceAsStream("org/antlr/codegen/templates/"+language+"_cyclicdfa.stg");
+		String templateFileName = "org/antlr/codegen/templates/"+language+"_cyclicdfa.stg";
+		InputStream is = cl.getResourceAsStream(templateFileName);
 		if ( is!=null ) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			cyclicDFATemplates = new StringTemplateGroup(br,
-												AngleBracketTemplateLexer.class,
-												null);
+			cyclicDFATemplates =
+				new StringTemplateGroup(br,
+										AngleBracketTemplateLexer.class,
+										ErrorManager.getStringTemplateErrorListener());
 			// cyclic inherits from main X.stg templates so you can define
 			// just the templates that are different
 			cyclicDFATemplates.setSuperGroup(templates); // who's your daddy? ;)
@@ -193,11 +202,16 @@ public class CodeGenerator {
 				br.close();
 			}
 			catch (IOException ioe) {
-				System.err.println("Cannot close template group file");
+				ErrorManager.error(ErrorManager.MSG_CANNOT_CLOSE_FILE,
+								   templateFileName);
 			}
 		}
 		else {
 			cyclicDFATemplates = templates;
+		}
+		if ( cyclicDFATemplates.getInstanceOf("cyclicDFA")==null ) {
+			ErrorManager.error(ErrorManager.MSG_MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES,
+							   language);
 		}
 	}
 
@@ -260,8 +274,9 @@ public class CodeGenerator {
 						headerFileST);
 		}
 		catch (RecognitionException re) {
-			System.err.println("problems walking tree to generate code for "+
-							   grammar.getName()+":"+re);
+			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE_DURING_CODEGEN,
+							   grammar.getName(),
+							   re);
 		}
 		genTokenTypeDefinitions(recognizerST);
 		genTokenTypeDefinitions(outputFileST);
@@ -277,8 +292,9 @@ public class CodeGenerator {
 			write(tokenVocabSerialization, getVocabFileName());
 		}
 		catch (IOException ioe) {
-			System.err.println("could not write generated code for "+
-							   grammar.getName()+":"+ioe);
+			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE,
+							   getVocabFileName(),
+							   ioe);
 		}
 	}
 

@@ -68,14 +68,7 @@ public class Target {
 										  Grammar grammar)
 	{
 		// Build NFAs from the grammar AST
-		try {
-			grammar.createNFAs();
-		}
-		catch (RecognitionException re) {
-			System.err.println("problems creating NFAs from grammar AST for "+
-					grammar.getName());
-			return;
-		}
+		grammar.createNFAs();
 
 		// Create the DFA predictors for each decision
 		grammar.createLookaheadDFAs();

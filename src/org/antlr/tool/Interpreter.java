@@ -131,14 +131,7 @@ public class Interpreter implements TokenSource {
 			if ( grammar.getType()==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();
 			}
-			try {
-				grammar.createNFAs();
-			}
-			catch (RecognitionException re) {
-				System.err.println("problems creating NFAs from grammar AST for "+
-								   grammar.getName());
-				return;
-			}
+			grammar.createNFAs();
 			// Create the DFA predictors for each decision
 			grammar.createLookaheadDFAs();
 		}
@@ -167,14 +160,7 @@ public class Interpreter implements TokenSource {
 			if ( grammar.getType()==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();
 			}
-			try {
-				grammar.createNFAs();
-			}
-			catch (RecognitionException re) {
-				System.err.println("problems creating NFAs from grammar AST for "+
-								   grammar.getName());
-				return;
-			}
+			grammar.createNFAs();
 			// Create the DFA predictors for each decision
 			grammar.createLookaheadDFAs();
 		}
@@ -343,8 +329,9 @@ public class Interpreter implements TokenSource {
 				s = (DFAState)eotTransition.getTarget();
 				continue dfaLoop;
 			}
-			System.err.println("unexpected label '"+
-					dfa.getNFA().getGrammar().getTokenName(c)+"' in dfa state "+s);
+			ErrorManager.error(ErrorManager.MSG_NO_VIABLE_DFA_ALT,
+							   s,
+							   dfa.getNFA().getGrammar().getTokenName(c));
 			return NFA.INVALID_ALT_NUMBER;
 		}
 		// woohoo!  We know which alt to predict
@@ -364,7 +351,9 @@ public class Interpreter implements TokenSource {
 			interp.lexer_action(code,token);
 		}
 		catch (RecognitionException re) {
-			System.err.println("cannot exec action: "+code.toString());
+			ErrorManager.error(ErrorManager.MSG_BAD_ACTION_AST_STRUCTURE,
+							   code,
+							   re);
 		}
 	}
 

@@ -1,0 +1,59 @@
+group en_US;
+
+// TOOL ERRORS
+// file errors
+CANNOT_WRITE_FILE(arg,exception) ::= "cannot write file <arg>: <exception>"
+CANNOT_CLOSE_FILE(arg,exception) ::= "cannot close file <arg>: <exception>"
+CANNOT_FIND_TOKENS_FILE(arg) ::= "cannot find tokens file <arg>"
+ERROR_READING_TOKENS_FILE(arg,exception) ::= 
+	"problem reading token vocabulary file <arg>: <exception>"
+
+INTERNAL_ERROR(arg) ::= "internal error: <arg>"
+INTERNAL_WARNING(arg) ::= "internal warning: <arg>"
+ERROR_CREATING_ARTIFICIAL_RULE(exception) ::=
+	"problems creating lexer rule listing all tokens: <exception>"
+TOKENS_FILE_SYNTAX_ERROR(arg,arg2) ::= 
+	"problems parsing token vocabulary file <arg> on line <arg2>"
+CANNOT_GEN_DOT_FILE(arg,exception) ::= 
+	"cannot write DFA DOT file <arg>: <exception>"
+BAD_AST_STRUCTURE_DURING_PRINTING() ::=
+	"bad internal tree structure found while printing grammar: <exception>"
+BAD_AST_STRUCTURE_DURING_CODEGEN() ::=
+	"bad internal tree structure found while generating code: <exception>"
+BAD_AST_STRUCTURE_DURING_BUILDNFA(arg,exception) ::= 
+	"bad internal tree structure found while building NFAs: <exception>"
+BAD_ACTION_AST_STRUCTURE() ::=
+	"bad internal tree structure found while interpeting lexer action '<arg>': <exception>"
+
+// code gen errors
+MISSING_CODE_GEN_TEMPLATES(arg) ::= 
+	"cannot find code generation templates for language <arg>"
+MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES() ::=
+	"cannot find code generation cyclic DFA templates for language <arg>"
+CODE_GEN_TEMPLATES_INCOMPLETE() ::= 
+	"at least one code generation template missing for language <arg>"
+CANNOT_CREATE_TARGET_GENERATOR(arg,exception) ::= 
+	"cannot create target <arg> code generator: <exception>"
+
+// grammar interpretation errors
+NO_VIABLE_DFA_ALT(arg,arg2) ::=
+	"no viable transition from state <arg> on <arg2> while interpreting DFA"
+
+// GRAMMAR ERRORS
+SYNTAX_ERROR() ::= "syntax error"
+RULE_REDEFINITION(file,line,col,arg) ::= 
+	"<loc()>rule <arg> redefinition"
+LEXER_RULES_NOT_ALLOWED() ::= 
+	"<loc()>lexer rule <arg> not allowed in parser"
+PARSER_RULES_NOT_ALLOWED() ::= 
+	"<loc()>parser rule <arg> not allowed in lexer"
+
+// GRAMMAR WARNINGS
+GRAMMAR_AMBIGUITY() ::= "grammar ambig"
+
+/* This factors out file location formatting; file,line,col inherited from
+ * enclosing template; don't manually pass stuff in.
+ */
+loc() ::= "<file>:<line>:<col>: "
+
+

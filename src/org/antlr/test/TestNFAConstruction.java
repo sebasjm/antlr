@@ -532,12 +532,7 @@ public class TestNFAConstruction extends TestSuite {
     private void checkRule(Grammar g, String rule, String expecting)
             throws FailedAssertionException
     {
-        try {
-            g.createNFAs();
-        }
-        catch (RecognitionException re) {
-            throw new FailedAssertionException("problem building nfas: "+re.toString());
-        }
+        g.createNFAs();
         State startState = g.getRuleStartState(rule);
         FASerializer serializer = new FASerializer(g);
         String result = serializer.serialize(startState);

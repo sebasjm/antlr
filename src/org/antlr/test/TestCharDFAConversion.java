@@ -171,12 +171,7 @@ public class TestCharDFAConversion extends TestSuite {
             if ( g.getType()==Grammar.LEXER ) {
                 g.addArtificialMatchTokensRule();
             }
-            try {
-                g.createNFAs();
-            }
-            catch (RecognitionException re) {
-                throw new FailedAssertionException("problem building nfas: "+re.toString());
-            }
+            g.createNFAs();
             g.createLookaheadDFAs();
         }
 

@@ -84,6 +84,10 @@ public class GrammarAST extends BaseAST {
         this.lookaheadDFA = lookaheadDFA;
     }
 
+	public Token getToken() {
+		return token;
+	}
+
     public NFAState getNFAStartState() {
         return NFAStartState;
     }

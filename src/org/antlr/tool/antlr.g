@@ -241,7 +241,7 @@ rule!
     	g.defineLexerRuleFoundInParser(name, tokenBuffer.toOriginalString(start,stop));
     }
    	else {
-   		int ruleIndex = g.defineRule(#ruleName.getText(), modifier, opts);
+   		int ruleIndex = g.defineRule(this, #ruleName.getToken(), modifier, opts);
 	    if ( ruleIndex!=Grammar.INVALID_RULE_INDEX ) {
     	    GrammarAST eor = #[EOR,"<end-of-rule>"];
         	eor.setEnclosingRule(#ruleName.getText());
