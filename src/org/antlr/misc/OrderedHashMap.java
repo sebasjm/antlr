@@ -31,6 +31,8 @@ import java.util.*;
 
 /** A HashMap that remembers the order that the elements were added.
  *  You can alter the ith element with set(i,value) too :)  Unique list.
+ *
+ *  TODO: replace with LinkedHashMap
  */
 public class OrderedHashMap extends HashMap {
 
