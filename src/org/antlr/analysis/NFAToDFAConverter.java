@@ -80,7 +80,13 @@ public class NFAToDFAConverter {
 				// we've hit max lookahead, make this a stop state
 				System.out.println("stop state @k="+k+" (terminated early)");
 				resolveNonDeterminisms(d);
-				d.setAcceptState(true); // must convert to accept state at k
+				// Check to see if we need to add any semantic predicate transitions
+				if ( d.isResolvedWithPredicates() ) {
+					addPredicateTransitions(d);
+				}
+				else {
+					d.setAcceptState(true); // must convert to accept state at k
+				}
 			}
 			else {
 				findNewDFAStatesAndAddDFATransitions(d);

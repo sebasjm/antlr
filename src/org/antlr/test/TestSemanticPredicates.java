@@ -298,6 +298,55 @@ public class TestSemanticPredicates extends TestSuite {
 					  null, null, 2);
 	}
 
+	public void testPredWithK1() throws Exception {
+		Grammar g = new Grammar(
+			"\tlexer grammar TLexer;\n" +
+			"A\n" +
+			"options {\n" +
+			"  k=1;\n" +
+			"}\n" +
+			"  : {p1}? ('x')+ '.'\n" +
+			"  | {p2}? ('x')+ '.'\n" +
+			"  ;\n");
+		String expecting =
+			".s0-'x'->.s1\n" +
+			".s1-{p1}?->:s3=>1\n" +
+			".s1-{p2}?->:s2=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] insufficientPredAlts = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 3, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, insufficientPredAlts,
+					  danglingAlts, numWarnings);
+	}
+
+	public void testPredWithArbitraryLookahead() throws Exception {
+		Grammar g = new Grammar(
+			"\tlexer grammar TLexer;\n" +
+			"A : {p1}? ('x')+ '.'\n" +
+			"  | {p2}? ('x')+ '.'\n" +
+			"  ;\n");
+		String expecting =
+			".s0-'x'->.s1\n" +
+			".s1-'.'->.s2\n" +
+			".s1-'x'->.s1\n" +
+			".s2-{p1}?->:s3=>1\n" +
+			".s2-{p2}?->:s4=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] insufficientPredAlts = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 3, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, insufficientPredAlts,
+					  danglingAlts, numWarnings);
+	}
+
+
 	// S U P P O R T
 
 	public void _template() throws Exception {
@@ -306,7 +355,15 @@ public class TestSemanticPredicates extends TestSuite {
 			"a : A | B;");
 		String expecting =
 			"\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = new int[] {1,2};
+		String ambigInput = "L ID R";
+		int[] insufficientPredAlts = new int[] {1};
+		int[] danglingAlts = null;
+		int numWarnings = 1;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, insufficientPredAlts,
+					  danglingAlts, numWarnings);
 	}
 
 	protected void checkDecision(Grammar g,
