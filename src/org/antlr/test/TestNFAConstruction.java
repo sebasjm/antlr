@@ -73,7 +73,7 @@ public class TestNFAConstruction extends TestSuite {
     public void testAorB() throws Exception {
         Grammar g = new Grammar(
                 "grammar P;\n"+
-                "a : A | B ;");
+                "a : A | B {;} ;");
         /* expecting (0)--Ep-->(1)--Ep-->(2)--A-->(3)--Ep-->(4)--Ep-->(5,end)
                                 |                            ^
                                (6)--Ep-->(7)--B-->(8)--------|
