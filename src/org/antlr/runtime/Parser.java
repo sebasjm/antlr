@@ -42,6 +42,10 @@ public class Parser {
 	 */
 	protected Stack following = new Stack();
 
+	/** This is true when we see an error and before having successfully
+	 *  matched a token.  Prevents generation of more than one error message
+	 *  per error.  
+	 */
 	protected boolean errorRecovery = false;
 
 
@@ -71,9 +75,9 @@ public class Parser {
 			errorRecovery = false;
 			return;
 		}
-		errorRecovery = true;
 		MismatchedTokenException mte = new MismatchedTokenException(ttype);
 		recoverFromMismatchedToken(mte, ttype, follow);
+		errorRecovery = true;
 		return;
 	}
 
@@ -88,6 +92,11 @@ public class Parser {
 	 *  more exceptions w/o breaking old code.
 	 */
 	public void reportError(RecognitionException e) {
+		// if we've already reported an error and have not matched a token
+		// yet successfully, don't report any errors.
+		if ( errorRecovery ) {
+			return;
+		}
 		String parserClassName = getClass().getName();
 		System.err.print(getRuleInvocationStack(e, parserClassName)+
 						 ": line "+input.LT(1).getLine()+" ");
@@ -131,81 +140,158 @@ public class Parser {
 	}
 
 	public void recover(RecognitionException re) {
-		BitSet followSet = computeRuleFollow();
+		BitSet followSet = computeErrorRecoverySet();
 		consumeUntil(followSet);
 	}
 
-	/*  Compute the context-sensitive FOLLOW set for current rule.
-	 *  During rule invocation, the parser pushes the set of tokens
-	 *  that can follow that rule reference on the stack; this amounts
-	 *  to computing FIRST of what follows the rule reference in the
-	 *  rule.  We can consider this the local follow.  The local
-	 *  follow set only includes tokens from within the enclosing
-	 *  rule; i.e., the FIRST computation done by ANTLR stops at the
-	 *  end of a rule.
-	 *
-	 *  This computation returns the union of all of these local
-	 *  follow sets.  It is important to note that the set is not
-	 *  limited to any particular lookahead depth.
-	 *
-	 *  For SLL(k) parsers, such as those built by ANTLR, you can only
-	 *  compute the "global" FOLLOW statically.  The global FOLLOW is
-	 *  the set of tokens that can follow a rule reference in *any*
-	 *  context.  In our case, since we are computing the combined set
-	 *  at run time, we know which particular single context and can
-	 *  compute an exact FOLLOW.
+	/*  Compute the error recovery set for the current rule.  During
+	 *  rule invocation, the parser pushes the set of tokens that can
+	 *  follow that rule reference on the stack; this amounts to
+	 *  computing FIRST of what follows the rule reference in the
+	 *  enclosing rule. This local follow set only includes tokens
+	 *  from within the rule; i.e., the FIRST computation done by
+	 *  ANTLR stops at the end of a rule.
 	 *
 	 *  EXAMPLE
 	 *
 	 *  When you find a "no viable alt exception", the input is not
 	 *  consistent with any of the alternatives for rule r.  The best
 	 *  thing to do is to consume tokens until you see something that
-	 *  can legally follow a call to r or any rule that called r.  You
-	 *  don't want the exact set of viable next tokens because the
-	 *  input might just be missing a token--you could consume the
-	 *  rest of the input looking for one of those tokens.
+	 *  can legally follow a call to r *or* any rule that called r.
+	 *  You don't want the exact set of viable next tokens because the
+	 *  input might just be missing a token--you might consume the
+	 *  rest of the input looking for one of the missing tokens.
 	 *
-	 *  For example, consider grammar:
+	 *  Consider grammar:
 	 *
-	 *  stat : ID '=' expr ';'
-	 *       | "return" expr '.'
-	 *       ;
-	 *  expr : atom ('+' atom)* ;
-	 *  atom : INT
-	 *       | '(' expr ')'
-	 *       ;
+	 *  a : '[' b ']'
+	 *    | '(' b ')'
+	 *    ;
+	 *  b : c '^' INT ;
+	 *  c : ID
+	 *    | INT
+	 *    ;
+	 *  
+	 *  At each rule invocation, the set of tokens that could follow
+	 *  that rule is pushed on a stack.  Here are the various "local"
+	 *  follow sets:
 	 *
-	 *  For input "i = (;" the parser will enter
+	 *  FOLLOW(b1_in_a) = FIRST(']') = ']'
+	 *  FOLLOW(b2_in_a) = FIRST(')') = ')'
+	 *  FOLLOW(c_in_b) = FIRST('^') = '^'
+	 *  
+	 *  Upon erroneous input "[]", the call chain is
 	 *
-	 *  stat -> expr -> atom -> expr -> atom
+	 *  a -> b -> c
 	 *
-	 *  and then discover ';' doesn't start an atom.  The FOLLOW of
-	 *  atom is set {'+',')',';'}.  Notice that it does not include
-	 *  '.'  because that token is contributed from a different
-	 *  context (that of having called expr from the 2nd alt of stat
-	 *  rather than the first as in our case).  The FOLLOW set is
-	 *  computed by walking back up the call chain and combining sets
-	 *  from the local follow for each rule.
+	 *  and, hence, the follow context stack is:
 	 *
-	 *  Anyway, the parser should not consume anything as LA(1)==';'.
-	 *  Consider the difference between FOLLOW(atom) and the set of
-	 *  viable tokens for what follows a reference to atom: {'+',')'}.
-	 *  If you used this set instead of the FOLLOW, you'd consume the
-	 *  ';' and probably far into the future looking for a + or ')'.
+	 *  depth  local follow set     after call to rule
+	 *    0         <EOF>                    a (from main())
+	 *    1          ']'                     b
+	 *    3          '^'                     c
+	 *
+	 *  Notice that ')' is not included, because b would have to have
+	 *  been called from a different context in rule a for ')' to be
+	 *  included. 
+	 *
+	 *  For error recovery, we cannot consider FOLLOW(c)
+	 *  (context-sensitive or otherwise).  We need the combined set of
+	 *  all context-sensitive FOLLOW sets--the set of all tokens that
+	 *  could follow any reference in the call chain.  We need to
+	 *  resync to one of those tokens.  Note that FOLLOW(c)='^' and if
+	 *  we resync'd to that token, we'd consume until EOF.  We need to
+	 *  sync to context-sensitive FOLLOWs for a, b, and c: {']','^'}.
+	 *  In this case, for input "[]", LA(1) is in this set so we would
+	 *  not consume anything and after printing an error rule c would
+	 *  return normally.  It would not find the required '^' though.
+	 *  At this point, it gets a mismatched token error and throws an
+	 *  exception (since LA(1) is not in the viable following token
+	 *  set).  The rule exception handler tries to recover, but finds
+	 *  the same recovery set and doesn't consume anything.  Rule b
+	 *  exits normally returning to rule a.  Now it finds the ']' (and
+	 *  with the successful match exits errorRecovery mode).
+	 *
+	 *  So, you cna see that the parser walks up call chain looking
+	 *  for the token that was a member of the recovery set.
+	 *
+	 *  Errors are not generated in errorRecovery mode.
+	 *
+	 *  ANTLR's error recovery mechanism is based upon original ideas:
+	 *
+	 *  "Algorithms + Data Structures = Programs" by Niklaus Wirth
+	 *
+	 *  and
+	 *
+	 *  "A note on error recovery in recursive descent parsers":
+	 *  http://portal.acm.org/citation.cfm?id=947902.947905
+	 *
+	 *  Later, Josef Grosch had some good ideas:
+	 *
+	 *  "Efficient and Comfortable Error Recovery in Recursive Descent
+	 *  Parsers":
+	 *  ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
+	 *
+	 *  Like Grosch I implemented local FOLLOW sets that are combined
+	 *  at run-time upon error to avoid overhead during parsing.
 	 */
-	protected BitSet computeRuleFollow() {
+	protected BitSet computeErrorRecoverySet() {
 		return combineFollows(false);
 	}
 
-	/** Compute the set of token types that can come next after a
-	 *  token reference.  You get the set of viable tokens that can
-	 *  possibly come next at lookahead depth 1.  You want the exact
-	 *  viable token set when recovering from a token mismatch.  If
-	 *  LA(1) is member of exact set, then you know there is most
-	 *  likely a missing token in the input stream.  "Insert" one by
-	 *  just not throwing an exception.
+	/** Compute the context-sensitive FOLLOW set for current rule.
+	 *  This is set of token types that can follow a specific rule
+	 *  reference given a specific call chain.  You get the set of
+	 *  viable tokens that can possibly come next (lookahead depth 1)
+	 *  given the current call chain.  Contrast this with the
+	 *  definition of plain FOLLOW for rule r:
+	 *
+	 *   FOLLOW(r)={x | S=>*alpha r beta in G and x in FIRST(beta)}
+	 *  
+	 *  where x in T* and alpha, beta in V*; T is set of terminals and
+	 *  V is the set of terminals and nonterminals.  In other words,
+	 *  FOLLOW(r) is the set of all tokens that can possibly follow
+	 *  references to r in *any* sentential form (context).  At
+	 *  runtime, however, we know precisely which context applies as
+	 *  we have the call chain.  We may compute the exact (rather
+	 *  than covering superset) set of following tokens.
+	 *
+	 *  For example, consider grammar:
+	 *
+	 *  stat : ID '=' expr ';'      // FOLLOW(stat)=={EOF}
+	 *       | "return" expr '.'
+	 *       ;
+	 *  expr : atom ('+' atom)* ;   // FOLLOW(expr)=={';','.',')'}
+	 *  atom : INT                  // FOLLOW(atom)=={'+',')',';','.'}
+	 *       | '(' expr ')'
+	 *       ;
+	 *
+	 *  The FOLLOW sets are all inclusive whereas context-sensitive
+	 *  FOLLOW sets are precisely what could follow a rule reference.
+	 *  For input input "i=(3);", here is the derivation:
+	 *
+	 *  stat => ID '=' expr ';'
+	 *       => ID '=' atom ('+' atom)* ';'
+	 *       => ID '=' '(' expr ')' ('+' atom)* ';'
+	 *       => ID '=' '(' atom ')' ('+' atom)* ';'
+	 *       => ID '=' '(' INT ')' ('+' atom)* ';'
+	 *       => ID '=' '(' INT ')' ';'
+	 *
+	 *  At the "3" token, you'd have a call chain of
+	 *
+	 *    stat -> expr -> atom -> expr -> atom
+	 *
+	 *  What can follow that specific nested ref to atom?  Exactly ')'
+	 *  as you can see by looking at the derivation of this specific
+	 *  input.  Contrast this with the FOLLOW(atom)={'+',')',';','.'}.
+	 *
+	 *  You want the exact viable token set when recovering from a
+	 *  token mismatch.  Upon token mismatch, if LA(1) is member of
+	 *  the viable next token set, then you know there is most likely
+	 *  a missing token in the input stream.  "Insert" one by just not
+	 *  throwing an exception.
 	 */
-	protected BitSet computeViableTokens() {
+	protected BitSet computeContextSensitiveRuleFOLLOW() {
 		return combineFollows(true);
 	}
 
@@ -227,6 +313,35 @@ public class Parser {
 		return followSet;
 	}
 
+	/** Attempt to recover from a single missing or extra token.
+	 *
+	 *  EXTRA TOKEN
+	 *
+	 *  LA(1) is not what we are looking for.  If LA(2) has the right token,
+	 *  however, then assume LA(1) is some extra spurious token.  Delete it
+	 *  and LA(2) as if we were doing a normal match(), which advances the
+	 *  input.
+	 *
+	 *  MISSING TOKEN
+	 *
+	 *  If current token is consistent with what could come after
+	 *  ttype then it is ok to "insert" the missing token, else throw
+	 *  exception For example, Input "i=(3;" is clearly missing the
+	 *  ')'.  When the parser returns from the nested call to expr, it
+	 *  will have call chain:
+	 *
+	 *    stat -> expr -> atom
+	 *
+	 *  and it will be trying to match the ')' at this point in the
+	 *  derivation: 
+	 *
+	 *       => ID '=' '(' INT ')' ('+' atom)* ';'
+	 *                          ^
+	 *  match() will see that ';' doesn't match ')' and report a
+	 *  mismatched token error.  To recover, it sees that LA(1)==';'
+	 *  is in the set of tokens that can follow the ')' token
+	 *  reference in rule atom.  It can assume that you forgot the ')'.
+	 */
 	public void recoverFromMismatchedToken(MismatchedTokenException mte,
 										   int ttype,
 										   org.antlr.runtime.BitSet follow)
@@ -242,7 +357,8 @@ public class Parser {
 		}
 		// compute what can follow this token reference
 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
-			BitSet viableTokensFollowingThisRule = computeViableTokens();
+			BitSet viableTokensFollowingThisRule =
+				computeContextSensitiveRuleFOLLOW();
 			follow = follow.or(viableTokensFollowingThisRule);
 			follow.remove(Token.EOR_TOKEN_TYPE);
 		}
@@ -250,9 +366,7 @@ public class Parser {
 		// then it is ok to "insert" the missing token, else throw exception
 		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
 		if ( follow.member(input.LA(1)) ) {
-			if ( !errorRecovery ) {
-				reportError(mte);
-			}
+			reportError(mte);
 			System.err.println("inserting "+getTokenNames()[ttype]);
 			return;
 		}
