@@ -235,9 +235,6 @@ const TOKEN EOFToken = { EOF };
 
 #define INIT_TOKEN_BUFSIZE 1024
 
-/* prototype for the internal tokens rule */
-int mTokens( LEXER_CONTEXT* ctx );
-
 /* define stuff for now with real support code this might need some tweakage
  */
 #define skip() ctx->skipToken = 1
@@ -345,10 +342,6 @@ int matchAny( LEXER_CONTEXT* ctx )
 		return ANTLR_UNEXPECTED_EOF;
 	return append( ctx, ch );
 }
-
-/* Token definitions */
-#define TOKEN_EOF (unsigned int)EOF
-<tokens:{#define TOKEN_<attr.name> <attr.type>U}; separator="\n">
 
 void <name>_init( void ) {
 	<literals:{hash_value(<attr.name>, <attr.type>);}; separator="\n">
@@ -675,7 +668,7 @@ charRef(char) ::= "ret = matchChar( ctx, <char> );"
 charRangeRef(a,b) ::= "ret = matchRange( ctx, <a>,<b> );"
 
 matchSet(s) ::= << /* matchSet */
-if ( !<s> )
+if ( ! ( <s> ) )
 {
 	if( LA(ctx,1) >= ' ' && LA(ctx,1) \< 255 )
 		fprintf( stderr, "line %d: set mismatch '%c'\r\n", ctx->line, LA(ctx,1) );
@@ -800,10 +793,10 @@ orPredicates(left,right) ::= "( <left> || <right> )"
 
 notPredicate(pred) ::= "!( <pred> )"
 
-lookaheadTest(atom,k,atomAsInt) ::= "LA(ctx,<k>) == <atom> /* latest <atomAsInt> */"
+lookaheadTest(atom,k,atomAsInt) ::= "LA(ctx,<k>) == <atom> /* k=<k> val=<atomAsInt> */"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::=
-	"( LA(ctx,<k>) >= <lower> && LA(ctx,<k>) \<= <upper> )"
+	"( LA(ctx,<k>) >= <lower> && LA(ctx,<k>) \<= <upper> ) /* <lowerAsInt> <upperAsInt>*/"
 
 setTest(ranges) ::= "<ranges; separator=\" || \">"
 
