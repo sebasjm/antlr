@@ -284,8 +284,8 @@ public class Grammar {
 							   re);
 		}
 
-		System.out.println("### define rules");
 		// DEFINE RULES
+		System.out.println("### define rules");
 		DefineGrammarItemsWalker defineItemsWalker = new DefineGrammarItemsWalker();
 		defineItemsWalker.setASTNodeClass("org.antlr.tool.GrammarAST");
 		try {

@@ -30,8 +30,27 @@ package org.antlr.runtime;
 /** A source of tokens must provide a sequence of tokens via nextToken()
  *  and also must reveal it's source of characters so a token's text can
  *  be computed later.  Tokens only store indices into the char stream.
+ *
+ *  Errors from the lexer are never passed to the parser.  Either you want
+ *  to keep going or you do not upon token recognition error.  If you do not
+ *  want to continue lexing then you do not want to continue parser.  Just
+ *  throw an exception not under RecognitionException and Java will naturally
+ *  toss you all the way out of the recognizers.  If you want to continue
+ *  lexing then you should not throw an exception to the parser--it has already
+ *  requested a token.  Keep lexing until you get a valid one.  Just report
+ *  errors and keep going.
  */
 public interface TokenSource {
-	public Token nextToken() throws TokenStreamException;
+	/** Return a Token object from your input stream (usually a CharStream).
+	 *  Do not fail/return upon lexing error; keep chewing on the characters
+	 *  until you get a good one; errors are not passed through to the parser.
+	 */
+	public Token nextToken();
+
+	/** From what CharStream are you pulling tokens?  Without a CharStream
+	 *  it may be impossible to obtain the text for a token since the
+	 *  default ANTLR mechanism does not create String objects for each token.
+	 *  Instead the start/stop index into the CharStream is recorded.
+	 */ 
 	public CharStream getCharStream();
 }

@@ -35,6 +35,8 @@ public interface TokenStream extends IntStream {
 	/** Get Token at current input marker + i ahead where i=1 is next Token. */
     public Token LT(int marker, int i);
 
-	/** Where is this stream pulling tokens from? */
+	/** Where is this stream pulling tokens from?  This is not the name, but
+	 *  the object that provides Token objects.
+	 */
 	public TokenSource getTokenSource();
 }

@@ -76,9 +76,7 @@ public class Interpreter implements TokenSource {
 		this.input = input;
 	}
 
-	public Token nextToken()
-		throws TokenStreamException
-	{
+	public Token nextToken() {
 		if ( grammar.type!=Grammar.LEXER ) {
 			return null;
 		}
@@ -88,11 +86,17 @@ public class Interpreter implements TokenSource {
 		int start = input.index();
 		int type = 0;
 		CommonToken token = null;
-		try {
-			token = scan(Grammar.TOKEN_RULENAME);
-		}
-		catch (RecognitionException re) {
-			throw new TokenStreamException(re);
+		loop:
+		while (true) {
+			try {
+				token = scan(Grammar.TOKEN_RULENAME);
+				break;
+			}
+			catch (RecognitionException re) {
+				// report a problem and try for another
+				reportScanError(re);
+				continue loop;
+			}
 		}
 		// the scan can only set type and channel (if a ${...} action found)
 		// we must set the line, and other junk here to make it a complete token
@@ -357,4 +361,10 @@ public class Interpreter implements TokenSource {
 		}
 	}
 
+	public void reportScanError(RecognitionException re) {
+		CharStream cs = (CharStream)input;
+		// don't report to ANTLR tool itself; make people override to redirect
+		System.err.println("problem matching token at "+
+						   cs.getLine()+":"+cs.getCharPositionInLine());
+	}
 }

@@ -14,12 +14,6 @@ import java.util.*;
 <recognizer><\n>
 >>
 
-headerFile(name, tokens, rules, cyclicDFAs) ::= <<
-// header for <name>
-<tokens:{const int <attr.name>=<attr.type>;<\n>}>
-<rules:{extern void <it.name>(<it.args>);<\n>}>
->>
-
 lexer(name, tokens, rules, cyclicDFAs) ::= <<
 class <name> extends Lexer {
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
@@ -27,11 +21,11 @@ class <name> extends Lexer {
         super(input);
     }
     public Token nextToken() {
-		if ( input.LA(1)==CharStream.EOF ) {
-			return Token.EOFToken;
-		}
-		token=null;
-		mTokens();
+        if ( input.LA(1)==CharStream.EOF ) {
+            return Token.EOFToken;
+        }
+        token=null;
+        mTokens();
         return token;
     }
 
@@ -50,34 +44,43 @@ class <name> extends Parser {
 >>
 
 rule(ruleName,args,block,enterAction,exitAction) ::= <<
-public void <ruleName>(<args>)
+public void <ruleName>(<args>) {   
+    try {
 <if(enterAction)>
-{
-    <enterAction>
-    <block>
-    <exitAction>
-}
+        <enterAction>
+        <block>
+        <exitAction><\n>
 <else>
-{
-	<block>
-}
+        <block>
 <endif>
+    }
+    catch (RecognitionException re) {
+        reportError(re);
+        recover();
+    }
+}
 >>
 
 lexerRule(ruleName,nakedBlock,args,block,enterAction,exitAction) ::= <<
 public void m<ruleName>(<args>)
 {
+    try {
 <if(nakedBlock)>
-	<block><\n>
+    <block><\n>
 <else>
     int type = <ruleName>;
     int start = getCharIndex();
     int line = getLine();
     int charPosition = getCharPositionInLine();
     int channel = Token.DEFAULT_CHANNEL;
-	<block>
+    <block>
     if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}<\n>
 <endif>
+    }
+    catch (RecognitionException re) {
+        reportError(re);
+        recover();
+    }
 }
 >>
 
@@ -96,40 +99,36 @@ switch (alt<decisionNumber>) {
 >>
 
 positiveClosureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<
-    int alt<decisionNumber>=0;
-    int cnt<decisionNumber>=0;
-    <decls>
+int cnt<decisionNumber>=0;
+<decls>
 loop<decisionNumber>:
-    do {
-        <decision>
-        switch (alt<decisionNumber>) {
-            <alts:altSwitchCase()>
-            default :
-		if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
-                <if(LEXER)>
-		else System.err.println("line "+getLine()+": no viable alt in decision <decisionNumber> LA(1)=="+(char)input.LA(1));<\n>
-                <else>
-		else System.err.println("no viable alt in decision <decisionNumber> LT(1)=="+((TokenStream)input).LT(1).toString(((CommonTokenStream)input).getTokenSource().getCharStream()));<\n>
-                <endif>
-        }
-        cnt<decisionNumber>++;
-    } while (true);
+do {
+    int alt<decisionNumber>=0;
+    <decision>
+    switch (alt<decisionNumber>) {
+	<alts:altSwitchCase()>
+	default :
+	    if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
+	    throw new EarlyExitException(<decisionNumber>);
+    }
+    cnt<decisionNumber>++;
+} while (true);
 >>
 
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
 closureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<
-    int alt<decisionNumber>=0;
-    <decls>
+<decls>
 loop<decisionNumber>:
-    do {
-        <decision>
-        switch (alt<decisionNumber>) {
-            <alts:altSwitchCase()>
-            default :
-                break loop<decisionNumber>;
-        }
-    } while (true);
+do {
+    int alt<decisionNumber>=0;
+    <decision>
+    switch (alt<decisionNumber>) {
+	<alts:altSwitchCase()>
+	default :
+	    break loop<decisionNumber>;
+    }
+} while (true);
 >>
 
 closureBlockSingleAlt ::= closureBlock
@@ -152,14 +151,15 @@ charRef(char) ::= "match(<char>);"
 
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
+/** For now, sets are interval tests and must be tested inline */
 matchSet(s) ::= <<
-if ( !(<s>) ) System.err.println("rule <ruleName> set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
-input.consume();<\n>
+if ( <s> ) input.consume();
+else throw new MismatchedSetException("<s>");<\n>
 >>
 
 matchNotSet(s) ::= <<
-if ( <s> ) System.err.println("rule <ruleName> ~set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
-input.consume();
+if ( !(<s>) ) input.consume();
+else throw new MismatchedNotSetException("<s>");<\n>
 >>
 
 lexerStringRef(string) ::= "match(<string>);"
@@ -184,12 +184,7 @@ else {
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
-<if(LEXER)>
-    System.err.println("<description>: state <stateNumber> no viable alt line "+getLine()+" c='"+(char)input.LA(1)+"'");<\n>
-<else>
-    System.err.println("<description>: state <stateNumber> no viable alt line token="+((TokenStream)input).LT(1).toString(((CommonTokenStream)input).getTokenSource().getCharStream()));<\n>
-<endif>
-    input.consume();<\n>
+    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>);<\n>
 <endif>
 }
 >>

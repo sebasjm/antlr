@@ -27,35 +27,17 @@
 */
 package org.antlr.runtime;
 
-/** A simple stream of integers used when all I care about is the char
- *  or token type sequence (such as interpretation).
- */
-public interface IntStream {
-	void consume();
+public class NoViableAltException extends RecognitionException {
+	public String grammarDecisionDescription;
+	public int decisionNumber;
+	public int stateNumber;
 
-	/** Get int at current input pointer + i ahead where i=1 is next int */
-	int LA(int i);
-
-	/** Tell the stream to start buffering if it hasn't already.  Return
-     *  current input position, index().
-     */
-	int mark();
-
-	/** Return the current input symbol index 0..n where n indicates the
-     *  last symbol has been read.
-     */
-	int index();
-
-	/** Reset the stream so that next call to index would return marker. */
-	void rewind(int marker);
-
-	/** Only makes sense for streams that buffer everything up probably, but
-	 *  might be useful to display the entire stream or for testing.
-	 */
-	int size();
-
-	/** A string describing where these ints are coming from; most of the
-	 *  time this will be a file name.
-	 */
-	String getSourceName();
+	public NoViableAltException(String grammarDecisionDescription,
+								int decisionNumber,
+								int stateNumber)
+	{
+		this.grammarDecisionDescription = grammarDecisionDescription;
+		this.decisionNumber = decisionNumber;
+		this.stateNumber = stateNumber;
+	}
 }

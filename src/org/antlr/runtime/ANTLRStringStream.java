@@ -102,5 +102,9 @@ public class ANTLRStringStream implements CharStream {
 
 	public void setCharPositionInLine(int pos) {
 		this.charPositionInLine = pos;
+	}
+
+	public String getSourceName() {
+		return "<string>";
 	}	
 }

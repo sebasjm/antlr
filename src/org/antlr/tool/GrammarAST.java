@@ -41,21 +41,21 @@ import java.util.HashMap;
  *  converted to NFAs via a tree walker.
  */
 public class GrammarAST extends BaseAST {
-    Token token = null;
-    GrammarAST enclosingBlock = null;
-    String enclosingRule = null;
+    protected Token token = null;
+    protected GrammarAST enclosingBlock = null;
+    protected String enclosingRule = null;
 
     /** If this is a decision node, what is the lookahead DFA? */
-    DFA lookaheadDFA = null;
+    protected DFA lookaheadDFA = null;
 
     /** What NFA was built from this node? */
-    NFAState NFAStartState = null;
+    protected NFAState NFAStartState = null;
 
     /** If this is a SET node, what are the elements? */
-    IntSet setValue = null;
+    protected IntSet setValue = null;
 
     /** If this is a BLOCK node, track options here */
-    Map options = null;
+    protected Map options = null;
 
     /** What are the default options for a subrule? */
     public static final Map defaultOptions =

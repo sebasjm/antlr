@@ -57,7 +57,7 @@ public class CommonTokenStream implements TokenStream {
 	protected int channel = Token.DEFAULT_CHANNEL;
     protected int p = 0;
 
-    public CommonTokenStream(TokenSource tokenSource) throws TokenStreamException {
+    public CommonTokenStream(TokenSource tokenSource) {
 		tokens = new ArrayList(500);
 		filteredTokens = new ArrayList(500);
         this.tokenSource = tokenSource;
@@ -148,6 +148,10 @@ public class CommonTokenStream implements TokenStream {
 
 	public TokenSource getTokenSource() {
 		return tokenSource;
+	}
+
+	public String getSourceName() {
+		return tokenSource.getCharStream().getSourceName();
 	}
 
 	public String toString() {

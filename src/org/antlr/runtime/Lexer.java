@@ -56,12 +56,11 @@ public abstract class Lexer implements TokenSource {
 		this.token = token;
 	}
 
-    public void match(String s) {
+    public void match(String s) throws MismatchedTokenException {
         int i = 0;
         while ( i<s.length() ) {
             if ( input.LA(1)!=s.charAt(i) ) {
-                System.err.println("mismatched char: "+
-                        (char)input.LA(1)+"; expecting '"+s.charAt(i)+"'");
+				throw new MismatchedTokenException(s.charAt(i));
             }
             i++;
             input.consume();
@@ -72,18 +71,16 @@ public abstract class Lexer implements TokenSource {
         input.consume();
     }
 
-    public void match(int c) {
+    public void match(int c) throws MismatchedTokenException {
         if ( input.LA(1)!=c ) {
-            System.err.println("mismatched char: "+
-                    (char)input.LA(1)+"; expecting "+(char)c+"'");
+			throw new MismatchedTokenException(c);
         }
         input.consume();
     }
 
-    public void matchRange(int x, int y) {
-        if ( input.LA(1)<x || input.LA(1)>y ) {
-            System.err.println("mismatched char: "+(char)input.LA(1)+"; expecting "+
-                    x+".."+y);
+    public void matchRange(int a, int b) throws MismatchedRangeException {
+        if ( input.LA(1)<a || input.LA(1)>b ) {
+            throw new MismatchedRangeException(a,b);
         }
         input.consume();
     }
@@ -99,5 +96,66 @@ public abstract class Lexer implements TokenSource {
 	/** What is the index of the current character of lookahead? */
 	public int getCharIndex() {
 		return input.index();
+	}
+
+	/** Report a recognition problem.  Java is not polymorphic on the
+	 *  argument types so you have to check the type of exception yourself.
+	 *  That's not very clean but it's better than generating a bunch of
+	 *  catch clauses in each rule and makes it easy to extend with
+	 *  more exceptions w/o breaking old code.
+	 */
+	public void reportError(RecognitionException e) {
+		System.err.print(Parser.getRuleInvocationStack(e,getClass().getName())+
+						 ": line "+input.getLine()+" ");
+		if ( e instanceof MismatchedTokenException ) {
+			MismatchedTokenException mte = (MismatchedTokenException)e;
+			System.err.println("mismatched char: '"+
+							   (char)input.LA(1)+
+							   "' on line "+getLine()+
+							   "; expecting char '"+(char)mte.expecting+"'");
+		}
+		else if ( e instanceof NoViableAltException ) {
+			NoViableAltException nvae = (NoViableAltException)e;
+			System.err.println(nvae.grammarDecisionDescription+
+							   " state "+nvae.stateNumber+
+							   " (decision="+nvae.decisionNumber+
+							   ") no viable alt line "+getLine()+"; char='"+
+							   (char)input.LA(1)+"'");
+		}
+		else if ( e instanceof EarlyExitException ) {
+			EarlyExitException eee = (EarlyExitException)e;
+			System.err.println("required (...)+ loop (decision="+
+							   eee.decisionNumber+
+							   ") did not match anything; on line "+
+							   getLine()+" char="+
+							   (char)input.LA(1)+"'");
+		}
+		else if ( e instanceof MismatchedSetException ) {
+			MismatchedSetException mse = (MismatchedSetException)e;
+			System.err.println("mismatched char: '"+
+							   (char)input.LA(1)+
+							   "' on line "+getLine()+
+							   "; expecting set "+mse.expecting);
+		}
+		else if ( e instanceof MismatchedNotSetException ) {
+			MismatchedSetException mse = (MismatchedSetException)e;
+			System.err.println("mismatched char: '"+
+							   (char)input.LA(1)+
+							   "' on line "+getLine()+
+							   "; expecting set "+mse.expecting);
+		}
+		else if ( e instanceof MismatchedRangeException ) {
+			MismatchedRangeException mre = (MismatchedRangeException)e;
+			System.err.println("mismatched char: '"+
+							   (char)input.LA(1)+
+							   "' on line "+getLine()+
+							   "; expecting set '"+(char)mre.a+"'..'"+
+							   (char)mre.b+"'");
+		}
+	}
+
+	/** TODO: make this accept the FOLLOW(enclosing-Rule) */
+	public void recover() {
+		input.consume();
 	}
 }
