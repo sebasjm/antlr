@@ -1,8 +1,8 @@
-package org.antlr.tool;
+package org.antlr.analysis;
 
-import org.antlr.misc.BitSet;
 import org.antlr.misc.IntervalSet;
 import org.antlr.misc.IntSet;
+import org.antlr.tool.Grammar;
 
 /** An LL(1) lookahead set; contains a set of token types and a "hasEOF"
  *  condition when the set contains EOF.  Since EOF is -1 everywhere and -1
