@@ -31,11 +31,15 @@ import java.io.IOException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
+import java.util.List;
+import java.util.ArrayList;
 
 // TODO: this should be special case of ANTLRStringStream right?
 public class ANTLRFileStream implements CharStream {
-    protected int p=0;
     protected String fileName;
+
+	/** 0..n-1 index into string of next char */
+	protected int p=0;
 
 	/** line number 1..n within the input */
 	protected int line = 1;
@@ -45,11 +49,15 @@ public class ANTLRFileStream implements CharStream {
 
     protected char[] data;
 
+	protected List markers;
+
 	public ANTLRFileStream() {
 	}
 
 	public ANTLRFileStream(String fileName) throws IOException {
 		load(fileName);
+		markers = new ArrayList(1);
+		markers.add(new CharStreamState());
 	}
 
 	public void load(String fileName) throws IOException {
@@ -105,7 +113,11 @@ public class ANTLRFileStream implements CharStream {
     }
 
     public int mark() {
-        return index(); // already buffered, just return index
+		CharStreamState state = (CharStreamState)markers.get(0);
+		state.p = p;
+		state.line = line;
+		state.charPositionInLine = charPositionInLine;
+        return 0;
     }
 
     /** Return the current input symbol index 0..n where n indicates the
@@ -119,8 +131,11 @@ public class ANTLRFileStream implements CharStream {
 		return data.length;
 	}
 
-    public void rewind(int marker) {
-        p = marker;
+    public void rewind(int m) {
+		CharStreamState state = (CharStreamState)markers.get(m);
+		p = state.p;
+		line = state.line;
+		charPositionInLine = state.charPositionInLine;
     }
 
 	public String substring(int start, int stop) {
