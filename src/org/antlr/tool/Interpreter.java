@@ -82,8 +82,7 @@ public class Interpreter implements TokenSource {
 		}
 		public void consumeToken(Token token) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
-			ParseTree elementNode =
-				new ParseTree(token.getText()/*+"<"+g.getTokenName(token.getType())+">"*/);
+			ParseTree elementNode = new ParseTree(token);
 			ruleNode.addChild(elementNode);
 		}
 		public void consumeHiddenToken(Token token) {}
@@ -259,23 +258,6 @@ public class Interpreter implements TokenSource {
 				/*
 				System.out.println("predicted alt "+predictedAlt+", parseAlt "+
 								   parseAlt);
-				*/
-				/*
-				if ( s.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
-					if ( predictedAlt==grammar.getNumberOfAltsForDecisionNFA(s) )
-					{
-						// special case; loop end decisions have exit as
-						// # block alts + 1; getNumberOfAltsForDecisionNFA() has
-						// both block alts and exit branch.  So, any predicted alt
-						// equal to number of alts is the exit alt.  The NFA
-						// sees that as alt 1
-						predictedAlt = 1;
-					}
-					else {
-						// exit branch is really first transition, so skip
-						predictedAlt = predictedAlt+1;
-					}
-				}
 				*/
 				NFAState alt = grammar.getNFAStateForAltOfDecision(s, parseAlt);
 				s = (NFAState)alt.transition(0).target;
