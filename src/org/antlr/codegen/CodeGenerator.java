@@ -241,7 +241,9 @@ public class CodeGenerator {
 			recognizerST = templates.getInstanceOf("lexer");
 			outputFileST.setAttribute("LEXER", "true");
 		}
-		else if ( grammar.getType()==Grammar.PARSER ) {
+		else if ( grammar.getType()==Grammar.PARSER ||
+			      grammar.getType()==Grammar.COMBINED )
+		{
 			recognizerST = templates.getInstanceOf("parser");
 			outputFileST.setAttribute("PARSER", "true");
 		}
@@ -278,8 +280,7 @@ public class CodeGenerator {
 						headerFileST);
 		}
 		catch (RecognitionException re) {
-			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE_DURING_CODEGEN,
-							   grammar.getName(),
+			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
 		genTokenTypeDefinitions(recognizerST);
@@ -539,18 +540,6 @@ public class CodeGenerator {
                 code.setAttribute("tokens.{name,type}", tokenName, new Integer(tokenType));
             }
         }
-
-        /*
-		if ( grammar.getType()==Grammar.LEXER ) {
-            // make a literals hash table or whatever target requires for literals
-            Iterator stringLiterals = grammar.getStringLiterals().iterator();
-            while (stringLiterals.hasNext()) {
-                String literal = (String) stringLiterals.next();
-                int tokenType = grammar.getTokenType(literal);
-                code.setAttribute("literals.{name,type}", literal, new Integer(tokenType));
-            }
-        }
-		*/
     }
 
     /** Generate a token vocab file with all the token names/types.  For example:
@@ -572,15 +561,6 @@ public class CodeGenerator {
             }
         }
 
-        /*
-		// make a literals hash table or whatever target requires for literals
-        Iterator stringLiterals = grammar.getStringLiterals().iterator();
-        while (stringLiterals.hasNext()) {
-            String literal = (String) stringLiterals.next();
-            int tokenType = grammar.getTokenType(literal);
-            vocabFileST.setAttribute("literals.{name,type}", literal, new Integer(tokenType));
-        }
-		*/
         return vocabFileST;
     }
 

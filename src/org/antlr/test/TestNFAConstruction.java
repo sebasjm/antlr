@@ -527,9 +527,89 @@ public class TestNFAConstruction extends TestSuite {
 			":s25->.s26\n" +
 			":s9-<EOF>->.s10\n";
         checkRule(g, "a", expecting);
-    }
+	}
 
-    private void checkRule(Grammar g, String rule, String expecting)
+	public void testSets() throws Exception {
+		Grammar g = new Grammar(
+			"grammar P;\n"+
+			"a : ( A | B )+ ;\n" +
+			"b : ( A | B{;} )+ ;\n" +
+			"c : (A|B) (A|B) ;\n" +
+			"d : ( A | B )* ;\n" +
+			"e : ( A | B )? ;");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A..B->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s3\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
+		checkRule(g, "a", expecting);
+		expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s11->.s12\n" +
+			".s12-B->.s13\n" +
+			".s13->.s6\n" +
+			".s2->.s3\n" +
+			".s3->.s11\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s3\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
+		checkRule(g, "b", expecting);
+		expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2-A..B->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A..B->.s5\n" +
+			".s5->.s6\n" +
+			".s6->:s7\n" +
+			":s7-<EOF>->.s8\n";
+		checkRule(g, "c", expecting);
+		expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s11->.s7\n" +
+			".s2->.s11\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A..B->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s3\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
+		checkRule(g, "d", expecting);
+		expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s11->.s7\n" +
+			".s2->.s11\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A..B->.s5\n" +
+			".s5->.s6\n" +
+			".s6->.s7\n" +
+			".s7->.s8\n" +
+			".s8->:s9\n" +
+			":s9-<EOF>->.s10\n";
+		checkRule(g, "e", expecting);
+	}
+
+
+	private void checkRule(Grammar g, String rule, String expecting)
             throws FailedAssertionException
     {
         g.createNFAs();

@@ -97,21 +97,23 @@ toString returns [String s=null]
 
 grammar
     :   (headerSpec)*
-        #( "grammar"
-           (cmt:DOC_COMMENT {out(#cmt.getText()+"\n");} )?
-           {out("grammar ");} atom (optionsSpec)? {out(";\n");}
-           rules
-         )
-    ;
+	    ( #( LEXER_GRAMMAR grammarSpec["lexer " ] )
+	    | #( PARSER_GRAMMAR grammarSpec["parser"] )
+	    | #( TREE_GRAMMAR grammarSpec["tree "] )
+	    | #( COMBINED_GRAMMAR grammarSpec[""] )
+	    )
+     ;
 
 headerSpec
     :   #( "header" a:ACTION {out("header {"+#a.getText()+"}\n");} )
     ;
 
-grammarType
-    :   "lexer"  {out("lexer ");}
-    |   "parser" {out("parser ");}
-    |   "tree"   {out("tree ");}
+grammarSpec[String gtype]
+	:	 id:ID {out(gtype+"grammar "+#id.getText());}
+        (cmt:DOC_COMMENT {out(#cmt.getText()+"\n");} )?
+        (optionsSpec)? {out(";\n");}
+        (tokensSpec)?
+        rules
     ;
 
 optionsSpec
@@ -119,11 +121,11 @@ optionsSpec
     ;
 
 option
-    :   #( ASSIGN id {out("=");} optionValue )
+    :   #( ASSIGN id:ID {out(#id.getText()+"=");} optionValue )
     ;
 
 optionValue
-	:	id
+	:	id:ID            {out(#id.getText());}
 	|   s:STRING_LITERAL {out(#s.getText());}
 	|	c:CHAR_LITERAL   {out(#c.getText());}
 	|	i:INT            {out(#i.getText());}
@@ -140,28 +142,37 @@ charSetElement
 	|   #( RANGE c3:CHAR_LITERAL c4:CHAR_LITERAL )
 	;
 
+tokensSpec
+	:	#( TOKENS ( tokenSpec )+ )
+	;
+
+tokenSpec
+	:	TOKEN_REF
+	|	#( ASSIGN TOKEN_REF (STRING_LITERAL|CHAR_LITERAL) )
+	;
+
 rules
     :   ( rule )+
     ;
 
 rule
-    :   #( RULE (r:RULE_REF {out(r+" : ");}|t:TOKEN_REF {out(t+" : ");})
-        block EOR {out(";\n");} )
+    :   #( RULE id:ID {out(#id.getText()+" : ");}
+           (modifier)? (optionsSpec)? b:block[false] EOR {out(";\n");}
+         )
     ;
 
-block
-    :   #(  BLOCK {out(" (");}
-            {
-            Map opts = #BLOCK.getOptions();
-            if ( opts!=null ) {
-                String os = opts.toString();
-                os = os.substring(1,os.length()-1);
-                out(os);
-                out(" :");
-            }
-            }
+modifier
+	:	"protected"
+	|	"public"
+	|	"private"
+	|	"fragment"
+	;
+
+block[boolean forceParens]
+    :   #(  BLOCK {if ( forceParens||#block.getNumberOfChildren()>2 ) out(" (");}
+            (optionsSpec)?
             alternative ( {out(" | ");} alternative)*
-            EOB   {out(")");}
+            EOB   {if ( forceParens||#block.getNumberOfChildren()>2 ) out(")");}
          )
     ;
 
@@ -171,12 +182,12 @@ alternative
 
 element
     :   atom
-    |   #(NOT {out("~");} element) 
+    |   #(NOT {out("~");} atom) 
     |   #(RANGE atom {out("..");} atom)
     |   #(CHAR_RANGE atom {out("..");} atom)
     |   ebnf
     |   tree
-    |   #( SYNPRED block ) {out("=>");}
+    |   #( SYNPRED block[true] ) {out("=>");}
     |   a:ACTION  {out(a.getText());}
     |	lexer_action
     |   SEMPRED
@@ -196,35 +207,37 @@ lexer_expr
 	|	ID
     ;
 
-ebnf:   block {out(" ");}
-    |   #( OPTIONAL block ) {out("? ");}
-    |   #( CLOSURE block )  {out("* ");}
-    |   #( POSITIVE_CLOSURE block ) {out("+ ");}
+ebnf:   block[false] {out(" ");}
+    |   #( OPTIONAL block[true] ) {out("? ");}
+    |   #( CLOSURE block[true] )  {out("* ");}
+    |   #( POSITIVE_CLOSURE block[true] ) {out("+ ");}
     ;
 
 tree:   #(TREE_BEGIN {out(" #(");} atom (element)* {out(") ");} )
     ;
 
 atom
-{out(" "+#atom.toString()+" ");}
-    :   RULE_REF
-    |   TOKEN_REF
-    |   CHAR_LITERAL
-    |   STRING_LITERAL
-    |   WILDCARD
-    |   s:SET {out("="+s.getSetValue().toString()+" ");}
+
+    :   (	{out(" "+#atom.toString()+" ");}
+    	:	RULE_REF
+		|   TOKEN_REF
+		|   CHAR_LITERAL
+		|   STRING_LITERAL
+		|   WILDCARD
+		)
+    |   set
     ;
 
-/** Match a.b.c.d qualified ids; WILDCARD here is overloaded as
- *  id separator; that is, I need a reference to the '.' token.
- */
-qualifiedID
-	:	id ( WILDCARD id )*
-	;
+set
+    :   #(SET {out("(");} setElement ({out("|");} setElement)* {out(")");} )
+    ;
 
-id
-{out(#id.toString());}
-    :	TOKEN_REF
-	|	RULE_REF
-	;
-
+setElement
+    :   (	{out(#setElement.getText());}
+    	:	CHAR_LITERAL
+		|   TOKEN_REF
+		|   STRING_LITERAL
+		)
+    |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
+    	{out(#c1.getText()+".."+#c2.getText());}
+    ;

@@ -142,7 +142,7 @@ public class FASerializer {
                 buf.append("->");
             }
             else if ( edge.isSemanticPredicate() ) {
-                buf.append("-{"+edge.getLabel().getSemanticContext()+"}?->");
+                buf.append("-"+edge.getLabel().getSemanticContext()+"->");
             }
             else {
                 buf.append("-"+edge.getLabel().toString(grammar)+"->");

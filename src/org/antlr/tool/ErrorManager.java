@@ -99,10 +99,8 @@ public class ErrorManager {
 	public static final int MSG_ERROR_CREATING_ARTIFICIAL_RULE = 12;
 	public static final int MSG_TOKENS_FILE_SYNTAX_ERROR = 13;
 	public static final int MSG_CANNOT_GEN_DOT_FILE = 14;
-	public static final int MSG_BAD_AST_STRUCTURE_DURING_PRINTING = 15;
-	public static final int MSG_BAD_AST_STRUCTURE_DURING_CODEGEN = 16;
-	public static final int MSG_BAD_AST_STRUCTURE_DURING_BUILDNFA = 17;
-	public static final int MSG_BAD_ACTION_AST_STRUCTURE = 18;
+	public static final int MSG_BAD_AST_STRUCTURE = 15;
+	public static final int MSG_BAD_ACTION_AST_STRUCTURE = 16;
 
 	// code gen errors
 	public static final int MSG_MISSING_CODE_GEN_TEMPLATES = 20;
@@ -345,7 +343,7 @@ public class ErrorManager {
 		int line = token.getLine();
 		int col = token.getColumn();
 		getErrorListener().error(
-			new GrammarMessage(msgID,g,parser.getFilename(),line,col,arg,arg2)
+			new GrammarMessage(msgID,g,g.getFileName(),line,col,arg,arg2)
 		);
 	}
 

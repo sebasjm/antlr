@@ -18,14 +18,10 @@ TOKENS_FILE_SYNTAX_ERROR(arg,arg2) ::=
 	"problems parsing token vocabulary file <arg> on line <arg2>"
 CANNOT_GEN_DOT_FILE(arg,exception) ::= 
 	"cannot write DFA DOT file <arg>: <exception>"
-BAD_AST_STRUCTURE_DURING_PRINTING() ::=
-	"bad internal tree structure found while printing grammar: <exception>"
-BAD_AST_STRUCTURE_DURING_CODEGEN() ::=
-	"bad internal tree structure found while generating code: <exception>"
-BAD_AST_STRUCTURE_DURING_BUILDNFA(arg,exception) ::= 
-	"bad internal tree structure found while building NFAs: <exception>"
-BAD_ACTION_AST_STRUCTURE() ::=
-	"bad internal tree structure found while interpeting lexer action '<arg>': <exception>"
+BAD_ACTION_AST_STRUCTURE(exception) ::=
+	"bad internal tree structure for action '<arg>': <exception>"
+BAD_AST_STRUCTURE(exception) ::=
+	"bad internal tree structure: <exception>"
 
 // code gen errors
 MISSING_CODE_GEN_TEMPLATES(arg) ::= 

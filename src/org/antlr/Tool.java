@@ -113,7 +113,7 @@ public class Tool {
 			// now handle the lexer if one was created for a merged spec
 
 			String lexerGrammarStr = grammar.getLexerGrammar();
-			if ( lexerGrammarStr!=null ) {
+			if ( grammar.getType()==Grammar.COMBINED && lexerGrammarStr!=null ) {
 				System.out.println("writing lexer to ./"+grammar.getName()+".lexer.g");
 				FileWriter fw = getOutputFile(grammar.getName()+".lexer.g");
 				fw.write(lexerGrammarStr);

@@ -130,9 +130,13 @@ public class GrammarAST extends BaseAST {
         return "";
     }
 
-    public void setType(int type) {
-        token.setType(type);
-    }
+	public void setType(int type) {
+		token.setType(type);
+	}
+
+	public void setText(String text) {
+		token.setText(text);
+	}
 
     public int getType() {
         if ( token!=null ) {

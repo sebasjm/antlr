@@ -34,12 +34,12 @@ import org.antlr.misc.*;
 import antlr.*;
 }
 
-/** Read in an ANTLR grammar and build an AST.  For now, I'm ignoring
- *  anything except the rules.
+/** Read in an ANTLR grammar and build an AST.  Try not to do
+ *  any actions, just build the tree.
  *
  *  Terence Parr
  *  University of San Francisco
- *  August 19, 2003
+ *  2004
  */
 class ANTLRParser extends Parser;
 options {
@@ -60,7 +60,6 @@ tokens {
     SYNPRED;
     RANGE;
     CHAR_RANGE;
-    NOT;
     EPSILON;
     ALT;
     EOR;
@@ -71,12 +70,21 @@ tokens {
     CHARSET;
     SET;
     ID;
+    LEXER_GRAMMAR;
+    PARSER_GRAMMAR;
+    TREE_GRAMMAR;
+    COMBINED_GRAMMAR;
 }
 
 {
-protected String currentMethodName;
-protected Grammar g = null;
-TokenStreamRewriteEngine tokenBuffer = null;
+	protected GrammarAST setToBlockWithSet(GrammarAST b) {
+		return #(#[BLOCK,"BLOCK"],
+		           #(#[ALT,"ALT"],
+		              #b,#[EOA,"<end-of-alt>"]
+		            ),
+		           #[EOB,"<end-of-block>"]
+		        );
+	}
 
     public void reportError(RecognitionException ex) {
         System.out.println("buildast: "+ex.toString());
@@ -86,30 +94,19 @@ TokenStreamRewriteEngine tokenBuffer = null;
     public void reportError(String s) {
         System.out.println("buildast: error: " + s);
     }
-
-public ANTLRParser(TokenStream in, Grammar g) {
-    this(in);
-	tokenBuffer = (TokenStreamRewriteEngine)in;
-    this.g = g;
-}
 }
 
 grammar!
-{
-GrammarAST c=null;
-}
    :    hdr:headerSpec
         ( a:ACTION )?
 	    ( cmt:DOC_COMMENT  )?
-        ( grammarType | {g.setType(Grammar.PARSER);} )
-        gr:"grammar" gid:id (opt:grammarOptionsSpec)? SEMI
-		    (tokensSpec!)?
+        gr:grammarType gid:id (opt:grammarOptionsSpec)? SEMI
+		    (ts:tokensSpec!)?
 		    ( ACTION! )?
 	        r:rules
         EOF
         {
-        #grammar = #(null, #hdr, #(#gr, #cmt, #gid, #a, #opt, #r));
-        g.setName(#gid.getText());
+        #grammar = #(null, #hdr, #(#gr, #gid, #cmt, #a, #opt, #ts, #r));
         }
 	;
 
@@ -121,39 +118,35 @@ headerSpec
 	;
 
 grammarType
-    :   "lexer"          {g.setType(Grammar.LEXER);}
-    |   "parser"         {g.setType(Grammar.PARSER);}
-    |   "tree"           {g.setType(Grammar.TREE_PARSER);}
+{int t = 0;}
+    :   (	"lexer"!  {t=LEXER_GRAMMAR;}    // pure lexer
+    	|   "parser"! {t=PARSER_GRAMMAR;}   // pure parser
+    	|   "tree"!   {t=TREE_GRAMMAR;}     // a tree parser
+    	|			  {t=COMBINED_GRAMMAR;} // merged parser/lexer
+    	)
+    	gr:"grammar" {#gr.setType(t);}
     ;
 
 grammarOptionsSpec
-{
-    HashMap opts = null;
-}
-    :   LPAREN^ {#LPAREN.setType(OPTIONS);}
-            opts=optionList {g.setOptions(opts);}
+    :   LPAREN!
+            optionList
         RPAREN!
     ;
 
-optionList returns [HashMap opts=new HashMap()]
-    :   option[opts] (COMMA! option[opts])*
+optionList
+    :   option (COMMA! option)*
+    	{#optionList = #(#[OPTIONS], #optionList);}
     ;
 
-option[HashMap opts]
-{
-    String key=null;
-    Object value=null;
-}
-    :   key=id ASSIGN^ value=optionValue {opts.put(key,value);}
+option
+    :   id ASSIGN^ optionValue
     ;
 
-optionValue returns [Object value=null]
-	:	value=id
-	|   s:STRING_LITERAL {String vs = s.getText();
-	                      value=vs.substring(1,vs.length()-1);}
-	|	c:CHAR_LITERAL   {String vs = c.getText();
-	                      value=vs.substring(1,vs.length()-1);}
-	|	i:INT            {value = new Integer(i.getText());}
+optionValue
+	:	id
+	|   STRING_LITERAL
+	|	CHAR_LITERAL
+	|	INT
 //	|   cs:charSet       {value = #cs;} // return set AST in this case
 	;
 
@@ -172,24 +165,16 @@ charSetElement
  *  do we allow string literals.
  */
 tokensSpec
-	:	TOKENS
-			(	t:TOKEN_REF {g.defineToken(t.getText());}
-				/*
-				(	t1:TOKEN_REF
-					( ASSIGN s1:STRING_LITERAL )? // (tokensSpecOptions)?
-                    {
-                    int ttype = g.defineToken(t1.getText());
-                    g.defineToken(s1.getText(), ttype);
-                    }
-				|	s3:STRING_LITERAL // (tokensSpecOptions)?
-                    {g.defineToken(s3.getText());}
-				)
-				*/
-				SEMI
-			)+
-		RCURLY
+	:	TOKENS^
+			( tokenSpec	)+
+		RCURLY!
 	;
 
+tokenSpec
+	:	TOKEN_REF ( ASSIGN^ (STRING_LITERAL|CHAR_LITERAL) )? SEMI!
+	;
+
+/*
 tokensSpecOptions
 	:	OPEN_ELEMENT_OPTION
 		id ASSIGN optionValue
@@ -198,6 +183,7 @@ tokensSpecOptions
 		)*
 		CLOSE_ELEMENT_OPTION
 	;
+*/
 
 rules
     :   (
@@ -211,131 +197,44 @@ rules
 		)+
     ;
 
-/*
-aliasLexerRule!
-{
-	String modifier=null;
-    Map opts = null;
-    int start=((TokenWithIndex)LT(1)).getIndex(), stop;
-}
-	:
-	(	d:DOC_COMMENT
-	)?
-	(	{modifier=LT(1).getText();}
-	:	p1:"protected"
-	|	p2:"public"
-	|	p3:"private"
-	|	p4:"fragment"
-	|	{modifier=null;}
-	)
-	ruleToken:TOKEN_REF
-	( BANG  )?
-	( aa:ARG_ACTION )?
-	( "returns" rt:ARG_ACTION  )?
-	( throwsSpec )?
-	( opts=optionList )?
-	(a:ACTION )?
-	COLON
-	{String literal=LT(1).getText();}
-	(	CHAR_LITERAL
-	|	STRING_LITERAL
-	)
-	SEMI
-	( exceptionGroup )?
-    {
-    String ruleName = ruleToken.getText();
-    stop = ((TokenWithIndex)LT(1)).getIndex()-1;
-    if ( g.getType()==Grammar.PARSER ) {
-    	// a merged grammar spec
-    	// For lexer "RULE : <literal>;" found in parser, must define
-    	// token type for RULE and set token type of <literal> to same value.
-		int ttype = getTokenType(literal);
-    	if ( ttype==Label.INVALID ) {
-    		ttype = g.defineToken(ruleName);
-    	}
-    	g.defineToken(literal, ttype); // make the literal have the same ttype
-    	// track lexer rules and send to another grammar
-    	g.defineLexerRuleFoundInParser(currentMethodName, tokenBuffer.toOriginalString(start,stop));
-    }
-   	else {
-   		int ruleIndex = g.defineRule(this, #ruleName.getToken(), modifier, opts);
-	    if ( ruleIndex!=Grammar.INVALID_RULE_INDEX ) {
-    	    GrammarAST eor = #[EOR,"<end-of-rule>"];
-        	eor.setEnclosingRule(#ruleName.getText());
-        	#rule = #(#[RULE,"rule"],#ruleName,#b,eor);
-        	g.setRuleAST(#ruleName.getText(), #rule);
-    	}
-    }
-    }
-	;
-*/
-
 rule!
 {
-	String modifier=null;
-    Map opts = null;
-    int start=((TokenWithIndex)LT(1)).getIndex(), stop;
+GrammarAST modifier=null;
 }
 	:
 	(	d:DOC_COMMENT	
 	)?
-	(	{modifier=LT(1).getText();}
-	:	p1:"protected"
-	|	p2:"public"		
-	|	p3:"private"
-	|	p4:"fragment"
-	|	{modifier=null;}
-	)
-	ruleName:id {currentMethodName = #ruleName.getText();}
+	(	p1:"protected"	{modifier=#p1;}
+	|	p2:"public"		{modifier=#p2;}
+	|	p3:"private"    {modifier=#p3;}
+	|	p4:"fragment"	{modifier=#p4;}
+	)?
+	ruleName:id
 	( BANG  )?
 	( aa:ARG_ACTION )?
 	( "returns" rt:ARG_ACTION  )?
 	( throwsSpec )?
-	( opts=optionList )?
+	( opts:optionList )?
 	(a:ACTION )?
 	COLON b:altList SEMI
 	( exceptionGroup )?
     {
-    stop = ((TokenWithIndex)LT(1)).getIndex()-1;
-    if ( Character.isUpperCase(currentMethodName.charAt(0)) &&
-         g.getType()==Grammar.PARSER )
-    {
-    	// a merged grammar spec, track lexer rules and send to another grammar
-    	g.defineLexerRuleFoundInParser(currentMethodName, tokenBuffer.toOriginalString(start,stop));
-    }
-   	else {
-   		int ruleIndex = g.defineRule(this, #ruleName.getToken(), modifier, opts);
-	    if ( ruleIndex!=Grammar.INVALID_RULE_INDEX ) {
-    	    GrammarAST eor = #[EOR,"<end-of-rule>"];
-        	eor.setEnclosingRule(#ruleName.getText());
-        	#rule = #(#[RULE,"rule"],#ruleName,#b,eor);
-        	g.setRuleAST(#ruleName.getText(), #rule);
-    	}
-    }
+    GrammarAST eor = #[EOR,"<end-of-rule>"];
+   	eor.setEnclosingRule(#ruleName.getText());
+    #rule = #(#[RULE,"rule"],#ruleName,modifier,#opts,#b,eor);
     }
 	;
 
 throwsSpec
-	:	"throws" id 
-		( COMMA id  )*
+	:	"throws" id ( COMMA id )*
 		
 	;
 
 /** Build #(BLOCK ( #(ALT ...) EOB )+ ) */
 block
-{
-    IntSet elements = null;
-    HashMap opts = null;
-}
-    :   (set)=> elements=set
-        {
-        GrammarAST s = #[SET,"SET"];
-        s.setSetValue(elements);
-        GrammarAST alt = #(#[ALT,"ALT"], s, #[EOA, "<end-of-alt>"]);
-        #block = #(#[BLOCK, "BLOCK"],alt,#[EOB, "<end-of-block>"]);
-        }
+    :   (set) => set  // special block like ('a'|'b'|'0'..'9')
 
-    |!  lp:LPAREN
+    |	lp:LPAREN^ {#lp.setType(BLOCK); #lp.setText("BLOCK");}
 		(
 			// 2nd alt and optional branch ambig due to
 			// linear approx LL(2) issue.  COLON ACTION
@@ -344,12 +243,14 @@ block
 				warnWhenFollowAmbig = false;
 			}
 		:
-			opts=optionList ( ACTION )? COLON
-		|	ACTION COLON
+			optionList ( ACTION )? COLON!
+		|	ACTION COLON!
 		)?
 
-		b:altList {#block = #b; #block.setOptions(opts);}
-        RPAREN
+		a1:alternative ( OR! a2:alternative )*
+
+        RPAREN!
+        {#block.addChild(#[EOB,"<end-of-block>"]);}
     ;
 
 altList
@@ -359,36 +260,7 @@ altList
         }
     ;
 
-/** Match two or more set elements and return a single "match set" tree */
-set returns [IntSet elements=new IntervalSet()]
-    :   LPAREN
-        setElement[elements] (OR! setElement[elements])+
-        RPAREN
-    ;
-
-setElement[IntSet elements]
-{
-    int ttype;
-}
-    :   c:CHAR_LITERAL
-        {
-        ttype = Grammar.getCharValueFromLiteral(c.getText());
-        elements.add(ttype);
-        }
-    |   t:TOKEN_REF
-        {
-        ttype = g.defineToken(t.getText());
-        elements.add(ttype);
-        }
-    |   s:STRING_LITERAL
-        {
-        ttype = g.defineToken(s.getText());
-        elements.add(ttype);
-        }
-//	|   CHAR_LITERAL RANGE^ CHAR_LITERAL
-    ;
-
-alternative // [GrammarAST enclosingBlock]
+alternative
 {
     GrammarAST eoa = #[EOA, "<end-of-alt>"];
 }
@@ -442,7 +314,7 @@ elementNoOptionSpec!
 }
 	:	id
 		ASSIGN
-		( id COLON  )?
+		( id COLON )?
 		(	rr:RULE_REF {#elementNoOptionSpec = #rr;}
 			( ARG_ACTION  )?
 			( BANG  )?
@@ -451,22 +323,15 @@ elementNoOptionSpec!
 			( ARG_ACTION  )?
 		)
 	|
-		(id COLON  )?
+		(id COLON)?
 		(	r2:RULE_REF {#elementNoOptionSpec = #r2;}
 			( ARG_ACTION  )?
 			( BANG  )?
 		|   r:range {#elementNoOptionSpec = #r;}
 		|   t:terminal  {#elementNoOptionSpec = #t;}
-		|	NOT_OP
+		|	NOT
 			(	nt:notTerminal  {#elementNoOptionSpec = #(#[NOT,"~"],#nt);}
-			|	elements=set
-	            {
-	            // must not after entire grammar has been read so
-	            // we can see entire token space, make NOT SET tree
-	            GrammarAST s = #[SET,"SET"];
-	            s.setSetValue(elements);
-	            #elementNoOptionSpec = #(#[NOT,"~"],s);
-	            }
+            |   s:set           {#elementNoOptionSpec = #(#[NOT,"~"],#s);}
 			)
 		|	e2:ebnf             {#elementNoOptionSpec = #e2;}
 		)
@@ -479,6 +344,20 @@ elementNoOptionSpec!
 
 	|   t3:tree                 {#elementNoOptionSpec = #t3;}
 	;
+
+/** Match two or more set elements */
+set
+    :   LPAREN^ {#LPAREN.setType(SET); #LPAREN.setText("SET");}
+        setElement (OR! setElement)+
+        RPAREN!
+    ;
+
+setElement
+    :   CHAR_LITERAL
+    |   TOKEN_REF
+    |   STRING_LITERAL
+    |   range
+    ;
 
 lexer_action
 	:	LEXER_ACTION^
@@ -513,9 +392,12 @@ ebnf!
     int col = LT(1).getColumn();
 }
 	:	b:block
-		(	(	QUESTION    {#ebnf=#([OPTIONAL,"?"],b);}
-			|	STAR	    {#ebnf=#([CLOSURE,"*"],b);}
-			|	PLUS	    {#ebnf=#([POSITIVE_CLOSURE,"+"],b);}
+		(	(	QUESTION    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
+							 #ebnf=#([OPTIONAL,"?"],#b);}
+			|	STAR	    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
+							 #ebnf=#([CLOSURE,"*"],#b);}
+			|	PLUS	    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
+							 #ebnf=#([POSITIVE_CLOSURE,"+"],#b);}
 			)
 			( BANG )?
 //		|   IMPLIES	        {#b.setType(SYNPRED); #ebnf=#b;}
@@ -537,18 +419,14 @@ range!
 
 terminal
     :   cl:CHAR_LITERAL ( BANG! )?
-    	{g.defineToken(cl.getText());}
 
-	|   tr:TOKEN_REF {g.defineToken(tr.getText());}
+	|   tr:TOKEN_REF
 		ast_type_spec!
 		// Args are only valid for lexer
 		( ARG_ACTION! )?
 
 	|   sl:STRING_LITERAL
 		ast_type_spec!
-		{
-		g.defineToken(sl.getText());
-		}
 
 	|   wi:WILDCARD ast_type_spec!
 	;
@@ -558,21 +436,11 @@ notTerminal
 
 		( BANG! )?
 	|
-		tr:TOKEN_REF {g.defineToken(tr.getText());}
-		 ast_type_spec!
+		tr:TOKEN_REF ast_type_spec!
 	;
 
-/** Match a.b.c.d qualified ids; WILDCARD here is overloaded as
- *  id separator; that is, I need a reference to the '.' token.
- */
-qualifiedID
-	:	id ( WILDCARD id )*
-	;
-
-id returns [String r]
-{r=LT(1).getText();}
-    :	TOKEN_REF
-	|	RULE_REF
+id	:	TOKEN_REF {#id.setType(ID);}
+	|	RULE_REF  {#id.setType(ID);}
 	;
 
 /** Match anything that looks like an ID and return tree as token type ID */
@@ -756,7 +624,7 @@ WILDCARD : '.' ;
 
 RANGE : ".." ;
 
-NOT_OP :	'~' ;
+NOT :	'~' ;
 
 RCURLY:	'}'	;
 

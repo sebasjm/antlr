@@ -461,7 +461,7 @@ public class TestDFAConversion extends TestSuite {
     public void testNonGreedy() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "CMT : \"/*\" ( greedy=false : ~'*' )* \"*/\" ;");
+                "CMT : \"/*\" ( greedy=false : . )* \"*/\" ;");
         String expecting =
                 ".s0-'*'->.s1\n" +
                 ".s0-{'\\u0000'..')', '+'..'\\uFFFE'}->:s4=>1\n" +

@@ -86,16 +86,12 @@ public class TestCharDFAConversion extends TestSuite {
         g.createLookaheadDFAs();
         // must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
         // into 0..8
-        String expecting =
-                ".s0-'0'..'8'->:s6=>1\n" +
-                ".s0-'9'->.s4\n" +
-                ".s0-{'a'..'j', 'l'..'o', 'q'..'z'}->:s5=>1\n" +
-                ".s0-{'k', 'p'}->.s1\n" +
-                ".s1-'$'->:s3=>2\n" +
-                ".s1-'@'->:s2=>1\n" +
-                ".s4-'$'->:s3=>2\n" +
-                ".s4-'@'->:s2=>1\n";
-        checkDecision(g, 2, expecting, null);
+		String expecting =
+			".s0-{'0'..'8', 'a'..'j', 'l'..'o', 'q'..'z'}->:s4=>1\n" +
+			".s0-{'9', 'k', 'p'}->.s1\n" +
+			".s1-'$'->:s2=>2\n" +
+			".s1-'@'->:s3=>1\n";
+        checkDecision(g, 1, expecting, null);
     }
 
     public void testDisjointSetCollidingWithTwoRangesCharsFirst() throws Exception {
@@ -106,17 +102,13 @@ public class TestCharDFAConversion extends TestSuite {
                 "  ;\n");
         g.createLookaheadDFAs();
         // must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
-        // into 0..8
-        String expecting =
-                ".s0-'0'..'8'->:s6=>2\n" +
-                ".s0-'9'->.s4\n" +
-                ".s0-{'a'..'j', 'l'..'o', 'q'..'z'}->:s5=>2\n" +
-                ".s0-{'k', 'p'}->.s1\n" +
-                ".s1-'$'->:s3=>1\n" +
-                ".s1-'@'->:s2=>2\n" +
-                ".s4-'$'->:s3=>1\n" +
-                ".s4-'@'->:s2=>2\n";
-        checkDecision(g, 2, expecting, null);
+		// into 0..8
+		String expecting =
+			".s0-{'0'..'8', 'a'..'j', 'l'..'o', 'q'..'z'}->:s4=>2\n" +
+			".s0-{'9', 'k', 'p'}->.s1\n" +
+			".s1-'$'->:s3=>1\n" +
+			".s1-'@'->:s2=>2\n";
+		checkDecision(g, 1, expecting, null);
     }
 
     public void testDisjointSetCollidingWithTwoRangesAsSeparateAlts() throws Exception {
@@ -196,6 +188,7 @@ public class TestCharDFAConversion extends TestSuite {
         }
 
         DFA dfa = g.getLookaheadDFA(decision);
+		assertTrue(dfa!=null, "unknown decision #"+decision);
         FASerializer serializer = new FASerializer(g);
         String result = serializer.serialize(dfa.getStartState());
         //System.out.print(result);

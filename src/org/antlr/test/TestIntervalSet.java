@@ -93,15 +93,31 @@ public class TestIntervalSet extends TestSuite {
         assertEqual(result, expecting);
     }
 
-    public void testNotSet() throws Exception {
-        IntervalSet vocabulary = IntervalSet.of(1,1000);
-        IntervalSet s = IntervalSet.of(50,60);
-        s.add(5);
-        s.add(250,300);
-        String expecting = "{1..4, 6..49, 61..249, 301..1000}";
-        String result = (s.complement(vocabulary)).toString();
-        assertEqual(result, expecting);
-    }
+	public void testNotSet() throws Exception {
+		IntervalSet vocabulary = IntervalSet.of(1,1000);
+		IntervalSet s = IntervalSet.of(50,60);
+		s.add(5);
+		s.add(250,300);
+		String expecting = "{1..4, 6..49, 61..249, 301..1000}";
+		String result = (s.complement(vocabulary)).toString();
+		assertEqual(result, expecting);
+	}
+
+	public void testNotEqualSet() throws Exception {
+		IntervalSet vocabulary = IntervalSet.of(1,1000);
+		IntervalSet s = IntervalSet.of(1,1000);
+		String expecting = "{}";
+		String result = (s.complement(vocabulary)).toString();
+		assertEqual(result, expecting);
+	}
+
+	public void testNotSetEdgeElement() throws Exception {
+		IntervalSet vocabulary = IntervalSet.of(1,2);
+		IntervalSet s = IntervalSet.of(1);
+		String expecting = "2";
+		String result = (s.complement(vocabulary)).toString();
+		assertEqual(result, expecting);
+	}
 
     public void testNotSetFragmentedVocabulary() throws Exception {
         IntervalSet vocabulary = IntervalSet.of(1,255);

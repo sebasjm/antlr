@@ -30,7 +30,7 @@ package org.antlr.tool;
 import antlr.collections.AST;
 import antlr.RecognitionException;
 import antlr.TokenStreamRewriteEngine;
-import antlr.LLkParser;
+import antlr.TokenWithIndex;
 
 import java.io.*;
 import java.util.*;
@@ -53,7 +53,8 @@ public class Grammar {
 
     public static final int LEXER = 1;
     public static final int PARSER = 2;
-    public static final int TREE_PARSER = 3;
+	public static final int TREE_PARSER = 3;
+	public static final int COMBINED = 4;
 
 	/** Combine the info associated with a rule; I'm using like a struct */
 	protected class Rule {
@@ -75,8 +76,8 @@ public class Grammar {
 		DFA dfa;
 	}
 
-    /** What name did the user provide for this grammar? */
-    protected String name;
+	/** What name did the user provide for this grammar? */
+	protected String name;
 
     /** What type of grammar is this: lexer, parser, tree walker */
     protected int type;
@@ -107,7 +108,9 @@ public class Grammar {
      *  that char literals and token types can exist in the same space
      *  and not step on each other.
      */
-    protected int tokenType = Label.MIN_TOKEN_TYPE;
+    protected int maxTokenType = Label.MIN_TOKEN_TYPE-1;
+
+	protected IntSet charVocabulary = IntervalSet.of(0x0000,0xFFFE);
 
     /** Map token like ID (but not literals like "while") to its token type */
     protected Map tokenNameToTypeMap = new HashMap();
@@ -177,6 +180,7 @@ public class Grammar {
 			AngleBracketTemplateLexer.class
 		);
 
+	/** What file name holds this grammar? */
 	protected String fileName;
 
     protected static int escapedCharValue[] = new int[255];
@@ -248,11 +252,41 @@ public class Grammar {
 		tokenBuffer.discard(ANTLRParser.ML_COMMENT);
 		tokenBuffer.discard(ANTLRParser.COMMENT);
 		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
-		ANTLRParser parser = new ANTLRParser(tokenBuffer, this);
+		ANTLRParser parser = new ANTLRParser(tokenBuffer);
 		parser.setFilename(this.getFileName());
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
+		System.out.println(grammarTree.toStringList());
+
+		System.out.println("### print grammar");
+		ANTLRTreePrinter printer = new ANTLRTreePrinter();
+		printer.setASTNodeClass("org.antlr.tool.GrammarAST");
+		System.out.println(printer.toString(grammarTree));
+
+		// ASSIGN TOKEN TYPES
+		System.out.println("### assign types");
+		AssignTokenTypesWalker ttypesWalker = new AssignTokenTypesWalker();
+		ttypesWalker.setASTNodeClass("org.antlr.tool.GrammarAST");
+		try {
+			ttypesWalker.grammar(grammarTree, this);
+		}
+		catch (RecognitionException re) {
+			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
+							   re);
+		}
+
+		System.out.println("### define rules");
+		// DEFINE RULES
+		DefineGrammarItemsWalker defineItemsWalker = new DefineGrammarItemsWalker();
+		defineItemsWalker.setASTNodeClass("org.antlr.tool.GrammarAST");
+		try {
+			defineItemsWalker.grammar(grammarTree, this);
+		}
+		catch (RecognitionException re) {
+			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
+							   re);
+		}
 	}
 
 	/** If the grammar is a merged grammar, return the text of the implicit
@@ -307,7 +341,7 @@ public class Grammar {
 		tokenBuffer.discard(ANTLRParser.ML_COMMENT);
 		tokenBuffer.discard(ANTLRParser.COMMENT);
 		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
-        ANTLRParser parser = new ANTLRParser(tokenBuffer, this);
+        ANTLRParser parser = new ANTLRParser(tokenBuffer);
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
         try {
             parser.rule();
@@ -316,7 +350,9 @@ public class Grammar {
         catch (Exception e) {
             ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,e);
         }
-    }
+		antlr.Token ruleToken = new antlr.TokenWithIndex(ANTLRParser.ID,TOKEN_RULENAME);
+		defineRule(ruleToken, null, null, (GrammarAST)parser.getAST());
+	}
 
     protected void initTokenSymbolTables() {
         // the faux token types take first NUM_FAUX_LABELS positions
@@ -352,66 +388,7 @@ public class Grammar {
 			}
 		}
 		if ( maxTokenType>0 ) {
-			tokenType = maxTokenType+1; // next type is defined above imported
-		}
-	}
-
-	protected void importTokenVocab(String vocabName) {
-		int maxTokenType = -1;
-		try {
-			FileReader fr = new FileReader(vocabName+".tokens");
-			BufferedReader br = new BufferedReader(fr);
-			String line = br.readLine();
-			int n = 1;
-			while ( line!=null ) {
-				if ( line.length()==0 ){
-					continue; // ignore blank lines
-				}
-				StringTokenizer tokenizer = new StringTokenizer(line, "=", true);
-				if ( !tokenizer.hasMoreTokens() ) {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
-									   new Integer(n));
-				}
-				String tokenName=tokenizer.nextToken();
-				if ( !tokenizer.hasMoreTokens() ) {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
-									   new Integer(n));
-				}
-				tokenizer.nextToken(); // skip '='
-				if ( !tokenizer.hasMoreTokens() ) {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
-									   new Integer(n));
-				}
-				String tokenTypeS=tokenizer.nextToken();
-				int tokenType = Integer.parseInt(tokenTypeS);
-				//System.out.println("import "+tokenName+"="+tokenType);
-				maxTokenType = Math.max(maxTokenType,tokenType);
-				defineToken(tokenName, tokenType);
-				line = br.readLine();
-				n++;
-			}
-			br.close();
-			fr.close();
-		}
-		catch (FileNotFoundException fnfe) {
-			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_TOKENS_FILE,
-							   vocabName+".tokens");
-		}
-		catch (IOException ioe) {
-			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   vocabName+".tokens",
-							   ioe);
-		}
-		catch (Exception e) {
-			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   vocabName+".tokens",
-							   e);
-		}
-		if ( maxTokenType>0 ) {
-			tokenType = maxTokenType+1; // next type is defined above imported
+			this.maxTokenType = maxTokenType+1; // next type is defined above imported
 		}
 	}
 
@@ -437,7 +414,7 @@ public class Grammar {
 			nfaBuilder.grammar(grammarTree);
 		}
 		catch (RecognitionException re) {
-			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE_DURING_BUILDNFA,
+			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   getName(),
 							   re);
 		}
@@ -502,26 +479,25 @@ public class Grammar {
      *  operation to set up tokens with specific values.
      */
     public void defineToken(String text, int tokenType) {
-        //System.out.println("defining token "+text+" at type="+tokenType);
+        System.out.println("defining token "+text+" at type="+tokenType);
         int index = Label.NUM_FAUX_LABELS+(tokenType)-Label.MIN_TOKEN_TYPE;
         if ( text.charAt(0)=='"' ) {
             stringLiteralToTypeMap.put(text, new Integer(tokenType));
-			defineLexerRuleForStringLiteral(text, tokenType);
         }
         else if ( text.charAt(0)=='\'' ) {
             charLiteralToTypeMap.put(text, new Integer(tokenType));
             index = tokenType; // for char, token type is as sent in
-			defineLexerRuleForCharLiteral(text, tokenType);
         }
         else { // must be a label like ID
             tokenNameToTypeMap.put(text, new Integer(tokenType));
         }
+		this.maxTokenType = Math.max(this.maxTokenType, tokenType);
         typeToTokenList.setSize(index+1);
         typeToTokenList.set(index, text);
     }
 
     /** Define a new token name, string or char literal token.
-     *  A new token type is created by incrementing tokenType.
+     *  A new token type is created by incrementing maxTokenType.
      *  Do nothing though if we've seen this token before or
      *  if the token is a string/char and we are in a lexer grammar.
      *  In a lexer, strings are simply matched and do not define
@@ -536,6 +512,7 @@ public class Grammar {
 	 *  when it will be useful and I assign token types during a single
 	 *  pass--I cannot see ahead to see which token rules will be fragments.
 	 */
+	/*
 	public int defineToken(String text) {
 		int ttype = getTokenType(text);
 		if ( ttype==Label.INVALID ) {
@@ -543,26 +520,28 @@ public class Grammar {
 			// if not in the lexer, then literals become token types
 			boolean isLiteral = text.charAt(0)=='"'||text.charAt(0)=='\'';
 			if ( getType()!=LEXER || !isLiteral ) {
-				ttype = this.tokenType;
-				defineToken(text, this.tokenType);
-				this.tokenType++;
+				ttype = this.maxTokenType;
+				defineToken(text, this.maxTokenType);
+				this.maxTokenType++;
 			}
 		}
         return ttype;
     }
+	*/
 
 	/** Define a new rule.  A new rule index is created by incrementing
-     *  ruleIndex. Pass in the parser and token info so we can pass the
-	 *  info on to the error manager if there is a problem.
+     *  ruleIndex.
      */
-    public int defineRule(LLkParser parser,
-						  antlr.Token ruleToken,
+    public int defineRule(antlr.Token ruleToken,
 						  String modifier,
-						  Map options)
+						  Map options,
+						  GrammarAST tree)
 	{
 		String ruleName = ruleToken.getText();
-        //System.out.println("defineRule("+ruleName+",modifier="+modifier+"): index="+ruleIndex);
-        if ( getRule(ruleName)!=null ) {
+        System.out.println("defineRule("+ruleName+",modifier="+modifier+
+						   "): index="+ruleIndex);
+        /*
+		if ( getRule(ruleName)!=null ) {
             ErrorManager.grammarError(ErrorManager.MSG_RULE_REDEFINITION,
 									  this,
 									  parser,
@@ -571,7 +550,7 @@ public class Grammar {
             return INVALID_RULE_INDEX;
         }
         if ( type==PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
-			ErrorManager.grammarError(ErrorManager.MSG_LEXER_RULES_NOT_ALLOWED,
+			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 									  this,
 									  parser,
 									  ruleToken,
@@ -586,16 +565,18 @@ public class Grammar {
 									  ruleName);
             return INVALID_RULE_INDEX;
         }
-        if ( type==LEXER && !ruleName.equals(TOKEN_RULENAME)) {
+		if ( type==LEXER && !ruleName.equals(TOKEN_RULENAME)) {
             // rules are also tokens in lexers
             defineToken(ruleName);
         }
+		*/
 		Rule r = new Rule();
 		r.index = ruleIndex;
 		r.name = ruleName;
 		r.modifier = modifier;
 		r.options = options;
         nameToRuleMap.put(ruleName, r);
+		setRuleAST(ruleName, tree);
         ruleIndexToRuleList.setSize(ruleIndex+1);
         ruleIndexToRuleList.set(ruleIndex, ruleName);
         ruleIndex++;
@@ -663,11 +644,13 @@ public class Grammar {
         return tokenNameToTypeMap.keySet();
     }
 
-    /** Return a set of all possible token types for this grammar */
-    public IntSet getTokenTypes() {
-        return IntervalSet.of(Label.MIN_TOKEN_TYPE,
-                              Label.MIN_TOKEN_TYPE+getNumberOfTokenTypes()-1);
-    }
+    /** Return a set of all possible token/char types for this grammar */
+	public IntSet getTokenTypes() {
+		if ( getType()==LEXER ) {
+			return charVocabulary;
+		}
+		return IntervalSet.of(Label.MIN_TOKEN_TYPE, getMaxTokenType());
+	}
 
     public String getTokenName(int ttype) {
 		// inside char range and lexer grammar?
@@ -705,9 +688,6 @@ public class Grammar {
     /** Save the option key/value pair and process it */
     public void setOption(String key, Object value) {
         options.put(key, value);
-        if ( key.equals("tokenVocab") ) {
-            importTokenVocab((String)value);
-        }
     }
 
     public void setOptions(Map options) {
@@ -879,8 +859,8 @@ public class Grammar {
 	}
 
     /** How many token types have been allocated so far? */
-    public int getNumberOfTokenTypes() {
-        return tokenType-Label.MIN_TOKEN_TYPE;
+    public int getMaxTokenType() {
+        return maxTokenType;
     }
 
     /** For lexer grammars, return everything in unicode not in set.
@@ -891,10 +871,10 @@ public class Grammar {
         if ( type == LEXER ) {
             return set.complement(Label.ALLCHAR);
         }
-        System.out.println("complement "+set);
-        System.out.println("vocabulary "+getTokenTypes());
+        System.out.println("complement "+set.toString(this));
+        System.out.println("vocabulary "+getTokenTypes().toString(this));
         IntSet c = set.complement(getTokenTypes());
-        System.out.println("c="+c);
+        System.out.println("result="+c.toString(this));
         return c;
     }
 
@@ -1023,7 +1003,7 @@ public class Grammar {
             s += new ANTLRTreePrinter().toString((AST)t);
         }
         catch (Exception e) {
-            ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE_DURING_PRINTING,
+            ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   t,
 							   e);
         }

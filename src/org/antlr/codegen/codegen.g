@@ -86,6 +86,7 @@ options {
     }
 }
 
+/*
 grammar[Grammar g,
         StringTemplate recognizerST,
         StringTemplate cyclicDFAST,  // in case DFAs go in separate file
@@ -103,22 +104,60 @@ grammar[Grammar g,
     }
 }
     :   (headerSpec[outputFileST])*
-        #( "grammar"
-            (cmt:DOC_COMMENT {outputFileST.setAttribute("docComment", #cmt.getText());} )?
+        #(  . // don't care about grammar type
             name=id
+            (cmt:DOC_COMMENT {outputFileST.setAttribute("docComment", #cmt.getText());} )?
             {
             recognizerST.setAttribute("name", name);
             outputFileST.setAttribute("name", name);
             headerFileST.setAttribute("name", name);
             }
             ( #(OPTIONS .) )?
+            ( #(TOKENS .) )?
             rules[recognizerST]
          )
+    ;
+    */
+
+grammar[Grammar g,
+        StringTemplate recognizerST,
+        StringTemplate cyclicDFAST,  // in case DFAs go in separate file
+        StringTemplate outputFileST,
+        StringTemplate headerFileST]
+{
+    init(g);
+    this.recognizerST = recognizerST;
+    this.outputFileST = outputFileST;
+    this.headerFileST = headerFileST;
+    this.cyclicDFAST = cyclicDFAST;
+    if ( cyclicDFAST==null ) {
+    	this.cyclicDFAST = recognizerST;
+    }
+}
+    :   (headerSpec[outputFileST])*
+	    ( #( LEXER_GRAMMAR grammarSpec )
+	    | #( PARSER_GRAMMAR grammarSpec )
+	    | #( TREE_GRAMMAR grammarSpec )
+	    | #( COMBINED_GRAMMAR grammarSpec )
+	    )
     ;
 
 headerSpec[StringTemplate outputFileST]
     :   #( "header" a:ACTION {outputFileST.setAttribute("headerAction", #a.getText());} )
     ;
+
+grammarSpec
+	:   name:ID
+		(cmt:DOC_COMMENT {outputFileST.setAttribute("docComment", #cmt.getText());} )?
+		{
+		recognizerST.setAttribute("name", #name.getText());
+		outputFileST.setAttribute("name", #name.getText());
+		headerFileST.setAttribute("name", #name.getText());
+		}
+		( #(OPTIONS .) )?
+		( #(TOKENS .) )?
+		rules[recognizerST]
+	;
 
 rules[StringTemplate recognizerST]
 {
@@ -146,7 +185,11 @@ rule returns [StringTemplate code=null]
     // get the dfa for the BLOCK
     DFA dfa = #rule.getChild(1).getLookaheadDFA();
 }
-    :   #( RULE r=id b=block["block", dfa] EOR )
+    :   #( RULE id:ID {r=#id.getText();}
+	( #(OPTIONS .) )?
+	(modifier)?
+	   b=block["block", dfa] EOR
+         )
         {
         if ( grammar.getType()==Grammar.LEXER ) {
         	code.setAttribute("isTokenRuleName",
@@ -163,6 +206,13 @@ rule returns [StringTemplate code=null]
         code.setAttribute("block", b);
         }
     ;
+
+modifier
+	:	"protected"
+	|	"public"
+	|	"private"
+	|	"fragment"
+	;
 
 block[String blockTemplateName, DFA dfa]
      returns [StringTemplate code=null]
@@ -187,6 +237,7 @@ block[String blockTemplateName, DFA dfa]
     List alts = null;
 }
     :   #(  BLOCK
+    	    ( OPTIONS )? // ignore
             a=alternative {code.setAttribute("alts",a);}
             ( a=alternative {code.setAttribute("alts",a);} )*
             EOB
@@ -217,7 +268,8 @@ element returns [StringTemplate code=null]
 	           int ttype = grammar.getTokenType(t.getText());
 	           elements = grammar.complement(ttype);
 	           }
-            |  st:SET {elements = st.getSetValue();}
+            |  st:SET
+               {elements = grammar.complement(st.getSetValue());} 
             )
             {
             code = templates.getInstanceOf("matchNotSet");
@@ -236,20 +288,16 @@ element returns [StringTemplate code=null]
         // TODO: wrap in {...} for some targets?
     |   act:ACTION
         {
-        String a = #act.getText();
-        a = a.substring(1,a.length()-1); // strip {...}
-        code = new StringTemplate(templates, a);
+        String actText = #act.getText();
+        actText = actText.substring(1,actText.length()-1); // strip {...}
+        code = new StringTemplate(templates, actText);
         }
 
     |	lexer_action
 
     |   SEMPRED
-    |   s:SET
-        {
-        code = templates.getInstanceOf("matchSet");
-        code.setAttribute("s", generator.genSetExpr(templates,s.getSetValue(),1));
-        }
-    |   EPSILON 
+
+    |   EPSILON
     ;
 
 lexer_action
@@ -330,10 +378,14 @@ atom returns [StringTemplate code=null]
                             code = templates.getInstanceOf("wildcard");
                         }
                         }
+
+    |	code=set
     ;
 
-id returns [String r]
-{r=#id.getText();}
-    :	TOKEN_REF
-	|	RULE_REF
-	;
+set returns [StringTemplate code=null]
+	:   s:SET
+        {
+        code = templates.getInstanceOf("matchSet");
+        code.setAttribute("s", generator.genSetExpr(templates,#s.getSetValue(),1));
+        }
+    ;

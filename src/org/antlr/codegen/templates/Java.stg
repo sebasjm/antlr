@@ -107,9 +107,9 @@ loop<decisionNumber>:
             default :
 		if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
                 <if(LEXER)>
-		else System.err.println("line "+getLine()+": no viable alt in decision <decisionNumber> LA(1)=="+(char)input.LA(1));
+		else System.err.println("line "+getLine()+": no viable alt in decision <decisionNumber> LA(1)=="+(char)input.LA(1));<\n>
                 <else>
-		else System.err.println("no viable alt in decision <decisionNumber> LT(1)=="+((TokenStream)input).LT(1));
+		else System.err.println("no viable alt in decision <decisionNumber> LT(1)=="+((TokenStream)input).LT(1));<\n>
                 <endif>
         }
         cnt<decisionNumber>++;
@@ -154,7 +154,7 @@ charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 matchSet(s) ::= <<
 if ( !(<s>) ) System.err.println("set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
-input.consume();
+input.consume();<\n>
 >>
 
 matchNotSet(s) ::= <<
@@ -185,11 +185,11 @@ else {
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
 <if(LEXER)>
-    System.err.println("<description>: no viable alt line "+getLine()+" c='"+(char)input.LA(1)+"'");
+    System.err.println("<description>: no viable alt line "+getLine()+" c='"+(char)input.LA(1)+"'");<\n>
 <else>
-    System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));
+    System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));<\n>
 <endif>
-    input.consume();
+    input.consume();<\n>
 <endif>
 }
 >>
