@@ -39,7 +39,7 @@ public class CommonTokenStream implements TokenStream {
 	protected int channel = Lexer.DEFAULT_CHANNEL;
     protected int p = 0;
 
-    public CommonTokenStream(TokenSource input) {
+    public CommonTokenStream(TokenSource input) throws TokenStreamException {
         tokens = new ArrayList();
         this.input = input;
         // suck in all the input tokens
@@ -50,7 +50,11 @@ public class CommonTokenStream implements TokenStream {
         }
     }
 
-    /** Move to the next token on our channel; consume at least one token. */
+	/** Move the input pointer to the next incoming token.  The stream
+	 *  must become active with lookahead(1) available.  consume() simply
+	 *  moves the input pointer so that lookahead(1) points at the next
+	 *  input symbol. Consume at least one token.
+	 */
 	public void consume() {
 		if ( p<tokens.size() ) {
             p++;
@@ -71,6 +75,20 @@ public class CommonTokenStream implements TokenStream {
         return LT(p, i);
     }
 
+	/** Get Token at current input marker + i ahead where i=1 is next Token.
+	 *  This is primarily used for evaluating semantic predicates which
+	 *  must evaluate relative to their original position not in the input
+	 *  stream; predicate hoisting can make them execute much further along,
+	 *  however, as we check syntax first and then semantic predicates.
+	 *
+	 *  int m = input.mark();
+	 *  Token atom = input.lookahead(1);
+	 *  input.next();
+	 *  input.next();
+	 *  ...
+	 *  input.next();
+	 *  assertTrue(atom==input.lookahead(m, 1));
+	 */
     public Token LT(int marker, int i) {
         if ( marker+i-1 >= tokens.size() ) {
             return Token.EOFToken;
@@ -93,7 +111,7 @@ public class CommonTokenStream implements TokenStream {
 	public int size() {
 		return tokens.size();
 	}
-	
+
     public int index() {
         return p;
     }

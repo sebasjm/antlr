@@ -28,15 +28,10 @@
 package org.antlr.runtime;
 
 /** A source of characters for an ANTLR lexer */
-public interface CharStream {
+public interface CharStream extends IntStream {
     public static final int EOF = -1;
 
-    public void consume();
-
-    /** Get int at current input pointer + i ahead where i=1 is next int */
-    public int LA(int i);
-
-    /** Get int at current input marker + i ahead where i=1 is next int.
+	/** Get int at current input marker + i ahead where i=1 is next int.
      *  This is primarily used for evaluating semantic predicates which
      *  must evaluate relative to their original position not in the input
      *  stream; predicate hoisting can make them execute much further along,
@@ -52,22 +47,5 @@ public interface CharStream {
      */
     public int LA(int marker, int i);
 
-    /** Tell the stream to start buffering if it hasn't already.  Return
-     *  current input position, index().
-     */
-    public int mark();
-
-    /** Return the current input symbol index 0..n where n indicates the
-     *  last symbol has been read.
-     */
-    public int index();
-
 	public String substring(int start, int stop);
-
-	/** Only makes sense for streams that buffer everything up probably, but
-	 *  might be useful to display the entire stream or for testing lexing.
-	 */
-	public int size();
-
-    public void rewind(int marker);
 }

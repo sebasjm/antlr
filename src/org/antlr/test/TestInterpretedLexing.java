@@ -29,9 +29,11 @@ package org.antlr.test;
 
 import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
+import org.antlr.tool.Interpreter;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
 
 public class TestInterpretedLexing extends TestSuite {
 
@@ -39,7 +41,8 @@ public class TestInterpretedLexing extends TestSuite {
     public TestInterpretedLexing() {
     }
 
-    public void testSimpleAltCharTest() throws Exception {
+    /*
+	public void testSimpleAltCharTest() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : 'a' | 'b' | 'c';");
@@ -76,12 +79,14 @@ public class TestInterpretedLexing extends TestSuite {
         g.parse("A", new ANTLRStringStream("b"));
         g.parse("A", new ANTLRStringStream("baa"));
     }
-
+    */
 	public void testSimpleLoops() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
 				"A : ('0'..'9')+ '.' ('0'..'9')* | ('0'..'9')+ ;\n");
-		g.parse("A", new ANTLRStringStream("1234.5"));
+		CharStream input = new ANTLRStringStream("1234.5");
+		Interpreter engine = new Interpreter(g, input);
+		int result = engine.scan("A");
 	}
 
 	public void testTokensRules() throws Exception {
@@ -91,14 +96,25 @@ public class TestInterpretedLexing extends TestSuite {
 			"FLOAT : (DIGIT)+ '.' (DIGIT)* ;\n"+
 			"fragment DIGIT : '0'..'9';\n" +
 			"WS : (' ')+ ;\n");
-		//Grammar pg = new Grammar("grammar p; a : (INT|FLOAT|WS)+;");
-		//pg.parse("a", g);
 		CharStream input = new ANTLRStringStream("123 139.52");
-		Token t = g.nextToken(input);
+		Interpreter lexEngine = new Interpreter(g, input);
+
+		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		// TODO: doesn't work yet.  it sees:
+		// unexpected label '4' in dfa state 0:{13|4, 6|3, 4|2, 14|4, 2|1, 1|4}
+		// probably 4 is the token type and can't match against the dfa?
+		Grammar pg = new Grammar("grammar p; a : (INT|FLOAT|WS)+;\n");
+		Interpreter parseEngine = new Interpreter(pg, tokens);
+		parseEngine.parse("a");
+		//pg.parse("a", g);
+
+		/*
+		Token t = lexEngine.nextToken();
 		while ( t.getType()!=Token.EOF ) {
 			System.out.println(t.toString(input));
-			t = g.nextToken(input);
+			t = lexEngine.nextToken();
 		}
+		*/
 	}
 
 }

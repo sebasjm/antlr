@@ -28,47 +28,10 @@
 package org.antlr.runtime;
 
 /** A stream of tokens accessing tokens from a TokenSource */
-public interface TokenStream {
-    /** Move the input pointer to the next incoming token.  The stream
-     *  must become active with lookahead(1) available.  consume() simply
-     *  moves the input pointer so that lookahead(1) points at the next
-     *  input symbol.
-     */
-    public void consume();
-
+public interface TokenStream extends IntStream {
     /** Get Token at current input pointer + i ahead where i=1 is next Token */
     public Token LT(int i);
 
-    /** Get lookahead token type at current input pointer + i ahead */
-    public int LA(int i);
-
-    /** Get Token at current input marker + i ahead where i=1 is next Token.
-     *  This is primarily used for evaluating semantic predicates which
-     *  must evaluate relative to their original position not in the input
-     *  stream; predicate hoisting can make them execute much further along,
-     *  however, as we check syntax first and then semantic predicates.
-     *
-     *  int m = input.mark();
-     *  Token atom = input.lookahead(1);
-     *  input.next();
-     *  input.next();
-     *  ...
-     *  input.next();
-     *  assertTrue(atom==input.lookahead(m, 1));
-     */
+	/** Get Token at current input marker + i ahead where i=1 is next Token. */
     public Token LT(int marker, int i);
-
-    public int LA(int marker, int i);
-
-    /** Tell the stream to start buffering if it hasn't already.  Return
-     *  current input position, index().
-     */
-    public int mark();
-
-    /** Return the current input symbol index 0..n where index==n indicates the
-     *  last symbol has been read.
-     */
-    public int index();
-
-    public void rewind(int marker);
 }

@@ -1,21 +1,52 @@
 package org.antlr.tool;
 
-import org.antlr.runtime.CharStream;
+import org.antlr.runtime.*;
 import org.antlr.analysis.*;
+import org.antlr.analysis.DFA;
 import antlr.RecognitionException;
 
 import java.util.Stack;
-import java.util.HashMap;
-import java.util.Map;
 
 /** The recognition interpreter/engine for grammars.  Separated
  *  out of Grammar as it's related, but technically not a Grammar function.
+ *  You create an interpreter for a grammar and an input stream.  This object
+ *  can act as a TokenSource so that you can hook up two grammars (via
+ *  a CommonTokenStream) to lex/parse.  Being a token source only makes sense
+ *  for a lexer grammar of course.
  */
-public class Interpreter {
+public class Interpreter implements TokenSource {
 	protected Grammar grammar;
+	protected IntStream input;
 
-	public Interpreter(Grammar grammar) {
+	public Interpreter(Grammar grammar, IntStream input) {
 		this.grammar = grammar;
+		this.input = input;
+	}
+
+	public Token nextToken()
+		throws TokenStreamException
+	{
+		if ( grammar.getType()!=Grammar.LEXER ) {
+			return null;
+		}
+		if ( input.LA(1)==CharStream.EOF ) {
+			return Token.EOFToken;
+		}
+		int start = input.index();
+		int type = 0;
+		try {
+			type = scan(Grammar.TOKEN_RULENAME);
+		}
+		catch (RecognitionException re) {
+			throw new TokenStreamException(re);
+		}
+		int stop = input.index()-1;
+		Token token = new CommonToken(type,Lexer.DEFAULT_CHANNEL,start,stop);
+		return token;
+	}
+
+	public CharStream getCharStream() {
+		return null;
 	}
 
 	/** For a given input char stream, try to match against the NFA
@@ -28,10 +59,14 @@ public class Interpreter {
 	 *
 	 *  Return the token type associated with the final rule end state.
 	 */
-	public int parse(String startRule, CharStream input)
-		throws Exception
+	public int scan(String startRule)
+		throws RecognitionException
 	{
-		System.out.println("parse("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
+		if ( grammar.getType()!=Grammar.LEXER ) {
+			return 0;
+		}
+		CharStream input = (CharStream)this.input;
+		System.out.println("scan("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
 			if ( grammar.getType()==Grammar.LEXER ) {
@@ -56,25 +91,38 @@ public class Interpreter {
 		return parseEngine(start, stop, input, ruleInvocationStack);
 	}
 
-	public void parse(String startRule, Grammar lexer)
-		throws Exception
+	public void parse(String startRule)
+		throws RecognitionException
 	{
 		System.out.println("parse("+startRule+")");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
+			if ( grammar.getType()==Grammar.LEXER ) {
+				grammar.addArtificialMatchTokensRule();
+			}
+			try {
+				grammar.createNFAs();
+			}
+			catch (RecognitionException re) {
+				System.err.println("problems creating NFAs from grammar AST for "+
+								   grammar.getName());
+				return;
+			}
+			// Create the DFA predictors for each decision
+			grammar.createLookaheadDFAs();
 		}
 		// do the parse
 		Stack ruleInvocationStack = new Stack();
 		NFAState start = grammar.getRuleStartState(startRule);
 		NFAState stop = grammar.getRuleStopState(startRule);
-		//parseEngine(start, stop, input, ruleInvocationStack);
+		parseEngine(start, stop, input, ruleInvocationStack);
 	}
 
 	protected int parseEngine(NFAState start,
 							  NFAState stop,
-							  CharStream input,
+							  IntStream input,
 							  Stack ruleInvocationStack)
-		throws Exception
+		throws RecognitionException
 	{
 		NFAState s = start;
 		int t = input.LA(1);
@@ -85,10 +133,10 @@ public class Interpreter {
 				// decision point, must predict and jump to alt
 				DFA dfa = grammar.getLookaheadDFA(s.getDecisionNumber());
 				int m = input.mark();
-				int predictedAlt = predict(dfa,input);
+				int predictedAlt = predict(dfa);
 				if ( predictedAlt == NFA.INVALID_ALT_NUMBER ) {
 					int position = input.index();
-					throw new Exception("parsing error: no viable alternative at position="+position+
+					throw new RecognitionException("parsing error: no viable alternative at position="+position+
 										" input symbol: "+grammar.getTokenName(t));
 				}
 				input.rewind(m);
@@ -150,7 +198,7 @@ public class Interpreter {
 			// CASE 5: error condition; label is inconsistent with input
 			else {
 				int position = input.index();
-				throw new Exception("parsing error at position="+position+
+				throw new RecognitionException("parsing error at position="+position+
 					" input symbol: "+grammar.getTokenName(t));
 			}
 		}
@@ -164,7 +212,7 @@ public class Interpreter {
 	 *  input.lookahead(1) must point at the input symbol you want to start
 	 *  predicting with.
 	 */
-	public int predict(DFA dfa, CharStream input) {
+	public int predict(DFA dfa) {
 		DFAState s = dfa.getStartState();
 		int c = input.LA(1);
 		Transition eotTransition = null;

@@ -27,7 +27,7 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.runtime.CharStream;
+import org.antlr.runtime.IntStream;
 import org.antlr.tool.*;
 
 import java.util.*;
@@ -120,9 +120,9 @@ public class DFA {
 		nfaConverter.convert(decisionStartState);
     }
 
-	public int predict(CharStream input) {
-		Interpreter interp = new Interpreter(nfa.getGrammar());
-		return interp.predict(this, input);
+	public int predict(IntStream input) {
+		Interpreter interp = new Interpreter(nfa.getGrammar(), input);
+		return interp.predict(this);
 	}
 
 	public void setStartState(DFAState startState) {

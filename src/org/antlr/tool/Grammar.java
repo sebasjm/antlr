@@ -176,7 +176,7 @@ public class Grammar {
     public Grammar(String grammarString)
             throws antlr.RecognitionException, antlr.TokenStreamException
     {
-        this(new StringReader(grammarString));
+		this(new StringReader(grammarString));
     }
 
     /** Create a grammar from a Reader.  Parse the grammar, building a tree
@@ -425,6 +425,7 @@ public class Grammar {
     }
 
 	/** Match a lexer rule using input and return the token type matched */
+	/*
 	public int parse(String startRule, CharStream input)
 		throws Exception
 	{
@@ -444,22 +445,7 @@ public class Grammar {
 		Interpreter engine = new Interpreter(this);
 		engine.parse(startRule,lexer);
 	}
-
-	public Token nextToken(CharStream input)
-			throws Exception
-	{
-		if ( getType()!=LEXER ) {
-			return null;
-		}
-		if ( input.LA(1)==CharStream.EOF ) {
-			return Token.EOFToken;
-		}
-		int start = input.index();
-		int type = parse(Grammar.TOKEN_RULENAME,input);
-		int stop = input.index()-1;
-		Token token = new CommonToken(type,Lexer.DEFAULT_CHANNEL,start,stop);
-		return token;
-	}
+    */
 
 	/** Define either a token at a particular token type value.  Blast an
      *  old value with a new one.  This is called directly during import vocab

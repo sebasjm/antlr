@@ -27,11 +27,30 @@
 */
 package org.antlr.runtime;
 
-/** A source of tokens must provide a sequence of tokens via nextToken()
- *  and also must reveal it's source of characters so a token's text can
- *  be computed later.  Tokens only store indices into the char stream.
+/** A simple stream of integers used when all I care about is the char
+ *  or token type sequence (such as interpretation).
  */
-public interface TokenSource {
-	public Token nextToken() throws TokenStreamException;
-	public CharStream getCharStream();
+public interface IntStream {
+	void consume();
+
+	/** Get int at current input pointer + i ahead where i=1 is next int */
+	int LA(int i);
+
+	/** Tell the stream to start buffering if it hasn't already.  Return
+     *  current input position, index().
+     */
+	int mark();
+
+	/** Return the current input symbol index 0..n where n indicates the
+     *  last symbol has been read.
+     */
+	int index();
+
+	/** Reset the stream so that next call to index would return marker. */
+	public void rewind(int marker);
+
+	/** Only makes sense for streams that buffer everything up probably, but
+	 *  might be useful to display the entire stream or for testing.
+	 */
+	public int size();
 }
