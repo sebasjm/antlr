@@ -711,6 +711,106 @@ public class CodeGenerator {
         return vocabFileST;
     }
 
+	// A C T I O N  T R A N S L A T I O N
+
+	/** Given an action string with @x.y and @x references, convert it
+	 *  to a StringTemplate (that will be inserted into the output StringTemplate)
+	 *  Replace @ references to template references.  Targets can then say
+	 *  how to translate these references with a template rather than code.
+	 *
+	 *  Jump from '@' to '@' in the action, building up a text buffer
+	 *  doing appropriate rewrites to template refs.  Final step, create
+	 *  the StringTemplate (make it part of the incoming group).
+	 */
+	public String translateAction(String ruleName,
+								  String action)
+	{
+		if ( ruleName==null ) {
+			return null;
+		}
+		Grammar.Rule r = grammar.getRule(ruleName);
+		if ( r==null ) {
+			return null;
+		}
+		StringBuffer buf = new StringBuffer();
+		for (int c=0; c<action.length(); c++) {
+			int attrStart = 0;
+			int attrStop = 0;
+			if ( action.charAt(c)!='@' ) {
+				buf.append(action.charAt(c));
+				continue;
+			}
+			int scopeStart = c+1;
+			int i = c+1;
+			while ( i<action.length() &&
+				    Character.isLetterOrDigit(action.charAt(i)) )
+			{
+				i++;
+			}
+			int scopeEnd = i-1; // i points at char past first ID
+			String id = action.substring(scopeStart,scopeEnd+1);
+			System.out.println("found id "+id);
+			if ( grammar.isValidScope(r,id) ) {
+				String scopeName = id;
+				System.out.println("it is scope");
+				StringTemplate refST = null;
+				// get attribute name (if any)
+				if ( action.charAt(i)=='.' ) { // @scope.attr?
+					i++;
+					attrStart = i;
+					while ( i<action.length() &&
+				            Character.isLetterOrDigit(action.charAt(i)) ) {
+						i++;
+					}
+					attrStop = i-1;
+					id = action.substring(attrStart,attrStop+1);
+					System.out.println("found 2nd id "+id);
+					AttributeScope scope =
+						grammar.getScopeContainingAttribute(r,scopeName,id);
+					System.out.println("its scope: "+scope);
+					refST = scope.getAttributeReferenceTemplate(templates);
+					refST.setAttribute("scope",scope);
+					AttributeScope.Attribute attr =
+						(AttributeScope.Attribute)scope.attributes.get(id);
+					if ( attr==null ) {
+						attr = new AttributeScope.Attribute();
+						attr.name = id; // if can't identify, just spit out
+					}
+					refST.setAttribute("attr",attr);
+					// do early evaluation of attribute ref
+					buf.append(refST.toString());
+					c = attrStop;
+				}
+				else { // reference to just @scope at this point
+					refST = templates.getInstanceOf("scopeRef");
+					AttributeScope scope = grammar.getScope(scopeName);
+					refST.setAttribute("scope",scope);
+					buf.append(refST.toString());
+					c = scopeEnd;
+				}
+			}
+			else { // must be reference to @attr; look up in rule,param,ret scope
+				AttributeScope scope =
+					grammar.getScopeContainingAttribute(r,null,id);
+				if ( scope!=null ) {
+					StringTemplate refST = scope.getAttributeReferenceTemplate(templates);
+					refST.setAttribute("scope",scope);
+					AttributeScope.Attribute attr =
+						(AttributeScope.Attribute)scope.attributes.get(id);
+					refST.setAttribute("attr",attr);
+					buf.append(refST.toString());
+				}
+				else {
+					buf.append(id);
+				}
+				c = scopeEnd;
+			}
+			//grammar.resolveToFullyQualified
+		}
+		System.out.println("template="+buf.toString());
+		return buf.toString();
+	}
+
 	// M I S C
 
 	public StringTemplateGroup getTemplates() {

@@ -322,7 +322,7 @@ public class TestNFAConstruction extends TestSuite {
 	public void testAplusNonGreedy() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
-				"A : (greedy=false:'0'..'9')+ ;\n");
+				"A : (options {greedy=false;}:'0'..'9')+ ;\n");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +

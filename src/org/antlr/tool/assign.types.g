@@ -492,6 +492,7 @@ rule
            (RET (ARG_ACTION)?)
            (optionsSpec)?
            (ruleScopeSpec)?
+           #( INITACTION (ACTION)? )
            b:block EOR
            {trackTokenRule(#id,#m,#b);}
          )

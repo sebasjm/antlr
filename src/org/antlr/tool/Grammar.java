@@ -67,6 +67,12 @@ public class Grammar {
 		public NFAState stopState;
 		public GrammarAST tree;
 		public GrammarAST lexerAction;
+		public AttributeScope returnScope;
+		public AttributeScope parameterScope;
+		/** the attr defined with "scope {...}" inside a rule */
+		public AttributeScope ruleScope;
+		/** A list of scope names (String) used by this rule */
+		public List useScopes;
 	}
 
 	public class Decision {
@@ -621,7 +627,7 @@ public class Grammar {
 		//defineToken(computeTokenNameFromLiteral(tokenType, literal), tokenType);
 	}
 
-	protected Rule getRule(String ruleName) {
+	public Rule getRule(String ruleName) {
 		Rule r = (Rule)nameToRuleMap.get(ruleName);
 		return r;
 	}
@@ -647,14 +653,62 @@ public class Grammar {
 		scopes.put(name,scope);
 	}
 
+	/** Define a either a global or rule scope such as return values. Rule
+	 *  objects track the scopes as well.  This global list is used for
+	 *  code generation; some targets need to do header files etc...
+	 */
 	public AttributeScope defineScope(String name) {
 		AttributeScope scope = new AttributeScope(name);
 		scopes.put(name,scope);
 		return scope;
 	}
 
+	public AttributeScope defineReturnScope(String ruleName) {
+		AttributeScope scope = new AttributeScope(ruleName);
+		scope.isReturnScope = true;
+		scopes.put(scope.getName(),scope);
+		return scope;
+	}
+
+	public AttributeScope defineParameterScope(String ruleName) {
+		AttributeScope scope = new AttributeScope(ruleName);
+		scope.isParameterScope = true;
+		scopes.put(scope.getName(),scope);
+		return scope;
+	}
+
 	public AttributeScope getScope(String name) {
 		return (AttributeScope)scopes.get(name);
+	}
+
+	/** Is id a valid scope name or r's name? */
+	public boolean isValidScope(Rule r, String id) {
+		return id.equals(r.name) || getScope(id)!=null;
+	}
+
+	public AttributeScope getScopeContainingAttribute(Rule r,
+													  String scopeName,
+													  String attrName)
+	{
+		if ( scopeName!=null && !scopeName.equals(r.name) ) {
+			AttributeScope scope = getScope(scopeName);
+			// TODO: what to do if no attrName in scope?
+			if ( scope.attributes.get(attrName)==null ) {
+				System.err.println("no "+attrName+" in scope "+scopeName);
+			}
+			return scope;
+		}
+		if ( r.returnScope!=null && r.returnScope.attributes.get(attrName)!=null ) {
+			return r.returnScope;
+		}
+		if ( r.parameterScope!=null && r.parameterScope.attributes.get(attrName)!=null ) {
+			return r.parameterScope;
+		}
+		if ( r.ruleScope!=null && r.ruleScope.attributes.get(attrName)!=null ) {
+			return r.ruleScope;
+		}
+		System.err.println("no scope for "+attrName+" (tried scope "+scopeName+")");
+		return null;
 	}
 
 	public Map getScopes() {

@@ -76,6 +76,7 @@ tokens {
     PARSER_GRAMMAR;
     TREE_GRAMMAR;
     COMBINED_GRAMMAR;
+    INITACTION;
 }
 
 {
@@ -233,7 +234,7 @@ GrammarAST modifier=null;
 	( throwsSpec )?
 	( opts:optionsSpec )?
 	( scopes:ruleScopeSpec )?
-	( "init" a:ACTION )?
+	( "init" init:ACTION )?
 	COLON
 	(	(setNoParens SEMI) => s:setNoParens
 		{#b=#(#[BLOCK,"BLOCK"],#(#[ALT,"ALT"],#s,#[EOA,"EOA"]),#[EOB,"EOB"]);}
@@ -246,7 +247,7 @@ GrammarAST modifier=null;
    	eor.setEnclosingRule(#ruleName.getText());
     #rule = #(#[RULE,"rule"],
               #ruleName,modifier,#(#[ARG,"ARG"],#aa),#(#[RET,"RET"],#rt),
-              #opts,#scopes,#b,eor);
+              #opts,#scopes,#(#[INITACTION,"INITACTION"],#init),#b,eor);
     }
 	;
 
@@ -256,8 +257,8 @@ throwsSpec
 	;
 
 ruleScopeSpec
-	:	"scope"^ ACTION ( ( COMMA! id )* SEMI )?
-	|	"scope"^ id ( COMMA! id )* SEMI
+	:	"scope"^ ACTION ( ( COMMA! id )* SEMI! )?
+	|	"scope"^ id ( COMMA! id )* SEMI!
 	;
 
 /** Build #(BLOCK ( #(ALT ...) EOB )+ ) */

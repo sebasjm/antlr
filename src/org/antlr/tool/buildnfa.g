@@ -157,6 +157,7 @@ rule
         (RET (ARG_ACTION)?)
 		( OPTIONS )?
 		( ruleScopeSpec )?
+           #( INITACTION (ACTION)? )
            #(BLOCK b=block EOB) EOR
            {
            if ( r.equals(Grammar.TOKEN_RULENAME) ) {

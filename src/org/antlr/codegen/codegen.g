@@ -158,7 +158,9 @@ grammarSpec
 		(cmt:DOC_COMMENT {outputFileST.setAttribute("docComment", #cmt.getText());} )?
 		{
 		recognizerST.setAttribute("name", #name.getText());
-		recognizerST.setAttribute("scopes", grammar.getScopes());
+		if ( grammar.type!=Grammar.LEXER ) {
+		    recognizerST.setAttribute("scopes", grammar.getScopes());
+		}
 		outputFileST.setAttribute("name", #name.getText());
 		headerFileST.setAttribute("name", #name.getText());
 		}
@@ -187,6 +189,7 @@ StringTemplate rST;
 rule returns [StringTemplate code=null]
 {
     String r;
+    String initAction = null;
     StringTemplate b;
 	// get the dfa for the BLOCK
     DFA dfa=#rule.getFirstChildWithType(BLOCK).getLookaheadDFA();
@@ -197,6 +200,9 @@ rule returns [StringTemplate code=null]
             (RET (ARG_ACTION)?)
 			( #(OPTIONS .) )?
 			(ruleScopeSpec)?
+            #( INITACTION
+               (ia:ACTION {initAction=generator.translateAction(r,#ia.getText());})?
+             )
 	     	b=block["block", dfa] EOR
          )
         // do not generate lexer rules in combined grammar
@@ -214,6 +220,7 @@ rule returns [StringTemplate code=null]
 				 Character.isUpperCase(r.charAt(0))) )
 			{
 				code = templates.getInstanceOf("rule");
+				code.setAttribute("ruleDescriptor", grammar.getRule(r));
 			}
 		}
         if ( code!=null ) {
@@ -236,6 +243,9 @@ rule returns [StringTemplate code=null]
 			}
 			code.setAttribute("ruleName", r);
 			code.setAttribute("block", b);
+			if ( initAction!=null ) {
+				code.setAttribute("initAction", initAction);
+			}
         }
         }
     ;
@@ -331,8 +341,9 @@ element returns [StringTemplate code=null]
     |   act:ACTION
         {
         String actText = #act.getText();
-        //actText = actText.substring(1,actText.length()-1); // strip {...}
-        code = new StringTemplate(templates, actText);
+
+        code = new StringTemplate(templates,
+                                  generator.translateAction(currentRuleName,#act.getText()));
         }
 
     |	lexer_action

@@ -49,7 +49,7 @@ class <name> extends Parser {
         "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
     };
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
-    <scopes:attributeScope(scope=it)>
+    <scopes:{<if(it.isGlobal)><attributeScope(scope=it)><endif>}>
     public <name>(TokenStream input) { super(input); }
     public String[] getTokenNames() { return tokenNames; }
 
@@ -61,19 +61,60 @@ class <name> extends Parser {
 attributeScope(scope) ::= <<
 
 // scope <scope.name>
+protected static class scope_<scope.name> {
+    <scope.attributes:{<if(it.isStatic)>static <it.decl>;<endif>}; separator="\n">
+    <scope.attributes:{<if(!it.isStatic)><it.decl>;<endif>}; separator="\n">
+};
+protected Stack stack_<scope.name> = new Stack();<\n>
+>>
+
+returnScope(scope) ::= <<
 <scope.attributes:{<if(it.isStatic)><it.decl>;<endif>}; separator="\n">
 protected static class scope_<scope.name> {
     <scope.attributes:{<if(!it.isStatic)><it.decl>;<endif>}; separator="\n">
 };
-protected Stack <scope.name> = new Stack();<\n>
 >>
+
+parameterScope(scope) ::= <<
+<scope.attributes:{<it.decl>}; separator=", ">
+>>
+
+/** Used in codegen.g to translate @x.y references.
+ *  I could have left actions as StringTemplates to be inserted in
+ *  the output (so they could use attributes inherited from surrounding
+ *  templates), but really wanted to pass in AttributeScope and Attribute
+ *  objects so this translation could query them.  So, translation of
+ *  @x.y to executable code occurs before recognizerST.toString() occurs.
+ *  I.e., actions are just text strings during final code generation.
+ */
+globalAttributeRef(scope,attr) ::= <<
+<if(attr.isStatic)>
+scope_<scope.name>.<attr.name>
+<else>
+((scope_<scope.name>)stack_<scope.name>.peek()).<attr.name>
+<endif>
+>>
+
+scopeRef(scope) ::= "((scope_<scope.name>)stack_<scope.name>.peek())"
+
+parameterAttributeRef(scope,attr) ::= "<attr.name>"
+
+returnAttributeRef(scope,attr) ::= "retval.<attr.name>"
+
+ruleAttributeRef ::= globalAttributeRef
 
 bitset(name, words64) ::= <<
 public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
 >>
 
-rule(ruleName,args,block,enterAction,exitAction) ::= <<
-public void <ruleName>(<args>) throws RecognitionException {   
+rule(ruleName,ruleDescriptor,initAction,block,enterAction,exitAction) ::= <<
+<ruleDescriptor.ruleScope:attributeScope(scope=it)>
+<ruleDescriptor.returnScope:returnScope(scope=it)>
+public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
+    <ruleDescriptor.useScopes:{stack_<it>.push(new scope_<it>());}; separator="\n">
+    <ruleDescriptor.ruleScope:{stack_<it.name>.push(new scope_<it.name>());}; separator="\n">
+    <ruleDescriptor.returnScope:{scope_<it.name> retval = scope_<it.name>();}; separator="\n">
+    <initAction>
 <if(enterAction)>
     <enterAction><\n>
 <endif>
@@ -85,11 +126,12 @@ public void <ruleName>(<args>) throws RecognitionException {
         errorRecovery = true;
         recover(re);
     }
-<if(exitAction)>
     finally {
-        <exitAction><\n>
+        <ruleDescriptor.useScopes:{stack_<it>.pop();}; separator="\n">
+        <ruleDescriptor.ruleScope:{stack_<it.name>.pop();}; separator="\n">
+        <exitAction>
     }<\n>
-<endif>
+    <if(ruleDescriptor.returnScope)>return retval;<endif>
 }
 >>
 
@@ -99,8 +141,9 @@ public void mTokens() throws RecognitionException {
 }
 >>
 
-lexerRule(ruleName,nakedBlock,args,block,enterAction,exitAction) ::= <<
+lexerRule(ruleName,nakedBlock,args,initAction,block,enterAction,exitAction) ::= <<
 public void m<ruleName>(<args>) throws RecognitionException {
+<initAction>
 <if(nakedBlock)>
     <block><\n>
 <else>

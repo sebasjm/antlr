@@ -169,6 +169,7 @@ rule
            {out(#id.getText()+" : ");}
            (optionsSpec)?
            (ruleScopeSpec)?
+           #( INITACTION (ACTION)? )
            b:block[false] EOR {out(";\n");}
          )
     ;

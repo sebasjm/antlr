@@ -20,8 +20,8 @@ CANNOT_GEN_DOT_FILE(arg,exception) ::=
 	"cannot write DFA DOT file <arg>: <exception>"
 BAD_ACTION_AST_STRUCTURE(exception) ::=
 	"bad internal tree structure for action '<arg>': <exception>"
-BAD_AST_STRUCTURE(exception) ::=
-	"bad internal tree structure: <exception>"
+BAD_AST_STRUCTURE(arg,exception) ::=
+	"bad internal tree structure '<arg>': <exception>"
 
 // code gen errors
 MISSING_CODE_GEN_TEMPLATES(arg) ::= 

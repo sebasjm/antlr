@@ -1,14 +1,16 @@
 package org.antlr.tool;
 
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
+
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.StringTokenizer;
 
 /** Track the attributes within a scope.  A named scoped has just its list
- *  of attributes.  An implicitly-named scope (i.e., a scope defined in a rule)
- *  has the list return values, arguments, and any new scope items.  Implicitly-
- *  defined scopes are named after the rule; rules and scopes then must live
- *  in the same name space--no collisions allowed.
+ *  of attributes.  Each rule has potentially 3 scopes: return values,
+ *  parameters, and an implicitly-named scope (i.e., a scope defined in a rule).
+ *  Implicitly-defined scopes are named after the rule; rules and scopes then
+ *  must live in the same name space--no collisions allowed.
  */
 public class AttributeScope {
 
@@ -28,13 +30,49 @@ public class AttributeScope {
 	}
 
 	/** The scope name */
-	public String name;
+	protected String name;
+
+	/** Not a rule scope, but visible to all rules */
+	public boolean isGlobal;
+
+	public boolean isParameterScope;
+
+	public boolean isReturnScope;
 
 	/** The list of Attribute objects */
 	public LinkedHashMap attributes = new LinkedHashMap();
 
 	public AttributeScope(String name) {
 		this.name = name;
+	}
+
+	public String getName() {
+		if ( isParameterScope ) {
+			return name+"_parameter";
+		}
+		else if ( isReturnScope ) {
+			return name+"_return";
+		}
+		return name;
+	}
+
+	public StringTemplate getAttributeReferenceTemplate(StringTemplateGroup group) {
+		StringTemplate refST;
+		if ( isGlobal ) {
+			refST = group.getInstanceOf("globalAttributeRef");
+		}
+		else {
+			if ( isParameterScope ) {
+				refST = group.getInstanceOf("parameterAttributeRef");
+			}
+			else if ( isReturnScope ) {
+				refST = group.getInstanceOf("returnAttributeRef");
+			}
+			else {
+				refST = group.getInstanceOf("ruleAttributeRef");
+			}
+		}
+		return refST;
 	}
 
 	/** From a chunk of text holding the definitions of the attributes,
@@ -66,7 +104,6 @@ public class AttributeScope {
 				attr.decl = decl.substring("static ".length(),decl.length());
 			}
 			attr.name = lastIDInDecl(decl);
-			System.out.println(attr);
 			attributes.put(attr.name, attr);
 		}
 	}
@@ -75,7 +112,7 @@ public class AttributeScope {
 	 *  ID (attribute name) in the decl.
 	 */
 	protected String lastIDInDecl(String decl) {
-		System.out.println("decl is "+decl);
+		//System.out.println("decl is "+decl);
 		if ( decl==null ) {
 			return "unknown";
 		}
@@ -111,7 +148,7 @@ public class AttributeScope {
 	}
 
 	public String toString() {
-		return name+":"+attributes;
+		return (isGlobal?"global ":"")+getName()+":"+attributes;
 	}
 
 	public static void main(String[] args) {

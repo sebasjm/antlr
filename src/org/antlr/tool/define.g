@@ -108,6 +108,7 @@ attrScope
 	:	#( "scope" name:ID attrs:ACTION )
 		{
 		AttributeScope scope = grammar.defineScope(name.getText());
+		scope.isGlobal = true;
 		scope.addAttributes(attrs.getText(), ";");
 		}
 	;
@@ -181,36 +182,42 @@ String name=null;
 Map opts=null;
 }
     :   #( RULE id:ID
-           {AttributeScope ruleScope = grammar.defineScope(id.getText());}
            (mod=modifier)?
-           ( ARG
-             (args:ARG_ACTION {ruleScope.addAttributes(args.getText(), ",");})?
-           )
-           ( RET
-             (ret:ARG_ACTION {ruleScope.addAttributes(ret.getText(), ",");})?
-           )
+           #( ARG (args:ARG_ACTION)? )
+           #( RET (ret:ARG_ACTION)? )
            (opts=optionsSpec)?
-           (ruleScopeSpec[ruleScope])?
+			{
+			name = #id.getText();
+			Grammar.Rule r = null;
+			if ( Character.isUpperCase(name.charAt(0)) &&
+				 grammar.type==Grammar.COMBINED )
+			{
+				// a merged grammar spec, track lexer rules and send to another grammar
+				//System.out.println("rule tree is:\n"+#rule.toStringTree());
+				ANTLRTreePrinter printer = new ANTLRTreePrinter();
+				printer.setASTNodeClass("org.antlr.tool.GrammarAST");
+				String ruleText = printer.toString(#rule);
+				//System.out.println("rule text is:\n"+ruleText);
+				grammar.defineLexerRuleFoundInParser(name, ruleText);
+				lexerRules.add(#rule); // track rules to remove from parser later
+			}
+			else {
+				grammar.defineRule(#id.getToken(), mod, opts, #rule);
+				r = grammar.getRule(name);
+				if ( #args!=null ) {
+					r.parameterScope = grammar.defineParameterScope(name);
+					r.parameterScope.addAttributes(#args.getText(), ",");
+				}
+				if ( #ret!=null ) {
+					r.returnScope = grammar.defineReturnScope(name);
+					r.returnScope.addAttributes(#ret.getText(), ",");
+				}
+			}
+			}
+           (ruleScopeSpec[r])?
+           #( INITACTION (ACTION)? )
            b:block EOR
          )
-		{
-		name = #id.getText();
-		if ( Character.isUpperCase(name.charAt(0)) &&
-			 grammar.type==Grammar.COMBINED )
-		{
-			// a merged grammar spec, track lexer rules and send to another grammar
-			//System.out.println("rule tree is:\n"+#rule.toStringTree());
-			ANTLRTreePrinter printer = new ANTLRTreePrinter();
-			printer.setASTNodeClass("org.antlr.tool.GrammarAST");
-			String ruleText = printer.toString(#rule);
-			//System.out.println("rule text is:\n"+ruleText);
-			grammar.defineLexerRuleFoundInParser(name, ruleText);
-			lexerRules.add(#rule); // track rules to remove from parser later
-		}
-		else {
-			grammar.defineRule(#id.getToken(), mod, opts, #rule);
-		}
-		}
     ;
 
 modifier returns [String mod]
@@ -223,10 +230,15 @@ mod = #modifier.getText();
 	|	"fragment"
 	;
 
-ruleScopeSpec[AttributeScope ruleScope]
- 	:	#( "scope"
- 	       (attrs:ACTION {ruleScope.addAttributes(attrs.getText(), ";");})?
- 	       ( ID )*
+ruleScopeSpec[Grammar.Rule r]
+ 	:	#( "scope" {r.ruleScope = grammar.defineScope(r.name);}
+ 	       (attrs:ACTION {r.ruleScope.addAttributes(#attrs.getText(), ";");})?
+ 	       ( uses:ID
+ 	         {
+ 	         if ( r.useScopes==null ) {r.useScopes=new ArrayList();}
+ 	         r.useScopes.add(#uses.getText());
+ 	         }
+ 	       )*
  	     )
  	;
 
