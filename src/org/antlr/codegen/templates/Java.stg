@@ -1,0 +1,289 @@
+group Java;
+
+// G R A M M A R  E L E M E N T S
+
+outputFile(LEXER,PARSER,TREE_PARSER, streamType, headerAction, docComment, recognizer) ::=
+<<
+<headerAction>
+
+import org.antlr.runtime.*;
+import java.util.*;
+
+<docComment>
+<recognizer>
+>>
+
+lexer(name, tokens, literals, rules, DFAs) ::= <<
+class <name> extends Lexer implements TokenSource {
+    <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
+    public static Map literals = new HashMap();
+    static {
+        <literals:{literals.put(<attr.name>, new Integer(<attr.type>));};
+         separator="\n">
+    }
+
+    public <name>(IntegerStream input) {
+        super(input);
+    }
+    public Token nextToken() {
+    restart:
+        while (true) {
+            skipToken=false;
+			if ( input.LA(1)==IntegerStream.EOF ) {
+				return Token.EOFToken;
+			}
+			token=null;
+			text.setLength(0);
+			mTokens();
+            if ( !skipToken ) break;
+        }
+        if ( token==null ) {
+            emit();
+        }
+        return token;
+    }
+
+    <rules; separator="\n">
+
+    <DFAs>
+}
+>>
+
+parser(name, tokens, rules, DFAs) ::= <<
+class <name> extends Parser {
+    <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
+    public <name>(TokenStream input) {
+        super(input);
+    }
+    <rules; separator="\n">
+
+    <DFAs>
+}
+>>
+
+rule(name,args,block,enterAction,exitAction) ::= <<
+public void <name>(<args>)
+<if(enterAction)>
+{
+    <enterAction>
+    <block>
+    <exitAction>
+}
+<else>
+<block>
+<endif>
+>>
+
+lexerRule(name,args,block,enterAction,exitAction) ::= <<
+public void m<name>(<args>)
+<if(enterAction)>
+{
+    <enterAction>
+    <block>
+    <exitAction>
+}
+<else>
+<block>
+<endif>
+>>
+
+blockSingleAlt(alts,decls,decision,decisionNumber,preamble) ::= <<
+{
+    <preamble>
+    <decls>
+    <alts>
+}
+>>
+
+block(alts,decls,decision,decisionNumber,preamble,maxK) ::= <<
+{
+    <preamble>
+    int alt<decisionNumber>=0;
+    <decls>
+    <decision>
+    switch (alt<decisionNumber>) {
+        <alts:altSwitchCase()>
+    }
+}
+>>
+
+positiveClosureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<
+{
+    int alt<decisionNumber>=0;
+    int cnt<decisionNumber>=0;
+    <decls>
+loop<decisionNumber>:
+    do {
+        <decision>
+        switch (alt<decisionNumber>) {
+            <alts:altSwitchCase()>
+            default :
+		if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
+                <if(LEXER)>
+		else System.err.println("line "+getLine()+": no viable alt in decision <decisionNumber> LA(1)=="+(char)input.LA(1));
+                <else>
+		else System.err.println("no viable alt in decision <decisionNumber> LT(1)=="+((TokenStream)input).LT(1));
+                <endif>
+        }
+        cnt<decisionNumber>++;
+    } while (true);
+}
+>>
+
+positiveClosureBlockSingleAlt ::= positiveClosureBlock
+
+closureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<
+{
+    int alt<decisionNumber>=0;
+    <decls>
+loop<decisionNumber>:
+    do {
+        <decision>
+        switch (alt<decisionNumber>) {
+            <alts:altSwitchCase()>
+            default :
+                break loop<decisionNumber>;
+        }
+    } while (true);
+}
+>>
+
+closureBlockSingleAlt ::= closureBlock
+
+optionalBlock ::= block
+
+optionalBlockSingleAlt ::= block
+
+altSwitchCase() ::= <<
+case <i> :
+    <attr>
+    break;
+>>
+
+dfaDecision(decisionNumber,description) ::=
+  "alt<decisionNumber> = DFA<decisionNumber>.predict(input);"
+
+alt(elements) ::= "<elements; separator=\"\n\">"
+
+tokenRef(token) ::= "match(<token>);"
+
+charRef(char) ::= "match(<char>);"
+
+charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
+
+matchSet(s) ::= <<
+if ( !(<s>) ) System.err.println("set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
+text.append((char)input.LA(1));
+input.consume();
+>>
+
+matchNotSet(s) ::= <<
+if ( <s> ) System.err.println("~set mismatch line "+getLine()+": '"+(char)input.LA(1)+"'");
+text.append((char)input.LA(1));
+input.consume();
+>>
+
+lexerStringRef(string) ::= "match(<string>);"
+
+wildcard() ::= "matchAny();"
+
+wildcardChar() ::= "matchAny();"
+
+ruleRef(rule,args) ::= "<rule>(<args>);"
+
+lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
+
+
+// A C T I O N S
+
+emit(type) ::= "emit(<type>);"
+
+setType(type) ::= "setType(<type>);"
+
+
+// D F A S
+
+dfaState(edges,defaultClause,eotPredictsAlt,description) ::= <<
+<edges; separator="else ">
+else {
+<if(eotPredictsAlt)>
+    alt<decisionNumber>=<eotPredictsAlt>;
+<else>
+<if(LEXER)>
+    System.err.println("<description>: no viable alt line "+getLine()+" c='"+(char)input.LA(1)+"'");
+<else>
+    System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));
+<endif>
+    input.consume();
+<endif>
+}
+>>
+
+dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>;"
+
+dfaEdge(labelExpr, targetState) ::= <<
+if ( <labelExpr> ) {
+    <targetState>
+}
+>>
+
+cyclicDFA(decision,states,description) ::= <<
+static class DFA<decision> extends DFA {
+    public static int predict(<(streamType)()> input) {
+        return predict(input, s0);
+    }
+    <states>
+}
+>>
+
+cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
+static DFA.State s<stateNumber> = new DFA.State() {
+    public DFA.State transition(<(streamType)()> input) {
+        <edges>
+        <if(needErrorClause)>
+        <if(LEXER)>
+        System.err.println("no viable alt line "+getLine()+" c='"+(char)input.LA(1)+"'");
+        <else>
+        System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));
+        <endif>
+        return null;
+        <endif>
+    }
+};
+>>
+
+cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
+static DFA.State s<stateNumber> = new DFA.State() {{alt=<predictAlt>;}};
+>>
+
+cyclicDFAEdge(labelExpr, targetStateNumber) ::= <<
+if ( <labelExpr> ) {return s<targetStateNumber>;}
+>>
+
+eotDFAEdge(targetStateNumber) ::= <<
+return s<targetStateNumber>;
+>>
+
+// D F A  E X P R E S S I O N S
+
+andPredicates(left,right) ::= "(<left>&&<right>)"
+
+orPredicates(left,right) ::= "(<left>||<right>)"
+
+notPredicate(pred) ::= "!(<pred>)"
+
+lookaheadTest(atom,k) ::= "input.LA(<k>)==<atom>"
+
+lookaheadRangeTest(lower,upper,k) ::=
+	"(input.LA(<k>)>=<lower> && input.LA(<k>)\<=<upper>)"
+
+setTest(ranges) ::= "<ranges; separator=\"||\">"
+
+
+// M I S C
+
+codeFileExtension() ::= ".java"
+
+lexerStreamType() ::= "IntegerStream"
+
+parserStreamType() ::= "IntegerStream"
