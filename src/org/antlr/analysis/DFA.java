@@ -78,7 +78,7 @@ public class DFA {
     protected List unreachableAlts;
 
     /** Which NFA are we converting (well, which piece of the NFA)? */
-    protected NFA nfa;
+    public NFA nfa;
 
     /** Given a choice in a nondeterministic situation, the decision will
      *  continue consuming tokens for the associated construct (usually
@@ -325,10 +325,6 @@ public class DFA {
 
     public int getNumberOfStates() {
         return numberOfStates;
-    }
-
-    public NFA getNFA() {
-        return nfa;
     }
 
 	public NFAState getDecisionNFAStartState() {

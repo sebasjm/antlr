@@ -403,7 +403,7 @@ public class DFAState extends State {
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
-			NFAState s = dfa.getNFA().getState(configuration.state);
+			NFAState s = dfa.nfa.getState(configuration.state);
 			if ( s.isEOTState() ) {
 				n++;
 			}

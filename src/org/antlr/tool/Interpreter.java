@@ -331,7 +331,7 @@ public class Interpreter implements TokenSource {
 			}
 			ErrorManager.error(ErrorManager.MSG_NO_VIABLE_DFA_ALT,
 							   s,
-							   dfa.getNFA().getGrammar().getTokenName(c));
+							   dfa.nfa.getGrammar().getTokenName(c));
 			return NFA.INVALID_ALT_NUMBER;
 		}
 		// woohoo!  We know which alt to predict

@@ -528,6 +528,13 @@ public class TestDFAConversion extends TestSuite {
 
 	public void testIndirectRecursionAmbigAlts() throws Exception {
 		// ambiguous grammar for "L ID R" (alts 1,2 of a)
+		// This was derived from the java grammar 12/4/2004 when it
+		// was not handling a unaryExpression properly.  I traced it
+		// to incorrect closure-busy condition.  It thought that the trace
+		// of a->b->a->b again for "L ID" was an infinite loop, but actually
+		// the repeat call to b only happens *after* an L has been matched.
+		// I added a check to see what the initial stack looks like and it
+		// seems to work now.
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a   :   L ID R\n" +
@@ -538,7 +545,11 @@ public class TestDFAConversion extends TestSuite {
 				"    |   L a R\n" +
 				"    ;");
 		String expecting =
-				"\n";
+			".s0-ID->:s5=>2\n" +
+			".s0-L->.s1\n" +
+			".s1-ID->.s3\n" +
+			".s1-L->:s2=>2\n" +
+			".s3-R->:s4=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 

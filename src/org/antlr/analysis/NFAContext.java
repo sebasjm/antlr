@@ -113,11 +113,16 @@ public class NFAContext {
     }
 
     /** Walk upwards to the root of the call stack context looking
-     *  for a particular invoking state.
+     *  for a particular invoking state.  Only look til before
+	 *  initialContext (which is when the overal closure operation started).
+	 *  We only care about re-invocations of a rule within same closure op
+	 *  because that implies same rule is visited w/o consuming input.
+	 *
+	 *  TODO: use linked hashmap for this?
      */
-    public boolean contains(int state) {
+    public boolean contains(int state, NFAContext initialContext) {
         NFAContext sp = this;
-        while ( sp.parent!=null ) {
+        while ( sp.parent!=null && sp.parent!=initialContext ) {
             if ( sp.invokingState.getStateNumber() == state ) {
                 return true;
             }

@@ -239,7 +239,7 @@ public class DecisionProbe {
 					// those states associated with this nondeterminism
 					List path = new LinkedList();
 					NFAState nfaStart = dfa.getNFADecisionStartState();
-					Grammar g = dfa.getNFA().getGrammar();
+					Grammar g = dfa.nfa.getGrammar();
 					if ( nfaStart.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
 						if ( alt==g.getNumberOfAltsForDecisionNFA(nfaStart) ) {
 							// TODO ugh: fix this weirdness!
@@ -458,7 +458,7 @@ public class DecisionProbe {
 				Label label = (Label)labels.get(labelIndex);
 				/*
 				System.out.println(s.getStateNumber()+"-"+
-								   label.toString(dfa.getNFA().getGrammar())+"->"+
+								   label.toString(dfa.nfa.getGrammar())+"->"+
 								   edgeTarget.getStateNumber());
 				*/
 				if ( t.getLabel().isEpsilon() ) {
@@ -476,7 +476,7 @@ public class DecisionProbe {
 					path.add(edgeTarget);
 					/*
 					System.out.println("found label "+
-									   t.getLabel().toString(dfa.getNFA().getGrammar())+
+									   t.getLabel().toString(dfa.nfa.getGrammar())+
 									   " at state "+s.getStateNumber());
 					*/
 					if ( labelIndex==labels.size()-1 ) {
@@ -515,7 +515,7 @@ public class DecisionProbe {
 	 *  for lexers and parsers, for example.
 	 */
 	public String getInputSequenceDisplay(List labels) {
-        Grammar g = dfa.getNFA().getGrammar();
+        Grammar g = dfa.nfa.getGrammar();
 		StringBuffer buf = new StringBuffer();
 		for (Iterator it = labels.iterator(); it.hasNext();) {
 			Label label = (Label) it.next();

@@ -27,11 +27,13 @@ public class NFAToDFAConverter {
 	/** We are converting which DFA? */
 	protected DFA dfa;
 
+	private static boolean debug = false;
+
 	public NFAToDFAConverter(DFA dfa) {
 		this.dfa = dfa;
 		NFAState nfaStartState = dfa.getNFADecisionStartState();
 		int nAlts =
-			dfa.getNFA().getGrammar().getNumberOfAltsForDecisionNFA(nfaStartState);
+			dfa.nfa.getGrammar().getNumberOfAltsForDecisionNFA(nfaStartState);
 		initContextTrees(nAlts);
 	}
 
@@ -43,10 +45,10 @@ public class NFAToDFAConverter {
 		// while more DFA states to check, process them
 		while ( !terminate && work.size()>0 ) {
 			DFAState d = (DFAState) work.get(0);
-			/*
-			System.out.println("convert DFA state "+d.getStateNumber()+
-					" ("+d.getNFAConfigurations().size()+" nfa states)");
-			*/
+			if ( debug ) {
+				System.out.println("convert DFA state "+d.getStateNumber()+
+								   " ("+d.getNFAConfigurations().size()+" nfa states)");
+			}
 			findNewDFAStatesAndAddDFATransitions(d);
 			work.remove(0); // done with it; remove from work list
 		}
@@ -84,11 +86,12 @@ public class NFAToDFAConverter {
 			// if first alt is derived from exit branch of loop,
 			// make alt=n+1 for n alts not 1
 			if ( i==0 && dfa.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
-				int numAltsIncludingExitBranch = dfa.getNFA().getGrammar()
+				int numAltsIncludingExitBranch = dfa.nfa.getGrammar()
 						.getNumberOfAltsForDecisionNFA(dfa.getDecisionNFAStartState());
 				altNum = numAltsIncludingExitBranch;
 				closure((NFAState)alt.transition(0).getTarget(),
 						altNum,
+						initialContext,
 						initialContext,
 						SemanticContext.EMPTY_SEMANTIC_CONTEXT,
 						startState,
@@ -98,6 +101,7 @@ public class NFAToDFAConverter {
 			else {
 				closure((NFAState)alt.transition(0).getTarget(),
 						altNum,
+						initialContext,
 						initialContext,
 						SemanticContext.EMPTY_SEMANTIC_CONTEXT,
 						startState,
@@ -168,10 +172,10 @@ public class NFAToDFAConverter {
 		for (int i=0; i<labels.size(); i++) {
 			Label label = (Label)labels.get(i);
 			DFAState t = reach(d, label);
-			/*
-			System.out.println("DFA state after reach "+d+"-" +
-					label.toString(nfa.getGrammar())+"->"+t);
-			*/
+			if ( debug ) {
+				System.out.println("DFA state after reach "+d+"-" +
+								   label.toString(dfa.nfa.getGrammar())+"->"+t);
+			}
 			if ( t.getNFAConfigurations().size()==0 ) {
 				// nothing was reached by label due to conflict resolution
 				continue;
@@ -204,10 +208,13 @@ public class NFAToDFAConverter {
 	 *  from the NFA states in d via purely epsilon transitions.
 	 */
 	public void closure(DFAState d) {
-		//System.out.println("closure("+d+")");
+		if ( debug ) {
+			System.out.println("closure("+d+")");
+		}
 		Set configs = new HashSet();
 		// Because we are adding to the configurations in closure
 		// must clone initial list so we know when to stop doing closure
+		// TODO: expensive, try to get around this alloc / copy
 		configs.addAll(d.getNFAConfigurations());
 		// for each NFA configuration in d
 		Iterator iter = configs.iterator();
@@ -218,9 +225,10 @@ public class NFAToDFAConverter {
 			}
 			// figure out reachable NFA states from each of d's nfa states
 			// via epsilon transitions
-			closure(dfa.getNFA().getState(c.state),
+			closure(dfa.nfa.getState(c.state),
 					c.alt,
 					c.context,
+					c.context, // initialContext = c.context (stack top)
 					c.semanticContext,
 					d,
 					false);
@@ -276,22 +284,26 @@ public class NFAToDFAConverter {
 	public void closure(NFAState p,
 						int alt,
 						NFAContext context,
+						NFAContext initialContext,
 						SemanticContext semanticContext,
 						DFAState d,
 						boolean collectPredicates)
 	{
-		//System.out.println("closure at NFA state "+p.getStateNumber()+"|"+alt+" filling DFA state "+d+" with context "+context);
-		//System.out.println("closure at NFA state "+p.getStateNumber()+"|"+alt+"; context "+context);
+		if ( debug ) {
+			System.out.println("closure at NFA state "+p.getStateNumber()+"|"+
+							   alt+" filling DFA state "+d+" with context "+context+
+							   "(initial context="+initialContext+")");
+		}
 
 		// Avoid infinite recursion
 		// If we've seen this configuration before during closure, stop
-		if ( closureIsBusy(d,p,alt,context,semanticContext) ) {
-			/*
-			System.out.println("avoid infinite closure computation emanating from "+
-			p.getDescription()+":"+
-			new NFAConfiguration(p.getStateNumber(),alt,context,semanticContext));
-			System.out.println("state is "+d);
-			*/
+		if ( closureIsBusy(d,p,alt,context,initialContext,semanticContext) ) {
+			if ( debug ) {
+				System.out.println("avoid infinite closure computation to state "+p.getStateNumber()+
+								   " from context "+context+" alt="+alt+" semctx="+semanticContext+
+								   " (initial context="+initialContext+")");
+				System.out.println("state is "+d);
+			}
 			return;
 		}
 		setClosureIsBusy(d,p,alt,context,semanticContext);
@@ -314,7 +326,7 @@ public class NFAToDFAConverter {
 			// System.out.println(" context="+context);
 			// traverse epsilon edge to new rule
 			NFAState ruleTarget = (NFAState)ref.getTarget();
-			closure(ruleTarget, alt, newContext, semanticContext, d, collectPredicates);
+			closure(ruleTarget, alt, newContext, initialContext, semanticContext, d, collectPredicates);
 		}
 		// Case 2: end of rule state, context (i.e., an invoker) exists
 		else if ( p.isAcceptState() && context.getParent()!=null ) {
@@ -323,7 +335,9 @@ public class NFAToDFAConverter {
 				(RuleClosureTransition)whichStateInvokedRule.transition(0);
 			NFAState continueState = edgeToRule.getFollowState();
 			NFAContext newContext = context.getParent(); // "pop" invoking state
-			closure(continueState, alt, newContext, semanticContext, d, collectPredicates);
+			// we must move the initial context for this overall closure
+			initialContext = newContext; // mv stack top
+			closure(continueState, alt, newContext, initialContext, semanticContext, d, collectPredicates);
 		}
 		// Case 3: end of rule state, nobody invoked this rule (no context)
 		//    Fall thru to be handled by case 4 automagically.
@@ -334,24 +348,26 @@ public class NFAToDFAConverter {
 				closure((NFAState)transition0.getTarget(),
 						alt,
 						context,
+						initialContext,
 						semanticContext,
 						d,
 						collectPredicates);
 			}
 			else if ( transition0!=null && transition0.isSemanticPredicate() ) {
 				// continue closure here too, but add the sem pred to ctx
-				SemanticContext newContext = semanticContext;
+				SemanticContext newSemanticContext = semanticContext;
 				if ( collectPredicates ) {
 					// AND the previous semantic context with new pred
 					SemanticContext labelContext =
 						transition0.getLabel().getSemanticContext();
-					newContext = SemanticContext.and(semanticContext,
+					newSemanticContext = SemanticContext.and(semanticContext,
 													 labelContext);
 				}
 				closure((NFAState)transition0.getTarget(),
 						alt,
 						context,
-						newContext,
+						initialContext,
+						newSemanticContext,
 						d,
 						collectPredicates);
 			}
@@ -360,6 +376,7 @@ public class NFAToDFAConverter {
 				closure((NFAState)transition1.getTarget(),
 						alt,
 						context,
+						initialContext,
 						semanticContext,
 						d,
 						collectPredicates);
@@ -414,15 +431,19 @@ public class NFAToDFAConverter {
 	 *      configurations that have the same state and where one
 	 *      context is a right suffix of another such as 5|2$, 5|262$.
 	 *      In this case, the closure got got to state 5 from context
-	 *      2$ and then, after visiting a state, q, whose followState
-	 *      is 6, return to state 5 which we already know can get to q
-	 *      and back to 5.  Infinite recursion.  More formally, if the
+	 *      2$ and then, after visiting another rule via state
+	 *      6, the algorithm returns to state 2 which again jumps to state 5.
+	 *      Could be infinite recursion.  More formally, if the
 	 *      state of the NFA may proceed from
 	 *
 	 *      p|alpha$ ->+ p|beta p alpha$
 	 *
 	 *      then the closure has detected an epsilon cycle in the NFA
 	 *      derived from left-recursion.
+	 *
+	 * 		TODO: ack! You can get back to same state with from same context but after consuming a token!
+	 * 		TODO: fix this comment to indicate that we need to check for cycles only within a single closure op
+	 *      TODO: also this comment reflects old context where it was "return addr" not jumping off point
 	 *
 	 *      A quick way to check for this cycle is to focus on a
 	 *      single configuration of p|alpha$ rather than searching
@@ -436,7 +457,7 @@ public class NFAToDFAConverter {
 	 *  The DFA simulates the possible configurations of the NFA and,
 	 *  hence, a closure that returns to the same state implies that
 	 *  the NFA returns to the same configuration without having
-	 *  consumed any input.  A clear example is an NFA state that
+	 *  consumed any input. [ONLY IF IN SAME CLOSURE!] A clear example is an NFA state that
 	 *  loops to itself on epsilon.  This loop should be ignored in
 	 *  the final DFA as it does not contribute to the language
 	 *  generated by the NFA (nor the DFA consequently).  We must
@@ -486,6 +507,7 @@ public class NFAToDFAConverter {
 								 NFAState p,
 								 int alt,
 								 NFAContext context,
+								 NFAContext initialContext,
 								 SemanticContext semContext)
 	{
 		// case (1) : epsilon cycle (same state, same context)
@@ -498,8 +520,8 @@ public class NFAToDFAConverter {
 			return true;
 		}
 
-		// case (2) : left recursion (same state, state visited before)
-		if ( context.contains(p.getStateNumber()) ) {
+		// case (2) : recursive (same state, state visited before)
+		if ( context.contains(p.getStateNumber(), initialContext) ) {
 			return true;
 		}
 		return false;
@@ -545,7 +567,7 @@ public class NFAToDFAConverter {
 			if ( c.resolved || c.resolveWithPredicate ) {
 				continue; // the conflict resolver indicates we must leave alone
 			}
-			NFAState p = dfa.getNFA().getState(c.state);
+			NFAState p = dfa.nfa.getState(c.state);
 			// by design of the grammar->NFA conversion, only transition 0
 			// may have a non-epsilon edge.
 			Transition edge = p.transition(0);
@@ -786,7 +808,7 @@ public class NFAToDFAConverter {
 		NFAConfiguration anyConfig;
 		Iterator itr = d.nfaConfigurations.iterator();
 		anyConfig = (NFAConfiguration)itr.next();
-		NFAState anyState = dfa.getNFA().getState(anyConfig.state);
+		NFAState anyState = dfa.nfa.getState(anyConfig.state);
 		// if d is target of EOT and more than one predicted alt
 		// indicate that d is nondeterministic on all alts otherwise
 		// it looks like state has no problem
@@ -796,7 +818,7 @@ public class NFAToDFAConverter {
 				nondeterministicAlts = allAlts;
 				int decision = d.dfa.getDecisionNumber();
 				NFAState tokensRuleStartState =
-					dfa.getNFA().getGrammar().getRuleStartState(Grammar.TOKEN_RULENAME);
+					dfa.nfa.getGrammar().getRuleStartState(Grammar.TOKEN_RULENAME);
 				NFAState decisionState =
 					(NFAState)tokensRuleStartState.transition(0).getTarget();
 				// track lexer rule issues differently than other decisions
