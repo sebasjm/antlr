@@ -530,7 +530,7 @@ public class Grammar {
      *  operation to set up tokens with specific values.
      */
     public void defineToken(String text, int tokenType) {
-        //System.out.println("defining token "+text+" at type="+tokenType);
+        System.out.println("defining token "+text+" at type="+tokenType);
         // There is a hole between the faux labels (negative numbers)
         // and the first token type.  We skip over the valid 16-bit char values.
         int index = Label.NUM_FAUX_LABELS+(tokenType)-Label.MIN_TOKEN_TYPE;
@@ -645,9 +645,14 @@ public class Grammar {
     }
 
     public String getTokenName(int ttype) {
-        // inside char range?
-        if ( ttype >= Label.MIN_LABEL_VALUE && ttype <= '\uFFFF' ) {
-            return getUnicodeEscapeString(ttype);
+        // inside char range and lexer grammar?
+        if ( this.type==LEXER ) {
+			if ( ttype >= Label.MIN_LABEL_VALUE && ttype <= '\uFFFF' ) {
+            	return getUnicodeEscapeString(ttype);
+			}
+			else {
+				return "<invalid char "+ttype+">";
+			}
         }
         // faux label?
         if ( ttype<Label.MIN_LABEL_VALUE ) {

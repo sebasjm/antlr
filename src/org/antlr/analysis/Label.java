@@ -82,8 +82,8 @@ public class Label implements Comparable {
     public static final int MIN_CHAR_VALUE = '\u0000';
     public static final int MAX_CHAR_VALUE = '\uFFFE';
 
-    /* tokens are outside of char range */
-    public static final int MIN_TOKEN_TYPE = '\uFFFF'+1;
+    /** tokens and char range overlap; tokens are 1..n */
+	public static final int MIN_TOKEN_TYPE = 1;
 
     /** We have labels like EPSILON that are below 0; it's hard to
      *  store them in an array with negative index so use this
