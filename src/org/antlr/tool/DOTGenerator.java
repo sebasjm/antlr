@@ -69,10 +69,10 @@ public class DOTGenerator {
         // The output DOT graph for visualization
         StringTemplate dot = null;
         if ( startState instanceof DFAState ) {
-            dot = stlib.getInstanceOf("org/antlr/tool/templates/dfa");
+            dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/dfa");
         }
         else {
-            dot = stlib.getInstanceOf("org/antlr/tool/templates/nfa");
+            dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/nfa");
         }
 
         markedStates = new HashSet();
@@ -88,7 +88,7 @@ public class DOTGenerator {
      */
     public String getRuleNFADOT(State startState) {
         // The output DOT graph for visualization
-        StringTemplate dot = stlib.getInstanceOf("org/antlr/tool/templates/nfa");
+        StringTemplate dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/nfa");
 
         markedStates = new HashSet();
         dot.setAttribute("startState",
@@ -113,10 +113,10 @@ public class DOTGenerator {
         // first add this node
         StringTemplate st;
         if ( s.isAcceptState() ) {
-            st = stlib.getInstanceOf("org/antlr/tool/templates/stopstate");
+            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/stopstate");
         }
         else {
-            st = stlib.getInstanceOf("org/antlr/tool/templates/state");
+            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/state");
         }
         st.setAttribute("name", getStateLabel(s));
         dot.setAttribute("states", st);
@@ -124,7 +124,7 @@ public class DOTGenerator {
         // make a DOT edge for each transition
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {
             Transition edge = (Transition) s.transition(i);
-            st = stlib.getInstanceOf("org/antlr/tool/templates/edge");
+            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
             st.setAttribute("label", getEdgeLabel(edge.getLabel().toString(grammar)));
             st.setAttribute("src", getStateLabel(s));
             st.setAttribute("target", getStateLabel(edge.getTarget()));
@@ -151,10 +151,10 @@ public class DOTGenerator {
         // first add this node
         StringTemplate st;
         if ( s.isAcceptState() ) {
-            st = stlib.getInstanceOf("org/antlr/tool/templates/stopstate");
+            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/stopstate");
         }
         else {
-            st = stlib.getInstanceOf("org/antlr/tool/templates/state");
+            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/state");
         }
         st.setAttribute("name", getStateLabel(s));
         dot.setAttribute("states", st);
@@ -168,7 +168,7 @@ public class DOTGenerator {
         if ( ((NFAState)s).getDecisionASTNode()!=null &&
              ((NFAState)s).getDecisionASTNode().getType()!=ANTLRParser.EOB )
         {
-            st = stlib.getInstanceOf("org/antlr/tool/templates/decision-rank");
+            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/decision-rank");
             NFAState alt = (NFAState)s;
             while ( alt!=null ) {
                 st.setAttribute("states", getStateLabel(alt));
@@ -188,7 +188,7 @@ public class DOTGenerator {
             if ( edge instanceof RuleClosureTransition ) {
                 RuleClosureTransition rr = ((RuleClosureTransition)edge);
                 // don't jump to other rules, but display edge to follow node
-                st = stlib.getInstanceOf("org/antlr/tool/templates/edge");
+                st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
                 st.setAttribute("label", "<"+grammar.getRuleName(rr.getRuleIndex())+">");
                 st.setAttribute("src", getStateLabel(s));
                 st.setAttribute("target", getStateLabel(rr.getFollowState()));
@@ -196,7 +196,7 @@ public class DOTGenerator {
                 walkRuleNFACreatingDOT(dot, rr.getFollowState());
                 continue;
             }
-            st = stlib.getInstanceOf("org/antlr/tool/templates/edge");
+            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
             st.setAttribute("label", getEdgeLabel(edge.getLabel().toString(grammar)));
             st.setAttribute("src", getStateLabel(s));
             st.setAttribute("target", getStateLabel(edge.getTarget()));
