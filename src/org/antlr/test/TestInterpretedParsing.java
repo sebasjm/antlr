@@ -69,7 +69,7 @@ public class TestInterpretedParsing extends TestSuite {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toString();
 		String expecting =
-			"(<grammar p> (prog WHILE ID LCURLY (assign ID ASSIGN (expr INT) SEMI) (assign ID ASSIGN (expr FLOAT) SEMI) (assign ID ASSIGN (expr ID) SEMI) RCURLY))";
+			"(<grammar p> (prog while x { (assign i = (expr 1) ;) (assign y = (expr 3.42) ;) (assign z = (expr y) ;) }))";
 		assertEqual(result, expecting);
 	}
 
@@ -103,7 +103,7 @@ public class TestInterpretedParsing extends TestSuite {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toString();
 		String expecting =
-			"(<grammar p> (prog WHILE ID LCURLY (assign ID ASSIGN (expr INT) MismatchedTokenException(3!=7))))";
+			"(<grammar p> (prog while x { (assign i = (expr 1) MismatchedTokenException(3!=7))))";
 		assertEqual(result, expecting);
 	}
 
@@ -137,7 +137,7 @@ public class TestInterpretedParsing extends TestSuite {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toString();
 		String expecting =
-			"(<grammar p> (prog WHILE ID LCURLY (assign ID ASSIGN (expr MismatchedSetException(7!={3, 8..9})))))";
+			"(<grammar p> (prog while x { (assign i = (expr MismatchedSetException(7!={3, 8..9})))))";
 		assertEqual(result, expecting);
 	}
 
@@ -171,7 +171,7 @@ public class TestInterpretedParsing extends TestSuite {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toString();
 		String expecting =
-			"(<grammar p> (prog WHILE ID LCURLY (assign ID ASSIGN (expr NoViableAltException(7!=[4:1: expr : ({;} INT | FLOAT | ID );])))))";
+			"(<grammar p> (prog while x { (assign i = (expr NoViableAltException(7!=[4:1: expr : ({;} INT | FLOAT | ID );])))))";
 		assertEqual(result, expecting);
 	}
 

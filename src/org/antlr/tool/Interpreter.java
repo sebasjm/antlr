@@ -50,7 +50,7 @@ public class Interpreter implements TokenSource {
 	/** This parser listener tracks rule entry/exit and token matches
 	 *  to build a simple parse tree using the standard ANTLR Tree interface
 	 */
-	static class BuildParseTree implements ANTLRDebugInterface {
+	class BuildParseTree implements ANTLRDebugInterface {
 		Grammar g;
 		Stack callStack = new Stack();
 		public BuildParseTree(Grammar g) {
@@ -76,7 +76,15 @@ public class Interpreter implements TokenSource {
 		}
 		public void consumeToken(Token token) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
-			ParseTree elementNode = new ParseTree(g.getTokenName(token.getType()));
+			CharStream cs = null ;
+			if ( input instanceof CharStream ) {
+				cs = (CharStream)input;
+			}
+			else {
+				cs = ((TokenStream)input).getTokenSource().getCharStream();
+			}
+			ParseTree elementNode =
+				new ParseTree(token.getText(cs)/*+"<"+g.getTokenName(token.getType())+">"*/);
 			ruleNode.addChild(elementNode);
 		}
 		public void LT(int i) {}
