@@ -137,7 +137,6 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	}
 
 	protected void dispatch(String line) {
-		System.out.println("event: "+line);
 		String[] elements = getEventElements(line);
 		if ( elements==null || elements[0]==null ) {
 			System.err.println("unknown debug event: "+line);
