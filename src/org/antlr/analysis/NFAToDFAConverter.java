@@ -308,7 +308,7 @@ public class NFAToDFAConverter {
 			Integer tI = new Integer(targetState.stateNumber);
 			Transition oldTransition = (Transition)targetToLabelMap.get(tI);
 			if ( oldTransition!=null ) {
-				System.out.println("extra transition to "+tI+" upon "+label.toString(dfa.nfa.grammar));
+				//System.out.println("extra transition to "+tI+" upon "+label.toString(dfa.nfa.grammar));
 				// already seen state d to target transition, just add label
 				// to old label unless EOT
 				if ( label.getAtom()==Label.EOT ) {
@@ -321,7 +321,7 @@ public class NFAToDFAConverter {
 						// ok, not EOT, add in this label to old label
 						oldTransition.label.add(label);
 					}
-					System.out.println("label updated to be "+oldTransition.label.toString(dfa.nfa.grammar));
+					//System.out.println("label updated to be "+oldTransition.label.toString(dfa.nfa.grammar));
 				}
 			}
 			else {

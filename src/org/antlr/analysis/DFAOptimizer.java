@@ -101,8 +101,10 @@ public class DFAOptimizer {
 	}
 
 	protected void optimize(DFA dfa) {
+		/*
 		System.out.println("Optimize DFA "+dfa.decisionNFAStartState.decisionNumber+
 						   " num states="+dfa.getNumberOfStates());
+		*/
 		long start = System.currentTimeMillis();
 		if ( PRUNE_EBNF_EXIT_BRANCHES ) {
 			visited.clear();
@@ -116,7 +118,7 @@ public class DFAOptimizer {
 			}
 		}
 		long stop = System.currentTimeMillis();
-		System.out.println("minimized in "+(int)(stop-start)+" ms");
+		//System.out.println("minimized in "+(int)(stop-start)+" ms");
     }
 
 	protected void optimizeExitBranches(DFAState d) {
@@ -129,14 +131,18 @@ public class DFAOptimizer {
 		for (int i = 0; i < d.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) d.transition(i);
 			DFAState edgeTarget = ((DFAState)edge.target);
+			/*
 			System.out.println(d.stateNumber+"-"+
 							   edge.label.toString(d.dfa.nfa.grammar)+"->"+
 							   edgeTarget.stateNumber);
+			*/
 			if ( edgeTarget.isAcceptState() &&
 				 edgeTarget.getUniquelyPredictedAlt()==nAlts)
 			{
+				/*
 				System.out.println("ignoring transition "+i+" to max alt "+
 								   d.dfa.getNumberOfAlts());
+				*/
 				d.removeTransition(i);
 				i--; // back up one so that i++ of loop iteration stays at i
 			}

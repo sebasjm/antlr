@@ -27,13 +27,29 @@
 */
 package org.antlr.runtime;
 
+import java.util.Set;
+import java.util.HashSet;
+
 public abstract class Token {
 	public static final int EOR_TOKEN_TYPE = 1;
 
     public static final int EOF = CharStream.EOF;
     public static final Token EOFToken = new CommonToken(EOF);
 	public static final int DEFAULT_CHANNEL = 0;
-    
+
+	/** The set of @label.property references that are valid for a token
+	 *  reference label.  @label.text -> label.getText() for example.
+	 */
+	public static final Set predefinedTokenProperties = new HashSet();
+	static {
+		predefinedTokenProperties.add("text");
+		predefinedTokenProperties.add("type");
+		predefinedTokenProperties.add("line");
+		predefinedTokenProperties.add("index");
+		predefinedTokenProperties.add("pos");
+		predefinedTokenProperties.add("channel");
+	}
+
     public abstract int getType();
     public abstract String getText(CharStream input);
     public abstract int getLine();
@@ -42,5 +58,7 @@ public abstract class Token {
 	public abstract void setCharPositionInLine(int index);
 	public abstract int getChannel();
 	public abstract void setChannel(int channel);
+	public abstract int getTokenIndex();
+	public abstract void setTokenIndex(int index);
 	public abstract String toString(CharStream input);
 }

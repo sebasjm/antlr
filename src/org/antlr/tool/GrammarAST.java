@@ -152,17 +152,31 @@ public class GrammarAST extends BaseAST {
     }
 
     public int getLine() {
+		int line=0;
         if ( token!=null ) {
-            return token.getLine();
+            line = token.getLine();
         }
-        return 0;
+		if ( line==0 ) {
+			AST child = getFirstChild();
+			if ( child!=null ) {
+				line = child.getLine();
+			}
+		}
+        return line;
     }
 
     public int getColumn() {
+		int col=0;
         if ( token!=null ) {
-            return token.getColumn();
+            col = token.getColumn();
         }
-        return 0;
+		if ( col==0 ) {
+			AST child = getFirstChild();
+			if ( child!=null ) {
+				col = child.getColumn();
+			}
+		}
+        return col;
     }
 
     public void setLine(int line) {

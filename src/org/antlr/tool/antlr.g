@@ -113,7 +113,7 @@ grammar!
 	        r:rules
         EOF
         {
-        #grammar = #(null, #hdr, #(#gr, #gid, #cmt, #a, #opt, #ts, #scopes, #r));
+        #grammar = #(null, #hdr, #(#gr, #gid, #cmt, #opt, #ts, #scopes, #a, #r));
         }
 	;
 
@@ -339,27 +339,27 @@ elementOptionSpec
 		CLOSE_ELEMENT_OPTION
 	;
 
-elementNoOptionSpec!
+elementNoOptionSpec
 {
     IntSet elements=null;
 }
-	:	(id ASSIGN)?
-		(   r:range {#elementNoOptionSpec = #r;}
-		|   t:terminal  {#elementNoOptionSpec = #t;}
-		|	NOT
-			(	nt:notTerminal  {#elementNoOptionSpec = #(#[NOT,"~"],#nt);}
-            |   s:set           {#elementNoOptionSpec = #(#[NOT,"~"],#s);}
+	:	(id ASSIGN^)?
+		(   r:range
+		|   t:terminal
+		|	NOT^
+			(	nt:notTerminal
+            |   s:set
 			)
-		|	e2:ebnf             {#elementNoOptionSpec = #e2;}
+		|	e2:ebnf
 		)
 
-	|   a:ACTION  	            {#elementNoOptionSpec = #a;}
+	|   a:ACTION
 
-	|   la:lexer_action         {#elementNoOptionSpec = #la;}
+	|   la:lexer_action
 
-	|   p:SEMPRED 	            {#elementNoOptionSpec = #p;}
+	|   p:SEMPRED
 
-	|   t3:tree                 {#elementNoOptionSpec = #t3;}
+	|   t3:tree
 	;
 
 /** Match two or more set elements */

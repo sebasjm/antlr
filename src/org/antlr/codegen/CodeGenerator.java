@@ -41,6 +41,7 @@ import org.antlr.analysis.*;
 import org.antlr.tool.*;
 import org.antlr.misc.*;
 import org.antlr.Tool;
+import org.antlr.runtime.Token;
 import org.antlr.codegen.bytecode.ClassFile;
 import antlr.collections.AST;
 import antlr.RecognitionException;
@@ -486,7 +487,7 @@ public class CodeGenerator {
 		}
 		dfaST.setAttribute("stateNumber", new Integer(s.stateNumber));
         String description = dfa.getNFADecisionStartState().getDescription();
-		System.out.println("DFA: "+description+" associated with AST "+decisionASTNode);
+		//System.out.println("DFA: "+description+" associated with AST "+decisionASTNode);
         if ( description!=null ) {
 			description = Utils.replace(description,"\"", "\\\"");
             dfaST.setAttribute("description", description);
@@ -725,12 +726,9 @@ public class CodeGenerator {
 	public String translateAction(String ruleName,
 								  String action)
 	{
-		if ( ruleName==null ) {
-			return null;
-		}
-		Grammar.Rule r = grammar.getRule(ruleName);
-		if ( r==null ) {
-			return null;
+		Grammar.Rule r = null;
+		if ( ruleName!=null ) {
+			r = grammar.getRule(ruleName);
 		}
 		StringBuffer buf = new StringBuffer();
 		for (int c=0; c<action.length(); c++) {
@@ -749,11 +747,38 @@ public class CodeGenerator {
 			}
 			int scopeEnd = i-1; // i points at char past first ID
 			String id = action.substring(scopeStart,scopeEnd+1);
+			StringTemplate refST = null;
 			System.out.println("found id "+id);
-			if ( grammar.isValidScope(r,id) ) {
+			if ( r!=null && r.tokenLabels.get(id)!=null ) { // not a scope, but is token ref
+				String label = id;
+				System.out.println("it's a token label");
+				// get attribute name (if any)
+				refST = templates.getInstanceOf("tokenLabelRef");
+				if ( action.charAt(i)=='.' ) { // @scope.attr?
+					i++;
+					attrStart = i;
+					while ( i<action.length() &&
+				            Character.isLetterOrDigit(action.charAt(i)) ) {
+						i++;
+					}
+					attrStop = i-1;
+					id = action.substring(attrStart,attrStop+1);
+					System.out.println("found 2nd id after token ref"+id);
+					if ( Token.predefinedTokenProperties.contains(id) ) {
+						System.out.println("it's a token property");
+						refST = templates.getInstanceOf("tokenLabelPropertyRef_"+id);
+					}
+					c = attrStop;
+				}
+				else {
+					c = scopeEnd;
+				}
+				refST.setAttribute("label",label);
+				buf.append(refST.toString());
+			}
+			else if ( grammar.isValidScope(r,id) ) {
 				String scopeName = id;
 				System.out.println("it is scope");
-				StringTemplate refST = null;
 				// get attribute name (if any)
 				if ( action.charAt(i)=='.' ) { // @scope.attr?
 					i++;
@@ -793,7 +818,7 @@ public class CodeGenerator {
 				AttributeScope scope =
 					grammar.getScopeContainingAttribute(r,null,id);
 				if ( scope!=null ) {
-					StringTemplate refST = scope.getAttributeReferenceTemplate(templates);
+					refST = scope.getAttributeReferenceTemplate(templates);
 					refST.setAttribute("scope",scope);
 					AttributeScope.Attribute attr =
 						(AttributeScope.Attribute)scope.attributes.get(id);

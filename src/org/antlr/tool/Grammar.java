@@ -72,7 +72,11 @@ public class Grammar {
 		/** the attr defined with "scope {...}" inside a rule */
 		public AttributeScope ruleScope;
 		/** A list of scope names (String) used by this rule */
-		public List useScopes;
+		public List useScopes = new ArrayList();
+		/** A list of all label names attached to tokens like id=ID */
+		public LinkedHashMap tokenLabels = new LinkedHashMap();
+		/** A list of all label names attached to rule references like f=field */
+		public LinkedHashMap ruleLabels = new LinkedHashMap();
 	}
 
 	public class Decision {
@@ -683,6 +687,9 @@ public class Grammar {
 
 	/** Is id a valid scope name or r's name? */
 	public boolean isValidScope(Rule r, String id) {
+		if ( r==null ) {
+			return getScope(id)!=null;
+		}
 		return id.equals(r.name) || getScope(id)!=null;
 	}
 
@@ -690,6 +697,14 @@ public class Grammar {
 													  String scopeName,
 													  String attrName)
 	{
+		if ( r==null ) { // must be action not in a rule
+			if ( scopeName==null ) {
+				System.err.println("no scope: "+scopeName);
+				return null;
+			}
+			AttributeScope scope = getScope(scopeName);
+			return scope;
+		}
 		if ( scopeName!=null && !scopeName.equals(r.name) ) {
 			AttributeScope scope = getScope(scopeName);
 			// TODO: what to do if no attrName in scope?
@@ -713,6 +728,26 @@ public class Grammar {
 
 	public Map getScopes() {
 		return scopes;
+	}
+
+	public void defineTokenRefLabel(String ruleName,
+									antlr.Token label,
+									GrammarAST tokenRef)
+	{
+        Rule r = getRule(ruleName);
+		if ( r!=null ) {
+			r.tokenLabels.put(label.getText(),label.getText());
+		}
+	}
+
+	public void defineRuleRefLabel(String ruleName,
+								   antlr.Token label,
+								   GrammarAST ruleRef)
+	{
+		Rule r = getRule(ruleName);
+		if ( r!=null ) {
+			r.ruleLabels.put(label.getText(),label.getText());
+		}
 	}
 
     public int getTokenType(String tokenName) {

@@ -32,8 +32,13 @@ public class CommonToken extends Token {
 	protected int line;
 	protected int charPositionInLine;
 	protected int channel=DEFAULT_CHANNEL;
+
+	/** What token number is this from 0..n-1 tokens */
+	protected int index;
+
     /** The char position into the input buffer where this token starts */
 	protected int start;
+	
 	/** The char position into the input buffer where this token stops */
 	protected int stop;
 
@@ -98,6 +103,14 @@ public class CommonToken extends Token {
 
 	public void setStopIndex(int stop) {
 		this.stop = stop;
+	}
+
+	public int getTokenIndex() {
+		return index;
+	}
+
+	public void setTokenIndex(int index) {
+		this.index = index;
 	}
 
     public String toString(CharStream input) {

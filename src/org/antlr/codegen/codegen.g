@@ -167,7 +167,10 @@ grammarSpec
 		( #(OPTIONS .) )?
 		( #(TOKENS .) )?
         (attrScope)*
-        (ACTION)?
+        ( act:ACTION
+          {recognizerST.setAttribute("globalAction",
+                           generator.translateAction(null,#act.getText()));}
+        )?
 		rules[recognizerST]
 	;
 
@@ -303,7 +306,7 @@ element returns [StringTemplate code=null]
 {
     IntSet elements=null;
 }
-    :   code=atom
+    :   code=atom[null]
     |   #(  n:NOT
             {code = templates.getInstanceOf("matchNotSet");}
             (  c:CHAR_LITERAL
@@ -328,11 +331,15 @@ element returns [StringTemplate code=null]
             code.setAttribute("s", generator.genSetExpr(templates,elements,1));
             }
          )
+
     |   #(CHAR_RANGE a:CHAR_LITERAL b:CHAR_LITERAL)
         {code = templates.getInstanceOf("charRangeRef");
          code.setAttribute("a", a.getText());
          code.setAttribute("b", b.getText());
         }
+
+    |	#(ASSIGN label:ID code=atom[label.getText()])
+
     |   code=ebnf
     |   tree
     |   #( SYNPRED block["block",null] )
@@ -382,12 +389,13 @@ ebnf returns [StringTemplate code=null]
         #( POSITIVE_CLOSURE code=block["positiveClosureBlock", dfa] )
     ;
 
-tree:   #(TREE_BEGIN atom (element)*)
+tree:   #(TREE_BEGIN atom[null] (element)*)
     ;
 
-atom returns [StringTemplate code=null]
+atom[String label] returns [StringTemplate code=null]
     :   r:RULE_REF     {code = templates.getInstanceOf("ruleRef");
                         code.setAttribute("rule", r.getText());
+                        if ( label!=null ) {code.setAttribute("label", label);}
                         code.setAttribute("elementIndex", ((TokenWithIndex)r.getToken()).getIndex());
                         generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName);
                        }
@@ -402,6 +410,7 @@ atom returns [StringTemplate code=null]
                            code.setAttribute("elementIndex", ((TokenWithIndex)#t.getToken()).getIndex());
                            generator.generateLocalFOLLOW(#t,#t.getText(),currentRuleName);
                        }
+                       if ( label!=null ) {code.setAttribute("label", label);}
                        }
 
     |   c:CHAR_LITERAL  {
@@ -418,6 +427,7 @@ atom returns [StringTemplate code=null]
 	                                String.valueOf(grammar.getTokenType(#c.getText())),
 	                                currentRuleName);
                             }
+                            if ( label!=null ) {code.setAttribute("label", label);}
                         }
 
     |   s:STRING_LITERAL{
@@ -434,6 +444,7 @@ atom returns [StringTemplate code=null]
 	                            String.valueOf(grammar.getTokenType(#s.getText())),
 	                            currentRuleName);
                         }
+                        if ( label!=null ) {code.setAttribute("label", label);}
                         }
 
     |   w:WILDCARD      {
@@ -443,15 +454,17 @@ atom returns [StringTemplate code=null]
                         else { // else it's a token type reference
                             code = templates.getInstanceOf("wildcard");
                         }
+                        if ( label!=null ) {code.setAttribute("label", label);}
                         }
 
-    |	code=set
+    |	code=set[label]
     ;
 
-set returns [StringTemplate code=null]
+set[String label] returns [StringTemplate code=null]
 	:   s:SET
         {
         code = templates.getInstanceOf("matchSet");
         code.setAttribute("s", generator.genSetExpr(templates,#s.getSetValue(),1));
+        if ( label!=null ) {code.setAttribute("label", label);}
         }
     ;

@@ -526,6 +526,7 @@ element
     |   #(NOT atom)
     |   #(RANGE atom atom)
     |   #(CHAR_RANGE atom atom)
+    |	#(ASSIGN ID atom)
     |   ebnf
     |   tree
     |   #( SYNPRED block ) 

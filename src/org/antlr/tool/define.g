@@ -43,6 +43,7 @@ options {
 {
 protected Grammar grammar;
 protected GrammarAST root;
+protected String currentRuleName;
 protected List lexerRules = new LinkedList();
 
 	/** Parser error-reporting function can be overridden in subclass */
@@ -60,11 +61,15 @@ protected List lexerRules = new LinkedList();
 		if ( grammar.type!=Grammar.COMBINED ) {
 			return;
 		}
-		// form is ( grammar ID ... ( rule ... ) ( rule ... ) ... )
-		GrammarAST p = (GrammarAST)root.getFirstChild();
+		// form is (header ... ) ( grammar ID (scope ...) ... ( rule ... ) ( rule ... ) ... )
+		GrammarAST p = root;
+		// find the grammar spec
+		while ( !p.getText().equals("grammar") ) {
+			p = (GrammarAST)p.getNextSibling();
+		}
+		p = (GrammarAST)p.getFirstChild(); // jump down to first child of grammar
 		// look for first RULE def
 		GrammarAST prev = p; // points to the ID (grammar name)
-		p = (GrammarAST)p.getNextSibling(); // either first rule or options etc ...
 		while ( p.getType()!=RULE ) {
 			prev = p;
 			p = (GrammarAST)p.getNextSibling();
@@ -188,6 +193,7 @@ Map opts=null;
            (opts=optionsSpec)?
 			{
 			name = #id.getText();
+			currentRuleName = name;
 			Grammar.Rule r = null;
 			if ( Character.isUpperCase(name.charAt(0)) &&
 				 grammar.type==Grammar.COMBINED )
@@ -235,7 +241,6 @@ ruleScopeSpec[Grammar.Rule r]
  	       (attrs:ACTION {r.ruleScope.addAttributes(#attrs.getText(), ";");})?
  	       ( uses:ID
  	         {
- 	         if ( r.useScopes==null ) {r.useScopes=new ArrayList();}
  	         r.useScopes.add(#uses.getText());
  	         }
  	       )*
@@ -260,6 +265,15 @@ element
     |   #(NOT atom)
     |   #(RANGE atom atom)
     |   #(CHAR_RANGE atom atom)
+    |	#(ASSIGN id:ID a:atom )
+    	{
+    	if ( #a.getType()==RULE_REF ) {
+    		grammar.defineRuleRefLabel(currentRuleName,id.getToken(),a);
+    	}
+    	else {
+    		grammar.defineTokenRefLabel(currentRuleName,id.getToken(),a);
+    	}
+    	}
     |   ebnf
     |   tree
     |   #( SYNPRED block ) 
@@ -288,7 +302,7 @@ ebnf:   block
     |   #( POSITIVE_CLOSURE block ) 
     ;
 
-tree:   #(TREE_BEGIN  atom (element)*  )
+tree:   #(TREE_BEGIN atom (element)*)
     ;
 
 atom

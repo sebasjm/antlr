@@ -61,14 +61,17 @@ public class CommonTokenStream implements TokenStream {
 		tokens = new ArrayList(500);
 		filteredTokens = new ArrayList(500);
         this.tokenSource = tokenSource;
+		int index = 0;
         // suck in all the input tokens
         Token t = tokenSource.nextToken();
         while ( t!=null && t.getType()!=CharStream.EOF ) {
+			t.setTokenIndex(index);
             tokens.add(t);
 			if ( t.getChannel()==channel ) {
 				filteredTokens.add(t);
 			}
             t = tokenSource.nextToken();
+			index++;
         }
     }
 

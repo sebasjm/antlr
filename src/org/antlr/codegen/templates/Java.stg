@@ -14,9 +14,10 @@ import java.util.Stack;
 <recognizer><\n>
 >>
 
-lexer(name, tokens, rules, cyclicDFAs) ::= <<
+lexer(name, tokens, globalAction, rules, cyclicDFAs) ::= <<
 class <name> extends Lexer {
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
+    <globalAction>
     public <name>(CharStream input) {
         super(input);
     }
@@ -43,7 +44,7 @@ retry:
 }
 >>
 
-parser(name, scopes, tokens, tokenNames, rules, cyclicDFAs, bitsets) ::= <<
+parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets) ::= <<
 class <name> extends Parser {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
@@ -53,18 +54,21 @@ class <name> extends Parser {
     public <name>(TokenStream input) { super(input); }
     public String[] getTokenNames() { return tokenNames; }
 
+    <globalAction>
     <rules; separator="\n\n">
     <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
 }
 >>
 
 attributeScope(scope) ::= <<
-
 // scope <scope.name>
+protected static class static_scope_<scope.name> {
+    <scope.attributes:{<if(it.isStatic)><it.decl>;<endif>}; separator="\n">
+}
+static_scope_<scope.name> static_<scope.name> = new static_scope_<scope.name>();
 protected static class scope_<scope.name> {
-    <scope.attributes:{<if(it.isStatic)>static <it.decl>;<endif>}; separator="\n">
     <scope.attributes:{<if(!it.isStatic)><it.decl>;<endif>}; separator="\n">
-};
+}
 protected Stack stack_<scope.name> = new Stack();<\n>
 >>
 
@@ -89,7 +93,7 @@ parameterScope(scope) ::= <<
  */
 globalAttributeRef(scope,attr) ::= <<
 <if(attr.isStatic)>
-scope_<scope.name>.<attr.name>
+static_<scope.name>.<attr.name>
 <else>
 ((scope_<scope.name>)stack_<scope.name>.peek()).<attr.name>
 <endif>
@@ -103,6 +107,18 @@ returnAttributeRef(scope,attr) ::= "retval.<attr.name>"
 
 ruleAttributeRef ::= globalAttributeRef
 
+/** How to translate @label */
+tokenLabelRef(label) ::= "<label>"
+
+// not sure the next are the right approach
+
+tokenLabelPropertyRef_text(label) ::= "<label>.getText(input.getTokenSource().getCharStream())"
+tokenLabelPropertyRef_type(label) ::= "<label>.getType()"
+tokenLabelPropertyRef_line(label) ::= "<label>.getLine()"
+tokenLabelPropertyRef_pos(label) ::= "<label>.getCharPositionInLine()"
+tokenLabelPropertyRef_channel(label) ::= "<label>.getChannel()"
+tokenLabelPropertyRef_index(label) ::= "<label>.getTokenIndex()"
+
 bitset(name, words64) ::= <<
 public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
 >>
@@ -114,6 +130,7 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
     <ruleDescriptor.useScopes:{stack_<it>.push(new scope_<it>());}; separator="\n">
     <ruleDescriptor.ruleScope:{stack_<it.name>.push(new scope_<it.name>());}; separator="\n">
     <ruleDescriptor.returnScope:{scope_<it.name> retval = scope_<it.name>();}; separator="\n">
+    <ruleDescriptor.tokenLabels:{Token <it>=null;}; separator="\n">
     <initAction>
 <if(enterAction)>
     <enterAction><\n>
@@ -219,31 +236,38 @@ case <i> :
 
 alt(elements) ::= "<elements; separator=\"\n\">"
 
-tokenRef(token,elementIndex) ::=
-  "match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);"
+tokenRef(token,label,elementIndex) ::= <<
+<if(label)><label>=input.LT(1);<endif>
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+>>
 
 charRef(char) ::= "match(<char>);"
 
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 /** For now, sets are interval tests and must be tested inline */
-matchSet(s) ::= <<
+matchSet(s,label) ::= <<
+<if(label)><label>=input.LT(1);<endif>
 if ( <s> ) input.consume();
 else throw new MismatchedSetException("<s>");<\n>
 >>
 
-matchNotSet(s) ::= <<
+matchNotSet(s,label) ::= <<
+<if(label)><label>=input.LT(1);<endif>
 if ( !(<s>) ) input.consume();
 else throw new MismatchedNotSetException("");<\n>
 >>
 
 lexerStringRef(string) ::= "match(<string>);"
 
-wildcard() ::= "matchAny();"
+wildcard(label) ::= <<
+<if(label)><label>=input.LT(1);<endif>
+matchAny();
+>>
 
 wildcardChar() ::= "matchAny();"
 
-ruleRef(rule,elementIndex,args) ::= <<
+ruleRef(rule,label,elementIndex,args) ::= <<
 <if(!LEXER)>
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <rule>(<args>);

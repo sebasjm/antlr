@@ -164,8 +164,8 @@ rules
 rule
     :   #( RULE id:ID
            (modifier)?
-           (ARG (arg:ARG_ACTION)? {out("["+#arg.getText()+"]");} )
-           (RET (ret:ARG_ACTION)? {out("returns ["+#ret.getText()+"]");} )
+           (ARG (arg:ARG_ACTION {out("["+#arg.getText()+"]");} )? )
+           (RET (ret:ARG_ACTION {out("returns ["+#ret.getText()+"]");} )? )
            {out(#id.getText()+" : ");}
            (optionsSpec)?
            (ruleScopeSpec)?
@@ -203,6 +203,7 @@ element
     |   #(NOT {out("~");} atom) 
     |   #(RANGE atom {out("..");} atom)
     |   #(CHAR_RANGE atom {out("..");} atom)
+    |	#(ASSIGN ID atom)
     |   ebnf
     |   tree
     |   #( SYNPRED block[true] ) {out("=>");}
