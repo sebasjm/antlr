@@ -58,7 +58,13 @@ public class Grammar {
 	public static final int COMBINED = 4;
 
 	/** Combine the info associated with a rule; I'm using like a struct */
-	public class Rule {
+	public static class Rule {
+		public static final Set predefinedRuleProperties = new HashSet();
+		static {
+			predefinedRuleProperties.add("start");
+			predefinedRuleProperties.add("stop");
+			predefinedRuleProperties.add("tree");
+		}
 		public String name;
 		public int index;
 		public String modifier;
@@ -67,23 +73,33 @@ public class Grammar {
 		public NFAState stopState;
 		public GrammarAST tree;
 		public GrammarAST lexerAction;
+		/** The return values of a rule and predefined rule attributes */
 		public AttributeScope returnScope;
 		public AttributeScope parameterScope;
-		/** the attr defined with "scope {...}" inside a rule */
+		/** the attributes defined with "scope {...}" inside a rule */
 		public AttributeScope ruleScope;
 		/** A list of scope names (String) used by this rule */
-		public List useScopes = new ArrayList();
-		/** A list of all label names attached to tokens like id=ID */
-		public LinkedHashMap tokenLabels = new LinkedHashMap();
-		/** A list of all label names attached to rule references like f=field */
-		public LinkedHashMap ruleLabels = new LinkedHashMap();
+		public List useScopes;
+		/** A list of all LabelElementPair attached to tokens like id=ID */
+		public LinkedHashMap tokenLabels;
+		/** A list of all LabelElementPair attached to rule references like f=field */
+		public LinkedHashMap ruleLabels;
 	}
 
-	public class Decision {
+	public static class Decision {
 		public int decision;
 		public NFAState startState;
 		public Map options;
 		public DFA dfa;
+	}
+
+	public static class LabelElementPair {
+		public antlr.Token label;
+		public GrammarAST elementRef;
+		public LabelElementPair(antlr.Token label, GrammarAST elementRef) {
+			this.label = label;
+			this.elementRef = elementRef;
+		}
 	}
 
 	/** What name did the user provide for this grammar? */
@@ -608,6 +624,8 @@ public class Grammar {
         ruleIndexToRuleList.setSize(ruleIndex+1);
         ruleIndexToRuleList.set(ruleIndex, ruleName);
         ruleIndex++;
+		// all rules have predefined attributes available in the return scope
+		r.returnScope = defineReturnScope(ruleName);
         return ruleIndex;
 	}
 
@@ -736,7 +754,11 @@ public class Grammar {
 	{
         Rule r = getRule(ruleName);
 		if ( r!=null ) {
-			r.tokenLabels.put(label.getText(),label.getText());
+			if ( r.tokenLabels==null ) {
+				r.tokenLabels = new LinkedHashMap();
+			}
+			r.tokenLabels.put(label.getText(),
+							  new LabelElementPair(label,tokenRef));
 		}
 	}
 
@@ -746,7 +768,11 @@ public class Grammar {
 	{
 		Rule r = getRule(ruleName);
 		if ( r!=null ) {
-			r.ruleLabels.put(label.getText(),label.getText());
+			if ( r.ruleLabels==null ) {
+				r.ruleLabels = new LinkedHashMap();
+			}
+			r.ruleLabels.put(label.getText(),
+							 new LabelElementPair(label,ruleRef));
 		}
 	}
 

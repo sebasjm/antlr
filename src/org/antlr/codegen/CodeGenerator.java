@@ -749,7 +749,8 @@ public class CodeGenerator {
 			String id = action.substring(scopeStart,scopeEnd+1);
 			StringTemplate refST = null;
 			System.out.println("found id "+id);
-			if ( r!=null && r.tokenLabels.get(id)!=null ) { // not a scope, but is token ref
+			if ( r!=null && r.tokenLabels!=null && r.tokenLabels.get(id)!=null ) {
+				// not a scope, but is token ref
 				String label = id;
 				System.out.println("it's a token label");
 				// get attribute name (if any)
@@ -771,6 +772,34 @@ public class CodeGenerator {
 					c = attrStop;
 				}
 				else {
+					c = scopeEnd;
+				}
+				refST.setAttribute("label",label);
+				buf.append(refST.toString());
+			}
+			else if ( r!=null && r.ruleLabels!=null && r.ruleLabels.get(id)!=null ) {
+				// not a scope, but is token ref
+				String label = id;
+				System.out.println("it's a rule label");
+				// get attribute name (if any)
+				if ( action.charAt(i)=='.' ) { // @scope.attr?
+					i++;
+					attrStart = i;
+					while ( i<action.length() &&
+				            Character.isLetterOrDigit(action.charAt(i)) ) {
+						i++;
+					}
+					attrStop = i-1;
+					id = action.substring(attrStart,attrStop+1);
+					System.out.println("found 2nd id after rule ref"+id);
+					if ( Grammar.Rule.predefinedRuleProperties.contains(id) ) {
+						System.out.println("it's a rule property");
+						refST = templates.getInstanceOf("ruleLabelPropertyRef_"+id);
+					}
+					c = attrStop;
+				}
+				else {
+					System.err.println("rule labels must be followed by a property reference.");
 					c = scopeEnd;
 				}
 				refST.setAttribute("label",label);

@@ -215,10 +215,11 @@ Map opts=null;
 					r.parameterScope.addAttributes(#args.getText(), ",");
 				}
 				if ( #ret!=null ) {
-					r.returnScope = grammar.defineReturnScope(name);
 					r.returnScope.addAttributes(#ret.getText(), ",");
 				}
 			}
+			// all rule's have a return scope
+			//r.ruleScope = grammar.defineScope(r.name);
 			}
            (ruleScopeSpec[r])?
            #( INITACTION (ACTION)? )
@@ -237,10 +238,16 @@ mod = #modifier.getText();
 	;
 
 ruleScopeSpec[Grammar.Rule r]
- 	:	#( "scope" {r.ruleScope = grammar.defineScope(r.name);}
- 	       (attrs:ACTION {r.ruleScope.addAttributes(#attrs.getText(), ";");})?
+ 	:	#( "scope"
+ 	       ( attrs:ACTION
+ 	         {
+ 	         r.ruleScope = grammar.defineScope(r.name);
+			 r.ruleScope.addAttributes(#attrs.getText(), ";");
+			 }
+		   )?
  	       ( uses:ID
  	         {
+ 	         if ( r.useScopes==null ) {r.useScopes=new ArrayList();}
  	         r.useScopes.add(#uses.getText());
  	         }
  	       )*

@@ -16,7 +16,7 @@ import java.util.Stack;
 
 lexer(name, tokens, globalAction, rules, cyclicDFAs) ::= <<
 class <name> extends Lexer {
-    <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
+    <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <globalAction>
     public <name>(CharStream input) {
         super(input);
@@ -49,7 +49,7 @@ class <name> extends Parser {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
     };
-    <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
+    <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isGlobal)><attributeScope(scope=it)><endif>}>
     public <name>(TokenStream input) { super(input); }
     public String[] getTokenNames() { return tokenNames; }
@@ -75,6 +75,7 @@ protected Stack stack_<scope.name> = new Stack();<\n>
 returnScope(scope) ::= <<
 <scope.attributes:{<if(it.isStatic)><it.decl>;<endif>}; separator="\n">
 protected static class scope_<scope.name> {
+    Token start=null, stop=null;
     <scope.attributes:{<if(!it.isStatic)><it.decl>;<endif>}; separator="\n">
 };
 >>
@@ -119,6 +120,10 @@ tokenLabelPropertyRef_pos(label) ::= "<label>.getCharPositionInLine()"
 tokenLabelPropertyRef_channel(label) ::= "<label>.getChannel()"
 tokenLabelPropertyRef_index(label) ::= "<label>.getTokenIndex()"
 
+ruleLabelPropertyRef_start(label) ::= "<label>.start"
+ruleLabelPropertyRef_stop(label) ::= "<label>.stop"
+ruleLabelPropertyRef_tree(label) ::= "<label>.tree"
+
 bitset(name, words64) ::= <<
 public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
 >>
@@ -129,8 +134,9 @@ rule(ruleName,ruleDescriptor,initAction,block,enterAction,exitAction) ::= <<
 public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <ruleDescriptor.useScopes:{stack_<it>.push(new scope_<it>());}; separator="\n">
     <ruleDescriptor.ruleScope:{stack_<it.name>.push(new scope_<it.name>());}; separator="\n">
-    <ruleDescriptor.returnScope:{scope_<it.name> retval = scope_<it.name>();}; separator="\n">
-    <ruleDescriptor.tokenLabels:{Token <it>=null;}; separator="\n">
+    <ruleDescriptor.returnScope:{scope_<it.name> retval = new scope_<it.name>();<\n>retval.start = input.LT(1);}; separator="\n">
+    <ruleDescriptor.tokenLabels:{Token <it.label.text>=null;}; separator="\n">
+    <ruleDescriptor.ruleLabels:{scope_<it.elementRef.text>_return <it.label.text>=null;}; separator="\n">
     <initAction>
 <if(enterAction)>
     <enterAction><\n>
@@ -146,9 +152,12 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
     finally {
         <ruleDescriptor.useScopes:{stack_<it>.pop();}; separator="\n">
         <ruleDescriptor.ruleScope:{stack_<it.name>.pop();}; separator="\n">
+        retval.stop = input.LT(0);
         <exitAction>
     }<\n>
-    <if(ruleDescriptor.returnScope)>return retval;<endif>
+<if(ruleDescriptor.returnScope)>
+    return retval;<\n>
+<endif>
 }
 >>
 
@@ -230,7 +239,7 @@ optionalBlockSingleAlt ::= block
 
 altSwitchCase() ::= <<
 case <i> :
-    <attr>
+    <it>
     break;<\n>
 >>
 
@@ -268,13 +277,14 @@ matchAny();
 wildcardChar() ::= "matchAny();"
 
 ruleRef(rule,label,elementIndex,args) ::= <<
-<if(!LEXER)>
+
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
-<rule>(<args>);
-following.pop();
+<if(label)>
+<label>=<rule>(<args>);<\n>
 <else>
 <rule>(<args>);<\n>
 <endif>
+following.pop();
 >>
 
 lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
