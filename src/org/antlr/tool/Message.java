@@ -10,12 +10,26 @@ import org.antlr.stringtemplate.StringTemplate;
  *  I update the error system in ANTLR itself.
  */
 public abstract class Message {
-	StringTemplate msgST;
+	public StringTemplate msgST;
+	public int msgID;
+	public Object arg;
+	public Object arg2;
+	public Throwable e;
+
 	public Message() {
 	}
+
 	public Message(int msgID) {
-		msgST = ErrorManager.getMessage(msgID);
+		this(msgID, null, null);
 	}
+
+	public Message(int msgID, Object arg, Object arg2) {
+		this.msgID = msgID;
+		msgST = ErrorManager.getMessage(msgID);
+		this.arg = arg;
+		this.arg2 = arg2;
+	}
+
 	public StringTemplate getMessage() {
 		return msgST;
 	}

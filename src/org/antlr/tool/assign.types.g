@@ -48,13 +48,15 @@ header {
  *  c) literals do NOT get token types
  *
  *  CASE 3 : merged parser / lexer grammar
- *	a) Any char or string literal gets a token type.
- *  b) Any reference to a token gets a token type.
+ *	a) Any char or string literal gets a token type in a parser rule
+ *  b) Any reference to a token gets a token type if not referencing
+ *     a fragment lexer rule
  *  c) The tokens section may alias a token name to a string or char (n/a yet?)
+ *     which must add a rule to the lexer
  *  d) token rule definitions get token types if not already defined
  *  e) token rule definitions may also alias a token name to a literal.
  *     E.g., Rule 'FOR : "for";' will alias FOR to "for" in the sense that
- *     references to either in the parser grammar will yield the
+ *     references to either in the parser grammar will yield the token type
  *
  *  Errors/warnings
  *  a) References to undefined token names in the lexer are a problem.
@@ -82,7 +84,7 @@ header {
  *  4. Informs the Grammar object of the type definitions such as:
  *     g.defineToken(<charliteral>, ttype);
  *     g.defineToken(<stringliteral>, ttype);
- *     g.defineToken(<tokenName>, ttype);
+ *     g.defineToken(<tokenID>, ttype);
  *     where some of the ttype values will be the same for aliases tokens.
  */
 class AssignTokenTypesWalker extends TreeParser;
@@ -170,8 +172,8 @@ protected void trackTokenRule(GrammarAST t,
 	// else error
 }
 
-protected void defineToken(String tokenName, int ttype) {
-	tokens.put(tokenName, new Integer(ttype));
+protected void defineToken(String tokenID, int ttype) {
+	tokens.put(tokenID, new Integer(ttype));
 }
 
 protected boolean matchesStructure(AST a, AST b) {
@@ -199,24 +201,28 @@ protected void alias(GrammarAST t, GrammarAST s) {
 }
 
 protected void assignTypes() {
+	/*
 	System.out.println("charLiterals="+charLiterals);
 	System.out.println("stringLiterals="+stringLiterals);
 	System.out.println("tokens="+tokens);
 	System.out.println("aliases="+aliases);
+	*/
 
-	assignTokenNameTypes();
+	assignTokenIDTypes();
 
-	aliasTokenNamesAndLiterals();
+	aliasTokenIDsAndLiterals();
 
 	assignCharTypes();
 
 	assignStringTypes();
 
+	/*
 	System.out.println("AFTER:");
 	System.out.println("charLiterals="+charLiterals);
 	System.out.println("stringLiterals="+stringLiterals);
 	System.out.println("tokens="+tokens);
 	System.out.println("aliases="+aliases);
+	*/
 
 	notifyGrammarObject();
 }
@@ -256,7 +262,7 @@ protected void assignTypes() {
 		}
 	}
 
-	protected void aliasTokenNamesAndLiterals() {
+	protected void aliasTokenIDsAndLiterals() {
 		if ( grammar.type!=Grammar.COMBINED ) {
 			return; // strings/chars are never token types 'cept in combined
 		}
@@ -264,24 +270,24 @@ protected void assignTypes() {
 		// was referenced
 		Set s = aliases.keySet();
 		for (Iterator it = s.iterator(); it.hasNext();) {
-			String tokenName = (String) it.next();
-			String literal = (String)aliases.get(tokenName);
+			String tokenID = (String) it.next();
+			String literal = (String)aliases.get(tokenID);
 			if ( literal.charAt(0)=='"' && stringLiterals.get(literal)!=null ) {
-				stringLiterals.put(literal, tokens.get(tokenName));
+				stringLiterals.put(literal, tokens.get(tokenID));
 			}
 			else if ( literal.charAt(0)=='\'' && charLiterals.get(literal)!=null ) {
-				charLiterals.put(literal, tokens.get(tokenName));
+				charLiterals.put(literal, tokens.get(tokenID));
 			}
 		}
 	}
 
-	protected void assignTokenNameTypes() {
+	protected void assignTokenIDTypes() {
 		// walk token names, assigning values if unassigned
 		Set s = tokens.keySet();
 		for (Iterator it = s.iterator(); it.hasNext();) {
-			String tokenName = (String) it.next();
-			if ( tokens.get(tokenName)==UNASSIGNED ) {
-				tokens.put(tokenName, new Integer(getNewTokenType()));
+			String tokenID = (String) it.next();
+			if ( tokens.get(tokenID)==UNASSIGNED ) {
+				tokens.put(tokenID, new Integer(getNewTokenType()));
 			}
 		}
 	}
@@ -289,9 +295,9 @@ protected void assignTypes() {
 	protected void notifyGrammarObject() {
 		Set s = tokens.keySet();
 		for (Iterator it = s.iterator(); it.hasNext();) {
-			String tokenName = (String) it.next();
-			int ttype = ((Integer)tokens.get(tokenName)).intValue();
-			grammar.defineToken(tokenName, ttype);
+			String tokenID = (String) it.next();
+			int ttype = ((Integer)tokens.get(tokenID)).intValue();
+			grammar.defineToken(tokenID, ttype);
 		}
 		s = charLiterals.keySet();
 		for (Iterator it = s.iterator(); it.hasNext();) {
@@ -314,14 +320,14 @@ protected void assignTypes() {
 	 */
 	protected void importTokenVocabulary(Grammar g) {
 		int maxTokenType=0;
-		Set importedTokenNames = g.getTokenNames();
-		for (Iterator it = importedTokenNames.iterator(); it.hasNext();) {
-			String tokenName = (String) it.next();
-			int tokenType = g.getTokenType(tokenName);
+		Set importedTokenIDs = g.getTokenIDs();
+		for (Iterator it = importedTokenIDs.iterator(); it.hasNext();) {
+			String tokenID = (String) it.next();
+			int tokenType = g.getTokenType(tokenID);
 			maxTokenType = Math.max(maxTokenType,tokenType);
 			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
-				//System.out.println("import token from grammar "+tokenName+"="+tokenType);
-				defineToken(tokenName, tokenType);
+				//System.out.println("import token from grammar "+tokenID+"="+tokenType);
+				defineToken(tokenID, tokenType);
 			}
 		}
 		if ( maxTokenType>0 ) {
@@ -346,7 +352,7 @@ protected void assignTypes() {
 									   vocabName+".tokens",
 									   new Integer(n));
 				}
-				String tokenName=tokenizer.nextToken();
+				String tokenID=tokenizer.nextToken();
 				if ( !tokenizer.hasMoreTokens() ) {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
 									   vocabName+".tokens",
@@ -360,9 +366,9 @@ protected void assignTypes() {
 				}
 				String tokenTypeS=tokenizer.nextToken();
 				int tokenType = Integer.parseInt(tokenTypeS);
-				// System.out.println("import "+tokenName+"="+tokenType);
+				// System.out.println("import "+tokenID+"="+tokenType);
 				maxTokenType = Math.max(maxTokenType,tokenType);
-				defineToken(tokenName, tokenType);
+				defineToken(tokenID, tokenType);
 				line = br.readLine();
 				n++;
 			}

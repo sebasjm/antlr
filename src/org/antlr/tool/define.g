@@ -44,7 +44,9 @@ options {
 protected Grammar grammar;
 protected GrammarAST root;
 protected String currentRuleName;
-protected List lexerRules = new LinkedList();
+protected Map lexerRules = new HashMap();
+protected Set ruleRefs = new HashSet();
+protected Set tokenIDRefs = new HashSet();
 
 	/** Parser error-reporting function can be overridden in subclass */
 	public void reportError(RecognitionException ex) {
@@ -54,6 +56,11 @@ protected List lexerRules = new LinkedList();
 	/** Parser error-reporting function can be overridden in subclass */
 	public void reportError(String s) {
 		System.out.println("define rules: error: " + s);
+	}
+
+	protected void finish() {
+		trimGrammar();
+		lookForReferencesToUndefinedSymbols();
 	}
 
 	/** Remove any lexer rules from a COMBINED; already passed to lexer */
@@ -89,6 +96,37 @@ protected List lexerRules = new LinkedList();
 		}
 		//System.out.println("root after removal is: "+root.toStringList());
 	}
+
+	/** If ref to undefined rule, give error at first occurrence.
+	 *
+	 *  If you ref ID in a combined grammar and don't define ID as a lexer rule
+	 *  it is an error.
+	 */
+	protected void lookForReferencesToUndefinedSymbols() {
+		// for each rule ref, ask if there is a rule definition
+		for (Iterator iter = ruleRefs.iterator(); iter.hasNext();) {
+			Token tok = (Token) iter.next();
+			String ruleName = tok.getText();
+			if ( grammar.getRule(ruleName)==null ) {
+				ErrorManager.grammarError(ErrorManager.MSG_UNDEFINED_RULE_REF,
+										  grammar,
+										  tok,
+										  ruleName);
+			}
+        }
+		if ( grammar.type==Grammar.COMBINED ) {
+			for (Iterator iter = tokenIDRefs.iterator(); iter.hasNext();) {
+				Token tok = (Token) iter.next();
+				String tokenID = tok.getText();
+				if ( lexerRules.get(tokenID)==null ) {
+					ErrorManager.grammarError(ErrorManager.MSG_NO_TOKEN_DEFINITION,
+											  grammar,
+											  tok,
+											  tokenID);
+				}
+			}
+		}
+	}
 }
 
 grammar[Grammar g]
@@ -97,12 +135,12 @@ grammar = g;
 root = #grammar;
 }
     :   (headerSpec)*
-	    ( #( LEXER_GRAMMAR 	  {grammar.type = Grammar.LEXER;} 	  grammarSpec )
+	    ( #( LEXER_GRAMMAR 	  {grammar.type = Grammar.LEXER;} 	    grammarSpec )
 	    | #( PARSER_GRAMMAR   {grammar.type = Grammar.PARSER;}      grammarSpec )
 	    | #( TREE_GRAMMAR     {grammar.type = Grammar.TREE_PARSER;} grammarSpec )
 	    | #( COMBINED_GRAMMAR {grammar.type = Grammar.COMBINED;}    grammarSpec )
 	    )
-	    {trimGrammar();}
+	    {finish();}
     ;
 
 headerSpec
@@ -205,7 +243,8 @@ Map opts=null;
 				String ruleText = printer.toString(#rule);
 				//System.out.println("rule text is:\n"+ruleText);
 				grammar.defineLexerRuleFoundInParser(name, ruleText);
-				lexerRules.add(#rule); // track rules to remove from parser later
+				// track lexer rules so we can warn about undefined tokens
+				lexerRules.put(#id.getText(), #rule);
 			}
 			else {
 				grammar.defineRule(#id.getToken(), mod, opts, #rule);
@@ -313,8 +352,8 @@ tree:   #(TREE_BEGIN atom (element)*)
     ;
 
 atom
-    :   RULE_REF
-    |   t:TOKEN_REF
+    :   r:RULE_REF		{if ( !ruleRefs.contains(r) ) {ruleRefs.add(r.token);}}
+    |   t:TOKEN_REF 	{if ( !tokenIDRefs.contains(t) ) {tokenIDRefs.add(t.token);}}
     |   c:CHAR_LITERAL
     |   s:STRING_LITERAL
     |   WILDCARD

@@ -132,6 +132,8 @@ public class ErrorManager {
 	public static final int MSG_LEXER_RULES_NOT_ALLOWED = 102;
 	public static final int MSG_PARSER_RULES_NOT_ALLOWED = 103;
 	public static final int MSG_CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL = 104;
+	public static final int MSG_NO_TOKEN_DEFINITION = 105;
+	public static final int MSG_UNDEFINED_RULE_REF = 106;
 
 
 	// GRAMMAR WARNINGS
@@ -338,33 +340,28 @@ public class ErrorManager {
 
 	public static void grammarError(int msgID,
 									Grammar g,
-									LLkParser parser,
 									Token token,
 									Object arg,
 									Object arg2)
 	{
-		int line = token.getLine();
-		int col = token.getColumn();
 		getErrorListener().error(
-			new GrammarMessage(msgID,g,g.getFileName(),line,col,arg,arg2)
+			new GrammarMessage(msgID,g,token,arg,arg2)
 		);
 	}
 
 	public static void grammarError(int msgID,
 									Grammar g,
-									LLkParser parser,
 									Token token,
 									Object arg)
 	{
-		grammarError(msgID,g,parser,token,arg,null);
+		grammarError(msgID,g,token,arg,null);
 	}
 
 	public static void grammarError(int msgID,
 									Grammar g,
-									LLkParser parser,
 									Token token)
 	{
-		grammarError(msgID,g,parser,token,null,null);
+		grammarError(msgID,g,token,null,null);
 	}
 
 	public static void internalError(Object error, Throwable e) {

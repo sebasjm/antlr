@@ -13,29 +13,22 @@ import org.antlr.stringtemplate.StringTemplate;
  *  TODO what to do with exceptions?  Want stack trace for internal errors?
  */
 public class ToolMessage extends Message {
-	protected Object arg;
-	protected Object arg2;
-	protected Throwable e;
 
 	public ToolMessage(int msgID) {
-		super(msgID);
-	}
-	public ToolMessage(int msgID, Exception e) {
-		this(msgID);
-		this.e = e;
+		super(msgID, null, null);
 	}
 	public ToolMessage(int msgID, Object arg) {
-		this(msgID);
-		this.arg = arg;
+		super(msgID, arg, null);
+	}
+	public ToolMessage(int msgID, Exception e) {
+		super(msgID);
+		this.e = e;
 	}
 	public ToolMessage(int msgID, Object arg, Object arg2) {
-		this(msgID);
-		this.arg = arg;
-		this.arg2 = arg2;
+		super(msgID, arg, arg2);
 	}
 	public ToolMessage(int msgID, Object arg, Throwable e) {
-		this(msgID);
-		this.arg = arg;
+		super(msgID,arg,null);
 		this.e = e;
 	}
 	public String toString() {

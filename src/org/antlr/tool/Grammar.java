@@ -30,6 +30,7 @@ package org.antlr.tool;
 import antlr.collections.AST;
 import antlr.RecognitionException;
 import antlr.TokenStreamRewriteEngine;
+import antlr.TreeParser;
 
 import java.io.*;
 import java.util.*;
@@ -84,6 +85,12 @@ public class Grammar {
 		public LinkedHashMap tokenLabels;
 		/** A list of all LabelElementPair attached to rule references like f=field */
 		public LinkedHashMap ruleLabels;
+		public String toString() { // used for testing
+			if ( modifier!=null ) {
+				return modifier+" "+name;
+			}
+			return name;
+		}
 	}
 
 	public static class Decision {
@@ -295,7 +302,7 @@ public class Grammar {
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
-		System.out.println(grammarTree.toStringList());
+		//System.out.println(grammarTree.toStringList());
 
 		/*
 		System.out.println("### print grammar");
@@ -327,10 +334,9 @@ public class Grammar {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
-		System.out.println("Scopes: "+scopes);
 	}
 
-	/** If the grammar is a merged grammar, return the text of the implicit
+	/** If he grammar is a merged grammar, return the text of the implicit
 	 *  lexer grammar.
 	 */
 	public String getLexerGrammar() {
@@ -387,7 +393,6 @@ public class Grammar {
         try {
             parser.rule();
             grammarTree.addChild(parser.getAST());
-			System.out.println("ast="+parser.getAST().toStringTree());
         }
         catch (Exception e) {
             ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,e);
@@ -512,7 +517,7 @@ public class Grammar {
 		}
 	}
 
-	/** Define either a token at a particular token type value.  Blast an
+	/** Define a token at a particular token type value.  Blast an
 	 *  old value with a new one.  This is called directly during import vocab
      *  operation to set up tokens with specific values.
      */
@@ -584,15 +589,14 @@ public class Grammar {
 		System.out.println("defineRule("+ruleName+",modifier="+modifier+
 						   "): index="+ruleIndex);
 		*/
-		/*
 		if ( getRule(ruleName)!=null ) {
             ErrorManager.grammarError(ErrorManager.MSG_RULE_REDEFINITION,
 									  this,
-									  parser,
 									  ruleToken,
 									  ruleName);
             return INVALID_RULE_INDEX;
         }
+		/*
         if ( type==PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 									  this,
@@ -792,9 +796,29 @@ public class Grammar {
         return i;
     }
 
-    public Set getTokenNames() {
-        return tokenNameToTypeMap.keySet();
-    }
+	/** Get the list of tokens that are IDs like BLOCK and LPAREN */
+	public Set getTokenIDs() {
+		return tokenNameToTypeMap.keySet();
+	}
+
+	/** Get a list of all token IDs, literals that have an associated
+	 *  token type.
+	 */
+	public Set getTokenNames() {
+		Set names = new HashSet();
+		for (int type=Label.MIN_TOKEN_TYPE; type<=getMaxTokenType(); type++) {
+			names.add(getTokenName(type));
+		}
+		return names;
+	}
+
+	public Set getStringLiteralTokens() {
+		return stringLiteralToTypeMap.keySet();
+	}
+
+	public Set getCharLiteralTokens() {
+		return charLiteralToTypeMap.keySet();
+	}
 
     /** Return a set of all possible token/char types for this grammar */
 	public IntSet getTokenTypes() {
@@ -812,6 +836,9 @@ public class Grammar {
 		return importTokenVocabularyFromGrammar;
 	}
 
+	/** Given a token type, get a meaningful name for it such as the ID
+	 *  or string literal etc...
+	 */
 	public String getTokenName(int ttype) {
 		String tokenName = null;
 		int index=0;

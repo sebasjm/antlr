@@ -666,7 +666,7 @@ public class CodeGenerator {
 	 */
 	protected void genTokenTypeConstants(StringTemplate code) {
 		// make constants for the token types
-		Iterator tokenIDs = grammar.getTokenNames().iterator();
+		Iterator tokenIDs = grammar.getTokenIDs().iterator();
 		while (tokenIDs.hasNext()) {
 			String tokenID = (String) tokenIDs.next();
 			int tokenType = grammar.getTokenType(tokenID);
@@ -700,12 +700,12 @@ public class CodeGenerator {
                 new StringTemplate(vocabFilePattern,
                                    AngleBracketTemplateLexer.class);
         // make constants for the token names
-        Iterator tokenNames = grammar.getTokenNames().iterator();
-        while (tokenNames.hasNext()) {
-            String tokenName = (String) tokenNames.next();
-            int tokenType = grammar.getTokenType(tokenName);
+        Iterator tokenIDs = grammar.getTokenIDs().iterator();
+        while (tokenIDs.hasNext()) {
+            String tokenID = (String) tokenIDs.next();
+            int tokenType = grammar.getTokenType(tokenID);
             if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
-                vocabFileST.setAttribute("tokens.{name,type}", tokenName, new Integer(tokenType));
+                vocabFileST.setAttribute("tokens.{name,type}", tokenID, new Integer(tokenType));
             }
         }
 
@@ -748,11 +748,9 @@ public class CodeGenerator {
 			int scopeEnd = i-1; // i points at char past first ID
 			String id = action.substring(scopeStart,scopeEnd+1);
 			StringTemplate refST = null;
-			System.out.println("found id "+id);
 			if ( r!=null && r.tokenLabels!=null && r.tokenLabels.get(id)!=null ) {
 				// not a scope, but is token ref
 				String label = id;
-				System.out.println("it's a token label");
 				// get attribute name (if any)
 				refST = templates.getInstanceOf("tokenLabelRef");
 				if ( action.charAt(i)=='.' ) { // @scope.attr?
@@ -764,9 +762,7 @@ public class CodeGenerator {
 					}
 					attrStop = i-1;
 					id = action.substring(attrStart,attrStop+1);
-					System.out.println("found 2nd id after token ref"+id);
 					if ( Token.predefinedTokenProperties.contains(id) ) {
-						System.out.println("it's a token property");
 						refST = templates.getInstanceOf("tokenLabelPropertyRef_"+id);
 					}
 					c = attrStop;
@@ -780,7 +776,6 @@ public class CodeGenerator {
 			else if ( r!=null && r.ruleLabels!=null && r.ruleLabels.get(id)!=null ) {
 				// not a scope, but is token ref
 				String label = id;
-				System.out.println("it's a rule label");
 				// get attribute name (if any)
 				if ( action.charAt(i)=='.' ) { // @scope.attr?
 					i++;
@@ -791,9 +786,7 @@ public class CodeGenerator {
 					}
 					attrStop = i-1;
 					id = action.substring(attrStart,attrStop+1);
-					System.out.println("found 2nd id after rule ref"+id);
 					if ( Grammar.Rule.predefinedRuleProperties.contains(id) ) {
-						System.out.println("it's a rule property");
 						refST = templates.getInstanceOf("ruleLabelPropertyRef_"+id);
 					}
 					c = attrStop;
@@ -807,7 +800,6 @@ public class CodeGenerator {
 			}
 			else if ( grammar.isValidScope(r,id) ) {
 				String scopeName = id;
-				System.out.println("it is scope");
 				// get attribute name (if any)
 				if ( action.charAt(i)=='.' ) { // @scope.attr?
 					i++;
@@ -818,10 +810,8 @@ public class CodeGenerator {
 					}
 					attrStop = i-1;
 					id = action.substring(attrStart,attrStop+1);
-					System.out.println("found 2nd id "+id);
 					AttributeScope scope =
 						grammar.getScopeContainingAttribute(r,scopeName,id);
-					System.out.println("its scope: "+scope);
 					refST = scope.getAttributeReferenceTemplate(templates);
 					refST.setAttribute("scope",scope);
 					AttributeScope.Attribute attr =
@@ -861,7 +851,7 @@ public class CodeGenerator {
 			}
 			//grammar.resolveToFullyQualified
 		}
-		System.out.println("template="+buf.toString());
+		//System.out.println("template="+buf.toString());
 		return buf.toString();
 	}
 
