@@ -320,7 +320,9 @@ public class Interpreter implements TokenSource {
 			// CASE 4: match label on transition
 			else if ( label.matches(t) ) {
 				if ( actions!=null ) {
-					if ( grammar.type == Grammar.PARSER ) {
+					if ( grammar.type == Grammar.PARSER ||
+						 grammar.type == Grammar.COMBINED )
+					{
 						actions.consumeToken(((TokenStream)input).LT(1));
 					}
 				}
