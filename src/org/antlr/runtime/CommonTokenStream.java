@@ -32,20 +32,42 @@ import org.antlr.tool.Grammar;
 import java.util.List;
 import java.util.ArrayList;
 
+/** The most common stream of tokens is one where every token is buffered up
+ *  and tokens are prefiltered for a certain channel (the parser will only
+ *  see these tokens and cannot change the filter channel number during the
+ *  parse).
+ *
+ *  TODO: how to access the full token stream?  How to track all tokens matched per rule?
+ */
 public class CommonTokenStream implements TokenStream {
     protected TokenSource tokenSource;
-    protected List tokens;
+
+	/** Record every single token pulled from the source so we can reproduce
+	 *  chunks of it later.
+	 */
+	protected List tokens;
+
+	/** For efficiently, prefilter the list of tokens to get only those on a
+	 *  specific channel.  (seems to cost a list to track this extra array;
+	 *  like 10% tokenizing a 5000 line java program w/o parsing).
+	 */
+	protected List filteredTokens;
+
 	/** Skip tokens on any channel but this one; this is how we skip whitespace... */
 	protected int channel = Token.DEFAULT_CHANNEL;
     protected int p = 0;
 
     public CommonTokenStream(TokenSource tokenSource) throws TokenStreamException {
-        tokens = new ArrayList();
+		tokens = new ArrayList(500);
+		filteredTokens = new ArrayList(500);
         this.tokenSource = tokenSource;
         // suck in all the input tokens
         Token t = tokenSource.nextToken();
         while ( t!=null && t.getType()!=CharStream.EOF ) {
             tokens.add(t);
+			if ( t.getChannel()==channel ) {
+				filteredTokens.add(t);
+			}
             t = tokenSource.nextToken();
         }
     }
@@ -54,15 +76,12 @@ public class CommonTokenStream implements TokenStream {
 	 *  must become active with lookahead(1) available.  consume() simply
 	 *  moves the input pointer so that lookahead(1) points at the next
 	 *  input symbol. Consume at least one token.
+	 *
+	 *  Walk past any token not on the channel the parser is listening to.
 	 */
 	public void consume() {
-		if ( p<tokens.size() ) {
+		if ( p<filteredTokens.size() ) {
             p++;
-			while ( p<tokens.size() &&
-					((Token)tokens.get(p)).getChannel()!=channel )
-			{
-				p++;
-			}
         }
     }
 
@@ -70,7 +89,9 @@ public class CommonTokenStream implements TokenStream {
 		this.channel = channel;
 	}
 
-    // TODO: does not filter!!!
+	/** Get the ith token from the current position 1..n where i=1 is the
+	 *  first symbol of lookahead.
+	 */
 	public Token LT(int i) {
         //System.out.println("LT("+i+")="+LT(p, i));
         return LT(p, i);
@@ -91,10 +112,10 @@ public class CommonTokenStream implements TokenStream {
 	 *  assertTrue(atom==input.lookahead(m, 1));
 	 */
     public Token LT(int marker, int i) {
-        if ( marker+i-1 >= tokens.size() ) {
+        if ( marker+i-1 >= filteredTokens.size() ) {
             return Token.EOFToken;
         }
-        return (Token)tokens.get(marker+i-1);
+        return (Token)filteredTokens.get(marker+i-1);
     }
 
     public int LA(int i) {
@@ -110,7 +131,11 @@ public class CommonTokenStream implements TokenStream {
     }
 
 	public int size() {
-		return tokens.size();
+		return filteredTokens.size();
+	}
+
+	public int getFilteredSize() {
+		return filteredTokens.size();
 	}
 
     public int index() {

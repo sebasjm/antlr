@@ -362,7 +362,7 @@ public class CodeGenerator {
         String description = dfa.getNFADecisionStartState().getDescription();
         if ( description!=null ) {
 			description = Utils.replace(description,"\"", "\\\"");
-            //dfaST.setAttribute("description", description);
+            dfaST.setAttribute("description", description);
         }
         int EOTPredicts = NFA.INVALID_ALT_NUMBER;
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {

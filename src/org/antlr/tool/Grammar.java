@@ -263,12 +263,14 @@ public class Grammar {
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
-		System.out.println(grammarTree.toStringList());
+		//System.out.println(grammarTree.toStringList());
 
+		/*
 		System.out.println("### print grammar");
 		ANTLRTreePrinter printer = new ANTLRTreePrinter();
 		printer.setASTNodeClass("org.antlr.tool.GrammarAST");
 		System.out.println(printer.toString(grammarTree));
+		*/
 
 		// ASSIGN TOKEN TYPES
 		System.out.println("### assign types");

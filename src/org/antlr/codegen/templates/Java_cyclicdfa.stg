@@ -2,13 +2,17 @@ group Java_dfa;
 
 dfaDecision(decisionNumber,description) ::= <<
 int m<decisionNumber> = input.mark();
+<if(LEXER)>
 int line<decisionNumber> = input.getLine();
 int pos<decisionNumber> = input.getCharPositionInLine();
+<endif>
 <! the <name> attribute is inherited via the parser, lexer, ... !>
 alt<decisionNumber> = <name>_DFA.DFA<decisionNumber>(input);
 input.rewind(m<decisionNumber>);
+<if(LEXER)>
 input.setLine(line<decisionNumber>);
 input.setCharPositionInLine(pos<decisionNumber>);<\n>
+<endif>
 >>
 
 allCyclicDFAs(cyclicDFAs) ::= <<

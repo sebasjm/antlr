@@ -122,14 +122,18 @@ protected int getNewTokenType() {
 
 /** Track characters in any non-lexer rule */
 protected void trackChar(GrammarAST t) {
-	if ( Character.isLowerCase(currentRuleName.charAt(0)) ) {
+	if ( currentRuleName==null ||
+	     Character.isLowerCase(currentRuleName.charAt(0)) )
+	{
 		charLiterals.put(t.getText(), UNASSIGNED_IN_PARSER_RULE);
 	}
 }
 
 /** Track string literals in any non-lexer rule */
 protected void trackString(GrammarAST t) {
-	if ( Character.isLowerCase(currentRuleName.charAt(0)) ) {
+	if ( currentRuleName==null ||
+             Character.isLowerCase(currentRuleName.charAt(0)) )
+	{
 		stringLiterals.put(t.getText(), UNASSIGNED_IN_PARSER_RULE);
 	}
 }

@@ -506,6 +506,42 @@ public class TestDFAConversion extends TestSuite {
 	}
 
 
+	public void testSelfRecursionAmbigAlts() throws Exception {
+		// ambiguous grammar for "L ID R" (alts 1,2 of a)
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a   :   L ID R\n" +
+				"    |   L a R\n" + // disabled for L ID R
+				"    |   b\n" +
+				"    ;\n" +
+				"\n" +
+				"b   :   ID\n" +
+				"    ;\n");
+		String expecting =
+			".s0-ID->:s5=>3\n" +
+			".s0-L->.s1\n" +
+			".s1-ID->.s3\n" +
+			".s1-L->:s2=>2\n" +
+			".s3-R->:s4=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testIndirectRecursionAmbigAlts() throws Exception {
+		// ambiguous grammar for "L ID R" (alts 1,2 of a)
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a   :   L ID R\n" +
+				"    |   b\n" +
+				"    ;\n" +
+				"\n" +
+				"b   :   ID\n" +
+				"    |   L a R\n" +
+				"    ;");
+		String expecting =
+				"\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
     // S U P P O R T
 
     public void _template() throws Exception {

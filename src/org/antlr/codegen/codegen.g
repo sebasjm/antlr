@@ -211,9 +211,11 @@ rule returns [StringTemplate code=null]
 				 trace!=null && trace.equals("true") )
 			{ // TODO: use option for now not cmd-line; HIDEOUS, fix this with ST composition
 				code.setAttribute("enterAction",
-					"System.out.println(\"enter "+r+"; LT(1)==\"+input.LT(1));");
+					"System.out.println(\"enter "+r+
+					"; LT(1)==\"+input.LT(1).toString(input.getTokenSource().getCharStream()));");
 				code.setAttribute("exitAction",
-					"System.out.println(\"exit "+r+"; LT(1)==\"+input.LT(1));");
+					"System.out.println(\"exit "+r+
+					"; LT(1)==\"+input.LT(1).toString(input.getTokenSource().getCharStream()));");
 			}
 			code.setAttribute("ruleName", r);
 			code.setAttribute("block", b);
@@ -367,7 +369,7 @@ atom returns [StringTemplate code=null]
     |   c:CHAR_LITERAL  {
                             if ( grammar.getType()==Grammar.LEXER ) {
                                 code = templates.getInstanceOf("charRef");
-                                code.setAttribute("char", grammar.getUnicodeEscape(c.getText());
+                                code.setAttribute("char", c.getText());
                             }
                             else { // else it's a token type reference
                                 code = templates.getInstanceOf("tokenRef");
