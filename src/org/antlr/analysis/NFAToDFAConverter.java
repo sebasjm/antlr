@@ -36,8 +36,8 @@ import java.util.*;
 
 /** Code that embodies the NFA conversion to DFA. */
 public class NFAToDFAConverter {
-	public static boolean COLLAPSE_ALL_INCIDENT_EDGES = false;
-	public static boolean MERGE_STOP_STATES = false;
+	public static boolean COLLAPSE_ALL_INCIDENT_EDGES = true;
+	public static boolean MERGE_STOP_STATES = true;
 
 	/** A list of DFA states we still need to process during NFA conversion */
 	protected List work = new LinkedList();
@@ -220,22 +220,26 @@ public class NFAToDFAConverter {
 			*/
 			DFAState targetState = addDFAState(t); // add if not in DFA yet
 
-			//System.out.println(d.stateNumber+"-"+label.toString(dfa.nfa.grammar)+"->"+targetState.stateNumber);
+			System.out.println(d.stateNumber+"-"+label.toString(dfa.nfa.grammar)+"->"+targetState.stateNumber);
 			if ( COLLAPSE_ALL_INCIDENT_EDGES ) {
 				// TODO: heh, might need to add pred transitions! do this later?
 				// track which targets we've hit
 				Integer tI = new Integer(targetState.stateNumber);
 				Transition oldTransition = (Transition)targetToLabelMap.get(tI);
 				if ( oldTransition!=null ) {
-					Label oldLabel = oldTransition.label;
-					//System.out.println("extra transition to "+tI+" upon "+label.toString(dfa.nfa.grammar));
+					System.out.println("extra transition to "+tI+" upon "+label.toString(dfa.nfa.grammar));
 					// already seen state d to target transition, just add label
 					// to old label
-					if ( label.getAtom()!=Label.EOT ) {
+					if ( label.getAtom()==Label.EOT ) {
+						// still need the transition, but don't merge
+						numberOfEdgesEmanating++;
+						d.addTransition(targetState, label);
+					}
+					else {
 						// must not alter labels obtained from the NFA; clone, add
 						//oldTransition.label = (Label)oldLabel.clone();
 						oldTransition.label.add(label);
-						System.out.println("label updated to be "+oldLabel.toString(dfa.nfa.grammar));
+						System.out.println("label updated to be "+oldTransition.label.toString(dfa.nfa.grammar));
 					}
 				}
 				else {

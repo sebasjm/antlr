@@ -437,19 +437,15 @@ public class Grammar {
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
             NFAState decisionStartState = getDecisionNFAStartState(decision);
             if ( decisionStartState.getNumberOfTransitions()>1 ) {
-				/*
 				System.out.println("--------------------\nbuilding lookahead DFA (d="
                         +decisionStartState.getDecisionNumber()+") for "+
                         decisionStartState.getDescription());
 				long start = System.currentTimeMillis();
-				*/
 				DFA lookaheadDFA = new DFA(decisionStartState);
 				long stop = System.currentTimeMillis();
 				setLookaheadDFA(decision, lookaheadDFA);
-				/*
 				System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
 					" states, "+(int)(stop-start)+" ms");
-				*/
 
 				if ( Tool.GENERATE_DFA_DOT ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.grammar);
