@@ -30,11 +30,9 @@ package org.antlr.tool;
 import antlr.collections.AST;
 import antlr.RecognitionException;
 import antlr.TokenStreamRewriteEngine;
-import antlr.TokenWithIndex;
 
 import java.io.*;
 import java.util.*;
-import java.util.BitSet;
 
 import org.antlr.analysis.*;
 import org.antlr.analysis.DFA;
@@ -43,6 +41,7 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.*;
+import org.antlr.misc.BitSet;
 
 /** Represents a grammar in memory. */
 public class Grammar {
@@ -58,23 +57,22 @@ public class Grammar {
 	public static final int COMBINED = 4;
 
 	/** Combine the info associated with a rule; I'm using like a struct */
-	protected class Rule {
-		String name;
-		int index;
-		String modifier;
-		Map options;
-		NFAState startState;
-		NFAState stopState;
-		GrammarAST tree;
-		GrammarAST lexerAction;
-		public String getName() {return name;}
+	public class Rule {
+		public String name;
+		public int index;
+		public String modifier;
+		public Map options;
+		public NFAState startState;
+		public NFAState stopState;
+		public GrammarAST tree;
+		public GrammarAST lexerAction;
 	}
 
-	protected class Decision {
-		int decision;
-		NFAState startState;
-		Map options;
-		DFA dfa;
+	public class Decision {
+		public int decision;
+		public NFAState startState;
+		public Map options;
+		public DFA dfa;
 	}
 
 	/** What name did the user provide for this grammar? */
@@ -172,6 +170,9 @@ public class Grammar {
      */
     protected CodeGenerator generator;
 
+	/** Used during LOOK to detect computation cycles */
+	protected Set lookBusy;
+
 	/** For merged lexer/parsers, we must construct a separate lexer spec.
 	 *  This is the template for lexer; put the literals first then the
 	 *  regular rules.  We don't need to specify a token vocab import as
@@ -264,7 +265,7 @@ public class Grammar {
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
-		System.out.println(grammarTree.toStringList());
+		//System.out.println(grammarTree.toStringList());
 
 		/*
 		System.out.println("### print grammar");
@@ -340,7 +341,7 @@ public class Grammar {
             	matchTokenRuleST.setAttribute("rules", r.name);
 			}
         }
-		System.out.println("tokens rule: "+matchTokenRuleST.toString());
+		//System.out.println("tokens rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
@@ -414,12 +415,6 @@ public class Grammar {
 		}
 		catch (IOException ioe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE, ioe);
-		}
-
-		for (Iterator itr = getRules().iterator(); itr.hasNext();) {
-			Grammar.Rule r = (Grammar.Rule) itr.next();
-			System.out.println("FOLLOW("+r.name+")="+
-							   reachable(r.stopState).toString());
 		}
 	}
 
@@ -972,10 +967,13 @@ public class Grammar {
         return null;
     }
 
-	Set reachableBusy;
-	public org.antlr.misc.BitSet reachable(NFAState s) {
-		reachableBusy = new HashSet();
-		return _reachable(s);
+	public LookaheadSet LOOK(NFAState s) {
+		lookBusy = new HashSet();
+		return reachable(s);
+	}
+
+	public LookaheadSet FOLLOW(String ruleName) {
+		return LOOK(getRuleStopState(ruleName));
 	}
 
 	/** From an NFA state, s, find the set of all labels reachable from s.
@@ -984,27 +982,32 @@ public class Grammar {
 	 *  this will return the FOLLOW set.  Use BitSet implementation as this
 	 *  will only be used on parser and tree parser grammars.
 	 */
-	protected org.antlr.misc.BitSet _reachable(NFAState s) {
-		if ( reachableBusy.contains(s) ) {
-			return org.antlr.misc.BitSet.empty;
+	protected LookaheadSet reachable(NFAState s) {
+		if ( lookBusy.contains(s) ) {
+			// return a copy of an empty set; we may modify set inline
+			return new LookaheadSet(new BitSet());
 		}
-		reachableBusy.add(s);
+		lookBusy.add(s);
 		Transition transition0 = s.transition(0);
 		if ( transition0==null ) {
 			return null;
 		}
 
 		if ( transition0.label.isAtom() ) {
-			return org.antlr.misc.BitSet.of(transition0.label.getAtom());
+			int atom = transition0.label.getAtom();
+			if ( atom==Label.EOF ) {
+				return LookaheadSet.EOF();
+			}
+			return new LookaheadSet(BitSet.of(atom));
 		}
 		if ( transition0.label.isSet() ) {
-			return org.antlr.misc.BitSet.of(transition0.label.getSet());
+			return new LookaheadSet(BitSet.of(transition0.label.getSet()));
 		}
-        org.antlr.misc.BitSet tset = reachable((NFAState)transition0.target);
+        LookaheadSet tset = reachable((NFAState)transition0.target);
 
 		Transition transition1 = s.transition(1);
 		if ( transition1!=null ) {
-			org.antlr.misc.BitSet tset1 = reachable((NFAState)transition1.target);
+			LookaheadSet tset1 = reachable((NFAState)transition1.target);
 			tset.orInPlace(tset1);
 		}
 		return tset;

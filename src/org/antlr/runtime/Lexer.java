@@ -154,7 +154,11 @@ public abstract class Lexer implements TokenSource {
 		}
 	}
 
-	/** TODO: make this accept the FOLLOW(enclosing-Rule) */
+	/** Lexers can normally about any char in it's vocabulary after matching
+	 *  a token, so do the easy thing and just kill a character and hope
+	 *  it all works out.  You can instead use the rule invocation stack
+	 *  to do sophisticated error recovery if you are in a fragment rule.
+	 */
 	public void recover() {
 		input.consume();
 	}

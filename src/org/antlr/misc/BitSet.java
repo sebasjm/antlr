@@ -27,8 +27,6 @@
 */
 package org.antlr.misc;
 
-import antlr.CharFormatter;
-
 import java.util.*;
 
 import org.antlr.analysis.Label;
@@ -99,7 +97,7 @@ public class BitSet implements IntSet, Cloneable {
         if ( set instanceof BitSet ) {
             this.orInPlace((BitSet)set);
         }
-		if ( set instanceof IntervalSet ) {
+		else if ( set instanceof IntervalSet ) {
 			IntervalSet other = (IntervalSet)set;
 			// walk set and add each interval
 			for (Iterator iter = other.intervals.iterator(); iter.hasNext();) {
@@ -107,7 +105,11 @@ public class BitSet implements IntSet, Cloneable {
 				this.orInPlace(BitSet.range(I.a,I.b));
 			}
 		}
-		throw new IllegalArgumentException("can't add "+set.getClass().getName()+" to BitSet");
+		else {
+			throw new IllegalArgumentException("can't add "+
+											   set.getClass().getName()+
+											   " to BitSet");
+		}
     }
 
     public void addAll(int[] elements) {
@@ -263,6 +265,9 @@ public class BitSet implements IntSet, Cloneable {
     }
 
     public IntSet complement(IntSet set) {
+		if ( set==null ) {
+			return this.complement();
+		}
         return set.subtract(this);
     }
 
@@ -308,6 +313,10 @@ public class BitSet implements IntSet, Cloneable {
     }
 
 	public static BitSet of(IntSet set) {
+		if ( set==null ) {
+			return null;
+		}
+
 		if ( set instanceof BitSet ) {
 			return (BitSet)set;
 		}
@@ -335,12 +344,18 @@ public class BitSet implements IntSet, Cloneable {
 
     /** return this | a in a new set */
     public IntSet or(IntSet a) {
+		if ( a==null ) {
+			return this;
+		}
         BitSet s = (BitSet)this.clone();
         s.orInPlace((BitSet)a);
         return s;
     }
 
     public void orInPlace(BitSet a) {
+		if ( a==null ) {
+			return;
+		}
         // If this is smaller than a, grow this first
         if (a.bits.length > bits.length) {
             setSize(a.bits.length);
@@ -433,10 +448,12 @@ public class BitSet implements IntSet, Cloneable {
     public String toString(Grammar g) {
         StringBuffer buf = new StringBuffer();
         String separator = ",";
+		boolean havePrintedAnElement = false;
+		buf.append('{');
 
         for (int i = 0; i < (bits.length << LOG_BITS); i++) {
             if (member(i)) {
-                if (i > 0) {
+                if (i > 0 && havePrintedAnElement ) {
                     buf.append(separator);
                 }
                 if ( g!=null ) {
@@ -445,28 +462,11 @@ public class BitSet implements IntSet, Cloneable {
                 else {
                     buf.append(i);
                 }
+				havePrintedAnElement = true;
             }
         }
+		buf.append('}');
         return buf.toString();
-    }
-
-    /** Transform a bit set into a string of characters.
-     * separator The string to put in between elements
-     * @param formatter An object implementing the CharFormatter interface.
-     * @return A commma-separated list of character constants.
-     */
-    public String toString(String separator, CharFormatter formatter) {
-        String str = "";
-
-        for (int i = 0; i < (bits.length << LOG_BITS); i++) {
-            if (member(i)) {
-                if (str.length() > 0) {
-                    str += separator;
-                }
-                str = str + formatter.literalChar(i);
-            }
-        }
-        return str;
     }
 
     /**Create a string representation where instead of integer elements, the
@@ -534,42 +534,6 @@ public class BitSet implements IntSet, Cloneable {
 
     public String toStringWithRanges() {
         return toString();
-    }
-
-    /** Print out the bit set but collapse char ranges. */
-    public String toStringWithRanges(String separator, CharFormatter formatter) {
-        String str = "";
-        int[] elems = this.toArray();
-        if (elems.length == 0) {
-            return "";
-        }
-        // look for ranges
-        int i = 0;
-        while (i < elems.length) {
-            int lastInRange;
-            lastInRange = 0;
-            for (int j = i + 1; j < elems.length; j++) {
-                if (elems[j] != elems[j - 1] + 1) {
-                    break;
-                }
-                lastInRange = j;
-            }
-            // found a range
-            if (str.length() > 0) {
-                str += separator;
-            }
-            if (lastInRange - i >= 2) {
-                str += formatter.literalChar(elems[i]);
-                str += "..";
-                str += formatter.literalChar(elems[lastInRange]);
-                i = lastInRange;	// skip past end of range for next range
-            }
-            else {	// no range, just print current char and move on
-                str += formatter.literalChar(elems[i]);
-            }
-            i++;
-        }
-        return str;
     }
 
     private final static int wordNumber(int bit) {

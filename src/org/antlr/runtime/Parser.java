@@ -65,7 +65,8 @@ public class Parser {
 	 *  more exceptions w/o breaking old code.
 	 */
 	public void reportError(RecognitionException e) {
-		System.err.print(getRuleInvocationStack()+
+		String parserClassName = getClass().getName();
+		System.err.print(getRuleInvocationStack(e, parserClassName)+
 						 ": line "+input.getTokenSource().getCharStream().getLine()+" ");
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
@@ -102,9 +103,26 @@ public class Parser {
 		}
 	}
 
-	/** TODO: make this accept the FOLLOW(enclosing-Rule) */
-	public void recover() {
-		input.consume();
+	public void recover(org.antlr.runtime.BitSet follow) {
+		consumeUntil(follow);
+	}
+
+	public void consumeUntil(int tokenType) {
+		while (input.LA(1) != Token.EOF && input.LA(1) != tokenType) {
+			input.consume();
+		}
+	}
+
+	/** Consume tokens until one matches the given token set */
+	public void consumeUntil(BitSet set) {
+		//System.out.println("consumeUntil("+set.toString()+")");
+		while (input.LA(1) != Token.EOF && !set.member(input.LA(1)) ) {
+			/*
+			System.out.println("LT(1)="+
+							   input.LT(1).toString(input.getTokenSource().getCharStream()));
+			*/
+			input.consume();
+		}
 	}
 
 	/** Return List<String> of the rules in your parser instance

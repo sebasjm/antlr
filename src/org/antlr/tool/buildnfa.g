@@ -64,7 +64,7 @@ protected void init() {
     Collection rules = grammar.getRules();
     for (Iterator itr = rules.iterator(); itr.hasNext();) {
 		Grammar.Rule r = (Grammar.Rule) itr.next();
-        String ruleName = r.getName();
+        String ruleName = r.name;
         NFAState ruleBeginState = factory.newState();
         ruleBeginState.setDescription("rule "+ruleName+" start");
 		ruleBeginState.setEnclosingRuleName(ruleName);
