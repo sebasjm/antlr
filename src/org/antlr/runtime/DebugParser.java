@@ -49,6 +49,7 @@ public class DebugParser extends Parser {
 		public void exitSubRule() {}
 		public void location(int line, int pos) {}
 		public void consumeToken(Token token) {}
+		public void LT(int i) {}
 		public void recognitionException(RecognitionException e) {}
 		public void recovered(Token t) {}
 	}

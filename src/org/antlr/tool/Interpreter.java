@@ -42,6 +42,7 @@ public class Interpreter implements TokenSource {
 		public void exitSubRule() {}
 		public void location(int line, int pos) {}
 		public void consumeToken(Token token) {}
+		public void LT(int i) {}
 		public void recognitionException(RecognitionException e) {}
 		public void recovered(Token t) {}
 	}
@@ -78,6 +79,7 @@ public class Interpreter implements TokenSource {
 			ParseTree elementNode = new ParseTree(g.getTokenName(token.getType()));
 			ruleNode.addChild(elementNode);
 		}
+		public void LT(int i) {}
 		public void recognitionException(RecognitionException e) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
 			ParseTree errorNode = new ParseTree(e);

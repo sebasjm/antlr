@@ -29,6 +29,13 @@ public interface ANTLRDebugInterface {
 	 */
 	public void consumeToken(Token t);
 
+	/** Somebody (anybody) looked ahead.  Note that this actually gets
+	 *  triggered by both LA and LT calls.  The debugger will want to know
+	 *  which Token object was examined.  Actually, most of the time, LA
+	 *  will call LT which is how LA triggers this event.
+	 */
+	public void LT(int i);
+
 	/** To watch a parser move through the grammar, the parser needs to
 	 *  inform the debugger what line/charPos it is passing in the grammar.
 	 *  For now, this does not know how to switch from one grammar to the
