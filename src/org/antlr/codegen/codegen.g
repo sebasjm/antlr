@@ -206,7 +206,7 @@ rule returns [StringTemplate code=null]
             #( INITACTION
                (ia:ACTION {initAction=generator.translateAction(r,#ia.getText());})?
              )
-	     	b=block["block", dfa] EOR
+	     	b=block["ruleBlock", dfa] EOR
          )
         // do not generate lexer rules in combined grammar
         {
@@ -232,17 +232,6 @@ rule returns [StringTemplate code=null]
 		    		r.equals(Grammar.TOKEN_RULENAME) ||
 		    	    (mod!=null&&mod.getText().equals(Grammar.FRAGMENT_RULE_MODIFIER));
 		    	code.setAttribute("nakedBlock", new Boolean(naked));
-			}
-			String trace = (String)grammar.getOption("trace");
-			if ( grammar.type!=Grammar.LEXER &&
-				 trace!=null && trace.equals("true") )
-			{ // TODO: use option for now not cmd-line; HIDEOUS, fix this with ST composition
-				code.setAttribute("enterAction",
-					"System.out.println(\"enter "+r+
-					"; LT(1)==\"+input.LT(1).toString(input.getTokenSource().getCharStream()));");
-				code.setAttribute("exitAction",
-					"System.out.println(\"exit "+r+
-					"; LT(1)==\"+input.LT(1).toString(input.getTokenSource().getCharStream()));");
 			}
 			code.setAttribute("ruleName", r);
 			code.setAttribute("block", b);

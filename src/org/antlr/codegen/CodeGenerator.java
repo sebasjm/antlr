@@ -147,6 +147,8 @@ public class CodeGenerator {
      */
     protected Tool tool;
 
+	protected boolean debug;
+
 	/** I have factored out the generation of acyclic DFAs to separate class */
 	protected ACyclicDFACodeGenerator acyclicDFAGenerator =
 		new ACyclicDFACodeGenerator(this);
@@ -301,6 +303,7 @@ public class CodeGenerator {
 			recognizerST = templates.getInstanceOf("parser");
 			outputFileST.setAttribute("PARSER", "true");
 			headerFileST.setAttribute("PARSER", "true");
+			outputFileST.setAttribute("debug", new Boolean(debug));
 		}
 		else {
 			recognizerST = templates.getInstanceOf("treeParser");
@@ -844,6 +847,10 @@ public class CodeGenerator {
 			return cyclicDFAST;
 		}
 		return null;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 
 	public StringTemplateGroup getCyclicDFATemplates() {

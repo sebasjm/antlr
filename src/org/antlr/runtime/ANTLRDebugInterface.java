@@ -19,16 +19,15 @@ public interface ANTLRDebugInterface {
 	 */
 	public void exitRule(String ruleName);
 
-	/** An input token was consumed; matched by any kind of element. */
-	public void consumeToken(Token token);
+	/** Track entry into any (...) subrule other EBNF construct */
+	public void enterSubRule();
 
-	/** An input char was consumed; matched by any kind of element.
-	 *  I separate this from consumeToken(Token) so that it's easier for the
-	 *  debuggers to know what kind of thing they are debugging; though the
-	 *  constructor for a debugger should probably make it clear what kind
-	 *  of parser it is.
+	public void exitSubRule();
+
+	/** An input token was consumed; matched by any kind of element.
+	 *  Trigger after the token was matched by things like match(), matchAny().
 	 */
-	public void consumeChar(int c);
+	public void consumeToken(Token t);
 
 	/** To watch a parser move through the grammar, the parser needs to
 	 *  inform the debugger what line/charPos it is passing in the grammar.
@@ -45,4 +44,12 @@ public interface ANTLRDebugInterface {
 	 *  without having to alter all the debug objects.
 	 */
 	public void recognitionException(RecognitionException e);
+
+	/** Indicates that the parser was in an error state and has now recovered
+	 *  in that a token, t, was successfully matched.  This will be useful
+	 *  in a gui where you want to probably grey out tokens that are consumed
+	 *  but not matched to anything in grammar.  Anything between an exception
+	 *  and recovered() was tossed out by the parser.
+	 */
+	public void recovered(Token t);
 }

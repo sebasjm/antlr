@@ -54,10 +54,11 @@ public class Tool {
     protected String grammarFileName;
     protected String outputDir = ".";
 	protected String genphrase = null;
+	protected boolean debug = false;
 
     public static void main(String[] args) {
         ErrorManager.info("ANTLR Parser Generator   Version " +
-                Version + "   1989-2004");
+                Version + "   1989-2005");
         try {
             Tool antlr = new Tool();
             antlr.processArgs(args);
@@ -104,6 +105,9 @@ public class Tool {
 			}
 			else if (args[i].equals("-dfa")) {
 				GENERATE_DFA_DOT=true;
+			}
+			else if (args[i].equals("-debug")) {
+				debug=true;
 			}
             else {
                 if (args[i].charAt(0) != '-') {
@@ -165,6 +169,7 @@ public class Tool {
 		if ( language!=null ) {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);
 			grammar.setCodeGenerator(generator);
+			generator.setDebug(debug);
 
 			if ( grammar.type==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();

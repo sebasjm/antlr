@@ -3,7 +3,7 @@ group Java;
 // G R A M M A R  E L E M E N T S
 
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
-           name, tokens, tokenNames, rules, cyclicDFAs, bitsets) ::=
+           name, tokens, tokenNames, rules, cyclicDFAs, bitsets, debug) ::=
 <<
 <headerAction>
 
@@ -45,13 +45,18 @@ retry:
 >>
 
 parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets) ::= <<
-class <name> extends Parser {
+class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isGlobal)><attributeScope(scope=it)><endif>}>
     public <name>(TokenStream input) { super(input); }
+<if(debug)>
+    public <name>(TokenStream input, ANTLRDebugInterface dbg) {
+        super(input,dbg);
+    }<\n>
+<endif>
     public String[] getTokenNames() { return tokenNames; }
 
     <globalAction>
@@ -128,7 +133,7 @@ bitset(name, words64) ::= <<
 public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
 >>
 
-rule(ruleName,ruleDescriptor,initAction,block,enterAction,exitAction) ::= <<
+rule(ruleName,ruleDescriptor,initAction,block) ::= <<
 <ruleDescriptor.ruleScope:attributeScope(scope=it)>
 <ruleDescriptor.returnScope:returnScope(scope=it)>
 public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
@@ -138,8 +143,9 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
     <ruleDescriptor.tokenLabels:{Token <it.label.text>=null;}; separator="\n">
     <ruleDescriptor.ruleLabels:{scope_<it.elementRef.text>_return <it.label.text>=null;}; separator="\n">
     <initAction>
-<if(enterAction)>
-    <enterAction><\n>
+<if(debug)>
+    dbg.enterRule("<ruleName>");
+    dbg.location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
 <endif>
     try {
         <block>
@@ -153,21 +159,23 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
         <ruleDescriptor.useScopes:{stack_<it>.pop();}; separator="\n">
         <ruleDescriptor.ruleScope:{stack_<it.name>.pop();}; separator="\n">
         retval.stop = input.LT(0);
-        <exitAction>
     }<\n>
+<if(debug)>
+    dbg.exitRule("<ruleName>");<\n>
+<endif>
 <if(ruleDescriptor.returnScope)>
     return retval;<\n>
 <endif>
 }
 >>
 
-tokensRule(ruleName,nakedBlock,args,block,enterAction,exitAction) ::= <<
+tokensRule(ruleName,nakedBlock,args,block) ::= <<
 public void mTokens() throws RecognitionException {
     <block><\n>
 }
 >>
 
-lexerRule(ruleName,nakedBlock,args,initAction,block,enterAction,exitAction) ::= <<
+lexerRule(ruleName,nakedBlock,args,initAction,block) ::= <<
 public void m<ruleName>(<args>) throws RecognitionException {
 <initAction>
 <if(nakedBlock)>
@@ -184,12 +192,31 @@ public void m<ruleName>(<args>) throws RecognitionException {
 }
 >>
 
-blockSingleAlt(alts,decls,decision,decisionNumber,preamble) ::= <<
-<preamble><decls><alts>
+blockSingleAlt(alts,decls,decision,decisionNumber) ::= <<
+<if(debug)>
+dbg.enterAlt(1);<\n>
+<endif>
+<decls><alts>
 >>
 
-block(alts,decls,decision,decisionNumber,preamble,maxK,maxAlt) ::= <<
-<preamble>
+block(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
+int alt<decisionNumber>=<maxAlt>;
+<decls>
+<if(debug)>
+dbg.enterSubRule();<\n>
+<endif>
+<decision>
+switch (alt<decisionNumber>) {
+    <alts:altSwitchCase()>
+}
+<if(debug)>
+dbg.exitSubRule();<\n>
+<endif>
+>>
+
+ruleBlockSingleAlt ::= blockSingleAlt
+
+ruleBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int alt<decisionNumber>=<maxAlt>;
 <decls>
 <decision>
@@ -201,6 +228,9 @@ switch (alt<decisionNumber>) {
 positiveClosureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int cnt<decisionNumber>=0;
 <decls>
+<if(debug)>
+dbg.enterSubRule();<\n>
+<endif>
 loop<decisionNumber>:
 do {
     int alt<decisionNumber>=<maxAlt>;
@@ -213,12 +243,18 @@ do {
     }
     cnt<decisionNumber>++;
 } while (true);
+<if(debug)>
+dbg.exitSubRule();<\n>
+<endif>
 >>
 
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
 closureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 <decls>
+<if(debug)>
+dbg.enterSubRule();<\n>
+<endif>
 loop<decisionNumber>:
 do {
     int alt<decisionNumber>=<maxAlt>;
@@ -229,6 +265,9 @@ do {
 	    break loop<decisionNumber>;
     }
 } while (true);
+<if(debug)>
+dbg.exitSubRule();<\n>
+<endif>
 >>
 
 closureBlockSingleAlt ::= closureBlock
@@ -239,6 +278,9 @@ optionalBlockSingleAlt ::= block
 
 altSwitchCase() ::= <<
 case <i> :
+<if(debug)>
+    dbg.enterAlt(<i>);<\n>
+<endif>
     <it>
     break;<\n>
 >>

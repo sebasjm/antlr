@@ -106,7 +106,8 @@ grammar!
    :    hdr:headerSpec
         ( ACTION )?
 	    ( cmt:DOC_COMMENT  )?
-        gr:grammarType gid:id (opt:grammarOptionsSpec)? SEMI
+        gr:grammarType gid:id SEMI
+		    (opt:optionsSpec)?
 		    (ts:tokensSpec!)?
         	scopes:attrScopes
 		    ( a:ACTION! )?
@@ -132,20 +133,23 @@ grammarType
     	gr:"grammar" {#gr.setType(gtype);}
     ;
 
+/*
 grammarOptionsSpec
     :   LPAREN!
             optionList
         RPAREN!
     ;
 
+optionList
+    :   option (COMMA! option)*
+    	{#optionList = #(#[OPTIONS,"OPTIONS"], #optionList);}
+    ;
+
+    */
+
 optionsSpec
 	:	OPTIONS^ (option SEMI!)+ RCURLY!
 	;
-
-optionList
-    :   option (COMMA! option)*
-    	{#optionList = #(#[OPTIONS], #optionList);}
-    ;
 
 option
     :   id ASSIGN^ optionValue

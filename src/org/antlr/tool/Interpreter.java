@@ -38,10 +38,12 @@ public class Interpreter implements TokenSource {
 		}
 		public void enterAlt(int alt) {}
 		public void enterRule(String ruleName) {}
+		public void enterSubRule() {}
+		public void exitSubRule() {}
 		public void location(int line, int pos) {}
 		public void consumeToken(Token token) {}
-		public void consumeChar(int c) {}
 		public void recognitionException(RecognitionException e) {}
+		public void recovered(Token t) {}
 	}
 
 	/** This parser listener tracks rule entry/exit and token matches
@@ -65,6 +67,8 @@ public class Interpreter implements TokenSource {
 			callStack.push(ruleNode);
 		}
 		public void enterAlt(int alt) {}
+		public void enterSubRule() {}
+		public void exitSubRule() {}
 		public void location(int line, int pos) {}
 		public void exitRule(String ruleName) {
 			callStack.pop();
@@ -74,12 +78,12 @@ public class Interpreter implements TokenSource {
 			ParseTree elementNode = new ParseTree(g.getTokenName(token.getType()));
 			ruleNode.addChild(elementNode);
 		}
-		public void consumeChar(int c) {}
 		public void recognitionException(RecognitionException e) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
 			ParseTree errorNode = new ParseTree(e);
 			ruleNode.addChild(errorNode);
 		}
+		public void recovered(Token t) {}
 	}
 
 	public Interpreter(Grammar grammar, IntStream input) {
@@ -310,9 +314,6 @@ public class Interpreter implements TokenSource {
 				if ( actions!=null ) {
 					if ( grammar.type == Grammar.PARSER ) {
 						actions.consumeToken(((TokenStream)input).LT(1));
-					}
-					else {
-						actions.consumeChar(input.LA(1));
 					}
 				}
 				s = (NFAState)s.transition(0).target;
