@@ -31,9 +31,13 @@ public class DebugTokenStream implements TokenStream {
 	protected ANTLRDebugInterface dbg;
 	protected TokenStream input;
 
-	public DebugTokenStream(ANTLRDebugInterface dbg, TokenStream input) {
-		this.dbg = dbg;
+	public DebugTokenStream(TokenStream input, ANTLRDebugInterface dbg) {
 		this.input = input;
+		setDebugListener(dbg);
+	}
+
+	public void setDebugListener(ANTLRDebugInterface dbg) {
+		this.dbg = dbg;
 	}
 
 	public void consume() {

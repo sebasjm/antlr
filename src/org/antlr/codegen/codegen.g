@@ -257,11 +257,6 @@ block[String blockTemplateName, DFA dfa]
      returns [StringTemplate code=null]
 {
     StringTemplate decision = null;
-    /*
-    if ( #block.getNumberOfChildren()==2 ) { // 1 alt + 1 EOB node => single alt
-        code = templates.getInstanceOf(blockTemplateName+"SingleAlt");
-    }
-    */
     if ( dfa!=null ) {
         code = templates.getInstanceOf(blockTemplateName);
         decision = generator.genLookaheadDecision(cyclicDFAST,dfa);
@@ -288,7 +283,19 @@ alternative returns [StringTemplate code=templates.getInstanceOf("alt")]
 {
 StringTemplate e;
 }
-    :   #( ALT (e=element {code.setAttribute("elements", e);})+ EOA )
+    :   #(	a:ALT
+    		(	{GrammarAST elAST=(GrammarAST)_t;}
+    			e=element
+    			{
+    			code.setAttribute("elements.{el,line,pos}",
+    							  e,
+    							  new Integer(elAST.getLine()),
+    							  new Integer(elAST.getColumn())
+    							 );
+    			}
+    		)+
+    		EOA
+    	 )
     ;
 
 element returns [StringTemplate code=null]
@@ -382,72 +389,79 @@ tree:   #(TREE_BEGIN atom[null] (element)*)
     ;
 
 atom[String label] returns [StringTemplate code=null]
-    :   r:RULE_REF     {code = templates.getInstanceOf("ruleRef");
-                        code.setAttribute("rule", r.getText());
-                        if ( label!=null ) {code.setAttribute("label", label);}
-                        code.setAttribute("elementIndex", ((TokenWithIndex)r.getToken()).getIndex());
-                        generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName);
-                       }
-    |   t:TOKEN_REF    {
-                       if ( grammar.type==Grammar.LEXER ) {
-                           code = templates.getInstanceOf("lexerRuleRef");
-                           code.setAttribute("rule", t.getText());
-                       }
-                       else {
-                           code = templates.getInstanceOf("tokenRef");
-                           code.setAttribute("token", t.getText());
-                           code.setAttribute("elementIndex", ((TokenWithIndex)#t.getToken()).getIndex());
-                           generator.generateLocalFOLLOW(#t,#t.getText(),currentRuleName);
-                       }
-                       if ( label!=null ) {code.setAttribute("label", label);}
-                       }
+    :   r:RULE_REF
+        {
+        code = templates.getInstanceOf("ruleRef");
+		code.setAttribute("rule", r.getText());
+		if ( label!=null ) {code.setAttribute("label", label);}
+		code.setAttribute("elementIndex", ((TokenWithIndex)r.getToken()).getIndex());
+		generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName);
+        }
 
-    |   c:CHAR_LITERAL  {
-                            if ( grammar.type==Grammar.LEXER ) {
-                                code = templates.getInstanceOf("charRef");
-                                code.setAttribute("char",
-                                   CodeGenerator.getJavaEscapedCharFromANTLRLiteral(c.getText()));
-                            }
-                            else { // else it's a token type reference
-                                code = templates.getInstanceOf("tokenRef");
-                                code.setAttribute("token",
-                                                  new Integer(grammar.getTokenType(c.getText())));
-                           		code.setAttribute("elementIndex",
-                           		                  ((TokenWithIndex)#c.getToken()).getIndex());
-	                            generator.generateLocalFOLLOW(#c,
-	                                String.valueOf(grammar.getTokenType(#c.getText())),
-	                                currentRuleName);
-                            }
-                            if ( label!=null ) {code.setAttribute("label", label);}
-                        }
+    |   t:TOKEN_REF
+        {
+		   if ( grammar.type==Grammar.LEXER ) {
+			   code = templates.getInstanceOf("lexerRuleRef");
+			   code.setAttribute("rule", t.getText());
+		   }
+		   else {
+			   code = templates.getInstanceOf("tokenRef");
+			   code.setAttribute("token", t.getText());
+			   code.setAttribute("elementIndex", ((TokenWithIndex)#t.getToken()).getIndex());
+			   generator.generateLocalFOLLOW(#t,#t.getText(),currentRuleName);
+		   }
+		   if ( label!=null ) {code.setAttribute("label", label);}
+		}
 
-    |   s:STRING_LITERAL{
-                        if ( grammar.type==Grammar.LEXER ) {
-                            code = templates.getInstanceOf("lexerStringRef");
-                            code.setAttribute("string",
-                               CodeGenerator.getJavaEscapedStringFromANTLRLiteral(s.getText()));
-                        }
-                        else { // else it's a token type reference
-                            code = templates.getInstanceOf("tokenRef");
-                            code.setAttribute("token",
-                                             new Integer(grammar.getTokenType(s.getText())));
-                            code.setAttribute("elementIndex", ((TokenWithIndex)#s.getToken()).getIndex());
-	                        generator.generateLocalFOLLOW(#s,
-	                            String.valueOf(grammar.getTokenType(#s.getText())),
-	                            currentRuleName);
-                        }
-                        if ( label!=null ) {code.setAttribute("label", label);}
-                        }
+    |   c:CHAR_LITERAL
+        {
+		if ( grammar.type==Grammar.LEXER ) {
+			code = templates.getInstanceOf("charRef");
+			code.setAttribute("char",
+			   CodeGenerator.getJavaEscapedCharFromANTLRLiteral(c.getText()));
+		}
+		else { // else it's a token type reference
+			code = templates.getInstanceOf("tokenRef");
+			code.setAttribute("token",
+							  new Integer(grammar.getTokenType(c.getText())));
+			code.setAttribute("elementIndex",
+							  ((TokenWithIndex)#c.getToken()).getIndex());
+			generator.generateLocalFOLLOW(#c,
+				String.valueOf(grammar.getTokenType(#c.getText())),
+				currentRuleName);
+		}
+		if ( label!=null ) {code.setAttribute("label", label);}
+        }
 
-    |   w:WILDCARD      {
-                        if ( grammar.type==Grammar.LEXER ) {
-                            code = templates.getInstanceOf("wildcardChar");
-                        }
-                        else { // else it's a token type reference
-                            code = templates.getInstanceOf("wildcard");
-                        }
-                        if ( label!=null ) {code.setAttribute("label", label);}
-                        }
+    |   s:STRING_LITERAL
+        {
+		if ( grammar.type==Grammar.LEXER ) {
+			code = templates.getInstanceOf("lexerStringRef");
+			code.setAttribute("string",
+			   CodeGenerator.getJavaEscapedStringFromANTLRLiteral(s.getText()));
+		}
+		else { // else it's a token type reference
+			code = templates.getInstanceOf("tokenRef");
+			code.setAttribute("token",
+							 new Integer(grammar.getTokenType(s.getText())));
+			code.setAttribute("elementIndex", ((TokenWithIndex)#s.getToken()).getIndex());
+			generator.generateLocalFOLLOW(#s,
+				String.valueOf(grammar.getTokenType(#s.getText())),
+				currentRuleName);
+		}
+		if ( label!=null ) {code.setAttribute("label", label);}
+		}
+
+    |   w:WILDCARD
+        {
+		if ( grammar.type==Grammar.LEXER ) {
+			code = templates.getInstanceOf("wildcardChar");
+		}
+		else { // else it's a token type reference
+			code = templates.getInstanceOf("wildcard");
+		}
+		if ( label!=null ) {code.setAttribute("label", label);}
+		}
 
     |	code=set[label]
     ;

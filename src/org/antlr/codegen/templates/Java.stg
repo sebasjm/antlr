@@ -285,7 +285,14 @@ case <i> :
     break;<\n>
 >>
 
-alt(elements) ::= "<elements; separator=\"\n\">"
+alt(elements) ::= "<elements:element()>"
+
+element() ::= <<
+<if(debug)>
+dbg.location(<it.line>,<it.pos>);<\n>
+<endif>
+<it.el><\n>
+>>
 
 tokenRef(token,label,elementIndex) ::= <<
 <if(label)><label>=input.LT(1);<endif>

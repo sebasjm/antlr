@@ -29,10 +29,22 @@ package org.antlr.runtime;
 
 public class DebugParser extends Parser {
 
-	static class DummyDebugger implements ANTLRDebugInterface {
-		public void enterRule(String ruleName) {}
+	/** The default debugger mimics the traceParser behavior of ANTLR 2.x */
+	class TraceDebugger implements ANTLRDebugInterface {
+		protected int level = 0;
+		public void enterRule(String ruleName) {
+			for (int i=1; i<=level; i++) {System.out.print(" ");}
+			CharStream cs = input.getTokenSource().getCharStream();
+			System.out.println("> "+ruleName+" LT(1)="+input.LT(1).toString(cs));
+			level++;
+		}
+		public void exitRule(String ruleName) {
+			level--;
+			for (int i=1; i<=level; i++) {System.out.print(" ");}
+			CharStream cs = input.getTokenSource().getCharStream();
+			System.out.println("< "+ruleName+" LT(1)="+input.LT(1).toString(cs));
+		}
 		public void enterAlt(int alt) {}
-		public void exitRule(String ruleName) {}
 		public void enterSubRule() {}
 		public void exitSubRule() {}
 		public void location(int line, int pos) {}
@@ -48,15 +60,22 @@ public class DebugParser extends Parser {
 	 *  proxy that fires consume events.
 	 */
 	public DebugParser(TokenStream input, ANTLRDebugInterface dbg) {
-		super(new DebugTokenStream(dbg,input));
+		super(new DebugTokenStream(input,dbg));
 		setDebugListener(dbg);
 	}
 
 	public DebugParser(TokenStream input) {
-		this(input, new DummyDebugger());
+		super(input);
+		setDebugListener(new TraceDebugger());
 	}
 
+	/** Provide a new debug event listener for this parser.  Notify the
+	 *  input stream too that it should send events to this listener.
+	 */
 	public void setDebugListener(ANTLRDebugInterface dbg) {
+		if ( input instanceof DebugTokenStream ) {
+			((DebugTokenStream)input).setDebugListener(dbg);
+		}
 		this.dbg = dbg;
 	}
 
