@@ -70,6 +70,11 @@ public class NFAState extends State {
     /** Is this state the sole target of an EOT transition? */
     protected boolean EOTState = false;
 
+	/** Jean Bovet needs in the GUI to know which state pairs correspond
+	 *  to the start/stop of a block.
+ 	 */
+	public int endOfBlockStateNumber = State.INVALID_STATE_NUMBER;
+
     public NFAState(NFA nfa) {
         this.nfa = nfa;
     }

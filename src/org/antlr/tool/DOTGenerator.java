@@ -288,10 +288,19 @@ public class DOTGenerator {
 			*/
             stateLabel = buf.toString();
         }
-        if ( (s instanceof NFAState) && ((NFAState)s).getDecisionASTNode()!=null ) {
-            stateLabel = stateLabel+",d="+
-                    ((NFAState)s).getDecisionNumber();
-        }
+		if ( (s instanceof NFAState) && ((NFAState)s).getDecisionASTNode()!=null ) {
+			stateLabel = stateLabel+",d="+
+					((NFAState)s).getDecisionNumber();
+			if ( ((NFAState)s).endOfBlockStateNumber!=State.INVALID_STATE_NUMBER ) {
+				stateLabel += ",eob="+((NFAState)s).endOfBlockStateNumber;
+			}
+		}
+		else if ( (s instanceof NFAState) &&
+			((NFAState)s).endOfBlockStateNumber!=State.INVALID_STATE_NUMBER)
+		{
+			stateLabel = stateLabel+",eob="+
+					((NFAState)s).endOfBlockStateNumber;
+		}
         else if ( s instanceof DFAState && ((DFAState)s).isAcceptState() ) {
             stateLabel = stateLabel+
                     "=>"+((DFAState)s).getUniquelyPredictedAlt();

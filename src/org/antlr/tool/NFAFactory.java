@@ -306,7 +306,6 @@ public class NFAFactory {
         if ( alternativeStateClusters==null || alternativeStateClusters.size()==0 ) {
             return null;
         }
-        IntSet altsAsSet = null;
 
         // even if we can collapse for lookahead purposes, we will still
         // need to predict the alts of this subrule in case there are actions
@@ -322,27 +321,28 @@ public class NFAFactory {
             // add begin NFAState for this alt connected by epsilon
             NFAState left = newState();
             left.setDescription("alt "+altNum+" of ()");
-            transitionBetweenStates(left, g.left, Label.EPSILON);
-            transitionBetweenStates(g.right, blockEndNFAState, Label.EPSILON);
-            // Are we the first alternative?
-            if ( firstAlt==null ) {
-                firstAlt = left; // track extreme left node of StateCluster
-            }
-            else {
-                // if not first alternative, must link to this alt from previous
-                transitionBetweenStates(prevAlternative, left, Label.EPSILON);
-            }
-            prevAlternative = left;
-            altNum++;
-        }
+			transitionBetweenStates(left, g.left, Label.EPSILON);
+			transitionBetweenStates(g.right, blockEndNFAState, Label.EPSILON);
+			// Are we the first alternative?
+			if ( firstAlt==null ) {
+				firstAlt = left; // track extreme left node of StateCluster
+			}
+			else {
+				// if not first alternative, must link to this alt from previous
+				transitionBetweenStates(prevAlternative, left, Label.EPSILON);
+			}
+			prevAlternative = left;
+			altNum++;
+		}
 
-        if ( altsAsSet==null ) {
-            // return StateCluster pointing representing entire block
-            // Points to first alt NFAState on left, block end on right
-            result = new StateCluster(firstAlt, blockEndNFAState);
-        }
+		// return StateCluster pointing representing entire block
+		// Points to first alt NFAState on left, block end on right
+		result = new StateCluster(firstAlt, blockEndNFAState);
 
-        return result;
+		// set EOB markers for Jean
+		firstAlt.endOfBlockStateNumber = blockEndNFAState.stateNumber;
+
+		return result;
     }
 
     /** From (A)? build either:
@@ -368,6 +368,10 @@ public class NFAFactory {
             transitionBetweenStates(realAlt, emptyAlt, Label.EPSILON);
             transitionBetweenStates(emptyAlt, blockEndNFAState, Label.EPSILON);
             transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
+
+			// set EOB markers for Jean
+			realAlt.endOfBlockStateNumber = A.right.stateNumber;
+
             g = new StateCluster(realAlt, blockEndNFAState);
         }
         else {
@@ -378,6 +382,10 @@ public class NFAFactory {
             emptyAlt.setDescription("epsilon path of ()? block");
             transitionBetweenStates(lastRealAlt, emptyAlt, Label.EPSILON);
             transitionBetweenStates(emptyAlt, A.right, Label.EPSILON);
+
+			// set EOB markers for Jean (I think this is redundant here)
+			A.left.endOfBlockStateNumber = A.right.stateNumber;
+
             g = A; // return same block, but now with optional last path
         }
 
@@ -404,6 +412,9 @@ public class NFAFactory {
 		// turn A's block end into a loopback (acts like alt 2)
 		transitionBetweenStates(A.right, A.left, Label.EPSILON); // loop back Transition 2
 		transitionBetweenStates(left, A.left, Label.EPSILON);
+
+		// set EOB markers for Jean
+		A.left.endOfBlockStateNumber = A.right.stateNumber;
 
         StateCluster g = new StateCluster(left, blockEndNFAState);
         return g;
@@ -453,6 +464,10 @@ public class NFAFactory {
         transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
         // Transition 2 of end block loops
         transitionBetweenStates(A.right, A.left, Label.EPSILON);
+
+		// set EOB markers for Jean
+		A.left.endOfBlockStateNumber = A.right.stateNumber;
+		realAlt.endOfBlockStateNumber = blockEndNFAState.stateNumber;
 
         StateCluster g = new StateCluster(realAlt, blockEndNFAState);
         return g;
