@@ -26,6 +26,7 @@ package org.antlr.runtime.tree;
 public interface Tree {
 	/** What user data is to be associated with this node? */
 	public Object getPayload();
+	public void setPayload(Object payload);
 
 	/** Get a child 0..n-1 node */
 	public Tree getChild(int i);

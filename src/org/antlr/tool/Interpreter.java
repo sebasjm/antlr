@@ -36,11 +36,12 @@ public class Interpreter implements TokenSource {
 				token = new CommonToken(type,channel,0,0);
 			}
 		}
+		public void enterAlt(int alt) {}
 		public void enterRule(String ruleName) {}
-		public void matchElement(int type) {}
-		public void mismatchedElement(MismatchedTokenException e) {}
-		public void mismatchedSet(MismatchedSetException e) {}
-		public void noViableAlt(NoViableAltException e) {}
+		public void location(int line, int pos) {}
+		public void consumeToken(Token token) {}
+		public void consumeChar(int c) {}
+		public void recognitionException(RecognitionException e) {}
 	}
 
 	/** This parser listener tracks rule entry/exit and token matches
@@ -63,25 +64,18 @@ public class Interpreter implements TokenSource {
 			parentRuleNode.addChild(ruleNode);
 			callStack.push(ruleNode);
 		}
+		public void enterAlt(int alt) {}
+		public void location(int line, int pos) {}
 		public void exitRule(String ruleName) {
 			callStack.pop();
 		}
-		public void matchElement(int type) {
+		public void consumeToken(Token token) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
-			ParseTree elementNode = new ParseTree(g.getTokenName(type));
+			ParseTree elementNode = new ParseTree(g.getTokenName(token.getType()));
 			ruleNode.addChild(elementNode);
 		}
-		public void mismatchedElement(MismatchedTokenException e) {
-			ParseTree ruleNode = (ParseTree)callStack.peek();
-			ParseTree errorNode = new ParseTree(e);
-			ruleNode.addChild(errorNode);
-		}
-		public void mismatchedSet(MismatchedSetException e) {
-			ParseTree ruleNode = (ParseTree)callStack.peek();
-			ParseTree errorNode = new ParseTree(e);
-			ruleNode.addChild(errorNode);
-		}
-		public void noViableAlt(NoViableAltException e) {
+		public void consumeChar(int c) {}
+		public void recognitionException(RecognitionException e) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
 			ParseTree errorNode = new ParseTree(e);
 			ruleNode.addChild(errorNode);
@@ -241,7 +235,7 @@ public class Interpreter implements TokenSource {
 												 s.stateNumber,
 												 input);
 					if ( actions!=null ) {
-						actions.noViableAlt(nvae);
+						actions.recognitionException(nvae);
 					}
 					throw nvae;
 				}
@@ -314,7 +308,12 @@ public class Interpreter implements TokenSource {
 			// CASE 4: match label on transition
 			else if ( label.matches(t) ) {
 				if ( actions!=null ) {
-					actions.matchElement(t);
+					if ( grammar.type == Grammar.PARSER ) {
+						actions.consumeToken(((TokenStream)input).LT(1));
+					}
+					else {
+						actions.consumeChar(input.LA(1));
+					}
 				}
 				s = (NFAState)s.transition(0).target;
 				input.consume();
@@ -327,7 +326,7 @@ public class Interpreter implements TokenSource {
 					MismatchedTokenException mte =
 						new MismatchedTokenException(label.getAtom(), input);
 					if ( actions!=null ) {
-						actions.mismatchedElement(mte);
+						actions.recognitionException(mte);
 					}
 					throw mte;
 				}
@@ -335,12 +334,12 @@ public class Interpreter implements TokenSource {
 					MismatchedSetException mse =
 						new MismatchedSetException(label.getSet(), input);
 					if ( actions!=null ) {
-						actions.mismatchedSet(mse);
+						actions.recognitionException(mse);
 					}
 					throw mse;
 				}
 				else {
-					throw new RecognitionException(); // unknown error
+					throw new RecognitionException(input); // unknown error
 				}
 			}
 		}

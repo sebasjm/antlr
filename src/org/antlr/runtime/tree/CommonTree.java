@@ -20,6 +20,10 @@ public class CommonTree implements Tree {
 		return payload;
 	}
 
+	public void setPayload(Object payload) {
+		this.payload = payload;
+	}
+
 	public Tree getParent() {
 		return parent;
 	}

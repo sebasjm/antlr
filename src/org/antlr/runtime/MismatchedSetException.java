@@ -32,12 +32,11 @@ import org.antlr.misc.IntSet;
 public class MismatchedSetException extends RecognitionException {
 	public IntSet expecting;
 	public int found;
-	public int index;
 
 	public MismatchedSetException(IntSet expecting, IntStream input) {
+		super(input);
 		this.expecting = expecting;
 		this.found = input.LA(1);
-		this.index = input.index();
 	}
 
 	public String toString() {

@@ -315,28 +315,6 @@ public class NFAFactory {
         if ( B==null ) {
             return A;
         }
-		/*
-		Transition ATrans = A.left.transition(0);
-		Transition BTrans = B.left.transition(0);
-		boolean AruleOrTokenRef =
-			(ATrans.target==A.right && ATrans.label.isAtom()) ||
-		    (ATrans instanceof RuleClosureTransition &&
-			 ((RuleClosureTransition)ATrans).getFollowState()==A.right);
-		boolean BruleOrTokenRef =
-			(BTrans.target==B.right && BTrans.label.isAtom()) ||
-		    (BTrans instanceof RuleClosureTransition &&
-			 ((RuleClosureTransition)BTrans).getFollowState()==B.right);
-		System.out.println("AruleOrTokenRef="+AruleOrTokenRef);
-		System.out.println("BruleOrTokenRef="+BruleOrTokenRef);
-		if ( AruleOrTokenRef && BruleOrTokenRef )
-		{
-            System.out.println("### opt "+A.right.stateNumber+"->"+B.left.stateNumber);
-			A.right.setTransition0(B.left.transition(0));
-		}
-        else {
-			transitionBetweenStates(A.right, B.left, Label.EPSILON);
-		}
-        */
 		transitionBetweenStates(A.right, B.left, Label.EPSILON);
 		StateCluster g = new StateCluster(A.left, B.right);
         return g;

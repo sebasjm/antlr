@@ -213,7 +213,7 @@ rules
 
 rule!
 {
-GrammarAST modifier=null;
+GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
 }
 	:
 	(	d:DOC_COMMENT	
@@ -232,19 +232,32 @@ GrammarAST modifier=null;
 	( opts:optionsSpec )?
 	( scopes:ruleScopeSpec )?
 	( "init" init:ACTION )?
-	COLON
+	colon:COLON
+	{
+	blkRoot = #[BLOCK,"BLOCK"];
+	blkRoot.setLine(colon.getLine());
+	blkRoot.setColumn(colon.getColumn());
+	eob = #[EOB,"<end-of-block>"];
+    }
 	(	(setNoParens SEMI) => s:setNoParens
-		{#b=#(#[BLOCK,"BLOCK"],#(#[ALT,"ALT"],#s,#[EOA,"EOA"]),#[EOB,"EOB"]);}
-	|	b:altList
+		{
+		blk = #(blkRoot,#(#[ALT,"ALT"],#s,#[EOA,"EOA"]),eob);
+		}
+
+	|	b:altList {blk = #b;}
 	)
-	SEMI
+	semi:SEMI
 	( exceptionGroup )?
     {
+	eob.setLine(semi.getLine());
+	eob.setColumn(semi.getColumn());
     GrammarAST eor = #[EOR,"<end-of-rule>"];
    	eor.setEnclosingRule(#ruleName.getText());
+	eor.setLine(semi.getLine());
+	eor.setColumn(semi.getColumn());
     #rule = #(#[RULE,"rule"],
               #ruleName,modifier,#(#[ARG,"ARG"],#aa),#(#[RET,"RET"],#rt),
-              #opts,#scopes,#(#[INITACTION,"INITACTION"],#init),#b,eor);
+              #opts,#scopes,#(#[INITACTION,"INITACTION"],#init),blk,eor);
     }
 	;
 
@@ -287,26 +300,34 @@ block
     ;
 
 altList
+{
+	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
+	blkRoot.setLine(LT(1).getLine());
+	blkRoot.setColumn(LT(1).getColumn());
+}
     :   a1:alternative ( OR! a2:alternative )*
         {
-        #altList = #(#[BLOCK,"BLOCK"],#altList,#[EOB,"<end-of-block>"]);
+        #altList = #(blkRoot,#altList,#[EOB,"<end-of-block>"]);
         }
     ;
 
 alternative
 {
     GrammarAST eoa = #[EOA, "<end-of-alt>"];
+    GrammarAST altRoot = #[ALT,"ALT"];
+    altRoot.setLine(LT(1).getLine());
+    altRoot.setColumn(LT(1).getColumn());
 }
-    :   (BANG!)? ( element )+ ( exceptionSpecNoLabel! )?
+    :   (BANG!)? ( el:element )+ ( exceptionSpecNoLabel! )?
         {
             if ( #alternative==null ) {
-                #alternative = #(#[ALT,"ALT"],#[EPSILON,"epsilon"],eoa);
+                #alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);
             }
             else {
-                #alternative = #(#[ALT,"ALT"], #alternative,eoa);
+                #alternative = #(altRoot, #alternative,eoa);
             }
         }
-    |   {#alternative = #(#[ALT,"ALT"],#[EPSILON,"epsilon"],eoa);}
+    |   {#alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);}
     ;
 
 exceptionGroup

@@ -49,7 +49,7 @@ package org.antlr.runtime;
  *  out after another kind of error, then just throw an exception not
  *  under this hierarchy.
  *
- *  In general, the recognition exceptions track where in a grammar an
+ *  In general, the recognition exceptions can track where in a grammar a
  *  problem occurred and/or what was the expected input.  While the parser
  *  knows its state (such as current input symbol and line info) that
  *  state can change before the exception is reported so current token index
@@ -59,4 +59,10 @@ package org.antlr.runtime;
  *  figure out a fancy report.
  */
 public class RecognitionException extends Exception {
+	/** What token/char were we looking at when the error occurred? */
+	public int index;
+
+	public RecognitionException(IntStream input) {
+		this.index = input.index();
+	}
 }

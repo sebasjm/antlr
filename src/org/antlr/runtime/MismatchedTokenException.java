@@ -29,13 +29,13 @@ package org.antlr.runtime;
 
 public class MismatchedTokenException extends RecognitionException {
 	public int expecting;
+	/** Track the mismatched token in case stream is not buffered */
 	public int found;
-	public int index;
 
 	public MismatchedTokenException(int expecting, IntStream input) {
+		super(input);
 		this.expecting = expecting;
 		this.found = input.LA(1);
-		this.index = input.index();
 	}
 
 	public String toString() {

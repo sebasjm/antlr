@@ -79,7 +79,7 @@ public abstract class Lexer implements TokenSource {
 
     public void matchRange(int a, int b) throws MismatchedRangeException {
         if ( input.LA(1)<a || input.LA(1)>b ) {
-            throw new MismatchedRangeException(a,b);
+            throw new MismatchedRangeException(a,b,input);
         }
         input.consume();
     }
