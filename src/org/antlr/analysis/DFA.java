@@ -27,7 +27,7 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.runtime.IntegerStream;
+import org.antlr.runtime.CharStream;
 import org.antlr.tool.GrammarAST;
 import org.antlr.tool.ANTLRParser;
 import org.antlr.tool.Grammar;
@@ -797,7 +797,7 @@ public class DFA {
      *  input.lookahead(1) must point at the input symbol you want to start
      *  predicting with.
      */
-    public int predict(IntegerStream input) {
+    public int predict(CharStream input) {
         DFAState s = getStartState();
         int c = input.LA(1);
     dfaLoop:

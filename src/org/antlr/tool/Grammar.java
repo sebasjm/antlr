@@ -34,7 +34,7 @@ import antlr.TokenStreamException;
 import java.io.*;
 import java.util.*;
 import org.antlr.analysis.*;
-import org.antlr.runtime.IntegerStream;
+import org.antlr.runtime.CharStream;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.codegen.CodeGenerator;
@@ -278,8 +278,10 @@ public class Grammar {
      *  match the appropriate chars as token types.
      *
      *  TODO: the double assign doesn't work yet
+	 *  TODO: actually remove ability to push strings across
      */
     protected void importTokenVocab(String vocabName) {
+		int maxTokenType = -1;
         try {
             FileReader fr = new FileReader(vocabName+".tokens");
             BufferedReader br = new BufferedReader(fr);
@@ -319,7 +321,8 @@ public class Grammar {
                                                 st.sval);
                         }
                         int tokenType = (int)st.nval;
-                        //System.out.println("import "+tokenName+"="+tokenType);
+                        System.out.println("import "+tokenName+"="+tokenType);
+						maxTokenType = Math.max(maxTokenType,tokenType);
                         defineToken(tokenName, tokenType);
                         token = st.nextToken(); // move to next assignment
                         break;
@@ -343,6 +346,9 @@ public class Grammar {
                     e.toString());
             e.printStackTrace(System.err);
         }
+		if ( maxTokenType>0 ) {
+			tokenType = maxTokenType+1; // next type is defined above imported
+		}
     }
 
     /** Walk the list of options, altering this Grammar object according
@@ -442,7 +448,7 @@ public class Grammar {
         return (DFA)decisionLookaheadDFAList.get(decision-1);
     }
 
-    public void parse(String startRule, IntegerStream input)
+    public void parse(String startRule, CharStream input)
             throws Exception
     {
         Stack ruleInvocationStack = new Stack();
@@ -451,13 +457,13 @@ public class Grammar {
     }
 
     protected void parseEngine(NFAState start,
-                               IntegerStream input,
+                               CharStream input,
                                Stack ruleInvocationStack)
         throws Exception
     {
         NFAState s = start;
         int t = input.LA(1);
-        while ( t!=IntegerStream.EOF ) {
+        while ( t!=CharStream.EOF ) {
             System.out.println("parse state "+s.getStateNumber()+" input="+
                     getTokenName(t));
             // CASE 1: decision state
@@ -666,7 +672,7 @@ public class Grammar {
             return String.valueOf(ttype);
         }
         if ( ttype==Label.EOF ) {
-            return String.valueOf(IntegerStream.EOF);
+            return String.valueOf(CharStream.EOF);
         }
         return name;
     }

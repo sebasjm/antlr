@@ -11,7 +11,7 @@ import org.antlr.runtime.*;
 import java.util.*;
 
 <docComment>
-<recognizer>
+<recognizer><\n>
 >>
 
 headerFile(name, tokens, rules, cyclicDFAs) ::= <<
@@ -21,32 +21,17 @@ headerFile(name, tokens, rules, cyclicDFAs) ::= <<
 >>
 
 lexer(name, tokens, literals, rules, cyclicDFAs) ::= <<
-class <name> extends Lexer implements TokenSource {
+class <name> extends Lexer {
     <tokens:{public static final int <attr.name>=<attr.type>;}; separator="\n">
-    public static Map literals = new HashMap();
-    static {
-        <literals:{literals.put(<attr.name>, new Integer(<attr.type>));};
-         separator="\n">
-    }
-
-    public <name>(IntegerStream input) {
+    public <name>(CharStream input) {
         super(input);
     }
     public Token nextToken() {
-    restart:
-        while (true) {
-            skipToken=false;
-			if ( input.LA(1)==IntegerStream.EOF ) {
-				return Token.EOFToken;
-			}
-			token=null;
-			text.setLength(0);
-			mTokens();
-            if ( !skipToken ) break;
-        }
-        if ( token==null ) {
-            emit();
-        }
+		if ( input.LA(1)==CharStream.EOF ) {
+			return Token.EOFToken;
+		}
+		token=null;
+		mTokens();
         return token;
     }
 
@@ -73,45 +58,44 @@ public void <name>(<args>)
     <exitAction>
 }
 <else>
-<block>
+{
+	<block>
+}
 <endif>
 >>
 
-lexerRule(name,args,block,enterAction,exitAction) ::= <<
+lexerRule(name,isTokenRuleName,args,block,enterAction,exitAction) ::= <<
 public void m<name>(<args>)
-<if(enterAction)>
 {
-    <enterAction>
-    <block>
-    <exitAction>
-}
+<if(isTokenRuleName)>
+	<block><\n>
 <else>
-<block>
+    int type = <name>;
+    int start = getCharIndex();
+    int line = getLine();
+    int charPosition = getCharPositionInLine();
+    int channel = DEFAULT_CHANNEL;
+	<block>
+    if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}<\n>
 <endif>
+}
 >>
 
 blockSingleAlt(alts,decls,decision,decisionNumber,preamble) ::= <<
-{
-    <preamble>
-    <decls>
-    <alts>
-}
+<preamble><decls><alts>
 >>
 
 block(alts,decls,decision,decisionNumber,preamble,maxK) ::= <<
-{
-    <preamble>
-    int alt<decisionNumber>=0;
-    <decls>
-    <decision>
-    switch (alt<decisionNumber>) {
-        <alts:altSwitchCase()>
-    }
+<preamble>
+int alt<decisionNumber>=0;
+<decls>
+<decision>
+switch (alt<decisionNumber>) {
+    <alts:altSwitchCase()>
 }
 >>
 
 positiveClosureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<
-{
     int alt<decisionNumber>=0;
     int cnt<decisionNumber>=0;
     <decls>
@@ -130,13 +114,11 @@ loop<decisionNumber>:
         }
         cnt<decisionNumber>++;
     } while (true);
-}
 >>
 
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
 closureBlock(alts,decls,decision,decisionNumber,maxK) ::= <<
-{
     int alt<decisionNumber>=0;
     <decls>
 loop<decisionNumber>:
@@ -148,7 +130,6 @@ loop<decisionNumber>:
                 break loop<decisionNumber>;
         }
     } while (true);
-}
 >>
 
 closureBlockSingleAlt ::= closureBlock
@@ -160,7 +141,7 @@ optionalBlockSingleAlt ::= block
 altSwitchCase() ::= <<
 case <i> :
     <attr>
-    break;
+    break;<\n>
 >>
 
 alt(elements) ::= "<elements; separator=\"\n\">"

@@ -27,7 +27,7 @@
 */
 package org.antlr.runtime;
 
-public class ANTLRStringStream implements IntegerStream {
+public class ANTLRStringStream implements CharStream {
     protected String input;
     protected int p=0;
 
@@ -44,7 +44,7 @@ public class ANTLRStringStream implements IntegerStream {
     public int LA(int i) {
         if ( p >= input.length() ) {
             //System.out.println("LA("+i+")=EOF; p="+p);
-            return IntegerStream.EOF;
+            return CharStream.EOF;
         }
         //System.out.println("LA("+i+")="+input.charAt(p+i-1)+"; p="+p);
         return input.charAt(p+i-1);
@@ -68,4 +68,8 @@ public class ANTLRStringStream implements IntegerStream {
     public void rewind(int marker) {
         p = marker;
     }
+
+	public String substring(int start, int stop) {
+		return input.substring(start,stop+1);
+	}
 }

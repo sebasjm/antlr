@@ -27,8 +27,8 @@
 */
 package org.antlr.runtime;
 
-/** A source of characters for an ANTLR lexer */
-public interface TokenStream extends IntegerStream {
+/** A stream of tokens accessing tokens from a TokenSource */
+public interface TokenStream {
     /** Move the input pointer to the next incoming token.  The stream
      *  must become active with lookahead(1) available.  consume() simply
      *  moves the input pointer so that lookahead(1) points at the next

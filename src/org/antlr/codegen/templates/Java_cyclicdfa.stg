@@ -16,7 +16,7 @@ allCyclicDFAs(cyclicDFAs) ::= <<
 >>
 
 cyclicDFA(decision,states,description) ::= <<
-.method DFA<decision> (Lorg/antlr/runtime/IntegerStream;)I 2
+.method DFA<decision> (Lorg/antlr/runtime/CharStream;)I 2
     goto s0
 errorState:
     getstatic java/lang/System.err Ljava/io/PrintStream;
@@ -32,7 +32,7 @@ s<stateNumber>:
 ; load lookahead into a local in every state
     aload 0
     iconst 1
-    invokeinterface org/antlr/runtime/IntegerStream.LA(I)I 2
+    invokeinterface org/antlr/runtime/CharStream.LA(I)I 2
     istore 1
 <edges>
 <if(needErrorClause)>
@@ -51,7 +51,7 @@ s<stateNumber>e<edgeNumber>:
 <labelExpr>
 s<stateNumber>e<edgeNumber>_go:
     aload 0
-    invokeinterface org/antlr/runtime/IntegerStream.consume()V 1
+    invokeinterface org/antlr/runtime/CharStream.consume()V 1
     goto s<targetStateNumber>
 s<stateNumber>e<edgeNumber>_skip:
 >>

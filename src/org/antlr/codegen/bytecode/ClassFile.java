@@ -179,7 +179,7 @@ public class ClassFile {
 			"aload 0\n" +
 			"invokespecial java/lang/Object.<init>()V\n"+
 			"return\n"+
-			".method DFA3 (Lorg/antlr/runtime/IntegerStream;)I 2\n" +
+			".method DFA3 (Lorg/antlr/runtime/CharStream;)I 2\n" +
 			"    iconst 0\n" +
 			"    istore 1\n" +
 			"    goto s0\n" +
@@ -202,7 +202,7 @@ public class ClassFile {
 			"; load lookahead into a local in every state\n" +
 			"    aload 0\n" +
 			"    iconst 1\n" +
-			"    invokeinterface org/antlr/runtime/IntegerStream.LA(I)I 2\n" +
+			"    invokeinterface org/antlr/runtime/CharStream.LA(I)I 2\n" +
 			"    istore 1\n" +
 			"s0e1:\n" +
 			"    iload 1\n" +
@@ -210,7 +210,7 @@ public class ClassFile {
 			"    if_icmpne s0e1_skip\n" +
 			"s0e1_go:\n" +
 			"    aload 0\n" +
-			"    invokeinterface org/antlr/runtime/IntegerStream.consume()V 1\n" +
+			"    invokeinterface org/antlr/runtime/CharStream.consume()V 1\n" +
 			"    goto s1\n" +
 			"s0e1_skip:\n" +
 			"s0e2:\n" +
@@ -219,7 +219,7 @@ public class ClassFile {
 			"    if_icmpne s0e2_skip\n" +
 			"s0e2_go:\n" +
 			"    aload 0\n" +
-			"    invokeinterface org/antlr/runtime/IntegerStream.consume()V 1\n" +
+			"    invokeinterface org/antlr/runtime/CharStream.consume()V 1\n" +
 			"    goto s2\n" +
 			"s0e2_skip:\n" +
 			"s0e3:\n" +
@@ -228,7 +228,7 @@ public class ClassFile {
 			"    if_icmpne s0e3_skip\n" +
 			"s0e3_go:\n" +
 			"    aload 0\n" +
-			"    invokeinterface org/antlr/runtime/IntegerStream.consume()V 1\n" +
+			"    invokeinterface org/antlr/runtime/CharStream.consume()V 1\n" +
 			"    goto s3\n" +
 			"s0e3_skip:\n" +
 			"    goto errorState\n"

@@ -28,13 +28,16 @@
 package org.antlr.runtime;
 
 public abstract class Token {
-    public static final int EOF = IntegerStream.EOF;
+    public static final int EOF = CharStream.EOF;
     public static final Token EOFToken = new CommonToken(EOF);
     
     public abstract int getType();
-    public abstract String getText();
+    public abstract String getText(CharStream input);
     public abstract int getLine();
     public abstract void setLine(int line);
-    public abstract int getColumn();
-    public abstract void setColumn(int column);
+	public abstract int getCharPositionInLine();
+	public abstract void setCharPositionInLine(int index);
+	public abstract int getChannel();
+	public abstract void setChannel(int channel);
+	public abstract String toString(CharStream input);
 }

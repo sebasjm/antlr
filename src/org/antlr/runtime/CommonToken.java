@@ -28,53 +28,63 @@
 package org.antlr.runtime;
 
 public class CommonToken extends Token {
-    protected String text;
     protected int type;
-    protected int line;
-    protected int column;
+	protected int line;
+	protected int charPositionInLine;
+	protected int channel;
+    /** The char position into the input buffer where this token starts */
+	protected int start;
+	/** The char position into the input buffer where this token stops */
+	protected int stop;
 
     public CommonToken(int type) {
         this.type = type;
     }
 
-    public CommonToken(int type, String text) {
+    public CommonToken(int type, int channel, int start, int stop) {
         this.type = type;
-        this.text = text;
+		this.channel = channel;
+		this.start = start;
+		this.stop = stop;
     }
 
     public int getType() {
         return type;
     }
 
-    public String getText() {
-        return text;
+	public void setLine(int line) {
+		this.line = line;
+	}
+
+    public String getText(CharStream input) {
+        return input.substring(start,stop);
     }
 
     public int getLine() {
         return line;
     }
 
-    public int getColumn() {
-        return column;
+    public int getCharPositionInLine() {
+        return charPositionInLine;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
+	public void setCharPositionInLine(int charPositionInLine) {
+		this.charPositionInLine = charPositionInLine;
+	}
+
+	public int getChannel() {
+		return channel;
+	}
+
+	public void setChannel(int channel) {
+		this.channel = channel;
+	}
 
     public void setType(int type) {
         this.type = type;
     }
 
-    public void setLine(int line) {
-        this.line = line;
-    }
-
-    public void setColumn(int column) {
-        this.column = column;
-    }
-
-    public String toString() {
-        return "["+text+"/"+type+","+line+":"+column+"]";
+    public String toString(CharStream input) {
+        return "["+getText(input)+"/"+type+","+line+":"+getCharPositionInLine()+"]";
     }
 }

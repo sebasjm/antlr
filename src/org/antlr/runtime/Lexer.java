@@ -27,37 +27,41 @@
 */
 package org.antlr.runtime;
 
-public class Lexer {
-    protected IntegerStream input;
+public abstract class Lexer implements TokenSource {
+	public static final int DEFAULT_CHANNEL = 0;
+
+    protected CharStream input;
     protected Token token;
-    protected int type;
-    protected StringBuffer text = new StringBuffer();
-    protected int line = 1;
-    protected int column = 1;
 
-    protected boolean skipToken = false;
+	protected StringBuffer inputBuffer;
 
-    public Lexer(IntegerStream input) {
-        this.input = input;
-    }
+    /** line number 1..n within the input */
+	protected int line = 1;
 
-    public void setType(int tokenType) {
-        type = tokenType;
-    }
+	/** The index of the character relative to the beginning of the line 0..n-1 */
+    protected int charPositionInLine = 0;
 
-    public void emit() {
-        emit(type);
-    }
+	public Lexer(CharStream input) {
+		this.input = input;
+	}
 
-    public void emit(int tokenType) {
-        token = new CommonToken(tokenType, text.toString());
-        token.setLine(line);
-        token.setColumn(line);
-    }
+	public CharStream getCharStream() {
+		return input;
+	}
+	
+	public void emit(int tokenType,
+					 int line, int charPosition,
+					 int channel,
+					 int start, int stop) {
+		Token token = new CommonToken(tokenType, channel, start, stop);
+		token.setLine(line);
+		token.setCharPositionInLine(charPosition);
+		emit(token);
+	}
 
-    public void setToken(Token token) {
-        this.token = token;
-    }
+	public void emit(Token token) {
+		this.token = token;
+	}
 
     public void match(String s) {
         int i = 0;
@@ -66,15 +70,15 @@ public class Lexer {
                 System.err.println("mismatched char: "+
                         (char)input.LA(1)+"; expecting '"+s.charAt(i)+"'");
             }
-            text.append((char)input.LA(1));
             i++;
             input.consume();
+			charPositionInLine++;
         }
     }
 
     public void matchAny() {
-        text.append((char)input.LA(1));
         input.consume();
+		charPositionInLine++;
     }
 
     public void match(int c) {
@@ -82,8 +86,8 @@ public class Lexer {
             System.err.println("mismatched char: "+
                     (char)input.LA(1)+"; expecting "+(char)c+"'");
         }
-        text.append((char)input.LA(1));
         input.consume();
+		charPositionInLine++;
     }
 
     public void matchRange(int x, int y) {
@@ -91,27 +95,25 @@ public class Lexer {
             System.err.println("mismatched char: "+(char)input.LA(1)+"; expecting "+
                     x+".."+y);
         }
-        text.append((char)input.LA(1));
         input.consume();
-    }
-
-    public void skip() {
-        skipToken = true;
+		charPositionInLine++;
     }
 
     public void newline() {
         line++;
+		charPositionInLine=0;
     }
 
     public int getLine() {
         return line;
     }
 
-    public void setColumn(int c) {
-        column = c;
+    public int getCharPositionInLine() {
+        return charPositionInLine;
     }
 
-    public int getColumn() {
-        return column;
-    }
+	/** What is the index of the current character of lookahead? */
+	public int getCharIndex() {
+		return input.index();
+	}
 }

@@ -39,7 +39,7 @@ import java.io.IOException;
  *
  *  .method dfa1 (LIntegerStream;)I
  *        aload 0
- *        invokeinterface IntegerStream.LA 2
+ *        invokeinterface CharStream.LA 2
  *        ipush 97
  *        if_icmpne label
  *        ireturn

@@ -27,6 +27,11 @@
 */
 package org.antlr.runtime;
 
+/** A source of tokens must provide a sequence of tokens via nextToken()
+ *  and also must reveal it's source of characters so a token's text can
+ *  be computed later.  Tokens only store indices into the char stream.
+ */
 public interface TokenSource {
-    public Token nextToken();
+	public Token nextToken();
+	public CharStream getCharStream();
 }

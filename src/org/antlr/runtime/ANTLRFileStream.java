@@ -32,7 +32,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 
-public class ANTLRFileStream implements IntegerStream {
+public class ANTLRFileStream implements CharStream {
     protected int p=0;
     String fileName;
     // todo: doesn't handle supplemental unicode codes
@@ -67,7 +67,7 @@ public class ANTLRFileStream implements IntegerStream {
     public int LA(int i) {
         if ( (p+i-1) >= data.length() ) {
             //System.out.println("char LA("+i+")=EOF; p="+p);
-            return IntegerStream.EOF;
+            return CharStream.EOF;
         }
         //System.out.println("char LA("+i+")="+data.charAt(p+i-1)+"; p="+p);
         return data.charAt(p+i-1);
@@ -91,4 +91,8 @@ public class ANTLRFileStream implements IntegerStream {
     public void rewind(int marker) {
         p = marker;
     }
+
+	public String substring(int start, int stop) {
+		return data.substring(start,stop+1);
+	}
 }

@@ -30,16 +30,17 @@ package org.antlr.runtime;
 /** A minimal DFA with a collection of hardcoded states used to predict
  *  alternatives at runtime. These DFA are created as static objects and,
  *  thus, are created only at parser/lexer/treewalker load time.
+ *  TODO: we don't need this anymore, right?
  */
 public class DFA {
     public static abstract class State {
         protected int alt;
-        public State transition(IntegerStream input) {return null;}
+        public State transition(CharStream input) {return null;}
     }
-    public static int predict(IntegerStream input, State start) {
+    public static int predict(CharStream input, State start) {
         int mark = input.mark();
         State s = start;
-        //while ( /* input.LA(1)!=IntegerStream.EOF &&*/ s.alt<=0 ) {
+        //while ( /* input.LA(1)!=CharStream.EOF &&*/ s.alt<=0 ) {
         while ( true ) {
             s = s.transition(input);
             if ( s==null ) {

@@ -148,17 +148,14 @@ rule returns [StringTemplate code=null]
 }
     :   #( RULE r=id b=block["block", dfa] EOR )
         {
-        if ( grammar.getType()==Grammar.LEXER &&
-             !r.equals(Grammar.TOKEN_RULENAME) )
-        {
-            StringTemplate setTypeST = templates.getInstanceOf("setType");
-            setTypeST.setAttribute("type", r);
-            b.setAttribute("preamble", setTypeST);
+        if ( grammar.getType()==Grammar.LEXER ) {
+        	code.setAttribute("isTokenRuleName",
+        	                  new Boolean(r.equals(Grammar.TOKEN_RULENAME)));
         }
         String trace = (String)grammar.getOption("trace");
         if ( grammar.getType()!=Grammar.LEXER &&
              trace!=null && trace.equals("true") )
-        { // use option for now not cmd-line
+        { // use option for now not cmd-line; HIDEOUS, fix this with ST composition
             code.setAttribute("enterAction", "System.out.println(\"enter "+r+"; LT(1)==\"+input.LT(1));");
             code.setAttribute("exitAction", "System.out.println(\"exit "+r+"; LT(1)==\"+input.LT(1));");
         }
