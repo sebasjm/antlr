@@ -219,7 +219,11 @@ public class Grammar {
 	protected StringTemplate lexerGrammarST =
 		new StringTemplate(
 			"lexer grammar <name>Lexer;\n" +
-			"\n" +
+			"<if(options)>" +
+			"options {\n" +
+			"  <options:{<it.name>=<it.value>;<\\n>}>\n" +
+			"}<\\n>\n" +
+			"<endif>\n" +
 			"<literals:{<it.ruleName> : <it.literal> ;\n}>\n" +
 			"<rules; separator=\"\n\n\">",
 			AngleBracketTemplateLexer.class
@@ -331,6 +335,13 @@ public class Grammar {
 			return null;
 		}
 		lexerGrammarST.setAttribute("name", name);
+		// make sure generated grammar has the same options
+		Iterator optionNames = options.keySet().iterator();
+		while (optionNames.hasNext()) {
+			String optionName = (String) optionNames.next();
+			Object value = options.get(optionName);
+			lexerGrammarST.setAttribute("options.{name,value}", optionName, value);
+		}
 		return lexerGrammarST.toString();
 	}
 

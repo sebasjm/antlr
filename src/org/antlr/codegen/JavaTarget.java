@@ -14,7 +14,7 @@ public class JavaTarget extends Target {
 													 StringTemplate recognizerST,
 													 StringTemplate cyclicDFAST)
 	{
-		return cyclicDFAST;
+		return recognizerST;
 	}
 
 	protected void genCyclicDFAFile(Tool tool,

@@ -29,7 +29,7 @@ public class CyclicDFACodeGenerator {
 		this.dfa = dfa;
 		StringTemplate dfaST = templates.getInstanceOf("cyclicDFA");
 		int d = dfa.getDecisionNumber();
-		dfaST.setAttribute("decision", new Integer(d));
+		dfaST.setAttribute("decisionNumber", new Integer(d));
 		dfaST.setAttribute("className", parent.getClassName());
 		visited = new BitSet(dfa.getNumberOfStates());
 		walkCyclicDFAGeneratingStateMachine(templates, dfaST, dfa.startState);
@@ -95,7 +95,6 @@ public class CyclicDFACodeGenerator {
 												   StringTemplate stateST,
 												   StringTemplate dfaST)
 	{
-		List labels = new ArrayList(50);
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
 			int edgeNumber = i+1;
@@ -111,8 +110,17 @@ public class CyclicDFACodeGenerator {
 				edgeST.setAttribute("edgeNumber", edgeNumberI);
 				edgeST.setAttribute("targetStateNumber",
 									new Integer(edge.target.stateNumber));
+				List labels = edge.label.getSet().toList();
+				for (int j = 0; j < labels.size(); j++) {
+					Integer vI = (Integer) labels.get(j);
+					String label =
+						parent.grammar.getTokenTypeAsLabel(vI.intValue());
+					labels.set(j, label); // rewrite List element to be name
+				}
+				edgeST.setAttribute("labels", labels);
 				stateST.setAttribute("edges", edgeST);
 			}
+			/*
 			List edgeLabels = edge.label.getSet().toList();
 			for (int j = 0; j < edgeLabels.size(); j++) {
 				Integer vI = (Integer) edgeLabels.get(j);
@@ -120,6 +128,7 @@ public class CyclicDFACodeGenerator {
 	                labels.add(new LabelEdgeNumberPair(vI.intValue(), edgeNumber));
 				}
 			}
+			*/
 			// now gen code for other states
 			walkCyclicDFAGeneratingStateMachine(templates,
 											   dfaST,
@@ -127,8 +136,9 @@ public class CyclicDFACodeGenerator {
 		}
 		// now sort the edge case values
 		if ( !s.isAcceptState() ) {
+			/*
 			Collections.sort( labels );
-			stateST.setAttribute("labels", labels);
+			*/
 		}
 	}
 

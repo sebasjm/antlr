@@ -12,7 +12,7 @@ import org.antlr.runtime.*;
 import java.util.Stack;
 
 <docComment>
-<recognizer><\n>
+<recognizer>
 >>
 
 lexer(name, tokens, globalAction, rules, cyclicDFAs, predicates) ::= <<
@@ -42,6 +42,9 @@ retry:
     }
 
     <rules; separator="\n\n">
+
+    <cyclicDFAs>
+
     <predicates; separator="\n">
 }
 >>
@@ -66,6 +69,8 @@ class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
     <rules; separator="\n\n">
 
     <predicates; separator="\n">
+
+    <cyclicDFAs>
 
     <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
 }
@@ -359,7 +364,12 @@ else {
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
+<if(LEXER)>
+    System.err.println("<description>: no viable alt line "+((CharStream)input).getLine()+" c='"+(char)input.LA(1)+"'");
+<else>
+    System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));
     throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+<endif>
 <endif>
 }
 >>
@@ -422,6 +432,85 @@ dfaEdgeSwitch(labels, targetState) ::= <<
 <labels:{case <it>:}; separator="\n">
     <targetState>
     break;
+>>
+
+// C y c l i c  D F A
+
+allCyclicDFAs(cyclicDFAs) ::= <<
+>>
+
+dfaDecision(decisionNumber,description) ::= <<
+int m<decisionNumber> = input.mark();
+<! the <name> attribute is inherited via the parser, lexer, ... !>
+alt<decisionNumber> = DFA<decisionNumber>.predict(input);
+input.rewind(m<decisionNumber>);
+>>
+
+cyclicDFA(className,decisionNumber,states,description) ::= <<
+static class DFA<decisionNumber> extends DFA {
+    public static int predict(IntStream input) throws RecognitionException {
+        return predict(input, s0);
+    }
+    <states>
+}
+>>
+
+cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
+static DFA.State s<stateNumber> = new DFA.State() {
+    public DFA.State transition(IntStream input) throws RecognitionException {
+        int LA<decisionNumber>_<stateNumber> = input.LA(1);
+        <edges>
+        <if(needErrorClause)>
+        <if(LEXER)>
+        System.err.println("no viable alt line "+((CharStream)input).getLine()+" c='"+(char)input.LA(1)+"'");
+	throw new NoViableAltException("<description>", 0, <stateNumber>, input);<\n>
+        <else>
+        System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));
+	throw new NoViableAltException("<description>", 0, <stateNumber>, input);<\n>
+        <endif>
+        <endif>
+    }
+};<\n>
+>>
+
+cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
+static DFA.State s<stateNumber> = new DFA.State() {{alt=<predictAlt>;}};<\n>
+>>
+
+cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber) ::= <<
+if ( <labelExpr> ) {return s<targetStateNumber>;}<\n>
+>>
+
+eotDFAEdge(targetStateNumber,edgeNumber) ::= <<
+return s<targetStateNumber>;<\n>
+>>
+
+// C y c l i c  S W I T C H
+
+cyclicDFAStateSwitch(stateNumber,labels,edges,
+                     needErrorClause,EOTTargetStateNumber) ::= <<
+static DFA.State s<stateNumber> = new DFA.State() {
+    public DFA.State transition(IntStream input) throws RecognitionException {
+        switch ( input.LA(1) ) {
+        <edges; separator="\n">
+        default:
+<if(needErrorClause)>
+            throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+<else>
+            return s<EOTTargetStateNumber>;<\n>	
+<endif>
+        }
+    }
+};<\n>
+>>
+
+cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
+<labels:{case <it>:}; separator="\n">
+    return s<targetStateNumber>;<\n>
+>>
+
+singlePredicateMethod(decision,stateNumber,edgeNumber,pred) ::= <<
+public boolean pred_DFA<decision>s<stateNumber>e<edgeNumber>() {return <pred>;}
 >>
 
 // D F A  E X P R E S S I O N S
