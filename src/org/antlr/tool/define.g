@@ -240,7 +240,7 @@ Map opts=null;
 				//System.out.println("rule tree is:\n"+#rule.toStringTree());
 				ANTLRTreePrinter printer = new ANTLRTreePrinter();
 				printer.setASTNodeClass("org.antlr.tool.GrammarAST");
-				String ruleText = printer.toString(#rule);
+				String ruleText = printer.toString(#rule, grammar);
 				//System.out.println("rule text is:\n"+ruleText);
 				grammar.defineLexerRuleFoundInParser(name, ruleText);
 				// track lexer rules so we can warn about undefined tokens

@@ -45,7 +45,8 @@ options {
 }
 
 {
-    StringBuffer buf = new StringBuffer(300);
+	protected Grammar grammar;
+    protected StringBuffer buf = new StringBuffer(300);
 
     public void out(String s) {
         buf.append(s);
@@ -83,7 +84,10 @@ options {
 }
 
 /** Call this to figure out how to print */
-toString returns [String s=null]
+toString[Grammar g] returns [String s=null]
+{
+grammar = g;
+}
     :   (   grammar
         |   rule
         |   alternative
@@ -123,7 +127,10 @@ grammarSpec[String gtype]
     ;
 
 optionsSpec
-    :   #( OPTIONS (option {out(" ");} )+ {out(" : ");} )
+    :   #( OPTIONS {out("options {");}
+    	   (option {out("; ");})+
+    	   {out("} : ");}
+    	 )
     ;
 
 option
@@ -132,8 +139,8 @@ option
 
 optionValue
 	:	id:ID            {out(#id.getText());}
-	|   s:STRING_LITERAL {out(#s.getText());}
-	|	c:CHAR_LITERAL   {out(#c.getText());}
+	|   s:STRING_LITERAL {out(Grammar.getANTLREscapedStringLiteral(#s.getText()));}
+	|	c:CHAR_LITERAL   {out(Grammar.getANTLREscapedCharLiteral(#c.getText()));}
 	|	i:INT            {out(#i.getText());}
 	|   charSet
 	;
@@ -236,14 +243,14 @@ tree:   #(TREE_BEGIN {out(" #(");} atom (element)* {out(") ");} )
     ;
 
 atom
-
-    :   (	{out(" "+#atom.toString()+" ");}
-    	:	RULE_REF
-		|   TOKEN_REF
-		|   CHAR_LITERAL
-		|   STRING_LITERAL
-		|   WILDCARD
+{out(" ");}
+    :   (	RULE_REF		{out(#atom.toString());}
+		|   TOKEN_REF		{out(#atom.toString());}
+		|   CHAR_LITERAL	{out(Grammar.getANTLREscapedCharLiteral(#atom.toString()));}
+		|   STRING_LITERAL	{out(Grammar.getANTLREscapedStringLiteral(#atom.toString()));}
+		|   WILDCARD		{out(#atom.toString());}
 		)
+		{out(" ");}
     |   set
     ;
 
@@ -252,11 +259,13 @@ set
     ;
 
 setElement
-    :   (	{out(#setElement.getText());}
-    	:	CHAR_LITERAL
-		|   TOKEN_REF
-		|   STRING_LITERAL
+    :   (	CHAR_LITERAL    {out(Grammar.getANTLREscapedCharLiteral(#setElement.toString()));}
+		|   TOKEN_REF		{out(#setElement.toString());}
+		|   STRING_LITERAL	{out(Grammar.getANTLREscapedStringLiteral(#setElement.toString()));}
 		)
     |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
-    	{out(#c1.getText()+".."+#c2.getText());}
+    	{out(Grammar.getANTLREscapedCharLiteral(#c1.getText())+
+    	     ".."+
+    	     Grammar.getANTLREscapedCharLiteral(#c2.getText()));
+    	}
     ;

@@ -76,4 +76,23 @@ public class Target {
 		// Create the DFA predictors for each decision
 		grammar.createLookaheadDFAs();
 	}
+
+	/** Convert from an ANTLR char literal as read by antlr.g to a literal
+	 *  suitable for the target language.
+	 */
+	protected String getEscapedCharLiteral(String literal) {
+		return CodeGenerator.getJavaEscapedCharFromANTLRLiteral(literal);
+	}
+
+	/** Convert from an ANTLR string literal as read by antlr.g to a literal
+	 *  suitable for the target language.
+	 */
+	protected String getEscapedStringLiteral(String literal) {
+		return CodeGenerator.getJavaEscapedStringFromANTLRLiteral(literal);
+	}
+
+	/** Some targets only support ASCII or 8-bit chars/strings. */
+	protected int getMaxCharValue() {
+		return '\uFFFF';
+	}
 }

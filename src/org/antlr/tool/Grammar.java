@@ -228,22 +228,6 @@ public class Grammar {
 	/** What file name holds this grammar? */
 	protected String fileName;
 
-    protected static int escapedCharValue[] = new int[255];
-    protected static String charValueEscape[] = new String[255];
-
-    static {
-        escapedCharValue['n'] = '\n';
-        escapedCharValue['r'] = '\r';
-        escapedCharValue['t'] = '\t';
-        escapedCharValue['b'] = '\b';
-        escapedCharValue['f'] = '\f';
-        charValueEscape['\n'] = "\\n";
-        charValueEscape['\r'] = "\\r";
-        charValueEscape['\t'] = "\\t";
-        charValueEscape['\b'] = "\\b";
-        charValueEscape['\f'] = "\\f";
-    }
-
 	public Grammar() {
 		initTokenSymbolTables();
 	}
@@ -472,15 +456,19 @@ public class Grammar {
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
             NFAState decisionStartState = getDecisionNFAStartState(decision);
             if ( decisionStartState.getNumberOfTransitions()>1 ) {
+				/*
 				System.out.println("--------------------\nbuilding lookahead DFA (d="
                         +decisionStartState.getDecisionNumber()+") for "+
                         decisionStartState.getDescription());
 				long start = System.currentTimeMillis();
+				*/
 				DFA lookaheadDFA = new DFA(decisionStartState);
-				long stop = System.currentTimeMillis();
 				setLookaheadDFA(decision, lookaheadDFA);
+				/*
+				long stop = System.currentTimeMillis();
 				System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
 					" states, "+(int)(stop-start)+" ms");
+					*/
 
 				if ( Tool.GENERATE_DFA_DOT ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.grammar);
@@ -641,16 +629,14 @@ public class Grammar {
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									computeTokenNameFromLiteral(tokenType,literal),
 									new Integer(tokenType),
-									literal);
-		//defineToken(computeTokenNameFromLiteral(tokenType, literal), tokenType);
+									Grammar.getANTLREscapedStringLiteral(literal));
 	}
 
 	public void defineLexerRuleForCharLiteral(String literal, int tokenType) {
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									computeTokenNameFromLiteral(tokenType,literal),
 									new Integer(tokenType),
-									literal);
-		//defineToken(computeTokenNameFromLiteral(tokenType, literal), tokenType);
+									Grammar.getANTLREscapedStringLiteral(literal));
 	}
 
 	public Rule getRule(String ruleName) {
@@ -820,6 +806,46 @@ public class Grammar {
 		return charLiteralToTypeMap.keySet();
 	}
 
+	/** Convert a char literal as read by antlr.g back to a grammar literal
+	 *  that has escaped chars instead of the real char value.
+	 */
+	public static String getANTLREscapedCharLiteral(String literal) {
+		return CodeGenerator.getJavaEscapedCharFromANTLRLiteral(literal);
+	}
+
+	/** Convert a string literal as read by antlr.g back to a grammar literal
+	 *  that has escaped chars instead of the real char values.
+	 */
+	public static String getANTLREscapedStringLiteral(String literal) {
+		return CodeGenerator.getJavaEscapedStringFromANTLRLiteral(literal);
+	}
+
+	/** Given a literal like (the 3 char sequence in single quotes) 'a',
+	 *  return the int value of 'a'.
+     *  Escaped stuff is already converted to single char in single-quotes.
+     */
+    public static int getCharValueFromANTLRGrammarLiteral(String literal) {
+        //System.out.println("getCharValueFromLiteral: "+literal+"; len="+literal.length());
+        if ( literal.length()==3 ) {
+            // no escape
+            return literal.charAt(1);
+        }
+        /*
+        if ( literal.equals("'\\\\'") ) { // if string is '\\', that's just \
+            return '\\';
+        }
+        if ( literal.length()==4 ) {
+            int special = escapedCharValue[literal.charAt(2)];
+            if ( special>0 ) {
+                return special;
+            }
+            // must be an escape regular char, return x in '\x'.
+            return literal.charAt(2);
+        }
+		*/
+        return Label.INVALID;
+    }
+
     /** Return a set of all possible token/char types for this grammar */
 	public IntSet getTokenTypes() {
 		if ( type==LEXER ) {
@@ -844,7 +870,7 @@ public class Grammar {
 		int index=0;
 		// inside char range and lexer grammar?
 		if ( this.type==LEXER && ttype >= Label.MIN_CHAR_VALUE && ttype <= Label.MAX_CHAR_VALUE ) {
-			tokenName = getUnicodeEscapeString(ttype);
+			tokenName = "'"+CodeGenerator.getJavaUnicodeEscapeString(ttype)+"'";
 		}
 		// faux label?
 		else if ( ttype<0 ) {
@@ -1235,7 +1261,7 @@ if ( sl.member(Label.EOF) ) {
         String s = null;
         try {
             s = t.getLine()+":"+t.getColumn()+": ";
-            s += new ANTLRTreePrinter().toString((AST)t);
+            s += new ANTLRTreePrinter().toString((AST)t, this);
         }
         catch (Exception e) {
             ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
@@ -1245,56 +1271,4 @@ if ( sl.member(Label.EOF) ) {
         return s;
     }
 
-    /** Return a string representing the unicode escape char for c. If c
-     *  has value 0x100, you will get '\u0100'.  ASCII gets the usual
-     *  char (non-hex) representation.  Control characters are spit out
-     *  as unicode.
-     *
-     *  TODO: It does NOT handle supplemental unicode chars; only <=16 bits
-     */
-    public static String getUnicodeEscapeString(int c) {
-        if ( c<charValueEscape.length && charValueEscape[c]!=null ) {
-            return "'"+charValueEscape[c]+"'";
-        }
-        if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
-             !Character.isISOControl((char)c) ) {
-            if ( c=='\\' ) {
-                return "'\\\\'";
-            }
-            if ( c=='\'') {
-                return "'\\''";
-            }
-            return "'"+Character.toString((char)c)+"'";
-        }
-        // turn on the bit above max '\uFFFF' value so that we pad with zeros
-        // then only take last 4 digits
-        String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-        String unicodeStr = "'\\u"+hex+"'";
-        return unicodeStr;
-    }
-
-    /** Given a literal like 'a', return the int value of 'a'.
-     *  For "'\n'", return int 10 ('\n').  Handles 16-bit char only.
-     */
-    public static int getCharValueFromLiteral(String literal) {
-        //System.out.println("getCharValueFromLiteral: "+literal+"; len="+literal.length());
-        if ( literal.length()==3 ) {
-            // no escape
-            return literal.charAt(1);
-        }
-        /*
-        if ( literal.equals("'\\\\'") ) { // if string is '\\', that's just \
-            return '\\';
-        }
-        */
-        if ( literal.length()==4 ) {
-            int special = escapedCharValue[literal.charAt(2)];
-            if ( special>0 ) {
-                return special;
-            }
-            // must be an escape regular char, return x in '\x'.
-            return literal.charAt(2);
-        }
-        return Label.INVALID;
-    }
 }

@@ -311,7 +311,7 @@ element returns [StringTemplate code=null]
             {code = templates.getInstanceOf("matchNotSet");}
             (  c:CHAR_LITERAL
 	           {
-	           int ttype = Grammar.getCharValueFromLiteral(c.getText());
+	           int ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
 	           elements = grammar.complement(ttype);
 	           }
 //          |  CHAR_RANGE
@@ -416,13 +416,15 @@ atom[String label] returns [StringTemplate code=null]
     |   c:CHAR_LITERAL  {
                             if ( grammar.type==Grammar.LEXER ) {
                                 code = templates.getInstanceOf("charRef");
-                                code.setAttribute("char", c.getText());
+                                code.setAttribute("char",
+                                   CodeGenerator.getJavaEscapedCharFromANTLRLiteral(c.getText()));
                             }
                             else { // else it's a token type reference
                                 code = templates.getInstanceOf("tokenRef");
                                 code.setAttribute("token",
-                                                 new Integer(grammar.getTokenType(c.getText())));
-                           code.setAttribute("elementIndex", ((TokenWithIndex)#c.getToken()).getIndex());
+                                                  new Integer(grammar.getTokenType(c.getText())));
+                           		code.setAttribute("elementIndex",
+                           		                  ((TokenWithIndex)#c.getToken()).getIndex());
 	                            generator.generateLocalFOLLOW(#c,
 	                                String.valueOf(grammar.getTokenType(#c.getText())),
 	                                currentRuleName);
@@ -433,7 +435,8 @@ atom[String label] returns [StringTemplate code=null]
     |   s:STRING_LITERAL{
                         if ( grammar.type==Grammar.LEXER ) {
                             code = templates.getInstanceOf("lexerStringRef");
-                            code.setAttribute("string", s.getText());
+                            code.setAttribute("string",
+                               CodeGenerator.getJavaEscapedCharFromANTLRLiteral(s.getText()));
                         }
                         else { // else it's a token type reference
                             code = templates.getInstanceOf("tokenRef");

@@ -322,7 +322,7 @@ exceptionHandler
    ;
 
 element
-	:	elementNoOptionSpec (elementOptionSpec!)?
+	:	elementNoOptionSpec //(elementOptionSpec!)?
 	;
 
 elementOptionSpec
@@ -443,7 +443,7 @@ terminal
 		( ARG_ACTION! )?
 
     |   RULE_REF
-        ( BANG )?
+        ast_type_spec!
 		( ARG_ACTION! )?
 
 	|   sl:STRING_LITERAL
@@ -656,29 +656,29 @@ STRING_LITERAL
 
 protected
 ESC	:	'\\'
-		(	'n'
-		|	'r'
-		|	't'
-		|	'b'
-		|	'f'
-		|	'w'
-		|	'a'
-		|	'"'
-		|	'\''
-		|	'\\'
+		(	'n' {$setText('\n');}
+		|	'r' {$setText('\r');}
+		|	't' {$setText('\t');}
+		|	'b' {$setText('\b');}
+		|	'f' {$setText('\f');}
+//		|	'w' {$setText('\w');}
+//		|	'a' {$setText('\a');}
+		|	'"' {$setText('\"');}
+		|	'\'' {$setText('\'');}
+		|	'\\' {$setText('\\');}
 		|	('0'..'3')
 			(
 				options {
 					warnWhenFollowAmbig = false;
 				}
 			:
-	('0'..'9')
+			('0'..'9')
 				(
 					options {
 						warnWhenFollowAmbig = false;
 					}
 				:
-	'0'..'9'
+				'0'..'9'
 				)?
 			)?
 		|	('4'..'7')
@@ -687,7 +687,7 @@ ESC	:	'\\'
 					warnWhenFollowAmbig = false;
 				}
 			:
-	('0'..'9')
+			('0'..'9')
 			)?
 		|	'u' XDIGIT XDIGIT XDIGIT XDIGIT
 		)

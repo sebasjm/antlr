@@ -86,6 +86,26 @@ public class CodeGenerator {
 	// TODO move this and the templates to a separate file?
     public static final String VOCAB_FILE_EXTENSION = ".tokens";
 
+	public static int escapedCharValue[] = new int[255];
+	public static String charValueEscape[] = new String[255];
+
+	static {
+		escapedCharValue['n'] = '\n';
+		escapedCharValue['r'] = '\r';
+		escapedCharValue['t'] = '\t';
+		escapedCharValue['b'] = '\b';
+		escapedCharValue['f'] = '\f';
+		escapedCharValue['\\'] = '\\';
+		escapedCharValue['\''] = '\'';
+		charValueEscape['\n'] = "\\n";
+		charValueEscape['\r'] = "\\r";
+		charValueEscape['\t'] = "\\t";
+		charValueEscape['\b'] = "\\b";
+		charValueEscape['\f'] = "\\f";
+		charValueEscape['\\'] = "\\\\";
+		charValueEscape['\''] = "\\'";
+	}
+
     /** Which grammar are we generating code for?  Each generator
      *  is attached to a specific grammar.
      */
@@ -854,6 +874,71 @@ public class CodeGenerator {
 		//System.out.println("template="+buf.toString());
 		return buf.toString();
 	}
+
+	// C H A R  T R A N S L A T I O N
+
+	/** The antlr.g grammar converts the escaped literal '\'' to ''' and
+	 *  all other escapes so char literals always have just a unicode 16-bit
+	 *  char value.  Use this method to get the escaped grammar literal back out,
+	 *  such as for printing out a grammar.
+	 */
+	public static String getJavaEscapedCharFromANTLRLiteral(String literal) {
+		int c = Grammar.getCharValueFromANTLRGrammarLiteral(literal);
+		return "'"+CodeGenerator.getJavaUnicodeEscapeString(c)+"'";
+	}
+
+	/** Given a literal like "\nfoo\\", antlr.g converts it to the actual
+	 *  char sequence implied by the escaped char seq.  To get an escaped
+	 *  literal back out for printing grammars and such, use this routine.
+	 *  Leave the double quotes on the outside of the literal.
+	 */
+	public static String getJavaEscapedStringFromANTLRLiteral(String literal) {
+		StringBuffer buf = new StringBuffer();
+		buf.append('"');
+		for (int i=1; i<literal.length()-1; i++) {
+			int c = literal.charAt(i);
+			if ( c<CodeGenerator.charValueEscape.length &&
+				 CodeGenerator.charValueEscape[c]!=null )
+			{
+				buf.append(CodeGenerator.charValueEscape[c]);
+			}
+			else {
+				buf.append((char)c);
+			}
+		}
+		buf.append('"');
+		return buf.toString();
+	}
+
+	/** Return a string representing the escaped char for code c.  E.g., If c
+     *  has value 0x100, you will get "\u0100".  ASCII gets the usual
+     *  char (non-hex) representation.  Control characters are spit out
+     *  as unicode.  While this is specially set up for returning Java strings,
+	 *  it can be used by any language target that has the same syntax. :)
+	 *  Note that this method does NOT put the quotes around it so that the
+	 *  method is more reusable.
+     */
+    public static String getJavaUnicodeEscapeString(int c) {
+        if ( c<charValueEscape.length && charValueEscape[c]!=null ) {
+            return charValueEscape[c];
+        }
+        if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
+             !Character.isISOControl((char)c) ) {
+            if ( c=='\\' ) {
+                return "\\\\";
+            }
+            if ( c=='\'') {
+                return "\\'";
+            }
+            return Character.toString((char)c);
+        }
+        // turn on the bit above max '\uFFFF' value so that we pad with zeros
+        // then only take last 4 digits
+        String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
+        String unicodeStr = "\\u"+hex;
+        return unicodeStr;
+    }
+
 
 	// M I S C
 

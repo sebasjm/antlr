@@ -48,8 +48,6 @@ public class GrammarNonDeterminismMessage extends Message {
 		List nondetAlts = probe.getNonDeterministicAltsForState(problemState);
 		for (Iterator iter = nondetAlts.iterator(); iter.hasNext();) {
 			Integer altI = (Integer) iter.next();
-			List path =
-				probe.getNFAPathStatesForAlt(problemState,altI.intValue(),labels);
 			NFAState nfaStart = probe.dfa.getNFADecisionStartState();
 			int displayAlt = altI.intValue();
 			if ( nfaStart.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
@@ -68,7 +66,14 @@ public class GrammarNonDeterminismMessage extends Message {
 					displayAlt = displayAlt+1;
 				}
 			}
-			st.setAttribute("paths.{alt,states}", new Integer(displayAlt), path);
+			if ( DecisionProbe.verbose ) {
+				List path =
+					probe.getNFAPathStatesForAlt(problemState,altI.intValue(),labels);
+				st.setAttribute("paths.{alt,states}", new Integer(displayAlt), path);
+			}
+			else {
+				st.setAttribute("conflictingAlts", displayAlt);
+			}
 		}
 		return st.toString();
 	}

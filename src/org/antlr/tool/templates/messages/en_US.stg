@@ -78,10 +78,12 @@ CANNOT_ALIAS_TOKENS_IN_LEXER(file,line,col,arg) ::=
 
 // GRAMMAR WARNINGS
 
-GRAMMAR_NONDETERMINISM(file,line,col,input,paths,disabled) ::= <<
+GRAMMAR_NONDETERMINISM(file,line,col,input,conflictingAlts,paths,disabled) ::= <<
 <loc()><if(input)>
 Decision can match input such as "<input>" using multiple alternatives:
 <paths:{  alt <it.alt> via NFA path <it.states; separator=","><\n>}>
+<else>
+Decision can match input such as "<input>" using multiple alternatives: <conflictingAlts; separator=", "><\n>
 <endif>
 <if(disabled)>
 As a result, alternative(s) <disabled; separator=","> were disabled for that input

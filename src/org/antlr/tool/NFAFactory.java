@@ -120,11 +120,12 @@ public class NFAFactory {
     }
 
 	/** From char 'c' build StateCluster o-intValue(c)->o
-	 *  can include unicode spec likes '\u0024' later.  Accepts
+	 *  can include unicode spec likes '\u0024'.  Accepts
 	 *  actual unicode 16-bit now, of course, by default.
+	 *  TODO: doesn't antlr.g do the conversion to single char now from \u0032?
 	 */
 	public StateCluster build_CharLiteralAtom(String charLiteral) {
-        int c = Grammar.getCharValueFromLiteral(charLiteral);
+        int c = Grammar.getCharValueFromANTLRGrammarLiteral(charLiteral);
         if ( charLiteral.charAt(1)=='\\' &&
              Character.toUpperCase(charLiteral.charAt(2))=='U' )
         {
@@ -140,8 +141,8 @@ public class NFAFactory {
      *  TODO not supplemental char clean!
 	 */
 	public StateCluster build_CharRange(String a, String b) {
-		int from = Grammar.getCharValueFromLiteral(a);
-		int to = Grammar.getCharValueFromLiteral(b);
+		int from = Grammar.getCharValueFromANTLRGrammarLiteral(a);
+		int to = Grammar.getCharValueFromANTLRGrammarLiteral(b);
 		return build_Range(from, to);
 	}
 
@@ -159,7 +160,7 @@ public class NFAFactory {
             NFAState last = null;
             NFAState prev = first;
             for (int i=0; i<stringLiteral.length(); i++) {
-                // TODO: what about >16bit chars in strings?  UTF-16?
+                // TODO: doesn't handle escaped char!!! actually antlr.g does it
                 int c = stringLiteral.charAt(i);
                 NFAState next = newState();
                 transitionBetweenStates(prev, next, c);
