@@ -162,7 +162,7 @@ public class TestCharDFAConversion extends TestSuite {
 	public void testNonGreedy() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"CMT : \"/*\" ( greedy=false : . )* \"*/\" ;");
+			"CMT : \"/*\" ( options {greedy=false;} : . )* \"*/\" ;");
 		String expecting =
 			".s0-'*'->.s1\n" +
 			".s0-{'\\u0000'..')', '+'..'\\uFFFE'}->:s3=>1\n" +
@@ -174,7 +174,7 @@ public class TestCharDFAConversion extends TestSuite {
 	public void testNonWildcardNonGreedy() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"DUH : (greedy=false:'x'|'y')* \"xy\" ;");
+			"DUH : (options {greedy=false;}:'x'|'y')* \"xy\" ;");
 		String expecting =
 			".s0-'x'->.s1\n" +
 			".s0-'y'->:s4=>2\n" +
@@ -186,7 +186,7 @@ public class TestCharDFAConversion extends TestSuite {
 	public void testNonGreedyLoopThatNeverLoops() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"DUH : (greedy=false:'x')+ ;");
+			"DUH : (options {greedy=false;}:'x')+ ;");
 		String expecting =
 			":s0=>2\n";
 		checkDecision(g, 1, expecting, new int[] {1});

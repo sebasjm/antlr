@@ -211,7 +211,7 @@ public class TestDFAConversion extends TestSuite {
 	public void testAPlusNonGreedyWhenDeterministic() throws Exception {
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"a : (greedy=false:A)+ ;\n");
+			"a : (options {greedy=false;}:A)+ ;\n");
 		// should look the same as A+ since no ambiguity
 		String expecting =
 			".s0-<EOF>->:s1=>2\n" +
@@ -456,7 +456,7 @@ public class TestDFAConversion extends TestSuite {
 			"a : A | B | C ;"
 		);
 		String expecting =
-			" ( grammar t ( rule a ( BLOCK ( ALT ( SET A B C ) EOA ) EOB ) <end-of-rule> ) )";
+			" ( grammar t ( rule a ARG RET INITACTION ( BLOCK ( ALT ( SET A B C ) EOA ) EOB ) <end-of-rule> ) )";
 		assertEqual(g.getGrammarTree().toStringTree(),
 					expecting);
 	}
