@@ -230,6 +230,9 @@ alternative returns [StateCluster g=null]
         if (g==null) { // if alt was a list of actions or whatever
             g = factory.build_Epsilon();
         }
+        else {
+        	factory.optimizeAlternative(g);
+        }
         }
     ;
 

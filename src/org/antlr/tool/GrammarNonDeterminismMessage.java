@@ -82,6 +82,7 @@ public class GrammarNonDeterminismMessage extends Message {
 		return st.toString();
 	}
 
+	/*
 	public void computeErrors() {
 		System.out.println("--------------------\nnondeterministic decision (d="
 				+probe.dfa.getDecisionNumber()+") for "+
@@ -166,5 +167,5 @@ public class GrammarNonDeterminismMessage extends Message {
 			//System.err.println("nondeterminism NOT resolved with sem preds");
 		}
 	}
-
+    */
 }

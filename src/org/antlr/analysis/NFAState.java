@@ -39,7 +39,7 @@ public class NFAState extends State {
 
     /** How many transitions; 0, 1, or 2 transitions */
     int numTransitions = 0;
-    public Transition[] transition = new Transition[MAX_TRANSITIONS];
+    Transition[] transition = new Transition[MAX_TRANSITIONS];
 
     /** Which NFA are we in? */
     NFA nfa = null;
@@ -92,6 +92,15 @@ public class NFAState extends State {
             numTransitions++;
         }
     }
+
+	/** Used during optimization to reset a state to have the (single)
+	 *  transition another state has.
+	 */
+	public void setTransition0(Transition e) {
+		transition[0] = e;
+		transition[1] = null;
+		numTransitions = 1;
+	}
 
     public Transition transition(int i) {
         return transition[i];

@@ -80,7 +80,7 @@ public class NFAToDFAConverter {
 		}
 	}
 
-	/** From this first alt NFA state of a decision, create a DFA.
+	/** From this first NFA state of a decision, create a DFA.
 	 *  Walk each alt in decision and compute closure from the start of that
 	 *  rule, making sure that the closure does not include other alts within
 	 *  that same decision.  The idea is to associate a specific alt number
@@ -220,7 +220,16 @@ public class NFAToDFAConverter {
 		}
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
+			System.out.println("dangling state: "+d.stateNumber);
 			dfa.probe.reportDanglingState(d);
+			/*
+			// turn off all configurations except for those associated with
+			// min alt number; somebody has to win else some input will not
+			// predict any alt.
+			int minAlt = resolveByPickingMinAlt(d, null);
+			convertToAcceptState(d, minAlt); // force it to be an accept state
+			terminate = true; // might as well stop now
+			*/
 			terminate = true; // might as well stop now
 		}
 
@@ -269,7 +278,7 @@ public class NFAToDFAConverter {
 	 *  ok at k=2.
 	 *
 	 *  A better decision is as follows:
-     * 
+     *
 	 *  if ( (input.LA(1)>='1' && input.LA(1)<='9') ) {
 	 *      alt7=1;
 	 *  }
@@ -282,7 +291,7 @@ public class NFAToDFAConverter {
 	 *      }
 	 *  }
 	 *
-	 *  The DFA originally has 3 edges going to the state the predicts alt 3, 
+	 *  The DFA originally has 3 edges going to the state the predicts alt 3,
 	 *  but upon seeing the EOT edge (the "else"-clause), this method
 	 *  replaces the old merged label (which would have (0..7|l|L)) with EOT.
 	 *  The code generator then leaves alt 3 predicted with a simple else-
@@ -790,31 +799,11 @@ public class NFAToDFAConverter {
         // If deterministic, don't add this state; it's an accept state
         // Just return as a valid DFA state
 		int alt = d.getUniquelyPredictedAlt();
-		if ( alt!=NFA.INVALID_ALT_NUMBER ) {
-			// only merge stop states if they are deterministic.
-			// later, the error reporting may want to trace the path from
-			// the start state to the nondet state
-			if ( DFAOptimizer.MERGE_STOP_STATES &&
-				 d.getNondeterministicAlts()==null )
-			{
-				// check to see if we already have an accept state for this alt
-				// [must do this after we resolve nondeterminisms in general]
-				DFAState acceptStateForAlt = dfa.getAcceptState(alt);
-				if ( acceptStateForAlt!=null ) {
-					dfa.removeState(d);    // oops; remove this state from DFA
-					d = acceptStateForAlt; // use old accept state; throw this one out
-				}
-				else {
-					d.setAcceptState(true); // new accept state for alt
-					dfa.setAcceptState(alt, d);
-				}
-			}
-			else {
-				d.setAcceptState(true); // new accept state for alt
-			}
+		if ( alt!=NFA.INVALID_ALT_NUMBER ) { // uniquely predicts an alt?
+			d = convertToAcceptState(d, alt);
 			/*
-			System.out.println("state "+d.getStateNumber()+" uniquely predicts alt "+
-			d.getUniquelyPredictedAlt());
+			System.out.println("state "+d.stateNumber+" uniquely predicts alt "+
+				d.getUniquelyPredictedAlt());
 			*/
 		}
 		else {
@@ -823,6 +812,31 @@ public class NFAToDFAConverter {
         }
         return d;
     }
+
+	protected DFAState convertToAcceptState(DFAState d, int alt) {
+		// only merge stop states if they are deterministic.
+		// later, the error reporting may want to trace the path from
+		// the start state to the nondet state
+		if ( DFAOptimizer.MERGE_STOP_STATES &&
+			 d.getNondeterministicAlts()==null )
+		{
+			// check to see if we already have an accept state for this alt
+			// [must do this after we resolve nondeterminisms in general]
+			DFAState acceptStateForAlt = dfa.getAcceptState(alt);
+			if ( acceptStateForAlt!=null ) {
+				dfa.removeState(d);    // oops; remove this state from DFA
+				d = acceptStateForAlt; // use old accept state; throw this one out
+			}
+			else {
+				d.setAcceptState(true); // new accept state for alt
+				dfa.setAcceptState(alt, d);
+			}
+		}
+		else {
+			d.setAcceptState(true); // new accept state for alt
+		}
+		return d;
+	}
 
 	/** If > 1 NFA configurations within this DFA state have identical
 	 *  NFA state and context, but differ in their predicted
@@ -1009,28 +1023,57 @@ public class NFAToDFAConverter {
         resolveByPickingMinAlt(d,nondeterministicAlts);
 	}
 
-	protected void resolveByPickingMinAlt(DFAState d, Set nondeterministicAlts) {
-		Iterator iter = nondeterministicAlts.iterator();
+	/** Turn off all configurations associated with the
+	 *  set of incoming nondeterministic alts except the min alt number.
+	 *  There may be many alts among the configurations but only turn off
+	 *  the ones with problems (other than the min alt of course).
+	 *
+	 *  If nondeterministicAlts is null then turn off all configs 'cept those
+	 *  associated with the minimum alt.
+	 *
+	 *  Return the min alt found.
+	 */
+	protected int resolveByPickingMinAlt(DFAState d, Set nondeterministicAlts) {
 		int min = Integer.MAX_VALUE;
-		while (iter.hasNext()) {
-			Integer altI = (Integer) iter.next();
-			int alt = altI.intValue();
-			if ( alt < min ) {
-				min = alt;
+		if ( nondeterministicAlts!=null ) {
+			// find the min constrained to the nondet alts
+			Iterator iter = nondeterministicAlts.iterator();
+			while (iter.hasNext()) {
+				Integer altI = (Integer) iter.next();
+				int alt = altI.intValue();
+				if ( alt < min ) {
+					min = alt;
+				}
+			}
+		}
+		else {
+			// else walk the actual configurations to find the min
+			Iterator iter = d.nfaConfigurations.iterator();
+			NFAConfiguration configuration;
+			while (iter.hasNext()) {
+				configuration = (NFAConfiguration) iter.next();
+				if ( configuration.alt<min ) {
+					min = configuration.alt;
+				}
 			}
 		}
 
 		// turn off all states associated with alts other than the good one
 		// (as long as they are one of the nondeterministic ones)
-		iter = d.nfaConfigurations.iterator();
+		Iterator iter = d.nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
-			if ( configuration.alt!=min &&
-				 nondeterministicAlts.contains(new Integer(configuration.alt)) ) {
-				configuration.resolved = true;
+			if ( configuration.alt!=min ) {
+				if ( nondeterministicAlts==null ||
+					 nondeterministicAlts.contains(new Integer(configuration.alt)) )
+				{
+					configuration.resolved = true;
+				}
 			}
 		}
+
+		return min;
 	}
 
 	/** See if a set of nondeterministic alternatives can be disambiguated

@@ -468,8 +468,7 @@ public class Grammar {
 				long stop = System.currentTimeMillis();
 				System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
 					" states, "+(int)(stop-start)+" ms");
-					*/
-
+                */
 				if ( Tool.GENERATE_DFA_DOT ) {
 					DOTGenerator dotGenerator = new DOTGenerator(nfa.grammar);
 					String dot = dotGenerator.getDOT( lookaheadDFA.startState );

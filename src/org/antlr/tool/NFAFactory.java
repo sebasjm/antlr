@@ -74,6 +74,46 @@ public class NFAFactory {
         return stateCounter;
     }
 
+	/** Optimize an alternative (list of grammar elements).
+	 *
+	 *  Walk the chain of elements (which can be complicated loop blocks...)
+	 *  and throw away any epsilon transitions used to link up simple elements.
+	 *
+	 *  This only removes 195 states from the java.g's NFA, but every little
+	 *  bit helps.  Perhaps I can improve in the future.
+	 */
+	public void optimizeAlternative(StateCluster alt) {
+		NFAState s = alt.left;
+		while ( s!=alt.right ) {
+			// if it's a block element, jump over it and continue
+			if ( s.endOfBlockStateNumber!=State.INVALID_STATE_NUMBER ) {
+				s = nfa.getState(s.endOfBlockStateNumber);
+				continue;
+			}
+			Transition t = s.transition(0);
+			if ( t instanceof RuleClosureTransition ) {
+				s = ((RuleClosureTransition)t).getFollowState();
+				continue;
+			}
+			if ( t.label.isEpsilon() && s.getNumberOfTransitions()==1 ) {
+				// bypass epsilon transition and point to what the epsilon's
+				// target points to unless that epsilon transition points to
+				// a block or loop etc..  Also don't collapse epsilons that
+				// point at the last node of the alt
+				NFAState epsilonTarget = (NFAState)t.target;
+				if ( epsilonTarget.endOfBlockStateNumber==State.INVALID_STATE_NUMBER &&
+					 epsilonTarget.transition(0)!=null )
+				{
+					s.setTransition0(epsilonTarget.transition(0));
+					/*
+					System.out.println("### opt "+s.stateNumber+"->"+
+									   epsilonTarget.transition(0).target.stateNumber);
+					*/									   
+				}
+			}
+			s = (NFAState)t.target;
+		}
+	}
 
 	/** From label A build Graph o-A->o */
 	public StateCluster build_Atom(int label) {
@@ -275,8 +315,30 @@ public class NFAFactory {
         if ( B==null ) {
             return A;
         }
-        transitionBetweenStates(A.right, B.left, Label.EPSILON);
-        StateCluster g = new StateCluster(A.left, B.right);
+		/*
+		Transition ATrans = A.left.transition(0);
+		Transition BTrans = B.left.transition(0);
+		boolean AruleOrTokenRef =
+			(ATrans.target==A.right && ATrans.label.isAtom()) ||
+		    (ATrans instanceof RuleClosureTransition &&
+			 ((RuleClosureTransition)ATrans).getFollowState()==A.right);
+		boolean BruleOrTokenRef =
+			(BTrans.target==B.right && BTrans.label.isAtom()) ||
+		    (BTrans instanceof RuleClosureTransition &&
+			 ((RuleClosureTransition)BTrans).getFollowState()==B.right);
+		System.out.println("AruleOrTokenRef="+AruleOrTokenRef);
+		System.out.println("BruleOrTokenRef="+BruleOrTokenRef);
+		if ( AruleOrTokenRef && BruleOrTokenRef )
+		{
+            System.out.println("### opt "+A.right.stateNumber+"->"+B.left.stateNumber);
+			A.right.setTransition0(B.left.transition(0));
+		}
+        else {
+			transitionBetweenStates(A.right, B.left, Label.EPSILON);
+		}
+        */
+		transitionBetweenStates(A.right, B.left, Label.EPSILON);
+		StateCluster g = new StateCluster(A.left, B.right);
         return g;
     }
 
@@ -310,7 +372,18 @@ public class NFAFactory {
             return null;
         }
 
-        // even if we can collapse for lookahead purposes, we will still
+		// single alt case
+		if ( alternativeStateClusters.size()==1 ) {
+			// single alt, no decision, just return only alt state cluster
+			StateCluster g = (StateCluster)alternativeStateClusters.get(0);
+			NFAState startOfAlt = newState(); // must have this no matter what
+			transitionBetweenStates(startOfAlt, g.left, Label.EPSILON);
+
+			//System.out.println("### opt saved start/stop end in (...)");
+			return new StateCluster(startOfAlt,g.right);
+		}
+
+		// even if we can collapse for lookahead purposes, we will still
         // need to predict the alts of this subrule in case there are actions
         // etc...  This is the decision that is pointed to from the AST node
         // (always)
@@ -361,21 +434,29 @@ public class NFAFactory {
         int n = nfa.grammar.getNumberOfAltsForDecisionNFA(A.left);
         if ( n==1 ) {
             // no decision, just wrap in an optional path
-            NFAState emptyAlt = newState();
-            NFAState realAlt = newState();
-            realAlt.setDescription("only alt of ()? block");
+            NFAState decisionState = newState();
+			decisionState.setDescription("only alt of ()? block");
+			NFAState emptyAlt = newState();
             emptyAlt.setDescription("epsilon path of ()? block");
-            NFAState blockEndNFAState = newState();
-            blockEndNFAState.setDescription("end ()? block");
-            transitionBetweenStates(realAlt, A.left, Label.EPSILON);
-            transitionBetweenStates(realAlt, emptyAlt, Label.EPSILON);
+            NFAState blockEndNFAState = null;
+			if ( A.right.getNumberOfTransitions()==0 ) {
+				blockEndNFAState = A.right;
+				// System.out.println("### opt saved block end in (...)?");
+			}
+			else {
+				// must have a loop back, have to create new block end
+				blockEndNFAState = newState();
+				transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
+			}
+			blockEndNFAState.setDescription("end ()? block");
+            transitionBetweenStates(decisionState, A.left, Label.EPSILON);
+            transitionBetweenStates(decisionState, emptyAlt, Label.EPSILON);
             transitionBetweenStates(emptyAlt, blockEndNFAState, Label.EPSILON);
-            transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
 
 			// set EOB markers for Jean
-			realAlt.endOfBlockStateNumber = blockEndNFAState.stateNumber;
+			decisionState.endOfBlockStateNumber = blockEndNFAState.stateNumber;
 
-            g = new StateCluster(realAlt, blockEndNFAState);
+            g = new StateCluster(decisionState, blockEndNFAState);
         }
         else {
             // a decision block, add an empty alt
@@ -451,17 +532,17 @@ public class NFAFactory {
      *  determination.  The antlr.codegen.g
      */
     public StateCluster build_Astar(StateCluster A) {
-		NFAState realAlt = newState();
-		realAlt.setDescription("enter loop path of ()* block");
+		NFAState bypassDecisionState = newState();
+		bypassDecisionState.setDescription("enter loop path of ()* block");
         NFAState optionalAlt = newState();
         optionalAlt.setDescription("epsilon path of ()* block");
         NFAState blockEndNFAState = newState();
 		// convert A's end block to loopback
 		A.right.setDescription("()* loopback");
         // Transition 1 to actual block of stuff
-        transitionBetweenStates(realAlt, A.left, Label.EPSILON);
+        transitionBetweenStates(bypassDecisionState, A.left, Label.EPSILON);
         // Transition 2 optional to bypass
-        transitionBetweenStates(realAlt, optionalAlt, Label.EPSILON);
+        transitionBetweenStates(bypassDecisionState, optionalAlt, Label.EPSILON);
 		transitionBetweenStates(optionalAlt, blockEndNFAState, Label.EPSILON);
         // Transition 1 of end block exits
         transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
@@ -470,9 +551,9 @@ public class NFAFactory {
 
 		// set EOB markers for Jean
 		A.left.endOfBlockStateNumber = A.right.stateNumber;
-		realAlt.endOfBlockStateNumber = blockEndNFAState.stateNumber;
+		bypassDecisionState.endOfBlockStateNumber = blockEndNFAState.stateNumber;
 
-        StateCluster g = new StateCluster(realAlt, blockEndNFAState);
+        StateCluster g = new StateCluster(bypassDecisionState, blockEndNFAState);
         return g;
     }
 
