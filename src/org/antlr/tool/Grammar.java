@@ -464,8 +464,8 @@ public class Grammar {
 				*/
 				DFA lookaheadDFA = new DFA(decisionStartState);
 				if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
-					Map options = getDecisionOptions(decision);
-					options.put("k", new Integer(1)); // set k=1 option and try again
+					// set k=1 option and try again
+					setDecisionOption(decision, "k", new Integer(1));
 					lookaheadDFA = new DFA(decisionStartState);
 				}
 
@@ -1052,6 +1052,16 @@ public class Grammar {
 	public void setDecisionOptions(int decision, Map options) {
 		Decision d = createDecision(decision);
 		d.options = options;
+	}
+
+	public void setDecisionOption(int decision, String name, Object value) {
+		Decision d = getDecision(decision);
+		if ( d!=null ) {
+			if ( d.options==null ) {
+				d.options = new HashMap();
+			}
+			d.options.put(name,value);
+		}
 	}
 
     /** How many token types have been allocated so far? */

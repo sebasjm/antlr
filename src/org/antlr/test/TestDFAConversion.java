@@ -62,8 +62,8 @@ public class TestDFAConversion extends TestSuite {
 			"a : A B | A C;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-B->:s2=>1\n" +
-			".s1-C->:s3=>2\n";
+			".s1-B->:s3=>1\n" +
+			".s1-C->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -73,14 +73,12 @@ public class TestDFAConversion extends TestSuite {
 			"a : A a X | A a Y;");
 		// nondeterministic from left edge; no stop state
 		String expecting =
-			".s0-A->.s1\n" +
-			".s1-A->.s2\n" +
-			".s2-A->.s3\n";
-		int[] unreachableAlts = new int[] {1,2};
-		int[] nonDetAlts = null;
+			".s0-A->:s1=>1\n"; // gets this after failing to do LL(*)
+		int[] unreachableAlts = new int[] {2};
+		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = null;
 		int[] danglingAlts = new int[] {1,2};
-		int numWarnings = 2;
+		int numWarnings = 3;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -171,8 +169,8 @@ public class TestDFAConversion extends TestSuite {
 			"a : A a | A B;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-A->:s2=>1\n" +
-			".s1-B->:s3=>2\n";
+			".s1-A->:s3=>1\n" +
+			".s1-B->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -424,26 +422,25 @@ public class TestDFAConversion extends TestSuite {
 	}
 
 	public void testIndirectIFThenElseStyleAmbig() throws Exception {
-		// the (c)+ loopback is ambig because it could match "CASE E"
+		// the (c)+ loopback is ambig because it could match "CASE"
 		// by entering the loop or by falling out and ignoring (s)*
 		// back falling back into (cg)* loop which stats over and
 		// calls cg again.  Either choice allows it to get back to
 		// the same node.  The software catches it as:
-		// "avoid infinite closure computation emanating from alt 1 of ():27|2|[8 $]"
-		// where state 27 is the first alt of (c)+ and 8 is the first alt
-		// of the (cg)* loop.
+		// "avoid infinite closure computation emanating from alt 1
+		// of ():27|2|[8 $]" where state 27 is the first alt of (c)+
+		// and 8 is the first alt of the (cg)* loop.
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
 			"s : LCURLY ( cg )* RCURLY | E SEMI  ;\n" +
 			"cg : (c)+ (s)* ;\n" +
 			"c : CASE E ;\n");
 		String expecting =
-			".s0-CASE->.s2\n" +
-			".s0-LCURLY..E->:s1=>2\n" +
-			".s2-E->:s3=>1\n";
+			".s0-CASE->:s2=>1\n" +
+			".s0-LCURLY..E->:s1=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = new int[] {1,2};
-		String ambigInput = "CASE E";
+		String ambigInput = "CASE";
 		int[] danglingAlts = null;
 		int numWarnings = 1;
 		checkDecision(g, 3, expecting, unreachableAlts,
@@ -510,7 +507,7 @@ public class TestDFAConversion extends TestSuite {
 			"a : A | B | C ;"
 		);
 		String expecting =
-			" ( grammar t ( rule a ARG RET INITACTION ( BLOCK ( ALT ( SET A B C ) EOA ) EOB ) <end-of-rule> ) )";
+			" ( grammar t ( rule a ARG RET INITACTION ( BLOCK ( ALT ( SET A B C ) EOA ) <end-of-block> ) <end-of-rule> ) )";
 		assertEqual(g.getGrammarTree().toStringTree(),
 					expecting);
 	}
@@ -545,19 +542,19 @@ public class TestDFAConversion extends TestSuite {
 		checkDecision(g, 3, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 		/* There are 2 nondet errors, but the checkDecision only checks first one :(
-		   The "B" conflicting input is not checked except by virtue of the
-		   result DFA.
+		The "B" conflicting input is not checked except by virtue of the
+		result DFA.
 <string>:2:5: Decision can match input such as "A" using multiple alternatives:
-  alt 1 via NFA path 7,2,3
-  alt 2 via NFA path 14,9,10
-  alt 3 via NFA path 16,17
+alt 1 via NFA path 7,2,3
+alt 2 via NFA path 14,9,10
+alt 3 via NFA path 16,17
 As a result, alternative(s) 2,3 were disabled for that input,
 <string>:2:5: Decision can match input such as "B" using multiple alternatives:
-  alt 1 via NFA path 7,8,4,5
-  alt 2 via NFA path 14,15,11,12
+alt 1 via NFA path 7,8,4,5
+alt 2 via NFA path 14,15,11,12
 As a result, alternative(s) 2 were disabled for that input
 <string>:2:5: The following alternatives are unreachable: 2,3
-		*/
+*/
 	}
 
 	public void testMultipleAltsSameSequenceCollision() throws Exception {
@@ -620,9 +617,9 @@ As a result, alternative(s) 2 were disabled for that input
 		String expecting =
 			".s0-ID->:s5=>3\n" +
 			".s0-L->.s1\n" +
-			".s1-ID->.s3\n" +
-			".s1-L->:s2=>2\n" +
-			".s3-R->:s4=>1\n";
+			".s1-ID->.s2\n" +
+			".s1-L->:s4=>2\n" +
+			".s2-R->:s3=>1\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = "L ID R";
@@ -651,11 +648,11 @@ As a result, alternative(s) 2 were disabled for that input
 			"    |   L a R\n" +
 			"    ;");
 		String expecting =
-			".s0-ID->:s2=>2\n" +
+			".s0-ID->:s4=>2\n" +
 			".s0-L->.s1\n" +
-			".s1-ID->.s3\n" +
-			".s1-L->:s2=>2\n" +
-			".s3-R->:s4=>1\n";
+			".s1-ID->.s2\n" +
+			".s1-L->:s4=>2\n" +
+			".s2-R->:s3=>1\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = "L ID R";
@@ -739,8 +736,8 @@ As a result, alternative(s) 2 were disabled for that input
 		}
 		else {
 			assertTrue(unreachableAlts.size()==0,
-					"unreachable alts mismatch; expecting none found "+
-					unreachableAlts);
+					   "unreachable alts mismatch; expecting none found "+
+					   unreachableAlts);
 		}
 
 		// check conflicting input
@@ -765,7 +762,7 @@ As a result, alternative(s) 2 were disabled for that input
 										str(expectingNonDetAlts));
 			List nonDetAlts =
 				nondetMsg.probe.getNonDeterministicAltsForState(nondetMsg.problemState);
-            // compare nonDetAlts with expectingNonDetAlts
+			// compare nonDetAlts with expectingNonDetAlts
 			BitSet s = new BitSet();
 			s.addAll(expectingNonDetAlts);
 			BitSet s2 = new BitSet();
