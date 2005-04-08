@@ -54,15 +54,34 @@ public class CommonTokenStream implements TokenStream {
 
 	/** Skip tokens on any channel but this one; this is how we skip whitespace... */
 	protected int channel = Token.DEFAULT_CHANNEL;
-    protected int p = 0;
+
+	/** By default, track all incoming tokens */
+	protected boolean discardOffChannelTokens = false;
+
+	/** The index into the tokens list of the current token (next token
+     *  to consume).  p==-1 indicates that the tokens list is empty
+     */
+    protected int p = -1;
+
+	public CommonTokenStream() {
+		tokens = new ArrayList(500);
+	}
 
 	public CommonTokenStream(TokenSource tokenSource) {
+	    this();
 		this.tokenSource = tokenSource;
 	}
 
 	public CommonTokenStream(TokenSource tokenSource, int channel) {
-		this.tokenSource = tokenSource;
+		this(tokenSource);
 		this.channel = channel;
+	}
+
+	/** Reset this token stream by setting its token source. */
+	public void setTokenSource(TokenSource tokenSource) {
+		this.tokenSource = tokenSource;
+		p = -1;
+		channel = Token.DEFAULT_CHANNEL;
 	}
 
 	/** Load all tokens from the token source and put in tokens.
@@ -70,12 +89,9 @@ public class CommonTokenStream implements TokenStream {
 	 *  set some token type / channel overrides before filling buffer.
 	 */
 	protected void fillBuffer() {
-		tokens = new ArrayList(500);
 		int index = 0;
 		Token t = tokenSource.nextToken();
 		while ( t!=null && t.getType()!=CharStream.EOF ) {
-			t.setTokenIndex(index);
-			tokens.add(t);
 			// is there a channel override for token type?
 			if ( channelOverrideMap!=null ) {
 				Integer channelI = (Integer)
@@ -84,36 +100,16 @@ public class CommonTokenStream implements TokenStream {
 					t.setChannel(channelI.intValue());
 				}
 			}
+			if ( !(discardOffChannelTokens && t.getChannel()!=this.channel) ) {
+				t.setTokenIndex(index);
+				tokens.add(t);
+				index++;
+			}
 			t = tokenSource.nextToken();
-			index++;
 		}
 		// leave p pointing at first token on channel
 		p = 0;
 		p = skipOffTokenChannels(p);
-		/*
-		filteredTokens = new ArrayList(500);
-		int index = 0;
-        // suck in all the input tokens
-        Token t = tokenSource.nextToken();
-        while ( t!=null && t.getType()!=CharStream.EOF ) {
-			t.setTokenIndex(index);
-            tokens.add(t);
-			// is there a channel override for token type?
-			if ( channelOverrideMap!=null ) {
-				Integer channelI = (Integer)
-					channelOverrideMap.get(new Integer(t.getType()));
-				if ( channelI!=null ) {
-					t.setChannel(channelI.intValue());
-				}
-			}
-			// ignore tokens on different channel
-			if ( t.getChannel()==channel ) {
-				filteredTokens.add(t);
-			}
-            t = tokenSource.nextToken();
-			index++;
-        }
-		*/
     }
 
 	/** Move the input pointer to the next incoming token.  The stream
@@ -161,11 +157,15 @@ public class CommonTokenStream implements TokenStream {
         channelOverrideMap.put(new Integer(ttype), new Integer(channel));
 	}
 
+	public void discardOffChannelTokens(boolean discardOffChannelTokens) {
+		this.discardOffChannelTokens = discardOffChannelTokens;
+	}
+
 	/** Get the ith token from the current position 1..n where k=1 is the
 	 *  first symbol of lookahead.
 	 */
 	public Token LT(int k) {
-		if ( tokens==null ) {
+		if ( p == -1 ) {
 			fillBuffer();
 		}
 		if ( k==0 ) {
@@ -192,7 +192,7 @@ public class CommonTokenStream implements TokenStream {
 
 	/** Look backwards k tokens on-channel tokens */
 	protected Token LB(int k) {
-		if ( tokens==null ) {
+		if ( p == -1 ) {
 			fillBuffer();
 		}
 		if ( k==0 ) {
@@ -280,7 +280,7 @@ public class CommonTokenStream implements TokenStream {
 	}
 
 	public String toString() {
-		if ( tokens==null ) {
+		if ( p == -1 ) {
 			fillBuffer();
 		}
  		StringBuffer buf = new StringBuffer();
