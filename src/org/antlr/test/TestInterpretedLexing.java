@@ -167,8 +167,8 @@ public class TestInterpretedLexing extends TestSuite {
 
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
 		String result = tokens.toString();
-		System.out.println(result);
-		String expecting = "[123/<2>,1:0] [ /<4>,1:3] [139.52/<3>,1:4]";
+		//System.out.println(result);
+		String expecting = "[0:123,<2>,1:0] [1: ,<4>,1:3] [2:139.52,<3>,1:4]";
 		assertEqual(result,expecting);
 	}
 
