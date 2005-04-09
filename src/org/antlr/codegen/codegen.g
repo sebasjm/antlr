@@ -79,9 +79,6 @@ options {
     protected StringTemplate outputFileST;
     protected StringTemplate headerFileST;
 
-    /** DFAs might be in different file, have separate pointer */
-    protected StringTemplate cyclicDFAST;
-
     protected void init(Grammar g) {
         this.grammar = g;
         this.generator = grammar.getCodeGenerator();
@@ -89,42 +86,8 @@ options {
     }
 }
 
-/*
 grammar[Grammar g,
         StringTemplate recognizerST,
-        StringTemplate cyclicDFAST,  // in case DFAs go in separate file
-        StringTemplate outputFileST,
-        StringTemplate headerFileST]
-{
-    String name;
-    init(g);
-    this.recognizerST = recognizerST;
-    this.outputFileST = outputFileST;
-    this.headerFileST = headerFileST;
-    this.cyclicDFAST = cyclicDFAST;
-    if ( cyclicDFAST==null ) {
-    	this.cyclicDFAST = recognizerST;
-    }
-}
-    :   (headerSpec[outputFileST])*
-        #(  . // don't care about grammar type
-            name=id
-            (cmt:DOC_COMMENT {outputFileST.setAttribute("docComment", #cmt.getText());} )?
-            {
-            recognizerST.setAttribute("name", name);
-            outputFileST.setAttribute("name", name);
-            headerFileST.setAttribute("name", name);
-            }
-            ( #(OPTIONS .) )?
-            ( #(TOKENS .) )?
-            rules[recognizerST]
-         )
-    ;
-    */
-
-grammar[Grammar g,
-        StringTemplate recognizerST,
-        StringTemplate cyclicDFAST,  // in case DFAs go in separate file
         StringTemplate outputFileST,
         StringTemplate headerFileST]
 {
@@ -132,10 +95,6 @@ grammar[Grammar g,
     this.recognizerST = recognizerST;
     this.outputFileST = outputFileST;
     this.headerFileST = headerFileST;
-    this.cyclicDFAST = cyclicDFAST;
-    if ( cyclicDFAST==null ) {
-    	this.cyclicDFAST = recognizerST;
-    }
 }
     :   (headerSpec[outputFileST])*
 	    ( #( LEXER_GRAMMAR grammarSpec )
@@ -259,7 +218,7 @@ block[String blockTemplateName, DFA dfa]
     StringTemplate decision = null;
     if ( dfa!=null ) {
         code = templates.getInstanceOf(blockTemplateName);
-        decision = generator.genLookaheadDecision(cyclicDFAST,dfa);
+        decision = generator.genLookaheadDecision(recognizerST,dfa);
         code.setAttribute("decision", decision);
         code.setAttribute("decisionNumber", dfa.getDecisionNumber());
 		code.setAttribute("maxK",generator.getMaxLookaheadDepth(dfa.getDecisionNumber()));

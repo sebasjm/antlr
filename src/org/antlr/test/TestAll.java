@@ -14,10 +14,6 @@ public class TestAll extends TestSuite {
 		System.out.println("successes: "+test.getSuccesses());
 		System.out.println("failures: "+test.getFailures());
 
-		test = TestRig.runAllTests(TestCyclicDFAByteCode.class);
-		System.out.println("successes: "+test.getSuccesses());
-		System.out.println("failures: "+test.getFailures());
-
 		test = TestRig.runAllTests(TestIntervalSet.class);
 		System.out.println("successes: "+test.getSuccesses());
 		System.out.println("failures: "+test.getFailures());

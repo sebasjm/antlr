@@ -40,7 +40,6 @@ import org.antlr.misc.*;
 import org.antlr.misc.BitSet;
 import org.antlr.Tool;
 import org.antlr.runtime.Token;
-import org.antlr.codegen.bytecode.ClassFile;
 import antlr.collections.AST;
 import antlr.RecognitionException;
 import antlr.TokenWithIndex;
@@ -61,17 +60,6 @@ import antlr.TokenWithIndex;
  *  a new target w/o even recompiling ANTLR itself.  The language=X option
  *  in a grammar file dictates which templates get loaded/used.
  *
- *  Some language need to handle cyclic DFAs differently than acyclic DFAs
- *  such as Java because it lacks a goto.  I had to build a set of templates
- *  that spit out bytecodes instead of Java (then I had to build the
- *  org.antlr.codegen.bytecode.* classes).  If you need to do them differently,
- *  define X_cyclicdfa.stg and the CodeGenerator will load that too else
- *  the cyclicDFATemplates just points at the normal templates.  There is
- *  a bit of overlap in the template names such as lookaheadTest.  The same
- *  code generation logic generations the edges for cyclic and acyclic DFAs
- *  so the X_cyclicdfa.stg file overrides those templates.  The CodeGenerator
- *  sets up X_cyclicdfa as a subgroup of X.
- *
  *  Some language like C need both parser files and header files.  Java needs
  *  to have a separate file for the cyclic DFA as ANTLR generates bytecodes
  *  directly (which cannot be in the generated parser Java file).  To facilitate
@@ -81,9 +69,6 @@ import antlr.TokenWithIndex;
  *  is in outptufile.
  */
 public class CodeGenerator {
-	// TODO move this and the templates to a separate file?
-    public static final String VOCAB_FILE_EXTENSION = ".tokens";
-
 	/** When generating SWITCH statements, some targets might need to limit
 	 *  the size (based upon the number of case labels).  Generally, this
 	 *  limit will be hit only for lexers where wildcard in a UNICODE
@@ -126,20 +111,6 @@ public class CodeGenerator {
 	/** Where are the templates this generator should use to generate code? */
 	protected StringTemplateGroup templates;
 
-	/** Where are the cyclic DFA templates this generator should
-	 *  use to generate code?  We separate out the cyclic ones because
-	 *  they could be very much more complicated than fixed lookahead.
-	 *  For example, the java target generates bytecodes directly.
-	 *  This group is set up as a subgroup of templates so you can override
-	 *  just the templates that are different.
-	 */
-	protected StringTemplateGroup cyclicDFATemplates;
-
-	/** The generated cyclic DFAs; need to be able to access from outside
-	 *  to check bytecode gen for Java etc...
-	 */
-	protected StringTemplate cyclicDFAST = null;
-
 	protected StringTemplate recognizerST;
 	protected StringTemplate outputFileST;
 	protected StringTemplate headerFileST;
@@ -162,16 +133,8 @@ public class CodeGenerator {
 	protected CyclicDFACodeGenerator cyclicDFAGenerator =
 		new CyclicDFACodeGenerator(this);
 
-	/** When generating code for DFAs (cyclic or otherwise), sometimes
-	 *  semantic predicates are required to predict alternatives.  Predicates
-	 *  in acyclic DFAs are evaluated in-line but cyclic DFAs are generated
-	 *  in bytecodes for the Java target.  The predicates need to be compiled
-	 *  somewhere so I put them in the recognizer as methods for the bytecodes
-	 *  to call.
-	 */
-	protected List semanticPredicateMethodsFromCyclicDFAs = new ArrayList();
-
 	// TODO move to separate file
+    public static final String VOCAB_FILE_EXTENSION = ".tokens";
 	protected final String vocabFilePattern =
             "<tokens:{<attr.name>=<attr.type>\n}>" +
             "<literals:{<attr.name>=<attr.type>\n}>";
@@ -186,7 +149,6 @@ public class CodeGenerator {
         this.grammar = grammar;
 		loadLanguageTarget(language);
         loadTemplates(language);
-		loadCyclicDFATemplates(language);
 	}
 
 	protected void loadLanguageTarget(String language) {
@@ -238,48 +200,15 @@ public class CodeGenerator {
 		}
 	}
 
-	protected void loadCyclicDFATemplates(String language) {
-		// now load language_dfa.stg if available, else just use main .stg
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		String templateFileName = "org/antlr/codegen/templates/"+language+"_cyclicdfa.stg";
-		InputStream is = cl.getResourceAsStream(templateFileName);
-		if ( is!=null ) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			cyclicDFATemplates =
-				new StringTemplateGroup(br,
-										AngleBracketTemplateLexer.class,
-										ErrorManager.getStringTemplateErrorListener());
-			// cyclic inherits from main X.stg templates so you can define
-			// just the templates that are different
-			cyclicDFATemplates.setSuperGroup(templates); // who's your daddy? ;)
-			try {
-				br.close();
-			}
-			catch (IOException ioe) {
-				ErrorManager.error(ErrorManager.MSG_CANNOT_CLOSE_FILE,
-								   templateFileName);
-			}
-		}
-		else {
-			cyclicDFATemplates = templates;
-		}
-		if ( cyclicDFATemplates.getInstanceOf("cyclicDFA")==null ) {
-			ErrorManager.error(ErrorManager.MSG_MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES,
-							   language);
-		}
-	}
-
     /** Given the grammar to which we are attached, walk the AST associated
      *  with that grammar to create NFAs.  Then create the DFAs for all
      *  decision points in the grammar by converting the NFAs to DFAs.
      *  Finally, walk the AST again to generate code.
 	 *
-	 *  Either 1, 2, or 3 files are written:
+	 *  Either 1 or 2 files are written:
 	 *
 	 * 		recognizer: the main parser/lexer/treewalker item
 	 * 		header file: language like C/C++ need extern definitions
-	 * 		cyclic DFAs: might need cyclic DFAs in separate file; e.g., Java
-	 * 				     generates bytecode directly to access goto instr.
 	 *
 	 *  The target, such as JavaTarget, dictates which files get written.
      */
@@ -326,15 +255,6 @@ public class CodeGenerator {
 		}
 		outputFileST.setAttribute("recognizer", recognizerST);
 
-		// CYCLIC DFAs
-		// Cyclic DFAs go into main recognizer ST by default
-		cyclicDFAST = getCyclicDFATemplates().getInstanceOf("allCyclicDFAs");
-		cyclicDFAST = target.chooseWhereCyclicDFAsGo(tool,
-													 this,
-													 grammar,
-													 recognizerST,
-													 cyclicDFAST);
-
 		// GENERATE RECOGNIZER
 		// Walk the AST holding the input grammar, this time generating code
 		// Decisions are generated by using the precomputed DFAs
@@ -344,7 +264,6 @@ public class CodeGenerator {
 			gen.grammar((AST)grammar.getGrammarTree(),
 						grammar,
 						recognizerST,
-						cyclicDFAST, // might point at recognizerST
 						outputFileST,
 						headerFileST);
 		}
@@ -352,12 +271,6 @@ public class CodeGenerator {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
-		recognizerST.setAttribute("predicates",
-								  semanticPredicateMethodsFromCyclicDFAs);
-		headerFileST.setAttribute("predicates",
-								  semanticPredicateMethodsFromCyclicDFAs);
-		outputFileST.setAttribute("predicates",
-								  semanticPredicateMethodsFromCyclicDFAs);
 		genTokenTypeConstants(recognizerST);
 		genTokenTypeConstants(outputFileST);
 		genTokenTypeConstants(headerFileST);
@@ -372,7 +285,6 @@ public class CodeGenerator {
 		try {
 			target.genRecognizerFile(tool,this,grammar,outputFileST);
 			target.genRecognizerHeaderFile(tool,this,grammar,headerFileST);
-			target.genCyclicDFAFile(tool, this, grammar, cyclicDFAST);
 			// write out the vocab interchange file; used by antlr,
 			// does not change per target
 			StringTemplate tokenVocabSerialization = genTokenVocabOutput();
@@ -482,12 +394,11 @@ public class CodeGenerator {
 	// L O O K A H E A D  D E C I S I O N  G E N E R A T I O N
 
     /** Generate code that computes the predicted alt given a DFA.  The
-	 *  cyclicDFATemplate can be either the main generated recognizerTemplate
+	 *  recognizerST can be either the main generated recognizerTemplate
 	 *  for storage in the main parser file or a separate file.  It's up to
-	 *  the code that ultimately invokes the codegen.g grammar rule (you pass
-	 *  in where you want all cyclic DFAs to be stored).
+	 *  the code that ultimately invokes the codegen.g grammar rule.
 	 */
-	public StringTemplate genLookaheadDecision(StringTemplate cyclicDFATemplate,
+	public StringTemplate genLookaheadDecision(StringTemplate recognizerST,
                                                DFA dfa)
     {
         StringTemplate decisionST;
@@ -497,10 +408,10 @@ public class CodeGenerator {
         }
         else {
             StringTemplate dfaST =
-				cyclicDFAGenerator.genCyclicLookaheadDecision(getCyclicDFATemplates(),
+				cyclicDFAGenerator.genCyclicLookaheadDecision(templates,
 															  dfa);
-            cyclicDFATemplate.setAttribute("cyclicDFAs", dfaST);
-            decisionST = cyclicDFATemplates.getInstanceOf("dfaDecision");
+            recognizerST.setAttribute("cyclicDFAs", dfaST);
+            decisionST = templates.getInstanceOf("dfaDecision");
 			String description = dfa.getNFADecisionStartState().getDescription();
 			if ( description!=null ) {
 				description = Utils.replace(description,"\"", "\\\"");
@@ -866,29 +777,12 @@ public class CodeGenerator {
 		return templates;
 	}
 
-	/** If cyclic DFAs generate bytecode, this will return the ST with the
-	 *  generated code if genRecognizer() has been invoked previously.
-	 */
-	public StringTemplate getCyclicDFAByteCodeST() {
-		if ( cyclicDFATemplates!=null ) {
-			return cyclicDFAST;
-		}
-		return null;
-	}
-
 	public void setOutputDirectory(String o) {
 		outputDirectory = o;
 	}
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
-	}
-
-	public StringTemplateGroup getCyclicDFATemplates() {
-		if ( cyclicDFATemplates!=null ) {
-			return cyclicDFATemplates;
-		}
-		return getTemplates(); // return main template lib if no special dfa one
 	}
 
 	public String getRecognizerFileName() {

@@ -175,7 +175,6 @@ public class CyclicDFACodeGenerator {
 					predMethodST.setAttribute("edgeNumber", i+1);
 					StringTemplate predEvalST = semCtx.genExpr(templates);
 					predMethodST.setAttribute("pred", predEvalST);
-					parent.semanticPredicateMethodsFromCyclicDFAs.add(predMethodST);
 					// we've computed a method to eval pred, now dump bytecodes
 					// to invoke method
 					exprST = templates.getInstanceOf("invokePredicate");

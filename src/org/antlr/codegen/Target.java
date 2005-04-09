@@ -49,24 +49,6 @@ public class Target {
 		// no header file by default
 	}
 
-	protected void genCyclicDFAFile(Tool tool,
-									CodeGenerator generator,
-									Grammar grammar,
-									StringTemplate cyclicDFAST)
-		throws IOException
-	{
-		// cyclic DFAs go into recognizerST by default
-	}
-
-	protected StringTemplate chooseWhereCyclicDFAsGo(Tool tool,
-													 CodeGenerator generator,
-													 Grammar grammar,
-													 StringTemplate recognizerST,
-													 StringTemplate cyclicDFAST)
-	{
-		return recognizerST; // by default cyclic DFAs go in recognizer itself
-	}
-
 	protected void performGrammarAnalysis(CodeGenerator generator,
 										  Grammar grammar)
 	{
