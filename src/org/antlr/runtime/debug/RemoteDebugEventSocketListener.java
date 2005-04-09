@@ -253,6 +253,10 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		String lineS = elements[offset+3];
 		String posS = elements[offset+4];
 		String text = elements[offset+5];
+		// this unescape is slow but easy to understand
+		text = text.replaceAll("%0A","\n");  // unescape \n
+		text = text.replaceAll("%0D","\r");  // unescape \r
+		text = text.replaceAll("%25","%");   // undo escaped escape chars
 		ProxyToken t =
 			new ProxyToken(Integer.parseInt(indexS),
 						   Integer.parseInt(typeS),

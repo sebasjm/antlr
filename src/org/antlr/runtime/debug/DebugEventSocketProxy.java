@@ -141,7 +141,11 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		if ( txt==null ) {
 			txt = "";
 		}
-		txt = txt.replaceAll("\n"," ");
+		// escape \n and \r all text for token appears to exist on one line
+		// this escape is slow but easy to understand
+		txt = txt.replaceAll("%","%25");   // escape all escape char ;)
+		txt = txt.replaceAll("\n","%0A");  // escape \n
+		txt = txt.replaceAll("\r","%0D");  // escape \r
 		buf.append(txt);
 		return buf.toString();
 	}
