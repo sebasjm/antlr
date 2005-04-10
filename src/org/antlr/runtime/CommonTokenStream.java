@@ -29,10 +29,7 @@ package org.antlr.runtime;
 
 import org.antlr.tool.Grammar;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /** The most common stream of tokens is one where every token is buffered up
  *  and tokens are prefiltered for a certain channel (the parser will only
@@ -51,6 +48,9 @@ public class CommonTokenStream implements TokenStream {
 
 	/** Map<tokentype, channel> to override some Tokens' channel numbers */
 	protected Map channelOverrideMap;
+
+	/** Set<tokentype>; discard any tokens with this type */
+	protected Set discardSet;
 
 	/** Skip tokens on any channel but this one; this is how we skip whitespace... */
 	protected int channel = Token.DEFAULT_CHANNEL;
@@ -92,15 +92,24 @@ public class CommonTokenStream implements TokenStream {
 		int index = 0;
 		Token t = tokenSource.nextToken();
 		while ( t!=null && t.getType()!=CharStream.EOF ) {
+			boolean discard = false;
+			if ( discardSet!=null &&
+				 discardSet.contains(new Integer(t.getType())) )
+			{
+				discard = true;
+			}
+			else if ( discardOffChannelTokens && t.getChannel()!=this.channel ) {
+				discard = true;
+			}
 			// is there a channel override for token type?
-			if ( channelOverrideMap!=null ) {
+			else if ( channelOverrideMap!=null ) {
 				Integer channelI = (Integer)
 					channelOverrideMap.get(new Integer(t.getType()));
 				if ( channelI!=null ) {
 					t.setChannel(channelI.intValue());
 				}
 			}
-			if ( !(discardOffChannelTokens && t.getChannel()!=this.channel) ) {
+			if ( !discard )	{
 				t.setTokenIndex(index);
 				tokens.add(t);
 				index++;
@@ -157,6 +166,13 @@ public class CommonTokenStream implements TokenStream {
         channelOverrideMap.put(new Integer(ttype), new Integer(channel));
 	}
 
+	public void discardTokenType(int ttype) {
+		if ( discardSet==null ) {
+			discardSet = new HashSet();
+		}
+        discardSet.add(new Integer(ttype));
+	}
+
 	public void discardOffChannelTokens(boolean discardOffChannelTokens) {
 		this.discardOffChannelTokens = discardOffChannelTokens;
 	}
@@ -186,6 +202,9 @@ public class CommonTokenStream implements TokenStream {
 			// skip off-channel tokens
 			i = skipOffTokenChannels(i+1); // leave p on valid token
 			n++;
+		}
+		if ( i>=tokens.size() ) {
+			return Token.EOFToken;
 		}
         return (Token)tokens.get(i);
     }
