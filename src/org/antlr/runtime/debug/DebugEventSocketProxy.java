@@ -107,7 +107,8 @@ public class DebugEventSocketProxy implements DebugEventListener {
 	}
 
 	public void LT(int i, Token t) {
-		transmit("LT "+i+" "+serializeToken(t));
+        if(t != null)
+            transmit("LT "+i+" "+serializeToken(t));
 	}
 
 	public void mark(int i) {
