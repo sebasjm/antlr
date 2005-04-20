@@ -32,7 +32,7 @@ public class DebugEventSocketProxy implements DebugEventListener {
 			socket.setTcpNoDelay(true);
 			out = new PrintStream(socket.getOutputStream());
 			in = new DataInputStream(socket.getInputStream());
-			transmit("ANTLR 3.0 parser");
+			transmit("ANTLR 3.0ea1");
 		}
 	}
 
