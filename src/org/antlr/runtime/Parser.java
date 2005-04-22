@@ -48,10 +48,15 @@ public class Parser {
 	 */
 	protected boolean errorRecovery = false;
 
-
     public Parser(TokenStream input) {
-        this.input = input;
+        setTokenStream(input);
     }
+
+	/** Set the token stream and reset the parser */
+	public void setTokenStream(TokenStream input) {
+		this.input = input;
+		following.setSize(0);
+	}
 
     public TokenStream getTokenStream() {
 		return input;

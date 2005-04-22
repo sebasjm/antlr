@@ -46,11 +46,4 @@ public interface TokenSource {
 	 *  until you get a good one; errors are not passed through to the parser.
 	 */
 	public Token nextToken();
-
-	/** From what CharStream are you pulling tokens?  Without a CharStream
-	 *  it may be impossible to obtain the text for a token since the
-	 *  default ANTLR mechanism does not create String objects for each token.
-	 *  Instead the start/stop index into the CharStream is recorded.
-	 */ 
-	//public CharStream getCharStream();
 }

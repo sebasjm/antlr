@@ -27,14 +27,34 @@
 */
 package org.antlr.runtime;
 
-public abstract class Lexer implements TokenSource {
-    protected CharStream input;
-    protected Token token;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Iterator;
 
-	protected StringBuffer inputBuffer;
+public abstract class Lexer implements TokenSource {
+	/** Where is the lexer drawing characters from? */
+    protected CharStream input;
+
+	/** The goal of all lexer rules/methods is to create a token object.
+	 *  This is an instance variable as multiple rules may collaborate to
+	 *  create a single token.  For example, NUM : INT | FLOAT ;
+	 *  In this case, you want the INT or FLOAT rule to set token and not
+	 *  have it reset to a NUM token in rule NUM.
+	 */
+    protected Token token;
 
 	public Lexer(CharStream input) {
 		this.input = input;
+	}
+
+	/** Set the char stream and reset the lexer */
+	public void setCharStream(CharStream input) {
+		this.input = input;
+		token = null;
+	}
+
+	public void emit(Token token) {
+		this.token = token;
 	}
 
 	public void emit(int tokenType,
@@ -45,10 +65,6 @@ public abstract class Lexer implements TokenSource {
 		token.setLine(line);
 		token.setCharPositionInLine(charPosition);
 		emit(token);
-	}
-
-	public void emit(Token token) {
-		this.token = token;
 	}
 
     public void match(String s) throws MismatchedTokenException {
