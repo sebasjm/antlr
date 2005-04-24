@@ -78,11 +78,71 @@ public interface DebugEventListener {
 	/** A recognition exception occurred such as NoViableAltException.  I made
 	 *  this a generic event so that I can alter the exception hierachy later
 	 *  without having to alter all the debug objects.
+	 *
+	 *  Upon error, the stack of enter rule/subrule must be properly unwound.
+	 *  If no viable alt occurs it is within an enter/exit decision, which
+	 *  also must be rewound.  Even the rewind for each mark must be unwount.
+	 *  In the Java target this is pretty easy using try/finally, if a bit
+	 *  ugly in the generated code.  The rewind is generated in DFA.predict()
+	 *  actually so no code needs to be generated for that.  For languages
+	 *  w/o this "finally" feature (C++?), the target implementor will have
+	 *  to build an event stack or something.
+	 *
+	 *  Across a socket for remote debugging, only the RecognitionException
+	 *  data fields are transmitted.  The token object or whatever that
+	 *  caused the problem was the last object referenced by LT.  The
+	 *  immediately preceding LT event should hold the unexpected Token or
+	 *  char.
+	 *
+	 *  Here is a sample event trace for grammar:
+	 *
+	 *  b : C ({;}A|B) // {;} is there to prevent A|B becoming a set
+     *    | D
+     *    ;
+     *
+	 *  The sequence for this rule (with no viable alt in the subrule) for
+	 *  input 'c c' (there are 3 tokens) is:
+	 *
+	 *		commence
+	 *		LT(1)
+	 *		enterRule b
+	 *		location 7 1
+	 *		enter decision 3
+	 *		LT(1)
+	 *		exit decision 3
+	 *		enterAlt1
+	 *		location 7 5
+	 *		LT(1)
+	 *		consumeToken [c/<4>,1:0]
+	 *		location 7 7
+	 *		enterSubRule 2
+	 *		enter decision 2
+	 *		LT(1)
+	 *		LT(1)
+	 *		recognitionException NoViableAltException 2 1 2
+	 *		exit decision 2
+	 *		exitSubRule 2
+	 *		recover
+	 *		LT(1)
+	 *		consumeToken [c/<4>,1:1]
+	 *		LT(1)
+	 *		recovered
+	 *		LT(-1)
+	 *		exitRule b
+	 *		terminate
 	 */
 	public void recognitionException(RecognitionException e);
 
-	/** Indicates that the parser was in an error state and has now recovered
-	 *  in that a token, t, was successfully matched.  This will be useful
+	/** Indicates the recognizer is about to consume tokens to resynchronize
+	 *  the parser.  Any consume events from here until the recovered event
+	 *  are not part of the parse--they are dead tokens.
+	 */
+	public void recover();
+
+	/** Indicates that the recognizer has finished consuming tokens in order
+	 *  to resychronize.  There may be multiple recover/recovered pairs
+	 *  before the recognizer comes out of errorRecovery mode (in which
+	 *  multiple errors are suppressed).  This will be useful
 	 *  in a gui where you want to probably grey out tokens that are consumed
 	 *  but not matched to anything in grammar.  Anything between an exception
 	 *  and recovered() was tossed out by the parser.

@@ -29,8 +29,6 @@ package org.antlr.runtime;
 
 public class MismatchedTokenException extends RecognitionException {
 	public int expecting;
-	/** Track the mismatched token in case stream is not buffered */
-	public int found;
 
 	public MismatchedTokenException() {
 	}
@@ -38,10 +36,9 @@ public class MismatchedTokenException extends RecognitionException {
 	public MismatchedTokenException(int expecting, IntStream input) {
 		super(input);
 		this.expecting = expecting;
-		this.found = input.LA(1);
 	}
 
 	public String toString() {
-		return "MismatchedTokenException("+found+"!="+expecting+")";
+		return "MismatchedTokenException("+getUnexpectedType()+"!="+expecting+")";
 	}
 }

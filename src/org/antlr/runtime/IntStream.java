@@ -54,9 +54,4 @@ public interface IntStream {
 	 *  might be useful to display the entire stream or for testing.
 	 */
 	int size();
-
-	/** A string describing where these ints are coming from; most of the
-	 *  time this will be a file name.
-	String getSourceName();
-	 */
 }

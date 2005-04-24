@@ -31,18 +31,16 @@ import org.antlr.misc.IntSet;
 
 public class MismatchedSetException extends RecognitionException {
 	public IntSet expecting;
-	public int found;
 
-	public MismatchedSetException() {
-	}
+	/** Used for remote debugger deserialization */
+	public MismatchedSetException() {;}
 
 	public MismatchedSetException(IntSet expecting, IntStream input) {
 		super(input);
 		this.expecting = expecting;
-		this.found = input.LA(1);
 	}
 
 	public String toString() {
-		return "MismatchedSetException("+found+"!="+expecting+")";
+		return "MismatchedSetException("+getUnexpectedType()+"!="+expecting+")";
 	}
 }

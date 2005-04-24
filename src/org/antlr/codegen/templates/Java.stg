@@ -166,7 +166,7 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
     <ruleDescriptor.ruleLabels:{scope_<it.elementRef.text>_return <it.label.text>=null;}; separator="\n">
     <initAction>
 <if(debug)>
-    dbg.enterRule("<ruleName>");
+    try { dbg.enterRule("<ruleName>");
     dbg.location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
 <endif>
     try {
@@ -174,7 +174,6 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
     }
     catch (RecognitionException re) {
         reportError(re);
-        errorRecovery = true;
         recover(re);
     }
     finally {
@@ -183,7 +182,7 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
         retval.stop = input.LT(-1);
     }<\n>
 <if(debug)>
-    dbg.exitRule("<ruleName>");<\n>
+    } finally {dbg.exitRule("<ruleName>");}<\n>
 <endif>
 <if(ruleDescriptor.returnScope)>
     return retval;<\n>
@@ -225,15 +224,15 @@ dbg.enterAlt(1);<\n>
 block(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int alt<decisionNumber>=<maxAlt>;
 <decls>
-<if(debug)>dbg.enterSubRule(<decisionNumber>);<\n><endif>
-<if(debug)>dbg.enterDecision(<decisionNumber>);<\n><endif>
+<if(debug)>try { dbg.enterSubRule(<decisionNumber>);<\n><endif>
+<if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
 <decision>
-<if(debug)>dbg.exitDecision(<decisionNumber>);<\n><endif>
+<if(debug)>} finally {dbg.exitDecision(<decisionNumber>);}<\n><endif>
 switch (alt<decisionNumber>) {
     <alts:altSwitchCase()>
 }
 <if(debug)>
-dbg.exitSubRule(<decisionNumber>);<\n>
+} finally {dbg.exitSubRule(<decisionNumber>);}<\n>
 <endif>
 >>
 
@@ -242,9 +241,9 @@ ruleBlockSingleAlt ::= blockSingleAlt
 ruleBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int alt<decisionNumber>=<maxAlt>;
 <decls>
-<if(debug)>dbg.enterDecision(<decisionNumber>);<\n><endif>
+<if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
 <decision>
-<if(debug)>dbg.exitDecision(<decisionNumber>);<\n><endif>
+<if(debug)>} finally {dbg.exitDecision(<decisionNumber>);}<\n><endif>
 switch (alt<decisionNumber>) {
     <alts:altSwitchCase()>
 }
@@ -254,24 +253,29 @@ positiveClosureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int cnt<decisionNumber>=0;
 <decls>
 <if(debug)>
-dbg.enterSubRule(<decisionNumber>);<\n>
+try { dbg.enterSubRule(<decisionNumber>);<\n>
 <endif>
 loop<decisionNumber>:
 do {
     int alt<decisionNumber>=<maxAlt>;
-<if(debug)>dbg.enterDecision(<decisionNumber>);<\n><endif>
+<if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
     <decision>
-<if(debug)>dbg.exitDecision(<decisionNumber>);<\n><endif>
+<if(debug)>} finally {dbg.exitDecision(<decisionNumber>);}<\n><endif>
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
 	default :
 	    if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
-	    throw new EarlyExitException(<decisionNumber>, input);
+            EarlyExitException eee =
+                new EarlyExitException(<decisionNumber>, input);
+<if(debug)>
+            dbg.recognitionException(eee);<\n>
+<endif>
+            throw eee;
     }
     cnt<decisionNumber>++;
 } while (true);
 <if(debug)>
-dbg.exitSubRule(<decisionNumber>);<\n>
+} finally { dbg.exitSubRule(<decisionNumber>);}<\n>
 <endif>
 >>
 
@@ -280,14 +284,14 @@ positiveClosureBlockSingleAlt ::= positiveClosureBlock
 closureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 <decls>
 <if(debug)>
-dbg.enterSubRule(<decisionNumber>);<\n>
+try { dbg.enterSubRule(<decisionNumber>);<\n>
 <endif>
 loop<decisionNumber>:
 do {
     int alt<decisionNumber>=<maxAlt>;
-<if(debug)>dbg.enterDecision(<decisionNumber>);<\n><endif>
+<if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
     <decision>
-<if(debug)>dbg.exitDecision(<decisionNumber>);<\n><endif>
+<if(debug)>} finally {dbg.exitDecision(<decisionNumber>);}<\n><endif>
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
 	default :
@@ -295,7 +299,7 @@ do {
     }
 } while (true);
 <if(debug)>
-dbg.exitSubRule(<decisionNumber>);<\n>
+} finally {dbg.exitSubRule(<decisionNumber>);}<\n>
 <endif>
 >>
 
@@ -333,16 +337,40 @@ charRef(char) ::= "match(<char>);"
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 /** For now, sets are interval tests and must be tested inline */
-matchSet(s,label) ::= <<
+matchSet(s,label,elementIndex) ::= <<
 <if(label)><label>=input.LT(1);<endif>
 if ( <s> ) input.consume();
-else throw new MismatchedSetException(null,input);<\n>
+else {
+    MismatchedSetException mse =
+        new MismatchedSetException(null,input);
+<if(debug)>
+    dbg.recognitionException(mse);<\n>
+<endif>
+<if(LEXER)>
+    recover(mse);
+<else>
+    recoverFromMismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
+<endif>
+    throw mse;
+}<\n>
 >>
 
-matchNotSet(s,label) ::= <<
+matchNotSet(s,label,elementIndex) ::= <<
 <if(label)><label>=input.LT(1);<endif>
 if ( !(<s>) ) input.consume();
-else throw new MismatchedNotSetException(null,input);<\n>
+else {
+    MismatchedNotSetException mnse =
+        new MismatchedNotSetException(null,input);
+<if(debug)>
+    dbg.recognitionException(mnse);<\n>
+<endif>
+<if(LEXER)>
+    recover(mnse);<\n>
+<else>
+    recoverFromMismatchedSet(mnse, FOLLOW_set_in_<ruleName><elementIndex>);<\n>
+<endif>
+    throw mnse;
+}<\n>
 >>
 
 lexerStringRef(string) ::= "match(<string>);"
@@ -370,11 +398,6 @@ lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
 
 // F i x e d  D F A  (if-then-else)
 
-/*
-dfaDecision(decisionNumber,description) ::=
-  "alt<decisionNumber> = DFA<decisionNumber>.predict(input);"
-*/
-
 dfaState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
 <edges; separator="\nelse ">
@@ -382,12 +405,12 @@ else {
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
-<if(LEXER)>
-    System.err.println("<description>: no viable alt line "+((CharStream)input).getLine()+" c='"+(char)input.LA(1)+"'");
-<else>
-    System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));
-    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+    NoViableAltException nvae =
+        new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+<if(debug)>
+    dbg.recognitionException(nvae);<\n>
 <endif>
+    throw nvae;<\n>
 <endif>
 }
 >>
@@ -424,7 +447,12 @@ default:
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
-    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+    NoViableAltException nvae =
+        new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+<if(debug)>
+    dbg.recognitionException(nvae);<\n>
+<endif>
+    throw nvae;<\n>
 <endif>
 }<\n>
 >>
@@ -459,7 +487,16 @@ allCyclicDFAs(cyclicDFAs) ::= <<
 
 dfaDecision(decisionNumber,description) ::= <<
 <! the <name> attribute is inherited via the parser, lexer, ... !>
+<if(debug)>
+try {
+    alt<decisionNumber> = DFA<decisionNumber>.predict(input);
+}
+catch (NoViableAltException nvae) {
+    dbg.recognitionException(nvae);
+}
+<else>
 alt<decisionNumber> = DFA<decisionNumber>.predict(input);
+<endif>
 >>
 
 cyclicDFA(className,decisionNumber,states,description) ::= <<
@@ -477,13 +514,9 @@ static DFA.State s<stateNumber> = new DFA.State() {
         int LA<decisionNumber>_<stateNumber> = input.LA(1);
         <edges>
         <if(needErrorClause)>
-        <if(LEXER)>
-        System.err.println("no viable alt line "+((CharStream)input).getLine()+" c='"+(char)input.LA(1)+"'");
-	throw new NoViableAltException("<description>", 0, <stateNumber>, input);<\n>
-        <else>
-        System.err.println("<description>: no viable alt line token="+((TokenStream)input).LT(1));
-	throw new NoViableAltException("<description>", 0, <stateNumber>, input);<\n>
-        <endif>
+        NoViableAltException nvae =
+	    new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+        throw nvae;
         <endif>
     }
 };<\n>
@@ -511,7 +544,9 @@ static DFA.State s<stateNumber> = new DFA.State() {
         <edges; separator="\n">
         default:
 <if(needErrorClause)>
-            throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+            NoViableAltException nvae =
+                new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+            throw nvae;
 <else>
             return s<EOTTargetStateNumber>;<\n>	
 <endif>

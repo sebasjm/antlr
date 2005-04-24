@@ -392,9 +392,16 @@ set	:   LPAREN! setNoParens RPAREN!
     ;
 
 setNoParens
+{Token startingToken = LT(1);}
     :   {!currentRuleName.equals(Grammar.TOKEN_RULENAME)}?
     	setElement (OR! setElement)+
-        {#setNoParens = #(#[SET,"SET"], #setNoParens);}
+        {
+        GrammarAST ast = new GrammarAST();
+		ast.initialize(new TokenWithIndex(SET, "SET"));
+		((TokenWithIndex)ast.token)
+			.setIndex(((TokenWithIndex)startingToken).getIndex());
+        #setNoParens = #(ast, #setNoParens);
+        }
     ;
 
 setElement

@@ -31,11 +31,10 @@ public class NoViableAltException extends RecognitionException {
 	public String grammarDecisionDescription;
 	public int decisionNumber;
 	public int stateNumber;
-	public int found;
 
-	public NoViableAltException() {
-	}
-
+	/** Used for remote debugger deserialization */
+	public NoViableAltException() {;}
+	
 	public NoViableAltException(String grammarDecisionDescription,
 								int decisionNumber,
 								int stateNumber,
@@ -45,10 +44,9 @@ public class NoViableAltException extends RecognitionException {
 		this.grammarDecisionDescription = grammarDecisionDescription;
 		this.decisionNumber = decisionNumber;
 		this.stateNumber = stateNumber;
-		this.found = input.LA(1);
 	}
 
 	public String toString() {
-		return "NoViableAltException("+found+"!=["+grammarDecisionDescription+"])";
+		return "NoViableAltException("+getUnexpectedType()+"!=["+grammarDecisionDescription+"])";
 	}
 }

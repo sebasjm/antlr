@@ -37,24 +37,29 @@ public class DFA {
         public State transition(IntStream input) throws RecognitionException {
 			return null;
 		}
-    }
-    public static int predict(IntStream input, State start)
+	}
+	public static int predict(IntStream input, State start)
 		throws RecognitionException
 	{
-        int mark = input.mark();
-        State s = start;
-        while ( true ) {
-            s = s.transition(input);
-            if ( s==null ) {
-                return 1; // problem; nothing predicted.  Choose alt 1
-            }
-            if ( s.alt>0 ) {
-                break; // don't consume atom (then exit) if alt predicted
-            }
-            input.consume();
-        }
-        input.rewind(mark);
-        return s.alt;
+		int mark = input.mark();
+		State s;
+		try {
+			s = start;
+			while ( true ) {
+				s = s.transition(input);
+				if ( s==null ) {
+					return 1; // problem; nothing predicted.  Choose alt 1
+				}
+				if ( s.alt>0 ) {
+					break; // don't consume atom (then exit) if alt predicted
+				}
+				input.consume();
+			}
+		}
+		finally {
+			input.rewind(mark);
+		}
+		return s.alt;
     }
 }
 

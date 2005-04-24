@@ -58,6 +58,7 @@ public class DebugParser extends Parser {
 		public void mark(int i) {}
 		public void rewind(int i) {}
 		public void recognitionException(RecognitionException e) {}
+		public void recover() {}
 		public void recovered() {}
 		public void commence() {}
 		public void terminate() {}
@@ -104,24 +105,63 @@ public class DebugParser extends Parser {
 		this.dbg = dbg;
 	}
 
-	public void match(int ttype, BitSet follow) throws MismatchedTokenException {
-		boolean before = this.errorRecovery;
-		Token t = input.LT(1);
-		super.match(ttype, follow);
-		boolean after = this.errorRecovery;
-		// if was in recovery and is not now, trigger recovered event
-		if ( before && !after ) {
-			dbg.recovered();
-		}
-	}
-
-	public void reportError(RecognitionException e) {
-		dbg.recognitionException(e);
-		super.reportError(e);
-	}
-
 	public void reportError(IOException e) {
 		System.err.println("problem with debugger: "+e);
 		e.printStackTrace(System.err);
 	}
+
+	public void recover(RecognitionException re, org.antlr.runtime.BitSet follow) {
+		dbg.recover();
+		try {
+			super.recover(re, follow);
+		}
+		finally {
+			dbg.recovered();
+		}
+	}
+
+	public void recoverFromMismatchedToken(MismatchedTokenException mte,
+										   int ttype,
+										   org.antlr.runtime.BitSet follow)
+		throws MismatchedTokenException
+	{
+		dbg.recognitionException(mte);
+		dbg.recover();
+		try {
+			super.recoverFromMismatchedToken(mte,ttype,follow);
+		}
+		finally {
+			dbg.recovered();
+		}
+	}
+
+	public void recoverFromExtraToken(MismatchedTokenException mte,
+									  int ttype,
+									  org.antlr.runtime.BitSet follow)
+		throws MismatchedTokenException
+	{
+		dbg.recognitionException(mte);
+		dbg.recover();
+		try {
+			super.recoverFromExtraToken(mte,ttype,follow);
+		}
+		finally {
+			dbg.recovered();
+		}
+	}
+
+	public void recoverFromMismatchedSet(RecognitionException mte,
+										 org.antlr.runtime.BitSet follow)
+		throws RecognitionException
+	{
+		dbg.recognitionException(mte);
+		dbg.recover();
+		try {
+			super.recoverFromMismatchedSet(mte,follow);
+		}
+		finally {
+			dbg.recovered();
+		}
+	}
+
 }

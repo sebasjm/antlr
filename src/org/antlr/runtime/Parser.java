@@ -79,7 +79,6 @@ public class Parser {
 		MismatchedTokenException mte =
 			new MismatchedTokenException(ttype, input);
 		recoverFromMismatchedToken(mte, ttype, follow);
-		errorRecovery = true;
 		return;
 	}
 
@@ -92,6 +91,17 @@ public class Parser {
 	 *  That's not very clean but it's better than generating a bunch of
 	 *  catch clauses in each rule and makes it easy to extend with
 	 *  more exceptions w/o breaking old code.
+	 *
+	 *  This method sets errorRecovery to indicate the parser is recovering
+	 *  not parsing.  Once in recovery mode, no errors are generated.
+	 *  To get out of recovery mode, the parser must successfully match
+	 *  a token (after a resync).  So it will go:
+	 *
+	 * 		1. error occurs
+	 * 		2. enter recovery mode, report error
+	 * 		3. consume until token found in resynch set
+	 * 		4. try to resume parsing
+	 * 		5. next match() will reset errorRecovery mode
 	 */
 	public void reportError(RecognitionException e) {
 		// if we've already reported an error and have not matched a token
@@ -99,40 +109,42 @@ public class Parser {
 		if ( errorRecovery ) {
 			return;
 		}
+		errorRecovery = true;
+
 		String parserClassName = getClass().getName();
 		System.err.print(getRuleInvocationStack(e, parserClassName)+
-						 ": line "+input.LT(1).getLine()+" ");
+						 ": line "+e.line+":"+e.charPositionInLine+" ");
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			System.err.println("mismatched token: "+
-							   input.LT(1)+
+							   e.token+
 							   "; expecting type "+getTokenNames()[mte.expecting]);
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;
-			System.err.println(nvae.grammarDecisionDescription+
+			System.err.println("decision=<<"+nvae.grammarDecisionDescription+">>"+
 							   " state "+nvae.stateNumber+
 							   " (decision="+nvae.decisionNumber+
 							   ") no viable alt; token="+
-							   input.LT(1));
+							   e.token);
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;
 			System.err.println("required (...)+ loop (decision="+
 							   eee.decisionNumber+
 							   ") did not match anything; token="+
-							   input.LT(1));
+							   e.token);
 		}
 		else if ( e instanceof MismatchedSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
 			System.err.println("mismatched token: "+
-							   input.LT(1)+
+							   e.token+
 							   "; expecting set "+mse.expecting);
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
 			MismatchedNotSetException mse = (MismatchedNotSetException)e;
 			System.err.println("mismatched token: "+
-							   input.LT(1)+
+							   e.token+
 							   "; expecting set "+mse.expecting);
 		}
 	}
@@ -141,9 +153,16 @@ public class Parser {
 		consumeUntil(follow);
 	}
 
+	/** Recover from an error found on the input stream.  Mostly this is
+	 *  NoViableAlt exceptions, but could be a mismatched token that
+	 *  the match() routine could not recover from.
+	 *
+	 *  Warning: if you override and you want to use -debug option,
+	 *  you'll have to trigger dbg.recover() and recovered() yourself.
+	 */
 	public void recover(RecognitionException re) {
 		BitSet followSet = computeErrorRecoverySet();
-		consumeUntil(followSet);
+		recover(re, followSet);
 	}
 
 	/*  Compute the error recovery set for the current rule.  During
@@ -344,41 +363,73 @@ public class Parser {
 	 *  is in the set of tokens that can follow the ')' token
 	 *  reference in rule atom.  It can assume that you forgot the ')'.
 	 */
-	public void recoverFromMismatchedToken(MismatchedTokenException mte,
+	public void recoverFromMismatchedToken(MismatchedTokenException e,
 										   int ttype,
 										   org.antlr.runtime.BitSet follow)
 		throws MismatchedTokenException
 	{
 		// if next token is what we are looking for then "delete" this token
 		if ( input.LA(2)==ttype ) {
-			reportError(mte);
+			reportError(e);
 			System.err.println("deleting "+input.LT(1));
-			input.consume(); // delete extra token
+			recoverFromExtraToken(e,ttype,follow);
 			input.consume(); // move past ttype token as if all were ok
 			return;
 		}
-		// compute what can follow this token reference
+		if ( !recoverFromMismatchedElement(e,follow) ) {
+			throw e;
+		}
+	}
+
+	/** How to recover when there is an extra, spurious token.  Mainly
+	 *  I factored out this functionality so I can override it in the
+	 *  DebugParser subclass.  It was the only way I could get the
+	 *  recover/recovered debug events in the right spot.
+	 */
+	public void recoverFromExtraToken(MismatchedTokenException e,
+									  int ttype,
+									  org.antlr.runtime.BitSet follow)
+		throws MismatchedTokenException
+	{
+		input.consume(); // simply delete extra token
+	}
+
+	public void recoverFromMismatchedSet(RecognitionException e,
+										 org.antlr.runtime.BitSet follow)
+		throws RecognitionException
+	{
+		// TODO do single token deletion like above for Token mismatch
+		if ( !recoverFromMismatchedElement(e,follow) ) {
+			throw e;
+		}
+	}
+
+	protected boolean recoverFromMismatchedElement(RecognitionException e,
+												   org.antlr.runtime.BitSet follow)
+	{
+		// compute what can follow this grammar element reference
 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
 			BitSet viableTokensFollowingThisRule =
 				computeContextSensitiveRuleFOLLOW();
 			follow = follow.or(viableTokensFollowingThisRule);
 			follow.remove(Token.EOR_TOKEN_TYPE);
 		}
-		// if current token is consistent with what could come after ttype
+		// if current token is consistent with what could come after set
 		// then it is ok to "insert" the missing token, else throw exception
 		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
 		if ( follow.member(input.LA(1)) ) {
-			reportError(mte);
-			System.err.println("inserting "+getTokenNames()[ttype]);
-			return;
+			reportError(e);
+			return true;
 		}
 		System.err.println("nothing to do; throw exception");
-		throw mte;
+		return false;
 	}
 
 	public void consumeUntil(int tokenType) {
-		while (input.LA(1) != Token.EOF && input.LA(1) != tokenType) {
+		int ttype = input.LA(1);
+		while (ttype != Token.EOF && ttype != tokenType) {
 			input.consume();
+			ttype = input.LA(1);
 		}
 	}
 
@@ -390,9 +441,11 @@ public class Parser {
 						   input.LT(1).toString(input.getTokenSource().getCharStream()));
 		input.consume(); // always consume at least one token; inoptimal but safe
 		*/
-		while (input.LA(1) != Token.EOF && !set.member(input.LA(1)) ) {
-			System.out.println("LT(1)="+input.LT(1));
+		int ttype = input.LA(1);
+		while (ttype != Token.EOF && !set.member(ttype) ) {
+			//System.out.println("LT(1)="+input.LT(1));
 			input.consume();
+			ttype = input.LA(1);
 		}
 	}
 

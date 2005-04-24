@@ -71,7 +71,10 @@ public abstract class Lexer implements TokenSource {
         int i = 0;
         while ( i<s.length() ) {
             if ( input.LA(1)!=s.charAt(i) ) {
-				throw new MismatchedTokenException(s.charAt(i), input);
+				MismatchedTokenException mte =
+					new MismatchedTokenException(s.charAt(i), input);
+				recover(mte);
+				throw mte;
             }
             i++;
             input.consume();
@@ -84,14 +87,22 @@ public abstract class Lexer implements TokenSource {
 
     public void match(int c) throws MismatchedTokenException {
         if ( input.LA(1)!=c ) {
-			throw new MismatchedTokenException(c, input);
+			MismatchedTokenException mte =
+				new MismatchedTokenException(c, input);
+			recover(mte);
+			throw mte;
         }
         input.consume();
     }
 
-    public void matchRange(int a, int b) throws MismatchedRangeException {
+    public void matchRange(int a, int b)
+		throws MismatchedRangeException
+	{
         if ( input.LA(1)<a || input.LA(1)>b ) {
-            throw new MismatchedRangeException(a,b,input);
+            MismatchedRangeException mre =
+				new MismatchedRangeException(a,b,input);
+			recover(mre);
+			throw mre;
         }
         input.consume();
     }
@@ -168,7 +179,7 @@ public abstract class Lexer implements TokenSource {
 		}
 	}
 
-	/** Lexers can normally about any char in it's vocabulary after matching
+	/** Lexers can normally match any char in it's vocabulary after matching
 	 *  a token, so do the easy thing and just kill a character and hope
 	 *  it all works out.  You can instead use the rule invocation stack
 	 *  to do sophisticated error recovery if you are in a fragment rule.
@@ -177,4 +188,5 @@ public abstract class Lexer implements TokenSource {
 		System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
 		input.consume();
 	}
+
 }

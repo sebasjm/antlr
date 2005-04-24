@@ -257,6 +257,7 @@ element returns [StateCluster g=null]
 	           g=factory.build_Set(st);
 	           }
             )
+        	{#n.followingNFAState = g.right;}
          )
     |   #(RANGE a:atom b:atom)
         {g = factory.build_Range(grammar.getTokenType(#a.getText()),
@@ -405,7 +406,11 @@ set returns [StateCluster g=null]
 IntSet elements=new IntervalSet();
 #set.setSetValue(elements); // track set for use by code gen
 }
-	:	#(SET (setElement[elements])+) {g = factory.build_Set(elements);}
+	:	#(s:SET (setElement[elements])+)
+        {
+        g = factory.build_Set(elements);
+        #s.followingNFAState = g.right;
+        }
 		//{System.out.println("set elements="+elements.toString(grammar));}
     ;
 

@@ -50,6 +50,7 @@ public class Interpreter implements TokenSource {
 		public void mark(int i) {}
 		public void rewind(int i) {}
 		public void recognitionException(RecognitionException e) {}
+		public void recover() {}
 		public void recovered() {}
 		public void commence() {}
 		public void terminate() {}
@@ -98,6 +99,7 @@ public class Interpreter implements TokenSource {
 			ParseTree errorNode = new ParseTree(e);
 			ruleNode.addChild(errorNode);
 		}
+		public void recover() {}
 		public void recovered() {}
 		public void commence() {}
 		public void terminate() {}

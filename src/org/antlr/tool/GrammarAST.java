@@ -51,7 +51,7 @@ public class GrammarAST extends BaseAST {
     /** What NFA was built from this node? */
     protected NFAState NFAStartState = null;
 
-	/** Rule ref nodes and token refs need to track their
+	/** Rule ref nodes, token refs, set, and NOT set refs need to track their
 	 *  location in the generated NFA so that local FOLLOW sets can be
 	 *  computed during code gen for automatic error recovery.
 	 */

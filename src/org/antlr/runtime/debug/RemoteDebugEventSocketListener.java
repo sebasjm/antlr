@@ -213,11 +213,17 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		}
 		else if ( elements[0].equals("exception") ) {
 			String excName = elements[1];
+			String indexS = elements[2];
+			String lineS = elements[3];
+			String posS = elements[4];
 			Class excClass = null;
 			try {
 				excClass = Class.forName(excName);
 				RecognitionException e =
 					(RecognitionException)excClass.newInstance();
+				e.index = Integer.parseInt(indexS);
+				e.line = Integer.parseInt(lineS);
+				e.charPositionInLine = Integer.parseInt(posS);
 				listener.recognitionException(e);
 			}
 			catch (ClassNotFoundException cnfe) {
@@ -235,6 +241,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		}
 		else if ( elements[0].equals("recovered") ) {
 			listener.recovered();
+		}
+		else if ( elements[0].equals("recover") ) {
+			listener.recover();
 		}
 		else if ( elements[0].equals("terminate") ) {
 			listener.terminate();

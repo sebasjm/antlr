@@ -268,7 +268,6 @@ element returns [StringTemplate code=null]
 	           int ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
 	           elements = grammar.complement(ttype);
 	           }
-//          |  CHAR_RANGE
             |  t:TOKEN_REF
 	           {
 	           int ttype = grammar.getTokenType(t.getText());
@@ -283,6 +282,10 @@ element returns [StringTemplate code=null]
             {
             code = templates.getInstanceOf("matchNotSet");
             code.setAttribute("s", generator.genSetExpr(templates,elements,1,false));
+		 	code.setAttribute("elementIndex", ((TokenWithIndex)#n.getToken()).getIndex());
+			if ( grammar.type!=Grammar.LEXER ) {
+		 		generator.generateLocalFOLLOW(#n,"set",currentRuleName);
+        	}
             }
          )
 
@@ -413,6 +416,10 @@ set[String label] returns [StringTemplate code=null]
 	:   s:SET
         {
         code = templates.getInstanceOf("matchSet");
+		code.setAttribute("elementIndex", ((TokenWithIndex)#s.getToken()).getIndex());
+		if ( grammar.type!=Grammar.LEXER ) {
+			generator.generateLocalFOLLOW(#s,"set",currentRuleName);
+        }
         code.setAttribute("s", generator.genSetExpr(templates,#s.getSetValue(),1,false));
         if ( label!=null ) {code.setAttribute("label", label);}
         }
