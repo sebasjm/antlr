@@ -239,11 +239,11 @@ public class RemoteDebugEventSocketListener implements Runnable {
 				iae.printStackTrace(System.err);
 			}
 		}
-		else if ( elements[0].equals("recovered") ) {
-			listener.recovered();
+		else if ( elements[0].equals("beginResync") ) {
+			listener.beginResync();
 		}
-		else if ( elements[0].equals("recover") ) {
-			listener.recover();
+		else if ( elements[0].equals("endResync") ) {
+			listener.endResync();
 		}
 		else if ( elements[0].equals("terminate") ) {
 			listener.terminate();

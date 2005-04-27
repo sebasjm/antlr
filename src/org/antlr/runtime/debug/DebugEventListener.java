@@ -16,8 +16,8 @@ public interface DebugEventListener {
 
 	/** This is the last thing executed before leaving a rule.  It is
 	 *  executed even if an exception is thrown.  This is triggered after
-	 *  error reporting and recovery have occurred.  This implies an
-	 *  "exitAlt" event.
+	 *  error reporting and recovery have occurred (unless the exception is
+	 *  not caught in this rule).  This implies an "exitAlt" event.
 	 */
 	public void exitRule(String ruleName);
 
@@ -122,11 +122,11 @@ public interface DebugEventListener {
 	 *		recognitionException NoViableAltException 2 1 2
 	 *		exit decision 2
 	 *		exitSubRule 2
-	 *		recover
+	 *		beginResync
 	 *		LT(1)
 	 *		consumeToken [c/<4>,1:1]
 	 *		LT(1)
-	 *		recovered
+	 *		endResync
 	 *		LT(-1)
 	 *		exitRule b
 	 *		terminate
@@ -137,17 +137,17 @@ public interface DebugEventListener {
 	 *  the parser.  Any consume events from here until the recovered event
 	 *  are not part of the parse--they are dead tokens.
 	 */
-	public void recover();
+	public void beginResync();
 
 	/** Indicates that the recognizer has finished consuming tokens in order
-	 *  to resychronize.  There may be multiple recover/recovered pairs
+	 *  to resychronize.  There may be multiple beginResync/endResync pairs
 	 *  before the recognizer comes out of errorRecovery mode (in which
 	 *  multiple errors are suppressed).  This will be useful
 	 *  in a gui where you want to probably grey out tokens that are consumed
-	 *  but not matched to anything in grammar.  Anything between an exception
-	 *  and recovered() was tossed out by the parser.
+	 *  but not matched to anything in grammar.  Anything between
+	 *  a beginResync/endResync pair was tossed out by the parser.
 	 */
-	public void recovered();
+	public void endResync();
 
 	/** Announce that parsing has begun.  Not strictly useful except for
 	 *  sending events over a socket.  A GUI for example will launch a thread

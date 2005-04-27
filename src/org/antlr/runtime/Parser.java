@@ -107,7 +107,8 @@ public class Parser {
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
 		if ( errorRecovery ) {
-			return;
+			System.err.print("[SPURIOUS] ");
+			//return;
 		}
 		errorRecovery = true;
 
@@ -149,20 +150,24 @@ public class Parser {
 		}
 	}
 
-	public void recover(RecognitionException re, org.antlr.runtime.BitSet follow) {
-		consumeUntil(follow);
-	}
-
 	/** Recover from an error found on the input stream.  Mostly this is
 	 *  NoViableAlt exceptions, but could be a mismatched token that
 	 *  the match() routine could not recover from.
-	 *
-	 *  Warning: if you override and you want to use -debug option,
-	 *  you'll have to trigger dbg.recover() and recovered() yourself.
 	 */
 	public void recover(RecognitionException re) {
 		BitSet followSet = computeErrorRecoverySet();
-		recover(re, followSet);
+		beginResync();
+		consumeUntil(followSet);
+		endResync();
+	}
+
+	/** A hook to listen in on the token consumption during error recovery.
+	 *  The DebugParser subclasses this to fire events to the listenter.
+	 */
+	public void beginResync() {
+	}
+
+	public void endResync() {
 	}
 
 	/*  Compute the error recovery set for the current rule.  During
@@ -368,30 +373,21 @@ public class Parser {
 										   org.antlr.runtime.BitSet follow)
 		throws MismatchedTokenException
 	{
+		System.out.println("recoverFromMismatchedToken");
 		// if next token is what we are looking for then "delete" this token
 		if ( input.LA(2)==ttype ) {
 			reportError(e);
-			System.err.println("deleting "+input.LT(1));
-			recoverFromExtraToken(e,ttype,follow);
+			System.err.println("recoverFromMismatchedToken deleting "+input.LT(1)+
+							   " since "+input.LT(2)+" is what we want");
+			beginResync();
+			input.consume(); // simply delete extra token
+			endResync();
 			input.consume(); // move past ttype token as if all were ok
 			return;
 		}
 		if ( !recoverFromMismatchedElement(e,follow) ) {
 			throw e;
 		}
-	}
-
-	/** How to recover when there is an extra, spurious token.  Mainly
-	 *  I factored out this functionality so I can override it in the
-	 *  DebugParser subclass.  It was the only way I could get the
-	 *  recover/recovered debug events in the right spot.
-	 */
-	public void recoverFromExtraToken(MismatchedTokenException e,
-									  int ttype,
-									  org.antlr.runtime.BitSet follow)
-		throws MismatchedTokenException
-	{
-		input.consume(); // simply delete extra token
 	}
 
 	public void recoverFromMismatchedSet(RecognitionException e,
@@ -404,9 +400,15 @@ public class Parser {
 		}
 	}
 
+	/** This code is factored out from mismatched token and mismatched set
+	 *  recovery.  It handles "single token insertion" error recovery for
+	 *  both.  No tokens are consumed to recover from insertions.  Return
+	 *  true if recovery was possible else return false.
+	 */
 	protected boolean recoverFromMismatchedElement(RecognitionException e,
 												   org.antlr.runtime.BitSet follow)
 	{
+		System.out.println("recoverFromMismatchedElement");
 		// compute what can follow this grammar element reference
 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
 			BitSet viableTokensFollowingThisRule =
@@ -418,6 +420,7 @@ public class Parser {
 		// then it is ok to "insert" the missing token, else throw exception
 		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
 		if ( follow.member(input.LA(1)) ) {
+			System.out.println("LT(1)=="+input.LT(1)+" is consistent with what follows; inserting...");
 			reportError(e);
 			return true;
 		}

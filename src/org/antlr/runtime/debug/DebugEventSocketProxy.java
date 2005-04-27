@@ -137,12 +137,12 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		transmit(buf.toString());
 	}
 
-	public void recover() {
-		transmit("recover");
+	public void beginResync() {
+		transmit("beginResync");
 	}
 
-	public void recovered() {
-		transmit("recovered");
+	public void endResync() {
+		transmit("endResync");
 	}
 
 	protected String serializeToken(Token t) {

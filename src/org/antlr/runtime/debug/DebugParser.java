@@ -58,8 +58,8 @@ public class DebugParser extends Parser {
 		public void mark(int i) {}
 		public void rewind(int i) {}
 		public void recognitionException(RecognitionException e) {}
-		public void recover() {}
-		public void recovered() {}
+		public void beginResync() {}
+		public void endResync() {}
 		public void commence() {}
 		public void terminate() {}
 	}
@@ -105,19 +105,22 @@ public class DebugParser extends Parser {
 		this.dbg = dbg;
 	}
 
+	public void reportError(RecognitionException e) {
+		dbg.recognitionException(e);
+		super.reportError(e);
+	}
+
 	public void reportError(IOException e) {
 		System.err.println("problem with debugger: "+e);
 		e.printStackTrace(System.err);
 	}
 
-	public void recover(RecognitionException re, org.antlr.runtime.BitSet follow) {
-		dbg.recover();
-		try {
-			super.recover(re, follow);
-		}
-		finally {
-			dbg.recovered();
-		}
+	public void beginResync() {
+		dbg.beginResync();
+	}
+
+	public void endResync() {
+		dbg.endResync();
 	}
 
 	public void recoverFromMismatchedToken(MismatchedTokenException mte,
@@ -126,28 +129,7 @@ public class DebugParser extends Parser {
 		throws MismatchedTokenException
 	{
 		dbg.recognitionException(mte);
-		dbg.recover();
-		try {
-			super.recoverFromMismatchedToken(mte,ttype,follow);
-		}
-		finally {
-			dbg.recovered();
-		}
-	}
-
-	public void recoverFromExtraToken(MismatchedTokenException mte,
-									  int ttype,
-									  org.antlr.runtime.BitSet follow)
-		throws MismatchedTokenException
-	{
-		dbg.recognitionException(mte);
-		dbg.recover();
-		try {
-			super.recoverFromExtraToken(mte,ttype,follow);
-		}
-		finally {
-			dbg.recovered();
-		}
+		super.recoverFromMismatchedToken(mte,ttype,follow);
 	}
 
 	public void recoverFromMismatchedSet(RecognitionException mte,
@@ -155,13 +137,6 @@ public class DebugParser extends Parser {
 		throws RecognitionException
 	{
 		dbg.recognitionException(mte);
-		dbg.recover();
-		try {
-			super.recoverFromMismatchedSet(mte,follow);
-		}
-		finally {
-			dbg.recovered();
-		}
+		super.recoverFromMismatchedSet(mte,follow);
 	}
-
 }
