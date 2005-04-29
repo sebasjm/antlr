@@ -264,17 +264,50 @@ public class DecisionProbe {
 	 *  find the path of NFA states associated with the labels sequence.
 	 *  Useful tracing where in the NFA, a single input sequence can be
 	 *  matched.  For different alts, you should get different NFA paths.
+	 *
+	 *  The first NFA state for all NFA paths will be the same: the starting
+	 *  NFA state of the first nondeterministic alt.  Imagine (A|B|A|A):
+	 *
+	 * 	5->9-A->o
+	 *  |
+	 *  6->10-B->o
+	 *  |
+	 *  7->11-A->o
+	 *  |
+	 *  8->12-A->o
+	 *
+	 *  There are 3 nondeterministic alts.  The paths should be:
+	 *  5 9 ...
+	 *  5 6 7 11 ...
+	 *  5 6 7 8 12 ...
+	 *
+	 *  The NFA path matching the sample input sequence (labels) is computed
+	 *  using states 9, 11, and 12 rather than 5, 7, 8 because state 5, for
+	 *  example can get to all ambig paths.  Must isolate for each alt (hence,
+	 *  the extra state beginning each alt in my NFA structures).  Here,
+	 *  firstAlt=1.
 	 */
-	public List getNFAPathStatesForAlt(DFAState targetState, int alt, List labels) {
+	public List getNFAPathStatesForAlt(int firstAlt,
+									   int alt,
+									   List labels)
+	{
 		NFAState nfaStart = dfa.getNFADecisionStartState();
-		NFAState altStart = dfa.nfa.grammar.getNFAStateForAltOfDecision(nfaStart,alt);
-		altStart = (NFAState)altStart.transition(0).target;
-		statesVisitedAtInputDepth = new HashSet();
-		//Set dfaStates = getDFAPathStatesToTarget(targetState);
-		//Set nfaStates = getNFAStatesFromDFAStatesForAlt(dfaStates,alt);
 		List path = new LinkedList();
-		path.add(altStart);
-		getNFAPath(altStart,
+		// first add all NFA states leading up to altStart state
+		for (int a=firstAlt; a<=alt; a++) {
+			NFAState s =
+				dfa.nfa.grammar.getNFAStateForAltOfDecision(nfaStart,a);
+			path.add(s);
+		}
+
+		// add first state of actual alt
+		NFAState altStart = dfa.nfa.grammar.getNFAStateForAltOfDecision(nfaStart,alt);
+		NFAState isolatedAltStart = (NFAState)altStart.transition(0).target;
+		path.add(isolatedAltStart);
+
+		// add the actual path now
+		statesVisitedAtInputDepth = new HashSet();
+		getNFAPath(isolatedAltStart,
 				   0,
 				   labels,
 				   path);
@@ -451,7 +484,6 @@ public class DecisionProbe {
     /** Given a set of DFA states, return a set of NFA states associated
 	 *  with alt collected from all DFA states.  If alt==0 then collect
 	 *  all NFA states regardless of alt.
-	 */
 	protected Set getNFAStatesFromDFAStatesForAlt(Set dfaStates, int alt) {
 		Set nfaStates = new LinkedHashSet();
 		for (Iterator it = dfaStates.iterator(); it.hasNext();) {
@@ -466,6 +498,7 @@ public class DecisionProbe {
 		}
 		return nfaStates;
 	}
+	 */
 
 	/** Given a start state and a final state, find a list of edge labels
 	 *  between the two ignoring epsilon.  Limit your scan to a set of states
@@ -516,15 +549,9 @@ public class DecisionProbe {
 	 */
 	protected boolean getNFAPath(NFAState s,     // starting where?
 								 int labelIndex, // 0..labels.size()-1
-								 //Set states,     // legal NFA states; Set<Integer>
 								 List labels,    // input sequence
 								 List path)      // output list of NFA states
 	{
-		/*
-		if ( !states.contains(new Integer(s.stateNumber)) ) {
-			return false; // the DFA doesn't have this NFA state in a config
-		}
-		*/
 		// track a visit to state s at input index labelIndex if not seen
 		String thisStateKey = getStateLabelIndexKey(s.stateNumber,labelIndex);
 		if ( statesVisitedAtInputDepth.contains(thisStateKey) ) {

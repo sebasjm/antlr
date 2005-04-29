@@ -46,35 +46,21 @@ public class GrammarNonDeterminismMessage extends Message {
 		st.setAttribute("disabled", probe.getDisabledAlternatives(problemState));
 
 		List nondetAlts = probe.getNonDeterministicAltsForState(problemState);
+		NFAState nfaStart = probe.dfa.getNFADecisionStartState();
+		// all state paths have to begin with same NFA state
+		NFAState commonNondetAltsNFAStartState = null;
+		int firstAlt = 0;
 		for (Iterator iter = nondetAlts.iterator(); iter.hasNext();) {
 			Integer displayAltI = (Integer) iter.next();
 			if ( DecisionProbe.verbose ) {
-				NFAState nfaStart = probe.dfa.getNFADecisionStartState();
 				int tracePathAlt =
 					nfaStart.translateDisplayAltToWalkAlt(displayAltI.intValue());
-				/*
-				int tracePathAlt = displayAltI.intValue();
-				if ( nfaStart.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
-				if ( tracePathAlt==
-				probe.dfa.nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStart) )
-				{
-				// special case; loop end decisions have exit as
-				// # block alts + 1; getNumberOfAltsForDecisionNFA() has
-				// both block alts and exit branch.  So, any predicted
-				// tracePathAlt equal to number of alts is the exit
-				// tracePathAlt.  The NFA sees that as tracePathAlt 1.
-				// Yes, this is gross, but I have searched for months
-				// for a better solution without success. :(
-				tracePathAlt = 1;
+				if ( firstAlt == 0 ) {
+					firstAlt = tracePathAlt;
 				}
-				else {
-				// exit branch is really first transition, so skip
-				tracePathAlt = tracePathAlt+1;
-				}
-				}
-				*/
 				List path =
-					probe.getNFAPathStatesForAlt(problemState,tracePathAlt,
+					probe.getNFAPathStatesForAlt(firstAlt,
+												 tracePathAlt,
 												 labels);
 				st.setAttribute("paths.{alt,states}",
 								displayAltI, path);
@@ -86,90 +72,4 @@ public class GrammarNonDeterminismMessage extends Message {
 		return st.toString();
 	}
 
-	/*
-	public void computeErrors() {
-		System.out.println("--------------------\nnondeterministic decision (d="
-				+probe.dfa.getDecisionNumber()+") for "+
-				probe.dfa.getNFADecisionStartState().getDescription());
-
-		Set resolvedStates = probe.getNondeterministicStatesResolvedWithSemanticPredicate();
-		Set problemStates = probe.getDFAStatesWithSyntacticallyAmbiguousAlts();
-		if ( problemStates.size()>0 ) {
-			Iterator it =
-				problemStates.iterator();
-			while (	it.hasNext() ) {
-				DFAState d = (DFAState) it.next();
-				if ( resolvedStates!=null && resolvedStates.contains(d) ) {
-					// don't report problem if resolved
-					continue;
-				}
-				List nondetAlts = probe.getNonDeterministicAltsForState(d);
-				if ( !DecisionProbe.verbose ) {
-					System.err.println("decision predicts multiple alternatives: "+
-									   nondetAlts+" for the same lookahead");
-					break;
-				}
-				List labels = probe.getSampleNonDeterministicInputSequence(d);
-				String input = probe.getInputSequenceDisplay(labels);
-				System.err.println("Decision can match input such as \""+input+"\" using multiple alternatives:");
-				// For each nondet alt, compute path of NFA states
-				for (Iterator iter = nondetAlts.iterator(); iter.hasNext();) {
-					Integer altI = (Integer) iter.next();
-					// now get path take for an input sequence limited to
-					// those states associated with this nondeterminism
-					NFAState nfaStart = probe.dfa.getNFADecisionStartState();
-					Grammar g = probe.dfa.nfa.grammar;
-					// convert all possible NFA states list for this displayAlt into
-					// an exact path for input 'labels'; more useful.
-					List path = probe.getNFAPathStatesForAlt(d,altI.intValue(),labels);
-					// compute the proper displayable alt number (ick)
-					int displayAlt = altI.intValue();
-					if ( nfaStart.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
-						if ( displayAlt==g.getNumberOfAltsForDecisionNFA(nfaStart) ) {
-							// special case; loop end decisions have exit as
-							// # block alts + 1; getNumberOfAltsForDecisionNFA() has
-							// both block alts and exit branch.  So, any predicted displayAlt
-							// equal to number of alts is the exit displayAlt.  The NFA
-							// sees that as displayAlt 1.  Yes, this is gross, but
-							// I have searched for months for a better solution
-							// without success. :(
-							displayAlt = 1;
-						}
-						else {
-							// exit branch is really first transition, so skip
-							displayAlt = displayAlt+1;
-						}
-					}
-					System.err.println("  alt "+altI+" via NFA path "+path);
-					SemanticContext altSemCtx =
-						probe.getSemanticContextForAlt(d,altI.intValue());
-					if ( altSemCtx!=null ) {
-						System.err.println("pred for "+displayAlt+": "+altSemCtx);
-					}
-				}
-				if ( DecisionProbe.verbose ) {
-					Set disabled = d.getDisabledAlternatives();
-					System.err.println("As a result, alternative(s) "+disabled+" were disabled for that input");
-				}
-				List incompleteAlts = probe.getIncompletelyCoveredAlts(d);
-				if ( incompleteAlts!=null && incompleteAlts.size()>0 ) {
-					System.err.println("alts with insufficient predicates: "+
-									   incompleteAlts);
-				}
-			}
-		}
-		List unreachableAlts = probe.dfa.getUnreachableAlts();
-		if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
-			System.err.println("The following alternatives are unreachable: "+
-							   unreachableAlts);
-		}
-		if ( probe.getNondeterministicStatesResolvedWithSemanticPredicate()!=null &&
-			 probe.getNondeterministicStatesResolvedWithSemanticPredicate().size()>0 )
-		{
-			System.err.println("states resolved with sem pred map: "+
-							   probe.getNondeterministicStatesResolvedWithSemanticPredicate());
-			//System.err.println("nondeterminism NOT resolved with sem preds");
-		}
-	}
-    */
 }

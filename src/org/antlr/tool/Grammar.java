@@ -1097,39 +1097,16 @@ public class Grammar {
         return n;
     }
 
-    /** Given an alt block NFA, return a list of the alts
-     *
-     *  o->o-A->o->o
-     *  |          ^
-     *  o->o-B->o--|
-     *  |          |
-     *  ...        |
-     *  |          |
-     *  o->o-Z->o--|
-    public List getBlockListOfAltStateClusters(NFAState blk) {
-        List alts = new LinkedList();
-        NFAState p = blk;
-        while ( p!=null ) {
-            // look for right end (just before end block)
-            NFAState q = (NFAState)p.transition(0).target;
-            while ( q.transition(0)!=null ) {
-                q = (NFAState)p.transition(0).target;
-            }
-            alts.add( p.transition(0) );
-            if ( p.transition(1)!=null ) {
-                p = (NFAState)p.transition(1).target;
-            }
-            else {
-                p = null;
-            }
-        }
-        return alts;
-    }
-     */
-
     /** Get the ith alternative (1..n) from a decision; return null when
      *  an invalid alt is requested.  I must count in to find the right
-     *  alternative number.
+     *  alternative number.  For (A|B), you get NFA structure (roughly):
+	 *
+	 *  o->o-A->o
+	 *  |
+	 *  o->o-B->o
+	 *
+	 *  This routine returns the leftmost state for each alt.  So alt=1, returns
+	 *  the upperleft most state in this structure.
      */
     public NFAState getNFAStateForAltOfDecision(NFAState decisionState, int alt) {
         if ( decisionState==null || alt<=0 ) {
