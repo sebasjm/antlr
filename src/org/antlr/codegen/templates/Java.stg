@@ -182,6 +182,7 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
         retval.stop = input.LT(-1);
     }<\n>
 <if(debug)>
+    dbg.location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
     } finally {dbg.exitRule("<ruleName>");}<\n>
 <endif>
 <if(ruleDescriptor.returnScope)>

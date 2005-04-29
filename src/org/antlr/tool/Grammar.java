@@ -73,6 +73,7 @@ public class Grammar {
 		public NFAState startState;
 		public NFAState stopState;
 		public GrammarAST tree;
+		public GrammarAST EORNode;
 		public GrammarAST lexerAction;
 		/** The return values of a rule and predefined rule attributes */
 		public AttributeScope returnScope;
@@ -901,6 +902,7 @@ public class Grammar {
 		Rule r = (Rule)nameToRuleMap.get(ruleName);
 		if ( r!=null ) {
 			r.tree = t;
+			r.EORNode = t.getLastChild();
 		}
 	}
 
