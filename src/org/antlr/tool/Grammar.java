@@ -252,7 +252,7 @@ public class Grammar {
             throws antlr.RecognitionException, antlr.TokenStreamException
     {
         this();
-		this.fileName = fileName;
+		setFileName(fileName);
 		setGrammarContent(r);
 	}
 
@@ -262,6 +262,16 @@ public class Grammar {
 
 	public String getFileName() {
 		return fileName;
+	}
+
+	/** Return the directory containing the grammar file for this grammar.
+	 *  normally this is a relative path from current directory.  People will
+	 *  often do "java org.antlr.Tool grammars/*.g"  So the file will be
+	 *  "grammar/foo.g" etc...  This method returns "grammar".
+	 */
+	public String getFileDirectory() {
+		File f = new File(fileName);
+		return f.getParent();
 	}
 
 	public void setGrammarContent(String grammarString)

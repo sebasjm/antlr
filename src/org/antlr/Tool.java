@@ -36,17 +36,19 @@ import org.antlr.analysis.*;
 import java.io.*;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 /** The main ANTLR entry point.  Read a grammar and generate a parser. */
 public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-    public static final String Version = "3.0 prototype";
+    public static final String Version = "3.0 early-access-1";
 
     // Input parameters / option
 
-    protected String grammarFileName;
+    protected List grammarFileNames = new ArrayList();
 	protected boolean generate_NFA_dot = false;
 	protected boolean generate_DFA_dot = false;
     protected String outputDirectory = ".";
@@ -109,7 +111,7 @@ public class Tool {
             else {
                 if (args[i].charAt(0) != '-') {
                     // Must be the grammar file
-                    grammarFileName = args[i];
+                    grammarFileNames.add(args[i]);
                 }
             }
         }
@@ -127,43 +129,46 @@ public class Tool {
     */
 
     protected void process()  {
-        try {
-			//StringTemplate.setLintMode(true);
-            FileReader fr = new FileReader(grammarFileName);
-            BufferedReader br = new BufferedReader(fr);
-            Grammar grammar = new Grammar(grammarFileName,br);
-            br.close();
-            fr.close();
+		for (int i = 0; i < grammarFileNames.size(); i++) {
+			String grammarFileName = (String) grammarFileNames.get(i);
+			try {
+				//StringTemplate.setLintMode(true);
+				FileReader fr = new FileReader(grammarFileName);
+				BufferedReader br = new BufferedReader(fr);
+				Grammar grammar = new Grammar(grammarFileName,br);
+				br.close();
+				fr.close();
 
-			processGrammar(grammar);
+				processGrammar(grammar);
 
-			// now handle the lexer if one was created for a merged spec
+				// now handle the lexer if one was created for a merged spec
 
-			String lexerGrammarStr = grammar.getLexerGrammar();
-			if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
-				System.out.println("writing lexer to ./"+grammar.name+".lexer.g");
-				FileWriter fw = getOutputFile(outputDirectory+File.separator+grammar.name+".lexer.g");
-				fw.write(lexerGrammarStr);
-				fw.close();
-				StringReader sr = new StringReader(lexerGrammarStr);
-				Grammar lexerGrammar = new Grammar();
-				lexerGrammar.setFileName("<internally-generated-lexer>");
-				lexerGrammar.importTokenVocabulary(grammar);
-				lexerGrammar.setGrammarContent(sr);
-				sr.close();
-				processGrammar(lexerGrammar);
+				String lexerGrammarStr = grammar.getLexerGrammar();
+				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
+					System.out.println("writing lexer to ./"+grammar.name+".lexer.g");
+					FileWriter fw = getOutputFile(grammar,grammar.name+".lexer.g");
+					fw.write(lexerGrammarStr);
+					fw.close();
+					StringReader sr = new StringReader(lexerGrammarStr);
+					Grammar lexerGrammar = new Grammar();
+					lexerGrammar.setFileName("<internally-generated-lexer>");
+					lexerGrammar.importTokenVocabulary(grammar);
+					lexerGrammar.setGrammarContent(sr);
+					sr.close();
+					processGrammar(lexerGrammar);
+				}
+
+				if ( generate_NFA_dot ) {
+					generateNFAs(grammar);
+				}
+				if ( generate_DFA_dot ) {
+					generateDFAs(grammar);
+				}
 			}
-
-			if ( generate_NFA_dot ) {
-				generateNFAs(grammar);
-			}
-			if ( generate_DFA_dot ) {
-				generateDFAs(grammar);
+			catch (Exception e) {
+				ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
 			}
 		}
-        catch (Exception e) {
-            ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
-        }
     }
 
 	protected void processGrammar(Grammar grammar)
@@ -191,7 +196,7 @@ public class Tool {
 			String dot = dotGenerator.getDOT( dfa.startState );
 			String dotFileName = g.name+"_dec-"+d;
 			try {
-				writeDOTFile(dotFileName, dot);
+				writeDOTFile(g, dotFileName, dot);
 			}
 			catch(IOException ioe) {
 				ErrorManager.error(ErrorManager.MSG_CANNOT_GEN_DOT_FILE,
@@ -209,6 +214,7 @@ public class Tool {
 			String ruleName = r.name;
 			try {
 				writeDOTFile(
+					g,
 					ruleName,
 					dotGenerator.getDOT(g.getRuleStartState(ruleName)));
 			}
@@ -218,27 +224,36 @@ public class Tool {
 		}
 	}
 
-	protected void writeDOTFile(String name, String dot) throws IOException {
-		FileWriter fw = getOutputFile(outputDirectory+File.separator+name+".dot");
+	protected void writeDOTFile(Grammar g, String name, String dot) throws IOException {
+		FileWriter fw = getOutputFile(g, name+".dot");
 		fw.write(dot);
 		fw.close();
 	}
 
 	private static void help() {
         System.err.println("usage: java org.antlr.Tool [args] file.g");
-        System.err.println("  -o outputDir       specify output directory where all output generated.");
-        System.err.println("  -glib inputDir     specify location of token files, grammars");
+		System.err.println("  -o outputDir       specify output directory where all output generated.");
+		System.err.println("  -debug             generate a parser that emits debugging events");
+        //System.err.println("  -glib inputDir     specify location of token files, grammars");
     }
 
     /** This method is used by all code generators to create new output
      *  files. If the outputDir set by -o is not present it will be created.
+	 *  The final filename is sensitive to the output directory and
+	 *  the directory where the grammar file was found.  If -o is /tmp
+	 *  and the original grammar file was foo/t.g then output files
+	 *  go in /tmp/foo.
      */
-    public FileWriter getOutputFile(String fileName) throws IOException {
-		File outDir = new File(fileName).getParentFile();
+    public FileWriter getOutputFile(Grammar g, String fileName) throws IOException {
+		String fullName =
+			outputDirectory+File.separator+
+			g.getFileDirectory()+File.separator+
+			fileName;
+		File outDir = new File(fullName).getParentFile();
 		if( !outDir.exists() ) {
 			outDir.mkdirs();
 		}
-        return new FileWriter(fileName);
+        return new FileWriter(fullName);
     }
 
 	public String getOutputDirectory() {

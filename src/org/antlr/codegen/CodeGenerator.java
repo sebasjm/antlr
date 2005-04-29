@@ -802,7 +802,7 @@ public class CodeGenerator {
 	public void write(StringTemplate code, String fileName) throws IOException {
         System.out.println("writing "+fileName);
         FileWriter fw =
-			tool.getOutputFile(outputDirectory+File.separator+fileName);
+			tool.getOutputFile(grammar, fileName);
         fw.write(code.toString());
         fw.close();
     }
