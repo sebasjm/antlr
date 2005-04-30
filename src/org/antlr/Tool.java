@@ -245,10 +245,19 @@ public class Tool {
 	 *  go in /tmp/foo.
      */
     public FileWriter getOutputFile(Grammar g, String fileName) throws IOException {
-		String fullName =
-			outputDirectory+File.separator+
-			g.getFileDirectory()+File.separator+
-			fileName;
+		String fullName;
+		String fileDir = g.getFileDirectory();
+		if ( fileDir==null ) {
+			fullName =
+				outputDirectory+File.separator+
+				fileName;
+		}
+		else {
+			fullName =
+				outputDirectory+File.separator+
+				fileDir+File.separator+
+				fileName;
+		}
 		File outDir = new File(fullName).getParentFile();
 		if( !outDir.exists() ) {
 			outDir.mkdirs();
