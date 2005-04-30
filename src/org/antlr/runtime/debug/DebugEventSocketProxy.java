@@ -4,18 +4,15 @@ import org.antlr.runtime.*;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.InputStream;
-import java.io.DataInputStream;
+import java.io.*;
 
 public class DebugEventSocketProxy implements DebugEventListener {
 	public static final int DEFAULT_DEBUGGER_PORT = 2005;
 	protected int port = DEFAULT_DEBUGGER_PORT;
 	protected ServerSocket serverSocket;
 	protected Socket socket;
-	PrintStream out;
-	DataInputStream in;
+	PrintWriter out;
+	BufferedReader in;
 
 	public DebugEventSocketProxy() {
 		this(DEFAULT_DEBUGGER_PORT);
@@ -30,8 +27,12 @@ public class DebugEventSocketProxy implements DebugEventListener {
 			serverSocket = new ServerSocket(port);
 			socket = serverSocket.accept();
 			socket.setTcpNoDelay(true);
-			out = new PrintStream(socket.getOutputStream());
-			in = new DataInputStream(socket.getInputStream());
+			OutputStream os = socket.getOutputStream();
+			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF8");
+			out = new PrintWriter(new BufferedWriter(osw));
+			InputStream is = socket.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is, "UTF8");
+			in = new BufferedReader(isr);
 			transmit("ANTLR 3.0ea1");
 		}
 	}
@@ -162,6 +163,7 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		txt = txt.replaceAll("\n","%0A");  // escape \n
 		txt = txt.replaceAll("\r","%0D");  // escape \r
 		buf.append(txt);
+		buf.append("\u0109\u0119");
 		return buf.toString();
 	}
 

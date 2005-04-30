@@ -2,12 +2,11 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.*;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.ConnectException;
 import java.util.StringTokenizer;
+import java.util.Locale;
 
 public class RemoteDebugEventSocketListener implements Runnable {
 	static final int MAX_EVENT_ELEMENTS = 8;
@@ -15,8 +14,8 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	String machine;
 	int port;
 	Socket channel = null;
-	DataInputStream in = null;
-	PrintStream out;
+	PrintWriter out;
+	BufferedReader in;
 	String event;
 
 	public static class ProxyToken extends Token {
@@ -113,8 +112,12 @@ public class RemoteDebugEventSocketListener implements Runnable {
         try {
             channel = new Socket(machine, port);
             channel.setTcpNoDelay(true);
-            in = new DataInputStream(channel.getInputStream());
-            out = new PrintStream(channel.getOutputStream());
+			OutputStream os = channel.getOutputStream();
+			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF8");
+			out = new PrintWriter(new BufferedWriter(osw));
+			InputStream is = channel.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is, "UTF8");
+			in = new BufferedReader(isr);
             success = true;
         } catch(Exception e) {
             System.err.println(e);
