@@ -87,8 +87,14 @@ UNKNOWN_DYNAMIC_ATTRIBUTE(file,line,col,arg) ::=
 	"<loc()>unknown dynamic attribute: <arg>"
 UNKNOWN_ATTRIBUTE_SCOPE(file,line,col,arg) ::=
 	"<loc()>unknown attribute scope: <arg>"
-UNKNOWN_ATTRIBUTE(file,line,col,arg) ::=
-	"<loc()>unknown attribute: <arg>"
+UNKNOWN_RULE_ATTRIBUTE(file,line,col,arg,arg2) ::=
+	"<loc()>unknown attribute for rule <arg>: <arg2>"
+UNKNOWN_SIMPLE_ATTRIBUTE(file,line,col,arg,args2) ::=
+	"<loc()>attribute is not a token, parameter, or return value: <arg>"
+ISOLATED_RULE_ATTRIBUTE(file,line,col,arg) ::=
+	"<loc()>missing attribute access on rule label: <arg>"
+INVALID_RULE_PARAMETER_REF(file,line,col,arg,arg2) ::=
+	"<loc()>cannot access rule <arg>'s parameter: <arg2>"
 
 // GRAMMAR WARNINGS
 

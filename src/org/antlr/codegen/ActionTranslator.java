@@ -175,18 +175,9 @@ public class ActionTranslator {
 		}
 		StringTemplate refST = null;
 		if ( r.getTokenLabel(label)!=null ) {
-			if ( Token.predefinedTokenProperties.contains(attribute) ) {
-				// $tokenRef.property
-				refST = generator.templates.getInstanceOf("tokenLabelPropertyRef_"+attribute);
-				refST.setAttribute("label",label);
-			}
-			else {
-				ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_ATTRIBUTE,
-										  grammar,
-										  actionToken,
-										  ref);
-				return ref;
-			}
+			// $tokenRef.property
+			refST = generator.templates.getInstanceOf("tokenLabelPropertyRef_"+attribute);
+			refST.setAttribute("label",label);
 		}
 		else {
 			if ( Rule.predefinedRuleProperties.contains(attribute) ) {
@@ -199,11 +190,21 @@ public class ActionTranslator {
 				Grammar.LabelElementPair ruleLabel = r.getRuleLabel(label);
 				String referencedRuleName = ruleLabel.elementRef.getText();
 				Rule referencedRule = grammar.getRule(referencedRuleName);
-				if ( referencedRule.getAttributeScope(attribute)==null ) {
-					ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_ATTRIBUTE,
+				AttributeScope scope = referencedRule.getAttributeScope(attribute);
+				if ( scope==null ) {
+					ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE,
 											  grammar,
 											  actionToken,
-											  ref);
+											  label,
+											  attribute);
+					return ref;
+				}
+				if ( scope==referencedRule.parameterScope ) {
+					ErrorManager.grammarError(ErrorManager.MSG_INVALID_RULE_PARAMETER_REF,
+											  grammar,
+											  actionToken,
+											  label,
+											  attribute);
 					return ref;
 				}
 				refST = generator.templates.getInstanceOf("ruleLabelRef");
@@ -224,13 +225,22 @@ public class ActionTranslator {
 		String ref = CodeGenerator.LOCAL_AND_LABEL_REF_CHAR+name;
 		StringTemplate refST = null;
 		if ( r.getTokenLabel(name)!=null ) {
+			// $tokenLabel
 			refST = generator.templates.getInstanceOf("tokenLabelRef");
 			refST.setAttribute("label", name);
 		}
+		else if ( r.getRuleLabel(name)!=null ) {
+			ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
+									  grammar,
+									  actionToken,
+									  ref);
+			return ref;
+		}
 		else {
+			// $parameter or $returnValue
 			AttributeScope scope = r.getAttributeScope(name);
 			if ( scope==null ) {
-				ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_ATTRIBUTE,
+				ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE,
 										  grammar,
 										  actionToken,
 										  ref);
@@ -241,13 +251,6 @@ public class ActionTranslator {
 			}
 			else if ( scope.isReturnScope ) {
 				refST = generator.templates.getInstanceOf("returnAttributeRef");
-			}
-			else {
-				ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_ATTRIBUTE,
-										  grammar,
-										  actionToken,
-										  ref);
-				return ref;
 			}
 			refST.setAttribute("attr", scope.getAttribute(name));
 		}
@@ -271,7 +274,7 @@ public class ActionTranslator {
 			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_ATTRIBUTE_SCOPE,
 									  grammar,
 									  actionToken,
-									  scope);
+									  CodeGenerator.DYNAMIC_ATTRIBUTE_REF_CHAR+scope);
 			return ref;
 		}
 		AttributeScope.Attribute attr =

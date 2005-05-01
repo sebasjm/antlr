@@ -163,7 +163,6 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		txt = txt.replaceAll("\n","%0A");  // escape \n
 		txt = txt.replaceAll("\r","%0D");  // escape \r
 		buf.append(txt);
-		buf.append("\u0109\u0119");
 		return buf.toString();
 	}
 

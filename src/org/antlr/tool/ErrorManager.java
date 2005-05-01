@@ -141,7 +141,10 @@ public class ErrorManager {
 	public static final int MSG_ATTRIBUTE_REF_NOT_IN_RULE = 111;
 	public static final int MSG_UNKNOWN_DYNAMIC_ATTRIBUTE = 112;
 	public static final int MSG_UNKNOWN_ATTRIBUTE_SCOPE = 113;
-	public static final int MSG_UNKNOWN_ATTRIBUTE = 114;
+	public static final int MSG_UNKNOWN_SIMPLE_ATTRIBUTE = 114;
+	public static final int MSG_INVALID_RULE_PARAMETER_REF = 115;
+	public static final int MSG_UNKNOWN_RULE_ATTRIBUTE = 116;
+	public static final int MSG_ISOLATED_RULE_ATTRIBUTE = 117;
 
 
 	// GRAMMAR WARNINGS
