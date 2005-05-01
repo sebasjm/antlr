@@ -5,6 +5,8 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
+import java.util.List;
+import java.util.ArrayList;
 
 /** Track the attributes within a scope.  A named scoped has just its list
  *  of attributes.  Each rule has potentially 3 scopes: return values,
@@ -40,7 +42,7 @@ public class AttributeScope {
 	public boolean isReturnScope;
 
 	/** The list of Attribute objects */
-	public LinkedHashMap attributes = new LinkedHashMap();
+	protected LinkedHashMap attributes = new LinkedHashMap();
 
 	public AttributeScope(String name) {
 		this.name = name;
@@ -56,6 +58,7 @@ public class AttributeScope {
 		return name;
 	}
 
+	/*
 	public StringTemplate getAttributeReferenceTemplate(StringTemplateGroup group) {
 		StringTemplate refST;
 		if ( isGlobal ) {
@@ -74,6 +77,7 @@ public class AttributeScope {
 		}
 		return refST;
 	}
+	*/
 
 	/** From a chunk of text holding the definitions of the attributes,
 	 *  pull them apart and create an Attribute for each one.  Add to
@@ -106,6 +110,16 @@ public class AttributeScope {
 			attr.name = lastIDInDecl(decl);
 			attributes.put(attr.name, attr);
 		}
+	}
+
+	public Attribute getAttribute(String name) {
+		return (Attribute)attributes.get(name);
+	}
+
+	public List getAttributes() {
+		List a = new ArrayList();
+		a.addAll(attributes.values());
+		return a;
 	}
 
 	/** For decls like "String foo" or "char *foo32[3]" return the last valid

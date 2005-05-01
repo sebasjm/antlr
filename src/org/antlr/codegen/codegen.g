@@ -128,7 +128,7 @@ grammarSpec
         (attrScope)*
         ( act:ACTION
           {recognizerST.setAttribute("globalAction",
-                           generator.translateAction(null,#act.getText()));}
+                           generator.translateAction(null,#act.getToken()));}
         )?
 		rules[recognizerST]
 	;
@@ -163,7 +163,7 @@ rule returns [StringTemplate code=null]
 			( #(OPTIONS .) )?
 			(ruleScopeSpec)?
             #( INITACTION
-               (ia:ACTION {initAction=generator.translateAction(r,#ia.getText());})?
+               (ia:ACTION {initAction=generator.translateAction(r,#ia.getToken());})?
              )
 	     	b=block["ruleBlock", dfa] EOR
          )
@@ -307,7 +307,7 @@ element returns [StringTemplate code=null]
         String actText = #act.getText();
 
         code = new StringTemplate(templates,
-                                  generator.translateAction(currentRuleName,#act.getText()));
+                                  generator.translateAction(currentRuleName,#act.getToken()));
         }
 
     |   SEMPRED

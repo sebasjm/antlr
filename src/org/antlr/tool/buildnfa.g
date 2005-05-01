@@ -63,7 +63,7 @@ protected void init() {
     // define all the rule begin/end NFAStates to solve forward reference issues
     Collection rules = grammar.getRules();
     for (Iterator itr = rules.iterator(); itr.hasNext();) {
-		Grammar.Rule r = (Grammar.Rule) itr.next();
+		Rule r = (Rule) itr.next();
         String ruleName = r.name;
         NFAState ruleBeginState = factory.newState();
         ruleBeginState.setDescription("rule "+ruleName+" start");

@@ -136,6 +136,12 @@ public class ErrorManager {
 	public static final int MSG_UNDEFINED_RULE_REF = 106;
 	public static final int MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE = 107;
 	public static final int MSG_CANNOT_ALIAS_TOKENS_IN_LEXER = 108;
+	public static final int MSG_MISSING_DOT_IN_ATTRIBUTE_REF = 109;
+	public static final int MSG_MISSING_ID_IN_ATTRIBUTE_REF = 110;
+	public static final int MSG_ATTRIBUTE_REF_NOT_IN_RULE = 111;
+	public static final int MSG_UNKNOWN_DYNAMIC_ATTRIBUTE = 112;
+	public static final int MSG_UNKNOWN_ATTRIBUTE_SCOPE = 113;
+	public static final int MSG_UNKNOWN_ATTRIBUTE = 114;
 
 
 	// GRAMMAR WARNINGS

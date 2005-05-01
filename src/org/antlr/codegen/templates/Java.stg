@@ -126,20 +126,23 @@ static_<scope.name>.<attr.name>
 <endif>
 >>
 
-scopeRef(scope) ::= "((scope_<scope.name>)stack_<scope.name>.peek())"
+// scopeRef(scope) ::= "((scope_<scope.name>)stack_<scope.name>.peek())"
 
-parameterAttributeRef(scope,attr) ::= "<attr.name>"
+parameterAttributeRef(attr) ::= "<attr.name>"
 
-returnAttributeRef(scope,attr) ::= "retval.<attr.name>"
+returnAttributeRef(attr) ::= "retval.<attr.name>"
 
-ruleAttributeRef ::= globalAttributeRef
+ruleScopeAttributeRef(scope,attr) ::=
+    "((scope_<scope.name>)stack_<scope.name>.peek()).<attr.name>"
 
-/** How to translate @label */
+ruleLabelRef(label,prop) ::= "<label>.<prop>"
+
+/** How to translate $tokenLabel */
 tokenLabelRef(label) ::= "<label>"
 
 // not sure the next are the right approach
 
-tokenLabelPropertyRef_text(label) ::= "<label>.getText(input.getTokenSource().getCharStream())"
+tokenLabelPropertyRef_text(label) ::= "<label>.getText()"
 tokenLabelPropertyRef_type(label) ::= "<label>.getType()"
 tokenLabelPropertyRef_line(label) ::= "<label>.getLine()"
 tokenLabelPropertyRef_pos(label) ::= "<label>.getCharPositionInLine()"

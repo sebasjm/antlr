@@ -232,7 +232,7 @@ Map opts=null;
 			{
 			name = #id.getText();
 			currentRuleName = name;
-			Grammar.Rule r = null;
+			Rule r = null;
 			if ( Character.isUpperCase(name.charAt(0)) &&
 				 grammar.type==Grammar.COMBINED )
 			{
@@ -277,7 +277,7 @@ mod = #modifier.getText();
 	|	"fragment"
 	;
 
-ruleScopeSpec[Grammar.Rule r]
+ruleScopeSpec[Rule r]
  	:	#( "scope"
  	       ( attrs:ACTION
  	         {

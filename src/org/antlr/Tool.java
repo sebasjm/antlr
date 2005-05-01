@@ -30,6 +30,7 @@ package org.antlr;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.DOTGenerator;
+import org.antlr.tool.Rule;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.analysis.*;
 
@@ -210,7 +211,7 @@ public class Tool {
 		DOTGenerator dotGenerator = new DOTGenerator(g);
 		Collection rules = g.getRules();
 		for (Iterator itr = rules.iterator(); itr.hasNext();) {
-			Grammar.Rule r = (Grammar.Rule) itr.next();
+			Rule r = (Rule) itr.next();
 			String ruleName = r.name;
 			try {
 				writeDOTFile(

@@ -58,42 +58,6 @@ public class Grammar {
 	public static final int TREE_PARSER = 3;
 	public static final int COMBINED = 4;
 
-	/** Combine the info associated with a rule; I'm using like a struct */
-	public static class Rule {
-		public static final Set predefinedRuleProperties = new HashSet();
-		static {
-			predefinedRuleProperties.add("start");
-			predefinedRuleProperties.add("stop");
-			predefinedRuleProperties.add("tree");
-		}
-		public String name;
-		public int index;
-		public String modifier;
-		public Map options;
-		public NFAState startState;
-		public NFAState stopState;
-		public GrammarAST tree;
-		public GrammarAST EORNode;
-		public GrammarAST lexerAction;
-		/** The return values of a rule and predefined rule attributes */
-		public AttributeScope returnScope;
-		public AttributeScope parameterScope;
-		/** the attributes defined with "scope {...}" inside a rule */
-		public AttributeScope ruleScope;
-		/** A list of scope names (String) used by this rule */
-		public List useScopes;
-		/** A list of all LabelElementPair attached to tokens like id=ID */
-		public LinkedHashMap tokenLabels;
-		/** A list of all LabelElementPair attached to rule references like f=field */
-		public LinkedHashMap ruleLabels;
-		public String toString() { // used for testing
-			if ( modifier!=null ) {
-				return modifier+" "+name;
-			}
-			return name;
-		}
-	}
-
 	public static class Decision {
 		public int decision;
 		public NFAState startState;
@@ -107,6 +71,9 @@ public class Grammar {
 		public LabelElementPair(antlr.Token label, GrammarAST elementRef) {
 			this.label = label;
 			this.elementRef = elementRef;
+		}
+		public String toString() {
+			return elementRef.toString();
 		}
 	}
 
@@ -687,39 +654,6 @@ public class Grammar {
 			return getScope(id)!=null;
 		}
 		return id.equals(r.name) || getScope(id)!=null;
-	}
-
-	public AttributeScope getScopeContainingAttribute(Rule r,
-													  String scopeName,
-													  String attrName)
-	{
-		if ( r==null ) { // must be action not in a rule
-			if ( scopeName==null ) {
-				System.err.println("no scope: "+scopeName);
-				return null;
-			}
-			AttributeScope scope = getScope(scopeName);
-			return scope;
-		}
-		if ( scopeName!=null && !scopeName.equals(r.name) ) {
-			AttributeScope scope = getScope(scopeName);
-			// TODO: what to do if no attrName in scope?
-			if ( scope.attributes.get(attrName)==null ) {
-				System.err.println("no "+attrName+" in scope "+scopeName);
-			}
-			return scope;
-		}
-		if ( r.returnScope!=null && r.returnScope.attributes.get(attrName)!=null ) {
-			return r.returnScope;
-		}
-		if ( r.parameterScope!=null && r.parameterScope.attributes.get(attrName)!=null ) {
-			return r.parameterScope;
-		}
-		if ( r.ruleScope!=null && r.ruleScope.attributes.get(attrName)!=null ) {
-			return r.ruleScope;
-		}
-		System.err.println("no scope for "+attrName+" (tried scope "+scopeName+")");
-		return null;
 	}
 
 	public Map getScopes() {
