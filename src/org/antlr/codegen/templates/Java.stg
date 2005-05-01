@@ -87,15 +87,9 @@ class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
 >>
 
 attributeScope(scope) ::= <<
-<if(scope.hasStatic)>
-protected static class static_<scope.name> {
-    <scope.attributes:{<if(it.isStatic)><it.decl>;<endif>}; separator="\n">
-}
-protected static_<scope.name> static_<scope.name> = new static_<scope.name>();<\n>
-<endif>
-<if(scope.hasNonStatic)>
+<if(scope.attributes)>
 protected static class <scope.name> {
-    <scope.attributes:{<if(!it.isStatic)><it.decl>;<endif>}; separator="\n">
+    <scope.attributes:{<it.decl>;}; separator="\n">
 }
 protected Stack stack_<scope.name> = new Stack();<\n>
 <endif>
@@ -117,7 +111,7 @@ protected static class <returnType()> {
 <if(ruleDescriptor.needPredefinedRuleAttributes)>
     Token start=null, stop=null;
 <endif>
-    <scope.attributes:{<if(!it.isStatic)><it.decl>;<endif>}; separator="\n">
+    <scope.attributes:{<it.decl>;}; separator="\n">
 };
 <endif>
 >>
@@ -135,11 +129,7 @@ parameterScope(scope) ::= <<
  *  I.e., actions are just text strings during final code generation.
  */
 globalAttributeRef(scope,attr) ::= <<
-<if(attr.isStatic)>
-static_<scope.name>.<attr.name>
-<else>
 ((<scope.name>)stack_<scope.name>.peek()).<attr.name>
-<endif>
 >>
 
 parameterAttributeRef(attr) ::= "<attr.name>"

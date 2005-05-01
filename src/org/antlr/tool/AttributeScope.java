@@ -21,12 +21,7 @@ public class AttributeScope {
 		public String decl;
 		/** The name of the attribute "foo" */
 		public String name;
-		/** Whether or not the static keyword is present */
-		public boolean isStatic;
 		public String toString() {
-			if ( isStatic ) {
-				return "static "+name;
-			}
 			return name;
 		}
 	}
@@ -40,12 +35,6 @@ public class AttributeScope {
 	public boolean isParameterScope;
 
 	public boolean isReturnScope;
-
-	/** There is at least one static attribute in this scope */
-	public boolean hasStatic = false;
-
-	/** There is at least one normal nonstatic attribute in this scope */
-	public boolean hasNonStatic = false;
 
 	/** The list of Attribute objects */
 	protected LinkedHashMap attributes = new LinkedHashMap();
@@ -87,15 +76,6 @@ public class AttributeScope {
 			}
 			Attribute attr = new Attribute();
 			attr.decl = decl;
-			if ( decl.startsWith("static ") ) {
-				attr.isStatic = true;
-				hasStatic = true;
-				// trim out "static"
-				attr.decl = decl.substring("static ".length(),decl.length());
-			}
-			else {
-				hasNonStatic = true;
-			}
 			attr.name = lastIDInDecl(decl);
 			attributes.put(attr.name, attr);
 		}
