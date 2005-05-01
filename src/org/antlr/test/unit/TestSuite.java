@@ -45,9 +45,15 @@ public abstract class TestSuite {
     }
 
     public void assertEqual(Object result, Object expecting) throws FailedAssertionException {
-        if ( result==null && expecting!=null ) {
-            throw new FailedAssertionException("expecting \""+expecting+"\"; found null");
-        }
+		if ( result==null && expecting!=null ) {
+			throw new FailedAssertionException("expecting \""+expecting+"\"; found null");
+		}
+		if ( result!=null && expecting==null ) {
+			throw new FailedAssertionException("expecting null; found \""+result);
+		}
+		if ( result==null && expecting==null ) {
+			return;
+		}
         assertTrue(result.equals(expecting), "expecting \""+expecting+"\"; found \""+result+"\"");
     }
 
