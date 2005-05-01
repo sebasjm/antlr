@@ -1,6 +1,7 @@
 package org.antlr.tool;
 
 import org.antlr.analysis.NFAState;
+import org.antlr.stringtemplate.StringTemplate;
 
 import java.util.*;
 
@@ -12,6 +13,7 @@ public class Rule {
 		predefinedRuleProperties.add("stop");
 		predefinedRuleProperties.add("tree");
 	}
+
 	public String name;
 	public int index;
 	public String modifier;
@@ -20,18 +22,28 @@ public class Rule {
 	public NFAState stopState;
 	public GrammarAST tree;
 	public GrammarAST EORNode;
-	public GrammarAST lexerAction;
+
 	/** The return values of a rule and predefined rule attributes */
 	public AttributeScope returnScope;
+
 	public AttributeScope parameterScope;
+
 	/** the attributes defined with "scope {...}" inside a rule */
 	public AttributeScope ruleScope;
+
 	/** A list of scope names (String) used by this rule */
 	public List useScopes;
+
 	/** A list of all LabelElementPair attached to tokens like id=ID */
 	public LinkedHashMap tokenLabels;
+
 	/** A list of all LabelElementPair attached to rule references like f=field */
 	public LinkedHashMap ruleLabels;
+
+	/** Do not generate start, stop etc... in a return value struct unless
+	 *  somebody references $r.start somewhere in an action.
+	 */
+	public boolean needPredefinedRuleAttributes = false;
 
 	public Grammar.LabelElementPair getLabel(String name) {
 		Grammar.LabelElementPair pair = null;
@@ -72,39 +84,14 @@ public class Rule {
 		return scope;
 	}
 
-	/*
-	public AttributeScope getScopeContainingAttribute(String scopeName,
-													  String attrName)
-	{
-		if ( r==null ) { // must be action not in a rule
-			if ( scopeName==null ) {
-				System.erprintln("no scope: "+scopeName);
-				return null;
-			}
-			AttributeScope scope = getScope(scopeName);
-			return scope;
-		}
-		if ( scopeName!=null && !scopeName.equals(name) ) {
-			AttributeScope scope = getScope(scopeName);
-			// TODO: what to do if no attrName in scope?
-			if ( scope.attributes.get(attrName)==null ) {
-				System.erprintln("no "+attrName+" in scope "+scopeName);
-			}
-			return scope;
-		}
-		if ( returnScope!=null && returnScope.attributes.get(attrName)!=null ) {
-			return returnScope;
-		}
-		if ( parameterScope!=null && parameterScope.attributes.get(attrName)!=null ) {
-			return parameterScope;
-		}
-		if ( ruleScope!=null && ruleScope.attributes.get(attrName)!=null ) {
-			return ruleScope;
-		}
-		System.erprintln("no scope for "+attrName+" (tried scope "+scopeName+")");
-		return null;
+	/** If a rule has no user-defined parameters and nobody references
+	 *  it's start/stop (predefined attributes), then there is no need to
+	 *  define a struct otherwise for now we assume a struct.
+	 *  TODO: if only one user-defined type and no one references predefined attrs don't generate struct
+	 */
+	public boolean getHasMultipleReturnValues() {
+		return needPredefinedRuleAttributes || returnScope.attributes.size()>0;
 	}
-	*/
 
 	public String toString() { // used for testing
 		if ( modifier!=null ) {

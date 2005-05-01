@@ -70,7 +70,7 @@ class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
         super(input,port);
     }<\n>
 <else>
-    public <name>(TokenStream input) { super(input); }
+    public <name>(TokenStream input) { super(input); }<\n>
 <endif>
     public String[] getTokenNames() { return tokenNames; }
 
@@ -87,23 +87,39 @@ class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
 >>
 
 attributeScope(scope) ::= <<
-// scope <scope.name>
-protected static class static_scope_<scope.name> {
+<if(scope.hasStatic)>
+protected static class static_<scope.name> {
     <scope.attributes:{<if(it.isStatic)><it.decl>;<endif>}; separator="\n">
 }
-static_scope_<scope.name> static_<scope.name> = new static_scope_<scope.name>();
-protected static class scope_<scope.name> {
+protected static_<scope.name> static_<scope.name> = new static_<scope.name>();<\n>
+<endif>
+<if(scope.hasNonStatic)>
+protected static class <scope.name> {
     <scope.attributes:{<if(!it.isStatic)><it.decl>;<endif>}; separator="\n">
 }
 protected Stack stack_<scope.name> = new Stack();<\n>
+<endif>
+>>
+
+ruleLabelType(name) ::= "<name>_return"
+
+returnType() ::= <<
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<ruleDescriptor.name>_return
+<else>
+void
+<endif>
 >>
 
 returnScope(scope) ::= <<
-<scope.attributes:{<if(it.isStatic)><it.decl>;<endif>}; separator="\n">
-protected static class scope_<scope.name> {
+<if(ruleDescriptor.hasMultipleReturnValues)>
+protected static class <returnType()> {
+<if(ruleDescriptor.needPredefinedRuleAttributes)>
     Token start=null, stop=null;
+<endif>
     <scope.attributes:{<if(!it.isStatic)><it.decl>;<endif>}; separator="\n">
 };
+<endif>
 >>
 
 parameterScope(scope) ::= <<
@@ -122,11 +138,9 @@ globalAttributeRef(scope,attr) ::= <<
 <if(attr.isStatic)>
 static_<scope.name>.<attr.name>
 <else>
-((scope_<scope.name>)stack_<scope.name>.peek()).<attr.name>
+((<scope.name>)stack_<scope.name>.peek()).<attr.name>
 <endif>
 >>
-
-// scopeRef(scope) ::= "((scope_<scope.name>)stack_<scope.name>.peek())"
 
 parameterAttributeRef(attr) ::= "<attr.name>"
 
@@ -158,15 +172,19 @@ public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separ
 >>
 
 rule(ruleName,ruleDescriptor,initAction,block) ::= <<
-<ruleDescriptor.ruleScope:attributeScope(scope=it)>
-<ruleDescriptor.returnScope:returnScope(scope=it)>
+<attributeScope(scope=ruleDescriptor.ruleScope)>
+<returnScope(scope=ruleDescriptor.returnScope)>
+
 // $ANTLR start <ruleName>
-public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
-    <ruleDescriptor.useScopes:{stack_<it>.push(new scope_<it>());}; separator="\n">
+public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
+    <ruleDescriptor.useScopes:{stack_<it>.push(new <it>());}; separator="\n">
     <ruleDescriptor.ruleScope:{stack_<it.name>.push(new scope_<it.name>());}; separator="\n">
-    <ruleDescriptor.returnScope:{scope_<it.name> retval = new scope_<it.name>();<\n>retval.start = input.LT(1);}; separator="\n">
+<if(ruleDescriptor.hasMultipleReturnValues)>
+    <returnType()> retval = new <returnType()>();
+    retval.start = input.LT(1);<\n>
+<endif>
     <ruleDescriptor.tokenLabels:{Token <it.label.text>=null;}; separator="\n">
-    <ruleDescriptor.ruleLabels:{scope_<it.elementRef.text>_return <it.label.text>=null;}; separator="\n">
+    <ruleDescriptor.ruleLabels:{<ruleLabelType(name=it.elementRef.text)> <it.label.text>=null;}; separator="\n">
     <initAction>
 <if(debug)>
     try { dbg.enterRule("<ruleName>");
@@ -182,13 +200,15 @@ public <if(ruleDescriptor.returnScope)>scope_<ruleName>_return<else>void<endif> 
     finally {
         <ruleDescriptor.useScopes:{stack_<it>.pop();}; separator="\n">
         <ruleDescriptor.ruleScope:{stack_<it.name>.pop();}; separator="\n">
-        retval.stop = input.LT(-1);
+<if(ruleDescriptor.hasMultipleReturnValues)>
+        retval.stop = input.LT(-1);<\n>
+<endif>
     }<\n>
 <if(debug)>
     dbg.location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
     } finally {dbg.exitRule("<ruleName>");}<\n>
 <endif>
-<if(ruleDescriptor.returnScope)>
+<if(ruleDescriptor.hasMultipleReturnValues)>
     return retval;<\n>
 <endif>
 }

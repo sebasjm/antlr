@@ -599,11 +599,6 @@ public class Grammar {
 		return r;
 	}
 
-	public GrammarAST getLexerRuleAction(String ruleName) {
-		Rule r = (Rule)nameToRuleMap.get(ruleName);
-		return r.lexerAction;
-	}
-
     public int getRuleIndex(String ruleName) {
 		Rule r = getRule(ruleName);
 		if ( r!=null ) {
@@ -685,6 +680,19 @@ public class Grammar {
 			}
 			r.ruleLabels.put(label.getText(),
 							 new LabelElementPair(label,ruleRef));
+		}
+	}
+
+	/** To yield smaller, more readable code, track which rules have their
+	 *  predefined attributes accessed.  If the rule has no user-defined
+	 *  return values, then don't generate the return value scope classes
+	 *  etc...  Make the rule have void return value.
+	 *  TODO: for single return values, don't use struct retval if no ref to predef attrs
+	 */
+	public void referenceRuleLabelPredefinedAttribute(String ruleName) {
+		Rule r = getRule(ruleName);
+		if ( r!=null ) {
+			r.needPredefinedRuleAttributes = true;
 		}
 	}
 
@@ -847,17 +855,6 @@ public class Grammar {
 		if ( r!=null ) {
 			r.tree = t;
 			r.EORNode = t.getLastChild();
-		}
-	}
-
-	/** When interpreting a lexer grammar, one wants to be able exec
-	 *  lexer actions to set the channel and token type.  For now,
-	 *  only the last action found is tracked per rule.
-	 */
-	public void setLexerRuleAction(String ruleName, GrammarAST t) {
-		Rule r = (Rule)nameToRuleMap.get(ruleName);
-		if ( r!=null ) {
-			r.lexerAction = t;
 		}
 	}
 

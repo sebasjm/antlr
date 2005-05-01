@@ -51,20 +51,21 @@ public class ActionTranslator {
 				c++;
 				continue;
 			}
-			c++; // skip $ or @
-			// cannot have $ or @ expressions outside of a rule
-			if ( r==null ) {
-				ErrorManager.grammarError(ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE,
-										  grammar,
-										  actionToken);
-				continue;
-			}
 			if ( action.charAt(c)==CodeGenerator.DYNAMIC_ATTRIBUTE_REF_CHAR ) {
 				// @...
-				c = parseDynamicAttributeRef(r,action,c,buf,actionToken);
+				c++; // skip @
+				c = parseDynamicAttributeRef(action,c,buf,actionToken);
 			}
             else {
 				// $...
+				c++; // skip $
+				// cannot have $ expressions outside of a rule
+				if ( r==null ) {
+					ErrorManager.grammarError(ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE,
+											  grammar,
+											  actionToken);
+					continue;
+				}
 				c = parseAttributeRef(r,action,c,buf,actionToken);
 			}
 		}
@@ -73,8 +74,7 @@ public class ActionTranslator {
 	}
 
 	/** For @x.y, get both x and y */
-	protected int parseDynamicAttributeRef(Rule r,
-										   String action,
+	protected int parseDynamicAttributeRef(String action,
 										   int c,
 										   StringBuffer buf,
 										   antlr.Token actionToken)
@@ -106,7 +106,7 @@ public class ActionTranslator {
 			return c;
 		}
 		c = dotIndex+attribute.length()+1; // move on
-		String attrRef = translateAttributeReference(r,actionToken,scope,attribute);
+		String attrRef = translateDynamicAttributeReference(actionToken,scope,attribute);
 		buf.append(attrRef);
 		return c;
 	}
@@ -180,15 +180,17 @@ public class ActionTranslator {
 			refST.setAttribute("label",label);
 		}
 		else {
+			Grammar.LabelElementPair ruleLabel = r.getRuleLabel(label);
+			String referencedRuleName = ruleLabel.elementRef.getText();
 			if ( Rule.predefinedRuleProperties.contains(attribute) ) {
 				// $ruleRef.property
 				refST = generator.templates.getInstanceOf("ruleLabelPropertyRef_"+attribute);
 				refST.setAttribute("label",label);
+				// track which rules have their predefined attributes accessed
+				grammar.referenceRuleLabelPredefinedAttribute(referencedRuleName);
 			}
 			else {
 				// $ruleRef.y
-				Grammar.LabelElementPair ruleLabel = r.getRuleLabel(label);
-				String referencedRuleName = ruleLabel.elementRef.getText();
 				Rule referencedRule = grammar.getRule(referencedRuleName);
 				AttributeScope scope = referencedRule.getAttributeScope(attribute);
 				if ( scope==null ) {
@@ -262,8 +264,7 @@ public class ActionTranslator {
 	 *  a scope defined within a rule.  y must be an attribute within
 	 *  that scope.
 	 */
-	protected String translateDynamicAttributeReference(Rule r,
-														antlr.Token actionToken,
+	protected String translateDynamicAttributeReference(antlr.Token actionToken,
 														String scope,
 														String attribute)
 	{

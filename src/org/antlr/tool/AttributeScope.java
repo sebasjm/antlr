@@ -41,6 +41,12 @@ public class AttributeScope {
 
 	public boolean isReturnScope;
 
+	/** There is at least one static attribute in this scope */
+	public boolean hasStatic = false;
+
+	/** There is at least one normal nonstatic attribute in this scope */
+	public boolean hasNonStatic = false;
+
 	/** The list of Attribute objects */
 	protected LinkedHashMap attributes = new LinkedHashMap();
 
@@ -57,27 +63,6 @@ public class AttributeScope {
 		}
 		return name;
 	}
-
-	/*
-	public StringTemplate getAttributeReferenceTemplate(StringTemplateGroup group) {
-		StringTemplate refST;
-		if ( isGlobal ) {
-			refST = group.getInstanceOf("globalAttributeRef");
-		}
-		else {
-			if ( isParameterScope ) {
-				refST = group.getInstanceOf("parameterAttributeRef");
-			}
-			else if ( isReturnScope ) {
-				refST = group.getInstanceOf("returnAttributeRef");
-			}
-			else {
-				refST = group.getInstanceOf("ruleAttributeRef");
-			}
-		}
-		return refST;
-	}
-	*/
 
 	/** From a chunk of text holding the definitions of the attributes,
 	 *  pull them apart and create an Attribute for each one.  Add to
@@ -104,8 +89,12 @@ public class AttributeScope {
 			attr.decl = decl;
 			if ( decl.startsWith("static ") ) {
 				attr.isStatic = true;
+				hasStatic = true;
 				// trim out "static"
 				attr.decl = decl.substring("static ".length(),decl.length());
+			}
+			else {
+				hasNonStatic = true;
 			}
 			attr.name = lastIDInDecl(decl);
 			attributes.put(attr.name, attr);
