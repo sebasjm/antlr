@@ -1,13 +1,12 @@
 package org.antlr.codegen;
 
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.tool.Grammar;
-import org.antlr.tool.Rule;
-import org.antlr.tool.ErrorManager;
-import org.antlr.tool.AttributeScope;
+import org.antlr.tool.*;
 import org.antlr.runtime.Token;
 
 public class ActionTranslator {
+	public static final char ATTRIBUTE_REF_CHAR = '$';
+
 	protected CodeGenerator generator;
 	protected Grammar grammar;
 
@@ -44,111 +43,126 @@ public class ActionTranslator {
 				c++;
 				continue;
 			}
-			if ( action.charAt(c)!=CodeGenerator.LOCAL_AND_LABEL_REF_CHAR &&
-				action.charAt(c)!=CodeGenerator.DYNAMIC_ATTRIBUTE_REF_CHAR )
-			{
-				buf.append(action.charAt(c));
-				c++;
-				continue;
-			}
-			if ( action.charAt(c)==CodeGenerator.DYNAMIC_ATTRIBUTE_REF_CHAR ) {
-				// @...
-				c++; // skip @
-				c = parseDynamicAttributeRef(action,c,buf,actionToken);
-			}
-            else {
+			if ( action.charAt(c)==ATTRIBUTE_REF_CHAR ) {
 				// $...
 				c++; // skip $
-				// cannot have $ expressions outside of a rule
-				if ( r==null ) {
-					ErrorManager.grammarError(ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE,
-											  grammar,
-											  actionToken);
-					continue;
-				}
-				c = parseAttributeRef(r,action,c,buf,actionToken);
+				c = parseAttributeReference(r,action,c,buf,actionToken);
+			}
+			else {
+				buf.append(action.charAt(c));
+				c++;
 			}
 		}
 		System.out.println("translated action="+buf.toString());
 		return buf.toString();
 	}
 
-	/** For @x.y, get both x and y */
-	protected int parseDynamicAttributeRef(String action,
-										   int c,
-										   StringBuffer buf,
-										   antlr.Token actionToken)
-	{
-		String scope = getID(action, c);
-		if ( scope==null ) {
-			ErrorManager.grammarError(ErrorManager.MSG_MISSING_ID_IN_ATTRIBUTE_REF,
-									  grammar,
-									  actionToken,
-									  ""+CodeGenerator.DYNAMIC_ATTRIBUTE_REF_CHAR);
-			return c;
+	/** Given x of $x.y or $x, figure out what scope x is if any (x might
+	 *  be a parameter, say, not a scope name).  The valid scopes are
+	 *  $rulelabel, $tokenlabel, $rulename, or $scopename.
+	 */
+	protected AttributeScope resolveScope(Rule r, String scopeName) {
+		if ( grammar.getScope(scopeName)!=null ) {
+			// $scopename
+			return grammar.getScope(scopeName);
 		}
-		int dotIndex = c + scope.length();
-		if ( dotIndex < action.length() && action.charAt(dotIndex)!='.' ) {
-			ErrorManager.grammarError(ErrorManager.MSG_MISSING_DOT_IN_ATTRIBUTE_REF,
-									  grammar,
-									  actionToken,
-									  scope);
-			c = dotIndex;
-			return c;
+		if ( r==null ) { // action outside of rule must be global scope
+			return null;
 		}
-		String attribute = getID(action, dotIndex+1);
-		if ( attribute==null ) {
-			ErrorManager.grammarError(ErrorManager.MSG_MISSING_ID_IN_ATTRIBUTE_REF,
-									  grammar,
-									  actionToken,
-									  CodeGenerator.DYNAMIC_ATTRIBUTE_REF_CHAR+scope);
-			c = dotIndex+1;
-			return c;
+		if ( r.name.equals(scopeName) ) {
+			// $rulename
+			return r.ruleScope;
 		}
-		c = dotIndex+attribute.length()+1; // move on
-		String attrRef = translateDynamicAttributeReference(actionToken,scope,attribute);
-		buf.append(attrRef);
-		return c;
+		if ( r.getTokenLabel(scopeName)!=null ) {
+			// $tokenLabel
+			return AttributeScope.tokenScope;
+		}
+		if ( r.getRuleLabel(scopeName)!=null ) {
+			// $ruleLabel
+			Grammar.LabelElementPair ruleLabel = r.getRuleLabel(scopeName);
+			String referencedRuleName = ruleLabel.elementRef.getText();
+			Rule referencedRule = grammar.getRule(referencedRuleName);
+			return new RuleLabelScope(referencedRule);
+		}
+		return null;
 	}
 
-	/** For $x or $x.y, get x and/or y
-	 *  get y only if x is rule or token label
+	/** What is the name of the template used to generate a reference to
+	 *  an attribute.  This is perhaps un-OO as the various scopes could
+	 *  answer what template generates code for that scope, but I like
+	 *  having all the template names encapsulated in one spot and in
+	 *  the codegen package.
 	 */
-	protected int parseAttributeRef(Rule r,
-									String action,
-									int c,
-									StringBuffer buf,
-									antlr.Token actionToken)
+	protected StringTemplate getScopedAttributeReferenceTemplate(Rule r,
+																 String scopeName,
+																 String attribute)
 	{
-		String id = getID(action, c);
-		c += id.length();
-		String attrRef=null;
-		if ( r.getLabel(id)!=null ) {
-			String label = id;
-			if ( c<action.length() && action.charAt(c)=='.' ) {
-				int dotIndex = c;
-				c++;
-				String attribute = getID(action, c);
-				c += attribute.length();
-				if ( r.getTokenLabel(label)!=null &&
-					!Token.predefinedTokenProperties.contains(attribute) )
-				{
-					attrRef = translateAttributeReference(r,actionToken,label);
-					c = dotIndex; // backup...not a token property
-				}
-				else {
-					// $ruleLabel.attribute
-					attrRef = translateAttributeReference(r,actionToken,label,attribute);
-				}
+		String stName = null;
+		if ( grammar.getScope(scopeName)!=null ) {
+			// $scopename
+			stName = "globalAttributeRef";
+		}
+		else if ( r.name.equals(scopeName) ) {
+			// $rulename
+			stName = "ruleScopeAttributeRef";
+		}
+		else if ( r.getTokenLabel(scopeName)!=null ) {
+			// $tokenLabel
+			stName = "tokenLabelPropertyRef_"+attribute;
+		}
+		else if ( r.getRuleLabel(scopeName)!=null ) {
+			// $ruleLabel
+			if( RuleLabelScope.predefinedRuleProperties.contains(attribute) ) {
+				stName = "ruleLabelPropertyRef_"+attribute;
 			}
 			else {
-				// $tokenLabel
-				attrRef = translateAttributeReference(r,actionToken,label);
+				stName = "ruleLabelRef";
+			}
+		}
+		if ( stName==null ) {
+			return null;
+		}
+		StringTemplate refST = generator.templates.getInstanceOf(stName);
+		refST.setAttribute("scope", scopeName);
+		refST.setAttribute("attr", attribute);
+		return refST;
+	}
+
+	/** Get $scope.attribute or just $scope if attribute not there.
+	 *  Then translate according to scope.
+	 */
+	protected int parseAttributeReference(Rule r,
+										String action,
+										int c,
+										StringBuffer buf,
+										antlr.Token actionToken)
+	{
+		String attrRef=null;
+		String scope = getID(action, c);
+		c += scope.length();
+		AttributeScope attrScope = resolveScope(r, scope);
+		if ( (c+1)<action.length() &&
+			 action.charAt(c)=='.' && Character.isLetter(action.charAt(c+1)))
+		{
+			// $x.y
+			int dotIndex = c;
+			c++;
+			String attribute = getID(action, c);
+			if ( attrScope!=null ) {
+				// $scope.attribute
+				attrRef = translateAttributeReference(r, actionToken, attrScope, scope, attribute);
+				c += attribute.length();
+			}
+			else {
+				// $arg.?, $retval.?  Translate before the dot only
+				// (could also be $x.y for unknown x outside of a rule)
+				attrRef = translateAttributeReference(r, actionToken, scope);
+				c = dotIndex;
 			}
 		}
 		else {
-			// $x
-			attrRef = translateAttributeReference(r,actionToken,id);
+			// Isolated $x
+			attrRef = translateAttributeReference(r, actionToken, scope);
 		}
 		buf.append(attrRef);
 		return c;
@@ -162,76 +176,89 @@ public class ActionTranslator {
 	 */
 	protected String translateAttributeReference(Rule r,
 												 antlr.Token actionToken,
-												 String label,
-												 String attribute)
+												 AttributeScope scope,
+												 String scopeName,
+												 String attributeName)
 	{
-		String ref = CodeGenerator.LOCAL_AND_LABEL_REF_CHAR+label+"."+attribute;
-		if ( r.getLabel(label)==null ) {
-			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_ATTRIBUTE_SCOPE,
+		String ref = ATTRIBUTE_REF_CHAR+scopeName+"."+attributeName;
+		Attribute attribute = scope.getAttribute(attributeName);
+		if ( attribute==null ) {
+			int msgID = 0;
+			// Spend some effort to generate good messages
+			// $x.unknown
+			if ( r.getTokenLabel(scopeName)!=null ) {
+				// $tokenlabel.unknown, just return what you would for $x
+				StringTemplate refST =
+					generator.templates.getInstanceOf("tokenLabelRef");
+				refST.setAttribute("label", scopeName);
+				// we must ignore the unknown; put it in the translated action
+                return refST.toString()+"."+attributeName;
+			}
+			// $rulename.unknown
+			if ( scope.isDynamicRuleScope ) {
+				msgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
+			}
+			// $rulelabel.unknown
+			else if ( scope instanceof RuleLabelScope) {
+				Rule referencedRule = ((RuleLabelScope)scope).referencedRule;
+				// $rulelabel.parameter
+				if ( referencedRule.parameterScope!=null &&
+					referencedRule.parameterScope.getAttribute(attributeName)!=null )
+				{
+					msgID = ErrorManager.MSG_INVALID_RULE_PARAMETER_REF;
+				}
+				// $rulelabel.dynamicscopeattribute
+				else if ( referencedRule.ruleScope!=null &&
+					referencedRule.ruleScope.getAttribute(attributeName)!=null )
+				{
+					msgID = ErrorManager.MSG_INVALID_RULE_SCOPE_ATTRIBUTE_REF;
+				}
+				// $rulename.unknown
+				else if ( scope.getAttribute(attributeName)==null ) {
+					msgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
+				}
+			}
+			// general error for unknown y in x
+			else {
+				msgID = ErrorManager.MSG_UNKNOWN_ATTRIBUTE_IN_SCOPE;
+			}
+
+			ErrorManager.grammarError(msgID,
+									  grammar,
+									  actionToken,
+									  scopeName,
+									  attributeName);
+			return ref;
+		}
+		StringTemplate refST =
+			getScopedAttributeReferenceTemplate(r,scopeName,attributeName);
+
+		return refST.toString();
+	}
+
+	/** Translate $x where x is either a parameter, return value, local
+	 *  rule-scope attribute, or token attributeName.
+	 */
+	protected String translateAttributeReference(Rule r,
+												 antlr.Token actionToken,
+												 String attributeName)
+	{
+		String ref = ATTRIBUTE_REF_CHAR+attributeName;
+		// cannot have isolated $x expressions outside of a rule
+		if ( r==null ) {
+			ErrorManager.grammarError(ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE,
 									  grammar,
 									  actionToken,
 									  ref);
 			return ref;
 		}
 		StringTemplate refST = null;
-		if ( r.getTokenLabel(label)!=null ) {
-			// $tokenRef.property
-			refST = generator.templates.getInstanceOf("tokenLabelPropertyRef_"+attribute);
-			refST.setAttribute("label",label);
-		}
-		else {
-			Grammar.LabelElementPair ruleLabel = r.getRuleLabel(label);
-			String referencedRuleName = ruleLabel.elementRef.getText();
-			if ( Rule.predefinedRuleProperties.contains(attribute) ) {
-				// $ruleRef.property
-				refST = generator.templates.getInstanceOf("ruleLabelPropertyRef_"+attribute);
-				refST.setAttribute("label",label);
-				// track which rules have their predefined attributes accessed
-				grammar.referenceRuleLabelPredefinedAttribute(referencedRuleName);
-			}
-			else {
-				// $ruleRef.y
-				Rule referencedRule = grammar.getRule(referencedRuleName);
-				AttributeScope scope = referencedRule.getAttributeScope(attribute);
-				if ( scope==null ) {
-					ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE,
-											  grammar,
-											  actionToken,
-											  label,
-											  attribute);
-					return ref;
-				}
-				if ( scope==referencedRule.parameterScope ) {
-					ErrorManager.grammarError(ErrorManager.MSG_INVALID_RULE_PARAMETER_REF,
-											  grammar,
-											  actionToken,
-											  label,
-											  attribute);
-					return ref;
-				}
-				refST = generator.templates.getInstanceOf("ruleLabelRef");
-				refST.setAttribute("label", label);
-				refST.setAttribute("prop", attribute);
-			}
-		}
-		return refST.toString();
-	}
-
-	/** Translate $x where x is either a parameter, return value, or token
-	 *  name.
-	 */
-	protected String translateAttributeReference(Rule r,
-												 antlr.Token actionToken,
-												 String name)
-	{
-		String ref = CodeGenerator.LOCAL_AND_LABEL_REF_CHAR+name;
-		StringTemplate refST = null;
-		if ( r.getTokenLabel(name)!=null ) {
+		if ( r.getTokenLabel(attributeName)!=null ) {
 			// $tokenLabel
 			refST = generator.templates.getInstanceOf("tokenLabelRef");
-			refST.setAttribute("label", name);
+			refST.setAttribute("label", attributeName);
 		}
-		else if ( r.getRuleLabel(name)!=null ) {
+		else if ( r.getRuleLabel(attributeName)!=null ) {
 			ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
 									  grammar,
 									  actionToken,
@@ -240,7 +267,7 @@ public class ActionTranslator {
 		}
 		else {
 			// $parameter or $returnValue
-			AttributeScope scope = r.getAttributeScope(name);
+			AttributeScope scope = r.getAttributeScope(attributeName);
 			if ( scope==null ) {
 				ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE,
 										  grammar,
@@ -254,49 +281,12 @@ public class ActionTranslator {
 			else if ( scope.isReturnScope ) {
 				refST = generator.templates.getInstanceOf("returnAttributeRef");
 			}
-			refST.setAttribute("attr", scope.getAttribute(name));
+			else if ( scope.isDynamicRuleScope ) {
+				refST = generator.templates.getInstanceOf("ruleScopeAttributeRef");
+				refST.setAttribute("scope", r.name);
+			}
+			refST.setAttribute("attr", scope.getAttribute(attributeName));
 		}
-		return refST.toString();
-	}
-
-
-	/** Translate @x.y where x is either a global scope definition or
-	 *  a scope defined within a rule.  y must be an attribute within
-	 *  that scope.
-	 */
-	protected String translateDynamicAttributeReference(antlr.Token actionToken,
-														String scope,
-														String attribute)
-	{
-		String ref = CodeGenerator.DYNAMIC_ATTRIBUTE_REF_CHAR+scope+"."+attribute;
-		StringTemplate refST = null;
-		AttributeScope attrScope = grammar.getScope(scope);
-		if ( attrScope==null ) {
-			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_ATTRIBUTE_SCOPE,
-									  grammar,
-									  actionToken,
-									  CodeGenerator.DYNAMIC_ATTRIBUTE_REF_CHAR+scope);
-			return ref;
-		}
-		AttributeScope.Attribute attr =
-			(AttributeScope.Attribute)attrScope.getAttribute(attribute);
-		if ( attr==null ) {
-			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_DYNAMIC_ATTRIBUTE,
-									  grammar,
-									  actionToken,
-									  ref);
-			return ref;
-		}
-		if ( attrScope.isGlobal ) {
-			// @globalscope.attribute
-			refST = generator.templates.getInstanceOf("globalAttributeRef");
-		}
-		else {
-			// @rulescope.attribute (this is not a $ruleRefLable.prop ref)
-			refST = generator.templates.getInstanceOf("ruleScopeAttributeRef");
-		}
-		refST.setAttribute("scope",attrScope);
-		refST.setAttribute("attr",attr);
 		return refST.toString();
 	}
 

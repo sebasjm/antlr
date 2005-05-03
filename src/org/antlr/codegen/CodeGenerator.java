@@ -78,9 +78,6 @@ public class CodeGenerator {
 	public int MIN_SWITCH_ALTS = 3;
 	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
 
-	public static final char DYNAMIC_ATTRIBUTE_REF_CHAR = '@';
-	public static final char LOCAL_AND_LABEL_REF_CHAR = '$';
-
 	public static int escapedCharValue[] = new int[255];
 	public static String charValueEscape[] = new String[255];
 

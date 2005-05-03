@@ -3,10 +3,7 @@ package org.antlr.tool;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
-import java.util.LinkedHashMap;
-import java.util.StringTokenizer;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 /** Track the attributes within a scope.  A named scoped has just its list
  *  of attributes.  Each rule has potentially 3 scopes: return values,
@@ -16,21 +13,28 @@ import java.util.ArrayList;
  */
 public class AttributeScope {
 
-	public static class Attribute {
-		/** The entire declaration such as "String foo;" minus "static" */
-		public String decl;
-		/** The name of the attribute "foo" */
-		public String name;
-		public String toString() {
-			return name;
-		}
+	/** All token scopes (token labels) share the same fixed scope of
+	 *  of predefined attributes.  I keep this out of the runtime.Token
+	 *  object to avoid a runtime space burden.
+	 */
+	public static AttributeScope tokenScope = new AttributeScope("Token");
+	static {
+		tokenScope.addAttribute("text", null);
+		tokenScope.addAttribute("type", null);
+		tokenScope.addAttribute("line", null);
+		tokenScope.addAttribute("index", null);
+		tokenScope.addAttribute("pos", null);
+		tokenScope.addAttribute("channel", null);
 	}
 
 	/** The scope name */
 	protected String name;
 
-	/** Not a rule scope, but visible to all rules */
-	public boolean isGlobal;
+	/** Not a rule scope, but visible to all rules "scope symbols { ...}" */
+	public boolean isDynamicGlobalScope;
+
+	/** Visible to all rules, but defined in rule "scope { int i; }" */
+	public boolean isDynamicRuleScope;
 
 	public boolean isParameterScope;
 
@@ -74,17 +78,24 @@ public class AttributeScope {
 			if ( decl.length()==0 ) {
 				break; // final bit of whitespace; ignore
 			}
-			Attribute attr = new Attribute();
-			attr.decl = decl;
-			attr.name = lastIDInDecl(decl);
+			Attribute attr = new Attribute(lastIDInDecl(decl), decl);
 			attributes.put(attr.name, attr);
 		}
+	}
+
+	public void addAttribute(String name, String decl) {
+		attributes.put(name, new Attribute(name,decl));
 	}
 
 	public Attribute getAttribute(String name) {
 		return (Attribute)attributes.get(name);
 	}
 
+	public String getAttributeReferenceTemplateName(String scope, String attribute) {
+		return "ruleLabelRef";
+	}
+
+	/** Used by templates to get all attributes */
 	public List getAttributes() {
 		List a = new ArrayList();
 		a.addAll(attributes.values());
@@ -131,7 +142,7 @@ public class AttributeScope {
 	}
 
 	public String toString() {
-		return (isGlobal?"global ":"")+getName()+":"+attributes;
+		return (isDynamicGlobalScope?"global ":"")+getName()+":"+attributes;
 	}
 
 	public static void main(String[] args) {

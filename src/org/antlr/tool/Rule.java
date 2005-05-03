@@ -7,13 +7,6 @@ import java.util.*;
 
 /** Combine the info associated with a rule */
 public class Rule {
-	public static final Set predefinedRuleProperties = new HashSet();
-	static {
-		predefinedRuleProperties.add("start");
-		predefinedRuleProperties.add("stop");
-		predefinedRuleProperties.add("tree");
-	}
-
 	public String name;
 	public int index;
 	public String modifier;
@@ -80,6 +73,9 @@ public class Rule {
 		}
 		if ( parameterScope!=null && parameterScope.attributes.get(name)!=null ) {
 			scope = parameterScope;
+		}
+		if ( ruleScope!=null && ruleScope.attributes.get(name)!=null ) {
+			scope = ruleScope;
 		}
 		return scope;
 	}

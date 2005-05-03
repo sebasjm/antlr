@@ -58,7 +58,7 @@ class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
         "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
-    <scopes:{<if(it.isGlobal)><attributeScope(scope=it)><endif>}>
+    <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 <if(debug)>
     public <name>(TokenStream input) {
 	super(input);
@@ -86,9 +86,18 @@ class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
 }
 >>
 
-attributeScope(scope) ::= <<
+globalAttributeScope(scope) ::= <<
 <if(scope.attributes)>
 protected static class <scope.name> {
+    <scope.attributes:{<it.decl>;}; separator="\n">
+}
+protected Stack stack_<scope.name> = new Stack();<\n>
+<endif>
+>>
+
+ruleAttributeScope(scope) ::= <<
+<if(scope.attributes)>
+protected static class <scope.name>_scope {
     <scope.attributes:{<it.decl>;}; separator="\n">
 }
 protected Stack stack_<scope.name> = new Stack();<\n>
@@ -129,7 +138,7 @@ parameterScope(scope) ::= <<
  *  I.e., actions are just text strings during final code generation.
  */
 globalAttributeRef(scope,attr) ::= <<
-((<scope.name>)stack_<scope.name>.peek()).<attr.name>
+((<scope>)stack_<scope>.peek()).<attr>
 >>
 
 parameterAttributeRef(attr) ::= "<attr.name>"
@@ -137,38 +146,38 @@ parameterAttributeRef(attr) ::= "<attr.name>"
 returnAttributeRef(attr) ::= "retval.<attr.name>"
 
 ruleScopeAttributeRef(scope,attr) ::=
-    "((scope_<scope.name>)stack_<scope.name>.peek()).<attr.name>"
+    "((scope_<scope>)stack_<scope>.peek()).<attr>"
 
-ruleLabelRef(label,prop) ::= "<label>.<prop>"
+ruleLabelRef(scope,attr) ::= "<scope>.<attr>"
 
 /** How to translate $tokenLabel */
 tokenLabelRef(label) ::= "<label>"
 
 // not sure the next are the right approach
 
-tokenLabelPropertyRef_text(label) ::= "<label>.getText()"
-tokenLabelPropertyRef_type(label) ::= "<label>.getType()"
-tokenLabelPropertyRef_line(label) ::= "<label>.getLine()"
-tokenLabelPropertyRef_pos(label) ::= "<label>.getCharPositionInLine()"
-tokenLabelPropertyRef_channel(label) ::= "<label>.getChannel()"
-tokenLabelPropertyRef_index(label) ::= "<label>.getTokenIndex()"
+tokenLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
+tokenLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
+tokenLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
+tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>.getCharPositionInLine()"
+tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
+tokenLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
 
-ruleLabelPropertyRef_start(label) ::= "<label>.start"
-ruleLabelPropertyRef_stop(label) ::= "<label>.stop"
-ruleLabelPropertyRef_tree(label) ::= "<label>.tree"
+ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
+ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
+ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
 
 bitset(name, words64) ::= <<
 public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
 >>
 
 rule(ruleName,ruleDescriptor,initAction,block) ::= <<
-<attributeScope(scope=ruleDescriptor.ruleScope)>
+<ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
 // $ANTLR start <ruleName>
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <ruleDescriptor.useScopes:{stack_<it>.push(new <it>());}; separator="\n">
-    <ruleDescriptor.ruleScope:{stack_<it.name>.push(new scope_<it.name>());}; separator="\n">
+    <ruleDescriptor.ruleScope:{stack_<it.name>.push(new <it.name>_scope());}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
     <returnType()> retval = new <returnType()>();
     retval.start = input.LT(1);<\n>

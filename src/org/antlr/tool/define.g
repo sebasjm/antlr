@@ -151,7 +151,7 @@ attrScope
 	:	#( "scope" name:ID attrs:ACTION )
 		{
 		AttributeScope scope = grammar.defineScope(name.getText());
-		scope.isGlobal = true;
+		scope.isDynamicGlobalScope = true;
 		scope.addAttributes(attrs.getText(), ";");
 		}
 	;
@@ -282,6 +282,7 @@ ruleScopeSpec[Rule r]
  	       ( attrs:ACTION
  	         {
  	         r.ruleScope = grammar.defineScope(r.name);
+			 r.ruleScope.isDynamicRuleScope = true;
 			 r.ruleScope.addAttributes(#attrs.getText(), ";");
 			 }
 		   )?

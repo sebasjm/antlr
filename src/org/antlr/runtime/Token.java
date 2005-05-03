@@ -37,19 +37,6 @@ public abstract class Token {
     public static final Token EOFToken = new CommonToken(EOF);
 	public static final int DEFAULT_CHANNEL = 0;
 
-	/** The set of @label.property references that are valid for a token
-	 *  reference label.  @label.text -> label.getText() for example.
-	 */
-	public static final Set predefinedTokenProperties = new HashSet();
-	static {
-		predefinedTokenProperties.add("text");
-		predefinedTokenProperties.add("type");
-		predefinedTokenProperties.add("line");
-		predefinedTokenProperties.add("index");
-		predefinedTokenProperties.add("pos");
-		predefinedTokenProperties.add("channel");
-	}
-
 	/** Get the text of the token */
 	public abstract String getText();
 

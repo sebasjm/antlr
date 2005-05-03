@@ -77,24 +77,20 @@ LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE(file,line,col,arg) ::=
 	"<loc()>literal has no associated lexer rule: <arg>"
 CANNOT_ALIAS_TOKENS_IN_LEXER(file,line,col,arg) ::=
 	"<loc()>literals are illegal in lexer tokens{} section: <arg>"
-MISSING_DOT_IN_ATTRIBUTE_REF(file,line,col,arg) ::=
-	"<loc()>missing '.' in attribute reference: <arg>"
-MISSING_ID_IN_ATTRIBUTE_REF(file,line,col,arg) ::=
-	"<loc()>missing id in attribute reference: <arg>"
 ATTRIBUTE_REF_NOT_IN_RULE(file,line,col) ::=
 	"<loc()>reference to attribute outside of a rule"
-UNKNOWN_DYNAMIC_ATTRIBUTE(file,line,col,arg) ::=
-	"<loc()>unknown dynamic attribute: <arg>"
-UNKNOWN_ATTRIBUTE_SCOPE(file,line,col,arg) ::=
-	"<loc()>unknown attribute scope: <arg>"
+UNKNOWN_ATTRIBUTE_IN_SCOPE(file,line,col,arg,arg2) ::=
+	"<loc()>unknown attribute for <arg>: <arg2>"
 UNKNOWN_RULE_ATTRIBUTE(file,line,col,arg,arg2) ::=
-	"<loc()>unknown attribute for rule <arg>: <arg2>"
+	"<loc()>unknown dynamically-scoped attribute for rule <arg>: <arg2>"
 UNKNOWN_SIMPLE_ATTRIBUTE(file,line,col,arg,args2) ::=
 	"<loc()>attribute is not a token, parameter, or return value: <arg>"
 ISOLATED_RULE_ATTRIBUTE(file,line,col,arg) ::=
 	"<loc()>missing attribute access on rule label: <arg>"
 INVALID_RULE_PARAMETER_REF(file,line,col,arg,arg2) ::=
 	"<loc()>cannot access rule <arg>'s parameter: <arg2>"
+INVALID_RULE_SCOPE_ATTRIBUTE_REF(file,line,col,arg,arg2) ::=
+	"<loc()>cannot access rule <arg>'s dynamically-scoped attribute: <arg2>"
 
 // GRAMMAR WARNINGS
 

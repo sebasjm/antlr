@@ -122,7 +122,7 @@ public class TestAttributes extends TestSuite {
 		String found = actionST.toString();
 		assertEqual(found, expecting);
 
-		assertTrue(equeue.errors.size()==0, "unexepected errors: "+equeue);
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
 	public void testInvalidArguments() throws Exception {
@@ -178,7 +178,7 @@ public class TestAttributes extends TestSuite {
 		String found = actionST.toString();
 		assertEqual(found, expecting);
 
-		assertTrue(equeue.errors.size()==0, "unexepected errors: "+equeue);
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
 	public void testInvalidReturnValues() throws Exception {
@@ -212,10 +212,10 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testTokenLabels() throws Exception {
-		String action = "$id; $f; $id.text; $id.getText(); $id.dork" +
+		String action = "$id; $f; $id.text; $id.getText(); $id.dork " +
 			"$id.type; $id.line; $id.pos; " +
 			"$id.channel; $id.index;";
-		String expecting = "id; f; id.getText(); id.getText(); id.dork" +
+		String expecting = "id; f; id.getText(); id.getText(); id.dork " +
 			"id.getType(); id.getLine(); id.getCharPositionInLine(); " +
 			"id.getChannel(); id.getTokenIndex();";
 
@@ -237,7 +237,7 @@ public class TestAttributes extends TestSuite {
 		String found = actionST.toString();
 		assertEqual(found, expecting);
 
-		assertTrue(equeue.errors.size()==0, "unexepected errors: "+equeue);
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
 	public void testRuleLabels() throws Exception {
@@ -265,7 +265,7 @@ public class TestAttributes extends TestSuite {
 		String found = actionST.toString();
 		assertEqual(found, expecting);
 
-		assertTrue(equeue.errors.size()==0, "unexepected errors: "+equeue);
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
 	public void testInvalidRuleLabelAccessesParameter() throws Exception {
@@ -296,6 +296,40 @@ public class TestAttributes extends TestSuite {
 		int expectedMsgID = ErrorManager.MSG_INVALID_RULE_PARAMETER_REF;
 		Object expectedArg = "r";
 		Object expectedArg2 = "z";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testInvalidRuleLabelAccessesScopeAttribute() throws Exception {
+		String action = "$r.n";
+		String expecting = action;
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a\n" +
+			"scope { int n; }\n" +
+			"  :\n" +
+			"  ;\n"+
+			"b : r=a[3] {"+action+"}\n" +
+			"  ;");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("b",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		int expectedMsgID = ErrorManager.MSG_INVALID_RULE_SCOPE_ATTRIBUTE_REF;
+		Object expectedArg = "r";
+		Object expectedArg2 = "n";
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
 		checkError(equeue, expectedMessage);
@@ -367,6 +401,288 @@ public class TestAttributes extends TestSuite {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testNonDynamicAttributeOutsideRule() throws Exception {
+		String action = "public void foo() { $x; }";
+		String expecting = action;
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"{\"+action+\"}\n" +
+			"a : ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate(null,
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE;
+		Object expectedArg = "$x";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testNonDynamicAttributeOutsideRule2() throws Exception {
+		String action = "public void foo() { $x.y; }";
+		String expecting = action;
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"{\"+action+\"}\n" +
+			"a : ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate(null,
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE;
+		Object expectedArg = "$x";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	// D Y N A M I C A L L Y  S C O P E D  A T T R I B U T E S
+
+	public void testBasicGlobalScope() throws Exception {
+		String action = "$Symbols.names.add($id.text);";
+		String expecting = "((Symbols)stack_Symbols.peek()).names.add(id.getText());";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"a : (id=ID ';' {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testGlobalScopeOutsideRule() throws Exception {
+		String action = "public void foo() {$Symbols.names.add(\"foo\");}";
+		String expecting = "public void foo() {((Symbols)stack_Symbols.peek()).names.add(\"foo\");}";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"{\"+action+\"}\n" +
+			"a : \n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testBasicRuleScope() throws Exception {
+		String action = "$a.n; $n;"; // both ok
+		String expecting = "((a)stack_a.peek()).n; ((scope_a)stack_a.peek()).n;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : {"+action+"}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testRuleScopeFromAnotherRule() throws Exception {
+		String action = "$a.n;"; // must be qualified
+		String expecting = "((a)stack_a.peek()).n;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : b\n" +
+			"  ;\n" +
+			"b : {\"+action+\"}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testUnknownDynamicAttribute() throws Exception {
+		String action = "$a.x";
+		String expecting = action;
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : {"+action+"}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		int expectedMsgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
+		Object expectedArg = "a";
+		Object expectedArg2 = "x";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testUnknownGlobalDynamicAttribute() throws Exception {
+		String action = "$Symbols.x";
+		String expecting = action;
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"}\n" +
+			"a : {\"+action+\"}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		int expectedMsgID = ErrorManager.MSG_UNKNOWN_ATTRIBUTE_IN_SCOPE;
+		Object expectedArg = "Symbols";
+		Object expectedArg2 = "x";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testUnqualifiedRuleScopeAttribute() throws Exception {
+		String action = "$n;"; // must be qualified
+		String expecting = "$n;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : b\n" +
+			"  ;\n" +
+			"b : {\"+action+\"}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("b",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		int expectedMsgID = ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE;
+		Object expectedArg = "$n";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+
 	// S U P P O R T
 
 	protected void checkError(ErrorQueue equeue,
@@ -394,44 +710,4 @@ public class TestAttributes extends TestSuite {
 		assertEqual(foundMsg.arg, expectedMessage.arg);
 		assertEqual(foundMsg.arg2, expectedMessage.arg2);
 	}
-
-/*
-protected void checkSymbols(Grammar g,
-								String rulesStr,
-								String tokensStr)
-		throws FailedAssertionException
-	{
-		Set tokens = g.getTokenNames();
-		System.out.println("all tokens="+tokens);
-
-		// make sure expected tokens are there
-		StringTokenizer st = new StringTokenizer(tokensStr, ", ");
-		while ( st.hasMoreTokens() ) {
-			String tokenName = st.nextToken();
-			assertTrue(g.getTokenType(tokenName)!=Label.INVALID,
-					   "token "+tokenName+" expected");
-			tokens.remove(tokenName);
-		}
-		// make sure there are not any others (other than <EOF> etc...)
-        for (Iterator iter = tokens.iterator(); iter.hasNext();) {
-			String tokenName = (String) iter.next();
-			assertTrue(g.getTokenType(tokenName)<Label.MIN_TOKEN_TYPE,
-					   "unexpected token name "+tokenName);
-		}
-
-		// make sure all expected rules are there
-		st = new StringTokenizer(rulesStr, ", ");
-		int n = 0;
-		while ( st.hasMoreTokens() ) {
-			String ruleName = st.nextToken();
-			assertTrue(g.getRule(ruleName)!=null, "rule "+ruleName+" expected");
-			n++;
-		}
-		Collection rules = g.getRules();
-		System.out.println("rules="+rules);
-		// make sure there are no extra rules
-		assertTrue(rules.size()==n,
-				   "number of rules mismatch; expecting "+n+"; found "+rules.size());
-	}
-    */
 }
