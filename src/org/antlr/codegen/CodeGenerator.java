@@ -367,7 +367,7 @@ public class CodeGenerator {
 		//System.out.println(" "+follow);
 
 		long[] words = null;
-		if ( follow.tokenTypeSet==null ) {
+		if ( follow==null || follow.tokenTypeSet==null ) {
 			words = new long[1];
 		}
 		else {

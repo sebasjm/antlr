@@ -91,6 +91,10 @@ INVALID_RULE_PARAMETER_REF(file,line,col,arg,arg2) ::=
 	"<loc()>cannot access rule <arg>'s parameter: <arg2>"
 INVALID_RULE_SCOPE_ATTRIBUTE_REF(file,line,col,arg,arg2) ::=
 	"<loc()>cannot access rule <arg>'s dynamically-scoped attribute: <arg2>"
+SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE(file,line,col,arg) ::=
+	"<loc()>symbol <arg> conflicts with global dynamic scope with same name"
+LABEL_CONFLICTS_WITH_RULE(file,line,col,arg) ::=
+	"<loc()>label <arg> conflicts with rule with same name"
 
 // GRAMMAR WARNINGS
 

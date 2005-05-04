@@ -143,6 +143,8 @@ public class ErrorManager {
 	public static final int MSG_INVALID_RULE_PARAMETER_REF = 115;
 	public static final int MSG_UNKNOWN_RULE_ATTRIBUTE = 116;
 	public static final int MSG_ISOLATED_RULE_ATTRIBUTE = 117;
+	public static final int MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE = 118;
+	public static final int MSG_LABEL_CONFLICTS_WITH_RULE = 119;
 
 
 	// GRAMMAR WARNINGS

@@ -300,6 +300,8 @@ public class Grammar {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
+
+        checkAllLabelsForConflicts();
 	}
 
 	/** If he grammar is a merged grammar, return the text of the implicit
@@ -539,11 +541,9 @@ public class Grammar {
 									  ruleName);
             return INVALID_RULE_INDEX;
         }
-		/*
-        if ( type==PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
-			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
+		if ( type==PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
+			ErrorManager.grammarError(ErrorManager.MSG_LEXER_RULES_NOT_ALLOWED,
 									  this,
-									  parser,
 									  ruleToken,
 									  ruleName);
             return INVALID_RULE_INDEX;
@@ -551,16 +551,19 @@ public class Grammar {
         if ( type==LEXER && Character.isLowerCase(ruleName.charAt(0)) ) {
 			ErrorManager.grammarError(ErrorManager.MSG_PARSER_RULES_NOT_ALLOWED,
 									  this,
-									  parser,
 									  ruleToken,
 									  ruleName);
             return INVALID_RULE_INDEX;
         }
-		if ( type==LEXER && !ruleName.equals(TOKEN_RULENAME)) {
-            // rules are also tokens in lexers
-            defineToken(ruleName);
-        }
-		*/
+		if ( getScope(ruleName)!=null ) {
+			ErrorManager.grammarError(ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
+									  this,
+									  ruleToken,
+									  ruleName);
+			// let it define a rule anyway to avoid future errors
+			// TODO make translation stop if define.g finds an error
+		}
+
 		Rule r = new Rule();
 		r.index = ruleIndex;
 		r.name = ruleName;
@@ -681,6 +684,53 @@ public class Grammar {
 			r.ruleLabels.put(label.getText(),
 							 new LabelElementPair(label,ruleRef));
 		}
+	}
+
+	protected void checkAllLabelsForConflicts() {
+		for (int i = 0; i < ruleIndexToRuleList.size(); i++) {
+			String ruleName = (String) ruleIndexToRuleList.elementAt(i);
+			if ( ruleName==null ) {
+				continue;
+			}
+			Rule r = getRule(ruleName);
+			if ( r.tokenLabels!=null ) {
+				Iterator it = r.tokenLabels.values().iterator();
+				while ( it.hasNext() ) {
+					LabelElementPair pair = (LabelElementPair) it.next();
+					chkBadLabel(pair.label);
+				}
+			}
+			if ( r.ruleLabels!=null ) {
+				Iterator it = r.ruleLabels.values().iterator();
+				while ( it.hasNext() ) {
+					LabelElementPair pair = (LabelElementPair) it.next();
+					chkBadLabel(pair.label);
+				}
+			}
+		}
+	}
+
+	/** Make sure a label doesn't conflict with another symbol.  For the
+	 *  label/rulename conflict, it checks during define.g and then
+	 *  during assign.types.g because define.g cannot see forward references,
+	 *  but assign.types.g can.
+	 */
+	public boolean chkBadLabel(antlr.Token label) {
+		if ( getScope(label.getText())!=null ) {
+			ErrorManager.grammarError(ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
+									  this,
+									  label,
+									  label.getText());
+			return true;
+		}
+		if ( getRule(label.getText())!=null ) {
+			ErrorManager.grammarError(ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE,
+									  this,
+									  label,
+									  label.getText());
+			return true;
+		}
+		return false;
 	}
 
 	/** To yield smaller, more readable code, track which rules have their
