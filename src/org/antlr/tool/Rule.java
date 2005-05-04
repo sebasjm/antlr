@@ -86,7 +86,9 @@ public class Rule {
 	 *  TODO: if only one user-defined type and no one references predefined attrs don't generate struct
 	 */
 	public boolean getHasMultipleReturnValues() {
-		return needPredefinedRuleAttributes || returnScope.attributes.size()>0;
+		return
+			needPredefinedRuleAttributes || 
+			(returnScope!=null && returnScope.attributes.size()>0);
 	}
 
 	public String toString() { // used for testing

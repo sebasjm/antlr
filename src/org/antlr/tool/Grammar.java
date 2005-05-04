@@ -301,7 +301,8 @@ public class Grammar {
 							   re);
 		}
 
-        checkAllLabelsForConflicts();
+        NameSpaceChecker nameSpaceChecker = new NameSpaceChecker(this);
+		nameSpaceChecker.checkConflicts();
 	}
 
 	/** If he grammar is a merged grammar, return the text of the implicit
@@ -535,34 +536,9 @@ public class Grammar {
 						   "): index="+ruleIndex);
 		*/
 		if ( getRule(ruleName)!=null ) {
-            ErrorManager.grammarError(ErrorManager.MSG_RULE_REDEFINITION,
-									  this,
-									  ruleToken,
-									  ruleName);
-            return INVALID_RULE_INDEX;
+			ErrorManager.grammarError(ErrorManager.MSG_RULE_REDEFINITION,
+									  this, ruleToken, ruleName);
         }
-		if ( type==PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
-			ErrorManager.grammarError(ErrorManager.MSG_LEXER_RULES_NOT_ALLOWED,
-									  this,
-									  ruleToken,
-									  ruleName);
-            return INVALID_RULE_INDEX;
-        }
-        if ( type==LEXER && Character.isLowerCase(ruleName.charAt(0)) ) {
-			ErrorManager.grammarError(ErrorManager.MSG_PARSER_RULES_NOT_ALLOWED,
-									  this,
-									  ruleToken,
-									  ruleName);
-            return INVALID_RULE_INDEX;
-        }
-		if ( getScope(ruleName)!=null ) {
-			ErrorManager.grammarError(ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
-									  this,
-									  ruleToken,
-									  ruleName);
-			// let it define a rule anyway to avoid future errors
-			// TODO make translation stop if define.g finds an error
-		}
 
 		Rule r = new Rule();
 		r.index = ruleIndex;
@@ -575,11 +551,11 @@ public class Grammar {
         ruleIndexToRuleList.set(ruleIndex, ruleName);
         ruleIndex++;
 		// all rules have predefined attributes available in the return scope
-		r.returnScope = defineReturnScope(ruleName);
+		//r.returnScope = defineReturnScope(ruleName);
         return ruleIndex;
 	}
 
-	public void defineLexerRuleFoundInParser(String ruleName, String ruleText) {
+	public void defineLexerRuleFoundInParser(antlr.Token ruleToken, String ruleText) {
 		lexerGrammarST.setAttribute("rules", ruleText);
 	}
 
@@ -614,47 +590,36 @@ public class Grammar {
         return (String)ruleIndexToRuleList.get(ruleIndex);
     }
 
-	public void defineScope(String name, AttributeScope scope) {
-		scopes.put(name,scope);
-	}
-
-	/** Define a either a global or rule scope such as return values. Rule
-	 *  objects track the scopes as well.  This global list is used for
-	 *  code generation; some targets need to do header files etc...
-	 */
-	public AttributeScope defineScope(String name) {
+	public AttributeScope defineGlobalScope(String name) {
 		AttributeScope scope = new AttributeScope(name);
 		scopes.put(name,scope);
 		return scope;
 	}
 
-	public AttributeScope defineReturnScope(String ruleName) {
-		AttributeScope scope = new AttributeScope(ruleName);
+	public AttributeScope createReturnScope(String ruleName) {
+		AttributeScope scope = new AttributeScope(ruleName+"_return");
 		scope.isReturnScope = true;
-		scopes.put(scope.getName(),scope);
 		return scope;
 	}
 
-	public AttributeScope defineParameterScope(String ruleName) {
+	public AttributeScope createRuleScope(String ruleName) {
 		AttributeScope scope = new AttributeScope(ruleName);
-		scope.isParameterScope = true;
-		scopes.put(scope.getName(),scope);
+		scope.isDynamicRuleScope = true;
 		return scope;
 	}
 
-	public AttributeScope getScope(String name) {
+	public AttributeScope createParameterScope(String ruleName) {
+		AttributeScope scope = new AttributeScope(ruleName+"_parameter");
+		scope.isParameterScope = true;
+		return scope;
+	}
+
+	/** Get a global scope */
+	public AttributeScope getGlobalScope(String name) {
 		return (AttributeScope)scopes.get(name);
 	}
 
-	/** Is id a valid scope name or r's name? */
-	public boolean isValidScope(Rule r, String id) {
-		if ( r==null ) {
-			return getScope(id)!=null;
-		}
-		return id.equals(r.name) || getScope(id)!=null;
-	}
-
-	public Map getScopes() {
+	public Map getGlobalScopes() {
 		return scopes;
 	}
 
@@ -686,52 +651,6 @@ public class Grammar {
 		}
 	}
 
-	protected void checkAllLabelsForConflicts() {
-		for (int i = 0; i < ruleIndexToRuleList.size(); i++) {
-			String ruleName = (String) ruleIndexToRuleList.elementAt(i);
-			if ( ruleName==null ) {
-				continue;
-			}
-			Rule r = getRule(ruleName);
-			if ( r.tokenLabels!=null ) {
-				Iterator it = r.tokenLabels.values().iterator();
-				while ( it.hasNext() ) {
-					LabelElementPair pair = (LabelElementPair) it.next();
-					chkBadLabel(pair.label);
-				}
-			}
-			if ( r.ruleLabels!=null ) {
-				Iterator it = r.ruleLabels.values().iterator();
-				while ( it.hasNext() ) {
-					LabelElementPair pair = (LabelElementPair) it.next();
-					chkBadLabel(pair.label);
-				}
-			}
-		}
-	}
-
-	/** Make sure a label doesn't conflict with another symbol.  For the
-	 *  label/rulename conflict, it checks during define.g and then
-	 *  during assign.types.g because define.g cannot see forward references,
-	 *  but assign.types.g can.
-	 */
-	public boolean chkBadLabel(antlr.Token label) {
-		if ( getScope(label.getText())!=null ) {
-			ErrorManager.grammarError(ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
-									  this,
-									  label,
-									  label.getText());
-			return true;
-		}
-		if ( getRule(label.getText())!=null ) {
-			ErrorManager.grammarError(ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE,
-									  this,
-									  label,
-									  label.getText());
-			return true;
-		}
-		return false;
-	}
 
 	/** To yield smaller, more readable code, track which rules have their
 	 *  predefined attributes accessed.  If the rule has no user-defined

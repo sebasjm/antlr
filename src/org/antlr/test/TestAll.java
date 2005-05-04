@@ -41,5 +41,9 @@ public class TestAll extends TestSuite {
 		test = TestRig.runAllTests(TestSymbolDefinitions.class);
 		System.out.println("successes: "+test.getSuccesses());
 		System.out.println("failures: "+test.getFailures());
+
+		test = TestRig.runAllTests(TestAttributes.class);
+		System.out.println("successes: "+test.getSuccesses());
+		System.out.println("failures: "+test.getFailures());
 	}
 }

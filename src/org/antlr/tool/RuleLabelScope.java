@@ -29,7 +29,10 @@ public class RuleLabelScope extends AttributeScope {
 		if ( predefinedRuleProperties.contains(name) ) {
 			return new Attribute(name, null);
 		}
-		return referencedRule.returnScope.getAttribute(name);
+		if ( referencedRule.returnScope!=null ) {
+			return referencedRule.returnScope.getAttribute(name);
+		}
+		return null;
 	}
 
 	public String getAttributeReferenceTemplateName(String scope, String attribute) {

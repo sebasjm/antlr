@@ -150,7 +150,7 @@ headerSpec
 attrScope
 	:	#( "scope" name:ID attrs:ACTION )
 		{
-		AttributeScope scope = grammar.defineScope(name.getText());
+		AttributeScope scope = grammar.defineGlobalScope(name.getText());
 		scope.isDynamicGlobalScope = true;
 		scope.addAttributes(attrs.getText(), ";");
 		}
@@ -242,7 +242,7 @@ Map opts=null;
 				printer.setASTNodeClass("org.antlr.tool.GrammarAST");
 				String ruleText = printer.toString(#rule, grammar);
 				//System.out.println("rule text is:\n"+ruleText);
-				grammar.defineLexerRuleFoundInParser(name, ruleText);
+				grammar.defineLexerRuleFoundInParser(#id.getToken(), ruleText);
 				// track lexer rules so we can warn about undefined tokens
 				lexerRules.put(#id.getText(), #rule);
 			}
@@ -250,15 +250,14 @@ Map opts=null;
 				grammar.defineRule(#id.getToken(), mod, opts, #rule);
 				r = grammar.getRule(name);
 				if ( #args!=null ) {
-					r.parameterScope = grammar.defineParameterScope(name);
+					r.parameterScope = grammar.createParameterScope(name);
 					r.parameterScope.addAttributes(#args.getText(), ",");
 				}
 				if ( #ret!=null ) {
+					r.returnScope = grammar.createReturnScope(name);
 					r.returnScope.addAttributes(#ret.getText(), ",");
 				}
 			}
-			// all rule's have a return scope
-			//r.ruleScope = grammar.defineScope(r.name);
 			}
            (ruleScopeSpec[r])?
            #( INITACTION (ACTION)? )
@@ -281,7 +280,7 @@ ruleScopeSpec[Rule r]
  	:	#( "scope"
  	       ( attrs:ACTION
  	         {
- 	         r.ruleScope = grammar.defineScope(r.name);
+ 	         r.ruleScope = grammar.createRuleScope(r.name);
 			 r.ruleScope.isDynamicRuleScope = true;
 			 r.ruleScope.addAttributes(#attrs.getText(), ";");
 			 }

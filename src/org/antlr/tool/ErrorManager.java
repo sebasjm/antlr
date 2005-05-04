@@ -145,7 +145,11 @@ public class ErrorManager {
 	public static final int MSG_ISOLATED_RULE_ATTRIBUTE = 117;
 	public static final int MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE = 118;
 	public static final int MSG_LABEL_CONFLICTS_WITH_RULE = 119;
-
+	public static final int MSG_LABEL_CONFLICTS_WITH_TOKEN = 120;
+	public static final int MSG_LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE = 121;
+	public static final int MSG_LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL = 122;
+	public static final int MSG_ATTRIBUTE_CONFLICTS_WITH_RULE = 123;
+	public static final int MSG_ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL = 124;
 
 	// GRAMMAR WARNINGS
 	public static final int MSG_GRAMMAR_NONDETERMINISM = 200; // A predicts alts 1,2

@@ -465,7 +465,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testBasicGlobalScope() throws Exception {
 		String action = "$Symbols.names.add($id.text);";
-		String expecting = "((Symbols)stack_Symbols.peek()).names.add(id.getText());";
+		String expecting = "((Symbols)Symbols_stack.peek()).names.add(id.getText());";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -495,7 +495,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testGlobalScopeOutsideRule() throws Exception {
 		String action = "public void foo() {$Symbols.names.add(\"foo\");}";
-		String expecting = "public void foo() {((Symbols)stack_Symbols.peek()).names.add(\"foo\");}";
+		String expecting = "public void foo() {((Symbols)Symbols_stack.peek()).names.add(\"foo\");}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -523,9 +523,37 @@ public class TestAttributes extends TestSuite {
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
+	public void testRuleScopeOutsideRule() throws Exception {
+		String action = "public void foo() {$a.name;}";
+		String expecting = "public void foo() {((a_scope)a_stack.peek()).name;}";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"{\"+action+\"}\n" +
+			"a\n" +
+			"scope { int name; }\n" +
+			"  : {foo();}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
 	public void testBasicRuleScope() throws Exception {
 		String action = "$a.n; $n;"; // both ok
-		String expecting = "((a)stack_a.peek()).n; ((scope_a)stack_a.peek()).n;";
+		String expecting = "((a_scope)a_stack.peek()).n; ((a_scope)a_stack.peek()).n;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -553,7 +581,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testRuleScopeFromAnotherRule() throws Exception {
 		String action = "$a.n;"; // must be qualified
-		String expecting = "((a)stack_a.peek()).n;";
+		String expecting = "((a_scope)a_stack.peek()).n;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -570,7 +598,7 @@ public class TestAttributes extends TestSuite {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
-			translator.translate("a",
+			translator.translate("b",
 							 new antlr.CommonToken(ANTLRParser.ACTION,action));
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);

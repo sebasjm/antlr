@@ -118,7 +118,7 @@ grammarSpec
 		{
 		recognizerST.setAttribute("name", #name.getText());
 		if ( grammar.type!=Grammar.LEXER ) {
-		    recognizerST.setAttribute("scopes", grammar.getScopes());
+		    recognizerST.setAttribute("scopes", grammar.getGlobalScopes());
 		}
 		outputFileST.setAttribute("name", #name.getText());
 		headerFileST.setAttribute("name", #name.getText());

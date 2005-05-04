@@ -53,7 +53,7 @@ public class ActionTranslator {
 				c++;
 			}
 		}
-		System.out.println("translated action="+buf.toString());
+		//System.out.println("translated action="+buf.toString());
 		return buf.toString();
 	}
 
@@ -62,9 +62,13 @@ public class ActionTranslator {
 	 *  $rulelabel, $tokenlabel, $rulename, or $scopename.
 	 */
 	protected AttributeScope resolveScope(Rule r, String scopeName) {
-		if ( grammar.getScope(scopeName)!=null ) {
+		if ( grammar.getGlobalScope(scopeName)!=null ) {
 			// $scopename
-			return grammar.getScope(scopeName);
+			return grammar.getGlobalScope(scopeName);
+		}
+		Rule scopeRule = grammar.getRule(scopeName);
+		if ( scopeRule!=null ) {
+			return scopeRule.ruleScope;
 		}
 		if ( r==null ) { // action outside of rule must be global scope
 			return null;
@@ -98,9 +102,12 @@ public class ActionTranslator {
 																 String attribute)
 	{
 		String stName = null;
-		if ( grammar.getScope(scopeName)!=null ) {
+		if ( grammar.getGlobalScope(scopeName)!=null ) {
 			// $scopename
 			stName = "globalAttributeRef";
+		}
+		else if ( grammar.getRule(scopeName)!=null ) {
+			stName = "ruleScopeAttributeRef";
 		}
 		else if ( r.name.equals(scopeName) ) {
 			// $rulename

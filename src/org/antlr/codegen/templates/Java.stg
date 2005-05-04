@@ -91,7 +91,7 @@ globalAttributeScope(scope) ::= <<
 protected static class <scope.name> {
     <scope.attributes:{<it.decl>;}; separator="\n">
 }
-protected Stack stack_<scope.name> = new Stack();<\n>
+protected Stack <scope.name>_stack = new Stack();<\n>
 <endif>
 >>
 
@@ -100,7 +100,7 @@ ruleAttributeScope(scope) ::= <<
 protected static class <scope.name>_scope {
     <scope.attributes:{<it.decl>;}; separator="\n">
 }
-protected Stack stack_<scope.name> = new Stack();<\n>
+protected Stack <scope.name>_stack = new Stack();<\n>
 <endif>
 >>
 
@@ -138,7 +138,7 @@ parameterScope(scope) ::= <<
  *  I.e., actions are just text strings during final code generation.
  */
 globalAttributeRef(scope,attr) ::= <<
-((<scope>)stack_<scope>.peek()).<attr>
+((<scope>)<scope>_stack.peek()).<attr>
 >>
 
 parameterAttributeRef(attr) ::= "<attr.name>"
@@ -146,7 +146,7 @@ parameterAttributeRef(attr) ::= "<attr.name>"
 returnAttributeRef(attr) ::= "retval.<attr.name>"
 
 ruleScopeAttributeRef(scope,attr) ::=
-    "((scope_<scope>)stack_<scope>.peek()).<attr>"
+    "((<scope>_scope)<scope>_stack.peek()).<attr>"
 
 ruleLabelRef(scope,attr) ::= "<scope>.<attr>"
 
@@ -176,8 +176,8 @@ rule(ruleName,ruleDescriptor,initAction,block) ::= <<
 
 // $ANTLR start <ruleName>
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
-    <ruleDescriptor.useScopes:{stack_<it>.push(new <it>());}; separator="\n">
-    <ruleDescriptor.ruleScope:{stack_<it.name>.push(new <it.name>_scope());}; separator="\n">
+    <ruleDescriptor.useScopes:{<it>_stack.push(new <it>());}; separator="\n">
+    <ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
     <returnType()> retval = new <returnType()>();
     retval.start = input.LT(1);<\n>
@@ -197,8 +197,8 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
         recover(re);
     }
     finally {
-        <ruleDescriptor.useScopes:{stack_<it>.pop();}; separator="\n">
-        <ruleDescriptor.ruleScope:{stack_<it.name>.pop();}; separator="\n">
+        <ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
+        <ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
         retval.stop = input.LT(-1);<\n>
 <endif>

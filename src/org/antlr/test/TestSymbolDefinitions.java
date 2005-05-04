@@ -324,6 +324,61 @@ public class TestSymbolDefinitions extends TestSuite {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testTokenRuleScopeConflict() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"scope ID {\n" +
+			"  int n;\n" +
+			"}\n" +
+			"ID : 'a'\n" +
+			"  ;\n");
+
+		Object expectedArg = "ID";
+		int expectedMsgID = ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testTokenScopeConflict() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"tokens { ID; }\n"+
+			"scope ID {\n" +
+			"  int n;\n" +
+			"}\n" +
+			"a : \n" +
+			"  ;\n");
+
+		Object expectedArg = "ID";
+		int expectedMsgID = ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testTokenRuleScopeConflictInLexerGrammar() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"scope ID {\n" +
+			"  int n;\n" +
+			"}\n" +
+			"ID : 'a'\n" +
+			"  ;\n");
+
+		Object expectedArg = "ID";
+		int expectedMsgID = ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
 	public void testTokenLabelScopeConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
@@ -375,6 +430,133 @@ public class TestSymbolDefinitions extends TestSuite {
 		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testLabelAndTokenNameConflict() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : ID=b \n" +
+			"  ;\n" +
+			"b : ID ;\n" +
+			"c : ;\n");
+
+		Object expectedArg = "ID";
+		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_TOKEN;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testLabelAndArgConflict() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a[int i] returns [int x]: i=ID \n" +
+			"  ;\n");
+
+		Object expectedArg = "i";
+		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testLabelAndParameterConflict() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a[int i] returns [int x]: x=ID \n" +
+			"  ;\n");
+
+		Object expectedArg = "x";
+		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testLabelRuleScopeConflict() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a\n" +
+			"scope {" +
+			"  int n;" +
+			"}\n" +
+			"  : n=ID\n" +
+			"  ;\n");
+
+		Object expectedArg = "n";
+		Object expectedArg2 = "a";
+		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testRuleScopeArgConflict() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a[int n]\n" +
+			"scope {" +
+			"  int n;" +
+			"}\n" +
+			"  : \n" +
+			"  ;\n");
+
+		Object expectedArg = "n";
+		Object expectedArg2 = "a";
+		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testRuleScopeReturnValueConflict() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a returns [int n]\n" +
+			"scope {" +
+			"  int n;" +
+			"}\n" +
+			"  : \n" +
+			"  ;\n");
+
+		Object expectedArg = "n";
+		Object expectedArg2 = "a";
+		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testRuleScopeRuleNameConflict() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a\n" +
+			"scope {" +
+			"  int a;" +
+			"}\n" +
+			"  : \n" +
+			"  ;\n");
+
+		Object expectedArg = "a";
+		Object expectedArg2 = null;
+		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_CONFLICTS_WITH_RULE;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
 		checkError(equeue, expectedMessage);
 	}
 
