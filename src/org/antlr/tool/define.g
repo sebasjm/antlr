@@ -315,12 +315,15 @@ element
     |	#(ASSIGN id:ID a:atom )
     	{
     	if ( #a.getType()==RULE_REF ) {
-    		grammar.defineRuleRefLabel(currentRuleName,id.getToken(),a);
+    		grammar.defineRuleRefLabel(currentRuleName,#id.getToken(),a);
     	}
-    	else {
-    		grammar.defineTokenRefLabel(currentRuleName,id.getToken(),a);
+    	else if ( #a.getType()!=CHAR_RANGE ) {
+    		grammar.defineTokenRefLabel(currentRuleName,#id.getToken(),a);
     	}
     	}
+    |	#(	PLUS_ASSIGN id2:ID a2:atom
+    	    {grammar.defineListLabel(currentRuleName,#id2.getToken(),#a2);}
+         )
     |   ebnf
     |   tree
     |   #( SYNPRED block ) 

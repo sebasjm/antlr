@@ -710,6 +710,153 @@ public class TestAttributes extends TestSuite {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testRuleAndTokenLabelTypeMismatch() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a : id=ID id=b\n" +
+			"  ;\n" +
+			"b : ;\n");
+		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
+		Object expectedArg = "id";
+		Object expectedArg2 = "rule!=token";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testListAndTokenLabelTypeMismatch() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a : ids+=ID ids=ID\n" +
+			"  ;\n" +
+			"b : ;\n");
+		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
+		Object expectedArg = "ids";
+		Object expectedArg2 = "token!=list";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testArgReturnValueMismatch() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a[int i] returns [int x, int i]\n" +
+			"  : \n" +
+			"  ;\n" +
+			"b : ;\n");
+		int expectedMsgID = ErrorManager.MSG_ARG_RETVAL_CONFLICT;
+		Object expectedArg = "i";
+		Object expectedArg2 = "a";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testSimplePlusEqualLabel() throws Exception {
+		String action = "$ids.size();"; // must be qualified
+		String expecting = "ids.size();";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"parser grammar t;\n"+
+				"a : ids+=ID ( COMMA ids+=ID {"+action+"})* ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testPlusEqualStringLabel() throws Exception {
+		String action = "$ids.size();"; // must be qualified
+		String expecting = "ids.size();";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : ids+=\"if\" ( ',' ids+=ID {"+action+"})* ;" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testPlusEqualSetLabel() throws Exception {
+		String action = "$ids.size();"; // must be qualified
+		String expecting = "ids.size();";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : ids+=('a'|'b') ( ',' ids+=ID {"+action+"})* ;" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testPlusEqualWildcardLabel() throws Exception {
+		String action = "$ids.size();"; // must be qualified
+		String expecting = "ids.size();";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : ids+=. ( ',' ids+=ID {"+action+"})* ;" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
 
 	// S U P P O R T
 
@@ -732,7 +879,7 @@ public class TestAttributes extends TestSuite {
 				foundMsg = m;
 			}
 		}
-		assertTrue(foundMsg!=null, "error "+expectedMessage.msgID+" expected");
+		assertTrue(foundMsg!=null, "no error; "+expectedMessage.msgID+" expected");
 		assertTrue(foundMsg instanceof GrammarSemanticsMessage,
 				   "error is not a GrammarSemanticsMessage");
 		assertEqual(foundMsg.arg, expectedMessage.arg);

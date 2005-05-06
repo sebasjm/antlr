@@ -115,6 +115,15 @@ public class TestSymbolDefinitions extends TestSuite {
 		checkSymbols(g, rules, tokenNames);
 	}
 
+	public void testSimplePlusEqualLabel() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar t;\n"+
+				"a : ids+=ID ( COMMA ids+=ID )* ;\n");
+		String rule = "a";
+		String labels = "ids";
+		checkPlusEqualsLabels(g, rule, labels);
+	}
+
 	// T E S T  E R R O R S
 
 	public void testParserStringLiterals() throws Exception {
@@ -585,13 +594,28 @@ public class TestSymbolDefinitions extends TestSuite {
 		assertEqual(foundMsg.arg, expectedMessage.arg);
 	}
 
+	protected void checkPlusEqualsLabels(Grammar g,
+										 String ruleName,
+										 String labelsStr)
+		throws FailedAssertionException
+	{
+		// make sure expected += labels are there
+		Rule r = g.getRule(ruleName);
+		StringTokenizer st = new StringTokenizer(labelsStr, ", ");
+		Set labels = new HashSet();
+		while ( st.hasMoreTokens() ) {
+			String labelName = st.nextToken();
+			labels.add(labelName);
+		}
+        assertEqual(labels, r.listLabels.keySet());
+	}
+
 	protected void checkSymbols(Grammar g,
 								String rulesStr,
 								String tokensStr)
 		throws FailedAssertionException
 	{
 		Set tokens = g.getTokenNames();
-		System.out.println("all tokens="+tokens);
 
 		// make sure expected tokens are there
 		StringTokenizer st = new StringTokenizer(tokensStr, ", ");
@@ -621,6 +645,7 @@ public class TestSymbolDefinitions extends TestSuite {
 		// make sure there are no extra rules
 		assertTrue(rules.size()==n,
 				   "number of rules mismatch; expecting "+n+"; found "+rules.size());
+
 	}
 
 }

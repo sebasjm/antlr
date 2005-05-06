@@ -33,20 +33,21 @@ public class Rule {
 	/** A list of all LabelElementPair attached to rule references like f=field */
 	public LinkedHashMap ruleLabels;
 
+	/** A list of all LabelElementPair like ids+=ID */
+	public LinkedHashMap listLabels;
+
+	/** All labels go in here (plus being split per the above lists) to
+	 *  catch dup label and label type mismatches.
+	 */
+	protected Map labelNameSpace = new HashMap();
+
 	/** Do not generate start, stop etc... in a return value struct unless
 	 *  somebody references $r.start somewhere in an action.
 	 */
 	public boolean needPredefinedRuleAttributes = false;
 
 	public Grammar.LabelElementPair getLabel(String name) {
-		Grammar.LabelElementPair pair = null;
-		if ( tokenLabels!=null ) {
-			pair = (Grammar.LabelElementPair)tokenLabels.get(name);
-		}
-		if ( pair==null && ruleLabels!=null ) {
-			pair = (Grammar.LabelElementPair)ruleLabels.get(name);
-		}
-		return pair;
+		return (Grammar.LabelElementPair)labelNameSpace.get(name);
 	}
 
 	public Grammar.LabelElementPair getTokenLabel(String name) {
@@ -61,6 +62,14 @@ public class Rule {
 		Grammar.LabelElementPair pair = null;
 		if ( ruleLabels!=null ) {
 			return (Grammar.LabelElementPair)ruleLabels.get(name);
+		}
+		return pair;
+	}
+
+	public Grammar.LabelElementPair getListLabel(String name) {
+		Grammar.LabelElementPair pair = null;
+		if ( listLabels!=null ) {
+			return (Grammar.LabelElementPair)listLabels.get(name);
 		}
 		return pair;
 	}
@@ -87,7 +96,7 @@ public class Rule {
 	 */
 	public boolean getHasMultipleReturnValues() {
 		return
-			needPredefinedRuleAttributes || 
+			needPredefinedRuleAttributes ||
 			(returnScope!=null && returnScope.attributes.size()>0);
 	}
 

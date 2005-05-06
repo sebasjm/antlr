@@ -79,6 +79,26 @@ options {
     protected StringTemplate outputFileST;
     protected StringTemplate headerFileST;
 
+	protected StringTemplate getLabelST(String ruleName, String labelName) {
+		Rule r = grammar.getRule(ruleName);
+		String stName = null;
+		if ( r==null ) {
+			return null;
+		}
+		Grammar.LabelElementPair pair = r.getLabel(labelName);
+		if ( pair!=null ) {
+			if ( pair.type == Grammar.TOKEN_LABEL ) {
+				stName = "tokenLabel";
+			}
+			else if ( pair.type == Grammar.LIST_LABEL ) {
+				stName = "listLabel";
+			}
+		}
+		StringTemplate st = templates.getInstanceOf(stName);
+		st.setAttribute("label", labelName);
+		return st;
+	}
+
     protected void init(Grammar g) {
         this.grammar = g;
         this.generator = grammar.getCodeGenerator();
@@ -295,7 +315,10 @@ element returns [StringTemplate code=null]
          code.setAttribute("b", b.getText());
         }
 
-    |	#(ASSIGN label:ID code=atom[label.getText()])
+    |	#(ASSIGN label:ID code=atom[#label.getText()])
+
+    |	#(	PLUS_ASSIGN label2:ID code=atom[#label2.getText()]
+         )
 
     |   code=ebnf
     |   tree
@@ -356,7 +379,9 @@ atom[String label] returns [StringTemplate code=null]
 			   code.setAttribute("elementIndex", ((TokenWithIndex)#t.getToken()).getIndex());
 			   generator.generateLocalFOLLOW(#t,#t.getText(),currentRuleName);
 		   }
-		   if ( label!=null ) {code.setAttribute("label", label);}
+		   if ( label!=null ) {
+		       code.setAttribute("labelST", getLabelST(currentRuleName,label));
+		   }
 		}
 
     |   c:CHAR_LITERAL
@@ -376,7 +401,9 @@ atom[String label] returns [StringTemplate code=null]
 				String.valueOf(grammar.getTokenType(#c.getText())),
 				currentRuleName);
 		}
-		if ( label!=null ) {code.setAttribute("label", label);}
+		if ( label!=null ) {
+		    code.setAttribute("labelST", getLabelST(currentRuleName,label));
+		}
         }
 
     |   s:STRING_LITERAL
@@ -395,7 +422,9 @@ atom[String label] returns [StringTemplate code=null]
 				String.valueOf(grammar.getTokenType(#s.getText())),
 				currentRuleName);
 		}
-		if ( label!=null ) {code.setAttribute("label", label);}
+		if ( label!=null ) {
+		    code.setAttribute("labelST", getLabelST(currentRuleName,label));
+		}
 		}
 
     |   w:WILDCARD
@@ -406,7 +435,9 @@ atom[String label] returns [StringTemplate code=null]
 		else { // else it's a token type reference
 			code = templates.getInstanceOf("wildcard");
 		}
-		if ( label!=null ) {code.setAttribute("label", label);}
+		if ( label!=null ) {
+		    code.setAttribute("labelST", getLabelST(currentRuleName,label));
+		}
 		}
 
     |	code=set[label]
@@ -421,6 +452,8 @@ set[String label] returns [StringTemplate code=null]
 			generator.generateLocalFOLLOW(#s,"set",currentRuleName);
         }
         code.setAttribute("s", generator.genSetExpr(templates,#s.getSetValue(),1,false));
-        if ( label!=null ) {code.setAttribute("label", label);}
+		if ( label!=null ) {
+		    code.setAttribute("labelST", getLabelST(currentRuleName,label));
+		}
         }
     ;

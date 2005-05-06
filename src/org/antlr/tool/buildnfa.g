@@ -265,6 +265,7 @@ element returns [StateCluster g=null]
     |   #(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
         {g = factory.build_CharRange(#c1.getText(), #c2.getText());}
     |	#(ASSIGN ID g=atom)
+    |	#(PLUS_ASSIGN ID g=atom)
     |   g=ebnf
     |   tree
     |   #( SYNPRED block )

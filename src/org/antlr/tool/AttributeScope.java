@@ -102,6 +102,31 @@ public class AttributeScope {
 		return a;
 	}
 
+	/** Return the set of keys that collide from
+	 *  this and other.
+	 */
+	public Set intersection(AttributeScope other) {
+		if ( other==null || other.size()==0 || size()==0 ) {
+			return null;
+		}
+		Set inter = new HashSet();
+		Set thisKeys = attributes.keySet();
+		for (Iterator it = thisKeys.iterator(); it.hasNext();) {
+			String key = (String) it.next();
+			if ( other.attributes.get(key)!=null ) {
+				inter.add(key);
+			}
+		}
+		if ( inter.size()==0 ) {
+			return null;
+		}
+		return inter;
+	}
+
+	public int size() {
+		return attributes==null?0:attributes.size();
+	}
+
 	/** For decls like "String foo" or "char *foo32[3]" return the last valid
 	 *  ID (attribute name) in the decl.
 	 */

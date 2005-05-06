@@ -48,7 +48,13 @@ import org.antlr.Tool;
 /** Represents a grammar in memory. */
 public class Grammar {
     public static final int INITIAL_DECISION_LIST_SIZE = 300;
-    public static final int INVALID_RULE_INDEX = -1;
+	public static final int INVALID_RULE_INDEX = -1;
+
+	public static final int RULE_LABEL = 1;
+	public static final int TOKEN_LABEL = 2;
+	public static final int LIST_LABEL = 3;
+
+	public static String[] LabelTypeToString = {"<invalid>", "rule", "token", "list"};
 
     public static final String TOKEN_RULENAME = "Tokens";
 	public static final String FRAGMENT_RULE_MODIFIER = "fragment";
@@ -68,6 +74,7 @@ public class Grammar {
 	public static class LabelElementPair {
 		public antlr.Token label;
 		public GrammarAST elementRef;
+		public int type; // e.g., RULE_LABEL
 		public LabelElementPair(antlr.Token label, GrammarAST elementRef) {
 			this.label = label;
 			this.elementRef = elementRef;
@@ -174,6 +181,8 @@ public class Grammar {
      *  recognizers in the target language.
      */
     protected CodeGenerator generator;
+
+	NameSpaceChecker nameSpaceChecker = new NameSpaceChecker(this);
 
 	/** Used during LOOK to detect computation cycles */
 	protected Set lookBusy = new HashSet();
@@ -301,7 +310,6 @@ public class Grammar {
 							   re);
 		}
 
-        NameSpaceChecker nameSpaceChecker = new NameSpaceChecker(this);
 		nameSpaceChecker.checkConflicts();
 	}
 
@@ -623,6 +631,28 @@ public class Grammar {
 		return scopes;
 	}
 
+	protected void defineLabel(Rule r, antlr.Token label, GrammarAST element, int type) {
+		String labelName = label.getText();
+        boolean err = nameSpaceChecker.checkForLabelTypeMismatch(r, label, type);
+		if ( err ) {
+			return;
+		}
+		LabelElementPair pair = new LabelElementPair(label,element);
+		pair.type = type;
+		r.labelNameSpace.put(labelName, pair);
+		switch ( type ) {
+			case TOKEN_LABEL :
+				r.tokenLabels.put(label.getText(), pair);
+				break;
+			case RULE_LABEL :
+				r.ruleLabels.put(label.getText(), pair);
+				break;
+			case LIST_LABEL :
+				r.listLabels.put(label.getText(), pair);
+				break;
+		}
+	}
+
 	public void defineTokenRefLabel(String ruleName,
 									antlr.Token label,
 									GrammarAST tokenRef)
@@ -632,8 +662,7 @@ public class Grammar {
 			if ( r.tokenLabels==null ) {
 				r.tokenLabels = new LinkedHashMap();
 			}
-			r.tokenLabels.put(label.getText(),
-							  new LabelElementPair(label,tokenRef));
+			defineLabel(r, label, tokenRef, TOKEN_LABEL);
 		}
 	}
 
@@ -646,11 +675,22 @@ public class Grammar {
 			if ( r.ruleLabels==null ) {
 				r.ruleLabels = new LinkedHashMap();
 			}
-			r.ruleLabels.put(label.getText(),
-							 new LabelElementPair(label,ruleRef));
+			defineLabel(r, label, ruleRef, RULE_LABEL);
 		}
 	}
 
+	public void defineListLabel(String ruleName,
+								antlr.Token label,
+								GrammarAST element)
+	{
+		Rule r = getRule(ruleName);
+		if ( r!=null ) {
+			if ( r.listLabels==null ) {
+				r.listLabels = new LinkedHashMap();
+			}
+			defineLabel(r, label, element, LIST_LABEL);
+		}
+	}
 
 	/** To yield smaller, more readable code, track which rules have their
 	 *  predefined attributes accessed.  If the rule has no user-defined

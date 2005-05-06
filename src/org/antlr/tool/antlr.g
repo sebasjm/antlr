@@ -373,12 +373,21 @@ elementNoOptionSpec
 	:	(id ASSIGN^)?
 		(   r:range
 		|   t:terminal
-		|	NOT^
+		|	NOT // TODO: wrong tree
 			(	nt:notTerminal
-            |   s:set
+            |   s:ebnf
 			)
 		|	e2:ebnf
 		)
+
+    |   id PLUS_ASSIGN^ 
+        (   t2:terminal
+		|	NOT
+			(	nt2:notTerminal
+            |   s2:ebnf
+			)
+		|   s3:ebnf
+        )
 
 	|   a:ACTION
 
@@ -647,6 +656,8 @@ STAR:	'*' ;
 PLUS:	'+' ;
 
 ASSIGN : '=' ;
+
+PLUS_ASSIGN : "+=" ;
 
 IMPLIES : "=>" ;
 

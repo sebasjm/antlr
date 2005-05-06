@@ -161,7 +161,7 @@ public class ActionTranslator {
 				c += attribute.length();
 			}
 			else {
-				// $arg.?, $retval.?  Translate before the dot only
+				// $arg.?, $retval.? $listlabel.? Translate before the dot only
 				// (could also be $x.y for unknown x outside of a rule)
 				attrRef = translateAttributeReference(r, actionToken, scope);
 				c = dotIndex;
@@ -260,19 +260,8 @@ public class ActionTranslator {
 			return ref;
 		}
 		StringTemplate refST = null;
-		if ( r.getTokenLabel(attributeName)!=null ) {
-			// $tokenLabel
-			refST = generator.templates.getInstanceOf("tokenLabelRef");
-			refST.setAttribute("label", attributeName);
-		}
-		else if ( r.getRuleLabel(attributeName)!=null ) {
-			ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
-									  grammar,
-									  actionToken,
-									  ref);
-			return ref;
-		}
-		else {
+		Grammar.LabelElementPair pair = r.getLabel(attributeName);
+		if ( pair==null ) {
 			// $parameter or $returnValue
 			AttributeScope scope = r.getAttributeScope(attributeName);
 			if ( scope==null ) {
@@ -293,6 +282,28 @@ public class ActionTranslator {
 				refST.setAttribute("scope", r.name);
 			}
 			refST.setAttribute("attr", scope.getAttribute(attributeName));
+		}
+		else {
+			// $label of some type
+			switch ( pair.type ) {
+				case Grammar.TOKEN_LABEL :
+					// $tokenLabel
+					refST = generator.templates.getInstanceOf("tokenLabelRef");
+					refST.setAttribute("label", attributeName);
+					break;
+				case Grammar.LIST_LABEL :
+					// $listLabel
+					refST = generator.templates.getInstanceOf("tokenLabelRef");
+					refST.setAttribute("label", attributeName);
+					break;
+				case Grammar.RULE_LABEL :
+					// $ruleLabel
+					ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
+											  grammar,
+											  actionToken,
+											  ref);
+					return ref;
+			}
 		}
 		return refST.toString();
 	}

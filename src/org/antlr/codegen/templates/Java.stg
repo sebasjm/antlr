@@ -183,6 +183,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     retval.start = input.LT(1);<\n>
 <endif>
     <ruleDescriptor.tokenLabels:{Token <it.label.text>=null;}; separator="\n">
+    <ruleDescriptor.listLabels:{List <it.label.text>=null;}; separator="\n">
     <ruleDescriptor.ruleLabels:{<ruleLabelType(name=it.elementRef.text)> <it.label.text>=null;}; separator="\n">
     <initAction>
 <if(debug)>
@@ -350,8 +351,15 @@ dbg.location(<it.line>,<it.pos>);<\n>
 <it.el><\n>
 >>
 
-tokenRef(token,label,elementIndex) ::= <<
-<if(label)><label>=input.LT(1);<endif>
+tokenLabel(label) ::= "<label>=input.LT(1);"
+
+listLabel(label) ::= <<
+if(<label>==null) <label>=new ArrayList();
+<label>.add(input.LT(1));
+>>
+
+tokenRef(token,labelST,elementIndex) ::= <<
+<labelST>
 match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 >>
 
@@ -360,8 +368,8 @@ charRef(char) ::= "match(<char>);"
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 /** For now, sets are interval tests and must be tested inline */
-matchSet(s,label,elementIndex) ::= <<
-<if(label)><label>=input.LT(1);<endif>
+matchSet(s,labelST,elementIndex) ::= <<
+<labelST>
 if ( <s> ) input.consume();
 else {
     MismatchedSetException mse =
@@ -378,8 +386,8 @@ else {
 }<\n>
 >>
 
-matchNotSet(s,label,elementIndex) ::= <<
-<if(label)><label>=input.LT(1);<endif>
+matchNotSet(s,labelST,elementIndex) ::= <<
+<labelST>
 if ( !(<s>) ) input.consume();
 else {
     MismatchedNotSetException mnse =
@@ -398,15 +406,14 @@ else {
 
 lexerStringRef(string) ::= "match(<string>);"
 
-wildcard(label) ::= <<
-<if(label)><label>=input.LT(1);<endif>
+wildcard(labelST) ::= <<
+<labelST>
 matchAny();
 >>
 
 wildcardChar() ::= "matchAny();"
 
 ruleRef(rule,label,elementIndex,args) ::= <<
-
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
 <label>=<rule>(<args>);<\n>

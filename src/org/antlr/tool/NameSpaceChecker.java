@@ -4,6 +4,7 @@ import org.antlr.analysis.Label;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class NameSpaceChecker {
 	protected Grammar grammar;
@@ -19,17 +20,9 @@ public class NameSpaceChecker {
 				continue;
 			}
 			Rule r = grammar.getRule(ruleName);
-			// walk all token labels for Rule r
-			if ( r.tokenLabels!=null ) {
-				Iterator it = r.tokenLabels.values().iterator();
-				while ( it.hasNext() ) {
-					Grammar.LabelElementPair pair = (Grammar.LabelElementPair) it.next();
-					checkForLabelConflict(r, pair.label);
-				}
-			}
-			// walk all rule labels for Rule r
-			if ( r.ruleLabels!=null ) {
-				Iterator it = r.ruleLabels.values().iterator();
+			// walk all labels for Rule r
+			if ( r.labelNameSpace!=null ) {
+				Iterator it = r.labelNameSpace.values().iterator();
 				while ( it.hasNext() ) {
 					Grammar.LabelElementPair pair = (Grammar.LabelElementPair) it.next();
 					checkForLabelConflict(r, pair.label);
@@ -44,6 +37,7 @@ public class NameSpaceChecker {
 				}
 			}
 			checkForRuleDefinitionProblems(r);
+			checkForRuleArgumentAndReturnValueConflicts(r);
 		}
 		// check all global scopes against tokens
 		Iterator it = grammar.getGlobalScopes().values().iterator();
@@ -53,14 +47,31 @@ public class NameSpaceChecker {
 		}
 	}
 
+	protected void checkForRuleArgumentAndReturnValueConflicts(Rule r) {
+		if ( r.returnScope!=null ) {
+			Set conflictingKeys = r.returnScope.intersection(r.parameterScope);
+			if (conflictingKeys!=null) {
+				for (Iterator it = conflictingKeys.iterator(); it.hasNext();) {
+					String key = (String) it.next();
+					ErrorManager.grammarError(
+						ErrorManager.MSG_ARG_RETVAL_CONFLICT,
+						grammar,
+						r.tree.getToken(),
+						key,
+						r.name);
+				}
+			}
+		}
+	}
+
 	protected void checkForRuleDefinitionProblems(Rule r) {
 		String ruleName = r.name;
 		antlr.Token ruleToken = r.tree.getToken();
 		int msgID = 0;
-		if ( grammar.type==grammar.PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
+		if ( grammar.type==Grammar.PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
 			msgID = ErrorManager.MSG_LEXER_RULES_NOT_ALLOWED;
         }
-        else if ( grammar.type==grammar.LEXER && Character.isLowerCase(ruleName.charAt(0)) ) {
+        else if ( grammar.type==Grammar.LEXER && Character.isLowerCase(ruleName.charAt(0)) ) {
 			msgID = ErrorManager.MSG_PARSER_RULES_NOT_ALLOWED;
         }
 		else if ( grammar.getGlobalScope(ruleName)!=null ) {
@@ -130,5 +141,28 @@ public class NameSpaceChecker {
 		if ( msgID!=0 ) {
 			ErrorManager.grammarError(msgID,grammar,label,label.getText(),arg2);
 		}
+	}
+
+	/** If type of previous label differs from new label's type, that's an error.
+	 */
+	public boolean checkForLabelTypeMismatch(Rule r, antlr.Token label, int type) {
+		Grammar.LabelElementPair prevLabelPair =
+			(Grammar.LabelElementPair)r.labelNameSpace.get(label.getText());
+		if ( prevLabelPair!=null ) {
+			// label already defined; if same type, no problem
+			if ( prevLabelPair.type != type ) {
+				String typeMismatchExpr =
+					Grammar.LabelTypeToString[type]+"!="+
+					Grammar.LabelTypeToString[prevLabelPair.type];
+				ErrorManager.grammarError(
+					ErrorManager.MSG_LABEL_TYPE_CONFLICT,
+					grammar,
+					label,
+					label.getText(),
+					typeMismatchExpr);
+				return true;
+			}
+		}
+		return false;
 	}
 }

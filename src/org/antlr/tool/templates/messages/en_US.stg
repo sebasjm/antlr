@@ -21,8 +21,10 @@ CANNOT_GEN_DOT_FILE(arg,exception) ::=
 	"cannot write DFA DOT file <arg>: <exception>"
 BAD_ACTION_AST_STRUCTURE(exception) ::=
 	"bad internal tree structure for action '<arg>': <exception>"
-BAD_AST_STRUCTURE(arg,exception) ::=
-	"bad internal tree structure '<arg>': <exception>"
+BAD_AST_STRUCTURE(arg,exception,stackTrace) ::= <<
+bad internal tree structure '<arg>': <exception>
+<stackTrace; separator="\n">
+>>
 
 // code gen errors
 MISSING_CODE_GEN_TEMPLATES(arg) ::= 
@@ -105,6 +107,10 @@ ATTRIBUTE_CONFLICTS_WITH_RULE(file,line,col,arg) ::=
 	"<loc()>rule <arg>'s dynamically-scoped attribute <arg> conflicts with the rule name"
 ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL(file,line,col,arg,arg2) ::=
 	"<loc()>rule <arg2>'s dynamically-scoped attribute <arg> conflicts with<arg2>'s return value or parameter with same name"
+LABEL_TYPE_CONFLICT(file,line,col,arg,arg2) ::=
+	"<loc()>label <arg> type mismatch with previous definition: <arg2>"
+ARG_RETVAL_CONFLICT(file,line,col,arg,arg2) ::=
+	"<loc()>rule <arg2>'s argument <arg> conflicts a return value with same name"
 
 // GRAMMAR WARNINGS
 
