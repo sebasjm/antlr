@@ -113,6 +113,7 @@ public class ActionTranslator {
 	 *  the codegen package.
 	 */
 	protected StringTemplate getScopedAttributeReferenceTemplate(Rule r,
+																 AttributeScope scope,
 																 String scopeName,
 																 String attribute)
 	{
@@ -136,6 +137,8 @@ public class ActionTranslator {
 			// $ruleLabel
 			if( RuleLabelScope.predefinedRuleProperties.contains(attribute) ) {
 				stName = "ruleLabelPropertyRef_"+attribute;
+				RuleLabelScope rlScope = (RuleLabelScope)scope;
+				grammar.referenceRuleLabelPredefinedAttribute(rlScope.referencedRule.name);
 			}
 			else {
 				stName = "ruleLabelRef";
@@ -278,7 +281,7 @@ public class ActionTranslator {
 			return ref;
 		}
 		StringTemplate refST =
-			getScopedAttributeReferenceTemplate(r,scopeName,attributeName);
+			getScopedAttributeReferenceTemplate(r,scope,scopeName,attributeName);
 
 		return refST.toString();
 	}
@@ -330,39 +333,33 @@ public class ActionTranslator {
 		}
 		else {
 			// ok, it's not a label; have to think a little harder then
-			/*
-			// First, try $tokenRef reference
-			refST = translateTokenReference(r, actionAST, attributeName);
-			*/
-			if ( refST==null ) {
-				// $parameter or $returnValue
-				List ruleRefs = r.getRuleRefsInAlt(attributeName, actionAST.outerAltNum);
-				if ( ruleRefs!=null ) {
-					ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
-											  grammar,
-											  actionToken,
-											  ref);
-					return ref;
-				}
-				if ( scope==null ) {
-					ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE,
-											  grammar,
-											  actionToken,
-											  ref);
-					return ref;
-				}
-				if ( scope.isParameterScope ) {
-					refST = generator.templates.getInstanceOf("parameterAttributeRef");
-				}
-				else if ( scope.isReturnScope ) {
-					refST = generator.templates.getInstanceOf("returnAttributeRef");
-				}
-				else if ( scope.isDynamicRuleScope ) {
-					refST = generator.templates.getInstanceOf("ruleScopeAttributeRef");
-					refST.setAttribute("scope", r.name);
-				}
-				refST.setAttribute("attr", scope.getAttribute(attributeName));
+			// $parameter or $returnValue
+			List ruleRefs = r.getRuleRefsInAlt(attributeName, actionAST.outerAltNum);
+			if ( ruleRefs!=null ) {
+				ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
+										  grammar,
+										  actionToken,
+										  ref);
+				return ref;
 			}
+			if ( scope==null ) {
+				ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE,
+										  grammar,
+										  actionToken,
+										  ref);
+				return ref;
+			}
+			if ( scope.isParameterScope ) {
+				refST = generator.templates.getInstanceOf("parameterAttributeRef");
+			}
+			else if ( scope.isReturnScope ) {
+				refST = generator.templates.getInstanceOf("returnAttributeRef");
+			}
+			else if ( scope.isDynamicRuleScope ) {
+				refST = generator.templates.getInstanceOf("ruleScopeAttributeRef");
+				refST.setAttribute("scope", r.name);
+			}
+			refST.setAttribute("attr", scope.getAttribute(attributeName));
 		}
 		return refST.toString();
 	}

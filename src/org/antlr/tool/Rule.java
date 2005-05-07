@@ -125,9 +125,9 @@ public class Rule {
 		return scope;
 	}
 
-	/** If a rule has no user-defined parameters and nobody references
+	/** If a rule has no user-defined return values and nobody references
 	 *  it's start/stop (predefined attributes), then there is no need to
-	 *  define a struct otherwise for now we assume a struct.
+	 *  define a struct; otherwise for now we assume a struct.
 	 *  TODO: if only one user-defined type and no one references predefined attrs don't generate struct
 	 */
 	public boolean getHasMultipleReturnValues() {
