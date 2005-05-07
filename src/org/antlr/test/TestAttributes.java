@@ -91,7 +91,7 @@ public class TestAttributes extends TestSuite {
 		String expecting = action;
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),0);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -115,7 +115,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -141,7 +141,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -171,7 +171,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -197,7 +197,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -230,7 +230,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -258,7 +258,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("b",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -286,7 +286,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("b",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -320,7 +320,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("b",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -353,7 +353,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("b",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -386,7 +386,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("b",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -395,6 +395,38 @@ public class TestAttributes extends TestSuite {
 
 		int expectedMsgID = ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE;
 		Object expectedArg = "$r";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testMissingUnlabeledRuleAttribute() throws Exception {
+		String action = "$a";
+		String expecting = action;
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a :\n" +
+			"  ;\n"+
+			"b : a {"+action+"}\n" +
+			"  ;");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("b",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		int expectedMsgID = ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE;
+		Object expectedArg = "$a";
 		Object expectedArg2 = null;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
@@ -416,7 +448,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate(null,
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),0);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -446,7 +478,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate(null,
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),0);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -483,7 +515,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -513,7 +545,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -540,8 +572,8 @@ public class TestAttributes extends TestSuite {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
-			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+			translator.translate(null,
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),0);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -569,7 +601,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -599,7 +631,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("b",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -627,7 +659,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -660,7 +692,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -695,7 +727,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("b",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -773,7 +805,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -798,7 +830,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -823,7 +855,7 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -848,7 +880,123 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
-							 new antlr.CommonToken(ANTLRParser.ACTION,action));
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testImplicitTokenLabel() throws Exception {
+		String action = "$ID; $ID.text; $ID.getText()";
+		String expecting = "ID_1; ID_1.getText(); ID_1.getText()";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : ID {"+action+"} ;" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testImplicitRuleLabel() throws Exception {
+		String action = "$r.start;";
+		String expecting = "r_1.start;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : r {"+action+"} ;" +
+				"r : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testReuseExistingLabelWithImplicitRuleLabel() throws Exception {
+		String action = "$r.start;";
+		String expecting = "x.start;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : x=r {"+action+"} ;" +
+				"r : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testReuseExistingLabelWithImplicitTokenLabel() throws Exception {
+		String action = "$ID.text;";
+		String expecting = "x.getText();";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : x=ID {"+action+"} ;" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);

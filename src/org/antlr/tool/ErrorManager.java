@@ -152,6 +152,9 @@ public class ErrorManager {
 	public static final int MSG_ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL = 124;
 	public static final int MSG_LABEL_TYPE_CONFLICT = 125;
 	public static final int MSG_ARG_RETVAL_CONFLICT = 126;
+	public static final int MSG_NONUNIQUE_REF = 127;
+	public static final int MSG_FORWARD_ELEMENT_REF = 128;
+
 
 	// GRAMMAR WARNINGS
 	public static final int MSG_GRAMMAR_NONDETERMINISM = 200; // A predicts alts 1,2

@@ -111,6 +111,10 @@ LABEL_TYPE_CONFLICT(file,line,col,arg,arg2) ::=
 	"<loc()>label <arg> type mismatch with previous definition: <arg2>"
 ARG_RETVAL_CONFLICT(file,line,col,arg,arg2) ::=
 	"<loc()>rule <arg2>'s argument <arg> conflicts a return value with same name"
+NONUNIQUE_REF(file,line,col,arg) ::=
+	"<loc()><arg> is a non-unique reference"
+FORWARD_ELEMENT_REF(file,line,col,arg) ::=
+	"<loc()>illegal forward reference: <arg>"
 
 // GRAMMAR WARNINGS
 

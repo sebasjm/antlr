@@ -41,10 +41,36 @@ public class Rule {
 	 */
 	protected Map labelNameSpace = new HashMap();
 
+	public int numberOfAlts;
+
+	/** Each alt has a Map<tokenRefName,List<tokenRefAST>>; range 1..numberOfAlts.
+	 *  So, if there are 3 ID refs in a rule's alt number 2, you'll have
+	 *  altToTokenRef[2].get("ID").size()==3.
+	 */
+	protected Map[] altToTokenRefMap;
+
+	/** Each alt has a Map<ruleRefName,List<ruleRefAST>>; range 1..numberOfAlts
+	 *  So, if there are 3 expr refs in a rule's alt number 2, you'll have
+	 *  altToRuleRef[2].get("expr").size()==3.
+	 */
+	protected Map[] altToRuleRefMap;
+
 	/** Do not generate start, stop etc... in a return value struct unless
 	 *  somebody references $r.start somewhere in an action.
 	 */
 	public boolean needPredefinedRuleAttributes = false;
+
+	public Rule(String ruleName, int ruleIndex, int numberOfAlts) {
+		this.name = ruleName;
+		this.index = ruleIndex;
+		this.numberOfAlts = numberOfAlts;
+		altToTokenRefMap = new Map[numberOfAlts+1];
+		altToRuleRefMap = new Map[numberOfAlts+1];
+		for (int alt=1; alt<=numberOfAlts; alt++) {
+			altToTokenRefMap[alt] = new HashMap();
+			altToRuleRefMap[alt] = new HashMap();
+		}
+	}
 
 	public Grammar.LabelElementPair getLabel(String name) {
 		return (Grammar.LabelElementPair)labelNameSpace.get(name);
@@ -72,6 +98,16 @@ public class Rule {
 			return (Grammar.LabelElementPair)listLabels.get(name);
 		}
 		return pair;
+	}
+
+	public List getTokenRefsInAlt(String ref, int altNum) {
+		List tokenRefASTs = (List)altToTokenRefMap[altNum].get(ref);
+		return tokenRefASTs;
+	}
+
+	public List getRuleRefsInAlt(String ref, int altNum) {
+		List ruleRefASTs = (List)altToRuleRefMap[altNum].get(ref);
+		return ruleRefASTs;
 	}
 
 	/** Return the scope containing name */

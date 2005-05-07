@@ -44,9 +44,8 @@ options {
 protected Grammar grammar;
 protected GrammarAST root;
 protected String currentRuleName;
-protected Map lexerRules = new HashMap();
-protected Set ruleRefs = new HashSet();
-protected Set tokenIDRefs = new HashSet();
+protected int outerAltNum = 0;
+protected int blockLevel = 0;
 
 	/** Parser error-reporting function can be overridden in subclass */
 	public void reportError(RecognitionException ex) {
@@ -60,7 +59,6 @@ protected Set tokenIDRefs = new HashSet();
 
 	protected void finish() {
 		trimGrammar();
-		lookForReferencesToUndefinedSymbols();
 	}
 
 	/** Remove any lexer rules from a COMBINED; already passed to lexer */
@@ -95,37 +93,6 @@ protected Set tokenIDRefs = new HashSet();
 			p = (GrammarAST)p.getNextSibling();
 		}
 		//System.out.println("root after removal is: "+root.toStringList());
-	}
-
-	/** If ref to undefined rule, give error at first occurrence.
-	 *
-	 *  If you ref ID in a combined grammar and don't define ID as a lexer rule
-	 *  it is an error.
-	 */
-	protected void lookForReferencesToUndefinedSymbols() {
-		// for each rule ref, ask if there is a rule definition
-		for (Iterator iter = ruleRefs.iterator(); iter.hasNext();) {
-			Token tok = (Token) iter.next();
-			String ruleName = tok.getText();
-			if ( grammar.getRule(ruleName)==null ) {
-				ErrorManager.grammarError(ErrorManager.MSG_UNDEFINED_RULE_REF,
-										  grammar,
-										  tok,
-										  ruleName);
-			}
-        }
-		if ( grammar.type==Grammar.COMBINED ) {
-			for (Iterator iter = tokenIDRefs.iterator(); iter.hasNext();) {
-				Token tok = (Token) iter.next();
-				String tokenID = tok.getText();
-				if ( lexerRules.get(tokenID)==null ) {
-					ErrorManager.grammarError(ErrorManager.MSG_NO_TOKEN_DEFINITION,
-											  grammar,
-											  tok,
-											  tokenID);
-				}
-			}
-		}
 	}
 }
 
@@ -243,11 +210,10 @@ Map opts=null;
 				String ruleText = printer.toString(#rule, grammar);
 				//System.out.println("rule text is:\n"+ruleText);
 				grammar.defineLexerRuleFoundInParser(#id.getToken(), ruleText);
-				// track lexer rules so we can warn about undefined tokens
-				lexerRules.put(#id.getText(), #rule);
 			}
 			else {
-				grammar.defineRule(#id.getToken(), mod, opts, #rule);
+				int numAlts = countAltsForRule(#rule);
+				grammar.defineRule(#id.getToken(), mod, opts, #rule, numAlts);
 				r = grammar.getRule(name);
 				if ( #args!=null ) {
 					r.parameterScope = grammar.createParameterScope(name);
@@ -261,10 +227,18 @@ Map opts=null;
 			}
            (ruleScopeSpec[r])?
            #( INITACTION (ACTION)? )
+           {this.blockLevel=0;}
            b:block EOR
            {#b.setOptions(opts);}
          )
     ;
+
+countAltsForRule returns [int n=0]
+    :   #( RULE id:ID (modifier)? ARG RET (OPTIONS)? ("scope")? INITACTION
+           #(  BLOCK (OPTIONS)? (ALT {n++;})+ EOB )
+           EOR
+         )
+	;
 
 modifier returns [String mod]
 {
@@ -295,11 +269,15 @@ ruleScopeSpec[Rule r]
  	;
 
 block
-{Map opts=null;}
+{
+Map opts=null;
+this.blockLevel++;
+if ( this.blockLevel==1 ) {this.outerAltNum=1;}
+}
     :   #(  BLOCK
             (opts=optionsSpec {#block.setOptions(opts);})?
-            alternative (  alternative)*
-            EOB   
+            (alternative {if ( this.blockLevel==1 ) {this.outerAltNum++;}})+
+            EOB
          )
     ;
 
@@ -326,24 +304,26 @@ element
          )
     |   ebnf
     |   tree
-    |   #( SYNPRED block ) 
-    |   ACTION
+    |   #( SYNPRED block )
+    |   act:ACTION {#act.outerAltNum = this.outerAltNum;}
     |   SEMPRED
     |   EPSILON 
     ;
 
-ebnf:   block 
-    |   #( OPTIONAL block ) 
-    |   #( CLOSURE block )  
-    |   #( POSITIVE_CLOSURE block ) 
+ebnf:   block
+    |   #( OPTIONAL block )
+    |   #( CLOSURE block )
+    |   #( POSITIVE_CLOSURE block )
     ;
 
 tree:   #(TREE_BEGIN atom (element)*)
     ;
 
 atom
-    :   r:RULE_REF		{if ( !ruleRefs.contains(r) ) {ruleRefs.add(r.token);}}
-    |   t:TOKEN_REF 	{if ( !tokenIDRefs.contains(t) ) {tokenIDRefs.add(t.token);}}
+    :   r:RULE_REF
+    	{grammar.altReferencesRule(currentRuleName, #r, this.outerAltNum);}
+    |   t:TOKEN_REF
+    	{grammar.altReferencesToken(currentRuleName, #t, this.outerAltNum);}
     |   c:CHAR_LITERAL
     |   s:STRING_LITERAL
     |   WILDCARD

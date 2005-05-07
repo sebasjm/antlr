@@ -33,6 +33,7 @@ import org.antlr.analysis.DFA;
 import org.antlr.analysis.NFA;
 import org.antlr.analysis.NFAState;
 import org.antlr.misc.IntSet;
+import org.antlr.stringtemplate.StringTemplate;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -42,7 +43,6 @@ import java.util.HashMap;
  */
 public class GrammarAST extends BaseAST {
     protected Token token = null;
-    protected GrammarAST enclosingBlock = null;
     protected String enclosingRule = null;
 
     /** If this is a decision node, what is the lookahead DFA? */
@@ -63,13 +63,20 @@ public class GrammarAST extends BaseAST {
     /** If this is a BLOCK node, track options here */
     protected Map options = null;
 
-    /** What are the default options for a subrule? */
+	/** if this is an ACTION node, this is the outermost enclosing
+	 *  alt num in rule
+	 */
+	public int outerAltNum;
+
+	/** if this is a TOKEN_REF or RULE_REF node, this is the code StringTemplate
+	 *  generated for this node.  We need to update it later to add
+	 *  a label if someone does $tokenref or $ruleref in an action.
+	 */
+	public StringTemplate code;
+
+	/** What are the default options for a subrule? */
     public static final Map defaultOptions =
             new HashMap() {{put("greedy","true");}};
-
-    public GrammarAST getEnclosingBlock() {
-        return enclosingBlock;
-    }
 
     public void initialize(int i, String s) {
         token = new CommonToken(i,s);
@@ -185,10 +192,6 @@ public class GrammarAST extends BaseAST {
 
     public void setColumn(int col) {
         token.setColumn(col);
-    }
-
-    public void setEnclosingBlock(GrammarAST enclosingBlock) {
-        this.enclosingBlock = enclosingBlock;
     }
 
     public void setEnclosingRule(String rule) {

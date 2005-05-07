@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import antlr.Token;
+
 public class NameSpaceChecker {
 	protected Grammar grammar;
 
@@ -45,6 +47,8 @@ public class NameSpaceChecker {
 			AttributeScope scope = (AttributeScope) it.next();
 			checkForGlobalScopeTokenConflict(scope);
 		}
+		// check for missing rule, tokens
+		lookForReferencesToUndefinedSymbols();
 	}
 
 	protected void checkForRuleArgumentAndReturnValueConflicts(Rule r) {
@@ -79,6 +83,37 @@ public class NameSpaceChecker {
 		}
 		if ( msgID!=0 ) {
 			ErrorManager.grammarError(msgID, grammar, ruleToken, ruleName);
+		}
+	}
+
+	/** If ref to undefined rule, give error at first occurrence.
+	 *
+	 *  If you ref ID in a combined grammar and don't define ID as a lexer rule
+	 *  it is an error.
+	 */
+	protected void lookForReferencesToUndefinedSymbols() {
+		// for each rule ref, ask if there is a rule definition
+		for (Iterator iter = grammar.ruleRefs.iterator(); iter.hasNext();) {
+			Token tok = (Token) iter.next();
+			String ruleName = tok.getText();
+			if ( grammar.getRule(ruleName)==null ) {
+				ErrorManager.grammarError(ErrorManager.MSG_UNDEFINED_RULE_REF,
+										  grammar,
+										  tok,
+										  ruleName);
+			}
+        }
+		if ( grammar.type==Grammar.COMBINED ) {
+			for (Iterator iter = grammar.tokenRefs.iterator(); iter.hasNext();) {
+				Token tok = (Token) iter.next();
+				String tokenID = tok.getText();
+				if ( !grammar.lexerRules.contains(tokenID) ) {
+					ErrorManager.grammarError(ErrorManager.MSG_NO_TOKEN_DEFINITION,
+											  grammar,
+											  tok,
+											  tokenID);
+				}
+			}
 		}
 	}
 

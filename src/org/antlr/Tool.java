@@ -147,9 +147,9 @@ public class Tool {
 				String lexerGrammarStr = grammar.getLexerGrammar();
 				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
 					System.out.println("writing lexer to ./"+grammar.name+".lexer.g");
-					FileWriter fw = getOutputFile(grammar,grammar.name+".lexer.g");
-					fw.write(lexerGrammarStr);
-					fw.close();
+					Writer w = getOutputFile(grammar,grammar.name+".lexer.g");
+					w.write(lexerGrammarStr);
+					w.close();
 					StringReader sr = new StringReader(lexerGrammarStr);
 					Grammar lexerGrammar = new Grammar();
 					lexerGrammar.setFileName("<internally-generated-lexer>");
@@ -178,7 +178,6 @@ public class Tool {
 		String language = (String)grammar.getOption("language");
 		if ( language!=null ) {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);
-			generator.setOutputDirectory(outputDirectory);
 			grammar.setCodeGenerator(generator);
 			generator.setDebug(debug);
 
@@ -226,7 +225,7 @@ public class Tool {
 	}
 
 	protected void writeDOTFile(Grammar g, String name, String dot) throws IOException {
-		FileWriter fw = getOutputFile(g, name+".dot");
+		Writer fw = getOutputFile(g, name+".dot");
 		fw.write(dot);
 		fw.close();
 	}
@@ -238,14 +237,24 @@ public class Tool {
         //System.err.println("  -glib inputDir     specify location of token files, grammars");
     }
 
+	public void setOutputDirectory(String outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
+
     /** This method is used by all code generators to create new output
      *  files. If the outputDir set by -o is not present it will be created.
 	 *  The final filename is sensitive to the output directory and
 	 *  the directory where the grammar file was found.  If -o is /tmp
 	 *  and the original grammar file was foo/t.g then output files
 	 *  go in /tmp/foo.
+	 *
+	 *  If outputDirectory==null then write a String and toss away (for now);
+	 *  like writing to /dev/null.
      */
-    public FileWriter getOutputFile(Grammar g, String fileName) throws IOException {
+    public Writer getOutputFile(Grammar g, String fileName) throws IOException {
+		if ( outputDirectory==null ) {
+			return new StringWriter();
+		}
 		String fullName;
 		String fileDir = g.getFileDirectory();
 		if ( fileDir==null ) {
@@ -263,7 +272,8 @@ public class Tool {
 		if( !outDir.exists() ) {
 			outDir.mkdirs();
 		}
-        return new FileWriter(fullName);
+        FileWriter fw = new FileWriter(fullName);
+		return new BufferedWriter(fw);
     }
 
 	public String getOutputDirectory() {

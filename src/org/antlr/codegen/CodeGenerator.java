@@ -120,9 +120,6 @@ public class CodeGenerator {
 	 */
 	protected Tool tool;
 
-	/** Where all output (nfa,dfa,.java,...) go */
-	protected String outputDirectory = ".";
-
 	protected boolean debug;
 
 	/** I have factored out the generation of acyclic DFAs to separate class */
@@ -553,10 +550,10 @@ public class CodeGenerator {
 	}
 
 	public String translateAction(String ruleName,
-								  antlr.Token actionToken)
+								  GrammarAST actionTree)
 	{
 		ActionTranslator translator = new ActionTranslator(this);
-		return translator.translate(ruleName,actionToken);
+		return translator.translate(ruleName,actionTree);
 	}
 
 	// C H A R  T R A N S L A T I O N
@@ -641,10 +638,6 @@ public class CodeGenerator {
 		return templates;
 	}
 
-	public void setOutputDirectory(String o) {
-		outputDirectory = o;
-	}
-
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 	}
@@ -665,10 +658,9 @@ public class CodeGenerator {
 
 	public void write(StringTemplate code, String fileName) throws IOException {
 		System.out.println("writing "+fileName);
-		FileWriter fw =
-			tool.getOutputFile(grammar, fileName);
-		fw.write(code.toString());
-		fw.close();
+		Writer w = tool.getOutputFile(grammar, fileName);
+		w.write(code.toString());
+		w.close();
 	}
 
 	/** You can generate a switch rather than if-then-else for a DFA state

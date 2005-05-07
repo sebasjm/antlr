@@ -140,6 +140,17 @@ public class Grammar {
 	 */
 	protected Grammar importTokenVocabularyFromGrammar;
 
+	/** The unique set of all rule references in any rule */
+	protected Set ruleRefs = new HashSet();
+
+	/** The unique set of all token ID references in any rule */
+	protected Set tokenRefs = new HashSet();
+
+	/** If combined or lexer grammar, track the rules; Set<String>.
+	 * 	Track lexer rules so we can warn about undefined tokens.
+ 	 */
+	protected Set lexerRules = new HashSet();
+
     /** Be able to assign a number to every decision in grammar;
      *  decisions in 1..n
      */
@@ -353,6 +364,7 @@ public class Grammar {
         // Now add token rule references
         Collection ruleNames = getRules();
         Iterator iter = ruleNames.iterator();
+		int numAlts = 0;
         while (iter.hasNext()) {
             Rule r = (Rule) iter.next();
 			// only add real token rules to Tokens rule
@@ -360,6 +372,7 @@ public class Grammar {
 				 !r.modifier.equals(FRAGMENT_RULE_MODIFIER) )
 			{
             	matchTokenRuleST.setAttribute("rules", r.name);
+				numAlts++;
 			}
         }
 		//System.out.println("tokens rule: "+matchTokenRuleST.toString());
@@ -382,7 +395,7 @@ public class Grammar {
             ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,e);
         }
 		antlr.Token ruleToken = new antlr.TokenWithIndex(ANTLRParser.ID,TOKEN_RULENAME);
-		defineRule(ruleToken, null, null, (GrammarAST)parser.getAST());
+		defineRule(ruleToken, null, null, (GrammarAST)parser.getAST(), numAlts);
 	}
 
     protected void initTokenSymbolTables() {
@@ -536,7 +549,8 @@ public class Grammar {
     public int defineRule(antlr.Token ruleToken,
 						  String modifier,
 						  Map options,
-						  GrammarAST tree)
+						  GrammarAST tree,
+						  int numAlts)
 	{
 		String ruleName = ruleToken.getText();
 		/*
@@ -548,9 +562,7 @@ public class Grammar {
 									  this, ruleToken, ruleName);
         }
 
-		Rule r = new Rule();
-		r.index = ruleIndex;
-		r.name = ruleName;
+		Rule r = new Rule(ruleName, ruleIndex, numAlts);
 		r.modifier = modifier;
 		r.options = options;
         nameToRuleMap.put(ruleName, r);
@@ -558,13 +570,12 @@ public class Grammar {
         ruleIndexToRuleList.setSize(ruleIndex+1);
         ruleIndexToRuleList.set(ruleIndex, ruleName);
         ruleIndex++;
-		// all rules have predefined attributes available in the return scope
-		//r.returnScope = defineReturnScope(ruleName);
         return ruleIndex;
 	}
 
 	public void defineLexerRuleFoundInParser(antlr.Token ruleToken, String ruleText) {
 		lexerGrammarST.setAttribute("rules", ruleText);
+		lexerRules.add(ruleToken.getText());
 	}
 
 	public void defineLexerRuleForStringLiteral(String literal, int tokenType) {
@@ -689,6 +700,54 @@ public class Grammar {
 				r.listLabels = new LinkedHashMap();
 			}
 			defineLabel(r, label, element, LIST_LABEL);
+		}
+	}
+
+	/** Track a rule reference within an outermost alt of a rule.  Used
+	 *  at the moment to decide if $ruleref refers to a unique rule ref in
+	 *  the alt.
+	 */
+	public void altReferencesRule(String ruleName, GrammarAST refAST, int outerAltNum) {
+		Rule r = getRule(ruleName);
+		if ( r==null ) {
+			return;
+		}
+		List refs = (List)r.altToRuleRefMap[outerAltNum].get(refAST.getText());
+		if ( refs==null ) {
+			refs = new ArrayList();
+			r.altToRuleRefMap[outerAltNum].put(refAST.getText(), refs);
+		}
+		refs.add(refAST);
+		referenceRule(refAST.getToken());
+	}
+
+	/** Track a token reference within an outermost alt of a rule.  Used
+	 *  at the moment to decide if $tokenref refers to a unique token ref in
+	 *  the alt.
+	 */
+	public void altReferencesToken(String ruleName, GrammarAST refAST, int outerAltNum) {
+		Rule r = getRule(ruleName);
+		if ( r==null ) {
+			return;
+		}
+		List refs = (List)r.altToTokenRefMap[outerAltNum].get(refAST.getText());
+		if ( refs==null ) {
+			refs = new ArrayList();
+			r.altToTokenRefMap[outerAltNum].put(refAST.getText(), refs);
+		}
+		refs.add(refAST);
+		referenceToken(refAST.getToken());
+	}
+
+	protected void referenceRule(antlr.Token refToken) {
+		if ( !ruleRefs.contains(refToken) ) {
+			ruleRefs.add(refToken);
+		}
+	}
+
+	protected void referenceToken(antlr.Token refToken) {
+		if ( !tokenRefs.contains(refToken) ) {
+			tokenRefs.add(refToken);
 		}
 	}
 

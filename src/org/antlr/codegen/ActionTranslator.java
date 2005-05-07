@@ -4,6 +4,10 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
 import org.antlr.runtime.Token;
 
+import java.util.List;
+
+import antlr.CommonToken;
+
 public class ActionTranslator {
 	public static final char ATTRIBUTE_REF_CHAR = '$';
 
@@ -16,6 +20,16 @@ public class ActionTranslator {
 		grammar = generator.grammar;
 	}
 
+	public String translate(String ruleName,
+						    antlr.Token actionToken,
+							int outerAltNum)
+	{
+		GrammarAST actionAST = new GrammarAST();
+		actionAST.initialize(actionToken);
+		actionAST.outerAltNum = outerAltNum;
+		return translate(ruleName, actionAST);
+	}
+
 	/** Given an action string with @x.y and @x references or $x.y/$x, convert it
 	 *  to a StringTemplate (that will be inserted into the output StringTemplate)
 	 *  Replace @ references to template references.  Targets can then say
@@ -26,8 +40,9 @@ public class ActionTranslator {
 	 *  the StringTemplate.
 	 */
 	public String translate(String ruleName,
-						    antlr.Token actionToken)
+						    GrammarAST actionAST)
 	{
+		antlr.Token actionToken = actionAST.getToken();
 		String action = actionToken.getText();
 		Rule r = null;
 		if ( ruleName!=null ) {
@@ -46,7 +61,7 @@ public class ActionTranslator {
 			if ( action.charAt(c)==ATTRIBUTE_REF_CHAR ) {
 				// $...
 				c++; // skip $
-				c = parseAttributeReference(r,action,c,buf,actionToken);
+				c = parseAttributeReference(r,action,c,buf,actionAST);
 			}
 			else {
 				buf.append(action.charAt(c));
@@ -142,34 +157,58 @@ public class ActionTranslator {
 										String action,
 										int c,
 										StringBuffer buf,
-										antlr.Token actionToken)
+										GrammarAST actionAST)
 	{
 		String attrRef=null;
 		String scope = getID(action, c);
 		c += scope.length();
 		AttributeScope attrScope = resolveScope(r, scope);
+		List ruleRefs = null;
+		List tokenRefs = null;
+		if ( r!=null ) {
+			ruleRefs = r.getRuleRefsInAlt(scope, actionAST.outerAltNum);
+			tokenRefs = r.getTokenRefsInAlt(scope, actionAST.outerAltNum);
+		}
 		if ( (c+1)<action.length() &&
 			 action.charAt(c)=='.' && Character.isLetter(action.charAt(c+1)))
 		{
 			// $x.y
 			int dotIndex = c;
 			c++;
-			String attribute = getID(action, c);
+			String attributeName = getID(action, c);
 			if ( attrScope!=null ) {
-				// $scope.attribute
-				attrRef = translateAttributeReference(r, actionToken, attrScope, scope, attribute);
-				c += attribute.length();
+				// $scope.attributeName
+				attrRef = translateAttributeReference(r, actionAST, attrScope, scope, attributeName);
+				c += attributeName.length();
+			}
+			else if ( ruleRefs!=null ) {
+				// $rule.attributeName
+				attrRef =
+					translateRuleReference(r, actionAST, scope, attributeName);
+				c += attributeName.length();
+			}
+			else if ( tokenRefs!=null ) {
+				// $token.attributeName
+				attrRef =
+					translateTokenReference(r, actionAST, scope, attributeName);
+				c += attributeName.length();
 			}
 			else {
 				// $arg.?, $retval.? $listlabel.? Translate before the dot only
 				// (could also be $x.y for unknown x outside of a rule)
-				attrRef = translateAttributeReference(r, actionToken, scope);
+				attrRef = translateAttributeReference(r, actionAST, scope);
 				c = dotIndex;
 			}
 		}
 		else {
 			// Isolated $x
-			attrRef = translateAttributeReference(r, actionToken, scope);
+			if ( tokenRefs!=null ) {
+				// $token
+				attrRef = translateTokenReference(r, actionAST, scope, null);
+			}
+			else {
+				attrRef = translateAttributeReference(r, actionAST, scope);
+			}
 		}
 		buf.append(attrRef);
 		return c;
@@ -182,11 +221,12 @@ public class ActionTranslator {
 	 *  then x must be a predefined attribute.
 	 */
 	protected String translateAttributeReference(Rule r,
-												 antlr.Token actionToken,
+												 GrammarAST actionAST,
 												 AttributeScope scope,
 												 String scopeName,
 												 String attributeName)
 	{
+		antlr.Token actionToken = actionAST.getToken();
 		String ref = ATTRIBUTE_REF_CHAR+scopeName+"."+attributeName;
 		Attribute attribute = scope.getAttribute(attributeName);
 		if ( attribute==null ) {
@@ -206,7 +246,7 @@ public class ActionTranslator {
 				msgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
 			}
 			// $rulelabel.unknown
-			else if ( scope instanceof RuleLabelScope) {
+			else if ( scope instanceof RuleLabelScope ) {
 				Rule referencedRule = ((RuleLabelScope)scope).referencedRule;
 				// $rulelabel.parameter
 				if ( referencedRule.parameterScope!=null &&
@@ -244,12 +284,16 @@ public class ActionTranslator {
 	}
 
 	/** Translate $x where x is either a parameter, return value, local
-	 *  rule-scope attribute, or token attributeName.
+	 *  rule-scope attribute, label, token name, or rule name.
+	 *
+	 *  $tokenLabel is handled in the $x.y translator as $tokenLabel is seen
+	 *  as a valid scope.
 	 */
 	protected String translateAttributeReference(Rule r,
-												 antlr.Token actionToken,
+												 GrammarAST actionAST,
 												 String attributeName)
 	{
+		antlr.Token actionToken = actionAST.getToken();
 		String ref = ATTRIBUTE_REF_CHAR+attributeName;
 		// cannot have isolated $x expressions outside of a rule
 		if ( r==null ) {
@@ -260,30 +304,9 @@ public class ActionTranslator {
 			return ref;
 		}
 		StringTemplate refST = null;
+		AttributeScope scope = r.getAttributeScope(attributeName);
 		Grammar.LabelElementPair pair = r.getLabel(attributeName);
-		if ( pair==null ) {
-			// $parameter or $returnValue
-			AttributeScope scope = r.getAttributeScope(attributeName);
-			if ( scope==null ) {
-				ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE,
-										  grammar,
-										  actionToken,
-										  ref);
-				return ref;
-			}
-			if ( scope.isParameterScope ) {
-				refST = generator.templates.getInstanceOf("parameterAttributeRef");
-			}
-			else if ( scope.isReturnScope ) {
-				refST = generator.templates.getInstanceOf("returnAttributeRef");
-			}
-			else if ( scope.isDynamicRuleScope ) {
-				refST = generator.templates.getInstanceOf("ruleScopeAttributeRef");
-				refST.setAttribute("scope", r.name);
-			}
-			refST.setAttribute("attr", scope.getAttribute(attributeName));
-		}
-		else {
+		if ( pair!=null ) {
 			// $label of some type
 			switch ( pair.type ) {
 				case Grammar.TOKEN_LABEL :
@@ -305,7 +328,119 @@ public class ActionTranslator {
 					return ref;
 			}
 		}
+		else {
+			// ok, it's not a label; have to think a little harder then
+			/*
+			// First, try $tokenRef reference
+			refST = translateTokenReference(r, actionAST, attributeName);
+			*/
+			if ( refST==null ) {
+				// $parameter or $returnValue
+				List ruleRefs = r.getRuleRefsInAlt(attributeName, actionAST.outerAltNum);
+				if ( ruleRefs!=null ) {
+					ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
+											  grammar,
+											  actionToken,
+											  ref);
+					return ref;
+				}
+				if ( scope==null ) {
+					ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE,
+											  grammar,
+											  actionToken,
+											  ref);
+					return ref;
+				}
+				if ( scope.isParameterScope ) {
+					refST = generator.templates.getInstanceOf("parameterAttributeRef");
+				}
+				else if ( scope.isReturnScope ) {
+					refST = generator.templates.getInstanceOf("returnAttributeRef");
+				}
+				else if ( scope.isDynamicRuleScope ) {
+					refST = generator.templates.getInstanceOf("ruleScopeAttributeRef");
+					refST.setAttribute("scope", r.name);
+				}
+				refST.setAttribute("attr", scope.getAttribute(attributeName));
+			}
+		}
 		return refST.toString();
+	}
+
+	/** For $ID, find unique ID reference and make it think it was
+	 *  labeled.  Then just invoke the usual translation routine.
+	 */
+	protected String translateTokenReference(Rule r,
+											 GrammarAST actionAST,
+											 String tokenRefName,
+											 String attributeName)
+	{
+		String ref = ATTRIBUTE_REF_CHAR+attributeName;
+		List tokenRefs = r.getTokenRefsInAlt(tokenRefName, actionAST.outerAltNum);
+		GrammarAST uniqueRefAST = (GrammarAST)tokenRefs.get(0);
+		if ( uniqueRefAST.code==null ) {
+			ErrorManager.grammarError(ErrorManager.MSG_FORWARD_ELEMENT_REF,
+									  grammar,
+									  actionAST.getToken(),
+									  ref);
+			return ref;
+		}
+		String labelName = tokenRefName+"_"+actionAST.outerAltNum;
+		StringTemplate existingLabelST =
+			(StringTemplate)uniqueRefAST.code.getAttribute("labelST");
+		if ( existingLabelST!=null ) {
+			labelName = (String)existingLabelST.getAttribute("label");
+		}
+		else {
+			// create new label
+			CommonToken label = new CommonToken(ANTLRParser.ID, labelName);
+			grammar.defineTokenRefLabel(r.name, label, uniqueRefAST);
+			StringTemplate labelST = generator.templates.getInstanceOf("tokenLabel");
+			labelST.setAttribute("label", labelName);
+			uniqueRefAST.code.setAttribute("labelST", labelST);
+		}
+		AttributeScope scope = AttributeScope.tokenScope;
+		if ( attributeName==null ) {
+			return translateAttributeReference(r, actionAST, labelName);
+		}
+		else {
+			return translateAttributeReference(r, actionAST, scope, labelName, attributeName);
+		}
+	}
+
+	/** For $expr, find unique expr reference and make it think it was
+	 *  labeled.  Then just invoke the usual translation routine.
+	 */
+	protected String translateRuleReference(Rule r,
+											GrammarAST actionAST,
+											String ruleRefName,
+											String attributeName)
+	{
+		String ref = ATTRIBUTE_REF_CHAR+ruleRefName+"."+attributeName;
+		List ruleRefs = r.getRuleRefsInAlt(ruleRefName, actionAST.outerAltNum);
+		GrammarAST uniqueRefAST = (GrammarAST)ruleRefs.get(0);
+		if ( uniqueRefAST.code==null ) {
+			ErrorManager.grammarError(ErrorManager.MSG_FORWARD_ELEMENT_REF,
+									  grammar,
+									  actionAST.getToken(),
+									  ref);
+			return ref;
+		}
+		String labelName = ruleRefName+"_"+actionAST.outerAltNum;
+		String existingLabelName =
+			(String)uniqueRefAST.code.getAttribute("label");
+		if ( existingLabelName!=null ) {
+			labelName = existingLabelName;
+		}
+		else {
+			// create new label
+			CommonToken label = new CommonToken(ANTLRParser.ID, labelName);
+			grammar.defineRuleRefLabel(r.name, label, uniqueRefAST);
+			uniqueRefAST.code.setAttribute("label", labelName);
+		}
+		Rule referencedRule = grammar.getRule(ruleRefName);
+		AttributeScope scope = new RuleLabelScope(referencedRule);
+		return translateAttributeReference(r, actionAST, scope, labelName, attributeName);
 	}
 
 	protected String getID(String action, int c) {

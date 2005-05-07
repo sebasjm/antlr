@@ -148,7 +148,7 @@ grammarSpec
         (attrScope)*
         ( act:ACTION
           {recognizerST.setAttribute("globalAction",
-                           generator.translateAction(null,#act.getToken()));}
+                           generator.translateAction(null,#act));}
         )?
 		rules[recognizerST]
 	;
@@ -183,7 +183,7 @@ rule returns [StringTemplate code=null]
 			( #(OPTIONS .) )?
 			(ruleScopeSpec)?
             #( INITACTION
-               (ia:ACTION {initAction=generator.translateAction(r,#ia.getToken());})?
+               (ia:ACTION {initAction=generator.translateAction(r,#ia);})?
              )
 	     	b=block["ruleBlock", dfa] EOR
          )
@@ -328,9 +328,8 @@ element returns [StringTemplate code=null]
     |   act:ACTION
         {
         String actText = #act.getText();
-
         code = new StringTemplate(templates,
-                                  generator.translateAction(currentRuleName,#act.getToken()));
+                                  generator.translateAction(currentRuleName,#act));
         }
 
     |   SEMPRED
@@ -365,6 +364,7 @@ atom[String label] returns [StringTemplate code=null]
 		if ( label!=null ) {code.setAttribute("label", label);}
 		code.setAttribute("elementIndex", ((TokenWithIndex)r.getToken()).getIndex());
 		generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName);
+		#r.code = code;
         }
 
     |   t:TOKEN_REF
@@ -382,6 +382,7 @@ atom[String label] returns [StringTemplate code=null]
 		   if ( label!=null ) {
 		       code.setAttribute("labelST", getLabelST(currentRuleName,label));
 		   }
+		   #t.code = code;
 		}
 
     |   c:CHAR_LITERAL
