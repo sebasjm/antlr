@@ -195,6 +195,7 @@ rule returns [StringTemplate code=null]
 			}
 			else {
 				code = templates.getInstanceOf("lexerRule");
+				code.setAttribute("ruleDescriptor", grammar.getRule(r));
 			}
 		}
 		else {
@@ -357,21 +358,25 @@ tree:   #(TREE_BEGIN atom[null] (element)*)
     ;
 
 atom[String label] returns [StringTemplate code=null]
-    :   r:RULE_REF
+    :   #( r:RULE_REF (rarg:ARG_ACTION)? )
         {
+        grammar.checkRuleReference(#r, #rarg, currentRuleName);
         code = templates.getInstanceOf("ruleRef");
 		code.setAttribute("rule", r.getText());
 		if ( label!=null ) {code.setAttribute("label", label);}
+		if ( #rarg!=null ) {code.setAttribute("args", #rarg.getText());}
 		code.setAttribute("elementIndex", ((TokenWithIndex)r.getToken()).getIndex());
 		generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName);
 		#r.code = code;
         }
 
-    |   t:TOKEN_REF
+    |   #( t:TOKEN_REF (targ:ARG_ACTION)? )
         {
+           grammar.checkRuleReference(#t, #targ, currentRuleName);
 		   if ( grammar.type==Grammar.LEXER ) {
 			   code = templates.getInstanceOf("lexerRuleRef");
 			   code.setAttribute("rule", t.getText());
+			   if ( #targ!=null ) {code.setAttribute("args", #targ.getText());}
 		   }
 		   else {
 			   code = templates.getInstanceOf("tokenRef");

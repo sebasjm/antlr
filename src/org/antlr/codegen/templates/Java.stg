@@ -221,8 +221,8 @@ public void mTokens() throws RecognitionException {
 }
 >>
 
-lexerRule(ruleName,nakedBlock,args,initAction,block) ::= <<
-public void m<ruleName>(<args>) throws RecognitionException {
+lexerRule(ruleName,nakedBlock,ruleDescriptor,initAction,block) ::= <<
+public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
 <initAction>
 <if(nakedBlock)>
     <block><\n>

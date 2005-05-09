@@ -79,8 +79,8 @@ LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE(file,line,col,arg) ::=
 	"<loc()>literal has no associated lexer rule: <arg>"
 CANNOT_ALIAS_TOKENS_IN_LEXER(file,line,col,arg) ::=
 	"<loc()>literals are illegal in lexer tokens{} section: <arg>"
-ATTRIBUTE_REF_NOT_IN_RULE(file,line,col) ::=
-	"<loc()>reference to attribute outside of a rule"
+ATTRIBUTE_REF_NOT_IN_RULE(file,line,col,arg) ::=
+	"<loc()>reference to attribute outside of a rule: <arg>"
 UNKNOWN_ATTRIBUTE_IN_SCOPE(file,line,col,arg,arg2) ::=
 	"<loc()>unknown attribute for <arg>: <arg2>"
 UNKNOWN_RULE_ATTRIBUTE(file,line,col,arg,arg2) ::=
@@ -115,6 +115,12 @@ NONUNIQUE_REF(file,line,col,arg) ::=
 	"<loc()><arg> is a non-unique reference"
 FORWARD_ELEMENT_REF(file,line,col,arg) ::=
 	"<loc()>illegal forward reference: <arg>"
+MISSING_RULE_ARGS(file,line,col,arg) ::=
+	"<loc()>missing parameter(s) on rule reference: <arg>"
+RULE_HAS_NO_ARGS(file,line,col,arg) ::=
+	"<loc()>rule <arg> has no defined parameters"
+ARGS_ON_TOKEN_REF(file,line,col,arg) ::=
+	"<loc()>token reference <arg> may not have parameters"
 
 // GRAMMAR WARNINGS
 

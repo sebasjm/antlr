@@ -111,7 +111,8 @@ root = #grammar;
     ;
 
 headerSpec
-    :   #( "header" (ID)? ACTION )
+    :   #( "header" (name:ID)? a:ACTION
+        {grammar.defineGrammarHeader(#name, #a);} )
     ;
 
 attrScope
@@ -204,16 +205,11 @@ Map opts=null;
 				 grammar.type==Grammar.COMBINED )
 			{
 				// a merged grammar spec, track lexer rules and send to another grammar
-				//System.out.println("rule tree is:\n"+#rule.toStringTree());
-				ANTLRTreePrinter printer = new ANTLRTreePrinter();
-				printer.setASTNodeClass("org.antlr.tool.GrammarAST");
-				String ruleText = printer.toString(#rule, grammar);
-				//System.out.println("rule text is:\n"+ruleText);
-				grammar.defineLexerRuleFoundInParser(#id.getToken(), ruleText);
+				grammar.defineLexerRuleFoundInParser(#id.getToken(), #rule);
 			}
 			else {
 				int numAlts = countAltsForRule(#rule);
-				grammar.defineRule(#id.getToken(), mod, opts, #rule, numAlts);
+				grammar.defineRule(#id.getToken(), mod, opts, #rule, #args, numAlts);
 				r = grammar.getRule(name);
 				if ( #args!=null ) {
 					r.parameterScope = grammar.createParameterScope(name);
@@ -320,10 +316,14 @@ tree:   #(TREE_BEGIN atom (element)*)
     ;
 
 atom
-    :   r:RULE_REF
-    	{grammar.altReferencesRule(currentRuleName, #r, this.outerAltNum);}
-    |   t:TOKEN_REF
-    	{grammar.altReferencesToken(currentRuleName, #t, this.outerAltNum);}
+    :   #( r:RULE_REF (rarg:ARG_ACTION)? )
+    	{
+    	grammar.altReferencesRule(currentRuleName, #r, this.outerAltNum);
+    	}
+    |   #( t:TOKEN_REF (targ:ARG_ACTION)? )
+    	{
+    	grammar.altReferencesToken(currentRuleName, #t, this.outerAltNum);
+    	}
     |   c:CHAR_LITERAL
     |   s:STRING_LITERAL
     |   WILDCARD

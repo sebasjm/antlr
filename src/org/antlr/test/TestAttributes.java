@@ -41,6 +41,7 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.debug.RemoteDebugEventSocketListener;
 
 import java.util.*;
+import java.io.StringReader;
 
 import antlr.Token;
 
@@ -89,6 +90,28 @@ public class TestAttributes extends TestSuite {
 		ActionTranslator translator = new ActionTranslator(generator);
 		String action = "i<3; \"<xmltag>\"";
 		String expecting = action;
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),0);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+	}
+
+	public void testEscaped$InAction() throws Exception {
+		String action = "int \\$n; \"\\$in string\\$\"";
+		String expecting = "int $n; \"$in string$\"";
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"{"+action+"}\n"+
+		    "a[User u, int i]\n" +
+			"        : {"+action+"}\n" +
+			"        ;");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
 							 new antlr.CommonToken(ANTLRParser.ACTION,action),0);
@@ -747,7 +770,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"a : id=ID id=b\n" +
+			"a : id=\"foo\" id=b\n" +
 			"  ;\n" +
 			"b : ;\n");
 		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
@@ -763,7 +786,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"a : ids+=ID ids=ID\n" +
+			"a : ids+='a' ids='b'\n" +
 			"  ;\n" +
 			"b : ;\n");
 		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
@@ -1006,6 +1029,173 @@ public class TestAttributes extends TestSuite {
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
+	public void testMissingArgs() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : r ;" +
+				"r[int i] : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_MISSING_RULE_ARGS;
+		Object expectedArg = "r";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testArgsWhenNoneDefined() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : r[32,34] ;" +
+				"r : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_RULE_HAS_NO_ARGS;
+		Object expectedArg = "r";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testArgsOnToken() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : ID[32,34] ;" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_ARGS_ON_TOKEN_REF;
+		Object expectedArg = "ID";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testArgsOnTokenInLexer() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"R : 'z' ID[32,34] ;" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_RULE_HAS_NO_ARGS;
+		Object expectedArg = "ID";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testMissingArgsInLexer() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"A : R ;" +
+				"R[int i] : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_MISSING_RULE_ARGS;
+		Object expectedArg = "R";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testArgsOnTokenInLexerRuleOfCombined() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : R;\n" +
+				"R : 'z' ID[32] ;" +
+				"ID : 'a';\n");
+
+		String lexerGrammarStr = g.getLexerGrammar();
+		StringReader sr = new StringReader(lexerGrammarStr);
+		Grammar lexerGrammar = new Grammar();
+		lexerGrammar.setFileName("<internally-generated-lexer>");
+		lexerGrammar.importTokenVocabulary(g);
+		lexerGrammar.setGrammarContent(sr);
+		sr.close();
+
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, lexerGrammar, "Java");
+		lexerGrammar.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_RULE_HAS_NO_ARGS;
+		Object expectedArg = "ID";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, lexerGrammar, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testMissingArgsOnTokenInLexerRuleOfCombined() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : R;\n" +
+				"R : 'z' ID ;" +
+				"ID[int i] : 'a';\n");
+
+		String lexerGrammarStr = g.getLexerGrammar();
+		StringReader sr = new StringReader(lexerGrammarStr);
+		Grammar lexerGrammar = new Grammar();
+		lexerGrammar.setFileName("<internally-generated-lexer>");
+		lexerGrammar.importTokenVocabulary(g);
+		lexerGrammar.setGrammarContent(sr);
+		sr.close();
+
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, lexerGrammar, "Java");
+		lexerGrammar.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_MISSING_RULE_ARGS;
+		Object expectedArg = "ID";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, lexerGrammar, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
 	// S U P P O R T
 
 	protected void checkError(ErrorQueue equeue,
@@ -1016,9 +1206,6 @@ public class TestAttributes extends TestSuite {
 		System.out.println(equeue.infos);
 		System.out.println(equeue.warnings);
 		System.out.println(equeue.errors);
-		assertTrue(equeue.errors.size()==n,
-				   "number of errors mismatch; expecting "+n+"; found "+
-				   equeue.errors.size());
 		*/
 		Message foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
@@ -1027,7 +1214,9 @@ public class TestAttributes extends TestSuite {
 				foundMsg = m;
 			}
 		}
-		assertTrue(foundMsg!=null, "no error; "+expectedMessage.msgID+" expected");
+		assertTrue(equeue.errors.size()>0, "no error; "+expectedMessage.msgID+" expected");
+		assertTrue(equeue.errors.size()<=1, "too many errors; "+equeue.errors);
+		assertTrue(foundMsg!=null, "couldn't find expected error: "+expectedMessage.msgID);
 		assertTrue(foundMsg instanceof GrammarSemanticsMessage,
 				   "error is not a GrammarSemanticsMessage");
 		assertEqual(foundMsg.arg, expectedMessage.arg);

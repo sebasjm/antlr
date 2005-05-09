@@ -206,6 +206,7 @@ public class Grammar {
 	 */
 	protected StringTemplate lexerGrammarST =
 		new StringTemplate(
+			"header {<header>}\n" +
 			"lexer grammar <name>Lexer;\n" +
 			"<if(options)>" +
 			"options {\n" +
@@ -324,7 +325,7 @@ public class Grammar {
 		nameSpaceChecker.checkConflicts();
 	}
 
-	/** If he grammar is a merged grammar, return the text of the implicit
+	/** If the grammar is a merged grammar, return the text of the implicit
 	 *  lexer grammar.
 	 */
 	public String getLexerGrammar() {
@@ -395,7 +396,7 @@ public class Grammar {
             ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,e);
         }
 		antlr.Token ruleToken = new antlr.TokenWithIndex(ANTLRParser.ID,TOKEN_RULENAME);
-		defineRule(ruleToken, null, null, (GrammarAST)parser.getAST(), numAlts);
+		defineRule(ruleToken, null, null, (GrammarAST)parser.getAST(), null, numAlts);
 	}
 
     protected void initTokenSymbolTables() {
@@ -510,39 +511,6 @@ public class Grammar {
         typeToTokenList.set(index, text);
     }
 
-    /** Define a new token name, string or char literal token.
-     *  A new token type is created by incrementing maxTokenType.
-     *  Do nothing though if we've seen this token before or
-     *  if the token is a string/char and we are in a lexer grammar.
-     *  In a lexer, strings are simply matched and do not define
-     *  a new token type.  Strings have token types in the lexer
-     *  only when they are imported from another grammar such as
-     *  a parser.  Do not define char literals as tokens in the
-     *  lexer either unless they are imported.
-     *
-	 *  Return the new token type value or Label.INVALID.
-	 *
-	 *  Token rule fragments are assigned token types; you never know
-	 *  when it will be useful and I assign token types during a single
-	 *  pass--I cannot see ahead to see which token rules will be fragments.
-	 */
-	/*
-	public int defineToken(String text) {
-		int ttype = getTokenType(text);
-		if ( ttype==Label.INVALID ) {
-			//System.out.println("defineToken("+text+")");
-			// if not in the lexer, then literals become token types
-			boolean isLiteral = text.charAt(0)=='"'||text.charAt(0)=='\'';
-			if ( getType()!=LEXER || !isLiteral ) {
-				ttype = this.maxTokenType;
-				defineToken(text, this.maxTokenType);
-				this.maxTokenType++;
-			}
-		}
-        return ttype;
-    }
-	*/
-
 	/** Define a new rule.  A new rule index is created by incrementing
      *  ruleIndex.
      */
@@ -550,6 +518,7 @@ public class Grammar {
 						  String modifier,
 						  Map options,
 						  GrammarAST tree,
+						  GrammarAST argActionAST,
 						  int numAlts)
 	{
 		String ruleName = ruleToken.getText();
@@ -567,15 +536,32 @@ public class Grammar {
 		r.options = options;
         nameToRuleMap.put(ruleName, r);
 		setRuleAST(ruleName, tree);
+		r.argActionAST = argActionAST;
         ruleIndexToRuleList.setSize(ruleIndex+1);
         ruleIndexToRuleList.set(ruleIndex, ruleName);
         ruleIndex++;
         return ruleIndex;
 	}
 
-	public void defineLexerRuleFoundInParser(antlr.Token ruleToken, String ruleText) {
-		lexerGrammarST.setAttribute("rules", ruleText);
-		lexerRules.add(ruleToken.getText());
+	public void defineGrammarHeader(GrammarAST nameAST, GrammarAST actionAST) {
+		// ignore name of header space for now
+		lexerGrammarST.setAttribute("header", actionAST.getText());
+	}
+
+	public void defineLexerRuleFoundInParser(antlr.Token ruleToken, GrammarAST ruleAST) {
+		//System.out.println("rule tree is:\n"+ruleAST.toStringTree());
+		ANTLRTreePrinter printer = new ANTLRTreePrinter();
+		printer.setASTNodeClass("org.antlr.tool.GrammarAST");
+		try {
+			String ruleText =  printer.toString(ruleAST, this);
+			//System.out.println("ruleText: "+ruleText);
+			lexerGrammarST.setAttribute("rules", ruleText);
+			lexerRules.add(ruleToken.getText());
+		}
+		catch (antlr.RecognitionException re) {
+			ErrorManager.internalError("defineLexerRuleFoundInParser: cannot convert "+
+									   "rule "+ruleToken.getText()+"'s AST to text");
+		}
 	}
 
 	public void defineLexerRuleForStringLiteral(String literal, int tokenType) {
@@ -761,6 +747,72 @@ public class Grammar {
 		Rule r = getRule(ruleName);
 		if ( r!=null ) {
 			r.needPredefinedRuleAttributes = true;
+		}
+	}
+
+	public void checkRuleReference(GrammarAST refAST,
+								   GrammarAST argsAST,
+								   String currentRuleName)
+	{
+		Rule r = getRule(refAST.getText());
+		if ( refAST.getType()==ANTLRParser.RULE_REF ) {
+			if ( argsAST!=null ) {
+				// rule[args]; ref has args
+                if ( r!=null && r.argActionAST==null ) {
+					// but rule def has no args
+					ErrorManager.grammarError(
+						ErrorManager.MSG_RULE_HAS_NO_ARGS,
+						this,
+						argsAST.getToken(),
+						r.name);
+				}
+			}
+			else {
+				// rule ref has no args
+				if ( r!=null && r.argActionAST!=null ) {
+					// but rule def has args
+					ErrorManager.grammarError(
+						ErrorManager.MSG_MISSING_RULE_ARGS,
+						this,
+						refAST.getToken(),
+						r.name);
+				}
+			}
+		}
+		else if ( refAST.getType()==ANTLRParser.TOKEN_REF ) {
+			if ( type!=LEXER ) {
+				if ( argsAST!=null ) {
+					// args on a token ref not in a lexer rule
+					ErrorManager.grammarError(
+						ErrorManager.MSG_ARGS_ON_TOKEN_REF,
+						this,
+						refAST.getToken(),
+						refAST.getText());
+				}
+				return; // ignore token refs in nonlexers
+			}
+			if ( argsAST!=null ) {
+				// tokenRef[args]; ref has args
+				if ( r!=null && r.argActionAST==null ) {
+					// but token rule def has no args
+					ErrorManager.grammarError(
+						ErrorManager.MSG_RULE_HAS_NO_ARGS,
+						this,
+						argsAST.getToken(),
+						r.name);
+				}
+			}
+			else {
+				// token ref has no args
+				if ( r!=null && r.argActionAST!=null ) {
+					// but token rule def has args
+					ErrorManager.grammarError(
+						ErrorManager.MSG_MISSING_RULE_ARGS,
+						this,
+						refAST.getToken(),
+						r.name);
+				}
+			}
 		}
 	}
 

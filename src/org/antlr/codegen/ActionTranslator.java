@@ -58,6 +58,13 @@ public class ActionTranslator {
 				c++;
 				continue;
 			}
+			if ( action.charAt(c)=='\\' &&
+				 (c+1)<action.length() && action.charAt(c+1)=='$' )
+			{
+				buf.append("$"); // translate \$ to $; not an attribute
+				c+=2;
+				continue;
+			}
 			if ( action.charAt(c)==ATTRIBUTE_REF_CHAR ) {
 				// $...
 				c++; // skip $

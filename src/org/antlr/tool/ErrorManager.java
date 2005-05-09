@@ -154,6 +154,9 @@ public class ErrorManager {
 	public static final int MSG_ARG_RETVAL_CONFLICT = 126;
 	public static final int MSG_NONUNIQUE_REF = 127;
 	public static final int MSG_FORWARD_ELEMENT_REF = 128;
+	public static final int MSG_MISSING_RULE_ARGS = 129;
+	public static final int MSG_RULE_HAS_NO_ARGS = 130;
+	public static final int MSG_ARGS_ON_TOKEN_REF = 131;
 
 
 	// GRAMMAR WARNINGS

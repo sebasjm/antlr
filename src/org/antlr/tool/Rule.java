@@ -13,7 +13,13 @@ public class Rule {
 	public Map options;
 	public NFAState startState;
 	public NFAState stopState;
+
+	/** The AST representing the whole rule */
 	public GrammarAST tree;
+
+	/** For convenience, track the argument def AST action node if any */
+	public GrammarAST argActionAST;
+
 	public GrammarAST EORNode;
 
 	/** The return values of a rule and predefined rule attributes */
@@ -101,13 +107,19 @@ public class Rule {
 	}
 
 	public List getTokenRefsInAlt(String ref, int altNum) {
-		List tokenRefASTs = (List)altToTokenRefMap[altNum].get(ref);
-		return tokenRefASTs;
+		if ( altToTokenRefMap[altNum]!=null ) {
+			List tokenRefASTs = (List)altToTokenRefMap[altNum].get(ref);
+			return tokenRefASTs;
+		}
+		return null;
 	}
 
 	public List getRuleRefsInAlt(String ref, int altNum) {
-		List ruleRefASTs = (List)altToRuleRefMap[altNum].get(ref);
-		return ruleRefASTs;
+		if ( altToRuleRefMap[altNum]!=null ) {
+			List ruleRefASTs = (List)altToRuleRefMap[altNum].get(ref);
+			return ruleRefASTs;
+		}
+		return null;
 	}
 
 	/** Return the scope containing name */

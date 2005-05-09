@@ -40,6 +40,17 @@ import java.util.HashMap;
 
 /** Grammars are first converted to ASTs using this class and then are
  *  converted to NFAs via a tree walker.
+ *
+ *  The reader may notice that I have made a very non-OO decision in this
+ *  class to track variables for many different kinds of nodes.  It wastes
+ *  space for nodes that don't need the values and OO principles cry out
+ *  for a new class type for each kind of node in my tree.  I am doing this
+ *  on purpose for a variety of reasons.  I don't like using the type
+ *  system for different node types; it yields too many damn class files
+ *  which I hate.  Perhaps if I put them all in one file.  Most importantly
+ *  though I hate all the type casting that would have to go on.  I would
+ *  have all sorts of extra work to do.  Ick.  Anyway, I'm doing all this
+ *  on purpose, not out of ignorance. ;)
  */
 public class GrammarAST extends BaseAST {
     protected Token token = null;

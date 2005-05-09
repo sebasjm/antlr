@@ -171,9 +171,10 @@ rules
 rule
     :   #( RULE id:ID
            (modifier)?
-           (ARG (arg:ARG_ACTION {out("["+#arg.getText()+"]");} )? )
-           (RET (ret:ARG_ACTION {out("returns ["+#ret.getText()+"]");} )? )
-           {out(#id.getText()+" : ");}
+           {out(#id.getText());}
+           #(ARG (arg:ARG_ACTION {out("["+#arg.getText()+"]");} )? )
+           #(RET (ret:ARG_ACTION {out(" returns ["+#ret.getText()+"]");} )? )
+           {out(" : ");}
            (optionsSpec)?
            (ruleScopeSpec)?
            #( INITACTION (ACTION)? )
@@ -231,8 +232,12 @@ tree:   #(TREE_BEGIN {out(" #(");} atom (element)* {out(") ");} )
 
 atom
 {out(" ");}
-    :   (	RULE_REF		{out(#atom.toString());}
-		|   TOKEN_REF		{out(#atom.toString());}
+    :   (	#( RULE_REF		{out(#atom.toString());}
+			   (rarg:ARG_ACTION	{out("["+#rarg.toString()+"]");} )?
+             )
+		|   #( TOKEN_REF		{out(#atom.toString());} 
+			   (targ:ARG_ACTION	{out("["+#targ.toString()+"]");} )?
+             )
 		|   CHAR_LITERAL	{out(Grammar.getANTLREscapedCharLiteral(#atom.toString()));}
 		|   STRING_LITERAL	{out(Grammar.getANTLREscapedStringLiteral(#atom.toString()));}
 		|   WILDCARD		{out(#atom.toString());}

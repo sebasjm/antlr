@@ -466,14 +466,11 @@ range!
 terminal
     :   cl:CHAR_LITERAL ast_type_spec!
 
-	|   tr:TOKEN_REF
-		ast_type_spec!
-		// Args are only valid for lexer
-		( ARG_ACTION! )?
+	|   tr:TOKEN_REF^ ast_type_spec!
+		// Args are only valid for lexer rules
+		( targ:ARG_ACTION )?
 
-    |   RULE_REF
-        ast_type_spec!
-		( ARG_ACTION! )?
+    |   rr:RULE_REF^ ast_type_spec! ( rarg:ARG_ACTION )?
 
 	|   sl:STRING_LITERAL
 		ast_type_spec!
@@ -692,8 +689,6 @@ ESC	:	'\\'
 		|	't' {$setText('\t');}
 		|	'b' {$setText('\b');}
 		|	'f' {$setText('\f');}
-//		|	'w' {$setText('\w');}
-//		|	'a' {$setText('\a');}
 		|	'"' {$setText('\"');}
 		|	'\'' {$setText('\'');}
 		|	'\\' {$setText('\\');}
@@ -721,6 +716,7 @@ ESC	:	'\\'
 			('0'..'9')
 			)?
 		|	'u' XDIGIT XDIGIT XDIGIT XDIGIT
+		|	. // unknown, leave as it is
 		)
 	;
 
