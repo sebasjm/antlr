@@ -52,7 +52,8 @@ public class Tool {
     protected List grammarFileNames = new ArrayList();
 	protected boolean generate_NFA_dot = false;
 	protected boolean generate_DFA_dot = false;
-    protected String outputDirectory = ".";
+	protected String outputDirectory = ".";
+	protected String libDirectory = ".";
 	protected boolean debug = false;
 	protected boolean trace = false;
 
@@ -78,6 +79,10 @@ public class Tool {
     }
 
     public void processArgs(String[] args) {
+		if ( args.length==0 ) {
+			help();
+			return;
+		}
         for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-o")) {
 				if (i + 1 >= args.length) {
@@ -91,6 +96,26 @@ public class Tool {
 					{
 						outputDirectory =
 							outputDirectory.substring(0,outputDirectory.length()-1);
+					}
+				}
+			}
+			else if (args[i].equals("-lib")) {
+				if (i + 1 >= args.length) {
+					System.err.println("missing library directory with -lib option; ignoring");
+				}
+				else {
+					i++;
+					libDirectory = args[i];
+					if ( libDirectory.endsWith("/") ||
+						 libDirectory.endsWith("\\") )
+					{
+						libDirectory =
+							libDirectory.substring(0,libDirectory.length()-1);
+					}
+					File outDir = new File(libDirectory);
+					if( !outDir.exists() ) {
+						ErrorManager.error(ErrorManager.MSG_DIR_NOT_FOUND);
+						libDirectory = ".";
 					}
 				}
 			}
@@ -136,7 +161,7 @@ public class Tool {
 				//StringTemplate.setLintMode(true);
 				FileReader fr = new FileReader(grammarFileName);
 				BufferedReader br = new BufferedReader(fr);
-				Grammar grammar = new Grammar(grammarFileName,br);
+				Grammar grammar = new Grammar(this,grammarFileName,br);
 				br.close();
 				fr.close();
 
@@ -234,7 +259,7 @@ public class Tool {
         System.err.println("usage: java org.antlr.Tool [args] file.g");
 		System.err.println("  -o outputDir       specify output directory where all output generated.");
 		System.err.println("  -debug             generate a parser that emits debugging events");
-        //System.err.println("  -glib inputDir     specify location of token files, grammars");
+        System.err.println("  -lib dir           specify location of token files");
     }
 
 	public void setOutputDirectory(String outputDirectory) {
@@ -280,4 +305,11 @@ public class Tool {
 		return outputDirectory;
 	}
 
+	/** Open a file in the -lib dir.  For now, it's just .tokens files */
+	public BufferedReader getLibraryFile(String fileName) throws IOException {
+		String fullName = libDirectory+File.separator+fileName;
+		FileReader fr = new FileReader(fullName);
+		BufferedReader br = new BufferedReader(fr);
+		return br;
+	}
 }

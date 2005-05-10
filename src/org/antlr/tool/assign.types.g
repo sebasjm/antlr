@@ -362,8 +362,7 @@ protected void assignTypes() {
 	protected void importTokenVocab(String vocabName) {
 		int maxTokenType = -1;
 		try {
-			FileReader fr = new FileReader(vocabName+".tokens");
-			BufferedReader br = new BufferedReader(fr);
+			BufferedReader br = grammar.getTool().getLibraryFile(vocabName+".tokens");
 			String line = br.readLine();
 			int n = 1;
 			while ( line!=null ) {
@@ -397,7 +396,6 @@ protected void assignTypes() {
 				n++;
 			}
 			br.close();
-			fr.close();
 		}
 		catch (FileNotFoundException fnfe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_TOKENS_FILE,

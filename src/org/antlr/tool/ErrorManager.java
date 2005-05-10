@@ -93,6 +93,7 @@ public class ErrorManager {
 	public static final int MSG_CANNOT_CLOSE_FILE = 2;
 	public static final int MSG_CANNOT_FIND_TOKENS_FILE = 3;
 	public static final int MSG_ERROR_READING_TOKENS_FILE = 4;
+	public static final int MSG_DIR_NOT_FOUND = 5;
 
 	public static final int MSG_INTERNAL_ERROR = 10;
 	public static final int MSG_INTERNAL_WARNING = 11;
@@ -108,23 +109,6 @@ public class ErrorManager {
 	public static final int MSG_CODE_GEN_TEMPLATES_INCOMPLETE = 22;
 	public static final int MSG_CANNOT_CREATE_TARGET_GENERATOR = 23;
 	public static final int MSG_CANNOT_COMPUTE_SAMPLE_INPUT_SEQ = 24;
-
-	// grammar interpretation errors
-	//public static final int MSG_NO_VIABLE_DFA_ALT = 30;
-
-	// bytecode generation problems
-	public static final int MSG_BYTECODE_UNKNOWN_INSTR = 40;
-	public static final int MSG_BYTECODE_CANNOT_HANDLE_ILOAD_ISTORE_OPND = 41;
-	public static final int MSG_BYTECODE_CANNOT_HANDLE_ALOAD_OPND = 42;
-	public static final int MSG_BYTECODE_CANNOT_HANDLE_LDC_OPND = 43;
-	public static final int MSG_BYTECODE_DUP_LABEL = 44;
-	public static final int MSG_BYTECODE_UNDEFINED_LABEL = 45;
-	public static final int MSG_BYTECODE_OPND_MISSING_QUOTE = 46;
-	public static final int MSG_BYTECODE_MISSING_METHOD = 47;
-	public static final int MSG_BYTECODE_MISSING_METHOD_NAME = 48;
-	public static final int MSG_BYTECODE_MISSING_METHOD_SIG = 49;
-	public static final int MSG_BYTECODE_MISSING_METHOD_MAXSTACK = 50;
-	public static final int MSG_BYTECODE_MISSING_METHOD_MAXLOCALS = 51;
 
 	// GRAMMAR ERRORS
 	public static final int MSG_SYNTAX_ERROR = 100;

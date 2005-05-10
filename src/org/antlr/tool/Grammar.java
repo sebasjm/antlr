@@ -140,6 +140,8 @@ public class Grammar {
 	 */
 	protected Grammar importTokenVocabularyFromGrammar;
 
+	protected Tool tool;
+
 	/** The unique set of all rule references in any rule */
 	protected Set ruleRefs = new HashSet();
 
@@ -228,7 +230,7 @@ public class Grammar {
 	public Grammar(String grammarString)
 			throws antlr.RecognitionException, antlr.TokenStreamException
 	{
-		this("<string>",new StringReader(grammarString));
+		this(null, "<string>",new StringReader(grammarString));
 	}
 
     /** Create a grammar from a Reader.  Parse the grammar, building a tree
@@ -236,10 +238,11 @@ public class Grammar {
      *  an NFA and associated factory.  Walk the AST representing the grammar,
      *  building the state clusters of the NFA.
      */
-    public Grammar(String fileName, Reader r)
+    public Grammar(Tool tool, String fileName, Reader r)
             throws antlr.RecognitionException, antlr.TokenStreamException
     {
         this();
+		setTool(tool);
 		setFileName(fileName);
 		setGrammarContent(r);
 	}
@@ -946,7 +949,8 @@ public class Grammar {
 
     /** Save the option key/value pair and process it */
     public void setOption(String key, Object value) {
-        options.put(key, value);
+        System.out.println("set option "+key+"="+value);
+ 		options.put(key, value);
     }
 
     public void setOptions(Map options) {
@@ -1321,6 +1325,14 @@ if ( sl.member(Label.EOF) ) {
     public GrammarAST getGrammarTree() {
         return grammarTree;
     }
+
+	public Tool getTool() {
+		return tool;
+	}
+
+	public void setTool(Tool tool) {
+		this.tool = tool;
+	}
 
 	/** given a token type and the text of the literal, come up with a
 	 *  decent token type label.  For now it's just T<type>.

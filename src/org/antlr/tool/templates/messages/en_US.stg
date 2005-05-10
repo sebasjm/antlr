@@ -5,8 +5,12 @@ group en_US;
 CANNOT_WRITE_FILE(arg,exception) ::= "cannot write file <arg>: <exception>"
 CANNOT_CLOSE_FILE(arg,exception) ::= "cannot close file <arg>: <exception>"
 CANNOT_FIND_TOKENS_FILE(arg) ::= "cannot find tokens file <arg>"
-ERROR_READING_TOKENS_FILE(arg,exception) ::= 
-	"problem reading token vocabulary file <arg>: <exception>"
+ERROR_READING_TOKENS_FILE(arg,exception,stackTrace) ::= <<
+problem reading token vocabulary file <arg>: <exception>
+<stackTrace; separator="\n">
+>>
+DIR_NOT_FOUND(arg) ::= 
+	"directory not found: <arg>"
 
 INTERNAL_ERROR(arg,arg2,exception,stackTrace) ::= <<
 internal error: <arg> <arg2><if(exception)>: <exception><endif>
