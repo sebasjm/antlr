@@ -245,7 +245,7 @@ GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
     }
 	(	(setNoParens SEMI) => s:setNoParens
 		{
-		blk = #(blkRoot,#(#[ALT,"ALT"],#s,#[EOA,"EOA"]),eob);
+		blk = #(blkRoot,#(#[ALT,"ALT"],#s,#[EOA,"<end-of-alt>"]),eob);
 		}
 
 	|	b:altList {blk = #b;}
@@ -371,22 +371,16 @@ elementNoOptionSpec
     IntSet elements=null;
 }
 	:	(id ASSIGN^)?
-		(   r:range
-		|   t:terminal
-		|	NOT // TODO: wrong tree
-			(	nt:notTerminal
-            |   s:ebnf
-			)
-		|	e2:ebnf
+		(   range
+		|   terminal
+		|	notSet
+		|	ebnf
 		)
 
     |   id PLUS_ASSIGN^ 
-        (   t2:terminal
-		|	NOT
-			(	nt2:notTerminal
-            |   s2:ebnf
-			)
-		|   s3:ebnf
+        (   terminal
+		|	notSet
+		|   ebnf
         )
 
 	|   a:ACTION
@@ -394,6 +388,13 @@ elementNoOptionSpec
 	|   p:SEMPRED
 
 	|   t3:tree
+	;
+
+notSet
+	:	NOT^
+		(	notTerminal
+        |   ebnf
+		)
 	;
 
 /** Match two or more set elements */

@@ -393,7 +393,11 @@ public class Grammar {
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
         try {
             parser.rule();
-            grammarTree.addChild(parser.getAST());
+			GrammarAST p = grammarTree;
+			while ( p.getType()!=ANTLRParser.LEXER_GRAMMAR ) {
+				p = (GrammarAST)p.getNextSibling();
+			}
+			p.addChild(parser.getAST());
         }
         catch (Exception e) {
             ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,e);
@@ -517,12 +521,12 @@ public class Grammar {
 	/** Define a new rule.  A new rule index is created by incrementing
      *  ruleIndex.
      */
-    public int defineRule(antlr.Token ruleToken,
-						  String modifier,
-						  Map options,
-						  GrammarAST tree,
-						  GrammarAST argActionAST,
-						  int numAlts)
+	public void defineRule(antlr.Token ruleToken,
+						   String modifier,
+						   Map options,
+						   GrammarAST tree,
+						   GrammarAST argActionAST,
+						   int numAlts)
 	{
 		String ruleName = ruleToken.getText();
 		/*
@@ -543,7 +547,6 @@ public class Grammar {
         ruleIndexToRuleList.setSize(ruleIndex+1);
         ruleIndexToRuleList.set(ruleIndex, ruleName);
         ruleIndex++;
-        return ruleIndex;
 	}
 
 	public void defineGrammarHeader(GrammarAST nameAST, GrammarAST actionAST) {
