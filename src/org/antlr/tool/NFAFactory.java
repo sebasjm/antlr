@@ -292,13 +292,13 @@ public class NFAFactory {
      *  hits the end of a rule.
      */
     private void build_EOFState(NFAState endNFAState) {
+		NFAState end = newState();
         int label = Label.EOF;
         if ( nfa.grammar.type==Grammar.LEXER ) {
             label = Label.EOT;
+			end.setEOTState(true);
         }
         // System.out.println("build "+nfa.grammar.getTokenName(label)+" loop on end of state "+endNFAState.getDescription());
-        NFAState end = newState();
-        end.setEOTState(true);
         Transition toEnd = new Transition(label, end);
         endNFAState.addTransition(toEnd);
     }

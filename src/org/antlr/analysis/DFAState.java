@@ -417,7 +417,7 @@ public class DFAState extends State {
 		return disabled;
 	}
 
-	/** */
+	/**
 	public int getNumberOfEOTNFAStates() {
 		int n = 0;
 		Iterator iter = nfaConfigurations.iterator();
@@ -431,7 +431,8 @@ public class DFAState extends State {
 		}
 		return n;
 	}
-
+    */
+	
 	protected Set getNondeterministicAlts() {
 		int maxk = dfa.getUserMaxLookahead();
 		if ( maxk>0 && maxk==k ) {
