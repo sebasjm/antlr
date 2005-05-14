@@ -69,9 +69,9 @@ BYTECODE_MISSING_METHOD_MAXLOCALS(arg) ::= "missing .method locals value"
 SYNTAX_ERROR() ::= "syntax error"
 RULE_REDEFINITION(file,line,col,arg) ::= 
 	"<loc()>rule <arg> redefinition"
-LEXER_RULES_NOT_ALLOWED(arg) ::= 
+LEXER_RULES_NOT_ALLOWED(file,line,col,arg) ::= 
 	"<loc()>lexer rule <arg> not allowed in parser"
-PARSER_RULES_NOT_ALLOWED(arg) ::= 
+PARSER_RULES_NOT_ALLOWED(file,line,col,arg) ::= 
 	"<loc()>parser rule <arg> not allowed in lexer"
 CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL(arg) ::=
 	"cannot find an attribute name in attribute declaration"
