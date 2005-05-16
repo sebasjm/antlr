@@ -804,14 +804,30 @@ NESTED_ACTION :
 		|	'\n'		{newline();}
 		)
 	|	NESTED_ACTION
-	|	CHAR_LITERAL
+	|	ACTION_CHAR_LITERAL
 	|	COMMENT
-	|	STRING_LITERAL
-//	|	ATTR_REF
+	|	ACTION_STRING_LITERAL
 	|	.
 	)*
 	'}'
    ;
+
+protected
+ACTION_CHAR_LITERAL
+	:	'\'' (ACTION_ESC|~'\'') '\''
+	;
+
+protected
+ACTION_STRING_LITERAL
+	:	'"' (ACTION_ESC|~'"')* '"'
+	;
+
+protected
+ACTION_ESC
+	:	"\'"
+	|	"\\\""
+	|	'\\' ~('\''|'"')
+	;
 
 TOKEN_REF
 options { testLiterals = true; }
@@ -836,15 +852,6 @@ RULE_REF
 		|
 		)
 	;
-
-/*
-protected
-ATTR_REF
-	:	'@' scope:INTERNAL_ID
-		(options {warnWhenFollowAmbig=false;}:'.' attr:INTERNAL_ID )?
-		{System.out.println("found "+scope.getText()+"."+attr);}
-	;
-*/
 
 protected
 WS_LOOP
@@ -874,19 +881,8 @@ INTERNAL_RULE_REF returns [int t]
 		{t = testLiteralsTable(t);}
 	;
 
-/*
 protected
-INTERNAL_ID
-	:	('a'..'z'|'A'..'Z'|'_')
-		(	options {warnWhenFollowAmbig=false;}
-		:
-			'a'..'z'|'A'..'Z'|'_'|'0'..'9'
-		)*
-	;
-*/
-
-protected
-WS_OPT :
-	(WS)?
+WS_OPT
+	:	(WS)?
 	;
 
