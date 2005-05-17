@@ -91,6 +91,14 @@ public class TokenRewriteStream extends CommonTokenStream {
 		}
 	}
 
+	/** TODO: make insertAfters append after each other.
+	 */
+	static class InsertAfterOp extends InsertBeforeOp {
+		public InsertAfterOp(int index, String text) {
+			super(index,text);
+		}
+	}
+
 	/** I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
 	 *  instructions.
 	 */
@@ -268,6 +276,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	public void insertAfter(String programName, int index, String text) {
 		// to insert after, just insert before next index (even if past end)
 		insertBefore(programName,index+1, text);
+		//addToSortedRewriteList(programName, new InsertAfterOp(index,text));
 	}
 
 	public void insertBefore(Token t, String text) {
@@ -412,9 +421,11 @@ public class TokenRewriteStream extends CommonTokenStream {
 				tokenCursor<=end &&
 				tokenCursor<tokens.size() )
 		{
+			// execute instructions associated with this token index
 			if ( rewriteOpIndex<rewrites.size() ) {
 				RewriteOperation op =
 						(RewriteOperation)rewrites.get(rewriteOpIndex);
+				// while we have ops for this token index, exec them
 				while ( tokenCursor==op.index && rewriteOpIndex<rewrites.size() ) {
 					//System.out.println("execute "+op+" at "+rewriteOpIndex);
 					tokenCursor = op.execute(buf);
@@ -424,6 +435,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 					}
 				}
 			}
+			// dump the token at this index
 			if ( tokenCursor<end ) {
 				buf.append(get(tokenCursor).getText());
 				tokenCursor++;
