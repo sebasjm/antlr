@@ -77,7 +77,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 			String opName = getClass().getName();
 			int $index = opName.indexOf('$');
 			opName = opName.substring($index+1, opName.length());
-			return opName+"@"+index;
+			return opName+"@"+index+'"'+text+'"';
 		}
 	}
 
@@ -191,19 +191,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	 */
 	protected void addToSortedRewriteList(String programName, RewriteOperation op) {
 		List rewrites = getProgram(programName);
-		System.out.println("### add "+op+"; rewrites="+rewrites);
-		// if at or beyond last op's index, just append
-		/*
-		if ( op.index>=getLastRewriteTokenIndex(programName) ) {
-			rewrites.add(op); // append to list of operations
-			// record the index of this operation for next time through
-			setLastRewriteTokenIndex(programName, op.index);
-			System.out.println("insert after last instruction");
-			System.out.println("after, rewrites="+rewrites);
-			return;
-		}
-		// not after the last one, so must insert to ordered list
-		*/
+		//System.out.println("### add "+op+"; rewrites="+rewrites);
 		Comparator comparator = new Comparator() {
 			public int compare(Object o, Object o1) {
 				RewriteOperation a = (RewriteOperation)o;
@@ -214,32 +202,55 @@ public class TokenRewriteStream extends CommonTokenStream {
 			}
 		};
         int pos = Collections.binarySearch(rewrites, op, comparator);
-		System.out.println("insert into list: pos="+pos);
+		//System.out.println("bin search returns: pos="+pos);
+
 		if ( pos>=0 ) {
+			// binarySearch does not guarantee first element when multiple
+			// are found.  I must seach backwards for first op with op.index
+			for (; pos>=0; pos--) {
+				RewriteOperation prevOp = (RewriteOperation)rewrites.get(pos);
+				if ( prevOp.index<op.index ) {
+					break;
+				}
+			}
+			pos++; // pos points at first op before ops with op.index; go back up one
+			// now pos is the index in rewrites of first op with op.index
+			//System.out.println("first op with op.index: pos="+pos);
+
 			// an instruction operating already on that index was found;
 			// make this one happen after all the others
-			System.out.println("found instr for index="+op.index);
-			RewriteOperation prevOp = (RewriteOperation)rewrites.get(pos);
-			if ( prevOp instanceof ReplaceOp && op instanceof ReplaceOp ) {
-				rewrites.set(pos, op); // replace old with new
+			//System.out.println("found instr for index="+op.index);
+			if ( op instanceof ReplaceOp ) {
+				boolean replaced = false;
+				int i;
+				// look for an existing replace
+				for (i=pos; i<rewrites.size(); i++) {
+					RewriteOperation prevOp = (RewriteOperation)rewrites.get(pos);
+					if ( prevOp.index!=op.index ) {
+						break;
+					}
+					if ( prevOp instanceof ReplaceOp ) {
+						rewrites.set(pos, op); // replace old with new
+						replaced=true;
+						break;
+					}
+					// keep going; must be an insert
+				}
+				if ( !replaced ) {
+					// add replace op to the end of all the inserts
+					rewrites.add(i, op);
+				}
 			}
 			else {
+				// inserts are added in front of existing inserts
 				rewrites.add(pos, op);
 			}
-			/*
-			int i;
-			// walk until you find an instruction whose index is > op.index
-			for (i=pos; i<rewrites.size()&&((RewriteOperation)rewrites.get(i)).index==op.index; i++) {
-				System.out.println("prev instr is "+((RewriteOperation)rewrites.get(i)));
-			}
-			rewrites.add(i, op);
-			*/
 		}
 		else {
-			System.out.println("no instruction at pos=="+pos);
+			//System.out.println("no instruction at pos=="+pos);
 			rewrites.add(-pos-1, op);
 		}
-		System.out.println("after, rewrites="+rewrites);
+		//System.out.println("after, rewrites="+rewrites);
 	}
 
 	public void insertAfter(Token t, String text) {
@@ -405,7 +416,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 				RewriteOperation op =
 						(RewriteOperation)rewrites.get(rewriteOpIndex);
 				while ( tokenCursor==op.index && rewriteOpIndex<rewrites.size() ) {
-					System.out.println("execute "+op+" at "+rewriteOpIndex);
+					//System.out.println("execute "+op+" at "+rewriteOpIndex);
 					tokenCursor = op.execute(buf);
 					rewriteOpIndex++;
 					if ( rewriteOpIndex<rewrites.size() ) {
@@ -422,7 +433,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		for (int opi=rewriteOpIndex; opi<rewrites.size(); opi++) {
 			RewriteOperation op =
 					(RewriteOperation)rewrites.get(opi);
-			System.out.println("execute "+op+" at "+opi);
+			//System.out.println("execute "+op+" at "+opi);
 			op.execute(buf); // must be insertions if after last token
 		}
 
