@@ -492,7 +492,7 @@ GrammarAST ebnfRoot=null;
     		}
     	)?
 
-    |!   rr:RULE_REF^ ast_type_spec! ( rarg:ARG_ACTION )?
+    |   rr:RULE_REF^ ast_type_spec! ( rarg:ARG_ACTION )?
     	(	(	QUESTION {ebnfRoot = #[OPTIONAL,"?"];}
     		|	STAR     {ebnfRoot = #[CLOSURE,"*"];}
     		|	PLUS     {ebnfRoot = #[POSITIVE_CLOSURE,"+"];}
