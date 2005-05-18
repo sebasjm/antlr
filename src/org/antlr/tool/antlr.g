@@ -465,13 +465,52 @@ range!
 	;
 
 terminal
+{
+GrammarAST ebnfRoot=null;
+}
     :   cl:CHAR_LITERAL ast_type_spec!
 
 	|   tr:TOKEN_REF^ ast_type_spec!
 		// Args are only valid for lexer rules
 		( targ:ARG_ACTION )?
+    	(	(	QUESTION {ebnfRoot = #[OPTIONAL,"?"];}
+    		|	STAR     {ebnfRoot = #[CLOSURE,"*"];}
+    		|	PLUS     {ebnfRoot = #[POSITIVE_CLOSURE,"+"];}
+    		)
+	    	{
+        	ebnfRoot.setLine(tr.getLine());
+        	ebnfRoot.setColumn(tr.getColumn());
+	    	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
+        	GrammarAST eob = #[EOB,"<end-of-block>"];
+			eob.setLine(tr.getLine());
+			eob.setColumn(tr.getColumn());
+   			#terminal =
+   			     #(ebnfRoot,
+   			       #(blkRoot,#(#[ALT,"ALT"],#(#tr,#targ),#[EOA,"<end-of-alt>"]),
+   			         eob)
+   			      );
+    		}
+    	)?
 
-    |   rr:RULE_REF^ ast_type_spec! ( rarg:ARG_ACTION )?
+    |!   rr:RULE_REF^ ast_type_spec! ( rarg:ARG_ACTION )?
+    	(	(	QUESTION {ebnfRoot = #[OPTIONAL,"?"];}
+    		|	STAR     {ebnfRoot = #[CLOSURE,"*"];}
+    		|	PLUS     {ebnfRoot = #[POSITIVE_CLOSURE,"+"];}
+    		)
+	    	{
+        	ebnfRoot.setLine(rr.getLine());
+        	ebnfRoot.setColumn(rr.getColumn());
+	    	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
+        	GrammarAST eob = #[EOB,"<end-of-block>"];
+			eob.setLine(rr.getLine());
+			eob.setColumn(rr.getColumn());
+   			#terminal =
+   			     #(ebnfRoot,
+   			       #(blkRoot,#(#[ALT,"ALT"],#(#rr,#rarg),#[EOA,"<end-of-alt>"]),
+   			         eob)
+   			      );
+    		}
+    	)?
 
 	|   sl:STRING_LITERAL
 		ast_type_spec!
