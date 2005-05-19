@@ -213,12 +213,12 @@ public class TestNFAConstruction extends TestSuite {
         checkRule(g, "a", expecting);
     }
 
-    public void testAoptional() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : (A)?;");
-        String expecting =
-            ".s0->.s1\n" +
+	public void testAoptional() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar P;\n"+
+				"a : (A)?;");
+		String expecting =
+			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s2->.s3\n" +
 			".s2->.s9\n" +
@@ -228,8 +228,26 @@ public class TestNFAConstruction extends TestSuite {
 			".s6->:s7\n" +
 			".s9->.s6\n" +
 			":s7-<EOF>->.s8\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
+
+	public void testNakedAoptional() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar P;\n"+
+				"a : A?;");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2->.s3\n" +
+			".s2->.s9\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s6\n" +
+			".s6->:s7\n" +
+			".s9->.s6\n" +
+			":s7-<EOF>->.s8\n";
+		checkRule(g, "a", expecting);
+	}
 
     public void testAorBthenC() throws Exception {
         Grammar g = new Grammar(
@@ -243,10 +261,10 @@ public class TestNFAConstruction extends TestSuite {
          */
     }
 
-    public void testAplus() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : (A)+;");
+	public void testAplus() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar P;\n"+
+				"a : (A)+;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -257,8 +275,25 @@ public class TestNFAConstruction extends TestSuite {
 			".s5->.s6\n" +
 			".s6->:s7\n" +
 			":s7-<EOF>->.s8\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
+
+	public void testNakedAplus() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar P;\n"+
+				"a : A+;");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s3\n" +
+			".s5->.s6\n" +
+			".s6->:s7\n" +
+			":s7-<EOF>->.s8\n";
+		checkRule(g, "a", expecting);
+	}
 
 	public void testAplusNonGreedy() throws Exception {
 		Grammar g = new Grammar(
@@ -325,10 +360,10 @@ public class TestNFAConstruction extends TestSuite {
         checkRule(g, "a", expecting);
     }
 
-    public void testAstar() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : (A)*;");
+	public void testAstar() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar P;\n"+
+				"a : (A)*;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -341,8 +376,27 @@ public class TestNFAConstruction extends TestSuite {
 			".s6->:s7\n" +
 			".s9->.s6\n" +
 			":s7-<EOF>->.s8\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
+
+	public void testNakedAstar() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar P;\n"+
+				"a : A*;");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2->.s3\n" +
+			".s2->.s9\n" +
+			".s3->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5->.s3\n" +
+			".s5->.s6\n" +
+			".s6->:s7\n" +
+			".s9->.s6\n" +
+			":s7-<EOF>->.s8\n";
+		checkRule(g, "a", expecting);
+	}
 
     public void testAorBstar() throws Exception {
         Grammar g = new Grammar(
