@@ -460,63 +460,62 @@ ast_type_spec
 	;
 
 range!
+{
+GrammarAST subrule=null, root=null;
+}
 	:	c1:CHAR_LITERAL RANGE c2:CHAR_LITERAL
-		{#range = #(#[CHAR_RANGE,".."], #c1, #c2);}
+		{
+		GrammarAST r = #[CHAR_RANGE,".."];
+		r.setLine(c1.getLine());
+		r.setColumn(c1.getColumn());
+		#range = #(r, #c1, #c2);
+		root = #range;
+		}
+    	(subrule=ebnfSuffix[root] {#range=subrule;})?
 	;
 
 terminal
 {
-GrammarAST ebnfRoot=null;
+GrammarAST ebnfRoot=null, subrule=null;
 }
-    :   cl:CHAR_LITERAL ast_type_spec!
+    :   cl:CHAR_LITERAL ast_type_spec! (subrule=ebnfSuffix[#cl] {#terminal=subrule;})?
 
-	|   tr:TOKEN_REF^ ast_type_spec!
+	|   tr:TOKEN_REF^ ast_type_spec! (subrule=ebnfSuffix[#tr] {#terminal=subrule;})?
 		// Args are only valid for lexer rules
 		( targ:ARG_ACTION )?
-    	(	(	QUESTION {ebnfRoot = #[OPTIONAL,"?"];}
-    		|	STAR     {ebnfRoot = #[CLOSURE,"*"];}
-    		|	PLUS     {ebnfRoot = #[POSITIVE_CLOSURE,"+"];}
-    		)
-	    	{
-        	ebnfRoot.setLine(tr.getLine());
-        	ebnfRoot.setColumn(tr.getColumn());
-	    	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
-        	GrammarAST eob = #[EOB,"<end-of-block>"];
-			eob.setLine(tr.getLine());
-			eob.setColumn(tr.getColumn());
-   			#terminal =
-   			     #(ebnfRoot,
-   			       #(blkRoot,#(#[ALT,"ALT"],#(#tr,#targ),#[EOA,"<end-of-alt>"]),
-   			         eob)
-   			      );
-    		}
-    	)?
 
     |   rr:RULE_REF^ ast_type_spec! ( rarg:ARG_ACTION )?
-    	(	(	QUESTION {ebnfRoot = #[OPTIONAL,"?"];}
-    		|	STAR     {ebnfRoot = #[CLOSURE,"*"];}
-    		|	PLUS     {ebnfRoot = #[POSITIVE_CLOSURE,"+"];}
-    		)
-	    	{
-        	ebnfRoot.setLine(rr.getLine());
-        	ebnfRoot.setColumn(rr.getColumn());
-	    	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
-        	GrammarAST eob = #[EOB,"<end-of-block>"];
-			eob.setLine(rr.getLine());
-			eob.setColumn(rr.getColumn());
-   			#terminal =
-   			     #(ebnfRoot,
-   			       #(blkRoot,#(#[ALT,"ALT"],#(#rr,#rarg),#[EOA,"<end-of-alt>"]),
-   			         eob)
-   			      );
-    		}
-    	)?
+    	(subrule=ebnfSuffix[#rr] {#terminal=subrule;})?
 
 	|   sl:STRING_LITERAL
 		ast_type_spec!
+    	(subrule=ebnfSuffix[#sl] {#terminal=subrule;})?
 
 	|   wi:WILDCARD ast_type_spec!
 	;
+
+ebnfSuffix[GrammarAST elemAST] returns [GrammarAST subrule=null]
+{
+GrammarAST ebnfRoot=null;
+}
+	:!	(	QUESTION {ebnfRoot = #[OPTIONAL,"?"];}
+   		|	STAR     {ebnfRoot = #[CLOSURE,"*"];}
+   		|	PLUS     {ebnfRoot = #[POSITIVE_CLOSURE,"+"];}
+   		)
+    	{
+       	ebnfRoot.setLine(elemAST.getLine());
+       	ebnfRoot.setColumn(elemAST.getColumn());
+    	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
+       	GrammarAST eob = #[EOB,"<end-of-block>"];
+		eob.setLine(elemAST.getLine());
+		eob.setColumn(elemAST.getColumn());
+  		subrule =
+  		     #(ebnfRoot,
+  		       #(blkRoot,#(#[ALT,"ALT"],elemAST,#[EOA,"<end-of-alt>"]),
+  		         eob)
+  		      );
+   		}
+    ;
 
 notTerminal
 	:   cl:CHAR_LITERAL
