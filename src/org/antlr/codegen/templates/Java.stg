@@ -1,7 +1,8 @@
 group Java;
 
-// G R A M M A R  E L E M E N T S
-
+/** The overall file structure of a recognizer; stores methods for rules
+ *  and cyclic DFAs plus support code.
+ */
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
            debug, predicates) ::=
@@ -52,6 +53,7 @@ retry:
 }
 >>
 
+/** How to generate a parser */
 parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates) ::= <<
 class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
     public static final String[] tokenNames = new String[] {
@@ -86,90 +88,9 @@ class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
 }
 >>
 
-globalAttributeScope(scope) ::= <<
-<if(scope.attributes)>
-protected static class <scope.name> {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
-<endif>
->>
-
-ruleAttributeScope(scope) ::= <<
-<if(scope.attributes)>
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
-<endif>
->>
-
-ruleLabelType(name) ::= "<name>_return"
-
-returnType() ::= <<
-<if(ruleDescriptor.hasMultipleReturnValues)>
-<ruleDescriptor.name>_return
-<else>
-void
-<endif>
->>
-
-returnScope(scope) ::= <<
-<if(ruleDescriptor.hasMultipleReturnValues)>
-protected static class <returnType()> {
-<if(ruleDescriptor.needPredefinedRuleAttributes)>
-    Token start=null, stop=null;
-<endif>
-    <scope.attributes:{<it.decl>;}; separator="\n">
-};
-<endif>
->>
-
-parameterScope(scope) ::= <<
-<scope.attributes:{<it.decl>}; separator=", ">
->>
-
-/** Used in codegen.g to translate @x.y references.
- *  I could have left actions as StringTemplates to be inserted in
- *  the output (so they could use attributes inherited from surrounding
- *  templates), but really wanted to pass in AttributeScope and Attribute
- *  objects so this translation could query them.  So, translation of
- *  @x.y to executable code occurs before recognizerST.toString() occurs.
- *  I.e., actions are just text strings during final code generation.
+/** How to generate code for a rule.  This includes any return type
+ *  data aggregates required for multiple return values.
  */
-globalAttributeRef(scope,attr) ::= <<
-((<scope>)<scope>_stack.peek()).<attr>
->>
-
-parameterAttributeRef(attr) ::= "<attr.name>"
-
-returnAttributeRef(attr) ::= "retval.<attr.name>"
-
-ruleScopeAttributeRef(scope,attr) ::=
-    "((<scope>_scope)<scope>_stack.peek()).<attr>"
-
-ruleLabelRef(scope,attr) ::= "<scope>.<attr>"
-
-/** How to translate $tokenLabel */
-tokenLabelRef(label) ::= "<label>"
-
-// not sure the next are the right approach
-
-tokenLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
-tokenLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
-tokenLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
-tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>.getCharPositionInLine()"
-tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
-tokenLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
-
-ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
-ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
-ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
-
-bitset(name, words64) ::= <<
-public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
->>
-
 rule(ruleName,ruleDescriptor,initAction,block) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
@@ -215,12 +136,9 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 // $ANTLR end <ruleName>
 >>
 
-tokensRule(ruleName,nakedBlock,args,block) ::= <<
-public void mTokens() throws RecognitionException {
-    <block><\n>
-}
->>
-
+/** How to generate a rule in the lexer; naked blocks are used for
+ *  fragment rules.
+ */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,initAction,block) ::= <<
 public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
 <initAction>
@@ -238,13 +156,18 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
 }
 >>
 
-blockSingleAlt(alts,decls,decision,decisionNumber) ::= <<
-<if(debug)>
-dbg.enterAlt(1);<\n>
-<endif>
-<decls><alts>
+/** How to generate code for the implicitly-defined lexer grammar rule
+ *  that chooses between lexer rules.
+ */
+tokensRule(ruleName,nakedBlock,args,block) ::= <<
+public void mTokens() throws RecognitionException {
+    <block><\n>
+}
 >>
 
+// S U B R U L E S
+
+/** A (...) subrule with multiple alternatives */
 block(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int alt<decisionNumber>=<maxAlt>;
 <decls>
@@ -260,8 +183,7 @@ switch (alt<decisionNumber>) {
 <endif>
 >>
 
-ruleBlockSingleAlt ::= blockSingleAlt
-
+/** A rule block with multiple alternatives */
 ruleBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int alt<decisionNumber>=<maxAlt>;
 <decls>
@@ -273,6 +195,17 @@ switch (alt<decisionNumber>) {
 }
 >>
 
+/** A special case of a (...) subrule with a single alternative */
+blockSingleAlt(alts,decls,decision,decisionNumber) ::= <<
+<if(debug)>
+dbg.enterAlt(1);<\n>
+<endif>
+<decls><alts>
+>>
+
+ruleBlockSingleAlt ::= blockSingleAlt
+
+/** A (..)+ block with 0 or more alternatives */
 positiveClosureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 int cnt<decisionNumber>=0;
 <decls>
@@ -305,6 +238,7 @@ do {
 
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
+/** A (..)* block with 0 or more alternatives */
 closureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
 <decls>
 <if(debug)>
@@ -329,10 +263,17 @@ do {
 
 closureBlockSingleAlt ::= closureBlock
 
+/** Optional blocks (x)? are translated to (x|) by before code generation
+ *  so we can just use the normal block template
+ */
 optionalBlock ::= block
 
 optionalBlockSingleAlt ::= block
 
+/** A case in a switch that jumps to an alternative given the alternative
+ *  number.  A DFA predicts the alternative and then a simple switch
+ *  does the jump to the code that actually matches that alternative.
+ */
 altSwitchCase() ::= <<
 case <i> :
 <if(debug)>
@@ -342,8 +283,14 @@ case <i> :
     break;<\n>
 >>
 
+/** An alternative is just a list of elements */
 alt(elements) ::= "<elements:element()>"
 
+// E L E M E N T S
+
+/** Dump the elements one per line and stick in debugging
+ *  location() trigger in front.
+ */
 element() ::= <<
 <if(debug)>
 dbg.location(<it.line>,<it.pos>);<\n>
@@ -351,20 +298,25 @@ dbg.location(<it.line>,<it.pos>);<\n>
 <it.el><\n>
 >>
 
+/** x=ID should grab the current symbol of lookahead */
 tokenLabel(label) ::= "<label>=input.LT(1);"
 
+/** x+=ID should add LT(1) to a list; create if not there */
 listLabel(label) ::= <<
 if(<label>==null) <label>=new ArrayList();
 <label>.add(input.LT(1));
 >>
 
+/** match a token optionally with a label in front */
 tokenRef(token,labelST,elementIndex) ::= <<
 <labelST>
 match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 >>
 
+/** match a character */
 charRef(char) ::= "match(<char>);"
 
+/** match a character range */
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 /** For now, sets are interval tests and must be tested inline */
@@ -386,6 +338,7 @@ else {
 }<\n>
 >>
 
+/** Match ~(A|B|...) */
 matchNotSet(s,labelST,elementIndex) ::= <<
 <labelST>
 if ( !(<s>) ) input.consume();
@@ -404,6 +357,7 @@ else {
 }<\n>
 >>
 
+/** Match a string literal */
 lexerStringRef(string) ::= "match(<string>);"
 
 wildcard(labelST) ::= <<
@@ -411,8 +365,12 @@ wildcard(labelST) ::= <<
 matchAny();
 >>
 
+/** Match . wildcard */
 wildcardChar() ::= "matchAny();"
 
+/** Match a rule reference by invoking it possibly with arguments
+ *  and a return value or values.
+ */
 ruleRef(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
@@ -423,8 +381,8 @@ following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 following.pop();
 >>
 
+/** A lexer rule reference */
 lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
-
 
 // F i x e d  D F A  (if-then-else)
 
@@ -445,11 +403,22 @@ else {
 }
 >>
 
+/** Same as a normal DFA state except that we don't examine lookahead
+ *  for the bypass alternative.  It delays error detection but this
+ *  is faster, smaller, and more what people expect.  For (X)? people
+ *  expect "if ( LA(1)==X ) match(X);" and that's it.
+ */
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
 <edges; separator="\nelse ">
 >>
 
+/** A DFA state that is actually the loopback decision of a closure
+ *  loop.  If end-of-token (EOT) predicts any of the targets then it
+ *  should act like a default clause (i.e., no error can be generated).
+ *  This is used only in the lexer so that ('a')* on the end of a rule
+ *  so anything other than 'a' predicts exiting.
+ */
 dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
 <edges; separator="\nelse "><\n>
@@ -460,8 +429,12 @@ else {
 <endif>
 >>
 
+/** An accept state indicates a unique alternative has been predicted */
 dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>;"
 
+/** A simple edge with an expression.  If the expression is satisfied,
+ *  enter to the target state.
+ */
 dfaEdge(labelExpr, targetState) ::= <<
 if ( <labelExpr> ) {
     <targetState>
@@ -470,6 +443,9 @@ if ( <labelExpr> ) {
 
 // F i x e d  D F A  (switch case)
 
+/** A DFA state where a SWITCH may be generated.  The code generator
+ *  decides if this is possible: CodeGenerator.canGenerateSwitch().
+ */
 dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 switch ( input.LA(<k>) ) {
 <edges; separator="\n">
@@ -512,11 +488,11 @@ dfaEdgeSwitch(labels, targetState) ::= <<
 
 // C y c l i c  D F A
 
-allCyclicDFAs(cyclicDFAs) ::= <<
->>
-
+/** The code to initiate execution of a cyclic DFA; this is used
+ *  in the rule to predict an alt just like the fixed DFA case.
+ *  The <name> attribute is inherited via the parser, lexer, ...
+ */
 dfaDecision(decisionNumber,description) ::= <<
-<! the <name> attribute is inherited via the parser, lexer, ... !>
 <if(debug)>
 try {
     alt<decisionNumber> = DFA<decisionNumber>.predict(input);
@@ -529,6 +505,7 @@ alt<decisionNumber> = DFA<decisionNumber>.predict(input);
 <endif>
 >>
 
+/** The overall cyclic DFA chunk; contains all the DFA states */
 cyclicDFA(className,decisionNumber,states,description) ::= <<
 static class DFA<decisionNumber> extends DFA {
     public static int predict(IntStream input) throws RecognitionException {
@@ -538,6 +515,7 @@ static class DFA<decisionNumber> extends DFA {
 }
 >>
 
+/** A state in a cyclic DFA */
 cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
 static DFA.State s<stateNumber> = new DFA.State() {
     public DFA.State transition(IntStream input) throws RecognitionException {
@@ -552,19 +530,30 @@ static DFA.State s<stateNumber> = new DFA.State() {
 };<\n>
 >>
 
+/** An accept state for a cyclic DFA */
 cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
 static DFA.State s<stateNumber> = new DFA.State() {{alt=<predictAlt>;}};<\n>
 >>
 
+/** Just like a fixed DFA edge, test the lookahead and indicate what
+ *  state to jump to next if successful.
+ */
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber) ::= <<
 if ( <labelExpr> ) {return s<targetStateNumber>;}<\n>
 >>
 
+/** An edge pointing at end-of-token; essentially matches any char;
+ *  always jump to the target.
+ */
 eotDFAEdge(targetStateNumber,edgeNumber) ::= <<
 return s<targetStateNumber>;<\n>
 >>
 
 // C y c l i c  S W I T C H
+
+/* A repetition of the cyclic DFA states, but using switches instead
+ * of if-then-else sequences.
+ */
 
 cyclicDFAStateSwitch(stateNumber,labels,edges,
                      needErrorClause,EOTTargetStateNumber) ::= <<
@@ -590,12 +579,6 @@ cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
     return s<targetStateNumber>;<\n>
 >>
 
-/*
-singlePredicateMethod(decision,stateNumber,edgeNumber,pred) ::= <<
-public boolean pred_DFA<decision>s<stateNumber>e<edgeNumber>() {return <pred>;}
->>
-*/
-
 // D F A  E X P R E S S I O N S
 
 andPredicates(left,right) ::= "(<left>&&<right>)"
@@ -608,17 +591,15 @@ singlePredicate(pred) ::= "<pred>"
 
 /** because generation of pred code and reference to it may be different,
  *  have a way to invoke predicates; they could be placed in methods
- *  somewhere, for example.  For acyclic DFAs, this method just directly
- *  evals the pred inline.
+ *  somewhere, for example.
  */
 invokePredicate(pred) ::= "<pred>"
 
-/** If this template exists, then build methods for acylic DFAs
-singlePredicateMethod(decision,stateNumber,edgeNumber,pred) ::= "...";
- */
-
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 
+/** Sometimes a lookahead test cannot assume that LA(k) is in a temp variable
+ *  somewhere.  Must ask for the lookahead directly.
+ */
 isolatedLookaheadTest(atom,k,atomAsInt) ::= "input.LA(<k>)==<atom>"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
@@ -629,13 +610,98 @@ isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= 
 
 setTest(ranges) ::= "<ranges; separator=\"||\">"
 
+// A T T R I B U T E S
+
+globalAttributeScope(scope) ::= <<
+<if(scope.attributes)>
+protected static class <scope.name> {
+    <scope.attributes:{<it.decl>;}; separator="\n">
+}
+protected Stack <scope.name>_stack = new Stack();<\n>
+<endif>
+>>
+
+ruleAttributeScope(scope) ::= <<
+<if(scope.attributes)>
+protected static class <scope.name>_scope {
+    <scope.attributes:{<it.decl>;}; separator="\n">
+}
+protected Stack <scope.name>_stack = new Stack();<\n>
+<endif>
+>>
+
+ruleLabelType(name) ::= "<name>_return"
+
+returnType() ::= <<
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<ruleDescriptor.name>_return
+<else>
+void
+<endif>
+>>
+
+returnScope(scope) ::= <<
+<if(ruleDescriptor.hasMultipleReturnValues)>
+protected static class <returnType()> {
+<if(ruleDescriptor.needPredefinedRuleAttributes)>
+    Token start=null, stop=null;
+<endif>
+    <scope.attributes:{<it.decl>;}; separator="\n">
+};
+<endif>
+>>
+
+parameterScope(scope) ::= <<
+<scope.attributes:{<it.decl>}; separator=", ">
+>>
+
+/** Used in codegen.g to translate $x.y references.
+ *  I could have left actions as StringTemplates to be inserted in
+ *  the output (so they could use attributes inherited from surrounding
+ *  templates), but really wanted to pass in AttributeScope and Attribute
+ *  objects so this translation could query them.  So, translation of
+ *  $x.y to executable code occurs before recognizerST.toString() occurs.
+ *  I.e., actions are just text strings during final code generation.
+ */
+globalAttributeRef(scope,attr) ::= <<
+((<scope>)<scope>_stack.peek()).<attr>
+>>
+
+parameterAttributeRef(attr) ::= "<attr.name>"
+
+returnAttributeRef(attr) ::= "retval.<attr.name>"
+
+ruleScopeAttributeRef(scope,attr) ::=
+    "((<scope>_scope)<scope>_stack.peek()).<attr>"
+
+ruleLabelRef(scope,attr) ::= "<scope>.<attr>"
+
+/** How to translate $tokenLabel */
+tokenLabelRef(label) ::= "<label>"
+
+// not sure the next are the right approach
+
+tokenLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
+tokenLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
+tokenLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
+tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>.getCharPositionInLine()"
+tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
+tokenLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
+
+ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
+ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
+ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
+
 // A C T I O N S
 
 emit(type) ::= "emit(<type>);"
 
 setType(type) ::= "setType(<type>);"
 
-
 // M I S C (properties, etc...)
+
+bitset(name, words64) ::= <<
+public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
+>>
 
 codeFileExtension() ::= ".java"
