@@ -27,9 +27,6 @@
 */
 package org.antlr.analysis;
 
-import java.util.Set;
-import java.util.HashSet;
-
 /** An NFA state, predicted alt, and syntactic/semantic context.
  *  The syntactic context is a pointer into the rule invocation
  *  chain used to arrive at the state.  The semantic context is

@@ -1,8 +1,5 @@
 package org.antlr.tool;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
-
 import java.util.*;
 
 /** Track the attributes within a scope.  A named scoped has just its list

@@ -2,7 +2,6 @@ package org.antlr.codegen;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
-import org.antlr.runtime.Token;
 
 import java.util.List;
 

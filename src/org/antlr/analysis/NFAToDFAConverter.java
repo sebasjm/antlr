@@ -28,7 +28,6 @@
 package org.antlr.analysis;
 
 import org.antlr.misc.*;
-import org.antlr.misc.BitSet;
 import org.antlr.tool.ANTLRParser;
 import org.antlr.tool.Grammar;
 

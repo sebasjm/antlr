@@ -6,7 +6,6 @@ import java.io.*;
 import java.net.Socket;
 import java.net.ConnectException;
 import java.util.StringTokenizer;
-import java.util.Locale;
 
 public class RemoteDebugEventSocketListener implements Runnable {
 	static final int MAX_EVENT_ELEMENTS = 8;

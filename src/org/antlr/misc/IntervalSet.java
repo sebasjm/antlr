@@ -29,8 +29,6 @@ package org.antlr.misc;
 
 import org.antlr.analysis.Label;
 import org.antlr.tool.Grammar;
-import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.stringtemplate.StringTemplate;
 
 import java.util.*;
 

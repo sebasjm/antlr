@@ -27,8 +27,6 @@
 */
 package org.antlr.runtime;
 
-import org.antlr.tool.Grammar;
-
 import java.util.*;
 
 /** The most common stream of tokens is one where every token is buffered up

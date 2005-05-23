@@ -2,8 +2,6 @@ package org.antlr.analysis;
 
 import org.antlr.tool.ANTLRParser;
 import org.antlr.tool.Grammar;
-import org.antlr.misc.BitSet;
-import org.antlr.misc.IntSet;
 
 import java.util.Set;
 import java.util.HashSet;

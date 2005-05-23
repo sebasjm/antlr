@@ -27,10 +27,6 @@
 */
 package org.antlr.runtime;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Iterator;
-
 public abstract class Lexer implements TokenSource {
 	/** Where is the lexer drawing characters from? */
     protected CharStream input;

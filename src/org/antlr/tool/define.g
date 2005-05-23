@@ -28,8 +28,6 @@ header {
 */
 	package org.antlr.tool;
 	import java.util.*;
-	import org.antlr.analysis.*;
-	import java.io.*;
 }
 
 class DefineGrammarItemsWalker extends TreeParser;

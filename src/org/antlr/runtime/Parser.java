@@ -27,9 +27,6 @@
 */
 package org.antlr.runtime;
 
-import org.antlr.misc.IntSet;
-import org.antlr.misc.IntervalSet;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;

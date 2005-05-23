@@ -27,7 +27,6 @@
 */
 package org.antlr.misc;
 
-import antlr.CharFormatter;
 import org.antlr.tool.Grammar;
 
 import java.util.List;

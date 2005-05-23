@@ -32,9 +32,6 @@ header {
     import org.antlr.misc.*;
 	import java.util.*;
 	import org.antlr.stringtemplate.*;
-    import java.io.InputStream;
-    import java.io.BufferedReader;
-    import java.io.InputStreamReader;
     import antlr.TokenWithIndex;
 }
 

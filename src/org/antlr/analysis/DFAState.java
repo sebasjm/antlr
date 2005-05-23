@@ -27,7 +27,6 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.misc.BitSet;
 import org.antlr.misc.IntSet;
 import org.antlr.misc.OrderedHashMap;
 

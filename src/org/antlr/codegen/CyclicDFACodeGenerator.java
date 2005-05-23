@@ -7,8 +7,6 @@ import org.antlr.misc.BitSet;
 import org.antlr.misc.IntSet;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class CyclicDFACodeGenerator {
 	protected CodeGenerator parent;

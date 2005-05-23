@@ -29,10 +29,6 @@ package org.antlr.analysis;
 
 import org.antlr.tool.GrammarAST;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-
 /** A state within an NFA. At most 2 transitions emanate from any NFA state. */
 public class NFAState extends State {
 	// I need to distinguish between NFA decision states for (...)* and (...)+

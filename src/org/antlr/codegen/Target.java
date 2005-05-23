@@ -1,6 +1,5 @@
 package org.antlr.codegen;
 
-import antlr.RecognitionException;
 import org.antlr.tool.Grammar;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.Tool;
