@@ -27,10 +27,7 @@
 */
 package org.antlr;
 
-import org.antlr.tool.Grammar;
-import org.antlr.tool.ErrorManager;
-import org.antlr.tool.DOTGenerator;
-import org.antlr.tool.Rule;
+import org.antlr.tool.*;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.analysis.*;
 
@@ -56,6 +53,8 @@ public class Tool {
 	protected String libDirectory = ".";
 	protected boolean debug = false;
 	protected boolean trace = false;
+	protected boolean profile = false;
+	protected boolean report = false;
 
     public static void main(String[] args) {
         ErrorManager.info("ANTLR Parser Generator   Version " +
@@ -134,6 +133,12 @@ public class Tool {
 			else if (args[i].equals("-trace")) {
 				trace=true;
 			}
+			else if (args[i].equals("-report")) {
+				report=true;
+			}
+			else if (args[i].equals("-profile")) {
+				profile=true;
+			}
             else {
                 if (args[i].charAt(0) != '-') {
                     // Must be the grammar file
@@ -171,7 +176,6 @@ public class Tool {
 
 				String lexerGrammarStr = grammar.getLexerGrammar();
 				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
-					System.out.println("writing lexer to ./"+grammar.name+".lexer.g");
 					Writer w = getOutputFile(grammar,grammar.name+".lexer.g");
 					w.write(lexerGrammarStr);
 					w.close();
@@ -189,6 +193,10 @@ public class Tool {
 				}
 				if ( generate_DFA_dot ) {
 					generateDFAs(grammar);
+				}
+				if ( report ) {
+					String report = new GrammarReporter(grammar).toString();
+					System.out.println(report);
 				}
 			}
 			catch (Exception e) {

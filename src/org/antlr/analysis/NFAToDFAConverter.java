@@ -75,7 +75,7 @@ public class NFAToDFAConverter {
 								   " ("+d.getNFAConfigurations().size()+" nfa states)");
 			}
 			int k = dfa.getUserMaxLookahead();
-			if ( k>0 && k==d.k ) {
+			if ( k>0 && k==d.getLookaheadDepth() ) {
 				// we've hit max lookahead, make this a stop state
 				System.out.println("stop state @k="+k+" (terminated early)");
 				resolveNonDeterminisms(d);
@@ -243,7 +243,7 @@ public class NFAToDFAConverter {
 				addTransition(d, label, targetState, targetToLabelMap);
 
 			// lookahead of target must be one larger than d's k
-			targetState.k = d.k + 1;
+			targetState.setLookaheadDepth(d.getLookaheadDepth() + 1);
 		}
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {

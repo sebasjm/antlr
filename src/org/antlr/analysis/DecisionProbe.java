@@ -160,18 +160,6 @@ public class DecisionProbe {
 		return terminated;
 	}
 
-	/** Return k if decision is LL(k) for some k else return max int */
-	public int getFixedLookaheadDepth() {
-		// TODO: probably need a method for optimization later that returns fixed lookahead
-		if ( isCyclic() ) {
-			return Integer.MAX_VALUE;
-		}
-		// find max k value as their might be multiple depths for different alts
-		// TODO: add functionality
-		return Integer.MAX_VALUE;
-	}
-
-
 	/** How many states does the DFA predictor have? */
 	public int getNumberOfStates() {
 		return dfa.getNumberOfStates();

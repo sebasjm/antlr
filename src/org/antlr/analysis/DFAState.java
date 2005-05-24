@@ -78,7 +78,7 @@ public class DFAState extends State {
 	 *  dfa states, but it is only a valid value if the user has specified
 	 *  a max fixed lookahead.
 	 */
-    public int k;
+    protected int k;
 
     /** The NFA->DFA algorithm may terminate leaving some states
      *  without a path to an accept state, implying that upon certain
@@ -433,8 +433,8 @@ public class DFAState extends State {
     */
 	
 	protected Set getNondeterministicAlts() {
-		int maxk = dfa.getUserMaxLookahead();
-		if ( maxk>0 && maxk==k ) {
+		int user_k = dfa.getUserMaxLookahead();
+		if ( user_k>0 && user_k==k ) {
 			// if fixed lookahead, then more than 1 alt is a nondeterminism
 			// if we have hit the max lookahead
 			return getAltSet();
@@ -683,4 +683,16 @@ public class DFAState extends State {
         buf.append("}");
         return buf.toString();
     }
+
+	public int getLookaheadDepth() {
+		return k;
+	}
+
+	public void setLookaheadDepth(int k) {
+		this.k = k;
+		if ( k > dfa.max_k ) { // track max k for entire DFA
+			dfa.max_k = k;
+		}
+	}
+
 }

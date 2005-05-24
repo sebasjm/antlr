@@ -66,7 +66,10 @@ public class DFA {
 	/** User specified max fixed lookahead.  If 0, nothing specified.  -1
 	 *  implies we have not looked at the options table yet to set k.
 	 */
-	protected int k = -1;
+	protected int user_k = -1;
+
+	/** While building the DFA, track max lookahead depth if not cyclic */
+	protected int max_k = -1;
 
     /** Is this DFA reduced?  I.e., can all states lead to an accept state? */
     protected boolean reduced = true;
@@ -126,7 +129,7 @@ public class DFA {
 	 *  is solved via semantic predicates.  Perhaps a GUI would want
 	 *  the ability to show that.
 	 */
-	protected DecisionProbe probe = new DecisionProbe(this);
+	public DecisionProbe probe = new DecisionProbe(this);
 
     public DFA(NFAState decisionStartState) {
         this.decisionNFAStartState = decisionStartState;
@@ -161,6 +164,8 @@ public class DFA {
      */
     protected DFAState addState(DFAState d) {
 		if ( getUserMaxLookahead()>0 ) {
+			states.put(d,d);
+			numberOfStates++;
 			return d;
 		}
 		DFAState existing = (DFAState)states.get(d);
@@ -209,16 +214,24 @@ public class DFA {
 	 *  DFA cycles are created when this value, k, is greater than 0.
 	 */
 	public int getUserMaxLookahead() {
-		if ( k>=0 ) {
-			return k;
+		if ( user_k>=0 ) {
+			return user_k;
 		}
 		Integer kI = (Integer)getOption("k");
 		if ( kI==null ) {
-			k=0;
+			user_k=0;
 			return 0;
 		}
-		k = kI.intValue();
-		return k;
+		user_k = kI.intValue();
+		return user_k;
+	}
+
+	/** Return k if decision is LL(k) for some k else return max int */
+	public int getMaxLookaheadDepth() {
+		if ( isCyclic() ) {
+			return Integer.MAX_VALUE;
+		}
+		return max_k;
 	}
 
     /** Return a list of Integer alt numbers for which no lookahead could

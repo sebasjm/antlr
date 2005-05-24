@@ -63,6 +63,13 @@ public class Grammar {
     public static final int PARSER = 2;
 	public static final int TREE_PARSER = 3;
 	public static final int COMBINED = 4;
+	public static final String[] grammarTypeToString = new String[] {
+		"<invalid>",
+		"lexer",
+		"parser",
+		"treeparser",
+		"combined"
+	};
 
 	public static class Decision {
 		public int decision;
@@ -1083,9 +1090,20 @@ public class Grammar {
 		return d.options;
     }
 
-    public int getNumberOfDecisions() {
-        return decisionNumber;
-    }
+	public int getNumberOfDecisions() {
+		return decisionNumber;
+	}
+
+	public int getNumberOfCyclicDecisions() {
+		int n = 0;
+		for (int i=1; i<=getNumberOfDecisions(); i++) {
+			Decision d = getDecision(i);
+			if ( d.dfa.isCyclic() ) {
+				n++;
+			}
+		}
+		return n;
+	}
 
 	/** Set the lookahead DFA for a particular decision.  This means
 	 *  that the appropriate AST node must updated to have the new lookahead
