@@ -137,8 +137,8 @@ public class CodeGenerator {
 
 	/** For every decision, track the maximum lookahead needed if fixed.
 	 *  Set to Integer.MAX_VALUE if cyclic DFA.
-	 */
 	protected int[] decisionToMaxLookaheadDepth;
+	 */
 
 	public CodeGenerator(Tool tool, Grammar grammar, String language) {
 		this.tool = tool;
@@ -215,8 +215,6 @@ public class CodeGenerator {
 		// OPTIMIZE DFA
 		DFAOptimizer optimizer = new DFAOptimizer(grammar);
 		optimizer.optimize();
-
-		decisionToMaxLookaheadDepth = new int[grammar.getNumberOfDecisions()+1];
 
 		// OUTPUT FILE (contains recognizerST)
 		outputFileST = templates.getInstanceOf("outputFile");
@@ -625,13 +623,6 @@ public class CodeGenerator {
 
 
 	// M I S C
-
-	public int getMaxLookaheadDepth(int decision) {
-		if ( decision<decisionToMaxLookaheadDepth.length ) {
-			return decisionToMaxLookaheadDepth[decision];
-		}
-		return 0;
-	}
 
 	public StringTemplateGroup getTemplates() {
 		return templates;

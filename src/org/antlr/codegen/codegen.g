@@ -239,7 +239,7 @@ block[String blockTemplateName, DFA dfa]
         decision = generator.genLookaheadDecision(recognizerST,dfa);
         code.setAttribute("decision", decision);
         code.setAttribute("decisionNumber", dfa.getDecisionNumber());
-		code.setAttribute("maxK",generator.getMaxLookaheadDepth(dfa.getDecisionNumber()));
+		code.setAttribute("maxK",dfa.getMaxLookaheadDepth());
 		code.setAttribute("maxAlt",dfa.getNumberOfAlts());
     }
     else {

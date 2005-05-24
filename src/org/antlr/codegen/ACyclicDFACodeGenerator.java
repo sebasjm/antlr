@@ -47,11 +47,13 @@ public class ACyclicDFACodeGenerator {
 			dfaEdgeName = "dfaEdgeSwitch";
 		}
 
+		/*
 		int oldMax = parent.decisionToMaxLookaheadDepth[dfa.getDecisionNumber()];
 		if( k > oldMax ) {
 			// track max (don't count the accept state)
 			parent.decisionToMaxLookaheadDepth[dfa.getDecisionNumber()] = k;
 		}
+		*/
 		GrammarAST decisionASTNode =
 			dfa.getNFADecisionStartState().getDecisionASTNode();
 		StringTemplate dfaST = templates.getInstanceOf(dfaStateName);

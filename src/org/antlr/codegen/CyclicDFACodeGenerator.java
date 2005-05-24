@@ -31,8 +31,6 @@ public class CyclicDFACodeGenerator {
 		dfaST.setAttribute("className", parent.getClassName());
 		visited = new BitSet(dfa.getNumberOfStates());
 		walkCyclicDFAGeneratingStateMachine(templates, dfaST, dfa.startState);
-		parent.decisionToMaxLookaheadDepth[dfa.getDecisionNumber()]
-			= Integer.MAX_VALUE;
 		return dfaST;
 	}
 
