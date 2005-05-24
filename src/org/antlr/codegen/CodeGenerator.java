@@ -656,7 +656,6 @@ public class CodeGenerator {
 	}
 
 	public void write(StringTemplate code, String fileName) throws IOException {
-		System.out.println("writing "+fileName);
 		Writer w = tool.getOutputFile(grammar, fileName);
 		w.write(code.toString());
 		w.close();
