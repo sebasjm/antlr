@@ -198,7 +198,7 @@ public class Tool {
 					String report = new GrammarReport(grammar).toString();
 					System.out.println(report);
 				}
-				new GrammarReport(grammar).writeStats();
+				new GrammarReport(grammar).writeReport();
 			}
 			catch (Exception e) {
 				ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);

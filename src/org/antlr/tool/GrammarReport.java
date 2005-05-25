@@ -2,6 +2,7 @@ package org.antlr.tool;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.io.*;
 import java.nio.channels.FileLock;
 import java.nio.channels.FileChannel;
@@ -16,6 +17,7 @@ public class GrammarReport {
 
 	public Grammar grammar;
 	public static final String ANTLRWORKS_DIR = "antlrworks";
+	public static final int NUM_GRAMMAR_STATS = 24;
 
 	public GrammarReport(Grammar grammar) {
 		this.grammar = grammar;
@@ -106,101 +108,92 @@ public class GrammarReport {
 	 *  return a human-readable version.  Return null if there is a
 	 *  problem with the data.
 	 */
-	public String toString(String notifyStatsLine) {
-        return null;
+	public String toString() {
+        return toString(toNotifyString());
 	}
 
-	public String toString() {
+	protected String[] decodeReportData(String data) {
+		String[] fields = new String[NUM_GRAMMAR_STATS];
+		StringTokenizer st = new StringTokenizer(data, "\t");
+		int i = 0;
+		while ( st.hasMoreTokens() ) {
+			fields[i] = st.nextToken();
+			i++;
+		}
+		if ( i!=NUM_GRAMMAR_STATS ) {
+			return null;
+		}
+		return fields;
+	}
+
+	public String toString(String notifyDataLine) {
+		String[] fields = decodeReportData(notifyDataLine);
+		if ( fields==null ) {
+			return null;
+		}
 		StringBuffer buf = new StringBuffer();
         buf.append("ANTLR Grammar Report; Stats Version ");
-		buf.append(Version);
+		buf.append(fields[0]);
 		buf.append('\n');
 		buf.append("Grammar: ");
-		buf.append(grammar.name);
+		buf.append(fields[1]);
 		buf.append('\n');
 		buf.append("Type: ");
-		buf.append(Grammar.grammarTypeToString[grammar.type]);
+		buf.append(fields[2]);
 		buf.append('\n');
 		buf.append("Target language: ");
-		buf.append(grammar.getOption("language"));
+		buf.append(fields[3]);
 		buf.append('\n');
 		buf.append("Rules: ");
-		buf.append(grammar.getRules().size());
+		buf.append(fields[4]);
 		buf.append('\n');
-		int totalProductions = 0;
-		Collection rules = grammar.getRules();
-		for (Iterator it = rules.iterator(); it.hasNext();) {
-			Rule r = (Rule) it.next();
-			totalProductions += r.numberOfAlts;
-		}
 		buf.append("Productions: ");
-		buf.append(totalProductions);
+		buf.append(fields[5]);
 		buf.append('\n');
 		buf.append("Decisions: ");
-		buf.append(grammar.getNumberOfDecisions());
+		buf.append(fields[6]);
 		buf.append('\n');
 		buf.append("Cyclic DFA decisions: ");
-		buf.append(grammar.getNumberOfCyclicDecisions());
+		buf.append(fields[7]);
 		buf.append('\n');
-		int numACyclicDecisions =
-			grammar.getNumberOfDecisions()-grammar.getNumberOfCyclicDecisions();
-		int[] depths = new int[numACyclicDecisions];
-		int[] acyclicDFAStates = new int[numACyclicDecisions];
-		int[] cyclicDFAStates = new int[grammar.getNumberOfCyclicDecisions()];
-		int acyclicIndex = 0;
-		int cyclicIndex = 0;
-		for (int i=1; i<=grammar.getNumberOfDecisions(); i++) {
-			Grammar.Decision d = grammar.getDecision(i);
-			if ( !d.dfa.isCyclic() ) {
-				int maxk = d.dfa.getMaxLookaheadDepth();
-				depths[acyclicIndex] = maxk;
-				acyclicDFAStates[acyclicIndex] = d.dfa.getNumberOfStates();
-				acyclicIndex++;
-			}
-			else {
-				cyclicDFAStates[cyclicIndex] = d.dfa.getNumberOfStates();
-				cyclicIndex++;
-			}
-		}
-		buf.append("Min fixed k: "); buf.append(min(depths));
+		buf.append("Min fixed k: "); buf.append(fields[8]);
 		buf.append('\n');
-		buf.append("Max fixed k: "); buf.append(max(depths));
+		buf.append("Max fixed k: "); buf.append(fields[9]);
 		buf.append('\n');
-		buf.append("Average fixed k: "); buf.append(avg(depths));
+		buf.append("Average fixed k: "); buf.append(fields[10]);
 		buf.append('\n');
-		buf.append("Standard deviation of fixed k: "); buf.append(stddev(depths));
+		buf.append("Standard deviation of fixed k: "); buf.append(fields[11]);
 		buf.append('\n');
-		buf.append("Min acyclic DFA states: "); buf.append(min(acyclicDFAStates));
+		buf.append("Min acyclic DFA states: "); buf.append(fields[12]);
 		buf.append('\n');
-		buf.append("Max acyclic DFA states: "); buf.append(max(acyclicDFAStates));
+		buf.append("Max acyclic DFA states: "); buf.append(fields[13]);
 		buf.append('\n');
-		buf.append("Average acyclic DFA states: "); buf.append(avg(acyclicDFAStates));
+		buf.append("Average acyclic DFA states: "); buf.append(fields[14]);
 		buf.append('\n');
-		buf.append("Standard deviation of acyclic DFA states: "); buf.append(stddev(acyclicDFAStates));
+		buf.append("Standard deviation of acyclic DFA states: "); buf.append(fields[15]);
 		buf.append('\n');
-		buf.append("Total acyclic DFA states: "); buf.append(sum(acyclicDFAStates));
+		buf.append("Total acyclic DFA states: "); buf.append(fields[16]);
 		buf.append('\n');
-		buf.append("Min cyclic DFA states: "); buf.append(min(cyclicDFAStates));
+		buf.append("Min cyclic DFA states: "); buf.append(fields[17]);
 		buf.append('\n');
-		buf.append("Max cyclic DFA states: "); buf.append(max(cyclicDFAStates));
+		buf.append("Max cyclic DFA states: "); buf.append(fields[18]);
 		buf.append('\n');
-		buf.append("Average cyclic DFA states: "); buf.append(avg(cyclicDFAStates));
+		buf.append("Average cyclic DFA states: "); buf.append(fields[19]);
 		buf.append('\n');
-		buf.append("Standard deviation of cyclic DFA states: "); buf.append(stddev(cyclicDFAStates));
+		buf.append("Standard deviation of cyclic DFA states: "); buf.append(fields[20]);
 		buf.append('\n');
-		buf.append("Total cyclic DFA states: "); buf.append(sum(cyclicDFAStates));
+		buf.append("Total cyclic DFA states: "); buf.append(fields[21]);
 		buf.append('\n');
 		buf.append("Vocabulary size: ");
-		buf.append(grammar.getTokenTypes().size());
+		buf.append(fields[22]);
 		buf.append('\n');
 		buf.append("DFA creation time in ms: ");
-		buf.append(grammar.DFACreationWallClockTimeInMS);
+		buf.append(fields[23]);
 		buf.append('\n');
 		return buf.toString();
 	}
 
-
-	public void writeStats() {
+	public void writeReport() {
 		String data = this.toNotifyString(); // compute data line to write
 		String absoluteFilename =
 			System.getProperty("user.home")+File.separator+
