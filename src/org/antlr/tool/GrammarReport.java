@@ -195,10 +195,7 @@ public class GrammarReport {
 
 	public void writeReport() {
 		String data = this.toNotifyString(); // compute data line to write
-		String absoluteFilename =
-			System.getProperty("user.home")+File.separator+
-			ANTLRWORKS_DIR+File.separator+
-			GRAMMAR_STATS_FILENAME;
+		String absoluteFilename = getAbsoluteFileName(GRAMMAR_STATS_FILENAME);
 		File f = new File(absoluteFilename);
 		File parent = f.getParentFile();
 		parent.mkdirs(); // ensure parent dir exists
@@ -237,6 +234,12 @@ public class GrammarReport {
 			ErrorManager.internalError("can't write stats to "+absoluteFilename,
 									   ioe);
 		}
+	}
+
+	public String getAbsoluteFileName(String filename) {
+		return System.getProperty("user.home")+File.separator+
+					ANTLRWORKS_DIR+File.separator+
+					filename;
 	}
 
 	// M I S C
