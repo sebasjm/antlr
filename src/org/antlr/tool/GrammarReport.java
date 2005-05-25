@@ -112,7 +112,7 @@ public class GrammarReport {
         return toString(toNotifyString());
 	}
 
-	protected String[] decodeReportData(String data) {
+	protected static String[] decodeReportData(String data) {
 		String[] fields = new String[NUM_GRAMMAR_STATS];
 		StringTokenizer st = new StringTokenizer(data, "\t");
 		int i = 0;
@@ -126,7 +126,7 @@ public class GrammarReport {
 		return fields;
 	}
 
-	public String toString(String notifyDataLine) {
+	public static String toString(String notifyDataLine) {
 		String[] fields = decodeReportData(notifyDataLine);
 		if ( fields==null ) {
 			return null;
