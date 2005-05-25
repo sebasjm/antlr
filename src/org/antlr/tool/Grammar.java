@@ -230,6 +230,13 @@ public class Grammar {
 	/** What file name holds this grammar? */
 	protected String fileName;
 
+	/** How long in ms did it take to build DFAs for this grammar?
+	 *  If this grammar is a combined grammar, it only records time for
+	 *  the parser grammar component.  This only records the time to
+	 *  do the LL(*) work; NFA->DFA conversion.
+	 */
+	public long DFACreationWallClockTimeInMS;
+
 	public Grammar() {
 		initTokenSymbolTables();
 	}
@@ -473,6 +480,7 @@ public class Grammar {
      */
     public void createLookaheadDFAs() {
 		//System.out.println("### create DFAs");
+		long start = System.currentTimeMillis();
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
             NFAState decisionStartState = getDecisionNFAStartState(decision);
             if ( decisionStartState.getNumberOfTransitions()>1 ) {
@@ -497,6 +505,8 @@ public class Grammar {
 				*/
 			}
 		}
+		long stop = System.currentTimeMillis();
+		DFACreationWallClockTimeInMS = stop - start;
 	}
 
 	/** Define a token at a particular token type value.  Blast an

@@ -195,9 +195,10 @@ public class Tool {
 					generateDFAs(grammar);
 				}
 				if ( report ) {
-					String report = new GrammarReporter(grammar).toString();
+					String report = new GrammarReport(grammar).toString();
 					System.out.println(report);
 				}
+				new GrammarReport(grammar).writeStats();
 			}
 			catch (Exception e) {
 				ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
@@ -265,8 +266,10 @@ public class Tool {
 
 	private static void help() {
         System.err.println("usage: java org.antlr.Tool [args] file.g");
-		System.err.println("  -o outputDir       specify output directory where all output generated.");
+		System.err.println("  -o outputDir       specify output directory where all output is generated");
 		System.err.println("  -debug             generate a parser that emits debugging events");
+		System.err.println("  -report            print out a report about the grammar(s) processed");
+		System.err.println("  -profile           generate a parser that computes profiling information");
         System.err.println("  -lib dir           specify location of token files");
     }
 
