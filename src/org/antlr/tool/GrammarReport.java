@@ -236,7 +236,7 @@ public class GrammarReport {
 		}
 	}
 
-	public String getAbsoluteFileName(String filename) {
+	public static String getAbsoluteFileName(String filename) {
 		return System.getProperty("user.home")+File.separator+
 					ANTLRWORKS_DIR+File.separator+
 					filename;
