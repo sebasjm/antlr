@@ -2,7 +2,8 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.IntStream;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.CommonToken;
 import org.antlr.tool.GrammarReport;
 
 import java.util.StringTokenizer;
@@ -16,7 +17,7 @@ public class Profiler implements DebugEventListener {
 	 */
 	public static final String Version = "1";
 	public static final String RUNTIME_STATS_FILENAME = "runtime.stats";
-	public static final int NUM_RUNTIME_STATS = 12;
+	public static final int NUM_RUNTIME_STATS = 16;
 
 	//public IntStream input;
 
@@ -24,23 +25,21 @@ public class Profiler implements DebugEventListener {
 
 	// working variables
 
-	public int level = 0;
-	private boolean inDecision = false;
-	public int maxLookaheadInDecision = 0;
+	protected int level = 0;
+	protected boolean inDecision = false;
+	protected int maxLookaheadInDecision = 0;
+	protected CommonToken lastTokenConsumed=null;
 
-	// stats below
+	// stats variables
 
 	public int numRuleInvocations = 0;
 	public int numFixedDecisions = 0;
 	public int numCyclicDecisions = 0;
 	public int[] decisionMaxFixedLookaheads = new int[200];
 	public int[] decisionMaxCyclicLookaheads = new int[200];
-
-	/*
-	public Profiler(IntStream input) {
-		this.input = input;
-	}
-	*/
+	public int numHiddenTokens = 0;
+	public int numCharsMatched = 0;
+	public int numHiddenCharsMatched = 0;
 
 	public Profiler(DebugParser parser) {
 		this.parser = parser;
@@ -98,11 +97,30 @@ public class Profiler implements DebugEventListener {
 	public void location(int line, int pos) {;}
 
 	public void consumeToken(Token token) {
-		if ( inDecision && parser.isCyclicDecision ) {
-			maxLookaheadInDecision++;
+		if ( inDecision ) {
+			if ( parser.isCyclicDecision ) {
+				maxLookaheadInDecision++;
+			}
 		}
+		/*
+		else {
+			numCharsMatched += token.getText().length();
+		}
+		*/
+		lastTokenConsumed = (CommonToken)token;
 	}
-	public void consumeHiddenToken(Token token) {;}
+
+	public void consumeHiddenToken(Token token) {
+		/*
+		if ( !inDecision ) {
+			//numHiddenTokens++;
+			int n = token.getText().length();
+			numCharsMatched += n;
+			numHiddenCharsMatched += n;
+		}
+		*/
+		lastTokenConsumed = (CommonToken)token;
+	}
 
 	public void LT(int i, Token t) {
 		if ( inDecision && !parser.isCyclicDecision ) {
@@ -128,6 +146,16 @@ public class Profiler implements DebugEventListener {
 	// R E P O R T I N G
 
 	public String toNotifyString() {
+		TokenStream input = parser.getTokenStream();
+		for (int i=0; i<input.size()&&i<=lastTokenConsumed.getTokenIndex(); i++) {
+			Token t = input.get(i);
+			if ( t.getChannel()!=Token.DEFAULT_CHANNEL ) {
+				numHiddenTokens++;
+				numHiddenCharsMatched += t.getText().length();
+			}
+		}
+		System.out.println("last token "+lastTokenConsumed);
+		numCharsMatched = lastTokenConsumed.getStopIndex() + 1;
 		decisionMaxFixedLookaheads = trim(decisionMaxFixedLookaheads, numFixedDecisions);
 		decisionMaxCyclicLookaheads = trim(decisionMaxCyclicLookaheads, numCyclicDecisions);
 		StringBuffer buf = new StringBuffer();
@@ -154,6 +182,14 @@ public class Profiler implements DebugEventListener {
 		buf.append(GrammarReport.avg(decisionMaxCyclicLookaheads));
 		buf.append('\t');
 		buf.append(GrammarReport.stddev(decisionMaxCyclicLookaheads));
+		buf.append('\t');
+		buf.append(parser.getTokenStream().size());
+		buf.append('\t');
+		buf.append(numHiddenTokens);
+		buf.append('\t');
+		buf.append(numCharsMatched);
+		buf.append('\t');
+		buf.append(numHiddenCharsMatched);
 		return buf.toString();
 	}
 
@@ -216,6 +252,18 @@ public class Profiler implements DebugEventListener {
 		buf.append('\n');
 		buf.append("standard deviation of depth used in arbitrary lookahead decisions ");
 		buf.append(fields[11]);
+		buf.append('\n');
+		buf.append("number of tokens ");
+		buf.append(fields[12]);
+		buf.append('\n');
+		buf.append("number of hidden tokens ");
+		buf.append(fields[13]);
+		buf.append('\n');
+		buf.append("number of char ");
+		buf.append(fields[14]);
+		buf.append('\n');
+		buf.append("number of hidden char ");
+		buf.append(fields[15]);
 		buf.append('\n');
 		return buf.toString();
 	}

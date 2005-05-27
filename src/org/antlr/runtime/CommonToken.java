@@ -123,6 +123,9 @@ public class CommonToken extends Token {
 		if ( channel>0 ) {
 			channelStr=",channel="+channel;
 		}
-        return "["+getTokenIndex()+":"+getText()+",<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+		String txt = getText().replaceAll("\n","\\\\n");
+		txt = txt.replaceAll("\r","\\\\r");
+		txt = txt.replaceAll("\t","\\\\t");
+        return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
     }
 }
