@@ -36,16 +36,10 @@ public class GrammarSyntaxMessage extends Message {
 			line = offendingToken.getLine();
 			col = offendingToken.getColumn();
 		}
-		String fileName = g.getFileName();
+		//String fileName = g.getFileName();
 		StringTemplate st = getMessageTemplate();
 		if ( arg!=null ) {
 			st.setAttribute("arg", arg);
-		}
-		if ( arg2!=null ) {
-			st.setAttribute("arg2", arg2);
-		}
-		if ( fileName!=null ) {
-			st.setAttribute("file", fileName);
 		}
 		st.setAttribute("line", new Integer(line));
 		st.setAttribute("col", new Integer(col));

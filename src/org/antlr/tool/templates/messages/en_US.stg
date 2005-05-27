@@ -66,7 +66,7 @@ BYTECODE_MISSING_METHOD_MAXSTACK(arg) ::= "missing .method maxstack value"
 BYTECODE_MISSING_METHOD_MAXLOCALS(arg) ::= "missing .method locals value"
 
 // GRAMMAR ERRORS
-SYNTAX_ERROR() ::= "syntax error"
+SYNTAX_ERROR(file,line,col,arg) ::= "<line>:<col>: syntax error: <arg>"
 RULE_REDEFINITION(file,line,col,arg) ::= 
 	"<loc()>rule <arg> redefinition"
 LEXER_RULES_NOT_ALLOWED(file,line,col,arg) ::= 
