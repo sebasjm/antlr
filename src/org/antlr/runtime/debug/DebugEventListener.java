@@ -149,17 +149,19 @@ public interface DebugEventListener {
 	 */
 	public void endResync();
 
-	/** Announce that parsing has begun.  Not strictly useful except for
+	/** Announce that parsing has begun.  Not technically useful except for
 	 *  sending events over a socket.  A GUI for example will launch a thread
 	 *  to connect and communicate with a remote parser.  The thread will want
-	 *  to notify the GUI when a connection is made.
+	 *  to notify the GUI when a connection is made.  ANTLR parsers
+	 *  trigger this upon entry to the first rule (the ruleLevel is used to
+	 *  figure this out).
 	 */
 	public void commence();
 
 	/** Parsing is over; successfully or not.  Mostly useful for telling
-	 *  remote debugging listeners that it's time to quit.  The invoker
-	 *  of the parser must call this not the parser because any rule
-	 *  can be a start symbol.
+	 *  remote debugging listeners that it's time to quit.  When the rule
+	 *  invocation level goes to zero at the end of a rule, we are done
+	 *  parsing.
 	 */
 	public void terminate();
 }

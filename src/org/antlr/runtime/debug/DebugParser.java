@@ -28,44 +28,18 @@
 package org.antlr.runtime.debug;
 
 import org.antlr.runtime.*;
+import org.antlr.tool.ErrorManager;
 
 import java.io.IOException;
 
 public class DebugParser extends Parser {
-
-	/** The default debugger mimics the traceParser behavior of ANTLR 2.x */
-	public class TraceDebugger implements DebugEventListener {
-		protected int level = 0;
-		public void enterRule(String ruleName) {
-			for (int i=1; i<=level; i++) {System.out.print(" ");}
-			System.out.println("> "+ruleName+" LT(1)="+input.LT(1).toString());
-			level++;
-		}
-		public void exitRule(String ruleName) {
-			level--;
-			for (int i=1; i<=level; i++) {System.out.print(" ");}
-			System.out.println("< "+ruleName+" LT(1)="+input.LT(1).toString());
-		}
-		public void enterAlt(int alt) {}
-		public void enterSubRule(int decisionNumber) {}
-		public void exitSubRule(int decisionNumber) {}
-		public void enterDecision(int decisionNumber) {}
-		public void exitDecision(int decisionNumber) {}
-		public void location(int line, int pos) {}
-		public void consumeToken(Token token) {}
-		public void consumeHiddenToken(Token token) {}
-		public void LT(int i, Token t) {}
-		public void mark(int i) {}
-		public void rewind(int i) {}
-		public void recognitionException(RecognitionException e) {}
-		public void beginResync() {}
-		public void endResync() {}
-		public void commence() {}
-		public void terminate() {}
-	}
-
 	/** Who to notify when events in the parser occur. */
 	protected DebugEventListener dbg = null;
+
+	/** Used to differentiate between fixed lookahead and cyclic DFA decisions
+	 *  while profiling.
+ 	 */
+	public boolean isCyclicDecision = false;
 
 	/** Create a normal parser except wrap the token stream in a debug
 	 *  proxy that fires consume events.
@@ -105,13 +79,16 @@ public class DebugParser extends Parser {
 		this.dbg = dbg;
 	}
 
+	public DebugEventListener getDebugListener() {
+		return dbg;
+	}
+
 	public void reportError(RecognitionException e) {
 		super.reportError(e);
 	}
 
 	public void reportError(IOException e) {
-		System.err.println("problem with debugger: "+e);
-		e.printStackTrace(System.err);
+		ErrorManager.internalError(e);
 	}
 
 	public void beginResync() {

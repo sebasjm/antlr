@@ -198,7 +198,9 @@ public class Tool {
 					String report = new GrammarReport(grammar).toString();
 					System.out.println(report);
 				}
-				new GrammarReport(grammar).writeReport();
+				GrammarReport report = new GrammarReport(grammar);
+				GrammarReport.writeReport(GrammarReport.GRAMMAR_STATS_FILENAME,
+										  report.toNotifyString());
 			}
 			catch (Exception e) {
 				ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
@@ -214,6 +216,8 @@ public class Tool {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);
 			grammar.setCodeGenerator(generator);
 			generator.setDebug(debug);
+			generator.setTrace(trace);
+			generator.setProfile(profile);
 
 			if ( grammar.type==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();

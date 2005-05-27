@@ -27,6 +27,9 @@
 */
 package org.antlr.runtime;
 
+import org.antlr.runtime.debug.DebugEventListener;
+import org.antlr.runtime.debug.Profiler;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -104,8 +107,8 @@ public class Parser {
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
 		if ( errorRecovery ) {
-			System.err.print("[SPURIOUS] ");
-			//return;
+			//System.err.print("[SPURIOUS] ");
+			return;
 		}
 		errorRecovery = true;
 

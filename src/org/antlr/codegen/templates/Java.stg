@@ -5,13 +5,17 @@ group Java;
  */
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           debug, predicates) ::=
+           debug, trace, profile, predicates) ::=
 <<
 <headerAction>
 
 import org.antlr.runtime.*;
+<if(profile)>
+import org.antlr.runtime.debug.*;
+<else>
 <if(debug)>
 import org.antlr.runtime.debug.*;
+<endif>
 <endif>
 import java.util.Stack;
 
@@ -55,22 +59,27 @@ retry:
 
 /** How to generate a parser */
 parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates) ::= <<
-class <name> extends <if(debug)>DebugParser<else>Parser<endif> {
+class <name> extends <if(debug)>Debug<endif>Parser {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 <if(debug)>
+    public int ruleLevel = 0;
+<if(profile)>
+    public <name>(TokenStream input) {
+	super(input,null);
+	setDebugListener(new Profiler(this));
+    }<\n>
+<else>
     public <name>(TokenStream input) {
 	super(input);
     }
     public <name>(TokenStream input, DebugEventListener dbg) {
         super(input,dbg);
     }<\n>
-    public <name>(TokenStream input, int port) {
-        super(input,port);
-    }<\n>
+<endif>
 <else>
     public <name>(TokenStream input) { super(input); }<\n>
 <endif>
@@ -109,6 +118,8 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     <initAction>
 <if(debug)>
     try { dbg.enterRule("<ruleName>");
+    if ( ruleLevel==0 ) {dbg.commence();}
+    ruleLevel++;
     dbg.location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
 <endif>
     try {
@@ -127,7 +138,12 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     }<\n>
 <if(debug)>
     dbg.location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
-    } finally {dbg.exitRule("<ruleName>");}<\n>
+    }
+    finally {
+        dbg.exitRule("<ruleName>");
+        ruleLevel--;
+        if ( ruleLevel==0 ) {dbg.terminate();}
+    }<\n>
 <endif>
 <if(ruleDescriptor.hasMultipleReturnValues)>
     return retval;<\n>
@@ -495,10 +511,12 @@ dfaEdgeSwitch(labels, targetState) ::= <<
 dfaDecision(decisionNumber,description) ::= <<
 <if(debug)>
 try {
+    isCyclicDecision = true;
     alt<decisionNumber> = DFA<decisionNumber>.predict(input);
 }
 catch (NoViableAltException nvae) {
     dbg.recognitionException(nvae);
+    throw nvae;
 }
 <else>
 alt<decisionNumber> = DFA<decisionNumber>.predict(input);

@@ -120,6 +120,8 @@ public class CodeGenerator {
 	protected Tool tool;
 
 	protected boolean debug;
+	protected boolean trace;
+	protected boolean profile;
 
 	/** I have factored out the generation of acyclic DFAs to separate class */
 	protected ACyclicDFACodeGenerator acyclicDFAGenerator =
@@ -241,6 +243,8 @@ public class CodeGenerator {
 			outputFileST.setAttribute("PARSER", new Boolean(true));
 			headerFileST.setAttribute("PARSER", new Boolean(true));
 			outputFileST.setAttribute("debug", new Boolean(debug));
+			outputFileST.setAttribute("trace", new Boolean(trace));
+			outputFileST.setAttribute("profile", new Boolean(profile));
 		}
 		else {
 			recognizerST = templates.getInstanceOf("treeParser");
@@ -630,6 +634,16 @@ public class CodeGenerator {
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+
+	public void setTrace(boolean trace) {
+		this.trace = trace;
+		setDebug(true); // requires debug events
+	}
+
+	public void setProfile(boolean profile) {
+		this.profile = profile;
+		setDebug(true); // requires debug events
 	}
 
 	public String getRecognizerFileName() {

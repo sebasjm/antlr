@@ -13,11 +13,10 @@ public class GrammarReport {
 	 */
 	public static final String Version = "1";
 	public static final String GRAMMAR_STATS_FILENAME = "grammar.stats";
-	public static final String RUNTIME_STATS_FILENAME = "runtime.stats";
-
-	public Grammar grammar;
 	public static final String ANTLRWORKS_DIR = "antlrworks";
 	public static final int NUM_GRAMMAR_STATS = 24;
+
+	public Grammar grammar;
 
 	public GrammarReport(Grammar grammar) {
 		this.grammar = grammar;
@@ -193,9 +192,8 @@ public class GrammarReport {
 		return buf.toString();
 	}
 
-	public void writeReport() {
-		String data = this.toNotifyString(); // compute data line to write
-		String absoluteFilename = getAbsoluteFileName(GRAMMAR_STATS_FILENAME);
+	public static void writeReport(String filename, String data) {
+		String absoluteFilename = getAbsoluteFileName(filename);
 		File f = new File(absoluteFilename);
 		File parent = f.getParentFile();
 		parent.mkdirs(); // ensure parent dir exists
