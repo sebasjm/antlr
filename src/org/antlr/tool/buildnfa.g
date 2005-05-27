@@ -103,11 +103,18 @@ protected void finish() {
 }
 
     public void reportError(RecognitionException ex) {
-        System.out.println("buildnfa: "+ex.toString());
-    }
-
-    public void reportError(String s) {
-        System.out.println("buildnfa: error: " + s);
+		Token token = null;
+		if ( ex instanceof MismatchedTokenException ) {
+			token = ((MismatchedTokenException)ex).token;
+		}
+		else if ( ex instanceof NoViableAltException ) {
+			token = ((NoViableAltException)ex).token;
+		}
+        ErrorManager.syntaxError(
+            ErrorManager.MSG_SYNTAX_ERROR,
+            token,
+            "buildnfa: "+ex.toString(),
+            ex);
     }
 }
 

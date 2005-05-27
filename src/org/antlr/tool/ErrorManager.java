@@ -44,6 +44,7 @@ import java.lang.reflect.Field;
 
 import antlr.LLkParser;
 import antlr.Token;
+import antlr.RecognitionException;
 
 /** Defines all the errors ANTLR can generator for both the tool and for
  *  issues with a grammar.
@@ -409,6 +410,16 @@ public class ErrorManager {
 									Token token)
 	{
 		grammarError(msgID,g,token,null,null);
+	}
+
+	public static void syntaxError(int msgID,
+								   Token token,
+								   Object arg,
+								   antlr.RecognitionException re)
+	{
+		getErrorListener().error(
+			new GrammarSyntaxMessage(msgID,token,arg,re)
+		);
 	}
 
 	public static void internalError(Object error, Throwable e) {

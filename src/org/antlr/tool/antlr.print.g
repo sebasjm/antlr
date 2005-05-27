@@ -52,14 +52,19 @@ options {
         buf.append(s);
     }
 
-    /** Parser error-reporting function can be overridden in subclass */
     public void reportError(RecognitionException ex) {
-        System.out.println("print: "+ex.toString());
-    }
-
-    /** Parser error-reporting function can be overridden in subclass */
-    public void reportError(String s) {
-        System.out.println("print: error: " + s);
+		Token token = null;
+		if ( ex instanceof MismatchedTokenException ) {
+			token = ((MismatchedTokenException)ex).token;
+		}
+		else if ( ex instanceof NoViableAltException ) {
+			token = ((NoViableAltException)ex).token;
+		}
+        ErrorManager.syntaxError(
+            ErrorManager.MSG_SYNTAX_ERROR,
+            token,
+            "antlr.print: "+ex.toString(),
+            ex);
     }
 
 	/** Normalize a grammar print out by removing all double spaces

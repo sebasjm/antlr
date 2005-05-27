@@ -45,15 +45,20 @@ protected String currentRuleName;
 protected int outerAltNum = 0;
 protected int blockLevel = 0;
 
-	/** Parser error-reporting function can be overridden in subclass */
-	public void reportError(RecognitionException ex) {
-		System.out.println("define rules: "+ex.toString());
-	}
-
-	/** Parser error-reporting function can be overridden in subclass */
-	public void reportError(String s) {
-		System.out.println("define rules: error: " + s);
-	}
+    public void reportError(RecognitionException ex) {
+		Token token = null;
+		if ( ex instanceof MismatchedTokenException ) {
+			token = ((MismatchedTokenException)ex).token;
+		}
+		else if ( ex instanceof NoViableAltException ) {
+			token = ((NoViableAltException)ex).token;
+		}
+        ErrorManager.syntaxError(
+            ErrorManager.MSG_SYNTAX_ERROR,
+            token,
+            "define: "+ex.toString(),
+            ex);
+    }
 
 	protected void finish() {
 		trimGrammar();

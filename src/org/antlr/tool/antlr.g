@@ -93,12 +93,18 @@ tokens {
 	}
 
     public void reportError(RecognitionException ex) {
-        System.out.println("buildast: "+ex.toString());
-        ex.printStackTrace(System.out);
-    }
-
-    public void reportError(String s) {
-        System.out.println("buildast: error: " + s);
+		Token token = null;
+		try {
+			token = LT(1);
+		}
+		catch (TokenStreamException tse) {
+			ErrorManager.internalError("can't get token???", tse);
+		}
+		ErrorManager.syntaxError(
+			ErrorManager.MSG_SYNTAX_ERROR,
+			token,
+			"antlr: "+ex.toString(),
+			ex);
     }
 }
 
