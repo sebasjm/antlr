@@ -42,8 +42,7 @@ public class DebugEventSocketProxy implements DebugEventListener {
 	}
 
 	public void terminate() {
-		out.println("terminate");
-		ack();
+		transmit("terminate");
 		out.close();
 		try {
 			socket.close();

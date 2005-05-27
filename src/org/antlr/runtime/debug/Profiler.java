@@ -72,13 +72,16 @@ public class Profiler implements DebugEventListener {
 		}
 		inDecision=false;
 		if ( parser.isCyclicDecision ) {
+			// cyclic decisions use number of consumes + 1; we track consumes
+			// so add one to the max lookahead.  For example, if it's LL(1)
+			// it will use LA(1) but will not consume.
+			maxLookaheadInDecision++;
 			if ( numCyclicDecisions>=decisionMaxCyclicLookaheads.length ) {
 				int[] bigger = new int[decisionMaxCyclicLookaheads.length*2];
 				System.arraycopy(decisionMaxCyclicLookaheads,0,bigger,0,decisionMaxCyclicLookaheads.length);
 				decisionMaxCyclicLookaheads = bigger;
 			}
 			decisionMaxCyclicLookaheads[numCyclicDecisions-1] = maxLookaheadInDecision;
-			System.out.println("max cyclic lookahead = "+maxLookaheadInDecision);
 		}
 		else {
 			if ( numFixedDecisions>=decisionMaxFixedLookaheads.length ) {
@@ -93,19 +96,22 @@ public class Profiler implements DebugEventListener {
 	}
 
 	public void location(int line, int pos) {;}
-	public void consumeToken(Token token) {;}
+
+	public void consumeToken(Token token) {
+		if ( inDecision && parser.isCyclicDecision ) {
+			maxLookaheadInDecision++;
+		}
+	}
 	public void consumeHiddenToken(Token token) {;}
 
 	public void LT(int i, Token t) {
-		if ( inDecision ) {
-			if ( parser.isCyclicDecision ) {
-				System.out.println("LT in cyclic: "+i+"="+t);
-			}
+		if ( inDecision && !parser.isCyclicDecision ) {
 			if ( i>maxLookaheadInDecision ) {
 				maxLookaheadInDecision = i;
 			}
 		}
 	}
+
 	public void mark(int i) {;}
 	public void rewind(int i) {;}
 	public void recognitionException(RecognitionException e) {;}
@@ -115,7 +121,7 @@ public class Profiler implements DebugEventListener {
 	public void commence() {;}
 
 	public void terminate() {
-		System.out.println("done parsing; data: "+toString());
+		System.out.println(toString());
 		GrammarReport.writeReport(RUNTIME_STATS_FILENAME,toNotifyString());
 	}
 
