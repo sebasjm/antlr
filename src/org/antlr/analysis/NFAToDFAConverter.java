@@ -795,12 +795,12 @@ public class NFAToDFAConverter {
 			Transition edge = p.transition(0);
 			Label edgeLabel = edge.label;
 			if ( edgeLabel.equals(eot) ) {
-				System.out.println("config with EOT: "+c);
+				//System.out.println("config with EOT: "+c);
 				d.setAcceptState(true);
-				System.out.println("d goes from "+d);
+				//System.out.println("d goes from "+d);
 				d.getNFAConfigurations().clear();
 				d.addNFAConfiguration(p,c.alt,c.context,c.semanticContext);
-				System.out.println("to "+d);
+				//System.out.println("to "+d);
 				return; // assume only one EOT transition
 			}
 		}
@@ -1037,6 +1037,7 @@ public class NFAToDFAConverter {
 		}
 
 		if ( !conflictingLexerRules ) {
+			// TODO: with k=x option set, this is called twice for same state
 			dfa.probe.reportNondeterminism(d);
 		}
 
@@ -1146,7 +1147,7 @@ public class NFAToDFAConverter {
 			return false;
 		}
 
-		System.out.println("nondeterministic alts with predicates: "+altToPredMap);
+		//System.out.println("nondeterministic alts with predicates: "+altToPredMap);
 		dfa.probe.reportAltPredicateContext(d, altToPredMap);
 
 		if ( nondeterministicAlts.size()-altToPredMap.size()>1 ) {
@@ -1167,7 +1168,7 @@ public class NFAToDFAConverter {
 			//System.out.println("all predicates "+unionOfPredicatesFromAllAlts);
 			SemanticContext notOtherPreds =
 					SemanticContext.not(unionOfPredicatesFromAllAlts);
-			System.out.println("covering naked alt="+nakedAlt+" with "+notOtherPreds);
+			//System.out.println("covering naked alt="+nakedAlt+" with "+notOtherPreds);
 			altToPredMap.put(new Integer(nakedAlt), notOtherPreds);
 			// set all config with alt=nakedAlt to have NOT of all
 			// predicates on other alts

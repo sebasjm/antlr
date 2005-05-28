@@ -261,6 +261,7 @@ public class NFAFactory {
      *  the SEMPRED token.
      */
     public StateCluster build_SemanticPredicate(AST pred) {
+		nfa.grammar.numberOfSemanticPredicates++;
         NFAState left = newState();
         NFAState right = newState();
         Transition e = new Transition(new Label(pred), right);

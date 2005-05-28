@@ -5,7 +5,7 @@ group Java;
  */
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           debug, trace, profile, predicates) ::=
+           debug, trace, profile, dumpProfile, predicates) ::=
 <<
 <headerAction>
 
@@ -70,7 +70,7 @@ class <name> extends <if(debug)>Debug<endif>Parser {
 <if(profile)>
     public <name>(TokenStream input) {
 	super(input,null);
-	setDebugListener(new Profiler(this));
+	setDebugListener(new Profiler(this,<dumpProfile>));
     }<\n>
 <else>
     public <name>(TokenStream input) {
@@ -80,6 +80,10 @@ class <name> extends <if(debug)>Debug<endif>Parser {
         super(input,dbg);
     }<\n>
 <endif>
+    protected boolean evalPredicate(boolean result, String predicate) {
+        dbg.semanticPredicate(result, predicate);
+	return result;
+    }<\n>
 <else>
     public <name>(TokenStream input) { super(input); }<\n>
 <endif>
@@ -605,13 +609,13 @@ orPredicates(left,right) ::= "(<left>||<right>)"
 
 notPredicate(pred) ::= "!(<pred>)"
 
-singlePredicate(pred) ::= "<pred>"
-
-/** because generation of pred code and reference to it may be different,
- *  have a way to invoke predicates; they could be placed in methods
- *  somewhere, for example.
- */
-invokePredicate(pred) ::= "<pred>"
+singlePredicate(pred) ::= <<
+<if(debug)>
+evalPredicate(<pred>,"<pred>")
+<else>
+<pred>
+<endif>
+>>
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 

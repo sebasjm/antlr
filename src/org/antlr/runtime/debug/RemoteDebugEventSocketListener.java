@@ -249,6 +249,13 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		else if ( elements[0].equals("terminate") ) {
 			listener.terminate();
 		}
+		else if ( elements[0].equals("semanticPredicate") ) {
+			Boolean result = Boolean.valueOf(elements[1]);
+			String predicateText = elements[2];
+			predicateText = unEscapeNewlines(predicateText);
+			listener.semanticPredicate(result.booleanValue(),
+									   predicateText);
+		}
 		else {
 			System.err.println("unknown debug event: "+line);
 		}
@@ -263,10 +270,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		String lineS = elements[offset+3];
 		String posS = elements[offset+4];
 		String text = elements[offset+5];
-		// this unescape is slow but easy to understand
-		text = text.replaceAll("%0A","\n");  // unescape \n
-		text = text.replaceAll("%0D","\r");  // unescape \r
-		text = text.replaceAll("%25","%");   // undo escaped escape chars
+		text = unEscapeNewlines(text);
 		ProxyToken t =
 			new ProxyToken(Integer.parseInt(indexS),
 						   Integer.parseInt(typeS),
@@ -316,6 +320,14 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			e.printStackTrace(System.err);
 		}
 		return elements;
+	}
+
+	protected String unEscapeNewlines(String txt) {
+		// this unescape is slow but easy to understand
+		txt = txt.replaceAll("%0A","\n");  // unescape \n
+		txt = txt.replaceAll("%0D","\r");  // unescape \r
+		txt = txt.replaceAll("%25","%");   // undo escaped escape chars
+		return txt;
 	}
 
 }

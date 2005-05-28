@@ -14,7 +14,7 @@ public class GrammarReport {
 	public static final String Version = "1";
 	public static final String GRAMMAR_STATS_FILENAME = "grammar.stats";
 	public static final String ANTLRWORKS_DIR = "antlrworks";
-	public static final int NUM_GRAMMAR_STATS = 24;
+	public static final int NUM_GRAMMAR_STATS = 29;
 
 	public Grammar grammar;
 
@@ -100,6 +100,16 @@ public class GrammarReport {
 		buf.append(grammar.getTokenTypes().size());
 		buf.append('\t');
 		buf.append(grammar.DFACreationWallClockTimeInMS);
+		buf.append('\t');
+		buf.append(grammar.numberOfSemanticPredicates);
+		buf.append('\t');
+		buf.append(grammar.numberOfManualLookaheadOptions);
+		buf.append('\t');
+		buf.append(grammar.setOfNondeterministicDecisionNumbers.size());
+		buf.append('\t');
+		buf.append(grammar.setOfNondeterministicDecisionNumbersResolvedWithPredicates.size());
+		buf.append('\t');
+		buf.append(grammar.numberOfDFAConversionsTerminatedEarly);
 		return buf.toString();
 	}
 
@@ -189,6 +199,21 @@ public class GrammarReport {
 		buf.append("DFA creation time in ms: ");
 		buf.append(fields[23]);
 		buf.append('\n');
+		buf.append("Number of semantic predicates: ");
+		buf.append(fields[24]);
+		buf.append('\n');
+		buf.append("Number of manual fixed lookahead k=value options: ");
+		buf.append(fields[25]);
+		buf.append('\n');
+		buf.append("Number of nondeterministic decisions: ");
+		buf.append(fields[26]);
+		buf.append('\n');
+		buf.append("Number of nondeterministic decisions resolved with predicates: ");
+		buf.append(fields[27]);
+		buf.append('\n');
+		buf.append("Number of DFA conversions terminated early: ");
+		buf.append(fields[28]);
+		buf.append('\n');
 		return buf.toString();
 	}
 
@@ -260,7 +285,7 @@ public class GrammarReport {
 	 */
 	public static double stddev(int[] X) {
 		int m = X.length;
-		if ( m==0 ) {
+		if ( m<=1 ) {
 			return 0;
 		}
 		double xbar = avg(X);

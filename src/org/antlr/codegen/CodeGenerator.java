@@ -122,6 +122,7 @@ public class CodeGenerator {
 	protected boolean debug;
 	protected boolean trace;
 	protected boolean profile;
+	protected boolean dumpProfile;
 
 	/** I have factored out the generation of acyclic DFAs to separate class */
 	protected ACyclicDFACodeGenerator acyclicDFAGenerator =
@@ -245,6 +246,7 @@ public class CodeGenerator {
 			outputFileST.setAttribute("debug", new Boolean(debug));
 			outputFileST.setAttribute("trace", new Boolean(trace));
 			outputFileST.setAttribute("profile", new Boolean(profile));
+			outputFileST.setAttribute("dumpProfile", new Boolean(dumpProfile));
 		}
 		else {
 			recognizerST = templates.getInstanceOf("treeParser");
@@ -644,6 +646,13 @@ public class CodeGenerator {
 	public void setProfile(boolean profile) {
 		this.profile = profile;
 		setDebug(true); // requires debug events
+	}
+
+	/** During early-access release, this distinguishes between
+	 *  forced profiling and -profile option
+	 */
+	public void setDumpProfile(boolean dumpProfile) {
+		this.dumpProfile = dumpProfile;
 	}
 
 	public String getRecognizerFileName() {

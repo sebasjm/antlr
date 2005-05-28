@@ -157,6 +157,7 @@ public class CyclicDFACodeGenerator {
 				edgeST = templates.getInstanceOf("cyclicDFAEdge");
 				StringTemplate exprST =
 					parent.genLabelExpr(templates,edge.label,1);
+				/*
 				// If this is a predicate edge and the code gen templates have
 				// a template called singlePredicateMethod, it indicates
 				// they want to build a method for predicates
@@ -176,6 +177,7 @@ public class CyclicDFACodeGenerator {
 					exprST = templates.getInstanceOf("invokePredicate");
 					exprST.setAttribute("pred", predEvalST);
 				}
+				*/
 				edgeST.setAttribute("labelExpr", exprST);
 			}
 			edgeST.setAttribute("edgeNumber", new Integer(i+1));

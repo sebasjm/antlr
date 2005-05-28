@@ -216,8 +216,15 @@ public class Tool {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);
 			grammar.setCodeGenerator(generator);
 			generator.setDebug(debug);
+			// for this release, everybody does profile unless
+			// debugging
+			if ( !debug ) {
+				generator.setProfile(true);
+			}
+			if ( profile ) {
+				generator.setDumpProfile(true);
+			}
 			generator.setTrace(trace);
-			generator.setProfile(profile);
 
 			if ( grammar.type==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();
@@ -270,11 +277,13 @@ public class Tool {
 
 	private static void help() {
         System.err.println("usage: java org.antlr.Tool [args] file.g");
-		System.err.println("  -o outputDir       specify output directory where all output is generated");
-		System.err.println("  -debug             generate a parser that emits debugging events");
-		System.err.println("  -report            print out a report about the grammar(s) processed");
-		System.err.println("  -profile           generate a parser that computes profiling information");
-        System.err.println("  -lib dir           specify location of token files");
+		System.err.println("  -o outputDir   specify output directory where all output is generated");
+		System.err.println("  -lib dir       specify location of token files");
+		System.err.println("  -report        print out a report about the grammar(s) processed");
+		System.err.println("  -debug         generate a parser that emits debugging events");
+		System.err.println("  -profile       enerate a parser that computes profiling information");
+		System.err.println("  -nfa           generate an NFA for each rule");
+		System.err.println("  -dfa           generate a DFA for each decision point");
     }
 
 	public void setOutputDirectory(String outputDirectory) {

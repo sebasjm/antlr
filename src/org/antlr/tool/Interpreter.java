@@ -52,6 +52,7 @@ public class Interpreter implements TokenSource {
 		public void recognitionException(RecognitionException e) {}
 		public void beginResync() {}
 		public void endResync() {}
+		public void semanticPredicate(boolean result, String predicate) {}
 		public void commence() {}
 		public void terminate() {}
 	}
@@ -101,6 +102,7 @@ public class Interpreter implements TokenSource {
 		}
 		public void beginResync() {}
 		public void endResync() {}
+		public void semanticPredicate(boolean result, String predicate) {}
 		public void commence() {}
 		public void terminate() {}
 	}

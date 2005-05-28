@@ -149,6 +149,9 @@ public interface DebugEventListener {
 	 */
 	public void endResync();
 
+	/** A semantic predicate was evaluate with this result and action text */
+	public void semanticPredicate(boolean result, String predicate);
+
 	/** Announce that parsing has begun.  Not technically useful except for
 	 *  sending events over a socket.  A GUI for example will launch a thread
 	 *  to connect and communicate with a remote parser.  The thread will want

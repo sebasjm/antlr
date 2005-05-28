@@ -40,6 +40,7 @@ public class Tracer implements DebugEventListener {
 	public void recognitionException(RecognitionException e) {}
 	public void beginResync() {}
 	public void endResync() {}
+	public void semanticPredicate(boolean result, String predicate) {}
 	public void commence() {}
 	public void terminate() {}
 

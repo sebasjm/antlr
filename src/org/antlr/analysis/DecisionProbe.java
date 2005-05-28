@@ -376,11 +376,15 @@ public class DecisionProbe {
 
 	public void reportEarlyTermination() {
 		terminated = true;
+		dfa.nfa.grammar.numberOfDFAConversionsTerminatedEarly++;
 	}
 
 	public void reportNondeterminism(DFAState d) {
 		altsWithProblem.addAll(d.getNondeterministicAlts()); // track overall list
 		statesWithSyntacticallyAmbiguousAltsSet.add(d);
+		dfa.nfa.grammar.setOfNondeterministicDecisionNumbers.add(
+			new Integer(dfa.getDecisionNumber())
+		);
 	}
 
 	public void reportLexerRuleNondeterminism(DFAState d, Set nondeterministicAlts) {
@@ -390,6 +394,10 @@ public class DecisionProbe {
 	public void reportNondeterminismResolvedWithSemanticPredicate(DFAState d)
 	{
 		statesResolvedWithSemanticPredicatesSet.add(d);
+		System.out.println("resolved with pred: "+d);
+		dfa.nfa.grammar.setOfNondeterministicDecisionNumbersResolvedWithPredicates.add(
+			new Integer(dfa.getDecisionNumber())
+		);
 	}
 
 	/** Report the list of predicates found for each alternative; copy

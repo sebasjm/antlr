@@ -228,7 +228,12 @@ Map opts=null;
            #( INITACTION (ACTION)? )
            {this.blockLevel=0;}
            b:block EOR
-           {#b.setOptions(opts);}
+           {
+           #b.setOptions(opts);
+           if ( opts!=null && opts.get("k")!=null ) {
+               grammar.numberOfManualLookaheadOptions++;
+           }
+           }
          )
     ;
 
@@ -274,7 +279,14 @@ this.blockLevel++;
 if ( this.blockLevel==1 ) {this.outerAltNum=1;}
 }
     :   #(  BLOCK
-            (opts=optionsSpec {#block.setOptions(opts);})?
+            (opts=optionsSpec
+             {
+             #block.setOptions(opts);
+             if ( opts.get("k")!=null ) {
+                 grammar.numberOfManualLookaheadOptions++;
+             }
+             }
+            )?
             (alternative {if ( this.blockLevel==1 ) {this.outerAltNum++;}})+
             EOB
          )

@@ -237,6 +237,12 @@ public class Grammar {
 	 */
 	public long DFACreationWallClockTimeInMS;
 
+	public int numberOfSemanticPredicates = 0;
+	public int numberOfManualLookaheadOptions = 0;
+	public Set setOfNondeterministicDecisionNumbers = new HashSet();
+	public Set setOfNondeterministicDecisionNumbersResolvedWithPredicates = new HashSet();
+	public int numberOfDFAConversionsTerminatedEarly = 0;
+
 	public Grammar() {
 		initTokenSymbolTables();
 	}

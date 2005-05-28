@@ -145,6 +145,16 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		transmit("endResync");
 	}
 
+	public void semanticPredicate(boolean result, String predicate) {
+		predicate = escapeNewlines(predicate);
+		StringBuffer buf = new StringBuffer(50);
+		buf.append("semanticPredicate ");
+		buf.append(result);
+		buf.append(" ");
+		buf.append(predicate);
+		transmit(buf.toString());
+	}
+
 	protected String serializeToken(Token t) {
 		StringBuffer buf = new StringBuffer(50);
 		buf.append(t.getTokenIndex()); buf.append(' ');
@@ -158,12 +168,16 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		}
 		// escape \n and \r all text for token appears to exist on one line
 		// this escape is slow but easy to understand
-		txt = txt.replaceAll("%","%25");   // escape all escape char ;)
-		txt = txt.replaceAll("\n","%0A");  // escape \n
-		txt = txt.replaceAll("\r","%0D");  // escape \r
+		txt = escapeNewlines(txt);
 		buf.append(txt);
 		return buf.toString();
 	}
 
+	protected String escapeNewlines(String txt) {
+		txt = txt.replaceAll("%","%25");   // escape all escape char ;)
+		txt = txt.replaceAll("\n","%0A");  // escape \n
+		txt = txt.replaceAll("\r","%0D");  // escape \r
+		return txt;
+	}
 }
 

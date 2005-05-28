@@ -27,9 +27,6 @@
 */
 package org.antlr.runtime;
 
-import org.antlr.runtime.debug.DebugEventListener;
-import org.antlr.runtime.debug.Profiler;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;

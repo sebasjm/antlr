@@ -17,11 +17,12 @@ public class Profiler implements DebugEventListener {
 	 */
 	public static final String Version = "1";
 	public static final String RUNTIME_STATS_FILENAME = "runtime.stats";
-	public static final int NUM_RUNTIME_STATS = 16;
+	public static final int NUM_RUNTIME_STATS = 18;
 
 	//public IntStream input;
 
 	public DebugParser parser = null;
+	public boolean dumpProfile = false;
 
 	// working variables
 
@@ -33,6 +34,7 @@ public class Profiler implements DebugEventListener {
 	// stats variables
 
 	public int numRuleInvocations = 0;
+	public int maxRuleInvocationDepth = 0;
 	public int numFixedDecisions = 0;
 	public int numCyclicDecisions = 0;
 	public int[] decisionMaxFixedLookaheads = new int[200];
@@ -40,14 +42,19 @@ public class Profiler implements DebugEventListener {
 	public int numHiddenTokens = 0;
 	public int numCharsMatched = 0;
 	public int numHiddenCharsMatched = 0;
+	public int numSemanticPredicates = 0;
 
-	public Profiler(DebugParser parser) {
+	public Profiler(DebugParser parser, boolean dumpProfile) {
 		this.parser = parser;
+		this.dumpProfile = dumpProfile;
 	}
 
 	public void enterRule(String ruleName) {
 		level++;
 		numRuleInvocations++;
+		if ( level>maxRuleInvocationDepth ) {
+			maxRuleInvocationDepth = level;
+		}
 	}
 
 	public void exitRule(String ruleName) {
@@ -102,23 +109,10 @@ public class Profiler implements DebugEventListener {
 				maxLookaheadInDecision++;
 			}
 		}
-		/*
-		else {
-			numCharsMatched += token.getText().length();
-		}
-		*/
 		lastTokenConsumed = (CommonToken)token;
 	}
 
 	public void consumeHiddenToken(Token token) {
-		/*
-		if ( !inDecision ) {
-			//numHiddenTokens++;
-			int n = token.getText().length();
-			numCharsMatched += n;
-			numHiddenCharsMatched += n;
-		}
-		*/
 		lastTokenConsumed = (CommonToken)token;
 	}
 
@@ -136,10 +130,16 @@ public class Profiler implements DebugEventListener {
 	public void beginResync() {;}
 	public void endResync() {;}
 
+	public void semanticPredicate(boolean result, String predicate) {
+		numSemanticPredicates++;
+	}
+
 	public void commence() {;}
 
 	public void terminate() {
-		System.out.println(toString());
+		if ( dumpProfile ) {
+			System.out.println(toString());
+		}
 		GrammarReport.writeReport(RUNTIME_STATS_FILENAME,toNotifyString());
 	}
 
@@ -154,7 +154,6 @@ public class Profiler implements DebugEventListener {
 				numHiddenCharsMatched += t.getText().length();
 			}
 		}
-		System.out.println("last token "+lastTokenConsumed);
 		numCharsMatched = lastTokenConsumed.getStopIndex() + 1;
 		decisionMaxFixedLookaheads = trim(decisionMaxFixedLookaheads, numFixedDecisions);
 		decisionMaxCyclicLookaheads = trim(decisionMaxCyclicLookaheads, numCyclicDecisions);
@@ -190,6 +189,10 @@ public class Profiler implements DebugEventListener {
 		buf.append(numCharsMatched);
 		buf.append('\t');
 		buf.append(numHiddenCharsMatched);
+		buf.append('\t');
+		buf.append(maxRuleInvocationDepth);
+		buf.append('\t');
+		buf.append(numSemanticPredicates);
 		return buf.toString();
 	}
 
@@ -264,6 +267,12 @@ public class Profiler implements DebugEventListener {
 		buf.append('\n');
 		buf.append("number of hidden char ");
 		buf.append(fields[15]);
+		buf.append('\n');
+		buf.append("max rule invocation nesting depth ");
+		buf.append(fields[16]);
+		buf.append('\n');
+		buf.append("number of evaluated semantic predicates ");
+		buf.append(fields[17]);
 		buf.append('\n');
 		return buf.toString();
 	}
