@@ -370,12 +370,14 @@ public class Parser {
 										   org.antlr.runtime.BitSet follow)
 		throws MismatchedTokenException
 	{
-		System.out.println("recoverFromMismatchedToken");
+		//System.out.println("recoverFromMismatchedToken");
 		// if next token is what we are looking for then "delete" this token
 		if ( input.LA(2)==ttype ) {
 			reportError(e);
+			/*
 			System.err.println("recoverFromMismatchedToken deleting "+input.LT(1)+
 							   " since "+input.LT(2)+" is what we want");
+			*/
 			beginResync();
 			input.consume(); // simply delete extra token
 			endResync();
@@ -405,7 +407,7 @@ public class Parser {
 	protected boolean recoverFromMismatchedElement(RecognitionException e,
 												   org.antlr.runtime.BitSet follow)
 	{
-		System.out.println("recoverFromMismatchedElement");
+		//System.out.println("recoverFromMismatchedElement");
 		// compute what can follow this grammar element reference
 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
 			BitSet viableTokensFollowingThisRule =
@@ -417,11 +419,11 @@ public class Parser {
 		// then it is ok to "insert" the missing token, else throw exception
 		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
 		if ( follow.member(input.LA(1)) ) {
-			System.out.println("LT(1)=="+input.LT(1)+" is consistent with what follows; inserting...");
+			//System.out.println("LT(1)=="+input.LT(1)+" is consistent with what follows; inserting...");
 			reportError(e);
 			return true;
 		}
-		System.err.println("nothing to do; throw exception");
+		//System.err.println("nothing to do; throw exception");
 		return false;
 	}
 
@@ -435,7 +437,7 @@ public class Parser {
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(BitSet set) {
-		System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
+		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
 		/*
 		System.out.println("LT(1)="+
 						   input.LT(1).toString(input.getTokenSource().getCharStream()));
