@@ -109,14 +109,23 @@ public class Parser {
 		}
 		errorRecovery = true;
 
-		String parserClassName = getClass().getName();
-		System.err.print(getRuleInvocationStack(e, parserClassName)+
+		displayRecognitionError(this.getClass().getName(),
+								this.getTokenNames(),
+								e);
+	}
+
+	public static void displayRecognitionError(String name,
+											   Object[] tokenNames,
+											   RecognitionException e)
+	{
+		System.err.print(getRuleInvocationStack(e, name)+
 						 ": line "+e.line+":"+e.charPositionInLine+" ");
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			System.err.println("mismatched token: "+
 							   e.token+
-							   "; expecting type "+getTokenNames()[mte.expecting]);
+							   "; expecting type "+
+							   tokenNames[mte.expecting]);
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;

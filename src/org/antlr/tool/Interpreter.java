@@ -150,7 +150,7 @@ public class Interpreter implements TokenSource {
 		int charPos = ((CharStream)input).getCharPositionInLine();
 		CommonToken token = null;
 		loop:
-		while (true) {
+		while (input.LA(1)!=CharStream.EOF) {
 			try {
 				token = scan(Grammar.TOKEN_RULENAME);
 				break;
@@ -285,6 +285,7 @@ public class Interpreter implements TokenSource {
 					if ( actions!=null ) {
 						actions.recognitionException(nvae);
 					}
+					input.consume(); // recover
 					throw nvae;
 				}
 				input.rewind(m);
@@ -358,6 +359,7 @@ public class Interpreter implements TokenSource {
 					if ( actions!=null ) {
 						actions.recognitionException(mte);
 					}
+					input.consume(); // recover
 					throw mte;
 				}
 				else if ( label.isSet() ) {
@@ -366,6 +368,7 @@ public class Interpreter implements TokenSource {
 					if ( actions!=null ) {
 						actions.recognitionException(mse);
 					}
+					input.consume(); // recover
 					throw mse;
 				}
 				else {
@@ -430,25 +433,12 @@ public class Interpreter implements TokenSource {
 		return s.getUniquelyPredictedAlt();
 	}
 
-	/** Exec an action limited to assignments like ( ${ ( = channel 99 ; ) ) */
-	/*
-	public void executeLexerAction(Token token, GrammarAST code) {
-		System.out.println("action "+code.toStringTree());
-		ActionInterpreter interp = new ActionInterpreter();
-		try {
-			interp.lexer_action(code,token);
-		}
-		catch (RecognitionException re) {
-			ErrorManager.error(ErrorManager.MSG_BAD_ACTION_AST_STRUCTURE,
-							   code,
-							   re);
-		}
-	}
-	*/
-
 	public void reportScanError(RecognitionException re) {
 		CharStream cs = (CharStream)input;
 		// don't report to ANTLR tool itself; make people override to redirect
+		Parser.displayRecognitionError(grammar.name,
+									   grammar.getTokenNames().toArray(),
+									   re);
 		System.err.println("problem matching token at "+
 						   cs.getLine()+":"+cs.getCharPositionInLine());
 	}

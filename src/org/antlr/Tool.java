@@ -42,7 +42,7 @@ public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-    public static final String Version = "3.0 early-access-1";
+    public static final String VERSION = "3.0ea1";
 
     // Input parameters / option
 
@@ -57,8 +57,8 @@ public class Tool {
 	protected boolean report = false;
 
     public static void main(String[] args) {
-        ErrorManager.info("ANTLR Parser Generator   Version " +
-                Version + "   1989-2005");
+        ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
+                VERSION + "   1989-2005");
         try {
             Tool antlr = new Tool();
             antlr.processArgs(args);
