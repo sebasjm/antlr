@@ -253,6 +253,12 @@ public class Grammar {
 		this(null, "<string>",new StringReader(grammarString));
 	}
 
+	public Grammar(String fileName, String grammarString)
+			throws antlr.RecognitionException, antlr.TokenStreamException
+	{
+		this(null, fileName, new StringReader(grammarString));
+	}
+
     /** Create a grammar from a Reader.  Parse the grammar, building a tree
      *  and loading a symbol table of sorts here in Grammar.  Then create
      *  an NFA and associated factory.  Walk the AST representing the grammar,

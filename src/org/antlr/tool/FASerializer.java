@@ -101,6 +101,10 @@ public class FASerializer {
      *  identical state machines will serialize the same way.
      */
     protected void walkFANormalizingStateNumbers(State s) {
+		if ( s==null ) {
+			ErrorManager.internalError("null state s");
+			return;
+		}
         if ( stateNumberTranslator.get(s)!=null ) {
             return; // already did this state
         }

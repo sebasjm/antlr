@@ -636,7 +636,6 @@ public class NFAFactory {
      *  sets. :)
      *
      *  Currently, you cannot have actions in the block.
-     */
     public IntSet getBlockAsSet(List alts) {
         System.out.println("getBlockAsSet "+alts);
         // empty subrule?
@@ -666,7 +665,8 @@ public class NFAFactory {
         }
         return set;
     }
-
+	 */
+ 
     /** Given a collapsed block of alts (a set of atoms), pull out
      *  the set and return it.
      */

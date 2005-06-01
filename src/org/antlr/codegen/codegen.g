@@ -283,7 +283,13 @@ element returns [StringTemplate code=null]
     |   #(  n:NOT
             (  c:CHAR_LITERAL
 	           {
-	           int ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
+	            int ttype=0;
+     			if ( grammar.type==Grammar.LEXER ) {
+        			ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
+     			}
+     			else {
+        			ttype = grammar.getTokenType(c.getText());
+        		}
 	           elements = grammar.complement(ttype);
 	           }
             |  t:TOKEN_REF

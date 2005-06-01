@@ -152,6 +152,10 @@ RULE_HAS_NO_ARGS(file,line,col,arg) ::=
 	"<loc()>rule <arg> has no defined parameters"
 ARGS_ON_TOKEN_REF(file,line,col,arg) ::=
 	"<loc()>token reference <arg> may not have parameters"
+/*
+NONCHAR_RANGE(file,line,col) ::=
+	"<loc()>range operator can only be used in the lexer"
+*/
 
 // GRAMMAR WARNINGS
 

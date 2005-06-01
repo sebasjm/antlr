@@ -248,8 +248,14 @@ element returns [StateCluster g=null]
     |   #(  n:NOT
             (  c:CHAR_LITERAL
 	           {
-	           int ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
-	           g=factory.build_Set(grammar.complement(ttype));
+	            int ttype=0;
+     			if ( grammar.type==Grammar.LEXER ) {
+        			ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
+     			}
+     			else {
+        			ttype = grammar.getTokenType(c.getText());
+        		}
+	            g=factory.build_Set(grammar.complement(ttype));
 	           }
             |  t:TOKEN_REF
 	           {
@@ -270,7 +276,11 @@ element returns [StateCluster g=null]
         {g = factory.build_Range(grammar.getTokenType(#a.getText()),
                                  grammar.getTokenType(#b.getText()));}
     |   #(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
-        {g = factory.build_CharRange(#c1.getText(), #c2.getText());}
+        {
+        if ( grammar.type==Grammar.LEXER ) {
+        	g = factory.build_CharRange(#c1.getText(), #c2.getText());
+        }
+        }
     |	#(ASSIGN ID g=atom)
     |	#(PLUS_ASSIGN ID g=atom)
     |   g=ebnf
@@ -428,7 +438,12 @@ setElement[IntSet elements]
 }
     :   c:CHAR_LITERAL
         {
-        ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
+     	if ( grammar.type==Grammar.LEXER ) {
+        	ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
+     	}
+     	else {
+        	ttype = grammar.getTokenType(c.getText());
+        }
         if ( elements.member(ttype) ) {
 			ErrorManager.grammarError(ErrorManager.MSG_DUPLICATE_SET_ENTRY,
 									  grammar,
@@ -461,8 +476,10 @@ setElement[IntSet elements]
         }
     |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
     	{
-        int a = Grammar.getCharValueFromANTLRGrammarLiteral(c1.getText());
-        int b = Grammar.getCharValueFromANTLRGrammarLiteral(c2.getText());
-    	elements.addAll(IntervalSet.of(a,b));
+     	if ( grammar.type==Grammar.LEXER ) {
+	        int a = Grammar.getCharValueFromANTLRGrammarLiteral(c1.getText());
+    	    int b = Grammar.getCharValueFromANTLRGrammarLiteral(c2.getText());
+    		elements.addAll(IntervalSet.of(a,b));
+     	}
     	}
     ;
