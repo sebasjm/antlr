@@ -80,6 +80,8 @@ public class CodeGenerator {
 	public static int escapedCharValue[] = new int[255];
 	public static String charValueEscape[] = new String[255];
 
+	public static HashMap javaTypeInitMap = new HashMap();
+
 	static {
 		escapedCharValue['n'] = '\n';
 		escapedCharValue['r'] = '\r';
@@ -95,6 +97,16 @@ public class CodeGenerator {
 		charValueEscape['\f'] = "\\f";
 		charValueEscape['\\'] = "\\\\";
 		charValueEscape['\''] = "\\'";
+
+		// TODO: move to template somehow
+		javaTypeInitMap.put("int", "0");
+		javaTypeInitMap.put("long", "0");
+		javaTypeInitMap.put("float", "0.0");
+		javaTypeInitMap.put("double", "0.0");
+		javaTypeInitMap.put("boolean", "false");
+		javaTypeInitMap.put("byte", "0");
+		javaTypeInitMap.put("short", "0");
+		javaTypeInitMap.put("char", "0");
 	}
 
 	/** Which grammar are we generating code for?  Each generator
@@ -221,6 +233,8 @@ public class CodeGenerator {
 
 		// OUTPUT FILE (contains recognizerST)
 		outputFileST = templates.getInstanceOf("outputFile");
+		// TODO: LANGUAGE DEPENDENCY!!!! fix!
+		outputFileST.setAttribute("javaTypeInitMap", javaTypeInitMap);
 
 		// HEADER FILE
 		if ( templates.isDefined("headerFile") ) {

@@ -42,7 +42,7 @@ public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-    public static final String VERSION = "3.0ea1";
+    public static final String VERSION = "3.0ea1 (June 1, 2005)";
 
     // Input parameters / option
 
@@ -276,7 +276,7 @@ public class Tool {
 	}
 
 	private static void help() {
-        System.err.println("usage: java org.antlr.Tool [args] file.g");
+        System.err.println("usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]");
 		System.err.println("  -o outputDir   specify output directory where all output is generated");
 		System.err.println("  -lib dir       specify location of token files");
 		System.err.println("  -report        print out a report about the grammar(s) processed");

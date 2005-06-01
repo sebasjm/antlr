@@ -167,12 +167,35 @@ public class Rule {
 	/** If a rule has no user-defined return values and nobody references
 	 *  it's start/stop (predefined attributes), then there is no need to
 	 *  define a struct; otherwise for now we assume a struct.
-	 *  TODO: if only one user-defined type and no one references predefined attrs don't generate struct
 	 */
 	public boolean getHasMultipleReturnValues() {
 		return
 			needPredefinedRuleAttributes ||
+			(returnScope!=null && returnScope.attributes.size()>1);
+	}
+
+	public boolean getHasReturnValue() {
+		return
+			needPredefinedRuleAttributes ||
 			(returnScope!=null && returnScope.attributes.size()>0);
+	}
+
+	public String getSingleValueReturnType() {
+		if ( returnScope!=null && returnScope.attributes.size()==1 ) {
+			Collection retvalAttrs = returnScope.attributes.values();
+			Object[] javaSucks = retvalAttrs.toArray();
+			return ((Attribute)javaSucks[0]).type;
+		}
+		return null;
+	}
+
+	public String getSingleValueReturnName() {
+		if ( returnScope!=null && returnScope.attributes.size()==1 ) {
+			Collection retvalAttrs = returnScope.attributes.values();
+			Object[] javaSucks = retvalAttrs.toArray();
+			return ((Attribute)javaSucks[0]).name;
+		}
+		return null;
 	}
 
 	public String toString() { // used for testing

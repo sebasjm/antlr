@@ -61,8 +61,4 @@ public class RuleLabelScope extends AttributeScope {
 		}
 		return null;
 	}
-
-	public String getAttributeReferenceTemplateName(String scope, String attribute) {
-		return "ruleLabelRef";
-	}
 }

@@ -31,19 +31,81 @@ package org.antlr.tool;
  *  scope blocks etc...
  */
 public class Attribute {
-	/** The entire declaration such as "String foo;" minus "static" */
+	/** The entire declaration such as "String foo;" */
 	public String decl;
+
+	/** The type; might be empty such as for Python which has no static typing */
+	public String type;
 
 	/** The name of the attribute "foo" */
 	public String name;
+
+	public Attribute(String decl) {
+		extractAttribute(decl);
+	}
 
 	public Attribute(String name, String decl) {
 		this.name = name;
 		this.decl = decl;
 	}
 
+	/** For decls like "String foo" or "char *foo32[3]" compute the ID
+	 *  and type declarations; return an Attribute object.
+	 */
+	protected void extractAttribute(String decl) {
+		if ( decl==null ) {
+			return;
+		}
+		boolean inID = false;
+		int start = -1;
+		// walk backwards looking for start of an ID
+		for (int i=decl.length()-1; i>=0; i--) {
+			// if we haven't found the end yet, keep going
+			if ( !inID && Character.isLetter(decl.charAt(i)) ) {
+			    inID = true;
+			}
+			else if ( inID && !Character.isLetter(decl.charAt(i)) ) {
+				start = i+1;
+				break;
+			}
+		}
+		if ( start<0 && inID ) {
+			start = 0;
+		}
+		if ( start<0 ) {
+			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL,decl);
+		}
+		// walk forwards looking for end of an ID
+		int stop=-1;
+		for (int i=start; i<decl.length(); i++) {
+			// if we haven't found the end yet, keep going
+			if ( !Character.isLetterOrDigit(decl.charAt(i)) ) {
+				stop = i;
+				break;
+			}
+			if ( i==decl.length()-1 ) {
+				stop = i+1;
+			}
+		}
+
+		// the name is the last ID
+		this.name = decl.substring(start,stop);
+
+		// the type is the decl minus the ID (could be empty)
+		this.type = decl.substring(0,start);
+		if ( stop<decl.length() ) {
+			this.type += decl.substring(stop,decl.length());
+		}
+		this.type = type.trim();
+		if ( this.type.length()==0 ) {
+			this.type = null;
+		}
+
+		this.decl = decl;
+	}
+
 	public String toString() {
-		return name;
+		return type+" "+name;
 	}
 }
 

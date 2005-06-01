@@ -87,7 +87,7 @@ public class AttributeScope {
 	 *  that terminates a definition such as ',' or ';'.  For example,
 	 *
 	 *  scope symbols {
-	 *  	static int n;
+	 *  	int n;
 	 *  	List names;
 	 *  }
 	 *
@@ -102,7 +102,7 @@ public class AttributeScope {
 			if ( decl.length()==0 ) {
 				break; // final bit of whitespace; ignore
 			}
-			Attribute attr = new Attribute(lastIDInDecl(decl), decl);
+			Attribute attr = new Attribute(decl);
 			attributes.put(attr.name, attr);
 		}
 	}
@@ -113,10 +113,6 @@ public class AttributeScope {
 
 	public Attribute getAttribute(String name) {
 		return (Attribute)attributes.get(name);
-	}
-
-	public String getAttributeReferenceTemplateName(String scope, String attribute) {
-		return "ruleLabelRef";
 	}
 
 	/** Used by templates to get all attributes */
@@ -151,51 +147,7 @@ public class AttributeScope {
 		return attributes==null?0:attributes.size();
 	}
 
-	/** For decls like "String foo" or "char *foo32[3]" return the last valid
-	 *  ID (attribute name) in the decl.
-	 */
-	protected String lastIDInDecl(String decl) {
-		//System.out.println("decl is "+decl);
-		if ( decl==null ) {
-			return "unknown";
-		}
-		boolean inID = false;
-		int start = -1;
-		// walk backwards looking for start of an ID
-		for (int i=decl.length()-1; i>=0; i--) {
-			// if we haven't found the end yet, keep going
-			if ( !inID && Character.isLetter(decl.charAt(i)) ) {
-			    inID = true;
-			}
-			else if ( inID && !Character.isLetter(decl.charAt(i)) ) {
-				start = i+1;
-				break;
-			}
-		}
-		if ( start<0 ) {
-			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_ATTRIBUTE_NAME_IN_DECL,decl);
-		}
-		// walk forwards looking for end of an ID
-		int stop=-1;
-		for (int i=start; i<decl.length(); i++) {
-			// if we haven't found the end yet, keep going
-			if ( !Character.isLetterOrDigit(decl.charAt(i)) ) {
-				stop = i;
-				break;
-			}
-			if ( i==decl.length()-1 ) {
-				stop = i+1;
-			}
-		}
-		return decl.substring(start,stop);
-	}
-
 	public String toString() {
 		return (isDynamicGlobalScope?"global ":"")+getName()+":"+attributes;
-	}
-
-	public static void main(String[] args) {
-		String s = new AttributeScope("test").lastIDInDecl(args[0]);
-		System.out.println("name is "+s);
 	}
 }

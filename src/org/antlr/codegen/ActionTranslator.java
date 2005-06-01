@@ -132,9 +132,7 @@ public class ActionTranslator {
 		if ( r.getRuleLabel(scopeName)!=null ) {
 			// $ruleLabel
 			Grammar.LabelElementPair ruleLabel = r.getRuleLabel(scopeName);
-			String referencedRuleName = ruleLabel.elementRef.getText();
-			Rule referencedRule = grammar.getRule(referencedRuleName);
-			return new RuleLabelScope(referencedRule);
+			return new RuleLabelScope(ruleLabel.referencedRule);
 		}
 		return null;
 	}
@@ -150,6 +148,7 @@ public class ActionTranslator {
 																 String scopeName,
 																 String attribute)
 	{
+		RuleLabelScope rlScope=null;
 		String stName = null;
 		if ( grammar.getGlobalScope(scopeName)!=null ) {
 			// $scopename
@@ -168,9 +167,9 @@ public class ActionTranslator {
 		}
 		else if ( r.getRuleLabel(scopeName)!=null ) {
 			// $ruleLabel
+			rlScope = (RuleLabelScope)scope;
 			if( RuleLabelScope.predefinedRuleProperties.contains(attribute) ) {
 				stName = "ruleLabelPropertyRef_"+attribute;
-				RuleLabelScope rlScope = (RuleLabelScope)scope;
 				grammar.referenceRuleLabelPredefinedAttribute(rlScope.referencedRule.name);
 			}
 			else {
@@ -182,7 +181,10 @@ public class ActionTranslator {
 		}
 		StringTemplate refST = generator.templates.getInstanceOf(stName);
 		refST.setAttribute("scope", scopeName);
-		refST.setAttribute("attr", attribute);
+		refST.setAttribute("attr", scope.getAttribute(attribute));
+		if ( stName.equals("ruleLabelRef") ) {
+			refST.setAttribute("referencedRule", rlScope.referencedRule);
+		}
 		return refST;
 	}
 
@@ -387,6 +389,7 @@ public class ActionTranslator {
 			}
 			else if ( scope.isReturnScope ) {
 				refST = generator.templates.getInstanceOf("returnAttributeRef");
+				refST.setAttribute("ruleDescriptor", r);
 			}
 			else if ( scope.isDynamicRuleScope ) {
 				refST = generator.templates.getInstanceOf("ruleScopeAttributeRef");

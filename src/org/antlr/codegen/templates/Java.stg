@@ -27,12 +27,14 @@
 */
 group Java;
 
+//crap; I need this: returnTypeMap ::= {"int":"0", "float":"0.0"}
+
 /** The overall file structure of a recognizer; stores methods for rules
  *  and cyclic DFAs plus support code.
  */
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           debug, trace, profile, dumpProfile, predicates) ::=
+           debug, trace, profile, dumpProfile, predicates, javaTypeInitMap) ::=
 <<
 <headerAction>
 
@@ -143,9 +145,12 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     <returnType()> retval = new <returnType()>();
     retval.start = input.LT(1);<\n>
 <endif>
+<if(ruleDescriptor.singleValueReturnType)>
+<returnType()> <ruleDescriptor.singleValueReturnName>;
+<endif>
     <ruleDescriptor.tokenLabels:{Token <it.label.text>=null;}; separator="\n">
     <ruleDescriptor.listLabels:{List <it.label.text>=null;}; separator="\n">
-    <ruleDescriptor.ruleLabels:{<ruleLabelType(name=it.elementRef.text)> <it.label.text>=null;}; separator="\n">
+    <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
     <initAction>
 <if(debug)>
     try { dbg.enterRule("<ruleName>");
@@ -176,8 +181,12 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
         if ( ruleLevel==0 ) {dbg.terminate();}
     }<\n>
 <endif>
-<if(ruleDescriptor.hasMultipleReturnValues)>
+<if(ruleDescriptor.hasReturnValue)>
+<if(ruleDescriptor.singleValueReturnType)>
+    return <ruleDescriptor.singleValueReturnName>;<\n>
+<else>
     return retval;<\n>
+<endif>
 <endif>
 }
 // $ANTLR end <ruleName>
@@ -679,14 +688,43 @@ protected Stack <scope.name>_stack = new Stack();<\n>
 <endif>
 >>
 
-ruleLabelType(name) ::= "<name>_return"
-
 returnType() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <ruleDescriptor.name>_return
 <else>
+<if(ruleDescriptor.singleValueReturnType)>
+<ruleDescriptor.singleValueReturnType>
+<else>
 void
 <endif>
+<endif>
+>>
+
+ruleLabelType(referencedRule) ::= <<
+<if(referencedRule.hasMultipleReturnValues)>
+<referencedRule.name>_return
+<else>
+<if(referencedRule.singleValueReturnType)>
+<referencedRule.singleValueReturnType>
+<else>
+void
+<endif>
+<endif>
+>>
+
+/** Using a type to init value map, try to init a type; if not in table
+ *  must be an object, use null.
+ */
+initValue(typeName) ::= <<
+<if(javaTypeInitMap.(typeName))>
+<javaTypeInitMap.(typeName)>
+<else>
+null
+<endif>
+>>
+
+ruleLabelDef(label) ::= <<
+<ruleLabelType(referencedRule=label.referencedRule)> <label.label.text> = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n>
 >>
 
 returnScope(scope) ::= <<
@@ -713,17 +751,30 @@ parameterScope(scope) ::= <<
  *  I.e., actions are just text strings during final code generation.
  */
 globalAttributeRef(scope,attr) ::= <<
-((<scope>)<scope>_stack.peek()).<attr>
+((<scope>)<scope>_stack.peek()).<attr.name>
 >>
 
 parameterAttributeRef(attr) ::= "<attr.name>"
 
-returnAttributeRef(attr) ::= "retval.<attr.name>"
-
 ruleScopeAttributeRef(scope,attr) ::=
-    "((<scope>_scope)<scope>_stack.peek()).<attr>"
+    "((<scope>_scope)<scope>_stack.peek()).<attr.name>"
 
-ruleLabelRef(scope,attr) ::= "<scope>.<attr>"
+/** reference an attribute of rule; might only have single return value */
+ruleLabelRef(referencedRule,scope,attr) ::= <<
+<if(referencedRule.singleValueReturnType)>
+<scope>
+<else>
+<scope>.<attr.name>
+<endif>
+>>
+
+returnAttributeRef(ruleDescriptor,attr) ::= <<
+<if(ruleDescriptor.singleValueReturnType)>
+<attr.name>
+<else>
+retval.<attr.name>
+<endif>
+>>
 
 /** How to translate $tokenLabel */
 tokenLabelRef(label) ::= "<label>"

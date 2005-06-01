@@ -78,13 +78,16 @@ public class Grammar {
 		public DFA dfa;
 	}
 
-	public static class LabelElementPair {
+	public class LabelElementPair {
 		public antlr.Token label;
 		public GrammarAST elementRef;
+		public Rule referencedRule;
 		public int type; // e.g., RULE_LABEL
 		public LabelElementPair(antlr.Token label, GrammarAST elementRef) {
 			this.label = label;
 			this.elementRef = elementRef;
+			String referencedRuleName = elementRef.getText();
+			this.referencedRule = getRule(referencedRuleName);
 		}
 		public String toString() {
 			return elementRef.toString();

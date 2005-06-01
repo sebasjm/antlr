@@ -265,7 +265,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree";
-		String expecting = "r.x; r.start; r.stop; r.tree";
+		String expecting = "r; r.start; r.stop; r.tree";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
