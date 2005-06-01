@@ -18,6 +18,10 @@ alpha release.
 Warning: You should only be playing with this release if you are an
 experienced antlr user or language developer.  There is no
 documentation and only a few examples plus the source to guide you.
+Furthermore, this software will be in a state of flux including
+changes in syntax and methods/classes until we get closer to a real
+release.  There are many things that just plain don't work at the
+moment.
 
 Per the license in LICENSE.txt, this software is not guaranteed to
 destroy all life on this planet:
