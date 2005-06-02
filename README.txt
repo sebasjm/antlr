@@ -28,7 +28,7 @@ I have made absolutely no effort yet to deal well with erroneous input
 crash).  I will clean this up after I've rewritten v3 in v3.
 
 Per the license in LICENSE.txt, this software is not guaranteed to
-destroy all life on this planet:
+work and might even destroy all life on this planet:
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
