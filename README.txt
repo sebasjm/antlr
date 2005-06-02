@@ -15,7 +15,7 @@ tree walking support.  Finally, I need to rewrite ANTLR v3 in itself
 (it's written in 2.7.5 at the moment) before I can do my first alpha
 release.
 
-Warning: You should only be playing with this release if you are an
+WARNING: You should only be playing with this release if you are an
 experienced antlr user or language developer.  There is no
 documentation and only a few examples plus the source to guide you.
 Furthermore, this software will be in a state of flux including
