@@ -110,7 +110,6 @@ antlr-3.0ea1/src/org/antlr/...
 antlr-3.0ea1/lib/stringtemplate-2.2b1.jar
 antlr-3.0ea1/lib/antlr-2.7.5.jar
 antlr-3.0ea1/lib/antlr-3.0ea1.jar
-antlr-3.0ea1/examples/java/...
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -133,8 +132,8 @@ usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -nfa           generate an NFA for each rule
   -dfa           generate a DFA for each decision point
 
-For example, consider how to make the LL-star example that comes with
-this distribution.
+For example, consider how to make the LL-star example from the examples 
+tarball you can get at http://www.antlr.org/download/examples-v3.tar.gz
 
 $ cd examples/java/LL-star
 $ java org.antlr.Tool simplec.g
