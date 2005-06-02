@@ -45,6 +45,8 @@ public class Parser {
 	 */
 	protected boolean errorRecovery = false;
 
+	protected int lastErrorTokenIndex = -1;
+
     public Parser(TokenStream input) {
         setTokenStream(input);
     }
@@ -161,6 +163,14 @@ public class Parser {
 	 *  the match() routine could not recover from.
 	 */
 	public void recover(RecognitionException re) {
+		if ( lastErrorTokenIndex==input.index() ) {
+			// uh oh, another error at same token index; must be a case
+			// where LT(1) is in the recovery token set so nothing is
+			// consumed; consume a single token so at least to prevent
+			// an infinite loop; this is a failsafe.
+			input.consume();
+		}
+		lastErrorTokenIndex = input.index();
 		BitSet followSet = computeErrorRecoverySet();
 		beginResync();
 		consumeUntil(followSet);
@@ -437,6 +447,7 @@ public class Parser {
 	}
 
 	public void consumeUntil(int tokenType) {
+		//System.out.println("consumeUntil "+tokenType);
 		int ttype = input.LA(1);
 		while (ttype != Token.EOF && ttype != tokenType) {
 			input.consume();
@@ -446,11 +457,10 @@ public class Parser {
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(BitSet set) {
-		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
 		/*
+		System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
 		System.out.println("LT(1)="+
-						   input.LT(1).toString(input.getTokenSource().getCharStream()));
-		input.consume(); // always consume at least one token; inoptimal but safe
+						   input.LT(1).toString());
 		*/
 		int ttype = input.LA(1);
 		while (ttype != Token.EOF && !set.member(ttype) ) {

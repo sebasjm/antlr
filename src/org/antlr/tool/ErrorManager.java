@@ -163,6 +163,17 @@ public class ErrorManager {
 	 */
 	private static Map threadToListenerMap = new HashMap();
 
+	static class ErrorCount {
+		public int errors;
+		public int warnings;
+		public int infos;
+	}
+
+	/** Track the number of errors regardless of the listener but track
+	 *  per thread.
+	 */
+	private static Map threadToErrorCountMap = new HashMap();
+
 	/** The group of templates that represent all possible ANTLR errors. */
 	private static StringTemplateGroup messages;
 
@@ -242,7 +253,7 @@ public class ErrorManager {
 		// it is inefficient to set the default locale here if another
 		// piece of code is going to set the locale, but that would
 		// require that a user call an init() function or something.  I prefer
-		// that this class be ready to go when loaded as I'm absent minded ;)
+		// that this class be ready to go when loaded as I'm absentminded ;)
 		setLocale(Locale.getDefault());
 	}
 
@@ -320,37 +331,55 @@ public class ErrorManager {
 		return el;
 	}
 
+	public static ErrorCount getErrorCount() {
+		ErrorCount ec =
+			(ErrorCount)threadToErrorCountMap.get(Thread.currentThread());
+		if ( ec==null ) {
+			ec = new ErrorCount();
+			threadToErrorCountMap.put(Thread.currentThread(), ec);
+		}
+		return ec;
+	}
+
 	public static void info(String msg) {
+		getErrorCount().infos++;
 		getErrorListener().info(msg);
 	}
 
 	public static void error(int msgID) {
+		getErrorCount().errors++;
 		getErrorListener().error(new ToolMessage(msgID));
 	}
 
 	public static void error(int msgID, Throwable e) {
+		getErrorCount().errors++;
 		getErrorListener().error(new ToolMessage(msgID,e));
 	}
 
 	public static void error(int msgID, Object arg) {
+		getErrorCount().errors++;
 		getErrorListener().error(new ToolMessage(msgID, arg));
 	}
 
 	public static void error(int msgID, Object arg, Object arg2) {
+		getErrorCount().errors++;
 		getErrorListener().error(new ToolMessage(msgID, arg, arg2));
 	}
 
 	public static void error(int msgID, Object arg, Throwable e) {
+		getErrorCount().errors++;
 		getErrorListener().error(new ToolMessage(msgID, arg, e));
 	}
 
 	public static void warning(int msgID, Object arg) {
+		getErrorCount().warnings++;
 		getErrorListener().warning(new ToolMessage(msgID, arg));
 	}
 
 	public static void nondeterminism(DecisionProbe probe,
 									  DFAState d)
 	{
+		getErrorCount().warnings++;
 		getErrorListener().warning(
 			new GrammarNonDeterminismMessage(probe,d)
 		);
@@ -359,6 +388,7 @@ public class ErrorManager {
 	public static void danglingState(DecisionProbe probe,
 									 DFAState d)
 	{
+		getErrorCount().warnings++;
 		getErrorListener().warning(
 			new GrammarDanglingStateMessage(probe,d)
 		);
@@ -366,6 +396,7 @@ public class ErrorManager {
 
 	public static void analysisAborted(DecisionProbe probe)
 	{
+		getErrorCount().warnings++;
 		getErrorListener().warning(
 			new GrammarAnalysisAbortedMessage(probe)
 		);
@@ -374,6 +405,7 @@ public class ErrorManager {
 	public static void unreachableAlts(DecisionProbe probe,
 									   List alts)
 	{
+		getErrorCount().warnings++;
 		getErrorListener().warning(
 			new GrammarUnreachableAltsMessage(probe,alts)
 		);
@@ -382,6 +414,7 @@ public class ErrorManager {
 	public static void insufficientPredicates(DecisionProbe probe,
 											  List alts)
 	{
+		getErrorCount().warnings++;
 		getErrorListener().warning(
 			new GrammarInsufficientPredicatesMessage(probe,alts)
 		);
@@ -393,6 +426,7 @@ public class ErrorManager {
 									Object arg,
 									Object arg2)
 	{
+		getErrorCount().errors++;
 		getErrorListener().error(
 			new GrammarSemanticsMessage(msgID,g,token,arg,arg2)
 		);
@@ -418,6 +452,7 @@ public class ErrorManager {
 								   Object arg,
 								   antlr.RecognitionException re)
 	{
+		getErrorCount().errors++;
 		getErrorListener().error(
 			new GrammarSyntaxMessage(msgID,token,arg,re)
 		);

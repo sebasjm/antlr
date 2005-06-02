@@ -46,7 +46,7 @@ public class Interp {
 	// pass me a java file to parse
 	public static void main(String[] args) throws Exception {
 		if ( args.length!=4 ) {
-			System.err.println("java Interp file.g tokens-to-ignore input-file");
+			System.err.println("java Interp file.g tokens-to-ignore start-rule input-file");
 			return;
 		}
 		String grammarFileName = args[0];

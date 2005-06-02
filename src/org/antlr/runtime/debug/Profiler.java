@@ -44,7 +44,7 @@ public class Profiler implements DebugEventListener {
 	 */
 	public static final String Version = "1";
 	public static final String RUNTIME_STATS_FILENAME = "runtime.stats";
-	public static final int NUM_RUNTIME_STATS = 18;
+	public static final int NUM_RUNTIME_STATS = 20;
 
 	//public IntStream input;
 
@@ -70,6 +70,7 @@ public class Profiler implements DebugEventListener {
 	public int numCharsMatched = 0;
 	public int numHiddenCharsMatched = 0;
 	public int numSemanticPredicates = 0;
+	protected int numberReportedErrors = 0;
 
 	public Profiler(DebugParser parser, boolean dumpProfile) {
 		this.parser = parser;
@@ -153,7 +154,11 @@ public class Profiler implements DebugEventListener {
 
 	public void mark(int i) {;}
 	public void rewind(int i) {;}
-	public void recognitionException(RecognitionException e) {;}
+
+	public void recognitionException(RecognitionException e) {
+		numberReportedErrors++;
+	}
+
 	public void beginResync() {;}
 	public void endResync() {;}
 
@@ -187,7 +192,11 @@ public class Profiler implements DebugEventListener {
 		StringBuffer buf = new StringBuffer();
 		buf.append(Version);
 		buf.append('\t');
+		buf.append(parser.getClass().getName());
+		buf.append('\t');
 		buf.append(numRuleInvocations);
+		buf.append('\t');
+		buf.append(maxRuleInvocationDepth);
 		buf.append('\t');
 		buf.append(numFixedDecisions);
 		buf.append('\t');
@@ -209,6 +218,8 @@ public class Profiler implements DebugEventListener {
 		buf.append('\t');
 		buf.append(GrammarReport.stddev(decisionMaxCyclicLookaheads));
 		buf.append('\t');
+		buf.append(numSemanticPredicates);
+		buf.append('\t');
 		buf.append(parser.getTokenStream().size());
 		buf.append('\t');
 		buf.append(numHiddenTokens);
@@ -217,9 +228,7 @@ public class Profiler implements DebugEventListener {
 		buf.append('\t');
 		buf.append(numHiddenCharsMatched);
 		buf.append('\t');
-		buf.append(maxRuleInvocationDepth);
-		buf.append('\t');
-		buf.append(numSemanticPredicates);
+		buf.append(numberReportedErrors);
 		return buf.toString();
 	}
 
@@ -250,56 +259,62 @@ public class Profiler implements DebugEventListener {
         buf.append("ANTLR Runtime Report; Profile Version ");
 		buf.append(fields[0]);
 		buf.append('\n');
-		buf.append("Number of rule invocations ");
+		buf.append("parser name ");
 		buf.append(fields[1]);
 		buf.append('\n');
-		buf.append("number of fixed lookahead decisions ");
+		buf.append("Number of rule invocations ");
 		buf.append(fields[2]);
 		buf.append('\n');
-		buf.append("min lookahead used in a fixed lookahead decision ");
+		buf.append("max rule invocation nesting depth ");
 		buf.append(fields[3]);
 		buf.append('\n');
-		buf.append("max lookahead used in a fixed lookahead decision ");
+		buf.append("number of fixed lookahead decisions ");
 		buf.append(fields[4]);
 		buf.append('\n');
-		buf.append("average lookahead depth used in fixed lookahead decisions ");
+		buf.append("min lookahead used in a fixed lookahead decision ");
 		buf.append(fields[5]);
 		buf.append('\n');
-		buf.append("standard deviation of depth used in fixed lookahead decisions ");
+		buf.append("max lookahead used in a fixed lookahead decision ");
 		buf.append(fields[6]);
 		buf.append('\n');
-		buf.append("number of arbitrary lookahead decisions ");
+		buf.append("average lookahead depth used in fixed lookahead decisions ");
 		buf.append(fields[7]);
 		buf.append('\n');
-		buf.append("min lookahead used in an arbitrary lookahead decision ");
+		buf.append("standard deviation of depth used in fixed lookahead decisions ");
 		buf.append(fields[8]);
 		buf.append('\n');
-		buf.append("max lookahead used in an arbitrary lookahead decision ");
+		buf.append("number of arbitrary lookahead decisions ");
 		buf.append(fields[9]);
 		buf.append('\n');
-		buf.append("average lookahead depth used in arbitrary lookahead decisions ");
+		buf.append("min lookahead used in an arbitrary lookahead decision ");
 		buf.append(fields[10]);
 		buf.append('\n');
-		buf.append("standard deviation of depth used in arbitrary lookahead decisions ");
+		buf.append("max lookahead used in an arbitrary lookahead decision ");
 		buf.append(fields[11]);
 		buf.append('\n');
-		buf.append("number of tokens ");
+		buf.append("average lookahead depth used in arbitrary lookahead decisions ");
 		buf.append(fields[12]);
 		buf.append('\n');
-		buf.append("number of hidden tokens ");
+		buf.append("standard deviation of depth used in arbitrary lookahead decisions ");
 		buf.append(fields[13]);
 		buf.append('\n');
-		buf.append("number of char ");
+		buf.append("number of evaluated semantic predicates ");
 		buf.append(fields[14]);
 		buf.append('\n');
-		buf.append("number of hidden char ");
+		buf.append("number of tokens ");
 		buf.append(fields[15]);
 		buf.append('\n');
-		buf.append("max rule invocation nesting depth ");
+		buf.append("number of hidden tokens ");
 		buf.append(fields[16]);
 		buf.append('\n');
-		buf.append("number of evaluated semantic predicates ");
+		buf.append("number of char ");
 		buf.append(fields[17]);
+		buf.append('\n');
+		buf.append("number of hidden char ");
+		buf.append(fields[18]);
+		buf.append('\n');
+		buf.append("number of syntax errors ");
+		buf.append(fields[19]);
 		buf.append('\n');
 		return buf.toString();
 	}

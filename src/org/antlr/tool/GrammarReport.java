@@ -41,7 +41,7 @@ public class GrammarReport {
 	public static final String Version = "1";
 	public static final String GRAMMAR_STATS_FILENAME = "grammar.stats";
 	public static final String ANTLRWORKS_DIR = "antlrworks";
-	public static final int NUM_GRAMMAR_STATS = 29;
+	public static final int NUM_GRAMMAR_STATS = 32;
 
 	public Grammar grammar;
 
@@ -137,6 +137,12 @@ public class GrammarReport {
 		buf.append(grammar.setOfNondeterministicDecisionNumbersResolvedWithPredicates.size());
 		buf.append('\t');
 		buf.append(grammar.numberOfDFAConversionsTerminatedEarly);
+		buf.append('\t');
+		buf.append(ErrorManager.getErrorCount().errors);
+		buf.append('\t');
+		buf.append(ErrorManager.getErrorCount().warnings);
+		buf.append('\t');
+		buf.append(ErrorManager.getErrorCount().infos);
 		return buf.toString();
 	}
 
@@ -240,6 +246,15 @@ public class GrammarReport {
 		buf.append('\n');
 		buf.append("Number of DFA conversions terminated early: ");
 		buf.append(fields[28]);
+		buf.append('\n');
+		buf.append("Number of errors: ");
+		buf.append(fields[29]);
+		buf.append('\n');
+		buf.append("Number of warnings: ");
+		buf.append(fields[30]);
+		buf.append('\n');
+		buf.append("Number of infos: ");
+		buf.append(fields[31]);
 		buf.append('\n');
 		return buf.toString();
 	}

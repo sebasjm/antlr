@@ -42,7 +42,7 @@ public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-    public static final String VERSION = "3.0ea1 (June 1, 2005)";
+    public static final String VERSION = "3.0ea1";
 
     // Input parameters / option
 
@@ -58,7 +58,7 @@ public class Tool {
 
     public static void main(String[] args) {
         ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
-                VERSION + "   1989-2005");
+                VERSION + " (June 1, 2005)  1989-2005");
         try {
             Tool antlr = new Tool();
             antlr.processArgs(args);
@@ -69,7 +69,7 @@ public class Tool {
                     System.getProperty("line.separator"));
             System.err.println("#$%%*&@# internal error: " + e.toString());
             System.err.println("[complain to nearest government official");
-            System.err.println(" or send hate-mail to terence@parr.us;");
+            System.err.println(" or send hate-mail to parrt@antlr.org;");
             System.err.println(" please send stack trace with report.]" +
                     System.getProperty("line.separator"));
             e.printStackTrace();
@@ -281,7 +281,7 @@ public class Tool {
 		System.err.println("  -lib dir       specify location of token files");
 		System.err.println("  -report        print out a report about the grammar(s) processed");
 		System.err.println("  -debug         generate a parser that emits debugging events");
-		System.err.println("  -profile       enerate a parser that computes profiling information");
+		System.err.println("  -profile       generate a parser that computes profiling information");
 		System.err.println("  -nfa           generate an NFA for each rule");
 		System.err.println("  -dfa           generate a DFA for each decision point");
     }

@@ -1,8 +1,8 @@
 Early Access ANTLR v3
 ANTLR 3.0ea1
-May 31, 2005
+June 1, 2005
 
-Terence Parr
+Terence Parr, parrt at cs usfca edu
 ANTLR Project lead
 University of San Francisco
 
@@ -11,9 +11,9 @@ INTRODUCTION
 Welcome to ANTLR v3!  I've been working on this for 2 straight years
 and, while it is not ready for a full release, it may prove useful to
 some of you.  The main functionality missing is tree construction and
-walking support as well.  Finally, I need to rewrite ANTLR v3 in
-itself (it's written in 2.7.5 at the moment) before I can do my first
-alpha release.
+tree walking support.  Finally, I need to rewrite ANTLR v3 in itself
+(it's written in 2.7.5 at the moment) before I can do my first alpha
+release.
 
 Warning: You should only be playing with this release if you are an
 experienced antlr user or language developer.  There is no
@@ -22,6 +22,10 @@ Furthermore, this software will be in a state of flux including
 changes in syntax and methods/classes until we get closer to a real
 release.  There are many things that just plain don't work at the
 moment.
+
+I have made absolutely no effort yet to deal well with erroneous input
+(well, semantic checking is pretty good, but bad syntax makes ANTLR
+crash).  I will clean this up after I've rewritten v3 in v3.
 
 Per the license in LICENSE.txt, this software is not guaranteed to
 destroy all life on this planet:
@@ -72,6 +76,11 @@ FLOAT : INT '.' INT ;
 The syntax is almost identical for features in common, but you should
 note that labels are always '=' not ':'.  So do id=ID not id:ID.
 
+You can do combined lexer/parser grammars again (ala PCCTS) both lexer
+and parser rules are defined in the same file.  See the examples.
+Really nice.  You can reference strings and characters in the grammar
+and ANTLR will generate the lexer for you.
+
 The attribute structure has been enhanced.  Rules may have multiple
 return values, for example.  Further, there are dynamically scoped
 attributes whereby a rule may define a value usable by any rule it
@@ -85,9 +94,9 @@ leaving most programmers the luxury of having it "just work."  For
 example, to read in some input, tweak it, and write it back out
 preserving whitespace, is easy in v3.
 
-The source code is much prettier.  You'll also note that the run-time
-classes are conveniently encapsulated in the org.antlr.runtime
-package.
+The ANTLR source code is much prettier.  You'll also note that the
+run-time classes are conveniently encapsulated in the
+org.antlr.runtime package.
 
 ----------------------------------------------------------------------
 
@@ -95,12 +104,13 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0ea1
+antlr-3.0ea1/README.txt (this file)
+antlr-3.0ea1/LICENSE.txt
 antlr-3.0ea1/src/org/antlr/...
-antlr-3.0ea1/lib/stringtemplate-2.1.jar
+antlr-3.0ea1/lib/stringtemplate-2.2b1.jar
 antlr-3.0ea1/lib/antlr-2.7.5.jar
 antlr-3.0ea1/lib/antlr-3.0ea1.jar
-antlr-3.0ea1/examples/java/
+antlr-3.0ea1/examples/java/...
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -113,7 +123,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0ea1   1989-2005
+ANTLR Parser Generator   Early Access Version 3.0ea1 (June 1, 2005)  1989-2005
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir   specify output directory where all output is generated
   -lib dir       specify location of token files
@@ -129,18 +139,62 @@ this distribution.
 $ cd examples/java/LL-star
 $ java org.antlr.Tool simplec.g
 $ jikes *.java
+
+For input:
+
+char c;
+int x;
+void bar(int x);
+int foo(int y, char d) {
+  int i;
+  for (i=0; i<3; i=i+1) {
+    x=3;
+    y=5;
+  }
+}
+
+you will see output as follows:
+
 $ java Main input
+bar is a declaration
+foo is a definition
 
+What if I want to test my parser without generating code?  Easy.  Just
+run ANTLR in interpreter mode.  It can't execute your actions, but it
+can create a parse tree from your input to show you how it would be
+matched.  Use the org.antlr.tool.Interp main class.  In the following,
+I interpret simplec.g on t.c, which contains "int x;"
 
-run
-	how to on grammar
-	options
-	Interp
+$ java org.antlr.tool.Interp simplec.g WS program t.c
+( <grammar SimpleC>
+  ( program
+    ( declaration
+      ( variable
+        ( type [@0,0:2='int',<14>,1:0] )
+        ( declarator [@2,4:4='x',<2>,1:4] )
+        [@3,5:5=';',<5>,1:5]
+      )
+    )
+  )
+)
 
-Differences
+where I have formatted the output to make it more readable.  I have
+told it to ignore all WS tokens.
 
-No error checking
+----------------------------------------------------------------------
 
-examples
+How do I rebuild ANTLR v3?
 
+Make sure the following two jars are in your CLASSPATH
+
+antlr-3.0ea1/lib/stringtemplate-2.2b1.jar
+antlr-3.0ea1/lib/antlr-2.7.5.jar
+
+then jump into antlr-3.0ea1/src directory and then type:
+
+$ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
+
+Takes 9 seconds on my 1Ghz laptop or 4 seconds with jikes.  Later I'll
+have a real build mechanism, though I must admit the one-liner appeals
+to me.  I use Intellij so I never type anything actually to build.
 

@@ -31,7 +31,7 @@ import org.antlr.runtime.*;
 
 public class DebugTokenStream implements TokenStream {
 	protected DebugEventListener dbg;
-	protected TokenStream input;
+	public TokenStream input;
 	protected boolean initialStreamState = true;
 
 	public DebugTokenStream(TokenStream input, DebugEventListener dbg) {

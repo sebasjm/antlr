@@ -83,10 +83,6 @@ public class DebugParser extends Parser {
 		return dbg;
 	}
 
-	public void reportError(RecognitionException e) {
-		super.reportError(e);
-	}
-
 	public void reportError(IOException e) {
 		ErrorManager.internalError(e);
 	}
