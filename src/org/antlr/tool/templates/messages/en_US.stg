@@ -29,28 +29,30 @@ group en_US;
 
 // TOOL ERRORS
 // file errors
-CANNOT_WRITE_FILE(arg,exception) ::= "cannot write file <arg>: <exception>"
-CANNOT_CLOSE_FILE(arg,exception) ::= "cannot close file <arg>: <exception>"
+CANNOT_WRITE_FILE(arg,exception,stackTrace) ::= <<
+cannot write file <arg>: <exception>
+<stackTrace; separator="\n">
+>>
+CANNOT_CLOSE_FILE(arg,exception,stackTrace) ::= "cannot close file <arg>: <exception>"
 CANNOT_FIND_TOKENS_FILE(arg) ::= "cannot find tokens file <arg>"
 ERROR_READING_TOKENS_FILE(arg,exception,stackTrace) ::= <<
 problem reading token vocabulary file <arg>: <exception>
 <stackTrace; separator="\n">
 >>
-DIR_NOT_FOUND(arg) ::= 
-	"directory not found: <arg>"
+DIR_NOT_FOUND(arg) ::= "directory not found: <arg>"
 
 INTERNAL_ERROR(arg,arg2,exception,stackTrace) ::= <<
 internal error: <arg> <arg2><if(exception)>: <exception><endif>
 <stackTrace; separator="\n">
 >>
 INTERNAL_WARNING(arg) ::= "internal warning: <arg>"
-ERROR_CREATING_ARTIFICIAL_RULE(exception) ::=
+ERROR_CREATING_ARTIFICIAL_RULE(exception,stackTrace) ::=
 	"problems creating lexer rule listing all tokens: <exception>"
 TOKENS_FILE_SYNTAX_ERROR(arg,arg2) ::= 
 	"problems parsing token vocabulary file <arg> on line <arg2>"
-CANNOT_GEN_DOT_FILE(arg,exception) ::= 
+CANNOT_GEN_DOT_FILE(arg,exception,stackTrace) ::= 
 	"cannot write DFA DOT file <arg>: <exception>"
-BAD_ACTION_AST_STRUCTURE(exception) ::=
+BAD_ACTION_AST_STRUCTURE(exception,stackTrace) ::=
 	"bad internal tree structure for action '<arg>': <exception>"
 BAD_AST_STRUCTURE(arg,exception,stackTrace) ::= <<
 bad internal tree structure '<arg>': <exception>
@@ -64,7 +66,7 @@ MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES() ::=
 	"cannot find code generation cyclic DFA templates for language <arg>"
 CODE_GEN_TEMPLATES_INCOMPLETE() ::= 
 	"at least one code generation template missing for language <arg>"
-CANNOT_CREATE_TARGET_GENERATOR(arg,exception) ::= 
+CANNOT_CREATE_TARGET_GENERATOR(arg,exception,stackTrace) ::= 
 	"cannot create target <arg> code generator: <exception>"
 CANNOT_COMPUTE_SAMPLE_INPUT_SEQ() ::= 
 	"cannot generate a sample input sequence from lookahead DFA"

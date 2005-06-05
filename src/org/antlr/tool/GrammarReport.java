@@ -267,32 +267,11 @@ public class GrammarReport {
 		// write file
 		try {
 			FileOutputStream fos = new FileOutputStream(f, true); // append
-			// First, try to get a lock
-			FileChannel channel = fos.getChannel();
-			FileLock lock = channel.tryLock();
-			if ( lock==null ) {
-				// oops, somebody has the lock
-				try {
-					Thread.sleep(1000); // sleep 1 sec and try again
-				}
-				catch (InterruptedException ie) {
-					; // who cares if we are interrupted
-				}
-				lock = channel.tryLock(); // try again
-			}
-			if ( lock!=null ) {
-				BufferedOutputStream bos = new BufferedOutputStream(fos);
-				PrintStream ps = new PrintStream(bos);
-				ps.println(data);
-				ps.close();
-				// release the lock
-				lock.release();
-				channel.close();
-			}
-			else {
-				ErrorManager.internalError("can't acquire lock on "+
-										   absoluteFilename);
-			}
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+			PrintStream ps = new PrintStream(bos);
+			ps.println(data);
+			ps.close();
+			bos.close();
 			fos.close();
 		}
 		catch (IOException ioe) {

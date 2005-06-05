@@ -42,7 +42,7 @@ public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-    public static final String VERSION = "3.0ea1";
+    public static final String VERSION = "3.0ea2";
 
     // Input parameters / option
 
@@ -113,7 +113,7 @@ public class Tool {
 					}
 					File outDir = new File(libDirectory);
 					if( !outDir.exists() ) {
-						ErrorManager.error(ErrorManager.MSG_DIR_NOT_FOUND);
+						ErrorManager.error(ErrorManager.MSG_DIR_NOT_FOUND,libDirectory);
 						libDirectory = ".";
 					}
 				}
