@@ -197,3 +197,30 @@ Takes 9 seconds on my 1Ghz laptop or 4 seconds with jikes.  Later I'll
 have a real build mechanism, though I must admit the one-liner appeals
 to me.  I use Intellij so I never type anything actually to build.
 
+-----------------------------------------------------------------------
+
+CHANGES
+
+3.0ea2
+
+Bug fixes
+
+* Some error messages were missing the stackTrace parameter
+
+* Removed the file locking mechanism as it's not cross platform
+
+* Some absolute vs relative path name problems with writing output
+  files.  Rules are now more concrete.  -o option takes precedence
+  // -o /tmp /var/lib/t.g => /tmp/T.java
+  // -o subdir/output /usr/lib/t.g => subdir/output/T.java
+  // -o . /usr/lib/t.g => ./T.java
+  // -o /tmp subdir/t.g => /tmp/subdir/t.g
+  // If they didn't specify a -o dir so just write to location
+  // where grammar is, absolute or relative
+
+New features
+
+
+3.0ea1 - June 1, 2005
+
+Initial early access release 
