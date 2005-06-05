@@ -95,6 +95,7 @@ public class ErrorManager {
 	public static final int MSG_CANNOT_FIND_TOKENS_FILE = 3;
 	public static final int MSG_ERROR_READING_TOKENS_FILE = 4;
 	public static final int MSG_DIR_NOT_FOUND = 5;
+	public static final int MSG_OUTPUT_DIR_IS_FILE = 6;
 
 	public static final int MSG_INTERNAL_ERROR = 10;
 	public static final int MSG_INTERNAL_WARNING = 11;

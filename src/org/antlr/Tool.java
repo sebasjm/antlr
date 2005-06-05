@@ -42,14 +42,16 @@ public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-    public static final String VERSION = "3.0ea2";
+	public static final String VERSION = "3.0ea2";
+
+	public static final String UNINITIALIZED_DIR = "<unset-dir>";
 
     // Input parameters / option
 
     protected List grammarFileNames = new ArrayList();
 	protected boolean generate_NFA_dot = false;
 	protected boolean generate_DFA_dot = false;
-	protected String outputDirectory = ".";
+	protected String outputDirectory = UNINITIALIZED_DIR;
 	protected String libDirectory = ".";
 	protected boolean debug = false;
 	protected boolean trace = false;
@@ -58,7 +60,7 @@ public class Tool {
 
     public static void main(String[] args) {
         ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
-                VERSION + " (June 1, 2005)  1989-2005");
+                VERSION + " (???, 2005)  1989-2005");
         try {
             Tool antlr = new Tool();
             antlr.processArgs(args);
@@ -95,6 +97,11 @@ public class Tool {
 					{
 						outputDirectory =
 							outputDirectory.substring(0,outputDirectory.length()-1);
+					}
+					File outDir = new File(outputDirectory);
+					if( outDir.exists() && !outDir.isDirectory() ) {
+						ErrorManager.error(ErrorManager.MSG_OUTPUT_DIR_IS_FILE,outputDirectory);
+						libDirectory = ".";
 					}
 				}
 			}
@@ -176,12 +183,15 @@ public class Tool {
 
 				String lexerGrammarStr = grammar.getLexerGrammar();
 				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
-					Writer w = getOutputFile(grammar,grammar.name+".lexer.g");
+					String lexerGrammarFileName = grammar.name+".lexer.g";
+					Writer w = getOutputFile(grammar,lexerGrammarFileName);
 					w.write(lexerGrammarStr);
 					w.close();
 					StringReader sr = new StringReader(lexerGrammarStr);
 					Grammar lexerGrammar = new Grammar();
-					lexerGrammar.setFileName("<internally-generated-lexer>");
+					File lexerGrammarFullFile =
+						new File(grammar.getFileDirectory(),lexerGrammarFileName);
+					lexerGrammar.setFileName(lexerGrammarFullFile.toString());
 					lexerGrammar.importTokenVocabulary(grammar);
 					lexerGrammar.setGrammarContent(sr);
 					sr.close();
@@ -297,31 +307,49 @@ public class Tool {
 	 *  and the original grammar file was foo/t.g then output files
 	 *  go in /tmp/foo.
 	 *
-	 *  If outputDirectory==null then write a String and toss away (for now);
-	 *  like writing to /dev/null.
+	 *  The output dir -o spec takes precedence if it's absolute.
+	 *  E.g., if the grammar file dir is absolute the output dir is given
+	 *  precendence. "-o /tmp /usr/lib/t.g" results in "/tmp/T.java" as
+	 *  output (assuming t.g holds T.java).
+	 *
+	 *  If no -o is specified, then just write to the directory where the
+	 *  grammar file was found.
+	 *
+	 *  If outputDirectory==null then write a String.
      */
     public Writer getOutputFile(Grammar g, String fileName) throws IOException {
+		System.out.println("fileName="+fileName);
+		System.out.println("g.getFileDir="+g.getFileDirectory());
+		System.out.println("outputDirectory="+outputDirectory);
 		if ( outputDirectory==null ) {
 			return new StringWriter();
 		}
-		String fullName;
-		String fileDir = g.getFileDirectory();
-		if ( fileDir==null ) {
-			fullName =
-				outputDirectory+File.separator+
-				fileName;
+		File outputDir = new File(outputDirectory);
+		File grammarFileDir = new File(g.getFileDirectory());
+		if ( outputDirectory!=UNINITIALIZED_DIR ) {
+			// -o /tmp /var/lib/t.g => /tmp/T.java
+			// -o subdir/output /usr/lib/t.g => subdir/output/T.java
+			// -o . /usr/lib/t.g => ./T.java
+			if ( grammarFileDir.isAbsolute() ) {
+				// somebody set the dir, it takes precendence; write new file there
+				outputDir = new File(outputDirectory);
+			}
+			else {
+				// -o /tmp subdir/t.g => /tmp/subdir/t.g
+				outputDir = new File(outputDirectory, g.getFileDirectory());
+			}
 		}
 		else {
-			fullName =
-				outputDirectory+File.separator+
-				fileDir+File.separator+
-				fileName;
+			// they didn't specify a -o dir so just write to location
+			// where grammar is, absolute or relative
+			outputDir = new File(g.getFileDirectory());
 		}
-		File outDir = new File(fullName).getParentFile();
-		if( !outDir.exists() ) {
-			outDir.mkdirs();
+		System.out.println("full output path="+outputDir.toString());
+
+		if( !outputDir.exists() ) {
+			outputDir.mkdirs();
 		}
-        FileWriter fw = new FileWriter(fullName);
+        FileWriter fw = new FileWriter(new File(outputDir, fileName));
 		return new BufferedWriter(fw);
     }
 
