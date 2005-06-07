@@ -75,7 +75,7 @@ public class GrammarAST extends BaseAST {
     protected Map options;
 
 	public static final Set legalOptions =
-			new HashSet() {{add("k");}};
+			new HashSet() {{add("k"); add("greedy");}};
 
 	/** if this is an ACTION node, this is the outermost enclosing
 	 *  alt num in rule
