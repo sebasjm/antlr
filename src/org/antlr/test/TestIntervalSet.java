@@ -29,6 +29,7 @@ package org.antlr.test;
 
 import org.antlr.test.unit.TestSuite;
 import org.antlr.misc.IntervalSet;
+import org.antlr.analysis.Label;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -276,13 +277,21 @@ public class TestIntervalSet extends TestSuite {
         assertEqual(result, expecting);
     }
 
-    public void testComplement2() throws Exception {
-        IntervalSet s = IntervalSet.of(100,101);
-        IntervalSet s2 = IntervalSet.of(100,102);
-        String expecting = "102";
-        String result = (s.complement(s2)).toString();
-        assertEqual(result, expecting);
-    }
+	public void testComplement2() throws Exception {
+		IntervalSet s = IntervalSet.of(100,101);
+		IntervalSet s2 = IntervalSet.of(100,102);
+		String expecting = "102";
+		String result = (s.complement(s2)).toString();
+		assertEqual(result, expecting);
+	}
+
+	public void testComplement3() throws Exception {
+		IntervalSet s = IntervalSet.of(1,96);
+		s.add(99,65534);
+		String expecting = "97..98";
+		String result = (s.complement()).toString();
+		assertEqual(result, expecting);
+	}
 
     public void testMergeOfRangesAndSingleValues() throws Exception {
         // {0..41, 42, 43..65534}

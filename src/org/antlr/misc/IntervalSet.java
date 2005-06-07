@@ -198,7 +198,6 @@ public class IntervalSet implements IntSet {
         }
     }
 
-    // TODO set complement broken for {1..96, 99..65534}
     public IntSet complement() {
         return this.complement(1,Label.MAX_CHAR_VALUE);
     }
