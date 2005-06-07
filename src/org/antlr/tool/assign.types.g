@@ -451,7 +451,9 @@ grammarSpec
 {Map opts=null;}
 	:	id:ID {grammar.name = #id.getText();}
 		(cmt:DOC_COMMENT)?
-        (opts=optionsSpec {grammar.setOptions(opts);})?
+        ( {Token optionsStartToken=((GrammarAST)_t).getToken();}
+          opts=optionsSpec {grammar.setOptions(opts, optionsStartToken);}
+        )?
         (tokensSpec)?
         (attrScope)*
         (ACTION)?
@@ -474,7 +476,8 @@ option[Map opts]
     :   #( ASSIGN id:ID {key=#id.getText();} value=optionValue )
         {
         opts.put(key,value);
-        if ( key.equals("tokenVocab") ) {
+        // check for grammar-level option to import vocabulary
+        if ( currentRuleName==null && key.equals("tokenVocab") ) {
             importTokenVocab((String)value);
         }
         }

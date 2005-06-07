@@ -137,8 +137,8 @@ LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE(file,line,col,arg,arg2) ::=
 	"<loc()>label <arg> conflicts with rule <arg2>'s dynamically-scoped attribute with same name"
 LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL(file,line,col,arg,arg2) ::=
 	"<loc()>label <arg> conflicts with rule <arg2>'s return value or parameter with same name"
-ATTRIBUTE_CONFLICTS_WITH_RULE(file,line,col,arg) ::=
-	"<loc()>rule <arg>'s dynamically-scoped attribute <arg> conflicts with the rule name"
+ATTRIBUTE_CONFLICTS_WITH_RULE(file,line,col,arg,arg2) ::=
+	"<loc()>rule <arg2>'s dynamically-scoped attribute <arg> conflicts with the rule name"
 ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL(file,line,col,arg,arg2) ::=
 	"<loc()>rule <arg2>'s dynamically-scoped attribute <arg> conflicts with<arg2>'s return value or parameter with same name"
 LABEL_TYPE_CONFLICT(file,line,col,arg,arg2) ::=
@@ -159,6 +159,8 @@ ARGS_ON_TOKEN_REF(file,line,col,arg) ::=
 NONCHAR_RANGE(file,line,col) ::=
 	"<loc()>range operator can only be used in the lexer"
 */
+ILLEGAL_OPTION(file,line,col,arg) ::=
+	"<loc()>illegal option <arg>"
 
 // GRAMMAR WARNINGS
 

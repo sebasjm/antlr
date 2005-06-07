@@ -218,6 +218,8 @@ Bug fixes
   // If they didn't specify a -o dir so just write to location
   // where grammar is, absolute or relative
 
+* does error checking on unknown option names now
+
 New features
 
 

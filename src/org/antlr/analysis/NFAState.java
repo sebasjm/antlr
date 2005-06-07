@@ -44,7 +44,7 @@ public class NFAState extends State {
     Transition[] transition = new Transition[MAX_TRANSITIONS];
 
     /** Which NFA are we in? */
-    NFA nfa = null;
+    public NFA nfa = null;
 
     /** What's its decision number from 1..n? */
     protected int decisionNumber = 0;

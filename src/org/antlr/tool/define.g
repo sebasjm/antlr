@@ -229,10 +229,9 @@ Map opts=null;
            {this.blockLevel=0;}
            b:block EOR
            {
-           #b.setOptions(opts);
-           if ( opts!=null && opts.get("k")!=null ) {
-               grammar.numberOfManualLookaheadOptions++;
-           }
+           // copy rule options into the block AST, which is where
+           // the analysis will look for k option etc...
+           #b.options = opts;
            }
          )
     ;
@@ -281,10 +280,7 @@ if ( this.blockLevel==1 ) {this.outerAltNum=1;}
     :   #(  BLOCK
             (opts=optionsSpec
              {
-             #block.setOptions(opts);
-             if ( opts.get("k")!=null ) {
-                 grammar.numberOfManualLookaheadOptions++;
-             }
+             #block.setOptions(grammar,opts);
              }
             )?
             (alternative {if ( this.blockLevel==1 ) {this.outerAltNum++;}})+

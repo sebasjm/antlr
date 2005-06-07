@@ -144,6 +144,7 @@ public class ErrorManager {
 	public static final int MSG_RULE_HAS_NO_ARGS = 130;
 	public static final int MSG_ARGS_ON_TOKEN_REF = 131;
 	//public static final int MSG_NONCHAR_RANGE = 132;
+	public static final int MSG_ILLEGAL_OPTION = 133;
 
 
 	// GRAMMAR WARNINGS

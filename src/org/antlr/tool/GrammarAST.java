@@ -35,8 +35,7 @@ import org.antlr.analysis.NFAState;
 import org.antlr.misc.IntSet;
 import org.antlr.stringtemplate.StringTemplate;
 
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /** Grammars are first converted to ASTs using this class and then are
  *  converted to NFAs via a tree walker.
@@ -53,6 +52,7 @@ import java.util.HashMap;
  *  on purpose, not out of ignorance. ;)
  */
 public class GrammarAST extends BaseAST {
+	/** This AST node was created from what token? */
     protected Token token = null;
     protected String enclosingRule = null;
 
@@ -72,7 +72,10 @@ public class GrammarAST extends BaseAST {
     protected IntSet setValue = null;
 
     /** If this is a BLOCK node, track options here */
-    protected Map options = null;
+    protected Map options;
+
+	public static final Set legalOptions =
+			new HashSet() {{add("k");}};
 
 	/** if this is an ACTION node, this is the outermost enclosing
 	 *  alt num in rule
@@ -117,18 +120,34 @@ public class GrammarAST extends BaseAST {
     }
 
     public void setNFAStartState(NFAState nfaStartState) {
-        this.NFAStartState = nfaStartState;
-    }
+		this.NFAStartState = nfaStartState;
+	}
 
-    /** Save the option key/value pair and process it */
-    public void setOption(String key, Object value) {
-        if ( value instanceof String ) {
-            String vs = (String)value;
-            if ( vs.charAt(0)=='"' ) {
-                value = vs.substring(1,vs.length()-1); // strip quotes
+	/** Save the option key/value pair and process it; return the key
+	 *  or null if invalid option.
+	 */
+	public String setOption(Grammar grammar, String key, Object value) {
+		if ( !legalOptions.contains(key) ) {
+			ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
+									  grammar,
+									  token,
+									  key);
+			return null;
+		}
+		if ( value instanceof String ) {
+			String vs = (String)value;
+			if ( vs.charAt(0)=='"' ) {
+				value = vs.substring(1,vs.length()-1); // strip quotes
             }
         }
+		if ( options==null ) {
+			options = new HashMap();
+		}
+		if ( key.equals("k") ) {
+			grammar.numberOfManualLookaheadOptions++;
+		}
         options.put(key, value);
+		return key;
     }
 
     public Object getOption(String key) {
@@ -139,8 +158,19 @@ public class GrammarAST extends BaseAST {
         return defaultOptions.get(key);
     }
 
-    public void setOptions(Map options) {
-        this.options = options;
+    public void setOptions(Grammar grammar, Map options) {
+		if ( options==null ) {
+			this.options = null;
+			return;
+		}
+		Set keys = options.keySet();
+		for (Iterator it = keys.iterator(); it.hasNext();) {
+			String optionName = (String) it.next();
+			String stored=setOption(grammar, optionName, options.get(optionName));
+			if ( stored==null ) {
+				it.remove();
+			}
+		}
     }
 
     public Map getOptions() {

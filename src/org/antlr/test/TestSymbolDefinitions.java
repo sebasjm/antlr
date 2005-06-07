@@ -31,8 +31,10 @@ import org.antlr.test.unit.TestSuite;
 import org.antlr.test.unit.FailedAssertionException;
 import org.antlr.tool.*;
 import org.antlr.analysis.Label;
+import org.antlr.Tool;
 
 import java.util.*;
+import java.io.StringReader;
 
 import antlr.Token;
 
@@ -569,6 +571,57 @@ public class TestSymbolDefinitions extends TestSuite {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testBadGrammarOption() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Tool antlr = new Tool();
+		Grammar g = new Grammar(antlr,
+								"t",
+								new StringReader(
+									"grammar t;\n"+
+									"options {foo=3; language=Java;}\n" +
+									"a : 'a';\n"));
+
+		Object expectedArg = "foo";
+		int expectedMsgID = ErrorManager.MSG_ILLEGAL_OPTION;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testBadRuleOption() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a\n"+
+				"options {k=3; tokenVocab=blort;}\n" +
+				"  : 'a';\n");
+
+		Object expectedArg = "tokenVocab";
+		int expectedMsgID = ErrorManager.MSG_ILLEGAL_OPTION;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testBadSubRuleOption() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue); // unique listener per thread
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : ( options {k=3; language=Java;}\n" +
+				"    : 'a'\n" +
+				"    | 'b'\n" +
+				"    )\n" +
+				"  ;\n");
+		Object expectedArg = "language";
+		int expectedMsgID = ErrorManager.MSG_ILLEGAL_OPTION;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
 	protected void checkError(ErrorQueue equeue,
 							  GrammarSemanticsMessage expectedMessage)
 		throws FailedAssertionException
@@ -580,7 +633,7 @@ public class TestSymbolDefinitions extends TestSuite {
 		assertTrue(equeue.errors.size()==n,
 				   "number of errors mismatch; expecting "+n+"; found "+
 				   equeue.errors.size());
-		*/
+				   */
 		Message foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
 			Message m = (Message)equeue.errors.get(i);

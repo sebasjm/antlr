@@ -37,12 +37,20 @@ public class Rule {
 	public String name;
 	public int index;
 	public String modifier;
-	public Map options;
 	public NFAState startState;
 	public NFAState stopState;
 
+	/** This rule's options */
+	protected Map options;
+
+	public static final Set legalOptions =
+			new HashSet() {{add("k");}};
+
 	/** The AST representing the whole rule */
 	public GrammarAST tree;
+
+	/** To which grammar does this belong? */
+	public Grammar grammar;
 
 	/** For convenience, track the argument def AST action node if any */
 	public GrammarAST argActionAST;
@@ -93,10 +101,15 @@ public class Rule {
 	 */
 	public boolean needPredefinedRuleAttributes = false;
 
-	public Rule(String ruleName, int ruleIndex, int numberOfAlts) {
+	public Rule(Grammar grammar,
+				String ruleName,
+				int ruleIndex,
+				int numberOfAlts)
+	{
 		this.name = ruleName;
 		this.index = ruleIndex;
 		this.numberOfAlts = numberOfAlts;
+		this.grammar = grammar;
 		altToTokenRefMap = new Map[numberOfAlts+1];
 		altToRuleRefMap = new Map[numberOfAlts+1];
 		for (int alt=1; alt<=numberOfAlts; alt++) {
@@ -196,6 +209,43 @@ public class Rule {
 			return ((Attribute)javaSucks[0]).name;
 		}
 		return null;
+	}
+
+	/** Save the option key/value pair and process it; return the key
+	 *  or null if invalid option.
+	 */
+	public String setOption(String key, Object value, antlr.Token optionsStartToken) {
+		if ( !legalOptions.contains(key) ) {
+			ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
+									  grammar,
+									  optionsStartToken,
+									  key);
+			return null;
+		}
+		if ( options==null ) {
+			options = new HashMap();
+		}
+		if ( key.equals("k") ) {
+			grammar.numberOfManualLookaheadOptions++;
+		}
+ 		options.put(key, value);
+		return key;
+	}
+
+	public void setOptions(Map options, antlr.Token optionsStartToken) {
+		if ( options==null ) {
+			this.options = null;
+			return;
+		}
+		Set keys = options.keySet();
+		for (Iterator it = keys.iterator(); it.hasNext();) {
+			String optionName = (String) it.next();
+			Object optionValue = options.get(optionName);
+			String stored=setOption(optionName, optionValue, optionsStartToken);
+			if ( stored==null ) {
+				it.remove();
+			}
+		}
 	}
 
 	public String toString() { // used for testing

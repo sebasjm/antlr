@@ -73,7 +73,10 @@ public class GrammarSemanticsMessage extends Message {
 			line = offendingToken.getLine();
 			col = offendingToken.getColumn();
 		}
-		String fileName = g.getFileName();
+		String fileName = null;
+		if ( g!=null ) {
+			fileName = g.getFileName();
+		}
 		StringTemplate st = getMessageTemplate();
 		if ( arg!=null ) {
 			st.setAttribute("arg", arg);

@@ -105,12 +105,14 @@ public class Grammar {
      *  There may be code generator specific options in here.  I do no
      *  interpretation of the key/value pairs...they are simply available for
      *  who wants them.
-     *  TODO: do error checking on unknown option names?
      */
-    protected Map options = new HashMap();
+    protected Map options;
 
-    public static final Map defaultOptions =
-            new HashMap() {{put("language","Java");}};
+	public static final Set legalOptions =
+			new HashSet() {{add("language"); add("tokenVocab");}};
+
+	public static final Map defaultOptions =
+			new HashMap() {{put("language","Java");}};
 
     /** The NFA that represents the grammar with edges labelled with tokens
      *  or epsilon.  It is more suitable to analysis than an AST representation.
@@ -570,11 +572,11 @@ public class Grammar {
 									  this, ruleToken, ruleName);
         }
 
-		Rule r = new Rule(ruleName, ruleIndex, numAlts);
+		Rule r = new Rule(this, ruleName, ruleIndex, numAlts);
 		r.modifier = modifier;
-		r.options = options;
         nameToRuleMap.put(ruleName, r);
 		setRuleAST(ruleName, tree);
+		r.setOptions(options, ruleToken);
 		r.argActionAST = argActionAST;
         ruleIndexToRuleList.setSize(ruleIndex+1);
         ruleIndexToRuleList.set(ruleIndex, ruleName);
@@ -779,7 +781,6 @@ public class Grammar {
 	 *  predefined attributes accessed.  If the rule has no user-defined
 	 *  return values, then don't generate the return value scope classes
 	 *  etc...  Make the rule have void return value.
-	 *  TODO: for single return values, don't use struct retval if no ref to predef attrs
 	 */
 	public void referenceRuleLabelPredefinedAttribute(String ruleName) {
 		Rule r = getRule(ruleName);
@@ -982,18 +983,37 @@ public class Grammar {
         return name;
     }
 
-    /** Save the option key/value pair and process it */
-    public void setOption(String key, Object value) {
-        System.out.println("set option "+key+"="+value);
+    /** Save the option key/value pair and process it; return the key
+	 *  or null if invalid option.
+	 */
+    public String setOption(String key, Object value, antlr.Token optionsStartToken) {
+		if ( !legalOptions.contains(key) ) {
+			ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
+									  this,
+									  optionsStartToken,
+									  key);
+			return null;
+		}
+		if ( options==null ) {
+			options = new HashMap();
+		}
  		options.put(key, value);
+		return key;
     }
 
-    public void setOptions(Map options) {
+    public void setOptions(Map options, antlr.Token optionsStartToken) {
+		if ( options==null ) {
+			this.options = null;
+			return;
+		}
         Set keys = options.keySet();
         for (Iterator it = keys.iterator(); it.hasNext();) {
             String optionName = (String) it.next();
             Object optionValue = options.get(optionName);
-            setOption(optionName, optionValue);
+            String stored=setOption(optionName, optionValue, optionsStartToken);
+			if ( stored==null ) {
+				it.remove();
+			}
         }
     }
 
