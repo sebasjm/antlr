@@ -27,17 +27,18 @@
 */
 package org.antlr.misc;
 
+import org.antlr.tool.ErrorManager;
+
 import java.util.*;
 
 /** A HashMap that remembers the order that the elements were added.
  *  You can alter the ith element with set(i,value) too :)  Unique list.
- *
- *  TODO: replace with LinkedHashMap
+ *  I need the replace/set-element-i functionality so I'm subclassing
+ *  OrderedHashSet.
  */
-public class OrderedHashMap extends HashMap {
-
+public class OrderedHashSet extends HashSet {
+    /** Track the elements as they are added to the set */
     protected List elements = new ArrayList();
-    protected List keys = new ArrayList();
 
     public Object get(int i) {
         return elements.get(i);
@@ -45,40 +46,31 @@ public class OrderedHashMap extends HashMap {
 
     /** Replace an existing value with a new value; updates the element
      *  list and the hash table, but not the key as that has not changed.
-     *
-     *  ####### FOR NOW, just a set, can't put key->value
      */
     public Object set(int i, Object value) {
-        keys.set(i, value);
         Object oldElement = elements.get(i);
         elements.set(i,value); // update list
-        super.remove(oldElement); // now update the hashtable, remove/add
-        super.put(value,value);
+        super.remove(oldElement); // now update the set: remove/add
+        super.add(value);
         return oldElement;
-    }
-
-    public Object put(Object key, Object value) {
-        keys.add(key);
-        elements.add(value);
-        return super.put(key, value);
     }
 
     /** Add a value to list; keep in hashtable for consistency also;
      *  Key is object itself.  Good for say asking if a certain string is in
      *  a list of strings.
      */
-    public Object add(Object value) {
-        return put(value, value);
+    public boolean add(Object value) {
+        boolean result = super.add(value);
+		elements.add(value);
+		return result;
     }
 
-    public Object remove(Object o) {
-        keys.remove(o);
+    public boolean remove(Object o) {
         elements.remove(o);
         return super.remove(o);
     }
 
     public void clear() {
-        keys.clear();
         elements.clear();
         super.clear();
     }
@@ -90,35 +82,15 @@ public class OrderedHashMap extends HashMap {
         return elements;
     }
 
-    public Set keySet() {
-        return super.keySet();
-    }
-
     public int size() {
         if ( elements.size()!=super.size() ) {
-            System.err.println("size mismatch hashmap: "+super.toString());
-            System.err.println("elements size is "+elements.size());
-            System.err.println("keys size is "+keys.size());
-            System.err.println("hashmap size is "+super.size());
+			ErrorManager.internalError("OrderedHashSet: elements and set size differs; "+
+									   elements.size()+"!="+super.size());
         }
         return elements.size();
     }
 
     public String toString() {
         return elements.toString();
-        /*
-        StringBuffer buf = new StringBuffer();
-        buf.append("[");
-        for (int i = 0; i < elements.size(); i++) {
-            Object o = (Object) elements.get(i);
-            if ( i>0 ) {
-                buf.append(", ");
-            }
-            buf.append(o);
-        }
-        buf.append("]");
-        return buf.toString();
-        */
     }
-
 }
