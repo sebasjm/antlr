@@ -60,13 +60,14 @@ public class Tool {
 
     public static void main(String[] args) {
         ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
-                VERSION + " (???, 2005)  1989-2005");
+                VERSION + " (June 12, 2005)  1989-2005");
         try {
             Tool antlr = new Tool();
             antlr.processArgs(args);
             antlr.process();
         }
         catch (Exception e) {
+			// catch anything I miss in the code
             System.err.println(System.getProperty("line.separator") +
                     System.getProperty("line.separator"));
             System.err.println("#$%%*&@# internal error: " + e.toString());
@@ -74,7 +75,7 @@ public class Tool {
             System.err.println(" or send hate-mail to parrt@antlr.org;");
             System.err.println(" please send stack trace with report.]" +
                     System.getProperty("line.separator"));
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
         System.exit(0);
     }
@@ -366,5 +367,10 @@ public class Tool {
 		FileReader fr = new FileReader(fullName);
 		BufferedReader br = new BufferedReader(fr);
 		return br;
+	}
+
+	/** If the tool needs to panic/exit, how do we do that? */
+	public void panic() {
+		throw new Error("ANTLR panic");
 	}
 }

@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0ea1
-June 1, 2005
+ANTLR 3.0ea2
+June 12, 2005
 
 Terence Parr, parrt at cs usfca edu
 ANTLR Project lead
@@ -201,7 +201,7 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0ea2
+3.0ea2 - June 12, 2005
 
 Bug fixes
 
@@ -219,6 +219,16 @@ Bug fixes
   // where grammar is, absolute or relative
 
 * does error checking on unknown option names now
+
+* Using just language code not locale name for error message file.  I.e.,
+  the default (and for any English speaking locale) is en.stg not en_US.stg
+  anymore.
+
+* The error manager now asks the Tool to panic rather than simply doing
+  a System.exit().
+
+* Lots of refactoring concerning grammar, rule, subrule options.  Now
+  detects invalid options.
 
 New features
 

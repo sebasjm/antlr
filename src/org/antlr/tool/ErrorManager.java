@@ -176,6 +176,12 @@ public class ErrorManager {
 	 */
 	private static Map threadToErrorCountMap = new HashMap();
 
+	/** Each thread has its own ptr to a Tool object, which knows how
+	 *  to panic, for example.  In a GUI, the thread might just throw an Error
+	 *  to exit rather than the suicide System.exit.
+	 */
+	private static Map threadToToolMap = new HashMap();
+
 	/** The group of templates that represent all possible ANTLR errors. */
 	private static StringTemplateGroup messages;
 
@@ -264,20 +270,22 @@ public class ErrorManager {
 	}
 
 	/** We really only need a single locale for entire running ANTLR code
-	 *  in a single VM.
-	 *  TODO: add "closest match" functionality.  E.g., use fr_FR if canadian fr not available
+	 *  in a single VM.  Only pay attention to the language, not the country
+	 *  so that French Canadians and French Frenchies all get the same
+	 *  template file, fr.stg.  Just easier this way.
 	 */
 	public static void setLocale(Locale locale) {
 		ErrorManager.locale = locale;
-		String fileName = "org/antlr/tool/templates/messages/"+locale+".stg";
+		String language = locale.getLanguage();
+		String fileName = "org/antlr/tool/templates/messages/"+language+".stg";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		InputStream is = cl.getResourceAsStream(fileName);
-		if ( is==null && locale.equals(Locale.US) ) {
-			System.err.println("ANTLR installation corrupted; cannot find US messages file "+fileName);
+		if ( is==null && language.equals(Locale.US.getLanguage()) ) {
+			rawError("ANTLR installation corrupted; cannot find English messages file "+fileName);
 			panic();
 		}
 		else if ( is==null ) {
-			System.err.println("no such locale file "+fileName);
+			rawError("no such locale file "+fileName+" retrying with English locale");
 			setLocale(Locale.US); // recurse on this rule, trying the US locale
 			return;
 		}
@@ -290,13 +298,13 @@ public class ErrorManager {
 			br.close();
 		}
 		catch (IOException ioe) {
-           	System.err.println("cannot close message file "+fileName);
+           	rawError("cannot close message file "+fileName, ioe);
 		}
 
 		messages.setErrorListener(blankSTListener);
 		boolean messagesOK = verifyMessages();
-		if ( !messagesOK && locale.equals(Locale.US) ) {
-			System.err.println("ANTLR installation corrupted; US messages file "+locale+" incomplete");
+		if ( !messagesOK && language.equals(Locale.US.getLanguage()) ) {
+			rawError("ANTLR installation corrupted; English messages file "+language+".stg incomplete");
 			panic();
 		}
 		else if ( !messagesOK ) {
@@ -313,6 +321,10 @@ public class ErrorManager {
 	 */
 	public static void setErrorListener(ANTLRErrorListener listener) {
 		threadToListenerMap.put(Thread.currentThread(), listener);
+	}
+
+	public static void setTool(Tool tool) {
+		threadToToolMap.put(Thread.currentThread(), tool);
 	}
 
 	/** Given a message ID, return a StringTemplate that somebody can fill
@@ -547,7 +559,29 @@ public class ErrorManager {
 		return ok;
 	}
 
+	/** If there are errors during ErrorManager init, we have no choice
+	 *  but to go to System.err.
+	 */
+	static void rawError(String msg) {
+		System.err.println(msg);
+	}
+
+	static void rawError(String msg, Throwable e) {
+		System.err.println(msg);
+		e.printStackTrace(System.err);
+	}
+
+	/** I *think* this will allow Tool subclasses to exit gracefully
+	 *  for GUIs etc...
+	 */
 	public static void panic() {
-		System.exit(-1);
+		Tool tool = (Tool)threadToToolMap.get(Thread.currentThread());
+		if ( tool==null ) {
+			// no tool registered, exit
+			System.exit(-1);
+		}
+		else {
+			tool.panic();
+		}
 	}
 }
