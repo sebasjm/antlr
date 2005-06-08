@@ -28,7 +28,7 @@
 package org.antlr.analysis;
 
 import org.antlr.misc.IntSet;
-import org.antlr.misc.OrderedHashMap;
+import org.antlr.misc.OrderedHashSet;
 
 import java.util.*;
 
@@ -120,7 +120,7 @@ public class DFAState extends State {
      *  to simply track possible labels.
      *  This is type List<Label>.
      */
-    protected OrderedHashMap reachableLabels = new OrderedHashMap();
+    protected OrderedHashSet reachableLabels = new OrderedHashSet();
 
     public DFAState(DFA dfa) {
         this.dfa = dfa;
@@ -236,7 +236,7 @@ public class DFAState extends State {
      */
     protected void addReachableLabel(Label label) {
         //System.out.println("addReachableLabel: "+label.getSet().toString(dfa.getNFA().getGrammar()));
-        if ( reachableLabels.containsKey(label) ) { // exact label present
+        if ( reachableLabels.contains(label) ) { // exact label present
             return;
         }
         IntSet t = label.getSet();
@@ -299,7 +299,7 @@ public class DFAState extends State {
         }
     }
 
-    public OrderedHashMap getReachableLabels() {
+    public OrderedHashSet getReachableLabels() {
         return reachableLabels;
     }
 

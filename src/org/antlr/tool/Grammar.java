@@ -74,7 +74,7 @@ public class Grammar {
 	public static class Decision {
 		public int decision;
 		public NFAState startState;
-		public Map options;
+		public GrammarAST blockAST;
 		public DFA dfa;
 	}
 
@@ -293,7 +293,8 @@ public class Grammar {
 	 */
 	public String getFileDirectory() {
 		File f = new File(fileName);
-		return f.getParent();
+		String parentDir = f.getParent();
+		return parentDir;
 	}
 
 	public void setGrammarContent(String grammarString)
@@ -371,11 +372,13 @@ public class Grammar {
 		}
 		lexerGrammarST.setAttribute("name", name);
 		// make sure generated grammar has the same options
-		Iterator optionNames = options.keySet().iterator();
-		while (optionNames.hasNext()) {
-			String optionName = (String) optionNames.next();
-			Object value = options.get(optionName);
-			lexerGrammarST.setAttribute("options.{name,value}", optionName, value);
+		if ( options!=null ) {
+			Iterator optionNames = options.keySet().iterator();
+			while (optionNames.hasNext()) {
+				String optionName = (String) optionNames.next();
+				Object value = options.get(optionName);
+				lexerGrammarST.setAttribute("options.{name,value}", optionName, value);
+			}
 		}
 		return lexerGrammarST.toString();
 	}
@@ -507,11 +510,13 @@ public class Grammar {
                         decisionStartState.getDescription());
 				long start = System.currentTimeMillis();
 				*/
-				DFA lookaheadDFA = new DFA(decisionStartState);
+				DFA lookaheadDFA = new DFA(decision, decisionStartState);
 				if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
 					// set k=1 option and try again
-					setDecisionOption(decision, "k", new Integer(1));
-					lookaheadDFA = new DFA(decisionStartState);
+					Decision d = getDecision(decision);
+					d.blockAST.setOption(this, "k", new Integer(1));
+					//setDecisionOption(decision, "k", new Integer(1));
+					lookaheadDFA = new DFA(decision, decisionStartState);
 				}
 
 				setLookaheadDFA(decision, lookaheadDFA);
@@ -1018,11 +1023,14 @@ public class Grammar {
     }
 
     public Object getOption(String key) {
-        Object v = options.get(key);
-        if ( v!=null ) {
-            return v;
-        }
-        return defaultOptions.get(key);
+		Object value = null;
+		if ( options!=null ) {
+			value = options.get(key);
+		}
+		if ( value==null ) {
+			value = defaultOptions.get(key);
+		}
+		return value;
     }
 
     public Collection getRules() {
@@ -1127,13 +1135,38 @@ public class Grammar {
 		return d.dfa;
 	}
 
-    public Map getDecisionOptions(int decision) {
+	public GrammarAST getDecisionBlockAST(int decision) {
+		Decision d = getDecision(decision);
+		if ( d==null ) {
+			return null;
+		}
+		return d.blockAST;
+	}
+
+	/*
+	public void setDecisionOptions(int decision, Map options) {
+		Decision d = createDecision(decision);
+		d.options = options;
+	}
+
+	public void setDecisionOption(int decision, String name, Object value) {
+		Decision d = getDecision(decision);
+		if ( d!=null ) {
+			if ( d.options==null ) {
+				d.options = new HashMap();
+			}
+			d.options.put(name,value);
+		}
+	}
+
+	public Map getDecisionOptions(int decision) {
 		Decision d = getDecision(decision);
 		if ( d==null ) {
 			return null;
 		}
 		return d.options;
     }
+    */
 
 	public int getNumberOfDecisions() {
 		return decisionNumber;
@@ -1172,19 +1205,9 @@ public class Grammar {
 		d.startState = state;
 	}
 
-	public void setDecisionOptions(int decision, Map options) {
+	public void setDecisionBlockAST(int decision, GrammarAST blockAST) {
 		Decision d = createDecision(decision);
-		d.options = options;
-	}
-
-	public void setDecisionOption(int decision, String name, Object value) {
-		Decision d = getDecision(decision);
-		if ( d!=null ) {
-			if ( d.options==null ) {
-				d.options = new HashMap();
-			}
-			d.options.put(name,value);
-		}
+		d.blockAST = blockAST;
 	}
 
     /** How many token types have been allocated so far? */

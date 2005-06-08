@@ -318,33 +318,36 @@ public class Tool {
 	 *  If outputDirectory==null then write a String.
      */
     public Writer getOutputFile(Grammar g, String fileName) throws IOException {
-		System.out.println("fileName="+fileName);
-		System.out.println("g.getFileDir="+g.getFileDirectory());
-		System.out.println("outputDirectory="+outputDirectory);
 		if ( outputDirectory==null ) {
 			return new StringWriter();
 		}
 		File outputDir = new File(outputDirectory);
-		File grammarFileDir = new File(g.getFileDirectory());
+		String fileDirectory = g.getFileDirectory();
 		if ( outputDirectory!=UNINITIALIZED_DIR ) {
 			// -o /tmp /var/lib/t.g => /tmp/T.java
 			// -o subdir/output /usr/lib/t.g => subdir/output/T.java
 			// -o . /usr/lib/t.g => ./T.java
-			if ( grammarFileDir.isAbsolute() ) {
+			if ( fileDirectory!=null &&
+				 (new File(fileDirectory).isAbsolute() ||
+				  fileDirectory.startsWith("~")) ) // isAbsolute doesn't count this :(
+			{
 				// somebody set the dir, it takes precendence; write new file there
 				outputDir = new File(outputDirectory);
 			}
 			else {
 				// -o /tmp subdir/t.g => /tmp/subdir/t.g
-				outputDir = new File(outputDirectory, g.getFileDirectory());
+				outputDir = new File(outputDirectory, fileDirectory);
 			}
 		}
 		else {
 			// they didn't specify a -o dir so just write to location
 			// where grammar is, absolute or relative
-			outputDir = new File(g.getFileDirectory());
+			String dir = ".";
+			if ( fileDirectory!=null ) {
+				dir = fileDirectory;
+			}
+			outputDir = new File(dir);
 		}
-		System.out.println("full output path="+outputDir.toString());
 
 		if( !outputDir.exists() ) {
 			outputDir.mkdirs();

@@ -171,7 +171,7 @@ public class NFAToDFAConverter {
 	 */
 	protected void findNewDFAStatesAndAddDFATransitions(DFAState d) {
 		//System.out.println("work on DFA state "+d);
-		OrderedHashMap labels = d.getReachableLabels();
+		OrderedHashSet labels = d.getReachableLabels();
 		/*
 		System.out.println("reachable="+labels.toString());
 		System.out.println("|reachable|/|nfaconfigs|="+
@@ -203,7 +203,7 @@ public class NFAToDFAConverter {
 		// state should become an accept state, predicting exit of loop.  It's
 		// just reversing the resolution of ambiguity.
 		// TODO: should this be done in the resolveAmbig method?
-		if ( !dfa.isGreedy() && labels.containsKey(new Label(Label.EOT)) ) {
+		if ( !dfa.isGreedy() && labels.contains(new Label(Label.EOT)) ) {
 			convertToEOTAcceptState(d);
 			return; // no more work to do on this accept state
 		}

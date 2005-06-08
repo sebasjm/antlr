@@ -421,7 +421,7 @@ public class DecisionProbe {
 	public void reportNondeterminismResolvedWithSemanticPredicate(DFAState d)
 	{
 		statesResolvedWithSemanticPredicatesSet.add(d);
-		System.out.println("resolved with pred: "+d);
+		//System.out.println("resolved with pred: "+d);
 		dfa.nfa.grammar.setOfNondeterministicDecisionNumbersResolvedWithPredicates.add(
 			new Integer(dfa.getDecisionNumber())
 		);

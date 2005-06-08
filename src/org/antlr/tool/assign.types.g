@@ -451,9 +451,12 @@ grammarSpec
 {Map opts=null;}
 	:	id:ID {grammar.name = #id.getText();}
 		(cmt:DOC_COMMENT)?
+		(optionsSpec)?
+/*
         ( {Token optionsStartToken=((GrammarAST)_t).getToken();}
           opts=optionsSpec {grammar.setOptions(opts, optionsStartToken);}
         )?
+*/
         (tokensSpec)?
         (attrScope)*
         (ACTION)?

@@ -48,6 +48,9 @@ public class DFA {
     /** What's the start state for this DFA? */
     public DFAState startState;
 
+	/** This DFA is being built for which decision? */
+	public int decisionNumber = 0;
+
     /** From what NFAState did we create the DFA? */
     public NFAState decisionNFAStartState;
 
@@ -96,32 +99,6 @@ public class DFA {
     /** Which NFA are we converting (well, which piece of the NFA)? */
     public NFA nfa;
 
-    /** Given a choice in a nondeterministic situation, the decision will
-     *  continue consuming tokens for the associated construct (usually
-     *  a loop).  When nongreedy, the construct will exit the instant
-     *  the lookahead is consistent with what follows the construct.  For
-     *  example, to match Pascal comments, you want something like this:
-     *
-     *  "(*" ( greedy=false : . )* "*)"
-     *
-     *  Otherwise, greedy loop version would consume until EOF.
-     *
-	 *  Loops will always just do the right thing I believe.  The DFA
-	 *  conversion will continue until it finds either a unique char sequence
-	 *  that predicts exiting the loop or it will hit EOT, which acts like
-	 *  a unique char.  The greedy=false just lets the DFA be smaller as it
-	 *  can stop when it finds a DFA state with an EOT transition.
-	 *
-     *  This is a cached value of what's in the options table.
-    protected boolean greedy = true;
-	 */
-
-    /** Subrules have options that will apply to any decisions built from
-     *  that subrule.  This points to the options created during antlr.g
-     *  parsing and stored in the BLOCK node.
-     */
-    protected Map options;
-
 	protected NFAToDFAConverter nfaConverter;
 
 	/** This probe tells you a lot about a decision and is useful even
@@ -131,11 +108,12 @@ public class DFA {
 	 */
 	public DecisionProbe probe = new DecisionProbe(this);
 
-    public DFA(NFAState decisionStartState) {
+    public DFA(int decisionNumber, NFAState decisionStartState) {
+		this.decisionNumber = decisionNumber;
         this.decisionNFAStartState = decisionStartState;
         nfa = decisionStartState.nfa;
         nAlts = nfa.grammar.getNumberOfAltsForDecisionNFA(decisionStartState);
-        setOptions( nfa.grammar.getDecisionOptions(getDecisionNumber()) );
+        //setOptions( nfa.grammar.getDecisionOptions(getDecisionNumber()) );
         initAltRelatedInfo();
 
         nfaConverter = new NFAToDFAConverter(this);
@@ -214,16 +192,21 @@ public class DFA {
 	 *  DFA cycles are created when this value, k, is greater than 0.
 	 */
 	public int getUserMaxLookahead() {
-		if ( user_k>=0 ) {
+		if ( user_k>=0 ) { // cache for speed
 			return user_k;
 		}
-		Integer kI = (Integer)getOption("k");
+		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decisionNumber);
+		Integer kI = (Integer)blockAST.getOption("k");
 		if ( kI==null ) {
 			user_k=0;
 			return 0;
 		}
 		user_k = kI.intValue();
 		return user_k;
+	}
+
+	public void setUserMaxLookahead(int k) {
+		this.user_k = k;
 	}
 
 	/** Return k if decision is LL(k) for some k else return max int */
@@ -353,31 +336,13 @@ public class DFA {
     }
 
     public boolean isGreedy() {
-		String v = (String)getOption("greedy");
+		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decisionNumber);
+		String v = (String)blockAST.getOption("greedy");
 		if ( v!=null && v.equals("false") ) {
 			return false;
 		}
         return true;
     }
-
-    public void setOptions(Map options) {
-        this.options = options;
-    }
-
-	public void setOption(String name, Object value) {
-		if ( options==null ) {
-			options = new HashMap();
-		}
-		options.put(name, value);
-	}
-
-	public Object getOption(String name) {
-		if ( options==null ) {
-			return null;
-		}
-		Object v = options.get(name);
-		return v;
-	}
 
     public DFAState newState() {
         DFAState n = new DFAState(this);
@@ -436,7 +401,7 @@ public class DFA {
 	 *  If EOT coexists with ALLCHAR:
 	 *  1. If not greedy, modify the labels parameter to be EOT
 	 *  2. If greedy, remove EOT from the labels set
-	protected boolean reachableLabelsEOTCoexistsWithAllChar(OrderedHashMap labels)
+	protected boolean reachableLabelsEOTCoexistsWithAllChar(OrderedHashSet labels)
 	{
 		Label eot = new Label(Label.EOT);
 		if ( !labels.containsKey(eot) ) {

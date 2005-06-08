@@ -151,12 +151,15 @@ public class GrammarAST extends BaseAST {
     }
 
     public Object getOption(String key) {
-        Object v = options.get(key);
-        if ( v!=null ) {
-            return v;
-        }
-        return defaultOptions.get(key);
-    }
+		Object value = null;
+		if ( options!=null ) {
+			value = options.get(key);
+		}
+		if ( value==null ) {
+			value = defaultOptions.get(key);
+		}
+		return value;
+	}
 
     public void setOptions(Grammar grammar, Map options) {
 		if ( options==null ) {

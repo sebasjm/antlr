@@ -131,7 +131,10 @@ grammarSpec
 {Map opts=null;}
 	:	id:ID
 		(cmt:DOC_COMMENT)?
-        (#(OPTIONS .))? // already parsed these in assign.types.g
+        //(#(OPTIONS .))? // already parsed these in assign.types.g
+        ( {Token optionsStartToken=((GrammarAST)_t).getToken();}
+          opts=optionsSpec {grammar.setOptions(opts, optionsStartToken);}
+        )?
         (tokensSpec)?
         (attrScope)*
         (ACTION)?

@@ -173,7 +173,7 @@ rule
 	                ruleState.setDecisionASTNode(#BLOCK); // always track ast node
                     int d = grammar.assignDecisionNumber( ruleState );
                     grammar.setDecisionNFA( d, ruleState );
-                    grammar.setDecisionOptions(d, #BLOCK.getOptions());
+                    grammar.setDecisionBlockAST(d, #BLOCK);
                 }
                 // hook rule start state for Tokens to its manually-created start
                 NFAState start = grammar.getRuleStartState(r);
@@ -193,7 +193,7 @@ rule
 						b.left.setDecisionASTNode(#BLOCK);
 						int d = grammar.assignDecisionNumber( b.left );
 						grammar.setDecisionNFA( d, b.left );
-						grammar.setDecisionOptions(d, #BLOCK.getOptions());
+                    	grammar.setDecisionBlockAST(d, #BLOCK);
 					}
 
 					// hook to end of rule node
@@ -303,7 +303,7 @@ ebnf returns [StateCluster g=null]
             b.left.setDecisionASTNode(#BLOCK);
             int d = grammar.assignDecisionNumber( b.left );
             grammar.setDecisionNFA( d, b.left );
-            grammar.setDecisionOptions(d, #BLOCK.getOptions());
+            grammar.setDecisionBlockAST(d, #BLOCK);
         }
         g = b;
         }
@@ -314,7 +314,7 @@ ebnf returns [StateCluster g=null]
         // there is always at least one alt even if block has just 1 alt
         int d = grammar.assignDecisionNumber( g.left );
 		grammar.setDecisionNFA(d, g.left);
-        grammar.setDecisionOptions(d, #blk.getOptions());
+        grammar.setDecisionBlockAST(d, #blk);
         g.left.setDecisionASTNode(#ebnf);
     	}
     |   #( CLOSURE #( BLOCK b=block eob:EOB ) )
@@ -324,7 +324,7 @@ ebnf returns [StateCluster g=null]
     	b.right.setDescription("()* loopback of "+grammar.grammarTreeToString(#ebnf));
         int d = grammar.assignDecisionNumber( b.right );
 		grammar.setDecisionNFA(d, b.right);
-        grammar.setDecisionOptions(d, #BLOCK.getOptions());
+        grammar.setDecisionBlockAST(d, #BLOCK);
         b.right.setDecisionASTNode(#eob);
         // make block entry state also have same decision for interpreting grammar
         NFAState altBlockState = (NFAState)g.left.transition(0).target;
@@ -341,7 +341,7 @@ ebnf returns [StateCluster g=null]
     	b.right.setDescription("()+ loopback of "+grammar.grammarTreeToString(#ebnf));
         int d = grammar.assignDecisionNumber( b.right );
 		grammar.setDecisionNFA(d, b.right);
-        grammar.setDecisionOptions(d, #blk2.getOptions());
+        grammar.setDecisionBlockAST(d, #blk2);
         b.right.setDecisionASTNode(#eob3);
         // make block entry state also have same decision for interpreting grammar
         NFAState altBlockState = (NFAState)g.left.transition(0).target;
