@@ -337,7 +337,11 @@ public class Tool {
 			}
 			else {
 				// -o /tmp subdir/t.g => /tmp/subdir/t.g
-				outputDir = new File(outputDirectory, fileDirectory);
+				String dir = ".";
+				if ( fileDirectory!=null ) {
+					dir = fileDirectory;
+				}
+				outputDir = new File(outputDirectory, dir);
 			}
 		}
 		else {
