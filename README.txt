@@ -107,7 +107,7 @@ Just untar and you'll get:
 antlr-3.0ea3/README.txt (this file)
 antlr-3.0ea3/LICENSE.txt
 antlr-3.0ea3/src/org/antlr/...
-antlr-3.0ea3/lib/stringtemplate-2.2b1.jar
+antlr-3.0ea3/lib/stringtemplate-2.2b2.jar (3.0ea3 needs 2.2b2 not 2.2b1)
 antlr-3.0ea3/lib/antlr-2.7.5.jar
 antlr-3.0ea3/lib/antlr-3.0ea3.jar
 
@@ -186,7 +186,7 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0ea3/lib/stringtemplate-2.2b1.jar
+antlr-3.0ea3/lib/stringtemplate-2.2b2.jar
 antlr-3.0ea3/lib/antlr-2.7.5.jar
 
 then jump into antlr-3.0ea3/src directory and then type:
