@@ -76,5 +76,9 @@ public class TestAll extends TestSuite {
 		test = TestRig.runAllTests(TestAutoAST.class);
 		System.out.println("successes: "+test.getSuccesses());
 		System.out.println("failures: "+test.getFailures());
+
+		test = TestRig.runAllTests(TestRewriteAST.class);
+		System.out.println("successes: "+test.getSuccesses());
+		System.out.println("failures: "+test.getFailures());
 	}
 }

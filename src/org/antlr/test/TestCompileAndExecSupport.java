@@ -33,10 +33,12 @@ public class TestCompileAndExecSupport {
 			stderr.start();
 			process.waitFor();
 			if ( stdout.toString().length()>0 ) {
-				System.err.println("compile stdout: "+stdout);
+				System.err.println("compile stderr from: "+cmdLine);
+				System.err.println(stdout);
 			}
 			if ( stderr.toString().length()>0 ) {
-				System.err.println("compile stderr: "+stderr);
+				System.err.println("compile stderr from: "+cmdLine);
+				System.err.println(stderr);
 			}
 			int ret = process.exitValue();
 			return ret==0;
