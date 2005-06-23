@@ -241,7 +241,7 @@ Map opts=null;
 
 countAltsForRule returns [int n=0]
     :   #( RULE id:ID (modifier)? ARG RET (OPTIONS)? ("scope")? INITACTION
-           #(  BLOCK (OPTIONS)? (ALT {n++;})+ EOB )
+           #(  BLOCK (OPTIONS)? (ALT (REWRITE)* {n++;})+ EOB )
            EOR
          )
 	;
@@ -281,19 +281,33 @@ this.blockLevel++;
 if ( this.blockLevel==1 ) {this.outerAltNum=1;}
 }
     :   #(  BLOCK
-            (opts=optionsSpec
-             {
-             #block.setOptions(grammar,opts);
-             }
-            )?
-            (alternative {if ( this.blockLevel==1 ) {this.outerAltNum++;}})+
+            (opts=optionsSpec {#block.setOptions(grammar,opts);})?
+            ( alternative rewrite
+              {if ( this.blockLevel==1 ) {this.outerAltNum++;}}
+            )+
             EOB
          )
     ;
 
 alternative
+{
+if ( grammar.type!=Grammar.LEXER && grammar.buildAST() && blockLevel==1 ) {
+	GrammarAST aRewriteNode = alternative_AST_in.findFirstType(REWRITE);
+	if ( aRewriteNode!=null||
+		 (#alternative.getNextSibling()!=null &&
+		  #alternative.getNextSibling().getType()==REWRITE) )
+	{
+		Rule r = grammar.getRule(currentRuleName);
+		r.trackAltsWithRewrites(this.outerAltNum);
+	}
+}
+}
     :   #( ALT (element)+ EOA )
     ;
+
+rewrite
+	:	( #( REWRITE (SEMPRED)? ALT ) )*
+	;
 
 element
     :   atom
@@ -310,7 +324,14 @@ element
     	}
     	}
     |	#(	PLUS_ASSIGN id2:ID a2:atom
-    	    {grammar.defineListLabel(currentRuleName,#id2.getToken(),#a2);}
+    	    {
+    	    if ( #a2.getType()==RULE_REF ) {
+    	    	grammar.defineRuleListLabel(currentRuleName,#id2.getToken(),#a2);
+    	    }
+    	    else {
+    	    	grammar.defineTokenListLabel(currentRuleName,#id2.getToken(),#a2);
+    	    }
+    	    }
          )
     |   ebnf
     |   tree
@@ -330,21 +351,43 @@ tree:   #(TREE_BEGIN atom (element)*)
     ;
 
 atom
-    :   #( r:RULE_REF (rarg:ARG_ACTION)? )
+    :   r:RULE_REF
+    	{grammar.altReferencesRule(currentRuleName, #r, this.outerAltNum);}
+    |   t:TOKEN_REF
     	{
-    	grammar.altReferencesRule(currentRuleName, #r, this.outerAltNum);
+    	if ( grammar.type!=Grammar.LEXER ) {
+    		grammar.altReferencesTokenID(currentRuleName, #t, this.outerAltNum);
     	}
-    |   #( t:TOKEN_REF (targ:ARG_ACTION)? )
-    	{
-    	grammar.altReferencesToken(currentRuleName, #t, this.outerAltNum);
     	}
     |   c:CHAR_LITERAL
+    	{
+    	if ( grammar.type!=Grammar.LEXER ) {
+    		Rule rule = grammar.getRule(currentRuleName);
+			if ( rule!=null ) {
+				rule.trackTokenReferenceInAlt(#c, outerAltNum);
+    		}
+    	}
+    	}
     |   s:STRING_LITERAL
+    	{
+    	if ( grammar.type!=Grammar.LEXER ) {
+    		Rule rule = grammar.getRule(currentRuleName);
+			if ( rule!=null ) {
+				rule.trackTokenReferenceInAlt(#s, outerAltNum);
+    		}
+    	}
+    	}
     |   WILDCARD
     |	set
     ;
 
-set :   #(SET (setElement)+)
+ast_suffix
+	:	ROOT
+	|	RULEROOT
+	|	BANG
+	;
+
+set :   #(SET (setElement)+ (ast_suffix)? )
     ;
 
 setElement

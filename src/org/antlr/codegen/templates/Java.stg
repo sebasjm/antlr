@@ -34,8 +34,11 @@ group Java;
  */
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           debug, trace, profile, dumpProfile, predicates, javaTypeInitMap) ::=
+           debug, trace, profile, dumpProfile, predicates,
+	   buildAST, buildTemplate, javaTypeInitMap,
+	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
+// $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 <headerAction>
 
 import org.antlr.runtime.*;
@@ -47,6 +50,11 @@ import org.antlr.runtime.debug.*;
 <endif>
 <endif>
 import java.util.Stack;
+<if(buildAST)>
+import org.antlr.runtime.tree.*;
+<endif>
+import java.util.List;
+import java.util.ArrayList;
 
 <docComment>
 <recognizer>
@@ -94,6 +102,15 @@ class <name> extends <if(debug)>Debug<endif>Parser {
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
+<if(buildAST)>
+    protected TreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
+    public void setTreeAdaptor(TreeAdaptor adaptor) {
+        this.adaptor = adaptor;
+    }
+    public TreeAdaptor getTreeAdaptor() {
+        return adaptor;
+    }<\n>
+<endif>
 <if(debug)>
     public int ruleLevel = 0;
 <if(profile)>
@@ -133,11 +150,12 @@ class <name> extends <if(debug)>Debug<endif>Parser {
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,initAction,block) ::= <<
+rule(ruleName,ruleDescriptor,initAction,block,description) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
 // $ANTLR start <ruleName>
+// <fileName>:<description>
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <ruleDescriptor.useScopes:{<it>_stack.push(new <it>());}; separator="\n">
     <ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
@@ -149,9 +167,23 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 <returnType()> <ruleDescriptor.singleValueReturnName>;
 <endif>
     <ruleDescriptor.tokenLabels:{Token <it.label.text>=null;}; separator="\n">
-    <ruleDescriptor.listLabels:{List <it.label.text>=null;}; separator="\n">
+<if(buildAST)>
+    <ruleDescriptor.tokenLabels:{Object <it.label.text>_tree=null;}; separator="\n">
+<endif>
+    <ruleDescriptor.tokenListLabels:{List list_<it.label.text>=null;}; separator="\n">
+    <ruleDescriptor.tokenListLabels:{Token <it.label.text>=null;}; separator="\n">
+<if(buildAST)>
+    <ruleDescriptor.tokenListLabels:{Object <it.label.text>_tree=null;}; separator="\n">
+<endif>
     <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
+    <ruleDescriptor.ruleListLabels:{List list_<it.label.text>=null;}; separator="\n">
+    <ruleDescriptor.ruleListLabels:ruleLabelDef(label=it); separator="\n">
+    <ruleDescriptor.allRuleRefsInAltsWithRewrites:{List list_<it>=new ArrayList();}; separator="\n">
+    <ruleDescriptor.allTokenRefsInAltsWithRewrites:{List list_<it>=new ArrayList();}; separator="\n">
     <initAction>
+<if(buildAST)>
+    Object root_0 = null;<\n>
+<endif>
 <if(debug)>
     try { dbg.enterRule("<ruleName>");
     if ( ruleLevel==0 ) {dbg.commence();}
@@ -169,7 +201,8 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
         <ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
         <ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-        retval.stop = input.LT(-1);<\n>
+        retval.stop = input.LT(-1);
+        retval.tree = root_0;<\n>
 <endif>
     }<\n>
 <if(debug)>
@@ -224,7 +257,11 @@ public void mTokens() throws RecognitionException {
 // S U B R U L E S
 
 /** A (...) subrule with multiple alternatives */
-block(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
+block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
+// <fileName>:<description>
+<!<if(buildAST)>
+Object root_<blockLevel> = adaptor.nil();<\n>
+<endif>!>
 int alt<decisionNumber>=<maxAlt>;
 <decls>
 <if(debug)>try { dbg.enterSubRule(<decisionNumber>);<\n><endif>
@@ -234,13 +271,17 @@ int alt<decisionNumber>=<maxAlt>;
 switch (alt<decisionNumber>) {
     <alts:altSwitchCase()>
 }
+<!<if(buildAST)>
+adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
+<endif>!>
 <if(debug)>
 } finally {dbg.exitSubRule(<decisionNumber>);}<\n>
 <endif>
 >>
 
 /** A rule block with multiple alternatives */
-ruleBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
+ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
+// <fileName>:<description>
 int alt<decisionNumber>=<maxAlt>;
 <decls>
 <if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
@@ -251,18 +292,32 @@ switch (alt<decisionNumber>) {
 }
 >>
 
-/** A special case of a (...) subrule with a single alternative */
-blockSingleAlt(alts,decls,decision,decisionNumber) ::= <<
+ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
+// <fileName>:<description>
 <if(debug)>
 dbg.enterAlt(1);<\n>
 <endif>
 <decls><alts>
 >>
 
-ruleBlockSingleAlt ::= blockSingleAlt
+/** A special case of a (...) subrule with a single alternative */
+blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
+// <fileName>:<description>
+<!<if(buildAST)>
+Object root_<blockLevel> = adaptor.nil();<\n>
+<endif>!>
+<if(debug)>
+dbg.enterAlt(1);<\n>
+<endif>
+<decls><alts>
+<!<if(buildAST)>
+adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
+<endif>!>
+>>
 
 /** A (..)+ block with 0 or more alternatives */
-positiveClosureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
+positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
+// <fileName>:<description>
 int cnt<decisionNumber>=0;
 <decls>
 <if(debug)>
@@ -270,6 +325,9 @@ try { dbg.enterSubRule(<decisionNumber>);<\n>
 <endif>
 loop<decisionNumber>:
 do {
+<!<if(buildAST)>
+    Object root_<blockLevel> = adaptor.nil();<\n>
+<endif>!>
     int alt<decisionNumber>=<maxAlt>;
 <if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
     <decision>
@@ -285,6 +343,9 @@ do {
 <endif>
             throw eee;
     }
+<!<if(buildAST)>
+    adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
+<endif>!>
     cnt<decisionNumber>++;
 } while (true);
 <if(debug)>
@@ -295,13 +356,17 @@ do {
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
 /** A (..)* block with 0 or more alternatives */
-closureBlock(alts,decls,decision,decisionNumber,maxK,maxAlt) ::= <<
+closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
+// <fileName>:<description>
 <decls>
 <if(debug)>
 try { dbg.enterSubRule(<decisionNumber>);<\n>
 <endif>
 loop<decisionNumber>:
 do {
+<!<if(buildAST)>
+    Object root_<blockLevel> = adaptor.nil();<\n>
+<endif>!>
     int alt<decisionNumber>=<maxAlt>;
 <if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
     <decision>
@@ -311,6 +376,9 @@ do {
 	default :
 	    break loop<decisionNumber>;
     }
+<!<if(buildAST)>
+    adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
+<endif>!>
 } while (true);
 <if(debug)>
 } finally {dbg.exitSubRule(<decisionNumber>);}<\n>
@@ -339,8 +407,27 @@ case <i> :
     break;<\n>
 >>
 
-/** An alternative is just a list of elements */
-alt(elements) ::= "<elements:element()>"
+/** An alternative is just a list of elements; at outermost level,
+ *  set the AST parameters to indicate what kind of tree to build.
+ */
+alt(elements,altNum,description,autoAST,outerAlt) ::= <<
+// <fileName>:<description>
+{
+<if(autoAST)>
+<if(outerAlt)>
+root_0 = adaptor.nil();<\n>
+<else>
+Object root_<blockLevel> = adaptor.nil();<\n>
+<endif>
+<endif>
+<elements:element()>
+<if(autoAST)>
+<if(!outerAlt)>
+adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
+<endif>
+<endif>
+}
+>>
 
 // E L E M E N T S
 
@@ -354,19 +441,97 @@ dbg.location(<it.line>,<it.pos>);<\n>
 <it.el><\n>
 >>
 
-/** x=ID should grab the current symbol of lookahead */
-tokenLabel(label) ::= "<label>=input.LT(1);"
-
-/** x+=ID should add LT(1) to a list; create if not there */
-listLabel(label) ::= <<
-if(<label>==null) <label>=new ArrayList();
-<label>.add(input.LT(1));
+/** match a token optionally with a label in front */
+tokenRef(token,label,elementIndex) ::= <<
+<if(label)>
+<label>=input.LT(1);<\n>
+<endif>
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 >>
 
-/** match a token optionally with a label in front */
-tokenRef(token,labelST,elementIndex) ::= <<
-<labelST>
+/** ID! is same as plain tokenRef */
+tokenRefASTBang ::= tokenRef
+
+
+/** ids+=ID no AST building */
+tokenRefAndListLabel(token,label,elementIndex) ::= <<
+<label>=input.LT(1);
 match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+if (list_<label>==null) list_<label>=new ArrayList();
+list_<label>.add(<label>);<\n>
+>>
+
+/** ids+=ID! is same as tokenRefAndListLabel */
+tokenRefASTBangAndListLabel ::= tokenRefAndListLabel
+
+/** Match a token but track it for use in a rewrite rule */
+tokenRefASTTrack(token,label,elementIndex) ::= <<
+<label>=input.LT(1);
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+list_<token>.add(<label>);<\n>
+>>
+
+/** Match a token but track it for use in a rewrite rule */
+tokenRefASTTrackAndListLabel(token,label,elementIndex) ::= <<
+<label>=input.LT(1);
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+list_<token>.add(<label>);<\n>
+if (list_<label>==null) list_<label>=new ArrayList();
+list_<label>.add(<label>);<\n>
+>>
+
+/** Match label+=TOKEN when buildAST but not rewrite alt */
+tokenRefASTAndListLabel(token,label,elementIndex) ::= <<
+<label>=input.LT(1);
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+if (list_<label>==null) list_<label>=new ArrayList();
+list_<label>.add(<label>);<\n>
+<label>_tree = adaptor.create(<label>);
+adaptor.addChild(root_<blockLevel>, <label>_tree);
+>>
+
+/** Match label+=TOKEN^ when buildAST but not rewrite alt */
+tokenRefASTRootAndListLabel(token,label,elementIndex) ::= <<
+<label>=input.LT(1);
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+if (list_<label>==null) list_<label>=new ArrayList();
+list_<label>.add(<label>);<\n>
+<label>_tree = adaptor.create(<label>);
+root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
+>>
+
+/** Match label+=TOKEN^^ when buildAST but not rewrite alt */
+tokenRefASTRuleRootAndListLabel(token,label,elementIndex) ::= <<
+<label>=input.LT(1);
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+if (list_<label>==null) list_<label>=new ArrayList();
+list_<label>.add(<label>);<\n>
+<label>_tree = adaptor.create(<label>);
+root_0 = adaptor.becomeRoot(<label>_tree, root_0);
+>>
+
+/** match a token when output==AST */
+tokenRefAST(token,label,elementIndex) ::= <<
+<label>=input.LT(1);
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+<label>_tree = adaptor.create(<label>);
+adaptor.addChild(root_<blockLevel>, <label>_tree);
+>>
+
+/** match a token when output==AST and ref is token^ */
+tokenRefASTRoot(token,label,elementIndex) ::= <<
+<label>=input.LT(1);
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+<label>_tree = adaptor.create(<label>);
+root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
+>>
+
+/** match a token when output==AST and ref is token^^ */
+tokenRefASTRuleRoot(token,label,elementIndex) ::= <<
+<label>=input.LT(1);
+match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+<label>_tree = adaptor.create(<label>);
+root_0 = adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** match a character */
@@ -376,25 +541,78 @@ charRef(char) ::= "match(<char>);"
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 /** For now, sets are interval tests and must be tested inline */
-matchSet(s,labelST,elementIndex) ::= <<
-<labelST>
+matchSet(s,label,elementIndex,not) ::= <<
+<if(label)>
+<label>=input.LT(1);<\n>
+<endif>
 if ( <s> ) input.consume();
 else {
-    MismatchedSetException mse =
-        new MismatchedSetException(null,input);
+    Mismatched<not>SetException mse =
+        new Mismatched<not>SetException(null,input);
 <if(debug)>
     dbg.recognitionException(mse);<\n>
 <endif>
 <if(LEXER)>
     recover(mse);
 <else>
-    recoverFromMismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
+    recoverFrom<not>MismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
 <endif>
     throw mse;
 }<\n>
 >>
 
-/** Match ~(A|B|...) */
+matchSetAST(s,label,elementIndex,not) ::= <<
+<label>=input.LT(1);
+if ( <s> ) {
+    adaptor.addChild(root_<blockLevel>, adaptor.create(<label>));
+    input.consume();
+}
+else {
+    Mismatched<not>SetException mse =
+        new Mismatched<not>SetException(null,input);
+<if(debug)>
+    dbg.recognitionException(mse);<\n>
+<endif>
+    recoverFromMismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
+    throw mse;
+}<\n>
+>>
+
+matchSetASTRoot(s,label,elementIndex,not) ::= <<
+<label>=input.LT(1);
+if ( <s> ) {
+    root_<blockLevel> = adaptor.becomeRoot(adaptor.create(<label>), root_<blockLevel>);
+    input.consume();
+}
+else {
+    Mismatched<not>SetException mse =
+        new Mismatched<not>SetException(null,input);
+<if(debug)>
+    dbg.recognitionException(mse);<\n>
+<endif>
+    recoverFromMismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
+    throw mse;
+}<\n>
+>>
+
+matchSetASTRuleRoot(s,label,elementIndex,not) ::= <<
+<label>=input.LT(1);<\n>
+if ( <s> ) {
+    root_0 = adaptor.becomeRoot(adaptor.create(<label>), root_0);
+    input.consume();
+}
+else {
+    Mismatched<not>SetException mse =
+        new Mismatched<not>SetException(null,input);
+<if(debug)>
+    dbg.recognitionException(mse);<\n>
+<endif>
+    recoverFromMismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
+    throw mse;
+}<\n>
+>>
+
+/** Match ~(A|B|...) NOT USED
 matchNotSet(s,labelST,elementIndex) ::= <<
 <labelST>
 if ( !(<s>) ) input.consume();
@@ -412,13 +630,37 @@ else {
     throw mnse;
 }<\n>
 >>
+*/
 
 /** Match a string literal */
 lexerStringRef(string) ::= "match(<string>);"
 
-wildcard(labelST) ::= <<
-<labelST>
+wildcard(label,elementIndex) ::= <<
+<if(label)>
+<label>=input.LT(1);<\n>
+<endif>
 matchAny();
+>>
+
+wildcardAST(label,elementIndex) ::= <<
+<label>=input.LT(1);
+matchAny();
+<label>_tree = adaptor.create(<label>);
+adaptor.addChild(root_<blockLevel>, <label>_tree);
+>>
+
+wildcardASTRoot(label,elementIndex) ::= <<
+<label>=input.LT(1);
+matchAny();
+<label>_tree = adaptor.create(<label>);
+root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
+>>
+
+wildcardASTRuleRoot(label,elementIndex) ::= <<
+<label>=input.LT(1);
+matchAny();
+<label>_tree = adaptor.create(<label>);
+root_0 = adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** Match . wildcard */
@@ -430,15 +672,287 @@ wildcardChar() ::= "matchAny();"
 ruleRef(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
-<label>=<rule>(<args>);<\n>
+<label>=<rule>(<args>);
 <else>
 <rule>(<args>);<\n>
 <endif>
 following.pop();
 >>
 
+ruleRefASTBang ::= ruleRef
+
+ruleRefASTTrack(rule,label,elementIndex,args) ::= <<
+following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+<label>=<rule>(<args>);
+list_<rule>.add(<label>.tree);<\n>
+following.pop();
+>>
+
+ruleRefASTTrackAndListLabel(rule,label,elementIndex,args) ::= <<
+following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+<label>=<rule>(<args>);
+list_<rule>.add(<label>.tree);<\n>
+if (list_<label>==null) list_<label>=new ArrayList();
+list_<label>.add(<label>.tree);<\n>
+following.pop();
+>>
+
+/** x+=rule when buildAST */
+ruleRefASTAndListLabel(rule,label,elementIndex,args) ::= <<
+following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+<label>=<rule>(<args>);
+adaptor.addChild(root_<blockLevel>, <label>.tree);<\n>
+if (list_<label>==null) list_<label>=new ArrayList();
+list_<label>.add(<label>.tree);<\n>
+following.pop();
+>>
+
+/** x+=rule! is same as tokenRefAndListLabel */
+ruleRefASTBangAndListLabel ::= ruleRefASTAndListLabel
+
+/** rule when buildAST */
+ruleRefAST(rule,label,elementIndex,args) ::= <<
+following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+<label>=<rule>(<args>);
+adaptor.addChild(root_<blockLevel>, <label>.tree);<\n>
+following.pop();
+>>
+
+/** rule^ */
+ruleRefASTRoot(rule,label,elementIndex,args) ::= <<
+following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+<label>=<rule>(<args>);
+root_<blockLevel> = adaptor.becomeRoot(<label>.tree, root_<blockLevel>);<\n>
+following.pop();
+>>
+
+/** x+=rule^^ */
+ruleRefASTRootAndListLabel(rule,label,elementIndex,args) ::= <<
+following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+<label>=<rule>(<args>);
+root_<blockLevel> = adaptor.becomeRoot(<label>.tree, root_<blockLevel>);<\n>
+if (list_<label>==null) list_<label>=new ArrayList();
+list_<label>.add(<label>.tree);<\n>
+following.pop();
+>>
+
+/** rule^^ */
+ruleRefASTRuleRoot(rule,label,elementIndex,args) ::= <<
+following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+<label>=<rule>(<args>);
+root_0 = adaptor.becomeRoot(<label>.tree, root_0);<\n>
+following.pop();
+>>
+
+/** x+=rule^^ */
+ruleRefASTRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
+following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+<label>=<rule>(<args>);
+root_0 = adaptor.becomeRoot(<label>.tree, root_0);<\n>
+if (list_<label>==null) list_<label>=new ArrayList();
+list_<label>.add(<label>.tree);<\n>
+following.pop();
+>>
+
 /** A lexer rule reference */
 lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
+
+// R e w r i t e
+
+rewriteCode(
+	alts, description,
+	firstReferencedElement, referencedTokens,
+	referencedTokenListLabels, referencedRuleListLabels,
+	referencedRules, rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
+<<
+
+// REWRITE
+<firstReferencedElement:{if ( list_<it>.size()!=1 ) throw new RuntimeException("element <it> length="+list_<it>.size()+" != 1");<\n>}>
+<referencedTokens:{if ( list_<it>.size()!=1 ) throw new RuntimeException("token <it> length="+list_<it>.size()+" != 1");<\n>}>
+<referencedRules:{if ( list_<it>.size()!=1 ) throw new RuntimeException("rule <it> length="+list_<it>.size()+" != 1");<\n>}>
+<referencedTokenListLabels:{if ( list_<it>.size()!=1 ) throw new RuntimeException("token <it> length="+list_<it>.size()+" != 1");<\n>}>
+<referencedRuleListLabels:{if ( list_<it>.size()!=1 ) throw new RuntimeException("rule <it> length="+list_<it>.size()+" != 1");<\n>}>
+int i_0 = 0;
+<prevRuleRootRef()>.tree = root_0;
+root_0 = adaptor.nil();
+<alts:rewriteAlt(); separator="else ">
+>>
+
+rewriteOptionalBlock(
+	alt,rewriteBlockLevel,
+	firstReferencedElement, referencedTokens,
+	referencedTokenListLabels, referencedRuleListLabels,
+	referencedRules,
+	description) ::=
+<<
+// <fileName>:<description>
+{
+int n_<rewriteBlockLevel> = list_<firstReferencedElement>.size();
+if ( n_<rewriteBlockLevel> > 1 ) throw new RuntimeException("<firstReferencedElement> list has > 1 elements");
+<referencedTokens:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Token <it> list differs in size from other elements");<\n>}>
+<referencedRules:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Rule <it> list differs in size from other elements");<\n>}>
+<referencedTokenListLabels:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Token <it> list differs in size from other elements");<\n>}>
+<referencedRuleListLabels:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Rule <it> list differs in size from other elements");<\n>}>
+if ( n_<rewriteBlockLevel>==1 ) {
+    int i_<rewriteBlockLevel> = 0;
+    <alt>
+    }
+}<\n>
+>>
+
+rewriteClosureBlock(
+	alt,rewriteBlockLevel,
+	firstReferencedElement, referencedTokens,
+	referencedTokenListLabels, referencedRuleListLabels,
+	referencedRules,
+	description) ::=
+<<
+// <fileName>:<description>
+{
+int n_<rewriteBlockLevel> = list_<firstReferencedElement>.size();
+<referencedTokens:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Token <it> list differs in size from other elements");<\n>}>
+<referencedRules:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Rule <it> list differs in size from other elements");<\n>}>
+<referencedTokenListLabels:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Token <it> list differs in size from other elements");<\n>}>
+<referencedRuleListLabels:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Rule <it> list differs in size from other elements");<\n>}>
+for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+    <alt>
+}
+}<\n>
+>>
+
+rewritePositiveClosureBlock(
+	alt,rewriteBlockLevel,
+	firstReferencedElement, referencedTokens,
+	referencedTokenListLabels, referencedRuleListLabels,
+	referencedRules,
+	description) ::=
+<<
+// <fileName>:<description>
+{
+int n_<rewriteBlockLevel> = list_<firstReferencedElement>.size();
+<referencedTokens:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Token <it> list differs in size from other elements");<\n>}>
+<referencedTokenListLabels:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Token <it> list differs in size from other elements");<\n>}>
+<referencedRules:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Rule <it> list differs in size from other elements");<\n>}>
+<referencedRuleListLabels:{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("Rule <it> list differs in size from other elements");<\n>}>
+if ( n_<rewriteBlockLevel>==0 ) throw new RuntimeException("Must have more than one element for (...)+ loops");
+for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+    <alt>
+}
+}<\n>
+>>
+
+rewriteAlt() ::= <<
+// <it.description>
+<if(it.pred)>
+if (<it.pred>) {
+    <it.alt>
+}<\n>
+<else>
+{
+    <it.alt>
+}<\n>
+<endif>
+>>
+
+/** For empty rewrites: "r : ... -> ;" */
+rewriteEmptyAlt() ::= "root_0 = null;"
+
+rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
+// <fileName>:<description>
+{
+Object root_<treeLevel> = adaptor.nil();
+<root>
+<children>
+adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
+}<\n>
+>>
+
+rewriteElementList(elements) ::= "<elements>"
+
+/** Gen ID */
+rewriteTokenRef(token,elementIndex) ::= <<
+adaptor.addChild(root_<treeLevel>, (Token)list_<token>.get(i_<rewriteBlockLevel>));<\n>
+>>
+
+/** Gen $label ... where defined via label=ID */
+rewriteTokenLabelRef(label,elementIndex) ::= <<
+adaptor.addChild(root_<treeLevel>, <label>);<\n>
+>>
+
+/** Gen $label ... where defined via label+=ID */
+rewriteTokenListLabelRef(label,elementIndex) ::= <<
+adaptor.addChild(root_<treeLevel>, (Token)list_<label>.get(i_<rewriteBlockLevel>));<\n>
+>>
+
+/** Gen ^($label ...) */
+rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
+root_<treeLevel> = adaptor.becomeRoot(<label>, root_<treeLevel>);<\n>
+>>
+
+/** Gen ^(ID ...) */
+rewriteTokenRefRoot(token,elementIndex) ::= <<
+root_<treeLevel> = adaptor.becomeRoot((Token)list_<token>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+>>
+
+rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
+adaptor.addChild(root_<treeLevel>, adaptor.create(<token>, <args><if(!args)>"<token>"<endif>));<\n>
+>>
+
+rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
+root_<treeLevel> = adaptor.becomeRoot(adaptor.create(<token>, <args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
+>>
+
+/** What is the name of the previous value of this rule's root tree?  This
+ *  let's us refer to $rule to mean previous value.  I am reusing the
+ *  variable 'tree' sitting in retval struct to hold the value of root_0 right
+ *  before I set it during rewrites.  The assign will be to retval.tree.
+ */
+prevRuleRootRef() ::= "retval"
+
+rewriteRuleRef(rule,dup) ::= <<
+<if(dup)>
+adaptor.addChild(root_<treeLevel>, adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)));<\n>
+<else>
+adaptor.addChild(root_<treeLevel>, list_<rule>.get(i_<rewriteBlockLevel>));<\n>
+<endif>
+>>
+
+rewriteRuleRefRoot(rule,dup) ::= <<
+<if(dup)>
+root_<treeLevel> = adaptor.becomeRoot(adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)), root_<treeLevel>);<\n>
+<else>
+root_<treeLevel> = adaptor.becomeRoot(list_<rule>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+<endif>
+>>
+
+rewriteAction(action) ::= <<
+adaptor.addChild(root_<treeLevel>, <action>);<\n>
+>>
+
+rewriteActionRoot(action) ::= <<
+root_<treeLevel> = adaptor.becomeRoot(<action>, root_<treeLevel>);<\n>
+>>
+
+/** Gen $ruleLabel ... where defined via ruleLabel=rule */
+rewriteRuleLabelRef(label) ::= <<
+adaptor.addChild(root_<treeLevel>, <label>.tree);<\n>
+>>
+
+/** Gen $ruleLabel ... where defined via ruleLabel+=rule */
+rewriteRuleListLabelRef(label) ::= <<
+adaptor.addChild(root_<treeLevel>, list_<label>.get(i_<rewriteBlockLevel>));<\n>
+>>
+
+/** Gen ^($ruleLabel ...) where ruleLabel=rule */
+rewriteRuleLabelRefRoot(label) ::= <<
+root_<treeLevel> = adaptor.becomeRoot(<label>.tree, root_<treeLevel>);<\n>
+>>
+
+/** Gen ^($ruleLabel ...) where ruleLabel+=rule */
+rewriteRuleListLabelRefRoot(label) ::= <<
+root_<treeLevel> = adaptor.becomeRoot(list_<label>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+>>
+
 
 // F i x e d  D F A  (if-then-else)
 
@@ -729,9 +1243,14 @@ ruleLabelDef(label) ::= <<
 
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-protected static class <returnType()> {
-<if(ruleDescriptor.needPredefinedRuleAttributes)>
-    Token start=null, stop=null;
+public static class <returnType()> {
+    Token start, stop;
+<if(buildAST)>
+    Object tree;
+<else>
+<if(buildTemplate)>
+    StringTemplate st;
+<endif>
 <endif>
     <scope.attributes:{<it.decl>;}; separator="\n">
 };
@@ -779,6 +1298,10 @@ retval.<attr.name>
 /** How to translate $tokenLabel */
 tokenLabelRef(label) ::= "<label>"
 
+/** ids+=ID {$ids} or e+=expr {$e} */
+listLabelRef(label) ::= "list_<label>"
+
+
 // not sure the next are the right approach
 
 tokenLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
@@ -787,6 +1310,7 @@ tokenLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
 tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>.getCharPositionInLine()"
 tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
 tokenLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
+tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
 ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"

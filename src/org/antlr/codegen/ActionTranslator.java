@@ -108,6 +108,8 @@ public class ActionTranslator {
 	/** Given x of $x.y or $x, figure out what scope x is if any (x might
 	 *  be a parameter, say, not a scope name).  The valid scopes are
 	 *  $rulelabel, $tokenlabel, $rulename, or $scopename.
+	 *  List labels like ids+=ID have no scope as they are a list of scopes
+	 *  in a sense.
 	 */
 	protected AttributeScope resolveScope(Rule r, String scopeName) {
 		if ( grammar.getGlobalScope(scopeName)!=null ) {
@@ -132,7 +134,8 @@ public class ActionTranslator {
 		if ( r.getRuleLabel(scopeName)!=null ) {
 			// $ruleLabel
 			Grammar.LabelElementPair ruleLabel = r.getRuleLabel(scopeName);
-			return new RuleLabelScope(ruleLabel.referencedRule);
+			Rule refdRule = grammar.getRule(ruleLabel.referencedRuleName);
+			return new RuleLabelScope(refdRule);
 		}
 		return null;
 	}
@@ -161,12 +164,16 @@ public class ActionTranslator {
 			// $rulename
 			stName = "ruleScopeAttributeRef";
 		}
-		else if ( r.getTokenLabel(scopeName)!=null ) {
-			// $tokenLabel
+		else if ( r.getTokenLabel(scopeName)!=null ||
+			      r.getTokenListLabel(scopeName)!=null )
+		{
+			// $tokenLabel.attr
 			stName = "tokenLabelPropertyRef_"+attribute;
 		}
-		else if ( r.getRuleLabel(scopeName)!=null ) {
-			// $ruleLabel
+		else if ( r.getRuleLabel(scopeName)!=null ||
+			      r.getRuleListLabel(scopeName)!=null )
+		{
+			// $ruleLabel.attr
 			rlScope = (RuleLabelScope)scope;
 			if( RuleLabelScope.predefinedRuleProperties.contains(attribute) ) {
 				stName = "ruleLabelPropertyRef_"+attribute;
@@ -192,20 +199,21 @@ public class ActionTranslator {
 	 *  Then translate according to scope.
 	 */
 	protected int parseAttributeReference(Rule r,
-										String action,
-										int c,
-										StringBuffer buf,
-										GrammarAST actionAST)
+										  String action,
+										  int c,
+										  StringBuffer buf,
+										  GrammarAST actionAST)
 	{
 		String attrRef=null;
 		String scope = getID(action, c);
 		c += scope.length();
 		AttributeScope attrScope = resolveScope(r, scope);
-		List ruleRefs = null;
-		List tokenRefs = null;
+		List ruleRefsInAlt = null;
+		List tokenRefsInAlt = null;
 		if ( r!=null ) {
-			ruleRefs = r.getRuleRefsInAlt(scope, actionAST.outerAltNum);
-			tokenRefs = r.getTokenRefsInAlt(scope, actionAST.outerAltNum);
+			String name = scope;
+			ruleRefsInAlt = r.getRuleRefsInAlt(name, actionAST.outerAltNum);
+			tokenRefsInAlt = r.getTokenRefsInAlt(name, actionAST.outerAltNum);
 		}
 		if ( (c+1)<action.length() &&
 			 action.charAt(c)=='.' && Character.isLetter(action.charAt(c+1)))
@@ -214,18 +222,19 @@ public class ActionTranslator {
 			int dotIndex = c;
 			c++;
 			String attributeName = getID(action, c);
+			//System.out.println("translate: "+scope+"."+attributeName);
 			if ( attrScope!=null ) {
 				// $scope.attributeName
 				attrRef = translateAttributeReference(r, actionAST, attrScope, scope, attributeName);
 				c += attributeName.length();
 			}
-			else if ( ruleRefs!=null ) {
+			else if ( ruleRefsInAlt!=null ) {
 				// $rule.attributeName
 				attrRef =
 					translateRuleReference(r, actionAST, scope, attributeName);
 				c += attributeName.length();
 			}
-			else if ( tokenRefs!=null ) {
+			else if ( tokenRefsInAlt!=null ) {
 				// $token.attributeName
 				attrRef =
 					translateTokenReference(r, actionAST, scope, attributeName);
@@ -240,9 +249,18 @@ public class ActionTranslator {
 		}
 		else {
 			// Isolated $x
-			if ( tokenRefs!=null ) {
+			//System.out.println("translate: "+scope);
+			if ( tokenRefsInAlt!=null ) {
 				// $token
 				attrRef = translateTokenReference(r, actionAST, scope, null);
+			}
+			else if ( r!=null && r.getTokenListLabel(scope)!=null ) {
+				// $tokenList
+                attrRef = translateElementListReference(scope);
+			}
+			else if ( r!=null && r.getRuleListLabel(scope)!=null ) {
+				// $ruleList
+				attrRef = translateElementListReference(scope);
 			}
 			else {
 				attrRef = translateAttributeReference(r, actionAST, scope);
@@ -266,6 +284,7 @@ public class ActionTranslator {
 	{
 		antlr.Token actionToken = actionAST.getToken();
 		String ref = ATTRIBUTE_REF_CHAR+scopeName+"."+attributeName;
+		//System.out.println("translate "+ref);
 		Attribute attribute = scope.getAttribute(attributeName);
 		if ( attribute==null ) {
 			int msgID = 0;
@@ -352,9 +371,10 @@ public class ActionTranslator {
 					refST = generator.templates.getInstanceOf("tokenLabelRef");
 					refST.setAttribute("label", attributeName);
 					break;
-				case Grammar.LIST_LABEL :
+				case Grammar.RULE_LIST_LABEL :
+				case Grammar.TOKEN_LIST_LABEL :
 					// $listLabel
-					refST = generator.templates.getInstanceOf("tokenLabelRef");
+					refST = generator.templates.getInstanceOf("listLabelRef");
 					refST.setAttribute("label", attributeName);
 					break;
 				case Grammar.RULE_LABEL :
@@ -408,7 +428,8 @@ public class ActionTranslator {
 											 String tokenRefName,
 											 String attributeName)
 	{
-		String ref = ATTRIBUTE_REF_CHAR+attributeName;
+		String ref = ATTRIBUTE_REF_CHAR+tokenRefName+"."+attributeName;
+		//System.out.println("translate token ref "+ref);
 		List tokenRefs = r.getTokenRefsInAlt(tokenRefName, actionAST.outerAltNum);
 		GrammarAST uniqueRefAST = (GrammarAST)tokenRefs.get(0);
 		if ( uniqueRefAST.code==null ) {
@@ -418,19 +439,19 @@ public class ActionTranslator {
 									  ref);
 			return ref;
 		}
-		String labelName = tokenRefName+"_"+actionAST.outerAltNum;
-		StringTemplate existingLabelST =
-			(StringTemplate)uniqueRefAST.code.getAttribute("labelST");
-		if ( existingLabelST!=null ) {
-			labelName = (String)existingLabelST.getAttribute("label");
+		String labelName = null;
+		String existingLabelName =
+			(String)uniqueRefAST.code.getAttribute("label");
+		// reuse any label or list label if it exists
+		if ( existingLabelName!=null ) {
+			labelName = existingLabelName;
 		}
 		else {
-			// create new label
+			// else create new label
+			labelName = generator.createUniqueLabel(tokenRefName);
 			CommonToken label = new CommonToken(ANTLRParser.ID, labelName);
 			grammar.defineTokenRefLabel(r.name, label, uniqueRefAST);
-			StringTemplate labelST = generator.templates.getInstanceOf("tokenLabel");
-			labelST.setAttribute("label", labelName);
-			uniqueRefAST.code.setAttribute("labelST", labelST);
+			uniqueRefAST.code.setAttribute("label", labelName);
 		}
 		AttributeScope scope = AttributeScope.tokenScope;
 		if ( attributeName==null ) {
@@ -450,6 +471,7 @@ public class ActionTranslator {
 											String attributeName)
 	{
 		String ref = ATTRIBUTE_REF_CHAR+ruleRefName+"."+attributeName;
+		//System.out.println("translate rule ref "+ref);
 		List ruleRefs = r.getRuleRefsInAlt(ruleRefName, actionAST.outerAltNum);
 		GrammarAST uniqueRefAST = (GrammarAST)ruleRefs.get(0);
 		if ( uniqueRefAST.code==null ) {
@@ -459,14 +481,15 @@ public class ActionTranslator {
 									  ref);
 			return ref;
 		}
-		String labelName = ruleRefName+"_"+actionAST.outerAltNum;
+		String labelName = null;
 		String existingLabelName =
 			(String)uniqueRefAST.code.getAttribute("label");
 		if ( existingLabelName!=null ) {
-			labelName = existingLabelName;
+			labelName = existingLabelName; // ok to reuse even if list label
 		}
-		else {
+		if ( labelName==null ) {
 			// create new label
+			labelName = generator.createUniqueLabel(ruleRefName);
 			CommonToken label = new CommonToken(ANTLRParser.ID, labelName);
 			grammar.defineRuleRefLabel(r.name, label, uniqueRefAST);
 			uniqueRefAST.code.setAttribute("label", labelName);
@@ -474,6 +497,13 @@ public class ActionTranslator {
 		Rule referencedRule = grammar.getRule(ruleRefName);
 		AttributeScope scope = new RuleLabelScope(referencedRule);
 		return translateAttributeReference(r, actionAST, scope, labelName, attributeName);
+	}
+
+	protected String translateElementListReference(String labelName) {
+		StringTemplate refST =
+			generator.templates.getInstanceOf("listLabelRef");
+		refST.setAttribute("label", labelName);
+		return refST.toString();
 	}
 
 	protected String getID(String action, int c) {
@@ -490,4 +520,5 @@ public class ActionTranslator {
 		}
 		return action.substring(start,end+1);
 	}
+
 }

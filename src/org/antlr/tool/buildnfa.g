@@ -222,7 +222,7 @@ block returns [StateCluster g = null]
     List alts = new LinkedList();
 }
     :   ( OPTIONS )? // ignore
-		( a=alternative {alts.add(a);} )+
+		( a=alternative rewrite {alts.add(a);} )+
         {
         g = factory.build_AlternativeBlock(alts);
         }
@@ -242,6 +242,10 @@ alternative returns [StateCluster g=null]
         }
         }
     ;
+
+rewrite
+	:	( #( REWRITE (SEMPRED)? ALT ) )*
+	;
 
 element returns [StateCluster g=null]
     :   g=atom

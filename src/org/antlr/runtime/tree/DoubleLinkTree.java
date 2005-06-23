@@ -25,41 +25,32 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.tool;
+package org.antlr.runtime.tree;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import java.util.List;
+import java.util.ArrayList;
 
-import java.util.Set;
-import java.util.HashSet;
+/** A generic doubly-linked tree implementation with no payload.
+ *  You must subclass to actually have any user data.
+ */
+public class DoubleLinkTree extends BaseTree {
+	protected DoubleLinkTree parent;
 
-public class RuleLabelScope extends AttributeScope {
-	public static final Set predefinedRuleProperties = new HashSet();
-	static {
-		predefinedRuleProperties.add("text");
-		predefinedRuleProperties.add("start");
-		predefinedRuleProperties.add("stop");
-		predefinedRuleProperties.add("tree");
-		predefinedRuleProperties.add("st");
+	public DoubleLinkTree getParent() {
+		return parent;
 	}
 
-	public Rule referencedRule;
-
-	public RuleLabelScope(Rule referencedRule) {
-		super("ref_"+referencedRule.name);
-		this.referencedRule = referencedRule;
+	public void setParent(DoubleLinkTree t) {
+		parent = t;
 	}
 
-	/** If you label a rule reference, you can access that rule's
-	 *  return values as well as any predefined attributes.
-	 */
-	public Attribute getAttribute(String name) {
-		if ( predefinedRuleProperties.contains(name) ) {
-			return new Attribute(name, null);
-		}
-		if ( referencedRule.returnScope!=null ) {
-			return referencedRule.returnScope.getAttribute(name);
-		}
-		return null;
+	public void addChild(BaseTree t) {
+		super.addChild(t);
+		((DoubleLinkTree)t).setParent((DoubleLinkTree)this);
+	}
+
+	public void setChild(int i, BaseTree t) {
+		super.setChild(i, t);
+		((DoubleLinkTree)t).setParent((DoubleLinkTree)this);
 	}
 }

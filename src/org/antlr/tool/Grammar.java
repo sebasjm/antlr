@@ -52,9 +52,11 @@ public class Grammar {
 
 	public static final int RULE_LABEL = 1;
 	public static final int TOKEN_LABEL = 2;
-	public static final int LIST_LABEL = 3;
+	public static final int RULE_LIST_LABEL = 3;
+	public static final int TOKEN_LIST_LABEL = 4;
 
-	public static String[] LabelTypeToString = {"<invalid>", "rule", "token", "list"};
+	public static String[] LabelTypeToString =
+		{"<invalid>", "rule", "token", "rule-list", "token-list"};
 
     public static final String TOKEN_RULENAME = "Tokens";
 	public static final String FRAGMENT_RULE_MODIFIER = "fragment";
@@ -81,13 +83,15 @@ public class Grammar {
 	public class LabelElementPair {
 		public antlr.Token label;
 		public GrammarAST elementRef;
-		public Rule referencedRule;
-		public int type; // e.g., RULE_LABEL
+		public String referencedRuleName;
+		public int type; // in {RULE_LABEL,TOKEN_LABEL,RULE_LIST_LABEL,TOKEN_LIST_LABEL}
 		public LabelElementPair(antlr.Token label, GrammarAST elementRef) {
 			this.label = label;
 			this.elementRef = elementRef;
-			String referencedRuleName = elementRef.getText();
-			this.referencedRule = getRule(referencedRuleName);
+			this.referencedRuleName = elementRef.getText();
+		}
+		public Rule getReferencedRule() {
+			return getRule(referencedRuleName);
 		}
 		public String toString() {
 			return elementRef.toString();
@@ -109,7 +113,15 @@ public class Grammar {
     protected Map options;
 
 	public static final Set legalOptions =
-			new HashSet() {{add("language"); add("tokenVocab");}};
+			new HashSet() {
+				{add("language"); add("tokenVocab");
+				 add("output"); add("ASTLabelType");}
+			};
+
+	public static final Set doNotCopyOptionsToLexer =
+		new HashSet() {
+			{add("output");add("ASTLabelType");}
+		};
 
 	public static final Map defaultOptions =
 			new HashMap() {{put("language","Java");}};
@@ -158,7 +170,7 @@ public class Grammar {
 	protected Set ruleRefs = new HashSet();
 
 	/** The unique set of all token ID references in any rule */
-	protected Set tokenRefs = new HashSet();
+	protected Set tokenIDRefs = new HashSet();
 
 	/** If combined or lexer grammar, track the rules; Set<String>.
 	 * 	Track lexer rules so we can warn about undefined tokens.
@@ -376,8 +388,10 @@ public class Grammar {
 			Iterator optionNames = options.keySet().iterator();
 			while (optionNames.hasNext()) {
 				String optionName = (String) optionNames.next();
-				Object value = options.get(optionName);
-				lexerGrammarST.setAttribute("options.{name,value}", optionName, value);
+				if ( !doNotCopyOptionsToLexer.contains(optionName) ) {
+					Object value = options.get(optionName);
+					lexerGrammarST.setAttribute("options.{name,value}", optionName, value);
+				}
 			}
 		}
 		return lexerGrammarST.toString();
@@ -598,7 +612,7 @@ public class Grammar {
 		ANTLRTreePrinter printer = new ANTLRTreePrinter();
 		printer.setASTNodeClass("org.antlr.tool.GrammarAST");
 		try {
-			String ruleText =  printer.toString(ruleAST, this);
+			String ruleText = printer.toString(ruleAST, this, true);
 			//System.out.println("ruleText: "+ruleText);
 			lexerGrammarST.setAttribute("rules", ruleText);
 			lexerRules.add(ruleToken.getText());
@@ -673,26 +687,15 @@ public class Grammar {
 		return scopes;
 	}
 
+	/** Define a label defined in a rule r; check the validity then ask the
+	 *  Rule object to actually define it.
+	 */
 	protected void defineLabel(Rule r, antlr.Token label, GrammarAST element, int type) {
-		String labelName = label.getText();
         boolean err = nameSpaceChecker.checkForLabelTypeMismatch(r, label, type);
 		if ( err ) {
 			return;
 		}
-		LabelElementPair pair = new LabelElementPair(label,element);
-		pair.type = type;
-		r.labelNameSpace.put(labelName, pair);
-		switch ( type ) {
-			case TOKEN_LABEL :
-				r.tokenLabels.put(label.getText(), pair);
-				break;
-			case RULE_LABEL :
-				r.ruleLabels.put(label.getText(), pair);
-				break;
-			case LIST_LABEL :
-				r.listLabels.put(label.getText(), pair);
-				break;
-		}
+		r.defineLabel(label, element, type);
 	}
 
 	public void defineTokenRefLabel(String ruleName,
@@ -701,9 +704,6 @@ public class Grammar {
 	{
         Rule r = getRule(ruleName);
 		if ( r!=null ) {
-			if ( r.tokenLabels==null ) {
-				r.tokenLabels = new LinkedHashMap();
-			}
 			defineLabel(r, label, tokenRef, TOKEN_LABEL);
 		}
 	}
@@ -714,71 +714,64 @@ public class Grammar {
 	{
 		Rule r = getRule(ruleName);
 		if ( r!=null ) {
-			if ( r.ruleLabels==null ) {
-				r.ruleLabels = new LinkedHashMap();
-			}
 			defineLabel(r, label, ruleRef, RULE_LABEL);
 		}
 	}
 
-	public void defineListLabel(String ruleName,
-								antlr.Token label,
-								GrammarAST element)
+	public void defineTokenListLabel(String ruleName,
+									 antlr.Token label,
+									 GrammarAST element)
 	{
 		Rule r = getRule(ruleName);
 		if ( r!=null ) {
-			if ( r.listLabels==null ) {
-				r.listLabels = new LinkedHashMap();
-			}
-			defineLabel(r, label, element, LIST_LABEL);
+			defineLabel(r, label, element, TOKEN_LIST_LABEL);
+		}
+	}
+
+	public void defineRuleListLabel(String ruleName,
+									antlr.Token label,
+									GrammarAST element)
+	{
+		if ( !buildAST() ) {
+			ErrorManager.grammarError(
+				ErrorManager.MSG_LIST_LABEL_INVALID_UNLESS_AST,this,label,label.getText());
+		}
+		Rule r = getRule(ruleName);
+		if ( r!=null ) {
+			defineLabel(r, label, element, RULE_LIST_LABEL);
 		}
 	}
 
 	/** Track a rule reference within an outermost alt of a rule.  Used
 	 *  at the moment to decide if $ruleref refers to a unique rule ref in
-	 *  the alt.
+	 *  the alt.  Rewrite rules force tracking of all rule AST results.
 	 */
 	public void altReferencesRule(String ruleName, GrammarAST refAST, int outerAltNum) {
 		Rule r = getRule(ruleName);
 		if ( r==null ) {
 			return;
 		}
-		List refs = (List)r.altToRuleRefMap[outerAltNum].get(refAST.getText());
-		if ( refs==null ) {
-			refs = new ArrayList();
-			r.altToRuleRefMap[outerAltNum].put(refAST.getText(), refs);
-		}
-		refs.add(refAST);
-		referenceRule(refAST.getToken());
-	}
-
-	/** Track a token reference within an outermost alt of a rule.  Used
-	 *  at the moment to decide if $tokenref refers to a unique token ref in
-	 *  the alt.
-	 */
-	public void altReferencesToken(String ruleName, GrammarAST refAST, int outerAltNum) {
-		Rule r = getRule(ruleName);
-		if ( r==null ) {
-			return;
-		}
-		List refs = (List)r.altToTokenRefMap[outerAltNum].get(refAST.getText());
-		if ( refs==null ) {
-			refs = new ArrayList();
-			r.altToTokenRefMap[outerAltNum].put(refAST.getText(), refs);
-		}
-		refs.add(refAST);
-		referenceToken(refAST.getToken());
-	}
-
-	protected void referenceRule(antlr.Token refToken) {
+		r.trackRuleReferenceInAlt(refAST, outerAltNum);
+		antlr.Token refToken = refAST.getToken();
 		if ( !ruleRefs.contains(refToken) ) {
 			ruleRefs.add(refToken);
 		}
 	}
 
-	protected void referenceToken(antlr.Token refToken) {
-		if ( !tokenRefs.contains(refToken) ) {
-			tokenRefs.add(refToken);
+	/** Track a token reference within an outermost alt of a rule.  Used
+	 *  to decide if $tokenref refers to a unique token ref in
+	 *  the alt. Does not track literals!
+	 *
+	 *  Rewrite rules force tracking of all tokens.
+	 */
+	public void altReferencesTokenID(String ruleName, GrammarAST refAST, int outerAltNum) {
+		Rule r = getRule(ruleName);
+		if ( r==null ) {
+			return;
+		}
+		r.trackTokenReferenceInAlt(refAST, outerAltNum);
+		if ( !tokenIDRefs.contains(refAST.getToken()) ) {
+			tokenIDRefs.add(refAST.getToken());
 		}
 	}
 
@@ -790,7 +783,7 @@ public class Grammar {
 	public void referenceRuleLabelPredefinedAttribute(String ruleName) {
 		Rule r = getRule(ruleName);
 		if ( r!=null ) {
-			r.needPredefinedRuleAttributes = true;
+			r.referencedPredefinedRuleAttributes = true;
 		}
 	}
 
@@ -1033,6 +1026,22 @@ public class Grammar {
 		return value;
     }
 
+	public boolean buildAST() {
+		String outputType = (String)getOption("output");
+		if ( outputType!=null ) {
+			return outputType.equals("AST");
+		}
+		return false;
+	}
+
+	public boolean buildTemplate() {
+		String outputType = (String)getOption("output");
+		if ( outputType!=null ) {
+			return outputType.equals("text");
+		}
+		return false;
+	}
+
     public Collection getRules() {
         return nameToRuleMap.values();
     }
@@ -1223,10 +1232,10 @@ public class Grammar {
         if ( type == LEXER ) {
             return set.complement(Label.ALLCHAR);
         }
-        System.out.println("complement "+set.toString(this));
-        System.out.println("vocabulary "+getTokenTypes().toString(this));
+        //System.out.println("complement "+set.toString(this));
+        //System.out.println("vocabulary "+getTokenTypes().toString(this));
         IntSet c = set.complement(getTokenTypes());
-        System.out.println("result="+c.toString(this));
+        //System.out.println("result="+c.toString(this));
         return c;
     }
 
@@ -1434,11 +1443,15 @@ if ( sl.member(Label.EOF) ) {
         return grammarTreeToString(grammarTree);
     }
 
-    public String grammarTreeToString(GrammarAST t) {
+	public String grammarTreeToString(GrammarAST t) {
+		return grammarTreeToString(t, true);
+	}
+
+	public String grammarTreeToString(GrammarAST t, boolean showActions) {
         String s = null;
         try {
             s = t.getLine()+":"+t.getColumn()+": ";
-            s += new ANTLRTreePrinter().toString((AST)t, this);
+            s += new ANTLRTreePrinter().toString((AST)t, this, showActions);
         }
         catch (Exception e) {
             ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,

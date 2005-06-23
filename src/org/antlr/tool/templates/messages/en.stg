@@ -161,6 +161,14 @@ NONCHAR_RANGE(file,line,col) ::=
 */
 ILLEGAL_OPTION(file,line,col,arg) ::=
 	"<loc()>illegal option <arg>"
+LIST_LABEL_INVALID_UNLESS_AST(file,line,col,arg) ::=
+	"<loc()>rule '+=' list labels are not allowed unless building trees: <arg>"
+UNDEFINED_TOKEN_REF_IN_REWRITE(file,line,col,arg) ::=
+  "<loc()>reference to undefined token in rewrite rule: <arg>"
+REWRITE_ELEMENT_NOT_PRESENT_ON_LHS(file,line,col,arg) ::=
+  "<loc()>reference to rewrite element <arg> without reference on left of ->"
+UNDEFINED_LABEL_REF_IN_REWRITE(file,line,col,arg) ::=
+  "<loc()>reference to undefined label in rewrite rule: $<arg>"
 
 // GRAMMAR WARNINGS
 

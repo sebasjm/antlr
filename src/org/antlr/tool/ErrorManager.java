@@ -145,6 +145,10 @@ public class ErrorManager {
 	public static final int MSG_ARGS_ON_TOKEN_REF = 131;
 	//public static final int MSG_NONCHAR_RANGE = 132;
 	public static final int MSG_ILLEGAL_OPTION = 133;
+	public static final int MSG_LIST_LABEL_INVALID_UNLESS_AST = 134;
+	public static final int MSG_UNDEFINED_TOKEN_REF_IN_REWRITE = 135;
+	public static final int MSG_REWRITE_ELEMENT_NOT_PRESENT_ON_LHS = 136;
+	public static final int MSG_UNDEFINED_LABEL_REF_IN_REWRITE = 137;
 
 
 	// GRAMMAR WARNINGS

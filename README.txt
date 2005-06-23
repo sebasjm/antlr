@@ -1,9 +1,9 @@
 Early Access ANTLR v3
-ANTLR 3.0ea2
-June 12, 2005
+ANTLR 3.0ea3
+June 24, 2005
 
 Terence Parr, parrt at cs usfca edu
-ANTLR Project lead
+ANTLR Project lead and supreme dictator
 University of San Francisco
 
 INTRODUCTION 
@@ -200,6 +200,43 @@ to me.  I use Intellij so I never type anything actually to build.
 -----------------------------------------------------------------------
 
 CHANGES
+
+3.0ea3 - June 24, 2005
+
+Enhancements
+
+* Automatic tree construction operators are in: ! ^ ^^
+
+* Tree construction rewrite rules are in
+	-> {pred1}? rewrite1
+	-> {pred2}? rewrite2
+	...
+	-> rewriteN
+
+  The rewrite rules may be elements like ID, expr, $label, {node expr}
+  and trees ^( <root> <children> ).  You have have (...)?, (...)*, (...)+
+  subrules as well.
+
+  You may have rewrites in subrules not just at outer level of rule, but
+  any -> rewrite forces auto AST construction off for that alternative
+  of that rule.
+
+  To avoid cycles, copy semantics are used:
+
+  r : INT -> INT INT ;
+
+  means make two new nodes from the same INT token.
+
+  Repeated references to a rule element implies a copy for at least one
+  tree:
+
+  a : atom -> ^(atom atom) ; // NOT CYCLE! (dup atom tree)
+
+* $ruleLabel.tree refers to tree created by matching the labeled element.
+
+* A description of the blocks/alts is generated as a comment in output code
+
+* A timestamp / signature is put at top of each generated code file
 
 3.0ea2 - June 12, 2005
 

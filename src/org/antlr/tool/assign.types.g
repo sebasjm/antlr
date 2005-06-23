@@ -145,7 +145,7 @@ protected void trackChar(GrammarAST t) {
 
 /** Track string literals in any non-lexer rule (could be in tokens{} section) */
 protected void trackString(GrammarAST t) {
-	// if lexer don't allow aliasing in tokens section
+	// if lexer, don't allow aliasing in tokens section
 	if ( currentRuleName==null && grammar.type==Grammar.LEXER ) {
 		ErrorManager.grammarError(ErrorManager.MSG_CANNOT_ALIAS_TOKENS_IN_LEXER,
 								  grammar,
@@ -551,7 +551,7 @@ ruleScopeSpec
 block
     :   #(  BLOCK
             (optionsSpec)?
-            alternative (  alternative)*
+            ( alternative rewrite )+
             EOB   
          )
     ;
@@ -559,6 +559,10 @@ block
 alternative
     :   #( ALT (element)+ EOA )
     ;
+
+rewrite
+	:	( #( REWRITE (SEMPRED)? ALT ) )*
+	;
 
 element
     :   atom
@@ -575,7 +579,7 @@ element
     |   EPSILON 
     ;
 
-ebnf:   block 
+ebnf:   block
     |   #( OPTIONAL block ) 
     |   #( CLOSURE block )  
     |   #( POSITIVE_CLOSURE block ) 
@@ -593,7 +597,13 @@ atom
     |	set
     ;
 
-set :   #(SET (setElement)+)
+ast_suffix
+	:	ROOT
+	|	RULEROOT
+	|	BANG
+	;
+
+set :   #(SET (setElement)+ (ast_suffix)? )
     ;
 
 setElement

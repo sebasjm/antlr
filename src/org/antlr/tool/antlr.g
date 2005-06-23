@@ -39,7 +39,7 @@ import antlr.*;
  *
  *  Terence Parr
  *  University of San Francisco
- *  2004
+ *  2005
  */
 class ANTLRParser extends Parser;
 options {
@@ -77,6 +77,7 @@ tokens {
     TREE_GRAMMAR;
     COMBINED_GRAMMAR;
     INITACTION;
+    LABEL; // $x used in rewrite rules
 }
 
 {
@@ -139,20 +140,6 @@ grammarType
     	gr:"grammar" {#gr.setType(gtype);}
     ;
 
-/*
-grammarOptionsSpec
-    :   LPAREN!
-            optionList
-        RPAREN!
-    ;
-
-optionList
-    :   option (COMMA! option)*
-    	{#optionList = #(#[OPTIONS,"OPTIONS"], #optionList);}
-    ;
-
-    */
-
 optionsSpec
 	:	OPTIONS^ (option SEMI!)+ RCURLY!
 	;
@@ -189,17 +176,6 @@ tokensSpec
 tokenSpec
 	:	TOKEN_REF ( ASSIGN^ (STRING_LITERAL|CHAR_LITERAL) )? SEMI!
 	;
-
-/*
-tokensSpecOptions
-	:	OPEN_ELEMENT_OPTION
-		id ASSIGN optionValue
-		(
-			SEMI id ASSIGN optionValue
-		)*
-		CLOSE_ELEMENT_OPTION
-	;
-*/
 
 attrScopes
 	:	(attrScope)*
@@ -283,7 +259,7 @@ ruleScopeSpec
 
 /** Build #(BLOCK ( #(ALT ...) EOB )+ ) */
 block
-    :   (set) => set  // special block like ('a'|'b'|'0'..'9')
+    :   (set) => s:set  // special block like ('a'|'b'|'0'..'9')
 
     |	lp:LPAREN^ {#lp.setType(BLOCK); #lp.setText("BLOCK");}
 		(
@@ -298,7 +274,7 @@ block
 		|	ACTION COLON!
 		)?
 
-		a1:alternative ( OR! a2:alternative )*
+		a1:alternative rewrite ( OR! a2:alternative rewrite )*
 
         RPAREN!
         {
@@ -315,7 +291,7 @@ altList
 	blkRoot.setLine(LT(1).getLine());
 	blkRoot.setColumn(LT(1).getColumn());
 }
-    :   a1:alternative ( OR! a2:alternative )*
+    :   a1:alternative rewrite ( OR! a2:alternative rewrite )*
         {
         #altList = #(blkRoot,#altList,#[EOB,"<end-of-block>"]);
         }
@@ -404,7 +380,8 @@ notSet
 	;
 
 /** Match two or more set elements */
-set	:   LPAREN! setNoParens RPAREN!
+set	:   LPAREN! s:setNoParens RPAREN!
+    	( ast:ast_suffix! {#s.addChild(#ast);} )?
     ;
 
 setNoParens
@@ -439,6 +416,7 @@ rootNode
 		terminal
 	;
 
+/** matches ENBF blocks (and sets via block rule) */
 ebnf!
 {
     int line = LT(1).getLine();
@@ -457,12 +435,6 @@ ebnf!
         |                   {#ebnf = #b;}
 		)
 		{#ebnf.setLine(line); #ebnf.setColumn(col);}
-	;
-
-ast_type_spec
-	:	(	CARET
-		|	BANG 
-		)?
 	;
 
 range!
@@ -484,20 +456,36 @@ terminal
 {
 GrammarAST ebnfRoot=null, subrule=null;
 }
-    :   cl:CHAR_LITERAL ast_type_spec! (subrule=ebnfSuffix[#cl] {#terminal=subrule;})?
+    :   cl:CHAR_LITERAL^
+    		(	subrule=ebnfSuffix[#cl] {#terminal=subrule;}
+    		|	ast_suffix
+    		)?
 
-	|   tr:TOKEN_REF^ ast_type_spec! (subrule=ebnfSuffix[#tr] {#terminal=subrule;})?
-		// Args are only valid for lexer rules
-		( targ:ARG_ACTION )?
+	|   tr:TOKEN_REF^
+			( ARG_ACTION )?
+			(	subrule=ebnfSuffix[#tr] {#terminal=subrule;}
+			|	ast_suffix
+			)?
+			// Args are only valid for lexer rules
 
-    |   rr:RULE_REF^ ast_type_spec! ( rarg:ARG_ACTION )?
-    	(subrule=ebnfSuffix[#rr] {#terminal=subrule;})?
+    |   rr:RULE_REF^
+			( ARG_ACTION )?
+			(	subrule=ebnfSuffix[#rr] {#terminal=subrule;}
+			|	ast_suffix
+			)?
 
-	|   sl:STRING_LITERAL
-		ast_type_spec!
-    	(subrule=ebnfSuffix[#sl] {#terminal=subrule;})?
+	|   sl:STRING_LITERAL^
+    		(	subrule=ebnfSuffix[#sl] {#terminal=subrule;}
+			|	ast_suffix
+			)?
 
-	|   wi:WILDCARD ast_type_spec!
+	|   wi:WILDCARD^ (ast_suffix)?
+	;
+
+ast_suffix
+	:	ROOT
+	|	RULEROOT
+	|	BANG
 	;
 
 ebnfSuffix[GrammarAST elemAST] returns [GrammarAST subrule=null]
@@ -524,11 +512,11 @@ GrammarAST ebnfRoot=null;
     ;
 
 notTerminal
-	:   cl:CHAR_LITERAL
+	:   cl:CHAR_LITERAL^ ( ast_suffix )? // bang could be "no char" in lexer
 
-		( BANG! )?
-	|
-		tr:TOKEN_REF ast_type_spec!
+	|	tr:TOKEN_REF^ (ast_suffix)?
+
+	|	STRING_LITERAL (ast_suffix)?
 	;
 
 id	:	TOKEN_REF {#id.setType(ID);}
@@ -539,6 +527,107 @@ id	:	TOKEN_REF {#id.setType(ID);}
 idToken
     :	TOKEN_REF {#idToken.setType(ID);}
 	|	RULE_REF  {#idToken.setType(ID);}
+	;
+
+// R E W R I T E  S Y N T A X
+
+rewrite
+{
+    GrammarAST root = new GrammarAST();
+}
+	:!	( options { warnWhenFollowAmbig=false;}
+		: rew:REWRITE pred:SEMPRED alt:rewrite_alternative
+	      {root.addChild( #(#rew, #pred, #alt) );}
+	    )*
+		rew2:REWRITE alt2:rewrite_alternative
+        {
+        root.addChild( #(#rew2, #alt2) );
+        #rewrite = (GrammarAST)root.getFirstChild();
+        }
+	|
+	;
+
+// DOESNT DO SETS
+rewrite_block
+    :   lp:LPAREN^ {#lp.setType(BLOCK); #lp.setText("BLOCK");}
+		rewrite_alternative
+        RPAREN!
+        {
+        GrammarAST eob = #[EOB,"<end-of-block>"];
+        eob.setLine(lp.getLine());
+        eob.setColumn(lp.getColumn());
+        #rewrite_block.addChild(eob);
+        }
+    ;
+
+rewrite_alternative
+{
+    GrammarAST eoa = #[EOA, "<end-of-alt>"];
+    GrammarAST altRoot = #[ALT,"ALT"];
+    altRoot.setLine(LT(1).getLine());
+    altRoot.setColumn(LT(1).getColumn());
+}
+    :   ( rewrite_element )+
+        {
+            if ( #rewrite_alternative==null ) {
+                #rewrite_alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);
+            }
+            else {
+                #rewrite_alternative = #(altRoot, #rewrite_alternative,eoa);
+            }
+        }
+   	|   {#rewrite_alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);}
+    ;
+
+rewrite_element
+{
+GrammarAST subrule=null;
+}
+	:	t:rewrite_terminal
+    	( subrule=ebnfSuffix[#t] {#rewrite_element=subrule;} )?
+	|   rewrite_ebnf
+//	|   a:ACTION
+	|   tr:rewrite_tree
+    	( subrule=ebnfSuffix[#tr] {#rewrite_element=subrule;} )?
+	;
+
+rewrite_terminal
+{
+GrammarAST subrule=null;
+}
+    :   cl:CHAR_LITERAL
+	|   tr:TOKEN_REF^ (ARG_ACTION)? // for imaginary nodes
+    |   rr:RULE_REF
+	|   sl:STRING_LITERAL
+	|!  d:DOLLAR i:id // reference to a label in a rewrite rule
+		{
+		#rewrite_terminal = #[LABEL,i_AST.getText()];
+		#rewrite_terminal.setLine(#d.getLine());
+		#rewrite_terminal.setColumn(#d.getColumn());
+		}
+	|	ACTION
+	;
+
+rewrite_ebnf!
+{
+    int line = LT(1).getLine();
+    int col = LT(1).getColumn();
+}
+	:	b:rewrite_block
+		(	QUESTION    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
+						 #rewrite_ebnf=#([OPTIONAL,"?"],#b);}
+		|	STAR	    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
+						 #rewrite_ebnf=#([CLOSURE,"*"],#b);}
+		|	PLUS	    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
+						 #rewrite_ebnf=#([POSITIVE_CLOSURE,"+"],#b);}
+		)
+		{#rewrite_ebnf.setLine(line); #rewrite_ebnf.setColumn(col);}
+	;
+
+rewrite_tree :
+	TREE_BEGIN^
+        rewrite_terminal ( rewrite_element )*
+    RPAREN!
 	;
 
 class ANTLRLexer extends Lexer;
@@ -620,7 +709,7 @@ COMMA : ',';
 
 QUESTION :	'?' ;
 
-TREE_BEGIN : "#(" ;
+TREE_BEGIN : "^(" ;
 
 LPAREN:	'(' ;
 
@@ -638,9 +727,13 @@ PLUS_ASSIGN : "+=" ;
 
 IMPLIES : "=>" ;
 
+REWRITE : "->" ;
+
 SEMI:	';' ;
 
-CARET : '^' ;
+ROOT : '^' ;
+
+RULEROOT : "^^" ;
 
 BANG : '!' ;
 
@@ -653,6 +746,8 @@ RANGE : ".." ;
 NOT :	'~' ;
 
 RCURLY:	'}'	;
+
+DOLLAR : '$' ;
 
 CHAR_LITERAL
 	:	'\'' (ESC|~'\'') '\''
@@ -713,16 +808,6 @@ XDIGIT :
 	;
 
 INT	:	('0'..'9')+
-	;
-
-/** ${...} is a lexer action */
-LEXER_ACTION
-	:   "${"
-	;
-
-/** ^{...} is a tree action */
-TREE_ACTION
-	:   "^{"
 	;
 
 ARG_ACTION

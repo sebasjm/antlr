@@ -304,4 +304,25 @@ public class GrammarAST extends BaseAST {
         }
         return array;
     }
+
+	/** Return a reference to the first node (depth-first) that has
+	 *  token type ttype.  Assume 'this' is a root node; don't visit siblings
+	 *  of root.  Return null if no node found with ttype.
+	 */
+	public GrammarAST findFirstType(int ttype) {
+		// check this node (the root) first
+		if ( this.getType()==ttype ) {
+			return this;
+		}
+		// else check children
+		GrammarAST child = (GrammarAST)this.getFirstChild();
+		while ( child!=null ) {
+			GrammarAST result = child.findFirstType(ttype);
+			if ( result!=null ) {
+				return result;
+			}
+			child = (GrammarAST)child.getNextSibling();
+		}
+		return null;
+	}
 }

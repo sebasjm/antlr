@@ -189,7 +189,7 @@ public class TestCharDFAConversion extends TestSuite {
 		String expecting =
 			":s0=>2\n";
 
-		TestSemanticPredicates.ErrorQueue equeue = new TestSemanticPredicates.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
 		checkDecision(g, 1, expecting, new int[] {1});

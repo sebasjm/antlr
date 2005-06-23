@@ -126,6 +126,9 @@ public class CodeGenerator {
 	protected StringTemplate outputFileST;
 	protected StringTemplate headerFileST;
 
+	/** Used to create unique labels */
+	protected int uniqueLabelNumber = 1;
+
 	/** A reference to the ANTLR tool so we can learn about output directories
 	 *  and such.
 	 */
@@ -144,16 +147,10 @@ public class CodeGenerator {
 	protected CyclicDFACodeGenerator cyclicDFAGenerator =
 		new CyclicDFACodeGenerator(this);
 
-	// TODO move to separate file
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
 	protected final String vocabFilePattern =
 		"<tokens:{<attr.name>=<attr.type>\n}>" +
 		"<literals:{<attr.name>=<attr.type>\n}>";
-
-	/** For every decision, track the maximum lookahead needed if fixed.
-	 *  Set to Integer.MAX_VALUE if cyclic DFA.
-	protected int[] decisionToMaxLookaheadDepth;
-	 */
 
 	public CodeGenerator(Tool tool, Grammar grammar, String language) {
 		this.tool = tool;
@@ -233,6 +230,13 @@ public class CodeGenerator {
 
 		// OUTPUT FILE (contains recognizerST)
 		outputFileST = templates.getInstanceOf("outputFile");
+		outputFileST.setAttribute("buildAST",
+								  new Boolean(grammar.type!=Grammar.LEXER&&
+											  grammar.buildAST()));
+		outputFileST.setAttribute("buildTemplate",
+								  new Boolean(grammar.type!=Grammar.LEXER&&
+											  grammar.buildTemplate()));
+
 		// TODO: LANGUAGE DEPENDENCY!!!! fix!
 		outputFileST.setAttribute("javaTypeInitMap", javaTypeInitMap);
 
@@ -268,6 +272,12 @@ public class CodeGenerator {
 			headerFileST.setAttribute("TREE_PARSER", new Boolean(true));
 		}
 		outputFileST.setAttribute("recognizer", recognizerST);
+
+		outputFileST.setAttribute("fileName", grammar.getFileName());
+		outputFileST.setAttribute("ANTLRVersion", Tool.VERSION);
+		outputFileST.setAttribute("generatedTimestamp", Tool.getCurrentTimeStamp());
+		headerFileST.setAttribute("fileName", grammar.getFileName());
+		headerFileST.setAttribute("generatedTimestamp", Tool.getCurrentTimeStamp());
 
 		// GENERATE RECOGNIZER
 		// Walk the AST holding the input grammar, this time generating code
@@ -713,4 +723,14 @@ public class CodeGenerator {
 		return true;
 	}
 
+	/** Create a label to track a token / rule reference's result.
+	 *  Technically, this is a place where I break model-view separation
+	 *  as I am creating a variable name that could be invalid in a
+	 *  target language, however, label ::= <ID><INT> is probably ok in
+	 *  all languages we care about.
+	 */
+	public String createUniqueLabel(String name) {
+		return new StringBuffer()
+			.append(name).append(uniqueLabelNumber++).toString();
+	}
 }

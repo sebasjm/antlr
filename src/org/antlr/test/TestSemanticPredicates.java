@@ -44,32 +44,6 @@ import antlr.RecognitionException;
 
 public class TestSemanticPredicates extends TestSuite {
 
-	static class ErrorQueue implements ANTLRErrorListener {
-		List infos = new LinkedList();
-		List errors = new LinkedList();
-		List warnings = new LinkedList();
-
-		public void info(String msg) {
-			infos.add(msg);
-		}
-
-		public void error(Message msg) {
-			errors.add(msg);
-		}
-
-		public void warning(Message msg) {
-			warnings.add(msg);
-		}
-
-		public void error(ToolMessage msg) {
-			errors.add(msg);
-		}
-
-		public int size() {
-			return infos.size() + errors.size() + warnings.size();
-		}
-	};
-
 	/** Public default constructor used by TestRig */
 	public TestSemanticPredicates() {
 	}

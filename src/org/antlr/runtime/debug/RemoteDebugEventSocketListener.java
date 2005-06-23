@@ -67,6 +67,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		public int getType() {
 			return type;
 		}
+		public void setType(int ttype) {
+			this.type = ttype;
+		}
 		public int getLine() {
 			return line;
 		}

@@ -74,8 +74,11 @@ public class Rule {
 	/** A list of all LabelElementPair attached to rule references like f=field */
 	public LinkedHashMap ruleLabels;
 
-	/** A list of all LabelElementPair like ids+=ID */
-	public LinkedHashMap listLabels;
+	/** A list of all Token list LabelElementPair like ids+=ID */
+	public LinkedHashMap tokenListLabels;
+
+	/** A list of all rule ref list LabelElementPair like ids+=expr */
+	public LinkedHashMap ruleListLabels;
 
 	/** All labels go in here (plus being split per the above lists) to
 	 *  catch dup label and label type mismatches.
@@ -86,20 +89,34 @@ public class Rule {
 
 	/** Each alt has a Map<tokenRefName,List<tokenRefAST>>; range 1..numberOfAlts.
 	 *  So, if there are 3 ID refs in a rule's alt number 2, you'll have
-	 *  altToTokenRef[2].get("ID").size()==3.
+	 *  altToTokenRef[2].get("ID").size()==3.  This is used to see if $ID is ok.
+	 *  There must be only one ID reference in the alt for $ID to be ok in
+	 *  an action--must be unique.
+	 *
+	 *  This also tracks '+' and "int" literal token references
+	 *  (if not in LEXER).
+	 *
+	 *  Rewrite rules force tracking of all tokens.
 	 */
 	protected Map[] altToTokenRefMap;
 
 	/** Each alt has a Map<ruleRefName,List<ruleRefAST>>; range 1..numberOfAlts
 	 *  So, if there are 3 expr refs in a rule's alt number 2, you'll have
-	 *  altToRuleRef[2].get("expr").size()==3.
+	 *  altToRuleRef[2].get("expr").size()==3.  This is used to see if $expr is ok.
+	 *  There must be only one expr reference in the alt for $expr to be ok in
+	 *  an action--must be unique.
+	 *
+	 *  Rewrite rules force tracking of all rule result ASTs.
 	 */
 	protected Map[] altToRuleRefMap;
 
+	/** Track which alts have rewrite rules associated with them. */
+	protected boolean[] altsWithRewrites;
+
 	/** Do not generate start, stop etc... in a return value struct unless
-	 *  somebody references $r.start somewhere in an action.
+	 *  somebody references $r.start somewhere.
 	 */
-	public boolean needPredefinedRuleAttributes = false;
+	public boolean referencedPredefinedRuleAttributes = false;
 
 	public Rule(Grammar grammar,
 				String ruleName,
@@ -112,10 +129,44 @@ public class Rule {
 		this.grammar = grammar;
 		altToTokenRefMap = new Map[numberOfAlts+1];
 		altToRuleRefMap = new Map[numberOfAlts+1];
+		altsWithRewrites = new boolean[numberOfAlts+1];
 		for (int alt=1; alt<=numberOfAlts; alt++) {
 			altToTokenRefMap[alt] = new HashMap();
 			altToRuleRefMap[alt] = new HashMap();
 		}
+	}
+
+	public void defineLabel(antlr.Token label, GrammarAST elementRef, int type) {
+		Grammar.LabelElementPair pair = grammar.new LabelElementPair(label,elementRef);
+		pair.type = type;
+		labelNameSpace.put(label.getText(), pair);
+		switch ( type ) {
+			case Grammar.TOKEN_LABEL :
+				if ( tokenLabels==null ) {
+					tokenLabels = new LinkedHashMap();
+				}
+				tokenLabels.put(label.getText(), pair);
+				break;
+			case Grammar.RULE_LABEL :
+				if ( ruleLabels==null ) {
+					ruleLabels = new LinkedHashMap();
+				}
+				ruleLabels.put(label.getText(), pair);
+				break;
+			case Grammar.TOKEN_LIST_LABEL :
+				if ( tokenListLabels==null ) {
+					tokenListLabels = new LinkedHashMap();
+				}
+				tokenListLabels.put(label.getText(), pair);
+				break;
+			case Grammar.RULE_LIST_LABEL :
+				if ( ruleListLabels==null ) {
+					ruleListLabels = new LinkedHashMap();
+				}
+				ruleListLabels.put(label.getText(), pair);
+				break;
+		}
+
 	}
 
 	public Grammar.LabelElementPair getLabel(String name) {
@@ -138,28 +189,109 @@ public class Rule {
 		return pair;
 	}
 
-	public Grammar.LabelElementPair getListLabel(String name) {
+	public Grammar.LabelElementPair getTokenListLabel(String name) {
 		Grammar.LabelElementPair pair = null;
-		if ( listLabels!=null ) {
-			return (Grammar.LabelElementPair)listLabels.get(name);
+		if ( tokenListLabels!=null ) {
+			return (Grammar.LabelElementPair)tokenListLabels.get(name);
 		}
 		return pair;
 	}
 
-	public List getTokenRefsInAlt(String ref, int altNum) {
-		if ( altToTokenRefMap[altNum]!=null ) {
-			List tokenRefASTs = (List)altToTokenRefMap[altNum].get(ref);
+	public Grammar.LabelElementPair getRuleListLabel(String name) {
+		Grammar.LabelElementPair pair = null;
+		if ( ruleListLabels!=null ) {
+			return (Grammar.LabelElementPair)ruleListLabels.get(name);
+		}
+		return pair;
+	}
+
+	/** Track a token ID or literal like '+' and "void" as having been referenced
+	 *  somewhere within the alts (not rewrite sections) of a rule.
+	 *
+	 *  This differs from Grammar.altReferencesTokenID(), which tracks all
+	 *  token IDs to check for token IDs without corresponding lexer rules.
+	 */
+	public void trackTokenReferenceInAlt(GrammarAST refAST, int outerAltNum) {
+		List refs = (List)altToTokenRefMap[outerAltNum].get(refAST.getText());
+		if ( refs==null ) {
+			refs = new ArrayList();
+			altToTokenRefMap[outerAltNum].put(refAST.getText(), refs);
+		}
+		refs.add(refAST);
+	}
+
+	public List getTokenRefsInAlt(String ref, int outerAltNum) {
+		if ( altToTokenRefMap[outerAltNum]!=null ) {
+			List tokenRefASTs = (List)altToTokenRefMap[outerAltNum].get(ref);
 			return tokenRefASTs;
 		}
 		return null;
 	}
 
-	public List getRuleRefsInAlt(String ref, int altNum) {
-		if ( altToRuleRefMap[altNum]!=null ) {
-			List ruleRefASTs = (List)altToRuleRefMap[altNum].get(ref);
+	public void trackRuleReferenceInAlt(GrammarAST refAST, int outerAltNum) {
+		List refs = (List)altToRuleRefMap[outerAltNum].get(refAST.getText());
+		if ( refs==null ) {
+			refs = new ArrayList();
+			altToRuleRefMap[outerAltNum].put(refAST.getText(), refs);
+		}
+		refs.add(refAST);
+	}
+
+	public List getRuleRefsInAlt(String ref, int outerAltNum) {
+		if ( altToRuleRefMap[outerAltNum]!=null ) {
+			List ruleRefASTs = (List)altToRuleRefMap[outerAltNum].get(ref);
 			return ruleRefASTs;
 		}
 		return null;
+	}
+
+	public Set getTokenRefsInAlt(int altNum) {
+		return altToTokenRefMap[altNum].keySet();
+	}
+
+	/** For use with rewrite rules, we must track all tokens matched on the
+	 *  left-hand-side; so we need Lists.  This is a unique list of all
+	 *  token types for which the rule needs a list of tokens.
+	 */
+	public Set getAllTokenRefsInAltsWithRewrites() {
+		Set tokens = new HashSet();
+		for (int i = 1; i <= numberOfAlts; i++) {
+			if ( altsWithRewrites[i] ) {
+				Map m = altToTokenRefMap[i];
+				Set s = m.keySet();
+				for (Iterator it = s.iterator(); it.hasNext();) {
+					// convert token name like ID to ID, "void" to 31
+					String tokenName = (String) it.next();
+					int ttype = grammar.getTokenType(tokenName);
+					String label = grammar.getTokenTypeAsLabel(ttype);
+					tokens.add(label);
+				}
+			}
+		}
+		return tokens;
+	}
+
+	public Set getRuleRefsInAlt(int altNum) {
+		return altToRuleRefMap[altNum].keySet();
+	}
+
+	/** For use with rewrite rules, we must track all rule AST results on the
+	 *  left-hand-side; so we need Lists.  This is a unique list of all
+	 *  rule results for which the rule needs a list of results.
+	 */
+	public Set getAllRuleRefsInAltsWithRewrites() {
+		Set rules = new HashSet();
+		for (int i = 1; i <= numberOfAlts; i++) {
+			if ( altsWithRewrites[i] ) {
+				Map m = altToRuleRefMap[i];
+				rules.addAll(m.keySet());
+			}
+		}
+		return rules;
+	}
+
+	public void trackAltsWithRewrites(int outerAltNum) {
+		altsWithRewrites[outerAltNum] = true;
 	}
 
 	/** Return the scope containing name */
@@ -183,13 +315,13 @@ public class Rule {
 	 */
 	public boolean getHasMultipleReturnValues() {
 		return
-			needPredefinedRuleAttributes ||
+			referencedPredefinedRuleAttributes || grammar.buildAST() ||
 			(returnScope!=null && returnScope.attributes.size()>1);
 	}
 
 	public boolean getHasReturnValue() {
 		return
-			needPredefinedRuleAttributes ||
+			referencedPredefinedRuleAttributes || grammar.buildAST() ||
 			(returnScope!=null && returnScope.attributes.size()>0);
 	}
 

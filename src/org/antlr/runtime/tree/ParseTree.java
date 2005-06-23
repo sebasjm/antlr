@@ -30,10 +30,15 @@ package org.antlr.runtime.tree;
 /** A record of the rules used to match a token sequence.  The tokens
  *  end up as the leaves of this tree and rule nodes are the interior nodes.
  *  This really adds no functionality, it is just an alias for CommonTree
- *  that is more meaningful (specific).
+ *  that is more meaningful (specific) and holds a String to display for a node.
  */
-public class ParseTree extends CommonTree {
+public class ParseTree extends BaseTree {
+	public Object payload;
 	public ParseTree(Object label) {
-		super(label);
+		this.payload = label;
+	}
+
+	public String toString() {
+		return payload.toString();
 	}
 }

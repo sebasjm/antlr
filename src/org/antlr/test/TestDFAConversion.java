@@ -698,7 +698,7 @@ As a result, alternative(s) 2 were disabled for that input
 		throws FailedAssertionException
 	{
 		DecisionProbe.verbose=true; // make sure we get all error info
-		TestSemanticPredicates.ErrorQueue equeue = new TestSemanticPredicates.ErrorQueue();
+		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
 		// mimic actions of org.antlr.Tool first time for grammar g

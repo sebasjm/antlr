@@ -49,6 +49,7 @@ public class AttributeScope {
 		tokenScope.addAttribute("index", null);
 		tokenScope.addAttribute("pos", null);
 		tokenScope.addAttribute("channel", null);
+		tokenScope.addAttribute("tree", null);
 	}
 
 	/** The scope name */

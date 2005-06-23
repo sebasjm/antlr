@@ -32,17 +32,14 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.analysis.*;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 /** The main ANTLR entry point.  Read a grammar and generate a parser. */
 public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-	public static final String VERSION = "3.0ea2";
+	public static final String VERSION = "3.0-trees";
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
 
@@ -59,33 +56,26 @@ public class Tool {
 	protected boolean report = false;
 
     public static void main(String[] args) {
-        ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
-                VERSION + " (June 12, 2005)  1989-2005");
-        try {
-            Tool antlr = new Tool();
-            antlr.processArgs(args);
-            antlr.process();
-        }
-        catch (Exception e) {
-			// catch anything I miss in the code
-            System.err.println(System.getProperty("line.separator") +
-                    System.getProperty("line.separator"));
-            System.err.println("#$%%*&@# internal error: " + e.toString());
-            System.err.println("[complain to nearest government official");
-            System.err.println(" or send hate-mail to parrt@antlr.org;");
-            System.err.println(" please send stack trace with report.]" +
-                    System.getProperty("line.separator"));
-            e.printStackTrace(System.err);
-        }
-        System.exit(0);
-    }
+		ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
+						  VERSION + " (June??, 2005)  1989-2005");
+		Tool antlr = new Tool(args);
+		antlr.process();
+		System.exit(0);
+	}
 
-    public void processArgs(String[] args) {
-		if ( args.length==0 ) {
+	public Tool() {
+	}
+
+	public Tool(String[] args) {
+		processArgs(args);
+	}
+
+	public void processArgs(String[] args) {
+		if ( args==null || args.length==0 ) {
 			help();
 			return;
 		}
-        for (int i = 0; i < args.length; i++) {
+		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-o")) {
 				if (i + 1 >= args.length) {
 					System.err.println("missing output directory with -o option; ignoring");
@@ -167,7 +157,7 @@ public class Tool {
     }
     */
 
-    protected void process()  {
+    public void process()  {
 		for (int i = 0; i < grammarFileNames.size(); i++) {
 			String grammarFileName = (String) grammarFileNames.get(i);
 			try {
@@ -378,4 +368,25 @@ public class Tool {
 	public void panic() {
 		throw new Error("ANTLR panic");
 	}
+
+	/** Return a time stamp string accurate to sec: yyyy-mm-dd hh:mm:ss */
+	public static String getCurrentTimeStamp() {
+		GregorianCalendar calendar = new java.util.GregorianCalendar();
+		int y = calendar.get(Calendar.YEAR);
+		int m = calendar.get(Calendar.MONTH)+1; // zero-based for months
+		int d = calendar.get(Calendar.DAY_OF_MONTH);
+		int h = calendar.get(Calendar.HOUR_OF_DAY);
+		int min = calendar.get(Calendar.MINUTE);
+		int sec = calendar.get(Calendar.SECOND);
+		String sy = String.valueOf(y);
+		String sm = m<10?"0"+m:String.valueOf(m);
+		String sd = d<10?"0"+d:String.valueOf(d);
+		String sh = h<10?"0"+h:String.valueOf(h);
+		String smin = min<10?"0"+min:String.valueOf(min);
+		String ssec = sec<10?"0"+sec:String.valueOf(sec);
+		return new StringBuffer().append(sy).append("-").append(sm).append("-")
+			.append(sd).append(" ").append(sh).append(":").append(smin)
+			.append(":").append(ssec).toString();
+	}
+
 }

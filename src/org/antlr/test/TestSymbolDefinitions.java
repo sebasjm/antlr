@@ -40,28 +40,6 @@ import antlr.Token;
 
 public class TestSymbolDefinitions extends TestSuite {
 
-	static class ErrorQueue implements ANTLRErrorListener {
-		List infos = new LinkedList();
-		List errors = new LinkedList();
-		List warnings = new LinkedList();
-
-		public void info(String msg) {
-			infos.add(msg);
-		}
-
-		public void error(Message msg) {
-			errors.add(msg);
-		}
-
-		public void warning(Message msg) {
-			warnings.add(msg);
-		}
-
-		public void error(ToolMessage msg) {
-			errors.add(msg);
-		}
-	};
-
     /** Public default constructor used by TestRig */
     public TestSymbolDefinitions() {
     }
@@ -122,8 +100,22 @@ public class TestSymbolDefinitions extends TestSuite {
 				"parser grammar t;\n"+
 				"a : ids+=ID ( COMMA ids+=ID )* ;\n");
 		String rule = "a";
-		String labels = "ids";
-		checkPlusEqualsLabels(g, rule, labels);
+		String tokenLabels = "ids";
+		String ruleLabels = null;
+		checkPlusEqualsLabels(g, rule, tokenLabels, ruleLabels);
+	}
+
+	public void testMixedPlusEqualLabel() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"options {output=AST;}\n" +
+				"a : id+=ID ( ',' e+=expr )* ;\n" +
+				"expr : 'e';\n" +
+				"ID : 'a';\n");
+		String rule = "a";
+		String tokenLabels = "id";
+		String ruleLabels = "e";
+		checkPlusEqualsLabels(g, rule, tokenLabels, ruleLabels);
 	}
 
 	// T E S T  E R R O R S
@@ -649,18 +641,42 @@ public class TestSymbolDefinitions extends TestSuite {
 
 	protected void checkPlusEqualsLabels(Grammar g,
 										 String ruleName,
-										 String labelsStr)
+										 String tokenLabelsStr,
+										 String ruleLabelsStr)
 		throws FailedAssertionException
 	{
 		// make sure expected += labels are there
 		Rule r = g.getRule(ruleName);
-		StringTokenizer st = new StringTokenizer(labelsStr, ", ");
-		Set labels = new HashSet();
+		StringTokenizer st = new StringTokenizer(tokenLabelsStr, ", ");
+		Set tokenLabels = null;
 		while ( st.hasMoreTokens() ) {
+			if ( tokenLabels==null ) {
+				tokenLabels = new HashSet();
+			}
 			String labelName = st.nextToken();
-			labels.add(labelName);
+			tokenLabels.add(labelName);
 		}
-        assertEqual(labels, r.listLabels.keySet());
+		Set ruleLabels = null;
+		if ( ruleLabelsStr!=null ) {
+			st = new StringTokenizer(ruleLabelsStr, ", ");
+			ruleLabels = new HashSet();
+			while ( st.hasMoreTokens() ) {
+				String labelName = st.nextToken();
+				ruleLabels.add(labelName);
+			}
+		}
+		assertTrue((tokenLabels!=null && r.tokenListLabels!=null) ||
+				   (tokenLabels==null && r.tokenListLabels==null),
+				   "token += labels mismatch; "+tokenLabels+"!="+r.tokenListLabels);
+		assertTrue((ruleLabels!=null && r.ruleListLabels!=null) ||
+				   (ruleLabels==null && r.ruleListLabels==null),
+				   "rule += labels mismatch; "+ruleLabels+"!="+r.ruleListLabels);
+		if ( tokenLabels!=null ) {
+			assertEqual(tokenLabels, r.tokenListLabels.keySet());
+		}
+		if ( ruleLabels!=null ) {
+			assertEqual(ruleLabels, r.ruleListLabels.keySet());
+		}
 	}
 
 	protected void checkSymbols(Grammar g,

@@ -46,6 +46,7 @@ options {
 
 {
 	protected Grammar grammar;
+	protected boolean showActions;
     protected StringBuffer buf = new StringBuffer(300);
 
     public void out(String s) {
@@ -89,14 +90,16 @@ options {
 }
 
 /** Call this to figure out how to print */
-toString[Grammar g] returns [String s=null]
+toString[Grammar g, boolean showActions] returns [String s=null]
 {
 grammar = g;
+this.showActions = showActions;
 }
     :   (   grammar
         |   rule
         |   alternative
         |   element
+        |	single_rewrite
         |   EOR {s="EOR";}
         )
         {return normalize(buf.toString());}
@@ -127,7 +130,7 @@ grammarSpec[String gtype]
         (optionsSpec)? {out(";\n");}
         (tokensSpec)?
         (attrScope)*
-        (ACTION)?
+        (ACTION {if ( showActions ) out(#ACTION.getText());} )?
         rules
     ;
 
@@ -182,7 +185,7 @@ rule
            {out(" : ");}
            (optionsSpec)?
            (ruleScopeSpec)?
-           #( INITACTION (ACTION)? )
+           #( INITACTION (ia:ACTION {if ( showActions ) out(#ia.getText());} )? )
            b:block[false] EOR {out(";\n");}
          )
     ;
@@ -200,16 +203,32 @@ ruleScopeSpec
  	;
 
 block[boolean forceParens]
-    :   #(  BLOCK {if ( forceParens||#block.getNumberOfChildren()>2 ) out(" (");}
+{
+int numAlts = countAltsForBlock(#block);
+}
+    :   #(  BLOCK {if ( forceParens||numAlts>1 ) out(" (");}
             (optionsSpec)?
-            alternative ( {out(" | ");} alternative)*
-            EOB   {if ( forceParens||#block.getNumberOfChildren()>2 ) out(")");}
+            alternative rewrite ( {out(" | ");} alternative rewrite )*
+            EOB   {if ( forceParens||numAlts>1 ) out(")");}
          )
     ;
+
+countAltsForBlock returns [int n=0]
+    :   #( BLOCK (OPTIONS)? (ALT (REWRITE)* {n++;})+ EOB )
+	;
 
 alternative
     :   #( ALT (element)+ EOA )
     ;
+
+single_rewrite
+	:	#( REWRITE {out("->");} (SEMPRED {out(" {"+#SEMPRED.getText()+"}?");})?
+	       alternative )
+	;
+
+rewrite
+	:	(single_rewrite)*
+	;
 
 element
     :   atom
@@ -221,38 +240,57 @@ element
     |   ebnf
     |   tree
     |   #( SYNPRED block[true] ) {out("=>");}
-    |   a:ACTION  {out("{"); out(a.getText()); out("}");}
-    |   SEMPRED
-    |   EPSILON {out(" epsilon ");}
+    |   a:ACTION  {if ( showActions ) {out("{"); out(a.getText()); out("}");}}
+    |   pred:SEMPRED
+    	{
+    	if ( showActions ) {out("{"); out(pred.getText()); out("}?");}
+    	else {out("{...}?");}
+    	}
+    |   EPSILON {out(" /* epsilon */ ");}
     ;
 
-ebnf:   block[false] {out(" ");}
+ebnf:   block[true] {out(" ");}
     |   #( OPTIONAL block[true] ) {out("? ");}
     |   #( CLOSURE block[true] )  {out("* ");}
     |   #( POSITIVE_CLOSURE block[true] ) {out("+ ");}
     ;
 
-tree:   #(TREE_BEGIN {out(" #(");} atom (element)* {out(") ");} )
+tree:   #(TREE_BEGIN {out(" ^(");} element (element)* {out(") ");} )
     ;
 
 atom
 {out(" ");}
     :   (	#( RULE_REF		{out(#atom.toString());}
-			   (rarg:ARG_ACTION	{out("["+#rarg.toString()+"]");} )?
+			   (rarg:ARG_ACTION	{out("["+#rarg.toString()+"]");})?
+			   (ast_suffix)?
              )
 		|   #( TOKEN_REF		{out(#atom.toString());} 
 			   (targ:ARG_ACTION	{out("["+#targ.toString()+"]");} )?
+			   (ast_suffix)?
              )
 		|   CHAR_LITERAL	{out(Grammar.getANTLREscapedCharLiteral(#atom.toString()));}
+			(ast_suffix)?
 		|   STRING_LITERAL	{out(Grammar.getANTLREscapedStringLiteral(#atom.toString()));}
+			(ast_suffix)?
 		|   WILDCARD		{out(#atom.toString());}
+			(ast_suffix)?
 		)
 		{out(" ");}
+    |	LABEL {out(" $"+#LABEL.getText());} // used in -> rewrites
     |   set
     ;
 
+ast_suffix
+	:	ROOT {out("^");}
+	|	RULEROOT {out("^^");}
+	|	BANG  {out("!");}
+	;
+
 set
-    :   #(SET {out("(");} setElement ({out("|");} setElement)* {out(")");} )
+    :   #( SET
+    	   {out("(");} setElement ({out("|");} setElement)* {out(")");}
+           (ast_suffix)?
+    	 )
     ;
 
 setElement

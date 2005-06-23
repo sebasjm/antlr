@@ -131,7 +131,7 @@ public class NameSpaceChecker {
 			}
         }
 		if ( grammar.type==Grammar.COMBINED ) {
-			for (Iterator iter = grammar.tokenRefs.iterator(); iter.hasNext();) {
+			for (Iterator iter = grammar.tokenIDRefs.iterator(); iter.hasNext();) {
 				Token tok = (Token) iter.next();
 				String tokenID = tok.getText();
 				if ( !grammar.lexerRules.contains(tokenID) ) {
