@@ -339,7 +339,7 @@ rule returns [StringTemplate code=null]
          )
         {
 		String description =
-		    grammar.grammarTreeToString(#rule.getFirstChildWithType(BLOCK));
+		    grammar.grammarTreeToString(#rule.getFirstChildWithType(BLOCK), false);
     	b.setAttribute("description", description);
 		/*
 		System.out.println("rule "+r+" tokens="+
@@ -461,7 +461,7 @@ if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL ) {
 		currentAltHasRewrite = false;
 	}
 }
-String description = grammar.grammarTreeToString(#alternative);
+String description = grammar.grammarTreeToString(#alternative, false);
 code.setAttribute("description", description);
 if ( !currentAltHasRewrite && grammar.buildAST() ) {
 	code.setAttribute("autoAST", new Boolean(true));
@@ -581,7 +581,7 @@ ebnf returns [StringTemplate code=null]
 			#( POSITIVE_CLOSURE code=block["positiveClosureBlock", dfa] )
 		)
 		{
-		String description = grammar.grammarTreeToString(#ebnf);
+		String description = grammar.grammarTreeToString(#ebnf, false);
     	code.setAttribute("description", description);
     	}
     ;
@@ -809,17 +809,17 @@ rewrite_element returns [StringTemplate code=null]
 rewrite_ebnf returns [StringTemplate code=null]
     :   #( OPTIONAL code=rewrite_block["rewriteOptionalBlock"] )
 		{
-		String description = grammar.grammarTreeToString(#rewrite_ebnf);
+		String description = grammar.grammarTreeToString(#rewrite_ebnf, false);
 		code.setAttribute("description", description);
 		}
     |   #( CLOSURE code=rewrite_block["rewriteClosureBlock"] )
 		{
-		String description = grammar.grammarTreeToString(#rewrite_ebnf);
+		String description = grammar.grammarTreeToString(#rewrite_ebnf, false);
 		code.setAttribute("description", description);
 		}
     |   #( POSITIVE_CLOSURE code=rewrite_block["rewritePositiveClosureBlock"] )
 		{
-		String description = grammar.grammarTreeToString(#rewrite_ebnf);
+		String description = grammar.grammarTreeToString(#rewrite_ebnf, false);
 		code.setAttribute("description", description);
 		}
     ;
@@ -836,7 +836,7 @@ StringTemplate r, el;
 			(el=rewrite_element {code.setAttribute("children",el);})*
 		)
 		{
-		String description = grammar.grammarTreeToString(#rewrite_tree);
+		String description = grammar.grammarTreeToString(#rewrite_tree, false);
 		code.setAttribute("description", description);
     	rewriteTreeNestingLevel--;
 		}
