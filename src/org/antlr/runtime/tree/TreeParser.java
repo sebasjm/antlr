@@ -1,4 +1,4 @@
-package org.antlr.runtime;
+package org.antlr.runtime.tree;
 
 /** A parser for a stream of tree nodes.  "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
