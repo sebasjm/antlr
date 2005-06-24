@@ -95,20 +95,22 @@ public class DebugParser extends Parser {
 		dbg.endResync();
 	}
 
-	public void recoverFromMismatchedToken(MismatchedTokenException mte,
+	public void recoverFromMismatchedToken(IntStream input,
+										   MismatchedTokenException mte,
 										   int ttype,
 										   org.antlr.runtime.BitSet follow)
 		throws MismatchedTokenException
 	{
 		dbg.recognitionException(mte);
-		super.recoverFromMismatchedToken(mte,ttype,follow);
+		super.recoverFromMismatchedToken(input,mte,ttype,follow);
 	}
 
-	public void recoverFromMismatchedSet(RecognitionException mte,
+	public void recoverFromMismatchedSet(IntStream input,
+										 RecognitionException mte,
 										 org.antlr.runtime.BitSet follow)
 		throws RecognitionException
 	{
 		dbg.recognitionException(mte);
-		super.recoverFromMismatchedSet(mte,follow);
+		super.recoverFromMismatchedSet(input,mte,follow);
 	}
 }

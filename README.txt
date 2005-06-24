@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0ea3
-June 23, 2005
+ANTLR 3.0ea4
+June ??, 2005
 
 Terence Parr, parrt at cs usfca edu
 ANTLR Project lead and supreme dictator
@@ -200,6 +200,10 @@ to me.  I use Intellij so I never type anything actually to build.
 -----------------------------------------------------------------------
 
 CHANGES
+
+3.0ea4 - June ??, 2005
+
+* refactored Parser to have a BaseParser and added TreeParser
 
 3.0ea3 - June 23, 2005
 

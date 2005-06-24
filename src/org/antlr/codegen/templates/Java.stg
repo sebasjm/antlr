@@ -80,7 +80,7 @@ retry:
             }
             catch (RecognitionException re) {
                 reportError(re);
-				recover(re);
+                recover(re);
             }
         }
         return token;
@@ -147,6 +147,59 @@ class <name> extends <if(debug)>Debug<endif>Parser {
 }
 >>
 
+/** How to generate a tree parser */
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates) ::= <<
+class <name> extends <if(debug)>Debug<endif>TreeParser {
+    public static final String[] tokenNames = new String[] {
+        "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
+    };
+    <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
+    <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
+<if(buildAST)>
+    protected TreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
+    public void setTreeAdaptor(TreeAdaptor adaptor) {
+        this.adaptor = adaptor;
+    }
+    public TreeAdaptor getTreeAdaptor() {
+        return adaptor;
+    }<\n>
+<endif>
+<if(debug)>
+    public int ruleLevel = 0;
+<if(profile)>
+    public <name>(TreeNodeStream input) {
+	super(input,null);
+	setDebugListener(new Profiler(this,<dumpProfile>));
+    }<\n>
+<else>
+    public <name>(TreeNodeStream input) {
+	super(input);
+    }
+    public <name>(TreeNodeStream input, DebugEventListener dbg) {
+        super(input,dbg);
+    }<\n>
+<endif>
+    protected boolean evalPredicate(boolean result, String predicate) {
+        dbg.semanticPredicate(result, predicate);
+	return result;
+    }<\n>
+<else>
+    public <name>(TreeNodeStream input) { super(input); }<\n>
+<endif>
+    public String[] getTokenNames() { return tokenNames; }
+
+    <globalAction>
+
+    <rules; separator="\n\n">
+
+    <predicates; separator="\n">
+
+    <cyclicDFAs>
+
+    <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
+}
+>>
+
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
@@ -195,7 +248,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     }
     catch (RecognitionException re) {
         reportError(re);
-        recover(re);
+        recover(input,re);
     }
     finally {
         <ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
@@ -446,7 +499,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label>=input.LT(1);<\n>
 <endif>
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 >>
 
 /** ID! is same as plain tokenRef */
@@ -456,7 +509,7 @@ tokenRefASTBang ::= tokenRef
 /** ids+=ID no AST building */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>);<\n>
 >>
@@ -467,14 +520,14 @@ tokenRefASTBangAndListLabel ::= tokenRefAndListLabel
 /** Match a token but track it for use in a rewrite rule */
 tokenRefASTTrack(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 list_<token>.add(<label>);<\n>
 >>
 
 /** Match a token but track it for use in a rewrite rule */
 tokenRefASTTrackAndListLabel(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 list_<token>.add(<label>);<\n>
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>);<\n>
@@ -483,7 +536,7 @@ list_<label>.add(<label>);<\n>
 /** Match label+=TOKEN when buildAST but not rewrite alt */
 tokenRefASTAndListLabel(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>);<\n>
 <label>_tree = adaptor.create(<label>);
@@ -493,7 +546,7 @@ adaptor.addChild(root_<blockLevel>, <label>_tree);
 /** Match label+=TOKEN^ when buildAST but not rewrite alt */
 tokenRefASTRootAndListLabel(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>);<\n>
 <label>_tree = adaptor.create(<label>);
@@ -503,7 +556,7 @@ root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
 /** Match label+=TOKEN^^ when buildAST but not rewrite alt */
 tokenRefASTRuleRootAndListLabel(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>);<\n>
 <label>_tree = adaptor.create(<label>);
@@ -513,7 +566,7 @@ root_0 = adaptor.becomeRoot(<label>_tree, root_0);
 /** match a token when output==AST */
 tokenRefAST(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 <label>_tree = adaptor.create(<label>);
 adaptor.addChild(root_<blockLevel>, <label>_tree);
 >>
@@ -521,7 +574,7 @@ adaptor.addChild(root_<blockLevel>, <label>_tree);
 /** match a token when output==AST and ref is token^ */
 tokenRefASTRoot(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 <label>_tree = adaptor.create(<label>);
 root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
 >>
@@ -529,7 +582,7 @@ root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
 /** match a token when output==AST and ref is token^^ */
 tokenRefASTRuleRoot(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
-match(<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 <label>_tree = adaptor.create(<label>);
 root_0 = adaptor.becomeRoot(<label>_tree, root_0);
 >>
@@ -555,7 +608,7 @@ else {
 <if(LEXER)>
     recover(mse);
 <else>
-    recoverFrom<not>MismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
+    recoverFrom<not>MismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
 <endif>
     throw mse;
 }<\n>
@@ -573,7 +626,7 @@ else {
 <if(debug)>
     dbg.recognitionException(mse);<\n>
 <endif>
-    recoverFromMismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
+    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
     throw mse;
 }<\n>
 >>
@@ -590,7 +643,7 @@ else {
 <if(debug)>
     dbg.recognitionException(mse);<\n>
 <endif>
-    recoverFromMismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
+    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
     throw mse;
 }<\n>
 >>
@@ -607,7 +660,7 @@ else {
 <if(debug)>
     dbg.recognitionException(mse);<\n>
 <endif>
-    recoverFromMismatchedSet(mse, FOLLOW_set_in_<ruleName><elementIndex>);
+    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
     throw mse;
 }<\n>
 >>
@@ -625,7 +678,7 @@ else {
 <if(LEXER)>
     recover(mnse);<\n>
 <else>
-    recoverFromMismatchedSet(mnse, FOLLOW_set_in_<ruleName><elementIndex>);<\n>
+    recoverFromMismatchedSet(input,mnse,FOLLOW_set_in_<ruleName><elementIndex>);<\n>
 <endif>
     throw mnse;
 }<\n>
@@ -639,26 +692,26 @@ wildcard(label,elementIndex) ::= <<
 <if(label)>
 <label>=input.LT(1);<\n>
 <endif>
-matchAny();
+matchAny(input);
 >>
 
 wildcardAST(label,elementIndex) ::= <<
 <label>=input.LT(1);
-matchAny();
+matchAny(input);
 <label>_tree = adaptor.create(<label>);
 adaptor.addChild(root_<blockLevel>, <label>_tree);
 >>
 
 wildcardASTRoot(label,elementIndex) ::= <<
 <label>=input.LT(1);
-matchAny();
+matchAny(input);
 <label>_tree = adaptor.create(<label>);
 root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
 >>
 
 wildcardASTRuleRoot(label,elementIndex) ::= <<
 <label>=input.LT(1);
-matchAny();
+matchAny(input);
 <label>_tree = adaptor.create(<label>);
 root_0 = adaptor.becomeRoot(<label>_tree, root_0);
 >>
