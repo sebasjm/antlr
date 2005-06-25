@@ -554,7 +554,7 @@ element returns [StringTemplate code=null]
          )
 
     |   code=ebnf
-    |   tree
+    |   code=tree
     |   #( SYNPRED block["block",null] )
 
     |   act:ACTION
@@ -590,7 +590,13 @@ ebnf returns [StringTemplate code=null]
     	}
     ;
 
-tree:   #(TREE_BEGIN atom[null] (element)*)
+tree returns [StringTemplate code=templates.getInstanceOf("tree")]
+{
+StringTemplate el=null;
+}
+    :   #( TREE_BEGIN el=element {code.setAttribute("root",el);}
+           (el=element {code.setAttribute("children",el);})*
+         )
     ;
 
 atom[String label] returns [StringTemplate code=null]

@@ -771,6 +771,14 @@ following.pop();
 /** A lexer rule reference */
 lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
 
+/** match ^(root children) in tree parser */
+tree(root, children) ::= <<
+<root>
+match(input, Token.DOWN, null);
+<children>
+match(input, Token.UP, null);
+>>
+
 // R e w r i t e
 
 rewriteCode(

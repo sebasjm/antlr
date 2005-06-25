@@ -347,7 +347,7 @@ ebnf:   block
     |   #( POSITIVE_CLOSURE block )
     ;
 
-tree:   #(TREE_BEGIN atom (element)*)
+tree:   #(TREE_BEGIN element (element)*)
     ;
 
 atom

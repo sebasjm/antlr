@@ -288,7 +288,7 @@ element returns [StateCluster g=null]
     |	#(ASSIGN ID g=atom)
     |	#(PLUS_ASSIGN ID g=atom)
     |   g=ebnf
-    |   tree
+    |   g=tree
     |   #( SYNPRED block )
     |   ACTION
     |   pred:SEMPRED {g = factory.build_SemanticPredicate(#pred);}
@@ -354,7 +354,26 @@ ebnf returns [StateCluster g=null]
         }
     ;
 
-tree:   #(TREE_BEGIN atom (element)*)
+tree returns [StateCluster g=null]
+{
+StateCluster e=null;
+}
+	:   #( TREE_BEGIN
+		   {GrammarAST el=(GrammarAST)_t;}
+		   g=element
+		   {
+           StateCluster down = factory.build_Atom(Label.DOWN);
+           // TODO set following states for imaginary nodes?
+           //el.followingNFAState = down.right;
+		   g = factory.build_AB(g,down);
+		   }
+		   ( {el=(GrammarAST)_t;} e=element {g = factory.build_AB(g,e);} )*
+		   {
+           StateCluster up = factory.build_Atom(Label.UP);
+           //el.followingNFAState = up.right;
+		   g = factory.build_AB(g,up);
+		   }
+		 )
     ;
 
 atom returns [StateCluster g=null]

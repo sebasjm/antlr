@@ -406,15 +406,16 @@ setElement
 
 tree :
 	TREE_BEGIN^
-        rootNode
-        ( element )+
+        element ( element )+
     RPAREN!
 	;
 
+/*
 rootNode
-	:   (id! COLON!)?
+	:   (id! ASSIGN!)?
 		terminal
 	;
+	*/
 
 /** matches ENBF blocks (and sets via block rule) */
 ebnf!

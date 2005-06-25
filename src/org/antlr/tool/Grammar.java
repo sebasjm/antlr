@@ -456,19 +456,27 @@ public class Grammar {
 
     protected void initTokenSymbolTables() {
         // the faux token types take first NUM_FAUX_LABELS positions
-        typeToTokenList.setSize(Label.NUM_FAUX_LABELS); // ensure room
+		// then we must have room for the predefined runtime token types
+		// like DOWN/UP used for tree parsing.
+        typeToTokenList.setSize(Label.NUM_FAUX_LABELS+Label.MIN_TOKEN_TYPE-1);
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.INVALID, "<INVALID>");
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOT, "<EOT>");
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SEMPRED, "<SEMPRED>");
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SET, "<SET>");
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EPSILON, Label.EPSILON_STR);
-        typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "<EOF>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "<EOF>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "<EOR>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.DOWN-1, "<DOWN>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.UP-1, "<UP>");
         tokenNameToTypeMap.put("<INVALID>", new Integer(Label.INVALID));
         tokenNameToTypeMap.put("<EOT>", new Integer(Label.EOT));
         tokenNameToTypeMap.put("<SEMPRED>", new Integer(Label.SEMPRED));
         tokenNameToTypeMap.put("<SET>", new Integer(Label.SET));
         tokenNameToTypeMap.put("<EPSILON>", new Integer(Label.EPSILON));
-        tokenNameToTypeMap.put("<EOF>", new Integer(Label.EOF));
+		tokenNameToTypeMap.put("<EOF>", new Integer(Label.EOF));
+		tokenNameToTypeMap.put("<EOR>", new Integer(Label.EOR_TOKEN_TYPE));
+		tokenNameToTypeMap.put("<DOWN>", new Integer(Label.DOWN));
+		tokenNameToTypeMap.put("<UP>", new Integer(Label.UP));
     }
 
     /** Walk the list of options, altering this Grammar object according
@@ -562,7 +570,7 @@ public class Grammar {
         else { // must be a label like ID
             tokenNameToTypeMap.put(text, new Integer(tokenType));
         }
-		int index = Label.NUM_FAUX_LABELS+(tokenType)-Label.MIN_TOKEN_TYPE;
+		int index = Label.NUM_FAUX_LABELS+tokenType-1;
 		//System.out.println("defining token "+text+" at type="+tokenType+", index="+index);
 		this.maxTokenType = Math.max(this.maxTokenType, tokenType);
         if ( index>=typeToTokenList.size() ) {
@@ -952,7 +960,15 @@ public class Grammar {
 			tokenName = (String)typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
 		}
 		else {
+			// normalize type to 1..n
+			/*
+			if ( ttype>=Label.MIN_TOKEN_TYPE ) {
+				index = ttype-Label.MIN_TOKEN_TYPE; // normalize index to 0..n
+				index = ttype-1;
+			}
 			index = ttype-Label.MIN_TOKEN_TYPE; // normalize index to 0..n
+			*/
+			index = ttype-1; // normalize to 0..n-1
 			index += Label.NUM_FAUX_LABELS;     // jump over faux tokens
 
 			if ( index<typeToTokenList.size() ) {
@@ -964,7 +980,7 @@ public class Grammar {
 		}
 		ErrorManager.assertTrue(tokenName!=null,
 								"null token name; ttype="+ttype+" tokens="+typeToTokenList);
-		//System.out.println("ttype="+ttype+", index="+index+", name="+tokenName);
+		//System.out.println("getTokenName ttype="+ttype+", index="+index+", name="+tokenName);
 		return tokenName;
 	}
 

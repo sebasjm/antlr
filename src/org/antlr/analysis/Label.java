@@ -102,6 +102,9 @@ public class Label implements Comparable, Cloneable {
 	public static final int EOR_TOKEN_TYPE =
 		org.antlr.runtime.Token.EOR_TOKEN_TYPE;
 
+	public static final int DOWN = org.antlr.runtime.Token.DOWN;
+	public static final int UP = org.antlr.runtime.Token.UP;
+
     /** tokens and char range overlap; tokens are MIN_TOKEN_TYPE..n */
 	public static final int MIN_TOKEN_TYPE =
 		org.antlr.runtime.Token.MIN_TOKEN_TYPE;
