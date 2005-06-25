@@ -66,24 +66,29 @@ public abstract class BaseTree implements Tree {
 	}
 
 	public void addChild(Tree t) {
+		//System.out.println("add "+t.toStringTree()+" as child to "+this.toStringTree());
 		if ( t==null ) {
 			return; // do nothing upon addChild(null)
 		}
-		BaseTree baseTree = (BaseTree)t;
 		if ( children==null ) {
 			createChildrenList(); // add children list on demand
 		}
-		if ( t.isNil() ) {
-			if ( this.children == baseTree.children ) {
+		BaseTree childTree = (BaseTree)t;
+		if ( childTree.isNil() ) {
+			if ( this.children == childTree.children ) {
 				throw new RuntimeException("attempt to add child list to itself");
 			}
-			// just add all of t's children to this
-			for (int i = 0; baseTree.children!=null && i < baseTree.children.size(); i++) {
-				children.add(baseTree.children.get(i));
+			// just add all of childTree's children to this
+			if ( childTree.children!=null ) {
+				int n = childTree.children.size();
+				for (int i = 0; i < n; i++) {
+					children.add(childTree.children.get(i));
+				}
 			}
-			return;
 		}
-		children.add(t);
+		else {
+			children.add(t);
+		}
 	}
 
 	public void setChild(int i, BaseTree t) {

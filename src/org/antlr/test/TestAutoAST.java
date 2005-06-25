@@ -458,7 +458,7 @@ public class TestAutoAST extends TestSuite {
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b");
-		String expecting = "id list=[[@0,0:0='a',<2>,1:0], [@2,2:2='b',<2>,1:2]];a b\n";
+		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];a b\n";
 		assertEqual(found, expecting);
 	}
 
@@ -475,7 +475,7 @@ public class TestAutoAST extends TestSuite {
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b");
-		String expecting = "id list=[[@0,0:0='a',<2>,1:0], [@2,2:2='b',<2>,1:2]];(a b)\n";
+		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];(a b)\n";
 		assertEqual(found, expecting);
 	}
 

@@ -8,27 +8,36 @@ import java.util.List;
 import java.lang.reflect.Method;
 
 public class CommonTreeAdaptor implements TreeAdaptor {
-	public Object create(Object payload) {
-		return new CommonTree((Token)payload);
-	}
-
 	public Object nil() {
 		return create(null);
 	}
 
 	public Object dupTree(Object tree) {
-		return ((CommonTree)tree).dupTree();
+		return ((Tree)tree).dupTree();
 	}
 
+	/** Duplicate a node.  This is part of the factory;
+	 *	override if you want another kind of node to be built.
+	 *
+	 *  I could use reflection to prevent having to override this
+	 *  but reflection is slow.
+	 */
 	public Object dupNode(Object treeNode) {
 		return new CommonTree((CommonTree)treeNode);
+	}
+
+	/** Create a node from a payload.  This is part of the factory;
+	 *	override if you want another kind of node to be built.
+	 */
+	public Object create(Object payload) {
+		return new CommonTree((Token)payload);
 	}
 
 	/** Add a child to the tree t.  If child is a flat tree (a list), make all
 	 *  in list children of t.
 	 */
 	public void addChild(Object t, Object child) {
-		((CommonTree)t).addChild((CommonTree)child);
+		((Tree)t).addChild((Tree)child);
 	}
 
 	/** If oldRoot is a nil root, just copy or move the children to newRoot.
@@ -43,24 +52,21 @@ public class CommonTreeAdaptor implements TreeAdaptor {
 	 *  simple node or nil root with a single child.
 	 */
 	public Object becomeRoot(Object newRoot, Object oldRoot) {
+		Tree newRootTree = (Tree)newRoot;
+		Tree oldRootTree = (Tree)oldRoot;
 		if ( oldRoot==null ) {
 			return newRoot;
 		}
-		if ( ((CommonTree)newRoot).isNil() ) {
-			List kids = ((CommonTree)newRoot).children;
-			if ( kids.size()>1 ) {
+		// handle ^(nil real-node)
+		if ( newRootTree.isNil() ) {
+			if ( newRootTree.getChildCount()>1 ) {
 				// TODO: make tree run time exceptions hierarchy
-				throw new IllegalArgumentException("more than one node as root (TODO: make exception hierarchy)");
+				throw new RuntimeException("more than one node as root (TODO: make exception hierarchy)");
 			}
-			newRoot = (CommonTree)((CommonTree)newRoot).children.get(0);
+			newRootTree = (Tree)newRootTree.getChild(0);
 		}
-		if ( ((CommonTree)oldRoot).isNil() ) {
-			((CommonTree)newRoot).children = ((CommonTree)oldRoot).children;
-		}
-		else {
-			((CommonTree)newRoot).addChild((CommonTree)oldRoot);
-		}
-		return newRoot;
+		newRootTree.addChild(oldRootTree);
+		return newRootTree;
 	}
 
 	public void addChild(Object t, Token child) {
@@ -83,7 +89,7 @@ public class CommonTreeAdaptor implements TreeAdaptor {
 		fromToken = createToken(fromToken);
 		//((ClassicToken)fromToken).setType(tokenType);
 		fromToken.setType(tokenType);
-		CommonTree t = (CommonTree)create(fromToken);
+		Tree t = (Tree)create(fromToken);
 		return t;
 	}
 
@@ -91,18 +97,18 @@ public class CommonTreeAdaptor implements TreeAdaptor {
 		fromToken = createToken(fromToken);
 		fromToken.setType(tokenType);
 		fromToken.setText(text);
-		CommonTree t = (CommonTree)create(fromToken);
+		Tree t = (Tree)create(fromToken);
 		return t;
 	}
 
 	public Object create(int tokenType, String text) {
 		Token fromToken = createToken(tokenType, text);
-		CommonTree t = (CommonTree)create(fromToken);
+		Tree t = (Tree)create(fromToken);
 		return t;
 	}
 
 	public int getType(Object t) {
-		((CommonTree)t).token.getType();
+		((Tree)t).getType();
 		return 0;
 	}
 

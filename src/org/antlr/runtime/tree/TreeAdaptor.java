@@ -73,6 +73,11 @@ public interface TreeAdaptor {
 	 *
 	 *  Return newRoot.  Throw an exception if newRoot is not a
 	 *  simple node or nil root with a single child.
+	 *
+	 *  Be advised that it's ok for newRoot to point at oldRoot's
+	 *  children; i.e., you don't have to copy the list.  We are
+	 *  constructing these nodes to we should have this control for
+	 *  efficiency.
 	 */
 	public Object becomeRoot(Object newRoot, Object oldRoot);
 
