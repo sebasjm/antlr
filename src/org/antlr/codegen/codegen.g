@@ -266,7 +266,11 @@ grammar[Grammar g,
     :   (headerSpec[outputFileST])*
 	    ( #( LEXER_GRAMMAR grammarSpec )
 	    | #( PARSER_GRAMMAR grammarSpec )
-	    | #( TREE_GRAMMAR grammarSpec )
+	    | #( TREE_GRAMMAR grammarSpec
+	         {
+	         recognizerST.setAttribute("ASTLabelType", g.getOption("ASTLabelType"));
+	         }
+	       )
 	    | #( COMBINED_GRAMMAR grammarSpec )
 	    )
     ;
@@ -374,7 +378,7 @@ rule returns [StringTemplate code=null]
 			}
 			else {
 				description =
-					grammar.grammarTreeToString(#rule);
+					grammar.grammarTreeToString(#rule,false);
 				code.setAttribute("description", description);
 			}
 			code.setAttribute("ruleName", r);

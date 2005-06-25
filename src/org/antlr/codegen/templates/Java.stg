@@ -34,7 +34,7 @@ group Java;
  */
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           debug, trace, profile, dumpProfile, predicates,
+           debug, trace, profile, dumpProfile,
 	   buildAST, buildTemplate, javaTypeInitMap,
 	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
@@ -52,6 +52,10 @@ import org.antlr.runtime.debug.*;
 import java.util.Stack;
 <if(buildAST)>
 import org.antlr.runtime.tree.*;
+<else>
+<if(TREE_PARSER)>
+import org.antlr.runtime.tree.*;
+<endif>
 <endif>
 import java.util.List;
 import java.util.ArrayList;
@@ -60,7 +64,7 @@ import java.util.ArrayList;
 <recognizer>
 >>
 
-lexer(name, tokens, globalAction, rules, cyclicDFAs, predicates) ::= <<
+lexer(name, tokens, globalAction, rules, cyclicDFAs) ::= <<
 class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <globalAction>
@@ -89,16 +93,14 @@ retry:
     <rules; separator="\n\n">
 
     <cyclicDFAs>
-
-    <predicates; separator="\n">
 }
 >>
 
 /** How to generate a parser */
-genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates, inputStreamType) ::= <<
-class <name> extends <if(debug)>Debug<endif>Parser {
+genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, inputStreamType, superClass, labelType) ::= <<
+class <name> extends <if(debug)>Debug<endif><superClass> {
     public static final String[] tokenNames = new String[] {
-        "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
+        "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
@@ -139,16 +141,14 @@ class <name> extends <if(debug)>Debug<endif>Parser {
 
     <rules; separator="\n\n">
 
-    <predicates; separator="\n">
-
     <cyclicDFAs>
 
     <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
 }
 >>
 
-parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates) ::= <<
-<genericParser(name=name,inputStreamType="TokenStream")>
+parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType) ::= <<
+<genericParser(name=name, scopes=scopes, tokens=tokens, tokenNames=tokenNames, globalAction=globalAction, rules=rules, cyclicDFAs=cyclicDFAs, bitsets=bitsets, inputStreamType="TokenStream", superClass="Parser", labelType="Token")>
 >>
 
 /** How to generate a tree parser; same as parser except the input
@@ -156,8 +156,9 @@ parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitset
  *  does not allow convenient invocation of other rules so the
  *  syntax is wacky (x=x) but I will fix for 2.2 final I hope. ;)
  */
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates) ::= <<
-<genericParser(name=name, scopes=scopes, tokens=tokens, tokenNames=tokenNames, globalAction=globalAction, rules=rules, cyclicDFAs=cyclicDFAs, bitsets=bitsets, predicates=predicates, inputStreamType="TreeNodeStream")>
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType, ASTLabelType) ::= <<
+<genericParser(name=name, scopes=scopes, tokens=tokens, tokenNames=tokenNames, globalAction=globalAction, rules=rules, cyclicDFAs=cyclicDFAs, bitsets=bitsets, inputStreamType="TreeNodeStream", superClass="TreeParser",
+ labelType=ASTLabelType)>
 >>
 
 /** How to generate code for a rule.  This includes any return type
@@ -179,12 +180,12 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 <if(ruleDescriptor.singleValueReturnType)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
 <endif>
-    <ruleDescriptor.tokenLabels:{Token <it.label.text>=null;}; separator="\n">
+    <ruleDescriptor.tokenLabels:{<labelType> <it.label.text>=null;}; separator="\n">
 <if(buildAST)>
     <ruleDescriptor.tokenLabels:{Object <it.label.text>_tree=null;}; separator="\n">
 <endif>
     <ruleDescriptor.tokenListLabels:{List list_<it.label.text>=null;}; separator="\n">
-    <ruleDescriptor.tokenListLabels:{Token <it.label.text>=null;}; separator="\n">
+    <ruleDescriptor.tokenListLabels:{<labelType> <it.label.text>=null;}; separator="\n">
 <if(buildAST)>
     <ruleDescriptor.tokenListLabels:{Object <it.label.text>_tree=null;}; separator="\n">
 <endif>
@@ -1257,7 +1258,7 @@ ruleLabelDef(label) ::= <<
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 public static class <returnType()> {
-    Token start, stop;
+    <labelType> start, stop;
 <if(buildAST)>
     Object tree;
 <else>

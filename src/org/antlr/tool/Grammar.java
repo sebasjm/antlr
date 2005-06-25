@@ -124,7 +124,7 @@ public class Grammar {
 		};
 
 	public static final Map defaultOptions =
-			new HashMap() {{put("language","Java");}};
+			new HashMap() {{put("language","Java"); put("ASTLabelType","Object");}};
 
     /** The NFA that represents the grammar with edges labelled with tokens
      *  or epsilon.  It is more suitable to analysis than an AST representation.

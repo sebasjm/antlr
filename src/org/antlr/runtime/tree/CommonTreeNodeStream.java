@@ -181,6 +181,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	public void consume() {
 		absoluteNodeIndex++;
+		head = (head+1) % lookahead.length;
 	}
 
 	public int LA(int i) {
