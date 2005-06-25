@@ -77,6 +77,21 @@ public class TestTreeNodeStream extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testListWithOneNode() throws Exception {
+		Tree root = new CommonTree((Token)null);
+
+		root.addChild(new CommonTree(new CommonToken(101)));
+
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(root);
+		String expecting = " 101";
+		String found = stream.toNodesOnlyString();
+		assertEqual(found, expecting);
+
+		expecting = " 101";
+		found = stream.toString();
+		assertEqual(found, expecting);
+	}
+
 	public void testAoverB() throws Exception {
 		Tree t = new CommonTree(new CommonToken(101));
 		t.addChild(new CommonTree(new CommonToken(102)));
