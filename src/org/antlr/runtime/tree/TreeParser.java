@@ -1,5 +1,7 @@
 package org.antlr.runtime.tree;
 
+import org.antlr.runtime.BaseParser;
+
 /** A parser for a stream of tree nodes.  "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
  *  the BaseParser superclass.

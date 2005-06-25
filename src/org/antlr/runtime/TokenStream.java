@@ -37,7 +37,13 @@ public interface TokenStream extends IntStream {
 	 */
     public Token LT(int k);
 
-	/** Get a token at an absolute index i; 0..n-1. */
+	/** Get a token at an absolute index i; 0..n-1.  This is really only
+	 *  needed for profiling and debugging and token stream rewriting.
+	 *  If you don't want to buffer up tokens, then this method makes no
+	 *  sense for you.  Naturally you can't use the rewrite stream feature.
+	 *  I believe DebugTokenStream can easily be altered to not use
+	 *  this method, removing the dependency.
+	 */
 	public Token get(int i);
 
 	/** Where is this stream pulling tokens from?  This is not the name, but

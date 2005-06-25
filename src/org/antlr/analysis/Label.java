@@ -102,9 +102,9 @@ public class Label implements Comparable, Cloneable {
 	public static final int EOR_TOKEN_TYPE =
 		org.antlr.runtime.Token.EOR_TOKEN_TYPE;
 
-    /** tokens and char range overlap; tokens are 2..n */
+    /** tokens and char range overlap; tokens are MIN_TOKEN_TYPE..n */
 	public static final int MIN_TOKEN_TYPE =
-		org.antlr.runtime.Token.EOR_TOKEN_TYPE+1;
+		org.antlr.runtime.Token.MIN_TOKEN_TYPE;
 
     /** The wildcard '.' char atom implies all valid characters==UNICODE */
     public static final IntSet ALLCHAR = IntervalSet.of(MIN_CHAR_VALUE,MAX_CHAR_VALUE);

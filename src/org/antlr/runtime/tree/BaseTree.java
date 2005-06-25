@@ -37,7 +37,7 @@ import java.util.Collections;
  *  an empty node whose children represent the list.  An empty, but
  *  non-null node is called "nil".
  */
-public class BaseTree {
+public abstract class BaseTree implements Tree {
 	protected List children;
 
 	public BaseTree() {
@@ -48,10 +48,10 @@ public class BaseTree {
 	 *  be copied as the children are not considered part of this node. 
 	 * @param node
 	 */
-	public BaseTree(BaseTree node) {
+	public BaseTree(Tree node) {
 	}
 
-	public BaseTree getChild(int i) {
+	public Tree getChild(int i) {
 		if ( children==null || i>=children.size() ) {
 			return null;
 		}
@@ -65,20 +65,21 @@ public class BaseTree {
 		return children.size();
 	}
 
-	public void addChild(BaseTree t) {
+	public void addChild(Tree t) {
 		if ( t==null ) {
 			return; // do nothing upon addChild(null)
 		}
+		BaseTree baseTree = (BaseTree)t;
 		if ( children==null ) {
 			createChildrenList(); // add children list on demand
 		}
 		if ( t.isNil() ) {
-			if ( this.children == t.children ) {
+			if ( this.children == baseTree.children ) {
 				throw new RuntimeException("attempt to add child list to itself");
 			}
 			// just add all of t's children to this
-			for (int i = 0; t.children!=null && i < t.children.size(); i++) {
-				children.add(t.children.get(i));
+			for (int i = 0; baseTree.children!=null && i < baseTree.children.size(); i++) {
+				children.add(baseTree.children.get(i));
 			}
 			return;
 		}
@@ -112,19 +113,19 @@ public class BaseTree {
 	 *  this tree.  This method should work for all subclasses as long
 	 *  as they override dupNode().
 	 */
-	public BaseTree dupTree() {
-		BaseTree newTree = this.dupNode();
+	public Tree dupTree() {
+		Tree newTree = this.dupNode();
 		for (int i = 0; children!=null && i < children.size(); i++) {
-			BaseTree t = (BaseTree) children.get(i);
-			BaseTree newNode = t.dupNode();
+			Tree t = (Tree) children.get(i);
+			Tree newNode = t.dupNode();
 			newTree.addChild(newNode);
 		}
 		return newTree;
 	}
 
-	public BaseTree dupNode() {
-		return new BaseTree(this);
-	}
+	public abstract Tree dupNode();
+
+	public abstract int getType();
 
 	public String toStringTree() {
 		if ( children==null || children.size()==0 ) {
@@ -150,7 +151,5 @@ public class BaseTree {
 	}
 
 	/** Override to say how a node (not a tree) should look as text */
-	public String toString() {
-		return "";
-	}
+	public abstract String toString();
 }

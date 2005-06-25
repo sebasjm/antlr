@@ -32,8 +32,9 @@ import java.util.ArrayList;
 
 /** A generic doubly-linked tree implementation with no payload.
  *  You must subclass to actually have any user data.
+ *  TODO: do we really need/want this?
  */
-public class DoubleLinkTree extends BaseTree {
+public abstract class DoubleLinkTree extends BaseTree {
 	protected DoubleLinkTree parent;
 
 	public DoubleLinkTree getParent() {

@@ -27,6 +27,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.runtime.tree;
 
+import org.antlr.runtime.IntStream;
+
 /** A stream of tree nodes, accessing nodes from a tree of some kind */
 public interface TreeNodeStream extends IntStream {
 	/** Get tree node at current input pointer + i ahead where i=1 is next node.
@@ -40,9 +42,6 @@ public interface TreeNodeStream extends IntStream {
 	 *  for both parser and tree grammars. :)
 	 */
 	public Object LT(int k);
-
-	/** Get a node at an absolute index i; 0..n-1. */
-	public Object get(int i);
 
 	/** Where is this stream pulling nodes from?  This is not the name, but
 	 *  the object that provides node objects.

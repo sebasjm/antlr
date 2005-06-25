@@ -38,6 +38,14 @@ public class ParseTree extends BaseTree {
 		this.payload = label;
 	}
 
+	public Tree dupNode() {
+		return null;
+	}
+
+	public int getType() {
+		return 0;
+	}
+
 	public String toString() {
 		return payload.toString();
 	}

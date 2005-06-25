@@ -46,12 +46,19 @@ public class CommonTree extends BaseTree {
 		this.token = t;
 	}
 
-	public BaseTree dupNode() {
+	public Tree dupNode() {
 		return new CommonTree(this);
 	}
 
 	public boolean isNil() {
 		return token==null;
+	}
+
+	public int getType() {
+		if ( token==null ) {
+			return 0;
+		}
+		return token.getType();
 	}
 
 	public String toString() {
