@@ -95,7 +95,7 @@ retry:
 >>
 
 /** How to generate a parser */
-parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates) ::= <<
+genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates, inputStreamType) ::= <<
 class <name> extends <if(debug)>Debug<endif>Parser {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
@@ -114,15 +114,15 @@ class <name> extends <if(debug)>Debug<endif>Parser {
 <if(debug)>
     public int ruleLevel = 0;
 <if(profile)>
-    public <name>(TokenStream input) {
+    public <name>(<inputStreamType> input) {
 	super(input,null);
 	setDebugListener(new Profiler(this,<dumpProfile>));
     }<\n>
 <else>
-    public <name>(TokenStream input) {
+    public <name>(<inputStreamType> input) {
 	super(input);
     }
-    public <name>(TokenStream input, DebugEventListener dbg) {
+    public <name>(<inputStreamType> input, DebugEventListener dbg) {
         super(input,dbg);
     }<\n>
 <endif>
@@ -131,7 +131,7 @@ class <name> extends <if(debug)>Debug<endif>Parser {
 	return result;
     }<\n>
 <else>
-    public <name>(TokenStream input) { super(input); }<\n>
+    public <name>(<inputStreamType> input) { super(input); }<\n>
 <endif>
     public String[] getTokenNames() { return tokenNames; }
 
@@ -147,57 +147,17 @@ class <name> extends <if(debug)>Debug<endif>Parser {
 }
 >>
 
-/** How to generate a tree parser */
+parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates) ::= <<
+<genericParser(name=name,inputStreamType="TokenStream")>
+>>
+
+/** How to generate a tree parser; same as parser except the input
+ *  stream is a different type.  This StringTemplate 2.2b2 version
+ *  does not allow convenient invocation of other rules so the
+ *  syntax is wacky (x=x) but I will fix for 2.2 final I hope. ;)
+ */
 treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, predicates) ::= <<
-class <name> extends <if(debug)>Debug<endif>TreeParser {
-    public static final String[] tokenNames = new String[] {
-        "\<invalid>", "\<EOR>", <tokenNames; separator=", ">
-    };
-    <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
-    <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
-<if(buildAST)>
-    protected TreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
-    public void setTreeAdaptor(TreeAdaptor adaptor) {
-        this.adaptor = adaptor;
-    }
-    public TreeAdaptor getTreeAdaptor() {
-        return adaptor;
-    }<\n>
-<endif>
-<if(debug)>
-    public int ruleLevel = 0;
-<if(profile)>
-    public <name>(TreeNodeStream input) {
-	super(input,null);
-	setDebugListener(new Profiler(this,<dumpProfile>));
-    }<\n>
-<else>
-    public <name>(TreeNodeStream input) {
-	super(input);
-    }
-    public <name>(TreeNodeStream input, DebugEventListener dbg) {
-        super(input,dbg);
-    }<\n>
-<endif>
-    protected boolean evalPredicate(boolean result, String predicate) {
-        dbg.semanticPredicate(result, predicate);
-	return result;
-    }<\n>
-<else>
-    public <name>(TreeNodeStream input) { super(input); }<\n>
-<endif>
-    public String[] getTokenNames() { return tokenNames; }
-
-    <globalAction>
-
-    <rules; separator="\n\n">
-
-    <predicates; separator="\n">
-
-    <cyclicDFAs>
-
-    <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
-}
+<genericParser(name=name, scopes=scopes, tokens=tokens, tokenNames=tokenNames, globalAction=globalAction, rules=rules, cyclicDFAs=cyclicDFAs, bitsets=bitsets, predicates=predicates, inputStreamType="TreeNodeStream")>
 >>
 
 /** How to generate code for a rule.  This includes any return type
