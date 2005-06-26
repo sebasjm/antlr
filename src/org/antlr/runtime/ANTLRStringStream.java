@@ -70,9 +70,9 @@ public class ANTLRStringStream implements CharStream {
         return input.charAt(p+i-1);
     }
 
-    public int LA(int marker, int i) {
-        return input.charAt(marker+i-1);
-    }
+	public int LT(int i) {
+		return LA(i);
+	}
 
     public int mark() {
 		CharStreamState state = (CharStreamState)markers.get(0);

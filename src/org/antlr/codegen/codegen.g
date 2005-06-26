@@ -138,19 +138,9 @@ options {
 		String suffix = getSTSuffix(ast_suffix,label);
 		name += suffix;
 		if ( suffix.length()>0 && label==null ) {
-			// we will need a label to do the AST or tracking, make one
-			/*
-			if ( suffix.index("Track")>=0 ) {
-				// we are tracking stuff for a rewrite..all IDs must add to
-				// same label.  The label is token<outerAltNum>
-				label = "token"+elementAST.outerAltNum.
-			}
-			else {
-			*/
-				label = generator.createUniqueLabel(elementName);
-				CommonToken labelTok = new CommonToken(ANTLRParser.ID, label);
-				grammar.defineTokenRefLabel(currentRuleName, labelTok, elementAST);
-			//}
+			label = generator.createUniqueLabel(elementName);
+			CommonToken labelTok = new CommonToken(ANTLRParser.ID, label);
+			grammar.defineTokenRefLabel(currentRuleName, labelTok, elementAST);
 		}
 		StringTemplate elementST = templates.getInstanceOf(name);
 		if ( label!=null ) {
@@ -209,40 +199,6 @@ options {
 		String STsuffix = astPart+operatorPart+rewritePart+listLabelPart;
 		//System.out.println("suffix = "+STsuffix);
 
-		/*
-		// handle AST stuff
-		String STsuffix = "";
-		if ( grammar.type==Grammar.LEXER ) {
-			return STsuffix;
-		}
-		if ( (currentAltHasRewrite && grammar.buildAST()) || hasListLabel ) {
-			return "Track";
-		}
-		else if ( (!currentAltHasRewrite && grammar.buildAST()) &&
-		     hasListLabel && ast_suffix==null )
-		{
-			return "ASTAndListLabel";
-		}
-		if ( !grammar.buildAST() ) {
-			return STsuffix;
-		}
-    	if ( ast_suffix==null ) {
-    		return "AST";
-    	}
-	    else {
-			if ( ast_suffix.getType()==ANTLRParser.ROOT &&
-			     !currentAltHasRewrite && hasListLabel )
-			{
-    			return "ASTRootAndListLabel";
-			}
-			else if ( ast_suffix.getType()==ANTLRParser.ROOT ) {
-    			return "ASTRoot";
-    		}
-    		else if ( ast_suffix.getType()==ANTLRParser.RULEROOT ) {
-    			return "ASTRuleRoot";
-    		}
-    	}
-    	*/
     	return STsuffix;
 	}
 
@@ -262,14 +218,16 @@ grammar[Grammar g,
     this.recognizerST = recognizerST;
     this.outputFileST = outputFileST;
     this.headerFileST = headerFileST;
+    String superClass = g.getOption("superClass");
+    recognizerST.setAttribute("superClass", superClass);
+    if ( g.type!=Grammar.LEXER ) {
+		recognizerST.setAttribute("ASTLabelType", g.getOption("ASTLabelType"));
+	}
 }
     :   (headerSpec[outputFileST])*
 	    ( #( LEXER_GRAMMAR grammarSpec )
 	    | #( PARSER_GRAMMAR grammarSpec )
 	    | #( TREE_GRAMMAR grammarSpec
-	         {
-	         recognizerST.setAttribute("ASTLabelType", g.getOption("ASTLabelType"));
-	         }
 	       )
 	    | #( COMBINED_GRAMMAR grammarSpec )
 	    )

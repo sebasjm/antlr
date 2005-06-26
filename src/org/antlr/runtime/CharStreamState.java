@@ -31,7 +31,7 @@ package org.antlr.runtime;
  *  predicates), we need to record the state of the input stream (char index,
  *  line, etc...) so that we can rewind the state after scanning ahead.
  */
-class CharStreamState {
+public class CharStreamState {
 	int p;
 	int line;
 	int charPositionInLine;

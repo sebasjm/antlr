@@ -107,11 +107,11 @@ public class ANTLRFileStream implements CharStream {
         return data[p+i-1];
     }
 
-    public int LA(int marker, int i) {
-        return data[marker+i-1];
-    }
+	public int LT(int i) {
+		return LA(i);
+	}
 
-    public int mark() {
+	public int mark() {
 		CharStreamState state = (CharStreamState)markers.get(0);
 		state.p = p;
 		state.line = line;

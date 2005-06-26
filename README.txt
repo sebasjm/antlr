@@ -203,7 +203,11 @@ CHANGES
 
 3.0ea4 - June ??, 2005
 
+* tree parsers work; added CommonTreeNodeStream
+
 * refactored Parser to have a BaseParser and added TreeParser
+
+* bug fix: actions being dumped in description strings; compile errors resulted
 
 3.0ea3 - June 23, 2005
 

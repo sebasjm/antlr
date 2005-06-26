@@ -115,16 +115,21 @@ public class Grammar {
 	public static final Set legalOptions =
 			new HashSet() {
 				{add("language"); add("tokenVocab");
-				 add("output"); add("ASTLabelType");}
+				 add("output"); add("ASTLabelType");
+				 add("superClass");
+				}
 			};
 
 	public static final Set doNotCopyOptionsToLexer =
 		new HashSet() {
-			{add("output");add("ASTLabelType");}
+			{add("output"); add("ASTLabelType"); add("superClass");}
 		};
 
 	public static final Map defaultOptions =
-			new HashMap() {{put("language","Java"); put("ASTLabelType","Object");}};
+			new HashMap() {
+				{put("language","Java");
+				}
+			};
 
     /** The NFA that represents the grammar with edges labelled with tokens
      *  or epsilon.  It is more suitable to analysis than an AST representation.

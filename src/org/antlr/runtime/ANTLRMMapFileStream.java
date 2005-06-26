@@ -98,9 +98,9 @@ public class ANTLRMMapFileStream implements CharStream {
         return mmap.get(p+i-1);
     }
 
-    public int LA(int marker, int i) {
-        return mmap.get(marker+i-1);
-    }
+	public int LT(int i) {
+		return LA(i);
+	}
 
     public int mark() {
         return index(); // already buffered, just return index

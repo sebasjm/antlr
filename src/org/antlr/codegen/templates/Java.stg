@@ -29,6 +29,8 @@ group Java;
 
 //crap; I need this: returnTypeMap ::= {"int":"0", "float":"0.0"}
 
+// need something like ASTLabelType ::= {"TreeParser":"Object", default="Object"}
+
 /** The overall file structure of a recognizer; stores methods for rules
  *  and cyclic DFAs plus support code.
  */
@@ -97,7 +99,7 @@ retry:
 >>
 
 /** How to generate a parser */
-genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, inputStreamType, superClass, labelType) ::= <<
+genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, inputStreamType, superClass, labelType, ASTLabelType) ::= <<
 class <name> extends <if(debug)>Debug<endif><superClass> {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
@@ -147,8 +149,21 @@ class <name> extends <if(debug)>Debug<endif><superClass> {
 }
 >>
 
-parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType) ::= <<
-<genericParser(name=name, scopes=scopes, tokens=tokens, tokenNames=tokenNames, globalAction=globalAction, rules=rules, cyclicDFAs=cyclicDFAs, bitsets=bitsets, inputStreamType="TokenStream", superClass="Parser", labelType="Token")>
+parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType, ASTLabelType, superClass) ::= <<
+
+<if(!ASTLabelType)>
+<if(!superClass)>
+<parser(ASTLabelType="Object", ...)>
+<else>
+<parser(...)>
+<endif>
+
+<genericParser(inputStreamType="TokenStream", ASTLabelType=<if(ASTLabelType)>ASTLabelType<else>"Object"<endif>, superClass=<if(superClass)>superClass<else>="Parser"<endif>, labelType="Token", ...)>
+
+ASTLabelType=<if(ASTLabelType)>ASTLabelType<else>"Object"<endif>, superClass=<if(superClass)>superClass<else>="Parser"<endif>, labelType="Token"
+
+
+<genericParser(name=name, scopes=scopes, tokens=tokens, tokenNames=tokenNames, globalAction=globalAction, rules=rules, cyclicDFAs=cyclicDFAs, bitsets=bitsets, inputStreamType="TokenStream", ASTLabelType=<if(ASTLabelType)>ASTLabelType<else>"Object"<endif>, superClass=<if(superClass)>superClass<else>="Parser"<endif>, labelType="Token")>
 >>
 
 /** How to generate a tree parser; same as parser except the input
@@ -156,9 +171,9 @@ parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitset
  *  does not allow convenient invocation of other rules so the
  *  syntax is wacky (x=x) but I will fix for 2.2 final I hope. ;)
  */
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType, ASTLabelType) ::= <<
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType, ASTLabelType, superClass) ::= <<
 <genericParser(name=name, scopes=scopes, tokens=tokens, tokenNames=tokenNames, globalAction=globalAction, rules=rules, cyclicDFAs=cyclicDFAs, bitsets=bitsets, inputStreamType="TreeNodeStream", superClass="TreeParser",
- labelType=ASTLabelType)>
+ labelType=ASTLabelType, ASTLabelType=<if(ASTLabelType)>ASTLabelType<else>"Object"<endif>, superClass=<if(superClass)>superClass<else>"TreeParser"<endif>)>
 >>
 
 /** How to generate code for a rule.  This includes any return type
@@ -182,12 +197,12 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 <endif>
     <ruleDescriptor.tokenLabels:{<labelType> <it.label.text>=null;}; separator="\n">
 <if(buildAST)>
-    <ruleDescriptor.tokenLabels:{Object <it.label.text>_tree=null;}; separator="\n">
+    <ruleDescriptor.tokenLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
 <endif>
     <ruleDescriptor.tokenListLabels:{List list_<it.label.text>=null;}; separator="\n">
     <ruleDescriptor.tokenListLabels:{<labelType> <it.label.text>=null;}; separator="\n">
 <if(buildAST)>
-    <ruleDescriptor.tokenListLabels:{Object <it.label.text>_tree=null;}; separator="\n">
+    <ruleDescriptor.tokenListLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
 <endif>
     <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
     <ruleDescriptor.ruleListLabels:{List list_<it.label.text>=null;}; separator="\n">
@@ -196,7 +211,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     <ruleDescriptor.allTokenRefsInAltsWithRewrites:{List list_<it>=new ArrayList();}; separator="\n">
     <initAction>
 <if(buildAST)>
-    Object root_0 = null;<\n>
+    <ASTLabelType> root_0 = null;<\n>
 <endif>
 <if(debug)>
     try { dbg.enterRule("<ruleName>");
@@ -274,7 +289,7 @@ public void mTokens() throws RecognitionException {
 block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 // <fileName>:<description>
 <!<if(buildAST)>
-Object root_<blockLevel> = adaptor.nil();<\n>
+<ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
 <endif>!>
 int alt<decisionNumber>=<maxAlt>;
 <decls>
@@ -318,7 +333,7 @@ dbg.enterAlt(1);<\n>
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
 // <fileName>:<description>
 <!<if(buildAST)>
-Object root_<blockLevel> = adaptor.nil();<\n>
+<ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
 <endif>!>
 <if(debug)>
 dbg.enterAlt(1);<\n>
@@ -340,7 +355,7 @@ try { dbg.enterSubRule(<decisionNumber>);<\n>
 loop<decisionNumber>:
 do {
 <!<if(buildAST)>
-    Object root_<blockLevel> = adaptor.nil();<\n>
+    <ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
 <endif>!>
     int alt<decisionNumber>=<maxAlt>;
 <if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
@@ -379,7 +394,7 @@ try { dbg.enterSubRule(<decisionNumber>);<\n>
 loop<decisionNumber>:
 do {
 <!<if(buildAST)>
-    Object root_<blockLevel> = adaptor.nil();<\n>
+    <ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
 <endif>!>
     int alt<decisionNumber>=<maxAlt>;
 <if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
@@ -431,7 +446,7 @@ alt(elements,altNum,description,autoAST,outerAlt) ::= <<
 <if(outerAlt)>
 root_0 = adaptor.nil();<\n>
 <else>
-Object root_<blockLevel> = adaptor.nil();<\n>
+<ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
 <endif>
 <endif>
 <elements:element()>
@@ -882,7 +897,7 @@ rewriteEmptyAlt() ::= "root_0 = null;"
 rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
 // <fileName>:<description>
 {
-Object root_<treeLevel> = adaptor.nil();
+<ASTLabelType> root_<treeLevel> = adaptor.nil();
 <root>
 <children>
 adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
@@ -1268,7 +1283,7 @@ returnScope(scope) ::= <<
 public static class <returnType()> {
     <labelType> start, stop;
 <if(buildAST)>
-    Object tree;
+    <ASTLabelType> tree;
 <else>
 <if(buildTemplate)>
     StringTemplate st;

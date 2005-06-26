@@ -31,24 +31,14 @@ package org.antlr.runtime;
 public interface CharStream extends IntStream {
     public static final int EOF = -1;
 
-	/** Get int at current input marker + i ahead where i=1 is next int.
-     *  This is primarily used for evaluating semantic predicates which
-     *  must evaluate relative to their original position not in the input
-     *  stream; predicate hoisting can make them execute much further along,
-     *  however, as we check syntax first and then semantic predicates.
-     *
-     *  int m = input.mark();
-     *  int atom = input.LA(1);
-     *  input.next();
-     *  input.next();
-     *  ...
-     *  input.next();
-     *  assertTrue(atom==input.LA(m, 1));
-     */
-    public int LA(int marker, int i);
-
 	public String substring(int start, int stop);
 
+	/** Get the ith character of lookahead.  This is the same usually as
+	 *  LA(i).  This will be used for labels in the generated
+	 *  lexer code.  I'd prefer to return a char here type-wise, but it's
+	 *  probably better to be 32-bit clean and be consistent with LA.
+	 */
+	public int LT(int i);
 
 	/** ANTLR tracks the line information automatically */
 	int getLine();
