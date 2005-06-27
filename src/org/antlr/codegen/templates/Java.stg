@@ -99,7 +99,7 @@ retry:
 >>
 
 /** How to generate a parser */
-genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, inputStreamType, superClass, labelType, ASTLabelType) ::= <<
+genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, inputStreamType, superClass, ASTLabelType="Object", labelType) ::= <<
 class <name> extends <if(debug)>Debug<endif><superClass> {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
@@ -149,31 +149,15 @@ class <name> extends <if(debug)>Debug<endif><superClass> {
 }
 >>
 
-parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType, ASTLabelType, superClass) ::= <<
-
-<if(!ASTLabelType)>
-<if(!superClass)>
-<parser(ASTLabelType="Object", ...)>
-<else>
-<parser(...)>
-<endif>
-
-<genericParser(inputStreamType="TokenStream", ASTLabelType=<if(ASTLabelType)>ASTLabelType<else>"Object"<endif>, superClass=<if(superClass)>superClass<else>="Parser"<endif>, labelType="Token", ...)>
-
-ASTLabelType=<if(ASTLabelType)>ASTLabelType<else>"Object"<endif>, superClass=<if(superClass)>superClass<else>="Parser"<endif>, labelType="Token"
-
-
-<genericParser(name=name, scopes=scopes, tokens=tokens, tokenNames=tokenNames, globalAction=globalAction, rules=rules, cyclicDFAs=cyclicDFAs, bitsets=bitsets, inputStreamType="TokenStream", ASTLabelType=<if(ASTLabelType)>ASTLabelType<else>"Object"<endif>, superClass=<if(superClass)>superClass<else>="Parser"<endif>, labelType="Token")>
+parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
+<genericParser(inputStreamType="TokenStream", ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
- *  stream is a different type.  This StringTemplate 2.2b2 version
- *  does not allow convenient invocation of other rules so the
- *  syntax is wacky (x=x) but I will fix for 2.2 final I hope. ;)
+ *  stream is a different type.
  */
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType, ASTLabelType, superClass) ::= <<
-<genericParser(name=name, scopes=scopes, tokens=tokens, tokenNames=tokenNames, globalAction=globalAction, rules=rules, cyclicDFAs=cyclicDFAs, bitsets=bitsets, inputStreamType="TreeNodeStream", superClass="TreeParser",
- labelType=ASTLabelType, ASTLabelType=<if(ASTLabelType)>ASTLabelType<else>"Object"<endif>, superClass=<if(superClass)>superClass<else>"TreeParser"<endif>)>
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType="<ASTLabelType>", ASTLabelType="Object", superClass="TreeParser") ::= <<
+<genericParser(inputStreamType="TreeNodeStream", ...)>
 >>
 
 /** How to generate code for a rule.  This includes any return type
@@ -288,9 +272,6 @@ public void mTokens() throws RecognitionException {
 /** A (...) subrule with multiple alternatives */
 block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 // <fileName>:<description>
-<!<if(buildAST)>
-<ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
-<endif>!>
 int alt<decisionNumber>=<maxAlt>;
 <decls>
 <if(debug)>try { dbg.enterSubRule(<decisionNumber>);<\n><endif>
@@ -300,9 +281,6 @@ int alt<decisionNumber>=<maxAlt>;
 switch (alt<decisionNumber>) {
     <alts:altSwitchCase()>
 }
-<!<if(buildAST)>
-adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
-<endif>!>
 <if(debug)>
 } finally {dbg.exitSubRule(<decisionNumber>);}<\n>
 <endif>
@@ -332,16 +310,10 @@ dbg.enterAlt(1);<\n>
 /** A special case of a (...) subrule with a single alternative */
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
 // <fileName>:<description>
-<!<if(buildAST)>
-<ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
-<endif>!>
 <if(debug)>
 dbg.enterAlt(1);<\n>
 <endif>
 <decls><alts>
-<!<if(buildAST)>
-adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
-<endif>!>
 >>
 
 /** A (..)+ block with 0 or more alternatives */
@@ -354,9 +326,6 @@ try { dbg.enterSubRule(<decisionNumber>);<\n>
 <endif>
 loop<decisionNumber>:
 do {
-<!<if(buildAST)>
-    <ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
-<endif>!>
     int alt<decisionNumber>=<maxAlt>;
 <if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
     <decision>
@@ -372,9 +341,6 @@ do {
 <endif>
             throw eee;
     }
-<!<if(buildAST)>
-    adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
-<endif>!>
     cnt<decisionNumber>++;
 } while (true);
 <if(debug)>
@@ -393,9 +359,6 @@ try { dbg.enterSubRule(<decisionNumber>);<\n>
 <endif>
 loop<decisionNumber>:
 do {
-<!<if(buildAST)>
-    <ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
-<endif>!>
     int alt<decisionNumber>=<maxAlt>;
 <if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
     <decision>
@@ -405,9 +368,6 @@ do {
 	default :
 	    break loop<decisionNumber>;
     }
-<!<if(buildAST)>
-    adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
-<endif>!>
 } while (true);
 <if(debug)>
 } finally {dbg.exitSubRule(<decisionNumber>);}<\n>

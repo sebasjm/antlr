@@ -247,6 +247,7 @@ public class CodeGenerator {
 		else {
 			// create a dummy to avoid null-checks all over code generator
 			headerFileST = new StringTemplate(templates,"");
+			headerFileST.setName("dummy-header-file");
 		}
 
 		// RECOGNIZER
@@ -485,7 +486,9 @@ public class CodeGenerator {
 			throw new IllegalArgumentException("unable to generate expressions for non IntervalSet objects");
 		}
 		if ( iset.getIntervals()==null || iset.getIntervals().size()==0 ) {
-			return new StringTemplate(templates, "");
+			StringTemplate emptyST = new StringTemplate(templates, "");
+			emptyST.setName("empty-set-expr");
+			return emptyST;
 		}
 		String testSTName = "lookaheadTest";
 		String testRangeSTName = "lookaheadRangeTest";
@@ -563,6 +566,7 @@ public class CodeGenerator {
 		StringTemplate vocabFileST =
 			new StringTemplate(vocabFilePattern,
 							   AngleBracketTemplateLexer.class);
+		vocabFileST.setName("vocab-file");
 		// make constants for the token names
 		Iterator tokenIDs = grammar.getTokenIDs().iterator();
 		while (tokenIDs.hasNext()) {
