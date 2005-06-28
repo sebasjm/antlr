@@ -32,8 +32,9 @@ import org.antlr.runtime.IntStream;
 /** A stream of tree nodes, accessing nodes from a tree of some kind */
 public interface TreeNodeStream extends IntStream {
 	/** Get tree node at current input pointer + i ahead where i=1 is next node.
-	 *  i<0 indicates nodes in the past.  So -1 is previous node and -2 is
-	 *  two nodes ago. LT(0) is undefined.  For i>=n, return null.
+	 *  i<0 indicates nodes in the past.  So LT(-1) is previous node, but
+	 *  implementations are not required to provide results for k < -1.
+	 *  LT(0) is undefined.  For i>=n, return null.
 	 *  Return null for LT(0) and any index that results in an absolute address
 	 *  that is negative.
 	 *
@@ -49,5 +50,13 @@ public interface TreeNodeStream extends IntStream {
 	 *  TODO: do we really need this?
 	 */
 	public Object getTreeSource();
+
+	/** Return the text of all nodes from start to stop, inclusive.
+	 *  If the stream does not buffer all the nodes then it can still
+	 *  walk recursively from start until stop.  You can always return
+	 *  null or "" too, but users should not access $ruleLabel.text in
+	 *  an action of course in that case.
+	 */
+	public String toString(Object start, Object stop);
 }
 

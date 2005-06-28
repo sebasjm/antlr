@@ -75,14 +75,81 @@ public class TestCompileAndExecSupport {
 									String input)
 	{
 		eraseFiles(".class");
-		antlr(grammarFileName, grammarStr);
-		compile(parserName+".java "+lexerName+".java");
+
+		rawGenerateAndBuildRecognizer(grammarFileName,
+									  grammarStr,
+									  parserName,
+									  lexerName);
 		writeFile(tmpdir, "input", input);
-		writeTestFile(parserName, lexerName, startRuleName);
+		return rawExecRecognizer(parserName,
+								 null,
+								 lexerName,
+								 startRuleName,
+								 null);
+	}
+
+	public static String execTreeParser(String parserGrammarFileName,
+										String parserGrammarStr,
+										String parserName,
+										String treeParserGrammarFileName,
+										String treeParserGrammarStr,
+										String treeParserName,
+										String lexerName,
+										String parserStartRuleName,
+										String treeParserStartRuleName,
+										String input)
+	{
+		eraseFiles(".class");
+
+		// build the parser
+		rawGenerateAndBuildRecognizer(parserGrammarFileName,
+									  parserGrammarStr,
+									  parserName,
+									  lexerName);
+
+		// build the tree parser
+		rawGenerateAndBuildRecognizer(treeParserGrammarFileName,
+									  treeParserGrammarStr,
+									  treeParserName,
+									  lexerName);
+
+		writeFile(tmpdir, "input", input);
+
+		return rawExecRecognizer(parserName,
+								 treeParserName,
+								 lexerName,
+								 parserStartRuleName,
+								 treeParserStartRuleName);
+	}
+
+	protected static void rawGenerateAndBuildRecognizer(String grammarFileName,
+														String grammarStr,
+														String parserName,
+														String lexerName)
+	{
+		antlr(grammarFileName, grammarStr);
+		if ( lexerName!=null ) {
+			compile(parserName+".java "+lexerName+".java");
+		}
+		else {
+			compile(parserName+".java");
+		}
+	}
+
+	protected static String rawExecRecognizer(String parserName,
+											  String treeParserName,
+											  String lexerName,
+											  String parserStartRuleName,
+											  String treeParserStartRuleName)
+	{
+		writeTestFile(parserName,
+					  treeParserName,
+					  lexerName,
+					  parserStartRuleName,
+					  treeParserStartRuleName);
+
 		compile("Test.java");
 		try {
-			// wow...took me an hour to figure out that stupid java wants
-			// the /tmp dir after the CLASSPATH; wouldn't run! :(
 			String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test /tmp/input";
 			//System.out.println("execParser: "+cmdLine);
 			Process process =
@@ -148,26 +215,39 @@ public class TestCompileAndExecSupport {
 		}
 	}
 
-	public static void writeTestFile(String parserName, String lexerName, String startRuleName) {
+	public static void writeTestFile(String parserName,
+									 String treeParserName,
+									 String lexerName,
+									 String parserStartRuleName,
+									 String treeParserStartRuleName)
+	{
 		StringTemplate outputFileST = new StringTemplate(
 			"import org.antlr.runtime.*;\n" +
 			"import org.antlr.runtime.tree.*;\n" +
 			"\n" +
 			"public class Test {\n" +
-			"        public static void main(String[] args) throws Exception {\n" +
-			"                CharStream input = new ANTLRFileStream(args[0]);\n" +
-			"                $lexerName$ lex = new $lexerName$(input);\n" +
-			"                CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-			"                $parserName$ parser = new $parserName$(tokens);\n" +
-			"                $parserName$.$startRuleName$_return r = parser.$startRuleName$();\n" +
-			"                if ( r.tree!=null )\n" +
-			"                    System.out.println(((CommonTree)r.tree).toStringTree());\n" +
-			"        }\n" +
+			"    public static void main(String[] args) throws Exception {\n" +
+			"        CharStream input = new ANTLRFileStream(args[0]);\n" +
+			"        $lexerName$ lex = new $lexerName$(input);\n" +
+			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+			"        $parserName$ parser = new $parserName$(tokens);\n" +
+			"        $parserName$.$parserStartRuleName$_return r = parser.$parserStartRuleName$();\n" +
+			"        $if(!treeParserStartRuleName)$\n" +
+			"        if ( r.tree!=null )\n" +
+			"            System.out.println(((Tree)r.tree).toStringTree());\n" +
+			"        $else$\n" +
+			"        CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);\n" +
+			"        $treeParserName$ walker = new $treeParserName$(nodes);\n" +
+			"        walker.$treeParserStartRuleName$();\n" +
+			"        $endif$\n" +
+			"    }\n" +
 			"}"
 			);
 		outputFileST.setAttribute("parserName", parserName);
+		outputFileST.setAttribute("treeParserName", treeParserName);
 		outputFileST.setAttribute("lexerName", lexerName);
-		outputFileST.setAttribute("startRuleName", startRuleName);
+		outputFileST.setAttribute("parserStartRuleName", parserStartRuleName);
+		outputFileST.setAttribute("treeParserStartRuleName", treeParserStartRuleName);
 		writeFile(tmpdir, "Test.java", outputFileST.toString());
 	}
 

@@ -50,4 +50,11 @@ public interface TokenStream extends IntStream {
 	 *  the object that provides Token objects.
 	 */
 	public TokenSource getTokenSource();
+
+	/** Return the text of all tokens from start to stop, inclusive.
+	 *  If the stream does not buffer all the tokens then it can just
+	 *  return "" or null;  Users should not access $ruleLabel.text in
+	 *  an action of course in that case.
+	 */
+	public String toString(int start, int stop);
 }

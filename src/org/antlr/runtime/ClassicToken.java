@@ -1,7 +1,11 @@
 package org.antlr.runtime;
 
 /** A Token object like we'd use in ANTLR 2.x; has an actual string created
- *  and associated with this object.
+ *  and associated with this object.  These objects are needed for imaginary
+ *  tree nodes that have payload objects.  We need to create a Token object
+ *  that has a string; the tree node will point at this token.  CommonToken
+ *  has indexes into a char stream and hence cannot be used to introduce
+ *  new strings.
  */
 public class ClassicToken extends Token {
 	protected String text;

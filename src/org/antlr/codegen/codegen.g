@@ -218,7 +218,7 @@ grammar[Grammar g,
     this.recognizerST = recognizerST;
     this.outputFileST = outputFileST;
     this.headerFileST = headerFileST;
-    String superClass = g.getOption("superClass");
+    String superClass = (String)g.getOption("superClass");
     recognizerST.setAttribute("superClass", superClass);
     if ( g.type!=Grammar.LEXER ) {
 		recognizerST.setAttribute("ASTLabelType", g.getOption("ASTLabelType"));
@@ -551,9 +551,27 @@ ebnf returns [StringTemplate code=null]
 tree returns [StringTemplate code=templates.getInstanceOf("tree")]
 {
 StringTemplate el=null;
+GrammarAST elAST=null;
 }
-    :   #( TREE_BEGIN el=element {code.setAttribute("root",el);}
-           (el=element {code.setAttribute("children",el);})*
+    :   #( TREE_BEGIN {elAST=(GrammarAST)_t;}
+    	   el=element
+           {
+           code.setAttribute("root.{el,line,pos}",
+							  el,
+							  new Integer(elAST.getLine()),
+							  new Integer(elAST.getColumn())
+							  );
+           }
+           ( {elAST=(GrammarAST)_t;}
+    		 el=element
+           	 {
+			 code.setAttribute("children.{el,line,pos}",
+							  el,
+							  new Integer(elAST.getLine()),
+							  new Integer(elAST.getColumn())
+							  );
+			 }
+           )*
          )
     ;
 

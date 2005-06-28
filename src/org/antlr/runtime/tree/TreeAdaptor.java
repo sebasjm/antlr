@@ -43,8 +43,18 @@ import java.util.List;
 public interface TreeAdaptor {
 	// C o n s t r u c t i o n
 
-	/** Create a tree node from some payload object (normally a Token) */
-	public Object create(Object payload);
+	/** Create a tree node from Token object; for CommonTree type trees,
+	 *  then the token just becomes the payload.
+     */
+	public Object create(Token payload);
+
+	/** Create a tree node from some generic object.  Most of the time
+	 *  this will be a tree node of some kind during AST construction in
+	 *  a parser or AST rewrite in a tree parser.  This catches all
+	 *  create() calls other than the specific create(Token), which you
+	 *  will see in a parser creating trees.
+	 */
+	public Object create(Object node);
 
 	/** Duplicate tree recursively, using dupNode() for each node */
 	public Object dupTree(Object tree);

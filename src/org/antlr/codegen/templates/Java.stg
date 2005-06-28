@@ -78,7 +78,7 @@ class <name> extends Lexer {
 retry:
         while (true) {
 	        if ( input.LA(1)==CharStream.EOF ) {
-        	    return Token.EOFToken;
+        	    return Token.EOF_TOKEN;
 	        }	
             try {
                 mTokens();
@@ -174,7 +174,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     <ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
     <returnType()> retval = new <returnType()>();
-    retval.start = input.LT(1);<\n>
+    retval.start = (<labelType>)input.LT(1);<\n>
 <endif>
 <if(ruleDescriptor.singleValueReturnType)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
@@ -214,8 +214,10 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
         <ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
         <ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-        retval.stop = input.LT(-1);
+        retval.stop = (<labelType>)input.LT(-1);
+<if(buildAST)>
         retval.tree = root_0;<\n>
+<endif>
 <endif>
     }<\n>
 <if(debug)>
@@ -661,7 +663,7 @@ wildcardChar() ::= "matchAny();"
 ruleRef(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
-<label>=<rule>(<args>);
+<label>=<rule>(<args>);<\n>
 <else>
 <rule>(<args>);<\n>
 <endif>
@@ -673,7 +675,7 @@ ruleRefASTBang ::= ruleRef
 ruleRefASTTrack(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
-list_<rule>.add(<label>.tree);<\n>
+list_<rule>.add(<label>.tree);
 following.pop();
 >>
 
@@ -682,7 +684,7 @@ following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
 list_<rule>.add(<label>.tree);<\n>
 if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>.tree);<\n>
+list_<label>.add(<label>.tree);
 following.pop();
 >>
 
@@ -692,7 +694,7 @@ following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
 adaptor.addChild(root_<blockLevel>, <label>.tree);<\n>
 if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>.tree);<\n>
+list_<label>.add(<label>.tree);
 following.pop();
 >>
 
@@ -703,7 +705,7 @@ ruleRefASTBangAndListLabel ::= ruleRefASTAndListLabel
 ruleRefAST(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
-adaptor.addChild(root_<blockLevel>, <label>.tree);<\n>
+adaptor.addChild(root_<blockLevel>, <label>.tree);
 following.pop();
 >>
 
@@ -711,7 +713,7 @@ following.pop();
 ruleRefASTRoot(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
-root_<blockLevel> = adaptor.becomeRoot(<label>.tree, root_<blockLevel>);<\n>
+root_<blockLevel> = adaptor.becomeRoot(<label>.tree, root_<blockLevel>);
 following.pop();
 >>
 
@@ -721,7 +723,7 @@ following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
 root_<blockLevel> = adaptor.becomeRoot(<label>.tree, root_<blockLevel>);<\n>
 if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>.tree);<\n>
+list_<label>.add(<label>.tree);
 following.pop();
 >>
 
@@ -729,7 +731,7 @@ following.pop();
 ruleRefASTRuleRoot(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
-root_0 = adaptor.becomeRoot(<label>.tree, root_0);<\n>
+root_0 = adaptor.becomeRoot(<label>.tree, root_0);
 following.pop();
 >>
 
@@ -748,9 +750,9 @@ lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
 
 /** match ^(root children) in tree parser */
 tree(root, children) ::= <<
-<root>
+<root:element()>
 match(input, Token.DOWN, null);
-<children>
+<children:element()>
 match(input, Token.UP, null);
 >>
 
@@ -868,7 +870,7 @@ rewriteElementList(elements) ::= "<elements>"
 
 /** Gen ID */
 rewriteTokenRef(token,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, (Token)list_<token>.get(i_<rewriteBlockLevel>));<\n>
+adaptor.addChild(root_<treeLevel>, (<labelType>)list_<token>.get(i_<rewriteBlockLevel>));<\n>
 >>
 
 /** Gen $label ... where defined via label=ID */
@@ -878,7 +880,7 @@ adaptor.addChild(root_<treeLevel>, <label>);<\n>
 
 /** Gen $label ... where defined via label+=ID */
 rewriteTokenListLabelRef(label,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, (Token)list_<label>.get(i_<rewriteBlockLevel>));<\n>
+adaptor.addChild(root_<treeLevel>, (<labelType>)list_<label>.get(i_<rewriteBlockLevel>));<\n>
 >>
 
 /** Gen ^($label ...) */
@@ -888,7 +890,7 @@ root_<treeLevel> = adaptor.becomeRoot(<label>, root_<treeLevel>);<\n>
 
 /** Gen ^(ID ...) */
 rewriteTokenRefRoot(token,elementIndex) ::= <<
-root_<treeLevel> = adaptor.becomeRoot((Token)list_<token>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+root_<treeLevel> = adaptor.becomeRoot((<labelType>)list_<token>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
@@ -1299,7 +1301,8 @@ tokenLabelRef(label) ::= "<label>"
 listLabelRef(label) ::= "list_<label>"
 
 
-// not sure the next are the right approach
+// not sure the next are the right approach; and they are evaluated early;
+// they cannot see TREE_PARSER or PARSER attributes for example. :(
 
 tokenLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
 tokenLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
@@ -1312,6 +1315,7 @@ tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
 ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
+ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start,<scope>.stop)"
 
 // A C T I O N S
 

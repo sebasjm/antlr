@@ -114,4 +114,12 @@ public class DebugTokenStream implements TokenStream {
 	public TokenSource getTokenSource() {
 		return input.getTokenSource();
 	}
+
+	public String toString() {
+		return input.toString();
+	}
+
+	public String toString(int start, int stop) {
+		return input.toString(start,stop);
+	}
 }

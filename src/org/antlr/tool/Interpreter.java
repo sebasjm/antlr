@@ -144,7 +144,7 @@ public class Interpreter implements TokenSource {
 			return null;
 		}
 		if ( input.LA(1)==CharStream.EOF ) {
-			return Token.EOFToken;
+			return Token.EOF_TOKEN;
 		}
 		int start = input.index();
 		int charPos = ((CharStream)input).getCharPositionInLine();

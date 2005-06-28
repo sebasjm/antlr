@@ -86,6 +86,9 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	/** Which node are we currently visiting? */
 	protected Tree currentNode;
 
+	/** Which node did we visit last?  Used for LT(-1) calls. */
+	protected Tree previousNode;
+
 	/** Which child are we currently visiting?  If -1 we have not visited
 	 *  this node yet; next consume() request will set currentIndex to 0.
 	 */
@@ -116,11 +119,8 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	public void reset() {
 		currentNode = root;
+		previousNode = null;
 		currentChildIndex = -1;
-		/*
-		nodeStack.push(null);
-		indexStack.push(new Integer(-1));
-		*/
 	}
 
 	// Satisfy TreeNodeStream
@@ -136,6 +136,12 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 *  for both parser and tree grammars. :)
 	 */
 	public Object LT(int k) {
+		if ( k==-1 ) {
+			return previousNode;
+		}
+		if ( k==0 ) {
+			return Tree.INVALID_NODE;
+		}
 		fill(k);
 		return lookahead[(head+k-1)%lookahead.length];
 	}
@@ -181,11 +187,16 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	public void consume() {
 		absoluteNodeIndex++;
+		previousNode = lookahead[head]; // track previous node before moving on
 		head = (head+1) % lookahead.length;
 	}
 
 	public int LA(int i) {
-		return ((Tree)LT(i)).getType();
+		Tree t = (Tree)LT(i);
+		if ( t==null ) {
+			return Token.INVALID_TOKEN_TYPE;
+		}
+		return t.getType();
 	}
 
 	public int mark() {
@@ -329,6 +340,27 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 			}
 		}
 		return buf.toString();
+	}
+
+	/** TODO: not sure this is what we want for trees. */
+	public String toString(Object start, Object stop) {
+		StringBuffer buf = new StringBuffer();
+		toStringWork((Tree)start, (Tree)stop, buf);
+		return buf.toString();
+	}
+
+	protected void toStringWork(Tree p, Tree stop, StringBuffer buf) {
+		if ( !p.isNil() ) {
+			buf.append(p.toString()); // ask the node to go to string
+		}
+		if ( p==stop ) {
+			return;
+		}
+		int n = p.getChildCount();
+		for (int c=0; c<n; c++) {
+			Tree child = p.getChild(c);
+			toStringWork(child, stop, buf);
+		}
 	}
 }
 

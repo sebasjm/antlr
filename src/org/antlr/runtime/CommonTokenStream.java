@@ -183,14 +183,14 @@ public class CommonTokenStream implements TokenStream {
 			fillBuffer();
 		}
 		if ( k==0 ) {
-			return null;
+			return Token.INVALID_TOKEN;
 		}
 		if ( k<0 ) {
 			return LB(-k);
 		}
 		//System.out.print("LT(p="+p+","+k+")=");
 		if ( (p+k-1) >= tokens.size() ) {
-			return Token.EOFToken;
+			return Token.EOF_TOKEN;
 		}
 		//System.out.println(tokens.get(p+k-1));
 		int i = p;
@@ -202,7 +202,7 @@ public class CommonTokenStream implements TokenStream {
 			n++;
 		}
 		if ( i>=tokens.size() ) {
-			return Token.EOFToken;
+			return Token.EOF_TOKEN;
 		}
         return (Token)tokens.get(i);
     }
@@ -240,41 +240,9 @@ public class CommonTokenStream implements TokenStream {
 		return (Token)tokens.get(i);
 	}
 
-	/** Get Token at current input marker + i ahead where i=1 is next Token.
-	 *  This is primarily used for evaluating semantic predicates which
-	 *  must evaluate relative to their original position not in the input
-	 *  stream; predicate hoisting can make them execute much further along,
-	 *  however, as we check syntax first and then semantic predicates.
-	 *
-	 *  int m = input.mark();
-	 *  Token atom = input.LT(1);
-	 *  input.consume();
-	 *  input.consume();
-	 *  ...
-	 *  input.consume();
-	 *  assertTrue(atom==input.LT(m, 1));
-	 */
-    /*
-	public Token LT(int marker, int i) {
-		if ( filteredTokens==null ) {
-			fillBuffer();
-		}
-        if ( marker+i-1 >= filteredTokens.size() ) {
-            return Token.EOFToken;
-        }
-        return (Token)filteredTokens.get(marker+i-1);
-    }
-	*/
-
     public int LA(int i) {
         return LT(i).getType();
     }
-
-    /*
-	public int LA(int marker, int i) {
-        return LT(marker, i).getType();
-    }
-	*/
 
     public int mark() {
         return index();
@@ -297,11 +265,18 @@ public class CommonTokenStream implements TokenStream {
 	}
 
 	public String toString() {
+		return toString(0, tokens.size()-1);
+	}
+
+	public String toString(int start, int stop) {
 		if ( p == -1 ) {
 			fillBuffer();
 		}
+		if ( stop>=tokens.size() ) {
+			stop = tokens.size()-1;
+		}
  		StringBuffer buf = new StringBuffer();
-		for (int i = 0; tokens!=null && i < tokens.size(); i++) {
+		for (int i = start; tokens!=null && i < stop; i++) {
 			Token t = (Token)tokens.get(i);
 			if ( i>0 ) {
 				buf.append(' ');

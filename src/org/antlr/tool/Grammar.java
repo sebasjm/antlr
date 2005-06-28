@@ -470,18 +470,18 @@ public class Grammar {
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SET, "<SET>");
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EPSILON, Label.EPSILON_STR);
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "<EOF>");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "<EOR>");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.DOWN-1, "<DOWN>");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.UP-1, "<UP>");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "Token.EOR_TOKEN_TYPE");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.DOWN-1, "Token.DOWN");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.UP-1, "Token.UP");
         tokenNameToTypeMap.put("<INVALID>", new Integer(Label.INVALID));
         tokenNameToTypeMap.put("<EOT>", new Integer(Label.EOT));
         tokenNameToTypeMap.put("<SEMPRED>", new Integer(Label.SEMPRED));
         tokenNameToTypeMap.put("<SET>", new Integer(Label.SET));
         tokenNameToTypeMap.put("<EPSILON>", new Integer(Label.EPSILON));
 		tokenNameToTypeMap.put("<EOF>", new Integer(Label.EOF));
-		tokenNameToTypeMap.put("<EOR>", new Integer(Label.EOR_TOKEN_TYPE));
-		tokenNameToTypeMap.put("<DOWN>", new Integer(Label.DOWN));
-		tokenNameToTypeMap.put("<UP>", new Integer(Label.UP));
+		tokenNameToTypeMap.put("EOR", new Integer(Label.EOR_TOKEN_TYPE));
+		tokenNameToTypeMap.put("DOWN", new Integer(Label.DOWN));
+		tokenNameToTypeMap.put("UP", new Integer(Label.UP));
     }
 
     /** Walk the list of options, altering this Grammar object according
@@ -1013,6 +1013,9 @@ public class Grammar {
 									  key);
 			return null;
 		}
+		if ( !optionIsValid(key, value) ) {
+			return null;
+		}
 		if ( options==null ) {
 			options = new HashMap();
 		}
@@ -1046,6 +1049,19 @@ public class Grammar {
 		}
 		return value;
     }
+
+	public boolean optionIsValid(String key, Object value) {
+		if ( key.equals("output") ) {
+			if ( type==TREE_PARSER ) {
+				ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
+										  this,
+										  null,
+										  key);
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public boolean buildAST() {
 		String outputType = (String)getOption("output");

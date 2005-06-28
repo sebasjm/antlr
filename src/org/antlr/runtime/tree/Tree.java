@@ -1,5 +1,8 @@
 package org.antlr.runtime.tree;
 
+import org.antlr.runtime.Token;
+import org.antlr.runtime.CommonToken;
+
 /** What does a tree look like?  ANTLR has a number of support classes
  *  such as CommonTreeNodeStream that work on these kinds of trees.  You
  *  don't have to make your trees implement this interface, but if you do,
@@ -9,6 +12,8 @@ package org.antlr.runtime.tree;
  *  even use Token objects as trees if you add a child list to your tokens.
  */
 public interface Tree {
+	public static final Tree INVALID_NODE = new CommonTree(Token.INVALID_TOKEN);
+
 	Tree getChild(int i);
 
 	int getChildCount();
