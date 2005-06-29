@@ -536,7 +536,7 @@ matchSet(s,label,elementIndex,not) ::= <<
 <if(label)>
 <label>=input.LT(1);<\n>
 <endif>
-if ( <s> ) input.consume();
+if ( <if(not)>!(<s>)<else><s><endif> ) input.consume();
 else {
     Mismatched<not>SetException mse =
         new Mismatched<not>SetException(null,input);
@@ -554,7 +554,7 @@ else {
 
 matchSetAST(s,label,elementIndex,not) ::= <<
 <label>=input.LT(1);
-if ( <s> ) {
+if ( <if(not)>!(<s>)<else><s><endif> ) {
     adaptor.addChild(root_<blockLevel>, adaptor.create(<label>));
     input.consume();
 }
@@ -571,7 +571,7 @@ else {
 
 matchSetASTRoot(s,label,elementIndex,not) ::= <<
 <label>=input.LT(1);
-if ( <s> ) {
+if ( <if(not)>!(<s>)<else><s><endif> ) {
     root_<blockLevel> = adaptor.becomeRoot(adaptor.create(<label>), root_<blockLevel>);
     input.consume();
 }
@@ -588,7 +588,7 @@ else {
 
 matchSetASTRuleRoot(s,label,elementIndex,not) ::= <<
 <label>=input.LT(1);<\n>
-if ( <s> ) {
+if ( <if(not)>!(<s>)<else><s><endif> ) {
     root_0 = adaptor.becomeRoot(adaptor.create(<label>), root_0);
     input.consume();
 }
@@ -655,7 +655,7 @@ root_0 = adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** Match . wildcard */
-wildcardChar() ::= "matchAny();"
+wildcardChar(elementIndex) ::= "matchAny();"
 
 /** Match a rule reference by invoking it possibly with arguments
  *  and a return value or values.

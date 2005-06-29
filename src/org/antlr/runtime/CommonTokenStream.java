@@ -265,6 +265,9 @@ public class CommonTokenStream implements TokenStream {
 	}
 
 	public String toString() {
+		if ( p == -1 ) {
+			fillBuffer();
+		}
 		return toString(0, tokens.size()-1);
 	}
 
@@ -276,7 +279,7 @@ public class CommonTokenStream implements TokenStream {
 			stop = tokens.size()-1;
 		}
  		StringBuffer buf = new StringBuffer();
-		for (int i = start; tokens!=null && i < stop; i++) {
+		for (int i = start; tokens!=null && i <= stop; i++) {
 			Token t = (Token)tokens.get(i);
 			if ( i>0 ) {
 				buf.append(' ');
