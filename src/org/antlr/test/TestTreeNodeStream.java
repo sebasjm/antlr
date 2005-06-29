@@ -106,4 +106,68 @@ public class TestTreeNodeStream extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testBufferOverflow() throws Exception {
+		StringBuffer buf = new StringBuffer();
+		StringBuffer buf2 = new StringBuffer();
+		// make ^(101 102 ... n)
+		Tree t = new CommonTree(new CommonToken(101));
+		buf.append(" 101");
+		buf2.append(" 101");
+		buf2.append(" ");
+		buf2.append(Token.DOWN);
+		for (int i=0; i<=CommonTreeNodeStream.INITIAL_LOOKAHEAD_BUFFER_SIZE+10; i++) {
+			t.addChild(new CommonTree(new CommonToken(102+i)));
+			buf.append(" ");
+			buf.append(102+i);
+			buf2.append(" ");
+			buf2.append(102+i);
+		}
+		buf2.append(" ");
+		buf2.append(Token.UP);
+
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(t);
+		String expecting = buf.toString();
+		String found = stream.toNodesOnlyString();
+		assertEqual(found, expecting);
+
+		expecting = buf2.toString();
+		found = stream.toString();
+		assertEqual(found, expecting);
+	}
+
+	/** Test what happens when tail hits the end of the buffer, but there
+	 *  is more room left.  Specifically that would mean that head is not
+	 *  at 0 but has advanced somewhere to the middle of the lookahead
+	 *  buffer.
+	 *
+	 *  Use consume() to advance N nodes into lookahead.  Then use LT()
+	 *  to load at least INITIAL_LOOKAHEAD_BUFFER_SIZE-N nodes so the
+	 *  buffer has to wrap.
+	 */
+	public void testBufferWrap() throws Exception {
+		int N = 10;
+		// make tree with types: 1 2 ... INITIAL_LOOKAHEAD_BUFFER_SIZE+N
+		Tree t = new CommonTree((Token)null);
+		for (int i=0; i<CommonTreeNodeStream.INITIAL_LOOKAHEAD_BUFFER_SIZE+N; i++) {
+			t.addChild(new CommonTree(new CommonToken(i+1)));
+		}
+
+		// move head to index N
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(t);
+		for (int i=1; i<=N; i++) { // consume N
+			Tree node = (Tree)stream.LT(1);
+			assertEqual(node.getType(), i);
+			stream.consume();
+		}
+
+		// now use LT to lookahead past end of buffer
+		int remaining = CommonTreeNodeStream.INITIAL_LOOKAHEAD_BUFFER_SIZE-N;
+		int wrapBy = 4; // wrap around by 4 nodes
+		assertTrue(wrapBy<N, "bad test code; wrapBy must be less than N");
+		for (int i=1; i<=remaining+wrapBy; i++) { // wrap past end of buffer
+			Tree node = (Tree)stream.LT(i); // look ahead to ith token
+			assertEqual(node.getType(), N+i);
+		}
+	}
+
 }

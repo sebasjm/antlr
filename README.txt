@@ -1,6 +1,6 @@
 Early Access ANTLR v3
 ANTLR 3.0ea4
-June ??, 2005
+June 29, 2005
 
 Terence Parr, parrt at cs usfca edu
 ANTLR Project lead and supreme dictator
@@ -22,6 +22,9 @@ Furthermore, this software will be in a state of flux including
 changes in syntax and methods/classes until we get closer to a real
 release.  There are many things that just plain don't work at the
 moment.
+
+[3.0ea4 has the key components now: lexer, parser, tree construction,
+ and tree parser]
 
 I have made absolutely no effort yet to deal well with erroneous input
 (well, semantic checking is pretty good, but bad syntax makes ANTLR
@@ -104,12 +107,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0ea3/README.txt (this file)
-antlr-3.0ea3/LICENSE.txt
-antlr-3.0ea3/src/org/antlr/...
-antlr-3.0ea3/lib/stringtemplate-2.2b2.jar (3.0ea3 needs 2.2b2 not 2.2b1)
-antlr-3.0ea3/lib/antlr-2.7.5.jar
-antlr-3.0ea3/lib/antlr-3.0ea3.jar
+antlr-3.0ea4/README.txt (this file)
+antlr-3.0ea4/LICENSE.txt
+antlr-3.0ea4/src/org/antlr/...
+antlr-3.0ea4/lib/stringtemplate-2.2b3.jar (3.0ea4 needs 2.2b3 not 2.2b2)
+antlr-3.0ea4/lib/antlr-2.7.5.jar
+antlr-3.0ea4/lib/antlr-3.0ea4.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -122,7 +125,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0ea3 (June 1, 2005)  1989-2005
+ANTLR Parser Generator   Early Access Version 3.0ea4 (June 29, 2005)  1989-2005
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir   specify output directory where all output is generated
   -lib dir       specify location of token files
@@ -186,10 +189,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0ea3/lib/stringtemplate-2.2b2.jar
-antlr-3.0ea3/lib/antlr-2.7.5.jar
+antlr-3.0ea4/lib/stringtemplate-2.2b3.jar
+antlr-3.0ea4/lib/antlr-2.7.5.jar
 
-then jump into antlr-3.0ea3/src directory and then type:
+then jump into antlr-3.0ea4/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -201,13 +204,17 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0ea4 - June ??, 2005
+3.0ea4 - June 29, 2005
 
-* tree parsers work; added CommonTreeNodeStream
+* tree parsers work; added CommonTreeNodeStream.  See simplecTreeParser
+  example in examples-v3 tarball.
+
+* added superClass and ASTLabelType options
 
 * refactored Parser to have a BaseParser and added TreeParser
 
-* bug fix: actions being dumped in description strings; compile errors resulted
+* bug fix: actions being dumped in description strings; compile errors
+  resulted
 
 3.0ea3 - June 23, 2005
 

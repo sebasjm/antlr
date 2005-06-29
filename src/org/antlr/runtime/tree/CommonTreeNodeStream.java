@@ -136,6 +136,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 *  for both parser and tree grammars. :)
 	 */
 	public Object LT(int k) {
+		System.out.println("LT("+k+"); head="+head+", tail="+tail);
 		if ( k==-1 ) {
 			return previousNode;
 		}
@@ -168,9 +169,11 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 *  this method, LT(1) will be lookahead[0].
 	 */
 	protected void addLookahead(Tree node) {
+		System.out.println("addLookahead head="+head+", tail="+tail);
 		lookahead[tail] = node;
-		tail++;
-		if ( tail==head ) { // buffer overflow: tail caught up with head
+		tail = (tail+1)%lookahead.length;
+		if ( tail==head ) {
+			// buffer overflow: tail caught up with head
 			// allocate a buffer 2x as big
 			Tree[] bigger = new Tree[2*lookahead.length];
 			// copy head to end of buffer to beginning of bigger buffer
@@ -178,6 +181,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 			System.arraycopy(lookahead, head, bigger, 0, remainderHeadToEnd);
 			// copy 0..tail to after that
 			System.arraycopy(lookahead, 0, bigger, remainderHeadToEnd, tail);
+			lookahead = bigger; // reset to bigger buffer
 			head = 0;
 			tail += remainderHeadToEnd;
 		}

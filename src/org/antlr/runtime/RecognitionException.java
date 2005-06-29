@@ -27,6 +27,9 @@
 */
 package org.antlr.runtime;
 
+import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.CommonTree;
+
 /** The root of the ANTLR exception hierarchy.
  *
  *  To avoid English-only error messages and to generally make things
@@ -67,9 +70,14 @@ public class RecognitionException extends Exception {
 
 	/** The current Token when an error occurred.  Since not all streams
 	 *  can retrieve the ith Token, we have to track the Token object.
-	 *  For parsers.
+	 *  For parsers.  Even when it's a tree parser, token might be set.
 	 */
 	public Token token;
+
+	/** If this is a tree parser exception, node is set to the node with
+	 *  the problem.
+	 */
+	public Object node;
 
 	/** The current char when an error occurred. For lexers. */
 	public int c;
@@ -93,6 +101,14 @@ public class RecognitionException extends Exception {
 			this.token = ((TokenStream)input).LT(1);
 			this.line = token.getLine();
 			this.charPositionInLine = token.getCharPositionInLine();
+		}
+		if ( input instanceof CommonTreeNodeStream ) {
+			this.node = ((CommonTreeNodeStream)input).LT(1);
+			if ( this.node instanceof CommonTree ) {
+				this.token = ((CommonTree)this.node).token;
+				this.line = token.getLine();
+				this.charPositionInLine = token.getCharPositionInLine();
+			}
 		}
 		else if ( input instanceof CharStream ) {
 			this.c = input.LA(1);
