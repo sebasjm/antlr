@@ -289,7 +289,7 @@ public class TestIntervalSet extends TestSuite {
 		IntervalSet s = IntervalSet.of(1,96);
 		s.add(99,65534);
 		String expecting = "97..98";
-		String result = (s.complement()).toString();
+		String result = (s.complement(Label.MAX_CHAR_VALUE)).toString();
 		assertEqual(result, expecting);
 	}
 

@@ -198,9 +198,11 @@ public class IntervalSet implements IntSet {
         }
     }
 
-    public IntSet complement() {
+    /*
+	public IntSet complement() {
         return this.complement(1,Label.MAX_CHAR_VALUE);
     }
+	*/
 
     public IntSet complement(int maxElement) {
         return this.complement(1,maxElement);
@@ -483,7 +485,7 @@ public class IntervalSet implements IntSet {
             int b = I.b;
             if ( a==b ) {
                 if ( g!=null ) {
-                    buf.append(g.getTokenName(a));
+                    buf.append(g.getTokenDisplayName(a));
                 }
                 else {
                     buf.append(a);
@@ -491,7 +493,7 @@ public class IntervalSet implements IntSet {
             }
             else {
                 if ( g!=null ) {
-                    buf.append(g.getTokenName(a)+".."+g.getTokenName(b));
+                    buf.append(g.getTokenDisplayName(a)+".."+g.getTokenDisplayName(b));
                 }
                 else {
                     buf.append(a+".."+b);

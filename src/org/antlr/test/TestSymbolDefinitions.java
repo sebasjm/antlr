@@ -118,6 +118,18 @@ public class TestSymbolDefinitions extends TestSuite {
 		checkPlusEqualsLabels(g, rule, tokenLabels, ruleLabels);
 	}
 
+	// T E S T  L I T E R A L  E S C A P E S
+
+	public void testParserCharLiteralWithEscape() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : '\\n';\n");
+		Set literals = g.getCharLiteralTokens();
+		System.out.println("literals="+literals);
+	}
+
+
+
 	// T E S T  E R R O R S
 
 	public void testParserStringLiterals() throws Exception {

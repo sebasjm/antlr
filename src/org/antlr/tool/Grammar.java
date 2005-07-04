@@ -146,7 +146,8 @@ public class Grammar {
      */
     protected int maxTokenType = Label.MIN_TOKEN_TYPE-1;
 
-	protected IntSet charVocabulary = IntervalSet.of(0x0000,0xFFFE);
+	/** TODO: hook this to the charVocabulary option */
+	protected IntSet charVocabulary = null;
 
     /** Map token like ID (but not literals like "while") to its token type */
     protected Map tokenNameToTypeMap = new HashMap();
@@ -892,7 +893,7 @@ public class Grammar {
 	public Set getTokenNames() {
 		Set names = new HashSet();
 		for (int type=Label.MIN_TOKEN_TYPE; type<=getMaxTokenType(); type++) {
-			names.add(getTokenName(type));
+			names.add(getTokenDisplayName(type));
 		}
 		return names;
 	}
@@ -933,14 +934,6 @@ public class Grammar {
         return Label.INVALID;
     }
 
-    /** Return a set of all possible token/char types for this grammar */
-	public IntSet getTokenTypes() {
-		if ( type==LEXER ) {
-			return charVocabulary;
-		}
-		return IntervalSet.of(Label.MIN_TOKEN_TYPE, getMaxTokenType());
-	}
-
 	public void importTokenVocabulary(Grammar g) {
 		importTokenVocabularyFromGrammar = g;
 	}
@@ -950,13 +943,15 @@ public class Grammar {
 	}
 
 	/** Given a token type, get a meaningful name for it such as the ID
-	 *  or string literal etc...
+	 *  or string literal.  Not used for code generation
 	 */
-	public String getTokenName(int ttype) {
+	public String getTokenDisplayName(int ttype) {
 		String tokenName = null;
 		int index=0;
-		// inside char range and lexer grammar?
-		if ( this.type==LEXER && ttype >= Label.MIN_CHAR_VALUE && ttype <= Label.MAX_CHAR_VALUE ) {
+		// inside any target's char range and lexer grammar?
+		if ( this.type==LEXER &&
+			 ttype >= Label.MIN_CHAR_VALUE && ttype <= Label.MAX_CHAR_VALUE )
+		{
 			tokenName = "'"+CodeGenerator.getJavaUnicodeEscapeString(ttype)+"'";
 		}
 		// faux label?
@@ -964,14 +959,7 @@ public class Grammar {
 			tokenName = (String)typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
 		}
 		else {
-			// normalize type to 1..n
-			/*
-			if ( ttype>=Label.MIN_TOKEN_TYPE ) {
-				index = ttype-Label.MIN_TOKEN_TYPE; // normalize index to 0..n
-				index = ttype-1;
-			}
-			index = ttype-Label.MIN_TOKEN_TYPE; // normalize index to 0..n
-			*/
+			// normalize token type to 1..n
 			index = ttype-1; // normalize to 0..n-1
 			index += Label.NUM_FAUX_LABELS;     // jump over faux tokens
 
@@ -988,10 +976,14 @@ public class Grammar {
 		return tokenName;
 	}
 
-	/** Get a meaningful name for a token type useful during code generation. */
+	/** Get a meaningful name for a token type useful during code generation.
+	 *  Literals without associated names are converted to the string equivalent
+	 *  of their integer values.
+	 */
     public String getTokenTypeAsLabel(int ttype) {
-        String name = getTokenName(ttype);
-		// if it's not a lexer, then can't use char value, must have token type name
+        String name = getTokenDisplayName(ttype);
+		// if it's not a lexer, then can't use char value,
+		// must have token type name
         if ( type!=LEXER && (name.charAt(0)=='"' || name.charAt(0)=='\'') ) {
             return String.valueOf(ttype);
         }
@@ -1260,14 +1252,42 @@ public class Grammar {
         return maxTokenType;
     }
 
+	/** What is the max char value possible for this grammar's target?  Use
+	 *  unicode max if no target defined.
+	 */
+	public int getMaxCharValue() {
+		if ( generator!=null ) {
+			return generator.target.getMaxCharValue();
+		}
+		else {
+			return Label.MAX_CHAR_VALUE;
+		}
+	}
+
+	/** Return a set of all possible token or char types for this grammar */
+	public IntSet getTokenTypes() {
+		if ( type==LEXER ) {
+			return getAllCharValues();
+		}
+		return IntervalSet.of(Label.MIN_TOKEN_TYPE, getMaxTokenType());
+	}
+
+	/** If there is a char vocabulary, use it; else return min to max char
+	 *  as defined by the target.  If no target, use max unicode char value.
+	 */
+	public IntSet getAllCharValues() {
+		if ( charVocabulary!=null ) {
+			return charVocabulary;
+		}
+		IntSet allChar = IntervalSet.of(Label.MIN_CHAR_VALUE, getMaxCharValue());
+		return allChar;
+	}
+
     /** For lexer grammars, return everything in unicode not in set.
      *  For parser and tree grammars, return everything in token space
-     *  from MIN_TOKEN_TYPE to last valid token type.
+     *  from MIN_TOKEN_TYPE to last valid token type or char value.
      */
     public IntSet complement(IntSet set) {
-        if ( type == LEXER ) {
-            return set.complement(Label.ALLCHAR);
-        }
         //System.out.println("complement "+set.toString(this));
         //System.out.println("vocabulary "+getTokenTypes().toString(this));
         IntSet c = set.complement(getTokenTypes());

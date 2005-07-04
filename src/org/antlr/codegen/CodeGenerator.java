@@ -117,7 +117,7 @@ public class CodeGenerator {
 	/** The target specifies how to write out files and do other language
 	 *  specific actions.
 	 */
-	protected Target target = null;
+	public Target target = null;
 
 	/** Where are the templates this generator should use to generate code? */
 	protected StringTemplateGroup templates;
@@ -548,7 +548,7 @@ public class CodeGenerator {
 	 */
 	protected void genTokenTypeNames(StringTemplate code) {
 		for (int t=Label.MIN_TOKEN_TYPE; t<=grammar.getMaxTokenType(); t++) {
-			String tokenName = grammar.getTokenName(t);
+			String tokenName = grammar.getTokenDisplayName(t);
 			if ( tokenName.charAt(0)=='\"' ) {
 				tokenName = Utils.replace(tokenName,"\"", "\\\"");
 			}

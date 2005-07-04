@@ -54,8 +54,6 @@ public interface IntSet {
      */
     IntSet and(IntSet a);
 
-    IntSet complement();
-
     IntSet complement(IntSet elements);
 
     IntSet or(IntSet a);

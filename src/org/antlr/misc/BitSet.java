@@ -475,7 +475,7 @@ public class BitSet implements IntSet, Cloneable {
                     buf.append(separator);
                 }
                 if ( g!=null ) {
-                    buf.append(g.getTokenName(i));
+                    buf.append(g.getTokenDisplayName(i));
                 }
                 else {
                     buf.append(i);

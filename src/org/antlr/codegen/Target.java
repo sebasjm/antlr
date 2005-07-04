@@ -30,6 +30,7 @@ package org.antlr.codegen;
 import org.antlr.tool.Grammar;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.Tool;
+import org.antlr.analysis.Label;
 
 import java.io.IOException;
 
@@ -86,7 +87,14 @@ public class Target {
 	}
 
 	/** Convert from an ANTLR char literal as read by antlr.g to a literal
-	 *  suitable for the target language.
+	 *  suitable for the target language.  ANTLR uses Grammar.defineToken
+	 *  to define char literals as tokens and stores the original text
+	 *  (found in the grammar) in the char literals table for use when
+	 *  displaying tokens and generating the token names table in the
+	 *  generated parser.  Any escaped chars must be converted to their
+	 *  intended value for use during analysis, however.  For example, '\n'
+	 *  should be stored as the 4 char sequence '\n' in the literals table,
+	 *  but the value of 10 (newline) must be used during analysis.
 	 */
 	protected String getEscapedCharLiteral(String literal) {
 		return CodeGenerator.getJavaEscapedCharFromANTLRLiteral(literal);
@@ -100,7 +108,7 @@ public class Target {
 	}
 
 	/** Some targets only support ASCII or 8-bit chars/strings. */
-	protected int getMaxCharValue() {
-		return '\uFFFF';
+	public int getMaxCharValue() {
+		return Label.MAX_CHAR_VALUE;
 	}
 }

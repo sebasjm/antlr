@@ -110,7 +110,7 @@ public class Label implements Comparable, Cloneable {
 		org.antlr.runtime.Token.MIN_TOKEN_TYPE;
 
     /** The wildcard '.' char atom implies all valid characters==UNICODE */
-    public static final IntSet ALLCHAR = IntervalSet.of(MIN_CHAR_VALUE,MAX_CHAR_VALUE);
+    //public static final IntSet ALLCHAR = IntervalSet.of(MIN_CHAR_VALUE,MAX_CHAR_VALUE);
 
     /** The token type or character value; or, signifies special label. */
     protected int label;
@@ -358,7 +358,7 @@ public class Label implements Comparable, Cloneable {
             case SEMPRED :
                 return "{"+semanticContext+"}?";
             default :
-                return g.getTokenName(label);
+                return g.getTokenDisplayName(label);
         }
     }
 

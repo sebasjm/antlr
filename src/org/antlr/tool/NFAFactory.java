@@ -146,7 +146,7 @@ public class NFAFactory {
         IntSet set = getCollapsedBlockAsSet(s0);
         if ( set!=null ) {
             // if set is available, then structure known and blk is a set
-            set = set.complement();
+            set = nfa.grammar.complement(set);
             Label label = s0.transition(0).target.transition(0).label;
             label.setSet(set);
         }
@@ -603,17 +603,11 @@ public class NFAFactory {
         return firstAlt;
     }
 
-    /** Build an atom with all unicode bits in its label */
+    /** Build an atom with all possible values in its label */
     public StateCluster build_Wildcard() {
         NFAState left = newState();
         NFAState right = newState();
-        Label label = null;
-        if ( nfa.grammar.type==Grammar.LEXER ) {
-            label = new Label(Label.ALLCHAR);
-        }
-        else {
-            label = new Label(nfa.grammar.getTokenTypes());
-        }
+        Label label = new Label(nfa.grammar.getTokenTypes()); // char or tokens
         Transition e = new Transition(label,right);
         left.addTransition(e);
         StateCluster g = new StateCluster(left, right);
