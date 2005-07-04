@@ -563,9 +563,8 @@ public class Grammar {
      *  operation to set up tokens with specific values.
      */
     public void defineToken(String text, int tokenType) {
-		// the index in the typeToTokenList table is actually shifted by
-		// NUM_FAUX_LABELS as you cannot have negative indices.
-		// For example, EOT is 6+-2-1 == 4
+		// the index in the typeToTokenList table is actually shifted to
+		// hold faux labels as you cannot have negative indices.
         if ( text.charAt(0)=='"' ) {
             stringLiteralToTypeMap.put(text, new Integer(tokenType));
         }
@@ -576,7 +575,7 @@ public class Grammar {
             tokenNameToTypeMap.put(text, new Integer(tokenType));
         }
 		int index = Label.NUM_FAUX_LABELS+tokenType-1;
-		//System.out.println("defining token "+text+" at type="+tokenType+", index="+index);
+		System.out.println("defining token "+text+" at type="+tokenType+", index="+index);
 		this.maxTokenType = Math.max(this.maxTokenType, tokenType);
         if ( index>=typeToTokenList.size() ) {
 			typeToTokenList.setSize(index+1);
@@ -985,7 +984,7 @@ public class Grammar {
 		}
 		ErrorManager.assertTrue(tokenName!=null,
 								"null token name; ttype="+ttype+" tokens="+typeToTokenList);
-		//System.out.println("getTokenName ttype="+ttype+", index="+index+", name="+tokenName);
+		System.out.println("getTokenName ttype="+ttype+", index="+index+", name="+tokenName);
 		return tokenName;
 	}
 

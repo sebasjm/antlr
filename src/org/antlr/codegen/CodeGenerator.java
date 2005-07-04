@@ -553,6 +553,7 @@ public class CodeGenerator {
 				tokenName = Utils.replace(tokenName,"\"", "\\\"");
 			}
 			tokenName = '\"'+tokenName+'\"';
+			System.out.println("token name="+tokenName);
 			code.setAttribute("tokenNames", tokenName);
 		}
 	}
@@ -635,7 +636,9 @@ public class CodeGenerator {
 			ErrorManager.internalError("invalid char value "+c);
 			return "<INVALID>";
 		}
+		System.out.println("c "+c);
 		if ( c<charValueEscape.length && charValueEscape[c]!=null ) {
+			System.out.println(" -> "+charValueEscape[c]);
 			return charValueEscape[c];
 		}
 		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
