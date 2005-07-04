@@ -114,7 +114,7 @@ public class ACyclicDFACodeGenerator {
 				for (int j = 0; j < labels.size(); j++) {
 					Integer vI = (Integer) labels.get(j);
 					String label =
-						parent.grammar.getTokenTypeAsLabel(vI.intValue());
+						parent.getTokenTypeAsTargetLabel(vI.intValue());
 					labels.set(j, label); // rewrite List element to be name
 				}
 				edgeST.setAttribute("labels", labels);

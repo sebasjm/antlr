@@ -437,7 +437,7 @@ public class Interpreter implements TokenSource {
 		CharStream cs = (CharStream)input;
 		// don't report to ANTLR tool itself; make people override to redirect
 		Parser.displayRecognitionError(grammar.name,
-									   grammar.getTokenNames().toArray(),
+									   grammar.getTokenDisplayNames().toArray(),
 									   re);
 		System.err.println("problem matching token at "+
 						   cs.getLine()+":"+cs.getCharPositionInLine());

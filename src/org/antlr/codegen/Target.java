@@ -86,28 +86,38 @@ public class Target {
 		grammar.createLookaheadDFAs();
 	}
 
-	/** Convert from an ANTLR char literal as read by antlr.g to a literal
-	 *  suitable for the target language.  ANTLR uses Grammar.defineToken
-	 *  to define char literals as tokens and stores the original text
-	 *  (found in the grammar) in the char literals table for use when
-	 *  displaying tokens and generating the token names table in the
-	 *  generated parser.  Any escaped chars must be converted to their
-	 *  intended value for use during analysis, however.  For example, '\n'
-	 *  should be stored as the 4 char sequence '\n' in the literals table,
-	 *  but the value of 10 (newline) must be used during analysis.
+	/** Convert from an ANTLR char literal found in a grammar file to
+	 *  an equivalent char literal in the target language.  For Java, this
+	 *  is the identify translation; i.e., '\n' -> '\n'.  Most languages
+	 *  will be able to use this 1-to-1 mapping.  Expect single quotes
+	 *  around the incoming literal.
 	 */
-	protected String getEscapedCharLiteral(String literal) {
-		return CodeGenerator.getJavaEscapedCharFromANTLRLiteral(literal);
+	public String getTargetCharLiteralFromANTLRCharLiteral(String literal) {
+		return literal;
 	}
 
-	/** Convert from an ANTLR string literal as read by antlr.g to a literal
-	 *  suitable for the target language.
+	/** Convert from an ANTLR string literal found in a grammar file to
+	 *  an equivalent string literal in the target language.  For Java, this
+	 *  is the identify translation; i.e., "\"\n" -> "\"\n".  Most languages
+	 *  will be able to use this 1-to-1 mapping.  Expect double quotes 
+	 *  around the incoming literal.
 	 */
-	protected String getEscapedStringLiteral(String literal) {
-		return CodeGenerator.getJavaEscapedStringFromANTLRLiteral(literal);
+	public String getTargetStringLiteralFromANTLRStringLiteral(String literal) {
+		return literal;
 	}
 
-	/** Some targets only support ASCII or 8-bit chars/strings. */
+	/** Convert from an ANTLR string literal as read and converted by antlr.g
+	 *  to a literal suitable for the target language.
+	 *
+	 *  Example, 4-char sequence "'\n'\'" is escaped to 5-char "'\\n\\''".
+	public String getEscapedStringLiteralToken(String literal) {
+		return CodeGenerator.getJavaEscapedStringFromStringLiteralToken(literal);
+	}
+	 */
+
+	/** Some targets only support ASCII or 8-bit chars/strings.  For example,
+	 *  C++ will probably want to return 0xFF here.
+	 */
 	public int getMaxCharValue() {
 		return Label.MAX_CHAR_VALUE;
 	}

@@ -61,6 +61,33 @@ public class Grammar {
     public static final String TOKEN_RULENAME = "Tokens";
 	public static final String FRAGMENT_RULE_MODIFIER = "fragment";
 
+	/** When converting ANTLR char and string literals, here is the
+	 *  value set of escape chars.
+	 */
+	public static int escapedCharValue[] = new int[255];
+
+	/** Given a char, we need to be able to show as an ANTLR literal.
+	 */
+	public static String charValueEscape[] = new String[255];
+
+	static {
+		escapedCharValue['n'] = '\n';
+		escapedCharValue['r'] = '\r';
+		escapedCharValue['t'] = '\t';
+		escapedCharValue['b'] = '\b';
+		escapedCharValue['f'] = '\f';
+		escapedCharValue['\\'] = '\\';
+		escapedCharValue['\''] = '\'';
+		escapedCharValue['"'] = '"';
+		charValueEscape['\n'] = "\\n";
+		charValueEscape['\r'] = "\\r";
+		charValueEscape['\t'] = "\\t";
+		charValueEscape['\b'] = "\\b";
+		charValueEscape['\f'] = "\\f";
+		charValueEscape['\\'] = "\\\\";
+		charValueEscape['\''] = "\\'";
+	}
+
     public static final int LEXER = 1;
     public static final int PARSER = 2;
 	public static final int TREE_PARSER = 3;
@@ -136,12 +163,12 @@ public class Grammar {
      */
     protected NFA nfa;
 
-    /** Tokens/literals (anything but char) are uniquely indexed.
+    /** Token names and literal tokens like "void" are uniquely indexed.
      *  with -1 implying EOF.  Characters are different; they go from
      *  -1 (EOF) to \uFFFE.  For example, 0 could be a binary byte you
      *  want to lexer.  Labels of DFA/NFA transitions can be both tokens
      *  and characters.  I use negative numbers for bookkeeping labels
-     *  like EPSILON. Char literals and token types overlap in the same
+     *  like EPSILON. Char/String literals and token types overlap in the same
 	 *  space, however.
      */
     protected int maxTokenType = Label.MIN_TOKEN_TYPE-1;
@@ -150,7 +177,7 @@ public class Grammar {
 	protected IntSet charVocabulary = null;
 
     /** Map token like ID (but not literals like "while") to its token type */
-    protected Map tokenNameToTypeMap = new HashMap();
+    protected Map tokenIDToTypeMap = new HashMap();
 
     /** Map token literals like "while" to its token type.  It may be that
      *  WHILE="while"=35, in which case both tokenNameToTypeMap and this
@@ -161,7 +188,9 @@ public class Grammar {
     /** Map char literals like 'a' to it's unicode int value as token type. */
     protected Map charLiteralToTypeMap = new HashMap();
 
-    /** Map a token type to its token name.  Must subtract MIN_TOKEN_TYPE from index. */
+    /** Map a token type to its token name.
+	 *  Must subtract MIN_TOKEN_TYPE from index.
+	 */
     protected Vector typeToTokenList = new Vector();
 
 	/** For interpreting and testing, you sometimes want to import token
@@ -474,15 +503,15 @@ public class Grammar {
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "Token.EOR_TOKEN_TYPE");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.DOWN-1, "Token.DOWN");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.UP-1, "Token.UP");
-        tokenNameToTypeMap.put("<INVALID>", new Integer(Label.INVALID));
-        tokenNameToTypeMap.put("<EOT>", new Integer(Label.EOT));
-        tokenNameToTypeMap.put("<SEMPRED>", new Integer(Label.SEMPRED));
-        tokenNameToTypeMap.put("<SET>", new Integer(Label.SET));
-        tokenNameToTypeMap.put("<EPSILON>", new Integer(Label.EPSILON));
-		tokenNameToTypeMap.put("<EOF>", new Integer(Label.EOF));
-		tokenNameToTypeMap.put("EOR", new Integer(Label.EOR_TOKEN_TYPE));
-		tokenNameToTypeMap.put("DOWN", new Integer(Label.DOWN));
-		tokenNameToTypeMap.put("UP", new Integer(Label.UP));
+        tokenIDToTypeMap.put("<INVALID>", new Integer(Label.INVALID));
+        tokenIDToTypeMap.put("<EOT>", new Integer(Label.EOT));
+        tokenIDToTypeMap.put("<SEMPRED>", new Integer(Label.SEMPRED));
+        tokenIDToTypeMap.put("<SET>", new Integer(Label.SET));
+        tokenIDToTypeMap.put("<EPSILON>", new Integer(Label.EPSILON));
+		tokenIDToTypeMap.put("<EOF>", new Integer(Label.EOF));
+		tokenIDToTypeMap.put("EOR", new Integer(Label.EOR_TOKEN_TYPE));
+		tokenIDToTypeMap.put("DOWN", new Integer(Label.DOWN));
+		tokenIDToTypeMap.put("UP", new Integer(Label.UP));
     }
 
     /** Walk the list of options, altering this Grammar object according
@@ -573,10 +602,10 @@ public class Grammar {
             charLiteralToTypeMap.put(text, new Integer(tokenType));
         }
         else { // must be a label like ID
-            tokenNameToTypeMap.put(text, new Integer(tokenType));
+            tokenIDToTypeMap.put(text, new Integer(tokenType));
         }
 		int index = Label.NUM_FAUX_LABELS+tokenType-1;
-		System.out.println("defining token "+text+" at type="+tokenType+", index="+index);
+		//System.out.println("defining token "+text+" at type="+tokenType+", index="+index);
 		this.maxTokenType = Math.max(this.maxTokenType, tokenType);
         if ( index>=typeToTokenList.size() ) {
 			typeToTokenList.setSize(index+1);
@@ -640,14 +669,14 @@ public class Grammar {
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									computeTokenNameFromLiteral(tokenType,literal),
 									new Integer(tokenType),
-									Grammar.getANTLREscapedStringLiteral(literal));
+									literal);
 	}
 
 	public void defineLexerRuleForCharLiteral(String literal, int tokenType) {
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									computeTokenNameFromLiteral(tokenType,literal),
 									new Integer(tokenType),
-									Grammar.getANTLREscapedStringLiteral(literal));
+									literal);
 	}
 
 	public Rule getRule(String ruleName) {
@@ -875,7 +904,7 @@ public class Grammar {
             I = (Integer)charLiteralToTypeMap.get(tokenName);
         }
         else { // must be a label like ID
-            I = (Integer)tokenNameToTypeMap.get(tokenName);
+            I = (Integer)tokenIDToTypeMap.get(tokenName);
         }
         int i = (I!=null)?I.intValue():Label.INVALID;
 		//System.out.println("grammar type "+getType()+" "+tokenName+"->"+i);
@@ -884,13 +913,13 @@ public class Grammar {
 
 	/** Get the list of tokens that are IDs like BLOCK and LPAREN */
 	public Set getTokenIDs() {
-		return tokenNameToTypeMap.keySet();
+		return tokenIDToTypeMap.keySet();
 	}
 
-	/** Get a list of all token IDs, literals that have an associated
+	/** Get a list of all token IDs and literals that have an associated
 	 *  token type.
 	 */
-	public Set getTokenNames() {
+	public Set getTokenDisplayNames() {
 		Set names = new HashSet();
 		for (int type=Label.MIN_TOKEN_TYPE; type<=getMaxTokenType(); type++) {
 			names.add(getTokenDisplayName(type));
@@ -907,32 +936,85 @@ public class Grammar {
 	}
 
 	/** Convert a char literal as read by antlr.g back to a grammar literal
-	 *  that has escaped chars instead of the real char value.
-	 */
-	public static String getANTLREscapedCharLiteral(String literal) {
-		return CodeGenerator.getJavaEscapedCharFromANTLRLiteral(literal);
+	 *  that has escaped chars instead of the real char value.  If a
+	 *  target is known, use its escape facility instead of the default Java
+	 *  converter.
+	public String getANTLREscapedCharLiteral(String literal) {
+		if ( generator!=null ) {
+			generator.target.getEscapedCharLiteralToken(literal);
+		}
+		return CodeGenerator.getJavaEscapedCharFromCharLiteralToken(literal);
 	}
+	 */
 
 	/** Convert a string literal as read by antlr.g back to a grammar literal
-	 *  that has escaped chars instead of the real char values.
-	 */
-	public static String getANTLREscapedStringLiteral(String literal) {
-		return CodeGenerator.getJavaEscapedStringFromANTLRLiteral(literal);
+	 *  that has escaped chars instead of the real char values.  If a
+	 *  target is known, use its escape facility instead of the default Java
+	 *  converter.
+	public String getANTLREscapedStringLiteral(String literal) {
+		if ( generator!=null ) {
+			generator.target.getEscapedStringLiteralToken(literal);
+		}
+		return CodeGenerator.getJavaEscapedStringFromStringLiteralToken(literal);
 	}
+	 */
 
-	/** Given a literal like (the 3 char sequence in single quotes) 'a',
-	 *  return the int value of 'a'.
-     *  Escaped stuff is already converted to single char in single-quotes.
+	/** Given a literal like (the 3 char sequence with single quotes) 'a',
+	 *  return the int value of 'a'. Convert escape sequences here also.
+	 *  ANTLR's antlr.g parser does not convert escape sequences.
      */
-    public static int getCharValueFromANTLRGrammarLiteral(String literal) {
+    public static int getCharValueFromGrammarCharLiteral(String literal) {
         if ( literal.length()==3 ) {
-            // no escape
-            return literal.charAt(1);
+			// 'x'
+            return literal.charAt(1); // no escape char
         }
-		ErrorManager.internalError("getCharValueFromANTLRGrammarLiteral: "+
-								   literal+"; len="+literal.length());
-        return Label.INVALID;
+		ErrorManager.assertTrue(literal.length()==4, "invalid char literals: "+literal);
+		// '\x'  (antlr lexer will catch invalid char)
+		int escChar = literal.charAt(2);
+		int charVal = escapedCharValue[escChar];
+		return charVal;
     }
+
+	/** ANTLR does not convert escape sequences during the parse phase because
+	 *  it could not know how to print String/char literals back out when
+	 *  printing grammars etc...  Someone in China might use the real unicode
+	 *  char in a literal as it will display on their screen; when printing
+	 *  back out, I could not know whether to display or use a unicode escape.
+	 *
+	 *  This routine converts a string literal with possible escape sequences
+	 *  into a pure string of 16-bit char values.  Escapes and unicode \u0000
+	 *  specs are converted to pure chars.  return in a buffer; people may
+	 *  want to walk/manipulate further.
+	 *
+	 *  The NFA construction routine must know the actual char values.
+	 */
+	public static StringBuffer getUnescapedStringFromGrammarStringLiteral(String literal) {
+		StringBuffer buf = new StringBuffer();
+		int last = literal.length()-1; // skip quotes on outside
+		for (int i=1; i<last; i++) {
+			char c = literal.charAt(i);
+			if ( c=='\'' ) {
+				i++;
+				c = literal.charAt(i);
+				if ( Character.toUpperCase(c)=='U' ) {
+					// \u0000
+					i++;
+					String unicodeChars = literal.substring(i,i+4);
+					// parse the unicode 16 bit hex value
+					int val = Integer.parseInt(unicodeChars, 16);
+					i+=4-1; // loop will inc by 1; only jump 3 then
+					buf.append((char)val);
+				}
+				else {
+					buf.append(escapedCharValue[c]); // normal \x escape
+				}
+			}
+			else {
+				buf.append(c); // simple char x
+			}
+		}
+		return buf;
+	}
 
 	public void importTokenVocabulary(Grammar g) {
 		importTokenVocabularyFromGrammar = g;
@@ -943,23 +1025,24 @@ public class Grammar {
 	}
 
 	/** Given a token type, get a meaningful name for it such as the ID
-	 *  or string literal.  Not used for code generation
+	 *  or string literal.  If this is a lexer and the ttype is in the
+	 *  char vocabulary, compute an ANTLR-valid (possibly escaped) char literal.
 	 */
 	public String getTokenDisplayName(int ttype) {
 		String tokenName = null;
 		int index=0;
-		// inside any target's char range and lexer grammar?
+		// inside any target's char range and is lexer grammar?
 		if ( this.type==LEXER &&
 			 ttype >= Label.MIN_CHAR_VALUE && ttype <= Label.MAX_CHAR_VALUE )
 		{
-			tokenName = "'"+CodeGenerator.getJavaUnicodeEscapeString(ttype)+"'";
+			return getANTLRCharLiteralForChar(ttype);
 		}
 		// faux label?
 		else if ( ttype<0 ) {
 			tokenName = (String)typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
 		}
 		else {
-			// normalize token type to 1..n
+			// compute index in typeToTokenList for ttype
 			index = ttype-1; // normalize to 0..n-1
 			index += Label.NUM_FAUX_LABELS;     // jump over faux tokens
 
@@ -972,26 +1055,9 @@ public class Grammar {
 		}
 		ErrorManager.assertTrue(tokenName!=null,
 								"null token name; ttype="+ttype+" tokens="+typeToTokenList);
-		System.out.println("getTokenName ttype="+ttype+", index="+index+", name="+tokenName);
+		//System.out.println("getTokenDisplaYanme ttype="+ttype+", index="+index+", name="+tokenName);
 		return tokenName;
 	}
-
-	/** Get a meaningful name for a token type useful during code generation.
-	 *  Literals without associated names are converted to the string equivalent
-	 *  of their integer values.
-	 */
-    public String getTokenTypeAsLabel(int ttype) {
-        String name = getTokenDisplayName(ttype);
-		// if it's not a lexer, then can't use char value,
-		// must have token type name
-        if ( type!=LEXER && (name.charAt(0)=='"' || name.charAt(0)=='\'') ) {
-            return String.valueOf(ttype);
-        }
-        if ( ttype==Label.EOF ) {
-            return String.valueOf(CharStream.EOF);
-        }
-        return name;
-    }
 
     /** Save the option key/value pair and process it; return the key
 	 *  or null if invalid option.
@@ -1283,6 +1349,39 @@ public class Grammar {
 		return allChar;
 	}
 
+	/** Return a string representing the escaped char for code c.  E.g., If c
+	 *  has value 0x100, you will get "\u0100".  ASCII gets the usual
+	 *  char (non-hex) representation.  Control characters are spit out
+	 *  as unicode.  While this is specially set up for returning Java strings,
+	 *  it can be used by any language target that has the same syntax. :)
+	 *  Note that this method does NOT put the quotes around it so that the
+	 *  method is more reusable.
+	 */
+	public static String getANTLRCharLiteralForChar(int c) {
+		if ( c<Label.MIN_CHAR_VALUE ) {
+			ErrorManager.internalError("invalid char value "+c);
+			return "'<INVALID>'";
+		}
+		if ( c<charValueEscape.length && charValueEscape[c]!=null ) {
+			return '\''+charValueEscape[c]+'\'';
+		}
+		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
+			!Character.isISOControl((char)c) ) {
+			if ( c=='\\' ) {
+				return "'\\\\'";
+			}
+			if ( c=='\'') {
+				return "'\\''";
+			}
+			return '\''+Character.toString((char)c)+'\'';
+		}
+		// turn on the bit above max '\uFFFF' value so that we pad with zeros
+		// then only take last 4 digits
+		String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
+		String unicodeStr = "'\\u"+hex+"'";
+		return unicodeStr;
+	}
+
     /** For lexer grammars, return everything in unicode not in set.
      *  For parser and tree grammars, return everything in token space
      *  from MIN_TOKEN_TYPE to last valid token type or char value.
@@ -1387,16 +1486,6 @@ public class Grammar {
 		if ( transition0.label.isSet() ) {
 			IntSet sl = transition0.label.getSet();
 			return new LookaheadSet(sl);
-/*
-if ( sl.member(Label.EOF) ) {
-				System.err.println("uh oh; set has EOF: "+sl.toString(this));
-				LookaheadSet e = LookaheadSet.EOF();
-				sl.remove(Label.EOF);
-				e.tokenTypeSet = new Lookah ead.of(sl);
-				return e;
-			}
-			return new LookaheadSet(BitSet.of(sl));
-			*/
 		}
         LookaheadSet tset = _LOOK((NFAState)transition0.target);
 

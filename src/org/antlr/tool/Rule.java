@@ -251,7 +251,8 @@ public class Rule {
 
 	/** For use with rewrite rules, we must track all tokens matched on the
 	 *  left-hand-side; so we need Lists.  This is a unique list of all
-	 *  token types for which the rule needs a list of tokens.
+	 *  token types for which the rule needs a list of tokens.  This
+	 *  is called from the rule template not directly by the code generator.
 	 */
 	public Set getAllTokenRefsInAltsWithRewrites() {
 		Set tokens = new HashSet();
@@ -263,7 +264,7 @@ public class Rule {
 					// convert token name like ID to ID, "void" to 31
 					String tokenName = (String) it.next();
 					int ttype = grammar.getTokenType(tokenName);
-					String label = grammar.getTokenTypeAsLabel(ttype);
+					String label = grammar.generator.getTokenTypeAsTargetLabel(ttype);
 					tokens.add(label);
 				}
 			}

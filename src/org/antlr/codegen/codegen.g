@@ -452,11 +452,13 @@ element returns [StringTemplate code=null]
 }
     :   code=atom[null]
     |   #(  n:NOT
+            {code = getTokenElementST("matchSet", "set", (GrammarAST)#n.getFirstChild(), #ast, null);}
+
             (  #( c:CHAR_LITERAL (ast1:ast_suffix)? )
 	           {
 	            int ttype=0;
      			if ( grammar.type==Grammar.LEXER ) {
-        			ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
+        			ttype = Grammar.getCharValueFromGrammarCharLiteral(c.getText());
      			}
      			else {
         			ttype = grammar.getTokenType(c.getText());
@@ -484,14 +486,14 @@ element returns [StringTemplate code=null]
 	           }
             |  #( st:SET (setElement)+ (ast4:ast_suffix)? )
                {
-               // do not complement elements; we're using matchNotSet
+               // SETs are not precomplemented by buildnfa.g like
+               // simple elements.
                elements = st.getSetValue();
 	           ast = #ast4;
                }
             )
             {
-	        code = getTokenElementST("matchSet", "set", (GrammarAST)#n.getFirstChild(), #ast, null);
-            code.setAttribute("not", "Not");
+            //code.setAttribute("not", "Not");
             code.setAttribute("s", generator.genSetExpr(templates,elements,1,false));
 		 	code.setAttribute("elementIndex", ((TokenWithIndex)#n.getToken()).getIndex());
 			if ( grammar.type!=Grammar.LEXER ) {
@@ -612,7 +614,7 @@ atom[String label] returns [StringTemplate code=null]
 		if ( grammar.type==Grammar.LEXER ) {
 			code = templates.getInstanceOf("charRef");
 			code.setAttribute("char",
-			   CodeGenerator.getJavaEscapedCharFromANTLRLiteral(c.getText()));
+			   generator.target.getTargetCharLiteralFromANTLRCharLiteral(c.getText()));
 			if ( label!=null ) {
 				code.setAttribute("label", label);
 			}
@@ -634,7 +636,7 @@ atom[String label] returns [StringTemplate code=null]
 		if ( grammar.type==Grammar.LEXER ) {
 			code = templates.getInstanceOf("lexerStringRef");
 			code.setAttribute("string",
-			   CodeGenerator.getJavaEscapedStringFromANTLRLiteral(s.getText()));
+			   generator.target.getTargetStringLiteralFromANTLRStringLiteral(s.getText()));
 			if ( label!=null ) {
 				code.setAttribute("label", label);
 			}
@@ -891,7 +893,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	}
 		code.setAttribute("elementIndex", ((TokenWithIndex)#rewrite_atom.getToken()).getIndex());
 		int ttype = grammar.getTokenType(tokenName);
-		String tok = grammar.getTokenTypeAsLabel(ttype);
+		String tok = generator.getTokenTypeAsTargetLabel(ttype);
     	code.setAttribute("token", tok);
     	if ( grammar.getTokenType(tokenName)==Label.INVALID ) {
 			ErrorManager.grammarError(ErrorManager.MSG_UNDEFINED_TOKEN_REF_IN_REWRITE,

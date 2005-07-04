@@ -147,8 +147,8 @@ option
 
 optionValue
 	:	id:ID            {out(#id.getText());}
-	|   s:STRING_LITERAL {out(Grammar.getANTLREscapedStringLiteral(#s.getText()));}
-	|	c:CHAR_LITERAL   {out(Grammar.getANTLREscapedCharLiteral(#c.getText()));}
+	|   s:STRING_LITERAL {out(#s.getText());}
+	|	c:CHAR_LITERAL   {out(#c.getText());}
 	|	i:INT            {out(#i.getText());}
 	|   charSet
 	;
@@ -268,9 +268,9 @@ atom
 			   (targ:ARG_ACTION	{out("["+#targ.toString()+"]");} )?
 			   (ast_suffix)?
              )
-		|   CHAR_LITERAL	{out(Grammar.getANTLREscapedCharLiteral(#atom.toString()));}
+		|   CHAR_LITERAL	{out(#atom.toString());}
 			(ast_suffix)?
-		|   STRING_LITERAL	{out(Grammar.getANTLREscapedStringLiteral(#atom.toString()));}
+		|   STRING_LITERAL	{out(#atom.toString());}
 			(ast_suffix)?
 		|   WILDCARD		{out(#atom.toString());}
 			(ast_suffix)?
@@ -294,13 +294,13 @@ set
     ;
 
 setElement
-    :   (	CHAR_LITERAL    {out(Grammar.getANTLREscapedCharLiteral(#setElement.toString()));}
+    :   (	CHAR_LITERAL    {out(#setElement.toString());}
 		|   TOKEN_REF		{out(#setElement.toString());}
-		|   STRING_LITERAL	{out(Grammar.getANTLREscapedStringLiteral(#setElement.toString()));}
+		|   STRING_LITERAL	{out(#setElement.toString());}
 		)
     |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
-    	{out(Grammar.getANTLREscapedCharLiteral(#c1.getText())+
+    	{out(#c1.getText()+
     	     ".."+
-    	     Grammar.getANTLREscapedCharLiteral(#c2.getText()));
+    	     #c2.getText());
     	}
     ;

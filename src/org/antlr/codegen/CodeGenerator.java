@@ -39,6 +39,7 @@ import org.antlr.tool.*;
 import org.antlr.misc.*;
 import org.antlr.misc.BitSet;
 import org.antlr.Tool;
+import org.antlr.runtime.CharStream;
 import antlr.collections.AST;
 import antlr.RecognitionException;
 import antlr.TokenWithIndex;
@@ -77,27 +78,9 @@ public class CodeGenerator {
 	public int MIN_SWITCH_ALTS = 3;
 	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
 
-	public static int escapedCharValue[] = new int[255];
-	public static String charValueEscape[] = new String[255];
-
 	public static HashMap javaTypeInitMap = new HashMap();
 
 	static {
-		escapedCharValue['n'] = '\n';
-		escapedCharValue['r'] = '\r';
-		escapedCharValue['t'] = '\t';
-		escapedCharValue['b'] = '\b';
-		escapedCharValue['f'] = '\f';
-		escapedCharValue['\\'] = '\\';
-		escapedCharValue['\''] = '\'';
-		charValueEscape['\n'] = "\\n";
-		charValueEscape['\r'] = "\\r";
-		charValueEscape['\t'] = "\\t";
-		charValueEscape['\b'] = "\\b";
-		charValueEscape['\f'] = "\\f";
-		charValueEscape['\\'] = "\\\\";
-		charValueEscape['\''] = "\\'";
-
 		// TODO: move to template somehow
 		javaTypeInitMap.put("int", "0");
 		javaTypeInitMap.put("long", "0");
@@ -460,7 +443,7 @@ public class CodeGenerator {
 		}
 		// must be simple label
 		StringTemplate eST = templates.getInstanceOf("lookaheadTest");
-		eST.setAttribute("atom", grammar.getTokenTypeAsLabel(label.getAtom()));
+		eST.setAttribute("atom", getTokenTypeAsTargetLabel(label.getAtom()));
 		eST.setAttribute("atomAsInt", new Integer(label.getAtom()));
 		eST.setAttribute("k", new Integer(k));
 		return eST;
@@ -506,15 +489,15 @@ public class CodeGenerator {
 			StringTemplate eST;
 			if ( a==b ) {
 				eST = templates.getInstanceOf(testSTName);
-				eST.setAttribute("atom", grammar.getTokenTypeAsLabel(a));
+				eST.setAttribute("atom", getTokenTypeAsTargetLabel(a));
 				eST.setAttribute("atomAsInt", new Integer(a));
 				//eST.setAttribute("k",new Integer(k));
 			}
 			else {
 				eST = templates.getInstanceOf(testRangeSTName);
-				eST.setAttribute("lower",grammar.getTokenTypeAsLabel(a));
+				eST.setAttribute("lower",getTokenTypeAsTargetLabel(a));
 				eST.setAttribute("lowerAsInt", new Integer(a));
-				eST.setAttribute("upper",grammar.getTokenTypeAsLabel(b));
+				eST.setAttribute("upper",getTokenTypeAsTargetLabel(b));
 				eST.setAttribute("upperAsInt", new Integer(b));
 				eST.setAttribute("rangeNumber",new Integer(rangeNumber));
 			}
@@ -553,10 +536,34 @@ public class CodeGenerator {
 				tokenName = Utils.replace(tokenName,"\"", "\\\"");
 			}
 			tokenName = '\"'+tokenName+'\"';
-			System.out.println("token name="+tokenName);
 			code.setAttribute("tokenNames", tokenName);
 		}
 	}
+
+	/** Get a meaningful name for a token type useful during code generation.
+	 *  Literals without associated names are converted to the string equivalent
+	 *  of their integer values. Used to generate x==ID and x==34 type comparisons
+	 *  etc...  Essentially we are looking for the most obvious way to refer
+	 *  to a token type in the generated code.  If in the lexer, return the
+	 *  char literal translated to the target language.  For example, ttype=10
+	 *  will yield '\n' from the getTokenDisplayName method.  That must
+	 *  be converted to the target languages literals.  For most C-derived
+	 *  languages no translation is needed.
+	 */
+    public String getTokenTypeAsTargetLabel(int ttype) {
+		String name = grammar.getTokenDisplayName(ttype);
+		if ( grammar.type==Grammar.LEXER ) {
+			return target.getTargetCharLiteralFromANTLRCharLiteral(name);
+		}
+		// If name is a literal, return the token type instead
+        if ( name.charAt(0)=='"' || name.charAt(0)=='\'' ) {
+            return String.valueOf(ttype);
+        }
+        if ( ttype==Label.EOF ) {
+            return String.valueOf(CharStream.EOF);
+        }
+        return name;
+    }
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7
@@ -594,18 +601,19 @@ public class CodeGenerator {
 	 *  all other escapes so char literals always have just a unicode 16-bit
 	 *  char value.  Use this method to get the escaped grammar literal back out,
 	 *  such as for printing out a grammar.
-	 */
-	public static String getJavaEscapedCharFromANTLRLiteral(String literal) {
-		int c = Grammar.getCharValueFromANTLRGrammarLiteral(literal);
-		return "'"+CodeGenerator.getJavaUnicodeEscapeString(c)+"'";
+	public static String getJavaEscapedCharFromCharLiteralToken(String literal) {
+		// pull out single char value
+		int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
+		// rebuild with escaped char in single quotes
+		return "'"+CodeGenerator.getJavaUnicodeEscapeStringForChar(c)+"'";
 	}
+	 */
 
 	/** Given a literal like "\nfoo\\", antlr.g converts it to the actual
 	 *  char sequence implied by the escaped char seq.  To get an escaped
 	 *  literal back out for printing grammars and such, use this routine.
 	 *  Leave the double quotes on the outside of the literal.
-	 */
-	public static String getJavaEscapedStringFromANTLRLiteral(String literal) {
+	public static String getJavaEscapedStringFromStringLiteralToken(String literal) {
 		StringBuffer buf = new StringBuffer();
 		buf.append('"');
 		for (int i=1; i<literal.length()-1; i++) {
@@ -622,42 +630,7 @@ public class CodeGenerator {
 		buf.append('"');
 		return buf.toString();
 	}
-
-	/** Return a string representing the escaped char for code c.  E.g., If c
-	 *  has value 0x100, you will get "\u0100".  ASCII gets the usual
-	 *  char (non-hex) representation.  Control characters are spit out
-	 *  as unicode.  While this is specially set up for returning Java strings,
-	 *  it can be used by any language target that has the same syntax. :)
-	 *  Note that this method does NOT put the quotes around it so that the
-	 *  method is more reusable.
 	 */
-	public static String getJavaUnicodeEscapeString(int c) {
-		if ( c<Label.MIN_CHAR_VALUE ) {
-			ErrorManager.internalError("invalid char value "+c);
-			return "<INVALID>";
-		}
-		System.out.println("c "+c);
-		if ( c<charValueEscape.length && charValueEscape[c]!=null ) {
-			System.out.println(" -> "+charValueEscape[c]);
-			return charValueEscape[c];
-		}
-		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
-			!Character.isISOControl((char)c) ) {
-			if ( c=='\\' ) {
-				return "\\\\";
-			}
-			if ( c=='\'') {
-				return "\\'";
-			}
-			return Character.toString((char)c);
-		}
-		// turn on the bit above max '\uFFFF' value so that we pad with zeros
-		// then only take last 4 digits
-		String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-		String unicodeStr = "\\u"+hex;
-		return unicodeStr;
-	}
-
 
 	// M I S C
 

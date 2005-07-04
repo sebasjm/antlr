@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0ea4
-June 29, 2005
+ANTLR 3.0ea5
+July 5, 2005
 
 Terence Parr, parrt at cs usfca edu
 ANTLR Project lead and supreme dictator
@@ -203,6 +203,18 @@ to me.  I use Intellij so I never type anything actually to build.
 -----------------------------------------------------------------------
 
 CHANGES
+
+3.0ea5 - July 5, 2005
+
+* Using '\n' in a parser grammar resulted in a nonescaped version of '\n' in the token names table making compilation fail.  I fixed this by reorganizing/cleaning up portion of ANTLR that deals with literals.  See comment org.antlr.codegen.Target.
+
+* Target.getMaxCharValue() did not use the appropriate max value constant.
+
+* ALLCHAR was a constant when it should use the Target max value def.  set complement for wildcard also didn't use the Target def.  Generally cleaned up the max char value stuff.
+
+* Code gen didn't deal with ASTLabelType properly...I think even the 3.0ea4 example tree parser was broken! :(
+
+* Added a few more unit tests dealing with escaped literals
 
 3.0ea4 - June 29, 2005
 

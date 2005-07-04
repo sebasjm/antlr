@@ -254,7 +254,7 @@ element returns [StateCluster g=null]
 	           {
 	            int ttype=0;
      			if ( grammar.type==Grammar.LEXER ) {
-        			ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
+        			ttype = Grammar.getCharValueFromGrammarCharLiteral(c.getText());
      			}
      			else {
         			ttype = grammar.getTokenType(c.getText());
@@ -270,7 +270,7 @@ element returns [StateCluster g=null]
 	           {
 	           GrammarAST stNode = (GrammarAST)n.getFirstChild();
                IntSet st = grammar.complement(stNode.getSetValue());
-               // stNode.setSetValue(st); don't store complement
+               stNode.setSetValue(st);
 	           g=factory.build_Set(st);
 	           }
             )
@@ -462,7 +462,7 @@ setElement[IntSet elements]
     :   c:CHAR_LITERAL
         {
      	if ( grammar.type==Grammar.LEXER ) {
-        	ttype = Grammar.getCharValueFromANTLRGrammarLiteral(c.getText());
+        	ttype = Grammar.getCharValueFromGrammarCharLiteral(c.getText());
      	}
      	else {
         	ttype = grammar.getTokenType(c.getText());
@@ -500,8 +500,8 @@ setElement[IntSet elements]
     |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
     	{
      	if ( grammar.type==Grammar.LEXER ) {
-	        int a = Grammar.getCharValueFromANTLRGrammarLiteral(c1.getText());
-    	    int b = Grammar.getCharValueFromANTLRGrammarLiteral(c2.getText());
+	        int a = Grammar.getCharValueFromGrammarCharLiteral(c1.getText());
+    	    int b = Grammar.getCharValueFromGrammarCharLiteral(c2.getText());
     		elements.addAll(IntervalSet.of(a,b));
      	}
     	}

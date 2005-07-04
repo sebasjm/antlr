@@ -760,14 +760,14 @@ STRING_LITERAL
 
 protected
 ESC	:	'\\'
-		(	'n' {$setText('\n');}
-		|	'r' {$setText('\r');}
-		|	't' {$setText('\t');}
-		|	'b' {$setText('\b');}
-		|	'f' {$setText('\f');}
-		|	'"' {$setText('\"');}
-		|	'\'' {$setText('\'');}
-		|	'\\' {$setText('\\');}
+		(	'n' //{$setText('\n');}
+		|	'r' //{$setText('\r');}
+		|	't' //{$setText('\t');}
+		|	'b' //{$setText('\b');}
+		|	'f' //{$setText('\f');}
+		|	'"' //{$setText('\"');}
+		|	'\'' //{$setText('\'');}
+		|	'\\' //{$setText('\\');}
 		|	('0'..'3')
 			(
 				options {

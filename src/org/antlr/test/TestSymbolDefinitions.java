@@ -125,10 +125,9 @@ public class TestSymbolDefinitions extends TestSuite {
 				"grammar t;\n"+
 				"a : '\\n';\n");
 		Set literals = g.getCharLiteralTokens();
-		System.out.println("literals="+literals);
+		// must store literals how they appear in the antlr grammar
+		assertEqual(literals.toArray()[0], "'\\n'");
 	}
-
-
 
 	// T E S T  E R R O R S
 
@@ -696,7 +695,7 @@ public class TestSymbolDefinitions extends TestSuite {
 								String tokensStr)
 		throws FailedAssertionException
 	{
-		Set tokens = g.getTokenNames();
+		Set tokens = g.getTokenDisplayNames();
 
 		// make sure expected tokens are there
 		StringTokenizer st = new StringTokenizer(tokensStr, ", ");

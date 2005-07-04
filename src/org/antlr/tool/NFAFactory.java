@@ -140,7 +140,6 @@ public class NFAFactory {
 
     /** Can only complement block of simple alts; can complement build_Set()
      *  result, that is.  Get set and complement, replace old with complement.
-     */
     public StateCluster build_AlternativeBlockComplement(StateCluster blk) {
         State s0 = blk.left;
         IntSet set = getCollapsedBlockAsSet(s0);
@@ -152,6 +151,7 @@ public class NFAFactory {
         }
         return blk;
     }
+	 */
 
     public StateCluster build_Range(int a, int b) {
         NFAState left = newState();
@@ -163,18 +163,9 @@ public class NFAFactory {
     }
 
 	/** From char 'c' build StateCluster o-intValue(c)->o
-	 *  can include unicode spec likes '\u0024'.  Accepts
-	 *  actual unicode 16-bit now, of course, by default.
-	 *  TODO: doesn't antlr.g do the conversion to single char now from \u0032?
 	 */
 	public StateCluster build_CharLiteralAtom(String charLiteral) {
-        int c = Grammar.getCharValueFromANTLRGrammarLiteral(charLiteral);
-        if ( charLiteral.charAt(1)=='\\' &&
-             Character.toUpperCase(charLiteral.charAt(2))=='U' )
-        {
-            String unicodeChars = charLiteral.substring(3,charLiteral.length()-1);
-            c = Integer.parseInt(unicodeChars, 16); // parse the unicode 16 bit
-        }
+        int c = Grammar.getCharValueFromGrammarCharLiteral(charLiteral);
 		return build_Atom(c);
 	}
 
@@ -184,8 +175,8 @@ public class NFAFactory {
      *  TODO not supplemental char clean!
 	 */
 	public StateCluster build_CharRange(String a, String b) {
-		int from = Grammar.getCharValueFromANTLRGrammarLiteral(a);
-		int to = Grammar.getCharValueFromANTLRGrammarLiteral(b);
+		int from = Grammar.getCharValueFromGrammarCharLiteral(a);
+		int to = Grammar.getCharValueFromGrammarCharLiteral(b);
 		return build_Range(from, to);
 	}
 
@@ -197,14 +188,13 @@ public class NFAFactory {
      */
     public StateCluster build_StringLiteralAtom(String stringLiteral) {
         if ( nfa.grammar.type==Grammar.LEXER ) {
-            // first remove the double-quotes
-            stringLiteral = stringLiteral.substring(1,stringLiteral.length()-1);
+			StringBuffer chars =
+				Grammar.getUnescapedStringFromGrammarStringLiteral(stringLiteral);
             NFAState first = newState();
             NFAState last = null;
             NFAState prev = first;
-            for (int i=0; i<stringLiteral.length(); i++) {
-                // TODO: doesn't handle escaped char!!! actually antlr.g does it
-                int c = stringLiteral.charAt(i);
+            for (int i=0; i<chars.length(); i++) {
+                int c = chars.charAt(i);
                 NFAState next = newState();
                 transitionBetweenStates(prev, next, c);
                 prev = last = next;

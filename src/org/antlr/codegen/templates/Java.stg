@@ -406,9 +406,9 @@ alt(elements,altNum,description,autoAST,outerAlt) ::= <<
 {
 <if(autoAST)>
 <if(outerAlt)>
-root_0 = adaptor.nil();<\n>
+root_0 = (<ASTLabelType>)adaptor.nil();<\n>
 <else>
-<ASTLabelType> root_<blockLevel> = adaptor.nil();<\n>
+<ASTLabelType> root_<blockLevel> = (<ASTLabelType>)adaptor.nil();<\n>
 <endif>
 <endif>
 <elements:element()>
@@ -488,7 +488,7 @@ match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>);<\n>
 <label>_tree = adaptor.create(<label>);
-root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
+root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
 >>
 
 /** Match label+=TOKEN^^ when buildAST but not rewrite alt */
@@ -498,7 +498,7 @@ match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>);<\n>
 <label>_tree = adaptor.create(<label>);
-root_0 = adaptor.becomeRoot(<label>_tree, root_0);
+root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** match a token when output==AST */
@@ -514,7 +514,7 @@ tokenRefASTRoot(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
 match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 <label>_tree = adaptor.create(<label>);
-root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
+root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
 >>
 
 /** match a token when output==AST and ref is token^^ */
@@ -522,7 +522,7 @@ tokenRefASTRuleRoot(token,label,elementIndex) ::= <<
 <label>=input.LT(1);
 match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 <label>_tree = adaptor.create(<label>);
-root_0 = adaptor.becomeRoot(<label>_tree, root_0);
+root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** match a character */
@@ -572,7 +572,7 @@ else {
 matchSetASTRoot(s,label,elementIndex,not) ::= <<
 <label>=input.LT(1);
 if ( <if(not)>!(<s>)<else><s><endif> ) {
-    root_<blockLevel> = adaptor.becomeRoot(adaptor.create(<label>), root_<blockLevel>);
+    root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_<blockLevel>);
     input.consume();
 }
 else {
@@ -589,7 +589,7 @@ else {
 matchSetASTRuleRoot(s,label,elementIndex,not) ::= <<
 <label>=input.LT(1);<\n>
 if ( <if(not)>!(<s>)<else><s><endif> ) {
-    root_0 = adaptor.becomeRoot(adaptor.create(<label>), root_0);
+    root_0 = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_0);
     input.consume();
 }
 else {
@@ -602,26 +602,6 @@ else {
     throw mse;
 }<\n>
 >>
-
-/** Match ~(A|B|...) NOT USED
-matchNotSet(s,labelST,elementIndex) ::= <<
-<labelST>
-if ( !(<s>) ) input.consume();
-else {
-    MismatchedNotSetException mnse =
-        new MismatchedNotSetException(null,input);
-<if(debug)>
-    dbg.recognitionException(mnse);<\n>
-<endif>
-<if(LEXER)>
-    recover(mnse);<\n>
-<else>
-    recoverFromMismatchedSet(input,mnse,FOLLOW_set_in_<ruleName><elementIndex>);<\n>
-<endif>
-    throw mnse;
-}<\n>
->>
-*/
 
 /** Match a string literal */
 lexerStringRef(string) ::= "match(<string>);"
@@ -644,14 +624,14 @@ wildcardASTRoot(label,elementIndex) ::= <<
 <label>=input.LT(1);
 matchAny(input);
 <label>_tree = adaptor.create(<label>);
-root_<blockLevel> = adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
+root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
 >>
 
 wildcardASTRuleRoot(label,elementIndex) ::= <<
 <label>=input.LT(1);
 matchAny(input);
 <label>_tree = adaptor.create(<label>);
-root_0 = adaptor.becomeRoot(<label>_tree, root_0);
+root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** Match . wildcard */
@@ -713,7 +693,7 @@ following.pop();
 ruleRefASTRoot(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
-root_<blockLevel> = adaptor.becomeRoot(<label>.tree, root_<blockLevel>);
+root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<blockLevel>);
 following.pop();
 >>
 
@@ -721,7 +701,7 @@ following.pop();
 ruleRefASTRootAndListLabel(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
-root_<blockLevel> = adaptor.becomeRoot(<label>.tree, root_<blockLevel>);<\n>
+root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<blockLevel>);<\n>
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>.tree);
 following.pop();
@@ -731,7 +711,7 @@ following.pop();
 ruleRefASTRuleRoot(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
-root_0 = adaptor.becomeRoot(<label>.tree, root_0);
+root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_0);
 following.pop();
 >>
 
@@ -739,7 +719,7 @@ following.pop();
 ruleRefASTRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <label>=<rule>(<args>);
-root_0 = adaptor.becomeRoot(<label>.tree, root_0);<\n>
+root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_0);<\n>
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>.tree);<\n>
 following.pop();
@@ -773,7 +753,7 @@ rewriteCode(
 <referencedRuleListLabels:{if ( list_<it>.size()!=1 ) throw new RuntimeException("rule <it> length="+list_<it>.size()+" != 1");<\n>}>
 int i_0 = 0;
 <prevRuleRootRef()>.tree = root_0;
-root_0 = adaptor.nil();
+root_0 = (<ASTLabelType>)adaptor.nil();
 <alts:rewriteAlt(); separator="else ">
 >>
 
@@ -859,7 +839,7 @@ rewriteEmptyAlt() ::= "root_0 = null;"
 rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
 // <fileName>:<description>
 {
-<ASTLabelType> root_<treeLevel> = adaptor.nil();
+<ASTLabelType> root_<treeLevel> = (<ASTLabelType>)adaptor.nil();
 <root>
 <children>
 adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
@@ -885,12 +865,12 @@ adaptor.addChild(root_<treeLevel>, (<labelType>)list_<label>.get(i_<rewriteBlock
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-root_<treeLevel> = adaptor.becomeRoot(<label>, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>, root_<treeLevel>);<\n>
 >>
 
 /** Gen ^(ID ...) */
 rewriteTokenRefRoot(token,elementIndex) ::= <<
-root_<treeLevel> = adaptor.becomeRoot((<labelType>)list_<token>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot((<labelType>)list_<token>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
@@ -898,7 +878,7 @@ adaptor.addChild(root_<treeLevel>, adaptor.create(<token>, <args><if(!args)>"<to
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
-root_<treeLevel> = adaptor.becomeRoot(adaptor.create(<token>, <args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<token>, <args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
 >>
 
 /** What is the name of the previous value of this rule's root tree?  This
@@ -918,9 +898,9 @@ adaptor.addChild(root_<treeLevel>, list_<rule>.get(i_<rewriteBlockLevel>));<\n>
 
 rewriteRuleRefRoot(rule,dup) ::= <<
 <if(dup)>
-root_<treeLevel> = adaptor.becomeRoot(adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)), root_<treeLevel>);<\n>
 <else>
-root_<treeLevel> = adaptor.becomeRoot(list_<rule>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<rule>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
 <endif>
 >>
 
@@ -929,7 +909,7 @@ adaptor.addChild(root_<treeLevel>, <action>);<\n>
 >>
 
 rewriteActionRoot(action) ::= <<
-root_<treeLevel> = adaptor.becomeRoot(<action>, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<action>, root_<treeLevel>);<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel=rule */
@@ -944,12 +924,12 @@ adaptor.addChild(root_<treeLevel>, list_<label>.get(i_<rewriteBlockLevel>));<\n>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
 rewriteRuleLabelRefRoot(label) ::= <<
-root_<treeLevel> = adaptor.becomeRoot(<label>.tree, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<treeLevel>);<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = adaptor.becomeRoot(list_<label>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<label>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
 >>
 
 
