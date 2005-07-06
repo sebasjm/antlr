@@ -93,6 +93,7 @@ public class Target {
 	 *  around the incoming literal.
 	 */
 	public String getTargetCharLiteralFromANTLRCharLiteral(String literal) {
+		// int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
 		return literal;
 	}
 
@@ -103,17 +104,12 @@ public class Target {
 	 *  around the incoming literal.
 	 */
 	public String getTargetStringLiteralFromANTLRStringLiteral(String literal) {
+		/*
+		StringBuffer buf =
+			Grammar.getUnescapedStringFromGrammarStringLiteral(literal);
+			*/
 		return literal;
 	}
-
-	/** Convert from an ANTLR string literal as read and converted by antlr.g
-	 *  to a literal suitable for the target language.
-	 *
-	 *  Example, 4-char sequence "'\n'\'" is escaped to 5-char "'\\n\\''".
-	public String getEscapedStringLiteralToken(String literal) {
-		return CodeGenerator.getJavaEscapedStringFromStringLiteralToken(literal);
-	}
-	 */
 
 	/** Some targets only support ASCII or 8-bit chars/strings.  For example,
 	 *  C++ will probably want to return 0xFF here.
