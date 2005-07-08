@@ -78,20 +78,6 @@ public class CodeGenerator {
 	public int MIN_SWITCH_ALTS = 3;
 	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
 
-	public static HashMap javaTypeInitMap = new HashMap();
-
-	static {
-		// TODO: move to template somehow
-		javaTypeInitMap.put("int", "0");
-		javaTypeInitMap.put("long", "0");
-		javaTypeInitMap.put("float", "0.0");
-		javaTypeInitMap.put("double", "0.0");
-		javaTypeInitMap.put("boolean", "false");
-		javaTypeInitMap.put("byte", "0");
-		javaTypeInitMap.put("short", "0");
-		javaTypeInitMap.put("char", "0");
-	}
-
 	/** Which grammar are we generating code for?  Each generator
 	 *  is attached to a specific grammar.
 	 */
@@ -219,9 +205,6 @@ public class CodeGenerator {
 		outputFileST.setAttribute("buildTemplate",
 								  new Boolean(grammar.type!=Grammar.LEXER&&
 											  grammar.buildTemplate()));
-
-		// TODO: LANGUAGE DEPENDENCY!!!! fix!
-		outputFileST.setAttribute("javaTypeInitMap", javaTypeInitMap);
 
 		// HEADER FILE
 		if ( templates.isDefined("headerFile") ) {

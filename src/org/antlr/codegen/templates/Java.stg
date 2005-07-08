@@ -27,9 +27,17 @@
 */
 group Java;
 
-//crap; I need this: returnTypeMap ::= {"int":"0", "float":"0.0"}
-
-// need something like ASTLabelType ::= {"TreeParser":"Object", default="Object"}
+javaTypeInitMap ::= [
+	"int":"0",
+	"long":"0",
+	"float":"0.0",
+	"double":"0.0",
+	"boolean":"false",
+	"byte":"0",
+	"short":"0",
+	"char":"0",
+	default:"null" // anything other than an atomic type
+]
 
 /** The overall file structure of a recognizer; stores methods for rules
  *  and cyclic DFAs plus support code.
@@ -37,7 +45,7 @@ group Java;
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
            debug, trace, profile, dumpProfile,
-	   buildAST, buildTemplate, javaTypeInitMap,
+	   buildAST, buildTemplate,
 	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
@@ -1206,14 +1214,10 @@ void
 >>
 
 /** Using a type to init value map, try to init a type; if not in table
- *  must be an object, use null.
+ *  must be an object, default value is "null".
  */
 initValue(typeName) ::= <<
-<if(javaTypeInitMap.(typeName))>
 <javaTypeInitMap.(typeName)>
-<else>
-null
-<endif>
 >>
 
 ruleLabelDef(label) ::= <<
