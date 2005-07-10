@@ -947,11 +947,11 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 					break;
 				case Grammar.TOKEN_LIST_LABEL :
 					stName = "rewriteTokenListLabelRef";
-					refListAttrName = "referencedTokenListLabels";
+					refListAttrName = "referencedListLabels";
 					break;
 				case Grammar.RULE_LIST_LABEL :
 					stName = "rewriteRuleListLabelRef";
-					refListAttrName = "referencedTokenListLabels";
+					refListAttrName = "referencedListLabels";
 					break;
 			}
 			if ( isRoot ) {
