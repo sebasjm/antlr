@@ -66,7 +66,6 @@ options {
     protected StringTemplate currentBlockST = null;
     protected boolean currentAltHasRewrite = false;
     protected int rewriteTreeNestingLevel = 0;
-    protected String firstReferencedElement = null;
     protected Set rewriteRuleRefs = null;
 
     public void reportError(RecognitionException ex) {
@@ -707,7 +706,6 @@ if ( #rewrite.getType()==REWRITE ) {
 	code.setAttribute("treeLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
 	code.setAttribute("rewriteBlockLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
 	currentBlockST = code;
-	firstReferencedElement = null;
 }
 }
 	:	(
@@ -728,11 +726,6 @@ if ( #rewrite.getType()==REWRITE ) {
 			pred=null;
 			}
 		)*
-		{
-		if ( code!=null ) {
-			code.setAttribute("firstReferencedElement", firstReferencedElement);
-		}
-		}
 	;
 
 rewrite_block[String blockTemplateName] returns [StringTemplate code=null]
@@ -741,8 +734,6 @@ rewriteBlockNestingLevel++;
 code = templates.getInstanceOf(blockTemplateName);
 StringTemplate save_currentBlockST = currentBlockST;
 currentBlockST = code;
-String save_firstReferencedElement = firstReferencedElement;
-firstReferencedElement = null;
 code.setAttribute("rewriteBlockLevel", rewriteBlockNestingLevel);
 StringTemplate alt=null;
 }
@@ -752,10 +743,8 @@ StringTemplate alt=null;
          )
     	{
     	code.setAttribute("alt", alt);
-		code.setAttribute("firstReferencedElement", firstReferencedElement);
     	rewriteBlockNestingLevel--;
     	currentBlockST = save_currentBlockST;
-    	firstReferencedElement = save_firstReferencedElement;
     	}
     ;
 
@@ -865,12 +854,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     			// we found a ref to the same rule in the same -> rewrite
     			code.setAttribute("dup", new Boolean(true));
     		}
-			if ( firstReferencedElement==null ) {
-				firstReferencedElement = ruleRefName;
-			}
-			else {
-				currentBlockST.setAttribute("referencedRules", ruleRefName);
-			}
+			currentBlockST.setAttribute("referencedRules", ruleRefName);
 		}
     	}
 
@@ -905,12 +889,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	else {
     		// only track this reference if it's valid
 			if ( !imaginary ) {
-				if ( firstReferencedElement==null ) {
-					firstReferencedElement = tok;
-				}
-				else {
-					currentBlockST.setAttribute("referencedTokens", tok);
-				}
+				currentBlockST.setAttribute("referencedTokens", tok);
 			}
 		}
     	}
@@ -960,12 +939,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 			code = templates.getInstanceOf(stName);
 			code.setAttribute("label", labelName);
 			if ( refListAttrName!=null ) {
-				if ( firstReferencedElement==null ) {
-					firstReferencedElement = #LABEL.getText();
-				}
-				else {
-					currentBlockST.setAttribute(refListAttrName, #LABEL.getText());
-				}
+				currentBlockST.setAttribute(refListAttrName, #LABEL.getText());
 			}
 		}
     	}
