@@ -153,7 +153,7 @@ class <name> extends <if(debug)>Debug<endif><superClass> {
 
     <cyclicDFAs>
 
-    <bitsets:bitset(name="FOLLOW_"+it.name+"_in_"+it.inName+it.tokenIndex, words64=it.bits)>
+    <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
 }
 >>
 
@@ -164,7 +164,7 @@ parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitset
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType="<ASTLabelType>", ASTLabelType="Object", superClass="TreeParser") ::= <<
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser") ::= <<
 <genericParser(inputStreamType="TreeNodeStream", ...)>
 >>
 
@@ -754,8 +754,8 @@ rewriteCode(
 <<
 
 // REWRITE
-<first(referencedTokens+referencedListLabels+referencedRules):{if ( list_<it>.size()!=1 ) throw new RuntimeException("element <it> length="+list_<it>.size()+" != 1");<\n>}>
-<rest(referencedTokens+referencedListLabels+referencedRules):{if ( list_<it>.size()!=1 ) throw new RuntimeException("rewrite element <it> length="+list_<it>.size()+" != 1");<\n>}>
+<first([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("element <it> length="+list_<it>.size()+" != 1");<\n>}>
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("rewrite element <it> length="+list_<it>.size()+" != 1");<\n>}>
 int i_0 = 0;
 <prevRuleRootRef()>.tree = root_0;
 root_0 = (<ASTLabelType>)adaptor.nil();
@@ -771,9 +771,9 @@ rewriteOptionalBlock(
 <<
 // <fileName>:<description>
 {
-int n_<rewriteBlockLevel> = list_<first(referencedTokens+referencedListLabels+referencedRules)>.size();
-if ( n_<rewriteBlockLevel> > 1 ) throw new RuntimeException("<first(referencedTokens+referencedListLabels+referencedRules)> list has > 1 elements");
-<rest(referencedTokens+referencedListLabels+referencedRules):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
+int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();
+if ( n_<rewriteBlockLevel> > 1 ) throw new RuntimeException("<first([referencedTokens,referencedListLabels,referencedRules])> list has > 1 elements");
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
 if ( n_<rewriteBlockLevel>==1 ) {
     int i_<rewriteBlockLevel> = 0;
     <alt>
@@ -790,8 +790,8 @@ rewriteClosureBlock(
 <<
 // <fileName>:<description>
 {
-int n_<rewriteBlockLevel> = list_<first(referencedTokens+referencedListLabels+referencedRules)>.size();
-<rest(referencedTokens+referencedListLabels+referencedRules):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
+int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
 for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
     <alt>
 }
@@ -807,8 +807,8 @@ rewritePositiveClosureBlock(
 <<
 // <fileName>:<description>
 {
-int n_<rewriteBlockLevel> = list_<first(referencedTokens+referencedListLabels+referencedRules)>.size();
-<rest(referencedTokens+referencedListLabels+referencedRules):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
+int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
 if ( n_<rewriteBlockLevel>==0 ) throw new RuntimeException("Must have more than one element for (...)+ loops");
 for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
     <alt>

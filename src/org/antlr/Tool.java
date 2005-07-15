@@ -39,7 +39,7 @@ public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-	public static final String VERSION = "3.0ea5";
+	public static final String VERSION = "3.0ea6";
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
 
