@@ -204,6 +204,10 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
+3.0ea6 - ??
+
+* ~'a'* and ~('a')* were not working properly
+
 3.0ea5 - July 5, 2005
 
 * Using '\n' in a parser grammar resulted in a nonescaped version of '\n' in the token names table making compilation fail.  I fixed this by reorganizing/cleaning up portion of ANTLR that deals with literals.  See comment org.antlr.codegen.Target.
