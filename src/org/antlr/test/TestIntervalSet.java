@@ -351,4 +351,21 @@ public class TestIntervalSet extends TestSuite {
 		String result = String.valueOf(s.toList());
 		assertEqual(result, expecting);
 	}
+
+	/** The following was broken:
+	    {'\u0000'..'s', 'u'..'\uFFFE'} & {'\u0000'..'q', 's'..'\uFFFE'}=
+	    {'\u0000'..'q', 's'}!!!! broken...
+	 	'q' is 113 ascii
+	 	'u' is 117
+	*/
+	public void testNotRIntersectionNotT() throws Exception {
+		IntervalSet s = IntervalSet.of(0,'s');
+		s.add('u',200);
+		IntervalSet s2 = IntervalSet.of(0,'q');
+		s2.add('s',200);
+		String expecting = "{0..113, 115, 117..200}";
+		String result = (s.and(s2)).toString();
+		assertEqual(result, expecting);
+	}
+
 }

@@ -386,7 +386,7 @@ public class IntervalSet implements IntSet {
                 }
             }
             else if ( mine.properlyContains(theirs) ) {
-                // overlap, compute intersection and add to new list
+                // overlap, add intersection, get next theirs
                 intersection.add(mine.intersection(theirs));
                 theirs = null;
                 if ( otherIter.hasNext() ) {
@@ -394,7 +394,7 @@ public class IntervalSet implements IntSet {
                 }
             }
             else if ( theirs.properlyContains(mine) ) {
-                // overlap, compute intersection and add to new list
+				// overlap, add intersection, get next mine
                 intersection.add(mine.intersection(theirs));
                 mine = null;
                 if ( thisIter.hasNext() ) {
@@ -402,17 +402,27 @@ public class IntervalSet implements IntSet {
                 }
             }
             else if ( !mine.disjoint(theirs) ) {
-                // overlap, compute intersection and add to new list
-                intersection.add(mine.intersection(theirs));
+                // overlap, add intersection
+				intersection.add(mine.intersection(theirs));
+				// Move the iterator of lower range [a..b], but not
+				// the upper range as it may contain elements that will collide
+				// with the next iterator. So, if mine=[0..115] and
+				// theirs=[115..200], then intersection is 115 and move mine
+				// but not theirs as theirs may collide with the next range
+				// in thisIter.
                 // move both iterators to next ranges
-                mine = null;
-                if ( thisIter.hasNext() ) {
-                    mine = (Interval)thisIter.next();
-                }
-                theirs = null;
-                if ( otherIter.hasNext() ) {
-                    theirs = (Interval)otherIter.next();
-                }
+				if ( mine.startsAfterNonDisjoint(theirs) ) {
+					theirs = null;
+					if ( otherIter.hasNext() ) {
+						theirs = (Interval)otherIter.next();
+					}
+				}
+				else if ( theirs.startsAfterNonDisjoint(mine) ) {
+					mine = null;
+					if ( thisIter.hasNext() ) {
+						mine = (Interval)thisIter.next();
+					}
+				}
             }
         }
         return intersection;
