@@ -198,16 +198,6 @@ public class IntervalSet implements IntSet {
         }
     }
 
-    /*
-	public IntSet complement() {
-        return this.complement(1,Label.MAX_CHAR_VALUE);
-    }
-	*/
-
-    public IntSet complement(int maxElement) {
-        return this.complement(1,maxElement);
-    }
-
     public IntSet complement(int minElement, int maxElement) {
         return this.complement(IntervalSet.of(minElement,maxElement));
     }
@@ -222,15 +212,64 @@ public class IntervalSet implements IntSet {
         if ( vocabulary==null ) {
             return null; // nothing in common with null set
         }
+		if ( !(vocabulary instanceof IntervalSet ) ) {
+			throw new IllegalArgumentException("can't complement with non IntervalSet ("+
+											   vocabulary.getClass().getName()+")");
+		}
+		IntervalSet vocabularyIS = ((IntervalSet)vocabulary);
+		int maxElement = vocabularyIS.getMaxElement();
 
-        return vocabulary.subtract(this); // difference - this
+		IntervalSet compl = new IntervalSet();
+		if ( intervals.size()==0 ) {
+			return compl;
+		}
+		Interval first = (Interval)intervals.get(0);
+		// add a range from 0 to first.a constrained to vocab
+		if ( first.a > 0 ) {
+			IntervalSet s = IntervalSet.of(0, first.a-1);
+			IntervalSet a = (IntervalSet)s.and(vocabularyIS);
+			compl.addAll(a);
+		}
+		for (int i=1; i<intervals.size(); i++) { // from 2nd interval .. nth
+			Interval previous = (Interval)intervals.get(i-1);
+			Interval current = (Interval)intervals.get(i);
+			IntervalSet s = IntervalSet.of(previous.b+1, current.a-1);
+			IntervalSet a = (IntervalSet)s.and(vocabularyIS);
+			compl.addAll(a);
+		}
+		Interval last = (Interval)intervals.get(intervals.size()-1);
+		// add a range from last.b to maxElement constrained to vocab
+		if ( last.b < maxElement ) {
+			IntervalSet s = IntervalSet.of(last.b+1, maxElement);
+			IntervalSet a = (IntervalSet)s.and(vocabularyIS);
+			compl.addAll(a);
+		}
+		return compl;
     }
+
+	/** Compute this-other via this&~other.
+	 *  Return a new set containing all elements in this but not in other.
+	 *  other is assumed to be a subset of this;
+     *  anything that is in other but not in this will be ignored.
+	 */
+	public IntSet subtract(IntSet other) {
+		// assume the whole unicode range here for the complement
+		// because it doesn't matter.  Anything beyond the max of this' set
+		// will be ignored since we are doing this & ~other.  The intersection
+		// will be empty.  The only problem would be when this' set max value
+		// goes beyond MAX_CHAR_VALUE, but hopefully the constant MAX_CHAR_VALUE
+		// will prevent this.
+		return this.and(((IntervalSet)other).complement(0,Label.MAX_CHAR_VALUE));
+	}
 
     /** return a new set containing all elements in this but not in other.
      *  Intervals may have to be broken up when ranges in this overlap
      *  with ranges in other.  other is assumed to be a subset of this;
      *  anything that is in other but not in this will be ignored.
-     */
+	 *
+	 *  Keep around, but 10-20-2005, I decided to make complement work w/o
+	 *  subtract and so then subtract can simply be a&~b
+	 *
     public IntSet subtract(IntSet other) {
         if ( other==null || !(other instanceof IntervalSet) ) {
             return null; // nothing in common with null set
@@ -340,6 +379,7 @@ public class IntervalSet implements IntSet {
         }
         return diff;
     }
+	 */
 
     /** TODO: implement this! */
 	public IntSet or(IntSet a) {
@@ -457,6 +497,22 @@ public class IntervalSet implements IntSet {
         }
         return Label.INVALID;
     }
+
+	public int getMaxElement() {
+		if ( isNil() ) {
+			return Label.INVALID;
+		}
+		Interval last = (Interval)intervals.get(intervals.size()-1);
+		return last.b;
+	}
+
+	public int getMinElement() {
+		if ( isNil() ) {
+			return Label.INVALID;
+		}
+		Interval first = (Interval)intervals.get(0);
+		return first.a;
+	}
 
     /** Return a list of Interval objects. */
     public List getIntervals() {

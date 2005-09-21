@@ -195,6 +195,19 @@ public class TestIntervalSet extends TestSuite {
         assertEqual(result, expecting);
     }
 
+	/** The following was broken:
+	 	{0..113, 115..65534}-{0..115, 117..65534}=116..65534
+	 */
+	public void testSubtractOfWackyRange() throws Exception {
+		IntervalSet s = IntervalSet.of(0,113);
+		s.add(115,200);
+		IntervalSet s2 = IntervalSet.of(0,115);
+		s2.add(117,200);
+		String expecting = "116";
+		String result = (s.subtract(s2)).toString();
+		assertEqual(result, expecting);
+	}
+
     public void testSimpleEquals() throws Exception {
         IntervalSet s = IntervalSet.of(10,20);
         IntervalSet s2 = IntervalSet.of(10,20);
@@ -289,7 +302,7 @@ public class TestIntervalSet extends TestSuite {
 		IntervalSet s = IntervalSet.of(1,96);
 		s.add(99,65534);
 		String expecting = "97..98";
-		String result = (s.complement(Label.MAX_CHAR_VALUE)).toString();
+		String result = (s.complement(1,Label.MAX_CHAR_VALUE)).toString();
 		assertEqual(result, expecting);
 	}
 
