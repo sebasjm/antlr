@@ -156,6 +156,8 @@ optionValue
 //	|   cs:charSet       {value = #cs;} // return set AST in this case
 	;
 
+/*
+will probably need for char vocab spec later
 charSet
 	:   LPAREN^ {#LPAREN.setType(CHARSET);}
 	        charSetElement ( OR^ charSetElement )*
@@ -166,6 +168,7 @@ charSetElement
 	:   c1:CHAR_LITERAL
 	|   c2:CHAR_LITERAL RANGE^ c3:CHAR_LITERAL
 	;
+*/
 
 tokensSpec
 	:	TOKENS^
@@ -225,7 +228,7 @@ GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
 	blkRoot.setColumn(colon.getColumn());
 	eob = #[EOB,"<end-of-block>"];
     }
-	(	(setNoParens SEMI) => s:setNoParens
+	(	(setNoParens SEMI) => s:setNoParens // try to collapse sets
 		{
 		blk = #(blkRoot,#(#[ALT,"ALT"],#s,#[EOA,"<end-of-alt>"]),eob);
 		}
@@ -373,10 +376,19 @@ elementNoOptionSpec
 	;
 
 notSet
-	:	NOT^
+{
+    int line = LT(1).getLine();
+    int col = LT(1).getColumn();
+    GrammarAST subrule=null;
+}
+	:	n:NOT^
 		(	notTerminal
-        |   ebnf
+        |   // special case: single element is not a set
+            (LPAREN setElement RPAREN)=> LPAREN! setElement RPAREN! 
+        |   set
 		)
+        ( subrule=ebnfSuffix[#n] {#notSet = subrule;} )?
+        {#notSet.setLine(line); #notSet.setColumn(col);}
 	;
 
 /** Match two or more set elements */
@@ -386,8 +398,7 @@ set	:   LPAREN! s:setNoParens RPAREN!
 
 setNoParens
 {Token startingToken = LT(1);}
-    :   {!currentRuleName.equals(Grammar.TOKEN_RULENAME)}?
-    	setElement (OR! setElement)+
+    :   setElement (OR! setElement)+
         {
         GrammarAST ast = new GrammarAST();
 		ast.initialize(new TokenWithIndex(SET, "SET"));

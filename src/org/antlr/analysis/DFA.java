@@ -346,8 +346,7 @@ public class DFA {
 
     public DFAState newState() {
         DFAState n = new DFAState(this);
-        int state = stateCounter;
-        n.stateNumber = state;
+        n.stateNumber = stateCounter;
         stateCounter++;
         return n;
     }

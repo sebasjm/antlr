@@ -110,7 +110,7 @@ this.showActions = showActions;
 grammar
     :   (headerSpec)*
 	    ( #( LEXER_GRAMMAR grammarSpec["lexer " ] )
-	    | #( PARSER_GRAMMAR grammarSpec["parser"] )
+	    | #( PARSER_GRAMMAR grammarSpec["parser "] )
 	    | #( TREE_GRAMMAR grammarSpec["tree "] )
 	    | #( COMBINED_GRAMMAR grammarSpec[""] )
 	    )
@@ -150,18 +150,20 @@ optionValue
 	|   s:STRING_LITERAL {out(#s.getText());}
 	|	c:CHAR_LITERAL   {out(#c.getText());}
 	|	i:INT            {out(#i.getText());}
-	|   charSet
+//	|   charSet
 	;
 
+/*
 charSet
 	:   #( CHARSET charSetElement )
 	;
 
 charSetElement
-	:   c:CHAR_LITERAL
+	:   c:CHAR_LITERAL {out(#c.getText());}
 	|   #( OR c1:CHAR_LITERAL c2:CHAR_LITERAL )
 	|   #( RANGE c3:CHAR_LITERAL c4:CHAR_LITERAL )
 	;
+*/
 
 tokensSpec
 	:	#( TOKENS ( tokenSpec )+ )

@@ -576,6 +576,142 @@ public class TestNFAConstruction extends TestSuite {
 		checkRule(g, "e", expecting);
 	}
 
+	public void testNotSet() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"tokens { A; B; C; }\n"+
+			"a : ~A ;\n");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2-B..C->.s3\n" +
+			".s3->:s4\n" +
+			":s4-<EOF>->.s5\n";
+		checkRule(g, "a", expecting);
+
+		String expectingGrammarStr =
+			"1:8: parser grammar P;\n" +
+			"a : ~ A ;";
+		assertEqual(g.toString(), expectingGrammarStr);
+	}
+
+	public void testNotSingletonBlockSet() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"tokens { A; B; C; }\n"+
+			"a : ~(A) ;\n");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2-B..C->.s3\n" +
+			".s3->:s4\n" +
+			":s4-<EOF>->.s5\n";
+		checkRule(g, "a", expecting);
+
+		String expectingGrammarStr =
+			"1:8: parser grammar P;\n" +
+			"a : ~ A ;";
+		assertEqual(g.toString(), expectingGrammarStr);
+	}
+
+	public void testNotCharSet() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"A : ~'3' ;\n");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2-{'\\u0000'..'2', '4'..'\\uFFFE'}->.s3\n" +
+			".s3->:s4\n" +
+			":s4-<EOT>->.s5\n";
+		checkRule(g, "A", expecting);
+
+		String expectingGrammarStr =
+			"1:7: lexer grammar P;\n" +
+			"A : ~ '3' ;";
+		assertEqual(g.toString(), expectingGrammarStr);
+	}
+
+	public void testNotBlockSet() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"A : ~('3'|'b') ;\n");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2-{'\\u0000'..'2', '4'..'a', 'c'..'\\uFFFE'}->.s3\n" +
+			".s3->:s4\n" +
+			":s4-<EOT>->.s5\n";
+		checkRule(g, "A", expecting);
+
+		String expectingGrammarStr =
+			"1:7: lexer grammar P;\n" +
+			"A : ~ ('3'|'b');";
+		assertEqual(g.toString(), expectingGrammarStr);
+	}
+
+	public void testNotSetLoop() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"A : ~('3')* ;\n");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2->.s3\n" +
+			".s2->.s9\n" +
+			".s3->.s4\n" +
+			".s4-{'\\u0000'..'2', '4'..'\\uFFFE'}->.s5\n" +
+			".s5->.s3\n" +
+			".s5->.s6\n" +
+			".s6->:s7\n" +
+			".s9->.s6\n" +
+			":s7-<EOT>->.s8\n";
+		checkRule(g, "A", expecting);
+
+		String expectingGrammarStr =
+			"1:7: lexer grammar P;\n" +
+			"A : (~ '3' )* ;";
+		assertEqual(g.toString(), expectingGrammarStr);
+	}
+
+	public void testNotBlockSetLoop() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"A : ~('3'|'b')* ;\n");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2->.s3\n" +
+			".s2->.s9\n" +
+			".s3->.s4\n" +
+			".s4-{'\\u0000'..'2', '4'..'a', 'c'..'\\uFFFE'}->.s5\n" +
+			".s5->.s3\n" +
+			".s5->.s6\n" +
+			".s6->:s7\n" +
+			".s9->.s6\n" +
+			":s7-<EOT>->.s8\n";
+		checkRule(g, "A", expecting);
+
+		String expectingGrammarStr =
+			"1:7: lexer grammar P;\n" +
+			"A : (~ ('3'|'b'))* ;";
+		assertEqual(g.toString(), expectingGrammarStr);
+	}
+
+	public void testSetsInCombinedGrammarSentToLexer() throws Exception {
+		// not sure this belongs in this test suite, but whatever.
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"A : '{' ~('}')* '}';\n");
+		String result = g.getLexerGrammar();
+		String expecting =
+			"header {}\n" +
+			"lexer grammar tLexer;\n" +
+			"\n" +
+			"A : '{' (~ '}' )* '}' ;";
+		assertEqual(result, expecting);
+	}
+
 	public void testEscapedCharLiteral() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+

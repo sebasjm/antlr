@@ -182,6 +182,7 @@ public abstract class Lexer implements TokenSource {
 	 */
 	public void recover(RecognitionException re) {
 		System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
+		//re.printStackTrace();
 		input.consume();
 	}
 

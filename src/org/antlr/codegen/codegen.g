@@ -451,8 +451,6 @@ element returns [StringTemplate code=null]
 }
     :   code=atom[null]
     |   #(  n:NOT
-            {code = getTokenElementST("matchSet", "set", (GrammarAST)#n.getFirstChild(), #ast, null);}
-
             (  #( c:CHAR_LITERAL (ast1:ast_suffix)? )
 	           {
 	            int ttype=0;
@@ -492,7 +490,11 @@ element returns [StringTemplate code=null]
                }
             )
             {
-            //code.setAttribute("not", "Not");
+            code = getTokenElementST("matchSet",
+                        "set",
+                        (GrammarAST)#n.getFirstChild(),
+                        ast,
+                        null);
             code.setAttribute("s", generator.genSetExpr(templates,elements,1,false));
 		 	code.setAttribute("elementIndex", ((TokenWithIndex)#n.getToken()).getIndex());
 			if ( grammar.type!=Grammar.LEXER ) {

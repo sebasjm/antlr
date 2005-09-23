@@ -235,8 +235,12 @@ public class DFAState extends State {
      *  Single element labels are treated as sets to make the code uniform.
      */
     protected void addReachableLabel(Label label) {
-        //System.out.println("addReachableLabel: "+label.getSet().toString(dfa.getNFA().getGrammar()));
-        if ( reachableLabels.contains(label) ) { // exact label present
+        /*
+		System.out.println("addReachableLabel to state "+dfa.decisionNumber+"."+stateNumber+": "+label.getSet().toString(dfa.nfa.grammar));
+		System.out.println("start of add to state "+dfa.decisionNumber+"."+stateNumber+": " +
+				"reachableLabels="+reachableLabels.toString());
+        */
+		if ( reachableLabels.contains(label) ) { // exact label present
             return;
         }
         IntSet t = label.getSet();
@@ -256,11 +260,11 @@ public class DFAState extends State {
             IntSet s_i = rl.getSet();
             IntSet intersection = s_i.and(t);
             /*
-            System.out.println(label.toString(dfa.getNFA().getGrammar())+" & "+
-                    rl.toString(dfa.getNFA().getGrammar())+"="+
-                    intersection.toString(dfa.getNFA().getGrammar()));
+			System.out.println("comparing ["+i+"]: "+label.toString(dfa.nfa.grammar)+" & "+
+                    rl.toString(dfa.nfa.grammar)+"="+
+                    intersection.toString(dfa.nfa.grammar));
             */
-            if ( intersection.isNil() ) {
+			if ( intersection.isNil() ) {
                 continue;
             }
 
@@ -273,6 +277,7 @@ public class DFAState extends State {
 
             // Compute s_i-t to see what is in current set and not in incoming
             IntSet existingMinusNewElements = s_i.subtract(t);
+			//System.out.println(s_i+"-"+t+"="+existingMinusNewElements);
             if ( !existingMinusNewElements.isNil() ) {
                 // found a new character class, add to the end (doesn't affect
                 // outer loop duration due to n computation a priori.
@@ -280,10 +285,10 @@ public class DFAState extends State {
                 reachableLabels.add(newLabel);
             }
 
-            /*
+			/*
             System.out.println("after collision, " +
                     "reachableLabels="+reachableLabels.toString());
-            */
+					*/
 
             // anything left to add to the reachableLabels?
             remainder = t.subtract(s_i);
@@ -294,9 +299,18 @@ public class DFAState extends State {
             t = remainder;
         }
         if ( !remainder.isNil() ) {
-            Label newLabel = new Label(remainder);
+			/*
+			System.out.println("before add remainder to state "+dfa.decisionNumber+"."+stateNumber+": " +
+					"reachableLabels="+reachableLabels.toString());
+			System.out.println("remainder state "+dfa.decisionNumber+"."+stateNumber+": "+remainder.toString(dfa.nfa.grammar));
+            */
+			Label newLabel = new Label(remainder);
             reachableLabels.add(newLabel);
         }
+		/*
+		System.out.println("#END of add to state "+dfa.decisionNumber+"."+stateNumber+": " +
+				"reachableLabels="+reachableLabels.toString());
+				*/
     }
 
     public OrderedHashSet getReachableLabels() {

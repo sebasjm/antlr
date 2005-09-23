@@ -540,35 +540,35 @@ charRef(char) ::= "match(<char>);"
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 /** For now, sets are interval tests and must be tested inline */
-matchSet(s,label,elementIndex,not) ::= <<
+matchSet(s,label,elementIndex) ::= <<
 <if(label)>
 <label>=input.LT(1);<\n>
 <endif>
-if ( <if(not)>!(<s>)<else><s><endif> ) input.consume();
+if ( <s> ) input.consume();
 else {
-    Mismatched<not>SetException mse =
-        new Mismatched<not>SetException(null,input);
+    MismatchedSetException mse =
+        new MismatchedSetException(null,input);
 <if(debug)>
     dbg.recognitionException(mse);<\n>
 <endif>
 <if(LEXER)>
     recover(mse);
 <else>
-    recoverFrom<not>MismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
+    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
 <endif>
     throw mse;
 }<\n>
 >>
 
-matchSetAST(s,label,elementIndex,not) ::= <<
+matchSetAST(s,label,elementIndex) ::= <<
 <label>=input.LT(1);
-if ( <if(not)>!(<s>)<else><s><endif> ) {
+if ( <s> ) {
     adaptor.addChild(root_<blockLevel>, adaptor.create(<label>));
     input.consume();
 }
 else {
-    Mismatched<not>SetException mse =
-        new Mismatched<not>SetException(null,input);
+    MismatchedSetException mse =
+        new MismatchedSetException(null,input);
 <if(debug)>
     dbg.recognitionException(mse);<\n>
 <endif>
@@ -577,15 +577,15 @@ else {
 }<\n>
 >>
 
-matchSetASTRoot(s,label,elementIndex,not) ::= <<
+matchSetASTRoot(s,label,elementIndex) ::= <<
 <label>=input.LT(1);
-if ( <if(not)>!(<s>)<else><s><endif> ) {
+if ( <s> ) {
     root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_<blockLevel>);
     input.consume();
 }
 else {
-    Mismatched<not>SetException mse =
-        new Mismatched<not>SetException(null,input);
+    MismatchedSetException mse =
+        new MismatchedSetException(null,input);
 <if(debug)>
     dbg.recognitionException(mse);<\n>
 <endif>
@@ -594,15 +594,15 @@ else {
 }<\n>
 >>
 
-matchSetASTRuleRoot(s,label,elementIndex,not) ::= <<
+matchSetASTRuleRoot(s,label,elementIndex) ::= <<
 <label>=input.LT(1);<\n>
-if ( <if(not)>!(<s>)<else><s><endif> ) {
+if ( <s> ) {
     root_0 = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_0);
     input.consume();
 }
 else {
-    Mismatched<not>SetException mse =
-        new Mismatched<not>SetException(null,input);
+    MismatchedSetException mse =
+        new MismatchedSetException(null,input);
 <if(debug)>
     dbg.recognitionException(mse);<\n>
 <endif>

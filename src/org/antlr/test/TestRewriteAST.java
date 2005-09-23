@@ -17,7 +17,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID INT -> ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34");
@@ -32,7 +32,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID -> ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc");
@@ -47,7 +47,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : 'c' -> 'c';\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "c");
@@ -62,7 +62,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : \"ick\" -> \"ick\";\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "ick");
@@ -78,7 +78,7 @@ public class TestRewriteAST extends TestSuite {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc");
@@ -93,7 +93,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID INT -> INT ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34");
@@ -109,7 +109,7 @@ public class TestRewriteAST extends TestSuite {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34");
@@ -124,7 +124,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID INT -> ^(INT ID);\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34");
@@ -139,7 +139,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : \"void\" ID INT -> \"void\" ^(INT ID);\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "void abc 34");
@@ -156,7 +156,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID INT ID INT -> ^( DUH ID ^( DUH INT) )+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 1 b 2");
@@ -171,7 +171,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID -> ID? ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc");
@@ -186,7 +186,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID ID -> ID* ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b");
@@ -201,7 +201,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID ID -> ID+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b");
@@ -217,7 +217,7 @@ public class TestRewriteAST extends TestSuite {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc");
@@ -233,7 +233,7 @@ public class TestRewriteAST extends TestSuite {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b");
@@ -249,7 +249,7 @@ public class TestRewriteAST extends TestSuite {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b");
@@ -264,7 +264,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID -> {true}? ID -> ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc");
@@ -279,7 +279,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : ID -> {false}? ID -> ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc");
@@ -297,7 +297,7 @@ public class TestRewriteAST extends TestSuite {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 2");
@@ -315,7 +315,7 @@ public class TestRewriteAST extends TestSuite {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 2");
@@ -331,7 +331,7 @@ public class TestRewriteAST extends TestSuite {
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "-34");
@@ -347,7 +347,7 @@ public class TestRewriteAST extends TestSuite {
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "+ 34");
@@ -363,7 +363,7 @@ public class TestRewriteAST extends TestSuite {
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "int a,b,c;");
@@ -379,7 +379,7 @@ public class TestRewriteAST extends TestSuite {
 			"type : \"int\" | \"float\" ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "var a:int; b:float;");
@@ -396,7 +396,7 @@ public class TestRewriteAST extends TestSuite {
 			"type : \"int\" | \"float\" ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a,b,c");
@@ -413,7 +413,7 @@ public class TestRewriteAST extends TestSuite {
 			"type : \"int\" | \"float\" ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a,b,c");
@@ -430,7 +430,7 @@ public class TestRewriteAST extends TestSuite {
 			"type : \"int\" | \"float\" ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "{a b c}");
@@ -447,7 +447,7 @@ public class TestRewriteAST extends TestSuite {
 			"type : \"int\" | \"float\" ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "{a b c}");
@@ -466,7 +466,7 @@ public class TestRewriteAST extends TestSuite {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 1 2");
@@ -484,7 +484,7 @@ public class TestRewriteAST extends TestSuite {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 1 2 3");
@@ -506,7 +506,7 @@ public class TestRewriteAST extends TestSuite {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "int a; int b=3;");
@@ -525,7 +525,7 @@ public class TestRewriteAST extends TestSuite {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b c d; 42");
@@ -541,7 +541,7 @@ public class TestRewriteAST extends TestSuite {
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "3");
@@ -557,7 +557,7 @@ public class TestRewriteAST extends TestSuite {
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "3");
@@ -574,7 +574,7 @@ public class TestRewriteAST extends TestSuite {
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "3+4+5");
@@ -591,7 +591,7 @@ public class TestRewriteAST extends TestSuite {
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "3");
@@ -610,7 +610,7 @@ public class TestRewriteAST extends TestSuite {
 			"B : 'b' ;\n" +
 			"C : 'c' ;\n" +
 			"D : 'd' ;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a a b b b c c c d");
@@ -630,7 +630,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : INT -> ugh ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = new Tool();
@@ -659,7 +659,7 @@ public class TestRewriteAST extends TestSuite {
 			"b : 'b' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = new Tool();
@@ -687,7 +687,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : INT -> ICK ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = new Tool();
@@ -715,7 +715,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : INT -> $foo ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = new Tool();
@@ -743,7 +743,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : INT -> 'a' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = new Tool();
@@ -771,7 +771,7 @@ public class TestRewriteAST extends TestSuite {
 			"a : INT -> \"foo\" ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = new Tool();

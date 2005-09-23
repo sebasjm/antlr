@@ -156,6 +156,36 @@ public class TestCharDFAConversion extends TestSuite {
 		checkDecision(g, 2, expecting, null);
 	}
 
+	public void testAdjacentNotCharLoops() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : (~'r')+ ;\n" +
+			"B : (~'s')+ ;\n");
+		String expecting =
+			".s0-'r'->:s3=>2\n" +
+			".s0-'s'->:s2=>1\n" +
+			".s0-{'\\u0000'..'q', 't'..'\\uFFFE'}->.s1\n" +
+			".s1-'r'->:s3=>2\n" +
+			".s1-<EOT>->:s2=>1\n" +
+			".s1-{'\\u0000'..'q', 't'..'\\uFFFE'}->.s1\n";
+		checkDecision(g, 3, expecting, null);
+	}
+
+	public void testNonAdjacentNotCharLoops() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : (~'r')+ ;\n" +
+			"B : (~'t')+ ;\n");
+		String expecting =
+			".s0-'r'->:s3=>2\n" +
+			".s0-'t'->:s2=>1\n" +
+			".s0-{'\\u0000'..'q', 's', 'u'..'\\uFFFE'}->.s1\n" +
+			".s1-'r'->:s3=>2\n" +
+			".s1-<EOT>->:s2=>1\n" +
+			".s1-{'\\u0000'..'q', 's', 'u'..'\\uFFFE'}->.s1\n";
+		checkDecision(g, 3, expecting, null);
+	}
+
 	// N O N G R E E D Y
 
 	public void testNonGreedy() throws Exception {

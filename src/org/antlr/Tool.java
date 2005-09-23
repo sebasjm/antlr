@@ -55,6 +55,10 @@ public class Tool {
 	protected boolean profile = false;
 	protected boolean report = false;
 
+	// the internal options are for my use on the command line during dev
+
+	public static boolean internalOption_GrammarTree = false;
+
     public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
 						  VERSION + " (July 5, 2005)  1989-2005");
@@ -136,6 +140,9 @@ public class Tool {
 			}
 			else if (args[i].equals("-profile")) {
 				profile=true;
+			}
+			else if (args[i].equals("-Igrtree")) {
+				internalOption_GrammarTree=true; // print grammar tree
 			}
             else {
                 if (args[i].charAt(0) != '-') {
