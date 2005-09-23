@@ -371,7 +371,9 @@ public class Grammar {
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
-		//System.out.println(grammarTree.toStringList());
+		if ( Tool.internalOption_GrammarTree ) {
+			System.out.println(grammarTree.toStringList());
+		}
 
 		/*
 		System.out.println("### print grammar");
@@ -473,9 +475,13 @@ public class Grammar {
 		tokenBuffer.discard(ANTLRParser.COMMENT);
 		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
         ANTLRParser parser = new ANTLRParser(tokenBuffer);
+		parser.gtype = ANTLRParser.LEXER_GRAMMAR;
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
         try {
             parser.rule();
+			if ( Tool.internalOption_GrammarTree ) {
+				System.out.println("Tokens rule: "+parser.getAST().toStringTree());
+			}
 			GrammarAST p = grammarTree;
 			while ( p.getType()!=ANTLRParser.LEXER_GRAMMAR ) {
 				p = (GrammarAST)p.getNextSibling();
