@@ -102,6 +102,7 @@ retry:
 
     <rules; separator="\n\n">
 
+    <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
 }
 >>
@@ -151,6 +152,8 @@ class <name> extends <if(debug)>Debug<endif><superClass> {
 
     <rules; separator="\n\n">
 
+    <! define a singleton instance for each cyclic DFA then define DFAs !>
+    <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
 
     <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
@@ -1041,21 +1044,21 @@ dfaDecision(decisionNumber,description) ::= <<
 <if(debug)>
 try {
     isCyclicDecision = true;
-    alt<decisionNumber> = DFA<decisionNumber>.predict(input);
+    alt<decisionNumber> = dfa<decisionNumber>.predict(input);
 }
 catch (NoViableAltException nvae) {
     dbg.recognitionException(nvae);
     throw nvae;
 }
 <else>
-alt<decisionNumber> = DFA<decisionNumber>.predict(input);
+alt<decisionNumber> = dfa<decisionNumber>.predict(input);
 <endif>
 >>
 
 /** The overall cyclic DFA chunk; contains all the DFA states */
 cyclicDFA(className,decisionNumber,states,description) ::= <<
-static class DFA<decisionNumber> extends DFA {
-    public static int predict(IntStream input) throws RecognitionException {
+class DFA<decisionNumber> extends DFA {
+    public int predict(IntStream input) throws RecognitionException {
         return predict(input, s0);
     }
     <states>
@@ -1064,7 +1067,7 @@ static class DFA<decisionNumber> extends DFA {
 
 /** A state in a cyclic DFA */
 cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
-static DFA.State s<stateNumber> = new DFA.State() {
+DFA.State s<stateNumber> = new DFA.State() {
     public DFA.State transition(IntStream input) throws RecognitionException {
         int LA<decisionNumber>_<stateNumber> = input.LA(1);
         <edges>
@@ -1079,7 +1082,7 @@ static DFA.State s<stateNumber> = new DFA.State() {
 
 /** An accept state for a cyclic DFA */
 cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
-static DFA.State s<stateNumber> = new DFA.State() {{alt=<predictAlt>;}};<\n>
+DFA.State s<stateNumber> = new DFA.State() {{alt=<predictAlt>;}};<\n>
 >>
 
 /** Just like a fixed DFA edge, test the lookahead and indicate what
@@ -1104,7 +1107,7 @@ return s<targetStateNumber>;<\n>
 
 cyclicDFAStateSwitch(stateNumber,labels,edges,
                      needErrorClause,EOTTargetStateNumber) ::= <<
-static DFA.State s<stateNumber> = new DFA.State() {
+DFA.State s<stateNumber> = new DFA.State() {
     public DFA.State transition(IntStream input) throws RecognitionException {
         switch ( input.LA(1) ) {
         <edges; separator="\n">
