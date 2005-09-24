@@ -142,11 +142,18 @@ public class TestCompileAndExecSupport {
 											  String parserStartRuleName,
 											  String treeParserStartRuleName)
 	{
-		writeTestFile(parserName,
-					  treeParserName,
-					  lexerName,
-					  parserStartRuleName,
-					  treeParserStartRuleName);
+		if ( treeParserName==null ) {
+			writeTestFile(parserName,
+						  lexerName,
+						  parserStartRuleName);
+		}
+		else {
+			writeTreeTestFile(parserName,
+							  treeParserName,
+							  lexerName,
+							  parserStartRuleName,
+							  treeParserStartRuleName);
+		}
 
 		compile("Test.java");
 		try {
@@ -216,10 +223,34 @@ public class TestCompileAndExecSupport {
 	}
 
 	public static void writeTestFile(String parserName,
-									 String treeParserName,
 									 String lexerName,
-									 String parserStartRuleName,
-									 String treeParserStartRuleName)
+									 String parserStartRuleName)
+	{
+		StringTemplate outputFileST = new StringTemplate(
+			"import org.antlr.runtime.*;\n" +
+			"import org.antlr.runtime.tree.*;\n" +
+			"\n" +
+			"public class Test {\n" +
+			"    public static void main(String[] args) throws Exception {\n" +
+			"        CharStream input = new ANTLRFileStream(args[0]);\n" +
+			"        $lexerName$ lex = new $lexerName$(input);\n" +
+			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+			"        $parserName$ parser = new $parserName$(tokens);\n" +
+			"        parser.$parserStartRuleName$();\n" +
+			"    }\n" +
+			"}"
+			);
+		outputFileST.setAttribute("parserName", parserName);
+		outputFileST.setAttribute("lexerName", lexerName);
+		outputFileST.setAttribute("parserStartRuleName", parserStartRuleName);
+		writeFile(tmpdir, "Test.java", outputFileST.toString());
+	}
+
+	public static void writeTreeTestFile(String parserName,
+										 String treeParserName,
+										 String lexerName,
+										 String parserStartRuleName,
+										 String treeParserStartRuleName)
 	{
 		StringTemplate outputFileST = new StringTemplate(
 			"import org.antlr.runtime.*;\n" +
