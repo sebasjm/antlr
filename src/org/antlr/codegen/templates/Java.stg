@@ -747,6 +747,16 @@ match(input, Token.DOWN, null);
 match(input, Token.UP, null);
 >>
 
+/** Every predicate is used as a validating predicate (even when it is
+ *  also hoisted into a prediction expression).
+ */
+validateSemanticPredicate(pred) ::= <<
+if ( !(<if(debug)>evalPredicate(<pred>,"<pred>")<else><pred><endif>) ) {
+    throw new FailedPredicateException(input, "<ruleName>", "<pred>");
+}
+>>
+
+
 // R e w r i t e
 
 rewriteCode(
@@ -1137,7 +1147,7 @@ orPredicates(left,right) ::= "(<left>||<right>)"
 
 notPredicate(pred) ::= "!(<pred>)"
 
-singlePredicate(pred) ::= <<
+evalPredicate(pred) ::= <<
 <if(debug)>
 evalPredicate(<pred>,"<pred>")
 <else>

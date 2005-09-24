@@ -173,6 +173,11 @@ public abstract class Lexer implements TokenSource {
 							   "; expecting set '"+(char)mre.a+"'..'"+
 							   (char)mre.b+"'");
 		}
+		else if ( e instanceof FailedPredicateException ) {
+			FailedPredicateException fpe = (FailedPredicateException)e;
+			System.err.println("rule "+fpe.ruleName+" failed predicate: {"+
+							   fpe.predicateText+"}?");			
+		}
 	}
 
 	/** Lexers can normally match any char in it's vocabulary after matching

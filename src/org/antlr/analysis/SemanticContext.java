@@ -98,7 +98,7 @@ public abstract class SemanticContext {
         }
 
         public StringTemplate genExpr(StringTemplateGroup templates) {
-			StringTemplate eST = templates.getInstanceOf("singlePredicate");
+			StringTemplate eST = templates.getInstanceOf("evalPredicate");
 			eST.setAttribute("pred", this.toString());
             return eST;
         }

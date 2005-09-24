@@ -525,7 +525,11 @@ element returns [StringTemplate code=null]
                                   generator.translateAction(currentRuleName,#act));
         }
 
-    |   SEMPRED
+    |   sp:SEMPRED
+        {
+        code = templates.getInstanceOf("validateSemanticPredicate");
+        code.setAttribute("pred", #sp.getText());
+        }
 
     |   EPSILON
     ;

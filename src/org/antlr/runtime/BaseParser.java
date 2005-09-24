@@ -128,6 +128,11 @@ public abstract class BaseParser {
 							   e.token+
 							   "; expecting set "+mse.expecting);
 		}
+		else if ( e instanceof FailedPredicateException ) {
+			FailedPredicateException fpe = (FailedPredicateException)e;
+			System.err.println("rule "+fpe.ruleName+" failed predicate: {"+
+							   fpe.predicateText+"}?");
+		}
 	}
 
 	/** Recover from an error found on the input stream.  Mostly this is
