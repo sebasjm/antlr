@@ -371,7 +371,7 @@ public class Grammar {
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar();
 		grammarTree = (GrammarAST)parser.getAST();
-		if ( Tool.internalOption_GrammarTree ) {
+		if ( Tool.internalOption_PrintGrammarTree ) {
 			System.out.println(grammarTree.toStringList());
 		}
 
@@ -479,7 +479,7 @@ public class Grammar {
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
         try {
             parser.rule();
-			if ( Tool.internalOption_GrammarTree ) {
+			if ( Tool.internalOption_PrintGrammarTree ) {
 				System.out.println("Tokens rule: "+parser.getAST().toStringTree());
 			}
 			GrammarAST p = grammarTree;

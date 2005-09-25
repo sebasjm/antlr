@@ -537,7 +537,12 @@ root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** match a character */
-charRef(char) ::= "match(<char>);"
+charRef(char,label) ::= <<
+<if(label)>
+int <label> = input.LA(1);<\n>
+<endif>
+match(<char>);
+>>
 
 /** match a character range */
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
@@ -615,7 +620,15 @@ else {
 >>
 
 /** Match a string literal */
-lexerStringRef(string) ::= "match(<string>);"
+lexerStringRef(string,label) ::= <<
+<if(label)>
+int <label>Start = getCharIndex();
+match(<string>);
+Token <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<else>
+match(<string>);<\n>
+<endif>
+>>
 
 wildcard(label,elementIndex) ::= <<
 <if(label)>
@@ -646,7 +659,12 @@ root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** Match . wildcard */
-wildcardChar(elementIndex) ::= "matchAny();"
+wildcardChar(elementIndex) ::= <<
+<if(label)>
+int <label> = input.LA(1);<\n>
+<endif>
+matchAny();
+>>
 
 /** Match a rule reference by invoking it possibly with arguments
  *  and a return value or values.
@@ -737,7 +755,15 @@ following.pop();
 >>
 
 /** A lexer rule reference */
-lexerRuleRef(rule,args) ::= "m<rule>(<args>);"
+lexerRuleRef(rule,label,args) ::= <<
+<if(label)>
+int <label>Start = getCharIndex();
+m<rule>(<args>);
+Token <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<else>
+m<rule>(<args>);
+<endif>
+>>
 
 /** match ^(root children) in tree parser */
 tree(root, children) ::= <<

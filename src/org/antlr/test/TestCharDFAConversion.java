@@ -32,6 +32,7 @@ import org.antlr.test.unit.FailedAssertionException;
 import org.antlr.tool.*;
 import org.antlr.analysis.State;
 import org.antlr.analysis.DFA;
+import org.antlr.analysis.DFAOptimizer;
 import org.antlr.codegen.CodeGenerator;
 
 import java.util.List;
@@ -184,6 +185,27 @@ public class TestCharDFAConversion extends TestSuite {
 			".s1-<EOT>->:s2=>1\n" +
 			".s1-{'\\u0000'..'q', 's', 'u'..'\\uFFFE'}->.s1\n";
 		checkDecision(g, 3, expecting, null);
+	}
+
+	public void testLoopsWithOptimizedOutExitBranches() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'x'* ~'x'+ ;\n");
+		String expecting =
+			".s0-'x'->:s2=>1\n" +
+			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>2\n";
+		checkDecision(g, 1, expecting, null);
+
+		// The optimizer yanks out all exit branches from EBNF blocks
+		// This is ok because we've already verified there are no problems
+		// with the enter/exit decision
+		DFAOptimizer optimizer = new DFAOptimizer(g);
+		optimizer.optimize();
+		FASerializer serializer = new FASerializer(g);
+		DFA dfa = g.getLookaheadDFA(1);
+		String result = serializer.serialize(dfa.startState);
+		expecting = ".s0-'x'->:s1=>1\n";
+		assertEqual(result, expecting);
 	}
 
 	// N O N G R E E D Y

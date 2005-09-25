@@ -128,11 +128,12 @@ public class DOTGenerator {
         // make a DOT edge for each transition
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
+			//System.out.println("dfa "+s+" edge from s"+s.stateNumber+" ["+i+"] of "+s.getNumberOfTransitions());
 			if ( STRIP_NONREDUCED_STATES ) {
 				if ( edge.target instanceof DFAState &&
 					((DFAState)edge.target).getAcceptStateReachable()!=DFA.REACHABLE_YES )
 				{
-					continue; // don't generate nodes for terminal states
+ 					continue; // don't generate nodes for terminal states
 				}
 			}
             st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");

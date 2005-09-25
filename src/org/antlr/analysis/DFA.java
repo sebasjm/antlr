@@ -29,6 +29,7 @@ package org.antlr.analysis;
 
 import org.antlr.runtime.IntStream;
 import org.antlr.tool.*;
+import org.antlr.Tool;
 
 import java.util.*;
 
@@ -128,6 +129,13 @@ public class DFA {
 		}
 		//long stop = System.currentTimeMillis();
 		//System.out.println("verify cost: "+(int)(stop-start)+" ms");
+
+		if ( Tool.internalOption_PrintDFA ) {
+			System.out.println("DFA d="+decisionNumber);
+			FASerializer serializer = new FASerializer(nfa.grammar);
+			String result = serializer.serialize(startState);
+			System.out.println(result);
+		}
     }
 
 	public int predict(IntStream input) {

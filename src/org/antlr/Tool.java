@@ -57,11 +57,12 @@ public class Tool {
 
 	// the internal options are for my use on the command line during dev
 
-	public static boolean internalOption_GrammarTree = false;
+	public static boolean internalOption_PrintGrammarTree = false;
+	public static boolean internalOption_PrintDFA = false;
 
     public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
-						  VERSION + " (July 5, 2005)  1989-2005");
+						  VERSION + " (?, 2005)  1989-2005");
 		Tool antlr = new Tool(args);
 		antlr.process();
 		System.exit(0);
@@ -142,7 +143,13 @@ public class Tool {
 				profile=true;
 			}
 			else if (args[i].equals("-Igrtree")) {
-				internalOption_GrammarTree=true; // print grammar tree
+				internalOption_PrintGrammarTree=true; // print grammar tree
+			}
+			else if (args[i].equals("-Idfa")) {
+				internalOption_PrintDFA=true;
+			}
+			else if (args[i].equals("-Inoprune")) {
+				DFAOptimizer.PRUNE_EBNF_EXIT_BRANCHES=false;
 			}
             else {
                 if (args[i].charAt(0) != '-') {
