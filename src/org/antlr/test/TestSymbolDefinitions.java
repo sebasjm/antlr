@@ -159,6 +159,48 @@ public class TestSymbolDefinitions extends TestSuite {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testEmptyNotChar() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar foo;\n" +
+				"a : (~'x')+ ;\n");
+		g.createNFAs();
+		Object expectedArg = "'x'";
+		int expectedMsgID = ErrorManager.MSG_EMPTY_COMPLEMENT;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testEmptyNotToken() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar foo;\n" +
+				"a : (~A)+ ;\n");
+		g.createNFAs();
+		Object expectedArg = "A";
+		int expectedMsgID = ErrorManager.MSG_EMPTY_COMPLEMENT;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testEmptyNotSet() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar foo;\n" +
+				"a : (~(A|B))+ ;\n");
+		g.createNFAs();
+		Object expectedArg = null;
+		int expectedMsgID = ErrorManager.MSG_EMPTY_COMPLEMENT;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
 	public void testStringLiteralInParserTokensSection() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread

@@ -171,6 +171,13 @@ UNDEFINED_LABEL_REF_IN_REWRITE(file,line,col,arg) ::=
   "<loc()>reference to undefined label in rewrite rule: $<arg>"
 NO_GRAMMAR_START_RULE (file,line,col,arg) ::=
   "grammar <arg>: no start rule (no rule can obviously be followed by EOF)"
+EMPTY_COMPLEMENT(file,line,col,arg) ::= <<
+<if(arg)>
+<loc()>set complement ~<arg> is empty
+<else>
+<loc()>set complement is empty
+<endif>
+>>
 
 // GRAMMAR WARNINGS
 

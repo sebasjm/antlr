@@ -260,24 +260,43 @@ element returns [StateCluster g=null]
 	           {
 	            int ttype=0;
      			if ( grammar.type==Grammar.LEXER ) {
-        			ttype = Grammar.getCharValueFromGrammarCharLiteral(c.getText());
+        			ttype = Grammar.getCharValueFromGrammarCharLiteral(#c.getText());
      			}
      			else {
-        			ttype = grammar.getTokenType(c.getText());
+        			ttype = grammar.getTokenType(#c.getText());
         		}
-	            g=factory.build_Set(grammar.complement(ttype));
+                IntSet notAtom = grammar.complement(ttype);
+                if ( notAtom.isNil() ) {
+                    ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
+					  			              grammar,
+								              #c.token,
+									          #c.getText());
+                }
+	            g=factory.build_Set(notAtom);
 	           }
             |  t:TOKEN_REF
 	           {
 	           int ttype = grammar.getTokenType(t.getText());
-	           g=factory.build_Set(grammar.complement(ttype));
+               IntSet notAtom = grammar.complement(ttype);
+               if ( notAtom.isNil() ) {
+                  ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
+				  			              grammar,
+							              #t.token,
+								          #t.getText());
+               }
+	           g=factory.build_Set(notAtom);
 	           }
             |  g=set
 	           {
 	           GrammarAST stNode = (GrammarAST)n.getFirstChild();
-               IntSet st = grammar.complement(stNode.getSetValue());
-               stNode.setSetValue(st);
-	           g=factory.build_Set(st);
+               IntSet notSet = grammar.complement(stNode.getSetValue());
+               stNode.setSetValue(notSet);
+               if ( notSet.isNil() ) {
+                  ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
+				  			              grammar,
+							              #n.token);
+               }
+	           g=factory.build_Set(notSet);
 	           }
             )
         	{#n.followingNFAState = g.right;}

@@ -206,6 +206,8 @@ CHANGES
 
 3.0ea6 - ??
 
+* ~T where T is the only token yielded an empty set but no error
+
 * Used to generate unreachable message here:
 
   parser grammar t;
