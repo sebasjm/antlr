@@ -659,7 +659,7 @@ root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** Match . wildcard */
-wildcardChar(elementIndex) ::= <<
+wildcardChar(label, elementIndex) ::= <<
 <if(label)>
 int <label> = input.LA(1);<\n>
 <endif>

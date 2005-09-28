@@ -206,6 +206,15 @@ CHANGES
 
 3.0ea6 - ??
 
+* This never exited loop:
+  DATA : (options {greedy=false;}: .* '\n' )* '\n' '.' ;
+  and now it works due to new default nongreedy .*  Also this works:
+  DATA : (options {greedy=false;}: .* '\n' )* '.' ;
+
+* Dot star ".*" syntax didn't work; in lexer it is nongreedy by
+  default.  In parser it is on greedy but also k=1 by default.  Added
+  unit tests.  Added blog entry to describe.
+
 * ~T where T is the only token yielded an empty set but no error
 
 * Used to generate unreachable message here:

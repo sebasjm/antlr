@@ -222,6 +222,58 @@ public class TestCharDFAConversion extends TestSuite {
 		checkDecision(g, 1, expecting, null);
 	}
 
+	public void testNonGreedyWildcardStar() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"SLCMT : \"//\" ( options {greedy=false;} : . )* '\n' ;");
+		String expecting =
+			".s0-'\\n'->:s1=>2\n" +
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testNonGreedyByDefaultWildcardStar() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"SLCMT : \"//\" .* '\n' ;");
+		String expecting =
+			".s0-'\\n'->:s1=>2\n" +
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testNonGreedyWildcardPlus() throws Exception {
+		// same DFA as nongreedy .* but code gen checks number of
+		// iterations at runtime
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"SLCMT : \"//\" ( options {greedy=false;} : . )+ '\n' ;");
+		String expecting =
+			".s0-'\\n'->:s1=>2\n" +
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testNonGreedyByDefaultWildcardPlus() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"SLCMT : \"//\" .+ '\n' ;");
+		String expecting =
+			".s0-'\\n'->:s1=>2\n" +
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testNonGreedyByDefaultWildcardPlusWithParens() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"SLCMT : \"//\" (.)+ '\n' ;");
+		String expecting =
+			".s0-'\\n'->:s1=>2\n" +
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
 	public void testNonWildcardNonGreedy() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+

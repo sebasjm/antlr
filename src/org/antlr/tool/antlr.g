@@ -491,7 +491,10 @@ GrammarAST ebnfRoot=null, subrule=null;
 			|	ast_suffix
 			)?
 
-	|   wi:WILDCARD^ (ast_suffix)?
+	|   wi:WILDCARD^
+    		(	subrule=ebnfSuffix[#wi] {#terminal=subrule;}
+			|	ast_suffix
+			)?
 	;
 
 ast_suffix

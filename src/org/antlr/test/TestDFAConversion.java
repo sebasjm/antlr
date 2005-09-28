@@ -720,6 +720,28 @@ As a result, alternative(s) 2 were disabled for that input
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
+	public void testWildcardStarK1AndNonGreedyByDefaultInParser() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n" +
+			"s : A block B+ EOF ;\n" +
+			"block : L .* R ;");
+		String expecting =
+			".s0-B->:s2=>1\n" +
+			".s0-EOF->:s1=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, 0);
+	}
+
+	public void testWildcardPlusK1AndNonGreedyByDefaultInParser() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n" +
+			"s : A block B+ EOF ;\n" +
+			"block : L .* R ;");
+		String expecting =
+			".s0-B->:s2=>1\n" +
+			".s0-EOF->:s1=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, 0);
+	}
+
 	// S U P P O R T
 
 	public void _template() throws Exception {

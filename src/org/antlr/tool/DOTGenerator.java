@@ -34,6 +34,7 @@ import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.ANTLRParser;
 import org.antlr.misc.Utils;
+import org.antlr.Tool;
 
 import java.util.*;
 import java.io.FileWriter;
@@ -273,20 +274,20 @@ public class DOTGenerator {
             Set configurations = ((DFAState)s).getNFAConfigurations();
             int n = 0;
 			buf.append(s.stateNumber);
-			/*
-			buf.append(": ");
-            for (Iterator it = configurations.iterator(); it.hasNext();) {
-                NFAConfiguration configuration = (NFAConfiguration) it.next();
-                n++;
-                buf.append(configuration.toString());
-                if ( n%5==0 ) {
-                    buf.append(",\\n");
-                }
-                else {
-                    buf.append(", ");
-                }
-            }
-			*/
+			if ( Tool.internalOption_ShowNFConfigsInDFA ) {
+				buf.append(": ");
+				for (Iterator it = configurations.iterator(); it.hasNext();) {
+					NFAConfiguration configuration = (NFAConfiguration) it.next();
+					n++;
+					buf.append(configuration.toString());
+					if ( n%5==0 ) {
+						buf.append(",\\n");
+					}
+					else {
+						buf.append(", ");
+					}
+				}
+			}
             stateLabel = buf.toString();
         }
 		if ( (s instanceof NFAState) && ((NFAState)s).getDecisionASTNode()!=null ) {

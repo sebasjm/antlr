@@ -128,11 +128,14 @@ attrScope
 	;
 
 grammarSpec
-{Map opts=null;}
+{
+Map opts=null;
+Token optionsStartToken=null;
+}
 	:	id:ID
 		(cmt:DOC_COMMENT)?
         //(#(OPTIONS .))? // already parsed these in assign.types.g
-        ( {Token optionsStartToken=((GrammarAST)_t).getToken();}
+        ( {optionsStartToken=((GrammarAST)_t).getToken();}
           opts=optionsSpec {grammar.setOptions(opts, optionsStartToken);}
         )?
         (tokensSpec)?
@@ -197,6 +200,7 @@ rule
 String mod=null;
 String name=null;
 Map opts=null;
+Rule r = null;
 }
     :   #( RULE id:ID
            (mod=modifier)?
@@ -206,7 +210,6 @@ Map opts=null;
 			{
 			name = #id.getText();
 			currentRuleName = name;
-			Rule r = null;
 			if ( Character.isUpperCase(name.charAt(0)) &&
 				 grammar.type==Grammar.COMBINED )
 			{
@@ -341,10 +344,37 @@ element
     |   EPSILON 
     ;
 
-ebnf:   block
+ebnf:   (dotLoop)=> dotLoop // .* or .+
+    |   block
     |   #( OPTIONAL block )
     |   #( CLOSURE block )
     |   #( POSITIVE_CLOSURE block )
+    ;
+
+/** Track the .* and .+ idioms and make them greedy by default.
+ *  If someone specifies an option, it won't match these
+ */
+dotLoop
+{
+    GrammarAST block = (GrammarAST)#dotLoop.getFirstChild();
+}
+    :   (   #( CLOSURE dotBlock )           
+        |   #( POSITIVE_CLOSURE dotBlock )
+        )
+        {
+        Map opts=new HashMap();
+        opts.put("greedy", "false");
+        if ( grammar.type!=Grammar.LEXER ) {
+            // parser grammars assume k=1 for .* loops
+            // otherwise they look til EOF!
+            opts.put("k", new Integer(1));
+        }
+        block.setOptions(grammar,opts);
+        }
+    ;
+
+dotBlock
+    :   #( BLOCK #( ALT WILDCARD EOA ) EOB )
     ;
 
 tree:   #(TREE_BEGIN element (element)*)

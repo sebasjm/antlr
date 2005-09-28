@@ -59,6 +59,8 @@ public class Tool {
 
 	public static boolean internalOption_PrintGrammarTree = false;
 	public static boolean internalOption_PrintDFA = false;
+	public static boolean internalOption_ShowNFConfigsInDFA = false;
+
 
     public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
@@ -157,6 +159,10 @@ public class Tool {
 			else if (args[i].equals("-Idbgconversion")) {
 				NFAToDFAConverter.debug = true;
 			}
+			else if (args[i].equals("-Idfaverbose")) {
+				internalOption_ShowNFConfigsInDFA = true;
+			}
+
             else {
                 if (args[i].charAt(0) != '-') {
                     // Must be the grammar file
