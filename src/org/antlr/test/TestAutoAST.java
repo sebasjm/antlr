@@ -310,6 +310,7 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
+			"s : a ;\n" +
 			"a : atom (\"exp\"^^ a)? ;\n" +
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
@@ -317,7 +318,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "3 exp 4 exp 5");
+												 "s", "3 exp 4 exp 5");
 		String expecting = "(exp 3 (exp 4 5))\n";
 		assertEqual(found, expecting);
 	}

@@ -263,8 +263,13 @@ public class NFAFactory {
     /** add an EOF transition to any rule end NFAState that points to nothing
      *  (i.e., for all those rules not invoked by another rule).  These
      *  are start symbols then.
+	 *
+	 *  Return the number of grammar entry points; i.e., how many rules are
+	 *  not invoked by another rule (they can only be invoked from outside).
+	 *  These are the start rules.
      */
-    public void build_EOFStates(List rules) {
+    public int build_EOFStates(List rules) {
+		int numberUnInvokedRules = 0;
         for (Iterator iterator = rules.iterator(); iterator.hasNext();) {
 			Rule r = (Rule) iterator.next();
 			String ruleName = r.name;
@@ -274,8 +279,11 @@ public class NFAFactory {
                 // if so, then don't let algorithm fall off the end of
                 // the rule, make it loop on EOF.
                 build_EOFState(endNFAState);
+				// track how many rules have been invoked by another rule
+				numberUnInvokedRules++;
             }
         }
+		return numberUnInvokedRules;
     }
 
     /** set up an NFA NFAState that will yield eof tokens or,
@@ -287,7 +295,7 @@ public class NFAFactory {
         int label = Label.EOF;
         if ( nfa.grammar.type==Grammar.LEXER ) {
             label = Label.EOT;
-			end.setEOTState(true);
+			end.setEOTTargetState(true);
         }
         // System.out.println("build "+nfa.grammar.getTokenName(label)+" loop on end of state "+endNFAState.getDescription());
         Transition toEnd = new Transition(label, end);

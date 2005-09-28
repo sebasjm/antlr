@@ -169,6 +169,8 @@ REWRITE_ELEMENT_NOT_PRESENT_ON_LHS(file,line,col,arg) ::=
   "<loc()>reference to rewrite element <arg> without reference on left of ->"
 UNDEFINED_LABEL_REF_IN_REWRITE(file,line,col,arg) ::=
   "<loc()>reference to undefined label in rewrite rule: $<arg>"
+NO_GRAMMAR_START_RULE (file,line,col,arg) ::=
+  "grammar <arg>: no start rule (no rule can obviously be followed by EOF)"
 
 // GRAMMAR WARNINGS
 

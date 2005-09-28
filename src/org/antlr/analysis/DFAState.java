@@ -460,17 +460,19 @@ public class DFAState extends State {
 
     /** Walk each NFA configuration in this DFA state looking for a conflict
      *  where (s|i|ctx) and (s|j|ctx) exist, indicating that state s with
-     *  context ctx predicts alts i and j.  Return an Integer set of the
-     *  alternative numbers that conflict.
+     *  context conflicting ctx predicts alts i and j.  Return an Integer set
+	 *  of the alternative numbers that conflict.  Two contexts conflict if
+	 *  they are equal or one is a stack suffix of the other or one is
+	 *  the empty context.
 	 *
-	 *  TODO: update comment and talk about [28|2|[18 $], 28|1] as ambig
-     *
-     *  Use a hash table to record state/ctx pairs as they are encountered.
-     *  When the same pair is seen again, the alt number must be the same
-     *  to avoid a conflict.
+     *  Use a hash table to record the lists of configs for each state
+	 *  as they are encountered.  We need only consider states for which
+	 *  there is more than one configuration.  The configurations' predicted
+	 *  alt must be different or must have different contexts to avoid a
+	 *  conflict.
      */
     protected Set getConflictingAlts() {
-		// TODO this is called multiple times: cache result
+		// TODO this is called multiple times: cache result?
 		//System.out.println("getNondetAlts for DFA state "+stateNumber);
  		Set nondeterministicAlts = new HashSet();
 
@@ -552,81 +554,14 @@ public class DFAState extends State {
 					NFAConfiguration t = (NFAConfiguration)configsForState.get(j);
 					// conflicts means s.ctx==t.ctx or s.ctx is a stack
 					// suffix of t.ctx or vice versa (if alts differ).
+					// Also a conflict if s.ctx or t.ctx is empty
 					if ( s.alt != t.alt && s.context.conflictsWith(t.context) ) {
 						nondeterministicAlts.add(new Integer(s.alt));
 						nondeterministicAlts.add(new Integer(t.alt));
 					}
 				}
 			}
-			/*
-			Map contextToAltMap = new HashMap();
-			Set alts = new HashSet();
-			boolean hasEmptyContext = false;
-			// walk each configuration for this state mapping context to alt
-			for (int i = 0;
-				 configsForState!=null &&
-				 configsForState.size()>1 &&
-				 i < configsForState.size();
-				 i++)
-			{
-				NFAConfiguration c = (NFAConfiguration) configsForState.get(i);
-				if ( c.context.isEmpty() ) {
-					hasEmptyContext = true;
-				}
-				Integer altI = new Integer(c.alt);
-				alts.add(altI);
-				// TODO: optimization: ignore configurations for alts already
-				// known to be nondeterministic
-				Integer prevAlt = (Integer)contextToAltMap.get(c.context);
-				if ( prevAlt==null ) {
-					contextToAltMap.put(c.context, altI);
-				}
-				else {
-					// these alts are in conflict; record this fact
-					nondeterministicAlts.add(prevAlt);
-					nondeterministicAlts.add(altI);
-				}
-			}
-
-			if ( hasEmptyContext && alts.size()>0 ) {
-				// empty context matches any context so it conflicts with any
-				// other alts associated with this NFA state
-				//System.out.println("configs ambig due to empty context: "+configsForState);
-				nondeterministicAlts.addAll(alts);
-			}
-			*/
 		}
-
-
-       /* This is pre-realization that (s,i,ctx1) and (s,j,ctx2) are same
-	    context if either context is empty.
-	    iter = nfaConfigurations.iterator();
-		Map statePlusContextToConfigMap = new HashMap();
-        while (iter.hasNext()) {
-            configuration = (NFAConfiguration) iter.next();
-			String key = new StringBuffer().append(configuration.state)
-				.append(configuration.context.toString()).toString();
-			NFAConfiguration previousConfig = null;
-			previousConfig = (NFAConfiguration)statePlusContextToConfigMap.get(key);
-			if ( previousConfig==null ) {
-				// new state + context pair; no previousAlt defined; define it
-				statePlusContextToConfigMap.put(key,configuration);
-			}
-			else {
-				// state + context pair exists, check to ensure previousAlt is same
-				if ( configuration.alt!=previousConfig.alt ) {
-					System.out.println("config "+key+" ambig for alts "+
-									   configuration.alt+","+previousConfig.alt);
-					// these alts are in conflict; record this fact
-					if ( nondeterministicAlts==null ) {
-						nondeterministicAlts = new HashSet();
-					}
-                    nondeterministicAlts.add(new Integer(previousConfig.alt));
-                    nondeterministicAlts.add(new Integer(configuration.alt));
-                }
-            }
-        }
-		*/
 
 		if ( nondeterministicAlts.size()==0 ) {
 			return null;

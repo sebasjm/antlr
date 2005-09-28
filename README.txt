@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0ea5
-July 5, 2005
+ANTLR 3.0ea6
+? ?, 2005
 
 Terence Parr, parrt at cs usfca edu
 ANTLR Project lead and supreme dictator
@@ -206,7 +206,38 @@ CHANGES
 
 3.0ea6 - ??
 
-* ~'a'* and ~('a')* were not working properly
+* Used to generate unreachable message here:
+
+  parser grammar t;
+  a : ID a
+    | ID
+    ;
+
+  z.g:3:11: The following alternatives are unreachable: 2
+
+  In fact it should really be an error; now it generates:
+
+  no start rule in grammar t (no rule can obviously be followed by EOF)
+
+  Per next change item, ANTLR cannot know that EOF follows rule 'a'.
+
+* added error message indicating that ANTLR can't figure out what your
+  start rule is.  Required to properly generate code in some cases.
+
+* validating semantic predicates now work (if they are false, they
+  throw a new FailedPredicateException
+
+* two hideous bug fixes in the IntervalSet, which made analysis go wrong
+  in a few cases.  Thanks to Oliver Zeigermann for finding lots of bugs
+  and making suggested fixes (including the next two items)!
+
+* cyclic DFAs are now nonstatic and hence can access instance variables
+
+* labels are now allowed on lexical elements (in the lexer)
+
+* added some internal debugging options
+
+* ~'a'* and ~('a')* were not working properly; refactored antlr.g grammar
 
 3.0ea5 - July 5, 2005
 

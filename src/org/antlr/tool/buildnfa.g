@@ -99,7 +99,13 @@ protected void addFollowTransition(String ruleName, NFAState following) {
 protected void finish() {
     List rules = new LinkedList();
     rules.addAll(grammar.getRules());
-    factory.build_EOFStates(rules);
+    int numEntryPoints = factory.build_EOFStates(rules);
+    if ( numEntryPoints==0 ) {
+        ErrorManager.grammarError(ErrorManager.MSG_NO_GRAMMAR_START_RULE,
+                                  grammar,
+                                  null,
+                                  grammar.name);
+    }
 }
 
     public void reportError(RecognitionException ex) {

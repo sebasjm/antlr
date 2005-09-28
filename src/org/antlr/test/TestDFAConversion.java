@@ -70,6 +70,7 @@ public class TestDFAConversion extends TestSuite {
 	public void testselfRecurseNonDet() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
+			"s : a ;\n" +
 			"a : A a X | A a Y;");
 		// nondeterministic from left edge; no stop state
 		String expecting =
@@ -86,16 +87,18 @@ public class TestDFAConversion extends TestSuite {
 	public void testselfRecurseNonDet2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
+			"s : a ;\n" +
 			"a : P a P | P;");
-		// nondeterministic from left edge; no stop state
+		// nondeterministic from left edge
 		String expecting =
 			".s0-P->.s1\n" +
-			".s1-P->:s2=>1\n";
-		int[] unreachableAlts = new int[] {2};
+			".s1-<EOF>->:s2=>2\n" +
+			".s1-P->:s3=>1\n";
+		int[] unreachableAlts = null;
 		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = "P P";
 		int[] danglingAlts = null;
-		int numWarnings = 2;
+		int numWarnings = 1;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -166,6 +169,7 @@ public class TestDFAConversion extends TestSuite {
 	public void testimmediateTailRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
+			"s : a ;\n" +
 			"a : A a | A B;");
 		String expecting =
 			".s0-A->.s1\n" +
@@ -177,14 +181,50 @@ public class TestDFAConversion extends TestSuite {
 	public void testAStar_immediateTailRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
+			"s : a ;\n" +
 			"a : A a | ;");
 		String expecting =
+			".s0-<EOF>->:s2=>2\n" +
 			".s0-A->:s1=>1\n";
-		int[] unreachableAlts = new int[] {2};
+		int[] unreachableAlts = null; // without
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 1;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testNoStartRule() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : A a | X;"); // single rule 'a' refers to itself; no start rule
+
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		g.createNFAs();
+		g.createLookaheadDFAs();
+
+		String expecting =
+			"grammar t: no start rule (no rule can obviously be followed by EOF)";
+		assertEqual(equeue.errors.get(0).toString(), expecting);
+	}
+
+	public void testAStar_immediateTailRecursion2() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : A a | A ;");
+		String expecting =
+			".s0-A->.s1\n" +
+			".s1-<EOF>->:s2=>2\n" +
+			".s1-A->:s3=>1\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -192,6 +232,7 @@ public class TestDFAConversion extends TestSuite {
 	public void testimmediateLeftRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
+			"s : a ;\n" +
 			"a : a A | B;");
 		String expecting =
 			".s0-B->:s1=>1\n";
@@ -432,8 +473,9 @@ public class TestDFAConversion extends TestSuite {
 		// and 8 is the first alt of the (cg)* loop.
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
-			"s : LCURLY ( cg )* RCURLY | E SEMI  ;\n" +
-			"cg : (c)+ (s)* ;\n" +
+			"s : stat ;\n" +
+			"stat : LCURLY ( cg )* RCURLY | E SEMI  ;\n" +
+			"cg : (c)+ (stat)* ;\n" +
 			"c : CASE E ;\n");
 		String expecting =
 			".s0-CASE->:s2=>1\n" +
@@ -607,6 +649,7 @@ As a result, alternative(s) 2 were disabled for that input
 		// ambiguous grammar for "L ID R" (alts 1,2 of a)
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
+			"s : a;\n" +
 			"a   :   L ID R\n" +
 			"    |   L a R\n" + // disabled for L ID R
 			"    |   b\n" +
@@ -640,6 +683,7 @@ As a result, alternative(s) 2 were disabled for that input
 		// seems to work now.
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
+			"s   :   a ;\n" +
 			"a   :   L ID R\n" +
 			"    |   b\n" +
 			"    ;\n" +
@@ -711,7 +755,7 @@ As a result, alternative(s) 2 were disabled for that input
 		}
 
 		if ( equeue.size()!=expectingNumWarnings ) {
-			System.err.println("Warnings issued: "+equeue.warnings);
+			System.err.println("Warnings issued: "+equeue);
 		}
 
 		assertTrue(equeue.size()==expectingNumWarnings,

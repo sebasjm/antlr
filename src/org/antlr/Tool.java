@@ -151,6 +151,12 @@ public class Tool {
 			else if (args[i].equals("-Inoprune")) {
 				DFAOptimizer.PRUNE_EBNF_EXIT_BRANCHES=false;
 			}
+			else if (args[i].equals("-Inocollapse")) {
+				DFAOptimizer.COLLAPSE_ALL_PARALLEL_EDGES=false;
+			}
+			else if (args[i].equals("-Idbgconversion")) {
+				NFAToDFAConverter.debug = true;
+			}
             else {
                 if (args[i].charAt(0) != '-') {
                     // Must be the grammar file

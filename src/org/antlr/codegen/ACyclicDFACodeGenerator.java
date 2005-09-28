@@ -55,6 +55,10 @@ public class ACyclicDFACodeGenerator {
 			DFAState s,
 			int k)
 	{
+		/*
+		System.out.println("walkFixedDFAGeneratingStateMachine DFA.state "+
+						   dfa.decisionNumber+"."+s.stateNumber);
+		*/
 		if ( s.isAcceptState() ) {
 			StringTemplate dfaST = templates.getInstanceOf("dfaAcceptState");
 			dfaST.setAttribute("alt", new Integer(s.getUniquelyPredictedAlt()));
@@ -99,12 +103,15 @@ public class ACyclicDFACodeGenerator {
 			dfaST.setAttribute("description", description);
 		}
 		int EOTPredicts = NFA.INVALID_ALT_NUMBER;
+		//System.out.println("DFA state "+s.stateNumber);
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
+			//System.out.println("edge label "+edge.label.toString());
 			if ( edge.label.getAtom()==Label.EOT ) {
 				// don't generate a real edge for EOT; track what EOT predicts
 				DFAState target = (DFAState)edge.target;
 				EOTPredicts = target.getUniquelyPredictedAlt();
+				//System.out.println("DFA state "+s.stateNumber+" EOT predicts "+EOTPredicts);
 				continue;
 			}
 			StringTemplate edgeST = templates.getInstanceOf(dfaEdgeName);
@@ -130,6 +137,10 @@ public class ACyclicDFACodeGenerator {
 												   k+1);
 			edgeST.setAttribute("targetState", targetST);
 			dfaST.setAttribute("edges", edgeST);
+			/*
+			System.out.println("back to DFA "+
+							   dfa.decisionNumber+"."+s.stateNumber);
+							   */
 		}
 		if ( EOTPredicts!=NFA.INVALID_ALT_NUMBER ) {
 			dfaST.setAttribute("eotPredictsAlt", new Integer(EOTPredicts));

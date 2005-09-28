@@ -53,7 +53,7 @@ public class NFAToDFAConverter {
 	/** We are converting which DFA? */
 	protected DFA dfa;
 
-	private static boolean debug = false;
+	public static boolean debug = false;
 
 	public NFAToDFAConverter(DFA dfa) {
 		this.dfa = dfa;
@@ -697,7 +697,9 @@ public class NFAToDFAConverter {
 			return true;
 		}
 
-		// case (2) : recursive (same state, state visited before)
+		// TODO: 9-25-05: move case(2) first as it's faster to check and more common?
+
+		// case (2) : recursive (same state, state visited before within closure)
 		if ( context.contains(p.stateNumber, initialContext) ) {
 			return true;
 		}
@@ -990,8 +992,8 @@ public class NFAToDFAConverter {
 	 *  then DFA conversion will leave this state as a dead state as nothing
 	 *  can be reached from this state.  To resolve the ambiguity, just do
 	 *  what flex and friends do: pick the first rule (alt in this case) to
-	 *  win.  This means you should put keywords before the ID rule (unless
-	 *  you're using the literals table).  If the DFA state has only one NFA
+	 *  win.  This means you should put keywords before the ID rule.
+	 *  If the DFA state has only one NFA
 	 *  state then there is no issue: it uniquely predicts one alt. :)  Problem
 	 *  states will look like this during conversion:
 	 *
@@ -1015,7 +1017,7 @@ public class NFAToDFAConverter {
 		// if d is target of EOT and more than one predicted alt
 		// indicate that d is nondeterministic on all alts otherwise
 		// it looks like state has no problem
-		if ( anyState.isEOTState() ) {
+		if ( anyState.isEOTTargetState() ) {
 			Set allAlts = d.getAltSet();
 			if ( allAlts!=null && allAlts.size()>1 ) {
 				nondeterministicAlts = allAlts;

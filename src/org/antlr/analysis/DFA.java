@@ -384,7 +384,7 @@ public class DFA {
 	 *  means the default clause.  So for ('a'..'z')+ you would see a DFA
 	 *  with a state that has a..z and EOT emanating from it.  a..z would
 	 *  jump to a state predicting alt 1 and EOT would jump to a state
-	 *  predicting alt 2 (the exit loop branch).  EOF implies anything other
+	 *  predicting alt 2 (the exit loop branch).  EOT implies anything other
 	 *  than a..z.  If for some reason, the set is "all char" such as with
 	 *  the wildcard '.', then EOT cannot match anything.  For example,
 	 *

@@ -149,6 +149,7 @@ public class ErrorManager {
 	public static final int MSG_UNDEFINED_TOKEN_REF_IN_REWRITE = 135;
 	public static final int MSG_REWRITE_ELEMENT_NOT_PRESENT_ON_LHS = 136;
 	public static final int MSG_UNDEFINED_LABEL_REF_IN_REWRITE = 137;
+	public static final int MSG_NO_GRAMMAR_START_RULE = 138;
 
 
 	// GRAMMAR WARNINGS

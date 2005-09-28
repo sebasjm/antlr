@@ -89,7 +89,7 @@ public class NFAState extends State {
     protected GrammarAST decisionASTNode;
 
     /** Is this state the sole target of an EOT transition? */
-    protected boolean EOTState = false;
+    protected boolean EOTTargetState = false;
 
 	/** Jean Bovet needs in the GUI to know which state pairs correspond
 	 *  to the start/stop of a block.
@@ -221,12 +221,12 @@ public class NFAState extends State {
 		return enclosingRule;
 	}
 
-    public boolean isEOTState() {
-        return EOTState;
+    public boolean isEOTTargetState() {
+        return EOTTargetState;
     }
 
-    public void setEOTState(boolean eot) {
-        EOTState = eot;
+    public void setEOTTargetState(boolean eot) {
+        EOTTargetState = eot;
     }
 
 	public String toString() {

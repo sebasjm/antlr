@@ -97,6 +97,7 @@ public class GrammarAST extends BaseAST {
     }
 
     public void initialize(AST ast) {
+		this.token = ((GrammarAST)ast).token;
     }
 
     public void initialize(Token token) {

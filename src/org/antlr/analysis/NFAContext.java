@@ -109,6 +109,8 @@ public class NFAContext {
 	 *  conflict, but [21 $] and [21 12 $] do conflict.  Note that I should
 	 *  probably not show the $ in this case.  There is a dummy node for each
 	 *  stack that just means empty; $ is a marker that's all.
+	 *
+	 *  TODO: Seems that suffix returns true if equals; faster if we do suffix only?
 	 */
 	public boolean conflictsWith(Object o) {
 		NFAContext other = ((NFAContext)o);
@@ -135,7 +137,7 @@ public class NFAContext {
 
     /** Walk upwards to the root of the call stack context looking
      *  for a particular invoking state.  Only look til before
-	 *  initialContext (which is when the overal closure operation started).
+	 *  initialContext (which is when the overall closure operation started).
 	 *  We only care about re-invocations of a rule within same closure op
 	 *  because that implies same rule is visited w/o consuming input.
 	 *
