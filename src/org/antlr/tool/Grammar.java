@@ -901,6 +901,34 @@ public class Grammar {
 		}
 	}
 
+	/** Rules like "a : ;" and "a : {...} ;" should not generate
+	 *  try/catch blocks for RecognitionException.  To detect this
+	 *  it's probably ok to just look for any reference to an atom
+	 *  that can match some input.  W/o that, the rule is unlikey to have
+	 *  any else.
+	 */ 
+	public boolean isEmptyRule(GrammarAST block) {
+		GrammarAST aTokenRefNode =
+			block.getFirstChildWithType(ANTLRParser.TOKEN_REF);
+		GrammarAST aStringLiteralRefNode =
+			block.getFirstChildWithType(ANTLRParser.STRING_LITERAL);
+		GrammarAST aCharLiteralRefNode =
+			block.getFirstChildWithType(ANTLRParser.CHAR_LITERAL);
+		GrammarAST aWildcardRefNode =
+			block.getFirstChildWithType(ANTLRParser.WILDCARD);
+		GrammarAST aRuleRefNode =
+			block.getFirstChildWithType(ANTLRParser.RULE_REF);
+		if ( aTokenRefNode==null&&
+			aStringLiteralRefNode==null&&
+			aCharLiteralRefNode==null&&
+			aWildcardRefNode==null&&
+			aRuleRefNode==null ) {
+			System.out.println("problem: empty rule");
+			return true;
+		}
+		return false;
+	}
+
     public int getTokenType(String tokenName) {
         Integer I = null;
         if ( tokenName.charAt(0)=='"') {

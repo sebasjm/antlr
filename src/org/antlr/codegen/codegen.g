@@ -282,7 +282,8 @@ rule returns [StringTemplate code=null]
     String initAction = null;
     StringTemplate b;
 	// get the dfa for the BLOCK
-    DFA dfa=#rule.getFirstChildWithType(BLOCK).getLookaheadDFA();
+    GrammarAST block=#rule.getFirstChildWithType(BLOCK);
+    DFA dfa=block.getLookaheadDFA();
 	// init blockNestingLevel so it's block level RULE_BLOCK_NESTING_LEVEL
 	// for alts of rule
 	blockNestingLevel = RULE_BLOCK_NESTING_LEVEL-1;
@@ -324,6 +325,8 @@ rule returns [StringTemplate code=null]
 			{
 				code = templates.getInstanceOf("rule");
 				code.setAttribute("ruleDescriptor", grammar.getRule(r));
+                code.setAttribute("emptyRule",
+                        new Boolean(grammar.isEmptyRule(block)));
 			}
 		}
         if ( code!=null ) {

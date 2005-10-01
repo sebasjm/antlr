@@ -174,7 +174,7 @@ treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bi
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,initAction,block,description) ::= <<
+rule(ruleName,ruleDescriptor,initAction,block,emptyRule,description) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
@@ -214,6 +214,17 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     ruleLevel++;
     dbg.location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
 <endif>
+<if(emptyRule)>
+    <block>
+    <ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
+    <ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
+<if(ruleDescriptor.hasMultipleReturnValues)>
+    retval.stop = (<labelType>)input.LT(-1);
+<if(buildAST)>
+    retval.tree = root_0;<\n>
+<endif>
+<endif>
+<else>
     try {
         <block>
     }
@@ -231,6 +242,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 <endif>
 <endif>
     }<\n>
+<endif>
 <if(debug)>
     dbg.location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
     }

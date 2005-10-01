@@ -270,12 +270,15 @@ atom
 			   (targ:ARG_ACTION	{out("["+#targ.toString()+"]");} )?
 			   (ast_suffix)?
              )
-		|   CHAR_LITERAL	{out(#atom.toString());}
-			(ast_suffix)?
-		|   STRING_LITERAL	{out(#atom.toString());}
-			(ast_suffix)?
-		|   WILDCARD		{out(#atom.toString());}
-			(ast_suffix)?
+		|   #( CHAR_LITERAL	{out(#atom.toString());}
+			   (ast_suffix)?
+             )
+		|   #( STRING_LITERAL	{out(#atom.toString());}
+			   (ast_suffix)?
+             )
+		|   #( WILDCARD		{out(#atom.toString());}
+			   (ast_suffix)?
+             )
 		)
 		{out(" ");}
     |	LABEL {out(" $"+#LABEL.getText());} // used in -> rewrites

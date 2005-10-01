@@ -1047,7 +1047,7 @@ public class NFAToDFAConverter {
 			}
 			else {
 				// TODO: remove when sure it's cool
-				System.out.println("warning suppressed for nongreedy loop");
+				System.out.println("temp warning: warning suppressed for nongreedy loop");
 			}
 		}
 
@@ -1068,11 +1068,11 @@ public class NFAToDFAConverter {
 	        winningAlt = resolveByPickingMinAlt(d,nondeterministicAlts);
 		}
 		else {
-			System.out.println("resolving exit alt for decision="+dfa.decisionNumber);
+			//System.out.println("resolving exit alt for decision="+dfa.decisionNumber);
 			// if nongreedy, resolve in favor of what follows block
 			winningAlt = resolveByPickingExitAlt(d,nondeterministicAlts);
 		}
-		System.out.println("winner is "+winningAlt);
+		//System.out.println("winner is "+winningAlt);
 	}
 
 	/** Turn off all configurations associated with the
