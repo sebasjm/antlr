@@ -45,7 +45,7 @@ import java.io.StringReader;
 
 import antlr.Token;
 
-/** Check the $x, $x.y, and @x.y attributes.  For checking the actual
+/** Check the $x, $x.y attributes.  For checking the actual
  *  translation, assume the Java target.  This is still a great test
  *  for the semantics of the $x.y stuff regardless of the target.
  */
@@ -867,7 +867,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testSimplePlusEqualLabel() throws Exception {
 		String action = "$ids.size();"; // must be qualified
-		String expecting = "ids.size();";
+		String expecting = "list_ids.size();";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -891,7 +891,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testPlusEqualStringLabel() throws Exception {
 		String action = "$ids.size();"; // must be qualified
-		String expecting = "ids.size();";
+		String expecting = "list_ids.size();";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -916,7 +916,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testPlusEqualSetLabel() throws Exception {
 		String action = "$ids.size();"; // must be qualified
-		String expecting = "ids.size();";
+		String expecting = "list_ids.size();";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -941,7 +941,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testPlusEqualWildcardLabel() throws Exception {
 		String action = "$ids.size();"; // must be qualified
-		String expecting = "ids.size();";
+		String expecting = "list_ids.size();";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
