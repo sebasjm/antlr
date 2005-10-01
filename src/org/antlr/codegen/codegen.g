@@ -326,7 +326,7 @@ rule returns [StringTemplate code=null]
 				code = templates.getInstanceOf("rule");
 				code.setAttribute("ruleDescriptor", grammar.getRule(r));
                 code.setAttribute("emptyRule",
-                        new Boolean(grammar.isEmptyRule(block)));
+                    new Boolean(grammar.isEmptyRule(block)));
 			}
 		}
         if ( code!=null ) {
