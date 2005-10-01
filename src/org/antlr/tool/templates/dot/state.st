@@ -1,1 +1,1 @@
-node [fontsize=11, shape = circle]; <name>
+node [fontsize=11, shape = <if(useBox)>box<else>circle<endif>]; <name>

@@ -1,1 +1,1 @@
-node [shape = doublecircle]; <name>
+node [shape = <if(useBox)>box<else>doublecircle<endif>]; <name>

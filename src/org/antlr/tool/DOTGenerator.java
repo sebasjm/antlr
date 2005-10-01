@@ -76,6 +76,8 @@ public class DOTGenerator {
             dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/dfa");
 			dot.setAttribute("startState",
 					new Integer(startState.stateNumber));
+			dot.setAttribute("useBox",
+							 new Boolean(Tool.internalOption_ShowNFConfigsInDFA));
 			walkCreatingDOT(dot, startState);
         }
         else {
