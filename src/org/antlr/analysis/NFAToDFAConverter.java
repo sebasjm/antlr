@@ -248,7 +248,7 @@ public class NFAToDFAConverter {
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
 			// TODO: can fixed lookahead hit a dangling state case?
-			System.err.println("dangling state: "+d.stateNumber);
+			System.err.println("dangling state: "+d);
 			dfa.probe.reportDanglingState(d);
 			dfa.probe.reportEarlyTermination();
 			// turn off all configurations except for those associated with
@@ -1019,15 +1019,16 @@ public class NFAToDFAConverter {
 		// it looks like state has no problem
 		if ( anyState.isEOTTargetState() ) {
 			Set allAlts = d.getAltSet();
+			// is more than 1 alt predicted?
 			if ( allAlts!=null && allAlts.size()>1 ) {
 				nondeterministicAlts = allAlts;
-				int decision = d.dfa.getDecisionNumber();
+				int decisionNumber = d.dfa.getDecisionNumber();
 				NFAState tokensRuleStartState =
 					dfa.nfa.grammar.getRuleStartState(Grammar.TOKEN_RULENAME);
-				NFAState decisionState =
+				NFAState tokensRuleDecisionState =
 					(NFAState)tokensRuleStartState.transition(0).target;
-				// track lexer rule issues differently than other decisions
-				if ( decisionState.getDecisionNumber() == decision ) {
+				// track Tokens rule issues differently than other decisions
+				if ( decisionNumber == tokensRuleDecisionState.getDecisionNumber() ) {
 					dfa.probe.reportLexerRuleNondeterminism(d,allAlts);
 					conflictingLexerRules = true;
 				}
