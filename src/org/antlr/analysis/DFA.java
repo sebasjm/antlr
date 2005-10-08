@@ -44,7 +44,7 @@ public class DFA {
 	public static final int REACHABLE_YES = 1;
 
 	/** Prevent explosion of DFA states during conversion. */
-	public static final int MAX_STATES_PER_DFA = 3000;
+	public static final int MAX_STATES_PER_DFA = 1000;
 
     /** What's the start state for this DFA? */
     public DFAState startState;
