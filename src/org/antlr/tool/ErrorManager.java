@@ -408,6 +408,7 @@ public class ErrorManager {
 	public static void danglingState(DecisionProbe probe,
 									 DFAState d)
 	{
+		System.out.println("danglingState alts: "+d.getAltSet());
 		getErrorCount().warnings++;
 		getErrorListener().warning(
 			new GrammarDanglingStateMessage(probe,d)

@@ -44,6 +44,33 @@ package org.antlr.analysis;
  *  on the path from this node thru the parent pointers to the root.
  */
 public class NFAContext {
+	/** This is similar to Bermudez's m constant in his LAR(m) where
+	 *  you bound the stack so your states don't explode.  The main difference
+	 *  is that I bound only recursion on the stack, not the simple stack size.
+	 *  This looser constraint will let the conversion roam further to find
+	 *  lookahead to resolve a decision.
+	 *
+	 *  Bermudez's m operates differently as it is his LR stack depth
+	 *  I'm pretty sure it therefore includes all stack symbols.  Here I am
+	 *  only preventing infinite recursion during a single closure operation.
+	 *
+	 *  max=0 implies you cannot ever recurse
+	 *  (note you can make as many calls as you want--you just can't ever
+	 *  visit a state that is on your rule invocation stack).
+	 *  max=1 implies you are able to recurse once (i.e., call a rule twice
+	 *  from the same place).
+	 *
+	 *  This tracks recursion to a rule specific to an invocation site!
+	 *  It does not detect multiple calls to a rule from different rule
+	 *  invocation states.  We are guaranteed to terminate because the
+	 *  stack can only grow as big as the number of NFA states.
+	 *
+	 *  I noticed that the Java grammar didn't work with max=0, but did with
+	 *  max=1.  Let's set to 2.  Recursion is sometimes needed to resolve some
+	 *  fixed lookahead decisions.
+	 */
+	public static int MAX_RECURSIVE_INVOCATIONS = 2;
+
     public NFAContext parent;
 
     /** The NFA state that invoked another rule's start state is recorded
@@ -132,6 +159,7 @@ public class NFAContext {
 			sp = sp.parent;
 			other = other.parent;
 		}
+		//System.out.println("suffix");
 		return true;
 	}
 
@@ -141,18 +169,54 @@ public class NFAContext {
 	 *  We only care about re-invocations of a rule within same closure op
 	 *  because that implies same rule is visited w/o consuming input.
 	 *
-	 *  TODO: use linked hashmap for this?
-     */
+	 *  The initialContext is always on the path to the root from 'this'
+	 *  so walking upwards from 'this' will always hit initialContext
+	 *  eventually; don't worry about hitting top of stack.
+	 *
+	 *  TOD O: use linked hashmap for this?
     public boolean contains(int state, NFAContext initialContext) {
         NFAContext sp = this;
-        while ( sp.parent!=null && sp.parent!=initialContext ) {
+		int n = 0; // track recursive invocations of state
+		System.out.println("this.context is "+sp);
+        //while ( sp.parent!=null && sp.parent!=initialContext ) {
+		while ( sp.parent!=null ) {
             if ( sp.invokingState.stateNumber == state ) {
-                return true;
+				n++;
+                if ( n>=MAX_RECURSIVE_INVOCATIONS ) {
+					System.out.println("contains");
+					return true;
+				}
             }
             sp = sp.parent;
         }
         return false;
     }
+	 */
+
+	/** Given an NFA state number, how many times has the NFA-to-DFA
+	 *  conversion pushed that state on the stack?  In other words,
+	 *  the NFA state must be a rule invocation state and this method
+	 *  tells you how many times you've been to this state.  If none,
+	 *  then you have not called the target rule from this state before
+	 *  (though another NFA state could have called that target rule).
+	 *  If n=1, then you've been to this state before during this
+	 *  DFA construction and are going to invoke that rule again.
+	 *
+	 *  Note that many NFA states can invoke rule r, but we ignore recursion
+	 *  unless you hit the same rule invocation state again.
+	 */
+	public int recursionDepthEmanatingFromState(int state) {
+		NFAContext sp = this;
+		int n = 0; // track recursive invocations of target from this state
+		//System.out.println("this.context is "+sp);
+		while ( sp.parent!=null ) {
+			if ( sp.invokingState.stateNumber == state ) {
+				n++;
+			}
+			sp = sp.parent;
+		}
+		return n;
+	}
 
     public int hashCode() {
         return cachedHashCode;

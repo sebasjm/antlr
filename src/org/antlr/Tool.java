@@ -162,6 +162,15 @@ public class Tool {
 			else if (args[i].equals("-Idfaverbose")) {
 				internalOption_ShowNFConfigsInDFA = true;
 			}
+			else if (args[i].equals("-Im")) {
+				if (i + 1 >= args.length) {
+					System.err.println("missing max recursion with -m option; ignoring");
+				}
+				else {
+					i++;
+					NFAContext.MAX_RECURSIVE_INVOCATIONS = Integer.parseInt(args[i]);
+				}
+			}
 
             else {
                 if (args[i].charAt(0) != '-') {

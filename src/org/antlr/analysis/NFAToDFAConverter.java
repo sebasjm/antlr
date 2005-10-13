@@ -248,7 +248,7 @@ public class NFAToDFAConverter {
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
 			// TODO: can fixed lookahead hit a dangling state case?
-			System.err.println("dangling state: "+d);
+			System.err.println("dangling state alts: "+d.getAltSet());
 			dfa.probe.reportDanglingState(d);
 			dfa.probe.reportEarlyTermination();
 			// turn off all configurations except for those associated with
@@ -257,6 +257,8 @@ public class NFAToDFAConverter {
 			int minAlt = resolveByPickingMinAlt(d, null);
 			convertToAcceptState(d, minAlt); // force it to be an accept state
 			terminate = true; // might as well stop now
+			//TODO: fix so we issue dangling state warnings when we reanalyze at k=1
+			//dfa.probe.issueWarnings();
 		}
 
 		// Check to see if we need to add any semantic predicate transitions
@@ -471,12 +473,6 @@ public class NFAToDFAConverter {
 		// Avoid infinite recursion
 		// If we've seen this configuration before during closure, stop
 		if ( closureIsBusy(d,p,alt,context,initialContext,semanticContext) ) {
-			if ( debug ) {
-				System.out.println("avoid infinite closure computation to state "+p.stateNumber+
-								   " from context "+context+" alt="+alt+" semctx="+semanticContext+
-								   " (initial context="+initialContext+")");
-				System.out.println("state is "+d);
-			}
 			return;
 		}
 		setClosureIsBusy(d,p,alt,context,semanticContext);
@@ -508,8 +504,14 @@ public class NFAToDFAConverter {
 				(RuleClosureTransition)whichStateInvokedRule.transition(0);
 			NFAState continueState = edgeToRule.getFollowState();
 			NFAContext newContext = context.parent; // "pop" invoking state
+			// TODO: really?  seems like initial context used only for termination
+			// Carved out 10/13/2005 as initialContext should really be fixed
+			// at where we started in closure(DFAState); it is fixed during
+			// any closure operation.
+			/*
 			// we must move the initial context for this overall closure
-			initialContext = newContext; // mv stack top
+			//initialContext = newContext; // mv stack top
+			*/
 			closure(continueState, alt, newContext, initialContext, semanticContext, d, collectPredicates);
 		}
 		// Case 3: end of rule state, nobody invoked this rule (no context)
@@ -685,22 +687,33 @@ public class NFAToDFAConverter {
 								 int alt,
 								 NFAContext context,
 								 NFAContext initialContext,
-								 SemanticContext semContext)
+								 SemanticContext semanticContext)
 	{
 		// case (1) : epsilon cycle (same state, same context)
 		NFAConfiguration c =
 				new NFAConfiguration(p.stateNumber,
 						alt,
 						context,
-						semContext);
+						semanticContext);
 		if ( d.closureBusy.contains(c) ) {
+			if ( debug ) {
+				System.out.println("avoid visiting exact closure computation NFA config: "+c);
+				System.out.println("state is "+d.dfa.decisionNumber+"."+d);
+			}
 			return true;
 		}
 
 		// TODO: 9-25-05: move case(2) first as it's faster to check and more common?
 
-		// case (2) : recursive (same state, state visited before within closure)
-		if ( context.contains(p.stateNumber, initialContext) ) {
+		// case (2) : recursive (visited rule from same invocation state)
+		int depth = context.recursionDepthEmanatingFromState(p.stateNumber);
+		if ( depth > NFAContext.MAX_RECURSIVE_INVOCATIONS ) {
+			if ( debug ) {
+				System.out.println("avoid infinite recursion from state "+p.stateNumber+
+								   " from context "+context+" alt="+alt+" semctx="+semanticContext
+								   );
+				System.out.println("state is "+d.dfa.decisionNumber+"."+d);
+			}
 			return true;
 		}
 		return false;
