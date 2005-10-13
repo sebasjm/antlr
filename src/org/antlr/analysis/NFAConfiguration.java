@@ -113,12 +113,18 @@ public class NFAConfiguration {
         return h;
     }
 
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(state);
-        buf.append("|");
-        buf.append(alt);
-        if ( context.parent!=null ) {
+	public String toString() {
+		return toString(true);
+	}
+
+	public String toString(boolean showAlt) {
+		StringBuffer buf = new StringBuffer();
+		buf.append(state);
+		if ( showAlt ) {
+			buf.append("|");
+			buf.append(alt);
+		}
+		if ( context.parent!=null ) {
             buf.append("|");
             buf.append(context);
         }
