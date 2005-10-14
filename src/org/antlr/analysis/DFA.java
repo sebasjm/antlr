@@ -59,7 +59,12 @@ public class DFA {
      *  to the actual DFAState object.  We use this to detect
      *  existing DFA states.
      */
-    protected Map states = new HashMap();
+    protected Map configurationsToDFAStateMap = new HashMap();
+
+	/** Maps the state number to the actual DFAState.  Use a Vector as it
+	 *  grows automatically when I set the ith element.
+	 */
+	protected Vector states = new Vector();
 
 	/** Unique state numbers */
 	protected int stateCounter = 0;
@@ -150,31 +155,36 @@ public class DFA {
      */
     protected DFAState addState(DFAState d) {
 		if ( getUserMaxLookahead()>0 ) {
-			states.put(d,d);
+			configurationsToDFAStateMap.put(d,d);
 			numberOfStates++;
 			return d;
 		}
-		DFAState existing = (DFAState)states.get(d);
+		DFAState existing = (DFAState)configurationsToDFAStateMap.get(d);
 		if ( existing != null ) {
 			// already there...get the existing DFA state
 			return existing;
 		}
 
 		// if not there, then add new state.
-        states.put(d,d);
+        configurationsToDFAStateMap.put(d,d);
         numberOfStates++;
 		return d;
 	}
 
 	public void removeState(DFAState d) {
-		DFAState it = (DFAState)states.remove(d);
+		DFAState it = (DFAState)configurationsToDFAStateMap.remove(d);
+		// states.set(d.stateNumber, null);
 		if ( it!=null ) {
 			numberOfStates--;
 		}
 	}
 
-	public Map getStates() {
-		return states;
+	public Map getConfigurationsToDFAStateMap() {
+		return configurationsToDFAStateMap;
+	}
+
+	public DFAState getState(int stateNumber) {
+		return (DFAState)states.get(stateNumber);
 	}
 
 	/** Is the DFA reduced?  I.e., does every state have a path to an accept
@@ -356,6 +366,8 @@ public class DFA {
         DFAState n = new DFAState(this);
         n.stateNumber = stateCounter;
         stateCounter++;
+		states.setSize(n.stateNumber+1);
+		states.set(n.stateNumber, n); // track state num to state
         return n;
     }
 

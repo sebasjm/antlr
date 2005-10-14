@@ -206,6 +206,24 @@ CHANGES
 
 3.0ea6 - ??
 
+* fixed a nasty bug in the analysis engine dealing with infinite recursion.
+  Spent all day thinking about it and cleaned up the code dramatically.
+  Bug fixed and software is more powerful and I understand it better! :)
+
+* improved verbose DFA nodes; organized by alt
+
+* got much better random phrase generation.  For example:
+
+ $ java org.antlr.tool.RandomPhrase simple.g program
+ int Ktcdn ';' method wh '(' ')' '{' return 5 ';' '}'
+
+* empty rules like "a : ;" generated code that didn't compile due to
+  try/catch for RecognitionException.  Generated code couldn't possibly
+  throw that exception.
+
+* when printing out a grammar, such as in comments in generated code,
+  ANTLR didn't print ast suffix stuff back out for literals.
+
 * This never exited loop:
   DATA : (options {greedy=false;}: .* '\n' )* '\n' '.' ;
   and now it works due to new default nongreedy .*  Also this works:

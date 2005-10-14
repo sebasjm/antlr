@@ -37,6 +37,7 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.BitSet;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import antlr.RecognitionException;
 
@@ -240,7 +241,7 @@ public class TestDFAConversion extends TestSuite {
 		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = "B";
 		int[] danglingAlts = null;
-		int numWarnings = 2;
+		int numWarnings = 3;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -706,6 +707,35 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
+	public void testTailRecursionInvokedFromArbitraryLookaheadDecision() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : b X\n" +
+			"  | b Y\n" +
+			"  ;\n" +
+			"\n" +
+			"b : A\n" +
+			"  | A b\n" +
+			"  ;\n");
+		String expecting =
+			".s0-A->.s1\n" +
+			".s1-A->.s2\n" +
+			".s1-X->:s3=>1\n" +
+			".s1-Y->:s5=>2\n" +
+			".s2-A->.s4\n" +
+			".s2-X->:s3=>1\n" +
+			".s2-Y->:s5=>2\n" +
+			".s4-X->:s3=>1\n" +
+			".s4-Y->:s5=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = new int[] {1,2};
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 1;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
 	public void testNoSetForTokenRefsInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -822,18 +852,28 @@ As a result, alternative(s) 2 were disabled for that input
 
 		// check nondet alts
 		if ( expectingNonDetAlts!=null ) {
+			RecursionOverflowMessage recMsg = null;
 			GrammarNonDeterminismMessage nondetMsg =
 				getNonDeterminismMessage(equeue.warnings);
-			assertTrue(nondetMsg!=null, "found no nondet alts; expecting: "+
-										str(expectingNonDetAlts));
-			List nonDetAlts =
-				nondetMsg.probe.getNonDeterministicAltsForState(nondetMsg.problemState);
+			List nonDetAlts = null;
+			if ( nondetMsg!=null ) {
+				nonDetAlts =
+					nondetMsg.probe.getNonDeterministicAltsForState(nondetMsg.problemState);
+			}
+			else {
+				recMsg = getRecursionOverflowMessage(equeue.warnings);
+				if ( recMsg!=null ) {
+					nonDetAlts = new ArrayList(recMsg.alts);
+				}
+			}
 			// compare nonDetAlts with expectingNonDetAlts
 			BitSet s = new BitSet();
 			s.addAll(expectingNonDetAlts);
 			BitSet s2 = new BitSet();
 			s2.addAll(nonDetAlts);
 			assertTrue(s.equals(s2), "nondet alts mismatch; expecting "+s+" found "+s2);
+			assertTrue(nondetMsg!=null||recMsg!=null, "found no nondet alts; expecting: "+
+										str(expectingNonDetAlts));
 		}
 		else {
 			// not expecting any nondet alts, make sure there are none
@@ -850,6 +890,16 @@ As a result, alternative(s) 2 were disabled for that input
 			Message m = (Message) warnings.get(i);
 			if ( m instanceof GrammarNonDeterminismMessage ) {
 				return (GrammarNonDeterminismMessage)m;
+			}
+		}
+		return null;
+	}
+
+	protected RecursionOverflowMessage getRecursionOverflowMessage(List warnings) {
+		for (int i = 0; i < warnings.size(); i++) {
+			Message m = (Message) warnings.get(i);
+			if ( m instanceof RecursionOverflowMessage ) {
+				return (RecursionOverflowMessage)m;
 			}
 		}
 		return null;

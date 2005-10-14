@@ -213,6 +213,14 @@ ANALYSIS_ABORTED(file,line,col) ::= <<
 <loc()>ANTLR could not analyze this decision probably due to a true ambiguity in the grammar.  ANTLR re-analyzed the decision with a fixed lookahead of k=1.
 >>
 
+RECURSION_OVERLOW(file,line,col,targetRule,input,alts,callSiteStates) ::= <<
+<loc()>After matching <input> decision cannot predict what comes next for alternative(s) <alts; separator=", "> due to recursion overflow to <targetRule> from call sites in rule(s) <callSiteStates:{s|<s.enclosingRule>}; separator=", ">
+>>
+
+LEFT_RECURSION(file,line,col,targetRule,input,alts,callSiteStates) ::= <<
+<loc()>Infinite recursion to <targetRule> from call sites in rule(s) <callSiteStates:{s|<s.enclosingRule>}; separator=", "> alternative(s) <alts; separator=", ">
+>>
+
 /* This factors out file location formatting; file,line,col inherited from
  * enclosing template; don't manually pass stuff in.
  */

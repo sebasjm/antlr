@@ -159,6 +159,9 @@ public class Tool {
 			else if (args[i].equals("-Idbgconversion")) {
 				NFAToDFAConverter.debug = true;
 			}
+			else if (args[i].equals("-Inomergestopstates")) {
+				DFAOptimizer.MERGE_STOP_STATES = false;
+			}
 			else if (args[i].equals("-Idfaverbose")) {
 				internalOption_ShowNFConfigsInDFA = true;
 			}

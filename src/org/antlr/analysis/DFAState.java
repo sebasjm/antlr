@@ -405,6 +405,26 @@ public class DFAState extends State {
         return alt;
     }
 
+	/** Return the uniquely mentioned alt from the NFA configurations;
+	 *  Ignore the resolved bit etc...  Return INVALID_ALT_NUMBER
+	 *  if there is more than one alt mentioned.
+	 */ 
+	public int getUniqueAlt() {
+		int alt = NFA.INVALID_ALT_NUMBER;
+		Iterator iter = nfaConfigurations.iterator();
+		NFAConfiguration configuration;
+		while (iter.hasNext()) {
+			configuration = (NFAConfiguration) iter.next();
+			if ( alt==NFA.INVALID_ALT_NUMBER ) {
+				alt = configuration.alt; // found first nonresolved alt
+			}
+			else if ( configuration.alt!=alt ) {
+				return NFA.INVALID_ALT_NUMBER;
+			}
+		}
+		return alt;
+	}
+
 	/** When more than one alternative can match the same input, the first
 	 *  alternative is chosen to resolve the conflict.  The other alts
 	 *  are "turned off" by setting the "resolved" flag in the NFA

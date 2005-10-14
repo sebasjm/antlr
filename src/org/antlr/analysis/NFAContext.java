@@ -69,7 +69,7 @@ public class NFAContext {
 	 *  max=1.  Let's set to 2.  Recursion is sometimes needed to resolve some
 	 *  fixed lookahead decisions.
 	 */
-	public static int MAX_RECURSIVE_INVOCATIONS = 2;
+	public static int MAX_RECURSIVE_INVOCATIONS = 1;
 
     public NFAContext parent;
 

@@ -1,0 +1,90 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2005 Terence Parr
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+package org.antlr.tool;
+
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.analysis.*;
+import antlr.Token;
+
+import java.util.*;
+
+public class RecursionOverflowMessage extends Message {
+	public DecisionProbe probe;
+	public DFAState problemState;
+	public String targetRule;
+	public Set alts;
+	public Set callSiteStates;
+
+	public RecursionOverflowMessage(DecisionProbe probe,
+									DFAState problemState,
+									String targetRule,
+									Set alts,
+									Set callSiteStates)
+	{
+		super(ErrorManager.MSG_RECURSION_OVERLOW);
+		this.probe = probe;
+		this.problemState = problemState;
+		this.targetRule = targetRule;
+		this.alts = alts;
+		this.callSiteStates = callSiteStates;
+	}
+
+	public String toString() {
+		boolean leftRecursion = false;
+		GrammarAST decisionASTNode = probe.dfa.getDecisionASTNode();
+		int line = decisionASTNode.getLine();
+		int col = decisionASTNode.getColumn();
+		String fileName = probe.dfa.nfa.grammar.getFileName();
+		if ( problemState.stateNumber==probe.dfa.startState.stateNumber ) {
+			// the first state is a problem, so recursion w/o seeing any input
+			leftRecursion = true;
+			setMessageID(ErrorManager.MSG_LEFT_RECURSION);
+		}
+		StringTemplate st = getMessageTemplate();
+		if ( fileName!=null ) {
+			st.setAttribute("file", fileName);
+		}
+		st.setAttribute("line", new Integer(line));
+		st.setAttribute("col", new Integer(col));
+
+		st.setAttribute("targetRule", targetRule);
+		List sortedAlts = new ArrayList(alts);
+		Collections.sort(sortedAlts);
+		st.setAttribute("alts", sortedAlts);
+		st.setAttribute("callSiteStates", callSiteStates);
+
+		if ( !leftRecursion ) {
+			List labels = probe.getSampleNonDeterministicInputSequence(problemState);
+			String input = probe.getInputSequenceDisplay(labels);
+			st.setAttribute("input", input);
+		}
+
+		return st.toString();
+	}
+
+}

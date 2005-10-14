@@ -29,6 +29,7 @@ package org.antlr.analysis;
 
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
+import org.antlr.tool.FASerializer;
 
 import java.util.*;
 
@@ -112,6 +113,12 @@ public class DecisionProbe {
 	 *  conflicting input sequence.
 	 */
 	protected Set altsWithProblem = new HashSet();
+
+	/** Recursion is limited to a particular depth.  If that limit is exceeded
+	 *  the proposed new NFAConfiguration is record for the associated DFA state.
+	 *  Map<DFAState,List<NFAConfiguration>>.
+	 */
+	protected Map stateToRecursiveOverflowConfigurationsMap = new HashMap();
 
 	/** Did ANTLR have to terminate early on the analysis of this decision? */
 	protected boolean terminated = false;
@@ -219,6 +226,9 @@ public class DecisionProbe {
 	 */
 	public List getNonDeterministicAltsForState(DFAState targetState) {
 		Set nondetAlts = targetState.getNondeterministicAlts();
+		if ( nondetAlts==null ) {
+			return null;
+		}
 		List sorted = new LinkedList();
 		sorted.addAll(nondetAlts);
 		Collections.sort(sorted); // make sure it's 1, 2, ...
@@ -376,6 +386,7 @@ public class DecisionProbe {
 				}
 			}
 		}
+
 		Set danglingStates = getDanglingStates();
 		if ( danglingStates.size()>0 ) {
 			//System.err.println("no emanating edges for states: "+danglingStates);
@@ -384,9 +395,64 @@ public class DecisionProbe {
 				ErrorManager.danglingState(this,d);
 			}
 		}
+
 		List unreachableAlts = dfa.getUnreachableAlts();
 		if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
 			ErrorManager.unreachableAlts(this,unreachableAlts);
+		}
+
+		// walk all dfa states with problems
+		// for each dfa make a map from target rules involved in recursion
+		// overflow to the list of associated alts
+		Map targetRuleToAltsMap = new HashMap();
+		Map targetRuleToCallSiteStateMap = new HashMap();
+		Set dfaStatesWithRecursionProblems =
+			stateToRecursiveOverflowConfigurationsMap.keySet();
+		for (Iterator it = dfaStatesWithRecursionProblems.iterator(); it.hasNext();) {
+			Integer stateI = (Integer) it.next();
+			// walk this DFA's config list
+			List configs = (List)stateToRecursiveOverflowConfigurationsMap.get(stateI);
+			for (int i = 0; i < configs.size(); i++) {
+				NFAConfiguration c = (NFAConfiguration) configs.get(i);
+				NFAState ruleInvocationState = dfa.nfa.getState(c.state);
+				Transition transition0 = ruleInvocationState.transition(0);
+				RuleClosureTransition ref = (RuleClosureTransition)transition0;
+				String targetRule = ((NFAState)ref.target).getEnclosingRule();
+				// track alts associated with target
+				Set alts = (Set)targetRuleToAltsMap.get(targetRule);
+				if ( alts==null ) {
+					alts = new HashSet();
+					targetRuleToAltsMap.put(targetRule, alts);
+				}
+				alts.add(new Integer(c.alt));
+				// track call sites for target
+				Set callSites = (Set)targetRuleToCallSiteStateMap.get(targetRule);
+				if ( callSites==null ) {
+					callSites = new HashSet();
+					targetRuleToCallSiteStateMap.put(targetRule, callSites);
+				}
+				callSites.add(ruleInvocationState);
+			}
+			/*
+			System.out.println("rule target to alts list: "+targetRuleToAltsMap);
+			System.out.println("rule target to call sites list: "+targetRuleToCallSiteStateMap);
+			*/
+			Set targetRulesForThisDFA = targetRuleToAltsMap.keySet();
+			for (Iterator itr = targetRulesForThisDFA.iterator(); itr.hasNext();) {
+				String targetRule = (String) itr.next();
+				Set alts = (Set)targetRuleToAltsMap.get(targetRule);
+				Set callSiteStates = (Set)targetRuleToCallSiteStateMap.get(targetRule);
+				DFAState d = dfa.getState(stateI.intValue());
+				if ( d.getUniqueAlt()==NFA.INVALID_ALT_NUMBER ) {
+					// report error only if this state will need to look further
+					// i.e., if it does not uniquely predict a single alt
+					ErrorManager.recursionOverflow(this,
+												   d,
+												   targetRule,
+												   alts,
+												   callSiteStates);
+				}
+			}
 		}
 	}
 
@@ -404,6 +470,23 @@ public class DecisionProbe {
 	public void reportEarlyTermination() {
 		terminated = true;
 		dfa.nfa.grammar.numberOfDFAConversionsTerminatedEarly++;
+	}
+
+	public void reportRecursiveOverflow(DFAState d,
+										NFAConfiguration recursiveNFAConfiguration)
+	{
+		// track the state number rather than the state as d will change
+		// out from underneath us; hash won't return any value
+		Integer stateI = new Integer(d.stateNumber);
+		List configs = (List)stateToRecursiveOverflowConfigurationsMap.get(stateI);
+		if ( configs==null ) {
+			configs = new ArrayList();
+			configs.add(recursiveNFAConfiguration);
+			stateToRecursiveOverflowConfigurationsMap.put(stateI, configs);
+		}
+		else {
+			configs.add(recursiveNFAConfiguration);
+		}
 	}
 
 	public void reportNondeterminism(DFAState d) {
@@ -497,10 +580,6 @@ public class DecisionProbe {
 		Set dfaStates = new HashSet();
 		stateReachable = new HashMap();
 		boolean reaches = reachesState(dfa.startState, targetState, dfaStates);
-		if ( !reaches ) {
-			System.err.println("whoa!  no path from start to "+
-							   targetState.stateNumber);
-		}
 		return dfaStates;
 	}
 

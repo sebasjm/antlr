@@ -11,8 +11,23 @@ import java.io.FileReader;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
+import java.util.Random;
 
+/** Generate a random phrase given a grammar.
+ *  Usage:
+ *     java org.antlr.tool.RandomPhrase grammarFile.g startRule [seed]
+ *
+ *  For example:
+ *     java org.antlr.tool.RandomPhrase simple.g program 342
+ *
+ *  The seed acts like a unique identifier so you can get the same random
+ *  phrase back during unit testing, for example.
+ *
+ *  If you do not specify a seed then the current time in milliseconds is used
+ *  guaranteeing that you'll never see that seed again.
+ */
 public class RandomPhrase {
+	protected static Random random;
 
 	/** an experimental method to generate random phrases for a given
 	 *  grammar given a start rule.  Return a list of token types.
@@ -65,11 +80,8 @@ public class RandomPhrase {
 			}
 			// decision point, pick ith alternative randomly
 			int n = g.getNumberOfAltsForDecisionNFA(state);
-			int randomAlt = (int)Math.floor(Math.random()*n + 1);
-			if ( randomAlt>n ) {
-				randomAlt = n;
-			}
-			//System.out.println("alt = "+randomAlt);
+			int randomAlt = random.nextInt(n) + 1;
+			//System.out.println("randomAlt="+randomAlt);
 			NFAState altStartState =
 				g.getNFAStateForAltOfDecision(state, randomAlt);
 			Transition t = altStartState.transition(0);
@@ -85,13 +97,7 @@ public class RandomPhrase {
 			// pick random element of set
 			IntSet typeSet = label.getSet();
 			List typeList = typeSet.toList();
-			double r = Math.random()*typeList.size();
-			int randomIndex = (int)Math.floor(r);
-			if ( randomIndex==typeList.size() ) {
-				// rare case, but check anyway.  If r==1.0*size,
-				// index would be out of range.
-				randomIndex--;
-			}
+			int randomIndex = random.nextInt(typeList.size());
 			return (Integer)typeList.get(randomIndex);
 		}
 		else {
@@ -104,6 +110,12 @@ public class RandomPhrase {
 	public static void main(String[] args) throws Exception {
 		String grammarFileName = args[0];
 		String startRule = args[1];
+		long seed = System.currentTimeMillis(); // use random seed unless spec.
+		if ( args.length==3 ) {
+			String seedStr = args[2];
+			seed = Integer.parseInt(seedStr);
+		}
+		random = new Random(seed);
 
 		Grammar parser =
 			new Grammar(null,

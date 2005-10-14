@@ -53,10 +53,14 @@ public abstract class Message {
 	}
 
 	public Message(int msgID, Object arg, Object arg2) {
-		this.msgID = msgID;
-		msgST = ErrorManager.getMessage(msgID);
+		setMessageID(msgID);
 		this.arg = arg;
 		this.arg2 = arg2;
+	}
+
+	public void setMessageID(int msgID) {
+		this.msgID = msgID;
+		msgST = ErrorManager.getMessage(msgID);
 	}
 
 	public StringTemplate getMessageTemplate() {

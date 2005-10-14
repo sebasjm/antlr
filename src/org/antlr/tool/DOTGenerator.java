@@ -309,7 +309,7 @@ public class DOTGenerator {
 						if ( (cIndex+1)<configsInAlt.size() ) {
 							buf.append(", ");
 						}
-						if ( n%5==0 && (configsInAlt.size()-cIndex)>2 ) {
+						if ( n%5==0 && (configsInAlt.size()-cIndex)>3 ) {
 							buf.append("\\n");
 						}
 					}

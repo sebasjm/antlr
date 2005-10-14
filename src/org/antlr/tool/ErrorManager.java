@@ -30,6 +30,7 @@ package org.antlr.tool;
 import org.antlr.Tool;
 import org.antlr.analysis.DecisionProbe;
 import org.antlr.analysis.DFAState;
+import org.antlr.analysis.NFAConfiguration;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplateErrorListener;
@@ -160,8 +161,10 @@ public class ErrorManager {
 	public static final int MSG_INSUFFICIENT_PREDICATES = 203;
 	public static final int MSG_DUPLICATE_SET_ENTRY = 204;    // (A|A)
 	public static final int MSG_ANALYSIS_ABORTED = 205;
+	public static final int MSG_RECURSION_OVERLOW = 206;
+	public static final int MSG_LEFT_RECURSION = 207;
 
-	public static final int MAX_MESSAGE_NUMBER = 205;
+	public static final int MAX_MESSAGE_NUMBER = 207;
 
 	/** Messages should be sensitive to the locale. */
 	private static Locale locale;
@@ -438,6 +441,19 @@ public class ErrorManager {
 		getErrorCount().warnings++;
 		getErrorListener().warning(
 			new GrammarInsufficientPredicatesMessage(probe,alts)
+		);
+	}
+
+	public static void recursionOverflow(DecisionProbe probe,
+										 DFAState problemState,
+										 String targetRule,
+										 Set alts,
+										 Set callSiteStates)
+	{
+		getErrorCount().warnings++;
+		getErrorListener().warning(
+			new RecursionOverflowMessage(probe,problemState,targetRule,
+										 alts,callSiteStates)
 		);
 	}
 
