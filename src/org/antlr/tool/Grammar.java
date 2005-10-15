@@ -199,6 +199,11 @@ public class Grammar {
 	 */
 	protected Grammar importTokenVocabularyFromGrammar;
 
+	/** For ANTLRWorks, we want to be able to map a line:col to a specific
+	 *  decision DFA so it can display DFA.
+	 */
+	Map lineColumnToLookaheadDFAMap = new HashMap();
+
 	protected Tool tool;
 
 	/** The unique set of all rule references in any rule */
@@ -583,6 +588,14 @@ public class Grammar {
 				}
 
 				setLookaheadDFA(decision, lookaheadDFA);
+
+				// create map from line:col to decision DFA (for ANTLRWorks)
+				GrammarAST decisionAST = lookaheadDFA.getDecisionASTNode();
+				int line = decisionAST.getLine();
+				int col = decisionAST.getColumn();
+				lineColumnToLookaheadDFAMap.put(new StringBuffer().append(line + ":")
+											.append(col).toString(), lookaheadDFA);
+
 				/*
 				long stop = System.currentTimeMillis();
 				System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
@@ -1278,6 +1291,12 @@ public class Grammar {
 			return null;
 		}
 		return d.blockAST;
+	}
+
+	/** Useful for ANTLRWorks to map position in file to the DFA for display */
+	public DFA getLookaheadDFAFromPositionInFile(int line, int col) {
+		return (DFA)lineColumnToLookaheadDFAMap.get(
+			new StringBuffer().append(line + ":").append(col).toString());
 	}
 
 	/*
