@@ -1293,6 +1293,28 @@ public class Grammar {
 		return d.blockAST;
 	}
 
+	/** returns a list of column numbers for all decisions
+	 *  on a particular line so ANTLRWorks choose the decision
+	 *  depending on the location of the cursor (otherwise,
+	 *  ANTLRWorks has to give the *exact* location which
+	 *  is not easy from the user point of view).
+	 *
+	 *  This is not particularly fast as it walks entire line:col->DFA map
+	 *  looking for a prefix of "line:".
+	 */
+	public List getLookaheadDFAColumnsForLineInFile(int line) {
+		String prefix = line+":";
+		List columns = new ArrayList();
+		for(Iterator iter = lineColumnToLookaheadDFAMap.keySet().iterator();
+			iter.hasNext(); ) {
+			String key = (String)iter.next();
+			if(key.startsWith(prefix)) {
+				columns.add(Integer.valueOf(key.substring(prefix.length())));
+			}
+		}
+		return columns;
+	}
+
 	/** Useful for ANTLRWorks to map position in file to the DFA for display */
 	public DFA getLookaheadDFAFromPositionInFile(int line, int col) {
 		return (DFA)lineColumnToLookaheadDFAMap.get(
