@@ -50,7 +50,10 @@ options {
 }
 
 tokens {
-	"tokens";
+	OPTIONS="options";
+	TOKENS="tokens";
+	PARSER="parser";
+	
     LEXER;
     RULE;
     BLOCK;
@@ -65,8 +68,6 @@ tokens {
     EOR;
     EOB;
     EOA; // end of alt
-    PARSER="parser";
-    OPTIONS;
     CHARSET;
     SET;
     ID;
@@ -654,10 +655,6 @@ options {
 	charVocabulary='\003'..'\377';
 }
 
-tokens {
-	"options";
-}
-
 WS	:	(	/*	'\r' '\n' can be matched in one alternative or by matching
 				'\r' in one iteration and '\n' in another.  I am trying to
 				handle any flavor of newline that comes in, but the language
@@ -926,8 +923,8 @@ RULE_REF
 	int t=0;
 }
 	:	t=INTERNAL_RULE_REF {_ttype=t;}
-		(	{t==LITERAL_options}? WS_LOOP ('{' {_ttype = OPTIONS;})?
-		|	{t==LITERAL_tokens}? WS_LOOP ('{' {_ttype = TOKENS;})?
+		(	{t==OPTIONS}? WS_LOOP ('{' {_ttype = OPTIONS;})?
+		|	{t==TOKENS}? WS_LOOP ('{' {_ttype = TOKENS;})?
 		|
 		)
 	;
