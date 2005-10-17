@@ -33,25 +33,22 @@ import antlr.Token;
 
 import java.util.*;
 
-/** Indicates recursion overflow.  A DFA state tried add an NFA configuration
- *  with NFA state p that was mentioned in its stack context too many times.
+/** Indicates recursion w/o having consumed a token.  Bad state must be
+ *  start state (s0).
  */
-public class RecursionOverflowMessage extends Message {
+public class LeftRecursionMessage extends Message {
 	public DecisionProbe probe;
-	public DFAState sampleBadState;
 	public int alt;
 	public Collection targetRules;
 	public Collection callSiteStates;
 
-	public RecursionOverflowMessage(DecisionProbe probe,
-									DFAState sampleBadState,
-									int alt,
-									Collection targetRules,
-									Collection callSiteStates)
+	public LeftRecursionMessage(DecisionProbe probe,
+								int alt,
+								Collection targetRules,
+								Collection callSiteStates)
 	{
-		super(ErrorManager.MSG_RECURSION_OVERLOW);
+		super(ErrorManager.MSG_LEFT_RECURSION);
 		this.probe = probe;
-		this.sampleBadState = sampleBadState;
 		this.alt = alt;
 		this.targetRules = targetRules;
 		this.callSiteStates = callSiteStates;
@@ -72,11 +69,6 @@ public class RecursionOverflowMessage extends Message {
 		st.setAttribute("targetRules", targetRules);
 		st.setAttribute("alt", alt);
 		st.setAttribute("callSiteStates", callSiteStates);
-
-		List labels =
-			probe.getSampleNonDeterministicInputSequence(sampleBadState);
-		String input = probe.getInputSequenceDisplay(labels);
-		st.setAttribute("input", input);
 
 		return st.toString();
 	}

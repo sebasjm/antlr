@@ -187,6 +187,10 @@ public class DFA {
 		return (DFAState)states.get(stateNumber);
 	}
 
+	public void setState(int stateNumber, DFAState d) {
+		states.set(stateNumber, d);
+	}
+
 	/** Is the DFA reduced?  I.e., does every state have a path to an accept
      *  state?  If not, don't delete as we need to generate an error indicating
      *  which paths are "dead ends".  Also tracks list of alts with no accept

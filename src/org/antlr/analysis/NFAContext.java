@@ -66,10 +66,12 @@ public class NFAContext {
 	 *  stack can only grow as big as the number of NFA states.
 	 *
 	 *  I noticed that the Java grammar didn't work with max=0, but did with
-	 *  max=1.  Let's set to 2.  Recursion is sometimes needed to resolve some
-	 *  fixed lookahead decisions.
+	 *  max=1.  Actually, fixed some warning messages and max=1 had
+	 *  some recursion errors that disappeared at max=2; Let's set to 2.
+	 *  Recursion is sometimes needed to resolve some fixed lookahead
+	 *  decisions.
 	 */
-	public static int MAX_RECURSIVE_INVOCATIONS = 1;
+	public static int MAX_RECURSIVE_INVOCATIONS = 2;
 
     public NFAContext parent;
 

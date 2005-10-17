@@ -234,7 +234,8 @@ public class NFAToDFAConverter {
 			System.out.println("DFA state after closure "+d+"-"+
 							   label.toString(dfa.nfa.grammar)+
 							   "->"+t);
-							   */
+			*/
+
 			DFAState targetState = addDFAStateToWorkList(t); // add if not in DFA yet
 
 			numberOfEdgesEmanating +=
@@ -246,17 +247,15 @@ public class NFAToDFAConverter {
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
 			// TODO: can fixed lookahead hit a dangling state case?
-			System.err.println("dangling state alts: "+d.getAltSet());
+			// TODO: yes, with left recursion
+			// TODO: alter DANGLING err template to have input to that state
+			//System.err.println("dangling state alts: "+d.getAltSet());
 			dfa.probe.reportDanglingState(d);
-			dfa.probe.reportEarlyTermination();
 			// turn off all configurations except for those associated with
 			// min alt number; somebody has to win else some input will not
 			// predict any alt.
 			int minAlt = resolveByPickingMinAlt(d, null);
 			convertToAcceptState(d, minAlt); // force it to be an accept state
-			terminate = true; // might as well stop now
-			//TODO: fix so we issue dangling state warnings when we reanalyze at k=1
-			//dfa.probe.issueWarnings();
 		}
 
 		// Check to see if we need to add any semantic predicate transitions
@@ -638,7 +637,14 @@ public class NFAToDFAConverter {
 		int depth = context.recursionDepthEmanatingFromState(p.stateNumber);
 		if ( depth > NFAContext.MAX_RECURSIVE_INVOCATIONS ) {
 			// report a problem if we detect an attempt to recurse higher
-			d.dfa.probe.reportRecursiveOverflow(d, proposedNFAConfiguration);
+			if ( dfa.startState == null ||
+				 d.stateNumber==dfa.startState.stateNumber )
+			{
+				d.dfa.probe.reportLeftRecursion(d, proposedNFAConfiguration);
+			}
+			else {
+				d.dfa.probe.reportRecursiveOverflow(d, proposedNFAConfiguration);
+			}
 			return true;
 		}
 		return false;
@@ -754,10 +760,20 @@ public class NFAToDFAConverter {
      *  at least one input sequence reaching that NFA state.
      */
     protected DFAState addDFAStateToWorkList(DFAState d) {
-        DFAState potentiallyExistingState = dfa.addState(d);
-		if ( d != potentiallyExistingState ) {
-			// already there...get the existing DFA state
-			return potentiallyExistingState;
+        DFAState existingState = dfa.addState(d);
+		if ( d != existingState ) {
+			// already there...use/return the existing DFA state.
+			// But also set the states[d.stateNumber] to the existing
+			// DFA state because the closureIsBusy must report
+			// infinite recursion on a state before it knows
+			// whether or not the state will already be
+			// found after closure on it finishes.  It could be
+			// refer to a state that will ultimately not make it
+			// into the reachable state space and the error
+			// reporting must be able to compute the path from
+			// start to the error state with infinite recursion
+			d.dfa.setState(d.stateNumber, existingState);
+			return existingState;
 		}
 
 		// if not there, then examine new state.
@@ -784,17 +800,21 @@ public class NFAToDFAConverter {
     }
 
 	protected DFAState convertToAcceptState(DFAState d, int alt) {
-		// only merge stop states if they are deterministic.
-		// later, the error reporting may want to trace the path from
+		// only merge stop states if they are deterministic and no
+		// recursion problems.
+		// Later, the error reporting may want to trace the path from
 		// the start state to the nondet state
 		if ( DFAOptimizer.MERGE_STOP_STATES &&
-			 d.getNondeterministicAlts()==null )
+			d.getNondeterministicAlts()==null &&
+			!dfa.probe.dfaStateHasRecursionOverflow(d) )
 		{
 			// check to see if we already have an accept state for this alt
 			// [must do this after we resolve nondeterminisms in general]
 			DFAState acceptStateForAlt = dfa.getAcceptState(alt);
 			if ( acceptStateForAlt!=null ) {
-				dfa.removeState(d);    // oops; remove this state from DFA
+				// we already have an accept state for alt
+				dfa.setState(d.stateNumber, acceptStateForAlt);
+				dfa.removeState(d);    // remove this state from DFA
 				d = acceptStateForAlt; // use old accept state; throw this one out
 			}
 			else {

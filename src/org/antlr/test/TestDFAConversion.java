@@ -863,7 +863,7 @@ As a result, alternative(s) 2 were disabled for that input
 			else {
 				recMsg = getRecursionOverflowMessage(equeue.warnings);
 				if ( recMsg!=null ) {
-					nonDetAlts = new ArrayList(recMsg.alts);
+					//nonDetAlts = new ArrayList(recMsg.alts);
 				}
 			}
 			// compare nonDetAlts with expectingNonDetAlts

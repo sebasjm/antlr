@@ -210,15 +210,15 @@ DUPLICATE_SET_ENTRY(file,line,col,arg) ::=
 	"<loc()>duplicate token type <arg> when collapsing subrule into set"
 
 ANALYSIS_ABORTED(file,line,col) ::= <<
-<loc()>ANTLR could not analyze this decision probably due to a true ambiguity in the grammar.  ANTLR re-analyzed the decision with a fixed lookahead of k=1.
+<loc()>ANTLR could not analyze this decision probably due to a true ambiguity in the grammar or left-recursion problems.  ANTLR re-analyzed the decision with a fixed lookahead of k=1.
 >>
 
-RECURSION_OVERLOW(file,line,col,targetRule,input,alts,callSiteStates) ::= <<
-<loc()>After matching <input> decision cannot predict what comes next for alternative(s) <alts; separator=", "> due to recursion overflow to <targetRule> from call sites in rule(s) <callSiteStates:{s|<s.enclosingRule>}; separator=", ">
+RECURSION_OVERLOW(file,line,col,alt,input,targetRules,callSiteStates) ::= <<
+<loc()>Alternative <alt>: after matching input such as <input> decision cannot predict what comes next due to recursion overflow <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule>};separator=", ">}; separator=" and ">
 >>
 
-LEFT_RECURSION(file,line,col,targetRule,input,alts,callSiteStates) ::= <<
-<loc()>Infinite recursion to <targetRule> from call sites in rule(s) <callSiteStates:{s|<s.enclosingRule>}; separator=", "> alternative(s) <alts; separator=", ">
+LEFT_RECURSION(file,line,col,targetRules,alt,callSiteStates) ::= <<
+<loc()>Alternative <alt> discovers infinite left-recursion <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule>};separator=", ">}; separator=" and ">
 >>
 
 /* This factors out file location formatting; file,line,col inherited from

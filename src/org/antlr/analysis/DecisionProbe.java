@@ -115,10 +115,16 @@ public class DecisionProbe {
 	protected Set altsWithProblem = new HashSet();
 
 	/** Recursion is limited to a particular depth.  If that limit is exceeded
-	 *  the proposed new NFAConfiguration is record for the associated DFA state.
+	 *  the proposed new NFAConfiguration is recorded for the associated DFA state.
 	 *  Map<DFAState,List<NFAConfiguration>>.
 	 */
 	protected Map stateToRecursiveOverflowConfigurationsMap = new HashMap();
+
+	/** Left recursion discovered.  The proposed new NFAConfiguration
+	 *  is recorded for the associated DFA state.
+	 *  Map<DFAState,List<NFAConfiguration>>.
+	 */
+	protected Map stateToLeftRecursiveConfigurationsMap = new HashMap();
 
 	/** Did ANTLR have to terminate early on the analysis of this decision? */
 	protected boolean terminated = false;
@@ -253,6 +259,11 @@ public class DecisionProbe {
 		return d.getDisabledAlternatives();
 	}
 
+	public boolean dfaStateHasRecursionOverflow(DFAState d) {
+		Integer stateI = new Integer(d.stateNumber);
+		return stateToRecursiveOverflowConfigurationsMap.get(stateI)!=null;
+	}
+
 	/** Return a List<Label> indicating an input sequence that can be matched
 	 *  from the start state of the DFA to the targetState (which is known
 	 *  to have a problem).
@@ -368,6 +379,8 @@ public class DecisionProbe {
 			return;
 		}
 
+		issueRecursionWarnings();
+
 		// generate a separate message for each problem state in DFA
 		Set resolvedStates = getNondeterministicStatesResolvedWithSemanticPredicate();
 		Set problemStates = getDFAStatesWithSyntacticallyAmbiguousAlts();
@@ -400,60 +413,131 @@ public class DecisionProbe {
 		if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
 			ErrorManager.unreachableAlts(this,unreachableAlts);
 		}
+	}
 
-		// walk all dfa states with problems
-		// for each dfa make a map from target rules involved in recursion
-		// overflow to the list of associated alts
-		Map targetRuleToAltsMap = new HashMap();
-		Map targetRuleToCallSiteStateMap = new HashMap();
+	protected void issueRecursionWarnings() {
+		// RECURSION OVERFLOW
+
 		Set dfaStatesWithRecursionProblems =
 			stateToRecursiveOverflowConfigurationsMap.keySet();
-		for (Iterator it = dfaStatesWithRecursionProblems.iterator(); it.hasNext();) {
+		// some of the states in dfaStatesWithRecursionProblems will be
+		// aliases to other states (that's how cycles get created in DFAs
+		// during conversion).  We need a unique real set
+		Set dfaStatesUnaliased = getUnaliasedDFAStateSet(dfaStatesWithRecursionProblems);
+
+		// now walk truly unique (unaliased) list of dfa states with inf recur
+		// Goal: create a map from alt to map<target,List<callsites>>
+		// Map<Map<String target, List<NFAState call sites>>
+		Map altToTargetToCallSitesMap = new HashMap();
+		// track a single problem DFA state for each alt
+		Map altToDFAState = new HashMap();
+		computeAltToProblemMaps(dfaStatesUnaliased,
+								stateToRecursiveOverflowConfigurationsMap,
+								altToTargetToCallSitesMap, // output param
+								altToDFAState);            // output param
+		//System.out.println("altToTargetToCallSitesMap="+altToTargetToCallSitesMap);
+
+		// walk each alt with recursion overflow problems and generate error
+		Set alts = altToTargetToCallSitesMap.keySet();
+		List sortedAlts = new ArrayList(alts);
+		Collections.sort(sortedAlts);
+		for (Iterator altsIt = sortedAlts.iterator(); altsIt.hasNext();) {
+			Integer altI = (Integer) altsIt.next();
+			Map targetToCallSiteMap =
+				(Map)altToTargetToCallSitesMap.get(altI);
+			Set targetRules = targetToCallSiteMap.keySet();
+			Collection callSiteStates = targetToCallSiteMap.values();
+			DFAState sampleBadState = (DFAState)altToDFAState.get(altI);
+			ErrorManager.recursionOverflow(this,
+										   sampleBadState,
+										   altI.intValue(),
+										   targetRules,
+										   callSiteStates);
+		}
+
+		// LEFT RECURSION
+		// TODO: hideous cut/paste of code; try to refactor
+
+		Set dfaStatesWithLeftRecursionProblems =
+			stateToLeftRecursiveConfigurationsMap.keySet();
+
+		dfaStatesUnaliased =
+			getUnaliasedDFAStateSet(dfaStatesWithLeftRecursionProblems);
+
+		// now walk truly unique (unaliased) list of dfa states with inf recur
+		// Goal: create a map from alt to map<target,List<callsites>>
+		// Map<Map<String target, List<NFAState call sites>>
+		altToTargetToCallSitesMap = new HashMap();
+		// track a single problem DFA state for each alt
+		altToDFAState = new HashMap();
+		computeAltToProblemMaps(dfaStatesUnaliased,
+								stateToLeftRecursiveConfigurationsMap,
+								altToTargetToCallSitesMap, // output param
+								altToDFAState);            // output param
+
+		// walk each alt with recursion overflow problems and generate error
+		alts = altToTargetToCallSitesMap.keySet();
+		sortedAlts = new ArrayList(alts);
+		Collections.sort(sortedAlts);
+		for (Iterator altsIt = sortedAlts.iterator(); altsIt.hasNext();) {
+			Integer altI = (Integer) altsIt.next();
+			Map targetToCallSiteMap =
+				(Map)altToTargetToCallSitesMap.get(altI);
+			Set targetRules = targetToCallSiteMap.keySet();
+			Collection callSiteStates = targetToCallSiteMap.values();
+			ErrorManager.leftRecursion(this,
+									   altI.intValue(),
+									   targetRules,
+									   callSiteStates);
+		}
+	}
+
+	private void computeAltToProblemMaps(Set dfaStatesUnaliased,
+										 Map configurationsMap,
+										 Map altToTargetToCallSitesMap,
+										 Map altToDFAState)
+	{
+		for (Iterator it = dfaStatesUnaliased.iterator(); it.hasNext();) {
 			Integer stateI = (Integer) it.next();
 			// walk this DFA's config list
-			List configs = (List)stateToRecursiveOverflowConfigurationsMap.get(stateI);
+			List configs = (List)configurationsMap.get(stateI);
 			for (int i = 0; i < configs.size(); i++) {
 				NFAConfiguration c = (NFAConfiguration) configs.get(i);
 				NFAState ruleInvocationState = dfa.nfa.getState(c.state);
 				Transition transition0 = ruleInvocationState.transition(0);
 				RuleClosureTransition ref = (RuleClosureTransition)transition0;
 				String targetRule = ((NFAState)ref.target).getEnclosingRule();
-				// track alts associated with target
-				Set alts = (Set)targetRuleToAltsMap.get(targetRule);
-				if ( alts==null ) {
-					alts = new HashSet();
-					targetRuleToAltsMap.put(targetRule, alts);
+				Integer altI = new Integer(c.alt);
+				Map targetToCallSiteMap =
+					(Map)altToTargetToCallSitesMap.get(altI);
+				if ( targetToCallSiteMap==null ) {
+					targetToCallSiteMap = new HashMap();
+					altToTargetToCallSitesMap.put(altI, targetToCallSiteMap);
 				}
-				alts.add(new Integer(c.alt));
-				// track call sites for target
-				Set callSites = (Set)targetRuleToCallSiteStateMap.get(targetRule);
+				Set callSites =
+					(HashSet)targetToCallSiteMap.get(targetRule);
 				if ( callSites==null ) {
 					callSites = new HashSet();
-					targetRuleToCallSiteStateMap.put(targetRule, callSites);
+					targetToCallSiteMap.put(targetRule, callSites);
 				}
 				callSites.add(ruleInvocationState);
-			}
-			/*
-			System.out.println("rule target to alts list: "+targetRuleToAltsMap);
-			System.out.println("rule target to call sites list: "+targetRuleToCallSiteStateMap);
-			*/
-			Set targetRulesForThisDFA = targetRuleToAltsMap.keySet();
-			for (Iterator itr = targetRulesForThisDFA.iterator(); itr.hasNext();) {
-				String targetRule = (String) itr.next();
-				Set alts = (Set)targetRuleToAltsMap.get(targetRule);
-				Set callSiteStates = (Set)targetRuleToCallSiteStateMap.get(targetRule);
-				DFAState d = dfa.getState(stateI.intValue());
-				if ( d.getUniqueAlt()==NFA.INVALID_ALT_NUMBER ) {
-					// report error only if this state will need to look further
-					// i.e., if it does not uniquely predict a single alt
-					ErrorManager.recursionOverflow(this,
-												   d,
-												   targetRule,
-												   alts,
-												   callSiteStates);
+				// track one problem DFA state per alt
+				if ( altToDFAState.get(altI)==null ) {
+					DFAState sampleBadState = dfa.getState(stateI.intValue());
+					altToDFAState.put(altI, sampleBadState);
 				}
 			}
 		}
+	}
+
+	private Set getUnaliasedDFAStateSet(Set dfaStatesWithRecursionProblems) {
+		Set dfaStatesUnaliased = new HashSet();
+		for (Iterator it = dfaStatesWithRecursionProblems.iterator(); it.hasNext();) {
+			Integer stateI = (Integer) it.next();
+			DFAState d = dfa.getState(stateI.intValue());
+			dfaStatesUnaliased.add(new Integer(d.stateNumber));
+		}
+		return dfaStatesUnaliased;
 	}
 
 
@@ -476,8 +560,13 @@ public class DecisionProbe {
 										NFAConfiguration recursiveNFAConfiguration)
 	{
 		// track the state number rather than the state as d will change
-		// out from underneath us; hash won't return any value
+		// out from underneath us; hash wouldn't return any value
 		Integer stateI = new Integer(d.stateNumber);
+		/*
+		dfaToRecursiveOverflowStateMap.put(d.dfa, stateI);
+		dfaToRecursiveOverflowAltMap.put(d.dfa,
+										 recursiveNFAConfiguration);
+										 */
 		List configs = (List)stateToRecursiveOverflowConfigurationsMap.get(stateI);
 		if ( configs==null ) {
 			configs = new ArrayList();
@@ -486,6 +575,23 @@ public class DecisionProbe {
 		}
 		else {
 			configs.add(recursiveNFAConfiguration);
+		}
+	}
+
+	public void reportLeftRecursion(DFAState d,
+									NFAConfiguration leftRecursiveNFAConfiguration)
+	{
+		// track the state number rather than the state as d will change
+		// out from underneath us; hash wouldn't return any value
+		Integer stateI = new Integer(d.stateNumber);
+		List configs = (List)stateToLeftRecursiveConfigurationsMap.get(stateI);
+		if ( configs==null ) {
+			configs = new ArrayList();
+			configs.add(leftRecursiveNFAConfiguration);
+			stateToLeftRecursiveConfigurationsMap.put(stateI, configs);
+		}
+		else {
+			configs.add(leftRecursiveNFAConfiguration);
 		}
 	}
 

@@ -411,7 +411,6 @@ public class ErrorManager {
 	public static void danglingState(DecisionProbe probe,
 									 DFAState d)
 	{
-		System.out.println("danglingState alts: "+d.getAltSet());
 		getErrorCount().warnings++;
 		getErrorListener().warning(
 			new GrammarDanglingStateMessage(probe,d)
@@ -445,15 +444,26 @@ public class ErrorManager {
 	}
 
 	public static void recursionOverflow(DecisionProbe probe,
-										 DFAState problemState,
-										 String targetRule,
-										 Set alts,
-										 Set callSiteStates)
+										 DFAState sampleBadState,
+										 int alt,
+										 Collection targetRules,
+										 Collection callSiteStates)
 	{
 		getErrorCount().warnings++;
 		getErrorListener().warning(
-			new RecursionOverflowMessage(probe,problemState,targetRule,
-										 alts,callSiteStates)
+			new RecursionOverflowMessage(probe,sampleBadState, alt,
+										 targetRules, callSiteStates)
+		);
+	}
+
+	public static void leftRecursion(DecisionProbe probe,
+									 int alt,
+									 Collection targetRules,
+									 Collection callSiteStates)
+	{
+		getErrorCount().warnings++;
+		getErrorListener().warning(
+			new LeftRecursionMessage(probe, alt, targetRules, callSiteStates)
 		);
 	}
 
