@@ -206,6 +206,11 @@ CHANGES
 
 3.0ea6 - ??
 
+* dramatically improved infinite recursion error messages (actually
+  left-recursion never even was printed out before).
+
+* wasn't printing dangling state messages when it reanalyzes with k=1.
+
 * fixed a nasty bug in the analysis engine dealing with infinite recursion.
   Spent all day thinking about it and cleaned up the code dramatically.
   Bug fixed and software is more powerful and I understand it better! :)

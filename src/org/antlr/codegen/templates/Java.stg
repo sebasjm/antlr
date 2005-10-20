@@ -75,7 +75,7 @@ import java.util.ArrayList;
 >>
 
 lexer(name, tokens, globalAction, rules, cyclicDFAs) ::= <<
-class <name> extends Lexer {
+public class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <globalAction>
     public <name>(CharStream input) {
@@ -109,7 +109,7 @@ retry:
 
 /** How to generate a parser */
 genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, inputStreamType, superClass, ASTLabelType="Object", labelType) ::= <<
-class <name> extends <if(debug)>Debug<endif><superClass> {
+public class <name> extends <if(debug)>Debug<endif><superClass> {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
     };
@@ -421,27 +421,19 @@ case <i> :
     break;<\n>
 >>
 
-/** An alternative is just a list of elements; at outermost level,
- *  set the AST parameters to indicate what kind of tree to build.
- */
+/** An alternative is just a list of elements; at outermost level */
 alt(elements,altNum,description,autoAST,outerAlt) ::= <<
 // <fileName>:<description>
 {
-<if(autoAST)>
-<if(outerAlt)>
-root_0 = (<ASTLabelType>)adaptor.nil();<\n>
-<else>
-<ASTLabelType> root_<blockLevel> = (<ASTLabelType>)adaptor.nil();<\n>
-<endif>
-<endif>
+<alt_declarations()>
 <elements:element()>
-<if(autoAST)>
-<if(!outerAlt)>
-adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
-<endif>
-<endif>
+<alt_cleanup()>
 }
 >>
+
+alt_declarations() ::= ""
+
+alt_cleanup() ::= ""
 
 // E L E M E N T S
 
@@ -463,89 +455,15 @@ tokenRef(token,label,elementIndex) ::= <<
 match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 >>
 
-/** ID! is same as plain tokenRef */
-tokenRefASTBang ::= tokenRef
-
-
 /** ids+=ID no AST building */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
-<label>=input.LT(1);
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+<tokenRef(...)>
+<listLabel(...)>
+>>
+
+listLabel(label) ::= <<
 if (list_<label>==null) list_<label>=new ArrayList();
 list_<label>.add(<label>);<\n>
->>
-
-/** ids+=ID! is same as tokenRefAndListLabel */
-tokenRefASTBangAndListLabel ::= tokenRefAndListLabel
-
-/** Match a token but track it for use in a rewrite rule */
-tokenRefASTTrack(token,label,elementIndex) ::= <<
-<label>=input.LT(1);
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
-list_<token>.add(<label>);<\n>
->>
-
-/** Match a token but track it for use in a rewrite rule */
-tokenRefASTTrackAndListLabel(token,label,elementIndex) ::= <<
-<label>=input.LT(1);
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
-list_<token>.add(<label>);<\n>
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>);<\n>
->>
-
-/** Match label+=TOKEN when buildAST but not rewrite alt */
-tokenRefASTAndListLabel(token,label,elementIndex) ::= <<
-<label>=input.LT(1);
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>);<\n>
-<label>_tree = adaptor.create(<label>);
-adaptor.addChild(root_<blockLevel>, <label>_tree);
->>
-
-/** Match label+=TOKEN^ when buildAST but not rewrite alt */
-tokenRefASTRootAndListLabel(token,label,elementIndex) ::= <<
-<label>=input.LT(1);
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>);<\n>
-<label>_tree = adaptor.create(<label>);
-root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
->>
-
-/** Match label+=TOKEN^^ when buildAST but not rewrite alt */
-tokenRefASTRuleRootAndListLabel(token,label,elementIndex) ::= <<
-<label>=input.LT(1);
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>);<\n>
-<label>_tree = adaptor.create(<label>);
-root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
->>
-
-/** match a token when output==AST */
-tokenRefAST(token,label,elementIndex) ::= <<
-<label>=input.LT(1);
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
-<label>_tree = adaptor.create(<label>);
-adaptor.addChild(root_<blockLevel>, <label>_tree);
->>
-
-/** match a token when output==AST and ref is token^ */
-tokenRefASTRoot(token,label,elementIndex) ::= <<
-<label>=input.LT(1);
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
-<label>_tree = adaptor.create(<label>);
-root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
->>
-
-/** match a token when output==AST and ref is token^^ */
-tokenRefASTRuleRoot(token,label,elementIndex) ::= <<
-<label>=input.LT(1);
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
-<label>_tree = adaptor.create(<label>);
-root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
 /** match a character */
@@ -580,57 +498,6 @@ else {
 }<\n>
 >>
 
-matchSetAST(s,label,elementIndex) ::= <<
-<label>=input.LT(1);
-if ( <s> ) {
-    adaptor.addChild(root_<blockLevel>, adaptor.create(<label>));
-    input.consume();
-}
-else {
-    MismatchedSetException mse =
-        new MismatchedSetException(null,input);
-<if(debug)>
-    dbg.recognitionException(mse);<\n>
-<endif>
-    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
-    throw mse;
-}<\n>
->>
-
-matchSetASTRoot(s,label,elementIndex) ::= <<
-<label>=input.LT(1);
-if ( <s> ) {
-    root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_<blockLevel>);
-    input.consume();
-}
-else {
-    MismatchedSetException mse =
-        new MismatchedSetException(null,input);
-<if(debug)>
-    dbg.recognitionException(mse);<\n>
-<endif>
-    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
-    throw mse;
-}<\n>
->>
-
-matchSetASTRuleRoot(s,label,elementIndex) ::= <<
-<label>=input.LT(1);<\n>
-if ( <s> ) {
-    root_0 = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_0);
-    input.consume();
-}
-else {
-    MismatchedSetException mse =
-        new MismatchedSetException(null,input);
-<if(debug)>
-    dbg.recognitionException(mse);<\n>
-<endif>
-    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
-    throw mse;
-}<\n>
->>
-
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
 <if(label)>
@@ -649,26 +516,6 @@ wildcard(label,elementIndex) ::= <<
 matchAny(input);
 >>
 
-wildcardAST(label,elementIndex) ::= <<
-<label>=input.LT(1);
-matchAny(input);
-<label>_tree = adaptor.create(<label>);
-adaptor.addChild(root_<blockLevel>, <label>_tree);
->>
-
-wildcardASTRoot(label,elementIndex) ::= <<
-<label>=input.LT(1);
-matchAny(input);
-<label>_tree = adaptor.create(<label>);
-root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
->>
-
-wildcardASTRuleRoot(label,elementIndex) ::= <<
-<label>=input.LT(1);
-matchAny(input);
-<label>_tree = adaptor.create(<label>);
-root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
->>
 
 /** Match . wildcard */
 wildcardChar(label, elementIndex) ::= <<
@@ -691,80 +538,6 @@ following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 following.pop();
 >>
 
-ruleRefASTBang ::= ruleRef
-
-ruleRefASTTrack(rule,label,elementIndex,args) ::= <<
-following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
-<label>=<rule>(<args>);
-list_<rule>.add(<label>.tree);
-following.pop();
->>
-
-ruleRefASTTrackAndListLabel(rule,label,elementIndex,args) ::= <<
-following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
-<label>=<rule>(<args>);
-list_<rule>.add(<label>.tree);<\n>
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>.tree);
-following.pop();
->>
-
-/** x+=rule when buildAST */
-ruleRefASTAndListLabel(rule,label,elementIndex,args) ::= <<
-following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
-<label>=<rule>(<args>);
-adaptor.addChild(root_<blockLevel>, <label>.tree);<\n>
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>.tree);
-following.pop();
->>
-
-/** x+=rule! is same as tokenRefAndListLabel */
-ruleRefASTBangAndListLabel ::= ruleRefASTAndListLabel
-
-/** rule when buildAST */
-ruleRefAST(rule,label,elementIndex,args) ::= <<
-following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
-<label>=<rule>(<args>);
-adaptor.addChild(root_<blockLevel>, <label>.tree);
-following.pop();
->>
-
-/** rule^ */
-ruleRefASTRoot(rule,label,elementIndex,args) ::= <<
-following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
-<label>=<rule>(<args>);
-root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<blockLevel>);
-following.pop();
->>
-
-/** x+=rule^^ */
-ruleRefASTRootAndListLabel(rule,label,elementIndex,args) ::= <<
-following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
-<label>=<rule>(<args>);
-root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<blockLevel>);<\n>
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>.tree);
-following.pop();
->>
-
-/** rule^^ */
-ruleRefASTRuleRoot(rule,label,elementIndex,args) ::= <<
-following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
-<label>=<rule>(<args>);
-root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_0);
-following.pop();
->>
-
-/** x+=rule^^ */
-ruleRefASTRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
-following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
-<label>=<rule>(<args>);
-root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_0);<\n>
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>.tree);<\n>
-following.pop();
->>
 
 /** A lexer rule reference */
 lexerRuleRef(rule,label,args) ::= <<

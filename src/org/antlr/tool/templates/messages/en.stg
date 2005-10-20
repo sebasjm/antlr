@@ -71,6 +71,8 @@ CANNOT_CREATE_TARGET_GENERATOR(arg,exception,stackTrace) ::=
 	"cannot create target <arg> code generator: <exception>"
 CANNOT_COMPUTE_SAMPLE_INPUT_SEQ() ::= 
 	"cannot generate a sample input sequence from lookahead DFA"
+MISSING_AST_CODE_GEN_TEMPLATES(arg) ::= 
+	"cannot find AST code generation templates for language <arg>"
 
 // grammar interpretation errors
 /*

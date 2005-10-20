@@ -112,6 +112,7 @@ public class ErrorManager {
 	public static final int MSG_CODE_GEN_TEMPLATES_INCOMPLETE = 22;
 	public static final int MSG_CANNOT_CREATE_TARGET_GENERATOR = 23;
 	public static final int MSG_CANNOT_COMPUTE_SAMPLE_INPUT_SEQ = 24;
+	public static final int MSG_MISSING_AST_CODE_GEN_TEMPLATES = 25;
 
 	// GRAMMAR ERRORS
 	public static final int MSG_SYNTAX_ERROR = 100;

@@ -152,27 +152,63 @@ public class CodeGenerator {
 	/** load the main language.stg template group file */
 	protected void loadTemplates(String language) {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		String templateFileName = "org/antlr/codegen/templates/"+language+".stg";
-		InputStream is = cl.getResourceAsStream(templateFileName);
+		String mainTemplateGroupFileName = "org/antlr/codegen/templates/"+language+".stg";
+		InputStream is = cl.getResourceAsStream(mainTemplateGroupFileName);
 		if ( is==null ) {
 			ErrorManager.error(ErrorManager.MSG_MISSING_CODE_GEN_TEMPLATES,
 							   language);
 			return;
 		}
+
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		templates = new StringTemplateGroup(br,
 											AngleBracketTemplateLexer.class,
 											ErrorManager.getStringTemplateErrorListener());
+		try {
+			br.close();
+		}
+		catch (IOException ioe) {
+			ErrorManager.internalError("can't close code gen templates file");
+		}
 		if ( !templates.isDefined("outputFile") ) {
 			ErrorManager.error(ErrorManager.MSG_CODE_GEN_TEMPLATES_INCOMPLETE,
 							   language);
 		}
+
+		// if they want to generate ASTs, must have <language>AST.stg file
+		String outputOption = (String)grammar.getOption("output");
+		if ( outputOption!=null && outputOption.equals("AST") ) {
+			String ASTTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"AST.stg";
+			is = cl.getResourceAsStream(ASTTemplateGroupFileName);
+			if ( is==null ) {
+				ErrorManager.error(ErrorManager.MSG_MISSING_AST_CODE_GEN_TEMPLATES,
+								   language);
+				return;
+			}
+			BufferedReader astbr = new BufferedReader(new InputStreamReader(is));
+			StringTemplateGroup ASTTemplates =
+				new StringTemplateGroup(astbr,
+										AngleBracketTemplateLexer.class,
+										ErrorManager.getStringTemplateErrorListener());
+
+			// AST templates INHERIT from normal templates
+			ASTTemplates.setSuperGroup(templates);
+			templates = ASTTemplates;
+
+			try {
+				astbr.close();
+			}
+			catch (IOException ioe) {
+				ErrorManager.internalError("can't close AST code gen templates file");
+			}
+		}
+
 		try {
 			br.close();
 		}
 		catch (IOException ioe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_CLOSE_FILE,
-							   templateFileName,
+							   mainTemplateGroupFileName,
 							   ioe);
 		}
 	}
