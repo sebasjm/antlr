@@ -1015,11 +1015,21 @@ public class Grammar {
 			// 'x'
             return literal.charAt(1); // no escape char
         }
-		ErrorManager.assertTrue(literal.length()==4, "invalid char literals: "+literal);
-		// '\x'  (antlr lexer will catch invalid char)
-		int escChar = literal.charAt(2);
-		int charVal = escapedCharValue[escChar];
-		return charVal;
+        else if ( literal.length() == 4 )
+        {
+			// '\x'  (antlr lexer will catch invalid char)
+			int escChar = literal.charAt(2);
+			int charVal = escapedCharValue[escChar];
+			return charVal;
+        }
+        else if( literal.length() == 8 )
+        {
+        	// '\u1234'
+        	String unicodeChars = literal.substring(3,literal.length()-1);
+    		return Integer.parseInt(unicodeChars, 16);
+         }
+		ErrorManager.assertTrue(false, "invalid char literal: "+literal);
+		return -1;
     }
 
 	/** ANTLR does not convert escape sequences during the parse phase because
