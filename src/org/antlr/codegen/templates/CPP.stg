@@ -75,7 +75,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
 
 lexer(name, tokens, globalAction, rules, cyclicDFAs) ::= <<
 template\<typename StreamType, typename TokenType, typename TokenBuilder>
-class <name> : public antlr3::Lexer\<StreamType,typename StreamType::char_type,TokenType> {
+class <name> : public antlr3::Lexer\<StreamType,TokenType> {
 	// carry over general types
 	typedef typename StreamType::position_type position_type;
 	typedef typename StreamType::char_type char_type;
@@ -130,7 +130,7 @@ public:
 	static const char* tokenNames[] = {
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
     };
-    <tokens:{static int <it.name>=<it.type>;}; separator="\n">
+    <tokens:{static tokenid_type <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 <if(buildAST)>
     protected TreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
@@ -286,7 +286,9 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 lexerRule(ruleName,nakedBlock,ruleDescriptor,initAction,block) ::= <<
 void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throw(antlr3::BaseRecognitionException)
 {
+<if(trace)>
 	antlr3::Tracer trace(this,"<ruleName>");
+<endif>
 	StreamType& input(this->getInput());
 <initAction>
 <if(nakedBlock)>
@@ -318,7 +320,7 @@ void mTokens() throw(antlr3::BaseRecognitionException)
 /** A (...) subrule with multiple alternatives */
 block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 // <fileName>:<description>
-int alt<decisionNumber>=<maxAlt>;
+decision_type alt<decisionNumber>=<maxAlt>;
 <decls>
 <if(debug)>try { dbg.enterSubRule(<decisionNumber>);<\n><endif>
 <if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
@@ -335,7 +337,7 @@ switch (alt<decisionNumber>) {
 /** A rule block with multiple alternatives */
 ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 // <fileName>:<description>
-int alt<decisionNumber>=<maxAlt>;
+decision_type alt<decisionNumber>=<maxAlt>;
 <decls>
 <if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
 <decision>
@@ -365,7 +367,7 @@ dbg.enterAlt(1);<\n>
 /** A (..)+ block with 0 or more alternatives */
 positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 // <fileName>:<description>
-unsigned int cnt<decisionNumber>=0;
+decision_type cnt<decisionNumber>=0;
 <decls>
 <if(debug)>
 try { dbg.enterSubRule(<decisionNumber>);<\n>
@@ -380,7 +382,7 @@ do {
 	default :
 		if ( cnt<decisionNumber> >= 1 )
 			goto loop<decisionNumber>;
-            EarlyExitException eee(<decisionNumber>, input);
+            EarlyExitException eee( input.getPosition(), <decisionNumber> );
 <if(debug)>
             dbg.recognitionException(eee);<\n>
 <endif>
@@ -490,7 +492,7 @@ list_<label>.add(<label>);<\n>
 /** match a character */
 charRef(char,label) ::= <<
 <if(label)>
-tokenid_type <label> = input.LA(1);<\n>
+<tokenid_type()> <label> = input.LA(1);<\n>
 <endif>
 this->match(<char>);
 >>
@@ -507,7 +509,7 @@ if ( <s> )
 	input.consume();
 else
 {
-	MismatchedSetException mse(input);
+	MismatchedSetException mse(input.getPosition(),input.LA(1));
 <if(debug)>
 	dbg.recognitionException(mse);<\n>
 <endif>
@@ -542,10 +544,12 @@ this->matchAny( input );
 /** Match . wildcard */
 wildcardChar(label, elementIndex) ::= <<
 <if(label)>
-tokenid_type <label> = input.LA(1);<\n>
+<tokenid_type()> <label> = input.LA(1);<\n>
 <endif>
 this->matchAny();
 >>
+
+tokenid_type() ::= "<if(LEXER)>char_type<else>tokenid_type<endif>"
 
 /** Match a rule reference by invoking it possibly with arguments
  *  and a return value or values.
@@ -779,14 +783,14 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<label>.get(i_<rewrit
 
 dfaState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 {
-	tokenid_type LA<decisionNumber>_<stateNumber> = input.LA(<k>);
+	<tokenid_type()> LA<decisionNumber>_<stateNumber> = input.LA(<k>);
 	<edges; separator="\nelse ">
 	else
 	{
 	<if(eotPredictsAlt)>
 		alt<decisionNumber> = <eotPredictsAlt>;
 	<else>
-		NoViableAltException nvae("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+		NoViableAltException nvae(input.getPosition(), "<description>", <decisionNumber>, <stateNumber>);<\n>
 	<if(debug)>
 		dbg.recognitionException(nvae);<\n>
 	<endif>
@@ -803,7 +807,7 @@ dfaState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
  */
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 {
-	tokenid_type LA<decisionNumber>_<stateNumber> = input.LA(<k>);
+	<tokenid_type()> LA<decisionNumber>_<stateNumber> = input.LA(<k>);
 	<edges; separator="\nelse ">
 }
 >>
@@ -815,7 +819,7 @@ dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
  *  anything other than 'a' predicts exiting.
  */
 dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
+<tokenid_type()> LA<decisionNumber>_<stateNumber> = input.LA(<k>);
 <edges; separator="\nelse "><\n>
 <if(eotPredictsAlt)>
 else {
@@ -848,7 +852,7 @@ default:
 <if(eotPredictsAlt)>
     alt<decisionNumber> = <eotPredictsAlt>;
 <else>
-    NoViableAltException nvae("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+    NoViableAltException nvae( input.getPosition(), "<description>", <decisionNumber>, <stateNumber> );<\n>
 <if(debug)>
     dbg.recognitionException(nvae);<\n>
 <endif>
@@ -903,14 +907,14 @@ alt<decisionNumber> = predictDFA<decisionNumber>(input);
 
 /** The overall cyclic DFA chunk; contains all the DFA states */
 cyclicDFA(className,decisionNumber,numDecisions,states,description) ::= <<
-int predictDFA<decisionNumber>( StreamType& input )
+decision_type predictDFA<decisionNumber>( StreamType& input )
 {
 	/* mark current location (rewind automatically when the rewinder goes
 	 * out of scope */
 	antlr3::Rewinder\<position_type> markPoint(input.getPosition());
 	goto s0;	// goto start...
 	<states>
-	throw NoViableAltException("<description>", <decisionNumber>, 0 /* fixme */, input);<\n>
+	throw NoViableAltException( input.getPosition(), "<description>", <decisionNumber>, 0 /* fixme */ );<\n>
 }<\n>
 >>
 
@@ -918,10 +922,10 @@ int predictDFA<decisionNumber>( StreamType& input )
 cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
 // cyclicDFAState
 s<stateNumber>: {
-	tokenid_type LA<decisionNumber>_<stateNumber> = input.LA(1);
+	<tokenid_type()> LA<decisionNumber>_<stateNumber> = input.LA(1);
 	<edges>
 	<if(needErrorClause)>
-	throw NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+	throw NoViableAltException( input.getPosition(), "<description>", <decisionNumber>, <stateNumber> );<\n>
 	<endif><\n>
 }<\n>
 >>
@@ -960,7 +964,7 @@ cyclicDFAStateSwitch(stateNumber,labels,edges,
 s<stateNumber>: switch ( input.LA(1) ) {
 <edges; separator="\n">
 default: <if(needErrorClause)> {
-	NoViableAltException nvae("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+	NoViableAltException nvae( input.getPosition(), "<description>", <decisionNumber>, <stateNumber> );<\n>
 	throw nvae;
 }<else>goto s<EOTTargetStateNumber>;<\n><endif>
 } // s<stateNumber>: switch( input.LA(1) )<\n>
