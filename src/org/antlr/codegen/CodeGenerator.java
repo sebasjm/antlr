@@ -572,7 +572,7 @@ public class CodeGenerator {
     public String getTokenTypeAsTargetLabel(int ttype) {
 		String name = grammar.getTokenDisplayName(ttype);
 		if ( grammar.type==Grammar.LEXER ) {
-			return target.getTargetCharLiteralFromANTLRCharLiteral(name);
+			return target.getTargetCharLiteralFromANTLRCharLiteral(this,name);
 		}
 		// If name is a literal, return the token type instead
         if ( name.charAt(0)=='"' || name.charAt(0)=='\'' ) {

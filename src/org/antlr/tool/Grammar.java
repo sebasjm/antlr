@@ -1408,7 +1408,7 @@ public class Grammar {
 	 */
 	public int getMaxCharValue() {
 		if ( generator!=null ) {
-			return generator.target.getMaxCharValue();
+			return generator.target.getMaxCharValue(generator);
 		}
 		else {
 			return Label.MAX_CHAR_VALUE;

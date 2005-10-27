@@ -92,7 +92,10 @@ public class Target {
 	 *  will be able to use this 1-to-1 mapping.  Expect single quotes
 	 *  around the incoming literal.
 	 */
-	public String getTargetCharLiteralFromANTLRCharLiteral(String literal) {
+	public String getTargetCharLiteralFromANTLRCharLiteral(
+		CodeGenerator generator,
+		String literal)
+	{
 		// int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
 		return literal;
 	}
@@ -103,7 +106,10 @@ public class Target {
 	 *  will be able to use this 1-to-1 mapping.  Expect double quotes 
 	 *  around the incoming literal.
 	 */
-	public String getTargetStringLiteralFromANTLRStringLiteral(String literal) {
+	public String getTargetStringLiteralFromANTLRStringLiteral(
+		CodeGenerator generator,
+		String literal)
+	{
 		/*
 		StringBuffer buf =
 			Grammar.getUnescapedStringFromGrammarStringLiteral(literal);
@@ -114,7 +120,7 @@ public class Target {
 	/** Some targets only support ASCII or 8-bit chars/strings.  For example,
 	 *  C++ will probably want to return 0xFF here.
 	 */
-	public int getMaxCharValue() {
+	public int getMaxCharValue(CodeGenerator generator) {
 		return Label.MAX_CHAR_VALUE;
 	}
 }

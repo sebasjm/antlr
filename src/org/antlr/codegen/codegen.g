@@ -622,7 +622,7 @@ atom[String label] returns [StringTemplate code=null]
 		if ( grammar.type==Grammar.LEXER ) {
 			code = templates.getInstanceOf("charRef");
 			code.setAttribute("char",
-			   generator.target.getTargetCharLiteralFromANTLRCharLiteral(c.getText()));
+			   generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,c.getText()));
 			if ( label!=null ) {
 				code.setAttribute("label", label);
 			}
@@ -644,7 +644,7 @@ atom[String label] returns [StringTemplate code=null]
 		if ( grammar.type==Grammar.LEXER ) {
 			code = templates.getInstanceOf("lexerStringRef");
 			code.setAttribute("string",
-			   generator.target.getTargetStringLiteralFromANTLRStringLiteral(s.getText()));
+			   generator.target.getTargetStringLiteralFromANTLRStringLiteral(generator,s.getText()));
 			if ( label!=null ) {
 				code.setAttribute("label", label);
 			}
