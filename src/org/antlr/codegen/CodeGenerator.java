@@ -152,7 +152,7 @@ public class CodeGenerator {
 	/** load the main language.stg template group file */
 	protected void loadTemplates(String language) {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		String mainTemplateGroupFileName = "org/antlr/codegen/templates/"+language+".stg";
+		String mainTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"/"+language+".stg";
 		InputStream is = cl.getResourceAsStream(mainTemplateGroupFileName);
 		if ( is==null ) {
 			ErrorManager.error(ErrorManager.MSG_MISSING_CODE_GEN_TEMPLATES,
@@ -178,7 +178,7 @@ public class CodeGenerator {
 		// if they want to generate ASTs, must have <language>AST.stg file
 		String outputOption = (String)grammar.getOption("output");
 		if ( outputOption!=null && outputOption.equals("AST") ) {
-			String ASTTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"AST.stg";
+			String ASTTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"/"+language+"AST.stg";
 			is = cl.getResourceAsStream(ASTTemplateGroupFileName);
 			if ( is==null ) {
 				ErrorManager.error(ErrorManager.MSG_MISSING_AST_CODE_GEN_TEMPLATES,
