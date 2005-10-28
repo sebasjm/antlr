@@ -81,7 +81,8 @@ public class CPPTarget extends Target {
 
 		return retval;
 	}
-/*
+/*  Currently generating one big header file so don't need this...
+
 	protected void genRecognizerHeaderFile(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
@@ -97,10 +98,16 @@ public class CPPTarget extends Target {
 	 *  is the identify translation; i.e., '\n' -> '\n'.  Most languages
 	 *  will be able to use this 1-to-1 mapping.  Expect single quotes
 	 *  around the incoming literal.
+	 *  Depending on the charvocabulary the charliteral should be prefixed with a 'L'
 	 */
-	public String getTargetCharLiteralFromANTLRCharLiteral(String literal) {
+	public String getTargetCharLiteralFromANTLRCharLiteral( CodeGenerator codegen, String literal) {
 		int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
-		return "L'"+escapeChar(c)+"'";
+		String prefix = "'";
+		if( codegen.grammar.getMaxCharValue() > 255 )
+			prefix = "L'";
+		else if( (c & 0x80) != 0 )	// if in char mode prevent sign extensions
+			return ""+c;
+		return prefix+escapeChar(c)+"'";
 	}
 
 	/** Convert from an ANTLR string literal found in a grammar file to
@@ -108,20 +115,25 @@ public class CPPTarget extends Target {
 	 *  is the identify translation; i.e., "\"\n" -> "\"\n".  Most languages
 	 *  will be able to use this 1-to-1 mapping.  Expect double quotes 
 	 *  around the incoming literal.
+	 *  Depending on the charvocabulary the string should be prefixed with a 'L'
 	 */
-	public String getTargetStringLiteralFromANTLRStringLiteral(String literal) {
+	public String getTargetStringLiteralFromANTLRStringLiteral( CodeGenerator codegen, String literal) {
 		StringBuffer buf = Grammar.getUnescapedStringFromGrammarStringLiteral(literal);
-		return "L\""+escapeString(buf.toString())+"\"";
+		String prefix = "\"";
+		if( codegen.grammar.getMaxCharValue() > 255 )
+			prefix = "L\"";
+		return prefix+escapeString(buf.toString())+"\"";
 	}
 	/** Character constants get truncated to this value.
-	 * RK: This should be derived from the charVocabulary. Depending on it
+	 * TODO: This should be derived from the charVocabulary. Depending on it
 	 * being 255 or 0xFFFF the templates should generate normal character
 	 * constants or multibyte ones.
-	 * I seem to lack a way to get at the charVocab here? 
-	 * (or at the Grammar.getMaxCharValue)
 	 */
-	public int getMaxCharValue() {
-//		return 255;
-		return Label.MAX_CHAR_VALUE;
+	public int getMaxCharValue( CodeGenerator codegen ) {
+		int maxval = 255; // codegen.grammar.get????();
+		if ( maxval <= 255 )
+			return 255;
+		else
+			return maxval;
 	}
 }
