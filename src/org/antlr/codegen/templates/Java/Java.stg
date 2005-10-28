@@ -51,6 +51,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 <headerAction>
 
+<@imports>
 import org.antlr.runtime.*;
 <if(profile)>
 import org.antlr.runtime.debug.*;
@@ -59,16 +60,13 @@ import org.antlr.runtime.debug.*;
 import org.antlr.runtime.debug.*;
 <endif>
 <endif>
-import java.util.Stack;
-<if(buildAST)>
-import org.antlr.runtime.tree.*;
-<else>
 <if(TREE_PARSER)>
 import org.antlr.runtime.tree.*;
 <endif>
-<endif>
+import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
+<@end>
 
 <docComment>
 <recognizer>
@@ -115,15 +113,7 @@ public class <name> extends <if(debug)>Debug<endif><superClass> {
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
-<if(buildAST)>
-    protected TreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
-    public void setTreeAdaptor(TreeAdaptor adaptor) {
-        this.adaptor = adaptor;
-    }
-    public TreeAdaptor getTreeAdaptor() {
-        return adaptor;
-    }<\n>
-<endif>
+<@members>
 <if(debug)>
     public int ruleLevel = 0;
 <if(profile)>
@@ -146,6 +136,7 @@ public class <name> extends <if(debug)>Debug<endif><superClass> {
 <else>
     public <name>(<inputStreamType> input) { super(input); }<\n>
 <endif>
+<@end>
     public String[] getTokenNames() { return tokenNames; }
 
     <globalAction>
@@ -181,33 +172,8 @@ rule(ruleName,ruleDescriptor,initAction,block,emptyRule,description) ::= <<
 // $ANTLR start <ruleName>
 // <fileName>:<description>
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
-    <ruleDescriptor.useScopes:{<it>_stack.push(new <it>());}; separator="\n">
-    <ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
-<if(ruleDescriptor.hasMultipleReturnValues)>
-    <returnType()> retval = new <returnType()>();
-    retval.start = (<labelType>)input.LT(1);<\n>
-<endif>
-<if(ruleDescriptor.singleValueReturnType)>
-<returnType()> <ruleDescriptor.singleValueReturnName>;
-<endif>
-    <ruleDescriptor.tokenLabels:{<labelType> <it.label.text>=null;}; separator="\n">
-<if(buildAST)>
-    <ruleDescriptor.tokenLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
-<endif>
-    <ruleDescriptor.tokenListLabels:{List list_<it.label.text>=null;}; separator="\n">
-    <ruleDescriptor.tokenListLabels:{<labelType> <it.label.text>=null;}; separator="\n">
-<if(buildAST)>
-    <ruleDescriptor.tokenListLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
-<endif>
-    <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
-    <ruleDescriptor.ruleListLabels:{List list_<it.label.text>=null;}; separator="\n">
-    <ruleDescriptor.ruleListLabels:ruleLabelDef(label=it); separator="\n">
-    <ruleDescriptor.allRuleRefsInAltsWithRewrites:{List list_<it>=new ArrayList();}; separator="\n">
-    <ruleDescriptor.allTokenRefsInAltsWithRewrites:{List list_<it>=new ArrayList();}; separator="\n">
+    <ruleDeclarations()>
     <initAction>
-<if(buildAST)>
-    <ASTLabelType> root_0 = null;<\n>
-<endif>
 <if(debug)>
     try { dbg.enterRule("<ruleName>");
     if ( ruleLevel==0 ) {dbg.commence();}
@@ -216,14 +182,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 <endif>
 <if(emptyRule)>
     <block>
-    <ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
-    <ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
-<if(ruleDescriptor.hasMultipleReturnValues)>
-    retval.stop = (<labelType>)input.LT(-1);
-<if(buildAST)>
-    retval.tree = root_0;<\n>
-<endif>
-<endif>
+    <ruleCleanUp()>
 <else>
     try {
         <block>
@@ -233,14 +192,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
         recover(input,re);
     }
     finally {
-        <ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
-        <ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
-<if(ruleDescriptor.hasMultipleReturnValues)>
-        retval.stop = (<labelType>)input.LT(-1);
-<if(buildAST)>
-        retval.tree = root_0;<\n>
-<endif>
-<endif>
+        <ruleCleanUp()>
     }<\n>
 <endif>
 <if(debug)>
@@ -261,6 +213,41 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 <endif>
 }
 // $ANTLR end <ruleName>
+>>
+
+ruleDeclarations() ::= <<
+<ruleDescriptor.useScopes:{<it>_stack.push(new <it>());}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<returnType()> retval = new <returnType()>();
+retval.start = (<labelType>)input.LT(1);<\n>
+<endif>
+<if(ruleDescriptor.singleValueReturnType)>
+<returnType()> <ruleDescriptor.singleValueReturnName>;
+<endif>
+<ruleLabelDefs()>
+<if(buildAST)>
+<ASTLabelType> root_0 = null;<\n>
+<endif>
+>>
+
+ruleLabelDefs() ::= <<
+<ruleDescriptor.tokenLabels:{<labelType> <it.label.text>=null;}; separator="\n">
+<ruleDescriptor.tokenListLabels:{List list_<it.label.text>=null;}; separator="\n">
+<ruleDescriptor.tokenListLabels:{<labelType> <it.label.text>=null;}; separator="\n">
+<ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
+<ruleDescriptor.ruleListLabels:{List list_<it.label.text>=null;}; separator="\n">
+<ruleDescriptor.ruleListLabels:ruleLabelDef(label=it); separator="\n">
+<ruleDescriptor.allRuleRefsInAltsWithRewrites:{List list_<it>=new ArrayList();}; separator="\n">
+<ruleDescriptor.allTokenRefsInAltsWithRewrites:{List list_<it>=new ArrayList();}; separator="\n">
+>>
+
+ruleCleanUp() ::= <<
+<ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
+<if(ruleDescriptor.hasMultipleReturnValues)>
+retval.stop = (<labelType>)input.LT(-1);
+<endif>
 >>
 
 /** How to generate a rule in the lexer; naked blocks are used for
@@ -425,15 +412,11 @@ case <i> :
 alt(elements,altNum,description,autoAST,outerAlt) ::= <<
 // <fileName>:<description>
 {
-<alt_declarations()>
+<@declarations()>
 <elements:element()>
-<alt_cleanup()>
+<@cleanup()>
 }
 >>
-
-alt_declarations() ::= ""
-
-alt_cleanup() ::= ""
 
 // E L E M E N T S
 

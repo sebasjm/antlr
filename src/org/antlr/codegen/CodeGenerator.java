@@ -185,14 +185,14 @@ public class CodeGenerator {
 								   language);
 				return;
 			}
+			// AST templates INHERIT from normal templates
 			BufferedReader astbr = new BufferedReader(new InputStreamReader(is));
 			StringTemplateGroup ASTTemplates =
 				new StringTemplateGroup(astbr,
 										AngleBracketTemplateLexer.class,
-										ErrorManager.getStringTemplateErrorListener());
-
-			// AST templates INHERIT from normal templates
-			ASTTemplates.setSuperGroup(templates);
+										ErrorManager.getStringTemplateErrorListener(),
+										templates);
+			//System.out.println("AST templates: "+ASTTemplates.toString(false));
 			templates = ASTTemplates;
 
 			try {
