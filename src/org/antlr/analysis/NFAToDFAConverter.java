@@ -123,9 +123,11 @@ public class NFAToDFAConverter {
 			// overall closure that will represent the DFA start state,
 			// but track the alt number
 			NFAContext initialContext = contextTrees[i];
-			// if first alt is derived from exit branch of loop,
-			// make alt=n+1 for n alts not 1
-			if ( i==0 && dfa.getDecisionASTNode().getType()==ANTLRParser.EOB ) {
+			// if first alt is derived from loopback/exit branch of loop,
+			// make alt=n+1 for n alts instead of 1
+			if ( i==0 &&
+				 dfa.getNFADecisionStartState().decisionStateType==NFAState.LOOPBACK )
+			{
 				int numAltsIncludingExitBranch = dfa.nfa.grammar
 						.getNumberOfAltsForDecisionNFA(dfa.decisionNFAStartState);
 				altNum = numAltsIncludingExitBranch;

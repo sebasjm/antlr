@@ -1384,7 +1384,7 @@ public class Grammar {
 	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
 		Decision d = createDecision(decision);
 		d.dfa = lookaheadDFA;
-		GrammarAST ast = d.startState.getDecisionASTNode();
+		GrammarAST ast = d.startState.getAssociatedASTNode();
 		ast.setLookaheadDFA(lookaheadDFA);
 	}
 

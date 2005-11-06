@@ -354,7 +354,7 @@ public class DFA {
      *  the loop back of a (...)+ block etc...
      */
     public GrammarAST getDecisionASTNode() {
-        return decisionNFAStartState.getDecisionASTNode();
+        return decisionNFAStartState.getAssociatedASTNode();
     }
 
     public boolean isGreedy() {

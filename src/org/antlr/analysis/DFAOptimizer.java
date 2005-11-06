@@ -130,19 +130,19 @@ public class DFAOptimizer {
 		System.out.println("Optimize DFA "+dfa.decisionNFAStartState.decisionNumber+
 						   " num states="+dfa.getNumberOfStates());
 		*/
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		if ( PRUNE_EBNF_EXIT_BRANCHES ) {
 			visited.clear();
 			int decisionType =
-				dfa.getNFADecisionStartState().getDecisionASTNode().getType();
+				dfa.getNFADecisionStartState().decisionStateType;
 			if ( dfa.isGreedy() && !dfa.isCyclic() &&
-				 (decisionType==ANTLRParser.OPTIONAL ||
-				 decisionType==ANTLRParser.EOB) )
+				 (decisionType==NFAState.OPTIONAL_BLOCK_START ||
+				 decisionType==NFAState.LOOPBACK) )
 			{
 				optimizeExitBranches(dfa.startState);
 			}
 		}
-		long stop = System.currentTimeMillis();
+		//long stop = System.currentTimeMillis();
 		//System.out.println("minimized in "+(int)(stop-start)+" ms");
     }
 

@@ -85,13 +85,12 @@ public class ACyclicDFACodeGenerator {
 			parent.decisionToMaxLookaheadDepth[dfa.getDecisionNumber()] = k;
 		}
 		*/
-		GrammarAST decisionASTNode =
-			dfa.getNFADecisionStartState().getDecisionASTNode();
+		//GrammarAST decisionASTNode = dfa.getDecisionASTNode();
 		StringTemplate dfaST = templates.getInstanceOf(dfaStateName);
-		if ( decisionASTNode.getType()==ANTLRParser.EOB ) {
+		if ( dfa.getNFADecisionStartState().decisionStateType==NFAState.LOOPBACK ) {
 			dfaST = templates.getInstanceOf(dfaLoopbackStateName);
 		}
-		else if ( decisionASTNode.getType()==ANTLRParser.OPTIONAL ) {
+		else if ( dfa.getNFADecisionStartState().decisionStateType==NFAState.OPTIONAL_BLOCK_START ) {
 			dfaST = templates.getInstanceOf(dfaOptionalBlockStateName);
 		}
 		dfaST.setAttribute("k", new Integer(k));

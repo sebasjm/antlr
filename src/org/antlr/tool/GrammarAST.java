@@ -59,7 +59,7 @@ public class GrammarAST extends BaseAST {
     /** If this is a decision node, what is the lookahead DFA? */
     protected DFA lookaheadDFA = null;
 
-    /** What NFA was built from this node? */
+    /** What NFA start state was built from this node? */
     protected NFAState NFAStartState = null;
 
 	/** Rule ref nodes, token refs, set, and NOT set refs need to track their

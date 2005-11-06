@@ -35,7 +35,8 @@ public class NFAState extends State {
 	// during NFA interpretation.
 	public static final int LOOPBACK = 1;
 	public static final int BLOCK_START = 2;
-	public static final int BYPASS = 3;
+	public static final int OPTIONAL_BLOCK_START = 3;
+	public static final int BYPASS = 4;
 
     public static final int MAX_TRANSITIONS = 2;
 
@@ -77,16 +78,15 @@ public class NFAState extends State {
      */
     protected String description;
 
-    /** Associate this NFAState with the corresponding GrammarAST node
+	/** Associate this NFAState with the corresponding GrammarAST node
      *  from which this node was created.  This is useful not only for
      *  associating the eventual lookahead DFA with the associated
      *  Grammar position, but also for providing users with
-     *  nondeterminism warnings.
-     *
-     *  Only decision states (such as block start or loop back states)
-     *  have this value set.
-     */
-    protected GrammarAST decisionASTNode;
+     *  nondeterminism warnings.  Mainly used by decision states to
+	 *  report line:col info.  Could also be used to track line:col
+	 *  for elements such as token refs.
+	 */
+	protected GrammarAST associatedASTNode;
 
     /** Is this state the sole target of an EOT transition? */
     protected boolean EOTTargetState = false;
@@ -185,16 +185,20 @@ public class NFAState extends State {
 
     // Setter/Getters
 
-    public GrammarAST getDecisionASTNode() {
-        return decisionASTNode;
-    }
-
-    /** What AST node is associated with this NFAState?  When you
+	/** What AST node is associated with this NFAState?  When you
 	 *  set the AST node, I set the node to point back to this NFA state.
 	 */
 	public void setDecisionASTNode(GrammarAST decisionASTNode) {
 		decisionASTNode.setNFAStartState(this);
-		this.decisionASTNode = decisionASTNode;
+		this.associatedASTNode = decisionASTNode;
+	}
+
+	public GrammarAST getAssociatedASTNode() {
+		return associatedASTNode;
+	}
+
+ 	public void setAssociatedASTNode(GrammarAST ASTNode) {
+		this.associatedASTNode = ASTNode;
 	}
 
 	public String getDescription() {
@@ -228,6 +232,10 @@ public class NFAState extends State {
     public void setEOTTargetState(boolean eot) {
         EOTTargetState = eot;
     }
+
+	public boolean isDecisionState() {
+		return decisionStateType>0;
+	}
 
 	public String toString() {
 		return String.valueOf(stateNumber);

@@ -180,8 +180,8 @@ public class DOTGenerator {
 
         // special case: if decision point, then line up the alt start states
         // unless it's an end of block
-        if ( ((NFAState)s).getDecisionASTNode()!=null &&
-             ((NFAState)s).getDecisionASTNode().getType()!=ANTLRParser.EOB )
+        if ( ((NFAState)s).isDecisionState() &&
+             ((NFAState)s).getAssociatedASTNode().getType()!=ANTLRParser.EOB )
         {
             st = stlib.getInstanceOf("org/antlr/tool/templates/dot/decision-rank");
             NFAState alt = (NFAState)s;
@@ -317,7 +317,7 @@ public class DOTGenerator {
 			}
             stateLabel = buf.toString();
         }
-		if ( (s instanceof NFAState) && ((NFAState)s).getDecisionASTNode()!=null ) {
+		if ( (s instanceof NFAState) && ((NFAState)s).isDecisionState() ) {
 			stateLabel = stateLabel+",d="+
 					((NFAState)s).getDecisionNumber();
 			if ( ((NFAState)s).endOfBlockStateNumber!=State.INVALID_STATE_NUMBER ) {
