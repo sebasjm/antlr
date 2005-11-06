@@ -75,12 +75,18 @@ public class TestDFAConversion extends TestSuite {
 			"a : A a X | A a Y;");
 		// nondeterministic from left edge; no stop state
 		String expecting =
-			".s0-A->:s1=>1\n"; // gets this after failing to do LL(*)
+			".s0-A->.s1\n" +
+			".s1-A->.s2\n" +
+			".s2-A->.s3\n" +
+			".s3-A->.s4\n" +
+			".s4-A->.s5\n" +
+			".s5-A->.s6\n" +
+			".s6-A->:s7=>1\n"; // gets this after failing to do LL(*)
 		int[] unreachableAlts = new int[] {2};
-		int[] nonDetAlts = new int[] {1,2};
+		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = new int[] {1,2};
-		int numWarnings = 3;
+		int numWarnings = 4;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -239,7 +245,7 @@ public class TestDFAConversion extends TestSuite {
 			".s0-B->:s1=>1\n";
 		int[] unreachableAlts = new int[] {2};
 		int[] nonDetAlts = new int[] {1,2};
-		String ambigInput = "B";
+		String ambigInput = null;
 		int[] danglingAlts = null;
 		int numWarnings = 3;
 		checkDecision(g, 1, expecting, unreachableAlts,
@@ -721,17 +727,20 @@ As a result, alternative(s) 2 were disabled for that input
 			".s0-A->.s1\n" +
 			".s1-A->.s2\n" +
 			".s1-X->:s3=>1\n" +
-			".s1-Y->:s5=>2\n" +
+			".s1-Y->:s6=>2\n" +
 			".s2-A->.s4\n" +
 			".s2-X->:s3=>1\n" +
-			".s2-Y->:s5=>2\n" +
+			".s2-Y->:s6=>2\n" +
+			".s4-A->.s5\n" +
 			".s4-X->:s3=>1\n" +
-			".s4-Y->:s5=>2\n";
+			".s4-Y->:s6=>2\n" +
+			".s5-X->:s3=>1\n" +
+			".s5-Y->:s6=>2\n";
 		int[] unreachableAlts = null;
-		int[] nonDetAlts = new int[] {1,2};
+		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 1;
+		int numWarnings = 2;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
