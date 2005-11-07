@@ -10,6 +10,8 @@ import org.antlr.Tool;
 import org.antlr.codegen.CodeGenerator;
 
 public class TestRewriteAST extends TestSuite {
+	private static boolean debug = true;
+
 	public void testDelete() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -20,7 +22,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34");
+												 "a", "abc 34", debug);
 		String expecting = "";
 		assertEqual(found, expecting);
 	}
@@ -35,7 +37,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc");
+												 "a", "abc", debug);
 		String expecting = "abc\n";
 		assertEqual(found, expecting);
 	}
@@ -50,7 +52,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "c");
+												 "a", "c", debug);
 		String expecting = "c\n";
 		assertEqual(found, expecting);
 	}
@@ -65,7 +67,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "ick");
+												 "a", "ick", debug);
 		String expecting = "ick\n";
 		assertEqual(found, expecting);
 	}
@@ -81,7 +83,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc");
+												 "a", "abc", debug);
 		String expecting = "abc\n";
 		assertEqual(found, expecting);
 	}
@@ -96,7 +98,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34");
+												 "a", "abc 34", debug);
 		String expecting = "34 abc\n";
 		assertEqual(found, expecting);
 	}
@@ -112,7 +114,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34");
+												 "a", "abc 34", debug);
 		String expecting = "34 abc\n";
 		assertEqual(found, expecting);
 	}
@@ -127,7 +129,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34");
+												 "a", "abc 34", debug);
 		String expecting = "(34 abc)\n";
 		assertEqual(found, expecting);
 	}
@@ -142,7 +144,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "void abc 34");
+												 "a", "void abc 34", debug);
 		String expecting = "void (34 abc)\n";
 		assertEqual(found, expecting);
 	}
@@ -159,7 +161,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b 2");
+												 "a", "a 1 b 2", debug);
 		String expecting = "(DUH a (DUH 1)) (DUH b (DUH 2))\n";
 		assertEqual(found, expecting);
 	}
@@ -174,7 +176,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc");
+												 "a", "abc", debug);
 		String expecting = "abc\n";
 		assertEqual(found, expecting);
 	}
@@ -189,7 +191,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "a b\n";
 		assertEqual(found, expecting);
 	}
@@ -204,7 +206,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "a b\n";
 		assertEqual(found, expecting);
 	}
@@ -220,7 +222,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc");
+												 "a", "abc", debug);
 		String expecting = "abc\n";
 		assertEqual(found, expecting);
 	}
@@ -236,7 +238,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "a b\n";
 		assertEqual(found, expecting);
 	}
@@ -252,7 +254,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "a b\n";
 		assertEqual(found, expecting);
 	}
@@ -267,7 +269,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc");
+												 "a", "abc", debug);
 		String expecting = "abc\n";
 		assertEqual(found, expecting);
 	}
@@ -282,7 +284,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc");
+												 "a", "abc", debug);
 		String expecting = "";
 		assertEqual(found, expecting);
 	}
@@ -300,7 +302,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 2");
+												 "a", "a 2", debug);
 		String expecting = "2\n";
 		assertEqual(found, expecting);
 	}
@@ -318,7 +320,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 2");
+												 "a", "a 2", debug);
 		String expecting = "(2 a)\n";
 		assertEqual(found, expecting);
 	}
@@ -334,7 +336,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "-34");
+												 "a", "-34", debug);
 		String expecting = "(- 34)\n";
 		assertEqual(found, expecting);
 	}
@@ -350,7 +352,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "+ 34");
+												 "a", "+ 34", debug);
 		String expecting = "(34 +)\n";
 		assertEqual(found, expecting);
 	}
@@ -366,7 +368,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "int a,b,c;");
+												 "a", "int a,b,c;", debug);
 		String expecting = "(int a b c)\n";
 		assertEqual(found, expecting);
 	}
@@ -382,7 +384,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "var a:int; b:float;");
+												 "a", "var a:int; b:float;", debug);
 		String expecting = "(var (: a int) (: b float))\n";
 		assertEqual(found, expecting);
 	}
@@ -399,7 +401,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a,b,c");
+												 "a", "a,b,c", debug);
 		String expecting = "(VAR a) (VAR b) (VAR c)\n";
 		assertEqual(found, expecting);
 	}
@@ -416,7 +418,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a,b,c");
+												 "a", "a,b,c", debug);
 		String expecting = "(var a) (var b) (var c)\n";
 		assertEqual(found, expecting);
 	}
@@ -433,7 +435,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "{a b c}");
+												 "a", "{a b c}", debug);
 		String expecting = "({ a b c)\n";
 		assertEqual(found, expecting);
 	}
@@ -450,7 +452,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "{a b c}");
+												 "a", "{a b c}", debug);
 		String expecting = "(block a b c)\n";
 		assertEqual(found, expecting);
 	}
@@ -469,7 +471,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 2");
+												 "a", "a 1 2", debug);
 		String expecting = "(2 1 a)\n";
 		assertEqual(found, expecting);
 	}
@@ -487,7 +489,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 2 3");
+												 "a", "a 1 2 3", debug);
 		String expecting = "1 a 2 3\n";
 		assertEqual(found, expecting);
 	}
@@ -509,7 +511,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "int a; int b=3;");
+												 "a", "int a; int b=3;", debug);
 		String expecting = "(TYPE int a) (TYPE int b 3)\n";
 		assertEqual(found, expecting);
 	}
@@ -528,7 +530,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b c d; 42");
+												 "a", "a b c d; 42", debug);
 		String expecting = "d 42\n";
 		assertEqual(found, expecting);
 	}
@@ -544,7 +546,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "3");
+												 "a", "3", debug);
 		String expecting = "(9 3)\n";
 		assertEqual(found, expecting);
 	}
@@ -560,7 +562,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "3");
+												 "a", "3", debug);
 		String expecting = "9 3\n";
 		assertEqual(found, expecting);
 	}
@@ -577,7 +579,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "3+4+5");
+												 "a", "3+4+5", debug);
 		String expecting = "(+ (+ 3 4) 5)\n";
 		assertEqual(found, expecting);
 	}
@@ -594,7 +596,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "3");
+												 "a", "3", debug);
 		String expecting = "(3 3)\n";
 		assertEqual(found, expecting);
 	}
@@ -613,7 +615,7 @@ public class TestRewriteAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a a b b b c c c d");
+												 "a", "a a b b b c c c d", debug);
 		String expecting = "a a b b b c c c d\n";
 		assertEqual(found, expecting);
 	}

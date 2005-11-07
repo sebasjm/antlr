@@ -44,7 +44,7 @@ javaTypeInitMap ::= [
  */
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           debug, trace, profile, dumpProfile,
+           debug, trace, profile,
 	   buildAST, buildTemplate,
 	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
@@ -53,13 +53,6 @@ outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
 
 <@imports>
 import org.antlr.runtime.*;
-<if(profile)>
-import org.antlr.runtime.debug.*;
-<else>
-<if(debug)>
-import org.antlr.runtime.debug.*;
-<endif>
-<endif>
 <if(TREE_PARSER)>
 import org.antlr.runtime.tree.*;
 <endif>
@@ -107,33 +100,13 @@ retry:
 
 /** How to generate a parser */
 genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, inputStreamType, superClass, ASTLabelType="Object", labelType) ::= <<
-public class <name> extends <if(debug)>Debug<endif><superClass> {
+public class <name> extends <@superClassName><superClass><@end> {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 <@members>
-<if(debug)>
-    public int ruleLevel = 0;
-<if(profile)>
-    public <name>(<inputStreamType> input) {
-	super(input,null);
-	setDebugListener(new Profiler(this,<dumpProfile>));
-    }<\n>
-<else>
-    public <name>(<inputStreamType> input) {
-	super(input);
-    }
-    public <name>(<inputStreamType> input, DebugEventListener dbg) {
-        super(input,dbg);
-    }<\n>
-<endif>
-    protected boolean evalPredicate(boolean result, String predicate) {
-        dbg.semanticPredicate(result, predicate);
-	return result;
-    }<\n>
-<else>
     public <name>(<inputStreamType> input) { super(input); }<\n>
 <endif>
 <@end>
@@ -147,7 +120,8 @@ public class <name> extends <if(debug)>Debug<endif><superClass> {
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
 
-    <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
+    <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
+                    words64=it.bits)>
 }
 >>
 
@@ -174,12 +148,7 @@ rule(ruleName,ruleDescriptor,initAction,block,emptyRule,description) ::= <<
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <ruleDeclarations()>
     <initAction>
-<if(debug)>
-    try { dbg.enterRule("<ruleName>");
-    if ( ruleLevel==0 ) {dbg.commence();}
-    ruleLevel++;
-    dbg.location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
-<endif>
+    <@preamble()>
 <if(emptyRule)>
     <block>
     <ruleCleanUp()>
@@ -195,16 +164,8 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
         <ruleCleanUp()>
     }<\n>
 <endif>
-<if(debug)>
-    dbg.location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
-    }
-    finally {
-        dbg.exitRule("<ruleName>");
-        ruleLevel--;
-        if ( ruleLevel==0 ) {dbg.terminate();}
-    }<\n>
-<endif>
-<ruleReturnValue()>
+    <@postamble()>
+    <ruleReturnValue()>
 }
 // $ANTLR end <ruleName>
 >>
@@ -239,9 +200,9 @@ ruleLabelDefs() ::= <<
 ruleReturnValue() ::= <<
 <if(ruleDescriptor.hasReturnValue)>
 <if(ruleDescriptor.singleValueReturnType)>
-    return <ruleDescriptor.singleValueReturnName>;<\n>
+return <ruleDescriptor.singleValueReturnName>;<\n>
 <else>
-    return retval;<\n>
+return retval;<\n>
 <endif>
 <endif>
 >>
@@ -290,16 +251,14 @@ block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,max
 // <fileName>:<description>
 int alt<decisionNumber>=<maxAlt>;
 <decls>
-<if(debug)>try { dbg.enterSubRule(<decisionNumber>);<\n><endif>
-<if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
+<@predecision()>
 <decision>
-<if(debug)>} finally {dbg.exitDecision(<decisionNumber>);}<\n><endif>
+<@postdecision()>
+<@prebranch()>
 switch (alt<decisionNumber>) {
     <alts:altSwitchCase()>
 }
-<if(debug)>
-} finally {dbg.exitSubRule(<decisionNumber>);}<\n>
-<endif>
+<@postbranch()>
 >>
 
 /** A rule block with multiple alternatives */
@@ -307,9 +266,9 @@ ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK
 // <fileName>:<description>
 int alt<decisionNumber>=<maxAlt>;
 <decls>
-<if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
+<@predecision()>
 <decision>
-<if(debug)>} finally {dbg.exitDecision(<decisionNumber>);}<\n><endif>
+<@postdecision()>
 switch (alt<decisionNumber>) {
     <alts:altSwitchCase()>
 }
@@ -317,19 +276,19 @@ switch (alt<decisionNumber>) {
 
 ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
 // <fileName>:<description>
-<if(debug)>
-dbg.enterAlt(1);<\n>
-<endif>
-<decls><alts>
+<decls>
+<@prebranch()>
+<alts>
+<@postbranch()>
 >>
 
 /** A special case of a (...) subrule with a single alternative */
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
 // <fileName>:<description>
-<if(debug)>
-dbg.enterAlt(1);<\n>
-<endif>
-<decls><alts>
+<decls>
+<@prebranch()>
+<alts>
+<@postbranch()>
 >>
 
 /** A (..)+ block with 0 or more alternatives */

@@ -435,6 +435,7 @@ atom returns [StateCluster g=null]
             int tokenType = grammar.getTokenType(t.getText());
             g = factory.build_Atom(tokenType);
             t.followingNFAState = g.right;
+            //g.left.setAssociatedASTNode(#t);
         }
         }
 

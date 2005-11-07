@@ -83,6 +83,9 @@ public class CodeGenerator {
 	 */
 	protected Grammar grammar;
 
+	/** What language are we generating? */
+	protected String language;
+
 	/** The target specifies how to write out files and do other language
 	 *  specific actions.
 	 */
@@ -103,10 +106,18 @@ public class CodeGenerator {
 	 */
 	protected Tool tool;
 
+	/** Generate debugging event method calls */
 	protected boolean debug;
+
+	/** Create a Tracer object and make the recognizer invoke this. */
 	protected boolean trace;
+
+	/** Track runtime parsing information about decisions etc...
+	 *  This requires the debugging event mechanism to work.
+	 */
 	protected boolean profile;
-	protected boolean dumpProfile;
+
+	//protected boolean dumpProfile;
 
 	/** I have factored out the generation of acyclic DFAs to separate class */
 	protected ACyclicDFACodeGenerator acyclicDFAGenerator =
@@ -124,8 +135,8 @@ public class CodeGenerator {
 	public CodeGenerator(Tool tool, Grammar grammar, String language) {
 		this.tool = tool;
 		this.grammar = grammar;
+		this.language = language;
 		loadLanguageTarget(language);
-		loadTemplates(language);
 	}
 
 	protected void loadLanguageTarget(String language) {
@@ -175,17 +186,44 @@ public class CodeGenerator {
 							   language);
 		}
 
-		// if they want to generate ASTs, must have <language>AST.stg file
-		String outputOption = (String)grammar.getOption("output");
-		if ( outputOption!=null && outputOption.equals("AST") ) {
-			String ASTTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"/"+language+"AST.stg";
+		// if they have debug on, Dbg inherits from <language>.stg
+		// We can't handle lexers at the moment.
+		if ( debug && grammar.type!=Grammar.LEXER ) {
+			String ASTTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"/Dbg.stg";
 			is = cl.getResourceAsStream(ASTTemplateGroupFileName);
 			if ( is==null ) {
 				ErrorManager.error(ErrorManager.MSG_MISSING_AST_CODE_GEN_TEMPLATES,
 								   language);
 				return;
 			}
-			// AST templates INHERIT from normal templates
+			// Dbg templates INHERIT from normal templates
+			BufferedReader astbr = new BufferedReader(new InputStreamReader(is));
+			StringTemplateGroup DbgTemplates =
+				new StringTemplateGroup(astbr,
+										AngleBracketTemplateLexer.class,
+										ErrorManager.getStringTemplateErrorListener(),
+										templates);
+			templates = DbgTemplates;
+
+			try {
+				astbr.close();
+			}
+			catch (IOException ioe) {
+				ErrorManager.internalError("can't close AST code gen templates file");
+			}
+		}
+
+		// if they want to generate ASTs, must have AST.stg file
+		String outputOption = (String)grammar.getOption("output");
+		if ( outputOption!=null && outputOption.equals("AST") ) {
+			String ASTTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"/AST.stg";
+			is = cl.getResourceAsStream(ASTTemplateGroupFileName);
+			if ( is==null ) {
+				ErrorManager.error(ErrorManager.MSG_MISSING_AST_CODE_GEN_TEMPLATES,
+								   language);
+				return;
+			}
+			// AST templates INHERIT from normal or normal+Dbg templates
 			BufferedReader astbr = new BufferedReader(new InputStreamReader(is));
 			StringTemplateGroup ASTTemplates =
 				new StringTemplateGroup(astbr,
@@ -226,6 +264,9 @@ public class CodeGenerator {
 	 *  The target, such as JavaTarget, dictates which files get written.
 	 */
 	public void genRecognizer() {
+		// LOAD OUTPUT TEMPLATES
+		loadTemplates(language);
+
 		// CREATE NFA FROM GRAMMAR, CREATE DFA FROM NFA
 		target.performGrammarAnalysis(this, grammar);
 
@@ -267,7 +308,6 @@ public class CodeGenerator {
 			outputFileST.setAttribute("debug", new Boolean(debug));
 			outputFileST.setAttribute("trace", new Boolean(trace));
 			outputFileST.setAttribute("profile", new Boolean(profile));
-			outputFileST.setAttribute("dumpProfile", new Boolean(dumpProfile));
 		}
 		else {
 			recognizerST = templates.getInstanceOf("treeParser");
@@ -659,6 +699,8 @@ public class CodeGenerator {
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+		// for now turn on profile so we have a listener for the dbg events
+		this.profile = true;
 	}
 
 	public void setTrace(boolean trace) {
@@ -673,10 +715,10 @@ public class CodeGenerator {
 
 	/** During early-access release, this distinguishes between
 	 *  forced profiling and -profile option
-	 */
 	public void setDumpProfile(boolean dumpProfile) {
 		this.dumpProfile = dumpProfile;
 	}
+	 */
 
 	public String getRecognizerFileName() {
 		StringTemplate extST = templates.getInstanceOf("codeFileExtension");

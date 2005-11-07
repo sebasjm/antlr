@@ -38,7 +38,7 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"  ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "xxxy");
+												 "a", "xxxy", false);
 		String expecting = "alt2\n";
 		assertEqual(found, expecting);
 	}
@@ -52,7 +52,7 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"  ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "xxxy");
+												 "a", "xxxy", false);
 		String expecting = "alt2\n";
 		assertEqual(found, expecting);
 	}
@@ -70,7 +70,7 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"  ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "x");
+												 "a", "x", false);
 		String expecting = "error: FailedPredicateException(a,{false}?)\n";
 		assertEqual(found, expecting);
 	}
@@ -87,7 +87,7 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34");
+												 "a", "abc 34", false);
 		String expecting = "\n";
 		assertEqual(found, expecting);
 	}

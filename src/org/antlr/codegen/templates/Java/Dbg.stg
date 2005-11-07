@@ -1,0 +1,96 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2005 Terence Parr
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+group Dbg;
+
+@outputFile.imports() ::= <<
+<@super.imports()>
+import org.antlr.runtime.debug.*;
+>>
+
+@genericParser.members() ::= <<
+    public int ruleLevel = 0;
+<if(profile)>
+    public <name>(<inputStreamType> input) {
+	super(input,null);
+	setDebugListener(new Profiler(this));
+    }<\n>
+<else>
+    public <name>(<inputStreamType> input) {
+	super(input);
+    }
+    public <name>(<inputStreamType> input, DebugEventListener dbg) {
+        super(input,dbg);
+    }<\n>
+<endif>
+    protected boolean evalPredicate(boolean result, String predicate) {
+        dbg.semanticPredicate(result, predicate);
+	return result;
+    }<\n>
+>>
+
+// this is broken; doubles Debug!
+// @genericParser.superClassName() ::= "Debug<@super.superClassName()>"
+@genericParser.superClassName() ::= "Debug<superClass>"
+
+@rule.preamble() ::= <<
+try { dbg.enterRule("<ruleName>");
+if ( ruleLevel==0 ) {dbg.commence();}
+ruleLevel++;
+dbg.location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
+>>
+
+@rule.postamble() ::= <<
+dbg.location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
+}
+finally {
+    dbg.exitRule("<ruleName>");
+    ruleLevel--;
+    if ( ruleLevel==0 ) {dbg.terminate();}
+}<\n>
+>>
+
+@block.predecision() ::= <<
+try { dbg.enterSubRule(<decisionNumber>);
+try { dbg.enterDecision(<decisionNumber>);<\n>
+>>
+
+@block.postdecision() ::= <<
+} finally {dbg.exitDecision(<decisionNumber>);}
+>>
+
+@block.postbranch() ::= <<
+} finally {dbg.exitSubRule(<decisionNumber>);}<\n>
+>>
+
+@ruleBlock.predecision() ::= "try { dbg.enterDecision(<decisionNumber>);<\n>"
+
+@ruleBlock.postdecision() ::= "} finally {dbg.exitDecision(<decisionNumber>);}<\n>"
+
+@ruleBlockSingleAlt.prebranch() ::= "dbg.enterAlt(1);<\n>"
+
+@blockSingleAlt.prebranch() ::= "dbg.enterAlt(1);<\n>"

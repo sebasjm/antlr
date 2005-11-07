@@ -3,6 +3,8 @@ package org.antlr.test;
 import org.antlr.test.unit.TestSuite;
 
 public class TestAutoAST extends TestSuite {
+	private static boolean debug = true;
+
 	public void testTokenList() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
@@ -13,7 +15,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "abc 34");
+												 "a", "abc 34", debug);
 		String expecting = "abc 34\n";
 		assertEqual(found, expecting);
 	}
@@ -28,7 +30,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "abc 34");
+												 "a", "abc 34", debug);
 		String expecting = "abc 34\n";
 		assertEqual(found, expecting);
 	}
@@ -43,7 +45,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "abc 34");
+												 "a", "abc 34", debug);
 		String expecting = "(abc 34)\n";
 		assertEqual(found, expecting);
 	}
@@ -58,7 +60,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "34 abc");
+												 "a", "34 abc", debug);
 		String expecting = "(abc 34)\n";
 		assertEqual(found, expecting);
 	}
@@ -73,7 +75,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34 dag 4532");
+												 "a", "abc 34 dag 4532", debug);
 		String expecting = "abc 4532\n";
 		assertEqual(found, expecting);
 	}
@@ -88,7 +90,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b 2 c 3");
+												 "a", "a 1 b 2 c 3", debug);
 		String expecting = "(a 1) (b 2) (c 3)\n";
 		assertEqual(found, expecting);
 	}
@@ -103,7 +105,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b 2 c 3");
+												 "a", "a 1 b 2 c 3", debug);
 		String expecting = "(1 a) (2 b) (3 c)\n";
 		assertEqual(found, expecting);
 	}
@@ -118,7 +120,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b 2 c 3");
+												 "a", "a 1 b 2 c 3", debug);
 		String expecting = "(a 1) (b 2) (c 3)\n";
 		assertEqual(found, expecting);
 	}
@@ -133,7 +135,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b 2 c 3");
+												 "a", "a 1 b 2 c 3", debug);
 		String expecting = "(a 1) (b 2) (c 3)\n";
 		assertEqual(found, expecting);
 	}
@@ -148,7 +150,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b");
+												 "a", "a 1 b", debug);
 		String expecting = "(b a 1)\n";
 		assertEqual(found, expecting);
 	}
@@ -163,7 +165,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "void foo;");
+												 "a", "void foo;", debug);
 		String expecting = "(void foo ;)\n";
 		assertEqual(found, expecting);
 	}
@@ -178,7 +180,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "void foo;");
+												 "a", "void foo;", debug);
 		String expecting = "(void foo ;)\n";
 		assertEqual(found, expecting);
 	}
@@ -193,7 +195,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "void foo;");
+												 "a", "void foo;", debug);
 		String expecting = "(foo void ;)\n";
 		assertEqual(found, expecting);
 	}
@@ -208,7 +210,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 34 c");
+												 "a", "a 34 c", debug);
 		String expecting = "(34 a c)\n";
 		assertEqual(found, expecting);
 	}
@@ -223,7 +225,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 34 c");
+												 "a", "a 34 c", debug);
 		String expecting = "(c (34 a))\n";
 		assertEqual(found, expecting);
 	}
@@ -238,7 +240,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "void a b;");
+												 "a", "void a b;", debug);
 		String expecting = "void a b ;\n";
 		assertEqual(found, expecting);
 	}
@@ -254,7 +256,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "int a");
+												 "a", "int a", debug);
 		String expecting = "int a\n";
 		assertEqual(found, expecting);
 	}
@@ -270,7 +272,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "int a");
+												 "a", "int a", debug);
 		String expecting = "(int a)\n";
 		assertEqual(found, expecting);
 	}
@@ -285,7 +287,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a+b+c+d");
+												 "a", "a+b+c+d", debug);
 		String expecting = "(+ (+ (+ a b) c) d)\n";
 		assertEqual(found, expecting);
 	}
@@ -301,7 +303,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a+b+c-d");
+												 "a", "a+b+c-d", debug);
 		String expecting = "(- (+ (+ a b) c) d)\n";
 		assertEqual(found, expecting);
 	}
@@ -318,7 +320,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "s", "3 exp 4 exp 5");
+												 "s", "3 exp 4 exp 5", debug);
 		String expecting = "(exp 3 (exp 4 5))\n";
 		assertEqual(found, expecting);
 	}
@@ -333,7 +335,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc");
+												 "a", "abc", debug);
 		String expecting = "abc\n";
 		assertEqual(found, expecting);
 	}
@@ -348,7 +350,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "+abc");
+												 "a", "+abc", debug);
 		String expecting = "(+ abc)\n";
 		assertEqual(found, expecting);
 	}
@@ -363,7 +365,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a+b-c");
+												 "a", "a+b-c", debug);
 		String expecting = "(- (+ a b) c)\n";
 		assertEqual(found, expecting);
 	}
@@ -378,7 +380,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "34+2");
+												 "a", "34+2", debug);
 		String expecting = "34 + 2\n";
 		assertEqual(found, expecting);
 	}
@@ -393,7 +395,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "34 55");
+												 "a", "34 55", debug);
 		String expecting = "(34 55)\n";
 		assertEqual(found, expecting);
 	}
@@ -409,7 +411,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "3+4+5");
+												 "a", "3+4+5", debug);
 		String expecting = "(+ (+ 3 4) 5)\n";
 		assertEqual(found, expecting);
 	}
@@ -425,7 +427,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "2nd id=b;a b\n";
 		assertEqual(found, expecting);
 	}
@@ -441,7 +443,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "2nd id=b;(b a)\n";
 		assertEqual(found, expecting);
 	}
@@ -458,7 +460,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];a b\n";
 		assertEqual(found, expecting);
 	}
@@ -475,7 +477,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];(a b)\n";
 		assertEqual(found, expecting);
 	}
@@ -490,7 +492,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a");
+												 "a", "a", debug);
 		String expecting = "a\n";
 		assertEqual(found, expecting);
 	}
@@ -505,7 +507,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a");
+												 "a", "a", debug);
 		String expecting = "nil\n";
 		assertEqual(found, expecting);
 	}
@@ -521,7 +523,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "2nd x=b;a b\n";
 		assertEqual(found, expecting);
 	}
@@ -537,7 +539,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "x=b;a b\n";
 		assertEqual(found, expecting);
 	}
@@ -553,7 +555,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "x=(b a);(b a)\n";
 		assertEqual(found, expecting);
 	}
@@ -569,7 +571,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b");
+												 "a", "a b", debug);
 		String expecting = "x=b;a b\n";
 		assertEqual(found, expecting);
 	}
@@ -587,7 +589,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b b c c d");
+												 "a", "a b b c c d", debug);
 		String expecting = "a b b c c d\n";
 		assertEqual(found, expecting);
 	}
@@ -605,7 +607,7 @@ public class TestAutoAST extends TestSuite {
 			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34");
+												 "a", "abc 34", debug);
 		String expecting = "\n";
 		assertEqual(found, expecting);
 	}

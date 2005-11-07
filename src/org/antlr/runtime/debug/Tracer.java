@@ -32,7 +32,10 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.IntStream;
 import org.antlr.runtime.TokenStream;
 
-/** The default debugger mimics the traceParser behavior of ANTLR 2.x */
+/** The default tracer mimics the traceParser behavior of ANTLR 2.x.
+ *  This listens for debugging events from the parser and implies
+ *  that you cannot debug and trace at the same time.
+ */
 public class Tracer implements DebugEventListener {
 	public IntStream input;
 	protected int level = 0;

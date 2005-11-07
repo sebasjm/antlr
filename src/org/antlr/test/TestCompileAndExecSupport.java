@@ -32,6 +32,8 @@ import org.antlr.Tool;
 import org.antlr.stringtemplate.StringTemplate;
 
 import java.io.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class TestCompileAndExecSupport {
 	public static final String jikes = "/usr/bin/jikes";
@@ -77,15 +79,20 @@ public class TestCompileAndExecSupport {
 		}
 	}
 
-	public static void antlr(String fileName, String grammarStr) {
+	public static void antlr(String fileName, String grammarStr, boolean debug) {
 		writeFile(tmpdir, fileName, grammarStr);
 		try {
 			Grammar g = new Grammar(grammarStr);
-			Tool antlr = new Tool(
-				new String[] {"-o",
-							  tmpdir,
-							  new File(tmpdir,g.name+".g").toString()}
-			);
+			List options = new ArrayList();
+			if ( debug ) {
+				options.add("-debug");
+			}
+			options.add("-o");
+			options.add(tmpdir);
+			options.add(new File(tmpdir,g.name+".g").toString());
+			String[] optionsA = new String[options.size()];
+			options.toArray(optionsA);
+			Tool antlr = new Tool(optionsA);
 			antlr.process();
 		}
 		catch (Exception e) {
@@ -99,14 +106,15 @@ public class TestCompileAndExecSupport {
 									String parserName,
 									String lexerName,
 									String startRuleName,
-									String input)
+									String input, boolean debug)
 	{
 		eraseFiles(".class");
 
 		rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  parserName,
-									  lexerName);
+									  lexerName,
+									  debug);
 		writeFile(tmpdir, "input", input);
 		boolean parserBuildsTrees = grammarStr.indexOf("output=AST")>=0;
 		return rawExecRecognizer(parserName,
@@ -128,19 +136,46 @@ public class TestCompileAndExecSupport {
 										String treeParserStartRuleName,
 										String input)
 	{
+		return execTreeParser(parserGrammarFileName,
+							  parserGrammarStr,
+							  parserName,
+							  treeParserGrammarFileName,
+							  treeParserGrammarStr,
+							  treeParserName,
+							  lexerName,
+							  parserStartRuleName,
+							  treeParserStartRuleName,
+							  input,
+							  false);
+	}
+
+	public static String execTreeParser(String parserGrammarFileName,
+										String parserGrammarStr,
+										String parserName,
+										String treeParserGrammarFileName,
+										String treeParserGrammarStr,
+										String treeParserName,
+										String lexerName,
+										String parserStartRuleName,
+										String treeParserStartRuleName,
+										String input,
+										boolean debug)
+	{
 		eraseFiles(".class");
 
 		// build the parser
 		rawGenerateAndBuildRecognizer(parserGrammarFileName,
 									  parserGrammarStr,
 									  parserName,
-									  lexerName);
+									  lexerName,
+									  debug);
 
 		// build the tree parser
 		rawGenerateAndBuildRecognizer(treeParserGrammarFileName,
 									  treeParserGrammarStr,
 									  treeParserName,
-									  lexerName);
+									  lexerName,
+									  debug);
 
 		writeFile(tmpdir, "input", input);
 
@@ -157,9 +192,10 @@ public class TestCompileAndExecSupport {
 	protected static void rawGenerateAndBuildRecognizer(String grammarFileName,
 														String grammarStr,
 														String parserName,
-														String lexerName)
+														String lexerName,
+														boolean debug)
 	{
-		antlr(grammarFileName, grammarStr);
+		antlr(grammarFileName, grammarStr, debug);
 		if ( lexerName!=null ) {
 			compile(parserName+".java "+lexerName+".java");
 		}

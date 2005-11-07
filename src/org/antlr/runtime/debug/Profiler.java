@@ -49,7 +49,6 @@ public class Profiler implements DebugEventListener {
 	//public IntStream input;
 
 	public DebugParser parser = null;
-	public boolean dumpProfile = false;
 
 	// working variables
 
@@ -72,9 +71,8 @@ public class Profiler implements DebugEventListener {
 	public int numSemanticPredicates = 0;
 	protected int numberReportedErrors = 0;
 
-	public Profiler(DebugParser parser, boolean dumpProfile) {
+	public Profiler(DebugParser parser) {
 		this.parser = parser;
-		this.dumpProfile = dumpProfile;
 	}
 
 	public void enterRule(String ruleName) {
@@ -169,9 +167,6 @@ public class Profiler implements DebugEventListener {
 	public void commence() {;}
 
 	public void terminate() {
-		if ( dumpProfile ) {
-			System.out.println(toString());
-		}
 		GrammarReport.writeReport(RUNTIME_STATS_FILENAME,toNotifyString());
 	}
 

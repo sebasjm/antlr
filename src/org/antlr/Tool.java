@@ -254,16 +254,15 @@ public class Tool {
 		if ( language!=null ) {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);
 			grammar.setCodeGenerator(generator);
-			generator.setDebug(debug);
-			// for this release, everybody does profile unless
-			// debugging
-			if ( !debug ) {
-				generator.setProfile(true);
+			if ( debug ) {
+				generator.setDebug(true);
 			}
 			if ( profile ) {
-				generator.setDumpProfile(true);
+				generator.setProfile(true);
 			}
-			generator.setTrace(trace);
+			if ( trace ) {
+				generator.setTrace(true);
+			}
 
 			if ( grammar.type==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();
