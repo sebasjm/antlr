@@ -700,7 +700,7 @@ public class CodeGenerator {
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 		// for now turn on profile so we have a listener for the dbg events
-		this.profile = true;
+		//this.profile = true;
 	}
 
 	public void setTrace(boolean trace) {
