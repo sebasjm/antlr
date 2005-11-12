@@ -83,6 +83,8 @@ public class TestAttributes extends TestSuite {
 			"        ;");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -107,6 +109,8 @@ public class TestAttributes extends TestSuite {
 			"        ;");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -164,6 +168,8 @@ public class TestAttributes extends TestSuite {
 			"b : x=a {"+action+"} ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("b",
@@ -190,6 +196,8 @@ public class TestAttributes extends TestSuite {
 			"        ;");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -249,6 +257,8 @@ public class TestAttributes extends TestSuite {
 			"  ;");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -569,6 +579,8 @@ public class TestAttributes extends TestSuite {
 			"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -599,6 +611,8 @@ public class TestAttributes extends TestSuite {
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -627,6 +641,8 @@ public class TestAttributes extends TestSuite {
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate(null,
@@ -655,6 +671,8 @@ public class TestAttributes extends TestSuite {
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -685,6 +703,8 @@ public class TestAttributes extends TestSuite {
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("b",
@@ -876,6 +896,8 @@ public class TestAttributes extends TestSuite {
 				"a : ids+=ID ( COMMA ids+=ID {"+action+"})* ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -901,6 +923,8 @@ public class TestAttributes extends TestSuite {
 				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -926,6 +950,8 @@ public class TestAttributes extends TestSuite {
 				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 		String rawTranslation =
 			translator.translate("a",
@@ -952,6 +978,8 @@ public class TestAttributes extends TestSuite {
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator);
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		String rawTranslation =
 			translator.translate("a",
 							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
@@ -977,10 +1005,10 @@ public class TestAttributes extends TestSuite {
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
-		g.setCodeGenerator(generator);
-		generator.genRecognizer();
 
 		ActionTranslator translator = new ActionTranslator(generator);
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		String rawTranslation =
 			translator.translate("a",
 							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
@@ -1323,6 +1351,8 @@ public class TestAttributes extends TestSuite {
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator);
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
 		String rawTranslation =
 			translator.translate("a",
 							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
