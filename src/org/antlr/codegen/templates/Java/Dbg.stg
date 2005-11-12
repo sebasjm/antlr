@@ -74,23 +74,83 @@ finally {
 }<\n>
 >>
 
-@block.predecision() ::= <<
-try { dbg.enterSubRule(<decisionNumber>);
-try { dbg.enterDecision(<decisionNumber>);<\n>
+// Common debug event triggers used by region overrides below
+
+enterSubRule() ::=
+    "try { dbg.enterSubRule(<decisionNumber>);<\n>"
+
+exitSubRule() ::=
+    "} finally {dbg.exitSubRule(<decisionNumber>);}<\n>"
+
+enterDecision() ::=
+    "try { dbg.enterDecision(<decisionNumber>);<\n>"
+
+exitDecision() ::=
+    "} finally {dbg.exitDecision(<decisionNumber>);}<\n>"
+
+enterAlt(n) ::= "dbg.enterAlt(<n>);<\n>"
+
+// Region overrides that tell various constructs to add debugging triggers
+
+@block.predecision() ::= "<enterSubRule()><enterDecision()>"
+
+@block.postdecision() ::= "<exitDecision()>"
+
+@block.postbranch() ::= "<exitSubRule()>"
+
+@ruleBlock.predecision() ::= "<enterDecision()>"
+
+@ruleBlock.postdecision() ::= "<exitDecision()>"
+
+@ruleBlockSingleAlt.prealt() ::= "<enterAlt(n=\"1\")>"
+
+@blockSingleAlt.prealt() ::= "<enterAlt(n=\"1\")>"
+
+@positiveClosureBlock.preloop() ::= "<enterSubRule()>"
+
+@positiveClosureBlock.postloop() ::= "<exitSubRule()>"
+
+@positiveClosureBlock.predecision() ::= "<enterDecision()>"
+
+@positiveClosureBlock.postdecision() ::= "<exitDecision()>"
+
+@positiveClosureBlock.earlyExitException() ::=
+    "dbg.recognitionException(eee);<\n>"
+
+@closureBlock.preloop() ::= "<enterSubRule()>"
+
+@closureBlock.postloop() ::= "<exitSubRule()>"
+
+@closureBlock.predecision() ::= "<enterDecision()>"
+
+@closureBlock.postdecision() ::= "<exitDecision()>"
+
+@altSwitchCase.prealt() ::= "<enterAlt(n=i)>"
+
+@element.prematch() ::=
+    "dbg.location(<it.line>,<it.pos>);"
+
+@matchSet.mismatchedSetException() ::=
+    "dbg.recognitionException(mse);"
+
+@dfaState.noViableAltException() ::= "dbg.recognitionException(nvae);"
+
+@dfaStateSwitch.noViableAltException() ::= "dbg.recognitionException(nvae);"
+
+dfaDecision(decisionNumber,description) ::= <<
+try {
+    isCyclicDecision = true;
+    <super.dfaDecision()>
+}
+catch (NoViableAltException nvae) {
+    dbg.recognitionException(nvae);
+    throw nvae;
+}
 >>
 
-@block.postdecision() ::= <<
-} finally {dbg.exitDecision(<decisionNumber>);}
+@cyclicDFAState.noViableAltException() ::= "dbg.recognitionException(nvae);"
+
+/** Force predicate validation to trigger an event */
+evalPredicate(pred) ::= <<
+evalPredicate(<pred>,"<pred>")
 >>
-
-@block.postbranch() ::= <<
-} finally {dbg.exitSubRule(<decisionNumber>);}<\n>
->>
-
-@ruleBlock.predecision() ::= "try { dbg.enterDecision(<decisionNumber>);<\n>"
-
-@ruleBlock.postdecision() ::= "} finally {dbg.exitDecision(<decisionNumber>);}<\n>"
-
-@ruleBlockSingleAlt.prebranch() ::= "dbg.enterAlt(1);<\n>"
-
-@blockSingleAlt.prebranch() ::= "dbg.enterAlt(1);<\n>"

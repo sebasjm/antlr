@@ -44,7 +44,7 @@ javaTypeInitMap ::= [
  */
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           debug, trace, profile,
+           trace, profile,
 	   buildAST, buildTemplate,
 	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
@@ -277,18 +277,18 @@ switch (alt<decisionNumber>) {
 ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
 // <fileName>:<description>
 <decls>
-<@prebranch()>
+<@prealt()>
 <alts>
-<@postbranch()>
+<@postalt()>
 >>
 
 /** A special case of a (...) subrule with a single alternative */
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
 // <fileName>:<description>
 <decls>
-<@prebranch()>
+<@prealt()>
 <alts>
-<@postbranch()>
+<@postalt()>
 >>
 
 /** A (..)+ block with 0 or more alternatives */
@@ -296,31 +296,25 @@ positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decision
 // <fileName>:<description>
 int cnt<decisionNumber>=0;
 <decls>
-<if(debug)>
-try { dbg.enterSubRule(<decisionNumber>);<\n>
-<endif>
+<@preloop()>
 loop<decisionNumber>:
 do {
     int alt<decisionNumber>=<maxAlt>;
-<if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
+    <@predecision()>
     <decision>
-<if(debug)>} finally {dbg.exitDecision(<decisionNumber>);}<\n><endif>
+    <@postdecision()>
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
 	default :
 	    if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
             EarlyExitException eee =
                 new EarlyExitException(<decisionNumber>, input);
-<if(debug)>
-            dbg.recognitionException(eee);<\n>
-<endif>
+            <@earlyExitException()>
             throw eee;
     }
     cnt<decisionNumber>++;
 } while (true);
-<if(debug)>
-} finally { dbg.exitSubRule(<decisionNumber>);}<\n>
-<endif>
+<@postloop()>
 >>
 
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
@@ -329,24 +323,20 @@ positiveClosureBlockSingleAlt ::= positiveClosureBlock
 closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 // <fileName>:<description>
 <decls>
-<if(debug)>
-try { dbg.enterSubRule(<decisionNumber>);<\n>
-<endif>
+<@preloop()>
 loop<decisionNumber>:
 do {
     int alt<decisionNumber>=<maxAlt>;
-<if(debug)>try { dbg.enterDecision(<decisionNumber>);<\n><endif>
+    <@predecision()>
     <decision>
-<if(debug)>} finally {dbg.exitDecision(<decisionNumber>);}<\n><endif>
+    <@postdecision()>
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
 	default :
 	    break loop<decisionNumber>;
     }
 } while (true);
-<if(debug)>
-} finally {dbg.exitSubRule(<decisionNumber>);}<\n>
-<endif>
+<@postloop()>
 >>
 
 closureBlockSingleAlt ::= closureBlock
@@ -364,9 +354,7 @@ optionalBlockSingleAlt ::= block
  */
 altSwitchCase() ::= <<
 case <i> :
-<if(debug)>
-    dbg.enterAlt(<i>);<\n>
-<endif>
+    <@prealt()>
     <it>
     break;<\n>
 >>
@@ -383,13 +371,9 @@ alt(elements,altNum,description,autoAST,outerAlt) ::= <<
 
 // E L E M E N T S
 
-/** Dump the elements one per line and stick in debugging
- *  location() trigger in front.
- */
+/** Dump the elements one per line */
 element() ::= <<
-<if(debug)>
-dbg.location(<it.line>,<it.pos>);<\n>
-<endif>
+<@prematch()>
 <it.el><\n>
 >>
 
@@ -432,9 +416,7 @@ if ( <s> ) input.consume();
 else {
     MismatchedSetException mse =
         new MismatchedSetException(null,input);
-<if(debug)>
-    dbg.recognitionException(mse);<\n>
-<endif>
+    <@mismatchedSetException()>
 <if(LEXER)>
     recover(mse);
 <else>
@@ -508,7 +490,7 @@ match(input, Token.UP, null);
  *  also hoisted into a prediction expression).
  */
 validateSemanticPredicate(pred) ::= <<
-if ( !(<if(debug)>evalPredicate(<pred>,"<pred>")<else><pred><endif>) ) {
+if ( !(<evalPredicate(...)>) ) {
     throw new FailedPredicateException(input, "<ruleName>", "<pred>");
 }
 >>
@@ -719,9 +701,7 @@ else {
 <else>
     NoViableAltException nvae =
         new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
-<if(debug)>
-    dbg.recognitionException(nvae);<\n>
-<endif>
+    <@noViableAltException()>
     throw nvae;<\n>
 <endif>
 }
@@ -779,9 +759,7 @@ default:
 <else>
     NoViableAltException nvae =
         new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
-<if(debug)>
-    dbg.recognitionException(nvae);<\n>
-<endif>
+    <@noViableAltException()>
     throw nvae;<\n>
 <endif>
 }<\n>
@@ -817,18 +795,7 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  *  The <name> attribute is inherited via the parser, lexer, ...
  */
 dfaDecision(decisionNumber,description) ::= <<
-<if(debug)>
-try {
-    isCyclicDecision = true;
-    alt<decisionNumber> = dfa<decisionNumber>.predict(input);
-}
-catch (NoViableAltException nvae) {
-    dbg.recognitionException(nvae);
-    throw nvae;
-}
-<else>
 alt<decisionNumber> = dfa<decisionNumber>.predict(input);
-<endif>
 >>
 
 /** The overall cyclic DFA chunk; contains all the DFA states */
@@ -850,6 +817,7 @@ DFA.State s<stateNumber> = new DFA.State() {
         <if(needErrorClause)>
         NoViableAltException nvae =
 	    new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+        <@noViableAltException()>
         throw nvae;
         <endif>
     }
@@ -911,15 +879,9 @@ andPredicates(left,right) ::= "(<left>&&<right>)"
 
 orPredicates(left,right) ::= "(<left>||<right>)"
 
-notPredicate(pred) ::= "!(<pred>)"
+notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
-evalPredicate(pred) ::= <<
-<if(debug)>
-evalPredicate(<pred>,"<pred>")
-<else>
-<pred>
-<endif>
->>
+evalPredicate(pred) ::= "<pred>"
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 

@@ -10,7 +10,7 @@ import org.antlr.Tool;
 import org.antlr.codegen.CodeGenerator;
 
 public class TestRewriteAST extends TestSuite {
-	private static boolean debug = true;
+	protected boolean debug = false;
 
 	public void testDelete() throws Exception {
 		String grammar =

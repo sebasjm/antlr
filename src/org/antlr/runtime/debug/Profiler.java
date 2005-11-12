@@ -27,10 +27,7 @@
 */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.Token;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
-import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.*;
 import org.antlr.tool.GrammarReport;
 
 import java.util.StringTokenizer;
@@ -70,6 +67,9 @@ public class Profiler implements DebugEventListener {
 	public int numHiddenCharsMatched = 0;
 	public int numSemanticPredicates = 0;
 	protected int numberReportedErrors = 0;
+	
+	public Profiler() {
+	}
 
 	public Profiler(DebugParser parser) {
 		this.parser = parser;
@@ -168,6 +168,10 @@ public class Profiler implements DebugEventListener {
 
 	public void terminate() {
 		GrammarReport.writeReport(RUNTIME_STATS_FILENAME,toNotifyString());
+	}
+
+	public void setParser(DebugParser parser) {
+		this.parser = parser;
 	}
 
 	// R E P O R T I N G

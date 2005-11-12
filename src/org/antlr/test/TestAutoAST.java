@@ -3,7 +3,7 @@ package org.antlr.test;
 import org.antlr.test.unit.TestSuite;
 
 public class TestAutoAST extends TestSuite {
-	private static boolean debug = true;
+	protected boolean debug = false;
 
 	public void testTokenList() throws Exception {
 		String grammar =
