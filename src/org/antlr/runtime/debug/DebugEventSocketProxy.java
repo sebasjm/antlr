@@ -34,7 +34,7 @@ import java.net.Socket;
 import java.io.*;
 
 public class DebugEventSocketProxy implements DebugEventListener {
-	public static final int DEFAULT_DEBUGGER_PORT = 2005;
+	public static final int DEFAULT_DEBUGGER_PORT = 0xC001;
 	protected int port = DEFAULT_DEBUGGER_PORT;
 	protected ServerSocket serverSocket;
 	protected Socket socket;
@@ -81,7 +81,7 @@ public class DebugEventSocketProxy implements DebugEventListener {
 
 	protected void ack() {
 		try {
-			String ack = in.readLine();
+			in.readLine();
 		}
 		catch (IOException ioe) {
 			ioe.printStackTrace(System.err);
