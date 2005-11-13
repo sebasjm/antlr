@@ -101,10 +101,10 @@ options {
 
 	protected StringTemplate getWildcardST(GrammarAST elementAST, GrammarAST ast_suffix, String label) {
 		String name = "wildcard";
-		if ( grammar.type!=Grammar.LEXER ) {
-			return getTokenElementST("wildcard", "wildcard", elementAST, ast_suffix, label);
+		if ( grammar.type==Grammar.LEXER ) {
+			name = "wildcardChar";
 		}
-		return templates.getInstanceOf("wildcardChar");
+		return getTokenElementST(name, name, elementAST, ast_suffix, label);
 	}
 
 	protected StringTemplate getRuleElementST(String name,

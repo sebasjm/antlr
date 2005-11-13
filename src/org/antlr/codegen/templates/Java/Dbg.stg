@@ -33,24 +33,24 @@ import org.antlr.runtime.debug.*;
 >>
 
 @genericParser.members() ::= <<
-    public int ruleLevel = 0;
+public int ruleLevel = 0;
 <if(profile)>
-    public <name>(<inputStreamType> input) {
-	super(input,null);
-	setDebugListener(new Profiler(this));
-    }<\n>
+public <name>(<inputStreamType> input) {
+    super(input,null);
+    setDebugListener(new Profiler(this));
+}<\n>
 <else>
-    public <name>(<inputStreamType> input) {
-	super(input);
-    }
-    public <name>(<inputStreamType> input, DebugEventListener dbg) {
-        super(input,dbg);
-    }<\n>
+public <name>(<inputStreamType> input) {
+    super(input);
+}
+public <name>(<inputStreamType> input, DebugEventListener dbg) {
+    super(input,dbg);
+}<\n>
 <endif>
-    protected boolean evalPredicate(boolean result, String predicate) {
-        dbg.semanticPredicate(result, predicate);
-	return result;
-    }<\n>
+protected boolean evalPredicate(boolean result, String predicate) {
+    dbg.semanticPredicate(result, predicate);
+    return result;
+}<\n>
 >>
 
 // this is broken; doubles Debug!

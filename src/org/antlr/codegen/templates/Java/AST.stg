@@ -34,15 +34,22 @@ import org.antlr.runtime.tree.*;<\n>
 <endif>
 >>
 
+/** Add an adaptor property that knows how to build trees */
 @genericParser.members() ::= <<
 <@super.members()>
-    protected TreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
-    public void setTreeAdaptor(TreeAdaptor adaptor) {
-        this.adaptor = adaptor;
-    }
-    public TreeAdaptor getTreeAdaptor() {
-        return adaptor;
-    }<\n>
+protected TreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
+public void setTreeAdaptor(TreeAdaptor adaptor) {
+    this.adaptor = adaptor;
+}
+public TreeAdaptor getTreeAdaptor() {
+    return adaptor;
+}<\n>
+>>
+
+/** Add a variable to track rule's return AST */
+ruleDeclarations() ::= <<
+<super.ruleDeclarations()>
+<ASTLabelType> root_0 = null;<\n>
 >>
 
 ruleLabelDefs() ::= <<
@@ -57,6 +64,8 @@ ruleCleanUp() ::= <<
 retval.tree = root_0;<\n>
 <endif>
 >>
+
+@returnScope.members() ::= "<ASTLabelType> tree;"
 
 /** When doing auto AST construction, we must define some variables;
  *  These should be turned off if doing rewrites.  This must be a "mode"
@@ -144,7 +153,7 @@ tokenRefASTTrackAndListLabel(token,label,elementIndex) ::= <<
 
 // SET AST
 
-matchSetAST(s,label,elementIndex) ::= <<
+matchSetAST(s,label,elementIndex, debug) ::= <<
 <label>=input.LT(1);
 if ( <s> ) {
     adaptor.addChild(root_<blockLevel>, adaptor.create(<label>));
@@ -161,7 +170,7 @@ else {
 }<\n>
 >>
 
-matchSetASTRoot(s,label,elementIndex) ::= <<
+matchSetASTRoot(s,label,elementIndex,debug) ::= <<
 <label>=input.LT(1);
 if ( <s> ) {
     root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_<blockLevel>);
@@ -178,7 +187,7 @@ else {
 }<\n>
 >>
 
-matchSetASTRuleRoot(s,label,elementIndex) ::= <<
+matchSetASTRuleRoot(s,label,elementIndex,debug) ::= <<
 <label>=input.LT(1);<\n>
 if ( <s> ) {
     root_0 = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_0);
@@ -293,4 +302,197 @@ wildcardASTRuleRoot(label,elementIndex) ::= <<
 matchAny(input);
 <label>_tree = adaptor.create(<label>);
 root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
+>>
+
+// R e w r i t e
+
+rewriteCode(
+	alts, description,
+	referencedTokens,
+	referencedListLabels,
+	referencedRules, rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
+<<
+
+// REWRITE
+<first([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("element <it> length="+list_<it>.size()+" != 1");<\n>}>
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("rewrite element <it> length="+list_<it>.size()+" != 1");<\n>}>
+int i_0 = 0;
+<prevRuleRootRef()>.tree = root_0;
+root_0 = (<ASTLabelType>)adaptor.nil();
+<alts:rewriteAlt(); separator="else ">
+>>
+
+rewriteOptionalBlock(
+	alt,rewriteBlockLevel,
+	referencedTokens,
+	referencedListLabels,
+	referencedRules,
+	description) ::=
+<<
+// <fileName>:<description>
+{
+<!
+int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
+!>
+<rewriteBlockCardinalityCheck()>
+if ( n_<rewriteBlockLevel> > 1 ) throw new RuntimeException("<first([referencedTokens,referencedListLabels,referencedRules])> list has > 1 elements");
+if ( n_<rewriteBlockLevel>==1 ) {
+    int i_<rewriteBlockLevel> = 0;
+    <alt>
+    }
+}<\n>
+>>
+
+rewriteClosureBlock(
+	alt,rewriteBlockLevel,
+	referencedTokens,
+	referencedListLabels,
+	referencedRules,
+	description) ::=
+<<
+// <fileName>:<description>
+{
+<rewriteBlockCardinalityCheck()>
+for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+    <alt>
+}
+}<\n>
+>>
+
+rewritePositiveClosureBlock(
+	alt,rewriteBlockLevel,
+	referencedTokens,
+	referencedListLabels,
+	referencedRules,
+	description) ::=
+<<
+// <fileName>:<description>
+{
+<rewriteBlockCardinalityCheck()>
+if ( n_<rewriteBlockLevel>==0 ) throw new RuntimeException("Must have more than one element for (...)+ loops");
+for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+    <alt>
+}
+}<\n>
+>>
+
+/** Elements referenced in rewrite loops/optional blocks must have
+ *  the same size.  Factor this out from rewriteXXXBlock rules.
+ */
+rewriteBlockCardinalityCheck() ::= <<
+int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
+>>
+
+rewriteAlt() ::= <<
+// <it.description>
+<if(it.pred)>
+if (<it.pred>) {
+    <it.alt>
+}<\n>
+<else>
+{
+    <it.alt>
+}<\n>
+<endif>
+>>
+
+/** For empty rewrites: "r : ... -> ;" */
+rewriteEmptyAlt() ::= "root_0 = null;"
+
+rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
+// <fileName>:<description>
+{
+<ASTLabelType> root_<treeLevel> = (<ASTLabelType>)adaptor.nil();
+<root>
+<children>
+adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
+}<\n>
+>>
+
+rewriteElementList(elements) ::= "<elements>"
+
+/** Gen ID */
+rewriteTokenRef(token,elementIndex) ::= <<
+adaptor.addChild(root_<treeLevel>, (<labelType>)list_<token>.get(i_<rewriteBlockLevel>));<\n>
+>>
+
+/** Gen $label ... where defined via label=ID */
+rewriteTokenLabelRef(label,elementIndex) ::= <<
+adaptor.addChild(root_<treeLevel>, <label>);<\n>
+>>
+
+/** Gen $label ... where defined via label+=ID */
+rewriteTokenListLabelRef(label,elementIndex) ::= <<
+adaptor.addChild(root_<treeLevel>, (<labelType>)list_<label>.get(i_<rewriteBlockLevel>));<\n>
+>>
+
+/** Gen ^($label ...) */
+rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>, root_<treeLevel>);<\n>
+>>
+
+/** Gen ^(ID ...) */
+rewriteTokenRefRoot(token,elementIndex) ::= <<
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot((<labelType>)list_<token>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+>>
+
+rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
+adaptor.addChild(root_<treeLevel>, adaptor.create(<token>, <args><if(!args)>"<token>"<endif>));<\n>
+>>
+
+rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<token>, <args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
+>>
+
+/** What is the name of the previous value of this rule's root tree?  This
+ *  let's us refer to $rule to mean previous value.  I am reusing the
+ *  variable 'tree' sitting in retval struct to hold the value of root_0 right
+ *  before I set it during rewrites.  The assign will be to retval.tree.
+ */
+prevRuleRootRef() ::= "retval"
+
+rewriteRuleRef(rule,dup) ::= <<
+<if(dup)>
+adaptor.addChild(root_<treeLevel>, adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)));<\n>
+<else>
+adaptor.addChild(root_<treeLevel>, list_<rule>.get(i_<rewriteBlockLevel>));<\n>
+<endif>
+>>
+
+rewriteRuleRefRoot(rule,dup) ::= <<
+<if(dup)>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)), root_<treeLevel>);<\n>
+<else>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<rule>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+<endif>
+>>
+
+rewriteAction(action) ::= <<
+adaptor.addChild(root_<treeLevel>, <action>);<\n>
+>>
+
+rewriteActionRoot(action) ::= <<
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<action>, root_<treeLevel>);<\n>
+>>
+
+/** Gen $ruleLabel ... where defined via ruleLabel=rule */
+rewriteRuleLabelRef(label) ::= <<
+adaptor.addChild(root_<treeLevel>, <label>.tree);<\n>
+>>
+
+/** Gen $ruleLabel ... where defined via ruleLabel+=rule */
+rewriteRuleListLabelRef(label) ::= <<
+adaptor.addChild(root_<treeLevel>, list_<label>.get(i_<rewriteBlockLevel>));<\n>
+>>
+
+/** Gen ^($ruleLabel ...) where ruleLabel=rule */
+rewriteRuleLabelRefRoot(label) ::= <<
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<treeLevel>);<\n>
+>>
+
+/** Gen ^($ruleLabel ...) where ruleLabel+=rule */
+rewriteRuleListLabelRefRoot(label) ::= <<
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<label>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
 >>

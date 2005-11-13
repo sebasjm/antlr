@@ -276,9 +276,6 @@ public class CodeGenerator {
 
 		// OUTPUT FILE (contains recognizerST)
 		outputFileST = templates.getInstanceOf("outputFile");
-		outputFileST.setAttribute("buildAST",
-								  new Boolean(grammar.type!=Grammar.LEXER&&
-											  grammar.buildAST()));
 		outputFileST.setAttribute("buildTemplate",
 								  new Boolean(grammar.type!=Grammar.LEXER&&
 											  grammar.buildTemplate()));
@@ -305,8 +302,6 @@ public class CodeGenerator {
 			recognizerST = templates.getInstanceOf("parser");
 			outputFileST.setAttribute("PARSER", new Boolean(true));
 			headerFileST.setAttribute("PARSER", new Boolean(true));
-			outputFileST.setAttribute("trace", new Boolean(trace));
-			outputFileST.setAttribute("profile", new Boolean(profile));
 		}
 		else {
 			recognizerST = templates.getInstanceOf("treeParser");

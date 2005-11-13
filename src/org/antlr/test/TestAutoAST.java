@@ -1,6 +1,7 @@
 package org.antlr.test;
 
 import org.antlr.test.unit.TestSuite;
+import org.antlr.stringtemplate.StringTemplate;
 
 public class TestAutoAST extends TestSuite {
 	protected boolean debug = false;

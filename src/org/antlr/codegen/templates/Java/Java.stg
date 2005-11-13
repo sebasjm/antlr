@@ -44,8 +44,7 @@ javaTypeInitMap ::= [
  */
 outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           trace, profile,
-	   buildAST, buildTemplate,
+           buildTemplate, profile,
 	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
@@ -99,14 +98,16 @@ retry:
 >>
 
 /** How to generate a parser */
-genericParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, inputStreamType, superClass, ASTLabelType="Object", labelType) ::= <<
+genericParser(name, scopes, tokens, tokenNames, globalAction, rules,
+              cyclicDFAs, bitsets, inputStreamType, superClass,
+              ASTLabelType="Object", labelType) ::= <<
 public class <name> extends <@superClassName><superClass><@end> {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
-<@members>
+    <@members>
     public <name>(<inputStreamType> input) { super(input); }<\n>
 <endif>
 <@end>
@@ -147,6 +148,7 @@ rule(ruleName,ruleDescriptor,initAction,block,emptyRule,description) ::= <<
 // <fileName>:<description>
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <ruleDeclarations()>
+    <ruleLabelDefs()>
     <initAction>
     <@preamble()>
 <if(emptyRule)>
@@ -180,21 +182,21 @@ retval.start = (<labelType>)input.LT(1);<\n>
 <if(ruleDescriptor.singleValueReturnType)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
 <endif>
-<ruleLabelDefs()>
-<if(buildAST)>
-<ASTLabelType> root_0 = null;<\n>
-<endif>
 >>
 
 ruleLabelDefs() ::= <<
-<ruleDescriptor.tokenLabels:{<labelType> <it.label.text>=null;}; separator="\n">
-<ruleDescriptor.tokenListLabels:{List list_<it.label.text>=null;}; separator="\n">
-<ruleDescriptor.tokenListLabels:{<labelType> <it.label.text>=null;}; separator="\n">
-<ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
-<ruleDescriptor.ruleListLabels:{List list_<it.label.text>=null;}; separator="\n">
-<ruleDescriptor.ruleListLabels:ruleLabelDef(label=it); separator="\n">
-<ruleDescriptor.allRuleRefsInAltsWithRewrites:{List list_<it>=new ArrayList();}; separator="\n">
-<ruleDescriptor.allTokenRefsInAltsWithRewrites:{List list_<it>=new ArrayList();}; separator="\n">
+<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
+    :{<labelType> <it.label.text>=null;}; separator="\n"
+>
+<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
+    :{List list_<it.label.text>=null;}; separator="\n"
+>
+<[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
+    :ruleLabelDef(label=it); separator="\n"
+>
+<[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
+    :{List list_<it>=new ArrayList();}; separator="\n"
+>
 >>
 
 ruleReturnValue() ::= <<
@@ -385,7 +387,7 @@ tokenRef(token,label,elementIndex) ::= <<
 match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 >>
 
-/** ids+=ID no AST building */
+/** ids+=ID */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
 <tokenRef(...)>
 <listLabel(...)>
@@ -426,6 +428,11 @@ else {
 }<\n>
 >>
 
+matchSetAndListLabel(s,label,elementIndex) ::= <<
+<matchSet(...)>
+<listLabel(...)>
+>>
+
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
 <if(label)>
@@ -444,13 +451,22 @@ wildcard(label,elementIndex) ::= <<
 matchAny(input);
 >>
 
+wildcardAndListLabel(label,elementIndex) ::= <<
+<wildcard(...)>
+<listLabel(...)>
+>>
 
-/** Match . wildcard */
+/** Match . wildcard in lexer */
 wildcardChar(label, elementIndex) ::= <<
 <if(label)>
 int <label> = input.LA(1);<\n>
 <endif>
 matchAny();
+>>
+
+wildcardCharListLabel(label, elementIndex) ::= <<
+<wildcardChar(...)>
+<listLabel(...)>
 >>
 
 /** Match a rule reference by invoking it possibly with arguments
@@ -494,201 +510,6 @@ if ( !(<evalPredicate(...)>) ) {
     throw new FailedPredicateException(input, "<ruleName>", "<pred>");
 }
 >>
-
-
-// R e w r i t e
-
-rewriteCode(
-	alts, description,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules, rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
-<<
-
-// REWRITE
-<first([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("element <it> length="+list_<it>.size()+" != 1");<\n>}>
-<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("rewrite element <it> length="+list_<it>.size()+" != 1");<\n>}>
-int i_0 = 0;
-<prevRuleRootRef()>.tree = root_0;
-root_0 = (<ASTLabelType>)adaptor.nil();
-<alts:rewriteAlt(); separator="else ">
->>
-
-rewriteOptionalBlock(
-	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	description) ::=
-<<
-// <fileName>:<description>
-{
-<!
-int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();
-<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
-!>
-<rewriteBlockCardinalityCheck()>
-if ( n_<rewriteBlockLevel> > 1 ) throw new RuntimeException("<first([referencedTokens,referencedListLabels,referencedRules])> list has > 1 elements");
-if ( n_<rewriteBlockLevel>==1 ) {
-    int i_<rewriteBlockLevel> = 0;
-    <alt>
-    }
-}<\n>
->>
-
-rewriteClosureBlock(
-	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	description) ::=
-<<
-// <fileName>:<description>
-{
-<rewriteBlockCardinalityCheck()>
-for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
-    <alt>
-}
-}<\n>
->>
-
-rewritePositiveClosureBlock(
-	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	description) ::=
-<<
-// <fileName>:<description>
-{
-<rewriteBlockCardinalityCheck()>
-if ( n_<rewriteBlockLevel>==0 ) throw new RuntimeException("Must have more than one element for (...)+ loops");
-for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
-    <alt>
-}
-}<\n>
->>
-
-/** Elements referenced in rewrite loops/optional blocks must have
- *  the same size.  Factor this out from rewriteXXXBlock rules.
- */
-rewriteBlockCardinalityCheck() ::= <<
-int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();
-<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
->>
-
-rewriteAlt() ::= <<
-// <it.description>
-<if(it.pred)>
-if (<it.pred>) {
-    <it.alt>
-}<\n>
-<else>
-{
-    <it.alt>
-}<\n>
-<endif>
->>
-
-/** For empty rewrites: "r : ... -> ;" */
-rewriteEmptyAlt() ::= "root_0 = null;"
-
-rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
-// <fileName>:<description>
-{
-<ASTLabelType> root_<treeLevel> = (<ASTLabelType>)adaptor.nil();
-<root>
-<children>
-adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
-}<\n>
->>
-
-rewriteElementList(elements) ::= "<elements>"
-
-/** Gen ID */
-rewriteTokenRef(token,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, (<labelType>)list_<token>.get(i_<rewriteBlockLevel>));<\n>
->>
-
-/** Gen $label ... where defined via label=ID */
-rewriteTokenLabelRef(label,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, <label>);<\n>
->>
-
-/** Gen $label ... where defined via label+=ID */
-rewriteTokenListLabelRef(label,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, (<labelType>)list_<label>.get(i_<rewriteBlockLevel>));<\n>
->>
-
-/** Gen ^($label ...) */
-rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>, root_<treeLevel>);<\n>
->>
-
-/** Gen ^(ID ...) */
-rewriteTokenRefRoot(token,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot((<labelType>)list_<token>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
->>
-
-rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, adaptor.create(<token>, <args><if(!args)>"<token>"<endif>));<\n>
->>
-
-rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<token>, <args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
->>
-
-/** What is the name of the previous value of this rule's root tree?  This
- *  let's us refer to $rule to mean previous value.  I am reusing the
- *  variable 'tree' sitting in retval struct to hold the value of root_0 right
- *  before I set it during rewrites.  The assign will be to retval.tree.
- */
-prevRuleRootRef() ::= "retval"
-
-rewriteRuleRef(rule,dup) ::= <<
-<if(dup)>
-adaptor.addChild(root_<treeLevel>, adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)));<\n>
-<else>
-adaptor.addChild(root_<treeLevel>, list_<rule>.get(i_<rewriteBlockLevel>));<\n>
-<endif>
->>
-
-rewriteRuleRefRoot(rule,dup) ::= <<
-<if(dup)>
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)), root_<treeLevel>);<\n>
-<else>
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<rule>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
-<endif>
->>
-
-rewriteAction(action) ::= <<
-adaptor.addChild(root_<treeLevel>, <action>);<\n>
->>
-
-rewriteActionRoot(action) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<action>, root_<treeLevel>);<\n>
->>
-
-/** Gen $ruleLabel ... where defined via ruleLabel=rule */
-rewriteRuleLabelRef(label) ::= <<
-adaptor.addChild(root_<treeLevel>, <label>.tree);<\n>
->>
-
-/** Gen $ruleLabel ... where defined via ruleLabel+=rule */
-rewriteRuleListLabelRef(label) ::= <<
-adaptor.addChild(root_<treeLevel>, list_<label>.get(i_<rewriteBlockLevel>));<\n>
->>
-
-/** Gen ^($ruleLabel ...) where ruleLabel=rule */
-rewriteRuleLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<treeLevel>);<\n>
->>
-
-/** Gen ^($ruleLabel ...) where ruleLabel+=rule */
-rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<label>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
->>
-
 
 // F i x e d  D F A  (if-then-else)
 
@@ -930,6 +751,9 @@ void
 <endif>
 >>
 
+/** Generate the Java type associated with a single or multiple return
+ *  values.
+ */
 ruleLabelType(referencedRule) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
 <referencedRule.name>_return
@@ -949,22 +773,21 @@ initValue(typeName) ::= <<
 <javaTypeInitMap.(typeName)>
 >>
 
+/** Define a rule label including default value */
 ruleLabelDef(label) ::= <<
 <ruleLabelType(referencedRule=label.referencedRule)> <label.label.text> = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n>
 >>
 
+/** Define a return struct for a rule if the code needs to access its
+ *  start/stop tokens, tree stuff, attributes, ...  Leave a hole for
+ *  subgroups to stick in members.
+ */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 public static class <returnType()> {
     <labelType> start, stop;
-<if(buildAST)>
-    <ASTLabelType> tree;
-<else>
-<if(buildTemplate)>
-    StringTemplate st;
-<endif>
-<endif>
     <scope.attributes:{<it.decl>;}; separator="\n">
+    <@members()>
 };
 <endif>
 >>
