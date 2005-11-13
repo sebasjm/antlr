@@ -410,11 +410,14 @@ match(<char>);
 charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 
 /** For now, sets are interval tests and must be tested inline */
-matchSet(s,label,elementIndex) ::= <<
+matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
 <label>=input.LT(1);<\n>
 <endif>
-if ( <s> ) input.consume();
+if ( <s> ) {
+    <postmatchCode>
+    input.consume();
+}
 else {
     MismatchedSetException mse =
         new MismatchedSetException(null,input);
@@ -428,7 +431,7 @@ else {
 }<\n>
 >>
 
-matchSetAndListLabel(s,label,elementIndex) ::= <<
+matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 <matchSet(...)>
 <listLabel(...)>
 >>

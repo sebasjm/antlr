@@ -517,7 +517,9 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : x+=b x+=b {System.out.print(\"2nd x=\"+((CommonTree)$x.get(1)).toStringTree()+\";\");} ;\n" +
+			"a : x+=b x+=b {" +
+				"b_return ret=(b_return)$x.get(1);" +
+				"System.out.print(\"2nd x=\"+((CommonTree)ret.tree).toStringTree()+\";\");} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -533,7 +535,9 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ( x+=b^ )+ {System.out.print(\"x=\"+((CommonTree)$x.get(1)).toStringTree()+\";\");} ;\n" +
+			"a : ( x+=b^ )+ {" +
+			"b_return ret=(b_return)$x.get(1);" +
+			"System.out.print(\"x=\"+((CommonTree)ret.tree).toStringTree()+\";\");} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -549,7 +553,9 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ( x+=b^^ )+ {System.out.print(\"x=\"+((CommonTree)$x.get(1)).toStringTree()+\";\");} ;\n" +
+			"a : ( x+=b^^ )+ {" +
+			"b_return ret=(b_return)$x.get(1);" +
+			"System.out.print(\"x=\"+((CommonTree)ret.tree).toStringTree()+\";\");} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -565,7 +571,9 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : x+=b! x+=b {System.out.print(\"x=\"+((CommonTree)$x.get(1)).toStringTree()+\";\");} ;\n" +
+			"a : x+=b! x+=b {" +
+			"b_return ret=(b_return)$x.get(0);" +
+			"System.out.print(\"1st x=\"+((CommonTree)ret.tree).toStringTree()+\";\");} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -573,7 +581,7 @@ public class TestAutoAST extends TestSuite {
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
-		String expecting = "x=b;a b\n";
+		String expecting = "1st x=a;b\n";
 		assertEqual(found, expecting);
 	}
 

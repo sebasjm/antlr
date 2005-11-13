@@ -25,6 +25,9 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/** Template overrides to add debugging to normal Java output;
+ *  If ASTs are built, then you'll also get ASTDbg.stg loaded.
+ */
 group Dbg;
 
 @outputFile.imports() ::= <<
@@ -53,9 +56,7 @@ protected boolean evalPredicate(boolean result, String predicate) {
 }<\n>
 >>
 
-// this is broken; doubles Debug!
-// @genericParser.superClassName() ::= "Debug<@super.superClassName()>"
-@genericParser.superClassName() ::= "Debug<superClass>"
+@genericParser.superClassName() ::= "Debug<@super.superClassName()>"
 
 @rule.preamble() ::= <<
 try { dbg.enterRule("<ruleName>");

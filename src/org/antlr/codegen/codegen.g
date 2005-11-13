@@ -115,7 +115,7 @@ options {
 	{
 		String suffix = getSTSuffix(ast_suffix,label);
 		name += suffix;
-		if ( suffix.length()>0 && label==null ) {
+		if ( (grammar.buildAST()||suffix.length()>0) && label==null) {
 			// we will need a label to do the AST or tracking, make one
 			label = generator.createUniqueLabel(elementName);
 			CommonToken labelTok = new CommonToken(ANTLRParser.ID, label);
@@ -136,7 +136,7 @@ options {
 	{
 		String suffix = getSTSuffix(ast_suffix,label);
 		name += suffix;
-		if ( suffix.length()>0 && label==null ) {
+		if ( (grammar.buildAST()||suffix.length()>0) && label==null) {
 			label = generator.createUniqueLabel(elementName);
 			CommonToken labelTok = new CommonToken(ANTLRParser.ID, label);
 			grammar.defineTokenRefLabel(currentRuleName, labelTok, elementAST);
@@ -195,7 +195,7 @@ options {
 		if ( hasListLabel ) {
 			listLabelPart = "AndListLabel";
 		}
-		String STsuffix = astPart+operatorPart+rewritePart+listLabelPart;
+		String STsuffix = operatorPart+rewritePart+listLabelPart;
 		//System.out.println("suffix = "+STsuffix);
 
     	return STsuffix;
