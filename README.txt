@@ -204,7 +204,11 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0ea6 - ??
+3.0ea6 - November 13, 2005
+
+* turned off -debug/-profile, which was on by default
+
+* completely refactored the output templates; added some missing templates.
 
 * dramatically improved infinite recursion error messages (actually
   left-recursion never even was printed out before).
