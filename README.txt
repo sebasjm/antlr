@@ -1,9 +1,9 @@
 Early Access ANTLR v3
 ANTLR 3.0ea6
-? ?, 2005
+November 13, 2005
 
 Terence Parr, parrt at cs usfca edu
-ANTLR Project lead and supreme dictator
+ANTLR project lead and supreme dictator
 University of San Francisco
 
 INTRODUCTION 
