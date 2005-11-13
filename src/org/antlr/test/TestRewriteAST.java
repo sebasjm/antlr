@@ -620,6 +620,22 @@ public class TestRewriteAST extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testRuleListLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : x+=b x+=b -> $x+;\n"+
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "a b", debug);
+		String expecting = "a b\n";
+		assertEqual(found, expecting);
+	}
+
 	// E R R O R S
 
 	public void testUnknownRule() throws Exception {

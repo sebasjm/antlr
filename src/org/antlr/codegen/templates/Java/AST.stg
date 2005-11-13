@@ -46,6 +46,8 @@ public TreeAdaptor getTreeAdaptor() {
 }<\n>
 >>
 
+@genericParser.ruleReturnMembers() ::= "<ASTLabelType> tree;"
+
 /** Add a variable to track rule's return AST */
 ruleDeclarations() ::= <<
 <super.ruleDeclarations()>
@@ -64,8 +66,6 @@ ruleCleanUp() ::= <<
 retval.tree = root_0;<\n>
 <endif>
 >>
-
-@returnScope.members() ::= "<ASTLabelType> tree;"
 
 /** When doing auto AST construction, we must define some variables;
  *  These should be turned off if doing rewrites.  This must be a "mode"
@@ -259,6 +259,9 @@ wildcardRuleRoot(label,elementIndex) ::= <<
 root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 >>
 
+// ugh, am i really missing the combinations for Track and ListLabel?
+// there's got to be a better way
+
 // R e w r i t e
 
 rewriteCode(
@@ -439,7 +442,7 @@ adaptor.addChild(root_<treeLevel>, <label>.tree);<\n>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-adaptor.addChild(root_<treeLevel>, list_<label>.get(i_<rewriteBlockLevel>));<\n>
+adaptor.addChild(root_<treeLevel>, ((RuleReturn)list_<label>.get(i_<rewriteBlockLevel>)).tree);<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
@@ -449,5 +452,5 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<treeLe
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<label>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(((RuleReturn)list_<label>.get(i_<rewriteBlockLevel>)).tree, root_<treeLevel>);<\n>
 >>

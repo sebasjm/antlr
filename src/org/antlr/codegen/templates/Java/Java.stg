@@ -109,8 +109,13 @@ public class <name> extends <@superClassName><superClass><@end> {
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
     public <name>(<inputStreamType> input) { super(input); }<\n>
-<endif>
-<@end>
+    <@end>
+
+    public static class RuleReturn {
+        <labelType> start, stop;
+	<@ruleReturnMembers()>
+    }
+
     public String[] getTokenNames() { return tokenNames; }
 
     <globalAction>
@@ -787,10 +792,8 @@ ruleLabelDef(label) ::= <<
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-public static class <returnType()> {
-    <labelType> start, stop;
+public static class <returnType()> extends RuleReturn {
     <scope.attributes:{<it.decl>;}; separator="\n">
-    <@members()>
 };
 <endif>
 >>
