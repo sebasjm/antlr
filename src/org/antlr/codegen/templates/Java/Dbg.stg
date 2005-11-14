@@ -141,7 +141,7 @@ enterAlt(n) ::= "dbg.enterAlt(<n>);<\n>"
 dfaDecision(decisionNumber,description) ::= <<
 try {
     isCyclicDecision = true;
-    <super.dfaDecision()>
+    <super.dfaDecision(...)>
 }
 catch (NoViableAltException nvae) {
     dbg.recognitionException(nvae);
