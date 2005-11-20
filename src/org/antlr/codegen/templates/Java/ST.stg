@@ -88,6 +88,10 @@ if (<it.pred>) {
 <endif>
 >>
 
+rewriteEmptyTemplate(alts) ::= <<
+retval.template = null;
+>>
+
 /** Invoke a template with a set of attribute name/value pairs */
 rewriteExternalTemplate(name,args) ::= <<
 retval.template = templateLib.getInstanceOf("<name>");

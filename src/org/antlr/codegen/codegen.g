@@ -729,7 +729,7 @@ setElement
 rewrite returns [StringTemplate code=null]
 {
 StringTemplate alt;
-if ( #rewrite.findFirstType(TEMPLATE)!=null ) {
+if ( generator.grammar.buildTemplate() ) {
 	code = templates.getInstanceOf("rewriteTemplate");
 }
 else if ( #rewrite.getType()==REWRITE ) {
@@ -785,7 +785,8 @@ rewrite_alternative
 {
 StringTemplate el,st;
 }
-    :   #(	a:ALT {code=templates.getInstanceOf("rewriteElementList");}
+    :   {generator.grammar.buildAST()}?
+    	#(	a:ALT {code=templates.getInstanceOf("rewriteElementList");}
 			(	( el=rewrite_element {code.setAttribute("elements", el);} )+
     		|	EPSILON
     			{code.setAttribute("elements",
@@ -793,6 +794,8 @@ StringTemplate el,st;
     		)
     		EOA
     	 )
+    |	{generator.grammar.buildTemplate()}?
+    	#( ALT EPSILON EOA ) {code=templates.getInstanceOf("rewriteEmptyTemplate");}
    	|	code=rewrite_template
    	|	act:ACTION
    		{

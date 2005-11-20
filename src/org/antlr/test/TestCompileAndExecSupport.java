@@ -117,12 +117,14 @@ public class TestCompileAndExecSupport {
 									  debug);
 		writeFile(tmpdir, "input", input);
 		boolean parserBuildsTrees = grammarStr.indexOf("output=AST")>=0;
+		boolean parserBuildsTemplate = grammarStr.indexOf("output=template")>=0;
 		return rawExecRecognizer(parserName,
 								 null,
 								 lexerName,
 								 startRuleName,
 								 null,
 								 parserBuildsTrees,
+								 parserBuildsTemplate,
 								 debug);
 	}
 
@@ -181,6 +183,7 @@ public class TestCompileAndExecSupport {
 		writeFile(tmpdir, "input", input);
 
 		boolean parserBuildsTrees = parserGrammarStr.indexOf("output=AST")>=0;
+		boolean parserBuildsTemplate = parserGrammarStr.indexOf("output=template")>=0;
 
 		return rawExecRecognizer(parserName,
 								 treeParserName,
@@ -188,6 +191,7 @@ public class TestCompileAndExecSupport {
 								 parserStartRuleName,
 								 treeParserStartRuleName,
 								 parserBuildsTrees,
+								 parserBuildsTemplate,
 								 debug);
 	}
 
@@ -212,21 +216,28 @@ public class TestCompileAndExecSupport {
 											  String parserStartRuleName,
 											  String treeParserStartRuleName,
 											  boolean parserBuildsTrees,
+											  boolean parserBuildsTemplate,
 											  boolean debug)
 	{
-		if ( !parserBuildsTrees ) {
-			writeTestFile(parserName,
-						  lexerName,
-						  parserStartRuleName,
-						  debug);
-		}
-		else {
+		if ( parserBuildsTrees ) {
 			writeTreeTestFile(parserName,
 							  treeParserName,
 							  lexerName,
 							  parserStartRuleName,
 							  treeParserStartRuleName,
 							  debug);
+		}
+		else if ( parserBuildsTemplate ) {
+			writeTemplateTestFile(parserName,
+								  lexerName,
+								  parserStartRuleName,
+								  debug);
+		}
+		else {
+			writeTestFile(parserName,
+						  lexerName,
+						  parserStartRuleName,
+						  debug);
 		}
 
 		compile("Test.java");
@@ -378,6 +389,54 @@ public class TestCompileAndExecSupport {
 		outputFileST.setAttribute("lexerName", lexerName);
 		outputFileST.setAttribute("parserStartRuleName", parserStartRuleName);
 		outputFileST.setAttribute("treeParserStartRuleName", treeParserStartRuleName);
+		writeFile(tmpdir, "Test.java", outputFileST.toString());
+	}
+
+	public static void writeTemplateTestFile(String parserName,
+											 String lexerName,
+											 String parserStartRuleName,
+											 boolean debug)
+	{
+		StringTemplate outputFileST = new StringTemplate(
+			"import org.antlr.runtime.*;\n" +
+			"import org.antlr.stringtemplate.*;\n" +
+			"import org.antlr.stringtemplate.language.*;\n" +
+			"import org.antlr.runtime.debug.*;\n" +
+			"import java.io.*;\n" +
+			"\n" +
+			"public class Test {\n" +
+			"    static String templates =\n" +
+			"    		\"group test;\"+" +
+			"    		\"foo(x,y) ::= \\\"<x> <y>\\\"\";\n"+
+			"    static StringTemplateGroup group ="+
+			"    		new StringTemplateGroup(new StringReader(templates)," +
+			"					AngleBracketTemplateLexer.class);"+
+			"    public static void main(String[] args) throws Exception {\n" +
+			"        CharStream input = new ANTLRFileStream(args[0]);\n" +
+			"        $lexerName$ lex = new $lexerName$(input);\n" +
+			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+			"        $createParser$\n"+
+			"		 parser.setTemplateLib(group);\n"+
+			"        $parserName$.$parserStartRuleName$_return r = parser.$parserStartRuleName$();\n" +
+			"        if ( r.template!=null )\n" +
+			"            System.out.print(r.template.toString());\n" +
+			"    }\n" +
+			"}"
+			);
+		StringTemplate createParserST =
+			new StringTemplate(
+			"        Profiler profiler = new Profiler();\n"+
+			"        $parserName$ parser = new $parserName$(tokens,profiler);\n" +
+			"        profiler.setParser(parser);\n");
+		if ( !debug ) {
+			createParserST =
+				new StringTemplate(
+				"        $parserName$ parser = new $parserName$(tokens);\n");
+		}
+		outputFileST.setAttribute("createParser", createParserST);
+		outputFileST.setAttribute("parserName", parserName);
+		outputFileST.setAttribute("lexerName", lexerName);
+		outputFileST.setAttribute("parserStartRuleName", parserStartRuleName);
 		writeFile(tmpdir, "Test.java", outputFileST.toString());
 	}
 
