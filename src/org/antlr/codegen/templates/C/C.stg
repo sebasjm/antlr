@@ -356,7 +356,7 @@ pANTLR3_WCHAR   <name>TokenNames[]
  * =============================================================================
  * \{
  */    
-<tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
+<tokens:{#define <it.name>      <it.type>}; separator="\n">
    
 /* End of token definitions for <name>Parser
  * =============================================================================
@@ -365,30 +365,79 @@ pANTLR3_WCHAR   <name>TokenNames[]
 
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     
-    <@members>
-    
-    ANTLR3_API pANTLR3_PARSER <name>Parser_new(<inputStreamType> input) { super(input); }<\n>
-    
-    <@end>
+<@members>
 
-    public static class RuleReturn {
-        <labelType> start, stop;
-	<@ruleReturnMembers()>
+/** \brief Create a new instance of a <name>Parser and return a context handle for it.
+ *
+ * \param[in] input The supplier of the intput stream for the parser, which in this
+ *                  case is a <inputStreamType>
+ * \return
+ *     - Failure : NULL - Unable to create a new parser
+ *     - Success : pANTLR3_PARSER - Pointer to a new context handle for a <name>Parser
+ */
+ANTLR3_API pANTLR3_PARSER <name>Parser_new(<inputStreamType> input) 
+{
+    pANTLR3_PARSER  <name>Parserctx;
+
+    /* Allocate the memory for the parser context 
+     */
+    <name>ParserCtx = (pANTLR3_PARSER)ANTLR3_MALLOC(sizeof(ANTLR3_PARSER));
+    
+    if  (<name>ParserCtx != NULL)
+    {
+        /* Initialize the input stream 
+         */
+        input->initialize(<name>ParserCtx);
+
+        /* Store the input stream context
+         */
+        <name>ParserCtx->input  = input;
     }
 
-    public String[] getTokenNames() { return tokenNames; }
+    /* More to do here probably */
 
-    <globalAction>
+    return  ctx<name>Parser;
+}<\n>
+    
+<@end>
 
-    <rules; separator="\n\n">
-
-    <! define a singleton instance for each cyclic DFA then define DFAs !>
-    <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
-    <cyclicDFAs>
-
-    <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
-                    words64=it.bits)>
+typedef struct RuleReturnStruct
+{
+    <labelType> start;
+    <labelType> stop;
+    <@ruleReturnMembers()>
 }
+    * pRULE_RETURN;
+
+ANTLR3_API ANTLR3_WCHAR getTokenNames() 
+{ 
+    return <name>tokenNames; 
+}
+
+<globalAction>
+
+<rules; separator="\n/* ============================================ */\n">
+
+<! define a singleton instance for each cyclic DFA then define DFAs !>
+
+/* =============================================================================
+ */
+/** \brief Cyclic DFAs for this parser:
+ * 
+ * \{
+ */
+<cyclicDFAs:{dfa | static pDFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
+<cyclicDFAs>
+/** \} */
+
+/* =============================================================================
+ */
+/** \brief Bitsets in use by this parser
+ * \{
+ */
+<bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
+                    words64=it.bits)>
+/** \}
 >>
 
 parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
@@ -409,9 +458,12 @@ rule(ruleName,ruleDescriptor,initAction,block,emptyRule,description) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
-// $ANTLR start <ruleName>
-// <fileName>:<description>
-public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
+/* Comes from:
+ * $ANTLR start <ruleName>
+ * <fileName>:<description>
+ */
+ANTLR3_API <returnType()> <name>_<ruleName>(pANTLR3_PARSER parserCtx, <ruleDescriptor.parameterScope:parameterScope(scope=it)>)
+{   
     <ruleDeclarations()>
     <ruleLabelDefs()>
     <initAction>
@@ -420,16 +472,24 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     <block>
     <ruleCleanUp()>
 <else>
-    try {
-        <block>
-    }
-    catch (RecognitionException re) {
-        reportError(re);
-        recover(input,re);
-    }
-    finally {
-        <ruleCleanUp()>
-    }<\n>
+    <block>
+    <ruleCleanUp()>
+   
+/* As much as goto is not the greatest codign technique when coding by hand,
+ * here we are generating code that is somewhat readable but not meant to be maintained
+ * The goto targets are simple and shuold be easy enough to follow with the eye.
+ */ 
+reportError:
+    /* Report the error with either the default error reporter or
+     * the user supplied error reporter.
+     */
+    <name>_reportError(parserCte);
+
+    /* Recover the parse state so we can attempt to proceed after this error
+     */
+    <name>_recover(parserCtx);
+
+    goto ruleEnd;
 <endif>
     <@postamble()>
     <ruleReturnValue()>
@@ -438,15 +498,22 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 >>
 
 ruleDeclarations() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.push(new <it>());}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
+
+/* Declarations */
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<returnType()> retval = new <returnType()>();
-retval.start = (<labelType>)input.LT(1);<\n>
+<returnType()> retval;
 <endif>
 <if(ruleDescriptor.singleValueReturnType)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
 <endif>
+
+/* Initializations */
+<if(ruleDescriptor.hasMultipleReturnValues)>
+retval       = <returnType()>_new(parserCtx);
+retval.start = (<labelType>)parserCtx->input.LT(1);<\n>
+<endif>
+<ruleDescriptor.useScopes:{<it>Stack_push(parserCtx);}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>Stack_push(parserCtx);}; separator="\n">
 >>
 
 ruleLabelDefs() ::= <<
@@ -466,11 +533,21 @@ ruleLabelDefs() ::= <<
 
 ruleReturnValue() ::= <<
 <if(ruleDescriptor.hasReturnValue)>
+    if  (parserCtx->recognitionException == ANTLR3_TRUE)
+    {
+        /* Not in error so we can return the rule value or structure
+         * that the programmer defined.
+         */
 <if(ruleDescriptor.singleValueReturnType)>
-return <ruleDescriptor.singleValueReturnName>;<\n>
+        return <ruleDescriptor.singleValueReturnName>;<\n>
 <else>
-return retval;<\n>
+        return retval;<\n>
 <endif>
+    }
+    else
+    {
+        return  NULL;
+    }
 <endif>
 >>
 
@@ -556,8 +633,9 @@ switch (alt<decisionNumber>) {
 ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 /* From: <fileName>:<description>
  */
-int alt<decisionNumber>=<maxAlt>;
+int alt<decisionNumber>;
 <decls>
+alt<decisionNumber> = <maxAlt>;
 <@predecision()>
 <decision>
 <@postdecision()>
@@ -567,7 +645,8 @@ switch (alt<decisionNumber>) {
 >>
 
 ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-// <fileName>:<description>
+/* From: <fileName>:<description>
+ */
 <decls>
 <@prealt()>
 <alts>
@@ -576,7 +655,8 @@ ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNu
 
 /** A special case of a (...) subrule with a single alternative */
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-// <fileName>:<description>
+/* From: <fileName>:<description>
+ */
 <decls>
 <@prealt()>
 <alts>
@@ -585,7 +665,8 @@ blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber
 
 /** A (..)+ block with 0 or more alternatives */
 positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description>
+/* From: <fileName>:<description>
+ */
 int cnt<decisionNumber>=0;
 <decls>
 <@preloop()>
@@ -613,7 +694,8 @@ positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
 /** A (..)* block with 0 or more alternatives */
 closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description>
+/* From: <fileName>:<description>
+ */
 <decls>
 <@preloop()>
 loop<decisionNumber>:
@@ -653,7 +735,8 @@ case <i> :
 
 /** An alternative is just a list of elements; at outermost level */
 alt(elements,altNum,description,autoAST,outerAlt) ::= <<
-// <fileName>:<description>
+/* From: <fileName>:<description>
+ */
 {
 <@declarations()>
 <elements:element()>
@@ -731,7 +814,7 @@ lexerStringRef(string,label) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
 match(<string>);
-Token <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+pANTLR3_TOKEN <label> = w CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
 match(<string>);<\n>
 <endif>
@@ -776,7 +859,9 @@ following.pop();
 >>
 
 
-/** A lexer rule reference */
+/** 
+ * A lexer rule reference 
+ */
 lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
@@ -989,15 +1074,15 @@ cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
 
 // D F A  E X P R E S S I O N S
 
-andPredicates(left,right) ::= "(<left>&&<right>)"
+andPredicates(left,right) ::= " (<left> && <right>) "
 
-orPredicates(left,right) ::= "(<left>||<right>)"
+orPredicates(left,right) ::= " (<left> || <right>) "
 
-notPredicate(pred) ::= "!(<evalPredicate(...)>)"
+notPredicate(pred) ::= " !(<evalPredicate(...)>) "
 
-evalPredicate(pred) ::= "<pred>"
+evalPredicate(pred) ::= " <pred> "
 
-lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
+lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber> == <atom>"
 
 /** Sometimes a lookahead test cannot assume that LA(k) is in a temp variable
  *  somewhere.  Must ask for the lookahead directly.
@@ -1005,30 +1090,71 @@ lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 isolatedLookaheadTest(atom,k,atomAsInt) ::= "input.LA(<k>)==<atom>"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
-(LA<decisionNumber>_<stateNumber>\>=<lower> && LA<decisionNumber>_<stateNumber>\<=<upper>)
+( (LA<decisionNumber>_<stateNumber>\> = <lower>) && LA<decisionNumber>_<stateNumber> \<= <upper> )
 >>
 
-isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "(input.LA(<k>)\>=<lower> && input.LA(<k>)\<=<upper>)"
+isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= " ((input.LA(<k>)\> = <lower>) && input.LA(<k>) \<= <upper>) "
 
-setTest(ranges) ::= "<ranges; separator=\"||\">"
+setTest(ranges) ::= "<ranges; separator=\" || \">"
 
 // A T T R I B U T E S
+//
+makeScopeSet() ::= <<
+/** Definition of the global attribute scop variable tracking
+ *  structure. An instance of this structure is created by calling
+ *  <scope.name>Stack_new().
+ */
+typedef struct  <scope.name>_SCOPE_STRUCT
+{
+    /** ANTLR3 C runtime scope controlling structure included
+     *  in all scope stacked structures.
+     */
+    ANTLR3_SCOPE    scopeTracker;
+
+    /* Programmer defined variables...
+     * =============================================================================
+     */
+    <scope.attributes:{<it.decl>;}; separator="\n">
+
+    /* End of programmer defined variables
+     * =============================================================================
+     */
+} 
+    * pANTLR3_<scope.name>_SCOPE;
+
+/** \brief Tracking pointer for the <scope.name> stack.
+ */
+static  pANTLR3_<scope.name>_SCOPE  <scope.name>Stack;
+
+/** \brief Allocate initial memory for a <scope.name> scope variable stack entry and
+ *         add it to the top of the stack.
+ */ 
+pANTLR3_<scope.name>_SCOPE <scope.name>Stack_push()
+{
+    /* Pointer used to create a new set of attributes
+     */
+    pANTLR3_<scope.name>_SCOPE      newAttributes;
+
+    /* Allocate the memory for a new structure
+     */
+    
+    /* Call the ANTLR3 C runtime code to initialize the new
+     * scope stack.
+     */
+    return  (pANTLR3_<scope.name>_SCOPE) antrl3Stack_add();
+ pANTLR3_<scope.name>_SCOPE <scope.name>_stack = antrl3Stack_new();<\n>
+}
+>>
 
 globalAttributeScope(scope) ::= <<
 <if(scope.attributes)>
-protected static class <scope.name> {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
+<makeScopeSet(...)>
 <endif>
 >>
 
 ruleAttributeScope(scope) ::= <<
 <if(scope.attributes)>
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
+<makeScopeSet(...)>
 <endif>
 >>
 
@@ -1153,7 +1279,7 @@ setType(type) ::= "setType(<type>);"
 // M I S C (properties, etc...)
 
 bitset(name, words64) ::= <<
-public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
+static  ANTLR3_BITSET <name>_bitset = {<words64:{<it>L};separator=",">};<\n>
 >>
 
 codeFileExtension() ::= ".c"
