@@ -112,7 +112,7 @@ public class <name> extends <@superClassName><superClass><@end> {
     <@end>
 
     public static class RuleReturn {
-        <labelType> start, stop;
+        public <labelType> start, stop;
 	<@ruleReturnMembers()>
     }
 
@@ -513,9 +513,9 @@ match(input, Token.UP, null);
 /** Every predicate is used as a validating predicate (even when it is
  *  also hoisted into a prediction expression).
  */
-validateSemanticPredicate(pred) ::= <<
+validateSemanticPredicate(pred,description) ::= <<
 if ( !(<evalPredicate(...)>) ) {
-    throw new FailedPredicateException(input, "<ruleName>", "<pred>");
+    throw new FailedPredicateException(input, "<ruleName>", "<description>");
 }
 >>
 
@@ -710,7 +710,7 @@ orPredicates(left,right) ::= "(<left>||<right>)"
 
 notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
-evalPredicate(pred) ::= "<pred>"
+evalPredicate(pred,description) ::= "<pred>"
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 

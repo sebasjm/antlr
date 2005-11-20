@@ -32,7 +32,11 @@ header {
 	import java.io.*;
 }
 
-/** Compute the token types for all literals and rules etc..  There are
+/** [Warning: TJP says that this is probably out of date as of 11/19/2005,
+ *   but since it's probably still useful, I'll leave in.  Don't have energy
+ *   to update at the moment.]
+ *
+ *  Compute the token types for all literals and rules etc..  There are
  *  a few different cases to consider for grammar types and a few situations
  *  within.
  *
@@ -561,7 +565,7 @@ alternative
     ;
 
 rewrite
-	:	( #( REWRITE (SEMPRED)? ALT ) )*
+	:	( #( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION) ) )*
 	;
 
 element

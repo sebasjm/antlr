@@ -499,4 +499,16 @@ public abstract class BaseParser {
 	public String[] getTokenNames() {
 		return null;
 	}
+
+	/** A convenience method for use most often with template rewrites.
+	 *  Convert a List<Token> to List<String>
+	 */
+	public List toStrings(List tokens) {
+		if ( tokens==null ) return null;
+		List strings = new ArrayList(tokens.size());
+		for (int i=0; i<tokens.size(); i++) {
+			strings.add(((Token)tokens.get(i)).getText());
+		}
+		return strings;
+	}
 }

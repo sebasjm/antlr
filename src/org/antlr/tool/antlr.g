@@ -37,6 +37,15 @@ import antlr.*;
 /** Read in an ANTLR grammar and build an AST.  Try not to do
  *  any actions, just build the tree.
  *
+ *  The phases are:
+ *
+ *		antlr.g (this file)
+ *		assign.types.g
+ *		define.g
+ *		buildnfa.g
+ *		antlr.print.g (optional)
+ *		codegen.g
+ *
  *  Terence Parr
  *  University of San Francisco
  *  2005
@@ -72,6 +81,7 @@ tokens {
     SET;
     ID;
     ARG;
+    ARGLIST;
     RET;
     LEXER_GRAMMAR;
     PARSER_GRAMMAR;
@@ -79,6 +89,7 @@ tokens {
     COMBINED_GRAMMAR;
     INITACTION;
     LABEL; // $x used in rewrite rules
+    TEMPLATE;
 }
 
 {
@@ -583,7 +594,9 @@ rewrite_alternative
     altRoot.setLine(LT(1).getLine());
     altRoot.setColumn(LT(1).getColumn());
 }
-    :   ( rewrite_element )+
+    :	( rewrite_template )=> rewrite_template
+
+    |	( rewrite_element )+
         {
             if ( #rewrite_alternative==null ) {
                 #rewrite_alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);
@@ -592,6 +605,7 @@ rewrite_alternative
                 #rewrite_alternative = #(altRoot, #rewrite_alternative,eoa);
             }
         }
+
    	|   {#rewrite_alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);}
     ;
 
@@ -644,6 +658,36 @@ rewrite_tree :
 	TREE_BEGIN^
         rewrite_terminal ( rewrite_element )*
     RPAREN!
+	;
+
+/** Build a tree for a template rewrite:
+      ^(TEMPLATE ID ^(ARGLIST ^(ARG ID ACTION) ...) )
+    where ARGLIST is always there even if no args exist
+ */
+rewrite_template
+{Token st=null;}
+	:   {LT(1).getText().equals("template")}?
+		rewrite_template_head {st=LT(1);}
+		( STRING_LITERAL! | DOUBLE_ANGLE_STRING_LITERAL! )
+		{#rewrite_template.addChild(#[st]);}
+	|	rewrite_template_head
+	|	ACTION
+	;
+
+rewrite_template_head
+	:	id lp:LPAREN^ {#lp.setType(TEMPLATE); #lp.setText("TEMPLATE");}
+		rewrite_template_args
+		RPAREN!
+	;
+
+rewrite_template_args
+	:	rewrite_template_arg (COMMA! rewrite_template_arg)*
+		{#rewrite_template_args = #(#[ARGLIST,"ARGLIST"], rewrite_template_args);}
+	|	{#rewrite_template_args = #[ARGLIST,"ARGLIST"];}
+	;
+
+rewrite_template_arg
+	:   id ASSIGN^ ACTION
 	;
 
 class ANTLRLexer extends Lexer;
@@ -769,6 +813,10 @@ STRING_LITERAL
 	:	'"' (ESC|~'"')* '"'
 	;
 
+DOUBLE_ANGLE_STRING_LITERAL
+	:	"<<" (options {greedy=false;}:ESC|.)* ">>"
+	;
+
 protected
 ESC	:	'\\'
 		(	'n' //{$setText('\n');}
@@ -779,6 +827,7 @@ ESC	:	'\\'
 		|	'"' //{$setText('\"');}
 		|	'\'' //{$setText('\'');}
 		|	'\\' //{$setText('\\');}
+		|	'>' //{$setText('>');} // used for escaping >>
 		|	('0'..'3')
 			(
 				options {

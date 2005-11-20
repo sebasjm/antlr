@@ -192,8 +192,8 @@ public class CodeGenerator {
 			String ASTTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"/Dbg.stg";
 			is = cl.getResourceAsStream(ASTTemplateGroupFileName);
 			if ( is==null ) {
-				ErrorManager.error(ErrorManager.MSG_MISSING_AST_CODE_GEN_TEMPLATES,
-								   language);
+				ErrorManager.error(ErrorManager.MSG_MISSING_CODE_GEN_TEMPLATES,
+								   language+"/Dbg");
 				return;
 			}
 			// Dbg templates INHERIT from normal templates
@@ -215,23 +215,30 @@ public class CodeGenerator {
 
 		// if they want to generate ASTs, must have AST.stg file
 		String outputOption = (String)grammar.getOption("output");
-		if ( outputOption!=null && outputOption.equals("AST") ) {
-			String ASTTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"/AST.stg";
+		if ( outputOption!=null &&
+			 (outputOption.equals("AST")||outputOption.equals("template")) )
+		{
+			String outputLib = "AST";
+			if ( outputOption.equals("template") ) {
+				outputLib = "ST";
+			}
+			String ASTTemplateGroupFileName =
+				"org/antlr/codegen/templates/"+language+"/"+outputLib+".stg";
 			is = cl.getResourceAsStream(ASTTemplateGroupFileName);
 			if ( is==null ) {
-				ErrorManager.error(ErrorManager.MSG_MISSING_AST_CODE_GEN_TEMPLATES,
-								   language);
+				ErrorManager.error(ErrorManager.MSG_MISSING_CODE_GEN_TEMPLATES,
+								   language+"/"+outputLib);
 				return;
 			}
-			// AST templates INHERIT from normal or normal+Dbg templates
+			// Output templates INHERIT from normal or normal+Dbg templates
 			BufferedReader astbr = new BufferedReader(new InputStreamReader(is));
-			StringTemplateGroup ASTTemplates =
+			StringTemplateGroup OutputTemplates =
 				new StringTemplateGroup(astbr,
 										AngleBracketTemplateLexer.class,
 										ErrorManager.getStringTemplateErrorListener(),
 										templates);
-			//System.out.println("AST templates: "+ASTTemplates.toString(false));
-			templates = ASTTemplates;
+			//System.out.println("AST templates: "+OutputTemplates.toString(false));
+			templates = OutputTemplates;
 
 			try {
 				astbr.close();
@@ -276,10 +283,12 @@ public class CodeGenerator {
 
 		// OUTPUT FILE (contains recognizerST)
 		outputFileST = templates.getInstanceOf("outputFile");
+		/*
 		outputFileST.setAttribute("buildTemplate",
 								  new Boolean(grammar.type!=Grammar.LEXER&&
 											  grammar.buildTemplate()));
-
+*/
+		
 		// HEADER FILE
 		if ( templates.isDefined("headerFile") ) {
 			headerFileST = templates.getInstanceOf("headerFile");
@@ -474,8 +483,8 @@ public class CodeGenerator {
 			recognizerST.setAttribute("cyclicDFAs", dfaST);
 			decisionST = templates.getInstanceOf("dfaDecision");
 			String description = dfa.getNFADecisionStartState().getDescription();
+			description = target.getTargetStringLiteralFromString(description);
 			if ( description!=null ) {
-				description = Utils.replace(description,"\"", "\\\"");
 				decisionST.setAttribute("description", description);
 			}
 			decisionST.setAttribute("decisionNumber",
@@ -506,7 +515,7 @@ public class CodeGenerator {
 													  Label label)
 	{
 		SemanticContext semCtx = label.getSemanticContext();
-		return semCtx.genExpr(templates);
+		return semCtx.genExpr(this,templates);
 	}
 
 	/** For intervals such as [3..3, 30..35], generate an expression that
@@ -647,43 +656,6 @@ public class CodeGenerator {
 		ActionTranslator translator = new ActionTranslator(this);
 		return translator.translate(ruleName,actionTree);
 	}
-
-	// C H A R  T R A N S L A T I O N
-
-	/** The antlr.g grammar converts the escaped literal '\'' to ''' and
-	 *  all other escapes so char literals always have just a unicode 16-bit
-	 *  char value.  Use this method to get the escaped grammar literal back out,
-	 *  such as for printing out a grammar.
-	public static String getJavaEscapedCharFromCharLiteralToken(String literal) {
-		// pull out single char value
-		int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
-		// rebuild with escaped char in single quotes
-		return "'"+CodeGenerator.getJavaUnicodeEscapeStringForChar(c)+"'";
-	}
-	 */
-
-	/** Given a literal like "\nfoo\\", antlr.g converts it to the actual
-	 *  char sequence implied by the escaped char seq.  To get an escaped
-	 *  literal back out for printing grammars and such, use this routine.
-	 *  Leave the double quotes on the outside of the literal.
-	public static String getJavaEscapedStringFromStringLiteralToken(String literal) {
-		StringBuffer buf = new StringBuffer();
-		buf.append('"');
-		for (int i=1; i<literal.length()-1; i++) {
-			int c = literal.charAt(i);
-			if ( c<CodeGenerator.charValueEscape.length &&
-				CodeGenerator.charValueEscape[c]!=null )
-			{
-				buf.append(CodeGenerator.charValueEscape[c]);
-			}
-			else {
-				buf.append((char)c);
-			}
-		}
-		buf.append('"');
-		return buf.toString();
-	}
-	 */
 
 	// M I S C
 

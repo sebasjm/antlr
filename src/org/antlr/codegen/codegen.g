@@ -64,7 +64,7 @@ options {
     protected int rewriteBlockNestingLevel = 0;
 	protected int outerAltNum = 0;
     protected StringTemplate currentBlockST = null;
-    protected boolean currentAltHasRewrite = false;
+    protected boolean currentAltHasASTRewrite = false;
     protected int rewriteTreeNestingLevel = 0;
     protected Set rewriteRuleRefs = null;
 
@@ -98,6 +98,8 @@ options {
 
     protected StringTemplate outputFileST;
     protected StringTemplate headerFileST;
+
+    protected String outputOption = "";
 
 	protected StringTemplate getWildcardST(GrammarAST elementAST, GrammarAST ast_suffix, String label) {
 		String name = "wildcard";
@@ -189,7 +191,7 @@ options {
     			operatorPart = "Bang";
     		}
    		}
-		if ( currentAltHasRewrite ) {
+		if ( currentAltHasASTRewrite ) {
 			rewritePart = "Track";
 		}
 		if ( hasListLabel ) {
@@ -218,6 +220,7 @@ grammar[Grammar g,
     this.outputFileST = outputFileST;
     this.headerFileST = headerFileST;
     String superClass = (String)g.getOption("superClass");
+    outputOption = (String)g.getOption("output");
     recognizerST.setAttribute("superClass", superClass);
     if ( g.type!=Grammar.LEXER ) {
 		recognizerST.setAttribute("ASTLabelType", g.getOption("ASTLabelType"));
@@ -302,13 +305,14 @@ rule returns [StringTemplate code=null]
         {
 		String description =
 		    grammar.grammarTreeToString(#rule.getFirstChildWithType(BLOCK), false);
+		description = generator.target.getTargetStringLiteralFromString(description);
     	b.setAttribute("description", description);
 		/*
 		System.out.println("rule "+r+" tokens="+
 						   grammar.getRule(r).getAllTokenRefsInAltsWithRewrites());
 		System.out.println("rule "+r+" rules="+
 						   grammar.getRule(r).getAllRuleRefsInAltsWithRewrites());
-		*/
+        */
         // do not generate lexer rules in combined grammar
 		if ( grammar.type==Grammar.LEXER ) {
 			if ( r.equals(Grammar.TOKEN_RULENAME) ) {
@@ -339,6 +343,8 @@ rule returns [StringTemplate code=null]
 			else {
 				description =
 					grammar.grammarTreeToString(#rule,false);
+			 	description =
+			 	    generator.target.getTargetStringLiteralFromString(description);
 				code.setAttribute("description", description);
 			}
 			code.setAttribute("ruleName", r);
@@ -419,15 +425,16 @@ if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL ) {
 		 (#alternative.getNextSibling()!=null &&
 		  #alternative.getNextSibling().getType()==REWRITE)) )
 	{
-		currentAltHasRewrite = true;
+		currentAltHasASTRewrite = true;
 	}
 	else {
-		currentAltHasRewrite = false;
+		currentAltHasASTRewrite = false;
 	}
 }
 String description = grammar.grammarTreeToString(#alternative, false);
+description = generator.target.getTargetStringLiteralFromString(description);
 code.setAttribute("description", description);
-if ( !currentAltHasRewrite && grammar.buildAST() ) {
+if ( !currentAltHasASTRewrite && grammar.buildAST() ) {
 	code.setAttribute("autoAST", new Boolean(true));
 }
 StringTemplate e;
@@ -523,7 +530,7 @@ element returns [StringTemplate code=null]
 
     |   act:ACTION
         {
-        String actText = #act.getText();
+        #act.outerAltNum = this.outerAltNum;
         code = new StringTemplate(templates,
                                   generator.translateAction(currentRuleName,#act));
         }
@@ -531,7 +538,11 @@ element returns [StringTemplate code=null]
     |   sp:SEMPRED
         {
         code = templates.getInstanceOf("validateSemanticPredicate");
-        code.setAttribute("pred", #sp.getText());
+        #sp.outerAltNum = this.outerAltNum;
+        code.setAttribute("pred", generator.translateAction(currentRuleName,#sp));
+		String description =
+			generator.target.getTargetStringLiteralFromString(#sp.getText());
+		code.setAttribute("description", description);
         }
 
     |   EPSILON
@@ -554,6 +565,7 @@ ebnf returns [StringTemplate code=null]
 		)
 		{
 		String description = grammar.grammarTreeToString(#ebnf, false);
+		description = generator.target.getTargetStringLiteralFromString(description);
     	code.setAttribute("description", description);
     	}
     ;
@@ -592,8 +604,11 @@ atom[String label] returns [StringTemplate code=null]
         code = getRuleElementST("ruleRef", #r.getText(), #r, #as1, label);
 		code.setAttribute("rule", r.getText());
 
-		//if ( label!=null ) {code.setAttribute("label", label);}
-		if ( #rarg!=null ) {code.setAttribute("args", #rarg.getText());}
+		if ( #rarg!=null ) {
+			#rarg.outerAltNum = this.outerAltNum;
+			String argAction = generator.translateAction(currentRuleName,#rarg);
+			code.setAttribute("args", argAction);
+		}
 		code.setAttribute("elementIndex", ((TokenWithIndex)r.getToken()).getIndex());
 		generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName);
 		#r.code = code;
@@ -605,7 +620,11 @@ atom[String label] returns [StringTemplate code=null]
 		   if ( grammar.type==Grammar.LEXER ) {
 			   code = templates.getInstanceOf("lexerRuleRef");
 			   code.setAttribute("rule", t.getText());
-			   if ( #targ!=null ) {code.setAttribute("args", #targ.getText());}
+				if ( #targ!=null ) {
+					#targ.outerAltNum = this.outerAltNum;
+					String argAction = generator.translateAction(currentRuleName,#targ);
+					code.setAttribute("args", argAction);
+				}
 			   if ( label!=null ) code.setAttribute("label", label);
 		   }
 		   else {
@@ -710,7 +729,10 @@ setElement
 rewrite returns [StringTemplate code=null]
 {
 StringTemplate alt;
-if ( #rewrite.getType()==REWRITE ) {
+if ( #rewrite.findFirstType(TEMPLATE)!=null ) {
+	code = templates.getInstanceOf("rewriteTemplate");
+}
+else if ( #rewrite.getType()==REWRITE ) {
 	code = templates.getInstanceOf("rewriteCode");
 	code.setAttribute("treeLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
 	code.setAttribute("rewriteBlockLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
@@ -726,12 +748,13 @@ if ( #rewrite.getType()==REWRITE ) {
 			if ( #pred!=null ) {
 				predText = #pred.getText();
 			}
-			String altDescr =
-			    grammar.grammarTreeToString(#r);
+			String description =
+			    grammar.grammarTreeToString(#r,false);
+			description = generator.target.getTargetStringLiteralFromString(description);
 			code.setAttribute("alts.{pred,alt,description}",
 							  predText,
 							  alt,
-							  altDescr);
+							  description);
 			pred=null;
 			}
 		)*
@@ -758,11 +781,11 @@ StringTemplate alt=null;
     ;
 
 rewrite_alternative
-	returns [StringTemplate code=templates.getInstanceOf("rewriteElementList")]
+	returns [StringTemplate code=null]
 {
-StringTemplate el;
+StringTemplate el,st;
 }
-    :   #(	a:ALT
+    :   #(	a:ALT {code=templates.getInstanceOf("rewriteElementList");}
 			(	( el=rewrite_element {code.setAttribute("elements", el);} )+
     		|	EPSILON
     			{code.setAttribute("elements",
@@ -770,6 +793,14 @@ StringTemplate el;
     		)
     		EOA
     	 )
+   	|	code=rewrite_template
+   	|	act:ACTION
+   		{
+        #act.outerAltNum = this.outerAltNum;
+   		code=templates.getInstanceOf("rewriteAction");
+   		code.setAttribute("action",
+   						  generator.translateAction(currentRuleName,#act));
+   		}
     ;
 
 rewrite_element returns [StringTemplate code=null]
@@ -796,16 +827,19 @@ rewrite_ebnf returns [StringTemplate code=null]
     :   #( OPTIONAL code=rewrite_block["rewriteOptionalBlock"] )
 		{
 		String description = grammar.grammarTreeToString(#rewrite_ebnf, false);
+		description = generator.target.getTargetStringLiteralFromString(description);
 		code.setAttribute("description", description);
 		}
     |   #( CLOSURE code=rewrite_block["rewriteClosureBlock"] )
 		{
 		String description = grammar.grammarTreeToString(#rewrite_ebnf, false);
+		description = generator.target.getTargetStringLiteralFromString(description);
 		code.setAttribute("description", description);
 		}
     |   #( POSITIVE_CLOSURE code=rewrite_block["rewritePositiveClosureBlock"] )
 		{
 		String description = grammar.grammarTreeToString(#rewrite_ebnf, false);
+		description = generator.target.getTargetStringLiteralFromString(description);
 		code.setAttribute("description", description);
 		}
     ;
@@ -823,6 +857,7 @@ StringTemplate r, el;
 		)
 		{
 		String description = grammar.grammarTreeToString(#rewrite_tree, false);
+		description = generator.target.getTargetStringLiteralFromString(description);
 		code.setAttribute("description", description);
     	rewriteTreeNestingLevel--;
 		}
@@ -882,6 +917,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	}
     	code = templates.getInstanceOf(stName);
     	if ( #arg!=null ) {
+	        #arg.outerAltNum = this.outerAltNum;
     		code.setAttribute("args", generator.translateAction(currentRuleName,#arg));
     	}
 		code.setAttribute("elementIndex", ((TokenWithIndex)#rewrite_atom.getToken()).getIndex());
@@ -956,9 +992,10 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     |	ACTION
         {
         // actions in rewrite rules yield a tree object
+		#ACTION.outerAltNum = this.outerAltNum;
         String actText = #ACTION.getText();
         String action = generator.translateAction(currentRuleName,#ACTION);
-		code = templates.getInstanceOf("rewriteAction"+(isRoot?"Root":""));
+		code = templates.getInstanceOf("rewriteNodeAction"+(isRoot?"Root":""));
 		code.setAttribute("action", action);
         }
     ;
@@ -972,3 +1009,42 @@ rewrite_setElement
     |   t:TOKEN_REF
     |   s:STRING_LITERAL
     ;
+
+rewrite_template returns [StringTemplate code=null]
+	:	#( TEMPLATE id:ID
+		   {
+		   if ( #id.getText().equals("template") ) {
+		   		code = templates.getInstanceOf("rewriteInlineTemplate");
+		   }
+		   else {
+		   		code = templates.getInstanceOf("rewriteExternalTemplate");
+		   		code.setAttribute("name", #id.getText());
+		   }
+		   }
+	       #( ARGLIST
+	       	  ( #( ASSIGN arg:ID a:ACTION
+		   		   {
+				   #a.outerAltNum = this.outerAltNum;
+		   		   String action = generator.translateAction(currentRuleName,#a);
+		   		   code.setAttribute("args.{name,value}", #arg.getText(), action);
+		   		   }
+	             )
+	          )*
+	        )
+		   ( STRING_LITERAL
+             {
+             String sl = #STRING_LITERAL.getText();
+			 String t = sl.substring(1,sl.length()-1); // strip quotes
+			 t = generator.target.getTargetStringLiteralFromString(t);
+             code.setAttribute("template",t);
+             }
+		   | DOUBLE_ANGLE_STRING_LITERAL
+             {
+             String sl = #DOUBLE_ANGLE_STRING_LITERAL.getText();
+			 String t = sl.substring(2,sl.length()-2); // strip double angle quotes
+			 t = generator.target.getTargetStringLiteralFromString(t);
+             code.setAttribute("template",t);
+             }
+		   )?
+	     )
+	;

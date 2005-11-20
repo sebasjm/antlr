@@ -271,7 +271,7 @@ rewriteCode(
 	referencedRules, rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
 <<
 
-// REWRITE
+// AST REWRITE
 <first([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("element <it> length="+list_<it>.size()+" != 1");<\n>}>
 <rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("rewrite element <it> length="+list_<it>.size()+" != 1");<\n>}>
 int i_0 = 0;
@@ -404,6 +404,11 @@ rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
 root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<token>, <args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
 >>
 
+/** plain -> {foo} action */
+rewriteAction(action) ::= <<
+root_0 = <action>;<\n>
+>>
+
 /** What is the name of the previous value of this rule's root tree?  This
  *  let's us refer to $rule to mean previous value.  I am reusing the
  *  variable 'tree' sitting in retval struct to hold the value of root_0 right
@@ -427,11 +432,11 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<rule>.get(i_<rewrite
 <endif>
 >>
 
-rewriteAction(action) ::= <<
+rewriteNodeAction(action) ::= <<
 adaptor.addChild(root_<treeLevel>, <action>);<\n>
 >>
 
-rewriteActionRoot(action) ::= <<
+rewriteNodeActionRoot(action) ::= <<
 root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<action>, root_<treeLevel>);<\n>
 >>
 

@@ -96,9 +96,9 @@ public class ACyclicDFACodeGenerator {
 		dfaST.setAttribute("k", new Integer(k));
 		dfaST.setAttribute("stateNumber", new Integer(s.stateNumber));
 		String description = dfa.getNFADecisionStartState().getDescription();
+		description = parent.target.getTargetStringLiteralFromString(description);
 		//System.out.println("DFA: "+description+" associated with AST "+decisionASTNode);
 		if ( description!=null ) {
-			description = Utils.replace(description,"\"", "\\\"");
 			dfaST.setAttribute("description", description);
 		}
 		int EOTPredicts = NFA.INVALID_ALT_NUMBER;

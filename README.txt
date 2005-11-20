@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0ea6
-November 13, 2005
+ANTLR 3.0ea7
+?, 2005
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator
@@ -203,6 +203,36 @@ to me.  I use Intellij so I never type anything actually to build.
 -----------------------------------------------------------------------
 
 CHANGES
+
+3.0ea7 - 
+
+* integrated StringTemplate in a very simple manner
+
+Syntax:
+-> template(arglist) "..."
+-> template(arglist) <<...>>
+-> namedTemplate(arglist)
+-> {free expression}
+-> // empty
+
+Predicate syntax:
+a : A B -> {p1}? foo(a={$A.text})
+        -> {p2}? foo(a={$B.text})
+        -> // return nothing
+
+An arg list is just a list of template attribute assignments to actions in curlies.
+
+There is a setTemplateLib() method for you to use with named template rewrites.
+
+Use a new option:
+
+grammar t;
+options {output=template;}
+...
+
+This all should work for tree grammars too, but I'm still testing.
+
+* fixed bugs where strings were improperly escaped in exceptions, comments, etc..  For example, newlines came out as newlines not the escaped version
 
 3.0ea6 - November 13, 2005
 

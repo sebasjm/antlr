@@ -224,8 +224,23 @@ alternative
     ;
 
 single_rewrite
-	:	#( REWRITE {out("->");} (SEMPRED {out(" {"+#SEMPRED.getText()+"}?");})?
-	       alternative )
+	:	#( REWRITE {out(" ->");} (SEMPRED {out(" {"+#SEMPRED.getText()+"}?");})?
+	       ( alternative | rewrite_template | ACTION {out(" {"+#ACTION.getText()+"}");})
+	     )
+	;
+
+rewrite_template
+	:	#( TEMPLATE id:ID {out(" "+#id.getText());}
+	       #( ARGLIST
+	       	  ( #( ARG arg:ID {out(#arg.getText()+"=");}
+	               a:ACTION   {out(#a.getText());}
+	             )
+	          )*
+	        )
+		   ( STRING_LITERAL {out(" "+#STRING_LITERAL.getText());}
+		   | DOUBLE_ANGLE_STRING_LITERAL {out(" "+#DOUBLE_ANGLE_STRING_LITERAL.getText());}
+		   )?
+	     )
 	;
 
 rewrite

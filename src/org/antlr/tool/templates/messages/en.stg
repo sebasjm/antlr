@@ -62,7 +62,7 @@ bad internal tree structure '<arg>': <exception>
 
 // code gen errors
 MISSING_CODE_GEN_TEMPLATES(arg) ::= 
-	"cannot find code generation templates for language <arg>"
+	"cannot find code generation templates <arg>.stg"
 MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES() ::=
 	"cannot find code generation cyclic DFA templates for language <arg>"
 CODE_GEN_TEMPLATES_INCOMPLETE() ::= 
@@ -71,8 +71,6 @@ CANNOT_CREATE_TARGET_GENERATOR(arg,exception,stackTrace) ::=
 	"cannot create target <arg> code generator: <exception>"
 CANNOT_COMPUTE_SAMPLE_INPUT_SEQ() ::= 
 	"cannot generate a sample input sequence from lookahead DFA"
-MISSING_AST_CODE_GEN_TEMPLATES(arg) ::= 
-	"cannot find AST code generation templates for language <arg>"
 
 // grammar interpretation errors
 /*
@@ -163,7 +161,7 @@ NONCHAR_RANGE(file,line,col) ::=
 */
 ILLEGAL_OPTION(file,line,col,arg) ::=
 	"<loc()>illegal option <arg>"
-LIST_LABEL_INVALID_UNLESS_AST(file,line,col,arg) ::=
+LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT(file,line,col,arg) ::=
 	"<loc()>rule '+=' list labels are not allowed unless building trees: <arg>"
 UNDEFINED_TOKEN_REF_IN_REWRITE(file,line,col,arg) ::=
   "<loc()>reference to undefined token in rewrite rule: <arg>"

@@ -195,7 +195,7 @@ rule
 
 					// track decision if > 1 alts
 					if ( grammar.getNumberOfAltsForDecisionNFA(b.left)>1 ) {
-						b.left.setDescription(grammar.grammarTreeToString(#rule));
+						b.left.setDescription(grammar.grammarTreeToString(#rule,false));
 						b.left.setDecisionASTNode(#BLOCK);
 						int d = grammar.assignDecisionNumber( b.left );
 						grammar.setDecisionNFA( d, b.left );
@@ -250,7 +250,7 @@ alternative returns [StateCluster g=null]
     ;
 
 rewrite
-	:	( #( REWRITE (SEMPRED)? ALT ) )*
+	:	( #( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION) ) )*
 	;
 
 element returns [StateCluster g=null]
@@ -328,7 +328,7 @@ ebnf returns [StateCluster g=null]
         {
         // track decision if > 1 alts
         if ( grammar.getNumberOfAltsForDecisionNFA(b.left)>1 ) {
-            b.left.setDescription(grammar.grammarTreeToString(#BLOCK));
+            b.left.setDescription(grammar.grammarTreeToString(#BLOCK,false));
             b.left.setDecisionASTNode(#BLOCK);
             int d = grammar.assignDecisionNumber( b.left );
             grammar.setDecisionNFA( d, b.left );
@@ -339,7 +339,7 @@ ebnf returns [StateCluster g=null]
     |   #( OPTIONAL #( blk:BLOCK b=block EOB ) )
         {
         g = factory.build_Aoptional(b);
-    	g.left.setDescription(grammar.grammarTreeToString(#ebnf));
+    	g.left.setDescription(grammar.grammarTreeToString(#ebnf,false));
         // there is always at least one alt even if block has just 1 alt
         int d = grammar.assignDecisionNumber( g.left );
 		grammar.setDecisionNFA(d, g.left);
@@ -350,7 +350,7 @@ ebnf returns [StateCluster g=null]
         {
         g = factory.build_Astar(b);
 		// track the loop back / exit decision point
-    	b.right.setDescription("()* loopback of "+grammar.grammarTreeToString(#ebnf));
+    	b.right.setDescription("()* loopback of "+grammar.grammarTreeToString(#ebnf,false));
         int d = grammar.assignDecisionNumber( b.right );
 		grammar.setDecisionNFA(d, b.right);
         grammar.setDecisionBlockAST(d, #BLOCK);
@@ -367,7 +367,7 @@ ebnf returns [StateCluster g=null]
         g = factory.build_Aplus(b);
         // don't make a decision on left edge, can reuse loop end decision
 		// track the loop back / exit decision point
-    	b.right.setDescription("()+ loopback of "+grammar.grammarTreeToString(#ebnf));
+    	b.right.setDescription("()+ loopback of "+grammar.grammarTreeToString(#ebnf,false));
         int d = grammar.assignDecisionNumber( b.right );
 		grammar.setDecisionNFA(d, b.right);
         grammar.setDecisionBlockAST(d, #blk2);

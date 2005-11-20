@@ -64,28 +64,28 @@ public class Grammar {
 	/** When converting ANTLR char and string literals, here is the
 	 *  value set of escape chars.
 	 */
-	public static int escapedCharValue[] = new int[255];
+	public static int ANTLRLiteralEscapedCharValue[] = new int[255];
 
 	/** Given a char, we need to be able to show as an ANTLR literal.
 	 */
-	public static String charValueEscape[] = new String[255];
+	public static String ANTLRLiteralCharValueEscape[] = new String[255];
 
 	static {
-		escapedCharValue['n'] = '\n';
-		escapedCharValue['r'] = '\r';
-		escapedCharValue['t'] = '\t';
-		escapedCharValue['b'] = '\b';
-		escapedCharValue['f'] = '\f';
-		escapedCharValue['\\'] = '\\';
-		escapedCharValue['\''] = '\'';
-		escapedCharValue['"'] = '"';
-		charValueEscape['\n'] = "\\n";
-		charValueEscape['\r'] = "\\r";
-		charValueEscape['\t'] = "\\t";
-		charValueEscape['\b'] = "\\b";
-		charValueEscape['\f'] = "\\f";
-		charValueEscape['\\'] = "\\\\";
-		charValueEscape['\''] = "\\'";
+		ANTLRLiteralEscapedCharValue['n'] = '\n';
+		ANTLRLiteralEscapedCharValue['r'] = '\r';
+		ANTLRLiteralEscapedCharValue['t'] = '\t';
+		ANTLRLiteralEscapedCharValue['b'] = '\b';
+		ANTLRLiteralEscapedCharValue['f'] = '\f';
+		ANTLRLiteralEscapedCharValue['\\'] = '\\';
+		ANTLRLiteralEscapedCharValue['\''] = '\'';
+		ANTLRLiteralEscapedCharValue['"'] = '"';
+		ANTLRLiteralCharValueEscape['\n'] = "\\n";
+		ANTLRLiteralCharValueEscape['\r'] = "\\r";
+		ANTLRLiteralCharValueEscape['\t'] = "\\t";
+		ANTLRLiteralCharValueEscape['\b'] = "\\b";
+		ANTLRLiteralCharValueEscape['\f'] = "\\f";
+		ANTLRLiteralCharValueEscape['\\'] = "\\\\";
+		ANTLRLiteralCharValueEscape['\''] = "\\'";
 	}
 
     public static final int LEXER = 1;
@@ -96,7 +96,7 @@ public class Grammar {
 		"<invalid>",
 		"lexer",
 		"parser",
-		"treeparser",
+		"tree",
 		"combined"
 	};
 
@@ -793,12 +793,13 @@ public class Grammar {
 									antlr.Token label,
 									GrammarAST element)
 	{
-		if ( !buildAST() ) {
-			ErrorManager.grammarError(
-				ErrorManager.MSG_LIST_LABEL_INVALID_UNLESS_AST,this,label,label.getText());
-		}
 		Rule r = getRule(ruleName);
 		if ( r!=null ) {
+			if ( !r.getHasMultipleReturnValues() ) {
+				ErrorManager.grammarError(
+					ErrorManager.LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT,this,
+					label,label.getText());
+			}
 			defineLabel(r, label, element, RULE_LIST_LABEL);
 		}
 	}
@@ -1019,7 +1020,7 @@ public class Grammar {
         {
 			// '\x'  (antlr lexer will catch invalid char)
 			int escChar = literal.charAt(2);
-			int charVal = escapedCharValue[escChar];
+			int charVal = ANTLRLiteralEscapedCharValue[escChar];
 			return charVal;
         }
         else if( literal.length() == 8 )
@@ -1063,7 +1064,7 @@ public class Grammar {
 					buf.append((char)val);
 				}
 				else {
-					buf.append(escapedCharValue[c]); // normal \x escape
+					buf.append(ANTLRLiteralEscapedCharValue[c]); // normal \x escape
 				}
 			}
 			else {
@@ -1188,7 +1189,7 @@ public class Grammar {
 	public boolean buildTemplate() {
 		String outputType = (String)getOption("output");
 		if ( outputType!=null ) {
-			return outputType.equals("text");
+			return outputType.equals("template");
 		}
 		return false;
 	}
@@ -1447,8 +1448,8 @@ public class Grammar {
 			ErrorManager.internalError("invalid char value "+c);
 			return "'<INVALID>'";
 		}
-		if ( c<charValueEscape.length && charValueEscape[c]!=null ) {
-			return '\''+charValueEscape[c]+'\'';
+		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {
+			return '\''+ANTLRLiteralCharValueEscape[c]+'\'';
 		}
 		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
 			!Character.isISOControl((char)c) ) {

@@ -317,12 +317,14 @@ public class Rule {
 	public boolean getHasMultipleReturnValues() {
 		return
 			referencedPredefinedRuleAttributes || grammar.buildAST() ||
+			grammar.buildTemplate() ||
 			(returnScope!=null && returnScope.attributes.size()>1);
 	}
 
 	public boolean getHasReturnValue() {
 		return
 			referencedPredefinedRuleAttributes || grammar.buildAST() ||
+			grammar.buildTemplate() ||
 			(returnScope!=null && returnScope.attributes.size()>0);
 	}
 

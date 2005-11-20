@@ -38,9 +38,8 @@ import java.io.IOException;
  *  a new X.stg file for language X, however, sometimes the files that must
  *  be generated vary enough that some X-specific functionality is required.
  *  For example, in C, you must generate header files whereas in Java you do not.
- *  On the other hand, Java must generate a separate file for cyclic DFAs
- *  so it can access bytecode's goto instruction.  Other languages may want
- *  to keep these DFA separate from the main generated recognizer file also.
+ *  Other languages may want to keep DFA separate from the main
+ *  generated recognizer file.
  *
  *  The notion of a Code Generator target abstracts out the creation
  *  of the various files.  As new language targets get added to the ANTLR
@@ -57,6 +56,31 @@ import java.io.IOException;
  *
  */
 public class Target {
+
+	/** For pure strings of Java 16-bit unicode char, how can we display
+	 *  it in the target language as a literal.  Useful for dumping
+	 *  predicates and such that may refer to chars that need to be escaped
+	 *  when represented as strings.  Also, templates need to be escape so
+	 *  that the target language can hold them as a string.
+	 *
+	 *  I have defined (via the constructor) the set of typical escapes,
+	 *  but your Target subclass is free to alter the translated chars or
+	 *  add more definitions.  This is nonstatic so each target can have
+	 *  a different set in memory at same time.
+	 */
+	protected String[] targetCharValueEscape = new String[255];
+
+	public Target() {
+		targetCharValueEscape['\n'] = "\\n";
+		targetCharValueEscape['\r'] = "\\r";
+		targetCharValueEscape['\t'] = "\\t";
+		targetCharValueEscape['\b'] = "\\b";
+		targetCharValueEscape['\f'] = "\\f";
+		targetCharValueEscape['\\'] = "\\\\";
+		targetCharValueEscape['\''] = "\\'";
+		targetCharValueEscape['"'] = "\\\"";
+	}
+
 	protected void genRecognizerFile(Tool tool,
 									CodeGenerator generator,
 									Grammar grammar,
@@ -110,11 +134,55 @@ public class Target {
 		CodeGenerator generator,
 		String literal)
 	{
-		/*
-		StringBuffer buf =
-			Grammar.getUnescapedStringFromGrammarStringLiteral(literal);
-			*/
 		return literal;
+	}
+
+	/** Given a random string of Java unicode chars, return a new string with
+	 *  optionally appropriate quote characters for target language and possibly
+	 *  with some escaped characters.  For example, if the incoming string has
+	 *  actual newline characters, the output of this method would convert them
+	 *  to the two char sequence \n for Java, C, C++, ...  The new string has
+	 *  double-quotes around it as well.  Example String in memory:
+	 *
+	 *     a"[newlinechar]b'c[carriagereturnchar]d[tab]e\f
+	 *
+	 *  would be converted to the valid Java s:
+	 *
+	 *     "a\"\nb'c\rd\te\\f"
+	 *
+	 *  or
+	 *
+	 *     a\"\nb'c\rd\te\\f
+	 *
+	 *  depending on the quoted arg.
+	 */
+	public String getTargetStringLiteralFromString(String s, boolean quoted) {
+		if ( s==null ) {
+			return null;
+		}
+		StringBuffer buf = new StringBuffer();
+		if ( quoted ) {
+			buf.append('"');
+		}
+		for (int i=0; i<s.length(); i++) {
+			int c = s.charAt(i);
+			if ( c<targetCharValueEscape.length &&
+				 targetCharValueEscape[c]!=null )
+			{
+				buf.append(targetCharValueEscape[c]);
+			}
+			else {
+				buf.append((char)c);
+			}
+		}
+		if ( quoted ) {
+			buf.append('"');
+		}
+		return buf.toString();
+	}
+
+	public String getTargetStringLiteralFromString(String s) {
+		return getTargetStringLiteralFromString(s, false);
 	}
 
 	/** Some targets only support ASCII or 8-bit chars/strings.  For example,

@@ -30,6 +30,7 @@ package org.antlr.analysis;
 import antlr.collections.AST;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.antlr.codegen.CodeGenerator;
 
 /** A binary tree structure used to record the semantic context in which
  *  an NFA configuration is valid.  It's either a single predicate or
@@ -60,7 +61,8 @@ public abstract class SemanticContext {
     /** Generate an expression that will evaluate the semantic context,
      *  given a set of output templates.
      */
-    public abstract StringTemplate genExpr(StringTemplateGroup templates);
+    public abstract StringTemplate genExpr(CodeGenerator generator,
+										   StringTemplateGroup templates);
 
     public static class Predicate extends SemanticContext {
         /** The AST node in tree created from the grammar holding the predicate */
@@ -97,9 +99,14 @@ public abstract class SemanticContext {
             return predicate.getText().hashCode();
         }
 
-        public StringTemplate genExpr(StringTemplateGroup templates) {
+        public StringTemplate genExpr(CodeGenerator generator,
+									  StringTemplateGroup templates)
+		{
 			StringTemplate eST = templates.getInstanceOf("evalPredicate");
 			eST.setAttribute("pred", this.toString());
+			String description =
+				generator.target.getTargetStringLiteralFromString(this.toString());
+			eST.setAttribute("description", description);
             return eST;
         }
 
@@ -131,7 +138,9 @@ public abstract class SemanticContext {
         public int hashCode() {
             return left.hashCode() + right.hashCode();
         }
-        public StringTemplate genExpr(StringTemplateGroup templates) {
+        public StringTemplate genExpr(CodeGenerator generator,
+									  StringTemplateGroup templates)
+		{
             StringTemplate eST = templates.getInstanceOf("andPredicates");
             eST.setAttribute("left", left);
             eST.setAttribute("right", right);
@@ -180,7 +189,9 @@ public abstract class SemanticContext {
         public int hashCode() {
             return left.hashCode() + right.hashCode();
         }
-        public StringTemplate genExpr(StringTemplateGroup templates) {
+        public StringTemplate genExpr(CodeGenerator generator,
+									  StringTemplateGroup templates)
+		{
             StringTemplate eST = templates.getInstanceOf("orPredicates");
             eST.setAttribute("left", left);
             eST.setAttribute("right", right);
@@ -209,7 +220,9 @@ public abstract class SemanticContext {
         public int hashCode() {
             return ctx.hashCode();
         }
-        public StringTemplate genExpr(StringTemplateGroup templates) {
+        public StringTemplate genExpr(CodeGenerator generator,
+									  StringTemplateGroup templates)
+		{
             StringTemplate eST = templates.getInstanceOf("notPredicate");
             eST.setAttribute("pred", ctx);
             return eST;

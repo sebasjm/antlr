@@ -143,25 +143,10 @@ public class CyclicDFACodeGenerator {
 				edgeST.setAttribute("labels", labels);
 				stateST.setAttribute("edges", edgeST);
 			}
-			/*
-			List edgeLabels = edge.label.getSet().toList();
-			for (int j = 0; j < edgeLabels.size(); j++) {
-				Integer vI = (Integer) edgeLabels.get(j);
-				if ( vI.intValue()!=Label.EOT ) {
-	                labels.add(new LabelEdgeNumberPair(vI.intValue(), edgeNumber));
-				}
-			}
-			*/
 			// now gen code for other states
 			walkCyclicDFAGeneratingStateMachine(templates,
 											   dfaST,
 											   (DFAState)edge.target);
-		}
-		// now sort the edge case values
-		if ( !s.isAcceptState() ) {
-			/*
-			Collections.sort( labels );
-			*/
 		}
 	}
 
@@ -184,27 +169,6 @@ public class CyclicDFACodeGenerator {
 				edgeST = templates.getInstanceOf("cyclicDFAEdge");
 				StringTemplate exprST =
 					parent.genLabelExpr(templates,edge.label,1);
-				/*
-				// If this is a predicate edge and the code gen templates have
-				// a template called singlePredicateMethod, it indicates
-				// they want to build a method for predicates
-				if ( edge.label.isSemanticPredicate() &&
-					 templates.isDefinedInThisGroup("singlePredicateMethod") )
-				{
-					SemanticContext semCtx = edge.label.getSemanticContext();
-					StringTemplate predMethodST =
-						templates.getInstanceOf("singlePredicateMethod");
-					predMethodST.setAttribute("decision", dfa.getDecisionNumber());
-					predMethodST.setAttribute("stateNumber", s.stateNumber);
-					predMethodST.setAttribute("edgeNumber", i+1);
-					StringTemplate predEvalST = semCtx.genExpr(templates);
-					predMethodST.setAttribute("pred", predEvalST);
-					// we've computed a method to eval pred, now dump bytecodes
-					// to invoke method
-					exprST = templates.getInstanceOf("invokePredicate");
-					exprST.setAttribute("pred", predEvalST);
-				}
-				*/
 				edgeST.setAttribute("labelExpr", exprST);
 			}
 			edgeST.setAttribute("edgeNumber", new Integer(i+1));

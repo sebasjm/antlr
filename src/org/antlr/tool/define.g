@@ -294,8 +294,8 @@ if ( this.blockLevel==1 ) {this.outerAltNum=1;}
 
 alternative
 {
-if ( grammar.type!=Grammar.LEXER && grammar.buildAST() && blockLevel==1 ) {
-	GrammarAST aRewriteNode = alternative_AST_in.findFirstType(REWRITE);
+if ( grammar.type!=Grammar.LEXER && grammar.getOption("output")!=null && blockLevel==1 ) {
+	GrammarAST aRewriteNode = #alternative.findFirstType(REWRITE);
 	if ( aRewriteNode!=null||
 		 (#alternative.getNextSibling()!=null &&
 		  #alternative.getNextSibling().getType()==REWRITE) )
@@ -309,7 +309,7 @@ if ( grammar.type!=Grammar.LEXER && grammar.buildAST() && blockLevel==1 ) {
     ;
 
 rewrite
-	:	( #( REWRITE (SEMPRED)? ALT ) )*
+	:	( #( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION) ) )*
 	;
 
 element
@@ -339,7 +339,7 @@ element
     |   ebnf
     |   tree
     |   #( SYNPRED block )
-    |   act:ACTION {#act.outerAltNum = this.outerAltNum;}
+    |   act:ACTION // doing in codegen now {#act.outerAltNum = this.outerAltNum;}
     |   SEMPRED
     |   EPSILON 
     ;
