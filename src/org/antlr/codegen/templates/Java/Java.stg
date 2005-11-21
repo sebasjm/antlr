@@ -387,7 +387,7 @@ element() ::= <<
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
-<label>=input.LT(1);<\n>
+<label>=(<labelType>)input.LT(1);<\n>
 <endif>
 match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
 >>
@@ -417,7 +417,7 @@ charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
-<label>=input.LT(1);<\n>
+<label>=(<labelType>)input.LT(1);<\n>
 <endif>
 if ( <s> ) {
     <postmatchCode>
@@ -454,7 +454,7 @@ match(<string>);<\n>
 
 wildcard(label,elementIndex) ::= <<
 <if(label)>
-<label>=input.LT(1);<\n>
+<label>=(<labelType>)input.LT(1);<\n>
 <endif>
 matchAny(input);
 >>
