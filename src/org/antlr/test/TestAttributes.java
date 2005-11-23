@@ -605,7 +605,11 @@ public class TestAttributes extends TestSuite {
 			"scope Symbols {\n" +
 			"  String x;\n" +
 			"}\n" +
-			"a scope { int y; }, Symbols; : b {"+action+"} ;\n" +
+			"a\n"+
+			"scope { int y; }\n"+
+			"scope Symbols;\n" +
+			" : b {"+action+"}\n" +
+			" ;\n" +
 			"b : ID {$Symbols.x=$ID.text} ;\n" +
 			"ID : 'a';\n");
 		Tool antlr = new Tool();
@@ -883,8 +887,8 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testFullyQualifiedRefToTemplateAttributeInCurrentRule() throws Exception {
-		String action = "$a.template;"; // can be qualified
-		String expecting = "retval.template;";
+		String action = "$a.st;"; // can be qualified
+		String expecting = "retval.st;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -911,7 +915,7 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testRuleDynamicScopeCollidesWithRuleRef() throws Exception {
-		String action = "$b.template;";
+		String action = "$b.st;";
 		String expecting = "";
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -931,7 +935,7 @@ public class TestAttributes extends TestSuite {
 
 		int expectedMsgID = ErrorManager.MSG_AMBIGUOUS_ATTR_REF_TO_RULE;
 		Object expectedArg = "b";
-		Object expectedArg2 = "template";
+		Object expectedArg2 = "st";
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg,
 										expectedArg2);
@@ -939,8 +943,8 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testRefToTemplateAttributeForCurrentRule() throws Exception {
-		String action = "$template=null;";
-		String expecting = "retval.template=null;";
+		String action = "$st=null;";
+		String expecting = "retval.st=null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
