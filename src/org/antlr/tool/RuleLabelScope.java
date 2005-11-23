@@ -34,13 +34,29 @@ import java.util.Set;
 import java.util.HashSet;
 
 public class RuleLabelScope extends AttributeScope {
+	/*
 	public static final Set predefinedRuleProperties = new HashSet();
 	static {
 		predefinedRuleProperties.add("text");
 		predefinedRuleProperties.add("start");
 		predefinedRuleProperties.add("stop");
 		predefinedRuleProperties.add("tree");
-		predefinedRuleProperties.add("st");
+		predefinedRuleProperties.add("template");
+	}
+	*/
+
+	/** All token scopes (token labels) share the same fixed scope of
+	 *  of predefined attributes.  I keep this out of the runtime.Token
+	 *  object to avoid a runtime space burden.
+	 */
+	public static AttributeScope predefinedRulePropertiesScope =
+		new AttributeScope("RulePredefined");
+	static {
+		predefinedRulePropertiesScope.addAttribute("text", null);
+		predefinedRulePropertiesScope.addAttribute("start", null);
+		predefinedRulePropertiesScope.addAttribute("stop", null);
+		predefinedRulePropertiesScope.addAttribute("tree", null);
+		predefinedRulePropertiesScope.addAttribute("st", null);
 	}
 
 	public Rule referencedRule;
@@ -54,8 +70,10 @@ public class RuleLabelScope extends AttributeScope {
 	 *  return values as well as any predefined attributes.
 	 */
 	public Attribute getAttribute(String name) {
-		if ( predefinedRuleProperties.contains(name) ) {
-			return new Attribute(name, null);
+		Attribute predefinedAttr =
+			predefinedRulePropertiesScope.getAttribute(name);
+		if ( predefinedAttr!=null ) {
+			return predefinedAttr;
 		}
 		if ( referencedRule.returnScope!=null ) {
 			return referencedRule.returnScope.getAttribute(name);

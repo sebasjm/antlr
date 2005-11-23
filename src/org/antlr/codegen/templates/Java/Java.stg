@@ -111,11 +111,6 @@ public class <name> extends <@superClassName><superClass><@end> {
     public <name>(<inputStreamType> input) { super(input); }<\n>
     <@end>
 
-    public static class RuleReturn {
-        public <labelType> start, stop;
-	<@ruleReturnMembers()>
-    }
-
     public String[] getTokenNames() { return tokenNames; }
 
     <globalAction>
@@ -490,6 +485,11 @@ following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 following.pop();
 >>
 
+/** ids+=ID */
+ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
+<ruleRef(...)>
+<listLabel(...)>
+>>
 
 /** A lexer rule reference */
 lexerRuleRef(rule,label,args) ::= <<
@@ -792,8 +792,9 @@ ruleLabelDef(label) ::= <<
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-public static class <returnType()> extends RuleReturn {
+public static class <returnType()> extends RuleReturnScope {
     <scope.attributes:{<it.decl>;}; separator="\n">
+    <@ruleReturnMembers()>
 };
 <endif>
 >>
@@ -858,6 +859,10 @@ ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
 ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
 ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start,<scope>.stop)"
+ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
+
+/** Somebody may ref $template or $tree or $stop within a rule */
+rulePropertyRef(attr) ::= "retval.<attr.name>"
 
 // A C T I O N S
 

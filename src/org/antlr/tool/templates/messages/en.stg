@@ -178,6 +178,8 @@ EMPTY_COMPLEMENT(file,line,col,arg) ::= <<
 <loc()>set complement is empty
 <endif>
 >>
+AMBIGUOUS_ATTR_REF_TO_RULE(file,line,col,arg,arg2) ::=
+  "<loc()>ambiguous reference to $<arg>; refers to both return value of rule reference in this alt and rule <arg>'s dynamic scope"
 
 // GRAMMAR WARNINGS
 

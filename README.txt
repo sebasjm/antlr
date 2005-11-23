@@ -206,6 +206,17 @@ CHANGES
 
 3.0ea7 - 
 
+* Created RuleReturnScope as a generic rule return value.  Makes it easier
+  to do this:
+    RuleReturnScope r = parser.program();
+    System.out.println(r.getTemplate().toString());
+
+* $template, $tree, $start, etc...
+
+* $r.x in current rule.  $r is ignored as fully-qualified name. $r.start works too
+
+* added warning about $r referring to both return value of rule and dynamic scope of rule
+
 * integrated StringTemplate in a very simple manner
 
 Syntax:

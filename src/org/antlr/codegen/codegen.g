@@ -57,7 +57,6 @@ options {
 {
 	protected static final int RULE_BLOCK_NESTING_LEVEL = 0;
 	protected static final int OUTER_REWRITE_NESTING_LEVEL = 0;
-	//protected static final String PREV_RULE_ROOT_LABEL = "old";
 
     protected String currentRuleName = null;
     protected int blockNestingLevel = 0;
@@ -418,6 +417,7 @@ block[String blockTemplateName, DFA dfa]
 
 alternative returns [StringTemplate code=templates.getInstanceOf("alt")]
 {
+// TODO: can we use Rule.altsWithRewrites???
 if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL ) {
 	GrammarAST aRewriteNode = #alternative.findFirstType(REWRITE);
 	if ( grammar.buildAST() &&
@@ -747,6 +747,8 @@ else if ( #rewrite.getType()==REWRITE ) {
 			String predText = null;
 			if ( #pred!=null ) {
 				predText = #pred.getText();
+        		#pred.outerAltNum = this.outerAltNum;
+        		predText = generator.translateAction(currentRuleName,#pred);
 			}
 			String description =
 			    grammar.grammarTreeToString(#r,false);

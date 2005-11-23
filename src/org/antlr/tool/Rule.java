@@ -106,11 +106,11 @@ public class Rule {
 	 *  There must be only one expr reference in the alt for $expr to be ok in
 	 *  an action--must be unique.
 	 *
-	 *  Rewrite rules force tracking of all rule result ASTs.
+	 *  Rewrite rules force tracking of all rule result ASTs. 1..n
 	 */
 	protected Map[] altToRuleRefMap;
 
-	/** Track which alts have rewrite rules associated with them. */
+	/** Track which alts have rewrite rules associated with them. 1..n */
 	protected boolean[] altsWithRewrites;
 
 	/** Do not generate start, stop etc... in a return value struct unless
@@ -272,8 +272,8 @@ public class Rule {
 		return tokens;
 	}
 
-	public Set getRuleRefsInAlt(int altNum) {
-		return altToRuleRefMap[altNum].keySet();
+	public Set getRuleRefsInAlt(int outerAltNum) {
+		return altToRuleRefMap[outerAltNum].keySet();
 	}
 
 	/** For use with rewrite rules, we must track all rule AST results on the
@@ -298,14 +298,18 @@ public class Rule {
 	/** Return the scope containing name */
 	public AttributeScope getAttributeScope(String name) {
 		AttributeScope scope = null;
-		if ( returnScope!=null && returnScope.attributes.get(name)!=null ) {
+		if ( returnScope!=null && returnScope.getAttribute(name)!=null ) {
 			scope = returnScope;
 		}
-		if ( parameterScope!=null && parameterScope.attributes.get(name)!=null ) {
+		if ( parameterScope!=null && parameterScope.getAttribute(name)!=null ) {
 			scope = parameterScope;
 		}
-		if ( ruleScope!=null && ruleScope.attributes.get(name)!=null ) {
+		if ( ruleScope!=null && ruleScope.getAttribute(name)!=null ) {
 			scope = ruleScope;
+		}
+		// added 11/22/05 TJP to handle rule predefined properties as a scope
+		if ( RuleLabelScope.predefinedRulePropertiesScope.getAttribute(name)!=null ) {
+			scope = RuleLabelScope.predefinedRulePropertiesScope;
 		}
 		return scope;
 	}

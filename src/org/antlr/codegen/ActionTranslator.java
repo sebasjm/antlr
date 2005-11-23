@@ -175,13 +175,16 @@ public class ActionTranslator {
 		{
 			// $ruleLabel.attr
 			rlScope = (RuleLabelScope)scope;
-			if( RuleLabelScope.predefinedRuleProperties.contains(attribute) ) {
+			if( RuleLabelScope.predefinedRulePropertiesScope.getAttribute(attribute)!=null ) {
 				stName = "ruleLabelPropertyRef_"+attribute;
 				grammar.referenceRuleLabelPredefinedAttribute(rlScope.referencedRule.name);
 			}
 			else {
 				stName = "ruleLabelRef";
 			}
+		}
+		else if ( RuleLabelScope.predefinedRulePropertiesScope.getAttribute(attribute)!=null ) {
+
 		}
 		if ( stName==null ) {
 			return null;
@@ -211,9 +214,8 @@ public class ActionTranslator {
 		List ruleRefsInAlt = null;
 		List tokenRefsInAlt = null;
 		if ( r!=null ) {
-			String name = scope;
-			ruleRefsInAlt = r.getRuleRefsInAlt(name, actionAST.outerAltNum);
-			tokenRefsInAlt = r.getTokenRefsInAlt(name, actionAST.outerAltNum);
+			ruleRefsInAlt = r.getRuleRefsInAlt(scope, actionAST.outerAltNum);
+			tokenRefsInAlt = r.getTokenRefsInAlt(scope, actionAST.outerAltNum);
 		}
 		if ( (c+1)<action.length() &&
 			 action.charAt(c)=='.' && Character.isLetter(action.charAt(c+1)))
@@ -223,7 +225,30 @@ public class ActionTranslator {
 			c++;
 			String attributeName = getID(action, c);
 			//System.out.println("translate: "+scope+"."+attributeName);
-			if ( attrScope!=null ) {
+			if ( attrScope!=null && ruleRefsInAlt!=null ) {
+				// SPECIAL CASE error message: $r where rule r has a
+				// dynamic scope and r is referenced in current alt.
+				// a : b {$b.foo} ;
+				// b scope {int x;} : 'b' ;
+				// In this case, $b in the action of rule a is ambiguous.
+				// Do you mean to look at the dynamic scope of b or do you
+				// mean the return value (implicit label) of the rule b call?
+				// The ruleRefsInAlt will be unique
+				ErrorManager.grammarError(ErrorManager.MSG_AMBIGUOUS_ATTR_REF_TO_RULE,
+										  grammar,
+										  actionAST.getToken(),
+										  scope,
+										  attributeName);
+				attrRef = ATTRIBUTE_REF_CHAR+scope+"."+attributeName;
+				c += attributeName.length();
+			}
+			else if ( attrScope==null && r!=null && r.name.equals(scope) ) {
+				// Reference to $r from within rule r: $r.arg, $r.retval, ...
+				// Just strip off $r as if it didn't exist and pretend it's $arg
+				attrRef = translateAttributeReference(r, actionAST, attributeName);
+				c += attributeName.length();
+			}
+			else if ( attrScope!=null ) {
 				// $scope.attributeName
 				attrRef = translateAttributeReference(r, actionAST, attrScope, scope, attributeName);
 				c += attributeName.length();
@@ -360,6 +385,13 @@ public class ActionTranslator {
 									  ref);
 			return ref;
 		}
+		if ( r.name.equals(attributeName) ) {
+			ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
+									  grammar,
+									  actionToken,
+									  ref);
+			return ref;
+		}
 		StringTemplate refST = null;
 		AttributeScope scope = r.getAttributeScope(attributeName);
 		Grammar.LabelElementPair pair = r.getLabel(attributeName);
@@ -414,6 +446,10 @@ public class ActionTranslator {
 			else if ( scope.isDynamicRuleScope ) {
 				refST = generator.templates.getInstanceOf("ruleScopeAttributeRef");
 				refST.setAttribute("scope", r.name);
+			}
+			else {
+				// must be predefined attribute like $template or $tree
+				refST = generator.templates.getInstanceOf("rulePropertyRef");
 			}
 			refST.setAttribute("attr", scope.getAttribute(attributeName));
 		}

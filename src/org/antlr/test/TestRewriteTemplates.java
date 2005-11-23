@@ -135,5 +135,20 @@ public class TestRewriteTemplates extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testTemplateReturn() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=template;}\n" +
+			"a : b {System.out.println($b.st);} ;\n" +
+			"b : ID INT -> foo(x={$ID.text},y={$INT.text}) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "abc 34", debug);
+		String expecting = "abc 34\n";
+		assertEqual(found, expecting);
+	}
 
 }

@@ -36,28 +36,14 @@ import org.antlr.stringtemplate.*;
 import org.antlr.stringtemplate.language.*;
 >>
 
-@genericParser.ruleReturnMembers() ::= <<
-public StringTemplate template;
+/** Add this to each rule's return value struct */
+@returnScope.ruleReturnMembers() ::= <<
+public StringTemplate st;
+public StringTemplate getTemplate() { return st; }
 >>
 
 @genericParser.members() ::= <<
 <@super.members()>
-/** Convert a List\<RuleReturn> to List\<StringTemplate> by copying
- *  out the .template property.  Useful when converting from
- *  list labels to template attributes:
- *
- *    a : ids+=ID -> foo(ids={toTemplates($ids)})
- *      ;
- */
-public List toTemplates(List retvals) {
-  if ( retvals==null ) return null;
-  List strings = new ArrayList(retvals.size());
-  for (int i=0; i\<retvals.size(); i++) {
-    strings.add(((RuleReturn)retvals.get(i)).template);
-  }
-  return strings;
-}
-
 protected StringTemplateGroup templateLib =
   new StringTemplateGroup("<name>Templates", AngleBracketTemplateLexer.class);
 
@@ -89,22 +75,28 @@ if (<it.pred>) {
 >>
 
 rewriteEmptyTemplate(alts) ::= <<
-retval.template = null;
+retval.st = null;
 >>
 
-/** Invoke a template with a set of attribute name/value pairs */
+/** Invoke a template with a set of attribute name/value pairs.
+ *  Set the value of the rule's template *after* having set
+ *  the attributes because the rule's template might be used as
+ *  an attribute to build a bigger template; you get a self-embedded
+ *  template.
+ */
 rewriteExternalTemplate(name,args) ::= <<
-retval.template = templateLib.getInstanceOf("<name>");
-<args:{a | retval.template.setAttribute("<a.name>", <a.value>);<\n>}>
+StringTemplate <name>_st = templateLib.getInstanceOf("<name>");
+<args:{a | <name>_st.setAttribute("<a.name>", <a.value>);<\n>}>
+retval.st = <name>_st;
 >>
 
 /** Invoke an inline template with a set of attribute name/value pairs */
 rewriteInlineTemplate(args, template) ::= <<
-retval.template = new StringTemplate(templateLib, "<template>");
-<args:{a | retval.template.setAttribute("<a.name>", <a.value>);<\n>}>
+retval.st = new StringTemplate(templateLib, "<template>");
+<args:{a | retval.st.setAttribute("<a.name>", <a.value>);<\n>}>
 >>
 
 /** plain -> {foo} action */
 rewriteAction(action) ::= <<
-retval.template = <action>;<\n>
+retval.st = <action>;<\n>
 >>

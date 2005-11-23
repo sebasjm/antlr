@@ -511,4 +511,20 @@ public abstract class BaseParser {
 		}
 		return strings;
 	}
+
+	/** Convert a List<RuleReturnScope> to List<StringTemplate> by copying
+	 *  out the .st property.  Useful when converting from
+	 *  list labels to template attributes:
+	 *
+	 *    a : ids+=ID -> foo(ids={toTemplates($ids)})
+	 *      ;
+	 */
+	public List toTemplates(List retvals) {
+		if ( retvals==null ) return null;
+		List strings = new ArrayList(retvals.size());
+		for (int i=0; i<retvals.size(); i++) {
+			strings.add(((RuleReturnScope)retvals.get(i)).getTemplate());
+		}
+		return strings;
+	}
 }

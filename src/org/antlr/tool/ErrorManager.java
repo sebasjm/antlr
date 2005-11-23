@@ -152,6 +152,7 @@ public class ErrorManager {
 	public static final int MSG_UNDEFINED_LABEL_REF_IN_REWRITE = 137;
 	public static final int MSG_NO_GRAMMAR_START_RULE = 138;
 	public static final int MSG_EMPTY_COMPLEMENT = 139;
+	public static final int MSG_AMBIGUOUS_ATTR_REF_TO_RULE = 140;
 
 
 	// GRAMMAR WARNINGS

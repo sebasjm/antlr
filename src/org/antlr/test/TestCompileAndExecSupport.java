@@ -418,8 +418,8 @@ public class TestCompileAndExecSupport {
 			"        $createParser$\n"+
 			"		 parser.setTemplateLib(group);\n"+
 			"        $parserName$.$parserStartRuleName$_return r = parser.$parserStartRuleName$();\n" +
-			"        if ( r.template!=null )\n" +
-			"            System.out.print(r.template.toString());\n" +
+			"        if ( r.st!=null )\n" +
+			"            System.out.print(r.st.toString());\n" +
 			"    }\n" +
 			"}"
 			);
