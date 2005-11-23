@@ -46,7 +46,10 @@ public TreeAdaptor getTreeAdaptor() {
 }<\n>
 >>
 
-@genericParser.ruleReturnMembers() ::= "<ASTLabelType> tree;"
+@returnScope.ruleReturnMembers() ::= <<
+<ASTLabelType> tree;
+public <ASTLabelType> getTree() { return tree; }
+>>
 
 /** Add a variable to track rule's return AST */
 ruleDeclarations() ::= <<
