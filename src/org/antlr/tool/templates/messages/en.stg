@@ -118,11 +118,11 @@ ATTRIBUTE_REF_NOT_IN_RULE(file,line,col,arg) ::=
 UNKNOWN_ATTRIBUTE_IN_SCOPE(file,line,col,arg,arg2) ::=
 	"<loc()>unknown attribute for <arg>: <arg2>"
 UNKNOWN_RULE_ATTRIBUTE(file,line,col,arg,arg2) ::=
-	"<loc()>unknown dynamically-scoped attribute for rule <arg>: <arg2>"
+	"<loc()>unknown attribute for rule <arg>: <arg2>"
 UNKNOWN_SIMPLE_ATTRIBUTE(file,line,col,arg,args2) ::=
 	"<loc()>attribute is not a token, parameter, or return value: <arg>"
-ISOLATED_RULE_ATTRIBUTE(file,line,col,arg) ::=
-	"<loc()>missing attribute access on rule label: <arg>"
+ISOLATED_RULE_SCOPE(file,line,col,arg) ::=
+	"<loc()>missing attribute access on rule scope: <arg>"
 INVALID_RULE_PARAMETER_REF(file,line,col,arg,arg2) ::=
 	"<loc()>cannot access rule <arg>'s parameter: <arg2>"
 INVALID_RULE_SCOPE_ATTRIBUTE_REF(file,line,col,arg,arg2) ::=
@@ -178,8 +178,14 @@ EMPTY_COMPLEMENT(file,line,col,arg) ::= <<
 <loc()>set complement is empty
 <endif>
 >>
-AMBIGUOUS_ATTR_REF_TO_RULE(file,line,col,arg,arg2) ::=
-  "<loc()>ambiguous reference to $<arg>; refers to both return value of rule reference in this alt and rule <arg>'s dynamic scope"
+UNKNOWN_DYNAMIC_SCOPE(file,line,col,arg,arg2) ::=
+  "<loc()>"
+UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE(file,line,col,arg,arg2) ::=
+  "<loc()>unknown dynamically-scope attribute for scope <arg>: <arg2>"
+AMBIGUOUS_RULE_SCOPE(file,line,col,arg) ::=
+  "<loc()>reference $<arg> is ambiguous since rule <arg> is referenced in the production and rule <arg> also has a dynamic scope"
+ISOLATED_RULE_ATTRIBUTE(file,line,col,arg) ::=
+	"<loc()>reference to locally-defined rule scope attribute without rule name: <arg>"
 
 // GRAMMAR WARNINGS
 

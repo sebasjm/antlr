@@ -129,7 +129,7 @@ public class ErrorManager {
 	public static final int MSG_UNKNOWN_SIMPLE_ATTRIBUTE = 114;
 	public static final int MSG_INVALID_RULE_PARAMETER_REF = 115;
 	public static final int MSG_UNKNOWN_RULE_ATTRIBUTE = 116;
-	public static final int MSG_ISOLATED_RULE_ATTRIBUTE = 117;
+	public static final int MSG_ISOLATED_RULE_SCOPE = 117;
 	public static final int MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE = 118;
 	public static final int MSG_LABEL_CONFLICTS_WITH_RULE = 119;
 	public static final int MSG_LABEL_CONFLICTS_WITH_TOKEN = 120;
@@ -144,7 +144,7 @@ public class ErrorManager {
 	public static final int MSG_MISSING_RULE_ARGS = 129;
 	public static final int MSG_RULE_HAS_NO_ARGS = 130;
 	public static final int MSG_ARGS_ON_TOKEN_REF = 131;
-	//public static final int MSG_NONCHAR_RANGE = 132;
+	public static final int MSG_AMBIGUOUS_RULE_SCOPE = 132;
 	public static final int MSG_ILLEGAL_OPTION = 133;
 	public static final int LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT = 134;
 	public static final int MSG_UNDEFINED_TOKEN_REF_IN_REWRITE = 135;
@@ -152,7 +152,9 @@ public class ErrorManager {
 	public static final int MSG_UNDEFINED_LABEL_REF_IN_REWRITE = 137;
 	public static final int MSG_NO_GRAMMAR_START_RULE = 138;
 	public static final int MSG_EMPTY_COMPLEMENT = 139;
-	public static final int MSG_AMBIGUOUS_ATTR_REF_TO_RULE = 140;
+	public static final int MSG_UNKNOWN_DYNAMIC_SCOPE = 140;
+	public static final int MSG_UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE = 141;
+	public static final int MSG_ISOLATED_RULE_ATTRIBUTE = 142;
 
 
 	// GRAMMAR WARNINGS

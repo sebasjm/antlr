@@ -34,6 +34,58 @@ import java.util.List;
 
 import antlr.CommonToken;
 
+/** This class embodies the translation of actions written in the target
+ *  language but containing special references that must be translated
+ *  for reasons of terseness and isolation from underlying implementation.
+ *
+ *  There are three forms of interest:
+ *
+ * 	$y		return value, parameter, rule or token label, predefined
+ * 			rule property, or token or rule reference within the enclosing
+ * 			rule's outermost alt. y must be a "local" reference; i.e., it
+ * 			must be referring to something defined within the enclosing rule.
+ *
+ * 			r[int i] returns [int j]
+ * 				:	{$i, $j, $start, $stop, $template, $tree}
+ * 					(ids+=ID)+ {$ids.size()} // .size is not used by antlr here
+ * 				;
+ *
+ * 			Can also mean y is a rule's dynamic scope or a global shared scope.
+ * 			Isolated $rulename is not allowed unless it has a dynamic scope *and*
+ * 			there is no reference to rulename in the enclosing alternative,
+ * 			which would be ambiguous.  See TestAttributes.testAmbiguousRuleRef()
+ *
+ * 	$x.y	if x is enclosing rule, y is a return value, parameter, or
+ * 			predefined property.  If x is a token label, y is predefined
+ * 			property of a token.  If x is a rule label, y is a return value
+ * 			of the invoked rule or a predefined rule property such as "stop".
+ * 			If x is a token referenced in that alt, it behaves like a token
+ * 			label.  If x is a rule reference in that alt, it behaves like
+ * 			a rule label.
+ *
+ * 			r[int i] returns [int j]
+ * 				:	{$r.i, $r.j, $r.start, $r.stop, $r.template, $r.tree}
+ * 					ID {$ID.text} s {$s.start; $s.k}
+ * 				;
+ * 			s returns [int k] : ... ;
+ *
+ * 	$x::y	the only way to access the attributes within a dynamic scope
+ * 			regardless of whether or not you are in the defining rule.
+ *
+ * 			scope Symbols { List names; }
+ * 			r
+ * 			scope {int i;}
+ * 			scope Symbols;
+ * 				:	{$r::i=3;} s {$Symbols::names;}
+ * 				;
+ * 			s	:	{$r::i; $Symbols::names;}
+ * 				;
+ *
+ *  This is the new syntax as of 11/23/2005 and should simplify things a bit
+ *  as all dynamic scope stuff is accessed with a different operator.  Actually
+ *  all it does is make the set of scopes to search for $y a bit smaller.  Oh,
+ *  and I should be able to be more specific with error messages.
+ */
 public class ActionTranslator {
 	public static final char ATTRIBUTE_REF_CHAR = '$';
 
@@ -56,12 +108,12 @@ public class ActionTranslator {
 		return translate(ruleName, actionAST);
 	}
 
-	/** Given an action string with @x.y and @x references or $x.y/$x, convert it
+	/** Given an action string with $y, $x.y and $x::y references, convert it
 	 *  to a StringTemplate (that will be inserted into the output StringTemplate)
-	 *  Replace @ references to template references.  Targets can then say
+	 *  Replace $ references to template references.  Targets can then say
 	 *  how to translate these references with a template rather than code.
 	 *
-	 *  Jump from '@'/'$' to '@'/'$' in the action, building up a text buffer
+	 *  Jump from $ to $ in the action, building up a text buffer
 	 *  doing appropriate rewrites to template refs.  Final step, create
 	 *  the StringTemplate.
 	 */
@@ -105,26 +157,33 @@ public class ActionTranslator {
 		return buf.toString();
 	}
 
-	/** Given x of $x.y or $x, figure out what scope x is if any (x might
-	 *  be a parameter, say, not a scope name).  The valid scopes are
-	 *  $rulelabel, $tokenlabel, $rulename, or $scopename.
-	 *  List labels like ids+=ID have no scope as they are a list of scopes
-	 *  in a sense.
+	/** Given x of $x::y or just $x, figure out what scope x is if any (x might
+	 *  be a parameter, say, not a scope name).  The valid scopes are rule names
+	 *  and global shared dynamic scopes.
 	 */
-	protected AttributeScope resolveScope(Rule r, String scopeName) {
+	protected AttributeScope resolveDynamicScope(String scopeName) {
 		if ( grammar.getGlobalScope(scopeName)!=null ) {
-			// $scopename
 			return grammar.getGlobalScope(scopeName);
 		}
 		Rule scopeRule = grammar.getRule(scopeName);
 		if ( scopeRule!=null ) {
 			return scopeRule.ruleScope;
 		}
-		if ( r==null ) { // action outside of rule must be global scope
+		return null; // not a valid dynamic scope
+	}
+
+	/** Given x of $x.y or $x, figure out what scope x is if any (x might
+	 *  be a parameter, say, not a scope name).  The valid scopes are
+	 *  $rulelabel, $tokenlabel, $currentrulename.
+	 *  List labels like ids+=ID have no scope as they are a list of scopes
+	 *  in a sense.
+	 */
+	protected AttributeScope resolveScope(Rule r, String scopeName) {
+		if ( r==null ) { // action outside of rule has no scope
 			return null;
 		}
 		if ( r.name.equals(scopeName) ) {
-			// $rulename
+			// $enclosingRulename
 			return r.ruleScope;
 		}
 		if ( r.getTokenLabel(scopeName)!=null ) {
@@ -198,8 +257,9 @@ public class ActionTranslator {
 		return refST;
 	}
 
-	/** Get $scope.attribute or just $scope if attribute not there.
-	 *  Then translate according to scope.
+	/** We found a $-reference.  Get the y of $x.y if it exists, then
+	 *  translate according to scope x.  Peel off $x::y references to
+	 *  a separate method.
 	 */
 	protected int parseAttributeReference(Rule r,
 										  String action,
@@ -210,57 +270,60 @@ public class ActionTranslator {
 		String attrRef=null;
 		String scope = getID(action, c);
 		c += scope.length();
-		AttributeScope attrScope = resolveScope(r, scope);
 		List ruleRefsInAlt = null;
 		List tokenRefsInAlt = null;
 		if ( r!=null ) {
 			ruleRefsInAlt = r.getRuleRefsInAlt(scope, actionAST.outerAltNum);
 			tokenRefsInAlt = r.getTokenRefsInAlt(scope, actionAST.outerAltNum);
 		}
-		if ( (c+1)<action.length() &&
-			 action.charAt(c)=='.' && Character.isLetter(action.charAt(c+1)))
-		{
+		boolean hasDot =
+			(c+1)<action.length() &&
+			 action.charAt(c)=='.' && Character.isLetter(action.charAt(c+1));
+		boolean hasDoubleColon =
+			(c+2)<action.length() &&
+			 action.charAt(c)==':' && action.charAt(c+1)==':' &&
+			 Character.isLetter(action.charAt(c+2));
+		AttributeScope dynamicScope = resolveDynamicScope(scope);
+		if ( dynamicScope!=null ) {
+			return parseDynamicAttribute(hasDoubleColon,
+										 c,
+										 action,
+										 r,
+										 actionAST,
+										 dynamicScope,
+										 scope,
+										 buf,
+										 ruleRefsInAlt);
+		}
+
+		AttributeScope attrScope = resolveScope(r, scope);
+		if ( hasDot ) {
 			// $x.y
 			int dotIndex = c;
 			c++;
 			String attributeName = getID(action, c);
 			//System.out.println("translate: "+scope+"."+attributeName);
-			if ( attrScope!=null && ruleRefsInAlt!=null ) {
-				// SPECIAL CASE error message: $r where rule r has a
-				// dynamic scope and r is referenced in current alt.
-				// a : b {$b.foo} ;
-				// b scope {int x;} : 'b' ;
-				// In this case, $b in the action of rule a is ambiguous.
-				// Do you mean to look at the dynamic scope of b or do you
-				// mean the return value (implicit label) of the rule b call?
-				// The ruleRefsInAlt will be unique
-				ErrorManager.grammarError(ErrorManager.MSG_AMBIGUOUS_ATTR_REF_TO_RULE,
-										  grammar,
-										  actionAST.getToken(),
-										  scope,
-										  attributeName);
-				attrRef = ATTRIBUTE_REF_CHAR+scope+"."+attributeName;
-				c += attributeName.length();
-			}
-			else if ( attrScope==null && r!=null && r.name.equals(scope) ) {
+			if ( attrScope==null && r!=null && r.name.equals(scope) ) {
 				// Reference to $r from within rule r: $r.arg, $r.retval, ...
 				// Just strip off $r as if it didn't exist and pretend it's $arg
-				attrRef = translateAttributeReference(r, actionAST, attributeName);
+				attrRef = translateIsolatedAttributeReference(r, actionAST, attributeName);
 				c += attributeName.length();
 			}
 			else if ( attrScope!=null ) {
-				// $scope.attributeName
+				// $scope.attributeName (label, ret val, param)
 				attrRef = translateAttributeReference(r, actionAST, attrScope, scope, attributeName);
 				c += attributeName.length();
 			}
 			else if ( ruleRefsInAlt!=null ) {
-				// $rule.attributeName
+				// $rulereference.attributeName
+				// decl : type ID {$type.y} ;
 				attrRef =
 					translateRuleReference(r, actionAST, scope, attributeName);
 				c += attributeName.length();
 			}
 			else if ( tokenRefsInAlt!=null ) {
 				// $token.attributeName
+				// decl : type ID {$ID.text} ;
 				attrRef =
 					translateTokenReference(r, actionAST, scope, attributeName);
 				c += attributeName.length();
@@ -268,7 +331,7 @@ public class ActionTranslator {
 			else {
 				// $arg.?, $retval.? $listlabel.? Translate before the dot only
 				// (could also be $x.y for unknown x outside of a rule)
-				attrRef = translateAttributeReference(r, actionAST, scope);
+				attrRef = translateIsolatedAttributeReference(r, actionAST, scope);
 				c = dotIndex;
 			}
 		}
@@ -288,11 +351,86 @@ public class ActionTranslator {
 				attrRef = translateElementListReference(scope);
 			}
 			else {
-				attrRef = translateAttributeReference(r, actionAST, scope);
+				attrRef = translateIsolatedAttributeReference(r, actionAST, scope);
 			}
 		}
 		buf.append(attrRef);
 		return c;
+	}
+
+	/** Handle $x::y and plain $x where x is dynamic scope.  Warn if
+	 *  ambig ref where x is also a rule ref in the enclosing alt.
+	 */
+	protected int parseDynamicAttribute(boolean hasDoubleColon, int c, String action, Rule r, GrammarAST actionAST, AttributeScope dynamicScope, String scope, StringBuffer buf, List ruleRefsInAlt) {
+		String attrRef;
+		if ( hasDoubleColon ) {
+			// $x::y
+			c+=2; // skip over ::
+			String attributeName = getID(action, c);
+			c += attributeName.length();
+			attrRef =
+				translateDynamicAttributeReference(r, actionAST, dynamicScope, scope, attributeName);
+			buf.append(attrRef);
+			return c;
+		}
+		else if ( ruleRefsInAlt==null ) {
+			// isolated $x scope ref (means access stack of scopes itself)
+			// must not be a rule reference to x in the enclosing alt
+			StringTemplate refST =
+				generator.templates.getInstanceOf("isolatedDynamicScopeRef");
+			refST.setAttribute("scope", scope);
+			buf.append(refST.toString());
+			return c;
+		}
+		else {
+			// ambiguous reference to $rule since rule is also referenced
+			// in the enclosing alt.
+			// y of $x::y does not exist (not an attribute in scope x)
+			ErrorManager.grammarError(ErrorManager.MSG_AMBIGUOUS_RULE_SCOPE,
+									  grammar,
+									  actionAST.getToken(),
+									  scope);
+			return c;
+		}
+	}
+
+	/** Translate $x::y where x is a rule name or a global shared dynamic
+	 *  scope name.
+	 */
+	protected String translateDynamicAttributeReference(Rule r,
+														GrammarAST actionAST,
+														AttributeScope scope,
+														String scopeName,
+														String attributeName)
+	{
+		antlr.Token actionToken = actionAST.getToken();
+		String ref = ATTRIBUTE_REF_CHAR+scopeName+"::"+attributeName;
+		//System.out.println("translate "+ref);
+		if ( scope==null ) {
+			// x of $x::y does not exist (not a rule nor global scope name)
+			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE,
+									  grammar,
+									  actionToken,
+									  scopeName,
+									  attributeName);
+			return ref;
+		}
+		Attribute attribute = scope.getAttribute(attributeName);
+		if ( attribute==null ) {
+			// y of $x::y does not exist (not an attribute in scope x)
+			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
+									  grammar,
+									  actionToken,
+									  scopeName,
+									  attributeName);
+			return ref;
+		}
+		// y is valid attribute in scope x at this point.
+		StringTemplate refST =
+			generator.templates.getInstanceOf("ruleScopeAttributeRef");
+		refST.setAttribute("scope", scopeName);
+		refST.setAttribute("attr", attribute);
+		return refST.toString();
 	}
 
 	/** Translate $x.y where x is either a rule label or a token label.
@@ -311,69 +449,72 @@ public class ActionTranslator {
 		String ref = ATTRIBUTE_REF_CHAR+scopeName+"."+attributeName;
 		//System.out.println("translate "+ref);
 		Attribute attribute = scope.getAttribute(attributeName);
-		if ( attribute==null ) {
-			int msgID = 0;
-			// Spend some effort to generate good messages
-			// $x.unknown
-			if ( r.getTokenLabel(scopeName)!=null ) {
-				// $tokenlabel.unknown, just return what you would for $x
-				StringTemplate refST =
-					generator.templates.getInstanceOf("tokenLabelRef");
-				refST.setAttribute("label", scopeName);
-				// we must ignore the unknown; put it in the translated action
-                return refST.toString()+"."+attributeName;
+		if ( attribute!=null ) {
+			// y exists in scope x; all is well
+			StringTemplate refST =
+				getScopedAttributeReferenceTemplate(r,scope,scopeName,attributeName);
+			return refST.toString();
+		}
+
+		// $tokenlabel.unknown
+		if ( r.getTokenLabel(scopeName)!=null ) {
+			// just return what you would for $x
+			StringTemplate refST =
+				generator.templates.getInstanceOf("tokenLabelRef");
+			refST.setAttribute("label", scopeName);
+			// we must ignore the unknown; put it in the translated action
+			return refST.toString()+"."+attributeName;
+		}
+
+		// Spend some effort to generate good messages
+		int msgID = 0;
+		// $rulename.unknown
+		if ( scope.isDynamicRuleScope ) {
+			msgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
+		}
+		// $rulelabel.unknown
+		else if ( scope instanceof RuleLabelScope ) {
+			Rule referencedRule = ((RuleLabelScope)scope).referencedRule;
+			// $rulelabel.parameter
+			if ( referencedRule.parameterScope!=null &&
+				referencedRule.parameterScope.getAttribute(attributeName)!=null )
+			{
+				msgID = ErrorManager.MSG_INVALID_RULE_PARAMETER_REF;
+			}
+			// $rulelabel.dynamicscopeattribute
+			else if ( referencedRule.ruleScope!=null &&
+				referencedRule.ruleScope.getAttribute(attributeName)!=null )
+			{
+				msgID = ErrorManager.MSG_INVALID_RULE_SCOPE_ATTRIBUTE_REF;
 			}
 			// $rulename.unknown
-			if ( scope.isDynamicRuleScope ) {
+			else if ( scope.getAttribute(attributeName)==null ) {
 				msgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
 			}
-			// $rulelabel.unknown
-			else if ( scope instanceof RuleLabelScope ) {
-				Rule referencedRule = ((RuleLabelScope)scope).referencedRule;
-				// $rulelabel.parameter
-				if ( referencedRule.parameterScope!=null &&
-					referencedRule.parameterScope.getAttribute(attributeName)!=null )
-				{
-					msgID = ErrorManager.MSG_INVALID_RULE_PARAMETER_REF;
-				}
-				// $rulelabel.dynamicscopeattribute
-				else if ( referencedRule.ruleScope!=null &&
-					referencedRule.ruleScope.getAttribute(attributeName)!=null )
-				{
-					msgID = ErrorManager.MSG_INVALID_RULE_SCOPE_ATTRIBUTE_REF;
-				}
-				// $rulename.unknown
-				else if ( scope.getAttribute(attributeName)==null ) {
-					msgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
-				}
-			}
-			// general error for unknown y in x
-			else {
-				msgID = ErrorManager.MSG_UNKNOWN_ATTRIBUTE_IN_SCOPE;
-			}
-
-			ErrorManager.grammarError(msgID,
-									  grammar,
-									  actionToken,
-									  scopeName,
-									  attributeName);
-			return ref;
 		}
-		StringTemplate refST =
-			getScopedAttributeReferenceTemplate(r,scope,scopeName,attributeName);
+		// general error for unknown y in x
+		else {
+			msgID = ErrorManager.MSG_UNKNOWN_ATTRIBUTE_IN_SCOPE;
+		}
 
-		return refST.toString();
+		ErrorManager.grammarError(msgID,
+								  grammar,
+								  actionToken,
+								  scopeName,
+								  attributeName);
+		return ref;
+
 	}
 
-	/** Translate $x where x is either a parameter, return value, local
+	/** Translate isolated $x where x is either a parameter, return value, local
 	 *  rule-scope attribute, label, token name, or rule name.
 	 *
 	 *  $tokenLabel is handled in the $x.y translator as $tokenLabel is seen
 	 *  as a valid scope.
 	 */
-	protected String translateAttributeReference(Rule r,
-												 GrammarAST actionAST,
-												 String attributeName)
+	protected String translateIsolatedAttributeReference(Rule r,
+														 GrammarAST actionAST,
+														 String attributeName)
 	{
 		antlr.Token actionToken = actionAST.getToken();
 		String ref = ATTRIBUTE_REF_CHAR+attributeName;
@@ -385,15 +526,8 @@ public class ActionTranslator {
 									  ref);
 			return ref;
 		}
-		if ( r.name.equals(attributeName) ) {
-			ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
-									  grammar,
-									  actionToken,
-									  ref);
-			return ref;
-		}
 		StringTemplate refST = null;
-		AttributeScope scope = r.getAttributeScope(attributeName);
+		AttributeScope attrScope = r.getAttributeScope(attributeName);
 		Grammar.LabelElementPair pair = r.getLabel(attributeName);
 		if ( pair!=null ) {
 			// $label of some type
@@ -411,7 +545,7 @@ public class ActionTranslator {
 					break;
 				case Grammar.RULE_LABEL :
 					// $ruleLabel
-					ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
+					ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_SCOPE,
 											  grammar,
 											  actionToken,
 											  ref);
@@ -419,39 +553,51 @@ public class ActionTranslator {
 			}
 		}
 		else {
-			// ok, it's not a label; have to think a little harder then
-			// $parameter or $returnValue
+			// ok, it's not a label; have to think a little harder then.
+			// Might be $parameter or $returnValue
 			List ruleRefs = r.getRuleRefsInAlt(attributeName, actionAST.outerAltNum);
 			if ( ruleRefs!=null ) {
-				ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
+				// isolated reference to a rule referenced in this alt
+				ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_SCOPE,
 										  grammar,
 										  actionToken,
 										  ref);
 				return ref;
 			}
-			if ( scope==null ) {
+			if ( r.name.equals(attributeName) ) {
+				// isolated ref to this rule that does not have a dynamic attrScope
+				ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_SCOPE,
+										  grammar,
+										  actionToken,
+										  ref);
+				return ref;
+			}
+			if ( attrScope==null ) {
 				ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE,
 										  grammar,
 										  actionToken,
 										  ref);
 				return ref;
 			}
-			if ( scope.isParameterScope ) {
+			if ( attrScope.isParameterScope ) {
 				refST = generator.templates.getInstanceOf("parameterAttributeRef");
 			}
-			else if ( scope.isReturnScope ) {
+			else if ( attrScope.isReturnScope ) {
 				refST = generator.templates.getInstanceOf("returnAttributeRef");
 				refST.setAttribute("ruleDescriptor", r);
 			}
-			else if ( scope.isDynamicRuleScope ) {
-				refST = generator.templates.getInstanceOf("ruleScopeAttributeRef");
-				refST.setAttribute("scope", r.name);
+			else if ( attrScope.isDynamicRuleScope ) {
+				ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
+										  grammar,
+										  actionToken,
+										  attributeName);
+				return ref;
 			}
 			else {
 				// must be predefined attribute like $template or $tree
 				refST = generator.templates.getInstanceOf("rulePropertyRef");
 			}
-			refST.setAttribute("attr", scope.getAttribute(attributeName));
+			refST.setAttribute("attr", attrScope.getAttribute(attributeName));
 		}
 		return refST.toString();
 	}
@@ -491,7 +637,7 @@ public class ActionTranslator {
 		}
 		AttributeScope scope = AttributeScope.tokenScope;
 		if ( attributeName==null ) {
-			return translateAttributeReference(r, actionAST, labelName);
+			return translateIsolatedAttributeReference(r, actionAST, labelName);
 		}
 		else {
 			return translateAttributeReference(r, actionAST, scope, labelName, attributeName);

@@ -90,6 +90,7 @@ tokens {
     INITACTION;
     LABEL; // $x used in rewrite rules
     TEMPLATE;
+    SCOPE="scope";
 }
 
 {
@@ -231,7 +232,7 @@ GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
 	( "returns" rt:ARG_ACTION  )?
 	( throwsSpec )?
 	( opts:optionsSpec )?
-	( scopes:ruleScopeSpec )?
+	scopes:ruleScopeSpec
 	( "init" init:ACTION )?
 	colon:COLON
 	{
@@ -268,8 +269,18 @@ throwsSpec
 	;
 
 ruleScopeSpec
-	:	"scope"^ ACTION ( ( COMMA! id )* SEMI! )?
-	|	"scope"^ id ( COMMA! id )* SEMI!
+{
+int line = LT(1).getLine();
+int column = LT(1).getColumn();
+}
+	:!	( options {warnWhenFollowAmbig=false;} : "scope" a:ACTION )?
+		( "scope" ids:idList SEMI! )*
+		{
+		GrammarAST scopeRoot = (GrammarAST)#[SCOPE,"scope"];
+		scopeRoot.setLine(line);
+		scopeRoot.setColumn(column);
+		#ruleScopeSpec = #(scopeRoot, #a, #ids);
+		}
 	;
 
 /** Build #(BLOCK ( #(ALT ...) EOB )+ ) */
@@ -544,6 +555,10 @@ notTerminal
 	|	tr:TOKEN_REF^ (ast_suffix)?
 
 	|	STRING_LITERAL (ast_suffix)?
+	;
+
+idList
+	:	(id)+
 	;
 
 id	:	TOKEN_REF {#id.setType(ID);}

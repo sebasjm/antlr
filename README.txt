@@ -206,6 +206,18 @@ CHANGES
 
 3.0ea7 - 
 
+* changed $dynamicscope.value to $dynamicscope::value 
+
+* $dynamicscope gets you the stack
+
+* rule scopes go like this now:
+
+  rule
+  scope {...}
+  scope slist,Symbols;
+  	: ...
+	;
+
 * Created RuleReturnScope as a generic rule return value.  Makes it easier
   to do this:
     RuleReturnScope r = parser.program();

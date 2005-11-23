@@ -173,7 +173,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 >>
 
 ruleDeclarations() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.push(new <it>());}; separator="\n">
+<ruleDescriptor.useScopes:{<it>_stack.push(new <it>_scope());}; separator="\n">
 <ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval = new <returnType()>();
@@ -731,7 +731,7 @@ setTest(ranges) ::= "<ranges; separator=\"||\">"
 
 globalAttributeScope(scope) ::= <<
 <if(scope.attributes)>
-protected static class <scope.name> {
+protected static class <scope.name>_scope {
     <scope.attributes:{<it.decl>;}; separator="\n">
 }
 protected Stack <scope.name>_stack = new Stack();<\n>
@@ -819,6 +819,12 @@ parameterAttributeRef(attr) ::= "<attr.name>"
 
 ruleScopeAttributeRef(scope,attr) ::=
     "((<scope>_scope)<scope>_stack.peek()).<attr.name>"
+
+/** $x is either global scope or x is rule with dynamic scope; refers
+ *  to stack itself not top of stack.  This is useful for predicates
+ *  like {$function.size()>0 && $function::name.equals("foo")}?
+ */
+isolatedDynamicScopeRef(scope) ::= "<scope>_stack"
 
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<

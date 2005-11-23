@@ -460,7 +460,7 @@ public class TestAttributes extends TestSuite {
 		String found = actionST.toString();
 		assertEqual(found, expecting);
 
-		int expectedMsgID = ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE;
+		int expectedMsgID = ErrorManager.MSG_ISOLATED_RULE_SCOPE;
 		Object expectedArg = "$r";
 		Object expectedArg2 = null;
 		GrammarSemanticsMessage expectedMessage =
@@ -476,7 +476,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-			"a :\n" +
+			"a returns [int x]:\n" +
 			"  ;\n"+
 			"b : a {"+action+"}\n" +
 			"  ;");
@@ -492,7 +492,7 @@ public class TestAttributes extends TestSuite {
 		String found = actionST.toString();
 		assertEqual(found, expecting);
 
-		int expectedMsgID = ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE;
+		int expectedMsgID = ErrorManager.MSG_ISOLATED_RULE_SCOPE;
 		Object expectedArg = "$a";
 		Object expectedArg2 = null;
 		GrammarSemanticsMessage expectedMessage =
@@ -563,8 +563,8 @@ public class TestAttributes extends TestSuite {
 	// D Y N A M I C A L L Y  S C O P E D  A T T R I B U T E S
 
 	public void testBasicGlobalScope() throws Exception {
-		String action = "$Symbols.names.add($id.text);";
-		String expecting = "((Symbols)Symbols_stack.peek()).names.add(id.getText());";
+		String action = "$Symbols::names.add($id.text);";
+		String expecting = "((Symbols_scope)Symbols_stack.peek()).names.add(id.getText());";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -595,8 +595,8 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testSharedGlobalScope() throws Exception {
-		String action = "$Symbols.x;";
-		String expecting = "((Symbols)Symbols_stack.peek()).x;";
+		String action = "$Symbols::x;";
+		String expecting = "((Symbols_scope)Symbols_stack.peek()).x;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -610,7 +610,7 @@ public class TestAttributes extends TestSuite {
 			"scope Symbols;\n" +
 			" : b {"+action+"}\n" +
 			" ;\n" +
-			"b : ID {$Symbols.x=$ID.text} ;\n" +
+			"b : ID {$Symbols::x=$ID.text} ;\n" +
 			"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -630,8 +630,8 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testGlobalScopeOutsideRule() throws Exception {
-		String action = "public void foo() {$Symbols.names.add(\"foo\");}";
-		String expecting = "public void foo() {((Symbols)Symbols_stack.peek()).names.add(\"foo\");}";
+		String action = "public void foo() {$Symbols::names.add(\"foo\");}";
+		String expecting = "public void foo() {((Symbols_scope)Symbols_stack.peek()).names.add(\"foo\");}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -662,14 +662,14 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testRuleScopeOutsideRule() throws Exception {
-		String action = "public void foo() {$a.name;}";
+		String action = "public void foo() {$a::name;}";
 		String expecting = "public void foo() {((a_scope)a_stack.peek()).name;}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"{\"+action+\"}\n" +
+			"{"+action+"}\n" +
 			"a\n" +
 			"scope { int name; }\n" +
 			"  : {foo();}\n" +
@@ -692,8 +692,8 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testBasicRuleScope() throws Exception {
-		String action = "$a.n; $n;"; // both ok
-		String expecting = "((a_scope)a_stack.peek()).n; ((a_scope)a_stack.peek()).n;";
+		String action = "$a::n;";
+		String expecting = "((a_scope)a_stack.peek()).n;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -721,8 +721,102 @@ public class TestAttributes extends TestSuite {
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
+	public void testUnqualifiedRuleScopeAccessInsideRule() throws Exception {
+		String action = "$n;";
+		String expecting = action;
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : {"+action+"}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+
+		int expectedMsgID = ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE;
+		Object expectedArg = "n";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg,
+										expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testIsolatedDynamicRuleScopeRef() throws Exception {
+		String action = "$a;"; // refers to stack not top of stack
+		String expecting = "a_stack;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : b ;\n" +
+			"b : {"+action+"}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("b",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testIsolatedGlobalScopeRef() throws Exception {
+		String action = "$Symbols;";
+		String expecting = "Symbols_stack;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"scope Symbols {\n" +
+			"  String x;\n" +
+			"}\n" +
+			"a\n"+
+			"scope { int y; }\n"+
+			"scope Symbols;\n" +
+			" : b {"+action+"}\n" +
+			" ;\n" +
+			"b : ID {$Symbols::x=$ID.text} ;\n" +
+			"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
 	public void testRuleScopeFromAnotherRule() throws Exception {
-		String action = "$a.n;"; // must be qualified
+		String action = "$a::n;"; // must be qualified
 		String expecting = "((a_scope)a_stack.peek()).n;";
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -754,7 +848,7 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testFullyQualifiedRefToCurrentRuleParameter() throws Exception {
-		String action = "$a.i;"; // must be qualified
+		String action = "$a.i;";
 		String expecting = "i;";
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -781,7 +875,7 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
-		String action = "$a.i;"; // must be qualified
+		String action = "$a.i;";
 		String expecting = "retval.i;";
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -808,7 +902,7 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testFullyQualifiedRefToLabelInCurrentRule() throws Exception {
-		String action = "$a.x;"; // must be qualified
+		String action = "$a.x;";
 		String expecting = "x;";
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -835,7 +929,7 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testIsolatedRefToCurrentRule() throws Exception {
-		String action = "$a;"; // must be qualified
+		String action = "$a;";
 		String expecting = "";
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -850,7 +944,7 @@ public class TestAttributes extends TestSuite {
 		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator);
 
-		int expectedMsgID = ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE;
+		int expectedMsgID = ErrorManager.MSG_ISOLATED_RULE_SCOPE;
 		Object expectedArg = "$a";
 		Object expectedArg2 = null;
 		GrammarSemanticsMessage expectedMessage =
@@ -914,9 +1008,9 @@ public class TestAttributes extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
-	public void testRuleDynamicScopeCollidesWithRuleRef() throws Exception {
-		String action = "$b.st;";
-		String expecting = "";
+	public void testAmbiguousRuleRef() throws Exception {
+		String action = "$b.stop;";
+		String expecting = action;
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -932,14 +1026,44 @@ public class TestAttributes extends TestSuite {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-
-		int expectedMsgID = ErrorManager.MSG_AMBIGUOUS_ATTR_REF_TO_RULE;
+		ActionTranslator translator = new ActionTranslator(generator);
+		int expectedMsgID = ErrorManager.MSG_AMBIGUOUS_RULE_SCOPE;
 		Object expectedArg = "b";
-		Object expectedArg2 = "st";
+		Object expectedArg2 = null;
 		GrammarSemanticsMessage expectedMessage =
-			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg,
-										expectedArg2);
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
 		checkError(equeue, expectedMessage);
+	}
+
+	public void testDynamicScopeRefOkEvenThoughRuleRefExists() throws Exception {
+		String action = "$b::n;";
+		String expecting = "((b_scope)b_stack.peek()).n;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n" +
+			"s : b ;\n"+
+			"b\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : '(' b ')' {"+action+"}\n" + // refers to current invocation's n
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("b",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+
+		assertEqual(found, expecting);
 	}
 
 	public void testRefToTemplateAttributeForCurrentRule() throws Exception {
@@ -1082,7 +1206,7 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testUnknownDynamicAttribute() throws Exception {
-		String action = "$a.x";
+		String action = "$a::x";
 		String expecting = action;
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -1106,7 +1230,7 @@ public class TestAttributes extends TestSuite {
 		String found = actionST.toString();
 		assertEqual(found, expecting);
 
-		int expectedMsgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
+		int expectedMsgID = ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE;
 		Object expectedArg = "a";
 		Object expectedArg2 = "x";
 		GrammarSemanticsMessage expectedMessage =
@@ -1115,7 +1239,7 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testUnknownGlobalDynamicAttribute() throws Exception {
-		String action = "$Symbols.x";
+		String action = "$Symbols::x";
 		String expecting = action;
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -1139,7 +1263,7 @@ public class TestAttributes extends TestSuite {
 		String found = actionST.toString();
 		assertEqual(found, expecting);
 
-		int expectedMsgID = ErrorManager.MSG_UNKNOWN_ATTRIBUTE_IN_SCOPE;
+		int expectedMsgID = ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE;
 		Object expectedArg = "Symbols";
 		Object expectedArg2 = "x";
 		GrammarSemanticsMessage expectedMessage =
