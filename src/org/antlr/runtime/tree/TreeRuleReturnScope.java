@@ -28,7 +28,6 @@
 package org.antlr.runtime.tree;
 
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.runtime.Token;
 
 /** This is identical to the RuleReturnScope except that
  *  the start/stop properties are tree nodes not Token objects
