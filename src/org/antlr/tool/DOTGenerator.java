@@ -47,6 +47,8 @@ import java.io.File;
 public class DOTGenerator {
 	public static final boolean STRIP_NONREDUCED_STATES = false;
 
+	protected String arrowhead="normal";
+
     /** Library of output templates; use <attrname> format */
     public static StringTemplateGroup stlib =
             new StringTemplateGroup("toollib", AngleBracketTemplateLexer.class);
@@ -143,6 +145,7 @@ public class DOTGenerator {
             st.setAttribute("label", getEdgeLabel(edge.label.toString(grammar)));
             st.setAttribute("src", getStateLabel(s));
             st.setAttribute("target", getStateLabel(edge.target));
+			st.setAttribute("arrowhead", arrowhead);
             dot.setAttribute("edges", st);
             walkCreatingDOT(dot, edge.target); // keep walkin'
         }
@@ -207,6 +210,7 @@ public class DOTGenerator {
                 st.setAttribute("label", "<"+grammar.getRuleName(rr.getRuleIndex())+">");
                 st.setAttribute("src", getStateLabel(s));
                 st.setAttribute("target", getStateLabel(rr.getFollowState()));
+				st.setAttribute("arrowhead", arrowhead);
                 dot.setAttribute("edges", st);
                 walkRuleNFACreatingDOT(dot, rr.getFollowState());
                 continue;
@@ -214,7 +218,8 @@ public class DOTGenerator {
             st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
             st.setAttribute("label", getEdgeLabel(edge.label.toString(grammar)));
             st.setAttribute("src", getStateLabel(s));
-            st.setAttribute("target", getStateLabel(edge.target));
+			st.setAttribute("target", getStateLabel(edge.target));
+			st.setAttribute("arrowhead", arrowhead);
             dot.setAttribute("edges", st);
             walkRuleNFACreatingDOT(dot, edge.target); // keep walkin'
         }
@@ -336,4 +341,12 @@ public class DOTGenerator {
         }
         return '"'+stateLabel+'"';
     }
+
+	public String getArrowheadType() {
+		return arrowhead;
+	}
+
+	public void setArrowheadType(String arrowhead) {
+		this.arrowhead = arrowhead;
+	}
 }
