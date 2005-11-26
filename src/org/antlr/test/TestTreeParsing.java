@@ -15,9 +15,9 @@ public class TestTreeParsing extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID INT;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"ID : \"a\"..\"z\"+ ;\n" +
+			"INT : \"0\"..\"9\"+;\n" +
+			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
 
 		String treeGrammar =
 			"tree grammar TP;\n" +
@@ -45,9 +45,9 @@ public class TestTreeParsing extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID INT -> ^(ID INT);\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"ID : \"a\"..\"z\"+ ;\n" +
+			"INT : \"0\"..\"9\"+;\n" +
+			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
 
 		String treeGrammar =
 			"tree grammar TP;\n" +
@@ -77,9 +77,9 @@ public class TestTreeParsing extends TestSuite {
 			"a : b c ;\n" +
 			"b : ID INT -> ^(ID INT);\n" +
 			"c : ID INT;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"ID : \"a\"..\"z\"+ ;\n" +
+			"INT : \"0\"..\"9\"+;\n" +
+			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
 
 		String treeGrammar =
 			"tree grammar TP;\n" +
@@ -110,9 +110,9 @@ public class TestTreeParsing extends TestSuite {
 			"a : b c ;\n" +
 			"b : ID INT+ -> ^(ID INT+);\n" +
 			"c : ID INT+;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"ID : \"a\"..\"z\"+ ;\n" +
+			"INT : \"0\"..\"9\"+;\n" +
+			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
 
 		String treeGrammar =
 			"tree grammar TP;\n" +

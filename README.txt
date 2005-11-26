@@ -206,6 +206,12 @@ CHANGES
 
 3.0ea7 - 
 
+* DOT diagrams didn't show escaped char properly.
+
+* Char literals are now "a" not 'a'.  This rendered most of my unit tests
+  unreadable due to escaping doublequote in Java strings, but it is the
+  the right thing to do for grammars.  One text (char/string) specifier.
+
 * action syntax changed "@scope::actionname {action}" where scope defaults
   to "parser" if parser grammar or combined grammar, "lexer" if lexer grammar,
   and "treeparser" if tree grammar.  The code generation targets decide

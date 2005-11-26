@@ -193,9 +193,6 @@ public class Grammar {
      */
     protected Map stringLiteralToTypeMap = new HashMap();
 
-    /** Map char literals like 'a' to it's unicode int value as token type. */
-    protected Map charLiteralToTypeMap = new HashMap();
-
     /** Map a token type to its token name.
 	 *  Must subtract MIN_TOKEN_TYPE from index.
 	 */
@@ -632,9 +629,6 @@ public class Grammar {
         if ( text.charAt(0)=='"' ) {
             stringLiteralToTypeMap.put(text, new Integer(tokenType));
         }
-        else if ( text.charAt(0)=='\'' ) {
-            charLiteralToTypeMap.put(text, new Integer(tokenType));
-        }
         else { // must be a label like ID
             tokenIDToTypeMap.put(text, new Integer(tokenType));
         }
@@ -1014,9 +1008,6 @@ public class Grammar {
         if ( tokenName.charAt(0)=='"') {
             I = (Integer)stringLiteralToTypeMap.get(tokenName);
         }
-        else if ( tokenName.charAt(0)=='\'') {
-            I = (Integer)charLiteralToTypeMap.get(tokenName);
-        }
         else { // must be a label like ID
             I = (Integer)tokenIDToTypeMap.get(tokenName);
         }
@@ -1041,6 +1032,7 @@ public class Grammar {
 		return names;
 	}
 
+	/*
 	public Set getStringLiteralTokens() {
 		return stringLiteralToTypeMap.keySet();
 	}
@@ -1048,50 +1040,30 @@ public class Grammar {
 	public Set getCharLiteralTokens() {
 		return charLiteralToTypeMap.keySet();
 	}
-
-	/** Convert a char literal as read by antlr.g back to a grammar literal
-	 *  that has escaped chars instead of the real char value.  If a
-	 *  target is known, use its escape facility instead of the default Java
-	 *  converter.
-	public String getANTLREscapedCharLiteral(String literal) {
-		if ( generator!=null ) {
-			generator.target.getEscapedCharLiteralToken(literal);
-		}
-		return CodeGenerator.getJavaEscapedCharFromCharLiteralToken(literal);
-	}
-	 */
-
-	/** Convert a string literal as read by antlr.g back to a grammar literal
-	 *  that has escaped chars instead of the real char values.  If a
-	 *  target is known, use its escape facility instead of the default Java
-	 *  converter.
-	public String getANTLREscapedStringLiteral(String literal) {
-		if ( generator!=null ) {
-			generator.target.getEscapedStringLiteralToken(literal);
-		}
-		return CodeGenerator.getJavaEscapedStringFromStringLiteralToken(literal);
-	}
-	 */
+	*/
 
 	/** Given a literal like (the 3 char sequence with single quotes) 'a',
 	 *  return the int value of 'a'. Convert escape sequences here also.
 	 *  ANTLR's antlr.g parser does not convert escape sequences.
+	 *
+	 *  11/26/2005: I changed literals to always be "..." even for chars.
+	 *  This routine still works though.
      */
     public static int getCharValueFromGrammarCharLiteral(String literal) {
         if ( literal.length()==3 ) {
-			// 'x'
+			// "x"
             return literal.charAt(1); // no escape char
         }
         else if ( literal.length() == 4 )
         {
-			// '\x'  (antlr lexer will catch invalid char)
+			// "\x"  (antlr lexer will catch invalid char)
 			int escChar = literal.charAt(2);
 			int charVal = ANTLRLiteralEscapedCharValue[escChar];
 			return charVal;
         }
         else if( literal.length() == 8 )
         {
-        	// '\u1234'
+        	// "\u1234"
         	String unicodeChars = literal.substring(3,literal.length()-1);
     		return Integer.parseInt(unicodeChars, 16);
          }
@@ -1113,11 +1085,12 @@ public class Grammar {
 	 *  The NFA construction routine must know the actual char values.
 	 */
 	public static StringBuffer getUnescapedStringFromGrammarStringLiteral(String literal) {
+		//System.out.println("escape: ["+literal+"]");
 		StringBuffer buf = new StringBuffer();
 		int last = literal.length()-1; // skip quotes on outside
 		for (int i=1; i<last; i++) {
 			char c = literal.charAt(i);
-			if ( c=='\'' ) {
+			if ( c=='\\' ) {
 				i++;
 				c = literal.charAt(i);
 				if ( Character.toUpperCase(c)=='U' ) {
@@ -1130,13 +1103,15 @@ public class Grammar {
 					buf.append((char)val);
 				}
 				else {
-					buf.append(ANTLRLiteralEscapedCharValue[c]); // normal \x escape
+					buf.append((char)ANTLRLiteralEscapedCharValue[c]); // normal \x escape
+					i++;
 				}
 			}
 			else {
 				buf.append(c); // simple char x
 			}
 		}
+		//System.out.println("string: ["+buf.toString()+"]");
 		return buf;
 	}
 
@@ -1181,6 +1156,11 @@ public class Grammar {
 								"null token name; ttype="+ttype+" tokens="+typeToTokenList);
 		//System.out.println("getTokenDisplaYanme ttype="+ttype+", index="+index+", name="+tokenName);
 		return tokenName;
+	}
+
+	/** Get the list of ANTLR String literals */
+	public Set getStringLiterals() {
+		return stringLiteralToTypeMap.keySet();
 	}
 
     /** Save the option key/value pair and process it; return the key
@@ -1506,8 +1486,8 @@ public class Grammar {
 	 *  char (non-hex) representation.  Control characters are spit out
 	 *  as unicode.  While this is specially set up for returning Java strings,
 	 *  it can be used by any language target that has the same syntax. :)
-	 *  Note that this method does NOT put the quotes around it so that the
-	 *  method is more reusable.
+	 *
+	 *  11/26/2005: I changed this to use double quotes, consistent with antlr.g
 	 */
 	public static String getANTLRCharLiteralForChar(int c) {
 		if ( c<Label.MIN_CHAR_VALUE ) {
@@ -1515,22 +1495,22 @@ public class Grammar {
 			return "'<INVALID>'";
 		}
 		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {
-			return '\''+ANTLRLiteralCharValueEscape[c]+'\'';
+			return '"'+ANTLRLiteralCharValueEscape[c]+'"';
 		}
 		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
 			!Character.isISOControl((char)c) ) {
 			if ( c=='\\' ) {
-				return "'\\\\'";
+				return "\"\\\\\\\"";
 			}
 			if ( c=='\'') {
-				return "'\\''";
+				return "\"'\"";
 			}
-			return '\''+Character.toString((char)c)+'\'';
+			return '"'+Character.toString((char)c)+'"';
 		}
-		// turn on the bit above max '\uFFFF' value so that we pad with zeros
+		// turn on the bit above max "\uFFFF" value so that we pad with zeros
 		// then only take last 4 digits
 		String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-		String unicodeStr = "'\\u"+hex+"'";
+		String unicodeStr = "\"\\u"+hex+"\"";
 		return unicodeStr;
 	}
 

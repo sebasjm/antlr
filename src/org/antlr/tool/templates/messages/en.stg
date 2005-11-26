@@ -190,6 +190,8 @@ INVALID_ACTION_SCOPE(file,line,col,arg,arg2) ::=
   "<loc()>unknown or invalid action scope for <arg2> grammar: <arg>"
 ACTION_REDEFINITION(file,line,col,arg) ::=
   "<loc()>redefinition of <arg> action"
+SINGLE_QUOTES_ILLEGAL(file,line,col,arg) ::=
+  "<loc()>character literals must use double quotes (such as \"x\"): <arg>"
 
 // GRAMMAR WARNINGS
 

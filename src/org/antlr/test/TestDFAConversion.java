@@ -523,20 +523,20 @@ public class TestDFAConversion extends TestSuite {
 	public void testComplementChar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : ~'x' | 'x';\n");
+			"A : ~\"x\" | \"x\";\n");
 		String expecting =
-			".s0-'x'->:s2=>2\n" +
-			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
+			".s0-\"x\"->:s2=>2\n" +
+			".s0-{\"\\u0000\"..\"w\", \"y\"..\"\\uFFFE\"}->:s1=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
 	public void testComplementCharSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : ~(' '|'\t'|'x') | 'x';\n");
+			"A : ~(\" \"|\"\t\"|\"x\") | \"x\";\n");
 		String expecting =
-			".s0-'x'->:s2=>2\n" +
-			".s0-{'\\u0000'..'\\b', '\\n'..'\\u001F', '!'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
+			".s0-\"x\"->:s2=>2\n" +
+			".s0-{\"\\u0000\"..\"\\b\", \"\\n\"..\"\\u001F\", \"!\"..\"w\", \"y\"..\"\\uFFFE\"}->:s1=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -564,12 +564,12 @@ public class TestDFAConversion extends TestSuite {
 	public void testTokensRuleAltsDoNotCollapse() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : 'a';" +
-			"B : 'b';\n"
+			"A : \"a\";" +
+			"B : \"b\";\n"
 		);
 		String expecting =
-			".s0-'a'->:s1=>1\n" +
-			".s0-'b'->:s2=>2\n";
+			".s0-\"a\"->:s1=>1\n" +
+			".s0-\"b\"->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -749,12 +749,12 @@ As a result, alternative(s) 2 were disabled for that input
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
 			"A : (B | C) ;\n"+
-			"fragment B : 'b' ;\n" +
-			"fragment C : 'c' ;\n"
+			"fragment B : \"b\" ;\n" +
+			"fragment C : \"c\" ;\n"
 		);
 		String expecting =
-			".s0-'b'->:s1=>1\n" +  // must not collapse set!
-			".s0-'c'->:s2=>2\n";
+			".s0-\"b\"->:s1=>1\n" +  // must not collapse set!
+			".s0-\"c\"->:s2=>2\n";
 		// no decision if (B|C) collapses; must not collapse
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}

@@ -299,7 +299,7 @@ rule returns [StringTemplate code=null]
         {
 		String description =
 		    grammar.grammarTreeToString(#rule.getFirstChildWithType(BLOCK), false);
-		description = generator.target.getTargetStringLiteralFromString(description);
+		//description = generator.target.getTargetStringLiteralFromString(description);
     	b.setAttribute("description", description);
 		/*
 		System.out.println("rule "+r+" tokens="+
@@ -337,8 +337,10 @@ rule returns [StringTemplate code=null]
 			else {
 				description =
 					grammar.grammarTreeToString(#rule,false);
+			 	/*
 			 	description =
 			 	    generator.target.getTargetStringLiteralFromString(description);
+				*/
 				code.setAttribute("description", description);
 			}
 			Rule theRule = grammar.getRule(r);
@@ -432,7 +434,7 @@ if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL ) {
 	}
 }
 String description = grammar.grammarTreeToString(#alternative, false);
-description = generator.target.getTargetStringLiteralFromString(description);
+//description = generator.target.getTargetStringLiteralFromString(description);
 code.setAttribute("description", description);
 if ( !currentAltHasASTRewrite && grammar.buildAST() ) {
 	code.setAttribute("autoAST", new Boolean(true));
@@ -515,8 +517,12 @@ element returns [StringTemplate code=null]
 
     |   #(CHAR_RANGE a:CHAR_LITERAL b:CHAR_LITERAL)
         {code = templates.getInstanceOf("charRangeRef");
-         code.setAttribute("a", a.getText());
-         code.setAttribute("b", b.getText());
+		 String low =
+		 	generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,a.getText());
+		 String high =
+		 	generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,b.getText());
+         code.setAttribute("a", low);
+         code.setAttribute("b", high);
         }
 
     |	#(ASSIGN label:ID code=atom[#label.getText()])
@@ -565,7 +571,7 @@ ebnf returns [StringTemplate code=null]
 		)
 		{
 		String description = grammar.grammarTreeToString(#ebnf, false);
-		description = generator.target.getTargetStringLiteralFromString(description);
+		//description = generator.target.getTargetStringLiteralFromString(description);
     	code.setAttribute("description", description);
     	}
     ;
@@ -752,7 +758,7 @@ else if ( #rewrite.getType()==REWRITE ) {
 			}
 			String description =
 			    grammar.grammarTreeToString(#r,false);
-			description = generator.target.getTargetStringLiteralFromString(description);
+			//description = generator.target.getTargetStringLiteralFromString(description);
 			code.setAttribute("alts.{pred,alt,description}",
 							  predText,
 							  alt,
@@ -832,19 +838,19 @@ rewrite_ebnf returns [StringTemplate code=null]
     :   #( OPTIONAL code=rewrite_block["rewriteOptionalBlock"] )
 		{
 		String description = grammar.grammarTreeToString(#rewrite_ebnf, false);
-		description = generator.target.getTargetStringLiteralFromString(description);
+		//description = generator.target.getTargetStringLiteralFromString(description);
 		code.setAttribute("description", description);
 		}
     |   #( CLOSURE code=rewrite_block["rewriteClosureBlock"] )
 		{
 		String description = grammar.grammarTreeToString(#rewrite_ebnf, false);
-		description = generator.target.getTargetStringLiteralFromString(description);
+		//description = generator.target.getTargetStringLiteralFromString(description);
 		code.setAttribute("description", description);
 		}
     |   #( POSITIVE_CLOSURE code=rewrite_block["rewritePositiveClosureBlock"] )
 		{
 		String description = grammar.grammarTreeToString(#rewrite_ebnf, false);
-		description = generator.target.getTargetStringLiteralFromString(description);
+		//description = generator.target.getTargetStringLiteralFromString(description);
 		code.setAttribute("description", description);
 		}
     ;
@@ -862,7 +868,7 @@ StringTemplate r, el;
 		)
 		{
 		String description = grammar.grammarTreeToString(#rewrite_tree, false);
-		description = generator.target.getTargetStringLiteralFromString(description);
+		//description = generator.target.getTargetStringLiteralFromString(description);
 		code.setAttribute("description", description);
     	rewriteTreeNestingLevel--;
 		}

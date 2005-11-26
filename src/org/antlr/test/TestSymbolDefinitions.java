@@ -75,8 +75,8 @@ public class TestSymbolDefinitions extends TestSuite {
 				"  C;\n" +
 				"  D;" +
 				"}\n"+
-				"A : 'a';\n" +
-				"C : 'c' ;");
+				"A : \"a\";\n" +
+				"C : \"c\" ;");
 		String rules = "A, C";
 		String tokenNames = "A, C, D";
 		checkSymbols(g, rules, tokenNames);
@@ -86,12 +86,12 @@ public class TestSymbolDefinitions extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : \"begin\" b \"end\";\n" +
-				"b : C ';' ;\n" +
-				"ID : 'a' ;\n" +
+				"b : C \";\" ;\n" +
+				"ID : \"a\" ;\n" +
 				"FOO : \"foo\" ;\n" +  // "foo" is not a token name
-				"C : 'c' ;\n");        // nor is 'c'
+				"C : \"c\" ;\n");        // nor is \"c\"
 		String rules = "a, b";
-		String tokenNames = "C, FOO, ID, \"begin\", \"end\", ';'";
+		String tokenNames = "C, FOO, ID, \"begin\", \"end\", \";\"";
 		checkSymbols(g, rules, tokenNames);
 	}
 
@@ -109,9 +109,9 @@ public class TestSymbolDefinitions extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"options {output=AST;}\n" +
-				"a : id+=ID ( ',' e+=expr )* ;\n" +
-				"expr : 'e';\n" +
-				"ID : 'a';\n");
+				"a : id+=ID ( \",\" e+=expr )* ;\n" +
+				"expr : \"e\";\n" +
+				"ID : \"a\";\n");
 		String rule = "a";
 		String tokenLabels = "id";
 		String ruleLabels = "e";
@@ -123,10 +123,10 @@ public class TestSymbolDefinitions extends TestSuite {
 	public void testParserCharLiteralWithEscape() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
-				"a : '\\n';\n");
-		Set literals = g.getCharLiteralTokens();
+				"a : \"\\n\";\n");
+		Set literals = g.getStringLiterals();
 		// must store literals how they appear in the antlr grammar
-		assertEqual(literals.toArray()[0], "'\\n'");
+		assertEqual(literals.toArray()[0], "\"\\n\"");
 	}
 
 	// T E S T  E R R O R S
@@ -150,9 +150,9 @@ public class TestSymbolDefinitions extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 				"parser grammar t;\n"+
-				"a : '(' b ;\n" +
+				"a : \"(\" b ;\n" +
 				"b : C ;");
-		Object expectedArg = "'('";
+		Object expectedArg = "\"(\"";
 		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
@@ -164,9 +164,9 @@ public class TestSymbolDefinitions extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 				"grammar foo;\n" +
-				"a : (~'x')+ ;\n");
+				"a : (~\"x\")+ ;\n");
 		g.createNFAs();
-		Object expectedArg = "'x'";
+		Object expectedArg = "\"x\"";
 		int expectedMsgID = ErrorManager.MSG_EMPTY_COMPLEMENT;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
@@ -224,11 +224,11 @@ public class TestSymbolDefinitions extends TestSuite {
 		Grammar g = new Grammar(
 				"parser grammar t;\n" +
 				"tokens {\n" +
-				"  B='(';\n" +
+				"  B=\"(\";\n" +
 				"}\n"+
 				"a : A B;\n" +
 				"b : C ;");
-		Object expectedArg = "'('";
+		Object expectedArg = "\"(\"";
 		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
@@ -241,10 +241,10 @@ public class TestSymbolDefinitions extends TestSuite {
 		Grammar g = new Grammar(
 				"lexer grammar t;\n" +
 				"tokens {\n" +
-				"  B='(';\n" +
+				"  B=\"(\";\n" +
 				"}\n"+
-				"ID : 'a';\n");
-		Object expectedArg = "'('";
+				"ID : \"a\";\n");
+		Object expectedArg = "\"(\"";
 		int expectedMsgID = ErrorManager.MSG_CANNOT_ALIAS_TOKENS_IN_LEXER;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
@@ -271,8 +271,8 @@ public class TestSymbolDefinitions extends TestSuite {
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
-				"ID : 'a' ;\n" +
-				"ID : 'd' ;");
+				"ID : \"a\" ;\n" +
+				"ID : \"d\" ;");
 
 		Object expectedArg = "ID";
 		int expectedMsgID = ErrorManager.MSG_RULE_REDEFINITION;
@@ -287,7 +287,7 @@ public class TestSymbolDefinitions extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"x : ID ;\n" +
-				"ID : 'a' ;\n" +
+				"ID : \"a\" ;\n" +
 				"x : ID ID ;");
 
 		Object expectedArg = "x";
@@ -388,7 +388,7 @@ public class TestSymbolDefinitions extends TestSuite {
 			"scope ID {\n" +
 			"  int n;\n" +
 			"}\n" +
-			"ID : 'a'\n" +
+			"ID : \"a\"\n" +
 			"  ;\n");
 
 		Object expectedArg = "ID";
@@ -425,7 +425,7 @@ public class TestSymbolDefinitions extends TestSuite {
 			"scope ID {\n" +
 			"  int n;\n" +
 			"}\n" +
-			"ID : 'a'\n" +
+			"ID : \"a\"\n" +
 			"  ;\n");
 
 		Object expectedArg = "ID";
@@ -625,7 +625,7 @@ public class TestSymbolDefinitions extends TestSuite {
 								new StringReader(
 									"grammar t;\n"+
 									"options {foo=3; language=Java;}\n" +
-									"a : 'a';\n"));
+									"a : \"a\";\n"));
 
 		Object expectedArg = "foo";
 		int expectedMsgID = ErrorManager.MSG_ILLEGAL_OPTION;
@@ -641,7 +641,7 @@ public class TestSymbolDefinitions extends TestSuite {
 				"grammar t;\n"+
 				"a\n"+
 				"options {k=3; tokenVocab=blort;}\n" +
-				"  : 'a';\n");
+				"  : \"a\";\n");
 
 		Object expectedArg = "tokenVocab";
 		int expectedMsgID = ErrorManager.MSG_ILLEGAL_OPTION;
@@ -656,8 +656,8 @@ public class TestSymbolDefinitions extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : ( options {k=3; language=Java;}\n" +
-				"    : 'a'\n" +
-				"    | 'b'\n" +
+				"    : \"a\"\n" +
+				"    | \"b\"\n" +
 				"    )\n" +
 				"  ;\n");
 		Object expectedArg = "language";

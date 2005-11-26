@@ -264,7 +264,8 @@ public class DOTGenerator {
 
     /** Fix edge strings so they print out in DOT properly */
     protected String getEdgeLabel(String label) {
-        label = Utils.replace(label,"\"", "\\\"");
+		label = Utils.replace(label,"\\", "\\\\");
+		label = Utils.replace(label,"\"", "\\\"");
         if ( label.equals(Label.EPSILON_STR) ) {
             label = "e";
         }

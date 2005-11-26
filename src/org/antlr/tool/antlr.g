@@ -735,21 +735,9 @@ options {
 	charVocabulary='\003'..'\377';
 }
 
-WS	:	(	/*	'\r' '\n' can be matched in one alternative or by matching
-				'\r' in one iteration and '\n' in another.  I am trying to
-				handle any flavor of newline that comes in, but the language
-				that allows both "\r\n" and "\r" and "\n" to all be valid
-				newline is ambiguous.  Consequently, the resulting grammar
-				must be ambiguous.  I'm shutting this warning off.
-			 */
-			options {
-				generateAmbigWarnings=false;
-			}
-		:	' '
+WS	:	(	' '
 		|	'\t'
-		|	'\r' '\n'	{newline();}
-		|	'\r'		{newline();}
-		|	'\n'		{newline();}
+		|	('\r')? '\n' {newline();}
 		)
 	;
 
@@ -843,12 +831,31 @@ RCURLY:	'}'	;
 
 DOLLAR : '$' ;
 
+// TJP removed 11/26/2005.
+// match for now, but give error
 CHAR_LITERAL
-	:	'\'' (ESC|~'\'') '\''
+	:	'\''! (ESC|~'\'') '\''!
+		{
+		String t = $getText;
+		$setText('\"'+t+'\"');
+		CommonToken tk = new CommonToken(CHAR_LITERAL,t);
+		tk.setLine(getLine());
+		tk.setColumn(getColumn());
+		ErrorManager.syntaxError(
+			ErrorManager.MSG_SINGLE_QUOTES_ILLEGAL,
+			tk,
+			"'"+t+"'", null);
+		}
 	;
 
 STRING_LITERAL
 	:	'"' (ESC|~'"')* '"'
+		{
+		StringBuffer s = Grammar.getUnescapedStringFromGrammarStringLiteral($getText);
+		if ( s.length()==1 ) {
+			$setType(CHAR_LITERAL);
+		}
+		}
 	;
 
 DOUBLE_ANGLE_STRING_LITERAL
@@ -857,15 +864,15 @@ DOUBLE_ANGLE_STRING_LITERAL
 
 protected
 ESC	:	'\\'
-		(	'n' //{$setText('\n');}
-		|	'r' //{$setText('\r');}
-		|	't' //{$setText('\t');}
-		|	'b' //{$setText('\b');}
-		|	'f' //{$setText('\f');}
-		|	'"' //{$setText('\"');}
-		|	'\'' //{$setText('\'');}
-		|	'\\' //{$setText('\\');}
-		|	'>' //{$setText('>');} // used for escaping >>
+		(	'n'
+		|	'r'
+		|	't'
+		|	'b'
+		|	'f'
+		|	'"'
+		|	'\''
+		|	'\\'
+		|	'>'
 		|	('0'..'3')
 			(
 				options {
@@ -928,7 +935,6 @@ NESTED_ARG_ACTION :
 	|	'\r' '\n'	{newline();}
 	|	'\r'		{newline();}
 	|	'\n'		{newline();}
-	|	CHAR_LITERAL
 	|	STRING_LITERAL
 	|	~']'
 	)*

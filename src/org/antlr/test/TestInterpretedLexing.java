@@ -76,7 +76,7 @@ public class TestInterpretedLexing extends TestSuite {
 	public void testSimpleAltCharTest() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "A : 'a' | 'b' | 'c';");
+                "A : \"a\" | \"b\" | \"c\";");
 		final int Atype = g.getTokenType("A");
         Interpreter engine = new Interpreter(g, new ANTLRStringStream("a"));
         engine = new Interpreter(g, new ANTLRStringStream("b"));
@@ -90,8 +90,8 @@ public class TestInterpretedLexing extends TestSuite {
     public void testSingleRuleRef() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "A : 'a' B 'c' ;\n" +
-                "B : 'b' ;\n");
+                "A : \"a\" B \"c\" ;\n" +
+                "B : \"b\" ;\n");
 		final int Atype = g.getTokenType("A");
 		Interpreter engine = new Interpreter(g, new ANTLRStringStream("abc")); // should ignore the x
 		Token result = engine.scan("A");
@@ -102,7 +102,7 @@ public class TestInterpretedLexing extends TestSuite {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "INT : (DIGIT)+ ;\n"+
-				"fragment DIGIT : '0'..'9';\n");
+				"fragment DIGIT : \"0\"..\"9\";\n");
 		final int INTtype = g.getTokenType("INT");
 		Interpreter engine = new Interpreter(g, new ANTLRStringStream("12x")); // should ignore the x
 		Token result = engine.scan("INT");
@@ -115,7 +115,7 @@ public class TestInterpretedLexing extends TestSuite {
     public void testMultAltLoop() throws Exception {
 		Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "A : ('0'..'9'|'a'|'b')+ ;\n");
+                "A : (\"0\"..\"9\"|\"a\"|\"b\")+ ;\n");
 		final int Atype = g.getTokenType("A");
 		Interpreter engine = new Interpreter(g, new ANTLRStringStream("a"));
 		Token result = engine.scan("A");
@@ -142,7 +142,7 @@ public class TestInterpretedLexing extends TestSuite {
 	public void testSimpleLoops() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
-				"A : ('0'..'9')+ '.' ('0'..'9')* | ('0'..'9')+ ;\n");
+				"A : (\"0\"..\"9\")+ \".\" (\"0\"..\"9\")* | (\"0\"..\"9\")+ ;\n");
 		final int Atype = g.getTokenType("A");
 		CharStream input = new ANTLRStringStream("1234.5");
 		Interpreter engine = new Interpreter(g, input);
@@ -159,16 +159,16 @@ public class TestInterpretedLexing extends TestSuite {
 		g.setGrammarContent(
 			"lexer grammar t;\n"+
 			"INT : (DIGIT)+ ;\n"+
-			"FLOAT : (DIGIT)+ '.' (DIGIT)* ;\n"+
-			"fragment DIGIT : '0'..'9';\n" +
-			"WS : (' ')+ {channel=99;};\n");
+			"FLOAT : (DIGIT)+ \".\" (DIGIT)* ;\n"+
+			"fragment DIGIT : \"0\"..\"9\";\n" +
+			"WS : (\" \")+ {channel=99;};\n");
 		CharStream input = new ANTLRStringStream("123 139.52");
 		Interpreter lexEngine = new Interpreter(g, input);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
 		String result = tokens.toString();
 		//System.out.println(result);
-		String expecting = "[@0,0:2='123',<4>,1:0] [@1,3:3=' ',<6>,1:3] [@2,4:9='139.52',<5>,1:4]";
+		String expecting = "[@0,0:2=\"123\",<4>,1:0] [@1,3:3=\" \",<6>,1:3] [@2,4:9=\"139.52\",<5>,1:4]";
 		assertEqual(result,expecting);
 	}
 

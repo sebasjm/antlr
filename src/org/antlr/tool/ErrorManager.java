@@ -157,6 +157,7 @@ public class ErrorManager {
 	public static final int MSG_ISOLATED_RULE_ATTRIBUTE = 142;
 	public static final int MSG_INVALID_ACTION_SCOPE = 143;
 	public static final int MSG_ACTION_REDEFINITION = 144;
+	public static final int MSG_SINGLE_QUOTES_ILLEGAL = 145;
 
 
 	// GRAMMAR WARNINGS

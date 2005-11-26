@@ -136,17 +136,23 @@ public class Target {
 	}
 
 	/** Convert from an ANTLR char literal found in a grammar file to
-	 *  an equivalent char literal in the target language.  For Java, this
-	 *  is the identify translation; i.e., '\n' -> '\n'.  Most languages
-	 *  will be able to use this 1-to-1 mapping.  Expect single quotes
-	 *  around the incoming literal.
+	 *  an equivalent char literal in the target language.  For most
+	 *  languages, this means converting "x" to 'x'.
+	 *
+	 *  Expect double quotes around the incoming literal.
+	 *
+	 *  Before I changed all literals to be "...", this
+	 *  was the identify translation; i.e., '\n' -> '\n'.
+	 *  Now, I just flip the double to single quotes.
 	 */
 	public String getTargetCharLiteralFromANTLRCharLiteral(
 		CodeGenerator generator,
 		String literal)
 	{
-		// int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
-		return literal;
+		StringBuffer buf = new StringBuffer(literal);
+		buf.setCharAt(0,'\'');
+		buf.setCharAt(literal.length()-1,'\'');
+		return buf.toString();
 	}
 
 	/** Convert from an ANTLR string literal found in a grammar file to

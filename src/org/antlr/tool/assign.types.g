@@ -296,8 +296,8 @@ protected void assignTypes() {
 	}
 
 	protected void aliasTokenIDsAndLiterals() {
-		if ( grammar.type!=Grammar.COMBINED ) {
-			return; // strings/chars are never token types 'cept in combined
+		if ( grammar.type==Grammar.LEXER ) {
+			return; // strings/chars are never token types in LEXER
 		}
 		// walk aliases if any and assign types to aliased literals if literal
 		// was referenced
@@ -308,7 +308,7 @@ protected void assignTypes() {
 			if ( literal.charAt(0)=='"' && stringLiterals.get(literal)!=null ) {
 				stringLiterals.put(literal, tokens.get(tokenID));
 			}
-			else if ( literal.charAt(0)=='\'' && charLiterals.get(literal)!=null ) {
+			else if ( literal.charAt(0)=='\"' && charLiterals.get(literal)!=null ) {
 				charLiterals.put(literal, tokens.get(tokenID));
 			}
 		}

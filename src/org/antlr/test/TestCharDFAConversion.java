@@ -50,91 +50,91 @@ public class TestCharDFAConversion extends TestSuite {
 	public void testSimpleRangeVersusChar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : 'a'..'z' '@' | 'k' '$' ;");
+			"A : \"a\"..\"z\" \"@\" | \"k\" \"$\" ;");
 		g.createLookaheadDFAs();
 		String expecting =
-			".s0-'k'->.s1\n" +
-			".s0-{'a'..'j', 'l'..'z'}->:s3=>1\n" +
-			".s1-'$'->:s2=>2\n" +
-			".s1-'@'->:s3=>1\n";
+			".s0-\"k\"->.s1\n" +
+			".s0-{\"a\"..\"j\", \"l\"..\"z\"}->:s3=>1\n" +
+			".s1-\"$\"->:s2=>2\n" +
+			".s1-\"@\"->:s3=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testRangeWithDisjointSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : 'a'..'z' '@'\n" +
-			"  | ('k'|'9'|'p') '$'\n" +
+			"A : \"a\"..\"z\" \"@\"\n" +
+			"  | (\"k\"|\"9\"|\"p\") \"$\"\n" +
 			"  ;\n");
 		g.createLookaheadDFAs();
-		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'}
+		// must break up a..z into {\"a\"..\"j\", \"l\"..\"o\", \"q\"..\"z\"}
 		String expecting =
-			".s0-'9'->:s2=>2\n" +
-			".s0-{'a'..'j', 'l'..'o', 'q'..'z'}->:s3=>1\n" +
-			".s0-{'k', 'p'}->.s1\n" +
-			".s1-'$'->:s2=>2\n" +
-			".s1-'@'->:s3=>1\n";
+			".s0-\"9\"->:s2=>2\n" +
+			".s0-{\"a\"..\"j\", \"l\"..\"o\", \"q\"..\"z\"}->:s3=>1\n" +
+			".s0-{\"k\", \"p\"}->.s1\n" +
+			".s1-\"$\"->:s2=>2\n" +
+			".s1-\"@\"->:s3=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testDisjointSetCollidingWithTwoRanges() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : ('a'..'z'|'0'..'9') '@'\n" +
-			"  | ('k'|'9'|'p') '$'\n" +
+			"A : (\"a\"..\"z\"|\"0\"..\"9\") \"@\"\n" +
+			"  | (\"k\"|\"9\"|\"p\") \"$\"\n" +
 			"  ;\n");
 		g.createLookaheadDFAs();
-		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
+		// must break up a..z into {\"a\"..\"j\", \"l\"..\"o\", \"q\"..\"z\"} and 0..9
 		// into 0..8
 		String expecting =
-			".s0-{'0'..'8', 'a'..'j', 'l'..'o', 'q'..'z'}->:s3=>1\n" +
-			".s0-{'9', 'k', 'p'}->.s1\n" +
-			".s1-'$'->:s2=>2\n" +
-			".s1-'@'->:s3=>1\n";
+			".s0-{\"0\"..\"8\", \"a\"..\"j\", \"l\"..\"o\", \"q\"..\"z\"}->:s3=>1\n" +
+			".s0-{\"9\", \"k\", \"p\"}->.s1\n" +
+			".s1-\"$\"->:s2=>2\n" +
+			".s1-\"@\"->:s3=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testDisjointSetCollidingWithTwoRangesCharsFirst() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : ('k'|'9'|'p') '$'\n" +
-			"  | ('a'..'z'|'0'..'9') '@'\n" +
+			"A : (\"k\"|\"9\"|\"p\") \"$\"\n" +
+			"  | (\"a\"..\"z\"|\"0\"..\"9\") \"@\"\n" +
 			"  ;\n");
 		g.createLookaheadDFAs();
-		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
+		// must break up a..z into {\"a\"..\"j\", \"l\"..\"o\", \"q\"..\"z\"} and 0..9
 		// into 0..8
 		String expecting =
-			".s0-{'0'..'8', 'a'..'j', 'l'..'o', 'q'..'z'}->:s2=>2\n" +
-			".s0-{'9', 'k', 'p'}->.s1\n" +
-			".s1-'$'->:s3=>1\n" +
-			".s1-'@'->:s2=>2\n";
+			".s0-{\"0\"..\"8\", \"a\"..\"j\", \"l\"..\"o\", \"q\"..\"z\"}->:s2=>2\n" +
+			".s0-{\"9\", \"k\", \"p\"}->.s1\n" +
+			".s1-\"$\"->:s3=>1\n" +
+			".s1-\"@\"->:s2=>2\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testDisjointSetCollidingWithTwoRangesAsSeparateAlts() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : 'a'..'z' '@'\n" +
-			"  | 'k' '$'\n" +
-			"  | '9' '$'\n" +
-			"  | 'p' '$'\n" +
-			"  | '0'..'9' '@'\n" +
+			"A : \"a\"..\"z\" \"@\"\n" +
+			"  | \"k\" \"$\"\n" +
+			"  | \"9\" \"$\"\n" +
+			"  | \"p\" \"$\"\n" +
+			"  | \"0\"..\"9\" \"@\"\n" +
 			"  ;\n");
 		g.createLookaheadDFAs();
-		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
+		// must break up a..z into {\"a\"..\"j\", \"l\"..\"o\", \"q\"..\"z\"} and 0..9
 		// into 0..8
 		String expecting =
-			".s0-'0'..'8'->:s8=>5\n" +
-			".s0-'9'->.s6\n" +
-			".s0-'k'->.s1\n" +
-			".s0-'p'->.s4\n" +
-			".s0-{'a'..'j', 'l'..'o', 'q'..'z'}->:s3=>1\n" +
-			".s1-'$'->:s2=>2\n" +
-			".s1-'@'->:s3=>1\n" +
-			".s4-'$'->:s5=>4\n" +
-			".s4-'@'->:s3=>1\n" +
-			".s6-'$'->:s7=>3\n" +
-			".s6-'@'->:s8=>5\n";
+			".s0-\"0\"..\"8\"->:s8=>5\n" +
+			".s0-\"9\"->.s6\n" +
+			".s0-\"k\"->.s1\n" +
+			".s0-\"p\"->.s4\n" +
+			".s0-{\"a\"..\"j\", \"l\"..\"o\", \"q\"..\"z\"}->:s3=>1\n" +
+			".s1-\"$\"->:s2=>2\n" +
+			".s1-\"@\"->:s3=>1\n" +
+			".s4-\"$\"->:s5=>4\n" +
+			".s4-\"@\"->:s3=>1\n" +
+			".s6-\"$\"->:s7=>3\n" +
+			".s6-\"@\"->:s8=>5\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -142,17 +142,17 @@ public class TestCharDFAConversion extends TestSuite {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"IF : \"if\" ;\n" +
-			"ID : ('a'..'z')+ ;\n");
+			"ID : (\"a\"..\"z\")+ ;\n");
 		String expecting =
-			".s0-'a'..'z'->:s2=>1\n" +
+			".s0-\"a\"..\"z\"->:s2=>1\n" +
 			".s0-<EOT>->:s1=>2\n";
 		checkDecision(g, 1, expecting, null);
 		expecting =
-			".s0-'i'->.s1\n" +
-			".s0-{'a'..'h', 'j'..'z'}->:s4=>2\n" +
-			".s1-'f'->.s2\n" +
+			".s0-\"i\"->.s1\n" +
+			".s0-{\"a\"..\"h\", \"j\"..\"z\"}->:s4=>2\n" +
+			".s1-\"f\"->.s2\n" +
 			".s1-<EOT>->:s4=>2\n" +
-			".s2-'a'..'z'->:s4=>2\n" +
+			".s2-\"a\"..\"z\"->:s4=>2\n" +
 			".s2-<EOT>->:s3=>1\n";
 		checkDecision(g, 2, expecting, null);
 	}
@@ -160,51 +160,51 @@ public class TestCharDFAConversion extends TestSuite {
 	public void testAdjacentNotCharLoops() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : (~'r')+ ;\n" +
-			"B : (~'s')+ ;\n");
+			"A : (~\"r\")+ ;\n" +
+			"B : (~\"s\")+ ;\n");
 		String expecting =
-			".s0-'r'->:s3=>2\n" +
-			".s0-'s'->:s2=>1\n" +
-			".s0-{'\\u0000'..'q', 't'..'\\uFFFE'}->.s1\n" +
-			".s1-'r'->:s3=>2\n" +
+			".s0-\"r\"->:s3=>2\n" +
+			".s0-\"s\"->:s2=>1\n" +
+			".s0-{\"\\u0000\"..\"q\", \"t\"..\"\\uFFFE\"}->.s1\n" +
+			".s1-\"r\"->:s3=>2\n" +
 			".s1-<EOT>->:s2=>1\n" +
-			".s1-{'\\u0000'..'q', 't'..'\\uFFFE'}->.s1\n";
+			".s1-{\"\\u0000\"..\"q\", \"t\"..\"\\uFFFE\"}->.s1\n";
 		checkDecision(g, 3, expecting, null);
 	}
 
 	public void testNonAdjacentNotCharLoops() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : (~'r')+ ;\n" +
-			"B : (~'t')+ ;\n");
+			"A : (~\"r\")+ ;\n" +
+			"B : (~\"t\")+ ;\n");
 		String expecting =
-			".s0-'r'->:s3=>2\n" +
-			".s0-'t'->:s2=>1\n" +
-			".s0-{'\\u0000'..'q', 's', 'u'..'\\uFFFE'}->.s1\n" +
-			".s1-'r'->:s3=>2\n" +
+			".s0-\"r\"->:s3=>2\n" +
+			".s0-\"t\"->:s2=>1\n" +
+			".s0-{\"\\u0000\"..\"q\", \"s\", \"u\"..\"\\uFFFE\"}->.s1\n" +
+			".s1-\"r\"->:s3=>2\n" +
 			".s1-<EOT>->:s2=>1\n" +
-			".s1-{'\\u0000'..'q', 's', 'u'..'\\uFFFE'}->.s1\n";
+			".s1-{\"\\u0000\"..\"q\", \"s\", \"u\"..\"\\uFFFE\"}->.s1\n";
 		checkDecision(g, 3, expecting, null);
 	}
 
 	public void testLoopsWithOptimizedOutExitBranches() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : 'x'* ~'x'+ ;\n");
+			"A : \"x\"* ~\"x\"+ ;\n");
 		String expecting =
-			".s0-'x'->:s2=>1\n" +
-			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>2\n";
+			".s0-\"x\"->:s2=>1\n" +
+			".s0-{\"\\u0000\"..\"w\", \"y\"..\"\\uFFFE\"}->:s1=>2\n";
 		checkDecision(g, 1, expecting, null);
 
 		// The optimizer yanks out all exit branches from EBNF blocks
-		// This is ok because we've already verified there are no problems
+		// This is ok because we\"ve already verified there are no problems
 		// with the enter/exit decision
 		DFAOptimizer optimizer = new DFAOptimizer(g);
 		optimizer.optimize();
 		FASerializer serializer = new FASerializer(g);
 		DFA dfa = g.getLookaheadDFA(1);
 		String result = serializer.serialize(dfa.startState);
-		expecting = ".s0-'x'->:s1=>1\n";
+		expecting = ".s0-\"x\"->:s1=>1\n";
 		assertEqual(result, expecting);
 	}
 
@@ -215,30 +215,30 @@ public class TestCharDFAConversion extends TestSuite {
 			"lexer grammar t;\n"+
 			"CMT : \"/*\" ( options {greedy=false;} : . )* \"*/\" ;");
 		String expecting =
-			".s0-'*'->.s1\n" +
-			".s0-{'\\u0000'..')', '+'..'\\uFFFE'}->:s3=>1\n" +
-			".s1-'/'->:s2=>2\n" +
-			".s1-{'\\u0000'..'.', '0'..'\\uFFFE'}->:s3=>1\n";
+			".s0-\"*\"->.s1\n" +
+			".s0-{\"\\u0000\"..\")\", \"+\"..\"\\uFFFE\"}->:s3=>1\n" +
+			".s1-\"/\"->:s2=>2\n" +
+			".s1-{\"\\u0000\"..\".\", \"0\"..\"\\uFFFE\"}->:s3=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testNonGreedyWildcardStar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"SLCMT : \"//\" ( options {greedy=false;} : . )* '\n' ;");
+			"SLCMT : \"//\" ( options {greedy=false;} : . )* \"\n\" ;");
 		String expecting =
-			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-\"\\n\"->:s1=>2\n" +
+			".s0-{\"\\u0000\"..\"\\t\", \"\\u000B\"..\"\\uFFFE\"}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testNonGreedyByDefaultWildcardStar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"SLCMT : \"//\" .* '\n' ;");
+			"SLCMT : \"//\" .* \"\n\" ;");
 		String expecting =
-			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-\"\\n\"->:s1=>2\n" +
+			".s0-{\"\\u0000\"..\"\\t\", \"\\u000B\"..\"\\uFFFE\"}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -247,49 +247,49 @@ public class TestCharDFAConversion extends TestSuite {
 		// iterations at runtime
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"SLCMT : \"//\" ( options {greedy=false;} : . )+ '\n' ;");
+			"SLCMT : \"//\" ( options {greedy=false;} : . )+ \"\n\" ;");
 		String expecting =
-			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-\"\\n\"->:s1=>2\n" +
+			".s0-{\"\\u0000\"..\"\\t\", \"\\u000B\"..\"\\uFFFE\"}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testNonGreedyByDefaultWildcardPlus() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"SLCMT : \"//\" .+ '\n' ;");
+			"SLCMT : \"//\" .+ \"\n\" ;");
 		String expecting =
-			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-\"\\n\"->:s1=>2\n" +
+			".s0-{\"\\u0000\"..\"\\t\", \"\\u000B\"..\"\\uFFFE\"}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testNonGreedyByDefaultWildcardPlusWithParens() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"SLCMT : \"//\" (.)+ '\n' ;");
+			"SLCMT : \"//\" (.)+ \"\n\" ;");
 		String expecting =
-			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-\"\\n\"->:s1=>2\n" +
+			".s0-{\"\\u0000\"..\"\\t\", \"\\u000B\"..\"\\uFFFE\"}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testNonWildcardNonGreedy() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"DUH : (options {greedy=false;}:'x'|'y')* \"xy\" ;");
+			"DUH : (options {greedy=false;}:\"x\"|\"y\")* \"xy\" ;");
 		String expecting =
-			".s0-'x'->.s1\n" +
-			".s0-'y'->:s4=>2\n" +
-			".s1-'x'->:s3=>1\n" +
-			".s1-'y'->:s2=>3\n";
+			".s0-\"x\"->.s1\n" +
+			".s0-\"y\"->:s4=>2\n" +
+			".s1-\"x\"->:s3=>1\n" +
+			".s1-\"y\"->:s2=>3\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
 	public void testNonGreedyLoopThatNeverLoops() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"DUH : (options {greedy=false;}:'x')+ ;"); // loop never matched
+			"DUH : (options {greedy=false;}:\"x\")+ ;"); // loop never matched
 		String expecting =
 			":s0=>2\n";
 
