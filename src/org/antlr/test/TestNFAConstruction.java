@@ -705,7 +705,6 @@ public class TestNFAConstruction extends TestSuite {
 			"A : '{' ~('}')* '}';\n");
 		String result = g.getLexerGrammar();
 		String expecting =
-			"header {}\n" +
 			"lexer grammar tLexer;\n" +
 			"\n" +
 			"A : '{' (~ '}' )* '}' ;";

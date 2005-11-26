@@ -206,7 +206,38 @@ CHANGES
 
 3.0ea7 - 
 
-* changed $dynamicscope.value to $dynamicscope::value 
+* action syntax changed "@scope::actionname {action}" where scope defaults
+  to "parser" if parser grammar or combined grammar, "lexer" if lexer grammar,
+  and "treeparser" if tree grammar.  The code generation targets decide
+  what scopes are available.  Each "scope" yields a hashtable for use in
+  the output templates.  The scopes full of actions are sent to all output
+  file templates (currently headerFile and outputFile) as attribute actions.
+  Then you can reference <actions.scope> to get the map of actions associated
+  with scope and <actions.parser.header> to get the parser's header action
+  for example.  This should be very flexible.  The target should only have
+  to define which scopes are valid, but the action names should be variable
+  so we don't have to recompile ANTLR to add actions to code gen templates.
+
+  grammar T;
+  options {language=Java;}
+  @header { package foo; }
+  @parser::stuff { int i; } // names within scope not checked; target dependent
+  @members { int i; }
+  @lexer::header {head}
+  @lexer::members { int j; }
+  @headerfile::blort {...} // error: this target doesn't have headerfile
+  @treeparser::members {...} // error: this is not a tree parser
+  a
+  @init {int i;}
+    : ID
+    ;
+  ID : 'a'..'z';
+
+  For now, the Java target uses members and header as a valid name.  Within a
+  rule, the init action name is valid.
+
+* changed $dynamicscope.value to $dynamicscope::value even if value is defined
+  in same rule such as $function::name where rule function defines name.
 
 * $dynamicscope gets you the stack
 

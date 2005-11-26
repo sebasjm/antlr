@@ -556,7 +556,7 @@ public class TestDFAConversion extends TestSuite {
 			"a : A | B | C ;"
 		);
 		String expecting =
-			" ( grammar t ( rule a ARG RET INITACTION ( BLOCK ( ALT ( SET A B C ) <end-of-alt> ) <end-of-block> ) <end-of-rule> ) )";
+			" ( grammar t ( rule a ARG RET scope ( BLOCK ( ALT ( SET A B C ) <end-of-alt> ) <end-of-block> ) <end-of-rule> ) )";
 		assertEqual(g.getGrammarTree().toStringTree(),
 					expecting);
 	}

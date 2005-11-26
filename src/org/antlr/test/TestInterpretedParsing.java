@@ -171,7 +171,7 @@ public class TestInterpretedParsing extends TestSuite {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toStringTree();
 		String expecting =
-			"(<grammar p> (prog [@0,0:4='while',<4>,1:0] [@2,6:6='x',<5>,1:6] [@4,8:8='{',<6>,1:8] (assign [@6,10:10='i',<5>,1:10] [@7,11:11='=',<8>,1:11] (expr NoViableAltException(9!=[4:1: expr : ({;} INT | FLOAT | ID );])))))";
+			"(<grammar p> (prog [@0,0:4='while',<4>,1:0] [@2,6:6='x',<5>,1:6] [@4,8:8='{',<6>,1:8] (assign [@6,10:10='i',<5>,1:10] [@7,11:11='=',<8>,1:11] (expr NoViableAltException(9!=[4:1: expr : ( INT | FLOAT | ID );])))))";
 		assertEqual(result, expecting);
 	}
 

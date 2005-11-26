@@ -28,11 +28,7 @@
 package org.antlr.test;
 
 import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
 import org.antlr.tool.Grammar;
-import org.antlr.tool.FASerializer;
-import org.antlr.analysis.State;
-import antlr.RecognitionException;
 
 public class TestASTConstruction extends TestSuite {
 
@@ -45,7 +41,7 @@ public class TestASTConstruction extends TestSuite {
 				"parser grammar P;\n"+
 				"a : A;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT A <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT A <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -56,7 +52,7 @@ public class TestASTConstruction extends TestSuite {
 				"A : B+;\n" +
 				"B : 'a';");
 		String expecting =
-			" ( rule A ARG RET INITACTION ( BLOCK ( ALT ( + ( BLOCK ( ALT B <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule A ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT B <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("A").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -67,7 +63,7 @@ public class TestASTConstruction extends TestSuite {
 				"a : (b)+;\n" +
 				"b : B;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( + ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -78,7 +74,7 @@ public class TestASTConstruction extends TestSuite {
 				"a : b+;\n" +
 				"b : B;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( + ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -89,7 +85,7 @@ public class TestASTConstruction extends TestSuite {
 				"a : (b)?;\n" +
 				"b : B;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( ? ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -100,7 +96,7 @@ public class TestASTConstruction extends TestSuite {
 				"a : b?;\n" +
 				"b : B;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( ? ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -111,7 +107,7 @@ public class TestASTConstruction extends TestSuite {
 				"a : (b)*;\n" +
 				"b : B;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( * ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -122,7 +118,7 @@ public class TestASTConstruction extends TestSuite {
 				"a : b*;\n" +
 				"b : B;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( * ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -132,7 +128,7 @@ public class TestASTConstruction extends TestSuite {
 				"grammar P;\n"+
 				"a : 'a'*;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( * ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -142,7 +138,7 @@ public class TestASTConstruction extends TestSuite {
 				"lexer grammar P;\n"+
 				"B : 'b'*;");
 		String expecting =
-			" ( rule B ARG RET INITACTION ( BLOCK ( ALT ( * ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule B ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -152,7 +148,7 @@ public class TestASTConstruction extends TestSuite {
 				"grammar P;\n"+
 				"a : \"while\"*;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( * ( BLOCK ( ALT \"while\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT \"while\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -162,7 +158,7 @@ public class TestASTConstruction extends TestSuite {
 				"lexer grammar P;\n"+
 				"B : \"while\"*;");
 		String expecting =
-			" ( rule B ARG RET INITACTION ( BLOCK ( ALT ( * ( BLOCK ( ALT \"while\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule B ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT \"while\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -172,7 +168,7 @@ public class TestASTConstruction extends TestSuite {
 				"grammar P;\n"+
 				"a : 'a'+;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( + ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -182,7 +178,7 @@ public class TestASTConstruction extends TestSuite {
 				"lexer grammar P;\n"+
 				"B : 'b'+;");
 		String expecting =
-			" ( rule B ARG RET INITACTION ( BLOCK ( ALT ( + ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule B ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -192,7 +188,7 @@ public class TestASTConstruction extends TestSuite {
 				"grammar P;\n"+
 				"a : 'a'?;");
 		String expecting =
-			" ( rule a ARG RET INITACTION ( BLOCK ( ALT ( ? ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -202,7 +198,7 @@ public class TestASTConstruction extends TestSuite {
 				"lexer grammar P;\n"+
 				"B : 'b'?;");
 		String expecting =
-			" ( rule B ARG RET INITACTION ( BLOCK ( ALT ( ? ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule B ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -212,7 +208,7 @@ public class TestASTConstruction extends TestSuite {
 				"lexer grammar P;\n"+
 				"ID : 'a'..'z'+;");
 		String expecting =
-			" ( rule ID ARG RET INITACTION ( BLOCK ( ALT ( + ( BLOCK ( ALT ( .. 'a' 'z' ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule ID ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT ( .. 'a' 'z' ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("ID").tree.toStringTree();
 		assertEqual(found,expecting);
 	}

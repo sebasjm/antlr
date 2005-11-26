@@ -77,7 +77,7 @@ public class TestAttributes extends TestSuite {
 		String expecting = "int $n; \"$in string$\"";
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-			"{"+action+"}\n"+
+			"@members {"+action+"}\n"+
 		    "a[User u, int i]\n" +
 			"        : {"+action+"}\n" +
 			"        ;");
@@ -508,7 +508,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-			"{\"+action+\"}\n" +
+			"@members {\"+action+\"}\n" +
 			"a : ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -538,7 +538,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-			"{\"+action+\"}\n" +
+			"@members {\"+action+\"}\n" +
 			"a : ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -641,7 +641,7 @@ public class TestAttributes extends TestSuite {
 			"  int n;\n" +
 			"  List names;\n" +
 			"}\n" +
-			"{\"+action+\"}\n" +
+			"@members {\"+action+\"}\n" +
 			"a : \n" +
 			"  ;\n");
 		Tool antlr = new Tool();
@@ -669,7 +669,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"{"+action+"}\n" +
+			"@members {"+action+"}\n" +
 			"a\n" +
 			"scope { int name; }\n" +
 			"  : {foo();}\n" +

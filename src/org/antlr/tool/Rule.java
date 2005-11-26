@@ -85,6 +85,15 @@ public class Rule {
 	 */
 	protected Map labelNameSpace = new HashMap();
 
+	/** Map a name to an action for this rule.  Currently init is only
+	 *  one we use, but we can add more in future.
+	 *  Map<String,GrammarAST>>
+	 *  The code generator will use this to fill holes in the rule template.
+	 *  I track the AST node for the action in case I need the line number
+	 *  for errors.
+	 */
+	protected Map actions = new HashMap();
+
 	public int numberOfAlts;
 
 	/** Each alt has a Map<tokenRefName,List<tokenRefAST>>; range 1..numberOfAlts.
@@ -348,6 +357,34 @@ public class Rule {
 			return ((Attribute)javaSucks[0]).name;
 		}
 		return null;
+	}
+
+	/** Given @scope::name {action} define it for this grammar.  Later,
+	 *  the code generator will ask for the actions table.
+	 */
+	public void defineAction(GrammarAST ampersandAST,
+							 GrammarAST nameAST,
+							 GrammarAST actionAST)
+	{
+		//System.out.println("rule @"+nameAST.getText()+"{"+actionAST.getText()+"}");
+		String name = nameAST.getText();
+		GrammarAST a = (GrammarAST)actions.get(name);
+		if ( a!=null ) {
+			ErrorManager.grammarError(
+				ErrorManager.MSG_ACTION_REDEFINITION,grammar,
+				nameAST.getToken(),nameAST.getText());
+		}
+		else {
+			actions.put(name,actionAST);
+		}
+	}
+
+	public Map getActions() {
+		return actions;
+	}
+
+	public void setActions(Map actions) {
+		this.actions = actions;
 	}
 
 	/** Save the option key/value pair and process it; return the key

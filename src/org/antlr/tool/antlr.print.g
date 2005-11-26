@@ -108,17 +108,12 @@ this.showActions = showActions;
 // --------------
 
 grammar
-    :   (headerSpec)*
-	    ( #( LEXER_GRAMMAR grammarSpec["lexer " ] )
+    :   ( #( LEXER_GRAMMAR grammarSpec["lexer " ] )
 	    | #( PARSER_GRAMMAR grammarSpec["parser "] )
 	    | #( TREE_GRAMMAR grammarSpec["tree "] )
 	    | #( COMBINED_GRAMMAR grammarSpec[""] )
 	    )
      ;
-
-headerSpec
-    :   #( "header" (ID)? a:ACTION {out("header {"+#a.getText()+"}\n");} )
-    ;
 
 attrScope
 	:	#( "scope" ID ACTION )
@@ -130,9 +125,32 @@ grammarSpec[String gtype]
         (optionsSpec)? {out(";\n");}
         (tokensSpec)?
         (attrScope)*
-        (ACTION {if ( showActions ) out(#ACTION.getText());} )?
+        (actions)?
         rules
     ;
+
+actions
+	:	( action )+
+	;
+
+action
+{
+String scope=null, name=null;
+String action=null;
+}
+	:	#(AMPERSAND id1:ID
+			( id2:ID a1:ACTION
+			  {scope=#id1.getText(); name=#a1.getText(); action=#a1.getText();}
+			| a2:ACTION
+			  {scope=null; name=#id1.getText(); action=#a2.getText();}
+			)
+		 )
+		 {
+		 if ( showActions ) {
+		 	out("@"+(scope!=null?scope+"::":"")+name+action);
+		 }
+		 }
+	;
 
 optionsSpec
     :   #( OPTIONS {out("options {");}
@@ -187,10 +205,15 @@ rule
            {out(" : ");}
            (optionsSpec)?
            (ruleScopeSpec)?
-           #( INITACTION (ia:ACTION {if ( showActions ) out(#ia.getText());} )? )
+		   (ruleAction)*
            b:block[false] EOR {out(";\n");}
          )
     ;
+
+ruleAction
+	:	#(AMPERSAND id:ID a:ACTION )
+		{if ( showActions ) out("@"+#id.getText()+"{"+#a.getText()+"}");}
+	;
 
 modifier
 {out(#modifier.getText()); out(" ");}

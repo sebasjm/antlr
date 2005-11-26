@@ -46,7 +46,7 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 	public void testSimpleCyclicDFAWithInstanceVarPredicate() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
-			"{boolean v=true;}\n" +
+			"@members {boolean v=true;}\n" +
 			"a :      'x'* 'y' {System.out.println(\"alt1\");}\n" +
 			"  | {v}? 'x'* 'y' {System.out.println(\"alt2\");}\n" +
 			"  ;\n" ;
@@ -60,7 +60,7 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 	public void testPredicateValidation() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
-			"{\n" +
+			"@members {\n" +
 			"public void reportError(RecognitionException e) {\n" +
 			"    System.out.println(\"error: \"+e.toString());\n" +
 			"}\n" +

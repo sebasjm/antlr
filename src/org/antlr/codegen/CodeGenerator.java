@@ -283,12 +283,7 @@ public class CodeGenerator {
 
 		// OUTPUT FILE (contains recognizerST)
 		outputFileST = templates.getInstanceOf("outputFile");
-		/*
-		outputFileST.setAttribute("buildTemplate",
-								  new Boolean(grammar.type!=Grammar.LEXER&&
-											  grammar.buildTemplate()));
-*/
-		
+
 		// HEADER FILE
 		if ( templates.isDefined("headerFile") ) {
 			headerFileST = templates.getInstanceOf("headerFile");
@@ -298,6 +293,15 @@ public class CodeGenerator {
 			headerFileST = new StringTemplate(templates,"");
 			headerFileST.setName("dummy-header-file");
 		}
+
+		// Ok, the only two possible output files are available now.
+		// Verify action scopes are ok for target and dump actions into output
+		// Templates can say <actions.parser.header> for example.
+		verifyActionScopesOkForTarget(grammar.getActions());
+		// translate $x::y references
+		translateActionAttributeReferences(grammar.getActions());
+		headerFileST.setAttribute("actions", grammar.getActions());
+		outputFileST.setAttribute("actions", grammar.getActions());
 
 		// RECOGNIZER
 		if ( grammar.type==Grammar.LEXER ) {
@@ -318,6 +322,8 @@ public class CodeGenerator {
 			headerFileST.setAttribute("TREE_PARSER", new Boolean(true));
 		}
 		outputFileST.setAttribute("recognizer", recognizerST);
+		outputFileST.setAttribute("actionScope",
+								  grammar.getDefaultActionScope(grammar.type));
 
 		outputFileST.setAttribute("fileName", grammar.getFileName());
 		outputFileST.setAttribute("ANTLRVersion", Tool.VERSION);
@@ -364,6 +370,57 @@ public class CodeGenerator {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE,
 							   getVocabFileName(),
 							   ioe);
+		}
+	}
+
+	/** Some targets will have some extra scopes like C++ may have
+	 *  @headerfile:name {action} or something.  Make sure the
+	 *  target likes the scopes in action table.
+	 */
+	protected void verifyActionScopesOkForTarget(Map actions) {
+		Set actionScopeKeySet = actions.keySet();
+		for (Iterator it = actionScopeKeySet.iterator(); it.hasNext();) {
+			String scope = (String)it.next();
+			if ( !target.isValidActionScope(grammar.type, scope) ) {
+				// get any action from the scope to get error location
+				Map scopeActions = (Map)actions.get(scope);
+				GrammarAST actionAST =
+					(GrammarAST)scopeActions.values().iterator().next();
+				ErrorManager.grammarError(
+					ErrorManager.MSG_INVALID_ACTION_SCOPE,grammar,
+					actionAST.getToken(),scope,
+					Grammar.grammarTypeToString[grammar.type]);
+			}
+		}
+	}
+
+	/** Actions may reference $x::y attributes, call translateAction on
+	 *  each action and replace that action in the Map.
+	 */
+	protected void translateActionAttributeReferences(Map actions) {
+		Set actionScopeKeySet = actions.keySet();
+		for (Iterator it = actionScopeKeySet.iterator(); it.hasNext();) {
+			String scope = (String)it.next();
+			Map scopeActions = (Map)actions.get(scope);
+			translateActionAttributeReferencesForSingleScope(null,scopeActions);
+		}
+	}
+
+	/** Use for translating rule @init{...} actions that have no scope */
+	protected void translateActionAttributeReferencesForSingleScope(
+		Rule r,
+		Map scopeActions)
+	{
+		String ruleName=null;
+		if ( r!=null ) {
+			ruleName = r.name;
+		}
+		Set actionNameSet = scopeActions.keySet();
+		for (Iterator nameIT = actionNameSet.iterator(); nameIT.hasNext();) {
+			String name = (String) nameIT.next();
+			GrammarAST actionAST = (GrammarAST)scopeActions.get(name);
+			String action = translateAction(ruleName,actionAST);
+			scopeActions.put(name, action); // replace with translation
 		}
 	}
 

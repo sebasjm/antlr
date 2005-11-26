@@ -450,7 +450,7 @@ adaptor.addChild(root_<treeLevel>, <label>.tree);<\n>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-adaptor.addChild(root_<treeLevel>, ((RuleReturn)list_<label>.get(i_<rewriteBlockLevel>)).tree);<\n>
+adaptor.addChild(root_<treeLevel>, ((RuleReturnScope)list_<label>.get(i_<rewriteBlockLevel>)).getTree());<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
@@ -460,5 +460,5 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<treeLe
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(((RuleReturn)list_<label>.get(i_<rewriteBlockLevel>)).tree, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(((RuleReturnScope)list_<label>.get(i_<rewriteBlockLevel>)).getTree(), root_<treeLevel>);<\n>
 >>

@@ -155,6 +155,8 @@ public class ErrorManager {
 	public static final int MSG_UNKNOWN_DYNAMIC_SCOPE = 140;
 	public static final int MSG_UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE = 141;
 	public static final int MSG_ISOLATED_RULE_ATTRIBUTE = 142;
+	public static final int MSG_INVALID_ACTION_SCOPE = 143;
+	public static final int MSG_ACTION_REDEFINITION = 144;
 
 
 	// GRAMMAR WARNINGS

@@ -158,6 +158,14 @@ public class Grammar {
 				}
 			};
 
+	/** Map a scope to a map of name:action pairs.
+	 *  Map<String, Map<String,GrammarAST>>
+	 *  The code generator will use this to fill holes in the output files.
+	 *  I track the AST node for the action in case I need the line number
+	 *  for errors.
+	 */
+	protected Map actions = new HashMap();
+
     /** The NFA that represents the grammar with edges labelled with tokens
      *  or epsilon.  It is more suitable to analysis than an AST representation.
      */
@@ -272,13 +280,13 @@ public class Grammar {
 	 */
 	protected StringTemplate lexerGrammarST =
 		new StringTemplate(
-			"header {<header>}\n" +
 			"lexer grammar <name>Lexer;\n" +
 			"<if(options)>" +
 			"options {\n" +
 			"  <options:{<it.name>=<it.value>;<\\n>}>\n" +
 			"}<\\n>\n" +
 			"<endif>\n" +
+			"<actionNames,actions:{n,a|@<n> {<a>}\n}>\n" +
 			"<literals:{<it.ruleName> : <it.literal> ;\n}>\n" +
 			"<rules; separator=\"\n\n\">",
 			AngleBracketTemplateLexer.class
@@ -425,6 +433,13 @@ public class Grammar {
 			return null;
 		}
 		lexerGrammarST.setAttribute("name", name);
+		// if there are any actions set for lexer, pass them in
+		if ( actions.get("lexer")!=null ) {
+			lexerGrammarST.setAttribute("actionNames",
+										((Map)actions.get("lexer")).keySet());
+			lexerGrammarST.setAttribute("actions",
+										((Map)actions.get("lexer")).values());
+		}
 		// make sure generated grammar has the same options
 		if ( options!=null ) {
 			Iterator optionNames = options.keySet().iterator();
@@ -666,6 +681,57 @@ public class Grammar {
 	public void defineGrammarHeader(GrammarAST nameAST, GrammarAST actionAST) {
 		// ignore name of header space for now
 		lexerGrammarST.setAttribute("header", actionAST.getText());
+	}
+
+	/** Given @scope::name {action} define it for this grammar.  Later,
+	 *  the code generator will ask for the actions table.
+	 */
+	public void defineAction(GrammarAST ampersandAST,
+							 String scope,
+							 GrammarAST nameAST,
+							 GrammarAST actionAST)
+	{
+		if ( scope==null ) {
+			scope = getDefaultActionScope(type);
+		}
+		//System.out.println("@"+scope+"::"+nameAST.getText()+"{"+actionAST.getText()+"}");
+		String name = nameAST.getText();
+		Map scopeActions = (Map)actions.get(scope);
+		if ( scopeActions==null ) {
+			scopeActions = new HashMap();
+			actions.put(scope, scopeActions);
+		}
+		GrammarAST a = (GrammarAST)scopeActions.get(name);
+		if ( a!=null ) {
+			ErrorManager.grammarError(
+				ErrorManager.MSG_ACTION_REDEFINITION,this,
+				nameAST.getToken(),nameAST.getText());
+		}
+		else {
+			scopeActions.put(name,actionAST);
+		}
+	}
+
+	public Map getActions() {
+		return actions;
+	}
+
+	/** Given a grammar type, what should be the default action scope?
+	 *  If I say @members in a COMBINED grammar, for example, the
+	 *  default scope should be "parser".
+	 */
+	public String getDefaultActionScope(int grammarType) {
+		switch (grammarType) {
+			case Grammar.LEXER :
+				return "lexer";
+			case Grammar.PARSER :
+				return "parser";
+			case Grammar.COMBINED :
+				return "parser";
+			case Grammar.TREE_PARSER :
+				return "treeparser";
+		}
+		return null;
 	}
 
 	public void defineLexerRuleFoundInParser(antlr.Token ruleToken, GrammarAST ruleAST) {

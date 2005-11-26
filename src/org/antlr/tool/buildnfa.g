@@ -126,17 +126,12 @@ protected void finish() {
 
 grammar
     :   {init();}
-        (headerSpec)*
-	    ( #( LEXER_GRAMMAR grammarSpec )
+        ( #( LEXER_GRAMMAR grammarSpec )
 	    | #( PARSER_GRAMMAR grammarSpec )
 	    | #( TREE_GRAMMAR grammarSpec )
 	    | #( COMBINED_GRAMMAR grammarSpec )
 	    )
         {finish();}
-    ;
-
-headerSpec
-    :   #( "header" (ID)? ACTION )
     ;
 
 attrScope
@@ -149,7 +144,7 @@ grammarSpec
         ( #(OPTIONS .) )?
         ( #(TOKENS .) )?
         (attrScope)*
-        (ACTION)?
+        (AMPERSAND)* // skip actions
         rules
 	;
 
@@ -170,7 +165,7 @@ rule
         (RET (ARG_ACTION)?)
 		( OPTIONS )?
 		( ruleScopeSpec )?
-           #( INITACTION (ACTION)? )
+		   (AMPERSAND)*
            #(BLOCK b=block EOB) EOR
            {
            if ( r.equals(Grammar.TOKEN_RULENAME) ) {

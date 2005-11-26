@@ -438,8 +438,7 @@ grammar[Grammar g]
 {
 	init(g);
 }
-    :   (headerSpec)*
-	    ( #( LEXER_GRAMMAR 	  {grammar.type = Grammar.LEXER;} 	  grammarSpec )
+    :   ( #( LEXER_GRAMMAR 	  {grammar.type = Grammar.LEXER;} 	  	grammarSpec )
 	    | #( PARSER_GRAMMAR   {grammar.type = Grammar.PARSER;}      grammarSpec )
 	    | #( TREE_GRAMMAR     {grammar.type = Grammar.TREE_PARSER;} grammarSpec )
 	    | #( COMBINED_GRAMMAR {grammar.type = Grammar.COMBINED;}    grammarSpec )
@@ -447,23 +446,14 @@ grammar[Grammar g]
         {assignTypes();}
     ;
 
-headerSpec
-    :   #( "header" a:ACTION )
-    ;
-
 grammarSpec
 {Map opts=null;}
 	:	id:ID {grammar.name = #id.getText();}
 		(cmt:DOC_COMMENT)?
 		(optionsSpec)?
-/*
-        ( {Token optionsStartToken=((GrammarAST)_t).getToken();}
-          opts=optionsSpec {grammar.setOptions(opts, optionsStartToken);}
-        )?
-*/
         (tokensSpec)?
         (attrScope)*
-        (ACTION)?
+        (AMPERSAND)* // skip actions
         rules
 	;
 
@@ -535,7 +525,7 @@ rule
            (RET (ARG_ACTION)?)
            (optionsSpec)?
            (ruleScopeSpec)?
-           #( INITACTION (ACTION)? )
+       	   (AMPERSAND)*
            b:block EOR
            {trackTokenRule(#id,#m,#b);}
          )

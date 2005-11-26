@@ -104,18 +104,12 @@ grammar[Grammar g]
 grammar = g;
 root = #grammar;
 }
-    :   (headerSpec)*
-	    ( #( LEXER_GRAMMAR 	  {grammar.type = Grammar.LEXER;} 	    grammarSpec )
+    :   ( #( LEXER_GRAMMAR 	  {grammar.type = Grammar.LEXER;} 	    grammarSpec )
 	    | #( PARSER_GRAMMAR   {grammar.type = Grammar.PARSER;}      grammarSpec )
 	    | #( TREE_GRAMMAR     {grammar.type = Grammar.TREE_PARSER;} grammarSpec )
 	    | #( COMBINED_GRAMMAR {grammar.type = Grammar.COMBINED;}    grammarSpec )
 	    )
 	    {finish();}
-    ;
-
-headerSpec
-    :   #( "header" (name:ID)? a:ACTION
-        {grammar.defineGrammarHeader(#name, #a);} )
     ;
 
 attrScope
@@ -140,8 +134,29 @@ Token optionsStartToken=null;
         )?
         (tokensSpec)?
         (attrScope)*
-        (ACTION)?
+        (actions)?
         rules
+	;
+
+actions
+	:	( action )+
+	;
+
+action
+{
+String scope=null;
+GrammarAST nameAST=null, actionAST=null;
+}
+	:	#(amp:AMPERSAND id1:ID
+			( id2:ID a1:ACTION
+			  {scope=#id1.getText(); nameAST=#id2; actionAST=#a1;}
+			| a2:ACTION
+			  {scope=null; nameAST=#id1; actionAST=#a2;}
+			)
+		 )
+		 {
+		 grammar.defineAction(#amp,scope,nameAST,actionAST);
+		 }
 	;
 
 optionsSpec returns [Map opts=new HashMap()]
@@ -231,7 +246,7 @@ Rule r = null;
 			}
 			}
            (ruleScopeSpec[r])?
-           #( INITACTION (ACTION)? )
+		   (ruleAction[r])*
            {this.blockLevel=0;}
            b:block EOR
            {
@@ -243,10 +258,14 @@ Rule r = null;
     ;
 
 countAltsForRule returns [int n=0]
-    :   #( RULE id:ID (modifier)? ARG RET (OPTIONS)? ("scope")? INITACTION
+    :   #( RULE id:ID (modifier)? ARG RET (OPTIONS)? ("scope")? (AMPERSAND)*
            #(  BLOCK (OPTIONS)? (ALT (REWRITE)* {n++;})+ EOB )
            EOR
          )
+	;
+
+ruleAction[Rule r]
+	:	#(amp:AMPERSAND id:ID a:ACTION ) {r.defineAction(#amp,#id,#a);}
 	;
 
 modifier returns [String mod]
@@ -285,12 +304,18 @@ if ( this.blockLevel==1 ) {this.outerAltNum=1;}
 }
     :   #(  BLOCK
             (opts=optionsSpec {#block.setOptions(grammar,opts);})?
+            (blockAction)*
             ( alternative rewrite
               {if ( this.blockLevel==1 ) {this.outerAltNum++;}}
             )+
             EOB
          )
     ;
+
+// TODO: this does nothing now! subrules cannot have init actions. :(
+blockAction
+	:	#(amp:AMPERSAND id:ID a:ACTION ) // {r.defineAction(#amp,#id,#a);}
+	;
 
 alternative
 {
@@ -339,7 +364,7 @@ element
     |   ebnf
     |   tree
     |   #( SYNPRED block )
-    |   act:ACTION // doing in codegen now {#act.outerAltNum = this.outerAltNum;}
+    |   act:ACTION
     |   SEMPRED
     |   EPSILON 
     ;

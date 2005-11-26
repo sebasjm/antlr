@@ -110,6 +110,31 @@ public class Target {
 		grammar.createLookaheadDFAs();
 	}
 
+	/** Is scope in @scope::name {action} valid for this kind of grammar?
+	 *  Targets like C++ may want to allow new scopes like headerfile or
+	 *  some such.  The action names themselves are not policed at the
+	 *  moment so targets can add template actions w/o having to recompile
+	 *  ANTLR.
+	 */
+	public boolean isValidActionScope(int grammarType, String scope) {
+		switch (grammarType) {
+			case Grammar.LEXER :
+				if ( scope.equals("lexer") ) {return true;}
+				break;
+			case Grammar.PARSER :
+				if ( scope.equals("parser") ) {return true;}
+				break;
+			case Grammar.COMBINED :
+				if ( scope.equals("parser") ) {return true;}
+				if ( scope.equals("lexer") ) {return true;}
+				break;
+			case Grammar.TREE_PARSER :
+				if ( scope.equals("treeparser") ) {return true;}
+				break;
+		}
+		return false;
+	}
+
 	/** Convert from an ANTLR char literal found in a grammar file to
 	 *  an equivalent char literal in the target language.  For Java, this
 	 *  is the identify translation; i.e., '\n' -> '\n'.  Most languages

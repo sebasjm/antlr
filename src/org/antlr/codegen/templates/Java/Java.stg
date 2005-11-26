@@ -42,13 +42,14 @@ javaTypeInitMap ::= [
 /** The overall file structure of a recognizer; stores methods for rules
  *  and cyclic DFAs plus support code.
  */
-outputFile(LEXER,PARSER,TREE_PARSER, headerAction, docComment, recognizer,
+outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
+           docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
            buildTemplate, profile,
 	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
-<headerAction>
+<actions.(actionScope).header>
 
 <@imports>
 import org.antlr.runtime.*;
@@ -64,10 +65,10 @@ import java.util.ArrayList;
 <recognizer>
 >>
 
-lexer(name, tokens, globalAction, rules, cyclicDFAs) ::= <<
+lexer(name, tokens, rules, cyclicDFAs) ::= <<
 public class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
-    <globalAction>
+    <actions.lexer.members>
     public <name>(CharStream input) {
         super(input);
     }
@@ -98,7 +99,7 @@ retry:
 >>
 
 /** How to generate a parser */
-genericParser(name, scopes, tokens, tokenNames, globalAction, rules,
+genericParser(name, scopes, tokens, tokenNames, rules,
               cyclicDFAs, bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType) ::= <<
 public class <name> extends <@superClassName><superClass><@end> {
@@ -113,7 +114,7 @@ public class <name> extends <@superClassName><superClass><@end> {
 
     public String[] getTokenNames() { return tokenNames; }
 
-    <globalAction>
+    <actions.parser.members>
 
     <rules; separator="\n\n">
 
@@ -126,7 +127,7 @@ public class <name> extends <@superClassName><superClass><@end> {
 }
 >>
 
-parser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
+parser(name, scopes, tokens, tokenNames, rules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
 <genericParser(inputStreamType="TokenStream", ...)>
 >>
 
@@ -140,7 +141,7 @@ treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bi
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,initAction,block,emptyRule,description) ::= <<
+rule(ruleName,ruleDescriptor,block,emptyRule,description) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
@@ -149,7 +150,7 @@ rule(ruleName,ruleDescriptor,initAction,block,emptyRule,description) ::= <<
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <ruleDeclarations()>
     <ruleLabelDefs()>
-    <initAction>
+    <ruleDescriptor.actions.init>
     <@preamble()>
 <if(emptyRule)>
     <block>
@@ -220,9 +221,9 @@ retval.stop = (<labelType>)input.LT(-1);
 /** How to generate a rule in the lexer; naked blocks are used for
  *  fragment rules.
  */
-lexerRule(ruleName,nakedBlock,ruleDescriptor,initAction,block) ::= <<
+lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
 public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
-<initAction>
+<ruleDescriptor.actions.init>
 <if(nakedBlock)>
     <block><\n>
 <else>

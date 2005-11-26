@@ -225,17 +225,12 @@ grammar[Grammar g,
 		recognizerST.setAttribute("ASTLabelType", g.getOption("ASTLabelType"));
 	}
 }
-    :   (headerSpec[outputFileST])*
-	    ( #( LEXER_GRAMMAR grammarSpec )
+    :   ( #( LEXER_GRAMMAR grammarSpec )
 	    | #( PARSER_GRAMMAR grammarSpec )
 	    | #( TREE_GRAMMAR grammarSpec
 	       )
 	    | #( COMBINED_GRAMMAR grammarSpec )
 	    )
-    ;
-
-headerSpec[StringTemplate outputFileST]
-    :   #( "header" (ID)? a:ACTION {outputFileST.setAttribute("headerAction", #a.getText());} )
     ;
 
 attrScope
@@ -256,10 +251,7 @@ grammarSpec
 		( #(OPTIONS .) )?
 		( #(TOKENS .) )?
         (attrScope)*
-        ( act:ACTION
-          {recognizerST.setAttribute("globalAction",
-                           generator.translateAction(null,#act));}
-        )?
+        (AMPERSAND)*
 		rules[recognizerST]
 	;
 
@@ -296,9 +288,12 @@ rule returns [StringTemplate code=null]
             (RET (ARG_ACTION)?)
 			( #(OPTIONS .) )?
 			(ruleScopeSpec)?
+		    (AMPERSAND)*
+		    /*
             #( INITACTION
                (ia:ACTION {initAction=generator.translateAction(r,#ia);})?
              )
+            */
 	     	b=block["ruleBlock", dfa] EOR
          )
         {
@@ -346,6 +341,11 @@ rule returns [StringTemplate code=null]
 			 	    generator.target.getTargetStringLiteralFromString(description);
 				code.setAttribute("description", description);
 			}
+			Rule theRule = grammar.getRule(r);
+			generator.translateActionAttributeReferencesForSingleScope(
+				theRule,
+				theRule.getActions()
+			);
 			code.setAttribute("ruleName", r);
 			code.setAttribute("block", b);
 			if ( initAction!=null ) {

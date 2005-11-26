@@ -123,25 +123,19 @@ tokens {
 }
 
 grammar!
-   :    hdr:headerSpec
+   :    //hdr:headerSpec
         ( ACTION )?
 	    ( cmt:DOC_COMMENT  )?
         gr:grammarType gid:id SEMI
 		    (opt:optionsSpec)?
 		    (ts:tokensSpec!)?
         	scopes:attrScopes
-		    ( a:ACTION! )?
+		    (a:actions)?
 	        r:rules
         EOF
         {
-        #grammar = #(null, #hdr, #(#gr, #gid, #cmt, #opt, #ts, #scopes, #a, #r));
+        #grammar = #(null, #(#gr, #gid, #cmt, #opt, #ts, #scopes, #a, #r));
         }
-	;
-
-headerSpec
-    :   ( 	"header"^ (id)?
-	 	    ACTION
-	    )*
 	;
 
 grammarType
@@ -152,6 +146,24 @@ grammarType
     	)
     	gr:"grammar" {#gr.setType(gtype);}
     ;
+
+actions
+	:	(action)+
+	;
+
+/** Match stuff like @parser::members {int i;} */
+action
+	:	AMPERSAND^ (actionScopeName COLON! COLON!)? id ACTION
+	;
+
+/** Sometimes the scope names will collide with keywords; allow them as
+ *  ids for action scopes.
+ */
+actionScopeName
+	:	id
+	|	l:"lexer"	{#l.setType(ID);}
+    |   p:"parser"	{#p.setType(ID);}
+	;
 
 optionsSpec
 	:	OPTIONS^ (option SEMI!)+ RCURLY!
@@ -233,7 +245,7 @@ GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
 	( throwsSpec )?
 	( opts:optionsSpec )?
 	scopes:ruleScopeSpec
-	( "init" init:ACTION )?
+	(a:ruleActions)?
 	colon:COLON
 	{
 	blkRoot = #[BLOCK,"BLOCK"];
@@ -259,8 +271,17 @@ GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
 	eor.setColumn(semi.getColumn());
     #rule = #(#[RULE,"rule"],
               #ruleName,modifier,#(#[ARG,"ARG"],#aa),#(#[RET,"RET"],#rt),
-              #opts,#scopes,#(#[INITACTION,"INITACTION"],#init),blk,eor);
+              #opts,#scopes,#a,blk,eor);
     }
+	;
+
+ruleActions
+	:	(ruleAction)+
+	;
+
+/** Match stuff like @init {int i;} */
+ruleAction
+	:	AMPERSAND^ id ACTION
 	;
 
 throwsSpec
@@ -296,7 +317,7 @@ block
 				warnWhenFollowAmbig = false;
 			}
 		:
-			optionsSpec ( "init" ACTION )? COLON!
+			optionsSpec ( ruleActions )? COLON!
 		|	ACTION COLON!
 		)?
 
@@ -775,6 +796,8 @@ OPEN_ELEMENT_OPTION
 CLOSE_ELEMENT_OPTION
 	:	'>'
 	;
+
+AMPERSAND : '@';
 
 COMMA : ',';
 
