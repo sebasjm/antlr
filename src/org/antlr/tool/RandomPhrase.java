@@ -31,6 +31,9 @@ public class RandomPhrase {
 
 	/** an experimental method to generate random phrases for a given
 	 *  grammar given a start rule.  Return a list of token types.
+	 *
+	 *  TODO: infinite loop upon indirect left recursion
+	 *  Must add check for rentry into a rule w/o having matched a single token/char
 	 */
 	protected static void randomPhrase(Grammar g, List tokenTypes, String startRule) {
 		// Build NFAs from the grammar AST
@@ -44,7 +47,7 @@ public class RandomPhrase {
 			if ( state==stopState && ruleInvocationStack.size()==0 ) {
 				break;
 			}
-			// System.out.println("state "+state);
+			//System.out.println("state "+state);
 			if ( state.getNumberOfTransitions()==0 ) {
 				//System.out.println("dangling state: "+state);
 				return;
@@ -52,7 +55,7 @@ public class RandomPhrase {
 			// end of rule node
 			if ( state.isAcceptState() ) {
 				NFAState invokingState = (NFAState)ruleInvocationStack.pop();
-				//System.out.println("pop invoking state "+invokingState);
+				// System.out.println("pop invoking state "+invokingState);
 				RuleClosureTransition invokingTransition =
 					(RuleClosureTransition)invokingState.transition(0);
 				// move to node after state that invoked this rule
@@ -65,9 +68,12 @@ public class RandomPhrase {
 				if ( t0 instanceof RuleClosureTransition ) {
 					ruleInvocationStack.push(state);
 					// System.out.println("push state "+state);
+					int ruleIndex = ((RuleClosureTransition)t0).getRuleIndex();
+					System.out.println("invoke "+g.getRuleName(ruleIndex));
 				}
 				else if ( !t0.label.isEpsilon() ) {
 					tokenTypes.add( getTokenType(t0.label) );
+					System.out.println(t0.label.toString(g));
 				}
 				state = (NFAState)t0.target;
 				continue;
@@ -85,9 +91,12 @@ public class RandomPhrase {
 			NFAState altStartState =
 				g.getNFAStateForAltOfDecision(state, randomAlt);
 			Transition t = altStartState.transition(0);
+			/*
+			start of a decision could never be a labeled transition
 			if ( !t.label.isEpsilon() ) {
 				tokenTypes.add( getTokenType(t.label) );
 			}
+			*/
 			state = (NFAState)t.target;
 		}
 	}
@@ -125,7 +134,12 @@ public class RandomPhrase {
 		String lexerGrammarText = parser.getLexerGrammar();
 		Grammar lexer = new Grammar();
 		lexer.importTokenVocabulary(parser);
-		lexer.setGrammarContent(lexerGrammarText);
+		if ( lexerGrammarText!=null ) {
+			lexer.setGrammarContent(lexerGrammarText);
+		}
+		else {
+			System.err.println("no lexer grammar found in "+grammarFileName);
+		}
 
 		List tokenTypes = new ArrayList(100);
 		randomPhrase(parser, tokenTypes, startRule);
@@ -144,7 +158,9 @@ public class RandomPhrase {
 				}
 			}
 			else { // it's a literal
-				System.out.print(" "+ttypeDisplayName);
+				String literal =
+					ttypeDisplayName.substring(1,ttypeDisplayName.length()-1);
+				System.out.print(" "+literal);
 			}
 		}
 		System.out.println();

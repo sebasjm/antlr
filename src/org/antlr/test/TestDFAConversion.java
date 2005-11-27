@@ -110,6 +110,24 @@ public class TestDFAConversion extends TestSuite {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
+	public void testIndirectRecursionLoop() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : b X ;\n"+
+			"b : a B ;\n");
+		// nondeterministic from left edge; no stop state
+		String expecting =
+			"\n";
+		int[] unreachableAlts = new int[] {2};
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = new int[] {1,2};
+		int numWarnings = 4;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
 	public void testifThenElse() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+

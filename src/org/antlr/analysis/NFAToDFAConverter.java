@@ -70,7 +70,7 @@ public class NFAToDFAConverter {
 		// while more DFA states to check, process them
 		while ( !terminate && work.size()>0 ) {
 			DFAState d = (DFAState) work.get(0);
-			if ( debug ) {
+			if ( dfa.nfa.grammar.getWatchNFAConversion() ) {
 				System.out.println("convert DFA state "+d.stateNumber+
 								   " ("+d.getNFAConfigurations().size()+" nfa states)");
 			}
@@ -463,7 +463,7 @@ public class NFAToDFAConverter {
 	{
 		if ( debug ) {
 			System.out.println("closure at NFA state "+p.stateNumber+"|"+
-							   alt+" filling DFA state "+d+" with context "+context
+							   alt+" filling DFA state "+d.stateNumber+" with context "+context
 							   );
 		}
 

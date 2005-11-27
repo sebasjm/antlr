@@ -269,6 +269,8 @@ public class Grammar {
 	/** Used during LOOK to detect computation cycles */
 	protected Set lookBusy = new HashSet();
 
+	protected boolean watchNFAConversion = false;
+
 	/** For merged lexer/parsers, we must construct a separate lexer spec.
 	 *  This is the template for lexer; put the literals first then the
 	 *  regular rules.  We don't need to specify a token vocab import as
@@ -583,13 +585,14 @@ public class Grammar {
 		long start = System.currentTimeMillis();
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
             NFAState decisionStartState = getDecisionNFAStartState(decision);
-            if ( decisionStartState.getNumberOfTransitions()>1 ) {
-				/*
-				System.out.println("--------------------\nbuilding lookahead DFA (d="
-                        +decisionStartState.getDecisionNumber()+") for "+
-                        decisionStartState.getDescription());
-				long start = System.currentTimeMillis();
-				*/
+			if ( decisionStartState.getNumberOfTransitions()>1 ) {
+				long startDFA=0,stopDFA=0;
+				if ( watchNFAConversion ) {
+					System.out.println("--------------------\nbuilding lookahead DFA (d="
+									   +decisionStartState.getDecisionNumber()+") for "+
+									   decisionStartState.getDescription());
+					startDFA = System.currentTimeMillis();
+				}
 				DFA lookaheadDFA = new DFA(decision, decisionStartState);
 				if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
 					// set k=1 option and try again
@@ -606,13 +609,13 @@ public class Grammar {
 				int line = decisionAST.getLine();
 				int col = decisionAST.getColumn();
 				lineColumnToLookaheadDFAMap.put(new StringBuffer().append(line + ":")
-											.append(col).toString(), lookaheadDFA);
+												.append(col).toString(), lookaheadDFA);
 
-				/*
-				long stop = System.currentTimeMillis();
-				System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
-					" states, "+(int)(stop-start)+" ms");
-				*/
+				if ( watchNFAConversion ) {
+					stopDFA = System.currentTimeMillis();
+					System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
+									   " states, "+(int)(stopDFA-startDFA)+" ms");
+				}
 			}
 		}
 		long stop = System.currentTimeMillis();
@@ -1678,4 +1681,11 @@ public class Grammar {
         return s;
     }
 
+	public void setWatchNFAConversion(boolean watchNFAConversion) {
+		this.watchNFAConversion = watchNFAConversion;
+	}
+
+	public boolean getWatchNFAConversion() {
+		return watchNFAConversion;
+	}
 }

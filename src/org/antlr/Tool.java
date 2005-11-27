@@ -60,6 +60,7 @@ public class Tool {
 	public static boolean internalOption_PrintGrammarTree = false;
 	public static boolean internalOption_PrintDFA = false;
 	public static boolean internalOption_ShowNFConfigsInDFA = false;
+	public static boolean internalOption_watchNFAConversion = false;
 
 
     public static void main(String[] args) {
@@ -165,6 +166,9 @@ public class Tool {
 			else if (args[i].equals("-Idfaverbose")) {
 				internalOption_ShowNFConfigsInDFA = true;
 			}
+			else if (args[i].equals("-Iwatchconversion")) {
+				internalOption_watchNFAConversion = true;
+			}
 			else if (args[i].equals("-Im")) {
 				if (i + 1 >= args.length) {
 					System.err.println("missing max recursion with -m option; ignoring");
@@ -203,6 +207,7 @@ public class Tool {
 				FileReader fr = new FileReader(grammarFileName);
 				BufferedReader br = new BufferedReader(fr);
 				Grammar grammar = new Grammar(this,grammarFileName,br);
+				grammar.setWatchNFAConversion(internalOption_watchNFAConversion);
 				br.close();
 				fr.close();
 
