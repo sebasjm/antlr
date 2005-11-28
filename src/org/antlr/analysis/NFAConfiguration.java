@@ -78,7 +78,7 @@ public class NFAConfiguration {
     protected int numberEpsilonTransitionsEmanatingFromState;
 
     /** Indicates that the NFA state associated with this configuration
-     *  has exactly one transition at it's an atom (not epsilon etc...).
+     *  has exactly one transition and it's an atom (not epsilon etc...).
      */
     protected boolean singleAtomTransitionEmanating;
 

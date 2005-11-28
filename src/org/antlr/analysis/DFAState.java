@@ -29,6 +29,7 @@ package org.antlr.analysis;
 
 import org.antlr.misc.IntSet;
 import org.antlr.misc.OrderedHashSet;
+import org.antlr.tool.Grammar;
 
 import java.util.*;
 
@@ -490,6 +491,9 @@ public class DFAState extends State {
 	 *  there is more than one configuration.  The configurations' predicted
 	 *  alt must be different or must have different contexts to avoid a
 	 *  conflict.
+	 *
+	 *  Don't report conflicts for DFA states that have conflicting Tokens
+	 *  rule NFA states; they will be resolved in favor of the first rule.
      */
     protected Set getConflictingAlts() {
 		// TODO this is called multiple times: cache result?
@@ -534,9 +538,21 @@ public class DFAState extends State {
 					alt = c.alt;
 				}
 				else if ( c.alt!=alt ) {
-					//System.out.println("potential conflict in state "+stateI+" configs: "+configsForState);
-					numPotentialConflicts++;
-					thisStateHasPotentialProblem = true;
+					/*
+					System.out.println("potential conflict in state "+stateI+
+									   " configs: "+configsForState);
+					*/
+					NFAState s = dfa.nfa.getState(stateI.intValue());
+					// 11/28/2005: don't report closures that pinch back
+					// together in Tokens rule.  We want to silently resolve
+					// to the first token definition ala lex/flex by ignoring
+					// these conflicts.
+					if ( dfa.nfa.grammar.type!=Grammar.LEXER ||
+						 !s.enclosingRule.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) )
+					{
+						numPotentialConflicts++;
+						thisStateHasPotentialProblem = true;
+					}
 				}
 			}
 			if ( !thisStateHasPotentialProblem ) {

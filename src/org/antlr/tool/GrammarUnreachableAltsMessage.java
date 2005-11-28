@@ -51,6 +51,10 @@ public class GrammarUnreachableAltsMessage extends Message {
 		super(ErrorManager.MSG_UNREACHABLE_ALTS);
 		this.probe = probe;
 		this.alts = alts;
+		// flip msg ID if alts are actually token refs in Tokens rule
+		if ( probe.dfa.isTokensRuleDecision() ) {
+			setMessageID(ErrorManager.MSG_UNREACHABLE_TOKENS);
+		}
 	}
 
 	public String toString() {
@@ -62,11 +66,28 @@ public class GrammarUnreachableAltsMessage extends Message {
 		if ( fileName!=null ) {
 			st.setAttribute("file", fileName);
 		}
+
+		if ( probe.dfa.isTokensRuleDecision() ) {
+			// alts are token rules, convert to the names instead of numbers
+			for (int i = 0; i < alts.size(); i++) {
+				Integer altI = (Integer) alts.get(i);
+				String tokenName =
+					probe.getTokenNameForTokensRuleAlt(altI.intValue());
+				// reset the line/col to the token definition
+				NFAState ruleStart =
+					probe.dfa.nfa.grammar.getRuleStartState(tokenName);
+				line = ruleStart.getAssociatedASTNode().getLine();
+				col = ruleStart.getAssociatedASTNode().getColumn();
+				st.setAttribute("tokens", tokenName);
+			}
+		}
+		else {
+			// regular alt numbers, show the alts
+			st.setAttribute("alts", alts);
+		}
+
 		st.setAttribute("line", new Integer(line));
 		st.setAttribute("col", new Integer(col));
-
-		st.setAttribute("alts", alts);
-
 		return st.toString();
 	}
 

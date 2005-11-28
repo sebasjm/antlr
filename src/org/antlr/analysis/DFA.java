@@ -129,7 +129,7 @@ public class DFA {
 		//long start = System.currentTimeMillis();
 		verify();
 		
-		if ( !probe.isDeterministic() || !probe.analysisAborted() ) {
+		if ( !probe.isDeterministic() || probe.analysisAborted() ) {
 			probe.issueWarnings();
 		}
 		//long stop = System.currentTimeMillis();
@@ -209,6 +209,19 @@ public class DFA {
     public boolean isCyclic() {
         return cyclic && getUserMaxLookahead()==0;
     }
+
+	/** Is this DFA derived from the NFA for the Tokens rule? */
+	public boolean isTokensRuleDecision() {
+		if ( nfa.grammar.type!=Grammar.LEXER ) {
+			return false;
+		}
+		NFAState nfaStart = getNFADecisionStartState();
+		NFAState TokensRuleStart =
+			nfa.grammar.getRuleStartState(Grammar.ARTIFICIAL_TOKENS_RULENAME);
+		NFAState TokensDecisionStart =
+			(NFAState)TokensRuleStart.transition(0).target;
+		return nfaStart == TokensDecisionStart;
+	}
 
 	/** The user may specify a max, acyclic lookahead for any decision.  No
 	 *  DFA cycles are created when this value, k, is greater than 0.

@@ -28,6 +28,7 @@
 package org.antlr.tool;
 
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.analysis.NFAState;
 
 /** The ANTLR code calls methods on ErrorManager to report errors etc...
  *  Rather than simply pass these arguments to the ANTLRErrorListener directly,
@@ -66,4 +67,5 @@ public abstract class Message {
 	public StringTemplate getMessageTemplate() {
 		return msgST;
 	}
+
 }

@@ -669,6 +669,21 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
+	public void testTokenCallsAnotherOnLeftEdge() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"F   :   I \".\"\n" +
+			"    ;\n" +
+			"I   :   \"0\"\n" +
+			"    ;\n"
+		);
+		String expecting =
+			".s0-\"0\"->.s1\n" +
+			".s1-\".\"->:s3=>1\n" +
+			".s1-<EOT>->:s2=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, 0);
+	}
+
 
 	public void testSelfRecursionAmbigAlts() throws Exception {
 		// ambiguous grammar for "L ID R" (alts 1,2 of a)

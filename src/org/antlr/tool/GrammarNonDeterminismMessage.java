@@ -51,6 +51,10 @@ public class GrammarNonDeterminismMessage extends Message {
 		super(ErrorManager.MSG_GRAMMAR_NONDETERMINISM);
 		this.probe = probe;
 		this.problemState = problemState;
+		// flip msg ID if alts are actually token refs in Tokens rule
+		if ( probe.dfa.isTokensRuleDecision() ) {
+			setMessageID(ErrorManager.MSG_TOKEN_NONDETERMINISM);
+		}
 	}
 
 	public String toString() {
@@ -70,12 +74,27 @@ public class GrammarNonDeterminismMessage extends Message {
 		String input = probe.getInputSequenceDisplay(labels);
 		st.setAttribute("input", input);
 
-		st.setAttribute("disabled", probe.getDisabledAlternatives(problemState));
+		if ( probe.dfa.isTokensRuleDecision() ) {
+			Set disabledAlts = probe.getDisabledAlternatives(problemState);
+			for (Iterator it = disabledAlts.iterator(); it.hasNext();) {
+				Integer altI = (Integer) it.next();
+				String tokenName =
+					probe.getTokenNameForTokensRuleAlt(altI.intValue());
+				// reset the line/col to the token definition (pick last one)
+				NFAState ruleStart =
+					probe.dfa.nfa.grammar.getRuleStartState(tokenName);
+				line = ruleStart.getAssociatedASTNode().getLine();
+				col = ruleStart.getAssociatedASTNode().getColumn();
+				st.setAttribute("disabled", tokenName);
+			}
+		}
+		else {
+			st.setAttribute("disabled", probe.getDisabledAlternatives(problemState));
+		}
 
 		List nondetAlts = probe.getNonDeterministicAltsForState(problemState);
 		NFAState nfaStart = probe.dfa.getNFADecisionStartState();
 		// all state paths have to begin with same NFA state
-		NFAState commonNondetAltsNFAStartState = null;
 		int firstAlt = 0;
 		for (Iterator iter = nondetAlts.iterator(); iter.hasNext();) {
 			Integer displayAltI = (Integer) iter.next();
@@ -93,7 +112,15 @@ public class GrammarNonDeterminismMessage extends Message {
 								displayAltI, path);
 			}
 			else {
-				st.setAttribute("conflictingAlts", displayAltI);
+				if ( probe.dfa.isTokensRuleDecision() ) {
+					// alts are token rules, convert to the names instead of numbers
+					String tokenName =
+						probe.getTokenNameForTokensRuleAlt(displayAltI.intValue());
+					st.setAttribute("conflictingTokens", tokenName);
+				}
+				else {
+					st.setAttribute("conflictingAlts", displayAltI);
+				}
 			}
 		}
 		return st.toString();

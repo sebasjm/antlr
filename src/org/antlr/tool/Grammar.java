@@ -58,7 +58,7 @@ public class Grammar {
 	public static String[] LabelTypeToString =
 		{"<invalid>", "rule", "token", "rule-list", "token-list"};
 
-    public static final String TOKEN_RULENAME = "Tokens";
+    public static final String ARTIFICIAL_TOKENS_RULENAME = "Tokens";
 	public static final String FRAGMENT_RULE_MODIFIER = "fragment";
 
 	/** When converting ANTLR char and string literals, here is the
@@ -466,7 +466,7 @@ public class Grammar {
     public void addArtificialMatchTokensRule() {
         StringTemplate matchTokenRuleST =
             new StringTemplate(
-                    TOKEN_RULENAME+" : <rules; separator=\"|\">;",
+                    ARTIFICIAL_TOKENS_RULENAME+" : <rules; separator=\"|\">;",
                     AngleBracketTemplateLexer.class);
 
         // Now add token rule references
@@ -510,7 +510,7 @@ public class Grammar {
         catch (Exception e) {
             ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,e);
         }
-		antlr.Token ruleToken = new antlr.TokenWithIndex(ANTLRParser.ID,TOKEN_RULENAME);
+		antlr.Token ruleToken = new antlr.TokenWithIndex(ANTLRParser.ID,ARTIFICIAL_TOKENS_RULENAME);
 		defineRule(ruleToken, null, null, (GrammarAST)parser.getAST(), null, numAlts);
 	}
 
@@ -870,6 +870,8 @@ public class Grammar {
 	/** Track a rule reference within an outermost alt of a rule.  Used
 	 *  at the moment to decide if $ruleref refers to a unique rule ref in
 	 *  the alt.  Rewrite rules force tracking of all rule AST results.
+	 *
+	 *  This data is also used to verify that all rules have been defined.
 	 */
 	public void altReferencesRule(String ruleName, GrammarAST refAST, int outerAltNum) {
 		Rule r = getRule(ruleName);

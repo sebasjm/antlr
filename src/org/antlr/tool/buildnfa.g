@@ -168,7 +168,8 @@ rule
 		   (AMPERSAND)*
            #(BLOCK b=block EOB) EOR
            {
-           if ( r.equals(Grammar.TOKEN_RULENAME) ) {
+           /* 11/28/2005: removed to treat Tokens rule like any other
+           if ( r.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ) {
                 NFAState ruleState = factory.build_ArtificialMatchTokensRuleNFA();
                 if ( grammar.getNumberOfAltsForDecisionNFA(ruleState)>1 ) {
 	                ruleState.setDecisionASTNode(#BLOCK); // always track ast node
@@ -180,12 +181,14 @@ rule
                 NFAState start = grammar.getRuleStartState(r);
 		        start.addTransition(new Transition(Label.EPSILON, ruleState));
            }
-           else {
+           else */
+           {
 				if ( Character.isLowerCase(r.charAt(0)) ||
 					 grammar.type==Grammar.LEXER )
 				{
 					// attach start node to block for this rule
 					NFAState start = grammar.getRuleStartState(r);
+					start.setAssociatedASTNode(#id);
 					start.addTransition(new Transition(Label.EPSILON, b.left));
 
 					// track decision if > 1 alts
@@ -404,7 +407,9 @@ atom returns [StateCluster g=null]
             int ruleIndex = grammar.getRuleIndex(r.getText());
             g = factory.build_RuleRef(ruleIndex, start);
             r.followingNFAState = g.right;
-            if ( g.left.transition(0) instanceof RuleClosureTransition ) {
+            if ( g.left.transition(0) instanceof RuleClosureTransition
+            	 && grammar.type!=Grammar.LEXER )
+            {
                 addFollowTransition(r.getText(), g.right);
             }
             // else rule ref got inlined to a set
@@ -418,19 +423,14 @@ atom returns [StateCluster g=null]
             if ( start!=null ) {
                 int ruleIndex = grammar.getRuleIndex(t.getText());
                 g = factory.build_RuleRef(ruleIndex, start);
-                //addFollowTransition(t.getText(), g.right);
-                // don't hook up follow links back into Tokens rule
-                // we need to see EOT on ends of token rules
-                if ( !currentRuleName.equals(Grammar.TOKEN_RULENAME) ) {
-                    addFollowTransition(t.getText(), g.right);
-                }
+                // don't add FOLLOW transitions in the lexer;
+                // only exact context should be used.
             }
         }
         else {
             int tokenType = grammar.getTokenType(t.getText());
             g = factory.build_Atom(tokenType);
             t.followingNFAState = g.right;
-            //g.left.setAssociatedASTNode(#t);
         }
         }
 

@@ -141,7 +141,7 @@ public class TestCharDFAConversion extends TestSuite {
 	public void testKeywordVersusID() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"IF : \"if\" ;\n" +
+			"IF : \"if\" ;\n" + // choose this over ID
 			"ID : (\"a\"..\"z\")+ ;\n");
 		String expecting =
 			".s0-\"a\"..\"z\"->:s2=>1\n" +
@@ -155,6 +155,30 @@ public class TestCharDFAConversion extends TestSuite {
 			".s2-\"a\"..\"z\"->:s4=>2\n" +
 			".s2-<EOT>->:s3=>1\n";
 		checkDecision(g, 2, expecting, null);
+	}
+
+	public void testIdenticalRules() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : \"a\" ;\n" +
+			"B : \"a\" ;\n"); // can't reach this
+		String expecting =
+			".s0-\"a\"->.s1\n" +
+			".s1-<EOT>->:s2=>1\n";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		checkDecision(g, 1, expecting, new int[] {2});
+
+		assertTrue(equeue.size()==1,
+				   "unexpected number of expected problems: "+equeue.size()+
+				   "; expecting "+1);
+		Message msg = (Message)equeue.warnings.get(0);
+		assertTrue(msg instanceof GrammarUnreachableAltsMessage,
+				   "warning must be an unreachable alt");
+		GrammarUnreachableAltsMessage u = (GrammarUnreachableAltsMessage)msg;
+		assertEqual(u.alts.toString(), "[2]");
 	}
 
 	public void testAdjacentNotCharLoops() throws Exception {

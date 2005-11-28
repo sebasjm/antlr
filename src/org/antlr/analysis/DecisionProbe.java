@@ -603,6 +603,10 @@ public class DecisionProbe {
 		);
 	}
 
+	/** Currently the analysis reports issues between token definitions, but
+	 *  we don't print out warnings in favor of just picking the first token
+	 *  definition found in the grammar ala lex/flex.
+	 */
 	public void reportLexerRuleNondeterminism(DFAState d, Set nondeterministicAlts) {
 		stateToSyntacticallyAmbiguousTokensRuleAltsMap.put(d,nondeterministicAlts);
 	}
@@ -839,5 +843,20 @@ public class DecisionProbe {
 		buf.append('_');
 		buf.append(i);
 		return buf.toString();
+	}
+
+	/** From an alt number associated with artificial Tokens rule, return
+	 *  the name of the token that is associated with that alt.
+	 */ 
+	public String getTokenNameForTokensRuleAlt(int alt) {
+		NFAState decisionState = dfa.getNFADecisionStartState();
+		NFAState altState =
+			dfa.nfa.grammar.getNFAStateForAltOfDecision(decisionState,alt);
+		NFAState decisionLeft = (NFAState)altState.transition(0).target;
+		RuleClosureTransition ruleCallEdge =
+			(RuleClosureTransition)decisionLeft.transition(0);
+		NFAState ruleStartState = (NFAState)ruleCallEdge.target;
+		//System.out.println("alt = "+decisionLeft.getEnclosingRule());
+		return ruleStartState.getEnclosingRule();
 	}
 }

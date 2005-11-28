@@ -58,7 +58,7 @@ public class Interpreter implements TokenSource {
 			this.g = g;
 		}
 		public void exitRule(String ruleName) {
-			if ( !ruleName.equals(Grammar.TOKEN_RULENAME) ){
+			if ( !ruleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ){
 				int type = g.getTokenType(ruleName);
 				int channel = Token.DEFAULT_CHANNEL;
 				token = new CommonToken((CharStream)input,type,channel,0,0);
@@ -152,7 +152,7 @@ public class Interpreter implements TokenSource {
 		loop:
 		while (input.LA(1)!=CharStream.EOF) {
 			try {
-				token = scan(Grammar.TOKEN_RULENAME);
+				token = scan(Grammar.ARTIFICIAL_TOKENS_RULENAME);
 				break;
 			}
 			catch (RecognitionException re) {

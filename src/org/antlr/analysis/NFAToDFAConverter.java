@@ -511,6 +511,24 @@ public class NFAToDFAConverter {
 			*/
 			closure(continueState, alt, newContext, semanticContext, d, collectPredicates);
 		}
+		/*
+		11/27/2005: I tried adding this but it highlighted that
+		lexer rules needed to be called from Tokens not just ref'd directly
+		so their contexts are different for F : I '.' ;  I : '0' ;  otherwise
+		we get an ambiguity.  The context of state following '0' has same
+		NFA state with [6 $] and [$] hence they conflict.  We need to get
+		the other stack call in there.
+		else if ( dfa.nfa.grammar.type == Grammar.LEXER &&
+			      p.isAcceptState() &&
+			context.invokingState.enclosingRule.equals("Tokens") )
+		{
+			// hit the end of a lexer rule when no one has invoked that rule
+			// (this will be the case if Tokens rule analysis reaches the
+			// stop state of a token in its alt list).
+			// Must not follow the FOLLOW links; must return
+			return;
+		}
+		*/
 		// Case 3: end of rule state, nobody invoked this rule (no context)
 		//    Fall thru to be handled by case 4 automagically.
 		// Case 4: ordinary NFA->DFA conversion case: simple epsilon transition
@@ -680,6 +698,9 @@ public class NFAToDFAConverter {
 	 *  configurations can reach NFA state 13 then 13 will be added to the
 	 *  new DFAState (labelDFATarget) with the same configuration as state
 	 *  7 had.
+	 *
+	 *  This method does not see EOT transitions off the end of token rule
+	 *  accept states if the rule was invoked by somebody.
 	 */
 	public DFAState reach(DFAState d, Label label) {
 		DFAState labelDFATarget = dfa.newState();
@@ -699,9 +720,24 @@ public class NFAToDFAConverter {
 			if ( edge==null || !c.singleAtomTransitionEmanating ) {
 				continue;
 			}
+			Label edgeLabel = edge.label;
+
+			// SPECIAL CASE
+			// if it's an EOT transition on end of lexer rule, but context
+			// stack is not empty, then don't see the EOT; the closure
+			// will have added in the proper states following the reference
+			// to this rule in the invoking rule.  In other words, if
+			// somebody called this rule, don't see the EOT emanating from
+			// this accept state.
+			if ( c.context.parent!=null &&
+				 edgeLabel.isAtom() &&
+				 edgeLabel.getAtom()==Label.EOT )
+			{
+				continue;
+			}
+
 			// Labels not unique at this point (not until addReachableLabels)
 			// so try simple int label match before general set intersection
-			Label edgeLabel = edge.label;
 			//System.out.println("comparing "+edgeLabel+" with "+label);
 			boolean matched =
 				(!label.isSet()&&edgeLabel.getAtom()==intLabel)||
@@ -947,14 +983,22 @@ public class NFAToDFAConverter {
 	 *
 	 *  AMBIGUOUS TOKENS
 	 *
+	 *  With keywords and ID tokens, there is an inherit ambiguity in that
+	 *  "int" can be matched by ID also.  Each lexer rule has an EOT
+	 *  transition emanating from it which is used whenever the end of
+	 *  a rule is reached and another token rule did not invoke it.  EOT
+	 *  is the only thing that can be seen next.  If two rules are identical
+	 *  like "int" and "int" then the 2nd def is unreachable and you'll get
+	 *  a warning.  We prevent a warning though for the keyword/ID issue.
+	 *
 	 *  If all NFA states in this DFA state are targets of EOT transitions,
 	 *  (and there is more than one state plus no unique alt is predicted)
 	 *  then DFA conversion will leave this state as a dead state as nothing
 	 *  can be reached from this state.  To resolve the ambiguity, just do
 	 *  what flex and friends do: pick the first rule (alt in this case) to
 	 *  win.  This means you should put keywords before the ID rule.
-	 *  If the DFA state has only one NFA
-	 *  state then there is no issue: it uniquely predicts one alt. :)  Problem
+	 *  If the DFA state has only one NFA state then there is no issue:
+	 *  it uniquely predicts one alt. :)  Problem
 	 *  states will look like this during conversion:
 	 *
 	 *  DFA 1:{9|1, 19|2, 14|3, 20|2, 23|2, 24|2, ...}-<EOT>->5:{41|3, 42|2}
@@ -963,13 +1007,20 @@ public class NFAToDFAConverter {
 	 *  in the EOF state (one for ID and one each for the identical rules).
 	 */
 	public void resolveNonDeterminisms(DFAState d) {
+		if ( debug ) {
+			System.out.println("resolveNonDeterminisms "+d.toString());
+		}
 		boolean conflictingLexerRules = false;
 		Set nondeterministicAlts = d.getNondeterministicAlts();
+		if ( debug && nondeterministicAlts!=null ) {
+			System.out.println("nondet alts="+nondeterministicAlts);
+		}
 
 		// CHECK FOR AMBIGUOUS EOT (if |allAlts|>1 and EOT state, resolve)
-
 		// grab any config to see if EOT state; any other configs must
-		// transition on EOT to get to this DFA state as well
+		// transition on EOT to get to this DFA state as well so all
+		// states in d must be targets of EOT.  These are the end states
+		// created in NFAFactory.build_EOFState
 		NFAConfiguration anyConfig;
 		Iterator itr = d.nfaConfigurations.iterator();
 		anyConfig = (NFAConfiguration)itr.next();
@@ -984,12 +1035,13 @@ public class NFAToDFAConverter {
 				nondeterministicAlts = allAlts;
 				int decisionNumber = d.dfa.getDecisionNumber();
 				NFAState tokensRuleStartState =
-					dfa.nfa.grammar.getRuleStartState(Grammar.TOKEN_RULENAME);
+					dfa.nfa.grammar.getRuleStartState(Grammar.ARTIFICIAL_TOKENS_RULENAME);
 				NFAState tokensRuleDecisionState =
 					(NFAState)tokensRuleStartState.transition(0).target;
 				// track Tokens rule issues differently than other decisions
 				if ( decisionNumber == tokensRuleDecisionState.getDecisionNumber() ) {
 					dfa.probe.reportLexerRuleNondeterminism(d,allAlts);
+					//System.out.println("Tokens rule DFA state "+d.stateNumber+" nondeterministic");
 					conflictingLexerRules = true;
 				}
 			}
@@ -1033,7 +1085,7 @@ public class NFAToDFAConverter {
 			// if nongreedy, resolve in favor of what follows block
 			winningAlt = resolveByPickingExitAlt(d,nondeterministicAlts);
 		}
-		//System.out.println("winner is "+winningAlt);
+		//System.out.println("state "+d.stateNumber+" resolved to alt "+winningAlt);
 	}
 
 	/** Turn off all configurations associated with the

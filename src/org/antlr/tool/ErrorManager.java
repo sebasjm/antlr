@@ -36,10 +36,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplateErrorListener;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 
-import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 import java.lang.reflect.Field;
 
@@ -169,8 +166,10 @@ public class ErrorManager {
 	public static final int MSG_ANALYSIS_ABORTED = 205;
 	public static final int MSG_RECURSION_OVERLOW = 206;
 	public static final int MSG_LEFT_RECURSION = 207;
+	public static final int MSG_UNREACHABLE_TOKENS = 208; // nothing predicts token
+	public static final int MSG_TOKEN_NONDETERMINISM = 209; // alts of Tokens rule
 
-	public static final int MAX_MESSAGE_NUMBER = 207;
+	public static final int MAX_MESSAGE_NUMBER = 209;
 
 	/** Messages should be sensitive to the locale. */
 	private static Locale locale;
@@ -313,7 +312,7 @@ public class ErrorManager {
 			br.close();
 		}
 		catch (IOException ioe) {
-           	rawError("cannot close message file "+fileName, ioe);
+			rawError("cannot close message file "+fileName, ioe);
 		}
 
 		messages.setErrorListener(blankSTListener);
@@ -326,6 +325,33 @@ public class ErrorManager {
 			setLocale(Locale.US); // try US to see if that will work
 		}
 	}
+
+	/** Encodes the error handling found in setLocale, but does not trigger
+	 *  panics, which would make GUI tools die if ANTLR's installation was
+	 *  a bit screwy.  Duplicated code...ick.
+	public static Locale getLocaleForValidMessages(Locale locale) {
+		ErrorManager.locale = locale;
+		String language = locale.getLanguage();
+		String fileName = "org/antlr/tool/templates/messages/"+language+".stg";
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		InputStream is = cl.getResourceAsStream(fileName);
+		if ( is==null && language.equals(Locale.US.getLanguage()) ) {
+			return null;
+		}
+		else if ( is==null ) {
+			return getLocaleForValidMessages(Locale.US); // recurse on this rule, trying the US locale
+		}
+
+		boolean messagesOK = verifyMessages();
+		if ( !messagesOK && language.equals(Locale.US.getLanguage()) ) {
+			return null;
+		}
+		else if ( !messagesOK ) {
+			return getLocaleForValidMessages(Locale.US); // try US to see if that will work
+		}
+		return true;
+	}
+	 */
 
 	/** In general, you'll want all errors to go to a single spot.
 	 *  However, in a GUI, you might have two frames up with two
@@ -606,7 +632,7 @@ public class ErrorManager {
 	}
 
 	static void rawError(String msg, Throwable e) {
-		System.err.println(msg);
+		rawError(msg);
 		e.printStackTrace(System.err);
 	}
 
@@ -617,7 +643,7 @@ public class ErrorManager {
 		Tool tool = (Tool)threadToToolMap.get(Thread.currentThread());
 		if ( tool==null ) {
 			// no tool registered, exit
-			System.exit(-1);
+			throw new Error("ANTLR ErrorManager panic");
 		}
 		else {
 			tool.panic();

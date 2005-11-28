@@ -206,6 +206,18 @@ CHANGES
 
 3.0ea7 - 
 
+* undefined lexer rules were not announced! fixed.
+
+* unreachable messages for Tokens rule now indicate rule name not alt. E.g.,
+
+  Ruby.lexer.g:24:1: The following token definitions are unreachable: IVAR
+
+* nondeterminism warnings improved for Tokens rule:
+
+Ruby.lexer.g:10:1: Multiple token rules can match input such as ""0".."9"": INT, FLOAT
+As a result, tokens(s) FLOAT were disabled for that input
+
+
 * DOT diagrams didn't show escaped char properly.
 
 * Char literals are now "a" not 'a'.  This rendered most of my unit tests

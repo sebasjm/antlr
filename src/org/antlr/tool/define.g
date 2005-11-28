@@ -410,7 +410,10 @@ atom
     	{grammar.altReferencesRule(currentRuleName, #r, this.outerAltNum);}
     |   t:TOKEN_REF
     	{
-    	if ( grammar.type!=Grammar.LEXER ) {
+    	if ( grammar.type==Grammar.LEXER ) {
+    		grammar.altReferencesRule(currentRuleName, #t, this.outerAltNum);
+    	}
+    	else {
     		grammar.altReferencesTokenID(currentRuleName, #t, this.outerAltNum);
     	}
     	}

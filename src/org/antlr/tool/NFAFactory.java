@@ -277,8 +277,18 @@ public class NFAFactory {
             // Is this rule a start symbol?  (no follow links)
             if ( endNFAState.transition(0)==null ) {
                 // if so, then don't let algorithm fall off the end of
-                // the rule, make it loop on EOF.
-                build_EOFState(endNFAState);
+                // the rule, make it hit EOF/EOT.
+				/*
+				if ( nfa.grammar.type==Grammar.LEXER ) {
+					return; // 11/28/2005: try having only Tokens with EOT transition
+				}
+                if ( nfa.grammar.type!=Grammar.LEXER ||
+					 ruleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) )
+				{
+					build_EOFState(endNFAState);
+				}
+				*/
+				build_EOFState(endNFAState);
 				// track how many rules have been invoked by another rule
 				numberUnInvokedRules++;
             }
@@ -297,8 +307,12 @@ public class NFAFactory {
             label = Label.EOT;
 			end.setEOTTargetState(true);
         }
-        // System.out.println("build "+nfa.grammar.getTokenName(label)+" loop on end of state "+endNFAState.getDescription());
-        Transition toEnd = new Transition(label, end);
+        /*
+		System.out.println("build "+nfa.grammar.getTokenDisplayName(label)+
+						   " loop on end of state "+endNFAState.getDescription()+
+						   " to state "+end.stateNumber);
+        */
+		Transition toEnd = new Transition(label, end);
         endNFAState.addTransition(toEnd);
     }
 
@@ -391,6 +405,8 @@ public class NFAFactory {
 		// return StateCluster pointing representing entire block
 		// Points to first alt NFAState on left, block end on right
 		result = new StateCluster(firstAlt, blockEndNFAState);
+
+		firstAlt.decisionStateType = NFAState.BLOCK_START;
 
 		// set EOB markers for Jean
 		firstAlt.endOfBlockStateNumber = blockEndNFAState.stateNumber;
@@ -540,7 +556,7 @@ public class NFAFactory {
      *  RuleRefTransitions as I want DFA conversion to stop at the EOT
      *  transition on the end of each token, rather than return to Tokens rule.
      *  If I used normal build_alternativeBlock for this, the RuleRefTransitions
-     *  would save return address went jumping away from Tokens rule.
+     *  would save return address when jumping away from Tokens rule.
      *
      *  All I do here is build n new states for n rules with an epsilon
      *  edge to the rule start states and then to the next state in the
@@ -556,7 +572,8 @@ public class NFAFactory {
 	 *
 	 *  This is the NFA created for the artificial rule created in
 	 *  Grammar.addArtificialMatchTokensRule().
-     */
+	 *
+	 *  11/28/2005: removed so we can use normal rule construction for Tokens.
     public NFAState build_ArtificialMatchTokensRuleNFA() {
         int altNum = 1;
         NFAState firstAlt = null; // the start state for the "rule"
@@ -567,15 +584,15 @@ public class NFAFactory {
 			Rule r = (Rule) iter.next();
             String ruleName = r.name;
 			String modifier = nfa.grammar.getRuleModifier(ruleName);
-            if ( ruleName.equals(Grammar.TOKEN_RULENAME) ||
+            if ( ruleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ||
 				 (modifier!=null &&
 				  modifier.equals(Grammar.FRAGMENT_RULE_MODIFIER)) )
 			{
                 continue; // don't loop to yourself or do nontoken rules
             }
-            NFAState ruleStartState = nfa.grammar.getRuleStartState(ruleName);;
+            NFAState ruleStartState = nfa.grammar.getRuleStartState(ruleName);
             NFAState left = newState();
-            left.setDescription("alt "+altNum+" of artificial rule "+Grammar.TOKEN_RULENAME);
+            left.setDescription("alt "+altNum+" of artificial rule "+Grammar.ARTIFICIAL_TOKENS_RULENAME);
             transitionBetweenStates(left, ruleStartState, Label.EPSILON);
             // Are we the first alternative?
             if ( firstAlt==null ) {
@@ -588,8 +605,11 @@ public class NFAFactory {
             prevAlternative = left;
             altNum++;
         }
+		firstAlt.decisionStateType = NFAState.BLOCK_START;
+
         return firstAlt;
     }
+	 */
 
     /** Build an atom with all possible values in its label */
     public StateCluster build_Wildcard() {

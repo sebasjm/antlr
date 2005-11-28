@@ -183,22 +183,23 @@ public class DOTGenerator {
 
         // special case: if decision point, then line up the alt start states
         // unless it's an end of block
-        if ( ((NFAState)s).isDecisionState() &&
-             ((NFAState)s).getAssociatedASTNode().getType()!=ANTLRParser.EOB )
-        {
-            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/decision-rank");
-            NFAState alt = (NFAState)s;
-            while ( alt!=null ) {
-                st.setAttribute("states", getStateLabel(alt));
-                if ( alt.transition(1)!=null ) {
-                    alt = (NFAState)alt.transition(1).target;
-                }
-                else {
-                    alt=null;
-                }
-            }
-            dot.setAttribute("decisionRanks", st);
-        }
+		if ( ((NFAState)s).isDecisionState() ) {
+			GrammarAST n = ((NFAState)s).getAssociatedASTNode();
+			if ( n!=null && n.getType()!=ANTLRParser.EOB ) {
+				st = stlib.getInstanceOf("org/antlr/tool/templates/dot/decision-rank");
+				NFAState alt = (NFAState)s;
+				while ( alt!=null ) {
+					st.setAttribute("states", getStateLabel(alt));
+					if ( alt.transition(1)!=null ) {
+						alt = (NFAState)alt.transition(1).target;
+					}
+					else {
+						alt=null;
+					}
+				}
+				dot.setAttribute("decisionRanks", st);
+			}
+		}
 
         // make a DOT edge for each transition
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {
@@ -333,8 +334,8 @@ public class DOTGenerator {
 		else if ( (s instanceof NFAState) &&
 			((NFAState)s).endOfBlockStateNumber!=State.INVALID_STATE_NUMBER)
 		{
-			stateLabel = stateLabel+",eob="+
-					((NFAState)s).endOfBlockStateNumber;
+			NFAState n = ((NFAState)s);
+			stateLabel = stateLabel+",eob="+n.endOfBlockStateNumber;
 		}
         else if ( s instanceof DFAState && ((DFAState)s).isAcceptState() ) {
             stateLabel = stateLabel+
