@@ -252,6 +252,11 @@ As a result, tokens(s) <disabled; separator=","> were disabled for that input
 <endif>
 >>
 
+LEFT_RECURSION_CYCLES(listOfCycles) ::= <<
+The following sets of rules are mutually left-recursive <listOfCycles:{c| [<c:{r|<r>}; separator=", ">]}; separator=" and ">
+>>
+
+
 
 /* This factors out file location formatting; file,line,col inherited from
  * enclosing template; don't manually pass stuff in.

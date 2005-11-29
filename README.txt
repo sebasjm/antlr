@@ -206,6 +206,8 @@ CHANGES
 
 3.0ea7 - 
 
+* left-recursive cycles from rules w/o decisions were not detected.
+
 * undefined lexer rules were not announced! fixed.
 
 * unreachable messages for Tokens rule now indicate rule name not alt. E.g.,

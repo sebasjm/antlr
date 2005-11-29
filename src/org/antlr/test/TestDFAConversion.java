@@ -38,6 +38,8 @@ import org.antlr.misc.BitSet;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 import antlr.RecognitionException;
 
@@ -116,16 +118,81 @@ public class TestDFAConversion extends TestSuite {
 			"s : a ;\n" +
 			"a : b X ;\n"+
 			"b : a B ;\n");
-		// nondeterministic from left edge; no stop state
-		String expecting =
-			"\n";
-		int[] unreachableAlts = new int[] {2};
-		int[] nonDetAlts = null;
-		String ambigInput = null;
-		int[] danglingAlts = new int[] {1,2};
-		int numWarnings = 4;
-		checkDecision(g, 1, expecting, unreachableAlts,
-					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		g.createNFAs();
+		g.createLookaheadDFAs();
+
+		Message msg = (Message)equeue.warnings.get(0);
+		assertTrue(msg!=null && msg instanceof LeftRecursionCyclesMessage,
+				   "expecting left recursion cycles; found "+msg.getClass().getName());
+		LeftRecursionCyclesMessage cyclesMsg = (LeftRecursionCyclesMessage)msg;
+
+		// cycle of [a, b]
+		Collection result = cyclesMsg.cycles;
+		List expecting = new ArrayList();
+		expecting.add(new HashSet() {{add("a"); add("b");}});
+		assertEqual(result,expecting);
+	}
+
+	public void testIndirectRecursionLoop2() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : i b X ;\n"+ // should see through i
+			"b : a B ;\n" +
+			"i : ;\n");
+
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		g.createNFAs();
+		g.createLookaheadDFAs();
+
+		Message msg = (Message)equeue.warnings.get(0);
+		assertTrue(msg!=null && msg instanceof LeftRecursionCyclesMessage,
+				   "expecting left recursion cycles; found "+msg.getClass().getName());
+		LeftRecursionCyclesMessage cyclesMsg = (LeftRecursionCyclesMessage)msg;
+
+		// cycle of [a, b]
+		Collection result = cyclesMsg.cycles;
+		List expecting = new ArrayList();
+		expecting.add(new HashSet() {{add("a"); add("b");}});
+		assertEqual(result,expecting);
+	}
+
+	public void testIndirectRecursionLoop3() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : i b X ;\n"+ // should see through i
+			"b : a B ;\n" +
+			"i : ;\n" +
+			"d : e ;\n" +
+			"e : d ;\n");
+
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		g.createNFAs();
+		g.createLookaheadDFAs();
+
+		Message msg = (Message)equeue.warnings.get(0);
+		assertTrue(msg!=null && msg instanceof LeftRecursionCyclesMessage,
+				   "expecting left recursion cycles; found "+msg.getClass().getName());
+		LeftRecursionCyclesMessage cyclesMsg = (LeftRecursionCyclesMessage)msg;
+
+		// cycle of [a, b]
+		Collection result = cyclesMsg.cycles;
+		List expecting = new ArrayList();
+		expecting.add(new HashSet() {{add("a"); add("b");}});
+		expecting.add(new HashSet() {{add("d"); add("e");}});
+		assertEqual(result,expecting);
 	}
 
 	public void testifThenElse() throws Exception {
@@ -942,6 +1009,16 @@ As a result, alternative(s) 2 were disabled for that input
 			Message m = (Message) warnings.get(i);
 			if ( m instanceof RecursionOverflowMessage ) {
 				return (RecursionOverflowMessage)m;
+			}
+		}
+		return null;
+	}
+
+	protected LeftRecursionCyclesMessage getLeftRecursionCyclesMessage(List warnings) {
+		for (int i = 0; i < warnings.size(); i++) {
+			Message m = (Message) warnings.get(i);
+			if ( m instanceof LeftRecursionCyclesMessage ) {
+				return (LeftRecursionCyclesMessage)m;
 			}
 		}
 		return null;

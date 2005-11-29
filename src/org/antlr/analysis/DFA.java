@@ -128,8 +128,11 @@ public class DFA {
 		// figure out if there are problems with decision
 		//long start = System.currentTimeMillis();
 		verify();
-		
-		if ( !probe.isDeterministic() || probe.analysisAborted() ) {
+
+		if ( !probe.isDeterministic() ||
+			 probe.analysisAborted() ||
+			 probe.analysisOverflowed() )
+		{
 			probe.issueWarnings();
 		}
 		//long stop = System.currentTimeMillis();

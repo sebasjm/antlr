@@ -269,6 +269,12 @@ public class Grammar {
 	/** Used during LOOK to detect computation cycles */
 	protected Set lookBusy = new HashSet();
 
+	/** The checkForLeftRecursion method needs to track what rules it has
+	 *  visited to track infinite recursion.
+	 */
+	protected Set visitedDuringRecursionCheck = null;
+
+
 	protected boolean watchNFAConversion = false;
 
 	/** For merged lexer/parsers, we must construct a separate lexer spec.
@@ -581,6 +587,9 @@ public class Grammar {
      *  Grammar without doing the expensive analysis.
      */
     public void createLookaheadDFAs() {
+		if ( nfa==null ) {
+			createNFAs();
+		}
 		//System.out.println("### create DFAs");
 		long start = System.currentTimeMillis();
         for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
@@ -618,6 +627,9 @@ public class Grammar {
 				}
 			}
 		}
+
+		checkSingleAltRulesForLeftRecursion();
+
 		long stop = System.currentTimeMillis();
 		DFACreationWallClockTimeInMS = stop - start;
 	}
@@ -978,6 +990,105 @@ public class Grammar {
 				}
 			}
 		}
+	}
+
+	/** As we may have single alt rules, we must still check
+	 *  for infinite left recursion among them.  Return true
+	 *  if any problems were found.
+	 */
+	protected boolean checkSingleAltRulesForLeftRecursion() {
+		List listOfRecursiveCycles = new ArrayList(); // List<Set<String(rule-name)>>
+		for (int i = 0; i < ruleIndexToRuleList.size(); i++) {
+			String ruleName = (String)ruleIndexToRuleList.elementAt(i);
+			if ( ruleName!=null ) {
+				NFAState s = getRuleStartState(ruleName);
+				visitedDuringRecursionCheck = new HashSet();
+				//System.out.println("check rule "+ruleName);
+				checkForLeftRecursion(s, listOfRecursiveCycles);
+			}
+		}
+		if ( listOfRecursiveCycles.size()>0 ) {
+			ErrorManager.leftRecursionCycles(listOfRecursiveCycles);
+			return true;
+		}
+		return false;
+	}
+
+	/** Recursively walk states from a starting rule's single alt start
+	 *  state looking for recursive cycles.  Ignore any cycles derived
+	 *  from decision points as the closure operations will have seen
+	 *  these already.
+	 *
+	 *  Return true if you reach an accept state, meaning that the rule
+	 *  is nullable.
+	 */
+	protected boolean checkForLeftRecursion(NFAState state,
+											List listOfRecursiveCycles)
+	{
+		Transition t0 = state.transition(0);
+		// only check rules with single alts for left-recursion
+		// as any decision states have already been examined.
+		// Also ignore any states that have decisions for same reason.
+		if ( state.getDecisionNumber()>0 ) {
+			return false;
+		}
+		if ( state.isAcceptState() ) {
+			//System.out.println("return from "+state.getEnclosingRule());
+			return true;
+		}
+		if ( state.getNumberOfTransitions()==1 ) {
+			// no branching, just take this path
+			if ( t0 instanceof RuleClosureTransition ) {
+				String targetRuleName = ((NFAState)t0.target).getEnclosingRule();
+				if ( visitedDuringRecursionCheck.contains(targetRuleName) ) {
+					/*
+					System.out.println("already visited "+targetRuleName+" called from "+
+									   state.getEnclosingRule());
+					*/
+					boolean foundCycle = false;
+					for (int i = 0; i < listOfRecursiveCycles.size(); i++) {
+						Set rulesInCycle = (Set) listOfRecursiveCycles.get(i);
+						// ensure both rules are in same cycle
+						if ( rulesInCycle.contains(targetRuleName) ) {
+							rulesInCycle.add(state.getEnclosingRule());
+							foundCycle = true;
+						}
+						if ( rulesInCycle.contains(state.getEnclosingRule()) ) {
+							rulesInCycle.add(targetRuleName);
+							foundCycle = true;
+						}
+					}
+					if ( !foundCycle ) {
+						Set cycle = new HashSet();
+						cycle.add(targetRuleName);
+						cycle.add(state.getEnclosingRule());
+						listOfRecursiveCycles.add(cycle);
+					}
+					return false;
+				}
+				// map invoked rule to who called it
+				visitedDuringRecursionCheck.add(targetRuleName);
+				//System.out.println("invoke "+targetRuleName);
+				boolean ruleWasNullable =
+					checkForLeftRecursion((NFAState)t0.target,listOfRecursiveCycles);
+				visitedDuringRecursionCheck.remove(targetRuleName);
+				if ( ruleWasNullable ) {
+					// must keep going in this rule then
+					//System.out.println("keep going");
+					checkForLeftRecursion(
+						((RuleClosureTransition)t0).getFollowState(),
+						listOfRecursiveCycles);
+				}
+			}
+			else if ( t0.label.isEpsilon() ) {
+				return checkForLeftRecursion((NFAState)t0.target,
+											 listOfRecursiveCycles);
+			}
+			return false; // must be labeled edge; don't look beyond
+		}
+
+		System.err.println("heh, i should not be checking decisions!");
+		return false;
 	}
 
 	/** Rules like "a : ;" and "a : {...} ;" should not generate

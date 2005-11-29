@@ -31,14 +31,8 @@ public class RandomPhrase {
 
 	/** an experimental method to generate random phrases for a given
 	 *  grammar given a start rule.  Return a list of token types.
-	 *
-	 *  TODO: infinite loop upon indirect left recursion
-	 *  Must add check for rentry into a rule w/o having matched a single token/char
 	 */
 	protected static void randomPhrase(Grammar g, List tokenTypes, String startRule) {
-		// Build NFAs from the grammar AST
-		g.createNFAs();
-
 		NFAState state = g.getRuleStartState(startRule);
 		NFAState stopState = g.getRuleStopState(startRule);
 
@@ -69,11 +63,11 @@ public class RandomPhrase {
 					ruleInvocationStack.push(state);
 					// System.out.println("push state "+state);
 					int ruleIndex = ((RuleClosureTransition)t0).getRuleIndex();
-					System.out.println("invoke "+g.getRuleName(ruleIndex));
+					//System.out.println("invoke "+g.getRuleName(ruleIndex));
 				}
 				else if ( !t0.label.isEpsilon() ) {
 					tokenTypes.add( getTokenType(t0.label) );
-					System.out.println(t0.label.toString(g));
+					//System.out.println(t0.label.toString(g));
 				}
 				state = (NFAState)t0.target;
 				continue;
@@ -130,6 +124,16 @@ public class RandomPhrase {
 			new Grammar(null,
 						grammarFileName,
 						new BufferedReader(new FileReader(grammarFileName)));
+		parser.createNFAs();
+
+		if ( parser.checkSingleAltRulesForLeftRecursion() ) {
+			return;
+		}
+
+		if ( parser.getRule(startRule)==null ) {
+			System.out.println("undefined start rule "+startRule);
+			return;
+		}
 
 		String lexerGrammarText = parser.getLexerGrammar();
 		Grammar lexer = new Grammar();
@@ -139,6 +143,10 @@ public class RandomPhrase {
 		}
 		else {
 			System.err.println("no lexer grammar found in "+grammarFileName);
+		}
+		lexer.createNFAs();
+		if ( lexer.checkSingleAltRulesForLeftRecursion() ) {
+			return;
 		}
 
 		List tokenTypes = new ArrayList(100);

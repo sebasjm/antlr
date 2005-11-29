@@ -168,8 +168,9 @@ public class ErrorManager {
 	public static final int MSG_LEFT_RECURSION = 207;
 	public static final int MSG_UNREACHABLE_TOKENS = 208; // nothing predicts token
 	public static final int MSG_TOKEN_NONDETERMINISM = 209; // alts of Tokens rule
+	public static final int MSG_LEFT_RECURSION_CYCLES = 210;
 
-	public static final int MAX_MESSAGE_NUMBER = 209;
+	public static final int MAX_MESSAGE_NUMBER = 210;
 
 	/** Messages should be sensitive to the locale. */
 	private static Locale locale;
@@ -496,6 +497,13 @@ public class ErrorManager {
 		getErrorCount().warnings++;
 		getErrorListener().warning(
 			new LeftRecursionMessage(probe, alt, targetRules, callSiteStates)
+		);
+	}
+
+	public static void leftRecursionCycles(Collection cycles) {
+		getErrorCount().warnings++;
+		getErrorListener().warning(
+			new LeftRecursionCyclesMessage(cycles)
 		);
 	}
 

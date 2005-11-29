@@ -200,6 +200,10 @@ public class DecisionProbe {
 		return terminated;
 	}
 
+	public boolean analysisOverflowed() {
+		return stateToRecursiveOverflowConfigurationsMap.size()>0;
+	}
+
 	/** How many states does the DFA predictor have? */
 	public int getNumberOfStates() {
 		return dfa.getNumberOfStates();
