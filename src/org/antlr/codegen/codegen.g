@@ -309,7 +309,7 @@ rule returns [StringTemplate code=null]
         */
         // do not generate lexer rules in combined grammar
 		if ( grammar.type==Grammar.LEXER ) {
-			if ( r.equals(Grammar.TOKEN_RULENAME) ) {
+			if ( r.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ) {
 				code = templates.getInstanceOf("tokensRule");
 			}
 			else {
@@ -330,7 +330,7 @@ rule returns [StringTemplate code=null]
         if ( code!=null ) {
 			if ( grammar.type==Grammar.LEXER ) {
 		    	boolean naked =
-		    		r.equals(Grammar.TOKEN_RULENAME) ||
+		    		r.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ||
 		    	    (mod!=null&&mod.getText().equals(Grammar.FRAGMENT_RULE_MODIFIER));
 		    	code.setAttribute("nakedBlock", new Boolean(naked));
 			}
