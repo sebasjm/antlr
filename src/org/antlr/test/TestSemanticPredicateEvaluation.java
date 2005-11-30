@@ -75,6 +75,120 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testLexerPreds() throws Exception {
+		String grammar =
+			"grammar foo;" +
+			"@lexer::members {boolean p=false;}\n" +
+			"a : (A|B)+ ;\n" +
+			"A : {p}? \"a\"  {System.out.println(\"token 1\");} ;\n" +
+			"B : {!p}? \"a\" {System.out.println(\"token 2\");} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "a", false);
+		// "a" is ambig; can match both A, B.  Pred says match 2
+		String expecting = "token 2\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testLexerPreds2() throws Exception {
+		String grammar =
+			"grammar foo;" +
+			"@lexer::members {boolean p=true;}\n" +
+			"a : (A|B)+ ;\n" +
+			"A : {p}? \"a\" {System.out.println(\"token 1\");} ;\n" +
+			"B : (\"a\"|\"b\")+ {System.out.println(\"token 2\");} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "a", false);
+		// "a" is ambig; can match both A, B.  Pred says match 1
+		String expecting = "token 1\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testLexerPredInExitBranch() throws Exception {
+		String grammar =
+			"grammar foo;" +
+			"@lexer::members {boolean p=true;}\n" +
+			"a : (A|B)+ ;\n" +
+			"A : (\"a\" {System.out.print(\"1\");})*\n" +
+			"    {p}?\n" +
+			"    (\"a\" {System.out.print(\"2\");})* ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "aaa", false);
+		String expecting = "222\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testLexerPredInExitBranch2() throws Exception {
+		String grammar =
+			"grammar foo;" +
+			"@lexer::members {boolean p=true;}\n" +
+			"a : (A|B)+ ;\n" +
+			"A : ({p}? \"a\" {System.out.print(\"1\");})*\n" +
+			"    (\"a\" {System.out.print(\"2\");})* ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "aaa", false);
+		String expecting = "111\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testLexerPredInExitBranch3() throws Exception {
+		String grammar =
+			"grammar foo;" +
+			"@lexer::members {boolean p=true;}\n" +
+			"a : (A|B)+ ;\n" +
+			"A : ({p}? \"a\" {System.out.print(\"1\");} | )\n" +
+			"    (\"a\" {System.out.print(\"2\");})* ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "aaa", false);
+		String expecting = "122\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testLexerPredInExitBranch4() throws Exception {
+		String grammar =
+			"grammar foo;" +
+			"a : (A|B)+ ;\n" +
+			"A @init {int n=0;} : ({n<2}? \"a\" {System.out.print(n++);})+\n" +
+			"    (\"a\" {System.out.print(\"x\");})* ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "aaaaa", false);
+		String expecting = "01xxx\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testLexerPredsInCyclicDFA() throws Exception {
+		String grammar =
+			"grammar foo;" +
+			"@lexer::members {boolean p=false;}\n" +
+			"a : (A|B)+ ;\n" +
+			"A : {p}? (\"a\")+ \"x\"  {System.out.println(\"token 1\");} ;\n" +
+			"B :      (\"a\")+ \"x\" {System.out.println(\"token 2\");} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "aax", false);
+		String expecting = "token 2\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testLexerPredsInCyclicDFA2() throws Exception {
+		String grammar =
+			"grammar foo;" +
+			"@lexer::members {boolean p=false;}\n" +
+			"a : (A|B)+ ;\n" +
+			"A : {p}? (\"a\")+ \"x\" (\"y\")? {System.out.println(\"token 1\");} ;\n" +
+			"B :      (\"a\")+ \"x\" {System.out.println(\"token 2\");} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "aax", false);
+		String expecting = "token 2\n";
+		assertEqual(found, expecting);
+	}
+
 	// S U P P O R T
 
 	public void _test() throws Exception {

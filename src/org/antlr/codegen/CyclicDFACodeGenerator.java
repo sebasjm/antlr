@@ -168,7 +168,7 @@ public class CyclicDFACodeGenerator {
 			else {
 				edgeST = templates.getInstanceOf("cyclicDFAEdge");
 				StringTemplate exprST =
-					parent.genLabelExpr(templates,edge.label,1);
+					parent.genLabelExpr(templates,edge,1);
 				edgeST.setAttribute("labelExpr", exprST);
 			}
 			edgeST.setAttribute("edgeNumber", new Integer(i+1));

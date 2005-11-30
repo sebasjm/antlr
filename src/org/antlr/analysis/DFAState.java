@@ -638,6 +638,30 @@ public class DFAState extends State {
 		return alts;
 	}
 
+	/** For gated productions, we need a list of all predicates for the
+	 *  target of an edge so we can gate the edge based upon the predicates
+	 *  associated with taking that path (if any).
+	 *
+	 *  experimental 11/29/2005
+	 *
+	 *  TODO: cache this as it's called a lot; or at least set bit if >1 present in state 
+	 */
+	public Set getGatedPredicatesInNFAConfigurations() {
+		Set preds = new HashSet();
+		Iterator iter = nfaConfigurations.iterator();
+		NFAConfiguration configuration;
+		while (iter.hasNext()) {
+			configuration = (NFAConfiguration) iter.next();
+			if ( configuration.semanticContext.isGated() ) {
+				preds.add(configuration.semanticContext);
+			}
+		}
+		if ( preds.size()==0 ) {
+			return null;
+		}
+		return preds;
+	}
+
     /** Is an accept state reachable from this state? */
     public int getAcceptStateReachable() {
         return acceptStateReachable;

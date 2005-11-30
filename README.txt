@@ -206,6 +206,17 @@ CHANGES
 
 3.0ea7 - 
 
+* bug fixed related to predicates in predictor
+lexer grammar w;
+A : {p}? "a" ;
+B : {!p}? ("a"|"b")+ ;
+DFA is correct.  A state splits for input "a" on the pred.
+Generated code though was hosed.  No pred tests in prediction code!
+I added testLexerPreds() and others in TestSemanticPredicateEvaluation.java
+
+* added execAction template in case we want to do something in front of
+  each action execution or something.
+
 * left-recursive cycles from rules w/o decisions were not detected.
 
 * undefined lexer rules were not announced! fixed.

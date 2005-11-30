@@ -567,10 +567,11 @@ else {
 dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>;"
 
 /** A simple edge with an expression.  If the expression is satisfied,
- *  enter to the target state.
+ *  enter to the target state.  To handle gated productions, we may
+ *  have to evaluate some predicates for this edge.
  */
-dfaEdge(labelExpr, targetState) ::= <<
-if ( <labelExpr> ) {
+dfaEdge(labelExpr, targetState, predicates) ::= <<
+if ( <labelExpr> <if(predicates)>&& (<predicates:{p|<p>}; separator="||">)<endif>) {
     <targetState>
 }
 >>
@@ -870,6 +871,10 @@ ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
 /** Somebody may ref $template or $tree or $stop within a rule */
 rulePropertyRef(attr) ::= "retval.<attr.name>"
+
+
+/** How to execute an action */
+execAction(action) ::= "<action>"
 
 // A C T I O N S
 

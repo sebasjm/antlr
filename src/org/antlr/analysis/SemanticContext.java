@@ -54,7 +54,11 @@ public abstract class SemanticContext {
      *  This prevents lots of if!=null type checks all over; it represents
      *  just an empty set of predicates.
      */
-    public static final SemanticContext EMPTY_SEMANTIC_CONTEXT = new Predicate();
+    public static final SemanticContext EMPTY_SEMANTIC_CONTEXT =
+		new Predicate() {{gated=false;}};
+
+	/** Is this a {...}?=> gating predicate or a normal disambiguating {..}? */
+	protected boolean gated = false;
 
     public abstract SemanticContext reduce();
 
@@ -73,6 +77,11 @@ public abstract class SemanticContext {
 
         public Predicate(AST predicate) {
             this.predicate = predicate;
+			/*
+			if ( predicate.getType()==GATED_SEMPRED ) {
+				this.gated = true;
+			}
+			*/
         }
 
         public SemanticContext reduce() {
@@ -261,4 +270,9 @@ public abstract class SemanticContext {
     public static SemanticContext not(SemanticContext a) {
         return new NOT(a);
     }
+
+	public boolean isGated() {
+		return gated;
+	}
+
 }

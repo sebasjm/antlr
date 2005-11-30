@@ -85,7 +85,6 @@ public class ACyclicDFACodeGenerator {
 			parent.decisionToMaxLookaheadDepth[dfa.getDecisionNumber()] = k;
 		}
 		*/
-		//GrammarAST decisionASTNode = dfa.getDecisionASTNode();
 		StringTemplate dfaST = templates.getInstanceOf(dfaStateName);
 		if ( dfa.getNFADecisionStartState().decisionStateType==NFAState.LOOPBACK ) {
 			dfaST = templates.getInstanceOf(dfaLoopbackStateName);
@@ -102,15 +101,28 @@ public class ACyclicDFACodeGenerator {
 			dfaST.setAttribute("description", description);
 		}
 		int EOTPredicts = NFA.INVALID_ALT_NUMBER;
+		DFAState EOTTarget = null;
 		//System.out.println("DFA state "+s.stateNumber);
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
 			//System.out.println("edge label "+edge.label.toString());
 			if ( edge.label.getAtom()==Label.EOT ) {
-				// don't generate a real edge for EOT; track what EOT predicts
-				DFAState target = (DFAState)edge.target;
-				EOTPredicts = target.getUniquelyPredictedAlt();
-				//System.out.println("DFA state "+s.stateNumber+" EOT predicts "+EOTPredicts);
+				// don't generate a real edge for EOT; track alt EOT predicts
+				// generate that prediction in the else clause as default case
+				EOTTarget = (DFAState)edge.target;
+				EOTPredicts = EOTTarget.getUniquelyPredictedAlt();
+				/*
+				System.out.println("DFA s"+s.stateNumber+" EOT goes to s"+
+								   edge.target.stateNumber+" predicates alt "+
+								   EOTPredicts);
+				*/
+				// TODO: BUG; preds after EOT are NOT generated!
+				// do the EOT edge last as ELSE clause and therefore no
+				// error clause should be generated.
+				// Actually, we can get away with adding all the edges
+				// emanating from the EOT target state as edges on this
+				// state as long as they are *after* everything else.
+				// The EOT arc is like a default wildcard clause
 				continue;
 			}
 			StringTemplate edgeST = templates.getInstanceOf(dfaEdgeName);
@@ -127,8 +139,15 @@ public class ACyclicDFACodeGenerator {
 			}
 			else { // else create an expression to evaluate (the general case)
 				edgeST.setAttribute("labelExpr",
-								parent.genLabelExpr(templates,edge.label,k));
+								parent.genLabelExpr(templates,edge,k));
 			}
+			if ( true ) {
+				DFAState target = (DFAState)edge.target;
+				//System.out.println("preds="+target.getGatedPredicatesInNFAConfigurations());
+				edgeST.setAttribute("predicates",
+									((DFAState)edge.target).getGatedPredicatesInNFAConfigurations());
+			}
+
 			StringTemplate targetST =
 				walkFixedDFAGeneratingStateMachine(templates,
 												   dfa,
@@ -141,8 +160,35 @@ public class ACyclicDFACodeGenerator {
 							   dfa.decisionNumber+"."+s.stateNumber);
 							   */
 		}
+
+		// HANDLE EOT EDGE
 		if ( EOTPredicts!=NFA.INVALID_ALT_NUMBER ) {
+			// EOT unique predicts an alt
 			dfaST.setAttribute("eotPredictsAlt", new Integer(EOTPredicts));
+		}
+		else if ( EOTTarget!=null && EOTTarget.getNumberOfTransitions()>0 ) {
+			// EOT state has transitions so must split on predicates.
+			// Generate predicate else-if clauses and then generate
+			// NoViableAlt exception as else clause.
+			// Note: these predicates emanate from the EOT target state
+			// rather than the current DFAState s so the error message
+			// might be slightly misleading if you are looking at the
+			// state number.  Predicates emanating from EOT targets are
+			// hoisted up to the state that has the EOT edge.
+			for (int i = 0; i < EOTTarget.getNumberOfTransitions(); i++) {
+				Transition predEdge = (Transition)EOTTarget.transition(i);
+				StringTemplate edgeST = templates.getInstanceOf(dfaEdgeName);
+				edgeST.setAttribute("labelExpr",
+							parent.genSemanticPredicateExpr(templates,predEdge));
+				// the target must be an accept state
+				StringTemplate targetST =
+					walkFixedDFAGeneratingStateMachine(templates,
+													   dfa,
+													   (DFAState)predEdge.target,
+													   k+1);
+				edgeST.setAttribute("targetState", targetST);
+				dfaST.setAttribute("edges", edgeST);
+			}
 		}
 		return dfaST;
 	}

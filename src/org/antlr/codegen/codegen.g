@@ -537,8 +537,8 @@ element returns [StringTemplate code=null]
     |   act:ACTION
         {
         #act.outerAltNum = this.outerAltNum;
-        code = new StringTemplate(templates,
-                                  generator.translateAction(currentRuleName,#act));
+        code = templates.getInstanceOf("execAction");
+        code.setAttribute("action", generator.translateAction(currentRuleName,#act));
         }
 
     |   sp:SEMPRED

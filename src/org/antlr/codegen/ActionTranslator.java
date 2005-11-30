@@ -131,11 +131,14 @@ public class ActionTranslator {
 		while ( c<action.length() ) {
 			// Actions get converted to templates; escape raw '<'s in actions
 			// as that is the template expression start: <expr>.
+			/* 11/30/2005: actually they are not converted to templates!
+			 * Might want actions to ref templates later...leave code in
 			if ( action.charAt(c)=='<' ) {
 				buf.append("\\<");
 				c++;
 				continue;
 			}
+			*/
 			if ( action.charAt(c)=='\\' &&
 				 (c+1)<action.length() && action.charAt(c+1)=='$' )
 			{

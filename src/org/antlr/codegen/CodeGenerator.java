@@ -550,12 +550,14 @@ public class CodeGenerator {
 		return decisionST;
 	}
 
+	/** Generate an expression for traversing an edge. */
 	protected StringTemplate genLabelExpr(StringTemplateGroup templates,
-										  Label label,
+										  Transition edge,
 										  int k)
 	{
+		Label label = edge.label;
 		if ( label.isSemanticPredicate() ) {
-			return genSemanticPredicateExpr(templates, label);
+			return genSemanticPredicateExpr(templates, edge);
 		}
 		if ( label.isSet() ) {
 			return genSetExpr(templates, label.getSet(), k, true);
@@ -569,8 +571,9 @@ public class CodeGenerator {
 	}
 
 	protected StringTemplate genSemanticPredicateExpr(StringTemplateGroup templates,
-													  Label label)
+													  Transition edge)
 	{
+		Label label = edge.label;
 		SemanticContext semCtx = label.getSemanticContext();
 		return semCtx.genExpr(this,templates);
 	}
@@ -777,6 +780,10 @@ public class CodeGenerator {
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
 			if ( edge.label.isSemanticPredicate() ) {
+				return false;
+			}
+			if ( ((DFAState)edge.target).getGatedPredicatesInNFAConfigurations()!=null ) {
+				// can't do a switch if the edges are going to required gated predicates
 				return false;
 			}
 			size += edge.label.getSet().size();
