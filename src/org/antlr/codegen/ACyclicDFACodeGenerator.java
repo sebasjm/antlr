@@ -116,13 +116,6 @@ public class ACyclicDFACodeGenerator {
 								   edge.target.stateNumber+" predicates alt "+
 								   EOTPredicts);
 				*/
-				// TODO: BUG; preds after EOT are NOT generated!
-				// do the EOT edge last as ELSE clause and therefore no
-				// error clause should be generated.
-				// Actually, we can get away with adding all the edges
-				// emanating from the EOT target state as edges on this
-				// state as long as they are *after* everything else.
-				// The EOT arc is like a default wildcard clause
 				continue;
 			}
 			StringTemplate edgeST = templates.getInstanceOf(dfaEdgeName);
@@ -141,7 +134,7 @@ public class ACyclicDFACodeGenerator {
 				edgeST.setAttribute("labelExpr",
 								parent.genLabelExpr(templates,edge,k));
 			}
-			if ( true ) {
+			if ( false ) {
 				DFAState target = (DFAState)edge.target;
 				//System.out.println("preds="+target.getGatedPredicatesInNFAConfigurations());
 				edgeST.setAttribute("predicates",
