@@ -149,6 +149,9 @@ public class Target {
 		CodeGenerator generator,
 		String literal)
 	{
+		if ( literal.charAt(1)=='\'' ) {
+			return "'\\''";
+		}
 		StringBuffer buf = new StringBuffer(literal);
 		buf.setCharAt(0,'\'');
 		buf.setCharAt(literal.length()-1,'\'');

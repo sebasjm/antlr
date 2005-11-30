@@ -153,9 +153,9 @@ String action=null;
 	;
 
 optionsSpec
-    :   #( OPTIONS {out("options {");}
+    :   #( OPTIONS {out(" options {");}
     	   (option {out("; ");})+
-    	   {out("} : ");}
+    	   {out("} ");}
     	 )
     ;
 
@@ -202,10 +202,10 @@ rule
            {out(#id.getText());}
            #(ARG (arg:ARG_ACTION {out("["+#arg.getText()+"]");} )? )
            #(RET (ret:ARG_ACTION {out(" returns ["+#ret.getText()+"]");} )? )
-           {out(" : ");}
            (optionsSpec)?
            (ruleScopeSpec)?
 		   (ruleAction)*
+           {out(" : ");}
            b:block[false] EOR {out(";\n");}
          )
     ;
@@ -232,7 +232,7 @@ block[boolean forceParens]
 int numAlts = countAltsForBlock(#block);
 }
     :   #(  BLOCK {if ( forceParens||numAlts>1 ) out(" (");}
-            (optionsSpec)?
+            (optionsSpec {out(" : ");} )?
             alternative rewrite ( {out(" | ");} alternative rewrite )*
             EOB   {if ( forceParens||numAlts>1 ) out(")");}
          )

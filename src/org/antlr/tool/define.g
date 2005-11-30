@@ -265,7 +265,7 @@ countAltsForRule returns [int n=0]
 	;
 
 ruleAction[Rule r]
-	:	#(amp:AMPERSAND id:ID a:ACTION ) {r.defineAction(#amp,#id,#a);}
+	:	#(amp:AMPERSAND id:ID a:ACTION ) {if (r!=null) r.defineAction(#amp,#id,#a);}
 	;
 
 modifier returns [String mod]
