@@ -78,20 +78,21 @@ leadIn(type) ::=
 outputFile(
             LEXER,
             PARSER,
-            TREE_PARSER, 
-            headerAction, 
-            docComment, 
+            TREE_PARSER,
+            actionScope,
+            actions,
+            docComment,
             recognizer,
-            name, 
-            tokens, 
-            tokenNames, 
-            rules, 
-            cyclicDFAs, 
+            name,
+            tokens,
+            tokenNames,
+            rules,
+            cyclicDFAs,
             bitsets,
-            buildTemplate, 
+            buildTemplate,
             profile,
-            fileName, 
-            ANTLRVersion, 
+            fileName,
+            ANTLRVersion,
             generatedTimestamp
             ) ::=
 <<
@@ -157,25 +158,27 @@ outputFile(
 headerFile(
             LEXER,
             PARSER,
-            TREE_PARSER, 
-            headerAction, 
-            docComment, 
+            TREE_PARSER,
+            actionScope,
+            actions,
+            docComment,
             recognizer,
-            name, 
-            tokens, 
-            tokenNames, 
-            rules, 
-            cyclicDFAs, 
+            name,
+            tokens,
+            tokenNames,
+            rules,
+            cyclicDFAs,
             bitsets,
-            buildTemplate, 
+            buildTemplate,
             profile,
-            fileName, 
-            ANTLRVersion, 
+            fileName,
+            ANTLRVersion,
             generatedTimestamp
             ) ::=
 <<
 <leadIn("header")>
-
+<actions.(actionScope).header>
+<buildTemplate.name>
 <if(LEXER)>
 
 /** \brief Token definitions for the lexer.
@@ -207,6 +210,12 @@ headerFile(
  */
 ANTLR3_API pANTLR3_LEXER <name>Lexer_new    (pANTLR3_CHARSTREAM     input);
 ANTLR3_API ANTLR3_RESULT <name>Lexer_nextToken   (pANTLR3_LEXER          lexerContext);
+<endif>
+<if(PARSER)>
+ ? parser blah
+<actions:{ a | <a> }; separator="\n">
+<actions.scope:{ s| <s>}; separator="\n">
+<rules:{ <it> }; separator="\n">
 <endif>
 >>
 
