@@ -36,6 +36,7 @@ import org.antlr.analysis.DecisionProbe;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.BitSet;
 import org.antlr.misc.Utils;
+import org.antlr.Tool;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -178,11 +179,12 @@ public class TestSemanticPredicates extends TestSuite {
 	public void testLeftRecursivePred() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
+			"s : a ;\n" +
 			"a : {p1}? a | ID ;\n");
 		String expecting =
 			".s0-ID->.s1\n" +
-			".s1-{!(p1)}?->:s3=>2\n" +
-			".s1-{p1}?->:s2=>1\n";
+			".s1-{!(p1)}?->:s2=>2\n" +
+			".s1-{p1}?->:s3=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -218,6 +220,115 @@ public class TestSemanticPredicates extends TestSuite {
 			".s1-B->.s2\n" +
 			".s2-{!(p1)}?->:s4=>2\n" +
 			".s2-{p1}?->:s3=>1\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testMatchesLongestThenTestPred() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : b | c ;\n" +
+			"b : {p}? A ;\n" +
+			"c : {q}? (A|B)+ ;");
+		String expecting =
+			".s0-A->.s1\n" +
+			".s0-B->:s4=>2\n" +
+			".s1-{p}?->:s3=>1\n" +
+			".s1-{q}?->:s2=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testLexerMatchesLongestThenTestPred() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"B : {p}? \"a\" ;\n" +
+			"C : {q}? (\"a\"|\"b\")+ ;");
+		String expecting =
+			".s0-\"a\"->.s1\n" +
+			".s0-\"b\"->:s5=>2\n" +
+			".s1-\"a\"..\"b\"->:s5=>2\n" +
+			".s1-<EOT>->.s2\n" +
+			".s2-{p}?->:s4=>1\n" +
+			".s2-{q}?->:s3=>2\n";
+		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testGatedPred() throws Exception {
+		// gated preds are present on all arcs in predictor
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"B : {p}? => \"a\" ;\n" +
+			"C : {q}? => (\"a\"|\"b\")+ ;");
+		String expecting =
+			".s0-\"a\"&&{(q||p)}?->.s1\n" +
+			".s0-\"b\"&&{q}?->:s5=>2\n" +
+			".s1-\"a\"..\"b\"&&{q}?->:s5=>2\n" +
+			".s1-<EOT>&&{(q||p)}?->.s2\n" +
+			".s2-{p}?->:s4=>1\n" +
+			".s2-{q}?->:s3=>2\n";
+		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testGatedPredInCyclicDFA() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"A : {p}?=> (\"a\")+ \"x\" ;\n" +
+			"B : {q}?=> (\"a\"|\"b\")+ \"x\" ;");
+		String expecting =
+			".s0-\"a\"&&{(p||q)}?->.s1\n" +
+			".s0-\"b\"&&{q}?->:s6=>2\n" +
+			".s1-\"a\"&&{(p||q)}?->.s1\n" +
+			".s1-\"b\"&&{q}?->:s6=>2\n" +
+			".s1-\"x\"&&{(q||p)}?->.s2\n" +
+			".s2-<EOT>&&{(p||q)}?->.s3\n" +
+			".s3-{p}?->:s4=>1\n" +
+			".s3-{q}?->:s5=>2\n";
+		checkDecision(g, 3, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testGatedPredDoesNotForceAllToBeGated() throws Exception {
+		Grammar g = new Grammar(
+			"grammar w;\n" +
+			"a : b | c ;\n" +
+			"b : {p}? B ;\n" +
+			"c : {q}?=> d ;\n" +
+			"d : {r}? C ;\n");
+		String expecting =
+			".s0-B->:s1=>1\n" +
+			".s0-C&&{q}?->:s2=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testGatedPredDoesNotForceAllToBeGated2() throws Exception {
+		Grammar g = new Grammar(
+			"grammar w;\n" +
+			"a : b | c ;\n" +
+			"b : {p}? B ;\n" +
+			"c : {q}?=> d ;\n" +
+			"d : {r}?=> C\n" +
+			"  | B\n" +
+			"  ;\n");
+		String expecting =
+			".s0-B&&{q}?->.s1\n" +
+			".s0-C&&{(q&&r)}?->:s4=>2\n" +
+			".s1-{p}?->:s3=>1\n" +
+			".s1-{q}?->:s2=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testORGatedPred() throws Exception {
+		Grammar g = new Grammar(
+			"grammar w;\n" +
+			"a : b | c ;\n" +
+			"b : {p}? B ;\n" +
+			"c : {q}?=> d ;\n" +
+			"d : {r}?=> C\n" +
+			"  | {s}?=> B\n" +
+			"  ;\n");
+		String expecting =
+			".s0-B&&{(q&&s)}?->.s1\n" +
+			".s0-C&&{(q&&r)}?->:s4=>2\n" +
+			".s1-{(q&&s)}?->:s2=>2\n" +
+			".s1-{p}?->:s3=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -387,6 +498,8 @@ public class TestSemanticPredicates extends TestSuite {
 		DecisionProbe.verbose=true; // make sure we get all error info
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
+		CodeGenerator generator = new CodeGenerator(new Tool(), g, "Java");
+		g.setCodeGenerator(generator);
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			if ( g.type==Grammar.LEXER ) {
@@ -397,7 +510,7 @@ public class TestSemanticPredicates extends TestSuite {
 		}
 
 		if ( equeue.size()!=expectingNumWarnings ) {
-			System.err.println("Warnings issued: "+equeue.warnings);
+			System.err.println("Warnings issued: "+equeue);
 		}
 
 		assertTrue(equeue.size()==expectingNumWarnings,

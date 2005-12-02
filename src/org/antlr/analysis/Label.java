@@ -168,15 +168,6 @@ public class Label implements Comparable, Cloneable {
 		return l;
 	}
 
-	/* not used?
-	public Label(Label l) {
-		this.label = l.label;
-		this.labelSet = l.labelSet;
-		this.labelSet = new IntervalSet();
-		this.labelSet.addAll(labelSet);
-	}
-	*/
-
 	public void add(Label a) {
 		if ( isAtom() ) {
 			labelSet = IntervalSet.of(label);

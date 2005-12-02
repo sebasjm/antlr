@@ -91,6 +91,7 @@ tokens {
     LABEL; // $x used in rewrite rules
     TEMPLATE;
     SCOPE="scope";
+    GATED_SEMPRED; // {p}? =>
 }
 
 {
@@ -414,7 +415,7 @@ elementNoOptionSpec
 
 	|   a:ACTION
 
-	|   p:SEMPRED
+	|   p:SEMPRED ( IMPLIES! {#p.setType(GATED_SEMPRED);} )?
 
 	|   t3:tree
 	;

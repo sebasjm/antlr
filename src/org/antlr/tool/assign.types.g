@@ -570,6 +570,7 @@ element
     |   #( SYNPRED block ) 
     |   ACTION
     |   SEMPRED
+    |   GATED_SEMPRED
     |   EPSILON 
     ;
 

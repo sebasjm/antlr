@@ -644,8 +644,7 @@ public class DFAState extends State {
 	 *
 	 *  experimental 11/29/2005
 	 *
-	 *  TODO: cache this as it's called a lot; or at least set bit if >1 present in state 
-	 */
+	 *  TODO: cache this as it's called a lot; or at least set bit if >1 present in state
 	public Set getGatedPredicatesInNFAConfigurations() {
 		Set preds = new HashSet();
 		Iterator iter = nfaConfigurations.iterator();
@@ -660,6 +659,34 @@ public class DFAState extends State {
 			return null;
 		}
 		return preds;
+	}
+	 */
+
+	/** For gated productions, we need an OR'd list of all predicates for the
+	 *  target of an edge so we can gate the edge based upon the predicates
+	 *  associated with taking that path (if any).
+	 *
+	 *  TODO: cache this as it's called a lot; or at least set bit if >1 present in state
+	 */
+	public SemanticContext getGatedPredicatesInNFAConfigurations() {
+		Iterator iter = nfaConfigurations.iterator();
+		SemanticContext unionOfPredicatesFromAllAlts = null;
+		NFAConfiguration configuration;
+		while (iter.hasNext()) {
+			configuration = (NFAConfiguration) iter.next();
+			SemanticContext gatedPredExpr =
+				configuration.semanticContext.getGatedPredicateContext();
+			if ( gatedPredExpr!=null ) {
+				if ( unionOfPredicatesFromAllAlts==null ) {
+					unionOfPredicatesFromAllAlts = gatedPredExpr;
+				}
+				else {
+					unionOfPredicatesFromAllAlts =
+						SemanticContext.or(unionOfPredicatesFromAllAlts,gatedPredExpr);
+				}
+			}
+		}
+		return unionOfPredicatesFromAllAlts;
 	}
 
     /** Is an accept state reachable from this state? */

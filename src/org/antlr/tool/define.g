@@ -366,6 +366,7 @@ element
     |   #( SYNPRED block )
     |   act:ACTION
     |   SEMPRED
+    |   GATED_SEMPRED
     |   EPSILON 
     ;
 

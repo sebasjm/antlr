@@ -286,6 +286,11 @@ element
     	if ( showActions ) {out("{"); out(pred.getText()); out("}?");}
     	else {out("{...}?");}
     	}
+    |   gpred:GATED_SEMPRED
+    	{
+    	if ( showActions ) {out("{"); out(gpred.getText()); out("}? =>");}
+    	else {out("{...}? =>");}
+    	}
     |   EPSILON {out(" /* epsilon */ ");}
     ;
 

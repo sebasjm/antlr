@@ -78,13 +78,6 @@ public class ACyclicDFACodeGenerator {
 			dfaEdgeName = "dfaEdgeSwitch";
 		}
 
-		/*
-		int oldMax = parent.decisionToMaxLookaheadDepth[dfa.getDecisionNumber()];
-		if( k > oldMax ) {
-			// track max (don't count the accept state)
-			parent.decisionToMaxLookaheadDepth[dfa.getDecisionNumber()] = k;
-		}
-		*/
 		StringTemplate dfaST = templates.getInstanceOf(dfaStateName);
 		if ( dfa.getNFADecisionStartState().decisionStateType==NFAState.LOOPBACK ) {
 			dfaST = templates.getInstanceOf(dfaLoopbackStateName);
@@ -134,11 +127,18 @@ public class ACyclicDFACodeGenerator {
 				edgeST.setAttribute("labelExpr",
 								parent.genLabelExpr(templates,edge,k));
 			}
-			if ( false ) {
+
+			// stick in any gated predicates for any edge if not already pred
+			if ( !edge.label.isSemanticPredicate() ) {
 				DFAState target = (DFAState)edge.target;
-				//System.out.println("preds="+target.getGatedPredicatesInNFAConfigurations());
-				edgeST.setAttribute("predicates",
-									((DFAState)edge.target).getGatedPredicatesInNFAConfigurations());
+				SemanticContext preds =
+					target.getGatedPredicatesInNFAConfigurations();
+				if ( preds!=null ) {
+					//System.out.println("preds="+target.getGatedPredicatesInNFAConfigurations());
+					StringTemplate predST = preds.genExpr(parent, parent.getTemplates());
+					edgeST.setAttribute("predicates",
+										predST.toString());
+				}
 			}
 
 			StringTemplate targetST =

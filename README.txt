@@ -206,6 +206,13 @@ CHANGES
 
 3.0ea7 - 
 
+* Added gated predicates "{p}?=>" that literally turn off a production whereas
+disambiguating predicates are only hoisted into the predictor when syntax alone
+is not sufficient to uniquely predict alternatives.
+
+A : {p}?  => "a" ;
+B : {!p}? => ("a"|"b")+ ;
+
 * bug fixed related to predicates in predictor
 lexer grammar w;
 A : {p}? "a" ;

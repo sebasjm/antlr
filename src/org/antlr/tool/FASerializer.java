@@ -145,15 +145,28 @@ public class FASerializer {
             if ( edge.isEpsilon() ) {
                 buf.append("->");
             }
-            else if ( edge.isSemanticPredicate() ) {
-                buf.append("-{"+edge.label.getSemanticContext()+"}?->");
-            }
-            else {
-                buf.append("-"+edge.label.toString(grammar)+"->");
-            }
-            Integer normalizedTargetStateNumberI =
-                    (Integer)stateNumberTranslator.get(edge.target);
-            int normalizedTargetStateNumber = normalizedTargetStateNumberI.intValue();
+			else if ( edge.isSemanticPredicate() ) {
+				buf.append("-{"+edge.label.getSemanticContext()+"}?->");
+			}
+			else {
+				String predsStr = "";
+				if ( edge.target instanceof DFAState ) {
+					// look for gated predicates; don't add gated to simple sempred edges
+					SemanticContext preds =
+						((DFAState)edge.target).getGatedPredicatesInNFAConfigurations();
+					if ( preds!=null ) {
+						predsStr = "&&{"+
+							preds.genExpr(grammar.generator,
+									   	  grammar.generator.getTemplates()).toString()
+							+"}?";
+					}
+				}
+				buf.append("-"+edge.label.toString(grammar)+predsStr+"->");
+			}
+
+			Integer normalizedTargetStateNumberI =
+				(Integer)stateNumberTranslator.get(edge.target);
+			int normalizedTargetStateNumber = normalizedTargetStateNumberI.intValue();
             buf.append(getStateString(normalizedTargetStateNumber, edge.target));
             buf.append("\n");
             lines.add(buf.toString());

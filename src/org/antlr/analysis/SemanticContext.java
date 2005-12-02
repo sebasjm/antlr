@@ -31,6 +31,10 @@ import antlr.collections.AST;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.codegen.CodeGenerator;
+import org.antlr.tool.ANTLRParser;
+import org.antlr.tool.GrammarAST;
+
+import java.util.Set;
 
 /** A binary tree structure used to record the semantic context in which
  *  an NFA configuration is valid.  It's either a single predicate or
@@ -54,13 +58,15 @@ public abstract class SemanticContext {
      *  This prevents lots of if!=null type checks all over; it represents
      *  just an empty set of predicates.
      */
-    public static final SemanticContext EMPTY_SEMANTIC_CONTEXT =
-		new Predicate() {{gated=false;}};
-
-	/** Is this a {...}?=> gating predicate or a normal disambiguating {..}? */
-	protected boolean gated = false;
+    public static final SemanticContext EMPTY_SEMANTIC_CONTEXT = new Predicate();
 
     public abstract SemanticContext reduce();
+
+	/** Given a semantic context expression tree, return a tree with all
+	 *  nongated predicates set to true and then reduced.  So p&&(q||r) would
+	 *  return p&&r if q is nongated but p and r are gated.
+	 */
+	public abstract SemanticContext getGatedPredicateContext();
 
     /** Generate an expression that will evaluate the semantic context,
      *  given a set of output templates.
@@ -72,17 +78,41 @@ public abstract class SemanticContext {
         /** The AST node in tree created from the grammar holding the predicate */
         protected AST predicate;
 
+		/** Is this a {...}?=> gating predicate or a normal disambiguating {..}?
+		 *  If any predicate in expression is gated, then expression is considered
+		 *  gated.
+		 *
+		 *  The simple Predicate object's predicate AST's type is used to set
+		 *  gated to true if type==GATED_SEMPRED.
+		 */
+		protected boolean gated = false;
+
+		public static final int INVALID_PRED_VALUE = -1;
+		public static final int FALSE_PRED = 0;
+		public static final int TRUE_PRED = 1;
+
+		/** sometimes predicates are known to be true or false; we need
+		 *  a way to represent this without resorting to a target language
+		 *  value like true or TRUE.
+		 */
+		protected int constantValue = INVALID_PRED_VALUE;
+
         public Predicate() {
+			predicate = new GrammarAST();
+			//predicate.initialize(ANTLRParser.SEMPRED, "true");
+			this.gated=false;
         }
 
         public Predicate(AST predicate) {
             this.predicate = predicate;
-			/*
-			if ( predicate.getType()==GATED_SEMPRED ) {
-				this.gated = true;
-			}
-			*/
+			this.gated = predicate.getType()==ANTLRParser.GATED_SEMPRED;
         }
+
+		public Predicate(Predicate p) {
+			this.predicate = p.predicate;
+			this.gated = p.gated;
+			this.constantValue = p.constantValue;
+		}
 
         public SemanticContext reduce() {
             // single pred is already reduced
@@ -90,15 +120,14 @@ public abstract class SemanticContext {
         }
 
         /** Two predicates are the same if they are literally the same
-         *  predicate in the grammar's AST.  They may have the same text
-         *  but they are different if they come from different locations.
-         *  Later, the compiler can do common-subexpression elimination. ;)
+         *  text rather than same node in the grammar's AST.
+		 *  Or, if they have the same constant value, return equal.
          */
         public boolean equals(Object o) {
             if ( !(o instanceof Predicate) ) {
                 return false;
             }
-            return predicate == ((Predicate)o).predicate;
+            return predicate.getText().equals(((Predicate)o).predicate.getText());
         }
 
         public int hashCode() {
@@ -111,15 +140,38 @@ public abstract class SemanticContext {
         public StringTemplate genExpr(CodeGenerator generator,
 									  StringTemplateGroup templates)
 		{
-			StringTemplate eST = templates.getInstanceOf("evalPredicate");
-			eST.setAttribute("pred", this.toString());
-			String description =
-				generator.target.getTargetStringLiteralFromString(this.toString());
-			eST.setAttribute("description", description);
+			StringTemplate eST = null;
+			if ( templates!=null ) {
+				eST = templates.getInstanceOf("evalPredicate");
+				eST.setAttribute("pred", this.toString());
+			}
+			else {
+				eST = new StringTemplate("$pred$");
+				eST.setAttribute("pred", this.toString());
+				return eST;
+			}
+			if ( generator!=null ) {
+				String description =
+					generator.target.getTargetStringLiteralFromString(this.toString());
+				eST.setAttribute("description", description);
+			}
             return eST;
         }
 
+		public SemanticContext getGatedPredicateContext() {
+			if ( gated ) {
+				return this;
+			}
+			return null;
+		}
+
         public String toString() {
+			if ( constantValue==TRUE_PRED ) {
+				return "true";
+			}
+			if ( constantValue==FALSE_PRED ) {
+				return "false";
+			}
             if ( predicate==null ) {
                 return "<nopred>";
             }
@@ -127,7 +179,21 @@ public abstract class SemanticContext {
         }
     }
 
-    public static class AND extends SemanticContext {
+	public static class TruePredicate extends Predicate {
+		public TruePredicate() {
+			super();
+			this.constantValue = TRUE_PRED;
+		}
+	}
+
+	public static class FalsePredicate extends Predicate {
+		public FalsePredicate() {
+			super();
+			this.constantValue = FALSE_PRED;
+		}
+	}
+
+	public static class AND extends SemanticContext {
         protected SemanticContext left,right;
         public AND(SemanticContext a, SemanticContext b) {
             this.left = a;
@@ -150,11 +216,28 @@ public abstract class SemanticContext {
         public StringTemplate genExpr(CodeGenerator generator,
 									  StringTemplateGroup templates)
 		{
-            StringTemplate eST = templates.getInstanceOf("andPredicates");
+			StringTemplate eST = null;
+			if ( templates!=null ) {
+				eST = templates.getInstanceOf("andPredicates");
+			}
+			else {
+				eST = new StringTemplate("($left$&&$right$)");
+			}
             eST.setAttribute("left", left);
             eST.setAttribute("right", right);
             return eST;
         }
+		public SemanticContext getGatedPredicateContext() {
+			SemanticContext gatedLeft = left.getGatedPredicateContext();
+			SemanticContext gatedRight = right.getGatedPredicateContext();
+			if ( gatedLeft==null ) {
+				return gatedRight;
+			}
+			if ( gatedRight==null ) {
+				return gatedLeft;
+			}
+			return new AND(gatedLeft, gatedRight);
+		}
         public String toString() {
             return "("+left+"&&"+right+")";
         }
@@ -171,11 +254,11 @@ public abstract class SemanticContext {
             // (p1a||p1b)||p1a => p1a||p1b where a=(p1a||p1b) and b=p1a
             left.reduce();
             right.reduce();
+			// (p||q)||p => p||q or vice versa
 			if ( left instanceof OR && right instanceof Predicate ) {
                 OR leftOr = (OR)left;
                 Predicate p = (Predicate)right;
                 if ( leftOr.left.equals(p) || leftOr.right.equals(p) ) {
-                    // eliminate p
                     return left;
                 }
             }
@@ -183,10 +266,18 @@ public abstract class SemanticContext {
                 OR rightOr = (OR)right;
                 Predicate p = (Predicate)left;
                 if ( rightOr.left.equals(p) || rightOr.right.equals(p) ) {
-                    // eliminate p
                     return right;
                 }
             }
+			// p||!p => true
+			if ( left.equals(not(right)) ) {
+				return new TruePredicate(); // return true pred
+			}
+			// !p||p => true
+			if ( right.equals(not(left)) ) {
+				return new TruePredicate(); // return true pred
+			}
+
             return this;
         }
         public boolean equals(Object o) {
@@ -201,11 +292,28 @@ public abstract class SemanticContext {
         public StringTemplate genExpr(CodeGenerator generator,
 									  StringTemplateGroup templates)
 		{
-            StringTemplate eST = templates.getInstanceOf("orPredicates");
+            StringTemplate eST = null;
+			if ( templates!=null ) {
+				eST = templates.getInstanceOf("orPredicates");
+			}
+			else {
+				eST = new StringTemplate("($left$||$right$)");
+			}
             eST.setAttribute("left", left);
             eST.setAttribute("right", right);
             return eST;
         }
+		public SemanticContext getGatedPredicateContext() {
+			SemanticContext gatedLeft = left.getGatedPredicateContext();
+			SemanticContext gatedRight = right.getGatedPredicateContext();
+			if ( gatedLeft==null ) {
+				return gatedRight;
+			}
+			if ( gatedRight==null ) {
+				return gatedLeft;
+			}
+			return new AND(gatedLeft, gatedRight);
+		}
         public String toString() {
             return "("+left+"||"+right+")";
         }
@@ -232,10 +340,23 @@ public abstract class SemanticContext {
         public StringTemplate genExpr(CodeGenerator generator,
 									  StringTemplateGroup templates)
 		{
-            StringTemplate eST = templates.getInstanceOf("notPredicate");
+			StringTemplate eST = null;
+			if ( templates!=null ) {
+				eST = templates.getInstanceOf("notPredicate");
+			}
+			else {
+				eST = new StringTemplate("?!($pred$)");
+			}
             eST.setAttribute("pred", ctx);
             return eST;
         }
+		public SemanticContext getGatedPredicateContext() {
+			SemanticContext p = ctx.getGatedPredicateContext();
+			if ( p==null ) {
+				return null;
+			}
+			return new NOT(p);
+		}
         public String toString() {
             return "!("+ctx+")";
         }
@@ -251,7 +372,7 @@ public abstract class SemanticContext {
         if ( a.equals(b) ) {
             return a; // if same, just return left one
         }
-        return new AND(a,b);
+        return new AND(a,b).reduce();
     }
 
     public static SemanticContext or(SemanticContext a, SemanticContext b) {
@@ -268,11 +389,7 @@ public abstract class SemanticContext {
     }
 
     public static SemanticContext not(SemanticContext a) {
-        return new NOT(a);
+        return new NOT(a).reduce();
     }
-
-	public boolean isGated() {
-		return gated;
-	}
 
 }

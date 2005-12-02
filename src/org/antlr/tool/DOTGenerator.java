@@ -142,7 +142,7 @@ public class DOTGenerator {
 				}
 			}
             st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
-            st.setAttribute("label", getEdgeLabel(edge.label.toString(grammar)));
+            st.setAttribute("label", getEdgeLabel(edge));
             st.setAttribute("src", getStateLabel(s));
             st.setAttribute("target", getStateLabel(edge.target));
 			st.setAttribute("arrowhead", arrowhead);
@@ -217,7 +217,7 @@ public class DOTGenerator {
                 continue;
             }
             st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
-            st.setAttribute("label", getEdgeLabel(edge.label.toString(grammar)));
+            st.setAttribute("label", getEdgeLabel(edge));
             st.setAttribute("src", getStateLabel(s));
 			st.setAttribute("target", getStateLabel(edge.target));
 			st.setAttribute("arrowhead", arrowhead);
@@ -263,13 +263,32 @@ public class DOTGenerator {
     }
     */
 
-    /** Fix edge strings so they print out in DOT properly */
-    protected String getEdgeLabel(String label) {
+    /** Fix edge strings so they print out in DOT properly;
+	 *  generate any gated predicates on edge too.
+	 */
+    protected String getEdgeLabel(Transition edge) {
+		String label = edge.label.toString(grammar);
 		label = Utils.replace(label,"\\", "\\\\");
 		label = Utils.replace(label,"\"", "\\\"");
         if ( label.equals(Label.EPSILON_STR) ) {
             label = "e";
         }
+		State target = edge.target;
+		if ( !edge.isSemanticPredicate() && target instanceof DFAState ) {
+			// look for gated predicates; don't add gated to simple sempred edges
+			SemanticContext preds =
+				((DFAState)target).getGatedPredicatesInNFAConfigurations();
+			if ( preds!=null ) {
+				String predsStr = "";
+				if ( preds!=null ) {
+					predsStr = "&&{"+
+						preds.genExpr(grammar.generator,
+										 grammar.generator.getTemplates()).toString()
+						+"}?";
+				}
+				label += predsStr;
+			}
+		}
         return label;
     }
 

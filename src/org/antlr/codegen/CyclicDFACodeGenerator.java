@@ -174,6 +174,14 @@ public class CyclicDFACodeGenerator {
 			edgeST.setAttribute("edgeNumber", new Integer(i+1));
 			edgeST.setAttribute("targetStateNumber",
 								 new Integer(edge.target.stateNumber));
+
+			// stick in any gated predicates for any edge if not already a pred
+			if ( !edge.label.isSemanticPredicate() ) {
+				DFAState target = (DFAState)edge.target;
+				edgeST.setAttribute("predicates",
+									target.getGatedPredicatesInNFAConfigurations());
+			}
+
 			if ( edge.label.getAtom()!=Label.EOT ) {
 				stateST.setAttribute("edges", edgeST);
 			}

@@ -541,7 +541,7 @@ element returns [StringTemplate code=null]
         code.setAttribute("action", generator.translateAction(currentRuleName,#act));
         }
 
-    |   sp:SEMPRED
+    |   (sp:SEMPRED|gsp:GATED_SEMPRED {#sp=#gsp;})
         {
         code = templates.getInstanceOf("validateSemanticPredicate");
         #sp.outerAltNum = this.outerAltNum;

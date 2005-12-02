@@ -260,7 +260,7 @@ public class NFAFactory {
         return g;
     }
 
-    /** add an EOF transition to any rule end NFAState that points to nothing
+	/** add an EOF transition to any rule end NFAState that points to nothing
      *  (i.e., for all those rules not invoked by another rule).  These
      *  are start symbols then.
 	 *
