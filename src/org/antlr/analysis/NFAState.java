@@ -169,6 +169,7 @@ public class NFAState extends State {
 				walkAlt = displayAlt % nAlts + 1; // rotate right mod 1..3
 				break;
 			case BLOCK_START :
+			case OPTIONAL_BLOCK_START :
 				walkAlt = displayAlt; // identity transformation
 				break;
 			case BYPASS :

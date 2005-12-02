@@ -269,9 +269,11 @@ public class Interpreter implements TokenSource {
 				// decision point, must predict and jump to alt
 				DFA dfa = grammar.getLookaheadDFA(s.getDecisionNumber());
 				/*
-				System.out.println("decision: "+
+				if ( grammar.type!=Grammar.LEXER ) {
+					System.out.println("decision: "+
 								   dfa.getNFADecisionStartState().getDescription()+
-								   " input="+grammar.getTokenName(t));
+								   " input="+grammar.getTokenDisplayName(t));
+				}
 				*/
 				int m = input.mark();
 				int predictedAlt = predict(dfa);
@@ -292,8 +294,10 @@ public class Interpreter implements TokenSource {
 				int parseAlt =
 					s.translateDisplayAltToWalkAlt(predictedAlt);
 				/*
-				System.out.println("predicted alt "+predictedAlt+", parseAlt "+
-								   parseAlt);
+				if ( grammar.type!=Grammar.LEXER ) {
+					System.out.println("predicted alt "+predictedAlt+", parseAlt "+
+									   parseAlt);
+				}
 				*/
 				NFAState alt = grammar.getNFAStateForAltOfDecision(s, parseAlt);
 				s = (NFAState)alt.transition(0).target;
