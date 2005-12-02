@@ -64,7 +64,9 @@ public class Attribute {
 			if ( !inID && Character.isLetter(decl.charAt(i)) ) {
 			    inID = true;
 			}
-			else if ( inID && !Character.isLetter(decl.charAt(i)) ) {
+			else if ( inID &&
+				      !(Character.isLetter(decl.charAt(i))||
+				       decl.charAt(i)=='_') ) {
 				start = i+1;
 				break;
 			}
@@ -79,7 +81,9 @@ public class Attribute {
 		int stop=-1;
 		for (int i=start; i<decl.length(); i++) {
 			// if we haven't found the end yet, keep going
-			if ( !Character.isLetterOrDigit(decl.charAt(i)) ) {
+			if ( !(Character.isLetter(decl.charAt(i))||
+				decl.charAt(i)=='_') )
+			{
 				stop = i;
 				break;
 			}

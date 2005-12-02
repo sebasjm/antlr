@@ -695,7 +695,8 @@ public class ActionTranslator {
 		int start = c;
 		int i = c+1;
 		while ( i<action.length() &&
-			Character.isLetterOrDigit(action.charAt(i)) )
+			(Character.isLetterOrDigit(action.charAt(i))||
+			action.charAt(i)=='_') )
 		{
 			i++;
 		}

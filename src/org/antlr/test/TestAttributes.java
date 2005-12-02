@@ -67,7 +67,8 @@ public class TestAttributes extends TestSuite {
 							 new antlr.CommonToken(ANTLRParser.ACTION,action),0);
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		StringTemplate actionST = new StringTemplate(templates, "<action>");
+		actionST.setAttribute("action", rawTranslation);
 		String found = actionST.toString();
 		assertEqual(found, expecting);
 	}
@@ -592,6 +593,37 @@ public class TestAttributes extends TestSuite {
 		assertEqual(found, expecting);
 
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testScopeAndAttributeWithUnderscore() throws Exception {
+		String action = "$foo_bar::a_b;";
+		String expecting = "((foo_bar_scope)foo_bar_stack.peek()).a_b;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"scope foo_bar {\n" +
+			"  int a_b;\n" +
+			"}\n" +
+			"a scope foo_bar; : (ID {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : \"a\";\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEqual(found, expecting);
 	}
 
 	public void testSharedGlobalScope() throws Exception {
