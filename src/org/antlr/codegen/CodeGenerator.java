@@ -303,6 +303,17 @@ public class CodeGenerator {
 		headerFileST.setAttribute("actions", grammar.getActions());
 		outputFileST.setAttribute("actions", grammar.getActions());
 
+		boolean canBacktrack = grammar.getSyntacticPredicates()!=null;
+		outputFileST.setAttribute("backtracking", new Boolean(canBacktrack));
+		headerFileST.setAttribute("backtracking", new Boolean(canBacktrack));
+		Set synpredNames = null;
+		if ( grammar.getSyntacticPredicates()!=null ) {
+			synpredNames = grammar.getSyntacticPredicates().keySet();
+		}
+		outputFileST.setAttribute("synpreds", synpredNames);
+		headerFileST.setAttribute("synpreds", grammar.getSyntacticPredicates());
+
+
 		// RECOGNIZER
 		if ( grammar.type==Grammar.LEXER ) {
 			recognizerST = templates.getInstanceOf("lexer");

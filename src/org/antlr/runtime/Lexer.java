@@ -31,6 +31,16 @@ public abstract class Lexer implements TokenSource {
 	/** Where is the lexer drawing characters from? */
     protected CharStream input;
 
+	/** In lieu of a return value, this indicates that a rule or char
+	 *  has failed to match.  Reset to false upon valid char match.
+	 */
+	protected boolean failed = false;
+
+	/** If 0, no backtracking is going on.  Safe to exec actions etc...
+	 *  If >0 then it's the level of backtracking.
+	 */
+	protected int backtracking = 0;
+
 	/** The goal of all lexer rules/methods is to create a token object.
 	 *  This is an instance variable as multiple rules may collaborate to
 	 *  create a single token.  For example, NUM : INT | FLOAT ;
@@ -67,6 +77,10 @@ public abstract class Lexer implements TokenSource {
         int i = 0;
         while ( i<s.length() ) {
             if ( input.LA(1)!=s.charAt(i) ) {
+				if ( backtracking>0 ) {
+					failed = true;
+					return;
+				}
 				MismatchedTokenException mte =
 					new MismatchedTokenException(s.charAt(i), input);
 				recover(mte);
@@ -74,6 +88,7 @@ public abstract class Lexer implements TokenSource {
             }
             i++;
             input.consume();
+			failed = false;
         }
     }
 
@@ -83,24 +98,34 @@ public abstract class Lexer implements TokenSource {
 
     public void match(int c) throws MismatchedTokenException {
         if ( input.LA(1)!=c ) {
+			if ( backtracking>0 ) {
+				failed = true;
+				return;
+			}
 			MismatchedTokenException mte =
 				new MismatchedTokenException(c, input);
 			recover(mte);
 			throw mte;
         }
         input.consume();
+		failed = false;
     }
 
     public void matchRange(int a, int b)
 		throws MismatchedRangeException
 	{
         if ( input.LA(1)<a || input.LA(1)>b ) {
+			if ( backtracking>0 ) {
+				failed = true;
+				return;
+			}
             MismatchedRangeException mre =
 				new MismatchedRangeException(a,b,input);
 			recover(mre);
 			throw mre;
         }
         input.consume();
+		failed = false;
     }
 
     public int getLine() {

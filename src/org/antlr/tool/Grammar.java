@@ -230,6 +230,13 @@ public class Grammar {
     /** Rules are uniquely labeled from 1..n */
     protected int ruleIndex = 1;
 
+	/** When we read in a grammar, we track the list of syntactic predicates
+	 *  and build faux rules for them later.  See my blog entry Dec 2, 2005:
+	 *  http://www.antlr.org/blog/antlr3/lookahead.tml
+	 *  This maps the name (we make up) for a pred to the AST grammar fragment.
+	 */
+	protected LinkedHashMap nameToSynpredASTMap;
+
 	/** Map a rule to it's Rule object
 	 */
 	protected LinkedHashMap nameToRuleMap = new LinkedHashMap();
@@ -273,7 +280,6 @@ public class Grammar {
 	 *  visited to track infinite recursion.
 	 */
 	protected Set visitedDuringRecursionCheck = null;
-
 
 	protected boolean watchNFAConversion = false;
 
@@ -387,8 +393,11 @@ public class Grammar {
 		ANTLRParser parser = new ANTLRParser(tokenBuffer);
 		parser.setFilename(this.getFileName());
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
-		parser.grammar();
+		parser.grammar(this);
 		grammarTree = (GrammarAST)parser.getAST();
+		addArtificialRulesForSyntacticPredicates(parser,
+												 grammarTree,
+												 nameToSynpredASTMap);
 		if ( Tool.internalOption_PrintGrammarTree ) {
 			System.out.println(grammarTree.toStringList());
 		}
@@ -518,6 +527,27 @@ public class Grammar {
         }
 		antlr.Token ruleToken = new antlr.TokenWithIndex(ANTLRParser.ID,ARTIFICIAL_TOKENS_RULENAME);
 		defineRule(ruleToken, null, null, (GrammarAST)parser.getAST(), null, numAlts);
+	}
+
+	/** for any syntactic predicates, define rules for them; they will get
+	 *  defined automatically like any other rule. :)
+	 */
+	protected void addArtificialRulesForSyntacticPredicates(ANTLRParser parser,
+															GrammarAST grammarTree,
+															LinkedHashMap nameToSynpredASTMap)
+	{
+		if ( nameToSynpredASTMap==null ) {
+			return;
+		}
+		Set predNames = nameToSynpredASTMap.keySet();
+		for (Iterator it = predNames.iterator(); it.hasNext();) {
+			String synpredName = (String)it.next();
+			GrammarAST fragmentAST =
+				(GrammarAST) nameToSynpredASTMap.get(synpredName);
+			GrammarAST ruleAST =
+				parser.createSimpleRuleAST(synpredName+"_fragment",fragmentAST);
+			grammarTree.addChild(ruleAST);
+		}
 	}
 
     protected void initTokenSymbolTables() {
@@ -687,9 +717,20 @@ public class Grammar {
         ruleIndex++;
 	}
 
-	public void defineGrammarHeader(GrammarAST nameAST, GrammarAST actionAST) {
-		// ignore name of header space for now
-		lexerGrammarST.setAttribute("header", actionAST.getText());
+	/** Define a new predicate and get back its name for use in building
+	 *  a semantic predicate reference to the syn pred.
+	 */
+	public String defineSyntacticPredicate(GrammarAST blockAST) {
+		if ( nameToSynpredASTMap==null ) {
+			nameToSynpredASTMap = new LinkedHashMap();
+		}
+		String predName = "synpred"+(nameToSynpredASTMap.size() + 1);
+		nameToSynpredASTMap.put(predName, blockAST);
+		return predName;
+	}
+
+	public LinkedHashMap getSyntacticPredicates() {
+		return nameToSynpredASTMap;
 	}
 
 	/** Given @scope::name {action} define it for this grammar.  Later,

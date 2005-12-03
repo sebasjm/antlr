@@ -46,6 +46,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
            buildTemplate, profile,
+	   backtracking, synpreds,
 	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
@@ -122,6 +123,8 @@ public class <name> extends <@superClassName><superClass><@end> {
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
 
+    <synpreds:{p | <synpred(name=p)>}>
+
     <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
                     words64=it.bits)>
 }
@@ -136,6 +139,18 @@ parser(name, scopes, tokens, tokenNames, rules, cyclicDFAs, bitsets, ASTLabelTyp
  */
 treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser") ::= <<
 <genericParser(inputStreamType="TreeNodeStream", ...)>
+>>
+
+synpred(name) ::= <<
+boolean <name>() {
+    backtracking++;
+    int start = input.mark();
+    try {<name>_fragment();}
+    catch (RecognitionException re) {System.err.println("impossible");}
+    input.rewind(start);
+    backtracking--;
+    return !failed;
+}<\n>
 >>
 
 /** How to generate code for a rule.  This includes any return type
@@ -385,7 +400,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)input.LT(1);<\n>
 <endif>
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);<if(backtracking)> if (failed) return;<endif>
 >>
 
 /** ids+=ID */
@@ -404,11 +419,11 @@ charRef(char,label) ::= <<
 <if(label)>
 int <label> = input.LA(1);<\n>
 <endif>
-match(<char>);
+match(<char>);<if(backtracking)> if (failed) return;<endif>
 >>
 
 /** match a character range */
-charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
+charRangeRef(a,b) ::= "matchRange(<a>,<b>);<if(backtracking)> if (failed) return;<endif>"
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
@@ -441,10 +456,10 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 lexerStringRef(string,label) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
-match(<string>);
+match(<string>);<if(backtracking)> if (failed) return;<endif>
 Token <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
-match(<string>);<\n>
+match(<string>);<if(backtracking)> if (failed) return;<endif><\n>
 <endif>
 >>
 
@@ -452,7 +467,7 @@ wildcard(label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)input.LT(1);<\n>
 <endif>
-matchAny(input);
+matchAny(input);<if(backtracking)> if (failed) return;<endif>
 >>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
@@ -465,7 +480,7 @@ wildcardChar(label, elementIndex) ::= <<
 <if(label)>
 int <label> = input.LA(1);<\n>
 <endif>
-matchAny();
+matchAny();<if(backtracking)> if (failed) return;<endif>
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
@@ -484,6 +499,7 @@ following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <rule>(<args>);<\n>
 <endif>
 following.pop();
+<if(backtracking)>if (failed) return;<endif>
 >>
 
 /** ids+=ID */
@@ -496,19 +512,19 @@ ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
-m<rule>(<args>);
+m<rule>(<args>);<if(backtracking)> if (failed) return;<endif>
 Token <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
-m<rule>(<args>);
+m<rule>(<args>);<if(backtracking)> if (failed) return;<endif>
 <endif>
 >>
 
 /** match ^(root children) in tree parser */
 tree(root, children) ::= <<
 <root:element()>
-match(input, Token.DOWN, null);
+match(input, Token.DOWN, null);<if(backtracking)> if (failed) return;<endif>
 <children:element()>
-match(input, Token.UP, null);
+match(input, Token.UP, null);<if(backtracking)> if (failed) return;<endif>
 >>
 
 /** Every predicate is used as a validating predicate (even when it is
@@ -516,6 +532,7 @@ match(input, Token.UP, null);
  */
 validateSemanticPredicate(pred,description) ::= <<
 if ( !(<evalPredicate(...)>) ) {
+    <if(backtracking)>if (failed) return;<endif>
     throw new FailedPredicateException(input, "<ruleName>", "<description>");
 }
 >>

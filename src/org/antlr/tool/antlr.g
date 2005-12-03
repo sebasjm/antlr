@@ -95,6 +95,7 @@ tokens {
 }
 
 {
+	Grammar grammar = null;
 	protected int gtype = 0;
 	protected String currentRuleName = null;
 
@@ -105,6 +106,16 @@ tokens {
 		            ),
 		           #[EOB,"<end-of-block>"]
 		        );
+	}
+
+	public GrammarAST createSimpleRuleAST(String name, GrammarAST block) {
+		GrammarAST ruleAST =
+		   #([RULE,"rule"],
+                 [ID,name],[ARG,"ARG"],[RET,"RET"],
+				 [SCOPE,"scope"],block,[EOR,"<end-of-rule>"]);
+		ruleAST.setLine(block.getLine());
+		ruleAST.setColumn(block.getColumn());
+		return ruleAST;
 	}
 
     public void reportError(RecognitionException ex) {
@@ -123,7 +134,10 @@ tokens {
     }
 }
 
-grammar!
+grammar![Grammar g]
+{
+	this.grammar = g;
+}
    :    //hdr:headerSpec
         ( ACTION )?
 	    ( cmt:DOC_COMMENT  )?
@@ -488,8 +502,16 @@ ebnf!
 							 #ebnf=#([POSITIVE_CLOSURE,"+"],#b);}
 			)
 			( BANG )?
-//		|   IMPLIES	        {#b.setType(SYNPRED); #ebnf=#b;}
-        |                   {#ebnf = #b;}
+		|   IMPLIES // syntactic predicate
+			{
+			// add grammar fragment to a list so we can make fake rules for them
+			// later.
+			String predName = grammar.defineSyntacticPredicate(#b);
+			// convert (alpha)=> into {synpredN()}? where N is some pred count
+			String synpredinvoke = predName+"()";
+			#ebnf = #[SEMPRED,synpredinvoke];
+			}
+        |   {#ebnf = #b;}
 		)
 		{#ebnf.setLine(line); #ebnf.setColumn(col);}
 	;

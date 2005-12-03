@@ -28,6 +28,16 @@ public abstract class BaseParser {
 	 */
 	protected int lastErrorIndex = -1;
 
+	/** In lieu of a return value, this indicates that a rule or token
+	 *  has failed to match.  Reset to false upon valid token match.
+	 */
+	protected boolean failed = false;
+
+	/** If 0, no backtracking is going on.  Safe to exec actions etc...
+	 *  If >0 then it's the level of backtracking.
+	 */
+	protected int backtracking = 0;
+
 	/** reset the parser's state */
 	public void reset() {
 		following.setSize(0);
@@ -45,6 +55,11 @@ public abstract class BaseParser {
 		if ( input.LA(1)==ttype ) {
 			input.consume();
 			errorRecovery = false;
+			failed = false;
+			return;
+		}
+		if ( backtracking>0 ) {
+			failed = true;
 			return;
 		}
 		MismatchedTokenException mte =
