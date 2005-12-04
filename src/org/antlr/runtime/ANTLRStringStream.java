@@ -100,6 +100,11 @@ public class ANTLRStringStream implements CharStream {
 		charPositionInLine = state.charPositionInLine;
     }
 
+	public void seek(int index) {
+		// TODO: broken.  How can we move forward without knowing new line/pos?
+		throw new NoSuchMethodError("not implemented yet");
+	}
+
 	public String substring(int start, int stop) {
 		return input.substring(start,stop+1);
 	}

@@ -206,6 +206,19 @@ CHANGES
 
 3.0ea7 - 
 
+* Added syntactic predicates (...)=>.  See December 4, 2005 entry:
+
+  http://www.antlr.org/blog/antlr3/lookahead.tml
+
+  Note that we have a new option for turning off rule memoization during
+  backtracking:
+
+  -nomemo        when backtracking don't generate memoization code
+
+* Predicates are now tested in order that you specify the alts.  If you
+  leave the last alt "naked" (w/o pred), it will assume a true pred rather
+  than union of other preds.
+
 * Added gated predicates "{p}?=>" that literally turn off a production whereas
 disambiguating predicates are only hoisted into the predictor when syntax alone
 is not sufficient to uniquely predict alternatives.

@@ -37,7 +37,9 @@ public interface IntStream {
 	int LA(int i);
 
 	/** Tell the stream to start buffering if it hasn't already.  Return
-     *  current input position, index().
+     *  current input position, index(), or some other marker so that
+	 *  when passed to rewind() you get back to the same spot.
+	 *  rewind(mark()) should not affect the input cursor.
 	 *  TODO: problem in that lexer stream returns not index but some marker 
      */
 	int mark();
@@ -47,8 +49,22 @@ public interface IntStream {
      */
 	int index();
 
-	/** Reset the stream so that next call to index would return marker. */
+	/** Reset the stream so that next call to index would return marker.
+	 *  The marker will usually be index() but it doesn't have to be.  It's
+	 *  just a marker to indicate what state the stream was in.
+	 */
 	void rewind(int marker);
+
+	/** Set the input cursor to the position indicated by index.  This is
+	 *  normally used to seek ahead in the input stream.  No buffering is
+	 *  required to do this unless you know your stream will use seek to
+	 *  move backwards.  This is different from rewind in its multi-directional
+	 *  ability and in that its argument is strictly an input cursor (index).
+	 *
+	 *  Currently, this method is only used for efficient backtracking, but
+	 *  in the future it may be used for incremental parsing.
+	 */
+	void seek(int index);
 
 	/** Only makes sense for streams that buffer everything up probably, but
 	 *  might be useful to display the entire stream or for testing.

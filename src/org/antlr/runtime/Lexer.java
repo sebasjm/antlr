@@ -41,6 +41,12 @@ public abstract class Lexer implements TokenSource {
 	 */
 	protected int backtracking = 0;
 
+	/** When backtracking, we need to know the start of the outermost
+	 *  current backtracking.  The rule memoization uses this as an offset
+	 *  in its memo array.
+	protected int firstBacktrackingMarker = -1;
+	 */
+
 	/** The goal of all lexer rules/methods is to create a token object.
 	 *  This is an instance variable as multiple rules may collaborate to
 	 *  create a single token.  For example, NUM : INT | FLOAT ;

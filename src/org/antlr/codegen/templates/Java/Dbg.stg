@@ -152,6 +152,6 @@ catch (NoViableAltException nvae) {
 @cyclicDFAState.noViableAltException() ::= "dbg.recognitionException(nvae);"
 
 /** Force predicate validation to trigger an event */
-evalPredicate(pred) ::= <<
-evalPredicate(<pred>,"<pred>")
+evalPredicate(pred,description) ::= <<
+evalPredicate(<pred>,"<description>")
 >>

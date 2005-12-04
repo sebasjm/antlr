@@ -128,7 +128,7 @@ public class ACyclicDFACodeGenerator {
 								parent.genLabelExpr(templates,edge,k));
 			}
 
-			// stick in any gated predicates for any edge if not already pred
+			// stick in any gated predicates for any edge if not already a pred
 			if ( !edge.label.isSemanticPredicate() ) {
 				DFAState target = (DFAState)edge.target;
 				SemanticContext preds =

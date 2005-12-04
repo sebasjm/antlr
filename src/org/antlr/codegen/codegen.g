@@ -551,6 +551,8 @@ element returns [StringTemplate code=null]
 		code.setAttribute("description", description);
         }
 
+    |	SYN_SEMPRED // used only in lookahead; don't generate validating pred
+
     |   EPSILON
     ;
 

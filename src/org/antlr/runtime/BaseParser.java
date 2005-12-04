@@ -38,6 +38,12 @@ public abstract class BaseParser {
 	 */
 	protected int backtracking = 0;
 
+	/** When backtracking, we need to know the start of the outermost
+	 *  current backtracking.  The rule memoization uses this as an offset
+	 *  in its memo array.
+	protected int firstBacktrackingMarker = -1;
+	 */
+
 	/** reset the parser's state */
 	public void reset() {
 		following.setSize(0);

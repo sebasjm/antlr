@@ -121,6 +121,11 @@ public class ANTLRMMapFileStream implements CharStream {
         p = marker;
     }
 
+	public void seek(int index) {
+		// TODO: broken.  How can we move forward without knowing new line/pos?
+		throw new NoSuchMethodError("not implemented yet");
+	}
+
 	public String substring(int start, int stop) {
 		return mmap.subSequence(start,stop-start+1).toString();
 	}

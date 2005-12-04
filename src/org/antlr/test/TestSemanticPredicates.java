@@ -145,8 +145,8 @@ public class TestSemanticPredicates extends TestSuite {
 			"c : {p2}? A ;\n");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-{p1}?->:s3=>1\n" +
-			".s1-{p2}?->:s2=>2\n";
+			".s1-{p1}?->:s2=>1\n" +
+			".s1-{p2}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -163,7 +163,7 @@ public class TestSemanticPredicates extends TestSuite {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
-	public void testDefaultPred() throws Exception {
+	public void testDefaultPredNakedAltIsLast() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : b | ID ;\n" +
@@ -171,8 +171,21 @@ public class TestSemanticPredicates extends TestSuite {
 		String expecting =
 			".s0-ID->.s1\n" +
 			".s0-INT->:s4=>1\n" +
-			".s1-{!(p1)}?->:s3=>2\n" +
-			".s1-{p1}?->:s2=>1\n";
+			".s1-{p1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testDefaultPredNakedAltNotLast() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : ID | b ;\n" +
+			"b : {p1}? ID | INT ;\n");
+		String expecting =
+			".s0-ID->.s1\n" +
+			".s0-INT->:s4=>2\n" +
+			".s1-{!(p1)}?->:s2=>1\n" +
+			".s1-{p1}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -183,8 +196,8 @@ public class TestSemanticPredicates extends TestSuite {
 			"a : {p1}? a | ID ;\n");
 		String expecting =
 			".s0-ID->.s1\n" +
-			".s1-{!(p1)}?->:s2=>2\n" +
-			".s1-{p1}?->:s3=>1\n";
+			".s1-{p1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -218,8 +231,8 @@ public class TestSemanticPredicates extends TestSuite {
 			".s0-A->.s1\n" +
 			".s0-C->:s5=>3\n" +
 			".s1-B->.s2\n" +
-			".s2-{!(p1)}?->:s4=>2\n" +
-			".s2-{p1}?->:s3=>1\n";
+			".s2-{p1}?->:s3=>1\n" +
+			".s2-{true}?->:s4=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -232,8 +245,8 @@ public class TestSemanticPredicates extends TestSuite {
 		String expecting =
 			".s0-A->.s1\n" +
 			".s0-B->:s4=>2\n" +
-			".s1-{p}?->:s3=>1\n" +
-			".s1-{q}?->:s2=>2\n";
+			".s1-{p}?->:s2=>1\n" +
+			".s1-{q}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -247,8 +260,8 @@ public class TestSemanticPredicates extends TestSuite {
 			".s0-\"b\"->:s5=>2\n" +
 			".s1-\"a\"..\"b\"->:s5=>2\n" +
 			".s1-<EOT>->.s2\n" +
-			".s2-{p}?->:s4=>1\n" +
-			".s2-{q}?->:s3=>2\n";
+			".s2-{p}?->:s3=>1\n" +
+			".s2-{q}?->:s4=>2\n";
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
 	}
 
@@ -263,8 +276,8 @@ public class TestSemanticPredicates extends TestSuite {
 			".s0-\"b\"&&{q}?->:s5=>2\n" +
 			".s1-\"a\"..\"b\"&&{q}?->:s5=>2\n" +
 			".s1-<EOT>&&{(q||p)}?->.s2\n" +
-			".s2-{p}?->:s4=>1\n" +
-			".s2-{q}?->:s3=>2\n";
+			".s2-{p}?->:s3=>1\n" +
+			".s2-{q}?->:s4=>2\n";
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
 	}
 
@@ -310,8 +323,8 @@ public class TestSemanticPredicates extends TestSuite {
 		String expecting =
 			".s0-B&&{q}?->.s1\n" +
 			".s0-C&&{(q&&r)}?->:s4=>2\n" +
-			".s1-{p}?->:s3=>1\n" +
-			".s1-{q}?->:s2=>2\n";
+			".s1-{p}?->:s2=>1\n" +
+			".s1-{q}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -327,8 +340,8 @@ public class TestSemanticPredicates extends TestSuite {
 		String expecting =
 			".s0-B&&{(q&&s)}?->.s1\n" +
 			".s0-C&&{(q&&r)}?->:s4=>2\n" +
-			".s1-{(q&&s)}?->:s2=>2\n" +
-			".s1-{p}?->:s3=>1\n";
+			".s1-{(q&&s)}?->:s3=>2\n" +
+			".s1-{p}?->:s2=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -395,8 +408,8 @@ public class TestSemanticPredicates extends TestSuite {
 			"  ;\n");
 		String expecting =
 			".s0-\"x\"->.s1\n" +
-			".s1-{p1}?->:s3=>1\n" +
-			".s1-{p2}?->:s2=>2\n";
+			".s1-{p1}?->:s2=>1\n" +
+			".s1-{p2}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;

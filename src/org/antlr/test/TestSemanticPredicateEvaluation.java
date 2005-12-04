@@ -33,8 +33,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 	public void testSimpleCyclicDFAWithPredicate() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
-			"a :         \"x\"* \"y\" {System.out.println(\"alt1\");}\n" +
-			"  | {true}? \"x\"* \"y\" {System.out.println(\"alt2\");}\n" +
+			"a : {false}? \"x\"* \"y\" {System.out.println(\"alt1\");}\n" +
+			"  | {true}?  \"x\"* \"y\" {System.out.println(\"alt2\");}\n" +
 			"  ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
@@ -47,8 +47,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 		String grammar =
 			"grammar foo;\n" +
 			"@members {boolean v=true;}\n" +
-			"a :      \"x\"* \"y\" {System.out.println(\"alt1\");}\n" +
-			"  | {v}? \"x\"* \"y\" {System.out.println(\"alt2\");}\n" +
+			"a : {false}? \"x\"* \"y\" {System.out.println(\"alt1\");}\n" +
+			"  | {v}?     \"x\"* \"y\" {System.out.println(\"alt2\");}\n" +
 			"  ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
@@ -106,6 +106,7 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 	}
 
 	public void testLexerPredInExitBranch() throws Exception {
+		// p says it's ok to exit; it has precendence over the !p loopback branch
 		String grammar =
 			"grammar foo;" +
 			"@lexer::members {boolean p=true;}\n" +

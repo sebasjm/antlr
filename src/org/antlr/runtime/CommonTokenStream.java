@@ -257,8 +257,12 @@ public class CommonTokenStream implements TokenStream {
     }
 
     public void rewind(int marker) {
-        p = marker;
+        seek(marker);
     }
+
+	public void seek(int index) {
+		p = index;
+	}
 
 	public TokenSource getTokenSource() {
 		return tokenSource;

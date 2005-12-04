@@ -54,6 +54,7 @@ public class Tool {
 	protected boolean trace = false;
 	protected boolean profile = false;
 	protected boolean report = false;
+	protected boolean memo = true;
 
 	// the internal options are for my use on the command line during dev
 
@@ -144,6 +145,9 @@ public class Tool {
 			}
 			else if (args[i].equals("-profile")) {
 				profile=true;
+			}
+			else if (args[i].equals("-nomemo")) {
+				memo=false;
 			}
 			else if (args[i].equals("-Igrtree")) {
 				internalOption_PrintGrammarTree=true; // print grammar tree
@@ -259,15 +263,10 @@ public class Tool {
 		if ( language!=null ) {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);
 			grammar.setCodeGenerator(generator);
-			if ( debug ) {
-				generator.setDebug(true);
-			}
-			if ( profile ) {
-				generator.setProfile(true);
-			}
-			if ( trace ) {
-				generator.setTrace(true);
-			}
+			generator.setDebug(debug);
+			generator.setProfile(profile);
+			generator.setTrace(trace);
+			generator.setMemoize(memo);
 
 			if ( grammar.type==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();
@@ -325,6 +324,7 @@ public class Tool {
 		System.err.println("  -report        print out a report about the grammar(s) processed");
 		System.err.println("  -debug         generate a parser that emits debugging events");
 		System.err.println("  -profile       generate a parser that computes profiling information");
+		System.err.println("  -nomemo        when backtracking don't generate memoization code");
 		System.err.println("  -nfa           generate an NFA for each rule");
 		System.err.println("  -dfa           generate a DFA for each decision point");
     }

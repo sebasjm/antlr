@@ -329,8 +329,6 @@ public class NFAToDFAConverter {
 	 *  so don't bother actually rewinding to execute that rule unless there
 	 *  are actions in that rule.  For now, since I am not preventing
 	 *  backtracking from Tokens rule, I will simply allow the optimization.
-	 *
-	 *  TODO: heh, might need to add pred transitions! do this code after?
 	 */
 	protected int addTransition(DFAState d,
 								Label label,
@@ -1215,27 +1213,52 @@ public class NFAToDFAConverter {
 		}
 
 		// Handle case where 1 predicate is missing
+		// Case 1. Semantic predicates
+		// If the missing pred is on nth alt, !(union of other preds)==true
+		// so we can avoid that computation.  If naked alt is ith, then must
+		// test it with !(union) since semantic predicated alts are order
+		// independent
+		// Case 2: Syntactic predicates
+		// The naked alt is always assumed to be true as the order of
+		// alts is the order of precedence.  The naked alt will be a tautology
+		// anyway as it's !(union of other preds).  This implies
+		// that there is no such thing as noviable alt for synpred edges
+		// emanating from a DFA state.
 		if ( altToPredMap.size()==nondeterministicAlts.size()-1 ) {
 			// if there are n-1 predicates for n nondeterministic alts, can fix
 			org.antlr.misc.BitSet ndSet = org.antlr.misc.BitSet.of(nondeterministicAlts);
 			org.antlr.misc.BitSet predSet = org.antlr.misc.BitSet.of(altToPredMap);
 			int nakedAlt = ndSet.subtract(predSet).getSingleElement();
-			// pretend naked alternative is covered with !(union other preds)
-			SemanticContext unionOfPredicatesFromAllAlts =
+			SemanticContext nakedAltPred = null;
+			if ( nakedAlt == nondeterministicAlts.size() ) {
+				nakedAltPred = new SemanticContext.TruePredicate();
+			}
+			else {
+				// pretend naked alternative is covered with !(union other preds)
+				// unless it's a synpred since those have precedence same
+				// as alt order
+				SemanticContext unionOfPredicatesFromAllAlts =
 					getUnionOfPredicates(altToPredMap);
-			//System.out.println("all predicates "+unionOfPredicatesFromAllAlts);
-			SemanticContext notOtherPreds =
-					SemanticContext.not(unionOfPredicatesFromAllAlts);
-			//System.out.println("covering naked alt="+nakedAlt+" with "+notOtherPreds);
-			altToPredMap.put(new Integer(nakedAlt), notOtherPreds);
-			// set all config with alt=nakedAlt to have NOT of all
-			// predicates on other alts
+				//System.out.println("all predicates "+unionOfPredicatesFromAllAlts);
+				if ( unionOfPredicatesFromAllAlts.isSyntacticPredicate() ) {
+					nakedAltPred = new SemanticContext.TruePredicate();
+				}
+				else {
+					nakedAltPred =
+						SemanticContext.not(unionOfPredicatesFromAllAlts);
+				}
+			}
+
+			//System.out.println("covering naked alt="+nakedAlt+" with "+nakedAltPred);
+
+			altToPredMap.put(new Integer(nakedAlt), nakedAltPred);
+			// set all config with alt=nakedAlt to have the computed predicate
 			Iterator iter = d.nfaConfigurations.iterator();
 			NFAConfiguration configuration;
 			while (iter.hasNext()) {
 				configuration = (NFAConfiguration) iter.next();
 				if ( configuration.alt == nakedAlt ) {
-					configuration.semanticContext = notOtherPreds;
+					configuration.semanticContext = nakedAltPred;
 				}
 			}
 		}
@@ -1417,14 +1440,39 @@ public class NFAToDFAConverter {
 
 	/** for each NFA config in d, look for "predicate required" sign set
 	 *  during nondeterminism resolution.
+	 *
+	 *  Add the predicate edges sorted by the alternative number; I'm fairly
+	 *  sure that I could walk the configs backwards so they are added to
+	 *  the predDFATarget in the right order, but it's best to make sure.
+	 *  Predicates succeed in the order they are specifed.  Alt i wins
+	 *  over alt i+1 if both predicates are true.
 	 */
 	protected void addPredicateTransitions(DFAState d) {
+		List configsWithPreds = new ArrayList();
+		// get a list of all configs with predicates
 		Iterator iter = d.getNFAConfigurations().iterator();
 		while ( iter.hasNext() ) {
 			NFAConfiguration c = (NFAConfiguration)iter.next();
-			if ( !c.resolveWithPredicate ) {
-				continue;
+			if ( c.resolveWithPredicate ) {
+				configsWithPreds.add(c);
 			}
+		}
+		// Sort ascending according to alt; alt i has higher precedence than i+1
+		Collections.sort(configsWithPreds,
+			 new Comparator() {
+				 public int compare(Object a, Object b) {
+					 NFAConfiguration ca = (NFAConfiguration)a;
+					 NFAConfiguration cb = (NFAConfiguration)b;
+					 if ( ca.alt < cb.alt ) return -1;
+					 else if ( ca.alt > cb.alt ) return 1;
+					 return 0;
+				 }
+			 });
+		List predConfigsSortedByAlt = configsWithPreds;
+		// Now, we can add edges to d for these preds in the right order
+		for (int i = 0; i < predConfigsSortedByAlt.size(); i++) {
+			NFAConfiguration c = (NFAConfiguration)predConfigsSortedByAlt.get(i);
+			// create a new DFA state that is a target of the predicate
 			DFAState predDFATarget = dfa.newState();
 			predDFATarget.addNFAConfiguration(dfa.nfa.getState(c.state),
 					c.alt,

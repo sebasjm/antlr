@@ -315,6 +315,7 @@ element returns [StateCluster g=null]
     |   #( SYNPRED block )
     |   ACTION
     |   pred:SEMPRED {g = factory.build_SemanticPredicate(#pred);}
+    |   spred:SYN_SEMPRED {g = factory.build_SemanticPredicate(#spred);}
     |   gpred:GATED_SEMPRED {g = factory.build_SemanticPredicate(#gpred);}
     |   EPSILON {g = factory.build_Epsilon();}
     ;

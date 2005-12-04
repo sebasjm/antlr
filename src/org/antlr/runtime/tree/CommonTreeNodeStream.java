@@ -212,6 +212,11 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	}
 
 	public void rewind(int marker) {
+		throw new NoSuchMethodError("can't rewind trees yet");
+	}
+
+	public void seek(int index) {
+		throw new NoSuchMethodError("can't seek trees yet");
 	}
 
 	/** Expensive to compute so I won't bother doing the right thing.

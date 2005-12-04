@@ -46,7 +46,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
            buildTemplate, profile,
-	   backtracking, synpreds,
+	   backtracking, synpreds, memoize,
 	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
@@ -60,6 +60,10 @@ import org.antlr.runtime.tree.*;
 import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
+<if(backtracking)>
+import java.util.Map;
+import java.util.HashMap;
+<endif>
 <@end>
 
 <docComment>
@@ -109,6 +113,9 @@ public class <name> extends <@superClassName><superClass><@end> {
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
+<if(memoize)>
+    <rules:{r|Map <r.ruleName>_memo;<\n>}> <! define rule memoization arrays !>
+<endif>
     <@members>
     public <name>(<inputStreamType> input) { super(input); }<\n>
     <@end>
@@ -143,14 +150,40 @@ treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bi
 
 synpred(name) ::= <<
 boolean <name>() {
-    backtracking++;
+    //System.out.println("begin backtracking <name> @"+input.index());
     int start = input.mark();
+    backtracking++;
     try {<name>_fragment();}
     catch (RecognitionException re) {System.err.println("impossible");}
     input.rewind(start);
     backtracking--;
-    return !failed;
+    //System.out.println("end backtracking <name>: "+(failed?"FAILED":"SUCCEEDED"));
+    boolean success = !failed;
+    failed=false; <! reset failure signal !>
+    return success;
 }<\n>
+>>
+
+ruleMemoization(name) ::= <<
+<if(memoize)>
+int ruleStartIndex = input.index();
+if ( backtracking>0 ) {	  
+    if ( <name>_memo==null ) <name>_memo = new HashMap();
+    Integer skipIndexI = (Integer)<name>_memo.get(new Integer(input.index()));
+    if ( skipIndexI!=null ) {
+      int skipIndex = skipIndexI.intValue();
+      //System.out.println("seen <name> before; skipping ahead to @"+skipIndex);
+      if ( skipIndex>=0 ) {
+      	 input.seek(skipIndex); <! jump to one past stop token !>
+      }
+      else {
+        failed=true;
+        //System.out.println("rule <name> will never succeed");
+      }
+      return;
+    }
+}
+<endif>
 >>
 
 /** How to generate code for a rule.  This includes any return type
@@ -165,6 +198,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description) ::= <<
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <ruleDeclarations()>
     <ruleLabelDefs()>
+    <ruleMemoization(name=ruleName)>
     <ruleDescriptor.actions.init>
     <@preamble()>
 <if(emptyRule)>
@@ -230,6 +264,16 @@ ruleCleanUp() ::= <<
 <ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 retval.stop = (<labelType>)input.LT(-1);
+<endif>
+<if(memoize)>
+<if(backtracking)>
+if ( backtracking>0 ) {
+  int skipIndex = input.index();
+  if ( failed ) skipIndex = -1;
+  //System.out.println("storing <ruleName>_memo["+ruleStartIndex+"] = "+skipIndex);
+  <ruleName>_memo.put(new Integer(ruleStartIndex), new Integer(skipIndex));
+}
+<endif>
 <endif>
 >>
 
@@ -891,9 +935,17 @@ rulePropertyRef(attr) ::= "retval.<attr.name>"
 
 
 /** How to execute an action */
-execAction(action) ::= "<action>"
+execAction(action) ::= <<
+<if(backtracking)>
+if ( backtracking==0 ) {
+  <action>
+}
+<else>
+<action>
+<endif>
+>>
 
-// A C T I O N S
+// L E X E R  A C T I O N S
 
 emit(type) ::= "emit(<type>);"
 
@@ -906,3 +958,6 @@ public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separ
 >>
 
 codeFileExtension() ::= ".java"
+
+true() ::= "true"
+false() ::= "false"

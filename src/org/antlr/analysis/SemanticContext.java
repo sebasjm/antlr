@@ -74,6 +74,8 @@ public abstract class SemanticContext {
     public abstract StringTemplate genExpr(CodeGenerator generator,
 										   StringTemplateGroup templates);
 
+	public abstract boolean isSyntacticPredicate();
+
     public static class Predicate extends SemanticContext {
         /** The AST node in tree created from the grammar holding the predicate */
         protected AST predicate;
@@ -165,11 +167,25 @@ public abstract class SemanticContext {
 			return null;
 		}
 
-        public String toString() {
+		public boolean isSyntacticPredicate() {
+			return predicate!=null && predicate.getType()==ANTLRParser.SYN_SEMPRED;
+		}
+
+		public String toString() {
+			return toString(null);
+		}
+
+		public String toString(StringTemplateGroup templates) {
 			if ( constantValue==TRUE_PRED ) {
+				if ( templates!=null ) {
+					return templates.getInstanceOf("true").toString();
+				}
 				return "true";
 			}
 			if ( constantValue==FALSE_PRED ) {
+				if ( templates!=null ) {
+					return templates.getInstanceOf("false").toString();
+				}
 				return "false";
 			}
             if ( predicate==null ) {
@@ -237,6 +253,9 @@ public abstract class SemanticContext {
 				return gatedLeft;
 			}
 			return new AND(gatedLeft, gatedRight);
+		}
+		public boolean isSyntacticPredicate() {
+			return left.isSyntacticPredicate()||right.isSyntacticPredicate();
 		}
         public String toString() {
             return "("+left+"&&"+right+")";
@@ -314,6 +333,9 @@ public abstract class SemanticContext {
 			}
 			return new AND(gatedLeft, gatedRight);
 		}
+		public boolean isSyntacticPredicate() {
+			return left.isSyntacticPredicate()||right.isSyntacticPredicate();
+		}
         public String toString() {
             return "("+left+"||"+right+")";
         }
@@ -356,6 +378,9 @@ public abstract class SemanticContext {
 				return null;
 			}
 			return new NOT(p);
+		}
+		public boolean isSyntacticPredicate() {
+			return ctx.isSyntacticPredicate();
 		}
         public String toString() {
             return "!("+ctx+")";

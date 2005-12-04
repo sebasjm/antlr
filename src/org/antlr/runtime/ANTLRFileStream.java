@@ -135,7 +135,12 @@ public class ANTLRFileStream implements CharStream {
 		p = state.p;
 		line = state.line;
 		charPositionInLine = state.charPositionInLine;
-    }
+	}
+
+	public void seek(int index) {
+		// TODO: broken.  How can we move forward without knowing new line/pos?
+		throw new NoSuchMethodError("not implemented yet");
+	}
 
 	public String substring(int start, int stop) {
 		return new String(data,start,stop-start+1);

@@ -286,6 +286,13 @@ element
     	if ( showActions ) {out("{"); out(pred.getText()); out("}?");}
     	else {out("{...}?");}
     	}
+    |   spred:SYN_SEMPRED
+    	{
+    	  String name = spred.getText().substring(0,spred.getText().length()-2); // rm ()
+    	  GrammarAST predAST=grammar.getSyntacticPredicate(name);
+    	  block(predAST, true);
+    	  out("=>");
+    	}
     |   gpred:GATED_SEMPRED
     	{
     	if ( showActions ) {out("{"); out(gpred.getText()); out("}? =>");}

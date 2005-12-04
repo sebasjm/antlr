@@ -92,6 +92,7 @@ tokens {
     TEMPLATE;
     SCOPE="scope";
     GATED_SEMPRED; // {p}? =>
+    SYN_SEMPRED; // (...) =>   it's a synpred converted to sempred
 }
 
 {
@@ -506,10 +507,10 @@ ebnf!
 			{
 			// add grammar fragment to a list so we can make fake rules for them
 			// later.
-			String predName = grammar.defineSyntacticPredicate(#b);
+			String predName = grammar.defineSyntacticPredicate(#b,currentRuleName);
 			// convert (alpha)=> into {synpredN()}? where N is some pred count
 			String synpredinvoke = predName+"()";
-			#ebnf = #[SEMPRED,synpredinvoke];
+			#ebnf = #[SYN_SEMPRED,synpredinvoke];
 			}
         |   {#ebnf = #b;}
 		)

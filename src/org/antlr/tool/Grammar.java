@@ -720,17 +720,32 @@ public class Grammar {
 	/** Define a new predicate and get back its name for use in building
 	 *  a semantic predicate reference to the syn pred.
 	 */
-	public String defineSyntacticPredicate(GrammarAST blockAST) {
+	public String defineSyntacticPredicate(GrammarAST blockAST,
+										   String currentRuleName)
+	{
 		if ( nameToSynpredASTMap==null ) {
 			nameToSynpredASTMap = new LinkedHashMap();
 		}
-		String predName = "synpred"+(nameToSynpredASTMap.size() + 1);
+		String predName = null;
+		if ( Character.isUpperCase(currentRuleName.charAt(0)) ) {
+			predName = "Synpred"+(nameToSynpredASTMap.size() + 1);
+		}
+		else {
+			predName = "synpred"+(nameToSynpredASTMap.size() + 1);
+		}
 		nameToSynpredASTMap.put(predName, blockAST);
 		return predName;
 	}
 
 	public LinkedHashMap getSyntacticPredicates() {
 		return nameToSynpredASTMap;
+	}
+
+	public GrammarAST getSyntacticPredicate(String name) {
+		if ( nameToSynpredASTMap==null ) {
+			return null;
+		}
+		return (GrammarAST)nameToSynpredASTMap.get(name);
 	}
 
 	/** Given @scope::name {action} define it for this grammar.  Later,

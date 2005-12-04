@@ -117,7 +117,8 @@ public class CodeGenerator {
 	 */
 	protected boolean profile;
 
-	//protected boolean dumpProfile;
+	/** Cache rule invocation results during backtracking */
+	protected boolean memoize = true;
 
 	/** I have factored out the generation of acyclic DFAs to separate class */
 	protected ACyclicDFACodeGenerator acyclicDFAGenerator =
@@ -306,6 +307,8 @@ public class CodeGenerator {
 		boolean canBacktrack = grammar.getSyntacticPredicates()!=null;
 		outputFileST.setAttribute("backtracking", new Boolean(canBacktrack));
 		headerFileST.setAttribute("backtracking", new Boolean(canBacktrack));
+		outputFileST.setAttribute("memoize", new Boolean(memoize&&canBacktrack));
+		headerFileST.setAttribute("memoize", new Boolean(memoize&&canBacktrack));
 		Set synpredNames = null;
 		if ( grammar.getSyntacticPredicates()!=null ) {
 			synpredNames = grammar.getSyntacticPredicates().keySet();
@@ -742,12 +745,20 @@ public class CodeGenerator {
 
 	public void setTrace(boolean trace) {
 		this.trace = trace;
-		setDebug(true); // requires debug events
+		if ( profile ) {
+			setDebug(true); // requires debug events
+		}
 	}
 
 	public void setProfile(boolean profile) {
 		this.profile = profile;
-		setDebug(true); // requires debug events
+		if ( profile ) {
+			setDebug(true); // requires debug events
+		}
+	}
+
+	public void setMemoize(boolean memoize) {
+		this.memoize = memoize;
 	}
 
 	/** During early-access release, this distinguishes between
