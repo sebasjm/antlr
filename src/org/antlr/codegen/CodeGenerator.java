@@ -314,7 +314,7 @@ public class CodeGenerator {
 			synpredNames = grammar.getSyntacticPredicates().keySet();
 		}
 		outputFileST.setAttribute("synpreds", synpredNames);
-		headerFileST.setAttribute("synpreds", grammar.getSyntacticPredicates());
+		headerFileST.setAttribute("synpreds", synpredNames);
 
 
 		// RECOGNIZER

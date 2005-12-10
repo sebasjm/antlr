@@ -98,6 +98,8 @@ retry:
 
     <rules; separator="\n\n">
 
+    <synpreds:{p | <lexerSynpred(name=p)>}>
+
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
 }
@@ -153,6 +155,13 @@ treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cycl
 synpred(name) ::= <<
 class <name>Ptr implements GrammarFragmentPtr {
     public void invoke() throws RecognitionException {<name>_fragment();}
+}
+<name>Ptr <name> = new <name>Ptr();<\n>
+>>
+
+lexerSynpred(name) ::= <<
+class <name>Ptr implements GrammarFragmentPtr {
+    public void invoke() throws RecognitionException {m<name>_fragment();}
 }
 <name>Ptr <name> = new <name>Ptr();<\n>
 >>

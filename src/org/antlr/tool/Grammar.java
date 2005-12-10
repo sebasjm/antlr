@@ -533,12 +533,15 @@ public class Grammar {
 			return;
 		}
 		Set predNames = nameToSynpredASTMap.keySet();
+		boolean isLexer = grammarTree.getType()==ANTLRParser.LEXER_GRAMMAR;
 		for (Iterator it = predNames.iterator(); it.hasNext();) {
 			String synpredName = (String)it.next();
 			GrammarAST fragmentAST =
 				(GrammarAST) nameToSynpredASTMap.get(synpredName);
 			GrammarAST ruleAST =
-				parser.createSimpleRuleAST(synpredName+"_fragment",fragmentAST);
+				parser.createSimpleRuleAST(synpredName+"_fragment",
+										   fragmentAST,
+										   isLexer);
 			grammarTree.addChild(ruleAST);
 		}
 	}

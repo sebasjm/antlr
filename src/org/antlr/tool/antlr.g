@@ -93,6 +93,7 @@ tokens {
     SCOPE="scope";
     GATED_SEMPRED; // {p}? =>
     SYN_SEMPRED; // (...) =>   it's a synpred converted to sempred
+    FRAGMENT="fragment";
 }
 
 {
@@ -109,10 +110,17 @@ tokens {
 		        );
 	}
 
-	public GrammarAST createSimpleRuleAST(String name, GrammarAST block) {
+	public GrammarAST createSimpleRuleAST(String name,
+										  GrammarAST block,
+										  boolean fragment)
+   {
+   		GrammarAST modifier = null;
+   		if ( fragment ) {
+   			modifier = #[FRAGMENT,"fragment"];
+   		}
 		GrammarAST ruleAST =
 		   #([RULE,"rule"],
-                 [ID,name],[ARG,"ARG"],[RET,"RET"],
+                 [ID,name],modifier,[ARG,"ARG"],[RET,"RET"],
 				 [SCOPE,"scope"],block,[EOR,"<end-of-rule>"]);
 		ruleAST.setLine(block.getLine());
 		ruleAST.setColumn(block.getColumn());
@@ -496,15 +504,22 @@ ebnf!
 							 #ebnf=#([POSITIVE_CLOSURE,"+"],#b);}
 			)
 			( BANG )?
-		|   IMPLIES // syntactic predicate
+		|   IMPLIES! // syntactic predicate
 			{
-			// add grammar fragment to a list so we can make fake rules for them
-			// later.
-			String predName = grammar.defineSyntacticPredicate(#b,currentRuleName);
-			// convert (alpha)=> into {synpredN}? where N is some pred count
-			// during code gen we convert to function call with templates
-			String synpredinvoke = predName;
-			#ebnf = #[SYN_SEMPRED,synpredinvoke];
+			if ( gtype==COMBINED_GRAMMAR &&
+			     Character.isUpperCase(currentRuleName.charAt(0)) )
+		    {
+		    	#ebnf = #(#[SYNPRED,"=>"],#b);
+		    }
+		    else {
+				// add grammar fragment to a list so we can make fake rules for them
+				// later.
+				String predName = grammar.defineSyntacticPredicate(#b,currentRuleName);
+				// convert (alpha)=> into {synpredN}? where N is some pred count
+				// during code gen we convert to function call with templates
+				String synpredinvoke = predName;
+				#ebnf = #[SYN_SEMPRED,synpredinvoke];
+			}
 			}
         |   {#ebnf = #b;}
 		)

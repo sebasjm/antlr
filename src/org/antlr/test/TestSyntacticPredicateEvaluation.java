@@ -132,20 +132,27 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 	}
 
 	public void testLexerPred() throws Exception {
-		// TODO: this one fails until I can change how I copy lexer rules
 		String grammar =
 			"grammar t;\n" +
 			"s : A ;\n" +
 			"A options {k=1;}\n" + // force backtracking
-			"  : (B '.')=>B {System.out.println(\"alt1\");}\n" +
+			"  : (B '.')=>B '.' {System.out.println(\"alt1\");}\n" +
 			"  | B {System.out.println(\"alt2\");}" +
 			"  ;\n" +
+			"fragment\n" +
 			"B : 'x'+ ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
 												 "s", "xxx", false);
 		String expecting =
 			"alt2\n";
+		assertEqual(found, expecting);
+
+		found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
+												 "s", "xxx.", false);
+		expecting =
+			"alt1\n";
 		assertEqual(found, expecting);
 	}
 
