@@ -206,6 +206,11 @@ CHANGES
 
 3.0ea7 - 
 
+* Added -print option to print out grammar w/o actions
+
+* Renamed BaseParser to be BaseRecognizer and even made Lexer derive from
+  this; nice as it now shares backtracking support code.
+
 * Added syntactic predicates (...)=>.  See December 4, 2005 entry:
 
   http://www.antlr.org/blog/antlr3/lookahead.tml
@@ -253,9 +258,7 @@ As a result, tokens(s) FLOAT were disabled for that input
 
 * DOT diagrams didn't show escaped char properly.
 
-* Char literals are now "a" not 'a'.  This rendered most of my unit tests
-  unreadable due to escaping doublequote in Java strings, but it is the
-  the right thing to do for grammars.  One text (char/string) specifier.
+* Char/string literals are now all 'abc' not "abc".
 
 * action syntax changed "@scope::actionname {action}" where scope defaults
   to "parser" if parser grammar or combined grammar, "lexer" if lexer grammar,

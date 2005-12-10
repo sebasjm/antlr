@@ -224,6 +224,9 @@ grammar[Grammar g,
     if ( g.type!=Grammar.LEXER ) {
 		recognizerST.setAttribute("ASTLabelType", g.getOption("ASTLabelType"));
 	}
+	recognizerST.setAttribute("numRules", grammar.getRules().size());
+	outputFileST.setAttribute("numRules", grammar.getRules().size());
+	headerFileST.setAttribute("numRules", grammar.getRules().size());
 }
     :   ( #( LEXER_GRAMMAR grammarSpec )
 	    | #( PARSER_GRAMMAR grammarSpec )
@@ -532,7 +535,6 @@ element returns [StringTemplate code=null]
 
     |   code=ebnf
     |   code=tree
-    |   #( SYNPRED block["block",null] )
 
     |   act:ACTION
         {

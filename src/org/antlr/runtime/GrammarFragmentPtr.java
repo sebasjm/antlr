@@ -27,27 +27,10 @@
 */
 package org.antlr.runtime;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Stack;
-
-/** A parser for TokenStreams.  "parser grammars" result in a subclass
- *  of this.
+/** Java is not bright enough to know what a function ptr is so I have to
+ *  use this hideous mess to pass a pointer to the syntactic predicate
+ *  launching mechanism.  HIDEOUS!
  */
-public class Parser extends BaseRecognizer {
-    protected TokenStream input;
-
-	public Parser(TokenStream input) {
-        setTokenStream(input);
-    }
-
-	/** Set the token stream and reset the parser */
-	public void setTokenStream(TokenStream input) {
-		this.input = input;
-		reset();
-	}
-
-    public TokenStream getTokenStream() {
-		return input;
-	}
+public interface GrammarFragmentPtr {
+	public void invoke() throws RecognitionException;
 }

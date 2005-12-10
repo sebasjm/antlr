@@ -481,13 +481,6 @@ tree :
     RPAREN!
 	;
 
-/*
-rootNode
-	:   (id! ASSIGN!)?
-		terminal
-	;
-	*/
-
 /** matches ENBF blocks (and sets via block rule) */
 ebnf!
 {
@@ -508,8 +501,9 @@ ebnf!
 			// add grammar fragment to a list so we can make fake rules for them
 			// later.
 			String predName = grammar.defineSyntacticPredicate(#b,currentRuleName);
-			// convert (alpha)=> into {synpredN()}? where N is some pred count
-			String synpredinvoke = predName+"()";
+			// convert (alpha)=> into {synpredN}? where N is some pred count
+			// during code gen we convert to function call with templates
+			String synpredinvoke = predName;
 			#ebnf = #[SYN_SEMPRED,synpredinvoke];
 			}
         |   {#ebnf = #b;}

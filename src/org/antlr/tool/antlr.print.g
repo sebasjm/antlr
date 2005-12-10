@@ -288,7 +288,7 @@ element
     	}
     |   spred:SYN_SEMPRED
     	{
-    	  String name = spred.getText().substring(0,spred.getText().length()-2); // rm ()
+    	  String name = spred.getText();
     	  GrammarAST predAST=grammar.getSyntacticPredicate(name);
     	  block(predAST, true);
     	  out("=>");

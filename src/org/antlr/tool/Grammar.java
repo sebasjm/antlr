@@ -402,13 +402,6 @@ public class Grammar {
 			System.out.println(grammarTree.toStringList());
 		}
 
-		/*
-		System.out.println("### print grammar");
-		ANTLRTreePrinter printer = new ANTLRTreePrinter();
-		printer.setASTNodeClass("org.antlr.tool.GrammarAST");
-		System.out.println(printer.toString(grammarTree));
-		*/
-
 		// ASSIGN TOKEN TYPES
 		//System.out.println("### assign types");
 		AssignTokenTypesWalker ttypesWalker = new AssignTokenTypesWalker();
@@ -1858,4 +1851,17 @@ public class Grammar {
 	public boolean getWatchNFAConversion() {
 		return watchNFAConversion;
 	}
+
+	public void printGrammar(PrintStream output) {
+		ANTLRTreePrinter printer = new ANTLRTreePrinter();
+		printer.setASTNodeClass("org.antlr.tool.GrammarAST");
+		try {
+			String g = printer.toString(grammarTree, this, false);
+			output.println(g);
+		}
+		catch (RecognitionException re) {
+			ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,re);
+		}
+	}
+
 }

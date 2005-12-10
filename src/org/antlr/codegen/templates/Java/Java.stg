@@ -46,7 +46,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
            buildTemplate, profile,
-	   backtracking, synpreds, memoize,
+	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
@@ -70,7 +70,7 @@ import java.util.HashMap;
 <recognizer>
 >>
 
-lexer(name, tokens, rules, cyclicDFAs) ::= <<
+lexer(name, tokens, rules, numRules, cyclicDFAs) ::= <<
 public class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <actions.lexer.members>
@@ -104,7 +104,7 @@ retry:
 >>
 
 /** How to generate a parser */
-genericParser(name, scopes, tokens, tokenNames, rules,
+genericParser(name, scopes, tokens, tokenNames, rules, numRules,
               cyclicDFAs, bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType) ::= <<
 public class <name> extends <@superClassName><superClass><@end> {
@@ -113,11 +113,13 @@ public class <name> extends <@superClassName><superClass><@end> {
     };
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
-<if(memoize)>
-    <rules:{r|Map <r.ruleName>_memo;<\n>}> <! define rule memoization arrays !>
-<endif>
     <@members>
-    public <name>(<inputStreamType> input) { super(input); }<\n>
+    public <name>(<inputStreamType> input) {
+        super(input);
+<if(memoize)>
+        ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
+<endif>
+    }
     <@end>
 
     public String[] getTokenNames() { return tokenNames; }
@@ -137,52 +139,28 @@ public class <name> extends <@superClassName><superClass><@end> {
 }
 >>
 
-parser(name, scopes, tokens, tokenNames, rules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
+parser(name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
 <genericParser(inputStreamType="TokenStream", ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser") ::= <<
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser") ::= <<
 <genericParser(inputStreamType="TreeNodeStream", ...)>
 >>
 
 synpred(name) ::= <<
-boolean <name>() {
-    //System.out.println("begin backtracking <name> @"+input.index());
-    int start = input.mark();
-    backtracking++;
-    try {<name>_fragment();}
-    catch (RecognitionException re) {System.err.println("impossible");}
-    input.rewind(start);
-    backtracking--;
-    //System.out.println("end backtracking <name>: "+(failed?"FAILED":"SUCCEEDED"));
-    boolean success = !failed;
-    failed=false; <! reset failure signal !>
-    return success;
-}<\n>
+class <name>Ptr implements GrammarFragmentPtr {
+    public void invoke() throws RecognitionException {<name>_fragment();}
+}
+<name>Ptr <name> = new <name>Ptr();<\n>
 >>
 
 ruleMemoization(name) ::= <<
 <if(memoize)>
-int ruleStartIndex = input.index();
-if ( backtracking>0 ) {	  
-    if ( <name>_memo==null ) <name>_memo = new HashMap();
-    Integer skipIndexI = (Integer)<name>_memo.get(new Integer(input.index()));
-    if ( skipIndexI!=null ) {
-      int skipIndex = skipIndexI.intValue();
-      //System.out.println("seen <name> before; skipping ahead to @"+skipIndex);
-      if ( skipIndex>=0 ) {
-      	 input.seek(skipIndex); <! jump to one past stop token !>
-      }
-      else {
-        failed=true;
-        //System.out.println("rule <name> will never succeed");
-      }
-      return;
-    }
-}
+int <ruleDescriptor.name>_StartIndex = input.index();
+if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { return; }
 <endif>
 >>
 
@@ -267,12 +245,7 @@ retval.stop = (<labelType>)input.LT(-1);
 <endif>
 <if(memoize)>
 <if(backtracking)>
-if ( backtracking>0 ) {
-  int skipIndex = input.index();
-  if ( failed ) skipIndex = -1;
-  //System.out.println("storing <ruleName>_memo["+ruleStartIndex+"] = "+skipIndex);
-  <ruleName>_memo.put(new Integer(ruleStartIndex), new Integer(skipIndex));
-}
+if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
 <endif>
 <endif>
 >>
@@ -774,6 +747,9 @@ orPredicates(left,right) ::= "(<left>||<right>)"
 notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
 evalPredicate(pred,description) ::= "<pred>"
+
+evalSynPredicate(pred,description) ::= 
+  "synpred(input, <pred>)"
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 

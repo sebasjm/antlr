@@ -1,12 +1,12 @@
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.BaseParser;
+import org.antlr.runtime.BaseRecognizer;
 
 /** A parser for a stream of tree nodes.  "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
- *  the BaseParser superclass.
+ *  the BaseRecognizer superclass.
 */
-public class TreeParser extends BaseParser {
+public class TreeParser extends BaseRecognizer {
 	protected TreeNodeStream input;
 
 	public TreeParser(TreeNodeStream input) {

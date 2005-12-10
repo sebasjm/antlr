@@ -89,6 +89,11 @@ public abstract class SemanticContext {
 		 */
 		protected boolean gated = false;
 
+		/** syntactic predicates are converted to semantic predicates
+		 *  but synpreds are generated slightly differently.
+		 */
+		protected boolean synpred = false;
+
 		public static final int INVALID_PRED_VALUE = -1;
 		public static final int FALSE_PRED = 0;
 		public static final int TRUE_PRED = 1;
@@ -101,18 +106,19 @@ public abstract class SemanticContext {
 
         public Predicate() {
 			predicate = new GrammarAST();
-			//predicate.initialize(ANTLRParser.SEMPRED, "true");
 			this.gated=false;
         }
 
         public Predicate(AST predicate) {
             this.predicate = predicate;
 			this.gated = predicate.getType()==ANTLRParser.GATED_SEMPRED;
+			this.synpred = predicate.getType()==ANTLRParser.SYN_SEMPRED;
         }
 
 		public Predicate(Predicate p) {
 			this.predicate = p.predicate;
 			this.gated = p.gated;
+			this.synpred = p.synpred;
 			this.constantValue = p.constantValue;
 		}
 
@@ -144,7 +150,12 @@ public abstract class SemanticContext {
 		{
 			StringTemplate eST = null;
 			if ( templates!=null ) {
-				eST = templates.getInstanceOf("evalPredicate");
+				if ( synpred ) {
+					eST = templates.getInstanceOf("evalSynPredicate");					
+				}
+				else {
+					eST = templates.getInstanceOf("evalPredicate");
+				}
 				eST.setAttribute("pred", this.toString());
 			}
 			else {

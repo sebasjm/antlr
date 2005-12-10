@@ -55,6 +55,7 @@ public class Tool {
 	protected boolean profile = false;
 	protected boolean report = false;
 	protected boolean memo = true;
+	protected boolean printGrammar = false;
 
 	// the internal options are for my use on the command line during dev
 
@@ -149,6 +150,9 @@ public class Tool {
 			else if (args[i].equals("-nomemo")) {
 				memo=false;
 			}
+			else if (args[i].equals("-print")) {
+				printGrammar = true;
+			}
 			else if (args[i].equals("-Igrtree")) {
 				internalOption_PrintGrammarTree=true; // print grammar tree
 			}
@@ -216,6 +220,10 @@ public class Tool {
 				fr.close();
 
 				processGrammar(grammar);
+
+				if ( printGrammar ) {
+					grammar.printGrammar(System.out);
+				}
 
 				// now handle the lexer if one was created for a merged spec
 
@@ -322,6 +330,7 @@ public class Tool {
 		System.err.println("  -o outputDir   specify output directory where all output is generated");
 		System.err.println("  -lib dir       specify location of token files");
 		System.err.println("  -report        print out a report about the grammar(s) processed");
+		System.err.println("  -print         print out the grammar without actions");
 		System.err.println("  -debug         generate a parser that emits debugging events");
 		System.err.println("  -profile       generate a parser that computes profiling information");
 		System.err.println("  -nomemo        when backtracking don't generate memoization code");
