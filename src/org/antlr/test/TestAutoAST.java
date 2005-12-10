@@ -11,9 +11,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
 			"a : ID INT ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "abc 34", debug);
@@ -26,9 +26,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
 			"a : (ID INT) ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "abc 34", debug);
@@ -41,9 +41,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
 			"a : ID^ INT ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "abc 34", debug);
@@ -56,9 +56,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : INT ID^ ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "34 abc", debug);
@@ -71,9 +71,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID INT! ID! INT ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34 dag 4532", debug);
@@ -86,9 +86,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ( ID^ INT )* ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 1 b 2 c 3", debug);
@@ -101,9 +101,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ( ID INT^ )* ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 1 b 2 c 3", debug);
@@ -116,9 +116,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ( ID^ INT )+ ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 1 b 2 c 3", debug);
@@ -131,9 +131,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ( ID^ INT )+ ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 1 b 2 c 3", debug);
@@ -146,9 +146,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ( ID INT )? ID^ ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 1 b", debug);
@@ -160,10 +160,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : v=\"void\"^ ID \";\" ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : v='void'^ ID ';' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "void foo;", debug);
@@ -175,10 +175,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : v=\"void\"^ . \";\" ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : v='void'^ . ';' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "void foo;", debug);
@@ -190,10 +190,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : v=\"void\" .^ \";\" ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : v='void' .^ ';' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "void foo;", debug);
@@ -206,9 +206,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID^ INT^ ID ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 34 c", debug);
@@ -221,9 +221,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID INT^ ID^ ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a 34 c", debug);
@@ -235,10 +235,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : \"void\" (({;}ID|INT) ID | \"null\" ) \";\" ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : 'void' (({;}ID|INT) ID | 'null' ) ';' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "void a b;", debug);
@@ -251,10 +251,10 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a  : type ID ;\n" +
-			"type : {;}\"int\" | \"float\" ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"type : {;}'int' | 'float' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "int a", debug);
@@ -267,10 +267,10 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a  : type^ ID ;\n" +
-			"type : {;}\"int\" | \"float\" ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"type : {;}'int' | 'float' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "int a", debug);
@@ -282,10 +282,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ID (\"+\"^^ ID)* ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : ID ('+'^^ ID)* ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a+b+c+d", debug);
@@ -298,10 +298,10 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID (op^^ ID)* ;\n" +
-			"op : {;}\"+\" | \"-\" ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"op : {;}'+' | '-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a+b+c-d", debug);
@@ -314,11 +314,11 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"s : a ;\n" +
-			"a : atom (\"exp\"^^ a)? ;\n" +
+			"a : atom ('exp'^^ a)? ;\n" +
 			"atom : INT ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "s", "3 exp 4 exp 5", debug);
@@ -331,9 +331,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID|INT ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc", debug);
@@ -345,10 +345,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : (\"+\" | \"-\")^ ID ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : ('+' | '-')^ ID ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "+abc", debug);
@@ -360,10 +360,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ID ((\"+\"|\"-\")^^ ID)* ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : ID (('+'|'-')^^ ID)* ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a+b-c", debug);
@@ -375,10 +375,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ~ID \"+\" INT ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : ~ID '+' INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "34+2", debug);
@@ -390,10 +390,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ~\"+\"^ INT ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : ~'+'^ INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "34 55", debug);
@@ -406,10 +406,10 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : INT (~INT^^ INT)* ;\n" +
-			"blort : \"+\" ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"blort : '+' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "3+4+5", debug);
@@ -422,10 +422,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : id=ID id=ID {System.out.print(\"2nd id=\"+$id.text+\";\");} ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : id=ID id=ID {System.out.print(\"2nd id=\"+$id.text+';');} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
@@ -438,10 +438,10 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : id=ID id=ID^ {System.out.print(\"2nd id=\"+$id.text+\";\");} ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : id=ID id=ID^ {System.out.print(\"2nd id=\"+$id.text+';');} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
@@ -455,14 +455,14 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ids+=ID ids+=ID {System.out.print(\"id list=\"+$ids+\";\");} ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : ids+=ID ids+=ID {System.out.print(\"id list=\"+$ids+';');} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
-		String expecting = "id list=[[@0,0:0=\"a\",<4>,1:0], [@2,2:2=\"b\",<4>,1:2]];a b\n";
+		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];a b\n";
 		assertEqual(found, expecting);
 	}
 
@@ -472,14 +472,14 @@ public class TestAutoAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ids+=ID^ ids+=ID {System.out.print(\"id list=\"+$ids+\";\");} ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : ids+=ID^ ids+=ID {System.out.print(\"id list=\"+$ids+';');} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
-		String expecting = "id list=[[@0,0:0=\"a\",<4>,1:0], [@2,2:2=\"b\",<4>,1:2]];(a b)\n";
+		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];(a b)\n";
 		assertEqual(found, expecting);
 	}
 
@@ -488,9 +488,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : id+=ID^^ ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a", debug);
@@ -503,9 +503,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : id+=ID! ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a", debug);
@@ -519,11 +519,11 @@ public class TestAutoAST extends TestSuite {
 			"options {output=AST;}\n" +
 			"a : x+=b x+=b {" +
 				"b_return ret=(b_return)$x.get(1);" +
-				"System.out.print(\"2nd x=\"+((CommonTree)ret.tree).toStringTree()+\";\");} ;\n" +
+				"System.out.print(\"2nd x=\"+((CommonTree)ret.tree).toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
@@ -537,11 +537,11 @@ public class TestAutoAST extends TestSuite {
 			"options {output=AST;}\n" +
 			"a : ( x+=b^ )+ {" +
 			"b_return ret=(b_return)$x.get(1);" +
-			"System.out.print(\"x=\"+((CommonTree)ret.tree).toStringTree()+\";\");} ;\n" +
+			"System.out.print(\"x=\"+((CommonTree)ret.tree).toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
@@ -555,11 +555,11 @@ public class TestAutoAST extends TestSuite {
 			"options {output=AST;}\n" +
 			"a : ( x+=b^^ )+ {" +
 			"b_return ret=(b_return)$x.get(1);" +
-			"System.out.print(\"x=\"+((CommonTree)ret.tree).toStringTree()+\";\");} ;\n" +
+			"System.out.print(\"x=\"+((CommonTree)ret.tree).toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
@@ -573,11 +573,11 @@ public class TestAutoAST extends TestSuite {
 			"options {output=AST;}\n" +
 			"a : x+=b! x+=b {" +
 			"b_return ret=(b_return)$x.get(0);" +
-			"System.out.print(\"1st x=\"+((CommonTree)ret.tree).toStringTree()+\";\");} ;\n" +
+			"System.out.print(\"1st x=\"+((CommonTree)ret.tree).toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
@@ -591,11 +591,11 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : A b=B b=B c+=C c+=C D {$D.text;} ;\n" +
-			"A : \"a\" ;\n" +
-			"B : \"b\" ;\n" +
-			"C : \"c\" ;\n" +
-			"D : \"d\" ;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"A : 'a' ;\n" +
+			"B : 'b' ;\n" +
+			"C : 'c' ;\n" +
+			"D : 'd' ;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b b c c d", debug);
@@ -611,9 +611,9 @@ public class TestAutoAST extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a :  ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34", debug);

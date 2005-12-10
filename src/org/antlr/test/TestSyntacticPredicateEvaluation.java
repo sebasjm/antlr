@@ -33,22 +33,22 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 	public void testTwoPredsWithNakedAlt() throws Exception {
 		String grammar =
 			"grammar t;\n" +
-			"s : (a \";\")+ ;\n" +
+			"s : (a ';')+ ;\n" +
 			"a\n" +
 			"options {\n" +
 			"  k=1;\n" +
 			"}\n" +
-			"  : (b \".\")=> b \".\" {System.out.println(\"alt 1\");}\n" +
+			"  : (b '.')=> b '.' {System.out.println(\"alt 1\");}\n" +
 			"  | (b)=> b {System.out.println(\"alt 2\");}\n" +
 			"  | c       {System.out.println(\"alt 3\");}\n" +
 			"  ;\n" +
 			"b\n" +
 			"@init {System.out.println(\"enter b\");}\n" +
-			"   : \"(\" \"x\" \")\" ;\n" +
+			"   : '(' 'x' ')' ;\n" +
 			"c\n" +
 			"@init {System.out.println(\"enter c\");}\n" +
-			"   : \"(\" c \")\" | \"x\" ;\n" +
-			"WS : (\" \"|\"\\n\")+ {channel=99;}\n" +
+			"   : '(' c ')' | 'x' ;\n" +
+			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
@@ -83,22 +83,22 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 	public void testTwoPredsWithNakedAltNotLast() throws Exception {
 		String grammar =
 			"grammar t;\n" +
-			"s : (a \";\")+ ;\n" +
+			"s : (a ';')+ ;\n" +
 			"a\n" +
 			"options {\n" +
 			"  k=1;\n" +
 			"}\n" +
-			"  : (b \".\")=> b \".\" {System.out.println(\"alt 1\");}\n" +
+			"  : (b '.')=> b '.' {System.out.println(\"alt 1\");}\n" +
 			"  | c       {System.out.println(\"alt 2\");}\n" +
 			"  | (b)=> b {System.out.println(\"alt 3\");}\n" +
 			"  ;\n" +
 			"b\n" +
 			"@init {System.out.println(\"enter b\");}\n" +
-			"   : \"(\" \"x\" \")\" ;\n" +
+			"   : '(' 'x' ')' ;\n" +
 			"c\n" +
 			"@init {System.out.println(\"enter c\");}\n" +
-			"   : \"(\" c \")\" | \"x\" ;\n" +
-			"WS : (\" \"|\"\\n\")+ {channel=99;}\n" +
+			"   : '(' c ')' | 'x' ;\n" +
+			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
@@ -137,10 +137,10 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"grammar t;\n" +
 			"s : A ;\n" +
 			"A options {k=1;}\n" + // force backtracking
-			"  : (B \".\")=>B {System.out.println(\"alt1\");}\n" +
+			"  : (B '.')=>B {System.out.println(\"alt1\");}\n" +
 			"  | B {System.out.println(\"alt2\");}" +
 			"  ;\n" +
-			"B : \"x\"+ ;\n" ;
+			"B : 'x'+ ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
 												 "s", "xxx", false);

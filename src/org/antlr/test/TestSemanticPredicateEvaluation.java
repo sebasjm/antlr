@@ -33,8 +33,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 	public void testSimpleCyclicDFAWithPredicate() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
-			"a : {false}? \"x\"* \"y\" {System.out.println(\"alt1\");}\n" +
-			"  | {true}?  \"x\"* \"y\" {System.out.println(\"alt2\");}\n" +
+			"a : {false}? 'x'* 'y' {System.out.println(\"alt1\");}\n" +
+			"  | {true}?  'x'* 'y' {System.out.println(\"alt2\");}\n" +
 			"  ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
@@ -47,8 +47,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 		String grammar =
 			"grammar foo;\n" +
 			"@members {boolean v=true;}\n" +
-			"a : {false}? \"x\"* \"y\" {System.out.println(\"alt1\");}\n" +
-			"  | {v}?     \"x\"* \"y\" {System.out.println(\"alt2\");}\n" +
+			"a : {false}? 'x'* 'y' {System.out.println(\"alt1\");}\n" +
+			"  | {v}?     'x'* 'y' {System.out.println(\"alt2\");}\n" +
 			"  ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
@@ -66,7 +66,7 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"}\n" +
 			"}\n" +
 			"\n" +
-			"a : {false}? \"x\"\n" +
+			"a : {false}? 'x'\n" +
 			"  ;\n" ;
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
@@ -80,8 +80,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"grammar foo;" +
 			"@lexer::members {boolean p=false;}\n" +
 			"a : (A|B)+ ;\n" +
-			"A : {p}? \"a\"  {System.out.println(\"token 1\");} ;\n" +
-			"B : {!p}? \"a\" {System.out.println(\"token 2\");} ;\n";
+			"A : {p}? 'a'  {System.out.println(\"token 1\");} ;\n" +
+			"B : {!p}? 'a' {System.out.println(\"token 2\");} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "a", false);
@@ -95,8 +95,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"grammar foo;" +
 			"@lexer::members {boolean p=true;}\n" +
 			"a : (A|B)+ ;\n" +
-			"A : {p}? \"a\" {System.out.println(\"token 1\");} ;\n" +
-			"B : (\"a\"|\"b\")+ {System.out.println(\"token 2\");} ;\n";
+			"A : {p}? 'a' {System.out.println(\"token 1\");} ;\n" +
+			"B : ('a'|'b')+ {System.out.println(\"token 2\");} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "a", false);
@@ -111,9 +111,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"grammar foo;" +
 			"@lexer::members {boolean p=true;}\n" +
 			"a : (A|B)+ ;\n" +
-			"A : (\"a\" {System.out.print(\"1\");})*\n" +
+			"A : ('a' {System.out.print(\"1\");})*\n" +
 			"    {p}?\n" +
-			"    (\"a\" {System.out.print(\"2\");})* ;\n";
+			"    ('a' {System.out.print(\"2\");})* ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "aaa", false);
@@ -126,8 +126,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"grammar foo;" +
 			"@lexer::members {boolean p=true;}\n" +
 			"a : (A|B)+ ;\n" +
-			"A : ({p}? \"a\" {System.out.print(\"1\");})*\n" +
-			"    (\"a\" {System.out.print(\"2\");})* ;\n";
+			"A : ({p}? 'a' {System.out.print(\"1\");})*\n" +
+			"    ('a' {System.out.print(\"2\");})* ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "aaa", false);
@@ -140,8 +140,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"grammar foo;" +
 			"@lexer::members {boolean p=true;}\n" +
 			"a : (A|B)+ ;\n" +
-			"A : ({p}? \"a\" {System.out.print(\"1\");} | )\n" +
-			"    (\"a\" {System.out.print(\"2\");})* ;\n";
+			"A : ({p}? 'a' {System.out.print(\"1\");} | )\n" +
+			"    ('a' {System.out.print(\"2\");})* ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "aaa", false);
@@ -153,8 +153,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 		String grammar =
 			"grammar foo;" +
 			"a : (A|B)+ ;\n" +
-			"A @init {int n=0;} : ({n<2}? \"a\" {System.out.print(n++);})+\n" +
-			"    (\"a\" {System.out.print(\"x\");})* ;\n";
+			"A @init {int n=0;} : ({n<2}? 'a' {System.out.print(n++);})+\n" +
+			"    ('a' {System.out.print(\"x\");})* ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "aaaaa", false);
@@ -167,8 +167,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"grammar foo;" +
 			"@lexer::members {boolean p=false;}\n" +
 			"a : (A|B)+ ;\n" +
-			"A : {p}? (\"a\")+ \"x\"  {System.out.println(\"token 1\");} ;\n" +
-			"B :      (\"a\")+ \"x\" {System.out.println(\"token 2\");} ;\n";
+			"A : {p}? ('a')+ 'x'  {System.out.println(\"token 1\");} ;\n" +
+			"B :      ('a')+ 'x' {System.out.println(\"token 2\");} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "aax", false);
@@ -181,8 +181,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"grammar foo;" +
 			"@lexer::members {boolean p=false;}\n" +
 			"a : (A|B)+ ;\n" +
-			"A : {p}? (\"a\")+ \"x\" (\"y\")? {System.out.println(\"token 1\");} ;\n" +
-			"B :      (\"a\")+ \"x\" {System.out.println(\"token 2\");} ;\n";
+			"A : {p}? ('a')+ 'x' ('y')? {System.out.println(\"token 1\");} ;\n" +
+			"B :      ('a')+ 'x' {System.out.println(\"token 2\");} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "aax", false);
@@ -194,8 +194,8 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 		String grammar =
 			"grammar foo;" +
 			"a : (A|B)+ ;\n" +
-			"A : {true}?=> \"a\" {System.out.println(\"token 1\");} ;\n" +
-			"B : {false}?=>(\"a\"|\"b\")+ {System.out.println(\"token 2\");} ;\n";
+			"A : {true}?=> 'a' {System.out.println(\"token 1\");} ;\n" +
+			"B : {false}?=>('a'|'b')+ {System.out.println(\"token 2\");} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "aa", false);
@@ -211,9 +211,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a :  ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34", false);

@@ -46,7 +46,7 @@ public class TestDFAMatching extends TestSuite {
     public void testSimpleAltCharTest() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "A : {;}\"a\" | \"b\" | \"c\";");
+                "A : {;}'a' | 'b' | 'c';");
 		g.createNFAs();
 		g.createLookaheadDFAs();
         DFA dfa = g.getLookaheadDFA(1);
@@ -59,7 +59,7 @@ public class TestDFAMatching extends TestSuite {
     public void testSets() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "A : {;}\"a\"..\"z\" | \";\" | \"0\"..\"9\" ;");
+                "A : {;}'a'..'z' | ';' | '0'..'9' ;");
 		g.createNFAs();
         g.createLookaheadDFAs();
         DFA dfa = g.getLookaheadDFA(1);
@@ -73,7 +73,7 @@ public class TestDFAMatching extends TestSuite {
     public void testFiniteCommonLeftPrefixes() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "A : \"a\" \"b\" | \"a\" \"c\" | \"d\" \"e\" ;");
+                "A : 'a' 'b' | 'a' 'c' | 'd' 'e' ;");
 		g.createNFAs();
         g.createLookaheadDFAs();
         DFA dfa = g.getLookaheadDFA(1);
@@ -86,8 +86,8 @@ public class TestDFAMatching extends TestSuite {
     public void testSimpleLoops() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
-                "A : (DIGIT)+ \".\" DIGIT | (DIGIT)+ ;\n" +
-                "DIGIT : \"0\"..\"9\" ;\n");
+                "A : (DIGIT)+ '.' DIGIT | (DIGIT)+ ;\n" +
+                "DIGIT : '0'..'9' ;\n");
 		g.createNFAs();
         g.createLookaheadDFAs();
         DFA dfa = g.getLookaheadDFA(3);

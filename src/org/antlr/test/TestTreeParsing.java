@@ -15,9 +15,9 @@ public class TestTreeParsing extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID INT;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		String treeGrammar =
 			"tree grammar TP;\n" +
@@ -45,9 +45,9 @@ public class TestTreeParsing extends TestSuite {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ID INT -> ^(ID INT);\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		String treeGrammar =
 			"tree grammar TP;\n" +
@@ -77,15 +77,15 @@ public class TestTreeParsing extends TestSuite {
 			"a : b c ;\n" +
 			"b : ID INT -> ^(ID INT);\n" +
 			"c : ID INT;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		String treeGrammar =
 			"tree grammar TP;\n" +
 			"a : b b ;\n" +
 			"b : ID INT    {System.out.print($ID+\" \"+$INT);}\n" +
-			"  | ^(ID INT) {System.out.print(\"^(\"+$ID+\" \"+$INT+\")\");}\n" +
+			"  | ^(ID INT) {System.out.print(\"^(\"+$ID+\" \"+$INT+')');}\n" +
 			"  ;\n";
 
 		String found =
@@ -110,15 +110,15 @@ public class TestTreeParsing extends TestSuite {
 			"a : b c ;\n" +
 			"b : ID INT+ -> ^(ID INT+);\n" +
 			"c : ID INT+;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 
 		String treeGrammar =
 			"tree grammar TP;\n" +
 			"a : b b ;\n" +
 			"b : ID INT+    {System.out.print($ID+\" \"+$INT);}\n" +
-			"  | ^(x=ID (y=INT)+) {System.out.print(\"^(\"+$x+\" \"+$y+\")\");}\n" +
+			"  | ^(x=ID (y=INT)+) {System.out.print(\"^(\"+$x+' '+$y+')');}\n" +
 			"  ;\n";
 
 		String found =

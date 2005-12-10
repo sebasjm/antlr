@@ -30,6 +30,7 @@ package org.antlr.codegen;
 import org.antlr.tool.Grammar;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.Tool;
+import org.antlr.misc.Utils;
 import org.antlr.analysis.Label;
 
 import java.io.IOException;
@@ -137,38 +138,32 @@ public class Target {
 
 	/** Convert from an ANTLR char literal found in a grammar file to
 	 *  an equivalent char literal in the target language.  For most
-	 *  languages, this means converting "x" to 'x'.
+	 *  languages, this means leaving 'x' as 'x'.
 	 *
-	 *  Expect double quotes around the incoming literal.
-	 *
-	 *  Before I changed all literals to be "...", this
-	 *  was the identify translation; i.e., '\n' -> '\n'.
-	 *  Now, I just flip the double to single quotes.
+	 *  Expect single quotes around the incoming literal.
 	 */
 	public String getTargetCharLiteralFromANTLRCharLiteral(
 		CodeGenerator generator,
 		String literal)
 	{
-		if ( literal.charAt(1)=='\'' ) {
-			return "'\\''";
-		}
-		StringBuffer buf = new StringBuffer(literal);
-		buf.setCharAt(0,'\'');
-		buf.setCharAt(literal.length()-1,'\'');
-		return buf.toString();
+		return literal;
 	}
 
 	/** Convert from an ANTLR string literal found in a grammar file to
 	 *  an equivalent string literal in the target language.  For Java, this
-	 *  is the identify translation; i.e., "\"\n" -> "\"\n".  Most languages
-	 *  will be able to use this 1-to-1 mapping.  Expect double quotes 
-	 *  around the incoming literal.
+	 *  is the translation 'a\n"' -> "a\n\"".  Expect single quotes
+	 *  around the incoming literal.  Just flip the quotes and replace
+	 *  double quotes with \"
 	 */
 	public String getTargetStringLiteralFromANTLRStringLiteral(
 		CodeGenerator generator,
 		String literal)
 	{
-		return literal;
+		Utils.replace(literal,"\"","\\\"");
+		StringBuffer buf = new StringBuffer(literal);
+		buf.setCharAt(0,'"');
+		buf.setCharAt(literal.length()-1,'"');
+		return buf.toString();
 	}
 
 	/** Given a random string of Java unicode chars, return a new string with

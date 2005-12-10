@@ -132,6 +132,6 @@ public class CommonToken extends Token {
 		else {
 			txt = "<no text>";
 		}
-        return "[@"+getTokenIndex()+","+start+":"+stop+"=\""+txt+"\",<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+        return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
     }
 }

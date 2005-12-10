@@ -668,10 +668,7 @@ public class CodeGenerator {
 	protected void genTokenTypeNames(StringTemplate code) {
 		for (int t=Label.MIN_TOKEN_TYPE; t<=grammar.getMaxTokenType(); t++) {
 			String tokenName = grammar.getTokenDisplayName(t);
-			if ( tokenName.charAt(0)=='\"' ) {
-				tokenName = Utils.replace(tokenName,"\"", "\\\"");
-			}
-			tokenName = '\"'+tokenName+'\"';
+			tokenName=target.getTargetStringLiteralFromString(tokenName, true);
 			code.setAttribute("tokenNames", tokenName);
 		}
 	}
@@ -692,7 +689,7 @@ public class CodeGenerator {
 			return target.getTargetCharLiteralFromANTLRCharLiteral(this,name);
 		}
 		// If name is a literal, return the token type instead
-        if ( name.charAt(0)=='"' || name.charAt(0)=='\'' ) {
+        if ( name.charAt(0)=='\'' ) {
             return String.valueOf(ttype);
         }
         if ( ttype==Label.EOF ) {

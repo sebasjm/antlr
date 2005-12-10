@@ -253,12 +253,12 @@ public class TestSemanticPredicates extends TestSuite {
 	public void testLexerMatchesLongestThenTestPred() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
-			"B : {p}? \"a\" ;\n" +
-			"C : {q}? (\"a\"|\"b\")+ ;");
+			"B : {p}? 'a' ;\n" +
+			"C : {q}? ('a'|'b')+ ;");
 		String expecting =
-			".s0-\"a\"->.s1\n" +
-			".s0-\"b\"->:s5=>2\n" +
-			".s1-\"a\"..\"b\"->:s5=>2\n" +
+			".s0-'a'->.s1\n" +
+			".s0-'b'->:s5=>2\n" +
+			".s1-'a'..'b'->:s5=>2\n" +
 			".s1-<EOT>->.s2\n" +
 			".s2-{p}?->:s3=>1\n" +
 			".s2-{q}?->:s4=>2\n";
@@ -269,12 +269,12 @@ public class TestSemanticPredicates extends TestSuite {
 		// gated preds are present on all arcs in predictor
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
-			"B : {p}? => \"a\" ;\n" +
-			"C : {q}? => (\"a\"|\"b\")+ ;");
+			"B : {p}? => 'a' ;\n" +
+			"C : {q}? => ('a'|'b')+ ;");
 		String expecting =
-			".s0-\"a\"&&{(q||p)}?->.s1\n" +
-			".s0-\"b\"&&{q}?->:s5=>2\n" +
-			".s1-\"a\"..\"b\"&&{q}?->:s5=>2\n" +
+			".s0-'a'&&{(q||p)}?->.s1\n" +
+			".s0-'b'&&{q}?->:s5=>2\n" +
+			".s1-'a'..'b'&&{q}?->:s5=>2\n" +
 			".s1-<EOT>&&{(q||p)}?->.s2\n" +
 			".s2-{p}?->:s3=>1\n" +
 			".s2-{q}?->:s4=>2\n";
@@ -284,14 +284,14 @@ public class TestSemanticPredicates extends TestSuite {
 	public void testGatedPredInCyclicDFA() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
-			"A : {p}?=> (\"a\")+ \"x\" ;\n" +
-			"B : {q}?=> (\"a\"|\"b\")+ \"x\" ;");
+			"A : {p}?=> ('a')+ 'x' ;\n" +
+			"B : {q}?=> ('a'|'b')+ 'x' ;");
 		String expecting =
-			".s0-\"a\"&&{(p||q)}?->.s1\n" +
-			".s0-\"b\"&&{q}?->:s6=>2\n" +
-			".s1-\"a\"&&{(p||q)}?->.s1\n" +
-			".s1-\"b\"&&{q}?->:s6=>2\n" +
-			".s1-\"x\"&&{(q||p)}?->.s2\n" +
+			".s0-'a'&&{(p||q)}?->.s1\n" +
+			".s0-'b'&&{q}?->:s6=>2\n" +
+			".s1-'a'&&{(p||q)}?->.s1\n" +
+			".s1-'b'&&{q}?->:s6=>2\n" +
+			".s1-'x'&&{(q||p)}?->.s2\n" +
 			".s2-<EOT>&&{(p||q)}?->.s3\n" +
 			".s3-{p}?->:s4=>1\n" +
 			".s3-{q}?->:s5=>2\n";
@@ -403,11 +403,11 @@ public class TestSemanticPredicates extends TestSuite {
 			"options {\n" +
 			"  k=1;\n" +
 			"}\n" +
-			"  : {p1}? (\"x\")+ \".\"\n" +
-			"  | {p2}? (\"x\")+ \".\"\n" +
+			"  : {p1}? ('x')+ '.'\n" +
+			"  | {p2}? ('x')+ '.'\n" +
 			"  ;\n");
 		String expecting =
-			".s0-\"x\"->.s1\n" +
+			".s0-'x'->.s1\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{p2}?->:s3=>2\n";
 		int[] unreachableAlts = null;
@@ -424,13 +424,13 @@ public class TestSemanticPredicates extends TestSuite {
 	public void testPredWithArbitraryLookahead() throws Exception {
 		Grammar g = new Grammar(
 			"\tlexer grammar TLexer;\n" +
-			"A : {p1}? (\"x\")+ \".\"\n" +
-			"  | {p2}? (\"x\")+ \".\"\n" +
+			"A : {p1}? ('x')+ '.'\n" +
+			"  | {p2}? ('x')+ '.'\n" +
 			"  ;\n");
 		String expecting =
-			".s0-\"x\"->.s1\n" +
-			".s1-\".\"->.s2\n" +
-			".s1-\"x\"->.s1\n" +
+			".s0-'x'->.s1\n" +
+			".s1-'.'->.s2\n" +
+			".s1-'x'->.s1\n" +
 			".s2-{p1}?->:s3=>1\n" +
 			".s2-{p2}?->:s4=>2\n";
 		int[] unreachableAlts = null;

@@ -50,7 +50,7 @@ public class TestASTConstruction extends TestSuite {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
 				"A : B+;\n" +
-				"B : \"a\";");
+				"B : 'a';");
 		String expecting =
 			" ( rule A ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT B <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("A").tree.toStringTree();
@@ -126,9 +126,9 @@ public class TestASTConstruction extends TestSuite {
 	public void testCharStar() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
-				"a : \"a\"*;");
+				"a : 'a'*;");
 		String expecting =
-			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT \"a\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -136,9 +136,9 @@ public class TestASTConstruction extends TestSuite {
 	public void testCharStarInLexer() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
-				"B : \"b\"*;");
+				"B : 'b'*;");
 		String expecting =
-			" ( rule B ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT \"b\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule B ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -146,9 +146,9 @@ public class TestASTConstruction extends TestSuite {
 	public void testStringStar() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
-				"a : \"while\"*;");
+				"a : 'while'*;");
 		String expecting =
-			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT \"while\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'while' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -156,9 +156,9 @@ public class TestASTConstruction extends TestSuite {
 	public void testStringStarInLexer() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
-				"B : \"while\"*;");
+				"B : 'while'*;");
 		String expecting =
-			" ( rule B ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT \"while\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule B ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'while' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -166,9 +166,9 @@ public class TestASTConstruction extends TestSuite {
 	public void testCharPlus() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
-				"a : \"a\"+;");
+				"a : 'a'+;");
 		String expecting =
-			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT \"a\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -176,9 +176,9 @@ public class TestASTConstruction extends TestSuite {
 	public void testCharPlusInLexer() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
-				"B : \"b\"+;");
+				"B : 'b'+;");
 		String expecting =
-			" ( rule B ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT \"b\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule B ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -186,9 +186,9 @@ public class TestASTConstruction extends TestSuite {
 	public void testCharOptional() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
-				"a : \"a\"?;");
+				"a : 'a'?;");
 		String expecting =
-			" ( rule a ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT \"a\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -196,9 +196,9 @@ public class TestASTConstruction extends TestSuite {
 	public void testCharOptionalInLexer() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
-				"B : \"b\"?;");
+				"B : 'b'?;");
 		String expecting =
-			" ( rule B ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT \"b\" <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule B ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
 		assertEqual(found,expecting);
 	}
@@ -206,9 +206,9 @@ public class TestASTConstruction extends TestSuite {
 	public void testCharRangePlus() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
-				"ID : \"a\"..\"z\"+;");
+				"ID : 'a'..'z'+;");
 		String expecting =
-			" ( rule ID ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT ( .. \"a\" \"z\" ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+			" ( rule ID ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT ( .. 'a' 'z' ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("ID").tree.toStringTree();
 		assertEqual(found,expecting);
 	}

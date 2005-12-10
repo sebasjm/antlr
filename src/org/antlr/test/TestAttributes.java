@@ -60,7 +60,7 @@ public class TestAttributes extends TestSuite {
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator);
-		String action = "i<3; \"<xmltag>\"";
+		String action = "i<3; '<xmltag>'";
 		String expecting = action;
 		String rawTranslation =
 			translator.translate("a",
@@ -164,7 +164,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 			"grammar t;\n"+
 			"a returns [int i]\n" +
-			"        : \"a\"\n" +
+			"        : 'a'\n" +
 			"        ;\n" +
 			"b : x=a {"+action+"} ;\n");
 		Tool antlr = new Tool();
@@ -509,7 +509,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-			"@members {\"+action+\"}\n" +
+			"@members {'+action+'}\n" +
 			"a : ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -539,7 +539,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-			"@members {\"+action+\"}\n" +
+			"@members {'+action+'}\n" +
 			"a : ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -575,9 +575,9 @@ public class TestAttributes extends TestSuite {
 			"  int n;\n" +
 			"  List names;\n" +
 			"}\n" +
-			"a scope Symbols; : (id=ID \";\" {"+action+"} )+\n" +
+			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
 			"  ;\n" +
-			"ID : \"a\";\n");
+			"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -608,7 +608,7 @@ public class TestAttributes extends TestSuite {
 			"}\n" +
 			"a scope foo_bar; : (ID {"+action+"} )+\n" +
 			"  ;\n" +
-			"ID : \"a\";\n");
+			"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -643,7 +643,7 @@ public class TestAttributes extends TestSuite {
 			" : b {"+action+"}\n" +
 			" ;\n" +
 			"b : ID {$Symbols::x=$ID.text} ;\n" +
-			"ID : \"a\";\n");
+			"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -662,8 +662,8 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testGlobalScopeOutsideRule() throws Exception {
-		String action = "public void foo() {$Symbols::names.add(\"foo\");}";
-		String expecting = "public void foo() {((Symbols_scope)Symbols_stack.peek()).names.add(\"foo\");}";
+		String action = "public void foo() {$Symbols::names.add('foo');}";
+		String expecting = "public void foo() {((Symbols_scope)Symbols_stack.peek()).names.add('foo');}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -673,7 +673,7 @@ public class TestAttributes extends TestSuite {
 			"  int n;\n" +
 			"  List names;\n" +
 			"}\n" +
-			"@members {\"+action+\"}\n" +
+			"@members {'+action+'}\n" +
 			"a : \n" +
 			"  ;\n");
 		Tool antlr = new Tool();
@@ -829,7 +829,7 @@ public class TestAttributes extends TestSuite {
 			" : b {"+action+"}\n" +
 			" ;\n" +
 			"b : ID {$Symbols::x=$ID.text} ;\n" +
-			"ID : \"a\";\n");
+			"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -941,7 +941,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"a : x=\"a\" {"+action+"}\n" +
+			"a : x='a' {"+action+"}\n" +
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -968,7 +968,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"a : \"a\" {"+action+"}\n" +
+			"a : 'a' {"+action+"}\n" +
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -993,7 +993,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"a : x+=\"a\" {"+action+"}\n" +
+			"a : x+='a' {"+action+"}\n" +
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1052,7 +1052,7 @@ public class TestAttributes extends TestSuite {
 			"b\n" +
 			"scope {\n" +
 			"  int n;\n" +
-			"} : \"b\" \n" +
+			"} : 'b' \n" +
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1079,7 +1079,7 @@ public class TestAttributes extends TestSuite {
 			"b\n" +
 			"scope {\n" +
 			"  int n;\n" +
-			"} : \"(\" b \")\" {"+action+"}\n" + // refers to current invocation\"s n
+			"} : '(' b ')' {"+action+"}\n" + // refers to current invocation's n
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1166,8 +1166,8 @@ public class TestAttributes extends TestSuite {
 			"a : ID {"+action+"}\n" +
 			"  | INT {"+action2+"}\n" +
 			"  ;\n" +
-			"ID : \"a\";\n" +
-			"INT : \"0\";\n");
+			"ID : 'a';\n" +
+			"INT : '0';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1208,8 +1208,8 @@ public class TestAttributes extends TestSuite {
 			"a : b {"+action+"}\n" +
 			"  | c {"+action2+"}\n" +
 			"  ;\n" +
-			"b : \"a\";\n" +
-			"c : \"0\";\n");
+			"b : 'a';\n" +
+			"c : '0';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1281,7 +1281,7 @@ public class TestAttributes extends TestSuite {
 			"scope Symbols {\n" +
 			"  int n;\n" +
 			"}\n" +
-			"a : {\"+action+\"}\n" +
+			"a : {'+action+'}\n" +
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1316,7 +1316,7 @@ public class TestAttributes extends TestSuite {
 			"  int n;\n" +
 			"} : b\n" +
 			"  ;\n" +
-			"b : {\"+action+\"}\n" +
+			"b : {'+action+'}\n" +
 			"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1343,7 +1343,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"a : id=\"foo\" id=b\n" +
+			"a : id='foo' id=b\n" +
 			"  ;\n" +
 			"b : ;\n");
 		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
@@ -1359,7 +1359,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-			"a : ids+=\"a\" ids=\"b\"\n" +
+			"a : ids+='a' ids='b'\n" +
 			"  ;\n" +
 			"b : ;\n");
 		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
@@ -1378,7 +1378,7 @@ public class TestAttributes extends TestSuite {
 			"options {output=AST;}\n"+
 			"a : bs+=b bs=b\n" +
 			"  ;\n" +
-			"b : \"b\";\n");
+			"b : 'b';\n");
 		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
 		Object expectedArg = "bs";
 		Object expectedArg2 = "rule!=rule-list";
@@ -1438,8 +1438,8 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 				"grammar t;\n"+
-				"a : ids+=\"if\" ( \",\" ids+=ID {"+action+"})* ;" +
-				"ID : \"a\";\n");
+				"a : ids+='if' ( ',' ids+=ID {"+action+"})* ;" +
+				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1465,8 +1465,8 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 				"grammar t;\n"+
-				"a : ids+=(\"a\"|\"b\") ( \",\" ids+=ID {"+action+"})* ;" +
-				"ID : \"a\";\n");
+				"a : ids+=('a'|'b') ( ',' ids+=ID {"+action+"})* ;" +
+				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1492,8 +1492,8 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 				"grammar t;\n"+
-				"a : ids+=. ( \",\" ids+=ID {"+action+"})* ;" +
-				"ID : \"a\";\n");
+				"a : ids+=. ( ',' ids+=ID {"+action+"})* ;" +
+				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator);
@@ -1520,7 +1520,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : ID {"+action+"} ;" +
-				"ID : \"a\";\n");
+				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1549,7 +1549,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : r {"+action+"} ;" +
-				"r : \"a\";\n");
+				"r : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1578,7 +1578,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : x=r {"+action+"} ;" +
-				"r : \"a\";\n");
+				"r : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1608,7 +1608,7 @@ public class TestAttributes extends TestSuite {
 				"grammar t;\n"+
 				"options {output=AST;}\n" +
 				"a : x+=r {"+action+"} ;" +
-				"r : \"a\";\n");
+				"r : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1637,7 +1637,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : x=ID {"+action+"} ;" +
-				"ID : \"a\";\n");
+				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1666,7 +1666,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : x+=ID {"+action+"} ;" +
-				"ID : \"a\";\n");
+				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1692,7 +1692,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : r ;" +
-				"r[int i] : \"a\";\n");
+				"r[int i] : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1713,7 +1713,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : r[32,34] ;" +
-				"r : \"a\";\n");
+				"r : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1734,7 +1734,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : ID[32,34] ;" +
-				"ID : \"a\";\n");
+				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1754,8 +1754,8 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
-				"R : \"z\" ID[32,34] ;" +
-				"ID : \"a\";\n");
+				"R : 'z' ID[32,34] ;" +
+				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1775,7 +1775,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
-				"R : x=\"z\" ;\n");
+				"R : x='z' ;\n");
 
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1789,7 +1789,7 @@ public class TestAttributes extends TestSuite {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
-				"R : x+=\"z\" ;\n");
+				"R : x+='z' ;\n");
 
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1832,7 +1832,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
 				"A : R ;" +
-				"R[int i] : \"a\";\n");
+				"R[int i] : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1853,8 +1853,8 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : R;\n" +
-				"R : \"z\" ID[32] ;" +
-				"ID : \"a\";\n");
+				"R : 'z' ID[32] ;" +
+				"ID : 'a';\n");
 
 		String lexerGrammarStr = g.getLexerGrammar();
 		StringReader sr = new StringReader(lexerGrammarStr);
@@ -1884,8 +1884,8 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : R;\n" +
-				"R : \"z\" ID ;" +
-				"ID[int i] : \"a\";\n");
+				"R : 'z' ID ;" +
+				"ID[int i] : 'a';\n");
 
 		String lexerGrammarStr = g.getLexerGrammar();
 		StringReader sr = new StringReader(lexerGrammarStr);
@@ -1920,7 +1920,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : id=ID {"+action+"} ;\n" +
-				"ID : \"a\";\n");
+				"ID : 'a';\n");
 
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
@@ -1949,7 +1949,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : ID {"+action+"} ;" +
-				"ID : \"a\";\n");
+				"ID : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");

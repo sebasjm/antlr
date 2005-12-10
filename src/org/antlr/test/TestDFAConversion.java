@@ -83,7 +83,9 @@ public class TestDFAConversion extends TestSuite {
 			".s3-A->.s4\n" +
 			".s4-A->.s5\n" +
 			".s5-A->.s6\n" +
-			".s6-A->:s7=>1\n"; // gets this after failing to do LL(*)
+			".s6-A->.s7\n" +
+			".s7-A->.s8\n" +
+			".s8-A->:s9=>1\n"; // gets this after failing to do LL(*)
 		int[] unreachableAlts = new int[] {2};
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -608,20 +610,20 @@ public class TestDFAConversion extends TestSuite {
 	public void testComplementChar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : ~\"x\" | \"x\";\n");
+			"A : ~'x' | 'x';\n");
 		String expecting =
-			".s0-\"x\"->:s2=>2\n" +
-			".s0-{\"\\u0000\"..\"w\", \"y\"..\"\\uFFFE\"}->:s1=>1\n";
+			".s0-'x'->:s2=>2\n" +
+			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
 	public void testComplementCharSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : ~(\" \"|\"\t\"|\"x\") | \"x\";\n");
+			"A : ~(' '|'\t'|'x') | 'x';\n");
 		String expecting =
-			".s0-\"x\"->:s2=>2\n" +
-			".s0-{\"\\u0000\"..\"\\b\", \"\\n\"..\"\\u001F\", \"!\"..\"w\", \"y\"..\"\\uFFFE\"}->:s1=>1\n";
+			".s0-'x'->:s2=>2\n" +
+			".s0-{'\\u0000'..'\\b', '\\n'..'\\u001F', '!'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -649,12 +651,12 @@ public class TestDFAConversion extends TestSuite {
 	public void testTokensRuleAltsDoNotCollapse() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";" +
-			"B : \"b\";\n"
+			"A : 'a';" +
+			"B : 'b';\n"
 		);
 		String expecting =
-			".s0-\"a\"->:s1=>1\n" +
-			".s0-\"b\"->:s2=>2\n";
+			".s0-'a'->:s1=>1\n" +
+			".s0-'b'->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -739,14 +741,14 @@ As a result, alternative(s) 2 were disabled for that input
 	public void testTokenCallsAnotherOnLeftEdge() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"F   :   I \".\"\n" +
+			"F   :   I '.'\n" +
 			"    ;\n" +
-			"I   :   \"0\"\n" +
+			"I   :   '0'\n" +
 			"    ;\n"
 		);
 		String expecting =
-			".s0-\"0\"->.s1\n" +
-			".s1-\".\"->:s3=>1\n" +
+			".s0-'0'->.s1\n" +
+			".s1-'.'->:s3=>1\n" +
 			".s1-<EOT>->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
@@ -834,8 +836,11 @@ As a result, alternative(s) 2 were disabled for that input
 			".s4-A->.s5\n" +
 			".s4-X->:s3=>1\n" +
 			".s4-Y->:s6=>2\n" +
+			".s5-A->.s7\n" +
 			".s5-X->:s3=>1\n" +
-			".s5-Y->:s6=>2\n";
+			".s5-Y->:s6=>2\n" +
+			".s7-X->:s3=>1\n" +
+			".s7-Y->:s6=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -849,12 +854,12 @@ As a result, alternative(s) 2 were disabled for that input
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
 			"A : (B | C) ;\n"+
-			"fragment B : \"b\" ;\n" +
-			"fragment C : \"c\" ;\n"
+			"fragment B : 'b' ;\n" +
+			"fragment C : 'c' ;\n"
 		);
 		String expecting =
-			".s0-\"b\"->:s1=>1\n" +  // must not collapse set!
-			".s0-\"c\"->:s2=>2\n";
+			".s0-'b'->:s1=>1\n" +  // must not collapse set!
+			".s0-'c'->:s2=>2\n";
 		// no decision if (B|C) collapses; must not collapse
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}

@@ -106,7 +106,6 @@ options {
     }
 
 protected Grammar grammar;
-protected Map charLiterals = new LinkedHashMap();   // Map<literal,Integer>
 protected Map stringLiterals = new LinkedHashMap(); // Map<literal,Integer>
 protected Map tokens = new LinkedHashMap();         // Map<name,Integer>
 protected Map aliases = new LinkedHashMap();        // Map<name,literal>
@@ -122,6 +121,7 @@ protected int getNewTokenType() {
 }
 
 /** Track characters in any non-lexer rule (could be in tokens{} section) */
+/*
 protected void trackChar(GrammarAST t) {
 	// if lexer don't allow aliasing in tokens section
 	if ( currentRuleName==null && grammar.type==Grammar.LEXER ) {
@@ -146,6 +146,7 @@ protected void trackChar(GrammarAST t) {
 		charLiterals.put(t.getText(), UNASSIGNED_IN_PARSER_RULE);
 	}
 }
+*/
 
 /** Track string literals in any non-lexer rule (could be in tokens{} section) */
 protected void trackString(GrammarAST t) {
@@ -235,7 +236,6 @@ protected void alias(GrammarAST t, GrammarAST s) {
 
 protected void assignTypes() {
 	/*
-	System.out.println("charLiterals="+charLiterals);
 	System.out.println("stringLiterals="+stringLiterals);
 	System.out.println("tokens="+tokens);
 	System.out.println("aliases="+aliases);
@@ -245,13 +245,10 @@ protected void assignTypes() {
 
 	aliasTokenIDsAndLiterals();
 
-	assignCharTypes();
-
 	assignStringTypes();
 
 	/*
 	System.out.println("AFTER:");
-	System.out.println("charLiterals="+charLiterals);
 	System.out.println("stringLiterals="+stringLiterals);
 	System.out.println("tokens="+tokens);
 	System.out.println("aliases="+aliases);
@@ -277,6 +274,7 @@ protected void assignTypes() {
 		}
 	}
 
+/*
 	protected void assignCharTypes() {
 		Set s;
 		// walk char literals assigning types to unassigned ones
@@ -294,6 +292,7 @@ protected void assignTypes() {
 			}
 		}
 	}
+*/
 
 	protected void aliasTokenIDsAndLiterals() {
 		if ( grammar.type==Grammar.LEXER ) {
@@ -305,11 +304,8 @@ protected void assignTypes() {
 		for (Iterator it = s.iterator(); it.hasNext();) {
 			String tokenID = (String) it.next();
 			String literal = (String)aliases.get(tokenID);
-			if ( literal.charAt(0)=='"' && stringLiterals.get(literal)!=null ) {
+			if ( literal.charAt(0)=='\'' && stringLiterals.get(literal)!=null ) {
 				stringLiterals.put(literal, tokens.get(tokenID));
-			}
-			else if ( literal.charAt(0)=='\"' && charLiterals.get(literal)!=null ) {
-				charLiterals.put(literal, tokens.get(tokenID));
 			}
 		}
 	}
@@ -331,12 +327,6 @@ protected void assignTypes() {
 			String tokenID = (String) it.next();
 			int ttype = ((Integer)tokens.get(tokenID)).intValue();
 			grammar.defineToken(tokenID, ttype);
-		}
-		s = charLiterals.keySet();
-		for (Iterator it = s.iterator(); it.hasNext();) {
-			String lit = (String) it.next();
-			int ttype = ((Integer)charLiterals.get(lit)).intValue();
-			grammar.defineToken(lit, ttype);
 		}
 		s = stringLiterals.keySet();
 		for (Iterator it = s.iterator(); it.hasNext();) {
@@ -509,7 +499,7 @@ tokenSpec
 	|	#( ASSIGN
 		   t2:TOKEN_REF       {trackToken(t2);}
 		   ( s:STRING_LITERAL {trackString(s); alias(t2,s);}
-		   | c:CHAR_LITERAL   {trackChar(c); alias(t2,c);}
+		   | c:CHAR_LITERAL   {trackString(c); alias(t2,c);}
 		   )
 		 )
 	;
@@ -587,7 +577,7 @@ tree:   #(TREE_BEGIN  element (element)*  )
 atom
     :   RULE_REF
     |   t:TOKEN_REF      {trackToken(t);}
-    |   c:CHAR_LITERAL   {trackChar(c);}
+    |   c:CHAR_LITERAL   {trackString(c);}
     |   s:STRING_LITERAL {trackString(s);}
     |   WILDCARD
     |	set
@@ -603,12 +593,12 @@ set :   #(SET (setElement)+ (ast_suffix)? )
     ;
 
 setElement
-    :   c:CHAR_LITERAL   {trackChar(c);}
+    :   c:CHAR_LITERAL   {trackString(c);}
     |   t:TOKEN_REF      {trackToken(t);}
     |   s:STRING_LITERAL {trackString(s);}
     |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
     	{
-    	trackChar(c1);
-    	trackChar(c2);
+    	trackString(c1);
+    	trackString(c2);
     	}
     ;

@@ -44,9 +44,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"grammar T;\n" +
 			"options {output=template;}\n" +
 			"a : ID INT -> ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34", debug);
@@ -59,9 +59,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"grammar T;\n" +
 			"options {output=template;}\n" +
 			"a : ID INT -> {new StringTemplate($ID.text)} ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34", debug);
@@ -74,9 +74,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"grammar T;\n" +
 			"options {output=template;}\n" +
 			"a : ID INT -> template(x={$ID},y={$INT}) <<x:<x.text>, y:<y.text>;>> ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34", debug);
@@ -85,15 +85,15 @@ public class TestRewriteTemplates extends TestSuite {
 	}
 
 	public void testNamedTemplate() throws Exception {
-		// the support code adds template group in it\"s output Test.java
+		// the support code adds template group in it's output Test.java
 		// that defines template foo.
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
 			"a : ID INT -> foo(x={$ID.text},y={$INT.text}) ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34", debug);
@@ -105,10 +105,10 @@ public class TestRewriteTemplates extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
-			"a : ID INT -> template(x={$ID.text},y={$INT.text}) \"<foo(...)>\" ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"a : ID INT -> template(x={$ID.text},y={$INT.text}) '<foo(...)>' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34", debug);
@@ -117,7 +117,7 @@ public class TestRewriteTemplates extends TestSuite {
 	}
 
 	public void testPredicatedAlts() throws Exception {
-		// the support code adds template group in it\"s output Test.java
+		// the support code adds template group in it's output Test.java
 		// that defines template foo.
 		String grammar =
 			"grammar T;\n" +
@@ -125,9 +125,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"a : ID INT -> {false}? foo(x={$ID.text},y={$INT.text})\n" +
 			"           -> foo(x={\"hi\"}, y={$ID.text})\n" +
 			"  ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34", debug);
@@ -141,9 +141,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"options {output=template;}\n" +
 			"a : b {System.out.println($b.st);} ;\n" +
 			"b : ID INT -> foo(x={$ID.text},y={$INT.text}) ;\n" +
-			"ID : \"a\"..\"z\"+ ;\n" +
-			"INT : \"0\"..\"9\"+;\n" +
-			"WS : (\" \"|\"\\n\") {channel=99;} ;\n";
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "abc 34", debug);

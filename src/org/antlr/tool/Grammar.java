@@ -671,7 +671,7 @@ public class Grammar {
     public void defineToken(String text, int tokenType) {
 		// the index in the typeToTokenList table is actually shifted to
 		// hold faux labels as you cannot have negative indices.
-        if ( text.charAt(0)=='"' ) {
+        if ( text.charAt(0)=='\'' ) {
             stringLiteralToTypeMap.put(text, new Integer(tokenType));
         }
         else { // must be a label like ID
@@ -1177,7 +1177,7 @@ public class Grammar {
 
     public int getTokenType(String tokenName) {
         Integer I = null;
-        if ( tokenName.charAt(0)=='"') {
+        if ( tokenName.charAt(0)=='\'') {
             I = (Integer)stringLiteralToTypeMap.get(tokenName);
         }
         else { // must be a label like ID
@@ -1223,19 +1223,19 @@ public class Grammar {
      */
     public static int getCharValueFromGrammarCharLiteral(String literal) {
         if ( literal.length()==3 ) {
-			// "x"
+			// 'x'
             return literal.charAt(1); // no escape char
         }
         else if ( literal.length() == 4 )
         {
-			// "\x"  (antlr lexer will catch invalid char)
+			// '\x'  (antlr lexer will catch invalid char)
 			int escChar = literal.charAt(2);
 			int charVal = ANTLRLiteralEscapedCharValue[escChar];
 			return charVal;
         }
         else if( literal.length() == 8 )
         {
-        	// "\u1234"
+        	// '\u1234'
         	String unicodeChars = literal.substring(3,literal.length()-1);
     		return Integer.parseInt(unicodeChars, 16);
          }
@@ -1660,6 +1660,7 @@ public class Grammar {
 	 *  it can be used by any language target that has the same syntax. :)
 	 *
 	 *  11/26/2005: I changed this to use double quotes, consistent with antlr.g
+	 *  12/09/2005: I changed so everything is single quotes
 	 */
 	public static String getANTLRCharLiteralForChar(int c) {
 		if ( c<Label.MIN_CHAR_VALUE ) {
@@ -1667,22 +1668,22 @@ public class Grammar {
 			return "'<INVALID>'";
 		}
 		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {
-			return '"'+ANTLRLiteralCharValueEscape[c]+'"';
+			return '\''+ANTLRLiteralCharValueEscape[c]+'\'';
 		}
 		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
 			!Character.isISOControl((char)c) ) {
 			if ( c=='\\' ) {
-				return "\"\\\\\\\"";
+				return "'\\\\'";
 			}
 			if ( c=='\'') {
-				return "\"'\"";
+				return "'\\''";
 			}
-			return '"'+Character.toString((char)c)+'"';
+			return '\''+Character.toString((char)c)+'\'';
 		}
 		// turn on the bit above max "\uFFFF" value so that we pad with zeros
 		// then only take last 4 digits
 		String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-		String unicodeStr = "\"\\u"+hex+"\"";
+		String unicodeStr = "'\\u"+hex+"'";
 		return unicodeStr;
 	}
 

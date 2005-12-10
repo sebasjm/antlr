@@ -855,30 +855,28 @@ RCURLY:	'}'	;
 
 DOLLAR : '$' ;
 
-// TJP removed 11/26/2005.
-// match for now, but give error
 CHAR_LITERAL
-	:	'\''! (ESC|~'\'') '\''!
+	:	'\'' (ESC|~'\'')* '\''
 		{
-		String t = $getText;
-		$setText('\"'+t+'\"');
-		CommonToken tk = new CommonToken(CHAR_LITERAL,t);
-		tk.setLine(getLine());
-		tk.setColumn(getColumn());
-		ErrorManager.syntaxError(
-			ErrorManager.MSG_SINGLE_QUOTES_ILLEGAL,
-			tk,
-			"'"+t+"'", null);
+		StringBuffer s = Grammar.getUnescapedStringFromGrammarStringLiteral($getText);
+		if ( s.length()>1 ) {
+			$setType(STRING_LITERAL);
+		}
 		}
 	;
 
 STRING_LITERAL
-	:	'"' (ESC|~'"')* '"'
+	:	'"'! (ESC|~'"')* '"'!
 		{
-		StringBuffer s = Grammar.getUnescapedStringFromGrammarStringLiteral($getText);
-		if ( s.length()==1 ) {
-			$setType(CHAR_LITERAL);
-		}
+		String t = $getText;
+		$setText('\''+t+'\'');
+		CommonToken tk = new CommonToken(STRING_LITERAL,t);
+		tk.setLine(getLine());
+		tk.setColumn(getColumn());
+		ErrorManager.syntaxError(
+			ErrorManager.MSG_DOUBLE_QUOTES_ILLEGAL,
+			tk,
+			"'"+t+"'", null);
 		}
 	;
 
@@ -1007,7 +1005,7 @@ NESTED_ACTION :
 
 protected
 ACTION_CHAR_LITERAL
-	:	'\'' (ACTION_ESC|~'\'') '\''
+	:	'\'' (ACTION_ESC|~'\'')* '\''
 	;
 
 protected
@@ -1017,7 +1015,7 @@ ACTION_STRING_LITERAL
 
 protected
 ACTION_ESC
-	:	"\'"
+	:	"\\'"
 	|	"\\\""
 	|	'\\' ~('\''|'"')
 	;
