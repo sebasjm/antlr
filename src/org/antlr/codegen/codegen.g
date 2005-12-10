@@ -1044,9 +1044,9 @@ rewrite_template returns [StringTemplate code=null]
 	             )
 	          )*
 	        )
-		   ( STRING_LITERAL
+		   ( DOUBLE_QUOTE_STRING_LITERAL
              {
-             String sl = #STRING_LITERAL.getText();
+             String sl = #DOUBLE_QUOTE_STRING_LITERAL.getText();
 			 String t = sl.substring(1,sl.length()-1); // strip quotes
 			 t = generator.target.getTargetStringLiteralFromString(t);
              code.setAttribute("template",t);

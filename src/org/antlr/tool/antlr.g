@@ -728,7 +728,7 @@ rewrite_template
 {Token st=null;}
 	:   {LT(1).getText().equals("template")}?
 		rewrite_template_head {st=LT(1);}
-		( STRING_LITERAL! | DOUBLE_ANGLE_STRING_LITERAL! )
+		( DOUBLE_QUOTE_STRING_LITERAL! | DOUBLE_ANGLE_STRING_LITERAL! )
 		{#rewrite_template.addChild(#[st]);}
 	|	rewrite_template_head
 	|	ACTION
@@ -865,19 +865,8 @@ CHAR_LITERAL
 		}
 	;
 
-STRING_LITERAL
-	:	'"'! (ESC|~'"')* '"'!
-		{
-		String t = $getText;
-		$setText('\''+t+'\'');
-		CommonToken tk = new CommonToken(STRING_LITERAL,t);
-		tk.setLine(getLine());
-		tk.setColumn(getColumn());
-		ErrorManager.syntaxError(
-			ErrorManager.MSG_DOUBLE_QUOTES_ILLEGAL,
-			tk,
-			"'"+t+"'", null);
-		}
+DOUBLE_QUOTE_STRING_LITERAL
+	:	'"' (ESC|~'"')* '"'
 	;
 
 DOUBLE_ANGLE_STRING_LITERAL
@@ -957,7 +946,7 @@ NESTED_ARG_ACTION :
 	|	'\r' '\n'	{newline();}
 	|	'\r'		{newline();}
 	|	'\n'		{newline();}
-	|	STRING_LITERAL
+	|	ACTION_STRING_LITERAL
 	|	~']'
 	)*
 	']'!

@@ -105,7 +105,7 @@ public class TestRewriteTemplates extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
-			"a : ID INT -> template(x={$ID.text},y={$INT.text}) '<foo(...)>' ;\n" +
+			"a : ID INT -> template(x={$ID.text},y={$INT.text}) \"<foo(...)>\" ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";

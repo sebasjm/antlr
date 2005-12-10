@@ -260,7 +260,7 @@ rewrite_template
 	             )
 	          )*
 	        )
-		   ( STRING_LITERAL {out(" "+#STRING_LITERAL.getText());}
+		   ( DOUBLE_QUOTE_STRING_LITERAL {out(" "+#DOUBLE_QUOTE_STRING_LITERAL.getText());}
 		   | DOUBLE_ANGLE_STRING_LITERAL {out(" "+#DOUBLE_ANGLE_STRING_LITERAL.getText());}
 		   )?
 	     )
