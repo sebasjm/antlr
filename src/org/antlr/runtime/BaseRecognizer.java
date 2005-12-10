@@ -1,14 +1,16 @@
 package org.antlr.runtime;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Stack;
+import java.util.*;
 
-/** A generic parser that can handle recognizers generated from
- *  both parser grammars and tree grammars.  This is all the parsing
- *  support code essentially; most of it is error recovery stuff.
+/** A generic recognizer that can handle recognizers generated from
+ *  lexer, parser, and tree grammars.  This is all the parsing
+ *  support code essentially; most of it is error recovery stuff and
+ *  backtracking.
  */
-public abstract class BaseParser {
+public abstract class BaseRecognizer {
+	public static final int MEMO_RULE_FAILED = -2;
+	public static final int MEMO_RULE_UNKNOWN = -1;
+
 	/** Track the set of token types that can follow any rule invocation.
 	 *  List<BitSet>.
 	 */
@@ -38,11 +40,14 @@ public abstract class BaseParser {
 	 */
 	protected int backtracking = 0;
 
-	/** When backtracking, we need to know the start of the outermost
-	 *  current backtracking.  The rule memoization uses this as an offset
-	 *  in its memo array.
-	protected int firstBacktrackingMarker = -1;
+	/** An array[size num rules] of Map<Integer,Integer> that tracks
+	 *  the stop token index for each rule.  ruleMemo[ruleIndex] is
+	 *  the memoization table for ruleIndex.  For key ruleStartIndex, you
+	 *  get back the stop token for associated rule or MEMO_RULE_FAILED.
+	 *
+	 *  This is only used if rule memoization is on (which it is by default).
 	 */
+	protected Map[] ruleMemo;
 
 	/** reset the parser's state */
 	public void reset() {
@@ -547,5 +552,57 @@ public abstract class BaseParser {
 			strings.add(((RuleReturnScope)retvals.get(i)).getTemplate());
 		}
 		return strings;
+	}
+
+	public int getRuleMemoization(int ruleIndex, int ruleStartIndex) {
+		if ( ruleMemo[ruleIndex]==null ) {
+			ruleMemo[ruleIndex] = new HashMap();
+		}
+		Integer stopIndexI =
+			(Integer)ruleMemo[ruleIndex].get(new Integer(ruleStartIndex));
+		if ( stopIndexI==null ) {
+			return MEMO_RULE_UNKNOWN;
+		}
+		return stopIndexI.intValue();
+	}
+
+	public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
+		int stopIndex = getRuleMemoization(ruleIndex, input.index());
+		if ( stopIndex==MEMO_RULE_UNKNOWN ) {
+			return false;
+		}
+		//System.out.println("seen <name> before; skipping ahead to @"+stopIndex+1);
+		if ( stopIndex==MEMO_RULE_FAILED ) {
+			//System.out.println("rule <name> will never succeed");
+			failed=true;
+		}
+		else {
+			input.seek(stopIndex+1); // jump to one past stop token
+		}
+		return true;
+	}
+
+	public void memoize(IntStream input,
+						int ruleIndex,
+						int ruleStartIndex)
+	{
+		int stopTokenIndex = failed?MEMO_RULE_FAILED:input.index()-1;
+		ruleMemo[ruleIndex].put(
+			new Integer(ruleStartIndex), new Integer(stopTokenIndex)
+		);
+	}
+
+	public boolean synpred(IntStream input, GrammarFragmentPtr fragment) {
+		//System.out.println("begin backtracking @"+input.index());
+		int start = input.mark();
+		backtracking++;
+		try {fragment.invoke();}
+		catch (RecognitionException re) {System.err.println("impossible");}
+		input.rewind(start);
+		backtracking--;
+		//System.out.println("end backtracking: "+(failed?"FAILED":"SUCCEEDED"));
+		boolean success = !failed;
+		failed=false;
+		return success;
 	}
 }
