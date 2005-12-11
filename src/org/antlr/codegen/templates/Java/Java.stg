@@ -81,9 +81,9 @@ public class <name> extends Lexer {
         token=null;
 retry:
         while (true) {
-	        if ( input.LA(1)==CharStream.EOF ) {
-        	    return Token.EOF_TOKEN;
-	        }	
+            if ( input.LA(1)==CharStream.EOF ) {
+                return Token.EOF_TOKEN;
+            }	
             try {
                 mTokens();
                 break retry;
@@ -351,6 +351,9 @@ do {
 	<alts:altSwitchCase()>
 	default :
 	    if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
+	    <if(backtracking)>
+            if (backtracking>0) {failed=true; return;}
+            <endif>
             EarlyExitException eee =
                 new EarlyExitException(<decisionNumber>, input);
             <@earlyExitException()>
@@ -459,8 +462,11 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 if ( <s> ) {
     <postmatchCode>
     input.consume();
+    errorRecovery=false;
+    <if(backtracking)>failed=false;<endif>
 }
 else {
+    <if(backtracking)>if (backtracking>0) {failed=true; return;}<endif>
     MismatchedSetException mse =
         new MismatchedSetException(null,input);
     <@mismatchedSetException()>
@@ -558,7 +564,7 @@ match(input, Token.UP, null);<if(backtracking)> if (failed) return;<endif>
  */
 validateSemanticPredicate(pred,description) ::= <<
 if ( !(<evalPredicate(...)>) ) {
-    <if(backtracking)>if (failed) return;<endif>
+    <if(backtracking)>if (backtracking>0) {failed=true; return;}<endif>
     throw new FailedPredicateException(input, "<ruleName>", "<description>");
 }
 >>
@@ -572,6 +578,9 @@ else {
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
+    <if(backtracking)>
+    if (backtracking>0) {failed=true; return;}
+    <endif>
     NoViableAltException nvae =
         new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
     <@noViableAltException()>
@@ -631,6 +640,9 @@ default:
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
+    <if(backtracking)>
+    if (backtracking>0) {failed=true; return;}
+    <endif>
     NoViableAltException nvae =
         new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
     <@noViableAltException()>
@@ -689,6 +701,9 @@ DFA.State s<stateNumber> = new DFA.State() {
         int LA<decisionNumber>_<stateNumber> = input.LA(1);
         <edges>
         <if(needErrorClause)>
+        <if(backtracking)>
+        if (backtracking>0) {failed=true; return null;}
+        <endif>
         NoViableAltException nvae =
 	    new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
         <@noViableAltException()>
@@ -731,6 +746,9 @@ DFA.State s<stateNumber> = new DFA.State() {
         <edges; separator="\n">
         default:
 <if(needErrorClause)>
+            <if(backtracking)>
+            if (backtracking>0) {failed=true; return null;}
+            <endif>
             NoViableAltException nvae =
                 new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
             throw nvae;

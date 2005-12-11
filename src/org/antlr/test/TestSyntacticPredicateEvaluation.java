@@ -156,4 +156,41 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testLexerPredCyclicPrediction() throws Exception {
+		String grammar =
+			"grammar t;\n" +
+			"s : A ;\n" +
+			"A : (B)=>(B|'y'+) {System.out.println(\"alt1\");}\n" +
+			"  | B {System.out.println(\"alt2\");}\n" +
+			"  | 'y'+ ';'" +
+			"  ;\n" +
+			"fragment\n" +
+			"B : 'x'+ ;\n" ;
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
+												 "s", "xxx", false);
+		String expecting =
+			"alt1\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testLexerPredCyclicPrediction2() throws Exception {
+		String grammar =
+			"grammar t;\n" +
+			"s : A ;\n" +
+			"A : (B '.')=>(B|'y'+) {System.out.println(\"alt1\");}\n" +
+			"  | B {System.out.println(\"alt2\");}\n" +
+			"  | 'y'+ ';'" +
+			"  ;\n" +
+			"fragment\n" +
+			"B : 'x'+ ;\n" ;
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
+												 "s", "xxx", false);
+		String expecting =
+			"alt2\n";
+		assertEqual(found, expecting);
+	}
+
+
 }
