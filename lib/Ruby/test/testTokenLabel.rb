@@ -24,58 +24,59 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'tmpdir'
-require 'tempfile'
-require 'stringio'
-require 'fileutils'
+require 'test/unit'
+require 'antlrtest'
 
-include FileUtils
+class TestTokenLabel < Test::Unit::TestCase
 
-class ANTLRTester
-    def self.execParser(grammar, lexerName, parserName, startRule, input)
-        tempfile = Tempfile.new("antlr")
-        dirname = tempfile.path + ".dir"
-        Dir.mkdir(dirname)
+    def test_implicit_label
+        grammar = <<-END
+			grammar Foo;
+			options {
+			    language = Ruby;
+			}
 
-        cp("../runtime/antlr.rb", dirname)
+			a : A { print $A.text };
 
-        result = nil
-        cd(dirname) do
-            # write the grammar to a file
-            File.open("grammar.g", "w") { |f| f.puts grammar }
+			A : ('a'..'z')+;
+	    END
 
-            # run antlr
-            `java -cp #{ENV['CLASSPATH']} org.antlr.Tool grammar.g`
+	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "abcd")
 
-            File.open("driver.rb", "w") do |f|
-                f.puts <<-DRIVER
-                    require '#{lexerName}'
-                    require '#{parserName}'
+	    assert_equal("abcd", found);
+    end
 
-                    charstream = ANTLR::CharStream.new(STDIN)
-                    lexer = #{lexerName}.new(charstream)
-                    tokenstream = ANTLR::TokenStream.new(lexer)
-                    parser = #{parserName}.new(tokenstream)
-
-                    parser.#{startRule}
-                DRIVER
-            end
-
-            # run the test
-            result = IO.popen("ruby driver.rb", "r+") do |pipe|
-                pipe.print(input)
-                pipe.close_write
-                pipe.gets
-            end
-
-            # delete created files
-            Dir.new(dirname).each { |file|
-                rm_f(file) if file != ".." && file != "."
+    def test_explicit_label
+        grammar = <<-END
+            grammar Foo;
+            options {
+                language = Ruby;
             }
-        end
 
-        Dir.delete(dirname)
+            a : x=A { print $x.text };
 
-        result
+            A : ('a'..'z')+;
+        END
+
+        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "abcd")
+
+        assert_equal("abcd", found);
+    end
+
+    def test_list_label
+        grammar = <<-END
+            grammar Foo;
+            options {
+                language = Ruby;
+            }
+
+            a : (x+=A)+ { print $x.map { |t| t.text }.join(",")};
+
+            A : ('a'..'z');
+        END
+
+        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "abcd")
+
+        assert_equal("a,b,c,d", found);
     end
 end

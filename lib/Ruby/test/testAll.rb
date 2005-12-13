@@ -30,3 +30,4 @@
 
 require 'testSemanticPredicateEvaluation.rb'
 require 'testSyntacticPredicateEvaluation.rb'
+require 'testTokenLabel.rb'
