@@ -1,6 +1,6 @@
 Early Access ANTLR v3
 ANTLR 3.0ea7
-?, 2005
+December 14, 2005
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator
@@ -8,7 +8,7 @@ University of San Francisco
 
 INTRODUCTION 
 
-Welcome to ANTLR v3!  I've been working on this for 2 straight years
+Welcome to ANTLR v3!  I've been working on this for 2.5 straight years
 and, while it is not ready for a full release, it may prove useful to
 some of you.  The main functionality missing is tree construction and
 tree walking support.  Finally, I need to rewrite ANTLR v3 in itself
@@ -23,7 +23,7 @@ changes in syntax and methods/classes until we get closer to a real
 release.  There are many things that just plain don't work at the
 moment.
 
-[3.0ea4 has the key components now: lexer, parser, tree construction,
+[3.0ea7 has the key components now: lexer, parser, tree construction,
  and tree parser]
 
 I have made absolutely no effort yet to deal well with erroneous input
@@ -107,12 +107,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0ea4/README.txt (this file)
-antlr-3.0ea4/LICENSE.txt
-antlr-3.0ea4/src/org/antlr/...
-antlr-3.0ea4/lib/stringtemplate-2.2b3.jar (3.0ea4 needs 2.2b3 not 2.2b2)
-antlr-3.0ea4/lib/antlr-2.7.5.jar
-antlr-3.0ea4/lib/antlr-3.0ea4.jar
+antlr-3.0ea7/README.txt (this file)
+antlr-3.0ea7/LICENSE.txt
+antlr-3.0ea7/src/org/antlr/...
+antlr-3.0ea7/lib/stringtemplate-2.2b4.jar (3.0ea7 needs 2.2b4)
+antlr-3.0ea7/lib/antlr-2.7.5.jar
+antlr-3.0ea7/lib/antlr-3.0ea7.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -125,7 +125,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0ea4 (June 29, 2005)  1989-2005
+ANTLR Parser Generator   Early Access Version 3.0ea7 (June 29, 2005)  1989-2005
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir   specify output directory where all output is generated
   -lib dir       specify location of token files
@@ -189,10 +189,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0ea4/lib/stringtemplate-2.2b3.jar
-antlr-3.0ea4/lib/antlr-2.7.5.jar
+antlr-3.0ea7/lib/stringtemplate-2.2b4.jar
+antlr-3.0ea7/lib/antlr-2.7.5.jar
 
-then jump into antlr-3.0ea4/src directory and then type:
+then jump into antlr-3.0ea7/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -204,7 +204,7 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0ea7 - 
+3.0ea7 - December 14, 2005
 
 * Added -print option to print out grammar w/o actions
 
@@ -423,7 +423,7 @@ This all should work for tree grammars too, but I'm still testing.
 
 * ALLCHAR was a constant when it should use the Target max value def.  set complement for wildcard also didn't use the Target def.  Generally cleaned up the max char value stuff.
 
-* Code gen didn't deal with ASTLabelType properly...I think even the 3.0ea4 example tree parser was broken! :(
+* Code gen didn't deal with ASTLabelType properly...I think even the 3.0ea7 example tree parser was broken! :(
 
 * Added a few more unit tests dealing with escaped literals
 
