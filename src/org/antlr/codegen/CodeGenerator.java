@@ -341,6 +341,7 @@ public class CodeGenerator {
 
 		outputFileST.setAttribute("fileName", grammar.getFileName());
 		outputFileST.setAttribute("ANTLRVersion", Tool.VERSION);
+		headerFileST.setAttribute("ANTLRVersion", Tool.VERSION);
 		outputFileST.setAttribute("generatedTimestamp", Tool.getCurrentTimeStamp());
 		headerFileST.setAttribute("fileName", grammar.getFileName());
 		headerFileST.setAttribute("generatedTimestamp", Tool.getCurrentTimeStamp());
