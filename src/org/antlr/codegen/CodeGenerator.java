@@ -538,6 +538,8 @@ public class CodeGenerator {
 	 *  recognizerST can be either the main generated recognizerTemplate
 	 *  for storage in the main parser file or a separate file.  It's up to
 	 *  the code that ultimately invokes the codegen.g grammar rule.
+	 *
+	 *  Regardless, the output file and header file get a copy of the DFAs.
 	 */
 	public StringTemplate genLookaheadDecision(StringTemplate recognizerST,
 											   DFA dfa)
@@ -552,6 +554,8 @@ public class CodeGenerator {
 				cyclicDFAGenerator.genCyclicLookaheadDecision(templates,
 															  dfa);
 			recognizerST.setAttribute("cyclicDFAs", dfaST);
+			outputFileST.setAttribute("cyclicDFAs", dfaST);
+			headerFileST.setAttribute("cyclicDFAs", dfaST);
 			decisionST = templates.getInstanceOf("dfaDecision");
 			String description = dfa.getNFADecisionStartState().getDescription();
 			description = target.getTargetStringLiteralFromString(description);
