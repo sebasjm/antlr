@@ -159,7 +159,7 @@ public class Target {
 		CodeGenerator generator,
 		String literal)
 	{
-		Utils.replace(literal,"\"","\\\"");
+		literal = Utils.replace(literal,"\"","\\\"");
 		StringBuffer buf = new StringBuffer(literal);
 		buf.setCharAt(0,'"');
 		buf.setCharAt(literal.length()-1,'"');

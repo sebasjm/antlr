@@ -806,16 +806,7 @@ StringTemplate el,st;
     		)
     		EOA
     	 )
-    |	{generator.grammar.buildTemplate()}?
-    	#( ALT EPSILON EOA ) {code=templates.getInstanceOf("rewriteEmptyTemplate");}
-   	|	code=rewrite_template
-   	|	act:ACTION
-   		{
-        #act.outerAltNum = this.outerAltNum;
-   		code=templates.getInstanceOf("rewriteAction");
-   		code.setAttribute("action",
-   						  generator.translateAction(currentRuleName,#act));
-   		}
+    |	{generator.grammar.buildTemplate()}? code=rewrite_template
     ;
 
 rewrite_element returns [StringTemplate code=null]
@@ -1026,7 +1017,8 @@ rewrite_setElement
     ;
 
 rewrite_template returns [StringTemplate code=null]
-	:	#( TEMPLATE id:ID
+    :	#( ALT EPSILON EOA ) {code=templates.getInstanceOf("rewriteEmptyTemplate");}
+   	|	#( TEMPLATE id:ID
 		   {
 		   if ( #id.getText().equals("template") ) {
 		   		code = templates.getInstanceOf("rewriteInlineTemplate");
@@ -1062,4 +1054,12 @@ rewrite_template returns [StringTemplate code=null]
              }
 		   )?
 	     )
+
+	|	act:ACTION
+   		{
+        #act.outerAltNum = this.outerAltNum;
+   		code=templates.getInstanceOf("rewriteAction");
+   		code.setAttribute("action",
+   						  generator.translateAction(currentRuleName,#act));
+   		}
 	;
