@@ -76,6 +76,7 @@ outputFile( LEXER,
             PARSER,
             TREE_PARSER,
             actionScope, 
+	   backtracking, synpreds, memoize, numRules,
             actions,
             docComment, 
             recognizer,
@@ -168,6 +169,10 @@ headerFile( LEXER,
 /* End of standard antlr 3 runtime definitions
  * =============================================================================
  */
+<if(backtracking)>
+import java.util.Map;
+import java.util.HashMap;
+<endif>
 <@end>
 
 <if(LEXER)>
@@ -225,7 +230,7 @@ ANTLR3_API ANTLR3_RESULT <name>Lexer_nextToken   (pANTLR3_LEXER          lexerCo
 >>
 
 
-lexer(name, tokens, rules, cyclicDFAs) ::= <<
+lexer(name, tokens, rules, numRules, cyclicDFAs) ::= <<
 public class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <actions.lexer.members>
@@ -236,9 +241,9 @@ public class <name> extends Lexer {
         token=null;
 retry:
         while (true) {
-	        if ( input.LA(1)==CharStream.EOF ) {
-        	    return Token.EOF_TOKEN;
-	        }	
+            if ( input.LA(1)==CharStream.EOF ) {
+                return Token.EOF_TOKEN;
+            }	
             try {
                 mTokens();
                 break retry;
@@ -253,13 +258,15 @@ retry:
 
     <rules; separator="\n\n">
 
+    <synpreds:{p | <lexerSynpred(name=p)>}>
+
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
 }
 >>
 
 /** How to generate a parser */
-genericParser(name, scopes, tokens, tokenNames, rules,
+genericParser(name, scopes, tokens, tokenNames, rules, numRules,
               cyclicDFAs, bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType) ::= <<
 public class <name> extends <@superClassName><superClass><@end> {
@@ -269,7 +276,12 @@ public class <name> extends <@superClassName><superClass><@end> {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
-    public <name>(<inputStreamType> input) { super(input); }<\n>
+    public <name>(<inputStreamType> input) {
+        super(input);
+<if(memoize)>
+        ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
+<endif>
+    }
     <@end>
 
     public String[] getTokenNames() { return tokenNames; }
@@ -282,20 +294,43 @@ public class <name> extends <@superClassName><superClass><@end> {
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
 
+    <synpreds:{p | <synpred(name=p)>}>
+
     <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
                     words64=it.bits)>
 }
 >>
 
-parser(name, scopes, tokens, tokenNames, rules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
+parser(name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
 <genericParser(inputStreamType="TokenStream", ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser") ::= <<
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser") ::= <<
 <genericParser(inputStreamType="TreeNodeStream", ...)>
+>>
+
+synpred(name) ::= <<
+class <name>Ptr implements GrammarFragmentPtr {
+    public void invoke() throws RecognitionException {<name>_fragment();}
+}
+<name>Ptr <name> = new <name>Ptr();<\n>
+>>
+
+lexerSynpred(name) ::= <<
+class <name>Ptr implements GrammarFragmentPtr {
+    public void invoke() throws RecognitionException {m<name>_fragment();}
+}
+<name>Ptr <name> = new <name>Ptr();<\n>
+>>
+
+ruleMemoization(name) ::= <<
+<if(memoize)>
+int <ruleDescriptor.name>_StartIndex = input.index();
+if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { return; }
+<endif>
 >>
 
 /** How to generate code for a rule.  This includes any return type
@@ -310,6 +345,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description) ::= <<
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <ruleDeclarations()>
     <ruleLabelDefs()>
+    <ruleMemoization(name=ruleName)>
     <ruleDescriptor.actions.init>
     <@preamble()>
 <if(emptyRule)>
@@ -375,6 +411,11 @@ ruleCleanUp() ::= <<
 <ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 retval.stop = (<labelType>)input.LT(-1);
+<endif>
+<if(memoize)>
+<if(backtracking)>
+if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
+<endif>
 <endif>
 >>
 
@@ -470,6 +511,9 @@ do {
 	<alts:altSwitchCase()>
 	default :
 	    if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
+	    <if(backtracking)>
+            if (backtracking>0) {failed=true; return;}
+            <endif>
             EarlyExitException eee =
                 new EarlyExitException(<decisionNumber>, input);
             <@earlyExitException()>
@@ -545,7 +589,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)input.LT(1);<\n>
 <endif>
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);
+match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>);<if(backtracking)> if (failed) return;<endif>
 >>
 
 /** ids+=ID */
@@ -564,11 +608,11 @@ charRef(char,label) ::= <<
 <if(label)>
 int <label> = input.LA(1);<\n>
 <endif>
-match(<char>);
+match(<char>);<if(backtracking)> if (failed) return;<endif>
 >>
 
 /** match a character range */
-charRangeRef(a,b) ::= "matchRange(<a>,<b>);"
+charRangeRef(a,b) ::= "matchRange(<a>,<b>);<if(backtracking)> if (failed) return;<endif>"
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
@@ -578,8 +622,11 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 if ( <s> ) {
     <postmatchCode>
     input.consume();
+    errorRecovery=false;
+    <if(backtracking)>failed=false;<endif>
 }
 else {
+    <if(backtracking)>if (backtracking>0) {failed=true; return;}<endif>
     MismatchedSetException mse =
         new MismatchedSetException(null,input);
     <@mismatchedSetException()>
@@ -601,10 +648,10 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 lexerStringRef(string,label) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
-match(<string>);
+match(<string>);<if(backtracking)> if (failed) return;<endif>
 Token <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
-match(<string>);<\n>
+match(<string>);<if(backtracking)> if (failed) return;<endif><\n>
 <endif>
 >>
 
@@ -612,7 +659,7 @@ wildcard(label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)input.LT(1);<\n>
 <endif>
-matchAny(input);
+matchAny(input);<if(backtracking)> if (failed) return;<endif>
 >>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
@@ -625,7 +672,7 @@ wildcardChar(label, elementIndex) ::= <<
 <if(label)>
 int <label> = input.LA(1);<\n>
 <endif>
-matchAny();
+matchAny();<if(backtracking)> if (failed) return;<endif>
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
@@ -644,6 +691,7 @@ following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <rule>(<args>);<\n>
 <endif>
 following.pop();
+<if(backtracking)>if (failed) return;<endif>
 >>
 
 /** ids+=ID */
@@ -656,19 +704,19 @@ ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
-m<rule>(<args>);
+m<rule>(<args>);<if(backtracking)> if (failed) return;<endif>
 Token <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
-m<rule>(<args>);
+m<rule>(<args>);<if(backtracking)> if (failed) return;<endif>
 <endif>
 >>
 
 /** match ^(root children) in tree parser */
 tree(root, children) ::= <<
 <root:element()>
-match(input, Token.DOWN, null);
+match(input, Token.DOWN, null);<if(backtracking)> if (failed) return;<endif>
 <children:element()>
-match(input, Token.UP, null);
+match(input, Token.UP, null);<if(backtracking)> if (failed) return;<endif>
 >>
 
 /** Every predicate is used as a validating predicate (even when it is
@@ -676,6 +724,7 @@ match(input, Token.UP, null);
  */
 validateSemanticPredicate(pred,description) ::= <<
 if ( !(<evalPredicate(...)>) ) {
+    <if(backtracking)>if (backtracking>0) {failed=true; return;}<endif>
     throw new FailedPredicateException(input, "<ruleName>", "<description>");
 }
 >>
@@ -689,6 +738,9 @@ else {
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
+    <if(backtracking)>
+    if (backtracking>0) {failed=true; return;}
+    <endif>
     NoViableAltException nvae =
         new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
     <@noViableAltException()>
@@ -748,6 +800,9 @@ default:
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
+    <if(backtracking)>
+    if (backtracking>0) {failed=true; return;}
+    <endif>
     NoViableAltException nvae =
         new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
     <@noViableAltException()>
@@ -806,6 +861,9 @@ DFA.State s<stateNumber> = new DFA.State() {
         int LA<decisionNumber>_<stateNumber> = input.LA(1);
         <edges>
         <if(needErrorClause)>
+        <if(backtracking)>
+        if (backtracking>0) {failed=true; return null;}
+        <endif>
         NoViableAltException nvae =
 	    new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
         <@noViableAltException()>
@@ -848,6 +906,9 @@ DFA.State s<stateNumber> = new DFA.State() {
         <edges; separator="\n">
         default:
 <if(needErrorClause)>
+            <if(backtracking)>
+            if (backtracking>0) {failed=true; return null;}
+            <endif>
             NoViableAltException nvae =
                 new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
             throw nvae;
@@ -873,6 +934,9 @@ orPredicates(left,right) ::= "(<left>||<right>)"
 notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
 evalPredicate(pred,description) ::= "<pred>"
+
+evalSynPredicate(pred,description) ::= 
+  "synpred(input, <pred>)"
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 
@@ -1169,7 +1233,7 @@ tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
 ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
-ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start,<scope>.stop)"
+ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start.getTokenIndex(),<scope>.stop.getTokenIndex())"
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
 /** Somebody may ref $template or $tree or $stop within a rule */
@@ -1177,9 +1241,17 @@ rulePropertyRef(attr) ::= "retval.<attr.name>"
 
 
 /** How to execute an action */
-execAction(action) ::= "<action>"
+execAction(action) ::= <<
+<if(backtracking)>
+if ( backtracking==0 ) {
+  <action>
+}
+<else>
+<action>
+<endif>
+>>
 
-// A C T I O N S
+// L E X E R  A C T I O N S
 
 emit(type) ::= "emit(<type>);"
 
@@ -1192,3 +1264,6 @@ public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separ
 >>
 
 codeFileExtension() ::= ".c"
+
+true() ::= "true"
+false() ::= "false"
