@@ -554,6 +554,16 @@ public abstract class BaseRecognizer {
 		return strings;
 	}
 
+	/** Given a rule number and a start token index number, return
+	 *  MEMO_RULE_UNKNOWN if the rule has not parsed input starting from
+	 *  start index.  If this rule has parsed input starting from the
+	 *  start index before, then return where the rule stopped parsing.
+	 *  It returns the index of the last token matched by the rule.
+	 *
+	 *  For now we use a hashtable and just the slow Object-based one.
+	 *  Later, we can make a special one for ints and also one that
+	 *  tosses out data after we commit past input position i.
+	 */
 	public int getRuleMemoization(int ruleIndex, int ruleStartIndex) {
 		if ( ruleMemo[ruleIndex]==null ) {
 			ruleMemo[ruleIndex] = new HashMap();
@@ -566,6 +576,15 @@ public abstract class BaseRecognizer {
 		return stopIndexI.intValue();
 	}
 
+	/** Has this rule already parsed input at the current index in the
+	 *  input stream?  Return the stop token index or MEMO_RULE_UNKNOWN.
+	 *  If we attempted but failed to parse properly before, return
+	 *  MEMO_RULE_FAILED.
+	 *
+	 *  This method has a side-effect: if we have seen this input for
+	 *  this rule and successfully parsed before, then seek ahead to
+	 *  1 past the stop token matched for this rule last time.
+	 */
 	public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
 		int stopIndex = getRuleMemoization(ruleIndex, input.index());
 		if ( stopIndex==MEMO_RULE_UNKNOWN ) {
@@ -582,6 +601,9 @@ public abstract class BaseRecognizer {
 		return true;
 	}
 
+	/** Record whether or not this rule parsed the input at this position
+	 *  successfully.  Use a standard java hashtable for now.
+	 */
 	public void memoize(IntStream input,
 						int ruleIndex,
 						int ruleStartIndex)
@@ -592,6 +614,10 @@ public abstract class BaseRecognizer {
 		);
 	}
 
+	/** A syntactic predicate.  Returns true/false depending on whether
+	 *  the specified grammar fragment matches the current input stream.
+	 *  This resets the failed instance var afterwards.
+	 */
 	public boolean synpred(IntStream input, GrammarFragmentPtr fragment) {
 		//System.out.println("begin backtracking @"+input.index());
 		int start = input.mark();
