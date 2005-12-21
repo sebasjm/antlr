@@ -215,9 +215,10 @@ ruleDeclarations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval = new <returnType()>();
 retval.start = (<labelType>)input.LT(1);<\n>
-<endif>
-<if(ruleDescriptor.singleValueReturnType)>
+<else>
+<if(ruleDescriptor.hasSingleReturnValue)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
+<endif>
 <endif>
 >>
 
@@ -238,7 +239,7 @@ ruleLabelDefs() ::= <<
 
 ruleReturnValue() ::= <<
 <if(ruleDescriptor.hasReturnValue)>
-<if(ruleDescriptor.singleValueReturnType)>
+<if(ruleDescriptor.hasSingleReturnValue)>
 return <ruleDescriptor.singleValueReturnName>;<\n>
 <else>
 return retval;<\n>
@@ -817,7 +818,7 @@ returnType() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <ruleDescriptor.name>_return
 <else>
-<if(ruleDescriptor.singleValueReturnType)>
+<if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnType>
 <else>
 void
@@ -832,7 +833,7 @@ ruleLabelType(referencedRule) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
 <referencedRule.name>_return
 <else>
-<if(referencedRule.singleValueReturnType)>
+<if(referencedRule.hasSingleReturnValue)>
 <referencedRule.singleValueReturnType>
 <else>
 void
@@ -859,7 +860,7 @@ ruleLabelDef(label) ::= <<
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 public static class <returnType()> extends <if(TREE_PARSER)>Tree<endif>RuleReturnScope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
+    <scope.attributes:{public <it.decl>;}; separator="\n">
     <@ruleReturnMembers()>
 };
 <endif>
@@ -894,18 +895,18 @@ isolatedDynamicScopeRef(scope) ::= "<scope>_stack"
 
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
-<if(referencedRule.singleValueReturnType)>
-<scope>
-<else>
+<if(referencedRule.hasMultipleReturnValues)>
 <scope>.<attr.name>
+<else>
+<scope>
 <endif>
 >>
 
 returnAttributeRef(ruleDescriptor,attr) ::= <<
-<if(ruleDescriptor.singleValueReturnType)>
-<attr.name>
-<else>
+<if(ruleDescriptor.hasMultipleReturnValues)>
 retval.<attr.name>
+<else>
+<attr.name>
 <endif>
 >>
 

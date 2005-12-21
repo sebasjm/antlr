@@ -325,13 +325,21 @@ public class Rule {
 
 	/** If a rule has no user-defined return values and nobody references
 	 *  it's start/stop (predefined attributes), then there is no need to
-	 *  define a struct; otherwise for now we assume a struct.
+	 *  define a struct; otherwise for now we assume a struct.  A rule also
+	 *  has multiple return values if you are building trees or templates.
 	 */
 	public boolean getHasMultipleReturnValues() {
 		return
 			referencedPredefinedRuleAttributes || grammar.buildAST() ||
 			grammar.buildTemplate() ||
 			(returnScope!=null && returnScope.attributes.size()>1);
+	}
+
+	public boolean getHasSingleReturnValue() {
+		return
+			!(referencedPredefinedRuleAttributes || grammar.buildAST() ||
+			grammar.buildTemplate()) &&
+			(returnScope!=null && returnScope.attributes.size()==1);
 	}
 
 	public boolean getHasReturnValue() {

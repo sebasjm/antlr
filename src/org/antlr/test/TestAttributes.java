@@ -1198,8 +1198,8 @@ public class TestAttributes extends TestSuite {
 	public void testRuleLabelFromMultipleAlts() throws Exception {
 		String action = "$b.text;"; // must be qualified
 		String action2 = "$c.text;"; // must be qualified
-		String expecting = "input.toString(b1.start,b1.stop);";
-		String expecting2 = "input.toString(c2.start,c2.stop);";
+		String expecting = "input.toString(b1.start.getTokenIndex(),b1.stop.getTokenIndex());";
+		String expecting2 = "input.toString(c2.start.getTokenIndex(),c2.stop.getTokenIndex());";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);

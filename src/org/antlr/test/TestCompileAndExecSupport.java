@@ -41,7 +41,7 @@ public class TestCompileAndExecSupport {
 	public static final String CLASSPATH = System.getProperty("java.class.path");
 	public static final String tmpdir = System.getProperty("java.io.tmpdir");
 
-	protected static boolean compile(String fileNames) {
+	public static boolean compile(String fileNames) {
 		String compiler = "javac";
 		String classpathOption = "-classpath";
 

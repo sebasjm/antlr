@@ -603,6 +603,22 @@ public class TestAutoAST extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testReturnValueWithAST() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"a : ID b {System.out.println($b.i);} ;\n" +
+			"b returns [int i] : INT {$i=Integer.parseInt($INT.text);} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "abc 34", debug);
+		String expecting = "34\nabc 34\n";
+		assertEqual(found, expecting);
+	}
+
 
 	// S U P P O R T
 

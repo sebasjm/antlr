@@ -204,6 +204,12 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
+3.0ea8 - ???
+
+* return values in return val structs are now public.
+
+* output=template with return values on rules was broken.  I assume return values with ASTs was broken too.  Fixed.
+
 3.0ea7 - December 14, 2005
 
 * Added -print option to print out grammar w/o actions

@@ -151,12 +151,18 @@ public abstract class SemanticContext {
 			StringTemplate eST = null;
 			if ( templates!=null ) {
 				if ( synpred ) {
-					eST = templates.getInstanceOf("evalSynPredicate");					
+					eST = templates.getInstanceOf("evalSynPredicate");
 				}
 				else {
 					eST = templates.getInstanceOf("evalPredicate");
 				}
 				eST.setAttribute("pred", this.toString());
+				/*
+				if ( generator!=null ) {
+					eST.setAttribute("pred",
+						generator.translateAction(currentRuleName,#sp));
+				}
+				*/
 			}
 			else {
 				eST = new StringTemplate("$pred$");
