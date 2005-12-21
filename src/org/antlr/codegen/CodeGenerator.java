@@ -380,6 +380,7 @@ public class CodeGenerator {
 			// does not change per target
 			StringTemplate tokenVocabSerialization = genTokenVocabOutput();
 			write(tokenVocabSerialization, getVocabFileName());
+			//System.out.println(outputFileST.toStructureString());
 		}
 		catch (IOException ioe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE,
