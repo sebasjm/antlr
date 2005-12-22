@@ -283,7 +283,7 @@ public class DOTGenerator {
 				if ( preds!=null ) {
 					predsStr = "&&{"+
 						preds.genExpr(grammar.generator,
-										 grammar.generator.getTemplates()).toString()
+										 grammar.generator.getTemplates(), null).toString()
 						+"}?";
 				}
 				label += predsStr;

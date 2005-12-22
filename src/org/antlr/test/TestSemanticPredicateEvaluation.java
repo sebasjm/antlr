@@ -204,6 +204,22 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testPredWithActionTranslation() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"a : b[2] ;\n" +
+			"b[int i]\n" +
+			"  : {$i==1}?   'a' {System.out.println(\"alt 1\");}\n" +
+			"  | {$b.i==2}? 'a' {System.out.println(\"alt 2\");}\n" +
+			"  ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "aa", false);
+		String expecting = "alt 2\n";
+		assertEqual(found, expecting);
+	}
+
+
 	// S U P P O R T
 
 	public void _test() throws Exception {

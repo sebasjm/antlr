@@ -157,7 +157,7 @@ public class FASerializer {
 					if ( preds!=null ) {
 						predsStr = "&&{"+
 							preds.genExpr(grammar.generator,
-									   	  grammar.generator.getTemplates()).toString()
+									   	  grammar.generator.getTemplates(), null).toString()
 							+"}?";
 					}
 				}

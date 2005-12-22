@@ -206,6 +206,9 @@ CHANGES
 
 3.0ea8 - ???
 
+* predicates have $x.y stuff translated now.  Warning: predicates might be
+  hoisted out of context.
+
 * return values in return val structs are now public.
 
 * output=template with return values on rules was broken.  I assume return values with ASTs was broken too.  Fixed.

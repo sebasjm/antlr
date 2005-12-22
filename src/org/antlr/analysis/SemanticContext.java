@@ -27,14 +27,11 @@
 */
 package org.antlr.analysis;
 
-import antlr.collections.AST;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.tool.ANTLRParser;
 import org.antlr.tool.GrammarAST;
-
-import java.util.Set;
 
 /** A binary tree structure used to record the semantic context in which
  *  an NFA configuration is valid.  It's either a single predicate or
@@ -72,13 +69,14 @@ public abstract class SemanticContext {
      *  given a set of output templates.
      */
     public abstract StringTemplate genExpr(CodeGenerator generator,
-										   StringTemplateGroup templates);
+										   StringTemplateGroup templates,
+										   DFA dfa);
 
 	public abstract boolean isSyntacticPredicate();
 
     public static class Predicate extends SemanticContext {
         /** The AST node in tree created from the grammar holding the predicate */
-        protected AST predicate;
+        protected GrammarAST predicate;
 
 		/** Is this a {...}?=> gating predicate or a normal disambiguating {..}?
 		 *  If any predicate in expression is gated, then expression is considered
@@ -109,7 +107,7 @@ public abstract class SemanticContext {
 			this.gated=false;
         }
 
-        public Predicate(AST predicate) {
+        public Predicate(GrammarAST predicate) {
             this.predicate = predicate;
 			this.gated = predicate.getType()==ANTLRParser.GATED_SEMPRED;
 			this.synpred = predicate.getType()==ANTLRParser.SYN_SEMPRED;
@@ -146,7 +144,8 @@ public abstract class SemanticContext {
         }
 
         public StringTemplate genExpr(CodeGenerator generator,
-									  StringTemplateGroup templates)
+									  StringTemplateGroup templates,
+									  DFA dfa)
 		{
 			StringTemplate eST = null;
 			if ( templates!=null ) {
@@ -156,13 +155,19 @@ public abstract class SemanticContext {
 				else {
 					eST = templates.getInstanceOf("evalPredicate");
 				}
-				eST.setAttribute("pred", this.toString());
+				String predEnclosingRuleName = predicate.getEnclosingRule();
 				/*
+				String decisionEnclosingRuleName =
+					dfa.getNFADecisionStartState().getEnclosingRule();
+				// if these rulenames are diff, then pred was hoisted out of rule
+				// Currently I don't warn you about this as it could be annoying.
+				// I do the translation anyway.
+				*/
+				//eST.setAttribute("pred", this.toString());
 				if ( generator!=null ) {
 					eST.setAttribute("pred",
-						generator.translateAction(currentRuleName,#sp));
+						generator.translateAction(predEnclosingRuleName,predicate));
 				}
-				*/
 			}
 			else {
 				eST = new StringTemplate("$pred$");
@@ -247,7 +252,8 @@ public abstract class SemanticContext {
             return left.hashCode() + right.hashCode();
         }
         public StringTemplate genExpr(CodeGenerator generator,
-									  StringTemplateGroup templates)
+									  StringTemplateGroup templates,
+									  DFA dfa)
 		{
 			StringTemplate eST = null;
 			if ( templates!=null ) {
@@ -256,8 +262,8 @@ public abstract class SemanticContext {
 			else {
 				eST = new StringTemplate("($left$&&$right$)");
 			}
-            eST.setAttribute("left", left);
-            eST.setAttribute("right", right);
+            eST.setAttribute("left", left.genExpr(generator,templates,dfa));
+            eST.setAttribute("right", right.genExpr(generator,templates,dfa));
             return eST;
         }
 		public SemanticContext getGatedPredicateContext() {
@@ -326,7 +332,8 @@ public abstract class SemanticContext {
             return left.hashCode() + right.hashCode();
         }
         public StringTemplate genExpr(CodeGenerator generator,
-									  StringTemplateGroup templates)
+									  StringTemplateGroup templates,
+									  DFA dfa)
 		{
             StringTemplate eST = null;
 			if ( templates!=null ) {
@@ -335,8 +342,8 @@ public abstract class SemanticContext {
 			else {
 				eST = new StringTemplate("($left$||$right$)");
 			}
-            eST.setAttribute("left", left);
-            eST.setAttribute("right", right);
+            eST.setAttribute("left", left.genExpr(generator,templates,dfa));
+            eST.setAttribute("right", right.genExpr(generator,templates,dfa));
             return eST;
         }
 		public SemanticContext getGatedPredicateContext() {
@@ -377,7 +384,8 @@ public abstract class SemanticContext {
             return ctx.hashCode();
         }
         public StringTemplate genExpr(CodeGenerator generator,
-									  StringTemplateGroup templates)
+									  StringTemplateGroup templates,
+									  DFA dfa)
 		{
 			StringTemplate eST = null;
 			if ( templates!=null ) {
@@ -386,7 +394,7 @@ public abstract class SemanticContext {
 			else {
 				eST = new StringTemplate("?!($pred$)");
 			}
-            eST.setAttribute("pred", ctx);
+            eST.setAttribute("pred", ctx.genExpr(generator,templates,dfa));
             return eST;
         }
 		public SemanticContext getGatedPredicateContext() {

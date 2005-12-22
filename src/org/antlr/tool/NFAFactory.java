@@ -250,7 +250,7 @@ public class NFAFactory {
      *  predicate action.  The pred is a pointer into the AST of
      *  the SEMPRED token.
      */
-    public StateCluster build_SemanticPredicate(AST pred) {
+    public StateCluster build_SemanticPredicate(GrammarAST pred) {
 		nfa.grammar.numberOfSemanticPredicates++;
         NFAState left = newState();
         NFAState right = newState();

@@ -439,6 +439,7 @@ elementNoOptionSpec
 	|   a:ACTION
 
 	|   p:SEMPRED ( IMPLIES! {#p.setType(GATED_SEMPRED);} )?
+		{#p.setEnclosingRule(currentRuleName);}
 
 	|   t3:tree
 	;
@@ -509,7 +510,7 @@ ebnf!
 			if ( gtype==COMBINED_GRAMMAR &&
 			     Character.isUpperCase(currentRuleName.charAt(0)) )
 		    {
-		    	#ebnf = #(#[SYNPRED,"=>"],#b);
+		    	#ebnf = #(#[SYNPRED,"=>"],#b); // ignore for lexer rules in combined
 		    }
 		    else {
 				// add grammar fragment to a list so we can make fake rules for them
@@ -519,6 +520,7 @@ ebnf!
 				// during code gen we convert to function call with templates
 				String synpredinvoke = predName;
 				#ebnf = #[SYN_SEMPRED,synpredinvoke];
+				#ebnf.setEnclosingRule(currentRuleName);
 			}
 			}
         |   {#ebnf = #b;}
@@ -634,6 +636,7 @@ rewrite
 	:!	( options { warnWhenFollowAmbig=false;}
 		: rew:REWRITE pred:SEMPRED alt:rewrite_alternative
 	      {root.addChild( #(#rew, #pred, #alt) );}
+		  {#pred.setEnclosingRule(currentRuleName);}	      
 	    )*
 		rew2:REWRITE alt2:rewrite_alternative
         {

@@ -28,9 +28,9 @@
 package org.antlr.analysis;
 
 import org.antlr.tool.Grammar;
+import org.antlr.tool.GrammarAST;
 import org.antlr.misc.IntervalSet;
 import org.antlr.misc.IntSet;
-import antlr.collections.AST;
 
 /** A state machine transition label.  A label can be either a simple
  *  label such as a token or character.  A label can be a set of char or
@@ -131,7 +131,7 @@ public class Label implements Comparable, Cloneable {
     }
 
     /** Make a semantic predicate label */
-    public Label(AST predicateASTNode) {
+    public Label(GrammarAST predicateASTNode) {
         this(SEMPRED);
         this.semanticContext = new SemanticContext.Predicate(predicateASTNode);
     }

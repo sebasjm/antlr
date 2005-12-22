@@ -595,7 +595,7 @@ public class CodeGenerator {
 	{
 		Label label = edge.label;
 		SemanticContext semCtx = label.getSemanticContext();
-		return semCtx.genExpr(this,templates);
+		return semCtx.genExpr(this,templates,((DFAState)edge.target).dfa);
 	}
 
 	/** For intervals such as [3..3, 30..35], generate an expression that

@@ -36,7 +36,7 @@ import org.antlr.misc.IntSet;
 import java.util.List;
 
 public class CyclicDFACodeGenerator {
-	protected CodeGenerator parent;
+	protected CodeGenerator parentGenerator;
 
 	/** Used by cyclic DFA state machine generator to avoid infinite recursion
 	 *  resulting from cycles int the DFA.  This is a set of int state #s.
@@ -45,7 +45,7 @@ public class CyclicDFACodeGenerator {
 	protected DFA dfa;
 
 	public CyclicDFACodeGenerator(CodeGenerator parent) {
-		this.parent = parent;
+		this.parentGenerator = parent;
 	}
 
 	public StringTemplate genCyclicLookaheadDecision(StringTemplateGroup templates,
@@ -55,7 +55,7 @@ public class CyclicDFACodeGenerator {
 		StringTemplate dfaST = templates.getInstanceOf("cyclicDFA");
 		int d = dfa.getDecisionNumber();
 		dfaST.setAttribute("decisionNumber", new Integer(d));
-		dfaST.setAttribute("className", parent.getClassName());
+		dfaST.setAttribute("className", parentGenerator.getClassName());
 		visited = new BitSet(dfa.getNumberOfStates());
 		walkCyclicDFAGeneratingStateMachine(templates, dfaST, dfa.startState);
 		return dfaST;
@@ -78,7 +78,7 @@ public class CyclicDFACodeGenerator {
 								 new Integer(s.getUniquelyPredictedAlt()));
 		}
 		else {
-			if ( parent.canGenerateSwitch(s) ) {
+			if ( parentGenerator.canGenerateSwitch(s) ) {
 				stateST = templates.getInstanceOf("cyclicDFAStateSwitch");
 			}
 			else {
@@ -87,7 +87,7 @@ public class CyclicDFACodeGenerator {
 			stateST.setAttribute("needErrorClause", new Boolean(true));
 		}
 		stateST.setAttribute("stateNumber", new Integer(s.stateNumber));
-		if ( parent.canGenerateSwitch(s) ) {
+		if ( parentGenerator.canGenerateSwitch(s) ) {
 			walkEdgesGeneratingComputedGoto(s, templates, stateST, dfaST);
 		}
 		else {
@@ -137,7 +137,7 @@ public class CyclicDFACodeGenerator {
 				for (int j = 0; j < labels.size(); j++) {
 					Integer vI = (Integer) labels.get(j);
 					String label =
-						parent.getTokenTypeAsTargetLabel(vI.intValue());
+						parentGenerator.getTokenTypeAsTargetLabel(vI.intValue());
 					labels.set(j, label); // rewrite List element to be name
 				}
 				edgeST.setAttribute("labels", labels);
@@ -168,7 +168,7 @@ public class CyclicDFACodeGenerator {
 			else {
 				edgeST = templates.getInstanceOf("cyclicDFAEdge");
 				StringTemplate exprST =
-					parent.genLabelExpr(templates,edge,1);
+					parentGenerator.genLabelExpr(templates,edge,1);
 				edgeST.setAttribute("labelExpr", exprST);
 			}
 			edgeST.setAttribute("edgeNumber", new Integer(i+1));
