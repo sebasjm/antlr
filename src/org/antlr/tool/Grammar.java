@@ -830,6 +830,11 @@ public class Grammar {
 				buf.append(t.getText());
 				buf.append("}");
 			}
+			else if ( t.getType()==ANTLRParser.ARG_ACTION ) {
+				buf.append("[");
+				buf.append(t.getText());
+				buf.append("]");
+			}
 			else {
 				buf.append(t.getText());
 			}

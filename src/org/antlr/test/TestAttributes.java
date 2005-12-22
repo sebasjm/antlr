@@ -275,7 +275,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-		String expecting = "r; r.start; r.stop; r.tree; r; r.stop;";
+		String expecting = "r.x; r.start; r.stop; r.tree; r.x; r.stop;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -307,7 +307,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testForwardRefRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.tree;";
-		String expecting = "r; r.start; r.stop; r.tree; r; r.tree;";
+		String expecting = "r.x; r.start; r.stop; r.tree; r.x; r.tree;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1198,8 +1198,8 @@ public class TestAttributes extends TestSuite {
 	public void testRuleLabelFromMultipleAlts() throws Exception {
 		String action = "$b.text;"; // must be qualified
 		String action2 = "$c.text;"; // must be qualified
-		String expecting = "input.toString(b1.start.getTokenIndex(),b1.stop.getTokenIndex());";
-		String expecting2 = "input.toString(c2.start.getTokenIndex(),c2.stop.getTokenIndex());";
+		String expecting = "input.toString(b1.start,b1.stop);";
+		String expecting2 = "input.toString(c2.start,c2.stop);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1853,7 +1853,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : R;\n" +
-				"R : 'z' ID[32] ;" +
+				"R : 'z' ID[32] ;\n" +
 				"ID : 'a';\n");
 
 		String lexerGrammarStr = g.getLexerGrammar();
@@ -1884,7 +1884,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : R;\n" +
-				"R : 'z' ID ;" +
+				"R : 'z' ID ;\n" +
 				"ID[int i] : 'a';\n");
 
 		String lexerGrammarStr = g.getLexerGrammar();
