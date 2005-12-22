@@ -128,4 +128,8 @@ public class DebugTokenStream implements TokenStream {
 	public String toString(int start, int stop) {
 		return input.toString(start,stop);
 	}
+
+	public String toString(Token start, Token stop) {
+		return input.toString(start,stop);
+	}
 }

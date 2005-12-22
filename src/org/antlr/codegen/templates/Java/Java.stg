@@ -931,7 +931,7 @@ tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
 ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
-ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start.getTokenIndex(),<scope>.stop.getTokenIndex())"
+ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start,<scope>.stop)"
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
 /** Somebody may ref $template or $tree or $stop within a rule */

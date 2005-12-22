@@ -292,4 +292,8 @@ public class CommonTokenStream implements TokenStream {
 		}
 		return buf.toString();
 	}
+
+	public String toString(Token start, Token stop) {
+		return toString(start.getTokenIndex(), stop.getTokenIndex());
+	}
 }

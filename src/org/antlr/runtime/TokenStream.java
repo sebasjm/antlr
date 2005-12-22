@@ -57,4 +57,12 @@ public interface TokenStream extends IntStream {
 	 *  an action of course in that case.
 	 */
 	public String toString(int start, int stop);
+
+	/** Because the user is not required to use a token with an index stored
+	 *  in it, we must provide a means for two token objects themselves to
+	 *  indicate the start/end location.  Most often this will just delegate
+	 *  to the other toString(int,int).  This is also parallel with
+	 *  the TreeNodeStream.toString(Object,Object).
+	 */
+	public String toString(Token start, Token stop);
 }
