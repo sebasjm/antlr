@@ -77,6 +77,10 @@ public class GrammarAST extends BaseAST {
 	public static final Set legalOptions =
 			new HashSet() {{add("k"); add("greedy");}};
 
+	/** What are the default options for a subrule? */
+    public static final Map defaultOptions =
+            new HashMap() {{put("greedy","true");}};
+
 	/** if this is an ACTION node, this is the outermost enclosing
 	 *  alt num in rule
 	 */
@@ -87,10 +91,6 @@ public class GrammarAST extends BaseAST {
 	 *  a label if someone does $tokenref or $ruleref in an action.
 	 */
 	public StringTemplate code;
-
-	/** What are the default options for a subrule? */
-    public static final Map defaultOptions =
-            new HashMap() {{put("greedy","true");}};
 
     public void initialize(int i, String s) {
         token = new CommonToken(i,s);
