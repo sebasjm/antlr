@@ -206,6 +206,11 @@ CHANGES
 
 3.0ea8 - ???
 
+* antlr generates #src lines in lexer grammars generated from combined grammars
+  so error messages refer to original file.
+
+* lexers generated from combined grammars now use originally formatting.
+
 * predicates have $x.y stuff translated now.  Warning: predicates might be
   hoisted out of context.
 

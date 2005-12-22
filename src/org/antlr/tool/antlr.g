@@ -252,6 +252,8 @@ rules
 rule!
 {
 GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
+int start = ((TokenWithIndex)LT(1)).getIndex();
+int startLine = LT(1).getLine();
 }
 	:
 	(	d:DOC_COMMENT	
@@ -263,7 +265,7 @@ GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
 	)?
 	ruleName:id
 	{currentRuleName=#ruleName.getText();}
-	( BANG  )?
+	( BANG )?
 	( aa:ARG_ACTION )?
 	( "returns" rt:ARG_ACTION  )?
 	( throwsSpec )?
@@ -281,19 +283,23 @@ GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
 		{
 		blk = #(blkRoot,#(#[ALT,"ALT"],#s,#[EOA,"<end-of-alt>"]),eob);
 		}
-
 	|	b:altList {blk = #b;}
 	)
 	semi:SEMI
 	( exceptionGroup )?
     {
+    int stop = ((TokenWithIndex)LT(1)).getIndex()-1; // point at the semi or exception thingie
 	eob.setLine(semi.getLine());
 	eob.setColumn(semi.getColumn());
     GrammarAST eor = #[EOR,"<end-of-rule>"];
    	eor.setEnclosingRule(#ruleName.getText());
 	eor.setLine(semi.getLine());
 	eor.setColumn(semi.getColumn());
-    #rule = #(#[RULE,"rule"],
+	GrammarAST root = #[RULE,"rule"];
+	root.ruleStartTokenIndex = start;
+	root.ruleStopTokenIndex = stop;
+	root.setLine(startLine);
+    #rule = #(root,
               #ruleName,modifier,#(#[ARG,"ARG"],#aa),#(#[RET,"RET"],#rt),
               #opts,#scopes,#a,blk,eor);
     }
@@ -636,7 +642,7 @@ rewrite
 	:!	( options { warnWhenFollowAmbig=false;}
 		: rew:REWRITE pred:SEMPRED alt:rewrite_alternative
 	      {root.addChild( #(#rew, #pred, #alt) );}
-		  {#pred.setEnclosingRule(currentRuleName);}	      
+		  {#pred.setEnclosingRule(currentRuleName);}
 	    )*
 		rew2:REWRITE alt2:rewrite_alternative
         {
@@ -795,18 +801,10 @@ ML_COMMENT :
 	|
 	)
 	(
-		/*	'\r' '\n' can be matched in one alternative or by matching
-			'\r' and then in the next token.  The language
-			that allows both "\r\n" and "\r" and "\n" to all be valid
-			newline is ambiguous.  Consequently, the resulting grammar
-			must be ambiguous.  I'm shutting this warning off.
-		 */
 		options {
 			greedy=false;  // make it exit upon "*/"
-			generateAmbigWarnings=false; // shut off newline errors
 		}
 	:	'\r' '\n'	{newline();}
-	|	'\r'		{newline();}
 	|	'\n'		{newline();}
 	|	~('\n'|'\r')
 	)*
@@ -948,15 +946,8 @@ protected
 NESTED_ARG_ACTION :
 	'['!
 	(
-		/*	'\r' '\n' can be matched in one alternative or by matching
-			'\r' and then '\n' in the next iteration.
-		 */
-		options {
-			generateAmbigWarnings=false; // shut off newline errors
-		}
-	:	NESTED_ARG_ACTION
+		NESTED_ARG_ACTION
 	|	'\r' '\n'	{newline();}
-	|	'\r'		{newline();}
 	|	'\n'		{newline();}
 	|	ACTION_STRING_LITERAL
 	|	~']'
@@ -988,11 +979,7 @@ NESTED_ACTION :
 		}
 	:
 		(
-			options {
-				generateAmbigWarnings = false; // shut off newline warning
-			}
-		:	'\r' '\n'	{newline();}
-		|	'\r' 		{newline();}
+			'\r' '\n'	{newline();}
 		|	'\n'		{newline();}
 		)
 	|	NESTED_ACTION
@@ -1076,5 +1063,18 @@ INTERNAL_RULE_REF returns [int t]
 protected
 WS_OPT
 	:	(WS)?
+	;
+
+/** Reset the file and line information; useful when the grammar
+ *  has been generated so that errors are shown relative to the
+ *  original file like the old C preprocessor used to do.
+ */
+SRC	:	"#src" ' ' file:ACTION_STRING_LITERAL ' ' line:INT ('\r')? '\n'
+		{
+		newline();
+		setFilename(file.getText().substring(1,file.getText().length()-1));
+		setLine(Integer.parseInt(line.getText()));
+		$setType(Token.SKIP); // don't let this go to the parser
+		}
 	;
 

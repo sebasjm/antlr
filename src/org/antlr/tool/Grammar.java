@@ -31,6 +31,7 @@ import antlr.collections.AST;
 import antlr.RecognitionException;
 import antlr.TokenStreamRewriteEngine;
 import antlr.TreeParser;
+import antlr.TokenWithIndex;
 
 import java.io.*;
 import java.util.*;
@@ -99,6 +100,12 @@ public class Grammar {
 		"tree",
 		"combined"
 	};
+
+	/** This is the buffer of *all* tokens found in the grammar file
+	 *  including whitespace tokens etc...  I use this to extract
+	 *  lexer rules from combined grammars.
+	 */
+	protected TokenStreamRewriteEngine tokenBuffer;
 
 	public static class Decision {
 		public int decision;
@@ -299,7 +306,7 @@ public class Grammar {
 			"<endif>\n" +
 			"<actionNames,actions:{n,a|@<n> {<a>}\n}>\n" +
 			"<literals:{<it.ruleName> : <it.literal> ;\n}>\n" +
-			"<rules; separator=\"\n\n\">",
+			"<rules>",
 			AngleBracketTemplateLexer.class
 		);
 
@@ -384,8 +391,7 @@ public class Grammar {
 		// in case they have a merged lexer/parser, send lexer rules to
 		// new grammar.
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
-		TokenStreamRewriteEngine tokenBuffer =
-			new TokenStreamRewriteEngine(lexer);
+		tokenBuffer = new TokenStreamRewriteEngine(lexer);
 		tokenBuffer.discard(ANTLRParser.WS);
 		tokenBuffer.discard(ANTLRParser.ML_COMMENT);
 		tokenBuffer.discard(ANTLRParser.COMMENT);
@@ -394,6 +400,7 @@ public class Grammar {
 		parser.setFilename(this.getFileName());
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar(this);
+		setFileName(lexer.getFilename()); // the lexer #src might change name
 		grammarTree = (GrammarAST)parser.getAST();
 		addArtificialRulesForSyntacticPredicates(parser,
 												 grammarTree,
@@ -795,20 +802,44 @@ public class Grammar {
 		return null;
 	}
 
-	public void defineLexerRuleFoundInParser(antlr.Token ruleToken, GrammarAST ruleAST) {
+	public void defineLexerRuleFoundInParser(antlr.Token ruleToken,
+											 GrammarAST ruleAST)
+	{
 		//System.out.println("rule tree is:\n"+ruleAST.toStringTree());
-		ANTLRTreePrinter printer = new ANTLRTreePrinter();
-		printer.setASTNodeClass("org.antlr.tool.GrammarAST");
-		try {
-			String ruleText = printer.toString(ruleAST, this, true);
-			//System.out.println("ruleText: "+ruleText);
-			lexerGrammarST.setAttribute("rules", ruleText);
-			lexerRules.add(ruleToken.getText());
+		/*
+		String ruleText = tokenBuffer.toOriginalString(ruleAST.ruleStartTokenIndex,
+											   ruleAST.ruleStopTokenIndex);
+		*/
+		// first, create the text of the rule
+		StringBuffer buf = new StringBuffer();
+		buf.append("#src \"");
+		buf.append(getFileName());
+		buf.append("\" ");
+		buf.append(ruleAST.getLine());
+		buf.append("\n");
+		for (int i=ruleAST.ruleStartTokenIndex;
+			 i<=ruleAST.ruleStopTokenIndex && i<tokenBuffer.size();
+			 i++)
+		{
+			TokenWithIndex t = (TokenWithIndex)tokenBuffer.getToken(i);
+			if ( t.getType()==ANTLRParser.BLOCK ) {
+				buf.append("(");
+			}
+			else if ( t.getType()==ANTLRParser.ACTION ) {
+				buf.append("{");
+				buf.append(t.getText());
+				buf.append("}");
+			}
+			else {
+				buf.append(t.getText());
+			}
 		}
-		catch (antlr.RecognitionException re) {
-			ErrorManager.internalError("defineLexerRuleFoundInParser: cannot convert "+
-									   "rule "+ruleToken.getText()+"'s AST to text");
-		}
+		String ruleText = buf.toString();
+		//System.out.println("[["+ruleText+"]]");
+		// now put the rule into the lexer grammar template
+		lexerGrammarST.setAttribute("rules", ruleText);
+		// track this lexer rule's name
+		lexerRules.add(ruleToken.getText());
 	}
 
 	public void defineLexerRuleForStringLiteral(String literal, int tokenType) {

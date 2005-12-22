@@ -54,7 +54,12 @@ import java.util.*;
 public class GrammarAST extends BaseAST {
 	/** This AST node was created from what token? */
     protected Token token = null;
+
     protected String enclosingRule = null;
+
+	/** If this is a RULE node then track rule's start, stop tokens' index. */
+	public int ruleStartTokenIndex;
+	public int ruleStopTokenIndex;
 
     /** If this is a decision node, what is the lookahead DFA? */
     protected DFA lookaheadDFA = null;
