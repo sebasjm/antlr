@@ -198,18 +198,6 @@ public abstract class SemanticContext {
 		}
 
 		public String toString(StringTemplateGroup templates) {
-			if ( constantValue==TRUE_PRED ) {
-				if ( templates!=null ) {
-					return templates.getInstanceOf("true").toString();
-				}
-				return "true";
-			}
-			if ( constantValue==FALSE_PRED ) {
-				if ( templates!=null ) {
-					return templates.getInstanceOf("false").toString();
-				}
-				return "false";
-			}
             if ( predicate==null ) {
                 return "<nopred>";
             }
@@ -222,12 +210,31 @@ public abstract class SemanticContext {
 			super();
 			this.constantValue = TRUE_PRED;
 		}
+
+		public StringTemplate genExpr(CodeGenerator generator,
+									  StringTemplateGroup templates,
+									  DFA dfa)
+		{
+			if ( templates!=null ) {
+				return templates.getInstanceOf("true");
+			}
+			return new StringTemplate("true");
+		}
 	}
 
 	public static class FalsePredicate extends Predicate {
 		public FalsePredicate() {
 			super();
 			this.constantValue = FALSE_PRED;
+		}
+		public StringTemplate genExpr(CodeGenerator generator,
+									  StringTemplateGroup templates,
+									  DFA dfa)
+		{
+			if ( templates!=null ) {
+				return templates.getInstanceOf("false");
+			}
+			return new StringTemplate("false");
 		}
 	}
 
