@@ -206,7 +206,9 @@ rule
            (ruleScopeSpec)?
 		   (ruleAction)*
            {out(" : ");}
-           b:block[false] EOR {out(";\n");}
+           b:block[false]
+           (exceptionGroup)?
+           EOR {out(";\n");}
          )
     ;
 
@@ -244,6 +246,18 @@ countAltsForBlock returns [int n=0]
 
 alternative
     :   #( ALT (element)+ EOA )
+    ;
+
+exceptionGroup
+	:	( exceptionSpec )+
+    ;
+
+exceptionSpec
+    :   #("exception" ( ARG_ACTION )? ( exceptionHandler )*)
+    ;
+
+exceptionHandler
+    :    #("catch" ARG_ACTION ACTION)
     ;
 
 single_rewrite

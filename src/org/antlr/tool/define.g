@@ -248,7 +248,9 @@ Rule r = null;
            (ruleScopeSpec[r])?
 		   (ruleAction[r])*
            {this.blockLevel=0;}
-           b:block EOR
+           b:block
+           (exceptionGroup)?
+           EOR
            {
            // copy rule options into the block AST, which is where
            // the analysis will look for k option etc...
@@ -260,6 +262,7 @@ Rule r = null;
 countAltsForRule returns [int n=0]
     :   #( RULE id:ID (modifier)? ARG RET (OPTIONS)? ("scope")? (AMPERSAND)*
            #(  BLOCK (OPTIONS)? (ALT (REWRITE)* {n++;})+ EOB )
+           (exceptionGroup)?
            EOR
          )
 	;
@@ -331,6 +334,18 @@ if ( grammar.type!=Grammar.LEXER && grammar.getOption("output")!=null && blockLe
 }
 }
     :   #( ALT (element)+ EOA )
+    ;
+
+exceptionGroup
+	:	( exceptionSpec )+
+    ;
+
+exceptionSpec
+    :   #("exception" ( ARG_ACTION )? ( exceptionHandler )+ )
+    ;
+
+exceptionHandler
+    :    #("catch" ARG_ACTION ACTION)
     ;
 
 rewrite

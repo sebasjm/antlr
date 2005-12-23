@@ -516,7 +516,9 @@ rule
            (optionsSpec)?
            (ruleScopeSpec)?
        	   (AMPERSAND)*
-           b:block EOR
+           b:block
+           (exceptionGroup)?
+           EOR
            {trackTokenRule(#id,#m,#b);}
          )
     ;
@@ -542,6 +544,18 @@ block
 
 alternative
     :   #( ALT (element)+ EOA )
+    ;
+
+exceptionGroup
+	:	( exceptionSpec )+
+    ;
+
+exceptionSpec
+    :   #("exception" ( ARG_ACTION )? ( exceptionHandler )*)
+    ;
+
+exceptionHandler
+    :    #("catch" ARG_ACTION ACTION)
     ;
 
 rewrite

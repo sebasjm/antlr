@@ -247,6 +247,7 @@ grammarSpec
 		recognizerST.setAttribute("name", #name.getText());
 		if ( grammar.type!=Grammar.LEXER ) {
 		    recognizerST.setAttribute("scopes", grammar.getGlobalScopes());
+		    headerFileST.setAttribute("scopes", grammar.getGlobalScopes());
 		}
 		outputFileST.setAttribute("name", #name.getText());
 		headerFileST.setAttribute("name", #name.getText());
@@ -297,39 +298,45 @@ rule returns [StringTemplate code=null]
                (ia:ACTION {initAction=generator.translateAction(r,#ia);})?
              )
             */
-	     	b=block["ruleBlock", dfa] EOR
-         )
-        {
-		String description =
-		    grammar.grammarTreeToString(#rule.getFirstChildWithType(BLOCK), false);
-		//description = generator.target.getTargetStringLiteralFromString(description);
-    	b.setAttribute("description", description);
-		/*
-		System.out.println("rule "+r+" tokens="+
-						   grammar.getRule(r).getAllTokenRefsInAltsWithRewrites());
-		System.out.println("rule "+r+" rules="+
-						   grammar.getRule(r).getAllRuleRefsInAltsWithRewrites());
-        */
-        // do not generate lexer rules in combined grammar
-		if ( grammar.type==Grammar.LEXER ) {
-			if ( r.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ) {
-				code = templates.getInstanceOf("tokensRule");
+	     	b=block["ruleBlock", dfa]
+
+			{
+			String description =
+				grammar.grammarTreeToString(#rule.getFirstChildWithType(BLOCK), false);
+			//description = generator.target.getTargetStringLiteralFromString(description);
+			b.setAttribute("description", description);
+			/*
+			System.out.println("rule "+r+" tokens="+
+							   grammar.getRule(r).getAllTokenRefsInAltsWithRewrites());
+			System.out.println("rule "+r+" rules="+
+							   grammar.getRule(r).getAllRuleRefsInAltsWithRewrites());
+			*/
+			// do not generate lexer rules in combined grammar
+			if ( grammar.type==Grammar.LEXER ) {
+				if ( r.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ) {
+					code = templates.getInstanceOf("tokensRule");
+				}
+				else {
+					code = templates.getInstanceOf("lexerRule");
+					code.setAttribute("ruleDescriptor", grammar.getRule(r));
+				}
 			}
 			else {
-				code = templates.getInstanceOf("lexerRule");
-				code.setAttribute("ruleDescriptor", grammar.getRule(r));
+				if ( !(grammar.type==Grammar.COMBINED &&
+					 Character.isUpperCase(r.charAt(0))) )
+				{
+					code = templates.getInstanceOf("rule");
+					code.setAttribute("ruleDescriptor", grammar.getRule(r));
+					code.setAttribute("emptyRule",
+						new Boolean(grammar.isEmptyRule(block)));
+				}
 			}
-		}
-		else {
-			if ( !(grammar.type==Grammar.COMBINED &&
-				 Character.isUpperCase(r.charAt(0))) )
-			{
-				code = templates.getInstanceOf("rule");
-				code.setAttribute("ruleDescriptor", grammar.getRule(r));
-                code.setAttribute("emptyRule",
-                    new Boolean(grammar.isEmptyRule(block)));
 			}
-		}
+
+	     	(exceptionGroup[code])?
+	     	EOR
+         )
+        {
         if ( code!=null ) {
 			if ( grammar.type==Grammar.LEXER ) {
 		    	boolean naked =
@@ -340,10 +347,6 @@ rule returns [StringTemplate code=null]
 			else {
 				description =
 					grammar.grammarTreeToString(#rule,false);
-			 	/*
-			 	description =
-			 	    generator.target.getTargetStringLiteralFromString(description);
-				*/
 				code.setAttribute("description", description);
 			}
 			Rule theRule = grammar.getRule(r);
@@ -418,6 +421,22 @@ block[String blockTemplateName, DFA dfa]
             EOB
          )
     	{blockNestingLevel--;}
+    ;
+
+exceptionGroup[StringTemplate ruleST]
+	:	( exceptionSpec[ruleST] )+  // we only handle one group now
+    ;
+
+exceptionSpec[StringTemplate ruleST]
+    :   #("exception" ( ARG_ACTION )? ( exceptionHandler[ruleST] )*)
+    ;
+
+exceptionHandler[StringTemplate ruleST]
+    :    #("catch" ARG_ACTION ACTION)
+    	{
+    	String actionText = generator.translateAction(currentRuleName,#ACTION);
+    	ruleST.setAttribute("exceptions.{decl,action}",#ARG_ACTION.getText(),actionText);
+    	}
     ;
 
 alternative returns [StringTemplate code=templates.getInstanceOf("alt")]

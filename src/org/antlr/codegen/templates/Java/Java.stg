@@ -176,7 +176,7 @@ if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { retu
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description) ::= <<
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
@@ -195,10 +195,14 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     try {
         <block>
     }
+<if(exceptions)>
+    <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
+<else>
     catch (RecognitionException re) {
         reportError(re);
         recover(input,re);
-    }
+    }<\n>
+<endif>
     finally {
         <ruleCleanUp()>
     }<\n>
@@ -207,6 +211,12 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     <ruleReturnValue()>
 }
 // $ANTLR end <ruleName>
+>>
+
+catch(decl,action) ::= <<
+catch (<e.decl>) {
+    <e.action>
+}
 >>
 
 ruleDeclarations() ::= <<

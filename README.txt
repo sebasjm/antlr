@@ -206,6 +206,20 @@ CHANGES
 
 3.0ea8 - ???
 
+* added basic exception handling; no labels, just general catches:
+
+a : {;}A | B ;
+        exception
+                catch[RecognitionException re] {
+                        System.out.println("recog error");
+                }
+                catch[Exception e] {
+                        System.out.println("error");
+                }
+
+* Added method to TokenStream:
+  public String toString(Token start, Token stop);
+
 * antlr generates #src lines in lexer grammars generated from combined grammars
   so error messages refer to original file.
 

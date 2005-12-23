@@ -166,7 +166,9 @@ rule
 		( OPTIONS )?
 		( ruleScopeSpec )?
 		   (AMPERSAND)*
-           #(BLOCK b=block EOB) EOR
+           #(BLOCK b=block EOB)
+           (exceptionGroup)?
+           EOR
            {
            /* 11/28/2005: removed to treat Tokens rule like any other
            if ( r.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ) {
@@ -245,6 +247,18 @@ alternative returns [StateCluster g=null]
         	factory.optimizeAlternative(g);
         }
         }
+    ;
+
+exceptionGroup
+	:	( exceptionSpec )+
+    ;
+
+exceptionSpec
+    :   #("exception" ( ARG_ACTION )? ( exceptionHandler )*)
+    ;
+
+exceptionHandler
+    :    #("catch" ARG_ACTION ACTION)
     ;
 
 rewrite

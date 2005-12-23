@@ -286,7 +286,7 @@ int startLine = LT(1).getLine();
 	|	b:altList {blk = #b;}
 	)
 	semi:SEMI
-	( exceptionGroup )?
+	( ex:exceptionGroup )?
     {
     int stop = ((TokenWithIndex)LT(1)).getIndex()-1; // point at the semi or exception thingie
 	eob.setLine(semi.getLine());
@@ -301,7 +301,7 @@ int startLine = LT(1).getLine();
 	root.setLine(startLine);
     #rule = #(root,
               #ruleName,modifier,#(#[ARG,"ARG"],#aa),#(#[RET,"RET"],#rt),
-              #opts,#scopes,#a,blk,eor);
+              #opts,#scopes,#a,blk,ex,eor);
     }
 	;
 
@@ -398,7 +398,7 @@ exceptionGroup
     ;
 
 exceptionSpec
-    :   "exception" ( ARG_ACTION  )?
+    :   "exception"^ ( ARG_ACTION )?
         ( exceptionHandler )*
     ;
 
@@ -407,7 +407,7 @@ exceptionSpecNoLabel
     ;
 
 exceptionHandler
-   :    "catch" ARG_ACTION ACTION
+   :    "catch"^ ARG_ACTION ACTION
    ;
 
 element

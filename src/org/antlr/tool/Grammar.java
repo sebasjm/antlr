@@ -822,6 +822,7 @@ public class Grammar {
 			 i++)
 		{
 			TokenWithIndex t = (TokenWithIndex)tokenBuffer.getToken(i);
+			// undo the text deletions done by the lexer (ugh)
 			if ( t.getType()==ANTLRParser.BLOCK ) {
 				buf.append("(");
 			}
@@ -829,6 +830,14 @@ public class Grammar {
 				buf.append("{");
 				buf.append(t.getText());
 				buf.append("}");
+			}
+			else if ( t.getType()==ANTLRParser.SEMPRED ||
+				t.getType()==ANTLRParser.SYN_SEMPRED ||
+				t.getType()==ANTLRParser.GATED_SEMPRED )
+			{
+				buf.append("{");
+				buf.append(t.getText());
+				buf.append("}?");
 			}
 			else if ( t.getType()==ANTLRParser.ARG_ACTION ) {
 				buf.append("[");
