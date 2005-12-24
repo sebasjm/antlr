@@ -707,7 +707,8 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			"lexer grammar tLexer;\n" +
 			"\n" +
-			"A : '{' (~ '}' )* '}' ;";
+			"#src \"<string>\" 2\n"+
+			"A : '{' ~('}')* '}';\n";
 		assertEqual(result, expecting);
 	}
 
