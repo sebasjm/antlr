@@ -220,6 +220,10 @@ public abstract class SemanticContext {
 			}
 			return new StringTemplate("true");
 		}
+
+		public String toString() {
+			return "true"; // not used for code gen, just DOT and print outs
+		}
 	}
 
 	public static class FalsePredicate extends Predicate {
@@ -235,6 +239,9 @@ public abstract class SemanticContext {
 				return templates.getInstanceOf("false");
 			}
 			return new StringTemplate("false");
+		}
+		public String toString() {
+			return "false"; // not used for code gen, just DOT and print outs
 		}
 	}
 
