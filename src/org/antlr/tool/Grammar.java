@@ -667,6 +667,13 @@ public class Grammar {
 		DFACreationWallClockTimeInMS = stop - start;
 	}
 
+	/** Return a new unique integer in the token type space */
+	public int getNewTokenType() {
+		maxTokenType++;
+		int type = maxTokenType;
+		return type;
+	}
+
 	/** Define a token at a particular token type value.  Blast an
 	 *  old value with a new one.  This is called directly during import vocab
      *  operation to set up tokens with specific values.
@@ -1245,16 +1252,6 @@ public class Grammar {
 		return names;
 	}
 
-	/*
-	public Set getStringLiteralTokens() {
-		return stringLiteralToTypeMap.keySet();
-	}
-
-	public Set getCharLiteralTokens() {
-		return charLiteralToTypeMap.keySet();
-	}
-	*/
-
 	/** Given a literal like (the 3 char sequence with single quotes) 'a',
 	 *  return the int value of 'a'. Convert escape sequences here also.
 	 *  ANTLR's antlr.g parser does not convert escape sequences.
@@ -1328,12 +1325,88 @@ public class Grammar {
 		return buf;
 	}
 
+	/*
 	public void importTokenVocabulary(Grammar g) {
 		importTokenVocabularyFromGrammar = g;
 	}
 
     public Grammar getGrammarWithTokenVocabularyToImport() {
 		return importTokenVocabularyFromGrammar;
+	}
+	*/
+
+	/** Pull your token definitions from an existing grammar in memory.
+	 *  You must use Grammar() ctor then this method then setGrammarContent()
+	 *  to make this work.  This is useful primarily for testing and
+	 *  interpreting grammars.  Return the max token type found.
+	 */
+	public int importTokenVocabulary(Grammar importFromGr) {
+		Set importedTokenIDs = importFromGr.getTokenIDs();
+		for (Iterator it = importedTokenIDs.iterator(); it.hasNext();) {
+			String tokenID = (String) it.next();
+			int tokenType = importFromGr.getTokenType(tokenID);
+			maxTokenType = Math.max(maxTokenType,tokenType);
+			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
+				//System.out.println("import token from grammar "+tokenID+"="+tokenType);
+				defineToken(tokenID, tokenType);
+			}
+		}
+		return maxTokenType; // return max found
+	}
+
+	/** Load a vocab file <vocabName>.tokens and return max token type found. */
+	public int importTokenVocabulary(String vocabName) {
+		try {
+			BufferedReader br = tool.getLibraryFile(vocabName+".tokens");
+			String line = br.readLine();
+			int n = 1;
+			while ( line!=null ) {
+				if ( line.length()==0 ){
+					continue; // ignore blank lines
+				}
+				StringTokenizer tokenizer = new StringTokenizer(line, "=", true);
+				if ( !tokenizer.hasMoreTokens() ) {
+					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
+									   vocabName+".tokens",
+									   new Integer(n));
+				}
+				String tokenID=tokenizer.nextToken();
+				if ( !tokenizer.hasMoreTokens() ) {
+					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
+									   vocabName+".tokens",
+									   new Integer(n));
+				}
+				tokenizer.nextToken(); // skip '='
+				if ( !tokenizer.hasMoreTokens() ) {
+					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
+									   vocabName+".tokens",
+									   new Integer(n));
+				}
+				String tokenTypeS=tokenizer.nextToken();
+				int tokenType = Integer.parseInt(tokenTypeS);
+				// System.out.println("import "+tokenID+"="+tokenType);
+				maxTokenType = Math.max(maxTokenType,tokenType);
+				defineToken(tokenID, tokenType);
+				line = br.readLine();
+				n++;
+			}
+			br.close();
+		}
+		catch (FileNotFoundException fnfe) {
+			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_TOKENS_FILE,
+							   vocabName+".tokens");
+		}
+		catch (IOException ioe) {
+			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
+							   vocabName+".tokens",
+							   ioe);
+		}
+		catch (Exception e) {
+			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
+							   vocabName+".tokens",
+							   e);
+		}
+		return maxTokenType;
 	}
 
 	/** Given a token type, get a meaningful name for it such as the ID

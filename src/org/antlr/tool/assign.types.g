@@ -112,41 +112,6 @@ protected Map aliases = new LinkedHashMap();        // Map<name,literal>
 protected String currentRuleName;
 protected static final Integer UNASSIGNED = new Integer(-1);
 protected static final Integer UNASSIGNED_IN_PARSER_RULE = new Integer(-2);
-protected int tokenType = Label.MIN_TOKEN_TYPE;
-
-protected int getNewTokenType() {
-	int type = tokenType;
-	tokenType++;
-	return type;
-}
-
-/** Track characters in any non-lexer rule (could be in tokens{} section) */
-/*
-protected void trackChar(GrammarAST t) {
-	// if lexer don't allow aliasing in tokens section
-	if ( currentRuleName==null && grammar.type==Grammar.LEXER ) {
-		ErrorManager.grammarError(ErrorManager.MSG_CANNOT_ALIAS_TOKENS_IN_LEXER,
-								  grammar,
-								  t.token,
-								  t.getText());
-		return;
-	}
-	// if not in a combined grammar rule or lexer rule, cannot reference literals
-	if ( grammar.type!=Grammar.COMBINED && grammar.type!=Grammar.LEXER ) {
-		ErrorManager.grammarError(ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE,
-								  grammar,
-								  t.token,
-								  t.getText());
-	}
-	// otherwise add literal to token types if referenced from parser rule
-	// or in the tokens{} section
-	if ( currentRuleName==null ||
-	     Character.isLowerCase(currentRuleName.charAt(0)) )
-	{
-		charLiterals.put(t.getText(), UNASSIGNED_IN_PARSER_RULE);
-	}
-}
-*/
 
 /** Track string literals in any non-lexer rule (could be in tokens{} section) */
 protected void trackString(GrammarAST t) {
@@ -167,8 +132,9 @@ protected void trackString(GrammarAST t) {
 	}
 	// otherwise add literal to token types if referenced from parser rule
 	// or in the tokens{} section
-	if ( currentRuleName==null ||
-         Character.isLowerCase(currentRuleName.charAt(0)) )
+	if ( (currentRuleName==null ||
+         Character.isLowerCase(currentRuleName.charAt(0))) &&
+         grammar.getTokenType(t.getText())==Label.INVALID )
 	{
 		stringLiterals.put(t.getText(), UNASSIGNED_IN_PARSER_RULE);
 	}
@@ -176,7 +142,7 @@ protected void trackString(GrammarAST t) {
 
 protected void trackToken(GrammarAST t) {
 	// imported token names might exist, only add if new
-	if ( tokens.get(t.getText())==null ) {
+	if ( grammar.getTokenType(t.getText())==Label.INVALID ) {
 		tokens.put(t.getText(), UNASSIGNED);
 	}
 }
@@ -190,8 +156,8 @@ protected void trackTokenRule(GrammarAST t,
 		if ( !Character.isUpperCase(t.getText().charAt(0)) ) {
 			return;
 		}
-		Integer existing = (Integer)tokens.get(t.getText());
-		if ( existing==null ) {
+		int existing = grammar.getTokenType(t.getText());
+		if ( existing==Label.INVALID ) {
 			tokens.put(t.getText(), UNASSIGNED);
 		}
 		// look for "<TOKEN> : <literal> ;" pattern
@@ -204,10 +170,6 @@ protected void trackTokenRule(GrammarAST t,
 		}
 	}
 	// else error
-}
-
-protected void defineToken(String tokenID, int ttype) {
-	tokens.put(tokenID, new Integer(ttype));
 }
 
 protected boolean matchesStructure(AST a, AST b) {
@@ -265,7 +227,7 @@ protected void assignTypes() {
 			Integer oldTypeI = (Integer)stringLiterals.get(lit);
 			int oldType = oldTypeI.intValue();
 			if ( oldType<Label.MIN_TOKEN_TYPE ) {
-				Integer typeI = new Integer(getNewTokenType());
+				Integer typeI = new Integer(grammar.getNewTokenType());
 				stringLiterals.put(lit, typeI);
 				// if string referenced in combined grammar parser rule,
 				// automatically define in the generated lexer
@@ -273,26 +235,6 @@ protected void assignTypes() {
 			}
 		}
 	}
-
-/*
-	protected void assignCharTypes() {
-		Set s;
-		// walk char literals assigning types to unassigned ones
-		s = charLiterals.keySet();
-		for (Iterator it = s.iterator(); it.hasNext();) {
-			String lit = (String) it.next();
-			Integer oldTypeI = (Integer)charLiterals.get(lit);
-			int oldType = oldTypeI.intValue();
-			if ( oldType<Label.MIN_TOKEN_TYPE ) {
-				Integer typeI = new Integer(getNewTokenType());
-				charLiterals.put(lit, typeI);
-				if ( oldTypeI == UNASSIGNED_IN_PARSER_RULE ) {
-					grammar.defineLexerRuleForCharLiteral(lit, typeI.intValue());
-				}
-			}
-		}
-	}
-*/
 
 	protected void aliasTokenIDsAndLiterals() {
 		if ( grammar.type==Grammar.LEXER ) {
@@ -316,7 +258,7 @@ protected void assignTypes() {
 		for (Iterator it = s.iterator(); it.hasNext();) {
 			String tokenID = (String) it.next();
 			if ( tokens.get(tokenID)==UNASSIGNED ) {
-				tokens.put(tokenID, new Integer(getNewTokenType()));
+				tokens.put(tokenID, new Integer(grammar.getNewTokenType()));
 			}
 		}
 	}
@@ -336,91 +278,8 @@ protected void assignTypes() {
 		}
 	}
 
-	/** Pull your token definitions from an existing grammar in memory.
-	 *  You must use Grammar() ctor then this method then setGrammarContent()
-	 *  to make this work.  This is useful primarily for testing and
-	 *  interpreting grammars.
-	 */
-	protected void importTokenVocabulary(Grammar g) {
-		int maxTokenType=0;
-		Set importedTokenIDs = g.getTokenIDs();
-		for (Iterator it = importedTokenIDs.iterator(); it.hasNext();) {
-			String tokenID = (String) it.next();
-			int tokenType = g.getTokenType(tokenID);
-			maxTokenType = Math.max(maxTokenType,tokenType);
-			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
-				//System.out.println("import token from grammar "+tokenID+"="+tokenType);
-				defineToken(tokenID, tokenType);
-			}
-		}
-		if ( maxTokenType>0 ) {
-			this.tokenType = maxTokenType+1; // next type is defined above imported
-		}
-	}
-
-	protected void importTokenVocab(String vocabName) {
-		int maxTokenType = -1;
-		try {
-			BufferedReader br = grammar.getTool().getLibraryFile(vocabName+".tokens");
-			String line = br.readLine();
-			int n = 1;
-			while ( line!=null ) {
-				if ( line.length()==0 ){
-					continue; // ignore blank lines
-				}
-				StringTokenizer tokenizer = new StringTokenizer(line, "=", true);
-				if ( !tokenizer.hasMoreTokens() ) {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
-									   new Integer(n));
-				}
-				String tokenID=tokenizer.nextToken();
-				if ( !tokenizer.hasMoreTokens() ) {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
-									   new Integer(n));
-				}
-				tokenizer.nextToken(); // skip '='
-				if ( !tokenizer.hasMoreTokens() ) {
-					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
-									   new Integer(n));
-				}
-				String tokenTypeS=tokenizer.nextToken();
-				int tokenType = Integer.parseInt(tokenTypeS);
-				// System.out.println("import "+tokenID+"="+tokenType);
-				maxTokenType = Math.max(maxTokenType,tokenType);
-				defineToken(tokenID, tokenType);
-				line = br.readLine();
-				n++;
-			}
-			br.close();
-		}
-		catch (FileNotFoundException fnfe) {
-			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_TOKENS_FILE,
-							   vocabName+".tokens");
-		}
-		catch (IOException ioe) {
-			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   vocabName+".tokens",
-							   ioe);
-		}
-		catch (Exception e) {
-			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   vocabName+".tokens",
-							   e);
-		}
-		if ( maxTokenType>0 ) {
-			this.tokenType = maxTokenType+1; // next type is defined above imported
-		}
-	}
-
 	protected void init(Grammar g) {
 		this.grammar = g;
-		Grammar importG = grammar.getGrammarWithTokenVocabularyToImport();
-		if ( importG!=null ) {
-			importTokenVocabulary(importG);
-		}
 	}
 }
 
@@ -465,7 +324,7 @@ option[Map opts]
         opts.put(key,value);
         // check for grammar-level option to import vocabulary
         if ( currentRuleName==null && key.equals("tokenVocab") ) {
-            importTokenVocab((String)value);
+            grammar.importTokenVocabulary((String)value);
         }
         }
     ;
