@@ -381,6 +381,15 @@ public class CodeGenerator {
 			StringTemplate tokenVocabSerialization = genTokenVocabOutput();
 			write(tokenVocabSerialization, getVocabFileName());
 			//System.out.println(outputFileST.toStructureString());
+			/*
+			Map edges = new HashMap();
+			outputFileST.getDependencyGraph(edges,false);
+			System.out.println(edges);
+			*/
+			/*
+			StringTemplate graphST = outputFileST.getDOTForDependencyGraph(true);
+			System.out.println(graphST);
+			*/
 		}
 		catch (IOException ioe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE,
