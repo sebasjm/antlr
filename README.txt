@@ -206,6 +206,9 @@ CHANGES
 
 3.0ea8 - ???
 
+* literals are now passed in the .tokens files so you can ref them in
+  tree parses, for example.
+
 * added basic exception handling; no labels, just general catches:
 
 a : {;}A | B ;

@@ -674,8 +674,10 @@ public class CodeGenerator {
 	protected void genTokenTypeNames(StringTemplate code) {
 		for (int t=Label.MIN_TOKEN_TYPE; t<=grammar.getMaxTokenType(); t++) {
 			String tokenName = grammar.getTokenDisplayName(t);
-			tokenName=target.getTargetStringLiteralFromString(tokenName, true);
-			code.setAttribute("tokenNames", tokenName);
+			if ( tokenName!=null ) {
+				tokenName=target.getTargetStringLiteralFromString(tokenName, true);
+				code.setAttribute("tokenNames", tokenName);
+			}
 		}
 	}
 
@@ -721,6 +723,16 @@ public class CodeGenerator {
 			int tokenType = grammar.getTokenType(tokenID);
 			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
 				vocabFileST.setAttribute("tokens.{name,type}", tokenID, new Integer(tokenType));
+			}
+		}
+
+		// now dump the strings
+		Iterator literals = grammar.getStringLiterals().iterator();
+		while (literals.hasNext()) {
+			String literal = (String) literals.next();
+			int tokenType = grammar.getTokenType(literal);
+			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
+				vocabFileST.setAttribute("tokens.{name,type}", literal, new Integer(tokenType));
 			}
 		}
 

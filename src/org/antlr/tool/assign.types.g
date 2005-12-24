@@ -124,7 +124,10 @@ protected void trackString(GrammarAST t) {
 		return;
 	}
 	// if not in a combined grammar rule or lexer rule, cannot reference literals
-	if ( grammar.type!=Grammar.COMBINED && grammar.type!=Grammar.LEXER ) {
+	// (unless defined previously via tokenVocab option)
+	if ( grammar.type!=Grammar.COMBINED && grammar.type!=Grammar.LEXER &&
+	     grammar.getTokenType(t.getText())==Label.INVALID )
+    {
 		ErrorManager.grammarError(ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE,
 								  grammar,
 								  t.token,

@@ -1325,16 +1325,6 @@ public class Grammar {
 		return buf;
 	}
 
-	/*
-	public void importTokenVocabulary(Grammar g) {
-		importTokenVocabularyFromGrammar = g;
-	}
-
-    public Grammar getGrammarWithTokenVocabularyToImport() {
-		return importTokenVocabularyFromGrammar;
-	}
-	*/
-
 	/** Pull your token definitions from an existing grammar in memory.
 	 *  You must use Grammar() ctor then this method then setGrammarContent()
 	 *  to make this work.  This is useful primarily for testing and
@@ -1358,37 +1348,67 @@ public class Grammar {
 	public int importTokenVocabulary(String vocabName) {
 		try {
 			BufferedReader br = tool.getLibraryFile(vocabName+".tokens");
-			String line = br.readLine();
-			int n = 1;
-			while ( line!=null ) {
-				if ( line.length()==0 ){
-					continue; // ignore blank lines
+			StreamTokenizer tokenizer = new StreamTokenizer(br);
+			tokenizer.parseNumbers();
+			tokenizer.wordChars('_', '_');
+			tokenizer.eolIsSignificant(true);
+			tokenizer.slashSlashComments(true);
+			tokenizer.slashStarComments(true);
+			tokenizer.ordinaryChar('=');
+			tokenizer.quoteChar('\'');
+			tokenizer.whitespaceChars(' ',' ');
+			tokenizer.whitespaceChars('\t','\t');
+			int lineNum = 1;
+			int token = tokenizer.nextToken();
+			while (token != StreamTokenizer.TT_EOF) {
+				String tokenID;
+				if ( token == StreamTokenizer.TT_WORD ) {
+					tokenID = tokenizer.sval;
 				}
-				StringTokenizer tokenizer = new StringTokenizer(line, "=", true);
-				if ( !tokenizer.hasMoreTokens() ) {
+				else if ( token == '\'' ) {
+					tokenID = "'"+tokenizer.sval+"'";
+				}
+				else {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
 									   vocabName+".tokens",
-									   new Integer(n));
+									   new Integer(lineNum));
+					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
+					token = tokenizer.nextToken();
+					continue;
 				}
-				String tokenID=tokenizer.nextToken();
-				if ( !tokenizer.hasMoreTokens() ) {
+				token = tokenizer.nextToken();
+				if ( token != '=' ) {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
 									   vocabName+".tokens",
-									   new Integer(n));
+									   new Integer(lineNum));
+					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
+					token = tokenizer.nextToken();
+					continue;
 				}
-				tokenizer.nextToken(); // skip '='
-				if ( !tokenizer.hasMoreTokens() ) {
+				token = tokenizer.nextToken(); // skip '='
+				if ( token != StreamTokenizer.TT_NUMBER ) {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
 									   vocabName+".tokens",
-									   new Integer(n));
+									   new Integer(lineNum));
+					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
+					token = tokenizer.nextToken();
+					continue;
 				}
-				String tokenTypeS=tokenizer.nextToken();
-				int tokenType = Integer.parseInt(tokenTypeS);
+				int tokenType = (int)tokenizer.nval;
+				token = tokenizer.nextToken();
 				// System.out.println("import "+tokenID+"="+tokenType);
 				maxTokenType = Math.max(maxTokenType,tokenType);
 				defineToken(tokenID, tokenType);
-				line = br.readLine();
-				n++;
+				lineNum++;
+				if ( token != StreamTokenizer.TT_EOL ) {
+					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
+									   vocabName+".tokens",
+									   new Integer(lineNum));
+					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
+					token = tokenizer.nextToken();
+					continue;
+				}
+				token = tokenizer.nextToken(); // skip newline
 			}
 			br.close();
 		}
@@ -1438,8 +1458,6 @@ public class Grammar {
 				tokenName = String.valueOf(ttype);
 			}
 		}
-		ErrorManager.assertTrue(tokenName!=null,
-								"null token name; ttype="+ttype+" tokens="+typeToTokenList);
 		//System.out.println("getTokenDisplaYanme ttype="+ttype+", index="+index+", name="+tokenName);
 		return tokenName;
 	}
