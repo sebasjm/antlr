@@ -124,7 +124,7 @@ headerFile( LEXER,
 #pragma mark Lexer
 @interface <name> : ANTLRLexer {
 	// Cyclic DFAs
-	<cyclicDFAs:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}>
+	<cyclicDFAs:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
 }
 
 <actions.lexer.members>
@@ -736,8 +736,6 @@ alt<decisionNumber> = [dfa<decisionNumber> predict:input];
 >>
 
 /** The overall cyclic DFA chunk; contains all the DFA states
-	this template intentionally left blank
-	The information is factored out into cyclicDFAInterface & cyclicDFAImplementation
 */
 cyclicDFA(className,decisionNumber,states,description) ::= <<
 #pragma mark C y c l i c   D F A
@@ -752,25 +750,29 @@ cyclicDFA(className,decisionNumber,states,description) ::= <<
 - (id) init
 {
 	if (self = [super init]) {
-		<cyclicDFAs.states:{state | s<state.stateNumber> = [[<name>DFAState<state.stateNumber> alloc] init];}; separator="\n">
+		<dfa.states:{state | s<state.stateNumber> = [[<name>DFA<dfa.decisionNumber>State<state.stateNumber> alloc] init];}; separator="\n">
 	}
 	return self;
 }
 
 - (void) dealloc
 {
-	<cyclicDFAs.states:{state | [s<state.stateNumber> release];}; separator="\n">
+	<dfa.states:{state | [s<state.stateNumber> release];}; separator="\n">
 	[super dealloc];
 }
 
-<states:{state | - (<name>DFAState<state.stateNumber> *) s<state.stateNumber> {
+<states:{state | - (<name>DFA<dfa.decisionNumber>State<state.stateNumber> *) s<state.stateNumber> {
 	return s<state.stateNumber>;
 }
 }; separator="\n">
 @end
 
 // here come the state class implementations
-<dfa.states; separator="\n\n">
+<dfa.states:{state | 
+@implementation <name>DFA<dfa.decisionNumber>State<state.stateNumber>
+<state>
+@end
+}; separator="\n\n">
 }; separator="\n">
 >>
 
@@ -794,7 +796,6 @@ cyclicDFAInterface() ::= <<
 	This actually is just the implementation for the transition method.
 */
 cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
-@implementation <name>DFAState<state.stateNumber>
 
 - (ANTLRDFAState *) transition:(ANTLRIntStream *)input
 {
@@ -814,35 +815,36 @@ cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
         @throw nvae;
         <endif>
 }
-@end
 >>
 
 
 /** A DFA state declaration */
 cyclicDFAStateIVars() ::= <<
-<cyclicDFAs.states:{state | ANTLRDFAState *s<state.stateNumber>;}; separator="\n">
+<cyclicDFAs:{dfa | <dfa.states:{state | <name>DFA<dfa.decisionNumber>State<state.stateNumber> *s<state.stateNumber>;}; separator="\n">}; separator="\n">
 >>
 
 cyclicDFAStateInterface() ::= <<
 #pragma mark C y c l i c   D F A   S t a t e s
-<cyclicDFAs.states:{state |
-@interface <name>DFAState<state.stateNumber> : ANTLRDFAState {
+<cyclicDFAs:{dfa |
+<dfa.states:{state |
+@interface <name>DFA<dfa.decisionNumber>State<state.stateNumber> : ANTLRDFAState {
 }
 <if(state.edges)>
-- (ANTLRDFAState *) transition:(ANTLRIntStream *)input;<\n>
+- (<name>DFA<dfa.decisionNumber>State<state.stateNumber> *) transition:(ANTLRIntStream *)input;<\n>
 <endif>
 @end
+}; separator="\n">
 }; separator="\n">
 >>
 
 cyclicDFAStateAccessorDecl() ::= <<
-<cyclicDFAs.states:{ state | - (<name>DFAState<state.stateNumber> *)s<state.stateNumber>;}; separator="\n">
+<cyclicDFAs:{dfa | <dfa.states:{ state | - (<name>DFA<dfa.decisionNumber>State<state.stateNumber> *)s<state.stateNumber>;}; separator="\n">}; separator="\n">
 >>
 
 
 /** An accept state for a cyclic DFA */
 cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
-@implementation <name>DFAState<stateNumber>
+
 // init accept state
 - (id) init
 {
@@ -851,7 +853,6 @@ cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
 	}
 	return self;
 }
-@end
 >>
 
 
@@ -876,9 +877,8 @@ return [dfa s<targetStateNumber>];<\n>
  */
 
 cyclicDFAStateSwitch(stateNumber,labels,edges,needErrorClause,EOTTargetStateNumber) ::= <<
-@implementation <name>DFAState<stateNumber>
 
-- (ANTLRDFAState *) transition:(ANTLRIntStream *)input
+- (<name>DFA<dfa.decisionNumber>State<state.stateNumber> *) transition:(ANTLRIntStream *)input
 {
 	switch ( [input LA:1] ) {
         <edges; separator="\n">
@@ -901,7 +901,6 @@ cyclicDFAStateSwitch(stateNumber,labels,edges,needErrorClause,EOTTargetStateNumb
 	}
 }
 
-@end
 >>
 
 cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
