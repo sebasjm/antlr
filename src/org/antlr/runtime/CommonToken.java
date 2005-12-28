@@ -33,6 +33,11 @@ public class CommonToken extends Token {
 	protected int charPositionInLine;
 	protected int channel=DEFAULT_CHANNEL;
 	protected CharStream input;
+	/** We need to be able to change the text once in a while.  If
+	 *  this is non-null, then getText should return this.  Note that
+	 *  start/stop are not affected by changing this.
+ 	 */
+	protected String text;
 
 	/** What token number is this from 0..n-1 tokens */
 	protected int index;
@@ -64,12 +69,19 @@ public class CommonToken extends Token {
 	}
 
     public String getText() {
+		if ( text!=null ) {
+			return text;
+		}
 		if ( input==null ) {
 			return null;
 		}
         return input.substring(start,stop);
     }
 
+	public void setText(String text) {
+		this.text = text;
+	}
+	
     public int getLine() {
         return line;
     }

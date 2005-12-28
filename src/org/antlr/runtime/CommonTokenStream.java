@@ -175,6 +175,42 @@ public class CommonTokenStream implements TokenStream {
 		this.discardOffChannelTokens = discardOffChannelTokens;
 	}
 
+	/** Given a start and stop index, return a List of all tokens in
+	 *  the token type BitSet.  Return null if no tokens were found.  This
+	 *  method looks at both on and off channel tokens.
+	 */
+	public List getTokens(int start, int stop, BitSet types) {
+		if ( stop>=tokens.size() ) {
+			stop=tokens.size();
+		}
+		if ( start<0 ) {
+			start=0;
+		}
+		if ( start>stop ) {
+			return null;
+		}
+		// list = [Token t from tokens[start:stop] | t.getType() in types]
+		List filteredTokens = new ArrayList();
+		for (int i=start; i<=stop; i++) {
+			Token t = (Token)tokens.get(i);
+			if ( types.member(t.getType()) ) {
+				filteredTokens.add(t);
+			}
+		}
+		if ( filteredTokens.size()==0 ) {
+			filteredTokens = null;
+		}
+		return filteredTokens;
+	}
+
+	public List getTokens(int start, int stop, List types) {
+		return getTokens(start,stop,new BitSet(types));
+	}
+
+	public List getTokens(int start, int stop, int ttype) {
+		return getTokens(start,stop,BitSet.of(ttype));
+	}
+
 	/** Get the ith token from the current position 1..n where k=1 is the
 	 *  first symbol of lookahead.
 	 */

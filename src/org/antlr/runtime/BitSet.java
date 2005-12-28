@@ -27,6 +27,8 @@
 */
 package org.antlr.runtime;
 
+import java.util.List;
+
 /**A stripped-down version of org.antlr.misc.BitSet that is just
  * good enough to handle runtime requirements such as FOLLOW sets
  * for automatic error recovery.
@@ -58,12 +60,50 @@ public class BitSet implements Cloneable {
         bits = bits_;
     }
 
+	/** Construction from a list of integers */
+	public BitSet(List items) {
+		for (int i = 0; i < items.size(); i++) {
+			Integer v = (Integer) items.get(i);
+			add(v.intValue());
+		}
+	}
+
     /** Construct a bitset given the size
      * @param nbits The size of the bitset in bits
      */
     public BitSet(int nbits) {
         bits = new long[((nbits - 1) >> LOG_BITS) + 1];
     }
+
+	public static BitSet of(int el) {
+		BitSet s = new BitSet(el + 1);
+		s.add(el);
+		return s;
+	}
+
+	public static BitSet of(int a, int b) {
+		BitSet s = new BitSet(Math.max(a,b)+1);
+		s.add(a);
+		s.add(b);
+		return s;
+	}
+
+	public static BitSet of(int a, int b, int c) {
+		BitSet s = new BitSet();
+		s.add(a);
+		s.add(b);
+		s.add(c);
+		return s;
+	}
+
+	public static BitSet of(int a, int b, int c, int d) {
+		BitSet s = new BitSet();
+		s.add(a);
+		s.add(b);
+		s.add(c);
+		s.add(d);
+		return s;
+	}
 
 	/** return this | a in a new set */
 	public BitSet or(BitSet a) {
@@ -73,6 +113,26 @@ public class BitSet implements Cloneable {
 		BitSet s = (BitSet)this.clone();
 		s.orInPlace(a);
 		return s;
+	}
+
+	/** or this element into this set (grow as necessary to accommodate) */
+	public void add(int el) {
+		int n = wordNumber(el);
+		if (n >= bits.length) {
+			growToInclude(el);
+		}
+		bits[n] |= bitMask(el);
+	}
+
+	/**
+	 * Grows the set to a larger number of bits.
+	 * @param bit element that must fit in set
+	 */
+	public void growToInclude(int bit) {
+		int newSize = Math.max(bits.length << 1, numWordsToHold(bit));
+		long newbits[] = new long[newSize];
+		System.arraycopy(bits, 0, newbits, 0, bits.length);
+		bits = newbits;
 	}
 
 	public void orInPlace(BitSet a) {
