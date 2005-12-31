@@ -80,6 +80,8 @@ public abstract class BaseRecognizer {
 	}
 
 	public void matchAny(IntStream input) {
+		errorRecovery = false;
+		failed = false;
 		input.consume();
 	}
 
@@ -590,12 +592,12 @@ public abstract class BaseRecognizer {
 		if ( stopIndex==MEMO_RULE_UNKNOWN ) {
 			return false;
 		}
-		//System.out.println("seen <name> before; skipping ahead to @"+stopIndex+1);
 		if ( stopIndex==MEMO_RULE_FAILED ) {
-			//System.out.println("rule <name> will never succeed");
+			//System.out.println("rule "+ruleIndex+" will never succeed");
 			failed=true;
 		}
 		else {
+			//System.out.println("seen rule "+ruleIndex+" before; skipping ahead to @"+(stopIndex+1)+" failed="+failed);
 			input.seek(stopIndex+1); // jump to one past stop token
 		}
 		return true;
@@ -609,9 +611,11 @@ public abstract class BaseRecognizer {
 						int ruleStartIndex)
 	{
 		int stopTokenIndex = failed?MEMO_RULE_FAILED:input.index()-1;
-		ruleMemo[ruleIndex].put(
-			new Integer(ruleStartIndex), new Integer(stopTokenIndex)
-		);
+		if ( ruleMemo[ruleIndex]!=null ) {
+			ruleMemo[ruleIndex].put(
+				new Integer(ruleStartIndex), new Integer(stopTokenIndex)
+			);
+		}
 	}
 
 	/** A syntactic predicate.  Returns true/false depending on whether
@@ -619,14 +623,17 @@ public abstract class BaseRecognizer {
 	 *  This resets the failed instance var afterwards.
 	 */
 	public boolean synpred(IntStream input, GrammarFragmentPtr fragment) {
-		//System.out.println("begin backtracking @"+input.index());
+		int i = input.index();
+		//System.out.println("begin backtracking="+backtracking+" @"+i+"="+((CommonTokenStream)input).LT(1));
 		int start = input.mark();
 		backtracking++;
 		try {fragment.invoke();}
-		catch (RecognitionException re) {System.err.println("impossible");}
+		catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
 		input.rewind(start);
 		backtracking--;
-		//System.out.println("end backtracking: "+(failed?"FAILED":"SUCCEEDED"));
+		//System.out.println("end backtracking="+backtracking+": "+(failed?"FAILED":"SUCCEEDED")+" @"+input.index()+" should be "+i);
 		boolean success = !failed;
 		failed=false;
 		return success;

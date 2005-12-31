@@ -316,6 +316,8 @@ public class CodeGenerator {
 		outputFileST.setAttribute("synpreds", synpredNames);
 		headerFileST.setAttribute("synpreds", synpredNames);
 
+		outputFileST.setAttribute("trace", new Boolean(trace));
+		headerFileST.setAttribute("trace", new Boolean(trace));
 
 		// RECOGNIZER
 		if ( grammar.type==Grammar.LEXER ) {
@@ -769,9 +771,6 @@ public class CodeGenerator {
 
 	public void setTrace(boolean trace) {
 		this.trace = trace;
-		if ( profile ) {
-			setDebug(true); // requires debug events
-		}
 	}
 
 	public void setProfile(boolean profile) {

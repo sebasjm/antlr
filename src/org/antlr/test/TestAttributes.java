@@ -1126,6 +1126,34 @@ public class TestAttributes extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testRefToTextAttributeForCurrentRule() throws Exception {
+		String action = "$text";
+		String expecting = "input.toString(retval.start,input.LT(-1))";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n" +
+			"options {output=template;}\n"+
+			"a : {"+action+"}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+
+		assertEqual(found, expecting);
+	}
+
 	public void testRefToStartAttributeForCurrentRule() throws Exception {
 		String action = "$start;";
 		String expecting = "retval.start;";

@@ -206,6 +206,24 @@ CHANGES
 
 3.0ea8 - ???
 
+* return in backtracking must return retval or null if return value.
+
+* $property within a rule now works like $text, $st, ...
+
+* AST/Template Rewrites were not gated by backtracking==0 so they
+  executed even when guessing.  Auto AST construction is now gated also.
+
+* CommonTokenStream was somehow returning tokens not text in toString()
+
+* added useful methods to runtime.BitSet and also to CommonToken so you can
+  update the text.  Added nice Token stream method:
+
+  /** Given a start and stop index, return a List of all tokens in
+   *  the token type BitSet.  Return null if no tokens were found.  This
+   *  method looks at both on and off channel tokens.
+   */
+  public List getTokens(int start, int stop, BitSet types);
+
 * literals are now passed in the .tokens files so you can ref them in
   tree parses, for example.
 

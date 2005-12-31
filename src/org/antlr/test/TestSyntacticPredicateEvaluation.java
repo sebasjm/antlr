@@ -56,6 +56,7 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 		String expecting =
 			"enter b\n" +
 			"enter b\n" +
+			"enter b\n" +
 			"alt 2\n";
 		assertEqual(found, expecting);
 
@@ -72,6 +73,7 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
 												 "a", "((x)) ;", false);
 		expecting =
+			"enter b\n" +
 			"enter b\n" +
 			"enter c\n" +
 			"enter c\n" +
@@ -192,5 +194,83 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testSimpleNestedPred() throws Exception {
+		String grammar =
+			"grammar t;\n" +
+			"s : (expr ';')+ ;\n" +
+			"expr\n" +
+			"options {\n" +
+			"  k=1;\n" +
+			"}\n" +
+			"@init {System.out.println(\"enter expr \"+input.LT(1).getText());}\n" +
+			"  : (atom 'x') => atom 'x'\n" +
+			"  | atom\n" +
+			";\n" +
+			"atom\n" +
+			"@init {System.out.println(\"enter atom \"+input.LT(1).getText());}\n" +
+			"   : '(' expr ')'\n" +
+			"   | INT\n" +
+			"   ;\n" +
+			"INT: '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n')+ {channel=99;}\n" +
+			"   ;\n" ;
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
+												 "s", "(34)x;", false);
+		String expecting =
+			"enter expr (\n" +
+			"enter atom (\n" +
+			"enter expr 34\n" +
+			"enter atom 34\n" +
+			"enter atom 34\n" +
+			"enter atom (\n" +
+			"enter expr 34\n" +
+			"enter atom 34\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testSynPredWithOutputTemplate() throws Exception {
+		// really just seeing if it will compile
+		String grammar =
+			"grammar t;\n" +
+			"options {output=template;}\n" +
+			"a\n" +
+			"options {\n" +
+			"  k=1;\n" +
+			"}\n" +
+			"  : ('x'+ 'y')=> 'x'+ 'y' -> template(a={$text}) <<1:<a>;>>\n" +
+			"  | 'x'+ 'z' -> template(a={$text}) <<2:<a>;>>\n"+
+			"  ;\n" +
+			"WS : (' '|'\\n')+ {channel=99;}\n" +
+			"   ;\n" ;
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
+												 "a", "xxxy", false);
+		String expecting =
+			"1:xxxy;\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testSynPredWithOutputAST() throws Exception {
+		// really just seeing if it will compile
+		String grammar =
+			"grammar t;\n" +
+			"options {output=AST;}\n" +
+			"a\n" +
+			"options {\n" +
+			"  k=1;\n" +
+			"}\n" +
+			"  : ('x'+ 'y')=> 'x'+ 'y'\n" +
+			"  | 'x'+ 'z'\n"+
+			"  ;\n" +
+			"WS : (' '|'\\n')+ {channel=99;}\n" +
+			"   ;\n" ;
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
+												 "a", "xxxy", false);
+		String expecting =
+			"x x x y\n";
+		assertEqual(found, expecting);
+	}
 
 }

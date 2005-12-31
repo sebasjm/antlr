@@ -55,6 +55,9 @@ public class CyclicDFACodeGenerator {
 		StringTemplate dfaST = templates.getInstanceOf("cyclicDFA");
 		int d = dfa.getDecisionNumber();
 		dfaST.setAttribute("decisionNumber", new Integer(d));
+		String ruleName = dfa.getDecisionASTNode().getEnclosingRule();
+		dfaST.setAttribute("ruleName", ruleName);
+		dfaST.setAttribute("ruleDescriptor", parentGenerator.grammar.getRule(ruleName));
 		dfaST.setAttribute("className", parentGenerator.getClassName());
 		visited = new BitSet(dfa.getNumberOfStates());
 		walkCyclicDFAGeneratingStateMachine(templates, dfaST, dfa.startState);

@@ -557,7 +557,7 @@ public class ActionTranslator {
 		}
 		else {
 			// ok, it's not a label; have to think a little harder then.
-			// Might be $parameter or $returnValue
+			// Might be $parameter or $returnValue or rule-scope property
 			List ruleRefs = r.getRuleRefsInAlt(attributeName, actionAST.outerAltNum);
 			if ( ruleRefs!=null ) {
 				// isolated reference to a rule referenced in this alt
@@ -596,9 +596,11 @@ public class ActionTranslator {
 										  attributeName);
 				return ref;
 			}
-			else {
-				// must be predefined attribute like $template or $tree
-				refST = generator.templates.getInstanceOf("rulePropertyRef");
+			else if ( RuleLabelScope.predefinedRulePropertiesScope.getAttribute(attributeName)!=null ) {
+				// predefined attribute like $template or $tree or $text
+				// referenced within that rule
+				String stName = "rulePropertyRef_"+attributeName;
+				refST = generator.templates.getInstanceOf(stName);
 			}
 			refST.setAttribute("attr", attrScope.getAttribute(attributeName));
 		}

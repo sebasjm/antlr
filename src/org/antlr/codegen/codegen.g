@@ -318,8 +318,8 @@ rule returns [StringTemplate code=null]
 				}
 				else {
 					code = templates.getInstanceOf("lexerRule");
-					code.setAttribute("ruleDescriptor", grammar.getRule(r));
 				}
+				code.setAttribute("ruleDescriptor", grammar.getRule(r));
 			}
 			else {
 				if ( !(grammar.type==Grammar.COMBINED &&

@@ -58,7 +58,13 @@ public StringTemplateGroup getTemplateLib() {
 rewriteTemplate(alts) ::= <<
 
 // TEMPLATE REWRITE
+<if(backtracking)>
+if ( backtracking==0 ) {
+  <alts:rewriteTemplateAlt(); separator="else ">
+}
+<else>
 <alts:rewriteTemplateAlt(); separator="else ">
+<endif>
 >>
 
 rewriteTemplateAlt() ::= <<

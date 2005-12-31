@@ -327,6 +327,9 @@ public class CommonTokenStream implements TokenStream {
 	}
 
 	public String toString(Token start, Token stop) {
-		return toString(start.getTokenIndex(), stop.getTokenIndex());
+		if ( start!=null && stop!=null ) {
+			return toString(start.getTokenIndex(), stop.getTokenIndex());
+		}
+		return null;
 	}
 }

@@ -34,20 +34,8 @@ import java.util.Set;
 import java.util.HashSet;
 
 public class RuleLabelScope extends AttributeScope {
-	/*
-	public static final Set predefinedRuleProperties = new HashSet();
-	static {
-		predefinedRuleProperties.add("text");
-		predefinedRuleProperties.add("start");
-		predefinedRuleProperties.add("stop");
-		predefinedRuleProperties.add("tree");
-		predefinedRuleProperties.add("template");
-	}
-	*/
-
-	/** All token scopes (token labels) share the same fixed scope of
-	 *  of predefined attributes.  I keep this out of the runtime.Token
-	 *  object to avoid a runtime space burden.
+	/** Rules have a predefined set of attributes as well as
+	 *  the return values.  'text' needs to be computed though so.
 	 */
 	public static AttributeScope predefinedRulePropertiesScope =
 		new AttributeScope("RulePredefined");

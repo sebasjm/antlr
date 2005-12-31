@@ -109,6 +109,7 @@ public class TestCompileAndExecSupport {
 									String input, boolean debug)
 	{
 		eraseFiles(".class");
+		eraseFiles(".java");
 
 		rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
@@ -165,6 +166,7 @@ public class TestCompileAndExecSupport {
 										boolean debug)
 	{
 		eraseFiles(".class");
+		eraseFiles(".java");
 
 		// build the parser
 		rawGenerateAndBuildRecognizer(parserGrammarFileName,
@@ -442,15 +444,11 @@ public class TestCompileAndExecSupport {
 
 	public static void eraseFiles(final String filesEndingWith) {
 		File tmpdirF = new File(tmpdir);
-		String[] files = tmpdirF.list(
-			new FilenameFilter() {
-				public boolean accept(java.io.File f, String name) {
-					return f.getName().endsWith(filesEndingWith);
-				}
-			}
-		);
+		String[] files = tmpdirF.list();
 		for(int i = 0; i < files.length; i++) {
-        	new File(files[i]).delete();
+			if ( files[i].endsWith(filesEndingWith) ) {
+        		new File(tmpdir+"/"+files[i]).delete();
+			}
 		}
 	}
 
