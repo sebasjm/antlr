@@ -1521,6 +1521,7 @@ public class Grammar {
     }
 
 	public boolean optionIsValid(String key, Object value) {
+		/*
 		if ( key.equals("output") ) {
 			if ( type==TREE_PARSER ) {
 				ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
@@ -1530,6 +1531,7 @@ public class Grammar {
 				return false;
 			}
 		}
+		*/
 		return true;
 	}
 

@@ -206,6 +206,9 @@ CHANGES
 
 3.0ea8 - ???
 
+* Tree grammars can now specify output; I've only tested output=templat
+  though.
+
 * You can reference EOF now in the parser and lexer.  It's just token type
   or char value -1.
 

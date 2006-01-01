@@ -136,4 +136,35 @@ public class TestTreeParsing extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testTemplateOutput() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n" +
+			"options {output=template; ASTLabelType=CommonTree;}\n" +
+			"s : a {System.out.println($a.st);};\n" +
+			"a : ID INT -> {new StringTemplate($INT.text)}\n" +
+			"  ;\n";
+
+		String found =
+			TestCompileAndExecSupport.execTreeParser("t.g",
+													 grammar,
+													 "T",
+													 "tp.g",
+													 treeGrammar,
+													 "TP",
+													 "TLexer",
+												 	 "a",
+													 "s",
+													 "abc 34");
+		String expecting = "34\n";
+		assertEqual(found, expecting);
+	}
+
 }

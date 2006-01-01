@@ -61,6 +61,10 @@ public class CommonTree extends BaseTree {
 		return token.getType();
 	}
 
+	public String getText() {
+		return toString();
+	}
+
 	public String toString() {
 		if ( isNil() ) {
 			return "nil";
