@@ -206,6 +206,19 @@ CHANGES
 
 3.0ea8 - ???
 
+* Bug fix: $ID refs in the *lexer* were all messed up.  Cleaned up the
+  set of properties available...
+
+* Bug fix: .st not found in rule ref when rule has scope:
+field
+scope {
+	StringTemplate funcDef;
+}
+    :   ...
+	{$field::funcDef = $field.st;}
+    ;
+it gets field_stack.st instead
+
 * return in backtracking must return retval or null if return value.
 
 * $property within a rule now works like $text, $st, ...

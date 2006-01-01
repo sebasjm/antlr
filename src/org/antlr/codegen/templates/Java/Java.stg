@@ -951,12 +951,19 @@ ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
 ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start,<scope>.stop)"
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "<scope>.getCharPositionInLine()"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
+lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
+
 // Somebody may ref $template or $tree or $stop within a rule:
-rulePropertyRef_start(attr) ::= "retval.start"
-rulePropertyRef_stop(attr) ::= "retval.stop"
-rulePropertyRef_tree(attr) ::= "retval.tree"
-rulePropertyRef_text(attr) ::= "input.toString(retval.start,input.LT(-1))"
-rulePropertyRef_st(attr) ::= "retval.st"
+rulePropertyRef_start(scope,attr) ::= "retval.start"
+rulePropertyRef_stop(scope,attr) ::= "retval.stop"
+rulePropertyRef_tree(scope,attr) ::= "retval.tree"
+rulePropertyRef_text(scope,attr) ::= "input.toString(retval.start,input.LT(-1))"
+rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 
 /** How to execute an action */

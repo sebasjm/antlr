@@ -253,6 +253,8 @@ public class TestCompileAndExecSupport {
 			stdout.start();
 			stderr.start();
 			process.waitFor();
+			stdout.join();
+			stderr.join();
 			String output = null;
 			output = stdout.toString();
 			if ( stderr.toString().length()>0 ) {
@@ -270,11 +272,13 @@ public class TestCompileAndExecSupport {
 	public static class StreamVacuum implements Runnable {
 		StringBuffer buf = new StringBuffer();
 		BufferedReader in;
+		Thread sucker;
 		public StreamVacuum(InputStream in) {
 			this.in = new BufferedReader( new InputStreamReader(in) );
 		}
 		public void start() {
-			new Thread(this).start();
+			sucker = new Thread(this);
+			sucker.start();
 		}
 		public void run() {
 			try {
@@ -288,6 +292,10 @@ public class TestCompileAndExecSupport {
 			catch (IOException ioe) {
 				System.err.println("can't read output from process");
 			}
+		}
+		/** wait for the thread to finish */
+		public void join() throws InterruptedException {
+			sucker.join();
 		}
 		public String toString() {
 			return buf.toString();
@@ -422,6 +430,8 @@ public class TestCompileAndExecSupport {
 			"        $parserName$.$parserStartRuleName$_return r = parser.$parserStartRuleName$();\n" +
 			"        if ( r.st!=null )\n" +
 			"            System.out.print(r.st.toString());\n" +
+			"	 	 else\n" +
+			"            System.out.print(\"empty\");\n" +
 			"    }\n" +
 			"}"
 			);

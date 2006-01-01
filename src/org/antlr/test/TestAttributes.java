@@ -1798,6 +1798,60 @@ public class TestAttributes extends TestSuite {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testLabelOnRuleRefInLexer() throws Exception {
+		String action = "$i.text";
+		String expecting = "i.getText()";
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"R : 'z' i=ID {"+action+"};" +
+				"fragment ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("R",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+
+		assertEqual(found, expecting);
+	}
+
+	public void testRefToRuleRefInLexer() throws Exception {
+		String action = "$ID.text";
+		String expecting = "ID1.getText()";
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"R : 'z' ID {"+action+"};" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("R",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+
+		assertEqual(found, expecting);
+	}
+
 	public void testCharLabelInLexer() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1993,6 +2047,35 @@ public class TestAttributes extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 		assertEqual(found, expecting);
+	}
+
+	public void testRuleRefWithDynamicScope() throws Exception {
+		String action = "$field::x = $field.st;";
+		String expecting = "((field_scope)field_stack.peek()).x = retval.st;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar a;\n" +
+				"field\n" +
+				"scope { StringTemplate x; }\n" +
+				"    :   'y' {"+action+"}\n" +
+				"    ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("field",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
 	// S U P P O R T

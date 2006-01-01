@@ -65,7 +65,12 @@ public class AttributeScope {
 
 	public boolean isReturnScope;
 
+	public boolean isPredefinedRuleScope;
+
+	public boolean isPredefinedLexerRuleScope;
+	
 	/** The list of Attribute objects */
+
 	protected LinkedHashMap attributes = new LinkedHashMap();
 
 	public AttributeScope(String name) {
