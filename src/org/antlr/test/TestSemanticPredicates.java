@@ -87,8 +87,8 @@ public class TestSemanticPredicates extends TestSuite {
 			"parser grammar P;\n"+
 			"a : ( {p1}? A | {p2}? A )+;");
 		String expecting =                   // loop back
-			".s0-<EOF>->:s1=>3\n" +
 			".s0-A->.s2\n" +
+			".s0-EOF->:s1=>3\n" +
 			".s2-{p1}?->:s3=>1\n" +
 			".s2-{p2}?->:s4=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
