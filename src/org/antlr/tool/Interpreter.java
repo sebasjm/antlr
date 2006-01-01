@@ -164,6 +164,9 @@ public class Interpreter implements TokenSource {
 		// the scan can only set type
 		// we must set the line, and other junk here to make it a complete token
 		int stop = input.index()-1;
+		if ( input.LA(1)==CharStream.EOF ) {
+			return Token.EOF_TOKEN;
+		}
 		token.setLine(((CharStream)input).getLine());
 		token.setStartIndex(start);
 		token.setStopIndex(stop);
