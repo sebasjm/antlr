@@ -206,6 +206,9 @@ CHANGES
 
 3.0ea8 - ???
 
+* You can reference EOF now in the parser and lexer.  It's just token type
+  or char value -1.
+
 * Bug fix: $ID refs in the *lexer* were all messed up.  Cleaned up the
   set of properties available...
 

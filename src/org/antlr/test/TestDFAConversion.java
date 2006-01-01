@@ -103,7 +103,7 @@ public class TestDFAConversion extends TestSuite {
 		// nondeterministic from left edge
 		String expecting =
 			".s0-P->.s1\n" +
-			".s1-<EOF>->:s2=>2\n" +
+			".s1-EOF->:s2=>2\n"+
 			".s1-P->:s3=>1\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = new int[] {1,2};
@@ -278,8 +278,8 @@ public class TestDFAConversion extends TestSuite {
 			"s : a ;\n" +
 			"a : A a | ;");
 		String expecting =
-			".s0-<EOF>->:s2=>2\n" +
-			".s0-A->:s1=>1\n";
+			".s0-A->:s1=>1\n" +
+			".s0-EOF->:s2=>2\n";
 		int[] unreachableAlts = null; // without
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -312,8 +312,8 @@ public class TestDFAConversion extends TestSuite {
 			"a : A a | A ;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-<EOF>->:s2=>2\n" +
-			".s1-A->:s3=>1\n";
+			".s1-A->:s3=>1\n" +
+			".s1-EOF->:s2=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -346,8 +346,8 @@ public class TestDFAConversion extends TestSuite {
 			"parser grammar t;\n"+
 			"a : ( A )* ;");
 		String expecting =
-			".s0-<EOF>->:s1=>2\n" +
-			".s0-A->:s2=>1\n";
+			".s0-A->:s2=>1\n" +
+			".s0-EOF->:s1=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -356,8 +356,8 @@ public class TestDFAConversion extends TestSuite {
 			"parser grammar t;\n"+
 			"a : ( A | B | C )* ;");
 		String expecting =
-			".s0-<EOF>->:s1=>2\n" +
-			".s0-A..C->:s2=>1\n";
+			".s0-A..C->:s2=>1\n" +
+			".s0-EOF->:s1=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -366,8 +366,8 @@ public class TestDFAConversion extends TestSuite {
 			"parser grammar t;\n"+
 			"a : ( A )+ ;");
 		String expecting =
-			".s0-<EOF>->:s1=>2\n" +
-			".s0-A->:s2=>1\n";
+			".s0-A->:s2=>1\n" +
+			".s0-EOF->:s1=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0); // loopback decision
 	}
 
@@ -377,8 +377,8 @@ public class TestDFAConversion extends TestSuite {
 			"a : (options {greedy=false;}:A)+ ;\n");
 		// should look the same as A+ since no ambiguity
 		String expecting =
-			".s0-<EOF>->:s1=>2\n" +
-			".s0-A->:s2=>1\n";
+			".s0-A->:s2=>1\n" +
+			".s0-EOF->:s1=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -387,8 +387,8 @@ public class TestDFAConversion extends TestSuite {
 			"parser grammar t;\n"+
 			"a : ( A | B | C )+ ;");
 		String expecting =
-			".s0-<EOF>->:s1=>2\n" +
-			".s0-A..C->:s2=>1\n";
+			".s0-A..C->:s2=>1\n" +
+			".s0-EOF->:s1=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -487,8 +487,8 @@ public class TestDFAConversion extends TestSuite {
 		String expecting =
 			".s0-A->:s2=>1\n" +
 			".s0-B->.s1\n" +
-			".s1-<EOF>->:s3=>2\n" +
-			".s1-A..B->:s2=>1\n"; // sees A|B as a set
+			".s1-A..B->:s2=>1\n" +
+			".s1-EOF->:s3=>2\n"; // sees A|B as a set
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -499,8 +499,8 @@ public class TestDFAConversion extends TestSuite {
 		String expecting =
 			".s0-A->:s2=>1\n" +
 			".s0-B->.s1\n" +
-			".s1-<EOF>->:s3=>2\n" +
-			".s1-B->:s2=>1\n";
+			".s1-B->:s2=>1\n" +
+			".s1-EOF->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 

@@ -563,8 +563,8 @@ public class Grammar {
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SEMPRED, "<SEMPRED>");
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SET, "<SET>");
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EPSILON, Label.EPSILON_STR);
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "<EOF>");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "Token.EOR_TOKEN_TYPE");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "EOF");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "<EOR>");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.DOWN-1, "Token.DOWN");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.UP-1, "Token.UP");
         tokenIDToTypeMap.put("<INVALID>", new Integer(Label.INVALID));
@@ -572,8 +572,8 @@ public class Grammar {
         tokenIDToTypeMap.put("<SEMPRED>", new Integer(Label.SEMPRED));
         tokenIDToTypeMap.put("<SET>", new Integer(Label.SET));
         tokenIDToTypeMap.put("<EPSILON>", new Integer(Label.EPSILON));
-		tokenIDToTypeMap.put("<EOF>", new Integer(Label.EOF));
-		tokenIDToTypeMap.put("EOR", new Integer(Label.EOR_TOKEN_TYPE));
+		tokenIDToTypeMap.put("EOF", new Integer(Label.EOF));
+		tokenIDToTypeMap.put("<EOR>", new Integer(Label.EOR_TOKEN_TYPE));
 		tokenIDToTypeMap.put("DOWN", new Integer(Label.DOWN));
 		tokenIDToTypeMap.put("UP", new Integer(Label.UP));
     }
@@ -679,6 +679,11 @@ public class Grammar {
      *  operation to set up tokens with specific values.
      */
     public void defineToken(String text, int tokenType) {
+		if ( tokenIDToTypeMap.get(text)!=null ) {
+			// already defined?  Must be predefined one like EOF;
+			// do nothing
+			return;
+		}
 		// the index in the typeToTokenList table is actually shifted to
 		// hold faux labels as you cannot have negative indices.
         if ( text.charAt(0)=='\'' ) {

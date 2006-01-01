@@ -647,14 +647,19 @@ atom[String label] returns [StringTemplate code=null]
         {
            grammar.checkRuleReference(#t, #targ, currentRuleName);
 		   if ( grammar.type==Grammar.LEXER ) {
-			   code = templates.getInstanceOf("lexerRuleRef");
-			   code.setAttribute("rule", t.getText());
-				if ( #targ!=null ) {
-					#targ.outerAltNum = this.outerAltNum;
-					String argAction = generator.translateAction(currentRuleName,#targ);
-					code.setAttribute("args", argAction);
+				if ( grammar.getTokenType(t.getText())==Label.EOF ) {
+					code = templates.getInstanceOf("lexerMatchEOF");
 				}
-			   if ( label!=null ) code.setAttribute("label", label);
+			    else {
+					code = templates.getInstanceOf("lexerRuleRef");
+					code.setAttribute("rule", t.getText());
+					if ( #targ!=null ) {
+						#targ.outerAltNum = this.outerAltNum;
+						String argAction = generator.translateAction(currentRuleName,#targ);
+						code.setAttribute("args", argAction);
+					}
+				}
+			    if ( label!=null ) code.setAttribute("label", label);
 		   }
 		   else {
 			   code = getTokenElementST("tokenRef", #t.getText(), #t, #as2, label);

@@ -123,7 +123,9 @@ public class NameSpaceChecker {
 		for (Iterator iter = grammar.ruleRefs.iterator(); iter.hasNext();) {
 			Token tok = (Token) iter.next();
 			String ruleName = tok.getText();
-			if ( grammar.getRule(ruleName)==null ) {
+			if ( grammar.getRule(ruleName)==null &&
+			     grammar.getTokenType(ruleName)!=Label.EOF )
+			{
 				ErrorManager.grammarError(ErrorManager.MSG_UNDEFINED_RULE_REF,
 										  grammar,
 										  tok,
@@ -134,7 +136,9 @@ public class NameSpaceChecker {
 			for (Iterator iter = grammar.tokenIDRefs.iterator(); iter.hasNext();) {
 				Token tok = (Token) iter.next();
 				String tokenID = tok.getText();
-				if ( !grammar.lexerRules.contains(tokenID) ) {
+				if ( !grammar.lexerRules.contains(tokenID) &&
+					 grammar.getTokenType(tokenID)!=Label.EOF )
+				{
 					ErrorManager.grammarError(ErrorManager.MSG_NO_TOKEN_DEFINITION,
 											  grammar,
 											  tok,

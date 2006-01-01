@@ -573,6 +573,17 @@ m<rule>(<args>); <checkRuleBacktrackFailure()>
 <endif>
 >>
 
+/** EOF in the lexer */
+lexerMatchEOF(label) ::= <<
+<if(label)>
+int <label>Start = getCharIndex();
+match(EOF); <checkRuleBacktrackFailure()>
+Token <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<else>
+match(EOF); <checkRuleBacktrackFailure()>
+<endif>
+>>
+
 /** match ^(root children) in tree parser */
 tree(root, children) ::= <<
 <root:element()>

@@ -673,7 +673,10 @@ public class CodeGenerator {
 		while (tokenIDs.hasNext()) {
 			String tokenID = (String) tokenIDs.next();
 			int tokenType = grammar.getTokenType(tokenID);
-			if ( tokenType>=Label.MIN_TOKEN_TYPE ) { // don't do FAUX labels
+			if ( tokenType==Label.EOF ||
+				 tokenType>=Label.MIN_TOKEN_TYPE )
+			{
+				// don't do FAUX labels 'cept EOF
 				code.setAttribute("tokens.{name,type}", tokenID, new Integer(tokenType));
 			}
 		}
