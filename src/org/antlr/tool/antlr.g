@@ -866,7 +866,7 @@ RCURLY:	'}'	;
 DOLLAR : '$' ;
 
 CHAR_LITERAL
-	:	'\'' (ESC|~'\'')* '\''
+	:	'\'' (ESC|'\n'{newline();}|~'\'')* '\''
 		{
 		StringBuffer s = Grammar.getUnescapedStringFromGrammarStringLiteral($getText);
 		if ( s.length()>1 ) {
@@ -876,11 +876,11 @@ CHAR_LITERAL
 	;
 
 DOUBLE_QUOTE_STRING_LITERAL
-	:	'"' (ESC|~'"')* '"'
+	:	'"' (ESC|'\n'{newline();}|~'"')* '"'
 	;
 
 DOUBLE_ANGLE_STRING_LITERAL
-	:	"<<" (options {greedy=false;}:ESC|.)* ">>"
+	:	"<<" (options {greedy=false;}:ESC|'\n'{newline();}|.)* ">>"
 	;
 
 protected
@@ -993,12 +993,12 @@ NESTED_ACTION :
 
 protected
 ACTION_CHAR_LITERAL
-	:	'\'' (ACTION_ESC|~'\'')* '\''
+	:	'\'' (ACTION_ESC|'\n'{newline();}|~'\'')* '\''
 	;
 
 protected
 ACTION_STRING_LITERAL
-	:	'"' (ACTION_ESC|~'"')* '"'
+	:	'"' (ACTION_ESC|'\n'{newline();}|~'"')* '"'
 	;
 
 protected

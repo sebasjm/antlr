@@ -44,6 +44,9 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 */
     protected Token token;
 
+	public Lexer() {
+	}
+
 	public Lexer(CharStream input) {
 		this.input = input;
 	}

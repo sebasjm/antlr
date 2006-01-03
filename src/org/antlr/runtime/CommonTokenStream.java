@@ -175,11 +175,25 @@ public class CommonTokenStream implements TokenStream {
 		this.discardOffChannelTokens = discardOffChannelTokens;
 	}
 
+	public List getTokens() {
+		if ( p == -1 ) {
+			fillBuffer();
+		}
+		return tokens;
+	}
+
+	public List getTokens(int start, int stop) {
+		return getTokens(start, stop, (BitSet)null);
+	}
+
 	/** Given a start and stop index, return a List of all tokens in
 	 *  the token type BitSet.  Return null if no tokens were found.  This
 	 *  method looks at both on and off channel tokens.
 	 */
 	public List getTokens(int start, int stop, BitSet types) {
+		if ( p == -1 ) {
+			fillBuffer();
+		}
 		if ( stop>=tokens.size() ) {
 			stop=tokens.size();
 		}
@@ -189,11 +203,12 @@ public class CommonTokenStream implements TokenStream {
 		if ( start>stop ) {
 			return null;
 		}
+
 		// list = [Token t from tokens[start:stop] | t.getType() in types]
 		List filteredTokens = new ArrayList();
 		for (int i=start; i<=stop; i++) {
 			Token t = (Token)tokens.get(i);
-			if ( types.member(t.getType()) ) {
+			if ( types==null || types.member(t.getType()) ) {
 				filteredTokens.add(t);
 			}
 		}
@@ -219,7 +234,7 @@ public class CommonTokenStream implements TokenStream {
 			fillBuffer();
 		}
 		if ( k==0 ) {
-			return Token.INVALID_TOKEN;
+			return null;
 		}
 		if ( k<0 ) {
 			return LB(-k);
@@ -245,6 +260,7 @@ public class CommonTokenStream implements TokenStream {
 
 	/** Look backwards k tokens on-channel tokens */
 	protected Token LB(int k) {
+		//System.out.print("LB(p="+p+","+k+") ");
 		if ( p == -1 ) {
 			fillBuffer();
 		}

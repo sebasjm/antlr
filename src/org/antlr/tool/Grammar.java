@@ -150,6 +150,7 @@ public class Grammar {
 			new HashSet() {
 				{add("language"); add("tokenVocab");
 				 add("output"); add("ASTLabelType");
+				 add("TokenLabelType");
 				 add("superClass");
 				}
 			};

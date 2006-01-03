@@ -70,10 +70,11 @@ import java.util.HashMap;
 <recognizer>
 >>
 
-lexer(name, tokens, rules, numRules, cyclicDFAs) ::= <<
+lexer(name, tokens, rules, numRules, cyclicDFAs, labelType="Token") ::= <<
 public class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <actions.lexer.members>
+    public <name>() {;} <! needed by subclasses !>
     public <name>(CharStream input) {
         super(input);
     }
@@ -286,8 +287,9 @@ if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.n
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
 public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
-<ruleDescriptor.actions.init>
+    <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+" failed="+failed+" backtracking="+backtracking);<endif>
 <if(nakedBlock)>
+    <ruleDescriptor.actions.init>
     <block><\n>
 <else>
     int type = <ruleName>;
@@ -295,9 +297,11 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
     int line = getLine();
     int charPosition = getCharPositionInLine();
     int channel = Token.DEFAULT_CHANNEL;
+    <ruleDescriptor.actions.init>
     <block>
     if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}<\n>
 <endif>
+    <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+" failed="+failed+" backtracking="+backtracking);<endif>
 }
 >>
 
@@ -511,7 +515,7 @@ lexerStringRef(string,label) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
 match(<string>); <checkRuleBacktrackFailure()>
-Token <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
 match(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
@@ -567,7 +571,7 @@ lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
 m<rule>(<args>); <checkRuleBacktrackFailure()>
-Token <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
 m<rule>(<args>); <checkRuleBacktrackFailure()>
 <endif>
@@ -578,7 +582,7 @@ lexerMatchEOF(label) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
 match(EOF); <checkRuleBacktrackFailure()>
-Token <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
 match(EOF); <checkRuleBacktrackFailure()>
 <endif>

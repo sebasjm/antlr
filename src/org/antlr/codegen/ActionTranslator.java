@@ -29,6 +29,7 @@ package org.antlr.codegen;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
+import org.antlr.misc.MutableInteger;
 
 import java.util.List;
 
@@ -316,6 +317,24 @@ public class ActionTranslator {
 			dotIndex = c;
 			c++;
 			attributeName = getID(action, c);
+		}
+
+		// peel off $templates::name(...) case
+		if ( scopeName.equals("templates") && hasDoubleColon ) {
+			if ( !grammar.getOption("output").equals("template") ) {
+				System.err.println("can't use $templates scope w/o output=template option");
+				return c+2;
+			}
+			else {
+				MutableInteger nextCharIndexI = new MutableInteger();
+				String t =
+					generator.translateTemplateConstructor(r.name,
+														   actionAST,
+														   afterScopeIDIndex+2,
+														   nextCharIndexI);
+				buf.append(t);
+				return nextCharIndexI.value;
+			}
 		}
 
 		AttributeScope attrScope = resolveScope(r, scopeName, attributeName);

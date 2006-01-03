@@ -34,6 +34,7 @@ group ST;
 <@super.imports()>
 import org.antlr.stringtemplate.*;
 import org.antlr.stringtemplate.language.*;
+import java.util.HashMap;
 >>
 
 /** Add this to each rule's return value struct */
@@ -53,6 +54,19 @@ public void setTemplateLib(StringTemplateGroup templateLib) {
 public StringTemplateGroup getTemplateLib() {
   return templateLib;
 }
+/** allows convenient multi-value initialization:
+ *  "new STAttrMap().put(...).put(...)"
+ */
+public static class STAttrMap extends HashMap {
+  public STAttrMap put(String attrName, Object value) {
+    super.put(attrName, value);
+    return this;
+  }
+  public STAttrMap put(String attrName, int value) {
+    super.put(attrName, new Integer(value));
+    return this;
+  }
+}
 >>
 
 rewriteTemplate(alts) ::= <<
@@ -71,17 +85,17 @@ rewriteTemplateAlt() ::= <<
 // <it.description>
 <if(it.pred)>
 if (<it.pred>) {
-    <it.alt>
+    retval.st = <it.alt>;
 }<\n>
 <else>
 {
-    <it.alt>
+    retval.st = <it.alt>;
 }<\n>
 <endif>
 >>
 
 rewriteEmptyTemplate(alts) ::= <<
-retval.st = null;
+null;
 >>
 
 /** Invoke a template with a set of attribute name/value pairs.
@@ -91,18 +105,19 @@ retval.st = null;
  *  template.
  */
 rewriteExternalTemplate(name,args) ::= <<
-StringTemplate <name>_st = templateLib.getInstanceOf("<name>");
-<args:{a | <name>_st.setAttribute("<a.name>", <a.value>);<\n>}>
-retval.st = <name>_st;
+templateLib.getInstanceOf("<name>"<if(args)>,
+  new STAttrMap()<args:{a | .put("<a.name>", <a.value>)}>
+  <endif>)
 >>
 
 /** Invoke an inline template with a set of attribute name/value pairs */
 rewriteInlineTemplate(args, template) ::= <<
-retval.st = new StringTemplate(templateLib, "<template>");
-<args:{a | retval.st.setAttribute("<a.name>", <a.value>);<\n>}>
+new StringTemplate(templateLib, "<template>"<if(args)>,
+  new STAttrMap()<args:{a | .put("<a.name>", <a.value>)}>
+  <endif>)
 >>
 
 /** plain -> {foo} action */
 rewriteAction(action) ::= <<
-retval.st = <action>;<\n>
+<action>
 >>

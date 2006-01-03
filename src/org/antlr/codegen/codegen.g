@@ -224,6 +224,9 @@ grammar[Grammar g,
     if ( g.type!=Grammar.LEXER ) {
 		recognizerST.setAttribute("ASTLabelType", g.getOption("ASTLabelType"));
 	}
+    if ( g.type!=Grammar.TREE_PARSER ) {
+		recognizerST.setAttribute("labelType", g.getOption("TokenLabelType"));
+	}
 	recognizerST.setAttribute("numRules", grammar.getRules().size());
 	outputFileST.setAttribute("numRules", grammar.getRules().size());
 	headerFileST.setAttribute("numRules", grammar.getRules().size());

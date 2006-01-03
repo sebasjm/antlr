@@ -206,6 +206,13 @@ CHANGES
 
 3.0ea8 - ???
 
+* added TokenLabelType for lexer/parser for all token labels
+
+* line numbers for error messages were not updated properly in antlr.g
+  for strings, char literals and <<...>>
+
+* init action in lexer rules was before the type,start,line,... decls.
+
 * Tree grammars can now specify output; I've only tested output=templat
   though.
 

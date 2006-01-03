@@ -43,6 +43,8 @@ import org.antlr.runtime.CharStream;
 import antlr.collections.AST;
 import antlr.RecognitionException;
 import antlr.TokenWithIndex;
+import antlr.TokenStreamRewriteEngine;
+import antlr.TokenStreamException;
 
 /** ANTLR's code generator.
  *
@@ -705,20 +707,20 @@ public class CodeGenerator {
 	 *  be converted to the target languages literals.  For most C-derived
 	 *  languages no translation is needed.
 	 */
-    public String getTokenTypeAsTargetLabel(int ttype) {
+	public String getTokenTypeAsTargetLabel(int ttype) {
 		String name = grammar.getTokenDisplayName(ttype);
 		if ( grammar.type==Grammar.LEXER ) {
 			return target.getTargetCharLiteralFromANTLRCharLiteral(this,name);
 		}
 		// If name is a literal, return the token type instead
-        if ( name.charAt(0)=='\'' ) {
-            return String.valueOf(ttype);
-        }
-        if ( ttype==Label.EOF ) {
-            return String.valueOf(CharStream.EOF);
-        }
-        return name;
-    }
+		if ( name.charAt(0)=='\'' ) {
+			return String.valueOf(ttype);
+		}
+		if ( ttype==Label.EOF ) {
+			return String.valueOf(CharStream.EOF);
+		}
+		return name;
+	}
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7
@@ -758,6 +760,84 @@ public class CodeGenerator {
 	{
 		ActionTranslator translator = new ActionTranslator(this);
 		return translator.translate(ruleName,actionTree);
+	}
+
+	/** Given a template constructor action like $template:CountingStringReader(name{...}) in
+	 *  an action, translate it to the appropriate template constructor
+	 *  from the templateLib.
+	 *
+	 *  This translates a *piece* of the action and hence this routine
+	 *  returns the index of the char at which it stopped parsing.
+	 *  This is a real mess in java.  blech.
+	 */
+	public String translateTemplateConstructor(String ruleName,
+											   GrammarAST actionTree,
+											   int startIndex,
+											   MutableInteger nextCharIndexI)
+	{
+		// first, parse with antlr.g
+		String actionText = actionTree.getText();
+		// silly, but I need to create my own counter...
+		class CountingStringReader extends StringReader {
+			public CountingStringReader(String text) {
+				super(text);
+			}
+			public int n = 0; // how many chars are read
+			public int read() throws IOException {
+				n++;
+				return super.read();
+			}
+		};
+		CountingStringReader sr = new CountingStringReader(actionText);
+		try {
+			sr.skip(startIndex);
+		}
+		catch (IOException ioe) {
+			ErrorManager.internalError("problems reading template action", ioe);
+		}
+		ANTLRLexer lexer = new ANTLRLexer(sr);
+		lexer.setFilename(grammar.getFileName());
+		// use the rewrite engine because we want to buffer up all tokens
+		// in case they have a merged lexer/parser, send lexer rules to
+		// new grammar.
+		lexer.setTokenObjectClass("antlr.TokenWithIndex");
+		TokenStreamRewriteEngine tokenBuffer = new TokenStreamRewriteEngine(lexer);
+		tokenBuffer.discard(ANTLRParser.WS);
+		tokenBuffer.discard(ANTLRParser.ML_COMMENT);
+		tokenBuffer.discard(ANTLRParser.COMMENT);
+		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
+		ANTLRParser parser = new ANTLRParser(tokenBuffer);
+		parser.setFilename(grammar.getFileName());
+		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
+		try {
+			parser.rewrite_template();
+		}
+		catch (RecognitionException re) {
+			System.err.println("can't parse template action");
+		}
+		catch (TokenStreamException tse) {
+			System.err.println("can't parse template action");
+		}
+		GrammarAST rewriteTree = (GrammarAST)parser.getAST();
+
+		// then translate via codegen.g
+		CodeGenTreeWalker gen = new CodeGenTreeWalker();
+		gen.init(grammar);
+		gen.currentRuleName = ruleName;
+		gen.outerAltNum = actionTree.outerAltNum;
+		String code = null;
+		try {
+			StringTemplate st = gen.rewrite_template((AST)rewriteTree);
+			code = st.toString();
+		}
+		catch (RecognitionException re) {
+			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
+							   re);
+		}
+
+		nextCharIndexI.value = startIndex+sr.n; // what char to match next
+
+		return code;
 	}
 
 	// M I S C

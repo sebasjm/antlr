@@ -431,7 +431,7 @@ public class TestCompileAndExecSupport {
 			"        if ( r.st!=null )\n" +
 			"            System.out.print(r.st.toString());\n" +
 			"	 	 else\n" +
-			"            System.out.print(\"empty\");\n" +
+			"            System.out.print(\"\");\n" +
 			"    }\n" +
 			"}"
 			);

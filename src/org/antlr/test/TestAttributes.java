@@ -2078,6 +2078,45 @@ public class TestAttributes extends TestSuite {
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
+	// Templates
+
+	public void testTemplateConstructor() throws Exception {
+		String action = "x = $templates::foo(name={$ID.text});";
+		String expecting = "x = templateLib.getInstanceOf(\"foo\",\n" +
+			"  new STAttrMap().put(\"name\", ID1.getText()));";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n" +
+				"options {\n" +
+				"    output=template;\n" +
+				"}\n" +
+				"\n" +
+				"a : ID {"+action+"}\n" +
+				"  ;\n" +
+				"\n" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+
+		assertEqual(found, expecting);
+
+	}
+
+
 	// S U P P O R T
 
 	protected void checkError(ErrorQueue equeue,
