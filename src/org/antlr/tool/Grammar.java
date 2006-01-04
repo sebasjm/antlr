@@ -149,9 +149,10 @@ public class Grammar {
 	public static final Set legalOptions =
 			new HashSet() {
 				{add("language"); add("tokenVocab");
-				 add("output"); add("ASTLabelType");
-				 add("TokenLabelType");
-				 add("superClass");
+				add("output"); add("ASTLabelType");
+				add("TokenLabelType");
+				add("superClass");
+				add("filter");
 				}
 			};
 

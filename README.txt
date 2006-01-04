@@ -206,6 +206,16 @@ CHANGES
 
 3.0ea8 - ???
 
+* filter=true mode for lexers; can do this now...upon mismatch, just
+  consumes a char and tries again:
+lexer grammar FuzzyJava;
+options {filter=true;}
+
+FIELD
+    :   TYPE WS? name=ID WS? (';'|'=')
+        {System.out.println("found var "+$name.text);}
+    ;
+
 * refactored char streams so ANTLRFileStream is now a subclass of
   ANTLRStringStream.
 

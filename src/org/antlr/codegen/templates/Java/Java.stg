@@ -70,7 +70,8 @@ import java.util.HashMap;
 <recognizer>
 >>
 
-lexer(name, tokens, rules, numRules, cyclicDFAs, labelType="Token") ::= <<
+lexer(name, tokens, rules, numRules, cyclicDFAs, labelType="Token",
+      filterMode) ::= <<
 public class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <actions.lexer.members>
@@ -78,31 +79,49 @@ public class <name> extends Lexer {
     public <name>(CharStream input) {
         super(input);
     }
-    public Token nextToken() {
-        token=null;
-retry:
-        while (true) {
-            if ( input.LA(1)==CharStream.EOF ) {
-                return Token.EOF_TOKEN;
-            }	
-            try {
-                mTokens();
-                break retry;
-            }
-            catch (RecognitionException re) {
-                reportError(re);
-                recover(re);
-            }
-        }
-        return token;
-    }
 
+<if(filterMode)>
+    <filteringNextToken()>
+<endif>
     <rules; separator="\n\n">
 
     <synpreds:{p | <lexerSynpred(name=p)>}>
 
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
+}
+>>
+
+/** A override of Lexer.nextToken() that backtracks over mTokens() looking
+ *  for matches.  No error can be generated upon error; just rewind, consume
+ *  a token and then try again.  backtracking needs to be set as well.
+ */
+filteringNextToken() ::= <<
+public Token nextToken() {
+    token=null;
+    while (true) {
+        if ( input.LA(1)==CharStream.EOF ) {
+            return Token.EOF_TOKEN;
+        }
+        try {
+            int m = input.mark();
+            backtracking=1;
+            failed=false;
+            mTokens();
+            backtracking=0;
+            input.rewind(m);
+            if ( failed ) {
+                input.consume(); <! // advance one char and try again !>
+            }
+            else {
+                mTokens();
+                return token;
+            }
+        }
+        catch (RecognitionException re) {
+            ; // can't happen in backtracking mode
+        }
+    }
 }
 >>
 

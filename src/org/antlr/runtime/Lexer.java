@@ -51,6 +51,29 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		this.input = input;
 	}
 
+	/** Return a token from this source; i.e., match a token on the char
+	 *  stream.
+	 */
+    public Token nextToken() {
+        token=null;
+        while (true) {
+            if ( input.LA(1)==CharStream.EOF ) {
+                return Token.EOF_TOKEN;
+            }
+            try {
+                mTokens();
+                return token;
+            }
+            catch (RecognitionException re) {
+                reportError(re);
+                recover(re);
+            }
+        }
+    }
+
+	/** This is the lexer entry point that sets instance var 'token' */
+	public abstract void mTokens() throws RecognitionException;
+
 	/** Set the char stream and reset the lexer */
 	public void setCharStream(CharStream input) {
 		this.input = input;

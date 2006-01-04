@@ -306,7 +306,10 @@ public class CodeGenerator {
 		headerFileST.setAttribute("actions", grammar.getActions());
 		outputFileST.setAttribute("actions", grammar.getActions());
 
-		boolean canBacktrack = grammar.getSyntacticPredicates()!=null;
+		boolean filterMode = grammar.getOption("filter")!=null &&
+						 	 grammar.getOption("filter").equals("true");
+		boolean canBacktrack = grammar.getSyntacticPredicates()!=null ||
+							   filterMode;
 		outputFileST.setAttribute("backtracking", new Boolean(canBacktrack));
 		headerFileST.setAttribute("backtracking", new Boolean(canBacktrack));
 		outputFileST.setAttribute("memoize", new Boolean(memoize&&canBacktrack));
@@ -326,6 +329,8 @@ public class CodeGenerator {
 			recognizerST = templates.getInstanceOf("lexer");
 			outputFileST.setAttribute("LEXER", new Boolean(true));
 			headerFileST.setAttribute("LEXER", new Boolean(true));
+			recognizerST.setAttribute("filterMode",
+									  new Boolean(filterMode));
 		}
 		else if ( grammar.type==Grammar.PARSER ||
 			grammar.type==Grammar.COMBINED )
