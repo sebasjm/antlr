@@ -27,11 +27,19 @@
 */
 package org.antlr.runtime;
 
+import java.io.IOException;
+import java.io.File;
+import java.io.FileReader;
 import java.util.List;
 import java.util.ArrayList;
 
+/** A pretty quick CharStream that pulls all data from an array
+ *  directly.  Every method call counts in the lexer.  Java's
+ *  strings aren't very good so I'm avoiding.
+ */
 public class ANTLRStringStream implements CharStream {
-    protected String input;
+	/** The data being scanned */
+	protected char[] data;
 
 	/** 0..n-1 index into string of next char */
 	protected int p=0;
@@ -42,47 +50,74 @@ public class ANTLRStringStream implements CharStream {
 	/** The index of the character relative to the beginning of the line 0..n-1 */
 	protected int charPositionInLine = 0;
 
+	/** tracks how deep mark() calls are nested */
+	protected int markDepth = 0;
+
+	/** A list of CharStreamState objects that tracks the stream state
+	 *  values line, charPositionInLine, and p that can change as you
+	 *  move through the input stream.  Indexed from 1..markDepth.
+	 */
 	protected List markers;
 
-    public ANTLRStringStream(String input) {
-        this.input = input;
-		markers = new ArrayList(1);
-		markers.add(new CharStreamState());
-    }
+	public ANTLRStringStream() {
+		markers = new ArrayList();
+		markers.add(null); // depth 0 means no backtracking, leave blank
+	}
+
+	/** Copy data in string to a local char array */
+	public ANTLRStringStream(String input) {
+		this();
+		this.data = input.toCharArray();
+	}
+
+	/** This is the preferred constructor as no data is copied */
+	public ANTLRStringStream(char[] data) {
+		this();
+		this.data = data;
+	}
+
+	/** Reset the stream so that it's in the same state it was
+	 *  when the object was created *except* the data array is not
+	 *  touched.
+	 */
+	public void reset() {
+		p = 0;
+		line = 1;
+		charPositionInLine = 0;
+		markDepth = 0;
+	}
 
     public void consume() {
-        if ( p< input.length() ) {
+		//System.out.println("prev p="+p+", c="+(char)data[p]);
+        if ( p < data.length ) {
 			charPositionInLine++;
-			if ( input.charAt(p)=='\n' ) {
+			if ( data[p]=='\n' ) {
+				/*
+				System.out.println("newline char found on line: "+line+
+								   "@ pos="+charPositionInLine);
+				*/
 				line++;
 				charPositionInLine=0;
 			}
-			p++;
+            p++;
+			//System.out.println("p moves to "+p+" (c='"+(char)data[p]+"')");
         }
     }
 
     public int LA(int i) {
-        if ( p >= input.length() ) {
-            //System.out.println("LA("+i+")=EOF; p="+p);
+        if ( (p+i-1) >= data.length ) {
+            //System.out.println("char LA("+i+")=EOF; p="+p);
             return CharStream.EOF;
         }
-        //System.out.println("LA("+i+")="+input.charAt(p+i-1)+"; p="+p);
-        return input.charAt(p+i-1);
+        //System.out.println("char LA("+i+")="+data.charAt(p+i-1)+"; p="+p);
+        return data[p+i-1];
     }
 
 	public int LT(int i) {
 		return LA(i);
 	}
 
-    public int mark() {
-		CharStreamState state = (CharStreamState)markers.get(0);
-		state.p = p;
-		state.line = line;
-		state.charPositionInLine = charPositionInLine;
-        return 0;
-    }
-
-    /** Return the current input symbol index 0..n where n indicates the
+	/** Return the current input symbol index 0..n where n indicates the
      *  last symbol has been read.
      */
     public int index() {
@@ -90,23 +125,57 @@ public class ANTLRStringStream implements CharStream {
     }
 
 	public int size() {
-		return input.length();
+		return data.length;
 	}
 
-    public void rewind(int m) {
-		CharStreamState state = (CharStreamState)markers.get(m);
-		p = state.p;
-		line = state.line;
-		charPositionInLine = state.charPositionInLine;
+	public int mark() {
+		markDepth++;
+		CharStreamState state = null;
+		if ( markDepth>=markers.size() ) {
+			state = new CharStreamState();
+			markers.add(state);
+		}
+		else {
+			state = (CharStreamState)markers.get(markDepth);
+		}
+		state.p = p;
+		state.line = line;
+		state.charPositionInLine = charPositionInLine;
+        return markDepth;
     }
 
+    public void rewind(int m) {
+		release(m);
+		CharStreamState state = (CharStreamState)markers.get(m);
+		// restore stream state
+		seek(state.p);
+		line = state.line;
+		charPositionInLine = state.charPositionInLine;
+	}
+
+	public void release(int marker) {
+		// unwind any other markers made after m and release m
+		markDepth = marker;
+		// release this marker
+		markDepth--;
+	}
+
+	/** consume() ahead until p==index; can't just set p=index as we must
+	 *  update line and charPositionInLine.
+	 */
 	public void seek(int index) {
-		// TODO: broken.  How can we move forward without knowing new line/pos?
-		throw new NoSuchMethodError("not implemented yet");
+		if ( index<=p ) {
+			p = index; // just jump; don't update stream state (line, ...)
+			return;
+		}
+		// seek forward, consume until p hits index
+		while ( p<index ) {
+			consume();
+		}
 	}
 
 	public String substring(int start, int stop) {
-		return input.substring(start,stop+1);
+		return new String(data,start,stop-start+1);
 	}
 
 	public int getLine() {
@@ -124,8 +193,4 @@ public class ANTLRStringStream implements CharStream {
 	public void setCharPositionInLine(int pos) {
 		this.charPositionInLine = pos;
 	}
-
-	public String getSourceName() {
-		return "<string>";
-	}	
 }

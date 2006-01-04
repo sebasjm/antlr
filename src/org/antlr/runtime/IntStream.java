@@ -51,15 +51,33 @@ public interface IntStream {
 
 	/** Reset the stream so that next call to index would return marker.
 	 *  The marker will usually be index() but it doesn't have to be.  It's
-	 *  just a marker to indicate what state the stream was in.
+	 *  just a marker to indicate what state the stream was in.  This is
+	 *  essentially calling release() and seek().  If there are markers
+	 *  created after this marker argument, this routine must unroll them
+	 *  like a stack.  Assume the state the stream was in when this marker
+	 *  was created.
 	 */
 	void rewind(int marker);
+
+	/** You may want to commit to a backtrack but don't want to force the
+	 *  stream to keep bookkeeping objects around for a marker that is
+	 *  no longer necessary.  This will have the same behavior as
+	 *  rewind() except it releases resources without the backward seek.
+	 */
+	void release(int marker);
 
 	/** Set the input cursor to the position indicated by index.  This is
 	 *  normally used to seek ahead in the input stream.  No buffering is
 	 *  required to do this unless you know your stream will use seek to
-	 *  move backwards.  This is different from rewind in its multi-directional
-	 *  ability and in that its argument is strictly an input cursor (index).
+	 *  move backwards such as when backtracking.
+	 *
+	 *  This is different from rewind in its multi-directional
+	 *  requirement and in that its argument is strictly an input cursor (index).
+	 *
+	 *  For char streams, seeking forward must update the stream state such
+	 *  as line number.  For seeking backwards, you will be presumably
+	 *  backtracking using the mark/rewind mechanism that restores state and
+	 *  so this method does not need to update state when seeking backwards.
 	 *
 	 *  Currently, this method is only used for efficient backtracking, but
 	 *  in the future it may be used for incremental parsing.

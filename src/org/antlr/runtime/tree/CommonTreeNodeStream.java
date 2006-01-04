@@ -204,7 +204,11 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	}
 
 	public int mark() {
-		return 0;
+		throw new NoSuchMethodError("can't rewind trees yet");
+	}
+
+	public void release(int marker) {
+		throw new NoSuchMethodError("can't rewind trees yet");
 	}
 
 	public int index() {

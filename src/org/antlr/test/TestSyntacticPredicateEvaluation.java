@@ -229,6 +229,58 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testTripleNestedPredInLexer() throws Exception {
+		String grammar =
+			"grammar t;\n" +
+			"s : (.)+ {System.out.println(\"done\");} ;\n" +
+			"EXPR\n" +
+			"options {\n" +
+			"  k=1;\n" +
+			"}\n" +
+			"@init {System.out.println(\"enter expr \"+(char)input.LT(1));}\n" +
+			"  : (ATOM 'x') => ATOM 'x' {System.out.println(\"ATOM x\");}\n" +
+			"  | ATOM {System.out.println(\"ATOM\");}\n" +
+			";\n" +
+			"fragment ATOM\n" +
+			"@init {System.out.println(\"enter atom \"+(char)input.LT(1));}\n" +
+			"   : '(' EXPR ')'\n" +
+			"   | INT\n" +
+			"   ;\n" +
+			"fragment INT: '0'..'9'+ ;\n" +
+			"fragment WS : (' '|'\\n')+ \n" +
+			"   ;\n" ;
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
+												 "s", "((34)x)x", false);
+		String expecting =
+			"enter expr (\n" +
+				"enter atom (\n" +
+				"enter expr (\n" +
+				"enter atom (\n" +
+				"enter expr 3\n" +
+				"enter atom 3\n" +
+				"enter atom 3\n" +
+				"enter atom (\n" +
+				"enter expr 3\n" +
+				"enter atom 3\n" +
+				"enter atom 3\n" +
+				"enter atom (\n" +
+				"enter expr (\n" +
+				"enter atom (\n" +
+				"enter expr 3\n" +
+				"enter atom 3\n" +
+				"enter atom 3\n" +
+				"enter atom (\n" +
+				"enter expr 3\n" +
+				"enter atom 3\n" +
+				"enter atom 3\n" +
+				"ATOM\n" +
+				"ATOM x\n" +
+				"ATOM x\n" +
+				"done\n";
+		assertEqual(found, expecting);
+	}
+
 	public void testSynPredWithOutputTemplate() throws Exception {
 		// really just seeing if it will compile
 		String grammar =

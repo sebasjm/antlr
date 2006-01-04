@@ -300,6 +300,10 @@ public class CommonTokenStream implements TokenStream {
         return index();
     }
 
+	public void release(int marker) {
+		// no resources to release
+	}
+
 	public int size() {
 		return tokens.size();
 	}

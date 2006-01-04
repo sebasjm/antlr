@@ -206,6 +206,11 @@ CHANGES
 
 3.0ea8 - ???
 
+* refactored char streams so ANTLRFileStream is now a subclass of
+  ANTLRStringStream.
+
+* char streams for lexer now allowed nested backtracking in lexer.
+
 * added TokenLabelType for lexer/parser for all token labels
 
 * line numbers for error messages were not updated properly in antlr.g

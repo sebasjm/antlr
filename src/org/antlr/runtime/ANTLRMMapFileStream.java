@@ -35,6 +35,10 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.Charset;
 
 // TODO: this should be special case of ANTLRStringStream right?
+// Actually as of 01/03/2005, TJP says that this is not really
+// that useful unless you have a file bigger than your memory
+// that you need to process AND you need to backtrack on it.
+// leave this here for now.
 public class ANTLRMMapFileStream implements CharStream {
     protected int p=0;
     String fileName;
@@ -105,6 +109,10 @@ public class ANTLRMMapFileStream implements CharStream {
     public int mark() {
         return index(); // already buffered, just return index
     }
+
+	public void release(int marker) {
+		throw new NoSuchMethodError("not implemented yet");
+	}
 
     /** Return the current input symbol index 0..n where n indicates the
      *  last symbol has been read.

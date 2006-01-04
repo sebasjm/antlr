@@ -30,33 +30,18 @@ package org.antlr.runtime;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileReader;
-import java.util.List;
-import java.util.ArrayList;
 
-// TODO: this should be special case of ANTLRStringStream right?
-public class ANTLRFileStream implements CharStream {
+/** This is a char buffer stream that is loaded from a file
+ *  all at once when you construct the object.
+ */
+public class ANTLRFileStream extends ANTLRStringStream {
     protected String fileName;
-
-	/** 0..n-1 index into string of next char */
-	protected int p=0;
-
-	/** line number 1..n within the input */
-	protected int line = 1;
-
-	/** The index of the character relative to the beginning of the line 0..n-1 */
-	protected int charPositionInLine = 0;
-
-    protected char[] data;
-
-	protected List markers;
 
 	public ANTLRFileStream() {
 	}
 
 	public ANTLRFileStream(String fileName) throws IOException {
 		load(fileName);
-		markers = new ArrayList(1);
-		markers.add(new CharStreamState());
 	}
 
 	public void load(String fileName) throws IOException {
@@ -75,92 +60,6 @@ public class ANTLRFileStream implements CharStream {
 			}
 		}
     }
-
-	public void reset() {
-		line = 1;
-		charPositionInLine = 0;
-	}
-
-    public void consume() {
-		//System.out.println("prev p="+p+", c="+(char)data[p]);
-        if ( p < data.length ) {
-			charPositionInLine++;
-			if ( data[p]=='\n' ) {
-				/*
-				System.out.println("newline char found on line: "+line+
-								   "@ pos="+charPositionInLine);
-				*/
-				line++;
-				charPositionInLine=0;
-			}
-            p++;
-			//System.out.println("p moves to "+p+" (c='"+(char)data[p]+"')");
-        }
-    }
-
-    public int LA(int i) {
-        if ( (p+i-1) >= data.length ) {
-            //System.out.println("char LA("+i+")=EOF; p="+p);
-            return CharStream.EOF;
-        }
-        //System.out.println("char LA("+i+")="+data.charAt(p+i-1)+"; p="+p);
-        return data[p+i-1];
-    }
-
-	public int LT(int i) {
-		return LA(i);
-	}
-
-	public int mark() {
-		CharStreamState state = (CharStreamState)markers.get(0);
-		state.p = p;
-		state.line = line;
-		state.charPositionInLine = charPositionInLine;
-        return 0;
-    }
-
-    /** Return the current input symbol index 0..n where n indicates the
-     *  last symbol has been read.
-     */
-    public int index() {
-        return p;
-    }
-
-	public int size() {
-		return data.length;
-	}
-
-    public void rewind(int m) {
-		CharStreamState state = (CharStreamState)markers.get(m);
-		p = state.p;
-		line = state.line;
-		charPositionInLine = state.charPositionInLine;
-	}
-
-	public void seek(int index) {
-		// TODO: broken.  How can we move forward without knowing new line/pos?
-		throw new NoSuchMethodError("not implemented yet");
-	}
-
-	public String substring(int start, int stop) {
-		return new String(data,start,stop-start+1);
-	}
-
-	public int getLine() {
-		return line;
-	}
-
-	public int getCharPositionInLine() {
-		return charPositionInLine;
-	}
-
-	public void setLine(int line) {
-		this.line = line;
-	}
-
-	public void setCharPositionInLine(int pos) {
-		this.charPositionInLine = pos;
-	}
 
 	public String getSourceName() {
 		return fileName;

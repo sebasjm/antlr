@@ -107,6 +107,9 @@ public class DebugTokenStream implements TokenStream {
 		input.rewind(marker);
 	}
 
+	public void release(int marker) {
+	}
+
 	public void seek(int index) {
 		// TODO: implement seek in dbg interface
 		// db.seek(index);
