@@ -595,6 +595,105 @@ public class TestAttributes extends TestSuite {
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
+	public void testIndexedGlobalScope() throws Exception {
+		String action = "$Symbols[-1]::names.add($id.text);";
+		String expecting =
+			"((Symbols_scope)Symbols_stack.elementAt(Symbols_stack.size()-1-1)).names.add(id.getText());";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void test0IndexedGlobalScope() throws Exception {
+		String action = "$Symbols[0]::names.add($id.text);";
+		String expecting =
+			"((Symbols_scope)Symbols_stack.elementAt(0)).names.add(id.getText());";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
+	public void testAbsoluteIndexedGlobalScope() throws Exception {
+		String action = "$Symbols[3]::names.add($id.text);";
+		String expecting =
+			"((Symbols_scope)Symbols_stack.elementAt(3)).names.add(id.getText());";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("a",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
 	public void testScopeAndAttributeWithUnderscore() throws Exception {
 		String action = "$foo_bar::a_b;";
 		String expecting = "((foo_bar_scope)foo_bar_stack.peek()).a_b;";

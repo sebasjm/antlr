@@ -928,15 +928,24 @@ parameterScope(scope) ::= <<
  *  objects so this translation could query them.  So, translation of
  *  $x.y to executable code occurs before recognizerST.toString() occurs.
  *  I.e., actions are just text strings during final code generation.
- */
 globalAttributeRef(scope,attr) ::= <<
 ((<scope>)<scope>_stack.peek()).<attr.name>
 >>
+ */
 
 parameterAttributeRef(attr) ::= "<attr.name>"
 
-ruleScopeAttributeRef(scope,attr) ::=
-    "((<scope>_scope)<scope>_stack.peek()).<attr.name>"
+scopeAttributeRef(scope,attr,index,negIndex) ::= <<
+<if(negIndex)>
+((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()<negIndex>-1)).<attr.name>
+<else>
+<if(index)>
+((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>
+<else>
+((<scope>_scope)<scope>_stack.peek()).<attr.name>
+<endif>
+<endif>
+>>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
  *  to stack itself not top of stack.  This is useful for predicates

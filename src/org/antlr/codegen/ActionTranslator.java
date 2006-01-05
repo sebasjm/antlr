@@ -82,6 +82,14 @@ import antlr.CommonToken;
  * 			s	:	{$r::i; $Symbols::names;}
  * 				;
  *
+ * 			To access deeper (than top of stack) scopes, use the notation:
+ *
+ * 			$x[-1]::y previous (just under top of stack)
+ * 			$x[-i]::y top of stack - i where the '-' MUST BE PRESENT;
+ * 					  i.e., i cannot simply be negative without the '-' sign!
+ * 			$x[i]::y  absolute index i (0..size-1)
+ * 			$x[0]::y  is the absolute 0 indexed element (bottom of the stack)
+ *
  *  This is the new syntax as of 11/23/2005 and should simplify things a bit
  *  as all dynamic scope stuff is accessed with a different operator.  Actually
  *  all it does is make the set of scopes to search for $y a bit smaller.  Oh,
@@ -302,13 +310,26 @@ public class ActionTranslator {
 			tokenRefsInAlt = r.getTokenRefsInAlt(scopeName, actionAST.outerAltNum);
 		}
 		int afterScopeIDIndex = c;
+		String scopeIndexExpr = null;
 		boolean hasDot =
 			(c+1)<action.length() &&
-			 action.charAt(c)=='.' && Character.isLetter(action.charAt(c+1));
+				action.charAt(c)=='.' && Character.isLetter(action.charAt(c+1));
 		boolean hasDoubleColon =
 			(c+2)<action.length() &&
 			 action.charAt(c)==':' && action.charAt(c+1)==':' &&
 			 Character.isLetter(action.charAt(c+2));
+		if ( c<action.length() && action.charAt(c)=='[' ) { // $x[...]::y case
+			int rbrack = action.indexOf(']',c);
+			scopeIndexExpr = action.substring(c+1,rbrack);
+			rbrack++; // jump to '::' hopefully
+			if ( (rbrack+2)<action.length() &&
+				action.charAt(rbrack)==':' && action.charAt(rbrack+1)==':' &&
+				Character.isLetter(action.charAt(rbrack+2)) )
+			{
+				hasDoubleColon = true;
+			}
+			afterScopeIDIndex = rbrack; // should point to the colon
+		}
 
 		String attributeName = null;
 		int dotIndex = 0;
@@ -347,6 +368,7 @@ public class ActionTranslator {
 										 actionAST,
 										 attrScope,
 										 scopeName,
+										 scopeIndexExpr,
 										 buf,
 										 ruleRefsInAlt);
 		}
@@ -409,10 +431,20 @@ public class ActionTranslator {
 		return c;
 	}
 
-	/** Handle $x::y and plain $x where x is dynamic scope.  Warn if
+	/** Handle $x::y and plain $x where x is dynamic scopeName.  Warn if
 	 *  ambig ref where x is also a rule ref in the enclosing alt.
 	 */
-	protected int parseDynamicAttribute(boolean hasDoubleColon, int c, String action, Rule r, GrammarAST actionAST, AttributeScope dynamicScope, String scope, StringBuffer buf, List ruleRefsInAlt) {
+	protected int parseDynamicAttribute(boolean hasDoubleColon,
+										int c,
+										String action,
+										Rule r,
+										GrammarAST actionAST,
+										AttributeScope dynamicScope,
+										String scopeName,
+										String scopeIndexExpr,
+										StringBuffer buf,
+										List ruleRefsInAlt)
+	{
 		String attrRef;
 		if ( hasDoubleColon ) {
 			// $x::y
@@ -420,39 +452,45 @@ public class ActionTranslator {
 			String attributeName = getID(action, c);
 			c += attributeName.length();
 			attrRef =
-				translateDynamicAttributeReference(r, actionAST, dynamicScope, scope, attributeName);
+				translateDynamicAttributeReference(r,
+												   actionAST,
+												   dynamicScope,
+												   scopeName,
+												   attributeName,
+												   scopeIndexExpr);
 			buf.append(attrRef);
 			return c;
 		}
 		else if ( ruleRefsInAlt==null ) {
-			// isolated $x scope ref (means access stack of scopes itself)
+			// isolated $x scopeName ref (means access stack of scopes itself)
 			// must not be a rule reference to x in the enclosing alt
 			StringTemplate refST =
 				generator.templates.getInstanceOf("isolatedDynamicScopeRef");
-			refST.setAttribute("scope", scope);
+			refST.setAttribute("scope", scopeName);
 			buf.append(refST.toString());
 			return c;
 		}
 		else {
 			// ambiguous reference to $rule since rule is also referenced
 			// in the enclosing alt.
-			// y of $x::y does not exist (not an attribute in scope x)
+			// y of $x::y does not exist (not an attribute in scopeName x)
 			ErrorManager.grammarError(ErrorManager.MSG_AMBIGUOUS_RULE_SCOPE,
 									  grammar,
 									  actionAST.getToken(),
-									  scope);
+									  scopeName);
 			return c;
 		}
 	}
 
-	/** Translate $x::y where x is a rule name or a global shared dynamic
-	 *  scope name.
+	/** Translate $x::y or $x[i]::y where x is a rule name or a global
+	 *  shared dynamic scope name.
 	 */
 	protected String translateDynamicAttributeReference(Rule r,
 														GrammarAST actionAST,
 														AttributeScope scope,
 														String scopeName,
-														String attributeName)
+														String attributeName,
+														String scopeIndexExpr)
 	{
 		antlr.Token actionToken = actionAST.getToken();
 		String ref = ATTRIBUTE_REF_CHAR+scopeName+"::"+attributeName;
@@ -478,9 +516,17 @@ public class ActionTranslator {
 		}
 		// y is valid attribute in scope x at this point.
 		StringTemplate refST =
-			generator.templates.getInstanceOf("ruleScopeAttributeRef");
+			generator.templates.getInstanceOf("scopeAttributeRef");
 		refST.setAttribute("scope", scopeName);
 		refST.setAttribute("attr", attribute);
+		if ( scopeIndexExpr!=null ) {
+			if ( scopeIndexExpr.startsWith("-") ) {
+				refST.setAttribute("negIndex", scopeIndexExpr);
+			}
+			else {
+				refST.setAttribute("index", scopeIndexExpr);
+			}
+		}
 		return refST.toString();
 	}
 

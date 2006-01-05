@@ -206,6 +206,10 @@ CHANGES
 
 3.0ea8 - ???
 
+* $x[i]::y and $x[-i]::y notation for accesssing absolute scope stack
+  indexes and relative negative scopes.  $x[-1]::y is the y attribute
+  of the previous scope (stack top - 1).
+
 * filter=true mode for lexers; can do this now...upon mismatch, just
   consumes a char and tries again:
 lexer grammar FuzzyJava;

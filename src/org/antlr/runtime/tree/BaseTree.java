@@ -46,7 +46,6 @@ public abstract class BaseTree implements Tree {
 	/** Create a new node from an existing node does nothing for BaseTree
 	 *  as there are no fields other than the children list, which cannot
 	 *  be copied as the children are not considered part of this node. 
-	 * @param node
 	 */
 	public BaseTree(Tree node) {
 	}

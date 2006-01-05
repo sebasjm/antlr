@@ -10,6 +10,8 @@ import org.antlr.runtime.CommonToken;
  *
  *  NOTE: When constructing trees, ANTLR can build any kind of tree; it can
  *  even use Token objects as trees if you add a child list to your tokens.
+ *
+ *  This is a tree node without any payload; just navigation and factory stuff.
  */
 public interface Tree {
 	public static final Tree INVALID_NODE = new CommonTree(Token.INVALID_TOKEN);

@@ -53,8 +53,8 @@ public interface TreeAdaptor {
 	 *  a parser or AST rewrite in a tree parser.  This catches all
 	 *  create() calls other than the specific create(Token), which you
 	 *  will see in a parser creating trees.
-	 */
 	public Object create(Object node);
+	 */
 
 	/** Duplicate tree recursively, using dupNode() for each node */
 	public Object dupTree(Object tree);
