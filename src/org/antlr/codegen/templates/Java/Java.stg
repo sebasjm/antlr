@@ -292,7 +292,7 @@ ruleCleanUp() ::= <<
 <ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
 <ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval.stop = (<labelType>)input.LT(-1);
+retval.stop = input.LT(-1);
 <endif>
 <if(memoize)>
 <if(backtracking)>
