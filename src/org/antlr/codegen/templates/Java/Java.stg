@@ -252,7 +252,7 @@ ruleDeclarations() ::= <<
 <ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval = new <returnType()>();
-retval.start = (<labelType>)input.LT(1);<\n>
+retval.start = input.LT(1);<\n>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
