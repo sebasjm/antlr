@@ -128,7 +128,7 @@ public Token nextToken() {
 /** How to generate a parser */
 genericParser(name, scopes, tokens, tokenNames, rules, numRules,
               cyclicDFAs, bitsets, inputStreamType, superClass,
-              ASTLabelType="Object", labelType) ::= <<
+              ASTLabelType="Object", labelType, members) ::= <<
 public class <name> extends <@superClassName><superClass><@end> {
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
@@ -146,7 +146,7 @@ public class <name> extends <@superClassName><superClass><@end> {
 
     public String[] getTokenNames() { return tokenNames; }
 
-    <actions.parser.members>
+    <members>
 
     <rules; separator="\n\n">
 
@@ -161,14 +161,14 @@ public class <name> extends <@superClassName><superClass><@end> {
 }
 >>
 
-parser(name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
+parser(name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="TokenStream", ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser") ::= <<
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser", members={<actions.treeparser.members>}) ::= <<
 <genericParser(inputStreamType="TreeNodeStream", ...)>
 >>
 
