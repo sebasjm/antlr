@@ -910,7 +910,7 @@ ruleLabelDef(label) ::= <<
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-public static class <returnType()> extends <if(TREE_PARSER)>Tree<endif>RuleReturnScope {
+public static class <returnType()> extends <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope {
     <scope.attributes:{public <it.decl>;}; separator="\n">
     <@ruleReturnMembers()>
 };
