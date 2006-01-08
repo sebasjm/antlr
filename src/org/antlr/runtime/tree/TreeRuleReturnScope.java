@@ -28,17 +28,14 @@
 package org.antlr.runtime.tree;
 
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.runtime.RuleReturnScope;
 
-/** This is identical to the RuleReturnScope except that
+/** This is identical to the ParserRuleReturnScope except that
  *  the start/stop properties are tree nodes not Token objects
  *  when you are parsing trees.  To be generic the tree node types
  *  have to be Object :(
  */
-public class TreeRuleReturnScope {
+public class TreeRuleReturnScope extends RuleReturnScope {
 	/** Start and stop nodes matched for a rule */
 	public Object start, stop;
-	/** Has a value potentially if output=AST; */
-	public Object getTree() { return null; }
-	/** Has a value potentially if output=template; */
-	public StringTemplate getTemplate() { return null; }
 }

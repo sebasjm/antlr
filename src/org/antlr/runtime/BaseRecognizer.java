@@ -544,7 +544,7 @@ public abstract class BaseRecognizer {
 	 *  out the .st property.  Useful when converting from
 	 *  list labels to template attributes:
 	 *
-	 *    a : ids+=ID -> foo(ids={toTemplates($ids)})
+	 *    a : ids+=rule -> foo(ids={toTemplates($ids)})
 	 *      ;
 	 */
 	public List toTemplates(List retvals) {

@@ -46,10 +46,6 @@ import org.antlr.stringtemplate.StringTemplate;
  *  I do not use getters for fields of objects that are used simply to
  *  group values such as this aggregate.
  */
-public class RuleReturnScope {
+public class ParserRuleReturnScope extends RuleReturnScope {
 	public Token start, stop;
-	/** Has a value potentially if output=AST; */
-	public Object getTree() { return null; }
-	/** Has a value potentially if output=template; */
-	public StringTemplate getTemplate() { return null; }
 }
