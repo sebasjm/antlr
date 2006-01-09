@@ -31,6 +31,10 @@ package org.antlr.runtime;
 public interface CharStream extends IntStream {
     public static final int EOF = -1;
 
+	/** For infinite streams, you don't need this; primarily I'm providing
+	 *  a useful interface for action code.  Just make sure actions don't
+	 *  use this on streams that don't support it.
+	 */
 	public String substring(int start, int stop);
 
 	/** Get the ith character of lookahead.  This is the same usually as

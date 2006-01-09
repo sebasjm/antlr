@@ -99,6 +99,7 @@ public class <name> extends Lexer {
 filteringNextToken() ::= <<
 public Token nextToken() {
     token=null;
+    tokenStartCharIndex = getCharIndex();
     while (true) {
         if ( input.LA(1)==CharStream.EOF ) {
             return Token.EOF_TOKEN;

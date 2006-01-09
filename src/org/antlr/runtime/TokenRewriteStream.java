@@ -62,7 +62,7 @@ import java.util.*;
  *      ...
  *      input.insertAfter(t, "text to put after t");}
  * 		input.insertAfter(u, "text after u");}
- * 		System.out.println(input.toString());
+ * 		System.out.println(tokens.toString());
  *
  *  Actually, you have to cast the 'input' to a TokenRewriteStream. :(
  *
@@ -72,10 +72,10 @@ import java.util.*;
  *  useful for generating a C file and also its header file--all from the
  *  same buffer:
  *
- *      input.insertAfter("pass1", t, "text to put after t");}
- * 		input.insertAfter("pass2", u, "text after u");}
- * 		System.out.println(input.toString("pass1"));
- * 		System.out.println(input.toString("pass2"));
+ *      tokens.insertAfter("pass1", t, "text to put after t");}
+ * 		tokens.insertAfter("pass2", u, "text after u");}
+ * 		System.out.println(tokens.toString("pass1"));
+ * 		System.out.println(tokens.toString("pass2"));
  *
  *  If you don't use named rewrite streams, a "default" stream is used as
  *  the first example shows.

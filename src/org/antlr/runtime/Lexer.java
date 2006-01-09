@@ -44,6 +44,12 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 */
     protected Token token;
 
+	/** What character index in the stream did the current token start at?
+	 *  Needed, for example, to get the text for current token.  Set at
+	 *  the start of nextToken.
+ 	 */
+	protected int tokenStartCharIndex = -1;
+
 	public Lexer() {
 	}
 
@@ -56,7 +62,8 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 */
     public Token nextToken() {
         token=null;
-        while (true) {
+		tokenStartCharIndex = getCharIndex();
+		while (true) {
             if ( input.LA(1)==CharStream.EOF ) {
                 return Token.EOF_TOKEN;
             }
@@ -78,6 +85,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	public void setCharStream(CharStream input) {
 		this.input = input;
 		token = null;
+		tokenStartCharIndex = -1;
 	}
 
 	public void emit(Token token) {
@@ -160,6 +168,11 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	/** What is the index of the current character of lookahead? */
 	public int getCharIndex() {
 		return input.index();
+	}
+
+	/** Return the text matched so far for the current token. */
+	public String getText() {
+		return input.substring(tokenStartCharIndex,getCharIndex()-1);
 	}
 
 	/** Report a recognition problem.  Java is not polymorphic on the
