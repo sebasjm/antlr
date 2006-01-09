@@ -1263,7 +1263,7 @@ public class Grammar {
 	 *  return the int value of 'a'. Convert escape sequences here also.
 	 *  ANTLR's antlr.g parser does not convert escape sequences.
 	 *
-	 *  11/26/2005: I changed literals to always be "..." even for chars.
+	 *  11/26/2005: I changed literals to always be '...' even for strings.
 	 *  This routine still works though.
      */
     public static int getCharValueFromGrammarCharLiteral(String literal) {
@@ -1321,7 +1321,6 @@ public class Grammar {
 				}
 				else {
 					buf.append((char)ANTLRLiteralEscapedCharValue[c]); // normal \x escape
-					i++;
 				}
 			}
 			else {
