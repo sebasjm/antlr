@@ -27,17 +27,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.*;
-import org.antlr.analysis.State;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.DFAOptimizer;
 import org.antlr.codegen.CodeGenerator;
+import org.antlr.test.unit.FailedAssertionException;
+import org.antlr.test.unit.TestSuite;
+import org.antlr.tool.*;
 
 import java.util.List;
-
-import antlr.RecognitionException;
 
 public class TestCharDFAConversion extends TestSuite {
 
@@ -310,6 +307,35 @@ public class TestCharDFAConversion extends TestSuite {
 		checkDecision(g, 1, expecting, null);
 	}
 
+	public void testNonWildcardEOTMakesItWorkWithoutNonGreedyOption() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"DUH : ('x'|'y')* 'xy' ;");
+		String expecting =
+			".s0-'x'->.s1\n" +
+				".s0-'y'->:s3=>1\n" +
+				".s1-'x'->:s3=>1\n" +
+				".s1-'y'->.s2\n" +
+				".s2-'x'..'y'->:s3=>1\n" +
+				".s2-<EOT>->:s4=>2\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testAltConflictsWithLoopThenExit() throws Exception {
+		// \" predicts alt 1, but wildcard then " can predict exit also
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"STRING : '\"' (options {greedy=false;}: '\\\\\"' | .)* '\"' ;\n"
+		);
+		String expecting =
+			".s0-'\"'->:s1=>3\n" +
+				".s0-'\\\\'->.s2\n" +
+				".s0-{'\\u0000'..'!', '#'..'[', ']'..'\\uFFFE'}->:s4=>2\n" +
+				".s2-'\"'->:s3=>1\n" +
+				".s2-{'\\u0000'..'!', '#'..'\\uFFFE'}->:s4=>2\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
 	public void testNonGreedyLoopThatNeverLoops() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
@@ -372,7 +398,7 @@ public class TestCharDFAConversion extends TestSuite {
 
 		// first make sure nondeterministic alts are as expected
 		if ( expectingUnreachableAlts==null ) {
-			assertTrue(nonDetAlts.size()==0, "unreachable alts mismatch");
+			assertTrue(nonDetAlts.size()==0, "unreachable alts mismatch; should be empty: "+nonDetAlts);
 		}
 		else {
 			for (int i=0; i<expectingUnreachableAlts.length; i++) {

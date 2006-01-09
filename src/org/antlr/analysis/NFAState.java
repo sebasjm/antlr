@@ -38,17 +38,17 @@ public class NFAState extends State {
 	public static final int OPTIONAL_BLOCK_START = 3;
 	public static final int BYPASS = 4;
 
-    public static final int MAX_TRANSITIONS = 2;
+	public static final int MAX_TRANSITIONS = 2;
 
-    /** How many transitions; 0, 1, or 2 transitions */
-    int numTransitions = 0;
-    Transition[] transition = new Transition[MAX_TRANSITIONS];
+	/** How many transitions; 0, 1, or 2 transitions */
+	int numTransitions = 0;
+	Transition[] transition = new Transition[MAX_TRANSITIONS];
 
-    /** Which NFA are we in? */
-    public NFA nfa = null;
+	/** Which NFA are we in? */
+	public NFA nfa = null;
 
-    /** What's its decision number from 1..n? */
-    protected int decisionNumber = 0;
+	/** What's its decision number from 1..n? */
+	protected int decisionNumber = 0;
 
 	/** Subrules (...)* and (...)+ have more than one decision point in
 	 *  the NFA created for them.  They both have a loop-exit-or-stay-in
@@ -72,47 +72,47 @@ public class NFAState extends State {
 	/** What rule do we live in? */
 	protected String enclosingRule;
 
-    /** During debugging and for nondeterminism warnings, it's useful
-     *  to know what relationship this node has to the original grammar.
-     *  For example, "start of alt 1 of rule a".
-     */
-    protected String description;
+	/** During debugging and for nondeterminism warnings, it's useful
+	 *  to know what relationship this node has to the original grammar.
+	 *  For example, "start of alt 1 of rule a".
+	 */
+	protected String description;
 
 	/** Associate this NFAState with the corresponding GrammarAST node
-     *  from which this node was created.  This is useful not only for
-     *  associating the eventual lookahead DFA with the associated
-     *  Grammar position, but also for providing users with
-     *  nondeterminism warnings.  Mainly used by decision states to
+	 *  from which this node was created.  This is useful not only for
+	 *  associating the eventual lookahead DFA with the associated
+	 *  Grammar position, but also for providing users with
+	 *  nondeterminism warnings.  Mainly used by decision states to
 	 *  report line:col info.  Could also be used to track line:col
 	 *  for elements such as token refs.
 	 */
 	protected GrammarAST associatedASTNode;
 
-    /** Is this state the sole target of an EOT transition? */
-    protected boolean EOTTargetState = false;
+	/** Is this state the sole target of an EOT transition? */
+	protected boolean EOTTargetState = false;
 
 	/** Jean Bovet needs in the GUI to know which state pairs correspond
 	 *  to the start/stop of a block.
- 	 */
+	  */
 	public int endOfBlockStateNumber = State.INVALID_STATE_NUMBER;
 
-    public NFAState(NFA nfa) {
-        this.nfa = nfa;
-    }
+	public NFAState(NFA nfa) {
+		this.nfa = nfa;
+	}
 
-    public int getNumberOfTransitions() {
-        return numTransitions;
-    }
+	public int getNumberOfTransitions() {
+		return numTransitions;
+	}
 
-    public void addTransition(Transition e) {
-        if ( numTransitions>transition.length ) {
-            throw new IllegalArgumentException("You can only have "+transition.length+" transitions");
-        }
-        if ( e!=null ) {
-            transition[numTransitions] = e;
-            numTransitions++;
-        }
-    }
+	public void addTransition(Transition e) {
+		if ( numTransitions>transition.length ) {
+			throw new IllegalArgumentException("You can only have "+transition.length+" transitions");
+		}
+		if ( e!=null ) {
+			transition[numTransitions] = e;
+			numTransitions++;
+		}
+	}
 
 	/** Used during optimization to reset a state to have the (single)
 	 *  transition another state has.
@@ -123,9 +123,9 @@ public class NFAState extends State {
 		numTransitions = 1;
 	}
 
-    public Transition transition(int i) {
-        return transition[i];
-    }
+	public Transition transition(int i) {
+		return transition[i];
+	}
 
 	/** The DFA decision for this NFA decision state always has
 	 *  an exit path for loops as n+1 for n alts in the loop.
@@ -153,7 +153,7 @@ public class NFAState extends State {
 	 *
 	 *  Return same alt if we can't translate.
 	 */
-	public int translateDisplayAltToWalkAlt(int displayAlt) {
+	public int translateDisplayAltToWalkAlt(DFA dfa, int displayAlt) {
 		if ( decisionNumber==0 || decisionStateType==0 ) {
 			return displayAlt;
 		}
@@ -161,7 +161,12 @@ public class NFAState extends State {
 		// find the NFA loopback state associated with this DFA
 		// and count number of alts (all alt numbers are computed
 		// based upon the loopback's NFA state.
+		/*
 		DFA dfa = nfa.grammar.getLookaheadDFA(decisionNumber);
+		if ( dfa==null ) {
+			ErrorManager.internalError("can't get DFA for decision "+decisionNumber);
+		}
+		*/
 		NFAState nfaStart = dfa.getNFADecisionStartState();
 		int nAlts = nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStart);
 		switch ( decisionStateType ) {
@@ -184,7 +189,7 @@ public class NFAState extends State {
 		return walkAlt;
 	}
 
-    // Setter/Getters
+	// Setter/Getters
 
 	/** What AST node is associated with this NFAState?  When you
 	 *  set the AST node, I set the node to point back to this NFA state.
@@ -198,25 +203,25 @@ public class NFAState extends State {
 		return associatedASTNode;
 	}
 
- 	public void setAssociatedASTNode(GrammarAST ASTNode) {
+	 public void setAssociatedASTNode(GrammarAST ASTNode) {
 		this.associatedASTNode = ASTNode;
 	}
 
 	public String getDescription() {
-        return description;
-    }
+		return description;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public int getDecisionNumber() {
-        return decisionNumber;
-    }
+	public int getDecisionNumber() {
+		return decisionNumber;
+	}
 
-    public void setDecisionNumber(int decisionNumber) {
-        this.decisionNumber = decisionNumber;
-    }
+	public void setDecisionNumber(int decisionNumber) {
+		this.decisionNumber = decisionNumber;
+	}
 
 	public void setEnclosingRuleName(String rule) {
 		this.enclosingRule = rule;
@@ -226,13 +231,13 @@ public class NFAState extends State {
 		return enclosingRule;
 	}
 
-    public boolean isEOTTargetState() {
-        return EOTTargetState;
-    }
+	public boolean isEOTTargetState() {
+		return EOTTargetState;
+	}
 
-    public void setEOTTargetState(boolean eot) {
-        EOTTargetState = eot;
-    }
+	public void setEOTTargetState(boolean eot) {
+		EOTTargetState = eot;
+	}
 
 	public boolean isDecisionState() {
 		return decisionStateType>0;

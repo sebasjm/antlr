@@ -27,12 +27,10 @@
 */
 package org.antlr.tool;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.analysis.DecisionProbe;
 import org.antlr.analysis.DFAState;
+import org.antlr.analysis.DecisionProbe;
 import org.antlr.analysis.NFAState;
-import org.antlr.analysis.SemanticContext;
-import antlr.Token;
+import org.antlr.stringtemplate.StringTemplate;
 
 import java.util.Iterator;
 import java.util.List;
@@ -96,30 +94,33 @@ public class GrammarNonDeterminismMessage extends Message {
 		NFAState nfaStart = probe.dfa.getNFADecisionStartState();
 		// all state paths have to begin with same NFA state
 		int firstAlt = 0;
-		for (Iterator iter = nondetAlts.iterator(); iter.hasNext();) {
-			Integer displayAltI = (Integer) iter.next();
-			if ( DecisionProbe.verbose ) {
-				int tracePathAlt =
-					nfaStart.translateDisplayAltToWalkAlt(displayAltI.intValue());
-				if ( firstAlt == 0 ) {
-					firstAlt = tracePathAlt;
-				}
-				List path =
-					probe.getNFAPathStatesForAlt(firstAlt,
-												 tracePathAlt,
-												 labels);
-				st.setAttribute("paths.{alt,states}",
-								displayAltI, path);
-			}
-			else {
-				if ( probe.dfa.isTokensRuleDecision() ) {
-					// alts are token rules, convert to the names instead of numbers
-					String tokenName =
-						probe.getTokenNameForTokensRuleAlt(displayAltI.intValue());
-					st.setAttribute("conflictingTokens", tokenName);
+		if ( nondetAlts!=null ) {
+			for (Iterator iter = nondetAlts.iterator(); iter.hasNext();) {
+				Integer displayAltI = (Integer) iter.next();
+				if ( DecisionProbe.verbose ) {
+					int tracePathAlt =
+						nfaStart.translateDisplayAltToWalkAlt(probe.dfa,
+															  displayAltI.intValue());
+					if ( firstAlt == 0 ) {
+						firstAlt = tracePathAlt;
+					}
+					List path =
+						probe.getNFAPathStatesForAlt(firstAlt,
+													 tracePathAlt,
+													 labels);
+					st.setAttribute("paths.{alt,states}",
+									displayAltI, path);
 				}
 				else {
-					st.setAttribute("conflictingAlts", displayAltI);
+					if ( probe.dfa.isTokensRuleDecision() ) {
+						// alts are token rules, convert to the names instead of numbers
+						String tokenName =
+							probe.getTokenNameForTokensRuleAlt(displayAltI.intValue());
+						st.setAttribute("conflictingTokens", tokenName);
+					}
+					else {
+						st.setAttribute("conflictingAlts", displayAltI);
+					}
 				}
 			}
 		}

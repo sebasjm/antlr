@@ -1052,6 +1052,11 @@ public class NFAToDFAConverter {
 
 		if ( !conflictingLexerRules ) {
 			// TODO: with k=x option set, this is called twice for same state
+			dfa.probe.reportNondeterminism(d);
+			// TODO: how to turn off when it's only the FOLLOW that is
+			// conflicting.  This used to shut off even alts i,j < n
+			// conflict warnings. :(
+			/*
 			if ( dfa.isGreedy() ) {
 				// if nongreedy then they have said to let it fall out of loop
 				// don't report the problem
@@ -1059,8 +1064,10 @@ public class NFAToDFAConverter {
 			}
 			else {
 				// TODO: remove when sure it's cool
+				dfa.probe.reportNondeterminism(d);
 				System.out.println("temp warning: warning suppressed for nongreedy loop");
 			}
+			*/
 		}
 
 		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
@@ -1080,9 +1087,23 @@ public class NFAToDFAConverter {
 	        winningAlt = resolveByPickingMinAlt(d,nondeterministicAlts);
 		}
 		else {
-			//System.out.println("resolving exit alt for decision="+dfa.decisionNumber);
-			// if nongreedy, resolve in favor of what follows block
-			winningAlt = resolveByPickingExitAlt(d,nondeterministicAlts);
+			// If nongreedy, the exit alt shout win, but only if it's
+			// involved in the nondeterminism!
+			/*
+			System.out.println("resolving exit alt for decision="+
+				dfa.decisionNumber+" state="+d);
+			System.out.println("nondet="+nondeterministicAlts);
+			System.out.println("exit alt "+exitAlt);
+			*/
+			int exitAlt = dfa.getNumberOfAlts();
+			if ( nondeterministicAlts.contains(new Integer(exitAlt)) ) {
+				// if nongreedy and exit alt is one of those nondeterministic alts
+				// predicted, resolve in favor of what follows block
+				winningAlt = resolveByPickingExitAlt(d,nondeterministicAlts);
+			}
+			else {
+				winningAlt = resolveByPickingMinAlt(d,nondeterministicAlts);
+			}
 		}
 		//System.out.println("state "+d.stateNumber+" resolved to alt "+winningAlt);
 	}
@@ -1107,7 +1128,7 @@ public class NFAToDFAConverter {
 			min = getMinAlt(d);
 		}
 
-		turnOffAlt(d, min, nondeterministicAlts);
+		turnOffOtherAlts(d, min, nondeterministicAlts);
 
 		return min;
 	}
@@ -1117,15 +1138,14 @@ public class NFAToDFAConverter {
 	 */
 	protected int resolveByPickingExitAlt(DFAState d, Set nondeterministicAlts) {
 		int exitAlt = dfa.getNumberOfAlts();
-		turnOffAlt(d, exitAlt, nondeterministicAlts);
-
+		turnOffOtherAlts(d, exitAlt, nondeterministicAlts);
 		return exitAlt;
 	}
 
 	/** turn off all states associated with alts other than the good one
 	 *  (as long as they are one of the nondeterministic ones)
 	 */
-	protected void turnOffAlt(DFAState d, int min, Set nondeterministicAlts) {
+	protected void turnOffOtherAlts(DFAState d, int min, Set nondeterministicAlts) {
 		Iterator iter = d.nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
