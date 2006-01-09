@@ -55,6 +55,8 @@ public class GrammarAnalysisAbortedMessage extends Message {
 		int col = decisionASTNode.getColumn();
 		String fileName = probe.dfa.nfa.grammar.getFileName();
 		StringTemplate st = getMessageTemplate();
+		st.setAttribute("enclosingRule",
+						probe.dfa.getNFADecisionStartState().getEnclosingRule());
 		if ( fileName!=null ) {
 			st.setAttribute("file", fileName);
 		}

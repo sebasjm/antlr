@@ -120,7 +120,9 @@ public Token nextToken() {
             }
         }
         catch (RecognitionException re) {
-            ; // can't happen in backtracking mode
+            // shouldn't happen in backtracking mode, but...
+            reportError(re);
+            recover(re);
         }
     }
 }
@@ -734,7 +736,7 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  *  The <name> attribute is inherited via the parser, lexer, ...
  */
 dfaDecision(decisionNumber,description) ::= <<
-alt<decisionNumber> = dfa<decisionNumber>.predict(input);
+alt<decisionNumber> = dfa<decisionNumber>.predict(input); <checkRuleBacktrackFailure()>
 >>
 
 /** The overall cyclic DFA chunk; contains all the DFA states */

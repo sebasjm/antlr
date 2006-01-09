@@ -28,7 +28,6 @@
 package org.antlr.analysis;
 
 import org.antlr.misc.*;
-import org.antlr.tool.ANTLRParser;
 import org.antlr.tool.Grammar;
 
 import java.util.*;
@@ -225,8 +224,10 @@ public class NFAToDFAConverter {
 			closure(t);  // add any NFA states reachable via epsilon
 
 			// FAILSAFE: so we cannot hit an exponentiality in
-			// the NFA conversion
-			if ( t.stateNumber>DFA.MAX_STATES_PER_DFA ) {
+			// the NFA conversion; don't let averate number of states
+			// per alt in this decision to exceed a max
+			int statesPerAltRatio = t.stateNumber/dfa.getNumberOfAlts();
+			if ( statesPerAltRatio>DFA.MAX_STATES_PER_ALT_IN_DFA ) {
 				terminate = true;
 				dfa.probe.reportEarlyTermination();
 				break;

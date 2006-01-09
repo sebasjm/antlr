@@ -223,8 +223,8 @@ INSUFFICIENT_PREDICATES(file,line,col,alts) ::= <<
 DUPLICATE_SET_ENTRY(file,line,col,arg) ::= 
 	"<loc()>duplicate token type <arg> when collapsing subrule into set"
 
-ANALYSIS_ABORTED(file,line,col) ::= <<
-<loc()>ANTLR could not analyze this decision probably due to a true ambiguity in the grammar or left-recursion problems.  ANTLR re-analyzed the decision with a fixed lookahead of k=1.
+ANALYSIS_ABORTED(file,line,col,enclosingRule) ::= <<
+<loc()>ANTLR could not analyze this decision in rule <enclosingRule> probably due to a true ambiguity in the grammar or left-recursion problems.  ANTLR re-analyzed the decision with a fixed lookahead of k=1.
 >>
 
 RECURSION_OVERLOW(file,line,col,alt,input,targetRules,callSiteStates) ::= <<

@@ -43,8 +43,10 @@ public class DFA {
 	public static final int REACHABLE_NO = 0;
 	public static final int REACHABLE_YES = 1;
 
-	/** Prevent explosion of DFA states during conversion. */
-	public static final int MAX_STATES_PER_DFA = 1000;
+	/** Prevent explosion of DFA states during conversion. The max number
+	 *  of states per alt in a single decision's DFA.
+	 */
+	public static final int MAX_STATES_PER_ALT_IN_DFA = 400;
 
     /** What's the start state for this DFA? */
     public DFAState startState;
