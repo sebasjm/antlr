@@ -1,11 +1,7 @@
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.Token;
-import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.ClassicToken;
-
-import java.util.List;
-import java.lang.reflect.Method;
+import org.antlr.runtime.Token;
 
 /** A TreeAdaptor that works with any Tree implementation.  It provides
  *  really just factory methods; all the work is done by BaseTreeAdaptor.
@@ -39,5 +35,14 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	/** Create an imaginary token, copying the contents of a previous token */
 	public Token createToken(Token fromToken) {
 		return new ClassicToken(fromToken);
+	}
+
+	/** track start/stop token index for subtree root created for a rule */
+	public void setTokenBoundaries(Object t, int start, int stop) {
+		if ( t==null ) {
+			return;
+		}
+		((CommonTree)t).startIndex = start;
+		((CommonTree)t).stopIndex = stop;
 	}
 }

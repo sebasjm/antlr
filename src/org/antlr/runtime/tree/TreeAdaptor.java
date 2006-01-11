@@ -29,8 +29,6 @@ package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
 
-import java.util.List;
-
 /** How to create and navigate trees.  Rather than have a separate factory
  *  and adaptor, I've merged them.  Makes sense to encapsulate.
  *
@@ -173,6 +171,13 @@ public interface TreeAdaptor {
 	/** Node constructors can set the text of a node */
 	public void setText(Object t, String text);
 
+	/** Where are the bounds in the input token stream for this node and
+	 *  all children?  Each rule that creates AST nodes will call this
+	 *  method right before returning.  Flat trees (i.e., lists) will
+	 *  still usually have a nil root node just to hold the children list.
+	 *  That node would contain the start/stop indexes then.
+	 */
+	public void setTokenBoundaries(Object t, int start, int stop);
 
 	// N a v i g a t i o n  /  T r e e  P a r s i n g
 

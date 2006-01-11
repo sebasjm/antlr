@@ -694,7 +694,6 @@ GrammarAST subrule=null;
 	:	t:rewrite_terminal
     	( subrule=ebnfSuffix[#t] {#rewrite_element=subrule;} )?
 	|   rewrite_ebnf
-//	|   a:ACTION
 	|   tr:rewrite_tree
     	( subrule=ebnfSuffix[#tr] {#rewrite_element=subrule;} )?
 	;

@@ -66,7 +66,8 @@ ruleLabelDefs() ::= <<
 ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval.tree = root_0;<\n>
+retval.tree = root_0;
+adaptor.setTokenBoundaries(root_0, retval.start.getTokenIndex(), retval.stop.getTokenIndex());
 <endif>
 >>
 

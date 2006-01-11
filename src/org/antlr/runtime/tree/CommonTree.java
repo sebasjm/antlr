@@ -28,13 +28,15 @@
 package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.CommonToken;
-
-import java.util.List;
-import java.util.ArrayList;
 
 /** A tree node that is wrapper for a Token object. */
 public class CommonTree extends BaseTree {
+	/** What token indexes bracket all tokens associated with this node
+	 *  and below?
+	 */
+	public int startIndex, stopIndex;
+
+	/** A single token is the payload */
 	public Token token;
 
 	public CommonTree(CommonTree node) {
