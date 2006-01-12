@@ -66,6 +66,9 @@ ruleLabelDefs() ::= <<
 ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
+if ( root_0.isNil() && root_0.getChildCount()==1 ) {
+    root_0 = (MantraNode)root_0.getChild(0);
+}
 retval.tree = root_0;
 adaptor.setTokenBoundaries(root_0, retval.start.getTokenIndex(), retval.stop.getTokenIndex());
 <endif>
