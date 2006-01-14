@@ -27,13 +27,12 @@
 */
 package org.antlr.codegen;
 
+import antlr.CommonToken;
+import org.antlr.misc.MutableInteger;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
-import org.antlr.misc.MutableInteger;
 
 import java.util.List;
-
-import antlr.CommonToken;
 
 /** This class embodies the translation of actions written in the target
  *  language but containing special references that must be translated
@@ -97,6 +96,7 @@ import antlr.CommonToken;
  */
 public class ActionTranslator {
 	public static final char ATTRIBUTE_REF_CHAR = '$';
+	public static final char TEMPLATE_REF_CHAR = '%';
 
 	protected CodeGenerator generator;
 	protected Grammar grammar;
@@ -159,6 +159,11 @@ public class ActionTranslator {
 				// $...
 				c++; // skip $
 				c = parseAttributeReference(r,action,c,buf,actionAST);
+			}
+			else if ( action.charAt(c)==TEMPLATE_REF_CHAR ) {
+				// $...
+				c++; // skip %
+				c = translateTemplateReference(r,action,c,buf,actionAST);
 			}
 			else {
 				buf.append(action.charAt(c));
@@ -341,8 +346,10 @@ public class ActionTranslator {
 		}
 
 		// peel off $templates::name(...) case
+		/*
 		if ( scopeName.equals("templates") && hasDoubleColon ) {
-			if ( !grammar.getOption("output").equals("template") ) {
+			String outputOption = (String)grammar.getOption("output");
+			if ( outputOption!=null && !outputOption.equals("template") ) {
 				System.err.println("can't use $templates scope w/o output=template option");
 				return c+2;
 			}
@@ -357,6 +364,7 @@ public class ActionTranslator {
 				return nextCharIndexI.value;
 			}
 		}
+		*/
 
 		AttributeScope attrScope = resolveScope(r, scopeName, attributeName);
 		if ( attrScope!=null &&
@@ -780,6 +788,132 @@ public class ActionTranslator {
 		return translateAttributeReference(r, actionAST, scope, labelName, attributeName);
 	}
 
+	/** We found a %-reference.  The possibilities are:
+	 *
+	 *    %foo(a={},b={},...) ctor (even shorter than $templates::foo(...))
+	 *    %({name-expr})(a={},...) indirect template ctor reference
+	 *
+	 *    The above are parsed by antlr.g and translated by codegen.g
+	 *    The following are parsed manually here:
+	 *
+	 *    %{string-expr} anonymous template from string expr
+	 *    %{expr}.y = z; template attribute y of StringTemplate-typed expr to z
+	 *    %x.y = z; set template attribute y of x (always set never get attr)
+	 *              to z [languages like python without ';' must still use the
+	 *              ';' which the code generator is free to remove during code gen]
+	 */
+	protected int translateTemplateReference(Rule r,
+											 String action,
+											 int c,
+											 StringBuffer buf,
+											 GrammarAST actionAST)
+	{
+		//System.out.println("%ref="+action.substring(c,action.indexOf('\n',c)));
+		// compute some possible indexes
+		String templateName = getID(action, c);
+		// Is it '%foo('?
+		boolean isCtor = templateName!=null &&
+			(c+templateName.length())<action.length() &&
+			 action.charAt(c+templateName.length())=='(';
+		int nameIndex = c;
+		int endOfAction = getCurlyAction(action, c);
+		if ( (c<action.length() && action.charAt(c)=='(') || isCtor) {
+			// %foo(...) or %({expr})(...)
+			String outputOption = (String)grammar.getOption("output");
+			if ( outputOption!=null && !outputOption.equals("template") ) {
+				return c+2;
+			}
+			else {
+				MutableInteger nextCharIndexI = new MutableInteger();
+				String t =
+					generator.translateTemplateConstructor(r.name,
+														   actionAST,
+														   nameIndex,
+														   nextCharIndexI);
+				buf.append(t);
+				return nextCharIndexI.value;
+			}
+		}
+
+		if ( endOfAction>c || templateName!=null ) {
+			// %{attr-expr}.y = z;
+			// %x.y = z;
+			// %{string-expr}
+			String translatedExprStr = null;
+			if ( endOfAction>c ) {
+				String exprStr = action.substring(c+1,endOfAction); // stuff in {...}
+				ActionTranslator translator = new ActionTranslator(generator);
+				translatedExprStr =
+					translator.translate(r.name,
+										 new antlr.CommonToken(ANTLRParser.ACTION,exprStr),1);
+			}
+			if ( endOfAction>c &&
+				 ((endOfAction+1)<action.length() && action.charAt(endOfAction+1)!='.') ||
+			     ((endOfAction+1)>=action.length()) )
+			{
+				// %{string-expr} literal template constructor
+				StringTemplate ctorST =
+					generator.templates.getInstanceOf("actionStringConstructor");
+				// expr might have $x.y in it...translate it.
+				ctorST.setAttribute("stringExpr", translatedExprStr);
+				buf.append(ctorST.toString());
+				return endOfAction+1;
+			}
+			String st;
+			int endOfExpr;
+			if ( templateName!=null ) {
+				st = templateName;
+				endOfExpr = c+templateName.length()-1;
+			}
+			else {
+				st = translatedExprStr;
+				endOfExpr = endOfAction;
+			}
+			int dot = endOfExpr+1;
+			if ( (dot<action.length() && action.charAt(dot)!='.') ) {
+				ErrorManager.grammarError(ErrorManager.MSG_INVALID_TEMPLATE_ACTION,
+										  grammar,
+										  actionAST.getToken(),
+										  action.substring(c-1,dot+1));
+				return c;
+			}
+			if ( (dot+1)<action.length() && action.charAt(dot+1)==' ') {
+				ErrorManager.grammarError(ErrorManager.MSG_INVALID_TEMPLATE_ACTION,
+										  grammar,
+										  actionAST.getToken(),
+										  action.substring(c-1,dot+2));
+				return c;
+			}
+			int equals = action.indexOf('=',endOfExpr);
+			int semicolon = action.indexOf(';',endOfExpr);
+			if ( !(dot>c && equals>dot && semicolon>equals) ) {
+				// not proper form; report and return
+				ErrorManager.grammarError(ErrorManager.MSG_INVALID_TEMPLATE_ACTION,
+										  grammar,
+										  actionAST.getToken(),
+										  action.substring(c-1,c+1));
+				return c;
+			}
+			c++; // skip '.'
+			String attrName = getID(action, dot+1);
+			String expr = action.substring(equals+1,semicolon);
+			// We now have values: st.attrName = expr;
+			StringTemplate assignST =
+				generator.templates.getInstanceOf("actionSetAttribute");
+			assignST.setAttribute("st", st);
+			assignST.setAttribute("attrName", attrName);
+			assignST.setAttribute("expr", expr);
+			buf.append(assignST.toString());
+			return semicolon+1;
+		}
+
+		ErrorManager.grammarError(ErrorManager.MSG_INVALID_TEMPLATE_ACTION,
+									  grammar,
+									  actionAST.getToken(),
+									  action.substring(c-1,c+1));
+		return c; // hmm...don't know what it is, just keep going
+	}
+
 	protected String translateElementListReference(String labelName) {
 		StringTemplate refST =
 			generator.templates.getInstanceOf("listLabelRef");
@@ -789,7 +923,7 @@ public class ActionTranslator {
 
 	protected String getID(String action, int c) {
 		int start = c;
-		int i = c+1;
+		int i = c;
 		while ( i<action.length() &&
 			(Character.isLetterOrDigit(action.charAt(i))||
 			action.charAt(i)=='_') )
@@ -803,4 +937,30 @@ public class ActionTranslator {
 		return action.substring(start,end+1);
 	}
 
+	/** Match (nested) curlies {...} action;
+	 *  return the terminating '}' char position.  c must point at '{'.
+	 */
+	protected int getCurlyAction(String action, int c) {
+		if ( action.charAt(c)!='{' ) {
+			return c; // not an action
+		}
+		int level = 0;
+		int start = c;
+		while ( c<action.length() ) {
+			if ( action.charAt(c)=='{' ) {
+				level++;
+			}
+			else if ( action.charAt(c)=='}' ) {
+				level--;
+				if ( level==0 ) {
+					return c;
+				}
+				if ( level<0 ) {
+					return start; // error too many '}'
+				}
+			}
+			c++;
+		}
+		return start; // finished without seeing '}' or possibly no '{'
+	}
 }

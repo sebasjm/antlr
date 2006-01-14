@@ -1045,18 +1045,22 @@ rewrite_setElement
 
 rewrite_template returns [StringTemplate code=null]
     :	#( ALT EPSILON EOA ) {code=templates.getInstanceOf("rewriteEmptyTemplate");}
-   	|	#( TEMPLATE id:ID
+   	|	#( TEMPLATE (id:ID|ind:ACTION)
 		   {
-		   if ( #id.getText().equals("template") ) {
+		   if ( #id!=null && #id.getText().equals("template") ) {
 		   		code = templates.getInstanceOf("rewriteInlineTemplate");
 		   }
-		   else {
+		   else if ( #id!=null ) {
 		   		code = templates.getInstanceOf("rewriteExternalTemplate");
 		   		code.setAttribute("name", #id.getText());
 		   }
+		   else if ( #ind!=null ) { // must be %({expr})(args)
+		   		code = templates.getInstanceOf("rewriteIndirectTemplate");
+		   		code.setAttribute("expr", #ind.getText());
+		   }
 		   }
 	       #( ARGLIST
-	       	  ( #( ASSIGN arg:ID a:ACTION
+	       	  ( #( ARG arg:ID a:ACTION
 		   		   {
 				   #a.outerAltNum = this.outerAltNum;
 		   		   String action = generator.translateAction(currentRuleName,#a);

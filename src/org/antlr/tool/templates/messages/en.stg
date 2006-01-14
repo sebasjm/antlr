@@ -192,6 +192,8 @@ ACTION_REDEFINITION(file,line,col,arg) ::=
   "<loc()>redefinition of <arg> action"
 DOUBLE_QUOTES_ILLEGAL(file,line,col,arg) ::=
   "<loc()>string literals must use single quotes (such as \'begin\'): <arg>"
+INVALID_TEMPLATE_ACTION(file,line,col,arg) ::=
+  "<loc()>invalid StringTemplate % shorthand syntax: '<arg>'"
 
 // GRAMMAR WARNINGS
 

@@ -267,12 +267,15 @@ single_rewrite
 	;
 
 rewrite_template
-	:	#( TEMPLATE id:ID {out(" "+#id.getText());}
+	:	#( TEMPLATE
+		   (id:ID {out(" "+#id.getText());}|ind:ACTION {out(" ({"+#ind.getText()+"})");})
 	       #( ARGLIST
-	       	  ( #( ARG arg:ID {out(#arg.getText()+"=");}
+              {out("(");}
+ 	       	  ( #( ARG arg:ID {out(#arg.getText()+"=");}
 	               a:ACTION   {out(#a.getText());}
 	             )
 	          )*
+              {out(")");}
 	        )
 		   ( DOUBLE_QUOTE_STRING_LITERAL {out(" "+#DOUBLE_QUOTE_STRING_LITERAL.getText());}
 		   | DOUBLE_ANGLE_STRING_LITERAL {out(" "+#DOUBLE_ANGLE_STRING_LITERAL.getText());}

@@ -28,13 +28,6 @@
 package org.antlr.test;
 
 import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.ErrorManager;
-import org.antlr.tool.GrammarSemanticsMessage;
-import org.antlr.tool.Message;
-import org.antlr.tool.Grammar;
-import org.antlr.Tool;
-import org.antlr.codegen.CodeGenerator;
 
 public class TestRewriteTemplates extends TestSuite {
 	protected boolean debug = false;
@@ -69,6 +62,21 @@ public class TestRewriteTemplates extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testEmbeddedLiteralConstructor() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=template;}\n" +
+			"a : ID INT -> {%{$ID.text}} ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "abc 34", debug);
+		String expecting = "abc\n";
+		assertEqual(found, expecting);
+	}
+
 	public void testInlineTemplate() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -91,6 +99,23 @@ public class TestRewriteTemplates extends TestSuite {
 			"grammar T;\n" +
 			"options {output=template;}\n" +
 			"a : ID INT -> foo(x={$ID.text},y={$INT.text}) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "abc 34", debug);
+		String expecting = "abc 34\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testIndirectTemplate() throws Exception {
+		// the support code adds template group in it's output Test.java
+		// that defines template foo.
+		String grammar =
+			"grammar T;\n" +
+			"options {output=template;}\n" +
+			"a : ID INT -> ({\"foo\"})(x={$ID.text},y={$INT.text}) ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";

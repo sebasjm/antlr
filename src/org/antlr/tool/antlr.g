@@ -738,23 +738,47 @@ rewrite_tree :
 	;
 
 /** Build a tree for a template rewrite:
-      ^(TEMPLATE ID ^(ARGLIST ^(ARG ID ACTION) ...) )
-    where ARGLIST is always there even if no args exist
+      ^(TEMPLATE (ID|ACTION) ^(ARGLIST ^(ARG ID ACTION) ...) )
+    where ARGLIST is always there even if no args exist.
+    ID can be "template" keyword.  If first child is ACTION then it's
+    an indirect template ref
+
+    -> foo(a={...}, b={...})
+    -> ({string-e})(a={...}, b={...})  // e evaluates to template name
+    -> {%{$ID.text}} // create literal template from string (done in ActionTranslator)
+	-> {st-expr} // st-expr evaluates to ST
  */
 rewrite_template
 {Token st=null;}
-	:   {LT(1).getText().equals("template")}?
+	:   // -> template(a={...},...) "..."
+		{LT(1).getText().equals("template")}? // inline
 		rewrite_template_head {st=LT(1);}
 		( DOUBLE_QUOTE_STRING_LITERAL! | DOUBLE_ANGLE_STRING_LITERAL! )
 		{#rewrite_template.addChild(#[st]);}
-	|	rewrite_template_head
-	|	ACTION
+
+	|	// -> foo(a={...}, ...)
+		rewrite_template_head
+
+	|	// -> ({expr})(a={...}, ...)
+		rewrite_indirect_template_head
+
+	|	// -> {...}
+		ACTION
 	;
 
+/** -> foo(a={...}, ...) */
 rewrite_template_head
 	:	id lp:LPAREN^ {#lp.setType(TEMPLATE); #lp.setText("TEMPLATE");}
 		rewrite_template_args
 		RPAREN!
+	;
+
+/** -> ({expr})(a={...}, ...) */
+rewrite_indirect_template_head
+	:	lp:LPAREN^ {#lp.setType(TEMPLATE); #lp.setText("TEMPLATE");}
+		ACTION
+		RPAREN!
+		LPAREN! rewrite_template_args RPAREN!
 	;
 
 rewrite_template_args
@@ -764,7 +788,7 @@ rewrite_template_args
 	;
 
 rewrite_template_arg
-	:   id ASSIGN^ ACTION
+	:   id a:ASSIGN^ {#a.setType(ARG); #a.setText("ARG");} ACTION
 	;
 
 class ANTLRLexer extends Lexer;

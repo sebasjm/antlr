@@ -110,6 +110,13 @@ templateLib.getInstanceOf("<name>"<if(args)>,
   <endif>)
 >>
 
+/** expr is a string expression that says what template to load */
+rewriteIndirectTemplate(expr,args) ::= <<
+templateLib.getInstanceOf(<expr><if(args)>,
+  new STAttrMap()<args:{a | .put("<a.name>", <a.value>)}>
+  <endif>)
+>>
+
 /** Invoke an inline template with a set of attribute name/value pairs */
 rewriteInlineTemplate(args, template) ::= <<
 new StringTemplate(templateLib, "<template>"<if(args)>,
@@ -120,4 +127,14 @@ new StringTemplate(templateLib, "<template>"<if(args)>,
 /** plain -> {foo} action */
 rewriteAction(action) ::= <<
 <action>
+>>
+
+/** An action has %st.attrName=expr; or %{st}.attrName=expr; */
+actionSetAttribute(st,attrName,expr) ::= <<
+(<st>).setAttribute("<attrName>",<expr>);
+>>
+
+/** Translate %{stringExpr} */
+actionStringConstructor(stringExpr) ::= <<
+new StringTemplate(templateLib,<stringExpr>)
 >>

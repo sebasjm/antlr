@@ -27,22 +27,21 @@
 */
 package org.antlr.tool;
 
+import antlr.Token;
 import org.antlr.Tool;
-import org.antlr.analysis.DecisionProbe;
 import org.antlr.analysis.DFAState;
-import org.antlr.analysis.NFAConfiguration;
+import org.antlr.analysis.DecisionProbe;
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplateErrorListener;
+import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-
-import antlr.LLkParser;
-import antlr.Token;
-import antlr.RecognitionException;
+import java.util.*;
 
 /** Defines all the errors ANTLR can generator for both the tool and for
  *  issues with a grammar.
@@ -155,6 +154,7 @@ public class ErrorManager {
 	public static final int MSG_INVALID_ACTION_SCOPE = 143;
 	public static final int MSG_ACTION_REDEFINITION = 144;
 	public static final int MSG_DOUBLE_QUOTES_ILLEGAL = 145;
+	public static final int MSG_INVALID_TEMPLATE_ACTION = 146;
 
 
 	// GRAMMAR WARNINGS
