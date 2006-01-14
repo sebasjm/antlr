@@ -27,24 +27,20 @@
 */
 package org.antlr.tool;
 
-import antlr.collections.AST;
 import antlr.RecognitionException;
 import antlr.TokenStreamRewriteEngine;
-import antlr.TreeParser;
 import antlr.TokenWithIndex;
+import antlr.collections.AST;
+import org.antlr.Tool;
+import org.antlr.analysis.*;
+import org.antlr.codegen.CodeGenerator;
+import org.antlr.misc.IntSet;
+import org.antlr.misc.IntervalSet;
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 
 import java.io.*;
 import java.util.*;
-
-import org.antlr.analysis.*;
-import org.antlr.analysis.DFA;
-import org.antlr.runtime.*;
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
-import org.antlr.codegen.CodeGenerator;
-import org.antlr.misc.*;
-import org.antlr.misc.BitSet;
-import org.antlr.Tool;
 
 /** Represents a grammar in memory. */
 public class Grammar {
@@ -474,11 +470,6 @@ public class Grammar {
      *  rules like this: "Tokens : ID | INT | SEMI ;"  nextToken() will invoke
      *  this to set the current token.  Add char literals before
      *  the rule references.
-	 *
-	 *  Note: the NFA created for this is specially built by
-	 *  NFAFactory.build_ArtificialMatchTokensRuleNFA() not the usual
-	 *  mechanism.  So, this creates the rule definition and associated tree,
-	 *  but the NFA is created by the NFAFactory.
      */
     public void addArtificialMatchTokensRule() {
         StringTemplate matchTokenRuleST =
