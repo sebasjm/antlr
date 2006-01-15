@@ -46,14 +46,6 @@ public interface TreeAdaptor {
      */
 	public Object create(Token payload);
 
-	/** Create a tree node from some generic object.  Most of the time
-	 *  this will be a tree node of some kind during AST construction in
-	 *  a parser or AST rewrite in a tree parser.  This catches all
-	 *  create() calls other than the specific create(Token), which you
-	 *  will see in a parser creating trees.
-	public Object create(Object node);
-	 */
-
 	/** Duplicate tree recursively, using dupNode() for each node */
 	public Object dupTree(Object tree);
 
@@ -88,6 +80,17 @@ public interface TreeAdaptor {
 	 *  efficiency.
 	 */
 	public Object becomeRoot(Object newRoot, Object oldRoot);
+
+	/** Given the root of the subtree created for this rule, post process
+	 *  it to do any simplifications or whatever you want.  A required
+	 *  behavior is to convert ^(nil singleSubtree) to singleSubtree
+	 *  as the setting of start/stop indexes relies on a single non-nil root
+	 *  for non-flat trees (such as for lists like "idlist : ID+ ;").
+	 *
+	 *  This method is executed after all rule tree construction and right
+	 *  before setTokenBoundaries().
+	 */
+	public Object rulePostProcessing(Object root);
 
 
 	// R e w r i t e  R u l e s

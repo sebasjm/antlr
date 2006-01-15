@@ -125,6 +125,8 @@ public class ActionTranslator {
 	 *  Jump from $ to $ in the action, building up a text buffer
 	 *  doing appropriate rewrites to template refs.  Final step, create
 	 *  the StringTemplate.
+	 *
+	 *  Also handles % template refs now. \% is escape as is \$.
 	 */
 	public String translate(String ruleName,
 						    GrammarAST actionAST)
@@ -152,6 +154,13 @@ public class ActionTranslator {
 				 (c+1)<action.length() && action.charAt(c+1)=='$' )
 			{
 				buf.append("$"); // translate \$ to $; not an attribute
+				c+=2;
+				continue;
+			}
+			if ( action.charAt(c)=='\\' &&
+				 (c+1)<action.length() && action.charAt(c+1)=='%' )
+			{
+				buf.append("%");
 				c+=2;
 				continue;
 			}

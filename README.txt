@@ -206,6 +206,22 @@ CHANGES
 
 3.0ea8 - ???
 
+* $templates::foo() is gone.  added % as special template symbol.
+  %foo(a={},b={},...) ctor (even shorter than $templates::foo(...))
+  %({name-expr})(a={},...) indirect template ctor reference
+
+  The above are parsed by antlr.g and translated by codegen.g
+  The following are parsed manually here:
+
+  %{string-expr} anonymous template from string expr
+  %{expr}.y = z; template attribute y of StringTemplate-typed expr to z
+  %x.y = z; set template attribute y of x (always set never get attr)
+            to z [languages like python without ';' must still use the
+            ';' which the code generator is free to remove during code gen]
+
+* -> ({expr})(a={},...) notation for indirect template rewrite.
+  expr is the name of the template.
+
 * $x[i]::y and $x[-i]::y notation for accesssing absolute scope stack
   indexes and relative negative scopes.  $x[-1]::y is the y attribute
   of the previous scope (stack top - 1).

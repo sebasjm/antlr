@@ -1,11 +1,6 @@
 package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.ClassicToken;
-
-import java.util.List;
-import java.lang.reflect.Method;
 
 public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	public Object nil() {
@@ -50,6 +45,15 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		}
 		newRootTree.addChild(oldRootTree);
 		return newRootTree;
+	}
+
+	/** Transform ^(nil x) to x */
+	public Object rulePostProcessing(Object root) {
+		Tree r = (Tree)root;
+		if ( r!=null && r.isNil() && r.getChildCount()==1 ) {
+			r = (Tree)r.getChild(0);
+		}
+		return r;
 	}
 
 	public void addChild(Object t, Token child) {
