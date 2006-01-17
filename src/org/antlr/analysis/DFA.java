@@ -413,6 +413,12 @@ public class DFA {
 		altToAcceptState = new DFAState[nAlts+1];
     }
 
+	public String toString() {
+		FASerializer serializer = new FASerializer(nfa.grammar);
+		String result = serializer.serialize(startState);
+		return result;
+	}
+
 	/** EOT (end of token) is a label that indicates when the DFA conversion
 	 *  algorithm would "fall off the end of a lexer rule".  It normally
 	 *  means the default clause.  So for ('a'..'z')+ you would see a DFA

@@ -248,10 +248,8 @@ grammarSpec
 		(cmt:DOC_COMMENT {outputFileST.setAttribute("docComment", #cmt.getText());} )?
 		{
 		recognizerST.setAttribute("name", #name.getText());
-		if ( grammar.type!=Grammar.LEXER ) {
-		    recognizerST.setAttribute("scopes", grammar.getGlobalScopes());
-		    headerFileST.setAttribute("scopes", grammar.getGlobalScopes());
-		}
+		recognizerST.setAttribute("scopes", grammar.getGlobalScopes());
+		headerFileST.setAttribute("scopes", grammar.getGlobalScopes());
 		outputFileST.setAttribute("name", #name.getText());
 		headerFileST.setAttribute("name", #name.getText());
 		}

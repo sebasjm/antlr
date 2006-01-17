@@ -354,27 +354,6 @@ public class ActionTranslator {
 			attributeName = getID(action, c);
 		}
 
-		// peel off $templates::name(...) case
-		/*
-		if ( scopeName.equals("templates") && hasDoubleColon ) {
-			String outputOption = (String)grammar.getOption("output");
-			if ( outputOption!=null && !outputOption.equals("template") ) {
-				System.err.println("can't use $templates scope w/o output=template option");
-				return c+2;
-			}
-			else {
-				MutableInteger nextCharIndexI = new MutableInteger();
-				String t =
-					generator.translateTemplateConstructor(r.name,
-														   actionAST,
-														   afterScopeIDIndex+2,
-														   nextCharIndexI);
-				buf.append(t);
-				return nextCharIndexI.value;
-			}
-		}
-		*/
-
 		AttributeScope attrScope = resolveScope(r, scopeName, attributeName);
 		if ( attrScope!=null &&
 			 (attrScope.isDynamicRuleScope || attrScope.isDynamicGlobalScope) ) {
@@ -580,6 +559,17 @@ public class ActionTranslator {
 			return refST.toString()+"."+attributeName;
 		}
 
+		if ( scope instanceof RuleLabelScope && grammar.type==Grammar.LEXER &&
+			 attribute==null )
+		{
+			// $RULE ref in lexer is ok, it's a token
+			StringTemplate refST =
+				generator.templates.getInstanceOf("lexerRuleLabel");
+			refST.setAttribute("label", scopeName);
+			// we must ignore the unknown; put it in the translated action
+			return refST.toString();
+		}
+
 		// Spend some effort to generate good messages
 		int msgID = 0;
 		// $rulename.unknown
@@ -671,11 +661,24 @@ public class ActionTranslator {
 			// Might be $parameter or $returnValue or rule-scope property
 			List ruleRefs = r.getRuleRefsInAlt(attributeName, actionAST.outerAltNum);
 			if ( ruleRefs!=null ) {
+				String ruleRef = attributeName;
 				// isolated reference to a rule referenced in this alt
-				ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_SCOPE,
-										  grammar,
-										  actionToken,
-										  ref);
+				if ( grammar.type == Grammar.LEXER ) { // ok in lexer, is token
+					if ( ruleRefs.size()>1 ) {
+						ErrorManager.grammarError(ErrorManager.MSG_NONUNIQUE_REF,
+												  grammar,
+												  actionToken,
+												  ref);
+						return ref;
+					}
+					return translateRuleReference(r,actionAST,ruleRef,null);
+				}
+				else {
+					ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_SCOPE,
+											  grammar,
+											  actionToken,
+											  ref);
+				}
 				return ref;
 			}
 			if ( r.name.equals(attributeName) ) {

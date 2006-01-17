@@ -27,7 +27,8 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.misc.*;
+import org.antlr.misc.IntSet;
+import org.antlr.misc.OrderedHashSet;
 import org.antlr.tool.Grammar;
 
 import java.util.*;
@@ -202,9 +203,29 @@ public class NFAToDFAConverter {
 		// state should become an accept state, predicting exit of loop.  It's
 		// just reversing the resolution of ambiguity.
 		// TODO: should this be done in the resolveAmbig method?
-		if ( !dfa.isGreedy() && labels.contains(new Label(Label.EOT)) ) {
+		Label EOTLabel = new Label(Label.EOT);
+		boolean containsEOT = labels.contains(EOTLabel);
+		if ( !dfa.isGreedy() && containsEOT ) {
 			convertToEOTAcceptState(d);
 			return; // no more work to do on this accept state
+		}
+
+		// if in filter mode for lexer, want to match shortest not longest
+		// string so if we see an EOT edge emanating from this state, then
+		// convert this state to an accept state.  This only counts for
+		// The Tokens rule as all other decisions must continue to look for
+		// longest match.
+		if ( dfa.nfa.grammar.type==Grammar.LEXER && containsEOT ) {
+			String filterOption = (String)dfa.nfa.grammar.getOption("filter");
+			boolean filterMode = filterOption!=null && filterOption.equals("true");
+			if ( filterMode && d.dfa.isTokensRuleDecision() ) {
+				DFAState t = reach(d, EOTLabel);
+				if ( t.getNFAConfigurations().size()>0 ) {
+					convertToEOTAcceptState(d);
+					//System.out.println("state "+d+" has EOT target "+t.stateNumber);
+					return;
+				}
+			}
 		}
 
 		// for each label that could possibly emanate from NFAStates of d
@@ -219,6 +240,10 @@ public class NFAToDFAConverter {
 			}
 			if ( t.getNFAConfigurations().size()==0 ) {
 				// nothing was reached by label due to conflict resolution
+				// EOT also seems to be in here occasionally probably due
+				// to an end-of-rule state seeing it even though we'll pop
+				// an invoking state off the state; don't bother to conflict
+				// as this labels set is a covering approximation only.
 				continue;
 			}
 			closure(t);  // add any NFA states reachable via epsilon
@@ -237,7 +262,7 @@ public class NFAToDFAConverter {
 			System.out.println("DFA state after closure "+d+"-"+
 							   label.toString(dfa.nfa.grammar)+
 							   "->"+t);
-			*/
+							   */
 
 			DFAState targetState = addDFAStateToWorkList(t); // add if not in DFA yet
 
@@ -247,6 +272,8 @@ public class NFAToDFAConverter {
 			// lookahead of target must be one larger than d's k
 			targetState.setLookaheadDepth(d.getLookaheadDepth() + 1);
 		}
+
+		//System.out.println("DFA after reach / closures:\n"+dfa);
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
 			// TODO: can fixed lookahead hit a dangling state case?
@@ -1032,13 +1059,8 @@ public class NFAToDFAConverter {
 			// is more than 1 alt predicted?
 			if ( allAlts!=null && allAlts.size()>1 ) {
 				nondeterministicAlts = allAlts;
-				int decisionNumber = d.dfa.getDecisionNumber();
-				NFAState tokensRuleStartState =
-					dfa.nfa.grammar.getRuleStartState(Grammar.ARTIFICIAL_TOKENS_RULENAME);
-				NFAState tokensRuleDecisionState =
-					(NFAState)tokensRuleStartState.transition(0).target;
 				// track Tokens rule issues differently than other decisions
-				if ( decisionNumber == tokensRuleDecisionState.getDecisionNumber() ) {
+				if ( d.dfa.isTokensRuleDecision() ) {
 					dfa.probe.reportLexerRuleNondeterminism(d,allAlts);
 					//System.out.println("Tokens rule DFA state "+d.stateNumber+" nondeterministic");
 					conflictingLexerRules = true;

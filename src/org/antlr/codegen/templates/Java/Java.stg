@@ -70,14 +70,18 @@ import java.util.HashMap;
 <recognizer>
 >>
 
-lexer(name, tokens, rules, numRules, cyclicDFAs, labelType="Token",
+lexer(name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="Token",
       filterMode) ::= <<
 public class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
+    <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <actions.lexer.members>
     public <name>() {;} <! needed by subclasses !>
     public <name>(CharStream input) {
         super(input);
+<if(memoize)>
+        ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
+<endif>
     }
 
 <if(filterMode)>
@@ -308,23 +312,35 @@ if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.n
  *  fragment rules.
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
+<ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
+
+// $ANTLR start <ruleName>
 public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
-    <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+    <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+    <ruleDeclarations()>
+    try {
 <if(nakedBlock)>
-    <ruleDescriptor.actions.init>
-    <block><\n>
+        <ruleDescriptor.actions.init>
+        <ruleMemoization(name=ruleName)>
+        <block><\n>
 <else>
-    int type = <ruleName>;
-    int start = getCharIndex();
-    int line = getLine();
-    int charPosition = getCharPositionInLine();
-    int channel = Token.DEFAULT_CHANNEL;
-    <ruleDescriptor.actions.init>
-    <block>
-    if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}<\n>
+        int type = <ruleName>;
+        int start = getCharIndex();
+        int line = getLine();
+        int charPosition = getCharPositionInLine();
+        int channel = Token.DEFAULT_CHANNEL;
+        <ruleDescriptor.actions.init>
+        <ruleMemoization(name=ruleName)>
+        <block>
+        if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}<\n>
 <endif>
-    <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+    }
+    finally {
+        <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+        <ruleCleanUp()>
+    }
 }
+// $ANTLR end <ruleName>
 >>
 
 /** How to generate code for the implicitly-defined lexer grammar rule
@@ -996,6 +1012,9 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
 ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start,<scope>.stop)"
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
+
+/** Isolated $RULE ref ok in lexer as it's a Token */
+lexerRuleLabel(label) ::= "<label>"
 
 lexerRuleLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
 lexerRuleLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
