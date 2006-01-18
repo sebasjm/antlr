@@ -101,6 +101,18 @@ tokens {
 	protected int gtype = 0;
 	protected String currentRuleName = null;
 
+	/* this next stuff supports construction of the Tokens artificial rule.
+	   I hate having some partial functionality here, I like doing everything
+	   in future tree passes, but the Tokens rule is sensitive to filter mode.
+	   And if it adds syn preds, future tree passes will need to process th
+	   fragments defined in Tokens; a cyclic dependency.
+	   As of 1-17-06 then, Tokens is created for lexer grammars in the
+	   antlr grammar parser itself.
+	*/
+	protected boolean isFilterMode;
+	protected List lexerRuleNames = new ArrayList();
+	public List getLexerRuleNames() { return lexerRuleNames; }
+
 	protected GrammarAST setToBlockWithSet(GrammarAST b) {
 		return #(#[BLOCK,"BLOCK"],
 		           #(#[ALT,"ALT"],
@@ -141,6 +153,16 @@ tokens {
 			"antlr: "+ex.toString(),
 			ex);
     }
+
+    public void cleanup(GrammarAST root) {
+		if ( gtype==LEXER_GRAMMAR ) {
+			GrammarAST tokensRuleAST =
+			    grammar.addArtificialMatchTokensRule(
+			    	root,
+			    	lexerRuleNames,
+			    	isFilterMode);
+		}
+    }
 }
 
 grammar![Grammar g]
@@ -159,6 +181,7 @@ grammar![Grammar g]
         EOF
         {
         #grammar = #(null, #(#gr, #gid, #cmt, #opt, #ts, #scopes, #a, #r));
+        cleanup(#grammar);
         }
 	;
 
@@ -194,7 +217,12 @@ optionsSpec
 	;
 
 option
-    :   id ASSIGN^ optionValue
+    :   o:id ASSIGN^ v:optionValue
+    	{
+    	if ( #o.getText().equals("filter") && #v.getText().equals("true") ) {
+    		isFilterMode = true;
+    	}
+    	}
     ;
 
 optionValue
@@ -264,7 +292,11 @@ int startLine = LT(1).getLine();
 	|	p4:"fragment"	{modifier=#p4;}
 	)?
 	ruleName:id
-	{currentRuleName=#ruleName.getText();}
+	{currentRuleName=#ruleName.getText();
+     if ( gtype==LEXER_GRAMMAR && #p4==null ) {
+         lexerRuleNames.add(currentRuleName);
+	 }
+	}
 	( BANG )?
 	( aa:ARG_ACTION )?
 	( "returns" rt:ARG_ACTION  )?

@@ -194,9 +194,6 @@ public class Interpreter implements TokenSource {
 		//System.out.println("scan("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
-			if ( grammar.type==Grammar.LEXER ) {
-				grammar.addArtificialMatchTokensRule();
-			}
 			grammar.createNFAs();
 			// Create the DFA predictors for each decision
 			grammar.createLookaheadDFAs();
@@ -223,9 +220,6 @@ public class Interpreter implements TokenSource {
 		//System.out.println("parse("+startRule+")");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
-			if ( grammar.type==Grammar.LEXER ) {
-				grammar.addArtificialMatchTokensRule();
-			}
 			grammar.createNFAs();
 			// Create the DFA predictors for each decision
 			grammar.createLookaheadDFAs();

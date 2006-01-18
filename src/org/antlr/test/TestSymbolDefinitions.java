@@ -27,16 +27,14 @@
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.*;
-import org.antlr.analysis.Label;
 import org.antlr.Tool;
+import org.antlr.analysis.Label;
+import org.antlr.test.unit.FailedAssertionException;
+import org.antlr.test.unit.TestSuite;
+import org.antlr.tool.*;
 
-import java.util.*;
 import java.io.StringReader;
-
-import antlr.Token;
+import java.util.*;
 
 public class TestSymbolDefinitions extends TestSuite {
 
@@ -77,7 +75,7 @@ public class TestSymbolDefinitions extends TestSuite {
 				"}\n"+
 				"A : 'a';\n" +
 				"C : 'c' ;");
-		String rules = "A, C";
+		String rules = "A, C, Tokens";
 		String tokenNames = "A, C, D";
 		checkSymbols(g, rules, tokenNames);
 	}

@@ -29,7 +29,6 @@ package org.antlr.analysis;
 
 import org.antlr.misc.IntSet;
 import org.antlr.misc.OrderedHashSet;
-import org.antlr.tool.Grammar;
 
 import java.util.*;
 
@@ -215,6 +214,10 @@ public class NFAToDFAConverter {
 		// convert this state to an accept state.  This only counts for
 		// The Tokens rule as all other decisions must continue to look for
 		// longest match.
+		// [Taking back out a few days later on Jan 17, 2006.  This could
+		//  be an option for the future, but this was wrong soluion for
+		//  filtering.]
+		/*
 		if ( dfa.nfa.grammar.type==Grammar.LEXER && containsEOT ) {
 			String filterOption = (String)dfa.nfa.grammar.getOption("filter");
 			boolean filterMode = filterOption!=null && filterOption.equals("true");
@@ -227,6 +230,7 @@ public class NFAToDFAConverter {
 				}
 			}
 		}
+		*/
 
 		// for each label that could possibly emanate from NFAStates of d
 		int numberOfEdgesEmanating = 0;

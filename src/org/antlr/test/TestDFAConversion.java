@@ -27,21 +27,17 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.*;
-import org.antlr.analysis.State;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.DecisionProbe;
-import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.BitSet;
+import org.antlr.test.unit.FailedAssertionException;
+import org.antlr.test.unit.TestSuite;
+import org.antlr.tool.*;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-
-import antlr.RecognitionException;
+import java.util.List;
 
 public class TestDFAConversion extends TestSuite {
 
@@ -913,9 +909,6 @@ As a result, alternative(s) 2 were disabled for that input
 
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
-			if ( g.type==Grammar.LEXER ) {
-				g.addArtificialMatchTokensRule();
-			}
 			g.createNFAs();
 			g.createLookaheadDFAs();
 		}

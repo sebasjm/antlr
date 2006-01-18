@@ -206,6 +206,12 @@ CHANGES
 
 3.0ea8 - ???
 
+* filter=true for lexers turns on k=1 and backtracking for every token
+  alternative.  Put the rules in priority order.
+
+* added getLine() etc... to Tree to support better error reporting for
+  trees.  Added MismatchedTreeNodeException.
+
 * $templates::foo() is gone.  added % as special template symbol.
   %foo(a={},b={},...) ctor (even shorter than $templates::foo(...))
   %({name-expr})(a={},...) indirect template ctor reference

@@ -47,7 +47,7 @@ public class ToolMessage extends Message {
 	public ToolMessage(int msgID, Object arg) {
 		super(msgID, arg, null);
 	}
-	public ToolMessage(int msgID, Exception e) {
+	public ToolMessage(int msgID, Throwable e) {
 		super(msgID);
 		this.e = e;
 	}

@@ -27,15 +27,11 @@
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.Grammar;
-import org.antlr.analysis.State;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.NFA;
 import org.antlr.runtime.ANTLRStringStream;
-
-import java.util.List;
+import org.antlr.test.unit.TestSuite;
+import org.antlr.tool.Grammar;
 
 public class TestDFAMatching extends TestSuite {
 
@@ -87,7 +83,7 @@ public class TestDFAMatching extends TestSuite {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : (DIGIT)+ '.' DIGIT | (DIGIT)+ ;\n" +
-                "DIGIT : '0'..'9' ;\n");
+                "fragment DIGIT : '0'..'9' ;\n");
 		g.createNFAs();
         g.createLookaheadDFAs();
         DFA dfa = g.getLookaheadDFA(3);

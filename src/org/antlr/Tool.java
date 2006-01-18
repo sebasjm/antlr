@@ -276,9 +276,11 @@ public class Tool {
 			generator.setTrace(trace);
 			generator.setMemoize(memo);
 
+			/*
 			if ( grammar.type==Grammar.LEXER ) {
 				grammar.addArtificialMatchTokensRule();
 			}
+			*/
 
 			generator.genRecognizer();
 		}

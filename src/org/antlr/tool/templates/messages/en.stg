@@ -47,8 +47,10 @@ internal error: <arg> <arg2><if(exception)>: <exception><endif>
 <stackTrace; separator="\n">
 >>
 INTERNAL_WARNING(arg) ::= "internal warning: <arg>"
-ERROR_CREATING_ARTIFICIAL_RULE(exception,stackTrace) ::=
-	"problems creating lexer rule listing all tokens: <exception>"
+ERROR_CREATING_ARTIFICIAL_RULE(arg,exception,stackTrace) ::= <<
+problems creating lexer rule listing all tokens: <exception>
+<stackTrace; separator="\n">
+>>
 TOKENS_FILE_SYNTAX_ERROR(arg,arg2) ::= 
 	"problems parsing token vocabulary file <arg> on line <arg2>"
 CANNOT_GEN_DOT_FILE(arg,exception,stackTrace) ::= 

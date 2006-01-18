@@ -395,14 +395,22 @@ public class Grammar {
 		tokenBuffer.discard(ANTLRParser.COMMENT);
 		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
 		ANTLRParser parser = new ANTLRParser(tokenBuffer);
+		List lexerRuleNames = parser.getLexerRuleNames();
 		parser.setFilename(this.getFileName());
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar(this);
-		setFileName(lexer.getFilename()); // the lexer #src might change name
 		grammarTree = (GrammarAST)parser.getAST();
-		addArtificialRulesForSyntacticPredicates(parser,
-												 grammarTree,
-												 nameToSynpredASTMap);
+		setFileName(lexer.getFilename()); // the lexer #src might change name
+
+		// Get syn pred rules and add to existing tree
+		List synpredRules =
+			getArtificialRulesForSyntacticPredicates(parser,
+												 	 nameToSynpredASTMap);
+		for (int i = 0; i < synpredRules.size(); i++) {
+			GrammarAST rAST = (GrammarAST) synpredRules.get(i);
+			grammarTree.addChild(rAST);
+		}
+
 		if ( Tool.internalOption_PrintGrammarTree ) {
 			System.out.println(grammarTree.toStringList());
 		}
@@ -430,6 +438,27 @@ public class Grammar {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
+
+		/*
+		if ( type==Grammar.LEXER ) {
+			GrammarAST tokensRuleAST = addArtificialMatchTokensRule(lexerRuleNames);
+			synpredRules =
+				getArtificialRulesForSyntacticPredicates(parser,
+														 nameToSynpredASTMap);
+			// DEFINE TOKENS RULES and any associated synpred fragments
+			try {
+				defineItemsWalker.rule(tokensRuleAST);
+				for (int i = 0; i < synpredRules.size(); i++) {
+					GrammarAST rAST = (GrammarAST) synpredRules.get(i);
+					defineItemsWalker.rule(rAST);
+				}
+			}
+			catch (RecognitionException re) {
+				ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
+								   re);
+			}
+		}
+		*/
 
 		nameSpaceChecker.checkConflicts();
 	}
@@ -466,31 +495,44 @@ public class Grammar {
 		return lexerGrammarST.toString();
 	}
 
-    /** Parse a rule we add artificially that is a list of the other lexer
+	/** Parse a rule we add artificially that is a list of the other lexer
      *  rules like this: "Tokens : ID | INT | SEMI ;"  nextToken() will invoke
      *  this to set the current token.  Add char literals before
      *  the rule references.
+	 *
+	 *  If in filter mode, we want every alt to backtrack and we need to
+	 *  do k=1 to force the "first token def wins" rule.  Otherwise, the
+	 *  longest-match rule comes into play with LL(*).
+	 *
+	 *  The ANTLRParser antlr.g file now invokes this when parsing a lexer
+	 *  grammar, which I think is proper even though it peeks at the info
+	 *  that later phases will compute.  It gets a list of lexer rules
+	 *  and builds a string representing the rule; then it creates a parser
+	 *  and adds the resulting tree to the grammar's tree.
      */
-    public void addArtificialMatchTokensRule() {
-        StringTemplate matchTokenRuleST =
-            new StringTemplate(
-                    ARTIFICIAL_TOKENS_RULENAME+" : <rules; separator=\"|\">;",
-                    AngleBracketTemplateLexer.class);
+    public GrammarAST addArtificialMatchTokensRule(GrammarAST grammarAST,
+												   List ruleNames,
+												   boolean filterMode) {
+		StringTemplate matchTokenRuleST = null;
+		if ( filterMode ) {
+			matchTokenRuleST = new StringTemplate(
+					ARTIFICIAL_TOKENS_RULENAME+
+						" options {k=1;} : <rules:{r| (<r>)=><r>}; separator=\"|\">;",
+					AngleBracketTemplateLexer.class);
+		}
+		else {
+			matchTokenRuleST = new StringTemplate(
+					ARTIFICIAL_TOKENS_RULENAME+" : <rules; separator=\"|\">;",
+					AngleBracketTemplateLexer.class);
+		}
 
-        // Now add token rule references
-        Collection ruleNames = getRules();
-        Iterator iter = ruleNames.iterator();
+		// Now add token rule references
 		int numAlts = 0;
-        while (iter.hasNext()) {
-            Rule r = (Rule) iter.next();
-			// only add real token rules to Tokens rule
-			if ( r.modifier==null ||
-				 !r.modifier.equals(FRAGMENT_RULE_MODIFIER) )
-			{
-            	matchTokenRuleST.setAttribute("rules", r.name);
-				numAlts++;
-			}
-        }
+		for (int i = 0; i < ruleNames.size(); i++) {
+			String rname = (String) ruleNames.get(i);
+			matchTokenRuleST.setAttribute("rules", rname);
+			numAlts++;
+		}
 		//System.out.println("tokens rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
@@ -502,6 +544,7 @@ public class Grammar {
 		tokenBuffer.discard(ANTLRParser.COMMENT);
 		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
         ANTLRParser parser = new ANTLRParser(tokenBuffer);
+		parser.grammar = this;
 		parser.gtype = ANTLRParser.LEXER_GRAMMAR;
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
         try {
@@ -509,28 +552,28 @@ public class Grammar {
 			if ( Tool.internalOption_PrintGrammarTree ) {
 				System.out.println("Tokens rule: "+parser.getAST().toStringTree());
 			}
-			GrammarAST p = grammarTree;
+			GrammarAST p = grammarAST;
 			while ( p.getType()!=ANTLRParser.LEXER_GRAMMAR ) {
 				p = (GrammarAST)p.getNextSibling();
 			}
 			p.addChild(parser.getAST());
         }
         catch (Exception e) {
-            ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,e);
+			ErrorManager.error(ErrorManager.MSG_ERROR_CREATING_ARTIFICIAL_RULE,
+							   e);
         }
-		antlr.Token ruleToken = new antlr.TokenWithIndex(ANTLRParser.ID,ARTIFICIAL_TOKENS_RULENAME);
-		defineRule(ruleToken, null, null, (GrammarAST)parser.getAST(), null, numAlts);
+		return (GrammarAST)parser.getAST();
 	}
 
-	/** for any syntactic predicates, define rules for them; they will get
+	/** for any syntactic predicates, we need to define rules for them; they will get
 	 *  defined automatically like any other rule. :)
 	 */
-	protected void addArtificialRulesForSyntacticPredicates(ANTLRParser parser,
-															GrammarAST grammarTree,
+	protected List getArtificialRulesForSyntacticPredicates(ANTLRParser parser,
 															LinkedHashMap nameToSynpredASTMap)
 	{
+		List rules = new ArrayList();
 		if ( nameToSynpredASTMap==null ) {
-			return;
+			return rules;
 		}
 		Set predNames = nameToSynpredASTMap.keySet();
 		boolean isLexer = grammarTree.getType()==ANTLRParser.LEXER_GRAMMAR;
@@ -542,8 +585,9 @@ public class Grammar {
 				parser.createSimpleRuleAST(synpredName+"_fragment",
 										   fragmentAST,
 										   isLexer);
-			grammarTree.addChild(ruleAST);
+			rules.add(ruleAST);
 		}
+		return rules;
 	}
 
     protected void initTokenSymbolTables() {

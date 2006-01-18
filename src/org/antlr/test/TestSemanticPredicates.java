@@ -27,21 +27,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.*;
-import org.antlr.analysis.State;
+import org.antlr.Tool;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.DecisionProbe;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.BitSet;
-import org.antlr.misc.Utils;
-import org.antlr.Tool;
+import org.antlr.test.unit.FailedAssertionException;
+import org.antlr.test.unit.TestSuite;
+import org.antlr.tool.*;
 
 import java.util.List;
-import java.util.LinkedList;
-
-import antlr.RecognitionException;
 
 public class TestSemanticPredicates extends TestSuite {
 
@@ -515,9 +510,6 @@ public class TestSemanticPredicates extends TestSuite {
 		g.setCodeGenerator(generator);
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
-			if ( g.type==Grammar.LEXER ) {
-				g.addArtificialMatchTokensRule();
-			}
 			g.createNFAs();
 			g.createLookaheadDFAs();
 		}

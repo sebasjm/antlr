@@ -381,9 +381,6 @@ public class TestCharDFAConversion extends TestSuite {
 		if ( g.getCodeGenerator()==null ) {
 			CodeGenerator generator = new CodeGenerator(null, g, "Java");
 			g.setCodeGenerator(generator);
-			if ( g.type==Grammar.LEXER ) {
-				g.addArtificialMatchTokensRule();
-			}
 			g.createNFAs();
 			g.createLookaheadDFAs();
 		}
