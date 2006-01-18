@@ -30,7 +30,7 @@ package org.antlr.runtime;
 public class CommonToken extends Token {
     protected int type;
 	protected int line;
-	protected int charPositionInLine;
+	protected int charPositionInLine = -1; // set to invalid position
 	protected int channel=DEFAULT_CHANNEL;
 	protected CharStream input;
 	/** We need to be able to change the text once in a while.  If
@@ -60,7 +60,22 @@ public class CommonToken extends Token {
 		this.stop = stop;
     }
 
-    public int getType() {
+	public CommonToken(int type, String text) {
+		this.type = type;
+		this.channel = DEFAULT_CHANNEL;
+		this.text = text;
+	}
+
+	public CommonToken(Token oldToken) {
+		text = oldToken.getText();
+		type = oldToken.getType();
+		line = oldToken.getLine();
+		index = oldToken.getTokenIndex();
+		charPositionInLine = oldToken.getCharPositionInLine();
+		channel = oldToken.getChannel();
+	}
+
+	public int getType() {
         return type;
     }
 

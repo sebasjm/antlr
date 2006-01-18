@@ -1,7 +1,6 @@
 package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.CommonToken;
 
 /** What does a tree look like?  ANTLR has a number of support classes
  *  such as CommonTreeNodeStream that work on these kinds of trees.  You
@@ -30,6 +29,11 @@ public interface Tree {
 
 	/** Return a token type; needed for tree parsing */
 	int getType();
+
+	/** In case we don't have a token payload, what is the line for errors? */
+	int getLine();
+
+	int getCharPositionInLine();
 
 	String toStringTree();
 

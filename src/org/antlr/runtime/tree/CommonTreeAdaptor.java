@@ -1,6 +1,6 @@
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.ClassicToken;
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
 /** A TreeAdaptor that works with any Tree implementation.  It provides
@@ -29,12 +29,12 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 
 	/** Create an imaginary token from a type and text */
 	public Token createToken(int tokenType, String text) {
-		return new ClassicToken(tokenType, text);
+		return new CommonToken(tokenType, text);
 	}
 
 	/** Create an imaginary token, copying the contents of a previous token */
 	public Token createToken(Token fromToken) {
-		return new ClassicToken(fromToken);
+		return new CommonToken(fromToken);
 	}
 
 	/** track start/stop token index for subtree root created for a rule */

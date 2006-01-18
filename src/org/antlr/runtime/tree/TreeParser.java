@@ -1,6 +1,6 @@
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.*;
 
 /** A parser for a stream of tree nodes.  "tree grammars" result in a subclass
  *  of this.  All the error reporting and recovery is shared with Parser via
@@ -22,4 +22,18 @@ public class TreeParser extends BaseRecognizer {
 	public TreeNodeStream getTreeNodeStream() {
 		return input;
 	}
+
+	
+
+	/** We have DOWN/UP nodes in the stream that have no line info; override.
+	 *  plus we want to alter the exception type.
+	 */
+	protected void mismatch(IntStream input, int ttype, BitSet follow)
+		throws RecognitionException
+	{
+		MismatchedTreeNodeException mte =
+			new MismatchedTreeNodeException(ttype, (TreeNodeStream)input);
+		recoverFromMismatchedToken(input, mte, ttype, follow);
+	}
+
 }

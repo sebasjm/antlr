@@ -27,9 +27,8 @@
 */
 package org.antlr.runtime.tree;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
 /** A generic tree implementation with no payload.  You must subclass to
  *  actually have any user data.  ANTLR v3 uses a list of children approach
@@ -152,6 +151,14 @@ public abstract class BaseTree implements Tree {
 			buf.append(")");
 		}
 		return buf.toString();
+	}
+
+	public int getLine() {
+		return 0;
+	}
+
+	public int getCharPositionInLine() {
+		return 0;
 	}
 
 	/** Override to say how a node (not a tree) should look as text */

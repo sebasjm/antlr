@@ -61,7 +61,7 @@ public abstract class BaseRecognizer {
 	 *  MismatchedTokenException upon input.LA(1)!=ttype.
 	 */
 	public void match(IntStream input, int ttype, BitSet follow)
-		throws MismatchedTokenException
+		throws RecognitionException
 	{
 		if ( input.LA(1)==ttype ) {
 			input.consume();
@@ -73,9 +73,7 @@ public abstract class BaseRecognizer {
 			failed = true;
 			return;
 		}
-		MismatchedTokenException mte =
-			new MismatchedTokenException(ttype, input);
-		recoverFromMismatchedToken(input, mte, ttype, follow);
+		mismatch(input, ttype, follow);
 		return;
 	}
 
@@ -83,6 +81,17 @@ public abstract class BaseRecognizer {
 		errorRecovery = false;
 		failed = false;
 		input.consume();
+	}
+
+	/** factor out what to do upon token mismatch so tree parsers can behave
+	 *  differently.
+	 */
+	protected void mismatch(IntStream input, int ttype, BitSet follow)
+		throws RecognitionException
+	{
+		MismatchedTokenException mte =
+			new MismatchedTokenException(ttype, input);
+		recoverFromMismatchedToken(input, mte, ttype, follow);
 	}
 
 	/** Report a recognition problem.  Java is not polymorphic on the
@@ -128,6 +137,13 @@ public abstract class BaseRecognizer {
 							   e.token+
 							   "; expecting type "+
 							   tokenNames[mte.expecting]);
+		}
+		if ( e instanceof MismatchedTreeNodeException ) {
+			MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
+			System.err.println("mismatched tree node: "+
+							   mtne.foundNode+
+							   "; expecting type "+
+							   tokenNames[mtne.expecting]);
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;
@@ -390,10 +406,10 @@ public abstract class BaseRecognizer {
 	 *  reference in rule atom.  It can assume that you forgot the ')'.
 	 */
 	public void recoverFromMismatchedToken(IntStream input,
-										   MismatchedTokenException e,
+										   RecognitionException e,
 										   int ttype,
 										   BitSet follow)
-		throws MismatchedTokenException
+		throws RecognitionException
 	{
 		//System.out.println("recoverFromMismatchedToken");
 		// if next token is what we are looking for then "delete" this token
@@ -434,6 +450,11 @@ public abstract class BaseRecognizer {
 												   RecognitionException e,
 												   BitSet follow)
 	{
+		if ( follow==null ) {
+			// we have no information about the follow; we can only consume
+			// a single token and hope for the best
+			return false;
+		}
 		//System.out.println("recoverFromMismatchedElement");
 		// compute what can follow this grammar element reference
 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
@@ -465,14 +486,10 @@ public abstract class BaseRecognizer {
 
 	/** Consume tokens until one matches the given token set */
 	public void consumeUntil(IntStream input, BitSet set) {
-		/*
-		System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
-		System.out.println("LT(1)="+
-						   input.LT(1).toString());
-		*/
+		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
 		int ttype = input.LA(1);
 		while (ttype != Token.EOF && !set.member(ttype) ) {
-			//System.out.println("LT(1)="+input.LT(1));
+			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
 			input.consume();
 			ttype = input.LA(1);
 		}

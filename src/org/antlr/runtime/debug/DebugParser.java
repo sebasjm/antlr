@@ -99,7 +99,7 @@ public class DebugParser extends Parser {
 										   MismatchedTokenException mte,
 										   int ttype,
 										   org.antlr.runtime.BitSet follow)
-		throws MismatchedTokenException
+		throws RecognitionException
 	{
 		dbg.recognitionException(mte);
 		super.recoverFromMismatchedToken(input,mte,ttype,follow);

@@ -27,13 +27,10 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
 import java.util.Iterator;
 import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind.
  *
@@ -48,25 +45,36 @@ import java.util.ArrayList;
 public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	public static final int INITIAL_LOOKAHEAD_BUFFER_SIZE = 20;
 
-	protected static class DummyTree implements Tree {
+	protected static abstract class DummyTree implements Tree {
+		int line;
+		int charPositionInLine;
 		public Tree getChild(int i) { return null; }
 		public int getChildCount() { return 0;}
 		public void addChild(Tree t) {}
 		public boolean isNil() {return false;}
 		public Tree dupTree() {return null;}
 		public Tree dupNode() {return null;}
-		public int getType() {return 0;}
+		public int getLine() {return line;}
+		public int getCharPositionInLine() {return charPositionInLine;}
 		public String toStringTree() {return null;}
 	}
 
 	public static final DummyTree DOWN =
 		new DummyTree() {
 			public int getType() {return Token.DOWN;}
+			public String toString() {return "DOWN";}
 		};
 
 	public static final DummyTree UP =
 		new DummyTree() {
 			public int getType() {return Token.UP;}
+			public String toString() {return "UP";}
+		};
+
+	public static final DummyTree EOF_NODE =
+		new DummyTree() {
+			public int getType() {return Token.EOF;}
+			public String toString() {return "EOF";}
 		};
 
 	/** Pull nodes from which tree? */
@@ -254,6 +262,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	public Object next() {
 		// already walked entire tree; nothing to return
 		if ( currentNode==null ) {
+			addLookahead(EOF_NODE);
 			return null;
 		}
 
@@ -301,7 +310,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		nodeStack.push(currentNode);
 		indexStack.push(new Integer(child));
 		if ( child==0 && !currentNode.isNil() ) {
-			addLookahead(DOWN);
+			addNavigationNode(Token.DOWN);
 		}
 		// visit child
 		currentNode = (Tree)currentNode.getChild(child);
@@ -312,16 +321,45 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		return node;
 	}
 
+	protected void addNavigationNode(final int ttype) {
+		if ( currentNode instanceof CommonTree ) {
+			DummyTree nav =
+				new DummyTree() {
+					public int getType() {return ttype;}
+					public String toString() {
+						if ( ttype==Token.DOWN ) {
+							return "DOWN";
+						}
+						else {
+							return "UP";
+						}
+					}
+				};
+			nav.line = currentNode.getLine();
+			nav.charPositionInLine = currentNode.getCharPositionInLine();
+			addLookahead(nav);
+		}
+		else {
+			// don't know the kind of tree, just return fixed shared node
+			if ( ttype==Token.DOWN ) {
+				addLookahead(DOWN);
+			}
+			else {
+				addLookahead(UP);
+			}
+		}
+	}
+
 	protected void walkBackToMostRecentNodeWithUnvisitedChildren() {
 		while ( currentNode!=null &&
-			    currentChildIndex>=currentNode.getChildCount() )
+				currentChildIndex>=currentNode.getChildCount() )
 		{
 			currentNode = (Tree)nodeStack.pop();
 			currentChildIndex = ((Integer)indexStack.pop()).intValue();
 			currentChildIndex++; // move to next child
 			if ( currentChildIndex>=currentNode.getChildCount() ) {
 				if ( !currentNode.isNil() ) {
-					addLookahead(UP);
+					addNavigationNode(Token.UP);
 				}
 				if ( currentNode==root ) { // we done yet?
 					currentNode = null;

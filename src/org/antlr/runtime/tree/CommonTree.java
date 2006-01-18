@@ -48,6 +48,10 @@ public class CommonTree extends BaseTree {
 		this.token = t;
 	}
 
+	public Token getToken() {
+		return token;
+	}
+
 	public Tree dupNode() {
 		return new CommonTree(this);
 	}
@@ -65,6 +69,26 @@ public class CommonTree extends BaseTree {
 
 	public String getText() {
 		return toString();
+	}
+
+	public int getLine() {
+		if ( token==null || token.getLine()==0 ) {
+			if ( getChildCount()>0 ) {
+				return getChild(0).getLine();
+			}
+			return 0;
+		}
+		return token.getLine();
+	}
+
+	public int getCharPositionInLine() {
+		if ( token==null || token.getCharPositionInLine()==-1 ) {
+			if ( getChildCount()>0 ) {
+				return getChild(0).getCharPositionInLine();
+			}
+			return 0;
+		}
+		return token.getCharPositionInLine();
 	}
 
 	public String toString() {
