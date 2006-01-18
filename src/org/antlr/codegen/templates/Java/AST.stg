@@ -67,7 +67,7 @@ ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 retval.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
-adaptor.setTokenBoundaries(root_0, retval.start.getTokenIndex(), retval.stop.getTokenIndex());
+adaptor.setTokenBoundaries(retval.tree, retval.start.getTokenIndex(), retval.stop.getTokenIndex());
 <endif>
 >>
 
