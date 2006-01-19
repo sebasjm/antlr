@@ -43,11 +43,16 @@ public <name>(<inputStreamType> input) {
     setDebugListener(new Profiler(this));
 }<\n>
 <else>
+<! bug: can't use <@super.members()> cut-n-paste instead !>
 public <name>(<inputStreamType> input) {
     super(input);
+<if(memoize)>
+    ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
+<endif>
 }
 public <name>(<inputStreamType> input, DebugEventListener dbg) {
-    super(input,dbg);
+    this(new DebugTokenStream(input,dbg));
+    setDebugListener(dbg);
 }<\n>
 <endif>
 protected boolean evalPredicate(boolean result, String predicate) {
