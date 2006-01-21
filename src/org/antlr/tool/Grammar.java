@@ -631,6 +631,10 @@ public class Grammar {
 
     public void createNFAs() {
 		//System.out.println("### create NFAs");
+		if ( nfa!=null ) {
+			// don't let it create more than once; has side-effects
+			return;
+		}
 		nfa = new NFA(this); // create NFA that TreeToNFAConverter'll fill in
 		NFAFactory factory = new NFAFactory(nfa);
 		TreeToNFAConverter nfaBuilder = new TreeToNFAConverter(this, nfa, factory);
