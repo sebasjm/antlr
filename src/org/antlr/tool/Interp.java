@@ -27,11 +27,14 @@
 */
 package org.antlr.tool;
 
-import org.antlr.tool.*;
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
-import java.io.*;
-import java.util.*;
+import org.antlr.runtime.ANTLRFileStream;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.tree.ParseTree;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.StringTokenizer;
 
 /** Interpret any ANTLR grammar:
  *
@@ -79,6 +82,6 @@ public class Interp {
 		}
 		Interpreter parseEngine = new Interpreter(parser, tokens);
 		ParseTree t = parseEngine.parse(startRule);
-		System.out.println(t);
+		System.out.println(t.toStringTree());
 	}
 }

@@ -195,6 +195,9 @@ public class Interpreter implements TokenSource {
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
 			grammar.createNFAs();
+		}
+
+		if ( !grammar.allDecisionDFAHaveBeenCreated() ) {
 			// Create the DFA predictors for each decision
 			grammar.createLookaheadDFAs();
 		}
@@ -221,6 +224,8 @@ public class Interpreter implements TokenSource {
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
 			grammar.createNFAs();
+		}
+		if ( !grammar.allDecisionDFAHaveBeenCreated() ) {
 			// Create the DFA predictors for each decision
 			grammar.createLookaheadDFAs();
 		}

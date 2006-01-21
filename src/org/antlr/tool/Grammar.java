@@ -324,6 +324,8 @@ public class Grammar {
 	public Set setOfNondeterministicDecisionNumbersResolvedWithPredicates = new HashSet();
 	public int numberOfDFAConversionsTerminatedEarly = 0;
 
+	protected boolean allDecisionDFACreated = false;
+
 	public Grammar() {
 		initTokenSymbolTables();
 	}
@@ -706,6 +708,9 @@ public class Grammar {
 
 		long stop = System.currentTimeMillis();
 		DFACreationWallClockTimeInMS = stop - start;
+
+		// indicate that we've finished building DFA (even if #decisions==0)
+		allDecisionDFACreated = true;
 	}
 
 	/** Return a new unique integer in the token type space */
@@ -1796,7 +1801,11 @@ public class Grammar {
 		d.blockAST = blockAST;
 	}
 
-    /** How many token types have been allocated so far? */
+	public boolean allDecisionDFAHaveBeenCreated() {
+		return allDecisionDFACreated;
+	}
+
+	/** How many token types have been allocated so far? */
     public int getMaxTokenType() {
         return maxTokenType;
     }
