@@ -192,4 +192,21 @@ public class TestRewriteTemplates extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testTemplateRefToDynamicAttributes() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=template;}\n" +
+			"a scope {String id;} : ID b {System.out.println($b.st.toString());} ;\n" +
+			"b : INT -> foo(x={$a::id}) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "abc 34", debug);
+		String expecting = "abc \n";
+		assertEqual(found, expecting);
+	}
+
+
 }

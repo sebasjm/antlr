@@ -67,7 +67,7 @@ MISSING_CODE_GEN_TEMPLATES(arg) ::=
 	"cannot find code generation templates <arg>.stg"
 MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES() ::=
 	"cannot find code generation cyclic DFA templates for language <arg>"
-CODE_GEN_TEMPLATES_INCOMPLETE() ::= 
+CODE_GEN_TEMPLATES_INCOMPLETE(arg) ::= 
 	"at least one code generation template missing for language <arg>"
 CANNOT_CREATE_TARGET_GENERATOR(arg,exception,stackTrace) ::= 
 	"cannot create target <arg> code generator: <exception>"

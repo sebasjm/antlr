@@ -905,6 +905,37 @@ public class TestAttributes extends TestSuite {
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
+	public void testDynamicRuleScopeRefInSubrule() throws Exception {
+		String action = "$a::n;";
+		String expecting = "((a_scope)a_stack.peek()).n;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : b ;\n" +
+			"b : {"+action+"}\n" +
+			"  ;\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator);
+		String rawTranslation =
+			translator.translate("b",
+							 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+	}
+
 	public void testIsolatedGlobalScopeRef() throws Exception {
 		String action = "$Symbols;";
 		String expecting = "Symbols_stack;";
