@@ -32,6 +32,8 @@ import java.io.*;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.antlr.stringtemplate.CommonGroupLoader;
+import org.antlr.stringtemplate.StringTemplateGroupLoader;
 // import org.antlr.stringtemplate.misc.StringTemplateTreeView;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.analysis.*;
@@ -166,98 +168,67 @@ public class CodeGenerator {
 	/** load the main language.stg template group file */
 	protected void loadTemplates(String language) {
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		String mainTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"/"+language+".stg";
-		InputStream is = cl.getResourceAsStream(mainTemplateGroupFileName);
-		if ( is==null ) {
+
+		// get a group loader containing main templates dir and target subdir
+		String absoluteTemplateRootDirectoryName =
+			cl.getResource("org/antlr/codegen/templates").getFile();
+		String templateDirs =
+			absoluteTemplateRootDirectoryName+":"+
+			absoluteTemplateRootDirectoryName+"/"+language;
+		//System.out.println("targets="+templateDirs.toString());
+		StringTemplateGroupLoader loader =
+			new CommonGroupLoader(templateDirs.toString(),
+							  ErrorManager.getStringTemplateErrorListener());
+		StringTemplateGroup.registerGroupLoader(loader);
+		StringTemplateGroup.registerDefaultLexer(AngleBracketTemplateLexer.class);
+
+		// first load main language template
+		StringTemplateGroup coreTemplates =
+			StringTemplateGroup.loadGroup(language);
+		if ( coreTemplates==null ) {
 			ErrorManager.error(ErrorManager.MSG_MISSING_CODE_GEN_TEMPLATES,
 							   language);
 			return;
 		}
 
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		templates = new StringTemplateGroup(br,
-											AngleBracketTemplateLexer.class,
-											ErrorManager.getStringTemplateErrorListener());
-		try {
-			br.close();
-		}
-		catch (IOException ioe) {
-			ErrorManager.internalError("can't close code gen templates file");
-		}
-		if ( !templates.isDefined("outputFile") ) {
-			ErrorManager.error(ErrorManager.MSG_CODE_GEN_TEMPLATES_INCOMPLETE,
-							   language);
-		}
-
-		// if they have debug on, Dbg inherits from <language>.stg
-		// We can't handle lexers at the moment.
-		if ( debug && grammar.type!=Grammar.LEXER ) {
-			String ASTTemplateGroupFileName = "org/antlr/codegen/templates/"+language+"/Dbg.stg";
-			is = cl.getResourceAsStream(ASTTemplateGroupFileName);
-			if ( is==null ) {
-				ErrorManager.error(ErrorManager.MSG_MISSING_CODE_GEN_TEMPLATES,
-								   language+"/Dbg");
-				return;
-			}
-			// Dbg templates INHERIT from normal templates
-			BufferedReader astbr = new BufferedReader(new InputStreamReader(is));
-			StringTemplateGroup DbgTemplates =
-				new StringTemplateGroup(astbr,
-										AngleBracketTemplateLexer.class,
-										ErrorManager.getStringTemplateErrorListener(),
-										templates);
-			templates = DbgTemplates;
-
-			try {
-				astbr.close();
-			}
-			catch (IOException ioe) {
-				ErrorManager.internalError("can't close AST code gen templates file");
-			}
-		}
-
-		// if they want to generate ASTs, must have AST.stg file
+		// dynamically add subgroups that act like filters to apply to
+		// their supergroup.  E.g., Java:Dbg:AST:ASTDbg.
 		String outputOption = (String)grammar.getOption("output");
-		if ( outputOption!=null &&
-			 (outputOption.equals("AST")||outputOption.equals("template")) )
-		{
-			String outputLib = "AST";
-			if ( outputOption.equals("template") ) {
-				outputLib = "ST";
+		if ( outputOption!=null && outputOption.equals("AST") ) {
+			if ( debug && grammar.type!=Grammar.LEXER ) {
+				StringTemplateGroup dbgTemplates =
+					StringTemplateGroup.loadGroup("Dbg", coreTemplates);
+				StringTemplateGroup astTemplates =
+					StringTemplateGroup.loadGroup("AST",dbgTemplates);
+				StringTemplateGroup astDbgTemplates =
+					StringTemplateGroup.loadGroup("ASTDbg", astTemplates);
+				templates = astDbgTemplates;
 			}
-			String ASTTemplateGroupFileName =
-				"org/antlr/codegen/templates/"+language+"/"+outputLib+".stg";
-			is = cl.getResourceAsStream(ASTTemplateGroupFileName);
-			if ( is==null ) {
-				ErrorManager.error(ErrorManager.MSG_MISSING_CODE_GEN_TEMPLATES,
-								   language+"/"+outputLib);
-				return;
-			}
-			// Output templates INHERIT from normal or normal+Dbg templates
-			BufferedReader astbr = new BufferedReader(new InputStreamReader(is));
-			StringTemplateGroup OutputTemplates =
-				new StringTemplateGroup(astbr,
-										AngleBracketTemplateLexer.class,
-										ErrorManager.getStringTemplateErrorListener(),
-										templates);
-			//System.out.println("AST templates: "+OutputTemplates.toString(false));
-			templates = OutputTemplates;
-
-			try {
-				astbr.close();
-			}
-			catch (IOException ioe) {
-				ErrorManager.internalError("can't close AST code gen templates file");
+			else {
+				templates = StringTemplateGroup.loadGroup("AST", coreTemplates);
 			}
 		}
-
-		try {
-			br.close();
+		else if ( outputOption!=null && outputOption.equals("template") ) {
+			if ( debug && grammar.type!=Grammar.LEXER ) {
+				StringTemplateGroup dbgTemplates =
+					StringTemplateGroup.loadGroup("Dbg", coreTemplates);
+				StringTemplateGroup stTemplates =
+					StringTemplateGroup.loadGroup("ST",dbgTemplates);
+				/*
+				StringTemplateGroup astDbgTemplates =
+					StringTemplateGroup.loadGroup("STDbg", astTemplates);
+				*/
+				templates = stTemplates;
+			}
+			else {
+				templates = StringTemplateGroup.loadGroup("ST", coreTemplates);
+			}
 		}
-		catch (IOException ioe) {
-			ErrorManager.error(ErrorManager.MSG_CANNOT_CLOSE_FILE,
-							   mainTemplateGroupFileName,
-							   ioe);
+		else if ( debug && grammar.type!=Grammar.LEXER ) {
+			templates = StringTemplateGroup.loadGroup("Dbg", coreTemplates);
+		}
+		else {
+			templates = coreTemplates;
 		}
 	}
 
@@ -276,6 +247,9 @@ public class CodeGenerator {
 	public void genRecognizer() {
 		// LOAD OUTPUT TEMPLATES
 		loadTemplates(language);
+		if ( templates==null ) {
+			return;
+		}
 
 		// CREATE NFA FROM GRAMMAR, CREATE DFA FROM NFA
 		target.performGrammarAnalysis(this, grammar);

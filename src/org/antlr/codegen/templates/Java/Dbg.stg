@@ -51,8 +51,7 @@ public <name>(<inputStreamType> input) {
 <endif>
 }
 public <name>(<inputStreamType> input, DebugEventListener dbg) {
-    this(new DebugTokenStream(input,dbg));
-    setDebugListener(dbg);
+    super(input, dbg);
 }<\n>
 <endif>
 protected boolean evalPredicate(boolean result, String predicate) {

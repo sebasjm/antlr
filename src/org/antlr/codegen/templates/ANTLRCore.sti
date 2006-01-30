@@ -1,0 +1,332 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2005 Terence Parr
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+interface ANTLRCore;
+
+/** The overall file structure of a recognizer; stores methods for rules
+ *  and cyclic DFAs plus support code.
+ */
+outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
+           docComment, recognizer,
+           name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
+           buildTemplate, profile,
+	   backtracking, synpreds, memoize, numRules,
+	   fileName, ANTLRVersion, generatedTimestamp, trace);
+
+optional 
+headerFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
+           recognizer, name, tokens, tokenNames, rules, cyclicDFAs,
+           bitsets, buildTemplate, profile, backtracking, synpreds,
+           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp);
+
+lexer(name, tokens, scopes, rules, numRules, cyclicDFAs, labelType,
+      filterMode);
+
+parser(name, scopes, tokens, tokenNames, rules, numRules,
+       cyclicDFAs, bitsets, ASTLabelType, superClass,
+       labelType, members);
+
+/** How to generate a tree parser; same as parser except the input
+ *  stream is a different type.
+ */
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules,
+           numRules, cyclicDFAs, bitsets, labelType, ASTLabelType,
+           superClass, members);
+
+/** How to generate code for a rule.  This includes any return type
+ *  data aggregates required for multiple return values.
+ */
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions);
+
+/** How to generate a rule in the lexer; naked blocks are used for
+ *  fragment rules.
+ */
+lexerRule(ruleName,nakedBlock,ruleDescriptor,block);
+
+/** How to generate code for the implicitly-defined lexer grammar rule
+ *  that chooses between lexer rules.
+ */
+tokensRule(ruleName,nakedBlock,args,block,ruleDescriptor);
+
+// S U B R U L E S
+
+/** A (...) subrule with multiple alternatives */
+block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description);
+
+/** A rule block with multiple alternatives */
+ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description);
+
+ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description);
+
+/** A special case of a (...) subrule with a single alternative */
+blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description);
+
+/** A (..)+ block with 0 or more alternatives */
+positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description);
+
+positiveClosureBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description);
+
+/** A (..)* block with 0 or more alternatives */
+closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description);
+
+closureBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description);
+
+/** Optional blocks (x)? are translated to (x|) by before code generation
+ *  so we can just use the normal block template
+ */
+optionalBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description);
+
+optionalBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description);
+
+/** An alternative is just a list of elements; at outermost level */
+alt(elements,altNum,description,autoAST,outerAlt);
+
+// E L E M E N T S
+
+/** match a token optionally with a label in front */
+tokenRef(token,label,elementIndex);
+
+/** ids+=ID */
+tokenRefAndListLabel(token,label,elementIndex);
+
+listLabel(label);
+
+/** match a character */
+charRef(char,label);
+
+/** match a character range */
+charRangeRef(a,b);
+
+/** For now, sets are interval tests and must be tested inline */
+matchSet(s,label,elementIndex,postmatchCode);
+
+matchSetAndListLabel(s,label,elementIndex,postmatchCode);
+
+/** Match a string literal */
+lexerStringRef(string,label);
+
+wildcard(label,elementIndex);
+
+wildcardAndListLabel(label,elementIndex);
+
+/** Match . wildcard in lexer */
+wildcardChar(label, elementIndex);
+
+wildcardCharListLabel(label, elementIndex);
+
+/** Match a rule reference by invoking it possibly with arguments
+ *  and a return value or values.
+ */
+ruleRef(rule,label,elementIndex,args);
+
+/** ids+=ID */
+ruleRefAndListLabel(rule,label,elementIndex,args);
+
+/** A lexer rule reference */
+lexerRuleRef(rule,label,args);
+
+/** EOF in the lexer */
+lexerMatchEOF(label);
+
+/** match ^(root children) in tree parser */
+tree(root, children);
+
+/** Every predicate is used as a validating predicate (even when it is
+ *  also hoisted into a prediction expression).
+ */
+validateSemanticPredicate(pred,description);
+
+// F i x e d  D F A  (if-then-else)
+
+dfaState(k,edges,eotPredictsAlt,description,stateNumber);
+
+/** Same as a normal DFA state except that we don't examine lookahead
+ *  for the bypass alternative.  It delays error detection but this
+ *  is faster, smaller, and more what people expect.  For (X)? people
+ *  expect "if ( LA(1)==X ) match(X);" and that's it.
+ */
+dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber);
+
+/** A DFA state that is actually the loopback decision of a closure
+ *  loop.  If end-of-token (EOT) predicts any of the targets then it
+ *  should act like a default clause (i.e., no error can be generated).
+ *  This is used only in the lexer so that for ('a')* on the end of a rule
+ *  anything other than 'a' predicts exiting.
+ */
+dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber);
+
+/** An accept state indicates a unique alternative has been predicted */
+dfaAcceptState(alt);
+
+/** A simple edge with an expression.  If the expression is satisfied,
+ *  enter to the target state.  To handle gated productions, we may
+ *  have to evaluate some predicates for this edge.
+ */
+dfaEdge(labelExpr, targetState, predicates);
+
+// F i x e d  D F A  (switch case)
+
+/** A DFA state where a SWITCH may be generated.  The code generator
+ *  decides if this is possible: CodeGenerator.canGenerateSwitch().
+ */
+dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber);
+
+dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber);
+
+dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber);
+
+dfaEdgeSwitch(labels, targetState);
+
+// C y c l i c  D F A
+
+/** The code to initiate execution of a cyclic DFA; this is used
+ *  in the rule to predict an alt just like the fixed DFA case.
+ *  The <name> attribute is inherited via the parser, lexer, ...
+ */
+dfaDecision(decisionNumber,description);
+
+/** The overall cyclic DFA chunk; contains all the DFA states */
+cyclicDFA(className,ruleName,ruleDescriptor,decisionNumber,states,description);
+
+/** A state in a cyclic DFA */
+cyclicDFAState(stateNumber,edges,needErrorClause);
+
+/** An accept state for a cyclic DFA */
+cyclicDFAAcceptState(stateNumber,predictAlt);
+
+/** Just like a fixed DFA edge, test the lookahead and indicate what
+ *  state to jump to next if successful.
+ */
+cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates);
+
+/** An edge pointing at end-of-token; essentially matches any char;
+ *  always jump to the target.
+ */
+eotDFAEdge(targetStateNumber,edgeNumber, predicates);
+
+// C y c l i c  S W I T C H
+
+/* A repetition of the cyclic DFA states, but using switches instead
+ * of if-then-else sequences.
+ */
+
+cyclicDFAStateSwitch(stateNumber,labels,edges,
+                     needErrorClause,EOTTargetStateNumber);
+
+cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber);
+
+// D F A  E X P R E S S I O N S
+
+andPredicates(left,right);
+
+orPredicates(left,right);
+
+notPredicate(pred);
+
+evalPredicate(pred,description);
+
+evalSynPredicate(pred,description);
+
+lookaheadTest(atom,k,atomAsInt);
+
+/** Sometimes a lookahead test cannot assume that LA(k) is in a temp variable
+ *  somewhere.  Must ask for the lookahead directly.
+ */
+isolatedLookaheadTest(atom,k,atomAsInt);
+
+lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt);
+
+isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt);
+
+setTest(ranges);
+
+// A T T R I B U T E S
+
+parameterAttributeRef(attr);
+
+scopeAttributeRef(scope,attr,index,negIndex);
+
+/** $x is either global scope or x is rule with dynamic scope; refers
+ *  to stack itself not top of stack.  This is useful for predicates
+ *  like {$function.size()>0 && $function::name.equals("foo")}?
+ */
+isolatedDynamicScopeRef(scope);
+
+/** reference an attribute of rule; might only have single return value */
+ruleLabelRef(referencedRule,scope,attr);
+
+returnAttributeRef(ruleDescriptor,attr);
+
+/** How to translate $tokenLabel */
+tokenLabelRef(label);
+
+/** ids+=ID {$ids} or e+=expr {$e} */
+listLabelRef(label);
+
+// not sure the next are the right approach; and they are evaluated early;
+// they cannot see TREE_PARSER or PARSER attributes for example. :(
+
+tokenLabelPropertyRef_text(scope,attr);
+tokenLabelPropertyRef_type(scope,attr);
+tokenLabelPropertyRef_line(scope,attr);
+tokenLabelPropertyRef_pos(scope,attr);
+tokenLabelPropertyRef_channel(scope,attr);
+tokenLabelPropertyRef_index(scope,attr);
+tokenLabelPropertyRef_tree(scope,attr);
+
+ruleLabelPropertyRef_start(scope,attr);
+ruleLabelPropertyRef_stop(scope,attr);
+ruleLabelPropertyRef_tree(scope,attr);
+ruleLabelPropertyRef_text(scope,attr);
+ruleLabelPropertyRef_st(scope,attr);
+
+/** Isolated $RULE ref ok in lexer as it's a Token */
+lexerRuleLabel(label);
+
+lexerRuleLabelPropertyRef_type(scope,attr);
+lexerRuleLabelPropertyRef_line(scope,attr);
+lexerRuleLabelPropertyRef_pos(scope,attr);
+lexerRuleLabelPropertyRef_channel(scope,attr);
+lexerRuleLabelPropertyRef_index(scope,attr);
+lexerRuleLabelPropertyRef_text(scope,attr);
+
+// Somebody may ref $template or $tree or $stop within a rule:
+rulePropertyRef_start(scope,attr);
+rulePropertyRef_stop(scope,attr);
+rulePropertyRef_tree(scope,attr);
+rulePropertyRef_text(scope,attr);
+rulePropertyRef_st(scope,attr);
+
+/** How to execute an action */
+execAction(action);
+
+// M I S C (properties, etc...)
+
+codeFileExtension();
+true();
+false();

@@ -25,7 +25,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-group Java;
+group Java implements ANTLRCore;
 
 javaTypeInitMap ::= [
 	"int":"0",
@@ -1042,11 +1042,13 @@ if ( backtracking==0 ) {
 <endif>
 >>
 
+/*
 // L E X E R  A C T I O N S
 
 emit(type) ::= "emit(<type>);"
 
 setType(type) ::= "setType(<type>);"
+*/
 
 // M I S C (properties, etc...)
 
