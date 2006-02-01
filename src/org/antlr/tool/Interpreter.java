@@ -27,12 +27,13 @@
 */
 package org.antlr.tool;
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.debug.*;
-import org.antlr.runtime.tree.ParseTree;
-import org.antlr.analysis.*;
 import org.antlr.analysis.DFA;
+import org.antlr.analysis.*;
+import org.antlr.runtime.*;
+import org.antlr.runtime.debug.DebugEventListener;
+import org.antlr.runtime.tree.ParseTree;
 
+import java.util.List;
 import java.util.Stack;
 
 /** The recognition interpreter/engine for grammars.  Separated
@@ -152,7 +153,7 @@ public class Interpreter implements TokenSource {
 		loop:
 		while (input.LA(1)!=CharStream.EOF) {
 			try {
-				token = scan(Grammar.ARTIFICIAL_TOKENS_RULENAME);
+				token = scan(Grammar.ARTIFICIAL_TOKENS_RULENAME, null);
 				break;
 			}
 			catch (RecognitionException re) {
@@ -184,7 +185,9 @@ public class Interpreter implements TokenSource {
 	 *
 	 *  Return the token type associated with the final rule end state.
 	 */
-	public void scan(String startRule, DebugEventListener actions)
+	public void scan(String startRule,
+					 DebugEventListener actions,
+					 List visitedStates)
 		throws RecognitionException
 	{
 		if ( grammar.type!=Grammar.LEXER ) {
@@ -206,18 +209,28 @@ public class Interpreter implements TokenSource {
 		Stack ruleInvocationStack = new Stack();
 		NFAState start = grammar.getRuleStartState(startRule);
 		NFAState stop = grammar.getRuleStopState(startRule);
-		parseEngine(startRule, start, stop, input, ruleInvocationStack, actions);
+		parseEngine(startRule, start, stop, input, ruleInvocationStack,
+					actions, visitedStates);
 	}
 
 	public CommonToken scan(String startRule)
 		throws RecognitionException
 	{
+		return scan(startRule, null);
+	}
+
+	public CommonToken scan(String startRule,
+							List visitedStates)
+		throws RecognitionException
+	{
 		LexerActionGetTokenType actions = new LexerActionGetTokenType(grammar);
-		scan(startRule, actions);
+		scan(startRule, actions, visitedStates);
 		return actions.token;
 	}
 
-	public void parse(String startRule, DebugEventListener actions)
+	public void parse(String startRule,
+					  DebugEventListener actions,
+					  List visitedStates)
 		throws RecognitionException
 	{
 		//System.out.println("parse("+startRule+")");
@@ -233,15 +246,22 @@ public class Interpreter implements TokenSource {
 		Stack ruleInvocationStack = new Stack();
 		NFAState start = grammar.getRuleStartState(startRule);
 		NFAState stop = grammar.getRuleStopState(startRule);
-		parseEngine(startRule, start, stop, input, ruleInvocationStack, actions);
+		parseEngine(startRule, start, stop, input, ruleInvocationStack,
+					actions, visitedStates);
 	}
 
 	public ParseTree parse(String startRule)
 		throws RecognitionException
 	{
+		return parse(startRule, null);
+	}
+
+	public ParseTree parse(String startRule, List visitedStates)
+		throws RecognitionException
+	{
 		BuildParseTree actions = new BuildParseTree(grammar);
 		try {
-			parse(startRule, actions);
+			parse(startRule, actions, visitedStates);
 		}
 		catch (RecognitionException re) {
 			// Errors are tracked via the ANTLRDebugInterface
@@ -251,12 +271,14 @@ public class Interpreter implements TokenSource {
 		return actions.getTree();
 	}
 
+	/** Fill a list of all NFA states visited during the parse */
 	protected void parseEngine(String startRule,
 							   NFAState start,
 							   NFAState stop,
 							   IntStream input,
 							   Stack ruleInvocationStack,
-							   DebugEventListener actions)
+							   DebugEventListener actions,
+							   List visitedStates)
 		throws RecognitionException
 	{
 		if ( actions!=null ) {
@@ -265,7 +287,13 @@ public class Interpreter implements TokenSource {
 		NFAState s = start;
 		int t = input.LA(1);
 		while ( s!=stop ) {
-			//System.out.println("parse state "+s.stateNumber+" input="+grammar.getTokenName(t));
+			if ( visitedStates!=null ) {
+				visitedStates.add(s);
+			}
+			/*
+			System.out.println("parse state "+s.stateNumber+" input="+
+				grammar.getTokenDisplayName(t));
+			*/
 			// CASE 1: decision state
 			if ( s.getDecisionNumber()>0 && grammar.getNumberOfAltsForDecisionNFA(s)>1 ) {
 				// decision point, must predict and jump to alt
