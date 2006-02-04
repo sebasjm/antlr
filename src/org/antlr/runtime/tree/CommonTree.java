@@ -39,6 +39,8 @@ public class CommonTree extends BaseTree {
 	/** A single token is the payload */
 	public Token token;
 
+	public CommonTree() { }
+	
 	public CommonTree(CommonTree node) {
 		super(node);
 		this.token = node.token;
