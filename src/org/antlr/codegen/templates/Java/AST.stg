@@ -291,8 +291,10 @@ rewriteCode(
 <if(backtracking)>
 if ( backtracking==0 ) {<\n>
 <endif>
+<!
 <first([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("element <it> length="+list_<it>.size()+" != 1");<\n>}>
 <rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("rewrite element <it> length="+list_<it>.size()+" != 1");<\n>}>
+!>
 int i_0 = 0;
 <prevRuleRootRef()>.tree = root_0;
 root_0 = (<ASTLabelType>)adaptor.nil();

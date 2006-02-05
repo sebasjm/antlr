@@ -206,6 +206,9 @@ CHANGES
 
 3.0ea8 - ???
 
+* Fixed another bug in tree rewrite stuff where it was checking that elements
+  had at least one element.  Strange...commented out for now to see if I can remember what's up.
+
 * Tree rewrites had problems when you didn't have x+=FOO variables.  Rules
   like this work now:
 
