@@ -286,6 +286,21 @@ public class TestRewriteAST extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testOptionalLabelNoListLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : (x=ID)? -> $x?;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "a", debug);
+		String expecting = "a\n";
+		assertEqual(found, expecting);
+	}
+
 	public void testPositiveClosureSingleRule() throws Exception {
 		String grammar =
 			"grammar T;\n" +

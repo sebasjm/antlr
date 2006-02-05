@@ -206,6 +206,11 @@ CHANGES
 
 3.0ea8 - ???
 
+* Tree rewrites had problems when you didn't have x+=FOO variables.  Rules
+  like this work now:
+
+  a : (x=ID)? y=ID -> ($x $y)?;
+
 * filter=true for lexers turns on k=1 and backtracking for every token
   alternative.  Put the rules in priority order.
 

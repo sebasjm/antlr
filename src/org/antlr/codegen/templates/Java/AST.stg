@@ -354,10 +354,19 @@ for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; 
 >>
 
 /** Elements referenced in rewrite loops/optional blocks must have
- *  the same size.  Factor this out from rewriteXXXBlock rules.
+ *  the same size.  Factor this out from rewriteXXXBlock rules.  This
+ *  only deals with the lists of stuff not single element labels like id=ID.
+ *  The n_xxx var is always defined and assumed to be 1 so optional blocks
+ *  and loops are always entered even if no list_xxx variables are found.
+ *  For example,
+ *  	a : (x=ID)? y=ID -> ($x $y)+;
+ *  should generate a loop where n defined to be 1 even though it can't really
+ *  loop, n=0 will prevent entry and even generate a cardinality problem.
+ *  ($x $y)? will work too with n=1.
  */
 rewriteBlockCardinalityCheck() ::= <<
-int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == null ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();
+int n_<rewriteBlockLevel> = 1;
+<first([referencedTokens,referencedListLabels,referencedRules]):{n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == null ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();}>
 <rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
 >>
 
