@@ -180,7 +180,7 @@ public interface TreeAdaptor {
 	 *  still usually have a nil root node just to hold the children list.
 	 *  That node would contain the start/stop indexes then.
 	 */
-	public void setTokenBoundaries(Object t, int start, int stop);
+	public void setTokenBoundaries(Object t, Token startToken, Token stopToken);
 
 	// N a v i g a t i o n  /  T r e e  P a r s i n g
 
