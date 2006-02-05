@@ -37,10 +37,18 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 		return new CommonToken(fromToken);
 	}
 
-	/** track start/stop token index for subtree root created for a rule */
-	public void setTokenBoundaries(Object t, int start, int stop) {
+	/** track start/stop token for subtree root created for a rule */
+	public void setTokenBoundaries(Object t, Token startToken, Token stopToken) {
 		if ( t==null ) {
 			return;
+		}
+		int start = 0;
+		int stop = 0;
+		if ( startToken!=null ) {
+			start = startToken.getTokenIndex();
+		}
+		if ( stopToken!=null ) {
+			stop = stopToken.getTokenIndex();
 		}
 		((CommonTree)t).startIndex = start;
 		((CommonTree)t).stopIndex = stop;
