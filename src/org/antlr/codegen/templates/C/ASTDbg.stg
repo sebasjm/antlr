@@ -29,3 +29,6 @@
 /** Template overrides to add debugging to AST stuff */
 group CASTDbg : ANTLRCore;
 
+// need at least one decl; add dummy for now
+foo() ::= "ick"
+

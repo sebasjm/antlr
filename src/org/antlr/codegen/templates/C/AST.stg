@@ -25,7 +25,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-group CAST : ANTLRCore;
+group CAST;
 
 @outputFile.imports() ::= <<
 <@super.imports()>
@@ -66,7 +66,8 @@ ruleLabelDefs() ::= <<
 ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval.tree = root_0;<\n>
+retval.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
+adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 <endif>
 >>
 
@@ -290,8 +291,10 @@ rewriteCode(
 <if(backtracking)>
 if ( backtracking==0 ) {<\n>
 <endif>
+<!
 <first([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("element <it> length="+list_<it>.size()+" != 1");<\n>}>
 <rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("rewrite element <it> length="+list_<it>.size()+" != 1");<\n>}>
+!>
 int i_0 = 0;
 <prevRuleRootRef()>.tree = root_0;
 root_0 = (<ASTLabelType>)adaptor.nil();
@@ -353,10 +356,19 @@ for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; 
 >>
 
 /** Elements referenced in rewrite loops/optional blocks must have
- *  the same size.  Factor this out from rewriteXXXBlock rules.
+ *  the same size.  Factor this out from rewriteXXXBlock rules.  This
+ *  only deals with the lists of stuff not single element labels like id=ID.
+ *  The n_xxx var is always defined and assumed to be 1 so optional blocks
+ *  and loops are always entered even if no list_xxx variables are found.
+ *  For example,
+ *  	a : (x=ID)? y=ID -> ($x $y)+;
+ *  should generate a loop where n defined to be 1 even though it can't really
+ *  loop, n=0 will prevent entry and even generate a cardinality problem.
+ *  ($x $y)? will work too with n=1.
  */
 rewriteBlockCardinalityCheck() ::= <<
-int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == null ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();
+int n_<rewriteBlockLevel> = 1;
+<first([referencedTokens,referencedListLabels,referencedRules]):{n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == null ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();}>
 <rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
 >>
 
@@ -464,7 +476,7 @@ adaptor.addChild(root_<treeLevel>, <label>.tree);<\n>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-adaptor.addChild(root_<treeLevel>, ((RuleReturnScope)list_<label>.get(i_<rewriteBlockLevel>)).getTree());<\n>
+adaptor.addChild(root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)list_<label>.get(i_<rewriteBlockLevel>)).getTree());<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
@@ -474,5 +486,5 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<treeLe
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(((RuleReturnScope)list_<label>.get(i_<rewriteBlockLevel>)).getTree(), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)list_<label>.get(i_<rewriteBlockLevel>)).getTree(), root_<treeLevel>);<\n>
 >>
