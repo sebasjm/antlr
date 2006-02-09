@@ -27,5 +27,5 @@
 */
 
 /** Template overrides to add debugging to AST stuff */
-group ASTDbg;
+group CASTDbg : ANTLRCore;
 

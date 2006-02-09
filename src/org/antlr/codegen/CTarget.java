@@ -37,10 +37,50 @@ public class CTarget extends Target {
 	protected void genRecognizerHeaderFile(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
-										   StringTemplate headerFileST)
+			 							   StringTemplate headerFileST)
 		throws IOException
 	{
 		generator.write(headerFileST, grammar.name+".h");
 	}
+        protected StringTemplate chooseWhereCyclicDFAsGo(Tool tool,
+										   CodeGenerator generator,
+										   Grammar grammar,
+										   StringTemplate recognizerST,
+										   StringTemplate cyclicDFAST)
+	{
+		return cyclicDFAST;
+	}
+ 	/** Is scope in @scope::name {action} valid for this kind of grammar?
+	 *  Targets like C++ may want to allow new scopes like headerfile or
+	 *  some such.  The action names themselves are not policed at the
+	 *  moment so targets can add template actions w/o having to recompile
+	 *  ANTLR.
+	 */
+	public boolean isValidActionScope(int grammarType, String scope) {
+		switch (grammarType) {
+			case Grammar.LEXER :
+				if ( scope.equals("lexer") ) {return true;}
+                                if ( scope.equals("header") ) {return true;}
+                                if ( scope.equals("includes") ) {return true;}
+				break;
+			case Grammar.PARSER :
+				if ( scope.equals("parser") ) {return true;}
+                                if ( scope.equals("header") ) {return true;}
+                                if ( scope.equals("includes") ) {return true;}
+				break;
+			case Grammar.COMBINED :
+				if ( scope.equals("parser") ) {return true;}
+				if ( scope.equals("lexer") ) {return true;}
+                                if ( scope.equals("header") ) {return true;}
+                                if ( scope.equals("includes") ) {return true;}
+				break;
+			case Grammar.TREE_PARSER :
+				if ( scope.equals("treeparser") ) {return true;}
+                                if ( scope.equals("header") ) {return true;}
+                                if ( scope.equals("includes") ) {return true;}
+				break;
+		}
+		return false;
+	}               
 }
 
