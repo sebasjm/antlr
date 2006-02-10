@@ -1027,7 +1027,7 @@ public class Grammar {
 		if ( r!=null ) {
 			if ( !r.getHasMultipleReturnValues() ) {
 				ErrorManager.grammarError(
-					ErrorManager.LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT,this,
+					ErrorManager.MSG_LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT,this,
 					label,label.getText());
 			}
 			defineLabel(r, label, element, RULE_LIST_LABEL);
