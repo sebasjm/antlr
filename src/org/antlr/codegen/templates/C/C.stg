@@ -155,11 +155,7 @@ outputFile( LEXER,
 headerFile( LEXER,
             PARSER,
             TREE_PARSER,
-            actionScope,
-	    backtracking, 
-            synpreds, 
-            memoize, 
-            numRules, 
+            actionScope, 
             actions,
             docComment, 
             recognizer,
@@ -171,6 +167,10 @@ headerFile( LEXER,
             bitsets,
             buildTemplate,
             profile,
+	    backtracking, 
+            synpreds, 
+            memoize, 
+            numRules,
             fileName,
             ANTLRVersion,
             generatedTimestamp,
@@ -271,7 +271,7 @@ has the callable functions (rules) shown below,
 
 /* Function protoypes for the lexer functions
  */
-ANTLR3_API pANTLR3_LEXER <name>Lexer_new         (pANTLR3_CHARSTREAM     input);
+ANTLR3_API p<name>_CONTEXT <name>Lexer_new         (pANTLR3_CHARSTREAM     input);
 ANTLR3_API ANTLR3_RESULT <name>Lexer_nextToken   (pANTLR3_LEXER          lexerContext);
 <endif>
 <if(PARSER)>
@@ -299,6 +299,13 @@ typedef struct <name>_Ctx_STRUCT
     ANTLR3_TREE_PARSER_CONTEXT
 <endif>
       antlr3Ctx;
+<if(memoize)>
+    /** Table for rule memoization (if there is such a word... there is now)
+     *  allows us to remember if we have been through the indexed rule
+     *  before, when backtracking/predicting.
+     */
+    pANTLR3_MEMO    ruleMemo[<numRules>+1];<\n> <! index from 1..n !>
+<endif>
 <scopes:{<if(it.isDynamicGlobalScope)>
 
     <globalAttributeScopeDef(scope=it)>
@@ -313,7 +320,8 @@ typedef struct <name>_Ctx_STRUCT
     pANTLR3_WCHAR    * getTokenNames();     /** Function to return the table of token names */
 
 }
-    * p<name>_CONTEXT;
+    * <name>_CONTEXT;
+typedef <name>_CONTEXT p<name>_CONTEXT;
 
 /** Symbolic definitions of all the tokens that the <grammarType()> will work with.
  *
@@ -357,39 +365,85 @@ headerReturnScope(ruleDescriptor) ::= "<returnScope(scope=ruleDescriptor.returnS
 
 headerReturnType(ruleDescriptor) ::= "<returnType()>"
 
-lexer(name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="Token",
-      filterMode) ::= <<
-public class <name> extends Lexer {
+// Produce the lexer output
+//
+lexer(  name, 
+        tokens, 
+        scopes, 
+        rules, 
+        numRules, 
+        cyclicDFAs, 
+        labelType="Token",
+        filterMode) ::= <<
+
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <actions.lexer.members>
-    public <name>() {;} <! needed by subclasses !>
-    public <name>(CharStream input) {
-        super(input);
-<if(memoize)>
-        ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
-<endif>
+
+ANTLR3_API p<name>_CONTEXT <name>Lexer_new         (pANTLR3_CHARSTREAM     input)
+{
+    p<name>_CONTEXT lexCtx; /* Context structure we will build and return   */
+
+    lexCtx = (p<name>_CONTEXT) ANTLR3_MALLOC(sizeof(<name>_CONTEXT));
+
+    if  (lexCtx == NULL)
+    {
+        /* Failed to allocate memory for lexer context */
+        return  ANTLR3_ERR_NOMEM;
     }
+
+    /* -------------------------------------------------------------------
+     * Memory for basic structure is allocated, now to fill in
+     * in base ANTLR3 structures. We intialize the function pointers
+     * for the standard ANTLR3 lexer funciton set, but upon return
+     * from here, the programmer amy set the pointers to provide custom
+     * implementations of each function.
+     */
+    
+    lexCtx.antlr3Ctx->input    = input;    /* Input stream interface   */
+
+    /* Call runtime routines to set up the base recognizer and lexer state
+     */
+    anltr3InitLexer(&lexCtx.antlr3Ctx);                    
+    
+<if(filterMode)>
+    /* We have filter mode turned on, so install the filtering nextToken function
+     */
+    lexCtx.antlr3Ctx->nextToken = <name>NextToken;
+<endif>
+}
 
 <if(filterMode)>
     <filteringNextToken()>
 <endif>
+
+    /* =========================================================================
+     * Functions to match the lexer grammar defined tokens from the input stream
+     */
+
     <rules; separator="\n\n">
 
+    /* =========================================================================
+     * Lexer syntactic predicates
+     */
     <synpreds:{p | <lexerSynpred(name=p)>}>
 
+    /* =========================================================================
+     * Cyclic DFAs for teh lexer
+     */
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
-}
+
 >>
 
-/** A override of Lexer.nextToken() that backtracks over mTokens() looking
+/** An override of the lexer's nextToken() method that backtracks over mTokens() looking
  *  for matches.  No error can be generated upon error; just rewind, consume
  *  a token and then try again.  backtracking needs to be set as well.
  */
 filteringNextToken() ::= <<
-public Token nextToken() {
-    token=null;
+ANTLR3_API ANTLR3_TOKEN <name>nextToken(p<name>_CONTEXT lexCtx) 
+{
+    lexCtx.antlr3Ctx.token  = null;
     tokenStartCharIndex = getCharIndex();
     while (true) {
         if ( input.LA(1)==CharStream.EOF ) {
