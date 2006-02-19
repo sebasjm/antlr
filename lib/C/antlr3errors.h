@@ -1,0 +1,9 @@
+#ifndef	_ANTLR3ERRORS_H
+#define	_ANTLR3ERRORS_H
+
+#define	ANTLR3_SUCCESS	0
+#define	ANTLR3_ERR_BASE	    -1
+#define	ANTLR3_ERR_NOMEM    ANTLR3_ERR_BASE - 0
+#define	ANTLR3_ERR_NOFILE   ANTLR3_ERR_BASE - 1
+
+#endif	/* _ANTLR3ERRORS_H */

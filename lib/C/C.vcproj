@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="C"
 	ProjectGUID="{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}"
+	RootNamespace="C"
 	SccProjectName="SAK"
 	SccAuxPath="SAK"
 	SccLocalPath="SAK"
@@ -23,19 +24,25 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(InputDir)&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				StringPooling="TRUE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="1"
+				StructMemberAlignment="0"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
+				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/C.lib"/>
+				OutputFile="$(OutDir)/antlr3c.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -101,11 +108,47 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			<File
+				RelativePath=".\antlr3collections.c">
+			</File>
+			<File
+				RelativePath=".\antlr3encodings.c">
+			</File>
+			<File
+				RelativePath=".\antlr3filestream.c">
+			</File>
+			<File
+				RelativePath=".\antlr3memory.c">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\antlr3.h">
+			</File>
+			<File
+				RelativePath=".\antlr3collections.h">
+			</File>
+			<File
+				RelativePath=".\antlr3defs.h">
+			</File>
+			<File
+				RelativePath=".\antlr3encodings.h">
+			</File>
+			<File
+				RelativePath=".\antlr3errors.h">
+			</File>
+			<File
+				RelativePath=".\antlr3filestream.h">
+			</File>
+			<File
+				RelativePath=".\antlr3input.h">
+			</File>
+			<File
+				RelativePath=".\antlr3memory.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

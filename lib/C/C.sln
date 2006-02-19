@@ -3,14 +3,21 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C", "C.vcproj", "{0F0FE03A-
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testcr", "..\testcr\testcr.vcproj", "{5D2F8877-8499-4FBA-A8B8-C542331F6ACB}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 2
+		SccNumberOfProjects = 3
 		SccLocalPath0 = .
 		CanCheckoutShared = true
-		SolutionUniqueID = {48ECC3B1-BE36-46C0-B548-EA10676321F1}
+		SolutionUniqueID = {A1EB2D24-65CF-48F9-9FCE-945F118519DB}
 		SccProjectUniqueName1 = C.vcproj
 		SccLocalPath1 = .
+		CanCheckoutShared = true
+		SccProjectUniqueName2 = ..\\testcr\\testcr.vcproj
+		SccLocalPath2 = ..\\testcr
 		CanCheckoutShared = true
 	EndGlobalSection
 	GlobalSection(SolutionConfiguration) = preSolution
@@ -22,6 +29,10 @@ Global
 		{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}.Debug.Build.0 = Debug|Win32
 		{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}.Release.ActiveCfg = Release|Win32
 		{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}.Release.Build.0 = Release|Win32
+		{5D2F8877-8499-4FBA-A8B8-C542331F6ACB}.Debug.ActiveCfg = Debug|Win32
+		{5D2F8877-8499-4FBA-A8B8-C542331F6ACB}.Debug.Build.0 = Debug|Win32
+		{5D2F8877-8499-4FBA-A8B8-C542331F6ACB}.Release.ActiveCfg = Release|Win32
+		{5D2F8877-8499-4FBA-A8B8-C542331F6ACB}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
