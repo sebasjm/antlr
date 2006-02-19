@@ -27,14 +27,12 @@
 #include    <antlr3.h>
 
 pANTLR3_INPUT_STREAM
-antlr3NewAsciiFileStream(pANTLR3_INT8 fileName)
+antlr3NewAsciiFileStream(pANTLR3_UINT8 fileName)
 {
     /* Pointer to the input stream we are going to create
      */
     pANTLR3_INPUT_STREAM    input;
-    
-
-    int			    status;
+    ANTLR3_UINT64	    status;
 
     /* Allocate memory for the input stream structure
      */
@@ -57,8 +55,26 @@ antlr3NewAsciiFileStream(pANTLR3_INT8 fileName)
 	ANTLR3_FREE(input->fileName);
 	ANTLR3_FREE(input);
 
-	return	(pANTLR3_INPUT_STREAM) status;
+	return	(pANTLR3_INPUT_STREAM)status;
     }
+
+    /* Install default line separator character (it can be replaced
+     * by the grammar programmer later)
+     */
+    input->newlineChar	    = (ANTLR3_UCHAR)'\n';
+
+    /* Install function pointers for an 8 bit ASCII input
+     */
+    input->reset	    = antlrInputReset;
+    input->getSourceName    = antrl3InputFileName;
+    input->consume	    = antlr3ConsumeAscii;
+    input->LA		    = antlr3AsciiLA;
+    input->LT		    = antlr3AsciiLT;
+    input->index	    = antlr3AsciiIndex;
+
+    /* Set up the input stream brand new
+     */
+    input->reset(input);
 
     return  input;
 }
@@ -67,45 +83,39 @@ int
 antlr3readAscii(pANTLR3_INPUT_STREAM    input)
 {
     ANTLR3_FDSC		    infile;
-    ANTLR3_UINT32	    fSize;
-    int			    inBytes;
+    size_t		    fSize;
 
     // Open the OS file in read binary mode
     //
-    infile  = antlr3Fopen(fileName, "rb");
+    infile  = antlr3Fopen(input->fileName, "rb");
 
     // Check that it was there
     //
     if	(infile == NULL)
     {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_ERR_NOFILE;
+	return	ANTLR3_ERR_NOFILE;
     }
 
-    // It was there, so we can read teh bytes now
+    // It was there, so we can read the bytes now
     //
-    fSize   = antlr3Fsize(fileName);	/* Size of input file	*/
+    fSize   = antlr3Fsize(input->fileName);	/* Size of input file	*/
 
     /* Allocate buffer for this input set   
      */
-    input->data	= ANTLR3_MALLOC((size_t)(fSize);
+    input->data	= ANTLR3_MALLOC(fSize);
 
     if	(input->data == NULL)
     {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_ERR_NOMEM;
+	return	ANTLR3_ERR_NOMEM;
     }
 
     /* Now we read the file. Characters are not converted to
      * the internal ANTLR encoding until they are read from the buffer
      */
-    inbytes = antlr3Fread(input->data)
+    antlr3Fread(infile, fSize, input->data);
 
-    return  ANTRL3_SUCCESS;
+    return  ANTLR3_SUCCESS;
 }
-
-ANTLR3_UCHAR
-readAsciiChar(pANTLR3_INPUT_STREAM    input)
-{
-    return
 
 /** \brief Open an operating system file and return the descriptor
  * We just use the common open() and related functions here. 
@@ -114,23 +124,23 @@ readAsciiChar(pANTLR3_INPUT_STREAM    input)
  * while file at once anyway, so it may be irrelevant.
  */
 ANTLR3_FDSC
-antlr3Fopen(const char *filename, const char * mode)
+antlr3Fopen(pANTLR3_UINT8 filename, const char * mode)
 {
-    return  (ANTLR3_FDSC)fopen(filename, mode);
+    return  (ANTLR3_FDSC)fopen((const char *)filename, mode);
 }
 
-ANTLR3_UINT32
-antlr3Fsize(pANTLR3_INT8 fileName)
+size_t
+antlr3Fsize(pANTLR3_UINT8 fileName)
 {   
     struct _stat	statbuf;
 
-    _stat(fileName, &statbuf);
+    _stat((const char *)fileName, &statbuf);
 
     return statbuf.st_size;
 }
 
-ANTLR3_UINT32
-antrl3Fread(ANTLR3_FDSC fdsc, void * data)
+size_t
+antlr3Fread(ANTLR3_FDSC fdsc, size_t count,  void * data)
 {
-    return  fread(data, 1, 1, fdsc);
+    return  fread(data, count, 1, fdsc);
 }

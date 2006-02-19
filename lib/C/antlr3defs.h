@@ -6,6 +6,8 @@
 
 /* Common definitions come first
  */
+#define	ANTLR3_TRUE	1
+#define	ANTLR3_FALSE	0
 
 #define	ANTLR3_WINDOWS
 #define	ANTLR3_WIN32

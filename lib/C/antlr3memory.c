@@ -19,8 +19,8 @@ ANTLR3_FREE(void * ptr)
     free(ptr);
 }
 
-ANTLR3_API pANTLR3_INT8
-ANTLR3_STRDUP(pANTLR3_INT8 instr)
+ANTLR3_API pANTLR3_UINT8
+ANTLR3_STRDUP(pANTLR3_UINT8 instr)
 {
-    return  (pANTLR3_INT8)strdup(instr);
+    return  (pANTLR3_UINT8)strdup((const char *)instr);
 }

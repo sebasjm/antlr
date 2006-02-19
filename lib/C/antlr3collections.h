@@ -1,7 +1,9 @@
 #ifndef	ANTLR3COLLECTIONS_H
 #define	ANTLR3COLLECTIONS_H
 
-ANTLR3_UINT32	antlr3Hash(void * key, ANTLR3_UINT32 keylen);
+#include    <antlr3defs.h>
+
+
 
 /** Internal structure representing an element in a hash bucket.
  *  Stores the original key so that duplicate keys can be rejected
@@ -39,7 +41,7 @@ typedef struct	ANTLR3_HASH_BUCKET_struct
     pANTLR3_HASH_ENTRY	entries;
     
 }
-    ANTLR3_HASH_BUCKET, pANTLR3_HASH_BUCKET;
+    ANTLR3_HASH_BUCKET, *pANTLR3_HASH_BUCKET;
 
 /** Structure that tracks a hash table
  */
@@ -51,6 +53,7 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
 
     /** Number of buckets available in this table
      */
+    ANTLR3_UINT32	modulo;
 
     /* Points to the memory where the array of buckets
      * starts.
@@ -59,5 +62,12 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
 
 }
     ANTLR3_HASH_TABLE, * pANTLR3_HASH_TABLE;
+
+
+pANTLR3_HASH_TABLE    antlr3NewHashTable(ANTLR3_UINT32 sizeHint);
+ANTLR3_UINT32	      antlr3Hash	(void * key, ANTLR3_UINT32 keylen);
+void		    * antlr3HashGet	(pANTLR3_HASH_TABLE table, void * key);
+int		      antlr3HashPut	(pANTLR3_HASH_TABLE table, void * key, void * element);
+void		      antlr3HashFree	(pANTLR3_HASH_TABLE table);
 
 #endif
