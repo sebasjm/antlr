@@ -6,8 +6,7 @@
 
 /* Common definitions come first
  */
-#define	ANTLR3_TRUE	1
-#define	ANTLR3_FALSE	0
+
 
 #define	ANTLR3_WINDOWS
 #define	ANTLR3_WIN32
@@ -35,6 +34,8 @@ typedef	UINT8	ANTLR3_UINT8,	*pANTLR3_UINT8;
 typedef	UINT16	ANTLR3_UINT16,	*pANTLR3_UINT16;
 typedef	UINT32	ANTLR3_UINT32,	*pANTLR3_UINT32;
 typedef	UINT64	ANTLR3_UINT64,	*pANTLR3_UINT64;
+
+typedef	UINT32	ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
 
 #define	ANTLR3_INLINE	inline
 

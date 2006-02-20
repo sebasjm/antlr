@@ -304,7 +304,7 @@ typedef struct <name>_Ctx_STRUCT
      *  allows us to remember if we have been through the indexed rule
      *  before, when backtracking/predicting.
      */
-    pANTLR3_MEMO    ruleMemo[<numRules>+1];<\n> <! index from 1..n !>
+    pANTLR3_HASH_TABLE    ruleMemo[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
 <scopes:{<if(it.isDynamicGlobalScope)>
 

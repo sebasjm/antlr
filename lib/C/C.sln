@@ -5,6 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C", "C.vcproj", "{0F0FE03A-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testcr", "..\testcr\testcr.vcproj", "{5D2F8877-8499-4FBA-A8B8-C542331F6ACB}"
 	ProjectSection(ProjectDependencies) = postProject
+		{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40} = {0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}
 	EndProjectSection
 EndProject
 Global

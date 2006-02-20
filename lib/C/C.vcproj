@@ -70,10 +70,20 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				EnableFiberSafeOptimizations="TRUE"
+				AdditionalIncludeDirectories="&quot;$(InputDir)&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="4"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="FALSE"
+				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
+				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
@@ -121,6 +131,9 @@
 				RelativePath=".\antlr3memory.c">
 			</File>
 			<File
+				RelativePath=".\antlr3stringstream.c">
+			</File>
+			<File
 				RelativePath=".\antlrinputstream.c">
 			</File>
 		</Filter>
@@ -130,6 +143,9 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\antlr3.h">
+			</File>
+			<File
+				RelativePath=".\antlr3baserecognizer.h">
 			</File>
 			<File
 				RelativePath=".\antlr3collections.h">
@@ -151,6 +167,9 @@
 			</File>
 			<File
 				RelativePath=".\antlr3memory.h">
+			</File>
+			<File
+				RelativePath=".\antlr3stringstream.h">
 			</File>
 		</Filter>
 		<Filter

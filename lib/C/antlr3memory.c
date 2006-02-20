@@ -24,3 +24,9 @@ ANTLR3_STRDUP(pANTLR3_UINT8 instr)
 {
     return  (pANTLR3_UINT8)strdup((const char *)instr);
 }
+
+ANTLR3_API void *
+ANTLR3_MEMMOVE(void * target, const void * source, ANTLR3_UINT64 size)
+{
+    return  memmove(target, source, (size_t)size);
+}

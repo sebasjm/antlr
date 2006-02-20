@@ -26,7 +26,16 @@
  */
 #include    <antlr3.h>
 
-pANTLR3_INPUT_STREAM
+
+/** \brief Use the contents of an operating system file as the input
+ *         for an input stream.
+ *
+ * \param fileName Name of operating system file to read.
+ * \return
+ *	- Pointer to new input stream context upon success
+ *	- One of the ANTLR_ERR_ defines on error.
+ */
+ANTLR3_API pANTLR3_INPUT_STREAM
 antlr3NewAsciiFileStream(pANTLR3_UINT8 fileName)
 {
     /* Pointer to the input stream we are going to create
@@ -58,23 +67,12 @@ antlr3NewAsciiFileStream(pANTLR3_UINT8 fileName)
 	return	(pANTLR3_INPUT_STREAM)status;
     }
 
-    /* Install default line separator character (it can be replaced
-     * by the grammar programmer later)
+    /* Call the common 8 bit ASCII input stream handler
+     * intializer type thingy doobry function.
      */
-    input->newlineChar	    = (ANTLR3_UCHAR)'\n';
+    antlr3AsciiSetupStream(input);
 
-    /* Install function pointers for an 8 bit ASCII input
-     */
-    input->reset	    = antlrInputReset;
-    input->getSourceName    = antrl3InputFileName;
-    input->consume	    = antlr3ConsumeAscii;
-    input->LA		    = antlr3AsciiLA;
-    input->LT		    = antlr3AsciiLT;
-    input->index	    = antlr3AsciiIndex;
 
-    /* Set up the input stream brand new
-     */
-    input->reset(input);
 
     return  input;
 }
@@ -102,12 +100,15 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input)
 
     /* Allocate buffer for this input set   
      */
-    input->data	= ANTLR3_MALLOC(fSize);
+    input->data	    = ANTLR3_MALLOC(fSize);
+    input->sizeBuf  = fSize;
 
     if	(input->data == NULL)
     {
 	return	ANTLR3_ERR_NOMEM;
     }
+    
+    input->isAllocated	= ANTLR3_TRUE;
 
     /* Now we read the file. Characters are not converted to
      * the internal ANTLR encoding until they are read from the buffer
