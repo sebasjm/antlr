@@ -13,6 +13,12 @@ ANTLR3_MALLOC(size_t request)
     return  malloc(request);
 }
 
+ANTLR3_API void *
+ANTLR3_REALLOC(void * current, ANTLR3_UINT64 request)
+{
+    return  realloc(current, (size_t)request);
+}
+
 ANTLR3_API void
 ANTLR3_FREE(void * ptr)
 {
@@ -29,4 +35,10 @@ ANTLR3_API void *
 ANTLR3_MEMMOVE(void * target, const void * source, ANTLR3_UINT64 size)
 {
     return  memmove(target, source, (size_t)size);
+}
+
+ANTLR3_API void *
+ANTLR3_MEMSET(void * target, ANTLR3_UINT8 byte, ANTLR3_UINT64 size)
+{
+    return memset(target, (int)byte, (size_t)size);
 }

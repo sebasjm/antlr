@@ -11,7 +11,7 @@
  */
 static void antlr3EnumNextEntry(pANTLR3_HASH_ENUM en);
 
-void
+ANTLR3_API void
 antlr3HashFree(pANTLR3_HASH_TABLE table)
 {
     ANTLR3_UINT32	bucket;	/* Used to traverse the buckets	*/

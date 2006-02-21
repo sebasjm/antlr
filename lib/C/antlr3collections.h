@@ -101,14 +101,14 @@ typedef struct	ANTLR3_HASH_ENUM_struct
 }
     ANTLR3_HASH_ENUM, *pANTLR3_HASH_ENUM;
 
-pANTLR3_HASH_TABLE    antlr3NewHashTable(ANTLR3_UINT32 sizeHint);
-ANTLR3_UINT32	      antlr3Hash	(void * key, ANTLR3_UINT32 keylen);
-void		    * antlr3HashGet	(pANTLR3_HASH_TABLE table, void * key);
-int		      antlr3HashPut	(pANTLR3_HASH_TABLE table, void * key, void * element, void (*free)(void *));
-void		      antlr3HashFree	(pANTLR3_HASH_TABLE table);
-void		      antlr3HashDelete	(pANTLR3_HASH_TABLE table, void * key);
-pANTLR3_HASH_ENUM     antlr3EnumNew	(pANTLR3_HASH_TABLE table);
-int		      antlr3EnumNext	(pANTLR3_HASH_ENUM en, void ** key, void ** data);
-void		      antlr3EnumFree	(pANTLR3_HASH_ENUM en);
+ANTLR3_API  pANTLR3_HASH_TABLE	      antlr3NewHashTable(ANTLR3_UINT32 sizeHint);
+ANTLR3_API  ANTLR3_UINT32	      antlr3Hash	(void * key, ANTLR3_UINT32 keylen);
+ANTLR3_API  void		    * antlr3HashGet	(pANTLR3_HASH_TABLE table, void * key);
+ANTLR3_API  int			      antlr3HashPut	(pANTLR3_HASH_TABLE table, void * key, void * element, void (*free)(void *));
+ANTLR3_API  void		      antlr3HashFree	(pANTLR3_HASH_TABLE table);
+ANTLR3_API  void		      antlr3HashDelete	(pANTLR3_HASH_TABLE table, void * key);
+ANTLR3_API  pANTLR3_HASH_ENUM	      antlr3EnumNew	(pANTLR3_HASH_TABLE table);
+ANTLR3_API  int			      antlr3EnumNext	(pANTLR3_HASH_ENUM en, void ** key, void ** data);
+ANTLR3_API  void		      antlr3EnumFree	(pANTLR3_HASH_ENUM en);
 
 #endif

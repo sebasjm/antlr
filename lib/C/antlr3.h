@@ -8,5 +8,7 @@
 #include    <antlr3filestream.h>
 #include    <antlr3encodings.h>
 #include    <antlr3collections.h>
+#include    <antlr3baserecognizer.h>
+#include    <antlr3exception.h>
 
 #endif

@@ -7,5 +7,7 @@ ANTLR3_API void		  * ANTLR3_MALLOC(size_t request);
 ANTLR3_API void		    ANTLR3_FREE(void * ptr);
 ANTLR3_API pANTLR3_UINT8    ANTLR3_STRDUP(pANTLR3_UINT8 instr);
 ANTLR3_API void		  * ANTLR3_MEMMOVE(void * target, const void * source, ANTLR3_UINT64 size);
+ANTLR3_API void		  * ANTLR3_MEMSET(void * target, ANTLR3_UINT8 byte, ANTLR3_UINT64 size);
+ANTLR3_API void		  * ANTLR3_REALLOC(void * current, ANTLR3_UINT64 request);
 
 #endif	/* _ANTLR3MEMORY_H */

@@ -18,7 +18,7 @@
 #include    <windows.h>
 #include    <stdio.h>
 #include    <sys/stat.h>
-
+#include    <stdarg.h>
 
 #define	ANTLR3_API  __declspec(dllexport)
 
