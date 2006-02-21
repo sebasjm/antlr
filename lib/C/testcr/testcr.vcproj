@@ -40,7 +40,7 @@
 				AdditionalDependencies="antlr3c.lib"
 				OutputFile="$(OutDir)/testcr.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\antlrsrc\code\antlr\main\lib\C\Debug"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)&quot;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/testcr.pdb"
 				SubSystem="1"
@@ -85,8 +85,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="antlr3c.lib"
 				OutputFile="$(OutDir)/testcr.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)$(OutDir)&quot;"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
 				OptimizeReferences="2"
