@@ -71,6 +71,12 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
      */
     ANTLR3_UINT64	count;
 
+    /** Pointer to function to completely delete this table
+     */
+    void	    (*free)	(struct ANTLR3_HASH_TABLE_struct * table);
+    void	    (*del)	(struct ANTLR3_HASH_TABLE_struct * table, void * key);
+    void *	    (*get)	(struct ANTLR3_HASH_TABLE_struct * table, void * key);
+    ANTLR3_INT32    (*put)	(struct ANTLR3_HASH_TABLE_struct * table, void * key, void * element, void (*freeptr)(void *));
 }
     ANTLR3_HASH_TABLE, * pANTLR3_HASH_TABLE;
 
@@ -98,17 +104,48 @@ typedef struct	ANTLR3_HASH_ENUM_struct
     /* Next entry to return, if NULL, then move to next bucket if any
      */
     pANTLR3_HASH_ENTRY	entry;
+
+    /* Interface
+     */
+    int		(*next)	    (struct ANTLR3_HASH_ENUM_struct * en, void ** key, void ** data);
+    void	(*free)	    (struct ANTLR3_HASH_ENUM_struct * table);
 }
     ANTLR3_HASH_ENUM, *pANTLR3_HASH_ENUM;
 
-ANTLR3_API  pANTLR3_HASH_TABLE	      antlr3NewHashTable(ANTLR3_UINT32 sizeHint);
+/** Structure that represents a LIST collection
+ */
+typedef	struct	ANTLR3_LIST_struct
+{
+    /** Hash table that is storing the list elements
+     */
+    pANTLR3_HASH_TABLE	table;
+
+    void	    (*free)	(struct ANTLR3_LIST_struct * list);
+    void	    (*del)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
+    void *	    (*get)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
+    ANTLR3_INT32    (*put)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
+
+}
+    ANTLR3_LIST, *pANTLR3_LIST;
+
+/** Structure that represents a Stack collection
+ */
+typedef	struct	ANTLR3_STACK_struct
+{
+    /** List that supports the stack structure
+     */
+    pANTLR3_LIST    list;
+    void	    (*free)	(struct ANTLR3_STACK_struct * stack);
+    void 	    (*pop)	(struct ANTLR3_STACK_struct * stack);
+    void *	    (*get)	(struct ANTLR3_STACK_struct * stack, ANTLR3_UINT64 key);
+    ANTLR3_BOOLEAN  (*push)	(struct ANTLR3_STACK_struct * stack, void * element, void (*freeptr)(void *));
+}
+    ANTLR3_STACK, *pANTLR3_STACK;
+
+ANTLR3_API  pANTLR3_HASH_TABLE	      antlr3HashTableNew(ANTLR3_UINT32 sizeHint);
 ANTLR3_API  ANTLR3_UINT32	      antlr3Hash	(void * key, ANTLR3_UINT32 keylen);
-ANTLR3_API  void		    * antlr3HashGet	(pANTLR3_HASH_TABLE table, void * key);
-ANTLR3_API  int			      antlr3HashPut	(pANTLR3_HASH_TABLE table, void * key, void * element, void (*free)(void *));
-ANTLR3_API  void		      antlr3HashFree	(pANTLR3_HASH_TABLE table);
-ANTLR3_API  void		      antlr3HashDelete	(pANTLR3_HASH_TABLE table, void * key);
 ANTLR3_API  pANTLR3_HASH_ENUM	      antlr3EnumNew	(pANTLR3_HASH_TABLE table);
-ANTLR3_API  int			      antlr3EnumNext	(pANTLR3_HASH_ENUM en, void ** key, void ** data);
-ANTLR3_API  void		      antlr3EnumFree	(pANTLR3_HASH_ENUM en);
+ANTLR3_API  pANTLR3_LIST	      antlr3ListNew	(ANTLR3_UINT32 sizeHint);
+ANTLR3_API  pANTLR3_STACK	      antlr3StackNew	(ANTLR3_UINT32 sizeHint);
 
 #endif

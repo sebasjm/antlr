@@ -7,11 +7,92 @@
  */
 #include    <antlr3.h>
 
+/* Interface functions for hash table
+ */
+static void		antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key);
+static void *		antlr3HashGet	    (pANTLR3_HASH_TABLE table, void * key);
+static ANTLR3_INT32	antlr3HashPut	    (pANTLR3_HASH_TABLE table, void * key, void * element, void (*freeptr)(void *));
+static void		antlr3HashFree	    (pANTLR3_HASH_TABLE table);
+
+/* Interface functions for enumeration
+ */
+static int	    antlr3EnumNext	    (pANTLR3_HASH_ENUM en, void ** key, void ** data);
+static void	    antlr3EnumFree	    (pANTLR3_HASH_ENUM en);
+
+/* Interface functions for List
+ */
+static void		antlr3ListFree	(pANTLR3_LIST list);
+static void		antlr3ListDelete(pANTLR3_LIST list, ANTLR3_UINT64 key);
+static void *		antlr3ListGet	(pANTLR3_LIST list, ANTLR3_UINT64 key);
+static	ANTLR3_INT32	antlr3ListPut	(pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
+
+/* Interface functions for Stack
+ */
+static void		antlr3StackFree	(pANTLR3_STACK  stack);
+static void		antlr3StackPop	(pANTLR3_STACK	stack);
+static void *		antlr3StackGet	(pANTLR3_STACK stack, ANTLR3_UINT64 key);
+static ANTLR3_BOOLEAN	antlr3StackPush	(pANTLR3_STACK stack, void * element, void (*freeptr)(void *));
+
 /* Local function to advance enumeration structure pointers
  */
 static void antlr3EnumNextEntry(pANTLR3_HASH_ENUM en);
 
-ANTLR3_API void
+pANTLR3_HASH_TABLE
+antlr3HashTableNew(ANTLR3_UINT32 sizeHint)
+{
+    /* All we have to do is create the hashtable tracking structure
+     * and allocate memory for the requested number of buckets.
+     */
+    pANTLR3_HASH_TABLE	table;
+    
+    ANTLR3_UINT32	bucket;	/* Used to traverse the buckets	*/
+
+    table   = ANTLR3_MALLOC(sizeof(ANTLR3_HASH_TABLE));
+
+    /* Error out if no memory left */
+    if	(table	== NULL)
+    {
+	return	(pANTLR3_HASH_TABLE) ANTLR3_ERR_NOMEM;
+    }
+
+    /* Allocate memory for the buckets
+     */
+    table->buckets = (pANTLR3_HASH_BUCKET) ANTLR3_MALLOC((size_t) (sizeof(ANTLR3_HASH_BUCKET) * sizeHint)); 
+
+    if	(table->buckets == NULL)
+    {
+	ANTLR3_FREE((void *)table);
+	return	(pANTLR3_HASH_TABLE) ANTLR3_ERR_NOMEM;
+    }
+
+    /* Modulo of the table, (bucket count).
+     */
+    table->modulo   = sizeHint;
+
+    table->count    = 0;	    /* Nothing in there yet ( I hope)	*/
+
+    /* Initialize the buckets to empty
+     */
+    for	(bucket = 0; bucket < sizeHint; bucket++)
+    {
+	table->buckets[bucket].entries = NULL;
+    }
+
+    /* Exclude duplicate entries by default
+     */
+    table->allowDups	= ANTLR3_FALSE;
+
+    /* Install the interface
+     */
+    table->free	    = antlr3HashFree;
+    table->get	    = antlr3HashGet;
+    table->put	    = antlr3HashPut;
+    table->del	    = antlr3HashDelete;
+
+    return  table;
+}
+
+static void
 antlr3HashFree(pANTLR3_HASH_TABLE table)
 {
     ANTLR3_UINT32	bucket;	/* Used to traverse the buckets	*/
@@ -80,58 +161,11 @@ antlr3HashFree(pANTLR3_HASH_TABLE table)
      */
     ANTLR3_FREE(table);
 }
-pANTLR3_HASH_TABLE
-antlr3NewHashTable(ANTLR3_UINT32 sizeHint)
-{
-    /* All we have to do is create the hashtable tracking structure
-     * and allocate memory for the requested number of buckets.
-     */
-    pANTLR3_HASH_TABLE	table;
-    
-    ANTLR3_UINT32	bucket;	/* Used to traverse the buckets	*/
-
-    table   = ANTLR3_MALLOC(sizeof(ANTLR3_HASH_TABLE));
-
-    /* Error out if no memory left */
-    if	(table	== NULL)
-    {
-	return	(pANTLR3_HASH_TABLE) ANTLR3_ERR_NOMEM;
-    }
-
-    /* Allocate memory for the buckets
-     */
-    table->buckets = (pANTLR3_HASH_BUCKET) ANTLR3_MALLOC((size_t) (sizeof(ANTLR3_HASH_BUCKET) * sizeHint)); 
-
-    if	(table->buckets == NULL)
-    {
-	ANTLR3_FREE((void *)table);
-	return	(pANTLR3_HASH_TABLE) ANTLR3_ERR_NOMEM;
-    }
-
-    /* Modulo of the table, (bucket count).
-     */
-    table->modulo   = sizeHint;
-
-    table->count    = 0;	    /* Nothing in there yet ( I hope)	*/
-
-    /* Initialize the buckets to empty
-     */
-    for	(bucket = 0; bucket < sizeHint; bucket++)
-    {
-	table->buckets[bucket].entries = NULL;
-    }
-
-    /* Exclude duplicate entries by default
-     */
-    table->allowDups	= ANTLR3_FALSE;
-
-    return  table;
-}
 
 /** Remove the element in the hash table for a particular
  *  key value, if it exists - no error if it does not.
  */
-void 
+static void 
 antlr3HashDelete(pANTLR3_HASH_TABLE table, void * key)
 {
     ANTLR3_UINT32	    hash;
@@ -206,7 +240,7 @@ antlr3HashDelete(pANTLR3_HASH_TABLE table, void * key)
 /** Return the element pointer in the hash table for a particular
  *  key value, or NULL if it don't exist (or was itself NULL).
  */
-void *
+static void *
 antlr3HashGet(pANTLR3_HASH_TABLE table, void * key)
 {
     ANTLR3_UINT32	    hash;
@@ -246,8 +280,8 @@ antlr3HashGet(pANTLR3_HASH_TABLE table, void * key)
 /** Add the element pointer in to the table, based upon the 
  *  hash of the provided key.
  */
-int
-antlr3HashPut(pANTLR3_HASH_TABLE table, void * key, void * element, void (*free)(void *))
+static	ANTLR3_INT32
+antlr3HashPut(pANTLR3_HASH_TABLE table, void * key, void * element, void (*freeptr)(void *))
 {
     ANTLR3_UINT32	    hash;
     pANTLR3_HASH_BUCKET	    bucket;
@@ -301,7 +335,7 @@ antlr3HashPut(pANTLR3_HASH_TABLE table, void * key, void * element, void (*free)
     }
 	
     entry->data		= element;		/* Install the data element supplied		    */
-    entry->free		= free;			/* Function that knows how to release the entry	    */
+    entry->free		= freeptr;			/* Function that knows how to release the entry	    */
     entry->key		= ANTLR3_STRDUP(key);	/* Record the key value				    */
     entry->nextEntry	= NULL;			/* Ensure that the forward pointer ends the chain   */
 
@@ -350,6 +384,11 @@ antlr3EnumNew	(pANTLR3_HASH_TABLE table)
 	antlr3EnumNextEntry(en);
     }
 
+    /* Install the interface
+     */
+    en->free	= antlr3EnumFree;
+    en->next	= antlr3EnumNext;
+
     /* All is good
      */
     return  en;
@@ -368,7 +407,7 @@ antlr3EnumNew	(pANTLR3_HASH_TABLE table)
  * \remark
  *  No checking of input structure is performed!
  */
-int
+static int
 antlr3EnumNext	(pANTLR3_HASH_ENUM en, void ** key, void ** data)
 {
     /* If the current entry is valid, then use it
@@ -461,7 +500,7 @@ antlr3EnumNextEntry(pANTLR3_HASH_ENUM en)
  *  enumeration.
  * \param[in] enum Pointer to ANTLR3 enumeratio structure returned by antlr3EnumNew()
  */
-void
+static void
 antlr3EnumFree	(pANTLR3_HASH_ENUM en)
 {
     /* Nothing to check, we just free it.
@@ -473,7 +512,7 @@ antlr3EnumFree	(pANTLR3_HASH_ENUM en)
  *  it. This can then be used (with suitable modulo) to index other
  *  structures.
  */
-ANTLR3_UINT32
+ANTLR3_API ANTLR3_UINT32
 antlr3Hash(void * key, ANTLR3_UINT32 keylen)
 {
     /* Accumulate the hash value of the key
@@ -500,4 +539,142 @@ antlr3Hash(void * key, ANTLR3_UINT32 keylen)
     }
 
     return  hash;
+}
+ANTLR3_API  pANTLR3_LIST
+antlr3ListNew	(ANTLR3_UINT32 sizeHint)
+{
+    pANTLR3_LIST    list;
+
+    /* Allocate memory
+     */
+    list    = (pANTLR3_LIST)ANTLR3_MALLOC((size_t)sizeof(ANTLR3_LIST));
+
+    if	(list == NULL)
+    {
+	return	(pANTLR3_LIST)ANTLR3_ERR_NOMEM;
+    }
+
+    /* Now we need to add a new table
+     */
+    list->table	= antlr3HashTableNew(sizeHint);
+
+    if	(list->table == (pANTLR3_HASH_TABLE)ANTLR3_ERR_NOMEM)
+    {
+	return	(pANTLR3_LIST)ANTLR3_ERR_NOMEM;
+    }
+
+    /* Allocation was good, install interface
+     */
+    list->free	= antlr3ListFree;
+    list->del	= antlr3ListDelete;
+    list->get	= antlr3ListGet;
+    list->put	= antlr3ListPut;
+
+    return  list;
+}
+
+static void
+antlr3ListFree	(pANTLR3_LIST list)
+{
+    /* Free the hashtable that stores the list
+     */
+    list->table->free(list->table);
+
+    /* Free the allocation for the list itself
+     */
+    ANTLR3_FREE(list);
+}
+
+static void
+antlr3ListDelete    (pANTLR3_LIST list, ANTLR3_UINT64 key)
+{
+    ANTLR3_UINT8    charKey[32];
+
+    sprintf((char *)charKey, "%d", key);
+
+    list->table->del(list->table, charKey);
+}
+
+static void *
+antlr3ListGet	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
+{
+    ANTLR3_UINT8    charKey[32];
+
+    sprintf((char *)charKey, "%d", key);
+
+    return list->table->get(list->table, charKey);
+}
+
+static	ANTLR3_INT32
+antlr3ListPut	    (pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *))
+{
+    ANTLR3_UINT8    charKey[32];
+
+    sprintf((char *)charKey, "%d", key);
+
+    return  list->table->put(list->table, (void *)charKey, element, freeptr);
+}
+
+ANTLR3_API  pANTLR3_STACK
+antlr3StackNew	(ANTLR3_UINT32 sizeHint)
+{
+    pANTLR3_STACK   stack;
+
+    /* Allocate memory
+     */
+    stack    = (pANTLR3_STACK)ANTLR3_MALLOC((size_t)sizeof(ANTLR3_STACK));
+
+    if	(stack == NULL)
+    {
+	return	(pANTLR3_STACK)ANTLR3_ERR_NOMEM;
+    }
+
+    /* Now we need to add a new table
+     */
+    stack->list	= antlr3ListNew(sizeHint);
+
+    if	(stack->list == (pANTLR3_LIST)ANTLR3_ERR_NOMEM)
+    {
+	return	(pANTLR3_STACK)ANTLR3_ERR_NOMEM;
+    }
+
+    /* Looks good, now add the interface
+     */
+    stack->get	= antlr3StackGet;
+    stack->free	= antlr3StackFree;
+    stack->pop	= antlr3StackPop;
+    stack->push	= antlr3StackPush;
+
+    return  stack;
+}
+static void
+antlr3StackFree	(pANTLR3_STACK  stack)
+{
+    /* Free the list that supports the stack
+     */
+    stack->list->free(stack->list);
+
+    ANTLR3_FREE(stack);
+}
+
+static void
+antlr3StackPop	(pANTLR3_STACK	stack)
+{
+   stack->list->del(stack->list, stack->list->table->count);
+}
+
+static void *
+antlr3StackGet	(pANTLR3_STACK stack, ANTLR3_UINT64 key)
+{
+    return  stack->list->get(stack->list, key);
+}
+
+static ANTLR3_BOOLEAN 
+antlr3StackPush	(pANTLR3_STACK stack, void * element, void (*freeptr)(void *))
+{
+    ANTLR3_UINT64	pushno;
+
+    pushno  = stack->list->table->count + 1;
+
+    return stack->list->put(stack->list, pushno, element, freeptr);
 }

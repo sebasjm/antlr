@@ -13,7 +13,7 @@ antlr3InputClose(pANTLR3_INPUT_STREAM input)
 {
     /* Close any markers in the input stream
      */
-    antlr3HashFree(input->markers);
+    input->markers->free(input->markers);
 
     /* Free the input stream buffer if we allocated it
      */
@@ -48,11 +48,14 @@ antlr3InputReset(pANTLR3_INPUT_STREAM input)
     
     /* Free up the markers table if it is there
      */
-    antlr3HashFree(input->markers);
+    if	(input->markers != NULL)
+    {
+	input->markers->free(input->markers);
+    }
 
     /* Install a new markers table
      */
-    input->markers  = antlr3NewHashTable(63);	/* May come back and revist the hash size with experience   */
+    input->markers  = antlr3HashTableNew(63);	/* May come back and revist the hash size with experience   */
 }
 
 /** \brief Return a pointer to the input stream source name, such as the file.
@@ -172,11 +175,11 @@ antlr3AsciiMark	(pANTLR3_INPUT_STREAM input)
 
 	/* Add it to the table
 	 */
-	antlr3HashPut(input->markers, key, state, ANTLR3_FREE);	/* No special structure, just free() on delete */
+	input->markers->put(input->markers, key, state, ANTLR3_FREE);	/* No special structure, just free() on delete */
     }
     else
     {
-	state	= antlr3HashGet(input->markers, key);
+	state	= (pANTLR3_LEX_STATE)input->markers->get(input->markers, key);
 
 	/* Assume no errors for speed, it will just blow up if the table failed
 	 * for some reasons, hence lots of unit tests on the tables ;-)
@@ -216,7 +219,7 @@ antlr3AsciiRewind	(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 mark)
     /* Find the supplied mark state 
      */
     sprintf ((char *)key, "%d", mark);
-    state   = antlr3HashGet(input->markers, &key);
+    state   = (pANTLR3_LEX_STATE)input->markers->get(input->markers, &key);
 
     /* Seek input pointer to the requested point
      */

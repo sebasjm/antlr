@@ -32,14 +32,14 @@ int main()
     
     antlr3InputClose(input);
 
-    ht	= antlr3NewHashTable(TEST_HASH_SIZE);
+    ht	= antlr3HashTableNew(TEST_HASH_SIZE);
 
     if	(ht >= 0)
     {
 	for (i=0; i<TEST_HASH_COUNT; i++)
 	{
 	    sprintf(key, "%d", i);
-	    antlr3HashPut(ht, key, (void *)strdup(key), myfree);
+	    ht->put(ht, key, (void *)strdup(key), myfree);
 	    if	((i % (TEST_HASH_COUNT/42)) == 0)
 	    {
 		printf("Key added: %s\n", key);
@@ -52,7 +52,7 @@ int main()
 	{
 	    i	= 0;
 	    /* Enumerate all entries */
-	    while   (antlr3EnumNext(en, &retkey, &retdata) == ANTLR3_SUCCESS)
+	    while   (en->next(en, &retkey, &retdata) == ANTLR3_SUCCESS)
 	    {
 		if  ((i % (TEST_HASH_COUNT/42)) == 0)
 		{
@@ -65,7 +65,7 @@ int main()
 	for (i=0; i<TEST_HASH_COUNT; i++)
 	{
 	    sprintf(key, "%d", i);
-	    retkey = antlr3HashGet(ht, key);
+	    retkey = ht->get(ht, key);
 
 	    if	((i % (TEST_HASH_COUNT/42)) == 0)
 	    {
@@ -76,7 +76,7 @@ int main()
 	for (i=TEST_HASH_COUNT-1; i >= 0; i--)
 	{
 	    sprintf(key, "%d", i);
-	    antlr3HashDelete(ht, key);
+	    ht->del(ht, key);
 	    if	((i % (TEST_HASH_COUNT/42)) == 0)
 	    {
 		printf("Key deleted: %s\n", key);
@@ -86,14 +86,14 @@ int main()
 	for (i=0; i<TEST_HASH_COUNT; i++)
 	{
 	    sprintf(key, "%d", i);
-	    antlr3HashPut(ht, key, (void *)strdup(key), myfree);
+	    ht->put(ht, key, (void *)strdup(key), myfree);
 	    if	((i % (TEST_HASH_COUNT/42)) == 0)
 	    {
 		printf("Key added: %s\n", key);
 	    }
 	}
 
-	antlr3HashFree(ht);
+	ht->free(ht);
     }
     return 0;
 }

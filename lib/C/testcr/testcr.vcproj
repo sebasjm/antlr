@@ -40,7 +40,7 @@
 				AdditionalDependencies="antlr3c.lib"
 				OutputFile="$(OutDir)/testcr.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)$(OutDir)&quot;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/testcr.pdb"
 				SubSystem="1"
