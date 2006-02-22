@@ -19,18 +19,23 @@ int main()
 
     ANTLR3_UINT32	c;
 
+    pANTLR3_STRING_FACTORY  sf;
+    pANTLR3_STRING	    string;
+
+    pANTLR3_TOKEN_FACTORY   tf;
+    pANTLR3_COMMON_TOKEN    tok;
+
     unsigned char   * retkey;
     void	    * retdata;
 
-    input   = antlr3NewAsciiFileStream("C:/iscsrc/users/5.1.mv/modules/Antlr/mvindex/src/mvindexcommands.g");
+    input   = antlr3AsciiFileStreamNew("C:/iscsrc/users/5.1.mv/modules/Antlr/mvindex/src/mvindexcommands.g");
 
     while   ((c = input->LA(input, 1)) != ANTLR3_CHARSTREAM_EOF)
     {
 	input->consume(input);
 	printf("%c", c);
     }
-    
-    input->close(input);
+
 
     ht	= antlr3HashTableNew(TEST_HASH_SIZE);
 
@@ -95,5 +100,47 @@ int main()
 
 	ht->free(ht);
     }
+
+    sf	= antlr3StringFactoryNew();
+
+    /* Let's create some strings
+     */
+    for (i=0; i<TEST_HASH_COUNT; i++)
+    {
+	sprintf(key, "This is string %d", i);
+	string	= sf->newPtr(sf, (pANTLR3_UINT8)key, (ANTLR3_UINT32)strlen(key));
+    }
+
+    /* Now we can try some string manipulation
+     */
+    for	(i=0; i<100; i++)
+    {
+	string->addi(string, i);
+    }
+
+    for (i=0 ; i<100; i++)
+    {
+	string->insert(string, i, "->ins<-");
+    }
+    
+    string->append(string, "\n\n    \t\t   \r\r   ");
+
+    string->factory->destroy(string->factory, string);
+
+    /* Close the factory, should release all the strings and tables and everything
+     */
+    sf->close(sf);
+
+    tf	    = input->tokFactory;
+
+    /* Create loads and loads of tokens
+     */
+    for	(i=0; i<20000; i++)
+    {
+	tok = tf->newToken(tf);
+    }
+    
+    input->close(input);
+
     return 0;
 }
