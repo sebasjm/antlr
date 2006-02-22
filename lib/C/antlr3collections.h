@@ -77,6 +77,7 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
     void	    (*del)	(struct ANTLR3_HASH_TABLE_struct * table, void * key);
     void *	    (*get)	(struct ANTLR3_HASH_TABLE_struct * table, void * key);
     ANTLR3_INT32    (*put)	(struct ANTLR3_HASH_TABLE_struct * table, void * key, void * element, void (*freeptr)(void *));
+    ANTLR3_UINT32   (*size)	(struct ANTLR3_HASH_TABLE_struct * table);
 }
     ANTLR3_HASH_TABLE, * pANTLR3_HASH_TABLE;
 
@@ -124,7 +125,8 @@ typedef	struct	ANTLR3_LIST_struct
     void	    (*del)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
     void *	    (*get)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
     ANTLR3_INT32    (*put)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
-
+    ANTLR3_UINT32   (*size)	(struct ANTLR3_LIST_struct * list);
+    
 }
     ANTLR3_LIST, *pANTLR3_LIST;
 
@@ -139,6 +141,7 @@ typedef	struct	ANTLR3_STACK_struct
     void 	    (*pop)	(struct ANTLR3_STACK_struct * stack);
     void *	    (*get)	(struct ANTLR3_STACK_struct * stack, ANTLR3_UINT64 key);
     ANTLR3_BOOLEAN  (*push)	(struct ANTLR3_STACK_struct * stack, void * element, void (*freeptr)(void *));
+    ANTLR3_UINT32   (*size)	(struct ANTLR3_STACK_struct * stack);
 }
     ANTLR3_STACK, *pANTLR3_STACK;
 

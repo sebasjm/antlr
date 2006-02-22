@@ -11,16 +11,41 @@
 #include    <antlr3errors.h>
 #include    <antlr3collections.h>
 
+/** Type indicator for a lexer recognizer
+ */
+#define	    ANTLR3_LEXER	0x0001
+
+/** Type inficator for a parser recognizer
+ */
+#define	    ANTLR3_PARSER	0x0002
+
+/** Type indicator for a tree parser recognizer
+ */
+#define	    ANTLR3_TREEPARSER	0x0003
+
 /** \brief Base tracking context structure for all types of
  * recognizers.
  */
 typedef	struct ANTLR3_BASE_RECOGNIZER_struct
 {
+    /** Inidicates the type of recognizer that we are an instance of.
+     *  The programmer may set this to anything of course, but the default 
+     *  implementations of the interface only really understand the built in
+     *  types, so new error handlers etc woudl proably be required too.
+     *
+     *  Valid types are:
+     *
+     *    - #ANTLR3_LEXER  
+     *	  - #ANTLR3_PARSER
+     *    - #ANTLR3_TREEPARSER
+     */
+    ANTLR3_UINT32	type;
+
     /** Track the set of token types that can follow any rule invocation.
      *  Hashtable as place holder but will change to new Stack structure
      *  shortly, to support: List<BitSet>.
      */
-    pANTLR3_HASH_TABLE	 following;
+    pANTLR3_STACK	following;
 
     /** This is true when we see an error and before having successfully
      *  matched a token.  Prevents generation of more than one error message
@@ -34,7 +59,7 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  ad naseum.  This is a failsafe mechanism to guarantee that at least
      *  one token/tree node is consumed for two errors.
      */
-    ANTLR3_UINT64	lastErrorIndex;
+    ANTLR3_INT64	lastErrorIndex;
 
     /** In lieu of a return value, this indicates that a rule or token
      *  has failed to match.  Reset to false upon valid token match.
@@ -166,7 +191,6 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      */
     void		(*recoverFromMismatchedToken)
 						    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
-							    pANTLR3_EXCEPTION	ex, 
 							    ANTLR3_UINT32	ttype,
 							    pANTLR3_BITSET	follow);
 
@@ -202,13 +226,13 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *
      * \todo Document how to overrider invocation stack functions.
      */
-    pANTLR3_HASH_TABLE	(*getRuleInvocationStack)	(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
-    pANTLR3_HASH_TABLE	(*getRuleInvocationStackNamed)  (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
+    pANTLR3_LIST	(*getRuleInvocationStack)	(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
+    pANTLR3_LIST	(*getRuleInvocationStackNamed)  (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
 								pANTLR3_EXCEPTION   ex,
 								pANTLR3_UINT8	    name);
 
     /** Pointer to a function that converts an ANLR3_LIST of tokens to an ANTLR3_LIST of
-     *  string token names. As this is mostly used in sring template processing it may not be useful
+     *  string token names. As this is mostly used in string template processing it may not be useful
      *  in the C runtime.
      */
     pANTLR3_HASH_TABLE	(*toStrings)			(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
@@ -248,5 +272,9 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
 
 }
     ANTLR3_BASE_RECOGNIZER, *pANTLR3_BASE_RECOGNIZER;
+
+    ANTLR3_API pANTLR3_BASE_RECOGNIZER	antlrBaseRecognizerNew		(ANTLR3_UINT32 type);
+    ANTLR3_API	void			antlr3RecognitionExceptionNew	(pANTLR3_BASE_RECOGNIZER recognizer);
+    ANTLR3_API	void			antlr3MTExceptionNew		(pANTLR3_BASE_RECOGNIZER recognizer);
 
 #endif	    /* _ANTLR3_BASERECOGNIZER_H	*/

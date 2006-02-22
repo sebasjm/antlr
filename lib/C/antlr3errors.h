@@ -12,8 +12,8 @@
 
 /** Indicates  memoizing on a rule failed.
  */
-#define	MEMO_RULE_FAILED	0xFFFFFFFE;
-#define	MEMO_RULE_UNKNOWN	0xFFFFFFFF;
+#define	MEMO_RULE_FAILED	0xFFFFFFFE
+#define	MEMO_RULE_UNKNOWN	0xFFFFFFFF
 
 
 #define	ANTLR3_ERR_BASE	    -1

@@ -13,6 +13,7 @@ static void		antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key);
 static void *		antlr3HashGet	    (pANTLR3_HASH_TABLE table, void * key);
 static ANTLR3_INT32	antlr3HashPut	    (pANTLR3_HASH_TABLE table, void * key, void * element, void (*freeptr)(void *));
 static void		antlr3HashFree	    (pANTLR3_HASH_TABLE table);
+static ANTLR3_UINT32	antlr4HashSize	    (pANTLR3_HASH_TABLE table);
 
 /* Interface functions for enumeration
  */
@@ -24,14 +25,16 @@ static void	    antlr3EnumFree	    (pANTLR3_HASH_ENUM en);
 static void		antlr3ListFree	(pANTLR3_LIST list);
 static void		antlr3ListDelete(pANTLR3_LIST list, ANTLR3_UINT64 key);
 static void *		antlr3ListGet	(pANTLR3_LIST list, ANTLR3_UINT64 key);
-static	ANTLR3_INT32	antlr3ListPut	(pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
+static ANTLR3_INT32	antlr3ListPut	(pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
+static ANTLR3_UINT32	antlr4ListSize	(pANTLR3_LIST list);
 
 /* Interface functions for Stack
  */
 static void		antlr3StackFree	(pANTLR3_STACK  stack);
 static void		antlr3StackPop	(pANTLR3_STACK	stack);
-static void *		antlr3StackGet	(pANTLR3_STACK stack, ANTLR3_UINT64 key);
-static ANTLR3_BOOLEAN	antlr3StackPush	(pANTLR3_STACK stack, void * element, void (*freeptr)(void *));
+static void *		antlr3StackGet	(pANTLR3_STACK	stack, ANTLR3_UINT64 key);
+static ANTLR3_BOOLEAN	antlr3StackPush	(pANTLR3_STACK	stack, void * element, void (*freeptr)(void *));
+static ANTLR3_UINT32	antlr4StackSize	(pANTLR3_STACK	stack);
 
 /* Local function to advance enumeration structure pointers
  */
@@ -540,6 +543,7 @@ antlr3Hash(void * key, ANTLR3_UINT32 keylen)
 
     return  hash;
 }
+
 ANTLR3_API  pANTLR3_LIST
 antlr3ListNew	(ANTLR3_UINT32 sizeHint)
 {
@@ -571,6 +575,11 @@ antlr3ListNew	(ANTLR3_UINT32 sizeHint)
     list->put	= antlr3ListPut;
 
     return  list;
+}
+
+static ANTLR3_UINT32	antlr4Listize	    (pANTLR3_LIST list)
+{
+    return  list->table->size(list->table);
 }
 
 static void
@@ -647,6 +656,13 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
 
     return  stack;
 }
+
+static ANTLR3_UINT32	antlr4StackSize	    (pANTLR3_STACK stack)
+{
+    return  stack->list->size(stack->list);
+}
+
+
 static void
 antlr3StackFree	(pANTLR3_STACK  stack)
 {

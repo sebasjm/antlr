@@ -30,7 +30,7 @@ int main()
 	printf("%c", c);
     }
     
-    antlr3InputClose(input);
+    input->close(input);
 
     ht	= antlr3HashTableNew(TEST_HASH_SIZE);
 

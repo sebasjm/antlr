@@ -18,7 +18,7 @@ static	ANTLR3_BOOLEAN	antlr3BitsetEquals	(pANTLR3_BITSET bitset1, pANTLR3_BITSET
 static	ANTLR3_BOOLEAN	antlr3BitsetMember	(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit);
 static	ANTLR3_UINT32	antlr3BitsetNumBits	(pANTLR3_BITSET bitset);
 static	void		antlr3BitsetRemove	(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit);
-static	ANTLR3_BOOLEAN	antrl3BitsetIsNil	(pANTLR3_BITSET bitset);
+static	ANTLR3_BOOLEAN	antlr3BitsetIsNil	(pANTLR3_BITSET bitset);
 
 // Local functions
 //
@@ -88,7 +88,7 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
     bitset->isMember	=   antlr3BitsetMember;
     bitset->numBits	=   antlr3BitsetNumBits;
     bitset->remove	=   antlr3BitsetRemove;
-    bitset->isNil	=   antrl3BitsetIsNil;
+    bitset->isNil	=   antlr3BitsetIsNil;
 
     /* All seems good
      */
@@ -441,7 +441,7 @@ antlr3BitsetRemove(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit)
     }
 }
 static ANTLR3_BOOLEAN
-antrl3BitsetIsNil(pANTLR3_BITSET bitset)
+antlr3BitsetIsNil(pANTLR3_BITSET bitset)
 {
    ANTLR3_UINT32    i;
 

@@ -57,7 +57,7 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size,
     /* Call the common 8 bit ASCII input stream handler
      * intializer type thingy doobry function.
      */
-    antlr3AsciiSetupStream(input);
+    antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
 
     return  input;
 }
@@ -122,7 +122,7 @@ pANTLR3_INPUT_STREAM	antlr3NewAsciiStringCopyStream	    (pANTLR3_UINT8 inString,
     /* Call the common 8 bit ASCII input stream handler
      * intializer type thingy doobry function.
      */
-    antlr3AsciiSetupStream(input);
+    antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
 
     return  input;
 }

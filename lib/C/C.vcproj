@@ -119,10 +119,16 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\antlr3baserecognizer.c">
+			</File>
+			<File
 				RelativePath=".\antlr3bitset.c">
 			</File>
 			<File
 				RelativePath=".\antlr3collections.c">
+			</File>
+			<File
+				RelativePath=".\antlr3commontoken.c">
 			</File>
 			<File
 				RelativePath=".\antlr3encodings.c">
@@ -158,6 +164,9 @@
 			</File>
 			<File
 				RelativePath=".\antlr3collections.h">
+			</File>
+			<File
+				RelativePath=".\antlr3commontoken.h">
 			</File>
 			<File
 				RelativePath=".\antlr3defs.h">

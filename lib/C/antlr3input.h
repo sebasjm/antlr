@@ -8,11 +8,49 @@
 #include    <antlr3defs.h>
 #include    <antlr3collections.h>
 
+/** Type inidicator for a character stream
+ * \remark if a custom stream is created but it can be treated as
+ * a char stream, then you may OR in this value to your type indicator
+ */
+#define	ANTLR3_CHARSTREAM	0x0001
+
+/** Type indicator for a Token stream
+ * \remark if a custom stream is created but it can be treated as
+ * a token stream, then you may OR in this value to your type indicator
+ */
+#define	ANTLR3_TOKENSTREAM	0x0002
+
+/** Type indicator for a common tree node stream
+ * \remark if a custom stream is created but it can be treated as
+ * a common tree node stream, then you may OR in this value to your type indicator
+ */
+#define	ANTLR3_COMMONTREENODE	0x0004
+
+/** Type mask for input stream so we can switch in the above types
+ *  \remark DO NOT USE 0x0000 as a stream type!
+ */
+#define	ANTLR3_INPUT_MASK	0x0007
+
 /** \brief Master context structure for an ANTLR3
  *   C runtime based input stream.
  */
 typedef	struct	ANTLR3_INPUT_struct
 {
+    /** Inidicates the type of input stream that we are an instance of.
+     *  The programmer may set this to anything of course, but the default 
+     *  implementations of the interface only really understand the built in
+     *  types, so new error handlers etc would probably be required too. You may OR
+     *  in the values of one of the standard valid types, if the input stream can be
+     *  treated in the same way as they are for error handlig etc.
+     *
+     *  Valid types are:
+     *
+     *    - #ANTLR3_CHARSTREAM  
+     *	  - #ANTLR3_TOKENSTREAM
+     *    - #ANTLR3_TREEPARSER
+     */
+    ANTLR3_UINT32	type;
+
     /** Pointer the start of the input string, chracters may be
      *  taken as offsets from here and in original input format encoding.
      */
@@ -49,7 +87,7 @@ typedef	struct	ANTLR3_INPUT_struct
 
     /** The offset within the current line of the current character
      */
-    ANTLR3_UINT32	charPositionInLine;
+    ANTLR3_INT32	charPositionInLine;
 
     /** Tracks how deep mark() calls are nested
      */
@@ -69,9 +107,16 @@ typedef	struct	ANTLR3_INPUT_struct
      */
     ANTLR3_UCHAR	newlineChar;
 
+    /* API */
+
+
     /** Pointer to function that returns the source file name (if any)
      */
     pANTLR3_UINT8	(*getSourceName)(struct	ANTLR3_INPUT_struct * input);
+
+    /** Pointer to function that closes the input stream
+     */
+    void		(*close)	(struct	ANTLR3_INPUT_struct * input);
 
     /** Pointer to function that resets the input stream
      */
@@ -90,7 +135,7 @@ typedef	struct	ANTLR3_INPUT_struct
      *  offset from nextChar. Same as LA for file stream, but overrides for token
      *  streams etc.
      */
-    ANTLR3_UCHAR	(*LT)		(struct	ANTLR3_INPUT_struct * input, ANTLR3_INT32 lt);
+    void *		(*LT)		(struct	ANTLR3_INPUT_struct * input, ANTLR3_INT32 lt);
 
     /** Pointer to function to return the current index in the output stream.
      */
@@ -201,31 +246,13 @@ typedef	struct	ANTLR3_LEX_STATE_struct
 
     /** The offset within the current line of the current character
      */
-    ANTLR3_UINT32	charPositionInLine;
+    ANTLR3_INT32	charPositionInLine;
 
 }
     ANTLR3_LEX_STATE, *pANTLR3_LEX_STATE;
 
     /* Prototypes 
      */
-    void	    antlr3InputClose		(pANTLR3_INPUT_STREAM input);
-    void	    antlr3InputReset		(pANTLR3_INPUT_STREAM input);
-    pANTLR3_UINT8   antrl3InputFileName		(pANTLR3_INPUT_STREAM input);
-    void	    antlr3AsciiConsume		(pANTLR3_INPUT_STREAM input);
-    ANTLR3_UCHAR    antlr3AsciiLA		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 la);
-    ANTLR3_UCHAR    antlr3AsciiLT		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 lt);
-    ANTLR3_UINT32   antlr3AsciiIndex		(pANTLR3_INPUT_STREAM input);
-    ANTLR3_UINT64   antrl3AsciiSize		(pANTLR3_INPUT_STREAM input);
-    ANTLR3_UINT32   antlr3AsciiMark		(pANTLR3_INPUT_STREAM input);
-    void	    antlr3AsciiRewind		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 mark);
-    void	    antlr3AsciiRelease		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 mark);
-    void	    antlr3AsciiSeek		(pANTLR3_INPUT_STREAM input, void * seekPoint);
-    void	  * antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 start, ANTLR3_INT32 stop);
-    ANTLR3_UINT64   antlr3AsciiGetLine		(pANTLR3_INPUT_STREAM input);
-    void	  * antlr3AsciiGetLineBuf	(pANTLR3_INPUT_STREAM input);
-    ANTLR3_UINT32   antlr3AsciiGetCharPosition	(pANTLR3_INPUT_STREAM input);
-    void	    antlr3AsciiSetLine		(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 line);
-    void	    antlr3AsciiSetCharPosition	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 position);
-    void	    antlr3AsciiSetNewLineChar	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 newlineChar);
-    void	    antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input);
+    
+    void	    antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type);
 #endif	/* _ANTLR3_INPUT_H  */

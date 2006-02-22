@@ -4,6 +4,10 @@
  */
 #include    <antlr3.h>
 
+
+static    void	antlr3ExceptionPrint(pANTLR3_EXCEPTION ex);
+static    void	antlr3ExceptionFree (pANTLR3_EXCEPTION ex);
+
 /**
  * \brief
  * Creates a new ANTLR3 exception structure
@@ -52,14 +56,17 @@ antlr3ExceptionNew(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_
     }
 
     ex->name		= name;		/* Install exception name	*/
-
-    ex->exception	= exception;	/* Install the exception number	*/
-
+    ex->type		= exception;	/* Install the exception number	*/
     ex->message		= message;	/* Install message string	*/
     
     /* Indicate whether the string should be freed if exception is destroyed    
      */
     ex->freeMessage	= freeMessage;
+
+    /* Install the API
+     */
+    ex->print	    = antlr3ExceptionPrint;
+    ex->free	    = antlr3ExceptionFree;
 
     return ex;
 }
@@ -78,7 +85,7 @@ antlr3ExceptionNew(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_
  * \see
  * ANTLR3_BASE_RECOGNIZER
  */
-void
+static void
 antlr3ExceptionPrint(pANTLR3_EXCEPTION ex)
 {
     /* Ensure valid pointer
@@ -89,7 +96,7 @@ antlr3ExceptionPrint(pANTLR3_EXCEPTION ex)
 	 */
 	if  (ex->message == NULL)
 	{
-	    printf("ANTLR3_EXCEPTION number %d (%08X).\n", ex->exception, ex->exception);
+	    printf("ANTLR3_EXCEPTION number %d (%08X).\n", ex->type, ex->type);
 	}
 	else
 	{
@@ -114,7 +121,7 @@ antlr3ExceptionPrint(pANTLR3_EXCEPTION ex)
  * \see
  * ANTLR3_EXCEPTION
  */
-void
+static void
 antlr3ExceptionFree(pANTLR3_EXCEPTION ex)
 {
     pANTLR3_EXCEPTION next;

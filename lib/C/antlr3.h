@@ -10,5 +10,6 @@
 #include    <antlr3collections.h>
 #include    <antlr3baserecognizer.h>
 #include    <antlr3exception.h>
+#include    <antlr3commontoken.h>
 
 #endif

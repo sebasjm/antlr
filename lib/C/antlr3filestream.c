@@ -70,7 +70,7 @@ antlr3NewAsciiFileStream(pANTLR3_UINT8 fileName)
     /* Call the common 8 bit ASCII input stream handler
      * intializer type thingy doobry function.
      */
-    antlr3AsciiSetupStream(input);
+    antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
 
 
 
