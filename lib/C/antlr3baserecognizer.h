@@ -7,9 +7,8 @@
 
 #include    <antlr3defs.h>
 #include    <antlr3exception.h>
-#include    <antlr3bitset.h>
-#include    <antlr3errors.h>
-#include    <antlr3collections.h>
+#include    <antlr3input.h>
+#include    <antlr3commontoken.h>
 
 /** Type indicator for a lexer recognizer
  */
@@ -273,8 +272,6 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
 }
     ANTLR3_BASE_RECOGNIZER, *pANTLR3_BASE_RECOGNIZER;
 
-    ANTLR3_API pANTLR3_BASE_RECOGNIZER	antlrBaseRecognizerNew		(ANTLR3_UINT32 type);
-    ANTLR3_API	void			antlr3RecognitionExceptionNew	(pANTLR3_BASE_RECOGNIZER recognizer);
-    ANTLR3_API	void			antlr3MTExceptionNew		(pANTLR3_BASE_RECOGNIZER recognizer);
+
 
 #endif	    /* _ANTLR3_BASERECOGNIZER_H	*/

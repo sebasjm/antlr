@@ -6,7 +6,6 @@
 #define	_ANTLR3_EXCEPTION_H
 
 #include    <antlr3defs.h>
-#include    <antlr3baserecognizer.h>
 
 /** Indicates that the recognizer received a token
  *  in the input that was not predicted.
@@ -47,7 +46,7 @@ typedef	struct ANTLR3_EXCEPTION_struct
      */
     void    *	    message;
 
-    /** If set to ANTLR_TRUE, this indicates that the message element of this structure
+    /** If set to ANTLR3_TRUE, this indicates that the message element of this structure
      *  should be freed by calling ANTLR3_FREE() when the exception is destroyed.
      */
     ANTLR3_BOOLEAN  freeMessage;
@@ -99,11 +98,11 @@ typedef	struct ANTLR3_EXCEPTION_struct
      */
     void	    (*freeCustom)   (void * custom);
     void	    (*print)	    (struct ANTLR3_EXCEPTION_struct * ex);
-    void	    (*free)	    (struct ANTLR3_EXCEPTION_struct * ex);
+    void	    (*freeEx)	    (struct ANTLR3_EXCEPTION_struct * ex);
 
 }
-    ANTLR3_EXCEPTION, *pANTLR3_EXCEPTION;
+    ANTLR3_EXCEPTION;
 
-    ANTLR3_API	pANTLR3_EXCEPTION	antlr3ExceptionNew	(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_BOOLEAN freeMessage);
+
 
 #endif

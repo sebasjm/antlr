@@ -143,6 +143,9 @@
 				RelativePath=".\antlr3memory.c">
 			</File>
 			<File
+				RelativePath=".\antlr3string.c">
+			</File>
+			<File
 				RelativePath=".\antlr3stringstream.c">
 			</File>
 			<File
@@ -187,10 +190,10 @@
 				RelativePath=".\antlr3input.h">
 			</File>
 			<File
-				RelativePath=".\antlr3memory.h">
+				RelativePath=".\antlr3interfaces.h">
 			</File>
 			<File
-				RelativePath=".\antlr3stringstream.h">
+				RelativePath=".\antlr3string.h">
 			</File>
 		</Filter>
 		<Filter

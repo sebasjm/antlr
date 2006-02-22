@@ -33,10 +33,10 @@
  * \param fileName Name of operating system file to read.
  * \return
  *	- Pointer to new input stream context upon success
- *	- One of the ANTLR_ERR_ defines on error.
+ *	- One of the ANTLR3_ERR_ defines on error.
  */
 ANTLR3_API pANTLR3_INPUT_STREAM
-antlr3NewAsciiFileStream(pANTLR3_UINT8 fileName)
+antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 {
     /* Pointer to the input stream we are going to create
      */

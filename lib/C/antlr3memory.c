@@ -5,7 +5,7 @@
  * system vs another in the future. For now, this just uses
  * malloc()
  */
-#include    <antlr3.h>
+#include    <antlr3defs.h>
 
 ANTLR3_API void *
 ANTLR3_MALLOC(size_t request)

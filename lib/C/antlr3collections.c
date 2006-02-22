@@ -13,7 +13,7 @@ static void		antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key);
 static void *		antlr3HashGet	    (pANTLR3_HASH_TABLE table, void * key);
 static ANTLR3_INT32	antlr3HashPut	    (pANTLR3_HASH_TABLE table, void * key, void * element, void (*freeptr)(void *));
 static void		antlr3HashFree	    (pANTLR3_HASH_TABLE table);
-static ANTLR3_UINT32	antlr4HashSize	    (pANTLR3_HASH_TABLE table);
+static ANTLR3_UINT64	antlr3HashSize	    (pANTLR3_HASH_TABLE table);
 
 /* Interface functions for enumeration
  */
@@ -26,7 +26,7 @@ static void		antlr3ListFree	(pANTLR3_LIST list);
 static void		antlr3ListDelete(pANTLR3_LIST list, ANTLR3_UINT64 key);
 static void *		antlr3ListGet	(pANTLR3_LIST list, ANTLR3_UINT64 key);
 static ANTLR3_INT32	antlr3ListPut	(pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
-static ANTLR3_UINT32	antlr4ListSize	(pANTLR3_LIST list);
+static ANTLR3_UINT64	antlr3ListSize	(pANTLR3_LIST list);
 
 /* Interface functions for Stack
  */
@@ -34,7 +34,8 @@ static void		antlr3StackFree	(pANTLR3_STACK  stack);
 static void		antlr3StackPop	(pANTLR3_STACK	stack);
 static void *		antlr3StackGet	(pANTLR3_STACK	stack, ANTLR3_UINT64 key);
 static ANTLR3_BOOLEAN	antlr3StackPush	(pANTLR3_STACK	stack, void * element, void (*freeptr)(void *));
-static ANTLR3_UINT32	antlr4StackSize	(pANTLR3_STACK	stack);
+static ANTLR3_UINT64	antlr3StackSize	(pANTLR3_STACK	stack);
+static void *		antlr3StackPeek	(pANTLR3_STACK	stack);
 
 /* Local function to advance enumeration structure pointers
  */
@@ -87,10 +88,11 @@ antlr3HashTableNew(ANTLR3_UINT32 sizeHint)
 
     /* Install the interface
      */
-    table->free	    = antlr3HashFree;
-    table->get	    = antlr3HashGet;
-    table->put	    = antlr3HashPut;
-    table->del	    = antlr3HashDelete;
+    table->free		= antlr3HashFree;
+    table->get		= antlr3HashGet;
+    table->put		= antlr3HashPut;
+    table->del		= antlr3HashDelete;
+    table->size		= antlr3HashSize;
 
     return  table;
 }
@@ -163,6 +165,13 @@ antlr3HashFree(pANTLR3_HASH_TABLE table)
     /* Now we free teh memory for the table itself
      */
     ANTLR3_FREE(table);
+}
+
+/** return the current size of the hash table
+ */
+static ANTLR3_UINT64	antlr3HashSize	    (pANTLR3_HASH_TABLE table)
+{
+    return  table->count;
 }
 
 /** Remove the element in the hash table for a particular
@@ -275,7 +284,7 @@ antlr3HashGet(pANTLR3_HASH_TABLE table, void * key)
 	entry = entry->nextEntry;
     }
 
-    /* If we got here, then we did no find the key
+    /* If we got here, then we did not find the key
      */
     return  NULL;
 }
@@ -573,11 +582,12 @@ antlr3ListNew	(ANTLR3_UINT32 sizeHint)
     list->del	= antlr3ListDelete;
     list->get	= antlr3ListGet;
     list->put	= antlr3ListPut;
+    list->size	= antlr3ListSize;
 
     return  list;
 }
 
-static ANTLR3_UINT32	antlr4Listize	    (pANTLR3_LIST list)
+static ANTLR3_UINT64	antlr3ListSize	    (pANTLR3_LIST list)
 {
     return  list->table->size(list->table);
 }
@@ -641,6 +651,7 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
     /* Now we need to add a new table
      */
     stack->list	= antlr3ListNew(sizeHint);
+    stack->top	= NULL;
 
     if	(stack->list == (pANTLR3_LIST)ANTLR3_ERR_NOMEM)
     {
@@ -657,7 +668,7 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
     return  stack;
 }
 
-static ANTLR3_UINT32	antlr4StackSize	    (pANTLR3_STACK stack)
+static ANTLR3_UINT64	antlr4StackSize	    (pANTLR3_STACK stack)
 {
     return  stack->list->size(stack->list);
 }
@@ -669,6 +680,7 @@ antlr3StackFree	(pANTLR3_STACK  stack)
     /* Free the list that supports the stack
      */
     stack->list->free(stack->list);
+    stack->top	= NULL;
 
     ANTLR3_FREE(stack);
 }
@@ -677,12 +689,19 @@ static void
 antlr3StackPop	(pANTLR3_STACK	stack)
 {
    stack->list->del(stack->list, stack->list->table->count);
+   stack->top = stack->list->get(stack->list, stack->list->table->count);
 }
 
 static void *
 antlr3StackGet	(pANTLR3_STACK stack, ANTLR3_UINT64 key)
 {
     return  stack->list->get(stack->list, key);
+}
+
+static void *
+antlr3StackPeek	(pANTLR3_STACK	stack)
+{
+    return  stack->top;
 }
 
 static ANTLR3_BOOLEAN 
@@ -692,5 +711,6 @@ antlr3StackPush	(pANTLR3_STACK stack, void * element, void (*freeptr)(void *))
 
     pushno  = stack->list->table->count + 1;
 
+    stack->top	= element;
     return stack->list->put(stack->list, pushno, element, freeptr);
 }

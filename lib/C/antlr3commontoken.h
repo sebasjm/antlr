@@ -11,6 +11,8 @@
 #ifndef	_ANTLR3_COMMON_TOKEN_H
 #define	_ANTLR3_COMMON_TOKEN_H
 
+#include    <antlr3defs.h>
+
 /** How many tokens to allocate at once in the token factory
  */
 #define	ANTLR3_FACTORY_POOL_SIZE    512
@@ -94,10 +96,10 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
      */
     ANTLR3_UINT64   stop;
 
-    /** Some token types actually do carry aroudn their associated text, hence
+    /** Some token types actually do carry around their associated text, hence
      * (*getText)() will return this pointer if it is not NULL
      */
-    pANTLR3_UINT8   text;
+    pANTLR3_STRING   text;
 
     /** Pointer to a custom element that the ANTLR3 programmer may define and install
      */
@@ -114,16 +116,16 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
 
     /** Pointer to function that returns the string representation of a token
      */
-    pANTLR3_UINT8   (*getText)(struct ANTLR3_COMMON_TOKEN_struct * token);
+    pANTLR3_STRING   (*getText)(struct ANTLR3_COMMON_TOKEN_struct * token);
 
     /** Pointer to a function that 'might' be able to set the text associated
      *  with a token. Imaginary tokens such as an ANTLR3_CLASSIC_TOKEN may actually
-     *  do this, however many tokens such as ANTLR_COMMON_TOKEN do not actaully have
+     *  do this, however many tokens such as ANTLR3_COMMON_TOKEN do not actaully have
      *  strings associated with them but just poit into the current input stream. These
      *  tokens will implement this function with a function that errors out (probably
      *  drastically.
      */
-    void	    (*setText)(struct ANTLR3_COMMON_TOKEN_struct * token);
+    void	    (*setText)(struct ANTLR3_COMMON_TOKEN_struct * token, pANTLR3_UINT8 text);
 
     /** Pointer to a function that returns the token type of this token
      */
@@ -143,7 +145,7 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
 
     /** Pointer to a function that gets the offset in the line where this token exists
      */ 
-    ANTLR3_UINT32   (*getCharPositionInLine)	(struct ANTLR3_COMMON_TOKEN_struct * token);
+    ANTLR3_INT32    (*getCharPositionInLine)	(struct ANTLR3_COMMON_TOKEN_struct * token);
 
     /** Pointer to a function that sets the offset in the line where this token exists
      */
@@ -187,7 +189,7 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
     /** Pointer to a function that returns this token as a text representation that can be 
      *  printed with embedded control codes such as \n replaced with the printable sequence "\\n"
      */
-    pANTLR3_INT8    (*toString)		(struct ANTLR3_COMMON_TOKEN_struct * token);
+    pANTLR3_STRING  (*toString)		(struct ANTLR3_COMMON_TOKEN_struct * token);
 }
     ANTLR3_COMMON_TOKEN, *pANTLR3_COMMON_TOKEN;
 
@@ -196,9 +198,9 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
  */
 typedef	struct ANTLR3_TOKEN_FACTORY_struct
 {
-    /** Pointer to the array of tokens that this factory has produced so far
+    /** Pointers to the array of tokens that this factory has produced so far
      */
-    pANTLR3_COMMON_TOKEN    pools;
+    pANTLR3_COMMON_TOKEN    *pools;
 
     /** Current pool tokens we are allocating from
      */
@@ -209,10 +211,15 @@ typedef	struct ANTLR3_TOKEN_FACTORY_struct
      */
     ANTLR3_UINT32	    nextToken;
 
-    /** Trick to initialized tokens and their API quickly, we set up this token when the
+    /** Trick to initialize tokens and their API quickly, we set up this token when the
      *  factory is created, then just copy the memory it uses into the new token.
      */
     ANTLR3_COMMON_TOKEN	    unTruc;
+
+    /** Pointer to an input stream that is using this token factory (may be NULL)
+     *  which will be assigned to the tokens automatically.
+     */
+    pANTLR3_INPUT_STREAM    input;
 
     /** Pointer to a function that returns a new token
      */
@@ -223,10 +230,5 @@ typedef	struct ANTLR3_TOKEN_FACTORY_struct
     void		    (*close)	    (struct ANTLR3_TOKEN_FACTORY_struct * factory);
 }
     ANTLR3_TOKEN_FACTORY, *pANTLR3_TOKEN_FACTORY;
-
-    /* Prototypes
-     */
-    ANTLR3_API pANTLR3_COMMON_TOKEN	antlr3NewCommonTokenType	(ANTLR3_UINT32 ttype);
-    ANTLR3_API pANTLR3_TOKEN_FACTORY	antlr3NewTokenFactory();
 
 #endif

@@ -18,7 +18,7 @@
  */
 #define	ANTLR3_BITSET_NIBBLE	4
 
-/** log2 of ANTLR3_BITSET_BITS 2^ANTLR_BITSET_LOG_BITS = ANTLR3_BITSET_BITS
+/** log2 of ANTLR3_BITSET_BITS 2^ANTLR3_BITSET_LOG_BITS = ANTLR3_BITSET_BITS
  */
 #define	ANTLR3_BITSET_LOG_BITS	6
 
@@ -61,12 +61,6 @@ typedef	struct ANTLR3_BITSET_struct
 }
     ANTLR3_BITSET, *pANTLR3_BITSET;
 
-    // Prototypes
-    //
-    ANTLR3_API	pANTLR3_BITSET  antlr3BitsetNew	    (ANTLR3_UINT32 numBits);
-    ANTLR3_API	void		antlr3BitsetFree    (pANTLR3_BITSET bitset);
-    ANTLR3_API	pANTLR3_BITSET  antlr3BitsetOf	    (ANTLR3_INT32 bit, ...);
-    ANTLR3_API	pANTLR3_BITSET	antlr3BitsetList    ();
-    ANTLR3_API	pANTLR3_BITSET  antlr3BitsetCopy    (pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements);
+
 
 #endif

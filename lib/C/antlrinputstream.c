@@ -1,8 +1,7 @@
 /** \file
  * Base functions to initalize and manipulate any input stream
  */
-#include    <antlr3.h>
-
+#include    <antlr3input.h>
 
 /* API functions
  */
@@ -18,7 +17,7 @@ static	    ANTLR3_UINT32   antlr3AsciiMark		(pANTLR3_INPUT_STREAM input);
 static	    void	    antlr3AsciiRewind		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 mark);
 static	    void	    antlr3AsciiRelease		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 mark);
 static	    void	    antlr3AsciiSeek		(pANTLR3_INPUT_STREAM input, void * seekPoint);
-static	    void	  * antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 start, ANTLR3_INT32 stop);
+static	    pANTLR3_STRING  antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 start, ANTLR3_INT32 stop);
 static	    ANTLR3_UINT64   antlr3AsciiGetLine		(pANTLR3_INPUT_STREAM input);
 static	    void	  * antlr3AsciiGetLineBuf	(pANTLR3_INPUT_STREAM input);
 static	    ANTLR3_UINT32   antlr3AsciiGetCharPosition	(pANTLR3_INPUT_STREAM input);
@@ -35,7 +34,24 @@ antlr3InputClose(pANTLR3_INPUT_STREAM input)
 {
     /* Close any markers in the input stream
      */
-    input->markers->free(input->markers);
+    if	(input->markers != NULL)
+    {
+	input->markers->free(input->markers);
+    }
+
+    /* Close the token factory
+     */
+    if	(input->tokFactory != NULL)
+    {
+	input->tokFactory->close(input->tokFactory);
+    }
+
+    /* Close the string factory
+     */
+    if	(input->strFactory != NULL)
+    {
+	input->strFactory->close(input->strFactory);
+    }
 
     /* Free the input stream buffer if we allocated it
      */
@@ -319,31 +335,10 @@ antlr3AsciiSeek	(pANTLR3_INPUT_STREAM input, void * seekPoint)
  * \param start Offset in input stream where the string starts
  * \param stop  Offset in the input stream where the string ends.
  */
-static void	  * 
+static pANTLR3_STRING
 antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 start, ANTLR3_INT32 stop)
 {
-    ANTLR3_UINT64   length;
-    pANTLR3_UINT8   ptr;
-
-    /* Work out how many ASCII (8 bit at least) characters this is
-     */
-    length  = stop - start;
-
-    if	(length <= 0)
-    {
-	return	NULL;
-    }
-
-    /* Allocate memory for the string
-     */
-    ptr	= (pANTLR3_UINT8)ANTLR3_MALLOC((size_t)length + 1);
-
-    if	(ptr != NULL)
-    {
-	ANTLR3_MEMMOVE(ptr, (const void *)(((pANTLR3_UINT8)input->data) + start), length);
-	*(ptr + length) = '\0';	    /* Terminate, these strings are usually used for Token streams and printing etc.	*/
-    }
-    return  (void *)ptr;
+    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)(input->data)+start, stop - start);
 }
 
 /** \brief Retrun the line number as understood by the 8 bit/ASCII input stream.
@@ -445,6 +440,14 @@ antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
 {
     input->type			    = type;
 
+    /* Build a string factory for this stream
+     */
+    input->strFactory	= antlr3StringFactoryNew();
+
+    /* Build a token factory for this stream
+     */
+    input->tokFactory	= antlr3TokenFactoryNew(input);
+
     /* Install function pointers for an 8 bit ASCII input
      */
     input->close		    = antlr3InputClose;		    /* Close down the stream completely					    */
@@ -463,6 +466,9 @@ antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
     input->setLine		    = antlr3AsciiSetLine;	    /* Set the input stream line number (does not set buffer pointers)	    */
     input->setCharPositionInLine    = antlr3AsciiSetCharPosition;   /* Set the offset in to the current line (does not set any pointers	)   */
     input->SetNewLineChar	    = antlr3AsciiSetNewLineChar;    /* Set the value of the newline trigger character			    */
+    input->rewind		    = antlr3AsciiRewind;	    /* How to rewind the input						    */
+    input->seek			    = antlr3AsciiSeek;		    /* How to seek to a specific point in the stream			    */
+    input->release		    = antlr3AsciiRelease;	    /* Reset marks after mark n						    */
 
     /* Initialize entries for tables etc
      */

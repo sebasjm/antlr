@@ -2,8 +2,7 @@
  * Contains default functions for creating and destroying as well as
  * otherwise handling ANTLR3 standard exception structures.
  */
-#include    <antlr3.h>
-
+#include    <antlr3exception.h>
 
 static    void	antlr3ExceptionPrint(pANTLR3_EXCEPTION ex);
 static    void	antlr3ExceptionFree (pANTLR3_EXCEPTION ex);
@@ -66,7 +65,7 @@ antlr3ExceptionNew(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_
     /* Install the API
      */
     ex->print	    = antlr3ExceptionPrint;
-    ex->free	    = antlr3ExceptionFree;
+    ex->freeEx	    = antlr3ExceptionFree;
 
     return ex;
 }

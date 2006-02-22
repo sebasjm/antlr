@@ -4,7 +4,7 @@
  * ANTLR3 programmer.
  * 
  */
-#include    <antlr3.h>
+#include    <antlr3baserecognizer.h>
 
 /* Interface functions
  */
@@ -14,7 +14,7 @@ static void	antlr3BRMismatch    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT
 static void	antlr3BRMatchAny    (pANTLR3_BASE_RECOGNIZER recognizer);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER
-antlrBaseRecognizerNew(ANTLR3_UINT32 type)
+antlr3BaseRecognizerNew(ANTLR3_UINT32 type)
 {
     pANTLR3_BASE_RECOGNIZER recognizer;
 

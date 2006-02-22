@@ -4,7 +4,7 @@
  * Java implementation.
  */
 
-#include    <antlr3.h>
+#include    <antlr3bitset.h>
 
 // External interface
 //

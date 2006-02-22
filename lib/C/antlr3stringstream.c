@@ -16,14 +16,14 @@
  *
  * \return
  *	- Pointer to new input stream context upon success
- *	- One of the ANTLR_ERR_ defines on error.
+ *	- One of the ANTLR3_ERR_ defines on error.
  *
  * \remark
  *  - ANTLR does not alter the input string in any way.
  *  - String is slightly incorrect in that the passed in pointer can be to any
  *    memory in C version of ANTLR3 of course.
  */
-pANTLR3_INPUT_STREAM	
+ANTLR3_API pANTLR3_INPUT_STREAM	
 antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name)
 {
     /* Pointer to the input stream we are going to create
@@ -72,7 +72,7 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size,
  *
  * \return
  *	- Pointer to new input stream context upon success
- *	- One of the ANTLR_ERR_ defines on error.
+ *	- One of the ANTLR3_ERR_ defines on error.
  *
  * \remark
  *  - ANTLR does not alter the input string in any way.

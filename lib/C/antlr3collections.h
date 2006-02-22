@@ -3,8 +3,6 @@
 
 #include    <antlr3defs.h>
 
-
-
 /** Internal structure representing an element in a hash bucket.
  *  Stores the original key so that duplicate keys can be rejected
  *  if necessary, and contains function can be suported. If the hash key
@@ -77,7 +75,7 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
     void	    (*del)	(struct ANTLR3_HASH_TABLE_struct * table, void * key);
     void *	    (*get)	(struct ANTLR3_HASH_TABLE_struct * table, void * key);
     ANTLR3_INT32    (*put)	(struct ANTLR3_HASH_TABLE_struct * table, void * key, void * element, void (*freeptr)(void *));
-    ANTLR3_UINT32   (*size)	(struct ANTLR3_HASH_TABLE_struct * table);
+    ANTLR3_UINT64   (*size)	(struct ANTLR3_HASH_TABLE_struct * table);
 }
     ANTLR3_HASH_TABLE, * pANTLR3_HASH_TABLE;
 
@@ -125,7 +123,7 @@ typedef	struct	ANTLR3_LIST_struct
     void	    (*del)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
     void *	    (*get)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
     ANTLR3_INT32    (*put)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
-    ANTLR3_UINT32   (*size)	(struct ANTLR3_LIST_struct * list);
+    ANTLR3_UINT64   (*size)	(struct ANTLR3_LIST_struct * list);
     
 }
     ANTLR3_LIST, *pANTLR3_LIST;
@@ -137,18 +135,20 @@ typedef	struct	ANTLR3_STACK_struct
     /** List that supports the stack structure
      */
     pANTLR3_LIST    list;
+
+    /** Used for quick access to the top of the stack
+     */
+    void *	    top;
     void	    (*free)	(struct ANTLR3_STACK_struct * stack);
     void 	    (*pop)	(struct ANTLR3_STACK_struct * stack);
     void *	    (*get)	(struct ANTLR3_STACK_struct * stack, ANTLR3_UINT64 key);
     ANTLR3_BOOLEAN  (*push)	(struct ANTLR3_STACK_struct * stack, void * element, void (*freeptr)(void *));
-    ANTLR3_UINT32   (*size)	(struct ANTLR3_STACK_struct * stack);
+    ANTLR3_UINT64   (*size)	(struct ANTLR3_STACK_struct * stack);
+    void *	    (*peek)	(struct ANTLR3_STACK_struct * stack);
+
 }
     ANTLR3_STACK, *pANTLR3_STACK;
 
-ANTLR3_API  pANTLR3_HASH_TABLE	      antlr3HashTableNew(ANTLR3_UINT32 sizeHint);
-ANTLR3_API  ANTLR3_UINT32	      antlr3Hash	(void * key, ANTLR3_UINT32 keylen);
-ANTLR3_API  pANTLR3_HASH_ENUM	      antlr3EnumNew	(pANTLR3_HASH_TABLE table);
-ANTLR3_API  pANTLR3_LIST	      antlr3ListNew	(ANTLR3_UINT32 sizeHint);
-ANTLR3_API  pANTLR3_STACK	      antlr3StackNew	(ANTLR3_UINT32 sizeHint);
+
 
 #endif
