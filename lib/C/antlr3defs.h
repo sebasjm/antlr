@@ -4,6 +4,7 @@
 #ifndef	_ANTLR3DEFS_H
 #define	_ANTLR3DEFS_H
 
+#define	ANTLR3_MEM_DEBUG
 
 
 /* Common definitions come first
@@ -98,12 +99,36 @@ ANTLR3_API pANTLR3_EXCEPTION	    antlr3ExceptionNew		    (ANTLR3_UINT32 exceptio
 
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3AsciiFileStreamNew	    (pANTLR3_UINT8 fileName);
 
+
+
+#ifdef	ANTLR3_MEM_DEBUG
+
+ANTLR3_API void			  * ANTLR3_MALLOC_DBG		    (pANTLR3_UINT8 file, ANTLR3_UINT32 line, size_t request);
+ANTLR3_API void			  * ANTLR3_REALLOC_DBG		    (pANTLR3_UINT8 file, ANTLR3_UINT32 line, void * current, ANTLR3_UINT64 request);
+ANTLR3_API void			    ANTLR3_FREE_DBG		    (void * ptr);
+ANTLR3_API pANTLR3_UINT8	    ANTLR3_STRDUP_DBG		    (pANTLR3_UINT8 file, ANTLR3_UINT32 line, pANTLR3_UINT8 instr);
+ANTLR3_API void			    ANTLR3_MEM_REPORT		    ();
+
+#define	ANTLR3_MALLOC( s )	ANTLR3_MALLOC_DBG   ((pANTLR3_UINT8) __FILE__ , (ANTLR3_UINT32)__LINE__ , (s))
+#define	ANTLR3_REALLOC( c, s)	ANTLR3_REALLOC_DBG  ((pANTLR3_UINT8) __FILE__ , (ANTLR3_UINT32)__LINE__ , c, s)
+#define	ANTLR3_FREE( p )	ANTLR3_FREE_DBG	    (p)
+#define	ANTLR3_FREE_FUNC	ANTLR3_FREE_DBG	
+#define	ANTLR3_STRDUP( p )	ANTLR3_STRDUP_DBG   ((pANTLR3_UINT8) __FILE__ , (ANTLR3_UINT32)__LINE__ , p)
+
+#else
+
+#define	ANTRL3_MEM_REPORT()
 ANTLR3_API void			  * ANTLR3_MALLOC		    (size_t request);
+ANTLR3_API void			  * ANTLR3_REALLOC		    (void * current, ANTLR3_UINT64 request);
 ANTLR3_API void			    ANTLR3_FREE			    (void * ptr);
+#define	ANTLR3_FREE_FUNC	    ANTLR3_FREE
 ANTLR3_API pANTLR3_UINT8	    ANTLR3_STRDUP		    (pANTLR3_UINT8 instr);
+
+#endif
+
 ANTLR3_API void			  * ANTLR3_MEMMOVE		    (void * target, const void * source, ANTLR3_UINT64 size);
 ANTLR3_API void			  * ANTLR3_MEMSET		    (void * target, ANTLR3_UINT8 byte, ANTLR3_UINT64 size);
-ANTLR3_API void			  * ANTLR3_REALLOC		    (void * current, ANTLR3_UINT64 request);
+
 
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringCopyStream	(pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);

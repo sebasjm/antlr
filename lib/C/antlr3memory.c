@@ -8,6 +8,20 @@
 #include    <antlr3defs.h>
 
 ANTLR3_API void *
+ANTLR3_MEMMOVE(void * target, const void * source, ANTLR3_UINT64 size)
+{
+    return  memmove(target, source, (size_t)size);
+}
+
+ANTLR3_API void *
+ANTLR3_MEMSET(void * target, ANTLR3_UINT8 byte, ANTLR3_UINT64 size)
+{
+    return memset(target, (int)byte, (size_t)size);
+}
+
+#ifndef	ANTLR3_MEM_DEBUG
+
+ANTLR3_API void *
 ANTLR3_MALLOC(size_t request)
 {
     return  malloc(request);
@@ -31,14 +45,182 @@ ANTLR3_STRDUP(pANTLR3_UINT8 instr)
     return  (pANTLR3_UINT8)strdup((const char *)instr);
 }
 
-ANTLR3_API void *
-ANTLR3_MEMMOVE(void * target, const void * source, ANTLR3_UINT64 size)
+#else
+
+#include    <antlr3collections.h>
+#ifdef	WIN32
+#pragma warning( disable : 4100 )
+#endif
+
+
+static	pANTLR3_LIST  memtrace;
+
+static	int initialized	= 0;
+static	int log		= 0;
+
+static void	init()
 {
-    return  memmove(target, source, (size_t)size);
+    initialized	    = 1;    /* Only call this once	    */
+    log		    = 0;    /* Don't log while initializing */
+    memtrace	    = antlr3ListNew(32767);    /* Nice big one for trace - just debugging - coudl even be biggger I guess	*/
+    log		    = 1;
+}
+
+struct	memrec
+{
+    ANTLR3_UINT8    file[256];
+    ANTLR3_UINT32   line;
+    ANTLR3_UINT64   size;
+    ANTLR3_UINT8    type;
+};
+
+ANTLR3_API void *
+ANTLR3_MALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, size_t request)
+{
+    void    * m;
+    struct  memrec * tr;
+
+    if	(!initialized)
+    {
+	init();
+    }
+
+    m =  malloc(request);
+
+    if	(log)
+    {
+	log = 0;
+	tr  = (struct  memrec *)malloc(sizeof(struct memrec));
+	tr->line    = line;
+	tr->size    = request;
+	tr->type    = 0;
+	sprintf((char *)tr->file, "%.256s", file);
+	memtrace->put(memtrace, (ANTLR3_UINT64)m, (void *)tr, free);
+	log = 1;
+    }
+    
+    return  m;
 }
 
 ANTLR3_API void *
-ANTLR3_MEMSET(void * target, ANTLR3_UINT8 byte, ANTLR3_UINT64 size)
+ANTLR3_REALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, void * current, ANTLR3_UINT64 request)
 {
-    return memset(target, (int)byte, (size_t)size);
+    void    * m;
+    struct  memrec * tr;
+
+    if	(!initialized)
+    {
+	init();
+    }
+
+    m =   realloc(current, (size_t)request);
+
+    if	(log && m != current)
+    {
+	log = 0;
+	memtrace->del(memtrace, (ANTLR3_UINT64)current);
+	tr  = (struct  memrec *)malloc(sizeof(struct memrec));
+	tr->line    = line;
+	tr->size    = request;
+	tr->type    = 1;
+	sprintf((char *)tr->file, "%.256s", file);
+	memtrace->put(memtrace, (ANTLR3_UINT64)m, (void *)tr, free);
+	log = 1;
+    }
+    
+    return  m;
+
 }
+
+ANTLR3_API void
+ANTLR3_FREE_DBG(void * ptr)
+{
+    if	(log)
+    {
+	log = 0;
+	memtrace->del(memtrace, (ANTLR3_UINT64)ptr);
+	log = 1;
+    }
+    free(ptr);
+}
+
+ANTLR3_API pANTLR3_UINT8
+ANTLR3_STRDUP_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, pANTLR3_UINT8 instr)
+{
+    void    * m;
+    struct  memrec * tr;
+
+    if	(!initialized)
+    {
+	init();
+    }
+
+    m =   (pANTLR3_UINT8)strdup((const char *)instr);
+    
+    if	(log)
+    {
+	log = 0;
+	tr  = (struct  memrec *)malloc(sizeof(struct memrec));
+	tr->line    = line;
+	tr->size    = strlen((const char *)instr);
+	tr->type    = 2;
+	sprintf((char *)tr->file, "%.256s", file);
+	memtrace->put(memtrace, (ANTLR3_UINT64)m, (void *)tr, free);
+	log = 1;
+    }
+    return m;
+}
+
+ANTLR3_API void
+ANTLR3_MEM_REPORT()
+{
+    pANTLR3_HASH_ENUM    en;
+
+    char    *addr;
+    struct  memrec * tr;
+    int	    first;
+
+    log	= 0;
+
+    en  = antlr3EnumNew(memtrace->table);
+
+    if  (en != NULL)
+    {
+	first	= 1;
+
+	/* Enumerate all entries */
+	while   (en->next(en, &addr, &tr) == ANTLR3_SUCCESS)
+	{
+	    if	(first)
+	    {
+		printf("ANTLR3 Found unreleased memory\n");
+		printf("==============================\n\n");
+		first	= 0;
+	    }
+	    switch  (tr->type)
+	    {
+	    case	0:
+		printf("    malloc : ");
+		break;
+	    case	1:
+		printf("   realloc : ");
+		break;
+	    case	2:
+		printf("    strdup : ");
+		break;
+	    default:
+		printf(" !UNKNOWN! : ");
+		break;
+	    }
+
+	    printf("%8I64d bytes at %10s  - line %8d of file %s\n",
+		    tr->size, addr, tr->line, tr->file);
+	}
+    }
+
+    en->free(en);
+    memtrace->free(memtrace);
+
+}
+
+#endif

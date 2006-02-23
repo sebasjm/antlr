@@ -404,13 +404,52 @@ static  void		setStopIndex		(pANTLR3_COMMON_TOKEN token, ANTLR3_UINT64 stop)
 static  pANTLR3_STRING    toString		(pANTLR3_COMMON_TOKEN token)
 {
     pANTLR3_STRING  text;
+    pANTLR3_STRING  outtext;
 
     text    =	token->getText(token);
-
+    
     if	(text == NULL)
     {
 	return NULL;
     }
 
-    return text->factory->printable(text->factory, text);	/* Get text associated with the token in printable form	*/
+    text = text->factory->printable(text->factory, text);	/* Get text associated with the token in printable form	*/
+
+    /* A new empty string to assemble all the stuff in
+     */
+    outtext = text->factory->newRaw(text->factory);
+
+    /* Now we use our handy dandy string utility to assemble the
+     * the reporting string
+     * return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+     */
+    outtext->append (outtext, "[@");
+    outtext->addi   (outtext, (ANTLR3_INT32)token->getTokenIndex(token));
+    outtext->append (outtext, " (");
+    outtext->addi   (outtext, (ANTLR3_INT32)token->getStartIndex(token));
+    outtext->addc   (outtext, ':');
+    outtext->addi   (outtext, (ANTLR3_INT32)token->getStopIndex(token));
+    outtext->append (outtext, ") ='");
+    outtext->append (outtext, text->text);
+    outtext->append (outtext, "', <");
+    outtext->addi   (outtext, token->type);
+    outtext->append (outtext, "> ");
+
+    if	(token->getChannel(token) > ANTLR3_TOKEN_DEFAULT_CHANNEL)
+    {
+	outtext->append	(outtext, "(channel = ");
+	outtext->addi	(outtext, (ANTLR3_INT32)token->getChannel(token));
+	outtext->append	(outtext, ") ");
+    }
+
+    outtext->addi   (outtext, (ANTLR3_INT32)token->getLine(token));
+    outtext->addc   (outtext, ':');
+    outtext->addi   (outtext, token->getCharPositionInLine(token));
+    outtext->addc   (outtext, ']');
+
+    /* Destroy the printable copy
+     */
+    text->factory->destroy(text->factory, text);
+
+    return  outtext;
 }

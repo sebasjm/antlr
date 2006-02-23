@@ -19,6 +19,7 @@ static    pANTLR3_UINT8	    set		(pANTLR3_STRING string, void * chars);
 static    pANTLR3_UINT8	    addc	(pANTLR3_STRING string, ANTLR3_UINT8 c);
 static    pANTLR3_UINT8	    addi	(pANTLR3_STRING string, ANTLR3_INT32 i);
 static	  pANTLR3_UINT8	    insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, void * newbit);
+static	  pANTLR3_UINT8	    inserti	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i);
 
 /* Local helpers
  */
@@ -126,6 +127,7 @@ stringInit  (pANTLR3_STRING string)
     string->append  = append;
     string->set	    = set;
     string->insert  = insert;
+    string->inserti = inserti;
 }
 
 /**
@@ -300,6 +302,7 @@ addc	(pANTLR3_STRING string, ANTLR3_UINT8 c)
     }
     *(string->text + string->len)	= c;
     *(string->text + string->len + 1)	= '\0';
+    string->len++;
 
     return  string->text;
 }
@@ -312,6 +315,15 @@ addi	(pANTLR3_STRING string, ANTLR3_INT32 i)
     sprintf((char *)newbit, "%d", i);
 
     return  string->append(string, newbit);
+}
+
+static	  pANTLR3_UINT8
+inserti	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i)
+{
+    ANTLR3_UINT8	    newbit[32];
+
+    sprintf((char *)newbit, "%d", i);
+    return  string->insert(string, point, newbit);
 }
 
 static	pANTLR3_UINT8

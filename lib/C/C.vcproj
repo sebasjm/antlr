@@ -149,6 +149,9 @@
 				RelativePath=".\antlr3stringstream.c">
 			</File>
 			<File
+				RelativePath=".\antlr3tokenstream.c">
+			</File>
+			<File
 				RelativePath=".\antlrinputstream.c">
 			</File>
 		</Filter>
@@ -195,6 +198,9 @@
 			<File
 				RelativePath=".\antlr3string.h">
 			</File>
+			<File
+				RelativePath=".\antlr3tokenstream.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -205,16 +211,19 @@
 			Name="Templates"
 			Filter=".stg">
 			<File
-				RelativePath=".\C.stg">
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg">
 			</File>
 			<File
-				RelativePath=".\CAst.stg">
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\ASTDbg.stg">
 			</File>
 			<File
-				RelativePath=".\CAstDbg.stg">
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\C.stg">
 			</File>
 			<File
-				RelativePath=".\CDbg.stg">
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\Dbg.stg">
+			</File>
+			<File
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\ST.stg">
 			</File>
 		</Filter>
 		<File

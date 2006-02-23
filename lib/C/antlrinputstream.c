@@ -222,7 +222,7 @@ antlr3AsciiMark	(pANTLR3_INPUT_STREAM input)
 
 	/* Add it to the table
 	 */
-	input->markers->put(input->markers, key, state, ANTLR3_FREE);	/* No special structure, just free() on delete */
+	input->markers->put(input->markers, key, state, ANTLR3_FREE_FUNC);	/* No special structure, just free() on delete */
     }
     else
     {

@@ -30,4 +30,7 @@ typedef struct ANTLR3_LEX_STATE_struct		*pANTLR3_LEX_STATE;
 typedef struct ANTLR3_STRING_FACTORY_struct	*pANTLR3_STRING_FACTORY;
 typedef struct ANTLR3_STRING_struct		*pANTLR3_STRING;
 
+typedef struct ANTLR3_TOKEN_SOURCE_struct	*pANTLR3_TOKEN_SOURCE;
+typedef	struct ANTLR3_TOKEN_STREAM_struct	*pANTLR3_TOKEN_STREAM;
+
 #endif

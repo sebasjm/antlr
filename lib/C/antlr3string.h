@@ -52,6 +52,11 @@ typedef	struct ANTLR3_STRING_struct
      */
     pANTLR3_UINT8   (*insert)	(pANTLR3_STRING string, ANTLR3_UINT32 point, void * newbit);
 
+    /** Pointer to function that inserts the supplied integer in string form at the specified
+     *  offset in the current string.
+     */
+    pANTLR3_UINT8   (*inserti)	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i);
+
     /** Pointer to function that sets the string value to a specific string
      */
     pANTLR3_UINT8   (*set)	(struct ANTLR3_STRING_struct * string, void * chars);
