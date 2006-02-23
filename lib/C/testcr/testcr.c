@@ -1,3 +1,6 @@
+
+#define	ANTLR3_MEM_DEBUG
+
 #include    <antlr3.h>
 
 void myfree(void * p)
@@ -67,6 +70,8 @@ int main()
 	    }
 	}
 
+	en->free(en);
+
 	for (i=0; i<TEST_HASH_COUNT; i++)
 	{
 	    sprintf(key, "%d", i);
@@ -135,12 +140,22 @@ int main()
 
     /* Create loads and loads of tokens
      */
-    for	(i=0; i<20000; i++)
+    for	(i=0; i<TEST_HASH_COUNT; i++)
     {
 	tok = tf->newToken(tf);
+	if	((i % (TEST_HASH_COUNT/42)) == 0)
+	{
+	    /* Deliberately throws away the pointer returned by toString()
+	     * to make sure the string factory cleans itself up.
+	     */
+	    printf("%s\n", tok->toString(tok)->text);
+	}
     }
     
+
+    
     input->close(input);
+    ANTLR3_MEM_REPORT();
 
     return 0;
 }
