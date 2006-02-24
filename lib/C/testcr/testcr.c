@@ -11,8 +11,12 @@ void myfree(void * p)
 #define	TEST_HASH_COUNT	10000
 #define	TEST_HASH_SIZE	3011
 
+
+
 int main()
 {
+    pANTLR3_BITSET bs1,bs2;
+
     pANTLR3_INPUT_STREAM input;
     int	i;
     ANTLR3_UINT8	    key[256];
@@ -30,6 +34,11 @@ int main()
 
     unsigned char   * retkey;
     void	    * retdata;
+
+    bs1  = antlr3BitsetOf(0, 64, -1);
+    bs2  = antlr3BitsetOf(0, 64, 1242, 345678, 9, 10, 11, 12, 13, 14, 15, 34, 56, 0, -1);
+
+    bs1->equals(bs1, bs2);
 
     input   = antlr3AsciiFileStreamNew("C:/iscsrc/users/5.1.mv/modules/Antlr/mvindex/src/mvindexcommands.g");
 
@@ -152,6 +161,7 @@ int main()
 	}
     }
     
+
 
     ANTLR3_MEM_REPORT(ANTLR3_FALSE);
     input->close(input);
