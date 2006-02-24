@@ -153,9 +153,9 @@ int main()
     }
     
 
-    
+    ANTLR3_MEM_REPORT(ANTLR3_FALSE);
     input->close(input);
-    ANTLR3_MEM_REPORT();
+    ANTLR3_MEM_REPORT(ANTLR3_TRUE);
 
     return 0;
 }
