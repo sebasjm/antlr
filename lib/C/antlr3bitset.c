@@ -23,6 +23,7 @@ static	ANTLR3_BOOLEAN	antlr3BitsetIsNil	(pANTLR3_BITSET bitset);
 // Local functions
 //
 static	void		growToInclude	(pANTLR3_BITSET bitset, ANTLR3_INT32 bit);
+static	void		grow		(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize);
 static	ANTLR3_UINT64	bitMask		(ANTLR3_UINT32 bitNumber);
 static	ANTLR3_UINT32	numWordsToHold	(ANTLR3_UINT32 bit);
 static	ANTLR3_UINT32	wordNumber	(ANTLR3_UINT32 bit);
@@ -85,6 +86,7 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
     bitset->orInPlace	=   antlr3BitsetORInPlace;
     bitset->size	=   antlr3BitsetSize;
     bitset->add		=   antlr3BitsetAdd;
+    bitset->grow	=   grow;
     bitset->equals	=   antlr3BitsetEquals;
     bitset->isMember	=   antlr3BitsetMember;
     bitset->numBits	=   antlr3BitsetNumBits;
@@ -186,6 +188,71 @@ antlr3BitsetList(pANTLR3_HASH_TABLE list)
     return NULL;
 }
 
+/*!
+ * \brief
+ * Creates a new bitset with at least one 64 bit bset of bits, but as
+ * many 64 bit sets as are required.
+ * 
+ * \param[in] bset
+ * A variable number of bits to add to the set, ending in -1 (impossible bit).
+ * 
+ * \returns
+ * A new bit set with all of the specified bitmaps in it and the API
+ * initialized.
+ * 
+ * Call as:
+ *  - pANTLR3_BITSET = antlrBitsetLoad(bset, bset11, ..., -1);
+ *  - pANTLR3_BITSET = antlrBitsetOf(-1);  Create empty bitset 
+ *
+ * \remarks
+ * Stdargs function - must supply -1 as last paremeter, which is NOT
+ * added to the set.
+ * 
+ */
+ANTLR3_API pANTLR3_BITSET
+antlr3BitsetLoad(ANTLR3_UINT64 bset, ...)
+{
+    pANTLR3_BITSET  bitset;
+    ANTLR3_UINT32  count;
+
+    va_list ap;
+
+    /* Allocate memory for the bitset structure itself
+     * the input parameter is the bit number (0 based)
+     * to include in the bitset, so we need at at least
+     * bit + 1 bits. If any arguments indicate a 
+     * a bit higher than the default number of bits (0 menas default size)
+     * then Add() will take care
+     * of it.
+     */
+    bitset  = antlr3BitsetNew(0);
+
+    if	(bitset == NULL)
+    {
+	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
+    }
+
+    /* Now we can add the element bits into the set
+     */
+    count   = 0;
+    va_start(ap, bset);
+    while   (bset != -1)
+    {
+	if  (bitset->length >= count)
+	{
+	    bitset->grow(bitset, count);
+	}
+	
+	bitset->bits[count] = bset;
+
+	bset = va_arg(ap, ANTLR3_UINT32);
+    }
+    va_end(ap);
+
+    /* return the new bitset
+     */
+    return  bitset;
+}
 
 /*!
  * \brief
@@ -286,12 +353,9 @@ antlr3BitsetAdd(pANTLR3_BITSET bitset, ANTLR3_INT32 bit)
 }
 
 static void
-growToInclude(pANTLR3_BITSET bitset, ANTLR3_INT32 bit)
+grow(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize)
 {
-    ANTLR3_UINT32   newSize;
     pANTLR3_UINT64   newBits;
-
-    newSize = max((bitset->length << 1), numWordsToHold(bit));
 
     /* Space for newly sized bitset - come back to this and iuse realloc, it may
      * be more efficient...
@@ -313,7 +377,12 @@ growToInclude(pANTLR3_BITSET bitset, ANTLR3_INT32 bit)
     /* In with the new bits... der der der der.
      */
     bitset->bits    = newBits;
+}
 
+static void
+growToInclude(pANTLR3_BITSET bitset, ANTLR3_INT32 bit)
+{
+    bitset->grow(bitset, max((bitset->length << 1), numWordsToHold(bit)));
 }
 
 static void
@@ -349,7 +418,7 @@ antlr3BitsetORInPlace(pANTLR3_BITSET bitset, pANTLR3_BITSET bitset2)
 static ANTLR3_UINT64
 bitMask(ANTLR3_UINT32 bitNumber)
 {
-    return  ((ANTLR3_UINT64)1) << (bitNumber & ANTLR3_BITSET_MOD_MASK);
+    return  ((ANTLR3_UINT64)1) << (bitNumber & (ANTLR3_BITSET_MOD_MASK));
 }
 
 static ANTLR3_UINT32
