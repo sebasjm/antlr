@@ -57,6 +57,7 @@ static	pANTLR3_LIST  memtrace;
 
 static	int initialized	= 0;
 static	int log		= 0;
+static	int reporting	= 0;
 
 static void	init()
 {
@@ -87,7 +88,7 @@ ANTLR3_MALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, size_t request)
 
     m =  malloc(request);
 
-    if	(log)
+    if	(log && !reporting)
     {
 	log = 0;
 	tr  = (struct  memrec *)malloc(sizeof(struct memrec));
@@ -115,7 +116,7 @@ ANTLR3_REALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, void * current, ANTLR
 
     m =   realloc(current, (size_t)request);
 
-    if	(log && m != current)
+    if	(log && !reporting && m != current)
     {
 	log = 0;
 	memtrace->del(memtrace, (ANTLR3_UINT64)current);
@@ -135,7 +136,7 @@ ANTLR3_REALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, void * current, ANTLR
 ANTLR3_API void
 ANTLR3_FREE_DBG(void * ptr)
 {
-    if	(log)
+    if	(log && !reporting)
     {
 	log = 0;
 	memtrace->del(memtrace, (ANTLR3_UINT64)ptr);
@@ -157,7 +158,7 @@ ANTLR3_STRDUP_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, pANTLR3_UINT8 instr)
 
     m =   (pANTLR3_UINT8)strdup((const char *)instr);
     
-    if	(log)
+    if	(log && ! reporting)
     {
 	log = 0;
 	tr  = (struct  memrec *)malloc(sizeof(struct memrec));
@@ -172,7 +173,7 @@ ANTLR3_STRDUP_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, pANTLR3_UINT8 instr)
 }
 
 ANTLR3_API void
-ANTLR3_MEM_REPORT()
+ANTLR3_MEM_REPORT(ANTLR3_BOOLEAN cleanup)
 {
     pANTLR3_HASH_ENUM    en;
 
@@ -180,18 +181,18 @@ ANTLR3_MEM_REPORT()
     struct  memrec * tr;
     int	    first;
 
-    log	= 0;
-
+    reporting	= 1;
+    first	= 1;
     en  = antlr3EnumNew(memtrace->table);
 
     if  (en != NULL)
     {
-	first	= 1;
+	first	= 2;
 
 	/* Enumerate all entries */
 	while   (en->next(en, &addr, &tr) == ANTLR3_SUCCESS)
 	{
-	    if	(first)
+	    if	(first == 2)
 	    {
 		printf("ANTLR3 Found unreleased memory\n");
 		printf("==============================\n\n");
@@ -219,8 +220,17 @@ ANTLR3_MEM_REPORT()
     }
 
     en->free(en);
-    memtrace->free(memtrace);
 
+    if	(first == 2)
+    {
+	printf("ANTLR3 : Congrats - No unreleased memory\n");
+	printf("========================================\n\n");
+    }
+    if	(cleanup)
+    {
+	memtrace->free(memtrace);
+    }
+    reporting = 0;
 }
 
 #endif
