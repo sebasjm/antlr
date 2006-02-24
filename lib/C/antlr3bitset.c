@@ -26,8 +26,9 @@ static	void		growToInclude	(pANTLR3_BITSET bitset, ANTLR3_INT32 bit);
 static	ANTLR3_UINT64	bitMask		(ANTLR3_UINT32 bitNumber);
 static	ANTLR3_UINT32	numWordsToHold	(ANTLR3_UINT32 bit);
 static	ANTLR3_UINT32	wordNumber	(ANTLR3_UINT32 bit);
+static	void		antlr3BitsetFree(pANTLR3_BITSET bitset);
 
-ANTLR3_API void
+static void
 antlr3BitsetFree(pANTLR3_BITSET bitset)
 {
     if	(bitset->bits != NULL)
@@ -56,7 +57,7 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
 	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
     }
 
-    /* Avoid memory thrashing at teh upfron expense of a few bytes
+    /* Avoid memory thrashing at the up front expense of a few bytes
      */
     if	(numBits < (8 * ANTLR3_BITSET_BITS))
     {
@@ -89,6 +90,7 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
     bitset->numBits	=   antlr3BitsetNumBits;
     bitset->remove	=   antlr3BitsetRemove;
     bitset->isNil	=   antlr3BitsetIsNil;
+    bitset->free	=   antlr3BitsetFree;
 
     /* All seems good
      */
@@ -160,9 +162,27 @@ antlr3BitsetClone(pANTLR3_BITSET inSet)
 
 
 ANTLR3_API pANTLR3_BITSET
-antlr3BitsetList()
+antlr3BitsetList(pANTLR3_HASH_TABLE list)
 {
-    /* TODO: Place holder until I need to code it and have written List and Stack */
+    pANTLR3_BITSET	bitSet;
+    pANTLR3_HASH_ENUM	en;
+    pANTLR3_UINT8	key;
+    ANTLR3_UINT64	bit;
+
+    /* We have no idea what exactly is in the list
+     * so creaeta a default bitset and then just add stuff
+     * as we enumerate.
+     */
+    bitSet  = antlr3BitsetNew(0);
+
+    en  = antlr3EnumNew(list);
+
+    while   (en->next(en, (void **)(&key), (void **)(&bit)) == ANTLR3_SUCCESS)
+    {
+	bitSet->add(bitSet, (ANTLR3_UINT32)bit);
+    }
+    en->free(en);
+
     return NULL;
 }
 

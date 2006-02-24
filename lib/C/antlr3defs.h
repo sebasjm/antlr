@@ -78,9 +78,8 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 // Prototypes
 //
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetNew		    (ANTLR3_UINT32 numBits);
-ANTLR3_API void			    antlr3BitsetFree		    (pANTLR3_BITSET bitset);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetOf		    (ANTLR3_INT32 bit, ...);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetList		    ();
+ANTLR3_API pANTLR3_BITSET	    antlr3BitsetList		    (pANTLR3_HASH_TABLE list);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetCopy		    (pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER  antlr3BaseRecognizerNew	    (ANTLR3_UINT32 type);
@@ -117,7 +116,7 @@ ANTLR3_API void			    ANTLR3_MEM_REPORT		    ();
 
 #else
 
-#define	ANTRL3_MEM_REPORT()
+#define	ANTLR3_MEM_REPORT()
 ANTLR3_API void			  * ANTLR3_MALLOC		    (size_t request);
 ANTLR3_API void			  * ANTLR3_REALLOC		    (void * current, ANTLR3_UINT64 request);
 ANTLR3_API void			    ANTLR3_FREE			    (void * ptr);

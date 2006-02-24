@@ -9,6 +9,7 @@
 #define	_ANTLR3_BITSET_H
 
 #include    <antlr3defs.h>
+#include    <antlr3collections.h>
 
 /** How many bits in the elements
  */
@@ -56,6 +57,7 @@ typedef	struct ANTLR3_BITSET_struct
     ANTLR3_UINT32   (*numBits)	    (struct ANTLR3_BITSET_struct  * bitset);
     void	    (*remove)	    (struct ANTLR3_BITSET_struct  * bitset, ANTLR3_UINT32 bit);
     ANTLR3_BOOLEAN  (*isNil)	    (struct ANTLR3_BITSET_struct  * bitset);
+    void	    (*free)	    (struct ANTLR3_BITSET_struct  * bitset);
 
 
 }

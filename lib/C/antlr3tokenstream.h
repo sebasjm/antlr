@@ -7,6 +7,11 @@
 #define	_ANTLR3_TOKENSTREAM_H
 
 #include    <antlr3defs.h>
+#include    <antlr3string.h>
+#include    <antlr3collections.h>
+#include    <antlr3input.h>
+#include    <antlr3commontoken.h>
+#include    <antlr3bitset.h>
 
 /** Definition of a token source, which has a pointer to a function that 
  *  returns the next token (using a token factory if it is going to be
@@ -44,7 +49,7 @@ typedef	struct ANTLR3_TOKEN_STREAM_struct
      *  Return null for LT(0) and any index that results in an absolute address
      *  that is negative.
      */
-    pANTLR3_COMMON_TOKEN    (*LT)   (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_INT32 k);
+    pANTLR3_COMMON_TOKEN    (*LT)   (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_INT64 k);
 
     /** Get a token at an absolute index i; 0..n-1.  This is really only
      *  needed for profiling and debugging and token stream rewriting.
@@ -53,7 +58,7 @@ typedef	struct ANTLR3_TOKEN_STREAM_struct
      *  I believe DebugTokenStream can easily be altered to not use
      *  this method, removing the dependency.
      */
-    pANTLR3_COMMON_TOKEN    (*get)		(struct ANTLR3_TOKEN_STREAM_struct * tokenStream, int i);
+    pANTLR3_COMMON_TOKEN    (*get)		(struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT64 i);
 
     /** Where is this stream pulling tokens from?  This is not the name, but
      *  a pointer into an interface that contains a ANTLR3_TOKEN_SOURCE interface.
@@ -62,12 +67,17 @@ typedef	struct ANTLR3_TOKEN_STREAM_struct
      */
     pANTLR3_TOKEN_SOURCE    (*getTokenSource)	(struct ANTLR3_TOKEN_STREAM_struct * tokenStream);
 
+    /** Return the text of all the tokens in the stream, as the old tramp in 
+     *  Leeds market used to say; "Get the lot!"
+     */
+    pANTLR3_STRING	    (*toString)		(struct ANTLR3_TOKEN_STREAM_struct * tokenStream);
+
     /** Return the text of all tokens from start to stop, inclusive.
      *  If the stream does not buffer all the tokens then it can just
      *  return an empty ANTLR3_STRING or NULL;  Grammars should not access $ruleLabel.text in
      *  an action in that case.
      */
-    pANTLR3_STRING	    (*toString)		(struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
+    pANTLR3_STRING	    (*toStringSS)	(struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
 
     /** Because the user is not required to use a token with an index stored
      *  in it, we must provide a means for two token objects themselves to
@@ -118,7 +128,86 @@ typedef	struct ANTLR3_TOKEN_STREAM_struct
     /** The index into the tokens list of the current token (the next one that will be
      *  consumed. p = -1 indicates that the token list is empty.
      */
-    ANTLR3_UINT64	    p;
+    ANTLR3_INT64	    p;
+
+    /** Move the input pointer to the next incoming token.  The stream
+     *  must become active with LT(1) available.  consume() simply
+     *  moves the input pointer so that LT(1) points at the next
+     *  input symbol. Consume at least one token.
+     *
+     *  Walk past any token not on the channel the parser is listening to.
+     */
+    void		    (*consume)(struct ANTLR3_TOKEN_STREAM_struct * tokenStream);
+
+    /** A simple filter mechanism whereby you can tell this token stream
+     *  to force all tokens of type ttype to be on channel.  For example,
+     *  when interpreting, we cannot exec actions so we need to tell
+     *  the stream to force all WS and NEWLINE to be a different, ignored
+     *  channel.
+     */
+    void		    (*setTokenTypeChannel)(struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT32 ttype, ANTLR3_UINT32 channel);
+
+    /** Add a particular token type to the discard set. If a token is found to belong 
+     *  to this set, then it is skipped/thrown away
+     */
+    void		    (*discardTokenType)	    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_INT32 ttype);
+
+    /** Signal to discard off channel tokens from here on in.
+     */
+    void		    (*discardOffChannelToks)(struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_BOOLEAN discard);
+
+    /** Function that returns a pointer to the ANTLR3_LIST of all tokens
+     *  in the stream (this causes the buffer to fill if we have not get any yet)
+     */
+    pANTLR3_LIST	    (*getTokens)	    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream);
+
+    /** Function that returns all the tokens between a start and a stop index.
+     *  TODO: This is a new list (Ack! Maybe this is a reason to have factories for LISTS adn HASHTABLES etc :-( come back to this)
+     */
+    pANTLR3_LIST	    (*getTokenRange)	    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
+
+    /** Function that returns all the tokens indicated by the specified bitset, within a range of tokens
+     */
+    pANTLR3_LIST	    (*getTokensSet)	    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, 
+							ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_BITSET types);
+    
+    /** Function that retruns all the tokens indicated by being a member of the supplied List
+     */
+    pANTLR3_LIST	    (*getTokensList)	    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, 
+							ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_LIST list);
+
+    /** Function that returns all tokens of a certain type within a range.
+     */
+    pANTLR3_LIST	    (*getTokensType)	    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, 
+							ANTLR3_UINT64 start, ANTLR3_UINT64 stop, ANTLR3_UINT32 type);
+
+    /** Function to return the type of token[i] in the stream, rather than the actual token
+     */
+    ANTLR3_UINT32	    (*LA)		    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT64 i);
+
+    /** Function to return the index for a mark()
+     */
+    ANTLR3_UINT64	    (*mark)		    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream);
+
+    /** Function to release the resources of a TokenStream mark
+     */
+    void		    (*release)		    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT64 mark);
+
+    /** Function to return the size (number of tokens in) of the token stream
+     */
+    ANTLR3_UINT64	    (*size)		    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream);
+
+    /** Function to return the current index (consume point) of the token stream
+     */
+    ANTLR3_UINT64	    (*index)		    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream);
+
+    /** Function to rewind the index to the specified point
+     */
+    void		    (*rewind)		    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT64 marker);
+
+    /** Function to seek to the specified token point
+     */
+    void		    (*seek)		    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT64 index);
 
 
 }
