@@ -1,6 +1,9 @@
 /** \file
  * Defines the basic structures used to manipulate character
- * streams from any input source.
+ * streams from any input source. The first implementation of
+ * this stream was ASCII 8 bit, but any chracter size and envoding
+ * can in theory be used, so long as they can return a 32 bit Integer
+ * representation of their characters.
  */
 #ifndef	_ANTLR3_INPUT_H
 #define	_ANTLR3_INPUT_H
@@ -8,49 +11,24 @@
 #include    <antlr3defs.h>
 #include    <antlr3string.h>
 #include    <antlr3commontoken.h>
-
-/** Type inidicator for a character stream
- * \remark if a custom stream is created but it can be treated as
- * a char stream, then you may OR in this value to your type indicator
- */
-#define	ANTLR3_CHARSTREAM	0x0001
-
-/** Type indicator for a Token stream
- * \remark if a custom stream is created but it can be treated as
- * a token stream, then you may OR in this value to your type indicator
- */
-#define	ANTLR3_TOKENSTREAM	0x0002
-
-/** Type indicator for a common tree node stream
- * \remark if a custom stream is created but it can be treated as
- * a common tree node stream, then you may OR in this value to your type indicator
- */
-#define	ANTLR3_COMMONTREENODE	0x0004
-
-/** Type mask for input stream so we can switch in the above types
- *  \remark DO NOT USE 0x0000 as a stream type!
- */
-#define	ANTLR3_INPUT_MASK	0x0007
+#include    <antlr3intstream.h>
 
 /** \brief Master context structure for an ANTLR3
  *   C runtime based input stream.
  */
 typedef	struct	ANTLR3_INPUT_STREAM_struct
 {
-    /** Inidicates the type of input stream that we are an instance of.
-     *  The programmer may set this to anything of course, but the default 
-     *  implementations of the interface only really understand the built in
-     *  types, so new error handlers etc would probably be required too. You may OR
-     *  in the values of one of the standard valid types, if the input stream can be
-     *  treated in the same way as they are for error handlig etc.
-     *
-     *  Valid types are:
-     *
-     *    - #ANTLR3_CHARSTREAM  
-     *	  - #ANTLR3_TOKENSTREAM
-     *    - #ANTLR3_TREEPARSER
+    /** Interfaces that provide streams must all provide
+     *  a generic ANTLR3_INT_STREAM interface and an ANTLR3_INPUT_STREAM
+     *  is no different.
      */
-    ANTLR3_UINT32	type;
+    pANTLR3_INT_STREAM	istream;
+
+    /** Whatever is providing the INPUT stream needs a pointer to itself
+     *  so that this can be passed back to it whenever teh api functions
+     *  are called.
+     */
+    void	      * me;
 
     /** Pointer the start of the input string, chracters may be
      *  taken as offsets from here and in original input format encoding.
@@ -100,7 +78,7 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
 
     /** Tracks how deep mark() calls are nested
      */
-    ANTLR3_UINT32	markDepth;
+    ANTLR3_UINT64	markDepth;
 
     /** List of mark() points in the input stream
      */
@@ -131,24 +109,11 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
      */
     void		(*reset)	(struct	ANTLR3_INPUT_STREAM_struct * input);
 
-    /** Pointer to function to consume the next element in the input stream
-     */
-    void		(*consume)	(struct ANTLR3_INPUT_STREAM_struct * input);
-
     /** Pointer to function to return input stream element at 1 based
-     *  offset from nextChar.
+     *  offset from nextChar. Same as LA for char stream, but token
+     *  streams etc. have one of these that does other stuff of course.
      */
-    ANTLR3_UCHAR	(*LA)		(struct	ANTLR3_INPUT_STREAM_struct * input, ANTLR3_INT32 la);
-
-    /** Pointer to function to return input stream element at 1 based
-     *  offset from nextChar. Same as LA for file stream, but overrides for token
-     *  streams etc.
-     */
-    void *		(*LT)		(struct	ANTLR3_INPUT_STREAM_struct * input, ANTLR3_INT32 lt);
-
-    /** Pointer to function to return the current index in the output stream.
-     */
-    ANTLR3_UINT32	(*index)	(struct ANTLR3_INPUT_STREAM_struct * input);
+    void *		(*LT)		(struct	ANTLR3_INPUT_STREAM_struct * input, ANTLR3_INT64 lt);
 
     /** Pointer to function to return the total size of the input buffer. For streams
      *  this may be just the total we have available so far. This means of course that
@@ -157,28 +122,10 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
      */
     ANTLR3_UINT64	(*size)		(struct ANTLR3_INPUT_STREAM_struct * input);
 
-    /** Pointer to function mark the current point in the input stream. Records
-     *  the state of teh inptu stream so taht it can be reset with rewind()
-     */
-    ANTLR3_UINT32	(*mark)		(struct ANTLR3_INPUT_STREAM_struct * input);
-
-    /** Pointer to function that resets the lexer to marker state n
-     */
-    void		(*rewind)	(struct ANTLR3_INPUT_STREAM_struct * input, ANTLR3_INT32 mark);
-
-    /** Pointer to function that cleans up any mark states after state n
-     */
-    void		(*release)	(struct ANTLR3_INPUT_STREAM_struct * input, ANTLR3_INT32 mark);
-
-    /** Pointer to function that seeks the input pointer to a particular character
-     *  offset in the input stream, taking care of any pointer updates, such as line etc.
-     */
-    void		(*seek)		(struct ANTLR3_INPUT_STREAM_struct * input, void * seekPoint);
-
     /** Pointer to function to return a substring of the input stream. String is returned in allocated
      *  memory and is in same encoding as the input stream itself, NOT internal ANTLR3_UCHAR form.
      */
-    pANTLR3_STRING	(*substr)	(struct ANTLR3_INPUT_STREAM_struct * input, ANTLR3_INT32 start, ANTLR3_INT32 stop);
+    pANTLR3_STRING	(*substr)	(struct ANTLR3_INPUT_STREAM_struct * input, ANTLR3_INT64 start, ANTLR3_INT64 stop);
 
     /** Pointer to function to return the current line number in the innput stream
      */

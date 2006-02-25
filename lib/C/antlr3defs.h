@@ -133,9 +133,17 @@ ANTLR3_API void			  * ANTLR3_MEMSET		    (void * target, ANTLR3_UINT8 byte, ANTL
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringCopyStream	(pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
 
+ANTLR3_API pANTLR3_INT_STREAM	    antlr3IntStreamNew		    ();
+
 ANTLR3_API pANTLR3_STRING_FACTORY   antlr3StringFactoryNew	    ();
 
 ANTLR3_API pANTLR3_COMMON_TOKEN	    antlr3CommonTokenNew	    (ANTLR3_UINT32 ttype);
 ANTLR3_API pANTLR3_TOKEN_FACTORY    antlr3TokenFactoryNew	    (pANTLR3_INPUT_STREAM input);
+
+ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
+antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source);
+
+ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
+antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint);
 
 #endif	/* _ANTLR3DEFS_H	*/

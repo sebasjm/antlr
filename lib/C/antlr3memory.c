@@ -56,15 +56,15 @@ ANTLR3_STRDUP(pANTLR3_UINT8 instr)
 static	pANTLR3_LIST  memtrace;
 
 static	int initialized	= 0;
-static	int log		= 0;
+static	int record		= 0;
 static	int reporting	= 0;
 
 static void	init()
 {
     initialized	    = 1;    /* Only call this once	    */
-    log		    = 0;    /* Don't log while initializing */
+    record		    = 0;    /* Don't record while initializing */
     memtrace	    = antlr3ListNew(32767);    /* Nice big one for trace - just debugging - coudl even be biggger I guess	*/
-    log		    = 1;
+    record		    = 1;
 }
 
 struct	memrec
@@ -88,16 +88,16 @@ ANTLR3_MALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, size_t request)
 
     m =  malloc(request);
 
-    if	(log && !reporting)
+    if	(record && !reporting)
     {
-	log = 0;
+	record = 0;
 	tr  = (struct  memrec *)malloc(sizeof(struct memrec));
 	tr->line    = line;
 	tr->size    = request;
 	tr->type    = 0;
 	sprintf((char *)tr->file, "%.256s", file);
 	memtrace->put(memtrace, (ANTLR3_UINT64)m, (void *)tr, free);
-	log = 1;
+	record = 1;
     }
     
     return  m;
@@ -116,9 +116,9 @@ ANTLR3_REALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, void * current, ANTLR
 
     m =   realloc(current, (size_t)request);
 
-    if	(log && !reporting && m != current)
+    if	(record && !reporting && m != current)
     {
-	log = 0;
+	record = 0;
 	memtrace->del(memtrace, (ANTLR3_UINT64)current);
 	tr  = (struct  memrec *)malloc(sizeof(struct memrec));
 	tr->line    = line;
@@ -126,7 +126,7 @@ ANTLR3_REALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, void * current, ANTLR
 	tr->type    = 1;
 	sprintf((char *)tr->file, "%.256s", file);
 	memtrace->put(memtrace, (ANTLR3_UINT64)m, (void *)tr, free);
-	log = 1;
+	record = 1;
     }
     
     return  m;
@@ -136,11 +136,11 @@ ANTLR3_REALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, void * current, ANTLR
 ANTLR3_API void
 ANTLR3_FREE_DBG(void * ptr)
 {
-    if	(log && !reporting)
+    if	(record && !reporting)
     {
-	log = 0;
+	record = 0;
 	memtrace->del(memtrace, (ANTLR3_UINT64)ptr);
-	log = 1;
+	record = 1;
     }
     free(ptr);
 }
@@ -158,16 +158,16 @@ ANTLR3_STRDUP_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, pANTLR3_UINT8 instr)
 
     m =   (pANTLR3_UINT8)strdup((const char *)instr);
     
-    if	(log && ! reporting)
+    if	(record && ! reporting)
     {
-	log = 0;
+	record = 0;
 	tr  = (struct  memrec *)malloc(sizeof(struct memrec));
 	tr->line    = line;
 	tr->size    = strlen((const char *)instr);
 	tr->type    = 2;
 	sprintf((char *)tr->file, "%.256s", file);
 	memtrace->put(memtrace, (ANTLR3_UINT64)m, (void *)tr, free);
-	log = 1;
+	record = 1;
     }
     return m;
 }

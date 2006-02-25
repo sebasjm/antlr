@@ -87,7 +87,7 @@ typedef	struct ANTLR3_EXCEPTION_struct
 
     /** Pointer to the input stream that this exception occurred in.
      */
-    pANTLR3_INPUT_STREAM    input;
+    pANTLR3_INT_STREAM    input;
 
     /** Pointer for you, the programmer to add anything you like to an exception.
      */
