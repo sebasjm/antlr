@@ -38,13 +38,29 @@ int main()
     bs1  = antlr3BitsetOf(0, 64, -1);
     bs2  = antlr3BitsetOf(0, 64, 1242, 345678, 9, 10, 11, 12, 13, 14, 15, 34, 56, 0, -1);
 
-    bs1->equals(bs1, bs2);
+    if	(bs1->equals(bs1, bs2) == ANTLR3_TRUE)
+    {
+	printf("Bitsets are not equal but say they are!\n");
+    }
+    bs1->free(bs1);
+    bs2->free(bs2);
+
+    bs1	= antlr3BitsetLoad(1, 0x00400044FF);
+    bs2 = antlr3BitsetLoad(3, 0x00400044FF, 0x2, 0x00);
+    
+    if	(bs1->equals(bs1, bs2) == ANTLR3_TRUE)
+    {
+	printf("Bitsets are not equal but say they are!\n");
+    }
+    
+    bs1->free(bs1);
+    bs2->free(bs2);
 
     input   = antlr3AsciiFileStreamNew("C:/iscsrc/users/5.1.mv/modules/Antlr/mvindex/src/mvindexcommands.g");
 
-    while   ((c = input->LA(input, 1)) != ANTLR3_CHARSTREAM_EOF)
+    while   ((c = input->istream->LA(input->me, 1)) != ANTLR3_CHARSTREAM_EOF)
     {
-	input->consume(input);
+	input->istream->consume(input);
 	printf("%c", c);
     }
 
@@ -163,7 +179,7 @@ int main()
     
 
 
-    ANTLR3_MEM_REPORT(ANTLR3_FALSE);
+   // ANTLR3_MEM_REPORT(ANTLR3_FALSE);
     input->close(input);
     ANTLR3_MEM_REPORT(ANTLR3_TRUE);
 
