@@ -210,7 +210,7 @@ antlr3BitsetList(pANTLR3_HASH_TABLE list)
  * 
  */
 ANTLR3_API pANTLR3_BITSET
-antlr3BitsetLoad(ANTLR3_UINT64 bset, ...)
+antlr3BitsetLoad(ANTLR3_UINT32 ec, ANTLR3_UINT64 bset, ...)
 {
     pANTLR3_BITSET  bitset;
     ANTLR3_UINT32  count;
@@ -234,18 +234,22 @@ antlr3BitsetLoad(ANTLR3_UINT64 bset, ...)
 
     /* Now we can add the element bits into the set
      */
-    count   = 0;
     va_start(ap, bset);
-    while   (bset != -1)
+    count=0;
+    while (count < ec)
     {
-	if  (bitset->length >= count)
+	if  (bitset->length <= count)
 	{
-	    bitset->grow(bitset, count);
+	    bitset->grow(bitset, count+1);
 	}
 	
 	bitset->bits[count] = bset;
 
-	bset = va_arg(ap, ANTLR3_UINT32);
+	count++;
+	if  (count < ec)
+	{
+	    bset = va_arg(ap, ANTLR3_UINT64);
+	}
     }
     va_end(ap);
 
@@ -366,13 +370,16 @@ grow(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize)
      */
     ANTLR3_MEMSET(newBits, 0x00, (size_t)(newSize * sizeof(ANTLR3_UINT64)));
 
-    /* Copy existing bits
-     */
-    ANTLR3_MEMMOVE((void *)newBits, (const void *)bitset->bits, (size_t)(bitset->length * sizeof(ANTLR3_UINT64)));
+    if	(bitset->bits != NULL)
+    {
+	/* Copy existing bits
+	 */
+	ANTLR3_MEMMOVE((void *)newBits, (const void *)bitset->bits, (size_t)(bitset->length * sizeof(ANTLR3_UINT64)));
 
-    /* Out with the old bits
-     */
-    ANTLR3_FREE(bitset->bits);
+        /* Out with the old bits
+	 */
+	ANTLR3_FREE(bitset->bits);
+    }
 
     /* In with the new bits... der der der der.
      */

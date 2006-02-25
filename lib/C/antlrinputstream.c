@@ -60,7 +60,7 @@ antlr3InputClose(pANTLR3_INPUT_STREAM input)
 	ANTLR3_FREE(input->data);
     }
     
-    input->istream->free(input->me);
+    input->istream->free(input->istream);
 
     /* We always allocate the memory for the stream name
      */
@@ -82,9 +82,11 @@ static void
 antlr3InputReset(pANTLR3_INPUT_STREAM input)
 {
 
-    input->nextChar	= input->data;	/* Input at first character */
-    input->line		= 1;		/* starts at line 1	    */
-    input->markDepth	= 0;		/* Reset markers	    */
+    input->nextChar		= input->data;	/* Input at first character */
+    input->line			= 1;		/* starts at line 1	    */
+    input->charPositionInLine	= -1;
+    input->currentLine		= input->data;
+    input->markDepth		= 0;		/* Reset markers	    */
     
     /* Free up the markers table if it is there
      */
@@ -122,7 +124,7 @@ antlr3AsciiConsume(pANTLR3_INPUT_STREAM input)
 	 */
 	input->charPositionInLine++;
 	
-	if  ((ANTLR3_UCHAR)(*((pANTLR3_INT8)input->data)) == input->newlineChar)
+	if  ((ANTLR3_UCHAR)(*((pANTLR3_INT8)input->nextChar)) == input->newlineChar)
 	{
 	    /* Reset for start of a new line of input
 	     */
@@ -449,8 +451,6 @@ antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
      */
     input->me			= input;
 
-    input->istream->type	= type;
-
     /* Build a string factory for this stream
      */
     input->strFactory	= antlr3StringFactoryNew();
@@ -466,6 +466,8 @@ antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
      */
     input->istream	= antlr3IntStreamNew();
     input->istream->me	= input;
+
+    input->istream->type	= type;
 
     /* Intstream API
      */

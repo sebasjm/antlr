@@ -58,7 +58,7 @@
 
 typedef	struct ANTLR3_INT_STREAM_struct
 {
-    /** Input stream type inidicator. Sometimes usefull for error reporting etc.
+    /** Input stream type inidicator. Sometimes useful for error reporting etc.
      */
     ANTLR3_UINT32	    type;
 

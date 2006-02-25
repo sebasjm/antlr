@@ -54,7 +54,7 @@ typedef	struct ANTLR3_EXCEPTION_struct
     /** Indicates the index of the 'token' we were looking at when the
      *  exception occurred.
      */
-    ANTLR3_UINT32   index;
+    ANTLR3_UINT64   index;
 
     /** Indicates what the current token was when the error occurred. Since not
      *  all input streams will be able to retrieve the nth token, we track it here

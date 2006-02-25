@@ -36,4 +36,6 @@ typedef struct ANTLR3_TOKEN_SOURCE_struct	    *pANTLR3_TOKEN_SOURCE;
 typedef	struct ANTLR3_TOKEN_STREAM_struct	    *pANTLR3_TOKEN_STREAM;
 typedef	struct ANTLR3_COMMON_TOKEN_STREAM_struct    *pANTLR3_COMMON_TOKEN_STREAM;
 
+typedef	struct ANTLR3_DFA_STATE_struct		*pANTLR3_DFA_STATE;
+typedef	struct ANTLR3_DFA_struct		*pANTLR3_DFA;
 #endif

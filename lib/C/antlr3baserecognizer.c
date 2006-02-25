@@ -9,9 +9,9 @@
 /* Interface functions
  */
 static void	antlr3BRReset	    (pANTLR3_BASE_RECOGNIZER recognizer);
-static void	antlr3BRMatch	    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
-static void	antlr3BRMismatch    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
-static void	antlr3BRMatchAny    (pANTLR3_BASE_RECOGNIZER recognizer);
+static void	antlr3BRMatch	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
+static void	antlr3BRMismatch    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
+static void	antlr3BRMatchAny    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER
 antlr3BaseRecognizerNew(ANTLR3_UINT32 type)
@@ -20,7 +20,8 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type)
 
     /* Allocate memory for the structure
      */
-    recognizer	= (pANTLR3_BASE_RECOGNIZER) ANTLR3_MALLOC((size_t)sizeof(ANTLR3_BASE_RECOGNIZER));
+    recognizer	    = (pANTLR3_BASE_RECOGNIZER) ANTLR3_MALLOC((size_t)sizeof(ANTLR3_BASE_RECOGNIZER));
+    recognizer->me  = recognizer;
 
     if	(recognizer == NULL)
     {
@@ -28,8 +29,6 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type)
 	 */
 	return	(pANTLR3_BASE_RECOGNIZER) ANTLR3_ERR_NOMEM;
     }
-
-
 
     /* Initialize variables
      */
@@ -67,11 +66,11 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type)
  * 
  */
 ANTLR3_API	void
-antlr3MTExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
+antlr3MTExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input)
 {
     /* Create a basic recognition exception strucuture
      */
-    antlr3RecognitionExceptionNew(recognizer);
+    antlr3RecognitionExceptionNew(recognizer, input);
 
     /* Now update it to indicate this is a Mismatched token exception
      */
@@ -82,8 +81,12 @@ antlr3MTExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 }
 
 ANTLR3_API	void
-antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
+antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer, void * input)
 {
+
+    pANTLR3_INPUT_STREAM	    cs;
+    pANTLR3_COMMON_TOKEN_STREAM	    ts;
+
     /* Create a basic exception strucuture
      */
     pANTLR3_EXCEPTION	ex = antlr3ExceptionNew(ANTLR3_RECOGNITION_EXCEPTION,
@@ -91,32 +94,37 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 						NULL,
 						ANTLR3_FALSE);
 
-    /* Record the input and recognizer state variables that make sense
-     */
-    ex->input	= recognizer->input;
-    ex->index	= recognizer->input->index(recognizer->input);
+    
+
 
     /* Rest of information depends on the base type of the 
      * input stream.
      */
-    switch  (recognizer->input->type & ANTLR3_INPUT_MASK)
+    switch  (recognizer->type & ANTLR3_INPUT_MASK)
     {
     case    ANTLR3_CHARSTREAM:
 
-	ex->c	    = recognizer->input->LA			    (recognizer->input, 1);	/* Current input character		    */
-	ex->line    = recognizer->input->getLine		    (recognizer->input);	/* Line number comes from stream	    */
-	ex->charPositionInLine
-		    = recognizer->input->getCharPositionInLine	    (recognizer->input);	/* Line offset also comes from the stream   */
+	cs	= (pANTLR3_INPUT_STREAM) input;
+
+	ex->c			= cs->istream->LA		    (cs->istream->me, 1);   /* Current input character			*/
+	ex->line		= cs->getLine			    (cs->me);		    /* Line number comes from stream		*/
+	ex->charPositionInLine	= cs->getCharPositionInLine	    (cs->me);		    /* Line offset also comes from the stream   */
+	ex->index		= cs->istream->index		    (cs->istream->me);
 	break;
 
     case    ANTLR3_TOKENSTREAM:
 
-	ex->token   = recognizer->input->LT			    (recognizer->input, 1);	/* Current input token			    */
+	ts	= (pANTLR3_COMMON_TOKEN_STREAM) input;
+
+	ex->token   = ts->tstream->LT(ts->tstream->me, 1);			/* Current input token			    */
 	ex->line    = ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine(ex->token);
+	ex->index   = ts->tstream->istream->index		  (ts->tstream->istream->me);
+	break;
     }
 
     return;
 }
+
 static void
 antlr3BRReset(pANTLR3_BASE_RECOGNIZER recognizer)
 {
@@ -137,13 +145,14 @@ antlr3BRReset(pANTLR3_BASE_RECOGNIZER recognizer)
  *  MismatchedTokenException upon input.LA(1)!=ttype.
  */
 static void
-antlr3BRMatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
+antlr3BRMatch(	pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input,
+		ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
 {
-    if	(recognizer->input->LA(recognizer->input, 1) == ttype)
+    if	(input->LA(input->me, 1) == ttype)
     {
 	/* The token was the one we were told to expect
 	 */
-	recognizer->input->consume(recognizer->input);	/* Consume that token from the stream	    */
+	input->consume(input->me);	/* Consume that token from the stream	    */
 	recognizer->errorRecovery   = ANTLR3_FALSE;	/* Not in error recovery now (if we were)   */
 	recognizer->failed	    = ANTLR3_FALSE;	/* The match was a success		    */
 	return;						/* We are done				    */
@@ -164,7 +173,7 @@ antlr3BRMatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_B
      * going on, so we mismatch, which creates an exception in the recognizer exception
      * stack.
      */
-    recognizer->mismatch(recognizer, ttype, follow);
+    recognizer->mismatch(recognizer->me, input, ttype, follow);
 
     return;
 }
@@ -178,25 +187,25 @@ antlr3BRMatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_B
  * Recognizer context pointer
  */
 static void
-antlr3BRMatchAny(pANTLR3_BASE_RECOGNIZER recognizer)
+antlr3BRMatchAny(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input)
 {
     recognizer->errorRecovery	    = ANTLR3_FALSE;
     recognizer->failed		    = ANTLR3_FALSE;
-    recognizer->input->consume(recognizer->input);
+    input->consume(input->me);
 
     return;
 }
 
 static	void
-antlr3BRMismatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
+antlr3BRMismatch(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
 {
     /* Install a mismtached token exception in the exception stack
      */
-    antlr3MTExceptionNew(recognizer);
+    antlr3MTExceptionNew(recognizer, input);
 
     /* Enter error recovery mode
      */
-    recognizer->recoverFromMismatchedToken(recognizer, ttype, follow);
+    recognizer->recoverFromMismatchedToken(recognizer->me, input, ttype, follow);
 
     return;
 

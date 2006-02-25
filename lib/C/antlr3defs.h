@@ -81,11 +81,11 @@ ANTLR3_API pANTLR3_BITSET	    antlr3BitsetNew		    (ANTLR3_UINT32 numBits);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetOf		    (ANTLR3_INT32 bit, ...);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetList		    (pANTLR3_HASH_TABLE list);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetCopy		    (pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetLoad		    (ANTLR3_UINT64 bset, ...);
+ANTLR3_API pANTLR3_BITSET	    antlr3BitsetLoad		    (ANTLR3_UINT32 ec, ANTLR3_UINT64 bset, ...);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER  antlr3BaseRecognizerNew	    (ANTLR3_UINT32 type);
-ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_BASE_RECOGNIZER recognizer);
-ANTLR3_API void			    antlr3MTExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer);
+ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_BASE_RECOGNIZER recognizer, void * input);
+ANTLR3_API void			    antlr3MTExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer, void * input);
 
 ANTLR3_API pANTLR3_HASH_TABLE	    antlr3HashTableNew		    (ANTLR3_UINT32 sizeHint);
 ANTLR3_API ANTLR3_UINT32	    antlr3Hash			    (void * key, ANTLR3_UINT32 keylen);

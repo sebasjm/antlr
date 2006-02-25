@@ -131,6 +131,9 @@
 				RelativePath=".\antlr3commontoken.c">
 			</File>
 			<File
+				RelativePath=".\antlr3dfa.c">
+			</File>
+			<File
 				RelativePath=".\antlr3encodings.c">
 			</File>
 			<File
@@ -179,6 +182,9 @@
 			</File>
 			<File
 				RelativePath=".\antlr3defs.h">
+			</File>
+			<File
+				RelativePath=".\antlr3dfa.h">
 			</File>
 			<File
 				RelativePath=".\antlr3encodings.h">
