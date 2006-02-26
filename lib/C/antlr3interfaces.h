@@ -38,4 +38,8 @@ typedef	struct ANTLR3_COMMON_TOKEN_STREAM_struct    *pANTLR3_COMMON_TOKEN_STREAM
 
 typedef	struct ANTLR3_DFA_STATE_struct		*pANTLR3_DFA_STATE;
 typedef	struct ANTLR3_DFA_struct		*pANTLR3_DFA;
+
+typedef	struct ANTLR3_LEXER_struct		*pANTLR3_LEXER;
+typedef struct ANTLR3_PARSER_struct		*pANTLR3_PARSER;
+
 #endif

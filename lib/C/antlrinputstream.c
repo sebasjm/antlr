@@ -39,13 +39,6 @@ antlr3InputClose(pANTLR3_INPUT_STREAM input)
 	input->markers->free(input->markers);
     }
 
-    /* Close the token factory
-     */
-    if	(input->tokFactory != NULL)
-    {
-	input->tokFactory->close(input->tokFactory);
-    }
-
     /* Close the string factory
      */
     if	(input->strFactory != NULL)
@@ -170,11 +163,11 @@ static void *
 antlr3AsciiLT(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 lt)
 {
     /* Casting is horrible but it means no warnings and LT should never be called
-     * on a character stream anyway I think. If it is then, teh void * wil lneed to be 
+     * on a character stream anyway I think. If it is then, teh void * will need to be 
      * cast back in a similar manner. Yuck! But this means that LT for Token streams and
      * tree streams is correct. We do not supply the istream pointer itself to the LA
      * function as we don't know who is implementing it, we pass the me pointer - this
-     * is true of all calls to interface APIs - if we ar reffering to ourselves we can
+     * is true of all calls to interface APIs - if we are referring to ourselves we can
      * use the pointer we were given in the function call, if calling an API we are holding
      * an implementation pointer for, then we pass its 'me' pointer.
      */
@@ -454,10 +447,6 @@ antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
     /* Build a string factory for this stream
      */
     input->strFactory	= antlr3StringFactoryNew();
-
-    /* Build a token factory for this stream
-     */
-    input->tokFactory	= antlr3TokenFactoryNew(input);
 
     /* Install function pointers for an 8 bit ASCII input
      */

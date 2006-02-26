@@ -13,15 +13,15 @@
 
 /** Type indicator for a lexer recognizer
  */
-#define	    ANTLR3_LEXER	0x0001
+#define	    ANTLR3_TYPE_LEXER		0x0001
 
 /** Type inficator for a parser recognizer
  */
-#define	    ANTLR3_PARSER	0x0002
+#define	    ANTLR3_TYPE_PARSER		0x0002
 
 /** Type indicator for a tree parser recognizer
  */
-#define	    ANTLR3_TREEPARSER	0x0003
+#define	    ANTLR3_TYPE_TREEPARSER	0x0004
 
 /** \brief Base tracking context structure for all types of
  * recognizers.
@@ -47,9 +47,15 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      */
     ANTLR3_UINT32	type;
 
+    /** Track around a hint from the creator of the recognizer as to how big this
+     *  thing is going to get, as the actress said to the bishop. This allows us
+     *  to tune hash tables accordingly. This might not be the best place for this
+     *  in the end but we will see.
+     */
+    ANTLR3_UINT32	sizeHint;
+
     /** Track the set of token types that can follow any rule invocation.
-     *  Hashtable as place holder but will change to new Stack structure
-     *  shortly, to support: List<BitSet>.
+     *  Stack structure, to support: List<BitSet>.
      */
     pANTLR3_STACK	following;
 
@@ -101,7 +107,7 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
 
     /** Pointer to a function that matches the current input symbol
      *  against the supplied type. the function causes an error if a
-     *  match is not found and the dfualt implementation will also
+     *  match is not found and the default implementation will also
      *  attempt to perform one token insertion or deletion if that is
      *  possible with the input stream. You can override the default
      *  implementation by installing a pointer to your own function
@@ -115,10 +121,10 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  exception pointer below (you can chain these if you like and handle them
      *  in some customized way).
      */
-    void		(*match)	(void * recognizer, pANTLR3_INT_STREAM	input,
+    ANTLR3_BOOLEAN	(*match)	(void * recognizer, pANTLR3_INT_STREAM	input,
 					    ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
 
-    /** Pointer to a function that matches the next token in the input stream
+    /** Pointer to a function that matches the next token/char in the input stream
      *  regardless of what it actaully is.
      */
     void		(*matchAny)	(void * recognizer, pANTLR3_INT_STREAM	input);
@@ -226,10 +232,10 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  the rules in the parser that got you to this point. Can be overridden by installing your
      *	own function set.
      *
-     * \todo Document how to overrider invocation stack functions.
+     * \todo Document how to override invocation stack functions.
      */
-    pANTLR3_LIST	(*getRuleInvocationStack)	(void * recognizer);
-    pANTLR3_LIST	(*getRuleInvocationStackNamed)  (void * recognizer,
+    pANTLR3_STACK	(*getRuleInvocationStack)	(void * recognizer);
+    pANTLR3_STACK	(*getRuleInvocationStackNamed)  (void * recognizer,
 								pANTLR3_EXCEPTION   ex,
 								pANTLR3_UINT8	    name);
 
@@ -270,7 +276,10 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      */
     ANTLR3_BOOLEAN	(*synpred)			(void * recognizer,  pANTLR3_INT_STREAM	input,
 								void (*predicate)());
-								
+
+    /** Pointer to a function that knows how to free the resources of a base recongizer.
+     */
+    void		(*free)				(void * recognizer);
 
 }
     ANTLR3_BASE_RECOGNIZER, *pANTLR3_BASE_RECOGNIZER;

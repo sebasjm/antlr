@@ -146,6 +146,9 @@
 				RelativePath=".\antlr3intstream.c">
 			</File>
 			<File
+				RelativePath=".\antlr3lexer.c">
+			</File>
+			<File
 				RelativePath=".\antlr3memory.c">
 			</File>
 			<File
@@ -206,6 +209,9 @@
 			</File>
 			<File
 				RelativePath=".\antlr3intstream.h">
+			</File>
+			<File
+				RelativePath=".\antlr3lexer.h">
 			</File>
 			<File
 				RelativePath=".\antlr3string.h">

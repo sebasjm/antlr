@@ -44,9 +44,6 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
      */
     pANTLR3_STRING_FACTORY  strFactory;
 
-    /** Token factory for this input stream
-     */
-    pANTLR3_TOKEN_FACTORY   tokFactory;
 
     /** Pointer to the next character to be consumed from the input data
      *  This is cast to point at the encoding of the original file that

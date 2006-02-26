@@ -9,19 +9,20 @@
 /* Interface functions
  */
 static void	antlr3BRReset	    (pANTLR3_BASE_RECOGNIZER recognizer);
-static void	antlr3BRMatch	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
+static ANTLR3_BOOLEAN
+		antlr3BRMatch	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
 static void	antlr3BRMismatch    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
 static void	antlr3BRMatchAny    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input);
+static void	antlr3BRFree	    (pANTLR3_BASE_RECOGNIZER recognizer);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER
-antlr3BaseRecognizerNew(ANTLR3_UINT32 type)
+antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
 {
     pANTLR3_BASE_RECOGNIZER recognizer;
 
     /* Allocate memory for the structure
      */
     recognizer	    = (pANTLR3_BASE_RECOGNIZER) ANTLR3_MALLOC((size_t)sizeof(ANTLR3_BASE_RECOGNIZER));
-    recognizer->me  = recognizer;
 
     if	(recognizer == NULL)
     {
@@ -29,6 +30,8 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type)
 	 */
 	return	(pANTLR3_BASE_RECOGNIZER) ANTLR3_ERR_NOMEM;
     }
+    recognizer->me	    = recognizer;
+    recognizer->sizeHint    = sizeHint;
 
     /* Initialize variables
      */
@@ -40,10 +43,11 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type)
 
     /* Install the API
      */
-    recognizer->reset	    = antlr3BRReset;
-    recognizer->match	    = antlr3BRMatch;
-    recognizer->mismatch    = antlr3BRMismatch;
-    recognizer->matchAny    = antlr3BRMatchAny;
+    recognizer->reset		= antlr3BRReset;
+    recognizer->match		= antlr3BRMatch;
+    recognizer->mismatch	= antlr3BRMismatch;
+    recognizer->matchAny	= antlr3BRMatchAny;
+    recognizer->free		= antlr3BRFree;
 
     if	(recognizer->following == NULL)
     {
@@ -54,6 +58,11 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type)
     }
 
     return  recognizer;
+}
+static void	
+antlr3BRFree	    (pANTLR3_BASE_RECOGNIZER recognizer)
+{
+    ANTLR3_FREE(recognizer);
 }
 
 /**
@@ -144,7 +153,7 @@ antlr3BRReset(pANTLR3_BASE_RECOGNIZER recognizer)
  *  exception catch (at the end of the method) by just throwing
  *  MismatchedTokenException upon input.LA(1)!=ttype.
  */
-static void
+static ANTLR3_BOOLEAN
 antlr3BRMatch(	pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input,
 		ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
 {
@@ -155,7 +164,7 @@ antlr3BRMatch(	pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input,
 	input->consume(input->me);	/* Consume that token from the stream	    */
 	recognizer->errorRecovery   = ANTLR3_FALSE;	/* Not in error recovery now (if we were)   */
 	recognizer->failed	    = ANTLR3_FALSE;	/* The match was a success		    */
-	return;						/* We are done				    */
+	return ANTLR3_TRUE;				/* We are done				    */
     }
 
     /* We did not find the expectd token type, if we are backtracking then
@@ -166,7 +175,7 @@ antlr3BRMatch(	pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input,
 	/* Backtracking is going on
 	 */
 	recognizer->failed  = ANTLR3_TRUE;
-	return;
+	return ANTLR3_FALSE;
     }
 
     /* We did not find the expected token and there is no backtracking
@@ -175,7 +184,7 @@ antlr3BRMatch(	pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input,
      */
     recognizer->mismatch(recognizer->me, input, ttype, follow);
 
-    return;
+    return ANTLR3_FALSE;
 }
 
 /**
