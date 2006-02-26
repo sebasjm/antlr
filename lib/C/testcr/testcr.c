@@ -11,7 +11,7 @@ void myfree(void * p)
 #define	TEST_HASH_COUNT	10000
 #define	TEST_HASH_SIZE	3011
 
-
+ANTLR3_UINT32 chars[10] = {'A', 'B', 'C', 'D'};
 
 int main()
 {
@@ -34,6 +34,13 @@ int main()
 
     unsigned char   * retkey;
     void	    * retdata;
+
+    printf("Length of string is %d", sizeof("JJJ\0")-1);
+
+    for	(i = 0 ; i <10; i++)
+    {
+	printf("Char is %c\n", chars[i]);
+    }
 
     bs1  = antlr3BitsetOf(0, 64, -1);
     bs2  = antlr3BitsetOf(0, 64, 1242, 345678, 9, 10, 11, 12, 13, 14, 15, 34, 56, 0, -1);
@@ -161,22 +168,22 @@ int main()
      */
     sf->close(sf);
 
-    tf	    = input->tokFactory;
+   // tf	    = input->tokFactory;
 
     /* Create loads and loads of tokens
      */
-    for	(i=0; i<TEST_HASH_COUNT; i++)
-    {
-	tok = tf->newToken(tf);
-	if	((i % (TEST_HASH_COUNT/42)) == 0)
-	{
-	    /* Deliberately throws away the pointer returned by toString()
-	     * to make sure the string factory cleans itself up.
-	     */
-	    printf("%s\n", tok->toString(tok)->text);
-	}
-    }
-    
+ //   for	(i=0; i<TEST_HASH_COUNT; i++)
+ //   {
+	//tok = tf->newToken(tf);
+	//if	((i % (TEST_HASH_COUNT/42)) == 0)
+	//{
+	//    /* Deliberately throws away the pointer returned by toString()
+	//     * to make sure the string factory cleans itself up.
+	//     */
+	//    printf("%s\n", tok->toString(tok)->text);
+	//}
+ //   }
+ //   
 
 
    // ANTLR3_MEM_REPORT(ANTLR3_FALSE);
