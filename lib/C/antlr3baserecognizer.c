@@ -61,6 +61,11 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
 static void	
 antlr3BRFree	    (pANTLR3_BASE_RECOGNIZER recognizer)
 {
+    if	(recognizer->ruleMemo != NULL)
+    {
+	recognizer->ruleMemo->free(recognizer->ruleMemo);
+    }
+
     ANTLR3_FREE(recognizer);
 }
 
