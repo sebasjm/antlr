@@ -91,7 +91,7 @@ typedef	struct ANTLR3_INT_STREAM_struct
     /** Return the current input symbol index 0..n where n indicates the
      *  last symbol has been read.
      */
-    ANTLR3_UINT64	    (*index)	    (void * intStream);
+    ANTLR3_INT64	    (*index)	    (void * intStream);
 
     /** Reset the stream so that next call to index would return marker.
      *  The marker will usually be index() but it doesn't have to be.  It's

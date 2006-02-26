@@ -8,11 +8,11 @@
 
 /* Interface functions
  */
-static void	antlr3BRReset	    (pANTLR3_BASE_RECOGNIZER recognizer);
 static ANTLR3_BOOLEAN
 		antlr3BRMatch	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
-static void	antlr3BRMismatch    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
 static void	antlr3BRMatchAny    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input);
+static void	antlr3BRMismatch    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
+
 static void	antlr3BRFree	    (pANTLR3_BASE_RECOGNIZER recognizer);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER
@@ -43,7 +43,6 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
 
     /* Install the API
      */
-    recognizer->reset		= antlr3BRReset;
     recognizer->match		= antlr3BRMatch;
     recognizer->mismatch	= antlr3BRMismatch;
     recognizer->matchAny	= antlr3BRMatchAny;
@@ -134,18 +133,6 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer, void * input)
     return;
 }
 
-static void
-antlr3BRReset(pANTLR3_BASE_RECOGNIZER recognizer)
-{
-    if	(recognizer->following != NULL)
-    {
-	recognizer->following->free(recognizer->following);
-    }
-
-    /* Install a new folowing set
-     */
-    recognizer->following   = antlr3StackNew(64);
-}
 
 /** Match current input symbol against ttype.  Upon error, do one token
  *  insertion or deletion if possible.  You can override to not recover

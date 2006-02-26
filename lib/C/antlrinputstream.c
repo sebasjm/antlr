@@ -11,7 +11,7 @@ static	    pANTLR3_UINT8   antlr3InputFileName		(pANTLR3_INPUT_STREAM input);
 static	    void	    antlr3AsciiConsume		(pANTLR3_INPUT_STREAM input);
 static	    ANTLR3_UCHAR    antlr3AsciiLA		(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 la);
 static	    void *	    antlr3AsciiLT		(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 lt);
-static	    ANTLR3_UINT64   antlr3AsciiIndex		(pANTLR3_INPUT_STREAM input);
+static	    ANTLR3_INT64    antlr3AsciiIndex		(pANTLR3_INPUT_STREAM input);
 static	    ANTLR3_UINT64   antlr3AsciiSize		(pANTLR3_INPUT_STREAM input);
 static	    ANTLR3_UINT64   antlr3AsciiMark		(pANTLR3_INPUT_STREAM input);
 static	    void	    antlr3AsciiRewind		(pANTLR3_INPUT_STREAM input, ANTLR3_UINT64 mark);
@@ -177,10 +177,10 @@ antlr3AsciiLT(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 lt)
 /** \brief Calculate the current index in the output stream.
  * \param[in] input Input stream context pointer
  */
-static ANTLR3_UINT64 
+static ANTLR3_INT64 
 antlr3AsciiIndex(pANTLR3_INPUT_STREAM input)
 {
-    return  (ANTLR3_UINT64)(((pANTLR3_INT8)input->nextChar) - ((pANTLR3_INT8)input->data));
+    return  (ANTLR3_INT64)(((pANTLR3_INT8)input->nextChar) - ((pANTLR3_INT8)input->data));
 }
 
 /** \brief Return the size of the current input stream, as an Ascii file

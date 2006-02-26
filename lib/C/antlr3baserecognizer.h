@@ -97,13 +97,10 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
     /** Pointer to an array of token names
      *  that are generally useful in error reporting. The generated parsers install
      *  this pointer. The table it points to is statically allocated as 8 bit ascii
-     *  at parser compile time.
+     *  at parser compile time - grammar token names are thus restricted in chracter
+     *  sets, which does not seem to terrible.
      */
     pANTLR3_UINT8	tokenNames;
-
-    /** Pointer to function to reset the parser's state
-     */
-    void		(*reset)(void * recognizer);
 
     /** Pointer to a function that matches the current input symbol
      *  against the supplied type. the function causes an error if a
@@ -120,6 +117,7 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  and creating a new exception structure and installing it in the
      *  exception pointer below (you can chain these if you like and handle them
      *  in some customized way).
+     *  TODO: See if we end up using error or just used failed...
      */
     ANTLR3_BOOLEAN	(*match)	(void * recognizer, pANTLR3_INT_STREAM	input,
 					    ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
@@ -152,13 +150,13 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      * 		4. try to resume parsing
      * 		5. next match() will reset errorRecovery mode
      */
-    void		(*reportError)		    (pANTLR3_EXCEPTION ex);
+    void		(*reportError)		    (void * recognizer, pANTLR3_EXCEPTION ex);
 
     /** Pointer to a function that is called to display a recognition error message. You may
      *  overrdide this function independently of (*reportError)() above as that function calls
      *  this one to do the actual exception printing.
      */
-    void		(*displayRecognitionError)  (pANTLR3_EXCEPTION ex, pANTLR3_UINT8 tokenNames);
+    void		(*displayRecognitionError)  (void * recognizer, pANTLR3_EXCEPTION ex, pANTLR3_UINT8 tokenNames);
 
     /** Pointer to a function that recovers from an error found in the input stream.
      *  Generally, this will be a #ANTLR3_EXCEPTION_NOVIABLE_ALT but it could also

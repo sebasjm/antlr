@@ -46,6 +46,10 @@ typedef	struct ANTLR3_EXCEPTION_struct
      */
     void    *	    message;
 
+    /** Name of the file/input source for reporting
+     */
+    void    *	    streamName;
+
     /** If set to ANTLR3_TRUE, this indicates that the message element of this structure
      *  should be freed by calling ANTLR3_FREE() when the exception is destroyed.
      */
