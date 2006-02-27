@@ -142,7 +142,7 @@ public class DOTGenerator {
             st.setAttribute("src", getStateLabel(s));
             st.setAttribute("target", getStateLabel(edge.target));
 			st.setAttribute("arrowhead", arrowhead);
-			st.setAttribute("rankdir", rankdir);
+			dot.setAttribute("rankdir", rankdir);
             dot.setAttribute("edges", st);
             walkCreatingDOT(dot, edge.target); // keep walkin'
         }
