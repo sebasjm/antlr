@@ -4,8 +4,29 @@
 #ifndef	_ANTLR3DEFS_H
 #define	_ANTLR3DEFS_H
 
-#define	ANTLR3_MEM_DEBUG
+/* Following are for genreaed code, they are not referenced internally!!!
+ */
+#if !defined(ANTLR3_HUGE) && !defined(ANTLR3_AVERAGE) && !defined(ANTLR3_SMALL)
+#define	ANTLR3_AVERAGE
+#endif
 
+#ifdef	ANTLR3_HUGE
+#ifndef	ANTLR3_SIZE_HINT
+#define	ANTLR3_SIZE_HINT    2049
+#endif
+#endif
+
+#ifdef	ANTLR3_AVERAGE
+#ifndef	ANTLR3_SIZE_HINT
+#define	ANTLR3_SIZE_HINT    1025
+#endif
+#endif
+
+#ifdef	ANTLR3_SMALL
+#ifndef	ANTLR3_SIZE_HINT
+#define	ANTLR3_SIZE_HINT    211
+#endif
+#endif
 
 /* Common definitions come first
  */

@@ -149,7 +149,7 @@ typedef	struct ANTLR3_LEXER_struct
      */
     ANTLR3_UINT64	(*getLine)		(void * lexer);
     ANTLR3_UINT64	(*getCharIndex)		(void * lexer);
-    ANTLR3_UINT64	(*getCharPositionInLine)(void * lexer);
+    ANTLR3_UINT32	(*getCharPositionInLine)(void * lexer);
 
     /** Pointer to function to return the text so far for the current token being generated
      */

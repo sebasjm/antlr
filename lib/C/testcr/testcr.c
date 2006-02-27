@@ -32,15 +32,11 @@ int main()
     pANTLR3_TOKEN_FACTORY   tf;
     pANTLR3_COMMON_TOKEN    tok;
 
+    pANTLR3_LEXER   lex;
+
+    int f[] = {'9','8','7'};
     unsigned char   * retkey;
     void	    * retdata;
-
-    printf("Length of string is %d", sizeof("JJJ\0")-1);
-
-    for	(i = 0 ; i <10; i++)
-    {
-	printf("Char is %c\n", chars[i]);
-    }
 
     bs1  = antlr3BitsetOf(0, 64, -1);
     bs2  = antlr3BitsetOf(0, 64, 1242, 345678, 9, 10, 11, 12, 13, 14, 15, 34, 56, 0, -1);

@@ -24,7 +24,7 @@ static void		    matchAny	    (pANTLR3_LEXER lexer);
 static void		    recover	    (pANTLR3_LEXER lexer);
 static ANTLR3_UINT64	    getLine	    (pANTLR3_LEXER lexer);
 static ANTLR3_UINT64	    getCharIndex    (pANTLR3_LEXER lexer);
-static ANTLR3_UINT64	    getCharPositionInLine
+static ANTLR3_UINT32	    getCharPositionInLine
 					    (pANTLR3_LEXER lexer);
 static pANTLR3_STRING	    getText	    (pANTLR3_LEXER lexer);
 static void		    freeLexer	    (pANTLR3_LEXER lexer);
@@ -71,6 +71,7 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 
 	return	(pANTLR3_LEXER) ANTLR3_ERR_NOMEM;
     }
+    lexer->tokSource->me    = lexer;
 
     /* Install the lexer API
      */
@@ -348,10 +349,10 @@ getLine	    (pANTLR3_LEXER lexer)
     return  lexer->input->getLine(lexer->input->me);
 }
 
-static ANTLR3_UINT64
+static ANTLR3_UINT32
 getCharPositionInLine	(pANTLR3_LEXER lexer)
 {
-    return  lexer->input->getLine(lexer->input->me);
+    return  lexer->input->getCharPositionInLine(lexer->input->me);
 }
 
 static ANTLR3_UINT64	getCharIndex	    (pANTLR3_LEXER lexer)

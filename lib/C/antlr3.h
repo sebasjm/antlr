@@ -8,10 +8,15 @@
 #include    <antlr3encodings.h>
 #include    <antlr3string.h>
 #include    <antlr3input.h>
+#include    <antlr3intstream.h>
 #include    <antlr3filestream.h>
 #include    <antlr3collections.h>
 #include    <antlr3baserecognizer.h>
 #include    <antlr3commontoken.h>
+#include    <antlr3tokenstream.h>
 #include    <antlr3bitset.h>
+#include    <antlr3dfa.h>
+#include    <antlr3lexer.h>
+#include    <antlr3parser.h>
 
 #endif

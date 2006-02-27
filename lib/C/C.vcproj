@@ -242,6 +242,13 @@
 			</File>
 			<File
 				RelativePath="..\..\src\org\antlr\codegen\templates\C\C.stg">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="COPY $(InputPath) $(ProjectDir)..\..\src\org\antlr\codegen\templates\C"
+						Outputs="$(ProjectDir)..\..\build\classes\org\antlr\codegen\templates\C\$(InputFileName)"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\org\antlr\codegen\templates\C\Dbg.stg">
