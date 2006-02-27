@@ -175,7 +175,8 @@ headerFile( LEXER,
             ANTLRVersion,
             generatedTimestamp,
             scopes,
-            trace
+            trace,
+            literals
         ) ::=
 <<
 <leadIn("C header")>
@@ -199,16 +200,22 @@ has the callable functions (rules) shown below,
  * in editors and so on.
  *
  * The parser entry points are called indirectly (by function pointer to function) via
- * a parser context typedef p<name>_CONTEXT, which is returned from a call to <mainName()>_new().
+ * a parser context typedef p<name>, which is returned from a call to <name>New().
  *
- * The entry points for <name>Parser are then as follows:
+<if(LEXER)>
+ * As this is a generated lexer, it is unlikely you will call it 'manually'. However
+ * the entry points are provided anyway.
  *
- * <rules: {r |  - <headerReturnType(ruleDescriptor=r.ruleDescriptor)>      p<name>_CONTEXT-><r.ruleDescriptor.name>()}; separator="\n * ">
+<endif>
+ * The entry points for <name> are  as follows:
+ *
+ * <rules: {r |  - <headerReturnType(ruleDescriptor=r.ruleDescriptor)>      p<name>-><r.ruleDescriptor.name>(p<name>)}; separator="\n * ">
  *
  * The return type for any particular rule is of course determined by the source
  * grammar file.
  */
-
+#ifndef	_<name>_H
+#define _<name>_H
 <actions.(actionScope).headerfile>
 <@includes>
 
@@ -223,7 +230,7 @@ has the callable functions (rules) shown below,
 /* =============================================================================
  * Runtime definitions for the generic tree parser
  */
-#include \<antlr3/c/treeparser.h>
+#include \<antlr3treeparser.h>
 
 /* End of runtime definitions for the generic tree parser.
  * =============================================================================
@@ -233,29 +240,17 @@ has the callable functions (rules) shown below,
 /* =============================================================================
  * Standard antlr3 C runtime definitions
  */
-#include    \<antlr3/c/antlr3.h>
+#include    \<antlr3.h>
 
 /* End of standard antlr 3 runtime definitions
  * =============================================================================
  */
 <if(backtracking)>
-/* We are doing some backtracking ... */
+/* Back tracking is enabled
+ */
 <endif>
 <@end>
 <if(LEXER)>
-
-/** \brief Token definitions for the lexer.
- *
- * These are the tokens that this lexer is able to spit out.
- * =============================================================================
- * \{
- */
-
-<tokens:{#define <it.name>      <it.type>}; separator="\n">
-
-/* End of token set that this lexer provides
- */
-/**  \}  */
 
 /**
  * Cyclic DFA's to drive this lexer
@@ -269,10 +264,8 @@ has the callable functions (rules) shown below,
  */
 /** \} */
 
-/* Function protoypes for the lexer functions
- */
-ANTLR3_API p<name>_CONTEXT <name>Lexer_new         (pANTLR3_CHARSTREAM     input);
-ANTLR3_API ANTLR3_RESULT <name>Lexer_nextToken   (pANTLR3_LEXER          lexerContext);
+
+
 <endif>
 <if(PARSER)>
 <endif>
@@ -284,27 +277,19 @@ ANTLR3_API ANTLR3_RESULT <name>Lexer_nextToken   (pANTLR3_LEXER          lexerCo
 
 /** Context tracking structure for <mainName()>
  */
-typedef struct <name>_Ctx_STRUCT
+typedef struct <name>_Ctx_struct
 {
     /** Built in ANTLR3 context tracker contains all the generic elements
      *  required for context tracking.
      */
 <if(PARSER)>
-    ANTLR3_PARSER_CONTEXT   
+    pANTLR3_PARSER   pParser;
 <endif>
 <if(LEXER)>
-    ANTLR3_LEXER_CONTEXT    
+    pANTLR3_LEXER    pLexer;
 <endif>
 <if(TREE_PARSER)>
-    ANTLR3_TREE_PARSER_CONTEXT
-<endif>
-      antlr3Ctx;
-<if(memoize)>
-    /** Table for rule memoization (if there is such a word... there is now)
-     *  allows us to remember if we have been through the indexed rule
-     *  before, when backtracking/predicting.
-     */
-    pANTLR3_HASH_TABLE    ruleMemo[<numRules>+1];<\n> <! index from 1..n !>
+    pANTLR3_TREE_PARSER	    pTreeParser;
 <endif>
 <scopes:{<if(it.isDynamicGlobalScope)>
 
@@ -315,26 +300,86 @@ typedef struct <name>_Ctx_STRUCT
     <ruleAttributeScopeDef(scope=r.ruleDescriptor.ruleScope)>
 <endif>}; separator="\n">
 
-    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*<r.ruleDescriptor.name>)(p<name>_CONTEXT ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>)}; separator=";\n";>
-    
-    pANTLR3_WCHAR    * getTokenNames();     /** Function to return the table of token names */
+<if(LEXER)>
+    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*m<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+<endif>
+<if(PARSER)>
+    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+<endif>
+<if(TREE_PARSER)>
+    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+<endif>
 
+    void (*free)   (struct <name>_Ctx_struct * ctx);
 }
-    * <name>_CONTEXT;
-typedef <name>_CONTEXT p<name>_CONTEXT;
+    <name>, * p<name>;
+
+/* Function protoypes for the lexer functions that external translation units
+ * may wish to call.
+ */
+ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     input);
 
 /** Symbolic definitions of all the tokens that the <grammarType()> will work with.
- *
  * \{
- */    
-<tokens:{#define <it.name>      <it.type>}; separator="\n">
+ *
+ * Antlr will define EOF, but we can't use that as it it is too common in
+ * in C header files and that would be confusing. There is no way to filter this out at the moment
+ * so we just undef it here for now. That isn't the value we get back from C recognizers
+ * anyway. We are looking for ANTLR3_TOKEN_EOF.
+ */
+#ifdef	EOF
+#undef	EOF
+#endif
    
+<tokens:{#define <it.name>      <it.type>}; separator="\n">
+
+
 /* End of token definitions for <name>
  * =============================================================================
  */
 /** \} */
 
+<if(literals)>
+/** String literals used by <name> that we must do things like matchs() with.
+ *  C will normally just lay down 8 bit characters, and you can use L"xxx" to
+ *  get wchar_t, but wchar_t is 16 bits on Windows, which is not UTF32 and so
+ *  we perform this little trick of defining the literals as arrays of UINT32
+ *  and passing in the address of these.
+ */
+<literals:{ANTLR3_UCHAR	lit_<i>  = <it>;}; separator="\n">
 
+<endif>
+
+/* MACROS for that hide the C interface implementations from the
+ * generated code, which makes it a littl emore understandable to the human eye.
+ * I am very much against using C pre-processor macros for funciton calls and bits
+ * of code as you cannot see what is happening when single stepping in debuggers
+ * and so. The exception (in my book at least) is for generated code, where you are
+ * not maintaining it, but may wish to read it or single step it, knowing that input()
+ * hides some indirect calls, but is always reffering to the inptu stream, this is
+ * probaly more readable than ctx->input->istream->input() and allows me to rejig
+ * the runtime interfaces without changing the generated code too often and without
+ * confiusing the reader of the genreatd output, who may not wish to know the gory
+ * details if the interface inheritence and so on.
+ */
+<if(LEXER)>
+ 
+/* Macros for access things in a lexer
+ */
+#define	    lexr		    ctx->pLexer
+#define	    ruleMemo		    lexr->rec->ruleMemo
+#define	    getCharIndex()	    lexr->getCharIndex(lexr->me)
+#define	    getLine()		    lexr->getLine(lexr->me)
+#define	    getCharPositionInLine() lexr->getCharPositionInLine(lexr->me)
+#define	    emit(t)		    lexr->emit(lexr->me, t)
+#define	    emitNew(t,l,cp,ch,s,i)  lexr->emitNew(lexr->me, t, l, cp, ch, s, i)
+#define	    matchc(c)		    lexr->matchc(lexr->me, c)
+#define	    matchs(s)		    lexr->matchs(lexr->me, s)
+#define	    matchRange(c1,c2)	    lexr->matchRange(lexr->me, c1, c2)
+#define	    token()		    lexr->token
+<endif>
+
+#endif
 >>
 
 grammarType() ::= <<
@@ -368,7 +413,7 @@ headerReturnType(ruleDescriptor) ::= "<returnType()>"
 // Produce the lexer output
 //
 lexer(  name, 
-        tokens, 
+        tokens,
         scopes, 
         rules, 
         numRules, 
@@ -376,63 +421,113 @@ lexer(  name,
         labelType="Token",
         filterMode) ::= <<
 
-    <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
-    <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
-    <actions.lexer.members>
+/* Forward declare implementation function for ANTLR3_TOKEN_SOURCE interface.
+ */
+static pANTLR3_COMMON_TOKEN <name>NextToken   (pANTLR3_LEXER          lexerContext);
 
-ANTLR3_API p<name>_CONTEXT <name>Lexer_new         (pANTLR3_CHARSTREAM     input)
+/* Forward declare the locally static matching functions we have generated.
+ */
+<rules:{r | static <headerReturnType(ruleDescriptor=r.ruleDescriptor)>	m<r.ruleDescriptor.name>    (p<name> ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+static void	<name>Free(p<name> ctx);
+
+<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
+
+<actions.lexer.members>
+
+static void
+<name>Free  (p<name> ctx)
 {
-    p<name>_CONTEXT lexCtx; /* Context structure we will build and return   */
-
-    lexCtx = (p<name>_CONTEXT) ANTLR3_MALLOC(sizeof(<name>_CONTEXT));
-
-    if  (lexCtx == NULL)
-    {
-        /* Failed to allocate memory for lexer context */
-        return  ANTLR3_ERR_NOMEM;
-    }
-
-    /* -------------------------------------------------------------------
-     * Memory for basic structure is allocated, now to fill in
-     * in base ANTLR3 structures. We intialize the function pointers
-     * for the standard ANTLR3 lexer funciton set, but upon return
-     * from here, the programmer amy set the pointers to provide custom
-     * implementations of each function.
-     */
-    
-    lexCtx.antlr3Ctx->input    = input;    /* Input stream interface   */
-
-    /* Call runtime routines to set up the base recognizer and lexer state
-     */
-    anltr3InitLexer(&lexCtx.antlr3Ctx);                    
-    
-<if(filterMode)>
-    /* We have filter mode turned on, so install the filtering nextToken function
-     */
-    lexCtx.antlr3Ctx->nextToken = <name>NextToken;
+<if(memoize)>
+    ruleMemo->free(ruleMemo->me);
 <endif>
+    lexr->free(lexr->me);
+    
+    ANTLR3_FREE(ctx);
 }
 
 <if(filterMode)>
     <filteringNextToken()>
 <endif>
 
-    /* =========================================================================
-     * Functions to match the lexer grammar defined tokens from the input stream
-     */
+/** \brief Create a new lexer called <name>
+ *
+ * \param[in] instream Pointer to an initialized input stream
+ *
+ * \return 
+ *     - Success p<name> initialized for the lex start
+ *     - Fail (p<name>)(ANTLR3_ERR_NOMEM)
+ */
+ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
+{
+    p<name> lexCtx; /* Context structure we will build and return   */
 
-    <rules; separator="\n\n">
+    lexCtx = (p<name>) ANTLR3_MALLOC(sizeof(<name>));
 
-    /* =========================================================================
-     * Lexer syntactic predicates
-     */
-    <synpreds:{p | <lexerSynpred(name=p)>}>
+    if  (lexCtx == NULL)
+    {
+        /* Failed to allocate memory for lexer context */
+        return  (p<name>)ANTLR3_ERR_NOMEM;
+    }
 
-    /* =========================================================================
-     * Cyclic DFAs for teh lexer
+    /* -------------------------------------------------------------------
+     * Memory for basic structure is allocated, now to fill in
+     * in base ANTLR3 structures. We intialize the function pointers
+     * for the standard ANTLR3 lexer function set, but upon return
+     * from here, the programmer may set the pointers to provide custom
+     * implementations of each function. 
+     *
+     * We don't use the macros defined in <name>.h here so you can get a sense
+     * of what goes where.
      */
-    <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
-    <cyclicDFAs>
+    
+    /* Create a base lexer, using the supplied input stream
+     */
+    lexCtx->pLexer	= antlr3LexerNewStream(ANTLR3_SIZE_HINT, instream);
+
+<if(memoize)>
+    /* Create a LIST for recording rule memos.
+     */
+    lexCtx->lexer->rec->ruleMemo    = antlr3ListNew(ANTLR3_SIZE_HINT);
+<endif>
+
+    /* Install the implementation of our parser interface
+     */
+    <rules:{r | lexCtx->m<r.ruleDescriptor.name>	= m<r.ruleDescriptor.name>;}; separator="\n";>
+    
+    lexCtx->free    = <name>Free;
+    
+<if(filterMode)>
+    /* We have filter mode turned on, so install the filtering nextToken function
+     */
+    lexCtx->lexer->tokSource->nextToken = <name>NextToken;
+<endif>
+}
+
+/* =========================================================================
+ * Functions to match the lexer grammar defined tokens from the input stream
+ */
+
+<rules; separator="\n\n">
+
+/* =========================================================================
+ * Lexer matching rules end.
+ * =========================================================================
+ */
+
+/* =========================================================================
+* Lexer syntactic predicates
+*/
+<synpreds:{p | <lexerSynpred(name=p)>}>
+/* =========================================================================
+ * Lexer syntactic predicates end.
+ * =========================================================================
+ */
+ 
+/* =========================================================================
+* Cyclic DFAs for the lexer
+*/
+<cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
+<cyclicDFAs>
 
 >>
 
@@ -441,7 +536,7 @@ ANTLR3_API p<name>_CONTEXT <name>Lexer_new         (pANTLR3_CHARSTREAM     input
  *  a token and then try again.  backtracking needs to be set as well.
  */
 filteringNextToken() ::= <<
-ANTLR3_API ANTLR3_TOKEN <name>nextToken(p<name>_CONTEXT lexCtx) 
+ANTLR3_API ANTLR3_TOKEN <name>nextToken(p<name> lexCtx) 
 {
     lexCtx.antlr3Ctx.token  = null;
     tokenStartCharIndex = getCharIndex();
@@ -502,14 +597,6 @@ static pANTLR3_WCHAR   <name>TokenNames[]
        };
 
     <@members>
-
-<if(memoize)>
-
-/** Boolean switches, one per rull so that memoization can test whether we
- *  have already failed this rule or not.
- */
-static ANTLR3_BOOL ruleMemo[<numRules>+1];<\n> <! index from 1..n !>
-<endif>
 
     <@end>
 
@@ -590,7 +677,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions) ::= <<
 /** $ANTLR start <ruleName>
  * <fileName>:<description>
  */
-static <returnType()> <ruleName>(p<name>_CONTEXT ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
+static <returnType()> m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 {   
     <if(trace)>printf("enter <ruleName> %s failed=%d, backtracking=%d\n", input.LT(1), backtracking);<endif>
     <ruleDeclarations()>
@@ -687,31 +774,52 @@ if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.n
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 
-// $ANTLR start <ruleName>
-public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
+/** \brief Lexer rule generated by ANTLR3
+ *
+ * $ANTLR start <ruleName>
+ *
+ * Looks to match the chracters the constitute the token <ruleName>
+ * from the attached input stream.
+ *
+ * \remark
+ *  - lexer->error == ANTLR3_TRUE if an exception was thrown.
+ */
+static
+void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
+{
     <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleDeclarations()>
-    try {
+        
 <if(nakedBlock)>
-        <ruleDescriptor.actions.init>
-        <ruleMemoization(name=ruleName)>
-        <block><\n>
+    <ruleDescriptor.actions.init>
+    <ruleMemoization(name=ruleName)>
+        
+    <block><\n>
 <else>
-        int type = <ruleName>;
-        int start = getCharIndex();
-        int line = getLine();
-        int charPosition = getCharPositionInLine();
-        int channel = Token.DEFAULT_CHANNEL;
-        <ruleDescriptor.actions.init>
-        <ruleMemoization(name=ruleName)>
-        <block>
-        if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}<\n>
+    ANTLR3_UINT32	    type;
+    ANTLR3_UINT64	    start;
+    ANTLR3_UINT64	    line;
+    ANTLR3_UINT32	    charPosition;
+    ANTLR3_UINT32	    channel;
+        
+    type		= <ruleName>;
+    start		= getCharIndex();
+    line		= getLine();
+    charPosition	= getCharPositionInLine();
+    channel		= ANTLR3_TOKEN_DEFAULT_CHANNEL;
+        
+    <ruleDescriptor.actions.init>
+    <ruleMemoization(name=ruleName)>
+    
+    <block>
+        
+    if ( token() == NULL ) 
+    {
+	emitNew(type,line,charPosition,channel,start,getCharIndex()-1);
+    }
 <endif>
-    }
-    finally {
         <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
-        <ruleCleanUp()>
-    }
+    <ruleCleanUp()>
 }
 // $ANTLR end <ruleName>
 >>
@@ -874,16 +982,19 @@ tokenRefAndListLabel(token,label,elementIndex) ::= <<
 >>
 
 listLabel(label) ::= <<
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>);<\n>
+if (list_<label>==NULL)
+{
+    list_<label>=antlr3NewList(ANTLR3_LIST_SIZE_HINT);
+}
+list_<label>->put(list_<label>, (ANTLR3_UINT64)<label>, NULL, NULL);<\n>
 >>
 
 /** match a character */
 charRef(char,label) ::= <<
 <if(label)>
-int <label> = input.LA(1);<\n>
+<label> = input->LA(1);<\n>
 <endif>
-match(<char>); <checkRuleBacktrackFailure()>
+matchc(<char>); <checkRuleBacktrackFailure()>
 >>
 
 /** match a character range */
@@ -925,10 +1036,10 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 lexerStringRef(string,label) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
-match(<string>); <checkRuleBacktrackFailure()>
+matchs(<string>); <checkRuleBacktrackFailure()>
 <labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
-match(<string>); <checkRuleBacktrackFailure()><\n>
+matchs(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
 >>
 
@@ -981,10 +1092,10 @@ ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
-m<rule>(<args>); <checkRuleBacktrackFailure()>
+m<rule>(ctx <if(args)>, <endif><args>); <checkRuleBacktrackFailure()>
 <labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
-m<rule>(<args>); <checkRuleBacktrackFailure()>
+m<rule>(ctx <if(args)>, <endif><args>); <checkRuleBacktrackFailure()>
 <endif>
 >>
 
@@ -1370,7 +1481,7 @@ pANTLR3_<name>_<scope.name>_SCOPE <name>_<scope.name>Stack_push(<name>Ctx ctx)
 
     /* Allocate the memory for a new structure
      */
-    newAttributes = (pANTLR3_<name>_<scope.name>_SCOPE)ANTRL3_MALLOC(sizeof(pANTLR3_<name>_<scope.name>_SCOPE));
+    newAttributes = (pANTLR3_<name>_<scope.name>_SCOPE)ANTLR3_MALLOC(sizeof(pANTLR3_<name>_<scope.name>_SCOPE));
 
     if  (newAttributes != NULL)
     {
@@ -1592,10 +1703,11 @@ setType(type) ::= "setType(<type>);"
 // M I S C (properties, etc...)
 
 bitset(name, words64) ::= <<
-public static final BitSet <name> = new BitSet(new long[]{<words64:{<it>L};separator=",">});<\n>
+pANTLR_BITSET <name>;
+<name> = antlr3BitsetLoad(<words64:{<it>};separator=",">});<\n>
 >>
 
 codeFileExtension() ::= ".c"
 
-true() ::= "true"
-false() ::= "false"
+true() ::= "ANTLR3_TRUE"
+false() ::= "ANTLR3_FALSE"
