@@ -27,19 +27,14 @@
 */
 package org.antlr.tool;
 
+import org.antlr.Tool;
 import org.antlr.analysis.*;
+import org.antlr.misc.Utils;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
-import org.antlr.tool.Grammar;
-import org.antlr.tool.ANTLRParser;
-import org.antlr.misc.Utils;
-import org.antlr.Tool;
 
 import java.util.*;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.File;
 
 /** The DOT (part of graphviz) generation aspect.
  *  TODO: move templates out of test!
@@ -48,8 +43,9 @@ public class DOTGenerator {
 	public static final boolean STRIP_NONREDUCED_STATES = false;
 
 	protected String arrowhead="normal";
+	protected String rankdir="TB";
 
-    /** Library of output templates; use <attrname> format */
+	/** Library of output templates; use <attrname> format */
     public static StringTemplateGroup stlib =
             new StringTemplateGroup("toollib", AngleBracketTemplateLexer.class);
 
@@ -146,6 +142,7 @@ public class DOTGenerator {
             st.setAttribute("src", getStateLabel(s));
             st.setAttribute("target", getStateLabel(edge.target));
 			st.setAttribute("arrowhead", arrowhead);
+			st.setAttribute("rankdir", rankdir);
             dot.setAttribute("edges", st);
             walkCreatingDOT(dot, edge.target); // keep walkin'
         }
@@ -369,5 +366,13 @@ public class DOTGenerator {
 
 	public void setArrowheadType(String arrowhead) {
 		this.arrowhead = arrowhead;
+	}
+
+	public String getRankdir() {
+		return rankdir;
+	}
+
+	public void setRankdir(String rankdir) {
+		this.rankdir = rankdir;
 	}
 }
