@@ -84,6 +84,7 @@ public class DOTGenerator {
 					new Integer(startState.stateNumber));
 			walkRuleNFACreatingDOT(dot, startState);
         }
+		dot.setAttribute("rankdir", rankdir);
         return dot.toString();
     }
 
@@ -142,7 +143,6 @@ public class DOTGenerator {
             st.setAttribute("src", getStateLabel(s));
             st.setAttribute("target", getStateLabel(edge.target));
 			st.setAttribute("arrowhead", arrowhead);
-			dot.setAttribute("rankdir", rankdir);
             dot.setAttribute("edges", st);
             walkCreatingDOT(dot, edge.target); // keep walkin'
         }
