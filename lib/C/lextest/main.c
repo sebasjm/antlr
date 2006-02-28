@@ -13,7 +13,7 @@ int main()
     input	= antlr3AsciiFileStreamNew("inputtext.txt");
 
     lxr		= lextestNew(input);
-lxr->pLexer->token
+
     tstream	= antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lxr->pLexer->tokSource);
 
     while   ((token = tstream->tstream->LT(tstream->tstream->me, 1))->getType(token) != ANTLR3_TOKEN_EOF)

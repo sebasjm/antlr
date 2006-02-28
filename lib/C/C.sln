@@ -8,13 +8,19 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testcr", "testcr\testcr.vcp
 		{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40} = {0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lextest", "..\lextest\lextest.vcproj", "{FE163CB1-6DEA-4688-90C0-022FE2E1C257}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test2", "test2\test2.vcproj", "{1A855725-8DDC-4838-A634-D8EFD35BB3F6}"
 	ProjectSection(ProjectDependencies) = postProject
+		{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40} = {0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lextest", "lextest\lextest.vcproj", "{FE163CB1-6DEA-4688-90C0-022FE2E1C257}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40} = {0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}
 	EndProjectSection
 EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 3
 		SccLocalPath0 = .
 		CanCheckoutShared = true
 		SolutionUniqueID = {A1EB2D24-65CF-48F9-9FCE-945F118519DB}
@@ -23,9 +29,6 @@ Global
 		CanCheckoutShared = true
 		SccProjectUniqueName2 = testcr\\testcr.vcproj
 		SccLocalPath2 = testcr
-		CanCheckoutShared = true
-		SccProjectUniqueName3 = ..\\lextest\\lextest.vcproj
-		SccLocalPath3 = ..\\lextest
 		CanCheckoutShared = true
 	EndGlobalSection
 	GlobalSection(SolutionConfiguration) = preSolution
@@ -41,6 +44,10 @@ Global
 		{5D2F8877-8499-4FBA-A8B8-C542331F6ACB}.Debug.Build.0 = Debug|Win32
 		{5D2F8877-8499-4FBA-A8B8-C542331F6ACB}.Release.ActiveCfg = Release|Win32
 		{5D2F8877-8499-4FBA-A8B8-C542331F6ACB}.Release.Build.0 = Release|Win32
+		{1A855725-8DDC-4838-A634-D8EFD35BB3F6}.Debug.ActiveCfg = Debug|Win32
+		{1A855725-8DDC-4838-A634-D8EFD35BB3F6}.Debug.Build.0 = Debug|Win32
+		{1A855725-8DDC-4838-A634-D8EFD35BB3F6}.Release.ActiveCfg = Release|Win32
+		{1A855725-8DDC-4838-A634-D8EFD35BB3F6}.Release.Build.0 = Release|Win32
 		{FE163CB1-6DEA-4688-90C0-022FE2E1C257}.Debug.ActiveCfg = Debug|Win32
 		{FE163CB1-6DEA-4688-90C0-022FE2E1C257}.Debug.Build.0 = Debug|Win32
 		{FE163CB1-6DEA-4688-90C0-022FE2E1C257}.Release.ActiveCfg = Release|Win32

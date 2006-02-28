@@ -105,8 +105,8 @@ ANTLR3_API pANTLR3_BITSET	    antlr3BitsetCopy		    (pANTLR3_UINT64 inSet, ANTLR
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetLoad		    (ANTLR3_UINT32 ec, ANTLR3_UINT64 bset, ...);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER  antlr3BaseRecognizerNew	    (ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint);
-ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_BASE_RECOGNIZER recognizer, void * input);
-ANTLR3_API void			    antlr3MTExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer, void * input);
+ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_INT_STREAM input);
+ANTLR3_API void			    antlr3MTExceptionNew	    (pANTLR3_INT_STREAM input);
 
 ANTLR3_API pANTLR3_HASH_TABLE	    antlr3HashTableNew		    (ANTLR3_UINT32 sizeHint);
 ANTLR3_API ANTLR3_UINT32	    antlr3Hash			    (void * key, ANTLR3_UINT32 keylen);
@@ -138,7 +138,7 @@ ANTLR3_API void			    ANTLR3_MEM_REPORT		    (ANTLR3_BOOLEAN);
 
 #else
 
-#define	ANTLR3_MEM_REPORT()
+#define	ANTLR3_MEM_REPORT(x)
 ANTLR3_API void			  * ANTLR3_MALLOC		    (size_t request);
 ANTLR3_API void			  * ANTLR3_REALLOC		    (void * current, ANTLR3_UINT64 request);
 ANTLR3_API void			    ANTLR3_FREE			    (void * ptr);

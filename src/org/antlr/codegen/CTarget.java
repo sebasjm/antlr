@@ -38,19 +38,31 @@ import java.util.ListIterator;
 public class CTarget extends Target {
     
         ArrayList strings = new ArrayList();
-        
+ 
+        protected void genRecognizerFile(Tool tool,
+									CodeGenerator generator,
+									Grammar grammar,
+									StringTemplate outputFileST)
+		throws IOException
+	{
+                // Before we write this, and cause it to generate its string,
+                // we need to add all the string literals that we are going to match
+                //
+                outputFileST.setAttribute("literals", strings);
+		String fileName = generator.getRecognizerFileName();
+		generator.write(outputFileST, fileName);
+	}
+                
 	protected void genRecognizerHeaderFile(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
 			 							   StringTemplate headerFileST)
 		throws IOException
 	{
-            // Before we write this, and cause it to generate its string
-            // We need to add all the string literals that we are going to match
-            //
-            headerFileST.setAttribute("literals", strings);
-		generator.write(headerFileST, grammar.name+".h");
+
+            generator.write(headerFileST, grammar.name+".h");
 	}
+        
         protected StringTemplate chooseWhereCyclicDFAsGo(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
@@ -133,7 +145,7 @@ public class CTarget extends Target {
                 index = strings.indexOf(bytes);
             }
              
-            String strref = "&lit_" + String.valueOf(index+1);
+            String strref = "lit_" + String.valueOf(index+1);
 
             return strref;
 	}

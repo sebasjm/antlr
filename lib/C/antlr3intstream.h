@@ -66,12 +66,23 @@ typedef	struct ANTLR3_INT_STREAM_struct
      *  so that this can be passed back to it whenever the api functions
      *  are called.
      */
-    void	      * me;
+    void			* me;
+    
+    /** If set to ANTLR3_TRUE then the input stream has an exception
+     * condition (this is tested by the generated code for the rules of
+     * the grammar).
+     */
+    ANTLR3_BOOLEAN	error;
+
+    /** Points to the first in a possible chain of exceptions that the
+     *  recognizer has discovered.
+     */
+    pANTLR3_EXCEPTION	    exception;
 
     /** Pointer to a funtion that can construct a generic exception structure
      * with such information as the input stream can privide.
      */
-    void		    (*exConstruct)  (void * intStream);
+    void		    (*exConstruct)  (pANTLR3_INT_STREAM intStream);
 
     /** Consume the next 'ANTR3_UINT32' in the stream
      */

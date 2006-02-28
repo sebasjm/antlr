@@ -27,9 +27,14 @@ static ANTLR3_UINT64	    getCharIndex    (pANTLR3_LEXER lexer);
 static ANTLR3_UINT32	    getCharPositionInLine
 					    (pANTLR3_LEXER lexer);
 static pANTLR3_STRING	    getText	    (pANTLR3_LEXER lexer);
+static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_LEXER lexer);
+
+static void		    displayRecognitionError	    (pANTLR3_LEXER lexer, pANTLR3_UINT8 tokenNames);
+static void		    reportError			    (pANTLR3_LEXER lexer);
+
 static void		    freeLexer	    (pANTLR3_LEXER lexer);
 
-
+extern	ANTLR3_COMMON_TOKEN ANTLR3_EOF_TOKEN;
 
 ANTLR3_API pANTLR3_LEXER
 antlr3LexerNew(ANTLR3_UINT32 sizeHint)
@@ -60,6 +65,9 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
     }
     lexer->rec->me  = lexer;
 
+    lexer->rec->displayRecognitionError	    = displayRecognitionError;
+    lexer->rec->reportError		    = reportError;
+
     /* Now install the token source interface
      */
     lexer->tokSource	= (pANTLR3_TOKEN_SOURCE)ANTLR3_MALLOC(sizeof(ANTLR3_TOKEN_SOURCE));
@@ -72,6 +80,14 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 	return	(pANTLR3_LEXER) ANTLR3_ERR_NOMEM;
     }
     lexer->tokSource->me    = lexer;
+
+    /* Install the default enxtToken() method, which may be overridden
+     * by generated code, or by anything else in fact.
+     */
+    lexer->tokSource->nextToken	    = nextToken;
+    lexer->tokSource->strFactory    = NULL;
+
+    lexer->tokFactory		    = NULL;
 
     /* Install the lexer API
      */
@@ -92,6 +108,75 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
     lexer->free			    = freeLexer;
     
     return  lexer;
+}
+
+
+/**
+ * \brief
+ * Default implementation of the nextToken() call for a lexer.
+ * 
+ * \param lexer
+ * Points to the implementation of a lexer.
+ * 
+ * \returns
+ * Write description of return value here.
+ * 
+ * \throws <exception class>
+ * Description of criteria for throwing this exception.
+ * 
+ * Write detailed description for nextToken here.
+ * 
+ * \remarks
+ * Write remarks for nextToken here.
+ * 
+ * \see
+ * Separate items with the '|' character.
+ */
+static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_LEXER lexer)
+{
+    /* Get rid of any previous token (token factory takes care of
+     * any deallocation when this token is finally used up.
+     */
+    lexer->token		    = NULL;
+    lexer->input->istream->error    = ANTLR3_FALSE;	    /* Start out without an exception	*/
+    lexer->rec->failed		    = ANTLR3_FALSE;
+
+    /* Record the start of the token in our input stream.
+     */
+    lexer->tokenStartCharIndex	= lexer->getCharIndex(lexer);   
+
+    /* Now call the matching rules and see if we can generate a new token
+     */
+    for	(;;)
+    {
+	if  (lexer->input->istream->LA(lexer->input->istream->me, 1) == ANTLR3_CHARSTREAM_EOF)
+	{
+	    /* Reached the end of the stream, nothign more to do.
+	     */
+	    return  &ANTLR3_EOF_TOKEN;
+	}
+	
+	lexer->token			= NULL;
+	lexer->input->istream->error    = ANTLR3_FALSE;	    /* Start out without an exception	*/
+	lexer->rec->failed		= ANTLR3_FALSE;
+
+	/* Call the generated lexer, see if it can get a new token together.
+	 */
+	lexer->mTokens(lexer->ctx);
+
+	if  (lexer->input->istream->error  == ANTLR3_TRUE)
+	{
+	    /* Recongition exception, report it and try to recover.
+	     */
+	    lexer->rec->failed	    = ANTLR3_TRUE;
+	    lexer->rec->reportError(lexer->rec->me);
+	    lexer->recover(lexer->me);
+	}
+	else
+	{
+	    return  lexer->token;
+	}
+    }
 }
 
 ANTLR3_API pANTLR3_LEXER
@@ -118,6 +203,51 @@ static void mTokens	    (pANTLR3_LEXER lexer)
     }
 }
 
+
+static void			
+reportError		    (pANTLR3_LEXER lexer)
+{
+    lexer->rec->displayRecognitionError(lexer->rec->me, lexer->rec->tokenNames);
+}
+
+#ifdef	WIN32
+#pragma warning( disable : 4100 )
+#endif
+
+static void			
+displayRecognitionError	    (pANTLR3_LEXER lexer, pANTLR3_UINT8 tokenNames)
+{
+    char    buf[64];
+
+    fprintf(stderr, "%s(", lexer->input->istream->exception->streamName);
+
+#ifdef WIN32
+    /* shanzzle fraazzle Dick Dastardly */
+    fprintf(stderr, "%I64d) ", lexer->input->istream->exception->line);
+#else
+    fprintf(stderr, "%lld) ", lexer->input->istream->exception->line);
+#endif
+
+    fprintf(stderr, ": error %d : %s at offset %d, near ", 
+					    lexer->input->istream->exception->type,
+		    (pANTLR3_UINT8)	   (lexer->input->istream->exception->message),
+					    lexer->input->istream->exception->charPositionInLine
+		    );
+
+    if	(isprint(lexer->input->istream->exception->c))
+    {
+	fprintf(stderr, "'%c'", lexer->input->istream->exception->c);
+    }
+    else
+    {
+	sprintf(buf, "char(%04x)", lexer->input->istream->exception->c);
+    }
+    fprintf(stderr, "%s\n", buf);
+
+    /* To DO: Handle the various exceptions we can get here
+     */
+}
+
 static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
 {
     /* Install the input interface
@@ -133,6 +263,20 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
     {
 	lexer->tokFactory	= antlr3TokenFactoryNew(input);
     }
+
+    if	(lexer->tokSource->strFactory == NULL)
+    {
+	if  (input->strFactory == NULL)
+	{
+	    input->strFactory = antlr3StringFactoryNew();
+	}
+
+	lexer->tokSource->strFactory =	input->strFactory;
+    }
+
+    /* This is a lexer, install the appropriate exception creator
+     */
+    input->istream->exConstruct = antlr3RecognitionExceptionNew;
 
     /* Set the current token to nothing
      */
@@ -223,7 +367,8 @@ matchs(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string)
 		return ANTLR3_FALSE;
 	    }
 	    
-	    lexer->input->istream->exConstruct(lexer->input->istream->me);
+	    lexer->input->istream->exConstruct(lexer->input->istream);
+	    lexer->rec->failed	 = ANTLR3_TRUE;
 
 	    /* TODO: IMplement exception creation more fully
 	     */
@@ -234,6 +379,7 @@ matchs(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string)
 	/* Matched correctly, do consume it
 	 */
 	lexer->input->istream->consume(lexer->input->istream->me);
+	string++;
 
 	/* Reset any failed indicator
 	 */

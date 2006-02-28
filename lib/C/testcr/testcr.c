@@ -1,5 +1,4 @@
 
-#define	ANTLR3_MEM_DEBUG
 
 #include    <antlr3.h>
 

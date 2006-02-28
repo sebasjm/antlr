@@ -77,11 +77,11 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
     return  input;
 }
 
-int
+ANTLR3_UINT64
 antlr3readAscii(pANTLR3_INPUT_STREAM    input)
 {
     ANTLR3_FDSC		    infile;
-    size_t		    fSize;
+    ANTLR3_UINT64	    fSize;
 
     // Open the OS file in read binary mode
     //
@@ -91,7 +91,7 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input)
     //
     if	(infile == NULL)
     {
-	return	ANTLR3_ERR_NOFILE;
+	return	(ANTLR3_UINT64)ANTLR3_ERR_NOFILE;
     }
 
     // It was there, so we can read the bytes now
@@ -100,12 +100,12 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input)
 
     /* Allocate buffer for this input set   
      */
-    input->data	    = ANTLR3_MALLOC(fSize);
+    input->data	    = ANTLR3_MALLOC((size_t)fSize);
     input->sizeBuf  = fSize;
 
     if	(input->data == NULL)
     {
-	return	ANTLR3_ERR_NOMEM;
+	return	(ANTLR3_UINT64)ANTLR3_ERR_NOMEM;
     }
     
     input->isAllocated	= ANTLR3_TRUE;
@@ -130,18 +130,18 @@ antlr3Fopen(pANTLR3_UINT8 filename, const char * mode)
     return  (ANTLR3_FDSC)fopen((const char *)filename, mode);
 }
 
-size_t
+ANTLR3_UINT64
 antlr3Fsize(pANTLR3_UINT8 fileName)
 {   
     struct _stat	statbuf;
 
     _stat((const char *)fileName, &statbuf);
 
-    return statbuf.st_size;
+    return (ANTLR3_UINT64)statbuf.st_size;
 }
 
-size_t
-antlr3Fread(ANTLR3_FDSC fdsc, size_t count,  void * data)
+ANTLR3_UINT64
+antlr3Fread(ANTLR3_FDSC fdsc, ANTLR3_UINT64 count,  void * data)
 {
-    return  fread(data, count, 1, fdsc);
+    return  (ANTLR3_UINT64)fread(data, (size_t)count, 1, fdsc);
 }

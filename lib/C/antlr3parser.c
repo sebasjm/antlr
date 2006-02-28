@@ -170,12 +170,12 @@ static void
 displayRecognitionError	    (pANTLR3_PARSER parser, pANTLR3_UINT8 tokenNames)
 {
     fprintf(stderr, "%s(%ld) : error %d : %s at offset %d, near %s\n", 
-					    parser->rec->exception->streamName, 
-					    parser->rec->exception->line,
-					    parser->rec->exception->type,
-		    (pANTLR3_UINT8)	   (parser->rec->exception->message),
-					    parser->rec->exception->charPositionInLine,
-		    ((pANTLR3_COMMON_TOKEN)(parser->rec->exception->token))->toString
+					    parser->tstream->istream->exception->streamName, 
+					    parser->tstream->istream->exception->line,
+					    parser->tstream->istream->exception->type,
+		    (pANTLR3_UINT8)	   (parser->tstream->istream->exception->message),
+					    parser->tstream->istream->exception->charPositionInLine,
+		    ((pANTLR3_COMMON_TOKEN)(parser->tstream->istream->exception->token))->toString
 		    );
 
     /* To DO: Handle the various exceptions we can get here
@@ -494,7 +494,7 @@ recoverFromMismatchedToken  (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, AN
 	 */
 	input->consume(input->me);
 
-	parser->rec->error  = ANTLR3_FALSE;	/* Exception is not outstanding any more */
+	parser->tstream->istream->error  = ANTLR3_FALSE;	/* Exception is not outstanding any more */
 
     }
 
@@ -507,7 +507,8 @@ recoverFromMismatchedToken  (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, AN
      */
     if	(parser->rec->recoverFromMismatchedElement(parser->rec->me, input, follow) == ANTLR3_FALSE)
     {
-	parser->rec->error  = ANTLR3_TRUE;
+	parser->tstream->istream->error  = ANTLR3_TRUE;
+	parser->rec->failed		 = ANTLR3_TRUE;
 	return;
     }
 
@@ -520,7 +521,8 @@ recoverFromMismatchedSet	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, p
      */
     if	(parser->rec->recoverFromMismatchedElement(parser->rec->me, input, follow) == ANTLR3_FALSE)
     {
-	parser->rec->error  = ANTLR3_TRUE;
+	parser->tstream->istream->error  = ANTLR3_TRUE;
+	parser->rec->failed		 = ANTLR3_TRUE;
 	return;
     }
 }
@@ -582,7 +584,8 @@ recoverFromMismatchedElement	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM inpu
 	/* report the error, but don't cause any rules to abort and stuff
 	 */
 	parser->rec->reportError(parser->rec->me);
-	parser->rec->error  = ANTLR3_FALSE;
+	parser->tstream->istream->error  = ANTLR3_FALSE;
+	parser->rec->failed		 = ANTLR3_FALSE;
 	return ANTLR3_TRUE;	/* Success in recovery	*/
     }
 

@@ -79,22 +79,22 @@ antlr3BRFree	    (pANTLR3_BASE_RECOGNIZER recognizer)
  * 
  */
 ANTLR3_API	void
-antlr3MTExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM input)
+antlr3MTExceptionNew(pANTLR3_INT_STREAM input)
 {
     /* Create a basic recognition exception strucuture
      */
-    antlr3RecognitionExceptionNew(recognizer, input);
+    antlr3RecognitionExceptionNew(input);
 
     /* Now update it to indicate this is a Mismatched token exception
      */
-    recognizer->exception->name		= ANTLR3_MISMATCHED_EX_NAME;
-    recognizer->exception->type		= ANTLR3_MISMATCHED_TOKEN_EXCEPTION;
+    input->exception->name		= ANTLR3_MISMATCHED_EX_NAME;
+    input->exception->type		= ANTLR3_MISMATCHED_TOKEN_EXCEPTION;
 
     return;
 }
 
 ANTLR3_API	void
-antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer, void * input)
+antlr3RecognitionExceptionNew(pANTLR3_INT_STREAM input)
 {
 
     pANTLR3_INPUT_STREAM	    cs;
@@ -103,38 +103,42 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer, void * input)
     /* Create a basic exception strucuture
      */
     pANTLR3_EXCEPTION	ex = antlr3ExceptionNew(ANTLR3_RECOGNITION_EXCEPTION,
-						ANTLR3_RECOGNITION_EX_NAME,
+						(void *)ANTLR3_RECOGNITION_EX_NAME,
 						NULL,
 						ANTLR3_FALSE);
-
-    
-
 
     /* Rest of information depends on the base type of the 
      * input stream.
      */
-    switch  (recognizer->type & ANTLR3_INPUT_MASK)
+    switch  (input->type & ANTLR3_INPUT_MASK)
     {
     case    ANTLR3_CHARSTREAM:
 
-	cs	= (pANTLR3_INPUT_STREAM) input;
+	cs	= (pANTLR3_INPUT_STREAM) input->me;
 
 	ex->c			= cs->istream->LA		    (cs->istream->me, 1);   /* Current input character			*/
 	ex->line		= cs->getLine			    (cs->me);		    /* Line number comes from stream		*/
 	ex->charPositionInLine	= cs->getCharPositionInLine	    (cs->me);		    /* Line offset also comes from the stream   */
 	ex->index		= cs->istream->index		    (cs->istream->me);
+	ex->streamName		= cs->getSourceName		    (cs->me);
+	ex->message		= "Unexpected character";
 	break;
 
     case    ANTLR3_TOKENSTREAM:
 
-	ts	= (pANTLR3_COMMON_TOKEN_STREAM) input;
+	ts	= (pANTLR3_COMMON_TOKEN_STREAM) input->me;
 
 	ex->token   = ts->tstream->LT(ts->tstream->me, 1);			/* Current input token			    */
 	ex->line    = ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine(ex->token);
 	ex->index   = ts->tstream->istream->index		  (ts->tstream->istream->me);
+	ex->streamName	= "Token stream: fix this Jim, pick p name from input stream into token stream!";
+	ex->message	= "Unexpected token";
 	break;
     }
 
+    ex->nextException	= NULL;
+    input->exception	= ex;
+    input->error	= ANTLR3_TRUE;	    /* Exception is outstanding	*/
     return;
 }
 
@@ -202,7 +206,7 @@ antlr3BRMismatch(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input, A
 {
     /* Install a mismtached token exception in the exception stack
      */
-    antlr3MTExceptionNew(recognizer, input);
+    antlr3MTExceptionNew(input);
 
     /* Enter error recovery mode
      */

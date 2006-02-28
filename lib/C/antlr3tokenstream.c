@@ -54,8 +54,12 @@ antlr3TokenStreamNew()
     }
 
     stream->me	    = stream;
+    
+    /* Install basic API 
+     */
     stream->free    = antlr3TokenStreamFree;
 
+    
     return stream;
 }
 
@@ -76,7 +80,7 @@ antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM stream)
 	stream->tstream->istream->free(stream->tstream->istream);
     }
 
-    if	(stream->tstream->me = stream)
+    if	(stream->tstream->me == stream)
     {
 	stream->tstream->free(stream->tstream);
     }
@@ -111,8 +115,14 @@ antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source
 
     stream = antlr3CommonTokenStreamNew(hint);
 
-    stream->tstream->setTokenSource(stream->tstream->me, source);
+    stream->channel = ANTLR3_TOKEN_DEFAULT_CHANNEL;
+    
+    stream->channelOverrides	= NULL;
+    stream->discardSet		= NULL;
+    stream->discardOffChannel	= ANTLR3_TRUE;
 
+    stream->tstream->setTokenSource(stream->tstream->me, source);
+    stream->free		= antlr3CTSFree;
     return  stream;
 }
 
@@ -138,8 +148,10 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
 
     /* Create space for the INT_STREAM interfacce
      */
-    stream->tstream->istream	    = antlr3IntStreamNew();
-    stream->tstream->istream->me    = stream;
+    stream->tstream->istream		    = antlr3IntStreamNew();
+    stream->tstream->istream->me	    = stream;
+    stream->tstream->istream->type	    = ANTLR3_TOKENSTREAM;
+    stream->tstream->istream->exConstruct   = antlr3MTExceptionNew;
 
     /* Install the token tracking tables
      */
@@ -194,7 +206,7 @@ tokLT  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 k)
 
     if	(tokenStream->p == -1)
     {
-	fillBuffer(tokenStream);
+	fillBuffer(tokenStream->me);
     }
     if	(k == 0)
     {
@@ -318,7 +330,7 @@ toStringSS   (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTL
 
     if	(tokenStream->p == -1)
     {
-	fillBuffer(tokenStream);
+	fillBuffer(tokenStream->me);
     }
     if	(stop >= tokenStream->tstream->istream->size(tokenStream->tstream->istream->me))
     {
@@ -594,7 +606,7 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
      * Remember we just get a pointer (reference if you like) here
      * and so if we store it anywhere, we don't set any pointers to auto free it.
      */
-    tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->me);
+    tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource->me);
 
     while   (tok != NULL && tok->getType(tok) != ANTLR3_CHARSTREAM_EOF)
     {

@@ -93,17 +93,6 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      */
     pANTLR3_LIST	ruleMemo;
 
-    /** If set to ANTLR3_TRUE then the input stream has an exception
-     * condition (this is tested by the generated code for the rules of
-     * the grammar).
-     */
-    ANTLR3_BOOLEAN	error;
-
-    /** Points to the first in a possible chain of exceptions that the
-     *  recognizer has discovered.
-     */
-    pANTLR3_EXCEPTION	exception;
-
     /** Pointer to an array of token names
      *  that are generally useful in error reporting. The generated parsers install
      *  this pointer. The table it points to is statically allocated as 8 bit ascii

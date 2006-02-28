@@ -47,6 +47,13 @@ typedef	struct ANTLR3_LEXER_struct
      */
     void	* me;
 
+    /** A generated lexer has an mTokens() function, which needs
+     *  the context pointer of the generated lexr, not the base lexer interface
+     *  this is stored here and initialized by the generated code (or manually
+     *  if this is a maunlly built lexer.
+     */
+    void	* ctx;
+
     /** A pointer to the character stream whence this lexer is receiving
      *  characters. I may come back to this and implement charstream outside
      *  the input stream as per the java implementatio.
@@ -87,13 +94,6 @@ typedef	struct ANTLR3_LEXER_struct
      */
     ANTLR3_INT64		tokenStartCharIndex;
 
-    /** Pointer to a function that matches chracters and sets the 
-     *  instance var token(see above).This implemenation is provided by the
-     *  generated lexer usually, but can be provided by anything that builds
-     *  a lexer of course.
-     */
-    void			(*mTokens)	    (void * lexer);
-
     /** Pointer to a function that sets the charstream source for the lexer and
      *  causes it to  be reset.
      */
@@ -112,6 +112,15 @@ typedef	struct ANTLR3_LEXER_struct
 							ANTLR3_UINT32 channel,
 							ANTLR3_UINT64 start,	ANTLR3_UINT64 stop
 							);
+
+    /** Pointer to the user provided (either manually or through code generation
+     *  function that causes the lexer rules to run the lexing rules and produce 
+     *  the next token if there iss one. This is called from nextToken() in the
+     *  pANTLR3_TOKEN_SOURCE. Note that the input parameter for this funciton is 
+     *  the generated lexer context (stored in ctx in this interface) it is a generated
+     *  function and expects the context to be the generated lexer. 
+     */
+    void	        (*mTokens)		    (void * ctx);
 
     /** Pointer to a function that attempts to match and consume the specified string from the input
      *  stream. Note that strings muse be passed as terminated arrays of ANTLR3_UCHAR. Strings are terminated

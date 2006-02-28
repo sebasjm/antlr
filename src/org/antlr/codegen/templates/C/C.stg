@@ -96,7 +96,8 @@ outputFile( LEXER,
             fileName,
             ANTLRVersion,
             generatedTimestamp,
-            trace
+            trace,
+            literals
             ) ::=
 <<
 <leadIn("C source")>
@@ -120,6 +121,17 @@ outputFile( LEXER,
 /* ----------------------------------------- */
 
 <docComment>
+
+<if(literals)>
+/** String literals used by <name> that we must do things like matchs() with.
+ *  C will normally just lay down 8 bit characters, and you can use L"xxx" to
+ *  get wchar_t, but wchar_t is 16 bits on Windows, which is not UTF32 and so
+ *  we perform this little trick of defining the literals as arrays of UINT32
+ *  and passing in the address of these.
+ */
+<literals:{ANTLR3_UCHAR	lit_<i>[]  = <it>;}; separator="\n">
+
+<endif>
 
 /* =============================================================================
  * Functions to create and destroy scopes. First come the rule scopes, followed
@@ -175,8 +187,7 @@ headerFile( LEXER,
             ANTLRVersion,
             generatedTimestamp,
             scopes,
-            trace,
-            literals
+            trace
         ) ::=
 <<
 <leadIn("C header")>
@@ -339,16 +350,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     input);
  */
 /** \} */
 
-<if(literals)>
-/** String literals used by <name> that we must do things like matchs() with.
- *  C will normally just lay down 8 bit characters, and you can use L"xxx" to
- *  get wchar_t, but wchar_t is 16 bits on Windows, which is not UTF32 and so
- *  we perform this little trick of defining the literals as arrays of UINT32
- *  and passing in the address of these.
- */
-<literals:{ANTLR3_UCHAR	lit_<i>  = <it>;}; separator="\n">
 
-<endif>
 
 /* MACROS for that hide the C interface implementations from the
  * generated code, which makes it a littl emore understandable to the human eye.
@@ -376,7 +378,8 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     input);
 #define	    matchc(c)		    lexr->matchc(lexr->me, c)
 #define	    matchs(s)		    lexr->matchs(lexr->me, s)
 #define	    matchRange(c1,c2)	    lexr->matchRange(lexr->me, c1, c2)
-#define	    token()		    lexr->token
+#define	    ltoken()		    lexr->token
+#define	    failed()		    (lexr->rec->failed == ANTLR3_TRUE)
 <endif>
 
 #endif
@@ -421,9 +424,11 @@ lexer(  name,
         labelType="Token",
         filterMode) ::= <<
 
+<if(filterMode)>
 /* Forward declare implementation function for ANTLR3_TOKEN_SOURCE interface.
  */
 static pANTLR3_COMMON_TOKEN <name>NextToken   (pANTLR3_LEXER          lexerContext);
+<endif>
 
 /* Forward declare the locally static matching functions we have generated.
  */
@@ -487,12 +492,22 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 <if(memoize)>
     /* Create a LIST for recording rule memos.
      */
-    lexCtx->lexer->rec->ruleMemo    = antlr3ListNew(ANTLR3_SIZE_HINT);
+    lexCtx->pLexer->rec->ruleMemo    = antlr3ListNew(ANTLR3_SIZE_HINT);
 <endif>
 
     /* Install the implementation of our parser interface
      */
     <rules:{r | lexCtx->m<r.ruleDescriptor.name>	= m<r.ruleDescriptor.name>;}; separator="\n";>
+    
+    /** When the nextToken() call is made to this lexers's pANTLR3_TOKEN_SOURCE
+     *  it will call mTokens() in this generated code, and will pass it the ctx
+     * pointer of this lexer, not the context of the base lexer, so store that now.
+     */
+    lexCtx->pLexer->ctx	    = lexCtx;
+    
+    /** Install the token matching function
+     */
+    lexCtx->pLexer->mTokens = mTokens;
     
     lexCtx->free    = <name>Free;
     
@@ -501,6 +516,10 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
      */
     lexCtx->lexer->tokSource->nextToken = <name>NextToken;
 <endif>
+
+    /* Return the newly built lexer to the caller
+     */
+    return  lexCtx;
 }
 
 /* =========================================================================
@@ -538,7 +557,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 filteringNextToken() ::= <<
 ANTLR3_API ANTLR3_TOKEN <name>nextToken(p<name> lexCtx) 
 {
-    lexCtx.antlr3Ctx.token  = null;
+    ltoken  = NULL;
     tokenStartCharIndex = getCharIndex();
     while (true) {
         if ( input.LA(1)==CharStream.EOF ) {
@@ -813,7 +832,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     
     <block>
         
-    if ( token() == NULL ) 
+    if ( ltoken() == NULL && !failed()) 
     {
 	emitNew(type,line,charPosition,channel,start,getCharIndex()-1);
     }
@@ -828,7 +847,9 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
  *  that chooses between lexer rules.
  */
 tokensRule(ruleName,nakedBlock,args,block,ruleDescriptor) ::= <<
-public void mTokens() throws RecognitionException {
+static void 
+mTokens(p<name> ctx)
+{
     <block><\n>
 }
 >>

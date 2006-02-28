@@ -453,8 +453,9 @@ antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
 
     /* Allocate stream interface
      */
-    input->istream	= antlr3IntStreamNew();
-    input->istream->me	= input;
+    input->istream	    = antlr3IntStreamNew();
+    input->istream->type    = ANTLR3_CHARSTREAM;
+    input->istream->me	    = input;
 
     input->istream->type	= type;
 

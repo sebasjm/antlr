@@ -3,9 +3,9 @@
 
 #include    <antlr3defs.h>
 
-ANTLR3_FDSC antlr3Fopen			(pANTLR3_UINT8 filename, const char * mode);
-size_t	    antlr3Fsize			(pANTLR3_UINT8 filename);
-int	    antlr3readAscii		(pANTLR3_INPUT_STREAM input);
-size_t	    antlr3Fread			(ANTLR3_FDSC fdsc, size_t count,  void * data);
+ANTLR3_FDSC	antlr3Fopen	(pANTLR3_UINT8 filename, const char * mode);
+ANTLR3_UINT64	antlr3Fsize	(pANTLR3_UINT8 filename);
+ANTLR3_UINT64	antlr3readAscii	(pANTLR3_INPUT_STREAM input);
+ANTLR3_UINT64	antlr3Fread	(ANTLR3_FDSC fdsc, ANTLR3_UINT64 count,  void * data);
 
 #endif
