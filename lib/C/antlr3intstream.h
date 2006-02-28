@@ -66,13 +66,17 @@ typedef	struct ANTLR3_INT_STREAM_struct
      *  so that this can be passed back to it whenever the api functions
      *  are called.
      */
-    void			* me;
+    void		    * me;
+
+    /** Special token for a token stream to restun EOF by
+     */
+    pANTLR3_COMMON_TOKEN    eofToken;
     
     /** If set to ANTLR3_TRUE then the input stream has an exception
      * condition (this is tested by the generated code for the rules of
      * the grammar).
      */
-    ANTLR3_BOOLEAN	error;
+    ANTLR3_BOOLEAN	    error;
 
     /** Points to the first in a possible chain of exceptions that the
      *  recognizer has discovered.

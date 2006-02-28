@@ -1,9 +1,36 @@
-lexer grammar lextest;
+grammar lextest;
 options {
   language=C;
 
 }
 
+create
+	: CREATEINDEX filename indexname by_specs assoc_specs 
+	;
+
+filename
+	: NAME
+	;
+	
+indexname
+       scope { int jimi;}
+	: NAME
+	;
+	
+by_specs
+	: (BY DREF)+
+	;
+	
+assoc_specs
+	: ASSOCIATE DREF+
+	;
+
+// LEXER STARTS HERE --------------------------------------
+//
+
+// Single character tokens
+//
+fragment
 DOLLAR	: '$' ;
 
 // Keywords
@@ -19,7 +46,7 @@ CREATEINDEX
 
 // Composites
 //
-DREF	:	DOLLAR NAME ;
+DREF	:	DOLLAR NUMBER ;
 
 NAME 	:	UPPERLOWERL ULN* ;
 
@@ -40,3 +67,6 @@ LOWERL	: 'a' .. 'z' ;
 
 fragment
 NUMBER	: '0' .. '9' ;
+
+WS: ('\n' | '\r' |' ' | '\t' )+ { channel = 99; }
+;

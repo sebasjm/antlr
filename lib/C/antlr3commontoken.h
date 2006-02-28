@@ -40,7 +40,7 @@
 
 /** End of file token
  */
-#define	ANTLR3_TOKEN_EOF	ANTLR3_CHARSTREAM_EOF
+#define	ANTLR3_TOKEN_EOF	(ANTLR3_CHARSTREAM_EOF & 0xFFFFFFFF)
 
 /** Default channel for a token
  */

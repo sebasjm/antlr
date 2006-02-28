@@ -36,7 +36,6 @@ static	void			setAPI		(pANTLR3_COMMON_TOKEN token);
 static	void			newPool		(pANTLR3_TOKEN_FACTORY factory);
 static	pANTLR3_COMMON_TOKEN    newPoolToken	(pANTLR3_TOKEN_FACTORY factory);
 
-ANTLR3_COMMON_TOKEN ANTLR3_EOF_TOKEN	= { ANTLR3_CHARSTREAM_EOF , ANTLR3_FALSE };
 
 
 ANTLR3_API pANTLR3_COMMON_TOKEN
@@ -242,6 +241,7 @@ newToken(void)
     /* Install the API
      */
     setAPI(token);
+    token->factoryMade = ANTLR3_FALSE;
 
     return  token;
 }
@@ -281,6 +281,7 @@ setAPI(pANTLR3_COMMON_TOKEN token)
     token->channel		    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
     token->line			    = 0;
     token->index		    = 0;
+    token->input		    = 0;
 
     return;
 }
@@ -314,6 +315,14 @@ static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
 	    /* There was no input stream for this token, or if
 	     * it did not pay the rent on a string factory
 	     */
+	    if	(token->factoryMade == ANTLR3_FALSE)
+	    {
+		token->text	    = (pANTLR3_STRING) ANTLR3_MALLOC(sizeof(ANTLR3_STRING));
+		token->text->len    = 0;
+		token->text->size   = 0;
+		token->text->text   = NULL;
+
+	    }
 	    return;
 	}
 

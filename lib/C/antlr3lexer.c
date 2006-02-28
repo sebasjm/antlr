@@ -34,7 +34,6 @@ static void		    reportError			    (pANTLR3_LEXER lexer);
 
 static void		    freeLexer	    (pANTLR3_LEXER lexer);
 
-extern	ANTLR3_COMMON_TOKEN ANTLR3_EOF_TOKEN;
 
 ANTLR3_API pANTLR3_LEXER
 antlr3LexerNew(ANTLR3_UINT32 sizeHint)
@@ -153,7 +152,12 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_LEXER lexer)
 	{
 	    /* Reached the end of the stream, nothign more to do.
 	     */
-	    return  &ANTLR3_EOF_TOKEN;
+	    pANTLR3_COMMON_TOKEN    teof = lexer->input->istream->eofToken;
+
+	    teof->setStartIndex (teof, lexer->getCharIndex(lexer->me));
+	    teof->setStopIndex  (teof, lexer->getCharIndex(lexer->me));
+	    teof->setLine	(teof, lexer->getLine(lexer->me));
+	    return  teof;
 	}
 	
 	lexer->token			= NULL;
@@ -231,18 +235,19 @@ displayRecognitionError	    (pANTLR3_LEXER lexer, pANTLR3_UINT8 tokenNames)
     fprintf(stderr, ": error %d : %s at offset %d, near ", 
 					    lexer->input->istream->exception->type,
 		    (pANTLR3_UINT8)	   (lexer->input->istream->exception->message),
-					    lexer->input->istream->exception->charPositionInLine
+					    lexer->input->istream->exception->charPositionInLine+1
 		    );
 
     if	(isprint(lexer->input->istream->exception->c))
     {
-	fprintf(stderr, "'%c'", lexer->input->istream->exception->c);
+	fprintf(stderr, "'%c'\n", lexer->input->istream->exception->c);
     }
     else
     {
 	sprintf(buf, "char(%04x)", lexer->input->istream->exception->c);
+	fprintf(stderr, "%s\n", buf);
     }
-    fprintf(stderr, "%s\n", buf);
+    
 
     /* To DO: Handle the various exceptions we can get here
      */
@@ -273,6 +278,11 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
 
 	lexer->tokSource->strFactory =	input->strFactory;
     }
+
+    /* Need to create the EOF token
+     */
+    input->istream->eofToken	= lexer->tokFactory->newToken(lexer->tokFactory);
+    input->istream->eofToken->setType(input->istream->eofToken, ANTLR3_TOKEN_EOF);
 
     /* This is a lexer, install the appropriate exception creator
      */

@@ -353,16 +353,17 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     input);
 
 
 /* MACROS for that hide the C interface implementations from the
- * generated code, which makes it a littl emore understandable to the human eye.
- * I am very much against using C pre-processor macros for funciton calls and bits
+ * generated code, which makes it a little more understandable to the human eye.
+ * I am very much against using C pre-processor macros for function calls and bits
  * of code as you cannot see what is happening when single stepping in debuggers
- * and so. The exception (in my book at least) is for generated code, where you are
- * not maintaining it, but may wish to read it or single step it, knowing that input()
- * hides some indirect calls, but is always reffering to the inptu stream, this is
- * probaly more readable than ctx->input->istream->input() and allows me to rejig
- * the runtime interfaces without changing the generated code too often and without
- * confiusing the reader of the genreatd output, who may not wish to know the gory
- * details if the interface inheritence and so on.
+ * and so on. The exception (in my book at least) is for generated code, where you are
+ * not maintaining it, but may wish to read. If you single step it, you know that input()
+ * hides some indirect calls, but is always reffering to the input stream. This is
+ * probaly more readable than ctx->input->istream->input(snarfle0->blarg) and allows me to rejig
+ * the runtime interfaces without changing the generated code too often, without
+ * confusing the reader of the generated output, who may not wish to know the gory
+ * details of the interface inheritence and wihtout naling anybody to a cross for 
+ * suggesting we just be nice to each other.
  */
 <if(LEXER)>
  
@@ -379,7 +380,22 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     input);
 #define	    matchs(s)		    lexr->matchs(lexr->me, s)
 #define	    matchRange(c1,c2)	    lexr->matchRange(lexr->me, c1, c2)
 #define	    ltoken()		    lexr->token
-#define	    failed()		    (lexr->rec->failed == ANTLR3_TRUE)
+#define	    LA(n)		    lexr->input->istream->LA(lexr->input->istream->me, n)
+#define	    hasfailed()		    (lexr->rec->failed == ANTLR3_TRUE)
+#define	    failedFlag()	    lexr->rec->failed
+#define	    theInput()		    lexr->input
+#define	    isException()	    (theInput()->istream->error == ANTLR3_TRUE)
+#define	    theException()	    theInput()->istream->exception
+#define	    exConstruct()	    theInput()->istream->exConstruct(theInput()->istream)
+#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream->me)
+#define	    lrecover()		    lexr->recover(lexr->me)
+#define	    setChannel(n)	    lexr->
+<endif>
+
+<if(PARSER)>
+/* Macros for accessing things in the parser
+ */
+#define	    haveAlreadyParsedRule(r) parser->rec->alreadyParsedRule(parser->me, r)
 <endif>
 
 #endif
@@ -560,7 +576,7 @@ ANTLR3_API ANTLR3_TOKEN <name>nextToken(p<name> lexCtx)
     ltoken  = NULL;
     tokenStartCharIndex = getCharIndex();
     while (true) {
-        if ( input.LA(1)==CharStream.EOF ) {
+        if ( LA(1)==CharStream.EOF ) {
             return Token.EOF_TOKEN;
         }
         try {
@@ -673,32 +689,51 @@ class <name>Ptr implements GrammarFragmentPtr {
 
 ruleMemoization(name) ::= <<
 <if(memoize)>
-if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { return <ruleReturnValue()>; }
+if ( backtracking>0 && haveAlreadyParsedRule(<ruleDescriptor.index>) )
+{
+    return <ruleReturnValue()>; 
+}
 <endif>
 >>
 
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
-<if(backtracking)>if (failed) return <ruleReturnValue()>;<endif>
+<if(backtracking)>
+/* checkRuleBacktrackFailure()
+ */
+if (hasFailed())
+{
+    return <ruleReturnValue()>;
+}
+<endif>
 >>
 
 /** This rule has failed, exit indicating failure during backtrack */
 ruleBacktrackFailure() ::= <<
-<if(backtracking)>if (backtracking>0) {failed=true; return <ruleReturnValue()>;}<endif>
+<if(backtracking)>
+/* ruleBacktrackFailure()
+ */
+if (backtracking>0)
+{
+    failedFlag() = <true()>; 
+    return <ruleReturnValue()>;
+}
+<endif>
 >>
 
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
 rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions) ::= <<
-
+/* rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions)
+ */
 
 /** $ANTLR start <ruleName>
  * <fileName>:<description>
  */
 static <returnType()> m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 {   
-    <if(trace)>printf("enter <ruleName> %s failed=%d, backtracking=%d\n", input.LT(1), backtracking);<endif>
+    <if(trace)>printf("enter <ruleName> %s failed=%d, backtracking=%d\n", LT(1), backtracking);<endif>
     <ruleDeclarations()>
     <ruleLabelDefs()>
     <ruleDescriptor.actions.init>
@@ -718,7 +753,7 @@ static <returnType()> m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>
 <endif>
 <endif>
     finally {
-        <if(trace)>System.out.println("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
+        <if(trace)>System.out.println("exit <ruleName> "+LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
     }
     <@postamble()>
@@ -728,17 +763,22 @@ static <returnType()> m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>
 >>
 
 catch(decl,action) ::= <<
-catch (<e.decl>) {
+/* catch(decl,action)
+ */
+if  (isException() && theException()->type == <e.decl> )
+{
     <e.action>
 }
 >>
 
 ruleDeclarations() ::= <<
+/* ruleDeclarations()
+ */
 <ruleDescriptor.useScopes:{<it>_stack.push(new <it>_scope());}; separator="\n">
 <ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval = new <returnType()>();
-retval.start = input.LT(1);<\n>
+retval.start = LT(1);<\n>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
@@ -747,9 +787,13 @@ retval.start = input.LT(1);<\n>
 <if(memoize)>
 int <ruleDescriptor.name>_StartIndex = input.index();
 <endif>
+/* End ruleDeclarations()
+ */
 >>
 
 ruleLabelDefs() ::= <<
+/* ruleLabelDefs()
+ */
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
     :{<labelType> <it.label.text>=null;}; separator="\n"
 >
@@ -765,6 +809,8 @@ ruleLabelDefs() ::= <<
 >>
 
 ruleReturnValue() ::= <<
+/* ruleReturnValue()
+ */
 <if(ruleDescriptor.hasReturnValue)>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnName>
@@ -775,22 +821,29 @@ retval
 >>
 
 ruleCleanUp() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
-<if(ruleDescriptor.hasMultipleReturnValues)>
-retval.stop = input.LT(-1);
-<endif>
+/* ruleCleanUp()
+ */
 <if(memoize)>
 <if(backtracking)>
 if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
 <endif>
 <endif>
+goto rule<ruleDescriptor.name>Ex; /* Prevent compiler warnings */
+rule<ruleDescriptor.name>Ex: ;
+<ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
+<if(ruleDescriptor.hasMultipleReturnValues)>
+retval.stop = LT(-1);
+<endif>
+
 >>
 
 /** How to generate a rule in the lexer; naked blocks are used for
- *  fragment rules.
+ *  fragment rules, which do not produce tokens.
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
+/* lexerRule(ruleName,nakedBlock,ruleDescriptor,block) 
+ */
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 
 /** \brief Lexer rule generated by ANTLR3
@@ -800,13 +853,16 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
  * Looks to match the chracters the constitute the token <ruleName>
  * from the attached input stream.
  *
+ * Comes from: <block.description>
+ *
  * \remark
  *  - lexer->error == ANTLR3_TRUE if an exception was thrown.
  */
 static
 void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 {
-    <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+
+    <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleDeclarations()>
         
 <if(nakedBlock)>
@@ -820,7 +876,8 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     ANTLR3_UINT64	    line;
     ANTLR3_UINT32	    charPosition;
     ANTLR3_UINT32	    channel;
-        
+
+    // ... <block.description>        JIM
     type		= <ruleName>;
     start		= getCharIndex();
     line		= getLine();
@@ -832,12 +889,12 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     
     <block>
         
-    if ( ltoken() == NULL && !failed()) 
+    if ( ltoken() == NULL && !isException()) 
     {
 	emitNew(type,line,charPosition,channel,start,getCharIndex()-1);
     }
 <endif>
-        <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+        <if(trace)>System.out.println("exit <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleCleanUp()>
 }
 // $ANTLR end <ruleName>
@@ -847,6 +904,11 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
  *  that chooses between lexer rules.
  */
 tokensRule(ruleName,nakedBlock,args,block,ruleDescriptor) ::= <<
+/* tokensRule(ruleName,nakedBlock,args,block,ruleDescriptor)
+ */
+/** This is the entry point in to the lexer from an object that
+ *  wants to generate the next token, such as a pCOMMON_TOKEN_STREAM
+ */
 static void 
 mTokens(p<name> ctx)
 {
@@ -858,14 +920,18 @@ mTokens(p<name> ctx)
 
 /** A (...) subrule with multiple alternatives */
 block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description>
+/* block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description)
+ *
+ * <fileName>:<description>
+ */
 int alt<decisionNumber>=<maxAlt>;
 <decls>
 <@predecision()>
 <decision>
 <@postdecision()>
 <@prebranch()>
-switch (alt<decisionNumber>) {
+switch (alt<decisionNumber>) 
+{
     <alts:altSwitchCase()>
 }
 <@postbranch()>
@@ -873,19 +939,28 @@ switch (alt<decisionNumber>) {
 
 /** A rule block with multiple alternatives */
 ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description>
-int alt<decisionNumber>=<maxAlt>;
+/* ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description)
+ *
+ * <fileName>:<description>
+ */
+ANTLR3_UINT32 alt<decisionNumber>;
+
+alt<decisionNumber>=<maxAlt>;
+
 <decls>
 <@predecision()>
 <decision>
 <@postdecision()>
-switch (alt<decisionNumber>) {
+switch (alt<decisionNumber>) 
+{
     <alts:altSwitchCase()>
 }
 >>
 
 ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-// <fileName>:<description>
+/* ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description)
+ * <fileName>:<description>
+ */
 <decls>
 <@prealt()>
 <alts>
@@ -894,7 +969,9 @@ ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNu
 
 /** A special case of a (...) subrule with a single alternative */
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-// <fileName>:<description>
+/* blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) 
+ * <fileName>:<description>
+ */
 <decls>
 <@prealt()>
 <alts>
@@ -903,50 +980,76 @@ blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber
 
 /** A (..)+ block with 0 or more alternatives */
 positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description>
-int cnt<decisionNumber>=0;
-<decls>
-<@preloop()>
-loop<decisionNumber>:
-do {
-    int alt<decisionNumber>=<maxAlt>;
-    <@predecision()>
-    <decision>
-    <@postdecision()>
-    switch (alt<decisionNumber>) {
-	<alts:altSwitchCase()>
-	default :
-	    if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
-	    <ruleBacktrackFailure()>
-            EarlyExitException eee =
-                new EarlyExitException(<decisionNumber>, input);
-            <@earlyExitException()>
-            throw eee;
+/* positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) 
+ * <fileName>:<description>
+ */
+{
+    int cnt<decisionNumber>=0;
+    <decls>
+    <@preloop()>
+
+    for (;;)
+    {
+        int alt<decisionNumber>=<maxAlt>;
+	<@predecision()>
+	<decision>
+	<@postdecision()>
+	switch (alt<decisionNumber>) 
+	{
+	    <alts:altSwitchCase()>
+	    default:
+	    
+		if ( cnt<decisionNumber> >= 1 )
+		{
+		    goto loop<decisionNumber>; /* Ah well, generated code or I'd shoot myself */
+		}
+		<ruleBacktrackFailure()>
+		<earlyExitEx()>
+		<@earlyExitException()>
+		goto rule<ruleDescriptor.name>Ex;
+	}
+	cnt<decisionNumber>++;
     }
-    cnt<decisionNumber>++;
-} while (true);
-<@postloop()>
+    loop<decisionNumber>: ;	/* Jump to here if this rule does not match */
+    <@postloop()>
+}
 >>
 
+earlyExitEx() ::= <<
+/* mismatchedSetEx()
+ */
+exConstruct();
+theException()->type = ANTLR3_EARLY_EXIT_EXCEPTION;
+theException()->name = ANTLR3_MISMATCHED_SET_NAME;
+<\n>
+>>
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
 /** A (..)* block with 0 or more alternatives */
 closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description>
+
+/* closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) 
+ *
+ * <fileName>:<description>
+ */
 <decls>
+
 <@preloop()>
-loop<decisionNumber>:
-do {
+for (;;)
+{
     int alt<decisionNumber>=<maxAlt>;
     <@predecision()>
     <decision>
     <@postdecision()>
-    switch (alt<decisionNumber>) {
+    switch (alt<decisionNumber>) 
+    {
 	<alts:altSwitchCase()>
-	default :
-	    break loop<decisionNumber>;
+	default:
+	    goto loop<decisionNumber>;	/* break out of the loop */
+	    break;
     }
-} while (true);
+}
+loop<decisionNumber>: ; /* Jump out to here if this rule does not match */
 <@postloop()>
 >>
 
@@ -964,7 +1067,9 @@ optionalBlockSingleAlt ::= block
  *  does the jump to the code that actually matches that alternative.
  */
 altSwitchCase() ::= <<
-case <i> :
+/* altSwitchCase()
+ */
+case <i>:
     <@prealt()>
     <it>
     break;<\n>
@@ -972,38 +1077,46 @@ case <i> :
 
 /** An alternative is just a list of elements; at outermost level */
 alt(elements,altNum,description,autoAST,outerAlt) ::= <<
-// <fileName>:<description>
-{
+/* alt(elements,altNum,description,autoAST,outerAlt)
+ * <fileName>:<description>
+ */
 <@declarations()>
 <elements:element()>
 <@cleanup()>
-}
 >>
 
 // E L E M E N T S
 
 /** Dump the elements one per line */
 element() ::= <<
+/* element()
+ */
 <@prematch()>
 <it.el><\n>
 >>
 
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex) ::= <<
+/* tokenRef(token,label,elementIndex)
+ */
 <if(label)>
-<label>=(<labelType>)input.LT(1);<\n>
+<label> = (<labelType>)LT(1);<\n>
 <endif>
-match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBacktrackFailure()>
+match(input, <token>, FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBacktrackFailure()>
 >>
 
 /** ids+=ID */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
+/* tokenRefAndListLabel(token,label,elementIndex)
+ */
 <tokenRef(...)>
 <listLabel(...)>
 >>
 
 listLabel(label) ::= <<
-if (list_<label>==NULL)
+/* listLabel(label)
+ */
+if (list_<label> == NULL)
 {
     list_<label>=antlr3NewList(ANTLR3_LIST_SIZE_HINT);
 }
@@ -1012,49 +1125,70 @@ list_<label>->put(list_<label>, (ANTLR3_UINT64)<label>, NULL, NULL);<\n>
 
 /** match a character */
 charRef(char,label) ::= <<
+/* charRef(char,label)
+ */
 <if(label)>
-<label> = input->LA(1);<\n>
+<label> = LA(1);<\n>
 <endif>
 matchc(<char>); <checkRuleBacktrackFailure()>
 >>
 
 /** match a character range */
-charRangeRef(a,b) ::= "matchRange(<a>,<b>); <checkRuleBacktrackFailure()>"
+charRangeRef(a,b) ::= <<
+/* charRangeRef(a,b)
+ */
+matchRange(<a>, <b>); <checkRuleBacktrackFailure()>
+>>
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
+/* matchSet(s,label,elementIndex,postmatchCode="")
+ */
 <if(label)>
-<label>=(<labelType>)input.LT(1);<\n>
+<label>=(<labelType>)LT(1);<\n>
 <endif>
-if ( <s> ) {
+if ( <s> ) 
+{
     <postmatchCode>
-    input.consume();
+    inputConsume();
 <if(!LEXER)>
     errorRecovery=false;
 <endif>
     <if(backtracking)>failed=false;<endif>
 }
-else {
+else 
+{
     <ruleBacktrackFailure()>
-    MismatchedSetException mse =
-        new MismatchedSetException(null,input);
+    <mismatchedSetEx()>
     <@mismatchedSetException()>
 <if(LEXER)>
-    recover(mse);
+    lrecover();
 <else>
-    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
+    precoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
 <endif>
-    throw mse;
+    goto rule<ruleDescriptor.name>Ex;
 }<\n>
 >>
 
+mismatchedSetEx() ::= <<
+/* mismatchedSetEx()
+ */
+exConstruct();
+theException()->type = ANTLR3_MISMATCHED_SET_EXCEPTION;
+theException()->name = ANTLR3_MISMATCHED_SET_NAME;
+>>
+
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
+/* matchSetAndListLabel(s,label,elementIndex,postmatchCode)
+ */
 <matchSet(...)>
 <listLabel(...)>
 >>
 
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
+/* lexerStringRef(string,label)
+ */
 <if(label)>
 int <label>Start = getCharIndex();
 matchs(<string>); <checkRuleBacktrackFailure()>
@@ -1065,26 +1199,34 @@ matchs(<string>); <checkRuleBacktrackFailure()><\n>
 >>
 
 wildcard(label,elementIndex) ::= <<
+/* wildcard(label,elementIndex)
+ */
 <if(label)>
-<label>=(<labelType>)input.LT(1);<\n>
+<label>=(<labelType>)LT(1);<\n>
 <endif>
 matchAny(input); <checkRuleBacktrackFailure()>
 >>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
+/* wildcardAndListLabel(label,elementIndex)
+ */
 <wildcard(...)>
 <listLabel(...)>
 >>
 
 /** Match . wildcard in lexer */
 wildcardChar(label, elementIndex) ::= <<
+/* wildcardChar(label, elementIndex)
+ */
 <if(label)>
-int <label> = input.LA(1);<\n>
+int <label> = LA(1);<\n>
 <endif>
 matchAny(); <checkRuleBacktrackFailure()>
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
+/* wildcardCharListLabel(label, elementIndex)
+ */
 <wildcardChar(...)>
 <listLabel(...)>
 >>
@@ -1093,6 +1235,8 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  and a return value or values.
  */
 ruleRef(rule,label,elementIndex,args) ::= <<
+/* ruleRef(rule,label,elementIndex,args)
+ */
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
 <label>=<rule>(<args>);<\n>
@@ -1105,12 +1249,17 @@ following.pop();
 
 /** ids+=ID */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
+/* ruleRefAndListLabel(rule,label,elementIndex,args)
+ */
 <ruleRef(...)>
 <listLabel(...)>
 >>
 
 /** A lexer rule reference */
 lexerRuleRef(rule,label,args) ::= <<
+/* lexerRuleRef(rule,label,args)
+ * From: <description>
+ */
 <if(label)>
 int <label>Start = getCharIndex();
 m<rule>(ctx <if(args)>, <endif><args>); <checkRuleBacktrackFailure()>
@@ -1122,17 +1271,21 @@ m<rule>(ctx <if(args)>, <endif><args>); <checkRuleBacktrackFailure()>
 
 /** EOF in the lexer */
 lexerMatchEOF(label) ::= <<
+/* lexerMatchEOF(label)
+ */
 <if(label)>
 int <label>Start = getCharIndex();
-match(EOF); <checkRuleBacktrackFailure()>
+matchc(ANTLR3_CHARSTREAM_EOF); <checkRuleBacktrackFailure()>
 <labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
-match(EOF); <checkRuleBacktrackFailure()>
+matchc(ANTLR3_CHARSTREAM_EOF); <checkRuleBacktrackFailure()>
 <endif>
 >>
 
 /** match ^(root children) in tree parser */
 tree(root, children) ::= <<
+/* tree(root, children)
+ */
 <root:element()>
 match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
 <children:element()>
@@ -1143,7 +1296,10 @@ match(input, Token.UP, null); <checkRuleBacktrackFailure()>
  *  also hoisted into a prediction expression).
  */
 validateSemanticPredicate(pred,description) ::= <<
-if ( !(<evalPredicate(...)>) ) {
+/* validateSemanticPredicate(pred,description) 
+ */
+if ( !(<evalPredicate(...)>) ) 
+{
     <ruleBacktrackFailure()>
     throw new FailedPredicateException(input, "<ruleName>", "<description>");
 }
@@ -1152,19 +1308,38 @@ if ( !(<evalPredicate(...)>) ) {
 // F i x e d  D F A  (if-then-else)
 
 dfaState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
-<edges; separator="\nelse ">
-else {
+
+/* dfaState(k,edges,eotPredictsAlt,description,stateNumber)
+ */
+{
+    int LA<decisionNumber>_<stateNumber> = LA(<k>);
+
+    <edges; separator="\nelse ">
+    else 
+    {
 <if(eotPredictsAlt)>
-    alt<decisionNumber>=<eotPredictsAlt>;
+        alt<decisionNumber>=<eotPredictsAlt>;
 <else>
-    <ruleBacktrackFailure()>
-    NoViableAltException nvae =
-        new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
-    <@noViableAltException()>
-    throw nvae;<\n>
+        <ruleBacktrackFailure()>
+    
+        <newNVException()>    
+        goto rule<ruleDescriptor.name>Ex;
+
 <endif>
+    }
 }
+>>
+
+newNVException() ::= <<
+    /* newNVException()
+     */
+    exConstruct();
+    theException()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
+    theException()->message      = "<description>";
+    theException()->decisionNum  = <decisionNumber>;
+    theException()->state        = <stateNumber>;
+    <@noViableAltException()>
+    <\n>
 >>
 
 /** Same as a normal DFA state except that we don't examine lookahead
@@ -1173,7 +1348,9 @@ else {
  *  expect "if ( LA(1)==X ) match(X);" and that's it.
  */
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
+/* dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber)
+ */
+int LA<decisionNumber>_<stateNumber> = LA(<k>);
 <edges; separator="\nelse ">
 >>
 
@@ -1183,25 +1360,36 @@ int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
  *  This is used only in the lexer so that for ('a')* on the end of a rule
  *  anything other than 'a' predicts exiting.
  */
+dfaLoopbackStateDecls()::= <<
+/* dfaLoopbackStateDecls(decisionNumber)
+ */
+ANTLR3_UINT32   LA<decisionNumber>_<stateNumber>;
+>>
 dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
+/* dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber)
+ */
+int LA<decisionNumber>_<stateNumber> = LA(<k>);
 <edges; separator="\nelse "><\n>
 <if(eotPredictsAlt)>
-else {
+else 
+{
     alt<decisionNumber>=<eotPredictsAlt>;
 }<\n>
 <endif>
 >>
 
 /** An accept state indicates a unique alternative has been predicted */
-dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>;"
+dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>; /* dfaAcceptState(alt) */"
 
 /** A simple edge with an expression.  If the expression is satisfied,
  *  enter to the target state.  To handle gated productions, we may
  *  have to evaluate some predicates for this edge.
  */
 dfaEdge(labelExpr, targetState, predicates) ::= <<
-if ( <labelExpr> <if(predicates)>&& <predicates><endif>) {
+/* dfaEdge(labelExpr, targetState, predicates)
+ */
+if ( <labelExpr> <if(predicates)>&& <predicates><endif>) 
+{
     <targetState>
 }
 >>
@@ -1212,29 +1400,37 @@ if ( <labelExpr> <if(predicates)>&& <predicates><endif>) {
  *  decides if this is possible: CodeGenerator.canGenerateSwitch().
  */
 dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-switch ( input.LA(<k>) ) {
+/* dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber)
+ */
+switch ( LA(<k>) ) 
+{
 <edges; separator="\n">
+
 default:
 <if(eotPredictsAlt)>
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
     <ruleBacktrackFailure()>
-    NoViableAltException nvae =
-        new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
-    <@noViableAltException()>
-    throw nvae;<\n>
+    <newNVException()>
+    <\n>
 <endif>
 }<\n>
 >>
 
 dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-switch ( input.LA(<k>) ) {
+/* dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber)
+ */
+switch ( LA(<k>) ) 
+{
     <edges; separator="\n">
 }<\n>
 >>
 
 dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber) ::= <<
-switch ( input.LA(<k>) ) {
+/* dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber)
+ */
+switch ( LA(<k>) ) 
+{
 <edges; separator="\n"><\n>
 <if(eotPredictsAlt)>
 default:
@@ -1245,6 +1441,8 @@ default:
 >>
 
 dfaEdgeSwitch(labels, targetState) ::= <<
+/* dfaEdgeSwitch(labels, targetState)
+ */
 <labels:{case <it>:}; separator="\n">
     <targetState>
     break;
@@ -1257,13 +1455,18 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  *  The <name> attribute is inherited via the parser, lexer, ...
  */
 dfaDecision(decisionNumber,description) ::= <<
+/* dfaDecision(decisionNumber,description)
+ */
 alt<decisionNumber> = dfa<decisionNumber>.predict(input); <checkRuleBacktrackFailure()>
 >>
 
 /** The overall cyclic DFA chunk; contains all the DFA states */
 cyclicDFA(className,ruleName,ruleDescriptor,decisionNumber,states,description) ::= <<
+/* cyclicDFA(className,ruleName,ruleDescriptor,decisionNumber,states,description)
+ */
 class DFA<decisionNumber> extends DFA {
-    public int predict(IntStream input) throws RecognitionException {
+    public int predict(IntStream input) throws RecognitionException 
+    {
         return predict(input, s0);
     }
     <states>
@@ -1272,9 +1475,11 @@ class DFA<decisionNumber> extends DFA {
 
 /** A state in a cyclic DFA */
 cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
+/* cyclicDFAState(stateNumber,edges,needErrorClause)
+ */
 DFA.State s<stateNumber> = new DFA.State() {
     public DFA.State transition(IntStream input) throws RecognitionException {
-        int LA<decisionNumber>_<stateNumber> = input.LA(1);
+        int LA<decisionNumber>_<stateNumber> = LA(1);
         <edges>
         <if(needErrorClause)>
         <if(backtracking)>
@@ -1291,21 +1496,32 @@ DFA.State s<stateNumber> = new DFA.State() {
 
 /** An accept state for a cyclic DFA */
 cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
-DFA.State s<stateNumber> = new DFA.State() {{alt=<predictAlt>;}};<\n>
+/* cyclicDFAAcceptState(stateNumber,predictAlt)
+ */
+DFA.State s<stateNumber> = new DFA.State()
+{
+  /* NOt sure what this does in Java -> have to test */
+    {alt=<predictAlt>;}
+};<\n>
 >>
 
 /** Just like a fixed DFA edge, test the lookahead and indicate what
  *  state to jump to next if successful.
  */
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates) ::= <<
-if ( <labelExpr> <if(predicates)>&& <predicates><endif>) {return s<targetStateNumber>;}<\n>
+/* cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates)
+ */
+if ( <labelExpr> <if(predicates)>&& <predicates><endif>)
+{
+    return s<targetStateNumber>;
+}<\n>
 >>
 
 /** An edge pointing at end-of-token; essentially matches any char;
  *  always jump to the target.
  */
 eotDFAEdge(targetStateNumber,edgeNumber, predicates) ::= <<
-return s<targetStateNumber>;<\n>
+return s<targetStateNumber>; /* eotDFAEdge(targetStateNumber,edgeNumber, predicates) */<\n>
 >>
 
 // C y c l i c  S W I T C H
@@ -1316,10 +1532,15 @@ return s<targetStateNumber>;<\n>
 
 cyclicDFAStateSwitch(stateNumber,labels,edges,
                      needErrorClause,EOTTargetStateNumber) ::= <<
+/* cyclicDFAStateSwitch(stateNumber,labels,edges,
+ *                   needErrorClause,EOTTargetStateNumber)
+ */
 DFA.State s<stateNumber> = new DFA.State() {
     public DFA.State transition(IntStream input) throws RecognitionException {
-        switch ( input.LA(1) ) {
+        switch ( LA(1) ) 
+        {
         <edges; separator="\n">
+        
         default:
 <if(needErrorClause)>
             <if(backtracking)>
@@ -1337,42 +1558,46 @@ DFA.State s<stateNumber> = new DFA.State() {
 >>
 
 cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
+/* cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber)
+ */
 <labels:{case <it>:}; separator="\n">
     return s<targetStateNumber>;<\n>
 >>
 
 // D F A  E X P R E S S I O N S
 
-andPredicates(left,right) ::= "(<left>&&<right>)"
+andPredicates(left,right) ::= "( <left> && <right> )"
 
-orPredicates(left,right) ::= "(<left>||<right>)"
+orPredicates(left,right) ::= "( <left> || <right> )"
 
-notPredicate(pred) ::= "!(<evalPredicate(...)>)"
+notPredicate(pred) ::= "!( <evalPredicate(...)> )"
 
 evalPredicate(pred,description) ::= "<pred>"
 
 evalSynPredicate(pred,description) ::= 
   "synpred(input, <pred>)"
 
-lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
+lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber> == <atom>"
 
 /** Sometimes a lookahead test cannot assume that LA(k) is in a temp variable
  *  somewhere.  Must ask for the lookahead directly.
  */
-isolatedLookaheadTest(atom,k,atomAsInt) ::= "input.LA(<k>)==<atom>"
+isolatedLookaheadTest(atom,k,atomAsInt) ::= "LA(<k>) == <atom>"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
-(LA<decisionNumber>_<stateNumber>\>=<lower> && LA<decisionNumber>_<stateNumber>\<=<upper>)
+(LA<decisionNumber>_<stateNumber> \>= <lower> && LA<decisionNumber>_<stateNumber> \<= <upper>)
 >>
 
-isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "(input.LA(<k>)\>=<lower> && input.LA(<k>)\<=<upper>)"
+isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "(LA(<k>) \>= <lower> && LA(<k>) \<= <upper>)"
 
-setTest(ranges) ::= "<ranges; separator=\"||\">"
+setTest(ranges) ::= "<ranges; separator=\" || \">"
 
 // A T T R I B U T E S
 
 makeScopeSet() ::= <<
-/** Definition of the <scope.name> scope variable tracking
+/* makeScopeSet() 
+ */
+ /** Definition of the <scope.name> scope variable tracking
  *  structure. An instance of this structure is created by calling
  *  <name>Parser_ctx-><name>_<scope.name>Stack_push().
  */
@@ -1398,6 +1623,8 @@ typedef struct  <name>_<scope.name>_SCOPE_STRUCT
 
 globalAttributeScopeDecl(scope) ::= 
 <<
+/* globalAttributeScopeDecl(scope)
+ */
 <if(scope.attributes)>
 <makeScopeSet(...)>
 <endif>
@@ -1405,6 +1632,8 @@ globalAttributeScopeDecl(scope) ::=
 
 ruleAttributeScopeDecl(scope) ::= 
 <<
+/* ruleAttributeScopeDecl(scope)
+ */
 <if(scope.attributes)>
 <makeScopeSet(...)>
 <endif>
@@ -1412,6 +1641,8 @@ ruleAttributeScopeDecl(scope) ::=
 
 globalAttributeScopeFuncDecl(scope) ::= 
 <<
+/* globalAttributeScopeFuncDecl(scope)
+ */
 <if(scope.attributes)>
 /* -----------------------------------------------------------------------------
  * Function declarations for creating and destroying a <name>_<scope.name> scope set 
@@ -1427,6 +1658,8 @@ static  pANTLR3_<name>_<scope.name>_SCOPE
 
 ruleAttributeScopeFuncDecl(scope) ::= 
 <<
+/* ruleAttributeScopeFuncDecl(scope)
+ */
 <if(scope.attributes)>
 /* -----------------------------------------------------------------------------
  * Function declarations for creating and destroying a <name>_<scope.name> scope set 
@@ -1442,6 +1675,8 @@ static  void
 
 globalAttributeScopeDef(scope) ::= 
 <<
+/* globalAttributeScopeDef(scope)
+ */
 <if(scope.attributes)>
 /** Pointer to the top of the <scope.name> stack for use by <name>_<scope.name>Stack_push()
  *  and <name>_<scope.name>Stack_pop()
@@ -1452,6 +1687,8 @@ static  pANTLR3_<scope.name>_SCOPE <name>_<scope.name>_stack;
 
 ruleAttributeScopeDef(scope) ::=
 <<
+/* ruleAttributeScopeDef(scope)
+ */
 <if(scope.attributes)>
 /** Pointer to the top of the <scope.name> stack for use by <name>_<scope.name>Stack_push()
  *  and <name>_<scope.name>Stack_pop()
@@ -1462,6 +1699,8 @@ pANTLR3_<scope.name>_SCOPE <name>_<scope.name>_stack;
 
 globalAttributeScopeFuncs(scope) ::= 
 <<
+/* globalAttributeScopeFuncs(scope)
+ */
 <if(scope.attributes)>
 <attributeFuncs(scope)>
 <endif>
@@ -1469,6 +1708,8 @@ globalAttributeScopeFuncs(scope) ::=
 
 ruleAttributeScopeFuncs(scope) ::=
 <<
+/* ruleAttributeScopeFuncs(scope)
+ */
 <if(scope.attributes)>
 <attributeFuncs(scope)>
 <endif>
@@ -1476,6 +1717,8 @@ ruleAttributeScopeFuncs(scope) ::=
 
 globalAttributeScope(scope) ::= 
 <<
+/* globalAttributeScope(scope)  
+ */
 <if(scope.attributes)>
 <name>_<scope.name>_stack = <name>_<scope.name>Stack_push();
 <endif>
@@ -1483,6 +1726,8 @@ globalAttributeScope(scope) ::=
 
 ruleAttributeScope(scope) ::= 
 <<
+/* ruleAttributeScope(scope)
+ */
 <if(scope.attributes)>
 <name>_<scope.name>_stack = <name>_<scope.name>Stack_push();
 <endif>
@@ -1490,6 +1735,8 @@ ruleAttributeScope(scope) ::=
 
 attributeFuncs(scope) ::=
 <<
+/* attributeFuncs(scope)
+ */
 <if(scope.attributes)>
 /** \brief Allocate initial memory for a <name>_<scope.name> scope variable stack entry and
  *         add it to the top of the stack.
@@ -1654,7 +1901,7 @@ ruleLabelRef(referencedRule,scope,attr) ::= <<
 
 returnAttributeRef(ruleDescriptor,attr) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval.<attr.name>
+retval-<attr.name> :___FIX this how to escape it
 <else>
 <attr.name>
 <endif>
@@ -1687,25 +1934,28 @@ ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
 
-lexerRuleLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
-lexerRuleLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= "<scope>.getCharPositionInLine()"
-lexerRuleLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
-lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
-lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "<scope>->getType()"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "<scope>->getLine()"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "<scope>->getCharPositionInLine()"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "<scope>->getChannel()"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>->getTokenIndex()"
+lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>->getText()"
 
 // Somebody may ref $template or $tree or $stop within a rule:
-rulePropertyRef_start(scope,attr) ::= "retval.start"
-rulePropertyRef_stop(scope,attr) ::= "retval.stop"
-rulePropertyRef_tree(scope,attr) ::= "retval.tree"
-rulePropertyRef_text(scope,attr) ::= "input.toString(retval.start,input.LT(-1))"
-rulePropertyRef_st(scope,attr) ::= "retval.st"
+rulePropertyRef_start(scope,attr) ::= "retval->start"
+rulePropertyRef_stop(scope,attr) ::= "retval->stop"
+rulePropertyRef_tree(scope,attr) ::= "retval->tree"
+rulePropertyRef_text(scope,attr) ::= "input->toString(retval.start,LT(-1))"
+rulePropertyRef_st(scope,attr) ::= "retval->st"
 
 
 /** How to execute an action */
 execAction(action) ::= <<
+/* execAction(action)
+ */
 <if(backtracking)>
-if ( backtracking==0 ) {
+if ( backtracking == 0 ) 
+{
   <action>
 }
 <else>
@@ -1724,6 +1974,8 @@ setType(type) ::= "setType(<type>);"
 // M I S C (properties, etc...)
 
 bitset(name, words64) ::= <<
+/* bitset(name, words64)
+ */
 pANTLR_BITSET <name>;
 <name> = antlr3BitsetLoad(<words64:{<it>};separator=",">});<\n>
 >>

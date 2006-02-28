@@ -225,15 +225,18 @@ printable(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
 	    *scannedText++ = '\\';
 	    *scannedText++ = 'n';
 	}
-	else if	(*(instr->text + i) < 0x32 || *(instr->text +i) > 0x7F)
+	else if	(!isprint(*(instr->text +i)))
 	{
 	    *scannedText++ = '?';
 	}
-	i++;
+	else
+	{
+	    *scannedText++ = *(instr->text + i);
+	}
     }
     *scannedText++  = '\0';
 
-    string->len	= (ANTLR3_UINT32)((ANTLR3_UINT64)scannedText - string->len);
+    string->len	= (ANTLR3_UINT32)(scannedText - string->text);
     
     return  string;
 }

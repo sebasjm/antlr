@@ -25,6 +25,31 @@
  */
 #define	ANTLR3_MISMATCHED_EX_NAME   "Mismatched Token Exception"
 
+/** Recognizer could not find a valid alternative from the input
+ */
+#define	ANTLR3_NO_VIABLE_ALT_EXCEPTION	    3
+
+/** Name of #ANTLR3_NO_VIABLE_ALT_EXCEPTION
+ */
+#define	ANTLR3_NO_VIABLE_ALT_NAME   "No Viable Alt"
+
+/* Character in a set was not found
+ */
+#define	ANTLR3_MISMATCHED_SET_EXCEPTION	    4
+
+/* Name of #ANTLR3_MISMATCHED_SET_EXCEPTION
+ */
+#define	ANTLR3_MISMATCHED_SET_NAME  "Mismatched set"
+
+/* A rule predicting at least n elements found less than that,
+ * such as: WS: " "+;
+ */
+#define	ANTLR3_EARLY_EXIT_EXCEPTION	    5
+
+/* Name of #ANTLR3_EARLY_EXIT_EXCEPTION
+ */
+#define	ANTLR3_EARLY_EXIT_NAME	     "Early exit"
+
 /** Base structure for an ANTLR3 exception tracker
  */
 typedef	struct ANTLR3_EXCEPTION_struct
@@ -84,6 +109,15 @@ typedef	struct ANTLR3_EXCEPTION_struct
     /** Character position in the line where the error occurred.
      */
     ANTLR3_INT32   charPositionInLine;
+
+    /** decision number for NVE
+     */
+    ANTLR3_UINT32   decisionNum;
+
+    /** State for NVE
+     */
+    ANTLR3_UINT32   state;
+
 
     /** Pointer to the next exception in the chain (if any)
      */

@@ -137,8 +137,11 @@ antlr3RecognitionExceptionNew(pANTLR3_INT_STREAM input)
     }
 
     ex->nextException	= NULL;
+    ex->input		= input;
+
     input->exception	= ex;
     input->error	= ANTLR3_TRUE;	    /* Exception is outstanding	*/
+
     return;
 }
 

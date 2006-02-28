@@ -34,7 +34,8 @@ import org.antlr.Tool;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ListIterator;
-
+import org.antlr.stringtemplate.misc.*;
+        
 public class CTarget extends Target {
     
         ArrayList strings = new ArrayList();
@@ -49,6 +50,7 @@ public class CTarget extends Target {
                 // we need to add all the string literals that we are going to match
                 //
                 outputFileST.setAttribute("literals", strings);
+               // System.out.println(outputFileST.toStructureString());
 		String fileName = generator.getRecognizerFileName();
 		generator.write(outputFileST, fileName);
 	}

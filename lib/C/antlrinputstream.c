@@ -148,7 +148,7 @@ antlr3AsciiLA(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 la)
     }
     else
     {
-	return	(ANTLR3_UCHAR)(*((pANTLR3_INT8)input->nextChar));
+	return	(ANTLR3_UCHAR)(*((pANTLR3_INT8)input->nextChar + la - 1));
     }
 }
 
@@ -340,7 +340,7 @@ antlr3AsciiSeek	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT64 seekPoint)
 static pANTLR3_STRING
 antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 start, ANTLR3_INT64 stop)
 {
-    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)(input->data)+start, (ANTLR3_UINT32)(stop - start));
+    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)(input->data)+start, (ANTLR3_UINT32)(stop - start + 1));
 }
 
 /** \brief Retrun the line number as understood by the 8 bit/ASCII input stream.

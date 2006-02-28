@@ -130,6 +130,9 @@
 				RelativePath=".\lextest.c">
 			</File>
 			<File
+				RelativePath=".\lextestLexer.c">
+			</File>
+			<File
 				RelativePath=".\main.c">
 			</File>
 		</Filter>
@@ -148,9 +151,9 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating antlr lexer debug mode (C output)"
-						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/build/classes;C:/antlrsrc/code/antlr/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)
+						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/java/main/build/classes;C:/antlrsrc/code/antlr/main/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)
 "
-						AdditionalDependencies="$(SolutionDir)..\..\src\org\antlr\codegen\templates\C\C.stg"
+						AdditionalDependencies="..\..\src\org\antlr\codegen\templates\C\C.stg"
 						Outputs="$(InputDir)$(TargetName)Lexer.c;$(InputDir)$(TargetName)Lexer.h"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -169,6 +172,9 @@
 				UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 				<File
 					RelativePath=".\lextest.h">
+				</File>
+				<File
+					RelativePath=".\lextestLexer.h">
 				</File>
 			</Filter>
 		</Filter>
