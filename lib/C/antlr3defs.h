@@ -102,7 +102,7 @@ ANTLR3_API pANTLR3_BITSET	    antlr3BitsetNew		    (ANTLR3_UINT32 numBits);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetOf		    (ANTLR3_INT32 bit, ...);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetList		    (pANTLR3_HASH_TABLE list);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetCopy		    (pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetLoad		    (ANTLR3_UINT32 ec, ANTLR3_UINT64 bset, ...);
+ANTLR3_API pANTLR3_BITSET	    antlr3BitsetLoad		    (ANTLR3_UINT32 ec, pANTLR3_UINT64 bset);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER  antlr3BaseRecognizerNew	    (ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint);
 ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_INT_STREAM input);
@@ -163,6 +163,8 @@ ANTLR3_API pANTLR3_TOKEN_FACTORY    antlr3TokenFactoryNew	    (pANTLR3_INPUT_STR
 
 ANTLR3_API pANTLR3_LEXER	    antlr3LexerNewStream	    (ANTLR3_UINT32 sizeHint, pANTLR3_INPUT_STREAM input);
 ANTLR3_API pANTLR3_LEXER	    antlr3LexerNew		    (ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_PARSER	    antlr3ParserNewStream	    (ANTLR3_UINT32 sizeHint, pANTLR3_TOKEN_STREAM tstream);
+ANTLR3_API pANTLR3_PARSER	    antlr3ParserNew		    (ANTLR3_UINT32 sizeHint);
 
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
 antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source);

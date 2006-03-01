@@ -48,13 +48,9 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
     recognizer->matchAny	= antlr3BRMatchAny;
     recognizer->free		= antlr3BRFree;
 
-    if	(recognizer->following == NULL)
-    {
-	/* Could not allocate memory for reset
-	 */
-	ANTLR3_FREE(recognizer);
-	return	(pANTLR3_BASE_RECOGNIZER) ANTLR3_ERR_NOMEM;
-    }
+    recognizer->following	= NULL;
+    recognizer->ruleMemo	= NULL;
+    recognizer->tokenNames	= NULL;
 
     return  recognizer;
 }

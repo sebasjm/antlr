@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="lextest"
-	ProjectGUID="{FE163CB1-6DEA-4688-90C0-022FE2E1C257}"
-	RootNamespace="lextest"
+	Name="test2"
+	ProjectGUID="{1A855725-8DDC-4838-A634-D8EFD35BB3F6}"
+	RootNamespace="test2"
 	SccProjectName="SAK"
 	SccAuxPath="SAK"
 	SccLocalPath="SAK"
@@ -24,13 +24,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\antlrsrc\code\antlr\main\lib\C;&quot;$(ProjectDir)&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)&quot;;&quot;$(ProjectDir)&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
 			<Tool
@@ -38,11 +38,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="antlr3c.lib"
-				OutputFile="$(OutDir)/lextest.exe"
+				OutputFile="$(OutDir)/test2.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="C:\antlrsrc\code\antlr\main\lib\C\Debug"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)$(OutDir)&quot;"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/lextest.pdb"
+				ProgramDatabaseFile="$(OutDir)/test2.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -74,9 +74,9 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\antlrsrc\code\antlr\main\lib\C;&quot;$(ProjectDir)&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)&quot;;&quot;$(ProjectDir)&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -86,9 +86,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="antlr3c.lib"
-				OutputFile="$(OutDir)/lextest.exe"
+				OutputFile="$(OutDir)/test2.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="C:\antlrsrc\code\antlr\main\lib\C\Release"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)$(OutDir)&quot;"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -124,16 +124,18 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\inputtext.txt">
-			</File>
-			<File
-				RelativePath=".\lextest.c">
-			</File>
-			<File
-				RelativePath=".\lextestLexer.c">
+				RelativePath=".\lex1.c">
 			</File>
 			<File
 				RelativePath=".\main.c">
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\lex1.h">
 			</File>
 		</Filter>
 		<Filter
@@ -142,41 +144,19 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 		</Filter>
 		<Filter
-			Name="grammars"
-			Filter="">
+			Name="Grammar"
+			Filter="*.g;*.g3">
 			<File
-				RelativePath=".\lextest.g">
+				RelativePath=".\lex1.g">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="Generating antlr lexer debug mode (C output)"
-						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/build/classes;C:/antlrsrc/code/antlr/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)
+						CommandLine="java -cp &quot;c:/antlrsrc/code/antlr/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar;c:/antlrsrc/code/stringtemplate/build/classes&quot; org.antlr.Tool $(InputFileName)
 "
-						AdditionalDependencies="..\..\src\org\antlr\codegen\templates\C\C.stg"
-						Outputs="$(InputDir)$(TargetName)Lexer.c;$(InputDir)$(TargetName)Lexer.h;$(InputDir)$(TargetName).c;$(InputDir)$(TargetName).h"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating antlr lexer Releasemode (C output)"
-						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/build/classes;C:/antlrsrc/code/antlr/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)
-"
-						Outputs="$(InputDir)$(TargetName)Lexer.c;$(InputDir)$(TargetName)Lexer.h"/>
+						Outputs="$(InputDir)$(InputName).h;$(InputDir)$(InputName).c"/>
 				</FileConfiguration>
 			</File>
-			<Filter
-				Name="Header Files"
-				Filter="h;hpp;hxx;hm;inl;inc;xsd"
-				UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-				<File
-					RelativePath=".\lextest.h">
-				</File>
-				<File
-					RelativePath=".\lextestLexer.h">
-				</File>
-			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

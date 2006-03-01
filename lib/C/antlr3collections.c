@@ -664,11 +664,13 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
     stack->free	= antlr3StackFree;
     stack->pop	= antlr3StackPop;
     stack->push	= antlr3StackPush;
+    stack->size	= antlr3StackSize;
+    stack->peek	= antlr3StackPeek;
 
     return  stack;
 }
 
-static ANTLR3_UINT64	antlr4StackSize	    (pANTLR3_STACK stack)
+static ANTLR3_UINT64	antlr3StackSize	    (pANTLR3_STACK stack)
 {
     return  stack->list->size(stack->list);
 }

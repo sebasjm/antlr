@@ -62,7 +62,7 @@ typedef	struct ANTLR3_BITSET_struct
 
 
 }
-    ANTLR3_BITSET, *pANTLR3_BITSET;
+    ANTLR3_BITSET;
 
 
 

@@ -169,9 +169,15 @@ reportError		    (pANTLR3_PARSER parser)
 static void			
 displayRecognitionError	    (pANTLR3_PARSER parser, pANTLR3_UINT8 tokenNames)
 {
-    fprintf(stderr, "%s(%ld) : error %d : %s at offset %d, near %s\n", 
-					    parser->tstream->istream->exception->streamName, 
-					    parser->tstream->istream->exception->line,
+    fprintf(stderr, "%s(", parser->tstream->istream->exception->streamName);
+#ifdef WIN32
+    /* shanzzle fraazzle Dick Dastardly */
+    fprintf(stderr, "%I64d) ", parser->tstream->istream->exception->line);
+#else
+    fprintf(stderr, "%lld) ", parser->tstream->istream->exception->type);
+#endif
+
+    fprintf(stderr, ": error %d : %s at offset %d, near %s\n", 
 					    parser->tstream->istream->exception->type,
 		    (pANTLR3_UINT8)	   (parser->tstream->istream->exception->message),
 					    parser->tstream->istream->exception->charPositionInLine,
@@ -230,6 +236,10 @@ recover			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input)
     /* Destoy the temporary bitset we produced.
      */
     followSet->free(followSet);
+
+    /* Reset the in error bit so we don't re-report the exception
+     */
+    parser->tstream->istream->error	= ANTLR3_FALSE;
 }
 
 static void			
@@ -407,15 +417,18 @@ combineFollows		    (pANTLR3_PARSER parser, ANTLR3_BOOLEAN exact)
     ANTLR3_UINT64	top;
     ANTLR3_UINT64	i;
 
-    top	= parser->rec->following->size(parser->rec->following) - 1;
+    top	= parser->rec->following->size(parser->rec->following);
 
     followSet	    = antlr3BitsetNew(0);
 
-    for (i = top; i>=0; i--)
+    for (i = top; i>0; i--)
     {
 	localFollowSet = (pANTLR3_BITSET) parser->rec->following->get(parser->rec->following, i);
 
-	followSet->orInPlace(followSet, localFollowSet);
+	if  (localFollowSet != NULL)
+	{
+	    followSet->orInPlace(followSet, localFollowSet);
+	}
 
 	if	(      exact == ANTLR3_TRUE
 		    && localFollowSet->isMember(localFollowSet, ANTLR3_EOR_TOKEN_TYPE) == ANTLR3_FALSE
@@ -631,7 +644,7 @@ consumeUntilSet			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, pANTLR3_
      */
     while   (ttype != ANTLR3_TOKEN_EOF && set->isMember(set, ttype) == ANTLR3_FALSE)
     {
-	input->consume(input);
+	input->consume(input->me);
 	ttype	= input->LA(input->me, 1);
     }
 }

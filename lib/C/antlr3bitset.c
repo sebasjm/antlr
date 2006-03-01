@@ -210,12 +210,10 @@ antlr3BitsetList(pANTLR3_HASH_TABLE list)
  * 
  */
 ANTLR3_API pANTLR3_BITSET
-antlr3BitsetLoad(ANTLR3_UINT32 ec, ANTLR3_UINT64 bset, ...)
+antlr3BitsetLoad(ANTLR3_UINT32 ec, pANTLR3_UINT64 bset)
 {
     pANTLR3_BITSET  bitset;
     ANTLR3_UINT32  count;
-
-    va_list ap;
 
     /* Allocate memory for the bitset structure itself
      * the input parameter is the bit number (0 based)
@@ -234,7 +232,6 @@ antlr3BitsetLoad(ANTLR3_UINT32 ec, ANTLR3_UINT64 bset, ...)
 
     /* Now we can add the element bits into the set
      */
-    va_start(ap, bset);
     count=0;
     while (count < ec)
     {
@@ -243,15 +240,9 @@ antlr3BitsetLoad(ANTLR3_UINT32 ec, ANTLR3_UINT64 bset, ...)
 	    bitset->grow(bitset, count+1);
 	}
 	
-	bitset->bits[count] = bset;
-
+	bitset->bits[count] = *(bset+count);
 	count++;
-	if  (count < ec)
-	{
-	    bset = va_arg(ap, ANTLR3_UINT64);
-	}
     }
-    va_end(ap);
 
     /* return the new bitset
      */
@@ -416,9 +407,9 @@ antlr3BitsetORInPlace(pANTLR3_BITSET bitset, pANTLR3_BITSET bitset2)
      */
     minimum = min(bitset->length, bitset2->length);
 
-    for	(i = minimum - 1; i >= 0; i--)
+    for	(i = minimum; i > 0; i--)
     {
-	bitset->bits[i] |= bitset2->bits[i];
+	bitset->bits[i-1] |= bitset2->bits[i-1];
     }
 }
 

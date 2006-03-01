@@ -28,15 +28,14 @@ int main()
     pANTLR3_STRING_FACTORY  sf;
     pANTLR3_STRING	    string;
 
-    pANTLR3_TOKEN_FACTORY   tf;
-    pANTLR3_COMMON_TOKEN    tok;
 
-    pANTLR3_LEXER   lex;
 
     int f[] = {'9','8','7'};
     unsigned char   * retkey;
     void	    * retdata;
 
+    int x;
+    
     bs1  = antlr3BitsetOf(0, 64, -1);
     bs2  = antlr3BitsetOf(0, 64, 1242, 345678, 9, 10, 11, 12, 13, 14, 15, 34, 56, 0, -1);
 

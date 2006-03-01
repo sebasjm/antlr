@@ -4,25 +4,45 @@ options {
 
 }
 
+creates	: create+;
+
 create
-	: CREATEINDEX filename indexname by_specs assoc_specs 
+	: x=CREATEINDEX 
+	{
+	    printf("found create.index\n");
+	    }
+	filename indexname by_specs assoc_specs 
+	{
+	    printf("Done! :-)\n");
+	}
 	;
 
 filename
-	: NAME
+	: n=NAME
+	{
+	    printf("Found filename is \%s\n", $n.text);
+	}
 	;
 	
 indexname
-       scope { int jimi;}
+       //scope { int jimi;}
 	: NAME
+	{
+	    printf("Found index name\n");
+	}
 	;
 	
 by_specs
-	: (BY DREF)+
+	: (BY DREF
+	    {printf("Found another BY clause\n");}
+	)+
 	;
 	
 assoc_specs
 	: ASSOCIATE DREF+
+	{
+	    printf("Associated clause parsed!\n");
+	    }
 	;
 
 // LEXER STARTS HERE --------------------------------------
