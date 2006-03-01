@@ -315,7 +315,7 @@ element
     	if ( showActions ) {out("{"); out(gpred.getText()); out("}? =>");}
     	else {out("{...}? =>");}
     	}
-    |   EPSILON {out(" /* epsilon */ ");}
+    |   EPSILON
     ;
 
 ebnf:   block[true] {out(" ");}
