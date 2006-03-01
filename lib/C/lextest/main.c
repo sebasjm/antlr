@@ -1,6 +1,6 @@
 #include    <antlr3.h>
-#include    <lextestLexer.h>
-#include    <lextest.h>
+#include    <cmqlLexer.h>
+#include    <cmql.h>
 
 int main()
 {
@@ -12,11 +12,11 @@ int main()
 
     input	= antlr3AsciiFileStreamNew("inputtext.txt");
 
-    lxr		= lextestLexerNew(input);
+    lxr		= cmqlLexerNew(input);
 
     tstream	= antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lxr->pLexer->tokSource);
 
-    psr		= lextestNew(tstream);
+    psr		= cmqlNew(tstream);
 
     psr->creates(psr);
 

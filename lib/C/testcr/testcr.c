@@ -34,7 +34,6 @@ int main()
     unsigned char   * retkey;
     void	    * retdata;
 
-    int x;
     
     bs1  = antlr3BitsetOf(0, 64, -1);
     bs2  = antlr3BitsetOf(0, 64, 1242, 345678, 9, 10, 11, 12, 13, 14, 15, 34, 56, 0, -1);
@@ -43,17 +42,6 @@ int main()
     {
 	printf("Bitsets are not equal but say they are!\n");
     }
-    bs1->free(bs1);
-    bs2->free(bs2);
-
-    bs1	= antlr3BitsetLoad(1, 0x00400044FF);
-    bs2 = antlr3BitsetLoad(3, 0x00400044FF, 0x2, 0x00);
-    
-    if	(bs1->equals(bs1, bs2) == ANTLR3_TRUE)
-    {
-	printf("Bitsets are not equal but say they are!\n");
-    }
-    
     bs1->free(bs1);
     bs2->free(bs2);
 

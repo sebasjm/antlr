@@ -124,6 +124,12 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\cmql.c">
+			</File>
+			<File
+				RelativePath=".\cmqlLexer.c">
+			</File>
+			<File
 				RelativePath=".\inputtext.txt">
 			</File>
 			<File
@@ -145,15 +151,26 @@
 			Name="grammars"
 			Filter="">
 			<File
+				RelativePath=".\cmql.g">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Translating to C"
+						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/java/main/build/classes;C:/antlrsrc/code/antlr/main/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)"
+						AdditionalDependencies="C:\antlrsrc\code\antlr\main\build\classes\org\antlr\codegen\templates\C\C.stg"
+						Outputs="$(InputDir)cmql.c;$(InputDir)cmql.h;$(InputDir)cmqlLexer.c;$(InputDir)cmqlLexer.h"/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\lextest.g">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating antlr lexer debug mode (C output)"
-						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/build/classes;C:/antlrsrc/code/antlr/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)
-"
-						AdditionalDependencies="..\..\src\org\antlr\codegen\templates\C\C.stg"
+						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/java/main/build/classes;C:/antlrsrc/code/antlr/main/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)"
+						AdditionalDependencies="C:\antlrsrc\code\antlr\main\build\classes\org\antlr\codegen\templates\C\C.stg"
 						Outputs="$(InputDir)$(TargetName)Lexer.c;$(InputDir)$(TargetName)Lexer.h;$(InputDir)$(TargetName).c;$(InputDir)$(TargetName).h"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -166,17 +183,27 @@
 						Outputs="$(InputDir)$(TargetName)Lexer.c;$(InputDir)$(TargetName)Lexer.h"/>
 				</FileConfiguration>
 			</File>
-			<Filter
-				Name="Header Files"
-				Filter="h;hpp;hxx;hm;inl;inc;xsd"
-				UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-				<File
-					RelativePath=".\lextest.h">
-				</File>
-				<File
-					RelativePath=".\lextestLexer.h">
-				</File>
-			</Filter>
+		</Filter>
+		<Filter
+			Name="Indexdefs"
+			Filter="*.mvd">
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\cmql.h">
+			</File>
+			<File
+				RelativePath=".\cmqlLexer.h">
+			</File>
+			<File
+				RelativePath=".\lextest.h">
+			</File>
+			<File
+				RelativePath=".\lextestLexer.h">
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -3,8 +3,16 @@ options {
   language=C;
 
 }
+@members
+{
+     of;
+}
+creates	
+@init
+{
 
-creates	: create+;
+}
+: create+;
 
 create
 	: x=CREATEINDEX 
