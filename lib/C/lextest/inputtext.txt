@@ -1,3 +1,192 @@
-CREATE.INDEX FRED INDNAME BY $1 ASSOCIATE $5 $6
-CREATE.INDEX FRED INDNAME BY $1 ASSOCIATE $4
+dictionary {
+  element {
+    refno = $0;
+    attrno = "0";
+    justification = "L";
+    name = "ID";
+    width = "10";
+  }
+  element {
+    refno = $1;
+    attrno = "4";
+    heading = "DUP.FLAG";
+    justification = "L";
+    mv = "S";
+    name = "4";
+    width = "1";
+  }
+  element {
+    refno = $2;
+    attrno = "1";
+    heading = "CON.FLAG";
+    justification = "R";
+    mv = "M";
+    name = "1";
+    width = "1";
+  }
+  element {
+    refno = $3;
+    attrno = "2";
+    heading = "TR.FLAG";
+    justification = "R";
+    mv = "M";
+    name = "2";
+    width = "1";
+  }
+  element {
+    refno = $4;
+    attrno = "3";
+    heading = "DELETE";
+    justification = "R";
+    mv = "M";
+    name = "3";
+    width = "1";
+  }
+  element {
+    refno = $5;
+    attrno = "5";
+    heading = "SETTLEMENT";
+    justification = "R";
+    mv = "M";
+    name = "5";
+    width = "2";
+  }
+  element {
+    refno = $6;
+    attrno = "6";
+    heading = "CON.NARR";
+    justification = "T";
+    mv = "M";
+    name = "6";
+    width = "40";
+  }
+  element {
+    refno = $7;
+    attrno = "7";
+    heading = "CHARM.FLAG";
+    justification = "R";
+    mv = "M";
+    name = "7";
+    width = "1";
+  }
+  element {
+    refno = $8;
+    attrno = "8";
+    heading = "CHARM.NARR";
+    justification = "T";
+    mv = "M";
+    name = "8";
+    width = "40";
+  }
+  element {
+    refno = $9;
+    attrno = "9";
+    heading = "EXTRA.CON";
+    justification = "R";
+    mv = "M";
+    name = "9";
+    width = "1";
+  }
+  element {
+    refno = $10;
+    attrno = "10";
+    heading = "CH.STP.IND";
+    justification = "R";
+    mv = "M";
+    name = "10";
+    width = "1";
+  }
+  element {
+    refno = $11;
+    attrno = "11";
+    heading = "SE.RET.CAT";
+    justification = "R";
+    mv = "M";
+    name = "11";
+    width = "1";
+  }
+  element {
+    refno = $12;
+    attrno = "12";
+    heading = "HOLD.FLAG";
+    justification = "R";
+    mv = "M";
+    name = "12";
+    width = "1";
+  }
+  element {
+    refno = $13;
+    attrno = "13";
+    heading = "HOLD.FLAG";
+    justification = "R";
+    mv = "M";
+    name = "13";
+    width = "1";
+  }
+  element {
+    refno = $14;
+    attrno = "14";
+    heading = "MULTI FLAG";
+    justification = "R";
+    mv = "M";
+    name = "14";
+    width = "1";
+  }
+  element {
+    refno = $15;
+    attrno = "15";
+    heading = "DIV MAN FLAG";
+    justification = "R";
+    mv = "M";
+    name = "15";
+    width = "1";
+  }
+  element {
+    refno = $16;
+    attrno = "16";
+    heading = "DEPOT";
+    justification = "R";
+    mv = "M";
+    name = "16";
+    width = "3";
+  }
+  element {
+    refno = $17;
+    attrno = "17";
+    justification = "R";
+    mv = "M";
+    name = "17";
+    width = "1";
+  }
+  element {
+    refno = $18;
+    attrno = "18";
+    heading = " ";
+    justification = "R";
+    mv = " ";
+    name = "18";
+    width = "10";
+  }
+  element {
+    refno = $19;
+    attrno = "19";
+    justification = "L";
+    mv = "M";
+    name = "19";
+    width = "10";
+  }
+}
+query {
+  filename="DAILY";
+  filetype=2;
+  command="SORT DAILY WITH NO 4 BY 4 1 2 34";
+  type=DATASTREAM;
+  processor="SORT^%SYS.MVQ";
+  options="";
+  sorted=true;
+  selectlist=false;
+  body {
+    WITH NO $1 BY $1 $2 $3 "34" @{ $2 $3 $4 $1 $5 $6 $7 $8 $9 $10 $11 $12 $13 $14 $15 $16 $17 $18 $19 } 
+  }
+}
 

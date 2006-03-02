@@ -17,7 +17,7 @@ int main()
     tstream	= antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lxr->pLexer->tokSource);
 
     psr		= cmqlNew(tstream);
-    psr->pParser->rec->errorRecovery
-    psr->creates(psr);
+
+    psr->query(psr);
 
 }

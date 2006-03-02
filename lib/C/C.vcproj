@@ -246,8 +246,9 @@
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="COPY $(InputPath) C:\antlrsrc\code\antlr\build\classes\org\antlr\codegen\templates\C"
-						Outputs="C:\antlrsrc\code\antlr\build\classes\org\antlr\codegen\templates\C\C.stg"/>
+						CommandLine="COPY $(InputPath) C:\antlrsrc\code\antlr\main\build\classes\org\antlr\codegen\templates\C
+"
+						Outputs="C:\antlrsrc\code\antlr\main\build\classes\org\antlr\codegen\templates\C\C.stg"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">

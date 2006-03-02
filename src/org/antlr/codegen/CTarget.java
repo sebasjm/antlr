@@ -110,6 +110,28 @@ public class CTarget extends Target {
 		return false;
 	}
         
+        public String getTargetCharLiteralFromANTLRCharLiteral(
+		CodeGenerator generator,
+		String literal)
+	{
+                
+                
+                
+                
+                if  (literal.startsWith("'\\u") )
+                {
+                    literal = "0x" +literal.substring(3, 7);
+                }
+                else
+                {
+                    int c = Character.valueOf(literal.charAt(1));
+                    if  (c < 32 || c > 127) {
+                        literal  =  "0x" + Integer.toHexString(c);
+                    }
+                }
+                
+                return literal;
+	}
         
 	/** Convert from an ANTLR string literal found in a grammar file to
 	 *  an equivalent string literal in the target language.  For Java, this

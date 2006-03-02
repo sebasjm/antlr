@@ -47,7 +47,7 @@ ANTLR3_BOOLEAN parseError;
 
 @lexer::members {
 
-    private boolean lexError;
+ANTLR3_BOOLEAN lexError;
 
 }
 
@@ -179,8 +179,8 @@ querySpecs
 	;
 
 truefalse
-        :   TRUE
-        |   FALSE
+        :   BOOLTRUE
+        |   BOOLFALSE
         ;
 
 
@@ -290,7 +290,7 @@ connective
 	|	HEADING STRING                  
 	|	HDR_SUPP                        
 	|	ID_SUPP                         
-	|	LPTR                            
+	|	LPTRQUAL                         
 	|	MARGIN integerparam             
 	|	NOPAGE                          
 	|	NOSPLIT                         
@@ -352,7 +352,7 @@ idselect_primary
 
 
 idselect_secondary
-        :  (op=EQ|op=NE|op=LT|op=GT|op=LE|op=GE) opstr=STRING
+        :  (op=EQ|op=NE|op=LTHAN|op=GT|op=LE|op=GE) opstr=STRING
 
             
 
@@ -482,7 +482,7 @@ value_selection_exp
 value_selection_primary
 	:	
                 STRING
-	|	(NE|LT|GT|LE|GE|EQ) (STRING | dict_element)	
+	|	(NE|LTHAN|GT|LE|GE|EQ) (STRING | dict_element)	
 	|       BETWEEN withbetween1 withbetween2
 	|	LIKE STRING	
 	|	UNLIKE STRING	
@@ -563,13 +563,13 @@ limiter_op
 
 limiter:
             (NOT NE s=STRING) 
-          | (NOT LT s=STRING) 
+          | (NOT LTHAN s=STRING) 
           | (NOT GT s=STRING) 
           | (NOT LE s=STRING) 
           | (NOT GE s=STRING) 
           | (NOT EQ s=STRING) 
           | (NE s=STRING)     
-          | (LT s=STRING)     
+          | (LTHAN s=STRING)     
           | (GT s=STRING)     
           | (LE s=STRING)     
           | (GE s=STRING)     
@@ -664,7 +664,7 @@ ELEMENT         :       'element';
 ENUM            :       'ENUM';
 EQ              :       'EQ' | '=';
 EVAL            :       'EVAL';
-FALSE           :       'false';
+BOOLFALSE       :       'false';
 FILENAME        :	'filename';
 FILETYPE        :       'filetype';
 FMT             :	'FMT';
@@ -684,8 +684,8 @@ ITEMSTREAM	:	'ITEMSTREAM';
 JUSTIFICATION   :       'justification';
 LE              :       'LE';
 LIKE            :	'LIKE';
-LPTR            :	'LPTR';
-LT              :       'LT';
+LPTRQUAL        :	'LPTR';
+LTHAN           :       'LT';
 MARGIN          :	'MARGIN';
 MAX             :       'MAX';
 MIN             :       'MIN';
@@ -721,7 +721,7 @@ TERMINAL        :       'TERMINAL';
 TO              :       'TO';
 TOTAL           :       'TOTAL';
 TRANSPORT       :       'TRANSPORT';
-TRUE            :       'true';
+BOOLTRUE        :       'true';
 TYPE            :	'type';
 UNIQUE          :       'UNIQUE';
 UNLIKE          :       'UNLIKE';
