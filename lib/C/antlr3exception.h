@@ -50,6 +50,9 @@
  */
 #define	ANTLR3_EARLY_EXIT_NAME	     "Early exit"
 
+#define	ANTLR3_FAILED_PREDICATE_EXCEPTION   6
+#define	ANTLR3_FAILED_PREDICATE_NAME	    "Predicate failed!"
+
 /** Base structure for an ANTLR3 exception tracker
  */
 typedef	struct ANTLR3_EXCEPTION_struct
@@ -118,6 +121,9 @@ typedef	struct ANTLR3_EXCEPTION_struct
      */
     ANTLR3_UINT32   state;
 
+    /** Rule name for failed prediacte exception
+     */
+    void	    * ruleName;
 
     /** Pointer to the next exception in the chain (if any)
      */

@@ -260,25 +260,22 @@ has the callable functions (rules) shown below,
  */
 <endif>
 <@end>
-<if(LEXER)>
 
-/**
- * Cyclic DFA's to drive this lexer
- * =============================================================================
- * \{
+/** Tricky typedef state to allow dfa states in Cyclic dfas to return the address of the
+ *  next dfa state that is predicted for the current dfa state, or the address
+ *  of themselves if they predict an alt. :-)
+ *
+ * \remark
+ * In case you can't read this, and I think no less of you if you cannot, 
+ * this declares ANTLR3_DFASTATE to be a pointer to a
+ * a function that accepts a context pointer and a pointer to the alt, and returns
+ * a pointer to a function that accepts a context pointer and a pointer to int and
+ * returns a pointer to void (which we then cast to ANTLR3_DFASTATE). There are other ways
+ * of doing this such as cascading definitions, but this works just fine.
+ *
+ * Jim Idle - March 2006
  */
-<cyclicDFAs>
-
-/* End of Cyclic DFAs
- * =============================================================================
- */
-/** \} */
-
-
-
-<endif>
-<if(PARSER)>
-<endif>
+typedef	    void *(*(*ANTLR3_DFASTATE)(p<name>, pANTLR3_UINT32))(p<name>, pANTLR3_UINT32) ;
 
 <rules:{r |<headerReturnScope(ruleDescriptor=r.ruleDescriptor)>}; separator="\n">
 
@@ -392,7 +389,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 #undef	    failedFlag
 #undef	    theInput
 #undef	    LA
-#undef	    isException
+#undef	    hasException
 #undef	    theException
 #undef	    exConstruct
 #undef	    inputConsume
@@ -409,16 +406,18 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 #define	    matchs(s)		    lexr->matchs(lexr->me, s)
 #define	    matchRange(c1,c2)	    lexr->matchRange(lexr->me, c1, c2)
 #define	    ltoken()		    lexr->token
-#define	    hasfailed()		    (lexr->rec->failed == ANTLR3_TRUE)
+#define	    hasFailed()		    (lexr->rec->failed == ANTLR3_TRUE)
 #define	    failedFlag()	    lexr->rec->failed
 #define	    theInput()		    lexr->input
 #undef	    LA
 #define	    LA(n)		    theInput()->istream->LA(lexr->input->istream->me, n)
-#define	    isException()	    (theInput()->istream->error == ANTLR3_TRUE)
+#define	    hasException()	    (theInput()->istream->error == ANTLR3_TRUE)
 #define	    theException()	    theInput()->istream->exception
 #define	    exConstruct()	    theInput()->istream->exConstruct(theInput()->istream)
 #define	    inputConsume()	    theInput()->istream->consume(theInput()->istream->me)
 #define	    lrecover()		    lexr->recover(lexr->me)
+#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream->me)
+#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream->me, m)
 <endif>
 
 <if(PARSER)>
@@ -427,8 +426,8 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
  
 #undef	    prsr		    
 #undef	    haveAlreadyParsedRule
-#undef	    thePinput
-#undef	    isException
+#undef	    theInput
+#undef	    hasException
 #undef	    theException
 #undef	    tmatch
 #undef	    tmatchAny
@@ -443,19 +442,26 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 
 #define	    prsr		    ctx->pParser  
 #define	    haveAlreadyParsedRule(r) prsr->rec->alreadyParsedRule(prsr->me, r)
-#define	    thePinput()		    prsr->tstream
-#define	    isException()	    (thePinput()->istream->error == ANTLR3_TRUE)
-#define	    theException()	    thePinput()->istream->exception
-#define	    tmatch(t, fs)	    prsr->rec->match(prsr->me, thePinput()->istream, t, fs)
-#define	    tmatchAny()		    prsr->rec->matchAny(prsr->me, thePinput()->istream->me)
+#define	    theInput()		    prsr->tstream
+#define	    hasException()	    (theInput()->istream->error == ANTLR3_TRUE)
+#define	    theException()	    theInput()->istream->exception
+#define	    tmatch(t, fs)	    prsr->rec->match(prsr->me, theInput()->istream, t, fs)
+#define	    tmatchAny()		    prsr->rec->matchAny(prsr->me, theInput()->istream->me)
 #define	    followStk()		    prsr->rec->following
 #define	    followPush(x)	    followStk()->push(followStk(), ((void *)(x)), NULL)
 #define	    followPop()		    followStk()->pop(followStk())
-#define	    precover()		    prsr->rec->recover(prsr->me, thePinput()->istream)
+#define	    precover()		    prsr->rec->recover(prsr->me, theInput()->istream)
 #define	    preportError()	    prsr->rec->reportError(prsr)
-#define	    LA(n)		    thePinput()->istream->LA(thePinput()->me, n)
-#define	    LT(n)		    thePinput()->LT(thePinput()->me, n)
-#define	    exConstruct()	    thePinput()->istream->exConstruct(thePinput()->istream)
+#define	    LA(n)		    theInput()->istream->LA(theInput()->me, n)
+#define	    LT(n)		    theInput()->LT(theInput()->me, n)
+#define	    exConstruct()	    theInput()->istream->exConstruct(theInput()->istream)
+#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream->me)
+#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream->me)
+#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream->me, m)
+#define	    perrorRecovery()	    prsr->rec->errorRecovery
+#define	    hasFailed()		    prsr->rec->failed
+#define	    precoverFromMismatchedSet(s)	prsr->rec->recoverFromMismatchedSet(prsr->rec->me, theInput()->istream, s)
+#define	    precoverFromMismatchedElement(e)	prsr->rec->recoverFromMismatchedElement(prsr->rec->me, theInput()->istream, s)
 <endif>
 
 #endif
@@ -621,7 +627,6 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 /* =========================================================================
 * Cyclic DFAs for the lexer
 */
-<cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
 <cyclicDFAs>
 
 >>
@@ -704,6 +709,7 @@ static void	<name>Free(p<name> ctx);
  */
 static	void <name>LoadFollowSets();
 
+<cyclicDFAs:{dfa | <cyclicDFADeclare(decisionNumber=dfa.decisionNumber,states=dfa.states)>}>
 
 /** \brief Create a new <name> parser and retrun a context for it.
  *
@@ -807,7 +813,6 @@ void <name>LoadFollowSets()
 <rules; separator="\n\n">
 
 <! define a singleton instance for each cyclic DFA then define DFAs !>
-<cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
 <cyclicDFAs>
 
 <synpreds:{p | <synpred(name=p)>}>
@@ -907,7 +912,7 @@ static <returnType()>
     <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
 <else>
 <if(!emptyRule)>
-    if (isException())
+    if (hasException())
     {
         preportError();
         precover();
@@ -926,7 +931,7 @@ static <returnType()>
 catch(decl,action) ::= <<
 /* catch(decl,action)
  */
-if  (isException() && theException()->type == <e.decl> )
+if  (hasException() && theException()->type == <e.decl> )
 {
     <e.action>
 }
@@ -945,8 +950,6 @@ ruleDeclarations() ::= <<
 <if(memoize)>
 ANTLR3_UINT64 <ruleDescriptor.name>_StartIndex;
 <endif>
-<ruleDescriptor.useScopes:{<scopeType(sname=it.name)>   <scopeTop(sname=it.name)>;}; separator="\n">
-<ruleDescriptor.ruleScope:{<scopeType(sname=it.name)>   <scopeTop(sname=it.name)>;}; separator="\n">
 >>
 
 ruleInitializations() ::= <<
@@ -968,16 +971,16 @@ ruleLabelDefs() ::= <<
 /* ruleLabelDefs()
  */
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
-    :{<labelType> <it.label.text>=NULL;}; separator="\n"
+    :{<labelType>    <it.label.text>;}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{pANLTR3_LIST list_<it.label.text>=NULL;}; separator="\n"
+    :{pANLTR3_LIST    list_<it.label.text>;}; separator="\n"
 >
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(label=it); separator="\n"
 >
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{pANLTR3_LIST list_<it>;}; separator="\n"
+    :{pANLTR3_LIST     list_<it>;}; separator="\n"
 >
 >>
 
@@ -985,10 +988,10 @@ ruleLabelInitializations() ::= <<
 /* ruleLabelInitializations()
  */
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
-    :{<labelType> <it.label.text>=NULL;}; separator="\n"
+    :{<it.label.text>       = NULL;}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{pANLTR3_LIST list_<it.label.text>=NULL;}; separator="\n"
+    :{list_<it.label.text>     = NULL;}; separator="\n"
 >
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(label=it); separator="\n"
@@ -1065,7 +1068,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     ANTLR3_UINT32	    charPosition;
     ANTLR3_UINT32	    channel;
 
-    type		= <ruleName>;
+    type		= t<ruleName>;
     start		= getCharIndex();
     line		= getLine();
     charPosition	= getCharPositionInLine();
@@ -1076,7 +1079,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     
     <block>
         
-    if ( ltoken() == NULL && !isException()) 
+    if ( ltoken() == NULL && !hasException()) 
     {
 	emitNew(type,line,charPosition,channel,start,getCharIndex()-1);
     }
@@ -1292,7 +1295,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label> = (<labelType>)LT(1);<\n>
 <endif>
-tmatch(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBacktrackFailure()>
+tmatch(t<token>, FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBacktrackFailure()>
 >>
 
 /** ids+=ID */
@@ -1342,9 +1345,9 @@ if ( <s> )
     <postmatchCode>
     inputConsume();
 <if(!LEXER)>
-    errorRecovery=false;
+    perrorRecovery()=ANTLR3_FALSE;
 <endif>
-    <if(backtracking)>failed=false;<endif>
+    <if(backtracking)>weFailed()=ANTLR3_FALSE;<endif>
 }
 else 
 {
@@ -1354,7 +1357,7 @@ else
 <if(LEXER)>
     lrecover();
 <else>
-    precoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
+    precoverFromMismatchedSet(FOLLOW_set_in_<ruleName><elementIndex>);
 <endif>
     goto rule<ruleDescriptor.name>Ex;
 }<\n>
@@ -1433,7 +1436,7 @@ followPush(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <else>
 <rule>(ctx<if(args)>, <args><endif>);<\n>
 <endif>
-if  (isException())
+if  (hasException())
 {
     goto rule<ruleDescriptor.name>Ex;
 }
@@ -1495,8 +1498,18 @@ validateSemanticPredicate(pred,description) ::= <<
 if ( !(<evalPredicate(...)>) ) 
 {
     <ruleBacktrackFailure()>
-    throw new FailedPredicateException(input, "<ruleName>", "<description>");
+    <newFPE(...)>
 }
+>>
+
+newFPE() ::= <<
+    /* newNVException()
+     */
+    exConstruct();
+    theException()->type         = ANTLR3_FAILED_PREDICATE_EXCEPTION;
+    theException()->message      = "<description>";
+    theException()->ruleName	 = "<ruleName>";
+    <\n>
 >>
 
 // F i x e d  D F A  (if-then-else)
@@ -1525,15 +1538,15 @@ dfaState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
 >>
 
 newNVException() ::= <<
-    /* newNVException()
-     */
-    exConstruct();
-    theException()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
-    theException()->message      = "<description>";
-    theException()->decisionNum  = <decisionNumber>;
-    theException()->state        = <stateNumber>;
-    <@noViableAltException()>
-    <\n>
+/* newNVException()
+ */
+exConstruct();
+theException()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
+theException()->message      = "<description>";
+theException()->decisionNum  = <decisionNumber>;
+theException()->state        = <stateNumber>;
+<@noViableAltException()>
+<\n>
 >>
 
 /** Same as a normal DFA state except that we don't examine lookahead
@@ -1608,7 +1621,7 @@ default:
 <else>
     <ruleBacktrackFailure()>
     <newNVException()>
-    <\n>
+    goto rule<ruleDescriptor.name>Ex;<\n>
 <endif>
 }<\n>
 >>
@@ -1653,51 +1666,108 @@ dfaEdgeSwitch(labels, targetState) ::= <<
 dfaDecision(decisionNumber,description) ::= <<
 /* dfaDecision(decisionNumber,description)
  */
-alt<decisionNumber> = dfa<decisionNumber>.predict(input); <checkRuleBacktrackFailure()>
+alt<decisionNumber> = dfa<decisionNumber>Predict(ctx); <checkRuleBacktrackFailure()>
+>>
+
+cyclicDFADeclare(decisionNumber,states) ::= <<
+/* Prediction routine for DFA #<decisionNumber>
+ */
+static ANTLR3_UINT32 dfa<decisionNumber>Predict(p<name> ctx);
+<states:{state | <DFAStateDeclare(decisionNumber=dfa.decisionNumber,state=state)>}>
+>>
+DFAStateDeclare(decisionNumber,state) ::= <<
+static ANTLR3_DFASTATE dfa<decisionNumber>S<state.stateNumber> (p<name>, pANTLR3_UINT32);<\n>
 >>
 
 /** The overall cyclic DFA chunk; contains all the DFA states */
 cyclicDFA(className,ruleName,ruleDescriptor,decisionNumber,states,description) ::= <<
 /* cyclicDFA(className,ruleName,ruleDescriptor,decisionNumber,states,description)
  */
-class DFA<decisionNumber> extends DFA {
-    public int predict(IntStream input) throws RecognitionException 
+/** Local function to evalute the static states and predict the
+ *  alternative states from decision #<decisionNumber>
+ *  cf: <description>
+ */
+static ANTLR3_UINT32 dfa<decisionNumber>Predict(p<name> ctx)
+{
+    ANTLR3_UINT32	alt;	    /* Alternate that is transitioned and finally selected */
+    ANTLR3_DFASTATE	next;	    /* Where to go next if we don't predict an alt */
+    ANTLR3_UINT64	mark;	    /* So we can rewind if we predict successfully  */
+    
+    alt	    = 0;		/* Nothing predicted yet    */
+    next    = NULL;
+    
+    mark    = markMyWords();	/* Stamp the input */
+    
+    /* Call state 0 and see where we end up!
+     */
+    next    = (ANTLR3_DFASTATE)dfa<decisionNumber>S0;
+    do
     {
-        return predict(input, s0);
+	next    = (ANTLR3_DFASTATE)(*next)(ctx, &alt); 
+	
+	if  (next == NULL || hasException())
+	{
+	    /* Nothing predicted - select alt 1 */
+	    return  1;
+	}
+	
+	if  (alt \<= 0)
+	{
+	    inputConsume();
+	}
     }
-    <states>
+    while
+	(alt \<= 0 && !hasException());
+
+    return alt;		/* May be invalid if an exception is outstanding. */
 }
+
+/* DFA state functions for DFA #<decisionNumber>
+ */
+<states>
 >>
 
 /** A state in a cyclic DFA */
 cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
 /* cyclicDFAState(stateNumber,edges,needErrorClause)
  */
-DFA.State s<stateNumber> = new DFA.State() {
-    public DFA.State transition(IntStream input) throws RecognitionException {
-        int LA<decisionNumber>_<stateNumber> = LA(1);
-        <edges>
-        <if(needErrorClause)>
-        <if(backtracking)>
-        if (backtracking>0) {failed=true; return null;}
-        <endif>
-        NoViableAltException nvae =
-	    new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
-        <@noViableAltException()>
-        throw nvae;
-        <endif>
+static ANTLR3_DFASTATE
+dfa<decisionNumber>S<stateNumber>(p<name> ctx, pANTLR3_UINT32 alt)
+{
+    
+
+    ANTLR3_INT32    LA<decisionNumber>_<stateNumber> = LA(1);
+    
+    <edges>
+    <if(needErrorClause)>
+    <if(backtracking)>
+    if (backtracking>0)
+    {
+	failedFlag()=ANTLR3_TRUE; 
+	return (ANTLR3_DFASTATE)NULL;
     }
-};<\n>
+    <endif>
+    <newNVException(...)>
+    <@noViableAltException()>
+    return (ANTLR3_DFASTATE)NULL;
+    <endif>
+}<\n>
 >>
 
 /** An accept state for a cyclic DFA */
 cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
 /* cyclicDFAAcceptState(stateNumber,predictAlt)
  */
-DFA.State s<stateNumber> = new DFA.State()
+static ANTLR3_DFASTATE
+dfa<decisionNumber>S<stateNumber>(p<name> ctx, pANTLR3_UINT32 alt)
 {
-  /* NOt sure what this does in Java -> have to test */
-    {alt=<predictAlt>;}
+    *alt = <predictAlt>;
+    
+    /* This dfa is at an end, we will pick that up from the fact 
+     * that we set an alt. We return ourselves as NULL singifies a
+     * backtracking or other error.
+     */
+    return  (ANTLR3_DFASTATE)dfa<decisionNumber>S<stateNumber>;
 };<\n>
 >>
 
@@ -1707,9 +1777,9 @@ DFA.State s<stateNumber> = new DFA.State()
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates) ::= <<
 /* cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates)
  */
-if ( <labelExpr> <if(predicates)>&& <predicates><endif>)
+if ( t<labelExpr> <if(predicates)>&& <predicates><endif>)
 {
-    return s<targetStateNumber>;
+    return (ANTLR3_DFASTATE)dfa<decisionNumber>S<targetStateNumber>;
 }<\n>
 >>
 
@@ -1717,7 +1787,7 @@ if ( <labelExpr> <if(predicates)>&& <predicates><endif>)
  *  always jump to the target.
  */
 eotDFAEdge(targetStateNumber,edgeNumber, predicates) ::= <<
-return s<targetStateNumber>; /* eotDFAEdge(targetStateNumber,edgeNumber, predicates) */<\n>
+return (ANTLR3_DFASTATE)dfa<decisionNumber>S<targetStateNumber>; /* eotDFAEdge(targetStateNumber,edgeNumber, predicates) */<\n>
 >>
 
 // C y c l i c  S W I T C H
@@ -1731,33 +1801,40 @@ cyclicDFAStateSwitch(stateNumber,labels,edges,
 /* cyclicDFAStateSwitch(stateNumber,labels,edges,
  *                   needErrorClause,EOTTargetStateNumber)
  */
-DFA.State s<stateNumber> = new DFA.State() {
-    public DFA.State transition(IntStream input) throws RecognitionException {
-        switch ( LA(1) ) 
-        {
-        <edges; separator="\n">
-        
-        default:
+static ANTLR3_DFASTATE
+dfa<decisionNumber>S<stateNumber>(p<name> ctx, pANTLR3_UINT32 alt)
+{
+    switch (LA(1))
+    {
+	<edges; separator="\n">
+    
+	default:
 <if(needErrorClause)>
-            <if(backtracking)>
-            if (backtracking>0) {failed=true; return null;}
-            <endif>
-            NoViableAltException nvae =
-                new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
-            throw nvae;
+	    <if(backtracking)>
+	    if (backtracking>0) 
+	    {
+		failedFlag()	= ANTLR3_TRUE;
+		return (ANTLR3_DFASTATE)NULL;
+		break;
+	    }
+	    <endif>
+	    <newNVException(...)>
+	    <@noViableAltException()>
+	    return (ANTLR3_DFASTATE)NULL;<\n>
+	    break;
 <else>
-            return s<EOTTargetStateNumber>;<\n>	
+	    return dfa<decisionNumber>S<EOTTargetStateNumber>;<\n>
+	    break;
 <endif>
-        }
     }
-};<\n>
+}<\n>
 >>
 
 cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
 /* cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber)
  */
-<labels:{case <it>:}; separator="\n">
-    return s<targetStateNumber>;<\n>
+<labels:{case t<it>:}; separator="\n">
+    return (ANTLR3_DFASTATE)dfa<decisionNumber>S<targetStateNumber>;<\n>
 >>
 
 // D F A  E X P R E S S I O N S
@@ -1781,10 +1858,10 @@ lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber> == t<atom>
 isolatedLookaheadTest(atom,k,atomAsInt) ::= "LA(<k>) == t<atom>"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
-(LA<decisionNumber>_<stateNumber> \>= <lower> && LA<decisionNumber>_<stateNumber> \<= <upper>)
+(LA<decisionNumber>_<stateNumber> \>= t<lower> && LA<decisionNumber>_<stateNumber> \<= t<upper>)
 >>
 
-isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "(LA(<k>) \>= <lower> && LA(<k>) \<= <upper>)"
+isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "(LA(<k>) \>= t<lower> && LA(<k>) \<= t<upper>)"
 
 setTest(ranges) ::= "<ranges; separator=\" || \">"
 
@@ -1892,9 +1969,9 @@ globalAttributeScopeDef(scope) ::=
  *  and <scopePopName(sname=scope.name)>()
  */
 pANTLR3_STACK <scopeStack(sname=scope.name)>;
-/** Pointer to the top of the stack for teh global scope <scopeStack(sname=scope.name)>
+/** Pointer to the top of the stack for the global scope <scopeStack(sname=scope.name)>
  */
-<scopeType(sname=scope.name)>    <scopeTop(sname=scope.name)>;
+<scopeType(sname=scope.name)>    <scopeTopDecl(sname=scope.name)>;
 <scopeType(sname=scope.name)>    <scopePushName(sname=scope.name)>(struct <name>_Ctx_struct * ctx);
 <endif>
 >>
@@ -1907,7 +1984,8 @@ ruleAttributeScopeDef(scope) ::= <<
  *  and <scopePopName(sname=scope.name)>()
  */
 pANTLR3_STACK <scopeStack(sname=scope.name)>;
-<scopeType(sname=scope.name)>   <scopePushName(sname=scope.name)>(struct <name>_Ctx_struct * ctx);
+<scopeType(sname=scope.name)>   (*<scopePushName(sname=scope.name)>)(struct <name>_Ctx_struct * ctx);
+<scopeType(sname=scope.name)>   <scopeTopDecl(sname=scope.name)>;
 <endif>
 >>
 
@@ -1944,12 +2022,16 @@ ctx-><scopePushName(sname=scope.name)> = <scopePushName(sname=scope.name)>;
 <endif>
 >>
 
-scopeTop(sname) ::= <<
+scopeTopDecl(sname) ::= <<
 p<sname>Top
 >>
 
+scopeTop(sname) ::= <<
+ctx-><scopeTopDecl(sname)>
+>>
+
 scopePop(sname) ::= <<
-ctx->p<sname>Pop(ctx->)
+<scopePopName(sname=sname)>();
 >>
 
 scopePush(sname) ::= <<
@@ -2037,7 +2119,7 @@ static <scopeType(sname=scope.name)>
 
 returnType() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-p<ruleDescriptor.name>_return
+<ruleDescriptor.name>_return
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnType>

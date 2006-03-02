@@ -1,15 +1,45 @@
 #include    <antlr3.h>
 #include    <lex1.h>
 
+typedef	    void *(*(*dfastate)(plex1, pANTLR3_UINT32))(plex1, pANTLR3_UINT32) ;
+dfastate funcb(plex1 ctx, pANTLR3_UINT32 i);
+dfastate funcc(plex1 ctx, pANTLR3_UINT32 i);
+dfastate funca(plex1     ctx, pANTLR3_UINT32 i)
+{
+	dfastate next;
+
+	next = funcb(ctx, i);
+
+	if (*i != 1)
+	{
+	    next = (dfastate)(*next)(ctx, i);
+	}
+	return (dfastate)next;
+	
+}
+
+dfastate funcb(plex1 ctx, pANTLR3_UINT32 i)
+{
+    *i = *i;
+    return (dfastate)funcc;
+}
+dfastate funcc(plex1 ctx, pANTLR3_UINT32 i)
+{
+    *i = 1;
+    return (dfastate)funcc;
+}
+
 int main()
 {
 
     pANTLR3_INPUT_STREAM	    input;
     pANTLR3_COMMON_TOKEN_STREAM	    tstream;
     plex1			    lxr;
-
+ANTLR3_UINT32 x;
     pANTLR3_COMMON_TOKEN	    token;
 
+    lxr = NULL;
+    funca(lxr, &x);
     input	= antlr3AsciiFileStreamNew((pANTLR3_UINT8)"c:/antlrsrc/code/antlr/main/lib/C/lextest/inputtext.txt");
 
     if	(input == (pANTLR3_INPUT_STREAM)ANTLR3_ERR_NOMEM)
@@ -34,3 +64,4 @@ int main()
 	tstream->tstream->istream->consume(tstream->tstream->istream->me);
     }
 }
+

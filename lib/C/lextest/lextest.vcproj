@@ -133,12 +133,6 @@
 				RelativePath=".\inputtext.txt">
 			</File>
 			<File
-				RelativePath=".\lextest.c">
-			</File>
-			<File
-				RelativePath=".\lextestLexer.c">
-			</File>
-			<File
 				RelativePath=".\main.c">
 			</File>
 		</Filter>
@@ -157,30 +151,10 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Translating to C"
-						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/java/main/build/classes;C:/antlrsrc/code/antlr/main/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)"
-						AdditionalDependencies="C:\antlrsrc\code\antlr\main\build\classes\org\antlr\codegen\templates\C\C.stg"
-						Outputs="$(InputDir)cmql.c;$(InputDir)cmql.h;$(InputDir)cmqlLexer.c;$(InputDir)cmqlLexer.h"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\lextest.g">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating antlr lexer debug mode (C output)"
-						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/java/main/build/classes;C:/antlrsrc/code/antlr/main/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)"
-						AdditionalDependencies="C:\antlrsrc\code\antlr\main\build\classes\org\antlr\codegen\templates\C\C.stg"
-						Outputs="$(InputDir)$(TargetName)Lexer.c;$(InputDir)$(TargetName)Lexer.h;$(InputDir)$(TargetName).c;$(InputDir)$(TargetName).h"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Generating antlr lexer Releasemode (C output)"
 						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/build/classes;C:/antlrsrc/code/antlr/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)
 "
-						Outputs="$(InputDir)$(TargetName)Lexer.c;$(InputDir)$(TargetName)Lexer.h"/>
+						AdditionalDependencies="C:\antlrsrc\code\antlrclasses\org\antlr\codegen\templates\C\C.stg"
+						Outputs="$(InputDir)cmql.c;$(InputDir)cmql.h;$(InputDir)cmqlLexer.c;$(InputDir)cmqlLexer.h"/>
 				</FileConfiguration>
 			</File>
 		</Filter>
