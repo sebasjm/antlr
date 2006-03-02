@@ -39,7 +39,7 @@ ANTLR3_UINT32 x;
     pANTLR3_COMMON_TOKEN	    token;
 
     lxr = NULL;
-    funca(lxr, &x);
+
     input	= antlr3AsciiFileStreamNew((pANTLR3_UINT8)"c:/antlrsrc/code/antlr/main/lib/C/lextest/inputtext.txt");
 
     if	(input == (pANTLR3_INPUT_STREAM)ANTLR3_ERR_NOMEM)

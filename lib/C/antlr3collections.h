@@ -71,11 +71,12 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
 
     /** Pointer to function to completely delete this table
      */
-    void	    (*free)	(struct ANTLR3_HASH_TABLE_struct * table);
-    void	    (*del)	(struct ANTLR3_HASH_TABLE_struct * table, void * key);
-    void *	    (*get)	(struct ANTLR3_HASH_TABLE_struct * table, void * key);
-    ANTLR3_INT32    (*put)	(struct ANTLR3_HASH_TABLE_struct * table, void * key, void * element, void (*freeptr)(void *));
-    ANTLR3_UINT64   (*size)	(struct ANTLR3_HASH_TABLE_struct * table);
+    void		(*free)	    (struct ANTLR3_HASH_TABLE_struct * table);
+    void		(*del)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key);
+    pANTLR3_HASH_ENTRY	(*remove)   (struct ANTLR3_HASH_TABLE_struct * table, void * key);
+    void *		(*get)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key);
+    ANTLR3_INT32	(*put)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key, void * element, void (*freeptr)(void *));
+    ANTLR3_UINT64	(*size)	    (struct ANTLR3_HASH_TABLE_struct * table);
 }
     ANTLR3_HASH_TABLE, * pANTLR3_HASH_TABLE;
 
@@ -122,6 +123,8 @@ typedef	struct	ANTLR3_LIST_struct
     void	    (*free)	(struct ANTLR3_LIST_struct * list);
     void	    (*del)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
     void *	    (*get)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
+    void *	    (*remove)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
+    ANTLR3_INT32    (*add)	(struct ANTLR3_LIST_struct * list, void * element, void (*freeptr)(void *));
     ANTLR3_INT32    (*put)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
     ANTLR3_UINT64   (*size)	(struct ANTLR3_LIST_struct * list);
     

@@ -172,4 +172,7 @@ antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
 antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint);
 
+ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNew();
+ANTLR3_API pANTLR3_BASE_TREE	    antlr3BaseTreeNew(pANTLR3_BASE_TREE tree);
+
 #endif	/* _ANTLR3DEFS_H	*/

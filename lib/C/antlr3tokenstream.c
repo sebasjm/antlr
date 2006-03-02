@@ -63,13 +63,7 @@ antlr3TokenStreamNew()
 
 static void
 antlr3TokenStreamFree(pANTLR3_TOKEN_STREAM stream)
-{
-    if	(      stream->istream->eofToken != NULL
-	    && stream->istream->eofToken->factoryMade == ANTLR3_FALSE)
-    {
-	stream->istream->eofToken->freeCustom(stream->istream->eofToken);
-    }
-	    
+{   
     ANTLR3_FREE(stream);
 }
 
@@ -112,6 +106,12 @@ antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM stream)
     ANTLR3_FREE(stream);
 }
 
+static void
+freeEofTOken(pANTLR3_COMMON_TOKEN tok)
+{
+    ANTLR3_FREE(tok);
+}
+
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
 antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source)
 {
@@ -131,6 +131,7 @@ antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source
      */
     stream->tstream->istream->eofToken	= antlr3CommonTokenNew(ANTLR3_TOKEN_EOF);
     stream->tstream->istream->eofToken->setType(stream->tstream->istream->eofToken, ANTLR3_TOKEN_EOF);
+    stream->tstream->istream->eofToken->freeCustom = freeEofTOken;
 
     stream->free		= antlr3CTSFree;
     return  stream;

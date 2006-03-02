@@ -24,7 +24,7 @@ ANTLR3_MEMSET(void * target, ANTLR3_UINT8 byte, ANTLR3_UINT64 size)
 ANTLR3_API void *
 ANTLR3_MALLOC(size_t request)
 {
-    return  malloc(request);
+    return  calloc(1, request+16);
 }
 
 ANTLR3_API void *

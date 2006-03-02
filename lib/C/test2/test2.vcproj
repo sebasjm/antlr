@@ -152,7 +152,7 @@
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="java -cp &quot;c:/antlrsrc/code/antlr/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar;c:/antlrsrc/code/stringtemplate/build/classes&quot; org.antlr.Tool $(InputFileName)
+						CommandLine="java -cp &quot;c:/antlrsrc/code/antlr/main/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar;c:/antlrsrc/code/stringtemplate/java/main/build/classes&quot; org.antlr.Tool $(InputFileName)
 "
 						Outputs="$(InputDir)$(InputName).h;$(InputDir)$(InputName).c"/>
 				</FileConfiguration>

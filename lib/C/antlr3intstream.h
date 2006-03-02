@@ -32,6 +32,7 @@
 #define	_ANTLR3_INTSTREAM_H
 
 #include    <antlr3defs.h>
+#include    <antlr3commontoken.h>
 
 /** Type inidicator for a character stream
  * \remark if a custom stream is created but it can be treated as

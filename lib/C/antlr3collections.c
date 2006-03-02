@@ -9,11 +9,12 @@
 
 /* Interface functions for hash table
  */
-static void		antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key);
-static void *		antlr3HashGet	    (pANTLR3_HASH_TABLE table, void * key);
-static ANTLR3_INT32	antlr3HashPut	    (pANTLR3_HASH_TABLE table, void * key, void * element, void (*freeptr)(void *));
-static void		antlr3HashFree	    (pANTLR3_HASH_TABLE table);
-static ANTLR3_UINT64	antlr3HashSize	    (pANTLR3_HASH_TABLE table);
+static void		    antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key);
+static void *		    antlr3HashGet	(pANTLR3_HASH_TABLE table, void * key);
+static pANTLR3_HASH_ENTRY   antlr3HashRemove    (pANTLR3_HASH_TABLE table, void * key);
+static ANTLR3_INT32	    antlr3HashPut	(pANTLR3_HASH_TABLE table, void * key, void * element, void (*freeptr)(void *));
+static void		    antlr3HashFree	(pANTLR3_HASH_TABLE table);
+static ANTLR3_UINT64	    antlr3HashSize	(pANTLR3_HASH_TABLE table);
 
 /* Interface functions for enumeration
  */
@@ -26,6 +27,8 @@ static void		antlr3ListFree	(pANTLR3_LIST list);
 static void		antlr3ListDelete(pANTLR3_LIST list, ANTLR3_UINT64 key);
 static void *		antlr3ListGet	(pANTLR3_LIST list, ANTLR3_UINT64 key);
 static ANTLR3_INT32	antlr3ListPut	(pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
+static ANTLR3_INT32	antlr3ListAdd   (pANTLR3_LIST list, void * element, void (*freeptr)(void *));
+static void *		antlr3ListRemove(pANTLR3_LIST list, ANTLR3_UINT64 key);
 static ANTLR3_UINT64	antlr3ListSize	(pANTLR3_LIST list);
 
 /* Interface functions for Stack
@@ -93,6 +96,7 @@ antlr3HashTableNew(ANTLR3_UINT32 sizeHint)
     table->put		= antlr3HashPut;
     table->del		= antlr3HashDelete;
     table->size		= antlr3HashSize;
+    table->remove	= antlr3HashRemove;
 
     return  table;
 }
@@ -177,8 +181,8 @@ static ANTLR3_UINT64	antlr3HashSize	    (pANTLR3_HASH_TABLE table)
 /** Remove the element in the hash table for a particular
  *  key value, if it exists - no error if it does not.
  */
-static void 
-antlr3HashDelete(pANTLR3_HASH_TABLE table, void * key)
+static pANTLR3_HASH_ENTRY
+antlr3HashRemove(pANTLR3_HASH_TABLE table, void * key)
 {
     ANTLR3_UINT32	    hash;
     pANTLR3_HASH_BUCKET	    bucket;
@@ -214,15 +218,7 @@ antlr3HashDelete(pANTLR3_HASH_TABLE table, void * key)
 	     */
 	    (*nextPointer)		= entry->nextEntry;
 
-	    /* Now we can free the elements and the entry in order
-	     */
-	    if	(entry->free != NULL)
-	    {
-		/* Call programmer supplied function to release this entry
-		 */
-		entry->free(entry->data);
-		entry->data = NULL;
-	    }
+	    
 
 	    /* Release the key - we allocated that
 	     */
@@ -233,10 +229,9 @@ antlr3HashDelete(pANTLR3_HASH_TABLE table, void * key)
 	     */
 	    ANTLR3_FREE(entry);
 
-	    /* Signal the end	*/
-	    entry   = NULL;
-
 	    table->count--;
+
+	    return entry;
 	}
 	else
 	{
@@ -246,6 +241,29 @@ antlr3HashDelete(pANTLR3_HASH_TABLE table, void * key)
 	    nextPointer	= & (entry->nextEntry);	    /* Address of the next pointer in the current entry	    */
 	    entry	= entry->nextEntry;	    /* Address of the next element in the bucket (if any)   */
 	}
+    }
+
+    return NULL;  /* Not found */
+}
+
+/** Takes the element with the supplied key out of the list, and deletes the data
+ *  calling the supplied free() routine if any. 
+ */
+static void
+antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key)
+{
+    pANTLR3_HASH_ENTRY	entry;
+
+    entry = antlr3HashRemove(table, key);
+	
+    /* Now we can free the elements and the entry in order
+     */
+    if	(entry != NULL && entry->free != NULL)
+    {
+	/* Call programmer supplied function to release this entry
+	 */
+	entry->free(entry->data);
+	entry->data = NULL;
     }
 }
 
@@ -288,6 +306,8 @@ antlr3HashGet(pANTLR3_HASH_TABLE table, void * key)
      */
     return  NULL;
 }
+
+
 
 /** Add the element pointer in to the table, based upon the 
  *  hash of the provided key.
@@ -578,11 +598,13 @@ antlr3ListNew	(ANTLR3_UINT32 sizeHint)
 
     /* Allocation was good, install interface
      */
-    list->free	= antlr3ListFree;
-    list->del	= antlr3ListDelete;
-    list->get	= antlr3ListGet;
-    list->put	= antlr3ListPut;
-    list->size	= antlr3ListSize;
+    list->free	    = antlr3ListFree;
+    list->del	    = antlr3ListDelete;
+    list->get	    = antlr3ListGet;
+    list->add	    = antlr3ListAdd;
+    list->remove    = antlr3ListRemove;
+    list->put	    = antlr3ListPut;
+    list->size	    = antlr3ListSize;
 
     return  list;
 }
@@ -622,6 +644,39 @@ antlr3ListGet	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
     sprintf((char *)charKey, "%d", key);
 
     return list->table->get(list->table, charKey);
+}
+
+/** Add the supplied element to the list, at the next available key
+ */
+static ANTLR3_INT32	antlr3ListAdd   (pANTLR3_LIST list, void * element, void (*freeptr)(void *))
+{
+    ANTLR3_UINT64   key;
+
+    key	    = list->table->size(list->table) + 1;
+    return list->put(list, key, element, freeptr);
+}
+
+/** Remove from the list, but don't free the element, just send it back to the
+ *  caller.
+ */
+static	void *
+antlr3ListRemove	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
+{
+    pANTLR3_HASH_ENTRY	    entry;
+    ANTLR3_UINT8    charKey[32];
+
+    sprintf((char *)charKey, "%d", key);
+
+    entry = list->table->remove(list->table, charKey);
+
+    if	(entry != NULL)
+    {
+        return  entry->data;
+    }
+    else
+    {
+	return	NULL;
+    }
 }
 
 static	ANTLR3_INT32

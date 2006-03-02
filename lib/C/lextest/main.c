@@ -10,14 +10,25 @@ int main()
     pcmqlLexer			    lxr;
     pcmql			    psr;
 
-    input	= antlr3AsciiFileStreamNew("inputtext.txt");
+    int i;
 
-    lxr		= cmqlLexerNew(input);
-    
-    tstream	= antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lxr->pLexer->tokSource);
+    for (i=0; i<100; i++)
+    {
+	printf("i = %d\n", i);
+	input	= antlr3AsciiFileStreamNew("inputtext.txt");
 
-    psr		= cmqlNew(tstream);
+	lxr		= cmqlLexerNew(input);
+        
+	tstream	= antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lxr->pLexer->tokSource);
 
-    psr->query(psr);
+	psr		= cmqlNew(tstream);
+	
+	psr->query(psr);
+
+	psr->free(psr);
+	tstream->free(tstream);
+	lxr->free(lxr);
+	input->close(input);
+    }
 
 }

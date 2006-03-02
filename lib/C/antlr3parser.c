@@ -114,7 +114,10 @@ antlr3ParserNewStream	(ANTLR3_UINT32 sizeHint, pANTLR3_TOKEN_STREAM tstream)
 static void		
 freeParser			    (pANTLR3_PARSER parser)
 {
-    parser->rec->free(parser->rec->me);
+    if	(parser->rec != NULL)
+    {
+	parser->rec->free(parser->rec);
+    }
     parser->rec	= NULL;
     ANTLR3_FREE(parser);
 }

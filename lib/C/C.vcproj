@@ -27,17 +27,20 @@
 				AdditionalIncludeDirectories="&quot;$(InputDir)&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				StringPooling="TRUE"
-				MinimalRebuild="TRUE"
+				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				StructMemberAlignment="0"
 				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
+				ExpandAttributedSource="TRUE"
+				AssemblerOutput="2"
+				BrowseInformation="1"
 				WarningLevel="4"
 				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -122,6 +125,9 @@
 				RelativePath=".\antlr3baserecognizer.c">
 			</File>
 			<File
+				RelativePath=".\antlr3basetree.c">
+			</File>
+			<File
 				RelativePath=".\antlr3bitset.c">
 			</File>
 			<File
@@ -129,6 +135,9 @@
 			</File>
 			<File
 				RelativePath=".\antlr3commontoken.c">
+			</File>
+			<File
+				RelativePath=".\antlr3commontree.c">
 			</File>
 			<File
 				RelativePath=".\antlr3dfa.c">
@@ -178,6 +187,9 @@
 				RelativePath=".\antlr3baserecognizer.h">
 			</File>
 			<File
+				RelativePath=".\antlr3basetree.h">
+			</File>
+			<File
 				RelativePath=".\antlr3bitset.h">
 			</File>
 			<File
@@ -185,6 +197,9 @@
 			</File>
 			<File
 				RelativePath=".\antlr3commontoken.h">
+			</File>
+			<File
+				RelativePath=".\antlr3commontree.h">
 			</File>
 			<File
 				RelativePath=".\antlr3defs.h">
@@ -218,6 +233,9 @@
 			</File>
 			<File
 				RelativePath=".\antlr3parser.h">
+			</File>
+			<File
+				RelativePath=".\antlr3rulereturnscope.h">
 			</File>
 			<File
 				RelativePath=".\antlr3string.h">

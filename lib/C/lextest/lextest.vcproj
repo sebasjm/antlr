@@ -28,23 +28,33 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
+				ExpandAttributedSource="TRUE"
+				AssemblerOutput="2"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="antlr3c.lib"
 				OutputFile="$(OutDir)/lextest.exe"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="C:\antlrsrc\code\antlr\main\lib\C\Debug"
 				GenerateDebugInformation="TRUE"
+				AssemblyDebug="1"
 				ProgramDatabaseFile="$(OutDir)/lextest.pdb"
+				GenerateMapFile="TRUE"
+				MapExports="TRUE"
+				MapLines="TRUE"
 				SubSystem="1"
-				TargetMachine="1"/>
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
+				TargetMachine="1"
+				FixedBaseAddress="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -153,7 +163,7 @@
 						Description="Translating to C"
 						CommandLine="java.exe -classpath &quot;C:/antlrsrc/code/stringtemplate/java/main/build/classes;C:/antlrsrc/code/antlr/main/build/classes;c:/antlrsrc/libs/antlr-2.7.6.jar&quot; org.antlr.Tool $(InputPath)
 "
-						AdditionalDependencies="C:\antlrsrc\code\antlr\main\build\classes\org\antlr\codegen\templates\C\C.stg"
+						AdditionalDependencies=""
 						Outputs="$(InputDir)cmql.c;$(InputDir)cmql.h;$(InputDir)cmqlLexer.c;$(InputDir)cmqlLexer.h"/>
 				</FileConfiguration>
 			</File>
