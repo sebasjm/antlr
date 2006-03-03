@@ -235,9 +235,6 @@
 				RelativePath=".\antlr3parser.h">
 			</File>
 			<File
-				RelativePath=".\antlr3rulereturnscope.h">
-			</File>
-			<File
 				RelativePath=".\antlr3string.h">
 			</File>
 			<File
