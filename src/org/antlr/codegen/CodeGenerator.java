@@ -509,20 +509,26 @@ public class CodeGenerator {
 			BitSet bits = BitSet.of(follow.tokenTypeSet);
 			words = bits.toPackedArray();
 		}
+		// use the target to convert to hex strings (typically)
+		String[] wordStrings = new String[words.length];
+		for (int j = 0; j < words.length; j++) {
+			long w = words[j];
+			wordStrings[j] = target.getTarget64BitStringFromValue(w);
+		}
 		recognizerST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
 								  referencedElementName,
 								  enclosingRuleName,
-								  words,
+								  wordStrings,
 								  new Integer(i));
 		outputFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
 								  referencedElementName,
 								  enclosingRuleName,
-								  words,
+								  wordStrings,
 								  new Integer(i));
 		headerFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
 								  referencedElementName,
 								  enclosingRuleName,
-								  words,
+								  wordStrings,
 								  new Integer(i));
 	}
 

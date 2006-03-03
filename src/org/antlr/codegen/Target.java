@@ -214,6 +214,24 @@ public class Target {
 		return getTargetStringLiteralFromString(s, false);
 	}
 
+	/** Convert long to 0xNNNNNNNNNNNNNNNN by default for spitting out
+	 *  with bitsets.  I.e., convert bytes to hex string.
+	 */
+	public String getTarget64BitStringFromValue(long word) {
+		int numHexDigits = 8*2;
+		StringBuffer buf = new StringBuffer(numHexDigits+2);
+		buf.append("0x");
+		String digits = Long.toHexString(word);
+		digits = digits.toUpperCase();
+		int padding = numHexDigits - digits.length();
+		// pad left with zeros
+		for (int i=1; i<=padding; i++) {
+			buf.append('0');
+		}
+		buf.append(digits);
+		return buf.toString();
+	}
+
 	/** Some targets only support ASCII or 8-bit chars/strings.  For example,
 	 *  C++ will probably want to return 0xFF here.
 	 */
