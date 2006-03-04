@@ -24,7 +24,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(InputDir)&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -122,58 +122,55 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\antlr3baserecognizer.c">
+				RelativePath=".\src\antlr3baserecognizer.c">
 			</File>
 			<File
-				RelativePath=".\antlr3basetree.c">
+				RelativePath=".\src\antlr3basetree.c">
 			</File>
 			<File
-				RelativePath=".\antlr3bitset.c">
+				RelativePath=".\src\antlr3bitset.c">
 			</File>
 			<File
-				RelativePath=".\antlr3collections.c">
+				RelativePath=".\src\antlr3collections.c">
 			</File>
 			<File
-				RelativePath=".\antlr3commontoken.c">
+				RelativePath=".\src\antlr3commontoken.c">
 			</File>
 			<File
-				RelativePath=".\antlr3commontree.c">
+				RelativePath=".\src\antlr3commontree.c">
 			</File>
 			<File
-				RelativePath=".\antlr3dfa.c">
+				RelativePath=".\src\antlr3encodings.c">
 			</File>
 			<File
-				RelativePath=".\antlr3encodings.c">
+				RelativePath=".\src\antlr3exception.c">
 			</File>
 			<File
-				RelativePath=".\antlr3exception.c">
+				RelativePath=".\src\antlr3filestream.c">
 			</File>
 			<File
-				RelativePath=".\antlr3filestream.c">
+				RelativePath=".\src\antlr3intstream.c">
 			</File>
 			<File
-				RelativePath=".\antlr3intstream.c">
+				RelativePath=".\src\antlr3lexer.c">
 			</File>
 			<File
-				RelativePath=".\antlr3lexer.c">
+				RelativePath=".\src\antlr3memory.c">
 			</File>
 			<File
-				RelativePath=".\antlr3memory.c">
+				RelativePath=".\src\antlr3parser.c">
 			</File>
 			<File
-				RelativePath=".\antlr3parser.c">
+				RelativePath=".\src\antlr3string.c">
 			</File>
 			<File
-				RelativePath=".\antlr3string.c">
+				RelativePath=".\src\antlr3stringstream.c">
 			</File>
 			<File
-				RelativePath=".\antlr3stringstream.c">
+				RelativePath=".\src\antlr3tokenstream.c">
 			</File>
 			<File
-				RelativePath=".\antlr3tokenstream.c">
-			</File>
-			<File
-				RelativePath=".\antlrinputstream.c">
+				RelativePath=".\src\antlrinputstream.c">
 			</File>
 		</Filter>
 		<Filter
@@ -181,70 +178,71 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\antlr3.h">
+				RelativePath=".\include\antlr3.h">
 			</File>
 			<File
-				RelativePath=".\antlr3baserecognizer.h">
+				RelativePath=".\include\antlr3baserecognizer.h">
 			</File>
 			<File
-				RelativePath=".\antlr3basetree.h">
+				RelativePath=".\include\antlr3basetree.h">
 			</File>
 			<File
-				RelativePath=".\antlr3bitset.h">
+				RelativePath=".\include\antlr3bitset.h">
 			</File>
 			<File
-				RelativePath=".\antlr3collections.h">
+				RelativePath=".\include\antlr3collections.h">
 			</File>
 			<File
-				RelativePath=".\antlr3commontoken.h">
+				RelativePath=".\include\antlr3commontoken.h">
 			</File>
 			<File
-				RelativePath=".\antlr3commontree.h">
+				RelativePath=".\include\antlr3commontree.h">
 			</File>
 			<File
-				RelativePath=".\antlr3defs.h">
+				RelativePath=".\include\antlr3defs.h">
 			</File>
 			<File
-				RelativePath=".\antlr3dfa.h">
+				RelativePath=".\include\antlr3encodings.h">
 			</File>
 			<File
-				RelativePath=".\antlr3encodings.h">
+				RelativePath=".\include\antlr3errors.h">
 			</File>
 			<File
-				RelativePath=".\antlr3errors.h">
+				RelativePath=".\include\antlr3exception.h">
 			</File>
 			<File
-				RelativePath=".\antlr3exception.h">
+				RelativePath=".\include\antlr3filestream.h">
 			</File>
 			<File
-				RelativePath=".\antlr3filestream.h">
+				RelativePath=".\include\antlr3input.h">
 			</File>
 			<File
-				RelativePath=".\antlr3input.h">
+				RelativePath=".\include\antlr3interfaces.h">
 			</File>
 			<File
-				RelativePath=".\antlr3interfaces.h">
+				RelativePath=".\include\antlr3intstream.h">
 			</File>
 			<File
-				RelativePath=".\antlr3intstream.h">
+				RelativePath=".\include\antlr3lexer.h">
 			</File>
 			<File
-				RelativePath=".\antlr3lexer.h">
+				RelativePath=".\include\antlr3memory.h">
 			</File>
 			<File
-				RelativePath=".\antlr3parser.h">
+				RelativePath=".\include\antlr3parser.h">
 			</File>
 			<File
-				RelativePath=".\antlr3string.h">
+				RelativePath=".\antlr3parsetree.h">
 			</File>
 			<File
-				RelativePath=".\antlr3tokenstream.h">
+				RelativePath=".\include\antlr3string.h">
 			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+			<File
+				RelativePath=".\include\antlr3stringstream.h">
+			</File>
+			<File
+				RelativePath=".\include\antlr3tokenstream.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Templates"
@@ -279,6 +277,17 @@
 			</File>
 			<File
 				RelativePath="..\..\src\org\antlr\codegen\templates\C\ST.stg">
+			</File>
+			<Filter
+				Name="Interfaces"
+				Filter="*.sti">
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Java"
+			Filter="*.java">
+			<File
+				RelativePath="..\..\src\org\antlr\codegen\CTarget.java">
 			</File>
 		</Filter>
 		<File

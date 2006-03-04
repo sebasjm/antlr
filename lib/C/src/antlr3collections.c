@@ -218,16 +218,10 @@ antlr3HashRemove(pANTLR3_HASH_TABLE table, void * key)
 	     */
 	    (*nextPointer)		= entry->nextEntry;
 
-	    
-
 	    /* Release the key - we allocated that
 	     */
 	    ANTLR3_FREE(entry->key);
 	    entry->key	= NULL;
-
-	    /* Finally release the space for this entry block.
-	     */
-	    ANTLR3_FREE(entry);
 
 	    table->count--;
 
@@ -265,6 +259,9 @@ antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key)
 	entry->free(entry->data);
 	entry->data = NULL;
     }
+    /* Finally release the space for this entry block.
+     */
+    ANTLR3_FREE(entry);
 }
 
 /** Return the element pointer in the hash table for a particular

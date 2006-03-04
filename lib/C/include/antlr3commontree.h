@@ -7,6 +7,7 @@
 
 #include    <antlr3defs.h>
 #include    <antlr3basetree.h>
+#include    <antlr3commontoken.h>
 
 typedef struct ANTLR3_COMMON_TREE_struct
 {
@@ -42,7 +43,7 @@ typedef struct ANTLR3_COMMON_TREE_struct
 
     ANTLR3_UINT32	    (*getType)			(pANTLR3_BASE_TREE tree);
 
-    ANTLR3_UINT8	    (*getText)			(pANTLR3_BASE_TREE tree);
+    pANTLR3_UINT8	    (*getText)			(pANTLR3_BASE_TREE tree);
 
     ANTLR3_UINT64	    (*getLine)			(pANTLR3_BASE_TREE tree);
     

@@ -129,7 +129,7 @@ outputFile( LEXER,
  *  we perform this little trick of defining the literals as arrays of UINT32
  *  and passing in the address of these.
  */
-<literals:{ANTLR3_UCHAR	lit_<i>[]  = <it>;}; separator="\n">
+<literals:{static ANTLR3_UCHAR	lit_<i>[]  = <it>;}; separator="\n">
 
 <endif>
 
@@ -454,8 +454,8 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 #define	    theInput()		    prsr->tstream
 #define	    hasException()	    (theInput()->istream->error == ANTLR3_TRUE)
 #define	    theException()	    theInput()->istream->exception
-#define	    tmatch(t, fs)	    prsr->rec->match(prsr->me, theInput()->istream, t, fs)
-#define	    tmatchAny()		    prsr->rec->matchAny(prsr->me, theInput()->istream->me)
+#define	    tmatch(t, fs)	    prsr->rec->match(prsr->rec, theInput()->istream, t, fs)
+#define	    tmatchAny()		    prsr->rec->matchAny(prsr->rec, theInput()->istream->me)
 #define	    followStk()		    prsr->rec->following
 #define	    followPush(x)	    followStk()->push(followStk(), ((void *)(x)), NULL)
 #define	    followPop()		    followStk()->pop(followStk())
@@ -469,8 +469,8 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 #define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream->me, m)
 #define	    perrorRecovery()	    prsr->rec->errorRecovery
 #define	    hasFailed()		    prsr->rec->failed
-#define	    precoverFromMismatchedSet(s)	prsr->rec->recoverFromMismatchedSet(prsr->rec->me, theInput()->istream, s)
-#define	    precoverFromMismatchedElement(e)	prsr->rec->recoverFromMismatchedElement(prsr->rec->me, theInput()->istream, s)
+#define	    precoverFromMismatchedSet(s)	prsr->rec->recoverFromMismatchedSet(prsr->rec, theInput()->istream, s)
+#define	    precoverFromMismatchedElement(e)	prsr->rec->recoverFromMismatchedElement(prsr->rec, theInput()->istream, s)
 <endif>
 
 #endif

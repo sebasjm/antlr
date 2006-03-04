@@ -177,7 +177,7 @@ antlr3BRMatch(	pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input,
      * going on, so we mismatch, which creates an exception in the recognizer exception
      * stack.
      */
-    recognizer->mismatch(recognizer->me, input, ttype, follow);
+    recognizer->mismatch(recognizer, input, ttype, follow);
 
     return ANTLR3_FALSE;
 }

@@ -52,7 +52,7 @@ typedef	struct ANTLR3_BASE_TREE_struct
 
     pANTLR3_STRING  (*toString)		(void * tree);
 
-    void    *	    (*free)		(struct ANTLR3_BASE_TREE_struct * tree);
+    void    	    (*free)		(struct ANTLR3_BASE_TREE_struct * tree);
 
 }
     ANTLR3_BASE_TREE;
