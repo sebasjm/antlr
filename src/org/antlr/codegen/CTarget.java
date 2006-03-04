@@ -27,14 +27,12 @@
 */
 package org.antlr.codegen;
 
+import org.antlr.Tool;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.Grammar;
-import org.antlr.Tool;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.ListIterator;
-import org.antlr.stringtemplate.misc.*;
         
 public class CTarget extends Target {
     
@@ -124,7 +122,10 @@ public class CTarget extends Target {
                 }
                 else
                 {
-                    int c = Character.valueOf(literal.charAt(1));
+					// hi, Jim.  I think:
+					// int c = Character.valueOf(literal.charAt(1));
+					// should be just:
+					int c = literal.charAt(1); // TJP
                     if  (c < 32 || c > 127) {
                         literal  =  "0x" + Integer.toHexString(c);
                     }
