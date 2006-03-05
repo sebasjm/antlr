@@ -206,6 +206,10 @@ CHANGES
 
 3.0ea8 - ???
 
+* bitsets are dumped in hex not decimal now for FOLLOW sets
+
+* /* epsilon */ is not printed now when printing out grammars with empty alts
+
 * Fixed another bug in tree rewrite stuff where it was checking that elements
   had at least one element.  Strange...commented out for now to see if I can remember what's up.
 

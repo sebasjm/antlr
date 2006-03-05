@@ -66,7 +66,7 @@ public class NFAContext {
 	 *  stack can only grow as big as the number of NFA states.
 	 *
 	 *  I noticed that the Java grammar didn't work with max=0, but did with
-	 *  max=3.  Let's set to 2.
+	 *  max=3.  Let's set to 3.
 	 *  Recursion is sometimes needed to resolve some fixed lookahead
 	 *  decisions.
 	 */

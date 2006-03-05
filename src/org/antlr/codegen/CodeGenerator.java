@@ -27,26 +27,28 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.codegen;
 
-import java.util.*;
-import java.io.*;
-
+import antlr.RecognitionException;
+import antlr.TokenStreamException;
+import antlr.TokenStreamRewriteEngine;
+import antlr.TokenWithIndex;
+import antlr.collections.AST;
+import org.antlr.Tool;
+import org.antlr.analysis.*;
+import org.antlr.misc.*;
+import org.antlr.runtime.CharStream;
+import org.antlr.stringtemplate.CommonGroupLoader;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.stringtemplate.CommonGroupLoader;
 import org.antlr.stringtemplate.StringTemplateGroupLoader;
-// import org.antlr.stringtemplate.misc.StringTemplateTreeView;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
-import org.antlr.analysis.*;
 import org.antlr.tool.*;
-import org.antlr.misc.*;
-import org.antlr.misc.BitSet;
-import org.antlr.Tool;
-import org.antlr.runtime.CharStream;
-import antlr.collections.AST;
-import antlr.RecognitionException;
-import antlr.TokenWithIndex;
-import antlr.TokenStreamRewriteEngine;
-import antlr.TokenStreamException;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.Writer;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /** ANTLR's code generator.
  *
@@ -81,6 +83,9 @@ public class CodeGenerator {
 	public int MAX_SWITCH_CASE_LABELS = 300;
 	public int MIN_SWITCH_ALTS = 3;
 	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
+
+	public String classpathTemplateRootDirectoryName =
+		"org/antlr/codegen/templates";
 
 	/** Which grammar are we generating code for?  Each generator
 	 *  is attached to a specific grammar.
@@ -167,14 +172,10 @@ public class CodeGenerator {
 
 	/** load the main language.stg template group file */
 	protected void loadTemplates(String language) {
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
 		// get a group loader containing main templates dir and target subdir
-		String absoluteTemplateRootDirectoryName =
-			cl.getResource("org/antlr/codegen/templates").getFile();
 		String templateDirs =
-			absoluteTemplateRootDirectoryName+":"+
-			absoluteTemplateRootDirectoryName+"/"+language;
+			classpathTemplateRootDirectoryName+":"+
+			classpathTemplateRootDirectoryName+"/"+language;
 		//System.out.println("targets="+templateDirs.toString());
 		StringTemplateGroupLoader loader =
 			new CommonGroupLoader(templateDirs.toString(),
@@ -364,25 +365,20 @@ public class CodeGenerator {
 			StringTemplate tokenVocabSerialization = genTokenVocabOutput();
 			write(tokenVocabSerialization, getVocabFileName());
 			//System.out.println(outputFileST.toStructureString());
-			/*
-			Map edges = new HashMap();
-			outputFileST.getDependencyGraph(edges,false);
-			System.out.println(edges);
-			*/
-			/*
-			StringTemplate graphST = outputFileST.getDOTForDependencyGraph(true);
-			System.out.println(graphST);
-			*/
 		}
 		catch (IOException ioe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE,
 							   getVocabFileName(),
 							   ioe);
 		}
+		/*
+		System.out.println("num obj.prop refs: "+ ASTExpr.totalObjPropRefs);
+		System.out.println("num obj.prop computations: "+ ASTExpr.totalObjPropComputations);
+		*/
 	}
 
 	/** Some targets will have some extra scopes like C++ may have
-	 *  @headerfile:name {action} or something.  Make sure the
+	 *  '@headerfile:name {action}' or something.  Make sure the
 	 *  target likes the scopes in action table.
 	 */
 	protected void verifyActionScopesOkForTarget(Map actions) {
