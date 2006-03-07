@@ -436,7 +436,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	public String toString(String programName, int start, int end) {
 		List rewrites = (List)programs.get(programName);
 		if ( rewrites==null || rewrites.size()==0 ) {
-			return toOriginalString(); // no instructions to execute
+			return toOriginalString(start,end); // no instructions to execute
 		}
 		StringBuffer buf = new StringBuffer();
 
