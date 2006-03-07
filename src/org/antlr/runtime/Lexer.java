@@ -182,13 +182,31 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  more exceptions w/o breaking old code.
 	 */
 	public void reportError(RecognitionException e) {
-		System.err.print(Parser.getRuleInvocationStack(e,getClass().getName())+
-						 ": line "+input.getLine()+" ");
+		/** TODO: not thought about recovery in lexer yet.
+		 *
+		// if we've already reported an error and have not matched a token
+		// yet successfully, don't report any errors.
+		if ( errorRecovery ) {
+			//System.err.print("[SPURIOUS] ");
+			return;
+		}
+		errorRecovery = true;
+		 */
+
+		displayRecognitionError(this.getClass().getName(),e);
+	}
+
+	public static void displayRecognitionError(String name,
+											   RecognitionException e)
+	{
+		System.err.print(getRuleInvocationStack(e, name)+
+						 ": line "+e.line+":"+e.charPositionInLine+" ");
+
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			System.err.println("mismatched char: '"+
-							   (char)input.LA(1)+
-							   "' on line "+getLine()+
+							   e.c+
+							   "' on line "+e.line+
 							   "; expecting char '"+(char)mte.expecting+"'");
 		}
 		else if ( e instanceof NoViableAltException ) {
@@ -196,39 +214,39 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 			System.err.println(nvae.grammarDecisionDescription+
 							   " state "+nvae.stateNumber+
 							   " (decision="+nvae.decisionNumber+
-							   ") no viable alt line "+getLine()+":"+getCharPositionInLine()+"; char='"+
-							   (char)input.LA(1)+"'");
+							   ") no viable alt line "+e.line+":"+e.charPositionInLine+"; char='"+
+							   e.c+"'");
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;
 			System.err.println("required (...)+ loop (decision="+
 							   eee.decisionNumber+
 							   ") did not match anything; on line "+
-							   getLine()+":"+getCharPositionInLine()+" char="+
-							   (char)input.LA(1)+"'");
+							   e.line+":"+e.charPositionInLine+" char="+
+							   e.c+"'");
 		}
 		else if ( e instanceof MismatchedSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
 			System.err.println("mismatched char: '"+
-							   (char)input.LA(1)+
-							   "' on line "+getLine()+
-							   ":"+getCharPositionInLine()+
+							   e.c+
+							   "' on line "+e.line+
+							   ":"+e.charPositionInLine+
 							   "; expecting set "+mse.expecting);
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
 			System.err.println("mismatched char: '"+
-							   (char)input.LA(1)+
-							   "' on line "+getLine()+
-							   ":"+getCharPositionInLine()+
+							   e.c+
+							   "' on line "+e.line+
+							   ":"+e.charPositionInLine+
 							   "; expecting set "+mse.expecting);
 		}
 		else if ( e instanceof MismatchedRangeException ) {
 			MismatchedRangeException mre = (MismatchedRangeException)e;
 			System.err.println("mismatched char: '"+
-							   (char)input.LA(1)+
-							   "' on line "+getLine()+
-							   ":"+getCharPositionInLine()+
+							   e.c+
+							   "' on line "+e.line+
+							   ":"+e.charPositionInLine+
 							   "; expecting set '"+(char)mre.a+"'..'"+
 							   (char)mre.b+"'");
 		}

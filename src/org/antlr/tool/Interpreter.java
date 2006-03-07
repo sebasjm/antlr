@@ -469,11 +469,9 @@ public class Interpreter implements TokenSource {
 
 	public void reportScanError(RecognitionException re) {
 		CharStream cs = (CharStream)input;
-		// don't report to ANTLR tool itself; make people override to redirect
-		Parser.displayRecognitionError(grammar.name,
-									   grammar.getTokenDisplayNames().toArray(),
-									   re);
 		System.err.println("problem matching token at "+
-						   cs.getLine()+":"+cs.getCharPositionInLine());
+			cs.getLine()+":"+cs.getCharPositionInLine());
+		// don't report to ANTLR tool itself; make people override to redirect
+		Lexer.displayRecognitionError(grammar.name,re);
 	}
 }

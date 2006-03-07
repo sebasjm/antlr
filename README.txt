@@ -206,6 +206,8 @@ CHANGES
 
 3.0ea8 - ???
 
+* lexer errors in interpreter were not printed properly
+
 * bitsets are dumped in hex not decimal now for FOLLOW sets
 
 * /* epsilon */ is not printed now when printing out grammars with empty alts

@@ -138,7 +138,7 @@ public abstract class BaseRecognizer {
 							   "; expecting type "+
 							   tokenNames[mte.expecting]);
 		}
-		if ( e instanceof MismatchedTreeNodeException ) {
+		else if ( e instanceof MismatchedTreeNodeException ) {
 			MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
 			System.err.println("mismatched tree node: "+
 							   mtne.foundNode+
