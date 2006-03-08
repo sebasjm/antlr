@@ -206,6 +206,10 @@ CHANGES
 
 3.0ea8 - ???
 
+* hideous bug fixed: PLUS='+' didn't result in '+' rule in lexer
+
+* TokenRewriteStream didn't do toString() right when no rewrites had been done.
+
 * lexer errors in interpreter were not printed properly
 
 * bitsets are dumped in hex not decimal now for FOLLOW sets

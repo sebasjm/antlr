@@ -373,7 +373,7 @@ public class CodeGenerator {
 		}
 		/*
 		System.out.println("num obj.prop refs: "+ ASTExpr.totalObjPropRefs);
-		System.out.println("num obj.prop computations: "+ ASTExpr.totalObjPropComputations);
+		System.out.println("num reflection lookups: "+ ASTExpr.totalReflectionLookups);
 		*/
 	}
 

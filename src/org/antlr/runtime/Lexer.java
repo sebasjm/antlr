@@ -96,10 +96,10 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 					 int line, int charPosition,
 					 int channel,
 					 int start, int stop) {
-		Token token = new CommonToken(input, tokenType, channel, start, stop);
-		token.setLine(line);
-		token.setCharPositionInLine(charPosition);
-		emit(token);
+		Token t = new CommonToken(input, tokenType, channel, start, stop);
+		t.setLine(line);
+		t.setCharPositionInLine(charPosition);
+		emit(t);
 	}
 
     public void match(String s) throws MismatchedTokenException {
@@ -205,7 +205,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			System.err.println("mismatched char: '"+
-							   e.c+
+							   ((char)e.c)+
 							   "' on line "+e.line+
 							   "; expecting char '"+(char)mte.expecting+"'");
 		}
@@ -215,7 +215,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 							   " state "+nvae.stateNumber+
 							   " (decision="+nvae.decisionNumber+
 							   ") no viable alt line "+e.line+":"+e.charPositionInLine+"; char='"+
-							   e.c+"'");
+							   ((char)e.c)+"'");
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;
@@ -223,12 +223,12 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 							   eee.decisionNumber+
 							   ") did not match anything; on line "+
 							   e.line+":"+e.charPositionInLine+" char="+
-							   e.c+"'");
+							   ((char)e.c)+"'");
 		}
 		else if ( e instanceof MismatchedSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
 			System.err.println("mismatched char: '"+
-							   e.c+
+							   ((char)e.c)+
 							   "' on line "+e.line+
 							   ":"+e.charPositionInLine+
 							   "; expecting set "+mse.expecting);
@@ -236,7 +236,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		else if ( e instanceof MismatchedNotSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
 			System.err.println("mismatched char: '"+
-							   e.c+
+							   ((char)e.c)+
 							   "' on line "+e.line+
 							   ":"+e.charPositionInLine+
 							   "; expecting set "+mse.expecting);
@@ -244,7 +244,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		else if ( e instanceof MismatchedRangeException ) {
 			MismatchedRangeException mre = (MismatchedRangeException)e;
 			System.err.println("mismatched char: '"+
-							   e.c+
+							   ((char)e.c)+
 							   "' on line "+e.line+
 							   ":"+e.charPositionInLine+
 							   "; expecting set '"+(char)mre.a+"'..'"+

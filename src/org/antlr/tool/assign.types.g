@@ -251,6 +251,9 @@ protected void assignTypes() {
 			String literal = (String)aliases.get(tokenID);
 			if ( literal.charAt(0)=='\'' && stringLiterals.get(literal)!=null ) {
 				stringLiterals.put(literal, tokens.get(tokenID));
+				// an alias still means you need a lexer rule for it
+				Integer typeI = (Integer)tokens.get(tokenID);
+				grammar.defineLexerRuleForAliasedStringLiteral(tokenID, literal, typeI.intValue());
 			}
 		}
 	}

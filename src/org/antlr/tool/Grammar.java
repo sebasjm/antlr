@@ -739,7 +739,7 @@ public class Grammar {
             tokenIDToTypeMap.put(text, new Integer(tokenType));
         }
 		int index = Label.NUM_FAUX_LABELS+tokenType-1;
-		//System.out.println("defining token "+text+" at type="+tokenType+", index="+index);
+		//System.out.println("defining "+name+" token "+text+" at type="+tokenType+", index="+index);
 		this.maxTokenType = Math.max(this.maxTokenType, tokenType);
         if ( index>=typeToTokenList.size() ) {
 			typeToTokenList.setSize(index+1);
@@ -914,19 +914,35 @@ public class Grammar {
 		lexerRules.add(ruleToken.getText());
 	}
 
+	/** If someone does PLUS='+' in the parser, must make sure we get
+	 *  "PLUS : '+' ;" in lexer not "T73 : '+';"
+	 */
+	public void defineLexerRuleForAliasedStringLiteral(String tokenID,
+													   String literal,
+													   int tokenType)
+	{
+		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
+									tokenID,
+									new Integer(tokenType),
+									literal);
+	}
+
 	public void defineLexerRuleForStringLiteral(String literal, int tokenType) {
+		//System.out.println("defineLexerRuleForStringLiteral: "+literal+" "+tokenType);
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									computeTokenNameFromLiteral(tokenType,literal),
 									new Integer(tokenType),
 									literal);
 	}
 
+	/*
 	public void defineLexerRuleForCharLiteral(String literal, int tokenType) {
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									computeTokenNameFromLiteral(tokenType,literal),
 									new Integer(tokenType),
 									literal);
 	}
+	*/
 
 	public Rule getRule(String ruleName) {
 		Rule r = (Rule)nameToRuleMap.get(ruleName);
@@ -2011,7 +2027,8 @@ public class Grammar {
 	}
 
 	/** given a token type and the text of the literal, come up with a
-	 *  decent token type label.  For now it's just T<type>.
+	 *  decent token type label.  For now it's just T<type>.  Actually,
+	 *  if there is an aliased name from tokens like PLUS='+', use it.
 	 */
 	public String computeTokenNameFromLiteral(int tokenType, String literal) {
 		return "T"+tokenType;
