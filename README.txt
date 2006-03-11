@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0ea7
-December 14, 2005
+ANTLR 3.0ea8
+January 11, 2006
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator
@@ -8,12 +8,14 @@ University of San Francisco
 
 INTRODUCTION 
 
-Welcome to ANTLR v3!  I've been working on this for 2.5 straight years
+Welcome to ANTLR v3!  I've been working on this for nearly 3 years
 and, while it is not ready for a full release, it may prove useful to
-some of you.  The main functionality missing is tree construction and
-tree walking support.  Finally, I need to rewrite ANTLR v3 in itself
-(it's written in 2.7.5 at the moment) before I can do my first alpha
-release.
+some of you.  No primary functionality is missing.  Ultimately, I need
+to rewrite ANTLR v3 in itself (it's written in 2.7.6 at the moment).
+
+You should use v3 in conjunction with ANTLRWorks:
+
+    http://www.antlr.org/works/index.html 
 
 WARNING: You should only be playing with this release if you are an
 experienced antlr user or language developer.  There is no
@@ -22,9 +24,6 @@ Furthermore, this software will be in a state of flux including
 changes in syntax and methods/classes until we get closer to a real
 release.  There are many things that just plain don't work at the
 moment.
-
-[3.0ea7 has the key components now: lexer, parser, tree construction,
- and tree parser]
 
 I have made absolutely no effort yet to deal well with erroneous input
 (well, semantic checking is pretty good, but bad syntax makes ANTLR
@@ -53,7 +52,8 @@ ANTLR stands for (AN)other (T)ool for (L)anguage (R)ecognition and was
 originally known as PCCTS.  ANTLR is a language tool that provides a
 framework for constructing recognizers, compilers, and translators
 from grammatical descriptions containing actions (this release only
-allows Java actions).
+allows Java actions).  See http://www.antlr.org/v3 for a list of
+targets/contributors.
 
 ----------------------------------------------------------------------
 
@@ -62,11 +62,13 @@ How is ANTLR v3 different than ANTLR v2?
 ANTLR v3 has a far superior parsing algorithm called LL(*) that
 handles many more grammars than v2 does.  In practice, it means you
 can throw almost any grammar at ANTLR that is non-left-recursive and
-umambiguous (same input can be matched by multiple rules); the cost is
-perhaps a tiny bit of backtracking.  There is currently no syntactic
-predicate (full LL backtracking) support because the LL(*) algorithm
-ramps up to use more lookahead when it needs to and is much more
-efficient than normal LL backtracking.
+unambiguous (same input can be matched by multiple rules); the cost is
+perhaps a tiny bit of backtracking, but with a DFA not a full parser.
+You can manually set the max lookahead k as an option for any decision
+though.  The LL(*) algorithm ramps up to use more lookahead when it
+needs to and is much more efficient than normal LL backtracking. There
+is support for syntactic predicate (full LL backtracking) when LL(*)
+fails.
 
 Lexers are much easier due to the LL(*) algorithm as well.  Previously
 these two lexer rules would cause trouble because ANTLR couldn't
@@ -90,6 +92,53 @@ attributes whereby a rule may define a value usable by any rule it
 invokes directly or indirectly w/o having to pass a parameter all the
 way down.
 
+ANTLR v3 tree construction is far superior--it provides tree rewrite
+rules where the right hand side is simply the tree grammar fragment
+describing the tree you want to build:
+
+formalArgs
+	:	typename declarator (',' typename declarator )*
+		-> ^(ARG typename declarator)+
+	;
+
+That builds tree sequences like:
+
+^(ARG int v1) ^(ARG int v2)
+
+ANTLR v3 also incorporates StringTemplate:
+
+      http://www.stringtemplate.org
+
+just like AST support.  It is useful for generating output.  For
+example this rule creates a template called 'import' for each import
+definition found in the input stream:
+
+grammar Java;
+options {
+  output=template;
+}
+...
+importDefinition
+    :   'import' identifierStar SEMI
+        -> import(name={$identifierStar.st},
+                begin={$identifierStar.start},
+                end={$identifierStar.stop})
+    ;
+
+The attributes are set via assignments in the argument list.  The
+arguments are actions with arbitrary expressions in the target
+language.  The .st label property is the result template from a rule
+reference.  There is a nice shorthand in actions too:
+
+    %foo(a={},b={},...) ctor
+    %({name-expr})(a={},...) indirect template ctor reference
+    %{string-expr} anonymous template from string expr
+    %{expr}.y = z; template attribute y of StringTemplate-typed expr to z
+    %x.y = z; set template attribute y of x (always set never get attr)
+              to z [languages like python without ';' must still use the
+              ';' which the code generator is free to remove during code gen]
+              Same as '(x).setAttribute("y", z);'
+
 For ANTLR v3 I decided to make the most common tasks easy by default
 rather.  This means that some of the basic objects are heavier weight
 than some speed demons would like, but they are free to pare it down
@@ -107,12 +156,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0ea7/README.txt (this file)
-antlr-3.0ea7/LICENSE.txt
-antlr-3.0ea7/src/org/antlr/...
-antlr-3.0ea7/lib/stringtemplate-2.2b4.jar (3.0ea7 needs 2.2b4)
-antlr-3.0ea7/lib/antlr-2.7.5.jar
-antlr-3.0ea7/lib/antlr-3.0ea7.jar
+antlr-3.0ea8/README.txt (this file)
+antlr-3.0ea8/LICENSE.txt
+antlr-3.0ea8/src/org/antlr/...
+antlr-3.0ea8/lib/stringtemplate-2.2b4.jar (3.0ea8 needs 2.2b6)
+antlr-3.0ea8/lib/antlr-2.7.6.jar
+antlr-3.0ea8/lib/antlr-3.0ea8.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -125,13 +174,16 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0ea7 (June 29, 2005)  1989-2005
+ANTLR Parser Generator   Early Access Version 3.0ea8 (Jan 11, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
-  -o outputDir   specify output directory where all output is generated
+  -o outputDir   specify output directory where all output is
+generated
   -lib dir       specify location of token files
   -report        print out a report about the grammar(s) processed
+  -print         print out the grammar without actions
   -debug         generate a parser that emits debugging events
-  -profile       enerate a parser that computes profiling information
+  -profile       generate a parser that computes profiling information
+  -nomemo        when backtracking don't generate memoization code
   -nfa           generate an NFA for each rule
   -dfa           generate a DFA for each decision point
 
@@ -189,10 +241,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0ea7/lib/stringtemplate-2.2b4.jar
-antlr-3.0ea7/lib/antlr-2.7.5.jar
+antlr-3.0ea8/lib/stringtemplate-2.2b6.jar
+antlr-3.0ea8/lib/antlr-2.7.6.jar
 
-then jump into antlr-3.0ea7/src directory and then type:
+then jump into antlr-3.0ea8/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -204,7 +256,12 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0ea8 - ???
+3.0ea8 - January 11, 2006
+
+* added @finally {...} action like @init for rules.  Executes in
+  finally block (java target) after all other stuff like rule memoization.
+  No code changes needs; ST just refs a new action:
+      <ruleDescriptor.actions.finally>
 
 * hideous bug fixed: PLUS='+' didn't result in '+' rule in lexer
 
