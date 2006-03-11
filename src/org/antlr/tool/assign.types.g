@@ -108,6 +108,10 @@ options {
 protected Grammar grammar;
 protected Map stringLiterals = new LinkedHashMap(); // Map<literal,Integer>
 protected Map tokens = new LinkedHashMap();         // Map<name,Integer>
+/** Track actual lexer rule defs so we don't get repeated token defs in 
+ *  generated lexer.
+ */
+protected Set tokenRuleDefs = new HashSet();        // Set<name>
 protected Map aliases = new LinkedHashMap();        // Map<name,literal>
 protected String currentRuleName;
 protected static final Integer UNASSIGNED = new Integer(-1);
@@ -166,10 +170,11 @@ protected void trackTokenRule(GrammarAST t,
 		// look for "<TOKEN> : <literal> ;" pattern
 		GrammarAST stringAlias = #(#[BLOCK], #(#[ALT], #[STRING_LITERAL]));
 		GrammarAST charAlias = #(#[BLOCK], #(#[ALT], #[CHAR_LITERAL]));
-		if ( matchesStructure(block,stringAlias) ||
-		     matchesStructure(block,charAlias) )
-	    {
+		if ( matchesStructure(block,charAlias) ||
+             matchesStructure(block,stringAlias) )
+		{
 			alias(t, (GrammarAST)block.getFirstChild().getFirstChild());
+			tokenRuleDefs.add(t.getText());
 		}
 	}
 	// else error
@@ -253,7 +258,9 @@ protected void assignTypes() {
 				stringLiterals.put(literal, tokens.get(tokenID));
 				// an alias still means you need a lexer rule for it
 				Integer typeI = (Integer)tokens.get(tokenID);
-				grammar.defineLexerRuleForAliasedStringLiteral(tokenID, literal, typeI.intValue());
+				if ( !tokenRuleDefs.contains(tokenID) ) {
+					grammar.defineLexerRuleForAliasedStringLiteral(tokenID, literal, typeI.intValue());
+				}
 			}
 		}
 	}

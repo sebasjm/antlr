@@ -80,6 +80,20 @@ public class TestSymbolDefinitions extends TestSuite {
 		checkSymbols(g, rules, tokenNames);
 	}
 
+	public void testTokensSectionWithAssignmentSection() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"tokens {\n" +
+				"  C='c';\n" +
+				"  D;" +
+				"}\n"+
+				"a : A | B;\n" +
+				"b : C ;");
+		String rules = "a, b";
+		String tokenNames = "A, B, C, D, 'c'";
+		checkSymbols(g, rules, tokenNames);
+	}
+
 	public void testCombinedGrammarLiterals() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
@@ -90,6 +104,16 @@ public class TestSymbolDefinitions extends TestSuite {
 				"C : 'c' ;\n");        // nor is 'c'
 		String rules = "a, b";
 		String tokenNames = "C, FOO, ID, 'begin', 'end', ';'";
+		checkSymbols(g, rules, tokenNames);
+	}
+
+	public void testCombinedGrammarWithRefToLiteralButNoTokenIDRef() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : 'a' ;\n" +
+				"A : 'a' ;\n");
+		String rules = "a";
+		String tokenNames = "A, 'a'";
 		checkSymbols(g, rules, tokenNames);
 	}
 

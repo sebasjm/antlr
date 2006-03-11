@@ -27,11 +27,12 @@
 */
 package org.antlr.test;
 
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.TokenRewriteStream;
 import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.ParseTree;
 
 public class TestTokenRewriteStream extends TestSuite {
 
@@ -42,9 +43,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testInsertBeforeIndex0() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -58,9 +59,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testInsertAfterLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -74,9 +75,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void test2InsertBeforeAfterMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -91,9 +92,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceIndex0() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -107,9 +108,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -123,9 +124,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -139,9 +140,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void test2ReplaceMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -156,9 +157,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceThenDeleteMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -173,9 +174,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceThenInsertSameIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -190,9 +191,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceThen2InsertSameIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -208,9 +209,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testInsertThenReplaceSameIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -225,9 +226,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void test2InsertMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -242,9 +243,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void test2InsertThenReplaceIndex0() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -260,9 +261,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceThenInsertBeforeLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -277,9 +278,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testInsertThenReplaceLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -294,9 +295,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceThenInsertAfterLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -311,9 +312,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceRangeThenInsertInMiddle() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -328,9 +329,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceRangeThenInsertAtLeftEdge() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -345,9 +346,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceRangeThenInsertAtRightEdge() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -362,9 +363,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceRangeThenInsertAfterRightEdge() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
@@ -379,9 +380,9 @@ public class TestTokenRewriteStream extends TestSuite {
 	public void testReplaceAll() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : \"a\";\n" +
-			"B : \"b\";\n" +
-			"C : \"c\";\n");
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);

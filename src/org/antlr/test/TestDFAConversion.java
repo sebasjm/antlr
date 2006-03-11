@@ -868,18 +868,30 @@ As a result, alternative(s) 2 were disabled for that input
 		String expecting =
 			".s0-B->:s2=>1\n" +
 			".s0-EOF->:s1=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, 0);
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = new int[] {1,2};
+		String ambigInput = "R";
+		int[] danglingAlts = null;
+		int numWarnings = 1;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
 	public void testWildcardPlusK1AndNonGreedyByDefaultInParser() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
 			"s : A block B+ EOF ;\n" +
-			"block : L .* R ;");
+			"block : L .+ R ;");
 		String expecting =
 			".s0-B->:s2=>1\n" +
 			".s0-EOF->:s1=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, 0);
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = new int[] {1,2};
+		String ambigInput = "R";
+		int[] danglingAlts = null;
+		int numWarnings = 1;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
 	// S U P P O R T

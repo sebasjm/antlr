@@ -27,12 +27,11 @@
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.Grammar;
-import org.antlr.tool.FASerializer;
 import org.antlr.analysis.State;
-import antlr.RecognitionException;
+import org.antlr.test.unit.FailedAssertionException;
+import org.antlr.test.unit.TestSuite;
+import org.antlr.tool.FASerializer;
+import org.antlr.tool.Grammar;
 
 public class TestNFAConstruction extends TestSuite {
 
@@ -628,7 +627,8 @@ public class TestNFAConstruction extends TestSuite {
 
 		String expectingGrammarStr =
 			"1:7: lexer grammar P;\n" +
-			"A : ~ '3' ;";
+				"A : ~ '3' ;\n"+
+				"Tokens : A ;";
 		assertEqual(g.toString(), expectingGrammarStr);
 	}
 
@@ -646,7 +646,8 @@ public class TestNFAConstruction extends TestSuite {
 
 		String expectingGrammarStr =
 			"1:7: lexer grammar P;\n" +
-			"A : ~ ('3'|'b');";
+			"A : ~ ('3'|'b');\n" +
+			"Tokens : A ;";
 		assertEqual(g.toString(), expectingGrammarStr);
 	}
 
@@ -670,7 +671,8 @@ public class TestNFAConstruction extends TestSuite {
 
 		String expectingGrammarStr =
 			"1:7: lexer grammar P;\n" +
-			"A : (~ '3' )* ;";
+			"A : (~ '3' )* ;\n" +
+			"Tokens : A ;";
 		assertEqual(g.toString(), expectingGrammarStr);
 	}
 
@@ -694,7 +696,8 @@ public class TestNFAConstruction extends TestSuite {
 
 		String expectingGrammarStr =
 			"1:7: lexer grammar P;\n" +
-			"A : (~ ('3'|'b'))* ;";
+			"A : (~ ('3'|'b'))* ;\n" +
+			"Tokens : A ;";
 		assertEqual(g.toString(), expectingGrammarStr);
 	}
 

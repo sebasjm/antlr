@@ -56,6 +56,16 @@ public abstract class BaseTree implements Tree {
 		return (BaseTree)children.get(i);
 	}
 
+	public Tree getFirstChildWithType(int type) {
+		for (int i = 0; children!=null && i < children.size(); i++) {
+			Tree t = (Tree) children.get(i);
+			if ( t.getType()==type ) {
+				return t;
+			}
+		}	
+		return null;
+	}
+
 	public int getChildCount() {
 		if ( children==null ) {
 			return 0;

@@ -196,7 +196,9 @@ public class TestRewriteTemplates extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
-			"a scope {String id;} : ID b {System.out.println($b.st.toString());} ;\n" +
+			"a scope {String id;} : ID {$a::id=$ID.text;} b\n" +
+			"	{System.out.println($b.st.toString());}\n" +
+			"   ;\n" +
 			"b : INT -> foo(x={$a::id}) ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +

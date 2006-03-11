@@ -925,6 +925,8 @@ public class Grammar {
 									tokenID,
 									new Integer(tokenType),
 									literal);
+		// track this lexer rule's name
+		lexerRules.add(tokenID);
 	}
 
 	public void defineLexerRuleForStringLiteral(String literal, int tokenType) {
