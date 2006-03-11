@@ -1,6 +1,6 @@
 Early Access ANTLR v3
 ANTLR 3.0ea8
-January 11, 2006
+March 11, 2006
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator
@@ -174,7 +174,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0ea8 (Jan 11, 2006) 1989-2006
+ANTLR Parser Generator   Early Access Version 3.0ea8 (Mar 11, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir   specify output directory where all output is
 generated
@@ -256,7 +256,7 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0ea8 - January 11, 2006
+3.0ea8 - March 11, 2006
 
 * added @finally {...} action like @init for rules.  Executes in
   finally block (java target) after all other stuff like rule memoization.
