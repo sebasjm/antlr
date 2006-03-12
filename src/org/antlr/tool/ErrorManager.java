@@ -155,6 +155,7 @@ public class ErrorManager {
 	public static final int MSG_ACTION_REDEFINITION = 144;
 	public static final int MSG_DOUBLE_QUOTES_ILLEGAL = 145;
 	public static final int MSG_INVALID_TEMPLATE_ACTION = 146;
+	public static final int MSG_MISSING_ATTRIBUTE_NAME = 147;
 
 
 	// GRAMMAR WARNINGS

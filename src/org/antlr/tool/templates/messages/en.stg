@@ -196,6 +196,8 @@ DOUBLE_QUOTES_ILLEGAL(file,line,col,arg) ::=
   "<loc()>string literals must use single quotes (such as \'begin\'): <arg>"
 INVALID_TEMPLATE_ACTION(file,line,col,arg) ::=
   "<loc()>invalid StringTemplate % shorthand syntax: '<arg>'"
+MISSING_ATTRIBUTE_NAME(file,line,col) ::=
+  "<loc()>missing attribute name on $ reference"
 
 // GRAMMAR WARNINGS
 
