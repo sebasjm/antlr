@@ -232,10 +232,14 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
 <else>
 <if(!emptyRule)>
+<if(actions.(actionScope).rulecatch)>
+    <actions.(actionScope).rulecatch>
+<else>
     catch (RecognitionException re) {
         reportError(re);
         recover(input,re);
     }<\n>
+<endif>
 <endif>
 <endif>
     finally {
