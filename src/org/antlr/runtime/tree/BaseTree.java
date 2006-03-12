@@ -99,6 +99,14 @@ public abstract class BaseTree implements Tree {
 		}
 	}
 
+	/** Add all elements of kids list as children of this node */
+	public void addChildren(List kids) {
+		for (int i = 0; i < kids.size(); i++) {
+			Tree t = (Tree) kids.get(i);
+			addChild(t);
+		}
+	}
+
 	public void setChild(int i, BaseTree t) {
 		if ( children==null ) {
 			createChildrenList();
