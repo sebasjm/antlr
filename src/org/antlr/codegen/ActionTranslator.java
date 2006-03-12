@@ -316,6 +316,12 @@ public class ActionTranslator {
 	{
 		String attrRef=null;
 		String scopeName = getID(action, c);
+		if ( scopeName==null ) {
+			ErrorManager.grammarError(ErrorManager.MSG_MISSING_ATTRIBUTE_NAME,
+									  grammar,
+									  actionAST.getToken());
+			return c+1;
+		}
 		c += scopeName.length();
 		List ruleRefsInAlt = null;
 		List tokenRefsInAlt = null;
