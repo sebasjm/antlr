@@ -930,6 +930,9 @@ static <returnType()>
     <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
 <else>
 <if(!emptyRule)>
+<if(actions.(actionScope).rulecatch)>
+    <actions.(actionScope).rulecatch>
+<else>
     if (hasException())
     {
         preportError();
@@ -937,9 +940,11 @@ static <returnType()>
     }<\n>
 <endif>
 <endif>
+<endif>
     <if(trace)>System.out.println("exit <ruleName> "+LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
 
 
+        <ruleDescriptor.actions.finally>
     <@postamble()>
     return <ruleReturnValue()>;
 }
