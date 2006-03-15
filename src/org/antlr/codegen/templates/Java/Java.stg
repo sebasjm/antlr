@@ -245,7 +245,11 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     finally {
         <if(trace)>System.out.println("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
-        <ruleDescriptor.actions.finally>
+<if(backtracking)>
+        if ( backtracking==0 ) {
+            <ruleDescriptor.actions.finally>
+        }<\n>
+<endif>
     }
     <@postamble()>
     return <ruleReturnValue()>;
@@ -343,6 +347,11 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
     finally {
         <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
+<if(backtracking)>
+        if ( backtracking==0 ) {
+            <ruleDescriptor.actions.finally>
+        }<\n>
+<endif>
     }
 }
 // $ANTLR end <ruleName>

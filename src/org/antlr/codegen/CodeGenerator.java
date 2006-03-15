@@ -743,7 +743,7 @@ public class CodeGenerator {
 		return translator.translate(ruleName,actionTree);
 	}
 
-	/** Given a template constructor action like $template:CountingStringReader(name{...}) in
+	/** Given a template constructor action like %foo(a={...}) in
 	 *  an action, translate it to the appropriate template constructor
 	 *  from the templateLib.
 	 *

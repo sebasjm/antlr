@@ -1054,7 +1054,8 @@ rewrite_template returns [StringTemplate code=null]
 		   }
 		   else if ( #ind!=null ) { // must be %({expr})(args)
 		   		code = templates.getInstanceOf("rewriteIndirectTemplate");
-		   		code.setAttribute("expr", #ind.getText());
+				String exprCode=generator.translateAction(currentRuleName,#ind);
+		   		code.setAttribute("expr", exprCode);
 		   }
 		   }
 	       #( ARGLIST
