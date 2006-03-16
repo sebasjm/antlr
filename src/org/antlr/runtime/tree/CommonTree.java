@@ -34,7 +34,7 @@ public class CommonTree extends BaseTree {
 	/** What token indexes bracket all tokens associated with this node
 	 *  and below?
 	 */
-	public int startIndex, stopIndex;
+	public int startIndex=-1, stopIndex=-1;
 
 	/** A single token is the payload */
 	public Token token;
