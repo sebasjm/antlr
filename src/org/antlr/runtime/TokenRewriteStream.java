@@ -452,6 +452,15 @@ public class TokenRewriteStream extends CommonTokenStream {
 			if ( rewriteOpIndex<rewrites.size() ) {
 				RewriteOperation op =
 						(RewriteOperation)rewrites.get(rewriteOpIndex);
+
+				// skip all ops at lower index
+				while ( op.index<tokenCursor && rewriteOpIndex<rewrites.size() ) {
+					rewriteOpIndex++;
+					if ( rewriteOpIndex<rewrites.size() ) {
+						op = (RewriteOperation)rewrites.get(rewriteOpIndex);
+					}
+				}
+
 				// while we have ops for this token index, exec them
 				while ( tokenCursor==op.index && rewriteOpIndex<rewrites.size() ) {
 					//System.out.println("execute "+op+" at "+rewriteOpIndex);
