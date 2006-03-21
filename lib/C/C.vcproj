@@ -25,7 +25,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
+				PreprocessorDefinitions="ANTLR3_WINDOWS;ANTLR3_WIN32"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -80,7 +80,7 @@
 				FavorSizeOrSpeed="1"
 				EnableFiberSafeOptimizations="TRUE"
 				AdditionalIncludeDirectories="&quot;$(InputDir)&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				PreprocessorDefinitions="ANTLR3_WINDOWS;ANTLR3_WIN32"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="FALSE"
 				EnableEnhancedInstructionSet="2"
@@ -161,6 +161,9 @@
 				RelativePath=".\src\antlr3parser.c">
 			</File>
 			<File
+				RelativePath=".\src\antlr3parsetree.c">
+			</File>
+			<File
 				RelativePath=".\src\antlr3string.c">
 			</File>
 			<File
@@ -232,7 +235,7 @@
 				RelativePath=".\include\antlr3parser.h">
 			</File>
 			<File
-				RelativePath=".\antlr3parsetree.h">
+				RelativePath=".\include\antlr3parsetree.h">
 			</File>
 			<File
 				RelativePath=".\include\antlr3string.h">

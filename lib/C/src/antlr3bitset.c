@@ -81,18 +81,18 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
 
     ANTLR3_MEMSET(bitset->bits, 0x00, (ANTLR3_UINT64)(numelements * sizeof(ANTLR3_UINT64)));
 
-    bitset->clone	=   antlr3BitsetClone;
-    bitset->or		=   antlr3BitsetOR;
-    bitset->orInPlace	=   antlr3BitsetORInPlace;
-    bitset->size	=   antlr3BitsetSize;
-    bitset->add		=   antlr3BitsetAdd;
-    bitset->grow	=   grow;
-    bitset->equals	=   antlr3BitsetEquals;
-    bitset->isMember	=   antlr3BitsetMember;
-    bitset->numBits	=   antlr3BitsetNumBits;
-    bitset->remove	=   antlr3BitsetRemove;
-    bitset->isNil	=   antlr3BitsetIsNil;
-    bitset->free	=   antlr3BitsetFree;
+    bitset->clone	=   ANTLR3_API_FUNC antlr3BitsetClone;
+    bitset->or		=   ANTLR3_API_FUNC antlr3BitsetOR;
+    bitset->orInPlace	=   ANTLR3_API_FUNC antlr3BitsetORInPlace;
+    bitset->size	=   ANTLR3_API_FUNC antlr3BitsetSize;
+    bitset->add		=   ANTLR3_API_FUNC antlr3BitsetAdd;
+    bitset->grow	=   ANTLR3_API_FUNC grow;
+    bitset->equals	=   ANTLR3_API_FUNC antlr3BitsetEquals;
+    bitset->isMember	=   ANTLR3_API_FUNC antlr3BitsetMember;
+    bitset->numBits	=   ANTLR3_API_FUNC antlr3BitsetNumBits;
+    bitset->remove	=   ANTLR3_API_FUNC antlr3BitsetRemove;
+    bitset->isNil	=   ANTLR3_API_FUNC antlr3BitsetIsNil;
+    bitset->free	=   ANTLR3_API_FUNC antlr3BitsetFree;
 
     /* All seems good
      */
@@ -424,7 +424,7 @@ antlr3BitsetSize(pANTLR3_BITSET bitset)
 {
     ANTLR3_UINT32   degree;
     ANTLR3_UINT32   i;
-    ANTLR3_UINT8    bit;
+    ANTLR3_INT8    bit;
     
     /* Come back to this, it may be faster to & with 0x01
      * then shift right a copy of the 4 bits, than shift left a constant of 1.
@@ -560,4 +560,5 @@ antlr3BitsetNumBits(pANTLR3_BITSET bitset)
 {
     return  bitset->length << ANTLR3_BITSET_LOG_BITS;
 }
+
 

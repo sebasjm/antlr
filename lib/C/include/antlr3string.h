@@ -72,7 +72,7 @@ typedef	struct ANTLR3_STRING_struct
 
 
 }
-    ANTLR3_STRING, *pANTLR3_STRING;
+    ANTLR3_STRING;
 
 /** Definition of the string factory interface, which creates and tracks
  *  strings for you of various shapes and sizes.
@@ -114,6 +114,7 @@ typedef struct	ANTLR3_STRING_FACTORY_struct
     void	    (*close)	(struct ANTLR3_STRING_FACTORY_struct * factory);
 
 }
-    ANTLR3_STRING_FACTORY, *pANTLR3_STRING_FACTORY;
+    ANTLR3_STRING_FACTORY;
 
 #endif
+

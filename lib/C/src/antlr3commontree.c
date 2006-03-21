@@ -28,16 +28,16 @@ antlr3CommonTreeNew()
      */
     antlr3BaseTreeNew(&(tree->baseTree));
 
-    tree->baseTree.me	    = tree;
+    tree->baseTree.me	    = ANTLR3_API_FUNC tree;
 
-    tree->baseTree.free	    = freeTree;
-    tree->baseTree.isNil    = isNil;
-    tree->baseTree.toString = toString;
-    tree->baseTree.dupNode  = dupNode;
+    tree->baseTree.free	    = ANTLR3_API_FUNC freeTree;
+    tree->baseTree.isNil    = ANTLR3_API_FUNC isNil;
+    tree->baseTree.toString = ANTLR3_API_FUNC toString;
+    tree->baseTree.dupNode  = ANTLR3_API_FUNC dupNode;
 
-    tree->getToken	    = getToken;
-    tree->getLine	    = getLine;
-    tree->getText	    = getText;
+    tree->getToken	    = ANTLR3_API_FUNC getToken;
+    tree->getLine	    = ANTLR3_API_FUNC getLine;
+    tree->getText	    = ANTLR3_API_FUNC getText;
 
     return tree;
 }
@@ -195,3 +195,4 @@ static pANTLR3_STRING	    toString			(pANTLR3_BASE_TREE tree)
 
 	return	((pANTLR3_COMMON_TREE)(tree->me))->token->getText(((pANTLR3_COMMON_TREE)(tree->me))->token);
 }
+

@@ -67,3 +67,4 @@ typedef	struct ANTLR3_BITSET_struct
 
 
 #endif
+

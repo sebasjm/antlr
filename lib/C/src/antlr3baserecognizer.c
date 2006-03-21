@@ -43,10 +43,10 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
 
     /* Install the API
      */
-    recognizer->match		= antlr3BRMatch;
-    recognizer->mismatch	= antlr3BRMismatch;
-    recognizer->matchAny	= antlr3BRMatchAny;
-    recognizer->free		= antlr3BRFree;
+    recognizer->match		= ANTLR3_API_FUNC antlr3BRMatch;
+    recognizer->mismatch	= ANTLR3_API_FUNC antlr3BRMismatch;
+    recognizer->matchAny	= ANTLR3_API_FUNC antlr3BRMatchAny;
+    recognizer->free		= ANTLR3_API_FUNC antlr3BRFree;
 
     recognizer->following	= NULL;
     recognizer->ruleMemo	= NULL;

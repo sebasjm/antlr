@@ -160,3 +160,4 @@ typedef	struct ANTLR3_INT_STREAM_struct
     ANTLR3_INT_STREAM;
 
 #endif
+

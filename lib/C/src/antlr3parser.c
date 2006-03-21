@@ -60,33 +60,33 @@ antlr3ParserNew		(ANTLR3_UINT32 sizeHint)
 
     /* Install the API
      */
-    parser->setTokenStream		= setTokenStream;
-    parser->getTokenStream		= getTokenStream;
-    parser->free			= freeParser;
+    parser->setTokenStream		= ANTLR3_API_FUNC setTokenStream;
+    parser->getTokenStream		= ANTLR3_API_FUNC getTokenStream;
+    parser->free			= ANTLR3_API_FUNC freeParser;
 
     /* Install the base recognizer API
      */
-    parser->reset				= reset;
-    parser->rec->reportError			= reportError;
-    parser->rec->displayRecognitionError	= displayRecognitionError;
-    parser->rec->recover			= recover;
-    parser->rec->beginResync			= beginResync;
-    parser->rec->endResync			= endResync;
-    parser->rec->computeErrorRecoverySet	= computeErrorRecoverySet;
-    parser->rec->computeCSRuleFollow		= computeCSRuleFollow;
-    parser->rec->combineFollows			= combineFollows;
-    parser->rec->recoverFromMismatchedToken	= recoverFromMismatchedToken;
-    parser->rec->recoverFromMismatchedSet	= recoverFromMismatchedSet;
-    parser->rec->recoverFromMismatchedElement	= recoverFromMismatchedElement;
-    parser->rec->consumeUntil			= consumeUntil;
-    parser->rec->consumeUntilSet		= consumeUntilSet;
-    parser->rec->getRuleInvocationStack		= getRuleInvocationStack;
-    parser->rec->getRuleInvocationStackNamed	= getRuleInvocationStackNamed;
-    parser->rec->toStrings			= toStrings;
-    parser->rec->getRuleMemoization		= getRuleMemoization;
-    parser->rec->alreadyParsedRule		= alreadyParsedRule;
-    parser->rec->memoize			= memoize;
-    parser->rec->synpred			= synpred;
+    parser->reset				= ANTLR3_API_FUNC reset;
+    parser->rec->reportError			= ANTLR3_API_FUNC reportError;
+    parser->rec->displayRecognitionError	= ANTLR3_API_FUNC displayRecognitionError;
+    parser->rec->recover			= ANTLR3_API_FUNC recover;
+    parser->rec->beginResync			= ANTLR3_API_FUNC beginResync;
+    parser->rec->endResync			= ANTLR3_API_FUNC endResync;
+    parser->rec->computeErrorRecoverySet	= ANTLR3_API_FUNC computeErrorRecoverySet;
+    parser->rec->computeCSRuleFollow		= ANTLR3_API_FUNC computeCSRuleFollow;
+    parser->rec->combineFollows			= ANTLR3_API_FUNC combineFollows;
+    parser->rec->recoverFromMismatchedToken	= ANTLR3_API_FUNC recoverFromMismatchedToken;
+    parser->rec->recoverFromMismatchedSet	= ANTLR3_API_FUNC recoverFromMismatchedSet;
+    parser->rec->recoverFromMismatchedElement	= ANTLR3_API_FUNC recoverFromMismatchedElement;
+    parser->rec->consumeUntil			= ANTLR3_API_FUNC consumeUntil;
+    parser->rec->consumeUntilSet		= ANTLR3_API_FUNC consumeUntilSet;
+    parser->rec->getRuleInvocationStack		= ANTLR3_API_FUNC getRuleInvocationStack;
+    parser->rec->getRuleInvocationStackNamed	= ANTLR3_API_FUNC getRuleInvocationStackNamed;
+    parser->rec->toStrings			= ANTLR3_API_FUNC toStrings;
+    parser->rec->getRuleMemoization		= ANTLR3_API_FUNC getRuleMemoization;
+    parser->rec->alreadyParsedRule		= ANTLR3_API_FUNC alreadyParsedRule;
+    parser->rec->memoize			= ANTLR3_API_FUNC memoize;
+    parser->rec->synpred			= ANTLR3_API_FUNC synpred;
 
     return parser;
 }
@@ -716,14 +716,14 @@ getRuleMemoization		    (pANTLR3_PARSER parser, ANTLR3_UINT32 ruleIndex, ANTLR3_
 	/* Did not find it, so create a new one
 	 */
 	ruleList    = antlr3ListNew(31);
-	parser->rec->ruleMemo->put(parser->rec->ruleMemo, (ANTLR3_UINT64)ruleIndex, (void *) ruleList, freeList);
+	parser->rec->ruleMemo->put(parser->rec->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), freeList);
     }
 
     /* See if there is a stop index associated with the supplied start index.
      * We index on the start position + 1, just in case there is ever a need to 
      * memoize the first token ever, at index 0.
      */
-    stopIndex	= (ANTLR3_UINT64)ruleList->get(ruleList, ruleParseStart+1);
+    stopIndex	= ANTLR3_UINT64_CAST(ruleList->get(ruleList, ruleParseStart+1));
 
     if	(stopIndex == 0)
     {
@@ -788,7 +788,7 @@ memoize				    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 r
     {
 	/* Add one to key in case the start is 0 eveer
 	 */
-	ruleList->put(ruleList, ruleParseStart+1, (void *)(stopIndex), NULL);
+	ruleList->put(ruleList, ruleParseStart+1, ANTLR3_FUNC_PTR(stopIndex), NULL);
     }
 }
 /** A syntactic predicate.  Returns true/false depending on whether
@@ -834,4 +834,5 @@ synpred				    (pANTLR3_PARSER parser, void * ctx, pANTLR3_INT_STREAM input, voi
 #ifdef	WIN32
 #pragma warning( default : 4100 )
 #endif
+
 

@@ -32,8 +32,6 @@
  */
 #include    <antlr3errors.h>
 
-#define	ANTLR3_WINDOWS
-#define	ANTLR3_WIN32
 
 #ifdef	ANTLR3_WINDOWS 
 
@@ -45,6 +43,7 @@
 #include    <stdarg.h>
 
 #define	ANTLR3_API  __declspec(dllexport)
+#define	ANTLR3_API_FUNC
 
 typedef	INT32	ANTLR3_CHAR,	*pANTLR3_CHAR;
 typedef	UINT32	ANTLR3_UCHAR,	*pANTLR3_UCHAR;
@@ -66,6 +65,10 @@ typedef	UINT32	ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
 typedef FILE *	    ANTLR3_FDSC;
 typedef	struct stat ANTLR3_FSTAT_STRUCT;
 
+#define	ANTLR3_FUNC_PTR(ptr) (void *)((ANTLR3_UINT64)(ptr))
+#define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)(ptr)
+#define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)((ANTLR3_UINT64)(ptr))
+
 #ifdef	ANTLR3_WIN32
 #endif
 
@@ -75,10 +78,46 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #endif
 
 #ifdef	ANTLR3_UNIX
+#include    <stdio.h>
+#include    <malloc.h>
+#include    <stdarg.h>
+#include    <sys/stat.h>
 
-#define	_stat	stat
+#define _stat   stat
 
+#define ANTLR3_API
+#define	ANTLR3_API_FUNC (void *)
+
+typedef int		    ANTLR3_CHAR,    *pANTLR3_CHAR;
+typedef unsigned int	    ANTLR3_UCHAR,   *pANTLR3_UCHAR;
+
+typedef char		    ANTLR3_INT8,    *pANTLR3_INT8;
+typedef short		    ANTLR3_INT16,   *pANTLR3_INT16;
+typedef int		    ANTLR3_INT32,   *pANTLR3_INT32;
+typedef long long	    ANTLR3_INT64,   *pANTLR3_INT64;
+
+typedef unsigned char       ANTLR3_UINT8,   *pANTLR3_UINT8;
+typedef unsigned short      ANTLR3_UINT16,  *pANTLR3_UINT16;
+typedef unsigned int        ANTLR3_UINT32,  *pANTLR3_UINT32;
+typedef unsigned long long  ANTLR3_UINT64,  *pANTLR3_UINT64;
+
+typedef unsigned int	    ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
+
+#define ANTLR3_INLINE   inline
 #define	ANTLR3_API
+
+typedef FILE *	    ANTLR3_FDSC;
+typedef	struct stat ANTLR3_FSTAT_STRUCT;
+
+#ifdef	ANTLR3_64
+#define	ANTLR3_FUNC_PTR(ptr) (void *)((ANTLR3_UINT64)(ptr))
+#define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)(ptr))
+#define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)((ANTLR3_UINT64)(ptr))
+#else
+#define	ANTLR3_FUNC_PTR(ptr) (void *)((ANTLR3_UINT32)(ptr))
+#define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)((ANTLR3_UINT32)(ptr))
+#define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)(ptr)
+#endif
 
 #endif
 

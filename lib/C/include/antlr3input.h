@@ -172,7 +172,7 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
     void		(*SetNewLineChar)	    (struct ANTLR3_INPUT_STREAM_struct * input, ANTLR3_UINT32 newlineChar);
 }
 
-    ANTLR3_INPUT_STREAM, *pANTLR3_INPUT_STREAM;
+    ANTLR3_INPUT_STREAM;
 
 
 /** \brief Structure for track lex input states as part of mark()
@@ -202,7 +202,7 @@ typedef	struct	ANTLR3_LEX_STATE_struct
     ANTLR3_INT32	charPositionInLine;
 
 }
-    ANTLR3_LEX_STATE, *pANTLR3_LEX_STATE;
+    ANTLR3_LEX_STATE;
 
     /* Prototypes 
      */

@@ -38,6 +38,8 @@ typedef	struct ANTLR3_BASE_TREE_struct
 
     void	    (*addChild)		(void * tree, void * child);
 
+    void	    (*addChildren)	(void * tree, pANTLR3_LIST kids);
+
     void	    (*setChild)		(void * tree, ANTLR3_UINT64 i, void * child);
 
     void    *	    (*deleteChild)	(void * tree, ANTLR3_UINT64 i);

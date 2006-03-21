@@ -51,11 +51,11 @@ antlr3TokenStreamNew()
 	return	(pANTLR3_TOKEN_STREAM) ANTLR3_ERR_NOMEM;
     }
 
-    stream->me	    = stream;
+    stream->me	    = ANTLR3_API_FUNC stream;
     
     /* Install basic API 
      */
-    stream->free    = antlr3TokenStreamFree;
+    stream->free    = ANTLR3_API_FUNC antlr3TokenStreamFree;
 
     
     return stream;
@@ -131,9 +131,9 @@ antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source
      */
     stream->tstream->istream->eofToken	= antlr3CommonTokenNew(ANTLR3_TOKEN_EOF);
     stream->tstream->istream->eofToken->setType(stream->tstream->istream->eofToken, ANTLR3_TOKEN_EOF);
-    stream->tstream->istream->eofToken->freeCustom = freeEofTOken;
+    stream->tstream->istream->eofToken->freeCustom = ANTLR3_API_FUNC freeEofTOken;
 
-    stream->free		= antlr3CTSFree;
+    stream->free		= ANTLR3_API_FUNC antlr3CTSFree;
     return  stream;
 }
 
@@ -155,14 +155,14 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
     /* Create space for the token stream interface
      */
     stream->tstream	= antlr3TokenStreamNew();
-    stream->tstream->me	= stream;
+    stream->tstream->me	= ANTLR3_API_FUNC stream;
 
     /* Create space for the INT_STREAM interfacce
      */
-    stream->tstream->istream		    = antlr3IntStreamNew();
-    stream->tstream->istream->me	    = stream;
+    stream->tstream->istream		    = ANTLR3_API_FUNC antlr3IntStreamNew();
+    stream->tstream->istream->me	    = ANTLR3_API_FUNC stream;
     stream->tstream->istream->type	    = ANTLR3_TOKENSTREAM;
-    stream->tstream->istream->exConstruct   = antlr3MTExceptionNew;
+    stream->tstream->istream->exConstruct   = ANTLR3_API_FUNC antlr3MTExceptionNew;
 
     /* Install the token tracking tables
      */
@@ -174,35 +174,35 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
 
     /* Install the common token stream API
      */
-    stream->setTokenTypeChannel	    = setTokenTypeChannel;
-    stream->discardTokenType	    = discardTokenType;
-    stream->discardOffChannelToks   = discardOffChannel;
-    stream->getTokens		    = getTokens;
-    stream->getTokenRange	    = getTokenRange;
-    stream->getTokensSet	    = getTokensSet;
-    stream->getTokensList	    = getTokensList;
-    stream->getTokensType	    = getTokensType;
+    stream->setTokenTypeChannel	    = ANTLR3_API_FUNC setTokenTypeChannel;
+    stream->discardTokenType	    = ANTLR3_API_FUNC discardTokenType;
+    stream->discardOffChannelToks   = ANTLR3_API_FUNC discardOffChannel;
+    stream->getTokens		    = ANTLR3_API_FUNC getTokens;
+    stream->getTokenRange	    = ANTLR3_API_FUNC getTokenRange;
+    stream->getTokensSet	    = ANTLR3_API_FUNC getTokensSet;
+    stream->getTokensList	    = ANTLR3_API_FUNC getTokensList;
+    stream->getTokensType	    = ANTLR3_API_FUNC getTokensType;
 
     /* Install the token stream API
      */
-    stream->tstream->LT			= tokLT;
-    stream->tstream->get		= get;
-    stream->tstream->getTokenSource	= getTokenSource;
-    stream->tstream->setTokenSource	= setTokenSource;
-    stream->tstream->toString		= toString;
-    stream->tstream->toStringSS		= toStringSS;
-    stream->tstream->toStringTT		= toStringTT;
+    stream->tstream->LT			= ANTLR3_API_FUNC tokLT;
+    stream->tstream->get		= ANTLR3_API_FUNC get;
+    stream->tstream->getTokenSource	= ANTLR3_API_FUNC getTokenSource;
+    stream->tstream->setTokenSource	= ANTLR3_API_FUNC setTokenSource;
+    stream->tstream->toString		= ANTLR3_API_FUNC toString;
+    stream->tstream->toStringSS		= ANTLR3_API_FUNC toStringSS;
+    stream->tstream->toStringTT		= ANTLR3_API_FUNC toStringTT;
 
     /* Install INT_STREAM interface
      */
-    stream->tstream->istream->LA	= LA;
-    stream->tstream->istream->mark	= mark;
-    stream->tstream->istream->release	= release;
-    stream->tstream->istream->size	= size;
-    stream->tstream->istream->index	= index;
-    stream->tstream->istream->rewind	= rewindStream;
-    stream->tstream->istream->seek	= seek;
-    stream->tstream->istream->consume	= consume;
+    stream->tstream->istream->LA	= ANTLR3_API_FUNC LA;
+    stream->tstream->istream->mark	= ANTLR3_API_FUNC mark;
+    stream->tstream->istream->release	= ANTLR3_API_FUNC release;
+    stream->tstream->istream->size	= ANTLR3_API_FUNC size;
+    stream->tstream->istream->index	= ANTLR3_API_FUNC index;
+    stream->tstream->istream->rewind	= ANTLR3_API_FUNC rewindStream;
+    stream->tstream->istream->seek	= ANTLR3_API_FUNC seek;
+    stream->tstream->istream->consume	= ANTLR3_API_FUNC consume;
     return  stream;
 }
 
@@ -431,7 +431,7 @@ setTokenTypeChannel (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT32 ttyp
     /* We add one to the channel so we can distinguish NULL as being no entry in the
      * table for a particular token type.
      */
-    tokenStream->channelOverrides->put(tokenStream->channelOverrides, ttype, (void *)((ANTLR3_UINT64)(channel + 1)), NULL);
+    tokenStream->channelOverrides->put(tokenStream->channelOverrides, ttype, ANTLR3_FUNC_PTR((ANTLR3_UINT64)channel + 1), NULL);
 }
 
 static void		    
@@ -445,7 +445,7 @@ discardTokenType    (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT32 ttype
     /* We add one to the channel so we can distinguish NULL as being no entry in the
      * table for a particular token type. We could use bitsets for this I suppose too.
      */
-    tokenStream->discardSet->put(tokenStream->discardSet, ttype, (void *)((ANTLR3_UINT64)(ttype + 1)), NULL);
+    tokenStream->discardSet->put(tokenStream->discardSet, ttype, ANTLR3_FUNC_PTR((ANTLR3_UINT64)ttype + 1), NULL);
 }
 
 static void		    
@@ -658,7 +658,7 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 	    {
 		/* Override found
 		 */
-		tok->setChannel(tok, (ANTLR3_UINT32)((ANTLR3_UINT64) channelI) - 1);
+		tok->setChannel(tok, ANTLR3_UINT32_CAST(channelI) - 1);
 	    }
 	}
 	

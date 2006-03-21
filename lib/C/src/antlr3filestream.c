@@ -64,7 +64,7 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 	ANTLR3_FREE(input->fileName);
 	ANTLR3_FREE(input);
 
-	return	(pANTLR3_INPUT_STREAM)status;
+	return	ANTLR3_FUNC_PTR(status);
     }
 
     /* Call the common 8 bit ASCII input stream handler

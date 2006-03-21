@@ -275,8 +275,9 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
     void		(*free)				(void * recognizer);
 
 }
-    ANTLR3_BASE_RECOGNIZER, *pANTLR3_BASE_RECOGNIZER;
+    ANTLR3_BASE_RECOGNIZER;
 
 
 
 #endif	    /* _ANTLR3_BASERECOGNIZER_H	*/
+

@@ -32,7 +32,7 @@ typedef	struct	ANTLR3_HASH_ENTRY_struct
      */
     struct	ANTLR3_HASH_ENTRY_struct * nextEntry;
 }
-    ANTLR3_HASH_ENTRY, *pANTLR3_HASH_ENTRY;
+    ANTLR3_HASH_ENTRY;
 
 /** Internal structure of a hash table bucket, which tracks
  *  all keys that hash to the same bucket.
@@ -46,7 +46,7 @@ typedef struct	ANTLR3_HASH_BUCKET_struct
     pANTLR3_HASH_ENTRY	entries;
     
 }
-    ANTLR3_HASH_BUCKET, *pANTLR3_HASH_BUCKET;
+    ANTLR3_HASH_BUCKET;
 
 /** Structure that tracks a hash table
  */
@@ -78,7 +78,7 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
     ANTLR3_INT32	(*put)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key, void * element, void (*freeptr)(void *));
     ANTLR3_UINT64	(*size)	    (struct ANTLR3_HASH_TABLE_struct * table);
 }
-    ANTLR3_HASH_TABLE, * pANTLR3_HASH_TABLE;
+    ANTLR3_HASH_TABLE;
 
 
 /** Internal structure representing an enumeration of a table.
@@ -110,7 +110,7 @@ typedef struct	ANTLR3_HASH_ENUM_struct
     int		(*next)	    (struct ANTLR3_HASH_ENUM_struct * en, void ** key, void ** data);
     void	(*free)	    (struct ANTLR3_HASH_ENUM_struct * table);
 }
-    ANTLR3_HASH_ENUM, *pANTLR3_HASH_ENUM;
+    ANTLR3_HASH_ENUM;
 
 /** Structure that represents a LIST collection
  */
@@ -129,7 +129,7 @@ typedef	struct	ANTLR3_LIST_struct
     ANTLR3_UINT64   (*size)	(struct ANTLR3_LIST_struct * list);
     
 }
-    ANTLR3_LIST, *pANTLR3_LIST;
+    ANTLR3_LIST;
 
 /** Structure that represents a Stack collection
  */
@@ -150,7 +150,7 @@ typedef	struct	ANTLR3_STACK_struct
     void *	    (*peek)	(struct ANTLR3_STACK_struct * stack);
 
 }
-    ANTLR3_STACK, *pANTLR3_STACK;
+    ANTLR3_STACK;
 
 
 

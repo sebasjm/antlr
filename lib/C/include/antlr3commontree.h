@@ -58,3 +58,5 @@ typedef struct ANTLR3_COMMON_TREE_struct
     ANTLR3_COMMON_TREE;
 
 #endif
+
+

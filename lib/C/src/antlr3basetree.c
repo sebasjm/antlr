@@ -3,6 +3,7 @@
 static void    *	getChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i);
 static ANTLR3_UINT64	getChildCount	(pANTLR3_BASE_TREE tree);
 static void		addChild	(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child);
+static void		addChildren	(pANTLR3_BASE_TREE tree, pANTLR3_LIST kids);
 static void		setChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i, void * child);
 static void    *	deleteChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i);
 static void    *	dupTree		(pANTLR3_BASE_TREE tree);
@@ -14,13 +15,14 @@ ANTLR3_API pANTLR3_BASE_TREE
 antlr3BaseTreeNew(pANTLR3_BASE_TREE  tree)
 {
     /* api */
-    tree->getChild	    = getChild;
-    tree->getChildCount	    = getChildCount;
-    tree->addChild	    = addChild;
-    tree->setChild	    = setChild;
-    tree->deleteChild	    = deleteChild;
-    tree->dupTree	    = dupTree;
-    tree->toStringTree	    = toStringTree;
+    tree->getChild	    = ANTLR3_API_FUNC getChild;
+    tree->getChildCount	    = ANTLR3_API_FUNC getChildCount;
+    tree->addChild	    = ANTLR3_API_FUNC addChild;
+    tree->addChildren	    = ANTLR3_API_FUNC addChildren;
+    tree->setChild	    = ANTLR3_API_FUNC setChild;
+    tree->deleteChild	    = ANTLR3_API_FUNC deleteChild;
+    tree->dupTree	    = ANTLR3_API_FUNC dupTree;
+    tree->toStringTree	    = ANTLR3_API_FUNC toStringTree;
 
     tree->children	    = NULL;
     
@@ -104,6 +106,19 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
     {
 	tree->children->add(tree->children, child, (void (*)(void *))child->free);
     }
+}
+
+/** Add all elements of the supplied list as children of this node
+ */
+static void
+addChildren	(pANTLR3_BASE_TREE tree, pANTLR3_LIST kids)
+{
+   ANTLR3_UINT64    i;
+
+   for	(i = 0; i < kids->size(kids); i++)
+   {
+       tree->addChild(tree, (pANTLR3_BASE_TREE)kids->get(kids, i));
+   }
 }
 
 static    void

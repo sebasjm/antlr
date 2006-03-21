@@ -15,7 +15,6 @@
 #include    <antlr3commontoken.h>
 #include    <antlr3tokenstream.h>
 #include    <antlr3bitset.h>
-#include    <antlr3dfa.h>
 #include    <antlr3lexer.h>
 #include    <antlr3parser.h>
 

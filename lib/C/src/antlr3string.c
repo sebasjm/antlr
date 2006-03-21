@@ -54,17 +54,17 @@ antlr3StringFactoryNew()
 
     /* Install the API
      */
-    factory->newRaw	= newRaw;
-    factory->newPtr	= newPtr;
-    factory->newSize	= newSize;
-    factory->destroy	= destroy;
-    factory->printable	= printable;
-    factory->destroy	= destroy;
-    factory->close	= close;
+    factory->newRaw	= ANTLR3_API_FUNC newRaw;
+    factory->newPtr	= ANTLR3_API_FUNC newPtr;
+    factory->newSize	= ANTLR3_API_FUNC newSize;
+    factory->destroy	= ANTLR3_API_FUNC destroy;
+    factory->printable	= ANTLR3_API_FUNC printable;
+    factory->destroy	= ANTLR3_API_FUNC destroy;
+    factory->close	= ANTLR3_API_FUNC close;
 
     return  factory;
 }
-
+ 
 /**
  *
  * \param factory 
@@ -89,7 +89,7 @@ newRaw	(pANTLR3_STRING_FACTORY factory)
 
     /* Add the string into the allocated list
      */
-    factory->strings->put(factory->strings, factory->index, (void *) string, stringFree);
+    factory->strings->put(factory->strings, factory->index, (void *) string, ANTLR3_API_FUNC stringFree);
     string->index   = factory->index++;
 
     return string;
@@ -364,3 +364,4 @@ insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, void * newbit)
 
     return  string->text;
 }
+

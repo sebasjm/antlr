@@ -51,21 +51,21 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 
     /* Install our this pointer (can be overridden by caller of course)
      */
-    lexer->me	= lexer;
+    lexer->me	= ANTLR3_API_FUNC lexer;
 
     /* Now we need to create the base recognizer
      */
-    lexer->rec	    = antlr3BaseRecognizerNew(ANTLR3_TYPE_LEXER, sizeHint);
+    lexer->rec	    = ANTLR3_API_FUNC antlr3BaseRecognizerNew(ANTLR3_TYPE_LEXER, sizeHint);
 
     if	(lexer->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_ERR_NOMEM)
     {
 	lexer->free(lexer);
 	return	(pANTLR3_LEXER) ANTLR3_ERR_NOMEM;
     }
-    lexer->rec->me  = lexer;
+    lexer->rec->me  = ANTLR3_API_FUNC lexer;
 
-    lexer->rec->displayRecognitionError	    = displayRecognitionError;
-    lexer->rec->reportError		    = reportError;
+    lexer->rec->displayRecognitionError	    = ANTLR3_API_FUNC displayRecognitionError;
+    lexer->rec->reportError		    = ANTLR3_API_FUNC reportError;
 
     /* Now install the token source interface
      */
@@ -78,33 +78,33 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 
 	return	(pANTLR3_LEXER) ANTLR3_ERR_NOMEM;
     }
-    lexer->tokSource->me    = lexer;
+    lexer->tokSource->me    = ANTLR3_API_FUNC lexer;
 
     /* Install the default enxtToken() method, which may be overridden
      * by generated code, or by anything else in fact.
      */
-    lexer->tokSource->nextToken	    = nextToken;
+    lexer->tokSource->nextToken	    = ANTLR3_API_FUNC nextToken;
     lexer->tokSource->strFactory    = NULL;
 
     lexer->tokFactory		    = NULL;
 
     /* Install the lexer API
      */
-    lexer->setCharStream	    = setCharStream;
-    lexer->mTokens		    = mTokens;
-    lexer->setCharStream	    = setCharStream;
-    lexer->emit			    = emit;
-    lexer->emitNew		    = emitNew;
-    lexer->matchs		    = matchs;
-    lexer->matchc		    = matchc;
-    lexer->matchRange		    = matchRange;
-    lexer->matchAny		    = matchAny;
-    lexer->recover		    = recover;
-    lexer->getLine		    = getLine;
-    lexer->getCharIndex		    = getCharIndex;
-    lexer->getCharPositionInLine    = getCharPositionInLine;
-    lexer->getText		    = getText;
-    lexer->free			    = freeLexer;
+    lexer->setCharStream	    = ANTLR3_API_FUNC setCharStream;
+    lexer->mTokens		    = ANTLR3_API_FUNC mTokens;
+    lexer->setCharStream	    = ANTLR3_API_FUNC setCharStream;
+    lexer->emit			    = ANTLR3_API_FUNC emit;
+    lexer->emitNew		    = ANTLR3_API_FUNC emitNew;
+    lexer->matchs		    = ANTLR3_API_FUNC matchs;
+    lexer->matchc		    = ANTLR3_API_FUNC matchc;
+    lexer->matchRange		    = ANTLR3_API_FUNC matchRange;
+    lexer->matchAny		    = ANTLR3_API_FUNC matchAny;
+    lexer->recover		    = ANTLR3_API_FUNC recover;
+    lexer->getLine		    = ANTLR3_API_FUNC getLine;
+    lexer->getCharIndex		    = ANTLR3_API_FUNC getCharIndex;
+    lexer->getCharPositionInLine    = ANTLR3_API_FUNC getCharPositionInLine;
+    lexer->getText		    = ANTLR3_API_FUNC getText;
+    lexer->free			    = ANTLR3_API_FUNC freeLexer;
     
     return  lexer;
 }
@@ -515,3 +515,4 @@ getText	    (pANTLR3_LEXER lexer)
 			    lexer->getCharIndex(lexer->me)-1);
 
 }
+

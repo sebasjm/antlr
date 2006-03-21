@@ -191,7 +191,7 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
      */
     pANTLR3_STRING  (*toString)		(struct ANTLR3_COMMON_TOKEN_struct * token);
 }
-    ANTLR3_COMMON_TOKEN, *pANTLR3_COMMON_TOKEN;
+    ANTLR3_COMMON_TOKEN;
 
 /** \brief ANTLR3 Token factory interface to create lots of tokens efficiently
  *  rather than creating and freeing lots of little bits of memory.
@@ -229,6 +229,6 @@ typedef	struct ANTLR3_TOKEN_FACTORY_struct
      */
     void		    (*close)	    (struct ANTLR3_TOKEN_FACTORY_struct * factory);
 }
-    ANTLR3_TOKEN_FACTORY, *pANTLR3_TOKEN_FACTORY;
+    ANTLR3_TOKEN_FACTORY;
 
 #endif
