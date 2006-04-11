@@ -30,6 +30,10 @@ package org.antlr.runtime.debug;
 import org.antlr.runtime.*;
 
 public interface DebugEventListener {
+	/** serialized version of true */
+	public static final int TRUE = 1;
+	public static final int FALSE = 0;
+
 	/** The parser has just entered a rule.  No decision has been made about
 	 *  which alt is predicted.  This is fired AFTER init actions have been
 	 *  executed.  Attributes are defined and available etc...
@@ -91,6 +95,10 @@ public interface DebugEventListener {
 	 *  is now rewound to index i.
 	 */
 	public void rewind(int i);
+
+	public void beginBacktrack(int level);
+
+	public void endBacktrack(int level, boolean successful);
 
 	/** To watch a parser move through the grammar, the parser needs to
 	 *  inform the debugger what line/charPos it is passing in the grammar.

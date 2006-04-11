@@ -320,9 +320,9 @@ public class TestTokenRewriteStream extends TestSuite {
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
 		tokens.LT(1); // fill buffer
 		tokens.replace(2, 4, "x");
-		tokens.insertBefore(3, "y");
+		tokens.insertBefore(3, "y"); // no effect; can't insert in middle of replaced region
 		String result = tokens.toString();
-		String expecting = "abyxba";
+		String expecting = "abxba";
 		assertEqual(result, expecting);
 	}
 
@@ -354,9 +354,9 @@ public class TestTokenRewriteStream extends TestSuite {
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
 		tokens.LT(1); // fill buffer
 		tokens.replace(2, 4, "x");
-		tokens.insertBefore(4, "y");
+		tokens.insertBefore(4, "y"); // no effect; within range of a replace
 		String result = tokens.toString();
-		String expecting = "abyxba";
+		String expecting = "abxba";
 		assertEqual(result, expecting);
 	}
 
@@ -390,6 +390,73 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(0, 6, "x");
 		String result = tokens.toString();
 		String expecting = "x";
+		assertEqual(result, expecting);
+	}
+
+	public void testReplaceSubsetThenFetch() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcccba");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(2, 4, "xyz");
+		String result = tokens.toString(0,6);
+		String expecting = "abxyzba";
+		assertEqual(result, expecting);
+	}
+
+	public void testReplaceThenReplaceSuperset() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcccba");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(2, 4, "xyz");
+		tokens.replace(2, 5, "foo"); // kills previous replace
+		String result = tokens.toString();
+		String expecting = "abfooa";
+		assertEqual(result, expecting);
+	}
+
+	public void testReplaceThenReplaceLowerIndexedSuperset() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcccba");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(2, 4, "xyz");
+		tokens.replace(1, 3, "foo"); // executes first since 1<2; then ignores replace@2 as it skips over 1..3
+		String result = tokens.toString();
+		String expecting = "afoocba";
+		assertEqual(result, expecting);
+	}
+
+	public void testReplaceSingleMiddleThenOverlappingSuperset() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcba");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(2, 2, "xyz");
+		tokens.replace(0, 3, "foo");
+		String result = tokens.toString();
+		String expecting = "fooa";
 		assertEqual(result, expecting);
 	}
 

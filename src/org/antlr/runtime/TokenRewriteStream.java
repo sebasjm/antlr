@@ -213,7 +213,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	 *  The list is ordered so that toString() can be done efficiently.
 	 *
 	 *  When there are multiple instructions at the same index, the instructions
-	 *  must be order to ensure proper behavior.  For example, a delete at
+	 *  must be ordered to ensure proper behavior.  For example, a delete at
 	 *  index i must kill any replace operation at i.  Insert-before operations
 	 *  must come before any replace / delete instructions.  If there are
 	 *  multiple insert instructions for a single index, they are done in
@@ -339,13 +339,15 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	public void replace(String programName, int from, int to, String text) {
-		//addToSortedRewriteList(new ReplaceOp(from, to, text));
+		addToSortedRewriteList(new ReplaceOp(from, to, text));
+		/*
 		// replace from..to by deleting from..to-1 and then do a replace
 		// on last index
 		for (int i=from; i<to; i++) {
 			addToSortedRewriteList(new DeleteOp(i,i));
 		}
 		addToSortedRewriteList(new ReplaceOp(to, to, text));
+		*/
 	}
 
 	public void replace(String programName, Token from, Token to, String text) {
@@ -422,11 +424,11 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	public String toString() {
-		return toString(MIN_TOKEN_INDEX, size());
+		return toString(MIN_TOKEN_INDEX, size()-1);
 	}
 
 	public String toString(String programName) {
-		return toString(programName, MIN_TOKEN_INDEX, size());
+		return toString(programName, MIN_TOKEN_INDEX, size()-1);
 	}
 
 	public String toString(int start, int end) {
@@ -448,6 +450,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 				tokenCursor<=end &&
 				tokenCursor<tokens.size() )
 		{
+			//System.out.println("tokenCursor="+tokenCursor);
 			// execute instructions associated with this token index
 			if ( rewriteOpIndex<rewrites.size() ) {
 				RewriteOperation op =
@@ -463,8 +466,9 @@ public class TokenRewriteStream extends CommonTokenStream {
 
 				// while we have ops for this token index, exec them
 				while ( tokenCursor==op.index && rewriteOpIndex<rewrites.size() ) {
-					//System.out.println("execute "+op+" at "+rewriteOpIndex);
+					//System.out.println("execute "+op+" at instruction "+rewriteOpIndex);
 					tokenCursor = op.execute(buf);
+					//System.out.println("after execute tokenCursor = "+tokenCursor);
 					rewriteOpIndex++;
 					if ( rewriteOpIndex<rewrites.size() ) {
 						op = (RewriteOperation)rewrites.get(rewriteOpIndex);
@@ -472,7 +476,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 				}
 			}
 			// dump the token at this index
-			if ( tokenCursor<end ) {
+			if ( tokenCursor<=end ) {
 				buf.append(get(tokenCursor).getText());
 				tokenCursor++;
 			}
@@ -481,15 +485,18 @@ public class TokenRewriteStream extends CommonTokenStream {
 		for (int opi=rewriteOpIndex; opi<rewrites.size(); opi++) {
 			RewriteOperation op =
 					(RewriteOperation)rewrites.get(opi);
+			if ( op.index>=size() ) {
+				op.execute(buf); // must be insertions if after last token
+			}
 			//System.out.println("execute "+op+" at "+opi);
-			op.execute(buf); // must be insertions if after last token
+			//op.execute(buf); // must be insertions if after last token
 		}
 
 		return buf.toString();
 	}
 
 	public String toDebugString() {
-		return toDebugString(MIN_TOKEN_INDEX, size());
+		return toDebugString(MIN_TOKEN_INDEX, size()-1);
 	}
 
 	public String toDebugString(int start, int end) {

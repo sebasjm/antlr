@@ -256,6 +256,34 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
+3.0ea9 - ??
+
+* updated debug events to send begin/end backtrack events for debugging
+
+* with a : (b->b) ('+' b -> ^(PLUS $a b))* ; you get b[0] each time as
+  there is no loop in rewrite rule itself.  Need to know context that
+  the -> is inside the rule and hence b means last value of b not all
+  values.
+
+* Bug in TokenRewriteStream; ops at indexes < start index blocked proper op.
+
+* Actions in ST rewrites "-> ({$op})()" were not translated
+
+* Added new action name:
+
+@rulecatch {
+catch (RecognitionException re) {
+    reportError(re);
+    recover(input,re);
+}
+catch (Throwable t) {
+    System.err.println(t);
+}
+}
+Overrides rule catch stuff.
+
+* Isolated $ refs caused exception
+
 3.0ea8 - March 11, 2006
 
 * added @finally {...} action like @init for rules.  Executes in

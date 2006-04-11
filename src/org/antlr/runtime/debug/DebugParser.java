@@ -95,6 +95,14 @@ public class DebugParser extends Parser {
 		dbg.endResync();
 	}
 
+	public void beginBacktrack(int level) {
+		dbg.beginBacktrack(level);
+	}
+
+	public void endBacktrack(int level, boolean successful) {
+		dbg.endBacktrack(level,successful);		
+	}
+
 	public void recoverFromMismatchedToken(IntStream input,
 										   MismatchedTokenException mte,
 										   int ttype,

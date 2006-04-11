@@ -77,6 +77,13 @@ public class Interpreter implements TokenSource {
 		public void LT(int i, Token t) {}
 		public void mark(int i) {}
 		public void rewind(int i) {}
+
+		public void beginBacktrack(int level) {
+		}
+
+		public void endBacktrack(int level, boolean successful) {
+		}
+
 		public void recognitionException(RecognitionException e) {}
 		public void beginResync() {}
 		public void endResync() {}
@@ -123,6 +130,13 @@ public class Interpreter implements TokenSource {
 		public void LT(int i, Token t) {}
 		public void mark(int i) {}
 		public void rewind(int i) {}
+
+		public void beginBacktrack(int level) {
+		}
+
+		public void endBacktrack(int level, boolean successful) {
+		}
+
 		public void recognitionException(RecognitionException e) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
 			ParseTree errorNode = new ParseTree(e);

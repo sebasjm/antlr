@@ -28,7 +28,6 @@
 package org.antlr.tool;
 
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.analysis.NFAState;
 
 /** The ANTLR code calls methods on ErrorManager to report errors etc...
  *  Rather than simply pass these arguments to the ANTLRErrorListener directly,
@@ -64,8 +63,11 @@ public abstract class Message {
 		msgST = ErrorManager.getMessage(msgID);
 	}
 
+	/** Return a new template instance every time someone tries to print
+	 *  a Message.
+	 */
 	public StringTemplate getMessageTemplate() {
-		return msgST;
+		return msgST.getInstanceOf();
 	}
 
 }

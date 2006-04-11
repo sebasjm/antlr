@@ -207,6 +207,13 @@ public abstract class BaseRecognizer {
 	public void endResync() {
 	}
 
+	/** A hook to listen in on the token consumption during error recovery.
+	 *  The DebugParser subclasses this to fire events to the listenter.
+	 */
+	public void beginBacktrack(int level) {}
+
+	public void endBacktrack(int level, boolean successful) {}
+
 	/*  Compute the error recovery set for the current rule.  During
 	 *  rule invocation, the parser pushes the set of tokens that can
 	 *  follow that rule reference on the stack; this amounts to
@@ -642,16 +649,18 @@ public abstract class BaseRecognizer {
 	public boolean synpred(IntStream input, GrammarFragmentPtr fragment) {
 		int i = input.index();
 		//System.out.println("begin backtracking="+backtracking+" @"+i+"="+((CommonTokenStream)input).LT(1));
-		int start = input.mark();
 		backtracking++;
+		beginBacktrack(backtracking);
+		int start = input.mark();
 		try {fragment.invoke();}
 		catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
+		boolean success = !failed;
 		input.rewind(start);
+		endBacktrack(backtracking, success);
 		backtracking--;
 		//System.out.println("end backtracking="+backtracking+": "+(failed?"FAILED":"SUCCEEDED")+" @"+input.index()+" should be "+i);
-		boolean success = !failed;
 		failed=false;
 		return success;
 	}

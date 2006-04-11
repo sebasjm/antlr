@@ -242,6 +242,14 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		else if ( elements[0].equals("rewind") ) {
 			listener.rewind(Integer.parseInt(elements[1]));
 		}
+		else if ( elements[0].equals("beginBacktrack") ) {
+			listener.beginBacktrack(Integer.parseInt(elements[1]));
+		}
+		else if ( elements[0].equals("endBacktrack") ) {
+			int level = Integer.parseInt(elements[1]);
+			int successI = Integer.parseInt(elements[2]);
+			listener.endBacktrack(level, successI==DebugEventListener.TRUE);
+		}
 		else if ( elements[0].equals("exception") ) {
 			String excName = elements[1];
 			String indexS = elements[2];
