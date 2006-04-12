@@ -1,5 +1,5 @@
 /** \file
- * Defintion of the ANTLR3 base tree.
+ * Definition of the ANTLR3 base tree.
  */
 
 #ifndef	_ANTLR3_BASE_TREE_H

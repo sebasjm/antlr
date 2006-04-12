@@ -27,17 +27,19 @@ typedef struct ANTLR3_PARSE_TREE_struct
 
     /** How to dup this node
      */
-    pANTLR3_BASE_TREE	    (*dupNode)(void * tree);
+    pANTLR3_BASE_TREE	    (*dupNode)	(void * tree);
 
     /** Return the type of this node
      */
-    ANTLR3_UINT32	    (*getType)(void * tree);
+    ANTLR3_UINT32	    (*getType)	(void * tree);
 
     /** Return the string representation of the payload (must be installed
      *  when the payload is added and point to a function that knwos how to 
      *  manifest a pANTLR3_STRING from a node.
      */
-    pANTLR3_STRING	    (*toString)(void * payload);
+    pANTLR3_STRING	    (*toString)	(void * payload);
+
+    void		    (*free)	(void * tree);
 
 }
     ANTLR3_PARSE_TREE;

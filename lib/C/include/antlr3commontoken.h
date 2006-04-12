@@ -105,7 +105,7 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
      */
     void    * custom;
 
-    /** Poiner to a function that knows how to free the custom structure when the 
+    /** Pointer to a function that knows how to free the custom structure when the 
      *  token is destroyed.
      */
     void    (*freeCustom)(void * custom);
