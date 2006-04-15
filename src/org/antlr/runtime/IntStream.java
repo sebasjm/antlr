@@ -59,6 +59,12 @@ public interface IntStream {
 	 */
 	void rewind(int marker);
 
+	/** Reset the stream to the state when last mark() was called.  Just
+	 *  like invoking rewind(getLastMark()) (though getLastMark does not
+	 *  exist).
+	 */
+	void rewind();
+
 	/** You may want to commit to a backtrack but don't want to force the
 	 *  stream to keep bookkeeping objects around for a marker that is
 	 *  no longer necessary.  This will have the same behavior as

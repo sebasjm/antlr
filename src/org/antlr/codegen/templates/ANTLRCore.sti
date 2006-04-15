@@ -214,7 +214,7 @@ dfaDecision(decisionNumber,description);
 cyclicDFA(className,ruleName,ruleDescriptor,decisionNumber,states,description);
 
 /** A state in a cyclic DFA */
-cyclicDFAState(stateNumber,edges,needErrorClause);
+cyclicDFAState(stateNumber,edges,needErrorClause,semPredState);
 
 /** An accept state for a cyclic DFA */
 cyclicDFAAcceptState(stateNumber,predictAlt);
@@ -236,7 +236,7 @@ eotDFAEdge(targetStateNumber,edgeNumber, predicates);
  */
 
 cyclicDFAStateSwitch(stateNumber,labels,edges,
-                     needErrorClause,EOTTargetStateNumber);
+                     needErrorClause,EOTTargetStateNumber,semPredState);
 
 cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber);
 

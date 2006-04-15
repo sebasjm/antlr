@@ -91,6 +91,9 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 */
 	protected Stack indexStack = new Stack();
 
+	/** Track the last mark() call result value for use in rewind(). */
+	protected int lastMarker;
+
 	/** Which node are we currently visiting? */
 	protected Tree currentNode;
 
@@ -225,6 +228,10 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	public void rewind(int marker) {
 		throw new NoSuchMethodError("can't rewind trees yet");
+	}
+
+	public void rewind() {
+		rewind(lastMarker);
 	}
 
 	public void seek(int index) {

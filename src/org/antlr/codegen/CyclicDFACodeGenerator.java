@@ -88,6 +88,8 @@ public class CyclicDFACodeGenerator {
 				stateST = templates.getInstanceOf("cyclicDFAState");
 			}
 			stateST.setAttribute("needErrorClause", new Boolean(true));
+			stateST.setAttribute("semPredState",
+								 new Boolean(s.isResolvedWithPredicates()));
 		}
 		stateST.setAttribute("stateNumber", new Integer(s.stateNumber));
 		if ( parentGenerator.canGenerateSwitch(s) ) {

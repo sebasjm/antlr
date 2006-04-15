@@ -786,10 +786,11 @@ class DFA<decisionNumber> extends DFA {
 >>
 
 /** A state in a cyclic DFA */
-cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
+cyclicDFAState(stateNumber,edges,needErrorClause,semPredState) ::= <<
 DFA.State s<stateNumber> = new DFA.State() {
     public DFA.State transition(IntStream input) throws RecognitionException {
         int LA<decisionNumber>_<stateNumber> = input.LA(1);
+        <if(semPredState)>input.rewind();<endif>
         <edges>
         <if(needErrorClause)>
         <if(backtracking)>
@@ -830,10 +831,12 @@ return s<targetStateNumber>;<\n>
  */
 
 cyclicDFAStateSwitch(stateNumber,labels,edges,
-                     needErrorClause,EOTTargetStateNumber) ::= <<
+                     needErrorClause,EOTTargetStateNumber,
+		     semPredState) ::= <<
 DFA.State s<stateNumber> = new DFA.State() {
     public DFA.State transition(IntStream input) throws RecognitionException {
         switch ( input.LA(1) ) {
+        <if(semPredState)>input.rewind();<endif>
         <edges; separator="\n">
         default:
 <if(needErrorClause)>

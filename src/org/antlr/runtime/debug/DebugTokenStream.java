@@ -34,6 +34,9 @@ public class DebugTokenStream implements TokenStream {
 	public TokenStream input;
 	protected boolean initialStreamState = true;
 
+	/** Track the last mark() call result value for use in rewind(). */
+	protected int lastMarker;
+
 	public DebugTokenStream(TokenStream input, DebugEventListener dbg) {
 		this.input = input;
 		setDebugListener(dbg);
@@ -93,9 +96,9 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public int mark() {
-		int m = input.index();
-		dbg.mark(m);
-		return input.mark();
+		lastMarker = input.mark();
+		dbg.mark(lastMarker);
+		return lastMarker;
 	}
 
 	public int index() {
@@ -105,6 +108,10 @@ public class DebugTokenStream implements TokenStream {
 	public void rewind(int marker) {
 		dbg.rewind(marker);
 		input.rewind(marker);
+	}
+
+	public void rewind() {
+		rewind(lastMarker);
 	}
 
 	public void release(int marker) {

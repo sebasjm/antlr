@@ -43,6 +43,9 @@ public class ANTLRMMapFileStream implements CharStream {
     protected int p=0;
     String fileName;
 
+	/** Track the last mark() call result value for use in rewind(). */
+	protected int lastMarker;
+
 	/** line number 1..n within the input */
 	protected int line = 1;
 
@@ -107,8 +110,9 @@ public class ANTLRMMapFileStream implements CharStream {
 	}
 
     public int mark() {
-        return index(); // already buffered, just return index
-    }
+        lastMarker = index(); // already buffered, just return index
+		return lastMarker;
+	}
 
 	public void release(int marker) {
 		throw new NoSuchMethodError("not implemented yet");
@@ -128,6 +132,10 @@ public class ANTLRMMapFileStream implements CharStream {
     public void rewind(int marker) {
         p = marker;
     }
+
+	public void rewind() {
+		rewind(lastMarker);
+	}
 
 	public void seek(int index) {
 		// TODO: broken.  How can we move forward without knowing new line/pos?

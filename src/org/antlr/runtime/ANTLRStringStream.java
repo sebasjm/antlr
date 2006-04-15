@@ -27,11 +27,8 @@
 */
 package org.antlr.runtime;
 
-import java.io.IOException;
-import java.io.File;
-import java.io.FileReader;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /** A pretty quick CharStream that pulls all data from an array
  *  directly.  Every method call counts in the lexer.  Java's
@@ -58,6 +55,9 @@ public class ANTLRStringStream implements CharStream {
 	 *  move through the input stream.  Indexed from 1..markDepth.
 	 */
 	protected List markers;
+
+	/** Track the last mark() call result value for use in rewind(). */
+	protected int lastMarker;
 
 	public ANTLRStringStream() {
 		markers = new ArrayList();
@@ -141,7 +141,8 @@ public class ANTLRStringStream implements CharStream {
 		state.p = p;
 		state.line = line;
 		state.charPositionInLine = charPositionInLine;
-        return markDepth;
+		lastMarker = markDepth;
+		return markDepth;
     }
 
     public void rewind(int m) {
@@ -151,6 +152,10 @@ public class ANTLRStringStream implements CharStream {
 		seek(state.p);
 		line = state.line;
 		charPositionInLine = state.charPositionInLine;
+	}
+
+	public void rewind() {
+		rewind(lastMarker);
 	}
 
 	public void release(int marker) {

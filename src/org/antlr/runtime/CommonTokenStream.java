@@ -56,6 +56,9 @@ public class CommonTokenStream implements TokenStream {
 	/** By default, track all incoming tokens */
 	protected boolean discardOffChannelTokens = false;
 
+	/** Track the last mark() call result value for use in rewind(). */
+	protected int lastMarker;
+
 	/** The index into the tokens list of the current token (next token
      *  to consume).  p==-1 indicates that the tokens list is empty
      */
@@ -297,8 +300,9 @@ public class CommonTokenStream implements TokenStream {
     }
 
     public int mark() {
-        return index();
-    }
+        lastMarker = index();
+		return lastMarker;
+	}
 
 	public void release(int marker) {
 		// no resources to release
@@ -312,9 +316,13 @@ public class CommonTokenStream implements TokenStream {
         return p;
     }
 
-    public void rewind(int marker) {
-        seek(marker);
-    }
+	public void rewind(int marker) {
+		seek(marker);
+	}
+
+	public void rewind() {
+		seek(lastMarker);
+	}
 
 	public void seek(int index) {
 		p = index;
