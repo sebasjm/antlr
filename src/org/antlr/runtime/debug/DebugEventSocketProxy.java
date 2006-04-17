@@ -146,6 +146,10 @@ public class DebugEventSocketProxy implements DebugEventListener {
 		transmit("rewind "+i);
 	}
 
+	public void rewind() {
+		transmit("rewind");
+	}
+
 	public void beginBacktrack(int level) {
 		transmit("beginBacktrack "+level);
 	}

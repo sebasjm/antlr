@@ -96,6 +96,15 @@ public interface DebugEventListener {
 	 */
 	public void rewind(int i);
 
+	/** Rewind to the input position of the last marker.
+	 *  Used currently only after a cyclic DFA and just
+	 *  before starting a sem/syn predicate to get the
+	 *  input position back to the start of the decision.
+	 *  Do not "pop" the marker off the state.  mark(i)
+	 *  and rewind(i) should balance still.
+	 */
+	public void rewind();
+
 	public void beginBacktrack(int level);
 
 	public void endBacktrack(int level, boolean successful);

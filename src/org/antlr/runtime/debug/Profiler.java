@@ -152,6 +152,7 @@ public class Profiler implements DebugEventListener {
 
 	public void mark(int i) {;}
 	public void rewind(int i) {;}
+	public void rewind() {}
 
 	public void beginBacktrack(int level) {
 		// TODO: implement

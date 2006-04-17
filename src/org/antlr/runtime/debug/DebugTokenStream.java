@@ -111,7 +111,8 @@ public class DebugTokenStream implements TokenStream {
 	}
 
 	public void rewind() {
-		rewind(lastMarker);
+		dbg.rewind();
+		input.rewind(lastMarker);
 	}
 
 	public void release(int marker) {

@@ -67,6 +67,7 @@ public class Tracer implements DebugEventListener {
 	public void LT(int i, Token t) {}
 	public void mark(int i) {}
 	public void rewind(int i) {}
+	public void rewind() {}
 
 	public void beginBacktrack(int level) {
 	}
