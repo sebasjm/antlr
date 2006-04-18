@@ -59,9 +59,14 @@ public interface IntStream {
 	 */
 	void rewind(int marker);
 
-	/** Reset the stream to the state when last mark() was called.  Just
-	 *  like invoking rewind(getLastMark()) (though getLastMark does not
-	 *  exist).
+	/** Rewind to the input position of the last marker.
+	 *  Used currently only after a cyclic DFA and just
+	 *  before starting a sem/syn predicate to get the
+	 *  input position back to the start of the decision.
+	 *  Do not "pop" the marker off the state.  mark(i)
+	 *  and rewind(i) should balance still. It is
+	 *  like invoking rewind(last marker) but it should not "pop"
+	 *  the marker off.  It's like seek(last marker's input position).
 	 */
 	void rewind();
 

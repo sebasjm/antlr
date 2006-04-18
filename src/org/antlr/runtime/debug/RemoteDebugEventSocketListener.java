@@ -240,11 +240,11 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			listener.mark(Integer.parseInt(elements[1]));
 		}
 		else if ( elements[0].equals("rewind") ) {
-			if ( elements.length>1 ) {
+			if ( elements[1]!=null ) {
 				listener.rewind(Integer.parseInt(elements[1]));
 			}
 			else {
-				listener.rewind();				
+				listener.rewind();
 			}
 		}
 		else if ( elements[0].equals("beginBacktrack") ) {
