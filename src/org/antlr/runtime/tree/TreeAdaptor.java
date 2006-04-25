@@ -95,7 +95,11 @@ public interface TreeAdaptor {
 	 *  it to do any simplifications or whatever you want.  A required
 	 *  behavior is to convert ^(nil singleSubtree) to singleSubtree
 	 *  as the setting of start/stop indexes relies on a single non-nil root
-	 *  for non-flat trees (such as for lists like "idlist : ID+ ;").
+	 *  for non-flat trees.
+	 *
+	 *  Flat trees such as for lists like "idlist : ID+ ;" are left alone
+	 *  unless there is only one ID.  For a list, the start/stop indexes
+	 *  are set in the nil node.
 	 *
 	 *  This method is executed after all rule tree construction and right
 	 *  before setTokenBoundaries().
