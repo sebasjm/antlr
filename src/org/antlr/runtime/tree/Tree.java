@@ -19,8 +19,15 @@ public interface Tree {
 
 	int getChildCount();
 
+	/** Add t as a child to this node.  If t is null, do nothing.  If t
+	 *  is nil, add all children of t to this' children.
+	 * @param t
+	 */
 	void addChild(Tree t);
 
+	/** Indicates the node is a nil node but may still have children, meaning
+	 *  the tree is a flat list.
+	 */
 	boolean isNil();
 
 	Tree dupTree();

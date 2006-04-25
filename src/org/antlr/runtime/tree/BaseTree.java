@@ -79,7 +79,7 @@ public abstract class BaseTree implements Tree {
 			return; // do nothing upon addChild(null)
 		}
 		if ( children==null ) {
-			createChildrenList(); // add children list on demand
+			createChildrenList(); // create children list on demand
 		}
 		BaseTree childTree = (BaseTree)t;
 		if ( childTree.isNil() ) {

@@ -21,13 +21,28 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	/** If oldRoot is a nil root, just copy or move the children to newRoot.
 	 *  If not a nil root, make oldRoot a child of newRoot.
 	 *
+	 *    old=^(nil a b c), new=r yields ^(r a b c)
+	 *    old=^(a b c), new=r yields ^(r ^(a b c))
+	 *
 	 *  If newRoot is a nil-rooted single child tree, use the single
 	 *  child as the new root node.
 	 *
+	 *    old=^(nil a b c), new=^(nil r) yields ^(r a b c)
+	 *    old=^(a b c), new=^(nil r) yields ^(r ^(a b c))
+	 *
 	 *  If oldRoot was null, it's ok, just return newRoot (even if isNil).
 	 *
+	 *    old=null, new=r yields r
+	 *    old=null, new=^(nil r) yields ^(nil r)
+	 *
 	 *  Return newRoot.  Throw an exception if newRoot is not a
-	 *  simple node or nil root with a single child.
+	 *  simple node or nil root with a single child node--it must be a root
+	 *  node.
+	 *
+	 *  Be advised that it's ok for newRoot to point at oldRoot's
+	 *  children; i.e., you don't have to copy the list.  We are
+	 *  constructing these nodes so we should have this control for
+	 *  efficiency.
 	 */
 	public Object becomeRoot(Object newRoot, Object oldRoot) {
 		Tree newRootTree = (Tree)newRoot;
@@ -43,6 +58,9 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 			}
 			newRootTree = (Tree)newRootTree.getChild(0);
 		}
+		// add oldRoot to newRoot; addChild takes care of case where oldRoot
+		// is a flat list (i.e., nil-rooted tree).  All children of oldRoot
+		// are added to newRoot.
 		newRootTree.addChild(oldRootTree);
 		return newRootTree;
 	}
