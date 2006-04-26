@@ -185,6 +185,8 @@ public interface TreeAdaptor {
 	/** Node constructors can set the type of a node */
 	public void setType(Object t, int type);
 
+	public String getText(Object t);
+
 	/** Node constructors can set the text of a node */
 	public void setText(Object t, String text);
 
@@ -195,6 +197,11 @@ public interface TreeAdaptor {
 	 *  That node would contain the start/stop indexes then.
 	 */
 	public void setTokenBoundaries(Object t, Token startToken, Token stopToken);
+	
+	public int getTokenStartIndex(Object t);
+
+	public int getTokenStopIndex(Object t);
+
 
 	// N a v i g a t i o n  /  T r e e  P a r s i n g
 

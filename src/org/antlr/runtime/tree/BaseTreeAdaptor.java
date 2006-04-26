@@ -110,17 +110,23 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	public void setType(Object t, int type) {
+		throw new NoSuchMethodError("can't do this yet");
+	}
+
+	public String getText(Object t) {
+		throw new NoSuchMethodError("can't do this yet");
 	}
 
 	public void setText(Object t, String text) {
+		throw new NoSuchMethodError("can't do this yet");
 	}
 
 	public Object getChild(int i) {
-		return null;
+		throw new NoSuchMethodError("can't do this yet");
 	}
 
 	public int getChildCount() {
-		return 0;
+		throw new NoSuchMethodError("can't do this yet");
 	}
 }
 

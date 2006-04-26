@@ -53,4 +53,12 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 		((CommonTree)t).startIndex = start;
 		((CommonTree)t).stopIndex = stop;
 	}
+
+	public int getTokenStartIndex(Object t) {
+		return ((CommonTree)t).startIndex;
+	}
+
+	public int getTokenStopIndex(Object t) {
+		return ((CommonTree)t).stopIndex;
+	}
 }
