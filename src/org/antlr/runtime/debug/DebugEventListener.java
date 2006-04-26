@@ -221,7 +221,38 @@ public interface DebugEventListener {
 	 */
 	public void terminate();
 
+	
 	// A S T  E v e n t s
 
-	
+	/** A nil was created (even nil nodes have a unique ID...
+	 *  they are not "null" per se)
+	 */
+	public void nilNode(int ID);
+
+	/** root_0 = ...;  Often (but not always) indicates start of new subtree.
+	 *  Does enterSubrule event help here?
+	 */
+	public void setSubRuleRoot(String name, int ID);
+
+	/** Same as setRoot accept label does not have to be a root of a subrule */
+	public void labelRoot(String label, int ID);
+
+	public void createNode(int ID, String text, int type);
+
+	public void createNode(int ID, int tokenIndex);
+
+	public void becomeRoot(int newRootID, int oldRootID);
+
+	public void addChild(int rootID, int childID);
+
+	/** We're done with this subtree; it's part of outer subtree now.
+	 *  If rootID is that of root_0 then tree construction is complete
+	 *  except for final trimNilRoot and setting token boundaries.
+	 */
+	public void close(int rootID);
+
+	/** converts ^(nil x) to x */
+	public void trimNilRoot(int ID);
+
+	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex);
 }

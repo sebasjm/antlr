@@ -33,7 +33,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.*;
 
-public class DebugEventSocketProxy implements DebugEventListener {
+public class DebugEventSocketProxy extends BlankDebugEventListener {
 	public static final int DEFAULT_DEBUGGER_PORT = 0xC001;
 	protected int port = DEFAULT_DEBUGGER_PORT;
 	protected ServerSocket serverSocket;

@@ -57,6 +57,19 @@ public class BlankDebugEventListener implements DebugEventListener {
 	public void semanticPredicate(boolean result, String predicate) {}
 	public void commence() {}
 	public void terminate() {}
+
+	// AST Stuff
+
+	public void nilNode(int ID) {}
+	public void setSubRuleRoot(String name, int ID) {}
+	public void labelRoot(String label, int ID) {}
+	public void createNode(int ID, String text, int type) {}
+	public void createNode(int ID, int tokenIndex) {}
+	public void becomeRoot(int newRootID, int oldRootID) {}
+	public void addChild(int rootID, int childID) {}
+	public void close(int rootID) {}
+	public void trimNilRoot(int ID) {}
+	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex) {}
 }
 
 
