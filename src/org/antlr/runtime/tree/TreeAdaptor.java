@@ -197,9 +197,11 @@ public interface TreeAdaptor {
 	 *  That node would contain the start/stop indexes then.
 	 */
 	public void setTokenBoundaries(Object t, Token startToken, Token stopToken);
-	
+
+	/** Get the token start index for this subtree; return -1 if no such index */
 	public int getTokenStartIndex(Object t);
 
+	/** Get the token stop index for this subtree; return -1 if no such index */
 	public int getTokenStopIndex(Object t);
 
 

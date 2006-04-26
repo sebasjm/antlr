@@ -31,6 +31,7 @@ import org.antlr.analysis.DFA;
 import org.antlr.analysis.*;
 import org.antlr.runtime.*;
 import org.antlr.runtime.debug.DebugEventListener;
+import org.antlr.runtime.debug.BlankDebugEventListener;
 import org.antlr.runtime.tree.ParseTree;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public class Interpreter implements TokenSource {
 	 *  To get a stream of tokens, you must call scan() multiple times,
 	 *  recording the token object result after each call.
 	 */
-	class LexerActionGetTokenType implements DebugEventListener {
+	class LexerActionGetTokenType extends BlankDebugEventListener {
 		public CommonToken token;
 		Grammar g;
 		public LexerActionGetTokenType(Grammar g) {
@@ -65,38 +66,12 @@ public class Interpreter implements TokenSource {
 				token = new CommonToken((CharStream)input,type,channel,0,0);
 			}
 		}
-		public void enterAlt(int alt) {}
-		public void enterRule(String ruleName) {}
-		public void enterSubRule(int decisionNumber) {}
-		public void exitSubRule(int decisionNumber) {}
-		public void enterDecision(int decisionNumber) {}
-		public void exitDecision(int decisionNumber) {}
-		public void location(int line, int pos) {}
-		public void consumeToken(Token token) {}
-		public void consumeHiddenToken(Token token) {}
-		public void LT(int i, Token t) {}
-		public void mark(int i) {}
-		public void rewind(int i) {}
-		public void rewind() {}
-
-		public void beginBacktrack(int level) {
-		}
-
-		public void endBacktrack(int level, boolean successful) {
-		}
-
-		public void recognitionException(RecognitionException e) {}
-		public void beginResync() {}
-		public void endResync() {}
-		public void semanticPredicate(boolean result, String predicate) {}
-		public void commence() {}
-		public void terminate() {}
 	}
 
 	/** This parser listener tracks rule entry/exit and token matches
 	 *  to build a simple parse tree using the standard ANTLR Tree interface
 	 */
-	class BuildParseTree implements DebugEventListener {
+	class BuildParseTree extends BlankDebugEventListener {
 		Grammar g;
 		Stack callStack = new Stack();
 		public BuildParseTree(Grammar g) {
@@ -113,12 +88,6 @@ public class Interpreter implements TokenSource {
 			parentRuleNode.addChild(ruleNode);
 			callStack.push(ruleNode);
 		}
-		public void enterAlt(int alt) {}
-		public void enterSubRule(int decisionNumber) {}
-		public void exitSubRule(int decisionNumber) {}
-		public void enterDecision(int decisionNumber) {}
-		public void exitDecision(int decisionNumber) {}
-		public void location(int line, int pos) {}
 		public void exitRule(String ruleName) {
 			callStack.pop();
 		}
@@ -127,28 +96,11 @@ public class Interpreter implements TokenSource {
 			ParseTree elementNode = new ParseTree(token);
 			ruleNode.addChild(elementNode);
 		}
-		public void consumeHiddenToken(Token token) {}
-		public void LT(int i, Token t) {}
-		public void mark(int i) {}
-		public void rewind(int i) {}
-		public void rewind() {}
-
-		public void beginBacktrack(int level) {
-		}
-
-		public void endBacktrack(int level, boolean successful) {
-		}
-
 		public void recognitionException(RecognitionException e) {
 			ParseTree ruleNode = (ParseTree)callStack.peek();
 			ParseTree errorNode = new ParseTree(e);
 			ruleNode.addChild(errorNode);
 		}
-		public void beginResync() {}
-		public void endResync() {}
-		public void semanticPredicate(boolean result, String predicate) {}
-		public void commence() {}
-		public void terminate() {}
 	}
 
 	public Interpreter(Grammar grammar, IntStream input) {

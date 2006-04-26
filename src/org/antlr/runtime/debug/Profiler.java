@@ -35,7 +35,7 @@ import java.util.StringTokenizer;
 /** Using the debug event interface, track what is happening in the parser
  *  and record statistics about the runtime.
  */
-public class Profiler implements DebugEventListener {
+public class Profiler extends BlankDebugEventListener {
 	/** Because I may change the stats, I need to track that for later
 	 *  computations to be consistent.
 	 */
@@ -87,10 +87,6 @@ public class Profiler implements DebugEventListener {
 		level--;
 	}
 
-	public void enterAlt(int alt) {;}
-	public void enterSubRule(int d) {;}
-	public void exitSubRule(int d) {;}
-
 	public void enterDecision(int decisionNumber) {
 		inDecision=true;
 	}
@@ -127,8 +123,6 @@ public class Profiler implements DebugEventListener {
 		maxLookaheadInDecision = 0;
 	}
 
-	public void location(int line, int pos) {;}
-
 	public void consumeToken(Token token) {
 		if ( inDecision ) {
 			if ( parser.isCyclicDecision ) {
@@ -150,10 +144,6 @@ public class Profiler implements DebugEventListener {
 		}
 	}
 
-	public void mark(int i) {;}
-	public void rewind(int i) {;}
-	public void rewind() {}
-
 	public void beginBacktrack(int level) {
 		// TODO: implement
 	}
@@ -166,14 +156,9 @@ public class Profiler implements DebugEventListener {
 		numberReportedErrors++;
 	}
 
-	public void beginResync() {;}
-	public void endResync() {;}
-
 	public void semanticPredicate(boolean result, String predicate) {
 		numSemanticPredicates++;
 	}
-
-	public void commence() {;}
 
 	public void terminate() {
 		GrammarReport.writeReport(RUNTIME_STATS_FILENAME,toNotifyString());
@@ -335,5 +320,4 @@ public class Profiler implements DebugEventListener {
 		}
 		return X;
 	}
-
 }

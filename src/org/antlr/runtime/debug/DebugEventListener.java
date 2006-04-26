@@ -29,6 +29,15 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.*;
 
+/** All debugging events that a recognizer can trigger.
+ *
+ *  I did not create a separate AST debugging interface as it would create
+ *  lots of extra classes and DebugParser has a dbg var defined, which makes
+ *  it hard to change to ASTDebugEventListener.  I looked hard at this issue
+ *  and it is easier to understand as one monolithic event interface for all
+ *  possible events.  Hopefully, adding ST debugging stuff won't be bad.  Leave
+ *  for future. 4/26/2006.
+ */
 public interface DebugEventListener {
 	/** serialized version of true */
 	public static final int TRUE = 1;
@@ -211,4 +220,8 @@ public interface DebugEventListener {
 	 *  parsing.
 	 */
 	public void terminate();
+
+	// A S T  E v e n t s
+
+	
 }
