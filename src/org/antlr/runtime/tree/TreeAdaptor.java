@@ -42,7 +42,8 @@ public interface TreeAdaptor {
 	// C o n s t r u c t i o n
 
 	/** Create a tree node from Token object; for CommonTree type trees,
-	 *  then the token just becomes the payload.
+	 *  then the token just becomes the payload.  This is the most
+	 *  common create call.
      */
 	public Object create(Token payload);
 
@@ -82,7 +83,7 @@ public interface TreeAdaptor {
 	 *
 	 *  Return newRoot.  Throw an exception if newRoot is not a
 	 *  simple node or nil root with a single child node--it must be a root
-	 *  node.
+	 *  node.  If newRoot is ^(nil x) return x as newRoot.
 	 *
 	 *  Be advised that it's ok for newRoot to point at oldRoot's
 	 *  children; i.e., you don't have to copy the list.  We are

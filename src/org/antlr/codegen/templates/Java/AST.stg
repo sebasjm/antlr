@@ -34,16 +34,20 @@ import org.antlr.runtime.tree.*;<\n>
 <endif>
 >>
 
-/** Add an adaptor property that knows how to build trees */
 @genericParser.members() ::= <<
 <@super.members()>
+<parserMembers()>
+>>
+
+/** Add an adaptor property that knows how to build trees */
+parserMembers() ::= <<
 protected TreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
 public void setTreeAdaptor(TreeAdaptor adaptor) {
     this.adaptor = adaptor;
 }
 public TreeAdaptor getTreeAdaptor() {
     return adaptor;
-}<\n>
+}
 >>
 
 @returnScope.ruleReturnMembers() ::= <<

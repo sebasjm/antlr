@@ -221,7 +221,7 @@ public interface DebugEventListener {
 	 */
 	public void terminate();
 
-	
+
 	// A S T  E v e n t s
 
 	/** A nil was created (even nil nodes have a unique ID...
@@ -229,30 +229,44 @@ public interface DebugEventListener {
 	 */
 	public void nilNode(int ID);
 
-	/** root_0 = ...;  Often (but not always) indicates start of new subtree.
-	 *  Does enterSubrule event help here?
+	/** root_0 = ...;  Often (but not always) indicates *start* of new subtree.
+	 *  Does enterSubrule event help here?  ID^^ within a subrule will set
+	 *  root_0 and is not the *start* of the subrule.
 	 */
-	public void setSubRuleRoot(String name, int ID);
+	public void setSubTreeRoot(String name, int ID);
 
-	/** Same as setRoot accept label does not have to be a root of a subrule */
+	/** Same as setSubTreeRoot accept label does not have to be a root of
+	 *  a subrule.  Don't need for now.
 	public void labelRoot(String label, int ID);
+	 */
 
+	/** Announce a new node built from text */
 	public void createNode(int ID, String text, int type);
 
+	/** Announce a new node built from an existing token */
 	public void createNode(int ID, int tokenIndex);
 
+	/** Make a node the new root of an existing root.  See
+	 *  @see org.antlr.runtime.tree.TreeAdaptor.becomeRoot()
+	 */
 	public void becomeRoot(int newRootID, int oldRootID);
 
+	/** Make childID a child of rootID.
+	 *  @see org.antlr.runtime.tree.TreeAdaptor.addChild()
+	 */
 	public void addChild(int rootID, int childID);
 
 	/** We're done with this subtree; it's part of outer subtree now.
 	 *  If rootID is that of root_0 then tree construction is complete
 	 *  except for final trimNilRoot and setting token boundaries.
+	public void closeSubTree(int rootID);
 	 */
-	public void close(int rootID);
 
-	/** converts ^(nil x) to x */
+	/** converts ^(nil x) to x.  This mimics expected functionality of
+	 *  @see org.antlr.runtime.tree.TreeAdaptor.rulePostProcessing()
+	 */
 	public void trimNilRoot(int ID);
 
+	/** Set the token start/stop token index for a subtree root or node */
 	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex);
 }

@@ -26,9 +26,18 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** Template overrides to add debugging to AST stuff */
+/** Template overrides to add debugging to AST stuff.  Dynamic inheritance
+ *  hierarchy is set up as ASTDbg : AST : Dbg : Java by code generator.
+ */
 group ASTDbg;
 
-// need at least one decl; add dummy for now
-foo() ::= "ick"
-
+parserMembers() ::= <<
+protected TreeAdaptor adaptor =
+    new DebugTreeAdaptor(dbg,new CommonTreeAdaptor());
+public void setTreeAdaptor(TreeAdaptor adaptor) {
+    this.adaptor = new DebugTreeAdaptor(dbg,adaptor);
+}
+public TreeAdaptor getTreeAdaptor() {
+    return adaptor;
+}<\n>
+>>
