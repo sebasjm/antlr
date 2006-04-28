@@ -824,7 +824,15 @@ StringTemplate el,st;
 }
     :   {generator.grammar.buildAST()}?
     	#(	a:ALT {code=templates.getInstanceOf("rewriteElementList");}
-			(	( el=rewrite_element {code.setAttribute("elements", el);} )+
+			(	(	{GrammarAST elAST=(GrammarAST)_t;}
+    				el=rewrite_element
+					{code.setAttribute("elements.{el,line,pos}",
+					 					el,
+    							  		new Integer(elAST.getLine()),
+    							  		new Integer(elAST.getColumn())
+					 					);
+					}
+				)+
     		|	EPSILON
     			{code.setAttribute("elements",
     							   templates.getInstanceOf("rewriteEmptyAlt"));}

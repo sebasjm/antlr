@@ -285,7 +285,7 @@ root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
 >>
 
-// ugh, am i really missing the combinations for Track and ListLabel?
+// TODO: ugh, am i really missing the combinations for Track and ListLabel?
 // there's got to be a better way
 
 // R e w r i t e
@@ -382,15 +382,15 @@ int n_<rewriteBlockLevel> = 1;
 <rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
 >>
 
-rewriteAlt() ::= <<
-// <it.description>
-<if(it.pred)>
-if (<it.pred>) {
-    <it.alt>
+rewriteAlt(a) ::= <<
+// <a.description>
+<if(a.pred)>
+if (<a.pred>) {
+    <a.alt>
 }<\n>
 <else>
 {
-    <it.alt>
+    <a.alt>
 }<\n>
 <endif>
 >>
@@ -408,7 +408,12 @@ adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
 }<\n>
 >>
 
-rewriteElementList(elements) ::= "<elements>"
+rewriteElementList(elements) ::= "<elements:rewriteElement()>"
+
+rewriteElement(e) ::= <<
+<@pregen()>
+<e.el>
+>>
 
 /** Gen ID */
 rewriteTokenRef(token,elementIndex) ::= <<

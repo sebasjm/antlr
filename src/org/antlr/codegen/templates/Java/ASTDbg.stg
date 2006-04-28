@@ -41,3 +41,5 @@ public TreeAdaptor getTreeAdaptor() {
     return adaptor;
 }<\n>
 >>
+
+@rewriteElement.pregen() ::= "dbg.location(<e.line>,<e.pos>);"
