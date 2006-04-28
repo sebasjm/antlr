@@ -72,15 +72,20 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 
 	public Object create(int tokenType, Token fromToken) {
 		Object n = adaptor.create(tokenType, fromToken);
+		dbg.createNode(getUniqueID(n), fromToken.getText(), tokenType);
 		return n;
 	}
 
 	public Object create(int tokenType, Token fromToken, String text) {
-		return adaptor.create(tokenType, fromToken, text);
+		Object n = adaptor.create(tokenType, fromToken, text);
+		dbg.createNode(getUniqueID(n), text, tokenType);
+		return n;
 	}
 
 	public Object create(int tokenType, String text) {
-		return adaptor.create(tokenType, text);
+		Object n = adaptor.create(tokenType, text);
+		dbg.createNode(getUniqueID(n), text, tokenType);
+		return n;
 	}
 
 	public int getType(Object t) {
