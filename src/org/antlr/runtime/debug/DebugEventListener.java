@@ -232,8 +232,8 @@ public interface DebugEventListener {
 	/** root_0 = ...;  Often (but not always) indicates *start* of new subtree.
 	 *  Does enterSubrule event help here?  ID^^ within a subrule will set
 	 *  root_0 and is not the *start* of the subrule.
-	 */
 	public void setSubTreeRoot(String name, int ID);
+	 */
 
 	/** Same as setSubTreeRoot accept label does not have to be a root of
 	 *  a subrule.  Don't need for now.
@@ -247,6 +247,16 @@ public interface DebugEventListener {
 	public void createNode(int ID, int tokenIndex);
 
 	/** Make a node the new root of an existing root.  See
+	 *
+	 *  Note: the newRootID parameter is possibly different
+	 *  than the TreeAdaptor.becomeRoot() newRoot parameter.
+	 *  In our case, it will always be the result of calling
+	 *  TreeAdaptor.becomeRoot() and not root_n or whatever.
+	 *
+	 *  The listener should assume that this event occurs
+	 *  only when the current subrule (or rule) subtree is
+	 *  being reset to newRootID.
+	 *
 	 *  @see org.antlr.runtime.tree.TreeAdaptor.becomeRoot()
 	 */
 	public void becomeRoot(int newRootID, int oldRootID);

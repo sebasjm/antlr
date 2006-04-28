@@ -258,6 +258,8 @@ CHANGES
 
 3.0ea9 - ??
 
+* added AST debug events to listener; added blank listener for convenience
+
 * updated debug events to send begin/end backtrack events for debugging
 
 * with a : (b->b) ('+' b -> ^(PLUS $a b))* ; you get b[0] each time as
