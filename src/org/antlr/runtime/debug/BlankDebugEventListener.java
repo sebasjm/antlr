@@ -66,7 +66,6 @@ public class BlankDebugEventListener implements DebugEventListener {
 	public void createNode(int ID, int tokenIndex) {}
 	public void becomeRoot(int newRootID, int oldRootID) {}
 	public void addChild(int rootID, int childID) {}
-	public void trimNilRoot(int ID) {}
 	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex) {}
 }
 

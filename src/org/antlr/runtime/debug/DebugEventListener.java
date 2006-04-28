@@ -225,20 +225,12 @@ public interface DebugEventListener {
 	// A S T  E v e n t s
 
 	/** A nil was created (even nil nodes have a unique ID...
-	 *  they are not "null" per se)
+	 *  they are not "null" per se).  As of 4/28/2006, this
+	 *  seems to be uniquely triggered when starting a new subtree
+	 *  such as when entering a subrule in automatic mode and when
+	 *  building a tree in rewrite mode.
 	 */
 	public void nilNode(int ID);
-
-	/** root_0 = ...;  Often (but not always) indicates *start* of new subtree.
-	 *  Does enterSubrule event help here?  ID^^ within a subrule will set
-	 *  root_0 and is not the *start* of the subrule.
-	public void setSubTreeRoot(String name, int ID);
-	 */
-
-	/** Same as setSubTreeRoot accept label does not have to be a root of
-	 *  a subrule.  Don't need for now.
-	public void labelRoot(String label, int ID);
-	 */
 
 	/** Announce a new node built from text */
 	public void createNode(int ID, String text, int type);
@@ -265,17 +257,6 @@ public interface DebugEventListener {
 	 *  @see org.antlr.runtime.tree.TreeAdaptor.addChild()
 	 */
 	public void addChild(int rootID, int childID);
-
-	/** We're done with this subtree; it's part of outer subtree now.
-	 *  If rootID is that of root_0 then tree construction is complete
-	 *  except for final trimNilRoot and setting token boundaries.
-	public void closeSubTree(int rootID);
-	 */
-
-	/** converts ^(nil x) to x.  This mimics expected functionality of
-	 *  @see org.antlr.runtime.tree.TreeAdaptor.rulePostProcessing()
-	 */
-	public void trimNilRoot(int ID);
 
 	/** Set the token start/stop token index for a subtree root or node */
 	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex);

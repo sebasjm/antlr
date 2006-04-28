@@ -4,11 +4,16 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.TreeAdaptor;
 
 /** A TreeAdaptor proxy that fires debugging events to a DebugEventListener
- *  delegate and uses the TreeAdaptor delegate to do the actual work.
- *  The only AST debugging event not triggered by this proxy is the
- *  setting of root_n variables in the generated code like
+ *  delegate and uses the TreeAdaptor delegate to do the actual work.  All
+ *  AST events are triggered by this adaptor; no code gen changes are needed
+ *  in generated rules.  Debugging events are triggered *after* invoking
+ *  tree adaptor routines.
  *
- * 		root_0 = adaptor.nil();
+ *  Trees created with actions in rewrite actions like "-> ^(ADD {foo} {bar})"
+ *  cannot be tracked as they might not use the adaptor to create foo, bar.
+ *  The debug listener has to deal with tree node IDs for which it did
+ *  not see a createNode event.  A single <unknown> node is sufficient even
+ *  if it represents a whole tree.
  */
 public class DebugTreeAdaptor implements TreeAdaptor {
 	protected DebugEventListener dbg;
@@ -53,9 +58,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object rulePostProcessing(Object root) {
-		Object n = adaptor.rulePostProcessing(root);
-		dbg.trimNilRoot(getUniqueID(root));
-		return n;
+		return adaptor.rulePostProcessing(root);
 	}
 
 	public void addChild(Object t, Token child) {

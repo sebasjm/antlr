@@ -299,6 +299,33 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			listener.semanticPredicate(result.booleanValue(),
 									   predicateText);
 		}
+		else if ( elements[0].equals("nilNode") ) {
+			listener.nilNode(Integer.parseInt(elements[1]));
+		}
+		else if ( elements[0].equals("createNodeFromToken") ) {
+			String tokenText = elements[3];
+			tokenText = unEscapeNewlines(tokenText);
+			listener.createNode(Integer.parseInt(elements[1]),
+								tokenText,
+								Integer.parseInt(elements[2]));
+		}
+		else if ( elements[0].equals("createNode") ) {
+			listener.createNode(Integer.parseInt(elements[1]),
+								Integer.parseInt(elements[2]));
+		}
+		else if ( elements[0].equals("becomeRoot") ) {
+			listener.becomeRoot(Integer.parseInt(elements[1]),
+								Integer.parseInt(elements[2]));
+		}
+		else if ( elements[0].equals("addChild") ) {
+			listener.addChild(Integer.parseInt(elements[1]),
+							  Integer.parseInt(elements[2]));
+		}
+		else if ( elements[0].equals("setTokenBoundaries") ) {
+			listener.setTokenBoundaries(Integer.parseInt(elements[1]),
+										Integer.parseInt(elements[2]),
+										Integer.parseInt(elements[3]));
+		}
 		else {
 			System.err.println("unknown debug event: "+line);
 		}

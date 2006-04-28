@@ -33,6 +33,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.*;
 
+/** A proxy debug event listener that forwards events over a socket to
+ *  a debugger (or any other listener) using a simple text-based protocol;
+ *  one event per line.  ANTLRWorks listens on server socket with a
+ *  RemoteDebugEventSocketListener instance.  These two objects must therefore
+ *  be kept in sync.  New events must be handled on both sides of socket.
+ */
 public class DebugEventSocketProxy extends BlankDebugEventListener {
 	public static final int DEFAULT_DEBUGGER_PORT = 0xC001;
 	protected int port = DEFAULT_DEBUGGER_PORT;
@@ -193,6 +199,43 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 		buf.append(predicate);
 		transmit(buf.toString());
 	}
+
+
+	// A S T  E v e n t s
+
+	public void nilNode(int ID) {
+		transmit("nilNode "+ID);
+	}
+
+	public void createNode(int ID, String text, int type) {
+		text = escapeNewlines(text);
+		StringBuffer buf = new StringBuffer(50);
+		buf.append("createNodeFromToken ");
+		buf.append(ID);
+		buf.append(" ");
+		buf.append(type);
+		buf.append(" ");
+		buf.append(text);
+		transmit(buf.toString());
+	}
+
+	public void createNode(int ID, int tokenIndex) {
+		transmit("createNode "+ID+" "+tokenIndex);
+	}
+
+	public void becomeRoot(int newRootID, int oldRootID) {
+		transmit("becomeRoot "+newRootID+" "+oldRootID);
+	}
+
+	public void addChild(int rootID, int childID) {
+		transmit("addChild "+rootID+" "+childID);
+	}
+
+	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex) {
+		transmit("setTokenBoundaries "+ID+" "+tokenStartIndex+" "+tokenStopIndex);
+	}
+
+	// support
 
 	protected String serializeToken(Token t) {
 		StringBuffer buf = new StringBuffer(50);
