@@ -116,6 +116,11 @@ public interface TreeAdaptor {
 	 *  You might want to do something different during rewrite construction
 	 *  than you do during auto-AST construction (which has create() calls
 	 *  generated in the output).
+	 *
+	 *  Be advised: when debugging ASTs, the DebugTreeAdaptor manually
+	 *  calls create(Token child) and then plain addChild(node, node)
+	 *  because it needs to trap calls to create, but it can't since it delegates
+	 *  to not inherits from the TreeAdaptor.
 	 */
 	public void addChild(Object t, Token child);
 
@@ -124,34 +129,13 @@ public interface TreeAdaptor {
 	 *  If not a nil root, make oldRoot a child of newRoot.
 	 *
 	 *  Return node created for newRoot.
+	 *
+	 *  Be advised: when debugging ASTs, the DebugTreeAdaptor manually
+	 *  calls create(Token child) and then plain becomeRoot(node, node)
+	 *  because it needs to trap calls to create, but it can't since it delegates
+	 *  to not inherits from the TreeAdaptor.
 	 */
 	public Object becomeRoot(Token newRoot, Object oldRoot);
-
-	/** Tell me how to create a token for use with imaginary token nodes.
-	 *  For example, there is probably no input symbol associated with imaginary
-	 *  token DECL, but you need to create it as a payload or whatever for
-	 *  the DECL node as in ^(DECL type ID).
-	 *
-	 *  If you care what the token payload objects' type is, you should
-	 *  override this method and any other createToken variant.
-	 */
-	public Token createToken(int tokenType, String text);
-
-	/** Tell me how to create a token for use with imaginary token nodes.
-	 *  For example, there is probably no input symbol associated with imaginary
-	 *  token DECL, but you need to create it as a payload or whatever for
-	 *  the DECL node as in ^(DECL type ID).
-	 *
-	 *  This is a variant of createToken where the new token is derived from
-	 *  an actual real input token.  Typically this is for converting '{'
-	 *  tokens to BLOCK etc...  You'll see
-	 *
-	 *    r : lc='{' ID+ '}' -> ^(BLOCK[$lc] ID+) ;
-	 *
-	 *  If you care what the token payload objects' type is, you should
-	 *  override this method and any other createToken variant.
-	 */
-	public Token createToken(Token fromToken);
 
 	/** Create a new node derived from a token, with a new token type.
 	 *  This is invoked from an imaginary node ref on right side of a

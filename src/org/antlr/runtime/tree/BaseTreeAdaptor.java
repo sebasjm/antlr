@@ -128,5 +128,31 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	public int getChildCount() {
 		throw new NoSuchMethodError("can't do this yet");
 	}
+
+	/** Tell me how to create a token for use with imaginary token nodes.
+	 *  For example, there is probably no input symbol associated with imaginary
+	 *  token DECL, but you need to create it as a payload or whatever for
+	 *  the DECL node as in ^(DECL type ID).
+	 *
+	 *  If you care what the token payload objects' type is, you should
+	 *  override this method and any other createToken variant.
+	 */
+	public abstract Token createToken(int tokenType, String text);
+
+	/** Tell me how to create a token for use with imaginary token nodes.
+	 *  For example, there is probably no input symbol associated with imaginary
+	 *  token DECL, but you need to create it as a payload or whatever for
+	 *  the DECL node as in ^(DECL type ID).
+	 *
+	 *  This is a variant of createToken where the new token is derived from
+	 *  an actual real input token.  Typically this is for converting '{'
+	 *  tokens to BLOCK etc...  You'll see
+	 *
+	 *    r : lc='{' ID+ '}' -> ^(BLOCK[$lc] ID+) ;
+	 *
+	 *  If you care what the token payload objects' type is, you should
+	 *  override this method and any other createToken variant.
+	 */
+	public abstract Token createToken(Token fromToken);
 }
 

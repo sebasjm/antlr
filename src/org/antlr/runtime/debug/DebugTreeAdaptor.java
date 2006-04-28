@@ -26,10 +26,12 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object dupTree(Object tree) {
+		// TODO: do these need to be sent to dbg?
 		return adaptor.dupTree(tree);
 	}
 
 	public Object dupNode(Object treeNode) {
+		// TODO: do these need to be sent to dbg?
 		return adaptor.dupNode(treeNode);
 	}
 
@@ -46,7 +48,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 
 	public Object becomeRoot(Object newRoot, Object oldRoot) {
 		Object n = adaptor.becomeRoot(newRoot, oldRoot);
-		dbg.becomeRoot(getUniqueID(newRoot), getUniqueID(oldRoot));
+		dbg.becomeRoot(getUniqueID(n), getUniqueID(oldRoot));
 		return n;
 	}
 
@@ -57,19 +59,15 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public void addChild(Object t, Token child) {
-		adaptor.addChild(t, child);
+		Object n = adaptor.create(child);
+		this.addChild(t, n);
 	}
 
 	public Object becomeRoot(Token newRoot, Object oldRoot) {
-		return adaptor.becomeRoot(newRoot, oldRoot);
-	}
-
-	public Token createToken(int tokenType, String text) {
-		return adaptor.createToken(tokenType, text);
-	}
-
-	public Token createToken(Token fromToken) {
-		return adaptor.createToken(fromToken);
+		Object n = adaptor.create(newRoot);
+		adaptor.becomeRoot(n, oldRoot);
+		dbg.becomeRoot(getUniqueID(n), getUniqueID(oldRoot));
+		return n;
 	}
 
 	public Object create(int tokenType, Token fromToken) {
