@@ -27,7 +27,8 @@
 */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 
 /** All debugging events that a recognizer can trigger.
  *
