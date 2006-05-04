@@ -97,14 +97,16 @@ public interface DebugEventListener {
 	 */
 	public void LT(int i, Token t);
 
-	/** The parser is going to look arbitrarily ahead starting with token i. */
-	public void mark(int i);
+	/** The parser is going to look arbitrarily ahead; mark this location,
+	 *  the token stream's marker is sent in case you need it.
+	 */
+	public void mark(int marker);
 
 	/** After an arbitrairly long lookahead as with a cyclic DFA (or with
-	 *  any backtrack), this informs the debugger that the current token
-	 *  is now rewound to index i.
+	 *  any backtrack), this informs the debugger that stream should be
+	 *  rewound to the position associated with marker.
 	 */
-	public void rewind(int i);
+	public void rewind(int marker);
 
 	/** Rewind to the input position of the last marker.
 	 *  Used currently only after a cyclic DFA and just

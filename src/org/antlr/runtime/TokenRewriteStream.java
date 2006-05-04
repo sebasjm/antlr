@@ -119,12 +119,12 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	/** TODO: make insertAfters append after each other.
-	 */
 	static class InsertAfterOp extends InsertBeforeOp {
 		public InsertAfterOp(int index, String text) {
 			super(index,text);
 		}
 	}
+	 */
 
 	/** I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
 	 *  instructions.
