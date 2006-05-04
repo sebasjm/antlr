@@ -225,6 +225,27 @@ public interface DebugEventListener {
 	public void terminate();
 
 
+	// T r e e  P a r s i n g
+
+	/** Input for a tree parser is an AST, but we know nothing for sure
+	 *  about a node except its type and text (obtained from the adaptor).
+	 *  This is the analog of the consumeToken method.  Again, the ID is
+	 *  the hashCode usually of the node so it only works if hashCode is
+	 *  not implemented.
+	 */
+	public void consumeNode(int ID, String text, int type);
+
+	/** The tree parser has popped back up from the child list to the
+	 *  root node.
+	 */
+	public void goUp();
+
+	/** The tree parser has descended to the first child of a the current
+	 *  root node.
+	 */
+	public void goDown();
+
+
 	// A S T  E v e n t s
 
 	/** A nil was created (even nil nodes have a unique ID...

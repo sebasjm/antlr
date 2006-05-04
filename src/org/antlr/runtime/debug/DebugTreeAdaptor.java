@@ -62,7 +62,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public void addChild(Object t, Token child) {
-		Object n = adaptor.create(child);
+		Object n = this.create(child);
 		this.addChild(t, n);
 	}
 
