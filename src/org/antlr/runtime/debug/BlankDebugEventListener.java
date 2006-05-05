@@ -61,6 +61,7 @@ public class BlankDebugEventListener implements DebugEventListener {
 	// Tree parsing stuff
 
 	public void consumeNode(int ID, String text, int type) {}
+	public void LT(int i, int ID, String text, int type) {}
 	public void goUp() {}
 	public void goDown() {}
 

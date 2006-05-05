@@ -597,7 +597,7 @@ public class TestRewriteAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : atom -> ^({adaptor.createToken(INT,\"9\")} atom) ;\n" +
+			"a : atom -> ^({adaptor.create(INT,\"9\")} atom) ;\n" +
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -613,7 +613,7 @@ public class TestRewriteAST extends TestSuite {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : atom -> {adaptor.createToken(INT,\"9\")} atom ;\n" +
+			"a : atom -> {adaptor.create(INT,\"9\")} atom ;\n" +
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +

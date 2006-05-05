@@ -81,4 +81,12 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	public int getTokenStopIndex(Object t) {
 		return ((CommonTree)t).stopIndex;
 	}
+
+	public String getText(Object t) {
+		return ((Tree)t).getText();
+	}
+
+	public int getType(Object t) {
+		return ((Tree)t).getType();
+	}
 }

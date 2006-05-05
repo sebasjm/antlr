@@ -51,6 +51,11 @@ public interface TreeNodeStream extends IntStream {
 	 */
 	public Object getTreeSource();
 
+	/** What adaptor can tell me how to interpret/navigate nodes and
+	 *  trees.  E.g., get text of a node.
+	 */
+	public TreeAdaptor getTreeAdaptor();
+
 	/** Return the text of all nodes from start to stop, inclusive.
 	 *  If the stream does not buffer all the nodes then it can still
 	 *  walk recursively from start until stop.  You can always return

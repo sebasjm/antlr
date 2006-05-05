@@ -46,6 +46,10 @@ public class ParseTree extends BaseTree {
 		return 0;
 	}
 
+	public String getText() {
+		return toString();
+	}
+
 	public String toString() {
 		return payload.toString();
 	}

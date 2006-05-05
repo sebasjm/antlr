@@ -26,7 +26,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 
 	public Object create(Token payload) {
 		Object n = adaptor.create(payload);
-		dbg.createNode(getUniqueID(n), payload.getTokenIndex());
+		dbg.createNode(adaptor.getUniqueID(n), payload.getTokenIndex());
 		return n;
 	}
 
@@ -42,18 +42,18 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 
 	public Object nil() {
 		Object n = adaptor.nil();
-		dbg.nilNode(getUniqueID(n));
+		dbg.nilNode(adaptor.getUniqueID(n));
 		return n;
 	}
 
 	public void addChild(Object t, Object child) {
 		adaptor.addChild(t,child);
-		dbg.addChild(getUniqueID(t), getUniqueID(child));
+		dbg.addChild(adaptor.getUniqueID(t), adaptor.getUniqueID(child));
 	}
 
 	public Object becomeRoot(Object newRoot, Object oldRoot) {
 		Object n = adaptor.becomeRoot(newRoot, oldRoot);
-		dbg.becomeRoot(getUniqueID(n), getUniqueID(oldRoot));
+		dbg.becomeRoot(adaptor.getUniqueID(n), adaptor.getUniqueID(oldRoot));
 		return n;
 	}
 
@@ -69,25 +69,25 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	public Object becomeRoot(Token newRoot, Object oldRoot) {
 		Object n = adaptor.create(newRoot);
 		adaptor.becomeRoot(n, oldRoot);
-		dbg.becomeRoot(getUniqueID(n), getUniqueID(oldRoot));
+		dbg.becomeRoot(adaptor.getUniqueID(n), adaptor.getUniqueID(oldRoot));
 		return n;
 	}
 
 	public Object create(int tokenType, Token fromToken) {
 		Object n = adaptor.create(tokenType, fromToken);
-		dbg.createNode(getUniqueID(n), fromToken.getText(), tokenType);
+		dbg.createNode(adaptor.getUniqueID(n), fromToken.getText(), tokenType);
 		return n;
 	}
 
 	public Object create(int tokenType, Token fromToken, String text) {
 		Object n = adaptor.create(tokenType, fromToken, text);
-		dbg.createNode(getUniqueID(n), text, tokenType);
+		dbg.createNode(adaptor.getUniqueID(n), text, tokenType);
 		return n;
 	}
 
 	public Object create(int tokenType, String text) {
 		Object n = adaptor.create(tokenType, text);
-		dbg.createNode(getUniqueID(n), text, tokenType);
+		dbg.createNode(adaptor.getUniqueID(n), text, tokenType);
 		return n;
 	}
 
@@ -110,7 +110,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	public void setTokenBoundaries(Object t, Token startToken, Token stopToken) {
 		adaptor.setTokenBoundaries(t, startToken, stopToken);
 		if ( startToken!=null && stopToken!=null ) {
-			dbg.setTokenBoundaries(getUniqueID(t),
+			dbg.setTokenBoundaries(adaptor.getUniqueID(t),
 								   startToken.getTokenIndex(),
 								   stopToken.getTokenIndex());
 		}
@@ -132,27 +132,12 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 		return adaptor.getChildCount();
 	}
 
-	// support
-
-	/** For identifying trees.
-	 *
-	 *  How to identify nodes so we can say "add node to a prior node"?
-	 *  Even becomeRoot is an issue. Ok, number the nodes as they are created?
-	 *  Use a Map<Tree,Integer> or can we get away with a node's hashCode?
-	 *  Two identical nodes could be in tree and hashCode would be same
-	 *  if they implement that method. Damn...no way to get address. I wonder
-	 *  if we can check to see if they implement hashCode and if so use the
-	 *  super's hashCode. Nope...node.super.hashCode() doesn't parse.
-	 *  Let's assume hashCode for now. Equals will have to be implemented,
-	 *  but hashCode must remain unimplemented against Java doc. No biggie as
-	 *  it's unlikely that people will add AST nodes to HashMaps.
-	 *
-	 *  TODO:  put a check to see if they have hashCode defined; that would break this
-	 *  Method m = node.getClass().getDeclaredMethod("hashCode", null);
-	 */
 	public int getUniqueID(Object node) {
-		return node.hashCode();
+		return adaptor.getUniqueID(node);
 	}
+
+	
+	// support
 
 	public DebugEventListener getDebugEventListener() {
 		return dbg;

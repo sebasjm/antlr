@@ -144,10 +144,6 @@ public abstract class BaseTree implements Tree {
 		return newTree;
 	}
 
-	public abstract Tree dupNode();
-
-	public abstract int getType();
-
 	public String toStringTree() {
 		if ( children==null || children.size()==0 ) {
 			return this.toString();

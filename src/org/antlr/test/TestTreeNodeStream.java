@@ -7,6 +7,7 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.CommonToken;
 
+/** Test the tree node stream. */
 public class TestTreeNodeStream extends TestSuite {
 	public void testSingleNode() throws Exception {
 		Tree t = new CommonTree(new CommonToken(101));
@@ -22,6 +23,7 @@ public class TestTreeNodeStream extends TestSuite {
 	}
 
 	public void test4Nodes() throws Exception {
+		// ^(101 ^(102 103) 104)
 		Tree t = new CommonTree(new CommonToken(101));
 		t.addChild(new CommonTree(new CommonToken(102)));
 		t.getChild(0).addChild(new CommonTree(new CommonToken(103)));

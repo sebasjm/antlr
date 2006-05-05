@@ -129,6 +129,13 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		throw new NoSuchMethodError("can't do this yet");
 	}
 
+	/**  TODO:  put a check to see if they have hashCode defined; that would break this
+	 *  Method m = node.getClass().getDeclaredMethod("hashCode", null);
+	 */
+	public int getUniqueID(Object node) {
+		return node.hashCode();
+	}
+
 	/** Tell me how to create a token for use with imaginary token nodes.
 	 *  For example, there is probably no input symbol associated with imaginary
 	 *  token DECL, but you need to create it as a payload or whatever for

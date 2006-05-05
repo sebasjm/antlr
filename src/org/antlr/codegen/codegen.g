@@ -834,8 +834,12 @@ StringTemplate el,st;
 					}
 				)+
     		|	EPSILON
-    			{code.setAttribute("elements",
-    							   templates.getInstanceOf("rewriteEmptyAlt"));}
+    			{code.setAttribute("elements.{el,line,pos}",
+    							   templates.getInstanceOf("rewriteEmptyAlt"),
+    							   new Integer(#a.getLine()),
+    							   new Integer(#a.getColumn())
+					 			   );
+				}
     		)
     		EOA
     	 )

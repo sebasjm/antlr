@@ -231,9 +231,17 @@ public interface DebugEventListener {
 	 *  about a node except its type and text (obtained from the adaptor).
 	 *  This is the analog of the consumeToken method.  Again, the ID is
 	 *  the hashCode usually of the node so it only works if hashCode is
-	 *  not implemented.
+	 *  not implemented.  If the type is UP or DOWN, then
+	 *  the ID is not really meaningful as it's fixed--there is
+	 *  just one UP node and one DOWN navigation node.
 	 */
 	public void consumeNode(int ID, String text, int type);
+
+	/** The tree parser lookedahead.  If the type is UP or DOWN,
+	 *  then the ID is not really meaningful as it's fixed--there is
+	 *  just one UP node and one DOWN navigation node.
+	 */
+	public void LT(int i, int ID, String text, int type);
 
 	/** The tree parser has popped back up from the child list to the
 	 *  root node.

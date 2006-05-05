@@ -300,8 +300,26 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			listener.semanticPredicate(result.booleanValue(),
 									   predicateText);
 		}
-		else if ( elements[0].equals("nilNode") ) {
-			listener.nilNode(Integer.parseInt(elements[1]));
+		else if ( elements[0].equals("consumeNode") ) {
+			String tokenText = elements[3];
+			tokenText = unEscapeNewlines(tokenText);
+			listener.consumeNode(Integer.parseInt(elements[1]),
+								 tokenText,
+								 Integer.parseInt(elements[2]));
+		}
+		else if ( elements[0].equals("LN") ) {
+			String tokenText = elements[4];
+			tokenText = unEscapeNewlines(tokenText);
+			listener.LT(Integer.parseInt(elements[1]),
+						Integer.parseInt(elements[2]),
+						tokenText,
+						Integer.parseInt(elements[3]));
+		}
+		else if ( elements[0].equals("goUp") ) {
+			listener.goUp();
+		}
+		else if ( elements[0].equals("goDown") ) {
+			listener.goDown();
 		}
 		else if ( elements[0].equals("createNodeFromToken") ) {
 			String tokenText = elements[3];

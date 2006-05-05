@@ -258,6 +258,46 @@ CHANGES
 
 3.0ea9 - ??
 
+* added events for debugging tree parsers:
+
+	/** Input for a tree parser is an AST, but we know nothing for sure
+	 *  about a node except its type and text (obtained from the adaptor).
+	 *  This is the analog of the consumeToken method.  Again, the ID is
+	 *  the hashCode usually of the node so it only works if hashCode is
+	 *  not implemented.
+	 */
+	public void consumeNode(int ID, String text, int type);
+
+	/** The tree parser looked ahead */
+	public void LT(int i, int ID, String text, int type);
+
+	/** The tree parser has popped back up from the child list to the
+	 *  root node.
+	 */
+	public void goUp();
+
+	/** The tree parser has descended to the first child of a the current
+	 *  root node.
+	 */
+	public void goDown();
+
+* Added DebugTreeNodeStream and DebugTreeParser classes
+
+* Added ctor because the debug tree node stream will need to ask quesitons about nodes and since  nodes are just Object, it needs an adaptor to decode the nodes and get text/type info for the debugger.
+
+public CommonTreeNodeStream(TreeAdaptor adaptor, Tree tree);
+
+* added getter to TreeNodeStream:
+	public TreeAdaptor getTreeAdaptor();
+
+* Implemented getText/getType in CommonTreeAdaptor.
+
+* Added TraceDebugEventListener that can dump all events to stdout.
+
+* I broke down and make Tree implement getText
+
+* tree rewrites now gen location debug events.
+
 * added AST debug events to listener; added blank listener for convenience
 
 * updated debug events to send begin/end backtrack events for debugging

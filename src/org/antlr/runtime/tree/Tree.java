@@ -37,6 +37,8 @@ public interface Tree {
 	/** Return a token type; needed for tree parsing */
 	int getType();
 
+	String getText();
+
 	/** In case we don't have a token payload, what is the line for errors? */
 	int getLine();
 
