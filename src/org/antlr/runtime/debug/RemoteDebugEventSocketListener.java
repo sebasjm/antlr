@@ -332,6 +332,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			listener.createNode(Integer.parseInt(elements[1]),
 								Integer.parseInt(elements[2]));
 		}
+		else if ( elements[0].equals("nilNode") ) {
+			listener.nilNode(Integer.parseInt(elements[1]));
+		}
 		else if ( elements[0].equals("becomeRoot") ) {
 			listener.becomeRoot(Integer.parseInt(elements[1]),
 								Integer.parseInt(elements[2]));

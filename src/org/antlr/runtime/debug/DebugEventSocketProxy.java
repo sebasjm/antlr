@@ -29,6 +29,7 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.antlr.Tool;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -67,7 +68,7 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 			InputStream is = socket.getInputStream();
 			InputStreamReader isr = new InputStreamReader(is, "UTF8");
 			in = new BufferedReader(isr);
-			transmit("ANTLR 3.0ea1");
+			transmit("ANTLR "+ Tool.VERSION);
 		}
 	}
 
