@@ -59,7 +59,8 @@ public class DebugParser extends Parser {
 	 */
 	public DebugParser(TokenStream input, int port) {
 		super(new DebugTokenStream(input,null));
-		DebugEventSocketProxy proxy = new DebugEventSocketProxy(port);
+		DebugEventSocketProxy proxy =
+			new DebugEventSocketProxy(getGrammarFileName(), port);
 		setDebugListener(proxy);
 		try {
 			proxy.handshake();

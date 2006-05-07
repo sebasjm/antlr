@@ -83,6 +83,7 @@ public class <name> extends Lexer {
         ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
     }
+    public String getGrammarFileName() { return "<fileName>"; }
 
 <if(filterMode)>
     <filteringNextToken()>
@@ -152,6 +153,7 @@ public class <name> extends <@superClassName><superClass><@end> {
     <@end>
 
     public String[] getTokenNames() { return tokenNames; }
+    public String getGrammarFileName() { return "<fileName>"; }
 
     <members>
 

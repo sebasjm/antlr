@@ -61,7 +61,8 @@ public class DebugTreeParser extends TreeParser {
 	 */
 	public DebugTreeParser(TreeNodeStream input, int port) {
 		super(new DebugTreeNodeStream(input,null));
-		DebugEventSocketProxy proxy = new DebugEventSocketProxy(port);
+		DebugEventSocketProxy proxy =
+			new DebugEventSocketProxy(getGrammarFileName(), port);
 		setDebugListener(proxy);
 		try {
 			proxy.handshake();

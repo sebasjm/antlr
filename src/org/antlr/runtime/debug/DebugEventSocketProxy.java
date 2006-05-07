@@ -46,14 +46,16 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 	protected int port = DEFAULT_DEBUGGER_PORT;
 	protected ServerSocket serverSocket;
 	protected Socket socket;
-	PrintWriter out;
-	BufferedReader in;
+	protected String grammarFileName;
+	protected PrintWriter out;
+	protected BufferedReader in;
 
 	public DebugEventSocketProxy() {
-		this(DEFAULT_DEBUGGER_PORT);
+		this(null, DEFAULT_DEBUGGER_PORT);
 	}
 
-	public DebugEventSocketProxy(int port) {
+	public DebugEventSocketProxy(String grammarFileName, int port) {
+		this.grammarFileName = grammarFileName;
 		this.port = port;
 	}
 
@@ -68,7 +70,10 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 			InputStream is = socket.getInputStream();
 			InputStreamReader isr = new InputStreamReader(is, "UTF8");
 			in = new BufferedReader(isr);
-			transmit("ANTLR "+ Tool.VERSION);
+			out.println("ANTLR "+ Tool.VERSION);
+			out.println("grammar "+ grammarFileName);
+			out.flush();
+			System.out.println("grammar "+ grammarFileName);
 		}
 	}
 

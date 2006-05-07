@@ -552,6 +552,13 @@ public abstract class BaseRecognizer {
 		return null;
 	}
 
+	/** For debugging and other purposes, might want the grammar name.
+	 *  Have ANTLR generate an implementation for this method.
+	 */
+	public String getGrammarFileName() {
+		return null;
+	}
+
 	/** A convenience method for use most often with template rewrites.
 	 *  Convert a List<Token> to List<String>
 	 */

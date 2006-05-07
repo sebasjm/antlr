@@ -26,7 +26,6 @@ public class TreeParser extends BaseRecognizer {
 		return input;
 	}
 
-
 	/** Convert a List<RuleReturnScope> to List<StringTemplate> by copying
 	 *  out the .st property.  Useful when converting from
 	 *  list labels to template attributes:

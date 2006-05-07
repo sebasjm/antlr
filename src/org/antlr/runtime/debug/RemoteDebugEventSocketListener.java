@@ -44,6 +44,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	PrintWriter out;
 	BufferedReader in;
 	String event;
+	/** Version of ANTLR (dictates events) */
+	String version;
+	String grammarFileName;
 
 	public static class ProxyToken extends Token {
 		int index;
@@ -183,8 +186,14 @@ public class RemoteDebugEventSocketListener implements Runnable {
     }
 
 	protected void handshake() throws IOException {
-		String line = in.readLine();
-		// TODO: check ANTLR and version and grammar file?
+		String antlrLine = in.readLine();
+		System.out.println("line 1: "+antlrLine);
+		String[] antlrElements = getEventElements(antlrLine);
+		version = antlrElements[1];
+		String grammarLine = in.readLine();
+		System.out.println("line 2: "+grammarLine);
+		String[] grammarElements = getEventElements(grammarLine);
+		grammarFileName = grammarElements[1];
 		ack();
 		listener.commence(); // inform listener after handshake
 	}
@@ -386,6 +395,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	// M i s c
 
 	public String[] getEventElements(String event) {
+		if ( event==null ) {
+			return null;
+		}
 		String[] elements = new String[MAX_EVENT_ELEMENTS];
 		String str = null; // a string element if present (must be last)
 		try {
