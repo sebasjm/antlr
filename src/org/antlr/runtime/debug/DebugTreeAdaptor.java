@@ -67,7 +67,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object becomeRoot(Token newRoot, Object oldRoot) {
-		Object n = adaptor.create(newRoot);
+		Object n = this.create(newRoot);
 		adaptor.becomeRoot(n, oldRoot);
 		dbg.becomeRoot(adaptor.getUniqueID(n), adaptor.getUniqueID(oldRoot));
 		return n;
