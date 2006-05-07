@@ -73,7 +73,6 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 			out.println("ANTLR "+ Tool.VERSION);
 			out.println("grammar "+ grammarFileName);
 			out.flush();
-			System.out.println("grammar "+ grammarFileName);
 		}
 	}
 
