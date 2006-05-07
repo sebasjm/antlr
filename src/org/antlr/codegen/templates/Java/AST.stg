@@ -402,8 +402,8 @@ rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
 // <fileName>:<description>
 {
 <ASTLabelType> root_<treeLevel> = (<ASTLabelType>)adaptor.nil();
-<root>
-<children>
+<root:rewriteElement()>
+<children:rewriteElement()>
 adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
 }<\n>
 >>

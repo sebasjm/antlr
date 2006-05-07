@@ -887,16 +887,55 @@ rewrite_ebnf returns [StringTemplate code=null]
 		}
     ;
 
+/*
+    :   #( TREE_BEGIN {elAST=(GrammarAST)_t;}
+    	   el=element
+           {
+           code.setAttribute("root.{el,line,pos}",
+							  el,
+							  new Integer(elAST.getLine()),
+							  new Integer(elAST.getColumn())
+							  );
+           }
+           ( {elAST=(GrammarAST)_t;}
+    		 el=element
+           	 {
+			 code.setAttribute("children.{el,line,pos}",
+							  el,
+							  new Integer(elAST.getLine()),
+							  new Integer(elAST.getColumn())
+							  );
+			 }
+           )*
+         )
+*/
+
 rewrite_tree returns [StringTemplate code=templates.getInstanceOf("rewriteTree")]
 {
 rewriteTreeNestingLevel++;
 code.setAttribute("treeLevel", rewriteTreeNestingLevel);
 code.setAttribute("enclosingTreeLevel", rewriteTreeNestingLevel-1);
 StringTemplate r, el;
+GrammarAST elAST=null;
 }
-	:   #(	TREE_BEGIN
-			r=rewrite_atom[true] {code.setAttribute("root",r);}
-			(el=rewrite_element {code.setAttribute("children",el);})*
+	:   #(	TREE_BEGIN {elAST=(GrammarAST)_t;}
+			r=rewrite_atom[true]
+			{code.setAttribute("root.{el,line,pos}",
+							   r,
+							   new Integer(elAST.getLine()),
+							   new Integer(elAST.getColumn())
+							  );
+			}
+			( {elAST=(GrammarAST)_t;}
+			  el=rewrite_element
+			  {
+			  code.setAttribute("children.{el,line,pos}",
+							    el,
+							    new Integer(elAST.getLine()),
+							    new Integer(elAST.getColumn())
+							    );
+			  }
+			)*
 		)
 		{
 		String description = grammar.grammarTreeToString(#rewrite_tree, false);
