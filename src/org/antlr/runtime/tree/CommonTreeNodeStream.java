@@ -36,7 +36,9 @@ import java.util.ArrayList;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind.
  *  The stream can be accessed as an Iterator or via LT(1)/consume or
- *  LT(i).
+ *  LT(i).  No new nodes should be created during the walk.  A small buffer
+ *  of tokens is kept to efficiently and easily handle LT(i) calls, though
+ *  the lookahead mechanism is fairly complicated.
  *
  *  For tree rewriting during tree parsing, this must also be able
  *  to replace a set of children without "losing its place".
@@ -110,7 +112,9 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 */
 	protected int currentChildIndex;
 
-	/** What node index are we at?  i=0..n-1 for n node trees. */
+	/** What node index did we just consume?  i=0..n-1 for n node trees.
+	 *  IntStream.next is hence 1 + this value.  Size will be same.
+	 */
 	protected int absoluteNodeIndex;
 
 	/** Buffer tree node stream for use with LT(i).  This list grows
@@ -316,12 +320,21 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		rewind(lastMarker);
 	}
 
+	/** consume() ahead until we hit index.  Can't just jump ahead--must
+	 *  spit out the navigation nodes.
+	 */
 	public void seek(int index) {
-		throw new NoSuchMethodError("can't seek trees yet");
+		if ( index<this.index() ) {
+			throw new IllegalArgumentException("can't seek backwards in node stream");
+		}
+		// seek forward, consume until we hit index
+		while ( this.index()<index ) {
+			consume();
+		}
 	}
 
 	public int index() {
-		return absoluteNodeIndex;
+		return absoluteNodeIndex+1;
 	}
 
 	/** Expensive to compute so I won't bother doing the right thing.

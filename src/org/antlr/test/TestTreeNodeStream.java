@@ -245,6 +245,55 @@ public class TestTreeNodeStream extends TestSuite {
 		assertEqual(((Tree)stream.LT(1)).getType(), Token.DOWN);
 	}
 
+	public void testSeek() throws Exception {
+		// ^(101 ^(102 103 ^(106 107) ) 104 105)
+		// stream has 7 real + 6 nav nodes
+		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
+		Tree r0 = new CommonTree(new CommonToken(101));
+		Tree r1 = new CommonTree(new CommonToken(102));
+		r0.addChild(r1);
+		r1.addChild(new CommonTree(new CommonToken(103)));
+		Tree r2 = new CommonTree(new CommonToken(106));
+		r2.addChild(new CommonTree(new CommonToken(107)));
+		r1.addChild(r2);
+		r0.addChild(new CommonTree(new CommonToken(104)));
+		r0.addChild(new CommonTree(new CommonToken(105)));
+
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		stream.consume(); // consume 101
+		stream.consume(); // consume DN
+		stream.consume(); // consume 102
+		stream.seek(7);   // seek to 107
+		assertEqual(((Tree)stream.LT(1)).getType(), 107);
+		stream.consume(); // consume 107
+		stream.consume(); // consume UP
+		stream.consume(); // consume UP
+		assertEqual(((Tree)stream.LT(1)).getType(), 104);
+	}
+
+	public void testSeekFromStart() throws Exception {
+		// ^(101 ^(102 103 ^(106 107) ) 104 105)
+		// stream has 7 real + 6 nav nodes
+		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
+		Tree r0 = new CommonTree(new CommonToken(101));
+		Tree r1 = new CommonTree(new CommonToken(102));
+		r0.addChild(r1);
+		r1.addChild(new CommonTree(new CommonToken(103)));
+		Tree r2 = new CommonTree(new CommonToken(106));
+		r2.addChild(new CommonTree(new CommonToken(107)));
+		r1.addChild(r2);
+		r0.addChild(new CommonTree(new CommonToken(104)));
+		r0.addChild(new CommonTree(new CommonToken(105)));
+
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		stream.seek(7);   // seek to 107
+		assertEqual(((Tree)stream.LT(1)).getType(), 107);
+		stream.consume(); // consume 107
+		stream.consume(); // consume UP
+		stream.consume(); // consume UP
+		assertEqual(((Tree)stream.LT(1)).getType(), 104);
+	}
+
 	public void testBufferOverflow() throws Exception {
 		StringBuffer buf = new StringBuffer();
 		StringBuffer buf2 = new StringBuffer();

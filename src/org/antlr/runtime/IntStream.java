@@ -46,7 +46,8 @@ public interface IntStream {
 	int mark();
 
 	/** Return the current input symbol index 0..n where n indicates the
-     *  last symbol has been read.
+     *  last symbol has been read.  The index is the symbol about to be
+	 *  read not the most recently read symbol.
      */
 	int index();
 
@@ -75,6 +76,9 @@ public interface IntStream {
 	 *  stream to keep bookkeeping objects around for a marker that is
 	 *  no longer necessary.  This will have the same behavior as
 	 *  rewind() except it releases resources without the backward seek.
+	 *  This must throw away resources for all markers back to the marker
+	 *  argument.  So if you're nested 5 levels of mark(), and then release(2)
+	 *  you have to release resources for depths 2..5.
 	 */
 	void release(int marker);
 
@@ -91,8 +95,10 @@ public interface IntStream {
 	 *  backtracking using the mark/rewind mechanism that restores state and
 	 *  so this method does not need to update state when seeking backwards.
 	 *
-	 *  Currently, this method is only used for efficient backtracking, but
-	 *  in the future it may be used for incremental parsing.
+	 *  Currently, this method is only used for efficient backtracking using
+	 *  memoization, but in the future it may be used for incremental parsing.
+	 *
+	 *  The index is 0..n-1.
 	 */
 	void seek(int index);
 

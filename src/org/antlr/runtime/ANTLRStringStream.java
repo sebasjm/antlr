@@ -118,7 +118,8 @@ public class ANTLRStringStream implements CharStream {
 	}
 
 	/** Return the current input symbol index 0..n where n indicates the
-     *  last symbol has been read.
+     *  last symbol has been read.  The index is the index of char to
+	 *  be returned from LA(1).
      */
     public int index() {
         return p;
