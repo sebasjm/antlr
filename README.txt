@@ -258,6 +258,9 @@ CHANGES
 
 3.0ea9 - ??
 
+* tree parsers can do arbitrary lookahead now including backtracking.  I
+  updated CommonTreeNodeStream.
+
 * added events for debugging tree parsers:
 
 	/** Input for a tree parser is an AST, but we know nothing for sure

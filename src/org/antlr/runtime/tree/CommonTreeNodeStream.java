@@ -31,11 +31,17 @@ import org.antlr.runtime.Token;
 
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind.
+ *  The stream can be accessed as an Iterator or via LT(1)/consume or
+ *  LT(i).
  *
  *  For tree rewriting during tree parsing, this must also be able
  *  to replace a set of children without "losing its place".
+ *  That part is not yet implemented.  Will permit a rule to return
+ *  a different tree and have it stitched into the output tree probably.
  *
  *  Because this class implements Iterator you can walk a tree with
  *  a for loop looking for nodes.  When using the Iterator
@@ -43,7 +49,7 @@ import java.util.Stack;
  *  are used for parsing via TreeNodeStream interface.
  */
 public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
-	public static final int INITIAL_LOOKAHEAD_BUFFER_SIZE = 20;
+	public static final int INITIAL_LOOKAHEAD_BUFFER_SIZE = 5;
 
 	protected static abstract class DummyTree extends BaseTree {
 		public Tree dupNode() {return null;}
@@ -51,7 +57,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	// all these navigation nodes are shared and hence they
 	// cannot contain any line/column info
-	
+
 	public static final DummyTree DOWN =
 		new DummyTree() {
 			public int getType() {return Token.DOWN;}
@@ -104,6 +110,9 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 */
 	protected int currentChildIndex;
 
+	/** What node index are we at?  i=0..n-1 for n node trees. */
+	protected int absoluteNodeIndex;
+
 	/** Buffer tree node stream for use with LT(i).  This list grows
 	 *  to fit new lookahead depths, but consume() wraps like a circular
 	 *  buffer.
@@ -115,11 +124,31 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	/** Add new lookahead at lookahead[tail].  tail wraps around at the
 	 *  end of the lookahead buffer so tail could be less than head.
- 	 */
+	  */
 	protected int tail;
 
-	/** What node index are we at?  i=0..n-1 for n node trees. */
-	protected int absoluteNodeIndex;
+	/** When walking ahead with cyclic DFA or for syntactic predicates,
+	  *  we need to record the state of the tree node stream.  This
+	 *  class wraps up the current state of the CommonTreeNodeStream.
+	 *  Calling mark() will push another of these on the markers stack.
+	 */
+	protected class TreeWalkState {
+		int currentChildIndex;
+		int absoluteNodeIndex;
+		Tree currentNode;
+		Tree previousNode;
+		/** Record state of the nodeStack */
+		int nodeStackSize;
+		/** Record state of the indexStack */
+		int indexStackSize;
+		Tree[] lookahead;
+	}
+
+	/** Calls to mark() may be nested so we have to track a stack of
+	 *  them.  The marker is an index into this stack.  Index 0 is
+	 *  the first marker.  This is a List<TreeWalkState>
+	 */
+	protected List markers;
 
 	public CommonTreeNodeStream(Tree tree) {
 		this(new CommonTreeAdaptor(), tree);
@@ -155,6 +184,9 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		//System.out.println("LT("+k+"); head="+head+", tail="+tail);
 		if ( k==-1 ) {
 			return previousNode;
+		}
+		if ( k<0 ) {
+			throw new IllegalArgumentException("tree node streams cannot look backwards more than 1 node");
 		}
 		if ( k==0 ) {
 			return Tree.INVALID_NODE;
@@ -206,6 +238,13 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	// Satisfy IntStream interface
 
 	public void consume() {
+		/*
+		System.out.println("consume: currentNode="+currentNode.getType()+
+						   " childIndex="+currentChildIndex+
+						   " nodeIndex="+absoluteNodeIndex);
+						   */
+		// make sure there is something in lookahead buf, which might call next()
+		fill(1);
 		absoluteNodeIndex++;
 		previousNode = lookahead[head]; // track previous node before moving on
 		head = (head+1) % lookahead.length;
@@ -219,20 +258,58 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		return t.getType();
 	}
 
+	/** Record the current state of the tree walk which includes
+	 *  the current node and stack state.
+	 */
 	public int mark() {
-		throw new NoSuchMethodError("can't rewind trees yet");
+		if ( markers==null ) {
+			markers = new ArrayList();
+		}
+		TreeWalkState state = new TreeWalkState();
+		state.absoluteNodeIndex = absoluteNodeIndex;
+		state.currentChildIndex = currentChildIndex;
+		state.currentNode = currentNode;
+		state.previousNode = previousNode;
+		state.nodeStackSize = nodeStack.size();
+		state.indexStackSize = indexStack.size();
+		// take snapshot of lookahead buffer
+		int n = getLookaheadSize();
+		int i=0;
+		state.lookahead = new Tree[n];
+		for (int k=1; k<=n; k++,i++) {
+			state.lookahead[i] = (Tree)LT(k);
+		}
+		markers.add(state);
+		return markers.size(); // markers go 1..depth
 	}
 
 	public void release(int marker) {
-		throw new NoSuchMethodError("can't rewind trees yet");
+		throw new NoSuchMethodError("can't release tree parse; email parrt@antlr.org");
 	}
 
-	public int index() {
-		return absoluteNodeIndex;
-	}
-
+	/** Rewind the current state of the tree walk to the state it
+	 *  was in when mark() was called and it returned marker.  Also,
+	 *  wipe out the lookahead which will force reloading a few nodes
+	 *  but it is better than making a copy of the lookahead buffer
+	 *  upon mark().
+	 */
 	public void rewind(int marker) {
-		throw new NoSuchMethodError("can't rewind trees yet");
+		if ( markers==null || markers.size()<marker ) {
+			return; // do nothing upon error; perhaps this should throw exception?
+		}
+		TreeWalkState state = (TreeWalkState)markers.get(marker-1);
+		markers.remove(marker-1); // "pop" state from stack
+		absoluteNodeIndex = state.absoluteNodeIndex;
+		currentChildIndex = state.currentChildIndex;
+		currentNode = state.currentNode;
+		previousNode = state.previousNode;
+		// drop node and index stacks back to old size
+		nodeStack.setSize(state.nodeStackSize);
+		indexStack.setSize(state.indexStackSize);
+		head = tail = 0; // wack lookahead buffer and then refill
+		for (; tail<state.lookahead.length; tail++) {
+			lookahead[tail] = state.lookahead[tail];
+		}
 	}
 
 	public void rewind() {
@@ -241,6 +318,10 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	public void seek(int index) {
 		throw new NoSuchMethodError("can't seek trees yet");
+	}
+
+	public int index() {
+		return absoluteNodeIndex;
 	}
 
 	/** Expensive to compute so I won't bother doing the right thing.
@@ -260,7 +341,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	/** Return the next node found during a depth-first walk of root.
 	 *  Also, add these nodes and DOWN/UP imaginary nodes into the lokoahead
 	 *  buffer as a side-effect.  Normally side-effects are bad, but because
-	 *  we can emit many tokens for ever next() call, it's pretty hard to
+	 *  we can emit many tokens for every next() call, it's pretty hard to
 	 *  use a single return value for that.  We must add these tokens to
 	 *  the lookahead buffer.
 	 *
@@ -365,6 +446,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		//}
 	}
 
+	/** Walk upwards looking for a node with more children to walk. */
 	protected void walkBackToMostRecentNodeWithUnvisitedChildren() {
 		while ( currentNode!=null &&
 				currentChildIndex>=currentNode.getChildCount() )
@@ -392,6 +474,9 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		return adaptor;
 	}
 
+	/** Using the Iterator interface, return a list of all the token types
+	 *  as text.  Used for testing.
+	 */
 	public String toNodesOnlyString() {
 		StringBuffer buf = new StringBuffer();
 		while (hasNext()) {
@@ -403,7 +488,8 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	}
 
 	/** Print out the entire tree including DOWN/UP nodes.  Uses
-	 *  a recursive walk.
+	 *  a recursive walk.  Mostly useful for testing as it yields
+	 *  the token types not text.
 	 */
 	public String toString() {
 		return toString(root, null);

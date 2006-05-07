@@ -108,6 +108,143 @@ public class TestTreeNodeStream extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testLT() throws Exception {
+		// ^(101 ^(102 103) 104)
+		Tree t = new CommonTree(new CommonToken(101));
+		t.addChild(new CommonTree(new CommonToken(102)));
+		t.getChild(0).addChild(new CommonTree(new CommonToken(103)));
+		t.addChild(new CommonTree(new CommonToken(104)));
+
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(t);
+		assertEqual(((Tree)stream.LT(1)).getType(), 101);
+		assertEqual(((Tree)stream.LT(2)).getType(), Token.DOWN);
+		assertEqual(((Tree)stream.LT(3)).getType(), 102);
+		assertEqual(((Tree)stream.LT(4)).getType(), Token.DOWN);
+		assertEqual(((Tree)stream.LT(5)).getType(), 103);
+		assertEqual(((Tree)stream.LT(6)).getType(), Token.UP);
+		assertEqual(((Tree)stream.LT(7)).getType(), 104);
+		assertEqual(((Tree)stream.LT(8)).getType(), Token.UP);
+		assertEqual(((Tree)stream.LT(9)).getType(), Token.EOF);
+		// check way ahead
+		assertEqual(((Tree)stream.LT(100)).getType(), Token.EOF);
+	}
+
+	public void testMarkRewindEntire() throws Exception {
+		// ^(101 ^(102 103 ^(106 107) ) 104 105)
+		// stream has 7 real + 6 nav nodes
+		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
+		Tree r0 = new CommonTree(new CommonToken(101));
+		Tree r1 = new CommonTree(new CommonToken(102));
+		r0.addChild(r1);
+		r1.addChild(new CommonTree(new CommonToken(103)));
+		Tree r2 = new CommonTree(new CommonToken(106));
+		r2.addChild(new CommonTree(new CommonToken(107)));
+		r1.addChild(r2);
+		r0.addChild(new CommonTree(new CommonToken(104)));
+		r0.addChild(new CommonTree(new CommonToken(105)));
+
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		int m = stream.mark(); // MARK
+		for (int k=1; k<=13; k++) { // consume til end
+			stream.LT(1);
+			stream.consume();
+		}
+		assertEqual(((Tree)stream.LT(1)).getType(), Token.EOF);
+		assertEqual(((Tree)stream.LT(-1)).getType(), Token.UP);
+		stream.rewind(m);      // REWIND
+
+		// consume til end again :)
+		for (int k=1; k<=13; k++) { // consume til end
+			stream.LT(1);
+			stream.consume();
+		}
+		assertEqual(((Tree)stream.LT(1)).getType(), Token.EOF);
+		assertEqual(((Tree)stream.LT(-1)).getType(), Token.UP);
+	}
+
+	public void testMarkRewindInMiddle() throws Exception {
+		// ^(101 ^(102 103 ^(106 107) ) 104 105)
+		// stream has 7 real + 6 nav nodes
+		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
+		Tree r0 = new CommonTree(new CommonToken(101));
+		Tree r1 = new CommonTree(new CommonToken(102));
+		r0.addChild(r1);
+		r1.addChild(new CommonTree(new CommonToken(103)));
+		Tree r2 = new CommonTree(new CommonToken(106));
+		r2.addChild(new CommonTree(new CommonToken(107)));
+		r1.addChild(r2);
+		r0.addChild(new CommonTree(new CommonToken(104)));
+		r0.addChild(new CommonTree(new CommonToken(105)));
+
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		for (int k=1; k<=7; k++) { // consume til middle
+			//System.out.println(((Tree)stream.LT(1)).getType());
+			stream.consume();
+		}
+		assertEqual(((Tree)stream.LT(1)).getType(), 107);
+		int m = stream.mark(); // MARK
+		stream.consume(); // consume 107
+		stream.consume(); // consume UP
+		stream.consume(); // consume UP
+		stream.consume(); // consume 104
+		stream.rewind(m);      // REWIND
+
+		assertEqual(((Tree)stream.LT(1)).getType(), 107);
+		stream.consume();
+		assertEqual(((Tree)stream.LT(1)).getType(), Token.UP);
+		stream.consume();
+		assertEqual(((Tree)stream.LT(1)).getType(), Token.UP);
+		stream.consume();
+		assertEqual(((Tree)stream.LT(1)).getType(), 104);
+		stream.consume();
+		// now we're past rewind position
+		assertEqual(((Tree)stream.LT(1)).getType(), 105);
+		stream.consume();
+		assertEqual(((Tree)stream.LT(1)).getType(), Token.UP);
+		stream.consume();
+		assertEqual(((Tree)stream.LT(1)).getType(), Token.EOF);
+		assertEqual(((Tree)stream.LT(-1)).getType(), Token.UP);
+	}
+
+	public void testMarkRewindNested() throws Exception {
+		// ^(101 ^(102 103 ^(106 107) ) 104 105)
+		// stream has 7 real + 6 nav nodes
+		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
+		Tree r0 = new CommonTree(new CommonToken(101));
+		Tree r1 = new CommonTree(new CommonToken(102));
+		r0.addChild(r1);
+		r1.addChild(new CommonTree(new CommonToken(103)));
+		Tree r2 = new CommonTree(new CommonToken(106));
+		r2.addChild(new CommonTree(new CommonToken(107)));
+		r1.addChild(r2);
+		r0.addChild(new CommonTree(new CommonToken(104)));
+		r0.addChild(new CommonTree(new CommonToken(105)));
+
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		int m = stream.mark(); // MARK at start
+		stream.consume(); // consume 101
+		stream.consume(); // consume DN
+		int m2 = stream.mark(); // MARK on 102
+		stream.consume(); // consume 102
+		stream.consume(); // consume DN
+		stream.consume(); // consume 103
+		stream.consume(); // consume 106
+		stream.rewind(m2);      // REWIND to 102
+		assertEqual(((Tree)stream.LT(1)).getType(), 102);
+		stream.consume();
+		assertEqual(((Tree)stream.LT(1)).getType(), Token.DOWN);
+		stream.consume();
+		// stop at 103 and rewind to start
+		stream.rewind(m); // REWIND to 101
+		assertEqual(((Tree)stream.LT(1)).getType(), 101);
+		stream.consume();
+		assertEqual(((Tree)stream.LT(1)).getType(), Token.DOWN);
+		stream.consume();
+		assertEqual(((Tree)stream.LT(1)).getType(), 102);
+		stream.consume();
+		assertEqual(((Tree)stream.LT(1)).getType(), Token.DOWN);
+	}
+
 	public void testBufferOverflow() throws Exception {
 		StringBuffer buf = new StringBuffer();
 		StringBuffer buf2 = new StringBuffer();

@@ -57,7 +57,9 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 		return new CommonToken(fromToken);
 	}
 
-	/** track start/stop token for subtree root created for a rule */
+	/** Track start/stop token for subtree root created for a rule.
+	 *  Only works with CommonTree nodes.
+	 */
 	public void setTokenBoundaries(Object t, Token startToken, Token stopToken) {
 		if ( t==null ) {
 			return;

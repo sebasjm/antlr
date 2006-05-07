@@ -39,8 +39,9 @@ public interface IntStream {
 	/** Tell the stream to start buffering if it hasn't already.  Return
      *  current input position, index(), or some other marker so that
 	 *  when passed to rewind() you get back to the same spot.
-	 *  rewind(mark()) should not affect the input cursor.
-	 *  TODO: problem in that lexer stream returns not index but some marker 
+	 *  rewind(mark()) should not affect the input cursor.  The Lexer
+	 *  track line/col info as well as input index so its markers are
+	 *  not pure input indexes.  Same for tree node streams.
      */
 	int mark();
 

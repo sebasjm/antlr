@@ -1,13 +1,6 @@
 package org.antlr.test;
 
 import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.tool.ErrorManager;
-import org.antlr.tool.GrammarSemanticsMessage;
-import org.antlr.tool.Message;
-import org.antlr.tool.Grammar;
-import org.antlr.Tool;
-import org.antlr.codegen.CodeGenerator;
 
 public class TestTreeParsing extends TestSuite {
 	public void testFlatList() throws Exception {
@@ -133,6 +126,38 @@ public class TestTreeParsing extends TestSuite {
 													 "a",
 													 "a 1 2 3 b 4 5");
 		String expecting = "^(a 3)b 5\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testCyclicDFALookahead() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT+ PERIOD;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"SEMI : ';' ;\n"+
+			"PERIOD : '.' ;\n"+
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n" +
+			"a : ID INT+ PERIOD {System.out.print(\"alt 1\");}"+
+			"  | ID INT+ SEMI   {System.out.print(\"alt 2\");}\n" +
+			"  ;\n";
+
+		String found =
+			TestCompileAndExecSupport.execTreeParser("t.g",
+													 grammar,
+													 "T",
+													 "tp.g",
+													 treeGrammar,
+													 "TP",
+													 "TLexer",
+												 	 "a",
+													 "a",
+													 "a 1 2 3.");
+		String expecting = "alt 1\n";
 		assertEqual(found, expecting);
 	}
 

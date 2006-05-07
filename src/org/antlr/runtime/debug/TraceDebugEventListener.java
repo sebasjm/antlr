@@ -1,5 +1,6 @@
 package org.antlr.runtime.debug;
 
+/** Print out (most of) the events... Useful for debugging, testing... */
 public class TraceDebugEventListener extends BlankDebugEventListener {
 	public void enterRule(String ruleName) { System.out.println("enterRule "+ruleName); }
 	public void exitRule(String ruleName) { System.out.println("exitRule "+ruleName); }
