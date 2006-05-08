@@ -66,7 +66,9 @@ public abstract class Token {
 	public abstract int getChannel();
 	public abstract void setChannel(int channel);
 
-	/** An index from 0..n-1 of the token object in the input stream. */
+	/** An index from 0..n-1 of the token object in the input stream.
+	 *  This must be valid in order to use the ANTLRWorks debugger.
+	 */
 	public abstract int getTokenIndex();
 	public abstract void setTokenIndex(int index);
 }
