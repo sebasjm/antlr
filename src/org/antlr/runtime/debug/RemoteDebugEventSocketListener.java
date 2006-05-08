@@ -47,6 +47,11 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	/** Version of ANTLR (dictates events) */
 	String version;
 	String grammarFileName;
+	/** Track the last token index we saw during a consume.  If same, then
+	 *  set a flag that we have a problem.
+	 */
+	int previousTokenIndex = -1;
+	boolean tokenIndexesInvalid = false;
 
 	public static class ProxyToken extends Token {
 		int index;
@@ -234,10 +239,18 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		}
 		else if ( elements[0].equals("consumeToken") ) {
 			Token t = deserializeToken(elements, 1);
+			if ( t.getTokenIndex() == previousTokenIndex ) {
+				tokenIndexesInvalid = true;
+			}
+			previousTokenIndex = t.getTokenIndex();
 			listener.consumeToken(t);
 		}
 		else if ( elements[0].equals("consumeHiddenToken") ) {
 			Token t = deserializeToken(elements, 1);
+			if ( t.getTokenIndex() == previousTokenIndex ) {
+				tokenIndexesInvalid = true;
+			}
+			previousTokenIndex = t.getTokenIndex();
 			listener.consumeHiddenToken(t);
 		}
 		else if ( elements[0].equals("LT") ) {
@@ -370,8 +383,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		String posS = elements[offset+4];
 		String text = elements[offset+5];
 		text = unEscapeNewlines(text);
+		int index = Integer.parseInt(indexS);
 		ProxyToken t =
-			new ProxyToken(Integer.parseInt(indexS),
+			new ProxyToken(index,
 						   Integer.parseInt(typeS),
 						   Integer.parseInt(channelS),
 						   Integer.parseInt(lineS),
@@ -431,6 +445,8 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		txt = txt.replaceAll("%25","%");   // undo escaped escape chars
 		return txt;
 	}
+
+	public boolean tokenIndexesAreInvalid() { return tokenIndexesInvalid; }
 
 }
 
