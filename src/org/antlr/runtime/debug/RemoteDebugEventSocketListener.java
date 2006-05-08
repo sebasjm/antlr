@@ -45,8 +45,8 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	BufferedReader in;
 	String event;
 	/** Version of ANTLR (dictates events) */
-	String version;
-	String grammarFileName;
+	public String version;
+	public String grammarFileName;
 	/** Track the last token index we saw during a consume.  If same, then
 	 *  set a flag that we have a problem.
 	 */
