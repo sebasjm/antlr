@@ -130,10 +130,14 @@ tokens {
    		if ( fragment ) {
    			modifier = #[FRAGMENT,"fragment"];
    		}
+   		GrammarAST EORAST = #[EOR,"<end-of-rule>"];
+   		GrammarAST EOBAST = block.getLastChild();
+		EORAST.setLine(EOBAST.getLine());
+		EORAST.setColumn(EOBAST.getColumn());
 		GrammarAST ruleAST =
 		   #([RULE,"rule"],
                  [ID,name],modifier,[ARG,"ARG"],[RET,"RET"],
-				 [SCOPE,"scope"],block,[EOR,"<end-of-rule>"]);
+				 [SCOPE,"scope"],block,EORAST);
 		ruleAST.setLine(block.getLine());
 		ruleAST.setColumn(block.getColumn());
 		return ruleAST;
@@ -385,11 +389,11 @@ block
 
 		a1:alternative rewrite ( OR! a2:alternative rewrite )*
 
-        RPAREN!
+        rp:RPAREN!
         {
         GrammarAST eob = #[EOB,"<end-of-block>"];
-        eob.setLine(lp.getLine());
-        eob.setColumn(lp.getColumn());
+        eob.setLine(rp.getLine());
+        eob.setColumn(rp.getColumn());
         #block.addChild(eob);
         }
     ;
@@ -422,7 +426,12 @@ alternative
                 #alternative = #(altRoot, #alternative,eoa);
             }
         }
-    |   {#alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);}
+    |   {
+    	GrammarAST eps = #[EPSILON,"epsilon"];
+		eps.setLine(LT(0).getLine()); // get line/col of '|' or ':' (prev token)
+		eps.setColumn(LT(0).getColumn());
+    	#alternative = #(altRoot,eps,eoa);
+    	}
     ;
 
 exceptionGroup
