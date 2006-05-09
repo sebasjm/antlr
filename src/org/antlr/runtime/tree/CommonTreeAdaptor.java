@@ -58,7 +58,9 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	}
 
 	/** Track start/stop token for subtree root created for a rule.
-	 *  Only works with CommonTree nodes.
+	 *  Only works with CommonTree nodes.  For rules that match nothing,
+	 *  seems like this will yield start=i and stop=i-1 in a nil node.
+	 *  Might be useful info so I'll not force to be i..i.
 	 */
 	public void setTokenBoundaries(Object t, Token startToken, Token stopToken) {
 		if ( t==null ) {
