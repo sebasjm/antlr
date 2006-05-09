@@ -76,8 +76,8 @@ public class DebugTreeParser extends TreeParser {
 	 *  input stream too that it should send events to this listener.
 	 */
 	public void setDebugListener(DebugEventListener dbg) {
-		if ( input instanceof DebugTokenStream ) {
-			((DebugTokenStream)input).setDebugListener(dbg);
+		if ( input instanceof DebugTreeNodeStream ) {
+			((DebugTreeNodeStream)input).setDebugListener(dbg);
 		}
 		this.dbg = dbg;
 	}
