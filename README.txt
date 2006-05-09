@@ -258,6 +258,8 @@ CHANGES
 
 3.0ea9 - ??
 
+* Bug fix: location 0, 0 emitted for synpreds and empty alts.
+
 * debugging event handshake how sends grammar file name.  Added getGrammarFileName() to recognizers.  Java.stg generates it:
 
     public String getGrammarFileName() { return "<fileName>"; }
