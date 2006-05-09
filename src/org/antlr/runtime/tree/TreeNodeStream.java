@@ -56,6 +56,14 @@ public interface TreeNodeStream extends IntStream {
 	 */
 	public TreeAdaptor getTreeAdaptor();
 
+	/** As we flatten the tree, we use UP, DOWN nodes to represent
+	 *  the tree structure.  When debugging we need unique nodes
+	 *  so we have to instantiate new ones.  When doing normal tree
+	 *  parsing, it's slow and a waste of memory to create unique
+	 *  navigation nodes.  Default should be false;
+	 */
+	public void setUniqueNavigationNodes(boolean uniqueNavigationNodes);
+
 	/** Return the text of all nodes from start to stop, inclusive.
 	 *  If the stream does not buffer all the nodes then it can still
 	 *  walk recursively from start until stop.  You can always return

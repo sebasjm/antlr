@@ -60,26 +60,32 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	// all these navigation nodes are shared and hence they
 	// cannot contain any line/column info
 
-	public static final DummyTree DOWN =
-		new DummyTree() {
-			public int getType() {return Token.DOWN;}
-			public String getText() {return "DOWN";}
-			public String toString() {return "DOWN";}
-		};
+	public static class NavDownNode extends DummyTree {
+		public int getType() {return Token.DOWN;}
+		public String getText() {return "DOWN";}
+		public String toString() {return "DOWN";}
+	};
 
-	public static final DummyTree UP =
-		new DummyTree() {
-			public int getType() {return Token.UP;}
-			public String getText() {return "UP";}
-			public String toString() {return "UP";}
-		};
+	public static class NavUpNode extends DummyTree {
+		public int getType() {return Token.UP;}
+		public String getText() {return "UP";}
+		public String toString() {return "UP";}
+	};
 
-	public static final DummyTree EOF_NODE =
-		new DummyTree() {
-			public int getType() {return Token.EOF;}
-			public String getText() {return "EOF";}
-			public String toString() {return "EOF";}
-		};
+	public static class EOFNode extends DummyTree {
+		public int getType() {return Token.EOF;}
+		public String getText() {return "EOF";}
+		public String toString() {return "EOF";}
+	};
+
+	public static final DummyTree DOWN = new NavDownNode();
+
+	public static final DummyTree UP = new NavUpNode();
+
+	public static final DummyTree EOF_NODE = new EOFNode();
+
+	/** Reuse same DOWN, UP navigation nodes unless this is true */
+	protected boolean uniqueNavigationNodes = false;
 
 	/** Pull nodes from which tree? */
 	protected Tree root;
@@ -427,36 +433,21 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		return node;
 	}
 
+	/** As we flatten the tree, we use UP, DOWN nodes to represent
+	 *  the tree structure.  When debugging we need unique nodes
+	 *  so instantiate new ones when uniqueNavigationNodes is true.
+	 */
 	protected void addNavigationNode(final int ttype) {
-		/*
-		if ( currentNode instanceof CommonTree ) {
-			DummyTree nav =
-				new DummyTree() {
-					public int getType() {return ttype;}
-					public String getText() {
-						return toString();
-					}
-					public String toString() {
-						if ( ttype==Token.DOWN ) {
-							return "DOWN";
-						}
-						else {
-							return "UP";
-						}
-					}
-				};
-			addLookahead(nav);
+		Tree node = null;
+		if ( ttype==Token.DOWN ) {
+			if ( hasUniqueNavigationNodes() ) node = new NavDownNode();
+			else node = DOWN;
 		}
 		else {
-		*/
-			// don't know the kind of tree, just return fixed shared node
-			if ( ttype==Token.DOWN ) {
-				addLookahead(DOWN);
-			}
-			else {
-				addLookahead(UP);
-			}
-		//}
+			if ( hasUniqueNavigationNodes() ) node = new NavUpNode();
+			else node = UP;
+		}
+		addLookahead(node);
 	}
 
 	/** Walk upwards looking for a node with more children to walk. */
@@ -485,6 +476,14 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	public TreeAdaptor getTreeAdaptor() {
 		return adaptor;
+	}
+
+	public boolean hasUniqueNavigationNodes() {
+		return uniqueNavigationNodes;
+	}
+
+	public void setUniqueNavigationNodes(boolean uniqueNavigationNodes) {
+		this.uniqueNavigationNodes = uniqueNavigationNodes;
 	}
 
 	/** Using the Iterator interface, return a list of all the token types

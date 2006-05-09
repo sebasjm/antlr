@@ -30,6 +30,10 @@ package org.antlr.runtime.debug;
 import org.antlr.runtime.tree.TreeAdaptor;
 import org.antlr.runtime.tree.TreeNodeStream;
 
+/** Debug any tree node stream.  The constructor accepts the stream
+ *  and a debug listener.  As node stream calls come in, debug events
+ *  are triggered.
+ */
 public class DebugTreeNodeStream implements TreeNodeStream {
 	protected DebugEventListener dbg;
 	protected TreeAdaptor adaptor;
@@ -44,6 +48,7 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 	{
 		this.input = input;
 		this.adaptor = input.getTreeAdaptor();
+		this.input.setUniqueNavigationNodes(true);
 		setDebugListener(dbg);
 	}
 
@@ -117,6 +122,15 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 
 	public Object getTreeSource() {
 		return input;
+	}
+
+	/** It is normally this object that instructs the node stream to
+	 *  create unique nav nodes, but to satisfy interface, we have to
+	 *  define it.  It might be better to ignore the parameter but
+	 *  there might be a use for it later, so I'll leave.
+	 */
+	public void setUniqueNavigationNodes(boolean uniqueNavigationNodes) {
+		input.setUniqueNavigationNodes(uniqueNavigationNodes);
 	}
 
 	public String toString(Object start, Object stop) {
