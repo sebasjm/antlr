@@ -62,8 +62,6 @@ public class BlankDebugEventListener implements DebugEventListener {
 
 	public void consumeNode(int ID, String text, int type) {}
 	public void LT(int i, int ID, String text, int type) {}
-	public void goUp() {}
-	public void goDown() {}
 
 	// AST Stuff
 

@@ -72,7 +72,7 @@ public interface DebugEventListener {
 	 *  associated with prediction.  You will see a single enter/exit
 	 *  subrule but multiple enter/exit decision events, one for each
 	 *  loop iteration.
-	 */ 
+	 */
 	public void enterDecision(int decisionNumber);
 
 	public void exitDecision(int decisionNumber);
@@ -242,16 +242,6 @@ public interface DebugEventListener {
 	 *  just one UP node and one DOWN navigation node.
 	 */
 	public void LT(int i, int ID, String text, int type);
-
-	/** The tree parser has popped back up from the child list to the
-	 *  root node.
-	 */
-	public void goUp();
-
-	/** The tree parser has descended to the first child of a the current
-	 *  root node.
-	 */
-	public void goDown();
 
 
 	// A S T  E v e n t s

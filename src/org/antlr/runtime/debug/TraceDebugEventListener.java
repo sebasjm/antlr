@@ -18,13 +18,6 @@ public class TraceDebugEventListener extends BlankDebugEventListener {
 		System.out.println("LT "+i+" "+ID+" "+text+" "+type);
 	}
 
-	public void goUp() {
-		System.out.println("goUp");
-	}
-
-	public void goDown() {
-		System.out.println("goDown");
-	}
 
 	// AST stuff
 	public void nilNode(int ID) {System.out.println("nilNode "+ID);}

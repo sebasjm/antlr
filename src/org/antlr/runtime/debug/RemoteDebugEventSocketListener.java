@@ -335,12 +335,6 @@ public class RemoteDebugEventSocketListener implements Runnable {
 						tokenText,
 						Integer.parseInt(elements[3]));
 		}
-		else if ( elements[0].equals("goUp") ) {
-			listener.goUp();
-		}
-		else if ( elements[0].equals("goDown") ) {
-			listener.goDown();
-		}
 		else if ( elements[0].equals("createNodeFromToken") ) {
 			String tokenText = elements[3];
 			tokenText = unEscapeNewlines(tokenText);

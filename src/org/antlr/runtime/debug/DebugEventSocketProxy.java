@@ -234,15 +234,7 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 		transmit(buf.toString());
 	}
 
-	public void goUp() {
-		transmit("goUp");
-	}
-
-	public void goDown() {
-		transmit("goDown");
-	}
-
-
+	
 	// A S T  E v e n t s
 
 	public void nilNode(int ID) {
