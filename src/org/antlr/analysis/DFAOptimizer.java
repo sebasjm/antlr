@@ -27,15 +27,12 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.tool.ANTLRParser;
 import org.antlr.tool.Grammar;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /** A module to perform optimizations on DFAs.
- *
- *  For now only EBNF exit branches are removed.
  *
  *  I could more easily (and more quickly) do some optimizations (such as
  *  PRUNE_EBNF_EXIT_BRANCHES) during DFA construction, but then it
@@ -89,6 +86,24 @@ import java.util.HashSet;
  *  can do on cyclic DFAs to make them have fewer edges.  Might have
  *  something to do with the EOT token.
  *
+ *  ### PRUNE_SUPERFLUOUS_EOT_EDGES
+ *
+ *  When a token is a subset of another such as the following rules, ANTLR
+ *  quietly assumes the first token to resolve the ambiguity.
+ *
+ *  EQ			: '=' ;
+ *  ASSIGNOP	: '=' | '+=' ;
+ *
+ *  It can yield states that have only a single edge on EOT to an accept
+ *  state.  This is a waste and messes up my code generation. ;)  If
+ *  Tokens rule DFA goes
+ *
+ * 		s0 -'='-> s3 -EOT-> s5 (accept)
+ *
+ *  then s5 should be pruned and s3 should be made an accept.  Do NOT do this
+ *  for keyword versus ID as the state with EOT edge emanating from it will
+ *  also have another edge.
+ *
  *  ### Optimization: COLLAPSE_ALL_INCIDENT_EDGES
  *
  *  Done during DFA construction.  See method addTransition() in
@@ -100,6 +115,7 @@ import java.util.HashSet;
  */
 public class DFAOptimizer {
 	public static boolean PRUNE_EBNF_EXIT_BRANCHES = true;
+	public static boolean PRUNE_TOKENS_RULE_SUPERFLUOUS_EOT_EDGES = true;
 	public static boolean COLLAPSE_ALL_PARALLEL_EDGES = true;
 	public static boolean MERGE_STOP_STATES = true;
 
@@ -142,6 +158,14 @@ public class DFAOptimizer {
 				optimizeExitBranches(dfa.startState);
 			}
 		}
+		// If the Tokens rule has syntactically ambiguous rules, try to prune
+		if ( PRUNE_TOKENS_RULE_SUPERFLUOUS_EOT_EDGES &&
+			 dfa.isTokensRuleDecision() &&
+			 dfa.probe.stateToSyntacticallyAmbiguousTokensRuleAltsMap.size()>0 )
+		{
+			visited.clear();
+			optimizeEOTBranches(dfa.startState);
+		}
 		//long stop = System.currentTimeMillis();
 		//System.out.println("minimized in "+(int)(stop-start)+" ms");
     }
@@ -161,17 +185,53 @@ public class DFAOptimizer {
 							   edge.label.toString(d.dfa.nfa.grammar)+"->"+
 							   edgeTarget.stateNumber);
 			*/
+			// if target is an accept state and that alt is the exit alt
 			if ( edgeTarget.isAcceptState() &&
-				 edgeTarget.getUniquelyPredictedAlt()==nAlts)
+				edgeTarget.getUniquelyPredictedAlt()==nAlts)
 			{
 				/*
-				System.out.println("ignoring transition "+i+" to max alt "+
-								   d.dfa.getNumberOfAlts());
-				*/
+									 System.out.println("ignoring transition "+i+" to max alt "+
+													d.dfa.getNumberOfAlts());
+									 */
 				d.removeTransition(i);
-				i--; // back up one so that i++ of loop iteration stays at i
+				i--; // back up one so that i++ of loop iteration stays within bounds
 			}
 			optimizeExitBranches(edgeTarget);
 		}
 	}
+
+	protected void optimizeEOTBranches(DFAState d) {
+		Integer sI = new Integer(d.stateNumber);
+		if ( visited.contains(sI) ) {
+			return; // already visited
+		}
+		visited.add(sI);
+		for (int i = 0; i < d.getNumberOfTransitions(); i++) {
+			Transition edge = (Transition) d.transition(i);
+			DFAState edgeTarget = ((DFAState)edge.target);
+			/*
+			System.out.println(d.stateNumber+"-"+
+							   edge.label.toString(d.dfa.nfa.grammar)+"->"+
+							   edgeTarget.stateNumber);
+			*/
+			// if only one edge coming out, it is EOT, and target is accept prune
+			if ( PRUNE_TOKENS_RULE_SUPERFLUOUS_EOT_EDGES &&
+				edgeTarget.isAcceptState() &&
+				d.getNumberOfTransitions()==1 &&
+				edge.label.isAtom() &&
+				edge.label.getAtom()==Label.EOT )
+			{
+				//System.out.println("state "+d+" can be pruned");
+				// remove the superfluous EOT edge
+				d.removeTransition(i);
+				d.setAcceptState(true); // make it an accept state
+				// force it to uniquely predict the originally predicted state
+				d.cachedUniquelyPredicatedAlt =
+					edgeTarget.getUniquelyPredictedAlt();
+				i--; // back up one so that i++ of loop iteration stays within bounds
+			}
+			optimizeEOTBranches(edgeTarget);
+		}
+	}
+
 }

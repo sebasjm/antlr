@@ -1019,7 +1019,9 @@ public class NFAToDFAConverter {
 	 *  a rule is reached and another token rule did not invoke it.  EOT
 	 *  is the only thing that can be seen next.  If two rules are identical
 	 *  like "int" and "int" then the 2nd def is unreachable and you'll get
-	 *  a warning.  We prevent a warning though for the keyword/ID issue.
+	 *  a warning.  We prevent a warning though for the keyword/ID issue as
+	 *  ID is still reachable.  This can be a bit weird.  '+' rule then a
+	 *  '+'|'+=' rule will fail to match '+' for the 2nd rule.
 	 *
 	 *  If all NFA states in this DFA state are targets of EOT transitions,
 	 *  (and there is more than one state plus no unique alt is predicted)
@@ -1034,7 +1036,7 @@ public class NFAToDFAConverter {
 	 *  DFA 1:{9|1, 19|2, 14|3, 20|2, 23|2, 24|2, ...}-<EOT>->5:{41|3, 42|2}
 	 *
 	 *  Worse, when you have two identical literal rules, you will see 3 alts
-	 *  in the EOF state (one for ID and one each for the identical rules).
+	 *  in the EOT state (one for ID and one each for the identical rules).
 	 */
 	public void resolveNonDeterminisms(DFAState d) {
 		if ( debug ) {
@@ -1066,7 +1068,7 @@ public class NFAToDFAConverter {
 				// track Tokens rule issues differently than other decisions
 				if ( d.dfa.isTokensRuleDecision() ) {
 					dfa.probe.reportLexerRuleNondeterminism(d,allAlts);
-					//System.out.println("Tokens rule DFA state "+d.stateNumber+" nondeterministic");
+					//System.out.println("Tokens rule DFA state "+d+" nondeterministic");
 					conflictingLexerRules = true;
 				}
 			}
