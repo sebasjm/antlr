@@ -289,8 +289,8 @@ rule returns [StringTemplate code=null]
 }
     :   #( RULE id:ID {r=#id.getText(); currentRuleName = r;}
 		    (mod:modifier)?
-            (ARG (ARG_ACTION)?)
-            (RET (ARG_ACTION)?)
+            #(ARG (ARG_ACTION)?)
+            #(RET (ARG_ACTION)?)
 			( #(OPTIONS .) )?
 			(ruleScopeSpec)?
 		    (AMPERSAND)*
