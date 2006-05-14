@@ -841,6 +841,15 @@ options {
 	charVocabulary='\003'..'\377';
 }
 
+{
+    /** advance the current column number by one; don't do tabs.
+     *  we want char position in line to be sent to AntlrWorks.
+     */
+    public void tab() {
+		setColumn( getColumn()+1 );
+    }
+}
+
 WS	:	(	' '
 		|	'\t'
 		|	('\r')? '\n' {newline();}
