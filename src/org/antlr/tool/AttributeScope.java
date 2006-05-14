@@ -27,6 +27,8 @@
 */
 package org.antlr.tool;
 
+import antlr.Token;
+
 import java.util.*;
 
 /** Track the attributes within a scope.  A named scoped has just its list
@@ -41,7 +43,7 @@ public class AttributeScope {
 	 *  of predefined attributes.  I keep this out of the runtime.Token
 	 *  object to avoid a runtime space burden.
 	 */
-	public static AttributeScope tokenScope = new AttributeScope("Token");
+	public static AttributeScope tokenScope = new AttributeScope("Token",null);
 	static {
 		tokenScope.addAttribute("text", null);
 		tokenScope.addAttribute("type", null);
@@ -52,8 +54,13 @@ public class AttributeScope {
 		tokenScope.addAttribute("tree", null);
 	}
 
+	/** This scope is associated with which input token (for error handling)? */
+	public Token derivedFromToken;
+
+	public Grammar grammar;
+
 	/** The scope name */
-	protected String name;
+	private String name;
 
 	/** Not a rule scope, but visible to all rules "scope symbols { ...}" */
 	public boolean isDynamicGlobalScope;
@@ -73,8 +80,14 @@ public class AttributeScope {
 
 	protected LinkedHashMap attributes = new LinkedHashMap();
 
-	public AttributeScope(String name) {
+	public AttributeScope(String name, Token derivedFromToken) {
+		this(null,name,derivedFromToken);
+	}
+
+	public AttributeScope(Grammar grammar, String name, Token derivedFromToken) {
+		this.grammar = grammar;
 		this.name = name;
+		this.derivedFromToken = derivedFromToken;
 	}
 
 	public String getName() {
@@ -109,6 +122,13 @@ public class AttributeScope {
 				break; // final bit of whitespace; ignore
 			}
 			Attribute attr = new Attribute(decl);
+			if ( !isReturnScope && attr.initValue!=null ) {
+				ErrorManager.grammarError(ErrorManager.MSG_ARG_INIT_VALUES_ILLEGAL,
+										  grammar,
+										  derivedFromToken,
+										  attr.name);
+				attr.initValue=null; // wipe it out
+			}
 			attributes.put(attr.name, attr);
 		}
 	}

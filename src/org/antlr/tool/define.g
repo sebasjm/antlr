@@ -115,7 +115,7 @@ root = #grammar;
 attrScope
 	:	#( "scope" name:ID attrs:ACTION )
 		{
-		AttributeScope scope = grammar.defineGlobalScope(name.getText());
+		AttributeScope scope = grammar.defineGlobalScope(name.getText(),#attrs.token);
 		scope.isDynamicGlobalScope = true;
 		scope.addAttributes(attrs.getText(), ";");
 		}
@@ -236,11 +236,11 @@ Rule r = null;
 				grammar.defineRule(#id.getToken(), mod, opts, #rule, #args, numAlts);
 				r = grammar.getRule(name);
 				if ( #args!=null ) {
-					r.parameterScope = grammar.createParameterScope(name);
+					r.parameterScope = grammar.createParameterScope(name,#args.token);
 					r.parameterScope.addAttributes(#args.getText(), ",");
 				}
 				if ( #ret!=null ) {
-					r.returnScope = grammar.createReturnScope(name);
+					r.returnScope = grammar.createReturnScope(name,#ret.token);
 					r.returnScope.addAttributes(#ret.getText(), ",");
 				}
 			}
@@ -285,7 +285,7 @@ ruleScopeSpec[Rule r]
  	:	#( "scope"
  	       ( attrs:ACTION
  	         {
- 	         r.ruleScope = grammar.createRuleScope(r.name);
+ 	         r.ruleScope = grammar.createRuleScope(r.name,#attrs.token);
 			 r.ruleScope.isDynamicRuleScope = true;
 			 r.ruleScope.addAttributes(#attrs.getText(), ";");
 			 }

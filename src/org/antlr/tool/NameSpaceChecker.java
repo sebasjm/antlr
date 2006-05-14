@@ -27,13 +27,12 @@
 */
 package org.antlr.tool;
 
+import antlr.Token;
 import org.antlr.analysis.Label;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import antlr.Token;
 
 public class NameSpaceChecker {
 	protected Grammar grammar;
@@ -149,9 +148,9 @@ public class NameSpaceChecker {
 	}
 
 	protected void checkForGlobalScopeTokenConflict(AttributeScope scope) {
-		if ( grammar.getTokenType(scope.name)!=Label.INVALID ) {
+		if ( grammar.getTokenType(scope.getName())!=Label.INVALID ) {
 			ErrorManager.grammarError(ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE,
-									  grammar, null, scope.name);
+									  grammar, null, scope.getName());
 		}
 	}
 

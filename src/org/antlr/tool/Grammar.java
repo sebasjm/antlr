@@ -30,6 +30,7 @@ package org.antlr.tool;
 import antlr.RecognitionException;
 import antlr.TokenStreamRewriteEngine;
 import antlr.TokenWithIndex;
+import antlr.Token;
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
@@ -397,7 +398,6 @@ public class Grammar {
 		tokenBuffer.discard(ANTLRParser.COMMENT);
 		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
 		ANTLRParser parser = new ANTLRParser(tokenBuffer);
-		List lexerRuleNames = parser.getLexerRuleNames();
 		parser.setFilename(this.getFileName());
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar(this);
@@ -440,27 +440,6 @@ public class Grammar {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
-
-		/*
-		if ( type==Grammar.LEXER ) {
-			GrammarAST tokensRuleAST = addArtificialMatchTokensRule(lexerRuleNames);
-			synpredRules =
-				getArtificialRulesForSyntacticPredicates(parser,
-														 nameToSynpredASTMap);
-			// DEFINE TOKENS RULES and any associated synpred fragments
-			try {
-				defineItemsWalker.rule(tokensRuleAST);
-				for (int i = 0; i < synpredRules.size(); i++) {
-					GrammarAST rAST = (GrammarAST) synpredRules.get(i);
-					defineItemsWalker.rule(rAST);
-				}
-			}
-			catch (RecognitionException re) {
-				ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
-								   re);
-			}
-		}
-		*/
 
 		nameSpaceChecker.checkConflicts();
 	}
@@ -963,26 +942,26 @@ public class Grammar {
         return (String)ruleIndexToRuleList.get(ruleIndex);
     }
 
-	public AttributeScope defineGlobalScope(String name) {
-		AttributeScope scope = new AttributeScope(name);
+	public AttributeScope defineGlobalScope(String name, Token scopeAction) {
+		AttributeScope scope = new AttributeScope(this, name, scopeAction);
 		scopes.put(name,scope);
 		return scope;
 	}
 
-	public AttributeScope createReturnScope(String ruleName) {
-		AttributeScope scope = new AttributeScope(ruleName+"_return");
+	public AttributeScope createReturnScope(String ruleName, Token retAction) {
+		AttributeScope scope = new AttributeScope(this, ruleName, retAction);
 		scope.isReturnScope = true;
 		return scope;
 	}
 
-	public AttributeScope createRuleScope(String ruleName) {
-		AttributeScope scope = new AttributeScope(ruleName);
+	public AttributeScope createRuleScope(String ruleName, Token scopeAction) {
+		AttributeScope scope = new AttributeScope(this, ruleName, scopeAction);
 		scope.isDynamicRuleScope = true;
 		return scope;
 	}
 
-	public AttributeScope createParameterScope(String ruleName) {
-		AttributeScope scope = new AttributeScope(ruleName+"_parameter");
+	public AttributeScope createParameterScope(String ruleName, Token argAction) {
+		AttributeScope scope = new AttributeScope(this, ruleName, argAction);
 		scope.isParameterScope = true;
 		return scope;
 	}

@@ -40,6 +40,9 @@ public class Attribute {
 	/** The name of the attribute "foo" */
 	public String name;
 
+	/** The optional attribute intialization expression */
+	public String initValue;
+
 	public Attribute(String decl) {
 		extractAttribute(decl);
 	}
@@ -50,7 +53,12 @@ public class Attribute {
 	}
 
 	/** For decls like "String foo" or "char *foo32[3]" compute the ID
-	 *  and type declarations; return an Attribute object.
+	 *  and type declarations.  Also handle "int x=3" and 'T t = new T("foo")'
+	 *  but if the separator is ',' you cannot use ',' in the initvalue.
+	 *  AttributeScope.addAttributes takes care of the separation so we are
+	 *  free here to use from '=' to end of string as the expression.
+	 *
+	 *  Set name, type, initvalue, and full decl instance vars.
 	 */
 	protected void extractAttribute(String decl) {
 		if ( decl==null ) {
@@ -58,8 +66,15 @@ public class Attribute {
 		}
 		boolean inID = false;
 		int start = -1;
+		int rightEdgeOfDeclarator = decl.length()-1;
+		int equalsIndex = decl.indexOf('=');
+		if ( equalsIndex>0 ) {
+			// everything after the '=' is the init value
+			this.initValue = decl.substring(equalsIndex+1,decl.length());
+			rightEdgeOfDeclarator = equalsIndex-1;
+		}
 		// walk backwards looking for start of an ID
-		for (int i=decl.length()-1; i>=0; i--) {
+		for (int i=rightEdgeOfDeclarator; i>=0; i--) {
 			// if we haven't found the end yet, keep going
 			if ( !inID && Character.isLetter(decl.charAt(i)) ) {
 			    inID = true;
@@ -79,7 +94,7 @@ public class Attribute {
 		}
 		// walk forwards looking for end of an ID
 		int stop=-1;
-		for (int i=start; i<decl.length(); i++) {
+		for (int i=start; i<=rightEdgeOfDeclarator; i++) {
 			// if we haven't found the end yet, keep going
 			if ( !(Character.isLetter(decl.charAt(i))||
 				decl.charAt(i)=='_') )
@@ -87,7 +102,7 @@ public class Attribute {
 				stop = i;
 				break;
 			}
-			if ( i==decl.length()-1 ) {
+			if ( i==rightEdgeOfDeclarator ) {
 				stop = i+1;
 			}
 		}
@@ -97,8 +112,8 @@ public class Attribute {
 
 		// the type is the decl minus the ID (could be empty)
 		this.type = decl.substring(0,start);
-		if ( stop<decl.length() ) {
-			this.type += decl.substring(stop,decl.length());
+		if ( stop<=rightEdgeOfDeclarator ) {
+			this.type += decl.substring(stop,rightEdgeOfDeclarator+1);
 		}
 		this.type = type.trim();
 		if ( this.type.length()==0 ) {
@@ -109,6 +124,9 @@ public class Attribute {
 	}
 
 	public String toString() {
+		if ( initValue!=null ) {
+			return type+" "+name+"="+initValue;
+		}
 		return type+" "+name;
 	}
 }

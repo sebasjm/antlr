@@ -739,8 +739,8 @@ public class CodeGenerator {
 	public String translateAction(String ruleName,
 								  GrammarAST actionTree)
 	{
-		ActionTranslator translator = new ActionTranslator(this);
-		return translator.translate(ruleName,actionTree);
+		ActionTranslator translator = new ActionTranslator(this,ruleName,actionTree);
+		return translator.translate();
 	}
 
 	/** Given a template constructor action like %foo(a={...}) in

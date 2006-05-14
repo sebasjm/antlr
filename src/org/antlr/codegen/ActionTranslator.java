@@ -101,21 +101,45 @@ public class ActionTranslator {
 	protected CodeGenerator generator;
 	protected Grammar grammar;
 
-	public ActionTranslator(CodeGenerator generator)
+	/** The tree node containing the action we're going to translate */
+	GrammarAST actionAST;
+
+	String ruleName;
+
+	public ActionTranslator(CodeGenerator generator,
+							String ruleName,
+						    GrammarAST actionAST)
+	{
+		this.generator = generator;
+		this.actionAST = actionAST;
+		this.ruleName = ruleName;
+		this.grammar = generator.grammar;
+	}
+
+	public ActionTranslator(CodeGenerator generator,
+						    String ruleName,
+							antlr.Token actionToken,
+							int outerAltNum)
 	{
 		this.generator = generator;
 		grammar = generator.grammar;
+		actionAST = new GrammarAST();
+		actionAST.initialize(actionToken);
+		actionAST.outerAltNum = outerAltNum;
+		this.ruleName = ruleName;
 	}
 
+	/*
 	public String translate(String ruleName,
 						    antlr.Token actionToken,
 							int outerAltNum)
 	{
-		GrammarAST actionAST = new GrammarAST();
+		actionAST = new GrammarAST();
 		actionAST.initialize(actionToken);
 		actionAST.outerAltNum = outerAltNum;
-		return translate(ruleName, actionAST);
+		return translate(ruleName);
 	}
+*/
 
 	/** Given an action string with $y, $x.y and $x::y references, convert it
 	 *  to a StringTemplate (that will be inserted into the output StringTemplate)
@@ -128,9 +152,7 @@ public class ActionTranslator {
 	 *
 	 *  Also handles % template refs now. \% is escape as is \$.
 	 */
-	public String translate(String ruleName,
-						    GrammarAST actionAST)
-	{
+	public String translate() {
 		antlr.Token actionToken = actionAST.getToken();
 		String action = actionToken.getText();
 		Rule r = null;
@@ -232,7 +254,7 @@ public class ActionTranslator {
 			// $ruleLabel
 			Grammar.LabelElementPair ruleLabel = r.getRuleLabel(scopeName);
 			Rule refdRule = grammar.getRule(ruleLabel.referencedRuleName);
-			RuleLabelScope scope = new RuleLabelScope(refdRule);
+			RuleLabelScope scope = new RuleLabelScope(refdRule,actionAST.token);
 			return scope;
 		}
 		// might be a dynamic scope
@@ -802,7 +824,7 @@ public class ActionTranslator {
 			uniqueRefAST.code.setAttribute("label", labelName);
 		}
 		Rule referencedRule = grammar.getRule(ruleRefName);
-		AttributeScope scope = new RuleLabelScope(referencedRule);
+		AttributeScope scope = new RuleLabelScope(referencedRule,actionAST.token);
 		return translateAttributeReference(r, actionAST, scope, labelName, attributeName);
 	}
 
@@ -860,10 +882,12 @@ public class ActionTranslator {
 			String translatedExprStr = null;
 			if ( endOfAction>c ) {
 				String exprStr = action.substring(c+1,endOfAction); // stuff in {...}
-				ActionTranslator translator = new ActionTranslator(generator);
-				translatedExprStr =
-					translator.translate(r.name,
+				ActionTranslator translator =
+					new ActionTranslator(generator,
+									     r.name,
 										 new antlr.CommonToken(ANTLRParser.ACTION,exprStr),1);
+				translatedExprStr =
+					translator.translate();
 			}
 			if ( endOfAction>c &&
 				 ((endOfAction+1)<action.length() && action.charAt(endOfAction+1)!='.') ||

@@ -34,10 +34,12 @@ public class TestTemplates extends TestSuite {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslator translator = new ActionTranslator(generator);
-		String rawTranslation =
-			translator.translate("a",
+		ActionTranslator translator =
+			new ActionTranslator(generator,
+								 "a",
 								 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -69,10 +71,12 @@ public class TestTemplates extends TestSuite {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslator translator = new ActionTranslator(generator);
-		String rawTranslation =
-			translator.translate("a",
+		ActionTranslator translator =
+			new ActionTranslator(generator,
+								 "a",
 								 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -103,10 +107,11 @@ public class TestTemplates extends TestSuite {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslator translator = new ActionTranslator(generator);
-		String rawTranslation =
-			translator.translate("a",
+		ActionTranslator translator = new ActionTranslator(generator,
+														   "a",
 								 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -137,10 +142,12 @@ public class TestTemplates extends TestSuite {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslator translator = new ActionTranslator(generator);
-		String rawTranslation =
-			translator.translate("a",
+		ActionTranslator translator =
+			new ActionTranslator(generator,
+								 "a",
 								 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
@@ -171,10 +178,11 @@ public class TestTemplates extends TestSuite {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslator translator = new ActionTranslator(generator);
-		String rawTranslation =
-			translator.translate("a",
+		ActionTranslator translator = new ActionTranslator(generator,
+								 "a",
 								 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);

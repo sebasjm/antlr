@@ -27,18 +27,14 @@
 */
 package org.antlr.tool;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
-
-import java.util.Set;
-import java.util.HashSet;
+import antlr.Token;
 
 public class RuleLabelScope extends AttributeScope {
 	/** Rules have a predefined set of attributes as well as
 	 *  the return values.  'text' needs to be computed though so.
 	 */
 	public static AttributeScope predefinedRulePropertiesScope =
-		new AttributeScope("RulePredefined") {{
+		new AttributeScope("RulePredefined",null) {{
 		addAttribute("text", null);
 		addAttribute("start", null);
 		addAttribute("stop", null);
@@ -51,7 +47,7 @@ public class RuleLabelScope extends AttributeScope {
 	 *  the return values.  'text' needs to be computed though so.
 	 */
 	public static AttributeScope predefinedLexerRulePropertiesScope =
-		new AttributeScope("RulePredefined") {{
+		new AttributeScope("RulePredefined",null) {{
 		addAttribute("text", null);
 		addAttribute("type", null);
 		addAttribute("line", null);
@@ -63,8 +59,8 @@ public class RuleLabelScope extends AttributeScope {
 
 	public Rule referencedRule;
 
-	public RuleLabelScope(Rule referencedRule) {
-		super("ref_"+referencedRule.name);
+	public RuleLabelScope(Rule referencedRule, Token actionToken) {
+		super("ref_"+referencedRule.name,actionToken);
 		this.referencedRule = referencedRule;
 	}
 

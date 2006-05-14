@@ -27,10 +27,11 @@
 */
 package org.antlr.tool;
 
-import antlr.collections.*;
-import antlr.*;
+import antlr.BaseAST;
+import antlr.CommonToken;
+import antlr.Token;
+import antlr.collections.AST;
 import org.antlr.analysis.DFA;
-import org.antlr.analysis.NFA;
 import org.antlr.analysis.NFAState;
 import org.antlr.misc.IntSet;
 import org.antlr.stringtemplate.StringTemplate;
@@ -53,7 +54,7 @@ import java.util.*;
  */
 public class GrammarAST extends BaseAST {
 	/** This AST node was created from what token? */
-    protected Token token = null;
+    public Token token = null;
 
     protected String enclosingRule = null;
 
@@ -62,10 +63,10 @@ public class GrammarAST extends BaseAST {
 	public int ruleStopTokenIndex;
 
     /** If this is a decision node, what is the lookahead DFA? */
-    protected DFA lookaheadDFA = null;
+    public DFA lookaheadDFA = null;
 
     /** What NFA start state was built from this node? */
-    protected NFAState NFAStartState = null;
+    public NFAState NFAStartState = null;
 
 	/** Rule ref nodes, token refs, set, and NOT set refs need to track their
 	 *  location in the generated NFA so that local FOLLOW sets can be

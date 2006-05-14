@@ -198,6 +198,9 @@ INVALID_TEMPLATE_ACTION(file,line,col,arg) ::=
   "<loc()>invalid StringTemplate % shorthand syntax: '<arg>'"
 MISSING_ATTRIBUTE_NAME(file,line,col) ::=
   "<loc()>missing attribute name on $ reference"
+ARG_INIT_VALUES_ILLEGAL(file,line,col,arg) ::=
+  "<loc()>rule parameters may not have init values: <arg>"
+
 
 // GRAMMAR WARNINGS
 
