@@ -71,7 +71,7 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 			InputStreamReader isr = new InputStreamReader(is, "UTF8");
 			in = new BufferedReader(isr);
 			out.println("ANTLR "+ Tool.VERSION);
-			out.println("grammar "+ grammarFileName);
+			out.println("grammar \""+ grammarFileName);
 			out.flush();
 		}
 	}
