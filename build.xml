@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<project name="antlr3" default="all" basedir=".">
+    <property file="./build.properties" />
+
+    <property name="build.dir" value="${basedir}/build" />
+    <property name="lib.dir" value="${basedir}/lib" />
+
+    <property name="src.dir" value="${basedir}/src" />
+    <property name="tool.dir" value="${src.dir}/org/antlr/tool" />
+    <property name="codegen.dir" value="${src.dir}/org/antlr/codegen" />
+
+    <property name="codegen.g" value="${codegen.dir}/codegen.g" />
+    <property name="antlr.g" value="${tool.dir}/antlr.g" />
+    <property name="antlr.print.g" value="${tool.dir}/antlr.print.g" />
+    <property name="assign.types.g" value="${tool.dir}/assign.types.g" />
+    <property name="buildnfa.g" value="${tool.dir}/buildnfa.g" />
+    <property name="define.g" value="${tool.dir}/define.g" />
+
+    <property name="antlr3.jar" value="${lib.dir}/antlr-${version}.jar" />
+
+    <path id="classpath">
+        <pathelement location="${stringtemplate.jar}"/>
+    </path>
+
+    <target name="clean" description="Deletes all class files">
+        <delete dir="${build.dir}"/>
+    </target>
+
+   <target name="generator">
+        <antlr target="${antlr.g}" />
+	<copy file="${tool.dir}/ANTLRTokenTypes.txt" todir="${codegen.dir}"/>
+        <antlr target="${antlr.print.g}" />
+        <antlr target="${assign.types.g}" />
+        <antlr target="${buildnfa.g}" />
+        <antlr target="${define.g}" />
+        <antlr target="${codegen.g}" />
+   </target>
+
+   <target name="compile" depends="generator">
+        <mkdir dir="${build.dir}"/>
+        <javac 
+            destdir="${build.dir}" 
+            debug="${compile.debug}"
+            debuglevel="${compile.debuglevel}"
+            deprecation="${compile.deprecation}" 
+            optimize="${compile.optimize}">
+            <classpath refid="classpath"/>
+	    <src path="${src.dir}"/>
+        </javac>
+   </target>
+
+   <target name="lib" depends="compile" description="Creates a new ANTLR3 jar">
+        <mkdir dir="${lib.dir}"/>
+        <jar jarfile="${antlr3.jar}">
+	  <fileset dir="${basedir}" includes="LICENSE.txt"/>
+	  <fileset dir="${src.dir}" includes="**/*.stg, **/*.st"/>
+	  <fileset dir="${build.dir}" includes="**/*.class"/>
+	  <manifest>
+	    <attribute name="Version" value="${version}"/>
+	  </manifest>
+	</jar>
+   </target>
+
+    <target name="all" depends="clean,lib" />
+
+</project>
