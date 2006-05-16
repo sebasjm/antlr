@@ -190,9 +190,9 @@ public class DFAOptimizer {
 				edgeTarget.getUniquelyPredictedAlt()==nAlts)
 			{
 				/*
-									 System.out.println("ignoring transition "+i+" to max alt "+
-													d.dfa.getNumberOfAlts());
-									 */
+				System.out.println("ignoring transition "+i+" to max alt "+
+					d.dfa.getNumberOfAlts());
+				*/
 				d.removeTransition(i);
 				i--; // back up one so that i++ of loop iteration stays within bounds
 			}

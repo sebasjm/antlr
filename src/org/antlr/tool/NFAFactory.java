@@ -27,15 +27,12 @@
 */
 package org.antlr.tool;
 
-import org.antlr.misc.IntervalSet;
-import org.antlr.misc.IntSet;
-import org.antlr.tool.Grammar;
 import org.antlr.analysis.*;
+import org.antlr.misc.IntSet;
+import org.antlr.misc.IntervalSet;
 
-import java.util.List;
 import java.util.Iterator;
-
-import antlr.collections.AST;
+import java.util.List;
 
 /** Routines to construct StateClusters from EBNF grammar constructs.
  *  No optimization is done to remove unnecessary epsilon edges.
@@ -458,7 +455,7 @@ public class NFAFactory {
 
             g = A; // return same block, but now with optional last path
         }
-		A.left.decisionStateType = NFAState.OPTIONAL_BLOCK_START;		
+		g.left.decisionStateType = NFAState.OPTIONAL_BLOCK_START;
 
         return g;
     }
