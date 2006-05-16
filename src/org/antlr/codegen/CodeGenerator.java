@@ -323,7 +323,9 @@ public class CodeGenerator {
 		outputFileST.setAttribute("actionScope",
 								  grammar.getDefaultActionScope(grammar.type));
 
-		outputFileST.setAttribute("fileName", grammar.getFileName());
+		String targetAppropriateFileNameString =
+			target.getTargetStringLiteralFromString(grammar.getFileName());
+		outputFileST.setAttribute("fileName", targetAppropriateFileNameString);
 		outputFileST.setAttribute("ANTLRVersion", Tool.VERSION);
 		headerFileST.setAttribute("ANTLRVersion", Tool.VERSION);
 		outputFileST.setAttribute("generatedTimestamp", Tool.getCurrentTimeStamp());

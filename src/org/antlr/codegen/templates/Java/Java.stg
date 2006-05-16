@@ -718,7 +718,7 @@ dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>;"
  *  have to evaluate some predicates for this edge.
  */
 dfaEdge(labelExpr, targetState, predicates) ::= <<
-if ( <labelExpr> <if(predicates)>&& <predicates><endif>) {
+if ( <labelExpr> <if(predicates)>&& (<predicates>)<endif>) {
     <targetState>
 }
 >>
@@ -816,7 +816,7 @@ DFA.State s<stateNumber> = new DFA.State() {{alt=<predictAlt>;}};<\n>
  *  state to jump to next if successful.
  */
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates) ::= <<
-if ( <labelExpr> <if(predicates)>&& <predicates><endif>) {return s<targetStateNumber>;}<\n>
+if ( <labelExpr> <if(predicates)>&& (<predicates>)<endif>) {return s<targetStateNumber>;}<\n>
 >>
 
 /** An edge pointing at end-of-token; essentially matches any char;

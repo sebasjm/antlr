@@ -61,7 +61,7 @@ public class Target {
 	/** For pure strings of Java 16-bit unicode char, how can we display
 	 *  it in the target language as a literal.  Useful for dumping
 	 *  predicates and such that may refer to chars that need to be escaped
-	 *  when represented as strings.  Also, templates need to be escape so
+	 *  when represented as strings.  Also, templates need to be escaped so
 	 *  that the target language can hold them as a string.
 	 *
 	 *  I have defined (via the constructor) the set of typical escapes,
