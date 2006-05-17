@@ -849,7 +849,7 @@ public class Grammar {
 		*/
 		// first, create the text of the rule
 		StringBuffer buf = new StringBuffer();
-		buf.append("#src \"");
+		buf.append("// $ANTLR src \"");
 		buf.append(getFileName());
 		buf.append("\" ");
 		buf.append(ruleAST.getLine());

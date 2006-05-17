@@ -861,10 +861,12 @@ COMMENT :
 	;
 
 protected
-SL_COMMENT :
-	"//"
-	( options {greedy=false;} : . )* '\n'
-	{ newline(); }
+SL_COMMENT
+ 	:	"//"
+ 	 	(	(" $ANTLR")=> " $ANTLR " SRC ('\r')? '\n' // src directive
+ 		|	( options {greedy=false;} : . )* ('\r')? '\n'
+		)
+		{ newline(); }
 	;
 
 protected
@@ -1142,7 +1144,8 @@ WS_OPT
  *  has been generated so that errors are shown relative to the
  *  original file like the old C preprocessor used to do.
  */
-SRC	:	"#src" ' ' file:ACTION_STRING_LITERAL ' ' line:INT ('\r')? '\n'
+protected
+SRC	:	"src" ' ' file:ACTION_STRING_LITERAL ' ' line:INT
 		{
 		newline();
 		setFilename(file.getText().substring(1,file.getText().length()-1));
