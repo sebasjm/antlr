@@ -258,6 +258,54 @@ CHANGES
 
 3.0ea9 - ??
 
+* unicode literals didn't really work in DOT output and generated code. fixed.
+
+* fixed the unit test rig so it compiles nicely with Java 1.5
+
+* Added ant build.xml file (reads build.properties file)
+
+* predicates sometimes failed to compile/eval properly due to missing (...)
+  in IF expressions.  Forced (..)
+
+* (...)? with only one alt were not optimized.  Was:
+
+        // t.g:4:7: ( B )?
+        int alt1=2;
+        int LA1_0 = input.LA(1);
+        if ( LA1_0==B ) {
+            alt1=1;
+        }
+        else if ( LA1_0==-1 ) {
+            alt1=2;
+        }
+        else {
+            NoViableAltException nvae =
+                new NoViableAltException("4:7: ( B )?", 1, 0, input);
+            throw nvae;
+        }
+
+is now:
+
+        // t.g:4:7: ( B )?
+        int alt1=2;
+        int LA1_0 = input.LA(1);
+        if ( LA1_0==B ) {
+            alt1=1;
+        }
+
+  Smaller, faster and more readable.
+
+* Allow manual init of return values now:
+  functionHeader returns [int x=3*4, char (*f)()=null] : ... ;
+
+* Added optimization for DFAs that fixed a codegen bug with rules in lexer:
+   EQ			 : '=' ;
+   ASSIGNOP		 : '=' | '+=' ;
+  EQ is a subset of other rule.  It did not given an error which is
+  correct, but generated bad code.
+
+* ANTLR was sending column not char position to ANTLRWorks.
+
 * Bug fix: location 0, 0 emitted for synpreds and empty alts.
 
 * debugging event handshake how sends grammar file name.  Added getGrammarFileName() to recognizers.  Java.stg generates it:

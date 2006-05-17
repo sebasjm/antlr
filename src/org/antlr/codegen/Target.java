@@ -138,7 +138,10 @@ public class Target {
 
 	/** Convert from an ANTLR char literal found in a grammar file to
 	 *  an equivalent char literal in the target language.  For most
-	 *  languages, this means leaving 'x' as 'x'.
+	 *  languages, this means leaving 'x' as 'x'.  Actually, we need
+	 *  to escape '\u000A' so that it doesn't get converted to \n by
+	 *  the compiler.  Convert the literal to the char value and then
+	 *  to an appropriate target char literal.
 	 *
 	 *  Expect single quotes around the incoming literal.
 	 */
@@ -146,7 +149,19 @@ public class Target {
 		CodeGenerator generator,
 		String literal)
 	{
-		return literal;
+		StringBuffer buf = new StringBuffer();
+		buf.append('\'');
+		int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
+		if ( c<targetCharValueEscape.length &&
+			 targetCharValueEscape[c]!=null )
+		{
+			buf.append(targetCharValueEscape[c]);
+		}
+		else {
+			buf.append((char)c);
+		}
+		buf.append('\'');
+		return buf.toString();
 	}
 
 	/** Convert from an ANTLR string literal found in a grammar file to
@@ -195,7 +210,8 @@ public class Target {
 		}
 		for (int i=0; i<s.length(); i++) {
 			int c = s.charAt(i);
-			if ( c<targetCharValueEscape.length &&
+			if ( c!='\'' && // don't escape single quotes in strings for java
+				 c<targetCharValueEscape.length &&
 				 targetCharValueEscape[c]!=null )
 			{
 				buf.append(targetCharValueEscape[c]);
