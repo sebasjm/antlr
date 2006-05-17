@@ -328,9 +328,10 @@ if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.n
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
+<returnScope(scope=ruleDescriptor.returnScope)>
 
 // $ANTLR start <ruleName>
-public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
+public <returnType()> m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
     <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleDeclarations()>
     try {
@@ -361,6 +362,7 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
         <ruleDescriptor.actions.finally>
 <endif>
     }
+    return <ruleReturnValue()>;
 }
 // $ANTLR end <ruleName>
 >>
