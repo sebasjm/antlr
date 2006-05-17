@@ -198,7 +198,7 @@ public class CommonTokenStream implements TokenStream {
 			fillBuffer();
 		}
 		if ( stop>=tokens.size() ) {
-			stop=tokens.size();
+			stop=tokens.size()-1;
 		}
 		if ( start<0 ) {
 			start=0;
@@ -207,7 +207,7 @@ public class CommonTokenStream implements TokenStream {
 			return null;
 		}
 
-		// list = [Token t from tokens[start:stop] | t.getType() in types]
+		// list = tokens[start:stop]:{Token t, t.getType() in types}
 		List filteredTokens = new ArrayList();
 		for (int i=start; i<=stop; i++) {
 			Token t = (Token)tokens.get(i);
