@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-15"?>
+<!-- Contributed by Oliver Zeigermann -->
 <project name="antlr3" default="all" basedir=".">
     <property file="./build.properties" />
 
