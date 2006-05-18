@@ -129,18 +129,6 @@ public class ActionTranslator {
 		this.ruleName = ruleName;
 	}
 
-	/*
-	public String translate(String ruleName,
-						    antlr.Token actionToken,
-							int outerAltNum)
-	{
-		actionAST = new GrammarAST();
-		actionAST.initialize(actionToken);
-		actionAST.outerAltNum = outerAltNum;
-		return translate(ruleName);
-	}
-*/
-
 	/** Given an action string with $y, $x.y and $x::y references, convert it
 	 *  to a StringTemplate (that will be inserted into the output StringTemplate)
 	 *  Replace $ references to template references.  Targets can then say

@@ -35,6 +35,7 @@ import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
 import org.antlr.misc.*;
+import org.antlr.misc.BitSet;
 import org.antlr.runtime.CharStream;
 import org.antlr.stringtemplate.CommonGroupLoader;
 import org.antlr.stringtemplate.StringTemplate;
@@ -46,9 +47,7 @@ import org.antlr.tool.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /** ANTLR's code generator.
  *
@@ -179,7 +178,7 @@ public class CodeGenerator {
 		//System.out.println("targets="+templateDirs.toString());
 		StringTemplateGroupLoader loader =
 			new CommonGroupLoader(templateDirs.toString(),
-							  ErrorManager.getStringTemplateErrorListener());
+								  ErrorManager.getStringTemplateErrorListener());
 		StringTemplateGroup.registerGroupLoader(loader);
 		StringTemplateGroup.registerDefaultLexer(AngleBracketTemplateLexer.class);
 
@@ -282,7 +281,7 @@ public class CodeGenerator {
 		outputFileST.setAttribute("actions", grammar.getActions());
 
 		boolean filterMode = grammar.getOption("filter")!=null &&
-						 	 grammar.getOption("filter").equals("true");
+							  grammar.getOption("filter").equals("true");
 		boolean canBacktrack = grammar.getSyntacticPredicates()!=null ||
 							   filterMode;
 		outputFileST.setAttribute("backtracking", new Boolean(canBacktrack));
@@ -743,6 +742,26 @@ public class CodeGenerator {
 	{
 		ActionTranslator translator = new ActionTranslator(this,ruleName,actionTree);
 		return translator.translate();
+	}
+
+	/** Translate an action like [3,"foo",a[3]] and return a List of the
+	 *  individual arguments.  Simple ',' separator is assumed.
+	 */
+	public List translateArgAction(String ruleName,
+								   GrammarAST actionTree)
+	{
+		ActionTranslator translator = new ActionTranslator(this,ruleName,actionTree);
+		String action = translator.translate();
+		StringTokenizer argTokens = new StringTokenizer(action, ",");
+		List args = new ArrayList();
+		while ( argTokens.hasMoreTokens() ) {
+			String arg = (String)argTokens.nextToken();
+			args.add(arg);
+		}
+		if ( args.size()==0 ) {
+			return null;
+		}
+		return args;
 	}
 
 	/** Given a template constructor action like %foo(a={...}) in

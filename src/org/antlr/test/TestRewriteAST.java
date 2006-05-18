@@ -706,7 +706,7 @@ public class TestRewriteAST extends TestSuite {
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
 												 "a", "a b", debug);
-		String expecting = "a b\n";
+		String expecting = "[not sure what this should be!]\n";
 		assertEqual(found, expecting);
 	}
 

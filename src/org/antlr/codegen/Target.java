@@ -27,11 +27,11 @@
 */
 package org.antlr.codegen;
 
-import org.antlr.tool.Grammar;
-import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.Tool;
-import org.antlr.misc.Utils;
 import org.antlr.analysis.Label;
+import org.antlr.misc.Utils;
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.tool.Grammar;
 
 import java.io.IOException;
 
@@ -152,14 +152,30 @@ public class Target {
 		StringBuffer buf = new StringBuffer();
 		buf.append('\'');
 		int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
+		if ( c<Label.MIN_CHAR_VALUE ) {
+			return "'\u0000'";
+		}
 		if ( c<targetCharValueEscape.length &&
 			 targetCharValueEscape[c]!=null )
 		{
 			buf.append(targetCharValueEscape[c]);
 		}
-		else {
+		else if ( Character.UnicodeBlock.of((char)c)==
+			      Character.UnicodeBlock.BASIC_LATIN &&
+				  !Character.isISOControl((char)c) )
+		{
+			// normal char
 			buf.append((char)c);
 		}
+		else {
+			// must be something unprintable...use \\uXXXX
+			// turn on the bit above max "\\uFFFF" value so that we pad with zeros
+			// then only take last 4 digits
+			String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
+			buf.append("\\u");
+			buf.append(hex);
+		}
+
 		buf.append('\'');
 		return buf.toString();
 	}

@@ -614,9 +614,9 @@ wildcardCharListLabel(label, elementIndex) ::= <<
 ruleRef(rule,label,elementIndex,args) ::= <<
 following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
-<label>=<rule>(<args>);<\n>
+<label>=<rule>(<args; separator=", ">);<\n>
 <else>
-<rule>(<args>);<\n>
+<rule>(<args; separator=", ">);<\n>
 <endif>
 following.pop();
 <checkRuleBacktrackFailure()>
@@ -632,10 +632,10 @@ ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
-m<rule>(<args>); <checkRuleBacktrackFailure()>
+m<rule>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
 <else>
-m<rule>(<args>); <checkRuleBacktrackFailure()>
+m<rule>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>
 >>
 

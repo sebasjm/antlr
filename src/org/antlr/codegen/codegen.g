@@ -636,8 +636,8 @@ atom[String label] returns [StringTemplate code=null]
 
 		if ( #rarg!=null ) {
 			#rarg.outerAltNum = this.outerAltNum;
-			String argAction = generator.translateAction(currentRuleName,#rarg);
-			code.setAttribute("args", argAction);
+			List args = generator.translateArgAction(currentRuleName,#rarg);
+			code.setAttribute("args", args);
 		}
 		code.setAttribute("elementIndex", ((TokenWithIndex)r.getToken()).getIndex());
 		generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName);
@@ -656,8 +656,8 @@ atom[String label] returns [StringTemplate code=null]
 					code.setAttribute("rule", t.getText());
 					if ( #targ!=null ) {
 						#targ.outerAltNum = this.outerAltNum;
-						String argAction = generator.translateAction(currentRuleName,#targ);
-						code.setAttribute("args", argAction);
+						List args = generator.translateArgAction(currentRuleName,#targ);
+						code.setAttribute("args", args);
 					}
 				}
 			    if ( label!=null ) code.setAttribute("label", label);
@@ -977,7 +977,8 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	code = templates.getInstanceOf(stName);
     	if ( #arg!=null ) {
 	        #arg.outerAltNum = this.outerAltNum;
-    		code.setAttribute("args", generator.translateAction(currentRuleName,#arg));
+			List args = generator.translateArgAction(currentRuleName,#arg);
+			code.setAttribute("args", args);
     	}
 		code.setAttribute("elementIndex", ((TokenWithIndex)#rewrite_atom.getToken()).getIndex());
 		int ttype = grammar.getTokenType(tokenName);
