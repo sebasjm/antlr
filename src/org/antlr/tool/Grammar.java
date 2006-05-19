@@ -151,12 +151,13 @@ public class Grammar {
 				add("TokenLabelType");
 				add("superClass");
 				add("filter");
+				add("k");
 				}
 			};
 
 	public static final Set doNotCopyOptionsToLexer =
 		new HashSet() {
-			{add("output"); add("ASTLabelType"); add("superClass");}
+			{add("output"); add("ASTLabelType"); add("superClass"); add("k");}
 		};
 
 	public static final Map defaultOptions =
@@ -164,6 +165,9 @@ public class Grammar {
 				{put("language","Java");
 				}
 			};
+
+	/** Is there a global fixed lookahead set for this grammar? */
+	protected int global_k = 0;
 
 	/** Map a scope to a map of name:action pairs.
 	 *  Map<String, Map<String,GrammarAST>>
@@ -706,9 +710,13 @@ public class Grammar {
 			Decision d = getDecision(decision);
 			d.blockAST.setOption(this, "k", new Integer(1));
 			//setDecisionOption(decision, "k", new Integer(1));
+			System.out.println("trying decision "+decision+" again with k=1");
 			lookaheadDFA = new DFA(decision, decisionStartState);
+			if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
+				ErrorManager.internalError("could not even do k=1 for decision "+decision);
+			}
 		}
-		
+
 		setLookaheadDFA(decision, lookaheadDFA);
 
 		// create map from line:col to decision DFA (for ANTLRWorks)
@@ -1547,7 +1555,18 @@ public class Grammar {
 		return stringLiteralToTypeMap.keySet();
 	}
 
-    /** Save the option key/value pair and process it; return the key
+	public int getGrammarMaxLookahead() {
+		if ( global_k>0 ) {
+			return global_k;
+		}
+		Integer kI = (Integer)getOption("k");
+		if ( kI!=null ) {
+			global_k = kI.intValue();
+		}
+		return global_k;
+	}
+
+	/** Save the option key/value pair and process it; return the key
 	 *  or null if invalid option.
 	 */
     public String setOption(String key, Object value, antlr.Token optionsStartToken) {
@@ -1564,7 +1583,9 @@ public class Grammar {
 		if ( options==null ) {
 			options = new HashMap();
 		}
- 		options.put(key, value);
+		if ( key.equals("k") ) {
+		}
+		options.put(key, value);
 		return key;
     }
 
@@ -1596,17 +1617,6 @@ public class Grammar {
     }
 
 	public boolean optionIsValid(String key, Object value) {
-		/*
-		if ( key.equals("output") ) {
-			if ( type==TREE_PARSER ) {
-				ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
-										  this,
-										  null,
-										  key);
-				return false;
-			}
-		}
-		*/
 		return true;
 	}
 
