@@ -166,8 +166,11 @@ public class Grammar {
 				}
 			};
 
-	/** Is there a global fixed lookahead set for this grammar? */
-	protected int global_k = 0;
+	/** Is there a global fixed lookahead set for this grammar?
+	 *  If 0, nothing specified.  -1 implies we have not looked at
+	 *  the options table yet to set k.
+	 */
+	protected int global_k = -1;
 
 	/** Map a scope to a map of name:action pairs.
 	 *  Map<String, Map<String,GrammarAST>>
@@ -1556,12 +1559,15 @@ public class Grammar {
 	}
 
 	public int getGrammarMaxLookahead() {
-		if ( global_k>0 ) {
+		if ( global_k>=0 ) {
 			return global_k;
 		}
 		Integer kI = (Integer)getOption("k");
 		if ( kI!=null ) {
 			global_k = kI.intValue();
+		}
+		else {
+			global_k = 0;
 		}
 		return global_k;
 	}

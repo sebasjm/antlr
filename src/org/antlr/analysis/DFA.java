@@ -241,6 +241,7 @@ public class DFA {
 
 	/** The user may specify a max, acyclic lookahead for any decision.  No
 	 *  DFA cycles are created when this value, k, is greater than 0.
+	 *  If this decision has no k lookahead specified, then try the grammar.
 	 */
 	public int getUserMaxLookahead() {
 		if ( user_k>=0 ) { // cache for speed
@@ -249,8 +250,8 @@ public class DFA {
 		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decisionNumber);
 		Integer kI = (Integer)blockAST.getOption("k");
 		if ( kI==null ) {
-			user_k=0;
-			return 0;
+			user_k = nfa.grammar.getGrammarMaxLookahead();
+			return user_k;
 		}
 		user_k = kI.intValue();
 		return user_k;

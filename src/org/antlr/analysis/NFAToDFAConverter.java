@@ -85,10 +85,6 @@ public class NFAToDFAConverter {
 								   " ("+d.getNFAConfigurations().size()+" nfa states)");
 			}
 			int k = dfa.getUserMaxLookahead();
-			if ( k<=0 ) {
-				// try for a grammar k option; else leave as 0
-				k = dfa.nfa.grammar.getGrammarMaxLookahead();
-			}
 			if ( k>0 && k==d.getLookaheadDepth() ) {
 				// we've hit max lookahead, make this a stop state
 				System.out.println("stop state @k="+k+" (terminated early)");
