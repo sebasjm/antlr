@@ -168,6 +168,9 @@ public class Tool {
 			else if (args[i].equals("-Idbgconversion")) {
 				NFAToDFAConverter.debug = true;
 			}
+			else if (args[i].equals("-Imultithreaded")) {
+				NFAToDFAConverter.SINGLE_THREADED_NFA_CONVERSION = false;
+			}
 			else if (args[i].equals("-Inomergestopstates")) {
 				DFAOptimizer.MERGE_STOP_STATES = false;
 			}
@@ -179,11 +182,20 @@ public class Tool {
 			}
 			else if (args[i].equals("-Im")) {
 				if (i + 1 >= args.length) {
-					System.err.println("missing max recursion with -m option; ignoring");
+					System.err.println("missing max recursion with -Im option; ignoring");
 				}
 				else {
 					i++;
 					NFAContext.MAX_RECURSIVE_INVOCATIONS = Integer.parseInt(args[i]);
+				}
+			}
+			else if (args[i].equals("-ImaxtimeforDFA")) {
+				if (i + 1 >= args.length) {
+					System.err.println("missing max time in ms -ImaxtimeforDFA option; ignoring");
+				}
+				else {
+					i++;
+					DFA.MAX_TIME_PER_DFA_CREATION = Integer.parseInt(args[i]);
 				}
 			}
 

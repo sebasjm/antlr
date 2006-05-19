@@ -166,6 +166,11 @@ public class DFAOptimizer {
 			visited.clear();
 			optimizeEOTBranches(dfa.startState);
 		}
+
+		/* ack...code gen needs this, cannot optimize
+		visited.clear();
+		unlinkUnneededStateData(dfa.startState);
+		*/
 		//long stop = System.currentTimeMillis();
 		//System.out.println("minimized in "+(int)(stop-start)+" ms");
     }
@@ -231,6 +236,23 @@ public class DFAOptimizer {
 				i--; // back up one so that i++ of loop iteration stays within bounds
 			}
 			optimizeEOTBranches(edgeTarget);
+		}
+	}
+
+	/** Walk DFA states, unlinking the nfa configs and whatever else I
+	 *  can to reduce memory footprint.
+	 */
+	protected void unlinkUnneededStateData(DFAState d) {
+		Integer sI = new Integer(d.stateNumber);
+		if ( visited.contains(sI) ) {
+			return; // already visited
+		}
+		visited.add(sI);
+		d.nfaConfigurations = null;
+		for (int i = 0; i < d.getNumberOfTransitions(); i++) {
+			Transition edge = (Transition) d.transition(i);
+			DFAState edgeTarget = ((DFAState)edge.target);
+			unlinkUnneededStateData(edgeTarget);
 		}
 	}
 

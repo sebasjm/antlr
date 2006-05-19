@@ -27,9 +27,12 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.runtime.IntStream;
-import org.antlr.tool.*;
+import org.antlr.tool.FASerializer;
+import org.antlr.tool.Grammar;
+import org.antlr.tool.GrammarAST;
+import org.antlr.tool.Interpreter;
 import org.antlr.Tool;
+import org.antlr.runtime.IntStream;
 
 import java.util.*;
 
@@ -48,7 +51,9 @@ public class DFA {
 	 */
 	public static final int MAX_STATES_PER_ALT_IN_DFA = 400;
 
-    /** What's the start state for this DFA? */
+	public static int MAX_TIME_PER_DFA_CREATION = 2*1000;
+
+	/** What's the start state for this DFA? */
     public DFAState startState;
 
 	/** This DFA is being built for which decision? */
@@ -116,7 +121,13 @@ public class DFA {
 	 */
 	public DecisionProbe probe = new DecisionProbe(this);
 
-    public DFA(int decisionNumber, NFAState decisionStartState) {
+	/** Track absolute time of the conversion so we can have a failsafe:
+	 *  if it takes too long, then terminate.  Assume bugs are in the
+	 *  analysis engine.
+	 */
+	protected long conversionStartTime;
+
+	public DFA(int decisionNumber, NFAState decisionStartState) {
 		this.decisionNumber = decisionNumber;
         this.decisionNFAStartState = decisionStartState;
         nfa = decisionStartState.nfa;
@@ -124,11 +135,11 @@ public class DFA {
         //setOptions( nfa.grammar.getDecisionOptions(getDecisionNumber()) );
         initAltRelatedInfo();
 
+		//long start = System.currentTimeMillis();
         nfaConverter = new NFAToDFAConverter(this);
 		nfaConverter.convert(decisionStartState);
 
 		// figure out if there are problems with decision
-		//long start = System.currentTimeMillis();
 		verify();
 
 		if ( !probe.isDeterministic() ||
@@ -298,7 +309,7 @@ public class DFA {
                 d.getStateNumber());
         */
 
-        if ( d.isAcceptState() ) {
+		if ( d.isAcceptState() ) {
             // accept states have no edges emanating from them so we can return
             d.setAcceptStateReachable(REACHABLE_YES);
             // this alt is uniquely predicted, remove from nondeterministic list

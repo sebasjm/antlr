@@ -37,6 +37,7 @@ import org.antlr.analysis.*;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.IntSet;
 import org.antlr.misc.IntervalSet;
+import org.antlr.misc.Barrier;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 
@@ -645,41 +646,38 @@ public class Grammar {
 		if ( nfa==null ) {
 			createNFAs();
 		}
+		// create a barrier expecting n DFA and this main creation thread
+		Barrier barrier = new Barrier(3);
 		//System.out.println("### create DFAs");
 		long start = System.currentTimeMillis();
-        for (int decision=1; decision<=getNumberOfDecisions(); decision++) {
-            NFAState decisionStartState = getDecisionNFAStartState(decision);
-			if ( decisionStartState.getNumberOfTransitions()>1 ) {
-				long startDFA=0,stopDFA=0;
-				if ( watchNFAConversion ) {
-					System.out.println("--------------------\nbuilding lookahead DFA (d="
-									   +decisionStartState.getDecisionNumber()+") for "+
-									   decisionStartState.getDescription());
-					startDFA = System.currentTimeMillis();
+		int numDecisions = getNumberOfDecisions();
+		if ( NFAToDFAConverter.SINGLE_THREADED_NFA_CONVERSION ) {
+			for (int decision=1; decision<=numDecisions; decision++) {
+				NFAState decisionStartState = getDecisionNFAStartState(decision);
+				if ( decisionStartState.getNumberOfTransitions()>1 ) {
+					createLookaheadDFA(decision);
 				}
-				DFA lookaheadDFA = new DFA(decision, decisionStartState);
-				if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
-					// set k=1 option and try again
-					Decision d = getDecision(decision);
-					d.blockAST.setOption(this, "k", new Integer(1));
-					//setDecisionOption(decision, "k", new Integer(1));
-					lookaheadDFA = new DFA(decision, decisionStartState);
-				}
-
-				setLookaheadDFA(decision, lookaheadDFA);
-
-				// create map from line:col to decision DFA (for ANTLRWorks)
-				GrammarAST decisionAST = lookaheadDFA.getDecisionASTNode();
-				int line = decisionAST.getLine();
-				int col = decisionAST.getColumn();
-				lineColumnToLookaheadDFAMap.put(new StringBuffer().append(line + ":")
-												.append(col).toString(), lookaheadDFA);
-
-				if ( watchNFAConversion ) {
-					stopDFA = System.currentTimeMillis();
-					System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
-									   " states, "+(int)(stopDFA-startDFA)+" ms");
-				}
+			}
+		}
+		else {
+			ErrorManager.info("two-threaded DFA conversion");
+			// assume 2 CPU for now
+			int midpoint = numDecisions/2;
+			NFAConversionThread t1 =
+				new NFAConversionThread(this, barrier, 1, midpoint);
+			new Thread(t1).start();
+			if ( midpoint == (numDecisions/2) ) {
+				midpoint++;
+			}
+			NFAConversionThread t2 =
+				new NFAConversionThread(this, barrier, midpoint, numDecisions);
+			new Thread(t2).start();
+			// wait for these two threads to finish
+			try {
+				barrier.waitForRelease();
+			}
+			catch(InterruptedException e) {
+				ErrorManager.internalError("what the hell? DFA interruptus", e);
 			}
 		}
 
@@ -690,6 +688,41 @@ public class Grammar {
 
 		// indicate that we've finished building DFA (even if #decisions==0)
 		allDecisionDFACreated = true;
+	}
+
+	public void createLookaheadDFA(int decision) {
+		NFAState decisionStartState = getDecisionNFAStartState(decision);
+		long startDFA=0,stopDFA=0;
+		if ( watchNFAConversion ) {
+			System.out.println("--------------------\nbuilding lookahead DFA (d="
+							   +decisionStartState.getDecisionNumber()+") for "+
+							   decisionStartState.getDescription());
+			startDFA = System.currentTimeMillis();
+		}
+		DFA lookaheadDFA = new DFA(decision, decisionStartState);
+		if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
+			lookaheadDFA = null; // make sure other memory is "free" before redoing
+			// set k=1 option and try again
+			Decision d = getDecision(decision);
+			d.blockAST.setOption(this, "k", new Integer(1));
+			//setDecisionOption(decision, "k", new Integer(1));
+			lookaheadDFA = new DFA(decision, decisionStartState);
+		}
+		
+		setLookaheadDFA(decision, lookaheadDFA);
+
+		// create map from line:col to decision DFA (for ANTLRWorks)
+		GrammarAST decisionAST = lookaheadDFA.getDecisionASTNode();
+		int line = decisionAST.getLine();
+		int col = decisionAST.getColumn();
+		lineColumnToLookaheadDFAMap.put(new StringBuffer().append(line + ":")
+										.append(col).toString(), lookaheadDFA);
+
+		if ( watchNFAConversion ) {
+			stopDFA = System.currentTimeMillis();
+			System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
+							   " states, "+(int)(stopDFA-startDFA)+" ms");
+		}
 	}
 
 	/** Return a new unique integer in the token type space */

@@ -38,7 +38,7 @@ public class NFAToDFAConverter {
 	protected List work = new LinkedList();
 
 	/** Have we found a condition that renders DFA useless?  If so, terminate */
-	protected boolean terminate = false;
+	protected boolean terminateConversion = false;
 
 	/** While converting NFA, we must track states that
 	 *  reference other rule's NFAs so we know what to do
@@ -54,6 +54,15 @@ public class NFAToDFAConverter {
 
 	public static boolean debug = false;
 
+	/** Should ANTLR launch multiple threads to convert NFAs to DFAs?
+	 *  With a 2-CPU box, I note that it's about the same single or
+	 *  multithreaded.  Both CPU meters are going even when single-threaded
+	 *  so I assume the GC is killing us.  Could be the compiler.  When I
+	 *  run java -Xint mode, I get about 15% speed improvement with multiple
+	 *  threads.
+	 */
+	public static boolean SINGLE_THREADED_NFA_CONVERSION = true;
+
 	public NFAToDFAConverter(DFA dfa) {
 		this.dfa = dfa;
 		NFAState nfaStartState = dfa.getNFADecisionStartState();
@@ -63,11 +72,13 @@ public class NFAToDFAConverter {
 	}
 
 	public void convert(NFAState blockStart) {
+		dfa.conversionStartTime = System.currentTimeMillis();
+
 		// create the DFA start state
 		dfa.startState = computeStartState();
 
 		// while more DFA states to check, process them
-		while ( !terminate && work.size()>0 ) {
+		while ( !terminateConversion && work.size()>0 ) {
 			DFAState d = (DFAState) work.get(0);
 			if ( dfa.nfa.grammar.getWatchNFAConversion() ) {
 				System.out.println("convert DFA state "+d.stateNumber+
@@ -257,7 +268,7 @@ public class NFAToDFAConverter {
 			// per alt in this decision to exceed a max
 			int statesPerAltRatio = t.stateNumber/dfa.getNumberOfAlts();
 			if ( statesPerAltRatio>DFA.MAX_STATES_PER_ALT_IN_DFA ) {
-				terminate = true;
+				terminateConversion = true;
 				dfa.probe.reportEarlyTermination();
 				break;
 			}
@@ -422,11 +433,12 @@ public class NFAToDFAConverter {
 		configs.addAll(d.getNFAConfigurations());
 		// for each NFA configuration in d
 		Iterator iter = configs.iterator();
-		while (iter.hasNext()) {
+		while (!terminateConversion && iter.hasNext()) {
 			NFAConfiguration c = (NFAConfiguration)iter.next();
 			if ( c.singleAtomTransitionEmanating ) {
 				continue; // ignore NFA states w/o epsilon transitions
 			}
+			//System.out.println("go do reach for NFA state "+c.state);
 			// figure out reachable NFA states from each of d's nfa states
 			// via epsilon transitions
 			closure(dfa.nfa.getState(c.state),
@@ -495,6 +507,20 @@ public class NFAToDFAConverter {
 			System.out.println("closure at NFA state "+p.stateNumber+"|"+
 							   alt+" filling DFA state "+d.stateNumber+" with context "+context
 							   );
+		}
+
+		if ( terminateConversion ) {
+			// keep walking back out, we're in the process of terminating
+			return;
+		}
+
+		if ( System.currentTimeMillis() - d.dfa.conversionStartTime >=
+			 DFA.MAX_TIME_PER_DFA_CREATION )
+		{
+			// report and back your way out; we've blown up somehow
+			terminateConversion = true;
+			dfa.probe.reportEarlyTermination();
+			return;
 		}
 
 		// Avoid infinite recursion
@@ -683,8 +709,13 @@ public class NFAToDFAConverter {
 			return true;
 		}
 
+		/*
+		System.out.print("closureIsBusy(d="+d.stateNumber+", nfap="+p.stateNumber+", alt="+alt+"): ");
+		System.out.println("unique Config="+proposedNFAConfiguration);
+		*/
 		// case (2) : recursive (visited rule from same invocation state)
 		int depth = context.recursionDepthEmanatingFromState(p.stateNumber);
+		//System.out.println("recursion depth "+depth+" from "+p.stateNumber+" for "+context);
 		if ( depth > NFAContext.MAX_RECURSIVE_INVOCATIONS ) {
 			// report a problem if we detect an attempt to recurse higher
 			if ( dfa.startState == null ||
