@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0ea8
-March 11, 2006
+ANTLR 3.0ea9
+May 20, 2006
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator
@@ -8,10 +8,11 @@ University of San Francisco
 
 INTRODUCTION 
 
-Welcome to ANTLR v3!  I've been working on this for nearly 3 years
-and, while it is not ready for a full release, it may prove useful to
-some of you.  No primary functionality is missing.  Ultimately, I need
-to rewrite ANTLR v3 in itself (it's written in 2.7.6 at the moment).
+Welcome to ANTLR v3!  I've been working on this for 3 years and, while
+it is not ready for a full release, it may prove useful to some of
+you.  No primary functionality is missing.  Ultimately, I need to
+rewrite ANTLR v3 in itself (it's written in 2.7.6 at the moment and
+also needs StringTemplate 2.3).
 
 You should use v3 in conjunction with ANTLRWorks:
 
@@ -24,6 +25,10 @@ Furthermore, this software will be in a state of flux including
 changes in syntax and methods/classes until we get closer to a real
 release.  There are many things that just plain don't work at the
 moment.
+
+See the new wiki FAQ:
+
+    http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
 I have made absolutely no effort yet to deal well with erroneous input
 (well, semantic checking is pretty good, but bad syntax makes ANTLR
@@ -156,12 +161,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0ea8/README.txt (this file)
-antlr-3.0ea8/LICENSE.txt
-antlr-3.0ea8/src/org/antlr/...
-antlr-3.0ea8/lib/stringtemplate-2.2b4.jar (3.0ea8 needs 2.2b6)
-antlr-3.0ea8/lib/antlr-2.7.6.jar
-antlr-3.0ea8/lib/antlr-3.0ea8.jar
+antlr-3.0ea9/README.txt (this file)
+antlr-3.0ea9/LICENSE.txt
+antlr-3.0ea9/src/org/antlr/...
+antlr-3.0ea9/lib/stringtemplate-2.2b7.jar (3.0ea9 needs 2.2b7)
+antlr-3.0ea9/lib/antlr-2.7.6.jar
+antlr-3.0ea9/lib/antlr-3.0ea9.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -174,7 +179,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0ea8 (Mar 11, 2006) 1989-2006
+ANTLR Parser Generator   Early Access Version 3.0ea9 (Mar 11, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir   specify output directory where all output is
 generated
@@ -241,10 +246,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0ea8/lib/stringtemplate-2.2b6.jar
-antlr-3.0ea8/lib/antlr-2.7.6.jar
+antlr-3.0ea9/lib/stringtemplate-2.2b6.jar
+antlr-3.0ea9/lib/antlr-2.7.6.jar
 
-then jump into antlr-3.0ea8/src directory and then type:
+then jump into antlr-3.0ea9/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -256,7 +261,22 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0ea9 - ??
+3.0ea9 - May 20, 2006
+
+* added global k value for grammar to limit lookahead for all decisions unless
+overridden in a particular decision.
+
+* added failsafe so that any decision taking longer than 2 seconds to create
+the DFA will fall back on k=1.  Use -ImaxtimeforDFA n (in ms) to set the time.
+
+* added an option (turned off for now) to use multiple threads to
+perform grammar analysis.  Not much help on a 2-CPU computer as
+garbage collection seems to peg the 2nd CPU already. :( Gotta wait for
+a 4 CPU box ;)
+
+* switched from #src to // $ANTLR src directive.
+
+* CommonTokenStream.getTokens() looked past end of buffer sometimes. fixed.
 
 * unicode literals didn't really work in DOT output and generated code. fixed.
 
