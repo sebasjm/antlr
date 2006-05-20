@@ -239,7 +239,7 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"}\n" +
 			"@init {System.out.println(\"enter expr \"+(char)input.LT(1));}\n" +
 			"  : (ATOM 'x') => ATOM 'x' {System.out.println(\"ATOM x\");}\n" +
-			"  | ATOM {System.out.println(\"ATOM\");}\n" +
+			"  | ATOM {System.out.println(\"ATOM \"+$ATOM.text);}\n" +
 			";\n" +
 			"fragment ATOM\n" +
 			"@init {System.out.println(\"enter atom \"+(char)input.LT(1));}\n" +
@@ -254,30 +254,22 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 												 "s", "((34)x)x", false);
 		String expecting =
 			"enter expr (\n" +
-				"enter atom (\n" +
-				"enter expr (\n" +
-				"enter atom (\n" +
-				"enter expr 3\n" +
-				"enter atom 3\n" +
-				"enter atom 3\n" +
-				"enter atom (\n" +
-				"enter expr 3\n" +
-				"enter atom 3\n" +
-				"enter atom 3\n" +
-				"enter atom (\n" +
-				"enter expr (\n" +
-				"enter atom (\n" +
-				"enter expr 3\n" +
-				"enter atom 3\n" +
-				"enter atom 3\n" +
-				"enter atom (\n" +
-				"enter expr 3\n" +
-				"enter atom 3\n" +
-				"enter atom 3\n" +
-				"ATOM\n" +
-				"ATOM x\n" +
-				"ATOM x\n" +
-				"done\n";
+			"enter atom (\n" +
+			"enter expr (\n" +
+			"enter atom (\n" +
+			"enter expr 3\n" +
+			"enter atom 3\n" +
+			"enter atom 3\n" +
+			"enter atom (\n" +
+			"enter atom (\n" +
+			"enter expr (\n" +
+			"enter atom (\n" +
+			"enter expr 3\n" +
+			"enter atom 3\n" +
+			"ATOM 34\n" +
+			"ATOM x\n" +
+			"ATOM x\n" +
+			"done\n";
 		assertEqual(found, expecting);
 	}
 
