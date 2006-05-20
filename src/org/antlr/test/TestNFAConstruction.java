@@ -710,7 +710,7 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			"lexer grammar tLexer;\n" +
 			"\n" +
-			"#src \"<string>\" 2\n"+
+			"// $ANTLR src \"<string>\" 2\n"+
 			"A : '{' ~('}')* '}';\n";
 		assertEqual(result, expecting);
 	}

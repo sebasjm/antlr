@@ -170,7 +170,7 @@ public class DFA {
 	 *  no cycles can be created.
      */
     protected DFAState addState(DFAState d) {
-		if ( getUserMaxLookahead()>0 ) {
+		if ( getMaxLookahead()>0 ) {
 			configurationsToDFAStateMap.put(d,d);
 			numberOfStates++;
 			return d;
@@ -223,7 +223,7 @@ public class DFA {
      *  to distinguish between alternatives.
      */
     public boolean isCyclic() {
-        return cyclic && getUserMaxLookahead()==0;
+        return cyclic && getMaxLookahead()==0;
     }
 
 	/** Is this DFA derived from the NFA for the Tokens rule? */
@@ -243,7 +243,7 @@ public class DFA {
 	 *  DFA cycles are created when this value, k, is greater than 0.
 	 *  If this decision has no k lookahead specified, then try the grammar.
 	 */
-	public int getUserMaxLookahead() {
+	public int getMaxLookahead() {
 		if ( user_k>=0 ) { // cache for speed
 			return user_k;
 		}

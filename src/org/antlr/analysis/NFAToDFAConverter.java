@@ -84,7 +84,7 @@ public class NFAToDFAConverter {
 				System.out.println("convert DFA state "+d.stateNumber+
 								   " ("+d.getNFAConfigurations().size()+" nfa states)");
 			}
-			int k = dfa.getUserMaxLookahead();
+			int k = dfa.getMaxLookahead();
 			if ( k>0 && k==d.getLookaheadDepth() ) {
 				// we've hit max lookahead, make this a stop state
 				System.out.println("stop state @k="+k+" (terminated early)");
@@ -517,6 +517,11 @@ public class NFAToDFAConverter {
 		if ( System.currentTimeMillis() - d.dfa.conversionStartTime >=
 			 DFA.MAX_TIME_PER_DFA_CREATION )
 		{
+			/*
+			if ( d.dfa.decisionNumber==19 ){
+				int i = 34;
+			}
+			*/
 			// report and back your way out; we've blown up somehow
 			terminateConversion = true;
 			dfa.probe.reportEarlyTermination();

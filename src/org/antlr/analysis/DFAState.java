@@ -468,7 +468,7 @@ public class DFAState extends State {
     */
 	
 	protected Set getNondeterministicAlts() {
-		int user_k = dfa.getUserMaxLookahead();
+		int user_k = dfa.getMaxLookahead();
 		if ( user_k>0 && user_k==k ) {
 			// if fixed lookahead, then more than 1 alt is a nondeterminism
 			// if we have hit the max lookahead

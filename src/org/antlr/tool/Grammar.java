@@ -707,9 +707,11 @@ public class Grammar {
 			startDFA = System.currentTimeMillis();
 		}
 		DFA lookaheadDFA = new DFA(decision, decisionStartState);
-		if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
+		if ( lookaheadDFA.analysisAborted() && // did analysis bug out?
+			 lookaheadDFA.getMaxLookahead()!=1 )
+		{
 			lookaheadDFA = null; // make sure other memory is "free" before redoing
-			// set k=1 option and try again
+			// set k=1 option if not already k=1 and try again
 			Decision d = getDecision(decision);
 			d.blockAST.setOption(this, "k", new Integer(1));
 			//setDecisionOption(decision, "k", new Integer(1));
