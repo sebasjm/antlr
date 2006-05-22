@@ -54,23 +54,23 @@ public class NFAContext {
 	 *  I'm pretty sure it therefore includes all stack symbols.  Here I am
 	 *  only preventing infinite recursion during a single closure operation.
 	 *
-	 *  max=0 implies you cannot ever recurse
-	 *  (note you can make as many calls as you want--you just can't ever
-	 *  visit a state that is on your rule invocation stack).
-	 *  max=1 implies you are able to recurse once (i.e., call a rule twice
-	 *  from the same place).
+	 *  max=0 implies you cannot ever jump to another rule during closure.
+	 *  max=1 implies you can make as many calls as you want--you just
+	 *        can't ever visit a state that is on your rule invocation stack.
+	 * 		  I.e., you cannot ever recurse.
+	 *  max=2 implies you are able to recurse once (i.e., call a rule twice
+	 *  	  from the same place).
 	 *
 	 *  This tracks recursion to a rule specific to an invocation site!
 	 *  It does not detect multiple calls to a rule from different rule
 	 *  invocation states.  We are guaranteed to terminate because the
-	 *  stack can only grow as big as the number of NFA states.
+	 *  stack can only grow as big as the number of NFA states * max.
 	 *
-	 *  I noticed that the Java grammar didn't work with max=0, but did with
-	 *  max=3.  Let's set to 3.
-	 *  Recursion is sometimes needed to resolve some fixed lookahead
-	 *  decisions.
+	 *  I noticed that the Java grammar didn't work with max=1, but did with
+	 *  max=4.  Let's set to 4. Recursion is sometimes needed to resolve some
+	 *  fixed lookahead decisions.
 	 */
-	public static int MAX_RECURSIVE_INVOCATIONS = 3;
+	public static int MAX_RECURSIVE_INVOCATIONS = 4;
 
     public NFAContext parent;
 
@@ -138,21 +138,53 @@ public class NFAContext {
 	 *  probably not show the $ in this case.  There is a dummy node for each
 	 *  stack that just means empty; $ is a marker that's all.
 	 *
+	 *  This is used in relation to checking conflicts associated with a
+	 *  single NFA state's configurations within a single DFA state.
+	 *  If there are configurations s and t within a DFA state such that
+	 *  s.state=t.state && s.alt != t.alt && s.ctx conflicts t.ctx then
+	 *  the DFA state predicts more than a single alt--it's nondeterministic.
+	 *  Two contexts conflict if they are the same or if one is a suffix
+	 *  of the other.
+	 *
+	 *  When comparing contexts, if one context has a stack and the other
+	 *  does not then they should be considered the same context.  The only
+	 *  way for an NFA state p to have an empty context and a nonempty context
+	 *  is the case when closure falls off end of rule without a call stack
+	 *  and re-enters the rule with a context.  This resolves the issue I
+	 *  discussed with Sriram Srinivasan Feb 28, 2005 about not terminating
+	 *  fast enough upon nondeterminism.
+	 *
 	 *  TODO: Seems that suffix returns true if equals; faster if we do suffix only?
 	 */
 	public boolean conflictsWith(Object o) {
 		NFAContext other = ((NFAContext)o);
 		return this.equals(other) || this.suffix(other);
+		// TODO: return this.suffix(other);
 	}
 
-	/** [21 $] suffix [21 12 $]
+	/** [$] suffix any context
+	 *  [21 $] suffix [21 12 $]
 	 *  [21 12 $] suffix [21 $]
 	 *  [21 18 $] suffix [21 18 12 9 $]
 	 *  [21 18 12 9 $] suffix [21 18 $]
 	 *  [21 12 $] not suffix [21 9 $]
+	 *
+	 *  Example "[21 $] suffix [21 12 $]" means: rule r invoked current rule
+	 *  from state 21.  Rule s invoked rule r from state 12 which then invoked
+	 *  current rule also via state 21.  While the context prior to state 21
+	 *  is different, the fact that both contexts emanate from state 21 implies
+	 *  that they are now going to track perfectly together.  Once they
+	 *  converged on state 21, there is no way they can separate.  In other
+	 *  words, the prior stack state is not consulted when computing where to
+	 *  go in the closure operation.  ?$ and ??$ are considered the same stack.
+	 *  If ? is popped off then $ and ?$ remain; they are now an empty and
+	 *  nonempty context comparison.  So, if one stack is a suffix of
+	 *  another, then it will still degenerate to the simple empty stack
+	 *  comparison case.
 	 */
 	protected boolean suffix(NFAContext other) {
 		NFAContext sp = this;
+		// if one of the contexts is empty, it never enters loop and returns true
 		while ( sp.parent!=null && other.parent!=null ) {
 			if ( sp.invokingState != other.invokingState ) {
 				return false;
@@ -165,28 +197,14 @@ public class NFAContext {
 	}
 
     /** Walk upwards to the root of the call stack context looking
-     *  for a particular invoking state.  Only look til before
-	 *  initialContext (which is when the overall closure operation started).
-	 *  We only care about re-invocations of a rule within same closure op
-	 *  because that implies same rule is visited w/o consuming input.
-	 *
-	 *  The initialContext is always on the path to the root from 'this'
-	 *  so walking upwards from 'this' will always hit initialContext
-	 *  eventually; don't worry about hitting top of stack.
-	 *
-	 *  TOD O: use linked hashmap for this?
-    public boolean contains(int state, NFAContext initialContext) {
+     *  for a particular invoking state.
+	public boolean contains(int state) {
         NFAContext sp = this;
 		int n = 0; // track recursive invocations of state
 		System.out.println("this.context is "+sp);
-        //while ( sp.parent!=null && sp.parent!=initialContext ) {
 		while ( sp.parent!=null ) {
             if ( sp.invokingState.stateNumber == state ) {
-				n++;
-                if ( n>=MAX_RECURSIVE_INVOCATIONS ) {
-					System.out.println("contains");
-					return true;
-				}
+				return true;
             }
             sp = sp.parent;
         }

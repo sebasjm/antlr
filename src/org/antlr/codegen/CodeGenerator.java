@@ -495,7 +495,15 @@ public class CodeGenerator {
 		" for "+referencedElementName+"#"+i+" in "+
 		enclosingRuleName);
 		*/
-		LookaheadSet follow = grammar.LOOK(followingNFAState);
+		LookaheadSet follow = null;
+		if ( followingNFAState!=null ) {
+			follow = grammar.LOOK(followingNFAState);
+		}
+
+		if ( follow==null ) {
+			ErrorManager.internalError("no follow state or cannot compute follow");
+			follow = new LookaheadSet();
+		}
 		//System.out.println(" "+follow);
 
 		long[] words = null;

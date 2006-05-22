@@ -261,7 +261,15 @@ public class NFAToDFAConverter {
 				// as this labels set is a covering approximation only.
 				continue;
 			}
-			closure(t);  // add any NFA states reachable via epsilon
+			if ( t.getUniqueAlt()==NFA.INVALID_ALT_NUMBER ) {
+				// Only compute closure if a unique alt number is not known.
+				// If a unique alternative is mentioned among all NFA
+				// configurations then there is no possibility of needing to look
+				// beyond this state; also no possibility of a nondeterminism.
+				// This optimization May 22, 2006 just dropped -Xint time
+				// for analysis of Java grammar from 11.5s to 2s!  Wow.
+				closure(t);  // add any NFA states reachable via epsilon
+			}
 
 			// FAILSAFE: so we cannot hit an exponentiality in
 			// the NFA conversion; don't let averate number of states
@@ -495,6 +503,62 @@ public class NFAToDFAConverter {
 	 *
 	 *   Current state p is always added to d's configuration list as it's part
 	 *   of the closure as well.
+	 *
+	 *  When is a closure operation in a cycle condition?  While it is
+	 *  very possible to have the same NFA state mentioned twice
+	 *  within the same DFA state, there are two situations that
+	 *  would lead to nontermination of closure operation:
+	 *
+	 *  (1) Whenever closure reaches a configuration where the same state
+	 *      with same context already exists.  This catches
+	 *      the IF-THEN-ELSE tail recursion cycle and things like
+	 *
+	 *      a : A a | B ;
+	 *
+	 *      the context will be $ (empty stack).
+	 *
+	 *      We have to check
+	 *      larger context stacks because of (...)+ loops.  For
+	 *      example, the context of a (...)+ can be nonempty if the
+	 *      surrounding rule is invoked by another rule:
+	 *
+	 *      a : b A | X ;
+	 *      b : (B|)+ ;  // nondeterministic by the way
+	 *
+	 *      The context of the (B|)+ loop is "invoked from item a :
+	 *      . b A ;" and then the empty alt of the loop can reach back
+	 *      to itself.  The context stack will have one "return
+	 *      address" element and so we must check for same state, same
+	 *      context for arbitrary context stacks.
+	 *
+	 *      A simple equality between the state and context stack
+	 *      strings satisfies this condition.  This condition catches
+	 *      cycles derived from tail recursion explicitly or
+	 *      implicitly with (...)+ loops.
+	 *
+	 *  (2) Whenever closure reaches a configuration where state p
+	 *      is present in its own context stack.  This means that
+	 *      p is a rule invocation state and the target rule has
+	 *      been called before.  NFAContext.MAX_RECURSIVE_INVOCATIONS
+	 *      (See the comment there also) determines how many times
+	 *      it's possible to recurse; clearly we cannot recurse forever.
+	 *      Some grammars such as the following actually require at
+	 *      least one recursive call to correctly compute the lookahead:
+	 *
+	 *      a : L ID R
+	 *        | b
+	 *        ;
+	 *      b : ID
+	 *        | L a R
+	 *        ;
+	 *
+	 *      Input L ID R is ambiguous but to figure this out, ANTLR
+	 *      needs to go a->b->a->b to find the L ID sequence.
+	 *
+	 *      Do not allow closure to add a configuration that would
+	 *      allow too much recursion.
+	 *
+	 *      This case also catches infinite left recursion.
 	 */
 	public void closure(NFAState p,
 						int alt,
@@ -503,7 +567,7 @@ public class NFAToDFAConverter {
 						DFAState d,
 						boolean collectPredicates)
 	{
-		if ( debug ) {
+		if ( false && d.dfa.decisionNumber==19 ){
 			System.out.println("closure at NFA state "+p.stateNumber+"|"+
 							   alt+" filling DFA state "+d.stateNumber+" with context "+context
 							   );
@@ -530,17 +594,44 @@ public class NFAToDFAConverter {
 
 		// Avoid infinite recursion
 		// If we've seen this configuration before during closure, stop
-		if ( closureIsBusy(d,p,alt,context,semanticContext) ) {
+		NFAConfiguration proposedNFAConfiguration =
+				new NFAConfiguration(p.stateNumber,
+						alt,
+						context,
+						semanticContext);
+		if ( d.closureBusy.contains(proposedNFAConfiguration) ) {
+			if ( debug ) {
+				System.out.println("avoid visiting exact closure computation NFA config: "+proposedNFAConfiguration);
+				System.out.println("state is "+d.dfa.decisionNumber+"."+d);
+			}
 			return;
 		}
-		setClosureIsBusy(d,p,alt,context,semanticContext);
+
+		// set closure to be busy for this NFA configuration
+		d.closureBusy.add(proposedNFAConfiguration);
 
 		// p itself is always in closure
-		d.addNFAConfiguration(p, alt, context, semanticContext);
+		d.addNFAConfiguration(p, proposedNFAConfiguration);
 
 		// Case 1: are we a reference to another rule?
 		Transition transition0 = p.transition(0);
 		if ( transition0 instanceof RuleClosureTransition ) {
+			// if this context has hit the max recursions for p.stateNumber,
+			// don't allow it to enter p.stateNumber again
+			int depth = context.recursionDepthEmanatingFromState(p.stateNumber);
+			// report a problem if we detect an attempt to recurse too high
+			if ( depth >= NFAContext.MAX_RECURSIVE_INVOCATIONS ) {
+				if ( dfa.startState == null ||
+					 d.stateNumber==dfa.startState.stateNumber )
+				{
+					d.dfa.probe.reportLeftRecursion(d, proposedNFAConfiguration);
+				}
+				else {
+					d.dfa.probe.reportRecursiveOverflow(d, proposedNFAConfiguration);
+				}
+				return;
+			}
+			// otherwise, it's cool to (re)enter target of this rule ref
 			RuleClosureTransition ref = (RuleClosureTransition)transition0;
 			// first create a new context and push onto call tree,
 			// recording the fact that we are invoking a rule and
@@ -562,14 +653,6 @@ public class NFAToDFAConverter {
 				(RuleClosureTransition)whichStateInvokedRule.transition(0);
 			NFAState continueState = edgeToRule.getFollowState();
 			NFAContext newContext = context.parent; // "pop" invoking state
-			// TODO: really?  seems like initial context used only for termination
-			// Carved out 10/13/2005 as initialContext should really be fixed
-			// at where we started in closure(DFAState); it is fixed during
-			// any closure operation.
-			/*
-			// we must move the initial context for this overall closure
-			//initialContext = newContext; // mv stack top
-			*/
 			closure(continueState, alt, newContext, semanticContext, d, collectPredicates);
 		}
 		/*
@@ -694,6 +777,7 @@ public class NFAToDFAConverter {
 	 *
 	 *      This case also catches infinite left recursion.
 	 */
+	/*
 	public boolean closureIsBusy(DFAState d,
 								 NFAState p,
 								 int alt,
@@ -714,41 +798,9 @@ public class NFAToDFAConverter {
 			return true;
 		}
 
-		/*
-		System.out.print("closureIsBusy(d="+d.stateNumber+", nfap="+p.stateNumber+", alt="+alt+"): ");
-		System.out.println("unique Config="+proposedNFAConfiguration);
-		*/
-		// case (2) : recursive (visited rule from same invocation state)
-		int depth = context.recursionDepthEmanatingFromState(p.stateNumber);
-		//System.out.println("recursion depth "+depth+" from "+p.stateNumber+" for "+context);
-		if ( depth > NFAContext.MAX_RECURSIVE_INVOCATIONS ) {
-			// report a problem if we detect an attempt to recurse higher
-			if ( dfa.startState == null ||
-				 d.stateNumber==dfa.startState.stateNumber )
-			{
-				d.dfa.probe.reportLeftRecursion(d, proposedNFAConfiguration);
-			}
-			else {
-				d.dfa.probe.reportRecursiveOverflow(d, proposedNFAConfiguration);
-			}
-			return true;
-		}
 		return false;
 	}
-
-	public void setClosureIsBusy(DFAState d,
-								 NFAState p,
-								 int alt,
-								 NFAContext context,
-								 SemanticContext semContext)
-	{
-		NFAConfiguration c =
-				new NFAConfiguration(p.stateNumber,
-									 alt,
-									 context,
-									 semContext);
-		d.closureBusy.add(c);
-	}
+*/
 
 	/** Given the set of NFA states in DFA state d, find all NFA states
 	 *  reachable traversing label arcs.  By definition, there can be

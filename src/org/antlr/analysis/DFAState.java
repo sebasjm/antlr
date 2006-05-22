@@ -109,6 +109,7 @@ public class DFAState extends State {
     /** Used to prevent the closure operation from looping to itself and
      *  hence looping forever.  Sensitive to the NFA state, the alt, and
      *  the context.
+	 *  TODO: heh, isn't this just the nfa config set?  Why have both?
      */
     protected Set closureBusy = new HashSet();
 
@@ -172,15 +173,8 @@ public class DFAState extends State {
      *  transition labels so we can simply walk it later rather than doing a
      *  loop over all possible labels in the NFA.
      */
-    public void addNFAConfiguration(NFAState state,
-                                    int alt,
-                                    NFAContext context,
-                                    SemanticContext semanticContext) {
-        NFAConfiguration c = new NFAConfiguration(state.stateNumber,
-                                                  alt,
-                                                  context,
-                                                  semanticContext);
-        if ( nfaConfigurations.contains(c) ) {
+    public void addNFAConfiguration(NFAState state, NFAConfiguration c) {
+		if ( nfaConfigurations.contains(c) ) {
             return;
         }
 
@@ -202,7 +196,15 @@ public class DFAState extends State {
         }
     }
 
-    /** Add label uniquely and disjointly; intersection with
+	public void addNFAConfiguration(NFAState state, int alt, NFAContext context, SemanticContext semanticContext) {
+		NFAConfiguration c = new NFAConfiguration(state.stateNumber,
+												  alt,
+												  context,
+												  semanticContext);
+		addNFAConfiguration(state, c);
+	}
+
+	/** Add label uniquely and disjointly; intersection with
      *  another set or int/char forces breaking up the set(s).
      *
      *  Example, if reachable list of labels is [a..z, {k,9}, 0..9],
@@ -417,7 +419,7 @@ public class DFAState extends State {
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
 			if ( alt==NFA.INVALID_ALT_NUMBER ) {
-				alt = configuration.alt; // found first nonresolved alt
+				alt = configuration.alt; // found first alt
 			}
 			else if ( configuration.alt!=alt ) {
 				return NFA.INVALID_ALT_NUMBER;
