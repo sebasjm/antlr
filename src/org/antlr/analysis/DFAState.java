@@ -108,12 +108,14 @@ public class DFAState extends State {
 
     /** Used to prevent the closure operation from looping to itself and
      *  hence looping forever.  Sensitive to the NFA state, the alt, and
-     *  the context.
-	 *  TODO: heh, isn't this just the nfa config set?  Why have both?
+     *  the context.  This just the nfa config set because we want to
+	 *  prevent closures only on states contributed by closure not reach
+	 *  operations.
      */
-    protected Set closureBusy = new HashSet();
+	//protected Set closureBusy = new HashSet();
+	protected List closureBusy = new ArrayList();
 
-    /** As this state is constructed (i.e., as NFA states are added), we
+	/** As this state is constructed (i.e., as NFA states are added), we
      *  can easily check for non-epsilon transitions because the only
      *  transition that could be a valid label is transition(0).  When we
      *  process this node eventually, we'll have to walk all states looking

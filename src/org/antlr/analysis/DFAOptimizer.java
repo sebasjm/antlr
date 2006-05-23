@@ -142,6 +142,9 @@ public class DFAOptimizer {
 	}
 
 	protected void optimize(DFA dfa) {
+		if ( dfa==null ) {
+			return; // nothing to do
+		}
 		/*
 		System.out.println("Optimize DFA "+dfa.decisionNFAStartState.decisionNumber+
 						   " num states="+dfa.getNumberOfStates());

@@ -153,13 +153,9 @@ public class NFAContext {
 	 *  and re-enters the rule with a context.  This resolves the issue I
 	 *  discussed with Sriram Srinivasan Feb 28, 2005 about not terminating
 	 *  fast enough upon nondeterminism.
-	 *
-	 *  TODO: Seems that suffix returns true if equals; faster if we do suffix only?
 	 */
-	public boolean conflictsWith(Object o) {
-		NFAContext other = ((NFAContext)o);
-		return this.equals(other) || this.suffix(other);
-		// TODO: return this.suffix(other);
+	public boolean conflictsWith(NFAContext other) {
+		return this.suffix(other); // || this.equals(other);
 	}
 
 	/** [$] suffix any context

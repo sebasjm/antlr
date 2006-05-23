@@ -27,12 +27,10 @@
 */
 package org.antlr.tool;
 
+import java.io.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.StringTokenizer;
-import java.io.*;
-import java.nio.channels.FileLock;
-import java.nio.channels.FileChannel;
 
 public class GrammarReport {
 	/** Because I may change the stats, I need to track that for later
@@ -85,6 +83,9 @@ public class GrammarReport {
 		int cyclicIndex = 0;
 		for (int i=1; i<=grammar.getNumberOfDecisions(); i++) {
 			Grammar.Decision d = grammar.getDecision(i);
+			if( d.dfa==null ) {
+				continue;
+			}
 			if ( !d.dfa.isCyclic() ) {
 				int maxk = d.dfa.getMaxLookaheadDepth();
 				depths[acyclicIndex] = maxk;

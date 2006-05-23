@@ -698,6 +698,11 @@ public class Grammar {
 	}
 
 	public void createLookaheadDFA(int decision) {
+		/*
+		if ( decision!=27 ) {
+			return; // debuggin
+		}
+		*/
 		NFAState decisionStartState = getDecisionNFAStartState(decision);
 		long startDFA=0,stopDFA=0;
 		if ( watchNFAConversion ) {
@@ -1815,7 +1820,7 @@ public class Grammar {
 		int n = 0;
 		for (int i=1; i<=getNumberOfDecisions(); i++) {
 			Decision d = getDecision(i);
-			if ( d.dfa.isCyclic() ) {
+			if ( d.dfa!=null && d.dfa.isCyclic() ) {
 				n++;
 			}
 		}

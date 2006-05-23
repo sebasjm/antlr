@@ -214,6 +214,30 @@ public class TestDFAConversion extends TestSuite {
 		checkDecision(g, 2, expecting, null, null, null, null, 0);
 	}
 
+	public void testifThenElseChecksStackSuffixConflict() throws Exception {
+		// if you don't check stack soon enough, this finds E B not just E
+		// as ambig input
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"slist: s SEMI ;\n"+
+			"s : IF s el | B;\n" +
+			"el: (E s)? ;\n");
+		String expecting =
+			".s0-E->:s1=>1\n" +
+			".s0-SEMI->:s2=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = new int[] {1,2};
+		String ambigInput = "E";
+		int[] danglingAlts = null;
+		int numWarnings = 1;
+		checkDecision(g, 2, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+		expecting =
+			".s0-B->:s2=>2\n" +
+			".s0-IF->:s1=>1\n";
+		checkDecision(g, 1, expecting, null, null, null, null, 0);
+	}
+
 	public void testinvokeRule() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
