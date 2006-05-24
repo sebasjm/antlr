@@ -1278,10 +1278,12 @@ public class Grammar {
 								listOfRecursiveCycles);
 			}
 			else {
-				// must visit if not already visited
+				// must visit if not already visited; send new visitedStates set
 				visitedDuringRecursionCheck.add(targetRuleName);
 				boolean callReachedAcceptState =
-					traceStatesLookingForLeftRecursion((NFAState)t0.target, visitedStates, listOfRecursiveCycles);
+					traceStatesLookingForLeftRecursion((NFAState)t0.target,
+													   new HashSet(),
+													   listOfRecursiveCycles);
 				// we're back from visiting that rule
 				visitedDuringRecursionCheck.remove(targetRuleName);
 				// must keep going in this rule then
@@ -1290,7 +1292,7 @@ public class Grammar {
 						((RuleClosureTransition)t0).getFollowState();
 					stateReachesAcceptState |=
 						traceStatesLookingForLeftRecursion(followingState,
-														   new HashSet(),
+														   visitedStates,
 														   listOfRecursiveCycles);
 				}
 			}
