@@ -126,7 +126,8 @@ public class RandomPhrase {
 						new BufferedReader(new FileReader(grammarFileName)));
 		parser.createNFAs();
 
-		if ( parser.checkSingleAltRulesForLeftRecursion() ) {
+		List leftRecursiveRules = parser.checkAllRulesForLeftRecursion();
+		if ( leftRecursiveRules.size()>0 ) {
 			return;
 		}
 
@@ -145,7 +146,8 @@ public class RandomPhrase {
 			System.err.println("no lexer grammar found in "+grammarFileName);
 		}
 		lexer.createNFAs();
-		if ( lexer.checkSingleAltRulesForLeftRecursion() ) {
+		leftRecursiveRules = lexer.checkAllRulesForLeftRecursion();
+		if ( leftRecursiveRules.size()>0 ) {
 			return;
 		}
 

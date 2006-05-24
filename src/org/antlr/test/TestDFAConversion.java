@@ -34,10 +34,7 @@ import org.antlr.test.unit.FailedAssertionException;
 import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class TestDFAConversion extends TestSuite {
 
@@ -121,7 +118,11 @@ public class TestDFAConversion extends TestSuite {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
-		g.createNFAs();
+		Set leftRecursive = g.getLeftRecursiveRules();
+		Set expectedRules =
+			new HashSet() {{add("a"); add("b");}};
+		assertEqual(leftRecursive, expectedRules);
+
 		g.createLookaheadDFAs();
 
 		Message msg = (Message)equeue.warnings.get(0);
@@ -148,7 +149,11 @@ public class TestDFAConversion extends TestSuite {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
-		g.createNFAs();
+		Set leftRecursive = g.getLeftRecursiveRules();
+		Set expectedRules =
+			new HashSet() {{add("a"); add("b");}};
+		assertEqual(leftRecursive, expectedRules);
+
 		g.createLookaheadDFAs();
 
 		Message msg = (Message)equeue.warnings.get(0);
@@ -177,8 +182,10 @@ public class TestDFAConversion extends TestSuite {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
-		g.createNFAs();
-		g.createLookaheadDFAs();
+		Set leftRecursive = g.getLeftRecursiveRules();
+		Set expectedRules =
+			new HashSet() {{add("a"); add("b"); add("e"); add("d");}};
+		assertEqual(leftRecursive, expectedRules);
 
 		Message msg = (Message)equeue.warnings.get(0);
 		assertTrue(msg!=null && msg instanceof LeftRecursionCyclesMessage,
@@ -348,15 +355,48 @@ public class TestDFAConversion extends TestSuite {
 			"parser grammar t;\n"+
 			"s : a ;\n" +
 			"a : a A | B;");
-		String expecting =
-			".s0-B->:s1=>1\n";
-		int[] unreachableAlts = new int[] {2};
-		int[] nonDetAlts = new int[] {1,2};
-		String ambigInput = null;
-		int[] danglingAlts = null;
-		int numWarnings = 3;
-		checkDecision(g, 1, expecting, unreachableAlts,
-					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+		Set leftRecursive = g.getLeftRecursiveRules();
+		Set expectedRules = new HashSet() {{add("a");}};
+		assertEqual(leftRecursive, expectedRules);
+	}
+
+	public void testIndirectLeftRecursion() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : b | A ;\n" +
+			"b : c ;\n" +
+			"c : a | C ;\n");
+		Set leftRecursive = g.getLeftRecursiveRules();
+		Set expectedRules = new HashSet() {{add("a"); add("b"); add("c");}};
+		assertEqual(leftRecursive, expectedRules);
+	}
+
+	public void testLeftRecursionInMultipleCycles() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+				"s : a x ;\n" +
+				"a : b | A ;\n" +
+				"b : c ;\n" +
+				"c : a | C ;\n" +
+				"x : y | X ;\n" +
+				"y : x ;\n");
+		Set leftRecursive = g.getLeftRecursiveRules();
+		Set expectedRules =
+			new HashSet() {{add("a"); add("b"); add("c"); add("x"); add("y");}};
+		assertEqual(leftRecursive, expectedRules);
+	}
+
+	public void testCycleInsideRuleDoesNotForceInfiniteRecursion() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a ;\n" +
+			"a : (A|)+ B;\n");
+		// before I added a visitedStates thing, it was possible to loop
+		// forever inside of a rule if there was an epsilon loop.
+		Set leftRecursive = g.getLeftRecursiveRules();
+		Set expectedRules = new HashSet();
+		assertEqual(leftRecursive, expectedRules);
 	}
 
 	// L O O P S

@@ -139,11 +139,11 @@ public class GrammarReport {
 		buf.append('\t');
 		buf.append(grammar.numberOfDFAConversionsTerminatedEarly);
 		buf.append('\t');
-		buf.append(ErrorManager.getErrorCount().errors);
+		buf.append(ErrorManager.getErrorState().errors);
 		buf.append('\t');
-		buf.append(ErrorManager.getErrorCount().warnings);
+		buf.append(ErrorManager.getErrorState().warnings);
 		buf.append('\t');
-		buf.append(ErrorManager.getErrorCount().infos);
+		buf.append(ErrorManager.getErrorState().infos);
 		return buf.toString();
 	}
 

@@ -261,6 +261,17 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
+3.0ea10 -
+
+* added method to get left recursive rules from grammar.
+
+* analysis, code gen not attempted if serious error (like
+  left-recursion or missing rule definition) occurred while reading
+  the grammar in and defining symbols.
+
+* added amazing optimization; reduces analysis time by 90% for java
+  grammar; simple IF statement addition!
+
 3.0ea9 - May 20, 2006
 
 * added global k value for grammar to limit lookahead for all decisions unless

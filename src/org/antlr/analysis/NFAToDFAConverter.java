@@ -574,7 +574,7 @@ public class NFAToDFAConverter {
 							   alt+" filling DFA state "+d.stateNumber+" with context "+context
 							   );
 		}
-
+		
 		if ( terminateConversion ) {
 			// keep walking back out, we're in the process of terminating
 			return;
@@ -583,11 +583,6 @@ public class NFAToDFAConverter {
 		if ( System.currentTimeMillis() - d.dfa.conversionStartTime >=
 			 DFA.MAX_TIME_PER_DFA_CREATION )
 		{
-			/*
-			if ( d.dfa.decisionNumber==19 ){
-				int i = 34;
-			}
-			*/
 			// report and back your way out; we've blown up somehow
 			terminateConversion = true;
 			dfa.probe.reportEarlyTermination();
@@ -721,10 +716,10 @@ public class NFAToDFAConverter {
 	 *  then clearly the exact same computation is proposed.  If a context
 	 *  is a suffix of the other, then again the computation is in an
 	 *  identical context.  ?$ and ??$ are considered the same stack.
-	 *  We have to walk configurations linearly doing the comparison.  I
-	 *  used to use a Set.
+	 *  We have to walk configurations linearly doing the comparison instead
+	 *  of a set for exact matches.
 	 *
-	 *  We cannot use a hash table for this lookup as contexts that are
+	 *  We cannot use a set hash table for this lookup as contexts that are
 	 *  suffixes could be !equal() but their hashCode()s would be different;
 	 *  that's a problem for a HashSet.  This costs a lot actually, it
 	 *  takes about 490ms vs 355ms for Java grammar's analysis phase when
@@ -733,6 +728,13 @@ public class NFAToDFAConverter {
 	 *  avoids chasing its tail during closure operations on highly left-
 	 *  recursive grammars.
 	 *
+	 *  Ok, backing this out to use exact match again for speed.  We will
+	 *  always detect the conflict later when checking for context suffixes...
+	 *  I was just trying to prevent unnecessary closures for random crap
+	 *  submitted by newbies.  Instead now I check for left-recursive stuff
+	 *  and terminate before analysis obviates the need to do this more
+	 *  expensive computation.
+	 *
 	 *  If the semantic context is different, then allow new computation.
 	 */
 	public boolean closureIsBusy(DFAState d,
@@ -740,18 +742,9 @@ public class NFAToDFAConverter {
 								 NFAConfiguration proposedNFAConfiguration)
 	{
 		// Check epsilon cycle (same state, same alt, same context)
+		return d.closureBusy.contains(proposedNFAConfiguration);
 		/*
-		if ( d.closureBusy.contains(proposedNFAConfiguration) ) {
-			return true;
-		}
-		*/
-		// Check epsilon cycle (same state, same alt, suffix of context)
-		/*
-		Iterator iter = d.closureBusy.iterator();
-		NFAConfiguration c;
-		while (iter.hasNext()) {
-			c = (NFAConfiguration) iter.next();
-		*/
+		// Uncomment to get all conflicts not just exact context matches
 		for (int i = 0; i < d.closureBusy.size(); i++) {
 			NFAConfiguration c = (NFAConfiguration) d.closureBusy.get(i);
 			if ( proposedNFAConfiguration.state==c.state &&
@@ -762,7 +755,7 @@ public class NFAToDFAConverter {
 				// if computing closure of start state, we tried to
 				// recompute a closure, must be left recursion.  We got back
 				// to the same computation.  After having consumed no input,
-				// we're back.
+				// we're back.  Only track rule invocation states
 				if ( (dfa.startState==null ||
 					  d.stateNumber==dfa.startState.stateNumber) &&
 					 p.transition(0) instanceof RuleClosureTransition )
@@ -773,6 +766,7 @@ public class NFAToDFAConverter {
 			}
 		}
 		return false;
+		*/
 	}
 
 	/** Given the set of NFA states in DFA state d, find all NFA states

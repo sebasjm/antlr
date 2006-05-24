@@ -251,6 +251,14 @@ public class CodeGenerator {
 			return;
 		}
 
+		// CHECK FOR LEFT RECURSION; Make sure we can actually do analysis
+		grammar.checkAllRulesForLeftRecursion();
+
+		// was there a severe problem while reading in grammar?
+		if ( ErrorManager.doNotAttemptAnalysis() ) {
+			return;
+		}
+
 		// CREATE NFA FROM GRAMMAR, CREATE DFA FROM NFA
 		target.performGrammarAnalysis(this, grammar);
 

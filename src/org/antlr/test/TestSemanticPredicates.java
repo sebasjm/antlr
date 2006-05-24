@@ -193,7 +193,28 @@ public class TestSemanticPredicates extends TestSuite {
 			".s0-ID->.s1\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		CodeGenerator generator = new CodeGenerator(new Tool(), g, "Java");
+		g.setCodeGenerator(generator);
+		if ( g.getNumberOfDecisions()==0 ) {
+			g.createNFAs();
+			g.createLookaheadDFAs();
+		}
+
+		DFA dfa = g.getLookaheadDFA(1);
+		FASerializer serializer = new FASerializer(g);
+		String result = serializer.serialize(dfa.startState);
+		assertEqual(result, expecting);
+
+		assertTrue(equeue.size()==1,
+				   "unexpected number of expected problems: "+equeue.size()+
+				   "; expecting "+1);
+		Message msg = (Message)equeue.warnings.get(0);
+		assertTrue(msg instanceof RecursionOverflowMessage,
+				   "warning must be a recursion overflow msg");
 	}
 
 	public void testIgnorePredFromLL2Alt() throws Exception {

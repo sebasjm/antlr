@@ -29,6 +29,7 @@ package org.antlr.tool;
 
 import antlr.Token;
 import org.antlr.Tool;
+import org.antlr.misc.BitSet;
 import org.antlr.analysis.DFAState;
 import org.antlr.analysis.DecisionProbe;
 import org.antlr.stringtemplate.StringTemplate;
@@ -107,7 +108,7 @@ public class ErrorManager {
 	public static final int MSG_MISSING_CYCLIC_DFA_CODE_GEN_TEMPLATES = 21;
 	public static final int MSG_CODE_GEN_TEMPLATES_INCOMPLETE = 22;
 	public static final int MSG_CANNOT_CREATE_TARGET_GENERATOR = 23;
-	public static final int MSG_CANNOT_COMPUTE_SAMPLE_INPUT_SEQ = 24;
+	//public static final int MSG_CANNOT_COMPUTE_SAMPLE_INPUT_SEQ = 24;
 
 	// GRAMMAR ERRORS
 	public static final int MSG_SYNTAX_ERROR = 100;
@@ -174,6 +175,16 @@ public class ErrorManager {
 
 	public static final int MAX_MESSAGE_NUMBER = 210;
 
+	/** Do not do perform analysis and code gen if one of these happens */
+	public static final BitSet ERRORS_FORCING_ABORT = new BitSet() {
+		{
+			add(MSG_RULE_REDEFINITION);
+			add(MSG_UNDEFINED_RULE_REF);
+			add(MSG_LEFT_RECURSION_CYCLES);
+			// TODO: ...
+		}
+	};
+
 	/** Messages should be sensitive to the locale. */
 	private static Locale locale;
 
@@ -182,10 +193,12 @@ public class ErrorManager {
 	 */
 	private static Map threadToListenerMap = new HashMap();
 
-	static class ErrorCount {
+	static class ErrorState {
 		public int errors;
 		public int warnings;
 		public int infos;
+		/** Track all error level msgIDs; we use to abort later if necessary */
+		public BitSet errorMsgIDs = new BitSet();
 	}
 
 	/** Track the number of errors regardless of the listener but track
@@ -389,55 +402,60 @@ public class ErrorManager {
 		return el;
 	}
 
-	public static ErrorCount getErrorCount() {
-		ErrorCount ec =
-			(ErrorCount)threadToErrorCountMap.get(Thread.currentThread());
+	public static ErrorState getErrorState() {
+		ErrorState ec =
+			(ErrorState)threadToErrorCountMap.get(Thread.currentThread());
 		if ( ec==null ) {
-			ec = new ErrorCount();
+			ec = new ErrorState();
 			threadToErrorCountMap.put(Thread.currentThread(), ec);
 		}
 		return ec;
 	}
 
 	public static void info(String msg) {
-		getErrorCount().infos++;
+		getErrorState().infos++;
 		getErrorListener().info(msg);
 	}
 
 	public static void error(int msgID) {
-		getErrorCount().errors++;
+		getErrorState().errors++;
+		getErrorState().errorMsgIDs.add(msgID);
 		getErrorListener().error(new ToolMessage(msgID));
 	}
 
 	public static void error(int msgID, Throwable e) {
-		getErrorCount().errors++;
+		getErrorState().errors++;
+		getErrorState().errorMsgIDs.add(msgID);
 		getErrorListener().error(new ToolMessage(msgID,e));
 	}
 
 	public static void error(int msgID, Object arg) {
-		getErrorCount().errors++;
+		getErrorState().errors++;
+		getErrorState().errorMsgIDs.add(msgID);
 		getErrorListener().error(new ToolMessage(msgID, arg));
 	}
 
 	public static void error(int msgID, Object arg, Object arg2) {
-		getErrorCount().errors++;
+		getErrorState().errors++;
+		getErrorState().errorMsgIDs.add(msgID);
 		getErrorListener().error(new ToolMessage(msgID, arg, arg2));
 	}
 
 	public static void error(int msgID, Object arg, Throwable e) {
-		getErrorCount().errors++;
+		getErrorState().errors++;
+		getErrorState().errorMsgIDs.add(msgID);
 		getErrorListener().error(new ToolMessage(msgID, arg, e));
 	}
 
 	public static void warning(int msgID, Object arg) {
-		getErrorCount().warnings++;
+		getErrorState().warnings++;
 		getErrorListener().warning(new ToolMessage(msgID, arg));
 	}
 
 	public static void nondeterminism(DecisionProbe probe,
 									  DFAState d)
 	{
-		getErrorCount().warnings++;
+		getErrorState().warnings++;
 		getErrorListener().warning(
 			new GrammarNonDeterminismMessage(probe,d)
 		);
@@ -446,7 +464,7 @@ public class ErrorManager {
 	public static void danglingState(DecisionProbe probe,
 									 DFAState d)
 	{
-		getErrorCount().warnings++;
+		getErrorState().warnings++;
 		getErrorListener().warning(
 			new GrammarDanglingStateMessage(probe,d)
 		);
@@ -454,7 +472,7 @@ public class ErrorManager {
 
 	public static void analysisAborted(DecisionProbe probe)
 	{
-		getErrorCount().warnings++;
+		getErrorState().warnings++;
 		getErrorListener().warning(
 			new GrammarAnalysisAbortedMessage(probe)
 		);
@@ -463,7 +481,7 @@ public class ErrorManager {
 	public static void unreachableAlts(DecisionProbe probe,
 									   List alts)
 	{
-		getErrorCount().warnings++;
+		getErrorState().warnings++;
 		getErrorListener().warning(
 			new GrammarUnreachableAltsMessage(probe,alts)
 		);
@@ -472,7 +490,7 @@ public class ErrorManager {
 	public static void insufficientPredicates(DecisionProbe probe,
 											  List alts)
 	{
-		getErrorCount().warnings++;
+		getErrorState().warnings++;
 		getErrorListener().warning(
 			new GrammarInsufficientPredicatesMessage(probe,alts)
 		);
@@ -484,7 +502,7 @@ public class ErrorManager {
 										 Collection targetRules,
 										 Collection callSiteStates)
 	{
-		getErrorCount().warnings++;
+		getErrorState().warnings++;
 		getErrorListener().warning(
 			new RecursionOverflowMessage(probe,sampleBadState, alt,
 										 targetRules, callSiteStates)
@@ -496,14 +514,15 @@ public class ErrorManager {
 									 Collection targetRules,
 									 Collection callSiteStates)
 	{
-		getErrorCount().warnings++;
+		getErrorState().warnings++;
 		getErrorListener().warning(
 			new LeftRecursionMessage(probe, alt, targetRules, callSiteStates)
 		);
 	}
 
 	public static void leftRecursionCycles(Collection cycles) {
-		getErrorCount().warnings++;
+		getErrorState().errors++;
+		getErrorState().errorMsgIDs.add(MSG_LEFT_RECURSION_CYCLES);
 		getErrorListener().warning(
 			new LeftRecursionCyclesMessage(cycles)
 		);
@@ -515,7 +534,8 @@ public class ErrorManager {
 									Object arg,
 									Object arg2)
 	{
-		getErrorCount().errors++;
+		getErrorState().errors++;
+		getErrorState().errorMsgIDs.add(msgID);
 		getErrorListener().error(
 			new GrammarSemanticsMessage(msgID,g,token,arg,arg2)
 		);
@@ -541,7 +561,8 @@ public class ErrorManager {
 								   Object arg,
 								   antlr.RecognitionException re)
 	{
-		getErrorCount().errors++;
+		getErrorState().errors++;
+		getErrorState().errorMsgIDs.add(msgID);
 		getErrorListener().error(
 			new GrammarSyntaxMessage(msgID,token,arg,re)
 		);
@@ -558,6 +579,10 @@ public class ErrorManager {
 			getLastNonErrorManagerCodeLocation(new Exception());
 		String msg = location+": "+error;
 		error(MSG_INTERNAL_ERROR, msg);
+	}
+
+	public static boolean doNotAttemptAnalysis() {
+		return !getErrorState().errorMsgIDs.and(ERRORS_FORCING_ABORT).isNil();
 	}
 
 	/** Return first non ErrorManager code location for generating messages */
@@ -594,6 +619,9 @@ public class ErrorManager {
 		for (int i = 0; i < fields.length; i++) {
 			Field f = fields[i];
 			String fieldName = f.getName();
+			if ( !fieldName.startsWith("MSG_") ) {
+				continue;
+			}
 			String templateName =
 				fieldName.substring("MSG_".length(),fieldName.length());
 			int msgID = 0;

@@ -244,6 +244,12 @@ public class Grammar {
     /** Rules are uniquely labeled from 1..n */
     protected int ruleIndex = 1;
 
+	/** A list of all rules that are in any left-recursive cycle.  There
+	 *  could be multiple cycles, but this is a flat list of all problematic
+	 *  rules.
+	 */
+	protected Set leftRecursiveRules;
+
 	/** When we read in a grammar, we track the list of syntactic predicates
 	 *  and build faux rules for them later.  See my blog entry Dec 2, 2005:
 	 *  http://www.antlr.org/blog/antlr3/lookahead.tml
@@ -653,10 +659,10 @@ public class Grammar {
 		if ( nfa==null ) {
 			createNFAs();
 		}
-		// create a barrier expecting n DFA and this main creation thread
-		Barrier barrier = new Barrier(3);
-		//System.out.println("### create DFAs");
+
 		long start = System.currentTimeMillis();
+
+		//System.out.println("### create DFAs");
 		int numDecisions = getNumberOfDecisions();
 		if ( NFAToDFAConverter.SINGLE_THREADED_NFA_CONVERSION ) {
 			for (int decision=1; decision<=numDecisions; decision++) {
@@ -668,6 +674,8 @@ public class Grammar {
 		}
 		else {
 			ErrorManager.info("two-threaded DFA conversion");
+			// create a barrier expecting n DFA and this main creation thread
+			Barrier barrier = new Barrier(3);
 			// assume 2 CPU for now
 			int midpoint = numDecisions/2;
 			NFAConversionThread t1 =
@@ -688,8 +696,6 @@ public class Grammar {
 			}
 		}
 
-		checkSingleAltRulesForLeftRecursion();
-
 		long stop = System.currentTimeMillis();
 		DFACreationWallClockTimeInMS = stop - start;
 
@@ -698,11 +704,6 @@ public class Grammar {
 	}
 
 	public void createLookaheadDFA(int decision) {
-		/*
-		if ( decision!=27 ) {
-			return; // debuggin
-		}
-		*/
 		NFAState decisionStartState = getDecisionNFAStartState(decision);
 		long startDFA=0,stopDFA=0;
 		if ( watchNFAConversion ) {
@@ -1195,103 +1196,151 @@ public class Grammar {
 		}
 	}
 
-	/** As we may have single alt rules, we must still check
-	 *  for infinite left recursion among them.  Return true
-	 *  if any problems were found.
+	/** Return a list of left-recursive rules; no analysis can be done
+	 *  successfully on these.  Useful to skip these rules then and also
+	 *  for ANTLRWorks to highlight them.
 	 */
-	protected boolean checkSingleAltRulesForLeftRecursion() {
+	public Set getLeftRecursiveRules() {
+		if ( nfa==null ) {
+			createNFAs();
+		}
+		if ( leftRecursiveRules!=null ) {
+			return leftRecursiveRules;
+		}
+		checkAllRulesForLeftRecursion();
+		return leftRecursiveRules;
+	}
+
+	/** Check all rules for infinite left recursion before analysis. Return list
+	 *  of troublesome rule cycles.  This method has two side-effects: it notifies
+	 *  the error manager that we have problems and it sets the list of
+	 *  recursive rules that we should ignore during analysis.
+	 *
+	 *  Return type: List<Set<String(rule-name)>>.
+	 */
+	public List checkAllRulesForLeftRecursion() {
+		createNFAs(); // make sure we have NFAs
+		leftRecursiveRules = new HashSet();
 		List listOfRecursiveCycles = new ArrayList(); // List<Set<String(rule-name)>>
 		for (int i = 0; i < ruleIndexToRuleList.size(); i++) {
 			String ruleName = (String)ruleIndexToRuleList.elementAt(i);
 			if ( ruleName!=null ) {
 				NFAState s = getRuleStartState(ruleName);
 				visitedDuringRecursionCheck = new HashSet();
-				//System.out.println("check rule "+ruleName);
-				checkForLeftRecursion(s, listOfRecursiveCycles);
+				visitedDuringRecursionCheck.add(ruleName);
+				Set visitedStates = new HashSet();
+				traceStatesLookingForLeftRecursion(s, visitedStates, listOfRecursiveCycles);
 			}
 		}
 		if ( listOfRecursiveCycles.size()>0 ) {
 			ErrorManager.leftRecursionCycles(listOfRecursiveCycles);
-			return true;
 		}
-		return false;
+		return listOfRecursiveCycles;
 	}
 
-	/** Recursively walk states from a starting rule's single alt start
-	 *  state looking for recursive cycles.  Ignore any cycles derived
-	 *  from decision points as the closure operations will have seen
-	 *  these already.
-	 *
-	 *  Return true if you reach an accept state, meaning that the rule
-	 *  is nullable.
+	/** From state s, look for any transition to a rule that is currently
+	 *  being traced.  When tracing r, visitedDuringRecursionCheck has r
+	 *  initially.  If you reach an accept state, return but notify the
+	 *  invoking rule that it is nullable, which implies that invoking
+	 *  rule must look at follow transition for that invoking state.
+	 *  The visitedStates tracks visited states within a single rule so
+	 *  we can avoid epsilon-loop-induced infinite recursion here.  Keep
+	 *  filling the cycles in listOfRecursiveCycles and also, as a
+	 *  side-effect, set leftRecursiveRules.
 	 */
-	protected boolean checkForLeftRecursion(NFAState state,
-											List listOfRecursiveCycles)
+	protected boolean traceStatesLookingForLeftRecursion(NFAState s,
+														 Set visitedStates,
+														 List listOfRecursiveCycles)
 	{
-		Transition t0 = state.transition(0);
-		// only check rules with single alts for left-recursion
-		// as any decision states have already been examined.
-		// Also ignore any states that have decisions for same reason.
-		if ( state.getDecisionNumber()>0 ) {
-			return false;
-		}
-		if ( state.isAcceptState() ) {
-			//System.out.println("return from "+state.getEnclosingRule());
+		if ( s.isAcceptState() ) {
+			// this rule must be nullable!
+			// At least one epsilon edge reached accept state
 			return true;
 		}
-		if ( state.getNumberOfTransitions()==1 ) {
-			// no branching, just take this path
-			if ( t0 instanceof RuleClosureTransition ) {
-				String targetRuleName = ((NFAState)t0.target).getEnclosingRule();
-				if ( visitedDuringRecursionCheck.contains(targetRuleName) ) {
-					/*
-					System.out.println("already visited "+targetRuleName+" called from "+
-									   state.getEnclosingRule());
-					*/
-					boolean foundCycle = false;
-					for (int i = 0; i < listOfRecursiveCycles.size(); i++) {
-						Set rulesInCycle = (Set) listOfRecursiveCycles.get(i);
-						// ensure both rules are in same cycle
-						if ( rulesInCycle.contains(targetRuleName) ) {
-							rulesInCycle.add(state.getEnclosingRule());
-							foundCycle = true;
-						}
-						if ( rulesInCycle.contains(state.getEnclosingRule()) ) {
-							rulesInCycle.add(targetRuleName);
-							foundCycle = true;
-						}
-					}
-					if ( !foundCycle ) {
-						Set cycle = new HashSet();
-						cycle.add(targetRuleName);
-						cycle.add(state.getEnclosingRule());
-						listOfRecursiveCycles.add(cycle);
-					}
-					return false;
-				}
-				// map invoked rule to who called it
-				visitedDuringRecursionCheck.add(targetRuleName);
-				//System.out.println("invoke "+targetRuleName);
-				boolean ruleWasNullable =
-					checkForLeftRecursion((NFAState)t0.target,listOfRecursiveCycles);
-				visitedDuringRecursionCheck.remove(targetRuleName);
-				if ( ruleWasNullable ) {
-					// must keep going in this rule then
-					//System.out.println("keep going");
-					checkForLeftRecursion(
-						((RuleClosureTransition)t0).getFollowState(),
-						listOfRecursiveCycles);
-				}
-			}
-			else if ( t0.label.isEpsilon() ) {
-				return checkForLeftRecursion((NFAState)t0.target,
-											 listOfRecursiveCycles);
-			}
-			return false; // must be labeled edge; don't look beyond
+		if ( visitedStates.contains(s) ) {
+			// within same rule, we've hit same state; quit looping
+			return false;
 		}
+		visitedStates.add(s);
+		boolean stateReachesAcceptState = false;
+		Transition t0 = s.transition(0);
+		if ( t0 instanceof RuleClosureTransition ) {
+			String targetRuleName = ((NFAState)t0.target).getEnclosingRule();
+			if ( visitedDuringRecursionCheck.contains(targetRuleName) ) {
+				// record left-recursive rule, but don't go back in
+				leftRecursiveRules.add(targetRuleName);
+				/*
+				System.out.println("already visited "+targetRuleName+", calling from "+
+								   s.getEnclosingRule());
+				*/
+				addRulesToCycle(targetRuleName,
+								s.getEnclosingRule(),
+								listOfRecursiveCycles);
+			}
+			else {
+				// must visit if not already visited
+				visitedDuringRecursionCheck.add(targetRuleName);
+				boolean callReachedAcceptState =
+					traceStatesLookingForLeftRecursion((NFAState)t0.target, visitedStates, listOfRecursiveCycles);
+				// we're back from visiting that rule
+				visitedDuringRecursionCheck.remove(targetRuleName);
+				// must keep going in this rule then
+				if ( callReachedAcceptState ) {
+					NFAState followingState =
+						((RuleClosureTransition)t0).getFollowState();
+					stateReachesAcceptState |=
+						traceStatesLookingForLeftRecursion(followingState,
+														   new HashSet(),
+														   listOfRecursiveCycles);
+				}
+			}
+		}
+		else if ( t0.label.isEpsilon() ) {
+			stateReachesAcceptState |=
+				traceStatesLookingForLeftRecursion((NFAState)t0.target, visitedStates, listOfRecursiveCycles);
+		}
+		// else it has a labeled edge
 
-		System.err.println("heh, i should not be checking decisions!");
-		return false;
+		// now do the other transition if it exists
+		Transition t1 = s.transition(1);
+		if ( t1!=null ) {
+			stateReachesAcceptState |=
+				traceStatesLookingForLeftRecursion((NFAState)t1.target,
+												   visitedStates,
+												   listOfRecursiveCycles);
+		}
+		return stateReachesAcceptState;
+	}
+
+	/** enclosingRuleName calls targetRuleName, find the cycle containing
+	 *  the target and add the caller.  Find the cycle containing the caller
+	 *  and add the target.  If no cycles contain either, then create a new
+	 *  cycle.  listOfRecursiveCycles is List<Set<String>> that holds a list
+	 *  of cycles (sets of rule names).
+	 */
+	protected void addRulesToCycle(String targetRuleName,
+								   String enclosingRuleName,
+								   List listOfRecursiveCycles)
+	{
+		boolean foundCycle = false;
+		for (int i = 0; i < listOfRecursiveCycles.size(); i++) {
+			Set rulesInCycle = (Set)listOfRecursiveCycles.get(i);
+			// ensure both rules are in same cycle
+			if ( rulesInCycle.contains(targetRuleName) ) {
+				rulesInCycle.add(enclosingRuleName);
+				foundCycle = true;
+			}
+			if ( rulesInCycle.contains(enclosingRuleName) ) {
+				rulesInCycle.add(targetRuleName);
+				foundCycle = true;
+			}
+		}
+		if ( !foundCycle ) {
+			Set cycle = new HashSet();
+			cycle.add(targetRuleName);
+			cycle.add(enclosingRuleName);
+			listOfRecursiveCycles.add(cycle);
+		}
 	}
 
 	/** Rules like "a : ;" and "a : {...} ;" should not generate

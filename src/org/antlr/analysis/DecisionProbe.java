@@ -29,7 +29,6 @@ package org.antlr.analysis;
 
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
-import org.antlr.tool.FASerializer;
 
 import java.util.*;
 
@@ -751,8 +750,9 @@ public class DecisionProbe {
 				return;
 			}
 		}
-		// hmm...no path available?
-		ErrorManager.error(ErrorManager.MSG_CANNOT_COMPUTE_SAMPLE_INPUT_SEQ);
+		labels.add(new Label(Label.EPSILON)); // indicate no input found
+		// this happens on a : {p1}? a | A ;
+		//ErrorManager.error(ErrorManager.MSG_CANNOT_COMPUTE_SAMPLE_INPUT_SEQ);
 	}
 
 	/** Given a sample input sequence, you usually would like to know the

@@ -301,6 +301,9 @@ public class Tool {
 	protected void generateDFAs(Grammar g) {
 		for (int d=1; d<=g.getNumberOfDecisions(); d++) {
 			DFA dfa = g.getLookaheadDFA(d);
+			if ( dfa==null ) {
+				continue; // not there for some reason, ignore
+			}
 			DOTGenerator dotGenerator = new DOTGenerator(g);
 			String dot = dotGenerator.getDOT( dfa.startState );
 			String dotFileName = g.name+"_dec-"+d;
