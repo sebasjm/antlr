@@ -250,6 +250,12 @@ public class Grammar {
 	 */
 	protected Set leftRecursiveRules;
 
+	/** An external tool requests that DFA analysis abort prematurely.  Stops
+	 *  at DFA granularity, which are limited to a DFA size and time computation
+	 *  as failsafe.
+	 */
+	protected boolean externalAnalysisAbort;
+
 	/** When we read in a grammar, we track the list of syntactic predicates
 	 *  and build faux rules for them later.  See my blog entry Dec 2, 2005:
 	 *  http://www.antlr.org/blog/antlr3/lookahead.tml
@@ -667,7 +673,7 @@ public class Grammar {
 		if ( NFAToDFAConverter.SINGLE_THREADED_NFA_CONVERSION ) {
 			for (int decision=1; decision<=numDecisions; decision++) {
 				NFAState decisionStartState = getDecisionNFAStartState(decision);
-				if ( decisionStartState.getNumberOfTransitions()>1 ) {
+				if ( !externalAnalysisAbort && decisionStartState.getNumberOfTransitions()>1 ) {
 					createLookaheadDFA(decision);
 				}
 			}
@@ -742,6 +748,13 @@ public class Grammar {
 			System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
 							   " states, "+(int)(stopDFA-startDFA)+" ms");
 		}
+	}
+
+	/** Terminate DFA creation (grammar analysis).  Happens on DFA creation
+	 *  boundaries so it might take DFA.MAX_TIME_PER_DFA_CREATION ms.
+	 */
+	public void abortNFAToDFAConverstion() {
+		externalAnalysisAbort = true;
 	}
 
 	/** Return a new unique integer in the token type space */
