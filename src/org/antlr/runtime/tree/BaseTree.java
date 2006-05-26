@@ -78,23 +78,29 @@ public abstract class BaseTree implements Tree {
 		if ( t==null ) {
 			return; // do nothing upon addChild(null)
 		}
-		if ( children==null ) {
-			createChildrenList(); // create children list on demand
-		}
 		BaseTree childTree = (BaseTree)t;
-		if ( childTree.isNil() ) {
-			if ( this.children == childTree.children ) {
+		if ( childTree.isNil() ) { // t is an empty node possibly with children
+			if ( this.children!=null && this.children == childTree.children ) {
 				throw new RuntimeException("attempt to add child list to itself");
 			}
 			// just add all of childTree's children to this
 			if ( childTree.children!=null ) {
-				int n = childTree.children.size();
-				for (int i = 0; i < n; i++) {
-					children.add(childTree.children.get(i));
+				if ( this.children!=null ) { // must copy, this has children already
+					int n = childTree.children.size();
+					for (int i = 0; i < n; i++) {
+						this.children.add(childTree.children.get(i));
+					}
+				}
+				else {
+					// no children for this but t has children; just set pointer
+					this.children = childTree.children;
 				}
 			}
 		}
-		else {
+		else { // t is not empty and might have children
+			if ( children==null ) {
+				createChildrenList(); // create children list on demand
+			}
 			children.add(t);
 		}
 	}
