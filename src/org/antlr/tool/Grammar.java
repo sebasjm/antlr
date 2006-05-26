@@ -753,7 +753,7 @@ public class Grammar {
 	/** Terminate DFA creation (grammar analysis).  Happens on DFA creation
 	 *  boundaries so it might take DFA.MAX_TIME_PER_DFA_CREATION ms.
 	 */
-	public void abortNFAToDFAConverstion() {
+	public void abortNFAToDFAConversion() {
 		externalAnalysisAbort = true;
 	}
 
