@@ -516,7 +516,7 @@ public class NFAFactory {
      *  for generating code, I don't need a DFA for the optional branch by
      *  virtue of how I generate code.  The exit-loopback-branch decision
      *  is sufficient to let me make an appropriate enter, exit, loop
-     *  determination.  The antlr.codegen.g
+     *  determination.  See codegen.g
      */
     public StateCluster build_Astar(StateCluster A) {
 		NFAState bypassDecisionState = newState();
