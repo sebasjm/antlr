@@ -19,15 +19,6 @@ public abstract class BaseRecognizer {
 	protected BitSet[] following = new BitSet[INITIAL_FOLLOW_STACK_SIZE];
 	protected int _fsp = -1;
 
-	protected void pushFollow(BitSet fset) {
-		if ( (_fsp +1)>=following.length ) {
-			BitSet[] f = new BitSet[following.length*2];
-			System.arraycopy(following, 0, f, 0, following.length-1);
-			following = f;
-		}
-		following[++_fsp] = fset;
-	}
-
 	/** This is true when we see an error and before having successfully
 	 *  matched a token.  Prevents generation of more than one error message
 	 *  per error.
@@ -512,6 +503,16 @@ public abstract class BaseRecognizer {
 			input.consume();
 			ttype = input.LA(1);
 		}
+	}
+
+	/** Push a rule's follow set using our own hardcoded stack */
+	protected void pushFollow(BitSet fset) {
+		if ( (_fsp +1)>=following.length ) {
+			BitSet[] f = new BitSet[following.length*2];
+			System.arraycopy(following, 0, f, 0, following.length-1);
+			following = f;
+		}
+		following[++_fsp] = fset;
 	}
 
 	/** Return List<String> of the rules in your parser instance
