@@ -476,11 +476,22 @@ public class NFAFactory {
     public StateCluster build_Aplus(StateCluster A) {
         NFAState left = newState();
         NFAState blockEndNFAState = newState();
+		blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_CLOSURE;
+
+		// don't reuse A.right as loopback if it's right edge of a loop block
+		if ( A.right.decisionStateType == NFAState.RIGHT_EDGE_OF_CLOSURE ) {
+			// nested A* so make another tail node to be the loop back
+			// instead of the usual A.right which is the EOB for inner loop
+			NFAState extraRightEdge = newState();
+			transitionBetweenStates(A.right, extraRightEdge, Label.EPSILON);
+			A.right = extraRightEdge;
+		}
+
         transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON); // follow is Transition 1
 		// turn A's block end into a loopback (acts like alt 2)
 		transitionBetweenStates(A.right, A.left, Label.EPSILON); // loop back Transition 2
 		transitionBetweenStates(left, A.left, Label.EPSILON);
-
+		
 		A.right.decisionStateType = NFAState.LOOPBACK;
 		A.left.decisionStateType = NFAState.BLOCK_START;
 
@@ -529,6 +540,7 @@ public class NFAFactory {
         NFAState blockEndNFAState = newState();
 		blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_CLOSURE;
 
+		// don't reuse A.right as loopback if it's right edge of a loop block
 		if ( A.right.decisionStateType == NFAState.RIGHT_EDGE_OF_CLOSURE ) {
 			// nested A* so make another tail node to be the loop back
 			// instead of the usual A.right which is the EOB for inner loop

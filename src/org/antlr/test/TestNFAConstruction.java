@@ -392,6 +392,80 @@ public class TestNFAConstruction extends TestSuite {
 		checkRule(g, "a", expecting);
 	}
 
+	public void testNestedAstar() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar P;\n"+
+				"a : (A*)*;");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s10->:s11\n" +
+			".s13->.s8\n" +
+			".s14->.s10\n" +
+			".s2->.s14\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4->.s13\n" +
+			".s4->.s5\n" +
+			".s5->.s6\n" +
+			".s6-A->.s7\n" +
+			".s7->.s5\n" +
+			".s7->.s8\n" +
+			".s8->.s9\n" +
+			".s9->.s10\n" +
+			".s9->.s3\n" +
+			":s11-EOF->.s12\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testPlusNestedInStar() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar P;\n"+
+				"a : (A+)*;");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s10->:s11\n" +
+			".s13->.s10\n" +
+			".s2->.s13\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4->.s5\n" +
+			".s5->.s6\n" +
+			".s6-A->.s7\n" +
+			".s7->.s5\n" +
+			".s7->.s8\n" +
+			".s8->.s9\n" +
+			".s9->.s10\n" +
+			".s9->.s3\n" +
+			":s11-EOF->.s12\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testStarNestedInPlus() throws Exception {
+		Grammar g = new Grammar(
+				"parser grammar P;\n"+
+				"a : (A*)+;");
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s10->:s11\n" +
+			".s13->.s8\n" +
+			".s2->.s3\n" +
+			".s3->.s4\n" +
+			".s4->.s13\n" +
+			".s4->.s5\n" +
+			".s5->.s6\n" +
+			".s6-A->.s7\n" +
+			".s7->.s5\n" +
+			".s7->.s8\n" +
+			".s8->.s9\n" +
+			".s9->.s10\n" +
+			".s9->.s3\n" +
+			":s11-EOF->.s12\n";
+		checkRule(g, "a", expecting);
+	}
+
 	public void testNakedAstar() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
