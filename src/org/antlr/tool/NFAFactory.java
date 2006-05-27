@@ -503,6 +503,9 @@ public class NFAFactory {
      *  left side NFAState and we add 3 new NFAStates (the
      *  optional branch is built just like an optional subrule).
      *  See the Aplus() method for more on the loop back Transition.
+	 *  The new node on right edge is set to RIGHT_EDGE_OF_CLOSURE so we
+	 *  can detect nested (A*)* loops and insert an extra node.  Previously,
+	 *  two blocks shared same EOB node.
      *
      *  There are 2 or 3 decision points in a A*.  If A is not a block (i.e.,
      *  it only has one alt), then there are two decisions: the optional bypass
@@ -524,9 +527,19 @@ public class NFAFactory {
         NFAState optionalAlt = newState();
         optionalAlt.setDescription("epsilon path of ()* block");
         NFAState blockEndNFAState = newState();
+		blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_CLOSURE;
+
+		if ( A.right.decisionStateType == NFAState.RIGHT_EDGE_OF_CLOSURE ) {
+			// nested A* so make another tail node to be the loop back
+			// instead of the usual A.right which is the EOB for inner loop
+			NFAState extraRightEdge = newState();
+			transitionBetweenStates(A.right, extraRightEdge, Label.EPSILON);
+			A.right = extraRightEdge;
+		}
+
 		// convert A's end block to loopback
 		A.right.setDescription("()* loopback");
-        // Transition 1 to actual block of stuff
+		// Transition 1 to actual block of stuff
         transitionBetweenStates(bypassDecisionState, A.left, Label.EPSILON);
         // Transition 2 optional to bypass
         transitionBetweenStates(bypassDecisionState, optionalAlt, Label.EPSILON);
