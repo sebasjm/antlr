@@ -10,11 +10,23 @@ import java.util.*;
 public abstract class BaseRecognizer {
 	public static final int MEMO_RULE_FAILED = -2;
 	public static final int MEMO_RULE_UNKNOWN = -1;
+	public static final int INITIAL_FOLLOW_STACK_SIZE = 100;
 
 	/** Track the set of token types that can follow any rule invocation.
-	 *  List<BitSet>.
+	 *  Stack grows upwards.  When it hits the max, it grows 2x in size
+	 *  and keeps going.
 	 */
-	protected Stack following = new Stack();
+	protected BitSet[] following = new BitSet[INITIAL_FOLLOW_STACK_SIZE];
+	protected int _fsp = -1;
+
+	protected void pushFollow(BitSet fset) {
+		if ( (_fsp +1)>=following.length ) {
+			BitSet[] f = new BitSet[following.length*2];
+			System.arraycopy(following, 0, f, 0, following.length-1);
+			following = f;
+		}
+		following[++_fsp] = fset;
+	}
 
 	/** This is true when we see an error and before having successfully
 	 *  matched a token.  Prevents generation of more than one error message
@@ -51,7 +63,7 @@ public abstract class BaseRecognizer {
 
 	/** reset the parser's state */
 	public void reset() {
-		following.setSize(0);
+		//following.setSize(0);
 	}
 
 	/** Match current input symbol against ttype.  Upon error, do one token
@@ -366,10 +378,10 @@ public abstract class BaseRecognizer {
 	}
 
 	protected BitSet combineFollows(boolean exact) {
-		int top = following.size()-1;
+		int top = following.length-1;
 		BitSet followSet = new BitSet();
 		for (int i=top; i>=0; i--) {
-			BitSet localFollowSet = (BitSet) following.get(i);
+			BitSet localFollowSet = (BitSet) following[i];
 			/*
 			System.out.println("local follow depth "+i+"="+
 							   localFollowSet.toString(getTokenNames())+")");

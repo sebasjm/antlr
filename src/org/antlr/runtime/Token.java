@@ -39,8 +39,19 @@ public abstract class Token {
 
     public static final int EOF = CharStream.EOF;
 	public static final Token EOF_TOKEN = new CommonToken(EOF);
+	
 	public static final int INVALID_TOKEN_TYPE = 0;
 	public static final Token INVALID_TOKEN = new CommonToken(INVALID_TOKEN_TYPE);
+
+	/** In an action, a lexer rule can set token to this SKIP_TOKEN and ANTLR
+	 *  will avoid creating a token for this symbol and try to fetch another.
+	 */
+	public static final Token SKIP_TOKEN = new CommonToken(INVALID_TOKEN_TYPE);
+
+	/** All tokens go to the parser (unless skip() is called in that rule)
+	 *  on a particular "channel".  The parser tunes to a particular channel
+	 *  so that whitespace etc... can go to the parser on a "hidden" channel.
+	 */
 	public static final int DEFAULT_CHANNEL = 0;
 
 	/** Get the text of the token */

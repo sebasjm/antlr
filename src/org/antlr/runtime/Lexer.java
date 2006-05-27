@@ -69,14 +69,26 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
             }
             try {
                 mTokens();
-                return token;
-            }
+				if ( token!=Token.SKIP_TOKEN ) {
+					return token;
+				}
+			}
             catch (RecognitionException re) {
                 reportError(re);
                 recover(re);
             }
         }
     }
+
+	/** Instruct the lexer to skip creating a token for current lexer rule
+	 *  and look for another token.  nextToken() knows to keep looking when
+	 *  a lexer rule finishes with token set to SKIP_TOKEN.  Recall that
+	 *  if token==null at end of any token rule, it creates one for you
+	 *  and emits it.
+	 */
+	public void skip() {
+		token = Token.SKIP_TOKEN;
+	}
 
 	/** This is the lexer entry point that sets instance var 'token' */
 	public abstract void mTokens() throws RecognitionException;

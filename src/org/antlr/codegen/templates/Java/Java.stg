@@ -612,13 +612,13 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  and a return value or values.
  */
 ruleRef(rule,label,elementIndex,args) ::= <<
-following.push(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+pushFollow(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
 <label>=<rule>(<args; separator=", ">);<\n>
 <else>
 <rule>(<args; separator=", ">);<\n>
 <endif>
-following.pop();
+_fsp--;
 <checkRuleBacktrackFailure()>
 >>
 
