@@ -27,12 +27,10 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.tool.FASerializer;
-import org.antlr.tool.Grammar;
-import org.antlr.tool.GrammarAST;
-import org.antlr.tool.Interpreter;
-import org.antlr.Tool;
+import org.antlr.misc.IntervalSet;
 import org.antlr.runtime.IntStream;
+import org.antlr.tool.*;
+import org.antlr.Tool;
 
 import java.util.*;
 
@@ -53,6 +51,8 @@ public class DFA {
 
 	public static int MAX_TIME_PER_DFA_CREATION = 2*1000;
 
+	public static int MAX_STATE_TRANSITIONS_FOR_TABLE = 127; // enough for ascii
+
 	/** What's the start state for this DFA? */
     public DFAState startState;
 
@@ -62,14 +62,17 @@ public class DFA {
     /** From what NFAState did we create the DFA? */
     public NFAState decisionNFAStartState;
 
-    /** A set of all DFA states.  Maps hash of nfa configurations
+    /** A set of all uniquely-numbered DFA states.  Maps hash of DFAState
      *  to the actual DFAState object.  We use this to detect
-     *  existing DFA states.
+     *  existing DFA states.  Map<DFAState,DFAState>.  Use Map so
+	 *  we can get old state back (Set only allows you to see if it's there).
      */
-    protected Map configurationsToDFAStateMap = new HashMap();
+    protected Map uniqueStates = new HashMap();
 
 	/** Maps the state number to the actual DFAState.  Use a Vector as it
-	 *  grows automatically when I set the ith element.
+	 *  grows automatically when I set the ith element.  This contains all
+	 *  states, but the states are not unique.  s3 might be same as s1 so
+	 *  s3 -> s1 in this table.  This is how cycles occur.
 	 */
 	protected Vector states = new Vector();
 
@@ -90,7 +93,9 @@ public class DFA {
     /** Is this DFA reduced?  I.e., can all states lead to an accept state? */
     protected boolean reduced = true;
 
-    /** Are there any loops in this DFA? */
+    /** Are there any loops in this DFA?
+	 *  Computed by doesStateReachAcceptState()
+	 */
     protected boolean cyclic = false;
 
     /** Each alt in an NFA derived from a grammar must have a DFA state that
@@ -127,6 +132,17 @@ public class DFA {
 	 */
 	protected long conversionStartTime;
 
+	/* This DFA can be converted to a transition[state][char] table and
+	 * the following tables are filled by createStateTables upon request.
+	 * These are injected into the templates for code generation.
+	 */
+	public Vector specialStates;
+	public Vector accept;
+	public Vector min;
+	public Vector max;
+	public Vector special;
+	public Vector transition;
+
 	public DFA(int decisionNumber, NFAState decisionStartState) {
 		this.decisionNumber = decisionNumber;
         this.decisionNFAStartState = decisionStartState;
@@ -141,6 +157,9 @@ public class DFA {
 
 		// figure out if there are problems with decision
 		verify();
+
+		// must be after verify as it computes cyclic, needed by this routine
+		resetStateNumbersToBeContiguous();
 
 		if ( !probe.isDeterministic() ||
 			 probe.analysisAborted() ||
@@ -159,6 +178,168 @@ public class DFA {
 		}
     }
 
+	/** Walk all states and reset their numbers to be a contiguous sequence
+	 *  of integers starting from 0.  Only cyclic DFA can have unused positions
+	 *  in states list.  State i might be identical to a previous state j and
+	 *  will result in states[i] == states[j].  We don't want to waste a state
+	 *  number on this.  Useful mostly for code generation in tables.
+	 */
+	public void resetStateNumbersToBeContiguous() {
+		if ( !isCyclic() ) {
+			return;
+		}
+		int snum=0;
+		Map states = getUniqueStates();
+		for (int i = 0; i <= getMaxStateNumber(); i++) {
+			DFAState s = getState(i);
+			// if valid and it's not already been renumbered
+			if ( states.containsValue(s) && s.stateNumber>=i ) {
+				// state i is a valid state, reset it's state number
+				s.stateNumber = snum++; // rewrite state numbers to be 0..n-1
+			}
+		}
+		if ( snum!=getNumberOfStates() ) {
+			ErrorManager.internalError("max state num "+getNumberOfStates()+
+				"!= max renumbered state "+snum);
+		}
+	}
+
+	public void createStateTables() {
+		System.out.println("createTables:\n"+this);
+
+		// create all the tables
+		specialStates = new Vector(this.getNumberOfStates()); // Vector<int>
+		specialStates.setSize(this.getNumberOfStates());
+		accept = new Vector(this.getNumberOfStates()); // Vector<int>
+		accept.setSize(this.getNumberOfStates());
+		min = new Vector(this.getNumberOfStates()); // Vector<int>
+		min.setSize(this.getNumberOfStates());
+		max = new Vector(this.getNumberOfStates()); // Vector<int>
+		max.setSize(this.getNumberOfStates());
+		special = new Vector(this.getNumberOfStates()); // Vector<short>
+		special.setSize(this.getNumberOfStates());
+		transition = new Vector(this.getNumberOfStates()); // Vector<Vector<int>>
+		transition.setSize(this.getNumberOfStates());
+
+		// for each state in the DFA
+		Map states = this.getUniqueStates();
+		for (Iterator it = states.values().iterator(); it.hasNext();) {
+			DFAState s = (DFAState)it.next();
+			if ( s.isAcceptState() ) {
+				// can't compute min,max,special,transition on accepts
+				accept.set(s.stateNumber,
+						   new Integer(s.getUniquelyPredictedAlt()));
+				special.set(s.stateNumber, new Integer(-1)); // not special
+				min.set(s.stateNumber, new Integer(0));
+				max.set(s.stateNumber, new Integer(0));
+			}
+			else {
+				accept.set(s.stateNumber, new Integer(0)); // doesn't predict
+				createMinMaxTables(s);
+				createTransitionTable(s);
+				createSpecialTable(s);
+			}
+		}
+
+		System.out.println("min="+min);
+		System.out.println("max="+max);
+		System.out.println("accept="+accept);
+		System.out.println("special="+special);
+		System.out.println("transition="+transition);
+	}
+
+	protected void createMinMaxTables(DFAState s) {
+		int smin = Label.MAX_CHAR_VALUE + 1;
+		int smax = Label.MIN_ATOM_VALUE - 1;
+		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
+			Transition edge = (Transition) s.transition(j);
+			Label label = edge.label;
+			if ( label.isAtom() ) {
+				if ( label.getAtom()<smin ) {
+					smin = label.getAtom();
+				}
+				if ( label.getAtom()>smax ) {
+					smax = label.getAtom();
+				}
+			}
+			else if ( label.isSet() ) {
+				IntervalSet labels = (IntervalSet)label.getSet();
+				if ( labels.getMinElement()<smin ) {
+					smin = labels.getMinElement();
+				}
+				if ( labels.getMaxElement()>smax ) {
+					smax = labels.getMaxElement();
+				}
+			}
+		}
+
+		min.set(s.stateNumber, new Integer(smin));
+		max.set(s.stateNumber, new Integer(smax));
+	}
+
+	protected void createTransitionTable(DFAState s) {
+		// TODO: create set to look for identical character classes
+		// which means we could share transition tables for multiple states
+		int smax = ((Integer)max.get(s.stateNumber)).intValue();
+		int smin = ((Integer)min.get(s.stateNumber)).intValue();
+		Vector stateTransitions = new Vector(smax-smin+1);
+		stateTransitions.setSize(smax-smin+1);
+		// fill with -1 as default transition to invalid state
+		for (int sti = 0; sti < stateTransitions.size(); sti++) {
+			stateTransitions.set(sti, new Integer(-1));
+		}
+		transition.set(s.stateNumber, stateTransitions);
+		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
+			Transition edge = (Transition) s.transition(j);
+			Label label = edge.label;
+			if ( label.isAtom() ) {
+				int labelIndex = label.getAtom()-smin; // offset from 0
+				stateTransitions.set(labelIndex,
+									 new Integer(edge.target.stateNumber));
+			}
+			else if ( label.isSet() ) {
+				IntervalSet labels = (IntervalSet)label.getSet();
+				List atoms = labels.toList();
+				for (int a = 0; a < atoms.size(); a++) {
+					Integer I = (Integer) atoms.get(a);
+					int labelIndex = I.intValue()-smin; // offset from 0
+					stateTransitions.set(labelIndex,
+										 new Integer(edge.target.stateNumber));
+				}
+			}
+		}
+	}
+
+	protected void createSpecialTable(DFAState s) {
+		// number all special states from 0...n-1 instead of their usual numbers
+		int uniqueCompressedSpecialStateNum = 0;
+		boolean hasSemPred = false;
+
+		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
+			Transition edge = (Transition) s.transition(j);
+			Label label = edge.label;
+			if ( label.isSemanticPredicate() ) {
+				hasSemPred = true;
+			}
+		}
+		// if has pred or too big for table, make it special
+		int smax = ((Integer)max.get(s.stateNumber)).intValue();
+		int smin = ((Integer)min.get(s.stateNumber)).intValue();
+		if ( hasSemPred || smax-smin>MAX_STATE_TRANSITIONS_FOR_TABLE) {
+			special.set(s.stateNumber,
+						new Integer(uniqueCompressedSpecialStateNum));
+			uniqueCompressedSpecialStateNum++;
+			specialStates.add(s);
+		}
+		else {
+			special.set(s.stateNumber, new Integer(-1)); // not special
+		}
+
+		for (int i = 0; i < specialStates.size(); i++) {
+			DFAState ss = (DFAState) specialStates.get(i);
+		}
+	}
+
 	public int predict(IntStream input) {
 		Interpreter interp = new Interpreter(nfa.grammar, input);
 		return interp.predict(this);
@@ -171,32 +352,39 @@ public class DFA {
      */
     protected DFAState addState(DFAState d) {
 		if ( getMaxLookahead()>0 ) {
-			configurationsToDFAStateMap.put(d,d);
+			uniqueStates.put(d,d);
 			numberOfStates++;
 			return d;
 		}
-		DFAState existing = (DFAState)configurationsToDFAStateMap.get(d);
+		DFAState existing = (DFAState)uniqueStates.get(d);
 		if ( existing != null ) {
 			// already there...get the existing DFA state
 			return existing;
 		}
 
 		// if not there, then add new state.
-        configurationsToDFAStateMap.put(d,d);
+        uniqueStates.put(d,d);
         numberOfStates++;
 		return d;
 	}
 
 	public void removeState(DFAState d) {
-		DFAState it = (DFAState)configurationsToDFAStateMap.remove(d);
+		DFAState it = (DFAState)uniqueStates.remove(d);
 		// states.set(d.stateNumber, null);
 		if ( it!=null ) {
 			numberOfStates--;
 		}
 	}
 
-	public Map getConfigurationsToDFAStateMap() {
-		return configurationsToDFAStateMap;
+	public Map getUniqueStates() {
+		return uniqueStates;
+	}
+
+	/** What is the max state number ever created?  This may be beyond
+	 *  getNumberOfStates().
+	 */
+	public int getMaxStateNumber() {
+		return states.size()-1;
 	}
 
 	public DFAState getState(int stateNumber) {

@@ -33,14 +33,15 @@ interface ANTLRCore;
  */
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
-           name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           buildTemplate, profile,
+           name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors,
+	   bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace);
 
 optional 
 headerFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
-           recognizer, name, tokens, tokenNames, scopes, rules, cyclicDFAs,
+           recognizer, name, tokens, tokenNames, scopes, rules, 
+	   cyclicDFADescriptors,
            bitsets, buildTemplate, profile, backtracking, synpreds,
            memoize, numRules, fileName, ANTLRVersion, generatedTimestamp);
 

@@ -230,6 +230,7 @@ public class CodeGenerator {
 		else {
 			templates = coreTemplates;
 		}
+		//templates.getStringTemplateWriter();
 	}
 
 	/** Given the grammar to which we are attached, walk the AST associated
@@ -563,6 +564,10 @@ public class CodeGenerator {
 				acyclicDFAGenerator.genFixedLookaheadDecision(getTemplates(), dfa);
 		}
 		else {
+			//dfa.createStateTables();
+			outputFileST.setAttribute("cyclicDFADescriptors", dfa);
+			headerFileST.setAttribute("cyclicDFADescriptors", dfa);
+
 			StringTemplate dfaST =
 				cyclicDFAGenerator.genCyclicLookaheadDecision(templates,
 															  dfa);
@@ -908,8 +913,109 @@ public class CodeGenerator {
 
 	public void write(StringTemplate code, String fileName) throws IOException {
 		Writer w = tool.getOutputFile(grammar, fileName);
-		w.write(code.toString());
+		long start = System.currentTimeMillis();
+		String output = code.toString();
+		long stop = System.currentTimeMillis();
+		System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
+		w.write(output);
 		w.close();
+	}
+
+	protected boolean isSpecialState(DFAState s) {
+		int size = 0;
+		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
+			Transition edge = (Transition) s.transition(i);
+			if ( edge.label.isSemanticPredicate() ) {
+				return false;
+			}
+			if ( ((DFAState)edge.target).getGatedPredicatesInNFAConfigurations()!=null ) {
+				// can't do a switch if the edges are going to required gated predicates
+				return false;
+			}
+			size += edge.label.getSet().size();
+		}
+		if ( s.getNumberOfTransitions()<MIN_SWITCH_ALTS || size>MAX_SWITCH_CASE_LABELS ) {
+			return false;
+		}
+		return true;
+	}
+
+	public String toTables(DFA d) {
+		int uniqueCompressedStateNum = 0;
+		List specialStates = new ArrayList();
+		StringBuffer buf = new StringBuffer();
+		buf.append("boolean[] accept = {");
+		for (int i = 0; i < d.getNumberOfStates(); i++) {
+			if ( i>0 ) buf.append(',');
+			DFAState s = d.getState(i);
+			buf.append(s.isAcceptState());
+		}
+		buf.append("};\n");
+		buf.append("short[] special = {");
+		for (int i = 0; i < d.getNumberOfStates(); i++) {
+			if ( i>0 ) buf.append(',');
+			DFAState s = d.getState(i);
+			if ( canGenerateSwitch(s) ) {
+				buf.append(-1);
+			}
+			else {
+				buf.append(uniqueCompressedStateNum);
+				uniqueCompressedStateNum++;
+				// TODO: add s to List of special states in switch
+				specialStates.add(s);
+			}
+		}
+		buf.append("};\n");
+		buf.append("char[] min = {");
+		for (int i = 0; i < d.getNumberOfStates(); i++) {
+			if ( i>0 ) buf.append(',');
+			DFAState s = d.getState(i);
+			OrderedHashSet labels = s.getReachableLabels();
+			int min = Label.MAX_CHAR_VALUE + 1;
+			for (int j = 0; j < s.getNumberOfTransitions(); j++) {
+				Transition edge = (Transition) s.transition(j);
+				Label label = edge.label;
+				if ( label.isAtom() && label.getAtom()<min ) {
+					min = label.getAtom();
+				}
+			}
+			buf.append(min);
+		}
+		buf.append("};\n");
+		buf.append("char[] max = {");
+		for (int i = 0; i < d.getNumberOfStates(); i++) {
+			if ( i>0 ) buf.append(',');
+			DFAState s = d.getState(i);
+			OrderedHashSet labels = s.getReachableLabels();
+			int max = Label.MIN_ATOM_VALUE - 1;
+			for (int j = 0; j < s.getNumberOfTransitions(); j++) {
+				Transition edge = (Transition) s.transition(j);
+				Label label = edge.label;
+				if ( label.isAtom() && label.getAtom()>max ) {
+					max = label.getAtom();
+				}
+			}
+			buf.append(max);
+		}
+		buf.append("};\n");
+		buf.append("short transition[][] = {");
+		for (int i = 0; i < d.getNumberOfStates(); i++) {
+			if ( i>0 ) buf.append(',');
+			DFAState s = d.getState(i);
+			buf.append("{");
+			for (int j = 0; j < s.getNumberOfTransitions(); j++) {
+				if ( j>0 ) buf.append(',');
+				Transition edge = (Transition) s.transition(j);
+			}
+			buf.append("}");
+		}
+		buf.append("};\n");
+
+		for (int i = 0; i < specialStates.size(); i++) {
+			DFAState s = (DFAState) specialStates.get(i);
+		}
+
+		return buf.toString();
 	}
 
 	/** You can generate a switch rather than if-then-else for a DFA state

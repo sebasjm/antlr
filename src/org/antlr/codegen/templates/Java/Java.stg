@@ -44,8 +44,9 @@ javaTypeInitMap ::= [
  */
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
-           name, tokens, tokenNames, rules, cyclicDFAs, bitsets,
-           buildTemplate, profile,
+           name, tokens, tokenNames, rules, cyclicDFAs,
+	   cyclicDFADescriptors,
+	   bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace) ::=
 <<
@@ -94,6 +95,11 @@ public class <name> extends Lexer {
 
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
+
+<!
+    <cyclicDFADescriptors:{dfa | protected _DFA<dfa.decisionNumber> _dfa<dfa.decisionNumber> = new _DFA<dfa.decisionNumber>();}>
+    <cyclicDFADescriptors:cyclicDFATables()> <! dump tables for all DFA !>
+
 }
 >>
 
@@ -162,6 +168,10 @@ public class <name> extends <@superClassName><superClass><@end> {
     <! define a singleton instance for each cyclic DFA then define DFAs !>
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
+
+<!
+    <cyclicDFADescriptors:{dfa | protected _DFA<dfa.decisionNumber> _dfa<dfa.decisionNumber> = new _DFA<dfa.decisionNumber>();}>
+    <cyclicDFADescriptors:cyclicDFATables()> <! dump tables for all DFA !>
 
     <synpreds:{p | <synpred(name=p)>}>
 
@@ -861,6 +871,29 @@ DFA.State s<stateNumber> = new DFA.State() {
 cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
 <labels:{case <it>:}; separator="\n">
     return s<targetStateNumber>;<\n>
+>>
+
+// C Y C L I C  D F A  T A B L E S
+
+/* TODO: make those int into short or even byte if possible */
+cyclicDFATables(dfa) ::= <<
+static final int[] min = { <dfa.min; separator=", "> };
+static final int[] max = { <dfa.max; separator=", "> };
+static final int[] accept = { <dfa.accept; separator=", "> };
+static final int[] special = { <dfa.special; separator=", "> };
+static final int[][] transition = { <dfa.transition:{t|\{<t; separator=", ">\}}; separator=", "> };
+
+class _DFA<dfa.decisionNumber> extends DFA2 {
+    public _DFA<dfa.decisionNumber>() {
+        this.min = _DFA<dfa.decisionNumber>_min;
+        this.max = _DFA<dfa.decisionNumber>_max;
+        this.accept = _DFA<dfa.decisionNumber>_accept;
+        this.special = _DFA<dfa.decisionNumber>_special;
+        this.transition = _DFA<dfa.decisionNumber>_transition;
+    }
+    
+    <! <dfa.specialStates> !>
+}<\n>
 >>
 
 // D F A  E X P R E S S I O N S

@@ -958,6 +958,18 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
+	// Check state table creation
+
+	public void testCyclicTableCreation() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : A+ X | A+ Y ;");
+		String expecting =
+			".s0-A->:s1=>1\n" +
+			".s0-B->:s2=>2\n";
+	}
+
+
 	// S U P P O R T
 
 	public void _template() throws Exception {

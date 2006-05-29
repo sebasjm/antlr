@@ -59,7 +59,7 @@ public class CyclicDFACodeGenerator {
 		dfaST.setAttribute("ruleName", ruleName);
 		dfaST.setAttribute("ruleDescriptor", parentGenerator.grammar.getRule(ruleName));
 		dfaST.setAttribute("className", parentGenerator.getClassName());
-		visited = new BitSet(dfa.getNumberOfStates());
+		visited = new BitSet(dfa.getMaxStateNumber()+1);
 		walkCyclicDFAGeneratingStateMachine(templates, dfaST, dfa.startState);
 		return dfaST;
 	}

@@ -170,6 +170,7 @@ public class NFAToDFAConverter {
 		// now DFA start state has the complete closure for the decision
 		// but we have tracked which alt is associated with which
 		// NFA states.
+		dfa.addState(startState); // make sure dfa knows about this state
 		work.add(startState);
 		return startState;
 	}
@@ -895,7 +896,7 @@ public class NFAToDFAConverter {
 			// into the reachable state space and the error
 			// reporting must be able to compute the path from
 			// start to the error state with infinite recursion
-			d.dfa.setState(d.stateNumber, existingState);
+			dfa.setState(d.stateNumber, existingState);
 			return existingState;
 		}
 
