@@ -105,9 +105,9 @@ public class DebugParser extends Parser {
 	}
 
 	public void recoverFromMismatchedToken(IntStream input,
-										   MismatchedTokenException mte,
+										   RecognitionException mte,
 										   int ttype,
-										   org.antlr.runtime.BitSet follow)
+										   BitSet follow)
 		throws RecognitionException
 	{
 		dbg.recognitionException(mte);
@@ -116,7 +116,7 @@ public class DebugParser extends Parser {
 
 	public void recoverFromMismatchedSet(IntStream input,
 										 RecognitionException mte,
-										 org.antlr.runtime.BitSet follow)
+										 BitSet follow)
 		throws RecognitionException
 	{
 		dbg.recognitionException(mte);
