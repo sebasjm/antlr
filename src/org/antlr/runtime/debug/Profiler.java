@@ -27,9 +27,14 @@
 */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.tool.GrammarReport;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /** Using the debug event interface, track what is happening in the parser
@@ -39,20 +44,20 @@ public class Profiler extends BlankDebugEventListener {
 	/** Because I may change the stats, I need to track that for later
 	 *  computations to be consistent.
 	 */
-	public static final String Version = "1";
+	public static final String Version = "2";
 	public static final String RUNTIME_STATS_FILENAME = "runtime.stats";
-	public static final int NUM_RUNTIME_STATS = 20;
-
-	//public IntStream input;
+	public static final int NUM_RUNTIME_STATS = 25;
 
 	public DebugParser parser = null;
 
 	// working variables
 
-	protected int level = 0;
-	protected boolean inDecision = false;
-	protected int maxLookaheadInDecision = 0;
+	protected int ruleLevel = 0;
+	protected int decisionLevel = 0;
+	protected int maxLookaheadInCurrentDecision = 0;
 	protected CommonToken lastTokenConsumed=null;
+
+	protected List lookaheadStack = new ArrayList();
 
 	// stats variables
 
@@ -60,14 +65,17 @@ public class Profiler extends BlankDebugEventListener {
 	public int maxRuleInvocationDepth = 0;
 	public int numFixedDecisions = 0;
 	public int numCyclicDecisions = 0;
-	public int[] decisionMaxFixedLookaheads = new int[200];
+	public int numBacktrackDecisions = 0;
+	public int[] decisionMaxFixedLookaheads = new int[200]; // TODO: make List
 	public int[] decisionMaxCyclicLookaheads = new int[200];
+	public List decisionMaxSynPredLookaheads = new ArrayList();
 	public int numHiddenTokens = 0;
 	public int numCharsMatched = 0;
 	public int numHiddenCharsMatched = 0;
 	public int numSemanticPredicates = 0;
+	public int numSyntacticPredicates = 0;
 	protected int numberReportedErrors = 0;
-	
+
 	public Profiler() {
 	}
 
@@ -76,40 +84,43 @@ public class Profiler extends BlankDebugEventListener {
 	}
 
 	public void enterRule(String ruleName) {
-		level++;
+		ruleLevel++;
 		numRuleInvocations++;
-		if ( level>maxRuleInvocationDepth ) {
-			maxRuleInvocationDepth = level;
+		if ( ruleLevel >maxRuleInvocationDepth ) {
+			maxRuleInvocationDepth = ruleLevel;
 		}
 	}
 
 	public void exitRule(String ruleName) {
-		level--;
+		ruleLevel--;
 	}
 
 	public void enterDecision(int decisionNumber) {
-		inDecision=true;
+		decisionLevel++;
+		int startingLookaheadIndex = parser.getTokenStream().index();
+		System.out.println("enterDecision "+decisionNumber+" @ index "+startingLookaheadIndex);
+		lookaheadStack.add(new Integer(startingLookaheadIndex));
 	}
 
 	public void exitDecision(int decisionNumber) {
+		System.out.println("exitDecision "+decisionNumber);
+		// track how many of acyclic, cyclic here as we don't know what kind
+		// yet in enterDecision event.
 		if ( parser.isCyclicDecision ) {
 			numCyclicDecisions++;
 		}
 		else {
 			numFixedDecisions++;
 		}
-		inDecision=false;
+		lookaheadStack.remove(lookaheadStack.size()-1); // pop lookahead depth counter
+		decisionLevel--;
 		if ( parser.isCyclicDecision ) {
-			// cyclic decisions use number of consumes + 1; we track consumes
-			// so add one to the max lookahead.  For example, if it's LL(1)
-			// it will use LA(1) but will not consume.
-			maxLookaheadInDecision++;
 			if ( numCyclicDecisions>=decisionMaxCyclicLookaheads.length ) {
 				int[] bigger = new int[decisionMaxCyclicLookaheads.length*2];
 				System.arraycopy(decisionMaxCyclicLookaheads,0,bigger,0,decisionMaxCyclicLookaheads.length);
 				decisionMaxCyclicLookaheads = bigger;
 			}
-			decisionMaxCyclicLookaheads[numCyclicDecisions-1] = maxLookaheadInDecision;
+			decisionMaxCyclicLookaheads[numCyclicDecisions-1] = maxLookaheadInCurrentDecision;
 		}
 		else {
 			if ( numFixedDecisions>=decisionMaxFixedLookaheads.length ) {
@@ -117,51 +128,124 @@ public class Profiler extends BlankDebugEventListener {
 				System.arraycopy(decisionMaxFixedLookaheads,0,bigger,0,decisionMaxFixedLookaheads.length);
 				decisionMaxFixedLookaheads = bigger;
 			}
-			decisionMaxFixedLookaheads[numFixedDecisions-1] = maxLookaheadInDecision;
+			decisionMaxFixedLookaheads[numFixedDecisions-1] = maxLookaheadInCurrentDecision;
 		}
-		parser.isCyclicDecision = false;
-		maxLookaheadInDecision = 0;
+		parser.isCyclicDecision = false; // can't nest so just reset to false
+		maxLookaheadInCurrentDecision = 0;
 	}
 
+	/** If we are in a decision, we want to track lookahead depth.
+	 *  If in a cyclic decision, we'll see
+	 * 		enter decision
+	 *      at least one LA and possibly a bunch of consumes
+	 * 	The isCyclicDecision flag will be on.
+	 */
 	public void consumeToken(Token token) {
-		if ( inDecision ) {
+		System.out.println("consume token "+token);
+		if ( inDecision() ) {
 			if ( parser.isCyclicDecision ) {
-				maxLookaheadInDecision++;
+				maxLookaheadInCurrentDecision++;
 			}
 		}
 		lastTokenConsumed = (CommonToken)token;
+	}
+
+	/** The parser is in a decision if the decision depth > 0.  This
+	 *  works for backtracking also, which can have nested decisions.
+	 */
+	public boolean inDecision() {
+		return decisionLevel>0;
 	}
 
 	public void consumeHiddenToken(Token token) {
+		System.out.println("consume hidden token "+token);
 		lastTokenConsumed = (CommonToken)token;
 	}
 
+	/** Track refs to lookahead if in a fixed decision */
 	public void LT(int i, Token t) {
-		if ( inDecision && !parser.isCyclicDecision ) {
-			if ( i>maxLookaheadInDecision ) {
-				maxLookaheadInDecision = i;
+		if ( inDecision() ) {
+			// get starting index off stack
+			int stackTop = lookaheadStack.size()-1;
+			Integer startingIndex = (Integer)lookaheadStack.get(stackTop);
+			// compute lookahead depth
+			int thisRefIndex = parser.getTokenStream().index();
+			int numHidden =
+				getNumberOfHiddenTokens(startingIndex.intValue(), thisRefIndex);
+			int depth = i + thisRefIndex - startingIndex.intValue() - numHidden;
+			System.out.println("LT("+i+") @ index "+thisRefIndex+" is depth "+depth);
+
+			if ( depth>maxLookaheadInCurrentDecision ) {
+				maxLookaheadInCurrentDecision = depth;
 			}
 		}
 	}
 
+	/** Track backtracking decisions.  You'll see a fixed or cyclic decision
+	 *  and then a backtrack.
+	 *
+	 * 		enter rule
+	 * 		...
+	 * 		enter decision
+	 * 		LA and possibly consumes (for cyclic DFAs)
+	 * 		begin backtrack level
+	 * 		mark m
+	 * 		rewind m
+	 * 		end backtrack level, success
+	 * 		exit decision
+	 * 		...
+	 * 		exit rule
+	 */
 	public void beginBacktrack(int level) {
-		// TODO: implement
+		System.out.println("enter backtrack "+level);
+		numBacktrackDecisions++;
 	}
 
+	/** Successful or not, track how much lookahead synpreds use */
 	public void endBacktrack(int level, boolean successful) {
-		// TODO: implement
+		System.out.println("exit backtrack "+level+": "+successful);
+		decisionMaxSynPredLookaheads.add(
+			new Integer(maxLookaheadInCurrentDecision)
+		);
 	}
+
+	/*
+	public void mark(int marker) {
+		int i = parser.getTokenStream().index();
+		System.out.println("mark @ index "+i);
+		synPredLookaheadStack.add(new Integer(i));
+	}
+
+	public void rewind(int marker) {
+		// pop starting index off stack
+		int stackTop = synPredLookaheadStack.size()-1;
+		Integer startingIndex = (Integer)synPredLookaheadStack.get(stackTop);
+		synPredLookaheadStack.remove(synPredLookaheadStack.size()-1);
+		// compute lookahead depth
+		int stopIndex = parser.getTokenStream().index();
+		System.out.println("rewind @ index "+stopIndex);
+		int depth = stopIndex - startingIndex.intValue();
+		System.out.println("depth of lookahead for synpred: "+depth);
+		decisionMaxSynPredLookaheads.add(
+			new Integer(depth)
+		);
+	}
+	*/
 
 	public void recognitionException(RecognitionException e) {
 		numberReportedErrors++;
 	}
 
 	public void semanticPredicate(boolean result, String predicate) {
-		numSemanticPredicates++;
+		if ( inDecision() ) {
+			numSemanticPredicates++;
+		}
 	}
 
 	public void terminate() {
-		GrammarReport.writeReport(RUNTIME_STATS_FILENAME,toNotifyString());
+		String stats = toNotifyString();
+		GrammarReport.writeReport(RUNTIME_STATS_FILENAME,stats);
+		System.out.println(toString(stats));
 	}
 
 	public void setParser(DebugParser parser) {
@@ -172,7 +256,7 @@ public class Profiler extends BlankDebugEventListener {
 
 	public String toNotifyString() {
 		TokenStream input = parser.getTokenStream();
-		for (int i=0; i<input.size()&&i<=lastTokenConsumed.getTokenIndex(); i++) {
+		for (int i=0; i<input.size()&&lastTokenConsumed!=null&&i<=lastTokenConsumed.getTokenIndex(); i++) {
 			Token t = input.get(i);
 			if ( t.getChannel()!=Token.DEFAULT_CHANNEL ) {
 				numHiddenTokens++;
@@ -211,6 +295,16 @@ public class Profiler extends BlankDebugEventListener {
 		buf.append('\t');
 		buf.append(GrammarReport.stddev(decisionMaxCyclicLookaheads));
 		buf.append('\t');
+		buf.append(numBacktrackDecisions);
+		buf.append('\t');
+		buf.append(GrammarReport.min(toArray(decisionMaxSynPredLookaheads)));
+		buf.append('\t');
+		buf.append(GrammarReport.max(toArray(decisionMaxSynPredLookaheads)));
+		buf.append('\t');
+		buf.append(GrammarReport.avg(toArray(decisionMaxSynPredLookaheads)));
+		buf.append('\t');
+		buf.append(GrammarReport.stddev(toArray(decisionMaxSynPredLookaheads)));
+		buf.append('\t');
 		buf.append(numSemanticPredicates);
 		buf.append('\t');
 		buf.append(parser.getTokenStream().size());
@@ -226,7 +320,7 @@ public class Profiler extends BlankDebugEventListener {
 	}
 
 	public String toString() {
-        return toString(toNotifyString());
+		return toString(toNotifyString());
 	}
 
 	protected static String[] decodeReportData(String data) {
@@ -249,7 +343,7 @@ public class Profiler extends BlankDebugEventListener {
 			return null;
 		}
 		StringBuffer buf = new StringBuffer();
-        buf.append("ANTLR Runtime Report; Profile Version ");
+		buf.append("ANTLR Runtime Report; Profile Version ");
 		buf.append(fields[0]);
 		buf.append('\n');
 		buf.append("parser name ");
@@ -291,23 +385,38 @@ public class Profiler extends BlankDebugEventListener {
 		buf.append("standard deviation of depth used in arbitrary lookahead decisions ");
 		buf.append(fields[13]);
 		buf.append('\n');
-		buf.append("number of evaluated semantic predicates ");
+		buf.append("number of evaluated syntactic predicates ");
 		buf.append(fields[14]);
 		buf.append('\n');
-		buf.append("number of tokens ");
+		buf.append("min lookahead used in a syntactic predicate ");
 		buf.append(fields[15]);
 		buf.append('\n');
-		buf.append("number of hidden tokens ");
+		buf.append("max lookahead used in a syntactic predicate ");
 		buf.append(fields[16]);
 		buf.append('\n');
-		buf.append("number of char ");
+		buf.append("average lookahead depth used in syntactic predicates ");
 		buf.append(fields[17]);
 		buf.append('\n');
-		buf.append("number of hidden char ");
+		buf.append("standard deviation of depth used in syntactic predicates ");
 		buf.append(fields[18]);
 		buf.append('\n');
-		buf.append("number of syntax errors ");
+		buf.append("number of evaluated semantic predicates ");
 		buf.append(fields[19]);
+		buf.append('\n');
+		buf.append("number of tokens ");
+		buf.append(fields[20]);
+		buf.append('\n');
+		buf.append("number of hidden tokens ");
+		buf.append(fields[21]);
+		buf.append('\n');
+		buf.append("number of char ");
+		buf.append(fields[22]);
+		buf.append('\n');
+		buf.append("number of hidden char ");
+		buf.append(fields[23]);
+		buf.append('\n');
+		buf.append("number of syntax errors ");
+		buf.append(fields[24]);
 		buf.append('\n');
 		return buf.toString();
 	}
@@ -319,5 +428,27 @@ public class Profiler extends BlankDebugEventListener {
 			X = trimmed;
 		}
 		return X;
+	}
+
+	protected int[] toArray(List a) {
+		int[] x = new int[a.size()];
+		for (int i = 0; i < a.size(); i++) {
+			Integer I = (Integer) a.get(i);
+			x[i] = I.intValue();
+		}
+		return x;
+	}
+
+	/** Get num hidden tokens between i..j inclusive */
+	public int getNumberOfHiddenTokens(int i, int j) {
+		int n = 0;
+		TokenStream input = parser.getTokenStream();
+		for (int ti = i; ti<input.size() && ti <= j; ti++) {
+			Token t = input.get(ti);
+			if ( t.getChannel()!=Token.DEFAULT_CHANNEL ) {
+				n++;
+			}
+		}
+		return n;
 	}
 }
