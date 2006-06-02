@@ -266,9 +266,11 @@ public class Tool {
 					String report = new GrammarReport(grammar).toString();
 					System.out.println(report);
 				}
-				GrammarReport report = new GrammarReport(grammar);
-				GrammarReport.writeReport(GrammarReport.GRAMMAR_STATS_FILENAME,
-										  report.toNotifyString());
+				if ( profile ) {
+					GrammarReport report = new GrammarReport(grammar);
+					GrammarReport.writeReport(GrammarReport.GRAMMAR_STATS_FILENAME,
+											  report.toNotifyString());
+				}
 			}
 			catch (Exception e) {
 				ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
