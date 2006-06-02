@@ -248,8 +248,11 @@ public class NFAFactory {
      *  the SEMPRED token.
      */
     public StateCluster build_SemanticPredicate(GrammarAST pred) {
-		nfa.grammar.numberOfSemanticPredicates++;
-        NFAState left = newState();
+		// don't count syn preds
+		if ( !pred.getText().toUpperCase().startsWith("SYNPRED") ) {
+			nfa.grammar.numberOfSemanticPredicates++;
+		}
+		NFAState left = newState();
         NFAState right = newState();
         Transition e = new Transition(new Label(pred), right);
         left.addTransition(e);

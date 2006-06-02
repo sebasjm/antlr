@@ -100,6 +100,7 @@ tokens {
 	Grammar grammar = null;
 	protected int gtype = 0;
 	protected String currentRuleName = null;
+	protected GrammarAST currentBlockAST = null;
 
 	/* this next stuff supports construction of the Tokens artificial rule.
 	   I hate having some partial functionality here, I like doing everything
@@ -372,6 +373,9 @@ int column = LT(1).getColumn();
 
 /** Build #(BLOCK ( #(ALT ...) EOB )+ ) */
 block
+{
+GrammarAST save = currentBlockAST;
+}
     :   (set) => s:set  // special block like ('a'|'b'|'0'..'9')
 
     |	lp:LPAREN^ {#lp.setType(BLOCK); #lp.setText("BLOCK");}
@@ -387,10 +391,13 @@ block
 		|	ACTION COLON!
 		)?
 
+		{currentBlockAST = #lp;}
+
 		a1:alternative rewrite ( OR! a2:alternative rewrite )*
 
         rp:RPAREN!
         {
+		currentBlockAST = save;
         GrammarAST eob = #[EOB,"<end-of-block>"];
         eob.setLine(rp.getLine());
         eob.setColumn(rp.getColumn());
@@ -403,10 +410,13 @@ altList
 	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
 	blkRoot.setLine(LT(1).getLine());
 	blkRoot.setColumn(LT(1).getColumn());
+	GrammarAST save = currentBlockAST;
+	currentBlockAST = #blkRoot;
 }
     :   a1:alternative rewrite ( OR! a2:alternative rewrite )*
         {
         #altList = #(blkRoot,#altList,#[EOB,"<end-of-block>"]);
+        currentBlockAST = save;
         }
     ;
 
@@ -486,7 +496,10 @@ elementNoOptionSpec
 	|   a:ACTION
 
 	|   p:SEMPRED ( IMPLIES! {#p.setType(GATED_SEMPRED);} )?
-		{#p.setEnclosingRule(currentRuleName);}
+		{
+		#p.setEnclosingRule(currentRuleName);
+		grammar.blocksWithSemPreds.add(currentBlockAST);
+		}
 
 	|   t3:tree
 	;
@@ -568,6 +581,8 @@ ebnf!
 				String synpredinvoke = predName;
 				#ebnf = #[SYN_SEMPRED,synpredinvoke];
 				#ebnf.setEnclosingRule(currentRuleName);
+				// track how many decisions have synpreds
+				grammar.blocksWithSynPreds.add(currentBlockAST);
 			}
 			}
         |   {#ebnf = #b;}

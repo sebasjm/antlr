@@ -86,7 +86,7 @@ public class CodeGenerator {
 	/** Which grammar are we generating code for?  Each generator
 	 *  is attached to a specific grammar.
 	 */
-	protected Grammar grammar;
+	public Grammar grammar;
 
 	/** What language are we generating? */
 	protected String language;
@@ -610,9 +610,10 @@ public class CodeGenerator {
 	protected StringTemplate genSemanticPredicateExpr(StringTemplateGroup templates,
 													  Transition edge)
 	{
+		DFA dfa = ((DFAState)edge.target).dfa; // which DFA are we in
 		Label label = edge.label;
 		SemanticContext semCtx = label.getSemanticContext();
-		return semCtx.genExpr(this,templates,((DFAState)edge.target).dfa);
+		return semCtx.genExpr(this,templates,dfa);
 	}
 
 	/** For intervals such as [3..3, 30..35], generate an expression that

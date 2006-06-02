@@ -151,9 +151,11 @@ public abstract class SemanticContext {
 			if ( templates!=null ) {
 				if ( synpred ) {
 					eST = templates.getInstanceOf("evalSynPredicate");
+					generator.grammar.decisionsWhoseDFAsUsesSynPreds.add(dfa);
 				}
 				else {
 					eST = templates.getInstanceOf("evalPredicate");
+					generator.grammar.decisionsWhoseDFAsUsesSemPreds.add(dfa);
 				}
 				String predEnclosingRuleName = predicate.getEnclosingRule();
 				/*

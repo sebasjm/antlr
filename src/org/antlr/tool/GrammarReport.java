@@ -31,15 +31,16 @@ import java.io.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.Map;
 
 public class GrammarReport {
 	/** Because I may change the stats, I need to track that for later
 	 *  computations to be consistent.
 	 */
-	public static final String Version = "1";
+	public static final String Version = "2";
 	public static final String GRAMMAR_STATS_FILENAME = "grammar.stats";
 	public static final String ANTLRWORKS_DIR = "antlrworks";
-	public static final int NUM_GRAMMAR_STATS = 32;
+	public static final int NUM_GRAMMAR_STATS = 37;
 
 	public Grammar grammar;
 
@@ -144,6 +145,18 @@ public class GrammarReport {
 		buf.append(ErrorManager.getErrorState().warnings);
 		buf.append('\t');
 		buf.append(ErrorManager.getErrorState().infos);
+		buf.append('\t');
+		Map synpreds = grammar.getSyntacticPredicates();
+		int num_synpreds = synpreds!=null ? synpreds.size() : 0;
+		buf.append(num_synpreds);
+		buf.append('\t');
+		buf.append(grammar.blocksWithSynPreds.size());
+		buf.append('\t');
+		buf.append(grammar.decisionsWhoseDFAsUsesSynPreds.size());
+		buf.append('\t');
+		buf.append(grammar.blocksWithSemPreds.size());
+		buf.append('\t');
+		buf.append(grammar.decisionsWhoseDFAsUsesSemPreds.size());
 		return buf.toString();
 	}
 
@@ -152,7 +165,7 @@ public class GrammarReport {
 	 *  problem with the data.
 	 */
 	public String toString() {
-        return toString(toNotifyString());
+		return toString(toNotifyString());
 	}
 
 	protected static String[] decodeReportData(String data) {
@@ -175,7 +188,7 @@ public class GrammarReport {
 			return null;
 		}
 		StringBuffer buf = new StringBuffer();
-        buf.append("ANTLR Grammar Report; Stats Version ");
+		buf.append("ANTLR Grammar Report; Stats Version ");
 		buf.append(fields[0]);
 		buf.append('\n');
 		buf.append("Grammar: ");
@@ -233,7 +246,7 @@ public class GrammarReport {
 		buf.append("DFA creation time in ms: ");
 		buf.append(fields[23]);
 		buf.append('\n');
-		buf.append("Number of semantic predicates: ");
+		buf.append("Number of semantic predicates found: ");
 		buf.append(fields[24]);
 		buf.append('\n');
 		buf.append("Number of manual fixed lookahead k=value options: ");
@@ -256,6 +269,21 @@ public class GrammarReport {
 		buf.append('\n');
 		buf.append("Number of infos: ");
 		buf.append(fields[31]);
+		buf.append('\n');
+		buf.append("Number of syntactic predicates found: ");
+		buf.append(fields[32]);
+		buf.append('\n');
+		buf.append("Decisions with syntactic predicates: ");
+		buf.append(fields[33]);
+		buf.append('\n');
+		buf.append("Decision DFAs using syntactic predicates: ");
+		buf.append(fields[34]);
+		buf.append('\n');
+		buf.append("Decisions with semantic predicates: ");
+		buf.append(fields[35]);
+		buf.append('\n');
+		buf.append("Decision DFAs using semantic predicates: ");
+		buf.append(fields[36]);
 		buf.append('\n');
 		return buf.toString();
 	}

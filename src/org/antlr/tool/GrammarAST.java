@@ -332,4 +332,11 @@ public class GrammarAST extends BaseAST {
 		}
 		return null;
 	}
+
+	/** Make nodes unique based upon Token so we can add them to a Set */
+	public boolean equals(AST ast) {
+		GrammarAST t = (GrammarAST)ast;
+		return token.getLine() == t.getLine() &&
+			   token.getColumn() == t.getColumn();
+	}
 }
