@@ -879,7 +879,7 @@ cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
 
 // C Y C L I C  D F A  T A B L E S
 
-/* TODO: make those int into short or even byte if possible */
+/* TODO: make those int into short or even byte if possible
 cyclicDFATables(dfa) ::= <<
 static final int[] min = { <dfa.min; separator=", "> };
 static final int[] max = { <dfa.max; separator=", "> };
@@ -901,7 +901,7 @@ class _DFA<dfa.decisionNumber> extends DFA2 {
     <! <dfa.specialStates> !>
 }<\n>
 >>
-
+ */
 // D F A  E X P R E S S I O N S
 
 andPredicates(left,right) ::= "(<left>&&<right>)"
