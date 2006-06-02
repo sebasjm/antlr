@@ -98,12 +98,12 @@ public class Profiler extends BlankDebugEventListener {
 	public void enterDecision(int decisionNumber) {
 		decisionLevel++;
 		int startingLookaheadIndex = parser.getTokenStream().index();
-		System.out.println("enterDecision "+decisionNumber+" @ index "+startingLookaheadIndex);
+		//System.out.println("enterDecision "+decisionNumber+" @ index "+startingLookaheadIndex);
 		lookaheadStack.add(new Integer(startingLookaheadIndex));
 	}
 
 	public void exitDecision(int decisionNumber) {
-		System.out.println("exitDecision "+decisionNumber);
+		//System.out.println("exitDecision "+decisionNumber);
 		// track how many of acyclic, cyclic here as we don't know what kind
 		// yet in enterDecision event.
 		if ( parser.isCyclicDecision ) {
@@ -141,7 +141,7 @@ public class Profiler extends BlankDebugEventListener {
 	 * 	The isCyclicDecision flag will be on.
 	 */
 	public void consumeToken(Token token) {
-		System.out.println("consume token "+token);
+		//System.out.println("consume token "+token);
 		if ( inDecision() ) {
 			if ( parser.isCyclicDecision ) {
 				maxLookaheadInCurrentDecision++;
@@ -158,7 +158,7 @@ public class Profiler extends BlankDebugEventListener {
 	}
 
 	public void consumeHiddenToken(Token token) {
-		System.out.println("consume hidden token "+token);
+		//System.out.println("consume hidden token "+token);
 		lastTokenConsumed = (CommonToken)token;
 	}
 
@@ -173,7 +173,7 @@ public class Profiler extends BlankDebugEventListener {
 			int numHidden =
 				getNumberOfHiddenTokens(startingIndex.intValue(), thisRefIndex);
 			int depth = i + thisRefIndex - startingIndex.intValue() - numHidden;
-			System.out.println("LT("+i+") @ index "+thisRefIndex+" is depth "+depth);
+			//System.out.println("LT("+i+") @ index "+thisRefIndex+" is depth "+depth);
 
 			if ( depth>maxLookaheadInCurrentDecision ) {
 				maxLookaheadInCurrentDecision = depth;
@@ -197,13 +197,13 @@ public class Profiler extends BlankDebugEventListener {
 	 * 		exit rule
 	 */
 	public void beginBacktrack(int level) {
-		System.out.println("enter backtrack "+level);
+		//System.out.println("enter backtrack "+level);
 		numBacktrackDecisions++;
 	}
 
 	/** Successful or not, track how much lookahead synpreds use */
 	public void endBacktrack(int level, boolean successful) {
-		System.out.println("exit backtrack "+level+": "+successful);
+		//System.out.println("exit backtrack "+level+": "+successful);
 		decisionMaxSynPredLookaheads.add(
 			new Integer(maxLookaheadInCurrentDecision)
 		);
