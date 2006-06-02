@@ -909,7 +909,7 @@ public class CodeGenerator {
 		//String output = code.toString(lineWidth);
 		String output = code.toString();
 		long stop = System.currentTimeMillis();
-		System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
+		//System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
 		w.write(output);
 		w.close();
 	}
