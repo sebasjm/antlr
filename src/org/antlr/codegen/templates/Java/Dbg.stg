@@ -37,23 +37,22 @@ import org.antlr.runtime.debug.*;
 
 @genericParser.members() ::= <<
 public int ruleLevel = 0;
-<if(profile)>
-public <name>(<inputStreamType> input) {
-    super(input,null);
-    setDebugListener(new Profiler(this));
-}<\n>
-<else>
 <! bug: can't use <@super.members()> cut-n-paste instead !>
 public <name>(<inputStreamType> input) {
-    super(input);
+<if(profile)>
+        this(input, new Profiler(null));
+        Profiler p = (Profiler)dbg;
+        p.setParser(this);
+<else>
+        super(input);
+<endif><\n>
 <if(memoize)>
-    ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
+        ruleMemo = new Map[<numRules>+1];<\n><! index from 1..n !>
 <endif>
 }
 public <name>(<inputStreamType> input, DebugEventListener dbg) {
     super(input, dbg);
 }<\n>
-<endif>
 protected boolean evalPredicate(boolean result, String predicate) {
     dbg.semanticPredicate(result, predicate);
     return result;

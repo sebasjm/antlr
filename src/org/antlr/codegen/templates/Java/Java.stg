@@ -96,8 +96,7 @@ public class <name> extends Lexer {
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
 
-<!
-    <cyclicDFADescriptors:{dfa | protected _DFA<dfa.decisionNumber> _dfa<dfa.decisionNumber> = new _DFA<dfa.decisionNumber>();}>
+<!    <cyclicDFADescriptors:{dfa | protected _DFA<dfa.decisionNumber> _dfa<dfa.decisionNumber> = new _DFA<dfa.decisionNumber>();}>
     <cyclicDFADescriptors:cyclicDFATables()> <! dump tables for all DFA !>
 
 }
@@ -151,7 +150,13 @@ public class <name> extends <@superClassName><superClass><@end> {
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
     public <name>(<inputStreamType> input) {
+<if(profile)>
+        this(input, new Profiler(null));
+        Profiler p = (Profiler)dbg;
+        p.setParser(this);
+<else>
         super(input);
+<endif>
 <if(memoize)>
         ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
@@ -169,8 +174,7 @@ public class <name> extends <@superClassName><superClass><@end> {
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}>
     <cyclicDFAs>
 
-<!
-    <cyclicDFADescriptors:{dfa | protected _DFA<dfa.decisionNumber> _dfa<dfa.decisionNumber> = new _DFA<dfa.decisionNumber>();}>
+<!    <cyclicDFADescriptors:{dfa | protected _DFA<dfa.decisionNumber> _dfa<dfa.decisionNumber> = new _DFA<dfa.decisionNumber>();}>
     <cyclicDFADescriptors:cyclicDFATables()> <! dump tables for all DFA !>
 
     <synpreds:{p | <synpred(name=p)>}>
@@ -881,7 +885,9 @@ static final int[] min = { <dfa.min; separator=", "> };
 static final int[] max = { <dfa.max; separator=", "> };
 static final int[] accept = { <dfa.accept; separator=", "> };
 static final int[] special = { <dfa.special; separator=", "> };
-static final int[][] transition = { <dfa.transition:{t|\{<t; separator=", ">\}}; separator=", "> };
+static final int[][] transition = {
+    <dfa.transition:{t|\{<t; wrap="true", separator=", ">\}}; separator=",\n">
+};
 
 class _DFA<dfa.decisionNumber> extends DFA2 {
     public _DFA<dfa.decisionNumber>() {
