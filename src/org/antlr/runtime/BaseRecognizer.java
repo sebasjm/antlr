@@ -54,6 +54,7 @@ public abstract class BaseRecognizer {
 
 	/** reset the parser's state */
 	public void reset() {
+		// TODO: implement this!
 		//following.setSize(0);
 	}
 
@@ -369,7 +370,7 @@ public abstract class BaseRecognizer {
 	}
 
 	protected BitSet combineFollows(boolean exact) {
-		int top = following.length-1;
+		int top = _fsp;
 		BitSet followSet = new BitSet();
 		for (int i=top; i>=0; i--) {
 			BitSet localFollowSet = (BitSet) following[i];
@@ -421,7 +422,6 @@ public abstract class BaseRecognizer {
 										   BitSet follow)
 		throws RecognitionException
 	{
-		//System.out.println("recoverFromMismatchedToken");
 		// if next token is what we are looking for then "delete" this token
 		if ( input.LA(2)==ttype ) {
 			reportError(e);
@@ -557,6 +557,10 @@ public abstract class BaseRecognizer {
 		return rules;
 	}
 
+	public int getBacktrackingLevel() {
+		return backtracking;
+	}
+
 	/** Used to print out token names like ID during debugging and
 	 *  error reporting.  The generated parsers implement a method
 	 *  that overrides this to point to their String[] tokenNames.
@@ -667,7 +671,7 @@ public abstract class BaseRecognizer {
 	 *  This resets the failed instance var afterwards.
 	 */
 	public boolean synpred(IntStream input, GrammarFragmentPtr fragment) {
-		int i = input.index();
+		//int i = input.index();
 		//System.out.println("begin backtracking="+backtracking+" @"+i+"="+((CommonTokenStream)input).LT(1));
 		backtracking++;
 		beginBacktrack(backtracking);

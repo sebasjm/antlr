@@ -61,9 +61,9 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  stream.
 	 */
     public Token nextToken() {
-        token=null;
-		tokenStartCharIndex = getCharIndex();
 		while (true) {
+			token=null;
+			tokenStartCharIndex = getCharIndex();
             if ( input.LA(1)==CharStream.EOF ) {
                 return Token.EOF_TOKEN;
             }
