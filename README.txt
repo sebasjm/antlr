@@ -263,6 +263,10 @@ CHANGES
 
 3.0ea10 -
 
+June 2, 2006
+
+* Improved grammar stats and added syntactic pred tracking.
+
 June 1, 2006
 
 * Due to a type mismatch, the DebugParser.recoverFromMismatchedToken()
