@@ -263,7 +263,44 @@ CHANGES
 
 3.0ea10 -
 
-* added method to get left recursive rules from grammar.
+June 1, 2006
+
+* Due to a type mismatch, the DebugParser.recoverFromMismatchedToken()
+  method was not called.  Debug events for mismatched token error
+  notification were not sent to ANTLRWorks probably
+
+* Added getBacktrackingLevel() for any recognizer; needed for profiler.
+
+* Only writes profiling data for antlr grammar analysis with -profile set
+
+* Major update and bug fix to (runtime) Profiler.
+
+May 27, 2006
+
+* Added Lexer.skip() to force lexer to ignore current token and look for
+  another; no token is created for current rule and is not passed on to
+  parser (or other consumer of the lexer).
+
+* Parsers are much faster now.  I removed use of java.util.Stack for pushing
+  follow sets and use a hardcoded array stack instead.  Dropped from
+  5900ms to 3900ms for parse+lex time parsing entire java 1.4.2 source.  Lex
+  time alone was about 1500ms.  Just looking at parse time, we get about 2x
+  speed improvement. :)
+
+May 26, 2006
+
+* Fixed NFA construction so it generates NFA for (A*)* such that ANTLRWorks 
+  can display it properly.
+
+May 25, 2006
+
+* added abort method to Grammar so AW can terminate the conversion if it's
+  taking too long.
+
+May 24, 2006
+ 
+* added method to get left recursive rules from grammar without doing full
+  grammar analysis.
 
 * analysis, code gen not attempted if serious error (like
   left-recursion or missing rule definition) occurred while reading
