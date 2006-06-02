@@ -37,10 +37,7 @@ import org.antlr.analysis.*;
 import org.antlr.misc.*;
 import org.antlr.misc.BitSet;
 import org.antlr.runtime.CharStream;
-import org.antlr.stringtemplate.CommonGroupLoader;
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.stringtemplate.StringTemplateGroupLoader;
+import org.antlr.stringtemplate.*;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.tool.*;
 
@@ -127,6 +124,8 @@ public class CodeGenerator {
 
 	/** Cache rule invocation results during backtracking */
 	protected boolean memoize = true;
+
+	protected int lineWidth = 72;
 
 	/** I have factored out the generation of acyclic DFAs to separate class */
 	protected ACyclicDFACodeGenerator acyclicDFAGenerator =
@@ -230,7 +229,6 @@ public class CodeGenerator {
 		else {
 			templates = coreTemplates;
 		}
-		//templates.getStringTemplateWriter();
 	}
 
 	/** Given the grammar to which we are attached, walk the AST associated
@@ -306,6 +304,9 @@ public class CodeGenerator {
 
 		outputFileST.setAttribute("trace", new Boolean(trace));
 		headerFileST.setAttribute("trace", new Boolean(trace));
+
+		outputFileST.setAttribute("profile", new Boolean(profile));
+		headerFileST.setAttribute("profile", new Boolean(profile));
 
 		// RECOGNIZER
 		if ( grammar.type==Grammar.LEXER ) {
@@ -871,8 +872,6 @@ public class CodeGenerator {
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
-		// for now turn on profile so we have a listener for the dbg events
-		//this.profile = true;
 	}
 
 	public void setTrace(boolean trace) {
@@ -889,13 +888,6 @@ public class CodeGenerator {
 	public void setMemoize(boolean memoize) {
 		this.memoize = memoize;
 	}
-
-	/** During early-access release, this distinguishes between
-	 *  forced profiling and -profile option
-	public void setDumpProfile(boolean dumpProfile) {
-		this.dumpProfile = dumpProfile;
-	}
-	 */
 
 	public String getRecognizerFileName() {
 		StringTemplate extST = templates.getInstanceOf("codeFileExtension");
@@ -914,6 +906,7 @@ public class CodeGenerator {
 	public void write(StringTemplate code, String fileName) throws IOException {
 		Writer w = tool.getOutputFile(grammar, fileName);
 		long start = System.currentTimeMillis();
+		//String output = code.toString(lineWidth);
 		String output = code.toString();
 		long stop = System.currentTimeMillis();
 		System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
