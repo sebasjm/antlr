@@ -27,10 +27,12 @@
 */
 package org.antlr.analysis;
 
+import org.antlr.Tool;
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.IntervalSet;
 import org.antlr.runtime.IntStream;
 import org.antlr.tool.*;
-import org.antlr.Tool;
 
 import java.util.*;
 
@@ -49,9 +51,9 @@ public class DFA {
 	 */
 	public static final int MAX_STATES_PER_ALT_IN_DFA = 400;
 
-	public static int MAX_TIME_PER_DFA_CREATION = 2*1000;
+	public static int MAX_TIME_PER_DFA_CREATION = 0; //2*1000;
 
-	public static int MAX_STATE_TRANSITIONS_FOR_TABLE = 127; // enough for ascii
+	public static int MAX_STATE_TRANSITIONS_FOR_TABLE = 255;
 
 	/** What's the start state for this DFA? */
     public DFAState startState;
@@ -62,17 +64,24 @@ public class DFA {
     /** From what NFAState did we create the DFA? */
     public NFAState decisionNFAStartState;
 
-    /** A set of all uniquely-numbered DFA states.  Maps hash of DFAState
+	/** The printable grammar fragment associated with this DFA */
+	public String description;
+
+	/** A set of all uniquely-numbered DFA states.  Maps hash of DFAState
      *  to the actual DFAState object.  We use this to detect
      *  existing DFA states.  Map<DFAState,DFAState>.  Use Map so
 	 *  we can get old state back (Set only allows you to see if it's there).
+	 *  Not used during fixed k lookahead as it's a waste to fill it with
+	 *  a dup of states array.
      */
     protected Map uniqueStates = new HashMap();
 
 	/** Maps the state number to the actual DFAState.  Use a Vector as it
 	 *  grows automatically when I set the ith element.  This contains all
 	 *  states, but the states are not unique.  s3 might be same as s1 so
-	 *  s3 -> s1 in this table.  This is how cycles occur.
+	 *  s3 -> s1 in this table.  This is how cycles occur.  If fixed k,
+	 *  then these states will all be unique as states[i] always points
+	 *  at state i when no cycles exist.
 	 */
 	protected Vector states = new Vector();
 
@@ -135,13 +144,24 @@ public class DFA {
 	/* This DFA can be converted to a transition[state][char] table and
 	 * the following tables are filled by createStateTables upon request.
 	 * These are injected into the templates for code generation.
+	 * See March 25, 2006 entry for description:
+	 *   http://www.antlr.org/blog/antlr3/codegen.tml
+	 * Often using Vector as can't set ith position in a List and have
+	 * it extend list size; bizarre.
 	 */
-	public Vector specialStates;
+
+	/** List of special DFAState objects */
+	public List specialStates;
+	/** List of ST for special states. */
+	public List specialStateSTs;
 	public Vector accept;
+	public Vector eot;
+	public Vector eof;
 	public Vector min;
 	public Vector max;
 	public Vector special;
 	public Vector transition;
+	protected int uniqueCompressedSpecialStateNum = 0;
 
 	public DFA(int decisionNumber, NFAState decisionStartState) {
 		this.decisionNumber = decisionNumber;
@@ -185,10 +205,24 @@ public class DFA {
 	 *  number on this.  Useful mostly for code generation in tables.
 	 */
 	public void resetStateNumbersToBeContiguous() {
+		/*
 		if ( !isCyclic() ) {
 			return;
 		}
+		*/
+		if ( getUserMaxLookahead()>0 ) {
+			// all numbers are unique already; no states are thrown out.
+			return;
+		}
 		int snum=0;
+		/*
+		if ( decisionNumber==30 ) {
+			System.out.println("DFA :"+decisionNumber+" "+this);
+			System.out.println("unique states: "+getUniqueStates());
+			System.out.println("states: "+states);
+			System.out.println("stateCounter="+stateCounter);
+		}
+		*/
 		Map states = getUniqueStates();
 		for (int i = 0; i <= getMaxStateNumber(); i++) {
 			DFAState s = getState(i);
@@ -199,31 +233,117 @@ public class DFA {
 			}
 		}
 		if ( snum!=getNumberOfStates() ) {
-			ErrorManager.internalError("max state num "+getNumberOfStates()+
+			ErrorManager.internalError("DFA "+decisionNumber+": "+decisionNFAStartState.getDescription()+" max state num "+getNumberOfStates()+
 				"!= max renumbered state "+snum);
 		}
 	}
 
-	public void createStateTables() {
-		System.out.println("createTables:\n"+this);
+	// JAVA-SPECIFIC Accessors!!!!!  It is so impossible to get arrays
+	// or even consistently formatted strings acceptable to java that
+	// I am forced to build the individual char elements here
+
+	public List getJavaCompressedAccept() { return getRunLengthEncoding(accept); }
+	public List getJavaCompressedEOT() { return getRunLengthEncoding(eot); }
+	public List getJavaCompressedEOF() { return getRunLengthEncoding(eof); }
+	public List getJavaCompressedMin() { return getRunLengthEncoding(min); }
+	public List getJavaCompressedMax() { return getRunLengthEncoding(max); }
+	public List getJavaCompressedSpecial() { return getRunLengthEncoding(special); }
+	public List getJavaCompressedTransition() {
+		if ( transition==null || transition.size()==0 ) {
+			return null;
+		}
+		List encoded = new ArrayList(transition.size());
+		// walk Vector<Vector<FormattedInteger>> which is the transition[][] table
+		for (int i = 0; i < transition.size(); i++) {
+			Vector transitionsForState = (Vector) transition.elementAt(i);
+			encoded.add(getRunLengthEncoding(transitionsForState));
+		}
+		return encoded;
+	}
+
+	/** Compress the incoming data list so that runs of same number are
+	 *  encoded as number,value pair sequences.  3 -1 -1 -1 28 is encoded
+	 *  as 1 3 3 -1 1 28.  I am pretty sure this is the lossless compression
+	 *  that GIF files use.  Transition tables are heavily compressed by
+	 *  this technique.  I got the idea from JFlex http://jflex.de/
+	 *
+	 *  Return List<String> where each string is either \xyz for 8bit char
+	 *  and \uFFFF for 16bit.  Hideous and specific to Java, but it is the
+	 *  only target bad enough to need it.
+	 */
+	public static List getRunLengthEncoding(List data) {
+		if ( data==null || data.size()==0 ) {
+			// for states with no transitions we want an empty string ""
+			// to hold its place in the transitions array.
+			List empty = new ArrayList();
+			empty.add("");
+			return empty;
+		}
+		Integer negOneI = new Integer(-1);
+		int size = Math.max(2,data.size()/2);
+		List encoded = new ArrayList(size); // guess at size
+		// scan values looking for runs
+		int i = 0;
+		while ( i < data.size() ) {
+			Integer I = (Integer)data.get(i);
+			if ( I==null ) {
+				I = negOneI; // empty values become -1
+			}
+			// count how many v there are?
+			int n = 0;
+			for (int j = i; j < data.size(); j++) {
+				Integer v = (Integer)data.get(j);
+				if ( v==null ) {
+					v = negOneI; // empty values become -1
+				}
+				if ( I.equals(v) ) {
+					n++;
+				}
+				else {
+					break;
+				}
+			}
+			encoded.add(encodeIntAsCharEscape((char)n));
+			encoded.add(encodeIntAsCharEscape((char)I.intValue()));
+			i+=n;
+		}
+		return encoded;
+	}
+
+	public void createStateTables(CodeGenerator generator) {
+		//System.out.println("createTables:\n"+this);
+
+		description = getNFADecisionStartState().getDescription();
+		description =
+			generator.target.getTargetStringLiteralFromString(description);
 
 		// create all the tables
-		specialStates = new Vector(this.getNumberOfStates()); // Vector<int>
-		specialStates.setSize(this.getNumberOfStates());
+		special = new Vector(this.getNumberOfStates()); // Vector<short>
+		special.setSize(this.getNumberOfStates());
+		specialStates = new ArrayList();				// List<DFAState>
+		specialStateSTs = new ArrayList();				// List<ST>
 		accept = new Vector(this.getNumberOfStates()); // Vector<int>
 		accept.setSize(this.getNumberOfStates());
+		eot = new Vector(this.getNumberOfStates()); // Vector<int>
+		eot.setSize(this.getNumberOfStates());
+		eof = new Vector(this.getNumberOfStates()); // Vector<int>
+		eof.setSize(this.getNumberOfStates());
 		min = new Vector(this.getNumberOfStates()); // Vector<int>
 		min.setSize(this.getNumberOfStates());
 		max = new Vector(this.getNumberOfStates()); // Vector<int>
 		max.setSize(this.getNumberOfStates());
-		special = new Vector(this.getNumberOfStates()); // Vector<short>
-		special.setSize(this.getNumberOfStates());
 		transition = new Vector(this.getNumberOfStates()); // Vector<Vector<int>>
 		transition.setSize(this.getNumberOfStates());
 
-		// for each state in the DFA
-		Map states = this.getUniqueStates();
-		for (Iterator it = states.values().iterator(); it.hasNext();) {
+		// for each state in the DFA, fill relevant tables.
+		Iterator it = null;
+		if ( getUserMaxLookahead()>0 ) {
+			it = states.iterator();
+		}
+		else {
+			it = getUniqueStates().values().iterator();
+		}
+		while ( it.hasNext() ) {
 			DFAState s = (DFAState)it.next();
 			if ( s.isAcceptState() ) {
 				// can't compute min,max,special,transition on accepts
@@ -237,16 +357,62 @@ public class DFA {
 				accept.set(s.stateNumber, new Integer(0)); // doesn't predict
 				createMinMaxTables(s);
 				createTransitionTable(s);
-				createSpecialTable(s);
+				createSpecialTable(generator, s);
+				createEOTTable(s);
 			}
 		}
 
+		// now that we have computed list of specialStates, gen code for 'em
+		for (int i = 0; i < specialStates.size(); i++) {
+			DFAState ss = (DFAState) specialStates.get(i);
+			StringTemplate stateST =
+				generator.generateSpecialState(ss);
+			specialStateSTs.add(stateST);
+		}
+
+		// check that the tables are not messed up by encode/decode
+		/*
+		testEncodeDecode(min);
+		testEncodeDecode(max);
+		testEncodeDecode(accept);
+		testEncodeDecode(special);
 		System.out.println("min="+min);
 		System.out.println("max="+max);
 		System.out.println("accept="+accept);
 		System.out.println("special="+special);
 		System.out.println("transition="+transition);
+		*/
 	}
+
+	/*
+	private void testEncodeDecode(List data) {
+		//System.out.println("data="+data);
+		List encoded = getRunLengthEncoding(data);
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < encoded.size(); i++) {
+			String I = (String)encoded.get(i);
+			int v = 0;
+			if ( I.startsWith("\\u") ) {
+				v = Integer.parseInt(I.substring(2,I.length()), 16);
+			}
+			else {
+				v = Integer.parseInt(I.substring(1,I.length()), 8);
+			}
+			buf.append((char)v);
+		}
+		String encodedS = buf.toString();
+		short[] decoded = DFA_.unpackEncodedString(encodedS);
+		//System.out.println("decoded:");
+		for (int i = 0; i < decoded.length; i++) {
+			short x = decoded[i];
+			if ( x!=((Integer)data.get(i)).intValue() ) {
+				System.err.println("problem with encoding");
+			}
+			//System.out.print(", "+x);
+		}
+		//System.out.println();
+	}
+*/
 
 	protected void createMinMaxTables(DFAState s) {
 		int smin = Label.MAX_CHAR_VALUE + 1;
@@ -255,11 +421,13 @@ public class DFA {
 			Transition edge = (Transition) s.transition(j);
 			Label label = edge.label;
 			if ( label.isAtom() ) {
-				if ( label.getAtom()<smin ) {
-					smin = label.getAtom();
-				}
-				if ( label.getAtom()>smax ) {
-					smax = label.getAtom();
+				if ( label.getAtom()>=Label.MIN_CHAR_VALUE ) {
+					if ( label.getAtom()<smin ) {
+						smin = label.getAtom();
+					}
+					if ( label.getAtom()>smax ) {
+						smax = label.getAtom();
+					}
 				}
 			}
 			else if ( label.isSet() ) {
@@ -273,8 +441,18 @@ public class DFA {
 			}
 		}
 
+		if ( smax<0 ) {
+			// must be predicates or pure EOT transition; just zero out min, max
+			smin = Label.MIN_CHAR_VALUE;
+			smax = Label.MIN_CHAR_VALUE;
+		}
+
 		min.set(s.stateNumber, new Integer(smin));
 		max.set(s.stateNumber, new Integer(smax));
+
+		if ( smax<0 || smin>Label.MAX_CHAR_VALUE ) {
+			ErrorManager.internalError("messed up: min="+min+", max="+max);
+		}
 	}
 
 	protected void createTransitionTable(DFAState s) {
@@ -292,7 +470,7 @@ public class DFA {
 		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
 			Transition edge = (Transition) s.transition(j);
 			Label label = edge.label;
-			if ( label.isAtom() ) {
+			if ( label.isAtom() && label.getAtom()>=Label.MIN_CHAR_VALUE ) {
 				int labelIndex = label.getAtom()-smin; // offset from 0
 				stateTransitions.set(labelIndex,
 									 new Integer(edge.target.stateNumber));
@@ -310,22 +488,42 @@ public class DFA {
 		}
 	}
 
-	protected void createSpecialTable(DFAState s) {
-		// number all special states from 0...n-1 instead of their usual numbers
-		int uniqueCompressedSpecialStateNum = 0;
-		boolean hasSemPred = false;
-
+	protected void createEOTTable(DFAState s) {
 		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
 			Transition edge = (Transition) s.transition(j);
 			Label label = edge.label;
-			if ( label.isSemanticPredicate() ) {
+			if ( label.isAtom() && label.getAtom()==Label.EOT ) {
+				// eot[s] points to accept state
+				eot.set(s.stateNumber, new Integer(edge.target.stateNumber));
+			}
+			else if ( label.isAtom() && label.getAtom()==Label.EOF ) {
+				// eof[s] points to accept state
+				eof.set(s.stateNumber, new Integer(edge.target.stateNumber));
+			}
+		}
+	}
+
+	protected void createSpecialTable(CodeGenerator generator, DFAState s) {
+		// number all special states from 0...n-1 instead of their usual numbers
+		boolean hasSemPred = false;
+
+		// TODO this code is very similar to canGenerateSwitch.  Refactor to share
+		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
+			Transition edge = (Transition) s.transition(j);
+			Label label = edge.label;
+			// can't do a switch if the edges have preds or are going to
+			// require gated predicates
+			if ( label.isSemanticPredicate() ||
+				 ((DFAState)edge.target).getGatedPredicatesInNFAConfigurations()!=null)
+			{
 				hasSemPred = true;
+				break;
 			}
 		}
 		// if has pred or too big for table, make it special
 		int smax = ((Integer)max.get(s.stateNumber)).intValue();
 		int smin = ((Integer)min.get(s.stateNumber)).intValue();
-		if ( hasSemPred || smax-smin>MAX_STATE_TRANSITIONS_FOR_TABLE) {
+		if ( hasSemPred || smax-smin>MAX_STATE_TRANSITIONS_FOR_TABLE ) {
 			special.set(s.stateNumber,
 						new Integer(uniqueCompressedSpecialStateNum));
 			uniqueCompressedSpecialStateNum++;
@@ -334,10 +532,14 @@ public class DFA {
 		else {
 			special.set(s.stateNumber, new Integer(-1)); // not special
 		}
+	}
 
-		for (int i = 0; i < specialStates.size(); i++) {
-			DFAState ss = (DFAState) specialStates.get(i);
+	public static String encodeIntAsCharEscape(int v) {
+		if ( v<=127 ) {
+			return "\\"+Integer.toOctalString(v);
 		}
+		String hex = Integer.toHexString(v|0x10000).substring(1,5);
+		return "\\u"+hex;
 	}
 
 	public int predict(IntStream input) {
@@ -348,14 +550,16 @@ public class DFA {
 	/** Add a new DFA state to this DFA if not already present.
      *  To force an acyclic, fixed maximum depth DFA, just always
 	 *  return the incoming state.  By not reusing old states,
-	 *  no cycles can be created.
+	 *  no cycles can be created.  If we're doing fixed k lookahead
+	 *  don't updated uniqueStates, just return incoming state, which
+	 *  indicates it's a new state.
      */
     protected DFAState addState(DFAState d) {
-		if ( getMaxLookahead()>0 ) {
-			uniqueStates.put(d,d);
-			numberOfStates++;
+		if ( getUserMaxLookahead()>0 ) {
 			return d;
 		}
+		// does a DFA state exist already with everything the same
+		// except its state number?
 		DFAState existing = (DFAState)uniqueStates.get(d);
 		if ( existing != null ) {
 			// already there...get the existing DFA state
@@ -370,7 +574,6 @@ public class DFA {
 
 	public void removeState(DFAState d) {
 		DFAState it = (DFAState)uniqueStates.remove(d);
-		// states.set(d.stateNumber, null);
 		if ( it!=null ) {
 			numberOfStates--;
 		}
@@ -411,7 +614,7 @@ public class DFA {
      *  to distinguish between alternatives.
      */
     public boolean isCyclic() {
-        return cyclic && getMaxLookahead()==0;
+        return cyclic && getUserMaxLookahead()==0;
     }
 
 	/** Is this DFA derived from the NFA for the Tokens rule? */
@@ -431,7 +634,7 @@ public class DFA {
 	 *  DFA cycles are created when this value, k, is greater than 0.
 	 *  If this decision has no k lookahead specified, then try the grammar.
 	 */
-	public int getMaxLookahead() {
+	public int getUserMaxLookahead() {
 		if ( user_k>=0 ) { // cache for speed
 			return user_k;
 		}
@@ -563,6 +766,10 @@ public class DFA {
 		altToAcceptState[alt] = acceptState;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
 	public int getDecisionNumber() {
         return decisionNFAStartState.getDecisionNumber();
     }
@@ -594,6 +801,10 @@ public class DFA {
     }
 
 	public int getNumberOfStates() {
+		if ( getUserMaxLookahead()>0 ) {
+			// if using fixed lookahead then uniqueSets not set
+			return states.size();
+		}
 		return numberOfStates;
 	}
 
@@ -615,8 +826,10 @@ public class DFA {
 
 	public String toString() {
 		FASerializer serializer = new FASerializer(nfa.grammar);
-		String result = serializer.serialize(startState);
-		return result;
+		if ( startState==null ) {
+			return "";
+		}
+		return serializer.serialize(startState);
 	}
 
 	/** EOT (end of token) is a label that indicates when the DFA conversion

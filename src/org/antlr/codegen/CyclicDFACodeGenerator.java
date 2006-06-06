@@ -27,13 +27,13 @@
 */
 package org.antlr.codegen;
 
+import org.antlr.analysis.DFA;
+import org.antlr.analysis.DFAState;
+import org.antlr.analysis.Label;
+import org.antlr.analysis.Transition;
+import org.antlr.misc.IntSet;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.analysis.*;
-import org.antlr.misc.BitSet;
-import org.antlr.misc.IntSet;
-
-import java.util.List;
 
 public class CyclicDFACodeGenerator {
 	protected CodeGenerator parentGenerator;
@@ -48,118 +48,22 @@ public class CyclicDFACodeGenerator {
 		this.parentGenerator = parent;
 	}
 
-	public StringTemplate genCyclicLookaheadDecision(StringTemplateGroup templates,
-													 DFA dfa)
-	{
-		this.dfa = dfa;
-		StringTemplate dfaST = templates.getInstanceOf("cyclicDFA");
-		int d = dfa.getDecisionNumber();
-		dfaST.setAttribute("decisionNumber", new Integer(d));
-		String ruleName = dfa.getDecisionASTNode().getEnclosingRule();
-		dfaST.setAttribute("ruleName", ruleName);
-		dfaST.setAttribute("ruleDescriptor", parentGenerator.grammar.getRule(ruleName));
-		dfaST.setAttribute("className", parentGenerator.getClassName());
-		visited = new BitSet(dfa.getMaxStateNumber()+1);
-		walkCyclicDFAGeneratingStateMachine(templates, dfaST, dfa.startState);
-		return dfaST;
-	}
-
-	protected void walkCyclicDFAGeneratingStateMachine(
-			StringTemplateGroup templates,
-			StringTemplate dfaST,
-			DFAState s)
-	{
-		if ( visited.member(s.stateNumber) ) {
-			return; // already visited
-		}
-		visited.add(s.stateNumber);
-
+	/** A special state is huge (too big for state tables) or has a predicated
+	 *  edge.  Generate a simple if-then-else.  Cannot be an accept state as
+	 *  they have no emanating edges.  Don't worry about switch vs if-then-else
+	 *  because if you get here, the state is super complicated and needs an
+	 *  if-then-else.  This is used by the new DFA scheme created June 2006.
+	 */
+	public StringTemplate generateSpecialState(DFAState s) {
+		StringTemplateGroup templates = parentGenerator.templates;
 		StringTemplate stateST;
-		if ( s.isAcceptState() ) {
-			stateST = templates.getInstanceOf("cyclicDFAAcceptState");
-			stateST.setAttribute("predictAlt",
-								 new Integer(s.getUniquelyPredictedAlt()));
-		}
-		else {
-			if ( parentGenerator.canGenerateSwitch(s) ) {
-				stateST = templates.getInstanceOf("cyclicDFAStateSwitch");
-			}
-			else {
-				stateST = templates.getInstanceOf("cyclicDFAState");
-			}
-			stateST.setAttribute("needErrorClause", new Boolean(true));
-			stateST.setAttribute("semPredState",
-								 new Boolean(s.isResolvedWithPredicates()));
-		}
-		stateST.setAttribute("stateNumber", new Integer(s.stateNumber));
-		if ( parentGenerator.canGenerateSwitch(s) ) {
-			walkEdgesGeneratingComputedGoto(s, templates, stateST, dfaST);
-		}
-		else {
-			walkEdgesGeneratingIfThenElse(s, templates, stateST, dfaST);
-		}
-		dfaST.setAttribute("states", stateST);
-	}
+		stateST = templates.getInstanceOf("cyclicDFAState");
+		stateST.setAttribute("needErrorClause", new Boolean(true));
+		stateST.setAttribute("semPredState",
+							 new Boolean(s.isResolvedWithPredicates()));
+		stateST.setAttribute("stateNumber", s.stateNumber);
+		stateST.setAttribute("decisionNumber", s.dfa.decisionNumber);
 
-	public static class LabelEdgeNumberPair implements Comparable {
-		public int value;
-		public int edgeNumber;
-		public LabelEdgeNumberPair(int value, int edgeNumber) {
-			this.value = value;
-			this.edgeNumber = edgeNumber;
-		}
-		public int compareTo(Object o) {
-			LabelEdgeNumberPair other = (LabelEdgeNumberPair)o;
-			return this.value-other.value;
-		}
-		public boolean equals(Object o) {
-			LabelEdgeNumberPair other = (LabelEdgeNumberPair)o;
-			return this.value==other.value;
-		}
-	}
-
-	protected void walkEdgesGeneratingComputedGoto(DFAState s,
-												   StringTemplateGroup templates,
-												   StringTemplate stateST,
-												   StringTemplate dfaST)
-	{
-		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
-			Transition edge = (Transition) s.transition(i);
-			int edgeNumber = i+1;
-			Integer edgeNumberI = new Integer(edgeNumber);
-			StringTemplate edgeST;
-			if ( edge.label.getAtom()==Label.EOT ) {
-				stateST.removeAttribute("needErrorClause");
-				stateST.setAttribute("EOTTargetStateNumber",
-									 new Integer(edge.target.stateNumber));
-			}
-			else {
-				edgeST = templates.getInstanceOf("cyclicDFAEdgeSwitch");
-				edgeST.setAttribute("edgeNumber", edgeNumberI);
-				edgeST.setAttribute("targetStateNumber",
-									new Integer(edge.target.stateNumber));
-				List labels = edge.label.getSet().toList();
-				for (int j = 0; j < labels.size(); j++) {
-					Integer vI = (Integer) labels.get(j);
-					String label =
-						parentGenerator.getTokenTypeAsTargetLabel(vI.intValue());
-					labels.set(j, label); // rewrite List element to be name
-				}
-				edgeST.setAttribute("labels", labels);
-				stateST.setAttribute("edges", edgeST);
-			}
-			// now gen code for other states
-			walkCyclicDFAGeneratingStateMachine(templates,
-											   dfaST,
-											   (DFAState)edge.target);
-		}
-	}
-
-	protected void walkEdgesGeneratingIfThenElse(DFAState s,
-												 StringTemplateGroup templates,
-												 StringTemplate stateST,
-												 StringTemplate dfaST)
-	{
 		StringTemplate eotST = null;
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
@@ -179,25 +83,20 @@ public class CyclicDFACodeGenerator {
 			edgeST.setAttribute("edgeNumber", new Integer(i+1));
 			edgeST.setAttribute("targetStateNumber",
 								 new Integer(edge.target.stateNumber));
-
 			// stick in any gated predicates for any edge if not already a pred
 			if ( !edge.label.isSemanticPredicate() ) {
 				DFAState target = (DFAState)edge.target;
 				edgeST.setAttribute("predicates",
 									target.getGatedPredicatesInNFAConfigurations());
 			}
-
 			if ( edge.label.getAtom()!=Label.EOT ) {
 				stateST.setAttribute("edges", edgeST);
 			}
-			// now check other states
-			walkCyclicDFAGeneratingStateMachine(templates,
-											   dfaST,
-											   (DFAState)edge.target);
 		}
 		if ( eotST!=null ) {
 			stateST.setAttribute("edges", eotST);
 		}
+		return stateST;
 	}
 
 }

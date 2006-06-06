@@ -84,10 +84,10 @@ public class NFAToDFAConverter {
 				System.out.println("convert DFA state "+d.stateNumber+
 								   " ("+d.getNFAConfigurations().size()+" nfa states)");
 			}
-			int k = dfa.getMaxLookahead();
+			int k = dfa.getUserMaxLookahead();
 			if ( k>0 && k==d.getLookaheadDepth() ) {
 				// we've hit max lookahead, make this a stop state
-				System.out.println("stop state @k="+k+" (terminated early)");
+				//System.out.println("stop state @k="+k+" (terminated early)");
 				resolveNonDeterminisms(d);
 				// Check to see if we need to add any semantic predicate transitions
 				if ( d.isResolvedWithPredicates() ) {
@@ -581,7 +581,8 @@ public class NFAToDFAConverter {
 			return;
 		}
 
-		if ( System.currentTimeMillis() - d.dfa.conversionStartTime >=
+		if ( DFA.MAX_TIME_PER_DFA_CREATION>0 &&
+			 System.currentTimeMillis() - d.dfa.conversionStartTime >=
 			 DFA.MAX_TIME_PER_DFA_CREATION )
 		{
 			// report and back your way out; we've blown up somehow
@@ -912,9 +913,9 @@ public class NFAToDFAConverter {
 		if ( alt!=NFA.INVALID_ALT_NUMBER ) { // uniquely predicts an alt?
 			d = convertToAcceptState(d, alt);
 			/*
-			System.out.println("state "+d.stateNumber+" uniquely predicts alt "+
+			System.out.println("convert to accept; DFA "+d.dfa.decisionNumber+" state "+d.stateNumber+" uniquely predicts alt "+
 				d.getUniquelyPredictedAlt());
-			*/
+				*/
 		}
 		else {
             // unresolved, add to work list to continue NFA conversion
@@ -936,9 +937,10 @@ public class NFAToDFAConverter {
 			// [must do this after we resolve nondeterminisms in general]
 			DFAState acceptStateForAlt = dfa.getAcceptState(alt);
 			if ( acceptStateForAlt!=null ) {
-				// we already have an accept state for alt
+				// we already have an accept state for alt;
+				// make this d.statenumber point at old DFA state
 				dfa.setState(d.stateNumber, acceptStateForAlt);
-				dfa.removeState(d);    // remove this state from DFA
+				dfa.removeState(d);    // remove this state from unique DFA state set
 				d = acceptStateForAlt; // use old accept state; throw this one out
 			}
 			else {
@@ -1584,6 +1586,15 @@ public class NFAToDFAConverter {
 					c.context,
 					c.semanticContext);
 			predDFATarget.setAcceptState(true);
+			DFAState existingState = dfa.addState(predDFATarget);
+			if ( predDFATarget != existingState ) {
+				// already there...use/return the existing DFA state that
+				// is a target of this predicate.  Make this state number
+				// point at the existing state
+				dfa.setState(predDFATarget.stateNumber, existingState);
+				predDFATarget = existingState;
+			}
+			// add a transition to pred target from d
 			d.addTransition(predDFATarget, new Label(c.semanticContext));
 		}
 	}

@@ -79,6 +79,7 @@ public class CodeGenerator {
 	public int MAX_SWITCH_CASE_LABELS = 300;
 	public int MIN_SWITCH_ALTS = 3;
 	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
+	public static boolean GEN_FIXED_DFA_INLINE = true;
 
 	public String classpathTemplateRootDirectoryName =
 		"org/antlr/codegen/templates";
@@ -128,12 +129,14 @@ public class CodeGenerator {
 	protected int lineWidth = 72;
 
 	/** I have factored out the generation of acyclic DFAs to separate class */
-	protected ACyclicDFACodeGenerator acyclicDFAGenerator =
+	public ACyclicDFACodeGenerator acyclicDFAGenerator =
 		new ACyclicDFACodeGenerator(this);
 
 	/** I have factored out the generation of cyclic DFAs to separate class */
-	protected CyclicDFACodeGenerator cyclicDFAGenerator =
+	/*
+	public CyclicDFACodeGenerator cyclicDFAGenerator =
 		new CyclicDFACodeGenerator(this);
+		*/
 
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
 	protected final String vocabFilePattern =
@@ -560,21 +563,23 @@ public class CodeGenerator {
 											   DFA dfa)
 	{
 		StringTemplate decisionST;
-		if ( !dfa.isCyclic() /* TODO: or too big */ ) {
+		dfa.createStateTables(this);
+		if ( GEN_FIXED_DFA_INLINE && !dfa.isCyclic() /* TODO: and ! too big */ ) {
 			decisionST =
 				acyclicDFAGenerator.genFixedLookaheadDecision(getTemplates(), dfa);
 		}
 		else {
-			//dfa.createStateTables();
 			outputFileST.setAttribute("cyclicDFADescriptors", dfa);
 			headerFileST.setAttribute("cyclicDFADescriptors", dfa);
 
+			/*
 			StringTemplate dfaST =
 				cyclicDFAGenerator.genCyclicLookaheadDecision(templates,
 															  dfa);
 			recognizerST.setAttribute("cyclicDFAs", dfaST);
 			outputFileST.setAttribute("cyclicDFAs", dfaST);
 			headerFileST.setAttribute("cyclicDFAs", dfaST);
+			*/
 			decisionST = templates.getInstanceOf("dfaDecision");
 			String description = dfa.getNFADecisionStartState().getDescription();
 			description = target.getTargetStringLiteralFromString(description);
@@ -585,6 +590,56 @@ public class CodeGenerator {
 									new Integer(dfa.getDecisionNumber()));
 		}
 		return decisionST;
+	}
+
+	/** A special state is huge (too big for state tables) or has a predicated
+	 *  edge.  Generate a simple if-then-else.  Cannot be an accept state as
+	 *  they have no emanating edges.  Don't worry about switch vs if-then-else
+	 *  because if you get here, the state is super complicated and needs an
+	 *  if-then-else.  This is used by the new DFA scheme created June 2006.
+	 */
+	public StringTemplate generateSpecialState(DFAState s) {
+		StringTemplate stateST;
+		stateST = templates.getInstanceOf("cyclicDFAState");
+		stateST.setAttribute("needErrorClause", new Boolean(true));
+		stateST.setAttribute("semPredState",
+							 new Boolean(s.isResolvedWithPredicates()));
+		stateST.setAttribute("stateNumber", s.stateNumber);
+		stateST.setAttribute("decisionNumber", s.dfa.decisionNumber);
+
+		StringTemplate eotST = null;
+		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
+			Transition edge = (Transition) s.transition(i);
+			StringTemplate edgeST;
+			if ( edge.label.getAtom()==Label.EOT ) {
+				// this is the default clause; has to held until last
+				edgeST = templates.getInstanceOf("eotDFAEdge");
+				stateST.removeAttribute("needErrorClause");
+				eotST = edgeST;
+			}
+			else {
+				edgeST = templates.getInstanceOf("cyclicDFAEdge");
+				StringTemplate exprST =
+					genLabelExpr(templates,edge,1);
+				edgeST.setAttribute("labelExpr", exprST);
+			}
+			edgeST.setAttribute("edgeNumber", new Integer(i+1));
+			edgeST.setAttribute("targetStateNumber",
+								 new Integer(edge.target.stateNumber));
+			// stick in any gated predicates for any edge if not already a pred
+			if ( !edge.label.isSemanticPredicate() ) {
+				DFAState target = (DFAState)edge.target;
+				edgeST.setAttribute("predicates",
+									target.getGatedPredicatesInNFAConfigurations());
+			}
+			if ( edge.label.getAtom()!=Label.EOT ) {
+				stateST.setAttribute("edges", edgeST);
+			}
+		}
+		if ( eotST!=null ) {
+			stateST.setAttribute("edges", eotST);
+		}
+		return stateST;
 	}
 
 	/** Generate an expression for traversing an edge. */
@@ -907,8 +962,8 @@ public class CodeGenerator {
 	public void write(StringTemplate code, String fileName) throws IOException {
 		Writer w = tool.getOutputFile(grammar, fileName);
 		long start = System.currentTimeMillis();
-		//String output = code.toString(lineWidth);
-		String output = code.toString();
+		String output = code.toString(lineWidth);
+		//String output = code.toString();
 		long stop = System.currentTimeMillis();
 		//System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
 		w.write(output);
@@ -934,84 +989,6 @@ public class CodeGenerator {
 		return true;
 	}
 
-	public String toTables(DFA d) {
-		int uniqueCompressedStateNum = 0;
-		List specialStates = new ArrayList();
-		StringBuffer buf = new StringBuffer();
-		buf.append("boolean[] accept = {");
-		for (int i = 0; i < d.getNumberOfStates(); i++) {
-			if ( i>0 ) buf.append(',');
-			DFAState s = d.getState(i);
-			buf.append(s.isAcceptState());
-		}
-		buf.append("};\n");
-		buf.append("short[] special = {");
-		for (int i = 0; i < d.getNumberOfStates(); i++) {
-			if ( i>0 ) buf.append(',');
-			DFAState s = d.getState(i);
-			if ( canGenerateSwitch(s) ) {
-				buf.append(-1);
-			}
-			else {
-				buf.append(uniqueCompressedStateNum);
-				uniqueCompressedStateNum++;
-				// TODO: add s to List of special states in switch
-				specialStates.add(s);
-			}
-		}
-		buf.append("};\n");
-		buf.append("char[] min = {");
-		for (int i = 0; i < d.getNumberOfStates(); i++) {
-			if ( i>0 ) buf.append(',');
-			DFAState s = d.getState(i);
-			OrderedHashSet labels = s.getReachableLabels();
-			int min = Label.MAX_CHAR_VALUE + 1;
-			for (int j = 0; j < s.getNumberOfTransitions(); j++) {
-				Transition edge = (Transition) s.transition(j);
-				Label label = edge.label;
-				if ( label.isAtom() && label.getAtom()<min ) {
-					min = label.getAtom();
-				}
-			}
-			buf.append(min);
-		}
-		buf.append("};\n");
-		buf.append("char[] max = {");
-		for (int i = 0; i < d.getNumberOfStates(); i++) {
-			if ( i>0 ) buf.append(',');
-			DFAState s = d.getState(i);
-			OrderedHashSet labels = s.getReachableLabels();
-			int max = Label.MIN_ATOM_VALUE - 1;
-			for (int j = 0; j < s.getNumberOfTransitions(); j++) {
-				Transition edge = (Transition) s.transition(j);
-				Label label = edge.label;
-				if ( label.isAtom() && label.getAtom()>max ) {
-					max = label.getAtom();
-				}
-			}
-			buf.append(max);
-		}
-		buf.append("};\n");
-		buf.append("short transition[][] = {");
-		for (int i = 0; i < d.getNumberOfStates(); i++) {
-			if ( i>0 ) buf.append(',');
-			DFAState s = d.getState(i);
-			buf.append("{");
-			for (int j = 0; j < s.getNumberOfTransitions(); j++) {
-				if ( j>0 ) buf.append(',');
-				Transition edge = (Transition) s.transition(j);
-			}
-			buf.append("}");
-		}
-		buf.append("};\n");
-
-		for (int i = 0; i < specialStates.size(); i++) {
-			DFAState s = (DFAState) specialStates.get(i);
-		}
-
-		return buf.toString();
-	}
-
 	/** You can generate a switch rather than if-then-else for a DFA state
 	 *  if there are no semantic predicates and the number of edge label
 	 *  values is small enough; e.g., don't generate a switch for a state
@@ -1028,13 +1005,14 @@ public class CodeGenerator {
 			if ( edge.label.isSemanticPredicate() ) {
 				return false;
 			}
+			// can't do a switch if the edges are going to required gated predicates
 			if ( ((DFAState)edge.target).getGatedPredicatesInNFAConfigurations()!=null ) {
-				// can't do a switch if the edges are going to required gated predicates
 				return false;
 			}
 			size += edge.label.getSet().size();
 		}
-		if ( s.getNumberOfTransitions()<MIN_SWITCH_ALTS || size>MAX_SWITCH_CASE_LABELS ) {
+		if ( s.getNumberOfTransitions()<MIN_SWITCH_ALTS ||
+			 size>MAX_SWITCH_CASE_LABELS ) {
 			return false;
 		}
 		return true;

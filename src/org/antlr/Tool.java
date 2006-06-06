@@ -39,7 +39,7 @@ public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-	public static final String VERSION = "3.0ea10";
+	public static final String VERSION = "3.0ea11";
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
 
@@ -67,7 +67,7 @@ public class Tool {
 
     public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
-						  VERSION + " (June 2, 2006)  1989-2006");
+						  VERSION + " (?)  1989-2006");
 		Tool antlr = new Tool(args);
 		antlr.process();
 		System.exit(0);

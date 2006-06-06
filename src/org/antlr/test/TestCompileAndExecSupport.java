@@ -325,7 +325,11 @@ public class TestCompileAndExecSupport {
 		StringTemplate outputFileST = new StringTemplate(
 			"import org.antlr.runtime.*;\n" +
 			"import org.antlr.runtime.tree.*;\n" +
+			"import org.antlr.runtime.debug.*;\n" +
 			"\n" +
+			"class Profiler2 extends Profiler {\n" +
+			"    public void terminate() { ; }\n" +
+			"}\n"+
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
 			"        CharStream input = new ANTLRFileStream(args[0]);\n" +
@@ -338,7 +342,7 @@ public class TestCompileAndExecSupport {
 			);
 		StringTemplate createParserST =
 			new StringTemplate(
-			"        Profiler profiler = new Profiler();\n"+
+			"        Profiler2 profiler = new Profiler2();\n"+
 			"        $parserName$ parser = new $parserName$(tokens,profiler);\n" +
 			"        profiler.setParser(parser);\n");
 		if ( !debug ) {
@@ -365,6 +369,9 @@ public class TestCompileAndExecSupport {
 			"import org.antlr.runtime.tree.*;\n" +
 			"import org.antlr.runtime.debug.*;\n" +
 			"\n" +
+			"class Profiler2 extends Profiler {\n" +
+			"    public void terminate() { ; }\n" +
+			"}\n"+
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
 			"        CharStream input = new ANTLRFileStream(args[0]);\n" +
@@ -385,7 +392,7 @@ public class TestCompileAndExecSupport {
 			);
 		StringTemplate createParserST =
 			new StringTemplate(
-			"        Profiler profiler = new Profiler();\n"+
+			"        Profiler2 profiler = new Profiler2();\n"+
 			"        $parserName$ parser = new $parserName$(tokens,profiler);\n" +
 			"        profiler.setParser(parser);\n");
 		if ( !debug ) {
@@ -414,6 +421,9 @@ public class TestCompileAndExecSupport {
 			"import org.antlr.runtime.debug.*;\n" +
 			"import java.io.*;\n" +
 			"\n" +
+			"class Profiler2 extends Profiler {\n" +
+			"    public void terminate() { ; }\n" +
+			"}\n"+
 			"public class Test {\n" +
 			"    static String templates =\n" +
 			"    		\"group test;\"+" +
@@ -437,7 +447,7 @@ public class TestCompileAndExecSupport {
 			);
 		StringTemplate createParserST =
 			new StringTemplate(
-			"        Profiler profiler = new Profiler();\n"+
+			"        Profiler2 profiler = new Profiler2();\n"+
 			"        $parserName$ parser = new $parserName$(tokens,profiler);\n" +
 			"        profiler.setParser(parser);\n");
 		if ( !debug ) {

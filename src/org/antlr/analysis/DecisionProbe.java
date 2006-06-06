@@ -423,18 +423,13 @@ public class DecisionProbe {
 
 		Set dfaStatesWithRecursionProblems =
 			stateToRecursiveOverflowConfigurationsMap.keySet();
-		// some of the states in dfaStatesWithRecursionProblems will be
-		// aliases to other states (that's how cycles get created in DFAs
-		// during conversion).  We need a unique real set
-		Set dfaStatesUnaliased = getUnaliasedDFAStateSet(dfaStatesWithRecursionProblems);
-
 		// now walk truly unique (unaliased) list of dfa states with inf recur
 		// Goal: create a map from alt to map<target,List<callsites>>
 		// Map<Map<String target, List<NFAState call sites>>
 		Map altToTargetToCallSitesMap = new HashMap();
 		// track a single problem DFA state for each alt
 		Map altToDFAState = new HashMap();
-		computeAltToProblemMaps(dfaStatesUnaliased,
+		computeAltToProblemMaps(dfaStatesWithRecursionProblems,
 								stateToRecursiveOverflowConfigurationsMap,
 								altToTargetToCallSitesMap, // output param
 								altToDFAState);            // output param
@@ -463,8 +458,7 @@ public class DecisionProbe {
 
 		Set dfaStatesWithLeftRecursionProblems =
 			stateToLeftRecursiveConfigurationsMap.keySet();
-
-		dfaStatesUnaliased =
+		Set dfaStatesUnaliased =
 			getUnaliasedDFAStateSet(dfaStatesWithLeftRecursionProblems);
 
 		// now walk truly unique (unaliased) list of dfa states with inf recur
@@ -565,11 +559,6 @@ public class DecisionProbe {
 		// track the state number rather than the state as d will change
 		// out from underneath us; hash wouldn't return any value
 		Integer stateI = new Integer(d.stateNumber);
-		/*
-		dfaToRecursiveOverflowStateMap.put(d.dfa, stateI);
-		dfaToRecursiveOverflowAltMap.put(d.dfa,
-										 recursiveNFAConfiguration);
-										 */
 		List configs = (List)stateToRecursiveOverflowConfigurationsMap.get(stateI);
 		if ( configs==null ) {
 			configs = new ArrayList();

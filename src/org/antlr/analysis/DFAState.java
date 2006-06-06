@@ -350,6 +350,10 @@ public class DFAState extends State {
      *  Because the number of alternatives and number of NFA states are
      *  finite, there is a finite number of DFA states that can be processed.
      *  This is necessary to show that the algorithm terminates.
+	 *
+	 *  Cannot test the state numbers here because in DFA.addState we need
+	 *  to know if any other state exists that has this exact set of NFA
+	 *  configurations.  The state number is irrelevant.
      */
     public boolean equals(Object o) {
         DFAState other = (DFAState)o;
@@ -359,17 +363,26 @@ public class DFAState extends State {
         if ( this.hashCode()!=other.hashCode() ) {
             return false;
         }
-        Set myPairs = new HashSet();
+		Set myPairs = new HashSet();
         Iterator iter = this.nfaConfigurations.iterator();
         while (iter.hasNext()) {
             NFAConfiguration myConfig = (NFAConfiguration) iter.next();
-			// TODO: remove this string cat
-            myPairs.add(myConfig.state+"|"+myConfig.alt);
+			// myConfig.state+"|"+myConfig.alt
+			StringBuffer buf = new StringBuffer();
+			buf.append(myConfig.state);
+			buf.append('|');
+			buf.append(myConfig.alt);
+			myPairs.add(buf.toString());
         }
         iter = other.nfaConfigurations.iterator();
         while (iter.hasNext()) {
             NFAConfiguration theirConfig = (NFAConfiguration) iter.next();
-            if ( !myPairs.contains(theirConfig.state+"|"+theirConfig.alt) ) {
+			// theirConfig.state+"|"+theirConfig.alt
+			StringBuffer buf = new StringBuffer();
+			buf.append(theirConfig.state);
+			buf.append('|');
+			buf.append(theirConfig.alt);
+            if ( !myPairs.contains(buf.toString()) ) {
                 return false;
             }
         }
@@ -471,7 +484,7 @@ public class DFAState extends State {
     */
 	
 	protected Set getNondeterministicAlts() {
-		int user_k = dfa.getMaxLookahead();
+		int user_k = dfa.getUserMaxLookahead();
 		if ( user_k>0 && user_k==k ) {
 			// if fixed lookahead, then more than 1 alt is a nondeterminism
 			// if we have hit the max lookahead

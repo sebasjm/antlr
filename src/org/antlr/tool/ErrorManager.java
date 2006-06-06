@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /** Defines all the errors ANTLR can generator for both the tool and for
@@ -276,6 +277,9 @@ public class ErrorManager {
 	static StringTemplateErrorListener theDefaultSTListener =
 		new StringTemplateErrorListener() {
 		public void error(String s, Throwable e) {
+			if ( e instanceof InvocationTargetException ) {
+				e = ((InvocationTargetException)e).getTargetException();
+			}
 			ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, s, e);
 		}
 		public void warning(String s) {

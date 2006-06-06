@@ -211,17 +211,23 @@ dfaEdgeSwitch(labels, targetState);
  */
 dfaDecision(decisionNumber,description);
 
-/** The overall cyclic DFA chunk; contains all the DFA states */
-cyclicDFA(className,ruleName,ruleDescriptor,decisionNumber,states,description);
+/** Generate the tables and support code needed for the DFAState object
+ *  argument.  Unless there is a semantic predicate (or syn pred, which
+ *  become sem preds), all states should be encoded in the state tables.
+ *  Consequently, cyclicDFAState/cyclicDFAEdge,eotDFAEdge templates are
+ *  not used except for special DFA states that cannot be encoded as
+ *  a transition table.
+ */
+cyclicDFA(dfa);
 
-/** A state in a cyclic DFA */
-cyclicDFAState(stateNumber,edges,needErrorClause,semPredState);
-
-/** An accept state for a cyclic DFA */
-cyclicDFAAcceptState(stateNumber,predictAlt);
+/** A special state in a cyclic DFA; special means has a semantic predicate
+ *  or it's a huge set of symbols to check.
+ */
+cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState);
 
 /** Just like a fixed DFA edge, test the lookahead and indicate what
- *  state to jump to next if successful.
+ *  state to jump to next if successful.  Again, this is for special
+ *  states.
  */
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates);
 
@@ -229,17 +235,6 @@ cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates);
  *  always jump to the target.
  */
 eotDFAEdge(targetStateNumber,edgeNumber, predicates);
-
-// C y c l i c  S W I T C H
-
-/* A repetition of the cyclic DFA states, but using switches instead
- * of if-then-else sequences.
- */
-
-cyclicDFAStateSwitch(stateNumber,labels,edges,
-                     needErrorClause,EOTTargetStateNumber,semPredState);
-
-cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber);
 
 // D F A  E X P R E S S I O N S
 

@@ -736,7 +736,7 @@ public class Grammar {
 		}
 		DFA lookaheadDFA = new DFA(decision, decisionStartState);
 		if ( lookaheadDFA.analysisAborted() && // did analysis bug out?
-			 lookaheadDFA.getMaxLookahead()!=1 )
+			 lookaheadDFA.getUserMaxLookahead()!=1 )
 		{
 			lookaheadDFA = null; // make sure other memory is "free" before redoing
 			// set k=1 option if not already k=1 and try again

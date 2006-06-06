@@ -152,7 +152,11 @@ catch (NoViableAltException nvae) {
 }
 >>
 
-@cyclicDFAState.noViableAltException() ::= "dbg.recognitionException(nvae);"
+@cyclicDFA.errorMethod() ::= <<
+public void error(NoViableAltException nvae) {
+    dbg.recognitionException(nvae);
+}
+>>
 
 /** Force predicate validation to trigger an event */
 evalPredicate(pred,description) ::= <<

@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0ea9
-May 20, 2006
+ANTLR 3.0ea10
+June 2, 2006
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator
@@ -12,7 +12,7 @@ Welcome to ANTLR v3!  I've been working on this for 3 years and, while
 it is not ready for a full release, it may prove useful to some of
 you.  No primary functionality is missing.  Ultimately, I need to
 rewrite ANTLR v3 in itself (it's written in 2.7.6 at the moment and
-also needs StringTemplate 2.3).
+also needs StringTemplate 2.3b7 or later).
 
 You should use v3 in conjunction with ANTLRWorks:
 
@@ -161,12 +161,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0ea9/README.txt (this file)
-antlr-3.0ea9/LICENSE.txt
-antlr-3.0ea9/src/org/antlr/...
-antlr-3.0ea9/lib/stringtemplate-2.2b7.jar (3.0ea9 needs 2.2b7)
-antlr-3.0ea9/lib/antlr-2.7.6.jar
-antlr-3.0ea9/lib/antlr-3.0ea9.jar
+antlr-3.0ea10/README.txt (this file)
+antlr-3.0ea10/LICENSE.txt
+antlr-3.0ea10/src/org/antlr/...
+antlr-3.0ea10/lib/stringtemplate-2.2b7.jar (3.0ea10 needs 2.2b7)
+antlr-3.0ea10/lib/antlr-2.7.6.jar
+antlr-3.0ea10/lib/antlr-3.0ea10.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -179,7 +179,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0ea9 (Mar 11, 2006) 1989-2006
+ANTLR Parser Generator   Early Access Version 3.0ea10 (Mar 11, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir   specify output directory where all output is
 generated
@@ -246,10 +246,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0ea9/lib/stringtemplate-2.2b6.jar
-antlr-3.0ea9/lib/antlr-2.7.6.jar
+antlr-3.0ea10/lib/stringtemplate-2.2b7.jar
+antlr-3.0ea10/lib/antlr-2.7.6.jar
 
-then jump into antlr-3.0ea9/src directory and then type:
+then jump into antlr-3.0ea10/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -262,6 +262,30 @@ to me.  I use Intellij so I never type anything actually to build.
 CHANGES
 
 3.0ea10 -
+
+June 6, 2006
+
+* New DFA mechanisms.  Cyclic DFA are implemented as state tables,
+  encoded via strings as java cannot handle large static arrays :(
+  States with edges emanating that have predicates are specially
+  treated.  A method is generated to do these states.  The DFA
+  simulation routine uses the "special" array to figure out if the
+  state is special.  See March 25, 2006 entry for description:
+  http://www.antlr.org/blog/antlr3/codegen.tml.  analysis.DFA now has
+  all the state tables generated for code gen.  CyclicCodeGenerator.java
+  disappeared as it's unneeded code. :)
+
+* Internal general clean up of the DFA.states vs uniqueStates thing.
+  Fixed lookahead decisions no longer fill uniqueStates.  Waste of
+  time.  Also noted that when adding sem pred edges, I didn't check
+  for state reuse.  Fixed.
+
+June 4, 2006
+
+* When resolving ambig DFA states predicates, I did not add the new states
+  to the list of unique DFA states.  No observable effect on output except
+  that DFA state numbers were not always contiguous for predicated decisions.
+  I needed this fix for new DFA tables.
 
 June 2, 2006
 
