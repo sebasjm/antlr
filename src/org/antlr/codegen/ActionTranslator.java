@@ -31,6 +31,8 @@ import antlr.CommonToken;
 import org.antlr.misc.MutableInteger;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.ANTLRStringStream;
 
 import java.util.List;
 
@@ -147,6 +149,15 @@ public class ActionTranslator {
 		if ( ruleName!=null ) {
 			r = grammar.getRule(ruleName);
 		}
+		/*
+		Action a = new Action(new ANTLRStringStream(action),
+							  r,
+							  actionAST.outerAltNum);
+		Token t;
+		do {
+			t = a.nextToken();
+		} while ( t.getType()!=Token.EOF );
+		*/
 		StringBuffer buf = new StringBuffer();
 		int c=0;
 		while ( c<action.length() ) {

@@ -93,7 +93,7 @@ public class <name> extends Lexer {
 
     <synpreds:{p | <lexerSynpred(name=p)>}>
 
-    <cyclicDFADescriptors:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}; separator="\n">
+    <cyclicDFADescriptors:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
     <cyclicDFADescriptors:cyclicDFA()> <! dump tables for all DFA !>
 
 }
@@ -169,7 +169,7 @@ public class <name> extends <@superClassName><superClass><@end> {
 
     <synpreds:{p | <synpred(name=p)>}>
 
-    <cyclicDFADescriptors:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>();}; separator="\n">
+    <cyclicDFADescriptors:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
     <cyclicDFADescriptors:cyclicDFA()> <! dump tables for all DFA !>
 
     <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
@@ -812,7 +812,8 @@ public static final String[] DFA<dfa.decisionNumber>_transition = {
 };
 
 class DFA<dfa.decisionNumber> extends DFA {
-    public DFA<dfa.decisionNumber>() {
+    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer) {
+        this.recognizer = recognizer;
         this.decisionNumber = <dfa.decisionNumber>;
         this.eot = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eotS);
         this.eof = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eofS);
@@ -842,8 +843,8 @@ class DFA<dfa.decisionNumber> extends DFA {
         if (backtracking>0) {failed=true; return -1;}<\n>
 <endif>
         NoViableAltException nvae =
-            new NoViableAltException(getDescription(), <dfa.decisionNumber>, _s, input);<\n>
-        <@noViableAltException()>
+            new NoViableAltException(getDescription(), <dfa.decisionNumber>, _s, input);
+        error(nvae);
         throw nvae;
     }<\n>
 <endif>

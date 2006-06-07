@@ -22,6 +22,9 @@ public class DFA {
 
 	protected int decisionNumber;
 
+	/** Which recognizer encloses this DFA?  Needed to check backtracking */
+	protected BaseRecognizer recognizer;
+
 	public static final boolean debug = false;
 
 	/** From the input stream, predict what alternative will succeed
@@ -67,39 +70,56 @@ public class DFA {
 							input.consume();
 							return alt;
 						}
-						throw new NoViableAltException(getDescription(), decisionNumber, s, input);
+/*
+						if (recognizer.backtracking>0) {
+							recognizer.failed=true;
+							return 0;
+						}
+						NoViableAltException nvae =
+							new NoViableAltException(getDescription(),
+													   decisionNumber,
+													   s,
+													   input);
+						error(nvae);
+						throw nvae;
+						*/
 					}
 					s = snext;
 					input.consume();
+					continue;
 				}
-				else if ( eot[s]>=0 ) {  // EOT Transition?
+				if ( eot[s]>=0 ) {  // EOT Transition?
 					if ( debug ) System.err.println("EOT transition");
 					s = eot[s];
 					input.consume();
+					continue;
 				}
-				else if ( c==Token.EOF && eof[s]>=0 ) {  // EOF Transition to accept state?
+				if ( c==Token.EOF && eof[s]>=0 ) {  // EOF Transition to accept state?
 					if ( debug ) System.err.println("accept via EOF; predict "+accept[eof[s]]+" from "+eof[s]);
 					return accept[eof[s]];
 				}
-				else { // not in range and not EOF/EOT, must be invalid symbol
-					if ( debug ) {
-						System.err.println("min["+s+"]="+min[s]);
-						System.err.println("max["+s+"]="+max[s]);
-						System.err.println("eot["+s+"]="+eot[s]);
-						System.err.println("eof["+s+"]="+eof[s]);
-						for (int p=0; p<transition[s].length; p++) {
-							System.err.print(transition[s][p]+" ");
-						}
-						System.err.println();
+				// not in range and not EOF/EOT, must be invalid symbol
+				if ( debug ) {
+					System.err.println("min["+s+"]="+min[s]);
+					System.err.println("max["+s+"]="+max[s]);
+					System.err.println("eot["+s+"]="+eot[s]);
+					System.err.println("eof["+s+"]="+eof[s]);
+					for (int p=0; p<transition[s].length; p++) {
+						System.err.print(transition[s][p]+" ");
 					}
-					NoViableAltException nvae =
-						new NoViableAltException(getDescription(),
-												   decisionNumber,
-												   s,
-												   input);
-					error(nvae);
-					throw nvae;
+					System.err.println();
 				}
+				if (recognizer.backtracking>0) {
+					recognizer.failed=true;
+					return 0;
+				}
+				NoViableAltException nvae =
+					new NoViableAltException(getDescription(),
+											 decisionNumber,
+											 s,
+											 input);
+				error(nvae);
+				throw nvae;
 			}
 		}
 		finally {
@@ -107,8 +127,11 @@ public class DFA {
 		}
 	}
 
+	protected void foo() throws NoViableAltException {
+	}
+
 	/** A hook for debugging interface */
-	public void error(NoViableAltException nvae) { ; }
+	protected void error(NoViableAltException nvae) { ; }
 
 	public int specialStateTransition(int s) throws NoViableAltException {
 		return -1;
