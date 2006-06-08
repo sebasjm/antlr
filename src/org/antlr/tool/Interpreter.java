@@ -161,8 +161,8 @@ public class Interpreter implements TokenSource {
 		if ( grammar.type!=Grammar.LEXER ) {
 			return;
 		}
-		CharStream input = (CharStream)this.input;
-		//System.out.println("scan("+startRule+",'"+input.substring(input.index(),input.size()-1)+"')");
+		CharStream in = (CharStream)this.input;
+		//System.out.println("scan("+startRule+",'"+in.substring(in.index(),in.size()-1)+"')");
 		// Build NFAs/DFAs from the grammar AST if NFAs haven't been built yet
 		if ( grammar.getRuleStartState(startRule)==null ) {
 			grammar.createNFAs();
@@ -177,7 +177,7 @@ public class Interpreter implements TokenSource {
 		Stack ruleInvocationStack = new Stack();
 		NFAState start = grammar.getRuleStartState(startRule);
 		NFAState stop = grammar.getRuleStopState(startRule);
-		parseEngine(startRule, start, stop, input, ruleInvocationStack,
+		parseEngine(startRule, start, stop, in, ruleInvocationStack,
 					actions, visitedStates);
 	}
 

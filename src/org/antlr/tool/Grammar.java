@@ -554,13 +554,13 @@ public class Grammar {
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
-		TokenStreamRewriteEngine tokenBuffer =
+		TokenStreamRewriteEngine tokbuf =
 			new TokenStreamRewriteEngine(lexer);
-		tokenBuffer.discard(ANTLRParser.WS);
-		tokenBuffer.discard(ANTLRParser.ML_COMMENT);
-		tokenBuffer.discard(ANTLRParser.COMMENT);
-		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
-        ANTLRParser parser = new ANTLRParser(tokenBuffer);
+		tokbuf.discard(ANTLRParser.WS);
+		tokbuf.discard(ANTLRParser.ML_COMMENT);
+		tokbuf.discard(ANTLRParser.COMMENT);
+		tokbuf.discard(ANTLRParser.SL_COMMENT);
+        ANTLRParser parser = new ANTLRParser(tokbuf);
 		parser.grammar = this;
 		parser.gtype = ANTLRParser.LEXER_GRAMMAR;
         parser.setASTNodeClass("org.antlr.tool.GrammarAST");
@@ -776,8 +776,7 @@ public class Grammar {
 	/** Return a new unique integer in the token type space */
 	public int getNewTokenType() {
 		maxTokenType++;
-		int type = maxTokenType;
-		return type;
+		return maxTokenType;
 	}
 
 	/** Define a token at a particular token type value.  Blast an
@@ -881,20 +880,20 @@ public class Grammar {
 			scope = getDefaultActionScope(type);
 		}
 		//System.out.println("@"+scope+"::"+nameAST.getText()+"{"+actionAST.getText()+"}");
-		String name = nameAST.getText();
+		String actionName = nameAST.getText();
 		Map scopeActions = (Map)actions.get(scope);
 		if ( scopeActions==null ) {
 			scopeActions = new HashMap();
 			actions.put(scope, scopeActions);
 		}
-		GrammarAST a = (GrammarAST)scopeActions.get(name);
+		GrammarAST a = (GrammarAST)scopeActions.get(actionName);
 		if ( a!=null ) {
 			ErrorManager.grammarError(
 				ErrorManager.MSG_ACTION_REDEFINITION,this,
 				nameAST.getToken(),nameAST.getText());
 		}
 		else {
-			scopeActions.put(name,actionAST);
+			scopeActions.put(actionName,actionAST);
 		}
 	}
 
@@ -1425,8 +1424,8 @@ public class Grammar {
 	 */
 	public Set getTokenDisplayNames() {
 		Set names = new HashSet();
-		for (int type=Label.MIN_TOKEN_TYPE; type<=getMaxTokenType(); type++) {
-			names.add(getTokenDisplayName(type));
+		for (int t =Label.MIN_TOKEN_TYPE; t <=getMaxTokenType(); t++) {
+			names.add(getTokenDisplayName(t));
 		}
 		return names;
 	}
