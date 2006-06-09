@@ -109,7 +109,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 
 	public void setTokenBoundaries(Object t, Token startToken, Token stopToken) {
 		adaptor.setTokenBoundaries(t, startToken, stopToken);
-		if ( startToken!=null && stopToken!=null ) {
+		if ( t!=null && startToken!=null && stopToken!=null ) {
 			dbg.setTokenBoundaries(adaptor.getUniqueID(t),
 								   startToken.getTokenIndex(),
 								   stopToken.getTokenIndex());
