@@ -435,8 +435,8 @@ exceptionSpec[StringTemplate ruleST]
 exceptionHandler[StringTemplate ruleST]
     :    #("catch" ARG_ACTION ACTION)
     	{
-    	String actionText = generator.translateAction(currentRuleName,#ACTION);
-    	ruleST.setAttribute("exceptions.{decl,action}",#ARG_ACTION.getText(),actionText);
+    	List chunks = generator.translateAction(currentRuleName,#ACTION);
+    	ruleST.setAttribute("exceptions.{decl,action}",#ARG_ACTION.getText(),chunks);
     	}
     ;
 
@@ -779,17 +779,17 @@ else if ( #rewrite.getType()==REWRITE ) {
 			#( r:REWRITE (pred:SEMPRED)? alt=rewrite_alternative )
 			{
             rewriteBlockNestingLevel = OUTER_REWRITE_NESTING_LEVEL;
-			String predText = null;
+			List predChunks = null;
 			if ( #pred!=null ) {
-				predText = #pred.getText();
+				//predText = #pred.getText();
         		#pred.outerAltNum = this.outerAltNum;
-        		predText = generator.translateAction(currentRuleName,#pred);
+        		predChunks = generator.translateAction(currentRuleName,#pred);
 			}
 			String description =
 			    grammar.grammarTreeToString(#r,false);
 			description = generator.target.getTargetStringLiteralFromString(description);
 			code.setAttribute("alts.{pred,alt,description}",
-							  predText,
+							  predChunks,
 							  alt,
 							  description);
 			pred=null;
@@ -1054,9 +1054,9 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
         // actions in rewrite rules yield a tree object
 		#ACTION.outerAltNum = this.outerAltNum;
         String actText = #ACTION.getText();
-        String action = generator.translateAction(currentRuleName,#ACTION);
+        List chunks = generator.translateAction(currentRuleName,#ACTION);
 		code = templates.getInstanceOf("rewriteNodeAction"+(isRoot?"Root":""));
-		code.setAttribute("action", action);
+		code.setAttribute("action", chunks);
         }
     ;
 
@@ -1083,16 +1083,16 @@ rewrite_template returns [StringTemplate code=null]
 		   }
 		   else if ( #ind!=null ) { // must be %({expr})(args)
 		   		code = templates.getInstanceOf("rewriteIndirectTemplate");
-				String exprCode=generator.translateAction(currentRuleName,#ind);
-		   		code.setAttribute("expr", exprCode);
+				List chunks=generator.translateAction(currentRuleName,#ind);
+		   		code.setAttribute("expr", chunks);
 		   }
 		   }
 	       #( ARGLIST
 	       	  ( #( ARG arg:ID a:ACTION
 		   		   {
 				   #a.outerAltNum = this.outerAltNum;
-		   		   String action = generator.translateAction(currentRuleName,#a);
-		   		   code.setAttribute("args.{name,value}", #arg.getText(), action);
+		   		   List chunks = generator.translateAction(currentRuleName,#a);
+		   		   code.setAttribute("args.{name,value}", #arg.getText(), chunks);
 		   		   }
 	             )
 	          )*

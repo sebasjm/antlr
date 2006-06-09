@@ -28,16 +28,20 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.antlr.codegen;
 
 import antlr.RecognitionException;
-import antlr.TokenStreamException;
 import antlr.TokenStreamRewriteEngine;
 import antlr.TokenWithIndex;
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
-import org.antlr.misc.*;
 import org.antlr.misc.BitSet;
+import org.antlr.misc.IntSet;
+import org.antlr.misc.Interval;
+import org.antlr.misc.IntervalSet;
 import org.antlr.runtime.CharStream;
-import org.antlr.stringtemplate.*;
+import org.antlr.stringtemplate.CommonGroupLoader;
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
+import org.antlr.stringtemplate.StringTemplateGroupLoader;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.tool.*;
 
@@ -139,7 +143,7 @@ public class CodeGenerator {
 		*/
 
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
-	protected final String vocabFilePattern =
+	protected final static String vocabFilePattern =
 		"<tokens:{<attr.name>=<attr.type>\n}>" +
 		"<literals:{<attr.name>=<attr.type>\n}>";
 
@@ -437,8 +441,8 @@ public class CodeGenerator {
 		for (Iterator nameIT = actionNameSet.iterator(); nameIT.hasNext();) {
 			String name = (String) nameIT.next();
 			GrammarAST actionAST = (GrammarAST)scopeActions.get(name);
-			String action = translateAction(ruleName,actionAST);
-			scopeActions.put(name, action); // replace with translation
+			List chunks = translateAction(ruleName,actionAST);
+			scopeActions.put(name, chunks); // replace with translation
 		}
 	}
 
@@ -628,9 +632,9 @@ public class CodeGenerator {
 								 new Integer(edge.target.stateNumber));
 			// stick in any gated predicates for any edge if not already a pred
 			if ( !edge.label.isSemanticPredicate() ) {
-				DFAState target = (DFAState)edge.target;
+				DFAState t = (DFAState)edge.target;
 				edgeST.setAttribute("predicates",
-									target.getGatedPredicatesInNFAConfigurations());
+									t.getGatedPredicatesInNFAConfigurations());
 			}
 			if ( edge.label.getAtom()!=Label.EOT ) {
 				stateST.setAttribute("edges", edgeST);
@@ -815,26 +819,33 @@ public class CodeGenerator {
 		return vocabFileST;
 	}
 
-	public String translateAction(String ruleName,
+	public List translateAction(String ruleName,
 								  GrammarAST actionTree)
 	{
 		ActionTranslator translator = new ActionTranslator(this,ruleName,actionTree);
-		return translator.translate();
+		return translator.translateToChunks();
 	}
 
 	/** Translate an action like [3,"foo",a[3]] and return a List of the
-	 *  individual arguments.  Simple ',' separator is assumed.
+	 *  translated actions.  Because actions are translated to a list of
+	 *  chunks, this returns List<List<String|StringTemplate>>.
+	 *
+	 *  Simple ',' separator is assumed.
 	 */
 	public List translateArgAction(String ruleName,
 								   GrammarAST actionTree)
 	{
-		ActionTranslator translator = new ActionTranslator(this,ruleName,actionTree);
-		String action = translator.translate();
-		StringTokenizer argTokens = new StringTokenizer(action, ",");
+		String actionText = actionTree.token.getText();
+		StringTokenizer argTokens = new StringTokenizer(actionText, ",");
 		List args = new ArrayList();
 		while ( argTokens.hasMoreTokens() ) {
 			String arg = (String)argTokens.nextToken();
-			args.add(arg);
+			ActionTranslator translator =
+				new ActionTranslator(this,ruleName,
+									 new antlr.CommonToken(ANTLRParser.ACTION,arg),
+									 actionTree.outerAltNum);
+			List chunks = translator.translateToChunks();
+			args.add(chunks);
 		}
 		if ( args.size()==0 ) {
 			return null;
@@ -844,42 +855,17 @@ public class CodeGenerator {
 
 	/** Given a template constructor action like %foo(a={...}) in
 	 *  an action, translate it to the appropriate template constructor
-	 *  from the templateLib.
-	 *
-	 *  This translates a *piece* of the action and hence this routine
-	 *  returns the index of the char at which it stopped parsing.
-	 *  This is a real mess in java.  blech.
+	 *  from the templateLib. This translates a *piece* of the action.
 	 */
-	public String translateTemplateConstructor(String ruleName,
-											   GrammarAST actionTree,
-											   int startIndex,
-											   MutableInteger nextCharIndexI)
+	public StringTemplate translateTemplateConstructor(String ruleName,
+													   int outerAltNum,
+													   antlr.Token actionToken,
+													   String templateActionText)
 	{
 		// first, parse with antlr.g
-		String actionText = actionTree.getText();
-		// silly, but I need to create my own counter...
-		class CountingStringReader extends StringReader {
-			public CountingStringReader(String text) {
-				super(text);
-			}
-			public int n = 0; // how many chars are read
-			public int read() throws IOException {
-				n++;
-				return super.read();
-			}
-		};
-		CountingStringReader sr = new CountingStringReader(actionText);
-		try {
-			sr.skip(startIndex);
-		}
-		catch (IOException ioe) {
-			ErrorManager.internalError("problems reading template action", ioe);
-		}
-		ANTLRLexer lexer = new ANTLRLexer(sr);
+		//System.out.println("translate template: "+templateActionText);
+		ANTLRLexer lexer = new ANTLRLexer(new StringReader(templateActionText));
 		lexer.setFilename(grammar.getFileName());
-		// use the rewrite engine because we want to buffer up all tokens
-		// in case they have a merged lexer/parser, send lexer rules to
-		// new grammar.
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
 		TokenStreamRewriteEngine tokenBuffer = new TokenStreamRewriteEngine(lexer);
 		tokenBuffer.discard(ANTLRParser.WS);
@@ -893,10 +879,13 @@ public class CodeGenerator {
 			parser.rewrite_template();
 		}
 		catch (RecognitionException re) {
-			System.err.println("can't parse template action");
+			ErrorManager.grammarError(ErrorManager.MSG_INVALID_TEMPLATE_ACTION,
+										  grammar,
+										  actionToken,
+										  templateActionText);
 		}
-		catch (TokenStreamException tse) {
-			System.err.println("can't parse template action");
+		catch (Exception tse) {
+			ErrorManager.internalError("can't parse template action",tse);
 		}
 		GrammarAST rewriteTree = (GrammarAST)parser.getAST();
 
@@ -904,20 +893,142 @@ public class CodeGenerator {
 		CodeGenTreeWalker gen = new CodeGenTreeWalker();
 		gen.init(grammar);
 		gen.currentRuleName = ruleName;
-		gen.outerAltNum = actionTree.outerAltNum;
-		String code = null;
+		gen.outerAltNum = outerAltNum;
+		StringTemplate st = null;
 		try {
-			StringTemplate st = gen.rewrite_template((AST)rewriteTree);
-			code = st.toString();
+			st = gen.rewrite_template((AST)rewriteTree);
 		}
 		catch (RecognitionException re) {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
+		return st;
+	}
 
-		nextCharIndexI.value = startIndex+sr.n; // what char to match next
 
-		return code;
+	public void issueInvalidScopeError(String x,
+									   String y,
+									   Rule enclosingRule,
+									   antlr.Token actionToken,
+									   int outerAltNum)
+	{
+		//System.out.println("error $"+x+"::"+y);
+		Rule r = grammar.getRule(x);
+		AttributeScope scope = grammar.getGlobalScope(x);
+		if ( scope==null ) {
+			scope = r.ruleScope; // if not global, might be rule scope
+		}
+		if ( enclosingRule==null ) {
+			// action not in a rule
+			return;
+		}
+
+		// action is in a rule
+		if ( scope==null ) {
+
+		}
+		else if ( scope.getAttribute(y)==null ) {
+			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
+										  grammar,
+										  actionToken,
+										  x,
+										  y);
+		}
+	}
+
+	public void issueInvalidAttributeError(String x,
+										   String y,
+										   Rule enclosingRule,
+										   antlr.Token actionToken,
+										   int outerAltNum)
+	{
+		//System.out.println("error $"+x+"."+y);
+		if ( enclosingRule==null ) {
+			// action not in a rule
+			ErrorManager.grammarError(ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE,
+										  grammar,
+										  actionToken,
+										  x,
+										  y);
+			return;
+		}
+
+		// action is in a rule
+		Grammar.LabelElementPair label = enclosingRule.getRuleLabel(x);
+
+		if ( label!=null || enclosingRule.getRuleRefsInAlt(x, outerAltNum)!=null ) {
+			// $rulelabel.attr or $ruleref.attr; must be unknown attr
+			String refdRuleName = x;
+			if ( label!=null ) {
+				refdRuleName = enclosingRule.getRuleLabel(x).referencedRuleName;
+			}
+			Rule refdRule = grammar.getRule(refdRuleName);
+			AttributeScope scope = refdRule.getAttributeScope(y);
+			if ( scope==null ) {
+				ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE,
+										  grammar,
+										  actionToken,
+										  refdRuleName,
+										  y);
+			}
+			else if ( scope.isParameterScope ) {
+				ErrorManager.grammarError(ErrorManager.MSG_INVALID_RULE_PARAMETER_REF,
+										  grammar,
+										  actionToken,
+										  refdRuleName,
+										  y);
+			}
+			else if ( scope.isDynamicRuleScope ) {
+				ErrorManager.grammarError(ErrorManager.MSG_INVALID_RULE_SCOPE_ATTRIBUTE_REF,
+										  grammar,
+										  actionToken,
+										  refdRuleName,
+										  y);
+			}
+		}
+
+	}
+
+	public void issueInvalidAttributeError(String x,
+										   Rule enclosingRule,
+										   antlr.Token actionToken,
+										   int outerAltNum)
+	{
+		//System.out.println("error $"+x);
+		if ( enclosingRule==null ) {
+			// action not in a rule
+			ErrorManager.grammarError(ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE,
+										  grammar,
+										  actionToken,
+										  x);
+			return;
+		}
+
+		// action is in a rule
+		Grammar.LabelElementPair label = enclosingRule.getRuleLabel(x);
+		AttributeScope scope = enclosingRule.getAttributeScope(x);
+
+		if ( label!=null ||
+			 enclosingRule.getRuleRefsInAlt(x, outerAltNum)!=null ||
+			 enclosingRule.name.equals(x) )
+		{
+			ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_SCOPE,
+										  grammar,
+										  actionToken,
+										  x);
+		}
+		else if ( scope!=null && scope.isDynamicRuleScope ) {
+			ErrorManager.grammarError(ErrorManager.MSG_ISOLATED_RULE_ATTRIBUTE,
+										  grammar,
+										  actionToken,
+										  x);
+		}
+		else {
+			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE,
+									  grammar,
+									  actionToken,
+									  x);
+		}
 	}
 
 	// M I S C

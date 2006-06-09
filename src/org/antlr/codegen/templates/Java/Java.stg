@@ -998,7 +998,7 @@ parameterAttributeRef(attr) ::= "<attr.name>"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
-((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()<negIndex>-1)).<attr.name>
+((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>
 <else>
 <if(index)>
 ((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>

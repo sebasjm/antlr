@@ -263,6 +263,12 @@ CHANGES
 
 3.0ea10 -
 
+June 9, 2006
+
+* Gutted and rebuilt the action translator for $x.y, $x::y, ...
+  Uses ANTLR v3 now for the first time inside v3 source. :)
+  ActionTranslator.java
+
 June 6, 2006
 
 * New DFA mechanisms.  Cyclic DFA are implemented as state tables,

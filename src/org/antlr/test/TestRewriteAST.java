@@ -741,6 +741,7 @@ public class TestRewriteAST extends TestSuite {
 	}
 
 	public void testKnownRuleButNotInLHS() throws Exception {
+		// THIS WORKS BY ITSELF BUT NOT WHEN I RUN WHOLE FILE!!!!!!
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 

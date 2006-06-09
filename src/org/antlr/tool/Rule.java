@@ -27,8 +27,9 @@
 */
 package org.antlr.tool;
 
+import antlr.CommonToken;
 import org.antlr.analysis.NFAState;
-import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.codegen.CodeGenerator;
 
 import java.util.*;
 
@@ -306,6 +307,18 @@ public class Rule {
 
 	/** Return the scope containing name */
 	public AttributeScope getAttributeScope(String name) {
+		AttributeScope scope = getLocalAttributeScope(name);
+		if ( scope!=null ) {
+			return scope;
+		}
+		if ( ruleScope!=null && ruleScope.getAttribute(name)!=null ) {
+			scope = ruleScope;
+		}
+		return scope;
+	}
+
+	/** Get the arg, return value, or predefined property for this rule */
+	public AttributeScope getLocalAttributeScope(String name) {
 		AttributeScope scope = null;
 		if ( returnScope!=null && returnScope.getAttribute(name)!=null ) {
 			scope = returnScope;
@@ -313,14 +326,66 @@ public class Rule {
 		if ( parameterScope!=null && parameterScope.getAttribute(name)!=null ) {
 			scope = parameterScope;
 		}
-		if ( ruleScope!=null && ruleScope.getAttribute(name)!=null ) {
-			scope = ruleScope;
-		}
-		// added 11/22/05 TJP to handle rule predefined properties as a scope
-		if ( RuleLabelScope.predefinedRulePropertiesScope.getAttribute(name)!=null ) {
+		if ( grammar.type != Grammar.LEXER &&
+			 RuleLabelScope.predefinedRulePropertiesScope.getAttribute(name)!=null )
+		{
 			scope = RuleLabelScope.predefinedRulePropertiesScope;
 		}
+		if ( grammar.type == Grammar.LEXER &&
+			 RuleLabelScope.predefinedLexerRulePropertiesScope.getAttribute(name)!=null )
+		{
+			scope = RuleLabelScope.predefinedLexerRulePropertiesScope;
+		}
 		return scope;
+	}
+
+	/** For references to tokens rather than by label such as $ID, we
+	 *  need to get the existing label for the ID ref or create a new
+	 *  one.
+	 */
+	public String getElementLabel(String refdSymbol,
+								  int outerAltNum,
+								  CodeGenerator generator)
+	{
+		GrammarAST uniqueRefAST;
+		if ( grammar.type != Grammar.LEXER &&
+			 Character.isUpperCase(refdSymbol.charAt(0)) )
+		{
+			// symbol is a token
+			List tokenRefs = getTokenRefsInAlt(refdSymbol, outerAltNum);
+			uniqueRefAST = (GrammarAST)tokenRefs.get(0);
+		}
+		else {
+			// symbol is a rule
+			List ruleRefs = getRuleRefsInAlt(refdSymbol, outerAltNum);
+			uniqueRefAST = (GrammarAST)ruleRefs.get(0);
+		}
+		if ( uniqueRefAST.code==null ) {
+			// no code?  must not have gen'd yet; forward ref
+			return null;
+		}
+		String labelName = null;
+		String existingLabelName =
+			(String)uniqueRefAST.code.getAttribute("label");
+		// reuse any label or list label if it exists
+		if ( existingLabelName!=null ) {
+			labelName = existingLabelName;
+		}
+		else {
+			// else create new label
+			labelName = generator.createUniqueLabel(refdSymbol);
+			CommonToken label = new CommonToken(ANTLRParser.ID, labelName);
+			if ( grammar.type != Grammar.LEXER &&
+			 	 Character.isUpperCase(refdSymbol.charAt(0)) )
+			{
+				grammar.defineTokenRefLabel(name, label, uniqueRefAST);
+			}
+			else {
+				grammar.defineRuleRefLabel(name, label, uniqueRefAST);
+			}
+			uniqueRefAST.code.setAttribute("label", labelName);
+		}
+		return labelName;
 	}
 
 	/** If a rule has no user-defined return values and nobody references
@@ -375,15 +440,15 @@ public class Rule {
 							 GrammarAST actionAST)
 	{
 		//System.out.println("rule @"+nameAST.getText()+"{"+actionAST.getText()+"}");
-		String name = nameAST.getText();
-		GrammarAST a = (GrammarAST)actions.get(name);
+		String actionName = nameAST.getText();
+		GrammarAST a = (GrammarAST)actions.get(actionName);
 		if ( a!=null ) {
 			ErrorManager.grammarError(
 				ErrorManager.MSG_ACTION_REDEFINITION,grammar,
 				nameAST.getToken(),nameAST.getText());
 		}
 		else {
-			actions.put(name,actionAST);
+			actions.put(actionName,actionAST);
 		}
 	}
 
@@ -412,7 +477,7 @@ public class Rule {
 		if ( key.equals("k") ) {
 			grammar.numberOfManualLookaheadOptions++;
 		}
- 		options.put(key, value);
+		 options.put(key, value);
 		return key;
 	}
 

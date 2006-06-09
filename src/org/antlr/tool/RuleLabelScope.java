@@ -73,6 +73,11 @@ public class RuleLabelScope extends AttributeScope {
 		if ( predefinedAttr!=null ) {
 			return predefinedAttr;
 		}
+		predefinedAttr =
+			predefinedLexerRulePropertiesScope.getAttribute(name);
+		if ( predefinedAttr!=null ) {
+			return predefinedAttr;
+		}
 		if ( referencedRule.returnScope!=null ) {
 			return referencedRule.returnScope.getAttribute(name);
 		}
