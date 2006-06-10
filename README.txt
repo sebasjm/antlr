@@ -269,6 +269,10 @@ June 9, 2006
   Uses ANTLR v3 now for the first time inside v3 source. :)
   ActionTranslator.java
 
+* Fixed a bug where referencing a return value on a rule didn't work
+  because later a ref to that rule's predefined properties didn't
+  properly force a return value struct to be built.  Added unit test.
+
 June 6, 2006
 
 * New DFA mechanisms.  Cyclic DFA are implemented as state tables,

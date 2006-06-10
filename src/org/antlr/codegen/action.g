@@ -191,6 +191,7 @@ ENCLOSING_RULE_SCOPE_ATTR
 		AttributeScope scope = enclosingRule.getLocalAttributeScope($y.text);
 		if ( scope.isPredefinedRuleScope ) {
 			st = template("rulePropertyRef_"+$y.text);
+			grammar.referenceRuleLabelPredefinedAttribute($x.text);
 			st.setAttribute("scope", $x.text);
 			st.setAttribute("attr", $y.text);
 		}
@@ -251,7 +252,7 @@ String refdRuleName=null;
 		// is valid for that rule's scope
 		{(enclosingRule.getRuleLabel($x.text)!=null || isRuleRefInAlt($x.text)) &&
 	      getRuleLabelAttribute(enclosingRule.getRuleLabel($x.text)!=null?enclosingRule.getRuleLabel($x.text).referencedRuleName:$x.text,$y.text)!=null}?
-		// {System.out.println("found \$rulelabel.attr or \$ruleref.attr: "+$x.text+"."+$y.text);}
+		//{System.out.println("found \$rulelabel.attr or \$ruleref.attr: "+$x.text+"."+$y.text);}
 		{
 		String label = $x.text;
 		if ( pair==null ) {
@@ -370,6 +371,7 @@ LOCAL_ATTR
 		AttributeScope scope = enclosingRule.getLocalAttributeScope($ID.text);
 		if ( scope.isPredefinedRuleScope ) {
 			st = template("rulePropertyRef_"+$ID.text);
+			grammar.referenceRuleLabelPredefinedAttribute(enclosingRule.name);
 			st.setAttribute("scope", enclosingRule.name);
 			st.setAttribute("attr", $ID.text);
 		}
