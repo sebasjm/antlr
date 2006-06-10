@@ -113,16 +113,18 @@ public Token nextToken() {
         }
         try {
             int m = input.mark();
-            backtracking=1;
+            backtracking=1; <! means we won't throw slow exception !>
             failed=false;
             mTokens();
-            backtracking=0;
-            input.rewind(m);
+	    backtracking=0;
+            <! mTokens backtracks with synpred at backtracking==2
+               and we set the synpredgate to allow actions at level 1.
+             !>
             if ( failed ) {
-                input.consume(); <! // advance one char and try again !>
+                input.rewind(m);
+                input.consume(); <! advance one char and try again !>
             }
             else {
-                mTokens();
                 return token;
             }
         }
@@ -254,15 +256,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     finally {
         <if(trace)>System.out.println("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
-<if(ruleDescriptor.actions.finally)>
-<if(backtracking)>
-        if ( backtracking==0 ) {
-            <ruleDescriptor.actions.finally>
-        }<\n>
-<else>
-        <ruleDescriptor.actions.finally>
-<endif>
-<endif>
+        <ruleDescriptor.actions.finally:execAction()>
     }
     <@postamble()>
     return <ruleReturnValue()>;
@@ -361,13 +355,7 @@ public <returnType()> m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(
     finally {
         <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
-<if(backtracking)>
-        if ( backtracking==0 ) {
-            <ruleDescriptor.actions.finally>
-        }<\n>
-<else>
-        <ruleDescriptor.actions.finally>
-<endif>
+        <ruleDescriptor.actions.finally:execAction()>
     }
     return <ruleReturnValue()>;
 }
@@ -1076,9 +1064,15 @@ rulePropertyRef_st(scope,attr) ::= "retval.st"
 /** How to execute an action */
 execAction(action) ::= <<
 <if(backtracking)>
+<if(actions.(actionScope).synpredgate)>
+if ( <actions.(actionScope).synpredgate> ) {
+  <action>
+}
+<else>
 if ( backtracking==0 ) {
   <action>
 }
+<endif>
 <else>
 <action>
 <endif>

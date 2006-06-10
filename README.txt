@@ -276,6 +276,9 @@ y   : L y R
     ;
   The DFAState.equals() method was messed up.
 
+* Added @synpredgate {...} action so you can tell ANTLR how to gate actions
+  in/out during syntactic predicate evaluation.
+
 June 9, 2006
 
 * Gutted and rebuilt the action translator for $x.y, $x::y, ...
