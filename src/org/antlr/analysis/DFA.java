@@ -555,6 +555,7 @@ public class DFA {
 	 *  indicates it's a new state.
      */
     protected DFAState addState(DFAState d) {
+		//System.out.println("addState: "+d);
 		if ( getUserMaxLookahead()>0 ) {
 			return d;
 		}

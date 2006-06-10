@@ -182,7 +182,7 @@ public class DFAState extends State {
         nfaConfigurations.add(c);
 
         // update hashCode; for some reason using context.hashCode() also
-        // makes the GC take like 70% of the CPU and this is slow!
+        // makes the GC take like 70% of the CPU and is slow!
         cachedHashCode += c.state + c.alt;
 
         // update reachableLabels
@@ -331,29 +331,22 @@ public class DFAState extends State {
 
     /** A decent hash for a DFA state is the sum of the NFA state/alt pairs.
      *  This is used when we add DFAState objects to the DFA.states Map and
-     *  when we compare DFA states.
+     *  when we compare DFA states.  Computed in addNFAConfiguration()
      */
     public int hashCode() {
         return cachedHashCode;
     }
 
-    /** Two DFAStates are equal if their NFA state/alt pairs are the same.
-     *  This method is used to see if a DFA state already exists.  At first
-     *  I was only checking that their NFA state subsets were the same, but
-     *  test "a : (A|B)+ B;" resulting in a loopback DFA with two states
-     *  containing the same NFA subsets but with different alts.  The DFA
-     *  erroneously treated the states as identical.
-     *
-     *  Walk this list, adding state+alt to a hashset.  Walk other list
-     *  and check against hashset.
-     *
-     *  Because the number of alternatives and number of NFA states are
+    /** Two DFAStates are equal if their NFA configuration sets are the
+	 *  same. This method is used to see if a DFA state already exists.
+	 *
+     *  Because the number of alternatives and number of NFA configurations are
      *  finite, there is a finite number of DFA states that can be processed.
      *  This is necessary to show that the algorithm terminates.
 	 *
 	 *  Cannot test the state numbers here because in DFA.addState we need
 	 *  to know if any other state exists that has this exact set of NFA
-	 *  configurations.  The state number is irrelevant.
+	 *  configurations.  The DFAState state number is irrelevant.
      */
     public boolean equals(Object o) {
         DFAState other = (DFAState)o;
@@ -363,28 +356,18 @@ public class DFAState extends State {
         if ( this.hashCode()!=other.hashCode() ) {
             return false;
         }
-		Set myPairs = new HashSet();
+		// if not same number of NFA configuraitons, cannot be same state
+		if ( this.nfaConfigurations.size() != other.nfaConfigurations.size() ) {
+			return false;
+		}
+
+		// compare set of NFA configurations in this set with other
         Iterator iter = this.nfaConfigurations.iterator();
         while (iter.hasNext()) {
             NFAConfiguration myConfig = (NFAConfiguration) iter.next();
-			// myConfig.state+"|"+myConfig.alt
-			StringBuffer buf = new StringBuffer();
-			buf.append(myConfig.state);
-			buf.append('|');
-			buf.append(myConfig.alt);
-			myPairs.add(buf.toString());
-        }
-        iter = other.nfaConfigurations.iterator();
-        while (iter.hasNext()) {
-            NFAConfiguration theirConfig = (NFAConfiguration) iter.next();
-			// theirConfig.state+"|"+theirConfig.alt
-			StringBuffer buf = new StringBuffer();
-			buf.append(theirConfig.state);
-			buf.append('|');
-			buf.append(theirConfig.alt);
-            if ( !myPairs.contains(buf.toString()) ) {
-                return false;
-            }
+			if ( !other.nfaConfigurations.contains(myConfig) ) {
+				return false;
+			}
         }
         return true;
     }

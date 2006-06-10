@@ -88,6 +88,52 @@ public class TestDFAConversion extends TestSuite {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
+	public void testCannotSeePastRecursion() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"x   : y X\n" +
+			"    | y Y\n" +
+			"    ;\n" +
+			"y   : L y R\n" +
+			"    | B\n" +
+			"    ;");
+		String expecting =
+			".s0-B->.s16\n" +
+			".s0-L->.s1\n" +
+			".s1-B->.s15\n" +
+			".s1-L->.s2\n" +
+			".s10-X->:s12=>1\n" +
+			".s10-Y->:s11=>2\n" +
+			".s13-R->.s8\n" +
+			".s14-R->.s9\n" +
+			".s15-R->.s10\n" +
+			".s16-X->:s12=>1\n" +
+			".s16-Y->:s11=>2\n" +
+			".s2-B->.s14\n" +
+			".s2-L->.s3\n" +
+			".s3-B->.s13\n" +
+			".s3-L->.s4\n" +
+			".s4-B->.s6\n" +
+			".s4-L->:s5=>1\n" +
+			".s6-R->.s7\n" +
+			".s7-R->.s8\n" +
+			".s8-R->.s9\n" +
+			".s9-R->.s10\n";
+		/* Gets:
+t.g:3:7: Alternative 1: after matching input such as L L L L L decision cannot predict what comes next due to recursion overflow to y from y
+t.g:3:7: Alternative 2: after matching input such as L L L L L decision cannot predict what comes next due to recursion overflow to y from y
+t.g:3:7: the decision cannot distinguish between alternative(s) 2,1 for at least one input sequence
+           But this test really only checks to make sure there are 3 errors
+		*/
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 3;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
 	public void testselfRecurseNonDet2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+

@@ -267,6 +267,15 @@ June 10, 2006
 
 * Fixed bug where unnecessary escapes yield char==0 like '\{'.
 
+* Fixed analysis bug.  This grammar didn't report a recursion warning:
+x   : y X
+    | y Y
+    ;
+y   : L y R
+    | B
+    ;
+  The DFAState.equals() method was messed up.
+
 June 9, 2006
 
 * Gutted and rebuilt the action translator for $x.y, $x::y, ...
