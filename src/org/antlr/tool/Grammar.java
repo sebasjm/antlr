@@ -1447,6 +1447,10 @@ public class Grammar {
 			// '\x'  (antlr lexer will catch invalid char)
 			int escChar = literal.charAt(2);
 			int charVal = ANTLRLiteralEscapedCharValue[escChar];
+			if ( charVal==0 ) {
+				// Unnecessary escapes like '\{' should just yield {
+				return escChar;
+			}
 			return charVal;
         }
         else if( literal.length() == 8 )
