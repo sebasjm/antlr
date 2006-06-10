@@ -263,6 +263,10 @@ CHANGES
 
 3.0ea10 -
 
+June 10, 2006
+
+* Fixed bug where unnecessary escapes yield char==0 like '\{'.
+
 June 9, 2006
 
 * Gutted and rebuilt the action translator for $x.y, $x::y, ...
