@@ -38,6 +38,9 @@ public class ANTLRStringStream implements CharStream {
 	/** The data being scanned */
 	protected char[] data;
 
+	/** How many characters are actually in the buffer */
+	protected int n;
+
 	/** 0..n-1 index into string of next char */
 	protected int p=0;
 
@@ -68,12 +71,14 @@ public class ANTLRStringStream implements CharStream {
 	public ANTLRStringStream(String input) {
 		this();
 		this.data = input.toCharArray();
+		this.n = input.length();
 	}
 
 	/** This is the preferred constructor as no data is copied */
-	public ANTLRStringStream(char[] data) {
+	public ANTLRStringStream(char[] data, int numberOfActualCharsInArray) {
 		this();
 		this.data = data;
+		this.n = numberOfActualCharsInArray;
 	}
 
 	/** Reset the stream so that it's in the same state it was
@@ -89,7 +94,7 @@ public class ANTLRStringStream implements CharStream {
 
     public void consume() {
 		//System.out.println("prev p="+p+", c="+(char)data[p]);
-        if ( p < data.length ) {
+        if ( p < n ) {
 			charPositionInLine++;
 			if ( data[p]=='\n' ) {
 				/*
@@ -105,7 +110,7 @@ public class ANTLRStringStream implements CharStream {
     }
 
     public int LA(int i) {
-        if ( (p+i-1) >= data.length ) {
+        if ( (p+i-1) >= n ) {
             //System.out.println("char LA("+i+")=EOF; p="+p);
             return CharStream.EOF;
         }
@@ -126,7 +131,7 @@ public class ANTLRStringStream implements CharStream {
     }
 
 	public int size() {
-		return data.length;
+		return n;
 	}
 
 	public int mark() {

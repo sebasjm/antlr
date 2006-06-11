@@ -267,6 +267,10 @@ June 11, 2006
 
 * Single return values are initialized now to default or to your spec.
 
+* cleaned up input stream stuff.  Added ANTLRReaderStream, ANTLRInputStream
+  and refactored.  You can specify encodings now on ANTLRFileStream (and
+  ANTLRInputStream) now.
+
 June 10, 2006
 
 * Fixed bug where unnecessary escapes yield char==0 like '\{'.

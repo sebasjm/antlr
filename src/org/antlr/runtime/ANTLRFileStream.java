@@ -27,39 +27,53 @@
 */
 package org.antlr.runtime;
 
-import java.io.IOException;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 
 /** This is a char buffer stream that is loaded from a file
- *  all at once when you construct the object.
+ *  all at once when you construct the object.  This looks very
+ *  much like an ANTLReader or ANTLRInputStream, but it's a special case
+ *  since we know the exact size of the object to load.  We can avoid lots
+ *  of data copying. 
  */
 public class ANTLRFileStream extends ANTLRStringStream {
-    protected String fileName;
-
-	public ANTLRFileStream() {
-	}
+	protected String fileName;
 
 	public ANTLRFileStream(String fileName) throws IOException {
-		load(fileName);
+		this(fileName, null);
 	}
 
-	public void load(String fileName) throws IOException {
-		//System.out.println("loading "+fileName);
+	public ANTLRFileStream(String fileName, String encoding) throws IOException {
 		this.fileName = fileName;
-		FileReader fr = null;
+		load(fileName, encoding);
+	}
+
+	public void load(String fileName, String encoding)
+		throws IOException
+	{
+		if ( fileName==null ) {
+			return;
+		}
+		File f = new File(fileName);
+		int size = (int)f.length();
+		InputStreamReader isr;
+		FileInputStream fis = new FileInputStream(fileName);
+		if ( encoding!=null ) {
+			isr = new InputStreamReader(fis, encoding);
+		}
+		else {
+			isr = new InputStreamReader(fis);
+		}
 		try {
-			File f = new File(fileName);
-			data = new char[(int)f.length()];
-			fr = new FileReader(fileName);
-			fr.read(data);
+			data = new char[size];
+			isr.read(data);
+			super.n = size;
 		}
 		finally {
-			if ( fr!=null ) {
-				fr.close();
+			if ( isr!=null ) {
+				isr.close();
 			}
 		}
-    }
+	}
 
 	public String getSourceName() {
 		return fileName;
