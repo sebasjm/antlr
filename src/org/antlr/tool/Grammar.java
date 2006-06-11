@@ -60,6 +60,8 @@ public class Grammar {
     public static final String ARTIFICIAL_TOKENS_RULENAME = "Tokens";
 	public static final String FRAGMENT_RULE_MODIFIER = "fragment";
 
+	public static final String SYNPREDGATE_ACTION_NAME = "synpredgate"; 
+
 	/** When converting ANTLR char and string literals, here is the
 	 *  value set of escape chars.
 	 */
@@ -180,7 +182,7 @@ public class Grammar {
 	 */
 	protected Map actions = new HashMap();
 
-    /** The NFA that represents the grammar with edges labelled with tokens
+	/** The NFA that represents the grammar with edges labelled with tokens
      *  or epsilon.  It is more suitable to analysis than an AST representation.
      */
     protected NFA nfa;

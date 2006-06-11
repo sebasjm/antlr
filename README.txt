@@ -261,7 +261,11 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0ea10 -
+3.0ea11 -
+
+June 11, 2006
+
+* Single return values are initialized now to default or to your spec.
 
 June 10, 2006
 
@@ -278,6 +282,10 @@ y   : L y R
 
 * Added @synpredgate {...} action so you can tell ANTLR how to gate actions
   in/out during syntactic predicate evaluation.
+
+* Fuzzy parsing should be more efficient.  It should backtrack over a rule
+  and then rewind and do it again "with feeling" to exec actions.  It was
+  actually doing it 3x not 2x.
 
 June 9, 2006
 
@@ -312,6 +320,8 @@ June 4, 2006
   to the list of unique DFA states.  No observable effect on output except
   that DFA state numbers were not always contiguous for predicated decisions.
   I needed this fix for new DFA tables.
+
+3.0ea10 - June 2, 2006
 
 June 2, 2006
 

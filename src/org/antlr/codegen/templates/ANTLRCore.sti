@@ -74,6 +74,10 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block);
  */
 tokensRule(ruleName,nakedBlock,args,block,ruleDescriptor);
 
+filteringNextToken();
+
+filteringActionGate();
+
 // S U B R U L E S
 
 /** A (...) subrule with multiple alternatives */

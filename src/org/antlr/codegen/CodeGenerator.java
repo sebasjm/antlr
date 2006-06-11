@@ -285,19 +285,42 @@ public class CodeGenerator {
 			headerFileST.setName("dummy-header-file");
 		}
 
-		// Ok, the only two possible output files are available now.
-		// Verify action scopes are ok for target and dump actions into output
-		// Templates can say <actions.parser.header> for example.
-		verifyActionScopesOkForTarget(grammar.getActions());
-		// translate $x::y references
-		translateActionAttributeReferences(grammar.getActions());
-		headerFileST.setAttribute("actions", grammar.getActions());
-		outputFileST.setAttribute("actions", grammar.getActions());
-
 		boolean filterMode = grammar.getOption("filter")!=null &&
 							  grammar.getOption("filter").equals("true");
 		boolean canBacktrack = grammar.getSyntacticPredicates()!=null ||
 							   filterMode;
+
+		// TODO: move this down further because generating the recognizer
+		// alters the model with info on who uses predefined properties etc...
+		// The actions here might refer to something.
+
+		// The only two possible output files are available at this point.
+		// Verify action scopes are ok for target and dump actions into output
+		// Templates can say <actions.parser.header> for example.
+		Map actions = grammar.getActions();
+		verifyActionScopesOkForTarget(actions);
+		// translate $x::y references
+		translateActionAttributeReferences(actions);
+		Map actionsForGrammarScope =
+			(Map)actions.get(grammar.getDefaultActionScope(grammar.type));
+		if ( filterMode &&
+			 (actionsForGrammarScope==null ||
+			 !actionsForGrammarScope.containsKey(Grammar.SYNPREDGATE_ACTION_NAME)) )
+		{
+			// if filtering, we need to set actions to execute at backtracking
+			// level 1 not 0.  Don't set this action if a user has though
+			StringTemplate gateST = templates.getInstanceOf("filteringActionGate");
+			if ( actionsForGrammarScope==null ) {
+				actionsForGrammarScope=new HashMap();
+				actions.put(grammar.getDefaultActionScope(grammar.type),
+							actionsForGrammarScope);
+			}
+			actionsForGrammarScope.put(Grammar.SYNPREDGATE_ACTION_NAME,
+									   gateST);
+		}
+		headerFileST.setAttribute("actions", actions);
+		outputFileST.setAttribute("actions", actions);
+
 		outputFileST.setAttribute("backtracking", new Boolean(canBacktrack));
 		headerFileST.setAttribute("backtracking", new Boolean(canBacktrack));
 		outputFileST.setAttribute("memoize", new Boolean(memoize&&canBacktrack));

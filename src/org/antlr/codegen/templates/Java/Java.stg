@@ -102,6 +102,8 @@ public class <name> extends Lexer {
 /** A override of Lexer.nextToken() that backtracks over mTokens() looking
  *  for matches.  No error can be generated upon error; just rewind, consume
  *  a token and then try again.  backtracking needs to be set as well.
+ *  Make rule memoization happen only at levels above 1 as we start mTokens
+ *  at backtracking==1.
  */
 filteringNextToken() ::= <<
 public Token nextToken() {
@@ -116,10 +118,9 @@ public Token nextToken() {
             backtracking=1; <! means we won't throw slow exception !>
             failed=false;
             mTokens();
-	    backtracking=0;
+            backtracking=0;
             <! mTokens backtracks with synpred at backtracking==2
-               and we set the synpredgate to allow actions at level 1.
-             !>
+               and we set the synpredgate to allow actions at level 1. !>
             if ( failed ) {
                 input.rewind(m);
                 input.consume(); <! advance one char and try again !>
@@ -135,7 +136,21 @@ public Token nextToken() {
         }
     }
 }
+
+public void memoize(IntStream input,
+		int ruleIndex,
+		int ruleStartIndex)
+{
+if ( backtracking>1 ) super.memoize(input, ruleIndex, ruleStartIndex);
+}
+
+public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
+if ( backtracking>1 ) return super.alreadyParsedRule(input, ruleIndex);
+return false;
+}
 >>
+
+filteringActionGate() ::= "backtracking==1"
 
 /** How to generate a parser */
 genericParser(name, scopes, tokens, tokenNames, rules, numRules,
@@ -277,9 +292,9 @@ ruleDeclarations() ::= <<
 <returnType()> retval = new <returnType()>();
 retval.start = input.LT(1);<\n>
 <else>
-<if(ruleDescriptor.hasSingleReturnValue)>
-<returnType()> <ruleDescriptor.singleValueReturnName>;
-<endif>
+<ruleDescriptor.returnScope.attributes:{ a |
+<a.type> <a.name> = <if(a.initValue)><a.initValue><else><initValue(a.type)><endif>;
+}>
 <endif>
 <if(memoize)>
 int <ruleDescriptor.name>_StartIndex = input.index();
