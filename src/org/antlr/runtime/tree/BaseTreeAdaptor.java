@@ -12,7 +12,13 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	/** Add a child to the tree t.  If child is a flat tree (a list), make all
-	 *  in list children of t.
+	 *  in list children of t. Warning: if t has no children, but child does
+	 *  and child isNil then it is ok to move children to t via
+	 *  t.children = child.children; i.e., without copying the array.  This
+	 *  is for construction and I'm not sure it's completely general for
+	 *  a tree's addChild method to work this way.  Make sure you differentiate
+	 *  between your tree's addChild and this parser tree construction addChild
+	 *  if it's not ok to move children to t with a simple assignment.
 	 */
 	public void addChild(Object t, Object child) {
 		((Tree)t).addChild((Tree)child);

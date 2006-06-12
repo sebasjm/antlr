@@ -64,7 +64,9 @@ public interface TreeAdaptor {
 	 *  and child isNil then it is ok to move children to t via
 	 *  t.children = child.children; i.e., without copying the array.  This
 	 *  is for construction and I'm not sure it's completely general for
-	 *  a tree's addChild method to work this way.
+	 *  a tree's addChild method to work this way.  Make sure you differentiate
+	 *  between your tree's addChild and this parser tree construction addChild
+	 *  if it's not ok to move children to t with a simple assignment.
 	 */
 	public void addChild(Object t, Object child);
 
