@@ -93,6 +93,11 @@ public class CommonToken extends Token {
         return input.substring(start,stop);
     }
 
+	/** Override the text for this token.  getText() will return this text
+	 *  rather than pulling from the buffer.  Note that this does not mean
+	 *  that start/stop indexes are not valid.  It means that that input
+	 *  was converted to a new string in the token object.
+	 */
 	public void setText(String text) {
 		this.text = text;
 	}
