@@ -652,6 +652,32 @@ public class TestAttributes extends TestSuite {
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
+	public void testUnknownGlobalScope() throws Exception {
+		String action = "$Symbols::names.add($id.text);";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
+		Tool antlr = new Tool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator,"a",
+														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+
+		assertTrue(equeue.errors.size()==2, "unexpected errors: "+equeue);
+
+		int expectedMsgID = ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE;
+		Object expectedArg = "Symbols";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
 	public void testIndexedGlobalScope() throws Exception {
 		String action = "$Symbols[-1]::names.add($id.text);";
 		String expecting =

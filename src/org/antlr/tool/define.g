@@ -292,8 +292,16 @@ ruleScopeSpec[Rule r]
 		   )?
  	       ( uses:ID
  	         {
- 	         if ( r.useScopes==null ) {r.useScopes=new ArrayList();}
- 	         r.useScopes.add(#uses.getText());
+ 	         if ( grammar.getGlobalScope(#uses.getText())==null ) {
+				 ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE,
+										   grammar,
+										   #uses.token,
+										   #uses.getText());
+	         }
+ 	         else {
+ 	         	if ( r.useScopes==null ) {r.useScopes=new ArrayList();}
+ 	         	r.useScopes.add(#uses.getText());
+ 	         }
  	         }
  	       )*
  	     )

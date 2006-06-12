@@ -180,10 +180,10 @@ EMPTY_COMPLEMENT(file,line,col,arg) ::= <<
 <loc()>set complement is empty
 <endif>
 >>
-UNKNOWN_DYNAMIC_SCOPE(file,line,col,arg,arg2) ::=
-  "<loc()>"
+UNKNOWN_DYNAMIC_SCOPE(file,line,col,arg) ::=
+  "<loc()>unknown dynamic scope: <arg>"
 UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE(file,line,col,arg,arg2) ::=
-  "<loc()>unknown dynamically-scope attribute for scope <arg>: <arg2>"
+  "<loc()>unknown dynamically-scoped attribute for scope <arg>: <arg2>"
 AMBIGUOUS_RULE_SCOPE(file,line,col,arg) ::=
   "<loc()>reference $<arg> is ambiguous since rule <arg> is referenced in the production and rule <arg> also has a dynamic scope"
 ISOLATED_RULE_ATTRIBUTE(file,line,col,arg) ::=

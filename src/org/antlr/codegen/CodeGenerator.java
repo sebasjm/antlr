@@ -939,16 +939,15 @@ public class CodeGenerator {
 		Rule r = grammar.getRule(x);
 		AttributeScope scope = grammar.getGlobalScope(x);
 		if ( scope==null ) {
-			scope = r.ruleScope; // if not global, might be rule scope
+			if ( r!=null ) {
+				scope = r.ruleScope; // if not global, might be rule scope
+			}
 		}
-		if ( enclosingRule==null ) {
-			// action not in a rule
-			return;
-		}
-
-		// action is in a rule
 		if ( scope==null ) {
-
+			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE,
+										  grammar,
+										  actionToken,
+										  x);
 		}
 		else if ( scope.getAttribute(y)==null ) {
 			ErrorManager.grammarError(ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE,
