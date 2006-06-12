@@ -271,7 +271,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     finally {
         <if(trace)>System.out.println("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
-        <ruleDescriptor.actions.finally:execAction()>
+        <(ruleDescriptor.actions.finally):execAction()>
     }
     <@postamble()>
     return <ruleReturnValue()>;
@@ -372,7 +372,7 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
     finally {
         <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
-        <ruleDescriptor.actions.finally:execAction()>
+        <(ruleDescriptor.actions.finally):execAction()>
     }
 }
 // $ANTLR end <ruleName>
@@ -1053,9 +1053,9 @@ tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
 tokenLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 
-ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
-ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
-ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
+ruleLabelPropertyRef_start(scope,attr) ::= "((<labelType>)<scope>.start)"
+ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
+ruleLabelPropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)<scope>.tree)"
 ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start,<scope>.stop)"
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
@@ -1070,9 +1070,9 @@ lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
 lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
 
 // Somebody may ref $template or $tree or $stop within a rule:
-rulePropertyRef_start(scope,attr) ::= "retval.start"
-rulePropertyRef_stop(scope,attr) ::= "retval.stop"
-rulePropertyRef_tree(scope,attr) ::= "retval.tree"
+rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval.start)"
+rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval.stop)"
+rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)retval.tree)"
 rulePropertyRef_text(scope,attr) ::= "input.toString(retval.start,input.LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 

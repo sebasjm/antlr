@@ -1078,6 +1078,10 @@ public class CodeGenerator {
 		this.memoize = memoize;
 	}
 
+	public StringTemplate getRecognizerST() {
+		return outputFileST;
+	}
+	
 	public String getRecognizerFileName() {
 		StringTemplate extST = templates.getInstanceOf("codeFileExtension");
 		return grammar.name+extST.toString();

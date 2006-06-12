@@ -308,7 +308,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-		String expecting = "r.x; r.start; r.stop; r.tree; r.x; r.stop;";
+		String expecting = "r.x; ((Token)r.start); ((Token)r.stop); ((Object)r.tree); r.x; ((Token)r.stop);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -317,23 +317,16 @@ public class TestAttributes extends TestSuite {
 				"a returns [int x]\n" +
 				"  :\n" +
 				"  ;\n"+
-				"b : r=a {"+action+"}\n" +
+				"b : r=a {###"+action+"!!!}\n" +
 				"  ;");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // codegen phase sets some vars we need
-
-		ActionTranslator translator = new ActionTranslator(generator,
-														   "b",
-														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
 		assertEqual(found, expecting);
 
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
@@ -341,7 +334,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testRuleLabelsWithSpecialToken() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-		String expecting = "r.x; r.start; r.stop; r.tree; r.x; r.stop;";
+		String expecting = "r.x; ((MYTOKEN)r.start); ((MYTOKEN)r.stop); ((Object)r.tree); r.x; ((MYTOKEN)r.stop);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -351,7 +344,7 @@ public class TestAttributes extends TestSuite {
 				"a returns [int x]\n" +
 				"  :\n" +
 				"  ;\n"+
-				"b : r=a {"+action+"}\n" +
+				"b : r=a {###"+action+"!!!}\n" +
 				"  ;");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
@@ -359,14 +352,9 @@ public class TestAttributes extends TestSuite {
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // codegen phase sets some vars we need
 
-		ActionTranslator translator = new ActionTranslator(generator, "b",
-														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
 		assertEqual(found, expecting);
 
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
@@ -374,13 +362,13 @@ public class TestAttributes extends TestSuite {
 
 	public void testForwardRefRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.tree;";
-		String expecting = "r.x; r.start; r.stop; r.tree; r.x; r.tree;";
+		String expecting = "r.x; ((Token)r.start); ((Token)r.stop); ((Object)r.tree); r.x; ((Object)r.tree);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"b : r=a {"+action+"}\n" +
+				"b : r=a {###"+action+"!!!}\n" +
 				"  ;\n" +
 				"a returns [int x]\n" +
 				"  : ;\n");
@@ -390,14 +378,9 @@ public class TestAttributes extends TestSuite {
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // codegen phase sets some vars we need
 
-		ActionTranslator translator = new ActionTranslator(generator, "b",
-														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
 		assertEqual(found, expecting);
 
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
@@ -1276,14 +1259,14 @@ public class TestAttributes extends TestSuite {
 	}
 
 	public void testRuleRefWhenRuleHasScope() throws Exception {
-		String action = "$b.stop;";
-		String expecting = "b1.stop;";
+		String action = "$b.start;";
+		String expecting = "((Token)b1.start);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n" +
-				"a : b {"+action+"} ;\n" +
+				"a : b {###"+action+"!!!} ;\n" +
 				"b\n" +
 				"scope {\n" +
 				"  int n;\n" +
@@ -1294,17 +1277,12 @@ public class TestAttributes extends TestSuite {
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
 
-		ActionTranslator translator = new ActionTranslator(generator,"a",
-														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
-
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
 		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
 	public void testDynamicScopeRefOkEvenThoughRuleRefExists() throws Exception {
@@ -1396,13 +1374,13 @@ public class TestAttributes extends TestSuite {
 
 	public void testRefToStartAttributeForCurrentRule() throws Exception {
 		String action = "$start;";
-		String expecting = "retval.start;";
+		String expecting = "((Token)retval.start);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
-				"a : {"+action+"}\n" +
+				"a : {###"+action+"!!!}\n" +
 				"  ;\n");
 		Tool antlr = new Tool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1410,15 +1388,12 @@ public class TestAttributes extends TestSuite {
 		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator,"a",
 														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
-
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
 		assertEqual(found, expecting);
+
+		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
 	}
 
 	public void testTokenLabelFromMultipleAlts() throws Exception {
@@ -1834,13 +1809,13 @@ public class TestAttributes extends TestSuite {
 
 	public void testImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
-		String expecting = "r1.start;";
+		String expecting = "((Token)r1.start);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : r {"+action+"} ;" +
+				"a : r {###"+action+"!!!} ;" +
 				"r : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
@@ -1848,16 +1823,9 @@ public class TestAttributes extends TestSuite {
 		g.setCodeGenerator(generator);
 		generator.genRecognizer();
 
-		ActionTranslator translator =
-			new ActionTranslator(generator,
-								 "a",
-								 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
 		assertEqual(found, expecting);
 
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
@@ -1865,13 +1833,13 @@ public class TestAttributes extends TestSuite {
 
 	public void testReuseExistingLabelWithImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
-		String expecting = "x.start;";
+		String expecting = "((Token)x.start);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : x=r {"+action+"} ;" +
+				"a : x=r {###"+action+"!!!} ;" +
 				"r : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
@@ -1879,14 +1847,9 @@ public class TestAttributes extends TestSuite {
 		g.setCodeGenerator(generator);
 		generator.genRecognizer();
 
-		ActionTranslator translator = new ActionTranslator(generator,"a",
-														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
 		assertEqual(found, expecting);
 
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
@@ -1894,14 +1857,14 @@ public class TestAttributes extends TestSuite {
 
 	public void testReuseExistingListLabelWithImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
-		String expecting = "x.start;";
+		String expecting = "((Token)x.start);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
 				"options {output=AST;}\n" +
-				"a : x+=r {"+action+"} ;" +
+				"a : x+=r {###"+action+"!!!} ;" +
 				"r : 'a';\n");
 		Tool antlr = new Tool();
 		antlr.setOutputDirectory(null); // write to /dev/null
@@ -1909,14 +1872,9 @@ public class TestAttributes extends TestSuite {
 		g.setCodeGenerator(generator);
 		generator.genRecognizer();
 
-		ActionTranslator translator = new ActionTranslator(generator,"a",
-														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
 		assertEqual(found, expecting);
 
 		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
