@@ -60,7 +60,7 @@ public class Grammar {
     public static final String ARTIFICIAL_TOKENS_RULENAME = "Tokens";
 	public static final String FRAGMENT_RULE_MODIFIER = "fragment";
 
-	public static final String SYNPREDGATE_ACTION_NAME = "synpredgate"; 
+	public static final String SYNPREDGATE_ACTION_NAME = "synpredgate";
 
 	/** When converting ANTLR char and string literals, here is the
 	 *  value set of escape chars.
@@ -227,7 +227,9 @@ public class Grammar {
 
 	protected Tool tool;
 
-	/** The unique set of all rule references in any rule */
+	/** The unique set of all rule references in any rule; set of Token
+	 *  objects so two refs to same rule can exist but at different line/position.
+	 */
 	protected Set ruleRefs = new HashSet();
 
 	/** The unique set of all token ID references in any rule */

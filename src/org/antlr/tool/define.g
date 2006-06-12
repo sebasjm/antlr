@@ -321,6 +321,7 @@ if ( this.blockLevel==1 ) {this.outerAltNum=1;}
             )+
             EOB
          )
+         {this.blockLevel--;}
     ;
 
 // TODO: this does nothing now! subrules cannot have init actions. :(
