@@ -107,12 +107,12 @@ public class <name> extends Lexer {
  */
 filteringNextToken() ::= <<
 public Token nextToken() {
-    token=null;
-    tokenStartCharIndex = getCharIndex();
     while (true) {
         if ( input.LA(1)==CharStream.EOF ) {
             return Token.EOF_TOKEN;
         }
+        token=null;
+        tokenStartCharIndex = getCharIndex();
         try {
             int m = input.mark();
             backtracking=1; <! means we won't throw slow exception !>
@@ -343,11 +343,8 @@ if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.n
  *  fragment rules.
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
-<ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
-<returnScope(scope=ruleDescriptor.returnScope)>
-
 // $ANTLR start <ruleName>
-public <returnType()> m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
+public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
     <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleDeclarations()>
     try {
@@ -356,6 +353,7 @@ public <returnType()> m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(
         <ruleMemoization(name=ruleName)>
         <block><\n>
 <else>
+        ruleNestingLevel++;
         int type = <ruleName>;
         int start = getCharIndex();
         int line = getLine();
@@ -364,7 +362,11 @@ public <returnType()> m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(
         <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
         <block>
-        if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}<\n>
+        <! create token if none exists *and* we are an outermost token rule !>
+        ruleNestingLevel--;
+        if ( token==null && ruleNestingLevel==0 ) {
+            emit(type,line,charPosition,channel,start,getCharIndex()-1);
+        }<\n>
 <endif>
     }
     finally {
@@ -372,7 +374,6 @@ public <returnType()> m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(
         <ruleCleanUp()>
         <ruleDescriptor.actions.finally:execAction()>
     }
-    return <ruleReturnValue()>;
 }
 // $ANTLR end <ruleName>
 >>
@@ -1092,14 +1093,6 @@ if ( backtracking==0 ) {
 <action>
 <endif>
 >>
-
-/*
-// L E X E R  A C T I O N S
-
-emit(type) ::= "emit(<type>);"
-
-setType(type) ::= "setType(<type>);"
-*/
 
 // M I S C (properties, etc...)
 

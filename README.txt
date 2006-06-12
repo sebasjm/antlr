@@ -263,6 +263,10 @@ CHANGES
 
 3.0ea11 -
 
+June 12, 2006
+
+* EOF works in the parser as a token name.
+
 June 11, 2006
 
 * Single return values are initialized now to default or to your spec.
@@ -270,6 +274,12 @@ June 11, 2006
 * cleaned up input stream stuff.  Added ANTLRReaderStream, ANTLRInputStream
   and refactored.  You can specify encodings now on ANTLRFileStream (and
   ANTLRInputStream) now.
+
+* You can set text local var now in a lexer rule and token gets that text.
+  start/stop indexes are still set for the token.
+
+* Changed lexer slightly.  Calling a nonfragment rule from a
+  nonfragment rule does not set the overall token.
 
 June 10, 2006
 

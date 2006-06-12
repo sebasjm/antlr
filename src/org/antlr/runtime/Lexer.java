@@ -38,9 +38,11 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 
 	/** The goal of all lexer rules/methods is to create a token object.
 	 *  This is an instance variable as multiple rules may collaborate to
-	 *  create a single token.  For example, NUM : INT | FLOAT ;
-	 *  In this case, you want the INT or FLOAT rule to set token and not
-	 *  have it reset to a NUM token in rule NUM.
+	 *  create a single token.  nextToken will return this object after
+	 *  matching lexer rule(s).  If you subclass to allow multiple token
+	 *  emissions, then set this to the last token to be matched or
+	 *  something nonnull so that the auto token emit mechanism will not
+	 *  emit another token.
 	 */
     protected Token token;
 
@@ -49,6 +51,18 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  the start of nextToken.
  	 */
 	protected int tokenStartCharIndex = -1;
+
+	/** You can set the text for the current token to override what is in
+	 *  the input char buffer.  Use setText() or can set this instance var.
+ 	 */
+	protected String text;
+
+	/** We must track the token rule nesting level as we only want to
+	 *  emit a token automatically at the outermost level so we don't get
+	 *  two if FLOAT calls INT.  To save code space and time, do not
+	 *  inc/dec this in fragment rules.
+	 */
+	protected int ruleNestingLevel;
 
 	public Lexer() {
 	}
@@ -64,7 +78,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		while (true) {
 			token=null;
 			tokenStartCharIndex = getCharIndex();
-            if ( input.LA(1)==CharStream.EOF ) {
+			if ( input.LA(1)==CharStream.EOF ) {
                 return Token.EOF_TOKEN;
             }
             try {
@@ -104,17 +118,25 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		this.token = token;
 	}
 
-	public void emit(int tokenType,
-					 int line, int charPosition,
-					 int channel,
-					 int start, int stop) {
+	/** The standard method called to automatically emit a token at the
+	 *  outermost lexical rule.  The token object should point into the
+	 *  char buffer start..stop.  If there is a text override in 'text',
+	 *  use that to set the token's text.
+	 */
+	public Token emit(int tokenType,
+					  int line, int charPosition,
+					  int channel,
+					  int start, int stop)
+	{
 		Token t = new CommonToken(input, tokenType, channel, start, stop);
 		t.setLine(line);
+		t.setText(text);
 		t.setCharPositionInLine(charPosition);
 		emit(t);
+		return t;
 	}
 
-    public void match(String s) throws MismatchedTokenException {
+	public void match(String s) throws MismatchedTokenException {
         int i = 0;
         while ( i<s.length() ) {
             if ( input.LA(1)!=s.charAt(i) ) {
@@ -182,9 +204,21 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		return input.index();
 	}
 
-	/** Return the text matched so far for the current token. */
+	/** Return the text matched so far for the current token or any
+	 *  text override.
+	 */
 	public String getText() {
+		if ( text!=null ) {
+			return text;
+		}
 		return input.substring(tokenStartCharIndex,getCharIndex()-1);
+	}
+
+	/** Set the complete text of this token; it wipes any previous
+	 *  changes to the text.
+	 */
+	public void setText(String text) {
+		this.text = text;
 	}
 
 	/** Report a recognition problem.  Java is not polymorphic on the
