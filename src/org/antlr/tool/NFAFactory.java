@@ -441,6 +441,7 @@ public class NFAFactory {
 
 			// set EOB markers for Jean
 			decisionState.endOfBlockStateNumber = blockEndNFAState.stateNumber;
+			blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_BLOCK;
 
             g = new StateCluster(decisionState, blockEndNFAState);
         }
@@ -455,6 +456,7 @@ public class NFAFactory {
 
 			// set EOB markers for Jean (I think this is redundant here)
 			A.left.endOfBlockStateNumber = A.right.stateNumber;
+			A.right.decisionStateType = NFAState.RIGHT_EDGE_OF_BLOCK;
 
             g = A; // return same block, but now with optional last path
         }
@@ -479,10 +481,10 @@ public class NFAFactory {
     public StateCluster build_Aplus(StateCluster A) {
         NFAState left = newState();
         NFAState blockEndNFAState = newState();
-		blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_CLOSURE;
+		blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_BLOCK;
 
-		// don't reuse A.right as loopback if it's right edge of a loop block
-		if ( A.right.decisionStateType == NFAState.RIGHT_EDGE_OF_CLOSURE ) {
+		// don't reuse A.right as loopback if it's right edge of another block
+		if ( A.right.decisionStateType == NFAState.RIGHT_EDGE_OF_BLOCK ) {
 			// nested A* so make another tail node to be the loop back
 			// instead of the usual A.right which is the EOB for inner loop
 			NFAState extraRightEdge = newState();
@@ -541,10 +543,10 @@ public class NFAFactory {
         NFAState optionalAlt = newState();
         optionalAlt.setDescription("epsilon path of ()* block");
         NFAState blockEndNFAState = newState();
-		blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_CLOSURE;
+		blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_BLOCK;
 
-		// don't reuse A.right as loopback if it's right edge of a loop block
-		if ( A.right.decisionStateType == NFAState.RIGHT_EDGE_OF_CLOSURE ) {
+		// don't reuse A.right as loopback if it's right edge of another block
+		if ( A.right.decisionStateType == NFAState.RIGHT_EDGE_OF_BLOCK ) {
 			// nested A* so make another tail node to be the loop back
 			// instead of the usual A.right which is the EOB for inner loop
 			NFAState extraRightEdge = newState();

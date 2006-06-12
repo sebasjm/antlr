@@ -37,7 +37,7 @@ public class NFAState extends State {
 	public static final int BLOCK_START = 2;
 	public static final int OPTIONAL_BLOCK_START = 3;
 	public static final int BYPASS = 4;
-	public static final int RIGHT_EDGE_OF_CLOSURE = 5;
+	public static final int RIGHT_EDGE_OF_BLOCK = 5;
 
 	public static final int MAX_TRANSITIONS = 2;
 
