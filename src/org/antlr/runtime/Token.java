@@ -57,13 +57,7 @@ public abstract class Token {
 	/** Get the text of the token */
 	public abstract String getText();
 
-	/** Set the text, but it might be a nop such as for the CommonToken,
-	 *  which doesn't have string pointers, just indexes into a char buffer.
-	 */
-	public void setText(String text) {
-		throw new RuntimeException("you cannot set the text of "+
-								   getClass().getName()+" token objects");
-	}
+	public void setText(String text) {;}
 
 	public abstract int getType();
 	public abstract void setType(int ttype);
