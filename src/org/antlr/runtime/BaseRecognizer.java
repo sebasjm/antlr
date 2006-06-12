@@ -130,24 +130,38 @@ public abstract class BaseRecognizer {
 	}
 
 	public static void displayRecognitionError(String name,
-											   Object[] tokenNames,
+											   String[] tokenNames,
 											   RecognitionException e)
 	{
 		System.err.print(getRuleInvocationStack(e, name)+
 						 ": line "+e.line+":"+e.charPositionInLine+" ");
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
+			String tokenName="<unknown>";
+			if ( mte.expecting==Token.EOF ) {
+				tokenName = "EOF";
+			}
+			else {
+				tokenName = tokenNames[mte.expecting];
+			}
 			System.err.println("mismatched token: "+
 							   e.token+
 							   "; expecting type "+
-							   tokenNames[mte.expecting]);
+							   tokenName);
 		}
 		else if ( e instanceof MismatchedTreeNodeException ) {
 			MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
+			String tokenName="<unknown>";
+			if ( mtne.expecting==Token.EOF ) {
+				tokenName = "EOF";
+			}
+			else {
+				tokenName = tokenNames[mtne.expecting];
+			}
 			System.err.println("mismatched tree node: "+
 							   mtne.foundNode+
 							   "; expecting type "+
-							   tokenNames[mtne.expecting]);
+							   tokenName);
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;
