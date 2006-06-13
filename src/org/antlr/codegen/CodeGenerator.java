@@ -236,6 +236,8 @@ public class CodeGenerator {
 		else {
 			templates = coreTemplates;
 		}
+
+		//templates.debugTemplateOutput = true;
 	}
 
 	/** Given the grammar to which we are attached, walk the AST associated
@@ -1081,7 +1083,7 @@ public class CodeGenerator {
 	public StringTemplate getRecognizerST() {
 		return outputFileST;
 	}
-	
+
 	public String getRecognizerFileName() {
 		StringTemplate extST = templates.getInstanceOf("codeFileExtension");
 		return grammar.name+extST.toString();

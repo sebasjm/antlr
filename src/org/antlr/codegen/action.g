@@ -211,6 +211,13 @@ ENCLOSING_RULE_SCOPE_ATTR
 			st.setAttribute("scope", $x.text);
 			st.setAttribute("attr", $y.text);
 		}
+	    else if ( scope.isPredefinedLexerRuleScope ) {
+	    	// perhaps not the most precise error message to use, but...
+			ErrorManager.grammarError(ErrorManager.MSG_RULE_HAS_NO_ARGS,
+									  grammar,
+									  actionToken,
+									  $x.text);
+	    }
 		else if ( scope.isParameterScope ) {
 			st = template("parameterAttributeRef");
 			st.setAttribute("attr", scope.getAttribute($y.text));
@@ -310,6 +317,7 @@ String refdRuleName=null;
 		}		
 		}
 	;
+	
 
 /** $label	either a token label or token/rule list label like label+=expr */
 LABEL_REF

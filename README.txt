@@ -267,6 +267,32 @@ June 12, 2006
 
 * EOF works in the parser as a token name.
 
+* Rule b:(A B?)*; didn't display properly in AW due to the way ANTLR
+  generated NFA.
+
+* "scope x;" in a rule for unknown x gives no error.  Fixed.  Added unit test.
+
+* Label type for refs to start/stop in tree parser and other parsers were
+  not used.  Lots of casting.  Ick. Fixed.
+
+* couldn't refer to $tokenlabel in isolation; but need so we can test if
+  something was matched.  Fixed.
+
+* Lots of little bugs fixed in $x.y, %... translation due to new
+  action translator.
+
+* Improperly tracking block nesting level; result was that you couldn't
+  see $ID in action of rule "a : A+ | ID {Token t = $ID;} | C ;"
+
+* a : ID ID {$ID.text;} ; did not get a warning about ambiguous $ID ref.
+
+* No error was found on $COMMENT.text:
+
+COMMENT
+    :   '/*' (options {greedy=false;} : . )* '*/'
+        {System.out.println("found method "+$COMMENT.text);}
+    ;
+
 June 11, 2006
 
 * Single return values are initialized now to default or to your spec.
