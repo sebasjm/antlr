@@ -128,6 +128,22 @@ public Grammar.LabelElementPair getElementLabel(String id) {
     return enclosingRule.getLabel(id);
 }
 
+public void checkElementRefUniqueness(String ref, boolean isToken) {
+		List refs = null;
+		if ( isToken ) {
+		    refs = enclosingRule.getTokenRefsInAlt(ref, outerAltNum);
+		}
+		else {
+		    refs = enclosingRule.getRuleRefsInAlt(ref, outerAltNum);
+		}
+		if ( refs!=null && refs.size()>1 ) {
+			ErrorManager.grammarError(ErrorManager.MSG_NONUNIQUE_REF,
+									  grammar,
+									  actionToken,
+									  ref);
+		}
+}
+
 /** For \$rulelabel.name, return the Attribute found for name.  It
  *  will be a predefined property or a return value.
  */
@@ -218,6 +234,7 @@ TOKEN_SCOPE_ATTR
 		String label = $x.text;
 		if ( enclosingRule.getTokenLabel($x.text)==null ) {
 			// \$tokenref.attr  gotta get old label or compute new one
+			checkElementRefUniqueness($ID.text, true);
 			label = enclosingRule.getElementLabel($x.text, outerAltNum, generator);
 			if ( label==null ) {
 				ErrorManager.grammarError(ErrorManager.MSG_FORWARD_ELEMENT_REF,
@@ -257,6 +274,7 @@ String refdRuleName=null;
 		String label = $x.text;
 		if ( pair==null ) {
 			// \$ruleref.attr  gotta get old label or compute new one
+			checkElementRefUniqueness($ID.text, false);
 			label = enclosingRule.getElementLabel($x.text, outerAltNum, generator);
 			if ( label==null ) {
 				ErrorManager.grammarError(ErrorManager.MSG_FORWARD_ELEMENT_REF,
@@ -312,12 +330,13 @@ LABEL_REF
 		}
 	;
 
-/** $tokenref.attr where attr is predefined property of a token. */
+/** $tokenref in a non-lexer grammar */
 ISOLATED_TOKEN_REF
-	:	'$' ID	{enclosingRule!=null && isTokenRefInAlt($ID.text)}?
-		// {System.out.println("found \$tokenref");}
+	:	'$' ID	{grammar.type!=Grammar.LEXER && enclosingRule!=null && isTokenRefInAlt($ID.text)}?
+		//{System.out.println("found \$tokenref");}
 		{
 		String label = enclosingRule.getElementLabel($ID.text, outerAltNum, generator);
+		checkElementRefUniqueness($ID.text, true);
 		if ( label==null ) {
 			ErrorManager.grammarError(ErrorManager.MSG_FORWARD_ELEMENT_REF,
 									  grammar,
@@ -336,9 +355,10 @@ ISOLATED_LEXER_RULE_REF
 	:	'$' ID	{grammar.type==Grammar.LEXER &&
 	             enclosingRule!=null &&
 	             isRuleRefInAlt($ID.text)}?
-		// {System.out.println("found \$lexerruleref");}
+		//{System.out.println("found \$lexerruleref");}
 		{
 		String label = enclosingRule.getElementLabel($ID.text, outerAltNum, generator);
+		checkElementRefUniqueness($ID.text, false);
 		if ( label==null ) {
 			ErrorManager.grammarError(ErrorManager.MSG_FORWARD_ELEMENT_REF,
 									  grammar,

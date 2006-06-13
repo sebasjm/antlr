@@ -2387,6 +2387,52 @@ public class TestAttributes extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testAmbiguousTokenRef() throws Exception {
+		String action = "$ID;";
+		String expecting = "";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+				"a : ID ID {"+action+"};" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_NONUNIQUE_REF;
+		Object expectedArg = "ID";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testAmbiguousTokenRefWithProp() throws Exception {
+		String action = "$ID.text;";
+		String expecting = "";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+				"a : ID ID {"+action+"};" +
+				"ID : 'a';\n");
+		Tool antlr = new Tool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_NONUNIQUE_REF;
+		Object expectedArg = "ID";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
+		checkError(equeue, expectedMessage);
+	}
+
 	public void testRuleRefWithDynamicScope() throws Exception {
 		String action = "$field::x = $field.st;";
 		String expecting = "((field_scope)field_stack.peek()).x = retval.st;";
