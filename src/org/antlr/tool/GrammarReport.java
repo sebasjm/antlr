@@ -37,10 +37,10 @@ public class GrammarReport {
 	/** Because I may change the stats, I need to track that for later
 	 *  computations to be consistent.
 	 */
-	public static final String Version = "2";
+	public static final String Version = "3";
 	public static final String GRAMMAR_STATS_FILENAME = "grammar.stats";
 	public static final String ANTLRWORKS_DIR = "antlrworks";
-	public static final int NUM_GRAMMAR_STATS = 37;
+	public static final int NUM_GRAMMAR_STATS = 38;
 
 	public Grammar grammar;
 
@@ -82,6 +82,7 @@ public class GrammarReport {
 		int[] cyclicDFAStates = new int[grammar.getNumberOfCyclicDecisions()];
 		int acyclicIndex = 0;
 		int cyclicIndex = 0;
+		int numLL1 = 0;
 		for (int i=1; i<=grammar.getNumberOfDecisions(); i++) {
 			Grammar.Decision d = grammar.getDecision(i);
 			if( d.dfa==null ) {
@@ -89,6 +90,9 @@ public class GrammarReport {
 			}
 			if ( !d.dfa.isCyclic() ) {
 				int maxk = d.dfa.getMaxLookaheadDepth();
+				if ( maxk==1 ) {
+					numLL1++;
+				}
 				depths[acyclicIndex] = maxk;
 				acyclicDFAStates[acyclicIndex] = d.dfa.getNumberOfStates();
 				acyclicIndex++;
@@ -98,6 +102,8 @@ public class GrammarReport {
 				cyclicIndex++;
 			}
 		}
+		buf.append(numLL1);
+		buf.append('\t');
 		buf.append(min(depths));
 		buf.append('\t');
 		buf.append(max(depths));
@@ -212,78 +218,80 @@ public class GrammarReport {
 		buf.append("Cyclic DFA decisions: ");
 		buf.append(fields[7]);
 		buf.append('\n');
-		buf.append("Min fixed k: "); buf.append(fields[8]);
+		buf.append("LL(1) decisions: "); buf.append(fields[8]);
 		buf.append('\n');
-		buf.append("Max fixed k: "); buf.append(fields[9]);
+		buf.append("Min fixed k: "); buf.append(fields[9]);
 		buf.append('\n');
-		buf.append("Average fixed k: "); buf.append(fields[10]);
+		buf.append("Max fixed k: "); buf.append(fields[10]);
 		buf.append('\n');
-		buf.append("Standard deviation of fixed k: "); buf.append(fields[11]);
+		buf.append("Average fixed k: "); buf.append(fields[11]);
 		buf.append('\n');
-		buf.append("Min acyclic DFA states: "); buf.append(fields[12]);
+		buf.append("Standard deviation of fixed k: "); buf.append(fields[12]);
 		buf.append('\n');
-		buf.append("Max acyclic DFA states: "); buf.append(fields[13]);
+		buf.append("Min acyclic DFA states: "); buf.append(fields[13]);
 		buf.append('\n');
-		buf.append("Average acyclic DFA states: "); buf.append(fields[14]);
+		buf.append("Max acyclic DFA states: "); buf.append(fields[14]);
 		buf.append('\n');
-		buf.append("Standard deviation of acyclic DFA states: "); buf.append(fields[15]);
+		buf.append("Average acyclic DFA states: "); buf.append(fields[15]);
 		buf.append('\n');
-		buf.append("Total acyclic DFA states: "); buf.append(fields[16]);
+		buf.append("Standard deviation of acyclic DFA states: "); buf.append(fields[16]);
 		buf.append('\n');
-		buf.append("Min cyclic DFA states: "); buf.append(fields[17]);
+		buf.append("Total acyclic DFA states: "); buf.append(fields[17]);
 		buf.append('\n');
-		buf.append("Max cyclic DFA states: "); buf.append(fields[18]);
+		buf.append("Min cyclic DFA states: "); buf.append(fields[18]);
 		buf.append('\n');
-		buf.append("Average cyclic DFA states: "); buf.append(fields[19]);
+		buf.append("Max cyclic DFA states: "); buf.append(fields[19]);
 		buf.append('\n');
-		buf.append("Standard deviation of cyclic DFA states: "); buf.append(fields[20]);
+		buf.append("Average cyclic DFA states: "); buf.append(fields[20]);
 		buf.append('\n');
-		buf.append("Total cyclic DFA states: "); buf.append(fields[21]);
+		buf.append("Standard deviation of cyclic DFA states: "); buf.append(fields[21]);
+		buf.append('\n');
+		buf.append("Total cyclic DFA states: "); buf.append(fields[22]);
 		buf.append('\n');
 		buf.append("Vocabulary size: ");
-		buf.append(fields[22]);
-		buf.append('\n');
-		buf.append("DFA creation time in ms: ");
 		buf.append(fields[23]);
 		buf.append('\n');
-		buf.append("Number of semantic predicates found: ");
+		buf.append("DFA creation time in ms: ");
 		buf.append(fields[24]);
 		buf.append('\n');
-		buf.append("Number of manual fixed lookahead k=value options: ");
+		buf.append("Number of semantic predicates found: ");
 		buf.append(fields[25]);
 		buf.append('\n');
-		buf.append("Number of nondeterministic decisions: ");
+		buf.append("Number of manual fixed lookahead k=value options: ");
 		buf.append(fields[26]);
 		buf.append('\n');
-		buf.append("Number of nondeterministic decisions resolved with predicates: ");
+		buf.append("Number of nondeterministic decisions: ");
 		buf.append(fields[27]);
 		buf.append('\n');
-		buf.append("Number of DFA conversions terminated early: ");
+		buf.append("Number of nondeterministic decisions resolved with predicates: ");
 		buf.append(fields[28]);
 		buf.append('\n');
-		buf.append("Number of errors: ");
+		buf.append("Number of DFA conversions terminated early: ");
 		buf.append(fields[29]);
 		buf.append('\n');
-		buf.append("Number of warnings: ");
+		buf.append("Number of errors: ");
 		buf.append(fields[30]);
 		buf.append('\n');
-		buf.append("Number of infos: ");
+		buf.append("Number of warnings: ");
 		buf.append(fields[31]);
 		buf.append('\n');
-		buf.append("Number of syntactic predicates found: ");
+		buf.append("Number of infos: ");
 		buf.append(fields[32]);
 		buf.append('\n');
-		buf.append("Decisions with syntactic predicates: ");
+		buf.append("Number of syntactic predicates found: ");
 		buf.append(fields[33]);
 		buf.append('\n');
-		buf.append("Decision DFAs using syntactic predicates: ");
+		buf.append("Decisions with syntactic predicates: ");
 		buf.append(fields[34]);
 		buf.append('\n');
-		buf.append("Decisions with semantic predicates: ");
+		buf.append("Decision DFAs using syntactic predicates: ");
 		buf.append(fields[35]);
 		buf.append('\n');
-		buf.append("Decision DFAs using semantic predicates: ");
+		buf.append("Decisions with semantic predicates: ");
 		buf.append(fields[36]);
+		buf.append('\n');
+		buf.append("Decision DFAs using semantic predicates: ");
+		buf.append(fields[37]);
 		buf.append('\n');
 		return buf.toString();
 	}
