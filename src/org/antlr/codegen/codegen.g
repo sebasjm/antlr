@@ -1033,9 +1033,11 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 			switch ( pair.type ) {
 				case Grammar.TOKEN_LABEL :
 					stName = "rewriteTokenLabelRef";
+					refListAttrName = "referencedTokenLabels";
 					break;
 				case Grammar.RULE_LABEL :
 					stName = "rewriteRuleLabelRef";
+					refListAttrName = "referencedRuleLabels";
 					break;
 				case Grammar.TOKEN_LIST_LABEL :
 					stName = "rewriteTokenListLabelRef";

@@ -694,6 +694,70 @@ public class TestRewriteAST extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testOptional() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : x=b (y=b)? -> $x $y?;\n"+
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "a", debug);
+		String expecting = "a\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testOptional2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : x=ID (y=b)? -> $x $y?;\n"+
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "a b", debug);
+		String expecting = "a b\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testOptional3() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : x=ID (y=b)? -> ($x $y)?;\n"+
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "a b", debug);
+		String expecting = "a b\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testOptional4() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : x+=ID (y=b)? -> ($x $y)?;\n"+
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
+												 "a", "a b", debug);
+		String expecting = "a b\n";
+		assertEqual(found, expecting);
+	}
+
 	public void testArbitraryExprType() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -771,6 +835,7 @@ public class TestRewriteAST extends TestSuite {
 	}
 
 	public void testUnknownToken() throws Exception {
+		// WORKS ALONE! :(
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 

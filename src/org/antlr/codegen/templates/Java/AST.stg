@@ -294,17 +294,16 @@ rewriteCode(
 	alts, description,
 	referencedTokens,
 	referencedListLabels,
-	referencedRules, rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
+	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
+	rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
 <<
 
 // AST REWRITE
 <if(backtracking)>
 if ( backtracking==0 ) {<\n>
 <endif>
-<!
-<first([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("element <it> length="+list_<it>.size()+" != 1");<\n>}>
-<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=1 ) throw new RuntimeException("rewrite element <it> length="+list_<it>.size()+" != 1");<\n>}>
-!>
 int i_0 = 0;
 <prevRuleRootRef()>.tree = root_0;
 root_0 = (<ASTLabelType>)adaptor.nil();
@@ -319,6 +318,8 @@ rewriteOptionalBlock(
 	referencedTokens,
 	referencedListLabels,
 	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
 	description) ::=
 <<
 // <fileName>:<description>
@@ -337,6 +338,8 @@ rewriteClosureBlock(
 	referencedTokens,
 	referencedListLabels,
 	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
 	description) ::=
 <<
 // <fileName>:<description>
@@ -353,6 +356,8 @@ rewritePositiveClosureBlock(
 	referencedTokens,
 	referencedListLabels,
 	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
 	description) ::=
 <<
 // <fileName>:<description>
@@ -377,9 +382,33 @@ for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; 
  *  ($x $y)? will work too with n=1.
  */
 rewriteBlockCardinalityCheck() ::= <<
-int n_<rewriteBlockLevel> = 1;
-<first([referencedTokens,referencedListLabels,referencedRules]):{n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == null ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();}>
+<! First compute size of lists of stuff !>
+<first([referencedTokens,referencedListLabels,referencedRules]):{int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == null ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();}>
+<! Check cardinality against first size !>
 <rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
+<!
+   Now generate checks for non-list labels
+!>
+<!
+   If no lists above, then we need to define n to be 0 or 1 depending on presence
+   of single-value labels
+!>
+<if(!first([referencedTokens,referencedListLabels,referencedRules]))>
+<first([referencedTokenLabels,referencedRuleLabels]):{label |
+int n_<rewriteBlockLevel> = <first([referencedTokenLabels,referencedRuleLabels])>==null ? 0 : 1;
+}>
+<! Now, gen checks to ensure non-list labels match cardinality of other labels !>
+<rest([referencedTokenLabels,referencedRuleLabels]):{label|
+if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n_<rewriteBlockLevel>==0) ) throw new RuntimeException("rewrite element <label> list differs in size from other elements");
+}>
+
+<else> <! there were some list labels !>
+
+<! Now, gen checks to ensure non-list labels match cardinality of lists !>
+<[referencedTokenLabels,referencedRuleLabels]:{label|
+if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n_<rewriteBlockLevel>==0) ) throw new RuntimeException("rewrite element <label> list differs in size from other elements");
+}>
+<endif>
 >>
 
 rewriteAlt(a) ::= <<
