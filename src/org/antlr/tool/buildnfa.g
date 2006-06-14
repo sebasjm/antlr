@@ -262,13 +262,21 @@ exceptionHandler
     ;
 
 rewrite
-	:	( #( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION) ) )*
+	:	(
+			{
+			if ( grammar.getOption("output")==null ) {
+				ErrorManager.grammarError(ErrorManager.MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
+										  grammar, #rewrite.token, currentRuleName);
+			}
+			}
+			#( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION) )
+		)*
 	;
 
 element returns [StateCluster g=null]
     :   g=atom
     |   #(  n:NOT
-            (  c:CHAR_LITERAL
+            (  #( c:CHAR_LITERAL (ast1:ast_suffix)? )
 	           {
 	            int ttype=0;
      			if ( grammar.type==Grammar.LEXER ) {
@@ -286,7 +294,7 @@ element returns [StateCluster g=null]
                 }
 	            g=factory.build_Set(notAtom);
 	           }
-            |  t:TOKEN_REF
+            |  #( t:TOKEN_REF (ast3:ast_suffix)? )
 	           {
 	           int ttype = grammar.getTokenType(t.getText());
                IntSet notAtom = grammar.complement(ttype);
@@ -411,12 +419,14 @@ StateCluster e=null;
            StateCluster up = factory.build_Atom(Label.UP);
            //el.followingNFAState = up.right;
 		   g = factory.build_AB(g,up);
+		   // tree roots point at right edge of DOWN for LOOK computation later
+		   #tree.NFATreeDownState = down.left;
 		   }
 		 )
     ;
 
 atom returns [StateCluster g=null]
-    :   r:RULE_REF
+    :   #( r:RULE_REF (rarg:ARG_ACTION)? (as1:ast_suffix)? )
         {
         NFAState start = grammar.getRuleStartState(r.getText());
         if ( start!=null ) {
@@ -432,7 +442,7 @@ atom returns [StateCluster g=null]
         }
         }
 
-    |   t:TOKEN_REF
+    |   #( t:TOKEN_REF (targ:ARG_ACTION)? (as2:ast_suffix)? )
         {
         if ( grammar.type==Grammar.LEXER ) {
             NFAState start = grammar.getRuleStartState(t.getText());
@@ -450,7 +460,7 @@ atom returns [StateCluster g=null]
         }
         }
 
-    |   c:CHAR_LITERAL
+    |   #( c:CHAR_LITERAL (as3:ast_suffix)? )
     	{
     	if ( grammar.type==Grammar.LEXER ) {
     		g = factory.build_CharLiteralAtom(c.getText());
@@ -462,7 +472,7 @@ atom returns [StateCluster g=null]
     	}
     	}
 
-    |   s:STRING_LITERAL
+    |   #( s:STRING_LITERAL (as4:ast_suffix)? )
     	{
      	if ( grammar.type==Grammar.LEXER ) {
      		g = factory.build_StringLiteralAtom(s.getText());
@@ -474,9 +484,21 @@ atom returns [StateCluster g=null]
      	}
      	}
 
-    |   WILDCARD         {g = factory.build_Wildcard();}
+    |   #( w:WILDCARD (as5:ast_suffix)? )    {g = factory.build_Wildcard();}
 
 	|	g=set
+	;
+
+ast_suffix
+{
+if ( grammar.getOption("output")==null ) {
+	ErrorManager.grammarError(ErrorManager.MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
+							  grammar, #ast_suffix.token, currentRuleName);
+}
+}
+	:	ROOT
+	|	RULEROOT
+	|	BANG
 	;
 
 set returns [StateCluster g=null]
@@ -484,7 +506,7 @@ set returns [StateCluster g=null]
 IntSet elements=new IntervalSet();
 #set.setSetValue(elements); // track set for use by code gen
 }
-	:	#(s:SET (setElement[elements])+)
+	:	#( s:SET (setElement[elements])+ ( ast:ast_suffix )? )
         {
         g = factory.build_Set(elements);
         #s.followingNFAState = g.right;

@@ -265,12 +265,15 @@ CHANGES
 
 June 13, 2006
 
-* ^(ROOT ID?) Didnt' work; nor did any other nullable child list such as
+* ^(ROOT ID?) Didn't work; nor did any other nullable child list such as
   ^(ROOT ID* INT?).  Now, I check to see if child list is nullable using
   Grammar.LOOK() and, if so, I generate an "IF lookahead is DOWN" gate 
   around the child list so the whole thing is optional.
 
 * Fixed a bug in LOOK that made it not look through nullable rules.
+
+* Using AST suffixes or -> rewrite syntax now gives an error w/o a grammar
+  output option.  Used to crash ;)
 
 June 12, 2006
 

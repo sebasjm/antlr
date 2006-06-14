@@ -695,7 +695,8 @@ rewrite
 {
     GrammarAST root = new GrammarAST();
 }
-	:!	( options { warnWhenFollowAmbig=false;}
+	:!
+		( options { warnWhenFollowAmbig=false;}
 		: rew:REWRITE pred:SEMPRED alt:rewrite_alternative
 	      {root.addChild( #(#rew, #pred, #alt) );}
 		  {#pred.setEnclosingRule(currentRuleName);}

@@ -200,7 +200,8 @@ MISSING_ATTRIBUTE_NAME(file,line,col) ::=
   "<loc()>missing attribute name on $ reference"
 ARG_INIT_VALUES_ILLEGAL(file,line,col,arg) ::=
   "<loc()>rule parameters may not have init values: <arg>"
-
+REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION(file,line,col,arg) ::=
+  "<loc()>rule <arg> uses rewrite syntax or operator with no output option"
 
 // GRAMMAR WARNINGS
 
