@@ -662,11 +662,19 @@ match(EOF); <checkRuleBacktrackFailure()>
 >>
 
 /** match ^(root children) in tree parser */
-tree(root, children) ::= <<
+tree(root, children, nullableChildList) ::= <<
 <root:element()>
+<if(nullableChildList)>
+if ( input.LA(1)==Token.DOWN ) {
+    match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
+    <children:element()>
+    match(input, Token.UP, null); <checkRuleBacktrackFailure()>
+}
+<else>
 match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
 <children:element()>
 match(input, Token.UP, null); <checkRuleBacktrackFailure()>
+<endif>
 >>
 
 /** Every predicate is used as a validating predicate (even when it is

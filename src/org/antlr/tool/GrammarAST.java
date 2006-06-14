@@ -68,13 +68,19 @@ public class GrammarAST extends BaseAST {
     /** What NFA start state was built from this node? */
     public NFAState NFAStartState = null;
 
+	/** This is used for TREE_BEGIN nodes to point into
+	 *  the NFA.  TREE_BEGINs point at left edge of DOWN for LOOK computation
+     *  purposes (Nullable tree child list needs special code gen when matching).
+	 */
+	public NFAState NFATreeDownState = null;
+
 	/** Rule ref nodes, token refs, set, and NOT set refs need to track their
 	 *  location in the generated NFA so that local FOLLOW sets can be
 	 *  computed during code gen for automatic error recovery.
 	 */
 	public NFAState followingNFAState = null;
 
-    /** If this is a SET node, what are the elements? */
+	/** If this is a SET node, what are the elements? */
     protected IntSet setValue = null;
 
     /** If this is a BLOCK node, track options here */

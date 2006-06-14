@@ -263,6 +263,15 @@ CHANGES
 
 3.0ea11 -
 
+June 13, 2006
+
+* ^(ROOT ID?) Didnt' work; nor did any other nullable child list such as
+  ^(ROOT ID* INT?).  Now, I check to see if child list is nullable using
+  Grammar.LOOK() and, if so, I generate an "IF lookahead is DOWN" gate 
+  around the child list so the whole thing is optional.
+
+* Fixed a bug in LOOK that made it not look through nullable rules.
+
 June 12, 2006
 
 * EOF works in the parser as a token name.
@@ -292,6 +301,8 @@ COMMENT
     :   '/*' (options {greedy=false;} : . )* '*/'
         {System.out.println("found method "+$COMMENT.text);}
     ;
+
+  $enclosinglexerrule scope does not exist.  Use text or setText() here.
 
 June 11, 2006
 

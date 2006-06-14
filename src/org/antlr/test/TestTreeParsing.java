@@ -192,4 +192,98 @@ public class TestTreeParsing extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testNullableChildList() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT? -> ^(ID INT?);\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n" +
+			"a : ^(ID INT?)\n" +
+			"    {System.out.println($ID);}\n" +
+			"  ;\n";
+
+		String found =
+			TestCompileAndExecSupport.execTreeParser("t.g",
+													 grammar,
+													 "T",
+													 "tp.g",
+													 treeGrammar,
+													 "TP",
+													 "TLexer",
+												 	 "a",
+													 "a",
+													 "abc");
+		String expecting = "abc\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testNullableChildList2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT? SEMI -> ^(ID INT?) SEMI ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"SEMI : ';' ;\n"+
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n" +
+			"a : ^(ID INT?) SEMI\n" +
+			"    {System.out.println($ID);}\n" +
+			"  ;\n";
+
+		String found =
+			TestCompileAndExecSupport.execTreeParser("t.g",
+													 grammar,
+													 "T",
+													 "tp.g",
+													 treeGrammar,
+													 "TP",
+													 "TLexer",
+												 	 "a",
+													 "a",
+													 "abc;");
+		String expecting = "abc\n";
+		assertEqual(found, expecting);
+	}
+
+	public void testNullableChildList3() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : x=ID INT? (y=ID)? SEMI -> ^($x INT? $y?) SEMI ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"SEMI : ';' ;\n"+
+			"WS : (' '|'\\n') {channel=99;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n" +
+			"a : ^(ID INT? b) SEMI\n" +
+			"    {System.out.println($ID+\", \"+$b.text);}\n" +
+			"  ;\n"+
+			"b : ID? ;\n";
+
+		String found =
+			TestCompileAndExecSupport.execTreeParser("t.g",
+													 grammar,
+													 "T",
+													 "tp.g",
+													 treeGrammar,
+													 "TP",
+													 "TLexer",
+												 	 "a",
+													 "a",
+													 "abc def;");
+		String expecting = "abc, def\n";
+		assertEqual(found, expecting);
+	}
+
+
 }

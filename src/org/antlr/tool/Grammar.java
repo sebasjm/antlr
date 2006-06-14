@@ -2088,6 +2088,10 @@ public class Grammar {
 	 *  follow chain to compute the real, correct follow set.
 	 *
 	 *  This routine will only be used on parser and tree parser grammars.
+	 *
+	 *  TODO: it does properly handle a : b A ; where b is nullable
+	 *  Actually it stops at end of rules, returning EOR.  Hmm...
+	 *  should check for that and keep going.
 	 */
 	public LookaheadSet LOOK(NFAState s) {
 		lookBusy.clear();
@@ -2121,6 +2125,22 @@ public class Grammar {
 			return new LookaheadSet(sl);
 		}
         LookaheadSet tset = _LOOK((NFAState)transition0.target);
+		if ( tset.member(Label.EOR_TOKEN_TYPE) ) {
+			if ( transition0 instanceof RuleClosureTransition ) {
+				// we called a rule that found the end of the rule.
+				// That means the rule is nullable and we need to
+				// keep looking at what follows the rule ref.  E.g.,
+				// a : b A ; where b is nullable means that LOOK(a)
+				// should include A.
+				RuleClosureTransition ruleInvocationTrans =
+					(RuleClosureTransition)transition0;
+				// remove the EOR and get what follows
+				tset.remove(Label.EOR_TOKEN_TYPE);
+				LookaheadSet fset =
+					_LOOK((NFAState)ruleInvocationTrans.getFollowState());
+				tset.orInPlace(fset);
+			}
+		}
 
 		Transition transition1 = s.transition(1);
 		if ( transition1!=null ) {

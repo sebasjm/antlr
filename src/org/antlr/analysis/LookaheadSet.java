@@ -58,6 +58,14 @@ public class LookaheadSet {
 		this.hasEOF = this.hasEOF || other.hasEOF;
 	}
 
+	public boolean member(int a) {
+		return tokenTypeSet.member(a);
+	}
+
+	public void remove(int a) {
+		tokenTypeSet = tokenTypeSet.subtract(IntervalSet.of(a));
+	}
+
 	public String toString(Grammar g) {
 		if ( tokenTypeSet==null ) {
 			if ( hasEOF ) {

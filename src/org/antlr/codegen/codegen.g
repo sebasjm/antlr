@@ -604,6 +604,14 @@ tree returns [StringTemplate code=templates.getInstanceOf("tree")]
 {
 StringTemplate el=null;
 GrammarAST elAST=null;
+NFAState afterDOWN = (NFAState)tree_AST_in.NFATreeDownState.transition(0).target;
+LookaheadSet s = grammar.LOOK(afterDOWN);
+if ( s.member(Label.UP) ) {
+	// nullable child list if we can see the UP as the next token
+	// we need an "if ( input.LA(1)==Token.DOWN )" gate around
+	// the child list.
+	code.setAttribute("nullableChildList", "true");
+}
 }
     :   #( TREE_BEGIN {elAST=(GrammarAST)_t;}
     	   el=element
