@@ -224,7 +224,15 @@ public class Tool {
 			String grammarFileName = (String) grammarFileNames.get(i);
 			try {
 				//StringTemplate.setLintMode(true);
-				FileReader fr = new FileReader(grammarFileName);
+				FileReader fr = null;
+				try {
+					fr = new FileReader(grammarFileName);
+				}
+				catch (IOException ioe) {
+					ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE,
+									   grammarFileName);
+					continue;
+				}
 				BufferedReader br = new BufferedReader(fr);
 				Grammar grammar = new Grammar(this,grammarFileName,br);
 				grammar.setWatchNFAConversion(internalOption_watchNFAConversion);

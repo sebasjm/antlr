@@ -286,6 +286,8 @@ t.g:4:17: the decision cannot distinguish between alternative(s) 2,1 for at leas
 * tracking of rule elements was on (making list defs at start of
   method) with templates instead of just with ASTs.  Turned off.
 
+* Doesn't crash when you give it a missing file now.
+
 June 13, 2006
 
 * ^(ROOT ID?) Didn't work; nor did any other nullable child list such as

@@ -41,6 +41,7 @@ problem reading token vocabulary file <arg>: <exception>
 >>
 DIR_NOT_FOUND(arg) ::= "directory not found: <arg>"
 OUTPUT_DIR_IS_FILE(arg) ::= "output directory is a file: <arg>"
+CANNOT_OPEN_FILE(arg) ::= "cannot find or open file: <arg>"
 
 INTERNAL_ERROR(arg,arg2,exception,stackTrace) ::= <<
 internal error: <arg> <arg2><if(exception)>: <exception><endif>
