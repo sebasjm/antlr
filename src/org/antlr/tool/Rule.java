@@ -265,7 +265,12 @@ public class Rule {
 	 *  is called from the rule template not directly by the code generator.
 	 */
 	public Set getAllTokenRefsInAltsWithRewrites() {
+		String output = (String)grammar.getOption("output");
 		Set tokens = new HashSet();
+		if ( output==null || !output.equals("AST") ) {
+			// return nothing if not generating trees; i.e., don't do for templates
+			return tokens;
+		}
 		for (int i = 1; i <= numberOfAlts; i++) {
 			if ( altsWithRewrites[i] ) {
 				Map m = altToTokenRefMap[i];
