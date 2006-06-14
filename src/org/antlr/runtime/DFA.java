@@ -70,19 +70,8 @@ public class DFA {
 							input.consume();
 							return alt;
 						}
-/*
-						if (recognizer.backtracking>0) {
-							recognizer.failed=true;
-							return 0;
-						}
-						NoViableAltException nvae =
-							new NoViableAltException(getDescription(),
-													   decisionNumber,
-													   s,
-													   input);
-						error(nvae);
-						throw nvae;
-						*/
+						noViableAlt(s,input);
+						return 0;
 					}
 					s = snext;
 					input.consume();
@@ -109,17 +98,8 @@ public class DFA {
 					}
 					System.err.println();
 				}
-				if (recognizer.backtracking>0) {
-					recognizer.failed=true;
-					return 0;
-				}
-				NoViableAltException nvae =
-					new NoViableAltException(getDescription(),
-											 decisionNumber,
-											 s,
-											 input);
-				error(nvae);
-				throw nvae;
+				noViableAlt(s,input);
+				return 0;
 			}
 		}
 		finally {
@@ -127,6 +107,18 @@ public class DFA {
 		}
 	}
 
+	protected void noViableAlt(int s, IntStream input) throws NoViableAltException {
+		if (recognizer.backtracking>0) {
+			recognizer.failed=true;
+		}
+		NoViableAltException nvae =
+			new NoViableAltException(getDescription(),
+									 decisionNumber,
+									 s,
+									 input);
+		error(nvae);
+		throw nvae;
+	}
 	protected void foo() throws NoViableAltException {
 	}
 
