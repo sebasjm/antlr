@@ -372,14 +372,9 @@ for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; 
 
 /** Elements referenced in rewrite loops/optional blocks must have
  *  the same size.  Factor this out from rewriteXXXBlock rules.  This
- *  only deals with the lists of stuff not single element labels like id=ID.
- *  The n_xxx var is always defined and assumed to be 1 so optional blocks
- *  and loops are always entered even if no list_xxx variables are found.
- *  For example,
- *  	a : (x=ID)? y=ID -> ($x $y)+;
- *  should generate a loop where n defined to be 1 even though it can't really
- *  loop, n=0 will prevent entry and even generate a cardinality problem.
- *  ($x $y)? will work too with n=1.
+ *  deals both with the lists of stuff and single element labels like id=ID.
+ *  The n_xxx var is always defined to either first list_ var or single-value
+ *  label.
  */
 rewriteBlockCardinalityCheck() ::= <<
 <! First compute size of lists of stuff !>
