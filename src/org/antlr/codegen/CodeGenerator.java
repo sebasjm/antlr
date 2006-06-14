@@ -236,7 +236,10 @@ public class CodeGenerator {
 			templates = coreTemplates;
 		}
 
-		//templates.debugTemplateOutput = true;
+		/*
+		templates.emitDebugStartStopStrings(true);
+		templates.doNotEmitDebugStringsForTemplate("codeFileExtension");
+		*/
 	}
 
 	/** Given the grammar to which we are attached, walk the AST associated

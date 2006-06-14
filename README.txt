@@ -263,6 +263,29 @@ CHANGES
 
 3.0ea11 -
 
+June 14, 2006
+
+* -> ($rulelabel)? didn't generate proper code for ASTs.
+
+* bug in code gen (did not compile)
+a : ID -> ID
+  | ID -> ID
+  ;
+Problem is repeated ref to ID from left side.  Juergen pointed this out.
+
+* use of tokenVocab with missing file yielded exception
+
+* (A|B)=> foo yielded an exception as (A|B) is a set not a block. Fixed.
+
+* Didn't set ID1= and INT1= for this alt:
+  | ^(ID INT+ {System.out.print(\"^(\"+$ID+\" \"+$INT+\")\");})
+
+* Fixed so repeated dangling state errors only occur once like:
+t.g:4:17: the decision cannot distinguish between alternative(s) 2,1 for at least one input sequence
+
+* tracking of rule elements was on (making list defs at start of
+  method) with templates instead of just with ASTs.  Turned off.
+
 June 13, 2006
 
 * ^(ROOT ID?) Didn't work; nor did any other nullable child list such as
@@ -274,6 +297,14 @@ June 13, 2006
 
 * Using AST suffixes or -> rewrite syntax now gives an error w/o a grammar
   output option.  Used to crash ;)
+
+* References to EOF ended up with improper -1 refs instead of EOF in output.
+
+* didn't warn of ambig ref to $expr in rewrite; fixed.
+list 
+     :	'[' expr 'for' type ID 'in' expr ']'
+	-> comprehension(expr={$expr.st},type={},list={},i={})
+	;
 
 June 12, 2006
 
