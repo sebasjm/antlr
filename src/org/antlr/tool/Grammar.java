@@ -1531,6 +1531,7 @@ public class Grammar {
 
 	/** Load a vocab file <vocabName>.tokens and return max token type found. */
 	public int importTokenVocabulary(String vocabName) {
+		String fullName = tool.getLibraryDirectory()+File.separator+vocabName+".tokens";
 		try {
 			BufferedReader br = tool.getLibraryFile(vocabName+".tokens");
 			StreamTokenizer tokenizer = new StreamTokenizer(br);
@@ -1599,16 +1600,16 @@ public class Grammar {
 		}
 		catch (FileNotFoundException fnfe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_TOKENS_FILE,
-							   vocabName+".tokens");
+							   fullName);
 		}
 		catch (IOException ioe) {
 			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   vocabName+".tokens",
+							   fullName,
 							   ioe);
 		}
 		catch (Exception e) {
 			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   vocabName+".tokens",
+							   fullName,
 							   e);
 		}
 		return maxTokenType;

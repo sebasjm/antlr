@@ -247,6 +247,7 @@ public class Tool {
 					w.close();
 					StringReader sr = new StringReader(lexerGrammarStr);
 					Grammar lexerGrammar = new Grammar();
+					lexerGrammar.setTool(this);
 					File lexerGrammarFullFile =
 						new File(grammar.getFileDirectory(),lexerGrammarFileName);
 					lexerGrammar.setFileName(lexerGrammarFullFile.toString());
@@ -432,6 +433,10 @@ public class Tool {
 		FileReader fr = new FileReader(fullName);
 		BufferedReader br = new BufferedReader(fr);
 		return br;
+	}
+
+	public String getLibraryDirectory() {
+		return libDirectory;
 	}
 
 	/** If the tool needs to panic/exit, how do we do that? */
