@@ -188,6 +188,17 @@ public class ErrorManager {
 		}
 	};
 
+	/** Only one error can be emitted for any entry in this table.
+	 *  Map<String,Set> where the key is a method name like danglingState.
+	 *  The set is whatever that method accepts or derives like a DFA.
+	 */
+	public static final Map emitSingleError = new HashMap() {
+		{
+			put("danglingState", new HashSet());
+		}
+	};
+
+
 	/** Messages should be sensitive to the locale. */
 	private static Locale locale;
 
@@ -471,9 +482,14 @@ public class ErrorManager {
 									 DFAState d)
 	{
 		getErrorState().warnings++;
-		getErrorListener().warning(
-			new GrammarDanglingStateMessage(probe,d)
-		);
+		Set seen = (Set)emitSingleError.get("danglingState");
+		if ( !seen.contains(d.dfa.decisionNumber+"|"+d.getAltSet()) ) {
+			getErrorListener().warning(
+				new GrammarDanglingStateMessage(probe,d)
+			);
+			// we've seen this decision and this alt set; never again
+			seen.add(d.dfa.decisionNumber+"|"+d.getAltSet());
+		}
 	}
 
 	public static void analysisAborted(DecisionProbe probe)
