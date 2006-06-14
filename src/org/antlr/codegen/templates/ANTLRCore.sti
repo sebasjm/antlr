@@ -168,22 +168,28 @@ validateSemanticPredicate(pred,description);
 
 // F i x e d  D F A  (if-then-else)
 
-dfaState(k,edges,eotPredictsAlt,description,stateNumber);
+dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState);
 
 /** Same as a normal DFA state except that we don't examine lookahead
  *  for the bypass alternative.  It delays error detection but this
  *  is faster, smaller, and more what people expect.  For (X)? people
  *  expect "if ( LA(1)==X ) match(X);" and that's it.
+ *
+ *  If a semPredState, don't force lookahead lookup; preds might not
+ *  need.
  */
-dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber);
+dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredState);
 
 /** A DFA state that is actually the loopback decision of a closure
  *  loop.  If end-of-token (EOT) predicts any of the targets then it
  *  should act like a default clause (i.e., no error can be generated).
- *  This is used only in the lexer so that for ('a')* on the end of a rule
- *  anything other than 'a' predicts exiting.
+ *  This is used only in the lexer so that for ('a')* on the end of a
+ *  rule anything other than 'a' predicts exiting.
+ *
+ *  If a semPredState, don't force lookahead lookup; preds might not
+ *  need.
  */
-dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber);
+dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState);
 
 /** An accept state indicates a unique alternative has been predicted */
 dfaAcceptState(alt);
@@ -199,11 +205,11 @@ dfaEdge(labelExpr, targetState, predicates);
 /** A DFA state where a SWITCH may be generated.  The code generator
  *  decides if this is possible: CodeGenerator.canGenerateSwitch().
  */
-dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber);
+dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber,semPredState);
 
-dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber);
+dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber,semPredState);
 
-dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber);
+dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber,semPredState);
 
 dfaEdgeSwitch(labels, targetState);
 

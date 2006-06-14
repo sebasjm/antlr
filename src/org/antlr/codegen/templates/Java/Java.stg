@@ -689,8 +689,10 @@ if ( !(<evalPredicate(...)>) ) {
 
 // F i x e d  D F A  (if-then-else)
 
-dfaState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
+dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
+<if(!semPredState)>
+int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
+<endif>
 <edges; separator="\nelse ">
 else {
 <if(eotPredictsAlt)>
@@ -710,8 +712,10 @@ else {
  *  is faster, smaller, and more what people expect.  For (X)? people
  *  expect "if ( LA(1)==X ) match(X);" and that's it.
  */
-dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
+dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
+<if(!semPredState)>
+int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
+<endif>
 <edges; separator="\nelse ">
 >>
 
@@ -721,8 +725,10 @@ int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
  *  This is used only in the lexer so that for ('a')* on the end of a rule
  *  anything other than 'a' predicts exiting.
  */
-dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-int LA<decisionNumber>_<stateNumber> = input.LA(<k>);
+dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
+<if(!semPredState)>
+int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
+<endif>
 <edges; separator="\nelse "><\n>
 <if(eotPredictsAlt)>
 else {
@@ -749,7 +755,7 @@ if ( <labelExpr> <if(predicates)>&& (<predicates>)<endif>) {
 /** A DFA state where a SWITCH may be generated.  The code generator
  *  decides if this is possible: CodeGenerator.canGenerateSwitch().
  */
-dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 switch ( input.LA(<k>) ) {
 <edges; separator="\n">
 default:
@@ -765,13 +771,13 @@ default:
 }<\n>
 >>
 
-dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 switch ( input.LA(<k>) ) {
     <edges; separator="\n">
 }<\n>
 >>
 
-dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 switch ( input.LA(<k>) ) {
 <edges; separator="\n"><\n>
 <if(eotPredictsAlt)>
@@ -867,8 +873,11 @@ class DFA<dfa.decisionNumber> extends DFA {
  *  state.
  */
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
-int LA<decisionNumber>_<stateNumber> = input.LA(1);
-<if(semPredState)>input.rewind();<endif>
+<if(semPredState)>
+input.rewind();<\n>
+<else>
+int LA<decisionNumber>_<stateNumber> = input.LA(1);<\n>
+<endif>
 s = -1;
 <edges; separator="\nelse ">
 if ( s>=0 ) return s;

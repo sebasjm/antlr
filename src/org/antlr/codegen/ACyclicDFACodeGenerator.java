@@ -27,12 +27,9 @@
 */
 package org.antlr.codegen;
 
+import org.antlr.analysis.*;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.analysis.*;
-import org.antlr.tool.GrammarAST;
-import org.antlr.tool.ANTLRParser;
-import org.antlr.misc.Utils;
 
 import java.util.List;
 
@@ -87,6 +84,8 @@ public class ACyclicDFACodeGenerator {
 		}
 		dfaST.setAttribute("k", new Integer(k));
 		dfaST.setAttribute("stateNumber", new Integer(s.stateNumber));
+		dfaST.setAttribute("semPredState",
+							new Boolean(s.isResolvedWithPredicates()));
 		String description = dfa.getNFADecisionStartState().getDescription();
 		description = parentGenerator.target.getTargetStringLiteralFromString(description);
 		//System.out.println("DFA: "+description+" associated with AST "+decisionASTNode);
