@@ -37,7 +37,6 @@ import org.antlr.misc.BitSet;
 import org.antlr.misc.IntSet;
 import org.antlr.misc.Interval;
 import org.antlr.misc.IntervalSet;
-import org.antlr.runtime.CharStream;
 import org.antlr.stringtemplate.CommonGroupLoader;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -804,9 +803,6 @@ public class CodeGenerator {
 		// If name is a literal, return the token type instead
 		if ( name.charAt(0)=='\'' ) {
 			return String.valueOf(ttype);
-		}
-		if ( ttype==Label.EOF ) {
-			return String.valueOf(CharStream.EOF);
 		}
 		return name;
 	}
