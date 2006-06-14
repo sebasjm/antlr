@@ -567,6 +567,7 @@ ebnf!
 			( BANG )?
 		|   IMPLIES! // syntactic predicate
 			{
+			if (#b.getType()==SET) #b=setToBlockWithSet(#b);
 			if ( gtype==COMBINED_GRAMMAR &&
 			     Character.isUpperCase(currentRuleName.charAt(0)) )
 		    {
