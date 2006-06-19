@@ -204,6 +204,22 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 		assertEqual(found, expecting);
 	}
 
+	public void testGatedPred2() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"@lexer::members {boolean sig=false;}\n"+
+			"a : (A|B)+ ;\n" +
+			"A : 'a' {System.out.print(\"A\"); sig=true;} ;\n" +
+			"B : 'b' ;\n" +
+			"C : {sig}?=> ('a'|'b') {System.out.print(\"C\");} ;\n";
+		String found =
+			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
+												 "a", "aa", false);
+		// "a" is ambig; can match both A, B.  Pred says match A twice
+		String expecting = "AC\n";
+		assertEqual(found, expecting);
+	}
+
 	public void testPredWithActionTranslation() throws Exception {
 		String grammar =
 			"grammar foo;\n" +

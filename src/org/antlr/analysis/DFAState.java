@@ -671,10 +671,14 @@ public class DFAState extends State {
 		Iterator iter = nfaConfigurations.iterator();
 		SemanticContext unionOfPredicatesFromAllAlts = null;
 		NFAConfiguration configuration;
+		boolean foundTruePred = false;
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
 			SemanticContext gatedPredExpr =
 				configuration.semanticContext.getGatedPredicateContext();
+			if ( gatedPredExpr==null ) {
+				foundTruePred = true;
+			}
 			if ( gatedPredExpr!=null ) {
 				if ( unionOfPredicatesFromAllAlts==null ) {
 					unionOfPredicatesFromAllAlts = gatedPredExpr;
@@ -684,6 +688,12 @@ public class DFAState extends State {
 						SemanticContext.or(unionOfPredicatesFromAllAlts,gatedPredExpr);
 				}
 			}
+		}
+		if ( foundTruePred ) {
+			return null;
+		}
+		if ( unionOfPredicatesFromAllAlts instanceof SemanticContext.TruePredicate ) {
+			return null;
 		}
 		return unionOfPredicatesFromAllAlts;
 	}

@@ -1337,7 +1337,8 @@ public class NFAToDFAConverter {
 			org.antlr.misc.BitSet predSet = org.antlr.misc.BitSet.of(altToPredMap);
 			int nakedAlt = ndSet.subtract(predSet).getSingleElement();
 			SemanticContext nakedAltPred = null;
-			if ( nakedAlt == nondeterministicAlts.size() ) {
+			if ( nakedAlt == max(nondeterministicAlts) ) {
+				// the naked alt is the last nondet alt and will be the default clause
 				nakedAltPred = new SemanticContext.TruePredicate();
 			}
 			else {
@@ -1610,4 +1611,24 @@ public class NFAToDFAConverter {
             contextTrees[i] = new NFAContext(null, null);
         }
     }
+
+	public static int max(Set s) {
+		if ( s==null ) {
+			return Integer.MIN_VALUE;
+		}
+		int i = 0;
+		int m = 0;
+		for (Iterator it = s.iterator(); it.hasNext();) {
+			i++;
+			Integer I = (Integer) it.next();
+			if ( i==1 ) { // init m with first value
+				m = I.intValue();
+				continue;
+			}
+			if ( I.intValue()>m ) {
+				m = I.intValue();
+			}
+		}
+		return m;
+	}
 }
