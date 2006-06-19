@@ -1157,7 +1157,10 @@ public class Grammar {
 	 */
 	public void referenceRuleLabelPredefinedAttribute(String ruleName) {
 		Rule r = getRule(ruleName);
-		if ( r!=null ) {
+		if ( r!=null && type!=LEXER ) {
+			// indicate that an action ref'd an attr unless it's in a lexer
+			// so that $ID.text refs don't force lexer rules to define
+			// return values...Token objects are created by the caller instead.
 			r.referencedPredefinedRuleAttributes = true;
 		}
 	}
