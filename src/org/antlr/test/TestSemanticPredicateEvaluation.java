@@ -215,7 +215,6 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 		String found =
 			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
 												 "a", "aa", false);
-		// "a" is ambig; can match both A, B.  Pred says match A twice
 		String expecting = "AC\n";
 		assertEqual(found, expecting);
 	}
