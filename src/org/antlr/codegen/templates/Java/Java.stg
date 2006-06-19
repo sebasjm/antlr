@@ -348,12 +348,12 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
     <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleDeclarations()>
     try {
+        ruleNestingLevel++;
 <if(nakedBlock)>
         <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
         <block><\n>
 <else>
-        ruleNestingLevel++;
         int type = <ruleName>;
         int start = getCharIndex();
         int line = getLine();
@@ -363,13 +363,13 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
         <ruleMemoization(name=ruleName)>
         <block>
         <! create token if none exists *and* we are an outermost token rule !>
-        ruleNestingLevel--;
-        if ( token==null && ruleNestingLevel==0 ) {
+        if ( token==null && ruleNestingLevel==1 ) {
             emit(type,line,charPosition,channel,start,getCharIndex()-1);
         }<\n>
 <endif>
     }
     finally {
+        ruleNestingLevel--;
         <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
         <(ruleDescriptor.actions.finally):execAction()>
