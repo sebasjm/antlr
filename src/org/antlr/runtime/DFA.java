@@ -39,20 +39,17 @@ public class DFA {
 		int s = 0; // we always start at s0
 		try {
 			while ( true ) {
-				if ( debug ) System.err.println("DFA_ "+decisionNumber+" state "+s+" LA(1)="+(char)input.LA(1)+"("+input.LA(1)+")");
+				if ( debug ) System.err.println("DFA "+decisionNumber+" state "+s+" LA(1)="+(char)input.LA(1)+"("+input.LA(1)+")");
 				int specialState = special[s];
 				if ( specialState>=0 ) {
-					/*
-					if ( debug ) System.err.println("DFA_ "+decisionNumber+
+					if ( debug ) System.err.println("DFA "+decisionNumber+
 						" state "+s+" is special state "+specialState);
-					*/
 					s = specialStateTransition(specialState);
 					input.consume();
 					continue;
 				}
 				if ( accept[s] >= 1 ) {
-					if ( debug ) System.err.println("accept; predict "+accept[s]+" from "+s);
-					input.consume();
+					if ( debug ) System.err.println("accept; predict "+accept[s]+" from state "+s);
 					return accept[s];
 				}
 				// look for a normal char transition
@@ -62,13 +59,18 @@ public class DFA {
 					if ( snext < 0 ) {
 						// was in range but not a normal transition
 						// must check EOT, which is like the else clause.
-						// eot[s]>=0 indicates that an EOT edge goes to an
-						// accept state
+						// eot[s]>=0 indicates that an EOT edge goes to another
+						// state.
 						if ( eot[s]>=0 ) {  // EOT Transition to accept state?
-							int alt = accept[eot[s]];
-							if ( debug ) System.err.println("accept via EOT; predict "+alt+" from "+eot[s]);
+							if ( debug ) System.err.println("EOT transition");
+							s = eot[s];
 							input.consume();
-							return alt;
+							// TODO: I had this as return accept[eot[s]]
+							// which assumed here that the EOT edge always
+							// went to an accept...faster to do this, but
+							// what about predicated edges coming from EOT
+							// target?
+							continue;
 						}
 						noViableAlt(s,input);
 						return 0;
