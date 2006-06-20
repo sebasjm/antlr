@@ -50,13 +50,13 @@ public class DFA {
 					input.consume();
 					continue;
 				}
-				int c = input.LA(1);
 				if ( accept[s] >= 1 ) {
 					if ( debug ) System.err.println("accept; predict "+accept[s]+" from "+s);
 					input.consume();
 					return accept[s];
 				}
 				// look for a normal char transition
+				int c = input.LA(1);
 				if (c>=min[s] && c<=max[s]) {
 					int snext = transition[s][c-min[s]]; // move to next state
 					if ( snext < 0 ) {
