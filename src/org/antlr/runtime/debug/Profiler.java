@@ -83,7 +83,7 @@ public class Profiler extends BlankDebugEventListener {
 	}
 
 	public void enterRule(String ruleName) {
-		System.out.println("enterRule "+ruleName);
+		//System.out.println("enterRule "+ruleName);
 		// don't count predicates as rules
 		if ( ruleName.toUpperCase().startsWith("SYNPRED") ) {
 			return;
