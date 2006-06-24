@@ -47,7 +47,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            name, tokens, tokenNames, rules, cyclicDFAs,
 	   cyclicDFADescriptors,
 	   bitsets, buildTemplate, profile,
-	   backtracking, synpreds, blorts, memoize, numRules,
+	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
@@ -180,8 +180,6 @@ public class <name> extends <@superClassName><superClass><@end> {
     <rules; separator="\n\n">
 
     <synpreds:{p | <synpred(p)>}>
-
-    <blorts>
 
     <cyclicDFADescriptors:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
     <cyclicDFADescriptors:cyclicDFA()> <! dump tables for all DFA !>
