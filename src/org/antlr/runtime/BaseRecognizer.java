@@ -697,7 +697,6 @@ public abstract class BaseRecognizer {
 	/** A syntactic predicate.  Returns true/false depending on whether
 	 *  the specified grammar fragment matches the current input stream.
 	 *  This resets the failed instance var afterwards.
-	 */
 	public boolean synpred(IntStream input, GrammarFragmentPtr fragment) {
 		//int i = input.index();
 		//System.out.println("begin backtracking="+backtracking+" @"+i+"="+((CommonTokenStream)input).LT(1));
@@ -716,4 +715,5 @@ public abstract class BaseRecognizer {
 		failed=false;
 		return success;
 	}
+	 */
 }
