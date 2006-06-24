@@ -1,71 +1,45 @@
-// $ANTLR 3.0ea11 action.g 2006-06-13 10:42:41
+// $ANTLR 3.0b1 action.g 2006-06-24 16:13:40
 
 package org.antlr.codegen;
-import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.runtime.*;
+import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
 
-
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 public class ActionTranslator extends Lexer {
-    public static final int Synpred20_fragment=53;
-    public static final int Synpred17_fragment=50;
+    public static final int LOCAL_ATTR=11;
     public static final int ISOLATED_DYNAMIC_SCOPE=17;
-    public static final int DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR=16;
-    public static final int SCOPE_INDEX_EXPR=14;
+    public static final int WS=18;
+    public static final int UNKNOWN_SYNTAX=30;
     public static final int DYNAMIC_SCOPE_ATTR=12;
+    public static final int SCOPE_INDEX_EXPR=14;
+    public static final int DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR=16;
     public static final int ISOLATED_TOKEN_REF=9;
     public static final int SET_ATTRIBUTE=25;
     public static final int SET_EXPR_ATTRIBUTE=24;
+    public static final int ACTION=21;
+    public static final int ERROR_X=29;
     public static final int TEMPLATE_INSTANCE=20;
-    public static final int Synpred12_fragment=45;
-    public static final int Synpred21_fragment=54;
-    public static final int Synpred6_fragment=39;
-    public static final int Synpred3_fragment=36;
+    public static final int TOKEN_SCOPE_ATTR=6;
+    public static final int ISOLATED_LEXER_RULE_REF=10;
+    public static final int ESC=27;
+    public static final int ATTR_VALUE_EXPR=23;
     public static final int RULE_SCOPE_ATTR=7;
     public static final int LABEL_REF=8;
     public static final int INT=32;
-    public static final int Synpred8_fragment=41;
-    public static final int Synpred2_fragment=35;
-    public static final int Synpred9_fragment=42;
-    public static final int ENCLOSING_RULE_SCOPE_ATTR=5;
-    public static final int ID=4;
-    public static final int TEMPLATE_EXPR=26;
-    public static final int Synpred19_fragment=52;
-    public static final int Synpred1_fragment=34;
-    public static final int LOCAL_ATTR=11;
-    public static final int Synpred15_fragment=48;
-    public static final int WS=18;
-    public static final int UNKNOWN_SYNTAX=30;
-    public static final int ACTION=21;
-    public static final int Synpred11_fragment=44;
-    public static final int ERROR_X=29;
-    public static final int ISOLATED_LEXER_RULE_REF=10;
-    public static final int TOKEN_SCOPE_ATTR=6;
-    public static final int ESC=27;
-    public static final int Synpred16_fragment=49;
-    public static final int ATTR_VALUE_EXPR=23;
-    public static final int Synpred13_fragment=46;
-    public static final int Synpred7_fragment=40;
     public static final int ARG=19;
     public static final int EOF=-1;
-    public static final int Synpred5_fragment=38;
     public static final int TEXT=31;
-    public static final int Synpred22_fragment=55;
     public static final int Tokens=33;
-    public static final int Synpred14_fragment=47;
     public static final int DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR=15;
-    public static final int Synpred10_fragment=43;
     public static final int ERROR_SCOPED_XY=13;
-    public static final int Synpred18_fragment=51;
+    public static final int ENCLOSING_RULE_SCOPE_ATTR=5;
     public static final int ERROR_XY=28;
-    public static final int Synpred4_fragment=37;
+    public static final int TEMPLATE_EXPR=26;
     public static final int INDIRECT_TEMPLATE_INSTANCE=22;
+    public static final int ID=4;
 
     public List chunks = new ArrayList();
     Rule enclosingRule;
@@ -140,7 +114,7 @@ public class ActionTranslator extends Lexer {
     public List translateAction(String action) {
         ActionTranslator translator =
             new ActionTranslator(generator,
-                                 enclosingRule.name,                 
+                                 enclosingRule.name,
                                  new antlr.CommonToken(ANTLRParser.ACTION,action),1);
         return translator.translateToChunks();
     }
@@ -216,7 +190,7 @@ public class ActionTranslator extends Lexer {
 
 
 
-    public ActionTranslator() {;} 
+    public ActionTranslator() {;}
     public ActionTranslator(CharStream input) {
         super(input);
         ruleMemo = new Map[52+1];
@@ -224,24 +198,24 @@ public class ActionTranslator extends Lexer {
     public String getGrammarFileName() { return "action.g"; }
 
     public Token nextToken() {
-        token=null;
-        tokenStartCharIndex = getCharIndex();
         while (true) {
             if ( input.LA(1)==CharStream.EOF ) {
                 return Token.EOF_TOKEN;
             }
+            token=null;
+            tokenStartCharIndex = getCharIndex();
             try {
                 int m = input.mark();
                 backtracking=1;
                 failed=false;
                 mTokens();
                 backtracking=0;
-                input.rewind(m);
+
                 if ( failed ) {
-                    input.consume(); 
+                    input.rewind(m);
+                    input.consume();
                 }
                 else {
-                    mTokens();
                     return token;
                 }
             }
@@ -252,10 +226,22 @@ public class ActionTranslator extends Lexer {
             }
         }
     }
-    // $ANTLR start ENCLOSING_RULE_SCOPE_ATTR
+
+    public void memoize(IntStream input,
+    		int ruleIndex,
+    		int ruleStartIndex)
+    {
+    if ( backtracking>1 ) super.memoize(input, ruleIndex, ruleStartIndex);
+    }
+
+    public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
+    if ( backtracking>1 ) return super.alreadyParsedRule(input, ruleIndex);
+    return false;
+    }// $ANTLR start ENCLOSING_RULE_SCOPE_ATTR
     public void mENCLOSING_RULE_SCOPE_ATTR() throws RecognitionException {
         int ENCLOSING_RULE_SCOPE_ATTR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = ENCLOSING_RULE_SCOPE_ATTR;
             int start = getCharIndex();
             int line = getLine();
@@ -279,7 +265,7 @@ public class ActionTranslator extends Lexer {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "ENCLOSING_RULE_SCOPE_ATTR", "enclosingRule!=null &&\n\t                         $x.text.equals(enclosingRule.name) &&\n\t                         enclosingRule.getLocalAttributeScope($y.text)!=null");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		StringTemplate st = null;
               		AttributeScope scope = enclosingRule.getLocalAttributeScope(y.getText());
@@ -305,27 +291,28 @@ public class ActionTranslator extends Lexer {
               			st.setAttribute("ruleDescriptor", enclosingRule);
               			st.setAttribute("attr", scope.getAttribute(y.getText()));
               		}
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 1, ENCLOSING_RULE_SCOPE_ATTR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ENCLOSING_RULE_SCOPE_ATTR
-
 
     // $ANTLR start TOKEN_SCOPE_ATTR
     public void mTOKEN_SCOPE_ATTR() throws RecognitionException {
         int TOKEN_SCOPE_ATTR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = TOKEN_SCOPE_ATTR;
             int start = getCharIndex();
             int line = getLine();
@@ -350,7 +337,7 @@ public class ActionTranslator extends Lexer {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "TOKEN_SCOPE_ATTR", "enclosingRule!=null &&\n\t                         (enclosingRule.getTokenLabel($x.text)!=null||\n\t                          isTokenRefInAlt($x.text)) &&\n\t                         AttributeScope.tokenScope.getAttribute($y.text)!=null");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		String label = x.getText();
               		if ( enclosingRule.getTokenLabel(x.getText())==null ) {
@@ -368,27 +355,28 @@ public class ActionTranslator extends Lexer {
               		StringTemplate st = template("tokenLabelPropertyRef_"+y.getText());
               		st.setAttribute("scope", label);
               		st.setAttribute("attr", AttributeScope.tokenScope.getAttribute(y.getText()));
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 2, TOKEN_SCOPE_ATTR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end TOKEN_SCOPE_ATTR
-
 
     // $ANTLR start RULE_SCOPE_ATTR
     public void mRULE_SCOPE_ATTR() throws RecognitionException {
         int RULE_SCOPE_ATTR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = RULE_SCOPE_ATTR;
             int start = getCharIndex();
             int line = getLine();
@@ -414,21 +402,21 @@ public class ActionTranslator extends Lexer {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "RULE_SCOPE_ATTR", "enclosingRule!=null");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		pair = enclosingRule.getRuleLabel(x.getText());
               		refdRuleName = x.getText();
               		if ( pair!=null ) {
               			refdRuleName = pair.referencedRuleName;
               		}
-              		
+
             }
             if ( !((enclosingRule.getRuleLabel(x.getText())!=null || isRuleRefInAlt(x.getText())) &&
             	      getRuleLabelAttribute(enclosingRule.getRuleLabel(x.getText())!=null?enclosingRule.getRuleLabel(x.getText()).referencedRuleName:x.getText(),y.getText())!=null) ) {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "RULE_SCOPE_ATTR", "(enclosingRule.getRuleLabel($x.text)!=null || isRuleRefInAlt($x.text)) &&\n\t      getRuleLabelAttribute(enclosingRule.getRuleLabel($x.text)!=null?enclosingRule.getRuleLabel($x.text).referencedRuleName:$x.text,$y.text)!=null");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		String label = x.getText();
               		if ( pair==null ) {
@@ -463,31 +451,32 @@ public class ActionTranslator extends Lexer {
               		}
               		else {
               			st = template("ruleLabelRef");
-              			st.setAttribute("referencedRule", refdRule);		
+              			st.setAttribute("referencedRule", refdRule);
               			st.setAttribute("scope", label);
               			st.setAttribute("attr", scope.getAttribute(y.getText()));
-              		}		
-              		
-            }
+              		}
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 3, RULE_SCOPE_ATTR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end RULE_SCOPE_ATTR
-
 
     // $ANTLR start LABEL_REF
     public void mLABEL_REF() throws RecognitionException {
         int LABEL_REF_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = LABEL_REF;
             int start = getCharIndex();
             int line = getLine();
@@ -507,7 +496,7 @@ public class ActionTranslator extends Lexer {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "LABEL_REF", "enclosingRule!=null &&\n\t            getElementLabel($ID.text)!=null &&\n\t\t        enclosingRule.getRuleLabel($ID.text)==null");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		StringTemplate st;
               		Grammar.LabelElementPair pair = getElementLabel(ID1.getText());
@@ -518,27 +507,28 @@ public class ActionTranslator extends Lexer {
               			st = template("listLabelRef");
               		}
               		st.setAttribute("label", ID1.getText());
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 4, LABEL_REF_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end LABEL_REF
-
 
     // $ANTLR start ISOLATED_TOKEN_REF
     public void mISOLATED_TOKEN_REF() throws RecognitionException {
         int ISOLATED_TOKEN_REF_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = ISOLATED_TOKEN_REF;
             int start = getCharIndex();
             int line = getLine();
@@ -556,7 +546,7 @@ public class ActionTranslator extends Lexer {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "ISOLATED_TOKEN_REF", "grammar.type!=Grammar.LEXER && enclosingRule!=null && isTokenRefInAlt($ID.text)");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		String label = enclosingRule.getElementLabel(ID2.getText(), outerAltNum, generator);
               		checkElementRefUniqueness(ID2.getText(), true);
@@ -570,27 +560,28 @@ public class ActionTranslator extends Lexer {
               			StringTemplate st = template("tokenLabelRef");
               			st.setAttribute("label", label);
               		}
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 5, ISOLATED_TOKEN_REF_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ISOLATED_TOKEN_REF
-
 
     // $ANTLR start ISOLATED_LEXER_RULE_REF
     public void mISOLATED_LEXER_RULE_REF() throws RecognitionException {
         int ISOLATED_LEXER_RULE_REF_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = ISOLATED_LEXER_RULE_REF;
             int start = getCharIndex();
             int line = getLine();
@@ -610,7 +601,7 @@ public class ActionTranslator extends Lexer {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "ISOLATED_LEXER_RULE_REF", "grammar.type==Grammar.LEXER &&\n\t             enclosingRule!=null &&\n\t             isRuleRefInAlt($ID.text)");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		String label = enclosingRule.getElementLabel(ID3.getText(), outerAltNum, generator);
               		checkElementRefUniqueness(ID3.getText(), false);
@@ -624,27 +615,28 @@ public class ActionTranslator extends Lexer {
               			StringTemplate st = template("lexerRuleLabel");
               			st.setAttribute("label", label);
               		}
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 6, ISOLATED_LEXER_RULE_REF_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ISOLATED_LEXER_RULE_REF
-
 
     // $ANTLR start LOCAL_ATTR
     public void mLOCAL_ATTR() throws RecognitionException {
         int LOCAL_ATTR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = LOCAL_ATTR;
             int start = getCharIndex();
             int line = getLine();
@@ -662,7 +654,7 @@ public class ActionTranslator extends Lexer {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "LOCAL_ATTR", "enclosingRule!=null && enclosingRule.getLocalAttributeScope($ID.text)!=null");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		StringTemplate st;
               		AttributeScope scope = enclosingRule.getLocalAttributeScope(ID4.getText());
@@ -678,30 +670,31 @@ public class ActionTranslator extends Lexer {
               		}
               		else {
               			st = template("returnAttributeRef");
-              			st.setAttribute("ruleDescriptor", enclosingRule);		
+              			st.setAttribute("ruleDescriptor", enclosingRule);
               			st.setAttribute("attr", scope.getAttribute(ID4.getText()));
-              		}		
-              		
-            }
+              		}
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 7, LOCAL_ATTR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end LOCAL_ATTR
-
 
     // $ANTLR start DYNAMIC_SCOPE_ATTR
     public void mDYNAMIC_SCOPE_ATTR() throws RecognitionException {
         int DYNAMIC_SCOPE_ATTR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = DYNAMIC_SCOPE_ATTR;
             int start = getCharIndex();
             int line = getLine();
@@ -725,7 +718,7 @@ public class ActionTranslator extends Lexer {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "DYNAMIC_SCOPE_ATTR", "resolveDynamicScope($x.text)!=null &&\n\t\t\t\t\t\t     resolveDynamicScope($x.text).getAttribute($y.text)!=null");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		AttributeScope scope = resolveDynamicScope(x.getText());
               		if ( scope!=null ) {
@@ -736,27 +729,28 @@ public class ActionTranslator extends Lexer {
               		else {
               			// error: invalid dynamic attribute
               		}
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 8, DYNAMIC_SCOPE_ATTR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end DYNAMIC_SCOPE_ATTR
-
 
     // $ANTLR start ERROR_SCOPED_XY
     public void mERROR_SCOPED_XY() throws RecognitionException {
         int ERROR_SCOPED_XY_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = ERROR_SCOPED_XY;
             int start = getCharIndex();
             int line = getLine();
@@ -775,33 +769,34 @@ public class ActionTranslator extends Lexer {
             int yStart = getCharIndex();
             mID(); if (failed) return ;
             Token y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart, getCharIndex()-1);
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		chunks.add(getText());
               		generator.issueInvalidScopeError(x.getText(),y.getText(),
               		                                 enclosingRule,actionToken,
-              		                                 outerAltNum);		
-              		
-            }
+              		                                 outerAltNum);
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 9, ERROR_SCOPED_XY_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ERROR_SCOPED_XY
-
 
     // $ANTLR start DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
     public void mDYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR() throws RecognitionException {
         int DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR;
             int start = getCharIndex();
             int line = getLine();
@@ -826,33 +821,34 @@ public class ActionTranslator extends Lexer {
             int yStart = getCharIndex();
             mID(); if (failed) return ;
             Token y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart, getCharIndex()-1);
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		StringTemplate st = template("scopeAttributeRef");
               		st.setAttribute("scope",    x.getText());
               		st.setAttribute("attr",     resolveDynamicScope(x.getText()).getAttribute(y.getText()));
               		st.setAttribute("negIndex", expr.getText());
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 10, DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
-
 
     // $ANTLR start DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
     public void mDYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR() throws RecognitionException {
         int DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR;
             int start = getCharIndex();
             int line = getLine();
@@ -876,33 +872,34 @@ public class ActionTranslator extends Lexer {
             int yStart = getCharIndex();
             mID(); if (failed) return ;
             Token y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart, getCharIndex()-1);
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		StringTemplate st = template("scopeAttributeRef");
               		st.setAttribute("scope", x.getText());
               		st.setAttribute("attr",  resolveDynamicScope(x.getText()).getAttribute(y.getText()));
               		st.setAttribute("index", expr.getText());
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 11, DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
-
 
     // $ANTLR start SCOPE_INDEX_EXPR
     public void mSCOPE_INDEX_EXPR() throws RecognitionException {
         int SCOPE_INDEX_EXPR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             if ( backtracking>0 && alreadyParsedRule(input, 12) ) { return ; }
             // action.g:489:4: ( (~ ']' )+ )
             // action.g:489:4: (~ ']' )+
@@ -913,7 +910,7 @@ public class ActionTranslator extends Lexer {
             do {
                 int alt1=2;
                 int LA1_0 = input.LA(1);
-                if ( (LA1_0>='\u0000' && LA1_0<='\\')||(LA1_0>='^' && LA1_0<='\uFFFE') ) {
+                if ( ((LA1_0>='\u0000' && LA1_0<='\\')||(LA1_0>='^' && LA1_0<='\uFFFE')) ) {
                     alt1=1;
                 }
 
@@ -952,19 +949,17 @@ public class ActionTranslator extends Lexer {
 
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 12, SCOPE_INDEX_EXPR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end SCOPE_INDEX_EXPR
-
 
     // $ANTLR start ISOLATED_DYNAMIC_SCOPE
     public void mISOLATED_DYNAMIC_SCOPE() throws RecognitionException {
         int ISOLATED_DYNAMIC_SCOPE_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = ISOLATED_DYNAMIC_SCOPE;
             int start = getCharIndex();
             int line = getLine();
@@ -982,31 +977,32 @@ public class ActionTranslator extends Lexer {
                 if (backtracking>0) {failed=true; return ;}
                 throw new FailedPredicateException(input, "ISOLATED_DYNAMIC_SCOPE", "resolveDynamicScope($ID.text)!=null");
             }
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		StringTemplate st = template("isolatedDynamicScopeRef");
               		st.setAttribute("scope", ID5.getText());
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 13, ISOLATED_DYNAMIC_SCOPE_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ISOLATED_DYNAMIC_SCOPE
-
 
     // $ANTLR start TEMPLATE_INSTANCE
     public void mTEMPLATE_INSTANCE() throws RecognitionException {
         int TEMPLATE_INSTANCE_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = TEMPLATE_INSTANCE;
             int start = getCharIndex();
             int line = getLine();
@@ -1022,7 +1018,7 @@ public class ActionTranslator extends Lexer {
             // action.g:511:15: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
             int alt6=2;
             int LA6_0 = input.LA(1);
-            if ( (LA6_0>='\t' && LA6_0<='\n')||LA6_0==' '||(LA6_0>='A' && LA6_0<='Z')||LA6_0=='_'||(LA6_0>='a' && LA6_0<='z') ) {
+            if ( ((LA6_0>='\t' && LA6_0<='\n')||LA6_0==' '||(LA6_0>='A' && LA6_0<='Z')||LA6_0=='_'||(LA6_0>='a' && LA6_0<='z')) ) {
                 alt6=1;
             }
             switch (alt6) {
@@ -1032,7 +1028,7 @@ public class ActionTranslator extends Lexer {
                     // action.g:511:17: ( WS )?
                     int alt2=2;
                     int LA2_0 = input.LA(1);
-                    if ( (LA2_0>='\t' && LA2_0<='\n')||LA2_0==' ' ) {
+                    if ( ((LA2_0>='\t' && LA2_0<='\n')||LA2_0==' ') ) {
                         alt2=1;
                     }
                     switch (alt2) {
@@ -1052,7 +1048,7 @@ public class ActionTranslator extends Lexer {
                     do {
                         int alt4=2;
                         int LA4_0 = input.LA(1);
-                        if ( LA4_0==',' ) {
+                        if ( (LA4_0==',') ) {
                             alt4=1;
                         }
 
@@ -1065,7 +1061,7 @@ public class ActionTranslator extends Lexer {
                     	    // action.g:511:30: ( WS )?
                     	    int alt3=2;
                     	    int LA3_0 = input.LA(1);
-                    	    if ( (LA3_0>='\t' && LA3_0<='\n')||LA3_0==' ' ) {
+                    	    if ( ((LA3_0>='\t' && LA3_0<='\n')||LA3_0==' ') ) {
                     	        alt3=1;
                     	    }
                     	    switch (alt3) {
@@ -1092,7 +1088,7 @@ public class ActionTranslator extends Lexer {
                     // action.g:511:40: ( WS )?
                     int alt5=2;
                     int LA5_0 = input.LA(1);
-                    if ( (LA5_0>='\t' && LA5_0<='\n')||LA5_0==' ' ) {
+                    if ( ((LA5_0>='\t' && LA5_0<='\n')||LA5_0==' ') ) {
                         alt5=1;
                     }
                     switch (alt5) {
@@ -1113,7 +1109,7 @@ public class ActionTranslator extends Lexer {
             }
 
             match(')'); if (failed) return ;
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		String action = getText().substring(1,getText().length());
               		StringTemplate st =
@@ -1122,27 +1118,28 @@ public class ActionTranslator extends Lexer {
               												   actionToken,
               												   action);
               		chunks.add(st);
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 14, TEMPLATE_INSTANCE_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end TEMPLATE_INSTANCE
-
 
     // $ANTLR start INDIRECT_TEMPLATE_INSTANCE
     public void mINDIRECT_TEMPLATE_INSTANCE() throws RecognitionException {
         int INDIRECT_TEMPLATE_INSTANCE_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = INDIRECT_TEMPLATE_INSTANCE;
             int start = getCharIndex();
             int line = getLine();
@@ -1160,7 +1157,7 @@ public class ActionTranslator extends Lexer {
             // action.g:526:27: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
             int alt11=2;
             int LA11_0 = input.LA(1);
-            if ( (LA11_0>='\t' && LA11_0<='\n')||LA11_0==' '||(LA11_0>='A' && LA11_0<='Z')||LA11_0=='_'||(LA11_0>='a' && LA11_0<='z') ) {
+            if ( ((LA11_0>='\t' && LA11_0<='\n')||LA11_0==' '||(LA11_0>='A' && LA11_0<='Z')||LA11_0=='_'||(LA11_0>='a' && LA11_0<='z')) ) {
                 alt11=1;
             }
             switch (alt11) {
@@ -1170,7 +1167,7 @@ public class ActionTranslator extends Lexer {
                     // action.g:526:29: ( WS )?
                     int alt7=2;
                     int LA7_0 = input.LA(1);
-                    if ( (LA7_0>='\t' && LA7_0<='\n')||LA7_0==' ' ) {
+                    if ( ((LA7_0>='\t' && LA7_0<='\n')||LA7_0==' ') ) {
                         alt7=1;
                     }
                     switch (alt7) {
@@ -1190,7 +1187,7 @@ public class ActionTranslator extends Lexer {
                     do {
                         int alt9=2;
                         int LA9_0 = input.LA(1);
-                        if ( LA9_0==',' ) {
+                        if ( (LA9_0==',') ) {
                             alt9=1;
                         }
 
@@ -1203,7 +1200,7 @@ public class ActionTranslator extends Lexer {
                     	    // action.g:526:42: ( WS )?
                     	    int alt8=2;
                     	    int LA8_0 = input.LA(1);
-                    	    if ( (LA8_0>='\t' && LA8_0<='\n')||LA8_0==' ' ) {
+                    	    if ( ((LA8_0>='\t' && LA8_0<='\n')||LA8_0==' ') ) {
                     	        alt8=1;
                     	    }
                     	    switch (alt8) {
@@ -1230,7 +1227,7 @@ public class ActionTranslator extends Lexer {
                     // action.g:526:52: ( WS )?
                     int alt10=2;
                     int LA10_0 = input.LA(1);
-                    if ( (LA10_0>='\t' && LA10_0<='\n')||LA10_0==' ' ) {
+                    if ( ((LA10_0>='\t' && LA10_0<='\n')||LA10_0==' ') ) {
                         alt10=1;
                     }
                     switch (alt10) {
@@ -1251,7 +1248,7 @@ public class ActionTranslator extends Lexer {
             }
 
             match(')'); if (failed) return ;
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		String action = getText().substring(1,getText().length());
               		StringTemplate st =
@@ -1260,27 +1257,28 @@ public class ActionTranslator extends Lexer {
               												   actionToken,
               												   action);
               		chunks.add(st);
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 15, INDIRECT_TEMPLATE_INSTANCE_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end INDIRECT_TEMPLATE_INSTANCE
-
 
     // $ANTLR start ARG
     public void mARG() throws RecognitionException {
         int ARG_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             if ( backtracking>0 && alreadyParsedRule(input, 16) ) { return ; }
             // action.g:540:7: ( ID '=' ACTION )
             // action.g:540:7: ID '=' ACTION
@@ -1293,19 +1291,17 @@ public class ActionTranslator extends Lexer {
 
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 16, ARG_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ARG
-
 
     // $ANTLR start SET_EXPR_ATTRIBUTE
     public void mSET_EXPR_ATTRIBUTE() throws RecognitionException {
         int SET_EXPR_ATTRIBUTE_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = SET_EXPR_ATTRIBUTE;
             int start = getCharIndex();
             int line = getLine();
@@ -1326,7 +1322,7 @@ public class ActionTranslator extends Lexer {
             // action.g:545:24: ( WS )?
             int alt12=2;
             int LA12_0 = input.LA(1);
-            if ( (LA12_0>='\t' && LA12_0<='\n')||LA12_0==' ' ) {
+            if ( ((LA12_0>='\t' && LA12_0<='\n')||LA12_0==' ') ) {
                 alt12=1;
             }
             switch (alt12) {
@@ -1345,7 +1341,7 @@ public class ActionTranslator extends Lexer {
             mATTR_VALUE_EXPR(); if (failed) return ;
             Token expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart, getCharIndex()-1);
             match(';'); if (failed) return ;
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		StringTemplate st = template("actionSetAttribute");
               		String action = a.getText();
@@ -1353,27 +1349,28 @@ public class ActionTranslator extends Lexer {
               		st.setAttribute("st", translateAction(action));
               		st.setAttribute("attrName", ID6.getText());
               		st.setAttribute("expr", translateAction(expr.getText()));
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 17, SET_EXPR_ATTRIBUTE_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end SET_EXPR_ATTRIBUTE
-
 
     // $ANTLR start SET_ATTRIBUTE
     public void mSET_ATTRIBUTE() throws RecognitionException {
         int SET_ATTRIBUTE_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = SET_ATTRIBUTE;
             int start = getCharIndex();
             int line = getLine();
@@ -1394,7 +1391,7 @@ public class ActionTranslator extends Lexer {
             // action.g:562:22: ( WS )?
             int alt13=2;
             int LA13_0 = input.LA(1);
-            if ( (LA13_0>='\t' && LA13_0<='\n')||LA13_0==' ' ) {
+            if ( ((LA13_0>='\t' && LA13_0<='\n')||LA13_0==' ') ) {
                 alt13=1;
             }
             switch (alt13) {
@@ -1413,33 +1410,34 @@ public class ActionTranslator extends Lexer {
             mATTR_VALUE_EXPR(); if (failed) return ;
             Token expr = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, exprStart, getCharIndex()-1);
             match(';'); if (failed) return ;
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		StringTemplate st = template("actionSetAttribute");
               		st.setAttribute("st", x.getText());
               		st.setAttribute("attrName", y.getText());
               		st.setAttribute("expr", translateAction(expr.getText()));
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 18, SET_ATTRIBUTE_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end SET_ATTRIBUTE
-
 
     // $ANTLR start ATTR_VALUE_EXPR
     public void mATTR_VALUE_EXPR() throws RecognitionException {
         int ATTR_VALUE_EXPR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             if ( backtracking>0 && alreadyParsedRule(input, 19) ) { return ; }
             // action.g:574:4: ( (~ ';' )+ )
             // action.g:574:4: (~ ';' )+
@@ -1450,7 +1448,7 @@ public class ActionTranslator extends Lexer {
             do {
                 int alt14=2;
                 int LA14_0 = input.LA(1);
-                if ( (LA14_0>='\u0000' && LA14_0<=':')||(LA14_0>='<' && LA14_0<='\uFFFE') ) {
+                if ( ((LA14_0>='\u0000' && LA14_0<=':')||(LA14_0>='<' && LA14_0<='\uFFFE')) ) {
                     alt14=1;
                 }
 
@@ -1489,19 +1487,17 @@ public class ActionTranslator extends Lexer {
 
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 19, ATTR_VALUE_EXPR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ATTR_VALUE_EXPR
-
 
     // $ANTLR start TEMPLATE_EXPR
     public void mTEMPLATE_EXPR() throws RecognitionException {
         int TEMPLATE_EXPR_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = TEMPLATE_EXPR;
             int start = getCharIndex();
             int line = getLine();
@@ -1515,33 +1511,34 @@ public class ActionTranslator extends Lexer {
             int aStart = getCharIndex();
             mACTION(); if (failed) return ;
             Token a = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, aStart, getCharIndex()-1);
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		StringTemplate st = template("actionStringConstructor");
               		String action = a.getText();
               		action = action.substring(1,action.length()-1); // stuff inside {...}
               		st.setAttribute("stringExpr", translateAction(action));
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 20, TEMPLATE_EXPR_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end TEMPLATE_EXPR
-
 
     // $ANTLR start ACTION
     public void mACTION() throws RecognitionException {
         int ACTION_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             if ( backtracking>0 && alreadyParsedRule(input, 21) ) { return ; }
             // action.g:591:4: ( '{' ( options {greedy=false; } : . )* '}' )
             // action.g:591:4: '{' ( options {greedy=false; } : . )* '}'
@@ -1552,10 +1549,10 @@ public class ActionTranslator extends Lexer {
             do {
                 int alt15=2;
                 int LA15_0 = input.LA(1);
-                if ( LA15_0=='}' ) {
+                if ( (LA15_0=='}') ) {
                     alt15=2;
                 }
-                else if ( (LA15_0>='\u0000' && LA15_0<='|')||(LA15_0>='~' && LA15_0<='\uFFFE') ) {
+                else if ( ((LA15_0>='\u0000' && LA15_0<='|')||(LA15_0>='~' && LA15_0<='\uFFFE')) ) {
                     alt15=1;
                 }
 
@@ -1580,19 +1577,17 @@ public class ActionTranslator extends Lexer {
 
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 21, ACTION_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ACTION
-
 
     // $ANTLR start ESC
     public void mESC() throws RecognitionException {
         int ESC_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = ESC;
             int start = getCharIndex();
             int line = getLine();
@@ -1602,12 +1597,12 @@ public class ActionTranslator extends Lexer {
             // action.g:594:9: ( '\\\\' '$' | '\\\\' '%' )
             int alt16=2;
             int LA16_0 = input.LA(1);
-            if ( LA16_0=='\\' ) {
+            if ( (LA16_0=='\\') ) {
                 int LA16_1 = input.LA(2);
-                if ( LA16_1=='%' ) {
+                if ( (LA16_1=='%') ) {
                     alt16=2;
                 }
-                else if ( LA16_1=='$' ) {
+                else if ( (LA16_1=='$') ) {
                     alt16=1;
                 }
                 else {
@@ -1631,7 +1626,7 @@ public class ActionTranslator extends Lexer {
                     {
                     match('\\'); if (failed) return ;
                     match('$'); if (failed) return ;
-                    if ( backtracking==0 ) {
+                    if ( backtracking==1 ) {
                       chunks.add("$");
                     }
 
@@ -1642,7 +1637,7 @@ public class ActionTranslator extends Lexer {
                     {
                     match('\\'); if (failed) return ;
                     match('%'); if (failed) return ;
-                    if ( backtracking==0 ) {
+                    if ( backtracking==1 ) {
                       chunks.add("%");
                     }
 
@@ -1650,22 +1645,23 @@ public class ActionTranslator extends Lexer {
                     break;
 
             }
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
-        }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 22, ESC_StartIndex); }
-            if ( backtracking==0 ) {
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
             }
         }
-        return ;
+        finally {
+            ruleNestingLevel--;
+            if ( backtracking>0 ) { memoize(input, 22, ESC_StartIndex); }
+        }
     }
     // $ANTLR end ESC
-
 
     // $ANTLR start ERROR_XY
     public void mERROR_XY() throws RecognitionException {
         int ERROR_XY_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = ERROR_XY;
             int start = getCharIndex();
             int line = getLine();
@@ -1683,33 +1679,34 @@ public class ActionTranslator extends Lexer {
             int yStart = getCharIndex();
             mID(); if (failed) return ;
             Token y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart, getCharIndex()-1);
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		chunks.add(getText());
               		generator.issueInvalidAttributeError(x.getText(),y.getText(),
               		                                     enclosingRule,actionToken,
               		                                     outerAltNum);
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 23, ERROR_XY_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ERROR_XY
-
 
     // $ANTLR start ERROR_X
     public void mERROR_X() throws RecognitionException {
         int ERROR_X_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = ERROR_X;
             int start = getCharIndex();
             int line = getLine();
@@ -1723,33 +1720,34 @@ public class ActionTranslator extends Lexer {
             int xStart = getCharIndex();
             mID(); if (failed) return ;
             Token x = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, xStart, getCharIndex()-1);
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
 
               		chunks.add(getText());
               		generator.issueInvalidAttributeError(x.getText(),
               		                                     enclosingRule,actionToken,
               		                                     outerAltNum);
-              		
-            }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
+            }
+
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
+            }
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 24, ERROR_X_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ERROR_X
-
 
     // $ANTLR start UNKNOWN_SYNTAX
     public void mUNKNOWN_SYNTAX() throws RecognitionException {
         int UNKNOWN_SYNTAX_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = UNKNOWN_SYNTAX;
             int start = getCharIndex();
             int line = getLine();
@@ -1759,10 +1757,10 @@ public class ActionTranslator extends Lexer {
             // action.g:619:4: ( '$' | '%' ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )* )
             int alt18=2;
             int LA18_0 = input.LA(1);
-            if ( LA18_0=='$' ) {
+            if ( (LA18_0=='$') ) {
                 alt18=1;
             }
-            else if ( LA18_0=='%' ) {
+            else if ( (LA18_0=='%') ) {
                 alt18=2;
             }
             else {
@@ -1777,11 +1775,11 @@ public class ActionTranslator extends Lexer {
                     // action.g:619:4: '$'
                     {
                     match('$'); if (failed) return ;
-                    if ( backtracking==0 ) {
+                    if ( backtracking==1 ) {
 
                       		chunks.add(getText());
                       		// shouldn't need an error here.  Just accept $ if it doesn't look like anything
-                      		
+
                     }
 
                     }
@@ -1937,36 +1935,37 @@ public class ActionTranslator extends Lexer {
                         }
                     } while (true);
 
-                    if ( backtracking==0 ) {
+                    if ( backtracking==1 ) {
 
                       		chunks.add(getText());
                       		ErrorManager.grammarError(ErrorManager.MSG_INVALID_TEMPLATE_ACTION,
                       								  grammar,
                       								  actionToken,
                       								  getText());
-                      		
+
                     }
 
                     }
                     break;
 
             }
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
-        }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 25, UNKNOWN_SYNTAX_StartIndex); }
-            if ( backtracking==0 ) {
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
             }
         }
-        return ;
+        finally {
+            ruleNestingLevel--;
+            if ( backtracking>0 ) { memoize(input, 25, UNKNOWN_SYNTAX_StartIndex); }
+        }
     }
     // $ANTLR end UNKNOWN_SYNTAX
-
 
     // $ANTLR start TEXT
     public void mTEXT() throws RecognitionException {
         int TEXT_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             int type = TEXT;
             int start = getCharIndex();
             int line = getLine();
@@ -1982,7 +1981,7 @@ public class ActionTranslator extends Lexer {
             do {
                 int alt19=2;
                 int LA19_0 = input.LA(1);
-                if ( (LA19_0>='\u0000' && LA19_0<='#')||(LA19_0>='&' && LA19_0<='[')||(LA19_0>=']' && LA19_0<='\uFFFE') ) {
+                if ( ((LA19_0>='\u0000' && LA19_0<='#')||(LA19_0>='&' && LA19_0<='[')||(LA19_0>=']' && LA19_0<='\uFFFE')) ) {
                     alt19=1;
                 }
 
@@ -2016,28 +2015,29 @@ public class ActionTranslator extends Lexer {
                 cnt19++;
             } while (true);
 
-            if ( backtracking==0 ) {
+            if ( backtracking==1 ) {
               chunks.add(getText());
             }
 
             }
 
-            if ( token==null ) {emit(type,line,charPosition,channel,start,getCharIndex()-1);}
-        }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 26, TEXT_StartIndex); }
-            if ( backtracking==0 ) {
+
+            if ( token==null && ruleNestingLevel==1 ) {
+                emit(type,line,charPosition,channel,start,getCharIndex()-1);
             }
         }
-        return ;
+        finally {
+            ruleNestingLevel--;
+            if ( backtracking>0 ) { memoize(input, 26, TEXT_StartIndex); }
+        }
     }
     // $ANTLR end TEXT
-
 
     // $ANTLR start ID
     public void mID() throws RecognitionException {
         int ID_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             if ( backtracking>0 && alreadyParsedRule(input, 27) ) { return ; }
             // action.g:638:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))* )
             // action.g:638:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))*
@@ -2058,7 +2058,7 @@ public class ActionTranslator extends Lexer {
             do {
                 int alt20=2;
                 int LA20_0 = input.LA(1);
-                if ( (LA20_0>='0' && LA20_0<='9')||(LA20_0>='A' && LA20_0<='Z')||LA20_0=='_'||(LA20_0>='a' && LA20_0<='z') ) {
+                if ( ((LA20_0>='0' && LA20_0<='9')||(LA20_0>='A' && LA20_0<='Z')||LA20_0=='_'||(LA20_0>='a' && LA20_0<='z')) ) {
                     alt20=1;
                 }
 
@@ -2092,19 +2092,17 @@ public class ActionTranslator extends Lexer {
 
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 27, ID_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end ID
-
 
     // $ANTLR start INT
     public void mINT() throws RecognitionException {
         int INT_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             if ( backtracking>0 && alreadyParsedRule(input, 28) ) { return ; }
             // action.g:642:7: ( ( '0' .. '9' )+ )
             // action.g:642:7: ( '0' .. '9' )+
@@ -2115,7 +2113,7 @@ public class ActionTranslator extends Lexer {
             do {
                 int alt21=2;
                 int LA21_0 = input.LA(1);
-                if ( (LA21_0>='0' && LA21_0<='9') ) {
+                if ( ((LA21_0>='0' && LA21_0<='9')) ) {
                     alt21=1;
                 }
 
@@ -2144,19 +2142,17 @@ public class ActionTranslator extends Lexer {
 
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 28, INT_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end INT
-
 
     // $ANTLR start WS
     public void mWS() throws RecognitionException {
         int WS_StartIndex = input.index();
         try {
+            ruleNestingLevel++;
             if ( backtracking>0 && alreadyParsedRule(input, 29) ) { return ; }
             // action.g:646:6: ( ( (' '|'\\t'|'\\n'))+ )
             // action.g:646:6: ( (' '|'\\t'|'\\n'))+
@@ -2167,7 +2163,7 @@ public class ActionTranslator extends Lexer {
             do {
                 int alt22=2;
                 int LA22_0 = input.LA(1);
-                if ( (LA22_0>='\t' && LA22_0<='\n')||LA22_0==' ' ) {
+                if ( ((LA22_0>='\t' && LA22_0<='\n')||LA22_0==' ') ) {
                     alt22=1;
                 }
 
@@ -2206,11 +2202,9 @@ public class ActionTranslator extends Lexer {
 
         }
         finally {
+            ruleNestingLevel--;
             if ( backtracking>0 ) { memoize(input, 29, WS_StartIndex); }
-            if ( backtracking==0 ) {
-            }
         }
-        return ;
     }
     // $ANTLR end WS
 
@@ -2218,51 +2212,50 @@ public class ActionTranslator extends Lexer {
         // action.g:1:25: ( ( ENCLOSING_RULE_SCOPE_ATTR )=> ENCLOSING_RULE_SCOPE_ATTR | ( TOKEN_SCOPE_ATTR )=> TOKEN_SCOPE_ATTR | ( RULE_SCOPE_ATTR )=> RULE_SCOPE_ATTR | ( LABEL_REF )=> LABEL_REF | ( ISOLATED_TOKEN_REF )=> ISOLATED_TOKEN_REF | ( ISOLATED_LEXER_RULE_REF )=> ISOLATED_LEXER_RULE_REF | ( LOCAL_ATTR )=> LOCAL_ATTR | ( DYNAMIC_SCOPE_ATTR )=> DYNAMIC_SCOPE_ATTR | ( ERROR_SCOPED_XY )=> ERROR_SCOPED_XY | ( DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR )=> DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR | ( DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR )=> DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR | ( ISOLATED_DYNAMIC_SCOPE )=> ISOLATED_DYNAMIC_SCOPE | ( TEMPLATE_INSTANCE )=> TEMPLATE_INSTANCE | ( INDIRECT_TEMPLATE_INSTANCE )=> INDIRECT_TEMPLATE_INSTANCE | ( SET_EXPR_ATTRIBUTE )=> SET_EXPR_ATTRIBUTE | ( SET_ATTRIBUTE )=> SET_ATTRIBUTE | ( TEMPLATE_EXPR )=> TEMPLATE_EXPR | ( ESC )=> ESC | ( ERROR_XY )=> ERROR_XY | ( ERROR_X )=> ERROR_X | ( UNKNOWN_SYNTAX )=> UNKNOWN_SYNTAX | ( TEXT )=> TEXT )
         int alt23=22;
         int LA23_0 = input.LA(1);
-        if ( LA23_0=='$' ) {
-            int LA23_1 = input.LA(2);
-            if ( synpred(input, Synpred1) ) {
+        if ( (LA23_0=='$') ) {
+            if ( (synpred1()) ) {
                 alt23=1;
             }
-            else if ( synpred(input, Synpred2) ) {
+            else if ( (synpred2()) ) {
                 alt23=2;
             }
-            else if ( synpred(input, Synpred3) ) {
+            else if ( (synpred3()) ) {
                 alt23=3;
             }
-            else if ( synpred(input, Synpred4) ) {
+            else if ( (synpred4()) ) {
                 alt23=4;
             }
-            else if ( synpred(input, Synpred5) ) {
+            else if ( (synpred5()) ) {
                 alt23=5;
             }
-            else if ( synpred(input, Synpred6) ) {
+            else if ( (synpred6()) ) {
                 alt23=6;
             }
-            else if ( synpred(input, Synpred7) ) {
+            else if ( (synpred7()) ) {
                 alt23=7;
             }
-            else if ( synpred(input, Synpred8) ) {
+            else if ( (synpred8()) ) {
                 alt23=8;
             }
-            else if ( synpred(input, Synpred9) ) {
+            else if ( (synpred9()) ) {
                 alt23=9;
             }
-            else if ( synpred(input, Synpred10) ) {
+            else if ( (synpred10()) ) {
                 alt23=10;
             }
-            else if ( synpred(input, Synpred11) ) {
+            else if ( (synpred11()) ) {
                 alt23=11;
             }
-            else if ( synpred(input, Synpred12) ) {
+            else if ( (synpred12()) ) {
                 alt23=12;
             }
-            else if ( synpred(input, Synpred19) ) {
+            else if ( (synpred19()) ) {
                 alt23=19;
             }
-            else if ( synpred(input, Synpred20) ) {
+            else if ( (synpred20()) ) {
                 alt23=20;
             }
-            else if ( synpred(input, Synpred21) ) {
+            else if ( (synpred21()) ) {
                 alt23=21;
             }
             else {
@@ -2273,24 +2266,23 @@ public class ActionTranslator extends Lexer {
                 throw nvae;
             }
         }
-        else if ( LA23_0=='%' ) {
-            int LA23_2 = input.LA(2);
-            if ( synpred(input, Synpred13) ) {
+        else if ( (LA23_0=='%') ) {
+            if ( (synpred13()) ) {
                 alt23=13;
             }
-            else if ( synpred(input, Synpred14) ) {
+            else if ( (synpred14()) ) {
                 alt23=14;
             }
-            else if ( synpred(input, Synpred15) ) {
+            else if ( (synpred15()) ) {
                 alt23=15;
             }
-            else if ( synpred(input, Synpred16) ) {
+            else if ( (synpred16()) ) {
                 alt23=16;
             }
-            else if ( synpred(input, Synpred17) ) {
+            else if ( (synpred17()) ) {
                 alt23=17;
             }
-            else if ( synpred(input, Synpred21) ) {
+            else if ( (synpred21()) ) {
                 alt23=21;
             }
             else {
@@ -2301,10 +2293,10 @@ public class ActionTranslator extends Lexer {
                 throw nvae;
             }
         }
-        else if ( LA23_0=='\\' ) {
+        else if ( (LA23_0=='\\') ) {
             alt23=18;
         }
-        else if ( (LA23_0>='\u0000' && LA23_0<='#')||(LA23_0>='&' && LA23_0<='[')||(LA23_0>=']' && LA23_0<='\uFFFE') ) {
+        else if ( ((LA23_0>='\u0000' && LA23_0<='#')||(LA23_0>='&' && LA23_0<='[')||(LA23_0>=']' && LA23_0<='\uFFFE')) ) {
             alt23=22;
         }
         else {
@@ -2496,602 +2488,558 @@ public class ActionTranslator extends Lexer {
 
     }
 
+    // $ANTLR start synpred1_fragment
+    public void synpred1_fragment() throws RecognitionException {
+        // action.g:1:25: ( ENCLOSING_RULE_SCOPE_ATTR )
+        // action.g:1:26: ENCLOSING_RULE_SCOPE_ATTR
+        {
+        mENCLOSING_RULE_SCOPE_ATTR(); if (failed) return ;
 
-    // $ANTLR start Synpred1_fragment
-    public void mSynpred1_fragment() throws RecognitionException {
-        int Synpred1_fragment_StartIndex = input.index();
+        }
+    }
+    // $ANTLR end synpred1_fragment
+
+    // $ANTLR start synpred2_fragment
+    public void synpred2_fragment() throws RecognitionException {
+        // action.g:1:80: ( TOKEN_SCOPE_ATTR )
+        // action.g:1:81: TOKEN_SCOPE_ATTR
+        {
+        mTOKEN_SCOPE_ATTR(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred2_fragment
+
+    // $ANTLR start synpred3_fragment
+    public void synpred3_fragment() throws RecognitionException {
+        // action.g:1:117: ( RULE_SCOPE_ATTR )
+        // action.g:1:118: RULE_SCOPE_ATTR
+        {
+        mRULE_SCOPE_ATTR(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred3_fragment
+
+    // $ANTLR start synpred4_fragment
+    public void synpred4_fragment() throws RecognitionException {
+        // action.g:1:152: ( LABEL_REF )
+        // action.g:1:153: LABEL_REF
+        {
+        mLABEL_REF(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred4_fragment
+
+    // $ANTLR start synpred5_fragment
+    public void synpred5_fragment() throws RecognitionException {
+        // action.g:1:175: ( ISOLATED_TOKEN_REF )
+        // action.g:1:176: ISOLATED_TOKEN_REF
+        {
+        mISOLATED_TOKEN_REF(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred5_fragment
+
+    // $ANTLR start synpred6_fragment
+    public void synpred6_fragment() throws RecognitionException {
+        // action.g:1:216: ( ISOLATED_LEXER_RULE_REF )
+        // action.g:1:217: ISOLATED_LEXER_RULE_REF
+        {
+        mISOLATED_LEXER_RULE_REF(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred6_fragment
+
+    // $ANTLR start synpred7_fragment
+    public void synpred7_fragment() throws RecognitionException {
+        // action.g:1:267: ( LOCAL_ATTR )
+        // action.g:1:268: LOCAL_ATTR
+        {
+        mLOCAL_ATTR(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred7_fragment
+
+    // $ANTLR start synpred8_fragment
+    public void synpred8_fragment() throws RecognitionException {
+        // action.g:1:292: ( DYNAMIC_SCOPE_ATTR )
+        // action.g:1:293: DYNAMIC_SCOPE_ATTR
+        {
+        mDYNAMIC_SCOPE_ATTR(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred8_fragment
+
+    // $ANTLR start synpred9_fragment
+    public void synpred9_fragment() throws RecognitionException {
+        // action.g:1:333: ( ERROR_SCOPED_XY )
+        // action.g:1:334: ERROR_SCOPED_XY
+        {
+        mERROR_SCOPED_XY(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred9_fragment
+
+    // $ANTLR start synpred10_fragment
+    public void synpred10_fragment() throws RecognitionException {
+        // action.g:1:368: ( DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR )
+        // action.g:1:369: DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
+        {
+        mDYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred10_fragment
+
+    // $ANTLR start synpred11_fragment
+    public void synpred11_fragment() throws RecognitionException {
+        // action.g:1:443: ( DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR )
+        // action.g:1:444: DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
+        {
+        mDYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred11_fragment
+
+    // $ANTLR start synpred12_fragment
+    public void synpred12_fragment() throws RecognitionException {
+        // action.g:1:518: ( ISOLATED_DYNAMIC_SCOPE )
+        // action.g:1:519: ISOLATED_DYNAMIC_SCOPE
+        {
+        mISOLATED_DYNAMIC_SCOPE(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred12_fragment
+
+    // $ANTLR start synpred13_fragment
+    public void synpred13_fragment() throws RecognitionException {
+        // action.g:1:567: ( TEMPLATE_INSTANCE )
+        // action.g:1:568: TEMPLATE_INSTANCE
+        {
+        mTEMPLATE_INSTANCE(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred13_fragment
+
+    // $ANTLR start synpred14_fragment
+    public void synpred14_fragment() throws RecognitionException {
+        // action.g:1:606: ( INDIRECT_TEMPLATE_INSTANCE )
+        // action.g:1:607: INDIRECT_TEMPLATE_INSTANCE
+        {
+        mINDIRECT_TEMPLATE_INSTANCE(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred14_fragment
+
+    // $ANTLR start synpred15_fragment
+    public void synpred15_fragment() throws RecognitionException {
+        // action.g:1:663: ( SET_EXPR_ATTRIBUTE )
+        // action.g:1:664: SET_EXPR_ATTRIBUTE
+        {
+        mSET_EXPR_ATTRIBUTE(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred15_fragment
+
+    // $ANTLR start synpred16_fragment
+    public void synpred16_fragment() throws RecognitionException {
+        // action.g:1:704: ( SET_ATTRIBUTE )
+        // action.g:1:705: SET_ATTRIBUTE
+        {
+        mSET_ATTRIBUTE(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred16_fragment
+
+    // $ANTLR start synpred17_fragment
+    public void synpred17_fragment() throws RecognitionException {
+        // action.g:1:735: ( TEMPLATE_EXPR )
+        // action.g:1:736: TEMPLATE_EXPR
+        {
+        mTEMPLATE_EXPR(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred17_fragment
+
+    // $ANTLR start synpred18_fragment
+    public void synpred18_fragment() throws RecognitionException {
+        // action.g:1:766: ( ESC )
+        // action.g:1:767: ESC
+        {
+        mESC(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred18_fragment
+
+    // $ANTLR start synpred19_fragment
+    public void synpred19_fragment() throws RecognitionException {
+        // action.g:1:777: ( ERROR_XY )
+        // action.g:1:778: ERROR_XY
+        {
+        mERROR_XY(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred19_fragment
+
+    // $ANTLR start synpred20_fragment
+    public void synpred20_fragment() throws RecognitionException {
+        // action.g:1:798: ( ERROR_X )
+        // action.g:1:799: ERROR_X
+        {
+        mERROR_X(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred20_fragment
+
+    // $ANTLR start synpred21_fragment
+    public void synpred21_fragment() throws RecognitionException {
+        // action.g:1:817: ( UNKNOWN_SYNTAX )
+        // action.g:1:818: UNKNOWN_SYNTAX
+        {
+        mUNKNOWN_SYNTAX(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred21_fragment
+
+    // $ANTLR start synpred22_fragment
+    public void synpred22_fragment() throws RecognitionException {
+        // action.g:1:850: ( TEXT )
+        // action.g:1:851: TEXT
+        {
+        mTEXT(); if (failed) return ;
+
+        }
+    }
+    // $ANTLR end synpred22_fragment
+
+    public boolean synpred1() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 31) ) { return ; }
-            // action.g:1:25: ( ENCLOSING_RULE_SCOPE_ATTR )
-            // action.g:1:26: ENCLOSING_RULE_SCOPE_ATTR
-            {
-            mENCLOSING_RULE_SCOPE_ATTR(); if (failed) return ;
-
-            }
-
+            synpred1_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 31, Synpred1_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred1_fragment
-
-
-    // $ANTLR start Synpred2_fragment
-    public void mSynpred2_fragment() throws RecognitionException {
-        int Synpred2_fragment_StartIndex = input.index();
+    public boolean synpred2() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 32) ) { return ; }
-            // action.g:1:80: ( TOKEN_SCOPE_ATTR )
-            // action.g:1:81: TOKEN_SCOPE_ATTR
-            {
-            mTOKEN_SCOPE_ATTR(); if (failed) return ;
-
-            }
-
+            synpred2_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 32, Synpred2_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred2_fragment
-
-
-    // $ANTLR start Synpred3_fragment
-    public void mSynpred3_fragment() throws RecognitionException {
-        int Synpred3_fragment_StartIndex = input.index();
+    public boolean synpred3() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 33) ) { return ; }
-            // action.g:1:117: ( RULE_SCOPE_ATTR )
-            // action.g:1:118: RULE_SCOPE_ATTR
-            {
-            mRULE_SCOPE_ATTR(); if (failed) return ;
-
-            }
-
+            synpred3_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 33, Synpred3_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred3_fragment
-
-
-    // $ANTLR start Synpred4_fragment
-    public void mSynpred4_fragment() throws RecognitionException {
-        int Synpred4_fragment_StartIndex = input.index();
+    public boolean synpred4() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 34) ) { return ; }
-            // action.g:1:152: ( LABEL_REF )
-            // action.g:1:153: LABEL_REF
-            {
-            mLABEL_REF(); if (failed) return ;
-
-            }
-
+            synpred4_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 34, Synpred4_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred4_fragment
-
-
-    // $ANTLR start Synpred5_fragment
-    public void mSynpred5_fragment() throws RecognitionException {
-        int Synpred5_fragment_StartIndex = input.index();
+    public boolean synpred5() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 35) ) { return ; }
-            // action.g:1:175: ( ISOLATED_TOKEN_REF )
-            // action.g:1:176: ISOLATED_TOKEN_REF
-            {
-            mISOLATED_TOKEN_REF(); if (failed) return ;
-
-            }
-
+            synpred5_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 35, Synpred5_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred5_fragment
-
-
-    // $ANTLR start Synpred6_fragment
-    public void mSynpred6_fragment() throws RecognitionException {
-        int Synpred6_fragment_StartIndex = input.index();
+    public boolean synpred6() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 36) ) { return ; }
-            // action.g:1:216: ( ISOLATED_LEXER_RULE_REF )
-            // action.g:1:217: ISOLATED_LEXER_RULE_REF
-            {
-            mISOLATED_LEXER_RULE_REF(); if (failed) return ;
-
-            }
-
+            synpred6_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 36, Synpred6_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred6_fragment
-
-
-    // $ANTLR start Synpred7_fragment
-    public void mSynpred7_fragment() throws RecognitionException {
-        int Synpred7_fragment_StartIndex = input.index();
+    public boolean synpred7() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 37) ) { return ; }
-            // action.g:1:267: ( LOCAL_ATTR )
-            // action.g:1:268: LOCAL_ATTR
-            {
-            mLOCAL_ATTR(); if (failed) return ;
-
-            }
-
+            synpred7_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 37, Synpred7_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred7_fragment
-
-
-    // $ANTLR start Synpred8_fragment
-    public void mSynpred8_fragment() throws RecognitionException {
-        int Synpred8_fragment_StartIndex = input.index();
+    public boolean synpred8() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 38) ) { return ; }
-            // action.g:1:292: ( DYNAMIC_SCOPE_ATTR )
-            // action.g:1:293: DYNAMIC_SCOPE_ATTR
-            {
-            mDYNAMIC_SCOPE_ATTR(); if (failed) return ;
-
-            }
-
+            synpred8_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 38, Synpred8_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred8_fragment
-
-
-    // $ANTLR start Synpred9_fragment
-    public void mSynpred9_fragment() throws RecognitionException {
-        int Synpred9_fragment_StartIndex = input.index();
+    public boolean synpred9() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 39) ) { return ; }
-            // action.g:1:333: ( ERROR_SCOPED_XY )
-            // action.g:1:334: ERROR_SCOPED_XY
-            {
-            mERROR_SCOPED_XY(); if (failed) return ;
-
-            }
-
+            synpred9_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 39, Synpred9_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred9_fragment
-
-
-    // $ANTLR start Synpred10_fragment
-    public void mSynpred10_fragment() throws RecognitionException {
-        int Synpred10_fragment_StartIndex = input.index();
+    public boolean synpred10() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 40) ) { return ; }
-            // action.g:1:368: ( DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR )
-            // action.g:1:369: DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
-            {
-            mDYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR(); if (failed) return ;
-
-            }
-
+            synpred10_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 40, Synpred10_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred10_fragment
-
-
-    // $ANTLR start Synpred11_fragment
-    public void mSynpred11_fragment() throws RecognitionException {
-        int Synpred11_fragment_StartIndex = input.index();
+    public boolean synpred11() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 41) ) { return ; }
-            // action.g:1:443: ( DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR )
-            // action.g:1:444: DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
-            {
-            mDYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR(); if (failed) return ;
-
-            }
-
+            synpred11_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 41, Synpred11_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred11_fragment
-
-
-    // $ANTLR start Synpred12_fragment
-    public void mSynpred12_fragment() throws RecognitionException {
-        int Synpred12_fragment_StartIndex = input.index();
+    public boolean synpred12() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 42) ) { return ; }
-            // action.g:1:518: ( ISOLATED_DYNAMIC_SCOPE )
-            // action.g:1:519: ISOLATED_DYNAMIC_SCOPE
-            {
-            mISOLATED_DYNAMIC_SCOPE(); if (failed) return ;
-
-            }
-
+            synpred12_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 42, Synpred12_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred12_fragment
-
-
-    // $ANTLR start Synpred13_fragment
-    public void mSynpred13_fragment() throws RecognitionException {
-        int Synpred13_fragment_StartIndex = input.index();
+    public boolean synpred13() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 43) ) { return ; }
-            // action.g:1:567: ( TEMPLATE_INSTANCE )
-            // action.g:1:568: TEMPLATE_INSTANCE
-            {
-            mTEMPLATE_INSTANCE(); if (failed) return ;
-
-            }
-
+            synpred13_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 43, Synpred13_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred13_fragment
-
-
-    // $ANTLR start Synpred14_fragment
-    public void mSynpred14_fragment() throws RecognitionException {
-        int Synpred14_fragment_StartIndex = input.index();
+    public boolean synpred14() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 44) ) { return ; }
-            // action.g:1:606: ( INDIRECT_TEMPLATE_INSTANCE )
-            // action.g:1:607: INDIRECT_TEMPLATE_INSTANCE
-            {
-            mINDIRECT_TEMPLATE_INSTANCE(); if (failed) return ;
-
-            }
-
+            synpred14_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 44, Synpred14_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred14_fragment
-
-
-    // $ANTLR start Synpred15_fragment
-    public void mSynpred15_fragment() throws RecognitionException {
-        int Synpred15_fragment_StartIndex = input.index();
+    public boolean synpred15() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 45) ) { return ; }
-            // action.g:1:663: ( SET_EXPR_ATTRIBUTE )
-            // action.g:1:664: SET_EXPR_ATTRIBUTE
-            {
-            mSET_EXPR_ATTRIBUTE(); if (failed) return ;
-
-            }
-
+            synpred15_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 45, Synpred15_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred15_fragment
-
-
-    // $ANTLR start Synpred16_fragment
-    public void mSynpred16_fragment() throws RecognitionException {
-        int Synpred16_fragment_StartIndex = input.index();
+    public boolean synpred16() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 46) ) { return ; }
-            // action.g:1:704: ( SET_ATTRIBUTE )
-            // action.g:1:705: SET_ATTRIBUTE
-            {
-            mSET_ATTRIBUTE(); if (failed) return ;
-
-            }
-
+            synpred16_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 46, Synpred16_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred16_fragment
-
-
-    // $ANTLR start Synpred17_fragment
-    public void mSynpred17_fragment() throws RecognitionException {
-        int Synpred17_fragment_StartIndex = input.index();
+    public boolean synpred17() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 47) ) { return ; }
-            // action.g:1:735: ( TEMPLATE_EXPR )
-            // action.g:1:736: TEMPLATE_EXPR
-            {
-            mTEMPLATE_EXPR(); if (failed) return ;
-
-            }
-
+            synpred17_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 47, Synpred17_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred17_fragment
-
-
-    // $ANTLR start Synpred18_fragment
-    public void mSynpred18_fragment() throws RecognitionException {
-        int Synpred18_fragment_StartIndex = input.index();
+    public boolean synpred18() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 48) ) { return ; }
-            // action.g:1:766: ( ESC )
-            // action.g:1:767: ESC
-            {
-            mESC(); if (failed) return ;
-
-            }
-
+            synpred18_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 48, Synpred18_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred18_fragment
-
-
-    // $ANTLR start Synpred19_fragment
-    public void mSynpred19_fragment() throws RecognitionException {
-        int Synpred19_fragment_StartIndex = input.index();
+    public boolean synpred19() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 49) ) { return ; }
-            // action.g:1:777: ( ERROR_XY )
-            // action.g:1:778: ERROR_XY
-            {
-            mERROR_XY(); if (failed) return ;
-
-            }
-
+            synpred19_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 49, Synpred19_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred19_fragment
-
-
-    // $ANTLR start Synpred20_fragment
-    public void mSynpred20_fragment() throws RecognitionException {
-        int Synpred20_fragment_StartIndex = input.index();
+    public boolean synpred20() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 50) ) { return ; }
-            // action.g:1:798: ( ERROR_X )
-            // action.g:1:799: ERROR_X
-            {
-            mERROR_X(); if (failed) return ;
-
-            }
-
+            synpred20_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 50, Synpred20_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred20_fragment
-
-
-    // $ANTLR start Synpred21_fragment
-    public void mSynpred21_fragment() throws RecognitionException {
-        int Synpred21_fragment_StartIndex = input.index();
+    public boolean synpred21() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 51) ) { return ; }
-            // action.g:1:817: ( UNKNOWN_SYNTAX )
-            // action.g:1:818: UNKNOWN_SYNTAX
-            {
-            mUNKNOWN_SYNTAX(); if (failed) return ;
-
-            }
-
+            synpred21_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 51, Synpred21_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred21_fragment
-
-
-    // $ANTLR start Synpred22_fragment
-    public void mSynpred22_fragment() throws RecognitionException {
-        int Synpred22_fragment_StartIndex = input.index();
+    public boolean synpred22() {
+        backtracking++;
+        int start = input.mark();
         try {
-            if ( backtracking>0 && alreadyParsedRule(input, 52) ) { return ; }
-            // action.g:1:850: ( TEXT )
-            // action.g:1:851: TEXT
-            {
-            mTEXT(); if (failed) return ;
-
-            }
-
+            synpred22_fragment(); // can never throw exception
+        } catch (RecognitionException re) {
+            System.err.println("impossible: "+re);
         }
-        finally {
-            if ( backtracking>0 ) { memoize(input, 52, Synpred22_fragment_StartIndex); }
-            if ( backtracking==0 ) {
-            }
-        }
-        return ;
+        boolean success = !failed;
+        input.rewind(start);
+        backtracking--;
+        failed=false;
+        return success;
     }
-    // $ANTLR end Synpred22_fragment
-
-    class Synpred1Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred1_fragment();}
-    }
-    Synpred1Ptr Synpred1 = new Synpred1Ptr();
-    class Synpred2Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred2_fragment();}
-    }
-    Synpred2Ptr Synpred2 = new Synpred2Ptr();
-    class Synpred3Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred3_fragment();}
-    }
-    Synpred3Ptr Synpred3 = new Synpred3Ptr();
-    class Synpred4Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred4_fragment();}
-    }
-    Synpred4Ptr Synpred4 = new Synpred4Ptr();
-    class Synpred5Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred5_fragment();}
-    }
-    Synpred5Ptr Synpred5 = new Synpred5Ptr();
-    class Synpred6Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred6_fragment();}
-    }
-    Synpred6Ptr Synpred6 = new Synpred6Ptr();
-    class Synpred7Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred7_fragment();}
-    }
-    Synpred7Ptr Synpred7 = new Synpred7Ptr();
-    class Synpred8Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred8_fragment();}
-    }
-    Synpred8Ptr Synpred8 = new Synpred8Ptr();
-    class Synpred9Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred9_fragment();}
-    }
-    Synpred9Ptr Synpred9 = new Synpred9Ptr();
-    class Synpred10Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred10_fragment();}
-    }
-    Synpred10Ptr Synpred10 = new Synpred10Ptr();
-    class Synpred11Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred11_fragment();}
-    }
-    Synpred11Ptr Synpred11 = new Synpred11Ptr();
-    class Synpred12Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred12_fragment();}
-    }
-    Synpred12Ptr Synpred12 = new Synpred12Ptr();
-    class Synpred13Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred13_fragment();}
-    }
-    Synpred13Ptr Synpred13 = new Synpred13Ptr();
-    class Synpred14Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred14_fragment();}
-    }
-    Synpred14Ptr Synpred14 = new Synpred14Ptr();
-    class Synpred15Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred15_fragment();}
-    }
-    Synpred15Ptr Synpred15 = new Synpred15Ptr();
-    class Synpred16Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred16_fragment();}
-    }
-    Synpred16Ptr Synpred16 = new Synpred16Ptr();
-    class Synpred17Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred17_fragment();}
-    }
-    Synpred17Ptr Synpred17 = new Synpred17Ptr();
-    class Synpred18Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred18_fragment();}
-    }
-    Synpred18Ptr Synpred18 = new Synpred18Ptr();
-    class Synpred19Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred19_fragment();}
-    }
-    Synpred19Ptr Synpred19 = new Synpred19Ptr();
-    class Synpred20Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred20_fragment();}
-    }
-    Synpred20Ptr Synpred20 = new Synpred20Ptr();
-    class Synpred21Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred21_fragment();}
-    }
-    Synpred21Ptr Synpred21 = new Synpred21Ptr();
-    class Synpred22Ptr implements GrammarFragmentPtr {
-        public void invoke() throws RecognitionException {mSynpred22_fragment();}
-    }
-    Synpred22Ptr Synpred22 = new Synpred22Ptr();
 
 
- 
+
 
 }

@@ -241,7 +241,7 @@ TOKEN_SCOPE_ATTR
 		String label = $x.text;
 		if ( enclosingRule.getTokenLabel($x.text)==null ) {
 			// \$tokenref.attr  gotta get old label or compute new one
-			checkElementRefUniqueness($ID.text, true);
+			checkElementRefUniqueness($x.text, true);
 			label = enclosingRule.getElementLabel($x.text, outerAltNum, generator);
 			if ( label==null ) {
 				ErrorManager.grammarError(ErrorManager.MSG_FORWARD_ELEMENT_REF,
@@ -281,7 +281,7 @@ String refdRuleName=null;
 		String label = $x.text;
 		if ( pair==null ) {
 			// \$ruleref.attr  gotta get old label or compute new one
-			checkElementRefUniqueness($ID.text, false);
+			checkElementRefUniqueness($x.text, false);
 			label = enclosingRule.getElementLabel($x.text, outerAltNum, generator);
 			if ( label==null ) {
 				ErrorManager.grammarError(ErrorManager.MSG_FORWARD_ELEMENT_REF,
