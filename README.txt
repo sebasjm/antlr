@@ -263,6 +263,12 @@ CHANGES
 
 3.0beta -
 
+June 24, 2006
+
+* syn preds no longer generate little static classes; they also don't
+  generate a whole bunch of extra crap in the rules built to test syn
+  preds.
+
 June 23-24, 2006
 
 * added output option to -report output.

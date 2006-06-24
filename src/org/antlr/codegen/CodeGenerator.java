@@ -103,6 +103,12 @@ public class CodeGenerator {
 	/** Where are the templates this generator should use to generate code? */
 	protected StringTemplateGroup templates;
 
+	/** The basic output templates without AST or templates stuff; this will be
+	 *  the templates loaded for the language such as Java.stg *and* the Dbg
+	 *  stuff if turned on.  This is used for generating syntactic predicates.
+	 */
+	protected StringTemplateGroup baseTemplates;
+
 	protected StringTemplate recognizerST;
 	protected StringTemplate outputFileST;
 	protected StringTemplate headerFileST;
@@ -190,7 +196,8 @@ public class CodeGenerator {
 		// first load main language template
 		StringTemplateGroup coreTemplates =
 			StringTemplateGroup.loadGroup(language);
-		if ( coreTemplates==null ) {
+		baseTemplates = coreTemplates;
+		if ( coreTemplates ==null ) {
 			ErrorManager.error(ErrorManager.MSG_MISSING_CODE_GEN_TEMPLATES,
 							   language);
 			return;
@@ -203,6 +210,7 @@ public class CodeGenerator {
 			if ( debug && grammar.type!=Grammar.LEXER ) {
 				StringTemplateGroup dbgTemplates =
 					StringTemplateGroup.loadGroup("Dbg", coreTemplates);
+				baseTemplates = dbgTemplates;
 				StringTemplateGroup astTemplates =
 					StringTemplateGroup.loadGroup("AST",dbgTemplates);
 				StringTemplateGroup astDbgTemplates =
@@ -217,6 +225,7 @@ public class CodeGenerator {
 			if ( debug && grammar.type!=Grammar.LEXER ) {
 				StringTemplateGroup dbgTemplates =
 					StringTemplateGroup.loadGroup("Dbg", coreTemplates);
+				baseTemplates = dbgTemplates;
 				StringTemplateGroup stTemplates =
 					StringTemplateGroup.loadGroup("ST",dbgTemplates);
 				/*
@@ -231,6 +240,7 @@ public class CodeGenerator {
 		}
 		else if ( debug && grammar.type!=Grammar.LEXER ) {
 			templates = StringTemplateGroup.loadGroup("Dbg", coreTemplates);
+			baseTemplates = templates;
 		}
 		else {
 			templates = coreTemplates;
@@ -1058,6 +1068,10 @@ public class CodeGenerator {
 
 	public StringTemplateGroup getTemplates() {
 		return templates;
+	}
+
+	public StringTemplateGroup getBaseTemplates() {
+		return baseTemplates;
 	}
 
 	public void setDebug(boolean debug) {

@@ -47,7 +47,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            name, tokens, tokenNames, rules, cyclicDFAs,
 	   cyclicDFADescriptors,
 	   bitsets, buildTemplate, profile,
-	   backtracking, synpreds, memoize, numRules,
+	   backtracking, synpreds, blorts, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
@@ -91,7 +91,7 @@ public class <name> extends Lexer {
 <endif>
     <rules; separator="\n\n">
 
-    <synpreds:{p | <lexerSynpred(name=p)>}>
+    <synpreds:{p | <lexerSynpred(p)>}>
 
     <cyclicDFADescriptors:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
     <cyclicDFADescriptors:cyclicDFA()> <! dump tables for all DFA !>
@@ -179,7 +179,9 @@ public class <name> extends <@superClassName><superClass><@end> {
 
     <rules; separator="\n\n">
 
-    <synpreds:{p | <synpred(name=p)>}>
+    <synpreds:{p | <synpred(p)>}>
+
+    <blorts>
 
     <cyclicDFADescriptors:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
     <cyclicDFADescriptors:cyclicDFA()> <! dump tables for all DFA !>
@@ -200,18 +202,51 @@ treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cycl
 <genericParser(inputStreamType="TreeNodeStream", ...)>
 >>
 
-synpred(name) ::= <<
-class <name>Ptr implements GrammarFragmentPtr {
-    public void invoke() throws RecognitionException {<name>_fragment();}
+/** A simpler version of a rule template that is specific to the imaginary
+ *  rules created for syntactic predicates.  As they never have return values
+ *  nor parameters etc..., just give simplest possible method.  Don't do
+ *  any of the normal memoization stuff in here either; it's a waste.
+ *  As predicates cannot be inlined into the invoking rule, they need to
+ *  be in a rule by themselves.
+ */
+synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
+<<
+// $ANTLR start <ruleName>
+public void <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
+    <if(trace)>System.out.println("enter <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
+<if(trace)>
+    try {
+        <block>
+    }
+    finally {
+        System.out.println("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);
+    }
+<else>
+    <block>
+<endif>
 }
-<name>Ptr <name> = new <name>Ptr();<\n>
+// $ANTLR end <ruleName>
+>>
+
+synpred(name) ::= <<
+public boolean <name>() {
+    backtracking++;
+    int start = input.mark();
+    try {
+        <name>_fragment(); // can never throw exception
+    } catch (RecognitionException re) {
+        System.err.println("impossible: "+re);
+    }
+    boolean success = !failed;
+    input.rewind(start);
+    backtracking--;
+    failed=false;
+    return success;
+}<\n>
 >>
 
 lexerSynpred(name) ::= <<
-class <name>Ptr implements GrammarFragmentPtr {
-    public void invoke() throws RecognitionException {m<name>_fragment();}
-}
-<name>Ptr <name> = new <name>Ptr();<\n>
+<synpred(name)>
 >>
 
 ruleMemoization(name) ::= <<
@@ -312,11 +347,13 @@ ruleLabelDefs() ::= <<
 >>
 
 ruleReturnValue() ::= <<
+<if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasReturnValue)>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnName>
 <else>
 retval
+<endif>
 <endif>
 <endif>
 >>
@@ -904,8 +941,7 @@ notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
 evalPredicate(pred,description) ::= "<pred>"
 
-evalSynPredicate(pred,description) ::= 
-  "synpred(input, <pred>)"
+evalSynPredicate(pred,description) ::= "<pred>()"
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 

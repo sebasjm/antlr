@@ -128,6 +128,8 @@ public class Rule {
 	 */
 	public boolean referencedPredefinedRuleAttributes = false;
 
+	public boolean isSynPred = false;
+
 	public Rule(Grammar grammar,
 				String ruleName,
 				int ruleIndex,

@@ -47,7 +47,6 @@ import java.util.*;
 /** Represents a grammar in memory. */
 public class Grammar {
 	public static final String SYNPRED_RULE_PREFIX = "synpred";
-	public static final String SYNPRED_LEXER_RULE_PREFIX = "Synpred";
 
     public static final int INITIAL_DECISION_LIST_SIZE = 300;
 	public static final int INVALID_RULE_INDEX = -1;
@@ -842,6 +841,9 @@ public class Grammar {
         ruleIndexToRuleList.setSize(ruleIndex+1);
         ruleIndexToRuleList.set(ruleIndex, ruleName);
         ruleIndex++;
+		if ( ruleName.startsWith(SYNPRED_RULE_PREFIX) ) {
+			r.isSynPred = true;
+		}
 	}
 
 	/** Define a new predicate and get back its name for use in building
@@ -854,12 +856,7 @@ public class Grammar {
 			nameToSynpredASTMap = new LinkedHashMap();
 		}
 		String predName = null;
-		if ( Character.isUpperCase(currentRuleName.charAt(0)) ) {
-			predName = SYNPRED_LEXER_RULE_PREFIX+(nameToSynpredASTMap.size() + 1);
-		}
-		else {
-			predName = SYNPRED_RULE_PREFIX +(nameToSynpredASTMap.size() + 1);
-		}
+		predName = SYNPRED_RULE_PREFIX+(nameToSynpredASTMap.size() + 1);
 		nameToSynpredASTMap.put(predName, blockAST);
 		return predName;
 	}

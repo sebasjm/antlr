@@ -116,7 +116,12 @@ options {
 	{
 		String suffix = getSTSuffix(ast_suffix,label);
 		name += suffix;
-		if ( (grammar.buildAST()||suffix.length()>0) && label==null) {
+		// if we're building trees and there is no label, gen a label
+		// unless we're in a synpred rule.
+		Rule r = grammar.getRule(currentRuleName);
+		if ( (grammar.buildAST()||suffix.length()>0) && label==null &&
+		     (r==null || !r.isSynPred) )
+		{
 			// we will need a label to do the AST or tracking, make one
 			label = generator.createUniqueLabel(elementName);
 			CommonToken labelTok = new CommonToken(ANTLRParser.ID, label);
@@ -137,7 +142,12 @@ options {
 	{
 		String suffix = getSTSuffix(ast_suffix,label);
 		name += suffix;
-		if ( (grammar.buildAST()||suffix.length()>0) && label==null) {
+		// if we're building trees and there is no label, gen a label
+		// unless we're in a synpred rule.
+		Rule r = grammar.getRule(currentRuleName);
+		if ( (grammar.buildAST()||suffix.length()>0) && label==null &&
+		     (r==null || !r.isSynPred) )
+		{
 			label = generator.createUniqueLabel(elementName);
 			CommonToken labelTok = new CommonToken(ANTLRParser.ID, label);
 			grammar.defineTokenRefLabel(currentRuleName, labelTok, elementAST);
@@ -286,6 +296,14 @@ rule returns [StringTemplate code=null]
 	// init blockNestingLevel so it's block level RULE_BLOCK_NESTING_LEVEL
 	// for alts of rule
 	blockNestingLevel = RULE_BLOCK_NESTING_LEVEL-1;
+	Rule ruleDescr = grammar.getRule(#rule.getFirstChild().getText());
+
+	// For syn preds, we don't want any AST code etc... in there.
+	// Save old templates ptr and restore later.  Base templates include Dbg.
+	StringTemplateGroup saveGroup = templates;
+	if ( ruleDescr.isSynPred ) {
+		templates = generator.getBaseTemplates();
+	}
 }
     :   #( RULE id:ID {r=#id.getText(); currentRuleName = r;}
 		    (mod:modifier)?
@@ -313,25 +331,31 @@ rule returns [StringTemplate code=null]
 							   grammar.getRule(r).getAllRuleRefsInAltsWithRewrites());
 			*/
 			// do not generate lexer rules in combined grammar
-			if ( grammar.type==Grammar.LEXER ) {
+			String stName = null;
+			if ( ruleDescr.isSynPred ) {
+				stName = "synpredRule";
+			}
+			else if ( grammar.type==Grammar.LEXER ) {
 				if ( r.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ) {
-					code = templates.getInstanceOf("tokensRule");
+					stName = "tokensRule";
 				}
 				else {
-					code = templates.getInstanceOf("lexerRule");
+					stName = "lexerRule";
 				}
-				code.setAttribute("ruleDescriptor", grammar.getRule(r));
 			}
 			else {
 				if ( !(grammar.type==Grammar.COMBINED &&
 					 Character.isUpperCase(r.charAt(0))) )
 				{
-					code = templates.getInstanceOf("rule");
-					code.setAttribute("ruleDescriptor", grammar.getRule(r));
-					code.setAttribute("emptyRule",
-						new Boolean(grammar.isEmptyRule(block)));
+					stName = "rule";
 				}
 			}
+			code = templates.getInstanceOf(stName);
+			if ( code.getName().equals("rule") ) {
+				code.setAttribute("emptyRule",
+					new Boolean(grammar.isEmptyRule(block)));
+			}
+			code.setAttribute("ruleDescriptor", ruleDescr);
 			}
 
 	     	(exceptionGroup[code])?
@@ -361,6 +385,7 @@ rule returns [StringTemplate code=null]
 				code.setAttribute("initAction", initAction);
 			}
         }
+		templates = saveGroup;
         }
     ;
 
@@ -772,14 +797,16 @@ setElement
 rewrite returns [StringTemplate code=null]
 {
 StringTemplate alt;
-if ( generator.grammar.buildTemplate() ) {
-	code = templates.getInstanceOf("rewriteTemplate");
-}
-else if ( #rewrite.getType()==REWRITE ) {
-	code = templates.getInstanceOf("rewriteCode");
-	code.setAttribute("treeLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
-	code.setAttribute("rewriteBlockLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
-	currentBlockST = code;
+if ( #rewrite.getType()==REWRITE ) {
+	if ( generator.grammar.buildTemplate() ) {
+		code = templates.getInstanceOf("rewriteTemplate");
+	}
+	else {
+		code = templates.getInstanceOf("rewriteCode");
+		code.setAttribute("treeLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
+		code.setAttribute("rewriteBlockLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
+		currentBlockST = code;
+	}
 }
 }
 	:	(

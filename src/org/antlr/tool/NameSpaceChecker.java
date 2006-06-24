@@ -101,7 +101,10 @@ public class NameSpaceChecker {
 		if ( grammar.type==Grammar.PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
 			msgID = ErrorManager.MSG_LEXER_RULES_NOT_ALLOWED;
         }
-        else if ( grammar.type==Grammar.LEXER && Character.isLowerCase(ruleName.charAt(0)) ) {
+        else if ( grammar.type==Grammar.LEXER &&
+			      Character.isLowerCase(ruleName.charAt(0)) &&
+			      !r.isSynPred )
+		{
 			msgID = ErrorManager.MSG_PARSER_RULES_NOT_ALLOWED;
         }
 		else if ( grammar.getGlobalScope(ruleName)!=null ) {

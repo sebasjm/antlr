@@ -225,6 +225,7 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"enter atom 34\n" +
 			"enter atom (\n" +
 			"enter expr 34\n" +
+			"enter atom 34\n" +
 			"enter atom 34\n";
 		assertEqual(found, expecting);
 	}
@@ -264,7 +265,9 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"enter atom (\n" +
 			"enter expr (\n" +
 			"enter atom (\n" +
+			"enter atom (\n" +
 			"enter expr 3\n" +
+			"enter atom 3\n" +
 			"enter atom 3\n" +
 			"ATOM 34\n" +
 			"ATOM x\n" +
