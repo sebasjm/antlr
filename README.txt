@@ -261,7 +261,53 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0ea11 -
+3.0beta -
+
+June 23-24, 2006
+
+* added output option to -report output.
+
+* added profiling info:
+  Number of rule invocations in "guessing" mode
+  number of rule memoization cache hits
+  number of rule memoization cache misses
+
+* made DFA DOT diagrams go left to right not top to bottom
+
+* When the DFA construction routine finds itself infinitely recursing,
+  it reports a warning, but now it stops working (doing closure ops)
+  on a state after finding this problem.  Often the other alts in the
+  DFA will be a problem also so this should save some analysis time
+  and reduce number of errors.  There is no point in continuing with
+  any closures; a single recursive issue is enough to ruin the state.
+
+* I try to recursive overflow states now by resolving these states
+  with semantic/syntactic predicates if they exist.  The DFA is then
+  deterministic rather than simply resolving by choosing first
+  nondeterministic alt.  I used to generated errors:
+
+~/tmp $ java org.antlr.Tool -dfa t.g
+ANTLR Parser Generator   Early Access Version 3.0b1 (?)  1989-2006
+t.g:2:5: Alternative 1: after matching input such as A A A A A decision cannot predict what comes next due to recursion overflow to b from b
+t.g:2:5: Alternative 2: after matching input such as A A A A A decision cannot predict what comes next due to recursion overflow to b from b
+
+  Now, I uses predicates if available and emits no warnings.
+
+* made sem preds share accept states.  Previously, multiple preds in a
+decision forked new accepts each time for each nondet state.
+
+June 19, 2006
+
+* Need parens around the prediction expressions in templates.
+
+* Referencing $ID.text in an action forced bad code gen in lexer rule ID.
+
+* Fixed a bug in how predicates are collected.  The definition of
+  "last predicated alternative" was incorrect in the analysis.  Further,
+  gated predicates incorrectly missed a case where an edge should become
+  true (a tautology).
+
+* Removed an unnecessary input.consume() reference in the runtime/DFA class.
 
 June 14, 2006
 
@@ -287,6 +333,8 @@ t.g:4:17: the decision cannot distinguish between alternative(s) 2,1 for at leas
   method) with templates instead of just with ASTs.  Turned off.
 
 * Doesn't crash when you give it a missing file now.
+
+* -report: add output info: how many LL(1) decisions.
 
 June 13, 2006
 

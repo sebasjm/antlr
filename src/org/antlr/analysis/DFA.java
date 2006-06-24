@@ -49,7 +49,7 @@ public class DFA {
 	/** Prevent explosion of DFA states during conversion. The max number
 	 *  of states per alt in a single decision's DFA.
 	 */
-	public static final int MAX_STATES_PER_ALT_IN_DFA = 400;
+	public static final int MAX_STATES_PER_ALT_IN_DFA = 450;
 
 	public static int MAX_TIME_PER_DFA_CREATION = 0; //2*1000;
 

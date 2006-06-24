@@ -680,6 +680,20 @@ public abstract class BaseRecognizer {
 		}
 	}
 
+	/** return how many rule/input-index pairs there are in total.
+	 *  TODO: this includes synpreds. :(
+	 */
+	public int getRuleMemoizationCacheSize() {
+		int n = 0;
+		for (int i = 0; ruleMemo!=null && i < ruleMemo.length; i++) {
+			Map ruleMap = ruleMemo[i];
+			if ( ruleMap!=null ) {
+				n += ruleMap.size(); // how many input indexes are recorded?
+			}
+		}
+		return n;
+	}
+
 	/** A syntactic predicate.  Returns true/false depending on whether
 	 *  the specified grammar fragment matches the current input stream.
 	 *  This resets the failed instance var afterwards.

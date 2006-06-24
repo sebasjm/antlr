@@ -43,7 +43,7 @@ public class DOTGenerator {
 	public static final boolean STRIP_NONREDUCED_STATES = false;
 
 	protected String arrowhead="normal";
-	protected String rankdir="TB";
+	protected String rankdir="LR";
 
 	/** Library of output templates; use <attrname> format */
     public static StringTemplateGroup stlib =

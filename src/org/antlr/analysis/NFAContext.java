@@ -51,8 +51,25 @@ public class NFAContext {
 	 *  lookahead to resolve a decision.
 	 *
 	 *  Bermudez's m operates differently as it is his LR stack depth
-	 *  I'm pretty sure it therefore includes all stack symbols.  Here I am
-	 *  only preventing infinite recursion during a single closure operation.
+	 *  I'm pretty sure it therefore includes all stack symbols.  Here I
+	 *  restrict the size of an NFA configuration to be finite because a
+	 *  stack component may mention the same NFA invocation state at
+	 *  most m times.  Hence, the number of DFA states will not grow forever.
+	 *  With recursive rules like
+	 *
+	 *    e : '(' e ')' | INT ;
+	 *
+	 *  you could chase your tail forever if somebody said "s : e '.' | e ';' ;"
+	 *  This constant prevents new states from being created after a stack gets
+	 *  "too big".
+	 *
+	 *  Imagine doing a depth-first search on the DFA...as you chase an input
+	 *  sequence you can recurse to same rule such as e above.  You'd have a
+	 *  chain of ((((.  When you get do some point, you have to give up.  The
+	 *  states in the chain will have longer and longer NFA config stacks.
+	 *  Must limit size.
+	 *
+	 *  TODO: i wonder if we can recognize recursive loops and use a simple cycle?
 	 *
 	 *  max=0 implies you cannot ever jump to another rule during closure.
 	 *  max=1 implies you can make as many calls as you want--you just
@@ -70,7 +87,7 @@ public class NFAContext {
 	 *  max=4.  Let's set to 4. Recursion is sometimes needed to resolve some
 	 *  fixed lookahead decisions.
 	 */
-	public static int MAX_RECURSIVE_INVOCATIONS = 4;
+	public static int MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK = 4;
 
     public NFAContext parent;
 

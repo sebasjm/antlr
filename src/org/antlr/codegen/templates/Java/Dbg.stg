@@ -36,6 +36,9 @@ import org.antlr.runtime.debug.*;
 >>
 
 @genericParser.members() ::= <<
+public static final String[] ruleNames = new String[] {
+    "invalidRule", <rules:{rST | "<rST.ruleName>"}; wrap="\n    ", separator=", ">
+};<\n>
 public int ruleLevel = 0;
 <! bug: can't use <@super.members()> cut-n-paste instead !>
 public <name>(<inputStreamType> input) {
@@ -50,6 +53,19 @@ public <name>(<inputStreamType> input) {
         ruleMemo = new Map[<numRules>+1];<\n><! index from 1..n !>
 <endif>
 }
+<if(profile)>
+public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
+    ((Profiler)dbg).examineRuleMemoization(input, ruleIndex, ruleNames[ruleIndex]);
+    return super.alreadyParsedRule(input, ruleIndex);
+}<\n>
+public void memoize(IntStream input,
+                    int ruleIndex,
+                    int ruleStartIndex)
+{
+    ((Profiler)dbg).memoize(input, ruleIndex, ruleStartIndex, ruleNames[ruleIndex]);
+    super.memoize(input, ruleIndex, ruleStartIndex);
+}<\n>
+<endif>
 public <name>(<inputStreamType> input, DebugEventListener dbg) {
     super(input, dbg);
 }<\n>

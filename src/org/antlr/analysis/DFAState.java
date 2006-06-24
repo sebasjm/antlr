@@ -61,7 +61,7 @@ import java.util.*;
  *  meaning that state was reached via a different set of rule invocations.
  */
 public class DFAState extends State {
-    public static final int INITIAL_NUM_TRANSITIONS = 8;
+    public static final int INITIAL_NUM_TRANSITIONS = 4;
 	public static final int PREDICTED_ALT_UNSET = NFA.INVALID_ALT_NUMBER-1;
 
     /** We are part of what DFA?  Use this ref to get access to the
@@ -96,7 +96,13 @@ public class DFAState extends State {
      */
     protected boolean resolvedWithPredicates = false;
 
-    /** Build up the hash code for this state as NFA configurations
+	/** If a closure operation finds that we tried to invoke the same
+	 *  rule too many times (stack would grow beyond a threshold), it
+	 *  marks the state has aborted and notifies the DecisionProbe.
+	 */
+	protected boolean abortedDueToRecursionOverflow = false;
+
+	/** Build up the hash code for this state as NFA configurations
      *  are added as it's monotonically increasing list of configurations.
      */
     protected int cachedHashCode;

@@ -442,7 +442,10 @@ public class NFAToDFAConverter {
 		configs.addAll(d.getNFAConfigurations());
 		// for each NFA configuration in d
 		Iterator iter = configs.iterator();
-		while (!terminateConversion && iter.hasNext()) {
+		while (!terminateConversion &&
+			   !d.abortedDueToRecursionOverflow &&
+			   iter.hasNext() )
+		{
 			NFAConfiguration c = (NFAConfiguration)iter.next();
 			if ( c.singleAtomTransitionEmanating ) {
 				continue; // ignore NFA states w/o epsilon transitions
@@ -619,8 +622,13 @@ public class NFAToDFAConverter {
 			// Detect an attempt to recurse too high
 			// if this context has hit the max recursions for p.stateNumber,
 			// don't allow it to enter p.stateNumber again
-			if ( depth >= NFAContext.MAX_RECURSIVE_INVOCATIONS ) {
+			if ( depth >= NFAContext.MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK ) {
+				/*
+				System.out.println("OVF state "+d);
+				System.out.println("proposed "+proposedNFAConfiguration);
+				*/
 				d.dfa.probe.reportRecursiveOverflow(d, proposedNFAConfiguration);
+				d.abortedDueToRecursionOverflow = true;
 				return;
 			}
 			// otherwise, it's cool to (re)enter target of this rule ref
@@ -931,7 +939,8 @@ public class NFAToDFAConverter {
 		// the start state to the nondet state
 		if ( DFAOptimizer.MERGE_STOP_STATES &&
 			d.getNondeterministicAlts()==null &&
-			!dfa.probe.dfaStateHasRecursionOverflow(d) )
+			!d.abortedDueToRecursionOverflow )
+			//!dfa.probe.dfaStateHasRecursionOverflow(d) )
 		{
 			// check to see if we already have an accept state for this alt
 			// [must do this after we resolve nondeterminisms in general]
@@ -1132,11 +1141,13 @@ public class NFAToDFAConverter {
 			}
 		}
 
-		if ( nondeterministicAlts==null ) {
+		// if no problems return unless we aborted work on d to avoid inf recursion
+		if ( !d.abortedDueToRecursionOverflow && nondeterministicAlts==null ) {
 			return; // no problems, return
 		}
 
-		if ( !conflictingLexerRules ) {
+		// if we're not a conflicting lexer rule and we didn't abort, report ambig
+		if ( !d.abortedDueToRecursionOverflow && !conflictingLexerRules ) {
 			// TODO: with k=x option set, this is called twice for same state
 			dfa.probe.reportNondeterminism(d);
 			// TODO: how to turn off when it's only the FOLLOW that is
@@ -1157,6 +1168,11 @@ public class NFAToDFAConverter {
 		}
 
 		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
+
+		// If we aborted, assume all alts mentioned in this DFA state are hosed
+		if ( d.abortedDueToRecursionOverflow ) {
+			nondeterministicAlts = d.getAltSet();
+		}
 
 		boolean resolved =
 			tryToResolveWithSemanticPredicates(d, nondeterministicAlts);
@@ -1374,6 +1390,11 @@ public class NFAToDFAConverter {
 		if ( altToPredMap.size()==nondeterministicAlts.size() ) {
 			// RESOLVE CONFLICT by picking one NFA configuration for each alt
 			// and setting its resolvedWithPredicate flag
+			// First, prevent a recursion warning on this state due to
+			// pred resolution
+			if ( d.abortedDueToRecursionOverflow ) {
+				d.dfa.probe.removeRecursiveOverflowState(d);
+			}
 			Iterator iter = d.nfaConfigurations.iterator();
 			NFAConfiguration configuration;
 			while (iter.hasNext()) {
@@ -1577,23 +1598,26 @@ public class NFAToDFAConverter {
 				 }
 			 });
 		List predConfigsSortedByAlt = configsWithPreds;
-		// Now, we can add edges to d for these preds in the right order
+		// Now, we can add edges emanating from d for these preds in right order
 		for (int i = 0; i < predConfigsSortedByAlt.size(); i++) {
 			NFAConfiguration c = (NFAConfiguration)predConfigsSortedByAlt.get(i);
-			// create a new DFA state that is a target of the predicate
-			DFAState predDFATarget = dfa.newState();
-			predDFATarget.addNFAConfiguration(dfa.nfa.getState(c.state),
-					c.alt,
-					c.context,
-					c.semanticContext);
-			predDFATarget.setAcceptState(true);
-			DFAState existingState = dfa.addState(predDFATarget);
-			if ( predDFATarget != existingState ) {
-				// already there...use/return the existing DFA state that
-				// is a target of this predicate.  Make this state number
-				// point at the existing state
-				dfa.setState(predDFATarget.stateNumber, existingState);
-				predDFATarget = existingState;
+			DFAState predDFATarget = d.dfa.getAcceptState(c.alt);
+			if ( predDFATarget==null ) {
+				predDFATarget = dfa.newState(); // create if not there.
+				// create a new DFA state that is a target of the predicate from d
+				predDFATarget.addNFAConfiguration(dfa.nfa.getState(c.state),
+												  c.alt,
+												  c.context,
+												  c.semanticContext);
+				predDFATarget.setAcceptState(true);
+				DFAState existingState = dfa.addState(predDFATarget);
+				if ( predDFATarget != existingState ) {
+					// already there...use/return the existing DFA state that
+					// is a target of this predicate.  Make this state number
+					// point at the existing state
+					dfa.setState(predDFATarget.stateNumber, existingState);
+					predDFATarget = existingState;
+				}
 			}
 			// add a transition to pred target from d
 			d.addTransition(predDFATarget, new Label(c.semanticContext));

@@ -115,7 +115,7 @@ public class DecisionProbe {
 
 	/** Recursion is limited to a particular depth.  If that limit is exceeded
 	 *  the proposed new NFAConfiguration is recorded for the associated DFA state.
-	 *  Map<DFAState,List<NFAConfiguration>>.
+	 *  Map<Integer DFA state number,List<NFAConfiguration>>.
 	 */
 	protected Map stateToRecursiveOverflowConfigurationsMap = new HashMap();
 
@@ -262,10 +262,20 @@ public class DecisionProbe {
 		return d.getDisabledAlternatives();
 	}
 
+	/** If a recursion overflow is resolve with predicates, then we need
+	 *  to shut off the warning that would be generated.
+	 */
+	public void removeRecursiveOverflowState(DFAState d) {
+		Integer stateI = new Integer(d.stateNumber);
+		stateToRecursiveOverflowConfigurationsMap.remove(stateI);
+	}
+
+	/*
 	public boolean dfaStateHasRecursionOverflow(DFAState d) {
 		Integer stateI = new Integer(d.stateNumber);
 		return stateToRecursiveOverflowConfigurationsMap.get(stateI)!=null;
 	}
+	*/
 
 	/** Return a List<Label> indicating an input sequence that can be matched
 	 *  from the start state of the DFA to the targetState (which is known

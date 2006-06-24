@@ -186,7 +186,7 @@ public class Tool {
 				}
 				else {
 					i++;
-					NFAContext.MAX_RECURSIVE_INVOCATIONS = Integer.parseInt(args[i]);
+					NFAContext.MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK = Integer.parseInt(args[i]);
 				}
 			}
 			else if (args[i].equals("-ImaxtimeforDFA")) {

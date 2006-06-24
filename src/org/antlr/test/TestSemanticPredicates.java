@@ -152,7 +152,7 @@ public class TestSemanticPredicates extends TestSuite {
 			"b : {p1}? ID | INT ;\n");
 		String expecting =  // only tests after ID, not INT :)
 			".s0-ID->.s1\n" +
-			".s0-INT->:s4=>1\n" +
+			".s0-INT->:s2=>1\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{p2}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
@@ -165,7 +165,7 @@ public class TestSemanticPredicates extends TestSuite {
 			"b : {p1}? ID | INT ;\n");
 		String expecting =
 			".s0-ID->.s1\n" +
-			".s0-INT->:s4=>1\n" +
+			".s0-INT->:s2=>1\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
@@ -178,7 +178,7 @@ public class TestSemanticPredicates extends TestSuite {
 			"b : {p1}? ID | INT ;\n");
 		String expecting =
 			".s0-ID->.s1\n" +
-			".s0-INT->:s4=>2\n" +
+			".s0-INT->:s3=>2\n" +
 			".s1-{!(p1)}?->:s2=>1\n" +
 			".s1-{p1}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
@@ -217,7 +217,7 @@ public class TestSemanticPredicates extends TestSuite {
 				   "warning must be a recursion overflow msg");
 	}
 
-	public void testIgnorePredFromLL2Alt() throws Exception {
+	public void testIgnorePredFromLL2AltLastAltIsDefaultTrue() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {p1}? A B | A C | {p2}? A | {p3}? A | A ;\n");
@@ -232,9 +232,30 @@ public class TestSemanticPredicates extends TestSuite {
 			".s0-A->.s1\n" +
 			".s1-B->:s2=>1\n" +
 			".s1-C->:s3=>2\n" +
-			".s1-{!((p3||p2))}?->:s6=>5\n" +
 			".s1-{p2}?->:s4=>3\n" +
-			".s1-{p3}?->:s5=>4\n";
+			".s1-{p3}?->:s5=>4\n" +
+			".s1-{true}?->:s6=>5\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testIgnorePredFromLL2AltPredUnionNeeded() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : {p1}? A B | A C | {p2}? A | A | {p3}? A ;\n");
+		// two situations of note:
+		// 1. A B syntax is enough to predict that alt, so p1 is not used
+		//    to distinguish it from alts 2..5
+		// 2. Alts 3, 4, 5 are nondeterministic with upon A.  p2, p3 and the
+		//    complement of p2||p3 is sufficient to resolve the conflict. Do
+		//    not include alt 1's p1 pred in the "complement of other alts"
+		//    because it is not considered nondeterministic with alts 3..5
+		String expecting =
+			".s0-A->.s1\n" +
+			".s1-B->:s2=>1\n" +
+			".s1-C->:s3=>2\n" +
+			".s1-{!((p2||p3))}?->:s5=>4\n" +
+			".s1-{p2}?->:s4=>3\n" +
+			".s1-{p3}?->:s6=>5\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -260,9 +281,54 @@ public class TestSemanticPredicates extends TestSuite {
 			"c : {q}? (A|B)+ ;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s0-B->:s4=>2\n" +
+			".s0-B->:s3=>2\n" +
 			".s1-{p}?->:s2=>1\n" +
 			".s1-{q}?->:s3=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testPredsUsedAfterRecursionOverflow() throws Exception {
+		Grammar g = new Grammar(
+			"grammar P;\n"+
+			"s : {p1}? e '.' | {p2}? e ':' ;\n" +
+			"e : '(' e ')' | INT ;\n");
+		String expecting =
+			".s0-'('->.s1\n" +
+			".s0-INT->.s16\n" +
+			".s1-'('->.s2\n" +
+			".s1-INT->.s15\n" +
+			".s10-')'->.s11\n" +
+			".s11-')'->.s12\n" +
+			".s12-'.'->:s6=>1\n" +
+			".s12-':'->:s7=>2\n" +
+			".s13-')'->.s10\n" +
+			".s14-')'->.s11\n" +
+			".s15-')'->.s12\n" +
+			".s16-'.'->:s6=>1\n" +
+			".s16-':'->:s7=>2\n" +
+			".s2-'('->.s3\n" +
+			".s2-INT->.s14\n" +
+			".s3-'('->.s4\n" +
+			".s3-INT->.s13\n" +
+			".s4-'('->.s5\n" +
+			".s4-INT->.s8\n" +
+			".s5-{p1}?->:s6=>1\n" +
+			".s5-{p2}?->:s7=>2\n" +
+			".s8-')'->.s9\n" +
+			".s9-')'->.s10\n";
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		CodeGenerator generator = new CodeGenerator(new Tool(), g, "Java");
+		g.setCodeGenerator(generator);
+		if ( g.getNumberOfDecisions()==0 ) {
+			g.createNFAs();
+			g.createLookaheadDFAs();
+		}
+
+		assertTrue(equeue.size()==0,
+				   "unexpected number of expected problems: "+equeue.size()+
+				   "; expecting "+0+": "+equeue);
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -273,8 +339,8 @@ public class TestSemanticPredicates extends TestSuite {
 			"C : {q}? ('a'|'b')+ ;");
 		String expecting =
 			".s0-'a'->.s1\n" +
-			".s0-'b'->:s5=>2\n" +
-			".s1-'a'..'b'->:s5=>2\n" +
+			".s0-'b'->:s4=>2\n" +
+			".s1-'a'..'b'->:s4=>2\n" +
 			".s1-<EOT>->.s2\n" +
 			".s2-{p}?->:s3=>1\n" +
 			".s2-{q}?->:s4=>2\n";
@@ -289,8 +355,8 @@ public class TestSemanticPredicates extends TestSuite {
 			"C : {q}? => ('a'|'b')+ ;");
 		String expecting =
 			".s0-'a'&&{(q||p)}?->.s1\n" +
-			".s0-'b'&&{q}?->:s5=>2\n" +
-			".s1-'a'..'b'&&{q}?->:s5=>2\n" +
+			".s0-'b'&&{q}?->:s4=>2\n" +
+			".s1-'a'..'b'&&{q}?->:s4=>2\n" +
 			".s1-<EOT>&&{(q||p)}?->.s2\n" +
 			".s2-{p}?->:s3=>1\n" +
 			".s2-{q}?->:s4=>2\n";
@@ -304,9 +370,9 @@ public class TestSemanticPredicates extends TestSuite {
 			"B : {q}?=> ('a'|'b')+ 'x' ;");
 		String expecting =
 			".s0-'a'&&{(p||q)}?->.s1\n" +
-			".s0-'b'&&{q}?->:s6=>2\n" +
+			".s0-'b'&&{q}?->:s5=>2\n" +
 			".s1-'a'&&{(p||q)}?->.s1\n" +
-			".s1-'b'&&{q}?->:s6=>2\n" +
+			".s1-'b'&&{q}?->:s5=>2\n" +
 			".s1-'x'&&{(q||p)}?->.s2\n" +
 			".s2-<EOT>&&{(p||q)}?->.s3\n" +
 			".s3-{p}?->:s4=>1\n" +
@@ -337,8 +403,8 @@ public class TestSemanticPredicates extends TestSuite {
 			"  | B\n" +
 			"  ;\n");
 		String expecting =
-			".s0-B&&{q}?->.s1\n" +
-			".s0-C&&{(q&&r)}?->:s4=>2\n" +
+			".s0-B->.s1\n" +
+			".s0-C&&{(q&&r)}?->:s3=>2\n" +
 			".s1-{p}?->:s2=>1\n" +
 			".s1-{q}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
@@ -354,8 +420,8 @@ public class TestSemanticPredicates extends TestSuite {
 			"  | {s}?=> B\n" +
 			"  ;\n");
 		String expecting =
-			".s0-B&&{(q&&s)}?->.s1\n" +
-			".s0-C&&{(q&&r)}?->:s4=>2\n" +
+			".s0-B->.s1\n" +
+			".s0-C&&{(q&&r)}?->:s3=>2\n" +
 			".s1-{(q&&s)}?->:s3=>2\n" +
 			".s1-{p}?->:s2=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);

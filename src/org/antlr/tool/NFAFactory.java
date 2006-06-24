@@ -249,7 +249,9 @@ public class NFAFactory {
      */
     public StateCluster build_SemanticPredicate(GrammarAST pred) {
 		// don't count syn preds
-		if ( !pred.getText().toUpperCase().startsWith("SYNPRED") ) {
+		if ( !pred.getText().toUpperCase()
+			    .startsWith(Grammar.SYNPRED_RULE_PREFIX.toUpperCase()) )
+		{
 			nfa.grammar.numberOfSemanticPredicates++;
 		}
 		NFAState left = newState();

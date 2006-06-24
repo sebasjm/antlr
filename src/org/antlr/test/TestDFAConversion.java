@@ -74,16 +74,12 @@ public class TestDFAConversion extends TestSuite {
 			".s1-A->.s2\n" +
 			".s2-A->.s3\n" +
 			".s3-A->.s4\n" +
-			".s4-A->.s5\n" +
-			".s5-A->.s6\n" +
-			".s6-A->.s7\n" +
-			".s7-A->.s8\n" +
-			".s8-A->:s9=>1\n"; // gets this after failing to do LL(*)
+			".s4-A->:s5=>1\n"; // gets this after failing to do LL(*)
 		int[] unreachableAlts = new int[] {2};
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = new int[] {1,2};
-		int numWarnings = 4;
+		int numWarnings = 2;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -121,15 +117,12 @@ public class TestDFAConversion extends TestSuite {
 			".s9-R->.s10\n";
 		/* Gets:
 t.g:3:7: Alternative 1: after matching input such as L L L L L decision cannot predict what comes next due to recursion overflow to y from y
-t.g:3:7: Alternative 2: after matching input such as L L L L L decision cannot predict what comes next due to recursion overflow to y from y
-t.g:3:7: the decision cannot distinguish between alternative(s) 2,1 for at least one input sequence
-           But this test really only checks to make sure there are 3 errors
 		*/
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 3;
+		int numWarnings = 1;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -942,16 +935,14 @@ As a result, alternative(s) 2 were disabled for that input
 			".s4-A->.s5\n" +
 			".s4-X->:s3=>1\n" +
 			".s4-Y->:s6=>2\n" +
-			".s5-A->.s7\n" +
+			".s5-A->:s7=>1\n" +
 			".s5-X->:s3=>1\n" +
-			".s5-Y->:s6=>2\n" +
-			".s7-X->:s3=>1\n" +
-			".s7-Y->:s6=>2\n";
+			".s5-Y->:s6=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 2;
+		int numWarnings = 1;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}

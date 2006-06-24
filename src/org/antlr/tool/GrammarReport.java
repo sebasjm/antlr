@@ -40,7 +40,7 @@ public class GrammarReport {
 	public static final String Version = "3";
 	public static final String GRAMMAR_STATS_FILENAME = "grammar.stats";
 	public static final String ANTLRWORKS_DIR = "antlrworks";
-	public static final int NUM_GRAMMAR_STATS = 38;
+	public static final int NUM_GRAMMAR_STATS = 39;
 
 	public Grammar grammar;
 
@@ -60,16 +60,22 @@ public class GrammarReport {
 		buf.append(Grammar.grammarTypeToString[grammar.type]);
 		buf.append('\t');
 		buf.append(grammar.getOption("language"));
-		buf.append('\t');
-		buf.append(grammar.getRules().size());
-		buf.append('\t');
-		int totalProductions = 0;
+		int totalNonSynPredProductions = 0;
+		int totalNonSynPredRules = 0;
 		Collection rules = grammar.getRules();
 		for (Iterator it = rules.iterator(); it.hasNext();) {
 			Rule r = (Rule) it.next();
-			totalProductions += r.numberOfAlts;
+			if ( !r.name.toUpperCase()
+			    .startsWith(Grammar.SYNPRED_RULE_PREFIX.toUpperCase()) )
+			{
+				totalNonSynPredProductions += r.numberOfAlts;
+				totalNonSynPredRules++;
+			}
 		}
-		buf.append(totalProductions);
+		buf.append('\t');
+		buf.append(totalNonSynPredRules);
+		buf.append('\t');
+		buf.append(totalNonSynPredProductions);
 		buf.append('\t');
 		buf.append(grammar.getNumberOfDecisions());
 		buf.append('\t');
@@ -163,6 +169,12 @@ public class GrammarReport {
 		buf.append(grammar.blocksWithSemPreds.size());
 		buf.append('\t');
 		buf.append(grammar.decisionsWhoseDFAsUsesSemPreds.size());
+		buf.append('\t');
+		String output = (String)grammar.getOption("output");
+		if ( output==null ) {
+			output = "none";
+		}
+		buf.append(output);
 		return buf.toString();
 	}
 
@@ -205,6 +217,9 @@ public class GrammarReport {
 		buf.append('\n');
 		buf.append("Target language: ");
 		buf.append(fields[3]);
+		buf.append('\n');
+		buf.append("Output: ");
+		buf.append(fields[38]);
 		buf.append('\n');
 		buf.append("Rules: ");
 		buf.append(fields[4]);

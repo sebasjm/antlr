@@ -27,15 +27,10 @@
 */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenStream;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.*;
 import org.antlr.tool.GrammarReport;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /** Using the debug event interface, track what is happening in the parser
  *  and record statistics about the runtime.
@@ -46,7 +41,7 @@ public class Profiler extends BlankDebugEventListener {
 	 */
 	public static final String Version = "2";
 	public static final String RUNTIME_STATS_FILENAME = "runtime.stats";
-	public static final int NUM_RUNTIME_STATS = 25;
+	public static final int NUM_RUNTIME_STATS = 29;
 
 	public DebugParser parser = null;
 
@@ -62,6 +57,7 @@ public class Profiler extends BlankDebugEventListener {
 	// stats variables
 
 	public int numRuleInvocations = 0;
+	public int numGuessingRuleInvocations = 0;
 	public int maxRuleInvocationDepth = 0;
 	public int numFixedDecisions = 0;
 	public int numCyclicDecisions = 0;
@@ -75,6 +71,9 @@ public class Profiler extends BlankDebugEventListener {
 	public int numSemanticPredicates = 0;
 	public int numSyntacticPredicates = 0;
 	protected int numberReportedErrors = 0;
+	public int numMemoizationCacheMisses = 0;
+	public int numMemoizationCacheHits = 0;
+	public int numMemoizationCacheEntries = 0;
 
 	public Profiler() {
 	}
@@ -84,11 +83,57 @@ public class Profiler extends BlankDebugEventListener {
 	}
 
 	public void enterRule(String ruleName) {
+		System.out.println("enterRule "+ruleName);
+		// don't count predicates as rules
+		if ( ruleName.toUpperCase().startsWith("SYNPRED") ) {
+			return;
+		}
 		ruleLevel++;
 		numRuleInvocations++;
 		if ( ruleLevel >maxRuleInvocationDepth ) {
 			maxRuleInvocationDepth = ruleLevel;
 		}
+
+	}
+
+	/** Track memoization; this is not part of standard debug interface
+	 *  but is triggered by profiling.  Code gen inserts an override
+	 *  for this method in the recognizer, which triggers this method.
+	 */
+	public void examineRuleMemoization(IntStream input,
+									   int ruleIndex,
+									   String ruleName)
+	{
+		System.out.println("examine memo "+ruleName);
+		// don't count predicates as rules
+		if ( ruleName.toUpperCase().startsWith("SYNPRED") ) {
+			// don't use Grammar constant for "synpred" as it is not in runtime
+			return;
+		}
+		int stopIndex = parser.getRuleMemoization(ruleIndex, input.index());
+		if ( stopIndex==BaseRecognizer.MEMO_RULE_UNKNOWN ) {
+			System.out.println("rule "+ruleIndex+" missed @ "+input.index());
+			numMemoizationCacheMisses++;
+			numGuessingRuleInvocations++; // we'll have to enter
+		}
+		else {
+			// regardless of rule success/failure, if in cache, we have a cache hit
+			System.out.println("rule "+ruleIndex+" hit @ "+input.index());
+			numMemoizationCacheHits++;
+		}
+	}
+
+	public void memoize(IntStream input,
+						int ruleIndex,
+						int ruleStartIndex,
+						String ruleName)
+	{
+		// count how many entries go into table
+		System.out.println("memoize "+ruleName);
+		if ( ruleName.toUpperCase().startsWith("SYNPRED") ) {
+			return;
+		}
+		numMemoizationCacheEntries++;
 	}
 
 	public void exitRule(String ruleName) {
@@ -134,19 +179,8 @@ public class Profiler extends BlankDebugEventListener {
 		maxLookaheadInCurrentDecision = 0;
 	}
 
-	/** If we are in a decision, we want to track lookahead depth.
-	 *  If in a cyclic decision, we'll see
-	 * 		enter decision
-	 *      at least one LA and possibly a bunch of consumes
-	 * 	The isCyclicDecision flag will be on.
-	 */
 	public void consumeToken(Token token) {
 		//System.out.println("consume token "+token);
-		if ( inDecision() ) {
-			if ( parser.isCyclicDecision ) {
-				maxLookaheadInCurrentDecision++;
-			}
-		}
 		lastTokenConsumed = (CommonToken)token;
 	}
 
@@ -162,7 +196,8 @@ public class Profiler extends BlankDebugEventListener {
 		lastTokenConsumed = (CommonToken)token;
 	}
 
-	/** Track refs to lookahead if in a fixed decision */
+	/** Track refs to lookahead if in a fixed/nonfixed decision.
+	 */
 	public void LT(int i, Token t) {
 		if ( inDecision() ) {
 			// get starting index off stack
@@ -173,8 +208,10 @@ public class Profiler extends BlankDebugEventListener {
 			int numHidden =
 				getNumberOfHiddenTokens(startingIndex.intValue(), thisRefIndex);
 			int depth = i + thisRefIndex - startingIndex.intValue() - numHidden;
-			//System.out.println("LT("+i+") @ index "+thisRefIndex+" is depth "+depth);
-
+			/*
+			System.out.println("LT("+i+") @ index "+thisRefIndex+" is depth "+depth+
+				" max is "+maxLookaheadInCurrentDecision);
+			*/
 			if ( depth>maxLookaheadInCurrentDecision ) {
 				maxLookaheadInCurrentDecision = depth;
 			}
@@ -255,6 +292,7 @@ public class Profiler extends BlankDebugEventListener {
 	// R E P O R T I N G
 
 	public String toNotifyString() {
+		System.out.println("### cache size " +parser.getRuleMemoizationCacheSize());
 		TokenStream input = parser.getTokenStream();
 		for (int i=0; i<input.size()&&lastTokenConsumed!=null&&i<=lastTokenConsumed.getTokenIndex(); i++) {
 			Token t = input.get(i);
@@ -316,6 +354,14 @@ public class Profiler extends BlankDebugEventListener {
 		buf.append(numHiddenCharsMatched);
 		buf.append('\t');
 		buf.append(numberReportedErrors);
+		buf.append('\t');
+		buf.append(numMemoizationCacheHits);
+		buf.append('\t');
+		buf.append(numMemoizationCacheMisses);
+		buf.append('\t');
+		buf.append(numGuessingRuleInvocations);
+		buf.append('\t');
+		buf.append(numMemoizationCacheEntries);
 		return buf.toString();
 	}
 
@@ -351,6 +397,9 @@ public class Profiler extends BlankDebugEventListener {
 		buf.append('\n');
 		buf.append("Number of rule invocations ");
 		buf.append(fields[2]);
+		buf.append('\n');
+		buf.append("Number of rule invocations in \"guessing\" mode ");
+		buf.append(fields[27]);
 		buf.append('\n');
 		buf.append("max rule invocation nesting depth ");
 		buf.append(fields[3]);
@@ -399,6 +448,15 @@ public class Profiler extends BlankDebugEventListener {
 		buf.append('\n');
 		buf.append("standard deviation of depth used in syntactic predicates ");
 		buf.append(fields[18]);
+		buf.append('\n');
+		buf.append("rule memoization cache size ");
+		buf.append(fields[28]);
+		buf.append('\n');
+		buf.append("number of rule memoization cache hits ");
+		buf.append(fields[25]);
+		buf.append('\n');
+		buf.append("number of rule memoization cache misses ");
+		buf.append(fields[26]);
 		buf.append('\n');
 		buf.append("number of evaluated semantic predicates ");
 		buf.append(fields[19]);

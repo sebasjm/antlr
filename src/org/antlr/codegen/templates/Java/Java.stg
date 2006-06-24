@@ -163,14 +163,9 @@ public class <name> extends <@superClassName><superClass><@end> {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
+   <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
     public <name>(<inputStreamType> input) {
-<if(profile)>
-        this(input, new Profiler(null));
-        Profiler p = (Profiler)dbg;
-        p.setParser(this);
-<else>
         super(input);
-<endif>
 <if(memoize)>
         ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
