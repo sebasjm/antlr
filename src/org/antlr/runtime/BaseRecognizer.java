@@ -225,13 +225,6 @@ public abstract class BaseRecognizer {
 	public void endResync() {
 	}
 
-	/** A hook to listen in on the token consumption during error recovery.
-	 *  The DebugParser subclasses this to fire events to the listenter.
-	 */
-	public void beginBacktrack(int level) {}
-
-	public void endBacktrack(int level, boolean successful) {}
-
 	/*  Compute the error recovery set for the current rule.  During
 	 *  rule invocation, the parser pushes the set of tokens that can
 	 *  follow that rule reference on the stack; this amounts to

@@ -229,6 +229,7 @@ public void <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 synpred(name) ::= <<
 public boolean <name>() {
     backtracking++;
+    <@start()>
     int start = input.mark();
     try {
         <name>_fragment(); // can never throw exception
@@ -237,6 +238,7 @@ public boolean <name>() {
     }
     boolean success = !failed;
     input.rewind(start);
+    <@stop()>
     backtracking--;
     failed=false;
     return success;

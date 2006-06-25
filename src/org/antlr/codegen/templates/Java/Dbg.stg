@@ -94,6 +94,12 @@ finally {
 }<\n>
 >>
 
+synpred_start() ::= "dork"
+
+@synpred.start() ::= "dbg.beginBacktrack(backtracking);"
+
+@synpred.stop() ::= "dbg.endBacktrack(backtracking);"
+
 // Common debug event triggers used by region overrides below
 
 enterSubRule() ::=

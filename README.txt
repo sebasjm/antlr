@@ -267,7 +267,7 @@ June 24, 2006
 
 * syn preds no longer generate little static classes; they also don't
   generate a whole bunch of extra crap in the rules built to test syn
-  preds.
+  preds.  Removed GrammarFragmentPointer class from runtime.
 
 June 23-24, 2006
 
