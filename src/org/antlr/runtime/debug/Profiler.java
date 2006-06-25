@@ -84,10 +84,6 @@ public class Profiler extends BlankDebugEventListener {
 
 	public void enterRule(String ruleName) {
 		//System.out.println("enterRule "+ruleName);
-		// don't count predicates as rules
-		if ( ruleName.toUpperCase().startsWith("SYNPRED") ) {
-			return;
-		}
 		ruleLevel++;
 		numRuleInvocations++;
 		if ( ruleLevel >maxRuleInvocationDepth ) {
@@ -104,21 +100,16 @@ public class Profiler extends BlankDebugEventListener {
 									   int ruleIndex,
 									   String ruleName)
 	{
-		System.out.println("examine memo "+ruleName);
-		// don't count predicates as rules
-		if ( ruleName.toUpperCase().startsWith("SYNPRED") ) {
-			// don't use Grammar constant for "synpred" as it is not in runtime
-			return;
-		}
+		//System.out.println("examine memo "+ruleName);
 		int stopIndex = parser.getRuleMemoization(ruleIndex, input.index());
 		if ( stopIndex==BaseRecognizer.MEMO_RULE_UNKNOWN ) {
-			System.out.println("rule "+ruleIndex+" missed @ "+input.index());
+			//System.out.println("rule "+ruleIndex+" missed @ "+input.index());
 			numMemoizationCacheMisses++;
 			numGuessingRuleInvocations++; // we'll have to enter
 		}
 		else {
 			// regardless of rule success/failure, if in cache, we have a cache hit
-			System.out.println("rule "+ruleIndex+" hit @ "+input.index());
+			//System.out.println("rule "+ruleIndex+" hit @ "+input.index());
 			numMemoizationCacheHits++;
 		}
 	}
@@ -129,10 +120,7 @@ public class Profiler extends BlankDebugEventListener {
 						String ruleName)
 	{
 		// count how many entries go into table
-		System.out.println("memoize "+ruleName);
-		if ( ruleName.toUpperCase().startsWith("SYNPRED") ) {
-			return;
-		}
+		//System.out.println("memoize "+ruleName);
 		numMemoizationCacheEntries++;
 	}
 
@@ -292,7 +280,6 @@ public class Profiler extends BlankDebugEventListener {
 	// R E P O R T I N G
 
 	public String toNotifyString() {
-		System.out.println("### cache size " +parser.getRuleMemoizationCacheSize());
 		TokenStream input = parser.getTokenStream();
 		for (int i=0; i<input.size()&&lastTokenConsumed!=null&&i<=lastTokenConsumed.getTokenIndex(); i++) {
 			Token t = input.get(i);
