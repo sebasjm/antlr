@@ -67,7 +67,7 @@ public class Tool {
 
     public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
-						  VERSION + " (?)  1989-2006");
+						  VERSION + " (June 27, 2006)  1989-2006");
 		Tool antlr = new Tool(args);
 		antlr.process();
 		System.exit(0);
