@@ -79,7 +79,7 @@ public class TestDFAConversion extends TestSuite {
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = new int[] {1,2};
-		int numWarnings = 2;
+		int numWarnings = 3;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -117,12 +117,13 @@ public class TestDFAConversion extends TestSuite {
 			".s9-R->.s10\n";
 		/* Gets:
 t.g:3:7: Alternative 1: after matching input such as L L L L L decision cannot predict what comes next due to recursion overflow to y from y
+t.g:3:7: Alternative 2: after matching input such as L L L L L decision cannot predict what comes next due to recursion overflow to y from y
 		*/
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 1;
+		int numWarnings = 2;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -942,7 +943,7 @@ As a result, alternative(s) 2 were disabled for that input
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 1;
+		int numWarnings = 2;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}

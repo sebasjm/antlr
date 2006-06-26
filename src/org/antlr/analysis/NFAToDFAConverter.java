@@ -442,10 +442,7 @@ public class NFAToDFAConverter {
 		configs.addAll(d.getNFAConfigurations());
 		// for each NFA configuration in d
 		Iterator iter = configs.iterator();
-		while (!terminateConversion &&
-			   !d.abortedDueToRecursionOverflow &&
-			   iter.hasNext() )
-		{
+		while (!terminateConversion && iter.hasNext() ) {
 			NFAConfiguration c = (NFAConfiguration)iter.next();
 			if ( c.singleAtomTransitionEmanating ) {
 				continue; // ignore NFA states w/o epsilon transitions
