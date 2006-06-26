@@ -1,38 +1,37 @@
 Early Access ANTLR v3
-ANTLR 3.0ea10
-June 2, 2006
+ANTLR 3.0b1
+June 27, 2006
 
 Terence Parr, parrt at cs usfca edu
-ANTLR project lead and supreme dictator
+ANTLR project lead and supreme dictator for life
 University of San Francisco
 
 INTRODUCTION 
 
-Welcome to ANTLR v3!  I've been working on this for 3 years and, while
-it is not ready for a full release, it may prove useful to some of
-you.  No primary functionality is missing.  Ultimately, I need to
-rewrite ANTLR v3 in itself (it's written in 2.7.6 at the moment and
-also needs StringTemplate 2.3b7 or later).
+Welcome to ANTLR v3!  I've been working on this for 3 years and it's
+almost ready!  I plan no feature additions between this beta and first
+3.0 release.  I have lots of features to add later, but this will be
+the first set.  Ultimately, I need to rewrite ANTLR v3 in itself (it's
+written in 2.7.6 at the moment and also needs StringTemplate 2.3b8 or
+later).
 
 You should use v3 in conjunction with ANTLRWorks:
 
     http://www.antlr.org/works/index.html 
 
-WARNING: You should only be playing with this release if you are an
-experienced antlr user or language developer.  There is no
-documentation and only a few examples plus the source to guide you.
-Furthermore, this software will be in a state of flux including
-changes in syntax and methods/classes until we get closer to a real
-release.  There are many things that just plain don't work at the
-moment.
+WARNING: There is no documentation yet (I plan on starting a book,
+which will be available online as I write it) and only the examples
+plus the source to guide you.
 
 See the new wiki FAQ:
 
     http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
-I have made absolutely no effort yet to deal well with erroneous input
-(well, semantic checking is pretty good, but bad syntax makes ANTLR
-crash).  I will clean this up after I've rewritten v3 in v3.
+Please help add/update FAQ entries.
+
+I have made very little effort at this point to deal well with
+erroneous input (e.g., bad syntax makes ANTLR crash).  I will clean
+this up after I've rewritten v3 in v3.
 
 Per the license in LICENSE.txt, this software is not guaranteed to
 work and might even destroy all life on this planet:
@@ -48,6 +47,21 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
+
+EXAMPLES
+
+ANTLR v3 sample grammars:
+
+    http://www.antlr.org/download/examples-v3.tar.gz
+
+contains the following examples: LL-star, cminus, dynamic-scope,
+fuzzy, hoistedPredicates, island-grammar, java, python, scopes,
+simplecTreeParser, treeparser, tweak, xmlLexer.
+
+Also check out Mantra Programming Language for a prototype (work in
+progress) using v3:
+
+    http://www.linguamantra.org/
 
 ----------------------------------------------------------------------
 
@@ -161,12 +175,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0ea10/README.txt (this file)
-antlr-3.0ea10/LICENSE.txt
-antlr-3.0ea10/src/org/antlr/...
-antlr-3.0ea10/lib/stringtemplate-2.2b7.jar (3.0ea10 needs 2.2b7)
-antlr-3.0ea10/lib/antlr-2.7.6.jar
-antlr-3.0ea10/lib/antlr-3.0ea10.jar
+antlr-3.0b1/README.txt (this file)
+antlr-3.0b1/LICENSE.txt
+antlr-3.0b1/src/org/antlr/...
+antlr-3.0b1/lib/stringtemplate-2.3b8.jar (3.0b1 needs 2.3b8)
+antlr-3.0b1/lib/antlr-2.7.6.jar
+antlr-3.0b1/lib/antlr-3.0b1.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -179,7 +193,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0ea10 (Mar 11, 2006) 1989-2006
+ANTLR Parser Generator   Early Access Version 3.0b1 (June 27, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir   specify output directory where all output is
 generated
@@ -246,10 +260,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0ea10/lib/stringtemplate-2.2b7.jar
-antlr-3.0ea10/lib/antlr-2.7.6.jar
+antlr-3.0b1/lib/stringtemplate-2.3b8.jar
+antlr-3.0b1/lib/antlr-2.7.6.jar
 
-then jump into antlr-3.0ea10/src directory and then type:
+then jump into antlr-3.0b1/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -261,7 +275,7 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0beta -
+3.0b1 - June 27, 2006
 
 June 24, 2006
 
@@ -279,13 +293,6 @@ June 23-24, 2006
   number of rule memoization cache misses
 
 * made DFA DOT diagrams go left to right not top to bottom
-
-* When the DFA construction routine finds itself infinitely recursing,
-  it reports a warning, but now it stops working (doing closure ops)
-  on a state after finding this problem.  Often the other alts in the
-  DFA will be a problem also so this should save some analysis time
-  and reduce number of errors.  There is no point in continuing with
-  any closures; a single recursive issue is enough to ruin the state.
 
 * I try to recursive overflow states now by resolving these states
   with semantic/syntactic predicates if they exist.  The DFA is then
@@ -1095,9 +1102,6 @@ Bug fixes
 
 * Lots of refactoring concerning grammar, rule, subrule options.  Now
   detects invalid options.
-
-New features
-
 
 3.0ea1 - June 1, 2005
 
