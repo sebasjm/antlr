@@ -51,7 +51,8 @@ public class DFA {
 	 */
 	public static final int MAX_STATES_PER_ALT_IN_DFA = 450;
 
-	public static int MAX_TIME_PER_DFA_CREATION = 0; //2*1000;
+	/** Set to 0 to not terminate early */
+	public static int MAX_TIME_PER_DFA_CREATION = 1*1000;
 
 	public static int MAX_STATE_TRANSITIONS_FOR_TABLE = 255;
 
