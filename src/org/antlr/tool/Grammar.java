@@ -748,7 +748,6 @@ public class Grammar {
 			// set k=1 option if not already k=1 and try again
 			Decision d = getDecision(decision);
 			d.blockAST.setOption(this, "k", new Integer(1));
-			//setDecisionOption(decision, "k", new Integer(1));
 			System.out.println("trying decision "+decision+" again with k=1");
 			lookaheadDFA = new DFA(decision, decisionStartState);
 			if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
