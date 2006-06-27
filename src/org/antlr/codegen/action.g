@@ -593,6 +593,7 @@ ACTION
 	
 ESC :   '\\' '$' {chunks.add("\$");}
 	|	'\\' '%' {chunks.add("\%");}
+	|	'\\' ~('$'|'%') {chunks.add(getText());}
     ;       
 
 ERROR_XY
