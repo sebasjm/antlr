@@ -235,7 +235,7 @@ DUPLICATE_SET_ENTRY(file,line,col,arg) ::=
 	"<loc()>duplicate token type <arg> when collapsing subrule into set"
 
 ANALYSIS_ABORTED(file,line,col,enclosingRule) ::= <<
-<loc()>ANTLR could not analyze this decision in rule <enclosingRule>; often this is because of recursive rule references visible from the left edge of alternatives.  ANTLR will re-analyze the decision with a fixed lookahead of k=1.  Consider using "options {k=1;}" for that decision and adding a syntactic predicate.
+<loc()>ANTLR could not analyze this decision in rule <enclosingRule>; often this is because of recursive rule references visible from the left edge of alternatives.  ANTLR will re-analyze the decision with a fixed lookahead of k=1.  Consider using "options {k=1;}" for that decision and possibly adding a syntactic predicate.
 >>
 
 RECURSION_OVERLOW(file,line,col,alt,input,targetRules,callSiteStates) ::= <<
