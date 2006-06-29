@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="ISO-8859-15"?>
 <!-- Contributed by Oliver Zeigermann -->
-<project name="antlr3" default="all" basedir=".">
+<project name="antlr3" default="build" basedir=".">
     <property file="./build.properties" />
 
     <property name="build.dir" value="${basedir}/build" />
@@ -50,7 +49,7 @@
         </javac>
    </target>
 
-   <target name="lib" depends="compile" description="Creates a new ANTLR3 jar">
+   <target name="build" depends="compile" description="Creates the ANTLR3 jar">
         <mkdir dir="${lib.dir}"/>
         <jar jarfile="${antlr3.jar}">
 	  <fileset dir="${basedir}" includes="LICENSE.txt"/>
@@ -62,6 +61,6 @@
 	</jar>
    </target>
 
-    <target name="all" depends="clean,lib" />
+   <target name="rebuild" depends="clean,build" />
 
 </project>
