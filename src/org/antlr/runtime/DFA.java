@@ -112,6 +112,7 @@ public class DFA {
 	protected void noViableAlt(int s, IntStream input) throws NoViableAltException {
 		if (recognizer.backtracking>0) {
 			recognizer.failed=true;
+			return;
 		}
 		NoViableAltException nvae =
 			new NoViableAltException(getDescription(),
