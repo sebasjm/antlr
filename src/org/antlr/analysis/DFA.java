@@ -54,7 +54,7 @@ public class DFA {
 	/** Set to 0 to not terminate early */
 	public static int MAX_TIME_PER_DFA_CREATION = 1*1000;
 
-	public static int MAX_STATE_TRANSITIONS_FOR_TABLE = 255;
+	public static int MAX_STATE_TRANSITIONS_FOR_TABLE = 512;
 
 	/** What's the start state for this DFA? */
     public DFAState startState;
@@ -641,12 +641,21 @@ public class DFA {
 			return user_k;
 		}
 		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decisionNumber);
-		Integer kI = (Integer)blockAST.getOption("k");
-		if ( kI==null ) {
+		Object k = blockAST.getOption("k");
+		if ( k==null ) {
 			user_k = nfa.grammar.getGrammarMaxLookahead();
 			return user_k;
 		}
-		user_k = kI.intValue();
+		if (k instanceof Integer) {
+			Integer kI = (Integer)k;
+			user_k = kI.intValue();
+		}
+		else {
+			// must be String "*"
+			if ( k.equals("*") ) {
+				user_k = 0;
+			}
+		}
 		return user_k;
 	}
 

@@ -275,6 +275,70 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
+3.0b2 - ??
+
+July 3, 2006
+
+* [Got this working properly today] backtrack mode that let's you type
+  in any old crap and ANTLR will backtrack if it can't figure out what
+  you meant.  No errors are reported by antlr during analysis.  It
+  implicitly adds a syn pred in front of every production, using them
+  only if static grammar LL(*) analysis fails.  Syn pred code is not
+  generated if the pred is not used in a decision.
+
+  This is essentially a rapid prototyping mode.
+
+* Added backtracking report to the -report option
+
+* Added NFA->DFA conversion early termination report to the -report option
+
+* Added grammar level k and backtrack options to -report
+
+* Added a dozen unit tests to test autobacktrack NFA construction.
+
+* If you are using filter mode, you must manually use option
+  memoize=true now.
+
+July 2, 2006
+
+* Added k=* option so you can set k=2, for example, on whole grammar,
+  but an individual decision can be LL(*).
+
+* memoize option for grammars, rules, blocks.  Remove -nomemo cmd-line option
+
+* but in DOT generator for DFA; fixed.
+
+* runtime.DFA reported errors even when backtracking
+
+July 1, 2006
+
+* Added -X option list to help
+
+* Syn preds were being hoisted into other rules, causing lots of extra
+  backtracking.
+
+June 29, 2006
+
+* unnecessary files removed during build.
+
+* Matt Benson updated build.xml
+
+* Detecting use of synpreds in analysis now instead of codegen.  In
+  this way, I can avoid analyzing decisions in synpreds for synpreds
+  not used in a DFA for a real rule.  This is used to optimize things
+  for backtrack option.
+
+* Code gen must add _fragment or whatever to end of pred name in
+  template synpredRule to avoid having ANTLR know anything about
+  method names.
+
+* Added -IdbgST option to emit ST delimiters at start/stop of all
+  templates spit out.
+
+June 28, 2006
+
+* Tweaked message when ANTLR cannot handle analysis.
+
 3.0b1 - June 27, 2006
 
 June 24, 2006

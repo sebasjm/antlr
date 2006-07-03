@@ -150,23 +150,30 @@ public class Grammar {
 
 	public static final Set legalOptions =
 			new HashSet() {
-				{add("language"); add("tokenVocab");
+				{
+				add("language"); add("tokenVocab");
 				add("output"); add("ASTLabelType");
 				add("TokenLabelType");
 				add("superClass");
 				add("filter");
 				add("k");
+				add("backtrack");
+				add("memoize");
 				}
 			};
 
 	public static final Set doNotCopyOptionsToLexer =
 		new HashSet() {
-			{add("output"); add("ASTLabelType"); add("superClass"); add("k");}
+			{
+				add("output"); add("ASTLabelType"); add("superClass");
+			 	add("k"); add("backtrack"); add("memoize");
+			}
 		};
 
 	public static final Map defaultOptions =
 			new HashMap() {
-				{put("language","Java");
+				{
+					put("language","Java");
 				}
 			};
 
@@ -349,7 +356,7 @@ public class Grammar {
 	public int numberOfManualLookaheadOptions = 0;
 	public Set setOfNondeterministicDecisionNumbers = new HashSet();
 	public Set setOfNondeterministicDecisionNumbersResolvedWithPredicates = new HashSet();
-	public int numberOfDFAConversionsTerminatedEarly = 0;
+	public Set setOfDFAWhoseConversionTerminatedEarly = new HashSet();
 
 	/** Track decisions with syn preds specified for reporting. Set<GrammarAST>.
 	 *  This is the a set of BLOCK type AST nodes.
@@ -358,6 +365,9 @@ public class Grammar {
 
 	/** Track decisions that actually use the sem preds in the DFA. Set<DFA> */
 	public Set decisionsWhoseDFAsUsesSynPreds = new HashSet();
+
+	/** Track the names of preds so we can avoid generating preds that are not used */
+	public Set synPredNamesUsedInDFA = new HashSet();
 
 	/** Track decisions with syn preds specified for reporting. Set<GrammarAST>.
 	 *  This is the a set of BLOCK type AST nodes.
@@ -605,7 +615,7 @@ public class Grammar {
 			GrammarAST fragmentAST =
 				(GrammarAST) nameToSynpredASTMap.get(synpredName);
 			GrammarAST ruleAST =
-				parser.createSimpleRuleAST(synpredName+"_fragment",
+				parser.createSimpleRuleAST(synpredName,
 										   fragmentAST,
 										   isLexer);
 			rules.add(ruleAST);
@@ -613,7 +623,7 @@ public class Grammar {
 		return rules;
 	}
 
-    protected void initTokenSymbolTables() {
+	protected void initTokenSymbolTables() {
         // the faux token types take first NUM_FAUX_LABELS positions
 		// then we must have room for the predefined runtime token types
 		// like DOWN/UP used for tree parsing.
@@ -732,6 +742,14 @@ public class Grammar {
 	}
 
 	public void createLookaheadDFA(int decision) {
+		Decision d = getDecision(decision);
+		String enclosingRule = d.startState.getEnclosingRule();
+		Rule r = getRule(enclosingRule);
+
+		//System.out.println("createLookaheadDFA(): "+enclosingRule+" dec "+decision+"; synprednames prev used "+synPredNamesUsedInDFA);
+		if ( r.isSynPred && !synPredNamesUsedInDFA.contains(enclosingRule) ) {
+			return;
+		}
 		NFAState decisionStartState = getDecisionNFAStartState(decision);
 		long startDFA=0,stopDFA=0;
 		if ( watchNFAConversion ) {
@@ -746,9 +764,8 @@ public class Grammar {
 		{
 			lookaheadDFA = null; // make sure other memory is "free" before redoing
 			// set k=1 option if not already k=1 and try again
-			Decision d = getDecision(decision);
 			d.blockAST.setOption(this, "k", new Integer(1));
-			System.out.println("trying decision "+decision+" again with k=1");
+			//System.out.println("trying decision "+decision+" again with k=1");
 			lookaheadDFA = new DFA(decision, decisionStartState);
 			if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
 				ErrorManager.internalError("could not even do k=1 for decision "+decision);
@@ -869,6 +886,14 @@ public class Grammar {
 			return null;
 		}
 		return (GrammarAST)nameToSynpredASTMap.get(name);
+	}
+
+	public void synPredUsedInDFA(DFA dfa, SemanticContext semCtx) {
+		decisionsWhoseDFAsUsesSynPreds.add(dfa);
+		semCtx.trackUseOfSyntacticPredicates(this); // walk ctx looking for preds
+		/*
+		System.out.println("after tracking use for dec "+dfa.decisionNumber+": "+
+		 synPredNamesUsedInDFA);*/
 	}
 
 	/** Given @scope::name {action} define it for this grammar.  Later,
@@ -1659,12 +1684,28 @@ public class Grammar {
 		if ( global_k>=0 ) {
 			return global_k;
 		}
+		/*
 		Integer kI = (Integer)getOption("k");
 		if ( kI!=null ) {
 			global_k = kI.intValue();
 		}
 		else {
 			global_k = 0;
+		}
+		*/
+		Object k = getOption("k");
+		if ( k==null ) {
+			global_k = 0;
+		}
+		else if (k instanceof Integer) {
+			Integer kI = (Integer)k;
+			global_k = kI.intValue();
+		}
+		else {
+			// must be String "*"
+			if ( k.equals("*") ) {  // this the default anyway
+				global_k = 0;
+			}
 		}
 		return global_k;
 	}
@@ -1685,8 +1726,6 @@ public class Grammar {
 		}
 		if ( options==null ) {
 			options = new HashMap();
-		}
-		if ( key.equals("k") ) {
 		}
 		options.put(key, value);
 		return key;

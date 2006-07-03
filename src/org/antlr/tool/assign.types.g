@@ -344,10 +344,8 @@ option[Map opts]
 
 optionValue returns [Object value=null]
     :   id:ID			 {value = #id.getText();}
-    |   s:STRING_LITERAL {String vs = #s.getText();
-                          value=vs.substring(1,vs.length()-1);}
-    |   c:CHAR_LITERAL   {String vs = #c.getText();
-                          value=vs.substring(1,vs.length()-1);}
+    |   s:STRING_LITERAL {value = #s.getText();}
+    |   c:CHAR_LITERAL   {value = #c.getText();}
     |   i:INT            {value = new Integer(#i.getText());}
 //  |   cs:charSet       {value = #cs;} // return set AST in this case
     ;

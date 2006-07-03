@@ -234,13 +234,12 @@ public class TestNFAConstruction extends TestSuite {
 			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s2->.s3\n" +
-			".s2->.s9\n" +
-			".s3->.s4\n" +
-			".s4-A->.s5\n" +
-			".s5->.s6\n" +
-			".s6->:s7\n" +
-			".s9->.s6\n" +
-			":s7-EOF->.s8\n";
+			".s2->.s8\n" +
+			".s3-A->.s4\n" +
+			".s4->.s5\n" +
+			".s5->:s6\n" +
+			".s8->.s5\n" +
+			":s6-EOF->.s7\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -252,13 +251,12 @@ public class TestNFAConstruction extends TestSuite {
 			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s2->.s3\n" +
-			".s2->.s9\n" +
-			".s3->.s4\n" +
-			".s4-A->.s5\n" +
-			".s5->.s6\n" +
-			".s6->:s7\n" +
-			".s9->.s6\n" +
-			":s7-EOF->.s8\n";
+			".s2->.s8\n" +
+			".s3-A->.s4\n" +
+			".s4->.s5\n" +
+			".s5->:s6\n" +
+			".s8->.s5\n" +
+			":s6-EOF->.s7\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -517,13 +515,12 @@ public class TestNFAConstruction extends TestSuite {
             ".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s2->.s3\n" +
-			".s2->.s9\n" +
-			".s3->.s4\n" +
-			".s4-A..B->.s5\n" +
-			".s5->.s6\n" +
-			".s6->:s7\n" +
-			".s9->.s6\n" +
-			":s7-EOF->.s8\n";
+			".s2->.s8\n" +
+			".s3-A..B->.s4\n" +
+			".s4->.s5\n" +
+			".s5->:s6\n" +
+			".s8->.s5\n" +
+			":s6-EOF->.s7\n";
         checkRule(g, "a", expecting);
     }
 
@@ -639,13 +636,12 @@ public class TestNFAConstruction extends TestSuite {
 			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s2->.s3\n" +
-			".s2->.s9\n" +
-			".s3->.s4\n" +
-			".s4-A..B->.s5\n" +
-			".s5->.s6\n" +
-			".s6->:s7\n" +
-			".s9->.s6\n" +
-			":s7-EOF->.s8\n";
+			".s2->.s8\n" +
+			".s3-A..B->.s4\n" +
+			".s4->.s5\n" +
+			".s5->:s6\n" +
+			".s8->.s5\n" +
+			":s6-EOF->.s7\n";
 		checkRule(g, "e", expecting);
 	}
 
@@ -814,6 +810,301 @@ public class TestNFAConstruction extends TestSuite {
 			":s4-EOF->.s5\n";
 		checkRule(g, "a", expecting);
 	}
+
+	// AUTO BACKTRACKING STUFF
+
+	public void testAutoBacktracking_RuleBlock() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : 'a'{;}|'b';"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s1->.s8\n" +
+				".s10->.s5\n" +
+				".s2-{synpred1}?->.s3\n" +
+				".s3-'a'->.s4\n" +
+				".s4->.s5\n" +
+				".s5->:s6\n" +
+				".s8->.s9\n" +
+				".s9-'b'->.s10\n" +
+				":s6-EOF->.s7\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_RuleSetBlock() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : 'a'|'b';"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s2-'a'..'b'->.s3\n" +
+				".s3->:s4\n" +
+				":s4-EOF->.s5\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_SimpleBlock() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a'{;}|'b') ;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s11->.s12\n" +
+				".s12-'b'->.s13\n" +
+				".s13->.s8\n" +
+				".s2-{synpred2}?->.s3\n" +
+				".s3->.s4\n" +
+				".s4->.s11\n" +
+				".s4->.s5\n" +
+				".s5-{synpred1}?->.s6\n" +
+				".s6-'a'->.s7\n" +
+				".s7->.s8\n" +
+				".s8->:s9\n" +
+				":s9-EOF->.s10\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_SetBlock() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a'|'b') ;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s2-{synpred1}?->.s3\n" +
+				".s3-'a'..'b'->.s4\n" +
+				".s4->:s5\n" +
+				":s5-EOF->.s6\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_StarBlock() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a'{;}|'b')* ;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s10->:s11\n" +
+				".s13->.s14\n" +
+				".s14-'b'->.s15\n" +
+				".s15->.s9\n" +
+				".s16->.s10\n" +
+				".s2-{synpred2}?->.s3\n" +
+				".s3->.s4\n" +
+				".s4->.s16\n" +
+				".s4->.s5\n" +
+				".s5->.s13\n" +
+				".s5->.s6\n" +
+				".s6-{synpred1}?->.s7\n" +
+				".s7-'a'->.s8\n" +
+				".s8->.s9\n" +
+				".s9->.s10\n" +
+				".s9->.s5\n" +
+				":s11-EOF->.s12\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_StarSetBlock() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a'|'b')* ;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s12->.s9\n" +
+				".s2-{synpred2}?->.s3\n" +
+				".s3->.s4\n" +
+				".s4->.s12\n" +
+				".s4->.s5\n" +
+				".s5->.s6\n" +
+				".s6-{synpred1}?->.s7\n" +
+				".s7-'a'..'b'->.s8\n" +
+				".s8->.s5\n" +
+				".s8->.s9\n" +
+				".s9->:s10\n" +
+				":s10-EOF->.s11\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_StarBlock1Alt() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a')* ;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s12->.s9\n" +
+				".s2-{synpred2}?->.s3\n" +
+				".s3->.s4\n" +
+				".s4->.s12\n" +
+				".s4->.s5\n" +
+				".s5->.s6\n" +
+				".s6-{synpred1}?->.s7\n" +
+				".s7-'a'->.s8\n" +
+				".s8->.s5\n" +
+				".s8->.s9\n" +
+				".s9->:s10\n" +
+				":s10-EOF->.s11\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_PlusBlock() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a'{;}|'b')+ ;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s12->.s13\n" +
+				".s13-'b'->.s14\n" +
+				".s14->.s8\n" +
+				".s2-{synpred2}?->.s3\n" +
+				".s3->.s4\n" +
+				".s4->.s12\n" +
+				".s4->.s5\n" +
+				".s5-{synpred1}?->.s6\n" +
+				".s6-'a'->.s7\n" +
+				".s7->.s8\n" +
+				".s8->.s4\n" +
+				".s8->.s9\n" +
+				".s9->:s10\n" +
+				":s10-EOF->.s11\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_PlusSetBlock() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a'|'b')+ ;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s2-{synpred2}?->.s3\n" +
+				".s3->.s4\n" +
+				".s4->.s5\n" +
+				".s5-{synpred1}?->.s6\n" +
+				".s6-'a'..'b'->.s7\n" +
+				".s7->.s4\n" +
+				".s7->.s8\n" +
+				".s8->:s9\n" +
+				":s9-EOF->.s10\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_PlusBlock1Alt() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a')+ ;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s2-{synpred2}?->.s3\n" +
+				".s3->.s4\n" +
+				".s4->.s5\n" +
+				".s5-{synpred1}?->.s6\n" +
+				".s6-'a'->.s7\n" +
+				".s7->.s4\n" +
+				".s7->.s8\n" +
+				".s8->:s9\n" +
+				":s9-EOF->.s10\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_OptionalBlock2Alts() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a'{;}|'b')?;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s11->.s12\n" +
+				".s11->.s15\n" +
+				".s12-{synpred2}?->.s13\n" +
+				".s13-'b'->.s14\n" +
+				".s14->.s8\n" +
+				".s15->.s8\n" +
+				".s2-{synpred3}?->.s3\n" +
+				".s3->.s4\n" +
+				".s4->.s11\n" +
+				".s4->.s5\n" +
+				".s5-{synpred1}?->.s6\n" +
+				".s6-'a'->.s7\n" +
+				".s7->.s8\n" +
+				".s8->:s9\n" +
+				":s9-EOF->.s10\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_OptionalBlock1Alt() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a')?;"
+		);
+		String expecting =
+				".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s11->.s8\n" +
+				".s2-{synpred2}?->.s3\n" +
+				".s3->.s4\n" +
+				".s4->.s11\n" +
+				".s4->.s5\n" +
+				".s5-{synpred1}?->.s6\n" +
+				".s6-'a'->.s7\n" +
+				".s7->.s8\n" +
+				".s8->:s9\n" +
+				":s9-EOF->.s10\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_ExistingPred() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"options {backtrack=true;}\n"+
+				"a : ('a')=> 'a' | 'b';"
+		);
+		String expecting =
+			".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s1->.s8\n" +
+				".s10->.s5\n" +
+				".s2-{synpred2}?->.s3\n" +
+				".s3-'a'->.s4\n" +
+				".s4->.s5\n" +
+				".s5->:s6\n" +
+				".s8->.s9\n" +
+				".s9-'b'->.s10\n" +
+				":s6-EOF->.s7\n";
+		checkRule(g, "a", expecting);
+	}
+
+
 
 	private void checkRule(Grammar g, String rule, String expecting)
             throws FailedAssertionException

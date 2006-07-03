@@ -80,8 +80,8 @@ public class <name> extends Lexer {
     public <name>() {;} <! needed by subclasses !>
     public <name>(CharStream input) {
         super(input);
-<if(memoize)>
-        ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
+<if(backtracking)>
+        ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
     }
     public String getGrammarFileName() { return "<fileName>"; }
@@ -166,8 +166,8 @@ public class <name> extends <@superClassName><superClass><@end> {
    <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
     public <name>(<inputStreamType> input) {
         super(input);
-<if(memoize)>
-        ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
+<if(backtracking)>
+        ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
     }
     <@end>
@@ -210,7 +210,7 @@ treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cycl
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
 // $ANTLR start <ruleName>
-public void <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
+public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <if(trace)>System.out.println("enter <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
 <if(trace)>
     try {
@@ -268,7 +268,7 @@ ruleBacktrackFailure() ::= <<
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions) ::= <<
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
@@ -374,7 +374,7 @@ if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.n
 /** How to generate a rule in the lexer; naked blocks are used for
  *  fragment rules.
  */
-lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
+lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
 // $ANTLR start <ruleName>
 public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
     <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
@@ -466,7 +466,7 @@ blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber
 <@postalt()>
 >>
 
-/** A (..)+ block with 0 or more alternatives */
+/** A (..)+ block with 1 or more alternatives */
 positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 // <fileName>:<description>
 int cnt<decisionNumber>=0;
@@ -495,7 +495,7 @@ do {
 
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
 
-/** A (..)* block with 0 or more alternatives */
+/** A (..)* block with 1 or more alternatives */
 closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 // <fileName>:<description>
 <decls>

@@ -27,20 +27,21 @@
 */
 package org.antlr.tool;
 
+import org.antlr.analysis.DFA;
+
 import java.io.*;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.StringTokenizer;
-import java.util.Map;
+import java.util.*;
 
 public class GrammarReport {
 	/** Because I may change the stats, I need to track that for later
 	 *  computations to be consistent.
 	 */
-	public static final String Version = "3";
+	public static final String Version = "4";
 	public static final String GRAMMAR_STATS_FILENAME = "grammar.stats";
 	public static final String ANTLRWORKS_DIR = "antlrworks";
-	public static final int NUM_GRAMMAR_STATS = 39;
+	public static final int NUM_GRAMMAR_STATS = 41;
+
+	public static final String newline = System.getProperty("line.separator");
 
 	public Grammar grammar;
 
@@ -66,7 +67,7 @@ public class GrammarReport {
 		for (Iterator it = rules.iterator(); it.hasNext();) {
 			Rule r = (Rule) it.next();
 			if ( !r.name.toUpperCase()
-			    .startsWith(Grammar.SYNPRED_RULE_PREFIX.toUpperCase()) )
+				.startsWith(Grammar.SYNPRED_RULE_PREFIX.toUpperCase()) )
 			{
 				totalNonSynPredProductions += r.numberOfAlts;
 				totalNonSynPredRules++;
@@ -150,7 +151,7 @@ public class GrammarReport {
 		buf.append('\t');
 		buf.append(grammar.setOfNondeterministicDecisionNumbersResolvedWithPredicates.size());
 		buf.append('\t');
-		buf.append(grammar.numberOfDFAConversionsTerminatedEarly);
+		buf.append(grammar.setOfDFAWhoseConversionTerminatedEarly.size());
 		buf.append('\t');
 		buf.append(ErrorManager.getErrorState().errors);
 		buf.append('\t');
@@ -175,9 +176,62 @@ public class GrammarReport {
 			output = "none";
 		}
 		buf.append(output);
+		buf.append('\t');
+		Object k = grammar.getOption("k");
+		if ( k==null ) {
+			k = "none";
+		}
+		buf.append(k);
+		buf.append('\t');
+		String backtrack = (String)grammar.getOption("backtrack");
+		if ( backtrack==null ) {
+			backtrack = "false";
+		}
+		buf.append(backtrack);
 		return buf.toString();
 	}
 
+	public String getBacktrackingReport() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("Backtracking report:");
+		buf.append(newline);
+		buf.append("Number of decisions that backtrack: ");
+		buf.append(grammar.decisionsWhoseDFAsUsesSynPreds.size());
+		buf.append(newline);
+		buf.append(getDFALocations(grammar.decisionsWhoseDFAsUsesSynPreds));
+		return buf.toString();
+	}
+
+	public String getEarlyTerminationReport() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("NFA conversion early termination report:");
+		buf.append(newline);
+		buf.append("Number of NFA conversions that terminated early: ");
+		buf.append(grammar.setOfDFAWhoseConversionTerminatedEarly.size());
+		buf.append(newline);
+		buf.append(getDFALocations(grammar.setOfDFAWhoseConversionTerminatedEarly));
+		return buf.toString();
+	}
+
+	protected String getDFALocations(Set dfas) {
+		StringBuffer buf = new StringBuffer();
+		Iterator it = dfas.iterator();
+		while ( it.hasNext() ) {
+			DFA dfa = (DFA) it.next();
+			buf.append("Rule ");
+			buf.append(dfa.decisionNFAStartState.getEnclosingRule());
+			buf.append(" decision ");
+			buf.append(dfa.decisionNumber);
+			buf.append(" location ");
+			GrammarAST decisionAST =
+				dfa.decisionNFAStartState.getAssociatedASTNode();
+			buf.append(decisionAST.getLine());
+			buf.append(":");
+			buf.append(decisionAST.getColumn());
+			buf.append(newline);
+		}
+		return buf.toString();
+	}
 	/** Given a stats line suitable for sending to the antlr.org site,
 	 *  return a human-readable version.  Return null if there is a
 	 *  problem with the data.
@@ -220,6 +274,12 @@ public class GrammarReport {
 		buf.append('\n');
 		buf.append("Output: ");
 		buf.append(fields[38]);
+		buf.append('\n');
+		buf.append("Grammar option k: ");
+		buf.append(fields[39]);
+		buf.append('\n');
+		buf.append("Grammar option backtrack: ");
+		buf.append(fields[40]);
 		buf.append('\n');
 		buf.append("Rules: ");
 		buf.append(fields[4]);

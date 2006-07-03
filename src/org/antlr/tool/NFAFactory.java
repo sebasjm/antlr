@@ -429,7 +429,8 @@ public class NFAFactory {
         int n = nfa.grammar.getNumberOfAltsForDecisionNFA(A.left);
         if ( n==1 ) {
             // no decision, just wrap in an optional path
-            NFAState decisionState = newState();
+			//NFAState decisionState = newState();
+			NFAState decisionState = A.left; // resuse left edge
 			decisionState.setDescription("only alt of ()? block");
 			NFAState emptyAlt = newState();
             emptyAlt.setDescription("epsilon path of ()? block");
@@ -437,7 +438,7 @@ public class NFAFactory {
 			blockEndNFAState = newState();
 			transitionBetweenStates(A.right, blockEndNFAState, Label.EPSILON);
 			blockEndNFAState.setDescription("end ()? block");
-            transitionBetweenStates(decisionState, A.left, Label.EPSILON);
+            //transitionBetweenStates(decisionState, A.left, Label.EPSILON);
             transitionBetweenStates(decisionState, emptyAlt, Label.EPSILON);
             transitionBetweenStates(emptyAlt, blockEndNFAState, Label.EPSILON);
 

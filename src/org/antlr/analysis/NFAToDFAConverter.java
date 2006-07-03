@@ -575,7 +575,7 @@ public class NFAToDFAConverter {
 							   alt+" filling DFA state "+d.stateNumber+" with context "+context
 							   );
 		}
-		
+
 		if ( terminateConversion ) {
 			// keep walking back out, we're in the process of terminating
 			return;
@@ -690,8 +690,26 @@ public class NFAToDFAConverter {
 					// AND the previous semantic context with new pred
 					SemanticContext labelContext =
 						transition0.label.getSemanticContext();
-					newSemanticContext = SemanticContext.and(semanticContext,
-													 labelContext);
+					// do not hoist syn preds from other rules; only get if in
+					// starting state's rule (i.e., context is empty)
+					int walkAlt =
+						dfa.decisionNFAStartState.translateDisplayAltToWalkAlt(dfa, alt);
+					NFAState altLeftEdge =
+						dfa.nfa.grammar.getNFAStateForAltOfDecision(dfa.decisionNFAStartState,walkAlt);
+					/*
+					System.out.println("state "+p.stateNumber+" alt "+alt+" walkAlt "+walkAlt+" trans to "+transition0.target);
+					System.out.println("DFA start state "+dfa.decisionNFAStartState.stateNumber);
+					System.out.println("alt left edge "+altLeftEdge.stateNumber+
+						", epsilon target "+
+						altLeftEdge.transition(0).target.stateNumber);
+					*/
+					if ( !labelContext.isSyntacticPredicate() ||
+						 p==altLeftEdge.transition(0).target )
+					{
+						//System.out.println("&"+labelContext+" enclosingRule="+p.enclosingRule);
+						newSemanticContext =
+							SemanticContext.and(semanticContext, labelContext);
+					}
 				}
 				closure((NFAState)transition0.target,
 						alt,
@@ -1404,6 +1422,10 @@ public class NFAToDFAConverter {
 					configuration.resolveWithPredicate = true;
 					configuration.semanticContext = semCtx; // reset to combined
 					altToPredMap.remove(new Integer(configuration.alt));
+					// notify grammar that we've used the preds contained in semCtx
+					if ( semCtx.isSyntacticPredicate() ) {
+						dfa.nfa.grammar.synPredUsedInDFA(dfa, semCtx);
+					}
 				}
 				else if ( nondeterministicAlts.contains(new Integer(configuration.alt)) ) {
 					// resolve all configurations for nondeterministic alts

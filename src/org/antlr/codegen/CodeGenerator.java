@@ -83,6 +83,7 @@ public class CodeGenerator {
 	public int MIN_SWITCH_ALTS = 3;
 	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
 	public static boolean GEN_FIXED_DFA_INLINE = true;
+	public static boolean EMIT_TEMPLATE_DELIMITERS = false;
 
 	public String classpathTemplateRootDirectoryName =
 		"org/antlr/codegen/templates";
@@ -246,10 +247,10 @@ public class CodeGenerator {
 			templates = coreTemplates;
 		}
 
-		/*
-		templates.emitDebugStartStopStrings(true);
-		templates.doNotEmitDebugStringsForTemplate("codeFileExtension");
-		*/
+		if ( EMIT_TEMPLATE_DELIMITERS ) {
+			templates.emitDebugStartStopStrings(true);
+			templates.doNotEmitDebugStringsForTemplate("codeFileExtension");
+		}
 	}
 
 	/** Given the grammar to which we are attached, walk the AST associated
@@ -337,11 +338,17 @@ public class CodeGenerator {
 
 		outputFileST.setAttribute("backtracking", new Boolean(canBacktrack));
 		headerFileST.setAttribute("backtracking", new Boolean(canBacktrack));
-		outputFileST.setAttribute("memoize", new Boolean(memoize&&canBacktrack));
-		headerFileST.setAttribute("memoize", new Boolean(memoize&&canBacktrack));
+		String memoize = (String)grammar.getOption("memoize");
+		outputFileST.setAttribute("memoize",
+								  new Boolean(memoize!=null&&memoize.equals("true")&&
+									          canBacktrack));
+		headerFileST.setAttribute("memoize",
+								  new Boolean(memoize!=null&&memoize.equals("true")&&
+									          canBacktrack));
+
 		Set synpredNames = null;
-		if ( grammar.getSyntacticPredicates()!=null ) {
-			synpredNames = grammar.getSyntacticPredicates().keySet();
+		if ( grammar.synPredNamesUsedInDFA.size()>0 ) {
+			synpredNames = grammar.synPredNamesUsedInDFA;
 		}
 		outputFileST.setAttribute("synpreds", synpredNames);
 		headerFileST.setAttribute("synpreds", synpredNames);
@@ -483,43 +490,6 @@ public class CodeGenerator {
 		}
 	}
 
-	/*
-	protected void fillFOLLOWSets(StringTemplate recognizerST,
-	StringTemplate outputFileST,
-	StringTemplate headerFileST)
-	{
-	long start = System.currentTimeMillis();
-	for (Iterator itr = grammar.getRules().iterator(); itr.hasNext();) {
-	Grammar.Rule r = (Grammar.Rule) itr.next();
-	LookaheadSet follow = grammar.FOLLOW(r.name);
-	//LookaheadSet follow = new LookaheadSet();
-	System.out.println("FOLLOW("+r.name+")="+follow.toString(grammar));
-	// TODO: not sending in EOF for FOLLOW sets! (might not need;
-	// consume until will know to stop at EOF)
-	long[] words = null;
-	if ( follow.tokenTypeSet==null ) {
-	words = new long[1];
-	}
-	else {
-	BitSet bits = BitSet.of(follow.tokenTypeSet);
-	//bits.remove(Label.EOF);
-	words = bits.toPackedArray();
-	}
-	recognizerST.setAttribute("bitsets.{name,inName,bits}",
-	r.name,
-	words);
-	outputFileST.setAttribute("bitsets.{name,inName,bits}",
-	r.name,
-	words);
-	headerFileST.setAttribute("bitsets.{name,inName,bits}",
-	r.name,
-	words);
-	}
-	long stop = System.currentTimeMillis();
-	System.out.println("FOLLOW sets computed in "+(int)(stop-start)+" ms");
-	}
-	*/
-
 	/** Error recovery in ANTLR recognizers.
 	 *
 	 *  Based upon original ideas:
@@ -612,15 +582,6 @@ public class CodeGenerator {
 		else {
 			outputFileST.setAttribute("cyclicDFADescriptors", dfa);
 			headerFileST.setAttribute("cyclicDFADescriptors", dfa);
-
-			/*
-			StringTemplate dfaST =
-				cyclicDFAGenerator.genCyclicLookaheadDecision(templates,
-															  dfa);
-			recognizerST.setAttribute("cyclicDFAs", dfaST);
-			outputFileST.setAttribute("cyclicDFAs", dfaST);
-			headerFileST.setAttribute("cyclicDFAs", dfaST);
-			*/
 			decisionST = templates.getInstanceOf("dfaDecision");
 			String description = dfa.getNFADecisionStartState().getDescription();
 			description = target.getTargetStringLiteralFromString(description);
@@ -1089,10 +1050,6 @@ public class CodeGenerator {
 		}
 	}
 
-	public void setMemoize(boolean memoize) {
-		this.memoize = memoize;
-	}
-
 	public StringTemplate getRecognizerST() {
 		return outputFileST;
 	}
@@ -1120,25 +1077,6 @@ public class CodeGenerator {
 		//System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
 		w.write(output);
 		w.close();
-	}
-
-	protected boolean isSpecialState(DFAState s) {
-		int size = 0;
-		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
-			Transition edge = (Transition) s.transition(i);
-			if ( edge.label.isSemanticPredicate() ) {
-				return false;
-			}
-			if ( ((DFAState)edge.target).getGatedPredicatesInNFAConfigurations()!=null ) {
-				// can't do a switch if the edges are going to required gated predicates
-				return false;
-			}
-			size += edge.label.getSet().size();
-		}
-		if ( s.getNumberOfTransitions()<MIN_SWITCH_ALTS || size>MAX_SWITCH_CASE_LABELS ) {
-			return false;
-		}
-		return true;
 	}
 
 	/** You can generate a switch rather than if-then-else for a DFA state

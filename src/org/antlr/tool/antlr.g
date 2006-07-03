@@ -105,22 +105,78 @@ tokens {
 	/* this next stuff supports construction of the Tokens artificial rule.
 	   I hate having some partial functionality here, I like doing everything
 	   in future tree passes, but the Tokens rule is sensitive to filter mode.
-	   And if it adds syn preds, future tree passes will need to process th
+	   And if it adds syn preds, future tree passes will need to process the
 	   fragments defined in Tokens; a cyclic dependency.
 	   As of 1-17-06 then, Tokens is created for lexer grammars in the
 	   antlr grammar parser itself.
+
+	   This grammar is also sensitive to the backtrack grammar option that
+	   tells ANTLR to automatically backtrack when it can't compute a DFA.
+
+	   7-2-06 I moved all option processing to antlr.g from define.g as I
+	   need backtrack option etc... for blocks.  Got messy.
 	*/
-	protected boolean isFilterMode;
 	protected List lexerRuleNames = new ArrayList();
 	public List getLexerRuleNames() { return lexerRuleNames; }
 
 	protected GrammarAST setToBlockWithSet(GrammarAST b) {
+		GrammarAST alt = #(#[ALT,"ALT"],#b,#[EOA,"<end-of-alt>"]);
+		prefixWithSynPred(alt);
 		return #(#[BLOCK,"BLOCK"],
-		           #(#[ALT,"ALT"],
-		              #b,#[EOA,"<end-of-alt>"]
-		            ),
+		           alt,
 		           #[EOB,"<end-of-block>"]
 		        );
+	}
+
+	protected GrammarAST createBlockFromDupAlt(GrammarAST alt) {
+		GrammarAST nalt = (GrammarAST)astFactory.dupTree(alt);
+		GrammarAST blk = #(#[BLOCK,"BLOCK"],
+						   nalt,
+						   #[EOB,"<end-of-block>"]
+						  );
+		return blk;
+	}
+
+	/** Rewrite alt to have a synpred as first element;
+	 *  (xxx)=>xxx
+	 *  but only if they didn't specify one manually.
+	 */
+	protected void prefixWithSynPred(GrammarAST alt) {
+		// if they want backtracking and it's not a lexer rule in combined grammar
+		String autoBacktrack = (String)currentBlockAST.getOption("backtrack");
+		if ( autoBacktrack==null ) {
+			autoBacktrack = (String)grammar.getOption("backtrack");
+		}
+		if ( autoBacktrack!=null&&autoBacktrack.equals("true") &&
+			 !(gtype==COMBINED_GRAMMAR &&
+			 Character.isUpperCase(currentRuleName.charAt(0))) &&
+			 alt.getFirstChild().getType()!=SYN_SEMPRED )
+		{
+			// duplicate alt and make a synpred block around that dup'd alt
+			GrammarAST synpredBlockAST = createBlockFromDupAlt(alt);
+
+			// Create a SYN_SEMPRED node as if user had typed this in
+			// Effectively we replace (xxx)=>xxx with {synpredxxx}? xxx
+			GrammarAST synpredAST = createSynSemPredFromBlock(synpredBlockAST);
+
+			// insert SYN_SEMPRED as first element of alt
+			synpredAST.getLastSibling().setNextSibling(alt.getFirstChild());
+			alt.setFirstChild(synpredAST);
+		}
+	}
+
+	protected GrammarAST createSynSemPredFromBlock(GrammarAST synpredBlockAST) {
+		// add grammar fragment to a list so we can make fake rules for them
+		// later.
+		String predName = grammar.defineSyntacticPredicate(synpredBlockAST,currentRuleName);
+		// convert (alpha)=> into {synpredN}? where N is some pred count
+		// during code gen we convert to function call with templates
+		String synpredinvoke = predName;
+		GrammarAST p = #[SYN_SEMPRED,synpredinvoke];
+		p.setEnclosingRule(currentRuleName);
+		// track how many decisions have synpreds
+		grammar.blocksWithSynPreds.add(currentBlockAST);
+		return p;
 	}
 
 	public GrammarAST createSimpleRuleAST(String name,
@@ -161,11 +217,12 @@ tokens {
 
     public void cleanup(GrammarAST root) {
 		if ( gtype==LEXER_GRAMMAR ) {
+			String filter = (String)grammar.getOption("filter");
 			GrammarAST tokensRuleAST =
 			    grammar.addArtificialMatchTokensRule(
 			    	root,
 			    	lexerRuleNames,
-			    	isFilterMode);
+			    	filter!=null&&filter.equals("true"));
 		}
     }
 }
@@ -173,19 +230,25 @@ tokens {
 grammar![Grammar g]
 {
 	this.grammar = g;
+	GrammarAST opt=null;
+	Token optionsStartToken = null;
+	Map opts;
 }
    :    //hdr:headerSpec
         ( ACTION )?
 	    ( cmt:DOC_COMMENT  )?
         gr:grammarType gid:id SEMI
-		    (opt:optionsSpec)?
+			( {optionsStartToken=LT(1);}
+			  opts=optionsSpec {grammar.setOptions(opts, optionsStartToken);}
+			  {opt=(GrammarAST)returnAST;}
+			)?
 		    (ts:tokensSpec!)?
         	scopes:attrScopes
 		    (a:actions)?
 	        r:rules
         EOF
         {
-        #grammar = #(null, #(#gr, #gid, #cmt, #opt, #ts, #scopes, #a, #r));
+        #grammar = #(null, #(#gr, #gid, #cmt, opt, #ts, #scopes, #a, #r));
         cleanup(#grammar);
         }
 	;
@@ -217,19 +280,62 @@ actionScopeName
     |   p:"parser"	{#p.setType(ID);}
 	;
 
-optionsSpec
-	:	OPTIONS^ (option SEMI!)+ RCURLY!
+/*
+optionsSpec returns [Map opts=new HashMap()]
+    :   #( OPTIONS (option[opts])+ )
+    ;
+
+option[Map opts]
+{
+    String key=null;
+    Object value=null;
+}
+    :   #( ASSIGN id:ID {key=#id.getText();} value=optionValue )
+        {opts.put(key,value);}
+    ;
+*/
+
+optionsSpec returns [Map opts=new HashMap()]
+	:	OPTIONS^ (option[opts] SEMI!)+ RCURLY!
 	;
 
-option
-    :   o:id ASSIGN^ v:optionValue
+option[Map opts]
+{
+    Object value=null;
+}
+    :   o:id ASSIGN^ value=optionValue
+    	{
+    	opts.put(#o.getText(), value);
+    	}
+    	/*
     	{
     	if ( #o.getText().equals("filter") && #v.getText().equals("true") ) {
     		isFilterMode = true;
     	}
+    	else if ( #o.getText().equals("backtrack") && #v.getText().equals("true") ) {
+    		if ( currentRuleName==null ) { // must grammar level
+    			isAutoBacktrackMode = true;
+    		}
+    		else {
+    			blockAutoBacktrackMode = true;
+    		}
     	}
+    	}
+    	*/
     ;
 
+optionValue returns [Object value=null]
+    :   x:id			 {value = #x.getText();}
+    |   s:STRING_LITERAL {String vs = #s.getText();
+                          value=vs.substring(1,vs.length()-1);}
+    |   c:CHAR_LITERAL   {String vs = #c.getText();
+                          value=vs.substring(1,vs.length()-1);}
+    |   i:INT            {value = new Integer(#i.getText());}
+    |	ss:STAR			 {#ss.setType(STRING_LITERAL); value = "*";} // used for k=*
+//  |   cs:charSet       {value = #cs;} // return set AST in this case
+    ;
+
+/*
 optionValue
 	:	id
 	|   STRING_LITERAL
@@ -237,6 +343,7 @@ optionValue
 	|	INT
 //	|   cs:charSet       {value = #cs;} // return set AST in this case
 	;
+*/
 
 /*
 will probably need for char vocab spec later
@@ -287,6 +394,8 @@ rule!
 GrammarAST modifier=null, blk=null, blkRoot=null, eob=null;
 int start = ((TokenWithIndex)LT(1)).getIndex();
 int startLine = LT(1).getLine();
+GrammarAST opt = null;
+Map opts = null;
 }
 	:
 	(	d:DOC_COMMENT	
@@ -306,12 +415,13 @@ int startLine = LT(1).getLine();
 	( aa:ARG_ACTION )?
 	( "returns" rt:ARG_ACTION  )?
 	( throwsSpec )?
-	( opts:optionsSpec )?
+    ( opts=optionsSpec {opt=(GrammarAST)returnAST;} )?
 	scopes:ruleScopeSpec
 	(a:ruleActions)?
 	colon:COLON
 	{
 	blkRoot = #[BLOCK,"BLOCK"];
+	blkRoot.options = opts;
 	blkRoot.setLine(colon.getLine());
 	blkRoot.setColumn(colon.getColumn());
 	eob = #[EOB,"<end-of-block>"];
@@ -320,7 +430,7 @@ int startLine = LT(1).getLine();
 		{
 		blk = #(blkRoot,#(#[ALT,"ALT"],#s,#[EOA,"<end-of-alt>"]),eob);
 		}
-	|	b:altList {blk = #b;}
+	|	b:altList[opts] {blk = #b;}
 	)
 	semi:SEMI
 	( ex:exceptionGroup )?
@@ -336,9 +446,11 @@ int startLine = LT(1).getLine();
 	root.ruleStartTokenIndex = start;
 	root.ruleStopTokenIndex = stop;
 	root.setLine(startLine);
+	root.options = opts;
     #rule = #(root,
               #ruleName,modifier,#(#[ARG,"ARG"],#aa),#(#[RET,"RET"],#rt),
-              #opts,#scopes,#a,blk,ex,eor);
+              opt,#scopes,#a,blk,ex,eor);
+	currentRuleName=null;
     }
 	;
 
@@ -375,6 +487,7 @@ int column = LT(1).getColumn();
 block
 {
 GrammarAST save = currentBlockAST;
+Map opts=null;
 }
     :   (set) => s:set  // special block like ('a'|'b'|'0'..'9')
 
@@ -387,13 +500,17 @@ GrammarAST save = currentBlockAST;
 				warnWhenFollowAmbig = false;
 			}
 		:
-			optionsSpec ( ruleActions )? COLON!
+            (opts=optionsSpec {#block.setOptions(grammar,opts);})?
+            ( ruleActions )?
+            COLON!
 		|	ACTION COLON!
 		)?
 
 		{currentBlockAST = #lp;}
 
-		a1:alternative rewrite ( OR! a2:alternative rewrite )*
+		a1:alternative rewrite
+		{prefixWithSynPred(#a1);}
+		( OR! a2:alternative rewrite {if (LA(1)==OR||LA(2)==QUESTION) prefixWithSynPred(#a2);} )*
 
         rp:RPAREN!
         {
@@ -405,15 +522,18 @@ GrammarAST save = currentBlockAST;
         }
     ;
 
-altList
+altList[Map opts]
 {
 	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
+	blkRoot.options = opts;
 	blkRoot.setLine(LT(1).getLine());
 	blkRoot.setColumn(LT(1).getColumn());
 	GrammarAST save = currentBlockAST;
 	currentBlockAST = #blkRoot;
 }
-    :   a1:alternative rewrite ( OR! a2:alternative rewrite )*
+    :   a1:alternative rewrite
+    	{prefixWithSynPred(#a1);}
+    	( OR! a2:alternative rewrite {if (LA(1)==OR) prefixWithSynPred(#a2);} )*
         {
         #altList = #(blkRoot,#altList,#[EOB,"<end-of-block>"]);
         currentBlockAST = save;
@@ -427,13 +547,14 @@ alternative
     altRoot.setLine(LT(1).getLine());
     altRoot.setColumn(LT(1).getColumn());
 }
-    :   (BANG!)? ( el:element )+ ( exceptionSpecNoLabel! )?
+    :   ( el:element )+ ( exceptionSpecNoLabel! )?
         {
             if ( #alternative==null ) {
                 #alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);
             }
             else {
-                #alternative = #(altRoot, #alternative,eoa);
+            	// we have a real list of stuff
+               	#alternative = #(altRoot, #alternative, eoa);
             }
         }
     |   {
@@ -471,7 +592,6 @@ elementOptionSpec
 		(
 			SEMI
 			id ASSIGN optionValue
-			
 		)*
 		CLOSE_ELEMENT_OPTION
 	;
@@ -574,6 +694,8 @@ ebnf!
 		    	#ebnf = #(#[SYNPRED,"=>"],#b); // ignore for lexer rules in combined
 		    }
 		    else {
+		    	#ebnf = createSynSemPredFromBlock(#b);
+		    	/*
 				// add grammar fragment to a list so we can make fake rules for them
 				// later.
 				String predName = grammar.defineSyntacticPredicate(#b,currentRuleName);
@@ -584,6 +706,7 @@ ebnf!
 				#ebnf.setEnclosingRule(currentRuleName);
 				// track how many decisions have synpreds
 				grammar.blocksWithSynPreds.add(currentBlockAST);
+				*/
 			}
 			}
         |   {#ebnf = #b;}
@@ -654,17 +777,21 @@ GrammarAST ebnfRoot=null;
    		|	PLUS     {ebnfRoot = #[POSITIVE_CLOSURE,"+"];}
    		)
     	{
+		GrammarAST save = currentBlockAST;
        	ebnfRoot.setLine(elemAST.getLine());
        	ebnfRoot.setColumn(elemAST.getColumn());
     	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
+    	currentBlockAST = blkRoot;
        	GrammarAST eob = #[EOB,"<end-of-block>"];
 		eob.setLine(elemAST.getLine());
 		eob.setColumn(elemAST.getColumn());
+		GrammarAST alt = #(#[ALT,"ALT"],elemAST,#[EOA,"<end-of-alt>"]);
+    	prefixWithSynPred(alt);
   		subrule =
   		     #(ebnfRoot,
-  		       #(blkRoot,#(#[ALT,"ALT"],elemAST,#[EOA,"<end-of-alt>"]),
-  		         eob)
+  		       #(blkRoot,alt,eob)
   		      );
+  		currentBlockAST = save;
    		}
     ;
 

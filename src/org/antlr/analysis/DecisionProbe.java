@@ -29,6 +29,7 @@ package org.antlr.analysis;
 
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
+import org.antlr.tool.GrammarAST;
 
 import java.util.*;
 
@@ -388,7 +389,15 @@ public class DecisionProbe {
 
 	public void issueWarnings() {
 		if ( analysisAborted() ) {
-			ErrorManager.analysisAborted(this);
+			GrammarAST blockAST = dfa.decisionNFAStartState.getAssociatedASTNode();
+			String autoBacktrack = (String)blockAST.getOption("backtrack");
+			if ( autoBacktrack==null ) {
+				autoBacktrack = (String)dfa.nfa.grammar.getOption("backtrack");
+			}
+			// only report early termination errors if !backtracking
+			if ( !(autoBacktrack!=null&&autoBacktrack.equals("true")) ) {
+				ErrorManager.analysisAborted(this);
+			}
 			return;
 		}
 
@@ -560,7 +569,7 @@ public class DecisionProbe {
 
 	public void reportEarlyTermination() {
 		terminated = true;
-		dfa.nfa.grammar.numberOfDFAConversionsTerminatedEarly++;
+		dfa.nfa.grammar.setOfDFAWhoseConversionTerminatedEarly.add(dfa);
 	}
 
 	public void reportRecursiveOverflow(DFAState d,

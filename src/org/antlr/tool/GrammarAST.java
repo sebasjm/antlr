@@ -53,6 +53,10 @@ import java.util.*;
  *  on purpose, not out of ignorance. ;)
  */
 public class GrammarAST extends BaseAST {
+	static int count = 0;
+
+	public int ID = ++count;
+
 	/** This AST node was created from what token? */
     public Token token = null;
 
@@ -86,11 +90,11 @@ public class GrammarAST extends BaseAST {
     /** If this is a BLOCK node, track options here */
     protected Map options;
 
-	public static final Set legalOptions =
-			new HashSet() {{add("k"); add("greedy");}};
+	public static final Set legalBlockOptions =
+			new HashSet() {{add("k"); add("greedy"); add("backtrack"); add("memoize");}};
 
 	/** What are the default options for a subrule? */
-    public static final Map defaultOptions =
+    public static final Map defaultBlockOptions =
             new HashMap() {{put("greedy","true");}};
 
 	/** if this is an ACTION node, this is the outermost enclosing
@@ -140,7 +144,7 @@ public class GrammarAST extends BaseAST {
 	 *  or null if invalid option.
 	 */
 	public String setOption(Grammar grammar, String key, Object value) {
-		if ( !legalOptions.contains(key) ) {
+		if ( !legalBlockOptions.contains(key) ) {
 			ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
 									  grammar,
 									  token,
@@ -169,7 +173,7 @@ public class GrammarAST extends BaseAST {
 			value = options.get(key);
 		}
 		if ( value==null ) {
-			value = defaultOptions.get(key);
+			value = defaultBlockOptions.get(key);
 		}
 		return value;
 	}

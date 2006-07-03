@@ -68,7 +68,7 @@ public class DOTGenerator {
      */
     public String getDOT(State startState) {
         // The output DOT graph for visualization
-        StringTemplate dot = null;
+		StringTemplate dot = null;
 		markedStates = new HashSet();
         if ( startState instanceof DFAState ) {
             dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/dfa");
@@ -76,7 +76,7 @@ public class DOTGenerator {
 					new Integer(startState.stateNumber));
 			dot.setAttribute("useBox",
 							 new Boolean(Tool.internalOption_ShowNFConfigsInDFA));
-			walkCreatingDOT(dot, startState);
+			walkCreatingDFADOT(dot, (DFAState)startState);
         }
         else {
             dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/nfa");
@@ -107,14 +107,14 @@ public class DOTGenerator {
      *  fill a DOT description template.  Keep filling the
      *  states and edges attributes.
      */
-    protected void walkCreatingDOT(StringTemplate dot,
-                                   State s)
+    protected void walkCreatingDFADOT(StringTemplate dot,
+									  DFAState s)
     {
-        if ( markedStates.contains(s) ) {
-            return; // already visited this node
+		if ( markedStates.contains(new Integer(s.stateNumber)) ) {
+			return; // already visited this node
         }
 
-        markedStates.add(s); // mark this node as completed.
+		markedStates.add(new Integer(s.stateNumber)); // mark this node as completed.
 
         // first add this node
         StringTemplate st;
@@ -130,21 +130,24 @@ public class DOTGenerator {
         // make a DOT edge for each transition
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
-			//System.out.println("dfa "+s+" edge from s"+s.stateNumber+" ["+i+"] of "+s.getNumberOfTransitions());
+			/*
+			System.out.println("dfa "+s.dfa.decisionNumber+
+				" edge from s"+s.stateNumber+" ["+i+"] of "+s.getNumberOfTransitions());
+			*/
 			if ( STRIP_NONREDUCED_STATES ) {
 				if ( edge.target instanceof DFAState &&
 					((DFAState)edge.target).getAcceptStateReachable()!=DFA.REACHABLE_YES )
 				{
- 					continue; // don't generate nodes for terminal states
+					continue; // don't generate nodes for terminal states
 				}
 			}
-            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
-            st.setAttribute("label", getEdgeLabel(edge));
-            st.setAttribute("src", getStateLabel(s));
+			st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
+			st.setAttribute("label", getEdgeLabel(edge));
+			st.setAttribute("src", getStateLabel(s));
             st.setAttribute("target", getStateLabel(edge.target));
 			st.setAttribute("arrowhead", arrowhead);
             dot.setAttribute("edges", st);
-            walkCreatingDOT(dot, edge.target); // keep walkin'
+            walkCreatingDFADOT(dot, (DFAState)edge.target); // keep walkin'
         }
     }
 

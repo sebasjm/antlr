@@ -130,7 +130,7 @@ Token optionsStartToken=null;
 		(cmt:DOC_COMMENT)?
         //(#(OPTIONS .))? // already parsed these in assign.types.g
         ( {optionsStartToken=((GrammarAST)_t).getToken();}
-          opts=optionsSpec {grammar.setOptions(opts, optionsStartToken);}
+          optionsSpec
         )?
         (tokensSpec)?
         (attrScope)*
@@ -159,6 +159,11 @@ GrammarAST nameAST=null, actionAST=null;
 		 }
 	;
 
+optionsSpec
+	:	OPTIONS
+	;
+
+/*
 optionsSpec returns [Map opts=new HashMap()]
     :   #( OPTIONS (option[opts])+ )
     ;
@@ -191,6 +196,7 @@ charSetElement
 	|   #( OR c1:CHAR_LITERAL c2:CHAR_LITERAL )
 	|   #( RANGE c3:CHAR_LITERAL c4:CHAR_LITERAL )
 	;
+*/
 
 tokensSpec
 	:	#( TOKENS ( tokenSpec )+ )
@@ -217,11 +223,11 @@ String name=null;
 Map opts=null;
 Rule r = null;
 }
-    :   #( RULE id:ID
+    :   #( RULE id:ID {opts = #RULE.options;}
            (mod=modifier)?
            #( ARG (args:ARG_ACTION)? )
            #( RET (ret:ARG_ACTION)? )
-           (opts=optionsSpec)?
+           (optionsSpec)?
 			{
 			name = #id.getText();
 			currentRuleName = name;
@@ -309,12 +315,11 @@ ruleScopeSpec[Rule r]
 
 block
 {
-Map opts=null;
 this.blockLevel++;
 if ( this.blockLevel==1 ) {this.outerAltNum=1;}
 }
     :   #(  BLOCK
-            (opts=optionsSpec {#block.setOptions(grammar,opts);})?
+            (optionsSpec)?
             (blockAction)*
             ( alternative rewrite
               {if ( this.blockLevel==1 ) {this.outerAltNum++;}}

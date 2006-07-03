@@ -274,14 +274,23 @@ rules[StringTemplate recognizerST]
 {
 StringTemplate rST;
 }
-    :   (	rST=rule
-    		{
-    		if ( rST!=null ) {
-				recognizerST.setAttribute("rules", rST);
-				outputFileST.setAttribute("rules", rST);
-				headerFileST.setAttribute("rules", rST);
-			}
-    		}
+    :   (	(	{
+    			String ruleName = _t.getFirstChild().getText();
+    			Rule r = grammar.getRule(ruleName);
+    			}
+     		:
+     			// if synpred, only gen if used in a DFA
+    			{!r.isSynPred || grammar.synPredNamesUsedInDFA.contains(ruleName)}?
+    			rST=rule
+				{
+				if ( rST!=null ) {
+					recognizerST.setAttribute("rules", rST);
+					outputFileST.setAttribute("rules", rST);
+					headerFileST.setAttribute("rules", rST);
+				}
+				}
+    		|	RULE
+    		)
    		)+
     ;
 
@@ -356,6 +365,16 @@ rule returns [StringTemplate code=null]
 					new Boolean(grammar.isEmptyRule(block)));
 			}
 			code.setAttribute("ruleDescriptor", ruleDescr);
+			String memo = (String)#rule.getOption("memoize");
+			if ( memo==null ) {
+				memo = (String)grammar.getOption("memoize");
+			}
+			if ( memo!=null && memo.equals("true") &&
+			     (stName.equals("rule")||stName.equals("lexerRule")) )
+			{
+            	code.setAttribute("memoize",
+            		new Boolean(memo!=null && memo.equals("true")));
+            }
 			}
 
 	     	(exceptionGroup[code])?

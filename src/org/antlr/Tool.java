@@ -39,7 +39,7 @@ public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-	public static final String VERSION = "3.0b1";
+	public static final String VERSION = "3.0b2";
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
 
@@ -54,7 +54,6 @@ public class Tool {
 	protected boolean trace = false;
 	protected boolean profile = false;
 	protected boolean report = false;
-	protected boolean memo = true;
 	protected boolean printGrammar = false;
 
 	// the internal options are for my use on the command line during dev
@@ -67,7 +66,7 @@ public class Tool {
 
     public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
-						  VERSION + " (June 27, 2006)  1989-2006");
+						  VERSION + " (July ??, 2006)  1989-2006");
 		Tool antlr = new Tool(args);
 		antlr.process();
 		System.exit(0);
@@ -147,58 +146,60 @@ public class Tool {
 			else if (args[i].equals("-profile")) {
 				profile=true;
 			}
-			else if (args[i].equals("-nomemo")) {
-				memo=false;
-			}
 			else if (args[i].equals("-print")) {
 				printGrammar = true;
 			}
-			else if (args[i].equals("-Igrtree")) {
+			else if (args[i].equals("-Xgrtree")) {
 				internalOption_PrintGrammarTree=true; // print grammar tree
 			}
-			else if (args[i].equals("-Idfa")) {
+			else if (args[i].equals("-Xdfa")) {
 				internalOption_PrintDFA=true;
 			}
-			else if (args[i].equals("-Inoprune")) {
+			else if (args[i].equals("-Xnoprune")) {
 				DFAOptimizer.PRUNE_EBNF_EXIT_BRANCHES=false;
 			}
-			else if (args[i].equals("-Inocollapse")) {
+			else if (args[i].equals("-Xnocollapse")) {
 				DFAOptimizer.COLLAPSE_ALL_PARALLEL_EDGES=false;
 			}
-			else if (args[i].equals("-Idbgconversion")) {
+			else if (args[i].equals("-Xdbgconversion")) {
 				NFAToDFAConverter.debug = true;
 			}
-			else if (args[i].equals("-Imultithreaded")) {
+			else if (args[i].equals("-Xmultithreaded")) {
 				NFAToDFAConverter.SINGLE_THREADED_NFA_CONVERSION = false;
 			}
-			else if (args[i].equals("-Inomergestopstates")) {
+			else if (args[i].equals("-Xnomergestopstates")) {
 				DFAOptimizer.MERGE_STOP_STATES = false;
 			}
-			else if (args[i].equals("-Idfaverbose")) {
+			else if (args[i].equals("-Xdfaverbose")) {
 				internalOption_ShowNFConfigsInDFA = true;
 			}
-			else if (args[i].equals("-Iwatchconversion")) {
+			else if (args[i].equals("-Xwatchconversion")) {
 				internalOption_watchNFAConversion = true;
 			}
-			else if (args[i].equals("-Im")) {
+			else if (args[i].equals("-XdbgST")) {
+				CodeGenerator.EMIT_TEMPLATE_DELIMITERS = true;
+			}
+			else if (args[i].equals("-Xm")) {
 				if (i + 1 >= args.length) {
-					System.err.println("missing max recursion with -Im option; ignoring");
+					System.err.println("missing max recursion with -Xm option; ignoring");
 				}
 				else {
 					i++;
 					NFAContext.MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK = Integer.parseInt(args[i]);
 				}
 			}
-			else if (args[i].equals("-ImaxtimeforDFA")) {
+			else if (args[i].equals("-Xconversiontimeout")) {
 				if (i + 1 >= args.length) {
-					System.err.println("missing max time in ms -ImaxtimeforDFA option; ignoring");
+					System.err.println("missing max time in ms -Xconversiontimeout option; ignoring");
 				}
 				else {
 					i++;
 					DFA.MAX_TIME_PER_DFA_CREATION = Integer.parseInt(args[i]);
 				}
 			}
-
+			else if (args[i].equals("-X")) {
+				Xhelp();
+			}
             else {
                 if (args[i].charAt(0) != '-') {
                     // Must be the grammar file
@@ -272,8 +273,12 @@ public class Tool {
 					generateDFAs(grammar);
 				}
 				if ( report ) {
-					String report = new GrammarReport(grammar).toString();
-					System.out.println(report);
+					GrammarReport report = new GrammarReport(grammar);
+					System.out.println(report.toString());
+					// print out a backtracking report too (that is not encoded into log)
+					System.out.println(report.getBacktrackingReport());
+					// same for aborted NFA->DFA conversions
+					System.out.println(report.getEarlyTerminationReport());
 				}
 				if ( profile ) {
 					GrammarReport report = new GrammarReport(grammar);
@@ -297,7 +302,6 @@ public class Tool {
 			generator.setDebug(debug);
 			generator.setProfile(profile);
 			generator.setTrace(trace);
-			generator.setMemoize(memo);
 
 			/*
 			if ( grammar.type==Grammar.LEXER ) {
@@ -361,9 +365,24 @@ public class Tool {
 		System.err.println("  -print         print out the grammar without actions");
 		System.err.println("  -debug         generate a parser that emits debugging events");
 		System.err.println("  -profile       generate a parser that computes profiling information");
-		System.err.println("  -nomemo        when backtracking don't generate memoization code");
 		System.err.println("  -nfa           generate an NFA for each rule");
 		System.err.println("  -dfa           generate a DFA for each decision point");
+		System.err.println("  -X             display extended argument list");
+    }
+
+	private static void Xhelp() {
+		System.err.println("  -Xgrtree            print the grammar AST");
+		System.err.println("  -Xdfa               print DFA as text ");
+		System.err.println("  -Xnoprune           do not test EBNF block exit branches");
+		System.err.println("  -Xnocollapse        collapse incident edges into DFA states");
+		System.err.println("  -Xdbgconversion     dump lots of info during NFA conversion");
+		System.err.println("  -Xmultithreaded     run the analysis in 2 threads");
+		System.err.println("  -Xnomergestopstates do not merge stop states");
+		System.err.println("  -Xdfaverbose        generate DFA states in DOT with NFA configs");
+		System.err.println("  -Xwatchconversion   print a message for each NFA before converting");
+		System.err.println("  -XdbgST             put tags at start/stop of all templates in output");
+		System.err.println("  -Xm                 max number of rule invocations during conversion");
+		System.err.println("  -Xconversiontimeout set NFA conversion timeout for each decision");
     }
 
 	public void setOutputDirectory(String outputDirectory) {

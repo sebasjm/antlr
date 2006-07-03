@@ -45,7 +45,7 @@ public class Rule {
 	protected Map options;
 
 	public static final Set legalOptions =
-			new HashSet() {{add("k"); add("greedy");}};
+			new HashSet() {{add("k"); add("greedy"); add("memoize"); add("backtrack");}};
 
 	/** The AST representing the whole rule */
 	public GrammarAST tree;

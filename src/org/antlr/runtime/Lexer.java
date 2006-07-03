@@ -112,6 +112,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		this.input = input;
 		token = null;
 		tokenStartCharIndex = -1;
+		ruleNestingLevel = 0;
 	}
 
 	public void emit(Token token) {
