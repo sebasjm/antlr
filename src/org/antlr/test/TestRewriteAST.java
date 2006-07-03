@@ -805,7 +805,6 @@ public class TestRewriteAST extends TestSuite {
 	}
 
 	public void testKnownRuleButNotInLHS() throws Exception {
-		// THIS WORKS BY ITSELF BUT NOT WHEN I RUN WHOLE FILE!!!!!!
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
@@ -835,7 +834,6 @@ public class TestRewriteAST extends TestSuite {
 	}
 
 	public void testUnknownToken() throws Exception {
-		// WORKS ALONE! :(
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
@@ -968,6 +966,7 @@ public class TestRewriteAST extends TestSuite {
 				   "error is not a GrammarSemanticsMessage");
 		assertEqual(foundMsg.arg, expectedMessage.arg);
 		assertEqual(foundMsg.arg2, expectedMessage.arg2);
+		ErrorManager.resetErrorState(); // wack errors for next test
 	}
 
 }

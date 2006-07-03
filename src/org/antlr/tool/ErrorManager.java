@@ -430,6 +430,11 @@ public class ErrorManager {
 		return ec;
 	}
 
+	public static void resetErrorState() {
+		ErrorState ec = new ErrorState();
+		threadToErrorCountMap.put(Thread.currentThread(), ec);
+	}
+
 	public static void info(String msg) {
 		getErrorState().infos++;
 		getErrorListener().info(msg);
