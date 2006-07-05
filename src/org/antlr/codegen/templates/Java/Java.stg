@@ -395,9 +395,12 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
         <ruleMemoization(name=ruleName)>
         <block>
         <! create token if none exists *and* we are an outermost token rule !>
+        <execAction({
         if ( token==null && ruleNestingLevel==1 ) {
             emit(type,line,charPosition,channel,start,getCharIndex()-1);
         }<\n>
+        }
+        )>
 <endif>
     }
     finally {
