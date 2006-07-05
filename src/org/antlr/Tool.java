@@ -66,7 +66,7 @@ public class Tool {
 
     public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
-						  VERSION + " (July ??, 2006)  1989-2006");
+						  VERSION + " (July 5, 2006)  1989-2006");
 		Tool antlr = new Tool(args);
 		antlr.process();
 		System.exit(0);
@@ -186,6 +186,15 @@ public class Tool {
 				else {
 					i++;
 					NFAContext.MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK = Integer.parseInt(args[i]);
+				}
+			}
+			else if (args[i].equals("-Xmaxdfaedges")) {
+				if (i + 1 >= args.length) {
+					System.err.println("missing max number of edges with -Xmaxdfaedges option; ignoring");
+				}
+				else {
+					i++;
+					DFA.MAX_STATE_TRANSITIONS_FOR_TABLE = Integer.parseInt(args[i]);
 				}
 			}
 			else if (args[i].equals("-Xconversiontimeout")) {
@@ -371,18 +380,19 @@ public class Tool {
     }
 
 	private static void Xhelp() {
-		System.err.println("  -Xgrtree            print the grammar AST");
-		System.err.println("  -Xdfa               print DFA as text ");
-		System.err.println("  -Xnoprune           do not test EBNF block exit branches");
-		System.err.println("  -Xnocollapse        collapse incident edges into DFA states");
-		System.err.println("  -Xdbgconversion     dump lots of info during NFA conversion");
-		System.err.println("  -Xmultithreaded     run the analysis in 2 threads");
-		System.err.println("  -Xnomergestopstates do not merge stop states");
-		System.err.println("  -Xdfaverbose        generate DFA states in DOT with NFA configs");
-		System.err.println("  -Xwatchconversion   print a message for each NFA before converting");
-		System.err.println("  -XdbgST             put tags at start/stop of all templates in output");
-		System.err.println("  -Xm                 max number of rule invocations during conversion");
-		System.err.println("  -Xconversiontimeout set NFA conversion timeout for each decision");
+		System.err.println("  -Xgrtree               print the grammar AST");
+		System.err.println("  -Xdfa                  print DFA as text ");
+		System.err.println("  -Xnoprune              do not test EBNF block exit branches");
+		System.err.println("  -Xnocollapse           collapse incident edges into DFA states");
+		System.err.println("  -Xdbgconversion        dump lots of info during NFA conversion");
+		System.err.println("  -Xmultithreaded        run the analysis in 2 threads");
+		System.err.println("  -Xnomergestopstates    do not merge stop states");
+		System.err.println("  -Xdfaverbose           generate DFA states in DOT with NFA configs");
+		System.err.println("  -Xwatchconversion      print a message for each NFA before converting");
+		System.err.println("  -XdbgST                put tags at start/stop of all templates in output");
+		System.err.println("  -Xm m                  max number of rule invocations during conversion");
+		System.err.println("  -Xmaxdfaedges m        max \"comfortable\" number of edges for single DFA state");
+		System.err.println("  -Xconversiontimeout t  set NFA conversion timeout for each decision");
     }
 
 	public void setOutputDirectory(String outputDirectory) {

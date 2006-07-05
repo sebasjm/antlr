@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0b1
-June 27, 2006
+ANTLR 3.0b2
+July 5, 2006
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -175,12 +175,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0b1/README.txt (this file)
-antlr-3.0b1/LICENSE.txt
-antlr-3.0b1/src/org/antlr/...
-antlr-3.0b1/lib/stringtemplate-2.3b8.jar (3.0b1 needs 2.3b8)
-antlr-3.0b1/lib/antlr-2.7.6.jar
-antlr-3.0b1/lib/antlr-3.0b1.jar
+antlr-3.0b2/README.txt (this file)
+antlr-3.0b2/LICENSE.txt
+antlr-3.0b2/src/org/antlr/...
+antlr-3.0b2/lib/stringtemplate-2.3b8.jar (3.0b2 needs 2.3b8)
+antlr-3.0b2/lib/antlr-2.7.6.jar
+antlr-3.0b2/lib/antlr-3.0b2.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -193,18 +193,17 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0b1 (June 27, 2006) 1989-2006
+ANTLR Parser Generator   Early Access Version 3.0b2 (July 5, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
-  -o outputDir   specify output directory where all output is
-generated
+  -o outputDir   specify output directory where all output is generated
   -lib dir       specify location of token files
   -report        print out a report about the grammar(s) processed
   -print         print out the grammar without actions
   -debug         generate a parser that emits debugging events
   -profile       generate a parser that computes profiling information
-  -nomemo        when backtracking don't generate memoization code
   -nfa           generate an NFA for each rule
   -dfa           generate a DFA for each decision point
+  -X             display extended argument list
 
 For example, consider how to make the LL-star example from the examples 
 tarball you can get at http://www.antlr.org/download/examples-v3.tar.gz
@@ -260,10 +259,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0b1/lib/stringtemplate-2.3b8.jar
-antlr-3.0b1/lib/antlr-2.7.6.jar
+antlr-3.0b2/lib/stringtemplate-2.3b8.jar
+antlr-3.0b2/lib/antlr-2.7.6.jar
 
-then jump into antlr-3.0b1/src directory and then type:
+then jump into antlr-3.0b2/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -275,9 +274,28 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0b2 - ??
+3.0b2 - July 5, 2006
 
+July 5, 2006
+
+* token emission not properly protected in lexer filter mode.
+
+* EOT, EOT DFA state transition tables should be init'd to -1 (only
+  was doing this for compressed tables).  Fixed.
+
+* in trace mode, exit method not shown for memoized rules
+
+* added -Xmaxdfaedges to allow you to increase number of edges allowed
+  for a single DFA state before it becomes "special" and can't fit in
+  a simple table.
+
+* Bug in tables.  Short are signed so min/max tables for DFA are now
+  char[].  Bizarre.
+  
 July 3, 2006
+
+* Added a method to reset the tool error state for current thread.
+  See ErrorManager.java
 
 * [Got this working properly today] backtrack mode that let's you type
   in any old crap and ANTLR will backtrack if it can't figure out what
@@ -364,7 +382,7 @@ June 23-24, 2006
   nondeterministic alt.  I used to generated errors:
 
 ~/tmp $ java org.antlr.Tool -dfa t.g
-ANTLR Parser Generator   Early Access Version 3.0b1 (?)  1989-2006
+ANTLR Parser Generator   Early Access Version 3.0b2 (July 5, 2006)  1989-2006
 t.g:2:5: Alternative 1: after matching input such as A A A A A decision cannot predict what comes next due to recursion overflow to b from b
 t.g:2:5: Alternative 2: after matching input such as A A A A A decision cannot predict what comes next due to recursion overflow to b from b
 

@@ -253,7 +253,7 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 		String found =
 			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
 												 "s", "((34)x)x", false);
-		String expecting =
+		String expecting = // has no memoization
 			"enter expr (\n" +
 			"enter atom (\n" +
 			"enter expr (\n" +
@@ -262,9 +262,15 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"enter atom 3\n" +
 			"enter atom 3\n" +
 			"enter atom (\n" +
+			"enter expr 3\n" +
+			"enter atom 3\n" +
+			"enter atom 3\n" +
 			"enter atom (\n" +
 			"enter expr (\n" +
 			"enter atom (\n" +
+			"enter expr 3\n" +
+			"enter atom 3\n" +
+			"enter atom 3\n" +
 			"enter atom (\n" +
 			"enter expr 3\n" +
 			"enter atom 3\n" +

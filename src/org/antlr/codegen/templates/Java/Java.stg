@@ -280,8 +280,8 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     <ruleLabelDefs()>
     <ruleDescriptor.actions.init>
     <@preamble()>
-    <ruleMemoization(name=ruleName)>
     try {
+        <ruleMemoization(name=ruleName)>
         <block>
     }
 <if(exceptions)>
@@ -870,8 +870,8 @@ class DFA<dfa.decisionNumber> extends DFA {
         this.decisionNumber = <dfa.decisionNumber>;
         this.eot = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eotS);
         this.eof = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eofS);
-        this.min = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_minS);
-        this.max = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_maxS);
+        this.min = DFA.unpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_minS);
+        this.max = DFA.unpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_maxS);
         this.accept = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_acceptS);
         this.special = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_specialS);
         int numStates = DFA<dfa.decisionNumber>_transition.length;

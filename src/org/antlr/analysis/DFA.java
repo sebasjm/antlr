@@ -54,6 +54,9 @@ public class DFA {
 	/** Set to 0 to not terminate early */
 	public static int MAX_TIME_PER_DFA_CREATION = 1*1000;
 
+	/** How many edges can each DFA state have before a "special" state
+	 *  is created that uses IF expressions instead of a table?
+	 */
 	public static int MAX_STATE_TRANSITIONS_FOR_TABLE = 512;
 
 	/** What's the start state for this DFA? */

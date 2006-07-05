@@ -437,6 +437,8 @@ public class Grammar {
 	public void setGrammarContent(Reader r)
 		throws antlr.RecognitionException, antlr.TokenStreamException
 	{
+		ErrorManager.resetErrorState(); // reset in case > 1 grammar in same thread
+
 		// BUILD AST FROM GRAMMAR
 		ANTLRLexer lexer = new ANTLRLexer(r);
 		lexer.setFilename(this.getFileName());

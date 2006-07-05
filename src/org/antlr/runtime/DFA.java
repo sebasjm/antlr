@@ -14,8 +14,8 @@ package org.antlr.runtime;
 public class DFA {
 	protected short[] eot;
 	protected short[] eof;
-	protected short[] min;
-    protected short[] max;
+	protected char[] min;
+    protected char[] max;
     protected short[] accept;
     protected short[] special;
     protected short[][] transition;
@@ -122,8 +122,6 @@ public class DFA {
 		error(nvae);
 		throw nvae;
 	}
-	protected void foo() throws NoViableAltException {
-	}
 
 	/** A hook for debugging interface */
 	protected void error(NoViableAltException nvae) { ; }
@@ -155,6 +153,26 @@ public class DFA {
 			// add v n times to data
 			for (int j=1; j<=n; j++) {
 				data[di++] = (short)v;
+			}
+		}
+		return data;
+	}
+
+	/** Hideous duplication of code, but I need different typed arrays out :( */
+	public static char[] unpackEncodedStringToUnsignedChars(String encodedString) {
+		// walk first to find how big it is.
+		int size = 0;
+		for (int i=0; i<encodedString.length(); i+=2) {
+			size += encodedString.charAt(i);
+		}
+		char[] data = new char[size];
+		int di = 0;
+		for (int i=0; i<encodedString.length(); i+=2) {
+			char n = encodedString.charAt(i);
+			char v = encodedString.charAt(i+1);
+			// add v n times to data
+			for (int j=1; j<=n; j++) {
+				data[di++] = v;
 			}
 		}
 		return data;
