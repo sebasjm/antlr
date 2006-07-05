@@ -490,16 +490,20 @@ public class DFA {
 	}
 
 	protected void createEOTTable(DFAState s) {
+		eot.set(s.stateNumber, new Integer(-1));
+		eof.set(s.stateNumber, new Integer(-1));
 		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
 			Transition edge = (Transition) s.transition(j);
 			Label label = edge.label;
-			if ( label.isAtom() && label.getAtom()==Label.EOT ) {
-				// eot[s] points to accept state
-				eot.set(s.stateNumber, new Integer(edge.target.stateNumber));
-			}
-			else if ( label.isAtom() && label.getAtom()==Label.EOF ) {
-				// eof[s] points to accept state
-				eof.set(s.stateNumber, new Integer(edge.target.stateNumber));
+			if ( label.isAtom() ) {
+				if ( label.getAtom()==Label.EOT ) {
+					// eot[s] points to accept state
+					eot.set(s.stateNumber, new Integer(edge.target.stateNumber));
+				}
+				else if ( label.getAtom()==Label.EOF ) {
+					// eof[s] points to accept state
+					eof.set(s.stateNumber, new Integer(edge.target.stateNumber));
+				}
 			}
 		}
 	}
