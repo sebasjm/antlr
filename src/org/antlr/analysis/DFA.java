@@ -346,6 +346,9 @@ public class DFA {
 		}
 		while ( it.hasNext() ) {
 			DFAState s = (DFAState)it.next();
+			// init EOT/EOF tables; need to be -1
+			eot.set(s.stateNumber, new Integer(-1));
+			eof.set(s.stateNumber, new Integer(-1));
 			if ( s.isAcceptState() ) {
 				// can't compute min,max,special,transition on accepts
 				accept.set(s.stateNumber,
@@ -490,8 +493,6 @@ public class DFA {
 	}
 
 	protected void createEOTTable(DFAState s) {
-		eot.set(s.stateNumber, new Integer(-1));
-		eof.set(s.stateNumber, new Integer(-1));
 		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
 			Transition edge = (Transition) s.transition(j);
 			Label label = edge.label;
