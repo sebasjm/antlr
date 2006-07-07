@@ -385,7 +385,7 @@ public abstract class SemanticContext {
 			if ( gatedRight==null ) {
 				return gatedLeft;
 			}
-			return new AND(gatedLeft, gatedRight);
+			return new OR(gatedLeft, gatedRight);
 		}
 		public boolean isSyntacticPredicate() {
 			return left.isSyntacticPredicate()||right.isSyntacticPredicate();
