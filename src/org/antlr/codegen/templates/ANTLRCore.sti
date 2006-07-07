@@ -259,7 +259,7 @@ eotDFAEdge(targetStateNumber,edgeNumber, predicates);
 
 andPredicates(left,right);
 
-orPredicates(left,right);
+orPredicates(operands);
 
 notPredicate(pred);
 

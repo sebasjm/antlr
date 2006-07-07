@@ -253,7 +253,7 @@ public class TestSemanticPredicates extends TestSuite {
 			".s0-A->.s1\n" +
 			".s1-B->:s2=>1\n" +
 			".s1-C->:s3=>2\n" +
-			".s1-{!((p2||p3))}?->:s5=>4\n" +
+			".s1-{!((p3||p2))}?->:s5=>4\n" +
 			".s1-{p2}?->:s4=>3\n" +
 			".s1-{p3}?->:s6=>5\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
@@ -354,10 +354,10 @@ public class TestSemanticPredicates extends TestSuite {
 			"B : {p}? => 'a' ;\n" +
 			"C : {q}? => ('a'|'b')+ ;");
 		String expecting =
-			".s0-'a'&&{(q||p)}?->.s1\n" +
+			".s0-'a'&&{(p||q)}?->.s1\n" +
 			".s0-'b'&&{q}?->:s4=>2\n" +
 			".s1-'a'..'b'&&{q}?->:s4=>2\n" +
-			".s1-<EOT>&&{(q||p)}?->.s2\n" +
+			".s1-<EOT>&&{(p||q)}?->.s2\n" +
 			".s2-{p}?->:s3=>1\n" +
 			".s2-{q}?->:s4=>2\n";
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
@@ -373,7 +373,7 @@ public class TestSemanticPredicates extends TestSuite {
 			".s0-'b'&&{q}?->:s5=>2\n" +
 			".s1-'a'&&{(p||q)}?->.s1\n" +
 			".s1-'b'&&{q}?->:s5=>2\n" +
-			".s1-'x'&&{(q||p)}?->.s2\n" +
+			".s1-'x'&&{(p||q)}?->.s2\n" +
 			".s2-<EOT>&&{(p||q)}?->.s3\n" +
 			".s3-{p}?->:s4=>1\n" +
 			".s3-{q}?->:s5=>2\n";

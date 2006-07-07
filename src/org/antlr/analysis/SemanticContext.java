@@ -33,6 +33,9 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.tool.ANTLRParser;
 import org.antlr.tool.GrammarAST;
 import org.antlr.tool.Grammar;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /** A binary tree structure used to record the semantic context in which
  *  an NFA configuration is valid.  It's either a single predicate or
@@ -49,6 +52,10 @@ import org.antlr.tool.Grammar;
  *
  *  I have scoped the AND, NOT, OR, and Predicate subclasses of
  *  SemanticContext within the scope of this outer class.
+ *
+ *  July 7, 2006: TJP altered OR to be set of operands. the Binary tree
+ *  made it really hard to reduce complicated || sequences to their minimum.
+ *  Got huge repeated || conditions.
  */
 public abstract class SemanticContext {
 	/** Create a default value for the semantic context shared among all
@@ -57,8 +64,6 @@ public abstract class SemanticContext {
 	 *  just an empty set of predicates.
 	 */
 	public static final SemanticContext EMPTY_SEMANTIC_CONTEXT = new Predicate();
-
-	public abstract SemanticContext reduce();
 
 	/** Given a semantic context expression tree, return a tree with all
 	 *  nongated predicates set to true and then reduced.  So p&&(q||r) would
@@ -125,14 +130,10 @@ public abstract class SemanticContext {
 			this.constantValue = p.constantValue;
 		}
 
-		public SemanticContext reduce() {
-			// single pred is already reduced
-			return this;
-		}
-
 		/** Two predicates are the same if they are literally the same
 		 *  text rather than same node in the grammar's AST.
 		 *  Or, if they have the same constant value, return equal.
+		 *  As of July 2006 I'm not sure these are needed.
 		 */
 		public boolean equals(Object o) {
 			if ( !(o instanceof Predicate) ) {
@@ -263,20 +264,6 @@ public abstract class SemanticContext {
 			this.left = a;
 			this.right = b;
 		}
-		public SemanticContext reduce() {
-			left.reduce();
-			right.reduce();
-			return this;
-		}
-		public boolean equals(Object o) {
-			if ( !(o instanceof AND) ) {
-				return false;
-			}
-			return left.equals(((AND)o).left) && right.equals(((AND)o).right);
-		}
-		public int hashCode() {
-			return left.hashCode() + right.hashCode();
-		}
 		public StringTemplate genExpr(CodeGenerator generator,
 									  StringTemplateGroup templates,
 									  DFA dfa)
@@ -316,50 +303,21 @@ public abstract class SemanticContext {
 	}
 
 	public static class OR extends SemanticContext {
-		protected SemanticContext left,right;
+		protected Set operands;
 		public OR(SemanticContext a, SemanticContext b) {
-			this.left = a;
-			this.right = b;
-		}
-		/** Interestingly, I only seem to need OR's reduce */
-		public SemanticContext reduce() {
-			// (p1a||p1b)||p1a => p1a||p1b where a=(p1a||p1b) and b=p1a
-			left.reduce();
-			right.reduce();
-			// (p||q)||p => p||q or vice versa
-			if ( left instanceof OR && right instanceof Predicate ) {
-				OR leftOr = (OR)left;
-				Predicate p = (Predicate)right;
-				if ( leftOr.left.equals(p) || leftOr.right.equals(p) ) {
-					return left;
-				}
+			operands = new HashSet();
+			if ( a instanceof OR ) {
+				operands.addAll(((OR)a).operands);
 			}
-			if ( left instanceof Predicate && right instanceof OR ) {
-				OR rightOr = (OR)right;
-				Predicate p = (Predicate)left;
-				if ( rightOr.left.equals(p) || rightOr.right.equals(p) ) {
-					return right;
-				}
+			else if ( a!=null ) {
+				operands.add(a);
 			}
-			// p||!p => true
-			if ( left.equals(not(right)) ) {
-				return new TruePredicate(); // return true pred
+			if ( b instanceof OR ) {
+				operands.addAll(((OR)b).operands);
 			}
-			// !p||p => true
-			if ( right.equals(not(left)) ) {
-				return new TruePredicate(); // return true pred
+			else if ( b!=null ) {
+				operands.add(b);
 			}
-
-			return this;
-		}
-		public boolean equals(Object o) {
-			if ( !(o instanceof OR) ) {
-				return false;
-			}
-			return left.equals(((OR)o).left) && right.equals(((OR)o).right);
-		}
-		public int hashCode() {
-			return left.hashCode() + right.hashCode();
 		}
 		public StringTemplate genExpr(CodeGenerator generator,
 									  StringTemplateGroup templates,
@@ -370,32 +328,54 @@ public abstract class SemanticContext {
 				eST = templates.getInstanceOf("orPredicates");
 			}
 			else {
-				eST = new StringTemplate("($left$||$right$)");
+				eST = new StringTemplate("($first(operands)$$rest(operands):{o | ||$o$}$)");
 			}
-			eST.setAttribute("left", left.genExpr(generator,templates,dfa));
-			eST.setAttribute("right", right.genExpr(generator,templates,dfa));
+			for (Iterator it = operands.iterator(); it.hasNext();) {
+				SemanticContext semctx = (SemanticContext) it.next();
+				eST.setAttribute("operands", semctx.genExpr(generator,templates,dfa));
+			}
 			return eST;
 		}
 		public SemanticContext getGatedPredicateContext() {
-			SemanticContext gatedLeft = left.getGatedPredicateContext();
-			SemanticContext gatedRight = right.getGatedPredicateContext();
-			if ( gatedLeft==null ) {
-				return gatedRight;
+			SemanticContext result = null;
+			for (Iterator it = operands.iterator(); it.hasNext();) {
+				SemanticContext semctx = (SemanticContext) it.next();
+				SemanticContext gatedPred = semctx.getGatedPredicateContext();
+				if ( gatedPred!=null ) {
+					result = new OR(result, gatedPred);
+				}
 			}
-			if ( gatedRight==null ) {
-				return gatedLeft;
-			}
-			return new OR(gatedLeft, gatedRight);
+			return result;
 		}
 		public boolean isSyntacticPredicate() {
-			return left.isSyntacticPredicate()||right.isSyntacticPredicate();
+			for (Iterator it = operands.iterator(); it.hasNext();) {
+				SemanticContext semctx = (SemanticContext) it.next();
+				if ( semctx.isSyntacticPredicate() ) {
+					return true;
+				}
+			}
+			return false;
 		}
 		public void trackUseOfSyntacticPredicates(Grammar g) {
-			left.trackUseOfSyntacticPredicates(g);
-			right.trackUseOfSyntacticPredicates(g);
+			for (Iterator it = operands.iterator(); it.hasNext();) {
+				SemanticContext semctx = (SemanticContext) it.next();
+				semctx.trackUseOfSyntacticPredicates(g);
+			}
 		}
 		public String toString() {
-			return "("+left+"||"+right+")";
+			StringBuffer buf = new StringBuffer();
+			buf.append("(");
+			int i = 0;
+			for (Iterator it = operands.iterator(); it.hasNext();) {
+				SemanticContext semctx = (SemanticContext) it.next();
+				if ( i>0 ) {
+					buf.append("||");
+				}
+				buf.append(semctx.toString());
+				i++;
+			}
+			buf.append(")");
+			return buf.toString();
 		}
 	}
 
@@ -403,19 +383,6 @@ public abstract class SemanticContext {
 		protected SemanticContext ctx;
 		public NOT(SemanticContext ctx) {
 			this.ctx = ctx;
-		}
-		public SemanticContext reduce() {
-			ctx.reduce();
-			return this;
-		}
-		public boolean equals(Object o) {
-			if ( !(o instanceof NOT) ) {
-				return false;
-			}
-			return ctx.equals(((NOT)o).ctx);
-		}
-		public int hashCode() {
-			return ctx.hashCode();
 		}
 		public StringTemplate genExpr(CodeGenerator generator,
 									  StringTemplateGroup templates,
@@ -459,7 +426,7 @@ public abstract class SemanticContext {
 		if ( a.equals(b) ) {
 			return a; // if same, just return left one
 		}
-		return new AND(a,b).reduce();
+		return new AND(a,b);
 	}
 
 	public static SemanticContext or(SemanticContext a, SemanticContext b) {
@@ -469,14 +436,11 @@ public abstract class SemanticContext {
 		if ( b==EMPTY_SEMANTIC_CONTEXT || b==null ) {
 			return a;
 		}
-		if ( a.equals(b) ) {
-			return a; // if same, just return left one
-		}
-		return new OR(a,b).reduce();
+		return new OR(a,b);
 	}
 
 	public static SemanticContext not(SemanticContext a) {
-		return new NOT(a).reduce();
+		return new NOT(a);
 	}
 
 }
