@@ -363,6 +363,20 @@ public class TestSemanticPredicates extends TestSuite {
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
 	}
 
+	public void testGatedPredHoistsAndCanBeInStopState() throws Exception {
+		// I found a bug where merging stop states made us throw away
+		// a stop state with a gated pred!
+		Grammar g = new Grammar(
+			"grammar u;\n" +
+			"a : b+ ;\n" +
+			"b : 'x' | {p}?=> 'y' ;");
+		String expecting =
+			".s0-'x'->:s2=>1\n" +
+			".s0-'y'&&{p}?->:s3=>1\n" +
+			".s0-EOF->:s1=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
 	public void testGatedPredInCyclicDFA() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -547,7 +561,7 @@ public class TestSemanticPredicates extends TestSuite {
 			"  ;\n");
 		String expecting =
 			".s0-X->.s1\n" +
-			".s1-{((b&&c)||(a&&c))}?->:s2=>1\n" +
+			".s1-{((a&&c)||(b&&c))}?->:s2=>1\n" +
 			".s1-{c}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
