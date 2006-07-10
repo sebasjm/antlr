@@ -117,7 +117,7 @@ public class DFAOptimizer {
 	public static boolean PRUNE_EBNF_EXIT_BRANCHES = true;
 	public static boolean PRUNE_TOKENS_RULE_SUPERFLUOUS_EOT_EDGES = true;
 	public static boolean COLLAPSE_ALL_PARALLEL_EDGES = true;
-	public static boolean MERGE_STOP_STATES = false;
+	public static boolean MERGE_STOP_STATES = true;
 
 	/** Used by DFA state machine generator to avoid infinite recursion
 	 *  resulting from cycles int the DFA.  This is a set of int state #s.

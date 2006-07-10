@@ -949,33 +949,45 @@ public class NFAToDFAConverter {
 
 	protected DFAState convertToAcceptState(DFAState d, int alt) {
 		// only merge stop states if they are deterministic and no
-		// recursion problems.
+		// recursion problems and only if they have the same gated pred
+		// context!
 		// Later, the error reporting may want to trace the path from
 		// the start state to the nondet state
 		if ( DFAOptimizer.MERGE_STOP_STATES &&
 			d.getNondeterministicAlts()==null &&
 			!d.abortedDueToRecursionOverflow )
-			//!dfa.probe.dfaStateHasRecursionOverflow(d) )
 		{
 			// check to see if we already have an accept state for this alt
 			// [must do this after we resolve nondeterminisms in general]
 			DFAState acceptStateForAlt = dfa.getAcceptState(alt);
 			if ( acceptStateForAlt!=null ) {
 				// we already have an accept state for alt;
-				// make this d.statenumber point at old DFA state
-				dfa.setState(d.stateNumber, acceptStateForAlt);
-				dfa.removeState(d);    // remove this state from unique DFA state set
-				d = acceptStateForAlt; // use old accept state; throw this one out
+				// Are their gate sem pred contexts the same?
+				// For now we assume a braindead version: both must not
+				// have gated preds or share exactly same single gated pred.
+				// The equals() method is only defined on Predicate contexts not
+				// OR etc...
+				SemanticContext gatedPreds = d.getGatedPredicatesInNFAConfigurations();
+				SemanticContext existingStateGatedPreds =
+					acceptStateForAlt.getGatedPredicatesInNFAConfigurations();
+				if ( (gatedPreds==null && existingStateGatedPreds==null) ||
+				     (gatedPreds!=null && existingStateGatedPreds!=null) ||
+					 gatedPreds.equals(existingStateGatedPreds) )
+				{
+					// make this d.statenumber point at old DFA state
+					dfa.setState(d.stateNumber, acceptStateForAlt);
+					dfa.removeState(d);    // remove this state from unique DFA state set
+					d = acceptStateForAlt; // use old accept state; throw this one out
+					return d;
+				}
+				// else consider it a new accept state; fall through.
 			}
-			else {
-				d.setAcceptState(true); // new accept state for alt
-				dfa.setAcceptState(alt, d);
-			}
-		}
-		else {
 			d.setAcceptState(true); // new accept state for alt
 			dfa.setAcceptState(alt, d);
+			return d;
 		}
+		d.setAcceptState(true); // new accept state for alt
+		dfa.setAcceptState(alt, d);
 		return d;
 	}
 
