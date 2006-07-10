@@ -770,15 +770,11 @@ public class CodeGenerator {
 	 *  languages no translation is needed.
 	 */
 	public String getTokenTypeAsTargetLabel(int ttype) {
-		String name = grammar.getTokenDisplayName(ttype);
 		if ( grammar.type==Grammar.LEXER ) {
+			String name = grammar.getTokenDisplayName(ttype);
 			return target.getTargetCharLiteralFromANTLRCharLiteral(this,name);
 		}
-		// If name is a literal, return the token type instead
-		if ( name.charAt(0)=='\'' ) {
-			return String.valueOf(ttype);
-		}
-		return name;
+		return target.getTokenTypeAsTargetLabel(this,ttype);
 	}
 
 	/** Generate a token vocab file with all the token names/types.  For example:

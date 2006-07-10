@@ -136,6 +136,16 @@ public class Target {
 		return false;
 	}
 
+	/** Target must be able to override the labels used for token types */
+	public String getTokenTypeAsTargetLabel(CodeGenerator generator, int ttype) {
+		String name = generator.grammar.getTokenDisplayName(ttype);
+		// If name is a literal, return the token type instead
+		if ( name.charAt(0)=='\'' ) {
+			return String.valueOf(ttype);
+		}
+		return name;
+	}
+
 	/** Convert from an ANTLR char literal found in a grammar file to
 	 *  an equivalent char literal in the target language.  For most
 	 *  languages, this means leaving 'x' as 'x'.  Actually, we need
