@@ -493,6 +493,13 @@ public class DFA {
 				}
 			}
 		}
+		// now add an empty row for states with no transitions;
+		// otherwise ST skips entry
+		for (int i = 0; i < transition.size(); i++) {
+			if (transition.elementAt(i) == null) {
+				transition.setElementAt(new ArrayList(), i);
+			}
+		}
 	}
 
 	protected void createEOTTable(DFAState s) {
