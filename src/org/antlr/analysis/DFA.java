@@ -497,7 +497,7 @@ public class DFA {
 		// otherwise ST skips entry
 		for (int i = 0; i < transition.size(); i++) {
 			if (transition.elementAt(i) == null) {
-				transition.setElementAt(new ArrayList(), i);
+				transition.setElementAt(new Vector(), i);
 			}
 		}
 	}
