@@ -1452,6 +1452,21 @@ public class Grammar {
 		return tokenIDToTypeMap.keySet();
 	}
 
+	/** Return an ordered integer list of token types that have no
+	 *  corresponding token ID like INT or KEYWORD_BEGIN; for stuff
+	 *  like 'begin'.
+	 */
+	public Collection getTokenTypesWithoutID() {
+		List types = new ArrayList();
+		for (int t =Label.MIN_TOKEN_TYPE; t<=getMaxTokenType(); t++) {
+			String name = getTokenDisplayName(t);
+			if ( name.charAt(0)=='\'' ) {
+				types.add(new Integer(t));
+			}
+		}
+		return types;
+	}
+
 	/** Get a list of all token IDs and literals that have an associated
 	 *  token type.
 	 */

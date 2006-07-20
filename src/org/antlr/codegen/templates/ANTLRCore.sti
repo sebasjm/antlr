@@ -45,17 +45,17 @@ headerFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
            bitsets, buildTemplate, profile, backtracking, synpreds,
            memoize, numRules, fileName, ANTLRVersion, generatedTimestamp);
 
-lexer(name, tokens, scopes, rules, numRules, cyclicDFAs, labelType,
+lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType,
       filterMode);
 
-parser(name, scopes, tokens, tokenNames, rules, numRules,
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
        cyclicDFAs, bitsets, ASTLabelType, superClass,
        labelType, members);
 
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules,
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules,
            numRules, cyclicDFAs, bitsets, labelType, ASTLabelType,
            superClass, members);
 

@@ -418,6 +418,9 @@ public class CodeGenerator {
 			genTokenTypeNames(headerFileST);
 		}
 
+		// all recognizers can see Grammar object
+		recognizerST.setAttribute("grammar", grammar);
+
 		// WRITE FILES
 		try {
 			target.genRecognizerFile(tool,this,grammar,outputFileST);
