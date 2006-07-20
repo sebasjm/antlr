@@ -53,7 +53,7 @@
         <mkdir dir="${lib.dir}"/>
         <jar jarfile="${antlr3.jar}">
 	  <fileset dir="${basedir}" includes="LICENSE.txt"/>
-	  <fileset dir="${src.dir}" includes="**/*.stg, **/*.st"/>
+          <fileset dir="${src.dir}" includes="**/*.stg, **/*.st, **/*.sti"/>
 	  <fileset dir="${build.dir}" includes="**/*.class"/>
 	  <manifest>
 	    <attribute name="Version" value="${version}"/>
