@@ -350,18 +350,22 @@ public class DFA {
 		while ( it.hasNext() ) {
 			DFAState s = (DFAState)it.next();
 			// init EOT/EOF tables; need to be -1
+			/*
 			eot.set(s.stateNumber, new Integer(-1));
 			eof.set(s.stateNumber, new Integer(-1));
+			*/
 			if ( s.isAcceptState() ) {
 				// can't compute min,max,special,transition on accepts
 				accept.set(s.stateNumber,
 						   new Integer(s.getUniquelyPredictedAlt()));
+				/*
 				special.set(s.stateNumber, new Integer(-1)); // not special
 				min.set(s.stateNumber, new Integer(0));
 				max.set(s.stateNumber, new Integer(0));
+				*/
 			}
 			else {
-				accept.set(s.stateNumber, new Integer(0)); // doesn't predict
+				//accept.set(s.stateNumber, new Integer(0)); // doesn't predict
 				createMinMaxTables(s);
 				createTransitionTable(s);
 				createSpecialTable(generator, s);
