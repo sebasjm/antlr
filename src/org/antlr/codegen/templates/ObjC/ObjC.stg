@@ -1,6 +1,6 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2005-2006 Terence Parr
+ Copyright (c) 2005 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,16 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-group ObjC;
+/*
+	Template group file for the Objective C code generator.
+	Heavily based on Java.stg
+
+	Written by Kay Roepke <kroepke(at)classdump.org>
+
+	This file is part of ANTLR and subject to the same license as ANTLR itself.
+*/
+
+group ObjC implements ANTLRCore;
 
 objcTypeInitMap ::= [
 	"int":"0",
@@ -38,210 +47,338 @@ objcTypeInitMap ::= [
 	"short":"0",
 	"char":"0",
 	"id":"nil",
-	default:"null" // anything other than an atomic type
+	default:"nil" // anything other than an atomic type
 ]
 
 /** The overall file structure of a recognizer; stores methods for rules
  *  and cyclic DFAs plus support code.
  */
-
-outputFile( LEXER,
-			PARSER,
-			TREE_PARSER,
-			actionScope,
-			actions,
-			docComment,
-			recognizer,
-			name,
-			tokens,
-			tokenNames,
-			rules,
-			cyclicDFAs,
-			bitsets,
-			buildTemplate,
-			profile,
-			backtracking,
-			synpreds,
-			memoize,
-			numRules,
-			fileName,
-			ANTLRVersion,
-			generatedTimestamp) ::=
+outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
+           docComment, recognizer,
+           name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors, bitsets,
+           buildTemplate, profile,
+	   backtracking, synpreds, memoize, numRules,
+	   fileName, ANTLRVersion, generatedTimestamp, trace) ::=
 <<
-/* Header actions */
+// $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 <actions.(actionScope).header>
-/* end header actions */
 
+<@imports>
 #import "<name>.h"
+<@end>
 
 <docComment>
-
 <recognizer>
 >>
 
 
-headerFile( LEXER,
-			PARSER,
-			TREE_PARSER,
-			actionScope,
-			actions,
-			docComment,
-			recognizer,
-			name,
-			tokens,
-			tokenNames,
-			rules,
-			cyclicDFAs,
-			bitsets,
-			buildTemplate,
-			profile,
-			backtracking,
-			synpreds,
-			memoize,
-			numRules,
-			fileName,
-			ANTLRVersion,
-			generatedTimestamp) ::=
+headerFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
+           recognizer, name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors,
+           bitsets, buildTemplate, profile, backtracking, synpreds,
+           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass) ::=
 <<
+// $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
-<actions.(actionScope).header>
-<buildTemplate.name>
-
-<if(TREE_PARSER)>
-// Sorry, this isn't done yet.
-<endif>
+#import \<Cocoa/Cocoa.h>
+#import \<ANTLR/ANTLR.h>
 
 <if(LEXER)>
-<tokens:{#define <it.name> <it.type> }; separator="\n">
-
-// Cyclic DFA state subclasses
-<cyclicDFAStateInterface(...)>
-
-// Cyclic DFAs newstyle
-<cyclicDFAInterface(...)>
-
-// The Lexer
-#pragma mark Lexer
-@interface <name> : ANTLRLexer {
-	// Cyclic DFAs
-	<cyclicDFAs:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
-}
-
-<actions.lexer.members>
-
-- (id) initWithCharStream:(ANTLRCharStream *)input;
-- (ANTLRToken *) nextToken;
-
-<rules:{rule |
-- (void) m<rule.ruleName><if(rule.ruleDescriptor.parameterScope)>:(<name><rule.ruleName>Parameter *)parameter<endif>; // TODO: parameterScope
-}>
-
-<synpreds:{p | <lexerSynpred(name=p)>}>
-
-@end
-
-
+<lexerHeaderFile(...)>
+<endif>
+<if(PARSER)>
+<parserHeaderFile(...)>
 <endif>
 >>
 
-lexer(name, tokens, rules, numRules, cyclicDFAs) ::= <<
+lexerHeaderFile() ::=
+<<
+#pragma mark Cyclic DFA start
+<cyclicDFADescriptors:cyclicDFAInterface()>
+#pragma mark Cyclic DFA end
 
-<cyclicDFAs>
+#pragma mark Rule return scopes start
+<rules:{rule |
+<rule.ruleDescriptor:returnScopeInterface(ruleDescriptor=rule.ruleDescriptor)>
+}>
+#pragma mark Rule return scopes end
 
-// The Lexer
-#pragma mark L e x e r
-@implementation <name> 
+#pragma mark Tokens
+<tokens:{#define <name>_<it.name>	<it.type>}; separator="\n">
 
-<actions.lexer.members>
+@interface <name> : ANTLRLexer {
+	<cyclicDFADescriptors:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
+	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
+	<actions.lexer.ivars>
+}
 
-- (id) initWithCharStream:(ANTLRCharStream *)input;
-- (ANTLRToken *) nextToken;
+<actions.lexer.methodsdecl>
 
-<rules; separator="\n">
+<rules:{rule |
+- (<rule.ruleDescriptor:{ruleDescriptor|<returnType()>}>) m<rule.ruleName><if(rule.ruleDescriptor.parameterScope)><rule.ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>;
+}>
 
-<synpreds:{p | <lexerSynpred(name=p)>}>
 
 @end
 >>
 
+lexer(name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="Token",
+      filterMode) ::= <<
+#pragma mark Cyclic DFA start
+<cyclicDFADescriptors:cyclicDFA()>
+#pragma mark Cyclic DFA end
+
+
+
+#pragma mark Rule return scopes start
+<rules:{rule |
+<rule.ruleDescriptor:returnScope(ruleDescriptor=rule.ruleDescriptor)>
+}>
+#pragma mark Rule return scopes end
+@implementation <name>
+
+<actions.lexer.methods>
+
+- (id) initWithCharStream:(id\<ANTLRCharStream>)anInput
+{
+	if (nil!=(self = [super initWithCharStream:anInput])) {
+		<if(memoize)>
+		// init memoize facility
+		<endif>
+		<synpreds:{p | <lexerSynpred(name=p)>};separator="\n">
+		<cyclicDFADescriptors:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
+		<actions.lexer.init>
+	}
+	return self;
+}
+
+- (void) dealloc
+{
+	<cyclicDFADescriptors:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
+<actions.lexer.dealloc>
+	[super dealloc];
+}
+
+<if(actions.lexer.reset)>
+- (void) reset
+{
+<actions.lexer.reset>
+	[super reset];
+}
+<endif>
+
+<if(filterMode)>
+<filteringNextToken()>
+<endif>
+
+<rules; separator="\n\n">
+
+@end
+>>
+
+/** A override of Lexer.nextToken() that backtracks over mTokens() looking
+ *  for matches.  No error can be generated upon error; just rewind, consume
+ *  a token and then try again.  backtracking needs to be set as well.
+ */
+filteringNextToken() ::= <<
+- (ANTLRToken *) nextToken
+{
+	[self setToken:nil];
+    tokenStartCharIndex = [self charIndex];
+    while (YES) {
+        if ( [input LA:1] == ANTLRCharStreamEOF ) {
+            return nil; // should really be a +eofToken call here -> go figure
+        }
+        @try {
+            int m = [input mark];
+            backtracking = 1;
+            failed = NO;
+            [self mTokens];
+            backtracking = 0;
+            [input rewind:m];
+            if ( failed ) {
+                [input consume]; <! // advance one char and try again !>
+            } else {
+                [self mTokens];
+                return token;
+            }
+        }
+        @catch (ANTLRRecognitionException *re) {
+            // shouldn't happen in backtracking mode, but...
+            [self reportError:re];
+            [self recover:re];
+        }
+    }
+}
+>>
+
+filteringActionGate() ::= "backtracking==1"
+
+parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
+           recognizer, name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors,
+           bitsets, buildTemplate, profile, backtracking, synpreds,
+           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass="ANTLRParser") ::=
+<<
+
+#pragma mark Cyclic DFA start
+<cyclicDFADescriptors:cyclicDFAInterface()>
+#pragma mark Cyclic DFA end
+
+#pragma mark Tokens
+<tokens:{#define <name>_<it.name>	<it.type>}; separator="\n">
+
+@interface <name> : <@superClassName><superClass><@end> {
+
+	<cyclicDFADescriptors:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
+ 	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
+	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
+
+ 	<actions.parser.ivars>
+ }
+
+ <actions.parser.methodsdecl>
+
+ <rules:{rule |
+ - (<rule.ruleDescriptor:{ruleDescriptor|<returnType()>}>) <rule.ruleName><if(rule.ruleDescriptor.parameterScope)><rule.ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>;
+ }>
+
+
+@end
+>>
+
+/** How to generate a parser */
 genericParser(name, scopes, tokens, tokenNames, rules, numRules,
               cyclicDFAs, bitsets, inputStreamType, superClass,
-              ASTLabelType="Object", labelType) ::= <<
+              ASTLabelType="id", labelType, members) ::= <<
 
+#pragma mark Cyclic DFA start
+<cyclicDFADescriptors:cyclicDFA()>
+#pragma mark Cyclic DFA end
+
+<bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
+
+@implementation <name>
+
++ (void) initialize
+{
+	<bitsets:bitsetInit(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
+}
+
+- (id) initWithTokenStream:(id\<ANTLRTokenStream>)aStream
+{
+	if ((self = [super initWithTokenStream:aStream])) {
+		tokenNames = [[NSArray alloc] initWithObjects:@"\<invalid>", @"\<EOR>", @"\<DOWN>", @"\<UP>", <tokenNames:{@<it>}; separator=", ", wrap="    ">, nil];
+<if(backtracking)>
+		ruleMemo = [[NSMutableDictionary alloc] init];
+<endif>
+		<cyclicDFADescriptors:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
+		<actions.parser.init>
+	}
+	return self;
+}
+
+- (void) dealloc
+{
+	[tokenNames release];
+<if(backtracking)>
+	[ruleMemo release];
+<endif>
+	<cyclicDFADescriptors:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
+	<actions.parser.dealloc>
+	[super dealloc];
+}
+
+<members>
+
+<rules; separator="\n\n">
+
+<synpreds:{p | <synpred(p)>}>
+
+@end
 >>
 
-parser(name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token") ::= <<
-<genericParser(inputStreamType="TokenStream", ...)>
+parser(name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="ANTLRParser", labelType="ANTLRToken *", members={<actions.parser.members>}) ::= <<
+<genericParser(inputStreamType="ANTLRTokenStream", ...)>
 >>
 
-/** How to generate a tree parser; same as parser except the input
- *  stream is a different type.
+treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ANTLRASTLabelType>}, ASTLabelType="id", superClass="ANTLRTreeParser", members={<actions.treeparser.members>}) ::= <<
+<genericParser(inputStreamType="ANTLRTreeNodeStream *", ...)>
+>>
+/** A simpler version of a rule template that is specific to the imaginary
+ *  rules created for syntactic predicates.  As they never have return values
+ *  nor parameters etc..., just give simplest possible method.  Don't do
+ *  any of the normal memoization stuff in here either; it's a waste.
+ *  As predicates cannot be inlined into the invoking rule, they need to
+ *  be in a rule by themselves.
  */
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser") ::= <<
-<genericParser(inputStreamType="TreeNodeStream", ...)>
+synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
+<<
+#error No synpreds yet.
 >>
+
 
 synpred(name) ::= <<
-// synpred
-@interface <name>Ptr(GrammarFragmentPtr) {
-}
-- (void) invoke;
-@end
+#error No synpreds yet.
 >>
 
 lexerSynpred(name) ::= <<
-//lexer synpred
-@interface <name>Ptr(GrammarFragmentPtr) {
-}
-- (void) invoke;
-@end
+<name>SyntacticPredicate = @selector(m<name>_fragment);
 >>
 
 ruleMemoization(name) ::= <<
 <if(memoize)>
-int <ruleDescriptor.name>_StartIndex = [input index];
-if ( backtracking > 0 && [self alreadyParsedRule:<ruleDescriptor.index> withInput:input] ) { return; }
+if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { return <ruleReturnValue()>; }
 <endif>
 >>
 
-// R U L E S
 
-/** How to generate code for a rule.  This includes any return type
- *  data aggregates required for multiple return values.
+/** How to generate code for a rule.
+ *  The return type aggregates are declared in the header file (headerFile template)
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description) ::= <<
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions, memoize) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
-<returnScope(scope=ruleDescriptor.returnScope)>
 
 // $ANTLR start <ruleName>
 // <fileName>:<description>
-public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
+- (<returnType()>) <ruleName><ruleDescriptor.parameterScope:parameterScope(scope=it)>
+{
+    <if(trace)>NSLog(@"enter <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);<endif>
     <ruleDeclarations()>
     <ruleLabelDefs()>
-    <ruleMemoization(name=ruleName)>
     <ruleDescriptor.actions.init>
     <@preamble()>
-<if(emptyRule)>
-    <block>
-    <ruleCleanUp()>
-<else>
-    try {
+    <ruleMemoization(name=ruleName)>
+    @try {
         <block>
     }
 <if(exceptions)>
     <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
 <else>
-    catch (RecognitionException re) {
-        reportError(re);
-        recover(input,re);
+<if(!emptyRule)>
+<if(actions.(actionScope).rulecatch)>
+    <actions.(actionScope).rulecatch>
+<else>
+    @catch (ANTLRRecognitionException *re) {
+        [self reportError:re];
+        [self recover:input exception:re];
     }<\n>
 <endif>
-    finally {
+<endif>
+<endif>
+    @finally {
+        <if(trace)>NSLog(@"exit <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);<endif>
         <ruleCleanUp()>
-    }<\n>
+<if(ruleDescriptor.actions.finally)>
+<if(backtracking)>
+        if ( backtracking==0 ) {
+            <ruleDescriptor.actions.finally>
+        }<\n>
+<else>
+        <ruleDescriptor.actions.finally>
 <endif>
+<endif>
+    }
     <@postamble()>
-    <ruleReturnValue()>
+    return <ruleReturnValue()>;
 }
 // $ANTLR end <ruleName>
 >>
@@ -253,93 +390,125 @@ catch (<e.decl>) {
 >>
 
 ruleDeclarations() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.push(new <it>_scope());}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
+<ruleDescriptor.useScopes:{<it>_stack addObject:(new <it>_scope());}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>_stack addObject:(new <it.name>_scope());}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<returnType()> retval = new <returnType()>();
-retval.start = (<labelType>)input.LT(1);<\n>
+<returnType()> retval = [[[<returnTypeName()> alloc] init] autorelease];
+[retval setStart:[input index]+1];<\n>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
 <endif>
 <endif>
+<if(memoize)>
+int <ruleDescriptor.name>_StartIndex = [input index];
+<endif>
 >>
 
 ruleLabelDefs() ::= <<
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
-    :{<labelType> <it.label.text>=null;}; separator="\n"
+    :{<labelType> <it.label.text> = nil;}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{List list_<it.label.text>=null;}; separator="\n"
+    :{NSMutableArray *list_<it.label.text> = nil;}; separator="\n"
 >
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(label=it); separator="\n"
 >
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{List list_<it>=new ArrayList();}; separator="\n"
+    :{NSMutableArray *list_<it> = [[NSMutableArray alloc] init];}; separator="\n"
 >
 >>
 
 ruleReturnValue() ::= <<
 <if(ruleDescriptor.hasReturnValue)>
 <if(ruleDescriptor.hasSingleReturnValue)>
-return <ruleDescriptor.singleValueReturnName>;<\n>
+<ruleDescriptor.singleValueReturnName>
 <else>
-return retval;<\n>
+retval
 <endif>
 <endif>
 >>
 
 ruleCleanUp() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
+//test token labels
+<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]:{[<it.label.text> release];}; separator="\n">
+//test token labels
+//test rule labels
+<[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]:{//[<it.label.text> release];}; separator="\n">
+//test rule labels
+<ruleDescriptor.useScopes:{[<it>_stack removeLastObject];}; separator="\n">
+<ruleDescriptor.ruleScope:{[<it.name>_stack removeLastObject];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval.stop = (<labelType>)input.LT(-1);
+[retval setStop:[input index]-1];<\n>
 <endif>
 <if(memoize)>
 <if(backtracking)>
-if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
+if ( backtracking>0 ) { [self memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex)]; }
 <endif>
 <endif>
 >>
 
+
 /** How to generate a rule in the lexer; naked blocks are used for
  *  fragment rules.
  */
-lexerRule(ruleName,nakedBlock,ruleDescriptor,block) ::= <<
-- (void) m<ruleName><if(ruleDescriptor.parameterScope)>:(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)<\n>#warning Parameterscope not implemented yet.<endif>
+lexerRule(ruleName,nakedBlock,ruleDescriptor,block, memoize) ::= <<
+
+<ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
+
+- (void) m<ruleName><if(ruleDescriptor.parameterScope)><ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>
 {
+    <if(trace)>NSLog(@"enter <ruleName> %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);<endif>
+	<ruleDeclarations()>
+	<ruleLabelDefs()>
+	@try {
 <ruleDescriptor.actions.init>
 <if(nakedBlock)>
-    <block><\n>
+        <ruleMemoization(name=ruleName)>
+		<block><\n>
 <else>
-    int type = <ruleName>;
-    int start = [self charIndex];
-    int line = [self line];
-    int charPosition = [self charPositionInLine];
-    int channel = [ANTLRToken defaultChannel];
-    <block>
-    if ( token == nil ) { [self emit:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]-1];}<\n>
+		int type = <name>_<ruleName>;
+		int start = [self charIndex];
+		int line = [self line];
+		int charPosition = [self charPositionInLine];
+		int channel = [ANTLRToken defaultChannel];
+		<block>
+		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}<\n>
 <endif>
+	}
+	@finally {
+        <if(trace)>NSLog(@"exit <ruleName> %@ failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);<endif>
+        // rule cleanup
+		<ruleCleanUp()>
+<if(backtracking)>
+		if ( backtracking == 0 ) {
+			<ruleDescriptor.actions.finally>
+		}<\n>
+<else>
+		<ruleDescriptor.actions.finally>
+<endif>
+	}
+	return;
 }
+// $ANTLR end <ruleName>
 >>
 
 /** How to generate code for the implicitly-defined lexer grammar rule
  *  that chooses between lexer rules.
  */
-tokensRule(ruleName,nakedBlock,args,block) ::= <<
+tokensRule(ruleName,nakedBlock,args,block,ruleDescriptor) ::= <<
 - (void) mTokens
 {
     <block><\n>
 }
 >>
 
-
 // S U B R U L E S
 
 /** A (...) subrule with multiple alternatives */
 block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description>
+// <fileName>:<description> // block
 int alt<decisionNumber>=<maxAlt>;
 <decls>
 <@predecision()>
@@ -354,7 +523,7 @@ switch (alt<decisionNumber>) {
 
 /** A rule block with multiple alternatives */
 ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description>
+// <fileName>:<description> //ruleblock
 int alt<decisionNumber>=<maxAlt>;
 <decls>
 <@predecision()>
@@ -366,7 +535,7 @@ switch (alt<decisionNumber>) {
 >>
 
 ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-// <fileName>:<description>
+// <fileName>:<description> // ruleBlockSingleAlt
 <decls>
 <@prealt()>
 <alts>
@@ -375,7 +544,7 @@ ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNu
 
 /** A special case of a (...) subrule with a single alternative */
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-// <fileName>:<description>
+// <fileName>:<description> // blockSingleAlt
 <decls>
 <@prealt()>
 <alts>
@@ -384,11 +553,11 @@ blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber
 
 /** A (..)+ block with 0 or more alternatives */
 positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-// <fileName>:<description>
+// <fileName>:<description>	// positiveClosureBlock
 int cnt<decisionNumber>=0;
 <decls>
 <@preloop()>
-loop<decisionNumber>:
+
 do {
     int alt<decisionNumber>=<maxAlt>;
     <@predecision()>
@@ -397,18 +566,16 @@ do {
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
 	default :
-	    if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
+	    if ( cnt<decisionNumber> >= 1 )  goto loop<decisionNumber>;
 	    <if(backtracking)>
             if (backtracking>0) { failed = YES; return; }
             <endif>
-#warning Not thought about exceptions, yet!
-//            EarlyExitException eee =
-//                new EarlyExitException(<decisionNumber>, input);
-            <@earlyExitException()>
-//            throw eee;
+			ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:<decisionNumber>];
+			<@earlyExitException()>
+			@throw eee;
     }
     cnt<decisionNumber>++;
-} while (true);
+} while (YES); loop<decisionNumber>: ;
 <@postloop()>
 >>
 
@@ -418,7 +585,6 @@ positiveClosureBlockSingleAlt ::= positiveClosureBlock
 closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 <decls>
 <@preloop()>
-loop<decisionNumber>:
 do {
     int alt<decisionNumber>=<maxAlt>;
     <@predecision()>
@@ -427,9 +593,9 @@ do {
     switch (alt<decisionNumber>) {
 	<alts:altSwitchCase()>
 	default :
-	    break loop<decisionNumber>;
+	    goto loop<decisionNumber>;
     }
-} while (true);
+} while (YES); loop<decisionNumber>: ;
 <@postloop()>
 >>
 
@@ -455,14 +621,13 @@ case <i> :
 
 /** An alternative is just a list of elements; at outermost level */
 alt(elements,altNum,description,autoAST,outerAlt) ::= <<
-// <fileName>:<description>
+// <fileName>:<description> // alt
 {
 <@declarations()>
 <elements:element()>
 <@cleanup()>
 }
 >>
-
 
 // E L E M E N T S
 
@@ -473,11 +638,11 @@ element() ::= <<
 >>
 
 /** match a token optionally with a label in front */
-tokenRef(token,label,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,tokenLabel) ::= <<
 <if(label)>
 <label>=(<labelType>)[input LT:1];<\n>
 <endif>
-[self match:input follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <if(backtracking)> if (failed) return;<endif>
+[self match:input tokenType:<tokenLabel> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <if(backtracking)> if (failed) return;<endif>
 >>
 
 /** ids+=ID */
@@ -495,12 +660,12 @@ charRef(char,label) ::= <<
 <if(label)>
 int <label> = [input LA:1];<\n>
 <endif>
-[self match:<char>];
+[self matchChar:<char>];
 <if(backtracking)>if (failed) return;<endif><\n>
 >>
 
 /** match a character range */
-charRangeRef(a,b) ::= "[self matchRange:<a>:<b>];<if(backtracking)> if (failed) return;<endif>"
+charRangeRef(a,b) ::= "[self matchRangeFromChar:<a> to:<b>];<if(backtracking)> if (failed) return;<endif>"
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
@@ -518,8 +683,7 @@ if (<s>) {
 		return;
 	}
 	<endif>
-#warning Think about exceptions!
-	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exception:nil description:input];
+	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
 <if(LEXER)>
 	[self recover:mse];
 <else>
@@ -538,11 +702,11 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 lexerStringRef(string,label) ::= <<
 <if(label)>
 int <label>Start = [self charIndex];
-[self match:<string>];
+[self matchString:<string>];
 <if(backtracking)>if (failed) return;<endif><\n>
-ANTLRToken *<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:kANTLRTokenInvalidTokenType channel:kANTLRDefaultChannel start:<label>Start, stop:[self charIndex]-1];
+<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:<label>Start, stop:[self charIndex]];
 <else>
-[self match:<string>];
+[self matchString:<string>];
 <if(backtracking)>if (failed) return;<endif><\n>
 <endif>
 >>
@@ -578,13 +742,13 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  and a return value or values.
  */
 ruleRef(rule,label,elementIndex,args) ::= <<
-[following push:FOLLLOW_<rule>_in_<ruleName><elementIndex>];
+[following addObject:FOLLOW_<rule>_in_<ruleName><elementIndex>];
 <if(label)>
-<label> = [self <rule><if(args)>:<args><endif>]<\n>
+<label> = [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
 <else>
-[self <rule><if(args)>:<args><endif>]<\n>
+[self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
 <endif>
-[following pop];
+[following removeLastObject];
 <if(backtracking)>if (failed) return;<endif><\n>
 >>
 
@@ -598,17 +762,29 @@ ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
 int <label>Start = [self charIndex];
-[self m<rule><if(args)>:<args><endif>];
+[self m<rule><if(args)>:<args; separator=" :"><endif>];
 <if(backtracking)>if (failed) return;<endif><\n>
-ANTLRToken *<label> = [[ANTRLCommonToken alloc] initWithInput:input tokenType:kANTLRTokenInvalidTokenType channel:kANTLRDefaultChannel start:<label>Start stop:[self charIndex]-1];
+<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:<label>Start stop:[self charIndex]];
 <else>
-[self m<rule><if(args)>:<args><endif>];
+[self m<rule><if(args)>:<args; separator=" :"><endif>];
 <if(backtracking)>if (failed) return;<endif><\n>
 <endif>
 >>
 
+/** EOF in the lexer */
+lexerMatchEOF(label) ::= <<
+#pragma mark ObjCify!
+<if(label)>
+int <label>Start = getCharIndex();
+match(EOF); <checkRuleBacktrackFailure()>
+<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<else>
+match(EOF); <checkRuleBacktrackFailure()>
+<endif>
+>>
+
 /** match ^(root children) in tree parser */
-tree(root, children) ::= <<
+tree(root, children,nullableChildList) ::= <<
 #warning Tree stuff incomplete!
 >>
 
@@ -620,9 +796,10 @@ validateSemanticPredicate(pred,description) ::= <<
 
 // F i x e d  D F A  (if-then-else)
 
-dfaState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
-int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
-<edges; separator="\nelse">
+dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
+{
+	int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
+	<edges; separator="\nelse ">
 else {
 <if(eotPredictsAlt)>
 	alt<decisionNumber> = <eotPredictsAlt>;
@@ -633,10 +810,12 @@ else {
 		return;
 	}
 	<endif>
-#warning Think about exceptions!
+    ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<decisionNumber> state:<stateNumber> stream:input];
 	<@noViableAltException()>
-	@throw nvae;
+	@throw nvae;<\n>
 <endif>
+	}
+}
 >>
 
 /** Same as a normal DFA state except that we don't examine lookahead
@@ -644,7 +823,7 @@ else {
  *  is faster, smaller, and more what people expect.  For (X)? people
  *  expect "if ( LA(1)==X ) match(X);" and that's it.
  */
-dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
 <edges; separator="\nelse">
 >>
@@ -655,7 +834,7 @@ int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
  *  This is used only in the lexer so that for ('a')* on the end of a rule
  *  anything other than 'a' predicts exiting.
  */
-dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
 <edges; separator="\nelse "><\n>
 <if(eotPredictsAlt)>
@@ -683,32 +862,34 @@ if ( <labelExpr> <if(predicates)>&& <predicates><endif>) {
 /** A DFA state where a SWITCH may be generated.  The code generator
  *  decides if this is possible: CodeGenerator.canGenerateSwitch().
  */
-dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 switch ([input LA:<k>]) {
 	<edges; separator="\n">
 default:
 <if(eotPredictsAlt)>
 	alt<decisionNumber> = <eotPredictsAlt>;
-<else>
+<else> {
 	<if(backtracking)>
 	if (backtracking > 0) {
 		failed = YES;
 		return;
 	}
 	<endif>
-#warning Think about exceptions!
+    ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<decisionNumber> state:<stateNumber> stream:input];
 	<@noViableAltException()>
-	@throw nvae;
+	@throw nvae;<\n>
+	}
 <endif>
+}
 >>
 
-dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 switch ([input LA:<k>]) {
 	<edges; separator="\n">
 }<\n>
 >>
 
-dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber) ::= <<
+dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 switch ([input LA:<k>]) {
 	<edges; separator="\n">
 <if(eotPredictsAlt)>
@@ -735,204 +916,134 @@ dfaDecision(decisionNumber,description) ::= <<
 alt<decisionNumber> = [dfa<decisionNumber> predict:input];
 >>
 
-/** The overall cyclic DFA chunk; contains all the DFA states
-*/
-cyclicDFA(className,decisionNumber,states,description) ::= <<
-#pragma mark C y c l i c   D F A
-<cyclicDFAs:{dfa |
-@implementation <name>DFA<dfa.decisionNumber>
+/** Used in headerFile */
+cyclicDFAInterface(dfa) ::= <<
+@interface <name>DFA<dfa.decisionNumber> : ANTLRDFA {} @end<\n>
+>>
 
-- (int) predict:(ANTLRIntStream *)input
-{
-	return [super predict:input startState:s0];
-}
+/** Used in lexer/parser implementation files */
+cyclicDFA(dfa) ::= <<
+@implementation <name>DFA<dfa.decisionNumber>
+const static int <name>dfa<dfa.decisionNumber>_eot[<dfa.numberOfStates>] =
+    {<dfa.eot; wrap="\n     ", separator=",">};
+const static int <name>dfa<dfa.decisionNumber>_eof[<dfa.numberOfStates>] =
+    {<dfa.eof; wrap="\n     ", separator=",">};
+const static unichar <name>dfa<dfa.decisionNumber>_min[<dfa.numberOfStates>] =
+    {<dfa.min; wrap="\n     ", separator=",">};
+const static unichar <name>dfa<dfa.decisionNumber>_max[<dfa.numberOfStates>] =
+    {<dfa.max; wrap="\n     ", separator=",">};
+const static int <name>dfa<dfa.decisionNumber>_accept[<dfa.numberOfStates>] =
+    {<dfa.accept; wrap="\n     ", separator=",">};
+const static int <name>dfa<dfa.decisionNumber>_special[<dfa.numberOfStates>] =
+    {<dfa.special; wrap="\n     ", separator=",">};
+<dfa.transition:{s|
+const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<s; wrap="\n    ", separator=",">};
+}>
 
 - (id) init
 {
-	if (self = [super init]) {
-		<dfa.states:{state | s<state.stateNumber> = [[<name>DFA<dfa.decisionNumber>State<state.stateNumber> alloc] init];}; separator="\n">
-	}
-	return self;
-}
-
-- (void) dealloc
-{
-	<dfa.states:{state | [s<state.stateNumber> release];}; separator="\n">
-	[super dealloc];
-}
-
-<states:{state | - (<name>DFA<dfa.decisionNumber>State<state.stateNumber> *) s<state.stateNumber> {
-	return s<state.stateNumber>;
-}
-}; separator="\n">
-@end
-
-// here come the state class implementations
-<dfa.states:{state | 
-@implementation <name>DFA<dfa.decisionNumber>State<state.stateNumber>
-<state>
-@end
-}; separator="\n\n">
-}; separator="\n">
->>
-
-cyclicDFAInterface() ::= <<
-#pragma mark C y c l i c   D F A
-<cyclicDFAs:{dfa |
-@interface <name>DFA<dfa.decisionNumber> : ANTLRDFA {
-
-	<cyclicDFAStateIVars(...)>
-	
-}
-- (int)predict:(ANTLRIntStream*)input;
-// states get accessors
-<cyclicDFAStateAccessorDecl(...)>
-@end
-}; separator="\n">
->>
-
-// C y c l i c D F A  S t a t e s  C l a s s e s
-/** A state in a cyclic DFA
-	This actually is just the implementation for the transition method.
-*/
-cyclicDFAState(stateNumber,edges,needErrorClause) ::= <<
-
-- (ANTLRDFAState *) transition:(ANTLRIntStream *)input
-{
-        int LA<decisionNumber>_<stateNumber> = [input LA:1];
-        <edges>
-        <if(needErrorClause)>
-        <if(backtracking)>
-        if (backtracking > 0) { 
-			failed = YES; 
+	if ((self = [super init]) != nil) {
+		eot = <name>dfa<dfa.decisionNumber>_eot;
+		eof = <name>dfa<dfa.decisionNumber>_eof;
+		min = <name>dfa<dfa.decisionNumber>_min;
+		max = <name>dfa<dfa.decisionNumber>_max;
+		accept = <name>dfa<dfa.decisionNumber>_accept;
+		special = <name>dfa<dfa.decisionNumber>_special;
+		if (!(transition = calloc(<dfa.numberOfStates>, sizeof(void*)))) {
+			[self release];
 			return nil;
 		}
-        <endif>
-        ANTLRNoViableAltException nvae = [ANTLRNoViableAltException exceptionWithName:@"ANTLRNoViableAltException"
-						   reason:@"<description>" 
-						   userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:<decisionNumber>], @"decisionNumber", [NSNumber numberWithInt:<stateNumber>], @"stateNumber", input, @"input", nil];<\n>
-        <@noViableAltException()>
-        @throw nvae;
-        <endif>
-}
->>
-
-
-/** A DFA state declaration */
-cyclicDFAStateIVars() ::= <<
-<cyclicDFAs:{dfa | <dfa.states:{state | <name>DFA<dfa.decisionNumber>State<state.stateNumber> *s<state.stateNumber>;}; separator="\n">}; separator="\n">
->>
-
-cyclicDFAStateInterface() ::= <<
-#pragma mark C y c l i c   D F A   S t a t e s
-<cyclicDFAs:{dfa |
-<dfa.states:{state |
-@interface <name>DFA<dfa.decisionNumber>State<state.stateNumber> : ANTLRDFAState {
-}
-<if(state.edges)>
-- (<name>DFA<dfa.decisionNumber>State<state.stateNumber> *) transition:(ANTLRIntStream *)input;<\n>
-<endif>
-@end
-}; separator="\n">
-}; separator="\n">
->>
-
-cyclicDFAStateAccessorDecl() ::= <<
-<cyclicDFAs:{dfa | <dfa.states:{ state | - (<name>DFA<dfa.decisionNumber>State<state.stateNumber> *)s<state.stateNumber>;}; separator="\n">}; separator="\n">
->>
-
-
-/** An accept state for a cyclic DFA */
-cyclicDFAAcceptState(stateNumber,predictAlt) ::= <<
-
-// init accept state
-- (id) init
-{
-	if (self = [super init]) {
-		alt = <predictAlt>;
+		<dfa.transition:{s|transition[<i0>] = <name>dfa<dfa.decisionNumber>_transition<i0>;}; separator="\n">
 	}
 	return self;
 }
+
+<if(dfa.specialStateSTs)>
+- (int) specialStateTransition:(int) s
+{
+	int _s = s;
+	switch ( s ) {
+ 		<dfa.specialStateSTs:{state |
+		case <i0> : <! compressed special state numbers 0..n-1 !>
+		<state>}; separator="\n">
+	}
+<if(backtracking)>
+	if ([recognizer isBacktracking]) {
+		[recognizer setIsFailed:YES];
+		return -1;
+	}<\n>
+<endif>
+	ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<dfa.decisionNumber> state:_s stream:input];
+	[self error:nvae];
+	@throw nvae;
+}<\n>
+<endif>
+
+- (void) release
+{
+	free(transition);
+	[super release];
+}
+
+- (NSString *) description
+{
+	return @"<dfa.description>";
+}
+
+@end
+<\n>
 >>
 
+cyclicDFAState(decisionNumber, stateNumber,edges,needErrorClause,semPredState) ::= <<
+<if(semPredState)>
+input.rewind();<\n>
+<else>
+int LA<decisionNumber>_<stateNumber> = [input LA:1];<\n>
+<endif>
+s = -1;
+<edges; separator="\nelse ">
+if ( s>=0 ) return s;
+break;
+>>
 
 /** Just like a fixed DFA edge, test the lookahead and indicate what
  *  state to jump to next if successful.
  */
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates) ::= <<
-if ( <labelExpr> <if(predicates)>&& <predicates><endif>) {return [dfa s<targetStateNumber>];}<\n>
+if ( (<labelExpr>) <if(predicates)>&& (<predicates>)<endif>) {s = <targetStateNumber>;}<\n>
 >>
 
 /** An edge pointing at end-of-token; essentially matches any char;
  *  always jump to the target.
  */
 eotDFAEdge(targetStateNumber,edgeNumber, predicates) ::= <<
-return [dfa s<targetStateNumber>];<\n>
->>
-
-// C y c l i c  S W I T C H
-
-/* A repetition of the cyclic DFA states, but using switches instead
- * of if-then-else sequences.
- */
-
-cyclicDFAStateSwitch(stateNumber,labels,edges,needErrorClause,EOTTargetStateNumber) ::= <<
-
-- (<name>DFA<dfa.decisionNumber>State<state.stateNumber> *) transition:(ANTLRIntStream *)input
-{
-	switch ( [input LA:1] ) {
-        <edges; separator="\n">
-        default:
-<if(needErrorClause)>
-            <if(backtracking)>
-            if (backtracking > 0) {
-				failed = YES;
-				return nil;
-			}
-            <endif>
-			ANTLRNoViableAltException nvae = [ANTLRNoViableAltException		exceptionWithName:@"ANTLRNoViableAltException"
-								   reason:@"<description>" 
-								 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:<decisionNumber>], @"decisionNumber", [NSNumber numberWithInt:<stateNumber>], @"stateNumber", input, @"input", nil];<\n>
-			<@noViableAltException()>
-			@throw nvae;
-<else>
-            return [dfa s<EOTTargetStateNumber>];<\n>	
-<endif>
-	}
-}
-
->>
-
-cyclicDFAEdgeSwitch(labels, targetStateNumber, edgeNumber) ::= <<
-<labels:{case <it>:}; separator="\n">
-    return [dfa s<targetStateNumber>];<\n>
+s = <targetStateNumber>;<\n>
 >>
 
 // D F A  E X P R E S S I O N S
 
 andPredicates(left,right) ::= "(<left>&&<right>)"
 
-orPredicates(left,right) ::= "(<left>||<right>)"
+orPredicates(operands) ::= "(first(operands)<rest(operands):{o | ||<o>}>)"
 
 notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
 evalPredicate(pred,description) ::= "<pred>"
 
-evalSynPredicate(pred,description) ::= "[self synpred:<pred> fromInput:input]"
+evalSynPredicate(pred,description) ::= "[self synpred:<pred>SyntacticPredicate stream:input]"
 
-lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
+lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>/*atom/Test*/"
 
 /** Sometimes a lookahead test cannot assume that LA(k) is in a temp variable
  *  somewhere.  Must ask for the lookahead directly.
  */
-isolatedLookaheadTest(atom,k,atomAsInt) ::= "[input LA:<k>]==<atom>"
+isolatedLookaheadTest(atom,k,atomAsInt) ::= "[input LA:<k>]==<atom>/*atom/iso*/"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
-(LA<decisionNumber>_<stateNumber>\>=<lower> && LA<decisionNumber>_<stateNumber>\<=<upper>)
-
+(LA<decisionNumber>_<stateNumber>\>=<lower>/*lower*/ && LA<decisionNumber>_<stateNumber>\<=<upper>/*upper/range*/)
 >>
 
-isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "([input LA:<k>])\>=<lower> && [input LA:<k>]\<=<upper>)"
+isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "([input LA:<k>]\>=<lower>/*lower*/ && [input LA:<k>]\<=<upper>/*upper/isorange*/)"
 
 setTest(ranges) ::= "<ranges; separator=\"||\">"
 
@@ -956,9 +1067,9 @@ protected Stack <scope.name>_stack = new Stack();<\n>
 <endif>
 >>
 
-returnType() ::= <<
+returnTypeName() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<ruleDescriptor.name>_return
+<name><ruleDescriptor.name>_return
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnType>
@@ -966,6 +1077,10 @@ returnType() ::= <<
 void
 <endif>
 <endif>
+>>
+
+returnType() ::= <<
+<returnTypeName()><if(ruleDescriptor.hasMultipleReturnValues)> *<endif>
 >>
 
 /** Generate the Java type associated with a single or multiple return
@@ -999,17 +1114,27 @@ ruleLabelDef(label) ::= <<
  *  start/stop tokens, tree stuff, attributes, ...  Leave a hole for
  *  subgroups to stick in members.
  */
-returnScope(scope) ::= <<
+returnScopeInterface(ruleDescriptor) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-public static class <returnType()> extends <if(TREE_PARSER)>Tree<endif>RuleReturnScope {
-    <scope.attributes:{public <it.decl>;}; separator="\n">
-    <@ruleReturnMembers()>
-};
+@interface <returnTypeName()> : ANTLR<if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<else>Parser<endif><endif>RuleReturnScope {
+    <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
+}
+#warning Use KVC for access to ivars!
+<@ruleReturnMembersInterface()>
+@end
+<endif>
+>>
+
+returnScope(ruleDescriptor) ::= <<
+<if(ruleDescriptor.hasMultipleReturnValues)>
+@implementation <returnTypeName()>
+<@ruleReturnMembers()>
+@end
 <endif>
 >>
 
 parameterScope(scope) ::= <<
-<scope.attributes:{<it.decl>}; separator=", ">
+<scope.attributes:{:(<it.type>)<it.name>}; separator=" ">
 >>
 
 /** Used in codegen.g to translate $x.y references.
@@ -1019,13 +1144,24 @@ parameterScope(scope) ::= <<
  *  objects so this translation could query them.  So, translation of
  *  $x.y to executable code occurs before recognizerST.toString() occurs.
  *  I.e., actions are just text strings during final code generation.
- */
 globalAttributeRef(scope,attr) ::= <<
+((<scope>)<scope>_stack.peek()).<attr.name>
 >>
+ */
 
 parameterAttributeRef(attr) ::= "<attr.name>"
 
-ruleScopeAttributeRef(scope,attr) ::= "[((<scope>_scope *)[<scope>_stack peek]) <attr.name>]"
+scopeAttributeRef(scope,attr,index,negIndex) ::= <<
+<if(negIndex)>
+((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()<negIndex>-1)).<attr.name>
+<else>
+<if(index)>
+((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>
+<else>
+((<scope>_scope)<scope>_stack.peek()).<attr.name>
+<endif>
+<endif>
+>>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
  *  to stack itself not top of stack.  This is useful for predicates
@@ -1035,9 +1171,19 @@ isolatedDynamicScopeRef(scope) ::= "<scope>_stack"
 
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
+<if(referencedRule.hasMultipleReturnValues)>
+<scope>.<attr.name>
+<else>
+<scope>
+<endif>
 >>
 
 returnAttributeRef(ruleDescriptor,attr) ::= <<
+<if(ruleDescriptor.hasMultipleReturnValues)>
+[retval setValue: forKey:@"<attr.name>"];
+<else>
+<attr.name>
+<endif>
 >>
 
 /** How to translate $tokenLabel */
@@ -1055,17 +1201,31 @@ tokenLabelPropertyRef_type(scope,attr) ::= "[<scope> type]"
 tokenLabelPropertyRef_line(scope,attr) ::= "[<scope> line]"
 tokenLabelPropertyRef_pos(scope,attr) ::= "[<scope> charPositionInLine]"
 tokenLabelPropertyRef_channel(scope,attr) ::= "[<scope> channel]"
-tokenLabelPropertyRef_index(scope,attr) ::= "[<scope>. tokenIndex]"
-tokenLabelPropertyRef_tree(scope,attr) ::= "[<scope>_tree"
+tokenLabelPropertyRef_index(scope,attr) ::= "[<scope> tokenIndex]"
+tokenLabelPropertyRef_tree(scope,attr) ::= "[<scope>_tree]"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "[<scope> start]"
 ruleLabelPropertyRef_stop(scope,attr) ::= "[<scope> stop]"
 ruleLabelPropertyRef_tree(scope,attr) ::= "[<scope> tree]"
-ruleLabelPropertyRef_text(scope,attr) ::= "[input toString:[<scope> start] :[<scope> stop]"
+ruleLabelPropertyRef_text(scope,attr) ::= "[input substringWithRange:NSMakeRange([<scope> start], [<scope> stop]-[<scope> start])]"
 ruleLabelPropertyRef_st(scope,attr) ::= "[<scope> st]"
 
-/** Somebody may ref $template or $tree or $stop within a rule */
-rulePropertyRef(attr) ::= "[retval <attr.name>]"
+/** Isolated $RULE ref ok in lexer as it's a Token */
+lexerRuleLabel(label) ::= "<label>"
+
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "[<scope> type]"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "[<scope> line]"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "[<scope> charPositionInLine]"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "[<scope> channel]"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "[<scope> tokenIndex]"
+lexerRuleLabelPropertyRef_text(scope,attr) ::= "[<scope> text]"
+
+// Somebody may ref $template or $tree or $stop within a rule:
+rulePropertyRef_start(scope,attr) ::= "[retval start]"
+rulePropertyRef_stop(scope,attr) ::= "[retval stop]"
+rulePropertyRef_tree(scope,attr) ::= "[retval tree]"
+rulePropertyRef_text(scope,attr) ::= "[input substringWithRange:NSMakeRange(start, [input index]-start)]"
+rulePropertyRef_st(scope,attr) ::= "[retval st]"
 
 
 /** How to execute an action */
@@ -1079,6 +1239,7 @@ if ( backtracking==0 ) {
 <endif>
 >>
 
+
 // L E X E R  A C T I O N S
 
 emit(type) ::= "[self emit:<type>];"
@@ -1088,22 +1249,16 @@ setType(type) ::= "[self setType:<type>];"
 // M I S C (properties, etc...)
 
 bitset(name, words64) ::= <<
+const static unsigned long long <name>_data[] = {<words64:{<it>L};separator=",">};
+static ANTLRBitSet *<name>;
+<! ANTLRBitSet *<name> = [[ANTLRBitSet alloc] initWithBits:<name>_data count:<length(words64)>];<\n> !>
+>>
+
+bitsetInit(name, words64) ::= <<
+<name> = [[ANTLRBitSet alloc] initWithBits:<name>_data count:<length(words64)>];<\n>
 >>
 
 codeFileExtension() ::= ".m"
 
 true() ::= "YES"
 false() ::= "NO"
-
-
-
-
-
-
-
-
-
-
-
-
-
