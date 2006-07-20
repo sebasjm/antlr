@@ -601,7 +601,23 @@ public class IntervalSet implements IntSet {
 		return values;
     }
 
-    public void remove(int el) {
+	public int[] toArray() {
+		int[] values = new int[size()];
+		Iterator iter = this.intervals.iterator();
+		int i = 0;
+		while (iter.hasNext()) {
+			Interval I = (Interval) iter.next();
+			int a = I.a;
+			int b = I.b;
+			for (int v=a; v<=b; v++) {
+				values[i] = v;
+				i++;
+			}
+		}
+		return values;
+	}
+
+	public void remove(int el) {
         throw new NoSuchMethodError("IntervalSet.remove() unimplemented");
     }
 }
