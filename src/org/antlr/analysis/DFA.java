@@ -469,10 +469,12 @@ public class DFA {
 		int smin = ((Integer)min.get(s.stateNumber)).intValue();
 		Vector stateTransitions = new Vector(smax-smin+1);
 		stateTransitions.setSize(smax-smin+1);
+		/*
 		// fill with -1 as default transition to invalid state
 		for (int sti = 0; sti < stateTransitions.size(); sti++) {
 			stateTransitions.set(sti, new Integer(-1));
 		}
+		*/
 		transition.set(s.stateNumber, stateTransitions);
 		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
 			Transition edge = (Transition) s.transition(j);
@@ -484,15 +486,15 @@ public class DFA {
 			}
 			else if ( label.isSet() ) {
 				IntervalSet labels = (IntervalSet)label.getSet();
-				List atoms = labels.toList();
-				for (int a = 0; a < atoms.size(); a++) {
-					Integer I = (Integer) atoms.get(a);
-					int labelIndex = I.intValue()-smin; // offset from 0
+				int[] atoms = labels.toArray();
+				for (int a = 0; a < atoms.length; a++) {
+					int labelIndex = atoms[a]-smin; // offset from 0
 					stateTransitions.set(labelIndex,
 										 new Integer(edge.target.stateNumber));
 				}
 			}
 		}
+		/*
 		// now add an empty row for states with no transitions;
 		// otherwise ST skips entry
 		for (int i = 0; i < transition.size(); i++) {
@@ -500,6 +502,7 @@ public class DFA {
 				transition.setElementAt(new Vector(), i);
 			}
 		}
+		*/
 	}
 
 	protected void createEOTTable(DFAState s) {

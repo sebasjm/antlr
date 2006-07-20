@@ -274,6 +274,33 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
+3.03 - July ??, 2006
+
+July 19, 2006
+
+* Code gen bug: states with no emanating edges were ignored by ST.
+  Now an empty list is used.
+
+* Added grammar parameter to recognizer templates so they can access
+  properties like getName(), ...
+
+July 10, 2006
+
+* Fixed the gated pred merged state bug.  Added unit test.
+
+* added new method to Target: getTokenTypeAsTargetLabel()
+
+July 7, 2006
+
+* I was doing an AND instead of OR in the gated predicate stuff.
+  Thanks to Stephen Kou!
+
+* Reduce op for combining predicates was insanely slow sometimes and
+  didn't actually work well.  Now it's fast and works.
+
+* There is a bug in merging of DFA stop states related to gated
+  preds...turned it off for now.
+ 
 3.0b2 - July 5, 2006
 
 July 5, 2006
