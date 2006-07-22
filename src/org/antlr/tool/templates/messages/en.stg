@@ -267,7 +267,9 @@ LEFT_RECURSION_CYCLES(listOfCycles) ::= <<
 The following sets of rules are mutually left-recursive <listOfCycles:{c| [<c:{r|<r>}; separator=", ">]}; separator=" and ">
 >>
 
-
+NONREGULAR_DECISION(file,line,col,ruleName,alts) ::= <<
+<loc()>[fatal] rule <ruleName> has non-LL(*) decision due to recursive rule invocations in alts <alts; separator=",">.  Resolve by left-factoring or using syntactic predicates with fixed k lookahead or using backtrack=true option.
+>>
 
 /* This factors out file location formatting; file,line,col inherited from
  * enclosing template; don't manually pass stuff in.

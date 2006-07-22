@@ -616,6 +616,21 @@ public class NFAToDFAConverter {
 		Transition transition0 = p.transition(0);
 		if ( transition0 instanceof RuleClosureTransition ) {
 			int depth = context.recursionDepthEmanatingFromState(p.stateNumber);
+			// Detect recursion by more than a single alt, which indicates
+			// that the decision's lookahead language is non-regular; terminate
+			if ( depth == 1 && d.dfa.getUserMaxLookahead()==0 ) { // k=* only
+			//if ( depth >= NFAContext.MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK ) {
+				d.dfa.recursiveAltSet.add(alt); // indicate that this alt is recursive
+				if ( d.dfa.recursiveAltSet.size()>1 ) {
+					//System.out.println("recursive alts: "+d.dfa.recursiveAltSet.toString());
+					d.dfa.probe.reportNonRegularDecision(d.dfa);
+					terminateConversion = true;
+				}
+				/*
+				System.out.println("alt "+alt+" in rule "+p.enclosingRule+" dec "+d.dfa.decisionNumber+
+					" recursing to "+ruleTarget.enclosingRule+" ctx: "+context);
+					*/
+			}
 			// Detect an attempt to recurse too high
 			// if this context has hit the max recursions for p.stateNumber,
 			// don't allow it to enter p.stateNumber again
@@ -628,6 +643,7 @@ public class NFAToDFAConverter {
 				d.abortedDueToRecursionOverflow = true;
 				return;
 			}
+
 			// otherwise, it's cool to (re)enter target of this rule ref
 			RuleClosureTransition ref = (RuleClosureTransition)transition0;
 			// first create a new context and push onto call tree,

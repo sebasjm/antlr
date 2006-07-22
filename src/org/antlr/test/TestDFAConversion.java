@@ -71,15 +71,12 @@ public class TestDFAConversion extends TestSuite {
 		// nondeterministic from left edge; no stop state
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-A->.s2\n" +
-			".s2-A->.s3\n" +
-			".s3-A->.s4\n" +
-			".s4-A->:s5=>1\n"; // gets this after failing to do LL(*)
-		int[] unreachableAlts = new int[] {2};
+			".s1-A->.s2\n"; // gets this after failing to do LL(*)
+		int[] unreachableAlts = new int[] {1,2};
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = new int[] {1,2};
-		int numWarnings = 3;
+		int numWarnings = 1;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -94,36 +91,15 @@ public class TestDFAConversion extends TestSuite {
 			"    | B\n" +
 			"    ;");
 		String expecting =
-			".s0-B->.s16\n" +
+			".s0-B->.s4\n" +
 			".s0-L->.s1\n" +
-			".s1-B->.s15\n" +
-			".s1-L->.s2\n" +
-			".s10-X->:s12=>1\n" +
-			".s10-Y->:s11=>2\n" +
-			".s13-R->.s8\n" +
-			".s14-R->.s9\n" +
-			".s15-R->.s10\n" +
-			".s16-X->:s12=>1\n" +
-			".s16-Y->:s11=>2\n" +
-			".s2-B->.s14\n" +
-			".s2-L->.s3\n" +
-			".s3-B->.s13\n" +
-			".s3-L->.s4\n" +
-			".s4-B->.s6\n" +
-			".s4-L->:s5=>1\n" +
-			".s6-R->.s7\n" +
-			".s7-R->.s8\n" +
-			".s8-R->.s9\n" +
-			".s9-R->.s10\n";
-		/* Gets:
-t.g:3:7: Alternative 1: after matching input such as L L L L L decision cannot predict what comes next due to recursion overflow to y from y
-t.g:3:7: Alternative 2: after matching input such as L L L L L decision cannot predict what comes next due to recursion overflow to y from y
-		*/
-		int[] unreachableAlts = null;
+			".s1-B->.s3\n" +
+			".s1-L->.s2\n";
+		int[] unreachableAlts = new int[] {1,2};
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 2;
+		int numWarnings = 1;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -928,22 +904,13 @@ As a result, alternative(s) 2 were disabled for that input
 		String expecting =
 			".s0-A->.s1\n" +
 			".s1-A->.s2\n" +
-			".s1-X->:s3=>1\n" +
-			".s1-Y->:s6=>2\n" +
-			".s2-A->.s4\n" +
-			".s2-X->:s3=>1\n" +
-			".s2-Y->:s6=>2\n" +
-			".s4-A->.s5\n" +
-			".s4-X->:s3=>1\n" +
-			".s4-Y->:s6=>2\n" +
-			".s5-A->:s7=>1\n" +
-			".s5-X->:s3=>1\n" +
-			".s5-Y->:s6=>2\n";
-		int[] unreachableAlts = null;
+			".s1-X->:s4=>1\n" +
+			".s1-Y->:s3=>2\n";
+		int[] unreachableAlts = new int[] {1,2};
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 2;
+		int numWarnings = 1;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}

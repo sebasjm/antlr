@@ -175,16 +175,26 @@ public class ErrorManager {
 	public static final int MSG_UNREACHABLE_TOKENS = 208; // nothing predicts token
 	public static final int MSG_TOKEN_NONDETERMINISM = 209; // alts of Tokens rule
 	public static final int MSG_LEFT_RECURSION_CYCLES = 210;
+	public static final int MSG_NONREGULAR_DECISION = 211;
 
-	public static final int MAX_MESSAGE_NUMBER = 210;
+
+	public static final int MAX_MESSAGE_NUMBER = 211;
 
 	/** Do not do perform analysis and code gen if one of these happens */
-	public static final BitSet ERRORS_FORCING_ABORT = new BitSet() {
+	public static final BitSet ERRORS_FORCING_NO_ANALYSIS = new BitSet() {
 		{
 			add(MSG_RULE_REDEFINITION);
 			add(MSG_UNDEFINED_RULE_REF);
 			add(MSG_LEFT_RECURSION_CYCLES);
 			add(MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION);
+			// TODO: ...
+		}
+	};
+
+	/** Do not do perform analysis and code gen if one of these happens */
+	public static final BitSet ERRORS_FORCING_NO_CODEGEN = new BitSet() {
+		{
+			add(MSG_NONREGULAR_DECISION);
 			// TODO: ...
 		}
 	};
@@ -524,6 +534,14 @@ public class ErrorManager {
 		);
 	}
 
+	public static void nonRegularDecision(DecisionProbe probe) {
+		getErrorState().errors++;
+		getErrorState().errorMsgIDs.add(MSG_NONREGULAR_DECISION);
+		getErrorListener().error(
+			new NonRegularDecisionMessage(probe, probe.getNonDeterministicAlts())
+		);
+	}
+
 	public static void recursionOverflow(DecisionProbe probe,
 										 DFAState sampleBadState,
 										 int alt,
@@ -610,7 +628,11 @@ public class ErrorManager {
 	}
 
 	public static boolean doNotAttemptAnalysis() {
-		return !getErrorState().errorMsgIDs.and(ERRORS_FORCING_ABORT).isNil();
+		return !getErrorState().errorMsgIDs.and(ERRORS_FORCING_NO_ANALYSIS).isNil();
+	}
+
+	public static boolean doNotAttemptCodeGen() {
+		return !getErrorState().errorMsgIDs.and(ERRORS_FORCING_NO_CODEGEN).isNil();
 	}
 
 	/** Return first non ErrorManager code location for generating messages */

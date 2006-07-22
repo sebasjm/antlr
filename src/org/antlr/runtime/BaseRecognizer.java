@@ -165,8 +165,8 @@ public abstract class BaseRecognizer {
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;
-			System.err.println("decision=<<"+nvae.grammarDecisionDescription+">>"+
-							   " state "+nvae.stateNumber+
+			System.err.println(//"decision=<<"+nvae.grammarDecisionDescription+">>"+
+							   "state "+nvae.stateNumber+
 							   " (decision="+nvae.decisionNumber+
 							   ") no viable alt; token="+
 							   e.token);

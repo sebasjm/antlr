@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0b2
-July 5, 2006
+ANTLR 3.0b3
+July 21, 2006
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -12,7 +12,7 @@ Welcome to ANTLR v3!  I've been working on this for 3 years and it's
 almost ready!  I plan no feature additions between this beta and first
 3.0 release.  I have lots of features to add later, but this will be
 the first set.  Ultimately, I need to rewrite ANTLR v3 in itself (it's
-written in 2.7.6 at the moment and also needs StringTemplate 2.3b8 or
+written in 2.7.6 at the moment and also needs StringTemplate 2.3b9 or
 later).
 
 You should use v3 in conjunction with ANTLRWorks:
@@ -175,12 +175,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0b2/README.txt (this file)
-antlr-3.0b2/LICENSE.txt
-antlr-3.0b2/src/org/antlr/...
-antlr-3.0b2/lib/stringtemplate-2.3b8.jar (3.0b2 needs 2.3b8)
-antlr-3.0b2/lib/antlr-2.7.6.jar
-antlr-3.0b2/lib/antlr-3.0b2.jar
+antlr-3.0b3/README.txt (this file)
+antlr-3.0b3/LICENSE.txt
+antlr-3.0b3/src/org/antlr/...
+antlr-3.0b3/lib/stringtemplate-2.3b9.jar (3.0b3 needs 2.3b9)
+antlr-3.0b3/lib/antlr-2.7.6.jar
+antlr-3.0b3/lib/antlr-3.0b3.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -193,7 +193,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0b2 (July 5, 2006) 1989-2006
+ANTLR Parser Generator   Early Access Version 3.0b3 (July 5, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir   specify output directory where all output is generated
   -lib dir       specify location of token files
@@ -259,10 +259,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0b2/lib/stringtemplate-2.3b8.jar
-antlr-3.0b2/lib/antlr-2.7.6.jar
+antlr-3.0b3/lib/stringtemplate-2.3b9.jar
+antlr-3.0b3/lib/antlr-2.7.6.jar
 
-then jump into antlr-3.0b2/src directory and then type:
+then jump into antlr-3.0b3/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -274,7 +274,33 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.03 - July ??, 2006
+3.0b3 - July 21, 2006
+
+* ANTLR fails to analyze complex decisions much less frequently.  It
+  turns out that the set of decisions for which ANTLR fails (times
+  out) is the same set (so far) of non-LL(*) decisions.  Morever, I'm
+  able to detect this situation quickly and report rather than timing
+  out. Errors look like:
+
+  java.g:468:23: [fatal] rule concreteDimensions has non-LL(*)
+    decision due to recursive rule invocations in alts 1,2.  Resolve
+    by left-factoring or using syntactic predicates with fixed k
+    lookahead or use backtrack=true option.
+
+  This message only appears when k=*.
+
+* Shortened no viable alt messages to not include decision
+  description:
+
+[compilationUnit, declaration]: line 8:8 decision=<<67:1: declaration
+: ( ( fieldDeclaration )=> fieldDeclaration | ( methodDeclaration )=>
+methodDeclaration | ( constructorDeclaration )=>
+constructorDeclaration | ( classDeclaration )=> classDeclaration | (
+interfaceDeclaration )=> interfaceDeclaration | ( blockDeclaration )=>
+blockDeclaration | emptyDeclaration );>> state 3 (decision=14) no
+viable alt; token=[@1,184:187='java',<122>,8:8]
+
+  too long and hard to read.
 
 July 19, 2006
 

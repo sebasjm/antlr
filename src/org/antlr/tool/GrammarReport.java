@@ -77,11 +77,6 @@ public class GrammarReport {
 		buf.append(totalNonSynPredRules);
 		buf.append('\t');
 		buf.append(totalNonSynPredProductions);
-		buf.append('\t');
-		buf.append(grammar.getNumberOfDecisions());
-		buf.append('\t');
-		buf.append(grammar.getNumberOfCyclicDecisions());
-		buf.append('\t');
 		int numACyclicDecisions =
 			grammar.getNumberOfDecisions()-grammar.getNumberOfCyclicDecisions();
 		int[] depths = new int[numACyclicDecisions];
@@ -90,11 +85,13 @@ public class GrammarReport {
 		int acyclicIndex = 0;
 		int cyclicIndex = 0;
 		int numLL1 = 0;
+		int numDec = 0;
 		for (int i=1; i<=grammar.getNumberOfDecisions(); i++) {
 			Grammar.Decision d = grammar.getDecision(i);
 			if( d.dfa==null ) {
 				continue;
 			}
+			numDec++;
 			if ( !d.dfa.isCyclic() ) {
 				int maxk = d.dfa.getMaxLookaheadDepth();
 				if ( maxk==1 ) {
@@ -109,6 +106,11 @@ public class GrammarReport {
 				cyclicIndex++;
 			}
 		}
+		buf.append('\t');
+		buf.append(numDec);
+		buf.append('\t');
+		buf.append(grammar.getNumberOfCyclicDecisions());
+		buf.append('\t');
 		buf.append(numLL1);
 		buf.append('\t');
 		buf.append(min(depths));
@@ -214,10 +216,16 @@ public class GrammarReport {
 	}
 
 	protected String getDFALocations(Set dfas) {
+		Set decisions = new HashSet();
 		StringBuffer buf = new StringBuffer();
 		Iterator it = dfas.iterator();
 		while ( it.hasNext() ) {
 			DFA dfa = (DFA) it.next();
+			// if we aborted a DFA and redid with k=1, the backtrackin
+			if ( decisions.contains(new Integer(dfa.decisionNumber)) ) {
+				continue;
+			}
+			decisions.add(new Integer(dfa.decisionNumber));
 			buf.append("Rule ");
 			buf.append(dfa.decisionNFAStartState.getEnclosingRule());
 			buf.append(" decision ");
@@ -232,6 +240,7 @@ public class GrammarReport {
 		}
 		return buf.toString();
 	}
+
 	/** Given a stats line suitable for sending to the antlr.org site,
 	 *  return a human-readable version.  Return null if there is a
 	 *  problem with the data.

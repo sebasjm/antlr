@@ -283,6 +283,11 @@ public class CodeGenerator {
 		// CREATE NFA FROM GRAMMAR, CREATE DFA FROM NFA
 		target.performGrammarAnalysis(this, grammar);
 
+		// some grammar analysis errors will not yield reliable DFA
+		if ( ErrorManager.doNotAttemptCodeGen() ) {
+			return;
+		}
+
 		// OPTIMIZE DFA
 		DFAOptimizer optimizer = new DFAOptimizer(grammar);
 		optimizer.optimize();

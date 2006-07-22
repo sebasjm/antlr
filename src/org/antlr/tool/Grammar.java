@@ -761,11 +761,16 @@ public class Grammar {
 			startDFA = System.currentTimeMillis();
 		}
 		DFA lookaheadDFA = new DFA(decision, decisionStartState);
-		if ( lookaheadDFA.analysisAborted() && // did analysis bug out?
-			 lookaheadDFA.getUserMaxLookahead()!=1 )
+		if ( (lookaheadDFA.analysisAborted() && // did analysis bug out?
+			 lookaheadDFA.getUserMaxLookahead()!=1) || // either k=* or k>1
+			 (lookaheadDFA.probe.nonRegularDecision() && // >1 alt recurses, k=*
+		      lookaheadDFA.getAutoBacktrackMode()) )
 		{
-			lookaheadDFA = null; // make sure other memory is "free" before redoing
 			// set k=1 option if not already k=1 and try again
+			// clean up tracking stuff
+			decisionsWhoseDFAsUsesSynPreds.remove(lookaheadDFA);
+			// TODO: clean up synPredNamesUsedInDFA also (harder)
+			lookaheadDFA = null; // make sure other memory is "free" before redoing
 			d.blockAST.setOption(this, "k", new Integer(1));
 			//System.out.println("trying decision "+decision+" again with k=1");
 			lookaheadDFA = new DFA(decision, decisionStartState);

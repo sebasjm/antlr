@@ -29,7 +29,6 @@ package org.antlr.analysis;
 
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
-import org.antlr.tool.GrammarAST;
 
 import java.util.*;
 
@@ -113,6 +112,11 @@ public class DecisionProbe {
 	 *  conflicting input sequence.
 	 */
 	protected Set altsWithProblem = new HashSet();
+
+	/** If we decision > 1 alt with recursion, nonregular; those alts are
+	 *  store in altsWithProblem.
+	 */
+	protected boolean nonRegularDecision = false;
 
 	/** Recursion is limited to a particular depth.  If that limit is exceeded
 	 *  the proposed new NFAConfiguration is recorded for the associated DFA state.
@@ -202,6 +206,10 @@ public class DecisionProbe {
 
 	public boolean analysisOverflowed() {
 		return stateToRecursiveOverflowConfigurationsMap.size()>0;
+	}
+
+	public boolean nonRegularDecision() {
+		return nonRegularDecision;
 	}
 
 	/** How many states does the DFA predictor have? */
@@ -389,16 +397,16 @@ public class DecisionProbe {
 
 	public void issueWarnings() {
 		if ( analysisAborted() ) {
-			GrammarAST blockAST = dfa.decisionNFAStartState.getAssociatedASTNode();
-			String autoBacktrack = (String)blockAST.getOption("backtrack");
-			if ( autoBacktrack==null ) {
-				autoBacktrack = (String)dfa.nfa.grammar.getOption("backtrack");
-			}
 			// only report early termination errors if !backtracking
-			if ( !(autoBacktrack!=null&&autoBacktrack.equals("true")) ) {
+			if ( !dfa.getAutoBacktrackMode() ) {
 				ErrorManager.analysisAborted(this);
 			}
 			return;
+		}
+
+		// NONREGULAR DUE TO RECURSION > 1 ALTS
+		if ( nonRegularDecision && !dfa.getAutoBacktrackMode() ) {
+			ErrorManager.nonRegularDecision(this);
 		}
 
 		issueRecursionWarnings();
@@ -431,15 +439,16 @@ public class DecisionProbe {
 			}
 		}
 
-		List unreachableAlts = dfa.getUnreachableAlts();
-		if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
-			ErrorManager.unreachableAlts(this,unreachableAlts);
+		if ( !nonRegularDecision ) {
+			List unreachableAlts = dfa.getUnreachableAlts();
+			if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
+				ErrorManager.unreachableAlts(this,unreachableAlts);
+			}
 		}
 	}
 
 	protected void issueRecursionWarnings() {
 		// RECURSION OVERFLOW
-
 		Set dfaStatesWithRecursionProblems =
 			stateToRecursiveOverflowConfigurationsMap.keySet();
 		// now walk truly unique (unaliased) list of dfa states with inf recur
@@ -570,6 +579,14 @@ public class DecisionProbe {
 	public void reportEarlyTermination() {
 		terminated = true;
 		dfa.nfa.grammar.setOfDFAWhoseConversionTerminatedEarly.add(dfa);
+	}
+
+	/** Report that at least 2 alts have recursive constructs.  There is
+	 *  no way to build a DFA so we terminated.
+	 */
+	public void reportNonRegularDecision(DFA dfa) {
+		nonRegularDecision = true;
+		altsWithProblem.addAll(dfa.recursiveAltSet.toList());
 	}
 
 	public void reportRecursiveOverflow(DFAState d,

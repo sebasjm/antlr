@@ -28,10 +28,11 @@
 package org.antlr.analysis;
 
 import org.antlr.Tool;
-import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.IntervalSet;
+import org.antlr.misc.IntSet;
 import org.antlr.runtime.IntStream;
+import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
 
 import java.util.*;
@@ -122,12 +123,17 @@ public class DFA {
      */
     protected List unreachableAlts;
 
+	protected int nAlts = 0;
+
 	/** We only want one accept state per predicted alt; track here */
 	protected DFAState[] altToAcceptState;
 
-	protected int nAlts = 0;
+	/** Track whether an alt discovers recursion for each alt during
+	 *  NFA to DFA conversion; >1 alt with recursion implies nonregular.
+	 */
+	protected IntSet recursiveAltSet = new IntervalSet();
 
-    /** Which NFA are we converting (well, which piece of the NFA)? */
+	/** Which NFA are we converting (well, which piece of the NFA)? */
     public NFA nfa;
 
 	protected NFAToDFAConverter nfaConverter;
@@ -681,6 +687,15 @@ public class DFA {
 		return user_k;
 	}
 
+	public boolean getAutoBacktrackMode() {
+		String autoBacktrack =
+			(String)decisionNFAStartState.getAssociatedASTNode().getOption("backtrack");
+		if ( autoBacktrack==null ) {
+			autoBacktrack = (String)nfa.grammar.getOption("backtrack");
+		}
+		return autoBacktrack!=null&&autoBacktrack.equals("true");
+	}
+
 	public void setUserMaxLookahead(int k) {
 		this.user_k = k;
 	}
@@ -712,7 +727,9 @@ public class DFA {
 	 *  4. if sem preds, nondeterministic alts must be sufficiently covered
 	 */
 	public void verify() {
-		doesStateReachAcceptState(startState);
+		if ( !probe.nonRegularDecision ) {
+			doesStateReachAcceptState(startState);
+		}
 	}
 
     /** figure out if this state eventually reaches an accept state and
