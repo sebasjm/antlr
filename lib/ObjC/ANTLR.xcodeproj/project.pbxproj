@@ -35,8 +35,6 @@
 		F70380BC0A07FA0D0070435D /* ANTLRMismatchedSetException.h in Headers */ = {isa = PBXBuildFile; fileRef = F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F70380BD0A07FA0D0070435D /* ANTLRMismatchedSetException.m in Sources */ = {isa = PBXBuildFile; fileRef = F70380BB0A07FA0D0070435D /* ANTLRMismatchedSetException.m */; };
 		F706A58D0A0EC4D0008999AB /* input in CopyFiles */ = {isa = PBXBuildFile; fileRef = F706A55B0A0EC307008999AB /* input */; };
-		F706A7490A112212008999AB /* Cyclic.m in Sources */ = {isa = PBXBuildFile; fileRef = F706A7480A112212008999AB /* Cyclic.m */; };
-		F706A7500A112259008999AB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F706A74F0A112259008999AB /* main.m */; };
 		F706A9CD0A122425008999AB /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F706A9DF0A122428008999AB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F706AA5C0A12242A008999AB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
@@ -180,11 +178,7 @@
 		F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedSetException.h; sourceTree = "<group>"; };
 		F70380BB0A07FA0D0070435D /* ANTLRMismatchedSetException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedSetException.m; sourceTree = "<group>"; };
 		F706A55B0A0EC307008999AB /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
-		F706A71E0A11212E008999AB /* cyclic.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = cyclic.g; sourceTree = "<group>"; };
 		F706A7230A11215A008999AB /* cyclic */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cyclic; sourceTree = BUILT_PRODUCTS_DIR; };
-		F706A7470A112212008999AB /* Cyclic.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Cyclic.h; sourceTree = "<group>"; };
-		F706A7480A112212008999AB /* Cyclic.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Cyclic.m; sourceTree = "<group>"; };
-		F706A74F0A112259008999AB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F70AA7A509AA2A6900C3FD5E /* ANTLR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLR.h; sourceTree = "<group>"; };
 		F70AA7AD09AA2AC000C3FD5E /* ANTLRIntStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRIntStream.h; sourceTree = "<group>"; };
 		F70AA7B509AA2B8800C3FD5E /* ANTLRCharStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRCharStream.h; sourceTree = "<group>"; };
@@ -423,7 +417,6 @@
 			children = (
 				F700ECCE0A5FE176005D0757 /* LL-star */,
 				F700E85D0A5FA2C0005D0757 /* combined */,
-				F706A71D0A11212D008999AB /* cyclic */,
 				F79D56590A0E238100EA3CEE /* fuzzy */,
 				F7037EBC0A05B06B0070435D /* lexertest-simple */,
 			);
@@ -440,18 +433,6 @@
 				F7037EC00A05B06B0070435D /* test.tokens */,
 			);
 			path = "lexertest-simple";
-			sourceTree = "<group>";
-		};
-		F706A71D0A11212D008999AB /* cyclic */ = {
-			isa = PBXGroup;
-			children = (
-				F706A7470A112212008999AB /* Cyclic.h */,
-				F706A7480A112212008999AB /* Cyclic.m */,
-				F706A71E0A11212E008999AB /* cyclic.g */,
-				F706A74F0A112259008999AB /* main.m */,
-			);
-			name = cyclic;
-			path = "cyclic returns";
 			sourceTree = "<group>";
 		};
 		F70AA7AA09AA2AAB00C3FD5E /* Streams */ = {
@@ -829,8 +810,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F706A7490A112212008999AB /* Cyclic.m in Sources */,
-				F706A7500A112259008999AB /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
