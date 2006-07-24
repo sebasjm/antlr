@@ -13,8 +13,6 @@
 		F700E61B0A5F66EC005D0757 /* ANTLREarlyExitException.h in Headers */ = {isa = PBXBuildFile; fileRef = F700E6190A5F66EC005D0757 /* ANTLREarlyExitException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F700E61C0A5F66EC005D0757 /* ANTLREarlyExitException.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E61A0A5F66EC005D0757 /* ANTLREarlyExitException.m */; };
 		F700E86B0A5FA34D005D0757 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E86A0A5FA34D005D0757 /* main.m */; };
-		F700E87C0A5FA774005D0757 /* Combined.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E8790A5FA774005D0757 /* Combined.m */; };
-		F700E87D0A5FA774005D0757 /* CombinedLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E87B0A5FA774005D0757 /* CombinedLexer.m */; };
 		F700E8FB0A5FAD21005D0757 /* ANTLRParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F700E8F90A5FAD21005D0757 /* ANTLRParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F700E8FC0A5FAD21005D0757 /* ANTLRParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E8FA0A5FAD21005D0757 /* ANTLRParser.m */; };
 		F700EC670A5FDF0D005D0757 /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
@@ -29,7 +27,6 @@
 		F7037CF00A0582FC0070435D /* ANTLRMismatchedRangeException.h in Headers */ = {isa = PBXBuildFile; fileRef = F7037CEE0A0582FC0070435D /* ANTLRMismatchedRangeException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F7037CF10A0582FC0070435D /* ANTLRMismatchedRangeException.m in Sources */ = {isa = PBXBuildFile; fileRef = F7037CEF0A0582FC0070435D /* ANTLRMismatchedRangeException.m */; };
 		F7037EA60A05AFD70070435D /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
-		F7037EC10A05B06B0070435D /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = F7037EBF0A05B06B0070435D /* test.m */; };
 		F70380BC0A07FA0D0070435D /* ANTLRMismatchedSetException.h in Headers */ = {isa = PBXBuildFile; fileRef = F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F70380BD0A07FA0D0070435D /* ANTLRMismatchedSetException.m in Sources */ = {isa = PBXBuildFile; fileRef = F70380BB0A07FA0D0070435D /* ANTLRMismatchedSetException.m */; };
 		F706A58D0A0EC4D0008999AB /* input in CopyFiles */ = {isa = PBXBuildFile; fileRef = F706A55B0A0EC307008999AB /* input */; };
@@ -66,7 +63,6 @@
 		F777678C09DD616600517181 /* ANTLRCharStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7B509AA2B8800C3FD5E /* ANTLRCharStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F777678E09DD618000517181 /* ANTLRLexer.h in Headers */ = {isa = PBXBuildFile; fileRef = F7A4099109659BFB002CC781 /* ANTLRLexer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F777678F09DD618100517181 /* ANTLRLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A4099209659BFB002CC781 /* ANTLRLexer.m */; };
-		F79D56BD0A0E286000EA3CEE /* FuzzyJava.m in Sources */ = {isa = PBXBuildFile; fileRef = F79D56BC0A0E286000EA3CEE /* FuzzyJava.m */; };
 		F79D56C10A0E287500EA3CEE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F79D56C00A0E287500EA3CEE /* main.m */; };
 		F79D598B0A0E51AB00EA3CEE /* ANTLRNoViableAltException.h in Headers */ = {isa = PBXBuildFile; fileRef = F79D59890A0E51AB00EA3CEE /* ANTLRNoViableAltException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F79D598C0A0E51AB00EA3CEE /* ANTLRNoViableAltException.m in Sources */ = {isa = PBXBuildFile; fileRef = F79D598A0A0E51AB00EA3CEE /* ANTLRNoViableAltException.m */; };
@@ -147,11 +143,6 @@
 		F700E85E0A5FA2DE005D0757 /* Combined.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Combined.g; path = combined/Combined.g; sourceTree = "<group>"; };
 		F700E8640A5FA31D005D0757 /* combined */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = combined; sourceTree = BUILT_PRODUCTS_DIR; };
 		F700E86A0A5FA34D005D0757 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = combined/main.m; sourceTree = "<group>"; };
-		F700E8770A5FA774005D0757 /* Combined.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Combined.h; path = combined/Combined.h; sourceTree = "<group>"; };
-		F700E8780A5FA774005D0757 /* Combined.lexer.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Combined.lexer.g; path = combined/Combined.lexer.g; sourceTree = "<group>"; };
-		F700E8790A5FA774005D0757 /* Combined.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = Combined.m; path = combined/Combined.m; sourceTree = "<group>"; };
-		F700E87A0A5FA774005D0757 /* CombinedLexer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CombinedLexer.h; path = combined/CombinedLexer.h; sourceTree = "<group>"; };
-		F700E87B0A5FA774005D0757 /* CombinedLexer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CombinedLexer.m; path = combined/CombinedLexer.m; sourceTree = "<group>"; };
 		F700E8F90A5FAD21005D0757 /* ANTLRParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRParser.h; sourceTree = "<group>"; };
 		F700E8FA0A5FAD21005D0757 /* ANTLRParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRParser.m; sourceTree = "<group>"; };
 		F700ECCF0A5FE176005D0757 /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
@@ -164,11 +155,8 @@
 		F700ED950A5FF2A5005D0757 /* ANTLRCommonTokenStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRCommonTokenStream.m; sourceTree = "<group>"; };
 		F7037CEE0A0582FC0070435D /* ANTLRMismatchedRangeException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedRangeException.h; sourceTree = "<group>"; };
 		F7037CEF0A0582FC0070435D /* ANTLRMismatchedRangeException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedRangeException.m; sourceTree = "<group>"; };
-		F7037EA00A05AFB60070435D /* lexertest-simple */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = "lexertest-simple"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F7037EA00A05AFB60070435D /* lexertest-simple */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "lexertest-simple"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7037EBD0A05B06B0070435D /* lexer.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = lexer.g; sourceTree = "<group>"; };
-		F7037EBE0A05B06B0070435D /* test.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
-		F7037EBF0A05B06B0070435D /* test.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; };
-		F7037EC00A05B06B0070435D /* test.tokens */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = test.tokens; sourceTree = "<group>"; };
 		F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedSetException.h; sourceTree = "<group>"; };
 		F70380BB0A07FA0D0070435D /* ANTLRMismatchedSetException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedSetException.m; sourceTree = "<group>"; };
 		F706A55B0A0EC307008999AB /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
@@ -201,8 +189,6 @@
 		F77766AE09DD53E800517181 /* ANTLRTokenStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRTokenStream.h; sourceTree = "<group>"; };
 		F79D565A0A0E238100EA3CEE /* java.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = java.g; sourceTree = "<group>"; };
 		F79D56600A0E23A400EA3CEE /* fuzzy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = fuzzy; sourceTree = BUILT_PRODUCTS_DIR; };
-		F79D56BB0A0E286000EA3CEE /* FuzzyJava.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = FuzzyJava.h; sourceTree = "<group>"; };
-		F79D56BC0A0E286000EA3CEE /* FuzzyJava.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = FuzzyJava.m; sourceTree = "<group>"; };
 		F79D56C00A0E287500EA3CEE /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F79D59890A0E51AB00EA3CEE /* ANTLRNoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRNoViableAltException.h; sourceTree = "<group>"; };
 		F79D598A0A0E51AB00EA3CEE /* ANTLRNoViableAltException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRNoViableAltException.m; sourceTree = "<group>"; };
@@ -381,11 +367,6 @@
 			isa = PBXGroup;
 			children = (
 				F700E85E0A5FA2DE005D0757 /* Combined.g */,
-				F700E8780A5FA774005D0757 /* Combined.lexer.g */,
-				F700E8770A5FA774005D0757 /* Combined.h */,
-				F700E8790A5FA774005D0757 /* Combined.m */,
-				F700E87A0A5FA774005D0757 /* CombinedLexer.h */,
-				F700E87B0A5FA774005D0757 /* CombinedLexer.m */,
 				F700E86A0A5FA34D005D0757 /* main.m */,
 			);
 			name = combined;
@@ -417,10 +398,7 @@
 			isa = PBXGroup;
 			children = (
 				F7037EBD0A05B06B0070435D /* lexer.g */,
-				F7037EBE0A05B06B0070435D /* test.h */,
-				F7037EBF0A05B06B0070435D /* test.m */,
 				F7E983940A0D6A5F00F16093 /* main.m */,
-				F7037EC00A05B06B0070435D /* test.tokens */,
 			);
 			path = "lexertest-simple";
 			sourceTree = "<group>";
@@ -468,8 +446,6 @@
 			isa = PBXGroup;
 			children = (
 				F706A55B0A0EC307008999AB /* input */,
-				F79D56BB0A0E286000EA3CEE /* FuzzyJava.h */,
-				F79D56BC0A0E286000EA3CEE /* FuzzyJava.m */,
 				F79D565A0A0E238100EA3CEE /* java.g */,
 				F79D56C00A0E287500EA3CEE /* main.m */,
 			);
@@ -772,8 +748,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F700E86B0A5FA34D005D0757 /* main.m in Sources */,
-				F700E87C0A5FA774005D0757 /* Combined.m in Sources */,
-				F700E87D0A5FA774005D0757 /* CombinedLexer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -789,7 +763,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F7037EC10A05B06B0070435D /* test.m in Sources */,
 				F7E983950A0D6A5F00F16093 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -814,7 +787,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F79D56BD0A0E286000EA3CEE /* FuzzyJava.m in Sources */,
 				F79D56C10A0E287500EA3CEE /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
