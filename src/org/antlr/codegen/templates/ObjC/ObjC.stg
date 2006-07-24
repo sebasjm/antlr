@@ -75,7 +75,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 headerFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
            recognizer, name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors,
            bitsets, buildTemplate, profile, backtracking, synpreds,
-           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass) ::=
+           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, scopes, superClass) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
@@ -121,7 +121,7 @@ lexerHeaderFile() ::=
 @end
 >>
 
-lexer(name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="Token",
+lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="Token",
       filterMode) ::= <<
 #pragma mark Cyclic DFA start
 <cyclicDFADescriptors:cyclicDFA()>
@@ -296,11 +296,11 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 @end
 >>
 
-parser(name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="ANTLRParser", labelType="ANTLRToken *", members={<actions.parser.members>}) ::= <<
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="ANTLRParser", labelType="ANTLRToken *", members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="ANTLRTokenStream", ...)>
 >>
 
-treeParser(name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ANTLRASTLabelType>}, ASTLabelType="id", superClass="ANTLRTreeParser", members={<actions.treeparser.members>}) ::= <<
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ANTLRASTLabelType>}, ASTLabelType="id", superClass="ANTLRTreeParser", members={<actions.treeparser.members>}) ::= <<
 <genericParser(inputStreamType="ANTLRTreeNodeStream *", ...)>
 >>
 /** A simpler version of a rule template that is specific to the imaginary
