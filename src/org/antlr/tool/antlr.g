@@ -128,8 +128,12 @@ tokens {
 		        );
 	}
 
+	/** Create a copy of the alt and make it into a BLOCK; all actions,
+	 *  labels, tree operators, rewrites are removed.
+	 */
 	protected GrammarAST createBlockFromDupAlt(GrammarAST alt) {
-		GrammarAST nalt = (GrammarAST)astFactory.dupTree(alt);
+		//GrammarAST nalt = (GrammarAST)astFactory.dupTree(alt);
+		GrammarAST nalt = GrammarAST.dupTreeNoActions(alt, null);
 		GrammarAST blk = #(#[BLOCK,"BLOCK"],
 						   nalt,
 						   #[EOB,"<end-of-block>"]
@@ -509,8 +513,10 @@ Map opts=null;
 		{currentBlockAST = #lp;}
 
 		a1:alternative rewrite
-		{prefixWithSynPred(#a1);}
-		( OR! a2:alternative rewrite {if (LA(1)==OR||LA(2)==QUESTION) prefixWithSynPred(#a2);} )*
+		{if (LA(1)==OR||(LA(2)==QUESTION||LA(2)==PLUS||LA(2)==STAR)) prefixWithSynPred(#a1);}
+		( OR! a2:alternative rewrite
+		  {if (LA(1)==OR||(LA(2)==QUESTION||LA(2)==PLUS||LA(2)==STAR)) prefixWithSynPred(#a2);}
+		)*
 
         rp:RPAREN!
         {
@@ -532,8 +538,9 @@ altList[Map opts]
 	currentBlockAST = #blkRoot;
 }
     :   a1:alternative rewrite
-    	{prefixWithSynPred(#a1);}
-    	( OR! a2:alternative rewrite {if (LA(1)==OR) prefixWithSynPred(#a2);} )*
+		{if (LA(1)==OR||(LA(2)==QUESTION||LA(2)==PLUS||LA(2)==STAR)) prefixWithSynPred(#a1);}
+    	( OR! a2:alternative rewrite
+    	  {if (LA(1)==OR||(LA(2)==QUESTION||LA(2)==PLUS||LA(2)==STAR)) prefixWithSynPred(#a2);} )*
         {
         #altList = #(blkRoot,#altList,#[EOB,"<end-of-block>"]);
         currentBlockAST = save;

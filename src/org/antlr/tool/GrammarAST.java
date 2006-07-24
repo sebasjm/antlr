@@ -108,7 +108,13 @@ public class GrammarAST extends BaseAST {
 	 */
 	public StringTemplate code;
 
-    public void initialize(int i, String s) {
+	public GrammarAST() {;}
+
+	public GrammarAST(int t, String txt) {
+		initialize(t,txt);
+	}
+
+	public void initialize(int i, String s) {
         token = new CommonToken(i,s);
     }
 
@@ -349,4 +355,64 @@ public class GrammarAST extends BaseAST {
 		return token.getLine() == t.getLine() &&
 			   token.getColumn() == t.getColumn();
 	}
+
+	public static GrammarAST dup(AST t) {
+		if ( t==null ) {
+			return null;
+		}
+		GrammarAST dup_t = new GrammarAST();
+		dup_t.initialize(t);
+		return dup_t;
+	}
+
+	public static void main(String[] args) {
+		GrammarAST t = new GrammarAST();
+	}
+
+	/** Duplicate tree including siblings of root. */
+	public static GrammarAST dupListNoActions(GrammarAST t, GrammarAST parent) {
+		GrammarAST result = dupTreeNoActions(t, parent);            // if t == null, then result==null
+		GrammarAST nt = result;
+		while (t != null) {						// for each sibling of the root
+			t = (GrammarAST)t.getNextSibling();
+			GrammarAST d = dupTreeNoActions(t, parent);
+			if ( d!=null ) {
+				if ( nt!=null ) {
+					nt.setNextSibling(d);	// dup each subtree, building new tree
+				}
+				nt = d;
+			}
+		}
+		return result;
+	}
+
+	/**Duplicate a tree, assuming this is a root node of a tree--
+	 * duplicate that node and what's below; ignore siblings of root node.
+	 */
+	public static GrammarAST dupTreeNoActions(GrammarAST t, GrammarAST parent) {
+		if ( t==null ) {
+			return null;
+		}
+		int ttype = t.getType();
+		if ( ttype==ANTLRParser.BANG ||
+			ttype==ANTLRParser.ROOT ||
+			ttype==ANTLRParser.REWRITE ||
+			ttype==ANTLRParser.RULEROOT ||
+			ttype==ANTLRParser.ACTION )
+		{
+			return null;
+		}
+		if ( ttype==ANTLRParser.ASSIGN &&
+			 (parent==null||parent.getType()!=ANTLRParser.OPTIONS) )
+		{
+			return dupTreeNoActions(t.getChild(1), t); // return x from ^(ASSIGN label x)
+		}
+		GrammarAST result = dup(t);		// make copy of root
+		// copy all children of root.
+		if (t != null) {
+			result.setFirstChild(dupListNoActions((GrammarAST)t.getFirstChild(), t));
+		}
+		return result;
+	}
+
 }
