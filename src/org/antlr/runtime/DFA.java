@@ -53,7 +53,7 @@ public class DFA {
 					return accept[s];
 				}
 				// look for a normal char transition
-				int c = input.LA(1);
+				char c = (char)input.LA(1); // -1 == \uFFFF, all tokens fit in 65000 space
 				if (c>=min[s] && c<=max[s]) {
 					int snext = transition[s][c-min[s]]; // move to next state
 					if ( snext < 0 ) {
@@ -85,7 +85,7 @@ public class DFA {
 					input.consume();
 					continue;
 				}
-				if ( c==Token.EOF && eof[s]>=0 ) {  // EOF Transition to accept state?
+				if ( c==(char)Token.EOF && eof[s]>=0 ) {  // EOF Transition to accept state?
 					if ( debug ) System.err.println("accept via EOF; predict "+accept[eof[s]]+" from "+eof[s]);
 					return accept[eof[s]];
 				}
