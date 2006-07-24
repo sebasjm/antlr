@@ -23,8 +23,6 @@
 		F700ECD90A5FE19A005D0757 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
 		F700ECDA0A5FE19A005D0757 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F700ECE80A5FE25D005D0757 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F700ECE70A5FE25D005D0757 /* main.m */; };
-		F700ECF10A5FE3A7005D0757 /* SimpleC.m in Sources */ = {isa = PBXBuildFile; fileRef = F700ECEE0A5FE3A7005D0757 /* SimpleC.m */; };
-		F700ECF20A5FE3A7005D0757 /* SimpleCLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F700ECF00A5FE3A7005D0757 /* SimpleCLexer.m */; };
 		F700ED7F0A5FF17C005D0757 /* ANTLRTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = F700ED7E0A5FF17C005D0757 /* ANTLRTokenSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F700ED960A5FF2A5005D0757 /* ANTLRCommonTokenStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F700ED940A5FF2A5005D0757 /* ANTLRCommonTokenStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F700ED970A5FF2A5005D0757 /* ANTLRCommonTokenStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F700ED950A5FF2A5005D0757 /* ANTLRCommonTokenStream.m */; };
@@ -161,16 +159,12 @@
 		F700ECD10A5FE176005D0757 /* simplec.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = simplec.g; sourceTree = "<group>"; };
 		F700ECD70A5FE186005D0757 /* LL-star */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "LL-star"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F700ECE70A5FE25D005D0757 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		F700ECED0A5FE3A7005D0757 /* SimpleC.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SimpleC.h; sourceTree = "<group>"; };
-		F700ECEE0A5FE3A7005D0757 /* SimpleC.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SimpleC.m; sourceTree = "<group>"; };
-		F700ECEF0A5FE3A7005D0757 /* SimpleCLexer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SimpleCLexer.h; sourceTree = "<group>"; };
-		F700ECF00A5FE3A7005D0757 /* SimpleCLexer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SimpleCLexer.m; sourceTree = "<group>"; };
 		F700ED7E0A5FF17C005D0757 /* ANTLRTokenSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRTokenSource.h; sourceTree = "<group>"; };
 		F700ED940A5FF2A5005D0757 /* ANTLRCommonTokenStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRCommonTokenStream.h; sourceTree = "<group>"; };
 		F700ED950A5FF2A5005D0757 /* ANTLRCommonTokenStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRCommonTokenStream.m; sourceTree = "<group>"; };
 		F7037CEE0A0582FC0070435D /* ANTLRMismatchedRangeException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedRangeException.h; sourceTree = "<group>"; };
 		F7037CEF0A0582FC0070435D /* ANTLRMismatchedRangeException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedRangeException.m; sourceTree = "<group>"; };
-		F7037EA00A05AFB60070435D /* lexertest-simple */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "lexertest-simple"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F7037EA00A05AFB60070435D /* lexertest-simple */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = "lexertest-simple"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7037EBD0A05B06B0070435D /* lexer.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = lexer.g; sourceTree = "<group>"; };
 		F7037EBE0A05B06B0070435D /* test.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		F7037EBF0A05B06B0070435D /* test.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; };
@@ -403,10 +397,6 @@
 				F700ECCF0A5FE176005D0757 /* input */,
 				F700ECD00A5FE176005D0757 /* output */,
 				F700ECD10A5FE176005D0757 /* simplec.g */,
-				F700ECED0A5FE3A7005D0757 /* SimpleC.h */,
-				F700ECEE0A5FE3A7005D0757 /* SimpleC.m */,
-				F700ECEF0A5FE3A7005D0757 /* SimpleCLexer.h */,
-				F700ECF00A5FE3A7005D0757 /* SimpleCLexer.m */,
 				F700ECE70A5FE25D005D0757 /* main.m */,
 			);
 			path = "LL-star";
@@ -792,8 +782,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F700ECE80A5FE25D005D0757 /* main.m in Sources */,
-				F700ECF10A5FE3A7005D0757 /* SimpleC.m in Sources */,
-				F700ECF20A5FE3A7005D0757 /* SimpleCLexer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
