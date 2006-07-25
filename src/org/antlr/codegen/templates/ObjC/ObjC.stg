@@ -312,7 +312,7 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
  */
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
-- (void) <ruleName>_fragment
+- (void) <ruleName>
 {
     <if(trace)>NSLog(@"enter <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);
     @try {
@@ -329,7 +329,7 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 
 
 synpred(name) ::= <<
-<name>SyntacticPredicate = @selector(m<name>_fragment);
+<name>SyntacticPredicate = @selector(m<name>);
 >>
 
 lexerSynpred(name) ::= <<
