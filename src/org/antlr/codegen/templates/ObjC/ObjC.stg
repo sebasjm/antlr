@@ -312,16 +312,28 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
  */
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
-#error No synpreds yet.
+- (void) <ruleName>_fragment
+{
+    <if(trace)>NSLog(@"enter <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);
+    @try {
+        <block>
+    }
+    @finally {
+        NSLog(@"exit <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);
+    }
+<else>
+    <block>
+<endif>
+}
 >>
 
 
 synpred(name) ::= <<
-#error No synpreds yet.
+<name>SyntacticPredicate = @selector(m<name>_fragment);
 >>
 
 lexerSynpred(name) ::= <<
-<name>SyntacticPredicate = @selector(m<name>_fragment);
+<synpred(name)>
 >>
 
 ruleMemoization(name) ::= <<
@@ -431,12 +443,12 @@ retval
 >>
 
 ruleCleanUp() ::= <<
-//test token labels
+// token labels
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]:{[<it.label.text> release];}; separator="\n">
 //test token labels
 //test rule labels
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]:{//[<it.label.text> release];}; separator="\n">
-//test rule labels
+// rule labels
 <ruleDescriptor.useScopes:{[<it>_stack removeLastObject];}; separator="\n">
 <ruleDescriptor.ruleScope:{[<it.name>_stack removeLastObject];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
@@ -1030,7 +1042,7 @@ notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
 evalPredicate(pred,description) ::= "<pred>"
 
-evalSynPredicate(pred,description) ::= "[self synpred:<pred>SyntacticPredicate stream:input]"
+evalSynPredicate(pred,description) ::= "[self evaluateSyntacticPredicate:<pred>SyntacticPredicate stream:input]"
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>/*atom/Test*/"
 

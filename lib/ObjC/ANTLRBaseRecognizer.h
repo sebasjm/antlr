@@ -123,4 +123,6 @@
 
 - (int) ruleMemoizationCacheSize;
 
+- (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment stream:(id<ANTLRIntStream>)input;
+
 @end

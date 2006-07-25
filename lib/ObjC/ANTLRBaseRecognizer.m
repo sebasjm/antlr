@@ -362,4 +362,21 @@
 	return n;
 }
 
+- (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment stream:(id<ANTLRIntStream>)input
+{
+    backtracking++;
+	int start = [input mark];
+    @try {
+        [self performSelector:synpredFragment];
+    }
+    @catch (ANTLRRecognitionException *re) {
+        NSLog(@"impossible synpred: %@", re);
+    }
+    BOOL success = !failed;
+    [input rewind:start];
+	backtracking--;
+    failed = NO;
+    return success;
+}	
+
 @end
