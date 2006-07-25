@@ -73,9 +73,9 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 
 
 headerFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
-           recognizer, name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors,
+           recognizer, name, tokens, tokenNames, rules, cyclicDFADescriptors,
            bitsets, buildTemplate, profile, backtracking, synpreds,
-           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, scopes, superClass) ::=
+           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
@@ -229,17 +229,17 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 @interface <name> : <@superClassName><superClass><@end> {
 
 	<cyclicDFADescriptors:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
- 	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
+	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
 	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 
- 	<actions.parser.ivars>
+	<actions.parser.ivars>
  }
 
- <actions.parser.methodsdecl>
+<actions.parser.methodsdecl>
 
- <rules:{rule |
- - (<rule.ruleDescriptor:{ruleDescriptor|<returnType()>}>) <rule.ruleName><if(rule.ruleDescriptor.parameterScope)><rule.ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>;
- }>
+<rules:{rule |
+- (<rule.ruleDescriptor:{ruleDescriptor|<returnType()>}>) <rule.ruleName><if(rule.ruleDescriptor.parameterScope)><rule.ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>;
+}>
 
 
 @end
@@ -638,11 +638,11 @@ element() ::= <<
 >>
 
 /** match a token optionally with a label in front */
-tokenRef(token,label,elementIndex,tokenLabel) ::= <<
+tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)[input LT:1];<\n>
 <endif>
-[self match:input tokenType:<tokenLabel> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <if(backtracking)> if (failed) return;<endif>
+[self match:input tokenType:<grammar.name>_<token> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <if(backtracking)> if (failed) return;<endif>
 >>
 
 /** ids+=ID */
@@ -925,20 +925,20 @@ cyclicDFAInterface(dfa) ::= <<
 cyclicDFA(dfa) ::= <<
 @implementation <name>DFA<dfa.decisionNumber>
 const static int <name>dfa<dfa.decisionNumber>_eot[<dfa.numberOfStates>] =
-    {<dfa.eot; wrap="\n     ", separator=",">};
+    {<dfa.eot; wrap="\n     ", separator=",", null="-1">};
 const static int <name>dfa<dfa.decisionNumber>_eof[<dfa.numberOfStates>] =
-    {<dfa.eof; wrap="\n     ", separator=",">};
+    {<dfa.eof; wrap="\n     ", separator=",", null="-1">};
 const static unichar <name>dfa<dfa.decisionNumber>_min[<dfa.numberOfStates>] =
-    {<dfa.min; wrap="\n     ", separator=",">};
+    {<dfa.min; wrap="\n     ", separator=",", null="0">};
 const static unichar <name>dfa<dfa.decisionNumber>_max[<dfa.numberOfStates>] =
-    {<dfa.max; wrap="\n     ", separator=",">};
+    {<dfa.max; wrap="\n     ", separator=",", null="0">};
 const static int <name>dfa<dfa.decisionNumber>_accept[<dfa.numberOfStates>] =
-    {<dfa.accept; wrap="\n     ", separator=",">};
+    {<dfa.accept; wrap="\n     ", separator=",", null="-1">};
 const static int <name>dfa<dfa.decisionNumber>_special[<dfa.numberOfStates>] =
-    {<dfa.special; wrap="\n     ", separator=",">};
+    {<dfa.special; wrap="\n     ", separator=",", null="-1">};
 <dfa.transition:{s|
-const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<s; wrap="\n    ", separator=",">};
-}>
+const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<s; wrap="\n    ", separator=",", null="-1">};
+}; null="">
 
 - (id) init
 {
@@ -953,7 +953,7 @@ const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<s; wrap="\n 
 			[self release];
 			return nil;
 		}
-		<dfa.transition:{s|transition[<i0>] = <name>dfa<dfa.decisionNumber>_transition<i0>;}; separator="\n">
+		<dfa.transition:{s|transition[<i0>] = <name>dfa<dfa.decisionNumber>_transition<i0>;}; separator="\n", null="">
 	}
 	return self;
 }

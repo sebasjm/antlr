@@ -79,7 +79,14 @@ public class ObjCTarget extends Target {
 
 	/** If we have a label, prefix it with the recognizer's name */
 	public String getTokenTypeAsTargetLabel(CodeGenerator generator, int ttype) {
-		return this.getTokenTextAndTypeAsTargetLabel(generator, null, ttype);
+		String name = generator.grammar.getTokenDisplayName(ttype);
+		// If name is a literal, return the token type instead
+		if ( name.charAt(0)=='\'' ) {
+			return String.valueOf(ttype);
+		}
+		return generator.grammar.name.concat("_").concat(name);
+		//return super.getTokenTypeAsTargetLabel(generator, ttype);
+		//return this.getTokenTextAndTypeAsTargetLabel(generator, null, ttype);
 	}
 
 	/** Target must be able to override the labels used for token types. Sometimes also depends on the token text.*/
