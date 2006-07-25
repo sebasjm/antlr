@@ -643,7 +643,7 @@ notSet
             (LPAREN setElement RPAREN)=> LPAREN! setElement RPAREN! 
         |   set
 		)
-        ( subrule=ebnfSuffix[#n] {#notSet = subrule;} )?
+        ( subrule=ebnfSuffix[#n,false] {#notSet = subrule;} )?
         {#notSet.setLine(line); #notSet.setColumn(col);}
 	;
 
@@ -733,7 +733,7 @@ GrammarAST subrule=null, root=null;
 		#range = #(r, #c1, #c2);
 		root = #range;
 		}
-    	(subrule=ebnfSuffix[root] {#range=subrule;})?
+    	(subrule=ebnfSuffix[root,false] {#range=subrule;})?
 	;
 
 terminal
@@ -741,30 +741,30 @@ terminal
 GrammarAST ebnfRoot=null, subrule=null;
 }
     :   cl:CHAR_LITERAL^
-    		(	subrule=ebnfSuffix[#cl] {#terminal=subrule;}
+    		(	subrule=ebnfSuffix[#cl,false] {#terminal=subrule;}
     		|	ast_suffix
     		)?
 
 	|   tr:TOKEN_REF^
 			( ARG_ACTION )?
-			(	subrule=ebnfSuffix[#tr] {#terminal=subrule;}
+			(	subrule=ebnfSuffix[#tr,false] {#terminal=subrule;}
 			|	ast_suffix
 			)?
 			// Args are only valid for lexer rules
 
     |   rr:RULE_REF^
 			( ARG_ACTION )?
-			(	subrule=ebnfSuffix[#rr] {#terminal=subrule;}
+			(	subrule=ebnfSuffix[#rr,false] {#terminal=subrule;}
 			|	ast_suffix
 			)?
 
 	|   sl:STRING_LITERAL^
-    		(	subrule=ebnfSuffix[#sl] {#terminal=subrule;}
+    		(	subrule=ebnfSuffix[#sl,false] {#terminal=subrule;}
 			|	ast_suffix
 			)?
 
 	|   wi:WILDCARD^
-    		(	subrule=ebnfSuffix[#wi] {#terminal=subrule;}
+    		(	subrule=ebnfSuffix[#wi,false] {#terminal=subrule;}
 			|	ast_suffix
 			)?
 	;
@@ -775,7 +775,7 @@ ast_suffix
 	|	BANG
 	;
 
-ebnfSuffix[GrammarAST elemAST] returns [GrammarAST subrule=null]
+ebnfSuffix[GrammarAST elemAST, boolean inRewrite] returns [GrammarAST subrule=null]
 {
 GrammarAST ebnfRoot=null;
 }
@@ -793,7 +793,9 @@ GrammarAST ebnfRoot=null;
 		eob.setLine(elemAST.getLine());
 		eob.setColumn(elemAST.getColumn());
 		GrammarAST alt = #(#[ALT,"ALT"],elemAST,#[EOA,"<end-of-alt>"]);
-    	prefixWithSynPred(alt);
+    	if ( !inRewrite ) {
+    		prefixWithSynPred(alt);
+    	}
   		subrule =
   		     #(ebnfRoot,
   		       #(blkRoot,alt,eob)
@@ -884,10 +886,10 @@ rewrite_element
 GrammarAST subrule=null;
 }
 	:	t:rewrite_terminal
-    	( subrule=ebnfSuffix[#t] {#rewrite_element=subrule;} )?
+    	( subrule=ebnfSuffix[#t,true] {#rewrite_element=subrule;} )?
 	|   rewrite_ebnf
 	|   tr:rewrite_tree
-    	( subrule=ebnfSuffix[#tr] {#rewrite_element=subrule;} )?
+    	( subrule=ebnfSuffix[#tr,true] {#rewrite_element=subrule;} )?
 	;
 
 rewrite_terminal
