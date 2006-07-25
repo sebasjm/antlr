@@ -440,7 +440,10 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		return txt;
 	}
 
-	public boolean tokenIndexesAreInvalid() { return tokenIndexesInvalid; }
+	public boolean tokenIndexesAreInvalid() {
+		return false;
+		//return tokenIndexesInvalid;
+	}
 
 }
 
