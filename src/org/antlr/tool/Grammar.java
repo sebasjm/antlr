@@ -832,7 +832,11 @@ public class Grammar {
         if ( index>=typeToTokenList.size() ) {
 			typeToTokenList.setSize(index+1);
 		}
-        typeToTokenList.set(index, text);
+		String prevToken = (String)typeToTokenList.get(index);
+		if ( prevToken==null || prevToken.charAt(0)=='\'' ) {
+			// only record if nothing there before or if thing before was a literal
+			typeToTokenList.set(index, text);
+		}
     }
 
 	/** Define a new rule.  A new rule index is created by incrementing

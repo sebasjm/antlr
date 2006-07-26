@@ -727,7 +727,7 @@ atom[String label] returns [StringTemplate code=null]
 				   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(t.getText()));
 				code.setAttribute("token",tokenLabel);
 			    code.setAttribute("elementIndex", ((TokenWithIndex)#t.getToken()).getIndex());
-			    generator.generateLocalFOLLOW(#t,#t.getText(),currentRuleName);
+			    generator.generateLocalFOLLOW(#t,tokenLabel,currentRuleName);
 		   }
 		   #t.code = code;
 		}
@@ -748,9 +748,7 @@ atom[String label] returns [StringTemplate code=null]
 			code.setAttribute("token",tokenLabel);
 			code.setAttribute("elementIndex",
 							  ((TokenWithIndex)#c.getToken()).getIndex());
-			generator.generateLocalFOLLOW(#c,
-				String.valueOf(grammar.getTokenType(#c.getText())),
-				currentRuleName);
+			generator.generateLocalFOLLOW(#c,tokenLabel,currentRuleName);
 		}
         }
 
@@ -770,9 +768,7 @@ atom[String label] returns [StringTemplate code=null]
 			   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(#s.getText()));
 			code.setAttribute("token",tokenLabel);
 			code.setAttribute("elementIndex", ((TokenWithIndex)#s.getToken()).getIndex());
-			generator.generateLocalFOLLOW(#s,
-				String.valueOf(grammar.getTokenType(#s.getText())),
-				currentRuleName);
+			generator.generateLocalFOLLOW(#s,tokenLabel,currentRuleName);
 		}
 		}
 
