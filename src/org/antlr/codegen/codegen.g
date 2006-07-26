@@ -762,7 +762,7 @@ atom[String label] returns [StringTemplate code=null]
 		else { // else it's a token type reference
 			code = getTokenElementST("tokenRef", "string_literal", #s, #as4, label);
 			String tokenLabel =
-			   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(t.getText()));
+			   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(#s.getText()));
 			code.setAttribute("token",tokenLabel);
 			code.setAttribute("elementIndex", ((TokenWithIndex)#s.getToken()).getIndex());
 			generator.generateLocalFOLLOW(#s,
