@@ -121,7 +121,7 @@ lexerHeaderFile() ::=
 @end
 >>
 
-lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="Token",
+lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="ANTLRToken *",
       filterMode) ::= <<
 #pragma mark Cyclic DFA start
 <cyclicDFADescriptors:cyclicDFA()>
@@ -312,7 +312,7 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
  */
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
-- (void) <ruleName>
+- (void) m<ruleName>
 {
     <if(trace)>NSLog(@"enter <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);
     @try {
