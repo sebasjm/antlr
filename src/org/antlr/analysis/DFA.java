@@ -151,6 +151,30 @@ public class DFA {
 	 */
 	protected long conversionStartTime;
 
+	/** Map an edge transition table to a unique set number; ordered so
+	 *  we can push into the output template as an ordered list of sets
+	 *  and then ref them from within the transition[][] table.  Like this
+	 *  for C# target:
+	 *     public static readonly DFA30_transition0 =
+	 *     	new short[] { 46, 46, -1, 46, 46, -1, -1, -1, -1, -1, -1, -1,...};
+	 *         public static readonly DFA30_transition1 =
+	 *     	new short[] { 21 };
+	 *      public static readonly short[][] DFA30_transition = {
+	 *     	  DFA30_transition0,
+	 *     	  DFA30_transition0,
+	 *     	  DFA30_transition1,
+	 *     	  ...
+	 *      };
+	 */
+	public Map edgeTransitionClassMap = new LinkedHashMap();
+
+	/** The unique edge transition class number; every time we see a new
+	 *  set of edges emanating from a state, we number it so we can reuse
+	 *  if it's every seen again for another state.  For Java grammar,
+	 *  some of the big edge transition tables are seen about 57 times.
+	 */
+	protected int edgeTransitionClass =0;
+
 	/* This DFA can be converted to a transition[state][char] table and
 	 * the following tables are filled by createStateTables upon request.
 	 * These are injected into the templates for code generation.
@@ -171,6 +195,10 @@ public class DFA {
 	public Vector max;
 	public Vector special;
 	public Vector transition;
+	/** just the Vector<Integer> indicating which unique edge table is at
+	 *  position i.
+	 */
+	public Vector transitionEdgeTables; // not used by java yet
 	protected int uniqueCompressedSpecialStateNum = 0;
 
 	public DFA(int decisionNumber, NFAState decisionStartState) {
@@ -344,6 +372,8 @@ public class DFA {
 		max.setSize(this.getNumberOfStates());
 		transition = new Vector(this.getNumberOfStates()); // Vector<Vector<int>>
 		transition.setSize(this.getNumberOfStates());
+		transitionEdgeTables = new Vector(this.getNumberOfStates()); // Vector<Vector<int>>
+		transitionEdgeTables.setSize(this.getNumberOfStates());
 
 		// for each state in the DFA, fill relevant tables.
 		Iterator it = null;
@@ -373,7 +403,7 @@ public class DFA {
 			else {
 				//accept.set(s.stateNumber, new Integer(0)); // doesn't predict
 				createMinMaxTables(s);
-				createTransitionTable(s);
+				createTransitionTableEntryForState(s);
 				createSpecialTable(generator, s);
 				createEOTTable(s);
 			}
@@ -472,19 +502,15 @@ public class DFA {
 		}
 	}
 
-	protected void createTransitionTable(DFAState s) {
-		// TODO: create set to look for identical character classes
-		// which means we could share transition tables for multiple states
+	protected void createTransitionTableEntryForState(DFAState s) {
+		/*
+		System.out.println("createTransitionTableEntryForState s"+s.stateNumber+
+			" dec "+s.dfa.decisionNumber+" cyclic="+s.dfa.isCyclic());
+		*/
 		int smax = ((Integer)max.get(s.stateNumber)).intValue();
 		int smin = ((Integer)min.get(s.stateNumber)).intValue();
 		Vector stateTransitions = new Vector(smax-smin+1);
 		stateTransitions.setSize(smax-smin+1);
-		/*
-		// fill with -1 as default transition to invalid state
-		for (int sti = 0; sti < stateTransitions.size(); sti++) {
-			stateTransitions.set(sti, new Integer(-1));
-		}
-		*/
 		transition.set(s.stateNumber, stateTransitions);
 		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
 			Transition edge = (Transition) s.transition(j);
@@ -504,15 +530,26 @@ public class DFA {
 				}
 			}
 		}
-		/*
-		// now add an empty row for states with no transitions;
-		// otherwise ST skips entry
-		for (int i = 0; i < transition.size(); i++) {
-			if (transition.elementAt(i) == null) {
-				transition.setElementAt(new Vector(), i);
-			}
+		// track unique state transition tables so we can reuse
+		Integer edgeClass = (Integer)edgeTransitionClassMap.get(stateTransitions);
+		if ( edgeClass!=null ) {
+			//System.out.println("we've seen this array before; size="+stateTransitions.size());
+			transitionEdgeTables.set(s.stateNumber, edgeClass);
 		}
-		*/
+		else {
+			/*
+			if ( stateTransitions.size()>255 ) {
+				System.out.println("edge edgeTable "+stateTransitions.size()+" s"+s.stateNumber+": "+new Integer(edgeTransitionClass));
+			}
+			else {
+				System.out.println("stateTransitions="+stateTransitions);
+			}
+			*/
+			edgeClass = new Integer(edgeTransitionClass);
+			transitionEdgeTables.set(s.stateNumber, edgeClass);
+			edgeTransitionClassMap.put(stateTransitions, edgeClass);
+			edgeTransitionClass++;
+		}
 	}
 
 	protected void createEOTTable(DFAState s) {

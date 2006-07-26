@@ -585,12 +585,12 @@ public class CodeGenerator {
 											   DFA dfa)
 	{
 		StringTemplate decisionST;
-		dfa.createStateTables(this);
 		if ( GEN_FIXED_DFA_INLINE && !dfa.isCyclic() /* TODO: and ! too big */ ) {
 			decisionST =
 				acyclicDFAGenerator.genFixedLookaheadDecision(getTemplates(), dfa);
 		}
 		else {
+			dfa.createStateTables(this);
 			outputFileST.setAttribute("cyclicDFAs", dfa);
 			headerFileST.setAttribute("cyclicDFAs", dfa);
 			decisionST = templates.getInstanceOf("dfaDecision");
