@@ -654,7 +654,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)[input LT:1];<\n>
 <endif>
-[self match:input tokenType:<grammar.name>_<token> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <if(backtracking)> if (failed) return;<endif>
+[self match:input tokenType:<token> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <if(backtracking)> if (failed) return;<endif>
 >>
 
 /** ids+=ID */
