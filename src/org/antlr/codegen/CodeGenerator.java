@@ -385,16 +385,19 @@ public class CodeGenerator {
 			headerFileST.setAttribute("TREE_PARSER", new Boolean(true));
 		}
 		outputFileST.setAttribute("recognizer", recognizerST);
+		headerFileST.setAttribute("recognizer", recognizerST);
 		outputFileST.setAttribute("actionScope",
+								  grammar.getDefaultActionScope(grammar.type));
+		headerFileST.setAttribute("actionScope",
 								  grammar.getDefaultActionScope(grammar.type));
 
 		String targetAppropriateFileNameString =
 			target.getTargetStringLiteralFromString(grammar.getFileName());
 		outputFileST.setAttribute("fileName", targetAppropriateFileNameString);
+		headerFileST.setAttribute("fileName", targetAppropriateFileNameString);
 		outputFileST.setAttribute("ANTLRVersion", Tool.VERSION);
 		headerFileST.setAttribute("ANTLRVersion", Tool.VERSION);
 		outputFileST.setAttribute("generatedTimestamp", Tool.getCurrentTimeStamp());
-		headerFileST.setAttribute("fileName", grammar.getFileName());
 		headerFileST.setAttribute("generatedTimestamp", Tool.getCurrentTimeStamp());
 
 		// GENERATE RECOGNIZER

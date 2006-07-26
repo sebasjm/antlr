@@ -255,7 +255,12 @@ attrScope
 
 grammarSpec
 	:   name:ID
-		(cmt:DOC_COMMENT {outputFileST.setAttribute("docComment", #cmt.getText());} )?
+		(cmt:DOC_COMMENT
+		 {
+		 outputFileST.setAttribute("docComment", #cmt.getText());
+		 headerFileST.setAttribute("docComment", #cmt.getText());
+		 }
+		)?
 		{
 		recognizerST.setAttribute("name", #name.getText());
 		recognizerST.setAttribute("scopes", grammar.getGlobalScopes());

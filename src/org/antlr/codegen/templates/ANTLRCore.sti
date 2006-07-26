@@ -39,11 +39,12 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 	   fileName, ANTLRVersion, generatedTimestamp, trace);
 
 optional 
-headerFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
-           recognizer, name, tokens, tokenNames, scopes, rules, 
-	   cyclicDFADescriptors,
-           bitsets, buildTemplate, profile, backtracking, synpreds,
-           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp);
+headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
+           docComment, recognizer,
+           name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors,
+	   bitsets, buildTemplate, profile,
+	   backtracking, synpreds, memoize, numRules,
+	   fileName, ANTLRVersion, generatedTimestamp, trace);
 
 lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType,
       filterMode);
