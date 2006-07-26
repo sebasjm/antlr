@@ -512,11 +512,13 @@ StringTemplate e;
     		(	{GrammarAST elAST=(GrammarAST)_t;}
     			e=element
     			{
-    			code.setAttribute("elements.{el,line,pos}",
-    							  e,
-    							  new Integer(elAST.getLine()),
-    							  new Integer(elAST.getColumn())
-    							 );
+    			if ( e!=null ) {
+					code.setAttribute("elements.{el,line,pos}",
+									  e,
+									  new Integer(elAST.getLine()),
+									  new Integer(elAST.getColumn())
+									 );
+    			}
     			}
     		)+
     		EOA
@@ -715,10 +717,12 @@ atom[String label] returns [StringTemplate code=null]
 			    if ( label!=null ) code.setAttribute("label", label);
 		   }
 		   else {
-			   code = getTokenElementST("tokenRef", #t.getText(), #t, #as2, label);
-			   code.setAttribute("token", t.getText());
-			   code.setAttribute("elementIndex", ((TokenWithIndex)#t.getToken()).getIndex());
-			   generator.generateLocalFOLLOW(#t,#t.getText(),currentRuleName);
+				code = getTokenElementST("tokenRef", #t.getText(), #t, #as2, label);
+				String tokenLabel =
+				   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(t.getText()));
+				code.setAttribute("token",tokenLabel);
+			    code.setAttribute("elementIndex", ((TokenWithIndex)#t.getToken()).getIndex());
+			    generator.generateLocalFOLLOW(#t,#t.getText(),currentRuleName);
 		   }
 		   #t.code = code;
 		}
@@ -735,8 +739,8 @@ atom[String label] returns [StringTemplate code=null]
 		}
 		else { // else it's a token type reference
 			code = getTokenElementST("tokenRef", "char_literal", #c, #as3, label);
-			code.setAttribute("token",
-							  new Integer(grammar.getTokenType(c.getText())));
+			String tokenLabel = generator.getTokenTypeAsTargetLabel(grammar.getTokenType(c.getText()));
+			code.setAttribute("token",tokenLabel);
 			code.setAttribute("elementIndex",
 							  ((TokenWithIndex)#c.getToken()).getIndex());
 			generator.generateLocalFOLLOW(#c,
@@ -757,8 +761,9 @@ atom[String label] returns [StringTemplate code=null]
 		}
 		else { // else it's a token type reference
 			code = getTokenElementST("tokenRef", "string_literal", #s, #as4, label);
-			code.setAttribute("token",
-							 new Integer(grammar.getTokenType(s.getText())));
+			String tokenLabel =
+			   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(t.getText()));
+			code.setAttribute("token",tokenLabel);
 			code.setAttribute("elementIndex", ((TokenWithIndex)#s.getToken()).getIndex());
 			generator.generateLocalFOLLOW(#s,
 				String.valueOf(grammar.getTokenType(#s.getText())),
