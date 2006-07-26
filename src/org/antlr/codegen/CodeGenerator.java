@@ -591,8 +591,8 @@ public class CodeGenerator {
 				acyclicDFAGenerator.genFixedLookaheadDecision(getTemplates(), dfa);
 		}
 		else {
-			outputFileST.setAttribute("cyclicDFADescriptors", dfa);
-			headerFileST.setAttribute("cyclicDFADescriptors", dfa);
+			outputFileST.setAttribute("cyclicDFAs", dfa);
+			headerFileST.setAttribute("cyclicDFAs", dfa);
 			decisionST = templates.getInstanceOf("dfaDecision");
 			String description = dfa.getNFADecisionStartState().getDescription();
 			description = target.getTargetStringLiteralFromString(description);

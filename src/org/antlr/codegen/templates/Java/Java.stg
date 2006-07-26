@@ -45,7 +45,6 @@ javaTypeInitMap ::= [
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs,
-	   cyclicDFADescriptors,
 	   bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace) ::=
@@ -71,7 +70,7 @@ import java.util.HashMap;
 <recognizer>
 >>
 
-lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="Token",
+lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
       filterMode) ::= <<
 public class <name> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
@@ -93,8 +92,8 @@ public class <name> extends Lexer {
 
     <synpreds:{p | <lexerSynpred(p)>}>
 
-    <cyclicDFADescriptors:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
-    <cyclicDFADescriptors:cyclicDFA()> <! dump tables for all DFA !>
+    <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
+    <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
 
 }
 >>
@@ -154,7 +153,7 @@ filteringActionGate() ::= "backtracking==1"
 
 /** How to generate a parser */
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
-              cyclicDFAs, bitsets, inputStreamType, superClass,
+              bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType, members) ::= <<
 public class <name> extends <@superClassName><superClass><@end> {
     public static final String[] tokenNames = new String[] {
@@ -181,22 +180,22 @@ public class <name> extends <@superClassName><superClass><@end> {
 
     <synpreds:{p | <synpred(p)>}>
 
-    <cyclicDFADescriptors:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
-    <cyclicDFADescriptors:cyclicDFA()> <! dump tables for all DFA !>
+    <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
+    <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
 
     <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
                     words64=it.bits)>
 }
 >>
 
-parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="TokenStream", ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser", members={<actions.treeparser.members>}) ::= <<
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser", members={<actions.treeparser.members>}) ::= <<
 <genericParser(inputStreamType="TreeNodeStream", ...)>
 >>
 

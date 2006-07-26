@@ -33,7 +33,7 @@ interface ANTLRCore;
  */
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
-           name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors,
+           name, tokens, tokenNames, rules, cyclicDFAs,
 	   bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace);
@@ -41,23 +41,23 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 optional 
 headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
-           name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors,
+           name, tokens, tokenNames, rules, cyclicDFAs,
 	   bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace);
 
-lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType,
+lexer(grammar, name, tokens, scopes, rules, numRules, labelType,
       filterMode);
 
 parser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
-       cyclicDFAs, bitsets, ASTLabelType, superClass,
+       bitsets, ASTLabelType, superClass,
        labelType, members);
 
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
 treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules,
-           numRules, cyclicDFAs, bitsets, labelType, ASTLabelType,
+           numRules, bitsets, labelType, ASTLabelType,
            superClass, members);
 
 /** A simpler version of a rule template that is specific to the imaginary
