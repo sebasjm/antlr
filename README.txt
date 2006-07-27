@@ -274,6 +274,67 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
+3.0b4 - ??
+
+July 26, 2006
+
+* compressed DFA edge tables significantly.  All edge tables are
+  unique. The transition table can reuse arrays.  Look like this now:
+
+     public static readonly DFA30_transition0 =
+     	new short[] { 46, 46, -1, 46, 46, -1, -1, -1, -1, -1, -1, -1,...};
+         public static readonly DFA30_transition1 =
+     	new short[] { 21 };
+      public static readonly short[][] DFA30_transition = {
+     	  DFA30_transition0,
+     	  DFA30_transition0,
+     	  DFA30_transition1,
+     	  ...
+      };
+
+* If you defined both a label like EQ and '=', sometimes the '=' was
+  used instead of the EQ label.
+
+* made headerFile template have same arg list as outputFile for consistency
+
+* outputFile, lexer, genericParser, parser, treeParser templates
+  reference cyclicDFAs attribute which was no longer used after I
+  started the new table-based DFA.  I made cyclicDFADescriptors
+  argument to outputFile and headerFile (only).  I think this is
+  correct as only OO languages will want the DFA in the recognizer.
+  At the top level, C and friends can use it.  Changed name to use
+  cyclicDFAs again as it's a better name probably.  Removed parameter
+  from the lexer, ...  For example, my parser template says this now:
+
+    <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
+
+* made all token ref token types go thru code gen's
+  getTokenTypeAsTargetLabel()
+
+* no more computing DFA transition tables for acyclic DFA.
+
+July 25, 2006
+
+* fixed a place where I was adding syn predicates into rewrite stuff.
+
+* turned off invalid token index warning in AW support; had a problem.
+
+* bad location event generated with -debug for synpreds in autobacktrack mode.
+
+July 24, 2006
+
+* changed runtime.DFA so that it treats all chars and token types as
+  char (unsigned 16 bit int).  -1 becomes '\uFFFF' then or 65535.
+
+* changed MAX_STATE_TRANSITIONS_FOR_TABLE to be 65534 by default
+  now. This means that all states can use a table to do transitions.
+
+* was not making synpreds on (C)* type loops with backtrack=true
+
+* was copying tree stuff and actions into synpreds with backtrack=true
+
+* was making synpreds on even single alt rules / blocks with backtrack=true
+
 3.0b3 - July 21, 2006
 
 * ANTLR fails to analyze complex decisions much less frequently.  It
