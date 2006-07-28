@@ -55,10 +55,10 @@ objcTypeInitMap ::= [
  */
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
-           name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors, bitsets,
-           buildTemplate, profile,
+           name, tokens, tokenNames, rules, cyclicDFAs,
+	   bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
-	   fileName, ANTLRVersion, generatedTimestamp, trace) ::=
+	   fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 <actions.(actionScope).header>
@@ -72,10 +72,12 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 >>
 
 
-headerFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
-           recognizer, name, tokens, tokenNames, rules, cyclicDFADescriptors,
-           bitsets, buildTemplate, profile, backtracking, synpreds,
-           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass) ::=
+headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
+           docComment, recognizer,
+           name, tokens, tokenNames, rules, cyclicDFAs,
+	   bitsets, buildTemplate, profile,
+	   backtracking, synpreds, memoize, numRules,
+	   fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
@@ -93,7 +95,7 @@ headerFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 lexerHeaderFile() ::=
 <<
 #pragma mark Cyclic DFA start
-<cyclicDFADescriptors:cyclicDFAInterface()>
+<cyclicDFAs:cyclicDFAInterface()>
 #pragma mark Cyclic DFA end
 
 #pragma mark Rule return scopes start
@@ -106,7 +108,7 @@ lexerHeaderFile() ::=
 <tokens:{#define <name>_<it.name>	<it.type>}; separator="\n">
 
 @interface <name> : ANTLRLexer {
-	<cyclicDFADescriptors:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
+	<cyclicDFAs:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
 	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
 	<actions.lexer.ivars>
 }
@@ -121,10 +123,10 @@ lexerHeaderFile() ::=
 @end
 >>
 
-lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="ANTLRToken *",
+lexer(grammar, name, tokens, scopes, rules, numRules, labelType="ANTLRToken *",
       filterMode) ::= <<
 #pragma mark Cyclic DFA start
-<cyclicDFADescriptors:cyclicDFA()>
+<cyclicDFAs:cyclicDFA()>
 #pragma mark Cyclic DFA end
 
 
@@ -145,7 +147,7 @@ lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="ANT
 		// init memoize facility
 		<endif>
 		<synpreds:{p | <lexerSynpred(name=p)>};separator="\n">
-		<cyclicDFADescriptors:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
+		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
 		<actions.lexer.init>
 	}
 	return self;
@@ -153,7 +155,7 @@ lexer(grammar, name, tokens, scopes, rules, numRules, cyclicDFAs, labelType="ANT
 
 - (void) dealloc
 {
-	<cyclicDFADescriptors:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
+	<cyclicDFAs:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
 <actions.lexer.dealloc>
 	[super dealloc];
 }
@@ -214,13 +216,13 @@ filteringNextToken() ::= <<
 filteringActionGate() ::= "backtracking==1"
 
 parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
-           recognizer, name, tokens, tokenNames, rules, cyclicDFAs, cyclicDFADescriptors,
+           recognizer, name, tokens, tokenNames, rules, cyclicDFAs,
            bitsets, buildTemplate, profile, backtracking, synpreds,
            memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass="ANTLRParser") ::=
 <<
 
 #pragma mark Cyclic DFA start
-<cyclicDFADescriptors:cyclicDFAInterface()>
+<cyclicDFAs:cyclicDFAInterface()>
 #pragma mark Cyclic DFA end
 
 #pragma mark Tokens
@@ -228,7 +230,7 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 
 @interface <name> : <@superClassName><superClass><@end> {
 
-	<cyclicDFADescriptors:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
+	<cyclicDFAs:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
 	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
 	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 
@@ -251,7 +253,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
               ASTLabelType="id", labelType, members) ::= <<
 
 #pragma mark Cyclic DFA start
-<cyclicDFADescriptors:cyclicDFA()>
+<cyclicDFAs:cyclicDFA()>
 #pragma mark Cyclic DFA end
 
 <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
@@ -270,7 +272,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 <if(backtracking)>
 		ruleMemo = [[NSMutableDictionary alloc] init];
 <endif>
-		<cyclicDFADescriptors:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
+		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
 		<actions.parser.init>
 	}
 	return self;
@@ -282,7 +284,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 <if(backtracking)>
 	[ruleMemo release];
 <endif>
-	<cyclicDFADescriptors:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
+	<cyclicDFAs:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
 	<actions.parser.dealloc>
 	[super dealloc];
 }
@@ -296,11 +298,11 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 @end
 >>
 
-parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, bitsets, ASTLabelType, superClass="ANTLRParser", labelType="ANTLRToken *", members={<actions.parser.members>}) ::= <<
-<genericParser(inputStreamType="ANTLRTokenStream", ...)>
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="ANTLRParser", labelType="ANTLRToken *", members={<actions.parser.members>}) ::= <<
+<genericParser(inputStreamType="ANTLRTokenStream *", ...)>
 >>
 
-treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, cyclicDFAs, bitsets, labelType={<ANTLRASTLabelType>}, ASTLabelType="id", superClass="ANTLRTreeParser", members={<actions.treeparser.members>}) ::= <<
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ANTLRASTLabelType>}, ASTLabelType="id", superClass="ANTLRTreeParser", members={<actions.treeparser.members>}) ::= <<
 <genericParser(inputStreamType="ANTLRTreeNodeStream *", ...)>
 >>
 /** A simpler version of a rule template that is specific to the imaginary
@@ -948,8 +950,9 @@ const static int <name>dfa<dfa.decisionNumber>_accept[<dfa.numberOfStates>] =
     {<dfa.accept; wrap="\n     ", separator=",", null="-1">};
 const static int <name>dfa<dfa.decisionNumber>_special[<dfa.numberOfStates>] =
     {<dfa.special; wrap="\n     ", separator=",", null="-1">};
-<dfa.transition:{s|
-const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<s; wrap="\n    ", separator=",", null="-1">};
+const static int <name>dfa<dfa.decisionNumber>_transition[] = {};
+<dfa.edgeTransitionClassMap.keys:{ table |
+const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<table; separator=", ", wrap="\n	", null="-1">};
 }; null="">
 
 - (id) init
@@ -965,7 +968,7 @@ const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<s; wrap="\n 
 			[self release];
 			return nil;
 		}
-		<dfa.transition:{s|transition[<i0>] = <name>dfa<dfa.decisionNumber>_transition<i0>;}; separator="\n", null="">
+		<dfa.transitionEdgeTables:{whichTable|transition[<i0>] = <name>dfa<dfa.decisionNumber>_transition<whichTable>;}; separator="\n", null="">
 	}
 	return self;
 }
