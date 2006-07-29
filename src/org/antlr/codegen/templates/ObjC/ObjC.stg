@@ -125,17 +125,16 @@ lexerHeaderFile() ::=
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="ANTLRToken *",
       filterMode) ::= <<
-#pragma mark Cyclic DFA start
+#pragma mark Cyclic DFAs
 <cyclicDFAs:cyclicDFA()>
-#pragma mark Cyclic DFA end
 
-
-
+/** As per Terence: No returns for lexer rules!
 #pragma mark Rule return scopes start
 <rules:{rule |
 <rule.ruleDescriptor:returnScope(ruleDescriptor=rule.ruleDescriptor)>
 }>
 #pragma mark Rule return scopes end
+*/
 @implementation <name>
 
 <actions.lexer.methods>
@@ -221,18 +220,25 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
            memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass="ANTLRParser") ::=
 <<
 
-#pragma mark Cyclic DFA start
+#pragma mark Cyclic DFA
 <cyclicDFAs:cyclicDFAInterface()>
-#pragma mark Cyclic DFA end
 
 #pragma mark Tokens
 <tokens:{#define <name>_<it.name>	<it.type>}; separator="\n">
+
+#pragma mark Dynamic Scopes
+<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDecl(scope=it)><endif>}>
+
+#pragma mark Rule Return Scopes
+<rules:{rule |
+<rule.ruleDescriptor:returnScope(ruleDescriptor=rule.ruleDescriptor)>
+}>
 
 @interface <name> : <@superClassName><superClass><@end> {
 
 	<cyclicDFAs:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
 	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
-	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
+	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeIVar(scope=it)><endif>}>
 
 	<actions.parser.ivars>
  }
@@ -252,11 +258,14 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
               cyclicDFAs, bitsets, inputStreamType, superClass,
               ASTLabelType="id", labelType, members) ::= <<
 
-#pragma mark Cyclic DFA start
+#pragma mark Cyclic DFA
 <cyclicDFAs:cyclicDFA()>
-#pragma mark Cyclic DFA end
 
+#pragma mark Bitsets
 <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
+
+#pragma mark Scopes
+<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeImpl(scope=it)><endif>}>
 
 @implementation <name>
 
@@ -273,6 +282,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 		ruleMemo = [[NSMutableDictionary alloc] init];
 <endif>
 		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
+		<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeInit(scope=it)><endif>}>
 		<actions.parser.init>
 	}
 	return self;
@@ -285,6 +295,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 	[ruleMemo release];
 <endif>
 	<cyclicDFAs:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
+	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDealloc(scope=it)><endif>}>
 	<actions.parser.dealloc>
 	[super dealloc];
 }
@@ -404,8 +415,8 @@ catch (<e.decl>) {
 >>
 
 ruleDeclarations() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack addObject:(new <it>_scope());}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack addObject:(new <it.name>_scope());}; separator="\n">
+<ruleDescriptor.useScopes:{[<name>_<it>_stack addObject:[[[<name>_<it>_scope alloc] init] autorelease]];}; separator="\n">
+<ruleDescriptor.ruleScope:{[<name>_<it.name>_stack addObject:[[[<name>_<it.name>_scope alloc] init] autorelease]];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval = [[[<returnTypeName()> alloc] init] autorelease];
 [retval setStart:[input index]+1];<\n>
@@ -451,8 +462,8 @@ ruleCleanUp() ::= <<
 //test rule labels
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]:{//[<it.label.text> release];}; separator="\n">
 // rule labels
-<ruleDescriptor.useScopes:{[<it>_stack removeLastObject];}; separator="\n">
-<ruleDescriptor.ruleScope:{[<it.name>_stack removeLastObject];}; separator="\n">
+<ruleDescriptor.useScopes:{[<name>_<it>_stack removeLastObject];}; separator="\n">
+<ruleDescriptor.ruleScope:{[<name>_<it.name>_stack removeLastObject];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 [retval setStop:[input index]-1];<\n>
 <endif>
@@ -1073,6 +1084,32 @@ protected Stack <scope.name>_stack = new Stack();<\n>
 <endif>
 >>
 
+globalAttributeScopeDecl(scope) ::= <<
+@interface <name>_<scope.name>_scope : NSObject {
+	<scope.attributes:{<it.decl>;}; separator="\n">
+}
+// use KVC to access attributes!
+@end
+>>
+
+globalAttributeScopeIVar(scope) ::= <<
+NSMutableArray *<name>_<scope.name>_stack;
+>>
+
+globalAttributeScopeImpl(scope) ::= <<
+@implementation <name>_<scope.name>_scope
+@end
+>>
+
+globalAttributeScopeInit(scope) ::= <<
+<name>_<scope.name>_stack = [[NSMutableArray alloc] init];
+>>
+
+globalAttributeScopeDealloc(scope) ::= <<
+[<name>_<scope.name>_stack release];
+>>
+
+
 ruleAttributeScope(scope) ::= <<
 <if(scope.attributes)>
 protected static class <scope.name>_scope {
@@ -1081,6 +1118,32 @@ protected static class <scope.name>_scope {
 protected Stack <scope.name>_stack = new Stack();<\n>
 <endif>
 >>
+
+ruleAttributeScopeDecl(scope) ::= <<
+@interface <name>_<scope.name>_scope : NSObject {
+	<scope.attributes:{<it.decl>;}; separator="\n">
+}
+// use KVC to access attributes!
+@end
+>>
+
+ruleAttributeScopeIVar(scope) ::= <<
+NSMutableArray *<name>_<scope.name>_stack;
+>>
+
+ruleAttributeScopeImpl(scope) ::= <<
+@implementation <name>_<scope.name>_scope
+@end
+>>
+
+ruleAttributeScopeInit(scope) ::= <<
+<name>_<scope.name>_stack = [[NSMutableArray alloc] init];
+>>
+
+ruleAttributeScopeDealloc(scope) ::= <<
+[<name>_<scope.name>_stack release];
+>>
+
 
 returnTypeName() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
@@ -1160,7 +1223,7 @@ parameterScope(scope) ::= <<
  *  $x.y to executable code occurs before recognizerST.toString() occurs.
  *  I.e., actions are just text strings during final code generation.
 globalAttributeRef(scope,attr) ::= <<
-((<scope>)<scope>_stack.peek()).<attr.name>
+[[(<scope>)<name>_<scope>_stack lastObject] valueForKey:@"<attr.name>"]
 >>
  */
 
@@ -1168,12 +1231,13 @@ parameterAttributeRef(attr) ::= "<attr.name>"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
+[[<name>_<scope>_stack objectAtIndex:[<name>_<scope>_stack count]<negIndex>-1] valueForKey:@"<attr.name>"]
 ((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()<negIndex>-1)).<attr.name>
 <else>
 <if(index)>
-((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>
+[[<name>_<scope>_stack objectAtIndex:<index>] valueForKey:@"<attr.name>"]
 <else>
-((<scope>_scope)<scope>_stack.peek()).<attr.name>
+[[<name>_<scope>_stack lastObject] valueForKey:@"<attr.name>"]
 <endif>
 <endif>
 >>
@@ -1182,12 +1246,12 @@ scopeAttributeRef(scope,attr,index,negIndex) ::= <<
  *  to stack itself not top of stack.  This is useful for predicates
  *  like {$function.size()>0 && $function::name.equals("foo")}?
  */
-isolatedDynamicScopeRef(scope) ::= "<scope>_stack"
+isolatedDynamicScopeRef(scope) ::= "<name>_<scope>_stack"
 
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-<scope>.<attr.name>
+[<scope> valueForKey:@"<attr.name>"]
 <else>
 <scope>
 <endif>

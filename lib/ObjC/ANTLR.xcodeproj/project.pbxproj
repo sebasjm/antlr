@@ -29,10 +29,6 @@
 		F7037EA60A05AFD70070435D /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F70380BC0A07FA0D0070435D /* ANTLRMismatchedSetException.h in Headers */ = {isa = PBXBuildFile; fileRef = F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F70380BD0A07FA0D0070435D /* ANTLRMismatchedSetException.m in Sources */ = {isa = PBXBuildFile; fileRef = F70380BB0A07FA0D0070435D /* ANTLRMismatchedSetException.m */; };
-		F706A58D0A0EC4D0008999AB /* input in CopyFiles */ = {isa = PBXBuildFile; fileRef = F706A55B0A0EC307008999AB /* input */; };
-		F706A9CD0A122425008999AB /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
-		F706A9DF0A122428008999AB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
-		F706AA5C0A12242A008999AB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F70AA7A609AA2A6900C3FD5E /* ANTLR.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7A509AA2A6900C3FD5E /* ANTLR.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F70AA7AF09AA2AC000C3FD5E /* ANTLRIntStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7AD09AA2AC000C3FD5E /* ANTLRIntStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F70AA7C709AA339900C3FD5E /* ANTLRStringStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7C509AA339900C3FD5E /* ANTLRStringStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -69,6 +65,24 @@
 		F79D5AF60A0E634900EA3CEE /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F79D5AF70A0E634A00EA3CEE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F79D5AF80A0E634A00EA3CEE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		F7A2E91A0A76AB9F0066CA1D /* SimpleC.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A2E9170A76AB9F0066CA1D /* SimpleC.m */; };
+		F7A2E91B0A76AB9F0066CA1D /* SimpleCLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A2E9190A76AB9F0066CA1D /* SimpleCLexer.m */; };
+		F7A2E91E0A76D5740066CA1D /* FuzzyJava.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = F7A2E91C0A76D5730066CA1D /* FuzzyJava.h */; };
+		F7A2E91F0A76D5740066CA1D /* FuzzyJava.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A2E91D0A76D5730066CA1D /* FuzzyJava.m */; };
+		F7DD06040A7B1663006A006C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		F7DD06070A7B1664006A006C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
+		F7DD06300A7B1665006A006C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
+		F7DD06C50A7B1691006A006C /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
+		F7DD06C60A7B16A5006A006C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD05E70A7B1572006A006C /* main.m */; };
+		F7DD06E90A7B1700006A006C /* T.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD06E60A7B1700006A006C /* T.m */; };
+		F7DD06EA0A7B1701006A006C /* TLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD06E80A7B1700006A006C /* TLexer.m */; };
+		F7DD074C0A7B6656006A006C /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
+		F7DD074D0A7B665C006A006C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
+		F7DD074E0A7B665D006A006C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		F7DD074F0A7B665D006A006C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
+		F7DD07810A7B67A7006A006C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD07800A7B67A7006A006C /* main.m */; };
+		F7DD07A60A7B6998006A006C /* SymtabTestParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD07A30A7B6998006A006C /* SymtabTestParser.m */; };
+		F7DD07A70A7B6998006A006C /* SymtabTestParserLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD07A50A7B6998006A006C /* SymtabTestParserLexer.m */; };
 		F7E983950A0D6A5F00F16093 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7E983940A0D6A5F00F16093 /* main.m */; };
 		F7E985580A0D865E00F16093 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F7E985590A0D866000F16093 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
@@ -99,18 +113,25 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = ANTLR;
 		};
-		F706A7250A112164008999AB /* PBXContainerItemProxy */ = {
+		F79D5AF10A0E632A00EA3CEE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = ANTLR;
 		};
-		F79D5AF10A0E632A00EA3CEE /* PBXContainerItemProxy */ = {
+		F7DD05F30A7B1649006A006C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* ANTLR */;
+			remoteInfo = ANTLR;
+		};
+		F7DD07500A7B6666006A006C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* ANTLR */;
 			remoteInfo = ANTLR;
 		};
 /* End PBXContainerItemProxy section */
@@ -122,7 +143,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				F706A58D0A0EC4D0008999AB /* input in CopyFiles */,
+				F7A2E91E0A76D5740066CA1D /* FuzzyJava.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,13 +156,12 @@
 		32DBCF5E0370ADEE00C91783 /* ANTLR_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLR_Prefix.pch; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* ANTLR.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ANTLR.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		F7009AD90A1BE4AE002EDD5D /* ANTLRLexerRuleReturnScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRLexerRuleReturnScope.h; sourceTree = "<group>"; };
 		F7009ADA0A1BE4AE002EDD5D /* ANTLRLexerRuleReturnScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRLexerRuleReturnScope.m; sourceTree = "<group>"; };
 		F700E6190A5F66EC005D0757 /* ANTLREarlyExitException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLREarlyExitException.h; sourceTree = "<group>"; };
 		F700E61A0A5F66EC005D0757 /* ANTLREarlyExitException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLREarlyExitException.m; sourceTree = "<group>"; };
 		F700E85E0A5FA2DE005D0757 /* Combined.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Combined.g; path = combined/Combined.g; sourceTree = "<group>"; };
-		F700E8640A5FA31D005D0757 /* combined */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = combined; sourceTree = BUILT_PRODUCTS_DIR; };
+		F700E8640A5FA31D005D0757 /* combined */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = combined; sourceTree = BUILT_PRODUCTS_DIR; };
 		F700E86A0A5FA34D005D0757 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = combined/main.m; sourceTree = "<group>"; };
 		F700E8F90A5FAD21005D0757 /* ANTLRParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRParser.h; sourceTree = "<group>"; };
 		F700E8FA0A5FAD21005D0757 /* ANTLRParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRParser.m; sourceTree = "<group>"; };
@@ -155,12 +175,11 @@
 		F700ED950A5FF2A5005D0757 /* ANTLRCommonTokenStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRCommonTokenStream.m; sourceTree = "<group>"; };
 		F7037CEE0A0582FC0070435D /* ANTLRMismatchedRangeException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedRangeException.h; sourceTree = "<group>"; };
 		F7037CEF0A0582FC0070435D /* ANTLRMismatchedRangeException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedRangeException.m; sourceTree = "<group>"; };
-		F7037EA00A05AFB60070435D /* lexertest-simple */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "lexertest-simple"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F7037EA00A05AFB60070435D /* lexertest-simple */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = "lexertest-simple"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7037EBD0A05B06B0070435D /* lexer.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = lexer.g; sourceTree = "<group>"; };
 		F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedSetException.h; sourceTree = "<group>"; };
 		F70380BB0A07FA0D0070435D /* ANTLRMismatchedSetException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedSetException.m; sourceTree = "<group>"; };
 		F706A55B0A0EC307008999AB /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
-		F706A7230A11215A008999AB /* cyclic */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cyclic; sourceTree = BUILT_PRODUCTS_DIR; };
 		F70AA7A509AA2A6900C3FD5E /* ANTLR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLR.h; sourceTree = "<group>"; };
 		F70AA7AD09AA2AC000C3FD5E /* ANTLRIntStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRIntStream.h; sourceTree = "<group>"; };
 		F70AA7B509AA2B8800C3FD5E /* ANTLRCharStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRCharStream.h; sourceTree = "<group>"; };
@@ -192,10 +211,34 @@
 		F79D56C00A0E287500EA3CEE /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F79D59890A0E51AB00EA3CEE /* ANTLRNoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRNoViableAltException.h; sourceTree = "<group>"; };
 		F79D598A0A0E51AB00EA3CEE /* ANTLRNoViableAltException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRNoViableAltException.m; sourceTree = "<group>"; };
+		F7A2E9160A76AB9F0066CA1D /* SimpleC.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SimpleC.h; sourceTree = "<group>"; };
+		F7A2E9170A76AB9F0066CA1D /* SimpleC.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SimpleC.m; sourceTree = "<group>"; };
+		F7A2E9180A76AB9F0066CA1D /* SimpleCLexer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SimpleCLexer.h; sourceTree = "<group>"; };
+		F7A2E9190A76AB9F0066CA1D /* SimpleCLexer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SimpleCLexer.m; sourceTree = "<group>"; };
+		F7A2E91C0A76D5730066CA1D /* FuzzyJava.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = FuzzyJava.h; sourceTree = "<group>"; };
+		F7A2E91D0A76D5730066CA1D /* FuzzyJava.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = FuzzyJava.m; sourceTree = "<group>"; };
 		F7A4098B09659BF3002CC781 /* ANTLRBaseRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRBaseRecognizer.h; sourceTree = "<group>"; };
 		F7A4098C09659BF3002CC781 /* ANTLRBaseRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRBaseRecognizer.m; sourceTree = "<group>"; };
 		F7A4099109659BFB002CC781 /* ANTLRLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRLexer.h; sourceTree = "<group>"; };
 		F7A4099209659BFB002CC781 /* ANTLRLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRLexer.m; sourceTree = "<group>"; };
+		F7DD05E20A7B14BE006A006C /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
+		F7DD05E30A7B14BE006A006C /* output */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = output; sourceTree = "<group>"; };
+		F7DD05E40A7B14BE006A006C /* t.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = t.g; sourceTree = "<group>"; };
+		F7DD05E70A7B1572006A006C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F7DD05EE0A7B15E1006A006C /* hoistedPredicates */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = hoistedPredicates; sourceTree = BUILT_PRODUCTS_DIR; };
+		F7DD06E50A7B1700006A006C /* T.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = T.h; sourceTree = "<group>"; };
+		F7DD06E60A7B1700006A006C /* T.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = T.m; sourceTree = "<group>"; };
+		F7DD06E70A7B1700006A006C /* TLexer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = TLexer.h; sourceTree = "<group>"; };
+		F7DD06E80A7B1700006A006C /* TLexer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = TLexer.m; sourceTree = "<group>"; };
+		F7DD073C0A7B660A006A006C /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
+		F7DD073D0A7B660A006A006C /* output */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = output; sourceTree = "<group>"; };
+		F7DD073E0A7B660A006A006C /* symtab.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = symtab.g; sourceTree = "<group>"; };
+		F7DD07440A7B6618006A006C /* scopes */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = scopes; sourceTree = BUILT_PRODUCTS_DIR; };
+		F7DD07800A7B67A7006A006C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F7DD07A20A7B6998006A006C /* SymtabTestParser.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SymtabTestParser.h; sourceTree = "<group>"; };
+		F7DD07A30A7B6998006A006C /* SymtabTestParser.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SymtabTestParser.m; sourceTree = "<group>"; };
+		F7DD07A40A7B6998006A006C /* SymtabTestParserLexer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SymtabTestParserLexer.h; sourceTree = "<group>"; };
+		F7DD07A50A7B6998006A006C /* SymtabTestParserLexer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SymtabTestParserLexer.m; sourceTree = "<group>"; };
 		F7E983940A0D6A5F00F16093 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F7F218EE097AFB1A000472E9 /* ANTLRBitSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRBitSet.h; sourceTree = "<group>"; };
 		F7F218EF097AFB1A000472E9 /* ANTLRBitSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRBitSet.m; sourceTree = "<group>"; };
@@ -242,16 +285,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F706A7210A11215A008999AB /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F706AA5C0A12242A008999AB /* Cocoa.framework in Frameworks */,
-				F706A9DF0A122428008999AB /* Foundation.framework in Frameworks */,
-				F706A9CD0A122425008999AB /* ANTLR.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F70BB37D098E5AFF0054FEF8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -272,6 +305,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F7DD05EC0A7B15E1006A006C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F7DD06040A7B1663006A006C /* Cocoa.framework in Frameworks */,
+				F7DD06070A7B1664006A006C /* CoreFoundation.framework in Frameworks */,
+				F7DD06300A7B1665006A006C /* Foundation.framework in Frameworks */,
+				F7DD06C50A7B1691006A006C /* ANTLR.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F7DD07420A7B6618006A006C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F7DD074C0A7B6656006A006C /* ANTLR.framework in Frameworks */,
+				F7DD074D0A7B665C006A006C /* Foundation.framework in Frameworks */,
+				F7DD074E0A7B665D006A006C /* Cocoa.framework in Frameworks */,
+				F7DD074F0A7B665D006A006C /* CoreFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -282,9 +337,10 @@
 				F70BB380098E5AFF0054FEF8 /* Test.octest */,
 				F7037EA00A05AFB60070435D /* lexertest-simple */,
 				F79D56600A0E23A400EA3CEE /* fuzzy */,
-				F706A7230A11215A008999AB /* cyclic */,
 				F700E8640A5FA31D005D0757 /* combined */,
 				F700ECD70A5FE186005D0757 /* LL-star */,
+				F7DD05EE0A7B15E1006A006C /* hoistedPredicates */,
+				F7DD07440A7B6618006A006C /* scopes */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -348,7 +404,6 @@
 		1058C7B2FEA5585E11CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D2F7E79907B2D74100F64583 /* CoreData.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
 			);
 			name = "Other Frameworks";
@@ -375,6 +430,10 @@
 		F700ECCE0A5FE176005D0757 /* LL-star */ = {
 			isa = PBXGroup;
 			children = (
+				F7A2E9160A76AB9F0066CA1D /* SimpleC.h */,
+				F7A2E9170A76AB9F0066CA1D /* SimpleC.m */,
+				F7A2E9180A76AB9F0066CA1D /* SimpleCLexer.h */,
+				F7A2E9190A76AB9F0066CA1D /* SimpleCLexer.m */,
 				F700ECCF0A5FE176005D0757 /* input */,
 				F700ECD00A5FE176005D0757 /* output */,
 				F700ECD10A5FE176005D0757 /* simplec.g */,
@@ -386,6 +445,8 @@
 		F7037EBB0A05B06B0070435D /* examples */ = {
 			isa = PBXGroup;
 			children = (
+				F7DD073B0A7B660A006A006C /* scopes */,
+				F7DD05E10A7B14BE006A006C /* hoistedPredicates */,
 				F700ECCE0A5FE176005D0757 /* LL-star */,
 				F700E85D0A5FA2C0005D0757 /* combined */,
 				F79D56590A0E238100EA3CEE /* fuzzy */,
@@ -445,6 +506,8 @@
 		F79D56590A0E238100EA3CEE /* fuzzy */ = {
 			isa = PBXGroup;
 			children = (
+				F7A2E91C0A76D5730066CA1D /* FuzzyJava.h */,
+				F7A2E91D0A76D5730066CA1D /* FuzzyJava.m */,
 				F706A55B0A0EC307008999AB /* input */,
 				F79D565A0A0E238100EA3CEE /* java.g */,
 				F79D56C00A0E287500EA3CEE /* main.m */,
@@ -493,6 +556,36 @@
 				F700E8FA0A5FAD21005D0757 /* ANTLRParser.m */,
 			);
 			name = Recognizer;
+			sourceTree = "<group>";
+		};
+		F7DD05E10A7B14BE006A006C /* hoistedPredicates */ = {
+			isa = PBXGroup;
+			children = (
+				F7DD06E50A7B1700006A006C /* T.h */,
+				F7DD06E60A7B1700006A006C /* T.m */,
+				F7DD06E70A7B1700006A006C /* TLexer.h */,
+				F7DD06E80A7B1700006A006C /* TLexer.m */,
+				F7DD05E20A7B14BE006A006C /* input */,
+				F7DD05E30A7B14BE006A006C /* output */,
+				F7DD05E40A7B14BE006A006C /* t.g */,
+				F7DD05E70A7B1572006A006C /* main.m */,
+			);
+			path = hoistedPredicates;
+			sourceTree = "<group>";
+		};
+		F7DD073B0A7B660A006A006C /* scopes */ = {
+			isa = PBXGroup;
+			children = (
+				F7DD07A20A7B6998006A006C /* SymtabTestParser.h */,
+				F7DD07A30A7B6998006A006C /* SymtabTestParser.m */,
+				F7DD07A40A7B6998006A006C /* SymtabTestParserLexer.h */,
+				F7DD07A50A7B6998006A006C /* SymtabTestParserLexer.m */,
+				F7DD073C0A7B660A006A006C /* input */,
+				F7DD073D0A7B660A006A006C /* output */,
+				F7DD073E0A7B660A006A006C /* symtab.g */,
+				F7DD07800A7B67A7006A006C /* main.m */,
+			);
+			path = scopes;
 			sourceTree = "<group>";
 		};
 		F7F218EB097AFB0C000472E9 /* Misc */ = {
@@ -609,23 +702,6 @@
 			productReference = F7037EA00A05AFB60070435D /* lexertest-simple */;
 			productType = "com.apple.product-type.tool";
 		};
-		F706A7220A11215A008999AB /* cyclic */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F706A7370A1121AC008999AB /* Build configuration list for PBXNativeTarget "cyclic" */;
-			buildPhases = (
-				F706A7200A11215A008999AB /* Sources */,
-				F706A7210A11215A008999AB /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				F706A7260A112164008999AB /* PBXTargetDependency */,
-			);
-			name = cyclic;
-			productName = cyclic;
-			productReference = F706A7230A11215A008999AB /* cyclic */;
-			productType = "com.apple.product-type.tool";
-		};
 		F70BB37F098E5AFF0054FEF8 /* Test */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F70BB382098E5B040054FEF8 /* Build configuration list for PBXNativeTarget "Test" */;
@@ -662,6 +738,40 @@
 			productReference = F79D56600A0E23A400EA3CEE /* fuzzy */;
 			productType = "com.apple.product-type.tool";
 		};
+		F7DD05ED0A7B15E1006A006C /* hoistedPredicates */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F7DD05F00A7B1640006A006C /* Build configuration list for PBXNativeTarget "hoistedPredicates" */;
+			buildPhases = (
+				F7DD05EB0A7B15E1006A006C /* Sources */,
+				F7DD05EC0A7B15E1006A006C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F7DD05F40A7B1649006A006C /* PBXTargetDependency */,
+			);
+			name = hoistedPredicates;
+			productName = hoistedPredicates;
+			productReference = F7DD05EE0A7B15E1006A006C /* hoistedPredicates */;
+			productType = "com.apple.product-type.tool";
+		};
+		F7DD07430A7B6618006A006C /* scopes */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F7DD07790A7B6682006A006C /* Build configuration list for PBXNativeTarget "scopes" */;
+			buildPhases = (
+				F7DD07410A7B6618006A006C /* Sources */,
+				F7DD07420A7B6618006A006C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F7DD07510A7B6666006A006C /* PBXTargetDependency */,
+			);
+			name = scopes;
+			productName = scopes;
+			productReference = F7DD07440A7B6618006A006C /* scopes */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -677,9 +787,10 @@
 				F70BB37F098E5AFF0054FEF8 /* Test */,
 				F7037E9F0A05AFB60070435D /* lexertest-simple */,
 				F79D565F0A0E23A400EA3CEE /* fuzzy */,
-				F706A7220A11215A008999AB /* cyclic */,
 				F700E8630A5FA31D005D0757 /* combined */,
 				F700ECD60A5FE186005D0757 /* LL-star */,
+				F7DD05ED0A7B15E1006A006C /* hoistedPredicates */,
+				F7DD07430A7B6618006A006C /* scopes */,
 			);
 		};
 /* End PBXProject section */
@@ -756,6 +867,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F700ECE80A5FE25D005D0757 /* main.m in Sources */,
+				F7A2E91A0A76AB9F0066CA1D /* SimpleC.m in Sources */,
+				F7A2E91B0A76AB9F0066CA1D /* SimpleCLexer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -764,13 +877,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F7E983950A0D6A5F00F16093 /* main.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F706A7200A11215A008999AB /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -788,6 +894,27 @@
 			buildActionMask = 2147483647;
 			files = (
 				F79D56C10A0E287500EA3CEE /* main.m in Sources */,
+				F7A2E91F0A76D5740066CA1D /* FuzzyJava.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F7DD05EB0A7B15E1006A006C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F7DD06C60A7B16A5006A006C /* main.m in Sources */,
+				F7DD06E90A7B1700006A006C /* T.m in Sources */,
+				F7DD06EA0A7B1701006A006C /* TLexer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F7DD07410A7B6618006A006C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F7DD07810A7B67A7006A006C /* main.m in Sources */,
+				F7DD07A60A7B6998006A006C /* SymtabTestParser.m in Sources */,
+				F7DD07A70A7B6998006A006C /* SymtabTestParserLexer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -809,15 +936,20 @@
 			target = 8DC2EF4F0486A6940098B216 /* ANTLR */;
 			targetProxy = F7037EA40A05AFCB0070435D /* PBXContainerItemProxy */;
 		};
-		F706A7260A112164008999AB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8DC2EF4F0486A6940098B216 /* ANTLR */;
-			targetProxy = F706A7250A112164008999AB /* PBXContainerItemProxy */;
-		};
 		F79D5AF20A0E632A00EA3CEE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* ANTLR */;
 			targetProxy = F79D5AF10A0E632A00EA3CEE /* PBXContainerItemProxy */;
+		};
+		F7DD05F40A7B1649006A006C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* ANTLR */;
+			targetProxy = F7DD05F30A7B1649006A006C /* PBXContainerItemProxy */;
+		};
+		F7DD07510A7B6666006A006C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* ANTLR */;
+			targetProxy = F7DD07500A7B6666006A006C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -902,6 +1034,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -1027,6 +1160,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_ENABLE_PASCAL_STRINGS = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1063,52 +1197,6 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "lexertest-simple";
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
-		F706A7380A1121AC008999AB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INSTALL_PATH = "$(HOME)/bin";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = cyclic;
-				ZERO_LINK = YES;
-			};
-			name = Debug;
-		};
-		F706A7390A1121AC008999AB /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INSTALL_PATH = "$(HOME)/bin";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = cyclic;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1174,6 +1262,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1210,6 +1299,102 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = fuzzy;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		F7DD05F10A7B1640006A006C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = hoistedPredicates;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		F7DD05F20A7B1640006A006C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = hoistedPredicates;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		F7DD077A0A7B6682006A006C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = scopes;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		F7DD077B0A7B6682006A006C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = scopes;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1262,15 +1447,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F706A7370A1121AC008999AB /* Build configuration list for PBXNativeTarget "cyclic" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F706A7380A1121AC008999AB /* Debug */,
-				F706A7390A1121AC008999AB /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		F70BB382098E5B040054FEF8 /* Build configuration list for PBXNativeTarget "Test" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1285,6 +1461,24 @@
 			buildConfigurations = (
 				F79D56700A0E23D600EA3CEE /* Debug */,
 				F79D56710A0E23D600EA3CEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F7DD05F00A7B1640006A006C /* Build configuration list for PBXNativeTarget "hoistedPredicates" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F7DD05F10A7B1640006A006C /* Debug */,
+				F7DD05F20A7B1640006A006C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F7DD07790A7B6682006A006C /* Build configuration list for PBXNativeTarget "scopes" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F7DD077A0A7B6682006A006C /* Debug */,
+				F7DD077B0A7B6682006A006C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
