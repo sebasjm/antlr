@@ -358,7 +358,7 @@ ISOLATED_TOKEN_REF
 		}
 	;
 
-/** $lexerruleref.attr where attr is predefined property of a lexer rule. */
+/** $lexerruleref from within the lexer */
 ISOLATED_LEXER_RULE_REF
 	:	'$' ID	{grammar.type==Grammar.LEXER &&
 	             enclosingRule!=null &&
@@ -512,12 +512,18 @@ TEMPLATE_INSTANCE
 		// {System.out.println("found \%foo(args)");}
 		{
 		String action = getText().substring(1,getText().length());
+		String ruleName = "<outside-of-rule>";
+		if ( enclosingRule!=null ) {
+			ruleName = enclosingRule.name;
+		}
 		StringTemplate st =
-			generator.translateTemplateConstructor(enclosingRule.name,
+			generator.translateTemplateConstructor(ruleName,
 												   outerAltNum,
 												   actionToken,
 												   action);
-		chunks.add(st);
+		if ( st!=null ) {
+			chunks.add(st);
+		}
 		}
 	;
 

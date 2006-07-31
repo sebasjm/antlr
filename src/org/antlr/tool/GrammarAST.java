@@ -402,7 +402,7 @@ public class GrammarAST extends BaseAST {
 		{
 			return null;
 		}
-		if ( ttype==ANTLRParser.ASSIGN &&
+		if ( (ttype==ANTLRParser.ASSIGN||ttype==ANTLRParser.PLUS_ASSIGN) &&
 			 (parent==null||parent.getType()!=ANTLRParser.OPTIONS) )
 		{
 			return dupTreeNoActions(t.getChild(1), t); // return x from ^(ASSIGN label x)
