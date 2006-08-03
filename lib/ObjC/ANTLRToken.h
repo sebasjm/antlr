@@ -41,7 +41,7 @@ typedef enum {
 	ANTLRTokenChannelDefault = 0
 } ANTLRTokenChannel;
 
-@interface ANTLRToken : NSObject {
+@interface ANTLRToken : NSObject <NSCopying> {
 	int type;
 }
 
@@ -51,8 +51,8 @@ typedef enum {
 - (NSString *) text;
 - (void) setText:(NSString *) theText;
 
-- (unsigned int) type;
-- (void) setType: (unsigned int) aType;
+- (int) type;
+- (void) setType: (int) aType;
 
 - (unsigned int) line;
 - (void) setLine: (unsigned int) aLine;
@@ -66,6 +66,6 @@ typedef enum {
 - (unsigned int) tokenIndex;
 - (void) setTokenIndex: (unsigned int) aTokenIndex;
 
-
+- (id) copyWithZone:(NSZone *)theZone;
 
 @end

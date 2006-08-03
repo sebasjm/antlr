@@ -35,7 +35,6 @@
 {
 	if (nil != (self = [super init])) {
 		markers = [[NSMutableArray alloc] init];
-		[markers addObject:[NSNull null]]; // depth 0 means no backtracking, leave blank
 		[self reset];
 	}
 	return self;
@@ -76,6 +75,8 @@
 	line = 1;
 	charPositionInLine = 0;
 	markDepth = 0;
+	[markers removeAllObjects];
+	[markers addObject:[NSNull null]];
 }
 
 - (void) consume 

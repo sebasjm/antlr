@@ -43,6 +43,22 @@
 	return self;
 }
 
+- (id) copyWithZone:(NSZone *)theZone
+{
+	ANTLRCommonToken *copy = [super copyWithZone:theZone];
+	if (copy) {
+		[copy setChannel:channel];
+		if (text)
+			[copy setText:text];
+		[copy setStart:start];
+		[copy setStop:stop];
+		[copy setIndex:index];
+		[copy setLine:line];
+		[copy setCharPositionInLine:charPositionInLine];
+		[copy setInput:input];
+	}
+	return copy;
+}
 
 // inherited from ANTLRToken
 //---------------------------------------------------------- 

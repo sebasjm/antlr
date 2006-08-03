@@ -300,7 +300,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 	[super dealloc];
 }
 
-<members>
+<actions.parser.methods>
 
 <rules; separator="\n\n">
 
@@ -850,7 +850,7 @@ else {
  */
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
-<edges; separator="\nelse">
+<edges; separator="\nelse ">
 >>
 
 /** A DFA state that is actually the loopback decision of a closure
@@ -1328,7 +1328,7 @@ setType(type) ::= "[self setType:<type>];"
 // M I S C (properties, etc...)
 
 bitset(name, words64) ::= <<
-const static unsigned long long <name>_data[] = {<words64:{<it>L};separator=",">};
+const static unsigned long long <name>_data[] = {<words64:{<it>LL};separator=",">};
 static ANTLRBitSet *<name>;
 <! ANTLRBitSet *<name> = [[ANTLRBitSet alloc] initWithBits:<name>_data count:<length(words64)>];<\n> !>
 >>

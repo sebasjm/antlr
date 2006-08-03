@@ -60,11 +60,11 @@
 {
 }
 
-- (unsigned int) type
+- (int) type
 {
-	return 0;
+	return type;
 }
-- (void) setType: (unsigned int) aType
+- (void) setType: (int) aType
 {
 	type = aType;
 }
@@ -99,6 +99,15 @@
 }
 - (void) setTokenIndex: (unsigned int) aTokenIndex
 {
+}
+
+- (id) copyWithZone:(NSZone *)theZone
+{
+	ANTLRToken *copy = [[[self class] allocWithZone:theZone] init];
+	if (copy) {
+		[copy setType:type];
+	}
+	return copy;
 }
 
 @end

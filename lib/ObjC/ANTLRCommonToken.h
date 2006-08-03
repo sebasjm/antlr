@@ -30,7 +30,7 @@
 #import <ANTLR/ANTLRToken.h>
 #import <ANTLR/ANTLRCharStream.h>
 
-@interface ANTLRCommonToken : ANTLRToken {
+@interface ANTLRCommonToken : ANTLRToken <NSCopying> {
 	NSString *text;
 	
 //	int type;					// inherited from ANTLRToken!
@@ -59,5 +59,6 @@
 - (int) index;
 - (void) setIndex: (int) anIndex;
 
+- (id) copyWithZone:(NSZone *)theZone;
 
 @end
