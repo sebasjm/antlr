@@ -458,10 +458,13 @@ retval
 ruleCleanUp() ::= <<
 // token labels
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]:{[<it.label.text> release];}; separator="\n">
-//test token labels
-//test rule labels
-<[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]:{//[<it.label.text> release];}; separator="\n">
+// token+rule list labels
+<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]:{[list_<it.label.text> release];}; separator="\n">
 // rule labels
+<[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]:{[<it.label.text> release];}; separator="\n">
+// rule refs in alts with rewrites
+<[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
+	:{[NSMutableArray *list_<it> release];}; separator="\n">
 <ruleDescriptor.useScopes:{[<name>_<it>_stack removeLastObject];}; separator="\n">
 <ruleDescriptor.ruleScope:{[<name>_<it.name>_stack removeLastObject];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
@@ -677,7 +680,10 @@ tokenRefAndListLabel(token,label,elementIndex) ::= <<
 >>
 
 listLabel(label) ::= <<
-if (list_<label> == nil) list_<label> = [[NSArray alloc] initWithObjects:<label>, nil];<\n>
+if (list_<label> == nil)
+	list_<label> = [[NSMutableArray alloc] initWithObjects:<label>, nil];
+else
+	[list_<label> addObject:<label>];
 >>
 
 /** match a character */
