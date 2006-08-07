@@ -553,7 +553,7 @@ public class DFAState extends State {
 					// to the first token definition ala lex/flex by ignoring
 					// these conflicts.
 					if ( dfa.nfa.grammar.type!=Grammar.LEXER ||
-						 !s.enclosingRule.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) )
+						 !dfa.decisionNFAStartState.enclosingRule.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) )
 					{
 						numPotentialConflicts++;
 						thisStateHasPotentialProblem = true;
