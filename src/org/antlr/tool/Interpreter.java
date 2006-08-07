@@ -261,7 +261,7 @@ public class Interpreter implements TokenSource {
 			/*
 			System.out.println("parse state "+s.stateNumber+" input="+
 				grammar.getTokenDisplayName(t));
-			*/
+				*/
 			// CASE 1: decision state
 			if ( s.getDecisionNumber()>0 && grammar.getNumberOfAltsForDecisionNFA(s)>1 ) {
 				// decision point, must predict and jump to alt
@@ -372,6 +372,17 @@ public class Interpreter implements TokenSource {
 					}
 					input.consume(); // recover
 					throw mse;
+				}
+				else if ( label.isSemanticPredicate() ) {
+					FailedPredicateException fpe =
+						new FailedPredicateException(input,
+													 s.getEnclosingRule(),
+													 label.getSemanticContext().toString());
+					if ( actions!=null ) {
+						actions.recognitionException(fpe);
+					}
+					input.consume(); // recover
+					throw fpe;
 				}
 				else {
 					throw new RecognitionException(input); // unknown error
