@@ -337,6 +337,9 @@ public class ErrorManager {
 		String language = locale.getLanguage();
 		String fileName = "org/antlr/tool/templates/messages/"+language+".stg";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if ( cl==null ) {
+			cl = ErrorManager.class.getClassLoader();
+		}
 		InputStream is = cl.getResourceAsStream(fileName);
 		if ( is==null && language.equals(Locale.US.getLanguage()) ) {
 			rawError("ANTLR installation corrupted; cannot find English messages file "+fileName);
