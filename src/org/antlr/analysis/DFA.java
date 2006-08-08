@@ -494,8 +494,8 @@ public class DFA {
 			smax = Label.MIN_CHAR_VALUE;
 		}
 
-		min.set(s.stateNumber, new Integer(smin));
-		max.set(s.stateNumber, new Integer(smax));
+		min.set(s.stateNumber, new Integer((char)smin));
+		max.set(s.stateNumber, new Integer((char)smax));
 
 		if ( smax<0 || smin>Label.MAX_CHAR_VALUE ) {
 			ErrorManager.internalError("messed up: min="+min+", max="+max);
