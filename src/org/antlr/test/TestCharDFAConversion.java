@@ -358,6 +358,59 @@ public class TestCharDFAConversion extends TestSuite {
 		assertEqual(u.alts.toString(), "[1]");
 	}
 
+	public void testRecursive() throws Exception {
+		// this is cool because the 3rd alt includes !(all other possibilities)
+		Grammar g = new Grammar(
+			"lexer grammar duh;\n" +
+			"SUBTEMPLATE\n" +
+			"        :       '{'\n" +
+			"                ( SUBTEMPLATE\n" +
+			"                | ESC\n" +
+			"                | ~('}'|'\\\\'|'{')\n" +
+			"                )*\n" +
+			"                '}'\n" +
+			"        ;\n" +
+			"fragment\n" +
+			"ESC     :       '\\\\' . ;");
+		g.createLookaheadDFAs();
+		String expecting =
+			".s0-'\\\\'->:s3=>2\n" +
+			".s0-'{'->:s2=>1\n" +
+			".s0-'}'->:s1=>4\n" +
+			".s0-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFE'}->:s4=>3\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testRecursive2() throws Exception {
+		// this is also cool because it resolves \\ to be ESC alt; it's just
+		// less efficient of a DFA
+		Grammar g = new Grammar(
+			"lexer grammar duh;\n" +
+			"SUBTEMPLATE\n" +
+			"        :       '{'\n" +
+			"                ( SUBTEMPLATE\n" +
+			"                | ESC\n" +
+			"                | ~('}'|'{')\n" +
+			"                )*\n" +
+			"                '}'\n" +
+			"        ;\n" +
+			"fragment\n" +
+			"ESC     :       '\\\\' . ;");
+		g.createLookaheadDFAs();
+		String expecting =
+			".s0-'\\\\'->.s3\n" +
+			".s0-'{'->:s2=>1\n" +
+			".s0-'}'->:s1=>4\n" +
+			".s0-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFE'}->:s5=>3\n" +
+			".s3-'\\\\'->:s8=>2\n" +
+			".s3-'{'->:s7=>2\n" +
+			".s3-'}'->.s4\n" +
+			".s3-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFE'}->:s6=>2\n" +
+			".s4-'\\u0000'..'\\uFFFE'->:s6=>2\n" +
+			".s4-<EOT>->:s5=>3\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
 	// S U P P O R T
 
 	public void _template() throws Exception {
