@@ -214,8 +214,8 @@ public interface TreeAdaptor {
 	// N a v i g a t i o n  /  T r e e  P a r s i n g
 
 	/** Get a child 0..n-1 node */
-	public Object getChild(int i);
+	public Object getChild(Object t, int i);
 
 	/** How many children?  If 0, then this is a leaf node */
-	public int getChildCount();
+	public int getChildCount(Object t);
 }

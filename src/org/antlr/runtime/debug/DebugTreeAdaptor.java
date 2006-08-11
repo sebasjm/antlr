@@ -124,12 +124,12 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 		return adaptor.getTokenStopIndex(t);
 	}
 
-	public Object getChild(int i) {
-		return adaptor.getChild(i);
+	public Object getChild(Object t, int i) {
+		return adaptor.getChild(t, i);
 	}
 
-	public int getChildCount() {
-		return adaptor.getChildCount();
+	public int getChildCount(Object t) {
+		return adaptor.getChildCount(t);
 	}
 
 	public int getUniqueID(Object node) {

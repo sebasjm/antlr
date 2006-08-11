@@ -127,11 +127,11 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		throw new NoSuchMethodError("can't do this yet");
 	}
 
-	public Object getChild(int i) {
+	public Object getChild(Object t, int i) {
 		throw new NoSuchMethodError("can't do this yet");
 	}
 
-	public int getChildCount() {
+	public int getChildCount(Object t) {
 		throw new NoSuchMethodError("can't do this yet");
 	}
 
