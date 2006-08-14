@@ -192,9 +192,12 @@ antlr3LexerNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_INPUT_STREAM input)
      */
     lexer   = antlr3LexerNew(sizeHint);
 
-    /* Install the input stream and reset the lexer
-     */
-    setCharStream(lexer, input);
+    if	(lexer != (pANTLR3_LEXER)ANTLR3_ERR_NOMEM) 
+    {
+	/* Install the input stream and reset the lexer
+	 */
+	setCharStream(lexer, input);
+    }
 
     return  lexer;
 }
@@ -282,6 +285,7 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
      */
     lexer->token		= NULL;
     lexer->tokenStartCharIndex	= -1;
+    lexer->ruleNestingLevel	= 0;
 }
 
 static void emit	    (pANTLR3_LEXER lexer,  pANTLR3_COMMON_TOKEN token)

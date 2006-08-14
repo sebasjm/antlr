@@ -71,6 +71,7 @@ public class CTarget extends Target {
 	{
 		return cyclicDFAST;
 	}
+        
  	/** Is scope in @scope::name {action} valid for this kind of grammar?
 	 *  Targets like C++ may want to allow new scopes like headerfile or
 	 *  some such.  The action names themselves are not policed at the

@@ -75,6 +75,10 @@ antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM stream)
     */
     if	(stream->tstream->istream->me == stream)
     {
+	if  (stream->tstream->istream->eofToken != NULL)
+	{
+	    stream->tstream->istream->eofToken->freeCustom((void *)stream->tstream->istream->eofToken);
+	}
 	stream->tstream->istream->free(stream->tstream->istream);
     }
 

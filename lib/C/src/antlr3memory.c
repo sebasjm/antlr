@@ -42,7 +42,7 @@ ANTLR3_FREE(void * ptr)
 ANTLR3_API pANTLR3_UINT8
 ANTLR3_STRDUP(pANTLR3_UINT8 instr)
 {
-    return  (pANTLR3_UINT8)strdup((const char *)instr);
+    return  (pANTLR3_UINT8)_strdup((const char *)instr);
 }
 
 #else
@@ -156,7 +156,7 @@ ANTLR3_STRDUP_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, pANTLR3_UINT8 instr)
 	init();
     }
 
-    m =   (pANTLR3_UINT8)strdup((const char *)instr);
+    m =   (pANTLR3_UINT8)_strdup((const char *)instr);
     
     if	(record && ! reporting)
     {
@@ -214,7 +214,7 @@ ANTLR3_MEM_REPORT(ANTLR3_BOOLEAN cleanup)
 		break;
 	    }
 
-	    printf("%8I64d bytes at %10s  - line %8d of file %s\n",
+	    printf("%8I64d bytes at %08I64X  - line %8d of file %s\n",
 		    tr->size, addr, tr->line, tr->file);
 	}
     }

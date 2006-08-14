@@ -59,6 +59,11 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      */
     pANTLR3_STACK	following;
 
+    /** Following stack tracker saves time by knowing which follow set we are
+     *  using.
+     */
+    ANTLR3_INT64	_fsp;
+
     /** This is true when we see an error and before having successfully
      *  matched a token.  Prevents generation of more than one error message
      *  per error.

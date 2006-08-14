@@ -37,6 +37,7 @@ antlr3InputClose(pANTLR3_INPUT_STREAM input)
     if	(input->markers != NULL)
     {
 	input->markers->free(input->markers);
+	input->markers = NULL;
     }
 
     /* Close the string factory
@@ -51,6 +52,7 @@ antlr3InputClose(pANTLR3_INPUT_STREAM input)
     if	(input->isAllocated && input->data != NULL)
     {
 	ANTLR3_FREE(input->data);
+	input->data = NULL;
     }
     
     input->istream->free(input->istream);

@@ -17,6 +17,44 @@ static pANTLR3_STRING	    toString			(pANTLR3_BASE_TREE tree);
     
 static void		freeTree	(pANTLR3_BASE_TREE tree);
 
+ANTLR3_API pANTLR3_COMMON_TREE	    
+antlr3CommonTreeNewFromTree(pANTLR3_COMMON_TREE tree)
+{
+    pANTLR3_COMMON_TREE	newTree;
+
+    newTree = antlr3CommonTreeNew();
+
+    if	(newTree == (pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM)
+    {
+	return	(pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM;
+    }
+
+    /* Pick up the payload we had in the supplied tree
+     */
+    newTree->token = tree->token;
+
+    return  newTree;
+}
+
+ANTLR3_API pANTLR3_COMMON_TREE	    
+antlr3CommonTreeNewFromToken(pANTLR3_COMMON_TOKEN token)
+{
+    pANTLR3_COMMON_TREE	newTree;
+
+    newTree = antlr3CommonTreeNew();
+
+    if	(newTree == (pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM)
+    {
+	return	(pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM;
+    }
+
+    /* Pick up the payload we had in the supplied tree
+     */
+    newTree->token = token;
+
+    return newTree;
+}
+
 ANTLR3_API pANTLR3_COMMON_TREE
 antlr3CommonTreeNew()
 {
@@ -24,20 +62,37 @@ antlr3CommonTreeNew()
 
     tree    = ANTLR3_MALLOC(sizeof(ANTLR3_COMMON_TREE));
 
+    if	(tree == NULL)
+    {
+	return (pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM;
+    }
     /* Init base tree
      */
     antlr3BaseTreeNew(&(tree->baseTree));
 
+    /* We need a pointer to ourselves for 
+     * the payload and few functions that we
+     * provide.
+     */
     tree->baseTree.me	    = ANTLR3_API_FUNC tree;
+
+    /* Common tree overrides */
 
     tree->baseTree.free	    = ANTLR3_API_FUNC freeTree;
     tree->baseTree.isNil    = ANTLR3_API_FUNC isNil;
     tree->baseTree.toString = ANTLR3_API_FUNC toString;
     tree->baseTree.dupNode  = ANTLR3_API_FUNC dupNode;
+    tree->baseTree.getLine  = ANTLR3_API_FUNC getLine;
+    tree->baseTree.getCharPositionInLine
+			    = ANTLR3_API_FUNC getCharPositionInLine;
+    tree->baseTree.toString = ANTLR3_API_FUNC toString;
 
     tree->getToken	    = ANTLR3_API_FUNC getToken;
-    tree->getLine	    = ANTLR3_API_FUNC getLine;
     tree->getText	    = ANTLR3_API_FUNC getText;
+
+    tree->token	= NULL;	/* No token as yet */
+    tree->startIndex	= 0;
+    tree->stopIndex	= 0;
 
     return tree;
 }
@@ -66,6 +121,7 @@ freeTree(pANTLR3_BASE_TREE tree)
     return;
 }
 
+
 static pANTLR3_COMMON_TOKEN 
 getToken			(pANTLR3_BASE_TREE tree)
 {
@@ -81,19 +137,9 @@ dupNode			(pANTLR3_BASE_TREE tree)
     /* The node we are duplicating is in fact the common tree (that's why we are here)
      * so we use the me pointer to duplicate.
      */
-    pANTLR3_COMMON_TREE	    theOld;
     pANTLR3_COMMON_TREE	    theNew;
     
-    theOld  = (pANTLR3_COMMON_TREE)(tree->me);
-    theNew  = antlr3CommonTreeNew();
-
-    /* Install the API
-     */
-    antlr3BaseTreeNew(tree);
-
-    /* Copy the token
-     */
-    theNew->token   = theOld->token;
+    theNew  = antlr3CommonTreeNewFromTree((pANTLR3_COMMON_TREE)(tree->me));
 
     /* The pointer we return is the base implementation of course
      */
@@ -155,7 +201,7 @@ static ANTLR3_UINT64	    getLine			(pANTLR3_BASE_TREE tree)
     {
 	if  (tree->getChildCount(tree) > 0)
 	{
-	    return /* Are you ready for this? */ ((pANTLR3_COMMON_TREE)((pANTLR3_BASE_TREE)tree->getChild(tree, 0))->me)->getLine(tree);
+	    return ((pANTLR3_BASE_TREE)tree->getChild(tree, 0))->getLine(tree);
 	}
 	return 0;
     }
@@ -164,18 +210,15 @@ static ANTLR3_UINT64	    getLine			(pANTLR3_BASE_TREE tree)
 
 static ANTLR3_UINT32	    getCharPositionInLine	(pANTLR3_BASE_TREE tree)
 {
-    pANTLR3_COMMON_TREE	    cTree;
     pANTLR3_COMMON_TOKEN    token;
 
-    cTree   = ((pANTLR3_COMMON_TREE)(tree->me))->me;
+    token   = ((pANTLR3_COMMON_TREE)(tree->me))->token;
 
-    token   = cTree->token;
-
-    if	(token == NULL || token->getCharPositionInLine(token) == 0)
+    if	(token == NULL || token->getCharPositionInLine(token) == -1)
     {
 	if  (tree->getChildCount(tree) > 0)
 	{
-	    return /* Are you ready for this? */ ((pANTLR3_COMMON_TREE)((pANTLR3_BASE_TREE)tree->getChild(tree, 0))->me)->getCharPositionInLine(tree);
+	    return ((pANTLR3_BASE_TREE)(tree->getChild(tree, 0)))->getCharPositionInLine(tree);
 	}
 	return 0;
     }

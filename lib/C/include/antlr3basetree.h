@@ -31,24 +31,36 @@ typedef	struct ANTLR3_BASE_TREE_struct
      */
     pANTLR3_STRING_FACTORY strFactory;
 
+    void	    (*addChild)		(void * tree, void * child);
+
+    void	    (*addChildren)	(void * tree, pANTLR3_LIST kids);
+
+    void    	    (*createChildrenList)
+					(void * tree);
+
+    void    *	    (*deleteChild)	(void * tree, ANTLR3_UINT64 i);
+
+    void    *	    (*dupNode)		(void * dupNode);
+
+    void    *	    (*dupTree)		(void * tree);
+
+    ANTLR3_UINT32   (*getCharPositionInLine)
+					(void * tree);
 
     void    *	    (*getChild)		(void * tree, ANTLR3_UINT64 i);
 
     ANTLR3_UINT64   (*getChildCount)	(void * tree);
 
-    void	    (*addChild)		(void * tree, void * child);
+    ANTLR3_UINT32   (*getType)		(void * tree);
 
-    void	    (*addChildren)	(void * tree, pANTLR3_LIST kids);
+    void    *	    (*getFirstChildWithType)
+					(void * tree, ANTLR3_UINT32 type);
 
-    void	    (*setChild)		(void * tree, ANTLR3_UINT64 i, void * child);
-
-    void    *	    (*deleteChild)	(void * tree, ANTLR3_UINT64 i);
+    ANTLR3_UINT64   (*getLine)		(void * tree);
 
     ANTLR3_BOOLEAN  (*isNil)		(void * tree);
 
-    void    *	    (*dupTree)		(void * tree);
-
-    void    *	    (*dupNode)		(void * dupNode);
+    void	    (*setChild)		(void * tree, ANTLR3_UINT64 i, void * child);
 
     pANTLR3_STRING  (*toStringTree)	(void * tree);
 

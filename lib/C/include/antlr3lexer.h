@@ -167,6 +167,13 @@ typedef	struct ANTLR3_LEXER_struct
     /** Pointer to a function that knows how to free the resources of a lexer
      */
     void		(*free)		    (void * lexer);
+
+    /** We must track the token rule nesting level as we only want to
+     *  emit a token automatically at the outermost level so we don't get
+     *  two if FLOAT calls INT.  To save code space and time, do not
+     *  inc/dec this in fragment rules.
+     */
+    ANTLR3_INT32	ruleNestingLevel;
 }
     ANTLR3_LEXER;
 

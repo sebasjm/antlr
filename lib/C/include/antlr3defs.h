@@ -4,6 +4,8 @@
 #ifndef	_ANTLR3DEFS_H
 #define	_ANTLR3DEFS_H
 
+#define	ANTLR3_MEM_DEBUG
+
 /* Following are for genreaed code, they are not referenced internally!!!
  */
 #if !defined(ANTLR3_HUGE) && !defined(ANTLR3_AVERAGE) && !defined(ANTLR3_SMALL)
@@ -37,8 +39,13 @@
 
 #define	WINDOWS_LEAN_AND_MEAN
 
+// Allow VC 8 (vs2004) to use 'secure' versions of various functions such as sprintf
+//
+#define	_CRT_SECURE_NO_DEPRECATE 
+
 #include    <windows.h>
 #include    <stdio.h>
+#include    <sys/types.h>
 #include    <sys/stat.h>
 #include    <stdarg.h>
 
@@ -212,6 +219,9 @@ ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
 antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint);
 
 ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNew();
+ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromTree(pANTLR3_COMMON_TREE tree);
+ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromToken(pANTLR3_COMMON_TOKEN tree);
+
 ANTLR3_API pANTLR3_BASE_TREE	    antlr3BaseTreeNew(pANTLR3_BASE_TREE tree);
 
 #endif	/* _ANTLR3DEFS_H	*/

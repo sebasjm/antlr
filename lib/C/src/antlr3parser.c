@@ -116,9 +116,15 @@ freeParser			    (pANTLR3_PARSER parser)
 {
     if	(parser->rec != NULL)
     {
-	parser->rec->free(parser->rec);
+	    if	(parser->rec->following != NULL)
+	    {
+		parser->rec->following->free(parser->rec->following);
+		parser->rec->following = NULL;
+	    }
+	    parser->rec->free(parser->rec);
+	    parser->rec	= NULL;
+
     }
-    parser->rec	= NULL;
     ANTLR3_FREE(parser);
 }
 

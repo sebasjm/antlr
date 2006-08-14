@@ -254,7 +254,7 @@ antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key)
      */
     if	(entry != NULL && entry->free != NULL)
     {
-	/* Call programmer supplied function to release this entry
+	/* Call programmer supplied function to release this entry data
 	 */
 	entry->free(entry->data);
 	entry->data = NULL;

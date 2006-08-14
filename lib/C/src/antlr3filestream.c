@@ -77,7 +77,7 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
     return  input;
 }
 
-ANTLR3_UINT64
+ANTLR3_API ANTLR3_UINT64
 antlr3readAscii(pANTLR3_INPUT_STREAM    input)
 {
     ANTLR3_FDSC		    infile;
@@ -115,6 +115,10 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input)
      */
     antlr3Fread(infile, fSize, input->data);
 
+    /* And close the file handle
+     */
+    antlr3Fclose(infile);
+
     return  ANTLR3_SUCCESS;
 }
 
@@ -124,13 +128,21 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input)
  * such as Windows and OpenVMS for instance. But the idea is to read the 
  * while file at once anyway, so it may be irrelevant.
  */
-ANTLR3_FDSC
+ANTLR3_API ANTLR3_FDSC
 antlr3Fopen(pANTLR3_UINT8 filename, const char * mode)
 {
     return  (ANTLR3_FDSC)fopen((const char *)filename, mode);
 }
 
-ANTLR3_UINT64
+/** \brief Close an operating system file and free any handles
+ *  etc.
+ */
+ANTLR3_API void
+antlr3Fclose(ANTLR3_FDSC fd)
+{
+    fclose(fd);
+}
+ANTLR3_API ANTLR3_UINT64
 antlr3Fsize(pANTLR3_UINT8 fileName)
 {   
     struct _stat	statbuf;
@@ -140,7 +152,7 @@ antlr3Fsize(pANTLR3_UINT8 fileName)
     return (ANTLR3_UINT64)statbuf.st_size;
 }
 
-ANTLR3_UINT64
+ANTLR3_API ANTLR3_UINT64
 antlr3Fread(ANTLR3_FDSC fdsc, ANTLR3_UINT64 count,  void * data)
 {
     return  (ANTLR3_UINT64)fread(data, (size_t)count, 1, fdsc);

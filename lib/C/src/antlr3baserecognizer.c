@@ -49,6 +49,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
     recognizer->free		= ANTLR3_API_FUNC antlr3BRFree;
 
     recognizer->following	= NULL;
+    recognizer->_fsp		= -1;
     recognizer->ruleMemo	= NULL;
     recognizer->tokenNames	= NULL;
 
