@@ -3,7 +3,10 @@ grammar cmql;
 
 options 
 {
-	language=C;
+	output      	= AST;
+	language		= C;
+        ASTLabelType    = pANTLR3_BASE_TREE;
+        //backtrack       = true;
 }
 
 // The following tokens are used to generate parser tree nodes for the
@@ -24,32 +27,29 @@ tokens
                 CONNECTIVES;
        OUTPUT_SPEC;
        SELECT_TO;
-       IIDS;
+       IID;
+       IIDSELECT;
        SELECT_FACTOR;
        WITH_CLAUSE;
        WITH_FACTOR;
        AND_WITH;
        OR_WITH;
+       WHEN_CLAUSE;
        AND_WHEN;
        OR_WHEN;
+       ASP;
+       ASP_OR;
+       ASP_AND;
        VSP;
        VSP_OR;
        VSP_AND;
-
+       INDEX_ELEMENT;
+       INDEX_NODE;
+       KNULL;		// Used to intercept things such as WITH X = ""
+       BYEXP;
+       SAVE;
 }
 
-
-@members {
-
-ANTLR3_BOOLEAN parseError;
-
-}
-
-@lexer::members {
-
-ANTLR3_BOOLEAN lexError;
-
-}
 
 // A query is passed in in pre-lexed form from the query pre-processor.
 // At this point, such elements as USING clauses have been resolved and the
@@ -57,20 +57,96 @@ ANTLR3_BOOLEAN lexError;
 // reasonable form for a parser such as this to deal with.
 //
 query
-    returns [boolean error]
-    scope   {boolean isidlist}
+    returns [ANTLR3_BOOLEAN error]
+    scope   {
+		ANTLR3_BOOLEAN isidlist; 
+		ANTLR3_BOOLEAN byexp; 
+		ANTLR3_BOOLEAN isSum; 
+		ANTLR3_BOOLEAN isStat;
+	    }
     @init   {
                 $query::isidlist    = ANTLR3_FALSE;
-                
+		$query::isSum	    = ANTLR3_FALSE;
+		$query::isStat	    = ANTLR3_FALSE;
+                $query::byexp       = ANTLR3_FALSE;
             }
 	: (
+            index_spec?                 // Definition of all indexes on this file
             dictionary_spec?		// Elements that define the dictionary/tables for this query
             query_body			// The Query itself
-            {
-                $error  = parseError;
-            }
           )
-            
+	;
+	  
+index_spec
+	: INDEXES
+		LBRACE
+		indexes+
+		RBRACE
+	;
+
+indexes
+    :	INDEX
+	LBRACE
+                index_name
+		index_type
+                index_storage
+		index_elements*
+		index_nodes*	
+	RBRACE
+	;
+
+index_name
+	: NAME EQ iname=STRING SEMI
+    ;
+
+index_type
+	: TYPE EQ (   INDEX
+                    | BITMAP
+                    | BITSLICE
+                  ) SEMI
+	;
+
+index_storage
+        : STORAGE EQ STRING SEMI
+        ;
+
+index_elements
+	: ELEMENT
+	  LBRACE
+           index_entry+  
+	  RBRACE
+	;
+
+index_entry
+	:   dict_name
+        |   dict_attrno
+        |   dict_mv_indicator
+        |   dict_attr8_itype
+        |   dict_conv
+        |   dict_just
+        |   dict_colno
+	;
+
+index_nodes
+	: NODE
+	  LBRACE
+	     node_entry+
+	  RBRACE
+	;
+	
+node_entry
+	:   dict_name
+        |   dict_attrno
+        |   dict_mv_indicator
+        |   dict_attr8_itype
+        |   dict_conv
+        |   dict_just
+	|   node_collation
+        |   dict_colno
+	;
+
+node_collation
+	:   COLLATED EQ bool SEMI
 	;
 
 dictionary_spec
@@ -80,7 +156,6 @@ dictionary_spec
                     dict_elements+
 		RBRACE
           )
-          
 	;
 
 dict_elements
@@ -90,7 +165,6 @@ dict_elements
 		dict_entry+
 	RBRACE
             )
-            
 	;
 
 dict_entry
@@ -105,6 +179,7 @@ dict_entry
         |   dict_just
         |   dict_width
         |   dict_format
+        |   dict_colno
 	;
 
 dict_assoc
@@ -154,6 +229,10 @@ dict_format
     : FORMAT EQ STRING SEMI
     ;
 
+dict_colno
+    : COLNO EQ STRING SEMI
+    ;
+
 query_body
 	: (
 	QUERY
@@ -162,34 +241,40 @@ query_body
 		queryLogic
 	RBRACE
           )
-          
 	;
 
 querySpecs
 	: (
 		FILENAME	EQ fname   =    STRING      SEMI
+                GLOBAL          EQ global  =    STRING      SEMI
                 FILETYPE        EQ ftype   =    NUMBER      SEMI
 		COMMAND 	EQ command =    STRING      SEMI
 		TYPE		EQ              query_type  SEMI
                 (PROCESSOR      EQ output  =    STRING      SEMI)?
                 OPTIONS         EQ opts    =    STRING      SEMI
-                SORTED          EQ   truefalse   SEMI
-                SELECTLIST      EQ     truefalse   SEMI
+                SORTED          EQ			    bool        SEMI
+                SELECTLIST      EQ			    bool        SEMI
            )
 	;
 
-truefalse
-        :   BOOLTRUE
-        |   BOOLFALSE
+bool
+        :   BTRUE
+        |   BFALSE
         ;
 
 
 query_type
 	:
 		IDLIST
-                { $query::isidlist = ANTLR3_TRUE;  }
+                { $query::isidlist  = ANTLR3_TRUE;  }
 	|	ITEMSTREAM
 	|	DATASTREAM
+        |       INTERNAL
+                { $query::isidlist  = ANTLR3_TRUE;  }
+	|	SUM
+		{ $query::isSum	    = ANTLR3_TRUE; }
+	|	STAT
+		{ $query::isStat    = ANTLR3_TRUE; }
 	;
 
 
@@ -197,27 +282,29 @@ query_type
 // Main query body grammar
 //
 queryLogic
+    options {k=1;}  // All alts coverd by the gated predicate
     scope   {
-              boolean firstExpression;
-              boolean firstIDExpression;
+              ANTLR3_BOOLEAN firstExpression;
+              ANTLR3_BOOLEAN firstIDExpression;
             }
     @init   {   
                 $queryLogic::firstExpression    = ANTLR3_TRUE;
                 $queryLogic::firstIDExpression  = ANTLR3_TRUE;
             }
-    : {  $query::isidlist}? => (selectTypeLogic)
-    | {! $query::isidlist}? => (listTypeLogic)
-    ;
-
+        : {  $query::isidlist}? => (selectTypeLogic)
+        | {! $query::isidlist}? => (listTypeLogic)
+        ;
 
 selectTypeLogic
 	:   (
 		BODY
 		LBRACE
-                    (itemid_clause)?
-                    (   saving_clause 
-                      | selectExp 
-                      | sort_exp
+                    (   (saving_clause           )
+                      | (selectExp               )
+                      | (sort_exp                )
+                      | (common_connectives      )
+                      | (itemid_clause           )
+                      | (output_spec) => (output_spec             )
                     )*
                     ( to_clause)?
                     (
@@ -233,7 +320,6 @@ selectTypeLogic
                     )?
                RBRACE
              )
-                
 	;
 
 
@@ -241,12 +327,14 @@ listTypeLogic
 	:   (
 		BODY
 		LBRACE
-                    ( (connective)* itemid_clause )?
-                    (   output_spec
-                      | connective
-                      | selectExp 
-                      | sort_exp
-                    )*	
+                    (
+                            (   output_spec
+                              | connective
+                              | selectExp 
+                              | sort_exp
+                              | itemid_clause
+                            )*	
+                    )
                     (
                         // If the query had an @ or @LPTR record to deal with, the pre-lexer
                         // just spits it out here. If the first part of the statement body found
@@ -267,19 +355,15 @@ listTypeLogic
                 // LIST FILE F1 should NOT include them, even though they were passed in to us.
                 // Similarly LIST FILE WITH F1 > "77" should include it as it has no output spec.
                 //
-                
 	;
-        exception catch[ANTLR3_RECOGNITION_EXCEPTION] 
-        {
-            fprintf(stderr, "Query statement is in error. Check dictionary definitions!\n");
-        }
+
 
 to_clause
-        : TO integerparam 
+        : TO integerparam
         ;
 
 connective
-	:	COL_HDR_SUPP                    
+	:	COL_HDR_SUPP                   
 	|	COL_SPACES integerparam         
 	|	COL_SUPP                        
 	|	COUNT_SUPP                      
@@ -287,35 +371,39 @@ connective
 	|	DET_SUPP                        
 	|	FOOTING  STRING                 
 	|	GRAND_TOTAL	STRING          
-	|	HEADING STRING                  
-	|	HDR_SUPP                        
+	|	HEADING STRING              
+	|	HDR_SUPP                    
 	|	ID_SUPP                         
-	|	LPTRQUAL                         
+	|	OPT_LPTR                            
 	|	MARGIN integerparam             
-	|	NOPAGE                          
+	|	NOPAGE                         
 	|	NOSPLIT                         
 	|	NO_INDEX                        
 	|	ONLY                            
 	|	REQUIRE_INDEX                   
 	|	REQUIRE_SELECT                  
-	|	SAMPLE        integerparam      
-	|	SAMPLED	integerparam            
 	|	VERT                            
-	|	WITHIN                          
-	|	FROM		integerparam    
+        |       common_connectives
 	;
+
+// Connectives that can be used both with SELECT and LIST
+//
+common_connectives
+        :	FROM        integerparam  
+	|	SAMPLE      integerparam      
+	|	SAMPLED     integerparam      
+        ;
 
 integerparam:
 		NUMBER 
 	;
 
 saving_clause:
-              SAVING
+              SAVING?
                  UNIQUE?
-                 dict_element+
+                 dict_element
                  NO_NULLS? 
 
-                
 	;
 
 //  Item Id selection clause
@@ -328,85 +416,45 @@ itemid_clause
 // We only get into expressions if there is a relational operator present 
 //
 idselectExp:
+                idselectSubExpr
+        ;
+
+idselectSubExpr:
 		idselect_primary 
                     ( iselectConjuntive idselect_secondary )* 
 	;
 
-
 iselectConjuntive
-        : AND 
-        | OR  
-        |     
+        : AND
+        | OR
         ; 
 
 
 idselect_primary
-	:   (str=STRING)+
+	:   (IDSTRING)
             
+        | (baddict)
             
-
         | idselect_secondary
 
-            
         ;
 
 
 idselect_secondary
-        :  (op=EQ|op=NE|op=LTHAN|op=GT|op=LE|op=GE) opstr=STRING
 
-            
+    scope   { ANTLR3_BOOLEAN reverseMatch;}
 
-	|   BETWEEN lower=STRING higher=STRING
+        :  (op=EQ|op=NE|op=OP_LT|op=GT|op=LE|op=GE) (baddict | opstr=IDSTRING)
 
-            
 
-	|   LIKE opstr=STRING
+	|   BETWEEN UQS? (lower=STRING | lower=IDSTRING) UQS? (higher=STRING | higher=IDSTRING)
 
-            
 
-	|   UNLIKE opstr=STRING
+	|   LIKE UQS? (opstr=STRING | opstr=IDSTRING)	
 
-            
-
-	|   LPAREN idselectExp RPAREN
-
-            
+	|   UNLIKE UQS? (opstr=STRING | opstr=IDSTRING)
 	;
 
-when_exp
-        : WHEN when_exp2
-	;
-
-when_exp2
-        : when_term (when_or_when when_term )*
-	;
-
-
-when_or_when
-        : OR WHEN 
-        ;
-
-when_term
-        : when_exp3 (when_and_when when_exp3 )*
-	;
-
-when_and_when
-        : AND WHEN 
-        ;
-
-when_exp3
-        : when_term2 (OR when_term2 )*
-	;
-
-when_term2
-        : when_factor (AND when_factor )*
-	;
-
-when_factor
-        :   NOT?  dict_element  (value_selection_exp)?
-                
-	|   LPAREN when_exp2 RPAREN
-	;
 
 //
 // Value selection clause
@@ -418,17 +466,26 @@ when_factor
 // MUST begin with either AND {WITH} or OR {WITH}
 //
 selectExp
-        :
-            // Symantic predicate ensures that first expresion has a "WITH"
+    scope
+    {
+	ANTLR3_BOOLEAN	isWhen;
+	ANTLR3_BOOLEAN isFirst;
+    }
+    @init   { $selectExp::isFirst   = ANTLR3_TRUE; }
+        : (
+            // Symantic predicate ensures that first expression has a "WITH"
             //
             { $queryLogic::firstExpression }?
  
-                    WITH selectTerm
+                    (	  WITH	{ $selectExp::isWhen = ANTLR3_FALSE; }
+			| WHEN	{ $selectExp::isWhen = ANTLR3_TRUE; }
+		    )
+
+			selectTerm (selectTermSet  )*
 
                     {  $queryLogic::firstExpression = ANTLR3_FALSE; }
-
-             
-        |
+	  )
+        | (
             // Syntactic predicate failed, hence this subsequent expression must begin
             // with "AND" or "OR". Note that we allow the user to miss out the WITH that
             // in theory MUST follow this as it is not ambiguous. However I have decided
@@ -436,68 +493,108 @@ selectExp
             // is stupid and we are going to make people specify which logical connection
             // they require.
             //
-           
             selectExpSubsequent
-
-             
-            
+	    )
         ;
 
 selectExpSubsequent
         :
-            AND WITH selectTerm    
-        |   OR  WITH selectTerm    
+           ( AND (    WITH  { $selectExp::isWhen = ANTLR3_FALSE; }
+		    | WHEN  { $selectExp::isWhen = ANTLR3_TRUE;  }
+		 ) 
+		    selectTerm (selectTermSet  )*
+	    
+	   )
+        |  ( OR  (    WITH  { $selectExp::isWhen = ANTLR3_FALSE; }
+		    | WHEN  { $selectExp::isWhen = ANTLR3_TRUE;  }
+		 ) 
+		    selectTerm (selectTermSet	)*   
+	    
+	    )
         ;
-        
-selectTerm
-    scope   { boolean isFirst;  }
-    @init   { $selectTerm::isFirst   = ANTLR3_TRUE; }
-        :	 
-	( NO? NOT? EACH?  dict_element  value_selection_exp* )
 
-                
-
-        | LPAREN selectTerm (selectExpSubsequent)* RPAREN
-
-                
-         
+selectTermSet
+	: AND selectTerm	
+	| OR  selectTerm	
 	;
+
+selectTerm
+    scope   { ANTLR3_BOOLEAN isFirst;  }
+    @init   { $selectTerm::isFirst   = ANTLR3_TRUE; }
+        : ( NO? NOT? EACH?  dict_element  ((value_selection_exp) => value_selection_exp)* )
+ 	;
 
 value_selection_exp
         : (
             value_selection_primary         
-
-                
-                
-                
-            
             |   AND value_selection_primary     
             |   OR  value_selection_primary     
           )
-          { 
+          {
             $selectTerm::isFirst = ANTLR3_FALSE;   // No longer first selection element, subsequent ones default to VSP_OR
           }
 	;
 
 value_selection_primary
-	:	
-                STRING
-	|	(NE|LTHAN|GT|LE|GE|EQ) (STRING | dict_element)	
+
+	scope	{ ANTLR3_BOOLEAN reverseMatch; }
+
+	:  UQS? s=STRING
+
+		// The expression  X ""    is the same as  NO X 
+		// The expression  X "abc" is the same as  X EQ "abc"
+		//
+	|   ISNULL
+
+	|   ISNOTNULL
+
+	|   EQ
+		(	UQS? s=STRING	    
+		    |	dict_element	
+		)	
+	
+	|   NE     
+		(	UQS? s=STRING	    
+		    |	dict_element
+		)	
+
+	|   OP_LT     
+		(	UQS? s=STRING
+		    |	dict_element	    
+		)
+
+	|   GT
+		(	UQS? s=STRING	    
+		    |	dict_element	  
+		)
+
+	|   LE     
+		(	UQS? s=STRING
+		    |	dict_element	   
+		)
+
+	|   GE     
+		(	UQS? s=STRING
+		    |	dict_element	 
+		)
+
 	|       BETWEEN withbetween1 withbetween2
-	|	LIKE STRING	
-	|	UNLIKE STRING	
-	|	SAID STRING
-	|	LPAREN value_selection_exp RPAREN
+		
+
+	|	LIKE UQS? opstr=STRING	
+
+	|	UNLIKE UQS? opstr=STRING	
+
 	;
 
 withbetween1
         :
-		(STRING | dict_element)
+		(UQS? STRING | dict_element)
 		;
 
 withbetween2
         :
-		(STRING | dict_element)
+		(UQS? STRING | dict_element)
 		;
 
 //  sort expression
@@ -512,16 +609,27 @@ sortclause
 		BY			dict_element 
 	|	BY_DSND 		dict_element
 	|	BY_EXP 			dict_display
+                {
+                    $query::byexp     = ANTLR3_TRUE;
+                }
 	|	BY_EXP_DSND		dict_display
+                {
+                    $query::byexp     = ANTLR3_TRUE;
+                }
 	|	BY_EXP_SUB		dict_display
+                {
+                    $query::byexp     = ANTLR3_TRUE;
+                }
 	|	BY_EXP_SUB_DSND         dict_display
+                {
+                    $query::byexp     = ANTLR3_TRUE;
+                }
 	;
 
 //  Output section
 //
 output_spec
         : output_elements
-            
         ;
 
 output_elements
@@ -530,52 +638,76 @@ output_elements
 	|	AVERAGE                 dict_element (NO_NULLS)?
 	|	ENUM                    dict_element (NO_NULLS)? 
 	|	MAX                     dict_display
-	|	MIN                     dict_display
+	|	MIN                     dict_display (NO_NULLS)?
 	|	PERCENT                 dict_display
 	|	TRANSPORT               dict_display
-	|	BREAK_ON    (STRING)?   dict_element (STRING)?
-	|	BREAK_SUP   (STRING)?   dict_element (STRING)?
+	|	BREAK_ON    (STRING)?   dict_element ((STRING)=>STRING)?
+	|	BREAK_SUP   (STRING)?   dict_element ((STRING)=>STRING)?
         |       dict_display
 	|	CALC                    dict_element
-        |       when_exp
 	;
 
 dict_display
-        :       ATTRIBUTEVALUE limiter_exp?
-                
+        :       ATTRIBUTEVALUE ((limiter_exp)=> limiter_exp)? formatting*
         ;
 
 dict_element
-        : ATTRIBUTEVALUE
-            
+        : ATTRIBUTEVALUE formatting*
         ;
         
 limiter_exp
-        :
-		limiter (limiter_op limiter)*
+        : 
+		limiter ((limiter_op)=> (limiter_op limiter))*
 	;
 
 limiter_op
         : AND   
-        | OR    
-        |       
+        | OR   
+        |     
         ;
 
 limiter:
-            (NOT NE s=STRING) 
-          | (NOT LTHAN s=STRING) 
-          | (NOT GT s=STRING) 
-          | (NOT LE s=STRING) 
-          | (NOT GE s=STRING) 
-          | (NOT EQ s=STRING) 
-          | (NE s=STRING)     
-          | (LTHAN s=STRING)     
-          | (GT s=STRING)     
-          | (LE s=STRING)     
-          | (GE s=STRING)     
-          | (EQ s=STRING)    
+            (NOT    NE     baddict)
+          | (NOT    OP_LT     baddict)
+          | (NOT    GT     baddict)
+          | (NOT    LE     baddict)
+          | (NOT    GE     baddict)
+          | (NOT    opt_eq baddict)
+          | (       NE     baddict)
+          | (       OP_LT     baddict)
+          | (       GT     baddict)
+          | (       LE     baddict)
+          | (       GE     baddict)
+          | (       opt_eq baddict)
 	;
- 
+
+opt_eq
+    : EQ
+    |
+    ;
+
+baddict
+    scope   { ANTLR3_BOOLEAN bad;              }
+    @init   { $baddict::bad = ANTLR3_FALSE;  }
+
+    :   (
+            UQS { $baddict::bad = ANTLR3_TRUE; } 
+        )? 
+            bs=STRING
+    
+    ;
+
+ formatting
+	:	FMT UQS? STRING             
+	|	CONV UQS? STRING            
+	|	DISPLAY_LIKE ATTRIBUTEVALUE 
+	|	COL_HDG UQS? STRING         
+	|	ASSOC UQS? STRING           
+	|	ASSOC_WITH ATTRIBUTEVALUE
+	|	MULTI_VALUE                 
+	|	SINGLE_VALUE                
+	;
+
 // -----------------------------------------------------------
 //
 // Lexer
@@ -597,7 +729,10 @@ WS	:   (	' '
 
 STRING
     : '"' ( ~('\"' | '\\') | ESCAPE_SEQUENCE )* '\"'
-    | '\'' ( ~('\'' | '\\') | ESCAPE_SEQUENCE )* '\''
+    ;
+
+IDSTRING
+    : '\'' ( ~('\'' | '\\') | ESCAPE_SEQUENCE )* '\''
     ;
 
 fragment
@@ -620,7 +755,7 @@ ATTRIBUTEVALUE
 	: '$'  DIGIT+
 	;
 
-NUMBER: DIGIT+ ;
+NUMBER: '-'? DIGIT+ ;
 
 fragment
 DIGIT: '0'..'9' ;
@@ -636,6 +771,8 @@ ATTR            :       'ATTR';
 ATTR8           :       'attr8';
 ATTRNO          :       'attrno';
 AVERAGE         :       'AVERAGE';
+BITMAP          :       'bitmap';
+BITSLICE        :       'bitslice';
 BETWEEN         :       'BETWEEN';
 BODY            :       'body';
 BREAK_ON        :       'BREAK.ON';
@@ -646,11 +783,13 @@ BY_EXP          :       'BY.EXP';
 BY_EXP_DSND     :       'BY.EXP.DSND';
 BY_EXP_SUB      :       'BY.EXP.SUB';
 BY_EXP_SUB_DSND :       'BY.EXP.SUB.DSND';
-COL_HDR         :	'COL.HDR';
+COL_HDG         :	'COL.HDG';
 CALC            :       'CALC';
 COL_HDR_SUPP	:	'COL.HDR.SUP';
 COL_SPACES      :	'COL.SPACES';
 COL_SUPP	:	'COL.SUP';
+COLNO           :       'colno';
+COLLATED        :       'collated';
 COMMAND         :	'command';
 CONV            :	'CONV' | 'conv';
 COUNT_SUPP	:	'COUNT.SUP';
@@ -664,7 +803,7 @@ ELEMENT         :       'element';
 ENUM            :       'ENUM';
 EQ              :       'EQ' | '=';
 EVAL            :       'EVAL';
-BOOLFALSE       :       'false';
+BFALSE           :       'false';
 FILENAME        :	'filename';
 FILETYPE        :       'filetype';
 FMT             :	'FMT';
@@ -672,20 +811,27 @@ FOOTING         :	'FOOTING';
 FORMAT          :       'format';
 FROM            :	'FROM';
 GE              :       'GE';
+GLOBAL          :       'global';
 GRAND_TOTAL	:	'GRAND.TOTAL';
-GT              :       'GT';
+GT              :       'GT'| 'AFTER';
 HDR_SUPP	:	'HDR.SUP';
 HEADING         :       'heading' | 'HEADING';
 ID_SUPP         :	'ID.SUP' 'P'?;
 IDLIST		:       'IDLIST';
 INQUIRING       :       'INQUIRING';
+INDEX           :       'index';
+INDEXES         :       'indexes';
+INTERNAL        :       'INTERNAL';
+ISNULL		:	'IS.NULL';
+ISNOTNULL	:	'IS.NOT.NULL';
+ORDER           :       'order';
 ITYPE           :       'itype';
 ITEMSTREAM	:	'ITEMSTREAM';
 JUSTIFICATION   :       'justification';
 LE              :       'LE';
-LIKE            :	'LIKE';
-LPTRQUAL        :	'LPTR';
-LTHAN           :       'LT';
+LIKE            :	'LIKE' | 'MATCHES' | 'MATCHING';
+OPT_LPTR            :	'LPTR';
+OP_LT              :       'LT' | 'BEFORE';
 MARGIN          :	'MARGIN';
 MAX             :       'MAX';
 MIN             :       'MIN';
@@ -694,6 +840,7 @@ MV              :       'mv';
 NAME            :       'name';
 NE              :       'NE';
 NO              :       'NO';
+NODE            :       'NODE';
 NO_INDEX	:	'NO.INDEX';
 NO_NULLS        :       'NO.NULLS';
 NOPAGE          :	'NOPAGE';
@@ -708,25 +855,31 @@ PRINTER         :       'printer';
 PROCESSOR       :       'processor';
 QUERY           :       'query';
 REFNO           :       'refno';
+REGULAR		: 'regular' | 'REGULAR';
 REQUIRE_INDEX	:	'REQUIRE.INDEX';
 REQUIRE_SELECT	:	'REQUIRE.SELECT';
-SAID            :       'SAID';
+SAID            :       'SAID' | 'SPOKEN';
 SAMPLE          :	'SAMPLE';
 SAMPLED         :	'SAMPLED';
 SAVING          :       'SAVING';
 SELECTLIST      :       'selectlist';
 SINGLE_VALUE	:	'SINGLE.VALUE';
 SORTED          :       'sorted';
+STAT		:	'STAT';
+STORAGE         :       'storage';
+SUM		:	'SUM';
 TERMINAL        :       'TERMINAL';
 TO              :       'TO';
 TOTAL           :       'TOTAL';
 TRANSPORT       :       'TRANSPORT';
-BOOLTRUE        :       'true';
+BTRUE            :       'true';
 TYPE            :	'type';
 UNIQUE          :       'UNIQUE';
-UNLIKE          :       'UNLIKE';
+UNLIKE          :       'UNLIKE' | 'NOT.MATCHING';
+UQS             :       'UQS';
 VERT            :	'VERT';
 WHEN            :       'WHEN';
 WIDTH           :       'width';
 WITH            :       'WITH' | 'WHERE';
 WITHIN          :	'WITHIN';
+

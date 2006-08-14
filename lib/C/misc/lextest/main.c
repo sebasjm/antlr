@@ -1,34 +1,70 @@
 #include    <antlr3.h>
-#include    <cmqlLexer.h>
 #include    <cmql.h>
+#include    <cmqlLexer.h>
 
-int main()
+int main( int argc, char *argv[ ])
 {
 
-    pANTLR3_INPUT_STREAM	    input;
-    pANTLR3_COMMON_TOKEN_STREAM	    tstream;
-    pcmqlLexer			    lxr;
-    pcmql			    psr;
+	pANTLR3_INPUT_STREAM	    input;
+	pANTLR3_COMMON_TOKEN_STREAM	    tstream;
+	pcmql			    psr;
+	pcmqlLexer			    lxr;
+	ANTLR3_BOOLEAN		    synError;
 
-    int i;
+	if	(argc < 2)
+	{
+	    fprintf(stderr, "Usage: cmqltest filename\n");
+	    exit(7);
+	}
 
-    for (i=0; i<100; i++)
-    {
-	printf("i = %d\n", i);
-	input	= antlr3AsciiFileStreamNew("inputtext.txt");
+	input	= antlr3AsciiFileStreamNew(argv[1]);
 
+	if  (	(input == (pANTLR3_INPUT_STREAM)ANTLR3_ERR_NOFILE))
+	{
+	    fprintf(stderr, "Unable to open input file!\n");
+	    exit(6);
+	}
+	if  (	(input == (pANTLR3_INPUT_STREAM)ANTLR3_ERR_NOMEM))
+	{
+	    fprintf(stderr, "Unable to allocate memory for input stream!\n");
+	    exit(1);
+	}
 	lxr		= cmqlLexerNew(input);
-        
+
+	if  (lxr == (pcmqlLexer)ANTLR3_ERR_NOMEM)
+	{
+	    fprintf(stderr, "Unable to allocate memory for lexer!\n");
+	    exit(2);
+	}
+
 	tstream	= antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lxr->pLexer->tokSource);
 
-	psr		= cmqlNew(tstream);
-	
-	psr->query(psr);
+	if  (tstream == (pANTLR3_COMMON_TOKEN_STREAM)ANTLR3_ERR_NOMEM)
+	{
+	    fprintf(stderr, "Unable to allocate memory for token stream!\n");
+	    exit(3);
+	}
 
-	psr->free(psr);
+	psr		= cmqlNew(tstream);
+
+	if  (psr == (pcmql)ANTLR3_ERR_NOMEM)
+	{
+	    fprintf(stderr, "Unable to allocate memory for parser!\n");
+	    exit(4);
+	}
+
+	synError	= psr->query(psr);
+
+	if  (synError == ANTLR3_TRUE)
+	{
+	    fprintf(stderr, "Syntax error parsing the query\n");
+	}
+
 	tstream->free(tstream);
+	psr->free(psr);
 	lxr->free(lxr);
 	input->close(input);
-    }
 
+	ANTLR3_MEM_REPORT(ANTLR3_TRUE);
+ 
 }
