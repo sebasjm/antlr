@@ -555,6 +555,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\antlr3commontreeadaptor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\antlr3commontreenodestream.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\antlr3defs.h"
 				>
 			</File>
@@ -612,6 +620,10 @@
 			</File>
 			<File
 				RelativePath=".\include\antlr3tokenstream.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\antlr3treenodestream.h"
 				>
 			</File>
 		</Filter>

@@ -1,5 +1,5 @@
 /** \file
- * Definition of the ANTLR3 base tree.
+ * Definition of the ANTLR3 base tree adaptor.
  */
 
 #ifndef	_ANTLR3_BASE_TREE_H
@@ -67,65 +67,61 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
 
     pANTLR3_BASE_TREE	(*becomeRootToken)	(void * adaptor, void * newRoot, pANTLR3_COMMON_TOKEN newRoot, pANTLR3_BASE_TREE oldRoot);
 
+    pANTLR3_BASE_TREE	(*create)		(void * adpator, pANTLR3_COMMON_TOKEN payload);
+
     pANTLR3_BASE_TREE	(*createTypeToken)	(void * adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken);
 
     pANTLR3_BASE_TREE	(*createTypeTokenText)	(void * adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken, pANTLR3_UINT32 text);
 
     pANTLR3_BASE_TREE	(*createTypeText)	(void * adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT32 text);
 
+    pANTLR3_BASE_TREE	(*dupNode)		(void * adaptor, pANTLR3_BASE_TREE treeNode);
+
     ANTLR3_UINT32	(*getType)		(void * adaptor, pANTLR3_BASE_TREE t);
 
     void		(*setType)		(void * adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type);
     
-    public String getText(Object t) {
-		throw new NoSuchMethodError("can't do this yet");
-	}
+    pANTLR3_STRING	(*getText)		(void * adaptor, pANTLR3_BASE_TREE t);
 
-	public void setText(Object t, String text) {
-		throw new NoSuchMethodError("can't do this yet");
-	}
+    void		(*setText)		(void * adaptor, pANTLR3_STRING t);
 
-	public Object getChild(int i) {
-		throw new NoSuchMethodError("can't do this yet");
-	}
+    pANTLR3_BASE_TREE	(*getChild)		(void * adaptor, ANTLR3_UINT64 i);
 
-	public int getChildCount() {
-		throw new NoSuchMethodError("can't do this yet");
-	}
+    pANTLR3_UINT64	(*getChildCount)	(void * adaptor, pANTLR3_BASE_TREE);
 
-	/**  TODO:  put a check to see if they have hashCode defined; that would break this
-	 *  Method m = node.getClass().getDeclaredMethod("hashCode", null);
-	 */
-	public int getUniqueID(Object node) {
-		return node.hashCode();
-	}
+    ANTLR3_UINT64	(*getUniqueID)		(void * adaptor, pANTLR3_BASE_TREE);
 
-	/** Tell me how to create a token for use with imaginary token nodes.
-	 *  For example, there is probably no input symbol associated with imaginary
-	 *  token DECL, but you need to create it as a payload or whatever for
-	 *  the DECL node as in ^(DECL type ID).
-	 *
-	 *  If you care what the token payload objects' type is, you should
-	 *  override this method and any other createToken variant.
-	 */
-	public abstract Token createToken(int tokenType, String text);
-
-	/** Tell me how to create a token for use with imaginary token nodes.
-	 *  For example, there is probably no input symbol associated with imaginary
-	 *  token DECL, but you need to create it as a payload or whatever for
-	 *  the DECL node as in ^(DECL type ID).
-	 *
-	 *  This is a variant of createToken where the new token is derived from
-	 *  an actual real input token.  Typically this is for converting '{'
-	 *  tokens to BLOCK etc...  You'll see
-	 *
-	 *    r : lc='{' ID+ '}' -> ^(BLOCK[$lc] ID+) ;
-	 *
-	 *  If you care what the token payload objects' type is, you should
-	 *  override this method and any other createToken variant.
-	 */
-	public abstract Token createToken(Token fromToken);
-
+    /** Tell me how to create a token for use with imaginary token nodes.
+     *  For example, there is probably no input symbol associated with imaginary
+     *  token DECL, but you need to create it as a payload or whatever for
+     *  the DECL node as in ^(DECL type ID).
+     *
+     *  If you care what the token payload objects' type is, you should
+     *  override this method and any other createToken variant.
+     */
+    pANTLR3_COMMON_TOKEN
+			(*createToken)		(void * adaptor, ANTLR3_UINT32 tokenType, pANTLR3_STRING text);
+    
+    /** Tell me how to create a token for use with imaginary token nodes.
+     *  For example, there is probably no input symbol associated with imaginary
+     *  token DECL, but you need to create it as a payload or whatever for
+     *  the DECL node as in ^(DECL type ID).
+     *
+     *  This is a variant of createToken where the new token is derived from
+     *  an actual real input token.  Typically this is for converting '{'
+     *  tokens to BLOCK etc...  You'll see
+     *
+     *    r : lc='{' ID+ '}' -> ^(BLOCK[$lc] ID+) ;
+     *
+     *  If you care what the token payload objects' type is, you should
+     *  override this method and any other createToken variant.
+     *
+     * NB: this being C it is not so easy to extend the types of creaeteToken.
+     *     We will have to see if anyone needs to do this and add any variants to
+     *     this interface.
+     */
+    pANTLR3_COMMON_TOKEN
+			(*createTokenFromToken)	(void * adpator, pANTLR3_COMMON_TOKEN fromToken);
 
 }
     ANTLR3_TREE_ADAPTOR;

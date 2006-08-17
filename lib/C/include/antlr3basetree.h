@@ -27,6 +27,11 @@ typedef	struct ANTLR3_BASE_TREE_struct
      */
     pANTLR3_LIST    children;
 
+    /** This is used to store teh current child index position while descending
+     *  and ascending trees as the tree walk progresses.
+     */
+    ANTLR3_UINT64   savedIndex;
+
     /** A string factory to produce strings for toString etc
      */
     pANTLR3_STRING_FACTORY strFactory;

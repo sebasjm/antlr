@@ -51,5 +51,6 @@ typedef	struct ANTLR3_COMMON_TREE_ADAPTOR_struct    *pANTLR3_COMMON_TREE_ADAPTOR
 typedef struct ANTLR3_TREE_PARSER_struct	    *pANTLR3_TREE_PARSER;
 
 typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct	    *pANTLR3_TREE_ADAPTOR;
+typedef struct ANTLR3_COMMON_TREE_ADAPTOR_struct    *pANTLR3_COMMON_TREE_ADAPTOR;
 
 #endif
