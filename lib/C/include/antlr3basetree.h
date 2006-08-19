@@ -20,7 +20,13 @@ typedef	struct ANTLR3_BASE_TREE_struct
 
     /** Implementors of this interface sometimes require a pointer to theirselves.
      */
-    void    *	    me;
+    void    *	    super;
+
+    /** Generic void pointer allows the grammar programmer to attach any structure they
+     *  like to a tree node, in many cases saving the need to create their own tree
+     *  and tree adaptors. ANTLR does not use this poituner, but will copy it for you and so on.
+     */
+    void    *	    u;
 
     /** The list of all the children that belong to this node. They are not part of the node
      *  as they belong to the common tree node that implements this.

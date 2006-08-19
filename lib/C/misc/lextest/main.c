@@ -9,7 +9,7 @@ int main( int argc, char *argv[ ])
 	pANTLR3_COMMON_TOKEN_STREAM	    tstream;
 	pcmql			    psr;
 	pcmqlLexer			    lxr;
-	ANTLR3_BOOLEAN		    synError;
+	query_return		    synError;
 
 	if	(argc < 2)
 	{
@@ -55,10 +55,12 @@ int main( int argc, char *argv[ ])
 
 	synError	= psr->query(psr);
 
-	if  (synError == ANTLR3_TRUE)
+	if  (synError.error == ANTLR3_TRUE)
 	{
 	    fprintf(stderr, "Syntax error parsing the query\n");
 	}
+
+	synError.tree->toStringTree(synError.tree);
 
 	tstream->free(tstream);
 	psr->free(psr);

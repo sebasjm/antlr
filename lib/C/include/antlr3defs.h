@@ -213,15 +213,18 @@ ANTLR3_API pANTLR3_PARSER	    antlr3ParserNewStream	    (ANTLR3_UINT32 sizeHint,
 ANTLR3_API pANTLR3_PARSER	    antlr3ParserNew		    (ANTLR3_UINT32 sizeHint);
 
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
-antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source);
-
+				    antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source);
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
-antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint);
+				    antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint);
 
+ANTLR3_API pANTLR3_TREE_ADAPTOR	    ANTLR3_TREE_ADAPTORNew();
 ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNew();
 ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromTree(pANTLR3_COMMON_TREE tree);
 ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromToken(pANTLR3_COMMON_TOKEN tree);
+ANTLR3_API pANTLR3_ARBORETUM	    antlr3ArboretumNew();
 
 ANTLR3_API pANTLR3_BASE_TREE	    antlr3BaseTreeNew(pANTLR3_BASE_TREE tree);
+
+ANTLR3_API void			    antlr3BaseTreeAdaptorInit(pANTLR3_TREE_ADAPTOR adaptor);
 
 #endif	/* _ANTLR3DEFS_H	*/

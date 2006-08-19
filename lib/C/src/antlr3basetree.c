@@ -120,7 +120,7 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 	return;
     }
 
-    if	(child->isNil(child->me) == ANTLR3_TRUE)
+    if	(child->isNil(child) == ANTLR3_TRUE)
     {
 	if  (child->children != NULL && child->children == tree->children)
 	{
@@ -176,12 +176,12 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 	 */
 	if  (tree->children == NULL)
 	{
-	    /* No children in the tree we are adding so create a new list on
-	     * the fly.
+	    /* No children in the tree we are adding to, so create a new list on
+	     * the fly to hold them.
 	     */
 	    tree->createChildrenList((void *)tree);
-	    tree->children->add(tree->children, child, (void (*)(void *))child->free);
 	}
+	tree->children->add(tree->children, child, (void (*)(void *))child->free);
     }
 }
 

@@ -726,6 +726,10 @@ skipOffTokenChannelsReverse(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT
 	{
 	    x--;
 	}
+	else
+	{
+	    return x;
+	}
     }
     return x;
 }

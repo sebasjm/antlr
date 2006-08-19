@@ -7,12 +7,12 @@ EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
 		SccNumberOfProjects = 3
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = lextest.vcproj
+		SccProjectUniqueName0 = ..\\..\\C.vcproj
+		SccLocalPath0 = ..\\..\\..\\..
+		SccProjectFilePathRelativizedFromConnection0 = lib\\C\\
 		SccLocalPath1 = .
-		SccProjectUniqueName2 = ..\\..\\C.vcproj
-		SccLocalPath2 = ..\\..\\..\\..
-		SccProjectFilePathRelativizedFromConnection2 = lib\\C\\
+		SccProjectUniqueName2 = lextest.vcproj
+		SccLocalPath2 = .
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

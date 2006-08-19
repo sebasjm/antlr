@@ -17,5 +17,7 @@
 #include    <antlr3bitset.h>
 #include    <antlr3lexer.h>
 #include    <antlr3parser.h>
+#include    <antlr3basetreeadaptor.h>
+#include    <antlr3commontreeadaptor.h>
 
 #endif

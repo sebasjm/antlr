@@ -457,6 +457,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\antlr3basetreeadaptor.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\antlr3bitset.c"
 				>
 			</File>
@@ -470,6 +474,14 @@
 			</File>
 			<File
 				RelativePath=".\src\antlr3commontree.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\antlr3commontreeadaptor.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\antlr3commontreenodestream.c"
 				>
 			</File>
 			<File
@@ -631,6 +643,10 @@
 			Name="Templates"
 			Filter=".stg"
 			>
+			<File
+				RelativePath="..\..\src\org\antlr\codegen\templates\Java\AST.stg"
+				>
+			</File>
 			<File
 				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg"
 				>

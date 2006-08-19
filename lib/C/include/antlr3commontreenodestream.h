@@ -2,18 +2,19 @@
  * Definition of the ANTLR3 common tree adaptor.
  */
 
-#ifndef	_ANTLR3_TREE_NODE_H
-#define	_ANTLR3_TREE_NODE_H
+#ifndef	_ANTLR3_COMMON_TREE_NODE_STREAM__H
+#define	_ANTLR3_COMMON_TREE_NODE_STREAM__H
 
 #include    <antlr3defs.h>
 #include    <antlr3collections.h>
 #include    <antlr3string.h>
+#include    <antlr3commontree.h>
 
 /** As tokens are cached in the stream for lookahead
  *  we start with a bufer of a certain size, defined here
  *  and increase the size if it overflows.
  */
-#define	INITIAL_LOOKAHEAD_BUFFER_SIZE  5;
+#define	INITIAL_LOOKAHEAD_BUFFER_SIZE  5
 
 typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 {
@@ -23,6 +24,11 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
      *  the tree node stream.
      */
     void		* super;
+
+    /* String factory for use by anything that wishes to create strings
+     * such as a tree representation or some copy of the text etc.
+     */
+    pANTLR3_STRING_FACTORY  stringFactory;
 
     /** Dummy tree node that indicates a descent into a child
      *  tree. Initialized by a call to create a new interface.
@@ -38,6 +44,11 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
      *  tree. Initialized by a call to create a new interface.
      */
     ANTLR3_BASE_TREE	  EOF_NODE;
+
+    /** Dummy node that is returned if we need to indicate an invlaid node
+     *  for any reason.
+     */
+    ANTLR3_BASE_TREE	  INVALID_NODE;
 
     /** If set to ANTLR3_TRUE then the navigation nodes UP, DOWN are
      *  duplicated rather than reused within the tree.
@@ -62,7 +73,7 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 
     /** Track the last mark() call result value for use in rewind(). 
      */
-    ANTLR3_UINT32	  lastMarker;
+    ANTLR3_UINT64	  lastMarker;
 
     /** Which node are we currently visiting?
      */
@@ -86,7 +97,12 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
      *  to fit new lookahead depths, but consume() wraps like a circular
      *  buffer.
      */
-    pANTLR3_BASE_TREE	  lookAhead;
+    pANTLR3_BASE_TREE	  * lookAhead;
+
+    /** NUmber of elements available in the lookahead buffer at any point in
+     *  time. This is the current size of the array.
+     */
+    ANTLR3_UINT32	  lookAheadLength;
 
     /** lookAhead[head] is the first symbol of lookahead, LT(1). 
      */
@@ -107,32 +123,12 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 
     void		(*reset)    (void * ctns);
 
-    /** Get tree node at current input pointer + i ahead where i=1 is next node.
-     *  i<0 indicates nodes in the past.  So -1 is previous node and -2 is
-     *  two nodes ago. LT(0) is undefined.  For i>=n, return null.
-     *  Return null for LT(0) and any index that results in an absolute address
-     *  that is negative.
-     *
-     *  This is analogus to the LT() method of the TokenStream, but this
-     *  returns a tree node instead of a token.  Makes code gen identical
-     *  for both parser and tree grammars. :)
-     */
     pANTLR3_BASE_TREE	    (*LT)		(void * ctns, ANTLR3_UINT64 k);
 
-    /** Where is this stream pulling nodes from?  This is not the name, but
-     *  the object that provides node objects.
-     */
     pANTLR3_BASE_TREE	    (*getTreeSource)	(void * ctns);
 
-    /** Make sure we have at least k symbols in lookahead buffer 
-     */
     void		    (*fill)		(void * ctns, ANTLR3_UINT64 k);
 
-    /** Add a node to the lookahead buffer.  Add at lookahead[tail].
-     *  If you tail+1 == head, then we must create a bigger buffer
-     *  and copy all the nodes over plus reset head, tail.  After
-     *  this method, LT(1) will be lookahead[0].
-     */
     void		    (*addLookahead)	(void * ctns, pANTLR3_BASE_TREE node);
 
     void		    (*consume)		(void * ctns);
@@ -149,41 +145,24 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 
     void		    (*seek)		(void * ctns, ANTLR3_UINT64 index);
 
-    void		    (*index)		(void * ctns);
+    ANTLR3_UINT64	    (*index)		(void * ctns);
 
     void		    (*size)		(void * ctns);
 
     ANTLR3_BOOLEAN	    (*hasNext)		(void * ctns);
 
-    /** Return the next node found during a depth-first walk of root.
-     *  Also, add these nodes and DOWN/UP imaginary nodes into the lokoahead
-     *  buffer as a side-effect.  Normally side-effects are bad, but because
-     *  we can emit many tokens for every next() call, it's pretty hard to
-     *  use a single return value for that.  We must add these tokens to
-     *  the lookahead buffer.
-     *
-     *  This does *not* return the DOWN/UP nodes; those are only returned
-     *  by the LT() method.
-     *
-     *  Ugh.  This mechanism is much more complicated than a recursive
-     *  solution, but it's the only way to provide nodes on-demand instead
-     *  of walking once completely through and buffering up the nodes. :(
-     */
     pANTLR3_BASE_TREE	    (*next)		(void * ctns);
 
     pANTLR3_BASE_TREE	    (*handleRootnode)	(void * ctns);
 
     pANTLR3_BASE_TREE	    (*visitChild)	(void * ctns, ANTLR3_UINT64 child);
 
-    /** As we flatten the tree, we use UP, DOWN nodes to represent
-     *  the tree structure.  When debugging we need unique nodes
-     *  so instantiate new ones when uniqueNavigationNodes is true.
-     */
     void		    (*addNavigationNode)    (void * ctns, ANTLR3_UINT32 ttype);
 
-    /** Walk upwards looking for a node with more children to walk
-     *  using a function with a name almost as long as this sentence
-     */
+    pANTLR3_BASE_TREE	    (*newDownNode)	(void * ctns);
+
+    pANTLR3_BASE_TREE	    (*newUpNode)	(void * ctns);
+
     void		    (*walkBackToMostRecentNodeWithUnvisitedChildren)
 
 				    (void * ctns);
@@ -195,41 +174,37 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 
     void		    (*setUniqueNavigationNodes)	(void * ctns, ANTLR3_BOOLEAN uniqueNavigationNodes);
 
-    /** Using the Iterator interface, return a list of all the token types
-     *  as text.  Used for testing.
-     */
     pANTLR3_STRING	    (*toNodesOnlyString)	(void * ctns);
 
-    /** Print out the entire tree including DOWN/UP nodes.  Uses
-     *  a recursive walk.  Mostly useful for testing as it yields
-     *  the token types not text.
-     */
     pANTLR3_STRING	    (*toString)			(void * ctns);
 
     pANTLR3_STRING	    (*toStringSS)		(void * ctns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop);
 
-    pANTLR3_STRING	    (*toStringWork)		(void * ctns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop, pANTLR3_STRING buf);
+    void		    (*toStringWork)		(void * ctns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop, pANTLR3_STRING buf);
 
-    ANTLR3_UINT64	    (*getLookaheadSize)		(void * ctns);
+    ANTLR3_UINT32	    (*getLookaheadSize)		(void * ctns);
 
 }
     ANTLR3_COMMON_TREE_NODE_STREAM;
 
-    /** This structure is used to save the state information in the treenodestream
-     *  when walking ahead with cyclic DFA or for syntactic predicates,
-     *  we need to record the state of the tree node stream.  This
-     *  class wraps up the current state of the CommonTreeNodeStream.
-     *  Calling mark() will push another of these on the markers stack.
-     */
-    typedef ANTLR3_TREE_WALK_STATE_struct
-    {
-	ANTLR3_UINT64	    currentChildIndex;
-	ANTLR3_UINT64	    absoluteNodeIndex;
-	pANTLR3_BASE_TREE   currentNode;
-	pANTLR3_BASE_TREE   previousNode;
-	ANTLR3_UINT64	    nodeStackSize;
-	pANTLR3_BASE_TREE   lookahead;
-    }
-       ANTLR3_TREE_WALK_STATE;
+/** This structure is used to save the state information in the treenodestream
+ *  when walking ahead with cyclic DFA or for syntactic predicates,
+ *  we need to record the state of the tree node stream.  This
+ *  class wraps up the current state of the CommonTreeNodeStream.
+ *  Calling mark() will push another of these on the markers stack.
+ */
+typedef struct ANTLR3_TREE_WALK_STATE_struct
+{
+    ANTLR3_UINT64	      currentChildIndex;
+    ANTLR3_UINT64	      absoluteNodeIndex;
+    pANTLR3_BASE_TREE	      currentNode;
+    pANTLR3_BASE_TREE	      previousNode;
+    ANTLR3_UINT64	      nodeStackSize;
+    pANTLR3_BASE_TREE	    * lookAhead;
+    ANTLR3_UINT32	      lookAheadLength;
+    ANTLR3_UINT32	      tail;
+    ANTLR3_UINT32	      head;
+}
+    ANTLR3_TREE_WALK_STATE;
 
 #endif

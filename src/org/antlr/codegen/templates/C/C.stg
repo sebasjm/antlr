@@ -96,6 +96,8 @@ outputFile( LEXER,
             ANTLRVersion,
             generatedTimestamp,
             trace,
+            scopes,
+            superClass,
             literals
             ) ::=
 <<
@@ -185,7 +187,7 @@ headerFile( LEXER,
             ANTLRVersion,
             generatedTimestamp,
             scopes,
-	    ASTLabelType="pANTLR3_BASE_TREE",
+			superClass,
             trace
         ) ::=
 <<
@@ -1190,7 +1192,9 @@ rule<ruleDescriptor.name>Ex: ;
 <ruleDescriptor.useScopes:{<scopePop(sname=it)>;}; separator="\n">
 <ruleDescriptor.ruleScope:{<scopePop(sname=it.name)>;}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
+<if(!ruleDescriptor.isSynPred)>
 retval.stop = LT(-1);<\n>
+<endif>
 <endif>
 >>
 
@@ -1449,9 +1453,12 @@ alt(elements,altNum,description,autoAST,outerAlt) ::= <<
 /* alt(elements,altNum,description,autoAST,outerAlt)
  * <fileName>:<description>
  */
-<@declarations()>
-<elements:element()>
-<@cleanup()>
+{
+    <@declarations()>
+    <@initializations()>
+    <elements:element()>
+    <@cleanup()>
+}
 >>
 
 // E L E M E N T S
@@ -2320,7 +2327,7 @@ ruleLabelDef(label) ::= <<
 >>
 /**  a rule label including default value */
 ruleLabelInitVal(label) ::= <<
-<label.label.text> = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n>
+/* <label.label.text> = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n> */
 >>
 
 /** Define a return struct for a rule if the code needs to access its
@@ -2336,7 +2343,6 @@ typedef struct <returnType(...)>_struct
     /** Generic return elements for ANTLR3 rules
      */
 <if(TREE_PARSER)>
-    pANTLR3_BASE_TREE	INVALID_NODE;
 <endif>
 <if(PARSER)>
 <endif>
@@ -2344,7 +2350,7 @@ typedef struct <returnType(...)>_struct
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
     <@ruleReturnMembers()>   
 }
-    * <returnType(...)>;
+    <returnType(...)>;
 <endif>
 <endif>
 /* end: returnScope() */
