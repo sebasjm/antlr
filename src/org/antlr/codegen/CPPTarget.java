@@ -27,8 +27,8 @@
 */
 package org.antlr.codegen;
 
-import org.antlr.analysis.Label;
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.tool.Grammar;
 import org.antlr.Tool;
 
@@ -81,18 +81,18 @@ public class CPPTarget extends Target {
 
 		return retval;
 	}
-/*  Currently generating one big header file so don't need this...
-
 	protected void genRecognizerHeaderFile(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
 										   StringTemplate headerFileST)
 		throws IOException
 	{
-		generator.write(headerFileST, grammar.name+".h");
+		StringTemplateGroup templates = generator.getTemplates();
+		/// @TODO this could better be moved into CodeGenerator.java
+		templates.doNotEmitDebugStringsForTemplate("headerFileExtension");	
+		String ext = templates.getInstanceOf("headerFileExtension").toString();
+		generator.write(headerFileST, grammar.name+ext);
 	}
-*/
-
 	/** Convert from an ANTLR char literal found in a grammar file to
 	 *  an equivalent char literal in the target language.  For Java, this
 	 *  is the identify translation; i.e., '\n' -> '\n'.  Most languages
