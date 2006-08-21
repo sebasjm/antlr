@@ -94,9 +94,14 @@ ruleCleanUp() ::= <<
 /* ruleCleanUp() */
 <super.ruleCleanUp()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval.tree = ctx->adaptor->rulePostProcessing(ctx->adaptor, root_0);
-ctx->adaptor->setTokenBoundaries(ctx->adaptor, retval.tree, retval.start, retval.stop);
+<if(backtracking)>
+if ( backtracking==0 ) {<\n>
 <endif>
+	retval.tree = ctx->adaptor->rulePostProcessing(ctx->adaptor, root_0);
+	ctx->adaptor->setTokenBoundaries(ctx->adaptor, retval.tree, retval.start, retval.stop);
+<if(backtracking)>
+}
+<endif><endif>
 /* End: ruleCleanUp() */
 >>
 
@@ -212,7 +217,7 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 tokenRefTrack(token,label,elementIndex) ::= <<
 /* tokenRefTrack(token,label,elementIndex) */
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>list_<token>->add(list_<token>, <label>);<\n>
+<if(backtracking)>if ( backtracking==0 ) <endif>list_<token>->add(list_<token>, <label>, NULL);<\n>
 /* End: tokenRefTrack(token,label,elementIndex) */
 >>
 
@@ -290,7 +295,7 @@ ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
 ruleRefTrack(rule,label,elementIndex,args) ::= <<
 /* ruleRefTrack(rule,label,elementIndex,args) */
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>list_<rule>->add(list_<rule>, <label>.tree);
+<if(backtracking)>if ( backtracking==0 ) <endif>list_<rule>->add(list_<rule>, <label>.tree, NULL);
 /* End: ruleRefTrack(rule,label,elementIndex,args) */
 >>
 
@@ -367,16 +372,21 @@ root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, <label>_tree, root_0);
 /* End: wildcardRuleRoot(label,elementIndex) */
 >>
 
-// ugh, am i really missing the combinations for Track and ListLabel?
 // there's got to be a better way
 
 // R e w r i t e
 
 rewriteCode(
-	alts, description,
+	alts, 
+	description,
 	referencedTokens,
 	referencedListLabels,
-	referencedRules, rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
+	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
+	rewriteBlockLevel, 
+	enclosingTreeLevel, 
+	treeLevel) ::=
 <<
 /* rewriteCode(
 	alts, description,
@@ -388,11 +398,7 @@ rewriteCode(
 if ( backtracking==0 ) <\n>
 <endif>
 {
-	<!
-	<first([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>->size(list_<it>)!=1 ) fprintf (stderr, "Element <it> length %d is != 1", list_<it>->size(list_<it>));<\n>}>
-	<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>->size(list_<it>)!=1 ) fprintf (stderr, "Rewrite element <it> length %d is != 1", list_<it>->size(list_<it>));<\n>}>
-	!>
-	ANTLR3_UINT64	 i_0	    = 0;
+	ANTLR3_UINT64	i_0	    = 0;
 	<prevRuleRootRef()>.tree    = root_0;
 	root_0			    = ctx->adaptor->nil(ctx->adaptor);
 	<alts:rewriteAlt(); separator="else ">
@@ -405,10 +411,13 @@ if ( backtracking==0 ) <\n>
 >>
 
 rewriteOptionalBlock(
-	alt,rewriteBlockLevel,
+	alt,
+	rewriteBlockLevel,
 	referencedTokens,
 	referencedListLabels,
 	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
 	description) ::=
 <<
 /* rewriteOptionalBlock(
@@ -436,10 +445,13 @@ rewriteOptionalBlock(
 >>
 
 rewriteClosureBlock(
-	alt,rewriteBlockLevel,
+	alt,
+	rewriteBlockLevel,
 	referencedTokens,
 	referencedListLabels,
 	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
 	description) ::=
 <<
 /* rewriteClosureBlock(
@@ -468,10 +480,13 @@ rewriteClosureBlock(
 >>
 
 rewritePositiveClosureBlock(
-	alt,rewriteBlockLevel,
+	alt,
+	rewriteBlockLevel,
 	referencedTokens,
 	referencedListLabels,
 	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
 	description) ::=
 <<
 /* rewritePositiveClosureBlock(
@@ -489,7 +504,7 @@ rewritePositiveClosureBlock(
     {
 	<alt>
     }
-}<\n>
+}	<\n>
 /* End: rewritePositiveClosureBlock(
 	alt,rewriteBlockLevel,
 	referencedTokens,
@@ -500,33 +515,52 @@ rewritePositiveClosureBlock(
 
 /** Elements referenced in rewrite loops/optional blocks must have
  *  the same size.  Factor this out from rewriteXXXBlock rules.  This
- *  only deals with the lists of stuff not single element labels like id=ID.
- *  The n_xxx var is always defined and assumed to be 1 so optional blocks
- *  and loops are always entered even if no list_xxx variables are found.
- *  For example,
- *  	a : (x=ID)? y=ID -> ($x $y)+;
- *  should generate a loop where n defined to be 1 even though it can't really
- *  loop, n=0 will prevent entry and even generate a cardinality problem.
- *  ($x $y)? will work too with n=1.
+ *  deals both with the lists of stuff and single element labels like id=ID.
+ *  The n_xxx var is always defined to either first list_ var or single-value
+ *  label.
  */
 rewriteBlockCardinalityCheck() ::= <<
-/* rewriteBlockCardinalityCheck() */
-ANTLR3_UINT64	n_<rewriteBlockLevel> = 1;
-<first([referencedTokens,referencedListLabels,referencedRules]):{n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == NULL ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>->size(list_<first([referencedTokens,referencedListLabels,referencedRules])>);}>
-<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>->size(list_<it>)!=n_<rewriteBlockLevel> ) fprintf(stderr, "rewrite element <it> list differs in size from other elements\n");<\n>}>
-/* End: rewriteBlockCardinalityCheck() */
+<! First compute size of lists of stuff !>
+<first([referencedTokens,referencedListLabels,referencedRules]):{ANTLR3_UINT64 n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == NULL ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>->size(list_<first([referencedTokens,referencedListLabels,referencedRules])>);}>
+<! Check cardinality against first size !>
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>->size(list_<it>)!=n_<rewriteBlockLevel> ) fprintf(stderr, "rewrite element <it> list differs in size from other elements!\n");<\n>}>
+<!
+   Now generate checks for non-list labels
+!>
+<!
+   If no lists above, then we need to define n to be 0 or 1 depending on presence
+   of single-value labels
+!>
+<if(!first([referencedTokens,referencedListLabels,referencedRules]))>
+<first([referencedTokenLabels,referencedRuleLabels]):{label |
+ANTLR3_UINT64 n_<rewriteBlockLevel> = <first([referencedTokenLabels,referencedRuleLabels])>==NULL ? 0 : 1;
+}>
+<! Now, gen checks to ensure non-list labels match cardinality of other labels !>
+<rest([referencedTokenLabels,referencedRuleLabels]):{label|
+if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label> != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element <label> list differs in size from other elements!\n");
+}>
+
+<else> <! there were some list labels !>
+
+<! Now, gen checks to ensure non-list labels match cardinality of lists !>
+<[referencedTokenLabels,referencedRuleLabels]:{label|
+if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label> != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element <label> list differs in size from other elements!\n");
+}>
+<endif>
 >>
 
-rewriteAlt() ::= <<
-/* rewriteAlt() */
-// <it.description>
-<if(it.pred)>
-if (<it.pred>) 
-<endif>
+rewriteAlt(a) ::= <<
+// <a.description>
+<if(a.pred)>
+if (<a.pred>) 
 {
-    <it.alt>
-}
-/* End: rewriteAlt() */
+    <a.alt>
+}<\n>
+<else>
+{
+    <a.alt>
+}<\n>
+<endif>
 >>
 
 /** For empty rewrites: "r : ... -> ;" */
@@ -537,67 +571,66 @@ rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
 // <fileName>:<description>
 {
     pANTLR3_BASE_TREE root_<treeLevel> = ctx->adaptor->nil(ctx->adaptor);
-    <root>
-    <children>
+    <root:rewriteElement()>
+    <children:rewriteElement()>
     ctx->adaptor->addChild(ctx->adaptor, root_<enclosingTreeLevel>, root_<treeLevel>);
 }<\n>
-/* End: rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) */
 >>
 
-rewriteElementList(elements) ::= "<elements>"
+rewriteElementList(elements) ::= "<elements:rewriteElement()>"
+
+rewriteElement(e) ::= <<
+<@pregen()>
+<e.el>
+>>
 
 /** Gen ID */
 rewriteTokenRef(token,elementIndex) ::= <<
 /* rewriteTokenRef(token,elementIndex) */
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, list_<token>->get(list_<token>, i_<rewriteBlockLevel>));<\n>
+// Is this a token actaully and not a tree list?
+ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, list_<token>->get(list_<token>, i_<rewriteBlockLevel>));<\n>
 /* End: rewriteTokenRef(token,elementIndex) */
 >>
 
 /** Gen $label ... where defined via label=ID */
 rewriteTokenLabelRef(label,elementIndex) ::= <<
 /* rewriteTokenLabelRef(label,elementIndex) */
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, <label>);<\n>
+ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, <label>);<\n>
 /* End: rewriteTokenLabelRef(label,elementIndex) */
 >>
 
 /** Gen $label ... where defined via label+=ID */
 rewriteTokenListLabelRef(label,elementIndex) ::= <<
 /* rewriteTokenListLabelRef(label,elementIndex) */
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, list_<label>->get(list_<label>, i_<rewriteBlockLevel>));<\n>
+ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, list_<label>->get(list_<label>, i_<rewriteBlockLevel>));<\n>
 /* Home: rewriteTokenListLabelRef(label,elementIndex) */
 >>
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
 /* rewriteTokenLabelRefRoot(label,elementIndex) */
-root_<treeLevel> = adaptor.becomeRoot(<label>, root_<treeLevel>);<\n>
+root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, <label>, root_<treeLevel>);<\n>
 /* End: rewriteTokenLabelRefRoot(label,elementIndex) */
 >>
 
 /** Gen ^(ID ...) */
 rewriteTokenRefRoot(token,elementIndex) ::= <<
 /* rewriteTokenRefRoot(token,elementIndex) */
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, list_<token>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, list_<token>->get(list_<token>, i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
 /* End: rewriteTokenRefRoot(token,elementIndex) */
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
-/* rewriteImaginaryTokenRef(args,token,elementIndex) */
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ctx->adaptor->create(ctx->adaptor, <token>, <args><if(!args)>"<token>"<endif>));<\n>
-/* End: rewriteImaginaryTokenRef(args,token,elementIndex) */
+ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, ctx->adaptor->createTypeText(ctx->adaptor, <token>, <args; separator=", "><if(!args)>"<token>"<endif>));<\n>
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
-/* rewriteImaginaryTokenRefRoot(args,token,elementIndex) */
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, adaptor.create(<token>, <args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
-/* End: rewriteImaginaryTokenRefRoot(args,token,elementIndex) */
+root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, ctx->adaptor->createTypeText(ctx->adaptor, <token>, <args; separator=", "><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
 >>
 
 /** plain -> {foo} action */
 rewriteAction(action) ::= <<
-/* rewriteAction(action) */
 root_0 = <action>;<\n>
-/* End: rewriteAction(action) */
 >>
 
 /** What is the name of the previous value of this rule's root tree?  This
@@ -620,7 +653,7 @@ ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, list_<rule>->get(list_<ru
 rewriteRuleRefRoot(rule,dup) ::= <<
 /* rewriteRuleRefRoot(rule,dup) */
 <if(dup)>
-root_<treeLevel> = list_<rule>->becomeRoot(adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)), root_<treeLevel>);<\n>
+root_<treeLevel> = list_<rule>->becomeRoot(ctx->adaptor, ctx->adaptor->dupTree(atx->adaptor, list_<rule>->get(list_<rule>, i_<rewriteBlockLevel>)), root_<treeLevel>);<\n>
 <else>
 root_<treeLevel> = list_<rule>->becomeRoot(list_<rule>->get(list_<rule>, i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
 <endif>
@@ -635,7 +668,7 @@ ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, <action>);<\n>
 
 rewriteNodeActionRoot(action) ::= <<
 /* rewriteNodeActionRoot(action) */
-root_<treeLevel> = ctx->adaptor->becomeRoot(<action>, root_<treeLevel>);<\n>
+root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <action>, root_<treeLevel>);<\n>
 /* End: rewriteNodeActionRoot(action) */
 >>
 

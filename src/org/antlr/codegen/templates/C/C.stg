@@ -1140,13 +1140,13 @@ ruleLabelDefs() ::= <<
     :{<labelType>    <it.label.text>;}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{pANLTR3_LIST    list_<it.label.text>;}; separator="\n"
+    :{pANTLR3_LIST    list_<it.label.text>;}; separator="\n"
 >
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(label=it); separator="\n"
 >
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{pANLTR3_LIST     list_<it>;}; separator="\n"
+    :{pANTLR3_LIST     list_<it>;}; separator="\n"
 >
 >>
 
@@ -2403,7 +2403,7 @@ ruleLabelRef(referencedRule,scope,attr) ::= <<
 
 returnAttributeRef(ruleDescriptor,attr) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval-<attr.name> :___FIX this how to escape it
+retval.<attr.name>
 <else>
 <attr.name>
 <endif>

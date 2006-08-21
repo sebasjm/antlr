@@ -28,7 +28,7 @@
 /** Template overrides to add debugging to normal Java output;
  *  If ASTs are built, then you'll also get ASTDbg.stg loaded.
  */
-group CDbg : ANTLRCore;
+group CDbg;
 
 @outputFile.imports() ::= <<
 <@super.imports()>
@@ -36,24 +36,39 @@ import org.antlr.runtime.debug.*;
 >>
 
 @genericParser.members() ::= <<
+public static final String[] ruleNames = new String[] {
+    "invalidRule", <rules:{rST | "<rST.ruleName>"}; wrap="\n    ", separator=", ">
+};<\n>
 public int ruleLevel = 0;
-<if(profile)>
-public <name>(<inputStreamType> input) {
-    super(input,null);
-    setDebugListener(new Profiler(this));
-}<\n>
-<else>
 <! bug: can't use <@super.members()> cut-n-paste instead !>
 public <name>(<inputStreamType> input) {
-    super(input);
+<if(profile)>
+        this(input, new Profiler(null));
+        Profiler p = (Profiler)dbg;
+        p.setParser(this);
+<else>
+        super(input);
+<endif><\n>
 <if(memoize)>
-    ruleMemo = new Map[<numRules>+1];<\n> <! index from 1..n !>
+        ruleMemo = new Map[<numRules>+1];<\n><! index from 1..n !>
 <endif>
 }
+<if(profile)>
+public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
+    ((Profiler)dbg).examineRuleMemoization(input, ruleIndex, ruleNames[ruleIndex]);
+    return super.alreadyParsedRule(input, ruleIndex);
+}<\n>
+public void memoize(IntStream input,
+                    int ruleIndex,
+                    int ruleStartIndex)
+{
+    ((Profiler)dbg).memoize(input, ruleIndex, ruleStartIndex, ruleNames[ruleIndex]);
+    super.memoize(input, ruleIndex, ruleStartIndex);
+}<\n>
+<endif>
 public <name>(<inputStreamType> input, DebugEventListener dbg) {
     super(input, dbg);
 }<\n>
-<endif>
 protected boolean evalPredicate(boolean result, String predicate) {
     dbg.semanticPredicate(result, predicate);
     return result;
@@ -78,6 +93,10 @@ finally {
     if ( ruleLevel==0 ) {dbg.terminate();}
 }<\n>
 >>
+
+@synpred.start() ::= "dbg.beginBacktrack(backtracking);"
+
+@synpred.stop() ::= "dbg.endBacktrack(backtracking, success);"
 
 // Common debug event triggers used by region overrides below
 
@@ -153,7 +172,11 @@ catch (NoViableAltException nvae) {
 }
 >>
 
-@cyclicDFAState.noViableAltException() ::= "dbg.recognitionException(nvae);"
+@cyclicDFA.errorMethod() ::= <<
+public void error(NoViableAltException nvae) {
+    dbg.recognitionException(nvae);
+}
+>>
 
 /** Force predicate validation to trigger an event */
 evalPredicate(pred,description) ::= <<
