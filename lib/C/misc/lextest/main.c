@@ -55,6 +55,7 @@ int main( int argc, char *argv[ ])
 	    exit(4);
 	}
 
+	printf("parsing to tree...\n");
 	synError	= psr->query(psr);
 
 	if  (synError.error == ANTLR3_TRUE)

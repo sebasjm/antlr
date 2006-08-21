@@ -74,7 +74,7 @@ getFirstChildWithType	(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 type)
 	cs	= tree->children->size(tree->children);
 	for	(i = 0; i < cs; i++)
 	{
-	    t = (pANTLR3_BASE_TREE) (tree->children->get(tree->children, i));
+	    t = (pANTLR3_BASE_TREE) (tree->children->get(tree->children, i+1));
 	    if  (tree->getType(t) == type)
 	    {
 		return  (pANTLR3_BASE_TREE)t;
@@ -94,7 +94,7 @@ getChild		(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i)
     {
 	return NULL;
     }
-    return  tree->children->get(tree->children, i);
+    return  tree->children->get(tree->children, i+1);
 }
 
 
@@ -114,6 +114,9 @@ getChildCount	(pANTLR3_BASE_TREE tree)
 void	    
 addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 {
+    ANTLR3_UINT64   n;
+    ANTLR3_UINT64   i;
+
     if	(child == NULL)
     {
 	// 
@@ -137,15 +140,12 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 	    {
 		// Need to copy the children as we already have children
 		//
-		ANTLR3_UINT64   n;
-		ANTLR3_UINT64   i;
-
-		n = tree->children->size(tree->children);
+		n = child->children->size(child->children);
 
 		for (i = 0; i<n; i++)
 		{
 		    void	* entry;
-		    entry	= child->children->get(child->children, i);
+		    entry	= child->children->get(child->children, i + 1);
 
 		    /* ANTLR3 lists can be sparse, unlike Array Lists
 		     */
@@ -196,7 +196,7 @@ addChildren	(pANTLR3_BASE_TREE tree, pANTLR3_LIST kids)
    s = kids->size(kids);
    for	(i = 0; i<s; i++)
    {
-       tree->addChild(tree, (pANTLR3_BASE_TREE)(kids->get(kids, i)));
+       tree->addChild(tree, (pANTLR3_BASE_TREE)(kids->get(kids, i+1)));
    }
 }
 
@@ -215,8 +215,8 @@ setChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i, void * child)
     {
 	tree->createChildrenList(tree);
     }
-    tree->children->remove(tree->children, i);	// remove any existing node at that position
-    tree->children->put(tree->children, i, child, NULL);
+    tree->children->remove(tree->children, i + 1);	// remove any existing node at that position
+    tree->children->put(tree->children, i+1, child, NULL);
 }
 
 static void    *
@@ -229,7 +229,7 @@ deleteChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i)
     /* NB: this makes the list sparse (with a gap at i)
      * unlike Java so be careful to cater for this elsewhere
      */
-    return  tree->children->remove(tree->children, i);
+    return  tree->children->remove(tree->children, i+1);
 }
 
 static void    *
@@ -249,7 +249,7 @@ dupTree		(pANTLR3_BASE_TREE tree)
 	    pANTLR3_BASE_TREE    t;
 	    pANTLR3_BASE_TREE    newNode;
 
-	    t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i);
+	    t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i+1);
     	
 	    if  (t!= NULL)
 	    {
@@ -267,6 +267,8 @@ toStringTree	(pANTLR3_BASE_TREE tree)
 {
     pANTLR3_STRING  string;
     ANTLR3_UINT64   i;
+    ANTLR3_UINT64   n;
+    pANTLR3_BASE_TREE   t;
 
     if	(tree->children == NULL || tree->children->size(tree->children) == 0)
     {
@@ -280,20 +282,23 @@ toStringTree	(pANTLR3_BASE_TREE tree)
     if	(tree->isNil(tree) == ANTLR3_FALSE)
     {
 	string->append(string, "(");
-	string->append(string, tree->toString(tree));
+	string->append(string, tree->toString(tree)->text);
 	string->append(string, " ");
     }
-    for	(i = 0; tree->children != NULL && i < tree->children->size(tree->children); i++)
+    if	(tree->children != NULL)
     {
-	pANTLR3_BASE_TREE   t;
+	n = tree->children->size(tree->children);
 
-	t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i + 1);
-	
-	if  (i > 0)
-	{
-	    string->append(string, " ");
+	for	(i = 0; i < n; i++)
+	{   
+	    t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i + 1);
+    	
+	    if  (i > 0)
+	    {
+		string->append(string, " ");
+	    }
+	    string->append(string, (t->toStringTree(t))->text);
 	}
-	string->append(string, t->toStringTree(t)->text);
     }
     if	(tree->isNil(tree) == ANTLR3_FALSE)
     {

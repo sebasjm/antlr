@@ -61,7 +61,7 @@
 				AssemblerOutput="2"
 				BrowseInformation="1"
 				WarningLevel="4"
-				WarnAsError="true"
+				WarnAsError="false"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -313,7 +313,7 @@
 				AssemblerOutput="2"
 				BrowseInformation="1"
 				WarningLevel="4"
-				WarnAsError="true"
+				WarnAsError="false"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -644,11 +644,11 @@
 			Filter=".stg"
 			>
 			<File
-				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg"
+				RelativePath="..\..\src\org\antlr\codegen\templates\Java\AST.stg"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\org\antlr\codegen\templates\Java\AST.stg"
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg"
 				>
 			</File>
 			<File
