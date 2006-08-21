@@ -11,6 +11,8 @@ int main( int argc, char *argv[ ])
 	pcmqlLexer			    lxr;
 	query_return		    synError;
 
+	pANTLR3_STRING		    treestr;
+
 	if	(argc < 2)
 	{
 	    fprintf(stderr, "Usage: cmqltest filename\n");
@@ -60,7 +62,9 @@ int main( int argc, char *argv[ ])
 	    fprintf(stderr, "Syntax error parsing the query\n");
 	}
 
-	synError.tree->toStringTree(synError.tree);
+	treestr = synError.tree->toStringTree(synError.tree);
+
+	printf("%s\n", treestr->text);
 
 	tstream->free(tstream);
 	psr->free(psr);

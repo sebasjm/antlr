@@ -78,14 +78,14 @@ newPool(pANTLR3_ARBORETUM factory)
      */
     factory->pools = (pANTLR3_COMMON_TREE *)
 		     ANTLR3_REALLOC(	(void *)factory->pools,	    /* Current pools pointer (starts at NULL)	*/
-					(ANTLR3_UINT64)((factory->thisPool + 1) * sizeof(pANTLR3_COMMON_TREE))	/* Memory for new pool pointers */
+					(ANTLR3_UINT64)((factory->thisPool + 1) * sizeof(pANTLR3_COMMON_TREE *))	/* Memory for new pool pointers */
 					);
 
     /* Allocate a new pool for the factory
      */
     factory->pools[factory->thisPool]	=
 			    (pANTLR3_COMMON_TREE) 
-				ANTLR3_MALLOC((size_t)(sizeof(pANTLR3_COMMON_TREE) * ANTLR3_FACTORY_POOL_SIZE));
+				ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_COMMON_TREE) * ANTLR3_FACTORY_POOL_SIZE));
 
 
     /* Reset the counters
@@ -306,11 +306,14 @@ freeTree(pANTLR3_BASE_TREE tree)
 	tree->children->free(tree->children);
     }
     
-    /* Now we can free this structure memory, which contains the base tree
-     * structure also. Later I wll expand this to call an public fuciton to release
-     * the base node, so people overriding it will be able to use it more freely.
-     */
-    ANTLR3_FREE(tree->super);
+    if	(((pANTLR3_COMMON_TREE)(tree->super))->factoryMade == ANTLR3_FALSE)
+    {
+	/* Now we can free this structure memory, which contains the base tree
+	 * structure also. Later I will expand this to call an public fuciton to release
+	 * the base node, so people overriding it will be able to use it more freely.
+	 */
+	ANTLR3_FREE(tree->super);
+    }
 
     return;
 }

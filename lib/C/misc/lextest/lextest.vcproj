@@ -232,7 +232,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Translating to C"
-						CommandLine="java.exe -classpath &quot;C:/antlrsrc/antlr276/antlr.jar;C:/antlrsrc/code/stringtemplate/dist/stringtemplate.jar;C:/antlrsrc/code/antlr/dist/antlr.jar&quot; org.antlr.Tool $(InputPath)&#x0D;&#x0A;"
+						CommandLine="java.exe -classpath &quot;C:\antlrsrc\code\stringtemplate\java\main\dist\stringtemplate.jar;C:/antlrsrc/antlr276/antlr.jar;C:/antlrsrc/code/antlr/dist/antlr.jar;C:/antlrsrc/code/antlr/main/dist/antlr.jar&quot; org.antlr.Tool $(InputPath)&#x0D;&#x0A;"
 						AdditionalDependencies=""
 						Outputs="$(InputDir)cmql.c;$(InputDir)cmql.h"
 					/>

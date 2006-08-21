@@ -644,11 +644,11 @@
 			Filter=".stg"
 			>
 			<File
-				RelativePath="..\..\src\org\antlr\codegen\templates\Java\AST.stg"
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg"
+				RelativePath="..\..\src\org\antlr\codegen\templates\Java\AST.stg"
 				>
 			</File>
 			<File

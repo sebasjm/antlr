@@ -287,7 +287,7 @@ toStringTree	(pANTLR3_BASE_TREE tree)
     {
 	pANTLR3_BASE_TREE   t;
 
-	t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i);
+	t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i + 1);
 	
 	if  (i > 0)
 	{

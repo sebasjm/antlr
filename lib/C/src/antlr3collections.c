@@ -356,7 +356,7 @@ antlr3HashPut(pANTLR3_HASH_TABLE table, void * key, void * element, void (*freep
     /* newPointer is now poiting at the pointer where we need to
      * add our new entry, so let's crate the entry and add it in.
      */
-    entry   = ANTLR3_MALLOC((size_t)sizeof(ANTLR3_HASH_ENTRY));
+    entry   = (pANTLR3_HASH_ENTRY)ANTLR3_MALLOC((size_t)sizeof(ANTLR3_HASH_ENTRY));
 
     if	(entry == NULL)
     {

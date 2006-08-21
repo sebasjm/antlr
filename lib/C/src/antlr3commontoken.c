@@ -108,7 +108,7 @@ newPool(pANTLR3_TOKEN_FACTORY factory)
      */
     factory->pools = (pANTLR3_COMMON_TOKEN *)
 		     ANTLR3_REALLOC(	(void *)factory->pools,	    /* Current pools pointer (starts at NULL)	*/
-					(ANTLR3_UINT64)((factory->thisPool + 1) * sizeof(pANTLR3_COMMON_TOKEN))	/* Memory for new pool pointers */
+					(ANTLR3_UINT64)((factory->thisPool + 1) * sizeof(pANTLR3_COMMON_TOKEN *))	/* Memory for new pool pointers */
 					);
 
     /* Allocate a new pool for the factory
@@ -296,7 +296,7 @@ static  pANTLR3_STRING  getText			(pANTLR3_COMMON_TOKEN token)
     {
 	return	token->input->substr(	token->input, 
 					(ANTLR3_UINT32)token->getStartIndex(token), 
-					(ANTLR3_UINT32)token->getStopIndex(token));
+ 					(ANTLR3_UINT32)token->getStopIndex(token));
     }
 
     /* Nothing to return
