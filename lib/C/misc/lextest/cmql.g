@@ -358,7 +358,7 @@ querySpecs
 	;
 
 bool
-        :   BRUE
+        :   BTRUE
         |   BFALSE
         ;
 
@@ -464,7 +464,6 @@ listTypeLogic
                 -> 
                         ^(STATEMENT $c1* $ic1* $os1* $se1* $so1* )
 	;
-
 
 to_clause
         : TO integerparam -> ^(SELECT_TO integerparam)
@@ -742,7 +741,7 @@ value_selection_primary
 				}
 			    }
 					    -> {   strcmp($s.text, "\"\"") == 0 }? COMPNULL
-					    -> {   strcmp($s.text, "\"\"") != 0 ) }? OPLT $s
+					    -> {   strcmp($s.text, "\"\"") != 0 }? OPLT $s
 					    ->
 		    |	d=dict_element	    -> OPLT $d
 		)
@@ -759,7 +758,7 @@ value_selection_primary
 			    {
 				if  (strcmp($s.text, "\"\"") == 0)  
 				{
-				    fprintf(stderr, "[CMQL - WARNING] : LT \"\" has no meaning. EQ \"\" assumed.\n");
+				    fprintf(stderr, "[CMQL - WARNING] : LE \"\" has no meaning. EQ \"\" assumed.\n");
 				}
 			    }
 					    -> {   strcmp($s.text, "\"\"") == 0 }? COMPNULL
@@ -771,7 +770,7 @@ value_selection_primary
 	|   GE     
 		(	UQS? s=STRING
 			    {
-				if  (strcmp($s.text, "\"\"") 
+				if  (strcmp($s.text, "\"\"") == 0)
 				{
 				    fprintf(stderr, "[CMQL - WARNING] : GE \"\" has no meaning (selects everything). NE \"\" assumed.");
 				}
