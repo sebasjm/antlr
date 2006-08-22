@@ -1494,9 +1494,9 @@ listLabel(label) ::= <<
  */
 if (list_<label> == NULL)
 {
-    list_<label>=antlr3NewList(ANTLR3_LIST_SIZE_HINT);
+    list_<label>=antlr3ListNew(ANTLR3_LIST_SIZE_HINT);
 }
-list_<label>->put(list_<label>, (ANTLR3_UINT64)<label>, NULL, NULL);<\n>
+list_<label>->add(list_<label>, &<label>, NULL);  /* Add whatever the retrun type is*/<\n>
 >>
 
 /** match a character */
@@ -2323,7 +2323,9 @@ initValue(typeName) ::= <<
 
 /** Define a rule label  */
 ruleLabelDef(label) ::= <<
-<ruleLabelType(referencedRule=label.referencedRule)> <label.label.text>;<\n>
+<ruleLabelType(referencedRule=label.referencedRule)> <label.label.text>;
+#undef	RETURN_TYPE_<label.label.text>
+#define	RETURN_TYPE_<label.label.text> <ruleLabelType(referencedRule=label.referencedRule)><\n>
 >>
 /**  a rule label including default value */
 ruleLabelInitVal(label) ::= <<

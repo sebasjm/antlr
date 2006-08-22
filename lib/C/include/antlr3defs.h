@@ -16,17 +16,22 @@
 #ifndef	ANTLR3_SIZE_HINT
 #define	ANTLR3_SIZE_HINT    2049
 #endif
+#ifndef	ANTLR3_LIST_SIZE_HINT
+#define	ANTLR3_LIST_SIZE_HINT 127
+#endif
 #endif
 
 #ifdef	ANTLR3_AVERAGE
 #ifndef	ANTLR3_SIZE_HINT
 #define	ANTLR3_SIZE_HINT    1025
+#define	ANTLR3_LIST_SIZE_HINT 63
 #endif
 #endif
 
 #ifdef	ANTLR3_SMALL
 #ifndef	ANTLR3_SIZE_HINT
 #define	ANTLR3_SIZE_HINT    211
+#define	ANTLR3_LIST_SIZE_HINT 31
 #endif
 #endif
 
@@ -39,7 +44,7 @@
 
 #define	WINDOWS_LEAN_AND_MEAN
 
-// Allow VC 8 (vs2004) to use 'secure' versions of various functions such as sprintf
+// Allow VC 8 (vs2005) to use 'secure' versions of various functions such as sprintf
 //
 #define	_CRT_SECURE_NO_DEPRECATE 
 

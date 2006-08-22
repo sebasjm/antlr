@@ -459,8 +459,8 @@ listTypeLogic
                 // Similarly LIST FILE WITH F1 > "77" should include it as it has no output spec.
                 //
                 -> { $c1 == NULL && $c2 == NULL && $ic1 == NULL && $se1 == NULL && $se2 == NULL && $so1 == NULL && $so2 == NULL && $os1 == NULL && $os2 == NULL}?
-                -> { os1 == NULL }?     // No output spec, use the default
-                        ^(STATEMENT$c1* $c2* $ic1* $os2* $se1* $se2* $so1* $so2* )                     
+                -> { $os1 == NULL }?     // No output spec, use the default
+                        ^(STATEMENT $c1* $c2* $ic1* $os2* $se1* $se2* $so1* $so2* )                     
                 -> 
                         ^(STATEMENT $c1* $ic1* $os1* $se1* $so1* )
 	;
@@ -560,7 +560,7 @@ idselect_secondary
 
     scope   { ANTLR3_BOOLEAN reverseMatch;}
 
-        :  (op=EQ|op=NE|op=LT|op=GT|op=LE|op=GE) (opde=baddict | opstr=IDSTRING)
+        :  (op=EQ|op=NE|op=OPLT|op=GT|op=LE|op=GE) (opde=baddict | opstr=IDSTRING)
 
             -> $op $opstr? $opde?
 
@@ -570,7 +570,7 @@ idselect_secondary
 
 	|   LIKE UQS? (opstr=STRING | opstr=IDSTRING)	
 		{ 
-		    if	($opstr.getText()[0] == '~')  
+		    if	($opstr.text[0] == '~')  
 		    {
 			$idselect_secondary::reverseMatch = ANTLR3_TRUE;
 		    } 
@@ -578,8 +578,8 @@ idselect_secondary
 		    {
 			$idselect_secondary::reverseMatch = ANTLR3_FALSE;
 		    }
-		   // $opstr.setText(convertPattern($opstr.getText()));
-		   // $opstr.setText("pattern convert goes here");
+		   // $opstr->setText(convertPattern($opstr.text));
+		   $opstr->setText($opstr, "pattern convert goes here");
 		}
             -> {  $idselect_secondary::reverseMatch }? UNLIKE $opstr
 	    -> {! $idselect_secondary::reverseMatch }? LIKE $opstr
@@ -587,7 +587,7 @@ idselect_secondary
 
 	|   UNLIKE UQS? (opstr=STRING | opstr=IDSTRING)
 		{ 
-		    if	($opstr.getText()[0] == '~')  
+		    if	($opstr.text[0] == '~')  
 		    {
 			$idselect_secondary::reverseMatch = ANTLR3_TRUE;
 		    } 
@@ -595,8 +595,8 @@ idselect_secondary
 		    {
 			$idselect_secondary::reverseMatch = ANTLR3_FALSE;
 		    }
-		   // $opstr.setText(convertPattern($opstr.getText()));
-		   // $opstr.setText("pattern convert goes here");
+		   // $opstr->setText(convertPattern($opstr.text));
+		   $opstr->setText($opstr, "pattern convert goes here");
 		}
             -> {  $idselect_secondary::reverseMatch }? LIKE $opstr
 	    -> {! $idselect_secondary::reverseMatch }? UNLIKE $opstr
@@ -710,8 +710,8 @@ value_selection_primary
 		// The expression  X ""    is the same as  NO X 
 		// The expression  X "abc" is the same as  X EQ "abc"
 		//
-		-> {   strcmp($s.getText(), "\"\"") == 0 }?  COMPNULL
-		-> {   strcmp($s.getText(), "\"\"") != 0 }?  EQ $s
+		-> {   strcmp($s.text, "\"\"") == 0 }?  COMPNULL
+		-> {   strcmp($s.text, "\"\"") != 0 }?  EQ $s
 		->
 	|   ISNULL
 		-> COMPNULL
@@ -720,36 +720,36 @@ value_selection_primary
 		-> NOT COMPNULL
 
 	|   EQ
-		(	UQS? s=STRING	    -> {   strcmp($s.getText(), "\"\"") == 0 }? COMPNULL
-					    -> {   strcmp($s.getText(), "\"\"") != 0 }? EQ $s
+		(	UQS? s=STRING	    -> {   strcmp($s.text, "\"\"") == 0 }? COMPNULL
+					    -> {   strcmp($s.text, "\"\"") != 0 }? EQ $s
 					    ->
 		    |	d=dict_element	    -> EQ $d
 		)	
 	
 	|   NE     
-		(	UQS? s=STRING	    -> {   strcmp($s.getText(), "\"\"") == 0 }? NOT COMPNULL
-					    -> {   strcmp($s.getText(), "\"\"") != 0 }? NE $s
+		(	UQS? s=STRING	    -> {   strcmp($s.text, "\"\"") == 0 }? NOT COMPNULL
+					    -> {   strcmp($s.text, "\"\"") != 0 }? NE $s
 					    ->
 		    |	d=dict_element	    -> NE $d
 		)	
 
-	|   LT     
+	|   OPLT     
 		(	UQS? s=STRING
 			    {
-				if  (strcmp($s.getText(), "\"\"") == 0) 
+				if  (strcmp($s.text, "\"\"") == 0) 
 				{
 				    fprintf(stderr, "[CMQL - WARNING] : LT \"\" has no meaning. EQ \"\" assumed.\n");
 				}
 			    }
-					    -> {   $s.getText().equals("\"\"") }? COMPNULL
-					    -> { ! $s.getText().equals("\"\"") }? LT $s
+					    -> {   strcmp($s.text, "\"\"") == 0 }? COMPNULL
+					    -> {   strcmp($s.text, "\"\"") != 0 ) }? OPLT $s
 					    ->
-		    |	d=dict_element	    -> LT $d
+		    |	d=dict_element	    -> OPLT $d
 		)
 
 	|   GT
-		(	UQS? s=STRING	    -> {   strcmp($s.getText(), "\"\"") == 0 }? NOT COMPNULL
-					    -> {   strcmp($s.getText(), "\"\"") != 0 }? GT $s
+		(	UQS? s=STRING	    -> {   strcmp($s.text, "\"\"") == 0 }? NOT COMPNULL
+					    -> {   strcmp($s.text, "\"\"") != 0 }? GT $s
 					    ->
 		    |	d=dict_element	    -> GT $d
 		)
@@ -757,13 +757,13 @@ value_selection_primary
 	|   LE     
 		(	UQS? s=STRING
 			    {
-				if  (strcmp($s.getText(), "\"\"") == 0)  
+				if  (strcmp($s.text, "\"\"") == 0)  
 				{
 				    fprintf(stderr, "[CMQL - WARNING] : LT \"\" has no meaning. EQ \"\" assumed.\n");
 				}
 			    }
-					    -> {   strcmp($s.getText(), "\"\"") == 0 }? COMPNULL
-					    -> {   strcmp($s.getText(), "\"\"") != 0 }? LE $s
+					    -> {   strcmp($s.text, "\"\"") == 0 }? COMPNULL
+					    -> {   strcmp($s.text, "\"\"") != 0 }? LE $s
 					    ->
 		    |	d=dict_element	    -> LE $d
 		)
@@ -771,13 +771,13 @@ value_selection_primary
 	|   GE     
 		(	UQS? s=STRING
 			    {
-				if  (strcmp($s.getText(), "\"\"") 
+				if  (strcmp($s.text, "\"\"") 
 				{
-				    System.out.println("[CMQL - WARNING] : GE \"\" has no meaning (selects everything). NE \"\" assumed.");
+				    fprintf(stderr, "[CMQL - WARNING] : GE \"\" has no meaning (selects everything). NE \"\" assumed.");
 				}
 			    }
-					    -> {   strcmp($s.getText(), "\"\"") == 0 }? NOT COMPNULL
-					    -> {   strcmp($s.getText(), "\"\"") != 0 }? GE $s
+					    -> {   strcmp($s.text, "\"\"") == 0 }? NOT COMPNULL
+					    -> {   strcmp($s.text, "\"\"") != 0 }? GE $s
 					    ->
 		    |	d=dict_element	    -> GE $d
 		)
@@ -788,7 +788,7 @@ value_selection_primary
 
 	|	LIKE UQS? opstr=STRING	
 		    {
-			if	($opstr.getText()[0] == '~')  
+			if	($opstr.text[0] = '~')  
 			{
 			    $value_selection_primary::reverseMatch = ANTLR3_TRUE;
 			} 
@@ -796,8 +796,8 @@ value_selection_primary
 			{
 			    $value_selection_primary::reverseMatch = ANTLR3_FALSE;
 			}
-			//$opstr.setText(convertPattern($opstr.getText()));
-			$opstr.setText("convert pattern goes here");
+			//$opstr->setText(convertPattern($opstr.text));
+			$opstr->setText($opstr, "convert pattern goes here");
 		    }
 		 -> {  $value_selection_primary::reverseMatch }? UNLIKE $opstr
 		 -> {! $value_selection_primary::reverseMatch }? LIKE $opstr
@@ -805,7 +805,7 @@ value_selection_primary
 
 	|	UNLIKE UQS? opstr=STRING	
 		    { 
-			if	($opstr.getText()[0] == '~') 
+			if	($opstr.text[0] == '~')
 			{
 			    $value_selection_primary::reverseMatch = ANTLR3_TRUE;
 			} 
@@ -813,8 +813,8 @@ value_selection_primary
 			{
 			    $value_selection_primary::reverseMatch = ANTLR3_FALSE;
 			}
-			//$opstr.setText(convertPattern($opstr.getText()));
-			$opstr.setText("convert pattern goes here");
+			//$opstr->setText(convertPattern($opstr.text));
+			$opstr->setText($opstr, "convert pattern goes here");
 		    }
 		 -> {  $value_selection_primary::reverseMatch }? LIKE $opstr
 		 -> {! $value_selection_primary::reverseMatch }? UNLIKE $opstr
@@ -908,13 +908,13 @@ limiter_op
 
 limiter:
             (NOT    NE     s=baddict) -> EQ $s
-          | (NOT    LT     s=baddict) -> GE $s
+          | (NOT    OPLT   s=baddict) -> GE $s
           | (NOT    GT     s=baddict) -> LE $s
           | (NOT    LE     s=baddict) -> GT $s
-          | (NOT    GE     s=baddict) -> LT $s
+          | (NOT    GE     s=baddict) -> OPLT $s
           | (NOT    opt_eq s=baddict) -> NE $s
           | (       NE     s=baddict) -> NE $s
-          | (       LT     s=baddict) -> LT $s
+          | (       OPLT   s=baddict) -> OPLT $s
           | (       GT     s=baddict) -> GT $s
           | (       LE     s=baddict) -> LE $s
           | (       GE     s=baddict) -> GE $s
@@ -938,7 +938,7 @@ baddict
     {
         if  ($baddict::bad) 
         {
-            fprintf(stderr, "CMQL: The dictionary entry \%s is not defined!\n", $bs.getText());
+            fprintf(stderr, "CMQL: The dictionary entry \%s is not defined!\n", $bs.text);
             parseError = ANTLR3_TRUE;
         }
     }
@@ -1077,7 +1077,7 @@ JUSTIFICATION   :       'justification';
 LE              :       'LE';
 LIKE            :	'LIKE' | 'MATCHES' | 'MATCHING';
 OPTLPTR         :	'LPTR';
-LT              :       'LT' | 'BEFORE';
+OPLT            :       'LT' | 'BEFORE';
 MARGIN          :	'MARGIN';
 MAX             :       'MAX';
 MIN             :       'MIN';

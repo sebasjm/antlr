@@ -533,7 +533,7 @@ rewriteBlockCardinalityCheck() ::= <<
 !>
 <if(!first([referencedTokens,referencedListLabels,referencedRules]))>
 <first([referencedTokenLabels,referencedRuleLabels]):{label |
-ANTLR3_UINT64 n_<rewriteBlockLevel> = <first([referencedTokenLabels,referencedRuleLabels])>==NULL ? 0 : 1;
+ANTLR3_UINT64 n_<rewriteBlockLevel> = <first([referencedTokenLabels,referencedRuleLabels])>.tree==NULL ? 0 : 1;
 }>
 <! Now, gen checks to ensure non-list labels match cardinality of other labels !>
 <rest([referencedTokenLabels,referencedRuleLabels]):{label|
@@ -621,11 +621,11 @@ root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, list_<token>->get
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
-ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, ctx->adaptor->createTypeText(ctx->adaptor, <token>, <args; separator=", "><if(!args)>"<token>"<endif>));<\n>
+ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ctx->adaptor->createTypeText(ctx->adaptor, <token>, <args; separator=", "><if(!args)>"<token>"<endif>));<\n>
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, ctx->adaptor->createTypeText(ctx->adaptor, <token>, <args; separator=", "><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
+root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->createTypeText(ctx->adaptor, <token>, <args; separator=", "><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
 >>
 
 /** plain -> {foo} action */
@@ -682,7 +682,7 @@ ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, <label>.tree);<\n>
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
 /* rewriteRuleListLabelRef(label) */
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)list_<label>->get(list_<label>, i_<rewriteBlockLevel>))->tree);<\n>
+ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ((RETURN_TYPE_<label> *)list_<label>->get(list_<label>, i_<rewriteBlockLevel>))->tree);<\n>
 /* End: rewriteRuleListLabelRef(label) */
 >>
 
@@ -696,6 +696,6 @@ root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <label>.tree, root_<tr
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
 /* rewriteRuleListLabelRefRoot(label) */
-root_<treeLevel> = ctx->adaptor->becomeRoot(((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)list_<label>->get(list_<label>, i_<rewriteBlockLevel>))->tree, root_<treeLevel>);<\n>
+root_<treeLevel> = ctx->adaptor->becomeRoot(((RETURN_TYPE_<label> *)list_<label>->get(list_<label>, i_<rewriteBlockLevel>))->tree, root_<treeLevel>);<\n>
 /* End: rewriteRuleListLabelRefRoot(label) */
 >>
