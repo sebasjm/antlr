@@ -73,6 +73,10 @@ ANTLR3_TREE_ADAPTORNew()
      */
     cta->arboretum  = antlr3ArboretumNew();
 
+    /* Allow the base tree adaptor to share the tree factory's string factory.
+     */
+    cta->baseAdaptor.strFactory	= cta->arboretum->unTruc.baseTree.strFactory;
+
     /* Return the address of the base adaptor interface.
      */
     return  &(cta->baseAdaptor);
@@ -121,7 +125,10 @@ createToken		(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UIN
 
     if	(newToken != (pANTLR3_COMMON_TOKEN)(ANTLR3_ERR_NOMEM))
     {
-	newToken->setText(newToken, text);
+	/* Create the text using our own string factory to avoid complicating
+	 * commontoken.
+	 */
+	newToken->text	= adaptor->strFactory->newPtr(adaptor->strFactory, text, (ANTLR3_UINT32)strlen((const char *)text));
     }
 
     return  newToken;
@@ -154,16 +161,21 @@ createTokenFromToken	(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fromTok
 
     if	(newToken != (pANTLR3_COMMON_TOKEN)(ANTLR3_ERR_NOMEM))
     {
-	newToken->setText(newToken, fromToken->getText(fromToken)->text);
-	newToken->setLine(newToken, fromToken->getLine(fromToken));
-	newToken->setTokenIndex(newToken, fromToken->getTokenIndex(fromToken));
-	newToken->setCharPositionInLine(newToken, fromToken->getCharPositionInLine(fromToken));
-	newToken->setChannel(newToken, fromToken->getChannel(fromToken));
+	/* Create the text using our own string factory to avoid complicating
+	 * commontoken.
+	 */
+	pANTLR3_STRING	text;
+	text		= fromToken->getText(fromToken);
+	newToken->text	= adaptor->strFactory->newPtr(adaptor->strFactory, text->text, text->len);
+
+	newToken->setLine		(newToken, fromToken->getLine(fromToken));
+	newToken->setTokenIndex		(newToken, fromToken->getTokenIndex(fromToken));
+	newToken->setCharPositionInLine	(newToken, fromToken->getCharPositionInLine(fromToken));
+	newToken->setChannel		(newToken, fromToken->getChannel(fromToken));
     }
 
     return  newToken;
 }
-
 
 /* Specific methods for a TreeAdaptor */
 

@@ -767,6 +767,15 @@ static	void <name>LoadFollowSets();
  */
 static	void <name>FreeFollowSets();
 
+/* For use in tree output where we are accumulating rule labels via label += ruleRef
+ * we need a function that knows how to free a return scope when the list is destroyed. 
+ * We cannot just use ANTLR3_FREE because in debug tracking mode, this is a macro.
+ */
+static	void freeScope(void * scope)
+{
+    ANTLR3_FREE(scope);
+}
+
 <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
 <cyclicDFAs:{dfa | <cyclicDFADeclare(decisionNumber=dfa.decisionNumber,states=dfa.states)>}>
 
@@ -1496,8 +1505,9 @@ if (list_<label> == NULL)
 {
     list_<label>=antlr3ListNew(ANTLR3_LIST_SIZE_HINT);
 }
-list_<label>->add(list_<label>, &<label>, NULL);  /* Add whatever the retrun type is*/<\n>
+list_<label>->add(list_<label>, <label>, NULL);
 >>
+
 
 /** match a character */
 charRef(char,label) ::= <<
@@ -2329,7 +2339,6 @@ ruleLabelDef(label) ::= <<
 >>
 /**  a rule label including default value */
 ruleLabelInitVal(label) ::= <<
-/* <label.label.text> = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n> */
 >>
 
 /** Define a return struct for a rule if the code needs to access its

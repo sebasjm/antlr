@@ -312,21 +312,24 @@ static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
 	 */
 	if  (token->input == NULL || token->input->strFactory == NULL)
 	{
-	    /* There was no input stream for this token, or if
-	     * it did not pay the rent on a string factory
+	    /* There was no input stream for this token, or
+	     * it did not pay the rent on a string factory.
+	     */
+
+	    /* There was no string factory, therefore, if this is not a factory made
+	     * token, we assume no resizing etc will go on and just set the text as it is given.
 	     */
 	    if	(token->factoryMade == ANTLR3_FALSE)
 	    {
 		token->text	    = (pANTLR3_STRING) ANTLR3_MALLOC(sizeof(ANTLR3_STRING));
-		token->text->len    = 0;
-		token->text->size   = 0;
-		token->text->text   = NULL;
-
+		token->text->len    = (ANTLR3_UINT32)strlen((const char *)text);
+		token->text->size   = token->text->len ;
+		token->text->text   = text;
 	    }
 	    return;
 	}
 
-	/* We can make a new string from teh supplied text then
+	/* We can make a new string from the supplied text then
 	 */
 	token->text = token->input->strFactory->newPtr(token->input->strFactory, text, (ANTLR3_UINT32)strlen((const char *)text));
     }

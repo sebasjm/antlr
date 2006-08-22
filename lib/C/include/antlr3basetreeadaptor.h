@@ -19,6 +19,10 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
      */
     void	* super;
 
+    /** We need a string factory for creating imaginary tokens
+     */
+    pANTLR3_STRING_FACTORY  strFactory;
+
 
     pANTLR3_BASE_TREE	    (*nil)			(void * adaptor);
 

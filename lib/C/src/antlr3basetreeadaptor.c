@@ -36,7 +36,7 @@ static	ANTLR3_UINT64		getUniqueID		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_T
 ANTLR3_API void
 antlr3BaseTreeAdaptorInit(pANTLR3_TREE_ADAPTOR adaptor)
 {
-	/* Initialize teh interface
+	/* Initialize the interface
 	 */
 	adaptor->nil			= ANTLR3_API_FUNC nil;
 	adaptor->dupTree		= ANTLR3_API_FUNC dupTree;
