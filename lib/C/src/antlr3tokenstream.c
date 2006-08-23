@@ -2,31 +2,39 @@
  */
 #include    <antlr3tokenstream.h>
 
-/* API */
+#ifdef	WIN32
+#pragma warning( disable : 4100 )
+#endif
 
-static pANTLR3_COMMON_TOKEN tokLT		(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 k);
-static pANTLR3_COMMON_TOKEN get			(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 i);
-static pANTLR3_TOKEN_SOURCE getTokenSource	(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
-static void		    setTokenSource	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, pANTLR3_TOKEN_SOURCE tokenSource);
-static pANTLR3_STRING	    toString		(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
-static pANTLR3_STRING	    toStringSS		(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
-static pANTLR3_STRING	    toStringTT		(pANTLR3_COMMON_TOKEN_STREAM tokenStream, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON_TOKEN stop);
-static void		    consume		(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
-static void		    setTokenTypeChannel	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT32 ttype, ANTLR3_UINT32 channel);
-static void		    discardTokenType	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT32 ttype);
-static void		    discardOffChannel	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_BOOLEAN discard);
-static pANTLR3_LIST	    getTokens		(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
-static pANTLR3_LIST	    getTokenRange	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
-static pANTLR3_LIST	    getTokensSet	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_BITSET types);
-static pANTLR3_LIST	    getTokensList	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_LIST list);
-static pANTLR3_LIST	    getTokensType	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, ANTLR3_UINT32 type);
-static ANTLR3_UINT32	    LA			(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
-static ANTLR3_UINT64	    mark		(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
-static void		    release		(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 mark);
-static ANTLR3_UINT64	    size		(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
-static ANTLR3_INT64	    index		(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
-static void		    rewindStream	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 marker);
-static void		    seek		(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 index);
+/* COMMON_TOKEN_STREAM API */
+static void		    setTokenTypeChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT32 ttype, ANTLR3_UINT32 channel);
+static void		    discardTokenType	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT32 ttype);
+static void		    discardOffChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_BOOLEAN discard);
+static pANTLR3_LIST	    getTokens		(pANTLR3_COMMON_TOKEN_STREAM cts);
+static pANTLR3_LIST	    getTokenRange	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
+static pANTLR3_LIST	    getTokensSet	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_BITSET types);
+static pANTLR3_LIST	    getTokensList	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_LIST list);
+static pANTLR3_LIST	    getTokensType	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, ANTLR3_UINT32 type);
+
+/* TOKEN_STREAM API 
+ */
+static pANTLR3_COMMON_TOKEN tokLT		(pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k);
+static pANTLR3_COMMON_TOKEN get			(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 i);
+static pANTLR3_TOKEN_SOURCE getTokenSource	(pANTLR3_TOKEN_STREAM ts);
+static void		    setTokenSource	(pANTLR3_TOKEN_STREAM ts, pANTLR3_TOKEN_SOURCE tokenSource);
+static pANTLR3_STRING	    toString		(pANTLR3_TOKEN_STREAM ts);
+static pANTLR3_STRING	    toStringSS		(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
+static pANTLR3_STRING	    toStringTT		(pANTLR3_TOKEN_STREAM ts, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON_TOKEN stop);
+
+/* INT STREAM API */
+static void		    consume		(pANTLR3_INT_STREAM is);
+static ANTLR3_UINT32	    LA			(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
+static ANTLR3_UINT64	    mark		(pANTLR3_INT_STREAM is);
+static void		    release		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
+static ANTLR3_UINT64	    size		(pANTLR3_INT_STREAM is);
+static ANTLR3_INT64	    index		(pANTLR3_INT_STREAM is);
+static void		    rewindStream	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
+static void		    seek		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
 
 static void		    antlr3TokenStreamFree   (pANTLR3_TOKEN_STREAM	    stream);
 static void		    antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM    stream);
@@ -51,8 +59,6 @@ antlr3TokenStreamNew()
 	return	(pANTLR3_TOKEN_STREAM) ANTLR3_ERR_NOMEM;
     }
 
-    stream->me	    = ANTLR3_API_FUNC stream;
-    
     /* Install basic API 
      */
     stream->free    = ANTLR3_API_FUNC antlr3TokenStreamFree;
@@ -73,17 +79,17 @@ antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM stream)
    /* We only free up our subordinate interfaces if they belong
     * to use, otherwise we let whoever owns them deal with them.
     */
-    if	(stream->tstream->istream->me == stream)
+    if	(stream->tstream->super == stream)
     {
-	if  (stream->tstream->istream->eofToken != NULL)
+	if	(stream->tstream->istream->super == stream->tstream)
 	{
-	    stream->tstream->istream->eofToken->freeCustom((void *)stream->tstream->istream->eofToken);
+	    if  (stream->tstream->istream->eofToken != NULL)
+	    {
+		stream->tstream->istream->eofToken->freeCustom((void *)stream->tstream->istream->eofToken);
+	    }
+	    stream->tstream->istream->free(stream->tstream->istream);
 	}
-	stream->tstream->istream->free(stream->tstream->istream);
-    }
 
-    if	(stream->tstream->me == stream)
-    {
 	stream->tstream->free(stream->tstream);
     }
 
@@ -129,7 +135,7 @@ antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source
     stream->discardSet		= NULL;
     stream->discardOffChannel	= ANTLR3_TRUE;
 
-    stream->tstream->setTokenSource(stream->tstream->me, source);
+    stream->tstream->setTokenSource(stream->tstream, source);
 
     /* Need to create the EOF token
      */
@@ -154,17 +160,16 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
     {
 	return	(pANTLR3_COMMON_TOKEN_STREAM) ANTLR3_ERR_NOMEM;
     }
-    stream->me		= stream;
 
     /* Create space for the token stream interface
      */
-    stream->tstream	= antlr3TokenStreamNew();
-    stream->tstream->me	= ANTLR3_API_FUNC stream;
+    stream->tstream	    = antlr3TokenStreamNew();
+    stream->tstream->super  = ANTLR3_API_FUNC stream;
 
     /* Create space for the INT_STREAM interfacce
      */
     stream->tstream->istream		    = ANTLR3_API_FUNC antlr3IntStreamNew();
-    stream->tstream->istream->me	    = ANTLR3_API_FUNC stream;
+    stream->tstream->istream->super	    = ANTLR3_API_FUNC (stream->tstream);
     stream->tstream->istream->type	    = ANTLR3_TOKENSTREAM;
     stream->tstream->istream->exConstruct   = ANTLR3_API_FUNC antlr3MTExceptionNew;
 
@@ -207,6 +212,7 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
     stream->tstream->istream->rewind	= ANTLR3_API_FUNC rewindStream;
     stream->tstream->istream->seek	= ANTLR3_API_FUNC seek;
     stream->tstream->istream->consume	= ANTLR3_API_FUNC consume;
+
     return  stream;
 }
 
@@ -214,14 +220,18 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
  *  first symbol of lookahead.
  */
 static pANTLR3_COMMON_TOKEN 
-tokLT  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 k)
+tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
 {
     ANTLR3_INT64    i;
     ANTLR3_INT64    n;
+    pANTLR3_COMMON_TOKEN_STREAM cts;
 
-    if	(tokenStream->p == -1)
+    cts	    = (pANTLR3_COMMON_TOKEN_STREAM)ts->super;
+    
+
+    if	(cts->p == -1)
     {
-	fillBuffer(tokenStream->me);
+	fillBuffer(cts);
     }
     if	(k == 0)
     {
@@ -229,19 +239,19 @@ tokLT  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 k)
     }
     if	(k < 0)
     {
-	return LB(tokenStream->me, -k);
+	return LB(cts, -k);
     }
-
-    if	((tokenStream->p + k - 1) >= (ANTLR3_INT64)tokenStream->tstream->istream->size(tokenStream->tstream->istream->me))
+   
+    if	((cts->p + k - 1) >= (ANTLR3_INT64)ts->istream->size(ts->istream))
     {
-	    pANTLR3_COMMON_TOKEN    teof = tokenStream->tstream->istream->eofToken;
+	    pANTLR3_COMMON_TOKEN    teof = ts->istream->eofToken;
 
-	    teof->setStartIndex (teof, tokenStream->tstream->istream->index	    (tokenStream->tstream->istream));
-	    teof->setStopIndex  (teof, tokenStream->tstream->istream->index	    (tokenStream->tstream->istream));
+	    teof->setStartIndex (teof, ts->istream->index	    (ts->istream));
+	    teof->setStopIndex  (teof, ts->istream->index	    (ts->istream));
 	    return  teof;
     }
 
-    i	= tokenStream->p;
+    i	= cts->p;
     n	= 1;
 
     /* Need to find k good tokens, skipping ones that are off channel
@@ -249,19 +259,19 @@ tokLT  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 k)
     while   ( n < k)
     {
 	/* Skip off-channel tokens */
-	i = skipOffTokenChannels(tokenStream->me, i+1); /* leave p on valid token    */
+	i = skipOffTokenChannels(cts, i+1); /* leave p on valid token    */
 	n++;
     }
-    if	( (ANTLR3_UINT64) i > tokenStream->tstream->istream->size(tokenStream->tstream->istream->me))
+    if	( (ANTLR3_UINT64) i > ts->istream->size(ts->istream))
     {
-	    pANTLR3_COMMON_TOKEN    teof = tokenStream->tstream->istream->eofToken;
+	    pANTLR3_COMMON_TOKEN    teof = ts->istream->eofToken;
 
-	    teof->setStartIndex (teof, tokenStream->tstream->istream->index	    (tokenStream->tstream->istream));
-	    teof->setStopIndex  (teof, tokenStream->tstream->istream->index	    (tokenStream->tstream->istream));
+	    teof->setStartIndex (teof, ts->istream->index(ts->istream));
+	    teof->setStopIndex  (teof, ts->istream->index(ts->istream));
 	    return  teof;
     }
 
-    return  (pANTLR3_COMMON_TOKEN)tokenStream->tokens->get(tokenStream->tokens, i);
+    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i);
 }
 
 #ifdef	WIN32
@@ -272,25 +282,25 @@ tokLT  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 k)
 #endif
 
 static	pANTLR3_COMMON_TOKEN
-LB  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 k)
+LB  (pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 k)
 {
     ANTLR3_INT64    i;
     ANTLR3_INT32    n;
 
-    if	(tokenStream->p == -1)
+    if	(cts->p == -1)
     {
-	fillBuffer(tokenStream->me);
+	fillBuffer(cts);
     }
     if	(k == 0)
     {
 	return NULL;
     }
-    if	((tokenStream->p - k) < 0)
+    if	((cts->p - k) < 0)
     {
 	return NULL;
     }
 
-    i	= tokenStream->p;
+    i	= cts->p;
     n	= 1;
 
     /* Need to find k good tokens, going backwards, skipping ones that are off channel
@@ -300,7 +310,7 @@ LB  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 k)
 	/* Skip off-channel tokens 
 	 */
 
-	i = skipOffTokenChannelsReverse(tokenStream, i-1); /* leave p on valid token    */
+	i = skipOffTokenChannelsReverse(cts, i-1); /* leave p on valid token    */
 	n++;
     }
     if	( i <0 )
@@ -308,71 +318,80 @@ LB  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 k)
 	return	NULL;
     }
 
-    return  (pANTLR3_COMMON_TOKEN)tokenStream->tokens->get(tokenStream->tokens, i);
+    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i);
 }
 
 static pANTLR3_COMMON_TOKEN 
-get (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 i)
+get (pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 i)
 {
-    return  (pANTLR3_COMMON_TOKEN)(tokenStream->tokens->get(tokenStream->tokens, i));
+    pANTLR3_COMMON_TOKEN_STREAM cts;
+
+    cts	    = (pANTLR3_COMMON_TOKEN_STREAM)ts->super;
+
+    return  (pANTLR3_COMMON_TOKEN)(cts->tokens->get(cts->tokens, i));
 }
 
 static pANTLR3_TOKEN_SOURCE 
-getTokenSource	(pANTLR3_COMMON_TOKEN_STREAM tokenStream)
+getTokenSource	(pANTLR3_TOKEN_STREAM ts)
 {
-    return  tokenStream->tstream->tokenSource;
+    return  ts->tokenSource;
 }
 
 static void
-setTokenSource	(   pANTLR3_COMMON_TOKEN_STREAM       tokenStream,
-		    pANTLR3_TOKEN_SOURCE	      tokenSource)
+setTokenSource	(   pANTLR3_TOKEN_STREAM ts,
+		    pANTLR3_TOKEN_SOURCE tokenSource)
 {
-    tokenStream->tstream->tokenSource	= tokenSource;
+    ts->tokenSource	= tokenSource;
 }
 
 static pANTLR3_STRING	    
-toString    (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
+toString    (pANTLR3_TOKEN_STREAM ts)
 {
-    if	(tokenStream->p == -1)
+    pANTLR3_COMMON_TOKEN_STREAM cts;
+
+    cts	    = (pANTLR3_COMMON_TOKEN_STREAM)ts->super;
+
+    if	(cts->p == -1)
     {
-	fillBuffer(tokenStream->me);
+	fillBuffer(cts);
     }
 
-    return  tokenStream->tstream->toStringSS
-		    (	tokenStream->tstream->me, 0, 
-			tokenStream->tstream->istream->size(tokenStream->tstream->istream->me));
+    return  ts->toStringSS(ts, 0, ts->istream->size(ts->istream));
 }
 
 static pANTLR3_STRING	    
-toStringSS   (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop)
+toStringSS   (pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop)
 {
-    pANTLR3_STRING	    string;
-    pANTLR3_TOKEN_SOURCE    ts;
-    pANTLR3_COMMON_TOKEN    tok;
-    ANTLR3_UINT64	    i;
+    pANTLR3_STRING		string;
+    pANTLR3_TOKEN_SOURCE	tsource;
+    pANTLR3_COMMON_TOKEN	tok;
+    ANTLR3_UINT64		i;
+    pANTLR3_COMMON_TOKEN_STREAM cts;
 
-    if	(tokenStream->p == -1)
+    cts	    = (pANTLR3_COMMON_TOKEN_STREAM)ts->super;
+
+    if	(cts->p == -1)
     {
-	fillBuffer(tokenStream->me);
+	fillBuffer(cts);
     }
-    if	(stop >= tokenStream->tstream->istream->size(tokenStream->tstream->istream->me))
+    if	(stop >= ts->istream->size(ts->istream))
     {
-	stop = tokenStream->tstream->istream->size(tokenStream->tstream->istream->me) -1;
+	stop = ts->istream->size(ts->istream)-1;
     }
     
     /* Who is giving us these tokens?
      */
-    ts  = tokenStream->tstream->getTokenSource(tokenStream->tstream->me);
+    tsource  = ts->getTokenSource(ts);
 
-    if	(ts != NULL && tokenStream->tokens != NULL)
+    if	(tsource != NULL && cts->tokens != NULL)
     {
 	/* Finally, let's get a string
 	 */
-	string	= ts->strFactory->newRaw(ts->strFactory);
+	string	= tsource->strFactory->newRaw(tsource->strFactory);
 
 	for (i = start; i <= stop; i++)
 	{
-	    tok	= tokenStream->tstream->get(tokenStream->tstream->me, i);
+	    tok	= ts->get(ts, i);
 
 	    if	(tok != NULL)
 	    {
@@ -387,14 +406,11 @@ toStringSS   (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTL
 }
 
 static pANTLR3_STRING	    
-toStringTT  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON_TOKEN stop)
+toStringTT  (pANTLR3_TOKEN_STREAM ts, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON_TOKEN stop)
 {
     if	(start != NULL && stop != NULL)
     {
-	return	tokenStream->tstream->toStringSS(   tokenStream->tstream->me,
-						    start-> getTokenIndex(start), 
-						    stop->  getTokenIndex(stop)
-						);
+	return	ts->toStringSS(ts, start->getTokenIndex(start), stop->getTokenIndex(stop));
     }
     else
     {
@@ -410,12 +426,18 @@ toStringTT  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, pANTLR3_COMMON_TOKEN start
  *  Walk past any token not on the channel the parser is listening to.
  */
 static void		    
-consume	(pANTLR3_COMMON_TOKEN_STREAM tokenStream)
+consume	(pANTLR3_INT_STREAM is)
 {
-    if	((ANTLR3_UINT64)tokenStream->p < tokenStream->tokens->size(tokenStream->tokens))
+    pANTLR3_COMMON_TOKEN_STREAM cts;
+    pANTLR3_TOKEN_STREAM	ts;
+
+    ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+    cts	    = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
+
+    if	((ANTLR3_UINT64)cts->p < cts->tokens->size(cts->tokens))
     {
-	tokenStream->p++;
-	tokenStream->p	= skipOffTokenChannels(tokenStream->me, tokenStream->p);
+	cts->p++;
+	cts->p	= skipOffTokenChannels(cts, cts->p);
     }
 }
 /** A simple filter mechanism whereby you can tell this token stream
@@ -463,7 +485,7 @@ getTokens   (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 {
     if	(tokenStream->p == -1)
     {
-	fillBuffer(tokenStream->me);
+	fillBuffer(tokenStream);
     }
 
     return  tokenStream->tokens;
@@ -472,7 +494,7 @@ getTokens   (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 static pANTLR3_LIST	    
 getTokenRange	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop)
 {
-    return tokenStream->getTokensSet(tokenStream->me, start, stop, NULL);
+    return tokenStream->getTokensSet(tokenStream, start, stop, NULL);
 }                                                   
 /** Given a start and stop index, return a List of all tokens in
  *  the token type BitSet.  Return null if no tokens were found.  This
@@ -488,11 +510,11 @@ getTokensSet	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTL
 
     if	(tokenStream->p == -1)
     {
-	fillBuffer(tokenStream->me);
+	fillBuffer(tokenStream);
     }
-    if	(stop > tokenStream->tstream->istream->size(tokenStream->tstream->istream->me))
+    if	(stop > tokenStream->tstream->istream->size(tokenStream->tstream->istream))
     {
-	stop = tokenStream->tstream->istream->size(tokenStream->tstream->istream->me);
+	stop = tokenStream->tstream->istream->size(tokenStream->tstream->istream);
     }
     if	(start > stop)
     {
@@ -503,11 +525,11 @@ getTokensSet	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTL
      * installed tokens and create a new list with just the ones we want
      * in it. We are just moving pointers about really.
      */
-    filteredList    = antlr3ListNew((ANTLR3_UINT32)tokenStream->tstream->istream->size(tokenStream->tstream->istream->me));
+    filteredList    = antlr3ListNew((ANTLR3_UINT32)tokenStream->tstream->istream->size(tokenStream->tstream->istream));
 
     for	(i = start, n = 0; i<= stop; i++)
     {
-	tok = tokenStream->tstream->get(tokenStream->tokens, i);
+	tok = tokenStream->tstream->get(tokenStream->tstream, i);
 
 	if  (	   types == NULL
 		|| types->isMember(types, tok->getType(tok))
@@ -536,7 +558,7 @@ getTokensList	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANT
 
     bitSet  = antlr3BitsetList(list->table);
 
-    newlist    = tokenStream->getTokensSet(tokenStream->me, start, stop, bitSet);
+    newlist    = tokenStream->getTokensSet(tokenStream, start, stop, bitSet);
 
     bitSet->free(bitSet);
 
@@ -551,7 +573,7 @@ getTokensType	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANT
     pANTLR3_LIST    newlist;
 
     bitSet  = antlr3BitsetOf(type, -1);
-    newlist = tokenStream->getTokensSet(tokenStream->me, start, stop, bitSet);
+    newlist = tokenStream->getTokensSet(tokenStream, start, stop, bitSet);
 
     bitSet->free(bitSet);
 
@@ -559,11 +581,14 @@ getTokensType	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANT
 }
 
 static ANTLR3_UINT32	    
-LA  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i)
+LA  (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 {
+    pANTLR3_TOKEN_STREAM    ts;
     pANTLR3_COMMON_TOKEN    tok;
 
-    tok	= tokenStream->tstream->LT(tokenStream->tstream->me, i);
+    ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+
+    tok	    = ts->LT(ts, i);
 
     if	(tok != NULL)
     {
@@ -576,41 +601,57 @@ LA  (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i)
 }
 
 static ANTLR3_UINT64
-mark	(pANTLR3_COMMON_TOKEN_STREAM tokenStream)
+mark	(pANTLR3_INT_STREAM is)
 {
-    return  tokenStream->tstream->istream->index(tokenStream->tstream->istream->me);
+    return  is->index(is);
 }
 
 static void		    
-release	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 mark)
+release	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
 {
-    mark++; /* Fool compilers to say we did something with it - easier than all the pragmas for all the compilers*/
-    tokenStream++;
     return;
 }
 
 static ANTLR3_UINT64	    
-size	(pANTLR3_COMMON_TOKEN_STREAM tokenStream)
+size	(pANTLR3_INT_STREAM is)
 {
-    return  tokenStream->tokens->size(tokenStream->tokens);
+    pANTLR3_COMMON_TOKEN_STREAM cts;
+    pANTLR3_TOKEN_STREAM	ts;
+
+    ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+    cts	    = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
+
+    return  cts->tokens->size(cts->tokens);
 }
 
 static ANTLR3_INT64    
-index	(pANTLR3_COMMON_TOKEN_STREAM tokenStream)
+index	(pANTLR3_INT_STREAM is)
 {
-    return  tokenStream->p;
+    pANTLR3_COMMON_TOKEN_STREAM cts;
+    pANTLR3_TOKEN_STREAM	ts;
+
+    ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+    cts	    = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
+
+    return  cts->p;
 }
 
 static void		    
-rewindStream	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 marker)
+rewindStream	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 {
-    tokenStream->tstream->istream->seek(tokenStream->tstream->istream->me, marker);
+    is->seek(is, marker);
 }
 
 static void		    
-seek	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 index)
+seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index)
 {
-    tokenStream->p  = index;
+    pANTLR3_COMMON_TOKEN_STREAM cts;
+    pANTLR3_TOKEN_STREAM	ts;
+
+    ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+    cts	    = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
+
+    cts->p  = index;
 }
 
 static void
@@ -625,11 +666,11 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
      */
     index   = 0;
 
-    /* Pick out the next token from teh token source
+    /* Pick out the next token from the token source
      * Remember we just get a pointer (reference if you like) here
      * and so if we store it anywhere, we don't set any pointers to auto free it.
      */
-    tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource->me);
+    tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource);
 
     while   (tok != NULL && tok->type != ANTLR3_TOKEN_EOF)
     {
@@ -673,17 +714,17 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 	    /* Add it, indicating tthat we will delete it and the table should not
 	     */
 	    tokenStream->p++;
-	    tokenStream->tokens->put(tokenStream->tokens, tokenStream->tstream->istream->index(tokenStream->tstream->istream->me), (void *)tok, NULL);
+	    tokenStream->tokens->put(tokenStream->tokens, tokenStream->tstream->istream->index(tokenStream->tstream->istream), (void *)tok, NULL);
 	    
 	}
 	
-	tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource->me);
+	tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource);
     }
 
     /* Set the consume pointer to the first token that is on our channel
      */
     tokenStream->p  = 0;
-    tokenStream->p  = skipOffTokenChannels(tokenStream->me, tokenStream->p);
+    tokenStream->p  = skipOffTokenChannels(tokenStream, tokenStream->p);
 
 }
 /** Given a starting index, return the index of the first on-channel
@@ -695,11 +736,11 @@ skipOffTokenChannels(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 i)
     ANTLR3_UINT64	    n;
     pANTLR3_COMMON_TOKEN    tok;
 
-    n	= tokenStream->tstream->istream->size(tokenStream->tstream->istream->me);
+    n	= tokenStream->tstream->istream->size(tokenStream->tstream->istream);
 
     while   (	   i < n )
     {
-	tok =	tokenStream->tstream->get(tokenStream->tstream->me, i);
+	tok =	tokenStream->tstream->get(tokenStream->tstream, i);
 
 	if  (tok == NULL || tok->getChannel(tok) != tokenStream->channel)
 	{
@@ -720,7 +761,7 @@ skipOffTokenChannelsReverse(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT
 
     while   ( x >= 0 )
     {
-	tok =	tokenStream->tstream->get(tokenStream->tstream->me, x);
+	tok =	tokenStream->tstream->get(tokenStream->tstream, x);
 
 	if  (tok == NULL || (tok->getChannel(tok) != tokenStream->channel))
 	{

@@ -27,10 +27,10 @@ static ANTLR3_UINT64	    getCharIndex    (pANTLR3_LEXER lexer);
 static ANTLR3_UINT32	    getCharPositionInLine
 					    (pANTLR3_LEXER lexer);
 static pANTLR3_STRING	    getText	    (pANTLR3_LEXER lexer);
-static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_LEXER lexer);
+static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource);
 
-static void		    displayRecognitionError	    (pANTLR3_LEXER lexer, pANTLR3_UINT8 tokenNames);
-static void		    reportError			    (pANTLR3_LEXER lexer);
+static void		    displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 tokenNames);
+static void		    reportError			    (pANTLR3_BASE_RECOGNIZER rec);
 
 static void		    freeLexer	    (pANTLR3_LEXER lexer);
 
@@ -49,10 +49,6 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 	return	(pANTLR3_LEXER) ANTLR3_ERR_NOMEM;
     }
 
-    /* Install our this pointer (can be overridden by caller of course)
-     */
-    lexer->me	= ANTLR3_API_FUNC lexer;
-
     /* Now we need to create the base recognizer
      */
     lexer->rec	    = ANTLR3_API_FUNC antlr3BaseRecognizerNew(ANTLR3_TYPE_LEXER, sizeHint);
@@ -62,7 +58,7 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 	lexer->free(lexer);
 	return	(pANTLR3_LEXER) ANTLR3_ERR_NOMEM;
     }
-    lexer->rec->me  = ANTLR3_API_FUNC lexer;
+    lexer->rec->super  = ANTLR3_API_FUNC lexer;
 
     lexer->rec->displayRecognitionError	    = ANTLR3_API_FUNC displayRecognitionError;
     lexer->rec->reportError		    = ANTLR3_API_FUNC reportError;
@@ -78,9 +74,9 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 
 	return	(pANTLR3_LEXER) ANTLR3_ERR_NOMEM;
     }
-    lexer->tokSource->me    = ANTLR3_API_FUNC lexer;
+    lexer->tokSource->super    = ANTLR3_API_FUNC lexer;
 
-    /* Install the default enxtToken() method, which may be overridden
+    /* Install the default nextToken() method, which may be overridden
      * by generated code, or by anything else in fact.
      */
     lexer->tokSource->nextToken	    = ANTLR3_API_FUNC nextToken;
@@ -114,8 +110,9 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
  * \brief
  * Default implementation of the nextToken() call for a lexer.
  * 
- * \param lexer
- * Points to the implementation of a lexer.
+ * \param toksouirce
+ * Points to the implementation of a token source. The lexer is 
+ * addressed by the super structure pointer.
  * 
  * \returns
  * Write description of return value here.
@@ -129,10 +126,13 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
  * Write remarks for nextToken here.
  * 
  * \see
- * Separate items with the '|' character.
  */
-static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_LEXER lexer)
+static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
 {
+    pANTLR3_LEXER   lexer;
+
+    lexer   = (pANTLR3_LEXER)(toksource->super);
+
     /* Get rid of any previous token (token factory takes care of
      * any deallocation when this token is finally used up.
      */
@@ -148,15 +148,15 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_LEXER lexer)
      */
     for	(;;)
     {
-	if  (lexer->input->istream->LA(lexer->input->istream->me, 1) == ANTLR3_CHARSTREAM_EOF)
+	if  (lexer->input->istream->LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
 	{
-	    /* Reached the end of the stream, nothign more to do.
+	    /* Reached the end of the stream, nothing more to do.
 	     */
 	    pANTLR3_COMMON_TOKEN    teof = lexer->input->istream->eofToken;
 
-	    teof->setStartIndex (teof, lexer->getCharIndex(lexer->me));
-	    teof->setStopIndex  (teof, lexer->getCharIndex(lexer->me));
-	    teof->setLine	(teof, lexer->getLine(lexer->me));
+	    teof->setStartIndex (teof, lexer->getCharIndex(lexer));
+	    teof->setStopIndex  (teof, lexer->getCharIndex(lexer));
+	    teof->setLine	(teof, lexer->getLine(lexer));
 	    return  teof;
 	}
 	
@@ -173,8 +173,8 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_LEXER lexer)
 	    /* Recongition exception, report it and try to recover.
 	     */
 	    lexer->rec->failed	    = ANTLR3_TRUE;
-	    lexer->rec->reportError(lexer->rec->me);
-	    lexer->recover(lexer->me);
+	    lexer->rec->reportError(lexer->rec);
+	    lexer->recover(lexer);
 	}
 	else
 	{
@@ -210,11 +210,10 @@ static void mTokens	    (pANTLR3_LEXER lexer)
     }
 }
 
-
 static void			
-reportError		    (pANTLR3_LEXER lexer)
+reportError		    (pANTLR3_BASE_RECOGNIZER rec)
 {
-    lexer->rec->displayRecognitionError(lexer->rec->me, lexer->rec->tokenNames);
+    rec->displayRecognitionError(rec, rec->tokenNames);
 }
 
 #ifdef	WIN32
@@ -222,9 +221,12 @@ reportError		    (pANTLR3_LEXER lexer)
 #endif
 
 static void			
-displayRecognitionError	    (pANTLR3_LEXER lexer, pANTLR3_UINT8 tokenNames)
+displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 tokenNames)
 {
     char    buf[64];
+    pANTLR3_LEXER   lexer;
+
+    lexer   = (pANTLR3_LEXER)(rec->super);
 
     fprintf(stderr, "%s(", lexer->input->istream->exception->streamName);
 
@@ -323,7 +325,7 @@ static void emitNew	    (pANTLR3_LEXER lexer,
     token->setLine		(token, line);
     token->setCharPositionInLine(token, charPosition);
 
-    lexer->emit(lexer->me, token);
+    lexer->emit(lexer, token);
 
 }
 
@@ -363,7 +365,7 @@ matchs(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string)
 {
     while   (*string != ANTLR3_STRING_TERMINATOR)
     {
-	if  (lexer->input->istream->LA(lexer->input->istream->me, 1) != (*string))
+	if  (lexer->input->istream->LA(lexer->input->istream, 1) != (*string))
 	{
 	    if	(lexer->rec->backtracking > 0)
 	    {
@@ -374,15 +376,15 @@ matchs(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string)
 	    lexer->input->istream->exConstruct(lexer->input->istream);
 	    lexer->rec->failed	 = ANTLR3_TRUE;
 
-	    /* TODO: IMplement exception creation more fully
+	    /* TODO: Implement exception creation more fully
 	     */
-	    lexer->recover(lexer->rec->me);
+	    lexer->recover(lexer);
 	    return  ANTLR3_FALSE;
 	}
 
 	/* Matched correctly, do consume it
 	 */
-	lexer->input->istream->consume(lexer->input->istream->me);
+	lexer->input->istream->consume(lexer->input->istream);
 	string++;
 
 	/* Reset any failed indicator
@@ -404,11 +406,11 @@ matchs(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string)
 static ANTLR3_BOOLEAN
 matchc(pANTLR3_LEXER lexer, ANTLR3_UCHAR c)
 {
-    if	(lexer->input->istream->LA(lexer->input->istream->me, 1) == c)
+    if	(lexer->input->istream->LA(lexer->input->istream, 1) == c)
     {
 	/* Matched correctly, do consume it
 	 */
-	lexer->input->istream->consume(lexer->input->istream->me);
+	lexer->input->istream->consume(lexer->input->istream);
 
 	/* Reset any failed indicator
 	 */
@@ -426,11 +428,11 @@ matchc(pANTLR3_LEXER lexer, ANTLR3_UCHAR c)
 	return	ANTLR3_FALSE;
     }
 
-    lexer->input->istream->exConstruct(lexer->input->istream->me);
+    lexer->input->istream->exConstruct(lexer->input->istream);
 
     /* TODO: Implement exception creation more fully
      */
-    lexer->recover(lexer->me);
+    lexer->recover(lexer);
 
     return  ANTLR3_FALSE;
 }
@@ -449,12 +451,12 @@ matchRange(pANTLR3_LEXER lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high)
 
     /* What is in the stream at the moment?
      */
-    c	= lexer->input->istream->LA(lexer->input->istream->me, 1);
+    c	= lexer->input->istream->LA(lexer->input->istream, 1);
     if	( c >= low && c <= high)
     {
 	/* Matched correctly, consume it
 	 */
-	lexer->input->istream->consume(lexer->input->istream->me);
+	lexer->input->istream->consume(lexer->input->istream);
 
 	/* Reset any failed indicator
 	 */
@@ -472,11 +474,11 @@ matchRange(pANTLR3_LEXER lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high)
 	return	ANTLR3_FALSE;
     }
 
-    lexer->input->istream->exConstruct(lexer->input->istream->me);
+    lexer->input->istream->exConstruct(lexer->input->istream);
 
     /* TODO: Implement exception creation more fully
      */
-    lexer->recover(lexer->me);
+    lexer->recover(lexer);
 
     return  ANTLR3_FALSE;
 }
@@ -484,39 +486,39 @@ matchRange(pANTLR3_LEXER lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high)
 static void
 matchAny	    (pANTLR3_LEXER lexer)
 {
-    lexer->input->istream->consume(lexer->input->istream->me);
+    lexer->input->istream->consume(lexer->input->istream);
 }
 
 static void
 recover	    (pANTLR3_LEXER lexer)
 {
-    lexer->input->istream->consume(lexer->input->istream->me);
+    lexer->input->istream->consume(lexer->input->istream);
 }
 
 static ANTLR3_UINT64
 getLine	    (pANTLR3_LEXER lexer)
 {
-    return  lexer->input->getLine(lexer->input->me);
+    return  lexer->input->getLine(lexer->input);
 }
 
 static ANTLR3_UINT32
 getCharPositionInLine	(pANTLR3_LEXER lexer)
 {
-    return  lexer->input->getCharPositionInLine(lexer->input->me);
+    return  lexer->input->getCharPositionInLine(lexer->input);
 }
 
 static ANTLR3_UINT64	getCharIndex	    (pANTLR3_LEXER lexer)
 {
-    return lexer->input->istream->index(lexer->input->istream->me);
+    return lexer->input->istream->index(lexer->input->istream);
 }
 
 static pANTLR3_STRING
 getText	    (pANTLR3_LEXER lexer)
 {
     return  lexer->input->substr(
-			    lexer->input->me, 
+			    lexer->input, 
 			    lexer->tokenStartCharIndex,
-			    lexer->getCharIndex(lexer->me)-1);
+			    lexer->getCharIndex(lexer)-1);
 
 }
 

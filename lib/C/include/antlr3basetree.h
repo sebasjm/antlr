@@ -42,40 +42,40 @@ typedef	struct ANTLR3_BASE_TREE_struct
      */
     pANTLR3_STRING_FACTORY strFactory;
 
-    void	    (*addChild)		(void * tree, void * child);
+    void	    (*addChild)		(struct ANTLR3_BASE_TREE_struct * tree, void * child);
 
-    void	    (*addChildren)	(void * tree, pANTLR3_LIST kids);
+    void	    (*addChildren)	(struct ANTLR3_BASE_TREE_struct * tree, pANTLR3_LIST kids);
 
     void    	    (*createChildrenList)
-					(void * tree);
+					(struct ANTLR3_BASE_TREE_struct * tree);
 
-    void    *	    (*deleteChild)	(void * tree, ANTLR3_UINT64 i);
+    void    *	    (*deleteChild)	(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT64 i);
 
-    void    *	    (*dupNode)		(void * dupNode);
+    void    *	    (*dupNode)		(struct ANTLR3_BASE_TREE_struct * dupNode);
 
-    void    *	    (*dupTree)		(void * tree);
+    void    *	    (*dupTree)		(struct ANTLR3_BASE_TREE_struct * tree);
 
     ANTLR3_UINT32   (*getCharPositionInLine)
-					(void * tree);
+					(struct ANTLR3_BASE_TREE_struct * tree);
 
-    void    *	    (*getChild)		(void * tree, ANTLR3_UINT64 i);
+    void    *	    (*getChild)		(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT64 i);
 
-    ANTLR3_UINT64   (*getChildCount)	(void * tree);
+    ANTLR3_UINT64   (*getChildCount)	(struct ANTLR3_BASE_TREE_struct * tree);
 
-    ANTLR3_UINT32   (*getType)		(void * tree);
+    ANTLR3_UINT32   (*getType)		(struct ANTLR3_BASE_TREE_struct * tree);
 
     void    *	    (*getFirstChildWithType)
-					(void * tree, ANTLR3_UINT32 type);
+					(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT32 type);
 
-    ANTLR3_UINT64   (*getLine)		(void * tree);
+    ANTLR3_UINT64   (*getLine)		(struct ANTLR3_BASE_TREE_struct * tree);
 
-    ANTLR3_BOOLEAN  (*isNil)		(void * tree);
+    ANTLR3_BOOLEAN  (*isNil)		(struct ANTLR3_BASE_TREE_struct * tree);
 
-    void	    (*setChild)		(void * tree, ANTLR3_UINT64 i, void * child);
+    void	    (*setChild)		(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT64 i, void * child);
 
-    pANTLR3_STRING  (*toStringTree)	(void * tree);
+    pANTLR3_STRING  (*toStringTree)	(struct ANTLR3_BASE_TREE_struct * tree);
 
-    pANTLR3_STRING  (*toString)		(void * tree);
+    pANTLR3_STRING  (*toString)		(struct ANTLR3_BASE_TREE_struct * tree);
 
     void    	    (*free)		(struct ANTLR3_BASE_TREE_struct * tree);
 

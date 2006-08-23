@@ -27,7 +27,7 @@ static	ANTLR3_UINT64   getTokenStartIndex	(pANTLR3_COMMON_TREE_ADAPTOR adaptor, 
 static  ANTLR3_UINT64   getTokenStopIndex	(pANTLR3_COMMON_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
 /** Create a new tree adaptor. Note that despite the fact that this is
- *  createing a new COMMON_TREE adaptor, we return the address of the
+ *  creating a new COMMON_TREE adaptor, we return the address of the
  * BASE_TREE interface, as should any other adaptor that wishes to be 
  * used as the tree element of a tree parse/build.
  *

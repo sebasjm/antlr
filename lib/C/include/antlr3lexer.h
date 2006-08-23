@@ -42,20 +42,22 @@
 
 typedef	struct ANTLR3_LEXER_struct
 {
-    /** An implementor of a lexer receives a pointer to itself
-     *  when its API functions are called.
+    /** If there is a super structure that is implementing the
+     *  lexer, then a pointer to it can be stored here in case
+     *  implementing functions are overridden by this super structure.
      */
-    void	* me;
+    void	* super;
 
     /** A generated lexer has an mTokens() function, which needs
      *  the context pointer of the generated lexr, not the base lexer interface
      *  this is stored here and initialized by the generated code (or manually
-     *  if this is a maunlly built lexer.
+     *  if this is a manually built lexer.
      */
     void	* ctx;
 
     /** A pointer to the character stream whence this lexer is receiving
-     *  characters. I may come back to this and implement charstream outside
+     *  characters. 
+     *  TODO: I may come back to this and implement charstream outside
      *  the input stream as per the java implementatio.
      */
     pANTLR3_INPUT_STREAM	input;
@@ -97,16 +99,16 @@ typedef	struct ANTLR3_LEXER_struct
     /** Pointer to a function that sets the charstream source for the lexer and
      *  causes it to  be reset.
      */
-    void			(*setCharStream)    (void * lexer, pANTLR3_INPUT_STREAM input);
+    void			(*setCharStream)    (struct ANTLR3_LEXER_struct * lexer, pANTLR3_INPUT_STREAM input);
     
     /** Pointer to a function that emits the supplied token as the next token in
      *  the stream.
      */
-    void			(*emit)		    (void * lexer, pANTLR3_COMMON_TOKEN token);
+    void			(*emit)		    (struct ANTLR3_LEXER_struct * lexer, pANTLR3_COMMON_TOKEN token);
 
     /** Pointer to a function that constructs a new token from the supplied information 
      */
-    void			(*emitNew)	    (void * lexer, 
+    void			(*emitNew)	    (struct ANTLR3_LEXER_struct * lexer, 
 							ANTLR3_UINT32 ttype,
 							ANTLR3_UINT64 line,	ANTLR3_UINT32 charPosition,
 							ANTLR3_UINT32 channel,
@@ -126,7 +128,7 @@ typedef	struct ANTLR3_LEXER_struct
      *  stream. Note that strings muse be passed as terminated arrays of ANTLR3_UCHAR. Strings are terminated
      *  with 0xFFFFFFFF, which is an invalid UTF32 character
      */
-    ANTLR3_BOOLEAN	(*matchs)	    (void * lexer, ANTLR3_UCHAR * string);
+    ANTLR3_BOOLEAN	(*matchs)	    (struct ANTLR3_LEXER_struct * lexer, ANTLR3_UCHAR * string);
 
     /** Pointer to a function that matches and consumes the specified character from the input stream.
      *  As the input stream is required to provide characters via LA() as UTF32 characters it does not 
@@ -135,38 +137,38 @@ typedef	struct ANTLR3_LEXER_struct
      *  to specify a single character, in which case the input stream and the lexer rules would have to match
      *  in encoding and then it would work 'by accident' anyway.
      */
-    ANTLR3_BOOLEAN	(*matchc)	    (void * lexer, ANTLR3_UCHAR c);
+    ANTLR3_BOOLEAN	(*matchc)	    (struct ANTLR3_LEXER_struct * lexer, ANTLR3_UCHAR c);
 
     /** Pointer to a function that matches any character in the supplied range (I suppose it could be a token range too
      *  but this would only be useful if the tokens were in tsome guaranteed order which is
      *  only going to happen with a hand crafted token set).
      */
-    ANTLR3_BOOLEAN	(*matchRange)	    (void * lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high);
+    ANTLR3_BOOLEAN	(*matchRange)	    (struct ANTLR3_LEXER_struct * lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high);
 
     /** Pointer to a function that matches the next token/char in the input stream
      *  regardless of what it actaully is.
      */
-    void		(*matchAny)	    (void * lexer);
+    void		(*matchAny)	    (struct ANTLR3_LEXER_struct * lexer);
 
     /** Pointer to a function that recovers from an error found in the input stream.
      *  Generally, this will be a #ANTLR3_EXCEPTION_NOVIABLE_ALT but it could also
      *  be from a mismatched token that the (*match)() could not recover from.
      */
-    void		(*recover)	    (void * lexer);
+    void		(*recover)	    (struct ANTLR3_LEXER_struct * lexer);
 
     /** Pointer to function to return the current line number in the input stream
      */
-    ANTLR3_UINT64	(*getLine)		(void * lexer);
-    ANTLR3_UINT64	(*getCharIndex)		(void * lexer);
-    ANTLR3_UINT32	(*getCharPositionInLine)(void * lexer);
+    ANTLR3_UINT64	(*getLine)		(struct ANTLR3_LEXER_struct * lexer);
+    ANTLR3_UINT64	(*getCharIndex)		(struct ANTLR3_LEXER_struct * lexer);
+    ANTLR3_UINT32	(*getCharPositionInLine)(struct ANTLR3_LEXER_struct * lexer);
 
     /** Pointer to function to return the text so far for the current token being generated
      */
-    pANTLR3_STRING	(*getText)	    (void * lexer);
+    pANTLR3_STRING	(*getText)	    (struct ANTLR3_LEXER_struct * lexer);
 
     /** Pointer to a function that knows how to free the resources of a lexer
      */
-    void		(*free)		    (void * lexer);
+    void		(*free)		    (struct ANTLR3_LEXER_struct * lexer);
 
     /** We must track the token rule nesting level as we only want to
      *  emit a token automatically at the outermost level so we don't get

@@ -59,15 +59,14 @@
 
 typedef	struct ANTLR3_INT_STREAM_struct
 {
-    /** Input stream type inidicator. Sometimes useful for error reporting etc.
+    /** Input stream type indicator. Sometimes useful for error reporting etc.
      */
     ANTLR3_UINT32	    type;
 
-    /** Whatever is providing this interface needs a pointer to itself
-     *  so that this can be passed back to it whenever the api functions
-     *  are called.
+    /** Pointer to the super structure that contains this interface. This
+     *  will usually be a token stream or a tree stream.
      */
-    void		    * me;
+    void		    * super;
 
     /** Special token for a token stream to restun EOF by
      */
@@ -87,27 +86,27 @@ typedef	struct ANTLR3_INT_STREAM_struct
     /** Pointer to a funtion that can construct a generic exception structure
      * with such information as the input stream can privide.
      */
-    void		    (*exConstruct)  (pANTLR3_INT_STREAM intStream);
+    void		    (*exConstruct)  (struct ANTLR3_INT_STREAM_struct * intStream);
 
     /** Consume the next 'ANTR3_UINT32' in the stream
      */
-    void		    (*consume)	    (void * intStream);
+    void		    (*consume)	    (struct ANTLR3_INT_STREAM_struct * intStream);
 
     /** Get ANTLR3_UINT32 at current input pointer + i ahead where i=1 is next ANTLR3_UINT32 
      */
-    ANTLR3_UINT32	    (*LA)	    (void * intStream, ANTLR3_INT64 i);
+    ANTLR3_UINT32	    (*LA)	    (struct ANTLR3_INT_STREAM_struct * intStream, ANTLR3_INT64 i);
 
     /** Tell the stream to start buffering if it hasn't already.  Return
      *  current input position, index(), or some other marker so that
      *  when passed to rewind() you get back to the same spot.
      *  rewind(mark()) should not affect the input cursor.
      */
-    ANTLR3_UINT64	    (*mark)	    (void * intStream);
+    ANTLR3_UINT64	    (*mark)	    (struct ANTLR3_INT_STREAM_struct * intStream);
     
     /** Return the current input symbol index 0..n where n indicates the
      *  last symbol has been read.
      */
-    ANTLR3_INT64	    (*index)	    (void * intStream);
+    ANTLR3_INT64	    (*index)	    (struct ANTLR3_INT_STREAM_struct * intStream);
 
     /** Reset the stream so that next call to index would return marker.
      *  The marker will usually be index() but it doesn't have to be.  It's
@@ -117,14 +116,14 @@ typedef	struct ANTLR3_INT_STREAM_struct
      *  like a stack.  Assume the state the stream was in when this marker
      *  was created.
      */
-    void		    (*rewind)	    (void * intStream, ANTLR3_UINT64 marker);
+    void		    (*rewind)	    (struct ANTLR3_INT_STREAM_struct * intStream, ANTLR3_UINT64 marker);
 
     /** You may want to commit to a backtrack but don't want to force the
      *  stream to keep bookkeeping objects around for a marker that is
      *  no longer necessary.  This will have the same behavior as
      *  rewind() except it releases resources without the backward seek.
      */
-    void		    (*release)	    (void * intStream, ANTLR3_UINT64 mark);
+    void		    (*release)	    (struct ANTLR3_INT_STREAM_struct * intStream, ANTLR3_UINT64 mark);
 
     /** Set the input cursor to the position indicated by index.  This is
      *  normally used to seek ahead in the input stream.  No buffering is
@@ -142,12 +141,12 @@ typedef	struct ANTLR3_INT_STREAM_struct
      *  Currently, this method is only used for efficient backtracking, but
      *  in the future it may be used for incremental parsing.
      */
-    void		    (*seek)	    (void * intStream, ANTLR3_UINT64 index);
+    void		    (*seek)	    (struct ANTLR3_INT_STREAM_struct * intStream, ANTLR3_UINT64 index);
 
     /** Only makes sense for streams that buffer everything up probably, but
      *  might be useful to display the entire stream or for testing.
      */
-    ANTLR3_UINT64	    (*size)	    (void * intStream);
+    ANTLR3_UINT64	    (*size)	    (struct ANTLR3_INT_STREAM_struct * intStream);
 
     /** Frees any resources that were allocated for the implementation of this
      *  interface. Usually this is just releasing the memory allocated

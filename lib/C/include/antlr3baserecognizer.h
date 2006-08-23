@@ -10,6 +10,7 @@
 #include    <antlr3input.h>
 #include    <antlr3tokenstream.h>
 #include    <antlr3commontoken.h>
+#include    <antlr3commontreenodestream.h>
 
 /** Type indicator for a lexer recognizer
  */
@@ -28,11 +29,11 @@
  */
 typedef	struct ANTLR3_BASE_RECOGNIZER_struct
 {
-    /** Whatever is providing this interface needs a pointer to itself
+    /** Whiever super structure is providing this interface needs a pointer to itself
      *  so that this can be passed back to it whenever the api functions
-     *  are called.
+     *  are called back from here.
      */
-    void	      * me;
+    void	      * super;
 
     /** Indicates the type of recognizer that we are an instance of.
      *  The programmer may set this to anything of course, but the default 
@@ -123,18 +124,18 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  in some customized way).
      *  TODO: See if we end up using error or just used failed...
      */
-    ANTLR3_BOOLEAN	(*match)	(void * recognizer, pANTLR3_INT_STREAM	input,
+    ANTLR3_BOOLEAN	(*match)	(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer, pANTLR3_INT_STREAM	input,
 					    ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
 
     /** Pointer to a function that matches the next token/char in the input stream
      *  regardless of what it actaully is.
      */
-    void		(*matchAny)	(void * recognizer, pANTLR3_INT_STREAM	input);
+    void		(*matchAny)	(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer, pANTLR3_INT_STREAM	input);
     
     /** Pointer to a function that works out what to do when a token mismatch
      *  occurs, so that Tree parsers can behave differently to other recognizers.
      */
-    void		(*mismatch)	(void * recognizer,  pANTLR3_INT_STREAM	input,
+    void		(*mismatch)	(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  pANTLR3_INT_STREAM	input,
 					    ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
 
     /** Pointer to a function to call to report a recognition problem. You may override
@@ -154,77 +155,77 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      * 		4. try to resume parsing
      * 		5. next match() will reset errorRecovery mode
      */
-    void		(*reportError)		    (void * recognizer);
+    void		(*reportError)		    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
 
     /** Pointer to a function that is called to display a recognition error message. You may
      *  overrdide this function independently of (*reportError)() above as that function calls
      *  this one to do the actual exception printing.
      */
-    void		(*displayRecognitionError)  (void * recognizer, pANTLR3_UINT8 tokenNames);
+    void		(*displayRecognitionError)  (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer, pANTLR3_UINT8 tokenNames);
 
     /** Pointer to a function that recovers from an error found in the input stream.
      *  Generally, this will be a #ANTLR3_EXCEPTION_NOVIABLE_ALT but it could also
      *  be from a mismatched token that the (*match)() could not recover from.
      */
-    void		(*recover)		    (void * recognizer,  pANTLR3_INT_STREAM	input);
+    void		(*recover)		    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  pANTLR3_INT_STREAM	input);
 
     /** Pointer to a function that is a hook to listen to token consumption during error recovery.
      *  This is mainly used by the debug parser to send events to the listener.
      */
-    void		(*beginResync)		    (void * recognizer);
+    void		(*beginResync)		    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
 
     /** Pointer to a function that is a hook to listen to token consumption during error recovery.
      *  This is mainly used by the debug parser to send events to the listener.
      */
-    void		(*endResync)		    (void * recognizer);
+    void		(*endResync)		    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
 
     /** Pointer to a function to computer the error recovery set for the current rule.
      *  \see antlr3ComputeErrorRecoverySet() for details.
      */
-    pANTLR3_BITSET	(*computeErrorRecoverySet)  (void * recognizer);
+    pANTLR3_BITSET	(*computeErrorRecoverySet)  (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
 
     /** Pointer to a function that computes the context-sensitive FOLLOW set for the 
      *  current rule.
      * \see antlr3ComputeCSRuleFollow() for details.
      */
-    pANTLR3_BITSET	(*computeCSRuleFollow)	    (void * recognizer);
+    pANTLR3_BITSET	(*computeCSRuleFollow)	    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
 
     /** Pointer to a function to combine follow bitsets.
      * \see antlr3CombineFollows() for details.
      */
-    pANTLR3_BITSET	(*combineFollows)	    (void * recognizer, 
+    pANTLR3_BITSET	(*combineFollows)	    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer, 
 							    ANTLR3_BOOLEAN exact);
  
     /** Pointer to a function that recovers from a mismatched token in the input stream.
      * \see antlr3RecoverMismatch() for details.
      */
     void		(*recoverFromMismatchedToken)
-						    (void * recognizer,  pANTLR3_INT_STREAM	input,
+						    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  pANTLR3_INT_STREAM	input,
 							    ANTLR3_UINT32	ttype,
 							    pANTLR3_BITSET	follow);
 
     /** Pointer to a function that recoverers from a mismatched set in the token stream, in a similar manner
      *  to (*recoverFromMismatchedToken)
      */
-    void		(*recoverFromMismatchedSet) (void * recognizer,  pANTLR3_INT_STREAM	input,
+    void		(*recoverFromMismatchedSet) (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  pANTLR3_INT_STREAM	input,
 							    pANTLR3_BITSET	follow);
 
     /** Pointer to common routine to handle single token insertion for recovery functions.
      */
     ANTLR3_BOOLEAN	(*recoverFromMismatchedElement)
-						    (void * recognizer,  pANTLR3_INT_STREAM	input,
+						    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  pANTLR3_INT_STREAM	input,
 							    pANTLR3_BITSET	follow);
     
     /** Pointer to function that consumes input until the next token matches
      *  the given token.
      */
-    void		(*consumeUntil)		    (void * recognizer,  pANTLR3_INT_STREAM	input,
+    void		(*consumeUntil)		    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  pANTLR3_INT_STREAM	input,
 							    ANTLR3_UINT32   tokenType);
 
     /** Pointer to function that consumes input until the next token matches
      *  one in the given set.
      */
-    void		(*consumeUntilSet)	    (void * recognizer,  pANTLR3_INT_STREAM	input,
+    void		(*consumeUntilSet)	    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  pANTLR3_INT_STREAM	input,
 							    pANTLR3_BITSET	set);
 
     /** Pointer to function that returns an ANTLR3_LIST of the strings that identify
@@ -233,15 +234,15 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *
      * \todo Document how to override invocation stack functions.
      */
-    pANTLR3_STACK	(*getRuleInvocationStack)	(void * recognizer);
-    pANTLR3_STACK	(*getRuleInvocationStackNamed)  (void * recognizer,
+    pANTLR3_STACK	(*getRuleInvocationStack)	(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
+    pANTLR3_STACK	(*getRuleInvocationStackNamed)  (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
 								pANTLR3_UINT8	    name);
 
     /** Pointer to a function that converts an ANLR3_LIST of tokens to an ANTLR3_LIST of
      *  string token names. As this is mostly used in string template processing it may not be useful
      *  in the C runtime.
      */
-    pANTLR3_HASH_TABLE	(*toStrings)			(void * recognizer,
+    pANTLR3_HASH_TABLE	(*toStrings)			(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
 								pANTLR3_HASH_TABLE);
 
     /** Pointer to a function to return whether the rule has parsed input starting at the supplied 
@@ -249,20 +250,20 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  then it will return ANTLR3_MEMO_RULE_UNKNOWN. If it has parsed from the suppled start point
      *  then it will return the point where it last stopped parsing after that start point.
      */
-    ANTLR3_UINT64	(*getRuleMemoization)		(void * recognizer,
+    ANTLR3_UINT64	(*getRuleMemoization)		(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
 								ANTLR3_UINT32	ruleIndex,
 								ANTLR3_UINT64	ruleParseStart);
 
     /** Pointer to function that determines whether the rule has parsed input at the current index
      *  in the input stream
      */
-    ANTLR3_BOOLEAN	(*alreadyParsedRule)		(void * recognizer,  pANTLR3_INT_STREAM	input,
+    ANTLR3_BOOLEAN	(*alreadyParsedRule)		(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  pANTLR3_INT_STREAM	input,
 								ANTLR3_UINT32	ruleIndex);
 
     /** Pointer to function that records whether the rule has parsed the input at a 
      *  current position successfully or not.
      */
-    void		(*memoize)			(void * recognizer,  pANTLR3_INT_STREAM	input,
+    void		(*memoize)			(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  pANTLR3_INT_STREAM	input,
 								ANTLR3_UINT32	ruleIndex,
 								ANTLR3_UINT64	ruleParseStart);
 
@@ -272,12 +273,12 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  via a pointer to a function (hence that's what all teh ANTLR3 C interfaces 
      *  do.
      */
-    ANTLR3_BOOLEAN	(*synpred)			(void * recognizer,  void * ctx, pANTLR3_INT_STREAM	input,
+    ANTLR3_BOOLEAN	(*synpred)			(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,  void * ctx, pANTLR3_INT_STREAM	input,
 								void (*predicate)(void * ctx));
 
     /** Pointer to a function that knows how to free the resources of a base recongizer.
      */
-    void		(*free)				(void * recognizer);
+    void		(*free)				(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
 
 }
     ANTLR3_BASE_RECOGNIZER;

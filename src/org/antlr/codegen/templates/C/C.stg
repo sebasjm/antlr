@@ -466,6 +466,61 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 #define	    precoverFromMismatchedElement(e)	prsr->rec->recoverFromMismatchedElement(prsr->rec, theInput()->istream, s)
 <endif>
 
+<if(TREE_PARSER)>
+/* Macros for accessing things in the parser
+ */
+ 
+#undef	    prsr		    
+#undef	    haveAlreadyParsedRule
+#undef	    theInput
+#undef	    hasException
+#undef	    theException
+#undef	    tmatch
+#undef	    tmatchAny
+#undef	    followStk
+#undef	    followPush
+#undef	    followPop
+#undef	    precover
+#undef	    preportError
+#undef	    LA
+#undef	    LT
+#undef	    exConstruct
+#undef	    inputConsume
+#undef	    markMyWords
+#undef	    rewindInput
+#undef	    perrorRecovery
+#undef	    hasFailed
+#undef	    failedFlag
+#undef	    precoverFromMismatchedSet
+#undef	    precoverFromMismatchedElement
+
+#define	    prsr		    ctx->pTreeParser  
+#define	    haveAlreadyParsedRule(r) prsr->rec->alreadyParsedRule(prsr->me, r)
+#define	    theInput()		    prsr->ctnstream
+#define	    hasException()	    (theInput()->error == ANTLR3_TRUE)
+#define	    theException()	    theInput()->exception
+#define	    tmatch(t, fs)	    prsr->rec->match(prsr->rec, theInput()->istream, t, fs)
+#define	    tmatchAny()		    prsr->rec->matchAny(prsr->rec, theInput()->istream->me)
+#define	    followStk()		    prsr->rec->following
+#define	    followPush(x)	    followStk()->push(followStk(), ((void *)(x)), NULL)
+#define	    followPop()		    followStk()->pop(followStk())
+#define	    precover()		    prsr->rec->recover(prsr->me, theInput()->istream)
+#define	    preportError()	    prsr->rec->reportError(prsr)
+#define	    LA(n)		    theInput()->istream->LA(theInput()->me, n)
+#define	    LT(n)		    theInput()->LT(theInput()->me, n)
+#define	    exConstruct()	    theInput()->istream->exConstruct(theInput()->istream)
+#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream->me)
+#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream->me)
+#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream->me, m)
+#define	    perrorRecovery()	    prsr->rec->errorRecovery
+#define	    _fsp		    prsr->rec->_fsp
+#define	    failedFlag		    prsr->rec->failed
+#define	    hasFailed()		    (failedFlag == ANTLR3_TRUE)
+#define	    backtracking	    prsr->rec->backtracking
+#define	    precoverFromMismatchedSet(s)	prsr->rec->recoverFromMismatchedSet(prsr->rec, theInput()->istream, s)
+#define	    precoverFromMismatchedElement(e)	prsr->rec->recoverFromMismatchedElement(prsr->rec, theInput()->istream, s)
+<endif>
+
 #endif
 >>
 

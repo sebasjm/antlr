@@ -639,10 +639,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\antlr3treenodestream.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\antlr3treeparser.h"
 				>
 			</File>

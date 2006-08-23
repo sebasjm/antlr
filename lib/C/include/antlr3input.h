@@ -24,11 +24,11 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
      */
     pANTLR3_INT_STREAM	istream;
 
-    /** Whatever is providing the INPUT stream needs a pointer to itself
-     *  so that this can be passed back to it whenever teh api functions
-     *  are called.
+    /** Whatever super structure is providing the INPUT stream needs a pointer to itself
+     *  so that this can be passed back to it whenever the api functions
+     *  are called back from this interface.
      */
-    void	      * me;
+    void	      * super;
 
     /** Pointer the start of the input string, chracters may be
      *  taken as offsets from here and in original input format encoding.

@@ -12,9 +12,10 @@
 typedef struct ANTLR3_PARSE_TREE_struct
 {
     /** Any interface that implements methods in this interface
-     *  may need to point back to itself using this pointer
+     *  may need to point back to itself using this pointer to its
+     *  super structure.
      */
-    void    * me;
+    void    * super;
 
     /** The payload that the parse tree node passes around
      */
@@ -27,19 +28,19 @@ typedef struct ANTLR3_PARSE_TREE_struct
 
     /** How to dup this node
      */
-    pANTLR3_BASE_TREE	    (*dupNode)	(void * tree);
+    pANTLR3_BASE_TREE	    (*dupNode)	(struct ANTLR3_PARSE_TREE_struct * tree);
 
     /** Return the type of this node
      */
-    ANTLR3_UINT32	    (*getType)	(void * tree);
+    ANTLR3_UINT32	    (*getType)	(struct ANTLR3_PARSE_TREE_struct * tree);
 
     /** Return the string representation of the payload (must be installed
      *  when the payload is added and point to a function that knwos how to 
      *  manifest a pANTLR3_STRING from a node.
      */
-    pANTLR3_STRING	    (*toString)	(void * payload);
+    pANTLR3_STRING	    (*toString)	(struct ANTLR3_PARSE_TREE_struct * payload);
 
-    void		    (*free)	(void * tree);
+    void		    (*free)	(struct ANTLR3_PARSE_TREE_struct * tree);
 
 }
     ANTLR3_PARSE_TREE;

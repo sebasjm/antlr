@@ -3,32 +3,36 @@
  */
 #include    <antlr3parser.h>
 
+/* Parser API 
+ */
 static void			setTokenStream		    (pANTLR3_PARSER parser, pANTLR3_TOKEN_STREAM);
 static pANTLR3_TOKEN_STREAM	getTokenStream		    (pANTLR3_PARSER parser);
 static void			reset			    (pANTLR3_PARSER parser);
-static void			reportError		    (pANTLR3_PARSER parser);
-static void			displayRecognitionError	    (pANTLR3_PARSER parser, pANTLR3_UINT8 tokenNames);
-static void			recover			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input);
-static void			beginResync		    (pANTLR3_PARSER parser);
-static void			endResync		    (pANTLR3_PARSER parser);
-static pANTLR3_BITSET		computeErrorRecoverySet	    (pANTLR3_PARSER parser);
-static pANTLR3_BITSET		computeCSRuleFollow	    (pANTLR3_PARSER parser);
-static pANTLR3_BITSET		combineFollows		    (pANTLR3_PARSER parser, ANTLR3_BOOLEAN exact);
-static void			recoverFromMismatchedToken  (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
-static void		recoverFromMismatchedSet	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, pANTLR3_BITSET follow);
-static ANTLR3_BOOLEAN	recoverFromMismatchedElement	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, pANTLR3_BITSET follow);
-static void		consumeUntil			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 tokenType);
-static void		consumeUntilSet			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, pANTLR3_BITSET set);
-static pANTLR3_STACK	getRuleInvocationStack		    (pANTLR3_PARSER parser);
-static pANTLR3_STACK	getRuleInvocationStackNamed	    (pANTLR3_PARSER parser, pANTLR3_UINT8 name);
-static pANTLR3_HASH_TABLE	
-			toStrings			    (pANTLR3_PARSER parser, pANTLR3_HASH_TABLE);
-static ANTLR3_UINT64	getRuleMemoization		    (pANTLR3_PARSER parser, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart);
-static ANTLR3_BOOLEAN	alreadyParsedRule		    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ruleIndex);
-static void		memoize				    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart);
-static ANTLR3_BOOLEAN	synpred				    (pANTLR3_PARSER parser, void * ctx, pANTLR3_INT_STREAM input, void (*predicate)(void * ctx));
-static void		freeParser			    (pANTLR3_PARSER parser);
+static void			freeParser		    (pANTLR3_PARSER parser);
 
+/* Base recognizer API
+ */
+static void			reportError		    (pANTLR3_BASE_RECOGNIZER rec);
+static void			displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 tokenNames);
+static void			recover			    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input);
+static void			beginResync		    (pANTLR3_BASE_RECOGNIZER rec);
+static void			endResync		    (pANTLR3_BASE_RECOGNIZER rec);
+static pANTLR3_BITSET		computeErrorRecoverySet	    (pANTLR3_BASE_RECOGNIZER rec);
+static pANTLR3_BITSET		computeCSRuleFollow	    (pANTLR3_BASE_RECOGNIZER rec);
+static pANTLR3_BITSET		combineFollows		    (pANTLR3_BASE_RECOGNIZER rec, ANTLR3_BOOLEAN exact);
+static void			recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
+static void		recoverFromMismatchedSet	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, pANTLR3_BITSET follow);
+static ANTLR3_BOOLEAN	recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, pANTLR3_BITSET follow);
+static void		consumeUntil			    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, ANTLR3_UINT32 tokenType);
+static void		consumeUntilSet			    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, pANTLR3_BITSET set);
+static pANTLR3_STACK	getRuleInvocationStack		    (pANTLR3_BASE_RECOGNIZER rec);
+static pANTLR3_STACK	getRuleInvocationStackNamed	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 name);
+static pANTLR3_HASH_TABLE	
+			toStrings			    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_HASH_TABLE);
+static ANTLR3_UINT64	getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER rec, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart);
+static ANTLR3_BOOLEAN	alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ruleIndex);
+static void		memoize				    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart);
+static ANTLR3_BOOLEAN	synpred				    (pANTLR3_BASE_RECOGNIZER rec, void * ctx, pANTLR3_INT_STREAM input, void (*predicate)(void * ctx));
 
 
 ANTLR3_API pANTLR3_PARSER
@@ -44,7 +48,6 @@ antlr3ParserNew		(ANTLR3_UINT32 sizeHint)
     {
 	return	(pANTLR3_PARSER) ANTLR3_ERR_NOMEM;
     }
-    parser->me	= parser;
 
     /* Install a base parser
      */
@@ -56,17 +59,17 @@ antlr3ParserNew		(ANTLR3_UINT32 sizeHint)
 	return	(pANTLR3_PARSER) ANTLR3_ERR_NOMEM;
     }
 
-    parser->rec->me	= parser;
+    parser->rec->super	= parser;
 
     /* Install the API
      */
     parser->setTokenStream		= ANTLR3_API_FUNC setTokenStream;
     parser->getTokenStream		= ANTLR3_API_FUNC getTokenStream;
     parser->free			= ANTLR3_API_FUNC freeParser;
+    parser->reset			= ANTLR3_API_FUNC reset;
 
     /* Install the base recognizer API
      */
-    parser->reset				= ANTLR3_API_FUNC reset;
     parser->rec->reportError			= ANTLR3_API_FUNC reportError;
     parser->rec->displayRecognitionError	= ANTLR3_API_FUNC displayRecognitionError;
     parser->rec->recover			= ANTLR3_API_FUNC recover;
@@ -106,7 +109,7 @@ antlr3ParserNewStream	(ANTLR3_UINT32 sizeHint, pANTLR3_TOKEN_STREAM tstream)
     /* Everything seems to be hunky dory so we can install the 
      * token stream.
      */
-    parser->setTokenStream(parser->me, tstream);
+    parser->setTokenStream(parser, tstream);
 
     return parser;
 }
@@ -132,7 +135,7 @@ static void
 setTokenStream		    (pANTLR3_PARSER parser, pANTLR3_TOKEN_STREAM tstream)
 {
     parser->tstream = tstream;
-    parser->reset(parser->rec->me);
+    parser->reset(parser);
 }
 
 static pANTLR3_TOKEN_STREAM	
@@ -155,9 +158,9 @@ reset			    (pANTLR3_PARSER parser)
 }
 
 static void			
-reportError		    (pANTLR3_PARSER parser)
+reportError		    (pANTLR3_BASE_RECOGNIZER rec)
 {
-    if	(parser->rec->errorRecovery == ANTLR3_TRUE)
+    if	(rec->errorRecovery == ANTLR3_TRUE)
     {
 	/* In error recovery so don't display another error while doing so
 	 */
@@ -166,9 +169,9 @@ reportError		    (pANTLR3_PARSER parser)
 
     /* Signal we are in error recovery now
      */
-    parser->rec->errorRecovery = ANTLR3_TRUE;
+    rec->errorRecovery = ANTLR3_TRUE;
 
-    parser->rec->displayRecognitionError(parser->rec->me, parser->rec->tokenNames);
+    rec->displayRecognitionError(rec, rec->tokenNames);
 }
 
 #ifdef	WIN32
@@ -176,8 +179,12 @@ reportError		    (pANTLR3_PARSER parser)
 #endif
 
 static void			
-displayRecognitionError	    (pANTLR3_PARSER parser, pANTLR3_UINT8 tokenNames)
+displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 tokenNames)
 {
+    pANTLR3_PARSER parser;
+
+    parser  = (pANTLR3_PARSER) (rec->super);
+
     fprintf(stderr, "%s(", parser->tstream->istream->exception->streamName);
 #ifdef WIN32
     /* shanzzle fraazzle Dick Dastardly */
@@ -202,45 +209,48 @@ displayRecognitionError	    (pANTLR3_PARSER parser, pANTLR3_UINT8 tokenNames)
  *  the match() routine could not recover from.
  */
 static void			
-recover			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input)
+recover			    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input)
 {
     /* Used to compute the follow set of tokens
     */
     pANTLR3_BITSET	followSet;
+    pANTLR3_PARSER parser;
+
+    parser  = (pANTLR3_PARSER) (rec->super);
 
     /* I know that all the indirction looks confusing, but you get used to it and it really isn't.
      * Don't be tempted to use macros like we do for the generated C code, you will never know
      * what is going on. The generated C code does this to hide implementation details.
      */
-    if	(parser->rec->lastErrorIndex == parser->tstream->istream->index(parser->tstream->istream->me))
+    if	(rec->lastErrorIndex == parser->tstream->istream->index(parser->tstream->istream))
     {
 	/* The last error was at the same token index point. This must be a case
 	 * where LT(1) is in the recovery token set so nothing is
 	 * consumed. Consume a single token so at least to prevent
 	 * an infinite loop; this is a failsafe.
 	 */
-	parser->tstream->istream->consume(parser->tstream->istream->me);
+	parser->tstream->istream->consume(parser->tstream->istream);
     }
 
     /* Record error index position
      */
-    parser->rec->lastErrorIndex	 = parser->tstream->istream->index(parser->tstream->istream->me);
+    rec->lastErrorIndex	 = parser->tstream->istream->index(parser->tstream->istream);
     
     /* Work out the follows set for error recovery
      */
-    followSet	= parser->rec->computeErrorRecoverySet(parser->rec->me);
+    followSet	= rec->computeErrorRecoverySet(rec);
 
-    /* Call resync hook (for debuggeres and so on)
+    /* Call resync hook (for debuggers and so on)
      */
-    parser->rec->beginResync(parser->rec->me);
+    rec->beginResync(rec);
 
     /* Consume tokens until we have resynced to something in the follows set
      */
-    parser->rec->consumeUntilSet(parser->rec->me, parser->tstream->istream, followSet);
+    rec->consumeUntilSet(rec, parser->tstream->istream, followSet);
 
     /* End resync hook 
      */
-    parser->rec->endResync(parser->rec->me);
+    rec->endResync(rec);
 
     /* Destoy the temporary bitset we produced.
      */
@@ -252,16 +262,17 @@ recover			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input)
 }
 
 static void			
-beginResync		    (pANTLR3_PARSER parser)
+beginResync		    (pANTLR3_BASE_RECOGNIZER rec)
 {
 }
 
 static void			
-endResync		    (pANTLR3_PARSER parser)
+endResync		    (pANTLR3_BASE_RECOGNIZER rec)
 {
 }
+
 /**
- * Documentation below is from teh Java implementation.
+ * Documentation below is from the Java implementation.
  *
  * Compute the error recovery set for the current rule.  During
  *  rule invocation, the parser pushes the set of tokens that can
@@ -355,9 +366,9 @@ endResync		    (pANTLR3_PARSER parser)
  *  at run-time upon error to avoid overhead during parsing.
  */
 static pANTLR3_BITSET		
-computeErrorRecoverySet	    (pANTLR3_PARSER parser)
+computeErrorRecoverySet	    (pANTLR3_BASE_RECOGNIZER rec)
 {
-    return   parser->rec->combineFollows(parser->me, ANTLR3_FALSE);
+    return   rec->combineFollows(rec, ANTLR3_FALSE);
 }
 
 /** Compute the context-sensitive FOLLOW set for current rule.
@@ -413,26 +424,26 @@ computeErrorRecoverySet	    (pANTLR3_PARSER parser)
  *  throwing an exception.
  */
 static pANTLR3_BITSET		
-computeCSRuleFollow	    (pANTLR3_PARSER parser)
+computeCSRuleFollow	    (pANTLR3_BASE_RECOGNIZER rec)
 {
-    return   parser->rec->combineFollows(parser->me, ANTLR3_FALSE);
+    return   rec->combineFollows(rec, ANTLR3_FALSE);
 }
 
 static pANTLR3_BITSET		
-combineFollows		    (pANTLR3_PARSER parser, ANTLR3_BOOLEAN exact)
+combineFollows		    (pANTLR3_BASE_RECOGNIZER rec, ANTLR3_BOOLEAN exact)
 {
     pANTLR3_BITSET	followSet;
     pANTLR3_BITSET	localFollowSet;
     ANTLR3_UINT64	top;
     ANTLR3_UINT64	i;
 
-    top	= parser->rec->following->size(parser->rec->following);
+    top	= rec->following->size(rec->following);
 
     followSet	    = antlr3BitsetNew(0);
 
     for (i = top; i>0; i--)
     {
-	localFollowSet = (pANTLR3_BITSET) parser->rec->following->get(parser->rec->following, i);
+	localFollowSet = (pANTLR3_BITSET) rec->following->get(rec->following, i);
 
 	if  (localFollowSet != NULL)
 	{
@@ -487,34 +498,38 @@ combineFollows		    (pANTLR3_PARSER parser, ANTLR3_BOOLEAN exact)
  * error flag and rules can cascade back when this is set.
  */
 static void			
-recoverFromMismatchedToken  (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
+recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
 {
+    pANTLR3_PARSER parser;
+
+    parser  = (pANTLR3_PARSER) (rec->super);
+
     /* If the next token after the one we are looking at in the input stream
      * is what we are looking for then we remove the one we have discovered
      * from the stream by consuming it, then consume this next one along too as
      * if nothing had happened.
      */
-    if	( input->LA(input->me, 2) == ttype)
+    if	( input->LA(input, 2) == ttype)
     {
 	/* Print out the error
 	 */
-	parser->rec->reportError(parser->rec->me);
+	rec->reportError(rec);
 
 	/* Call resync hook (for debuggeres and so on)
 	 */
-	parser->rec->beginResync(parser->rec->me);
+	rec->beginResync(rec);
 
 	/* "delete" the extra token
 	 */
-	input->consume(input->me);
+	input->consume(input);
 
 	/* End resync hook 
 	 */
-	parser->rec->endResync(parser->rec->me);
+	rec->endResync(rec);
 
 	/* consume the token that the rule actually expected to get
 	 */
-	input->consume(input->me);
+	input->consume(input);
 
 	parser->tstream->istream->error  = ANTLR3_FALSE;	/* Exception is not outstanding any more */
 
@@ -527,24 +542,27 @@ recoverFromMismatchedToken  (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, AN
      * we are hunky dory again and can move on, if we cannot, then we resort
      * to throwing the exception.
      */
-    if	(parser->rec->recoverFromMismatchedElement(parser->rec->me, input, follow) == ANTLR3_FALSE)
+    if	(rec->recoverFromMismatchedElement(rec, input, follow) == ANTLR3_FALSE)
     {
 	parser->tstream->istream->error  = ANTLR3_TRUE;
-	parser->rec->failed		 = ANTLR3_TRUE;
+	rec->failed			 = ANTLR3_TRUE;
 	return;
     }
-
 }
 
 static void		
-recoverFromMismatchedSet	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, pANTLR3_BITSET follow)
+recoverFromMismatchedSet	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, pANTLR3_BITSET follow)
 {
+    pANTLR3_PARSER parser;
+
+    parser  = (pANTLR3_PARSER) (rec->super);
+
     /* TODO - Single token deletion like in recoverFromMismatchedToken()
      */
-    if	(parser->rec->recoverFromMismatchedElement(parser->rec->me, input, follow) == ANTLR3_FALSE)
+    if	(rec->recoverFromMismatchedElement(rec, input, follow) == ANTLR3_FALSE)
     {
 	parser->tstream->istream->error  = ANTLR3_TRUE;
-	parser->rec->failed		 = ANTLR3_TRUE;
+	rec->failed			= ANTLR3_TRUE;
 	return;
     }
 }
@@ -555,11 +573,13 @@ recoverFromMismatchedSet	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, p
  *  true if recovery was possible else return false.
  */
 static ANTLR3_BOOLEAN	
-recoverFromMismatchedElement	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, pANTLR3_BITSET follow)
+recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, pANTLR3_BITSET follow)
 {
     pANTLR3_BITSET  viableToksFollowingRule;
-
     pANTLR3_BITSET  newFollow;
+    pANTLR3_PARSER  parser;
+
+    parser  = (pANTLR3_PARSER) (rec->super);
 
     newFollow	= NULL;
 
@@ -581,7 +601,7 @@ recoverFromMismatchedElement	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM inpu
 	/* First we need to know which of the available tokens are viable
 	 * to follow this reference.
 	 */
-	viableToksFollowingRule	= parser->rec->computeCSRuleFollow(parser->rec->me);
+	viableToksFollowingRule	= rec->computeCSRuleFollow(rec);
 
 	/* Knowing that, we can or in the follow set
 	 */
@@ -601,13 +621,13 @@ recoverFromMismatchedElement	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM inpu
      * is consistent, then we can "insert" that token by not throwing
      * an exception and assumimng that we saw it. 
      */
-    if	( follow->isMember(follow, input->LA(input->me, 1)) == ANTLR3_TRUE)
+    if	( follow->isMember(follow, input->LA(input, 1)) == ANTLR3_TRUE)
     {
 	/* report the error, but don't cause any rules to abort and stuff
 	 */
-	parser->rec->reportError(parser->rec->me);
+	rec->reportError(rec);
 	parser->tstream->istream->error  = ANTLR3_FALSE;
-	parser->rec->failed		 = ANTLR3_FALSE;
+	rec->failed			 = ANTLR3_FALSE;
 	return ANTLR3_TRUE;	/* Success in recovery	*/
     }
 
@@ -620,20 +640,20 @@ recoverFromMismatchedElement	    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM inpu
 /** Eat tokens from the input stream until we get one of JUST the right type
  */
 static void		
-consumeUntil			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 tokenType)
+consumeUntil			    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, ANTLR3_UINT32 tokenType)
 {
     ANTLR3_UINT32   ttype;
 
     /* What do have at the moment?
      */
-    ttype	= input->LA(input->me, 1);
+    ttype	= input->LA(input, 1);
 
     /* Start eating tokens until we get to the one we want.
      */
     while   (ttype != ANTLR3_TOKEN_EOF && ttype != tokenType)
     {
-	input->consume(input->me);
-	ttype	= input->LA(input->me, 1);
+	input->consume(input);
+	ttype	= input->LA(input, 1);
     }
 }
 
@@ -641,20 +661,20 @@ consumeUntil			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT
  *  belongs to the supplied set.
  */
 static void		
-consumeUntilSet			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, pANTLR3_BITSET set)
+consumeUntilSet			    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, pANTLR3_BITSET set)
 {
     ANTLR3_UINT32   ttype;
 
     /* What do have at the moment?
      */
-    ttype	= input->LA(input->me, 1);
+    ttype	= input->LA(input, 1);
 
     /* Start eating tokens until we get to one we want.
      */
     while   (ttype != ANTLR3_TOKEN_EOF && set->isMember(set, ttype) == ANTLR3_FALSE)
     {
-	input->consume(input->me);
-	ttype	= input->LA(input->me, 1);
+	input->consume(input);
+	ttype	= input->LA(input, 1);
     }
 }
 
@@ -669,13 +689,13 @@ consumeUntilSet			    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, pANTLR3_
  *  TODO: Consult with Ter on this one as to usefulness, it is easy but do I need it?
  */
 static pANTLR3_STACK	
-getRuleInvocationStack		    (pANTLR3_PARSER parser)
+getRuleInvocationStack		    (pANTLR3_BASE_RECOGNIZER rec)
 {
     return NULL;
 }
 
 static pANTLR3_STACK	
-getRuleInvocationStackNamed	    (pANTLR3_PARSER parser, pANTLR3_UINT8 name)
+getRuleInvocationStackNamed	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 name)
 {
     return NULL;
 }
@@ -683,7 +703,7 @@ getRuleInvocationStackNamed	    (pANTLR3_PARSER parser, pANTLR3_UINT8 name)
 /** Convenience method for template rewrites - NYI.
  */
 static pANTLR3_HASH_TABLE	
-toStrings			    (pANTLR3_PARSER parser, pANTLR3_HASH_TABLE tokens)
+toStrings			    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_HASH_TABLE tokens)
 {
     return NULL;
 }
@@ -704,7 +724,7 @@ freeList    (void * list)
  * version of the table.
  */
 static ANTLR3_UINT64	
-getRuleMemoization		    (pANTLR3_PARSER parser, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart)
+getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER rec, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart)
 {
     /* The rule memos are an ANTLR3_LIST of ANTLR3_LIST.
      */
@@ -715,14 +735,14 @@ getRuleMemoization		    (pANTLR3_PARSER parser, ANTLR3_UINT32 ruleIndex, ANTLR3_
     /* See if we have a list in the ruleMemos for this rule, and if not, then create one
      * as we will need it eventually.
      */
-    ruleList	= parser->rec->ruleMemo->get(parser->rec->ruleMemo, (ANTLR3_UINT64)ruleIndex);
+    ruleList	= rec->ruleMemo->get(rec->ruleMemo, (ANTLR3_UINT64)ruleIndex);
 
     if	(ruleList == NULL)
     {
 	/* Did not find it, so create a new one
 	 */
 	ruleList    = antlr3ListNew(31);
-	parser->rec->ruleMemo->put(parser->rec->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), freeList);
+	rec->ruleMemo->put(rec->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), freeList);
     }
 
     /* See if there is a stop index associated with the supplied start index.
@@ -748,13 +768,13 @@ getRuleMemoization		    (pANTLR3_PARSER parser, ANTLR3_UINT32 ruleIndex, ANTLR3_
  *  1 past the stop token matched for this rule last time.
  */
 static ANTLR3_BOOLEAN	
-alreadyParsedRule		    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ruleIndex)
+alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ruleIndex)
 {
     ANTLR3_UINT64	stopIndex;
 
     /* See if we have a memo marker for this.
      */
-    stopIndex	    = parser->rec->getRuleMemoization(parser->rec->me, ruleIndex, input->index(input->me));
+    stopIndex	    = rec->getRuleMemoization(rec, ruleIndex, input->index(input));
 
     if	(stopIndex  == MEMO_RULE_UNKNOWN)
     {
@@ -763,11 +783,11 @@ alreadyParsedRule		    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_
 
     if	(stopIndex == MEMO_RULE_FAILED)
     {
-	parser->rec->failed = ANTLR3_TRUE;
+	rec->failed = ANTLR3_TRUE;
     }
     else
     {
-	input->seek(input->me, stopIndex+1);
+	input->seek(input, stopIndex+1);
     }
 
     /* If here then the rule was executed for this input already
@@ -779,16 +799,16 @@ alreadyParsedRule		    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_
  *  successfully.
  */
 static void		
-memoize				    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart)
+memoize	(pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart)
 {
     /* The rule memos are an ANTLR3_LIST of ANTLR3_LIST.
      */
     pANTLR3_LIST    ruleList;
     ANTLR3_UINT64   stopIndex;
     
-    stopIndex	= parser->rec->failed == ANTLR3_TRUE ? MEMO_RULE_FAILED : input->index(input->me) - 1;
+    stopIndex	= rec->failed == ANTLR3_TRUE ? MEMO_RULE_FAILED : input->index(input) - 1;
 
-    ruleList	= parser->rec->ruleMemo->get(parser->rec->ruleMemo, (ANTLR3_UINT64)ruleIndex);
+    ruleList	= rec->ruleMemo->get(rec->ruleMemo, (ANTLR3_UINT64)ruleIndex);
 
     if	(ruleList != NULL)
     {
@@ -802,15 +822,15 @@ memoize				    (pANTLR3_PARSER parser, pANTLR3_INT_STREAM input, ANTLR3_UINT32 r
  *  This resets the failed instance var afterwards.
  */
 static ANTLR3_BOOLEAN	
-synpred				    (pANTLR3_PARSER parser, void * ctx, pANTLR3_INT_STREAM input, void (*predicate)(void * ctx))
+synpred	(pANTLR3_BASE_RECOGNIZER rec, void * ctx, pANTLR3_INT_STREAM input, void (*predicate)(void * ctx))
 {
     ANTLR3_UINT64   start;
 
     /* Begin backtracking so we can get back to where we started after trying out
      * the syntactic predicate.
      */
-    start   = input->mark(input->me);
-    parser->rec->backtracking++;
+    start   = input->mark(input);
+    rec->backtracking++;
 
     /* Try the syntactical predicate
      */
@@ -818,21 +838,21 @@ synpred				    (pANTLR3_PARSER parser, void * ctx, pANTLR3_INT_STREAM input, voi
 
     /* Reset
      */
-    input->rewind(input->me, start);
-    parser->rec->backtracking--;
+    input->rewind(input, start);
+    rec->backtracking--;
 
-    if	(parser->rec->failed == ANTLR3_TRUE)
+    if	(rec->failed == ANTLR3_TRUE)
     {
 	/* Predicate failed
 	 */
-	parser->rec->failed = ANTLR3_FALSE;
+	rec->failed = ANTLR3_FALSE;
 	return	ANTLR3_FALSE;
     }
     else
     {
 	/* Predicate was succesful
 	 */
-	parser->rec->failed	= ANTLR3_FALSE;
+	rec->failed	= ANTLR3_FALSE;
 	return	ANTLR3_TRUE;
     }
 }

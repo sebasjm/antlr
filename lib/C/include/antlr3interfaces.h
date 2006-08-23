@@ -47,6 +47,7 @@ typedef struct ANTLR3_COMMON_TREE_struct	    *pANTLR3_COMMON_TREE;
 typedef	struct ANTLR3_ARBORETUM_struct		    *pANTLR3_ARBORETUM;
 typedef	struct ANTLR3_PARSE_TREE_struct		    *pANTLR3_PARSE_TREE;
 
+typedef struct ANTLR3_TREE_NODE_STREAM_struct	    *pANTLR3_TREE_NODE_STREAM;
 typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct    *pANTLR3_COMMON_TREE_NODE_STREAM;
 typedef struct ANTLR3_TREE_WALK_STATE_struct	    *pANTLR3_TREE_WALK_STATE;
 typedef struct ANTLR3_BASE_TREE_ADAPTOR_struct	    *pANTLR3_BASE_TREE_ADAPTOR;
@@ -56,4 +57,5 @@ typedef struct ANTLR3_TREE_PARSER_struct	    *pANTLR3_TREE_PARSER;
 typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct	    *pANTLR3_TREE_ADAPTOR;
 typedef struct ANTLR3_COMMON_TREE_ADAPTOR_struct    *pANTLR3_COMMON_TREE_ADAPTOR;
 
+typedef	struct ANTLR3_TREE_PARSER_struct	    *pANTLR3_TREE_PARSER;
 #endif

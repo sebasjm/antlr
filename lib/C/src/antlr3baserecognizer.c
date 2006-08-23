@@ -30,7 +30,6 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
 	 */
 	return	(pANTLR3_BASE_RECOGNIZER) ANTLR3_ERR_NOMEM;
     }
-    recognizer->me	    = recognizer;
     recognizer->sizeHint    = sizeHint;
 
     /* Initialize variables
@@ -94,8 +93,9 @@ ANTLR3_API	void
 antlr3RecognitionExceptionNew(pANTLR3_INT_STREAM input)
 {
 
-    pANTLR3_INPUT_STREAM	    cs;
-    pANTLR3_COMMON_TOKEN_STREAM	    ts;
+    pANTLR3_INPUT_STREAM	    is;
+    pANTLR3_COMMON_TOKEN_STREAM	    cts;
+    pANTLR3_TREE_NODE_STREAM	    tns;
 
     /* Create a basic exception strucuture
      */
@@ -111,25 +111,36 @@ antlr3RecognitionExceptionNew(pANTLR3_INT_STREAM input)
     {
     case    ANTLR3_CHARSTREAM:
 
-	cs	= (pANTLR3_INPUT_STREAM) input->me;
+	is	= (pANTLR3_INPUT_STREAM) input->super;
 
-	ex->c			= cs->istream->LA		    (cs->istream->me, 1);   /* Current input character			*/
-	ex->line		= cs->getLine			    (cs->me);		    /* Line number comes from stream		*/
-	ex->charPositionInLine	= cs->getCharPositionInLine	    (cs->me);		    /* Line offset also comes from the stream   */
-	ex->index		= cs->istream->index		    (cs->istream->me);
-	ex->streamName		= cs->getSourceName		    (cs->me);
+	ex->c			= is->istream->LA			(is->istream, 1);	    /* Current input character			*/
+	ex->line		= is->getLine				(is);		    /* Line number comes from stream		*/
+	ex->charPositionInLine	= is->getCharPositionInLine		(is);		    /* Line offset also comes from the stream   */
+	ex->index		= is->istream->index			(is->istream);
+	ex->streamName		= is->getSourceName			(is);
 	ex->message		= "Unexpected character";
 	break;
 
     case    ANTLR3_TOKENSTREAM:
 
-	ts	= (pANTLR3_COMMON_TOKEN_STREAM) input->me;
+	cts	= (pANTLR3_COMMON_TOKEN_STREAM) input->super;
 
-	ex->token   = ts->tstream->LT(ts->tstream->me, 1);			/* Current input token			    */
-	ex->line    = ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine(ex->token);
-	ex->index   = ts->tstream->istream->index		  (ts->tstream->istream->me);
+	ex->token	= cts->tstream->LT				(cts->tstream, 1);	    /* Current input token			    */
+	ex->line	= ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine	(ex->token);
+	ex->index	= cts->tstream->istream->index			(cts->tstream->istream);
 	ex->streamName	= "Token stream: fix this Jim, pick p name from input stream into token stream!";
 	ex->message	= "Unexpected token";
+	break;
+
+    case    ANTLR3_COMMONTREENODE:
+
+	tns	= (pANTLR3_TREE_NODE_STREAM) input->super;
+
+	ex->token	= tns->LT					(tns, 1);	    /* Current input token			    */
+	ex->line	= ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine	(ex->token);
+	ex->index	= tns->istream->index				(tns->istream);
+	ex->streamName	= "Token stream: fix this Jim, pick p name from input stream into token stream!";
+	ex->message	= "Unexpected node";
 	break;
     }
 
@@ -153,11 +164,11 @@ static ANTLR3_BOOLEAN
 antlr3BRMatch(	pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input,
 		ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
 {
-    if	(input->LA(input->me, 1) == ttype)
+    if	(input->LA(input, 1) == ttype)
     {
 	/* The token was the one we were told to expect
 	 */
-	input->consume(input->me);	/* Consume that token from the stream	    */
+	input->consume(input);				 /* Consume that token from the stream	    */
 	recognizer->errorRecovery   = ANTLR3_FALSE;	/* Not in error recovery now (if we were)   */
 	recognizer->failed	    = ANTLR3_FALSE;	/* The match was a success		    */
 	return ANTLR3_TRUE;				/* We are done				    */
@@ -196,7 +207,7 @@ antlr3BRMatchAny(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input)
 {
     recognizer->errorRecovery	    = ANTLR3_FALSE;
     recognizer->failed		    = ANTLR3_FALSE;
-    input->consume(input->me);
+    input->consume(input);
 
     return;
 }
@@ -210,7 +221,7 @@ antlr3BRMismatch(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	input, A
 
     /* Enter error recovery mode
      */
-    recognizer->recoverFromMismatchedToken(recognizer->me, input, ttype, follow);
+    recognizer->recoverFromMismatchedToken(recognizer, input, ttype, follow);
 
     return;
 

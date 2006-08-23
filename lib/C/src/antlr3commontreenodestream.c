@@ -9,45 +9,223 @@
 #pragma warning( disable : 4100 )
 #endif
 
-static	void			    reset			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	pANTLR3_BASE_TREE	    LT				(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 k);
-static	pANTLR3_BASE_TREE	    getTreeSource		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	void			    fill			(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 k);
+/* COMMON TREE STREAM API */
 static	void			    addLookahead		(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE node);
-static	void			    consume			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	ANTLR3_UINT32		    LA				(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 i);
-static	ANTLR3_UINT64		    mark			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	void			    release			(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 marker);
-static	void			    rewindMark			(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 marker);
-static	void			    rewindInput			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	void			    seek			(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 index);
-static	ANTLR3_UINT64		    index			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	ANTLR3_UINT64		    size			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	ANTLR3_BOOLEAN		    hasNext			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	pANTLR3_BASE_TREE	    next			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	pANTLR3_BASE_TREE	    handleRootnode		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	pANTLR3_BASE_TREE	    visitChild			(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 child);
 static	void			    addNavigationNode		(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT32 ttype);
+static	void			    fill			(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 k);
+static	ANTLR3_UINT32		    getLookaheadSize		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	pANTLR3_BASE_TREE	    handleRootnode		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	ANTLR3_BOOLEAN		    hasNext			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	ANTLR3_BOOLEAN		    hasUniqueNavigationNodes	(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	pANTLR3_BASE_TREE	    newDownNode			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	pANTLR3_BASE_TREE	    newUpNode			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	pANTLR3_BASE_TREE	    next			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	void			    reset			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	void			    rewindInput			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	pANTLR3_STRING		    toNodesOnlyString		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	pANTLR3_BASE_TREE	    visitChild			(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 child);
 static	void			    walkBackToMostRecentNodeWithUnvisitedChildren   
 								(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	pANTLR3_BASE_TREE_ADAPTOR   getTreeAdaptor		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	ANTLR3_BOOLEAN		    hasUniqueNavigationNodes	(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	void			    setUniqueNavigationNodes	(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_BOOLEAN uniqueNavigationNodes);
-static	pANTLR3_STRING		    toNodesOnlyString		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	pANTLR3_STRING		    toString			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	pANTLR3_STRING		    toStringSS			(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop);
-static	void			    toStringWork		(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop, pANTLR3_STRING buf);
-static	ANTLR3_UINT32		    getLookaheadSize		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+/* TREE NODE STREAM API */
+static	pANTLR3_BASE_TREE_ADAPTOR   getTreeAdaptor		(pANTLR3_TREE_NODE_STREAM tns);
+static	pANTLR3_BASE_TREE	    getTreeSource		(pANTLR3_TREE_NODE_STREAM tns);
+static	pANTLR3_BASE_TREE	    LT				(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_UINT64 k);
+static	void			    setUniqueNavigationNodes	(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_BOOLEAN uniqueNavigationNodes);
+static	pANTLR3_STRING		    toString			(pANTLR3_TREE_NODE_STREAM tns);
+static	pANTLR3_STRING		    toStringSS			(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop);
+static	void			    toStringWork		(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop, pANTLR3_STRING buf);
+
+/* INT STREAM API */
+static	void			    consume			(pANTLR3_INT_STREAM is);
+static	ANTLR3_INT64		    index			(pANTLR3_INT_STREAM is);
+static	ANTLR3_UINT32		    LA				(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
+static	ANTLR3_UINT64		    mark			(pANTLR3_INT_STREAM is);
+static	void			    release			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
+static	void			    rewindMark			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
+static	void			    seek			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
+static	ANTLR3_UINT64		    size			(pANTLR3_INT_STREAM is);
 
 
+static	void			    antlr3TreeNodeStreamFree	    (pANTLR3_TREE_NODE_STREAM tns);
+static	void			    antlr3CommonTreeNodeStreamFree  (pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 
+ANTLR3_API pANTLR3_TREE_NODE_STREAM
+antlr3TreeNodeStreamNew()
+{
+    pANTLR3_TREE_NODE_STREAM stream;
 
+    /* Memory for the interface structure
+     */
+    stream  = (pANTLR3_TREE_NODE_STREAM) ANTLR3_MALLOC(sizeof(ANTLR3_TREE_NODE_STREAM));
 
+    if	(stream == NULL)
+    {
+	return	(pANTLR3_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+    }
 
+    /* Install basic API 
+     */
+    stream->free    = ANTLR3_API_FUNC antlr3TreeNodeStreamFree;
+    
+    return stream;
+}
 
+static void
+antlr3TreeNodeStreamFree(pANTLR3_TREE_NODE_STREAM stream)
+{   
+    ANTLR3_FREE(stream);
+}
 
+ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM
+antlr3CommonTreeNodeStreamNew(ANTLR3_UINT32 hint)
+{
+    pANTLR3_COMMON_TREE_NODE_STREAM stream;
+    pANTLR3_COMMON_TOKEN	    token;
+
+    /* Memory for the interface structure
+     */
+    stream  = (pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_MALLOC(sizeof(ANTLR3_COMMON_TREE_NODE_STREAM));
+
+    if	(stream == NULL)
+    {
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+    }
+
+     /* String factory for tree walker
+     */
+    stream->stringFactory		= antlr3StringFactoryNew();
+
+    if	(stream->stringFactory == (pANTLR3_STRING_FACTORY) ANTLR3_ERR_NOMEM)
+    {
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+    }
+
+    /* Create an adaptor for the common tree node stream
+     */
+    stream->adaptor	    = ANTLR3_TREE_ADAPTORNew();
+
+    if	(stream->adaptor == (pANTLR3_TREE_ADAPTOR) ANTLR3_ERR_NOMEM)
+    {
+	stream->stringFactory->close	(stream->stringFactory);
+
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+    }
+
+    /* Create space for the tree node stream interface
+     */
+    stream->tnstream	    = antlr3TreeNodeStreamNew();
+
+    if	(stream->tnstream == (pANTLR3_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM)
+    {
+	stream->stringFactory->close	(stream->stringFactory);
+	stream->adaptor->free		(stream->adaptor);
+
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+    }
+
+    /* Create space for the INT_STREAM interfacce
+     */
+    stream->tnstream->istream		    = ANTLR3_API_FUNC antlr3IntStreamNew();
+    
+    if	(stream->tnstream->istream == (pANTLR3_INT_STREAM) ANTLR3_ERR_NOMEM)
+    {
+	stream->stringFactory->close	(stream->stringFactory);
+	stream->adaptor->free		(stream->adaptor);
+	stream->tnstream->free		(stream->tnstream);
+
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+    }
+
+    /* Install the common tree node stream API
+     */
+    stream->addLookahead		    = ANTLR3_API_FUNC addLookahead;
+    stream->addNavigationNode		    = ANTLR3_API_FUNC addNavigationNode;
+    stream->fill			    = ANTLR3_API_FUNC fill;
+    stream->getLookaheadSize		    = ANTLR3_API_FUNC getLookaheadSize;
+    stream->handleRootnode		    = ANTLR3_API_FUNC handleRootnode;
+    stream->hasNext			    = ANTLR3_API_FUNC hasNext;
+    stream->hasUniqueNavigationNodes	    = ANTLR3_API_FUNC hasUniqueNavigationNodes;
+    stream->newDownNode			    = ANTLR3_API_FUNC newDownNode;
+    stream->newUpNode			    = ANTLR3_API_FUNC newUpNode;
+    stream->next			    = ANTLR3_API_FUNC next;
+    stream->reset			    = ANTLR3_API_FUNC reset;
+    stream->toNodesOnlyString		    = ANTLR3_API_FUNC toNodesOnlyString;
+    stream->visitChild			    = ANTLR3_API_FUNC visitChild;
+    stream->walkBackToMostRecentNodeWithUnvisitedChildren
+					    = ANTLR3_API_FUNC walkBackToMostRecentNodeWithUnvisitedChildren;
+ 
+    stream->free			    = ANTLR3_API_FUNC antlr3CommonTreeNodeStreamFree;
+
+    /* Install the tree node stream API
+     */
+    stream->tnstream->getTreeAdaptor		= ANTLR3_API_FUNC getTreeAdaptor;
+    stream->tnstream->getTreeSource		= ANTLR3_API_FUNC getTreeSource;
+    stream->tnstream->LT			= ANTLR3_API_FUNC LT;
+    stream->tnstream->setUniqueNavigationNodes	= ANTLR3_API_FUNC setUniqueNavigationNodes;
+    stream->tnstream->toString			= ANTLR3_API_FUNC toString;
+    stream->tnstream->toStringSS		= ANTLR3_API_FUNC toStringSS;
+    stream->tnstream->toStringWork		= ANTLR3_API_FUNC toStringWork;
+
+    /* Install INT_STREAM interface
+     */
+    stream->tnstream->istream->consume	    = ANTLR3_API_FUNC consume;
+    stream->tnstream->istream->exConstruct  = ANTLR3_API_FUNC antlr3MTExceptionNew;
+    stream->tnstream->istream->index	    = ANTLR3_API_FUNC index;
+    stream->tnstream->istream->LA	    = ANTLR3_API_FUNC LA;
+    stream->tnstream->istream->mark	    = ANTLR3_API_FUNC mark;
+    stream->tnstream->istream->release	    = ANTLR3_API_FUNC release;
+    stream->tnstream->istream->rewind	    = ANTLR3_API_FUNC rewindMark;
+    stream->tnstream->istream->seek	    = ANTLR3_API_FUNC seek;
+    stream->tnstream->istream->size	    = ANTLR3_API_FUNC size;
+
+    
+    /* Initialize data elements of INT stream
+     */
+    stream->tnstream->istream->type	    = ANTLR3_COMMONTREENODE;
+    stream->tnstream->istream->super	    = ANTLR3_API_FUNC (stream->tnstream);
+
+    /* Initialize data elements of TREE stream
+     */
+    stream->tnstream->ctns = ANTLR3_API_FUNC stream;
+
+    /* Initialize data elements of the TREE NODE stream
+     */
+    stream->super			= NULL;
+    stream->uniqueNavigationNodes	= ANTLR3_FALSE;
+    stream->nodeStack			= antlr3StackNew(hint);
+    stream->lookAheadLength		= INITIAL_LOOKAHEAD_BUFFER_SIZE;
+    stream->lookAhead			= (pANTLR3_BASE_TREE *) ANTLR3_MALLOC( INITIAL_LOOKAHEAD_BUFFER_SIZE * sizeof(pANTLR3_BASE_TREE) );
+    stream->markers			= NULL;
+
+    /* Install the navigation nodes     
+     */
+    antlr3BaseTreeNew(&(stream->UP.baseTree));
+    antlr3BaseTreeNew(&(stream->DOWN.baseTree));
+    antlr3BaseTreeNew(&(stream->EOF_NODE.baseTree));
+    antlr3BaseTreeNew(&(stream->INVALID_NODE.baseTree));
+
+    token			= antlr3CommonTokenNew(ANTLR3_TOKEN_UP);
+    token->text			= stream->stringFactory->newPtr(stream->stringFactory, (pANTLR3_UINT8)"UP", 2);
+    stream->UP.token		= token;
+
+    token			= antlr3CommonTokenNew(ANTLR3_TOKEN_DOWN);
+    token->text			= stream->stringFactory->newPtr(stream->stringFactory, (pANTLR3_UINT8)"DOWN", 2);
+    stream->DOWN.token		= token;
+
+    token			= antlr3CommonTokenNew(ANTLR3_TOKEN_EOF);
+    token->text			= stream->stringFactory->newPtr(stream->stringFactory, (pANTLR3_UINT8)"EOF", 2);
+    stream->EOF_NODE.token	= token;
+
+    token			= antlr3CommonTokenNew(ANTLR3_TOKEN_INVALID);
+    token->text			= stream->stringFactory->newPtr(stream->stringFactory, (pANTLR3_UINT8)"INVALID", 2);
+    stream->INVALID_NODE.token	= token;
+
+    return  stream;
+}
+
+static	void			    antlr3CommonTreeNodeStreamFree  (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+{
+}
 
 /** Reset the input stream to the start of the input nodes.
  */
@@ -73,11 +251,11 @@ reset	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
  *  for both parser and tree grammars. :)
  */
 static	pANTLR3_BASE_TREE	    
-LT	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 k)
+LT	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_UINT64 k)
 {
     if	(k == -1)
     {
-	return	ctns->previousNode;
+	return	tns->ctns->previousNode;
     }
     else if	(k < 0)
     {
@@ -86,27 +264,27 @@ LT	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 k)
     }
     else if	(k == 0)
     {
-	return	&(ctns->INVALID_NODE);
+	return	&(tns->ctns->INVALID_NODE.baseTree);
     }
 
     /* k was a legitimate request, so we need to ensure we have at least
      * k nodes in the look ahead buffer.
      */
-    ctns->fill(ctns, k);
+    tns->ctns->fill(tns->ctns, k);
 
     /* Return k tokens in front of the current head token, allowing for the fact
      * that k could wrap around the circular buffer.
      */
-    return  *(ctns->lookAhead + ((ctns->head + k + 1) % ctns->lookAheadLength));
+    return  *(tns->ctns->lookAhead + ((tns->ctns->head + k + 1) % tns->ctns->lookAheadLength));
 }
 
 /** Where is this stream pulling nodes from?  This is not the name, but
  *  the object that provides node objects.
  */
 static	pANTLR3_BASE_TREE	    
-getTreeSource	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+getTreeSource	(pANTLR3_TREE_NODE_STREAM tns)
 {
-    return  ctns->root;
+    return  tns->ctns->root;
 }
 
 /** Make sure we have at least k symbols in lookahead buffer 
@@ -168,8 +346,14 @@ addLookahead	(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE node)
 /** Consume the next node from the input stream
  */
 static	void		    
-consume	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+consume	(pANTLR3_INT_STREAM is)
 {
+    pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
+    ctns    = tns->ctns;
+
     /* Make sure that we have at least one node to consume in the lookahead
      * buffer by calling fill, which might call next.
      */
@@ -186,13 +370,18 @@ consume	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 }
 
 static	ANTLR3_UINT32	    
-LA	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 i)
+LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 {
-    pANTLR3_BASE_TREE	t;
+    pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+    pANTLR3_BASE_TREE			t;
+
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
+    ctns    = tns->ctns;
 
     /* Ask LT for the 'token' at that position
      */
-    t = ctns->LT(ctns, i);
+    t = tns->LT(tns, i);
 
     if	(t == NULL)
     {
@@ -227,9 +416,15 @@ markFree(void * memory)
  * after a syntactic predicate and so on.
  */
 static	ANTLR3_UINT64	    
-mark	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+mark	(pANTLR3_INT_STREAM is)
 {
-    pANTLR3_TREE_WALK_STATE	state;
+    pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+    pANTLR3_TREE_WALK_STATE		state;
+
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
+    ctns    = tns->ctns;
+
 
     if	(ctns->markers == NULL)
     {
@@ -276,7 +471,7 @@ mark	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 }
 
 static	void		    
-release	(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 marker)
+release	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 {
     fprintf(stderr, "Cannot release a tree parse\n");
 }
@@ -288,10 +483,15 @@ release	(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 marker)
  *  upon mark().
  */
 static	void		    
-rewindMark	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 marker)
+rewindMark	    (pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 {
-    pANTLR3_TREE_WALK_STATE	state;
-    ANTLR3_UINT64		m;
+    pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+    pANTLR3_TREE_WALK_STATE		state;
+    ANTLR3_UINT64			m;
+
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
+    ctns    = tns->ctns;
 
     if	(ctns->markers == NULL || ctns->markers->size(ctns->markers) < marker)
     {
@@ -339,18 +539,24 @@ rewindMark	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 marker)
 static	void		    
 rewindInput	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 {
-    ctns->rewindMark(ctns, ctns->lastMarker);
+    ctns->tnstream->istream->rewind(ctns->tnstream->istream, ctns->lastMarker);
 }
 
 /** consume() ahead until we hit index.  Can't just jump ahead--must
  *  spit out the navigation nodes.
  */
 static	void		    
-seek	(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 index)
+seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index)
 {
+    pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
+    ctns    = tns->ctns;
+
     /* Check for trying to seek in reverse
      */
-    if	(index < ctns->index(ctns))
+    if	((ANTLR3_INT64)index < is->index(is))
     {
 	fprintf(stderr, "Can't seek backwards in a node stream\n");
     }
@@ -358,15 +564,21 @@ seek	(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 index)
     /* Seek forwards, so we consume nodes until we arrive at the
      * index.
      */
-    while   (ctns->index(ctns) < index)
+    while   (is->index(is) < (ANTLR3_INT64)index)
     {
-	ctns->consume(ctns);
+	is->consume(is);
     }
 }
 
-static	ANTLR3_UINT64		    
-index	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+static	ANTLR3_INT64		    
+index	(pANTLR3_INT_STREAM is)
 {
+    pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
+    ctns    = tns->ctns;
+
     return ctns->absoluteNodeIndex + 1;
 }
 
@@ -375,8 +587,14 @@ index	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
  *  after parsing it returns true size.
  */
 static	ANTLR3_UINT64		    
-size	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+size	(pANTLR3_INT_STREAM is)
 {
+    pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
+    ctns    = tns->ctns;
+
     return ctns->absoluteNodeIndex + 1;
 }
 
@@ -407,7 +625,7 @@ next	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
      */
     if	(ctns->currentNode == NULL)
     {
-	ctns->addLookahead(ctns, &(ctns->EOF_NODE));
+	ctns->addLookahead(ctns, &(ctns->EOF_NODE.baseTree));
 	return	NULL;
     }
 
@@ -533,7 +751,7 @@ addNavigationNode	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT32 ttype
 	}
 	else
 	{
-	    node    = &(ctns->DOWN);
+	    node    = &(ctns->DOWN.baseTree);
 	}
     }
     else
@@ -544,7 +762,7 @@ addNavigationNode	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT32 ttype
 	}
 	else
 	{
-	    node    = &(ctns->UP);
+	    node    = &(ctns->UP.baseTree);
 	}
     }
 
@@ -592,9 +810,9 @@ walkBackToMostRecentNodeWithUnvisitedChildren	    (pANTLR3_COMMON_TREE_NODE_STRE
 }
 
 static	pANTLR3_BASE_TREE_ADAPTOR			    
-getTreeAdaptor	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+getTreeAdaptor	(pANTLR3_TREE_NODE_STREAM tns)
 {
-    return  ctns->adaptor;
+    return  tns->ctns->adaptor;
 }
 
 static	ANTLR3_BOOLEAN	    
@@ -604,9 +822,9 @@ hasUniqueNavigationNodes	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 }
 
 static	void		    
-setUniqueNavigationNodes	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_BOOLEAN uniqueNavigationNodes)
+setUniqueNavigationNodes	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_BOOLEAN uniqueNavigationNodes)
 {
-    ctns->uniqueNavigationNodes = uniqueNavigationNodes;
+    tns->ctns->uniqueNavigationNodes = uniqueNavigationNodes;
 }
 
 /** Using the Iterator interface, return a list of all the token types
@@ -637,25 +855,25 @@ toNodesOnlyString	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
  *  the token types not text.
  */
 static	pANTLR3_STRING	    
-toString	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+toString	    (pANTLR3_TREE_NODE_STREAM tns)
 {
-    return  ctns->toStringSS(ctns, ctns->root, NULL);
+    return  tns->toStringSS(tns, tns->ctns->root, NULL);
 }
 
 static	pANTLR3_STRING	    
-toStringSS	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop)
+toStringSS	    (pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop)
 {
     pANTLR3_STRING  buf;
 
-    buf = ctns->stringFactory->newRaw(ctns->stringFactory);
+    buf = tns->ctns->stringFactory->newRaw(tns->ctns->stringFactory);
 
-    ctns->toStringWork(ctns, start, stop, buf);
+    tns->toStringWork(tns, start, stop, buf);
 
     return  buf;
 }
 
 static	void	    
-toStringWork	(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TREE stop, pANTLR3_STRING buf)
+toStringWork	(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TREE stop, pANTLR3_STRING buf)
 {
 
     ANTLR3_UINT64   n;
@@ -669,7 +887,7 @@ toStringWork	(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE p, pANTLR3
 
 	if  (text == NULL)
 	{
-	    text = ctns->stringFactory->newRaw(ctns->stringFactory);
+	    text = tns->ctns->stringFactory->newRaw(tns->ctns->stringFactory);
 
 	    text->append    (text, " ");
 	    text->addi	    (text, p->getType(p));
@@ -696,7 +914,7 @@ toStringWork	(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE p, pANTLR3
 	pANTLR3_BASE_TREE   child;
 
 	child = p->getChild(p, c);
-	ctns->toStringWork(ctns, child, stop, buf);
+	tns->toStringWork(tns, child, stop, buf);
     }
 
     if	(n > 0 && ! p->isNil(p) )
@@ -717,9 +935,25 @@ getLookaheadSize	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 static	pANTLR3_BASE_TREE	    
 newDownNode		(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 {
+    pANTLR3_COMMON_TREE	    dNode;
+    pANTLR3_COMMON_TOKEN    token;
+
+    token	= antlr3CommonTokenNew(ANTLR3_TOKEN_DOWN);
+    token->text	= ctns->stringFactory->newPtr(ctns->stringFactory, (pANTLR3_UINT8)"DOWN", 4);
+    dNode	= antlr3CommonTreeNewFromToken(token);
+
+    return  &(dNode->baseTree);
 }
 
 static	pANTLR3_BASE_TREE	    
 newUpNode		(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 {
+    pANTLR3_COMMON_TREE	    uNode;
+    pANTLR3_COMMON_TOKEN    token;
+
+    token	= antlr3CommonTokenNew(ANTLR3_TOKEN_UP);
+    token->text	= ctns->stringFactory->newPtr(ctns->stringFactory, (pANTLR3_UINT8)"UP", 2);
+    uNode	= antlr3CommonTreeNewFromToken(token);
+
+    return  &(uNode->baseTree);
 }
