@@ -528,6 +528,10 @@
 				RelativePath=".\src\antlr3tokenstream.c"
 				>
 			</File>
+			<File
+				RelativePath=".\src\antlr3treeparser.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -638,17 +642,21 @@
 				RelativePath=".\include\antlr3treenodestream.h"
 				>
 			</File>
+			<File
+				RelativePath=".\include\antlr3treeparser.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Templates"
 			Filter=".stg"
 			>
 			<File
-				RelativePath="..\..\src\org\antlr\codegen\templates\Java\AST.stg"
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg"
+				RelativePath="..\..\src\org\antlr\codegen\templates\Java\AST.stg"
 				>
 			</File>
 			<File

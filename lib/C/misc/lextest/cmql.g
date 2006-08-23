@@ -1048,7 +1048,7 @@ ELEMENT         :       'element';
 ENUM            :       'ENUM';
 EQ              :       'EQ' | '=';
 EVAL            :       'EVAL';
-BFALSE          :      'false';
+BFALSE          :       'false';
 FILENAME        :	'filename';
 FILETYPE        :       'filetype';
 FMT             :	'FMT';

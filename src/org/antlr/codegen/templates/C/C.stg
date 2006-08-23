@@ -968,7 +968,7 @@ treeParser(	grammar,
 			superClass="TreeParser", 
 			members={<actions.treeparser.members>}
 			) ::= <<
-<genericParser(inputStreamType="TreeNodeStream", ...)>
+<genericParser(inputStreamType="pANTLR3_COMMON_TREE_NODE_STREAM", ...)>
 >>
 
 /** A simpler version of a rule template that is specific to the imaginary
