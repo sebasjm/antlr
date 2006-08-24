@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0b3
-July 21, 2006
+ANTLR 3.0b4
+August 24, 2006
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -175,12 +175,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0b3/README.txt (this file)
-antlr-3.0b3/LICENSE.txt
-antlr-3.0b3/src/org/antlr/...
-antlr-3.0b3/lib/stringtemplate-2.3b9.jar (3.0b3 needs 2.3b9)
-antlr-3.0b3/lib/antlr-2.7.6.jar
-antlr-3.0b3/lib/antlr-3.0b3.jar
+antlr-3.0b4/README.txt (this file)
+antlr-3.0b4/LICENSE.txt
+antlr-3.0b4/src/org/antlr/...
+antlr-3.0b4/lib/stringtemplate-2.3b9.jar (3.0b4 needs 2.3b9)
+antlr-3.0b4/lib/antlr-2.7.6.jar
+antlr-3.0b4/lib/antlr-3.0b4.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -193,7 +193,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0b3 (July 5, 2006) 1989-2006
+ANTLR Parser Generator   Early Access Version 3.0b4 (August 24, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir   specify output directory where all output is generated
   -lib dir       specify location of token files
@@ -259,10 +259,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0b3/lib/stringtemplate-2.3b9.jar
-antlr-3.0b3/lib/antlr-2.7.6.jar
+antlr-3.0b4/lib/stringtemplate-2.3b9.jar
+antlr-3.0b4/lib/antlr-2.7.6.jar
 
-then jump into antlr-3.0b3/src directory and then type:
+then jump into antlr-3.0b4/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -274,7 +274,29 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
-3.0b4 - ??
+3.0b4 - August 24, 2006
+
+August 24, 2006
+
+* added C# target to lib, codegen, templates
+
+August 11, 2006
+
+* added tree arg to navigation methods in treeadaptor
+
+August 07, 2006
+
+* fixed bug related to (a|)+ on end of lexer rules.  crashed instead
+  of warning.
+
+* added warning that interpreter doesn't do synpreds yet
+
+* allow different source of classloader:
+ClassLoader cl = Thread.currentThread().getContextClassLoader();
+if ( cl==null ) {
+    cl = this.getClass().getClassLoader();
+}
+
 
 July 26, 2006
 
