@@ -252,20 +252,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\java.g"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Translating"
-						CommandLine="java.exe -Xmx500M -classpath &quot;C:\antlrsrc\code\stringtemplate\dist\stringtemplate.jar;C:\antlrsrc\code\stringtemplate\java\main\dist\stringtemplate.jar;C:/antlrsrc/antlr276/antlr.jar;C:/antlrsrc/code/antlr/dist/antlr.jar;C:/antlrsrc/code/antlr/main/dist/antlr.jar&quot; org.antlr.Tool -dfa -nfa $(InputPath)"
-						Outputs="javaParser.java"
-					/>
-				</FileConfiguration>
-			</File>
 		</Filter>
 		<Filter
 			Name="Indexdefs"
@@ -287,6 +273,14 @@
 			</File>
 			<File
 				RelativePath=".\cmqlTree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\JavaParser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\JavaParserLexer.h"
 				>
 			</File>
 			<File

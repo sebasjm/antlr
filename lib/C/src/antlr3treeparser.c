@@ -45,6 +45,7 @@ antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREA
      * from the base recognizer structure
      */
     parser->rec->super	= parser;
+    parser->rec->type	= ANTLR3_TYPE_TREE_PARSER;
 
     /* Install our base recognizer overrides
      */
@@ -112,7 +113,7 @@ static void
 setTreeNodeStream	(pANTLR3_TREE_PARSER parser, pANTLR3_COMMON_TREE_NODE_STREAM input)
 {
     parser->ctnstream = input;
-    parser->rec->reset(parser->rec);
+  //  parser->rec->reset(parser->rec);
 }
 
 /** Return a pointer to the input stream

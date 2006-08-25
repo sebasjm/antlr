@@ -48,7 +48,7 @@ public class CTarget extends Target {
                 // we need to add all the string literals that we are going to match
                 //
                 outputFileST.setAttribute("literals", strings);
-               // System.out.println(outputFileST.toStructureString());
+                //System.out.println(outputFileST.toStructureString());
 		String fileName = generator.getRecognizerFileName();
 		generator.write(outputFileST, fileName);
 	}
@@ -69,7 +69,7 @@ public class CTarget extends Target {
 										   StringTemplate recognizerST,
 										   StringTemplate cyclicDFAST)
 	{
-		return cyclicDFAST;
+		return recognizerST;
 	}
         
  	/** Is scope in @scope::name {action} valid for this kind of grammar?

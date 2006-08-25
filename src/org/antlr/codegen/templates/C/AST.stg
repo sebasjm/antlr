@@ -38,7 +38,11 @@ pANTLR3_BASE_TREE_ADAPTOR	adaptor;
  *  tree parsers and producers require.
  */
 @genericParser.apifuncs() ::= <<
+<if(PARSER)>
 ctx->adaptor	= ANTLR3_TREE_ADAPTORNew();
+<else>
+ctx->adaptor	= instream->adaptor;
+<endif>
 >>
 
 @returnScope.ruleReturnMembers() ::= <<
@@ -104,15 +108,16 @@ ruleCleanUp() ::= <<
 <if(backtracking)>
 if ( backtracking==0 ) {<\n>
 <endif>
+<if(!ruleDescriptor.isSynPred)>
+	retval.stop = LT(-1);<\n>
+<endif>
 	retval.tree = ctx->adaptor->rulePostProcessing(ctx->adaptor, root_0);
 	ctx->adaptor->setTokenBoundaries(ctx->adaptor, retval.tree, retval.start, retval.stop);
 <if(backtracking)>
 }
 <endif>
 <endif>
-<if(!ruleDescriptor.isSynPred)>
-retval.stop = LT(-1);<\n>
-<endif>
+
 /* End: ruleCleanUp() */
 >>
 

@@ -12,8 +12,9 @@ int main( int argc, char *argv[ ])
 	pcmql				    psr;
 	pcmqlLexer			    lxr;
 	pcmqlTree			    walker;
-
-	query_return		    synError;
+	pANTLR3_STRING			    jobno;
+	
+	cmql_query_return		    synError;
 
 	pANTLR3_STRING		    treestr;
 
@@ -71,11 +72,10 @@ int main( int argc, char *argv[ ])
 
 	printf("%s\n", treestr->text);
 
-	nodes	    = antlr3CommonTreeNodeStreamNew(ANTLR3_SIZE_HINT);
-	nodes->root = synError.tree;
+	nodes	    = antlr3CommonTreeNodeStreamNewTree(synError.tree, ANTLR3_SIZE_HINT);
         walker	    = cmqlTreeNew(nodes);
 
-	walker->query(walker);
+	walker->query(walker, jobno);
 
 	tstream->free(tstream);
 	psr->free(psr);

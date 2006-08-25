@@ -75,6 +75,21 @@ antlr3TreeNodeStreamFree(pANTLR3_TREE_NODE_STREAM stream)
 {   
     ANTLR3_FREE(stream);
 }
+ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM
+antlr3CommonTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint)
+{
+    pANTLR3_COMMON_TREE_NODE_STREAM stream;
+
+    stream = antlr3CommonTreeNodeStreamNew(hint);
+
+    if	(stream == (pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM)
+    {
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+    }
+    stream->root    = tree;
+
+    return stream;
+}
 
 ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM
 antlr3CommonTreeNodeStreamNew(ANTLR3_UINT32 hint)
