@@ -104,7 +104,7 @@ antlr3CommonTreeNodeStreamNew(ANTLR3_UINT32 hint)
      */
     stream->adaptor	    = ANTLR3_TREE_ADAPTORNew();
 
-    if	(stream->adaptor == (pANTLR3_TREE_ADAPTOR) ANTLR3_ERR_NOMEM)
+    if	(stream->adaptor == (pANTLR3_BASE_TREE_ADAPTOR) ANTLR3_ERR_NOMEM)
     {
 	stream->stringFactory->close	(stream->stringFactory);
 
@@ -169,7 +169,6 @@ antlr3CommonTreeNodeStreamNew(ANTLR3_UINT32 hint)
     /* Install INT_STREAM interface
      */
     stream->tnstream->istream->consume	    = ANTLR3_API_FUNC consume;
-    stream->tnstream->istream->exConstruct  = ANTLR3_API_FUNC antlr3MTExceptionNew;
     stream->tnstream->istream->index	    = ANTLR3_API_FUNC index;
     stream->tnstream->istream->LA	    = ANTLR3_API_FUNC LA;
     stream->tnstream->istream->mark	    = ANTLR3_API_FUNC mark;
@@ -685,7 +684,7 @@ handleRootnode	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 	 */
 	ctns->addLookahead(ctns, node);
 	
-	if  ( ctns->currentNode->getChildCount(ctns) == 0)
+	if  ( ctns->currentNode->getChildCount(ctns->currentNode) == 0)
 	{
 	    /* This is a single node with no children
 	     */

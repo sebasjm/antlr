@@ -13,29 +13,25 @@
 #endif
 
 /* BASE_TREE_ADAPTOR overrides... */
-static	pANTLR3_BASE_TREE	dupNode		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE treeNode);
-static	pANTLR3_BASE_TREE	create		(pANTLR3_TREE_ADAPTOR adpator, pANTLR3_COMMON_TOKEN payload);
-static	pANTLR3_COMMON_TOKEN	createToken	(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);
-static	pANTLR3_COMMON_TOKEN	createTokenFromToken	(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fromToken);
-static	pANTLR3_UINT8		getText		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	ANTLR3_UINT32		getType		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_BASE_TREE	dupNode		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE treeNode);
+static	pANTLR3_BASE_TREE	create		(pANTLR3_BASE_TREE_ADAPTOR adpator, pANTLR3_COMMON_TOKEN payload);
+static	pANTLR3_COMMON_TOKEN	createToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);
+static	pANTLR3_COMMON_TOKEN	createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fromToken);
+static	pANTLR3_UINT8		getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_UINT32		getType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
 /* Methods specific to each tree adaptor
  */
-static	void		setTokenBoundaries	(pANTLR3_COMMON_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken);
-static	ANTLR3_UINT64   getTokenStartIndex	(pANTLR3_COMMON_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static  ANTLR3_UINT64   getTokenStopIndex	(pANTLR3_COMMON_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	void		setTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken);
+static	ANTLR3_UINT64   getTokenStartIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static  ANTLR3_UINT64   getTokenStopIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
 /** Create a new tree adaptor. Note that despite the fact that this is
  *  creating a new COMMON_TREE adaptor, we return the address of the
- * BASE_TREE interface, as should any other adaptor that wishes to be 
- * used as the tree element of a tree parse/build.
- *
- * The name of this function is very important, it should be the name of
- * the ASTlabel type that is specified in the grammar, subscripted by
- * New. This should also be the same for your own tree adaptors,
+ *  BASE_TREE interface, as should any other adaptor that wishes to be 
+ *  used as the tree element of a tree parse/build.
  */
-ANTLR3_API pANTLR3_TREE_ADAPTOR
+ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR
 ANTLR3_TREE_ADAPTORNew()
 {
     pANTLR3_COMMON_TREE_ADAPTOR	cta;
@@ -46,7 +42,7 @@ ANTLR3_TREE_ADAPTORNew()
 
     if	(cta == NULL)
     {
-	return	(pANTLR3_TREE_ADAPTOR)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_BASE_TREE_ADAPTOR)(ANTLR3_ERR_NOMEM);
     }
 
     /* Memory is initialized, so initialize the base tree adaptor
@@ -88,13 +84,13 @@ ANTLR3_TREE_ADAPTORNew()
 /** Duplicate the supplied node.
  */
 static	pANTLR3_BASE_TREE
-dupNode		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE treeNode)
+dupNode		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE treeNode)
 {
     return  treeNode->dupNode(treeNode);
 }
 
 static	pANTLR3_BASE_TREE
-create		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN payload)
+create		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN payload)
 {
     pANTLR3_BASE_TREE	ct;
     
@@ -117,7 +113,7 @@ create		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN payload)
  *  override this method and any other createToken variant.
  */
 static	pANTLR3_COMMON_TOKEN
-createToken		(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text)
+createToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text)
 {
     pANTLR3_COMMON_TOKEN    newToken;
 
@@ -153,7 +149,7 @@ createToken		(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UIN
  *     this interface.
  */
 static	pANTLR3_COMMON_TOKEN
-createTokenFromToken	(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fromToken)
+createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fromToken)
 {
     pANTLR3_COMMON_TOKEN    newToken;
 
@@ -185,7 +181,7 @@ createTokenFromToken	(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fromTok
  *  Might be useful info so I'll not force to be i..i.
  */
 static	void
-setTokenBoundaries	(pANTLR3_COMMON_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken)
+setTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken)
 {
     ANTLR3_UINT64   start;
     ANTLR3_UINT64   stop;
@@ -223,25 +219,25 @@ setTokenBoundaries	(pANTLR3_COMMON_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pA
 }
 
 static	ANTLR3_UINT64   
-getTokenStartIndex	(pANTLR3_COMMON_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+getTokenStartIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
     return  ((pANTLR3_COMMON_TREE)(t->super))->startIndex;
 }
 
 static	ANTLR3_UINT64   
-getTokenStopIndex	(pANTLR3_COMMON_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+getTokenStopIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
     return  ((pANTLR3_COMMON_TREE)(t->super))->stopIndex;
 }
 
 static	pANTLR3_UINT8
-getText		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
     return  ((pANTLR3_COMMON_TREE)(t->super))->getText(t);
 }
 
 static	ANTLR3_UINT32
-getType		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+getType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
     return  t->getType(t);
 }

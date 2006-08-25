@@ -36,8 +36,7 @@ typedef struct ANTLR3_TOKEN_SOURCE_struct	    *pANTLR3_TOKEN_SOURCE;
 typedef	struct ANTLR3_TOKEN_STREAM_struct	    *pANTLR3_TOKEN_STREAM;
 typedef	struct ANTLR3_COMMON_TOKEN_STREAM_struct    *pANTLR3_COMMON_TOKEN_STREAM;
 
-typedef	struct ANTLR3_DFA_STATE_struct		    *pANTLR3_DFA_STATE;
-typedef	struct ANTLR3_DFA_struct		    *pANTLR3_DFA;
+typedef struct ANTLR3_CYCLIC_DFA_struct		    *pANTLR3_CYCLIC_DFA;
 
 typedef	struct ANTLR3_LEXER_struct		    *pANTLR3_LEXER;
 typedef struct ANTLR3_PARSER_struct		    *pANTLR3_PARSER;
@@ -50,12 +49,10 @@ typedef	struct ANTLR3_PARSE_TREE_struct		    *pANTLR3_PARSE_TREE;
 typedef struct ANTLR3_TREE_NODE_STREAM_struct	    *pANTLR3_TREE_NODE_STREAM;
 typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct    *pANTLR3_COMMON_TREE_NODE_STREAM;
 typedef struct ANTLR3_TREE_WALK_STATE_struct	    *pANTLR3_TREE_WALK_STATE;
+
 typedef struct ANTLR3_BASE_TREE_ADAPTOR_struct	    *pANTLR3_BASE_TREE_ADAPTOR;
 typedef	struct ANTLR3_COMMON_TREE_ADAPTOR_struct    *pANTLR3_COMMON_TREE_ADAPTOR;
+
 typedef struct ANTLR3_TREE_PARSER_struct	    *pANTLR3_TREE_PARSER;
 
-typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct	    *pANTLR3_TREE_ADAPTOR;
-typedef struct ANTLR3_COMMON_TREE_ADAPTOR_struct    *pANTLR3_COMMON_TREE_ADAPTOR;
-
-typedef	struct ANTLR3_TREE_PARSER_struct	    *pANTLR3_TREE_PARSER;
 #endif

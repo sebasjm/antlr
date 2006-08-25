@@ -1,14 +1,18 @@
 #include    <antlr3.h>
 #include    <cmql.h>
 #include    <cmqlLexer.h>
+#include    <cmqlTree.h>
 
 int main( int argc, char *argv[ ])
 {
 
-	pANTLR3_INPUT_STREAM	    input;
+	pANTLR3_INPUT_STREAM		    input;
 	pANTLR3_COMMON_TOKEN_STREAM	    tstream;
-	pcmql			    psr;
+	pANTLR3_COMMON_TREE_NODE_STREAM	    nodes;
+	pcmql				    psr;
 	pcmqlLexer			    lxr;
+	pcmqlTree			    walker;
+
 	query_return		    synError;
 
 	pANTLR3_STRING		    treestr;
@@ -66,6 +70,12 @@ int main( int argc, char *argv[ ])
 	treestr = synError.tree->toStringTree(synError.tree);
 
 	printf("%s\n", treestr->text);
+
+	nodes	    = antlr3CommonTreeNodeStreamNew(ANTLR3_SIZE_HINT);
+	nodes->root = synError.tree;
+        walker	    = cmqlTreeNew(nodes);
+
+	walker->query(walker);
 
 	tstream->free(tstream);
 	psr->free(psr);

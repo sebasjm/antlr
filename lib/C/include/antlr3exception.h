@@ -53,6 +53,10 @@
 #define	ANTLR3_FAILED_PREDICATE_EXCEPTION   6
 #define	ANTLR3_FAILED_PREDICATE_NAME	    "Predicate failed!"
 
+#define	ANTLR3_MISMATCHED_TREE_NODE_EXCEPTION	7
+#define	ANTLR3_MISMATCHED_TREE_NODE_NAME    "Mismatched tree node!"
+
+
 /** Base structure for an ANTLR3 exception tracker
  */
 typedef	struct ANTLR3_EXCEPTION_struct
@@ -88,11 +92,15 @@ typedef	struct ANTLR3_EXCEPTION_struct
      */
     ANTLR3_UINT64   index;
 
-    /** Indicates what the current token was when the error occurred. Since not
+    /** Indicates what the current token/tree was when the error occurred. Since not
      *  all input streams will be able to retrieve the nth token, we track it here
      *  instead. This is for parsers, and even tree parsers may set this.
      */
     void	* token;
+
+    /** Indicates the token we were expecting to see next when teh error occured
+     */
+    ANTLR3_UINT32   expecting;
 
     /** If this is a tree parser exception then the node is set to point ot the node
      * that caused the issue.

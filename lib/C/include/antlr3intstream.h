@@ -68,25 +68,10 @@ typedef	struct ANTLR3_INT_STREAM_struct
      */
     void		    * super;
 
-    /** Special token for a token stream to restun EOF by
+    /** Special token for a token stream to return EOF by
      */
     pANTLR3_COMMON_TOKEN    eofToken;
     
-    /** If set to ANTLR3_TRUE then the input stream has an exception
-     * condition (this is tested by the generated code for the rules of
-     * the grammar).
-     */
-    ANTLR3_BOOLEAN	    error;
-
-    /** Points to the first in a possible chain of exceptions that the
-     *  recognizer has discovered.
-     */
-    pANTLR3_EXCEPTION	    exception;
-
-    /** Pointer to a funtion that can construct a generic exception structure
-     * with such information as the input stream can privide.
-     */
-    void		    (*exConstruct)  (struct ANTLR3_INT_STREAM_struct * intStream);
 
     /** Consume the next 'ANTR3_UINT32' in the stream
      */

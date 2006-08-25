@@ -171,7 +171,6 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
     stream->tstream->istream		    = ANTLR3_API_FUNC antlr3IntStreamNew();
     stream->tstream->istream->super	    = ANTLR3_API_FUNC (stream->tstream);
     stream->tstream->istream->type	    = ANTLR3_TOKENSTREAM;
-    stream->tstream->istream->exConstruct   = ANTLR3_API_FUNC antlr3MTExceptionNew;
 
     /* Install the token tracking tables
      */

@@ -156,9 +156,9 @@ ANTLR3_API pANTLR3_BITSET	    antlr3BitsetCopy		    (pANTLR3_UINT64 inSet, ANTLR
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetLoad		    (ANTLR3_UINT32 ec, pANTLR3_UINT64 bset);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER  antlr3BaseRecognizerNew	    (ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint);
-ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_INT_STREAM input);
-ANTLR3_API void			    antlr3MTExceptionNew	    (pANTLR3_INT_STREAM input);
-
+ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_BASE_RECOGNIZER recognizer);
+ANTLR3_API void			    antlr3MTExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer);
+ANTLR3_API void			    antlr3MTNExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer);
 ANTLR3_API pANTLR3_HASH_TABLE	    antlr3HashTableNew		    (ANTLR3_UINT32 sizeHint);
 ANTLR3_API ANTLR3_UINT32	    antlr3Hash			    (void * key, ANTLR3_UINT32 keylen);
 ANTLR3_API pANTLR3_HASH_ENUM	    antlr3EnumNew		    (pANTLR3_HASH_TABLE table);
@@ -222,14 +222,20 @@ ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
 				    antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint);
 
-ANTLR3_API pANTLR3_TREE_ADAPTOR	    ANTLR3_TREE_ADAPTORNew();
-ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNew();
-ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromTree(pANTLR3_COMMON_TREE tree);
-ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromToken(pANTLR3_COMMON_TOKEN tree);
-ANTLR3_API pANTLR3_ARBORETUM	    antlr3ArboretumNew();
+ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR	    ANTLR3_TREE_ADAPTORNew();
+ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNew		    ();
+ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromTree	    (pANTLR3_COMMON_TREE tree);
+ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromToken    (pANTLR3_COMMON_TOKEN tree);
+ANTLR3_API pANTLR3_ARBORETUM	    antlr3ArboretumNew		    ();
 
-ANTLR3_API pANTLR3_BASE_TREE	    antlr3BaseTreeNew(pANTLR3_BASE_TREE tree);
+ANTLR3_API pANTLR3_BASE_TREE	    antlr3BaseTreeNew		    (pANTLR3_BASE_TREE tree);
 
-ANTLR3_API void			    antlr3BaseTreeAdaptorInit(pANTLR3_TREE_ADAPTOR adaptor);
+ANTLR3_API void			    antlr3BaseTreeAdaptorInit	    (pANTLR3_BASE_TREE_ADAPTOR adaptor);
+
+ANTLR3_API pANTLR3_TREE_PARSER	    antlr3TreeParserNewStream	    (ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREAM ctnstream);
+
+ANTLR3_API ANTLR3_INT32	    antlr3dfaspecialTransition	    (pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s);
+ANTLR3_API ANTLR3_INT32	    antlr3dfaspecialStateTransition (pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s);
+ANTLR3_API ANTLR3_INT32	    antlr3dfapredict		    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA cdfa);
 
 #endif	/* _ANTLR3DEFS_H	*/

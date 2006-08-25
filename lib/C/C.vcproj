@@ -485,6 +485,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\antlr3cyclicdfa.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\antlr3encodings.c"
 				>
 			</File>
@@ -579,6 +583,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\antlr3cyclicdfa.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\antlr3defs.h"
 				>
 			</File>
@@ -648,11 +656,11 @@
 			Filter=".stg"
 			>
 			<File
-				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg"
+				RelativePath="..\..\src\org\antlr\codegen\templates\Java\AST.stg"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\org\antlr\codegen\templates\Java\AST.stg"
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\AST.stg"
 				>
 			</File>
 			<File

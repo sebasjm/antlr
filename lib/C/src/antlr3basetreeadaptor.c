@@ -11,30 +11,30 @@
 
 /* Interface functions
  */
-static	pANTLR3_BASE_TREE	nil			(pANTLR3_TREE_ADAPTOR adaptor);
-static	pANTLR3_BASE_TREE	dupTree			(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	void			addChild		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE child);
-static	pANTLR3_BASE_TREE	becomeRoot		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRoot, pANTLR3_BASE_TREE oldRoot);
-static	pANTLR3_BASE_TREE	rulePostProcessing	(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE root);
-static	void			addChildToken		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child);
-static	pANTLR3_BASE_TREE	becomeRootToken		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN newRoot, pANTLR3_BASE_TREE oldRoot);
-static	pANTLR3_BASE_TREE	createTypeToken		(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken);
-static	pANTLR3_BASE_TREE	createTypeTokenText	(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken, pANTLR3_UINT8 text);
-static	pANTLR3_BASE_TREE	createTypeText		(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);
-static	ANTLR3_UINT32		getType			(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	void			setType			(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type);
-static	pANTLR3_UINT8		getText			(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	void			setText			(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
-static	pANTLR3_BASE_TREE	getChild		(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT64 i);
-static	pANTLR3_UINT64		getChildCount		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	ANTLR3_UINT64		getUniqueID		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_BASE_TREE	nil			(pANTLR3_BASE_TREE_ADAPTOR adaptor);
+static	pANTLR3_BASE_TREE	dupTree			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	void			addChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE child);
+static	pANTLR3_BASE_TREE	becomeRoot		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRoot, pANTLR3_BASE_TREE oldRoot);
+static	pANTLR3_BASE_TREE	rulePostProcessing	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE root);
+static	void			addChildToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child);
+static	pANTLR3_BASE_TREE	becomeRootToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN newRoot, pANTLR3_BASE_TREE oldRoot);
+static	pANTLR3_BASE_TREE	createTypeToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken);
+static	pANTLR3_BASE_TREE	createTypeTokenText	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken, pANTLR3_UINT8 text);
+static	pANTLR3_BASE_TREE	createTypeText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);
+static	ANTLR3_UINT32		getType			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	void			setType			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type);
+static	pANTLR3_UINT8		getText			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	void			setText			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
+static	pANTLR3_BASE_TREE	getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT64 i);
+static	pANTLR3_UINT64		getChildCount		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_UINT64		getUniqueID		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
 /** Given a pointer to a base tree adaptor structure (which is usually embedded in the
  *  super class the implements the tree adaptor used in the parse), initialize its
  *  function pointers and so on.
  */
 ANTLR3_API void
-antlr3BaseTreeAdaptorInit(pANTLR3_TREE_ADAPTOR adaptor)
+antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor)
 {
 	/* Initialize the interface
 	 */
@@ -64,7 +64,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_TREE_ADAPTOR adaptor)
 /** Create and return a nil tree node (no token payload)
  */
 static	pANTLR3_BASE_TREE	
-nil	    (pANTLR3_TREE_ADAPTOR adaptor)
+nil	    (pANTLR3_BASE_TREE_ADAPTOR adaptor)
 {
 	return	adaptor->create(adaptor, NULL);
 }
@@ -73,7 +73,7 @@ nil	    (pANTLR3_TREE_ADAPTOR adaptor)
  *  BASE_TREE interface.)
  */
 static	pANTLR3_BASE_TREE	
-   dupTree  (pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+   dupTree  (pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
 	return	t->dupTree(t);
 }
@@ -88,7 +88,7 @@ static	pANTLR3_BASE_TREE
  *  if it's not ok to move children to t with a simple assignment.
  */
 static	void	
-   addChild (pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE child)
+   addChild (pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE child)
 {
 	t->addChild(t, child);
 }
@@ -96,7 +96,7 @@ static	void
 /** Use the adaptor implementation to add a child node with the supplied token
  */
 static	void		
-   addChildToken		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child)
+   addChildToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child)
 {
 	adaptor->addChild(adaptor, t, adaptor->create(adaptor, child));
 }
@@ -128,7 +128,7 @@ static	void
  *  efficiency.
  */
 static	pANTLR3_BASE_TREE	
-   becomeRoot	(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pANTLR3_BASE_TREE oldRootTree)
+   becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pANTLR3_BASE_TREE oldRootTree)
 {
 	// root is just the new tree as is if there is no
 	// current root tree.
@@ -170,7 +170,7 @@ static	pANTLR3_BASE_TREE
 /** Transform ^(nil x) to x 
  */
 static	pANTLR3_BASE_TREE	
-   rulePostProcessing	(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE root)
+   rulePostProcessing	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE root)
 {
 
 	if (root != NULL && root->isNil(root) && root->getChildCount(root) == 1)
@@ -185,7 +185,7 @@ static	pANTLR3_BASE_TREE
  *  to the root of the tree.
  */
 static	pANTLR3_BASE_TREE	
-   becomeRootToken	(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN newRoot, pANTLR3_BASE_TREE oldRoot)
+   becomeRootToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN newRoot, pANTLR3_BASE_TREE oldRoot)
 {
 	return	adaptor->becomeRoot(adaptor, adaptor->create(adaptor, newRoot), oldRoot);
 }
@@ -194,7 +194,7 @@ static	pANTLR3_BASE_TREE
  *  from the supplied token.
  */
 static	pANTLR3_BASE_TREE	
-   createTypeToken	(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken)
+   createTypeToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken)
 {
 	// Create the new token
 	//
@@ -210,7 +210,7 @@ static	pANTLR3_BASE_TREE
 }
 
 static	pANTLR3_BASE_TREE	
-   createTypeTokenText	(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken, pANTLR3_UINT8 text)
+   createTypeTokenText	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken, pANTLR3_UINT8 text)
 {
 	// Create the new token
 	//
@@ -230,7 +230,7 @@ static	pANTLR3_BASE_TREE
 }
 
 static	pANTLR3_BASE_TREE	
-   createTypeText	(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text)
+   createTypeText	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text)
 {
 	pANTLR3_COMMON_TOKEN	fromToken;
 
@@ -246,7 +246,7 @@ static	pANTLR3_BASE_TREE
 /** Dummy implementation - will be supplied by super class
  */
 static	ANTLR3_UINT32	
-   getType		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+   getType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
 	return	0;
 }
@@ -254,7 +254,7 @@ static	ANTLR3_UINT32
 /** Dummy implementation - will be supplied by super class
  */
 static	void		
-   setType		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type)
+   setType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement setType()\n");
 }
@@ -262,7 +262,7 @@ static	void
 /** Dummy implementation - will be supplied by super class
  */
 static	pANTLR3_UINT8	
-   getText		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+   getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement getText()\n");
 	return	NULL;
@@ -271,20 +271,20 @@ static	pANTLR3_UINT8
 /** Dummy implementation - will be supplied by super class
  */
 static	void		
-   setText		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t)
+   setText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
 }
 
 static	pANTLR3_BASE_TREE	
-   getChild		(pANTLR3_TREE_ADAPTOR adaptor, ANTLR3_UINT64 i)
+   getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT64 i)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement getChild()\n");
 	return NULL;
 }
 
 static	pANTLR3_UINT64	
-   getChildCount	(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree)
+   getChildCount	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement getChildCount()\n");
 	return NULL;
@@ -294,7 +294,7 @@ static	pANTLR3_UINT64
  *  we can just use its address suitably converted/cast to an integer.
  */
 static	ANTLR3_UINT64	
-   getUniqueID		(pANTLR3_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE node)
+   getUniqueID		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE node)
 {
 	return	(ANTLR3_UINT64) node;
 }

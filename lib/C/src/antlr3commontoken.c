@@ -281,7 +281,7 @@ setAPI(pANTLR3_COMMON_TOKEN token)
     token->channel		    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
     token->line			    = 0;
     token->index		    = 0;
-    token->input		    = 0;
+    token->input		    = NULL;
 
     return;
 }

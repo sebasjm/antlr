@@ -30,7 +30,7 @@ group CAST;
 /** Add an adaptor property that knows how to build trees */
 @headerFile.members() ::= <<
 /* @headerFile.members() */
-pANTLR3_TREE_ADAPTOR	adaptor;
+pANTLR3_BASE_TREE_ADAPTOR	adaptor;
 /* End @headerFile.members() */
 >>
 
@@ -71,6 +71,9 @@ ruleInitializations() ::= <<
 /* ruleInitializations() */
 <super.ruleInitializations()>
 root_0 = NULL;<\n>
+<if(ruleDescriptor.hasMultipleReturnValues)>
+retval.start = LT(1);<\n>
+<endif>
 /* End ruleInitializations() */
 >>
 
@@ -105,7 +108,11 @@ if ( backtracking==0 ) {<\n>
 	ctx->adaptor->setTokenBoundaries(ctx->adaptor, retval.tree, retval.start, retval.stop);
 <if(backtracking)>
 }
-<endif><endif>
+<endif>
+<endif>
+<if(!ruleDescriptor.isSynPred)>
+retval.stop = LT(-1);<\n>
+<endif>
 /* End: ruleCleanUp() */
 >>
 

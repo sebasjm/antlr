@@ -389,26 +389,26 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 
 #define	    lexr		    ctx->pLexer
 #define	    ruleMemo		    lexr->rec->ruleMemo
-#define	    getCharIndex()	    lexr->getCharIndex(lexr->me)
-#define	    getLine()		    lexr->getLine(lexr->me)
-#define	    getCharPositionInLine() lexr->getCharPositionInLine(lexr->me)
-#define	    emit(t)		    lexr->emit(lexr->me, t)
-#define	    emitNew(t,l,cp,ch,s,i)  lexr->emitNew(lexr->me, t, l, cp, ch, s, i)
-#define	    matchc(c)		    lexr->matchc(lexr->me, c)
-#define	    matchs(s)		    lexr->matchs(lexr->me, s)
-#define	    matchRange(c1,c2)	    lexr->matchRange(lexr->me, c1, c2)
+#define	    getCharIndex()	    lexr->getCharIndex(lexr)
+#define	    getLine()		    lexr->getLine(lexr)
+#define	    getCharPositionInLine() lexr->getCharPositionInLine(lexr)
+#define	    emit(t)		    lexr->emit(lexr-, t)
+#define	    emitNew(t,l,cp,ch,s,i)  lexr->emitNew(lexr, t, l, cp, ch, s, i)
+#define	    matchc(c)		    lexr->matchc(lexr, c)
+#define	    matchs(s)		    lexr->matchs(lexr, s)
+#define	    matchRange(c1,c2)	    lexr->matchRange(lexr, c1, c2)
 #define	    ltoken()		    lexr->token
 #define	    hasFailed()		    (lexr->rec->failed == ANTLR3_TRUE)
 #define	    failedFlag()	    lexr->rec->failed
 #define	    theInput()		    lexr->input
-#define	    LA(n)		    theInput()->istream->LA(lexr->input->istream->me, n)
-#define	    hasException()	    (theInput()->istream->error == ANTLR3_TRUE)
-#define	    theException()	    theInput()->istream->exception
-#define	    exConstruct()	    theInput()->istream->exConstruct(theInput()->istream)
-#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream->me)
-#define	    lrecover()		    lexr->recover(lexr->me)
-#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream->me)
-#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream->me, m)
+#define	    LA(n)		    theInput()->istream->LA(lexr->input->istream, n)
+#define	    hasException()	    (lexr->rec->error == ANTLR3_TRUE)
+#define	    theException()	    lexr->rec->exception
+#define	    exConstruct()	    lexr->rec->exConstruct(lexr->rec)
+#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream)
+#define	    lrecover()		    lexr->recover(lexr)
+#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream)
+#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream, m)
 <endif>
 
 <if(PARSER)>
@@ -440,30 +440,30 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 #undef	    precoverFromMismatchedElement
 
 #define	    prsr		    ctx->pParser  
-#define	    haveAlreadyParsedRule(r) prsr->rec->alreadyParsedRule(prsr->me, r)
+#define	    haveAlreadyParsedRule(r) prsr->rec->alreadyParsedRule(prsr, r)
 #define	    theInput()		    prsr->tstream
-#define	    hasException()	    (theInput()->istream->error == ANTLR3_TRUE)
-#define	    theException()	    theInput()->istream->exception
-#define	    tmatch(t, fs)	    prsr->rec->match(prsr->rec, theInput()->istream, t, fs)
-#define	    tmatchAny()		    prsr->rec->matchAny(prsr->rec, theInput()->istream->me)
+#define	    hasException()	    (prsr->rec->error == ANTLR3_TRUE)
+#define	    theException()	    prsr->rec->exception
+#define	    tmatch(t, fs)	    prsr->rec->match(prsr->rec, t, fs)
+#define	    tmatchAny()		    prsr->rec->matchAny(prsr->rec)
 #define	    followStk()		    prsr->rec->following
 #define	    followPush(x)	    followStk()->push(followStk(), ((void *)(x)), NULL)
 #define	    followPop()		    followStk()->pop(followStk())
-#define	    precover()		    prsr->rec->recover(prsr->me, theInput()->istream)
-#define	    preportError()	    prsr->rec->reportError(prsr)
-#define	    LA(n)		    theInput()->istream->LA(theInput()->me, n)
-#define	    LT(n)		    theInput()->LT(theInput()->me, n)
-#define	    exConstruct()	    theInput()->istream->exConstruct(theInput()->istream)
-#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream->me)
-#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream->me)
-#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream->me, m)
+#define	    precover()		    prsr->rec->recover(prsr->rec)
+#define	    preportError()	    prsr->rec->reportError(prsr->rec)
+#define	    LA(n)		    theInput()->istream->LA(theInput()->istream, n)
+#define	    LT(n)		    theInput()->LT(theInput(), n)
+#define	    exConstruct()	    prsr->rec->exConstruct(prsr->rec)
+#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream)
+#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream)
+#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream, m)
 #define	    perrorRecovery()	    prsr->rec->errorRecovery
 #define	    _fsp		    prsr->rec->_fsp
 #define	    failedFlag		    prsr->rec->failed
 #define	    hasFailed()		    (failedFlag == ANTLR3_TRUE)
 #define	    backtracking	    prsr->rec->backtracking
-#define	    precoverFromMismatchedSet(s)	prsr->rec->recoverFromMismatchedSet(prsr->rec, theInput()->istream, s)
-#define	    precoverFromMismatchedElement(e)	prsr->rec->recoverFromMismatchedElement(prsr->rec, theInput()->istream, s)
+#define	    precoverFromMismatchedSet(s)	prsr->rec->recoverFromMismatchedSet(prsr->rec, s)
+#define	    precoverFromMismatchedElement(e)	prsr->rec->recoverFromMismatchedElement(prsr->rec, s)
 <endif>
 
 <if(TREE_PARSER)>
@@ -488,6 +488,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 #undef	    inputConsume
 #undef	    markMyWords
 #undef	    rewindInput
+#undef	    rewind
 #undef	    perrorRecovery
 #undef	    hasFailed
 #undef	    failedFlag
@@ -495,32 +496,49 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
 #undef	    precoverFromMismatchedElement
 
 #define	    prsr		    ctx->pTreeParser  
-#define	    haveAlreadyParsedRule(r) prsr->rec->alreadyParsedRule(prsr->me, r)
+#define	    haveAlreadyParsedRule(r) prsr->rec->alreadyParsedRule(prsr, r)
 #define	    theInput()		    prsr->ctnstream
-#define	    hasException()	    (theInput()->error == ANTLR3_TRUE)
-#define	    theException()	    theInput()->exception
-#define	    tmatch(t, fs)	    prsr->rec->match(prsr->rec, theInput()->istream, t, fs)
-#define	    tmatchAny()		    prsr->rec->matchAny(prsr->rec, theInput()->istream->me)
+#define	    hasException()	    (prsr->rec->error == ANTLR3_TRUE)
+#define	    theException()	    prsr->rec->exception
+#define	    tmatch(t, fs)	    prsr->rec->match(prsr->rec, t, fs)
+#define	    tmatchAny()		    prsr->rec->matchAny(prsr->rec)
 #define	    followStk()		    prsr->rec->following
 #define	    followPush(x)	    followStk()->push(followStk(), ((void *)(x)), NULL)
 #define	    followPop()		    followStk()->pop(followStk())
-#define	    precover()		    prsr->rec->recover(prsr->me, theInput()->istream)
-#define	    preportError()	    prsr->rec->reportError(prsr)
-#define	    LA(n)		    theInput()->istream->LA(theInput()->me, n)
-#define	    LT(n)		    theInput()->LT(theInput()->me, n)
-#define	    exConstruct()	    theInput()->istream->exConstruct(theInput()->istream)
-#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream->me)
-#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream->me)
-#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream->me, m)
+#define	    precover()		    prsr->rec->recover(prsr->rec)
+#define	    preportError()	    prsr->rec->reportError(prsr->rec)
+#define	    LA(n)		    theInput()->tnstream->istream->LA(theInput()->tnstream->istream, n)
+#define	    LT(n)		    theInput()->tnstream->LT(theInput()->tnstream, n)
+#define	    exConstruct()	    prsr->rec->exConstruct(prsr->rec)
+#define	    inputConsume()	    theInput()->tnstream->istream->consume(theInput()->tnstream->istream)
+#define	    markMyWords()	    theInput()->tnstream->istream->mark(theInput()->tnstream->istream)
+#define	    rewindInput(m)	    theInput()->tnstream->istream->rewind(theInput()->tnstream->istream, m)
+#define	    rewind()		    theInput()->rewind(theInput())
 #define	    perrorRecovery()	    prsr->rec->errorRecovery
 #define	    _fsp		    prsr->rec->_fsp
 #define	    failedFlag		    prsr->rec->failed
 #define	    hasFailed()		    (failedFlag == ANTLR3_TRUE)
 #define	    backtracking	    prsr->rec->backtracking
-#define	    precoverFromMismatchedSet(s)	prsr->rec->recoverFromMismatchedSet(prsr->rec, theInput()->istream, s)
-#define	    precoverFromMismatchedElement(e)	prsr->rec->recoverFromMismatchedElement(prsr->rec, theInput()->istream, s)
+#define	    precoverFromMismatchedSet(s)	prsr->rec->recoverFromMismatchedSet(prsr->rec, s)
+#define	    precoverFromMismatchedElement(e)	prsr->rec->recoverFromMismatchedElement(prsr->rec, s)
 <endif>
 
+#endif
+
+#ifndef	ANTLR3_TOKEN_STRUCT
+#define ANTLR3_TOKEN_STRUCT
+/** Work around because Token.UP and Token.DOWN are defined
+ *  literally to dfaEdge() - consult with Ter on this one.
+ */
+typedef struct ANTLR3_TOKEN_STRUCT_struct
+{
+    ANTLR3_UINT32   INVALID;
+    ANTLR3_UINT32   EOR;
+    ANTLR3_UINT32   DOWN;
+    ANTLR3_UINT32   UP;
+}
+    TOKEN_STRUCT;
+    
 #endif
 >>
 
@@ -568,6 +586,7 @@ lexer(  grammar,
         
 <endif>
 
+
 <if(filterMode)>
 /* Forward declare implementation function for ANTLR3_TOKEN_SOURCE interface.
  */
@@ -587,9 +606,9 @@ static void
 <name>Free  (p<name> ctx)
 {
 <if(memoize)>
-    ruleMemo->free(ruleMemo->me);
+    ruleMemo->free(ruleMemo);
 <endif>
-    lexr->free(lexr->me);
+    lexr->free(lexr);
     
     ANTLR3_FREE(ctx);
 }
@@ -712,13 +731,6 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 /* =========================================================================
  * End of DFA tables for the lexer
  */
-
-/* =========================================================================
- * Cyclic DFAs for the lexer
- */
-<cyclicDFAs>
-/* End of cyclic DFAs for the lexer
- */
 >>
 
 /** An override of the lexer's nextToken() method that backtracks over mTokens() looking
@@ -728,13 +740,14 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
  *  at backtracking==1.
  */
 filteringNextToken() ::= <<
-ANTLR3_API ANTLR3_TOKEN <name>nextToken(p<name> lexCtx) 
+static ANTLR3_TOKEN 
+<name>nextToken(p<name> lexCtx) 
 {
     ltoken  = NULL;
     tokenStartCharIndex = getCharIndex();
     while (true) {
         if ( LA(1)==CharStream.EOF ) {
-            return Token.EOF_TOKEN;
+            return ANTLR_EOF_TOKEN;
         }
         token=null;
         tokenStartCharIndex = getCharIndex();
@@ -805,6 +818,11 @@ static pANTLR3_UINT8   <name>TokenNames[]
         <tokenNames:{(pANTLR3_UINT8) <it>}; separator=",\n">
        };
 
+/* Work around invalid dfaEdge() attribute passing
+ * in tree parser
+ */
+ static TOKEN_STRUCT Token = {ANTLR3_TOKEN_INVALID, ANTLR3_EOR_TOKEN_TYPE, ANTLR3_TOKEN_DOWN, ANTLR3_TOKEN_UP };
+
     <@members>
 
     <@end>
@@ -870,7 +888,7 @@ ANTLR3_API p<name>
      * from here, the programmer may set the pointers to provide custom
      * implementations of each function. 
      *
-     * We don't use the macros defined in <name>.h here so you can get a sense
+     * We don't use the macros defined in <name>.h here, in order that you can get a sense
      * of what goes where.
      */
 
@@ -880,11 +898,11 @@ ANTLR3_API p<name>
     ctx->pParser	    = antlr3ParserNewStream(ANTLR3_SIZE_HINT, instream->tstream);
 <endif>
 <if(TREE_PARSER)>
-    /* Create a base Tree parser/recognizer, using the supplied token stream
+    /* Create a base Tree parser/recognizer, using the supplied tree node stream
      */
-    ctx->pTreeParser	    = antlr3TreeParserNewStream(instream);
-    
+    ctx->pTreeParser	    = antlr3TreeParserNewStream(ANTLR3_SIZE_HINT, instream);
 <endif>
+
     /* Install the implementation of our <name> interface
      */
     <rules:{r | ctx-><r.ruleDescriptor.name>	= <r.ruleDescriptor.name>;}; separator="\n";>
@@ -929,8 +947,11 @@ ANTLR3_API p<name>
     <recognizer.scopes:{<if(it.isDynamicGlobalScope)>
 <globalAttributeScopeFree(scope=it)><\n>
 <endif>}>
-
+<if(TREE_PARSER)>
+    ctx->pTreeParser->free(ctx->pTreeParser);
+<else>
     ctx->pParser->free(ctx->pParser);
+<endif>
     ANTLR3_FREE(ctx);
  }
  
@@ -1185,9 +1206,6 @@ ANTLR3_UINT64 <ruleDescriptor.name>_StartIndex;
 ruleInitializations() ::= <<
 /* Initilalize rule variables
  */
-<if(ruleDescriptor.hasMultipleReturnValues)>
-retval.start = LT(1);<\n>
-<endif>
 <if(memoize)>
 <ruleDescriptor.name>_StartIndex = input.index();
 <endif>
@@ -1256,9 +1274,6 @@ rule<ruleDescriptor.name>Ex: ;
 <ruleDescriptor.useScopes:{<scopePop(sname=it)>;}; separator="\n">
 <ruleDescriptor.ruleScope:{<scopePop(sname=it.name)>;}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<if(!ruleDescriptor.isSynPred)>
-retval.stop = LT(-1);<\n>
-<endif>
 <endif>
 >>
 
@@ -1542,7 +1557,8 @@ tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label> = (<labelType>)LT(1);<\n>
 <endif>
-tmatch(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBacktrackFailure()>
+tmatch(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>); 
+<checkRuleBacktrackFailure()>
 >>
 
 /** ids+=ID */
@@ -1571,14 +1587,16 @@ charRef(char,label) ::= <<
 <if(label)>
 <label> = LA(1);<\n>
 <endif>
-matchc(<char>); <checkRuleBacktrackFailure()>
+matchc(<char>); 
+<checkRuleBacktrackFailure()>
 >>
 
 /** match a character range */
 charRangeRef(a,b) ::= <<
 /* charRangeRef(a,b)
  */
-matchRange(<a>, <b>); <checkRuleBacktrackFailure()>
+matchRange(<a>, <b>); 
+<checkRuleBacktrackFailure()>
 >>
 
 /** For now, sets are interval tests and must be tested inline */
@@ -1632,10 +1650,16 @@ lexerStringRef(string,label) ::= <<
  */
 <if(label)>
 int <label>Start = getCharIndex();
-matchs(<string>); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+matchs(<string>); 
+<checkRuleBacktrackFailure()>
+<labelType> <label> = lexr->tokFactory->newToken(lexr->tokFactory);
+<label>->setType(<label>, ANTLR3_TOKEN_INVALID);
+<label>->setStartIndex(<label>, <label>Start);
+<label>->setStopIndex(<label>, getCharIndex()-1);
+<label>->input = theInput()->tnstream->istream;
 <else>
-matchs(<string>); <checkRuleBacktrackFailure()><\n>
+matchs(<string>); 
+<checkRuleBacktrackFailure()><\n>
 <endif>
 >>
 
@@ -1645,7 +1669,8 @@ wildcard(label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
-matchAny(input); <checkRuleBacktrackFailure()>
+matchAny(input); 
+<checkRuleBacktrackFailure()>
 >>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
@@ -1662,7 +1687,8 @@ wildcardChar(label, elementIndex) ::= <<
 <if(label)>
 int <label> = LA(1);<\n>
 <endif>
-matchAny(); <checkRuleBacktrackFailure()>
+matchAny(); 
+<checkRuleBacktrackFailure()>
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
@@ -1707,10 +1733,16 @@ lexerRuleRef(rule,label,args) ::= <<
  */
 <if(label)>
 int <label>Start = getCharIndex();
-m<rule>(ctx <if(args)>, <endif><args; separator=", ">); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
+<checkRuleBacktrackFailure()>
+<labelType> <label> = lexr->tokFactory->newToken(lexr->tokFactory);
+<label>->setType(<label>, ANTLR3_TOKEN_INVALID);
+<label>->setStartIndex(<label>, <label>Start);
+<label>->setStopIndex(<label>, getCharIndex()-1);
+<label>->input = theInput()->tnstream->istream;
 <else>
-m<rule>(ctx <if(args)>, <endif><args; separator=", ">); <checkRuleBacktrackFailure()>
+m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
+<checkRuleBacktrackFailure()>
 <endif>
 >>
 
@@ -1720,10 +1752,16 @@ lexerMatchEOF(label) ::= <<
  */
 <if(label)>
 int <label>Start = getCharIndex();
-matchc(ANTLR3_CHARSTREAM_EOF); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+matchc(ANTLR3_CHARSTREAM_EOF); 
+<checkRuleBacktrackFailure()>
+<labelType> <label> = lexr->tokFactory->newToken(lexr->tokFactory);
+<label>->setType(<label>, ANTLR3_TOKEN_EOF);
+<label>->setStartIndex(<label>, <label>Start);
+<label>->setStopIndex(<label>, getCharIndex()-1);
+<label>->input = theInput()->tnstream->istream;
 <else>
-matchc(ANTLR3_CHARSTREAM_EOF); <checkRuleBacktrackFailure()>
+matchc(ANTLR3_CHARSTREAM_EOF); 
+<checkRuleBacktrackFailure()>
 <endif>
 >>
 
@@ -1733,15 +1771,19 @@ tree(root, children, nullableChildList) ::= <<
  */
 <root:element()>
 <if(nullableChildList)>
-if ( input.LA(1)==Token.DOWN ) {
-    match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
+if ( LA(1)==ANTLR3_TOKEN_DOWN ) {
+    tmatch(ANTLR3_TOKEN_DOWN, NULL); 
+    <checkRuleBacktrackFailure()>
     <children:element()>
-    match(input, Token.UP, null); <checkRuleBacktrackFailure()>
+    tmatch(ANTLR3_TOKEN_UP, NULL); 
+    <checkRuleBacktrackFailure()>
 }
 <else>
-match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
+tmatch(ANTLR3_TOKEN_DOWN, NULL); 
+<checkRuleBacktrackFailure()>
 <children:element()>
-match(input, Token.UP, null); <checkRuleBacktrackFailure()>
+tmatch(ANTLR3_TOKEN_UP, NULL); 
+<checkRuleBacktrackFailure()>
 <endif>
 >>
 
@@ -1930,26 +1972,20 @@ dfaEdgeSwitch(labels, targetState) ::= <<
 dfaDecision(decisionNumber,description) ::= <<
 /* dfaDecision(decisionNumber,description)
  */
-alt<decisionNumber> = dfa<decisionNumber>Predict(ctx);
+alt<decisionNumber> = antlr3DFAPredict(ctx, cyclicDFA<decisionNumber>);
 >>
 
 cyclicDFADeclare(decisionNumber,states) ::= <<
 /* Prediction routine for DFA #<decisionNumber>
  */
-static ANTLR3_UINT32 dfa<decisionNumber>Predict(p<name> ctx);
+//static ANTLR3_UINT32 dfa<decisionNumber>Predict(p<name> ctx);
 <states:{state | <DFAStateDeclare(decisionNumber=dfa.decisionNumber,state=state)>}>
 >>
 DFAStateDeclare(decisionNumber,state) ::= <<
-static ANTLR3_DFASTATE dfa<decisionNumber>S<state.stateNumber> (p<name>, pANTLR3_UINT32);<\n>
+//static ANTLR3_DFASTATE dfa<decisionNumber>S<state.stateNumber> (p<name>, pANTLR3_UINT32);<\n>
 >>
 
-/* Dump DFA tables as run-length-encoded Strings of octal values.
- * Can't use hex as compiler translates them before compilation.
- * These strings are split into multiple, concatenated strings.
- * Java puts them back together at compile time thankfully.
- * Java cannot handle large static arrays, so we're stuck with this
- * encode/decode approach.  See analysis and runtime DFA for
- * the encoding methods.
+/* Dump DFA tables as part of a static 
  */
 cyclicDFA(dfa) ::= <<
 public static final String DFA<dfa.decisionNumber>_eotS =
@@ -2013,9 +2049,9 @@ class DFA<dfa.decisionNumber> extends DFA {
  */
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
 <if(semPredState)>
-input.rewind();<\n>
+rewind();<\n>
 <else>
-int LA<decisionNumber>_<stateNumber> = input.LA(1);<\n>
+int LA<decisionNumber>_<stateNumber> = LA(1);<\n>
 <endif>
 s = -1;
 <edges; separator="\nelse ">
@@ -2408,13 +2444,8 @@ typedef struct <returnType(...)>_struct
 {
     /** Generic return elements for ANTLR3 rules
      */
-<if(TREE_PARSER)>
-<endif>
-<if(PARSER)>
-<endif>
-
-    <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
     <@ruleReturnMembers()>   
+    <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
 }
     <returnType(...)>;
 <endif>

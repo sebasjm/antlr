@@ -86,7 +86,7 @@ query[pANTLR3_STRING processNo]
     @init
     {
         //$query::iterator                    = new cmqlProcessor();
-        $query::iterator.suppressMissing    = ANTLR3_FALSE;        // Assume that we want a list of ids missing from input list
+        //$query::iterator.suppressMissing    = ANTLR3_FALSE;        // Assume that we want a list of ids missing from input list
        // $query::orderClauses                = "";
         $query::haveOrder                   = ANTLR3_FALSE;
        // $query::connectives                 = "";
@@ -104,7 +104,7 @@ query[pANTLR3_STRING processNo]
        // $definitionCode         = ""; 
         $treeError              = ANTLR3_FALSE;
 
-        /
+        //
 
         $query::displayNo       = 0;        // Display columns start at 0
         $query::orderNo         = 1000;    // BY columns start at 1000
@@ -118,7 +118,7 @@ query[pANTLR3_STRING processNo]
                 | BYEXP
                     {
                         $query::isExploded          = ANTLR3_TRUE;
-                        $query::iterator.exploding  = ANTLR3_TRUE;
+                        //$query::iterator.exploding  = ANTLR3_TRUE;
                     }
             )
             index_spec?
@@ -425,7 +425,7 @@ statement
     @init    
     {
         sqlStatement                = NULL;
-        $query::iterator.breakCount = 0;
+        //$query::iterator.breakCount = 0;
         $statement::inquiring        = ANTLR3_FALSE;
     }
 	:   ^(  STATEMENT
@@ -489,10 +489,8 @@ scope   { int col; }
             )?
             (     NO_NULLS
                     {
-                        $savingClause::col.savingNulls    = ANTLR3_FALSE;
                     }
                 |   {
-                        $savingClause::col.savingNulls    = ANTLR3_TRUE;
                     }
             )
          )
@@ -558,7 +556,7 @@ idselectPrimary
 //
 selectExp 
     scope   { pANTLR3_STRING	expression; }
-    @init   { $selectExp::expression = ""; }
+    @init   { $selectExp::expression = NULL; }
     :
       ^(WITH_CLAUSE selectFactorSet[ANTLR3_FALSE]+ )
 

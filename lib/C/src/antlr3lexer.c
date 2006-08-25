@@ -137,7 +137,7 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
      * any deallocation when this token is finally used up.
      */
     lexer->token		    = NULL;
-    lexer->input->istream->error    = ANTLR3_FALSE;	    /* Start out without an exception	*/
+    lexer->rec->error		    = ANTLR3_FALSE;	    /* Start out without an exception	*/
     lexer->rec->failed		    = ANTLR3_FALSE;
 
     /* Record the start of the token in our input stream.
@@ -161,14 +161,14 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
 	}
 	
 	lexer->token			= NULL;
-	lexer->input->istream->error    = ANTLR3_FALSE;	    /* Start out without an exception	*/
+	lexer->rec->error		= ANTLR3_FALSE;	    /* Start out without an exception	*/
 	lexer->rec->failed		= ANTLR3_FALSE;
 
 	/* Call the generated lexer, see if it can get a new token together.
 	 */
 	lexer->mTokens(lexer->ctx);
 
-	if  (lexer->input->istream->error  == ANTLR3_TRUE)
+	if  (lexer->rec->error  == ANTLR3_TRUE)
 	{
 	    /* Recongition exception, report it and try to recover.
 	     */
@@ -228,28 +228,28 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 tokenNam
 
     lexer   = (pANTLR3_LEXER)(rec->super);
 
-    fprintf(stderr, "%s(", lexer->input->istream->exception->streamName);
+    fprintf(stderr, "%s(", lexer->rec->exception->streamName);
 
 #ifdef WIN32
     /* shanzzle fraazzle Dick Dastardly */
-    fprintf(stderr, "%I64d) ", lexer->input->istream->exception->line);
+    fprintf(stderr, "%I64d) ", lexer->rec->exception->line);
 #else
-    fprintf(stderr, "%lld) ", lexer->input->istream->exception->line);
+    fprintf(stderr, "%lld) ", lexer->rec->exception->line);
 #endif
 
     fprintf(stderr, ": error %d : %s at offset %d, near ", 
-					    lexer->input->istream->exception->type,
-		    (pANTLR3_UINT8)	   (lexer->input->istream->exception->message),
-					    lexer->input->istream->exception->charPositionInLine+1
+					    lexer->rec->exception->type,
+		    (pANTLR3_UINT8)	   (lexer->rec->exception->message),
+					    lexer->rec->exception->charPositionInLine+1
 		    );
 
-    if	(isprint(lexer->input->istream->exception->c))
+    if	(isprint(lexer->rec->exception->c))
     {
-	fprintf(stderr, "'%c'\n", lexer->input->istream->exception->c);
+	fprintf(stderr, "'%c'\n", lexer->rec->exception->c);
     }
     else
     {
-	sprintf(buf, "char(%04x)", lexer->input->istream->exception->c);
+	sprintf(buf, "char(%04x)", lexer->rec->exception->c);
 	fprintf(stderr, "%s\n", buf);
     }
     
@@ -281,7 +281,7 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
 
     /* This is a lexer, install the appropriate exception creator
      */
-    input->istream->exConstruct = antlr3RecognitionExceptionNew;
+    lexer->rec->exConstruct = antlr3RecognitionExceptionNew;
 
     /* Set the current token to nothing
      */
@@ -373,7 +373,7 @@ matchs(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string)
 		return ANTLR3_FALSE;
 	    }
 	    
-	    lexer->input->istream->exConstruct(lexer->input->istream);
+	    lexer->rec->exConstruct(lexer->rec);
 	    lexer->rec->failed	 = ANTLR3_TRUE;
 
 	    /* TODO: Implement exception creation more fully
@@ -428,7 +428,7 @@ matchc(pANTLR3_LEXER lexer, ANTLR3_UCHAR c)
 	return	ANTLR3_FALSE;
     }
 
-    lexer->input->istream->exConstruct(lexer->input->istream);
+    lexer->rec->exConstruct(lexer->rec);
 
     /* TODO: Implement exception creation more fully
      */
@@ -474,7 +474,7 @@ matchRange(pANTLR3_LEXER lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high)
 	return	ANTLR3_FALSE;
     }
 
-    lexer->input->istream->exConstruct(lexer->input->istream);
+    lexer->rec->exConstruct(lexer->rec);
 
     /* TODO: Implement exception creation more fully
      */

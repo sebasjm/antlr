@@ -8,6 +8,7 @@
 #include    <antlr3encodings.h>
 #include    <antlr3string.h>
 #include    <antlr3input.h>
+#include    <antlr3cyclicdfa.h>
 #include    <antlr3intstream.h>
 #include    <antlr3filestream.h>
 #include    <antlr3collections.h>
