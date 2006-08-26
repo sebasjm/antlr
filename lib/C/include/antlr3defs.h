@@ -227,7 +227,7 @@ ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNew		    ();
 ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromTree	    (pANTLR3_COMMON_TREE tree);
 ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromToken    (pANTLR3_COMMON_TOKEN tree);
 ANTLR3_API pANTLR3_ARBORETUM	    antlr3ArboretumNew		    ();
-
+ANTLR3_API void			    antlr3SetCTAPI		    (pANTLR3_COMMON_TREE tree);
 ANTLR3_API pANTLR3_BASE_TREE	    antlr3BaseTreeNew		    (pANTLR3_BASE_TREE tree);
 
 ANTLR3_API void			    antlr3BaseTreeAdaptorInit	    (pANTLR3_BASE_TREE_ADAPTOR adaptor);

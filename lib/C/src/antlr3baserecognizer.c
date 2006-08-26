@@ -37,7 +37,7 @@ static ANTLR3_UINT64		getRuleMemoization	    (pANTLR3_BASE_RECOGNIZER recognizer
 static ANTLR3_BOOLEAN		alreadyParsedRule	    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex);
 static void			memoize			    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart);
 static ANTLR3_BOOLEAN		synpred			    (pANTLR3_BASE_RECOGNIZER recognizer, void * ctx, void (*predicate)(void * ctx));
-
+static void			reset			    (pANTLR3_BASE_RECOGNIZER recognizer);
 static void			freeBR			    (pANTLR3_BASE_RECOGNIZER recognizer);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER
@@ -80,6 +80,8 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
     recognizer->recoverFromMismatchedSet    = ANTLR3_API_FUNC recoverFromMismatchedSet;
     recognizer->recoverFromMismatchedToken  = ANTLR3_API_FUNC recoverFromMismatchedToken;
     recognizer->reportError		    = ANTLR3_API_FUNC reportError;
+    recognizer->reset			    = ANTLR3_API_FUNC reset;
+
     recognizer->synpred			    = ANTLR3_API_FUNC synpred;
     recognizer->toStrings		    = ANTLR3_API_FUNC toStrings;
 
@@ -1379,6 +1381,14 @@ synpred	(pANTLR3_BASE_RECOGNIZER recognizer, void * ctx, void (*predicate)(void 
 static void
 reset(pANTLR3_BASE_RECOGNIZER recognizer)
 {
+    if	(recognizer->following != NULL)
+    {
+	recognizer->following->free(recognizer->following);
+    }
+
+    /* Install a new following set
+     */
+    recognizer->following   = antlr3StackNew(64);
 }
 
 #ifdef	WIN32

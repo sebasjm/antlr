@@ -7,10 +7,7 @@
  */
 static void			setTokenStream		    (pANTLR3_PARSER parser, pANTLR3_TOKEN_STREAM);
 static pANTLR3_TOKEN_STREAM	getTokenStream		    (pANTLR3_PARSER parser);
-static void			reset			    (pANTLR3_PARSER parser);
 static void			freeParser		    (pANTLR3_PARSER parser);
-
-
 
 ANTLR3_API pANTLR3_PARSER
 antlr3ParserNew		(ANTLR3_UINT32 sizeHint)
@@ -47,7 +44,6 @@ antlr3ParserNew		(ANTLR3_UINT32 sizeHint)
     parser->setTokenStream		= ANTLR3_API_FUNC setTokenStream;
     parser->getTokenStream		= ANTLR3_API_FUNC getTokenStream;
     parser->free			= ANTLR3_API_FUNC freeParser;
-    parser->reset			= ANTLR3_API_FUNC reset;
 
     return parser;
 }
@@ -93,7 +89,7 @@ static void
 setTokenStream		    (pANTLR3_PARSER parser, pANTLR3_TOKEN_STREAM tstream)
 {
     parser->tstream = tstream;
-    parser->reset(parser);
+    parser->rec->reset(parser->rec);
 }
 
 static pANTLR3_TOKEN_STREAM	
@@ -102,18 +98,7 @@ getTokenStream		    (pANTLR3_PARSER parser)
     return  parser->tstream;
 }
 
-static void			
-reset			    (pANTLR3_PARSER parser)
-{
-    if	(parser->rec->following != NULL)
-    {
-	parser->rec->following->free(parser->rec->following);
-    }
 
-    /* Install a new following set
-     */
-    parser->rec->following   = antlr3StackNew(64);
-}
 
 
 

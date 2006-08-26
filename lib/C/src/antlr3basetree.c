@@ -43,7 +43,6 @@ antlr3BaseTreeNew(pANTLR3_BASE_TREE  tree)
    
     tree->getFirstChildWithType
 			    = ANTLR3_API_FUNC getFirstChildWithType;
-    
     tree->children	    = NULL;
 
     /* Rest must be filled in by caller.

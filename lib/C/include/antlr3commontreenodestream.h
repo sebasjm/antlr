@@ -161,7 +161,7 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 
     /* INTERFACE    */
 
-    void		    (*fill)		(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_UINT64 k);
+    void		    (*fill)		(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_INT64 k);
 
     void		    (*addLookahead)	(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, pANTLR3_BASE_TREE node);
 

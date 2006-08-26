@@ -75,6 +75,7 @@ int main( int argc, char *argv[ ])
 	nodes	    = antlr3CommonTreeNodeStreamNewTree(synError.tree, ANTLR3_SIZE_HINT);
         walker	    = cmqlTreeNew(nodes);
 
+	jobno = nodes->stringFactory->newPtr(nodes->stringFactory, (pANTLR3_UINT8)"69", 2);
 	walker->query(walker, jobno);
 
 	tstream->free(tstream);

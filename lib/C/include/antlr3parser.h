@@ -40,10 +40,6 @@ typedef	struct ANTLR3_PARSER_struct
      */
     pANTLR3_TOKEN_STREAM	(*getTokenStream)	(struct ANTLR3_PARSER_struct	* parser);
 
-    /** Pointer to function to reset the parser's state
-     */
-    void			(*reset)		(struct ANTLR3_PARSER_struct   * parser);
-
     /** Pointer to a function that knows how to free resources of an ANTLR3 parser.
      */
     void			(*free)			(struct ANTLR3_PARSER_struct	* parser);

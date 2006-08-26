@@ -168,6 +168,7 @@ createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fr
 	newToken->setTokenIndex		(newToken, fromToken->getTokenIndex(fromToken));
 	newToken->setCharPositionInLine	(newToken, fromToken->getCharPositionInLine(fromToken));
 	newToken->setChannel		(newToken, fromToken->getChannel(fromToken));
+	newToken->toString		= fromToken->toString;
     }
 
     return  newToken;

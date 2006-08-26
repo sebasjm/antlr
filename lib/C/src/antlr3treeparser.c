@@ -113,7 +113,8 @@ static void
 setTreeNodeStream	(pANTLR3_TREE_PARSER parser, pANTLR3_COMMON_TREE_NODE_STREAM input)
 {
     parser->ctnstream = input;
-  //  parser->rec->reset(parser->rec);
+    parser->rec->reset		(parser->rec);
+    parser->ctnstream->reset	(parser->ctnstream);
 }
 
 /** Return a pointer to the input stream

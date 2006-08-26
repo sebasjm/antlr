@@ -18,7 +18,6 @@ static pANTLR3_STRING	    toString			(pANTLR3_BASE_TREE tree);
 static void		    freeTree			(pANTLR3_BASE_TREE tree);
 
 /* Factory functions for the Arboretum */
-static void		    setAPI			(pANTLR3_COMMON_TREE tree);
 static void		    newPool			(pANTLR3_ARBORETUM factory);
 static pANTLR3_BASE_TREE    newPoolTree			(pANTLR3_ARBORETUM factory);
 static pANTLR3_BASE_TREE    newFromTree			(pANTLR3_ARBORETUM factory, pANTLR3_COMMON_TREE tree);
@@ -55,7 +54,7 @@ antlr3ArboretumNew()
     /* Factory space is good, we now want to initialize our cheating token
      * which one it is initialized is the model for all tokens we manufacture
      */
-    setAPI(&factory->unTruc);
+    antlr3SetCTAPI(&factory->unTruc);
 
     /* Set some initial variables for future copying, including a string factory
      * that we can use later for converting trees to strings.
@@ -202,8 +201,8 @@ factoryClose	    (pANTLR3_ARBORETUM factory)
 }
 
 
-static void 
-setAPI(pANTLR3_COMMON_TREE tree)
+ANTLR3_API void 
+antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 {
     /* Init base tree
      */
@@ -225,6 +224,7 @@ setAPI(pANTLR3_COMMON_TREE tree)
     tree->baseTree.getCharPositionInLine
 			    = ANTLR3_API_FUNC getCharPositionInLine;
     tree->baseTree.toString = ANTLR3_API_FUNC toString;
+    tree->baseTree.getType  = ANTLR3_API_FUNC getType;
 
     tree->getToken	    = ANTLR3_API_FUNC getToken;
     tree->getText	    = ANTLR3_API_FUNC getText;
@@ -292,7 +292,7 @@ antlr3CommonTreeNew()
 	return (pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM;
     }
 
-    setAPI(tree);
+    antlr3SetCTAPI(tree);
 
     return tree;
 }
