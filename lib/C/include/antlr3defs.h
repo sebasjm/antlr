@@ -39,6 +39,16 @@
  */
 #include    <antlr3errors.h>
 
+/* Work out what operating system/compiler this is. We just do this once
+ * here and use an internal symbol after this.
+ */
+#ifdef	WIN32
+#ifndef	ANTLR3_WINDOWS
+#define	ANTLR3_WINDOWS
+#define	ANTLR3_WIN32
+#endif
+#endif
+
 
 #ifdef	ANTLR3_WINDOWS 
 
