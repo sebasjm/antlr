@@ -8,7 +8,7 @@
 			Name="Antlr3Lexer"
 			DisplayName="ANTLR 3 Lexer Grammar Translation"
 			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
-			Outputs="[OutputDirectory\]$(InputName).c [OutputDirectory]\$(InputName).h"
+			Outputs="[OutputDirectory\]$(InputName).c;[OutputDirectory]\$(InputName).h"
 			FileExtensions="*.g3l"
 			ExecutionDescription="Translating to lexer."
 			SupportsFileBatching="true"
@@ -17,7 +17,7 @@
 				<StringProperty
 					Name="JavaOptions"
 					DisplayName="Java VM Options"
-					PropertyPageName="Java VM"
+					PropertyPageName="Java"
 					Description="Specify any options required to invoke the java VM on this grammar file. Sometimes larger grammars require more memory than the standard allocation and you can specify this here."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
@@ -88,6 +88,7 @@
 				<StringProperty
 					Name="LibDir"
 					DisplayName="Token directory"
+					PropertyPageName="Code Generation"
 					Category="General"
 					Description="In which directory can ANTLR3 locate grammar token files if not in the same directory as the grammar file."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
@@ -115,6 +116,7 @@
 				<StringProperty
 					Name="OutputDirectory"
 					DisplayName="Output Directory"
+					PropertyPageName="Code Generation"
 					Description="Which directory the generated output files be sent to if not the same directory as the grammar file."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
@@ -189,7 +191,7 @@
 			Name="Antlr3Parser"
 			DisplayName="ANTLR 3 Parser Grammar Translation"
 			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
-			Outputs="[OutputDirectory]\$(InputName).c [OutputDirectory]\$(InputName).h"
+			Outputs="[OutputDirectory]\$(InputName).c;[OutputDirectory]\$(InputName).h"
 			FileExtensions="*.g3p"
 			ExecutionDescription="Translating to parser."
 			SupportsFileBatching="true"
@@ -198,7 +200,7 @@
 				<StringProperty
 					Name="JavaOptions"
 					DisplayName="Java VM Options"
-					PropertyPageName="Java VM"
+					PropertyPageName="Java"
 					Description="Specify any options required to invoke the java VM on this grammar file. Sometimes larger grammars require more memory than the standard allocation and you can specify this here."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
@@ -269,6 +271,7 @@
 				<StringProperty
 					Name="LibDir"
 					DisplayName="Token directory"
+					PropertyPageName="Code Generation"
 					Category="General"
 					Description="In which directory can ANTLR3 locate grammar token files if not in the same directory as the grammar file."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
@@ -296,9 +299,11 @@
 				<StringProperty
 					Name="OutputDirectory"
 					DisplayName="Output Directory"
+					PropertyPageName="Code Generation"
 					Description="Which directory the generated output files be sent to if not the same directory as the grammar file."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
+					DefaultValue="$(InputDir)"
 				/>
 				<BooleanProperty
 					Name="CollapseEdges"
@@ -320,6 +325,7 @@
 				<StringProperty
 					Name="ANTLR3Jar"
 					DisplayName="ANTLR3 Jar"
+					PropertyPageName="Java"
 					Category="JavaVM"
 					Description="Specifies the absolute location of the ANTLR3 jar file if it is not in a location covered by %CLASSPATH%. Specify using UNIX directory delimiters to minimize problems."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
@@ -328,6 +334,7 @@
 				<StringProperty
 					Name="Java"
 					DisplayName="Java command"
+					PropertyPageName="Java"
 					Description="Specifies the command that invokes the java VM. Usually java, but could be something else such as jikes"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
@@ -369,7 +376,7 @@
 			Name="Antlr3TreeParser"
 			DisplayName="ANTLR 3 Tree Parser Grammar Translation"
 			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
-			Outputs="[OutputDirectory]\$(InputName).c [OutputDirectory]\$(InputName).h"
+			Outputs="[OutputDirectory]\$(InputName).c;[OutputDirectory]\$(InputName).h"
 			FileExtensions="*.g3t"
 			ExecutionDescription="Translating to tree parser."
 			SupportsFileBatching="true"
@@ -378,7 +385,7 @@
 				<StringProperty
 					Name="JavaOptions"
 					DisplayName="Java VM Options"
-					PropertyPageName="Java VM"
+					PropertyPageName="Java"
 					Description="Specify any options required to invoke the java VM on this grammar file. Sometimes larger grammars require more memory than the standard allocation and you can specify this here."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
@@ -449,6 +456,7 @@
 				<StringProperty
 					Name="LibDir"
 					DisplayName="Token directory"
+					PropertyPageName="Code Generation"
 					Category="General"
 					Description="In which directory can ANTLR3 locate grammar token files if not in the same directory as the grammar file."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
@@ -476,6 +484,7 @@
 				<StringProperty
 					Name="OutputDirectory"
 					DisplayName="Output Directory"
+					PropertyPageName="Code Generation"
 					Description="Which directory the generated output files be sent to if not the same directory as the grammar file."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
@@ -500,6 +509,7 @@
 				<StringProperty
 					Name="ANTLR3Jar"
 					DisplayName="ANTLR3 Jar"
+					PropertyPageName="Java"
 					Category="JavaVM"
 					Description="Specifies the absolute location of the ANTLR3 jar file if it is not in a location covered by %CLASSPATH%. Specify using UNIX directory delimiters to minimize problems."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
@@ -508,6 +518,7 @@
 				<StringProperty
 					Name="Java"
 					DisplayName="Java command"
+					PropertyPageName="Java"
 					Description="Specifies the command that invokes the java VM. Usually java, but could be something else such as jikes"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
@@ -543,13 +554,6 @@
 					Switch="-Xconversiontimeout [value]"
 					DefaultValue="32767"
 				/>
-				<StringProperty
-					Name="OD"
-					IsReadOnly="true"
-					DisplayName="OD"
-					Switch="-o [value]"
-					DefaultValue="[OutputDirectory]"
-				/>
 			</Properties>
 		</CustomBuildRule>
 		<CustomBuildRule
@@ -565,7 +569,7 @@
 				<StringProperty
 					Name="JavaOptions"
 					DisplayName="Java VM Options"
-					PropertyPageName="Java VM"
+					PropertyPageName="Java"
 					Description="Specify any options required to invoke the java VM on this grammar file. Sometimes larger grammars require more memory than the standard allocation and you can specify this here."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
@@ -636,6 +640,7 @@
 				<StringProperty
 					Name="LibDir"
 					DisplayName="Token directory"
+					PropertyPageName="Code Generation"
 					Category="General"
 					Description="In which directory can ANTLR3 locate grammar token files if not in the same directory as the grammar file."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
@@ -663,6 +668,7 @@
 				<StringProperty
 					Name="OutputDirectory"
 					DisplayName="Output Directory"
+					PropertyPageName="Code Generation"
 					Description="Which directory the generated output files be sent to if not the same directory as the grammar file."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="[value]"
@@ -688,6 +694,7 @@
 				<StringProperty
 					Name="ANTLR3Jar"
 					DisplayName="ANTLR3 Jar"
+					PropertyPageName="Java"
 					Category="JavaVM"
 					Description="Specifies the absolute location of the ANTLR3 jar file if it is not in a location covered by %CLASSPATH%. Specify using UNIX directory delimiters to minimize problems."
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
