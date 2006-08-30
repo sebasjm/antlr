@@ -228,10 +228,8 @@ has the callable functions (rules) shown below,
  */
 #ifndef	_<name>_H
 #define _<name>_H
-<actions.(actionScope).headerfile>
-<@includes>
-
-
+<actions.(actionScope).preincludes>
+<actions.(actionScope).header>
 /* =============================================================================
  * Standard antlr3 C runtime definitions
  */
@@ -240,13 +238,14 @@ has the callable functions (rules) shown below,
 /* End of standard antlr 3 runtime definitions
  * =============================================================================
  */
+<actions.(actionScope).includes>
+
 <if(backtracking)>
 /* ========================
  * BACKTRACKING IS ENABLED
  * ========================
  */
 <endif>
-<@end>
 
 /** Tricky typedef state to allow dfa states in Cyclic dfas to return the address of the
  *  next dfa state that is predicted for the current dfa state, or the address
@@ -341,7 +340,9 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #ifdef	EOF
 #undef	EOF
 #endif
- 
+#ifdef	Tokens
+#undef	Tokens
+#endif 
 <tokens:{#define <it.name>      <it.type>}; separator="\n">
 
 
@@ -352,12 +353,12 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 
 /* Work arounds because ruleScopeRef() does not have access to <name>
  */
-#ifndef SCOPE_DEFS
-#define	SCOPE_DEFS
+#undef	SCOPE_TYPE
+#undef	SCOPE_STACK
+#undef	SCOPE_TOP
 #define	SCOPE_TYPE(scope)   p<name>_##scope##_SCOPE
 #define SCOPE_STACK(scope)  p<name>_##scope##Stack
 #define	SCOPE_TOP(scope)    ctx->p<name>_##scope##Top
-#endif
 
 /* MACROS that hide the C interface implementations from the
  * generated code, which makes it a little more understandable to the human eye.
@@ -1714,7 +1715,7 @@ wildcard(label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
-matchAny(input); 
+tmatchAny(); 
 <checkRuleBacktrackFailure()>
 >>
 
@@ -2606,17 +2607,17 @@ listLabelRef(label) ::= "list_<label>"
 // they cannot see TREE_PARSER or PARSER attributes for example. :(
 
 tokenLabelPropertyRef_text(scope,attr) ::= "<scope>->getText(<scope>)->text"
-tokenLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
-tokenLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
-tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>.getCharPositionInLine()"
-tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
-tokenLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
-tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
+tokenLabelPropertyRef_type(scope,attr) ::= "<scope>->getType()"
+tokenLabelPropertyRef_line(scope,attr) ::= "<scope>->getLine()"
+tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>->getCharPositionInLine()"
+tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>->getChannel()"
+tokenLabelPropertyRef_index(scope,attr) ::= "<scope>->getTokenIndex()"
+tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>->tree"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "((<labelType>)<scope>.start)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)<scope>.tree)"
-ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start,<scope>.stop)"
+ruleLabelPropertyRef_text(scope,attr) ::= "theInput()->toString(<scope>.start,<scope>.stop)"
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
@@ -2630,11 +2631,11 @@ lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>->getTokenIndex()"
 lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>->getText()"
 
 // Somebody may ref $template or $tree or $stop within a rule:
-rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval)->start"
-rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval)->stop"
-rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval)->tree"
-rulePropertyRef_text(scope,attr) ::= "input->toString(retval.start,LT(-1))"
-rulePropertyRef_st(scope,attr) ::= "retval->st"
+rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval).start"
+rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval).stop"
+rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval).tree"
+rulePropertyRef_text(scope,attr) ::= "theInput()->toString(retval.start,LT(-1))"
+rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 
 /** How to execute an action */
@@ -2645,16 +2646,18 @@ execAction(action) ::= <<
 <if(actions.(actionScope).synpredgate)>
 if ( <actions.(actionScope).synpredgate> ) 
 {
-  <action>
+    <action>
 }
 <else>
 if ( backtracking == 0 ) 
 {
-  <action>
+    <action>
 }
 <endif>
 <else>
-<action>
+{
+    <action>
+}
 <endif>
 >>
 

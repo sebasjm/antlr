@@ -8,6 +8,7 @@
 static    pANTLR3_STRING    newRaw	(pANTLR3_STRING_FACTORY factory);
 static    pANTLR3_STRING    newSize	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size);
 static    pANTLR3_STRING    newPtr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
+static    pANTLR3_STRING    newStr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string);
 static    void		    destroy	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
 static    pANTLR3_STRING    printable	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
 static    void		    close	(pANTLR3_STRING_FACTORY factory);
@@ -56,6 +57,7 @@ antlr3StringFactoryNew()
      */
     factory->newRaw	= ANTLR3_API_FUNC newRaw;
     factory->newPtr	= ANTLR3_API_FUNC newPtr;
+    factory->newStr	= ANTLR3_API_FUNC newStr;
     factory->newSize	= ANTLR3_API_FUNC newSize;
     factory->destroy	= ANTLR3_API_FUNC destroy;
     factory->printable	= ANTLR3_API_FUNC printable;
@@ -181,6 +183,12 @@ newPtr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size)
     }
 
     return  string;
+}
+
+static    pANTLR3_STRING    
+newStr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr)
+{
+    return factory->newPtr(factory, ptr, (ANTLR3_UINT32)strlen((const char *)ptr));
 }
 
 static    void		    

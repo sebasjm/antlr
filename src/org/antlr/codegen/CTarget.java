@@ -84,12 +84,14 @@ public class CTarget extends Target {
 				if ( scope.equals("lexer") ) {return true;}
                                 if ( scope.equals("header") ) {return true;}
                                 if ( scope.equals("includes") ) {return true;}
+                                if ( scope.equals("preincludes") ) {return true;}
                                 if ( scope.equals("overrides") ) {return true;}
 				break;
 			case Grammar.PARSER :
 				if ( scope.equals("parser") ) {return true;}
                                 if ( scope.equals("header") ) {return true;}
                                 if ( scope.equals("includes") ) {return true;}
+                                if ( scope.equals("preincludes") ) {return true;}
                                 if ( scope.equals("overrides") ) {return true;}
 				break;
 			case Grammar.COMBINED :
@@ -97,12 +99,14 @@ public class CTarget extends Target {
 				if ( scope.equals("lexer") ) {return true;}
                                 if ( scope.equals("header") ) {return true;}
                                 if ( scope.equals("includes") ) {return true;}
+                                if ( scope.equals("preincludes") ) {return true;}
                                 if ( scope.equals("overrides") ) {return true;}
 				break;
 			case Grammar.TREE_PARSER :
 				if ( scope.equals("treeparser") ) {return true;}
                                 if ( scope.equals("header") ) {return true;}
                                 if ( scope.equals("includes") ) {return true;}
+                                if ( scope.equals("preincludes") ) {return true;}
                                 if ( scope.equals("overrides") ) {return true;}
 				break;
 		}

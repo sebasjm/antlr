@@ -234,7 +234,7 @@ getTokenStopIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 static	pANTLR3_UINT8
 getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
-    return  ((pANTLR3_COMMON_TREE)(t->super))->getText(t);
+    return  t->getText(t);
 }
 
 static	ANTLR3_UINT32

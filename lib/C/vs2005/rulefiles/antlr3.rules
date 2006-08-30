@@ -7,7 +7,7 @@
 		<CustomBuildRule
 			Name="Antlr3Lexer"
 			DisplayName="ANTLR 3 Lexer Grammar Translation"
-			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
+			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [Absolute] [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
 			Outputs="[OutputDirectory\]$(InputName).c;[OutputDirectory]\$(InputName).h"
 			FileExtensions="*.g3l"
 			ExecutionDescription="Translating to lexer."
@@ -185,12 +185,20 @@
 					Switch="-Xconversiontimeout [value]"
 					DefaultValue="32767"
 				/>
+				<BooleanProperty
+					Name="Absolute"
+					DisplayName="Absolute Directories"
+					PropertyPageName="Code Generation"
+					Description="If true, causes ANTLR to assume output directory is always the absolute output path and not to use relative paths as per the intput spec. For visual studio, this should usually be set to true."
+					Switch="-a"
+					DefaultValue="true"
+				/>
 			</Properties>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="Antlr3Parser"
 			DisplayName="ANTLR 3 Parser Grammar Translation"
-			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
+			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [Absolute] [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
 			Outputs="[OutputDirectory]\$(InputName).c;[OutputDirectory]\$(InputName).h"
 			FileExtensions="*.g3p"
 			ExecutionDescription="Translating to parser."
@@ -370,12 +378,20 @@
 					Switch="-Xconversiontimeout [value]"
 					DefaultValue="32767"
 				/>
+				<BooleanProperty
+					Name="Absolute"
+					DisplayName="Absolute paths"
+					PropertyPageName="Code Generation"
+					Description="If true, causes ANTLR to assume output directory is always the absolute output path and not to use relative paths as per the intput spec. For visual studio, this should usually be set to true."
+					Switch="-a"
+					DefaultValue="true"
+				/>
 			</Properties>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="Antlr3TreeParser"
 			DisplayName="ANTLR 3 Tree Parser Grammar Translation"
-			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
+			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [Absolute] [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
 			Outputs="[OutputDirectory]\$(InputName).c;[OutputDirectory]\$(InputName).h"
 			FileExtensions="*.g3t"
 			ExecutionDescription="Translating to tree parser."
@@ -554,12 +570,20 @@
 					Switch="-Xconversiontimeout [value]"
 					DefaultValue="32767"
 				/>
+				<BooleanProperty
+					Name="Absolute"
+					DisplayName="Absolute directories"
+					PropertyPageName="Code Generation"
+					Description="If true, causes ANTLR to assume output directory is always the absolute output path and not to use relative paths as per the intput spec. For visual studio, this should usually be set to true."
+					Switch="-a"
+					DefaultValue="true"
+				/>
 			</Properties>
 		</CustomBuildRule>
 		<CustomBuildRule
 			Name="Antlr3ParserLexer"
 			DisplayName="ANTLR 3 Parser/Lexer Grammar Translation"
-			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
+			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [Absolute] [LibDir] -o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
 			Outputs="[OutputDirectory]\$(InputName).c;[OutputDirectory]\$(InputName).h;[OutputDirectory]\$(InputName)Lexer.c;[OutputDirectory]\$(InputName)Lexer.h"
 			FileExtensions="*.g3pl;*.g3"
 			ExecutionDescription="Translating to parser/lexer combination"
@@ -737,6 +761,14 @@
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="-Xconversiontimeout [value]"
 					DefaultValue="32767"
+				/>
+				<BooleanProperty
+					Name="Absolute"
+					DisplayName="Absolute Directories"
+					PropertyPageName="Code Generation"
+					Description="If true, causes ANTLR to assume output directory is always the absolute output path and not to use relative paths as per the intput spec. For visual studio, this should usually be set to true."
+					Switch="-a"
+					DefaultValue="true"
 				/>
 			</Properties>
 		</CustomBuildRule>

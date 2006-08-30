@@ -60,10 +60,7 @@ typedef struct ANTLR3_COMMON_TREE_struct
      */
     ANTLR3_BASE_TREE	    baseTree;
 
-    pANTLR3_COMMON_TOKEN    (*getToken)			(pANTLR3_BASE_TREE base);
-
-    pANTLR3_UINT8	    (*getText)			(pANTLR3_BASE_TREE tree);
-       
+    pANTLR3_COMMON_TOKEN    (*getToken)			(pANTLR3_BASE_TREE base);       
  
 }
     ANTLR3_COMMON_TREE;

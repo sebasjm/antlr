@@ -225,9 +225,9 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 			    = ANTLR3_API_FUNC getCharPositionInLine;
     tree->baseTree.toString = ANTLR3_API_FUNC toString;
     tree->baseTree.getType  = ANTLR3_API_FUNC getType;
+    tree->baseTree.getText  = ANTLR3_API_FUNC getText;
 
     tree->getToken	    = ANTLR3_API_FUNC getToken;
-    tree->getText	    = ANTLR3_API_FUNC getText;
 
     tree->token	= NULL;	/* No token as yet */
     tree->startIndex	= 0;

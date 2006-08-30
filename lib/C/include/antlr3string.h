@@ -100,6 +100,10 @@ typedef struct	ANTLR3_STRING_FACTORY_struct
      */
     pANTLR3_STRING  (*newPtr)	(struct ANTLR3_STRING_FACTORY_struct * factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
 
+    /** Pointer to function that manufactures a string from a given pointer and length
+     */
+    pANTLR3_STRING  (*newStr)	(struct ANTLR3_STRING_FACTORY_struct * factory, pANTLR3_UINT8 string);
+
     /** Pointer to function that deletes the string altogether
      */
     void	    (*destroy)	(struct ANTLR3_STRING_FACTORY_struct * factory, pANTLR3_STRING string);
