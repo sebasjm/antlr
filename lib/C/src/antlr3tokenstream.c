@@ -394,7 +394,7 @@ toStringSS   (pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop)
 
 	    if	(tok != NULL)
 	    {
-		string->append(string, tok->getText(tok)->text);
+		string->appendS(string, tok->getText(tok));
 	    }
 	}
 

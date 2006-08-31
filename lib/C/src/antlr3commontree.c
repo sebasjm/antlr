@@ -10,7 +10,7 @@ static pANTLR3_COMMON_TOKEN getToken			(pANTLR3_BASE_TREE tree);
 static pANTLR3_BASE_TREE    dupNode			(pANTLR3_BASE_TREE tree);
 static ANTLR3_BOOLEAN	    isNil			(pANTLR3_BASE_TREE tree);
 static ANTLR3_UINT32	    getType			(pANTLR3_BASE_TREE tree);
-static pANTLR3_UINT8	    getText			(pANTLR3_BASE_TREE tree);
+static pANTLR3_STRING	    getText			(pANTLR3_BASE_TREE tree);
 static ANTLR3_UINT64	    getLine			(pANTLR3_BASE_TREE tree);
 static ANTLR3_UINT32	    getCharPositionInLine	(pANTLR3_BASE_TREE tree);
 static pANTLR3_STRING	    toString			(pANTLR3_BASE_TREE tree);
@@ -385,10 +385,10 @@ getType			(pANTLR3_BASE_TREE tree)
     }
 }
 
-static pANTLR3_UINT8	    
+static pANTLR3_STRING	    
 getText			(pANTLR3_BASE_TREE tree)
 {
-    return	tree->toString(tree)->text;
+    return	tree->toString(tree);
 }
 
 static ANTLR3_UINT64	    getLine			(pANTLR3_BASE_TREE tree)

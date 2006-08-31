@@ -7,7 +7,7 @@
 
 /* Token API
  */
-static  pANTLR3_STRING  getText			(pANTLR3_COMMON_TOKEN token);
+static  pANTLR3_STRING	getText			(pANTLR3_COMMON_TOKEN token);
 static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text);
 static	ANTLR3_UINT32   getType			(pANTLR3_COMMON_TOKEN token);
 static  void		setType			(pANTLR3_COMMON_TOKEN token, ANTLR3_UINT32 type);
@@ -324,7 +324,7 @@ static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
 		token->text	    = (pANTLR3_STRING) ANTLR3_MALLOC(sizeof(ANTLR3_STRING));
 		token->text->len    = (ANTLR3_UINT32)strlen((const char *)text);
 		token->text->size   = token->text->len ;
-		token->text->text   = text;
+		token->text->chars  = text;
 	    }
 	    return;
 	}
@@ -442,7 +442,7 @@ static  pANTLR3_STRING    toString		(pANTLR3_COMMON_TOKEN token)
     outtext->addc   (outtext, ':');
     outtext->addi   (outtext, (ANTLR3_INT32)token->getStopIndex(token));
     outtext->append (outtext, ") ='");
-    outtext->append (outtext, text->text);
+    outtext->appendS(outtext, text);
     outtext->append (outtext, "', <");
     outtext->addi   (outtext, token->type);
     outtext->append (outtext, "> ");

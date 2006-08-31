@@ -908,7 +908,7 @@ toStringWork	(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TR
 	    text->addi	    (text, p->getType(p));
 	}
 
-	buf->append(buf, text->text);
+	buf->appendS(buf, text);
     }
 
     if	(p == stop)

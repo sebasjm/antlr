@@ -280,9 +280,9 @@ toStringTree	(pANTLR3_BASE_TREE tree)
 
     if	(tree->isNil(tree) == ANTLR3_FALSE)
     {
-	string->append(string, "(");
-	string->append(string, tree->toString(tree)->text);
-	string->append(string, " ");
+	string->append	(string, "(");
+	string->appendS	(string, tree->toString(tree));
+	string->append	(string, " ");
     }
     if	(tree->children != NULL)
     {
@@ -296,7 +296,7 @@ toStringTree	(pANTLR3_BASE_TREE tree)
 	    {
 		string->append(string, " ");
 	    }
-	    string->append(string, (t->toStringTree(t))->text);
+	    string->appendS(string, t->toStringTree(t));
 	}
     }
     if	(tree->isNil(tree) == ANTLR3_FALSE)

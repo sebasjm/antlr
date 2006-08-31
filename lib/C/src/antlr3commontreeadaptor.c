@@ -17,7 +17,7 @@ static	pANTLR3_BASE_TREE	dupNode		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BA
 static	pANTLR3_BASE_TREE	create		(pANTLR3_BASE_TREE_ADAPTOR adpator, pANTLR3_COMMON_TOKEN payload);
 static	pANTLR3_COMMON_TOKEN	createToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);
 static	pANTLR3_COMMON_TOKEN	createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fromToken);
-static	pANTLR3_UINT8		getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_STRING		getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT32		getType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
 /* Methods specific to each tree adaptor
@@ -162,7 +162,7 @@ createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fr
 	 */
 	pANTLR3_STRING	text;
 	text		= fromToken->getText(fromToken);
-	newToken->text	= adaptor->strFactory->newPtr(adaptor->strFactory, text->text, text->len);
+	newToken->text	= adaptor->strFactory->newPtr(adaptor->strFactory, text->chars, text->len);
 
 	newToken->setLine		(newToken, fromToken->getLine(fromToken));
 	newToken->setTokenIndex		(newToken, fromToken->getTokenIndex(fromToken));
@@ -231,7 +231,7 @@ getTokenStopIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
     return  ((pANTLR3_COMMON_TREE)(t->super))->stopIndex;
 }
 
-static	pANTLR3_UINT8
+static	pANTLR3_STRING
 getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
     return  t->getText(t);

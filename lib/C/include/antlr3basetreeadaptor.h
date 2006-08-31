@@ -47,7 +47,7 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
 
     void		    (*setType)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type);
     
-    pANTLR3_UINT8	    (*getText)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t);
+    pANTLR3_STRING	    (*getText)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t);
 
     void		    (*setText)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_UINT8 t);
 

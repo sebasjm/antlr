@@ -114,9 +114,10 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
      * API 
      */
 
-    /** Pointer to function that returns the string representation of a token
+    /** Pointer to function that returns the text pointer of a token, use
+     *  toString() if you want a pANTLR3_STRING version of the token.
      */
-    pANTLR3_STRING   (*getText)(struct ANTLR3_COMMON_TOKEN_struct * token);
+    pANTLR3_STRING  (*getText)(struct ANTLR3_COMMON_TOKEN_struct * token);
 
     /** Pointer to a function that 'might' be able to set the text associated
      *  with a token. Imaginary tokens such as an ANTLR3_CLASSIC_TOKEN may actually
@@ -188,6 +189,8 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
 
     /** Pointer to a function that returns this token as a text representation that can be 
      *  printed with embedded control codes such as \n replaced with the printable sequence "\\n"
+     *  This also yields a string structure that can be used more easilly than the pointer to 
+     *  the input stream in certain situations.
      */
     pANTLR3_STRING  (*toString)		(struct ANTLR3_COMMON_TOKEN_struct * token);
 }

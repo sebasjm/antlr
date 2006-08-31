@@ -69,7 +69,7 @@ typedef	struct ANTLR3_BASE_TREE_struct
 
     ANTLR3_UINT64   (*getLine)		(struct ANTLR3_BASE_TREE_struct * tree);
 
-    pANTLR3_UINT8   (*getText)		(struct ANTLR3_BASE_TREE_struct * tree);
+    pANTLR3_STRING  (*getText)		(struct ANTLR3_BASE_TREE_struct * tree);
 
     ANTLR3_BOOLEAN  (*isNil)		(struct ANTLR3_BASE_TREE_struct * tree);
 

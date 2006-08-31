@@ -392,6 +392,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #undef	    hasFailed
 #undef	    failedFlag
 #undef	    theInput
+#undef	    strStream
 #undef	    LA
 #undef	    hasException
 #undef	    theException
@@ -417,6 +418,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    hasFailed()		    (rec->failed == ANTLR3_TRUE)
 #define	    failedFlag()	    rec->failed
 #define	    theInput()		    lexr->input
+#define	    strStream		    theInput()
 #define	    LA(n)		    theInput()->istream->LA(lexr->input->istream, n)
 #define	    hasException()	    (rec->error == ANTLR3_TRUE)
 #define	    theException()	    rec->exception
@@ -435,6 +437,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #undef	    rec		    
 #undef	    haveAlreadyParsedRule
 #undef	    theInput
+#undef	    strStream
 #undef	    hasException
 #undef	    theException
 #undef	    tmatch
@@ -460,6 +463,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    rec			    prsr->rec
 #define	    haveAlreadyParsedRule(r) rec->alreadyParsedRule(rec, r)
 #define	    theInput()		    prsr->tstream
+#define	    strStream		    theInput()
 #define	    hasException()	    (rec->error == ANTLR3_TRUE)
 #define	    theException()	    rec->exception
 #define	    tmatch(t, fs)	    rec->match(rec, t, fs)
@@ -492,6 +496,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #undef	    rec		    
 #undef	    haveAlreadyParsedRule
 #undef	    theInput
+#undef	    strStream
 #undef	    hasException
 #undef	    theException
 #undef	    tmatch
@@ -518,6 +523,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    rec			    prsr->rec
 #define	    haveAlreadyParsedRule(r) rec->alreadyParsedRule(rec, r)
 #define	    theInput()		    prsr->ctnstream
+#define	    strStream		    theInput()->tnstream
 #define	    hasException()	    (rec->error == ANTLR3_TRUE)
 #define	    theException()	    rec->exception
 #define	    tmatch(t, fs)	    rec->match(rec, t, fs)
@@ -2606,35 +2612,35 @@ listLabelRef(label) ::= "list_<label>"
 // not sure the next are the right approach; and they are evaluated early;
 // they cannot see TREE_PARSER or PARSER attributes for example. :(
 
-tokenLabelPropertyRef_text(scope,attr) ::= "<scope>->getText(<scope>)->text"
-tokenLabelPropertyRef_type(scope,attr) ::= "<scope>->getType()"
-tokenLabelPropertyRef_line(scope,attr) ::= "<scope>->getLine()"
-tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>->getCharPositionInLine()"
-tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>->getChannel()"
-tokenLabelPropertyRef_index(scope,attr) ::= "<scope>->getTokenIndex()"
+tokenLabelPropertyRef_text(scope,attr) ::= "<scope>->getText(<scope>)"
+tokenLabelPropertyRef_type(scope,attr) ::= "<scope>->getType(<scope>)"
+tokenLabelPropertyRef_line(scope,attr) ::= "<scope>->getLine(<scope>)"
+tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>->getCharPositionInLine(<scope>)"
+tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>->getChannel(<scope>)"
+tokenLabelPropertyRef_index(scope,attr) ::= "<scope>->getTokenIndex(<scope>)"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>->tree"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "((<labelType>)<scope>.start)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)<scope>.tree)"
-ruleLabelPropertyRef_text(scope,attr) ::= "theInput()->toString(<scope>.start,<scope>.stop)"
+ruleLabelPropertyRef_text(scope,attr) ::= "strStream->toString(<scope>.start,<scope>.stop)"
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
 
-lexerRuleLabelPropertyRef_type(scope,attr) ::= "<scope>->getType()"
-lexerRuleLabelPropertyRef_line(scope,attr) ::= "<scope>->getLine()"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= "<scope>->getCharPositionInLine()"
-lexerRuleLabelPropertyRef_channel(scope,attr) ::= "<scope>->getChannel()"
-lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>->getTokenIndex()"
-lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>->getText()"
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "<scope>->getType(<scope>)"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "<scope>->getLine(<scope>)"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "<scope>->getCharPositionInLine(<scope>)"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "<scope>->getChannel(<scope>)"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>->getTokenIndex(<scope>)"
+lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>->getText(<scope>)"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval).start"
 rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval).stop"
 rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval).tree"
-rulePropertyRef_text(scope,attr) ::= "theInput()->toString(retval.start,LT(-1))"
+rulePropertyRef_text(scope,attr) ::= "strStream->toString(retval.start,LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 

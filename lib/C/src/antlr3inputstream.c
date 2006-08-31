@@ -453,7 +453,6 @@ antlr3AsciiGetLine		(pANTLR3_INPUT_STREAM input)
     return  input->line;
 }
 
-
 /** \ Brief return a pointer into the input stream that points at the start
  *    of the current input line as triggered by the end of line character installed
  *    for the stream ('\n' unless told differently).

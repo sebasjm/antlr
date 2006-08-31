@@ -20,27 +20,31 @@ typedef	struct ANTLR3_STRING_struct
 
     /** The factor that created this string
      */
-    pANTLR3_STRING_FACTORY  factory;
+    pANTLR3_STRING_FACTORY	factory;
 
     /** Pointer to the current string value (starts at NULL unless
      *  the string allocator is told to create it with a preknown size.
      */
-    pANTLR3_UINT8   text;
+    pANTLR3_UINT8		chars;
 
     /** Current length of the string up to and not including, the trailing '\0'
-     *  Note that the actual allocation
+     *  Note that the actual allocation (->size)
      *  is always at least one byte more than this to accomodate trailing '\0'
      */
-    ANTLR3_UINT32   len;
+    ANTLR3_UINT32		len;
 
     /** Current size of the string in bytes including the trailing '\0'
      */
-    ANTLR3_UINT32   size;
+    ANTLR3_UINT32		size;
 
     /** Index of string (allocation number) in case someone wants
      *  to explictly release it.
      */
-    ANTLR3_UINT32    index;
+    ANTLR3_UINT32		index;
+
+    /** Pointer to function that sets the string value to a specific string
+     */
+    pANTLR3_UINT8   (*set)	(struct ANTLR3_STRING_struct * string, void * chars);
 
     /** Pointer to function adds a raw char * type pointer to the
      *  current string.
@@ -52,18 +56,27 @@ typedef	struct ANTLR3_STRING_struct
      */
     pANTLR3_UINT8   (*insert)	(struct ANTLR3_STRING_struct * string, ANTLR3_UINT32 point, void * newbit);
 
+    /** Pointer to function that sets the string value to a copy of the supplied string
+     */
+    pANTLR3_UINT8   (*setS)	(struct ANTLR3_STRING_struct * string, struct ANTLR3_STRING_struct * chars);
+
+    /** Pointer to function appends a copy of the characters contained in another string.
+     */
+    pANTLR3_UINT8   (*appendS)	(struct ANTLR3_STRING_struct * string, struct ANTLR3_STRING_struct * newbit);
+
+    /** Pointer to function that inserts a copy of the characters in the supplied string at the specified
+     *  offset in the current string.
+     */
+    pANTLR3_UINT8   (*insertS)	(struct ANTLR3_STRING_struct * string, ANTLR3_UINT32 point, struct ANTLR3_STRING_struct * newbit);
+
     /** Pointer to function that inserts the supplied integer in string form at the specified
      *  offset in the current string.
      */
     pANTLR3_UINT8   (*inserti)	(struct ANTLR3_STRING_struct * string, ANTLR3_UINT32 point, ANTLR3_INT32 i);
 
-    /** Pointer to function that sets the string value to a specific string
-     */
-    pANTLR3_UINT8   (*set)	(struct ANTLR3_STRING_struct * string, void * chars);
-
     /** Pointer to function that adds a single character to the end of the string
      */
-    pANTLR3_UINT8   (*addc)	(struct ANTLR3_STRING_struct * string, ANTLR3_UINT8 c);
+    pANTLR3_UINT8   (*addc)	(struct ANTLR3_STRING_struct * string, ANTLR3_UINT32 c);
 
     /** Pointer to function that adds the stringified representation of an integer
      *  to the string.
