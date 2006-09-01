@@ -49,7 +49,9 @@
             debug="${compile.debug}"
             debuglevel="${compile.debuglevel}"
             deprecation="${compile.deprecation}" 
-            optimize="${compile.optimize}">
+            optimize="${compile.optimize}"
+			source="1.4"
+			target="1.4">
             <classpath refid="classpath"/>
 			<src path="${src.dir}"/>
         </javac>
