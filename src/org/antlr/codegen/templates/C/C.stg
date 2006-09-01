@@ -229,7 +229,6 @@ has the callable functions (rules) shown below,
 #ifndef	_<name>_H
 #define _<name>_H
 <actions.(actionScope).preincludes>
-<actions.(actionScope).header>
 /* =============================================================================
  * Standard antlr3 C runtime definitions
  */
@@ -239,31 +238,21 @@ has the callable functions (rules) shown below,
  * =============================================================================
  */
 <actions.(actionScope).includes>
+<actions.(actionScope).header>
 
+#ifdef	WIN32
+#pragma warning( disable : 4127 )
+#pragma warning( disable : 4189 )
+#endif
 <if(backtracking)>
+
 /* ========================
  * BACKTRACKING IS ENABLED
  * ========================
  */
 <endif>
 
-/** Tricky typedef state to allow dfa states in Cyclic dfas to return the address of the
- *  next dfa state that is predicted for the current dfa state, or the address
- *  of themselves if they predict an alt. :-)
- *
- * \remark
- * In case you can't read this, and I think no less of you if you cannot, 
- * this declares ANTLR3_DFASTATE to be a pointer to a
- * a function that accepts a context pointer and a pointer to the alt, and returns
- * a pointer to a function that accepts a context pointer and a pointer to int and
- * returns a pointer to void (which we then cast to ANTLR3_DFASTATE). There are other ways
- * of doing this such as cascading definitions, but this works just fine.
- *
- * Jim Idle - March 2006
- */
-typedef	    void *(*(*ANTLR3_DFASTATE)(p<name>, pANTLR3_UINT32))(p<name>, pANTLR3_UINT32) ;
-
-<rules:{r |<headerReturnScope(ruleDescriptor=r.ruleDescriptor,...)>}; separator="\n">
+<rules:{r |<headerReturnScope(ruleDescriptor=r.ruleDescriptor,...)>}>
 
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDecl(scope=it)><endif>}>
 <rules:{r |<ruleAttributeScopeDecl(scope=r.ruleDescriptor.ruleScope)>}>
@@ -2541,7 +2530,7 @@ typedef struct <returnType(...)>_struct
     <@ruleReturnMembers()>   
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
 }
-    <returnType(...)>;<\n>
+    <returnType(...)>;<\n><\n>
 <endif>
 <endif>
 >>

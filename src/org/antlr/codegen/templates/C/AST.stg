@@ -682,11 +682,11 @@ root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, list_<token>->get
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ctx->adaptor->createTypeText(ctx->adaptor, <token>, <args; separator=", "><if(!args)>"<token>"<endif>));<\n>
+ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ctx->adaptor->createTypeText(ctx->adaptor, <token>, (pANTLR3_UINT8)<args; separator=", (pANTLR3_UINT8)"><if(!args)>"<token>"<endif>));<\n>
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->createTypeText(ctx->adaptor, <token>, <args; separator=", "><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
+root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->createTypeText(ctx->adaptor, <token>, (pANTLR3_UINT8)<args; separator=", (pANTLR3_UINT8)"><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
 >>
 
 /** plain -> {foo} action */
