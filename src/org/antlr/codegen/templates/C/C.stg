@@ -241,8 +241,20 @@ has the callable functions (rules) shown below,
 <actions.(actionScope).header>
 
 #ifdef	WIN32
+// Disable: Unreferenced parameter,                - Rules with parameters that are not used
+//          constant conditional,                  - ANTLR realizes that a prediction is always true (synpred usually)
+//          initialized but unused variable        - tree rewrite vairables declared but not needed
+//          potentially unitialized variable used  - retval always returned from a rule 
+//
+// These are only really displayed at waring level /W4 but that is the code ideal I am aiming at
+// and the codegen must generate some of these warnings by necessity, apart from 4100, which is
+// usually generated when a parser rule is given a parameter that it does not use. Mostly though
+// this is a matter of orthogonality hence I disable that one.
+//
+#pragma warning( disable : 4100 )
 #pragma warning( disable : 4127 )
 #pragma warning( disable : 4189 )
+#pragma warning( disable : 4701 )
 #endif
 <if(backtracking)>
 
@@ -547,10 +559,10 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
  */
 typedef struct ANTLR3_TOKEN_STRUCT_struct
 {
-    ANTLR3_UINT32   INVALID;
-    ANTLR3_UINT32   EOR;
-    ANTLR3_UINT32   DOWN;
-    ANTLR3_UINT32   UP;
+    ANTLR3_INT32   INVALID;
+    ANTLR3_INT32   EOR;
+    ANTLR3_INT32   DOWN;
+    ANTLR3_INT32   UP;
 }
     TOKEN_STRUCT;
     
