@@ -42,9 +42,9 @@ ANTLR3_API ANTLR3_INT32
 antlr3dfapredict (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA cdfa)
 {
     ANTLR3_UINT64	mark;
-    ANTLR3_UINT32	s;
-    ANTLR3_UINT32	specialState;
-    ANTLR3_UINT32	c;
+    ANTLR3_INT32	s;
+    ANTLR3_INT32	specialState;
+    ANTLR3_INT32	c;
 
     mark	= is->mark(is);	    /* Store where we are right now	*/
     s		= 0;		    /* Always start with state 0	*/

@@ -306,7 +306,7 @@ antlr3AsciiMark	(pANTLR3_INT_STREAM is)
     /* See if we are revisitng a mark as we can just reuse the hashtable
      * entry if we are, otherwise, we need a new one
      */
-    if	(input->markDepth < input->markers->count)
+    if	(input->markDepth > input->markers->count)
     {	
 	state	= ANTLR3_MALLOC(sizeof(ANTLR3_LEX_STATE));
 
@@ -371,7 +371,8 @@ antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
     input->charPositionInLine	= state->charPositionInLine;
     input->currentLine		= state->currentLine;
     input->line			= state->line;
-    
+    input->nextChar		= state->nextChar;
+
     /* And we are done
      */
 }
@@ -406,7 +407,7 @@ antlr3AsciiRelease	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
 static void
 antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
 {
-    ANTLR3_UINT64   count;
+    ANTLR3_INT64   count;
     pANTLR3_INPUT_STREAM input;
 
     input   = ((pANTLR3_INPUT_STREAM) is->super);
@@ -415,13 +416,13 @@ antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
      * input point, then we assume that we are reseting from a mark
      * and do not need to scan, but can just set to there.
      */
-    if	(((pANTLR3_UINT8)input->data + seekPoint) <= ((pANTLR3_UINT8)input->nextChar))
+    if	(((pANTLR3_UINT8)seekPoint) <= ((pANTLR3_UINT8)input->nextChar))
     {
 	input->nextChar	= ((pANTLR3_UINT8)input->data) + seekPoint;
     }
     else
     {
-	count	= seekPoint - ANTLR3_UINT64_CAST(((pANTLR3_UINT8)(input->nextChar) - (pANTLR3_UINT8)input->data));
+	count	= seekPoint - ANTLR3_UINT64_CAST(((pANTLR3_UINT8)(input->nextChar)));
 
 	while (count--)
 	{

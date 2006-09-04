@@ -28,8 +28,8 @@ typedef struct ANTLR3_CYCLIC_DFA_struct
 
     const ANTLR3_INT16		    * const eot;
     const ANTLR3_INT16		    * const eof;
-    const ANTLR3_UINT16		    * const min;
-    const ANTLR3_UINT16		    * const max;
+    const ANTLR3_INT16		    * const min;
+    const ANTLR3_INT16		    * const max;
     const ANTLR3_INT16		    * const accept;
     const ANTLR3_INT16		    * const special;
     const ANTLR3_INT16	    * const * const transition;

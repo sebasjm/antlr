@@ -312,6 +312,7 @@ set	(pANTLR3_STRING string, void * chars)
     /* Note we copy one more byte than the strlen in order to get the trailing '\0'
      */
     ANTLR3_MEMMOVE((void *)(string->chars), chars, (ANTLR3_UINT64)(len));
+    string->len	    = len;
 
     return  string->chars;
 
@@ -393,7 +394,16 @@ static    pANTLR3_UINT8	    setS	(pANTLR3_STRING string, pANTLR3_STRING chars)
 }
 static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbit)
 {
-    return  append(string, newbit->chars);
+    // We may be passed an empty string, in which case we just return the current pointer
+    //
+    if	(newbit->len == 0 || newbit->size == 0 || newbit->chars == NULL)
+    {
+	return	string->chars;
+    }
+    else
+    {
+	return  append(string, newbit->chars);
+    }
 }
 static	  pANTLR3_UINT8	    insertS	(pANTLR3_STRING string, ANTLR3_UINT32 point, pANTLR3_STRING newbit)
 {

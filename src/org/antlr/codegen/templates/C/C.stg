@@ -287,13 +287,11 @@ typedef struct <name>_Ctx_struct
     pANTLR3_TREE_PARSER	    pTreeParser;
 <endif>
 <scopes:{<if(it.isDynamicGlobalScope)>
-
     <globalAttributeScopeDef(scope=it)>
 <endif>}; separator="\n\n">
 <rules: {r |<if(r.ruleDescriptor.ruleScope)>
-
     <ruleAttributeScopeDef(scope=r.ruleDescriptor.ruleScope)>
-<endif>}; separator="\n">
+<endif>}>
 
 <if(LEXER)>
     <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*m<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
@@ -409,7 +407,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    getCharIndex()	    lexr->getCharIndex(lexr)
 #define	    getLine()		    lexr->getLine(lexr)
 #define	    getCharPositionInLine() lexr->getCharPositionInLine(lexr)
-#define	    emit(t)		    lexr->emit(lexr-, t)
+#define	    emit(t)		    lexr->emit(lexr, t)
 #define	    emitNew(t,l,cp,ch,s,i)  lexr->emitNew(lexr, t, l, cp, ch, s, i)
 #define	    matchc(c)		    lexr->matchc(lexr, c)
 #define	    matchs(s)		    lexr->matchs(lexr, s)
@@ -2046,13 +2044,13 @@ static const ANTLR3_INT16 dfa<dfa.decisionNumber>_eof[<dfa.numberOfStates>] =
     {
 	<dfa.eof; wrap="\n", separator=", ", null="-1">
     };
-static const ANTLR3_UINT16 dfa<dfa.decisionNumber>_min[<dfa.numberOfStates>] =
+static const ANTLR3_INT16 dfa<dfa.decisionNumber>_min[<dfa.numberOfStates>] =
     {
-	<dfa.min; wrap="\n", separator=", ", null="0">
+	<dfa.min; wrap="\n", separator=", ", null="-1">
     };
-static const ANTLR3_UINT16 dfa<dfa.decisionNumber>_max[<dfa.numberOfStates>] =
+static const ANTLR3_INT16 dfa<dfa.decisionNumber>_max[<dfa.numberOfStates>] =
     {
-	<dfa.max; wrap="\n", separator=", ", null="0">
+	<dfa.max; wrap="\n", separator=", ", null="-1">
     };
 static const ANTLR3_INT16 dfa<dfa.decisionNumber>_accept[<dfa.numberOfStates>] =
     {
@@ -2310,6 +2308,7 @@ pANTLR3_STACK <scopeStack(sname=scope.name)>;
  */
 <scopeType(sname=scope.name,...)>    <scopeTopDecl(sname=scope.name,...)>;
 <scopeType(sname=scope.name,...)>    <scopePushName(sname=scope.name,...)>(struct <name>_Ctx_struct * ctx);
+
 <endif>
 >>
 
@@ -2323,6 +2322,7 @@ ruleAttributeScopeDef(scope) ::= <<
 pANTLR3_STACK <scopeStack(sname=scope.name,...)>;
 <scopeType(sname=scope.name,...)>   (*<scopePushName(sname=scope.name,...)>)(struct <name>_Ctx_struct * ctx);
 <scopeType(sname=scope.name,...)>   <scopeTopDecl(sname=scope.name,...)>;
+
 <endif>
 >>
 
