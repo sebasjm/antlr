@@ -858,7 +858,7 @@ toNodesOnlyString	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 
 	t = ctns->next(ctns);
 
-	buf->append (buf, (pANTLR3_UINT8)" ");
+	buf->append (buf, " ");
 	buf->addi   (buf, t->getType(t));
     }
 

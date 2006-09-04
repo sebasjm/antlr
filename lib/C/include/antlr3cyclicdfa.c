@@ -80,7 +80,7 @@ antlr3dfapredict (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CY
 	 */
 	if  (c>= cdfa->min[s] && c <= cdfa->max[s])
 	{
-	    ANTLR3_UINT32   snext;
+	    ANTLR3_INT32   snext;
 
 	    /* What is the next state?
 	     */
@@ -93,7 +93,7 @@ antlr3dfapredict (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CY
 		 * eot[s]>=0 indicates that an EOT edge goes to another
 		 * state.
 		 */
-		if  (cdfa->eot[s] != 0xFFFF)
+		if  (cdfa->eot[s] >= 0)
 		{
 		    s = cdfa->eot[s];
 		    is->consume(is);

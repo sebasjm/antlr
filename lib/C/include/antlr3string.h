@@ -44,17 +44,17 @@ typedef	struct ANTLR3_STRING_struct
 
     /** Pointer to function that sets the string value to a specific string
      */
-    pANTLR3_UINT8   (*set)	(struct ANTLR3_STRING_struct * string, void * chars);
+    pANTLR3_UINT8   (*set)	(struct ANTLR3_STRING_struct * string, const char * chars);
 
     /** Pointer to function adds a raw char * type pointer to the
      *  current string.
      */
-    pANTLR3_UINT8   (*append)	(struct ANTLR3_STRING_struct * string, void * newbit);
+    pANTLR3_UINT8   (*append)	(struct ANTLR3_STRING_struct * string, const char * newbit);
 
     /** Pointer to function that inserts the supplied string at the specified
      *  offset in the current string.
      */
-    pANTLR3_UINT8   (*insert)	(struct ANTLR3_STRING_struct * string, ANTLR3_UINT32 point, void * newbit);
+    pANTLR3_UINT8   (*insert)	(struct ANTLR3_STRING_struct * string, ANTLR3_UINT32 point, const char * newbit);
 
     /** Pointer to function that sets the string value to a copy of the supplied string
      */

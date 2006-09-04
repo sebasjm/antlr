@@ -335,7 +335,7 @@ static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
     }
     else
     {
-	token->text->set(token->text, text);
+	token->text->set(token->text, (const char *)text);
     }
 
     /* We are done 

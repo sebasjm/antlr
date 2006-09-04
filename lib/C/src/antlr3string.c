@@ -15,9 +15,9 @@ static    void		    close	(pANTLR3_STRING_FACTORY factory);
 
 /* String API
  */
-static    pANTLR3_UINT8	    set		(pANTLR3_STRING string, void * chars);
-static    pANTLR3_UINT8	    append	(pANTLR3_STRING string, void * newbit);
-static	  pANTLR3_UINT8	    insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, void * newbit);
+static    pANTLR3_UINT8	    set		(pANTLR3_STRING string, const char * chars);
+static    pANTLR3_UINT8	    append	(pANTLR3_STRING string, const char * newbit);
+static	  pANTLR3_UINT8	    insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit);
 
 static    pANTLR3_UINT8	    setS	(pANTLR3_STRING string, pANTLR3_STRING chars);
 static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbit);
@@ -277,7 +277,7 @@ close	(pANTLR3_STRING_FACTORY factory)
 }
 
 static    pANTLR3_UINT8   
-append	(pANTLR3_STRING string, void * newbit)
+append	(pANTLR3_STRING string, const char * newbit)
 {
     ANTLR3_UINT32 len;
 
@@ -298,7 +298,7 @@ append	(pANTLR3_STRING string, void * newbit)
 }
 
 static    pANTLR3_UINT8   
-set	(pANTLR3_STRING string, void * chars)
+set	(pANTLR3_STRING string, const char * chars)
 {
     ANTLR3_UINT32	len;
 
@@ -340,7 +340,7 @@ addi	(pANTLR3_STRING string, ANTLR3_INT32 i)
 
     sprintf((char *)newbit, "%d", i);
 
-    return  string->append(string, newbit);
+    return  string->append(string, (const char *)newbit);
 }
 
 static	  pANTLR3_UINT8
@@ -349,11 +349,11 @@ inserti	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i)
     ANTLR3_UINT8	    newbit[32];
 
     sprintf((char *)newbit, "%d", i);
-    return  string->insert(string, point, newbit);
+    return  string->insert(string, point, (const char *)newbit);
 }
 
 static	pANTLR3_UINT8
-insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, void * newbit)
+insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
 {
     ANTLR3_UINT32	len;
 
@@ -390,7 +390,7 @@ insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, void * newbit)
 
 static    pANTLR3_UINT8	    setS	(pANTLR3_STRING string, pANTLR3_STRING chars)
 {
-    return  set(string, chars->chars);
+    return  set(string, (const char *)(chars->chars));
 }
 static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbit)
 {
@@ -402,10 +402,10 @@ static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbi
     }
     else
     {
-	return  append(string, newbit->chars);
+	return  append(string, (const char *)(newbit->chars));
     }
 }
 static	  pANTLR3_UINT8	    insertS	(pANTLR3_STRING string, ANTLR3_UINT32 point, pANTLR3_STRING newbit)
 {
-    return  insert(string, point, newbit->chars);
+    return  insert(string, point, (const char *)(newbit->chars));
 }
