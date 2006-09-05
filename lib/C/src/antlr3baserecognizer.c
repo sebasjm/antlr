@@ -171,7 +171,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
     case	ANTLR3_TYPE_PARSER:
 
 	parser  = (pANTLR3_PARSER) (recognizer->super);
-	cts	= (pANTLR3_COMMON_TOKEN_STREAM)(parser->tstream->tokenSource->super);
+	cts	= (pANTLR3_COMMON_TOKEN_STREAM)(parser->tstream->super);
 	is	= parser->tstream->istream;
 
 	break;
@@ -650,7 +650,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 t
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction displayRecogniionError called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizerfunction displayRecogniionError called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
@@ -669,7 +669,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 t
 					    recognizer->exception->type,
 		    (pANTLR3_UINT8)	   (recognizer->exception->message),
 					    recognizer->exception->charPositionInLine,
-		    ((pANTLR3_COMMON_TOKEN)(recognizer->exception->token))->toString
+		    ((pANTLR3_COMMON_TOKEN)(recognizer->exception->token))->toString(recognizer->exception->token)->chars
 		    );
 
     /* To DO: Handle the various exceptions we can get here

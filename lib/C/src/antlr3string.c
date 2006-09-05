@@ -256,7 +256,7 @@ printable(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
 	    *scannedText++ = *(instr->chars + i);
 	}
     }
-    *scannedText++  = '\0';
+    *scannedText  = '\0';
 
     string->len	= (ANTLR3_UINT32)(scannedText - string->chars);
     

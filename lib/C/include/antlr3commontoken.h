@@ -101,6 +101,24 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
      */
     pANTLR3_STRING   text;
 
+    /**  Because it is a bit more of a hassle to override an ANTLR3_COMMON_TOKEN
+     *   as the standard structure for a token, a number of user programmable 
+     *	 elements are allowed in a token. This is one of them.
+     */
+    ANTLR3_UINT32   user1;
+    
+    /**  Because it is a bit more of a hassle to override an ANTLR3_COMMON_TOKEN
+     *   as the standard structure for a token, a number of user programmable 
+     *	 elements are allowed in a token. This is one of them.
+     */
+    ANTLR3_UINT32   user2;
+
+    /**  Because it is a bit more of a hassle to override an ANTLR3_COMMON_TOKEN
+     *   as the standard structure for a token, a number of user programmable 
+     *	 elements are allowed in a token. This is one of them.
+     */
+    ANTLR3_UINT32   user3;
+
     /** Pointer to a custom element that the ANTLR3 programmer may define and install
      */
     void    * custom;

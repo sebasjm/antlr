@@ -603,7 +603,7 @@ lexer(  grammar,
         scopes,
         rules, 
         numRules, 
-        labelType="pANTLR_COMMON_TOKEN",
+        labelType="pANTLR3_COMMON_TOKEN",
         filterMode) ::= <<
 <if(backtracking)>
         // Left here to check it Jim - Jim
@@ -953,6 +953,8 @@ ANTLR3_API p<name>
     <@apifuncs>
 
     <@end>
+    
+    <actions.parser.apifuncs>
     /* Initialize the follow bit sets
      */
     <name>LoadFollowSets();
@@ -1352,7 +1354,9 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
 
     <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleDeclarations()>
-
+    <ruleLabelDefs()>
+    <ruleInitializations()>
+    <ruleLabelInitializations()>
 <if(nakedBlock)>
     ctx->pLexer->ruleNestingLevel++;
     <ruleDescriptor.actions.init>
@@ -1783,14 +1787,16 @@ lexerRuleRef(rule,label,args) ::= <<
  * From: <description>
  */
 <if(label)>
-int <label>Start = getCharIndex();
-m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
-<checkRuleBacktrackFailure()>
-<labelType> <label> = lexr->tokFactory->newToken(lexr->tokFactory);
-<label>->setType(<label>, ANTLR3_TOKEN_INVALID);
-<label>->setStartIndex(<label>, <label>Start);
-<label>->setStopIndex(<label>, getCharIndex()-1);
-<label>->input = theInput()->tnstream->istream;
+{
+    ANTLR3_UINT64 <label>Start = getCharIndex();
+    m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
+    <checkRuleBacktrackFailure()>
+    <label> = lexr->tokFactory->newToken(lexr->tokFactory);
+    <label>->setType(<label>, ANTLR3_TOKEN_INVALID);
+    <label>->setStartIndex(<label>, <label>Start);
+    <label>->setStopIndex(<label>, getCharIndex()-1);
+    <label>->input = theInput();
+}
 <else>
 m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
 <checkRuleBacktrackFailure()>
@@ -1802,18 +1808,21 @@ lexerMatchEOF(label) ::= <<
 /* lexerMatchEOF(label)
  */
 <if(label)>
-int <label>Start = getCharIndex();
-matchc(ANTLR3_CHARSTREAM_EOF); 
-<checkRuleBacktrackFailure()>
-<labelType> <label> = lexr->tokFactory->newToken(lexr->tokFactory);
-<label>->setType(<label>, ANTLR3_TOKEN_EOF);
-<label>->setStartIndex(<label>, <label>Start);
-<label>->setStopIndex(<label>, getCharIndex()-1);
-<label>->input = theInput()->tnstream->istream;
+{
+    int <label>Start = getCharIndex();
+    <labelType> <label>;
+    matchc(ANTLR3_CHARSTREAM_EOF); 
+    <checkRuleBacktrackFailure()>
+    <label> = lexr->tokFactory->newToken(lexr->tokFactory);
+    <label>->setType(<label>, ANTLR3_TOKEN_EOF);
+    <label>->setStartIndex(<label>, <label>Start);
+    <label>->setStopIndex(<label>, getCharIndex()-1);
+    <label>->input = theInput()->tnstream->istream;
+}
 <else>
-matchc(ANTLR3_CHARSTREAM_EOF); 
-<checkRuleBacktrackFailure()>
-<endif>
+    matchc(ANTLR3_CHARSTREAM_EOF); 
+    <checkRuleBacktrackFailure()>
+    <endif>
 >>
 
 /** match ^(root children) in tree parser */
