@@ -955,6 +955,10 @@ ANTLR3_API p<name>
     <@end>
     
     <actions.parser.apifuncs>
+    /* Install the token table
+     */
+    rec->tokenNames   = <name>TokenNames;
+    
     /* Initialize the follow bit sets
      */
     <name>LoadFollowSets();

@@ -23,7 +23,7 @@ static void			mismatch		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 static void			reportError		    (pANTLR3_BASE_RECOGNIZER recognizer);
 static pANTLR3_BITSET		computeCSRuleFollow	    (pANTLR3_BASE_RECOGNIZER recognizer);
 static pANTLR3_BITSET		combineFollows		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_BOOLEAN exact);
-static void			displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 tokenNames);
+static void			displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 * tokenNames);
 static void			recover			    (pANTLR3_BASE_RECOGNIZER recognizer);
 static void			recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
 static void			recoverFromMismatchedSet    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET follow);
@@ -628,7 +628,7 @@ combineFollows		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_BOOLEAN exact)
 #endif
 
 static void			
-displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 tokenNames)
+displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 * tokenNames)
 {
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;

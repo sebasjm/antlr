@@ -122,7 +122,7 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  at parser compile time - grammar token names are thus restricted in chracter
      *  sets, which does not seem to terrible.
      */
-    pANTLR3_UINT8	tokenNames;
+    pANTLR3_UINT8	* tokenNames;
 
     /** User programmable poitner that can be used for instance as a place to
      *  store some tracking structure specific to the grammar that would not normally
@@ -184,7 +184,7 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  overrdide this function independently of (*reportError)() above as that function calls
      *  this one to do the actual exception printing.
      */
-    void		(*displayRecognitionError)  (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer, pANTLR3_UINT8 tokenNames);
+    void		(*displayRecognitionError)  (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer, pANTLR3_UINT8 * tokenNames);
 
     /** Pointer to a function that recovers from an error found in the input stream.
      *  Generally, this will be a #ANTLR3_EXCEPTION_NOVIABLE_ALT but it could also

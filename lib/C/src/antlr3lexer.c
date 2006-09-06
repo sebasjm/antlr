@@ -29,7 +29,7 @@ static ANTLR3_UINT32	    getCharPositionInLine
 static pANTLR3_STRING	    getText	    (pANTLR3_LEXER lexer);
 static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource);
 
-static void		    displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 tokenNames);
+static void		    displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 * tokenNames);
 static void		    reportError			    (pANTLR3_BASE_RECOGNIZER rec);
 
 static void		    freeLexer	    (pANTLR3_LEXER lexer);
@@ -221,7 +221,7 @@ reportError		    (pANTLR3_BASE_RECOGNIZER rec)
 #endif
 
 static void			
-displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 tokenNames)
+displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 * tokenNames)
 {
     char    buf[64];
     pANTLR3_LEXER   lexer;
