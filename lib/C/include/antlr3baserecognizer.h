@@ -95,6 +95,12 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      */
     ANTLR3_BOOLEAN	failed;
 
+    /** When the recognizer terminates, the error handling functions
+     *  will have incremented this value if any error occured (that was displayed). It can then be
+     *  used by the grammar programmer without having to use static globals.
+     */
+    ANTLR3_UINT32	errorCount;
+
     /** If 0, no backtracking is going on.  Safe to exec actions etc...
      *  If >0 then it's the level of backtracking.
      */
@@ -117,6 +123,12 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  sets, which does not seem to terrible.
      */
     pANTLR3_UINT8	tokenNames;
+
+    /** User programmable poitner that can be used for instance as a place to
+     *  store some tracking structure specific to the grammar that would not normally
+     *  be available to the error handling functions.
+     */
+    void		* userp;
 
     /** Pointer to a function that matches the current input symbol
      *  against the supplied type. the function causes an error if a

@@ -419,9 +419,8 @@ matchc(pANTLR3_LEXER lexer, ANTLR3_UCHAR c)
 	return	ANTLR3_TRUE;
     }
     
-    /* Failed to match, execption and recovery time.
+    /* Failed to match, exception and recovery time.
      */
-
     if	(lexer->rec->backtracking > 0)
     {
 	lexer->rec->failed  = ANTLR3_TRUE;

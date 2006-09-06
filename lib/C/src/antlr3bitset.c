@@ -19,6 +19,7 @@ static	ANTLR3_BOOLEAN	antlr3BitsetMember	(pANTLR3_BITSET bitset, ANTLR3_UINT32 b
 static	ANTLR3_UINT32	antlr3BitsetNumBits	(pANTLR3_BITSET bitset);
 static	void		antlr3BitsetRemove	(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit);
 static	ANTLR3_BOOLEAN	antlr3BitsetIsNil	(pANTLR3_BITSET bitset);
+static	pANTLR3_INT32	antlr3BitsetToIntList	(pANTLR3_BITSET bitset);
 
 // Local functions
 //
@@ -92,6 +93,8 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
     bitset->numBits	=   ANTLR3_API_FUNC antlr3BitsetNumBits;
     bitset->remove	=   ANTLR3_API_FUNC antlr3BitsetRemove;
     bitset->isNil	=   ANTLR3_API_FUNC antlr3BitsetIsNil;
+    bitset->toIntList	=   ANTLR3_API_FUNC antlr3BitsetToIntList;
+
     bitset->free	=   ANTLR3_API_FUNC antlr3BitsetFree;
 
     /* All seems good
@@ -172,7 +175,7 @@ antlr3BitsetList(pANTLR3_HASH_TABLE list)
     ANTLR3_UINT64	bit;
 
     /* We have no idea what exactly is in the list
-     * so creaeta a default bitset and then just add stuff
+     * so create a default bitset and then just add stuff
      * as we enumerate.
      */
     bitSet  = antlr3BitsetNew(0);
@@ -561,4 +564,45 @@ antlr3BitsetNumBits(pANTLR3_BITSET bitset)
     return  bitset->length << ANTLR3_BITSET_LOG_BITS;
 }
 
+/** Produce an integer list of all the bits that are turned on
+ *  in this bitset. Used for error processing in the main as the bitset
+ *  reresents a number of integer tokens which we use for follow sets
+ *  and so on.
+ *
+ *  The first entry is the number of elements following in the list.
+ */
+static	pANTLR3_INT32	
+antlr3BitsetToIntList	(pANTLR3_BITSET bitset)
+{
+    ANTLR3_UINT32   numInts;	    /* How many integers we will need	*/
+    ANTLR3_UINT32   numBits;	    /* How many bits are in the set	*/
+    ANTLR3_UINT32   i;
+    ANTLR3_UINT32   index;
+
+    pANTLR3_INT32  intList;
+
+    numInts = bitset->size(bitset) + 1;
+    numBits = bitset->numBits(bitset);
+ 
+    intList = (pANTLR3_INT32)ANTLR3_MALLOC(numInts * sizeof(ANTLR3_INT32));
+
+    if	(intList == NULL)
+    {
+	return NULL;	/* Out of memory    */
+    }
+
+    /* Enumerate teh bits that are turned on
+     */
+    for	(i = 0, index = 1; i<numBits; i++)
+    {
+	if  (bitset->isMember(bitset, i) == ANTLR3_TRUE)
+	{
+	    intList[index++]    = i;
+	}
+    }
+
+    /* Result set
+     */
+    return  intList;
+}
 

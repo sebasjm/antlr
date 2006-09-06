@@ -1527,7 +1527,7 @@ earlyExitEx() ::= <<
  */
 exConstruct();
 theException()->type = ANTLR3_EARLY_EXIT_EXCEPTION;
-theException()->name = ANTLR3_MISMATCHED_SET_NAME;
+theException()->name = ANTLR3_EARLY_EXIT_NAME;
 <\n>
 >>
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
@@ -1688,8 +1688,11 @@ mismatchedSetEx() ::= <<
 /* mismatchedSetEx()
  */
 exConstruct();
-theException()->type = ANTLR3_MISMATCHED_SET_EXCEPTION;
-theException()->name = ANTLR3_MISMATCHED_SET_NAME;
+theException()->type         = ANTLR3_MISMATCHED_SET_EXCEPTION;
+theException()->name         = ANTLR3_MISMATCHED_SET_NAME;
+<if(PARSER)>
+theException()->expectingSet = FOLLOW_set_in_<ruleName><elementIndex>;
+<endif>
 >>
 
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<

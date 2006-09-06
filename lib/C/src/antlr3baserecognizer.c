@@ -93,6 +93,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
     recognizer->errorRecovery	= ANTLR3_FALSE;
     recognizer->lastErrorIndex	= -1;
     recognizer->failed		= ANTLR3_FALSE;
+    recognizer->errorCount	= 0;
     recognizer->backtracking	= 0;
     recognizer->following	= NULL;
     recognizer->_fsp		= -1;
@@ -372,6 +373,11 @@ mismatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET
     pANTLR3_TREE_PARSER	    tparser;
     pANTLR3_INT_STREAM	    is;
 
+    /* Install a mismatched token exception in the exception stack
+     */
+    antlr3MTExceptionNew(recognizer);
+    recognizer->exception->expecting    = ttype;
+
     switch	(recognizer->type)
     {
     case	ANTLR3_TYPE_PARSER:
@@ -384,15 +390,13 @@ mismatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction 'mismatch' called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizerfunction 'mismatch' called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
     }
 
-    /* Install a mismtached token exception in the exception stack
-     */
-    antlr3MTExceptionNew(recognizer);
+
 
     /* Enter error recovery mode
      */
@@ -629,6 +633,10 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 t
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;
     pANTLR3_INT_STREAM	    is;
+
+    /* Indicate this recognizer had an error while processing.
+     */
+    recognizer->errorCount++;
 
     switch	(recognizer->type)
     {

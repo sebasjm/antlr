@@ -98,9 +98,15 @@ typedef	struct ANTLR3_EXCEPTION_struct
      */
     void	* token;
 
-    /** Indicates the token we were expecting to see next when teh error occured
+    /** Indicates the token we were expecting to see next when the error occured
      */
     ANTLR3_UINT32   expecting;
+
+    /** Indicates a set of tokens that we were expecting to see one of when the
+     *  error occured. It is a following bitset, so you can use ->toIntList() on it
+     *  to generate an array of integers that it represents.
+     */
+    pANTLR3_BITSET  expectingSet;
 
     /** If this is a tree parser exception then the node is set to point ot the node
      * that caused the issue.
