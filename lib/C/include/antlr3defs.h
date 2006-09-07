@@ -47,6 +47,8 @@
 #define	ANTLR3_WINDOWS
 #define	ANTLR3_WIN32
 #endif
+#else
+#define ANTLR3_UNIX
 #endif
 
 
@@ -101,9 +103,11 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 
 #ifdef	ANTLR3_UNIX
 #include    <stdio.h>
-#include    <malloc.h>
+#include	<stdlib.h>
+#include    <sys/malloc.h>
 #include    <stdarg.h>
 #include    <sys/stat.h>
+#include	<string.h>
 
 #define _stat   stat
 
