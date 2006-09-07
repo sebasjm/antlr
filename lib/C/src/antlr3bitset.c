@@ -383,7 +383,19 @@ grow(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize)
 static void
 growToInclude(pANTLR3_BITSET bitset, ANTLR3_INT32 bit)
 {
-    bitset->grow(bitset, max((bitset->length << 1), numWordsToHold(bit)));
+	ANTLR3_UINT32	bl;
+	ANTLR3_UINT32	nw;
+
+	bl = (bitset->length << 1);
+	nw = numWordsToHold(bit);
+	if	(bl > nw)
+	{
+		bitset->grow(bitset, bl);
+	}
+	else
+	{
+		bitset->grow(bitset, nw);
+	}
 }
 
 static void
@@ -408,7 +420,14 @@ antlr3BitsetORInPlace(pANTLR3_BITSET bitset, pANTLR3_BITSET bitset2)
     
     /* Or the miniimum number of bits after any resizing went on
      */
-    minimum = min(bitset->length, bitset2->length);
+    if	(bitset->length < bitset2->length)
+	{
+		minimum = bitset->length;
+	}
+	else
+	{
+		minimum = bitset2->length;
+	}
 
     for	(i = minimum; i > 0; i--)
     {
@@ -464,7 +483,14 @@ antlr3BitsetEquals(pANTLR3_BITSET bitset1, pANTLR3_BITSET bitset2)
 
     /* Work out the minimum comparison set
      */
-    minimum = min(bitset1->length, bitset2->length);
+    if	(bitset1->length < bitset2->length)
+    {
+	minimum = bitset1->length;
+    }
+    else
+    {
+	minimum = bitset2->length;
+    }
 
     /* Make sure explict in common bits are equal
      */

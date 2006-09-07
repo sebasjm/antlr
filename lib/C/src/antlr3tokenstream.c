@@ -32,7 +32,7 @@ static ANTLR3_UINT32	    LA			(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
 static ANTLR3_UINT64	    mark		(pANTLR3_INT_STREAM is);
 static void		    release		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
 static ANTLR3_UINT64	    size		(pANTLR3_INT_STREAM is);
-static ANTLR3_INT64	    index		(pANTLR3_INT_STREAM is);
+static ANTLR3_INT64	    tindex		(pANTLR3_INT_STREAM is);
 static void		    rewindStream	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
 static void		    seek		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
 
@@ -207,7 +207,7 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
     stream->tstream->istream->mark	= ANTLR3_API_FUNC mark;
     stream->tstream->istream->release	= ANTLR3_API_FUNC release;
     stream->tstream->istream->size	= ANTLR3_API_FUNC size;
-    stream->tstream->istream->index	= ANTLR3_API_FUNC index;
+    stream->tstream->istream->index	= ANTLR3_API_FUNC tindex;
     stream->tstream->istream->rewind	= ANTLR3_API_FUNC rewindStream;
     stream->tstream->istream->seek	= ANTLR3_API_FUNC seek;
     stream->tstream->istream->consume	= ANTLR3_API_FUNC consume;
@@ -624,7 +624,7 @@ size	(pANTLR3_INT_STREAM is)
 }
 
 static ANTLR3_INT64    
-index	(pANTLR3_INT_STREAM is)
+tindex	(pANTLR3_INT_STREAM is)
 {
     pANTLR3_COMMON_TOKEN_STREAM cts;
     pANTLR3_TOKEN_STREAM	ts;

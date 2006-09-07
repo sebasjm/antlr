@@ -37,7 +37,7 @@ static	void			    toStringWork		(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE
 
 /* INT STREAM API */
 static	void			    consume			(pANTLR3_INT_STREAM is);
-static	ANTLR3_INT64		    index			(pANTLR3_INT_STREAM is);
+static	ANTLR3_INT64		    tindex			(pANTLR3_INT_STREAM is);
 static	ANTLR3_UINT32		    LA				(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
 static	ANTLR3_UINT64		    mark			(pANTLR3_INT_STREAM is);
 static	void			    release			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
@@ -184,7 +184,7 @@ antlr3CommonTreeNodeStreamNew(ANTLR3_UINT32 hint)
     /* Install INT_STREAM interface
      */
     stream->tnstream->istream->consume	    = ANTLR3_API_FUNC consume;
-    stream->tnstream->istream->index	    = ANTLR3_API_FUNC index;
+    stream->tnstream->istream->index	    = ANTLR3_API_FUNC tindex;
     stream->tnstream->istream->LA	    = ANTLR3_API_FUNC LA;
     stream->tnstream->istream->mark	    = ANTLR3_API_FUNC mark;
     stream->tnstream->istream->release	    = ANTLR3_API_FUNC release;
@@ -586,7 +586,7 @@ seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index)
 }
 
 static	ANTLR3_INT64		    
-index	(pANTLR3_INT_STREAM is)
+tindex	(pANTLR3_INT_STREAM is)
 {
     pANTLR3_TREE_NODE_STREAM		tns;
     pANTLR3_COMMON_TREE_NODE_STREAM	ctns;

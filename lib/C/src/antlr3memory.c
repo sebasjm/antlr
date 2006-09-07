@@ -42,7 +42,7 @@ ANTLR3_FREE(void * ptr)
 ANTLR3_API pANTLR3_UINT8
 ANTLR3_STRDUP(pANTLR3_UINT8 instr)
 {
-    return  (pANTLR3_UINT8)_strdup((const char *)instr);
+    return  (pANTLR3_UINT8)strdup((const char *)instr);
 }
 
 #else
@@ -156,7 +156,7 @@ ANTLR3_STRDUP_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, pANTLR3_UINT8 instr)
 	init();
     }
 
-    m =   (pANTLR3_UINT8)_strdup((const char *)instr);
+    m =   (pANTLR3_UINT8)strdup((const char *)instr);
     
     if	(record && ! reporting)
     {
