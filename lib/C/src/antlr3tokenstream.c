@@ -531,7 +531,7 @@ getTokensSet	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANTL
 	tok = tokenStream->tstream->get(tokenStream->tstream, i);
 
 	if  (	   types == NULL
-		|| types->isMember(types, tok->getType(tok))
+		|| types->isMember(types, tok->getType(tok) == ANTLR3_TRUE)
 	    )
 	{
 	    filteredList->put(filteredList, n++, (void *)tok, NULL);

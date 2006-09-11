@@ -445,7 +445,7 @@ static ANTLR3_UINT32
 antlr3BitsetSize(pANTLR3_BITSET bitset)
 {
     ANTLR3_UINT32   degree;
-    ANTLR3_UINT32   i;
+    ANTLR3_INT32   i;
     ANTLR3_INT8    bit;
     
     /* Come back to this, it may be faster to & with 0x01
@@ -541,7 +541,14 @@ antlr3BitsetMember(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit)
 	return	ANTLR3_FALSE;
     }
     
-    return  (ANTLR3_BOOLEAN)(bitset->bits[wordNo] & bitMask(bit));
+    if	((bitset->bits[wordNo] & bitMask(bit)) == 0)
+    {
+	return	ANTLR3_FALSE;
+    }
+    else
+    {
+	return	ANTLR3_TRUE;
+    }
 }
 
 static void
@@ -616,6 +623,8 @@ antlr3BitsetToIntList	(pANTLR3_BITSET bitset)
     {
 	return NULL;	/* Out of memory    */
     }
+
+    intList[0] = numInts;
 
     /* Enumerate teh bits that are turned on
      */

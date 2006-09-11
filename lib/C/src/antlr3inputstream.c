@@ -195,7 +195,7 @@ antlr3AsciiConsume(pANTLR3_INT_STREAM is)
 	 */
 	input->charPositionInLine++;
 	
-	if  ((ANTLR3_UCHAR)(*((pANTLR3_INT8)input->nextChar)) == input->newlineChar)
+	if  ((ANTLR3_UCHAR)(*((pANTLR3_UINT8)input->nextChar)) == input->newlineChar)
 	{
 	    /* Reset for start of a new line of input
 	     */
@@ -230,7 +230,7 @@ antlr3AsciiLA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
     }
     else
     {
-	return	(ANTLR3_UCHAR)(*((pANTLR3_INT8)input->nextChar + la - 1));
+	return	(ANTLR3_UCHAR)(*((pANTLR3_UINT8)input->nextChar + la - 1));
     }
 }
 

@@ -99,6 +99,14 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #ifdef	ANTLR3_WIN64
 #endif
 
+// Warngins that are over-zealous such as complaining about strdup, we
+// can turn off.
+//
+
+// Don't complain about "deprecated" functions such as strdup
+//
+#pragma warning( disable : 4996 )
+
 #endif
 
 #ifdef	ANTLR3_UNIX
