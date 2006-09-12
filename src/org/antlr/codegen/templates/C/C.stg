@@ -2693,7 +2693,7 @@ bitsetDeclare(name, words64) ::= <<
  * rule state: <name>
  */
 static  pANTLR3_BITSET <name>;
-static  ANTLR3_UINT64 <name>_bits[] = { <words64:{<it>}; separator=", "> };
+static  ANTLR3_UINT64 <name>_bits[] = { <words64:{ANTLR3_UINT64_LIT(<it>)}; separator=", "> };
 >>
 
 bitset(name, words64) ::= <<

@@ -227,7 +227,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 
     case    ANTLR3_COMMONTREENODE:
 
-	ex->token		= tns->LT						    (tns, 1);	    /* Current input token			    */
+	ex->token		= tns->LT						    (tns, 1);	    /* Current input tree node			    */
 	ex->line		= ((pANTLR3_BASE_TREE)(ex->token))->getLine		    (ex->token);
 	ex->charPositionInLine	= ((pANTLR3_BASE_TREE)(ex->token))->getCharPositionInLine   (ex->token);
 	ex->index		= tns->istream->index					    (tns->istream);
@@ -633,37 +633,15 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;
     pANTLR3_INT_STREAM	    is;
+    pANTLR3_COMMON_TOKEN    theToken;
+    pANTLR3_BASE_TREE	    theBaseTree;
+    pANTLR3_COMMON_TREE	    theCommonTree;
 
     /* Indicate this recognizer had an error while processing.
      */
     recognizer->errorCount++;
+    theToken	= NULL;		/* Assume there is no token to use  */
 
-    switch	(recognizer->type)
-    {
-    case	ANTLR3_TYPE_PARSER:
-
-	parser  = (pANTLR3_PARSER) (recognizer->super);
-	tparser	= NULL;
-	is	= parser->tstream->istream;
-
-	break;
-
-    case	ANTLR3_TYPE_TREE_PARSER:
-
-	tparser = (pANTLR3_TREE_PARSER) (recognizer->super);
-	parser	= NULL;
-	is	= tparser->ctnstream->tnstream->istream;
-
-	break;
-
-    default:
-	    
-	fprintf(stderr, "Base recognizerfunction displayRecogniionError called by unknown parser type - provide override for this function\n");
-	return;
-
-	break;
-    }
-    
     fprintf(stderr, "%s(", recognizer->exception->streamName);
 
 #ifdef WIN32
@@ -673,14 +651,60 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
     fprintf(stderr, "%lld) ", recognizer->exception->type);
 #endif
 
-    fprintf(stderr, ": error %d : %s at offset %d, near %s\n", 
+    fprintf(stderr, ": error %d : %s", 
 					    recognizer->exception->type,
-		    (pANTLR3_UINT8)	   (recognizer->exception->message),
-					    recognizer->exception->charPositionInLine,
-		    ((pANTLR3_COMMON_TOKEN)(recognizer->exception->token))->toString(recognizer->exception->token)->chars
-		    );
+		    (pANTLR3_UINT8)	   (recognizer->exception->message));
+					    
 
-    /* To DO: Handle the various exceptions we can get here
+    // How we determine the next piece is dependent on which thign raised the
+    // error.
+    //
+    switch	(recognizer->type)
+    {
+    case	ANTLR3_TYPE_PARSER:
+
+	parser	    = (pANTLR3_PARSER) (recognizer->super);
+	tparser	    = NULL;
+	is	    = parser->tstream->istream;
+	theToken    = (pANTLR3_COMMON_TOKEN)(recognizer->exception->token);
+	fprintf(stderr, ", at offset %d", recognizer->exception->charPositionInLine);
+	break;
+
+    case	ANTLR3_TYPE_TREE_PARSER:
+
+	tparser		= (pANTLR3_TREE_PARSER) (recognizer->super);
+	parser		= NULL;
+	is		= tparser->ctnstream->tnstream->istream;
+	theBaseTree	= (pANTLR3_BASE_TREE)(recognizer->exception->token);
+
+	if  (theBaseTree != NULL)
+	{
+	    theCommonTree	= (pANTLR3_COMMON_TREE)	    theBaseTree->super;
+
+	    if	(theCommonTree != NULL)
+	    {
+		theToken	= (pANTLR3_COMMON_TOKEN)    theCommonTree->getToken(theBaseTree);
+	    }
+	    fprintf(stderr, ", at offset %d", theBaseTree->getCharPositionInLine(theBaseTree));
+	}
+	break;
+
+    default:
+	    
+	fprintf(stderr, "Base recognizerfunction displayRecognitionError called by unknown parser type - provide override for this function\n");
+	return;
+	break;
+    }
+
+    if  (theToken != NULL)
+    {
+	fprintf(stderr, ", near %s", theToken->toString(theToken)->chars);
+    }
+    
+    fprintf(stderr, "\n");
+
+    /* TODO: Improve error output acccording to the exception type, though generally
+     *       the implementor will want their own function to replace this.
      */
 }
 

@@ -92,7 +92,7 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define	ANTLR3_FUNC_PTR(ptr) (void *)((ANTLR3_UINT64)(ptr))
 #define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)(ptr)
 #define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)((ANTLR3_UINT64)(ptr))
-
+#define	ANTLR3_UINT64_LIT(lit)	    lit##ULL
 #ifdef	ANTLR3_WIN32
 #endif
 
@@ -151,6 +151,7 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define	ANTLR3_FUNC_PTR(ptr) (void *)((ANTLR3_UINT32)(ptr))
 #define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)((ANTLR3_UINT32)(ptr))
 #define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)(ptr)
+#define	ANTLR3_UINT64_LIT(lit)	    lit##ULL
 #endif
 
 #endif

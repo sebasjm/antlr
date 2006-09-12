@@ -251,8 +251,7 @@ antlr3AsciiLT(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 lt)
      * function as we don't know who is implementing it, we pass the me pointer - this
      * is true of all calls to interface APIs - if we are referring to ourselves we can
      * use the pointer we were given in the function call, if calling an API we are holding
-     * an implementation pointer for, then we pass its 'me' pointer.
-     * TODO: Revisit this.
+     * an implementation pointer for, then we pass its 'super'.
      */
     return (ANTLR3_FUNC_PTR(input->istream->LA(input->istream, lt)));
 }
