@@ -187,8 +187,9 @@ headerFile( LEXER,
             ANTLRVersion,
             generatedTimestamp,
             scopes,
-			superClass,
-            trace
+	    superClass,
+            trace,
+            literals
         ) ::=
 <<
 <leadIn("C header")>
