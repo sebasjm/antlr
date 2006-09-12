@@ -46,13 +46,15 @@
 			[self setToken:[(id<ANTLRTokenStream>)input LT:1]];
 			line = [token line];
 			charPositionInLine = [token charPositionInLine];
-		}
-		else if ([inputClass conformsToProtocol:@protocol(ANTLRCharStream)]) {
+		} else if ([inputClass conformsToProtocol:@protocol(ANTLRCharStream)]) {
 			c = (unichar)[input LA:1];
 			line = [(id<ANTLRCharStream>)input line];
 			charPositionInLine = [(id<ANTLRCharStream>)input charPositionInLine];
-		}
-		else {
+		} else if ([inputClass conformsToProtocol:@protocol(ANTLRTreeNodeStream)]) {
+			[self setNode:[(id<ANTLRTreeNodeStream>)input LT:1]];
+			line = [node line];
+			charPositionInLine = [node charPositionInLine];
+		} else {
 			c = (unichar)[input LA:1];
 		}
 	}
@@ -63,6 +65,7 @@
 {
 	[self setStream:nil];
 	[self setToken:nil];
+	[self setNode:nil];
 	[super dealloc];
 }
 
@@ -80,6 +83,8 @@
 	NSMutableString *desc = [[NSMutableString alloc] initWithString:NSStringFromClass([self class])];
 	if (token) {
 		[desc appendFormat:@" token:%@", token];
+	} else if (node) {
+		[desc appendFormat:@" node:%@", node];
 	} else {
 		[desc appendFormat:@" char:%c", c];
 	}
@@ -121,7 +126,22 @@
     }
 }
 
+//---------------------------------------------------------- 
+//  node 
+//---------------------------------------------------------- 
+- (id<ANTLRTree>) node
+{
+    return node; 
+}
 
+- (void) setNode: (id<ANTLRTree>) aNode
+{
+    if (node != aNode) {
+        [aNode retain];
+        [node release];
+        node = aNode;
+    }
+}
 
 
 @end

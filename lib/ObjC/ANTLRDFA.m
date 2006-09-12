@@ -33,6 +33,8 @@ static BOOL debug = NO;
 
 @implementation ANTLRDFA
 
+// using the tables ANTLR generates for the DFA based prediction this method simulates the DFA
+// and returns the prediction of the alternative to be used.
 - (int) predict:(id<ANTLRIntStream>) stream
 {
 	unsigned int mark = [stream mark];
@@ -42,15 +44,20 @@ static BOOL debug = NO;
 			if ( debug ) NSLog(@"DFA %d state %d LA(1)=%c(%d)", decisionNumber, s, (unichar)[stream LA:1], [stream LA:1]);
 			int specialState = special[s];
 			if (specialState >= 0) {
+				// this state is special in that it has some code associated with it. we cannot do this in a pure DFA so
+				// we signal the caller accordingly.
 				if ( debug ) NSLog(@"DFA %d state %d is special state %d", decisionNumber, s, specialState);
 				s = [self specialStateTransition:specialState];
 				[stream consume];
 				continue;
 			}
+			// if this is an accepting state return the prediction
 			if (accept[s] >= 1) {
 				if ( debug ) NSLog(@"accept; predict %d from state %d", accept[s], s);
 				return accept[s];
 			}
+			// based on the lookahead lookup the next transition, consume and do transition
+			// or signal that we have no viable alternative
 			int c = [stream LA:1];
 			if ( (unichar)c >= min[s] && (unichar)c <= max[s]) {
 				int snext = transition[s][c-min[s]];
@@ -68,12 +75,14 @@ static BOOL debug = NO;
 				[stream consume];
 				continue;
 			}
+			// we are the end of the token, consume and do transition. we may still accept the input in the next state
 			if (eot[s] >= 0) {
 				if ( debug ) NSLog(@"EOT transition");
 				s = eot[s];
 				[stream consume];
 				continue;
 			}
+			// we are at EOF and may even accept the input.
 			if ( c == ANTLRTokenTypeEOF && eof[s] >= 0) {
 				if ( debug ) NSLog(@"accept via EOF; predict %d from %d", accept[eof[s]], eof[s]);
 				return accept[eof[s]];
@@ -100,7 +109,7 @@ static BOOL debug = NO;
 
 - (int) specialStateTransition:(int) state
 {
-	return -1;
+	return 0;
 }
 
 - (NSString *) description

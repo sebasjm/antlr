@@ -25,61 +25,37 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #import <Cocoa/Cocoa.h>
+#import <ANTLR/ANTLRCommonToken.h>
+#import <ANTLR/ANTLRTree.h>
 
-typedef enum {
-	ANTLRTokenTypeEOF = -1,
-	ANTLRTokenTypeInvalid,
-	ANTLRTokenTypeEOR,
-	ANTLRTokenTypeDOWN,
-	ANTLRTokenTypeUP,
-	ANTLRTokenTypeMIN
-} ANTLRTokenType;
-
-typedef enum {
-	ANTLRTokenChannelDefault = 0
-} ANTLRTokenChannel;
-
-
-// The abstract Token class
-// TODO also provide an ANTLRToken protocol
-
-@interface ANTLRToken : NSObject <NSCopying> {
-	int type;			// needed for +eofToken
+@interface ANTLRCommonTree : ANTLRTree {
+	int startIndex;
+	int stopIndex;
+	ANTLRCommonToken *token;
 }
 
-// The singleton eofToken instance.
-+ (ANTLRToken *) eofToken;
-// The default channel for this class of Tokens
-+ (ANTLRTokenChannel) defaultChannel;
+- (id<ANTLRTree>) initWithTreeNode:(ANTLRCommonTree *)aNode;
+- (id<ANTLRTree>) initWithToken:(ANTLRCommonToken *)aToken;
+- (id<ANTLRTree>) initWithTokenType:(int)aTokenType;
 
-// provide hooks to explicitely set the text as opposed to use the indices into the CharStream
+- (id<ANTLRTree>) copyWithZone:(NSZone *)aZone;
+
+- (BOOL) isEmpty;
+
+- (ANTLRCommonToken *) token;
+- (void) setToken:(ANTLRCommonToken *)aToken;
+- (int) tokenType;
 - (NSString *) text;
-- (void) setText:(NSString *) theText;
-
-- (int) type;
-- (void) setType: (int) aType;
-
-// ANTLR v3 provides automatic line and position tracking. Subclasses do not need to
-// override these, if they do not want to store line/pos tracking information
 - (unsigned int) line;
-- (void) setLine: (unsigned int) aLine;
-
 - (unsigned int) charPositionInLine;
-- (void) setCharPositionInLine: (unsigned int) aCharPositionInLine;
 
-// explicitely change the channel this Token is on. The default parser implementation
-// just sees the defaultChannel
-// Common idiom is to put whitespace tokens on channel 99.
-- (unsigned int) channel;
-- (void) setChannel: (unsigned int) aChannel;
+- (NSString *) treeDescription;
+- (NSString *) description;
 
-// the index of this Token into the TokenStream
-- (unsigned int) tokenIndex;
-- (void) setTokenIndex: (unsigned int) aTokenIndex;
-
-// conform to NSCopying
-- (id) copyWithZone:(NSZone *)theZone;
+- (int) startIndex;
+- (void) setStartIndex: (int) aStartIndex;
+- (int) stopIndex;
+- (void) setStopIndex: (int) aStopIndex;
 
 @end

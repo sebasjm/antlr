@@ -27,6 +27,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+// encapsulates a stream's state, so we can put it into an NSArray.
+// No magic is happening here.
 
 @interface ANTLRStringStreamState : NSObject {
 	unsigned int index;

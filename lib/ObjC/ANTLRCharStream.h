@@ -35,15 +35,15 @@
 
 - (NSString *) substringWithRange:(NSRange) theRange;
 
-/** ANTLR tracks the line information automatically */
+// ANTLR tracks the line information automatically
 - (unsigned int) line;
 
-/** Because this stream can rewind, we need to be able to reset the line */
+// Because this stream can rewind, we need to be able to reset the line
 - (void) setLine:(unsigned int) theLine;
 
 - (void) setCharPositionInLine:(unsigned int) thePos;
 
-/** The index of the character relative to the beginning of the line 0..n-1 */
+// The index of the character relative to the beginning of the line 0..n-1
 - (unsigned int) charPositionInLine;
 
 

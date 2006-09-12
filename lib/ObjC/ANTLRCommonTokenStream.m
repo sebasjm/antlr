@@ -89,7 +89,7 @@
 	}
 	// leave p pointing at first token on channel
 	p = 0;
-	p = [self skipOffTokenChannels:p];
+	p = [self skipOffChannelTokens:p];
 }
 
 #pragma mark Accessors
@@ -113,7 +113,7 @@
 
 #pragma mark Channels & Skipping
 
-- (int) skipOffTokenChannels:(int) i
+- (int) skipOffChannelTokens:(int) i
 {
 	int n = [tokens count];
 	int tmp = i;
@@ -123,7 +123,7 @@
 	return tmp;
 }
 
-- (int) skipOffTokenChannelsReverse:(int) i
+- (int) skipOffChannelTokensReverse:(int) i
 {
 	int tmp = i;
 	while ( tmp >= 0 && [(ANTLRToken *)[tokens objectAtIndex:tmp] channel] != channel ) {
@@ -230,16 +230,16 @@
 		return [self LB:k];
 	}
 	if ( (p+k-1) >= [tokens count] ) {
-		return [ANTLRToken eofToken]; //ANTLRTokenTypeEOF
+		return [ANTLRToken eofToken];
 	}
 	int i = p;
 	int n = 1;
 	while ( n < k ) {
-		i = [self skipOffTokenChannels:i+1];
+		i = [self skipOffChannelTokens:i+1];
 		n++;
 	}
 	if ( i >= [tokens count] ) {
-		return [ANTLRToken eofToken]; //ANTLRTokenTypeEOF
+		return [ANTLRToken eofToken];
 	}
 	return [tokens objectAtIndex:i];
 }
@@ -256,12 +256,12 @@
 		return nil;
 	}
 	if ( (p+k-1) >= [tokens count] ) {
-		return [ANTLRToken eofToken]; //ANTLRTokenTypeEOF
+		return [ANTLRToken eofToken];
 	}
 	int i = p;
 	int n = 1;
 	while ( n <= k ) {
-		i = [self skipOffTokenChannelsReverse:i-1];
+		i = [self skipOffChannelTokensReverse:i-1];
 		n++;
 	}
 	if ( i < 0 ) {
@@ -281,7 +281,7 @@
 {
 	if (p < [tokens count]) {
 		p++;
-		p = [self skipOffTokenChannels:p];
+		p = [self skipOffChannelTokens:p];
 	}
 }
 

@@ -43,6 +43,7 @@
 	ANTLRBaseRecognizer *recognizer;
 }
 
+// simulate the DFA using the static tables and predict an alternative
 - (int) predict:(id<ANTLRIntStream>) stream;
 - (void) noViableAlt:(int) state stream:(id<ANTLRIntStream>)theStream;
 

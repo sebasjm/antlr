@@ -31,6 +31,7 @@
 
 @implementation ANTLRToken
 
+// return the singleton EOF Token 
 + (ANTLRToken *) eofToken
 {
 	static ANTLRToken *eofToken = nil;
@@ -46,12 +47,14 @@
 }
 
 
+// the default channel for this class of Tokens
 + (ANTLRTokenChannel) defaultChannel
 {
 	return ANTLRTokenChannelDefault;
 }
 
 
+// provide dummy implementations of the accessor methods.
 - (NSString *) text
 {
 	return nil;
@@ -100,6 +103,8 @@
 - (void) setTokenIndex: (unsigned int) aTokenIndex
 {
 }
+
+#pragma mark NSCopying conformance
 
 - (id) copyWithZone:(NSZone *)theZone
 {

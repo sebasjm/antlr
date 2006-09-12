@@ -61,7 +61,6 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 	   fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
-<actions.(actionScope).header>
 
 <@imports>
 #import "<name>.h"
@@ -83,6 +82,8 @@ headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 
 #import \<Cocoa/Cocoa.h>
 #import \<ANTLR/ANTLR.h>
+
+<actions.(actionScope).header>
 
 <if(LEXER)>
 <lexerHeaderFile(...)>
@@ -229,10 +230,12 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 #pragma mark Dynamic Scopes
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDecl(scope=it)><endif>}>
 
-#pragma mark Rule Return Scopes
+#pragma mark Rule return scopes start
 <rules:{rule |
-<rule.ruleDescriptor:returnScope(ruleDescriptor=rule.ruleDescriptor)>
+<rule.ruleDescriptor:returnScopeInterface(ruleDescriptor=rule.ruleDescriptor)>
 }>
+#pragma mark Rule return scopes end
+
 
 @interface <name> : <@superClassName><superClass><@end> {
 
@@ -1064,18 +1067,18 @@ evalPredicate(pred,description) ::= "<pred>"
 
 evalSynPredicate(pred,description) ::= "[self evaluateSyntacticPredicate:<pred>SyntacticPredicate stream:input]"
 
-lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>/*atom/Test*/"
+lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 
 /** Sometimes a lookahead test cannot assume that LA(k) is in a temp variable
  *  somewhere.  Must ask for the lookahead directly.
  */
-isolatedLookaheadTest(atom,k,atomAsInt) ::= "[input LA:<k>]==<atom>/*atom/iso*/"
+isolatedLookaheadTest(atom,k,atomAsInt) ::= "[input LA:<k>]==<atom>"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
-(LA<decisionNumber>_<stateNumber>\>=<lower>/*lower*/ && LA<decisionNumber>_<stateNumber>\<=<upper>/*upper/range*/)
+(LA<decisionNumber>_<stateNumber>\>=<lower> && LA<decisionNumber>_<stateNumber>\<=<upper>)
 >>
 
-isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "([input LA:<k>]\>=<lower>/*lower*/ && [input LA:<k>]\<=<upper>/*upper/isorange*/)"
+isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "([input LA:<k>]\>=<lower> && [input LA:<k>]\<=<upper>)"
 
 setTest(ranges) ::= "<ranges; separator=\"||\">"
 

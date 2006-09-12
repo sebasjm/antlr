@@ -31,13 +31,14 @@
 #import <ANTLR/ANTLRIntStream.h>
 #import <ANTLR/ANTLRCharStream.h>
 #import <ANTLR/ANTLRTokenStream.h>
+#import <ANTLR/ANTLRTree.h>
+#import <ANTLR/ANTLRTreeNodeStream.h>
 
 @interface ANTLRRecognitionException : NSException {
 	id<ANTLRIntStream> input;
 	int index;
 	ANTLRToken *token;
-#warning TreeParser support not yet implemented.
-	// id node;
+	id<ANTLRTree> node;
 	unichar c;
 	int line;
 	int charPositionInLine;
@@ -53,5 +54,7 @@
 - (ANTLRToken *) token;
 - (void) setToken: (ANTLRToken *) aToken;
 
+- (id<ANTLRTree>) node;
+- (void) setNode: (id<ANTLRTree>) aNode;
 
 @end

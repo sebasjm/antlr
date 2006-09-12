@@ -66,6 +66,7 @@
 }
 
 
+// this method may be overridden in the generated lexer if we generate a filtering lexer.
 - (ANTLRToken *) nextToken
 {
 	token = nil;
@@ -86,7 +87,7 @@
 	}
 }
 
-- (void) mTokens { [self doesNotRecognizeSelector:_cmd]; }		// abstract
+- (void) mTokens { [self doesNotRecognizeSelector:_cmd]; }		// abstract, defined in generated source as a starting point for matching
 - (id<ANTLRCharStream>) input
 {
     return input; 
@@ -103,11 +104,15 @@
 	tokenStartCharIndex = -1;
 }
 
+// use this to emit custom tokens from a lexer rule
 - (void) emit:(ANTLRToken *)aToken
 {
 	[self setToken:aToken];
 }
 
+// this method is used by the code generator to automatically emit tokens from the lexer.
+// for now it will always return ANTLRCommonTokens
+// use a manual emit: in the grammar to return custom tokens
 - (void) emitTokenWithType:(ANTLRTokenType)aTType 
 					  line:(unsigned int)aLine 
 			  charPosition:(unsigned int)aCharPos 
@@ -155,6 +160,8 @@
 
 - (void) matchChar:(unichar) aChar
 {
+	// TODO: -LA: is returning an int because it sometimes is used in the generated parser to compare lookahead with a tokentype.
+	//		 try to change all those occurrences to -LT: if possible (i.e. if ANTLR can be made to generate LA only for lexer code)
 	if ((unichar)[input LA:1] != aChar) {
 		if (backtracking > 0) {
 			failed = YES;

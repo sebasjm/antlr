@@ -31,6 +31,7 @@
 
 @implementation ANTLRCommonToken
 
+// designated initializer
 - (ANTLRCommonToken *) initWithInput:(id<ANTLRCharStream>)anInput tokenType:(int)aTType channel:(int)aChannel start:(int)theStart stop:(int)theStop
 {
 	if (nil != (self = [super init])) {
@@ -43,19 +44,29 @@
 	return self;
 }
 
+- (ANTLRCommonToken *) initWithToken:(ANTLRCommonToken *)aToken
+{
+	return [aToken copy];
+}
+
+// create a copy, including the text if available
+// the input stream is *not* copied!
 - (id) copyWithZone:(NSZone *)theZone
 {
 	ANTLRCommonToken *copy = [super copyWithZone:theZone];
 	if (copy) {
 		[copy setChannel:channel];
-		if (text)
-			[copy setText:text];
+		if (text) {
+			NSString *copyOfText = [text copyWithZone:theZone];
+			[copy setText:copyOfText];
+			[copyOfText release];
+		}
 		[copy setStart:start];
 		[copy setStop:stop];
 		[copy setIndex:index];
 		[copy setLine:line];
 		[copy setCharPositionInLine:charPositionInLine];
-		[copy setInput:input];
+		[copy setInput:input];		// not a copy, but a reference to the original input stream!
 	}
 	return copy;
 }
@@ -87,12 +98,12 @@
 //---------------------------------------------------------- 
 //  type 
 //---------------------------------------------------------- 
-- (int) type
+- (unsigned int) type
 {
     return type;
 }
 
-- (void) setType: (int) aType
+- (void) setType: (unsigned int) aType
 {
     type = aType;
 }
@@ -100,12 +111,12 @@
 //---------------------------------------------------------- 
 //  line 
 //---------------------------------------------------------- 
-- (int) line
+- (unsigned int) line
 {
     return line;
 }
 
-- (void) setLine: (int) aLine
+- (void) setLine: (unsigned int) aLine
 {
     line = aLine;
 }
@@ -113,12 +124,12 @@
 //---------------------------------------------------------- 
 //  charPositionInLine 
 //---------------------------------------------------------- 
-- (int) charPositionInLine
+- (unsigned int) charPositionInLine
 {
     return charPositionInLine;
 }
 
-- (void) setCharPositionInLine: (int) aCharPositionInLine
+- (void) setCharPositionInLine: (unsigned int) aCharPositionInLine
 {
     charPositionInLine = aCharPositionInLine;
 }
@@ -126,12 +137,12 @@
 //---------------------------------------------------------- 
 //  channel 
 //---------------------------------------------------------- 
-- (int) channel
+- (unsigned int) channel
 {
     return channel;
 }
 
-- (void) setChannel: (int) aChannel
+- (void) setChannel: (unsigned int) aChannel
 {
     channel = aChannel;
 }
@@ -161,12 +172,12 @@
 //---------------------------------------------------------- 
 //  start 
 //---------------------------------------------------------- 
-- (int) start
+- (unsigned int) start
 {
     return start;
 }
 
-- (void) setStart: (int) aStart
+- (void) setStart: (unsigned int) aStart
 {
     start = aStart;
 }
@@ -174,12 +185,12 @@
 //---------------------------------------------------------- 
 //  stop 
 //---------------------------------------------------------- 
-- (int) stop
+- (unsigned int) stop
 {
     return stop;
 }
 
-- (void) setStop: (int) aStop
+- (void) setStop: (unsigned int) aStop
 {
     stop = aStop;
 }
@@ -187,17 +198,18 @@
 //---------------------------------------------------------- 
 //  index 
 //---------------------------------------------------------- 
-- (int) index
+- (unsigned int) index
 {
     return index;
 }
 
-- (void) setIndex: (int) anIndex
+- (void) setIndex: (unsigned int) anIndex
 {
     index = anIndex;
 }
 
 
+// provide a textual representation for debugging
 - (NSString *) description
 {
 	NSString *channelString = [[NSString alloc] initWithFormat:@"channel=%d", channel];

@@ -27,59 +27,71 @@
 
 
 #import <Cocoa/Cocoa.h>
-#import <ANTLR/ANTLRCharStream.h>
+#import <ANTLR/ANTLRTreeNodeStream.h>
+#import <ANTLR/ANTLRCommonTree.h>
+#import <ANTLR/ANTLRCommonTreeAdaptor.h>
 
-@interface ANTLRStringStream : NSObject < ANTLRCharStream > {
-	NSMutableArray *markers;
-	NSString *data;
+@interface ANTLRCommonTreeNodeStream : NSObject < ANTLRTreeNodeStream > {
+
+	BOOL shouldUseUniqueNavigationNodes;
+
+	ANTLRCommonTree *root;
+	ANTLRCommonTree *currentNode;
+	ANTLRCommonTree *previousNode;
+
+	ANTLRCommonTreeAdaptor *treeAdaptor;
 	
-	unsigned  p;
-	unsigned  line;
-	unsigned  charPositionInLine;
-	unsigned  markDepth;
+	NSMutableArray *nodeStack;
+	NSMutableArray *indexStack;
+	NSMutableArray *markers;
+	int lastMarker;
+	
+	int currentChildIndex;
+	int absoluteNodeIndex;
+	
+	NSMutableArray *lookahead;
+	unsigned int head;
+	unsigned int tail;
 }
 
-- (id) init;
+- (id) initWithTree:(ANTLRCommonTree *)theTree;
+- (id) initWithTree:(ANTLRCommonTree *)theTree treeAdaptor:(ANTLRCommonTreeAdaptor *)theAdaptor;
 
-// this initializer copies the string
-- (id) initWithString:(NSString *) theString;
-
-// This is the preferred constructor as no data is copied
-- (id) initWithStringNoCopy:(NSString *) theString;
-
-- (void) dealloc;
-
-// reset the stream's state, but keep the data to feed off
 - (void) reset;
-// consume one character from the stream
+
+#pragma mark ANTLRTreeNodeStream conformance
+
+- (id) LT:(int)k;
+- (ANTLRTreeAdaptor *) treeAdaptor;
+- (void) setUsesUniqueNavigationNodes:(BOOL)flag;
+
+#pragma mark ANTLRIntStream conformance
 - (void) consume;
-
-// look ahead i characters
-- (int) LA:(int) i;
-
-// returns the position of the current input symbol
-- (unsigned int) index;
-// total length of the input data
-- (unsigned int) count;
-
-// seek and rewind in the stream
+- (int) LA:(unsigned int) i;
 - (unsigned int) mark;
+- (unsigned int) index;
 - (void) rewind:(unsigned int) marker;
+- (void) rewind;
 - (void) release:(unsigned int) marker;
 - (void) seek:(unsigned int) index;
+- (unsigned int) count;
 
-// provide the streams data (e.g. for tokens using indices)
-- (NSString *) substringWithRange:(NSRange) theRange;
+#pragma mark Lookahead Handling
+- (void) addLookahead:(id<ANTLRTree>)aNode;
+- (unsigned int) lookaheadSize;
+- (void) fillBufferWithLookahead:(int)k;
+- (id) nextObject;
 
-// used for tracking the current position in the input stream
-- (unsigned int) line;
-- (void) setLine:(unsigned int) theLine;
-- (unsigned int) charPositionInLine;
-- (void) setCharPositionInLine:(unsigned int) thePos;
+#pragma mark Node visiting
+- (ANTLRCommonTree *) handleRootNode;
+- (ANTLRCommonTree *) visitChild:(int)childNumber;
+- (void) walkBackToMostRecentNodeWithUnvisitedChildren;
+- (void) addNavigationNodeWithType:(int)tokenType;
 
-// accessors to the raw data of this stream
-- (NSString *) data;
-- (void) setData: (NSString *) aData;
+#pragma mark Accessors
+- (ANTLRCommonTree *) root;
+- (void) setRoot: (ANTLRCommonTree *) aRoot;
 
+- (void) setTreeAdaptor: (ANTLRCommonTreeAdaptor *) aTreeAdaptor;
 
 @end

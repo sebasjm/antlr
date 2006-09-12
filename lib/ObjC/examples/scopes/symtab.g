@@ -31,7 +31,7 @@ scope Symbols;
     level++;
 // doesn't work. no lvalue!	
 //    $Symbols::names = [[NSMutableArray alloc] init];
-	[[$Symbols lastObject] setValue:[[NSMutableArray alloc] init] forKey:@"names"];
+	[[$Symbols lastObject] setValue:[NSMutableArray array] forKey:@"names"];
 }
 @finally {
 	[$Symbols::names release];

@@ -42,16 +42,14 @@
 	unsigned int tokenStartCharIndex;
 }
 
-// init
 #pragma mark Initializer
 - (id) initWithCharStream:(id<ANTLRCharStream>)anInput;
 
-// token stuff
 #pragma mark Tokens
 - (ANTLRToken *) token;
 - (void) setToken: (ANTLRToken *) aToken;
 - (ANTLRToken *) nextToken;
-- (void) mTokens;		// abstract
+- (void) mTokens;		// abstract, defined in generated sources
 - (id<ANTLRCharStream>) input;
 - (void) setInput:(id<ANTLRCharStream>)aCharStream;
 - (void) emit:(ANTLRToken *)aToken;
@@ -62,16 +60,13 @@
 					 start:(unsigned int)theStart
 					  stop:(unsigned int)theStop;
 
-// matching
 #pragma mark Matching
 - (void) matchString:(NSString *)aString;
 - (void) matchAny;
 - (void) matchChar:(unichar) aChar;
 - (void) matchRangeFromChar:(unichar)fromChar to:(unichar)toChar;
 
-// info
 #pragma mark Informational
-
 - (unsigned int) line;
 - (unsigned int) charPositionInLine;
 - (unsigned int) charIndex;

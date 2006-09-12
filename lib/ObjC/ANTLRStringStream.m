@@ -35,12 +35,11 @@
 {
 	if (nil != (self = [super init])) {
 		markers = [[NSMutableArray alloc] init];
-		[self reset];
+		[self reset];			// rely on internal implementation to reset the state, instead of duplicating here.
 	}
 	return self;
 }
 
-/** Copy data in string to a local char array */
 - (id) initWithString:(NSString *) theString
 {
 	if (nil != (self = [self init])) {
@@ -49,7 +48,6 @@
 	return self;
 }
 
-/** This is the preferred constructor as no data is copied */
 - (id) initWithStringNoCopy:(NSString *) theString
 {
 	if (nil != (self = [self init])) {
@@ -65,10 +63,9 @@
 	[super dealloc];
 }
 
-/** Reset the stream so that it's in the same state it was
-*  when the object was created *except* the data array is not
-*  touched.
-*/
+
+// reset the streams state
+// the streams content is not reset!
 - (void) reset
 {
 	p = 0;
@@ -76,9 +73,14 @@
 	charPositionInLine = 0;
 	markDepth = 0;
 	[markers removeAllObjects];
-	[markers addObject:[NSNull null]];
+	[markers addObject:[NSNull null]];		// ANTLR generates code that assumes markers to be 1-based,
+											// thus the initial null in the array!
 }
 
+// read one character off the stream, tracking line numbers and character positions
+// automatically.
+// Override this in subclasses if you want to avoid the overhead of automatic line/pos
+// handling. Do not call super in that case.
 - (void) consume 
 {
 	if ( p < [data length] ) {
@@ -91,6 +93,7 @@
 	}
 }
 
+// implement the lookahead method used in lexers
 - (int) LA:(int) i 
 {
 	if ( (p+i-1) >= [data length] ) {
@@ -99,9 +102,7 @@
 	return (int)[data characterAtIndex:p+i-1];
 }
 
-/** Return the current input symbol index 0..n where n indicates the
-*  last symbol has been read.
-*/
+// current input position
 - (unsigned int) index 
 {
 	return p;
@@ -112,6 +113,9 @@
 	return [data length];
 }
 
+// push the current state of the stream onto a stack
+// returns the depth of the stack, to be used as a marker to rewind the stream.
+// Note: markers are 1-based!
 - (unsigned int) mark 
 {
 	markDepth++;
@@ -140,18 +144,21 @@
 	charPositionInLine = [state charPositionInLine];
 }
 
+// remove stream states on top of 'marker' from the marker stack
+// returns the new markDepth of the stack.
+// Note: unfortunate naming for Objective-C, but to keep close to the Java target this is named release:
 - (void) release:(unsigned int) marker 
 {
-#warning Leaking memory here?
-	// unwind any other markers made after m and release m
+	// unwind any other markers made after marker and release marker
+	[markers removeObjectsInRange:NSMakeRange(marker+1, [markers count] - marker+1)];
 	markDepth = marker;
 	// release this marker
 	markDepth--;
 }
 
-/** consume() ahead until p==index; can't just set p=index as we must
-*  update line and charPositionInLine.
-*/
+// when seeking forward we must handle character position and line numbers.
+// seeking backward already has the correct line information on the markers stack, 
+// so we just take it from there.
 - (void) seek:(unsigned int) index 
 {
 	if ( index<=p ) {
@@ -164,6 +171,7 @@
 	}
 }
 
+// get a substring from our raw data.
 - (NSString *) substringWithRange:(NSRange) theRange 
 {
 	return [data substringWithRange:theRange];

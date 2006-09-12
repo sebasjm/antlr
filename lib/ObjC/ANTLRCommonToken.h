@@ -34,31 +34,38 @@
 	NSString *text;
 	
 //	int type;					// inherited from ANTLRToken!
-	int line;
-	int charPositionInLine;
-	int channel;
+	// information about the Token's position in the input stream
+	unsigned int line;
+	unsigned int charPositionInLine;
+	unsigned int channel;
 	
+	// the actual input stream this token was found in
 	id<ANTLRCharStream> input;
-	
-	int start;
-	int stop;
-	int index;
+	// indices into the CharStream to avoid copying the text
+	// can manually override the text by using -setText:
+	unsigned int start;
+	unsigned int stop;
+	// this token's position in the TokenStream
+	unsigned int index;
 }
 
+// designated initializer. This is used as the default way to initialize a Token in the generated code.
 - (ANTLRCommonToken *) initWithInput:(id<ANTLRCharStream>)anInput tokenType:(int)aTType channel:(int)aChannel start:(int)theStart stop:(int)theStop;
+- (ANTLRCommonToken *) initWithToken:(ANTLRCommonToken *)aToken;
 
 - (id<ANTLRCharStream>) input;
 - (void) setInput: (id<ANTLRCharStream>) anInput;
 
-- (int) start;
-- (void) setStart: (int) aStart;
+- (unsigned int) start;
+- (void) setStart: (unsigned int) aStart;
 
-- (int) stop;
-- (void) setStop: (int) aStop;
+- (unsigned int) stop;
+- (void) setStop: (unsigned int) aStop;
 
-- (int) index;
-- (void) setIndex: (int) anIndex;
+- (unsigned int) index;
+- (void) setIndex: (unsigned int) anIndex;
 
+// conform to NSCopying
 - (id) copyWithZone:(NSZone *)theZone;
 
 @end

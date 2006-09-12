@@ -38,25 +38,24 @@
 #define ANTLR_INITIAL_FOLLOW_STACK_SIZE 100
 
 @class ANTLRBitSet;
-@class ANTLRGrammarFragment;
 #import <ANTLR/ANTLRRecognitionException.h>
 #import <ANTLR/ANTLRMismatchedTokenException.h>
 #import <ANTLR/ANTLRToken.h>
 
 @interface ANTLRBaseRecognizer : NSObject {
-	NSMutableArray *following;
-	int fsp;
-	BOOL errorRecovery;
+	NSMutableArray *following;			// a stack of FOLLOW bitsets used for context sensitive prediction and recovery
+	BOOL errorRecovery;					// are we recovering?
 	int lastErrorIndex;
-	BOOL failed;
-	int backtracking;
-	NSMutableDictionary *ruleMemo;
+	BOOL failed;						// indicate that some match failed
+	int backtracking;					// the level of backtracking
+	NSMutableDictionary *ruleMemo;		// store previous results of matching rules so we don't have to do it again. Hook in incremental stuff here, too.
 	
-	NSArray *tokenNames;
-	NSString *grammarFileName;
+	NSArray *tokenNames;				// textual representation of the tokens for this grammar. filled in by codegeneration
+	NSString *grammarFileName;			// where did the grammar come from. filled in by codegeneration
 	
 }
 
+// simple accessors
 - (BOOL) isFailed;
 - (void) setIsFailed: (BOOL) flag;
 
@@ -65,20 +64,22 @@
 
 - (id) init;
 
+// reset this recognizer - might be extended by codegeneration/grammar
 - (void) reset;
 
+// do actual matching of tokens/characters
 - (void) match:(id<ANTLRIntStream>)input tokenType:(ANTLRTokenType) ttype follow:(ANTLRBitSet *)follow;
 - (void) matchAny:(id<ANTLRIntStream>)input;
 
+// error reporting and recovery
 - (void) reportError:(NSException *)e;
 - (void) displayRecognitionError:(NSString *)name tokenNames:(NSArray *)tokenNames exception:(NSException *)e;
-
 - (void) recover:(id<ANTLRIntStream>)input exception:(NSException *)e;
-
 - (void) beginResync;
 - (void) endResync;
 
-- (ANTLRBitSet *)computeContectSensitiveRuleFOLLOW;
+// compute the bitsets necessary to do matching and recovery
+- (ANTLRBitSet *)computeContextSensitiveRuleFOLLOW;
 - (ANTLRBitSet *)combineFollowsExact:(BOOL) exact;
 - (ANTLRBitSet *)computeErrorRecoverySet;
 
@@ -96,12 +97,13 @@
 							exception:(NSException *)e
 							   follow:(ANTLRBitSet *)follow;
 
+// helper methods for recovery. try to resync somewhere
 - (void) consumeUntil:(id<ANTLRIntStream>)input
 			tokenType:(ANTLRTokenType)ttype;
 - (void) consumeUntil:(id<ANTLRIntStream>)input
 			   bitSet:(ANTLRBitSet *)bitSet;
 
-
+// to be used by the debugger to do reporting. maybe hook in incremental stuff here, too.
 - (NSArray *) ruleInvocationStack;
 - (NSArray *) ruleInvocationStack:(id) exception
 					   recognizer:(Class) recognizerClass;
@@ -112,7 +114,7 @@
 - (NSArray *) toStrings:(NSArray *)tokens;
 - (NSArray *) toTemplates:(NSArray *)retvals;
 
-
+// support for memoization
 - (int) ruleMemoization:(int)ruleIndex startIndex:(int)ruleStartIndex;
 
 - (BOOL) alreadyParsedRule:(id<ANTLRIntStream>)input ruleIndex:(int)ruleIndex;
@@ -123,6 +125,9 @@
 
 - (int) ruleMemoizationCacheSize;
 
+
+// support for syntactic predicates. these are called indirectly to support funky stuff in grammars, like
+// supplying selectors instead of writing code directly into the actions of the grammar.
 - (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment stream:(id<ANTLRIntStream>)input;
 
 @end

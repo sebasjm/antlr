@@ -25,61 +25,44 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-#import <Cocoa/Cocoa.h>
-
-typedef enum {
-	ANTLRTokenTypeEOF = -1,
-	ANTLRTokenTypeInvalid,
-	ANTLRTokenTypeEOR,
-	ANTLRTokenTypeDOWN,
-	ANTLRTokenTypeUP,
-	ANTLRTokenTypeMIN
-} ANTLRTokenType;
-
-typedef enum {
-	ANTLRTokenChannelDefault = 0
-} ANTLRTokenChannel;
+#import "ANTLRTreeParser.h"
 
 
-// The abstract Token class
-// TODO also provide an ANTLRToken protocol
+@implementation ANTLRTreeParser
 
-@interface ANTLRToken : NSObject <NSCopying> {
-	int type;			// needed for +eofToken
+- (id) initWithTreeNodeStream:(id<ANTLRTreeNodeStream>)theInput
+{
+	if ((self = [super init]) != nil) {
+		[self setInput:theInput];
+	}
+	return self;
 }
 
-// The singleton eofToken instance.
-+ (ANTLRToken *) eofToken;
-// The default channel for this class of Tokens
-+ (ANTLRTokenChannel) defaultChannel;
+- (void) dealloc
+{
+	[self setInput:nil];
+	[super dealloc];
+}
 
-// provide hooks to explicitely set the text as opposed to use the indices into the CharStream
-- (NSString *) text;
-- (void) setText:(NSString *) theText;
+- (void) mismatch:(id<ANTLRIntStream>)aStream tokenType:(int)aTType follow:(ANTLRBitSet *)aBitset
+{
+	ANTLRMismatchedTreeNodeException *mte = [ANTLRMismatchedTreeNodeException exceptionWithTokenType:aTType stream:aStream];
+	[self recoverFromMismatchedToken:aStream exception:mte tokenType:aTType follow:aBitset];
+}
 
-- (int) type;
-- (void) setType: (int) aType;
+- (id<ANTLRTreeNodeStream>) input
+{
+    return input; 
+}
 
-// ANTLR v3 provides automatic line and position tracking. Subclasses do not need to
-// override these, if they do not want to store line/pos tracking information
-- (unsigned int) line;
-- (void) setLine: (unsigned int) aLine;
+- (void) setInput: (id<ANTLRTreeNodeStream>) anInput
+{
+    if (input != anInput) {
+        [anInput retain];
+        [input release];
+        input = anInput;
+    }
+}
 
-- (unsigned int) charPositionInLine;
-- (void) setCharPositionInLine: (unsigned int) aCharPositionInLine;
-
-// explicitely change the channel this Token is on. The default parser implementation
-// just sees the defaultChannel
-// Common idiom is to put whitespace tokens on channel 99.
-- (unsigned int) channel;
-- (void) setChannel: (unsigned int) aChannel;
-
-// the index of this Token into the TokenStream
-- (unsigned int) tokenIndex;
-- (void) setTokenIndex: (unsigned int) aTokenIndex;
-
-// conform to NSCopying
-- (id) copyWithZone:(NSZone *)theZone;
 
 @end

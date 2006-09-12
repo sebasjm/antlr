@@ -29,11 +29,14 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreFoundation/CoreFoundation.h>
 
+// A simple wrapper around CoreFoundation bit vectors to shield the rest of the implementation
+// from the specifics of the BitVector initialization and query functions.
+// This is fast, so there is no need to reinvent the wheel just yet.
+
 @interface ANTLRBitSet : NSObject < NSCopying > {
 	CFMutableBitVectorRef bitVector;
 }
 
-// initializer
 #pragma mark Initializer
 
 - (ANTLRBitSet *) init;
@@ -41,7 +44,6 @@
 - (ANTLRBitSet *) initWithBits:(const unsigned long long const*)theBits count:(unsigned int)theCount;
 - (ANTLRBitSet *) initWithArrayOfBits:(NSArray *)theArray;
 
-// operations
 #pragma mark Operations
 - (ANTLRBitSet *) or:(ANTLRBitSet *) aBitSet;
 - (void) orInPlace:(ANTLRBitSet *) aBitSet;
@@ -51,14 +53,13 @@
 - (unsigned int) size;
 - (void) setSize:(unsigned int) noOfWords;
 
-// informational
 #pragma mark Informational
 - (unsigned long long) bitMask:(unsigned int) bitNumber;
 - (BOOL) isMember:(unsigned int) bitNumber;
 - (BOOL) isNil;
 - (NSString *) toString;
+- (NSString *) description;
 
-// NSCopying
 #pragma mark NSCopying support
 
 - (id) copyWithZone:(NSZone *) theZone;

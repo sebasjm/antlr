@@ -25,61 +25,22 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #import <Cocoa/Cocoa.h>
+#import <ANTLR/ANTLRBaseRecognizer.h>
+#import <ANTLR/ANTLRTreeNodeStream.h>
+#import <ANTLR/ANTLRMismatchedTreeNodeException.h>
 
-typedef enum {
-	ANTLRTokenTypeEOF = -1,
-	ANTLRTokenTypeInvalid,
-	ANTLRTokenTypeEOR,
-	ANTLRTokenTypeDOWN,
-	ANTLRTokenTypeUP,
-	ANTLRTokenTypeMIN
-} ANTLRTokenType;
-
-typedef enum {
-	ANTLRTokenChannelDefault = 0
-} ANTLRTokenChannel;
-
-
-// The abstract Token class
-// TODO also provide an ANTLRToken protocol
-
-@interface ANTLRToken : NSObject <NSCopying> {
-	int type;			// needed for +eofToken
+@interface ANTLRTreeParser : ANTLRBaseRecognizer {
+	id<ANTLRTreeNodeStream> input;
 }
 
-// The singleton eofToken instance.
-+ (ANTLRToken *) eofToken;
-// The default channel for this class of Tokens
-+ (ANTLRTokenChannel) defaultChannel;
+- (id) initWithTreeNodeStream:(id<ANTLRTreeNodeStream>)theInput;
 
-// provide hooks to explicitely set the text as opposed to use the indices into the CharStream
-- (NSString *) text;
-- (void) setText:(NSString *) theText;
+- (id<ANTLRTreeNodeStream>) input;
+- (void) setInput: (id<ANTLRTreeNodeStream>) anInput;
 
-- (int) type;
-- (void) setType: (int) aType;
 
-// ANTLR v3 provides automatic line and position tracking. Subclasses do not need to
-// override these, if they do not want to store line/pos tracking information
-- (unsigned int) line;
-- (void) setLine: (unsigned int) aLine;
 
-- (unsigned int) charPositionInLine;
-- (void) setCharPositionInLine: (unsigned int) aCharPositionInLine;
 
-// explicitely change the channel this Token is on. The default parser implementation
-// just sees the defaultChannel
-// Common idiom is to put whitespace tokens on channel 99.
-- (unsigned int) channel;
-- (void) setChannel: (unsigned int) aChannel;
-
-// the index of this Token into the TokenStream
-- (unsigned int) tokenIndex;
-- (void) setTokenIndex: (unsigned int) aTokenIndex;
-
-// conform to NSCopying
-- (id) copyWithZone:(NSZone *)theZone;
 
 @end

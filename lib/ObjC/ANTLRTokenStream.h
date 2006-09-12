@@ -31,12 +31,12 @@
 
 @protocol ANTLRTokenStream < ANTLRIntStream >
 
-    /** Get Token at current input pointer + i ahead where i=1 is next Token.
-	*  i<0 indicates tokens in the past.  So -1 is previous token and -2 is
-	*  two tokens ago. LT(0) is undefined.  For i>=n, return Token.EOFToken.
-	*  Return null for LT(0) and any index that results in an absolute address
-	*  that is negative.
-					 */
+// Get Token at current input pointer + i ahead where i=1 is next Token.
+// i<0 indicates tokens in the past.  So -1 is previous token and -2 is
+// two tokens ago. LT:0 is undefined.  For i>=n, return Token.EOFToken.
+// Return null for LT:0 and any index that results in an absolute address
+// that is negative.
+
 - (ANTLRToken *) LT:(unsigned int) i;
 
 - (ANTLRToken *) tokenAtIndex:(unsigned int) i;

@@ -42,7 +42,6 @@
 		lastErrorIndex = -1;
 		failed = NO;
 		backtracking = 0;
-		fsp = -1;
 		ruleMemo = [[NSMutableArray alloc] initWithCapacity:ANTLR_INITIAL_FOLLOW_STACK_SIZE];
 	}
 	return self;
@@ -75,17 +74,19 @@
 	return backtracking;
 }
 
+// reset the recognizer to the initial state. does not touch the token source!
+// this can be extended by the grammar writer to reset custom ivars
 - (void) reset
 {
 	errorRecovery = NO;
 	lastErrorIndex = -1;
 	failed = NO;
 	backtracking = 0;
-	fsp = -1;
 	[following removeAllObjects]; 
 	[ruleMemo removeAllObjects];
 }
 
+// match the next token on the input stream. try to recover with the FOLLOW set is there is a mismatch
 - (void) match:(id<ANTLRIntStream>)input 
 	 tokenType:(ANTLRTokenType) ttype
 		follow:(ANTLRBitSet *)follow
@@ -103,12 +104,14 @@
 	[self mismatch:input tokenType:ttype follow:follow];
 }
 
+// prepare and exception and try to recover from a mismatch
 - (void) mismatch:(id<ANTLRIntStream>)aStream tokenType:(int)aTType follow:(ANTLRBitSet *)aBitset
 {
 	ANTLRMismatchedTokenException *mte = [ANTLRMismatchedTokenException exceptionWithTokenType:aTType stream:aStream];
 	[self recoverFromMismatchedToken:aStream exception:mte tokenType:aTType follow:aBitset];
 }
 
+// just consume the next symbol and reset the error ivars
 - (void) matchAny:(id<ANTLRIntStream>)input
 {
 	errorRecovery = NO;
@@ -116,6 +119,7 @@
 	[input consume];
 }
 
+// everything failed. report the error
 - (void) reportError:(NSException *)e
 {
 	if (errorRecovery) {
@@ -125,11 +129,13 @@
 	[self displayRecognitionError:NSStringFromClass([self class]) tokenNames:[self tokenNames] exception:e];
 }
 
+// override to implement a different display strategy.
 - (void) displayRecognitionError:(NSString *)name tokenNames:(NSArray *)tokenNames exception:(NSException *)e
 {
 	NSLog(@"%@", [e description]);
 }
 
+// try to recover from a mismatch by resyncing
 - (void) recover:(id<ANTLRIntStream>)input exception:(NSException *)e
 {
 	if (lastErrorIndex == [input index]) {
@@ -142,6 +148,9 @@
 	[self endResync];
 }
 
+
+// hooks for debugger
+// TODO
 - (void) beginResync
 {
 }
@@ -156,19 +165,17 @@
 	return [self combineFollowsExact:NO];
 }
 
-
-
-- (ANTLRBitSet *)computeContectSensitiveRuleFOLLOW
+- (ANTLRBitSet *)computeContextSensitiveRuleFOLLOW
 {
 	return [self combineFollowsExact:YES];
 }
 
+// compute a new FOLLOW set for recovery using the rules we have descended through
 - (ANTLRBitSet *)combineFollowsExact:(BOOL)exact
 {
-	int top = fsp;
 	ANTLRBitSet *followSet = [[[ANTLRBitSet alloc] init] autorelease];
 	int i;
-	for (i = top; i >= 0; i--) {
+	for (i = [following count]-1; i >= 0; i--) {
 		ANTLRBitSet *localFollowSet = [following objectAtIndex:i];
 		[followSet orInPlace:localFollowSet];
 		if (exact && ![localFollowSet isMember:ANTLRTokenTypeEOR]) {
@@ -180,6 +187,7 @@
 }
 
 
+// delete one token and try to carry on.
 - (void) recoverFromMismatchedToken:(id<ANTLRIntStream>)input 
 						  exception:(NSException *)e 
 						  tokenType:(ANTLRTokenType)ttype 
@@ -202,12 +210,13 @@
 						exception:(NSException *)e
 						   follow:(ANTLRBitSet *)follow
 {
-	// todo
+	// TODO - recovery is currently incomplete in ANTLR
 	if (![self recoverFromMismatchedElement:input exception:e follow:follow]) {
 		@throw e;
 	}
 }
 
+// this code handles single token insertion recovery
 - (BOOL) recoverFromMismatchedElement:(id<ANTLRIntStream>)input
 							exception:(NSException *)e
 							   follow:(ANTLRBitSet *)follow
@@ -215,19 +224,24 @@
 	if (follow == nil) {
 		return NO;
 	}
+	
+	// compute the viable symbols that can follow the current rule
 	ANTLRBitSet *localFollow = follow;
 	if ([follow isMember:ANTLRTokenTypeEOR]) {
-		ANTLRBitSet *viableTokensFollowingThisRule = [self computeContectSensitiveRuleFOLLOW];
+		ANTLRBitSet *viableTokensFollowingThisRule = [self computeContextSensitiveRuleFOLLOW];
 		ANTLRBitSet *localFollow = [follow or:viableTokensFollowingThisRule];
 		[localFollow remove:ANTLRTokenTypeEOR];
 	}
+	// if the current token could follow the missing token we tell the user and proceed with matching
 	if ([localFollow isMember:[input LA:1]]) {
 		[self reportError:e];
 		return YES;
 	}
+	// otherwise the match fails
 	return NO;
 }
 
+// used in resyncing to skip to next token of a known type
 - (void) consumeUntil:(id<ANTLRIntStream>)input
 			tokenType:(ANTLRTokenType)theTtype
 {
@@ -238,6 +252,7 @@
 	}
 }
 
+// used in resyncing to skip to the next token whose type in the bitset
 - (void) consumeUntil:(id<ANTLRIntStream>)input
 			   bitSet:(ANTLRBitSet *)bitSet
 {
@@ -251,7 +266,6 @@
 - (void) pushFollow:(ANTLRBitSet *)follow
 {
 	[following addObject:follow];
-	fsp = [following count];
 }
 
 
@@ -279,6 +293,7 @@
 	return grammarFileName;
 }
 
+// pure convenience
 - (NSArray *) toStrings:(NSArray *)tokens
 {
 	if (tokens == nil ) {
@@ -294,24 +309,17 @@
 }
 
 
-
+// TODO need an Objective-C StringTemplate implementation for this
 - (NSArray *) toTemplates:(NSArray *)retvals
 {
 	return nil;
 #warning Templates are not yet supported in ObjC!
-/*	if (retvals == nil ) {
-		return nil;
-	}
-	NSMutableArray *strings = [[[NSArray alloc] init] autorelease];
-	NSEnumerator *retvalsEnumerator = [retvals objectEnumerator];
-	id value;
-	while (nil != (value = [retvalsEnumerator nextObject])) {
-		[strings addObject:[(ANTLRRuleReturnScope *)value template]];
-	}
-	return strings;
-*/
 }
 
+// the following methods handle the "memoization" caching functionality
+// they work by associating token indices with rule numbers.
+// that way, when we are about to parse a rule and have parsed the rule previously, e.g. in prediction,
+// we don't have to do it again but can simply return the token index to continue up parsing at.
 
 - (int) ruleMemoization:(int)ruleIndex startIndex:(int)ruleStartIndex
 {
@@ -362,6 +370,7 @@
 	return n;
 }
 
+// call a syntactic predicate methods using its selector. this way we can support arbitrary synpreds.
 - (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment stream:(id<ANTLRIntStream>)input
 {
     backtracking++;
