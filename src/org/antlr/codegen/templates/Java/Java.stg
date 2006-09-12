@@ -48,7 +48,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 	   bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
-	   scopes, superClass) ::=
+	   scopes, superClass, literals) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 <actions.(actionScope).header>

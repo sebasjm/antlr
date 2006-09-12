@@ -55,6 +55,7 @@ public class Tool {
 	protected boolean profile = false;
 	protected boolean report = false;
 	protected boolean printGrammar = false;
+	protected boolean forceAllFilesToOutputDir = false;
 
 	// the internal options are for my use on the command line during dev
 
@@ -84,7 +85,7 @@ public class Tool {
 			return;
 		}
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-o")) {
+			if (args[i].equals("-o") || args[i].equals("-fo")) {
 				if (i + 1 >= args.length) {
 					System.err.println("missing output directory with -o option; ignoring");
 				}
@@ -101,6 +102,9 @@ public class Tool {
 					if( outDir.exists() && !outDir.isDirectory() ) {
 						ErrorManager.error(ErrorManager.MSG_OUTPUT_DIR_IS_FILE,outputDirectory);
 						libDirectory = ".";
+					}
+					if ( args[i].equals("-fo") ) { // force output into dir
+						forceAllFilesToOutputDir = true;
 					}
 				}
 			}
@@ -368,6 +372,7 @@ public class Tool {
 	private static void help() {
         System.err.println("usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]");
 		System.err.println("  -o outputDir   specify output directory where all output is generated");
+		System.err.println("  -fo outputDir  same as -o but force even files with relative paths to dir");
 		System.err.println("  -lib dir       specify location of token files");
 		System.err.println("  -report        print out a report about the grammar(s) processed");
 		System.err.println("  -print         print out the grammar without actions");
@@ -427,7 +432,9 @@ public class Tool {
 			// -o . /usr/lib/t.g => ./T.java
 			if ( fileDirectory!=null &&
 				 (new File(fileDirectory).isAbsolute() ||
-				  fileDirectory.startsWith("~")) ) // isAbsolute doesn't count this :(
+				  fileDirectory.startsWith("~")) || // isAbsolute doesn't count this :(
+				  forceAllFilesToOutputDir
+				)
 			{
 				// somebody set the dir, it takes precendence; write new file there
 				outputDir = new File(outputDirectory);
