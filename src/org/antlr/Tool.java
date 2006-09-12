@@ -233,8 +233,12 @@ public class Tool {
     */
 
     public void process()  {
+		int numFiles = grammarFileNames.size();
 		for (int i = 0; i < grammarFileNames.size(); i++) {
 			String grammarFileName = (String) grammarFileNames.get(i);
+			if ( numFiles > 1 ) {
+			    System.out.println(grammarFileName);
+			}
 			try {
 				//StringTemplate.setLintMode(true);
 				FileReader fr = null;
