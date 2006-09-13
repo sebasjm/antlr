@@ -1,0 +1,580 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2006 Kay Roepke
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+group AST;
+
+@outputFile.imports() ::= <<
+<@super.imports()>
+<if(!TREE_PARSER)><! tree parser would already have imported !>
+#import \<ANTLR/ANTLR.h><\n>
+<endif>
+>>
+
+@parserHeaderFile.ivars() ::= <<
+<@super.ivars()>
+<parserIVars()>
+>>
+
+@parserHeaderFile.methods() ::= <<
+<@super.methods()>
+<parserMethodsDecl()>
+>>
+
+@genericParser.methods() ::= <<
+<@super.methods()>
+<parserMethods()>
+>>
+
+/** additional init code for tree support */
+@genericParser.init() ::= <<
+<@super.init()>
+[self setAdaptor:[ANTLRCommonTreeAdaptor class]];
+>>
+
+/** Add an adaptor property that knows how to build trees */
+parserIVars() ::= <<
+Class adaptor;
+>>
+
+/** Declaration of additional tree support methods - go in interface of parserHeaderFile() */
+parserMethodsDecl() ::= <<
+- (Class) adaptor;
+- (void) setAdaptor:(Class)theAdaptor;
+>>
+
+/** Definition of addition tree support methods - go in implementation of genericParser() */
+parserMethods() ::= <<
+- (Class) adaptor
+{
+	return adaptor;
+}
+
+- (void) setAdaptor:(Class)theAdaptor
+{
+	adaptor = theAdaptor;
+}
+>>
+
+/** addition ivars for returnscopes */
+@returnScopeInterface.ivars() ::= <<
+<recognizer.ASTLabelType; null="id"> tree;
+>>
+
+/** the interface of returnScope methods */
+@returnScopeInterface.methods() ::= <<
+- (<recognizer.ASTLabelType; null="id">) tree;
+- (void) setTree:(<recognizer.ASTLabelType>)aTree;
+>>
+
+/** the implementation of returnScope methods */
+@returnScope.methods() ::= <<
+- (<ASTLabelType>) tree
+{
+	return tree;
+}
+- (void) setTree:(<ASTLabelType>)aTree
+{
+	if (tree != aTree) {
+		[aTree retain];
+		[tree release];
+		tree = aTree;
+	}
+}
+>>
+
+/** Add a variable to track rule's return AST */
+ruleDeclarations() ::= <<
+<super.ruleDeclarations()>
+<ASTLabelType> root_0 = nil;<\n>
+>>
+
+ruleLabelDefs() ::= <<
+<super.ruleLabelDefs()>
+<ruleDescriptor.tokenLabels:{<ASTLabelType> <it.label.text>_tree = nil;}; separator="\n">
+<ruleDescriptor.tokenListLabels:{<ASTLabelType> <it.label.text>_tree = nil;}; separator="\n">
+>>
+
+ruleCleanUp() ::= <<
+<super.ruleCleanUp()>
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<if(backtracking)>
+if ( backtracking == 0 ) {<\n>
+<endif>
+    [retval setTree:(<ASTLabelType>)[adaptor postProcessTree:root_0]];
+    [adaptor setBoundariesForTree:[retval tree] fromToken:[retval start] toToken:[retval stop]];
+<if(backtracking)>
+}
+<endif>
+<endif>
+>>
+
+/** When doing auto AST construction, we must define some variables;
+ *  These should be turned off if doing rewrites.  This must be a "mode"
+ *  as a rule could have both rewrite and AST within the same alternative
+ *  block.
+ */
+@alt.declarations() ::= <<
+<if(autoAST)>
+<if(outerAlt)>
+root_0 = (<ASTLabelType>)[adaptor emptyTree];<\n>
+<else>
+<ASTLabelType> root_<blockLevel> = (<ASTLabelType>)[adaptor emptyTree];<\n>
+<endif>
+<endif>
+>>
+
+@alt.cleanup() ::= <<
+<if(autoAST)>
+<if(!outerAlt)>
+<if(backtracking)>if ( backtracking == 0 ) <endif>[adaptor addChild:root_<blockLevel> toTree:root_<enclosingBlockLevel>];<\n>
+<endif>
+<endif>
+>>
+
+// TOKEN AST STUFF
+
+/** ID and output=AST */
+tokenRef(token,label,elementIndex) ::= <<
+<super.tokenRef(...)>
+<if(backtracking)>if ( backtracking == 0 ) {<endif>
+<label>_tree = (<ASTLabelType>)[adaptor newTreeWithToken:<label>];
+[adaptor addChild:<label>_tree toTree:root_<blockLevel>];
+<if(backtracking)>}<endif>
+>>
+
+/** ID! and output=AST (same as plain tokenRef) */
+tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
+
+/** ID^ and output=AST */
+tokenRefRoot(token,label,elementIndex) ::= <<
+<super.tokenRef(...)>
+<if(backtracking)>if ( backtracking == 0 ) {<endif>
+<label>_tree = (<ASTLabelType>)[adaptor newTreeWithToken:<label>];
+root_<blockLevel> = (<ASTLabelType>)[adaptor makeNode:<label>_tree parentOf:root_<blockLevel>];
+<if(backtracking)>}<endif>
+>>
+
+/** ID^^ and output=AST */
+tokenRefRuleRoot(token,label,elementIndex) ::= <<
+<super.tokenRef(...)>
+<if(backtracking)>if ( backtracking == 0 ) {<endif>
+<label>_tree = (<ASTLabelType>)[adaptor newTreeWithToken:<label>];
+root_0 = (<ASTLabelType>)[adaptor makeNode:<label>_tree parentOf:root_0];
+<if(backtracking)>}<endif>
+>>
+
+/** ids+=ID! and output=AST */
+tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
+<tokenRefBang(...)>
+<listLabel(...)>
+>>
+
+/** label+=TOKEN when output=AST but not rewrite alt */
+tokenRefAndListLabel(token,label,elementIndex) ::= <<
+<tokenRef(...)>
+<listLabel(...)>
+>>
+
+/** Match label+=TOKEN^ when output=AST but not rewrite alt */
+tokenRefRootAndListLabel(token,label,elementIndex) ::= <<
+<tokenRefRoot(...)>
+<listLabel(...)>
+>>
+
+/** Match label+=TOKEN^^ when output=AST but not rewrite alt */
+tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
+<tokenRefRuleRoot(...)>
+<listLabel(...)>
+>>
+
+/** ID but track it for use in a rewrite rule */
+tokenRefTrack(token,label,elementIndex) ::= <<
+<super.tokenRef(...)>
+<if(backtracking)>if ( backtracking == 0 ) <endif>[list_<token> addObject:<label>];<\n>
+>>
+
+/** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
+ *  to the tracking list list_ID for use in the rewrite.
+ */
+tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
+<tokenRefTrack(...)>
+<listLabel(...)>
+>>
+
+// SET AST
+
+// the match set stuff is interesting in that it uses an argument list
+// to pass code to the default matchSet; another possible way to alter
+// inherited code.  I don't use the region stuff because I need to pass
+// different chunks depending on the operator.  I don't like making
+// the template name have the operator as the number of templates gets
+// large but this is the most flexible--this is as opposed to having
+// the code generator call matchSet then add root code or ruleroot code
+// plus list label plus ...  The combinations might require complicated
+// rather than just added on code.  Investigate that refactoring when
+// I have more time.
+
+matchSet(s,label,elementIndex,postmatchCode) ::= <<
+<super.matchSet(..., postmatchCode={<if(backtracking)>if (backtracking == 0) <endif>[adaptor addChild:[adaptor newTreeWithToken:<label>] toTree:root_<blockLevel>];})>
+>>
+
+matchSetRoot(s,label,elementIndex,debug) ::= <<
+<super.matchSet(..., postmatchCode={<if(backtracking)>if (backtracking == 0) <endif>root_<blockLevel> = (<ASTLabelType>)[adaptor makeNode:[adaptor newTreeWithToken:<label> parentOf:root_<blockLevel>];})>
+>>
+
+matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
+<super.matchSet(..., postmatchCode={<if(backtracking)>if (backtracking == 0) <endif>root_0 = (<ASTLabelType>)[adaptor makeNode:[adaptor newTreeWithToken:<label>] parentOf:root_0];})>
+>>
+
+// RULE REF AST
+
+/** rule when output=AST */
+ruleRef(rule,label,elementIndex,args) ::= <<
+<super.ruleRef(...)>
+<if(backtracking)>if (backtracking == 0) <endif>[adaptor addChild:[<label> tree] toTree:root_<blockLevel>];
+>>
+
+/** rule! is same as normal rule ref */
+ruleRefBang(rule,label,elementIndex,args) ::= "<super.ruleRef(...)>"
+
+/** rule^ */
+ruleRefRoot(rule,label,elementIndex,args) ::= <<
+<super.ruleRef(...)>
+<if(backtracking)>if (backtracking == 0) <endif>root_<blockLevel> = (<ASTLabelType>)[adaptor makeNode:[<label> tree] parentOf:root_<blockLevel>];
+>>
+
+/** rule^^ */
+ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
+<super.ruleRef(...)>
+<if(backtracking)>if (backtracking == 0) <endif>root_0 = (<ASTLabelType>)[adaptor makeNode:[<label> tree] parentOf:root_0];
+>>
+
+/** rule when output=AST and tracking for rewrite */
+ruleRefTrack(rule,label,elementIndex,args) ::= <<
+<super.ruleRef(...)>
+<if(backtracking)>if (backtracking == 0) <endif>[list_<rule> addObject:[<label> tree]];
+>>
+
+/** x+=rule when output=AST and tracking for rewrite */
+ruleRefTrackAndListLabel(rule,label,elementIndex,args) ::= <<
+<ruleRefTrack(...)>
+<listLabel(...)>
+>>
+
+/** x+=rule when output=AST */
+ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
+<ruleRef(...)>
+<listLabel(...)>
+>>
+
+/** x+=rule! when output=AST is a rule ref with list addition */
+ruleRefBangAndListLabel(rule,label,elementIndex,args) ::= <<
+<ruleRefBang(...)>
+<listLabel(...)>
+>>
+
+/** x+=rule^ */
+ruleRefRootAndListLabel(rule,label,elementIndex,args) ::= <<
+<super.ruleRef(...)>
+root_<blockLevel> = (<ASTLabelType>)[adaptor makeNode:[<label> tree] parentOf:root_<blockLevel>];<\n>
+<listLabel(...)>
+>>
+
+/** x+=rule^^ */
+ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
+<ruleRefRuleRoot(...)>
+<listLabel(...)>
+>>
+
+// WILDCARD AST
+
+wildcard(label,elementIndex) ::= <<
+<super.wildcard(...)>
+<if(backtracking)>if (backtracking == 0) {<endif>
+<label>_tree = (<ASTLabelType>)[adaptor newTreeWithToken:<label>];
+[adaptor addChild:<label>_tree toTree:root_<blockLevel>];
+<if(backtracking)>}<endif>
+>>
+
+wildcardRoot(label,elementIndex) ::= <<
+<super.wildcard(...)>
+<if(backtracking)>if (backtracking == 0) {<endif>
+<label>_tree = (<ASTLabelType>)[adaptor newTreeWithToken:<label>];
+root_<blockLevel> = (<ASTLabelType>)[adaptor makeNode:<label>_tree parentOf:root_<blockLevel>];
+<if(backtracking)>}<endif>
+>>
+
+wildcardRuleRoot(label,elementIndex) ::= <<
+<super.wildcard(...)>
+<if(backtracking)>if (backtracking == 0) {<endif>
+<label>_tree = (<ASTLabelType>)[adaptor newTreeWithToken:<label>];
+root_0 = (<ASTLabelType>)[adaptor makeNode:<label>_tree parentOf:root_0];
+<if(backtracking)>}<endif>
+>>
+
+// TODO: ugh, am i really missing the combinations for Track and ListLabel?
+// there's got to be a better way
+
+// R e w r i t e
+
+rewriteCode(
+	alts, description,
+	referencedTokens,
+	referencedListLabels,
+	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
+	rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
+<<
+
+// AST REWRITE
+<if(backtracking)>
+if (backtracking == 0) {<\n>
+<endif>
+int i_0 = 0;
+[<prevRuleRootRef()> setTree:root_0];
+root_0 = (<ASTLabelType>)[adaptor emptyTree];
+<alts:rewriteAlt(); separator="else ">
+<if(backtracking)>
+}
+<endif>
+>>
+
+rewriteOptionalBlock(
+	alt,rewriteBlockLevel,
+	referencedTokens,
+	referencedListLabels,
+	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
+	description) ::=
+<<
+// <fileName>:<description>
+{
+<rewriteBlockCardinalityCheck()>
+if ( n_<rewriteBlockLevel> > 1 ) @throw [NSException exceptionWithName:@"ANTLRTreeRewriteException" reason:@"<first([referencedTokens,referencedListLabels,referencedRules])> list has > 1 elements" userInfo:nil];
+if ( n_<rewriteBlockLevel>==1 ) {
+    int i_<rewriteBlockLevel> = 0;
+    <alt>
+    }
+}<\n>
+>>
+
+rewriteClosureBlock(
+	alt,rewriteBlockLevel,
+	referencedTokens,
+	referencedListLabels,
+	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
+	description) ::=
+<<
+// <fileName>:<description>
+{
+<rewriteBlockCardinalityCheck()>
+for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+    <alt>
+}
+}<\n>
+>>
+
+rewritePositiveClosureBlock(
+	alt,rewriteBlockLevel,
+	referencedTokens,
+	referencedListLabels,
+	referencedRules,
+	referencedTokenLabels,
+	referencedRuleLabels,
+	description) ::=
+<<
+// <fileName>:<description>
+{
+<rewriteBlockCardinalityCheck()>
+if ( n_<rewriteBlockLevel>==0 ) @throw [NSException exceptionWithName:@"ANTLRTreeRewriteException" reason:@"Must have more than one element for (...)+ loops" userInfo:nil];
+for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+    <alt>
+}
+}<\n>
+>>
+
+/** Elements referenced in rewrite loops/optional blocks must have
+ *  the same size.  Factor this out from rewriteXXXBlock rules.  This
+ *  deals both with the lists of stuff and single element labels like id=ID.
+ *  The n_xxx var is always defined to either first list_ var or single-value
+ *  label.
+ */
+rewriteBlockCardinalityCheck() ::= <<
+<! First compute size of lists of stuff !>
+<first([referencedTokens,referencedListLabels,referencedRules]):{int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == nil ? 0 : [list_<first([referencedTokens,referencedListLabels,referencedRules])> count];}>
+<! Check cardinality against first size !>
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( [list_<it> count] != n_<rewriteBlockLevel> ) @throw [NSException exceptionWithName:@"ANTLRTreeRewriteException" reason:@"rewrite element <it> list differs in size from other elements" userInfo:nil];<\n>}>
+<!
+   Now generate checks for non-list labels
+!>
+<!
+   If no lists above, then we need to define n to be 0 or 1 depending on presence
+   of single-value labels
+!>
+<if(!first([referencedTokens,referencedListLabels,referencedRules]))>
+<first([referencedTokenLabels,referencedRuleLabels]):{label |
+int n_<rewriteBlockLevel> = <first([referencedTokenLabels,referencedRuleLabels])> == nil ? 0 : 1;
+}>
+<! Now, gen checks to ensure non-list labels match cardinality of other labels !>
+<rest([referencedTokenLabels,referencedRuleLabels]):{label|
+if ( (<label> == nil && n_<rewriteBlockLevel>\>0) || (<label> != nil && n_<rewriteBlockLevel> == 0) ) @throw [NSException exceptionWithName:@"ANTLRTreeRewriteException" reason:@"rewrite element <label> list differs in size from other elements" userInfo:nil];
+}>
+
+<else> <! there were some list labels !>
+
+<! Now, gen checks to ensure non-list labels match cardinality of lists !>
+<[referencedTokenLabels,referencedRuleLabels]:{label|
+if ( (<label> == nil && n_<rewriteBlockLevel>\>0) || (<label> != nil && n_<rewriteBlockLevel> == 0) ) @throw [NSException exceptionWithName:@"ANTLRTreeRewriteException" reason:@"rewrite element <label> list differs in size from other elements" userInfo:nil];
+}>
+<endif>
+>>
+
+rewriteAlt(a) ::= <<
+// <a.description>
+<if(a.pred)>
+if (<a.pred>) {
+    <a.alt>
+}<\n>
+<else>
+{
+    <a.alt>
+}<\n>
+<endif>
+>>
+
+/** For empty rewrites: "r : ... -> ;" */
+rewriteEmptyAlt() ::= "root_0 = nil;"
+
+rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
+// <fileName>:<description>
+{
+<ASTLabelType> root_<treeLevel> = (<ASTLabelType>)[adaptor emptyTree];
+<root:rewriteElement()>
+<children:rewriteElement()>
+[adaptor addChild:root_<treeLevel> toTree:root_<enclosingTreeLevel>];
+}<\n>
+>>
+
+rewriteElementList(elements) ::= "<elements:rewriteElement()>"
+
+rewriteElement(e) ::= <<
+<@pregen()>
+<e.el>
+>>
+
+/** Gen ID */
+rewriteTokenRef(token,elementIndex) ::= <<
+[adaptor addTokenAsChild:(<labelType>)[list_<token> objectAtIndex:i_<rewriteBlockLevel>] toTree:root_<treeLevel>];<\n>
+>>
+
+/** Gen $label ... where defined via label=ID */
+rewriteTokenLabelRef(label,elementIndex) ::= <<
+[adaptor addTokenAsChild:<label> toTree:root_<treeLevel>];<\n>
+>>
+
+/** Gen $label ... where defined via label+=ID */
+rewriteTokenListLabelRef(label,elementIndex) ::= <<
+[adaptor addTokenAsChild:(<labelType>)[list_<label> objectAtIndex:i_<rewriteBlockLevel>] toTree:root_<treeLevel>];<\n>
+>>
+
+/** Gen ^($label ...) */
+rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
+root_<treeLevel> = (<ASTLabelType>)[adaptor makeToken:<label> parentOf:root_<treeLevel>];<\n>
+>>
+
+/** Gen ^(ID ...) */
+rewriteTokenRefRoot(token,elementIndex) ::= <<
+root_<treeLevel> = (<ASTLabelType>)[adaptor makeToken:(<labelType>)[list_<token> objectAtIndex:i_<rewriteBlockLevel>] parentOf:root_<treeLevel>];<\n>
+>>
+
+rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
+[adaptor addChild:[adaptor newTreeWithTokenType:<token> <if(args)>text:[<first(args)> text]<else>text:[tokenNames objectAtIndex:<token>]<endif>] toTree:root_<treeLevel>];<\n>
+>>
+
+rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
+root_<treeLevel> = (<ASTLabelType>)[adaptor makeNode:[adaptor newTreeWithTokenType:<token> <if(args)>text:[<first(args)> text]<else>text:[tokenNames objectAtIndex:<token>]<endif>] parentOf:root_<treeLevel>];<\n>
+>>
+
+/** plain -> {foo} action */
+rewriteAction(action) ::= <<
+root_0 = <action>;<\n>
+>>
+
+/** What is the name of the previous value of this rule's root tree?  This
+ *  let's us refer to $rule to mean previous value.  I am reusing the
+ *  variable 'tree' sitting in retval struct to hold the value of root_0 right
+ *  before I set it during rewrites.  The assign will be to retval.tree.
+ */
+prevRuleRootRef() ::= "retval"
+
+rewriteRuleRef(rule,dup) ::= <<
+<if(dup)>
+[adaptor addChild:[adaptor copyTree:(id\<ANTLRTree>)[list_<rule> objectAtIndex:i_<rewriteBlockLevel>]] toTree:root_<treeLevel>];<\n>
+<else>
+[adaptor addChild:(id\<ANTLRTree>)[list_<rule> objectAtIndex:i_<rewriteBlockLevel>] toTree:root_<treeLevel>];<\n>
+<endif>
+>>
+
+rewriteRuleRefRoot(rule,dup) ::= <<
+<if(dup)>
+root_<treeLevel> = (<ASTLabelType>)[adaptor makeNode:[adaptor copyTree:(id\<ANTLRTree>)[list_<rule> objectAtIndex:i_<rewriteBlockLevel>]] parentOf:root_<treeLevel>];<\n>
+<else>
+root_<treeLevel> = (<ASTLabelType>)[adaptor makeNode:(id\<ANTLRTree>)[list_<rule> objectAtIndex:i_<rewriteBlockLevel>] parentOf:root_<treeLevel>];<\n>
+<endif>
+>>
+
+rewriteNodeAction(action) ::= <<
+[adaptor addChild:<action> toTree:root_<treeLevel>];<\n>
+>>
+
+rewriteNodeActionRoot(action) ::= <<
+root_<treeLevel> = (<ASTLabelType>)[adaptor makeNode:<action> parentOf:root_<treeLevel>];<\n>
+>>
+
+/** Gen $ruleLabel ... where defined via ruleLabel=rule */
+rewriteRuleLabelRef(label) ::= <<
+[adaptor addChild:[<label> tree] toTree:root_<treeLevel>];<\n>
+>>
+
+/** Gen $ruleLabel ... where defined via ruleLabel+=rule */
+rewriteRuleListLabelRef(label) ::= <<
+[adaptor addChild:[(<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope *)[list_<label> objectAtIndex:i_<rewriteBlockLevel>] tree] toTree:root_<treeLevel>];<\n>
+>>
+
+/** Gen ^($ruleLabel ...) where ruleLabel=rule */
+rewriteRuleLabelRefRoot(label) ::= <<
+root_<treeLevel> = (<ASTLabelType>)[adaptor makeNode:[<label> tree] parentOf:root_<treeLevel>];<\n>
+>>
+
+/** Gen ^($ruleLabel ...) where ruleLabel+=rule */
+rewriteRuleListLabelRefRoot(label) ::= <<
+root_<treeLevel> = (<ASTLabelType>)[adaptor makeNode:[(<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope *)[list_<label> objectAtIndex:i_<rewriteBlockLevel>] tree] parentOf:root_<treeLevel>];<\n>
+>>
