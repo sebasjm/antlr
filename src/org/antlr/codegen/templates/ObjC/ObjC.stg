@@ -1,6 +1,6 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2005 Terence Parr
+ Copyright (c) 2006 Kay Roepke
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            name, tokens, tokenNames, rules, cyclicDFAs,
 	   bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
-	   fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass) ::=
+	   fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass,literals) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
@@ -76,7 +76,7 @@ headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            name, tokens, tokenNames, rules, cyclicDFAs,
 	   bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
-	   fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass) ::=
+	   fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass,literals) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
@@ -89,6 +89,9 @@ headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 <lexerHeaderFile(...)>
 <endif>
 <if(PARSER)>
+<parserHeaderFile(...)>
+<endif>
+<if(TREE_PARSER)>
 <parserHeaderFile(...)>
 <endif>
 >>
@@ -243,6 +246,8 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
 	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeIVar(scope=it)><endif>}>
 
+	<@ivars()>
+
 	<actions.parser.ivars>
  }
 
@@ -252,6 +257,7 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 - (<rule.ruleDescriptor:{ruleDescriptor|<returnType()>}>) <rule.ruleName><if(rule.ruleDescriptor.parameterScope)><rule.ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>;
 }>
 
+<@methods()>
 
 @end
 >>
@@ -270,6 +276,11 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 #pragma mark Scopes
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeImpl(scope=it)><endif>}>
 
+#pragma mark Rule return scopes start
+<rules:{rule |
+<rule.ruleDescriptor:returnScope(ruleDescriptor=rule.ruleDescriptor)>
+}>
+
 @implementation <name>
 
 + (void) initialize
@@ -287,6 +298,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
 		<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeInit(scope=it)><endif>}>
 		<actions.parser.init>
+		<@init()>
 	}
 	return self;
 }
@@ -300,6 +312,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 	<cyclicDFAs:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
 	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDealloc(scope=it)><endif>}>
 	<actions.parser.dealloc>
+	<@dealloc()>
 	[super dealloc];
 }
 
@@ -308,6 +321,8 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 <rules; separator="\n\n">
 
 <synpreds:{p | <synpred(p)>}>
+
+<@methods()>
 
 @end
 >>
@@ -421,8 +436,8 @@ ruleDeclarations() ::= <<
 <ruleDescriptor.useScopes:{[<name>_<it>_stack addObject:[[[<name>_<it>_scope alloc] init] autorelease]];}; separator="\n">
 <ruleDescriptor.ruleScope:{[<name>_<it.name>_stack addObject:[[[<name>_<it.name>_scope alloc] init] autorelease]];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<returnType()> retval = [[[<returnTypeName()> alloc] init] autorelease];
-[retval setStart:[input index]+1];<\n>
+<returnType()> retval = [[<returnTypeName()> alloc] init]; <! retvals are released in the calling rule! !>
+[retval setStart:[input LT:1]];<\n>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
@@ -467,11 +482,11 @@ ruleCleanUp() ::= <<
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]:{[<it.label.text> release];}; separator="\n">
 // rule refs in alts with rewrites
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-	:{[NSMutableArray *list_<it> release];}; separator="\n">
+	:{[list_<it> release];}; separator="\n">
 <ruleDescriptor.useScopes:{[<name>_<it>_stack removeLastObject];}; separator="\n">
 <ruleDescriptor.ruleScope:{[<name>_<it.name>_stack removeLastObject];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-[retval setStop:[input index]-1];<\n>
+[retval setStop:[input LT:-1]];<\n>
 <endif>
 <if(memoize)>
 <if(backtracking)>
@@ -807,7 +822,7 @@ int <label>Start = [self charIndex];
 
 /** EOF in the lexer */
 lexerMatchEOF(label) ::= <<
-#pragma mark ObjCify!
+#warning ObjCify!
 <if(label)>
 int <label>Start = getCharIndex();
 match(EOF); <checkRuleBacktrackFailure()>
@@ -1170,12 +1185,12 @@ returnType() ::= <<
 <returnTypeName()><if(ruleDescriptor.hasMultipleReturnValues)> *<endif>
 >>
 
-/** Generate the Java type associated with a single or multiple return
+/** Generate the Objective-C type associated with a single or multiple return
  *  values.
  */
 ruleLabelType(referencedRule) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-<referencedRule.name>_return
+<name><referencedRule.name>_return *
 <else>
 <if(referencedRule.hasSingleReturnValue)>
 <referencedRule.singleValueReturnType>
@@ -1203,11 +1218,11 @@ ruleLabelDef(label) ::= <<
  */
 returnScopeInterface(ruleDescriptor) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-@interface <returnTypeName()> : ANTLR<if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<else>Parser<endif><endif>RuleReturnScope {
+@interface <returnTypeName()> : ANTLR<if(TREE_PARSER)>Tree<endif>ParserRuleReturnScope {
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
+    <@ivars()>
 }
-#warning Use KVC for access to ivars!
-<@ruleReturnMembersInterface()>
+<@methods()>
 @end
 <endif>
 >>
@@ -1215,7 +1230,7 @@ returnScopeInterface(ruleDescriptor) ::= <<
 returnScope(ruleDescriptor) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 @implementation <returnTypeName()>
-<@ruleReturnMembers()>
+<@methods()>
 @end
 <endif>
 >>
@@ -1239,6 +1254,7 @@ globalAttributeRef(scope,attr) ::= <<
 parameterAttributeRef(attr) ::= "<attr.name>"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
+#warning TODO scopes
 <if(negIndex)>
 [[<name>_<scope>_stack objectAtIndex:[<name>_<scope>_stack count]<negIndex>-1] valueForKey:@"<attr.name>"]
 ((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()<negIndex>-1)).<attr.name>

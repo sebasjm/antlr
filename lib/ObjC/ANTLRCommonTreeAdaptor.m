@@ -15,6 +15,7 @@
 	// I simply don't get the warning here...gcc says:
 	// warning: class 'ANTLRCommonToken' does not implement the 'ANTLRTree' protocol
 	// IMHO that's FUBAR...
+#warning WTF is this warning about?	
 	return [[ANTLRCommonTree alloc] initWithToken:(ANTLRCommonToken *)payload];
 }
 

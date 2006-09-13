@@ -264,10 +264,10 @@
 		i = [self skipOffChannelTokensReverse:i-1];
 		n++;
 	}
-	if ( i < 0 ) {
+	if ( i-1 < 0 ) {
 		return nil;
 	}
-	return [tokens objectAtIndex:i];
+	return [tokens objectAtIndex:i-1];
 }
 
 - (int) LA:(int)k

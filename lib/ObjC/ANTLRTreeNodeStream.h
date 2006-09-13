@@ -28,6 +28,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLRIntStream.h>
+#import <ANTLR/ANTLRTreeAdaptor.h>
 
 @protocol ANTLRTreeNodeStream < ANTLRIntStream > 
 

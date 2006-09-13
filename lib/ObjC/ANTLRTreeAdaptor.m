@@ -107,6 +107,23 @@
 	return [self makeNode:[self newTreeWithToken:newRoot] parentOf:oldRoot];
 }
 
++ (id<ANTLRTree>) newTreeWithTokenType:(int)tokenType
+{
+	ANTLRToken *newToken = [self newTokenWithTokenType:tokenType text:nil];
+	
+	id<ANTLRTree> newTree = [self newTreeWithToken:newToken];
+	[newToken release];
+	return newTree;
+}
+
++ (id<ANTLRTree>) newTreeWithTokenType:(int)tokenType text:(NSString *)tokenText
+{
+	ANTLRToken *newToken = [self newTokenWithTokenType:tokenType text:tokenText];
+	
+	id<ANTLRTree> newTree = [self newTreeWithToken:newToken];
+	[newToken release];
+	return newTree;
+}
 
 + (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken tokenType:(int)tokenType
 {

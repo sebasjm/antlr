@@ -30,6 +30,7 @@
 #import <ANTLR/ANTLRBaseRecognizer.h>
 #import <ANTLR/ANTLRLexer.h>
 #import <ANTLR/ANTLRParser.h>
+#import <ANTLR/ANTLRTreeParser.h>
 #import <ANTLR/ANTLRDFA.h>
 #import <ANTLR/ANTLRStringStream.h>
 #import <ANTLR/ANTLRTokenSource.h>
@@ -40,5 +41,15 @@
 #import <ANTLR/ANTLRMismatchedSetException.h>
 #import <ANTLR/ANTLRMismatchedTokenException.h>
 #import <ANTLR/ANTLRMismatchedRangeException.h>
+#import <ANTLR/ANTLRMismatchedTreeNodeException.h>
 #import <ANTLR/ANTLRNoViableAltException.h>
+
 #import <ANTLR/ANTLRLexerRuleReturnScope.h>
+#import <ANTLR/ANTLRParserRuleReturnScope.h>
+
+#import <ANTLR/ANTLRTree.h>
+#import <ANTLR/ANTLRCommonTree.h>
+#import <ANTLR/ANTLRTreeAdaptor.h>
+#import <ANTLR/ANTLRCommonTreeAdaptor.h>
+#import <ANTLR/ANTLRTreeNodeStream.h>
+#import <ANTLR/ANTLRCommonTreeNodeStream.h>
