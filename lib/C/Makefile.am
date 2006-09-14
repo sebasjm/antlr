@@ -61,7 +61,7 @@ libantlr3c_la_LDFLAGS = -version-info 0:0:0
 INCLUDES = -I include
 
 
-EXTRA_DIST = 	ReadMe.txt vs2005/rulefiles/antlr3.rules	\
+EXTRA_DIST = 	vs2005/rulefiles/antlr3.rules	\
 			 	C.sln C.vcproj C.vcproj.vspscc	\
 				C.vssscc
 
