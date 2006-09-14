@@ -130,39 +130,39 @@ static	void
 static	pANTLR3_BASE_TREE	
    becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pANTLR3_BASE_TREE oldRootTree)
 {
-	// root is just the new tree as is if there is no
-	// current root tree.
-	//
+	/* root is just the new tree as is if there is no
+	 * current root tree.
+	 */
 	if	(oldRootTree == NULL)
 	{
 		return	newRootTree;
 	}
 
-	// Produce ^(nil real-node)
-	//
+	/* Produce ^(nil real-node)
+	 */
 	if	(newRootTree->isNil(newRootTree))
 	{
 		if	(newRootTree->getChildCount(newRootTree) > 1)
 		{
-			// TODO: Handle tree exceptions 
-			//
+			/* TODO: Handle tree exceptions 
+			 */
 			fprintf(stderr, "More than one node as root! ODO: Create tree exception hndling\n");
 			return newRootTree;
 		}
 
-		// The new root is the first child
-		//
+		/* The new root is the first child
+		 */
 		newRootTree = newRootTree->getChild(newRootTree, 0);
 	}
 
-	// Add old root into new root. addChild takes care of the case where oldRoot
-	// is a flat list (nill rooted tree). All children of oldroot are added to
-	// new root.
-	//
+	/* Add old root into new root. addChild takes care of the case where oldRoot
+	 * is a flat list (nill rooted tree). All children of oldroot are added to
+	 * new root.
+	 */
 	newRootTree->addChild(newRootTree, oldRootTree);
 
-	// Always returns new root structure
-	//
+	/* Always returns new root structure
+	 */
 	return	newRootTree;
 
 }
@@ -196,36 +196,36 @@ static	pANTLR3_BASE_TREE
 static	pANTLR3_BASE_TREE	
    createTypeToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken)
 {
-	// Create the new token
-	//
+	/* Create the new token
+	 */
 	fromToken = adaptor->createTokenFromToken(adaptor, fromToken);
 
-	// Set the type of the new token to that supplied
-	//
+	/* Set the type of the new token to that supplied
+	 */
 	fromToken->setType(fromToken, tokenType);
 
-	// Return a new node based upon this token
-	//
+	/* Return a new node based upon this token
+	 */
 	return	adaptor->create(adaptor, fromToken);
 }
 
 static	pANTLR3_BASE_TREE	
    createTypeTokenText	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken, pANTLR3_UINT8 text)
 {
-	// Create the new token
-	//
+	/* Create the new token
+	 */
 	fromToken = adaptor->createTokenFromToken(adaptor, fromToken);
 
-	// Set the type of the new token to that supplied
-	//
+	/* Set the type of the new token to that supplied
+	 */
 	fromToken->setType(fromToken, tokenType);
 
-	// Set the text of the token accoridngly
-	//
+	/* Set the text of the token accoridngly
+	 */
 	fromToken->setText(fromToken, text);
 
-	// Return a new node based upon this token
-	//
+	/* Return a new node based upon this token
+	 */
 	return	adaptor->create(adaptor, fromToken);
 }
 
@@ -234,12 +234,12 @@ static	pANTLR3_BASE_TREE
 {
 	pANTLR3_COMMON_TOKEN	fromToken;
 
-	// Create the new token
-	//
+	/* Create the new token
+	 */
 	fromToken = adaptor->createToken(adaptor, tokenType, text);
 
-	// Return a new node based upon this token
-	//
+	/* Return a new node based upon this token
+	 */
 	return	adaptor->create(adaptor, fromToken);
 }
 

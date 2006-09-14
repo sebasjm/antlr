@@ -47,17 +47,14 @@
 #define	ANTLR3_WINDOWS
 #define	ANTLR3_WIN32
 #endif
-#else
-#define ANTLR3_UNIX
 #endif
-
 
 #ifdef	ANTLR3_WINDOWS 
 
 #define	WINDOWS_LEAN_AND_MEAN
 
-// Allow VC 8 (vs2005) to use 'secure' versions of various functions such as sprintf
-//
+/* Allow VC 8 (vs2005) to use 'secure' versions of various functions such as sprintf
+ */
 #define	_CRT_SECURE_NO_DEPRECATE 
 
 #include    <windows.h>
@@ -99,23 +96,41 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #ifdef	ANTLR3_WIN64
 #endif
 
-// Warngins that are over-zealous such as complaining about strdup, we
-// can turn off.
-//
+/* Warnings that are over-zealous such as complaining about strdup, we
+ * can turn off.
+ */
 
-// Don't complain about "deprecated" functions such as strdup
-//
+/* Don't complain about "deprecated" functions such as strdup
+ */
 #pragma warning( disable : 4996 )
 
-#endif
+#else
 
-#ifdef	ANTLR3_UNIX
+/* Include configure generated header file
+ */
+#include	<antlr3config.h>
+
 #include    <stdio.h>
 #include	<stdlib.h>
+#ifdef	HAVE_MALLOC_H
+#include    <malloc.h>
+#endif
+
+#ifdef	HAVE_SYS_MALLOC_H
 #include    <sys/malloc.h>
+#endif
+
 #include    <stdarg.h>
 #include    <sys/stat.h>
 #include	<string.h>
+
+/* Some platforms define a macor, index() in string.h. AIX is
+ * one of these for instance. we must get rid of that definition
+ * as we use ->index all over the place.
+ */
+#ifdef	index
+#undef	index
+#endif
 
 #define _stat   stat
 
@@ -170,8 +185,8 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
  */
 #include    <antlr3interfaces.h>
 
-// Prototypes
-//
+/* Prototypes
+ */
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetNew		    (ANTLR3_UINT32 numBits);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetOf		    (ANTLR3_INT32 bit, ...);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetList		    (pANTLR3_HASH_TABLE list);

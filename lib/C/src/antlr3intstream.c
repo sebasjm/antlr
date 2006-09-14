@@ -28,13 +28,14 @@ antlr3IntStreamNew()
 static	void	
 freeStream    (pANTLR3_INT_STREAM stream)
 {
-    // TODO: Why did I comment this out?
-    //
-    //if	(      stream->eofToken != NULL
-	//    && stream->eofToken->factoryMade == ANTLR3_FALSE)
-    //{
-//	stream->eofToken->freeCustom(stream->eofToken);
-//	stream->eofToken = NULL;
-   // }
+    /* TODO: Why did I comment this out?
+     *
+		if	(      stream->eofToken != NULL
+			&& stream->eofToken->factoryMade == ANTLR3_FALSE)
+		{
+		stream->eofToken->freeCustom(stream->eofToken);
+		stream->eofToken = NULL;
+		}
+    */
     ANTLR3_FREE(stream);
 }

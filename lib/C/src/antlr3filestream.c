@@ -83,19 +83,19 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input)
     ANTLR3_FDSC		    infile;
     ANTLR3_UINT64	    fSize;
 
-    // Open the OS file in read binary mode
-    //
+    /* Open the OS file in read binary mode
+     */
     infile  = antlr3Fopen(input->fileName, "rb");
 
-    // Check that it was there
-    //
+    /* Check that it was there
+     */
     if	(infile == NULL)
     {
 	return	(ANTLR3_UINT64)ANTLR3_ERR_NOFILE;
     }
 
-    // It was there, so we can read the bytes now
-    //
+    /* It was there, so we can read the bytes now
+     */
     fSize   = antlr3Fsize(input->fileName);	/* Size of input file	*/
 
     /* Allocate buffer for this input set   

@@ -6,8 +6,8 @@
 
 #include    <antlr3bitset.h>
 
-// External interface
-//
+/* External interface
+ */
 
 static	pANTLR3_BITSET  antlr3BitsetClone	(pANTLR3_BITSET inSet);
 static	pANTLR3_BITSET  antlr3BitsetOR		(pANTLR3_BITSET bitset1, pANTLR3_BITSET bitset2);
@@ -21,8 +21,8 @@ static	void		antlr3BitsetRemove	(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit);
 static	ANTLR3_BOOLEAN	antlr3BitsetIsNil	(pANTLR3_BITSET bitset);
 static	pANTLR3_INT32	antlr3BitsetToIntList	(pANTLR3_BITSET bitset);
 
-// Local functions
-//
+/* Local functions
+ */
 static	void		growToInclude	(pANTLR3_BITSET bitset, ANTLR3_INT32 bit);
 static	void		grow		(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize);
 static	ANTLR3_UINT64	bitMask		(ANTLR3_UINT32 bitNumber);

@@ -118,7 +118,6 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 
     if	(child == NULL)
     {
-	// 
 	return;
     }
 
@@ -126,7 +125,8 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
     {
 	if  (child->children != NULL && child->children == tree->children)
 	{
-	    // TODO: Change to exception rather than fprintf
+	    /* TODO: Change to exception rather than fprintf
+	     */
 	    fprintf(stderr, "ANTLR3: An attempt was made to add a child list to itself!\n");
 	    return;
 	}
@@ -137,8 +137,8 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 	{
 	    if	(tree->children != NULL)
 	    {
-		// Need to copy the children as we already have children
-		//
+		/* Need to copy the children as we already have children
+		 */
 		n = child->children->size(child->children);
 
 		for (i = 0; i<n; i++)
@@ -214,7 +214,7 @@ setChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i, void * child)
     {
 	tree->createChildrenList(tree);
     }
-    tree->children->remove(tree->children, i + 1);	// remove any existing node at that position
+    tree->children->remove(tree->children, i + 1);	/* remove any existing node at that position */
     tree->children->put(tree->children, i+1, child, NULL);
 }
 
@@ -274,8 +274,8 @@ toStringTree	(pANTLR3_BASE_TREE tree)
 	return	tree->toString(tree);
     }
 
-    // Need a new string with nothing at all in it.
-    //
+    /* Need a new string with nothing at all in it.
+     */
     string	= tree->strFactory->newRaw(tree->strFactory);
 
     if	(tree->isNil(tree) == ANTLR3_FALSE)

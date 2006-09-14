@@ -656,9 +656,9 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		    (pANTLR3_UINT8)	   (recognizer->exception->message));
 					    
 
-    // How we determine the next piece is dependent on which thign raised the
-    // error.
-    //
+    /* How we determine the next piece is dependent on which thign raised the
+     * error.
+     */
     switch	(recognizer->type)
     {
     case	ANTLR3_TYPE_PARSER:

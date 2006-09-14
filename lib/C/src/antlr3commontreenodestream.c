@@ -510,7 +510,7 @@ rewindMark	    (pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 
     if	(ctns->markers == NULL || ctns->markers->size(ctns->markers) < marker)
     {
-	return;	    // No such marker - do nothing
+	return;	    /* No such marker - do nothing */
     }
 
     /* Retrieve the marker at the specified mark
@@ -797,7 +797,7 @@ walkBackToMostRecentNodeWithUnvisitedChildren	    (pANTLR3_COMMON_TREE_NODE_STRE
 	    )
     {
 	ctns->currentNode	= (pANTLR3_BASE_TREE) (ctns->nodeStack->top);
-	ctns->nodeStack->pop(ctns->nodeStack);		// Remove top element now
+	ctns->nodeStack->pop(ctns->nodeStack);		/* Remove top element now */
 
 	/* Move to the next child after the one the we just traversed. The index of the one we just traversed
 	 * was stored in the current node we saved upon our stack.
