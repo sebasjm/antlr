@@ -87,9 +87,12 @@ public class Tool {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-o") || args[i].equals("-fo")) {
 				if (i + 1 >= args.length) {
-					System.err.println("missing output directory with -o option; ignoring");
+					System.err.println("missing output directory with -fo/-o option; ignoring");
 				}
 				else {
+					if ( args[i].equals("-fo") ) { // force output into dir
+						forceAllFilesToOutputDir = true;
+					}
 					i++;
 					outputDirectory = args[i];
 					if ( outputDirectory.endsWith("/") ||
@@ -102,9 +105,6 @@ public class Tool {
 					if( outDir.exists() && !outDir.isDirectory() ) {
 						ErrorManager.error(ErrorManager.MSG_OUTPUT_DIR_IS_FILE,outputDirectory);
 						libDirectory = ".";
-					}
-					if ( args[i].equals("-fo") ) { // force output into dir
-						forceAllFilesToOutputDir = true;
 					}
 				}
 			}
