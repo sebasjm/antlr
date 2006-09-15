@@ -27,7 +27,7 @@
 */
 package org.antlr.runtime;
 
-public class CommonToken extends Token {
+public class CommonToken implements Token {
     protected int type;
 	protected int line;
 	protected int charPositionInLine = -1; // set to invalid position

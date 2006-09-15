@@ -27,7 +27,7 @@
 */
 package org.antlr.runtime;
 
-public abstract class Token {
+public interface Token {
 	public static final int EOR_TOKEN_TYPE = 1;
 
 	/** imaginary tree navigation type; traverse "get child" link */
@@ -56,8 +56,7 @@ public abstract class Token {
 
 	/** Get the text of the token */
 	public abstract String getText();
-
-	public void setText(String text) {;}
+	public abstract void setText(String text);
 
 	public abstract int getType();
 	public abstract void setType(int ttype);

@@ -53,7 +53,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	int previousTokenIndex = -1;
 	boolean tokenIndexesInvalid = false;
 
-	public static class ProxyToken extends Token {
+	public static class ProxyToken implements Token {
 		int index;
 		int type;
 		int channel;
@@ -72,6 +72,9 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		}
 		public String getText() {
 			return text;
+		}
+		public void setText(String text) {
+			this.text = text;
 		}
 		public int getType() {
 			return type;

@@ -7,7 +7,7 @@ package org.antlr.runtime;
  *  has indexes into a char stream and hence cannot be used to introduce
  *  new strings.
  */
-public class ClassicToken extends Token {
+public class ClassicToken implements Token {
 	protected String text;
 	protected int type;
 	protected int line;
