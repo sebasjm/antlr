@@ -27,15 +27,13 @@
 */
 package org.antlr.runtime;
 
-import org.antlr.misc.IntSet;
-
 public class MismatchedSetException extends RecognitionException {
-	public IntSet expecting;
+	public Object /* is IntSet */ expecting;
 
 	/** Used for remote debugger deserialization */
 	public MismatchedSetException() {;}
 
-	public MismatchedSetException(IntSet expecting, IntStream input) {
+	public MismatchedSetException(Object expecting, IntStream input) {
 		super(input);
 		this.expecting = expecting;
 	}

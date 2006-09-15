@@ -30,6 +30,7 @@ package org.antlr;
 import org.antlr.tool.*;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.analysis.*;
+import org.antlr.runtime.misc.Stats;
 
 import java.io.*;
 import java.util.*;
@@ -298,7 +299,7 @@ public class Tool {
 				}
 				if ( profile ) {
 					GrammarReport report = new GrammarReport(grammar);
-					GrammarReport.writeReport(GrammarReport.GRAMMAR_STATS_FILENAME,
+					Stats.writeReport(GrammarReport.GRAMMAR_STATS_FILENAME,
 											  report.toNotifyString());
 				}
 			}

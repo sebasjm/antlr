@@ -27,7 +27,6 @@
 */
 package org.antlr.runtime.tree;
 
-import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.runtime.RuleReturnScope;
 
 /** This is identical to the ParserRuleReturnScope except that

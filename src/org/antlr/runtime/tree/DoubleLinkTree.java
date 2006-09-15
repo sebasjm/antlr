@@ -27,9 +27,6 @@
 */
 package org.antlr.runtime.tree;
 
-import java.util.List;
-import java.util.ArrayList;
-
 /** A generic doubly-linked tree implementation with no payload.
  *  You must subclass to actually have any user data.
  *  TODO: do we really need/want this?

@@ -27,10 +27,6 @@
 */
 package org.antlr.runtime;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Stack;
-
 /** A parser for TokenStreams.  "parser grammars" result in a subclass
  *  of this.
  */

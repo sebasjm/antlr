@@ -28,8 +28,8 @@
 package org.antlr.tool;
 
 import org.antlr.analysis.DFA;
+import org.antlr.runtime.misc.Stats;
 
-import java.io.*;
 import java.util.*;
 
 public class GrammarReport {
@@ -113,33 +113,33 @@ public class GrammarReport {
 		buf.append('\t');
 		buf.append(numLL1);
 		buf.append('\t');
-		buf.append(min(depths));
+		buf.append(Stats.min(depths));
 		buf.append('\t');
-		buf.append(max(depths));
+		buf.append(Stats.max(depths));
 		buf.append('\t');
-		buf.append(avg(depths));
+		buf.append(Stats.avg(depths));
 		buf.append('\t');
-		buf.append(stddev(depths));
+		buf.append(Stats.stddev(depths));
 		buf.append('\t');
-		buf.append(min(acyclicDFAStates));
+		buf.append(Stats.min(acyclicDFAStates));
 		buf.append('\t');
-		buf.append(max(acyclicDFAStates));
+		buf.append(Stats.max(acyclicDFAStates));
 		buf.append('\t');
-		buf.append(avg(acyclicDFAStates));
+		buf.append(Stats.avg(acyclicDFAStates));
 		buf.append('\t');
-		buf.append(stddev(acyclicDFAStates));
+		buf.append(Stats.stddev(acyclicDFAStates));
 		buf.append('\t');
-		buf.append(sum(acyclicDFAStates));
+		buf.append(Stats.sum(acyclicDFAStates));
 		buf.append('\t');
-		buf.append(min(cyclicDFAStates));
+		buf.append(Stats.min(cyclicDFAStates));
 		buf.append('\t');
-		buf.append(max(cyclicDFAStates));
+		buf.append(Stats.max(cyclicDFAStates));
 		buf.append('\t');
-		buf.append(avg(cyclicDFAStates));
+		buf.append(Stats.avg(cyclicDFAStates));
 		buf.append('\t');
-		buf.append(stddev(cyclicDFAStates));
+		buf.append(Stats.stddev(cyclicDFAStates));
 		buf.append('\t');
-		buf.append(sum(cyclicDFAStates));
+		buf.append(Stats.sum(cyclicDFAStates));
 		buf.append('\t');
 		buf.append(grammar.getTokenTypes().size());
 		buf.append('\t');
@@ -380,118 +380,4 @@ public class GrammarReport {
 		return buf.toString();
 	}
 
-	public static void writeReport(String filename, String data) {
-		String absoluteFilename = getAbsoluteFileName(filename);
-		File f = new File(absoluteFilename);
-		File parent = f.getParentFile();
-		parent.mkdirs(); // ensure parent dir exists
-		// write file
-		try {
-			FileOutputStream fos = new FileOutputStream(f, true); // append
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			PrintStream ps = new PrintStream(bos);
-			ps.println(data);
-			ps.close();
-			bos.close();
-			fos.close();
-		}
-		catch (IOException ioe) {
-			ErrorManager.internalError("can't write stats to "+absoluteFilename,
-									   ioe);
-		}
-	}
-
-	public static String getAbsoluteFileName(String filename) {
-		return System.getProperty("user.home")+File.separator+
-					ANTLRWORKS_DIR+File.separator+
-					filename;
-	}
-
-	// M I S C
-
-	// note that these routines return 0.0 if no values exist in the X[]
-	// which is not "correct", but it is useful so I don't generate NaN
-	// in my output
-
-	/** Compute the sample (unbiased estimator) standard deviation following:
-	 *
-	 *  Computing Deviations: Standard Accuracy
-	 *  Tony F. Chan and John Gregg Lewis
-	 *  Stanford University
-	 *  Communications of ACM September 1979 of Volume 22 the ACM Number 9
-	 *
-	 *  The "two-pass" method from the paper; supposed to have better
-	 *  numerical properties than the textbook summation/sqrt.  To me
-	 *  this looks like the textbook method, but I ain't no numerical
-	 *  methods guy.
-	 */
-	public static double stddev(int[] X) {
-		int m = X.length;
-		if ( m<=1 ) {
-			return 0;
-		}
-		double xbar = avg(X);
-		double s2 = 0.0;
-		for (int i=0; i<m; i++){
-			s2 += (X[i] - xbar)*(X[i] - xbar);
-		}
-		s2 = s2/(m-1);
-		return Math.sqrt(s2);
-	}
-
-	/** Compute the sample mean */
-	public static double avg(int[] X) {
-		double xbar = 0.0;
-		int m = X.length;
-		if ( m==0 ) {
-			return 0;
-		}
-		for (int i=0; i<m; i++){
-			xbar += X[i];
-		}
-		if ( xbar>=0.0 ) {
-			return xbar / m;
-		}
-		return 0.0;
-	}
-
-	public static int min(int[] X) {
-		int min = Integer.MAX_VALUE;
-		int m = X.length;
-		if ( m==0 ) {
-			return 0;
-		}
-		for (int i=0; i<m; i++){
-			if ( X[i] < min ) {
-				min = X[i];
-			}
-		}
-		return min;
-	}
-
-	public static int max(int[] X) {
-		int max = Integer.MIN_VALUE;
-		int m = X.length;
-		if ( m==0 ) {
-			return 0;
-		}
-		for (int i=0; i<m; i++){
-			if ( X[i] > max ) {
-				max = X[i];
-			}
-		}
-		return max;
-	}
-
-	public static int sum(int[] X) {
-		int s = 0;
-		int m = X.length;
-		if ( m==0 ) {
-			return 0;
-		}
-		for (int i=0; i<m; i++){
-			s += X[i];
-		}
-		return s;
-	}
 }

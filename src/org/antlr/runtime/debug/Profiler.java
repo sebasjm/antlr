@@ -28,7 +28,7 @@
 package org.antlr.runtime.debug;
 
 import org.antlr.runtime.*;
-import org.antlr.tool.GrammarReport;
+import org.antlr.runtime.misc.Stats;
 
 import java.util.*;
 
@@ -269,7 +269,7 @@ public class Profiler extends BlankDebugEventListener {
 
 	public void terminate() {
 		String stats = toNotifyString();
-		GrammarReport.writeReport(RUNTIME_STATS_FILENAME,stats);
+		Stats.writeReport(RUNTIME_STATS_FILENAME,stats);
 		System.out.println(toString(stats));
 	}
 
@@ -302,33 +302,33 @@ public class Profiler extends BlankDebugEventListener {
 		buf.append('\t');
 		buf.append(numFixedDecisions);
 		buf.append('\t');
-		buf.append(GrammarReport.min(decisionMaxFixedLookaheads));
+		buf.append(Stats.min(decisionMaxFixedLookaheads));
 		buf.append('\t');
-		buf.append(GrammarReport.max(decisionMaxFixedLookaheads));
+		buf.append(Stats.max(decisionMaxFixedLookaheads));
 		buf.append('\t');
-		buf.append(GrammarReport.avg(decisionMaxFixedLookaheads));
+		buf.append(Stats.avg(decisionMaxFixedLookaheads));
 		buf.append('\t');
-		buf.append(GrammarReport.stddev(decisionMaxFixedLookaheads));
+		buf.append(Stats.stddev(decisionMaxFixedLookaheads));
 		buf.append('\t');
 		buf.append(numCyclicDecisions);
 		buf.append('\t');
-		buf.append(GrammarReport.min(decisionMaxCyclicLookaheads));
+		buf.append(Stats.min(decisionMaxCyclicLookaheads));
 		buf.append('\t');
-		buf.append(GrammarReport.max(decisionMaxCyclicLookaheads));
+		buf.append(Stats.max(decisionMaxCyclicLookaheads));
 		buf.append('\t');
-		buf.append(GrammarReport.avg(decisionMaxCyclicLookaheads));
+		buf.append(Stats.avg(decisionMaxCyclicLookaheads));
 		buf.append('\t');
-		buf.append(GrammarReport.stddev(decisionMaxCyclicLookaheads));
+		buf.append(Stats.stddev(decisionMaxCyclicLookaheads));
 		buf.append('\t');
 		buf.append(numBacktrackDecisions);
 		buf.append('\t');
-		buf.append(GrammarReport.min(toArray(decisionMaxSynPredLookaheads)));
+		buf.append(Stats.min(toArray(decisionMaxSynPredLookaheads)));
 		buf.append('\t');
-		buf.append(GrammarReport.max(toArray(decisionMaxSynPredLookaheads)));
+		buf.append(Stats.max(toArray(decisionMaxSynPredLookaheads)));
 		buf.append('\t');
-		buf.append(GrammarReport.avg(toArray(decisionMaxSynPredLookaheads)));
+		buf.append(Stats.avg(toArray(decisionMaxSynPredLookaheads)));
 		buf.append('\t');
-		buf.append(GrammarReport.stddev(toArray(decisionMaxSynPredLookaheads)));
+		buf.append(Stats.stddev(toArray(decisionMaxSynPredLookaheads)));
 		buf.append('\t');
 		buf.append(numSemanticPredicates);
 		buf.append('\t');

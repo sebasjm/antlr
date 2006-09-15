@@ -40,6 +40,8 @@ import org.antlr.runtime.Token;
  *  for future. 4/26/2006.
  */
 public interface DebugEventListener {
+	public static final String PROTOCOL_VERSION = "1";
+	
 	/** serialized version of true */
 	public static final int TRUE = 1;
 	public static final int FALSE = 0;
