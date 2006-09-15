@@ -857,19 +857,17 @@ public class TestNFAConstruction extends TestSuite {
 		);
 		String expecting =
 			".s0->.s1\n" +
-				".s1->.s2\n" +
-				".s11->.s12\n" +
-				".s12-'b'->.s13\n" +
-				".s13->.s8\n" +
-				".s2-{synpred2}?->.s3\n" +
-				".s3->.s4\n" +
-				".s4->.s11\n" +
-				".s4->.s5\n" +
-				".s5-{synpred1}?->.s6\n" +
-				".s6-'a'->.s7\n" +
-				".s7->.s8\n" +
-				".s8->:s9\n" +
-				":s9-EOF->.s10\n";
+			".s1->.s2\n" +
+			".s10-'b'->.s11\n" +
+			".s11->.s6\n" +
+			".s2->.s3\n" +
+			".s2->.s9\n" +
+			".s3-{synpred1}?->.s4\n" +
+			".s4-'a'->.s5\n" +
+			".s5->.s6\n" +
+			".s6->:s7\n" +
+			".s9->.s10\n" +
+			":s7-EOF->.s8\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -882,10 +880,9 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			".s0->.s1\n" +
 				".s1->.s2\n" +
-				".s2-{synpred1}?->.s3\n" +
-				".s3-'a'..'b'->.s4\n" +
-				".s4->:s5\n" +
-				":s5-EOF->.s6\n";
+				".s2-'a'..'b'->.s3\n" +
+				".s3->:s4\n" +
+				":s4-EOF->.s5\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -898,23 +895,22 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			".s0->.s1\n" +
 				".s1->.s2\n" +
-				".s10->:s11\n" +
-				".s13->.s14\n" +
-				".s14-'b'->.s15\n" +
-				".s15->.s9\n" +
-				".s16->.s10\n" +
-				".s2-{synpred2}?->.s3\n" +
+				".s11->.s12\n" +
+				".s12-{synpred2}?->.s13\n" +
+				".s13-'b'->.s14\n" +
+				".s14->.s7\n" +
+				".s15->.s8\n" +
+				".s2->.s15\n" +
+				".s2->.s3\n" +
+				".s3->.s11\n" +
 				".s3->.s4\n" +
-				".s4->.s16\n" +
-				".s4->.s5\n" +
-				".s5->.s13\n" +
-				".s5->.s6\n" +
-				".s6-{synpred1}?->.s7\n" +
-				".s7-'a'->.s8\n" +
-				".s8->.s9\n" +
-				".s9->.s10\n" +
-				".s9->.s5\n" +
-				":s11-EOF->.s12\n";
+				".s4-{synpred1}?->.s5\n" +
+				".s5-'a'->.s6\n" +
+				".s6->.s7\n" +
+				".s7->.s3\n" +
+				".s7->.s8\n" +
+				".s8->:s9\n" +
+				":s9-EOF->.s10\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -927,18 +923,16 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			".s0->.s1\n" +
 				".s1->.s2\n" +
-				".s12->.s9\n" +
-				".s2-{synpred2}?->.s3\n" +
+				".s10->.s7\n" +
+				".s2->.s10\n" +
+				".s2->.s3\n" +
 				".s3->.s4\n" +
-				".s4->.s12\n" +
-				".s4->.s5\n" +
-				".s5->.s6\n" +
-				".s6-{synpred1}?->.s7\n" +
-				".s7-'a'..'b'->.s8\n" +
-				".s8->.s5\n" +
-				".s8->.s9\n" +
-				".s9->:s10\n" +
-				":s10-EOF->.s11\n";
+				".s4-{synpred1}?->.s5\n" +
+				".s5-'a'..'b'->.s6\n" +
+				".s6->.s3\n" +
+				".s6->.s7\n" +
+				".s7->:s8\n" +
+				":s8-EOF->.s9\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -951,18 +945,16 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			".s0->.s1\n" +
 				".s1->.s2\n" +
-				".s12->.s9\n" +
-				".s2-{synpred2}?->.s3\n" +
+				".s10->.s7\n" +
+				".s2->.s10\n" +
+				".s2->.s3\n" +
 				".s3->.s4\n" +
-				".s4->.s12\n" +
-				".s4->.s5\n" +
-				".s5->.s6\n" +
-				".s6-{synpred1}?->.s7\n" +
-				".s7-'a'->.s8\n" +
-				".s8->.s5\n" +
-				".s8->.s9\n" +
-				".s9->:s10\n" +
-				":s10-EOF->.s11\n";
+				".s4-{synpred1}?->.s5\n" +
+				".s5-'a'->.s6\n" +
+				".s6->.s3\n" +
+				".s6->.s7\n" +
+				".s7->:s8\n" +
+				":s8-EOF->.s9\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -975,20 +967,20 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			".s0->.s1\n" +
 				".s1->.s2\n" +
-				".s12->.s13\n" +
+				".s11->.s12\n" +
+				".s12-{synpred2}?->.s13\n" +
 				".s13-'b'->.s14\n" +
-				".s14->.s8\n" +
-				".s2-{synpred2}?->.s3\n" +
+				".s14->.s7\n" +
+				".s2->.s3\n" +
+				".s3->.s11\n" +
 				".s3->.s4\n" +
-				".s4->.s12\n" +
-				".s4->.s5\n" +
-				".s5-{synpred1}?->.s6\n" +
-				".s6-'a'->.s7\n" +
+				".s4-{synpred1}?->.s5\n" +
+				".s5-'a'->.s6\n" +
+				".s6->.s7\n" +
+				".s7->.s3\n" +
 				".s7->.s8\n" +
-				".s8->.s4\n" +
-				".s8->.s9\n" +
-				".s9->:s10\n" +
-				":s10-EOF->.s11\n";
+				".s8->:s9\n" +
+				":s9-EOF->.s10\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -1001,15 +993,14 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			".s0->.s1\n" +
 				".s1->.s2\n" +
-				".s2-{synpred2}?->.s3\n" +
+				".s2->.s3\n" +
 				".s3->.s4\n" +
-				".s4->.s5\n" +
-				".s5-{synpred1}?->.s6\n" +
-				".s6-'a'..'b'->.s7\n" +
-				".s7->.s4\n" +
-				".s7->.s8\n" +
-				".s8->:s9\n" +
-				":s9-EOF->.s10\n";
+				".s4-{synpred1}?->.s5\n" +
+				".s5-'a'..'b'->.s6\n" +
+				".s6->.s3\n" +
+				".s6->.s7\n" +
+				".s7->:s8\n" +
+				":s8-EOF->.s9\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -1022,15 +1013,14 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			".s0->.s1\n" +
 				".s1->.s2\n" +
-				".s2-{synpred2}?->.s3\n" +
+				".s2->.s3\n" +
 				".s3->.s4\n" +
-				".s4->.s5\n" +
-				".s5-{synpred1}?->.s6\n" +
-				".s6-'a'->.s7\n" +
-				".s7->.s4\n" +
-				".s7->.s8\n" +
-				".s8->:s9\n" +
-				":s9-EOF->.s10\n";
+				".s4-{synpred1}?->.s5\n" +
+				".s5-'a'->.s6\n" +
+				".s6->.s3\n" +
+				".s6->.s7\n" +
+				".s7->:s8\n" +
+				":s8-EOF->.s9\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -1043,21 +1033,19 @@ public class TestNFAConstruction extends TestSuite {
 		String expecting =
 			".s0->.s1\n" +
 				".s1->.s2\n" +
-				".s11->.s12\n" +
-				".s11->.s15\n" +
-				".s12-{synpred2}?->.s13\n" +
-				".s13-'b'->.s14\n" +
-				".s14->.s8\n" +
-				".s15->.s8\n" +
-				".s2-{synpred3}?->.s3\n" +
-				".s3->.s4\n" +
-				".s4->.s11\n" +
-				".s4->.s5\n" +
-				".s5-{synpred1}?->.s6\n" +
-				".s6-'a'->.s7\n" +
-				".s7->.s8\n" +
-				".s8->:s9\n" +
-				":s9-EOF->.s10\n";
+				".s10-{synpred2}?->.s11\n" +
+				".s11-'b'->.s12\n" +
+				".s12->.s6\n" +
+				".s13->.s6\n" +
+				".s2->.s3\n" +
+				".s2->.s9\n" +
+				".s3-{synpred1}?->.s4\n" +
+				".s4-'a'->.s5\n" +
+				".s5->.s6\n" +
+				".s6->:s7\n" +
+				".s9->.s10\n" +
+				".s9->.s13\n" +
+				":s7-EOF->.s8\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -1069,17 +1057,15 @@ public class TestNFAConstruction extends TestSuite {
 		);
 		String expecting =
 				".s0->.s1\n" +
-				".s1->.s2\n" +
-				".s11->.s8\n" +
-				".s2-{synpred2}?->.s3\n" +
-				".s3->.s4\n" +
-				".s4->.s11\n" +
-				".s4->.s5\n" +
-				".s5-{synpred1}?->.s6\n" +
-				".s6-'a'->.s7\n" +
-				".s7->.s8\n" +
-				".s8->:s9\n" +
-				":s9-EOF->.s10\n";
+					".s1->.s2\n" +
+					".s2->.s3\n" +
+					".s2->.s9\n" +
+					".s3-{synpred1}?->.s4\n" +
+					".s4-'a'->.s5\n" +
+					".s5->.s6\n" +
+					".s6->:s7\n" +
+					".s9->.s6\n" +
+					":s7-EOF->.s8\n";
 		checkRule(g, "a", expecting);
 	}
 
@@ -1094,7 +1080,7 @@ public class TestNFAConstruction extends TestSuite {
 				".s1->.s2\n" +
 				".s1->.s8\n" +
 				".s10->.s5\n" +
-				".s2-{synpred2}?->.s3\n" +
+				".s2-{synpred1}?->.s3\n" +
 				".s3-'a'->.s4\n" +
 				".s4->.s5\n" +
 				".s5->:s6\n" +

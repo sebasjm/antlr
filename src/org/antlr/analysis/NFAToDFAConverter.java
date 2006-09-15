@@ -987,8 +987,8 @@ public class NFAToDFAConverter {
 				SemanticContext existingStateGatedPreds =
 					acceptStateForAlt.getGatedPredicatesInNFAConfigurations();
 				if ( (gatedPreds==null && existingStateGatedPreds==null) ||
-				     (gatedPreds!=null && existingStateGatedPreds!=null) ||
-					 gatedPreds.equals(existingStateGatedPreds) )
+				     ((gatedPreds!=null && existingStateGatedPreds!=null) &&
+					  gatedPreds.equals(existingStateGatedPreds)) )
 				{
 					// make this d.statenumber point at old DFA state
 					dfa.setState(d.stateNumber, acceptStateForAlt);
