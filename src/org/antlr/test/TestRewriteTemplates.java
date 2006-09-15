@@ -38,7 +38,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("", found);
 	}
@@ -51,7 +51,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc\n", found);
 	}
@@ -64,7 +64,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc\n", found);
 	}
@@ -77,7 +77,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("x:abc, y:34;\n", found);
 	}
@@ -92,7 +92,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
 	}
@@ -107,7 +107,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
 	}
@@ -120,7 +120,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
 	}
@@ -137,7 +137,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("hi abc\n", found);
 	}
@@ -151,7 +151,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
 	}
@@ -165,7 +165,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("8\n", found);
 	}
@@ -181,7 +181,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found = execParser("t.g", grammar, "T", "TLexer",
+		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc \n", found);
 	}

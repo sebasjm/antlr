@@ -262,11 +262,13 @@ grammarSpec
 		 }
 		)?
 		{
-		recognizerST.setAttribute("name", #name.getText());
+		String suffix = Grammar.grammarTypeToFileNameSuffix[grammar.type];
+        String n = #name.getText()+suffix;
+		recognizerST.setAttribute("name", n);
+		outputFileST.setAttribute("name", n);
+		headerFileST.setAttribute("name", n);
 		recognizerST.setAttribute("scopes", grammar.getGlobalScopes());
 		headerFileST.setAttribute("scopes", grammar.getGlobalScopes());
-		outputFileST.setAttribute("name", #name.getText());
-		headerFileST.setAttribute("name", #name.getText());
 		}
 		( #(OPTIONS .) )?
 		( #(TOKENS .) )?

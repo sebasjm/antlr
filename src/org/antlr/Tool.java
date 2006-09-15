@@ -39,7 +39,7 @@ public class Tool {
     /** If hasError, cannot continue processing */
     protected boolean hasError;
 
-	public static final String VERSION = "3.0b4";
+	public static final String VERSION = "3.0b5";
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
 
@@ -266,7 +266,7 @@ public class Tool {
 
 				String lexerGrammarStr = grammar.getLexerGrammar();
 				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
-					String lexerGrammarFileName = grammar.name+".lexer.g";
+					String lexerGrammarFileName = grammar.name+"$Lexer"+Grammar.GRAMMAR_FILE_EXTENSION;
 					Writer w = getOutputFile(grammar,lexerGrammarFileName);
 					w.write(lexerGrammarStr);
 					w.close();
@@ -416,8 +416,8 @@ public class Tool {
 	 *
 	 *  The output dir -o spec takes precedence if it's absolute.
 	 *  E.g., if the grammar file dir is absolute the output dir is given
-	 *  precendence. "-o /tmp /usr/lib/t.g" results in "/tmp/T.java" as
-	 *  output (assuming t.g holds T.java).
+	 *  precendence. "-o /tmp /usr/lib/t.g3" results in "/tmp/T.java" as
+	 *  output (assuming t.g3 holds T.java).
 	 *
 	 *  If no -o is specified, then just write to the directory where the
 	 *  grammar file was found.

@@ -42,7 +42,7 @@ public class TestLexer extends BaseTest {
 			"a : A {System.out.println(input);} ;\n"+
 			"A : '\\\\' 't' {setText(\"\t\");} ;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;";
-		String found = execParser("P.g", grammar, "P", "PLexer",
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
 				    "a", "\\t", debug);
 		assertEquals("\t\n", found);
 	}
@@ -56,7 +56,7 @@ public class TestLexer extends BaseTest {
 			"A : '-' I ;\n" +
 			"I : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\n') {channel=99;} ;";
-		String found = execParser("P.g", grammar, "P", "PLexer",
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
 				    "a", "-34", debug);
 		assertEquals("-34\n", found);
 	}
@@ -70,7 +70,7 @@ public class TestLexer extends BaseTest {
 			"A : '-' I ;\n" +
 			"fragment I : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\n') {channel=99;} ;";
-		String found = execParser("P.g", grammar, "P", "PLexer",
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
 				    "a", "-34", debug);
 		assertEquals("-34\n", found);
 	}
@@ -84,7 +84,7 @@ public class TestLexer extends BaseTest {
 			"A : I '.' I ;\n" +
 			"fragment I : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\n') {channel=99;} ;";
-		String found = execParser("P.g", grammar, "P", "PLexer",
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
 				    "a", "3.14159", debug);
 		assertEquals("3.14159\n", found);
 	}

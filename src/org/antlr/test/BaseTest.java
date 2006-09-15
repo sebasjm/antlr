@@ -102,7 +102,7 @@ public abstract class BaseTest extends TestCase {
 			}
 			options.add("-o");
 			options.add(tmpdir);
-			options.add(new File(tmpdir,g.name+".g").toString());
+			options.add(new File(tmpdir,g.name+Grammar.GRAMMAR_FILE_EXTENSION).toString());
 			String[] optionsA = new String[options.size()];
 			options.toArray(optionsA);
 			Tool antlr = new Tool(optionsA);

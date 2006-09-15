@@ -1063,7 +1063,8 @@ public class CodeGenerator {
 
 	public String getRecognizerFileName() {
 		StringTemplate extST = templates.getInstanceOf("codeFileExtension");
-		return grammar.name+extST.toString();
+		String suffix = Grammar.grammarTypeToFileNameSuffix[grammar.type];
+		return grammar.name+suffix+extST.toString();
 	}
 
 	public String getVocabFileName() {

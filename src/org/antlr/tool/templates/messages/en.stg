@@ -62,6 +62,10 @@ BAD_AST_STRUCTURE(arg,exception,stackTrace) ::= <<
 bad internal tree structure '<arg>': <exception>
 <stackTrace; separator="\n">
 >>
+FILE_AND_GRAMMAR_NAME_DIFFER(arg,arg2) ::=
+  "file <arg2> contains grammar <arg>; names much be identical"
+FILENAME_EXTENSION_ERROR(arg) ::= 
+  "file <arg> must end in a file extension, normally .g or .g3"
 
 // code gen errors
 MISSING_CODE_GEN_TEMPLATES(arg) ::= 

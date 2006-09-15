@@ -96,6 +96,8 @@ public class ErrorManager {
 	public static final int MSG_DIR_NOT_FOUND = 5;
 	public static final int MSG_OUTPUT_DIR_IS_FILE = 6;
 	public static final int MSG_CANNOT_OPEN_FILE = 7;
+	public static final int MSG_FILE_AND_GRAMMAR_NAME_DIFFER = 8;
+	public static final int MSG_FILENAME_EXTENSION_ERROR = 9;
 
 	public static final int MSG_INTERNAL_ERROR = 10;
 	public static final int MSG_INTERNAL_WARNING = 11;
@@ -195,6 +197,7 @@ public class ErrorManager {
 	public static final BitSet ERRORS_FORCING_NO_CODEGEN = new BitSet() {
 		{
 			add(MSG_NONREGULAR_DECISION);
+			add(MSG_FILE_AND_GRAMMAR_NAME_DIFFER);
 			// TODO: ...
 		}
 	};

@@ -310,7 +310,7 @@ grammar[Grammar g]
 
 grammarSpec
 {Map opts=null;}
-	:	id:ID {grammar.name = #id.getText();}
+	:	id:ID {grammar.setName(#id.getText());}
 		(cmt:DOC_COMMENT)?
 		(optionsSpec)?
         (tokensSpec)?

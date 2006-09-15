@@ -48,7 +48,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"   : '(' c ')' | 'x' ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "t", "tLexer",
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "a", "(x) ;", false);
 		String expecting =
 			"enter b\n" +
@@ -57,7 +57,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"alt 2\n";
 		assertEquals(expecting, found);
 
-		found = execParser("t.g", grammar, "t", "tLexer",
+		found = execParser("t.g", grammar, "tParser", "tLexer",
 			    "a", "(x). ;", false);
 		expecting =
 			"enter b\n" +
@@ -65,7 +65,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"alt 1\n";
 		assertEquals(expecting, found);
 
-		found = execParser("t.g", grammar, "t", "tLexer",
+		found = execParser("t.g", grammar, "tParser", "tLexer",
 			    "a", "((x)) ;", false);
 		expecting =
 			"enter b\n" +
@@ -97,7 +97,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"   : '(' c ')' | 'x' ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "t", "tLexer",
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "a", "(x) ;", false);
 		String expecting =
 			"enter b\n" +
@@ -106,7 +106,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"alt 2\n";
 		assertEquals(expecting, found);
 
-		found = execParser("t.g", grammar, "t", "tLexer",
+		found = execParser("t.g", grammar, "tParser", "tLexer",
 			    "a", "(x). ;", false);
 		expecting =
 			"enter b\n" +
@@ -114,7 +114,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"alt 1\n";
 		assertEquals(expecting, found);
 
-		found = execParser("t.g", grammar, "t", "tLexer",
+		found = execParser("t.g", grammar, "tParser", "tLexer",
 			    "a", "((x)) ;", false);
 		expecting =
 			"enter b\n" +
@@ -135,12 +135,12 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found = execParser("t.g", grammar, "t", "tLexer",
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "s", "xxx", false);
 
 		assertEquals("alt2\n", found);
 
-		found = execParser("t.g", grammar, "t", "tLexer",
+		found = execParser("t.g", grammar, "tParser", "tLexer",
 			    "s", "xxx.", false);
 
 		assertEquals("alt1\n", found);
@@ -156,7 +156,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found = execParser("t.g", grammar, "t", "tLexer",
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "s", "xxx", false);
 
 		assertEquals("alt1\n", found);
@@ -172,7 +172,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found = execParser("t.g", grammar, "t", "tLexer",
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "s", "xxx", false);
 		assertEquals("alt2\n", found);
 	}
@@ -197,7 +197,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"INT: '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "t", "tLexer",
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "s", "(34)x;", false);
 		String expecting =
 			"enter expr (\n" +
@@ -232,7 +232,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"fragment INT: '0'..'9'+ ;\n" +
 			"fragment WS : (' '|'\\n')+ \n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "t", "tLexer",
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "s", "((34)x)x", false);
 		String expecting = // has no memoization
 			"enter expr (\n" +
@@ -277,7 +277,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "t", "tLexer",
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "a", "xxxy", false);
 
 		assertEquals("1:xxxy;\n", found);
@@ -297,7 +297,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "t", "tLexer",
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "a", "xxxy", false);
 
 		assertEquals("x x x y\n", found);
