@@ -33,8 +33,6 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.*;
 
 import java.io.StringReader;
@@ -44,7 +42,7 @@ import java.util.List;
  *  translation, assume the Java target.  This is still a great test
  *  for the semantics of the $x.y stuff regardless of the target.
  */
-public class TestAttributes extends TestSuite {
+public class TestAttributes extends BaseTest {
 
 	/** Public default constructor used by TestRig */
 	public TestAttributes() {
@@ -52,7 +50,7 @@ public class TestAttributes extends TestSuite {
 
 	public void testEscapedLessThanInAction() throws Exception {
 		Grammar g = new Grammar();
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		String action = "i<3; '<xmltag>'";
 		ActionTranslator translator = new ActionTranslator(generator,"a",
@@ -65,7 +63,7 @@ public class TestAttributes extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, "<action>");
 		actionST.setAttribute("action", rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testEscaped$InAction() throws Exception {
@@ -77,7 +75,7 @@ public class TestAttributes extends TestSuite {
 				"a[User u, int i]\n" +
 				"        : {"+action+"}\n" +
 				"        ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -91,7 +89,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testArguments() throws Exception {
@@ -105,7 +103,7 @@ public class TestAttributes extends TestSuite {
 				"a[User u, int i]\n" +
 				"        : {"+action+"}\n" +
 				"        ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -117,9 +115,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	/** $x.start refs are checked during translation not before so ANTLR misses
@@ -138,7 +136,7 @@ public class TestAttributes extends TestSuite {
 			"parser grammar t;\n"+
 			"a : x=b {"+action+"} ;\n" +
 			"b returns [int foo] : B {$b.start} ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -150,9 +148,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testInvalidArguments() throws Exception {
@@ -166,7 +164,7 @@ public class TestAttributes extends TestSuite {
 				"a[User u, int i]\n" +
 				"        : {"+action+"}\n" +
 				"        ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator,
 														   "a",
@@ -177,7 +175,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE;
 		Object expectedArg = "x";
@@ -198,7 +196,7 @@ public class TestAttributes extends TestSuite {
 				"        : 'a'\n" +
 				"        ;\n" +
 				"b : x=a {"+action+"} ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -212,9 +210,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testReturnValues() throws Exception {
@@ -228,7 +226,7 @@ public class TestAttributes extends TestSuite {
 				"a returns [User u, int i]\n" +
 				"        : {"+action+"}\n" +
 				"        ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -240,9 +238,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testInvalidReturnValues() throws Exception {
@@ -256,7 +254,7 @@ public class TestAttributes extends TestSuite {
 				"a returns [User u, int i]\n" +
 				"        : {"+action+"}\n" +
 				"        ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator,"a",
 														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
@@ -266,7 +264,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE;
 		Object expectedArg = "x";
@@ -289,7 +287,7 @@ public class TestAttributes extends TestSuite {
 			"parser grammar t;\n"+
 				"a : id=ID f=FLOAT {"+action+"}\n" +
 				"  ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -301,9 +299,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRuleLabels() throws Exception {
@@ -319,7 +317,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n"+
 				"b : r=a {###"+action+"!!!}\n" +
 				"  ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -327,9 +325,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate codeST = generator.getRecognizerST();
 		String code = codeST.toString();
 		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRuleLabelsWithSpecialToken() throws Exception {
@@ -346,7 +344,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n"+
 				"b : r=a {###"+action+"!!!}\n" +
 				"  ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -355,9 +353,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate codeST = generator.getRecognizerST();
 		String code = codeST.toString();
 		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testForwardRefRuleLabels() throws Exception {
@@ -372,7 +370,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n" +
 				"a returns [int x]\n" +
 				"  : ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -381,9 +379,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate codeST = generator.getRecognizerST();
 		String code = codeST.toString();
 		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testInvalidRuleLabelAccessesParameter() throws Exception {
@@ -399,7 +397,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n"+
 				"b : r=a[3] {"+action+"}\n" +
 				"  ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator, "b",
 														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
@@ -409,7 +407,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_INVALID_RULE_PARAMETER_REF;
 		Object expectedArg = "a";
@@ -433,7 +431,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n"+
 				"b : r=a[3] {"+action+"}\n" +
 				"  ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator, "b",
 														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
@@ -443,7 +441,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_INVALID_RULE_SCOPE_ATTRIBUTE_REF;
 		Object expectedArg = "a";
@@ -466,7 +464,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n"+
 				"b : r=a[3] {"+action+"}\n" +
 				"  ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator, "b",
 														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
@@ -476,7 +474,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
 		Object expectedArg = "a";
@@ -499,7 +497,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n"+
 				"b : r=a[3] {"+action+"}\n" +
 				"  ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator, "b",
 														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
@@ -526,7 +524,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n"+
 				"b : a {"+action+"}\n" +
 				"  ;");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator, "b",
 														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
@@ -550,7 +548,7 @@ public class TestAttributes extends TestSuite {
 			"parser grammar t;\n"+
 				"@members {'+action+'}\n" +
 				"a : ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator,
 														   null,
@@ -561,7 +559,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE;
 		Object expectedArg = "x";
@@ -580,7 +578,7 @@ public class TestAttributes extends TestSuite {
 			"parser grammar t;\n"+
 				"@members {'+action+'}\n" +
 				"a : ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator = new ActionTranslator(generator,
 														   null,
@@ -591,7 +589,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_REF_NOT_IN_RULE;
 		Object expectedArg = "x";
@@ -618,7 +616,7 @@ public class TestAttributes extends TestSuite {
 				"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
 				"  ;\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -630,9 +628,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testUnknownGlobalScope() throws Exception {
@@ -645,14 +643,14 @@ public class TestAttributes extends TestSuite {
 			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
 			"  ;\n" +
 			"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
 		ActionTranslator translator = new ActionTranslator(generator,"a",
 														   new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 
-		assertTrue(equeue.errors.size()==2, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 2, equeue.errors.size());
 
 		int expectedMsgID = ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE;
 		Object expectedArg = "Symbols";
@@ -677,7 +675,7 @@ public class TestAttributes extends TestSuite {
 				"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
 				"  ;\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -689,9 +687,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void test0IndexedGlobalScope() throws Exception {
@@ -710,7 +708,7 @@ public class TestAttributes extends TestSuite {
 				"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
 				"  ;\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -722,9 +720,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testAbsoluteIndexedGlobalScope() throws Exception {
@@ -743,7 +741,7 @@ public class TestAttributes extends TestSuite {
 				"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
 				"  ;\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -755,9 +753,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testScopeAndAttributeWithUnderscore() throws Exception {
@@ -774,7 +772,7 @@ public class TestAttributes extends TestSuite {
 				"a scope foo_bar; : (ID {"+action+"} )+\n" +
 				"  ;\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -787,8 +785,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testSharedGlobalScope() throws Exception {
@@ -809,7 +808,7 @@ public class TestAttributes extends TestSuite {
 				" ;\n" +
 				"b : ID {$Symbols::x=$ID.text} ;\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -821,9 +820,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testGlobalScopeOutsideRule() throws Exception {
@@ -841,7 +840,7 @@ public class TestAttributes extends TestSuite {
 				"@members {'+action+'}\n" +
 				"a : \n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -853,9 +852,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRuleScopeOutsideRule() throws Exception {
@@ -871,7 +870,7 @@ public class TestAttributes extends TestSuite {
 				"scope { int name; }\n" +
 				"  : {foo();}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -884,9 +883,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testBasicRuleScope() throws Exception {
@@ -902,7 +901,7 @@ public class TestAttributes extends TestSuite {
 				"  int n;\n" +
 				"} : {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -914,9 +913,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testUnqualifiedRuleScopeAccessInsideRule() throws Exception {
@@ -932,7 +931,7 @@ public class TestAttributes extends TestSuite {
 				"  int n;\n" +
 				"} : {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -960,7 +959,7 @@ public class TestAttributes extends TestSuite {
 				"} : b ;\n" +
 				"b : {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -972,9 +971,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testDynamicRuleScopeRefInSubrule() throws Exception {
@@ -991,7 +990,7 @@ public class TestAttributes extends TestSuite {
 				"} : b ;\n" +
 				"b : {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1003,9 +1002,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testIsolatedGlobalScopeRef() throws Exception {
@@ -1026,7 +1025,7 @@ public class TestAttributes extends TestSuite {
 				" ;\n" +
 				"b : ID {$Symbols::x=$ID.text} ;\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1038,9 +1037,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRuleScopeFromAnotherRule() throws Exception {
@@ -1058,7 +1057,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n" +
 				"b : {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1070,9 +1069,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testFullyQualifiedRefToCurrentRuleParameter() throws Exception {
@@ -1085,7 +1084,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a[int i]: {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1097,9 +1096,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
@@ -1112,7 +1111,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a returns [int i, int j]: {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1124,9 +1123,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testIsolatedRefToCurrentRule() throws Exception {
@@ -1139,7 +1138,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : 'a' {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1163,7 +1162,7 @@ public class TestAttributes extends TestSuite {
 				"a : x=b {"+action+"}\n" +
 				"  ;\n" +
 				"b : 'b' ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1186,7 +1185,7 @@ public class TestAttributes extends TestSuite {
 				"grammar t;\n"+
 					"a : x='a' {"+action+"}\n" +
 					"  ;\n");
-			Tool antlr = new Tool();
+			Tool antlr = newTool();
 			CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 			g.setCodeGenerator(generator);
 			generator.genRecognizer(); // forces load of templates
@@ -1198,9 +1197,9 @@ public class TestAttributes extends TestSuite {
 				new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 			StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 			String found = actionST.toString();
-			assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+			assertEquals(expecting, found);
 
-			assertEqual(found, expecting);
+			assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 		}
 
 	public void testFullyQualifiedRefToListLabelInCurrentRule() throws Exception {
@@ -1213,7 +1212,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : x+='a' {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1225,9 +1224,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 */
 	public void testFullyQualifiedRefToTemplateAttributeInCurrentRule() throws Exception {
@@ -1241,7 +1240,7 @@ public class TestAttributes extends TestSuite {
 				"options {output=template;}\n"+
 				"a : (A->{$A.text}) {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1253,9 +1252,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRuleRefWhenRuleHasScope() throws Exception {
@@ -1272,7 +1271,7 @@ public class TestAttributes extends TestSuite {
 				"  int n;\n" +
 				"} : 'b' \n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1280,9 +1279,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate codeST = generator.getRecognizerST();
 		String code = codeST.toString();
 		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testDynamicScopeRefOkEvenThoughRuleRefExists() throws Exception {
@@ -1299,7 +1298,7 @@ public class TestAttributes extends TestSuite {
 				"  int n;\n" +
 				"} : '(' b ')' {"+action+"}\n" + // refers to current invocation's n
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1311,9 +1310,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRefToTemplateAttributeForCurrentRule() throws Exception {
@@ -1327,7 +1326,7 @@ public class TestAttributes extends TestSuite {
 				"options {output=template;}\n"+
 				"a : {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1339,9 +1338,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRefToTextAttributeForCurrentRule() throws Exception {
@@ -1355,7 +1354,7 @@ public class TestAttributes extends TestSuite {
 				"options {output=template;}\n"+
 				"a : {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1367,9 +1366,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRefToStartAttributeForCurrentRule() throws Exception {
@@ -1382,7 +1381,7 @@ public class TestAttributes extends TestSuite {
 			"parser grammar t;\n" +
 				"a : {###"+action+"!!!}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1391,9 +1390,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate codeST = generator.getRecognizerST();
 		String code = codeST.toString();
 		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testTokenLabelFromMultipleAlts() throws Exception {
@@ -1411,7 +1410,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n" +
 				"ID : 'a';\n" +
 				"INT : '0';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1423,9 +1422,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 		translator = new ActionTranslator(generator,
 										  "a",
 										  new antlr.CommonToken(ANTLRParser.ACTION,action2),2);
@@ -1436,8 +1435,9 @@ public class TestAttributes extends TestSuite {
 		actionST = new StringTemplate(templates, rawTranslation);
 		found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
-		assertEqual(found, expecting2);
+		assertEquals(expecting2, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRuleLabelFromMultipleAlts() throws Exception {
@@ -1455,7 +1455,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n" +
 				"b : 'a';\n" +
 				"c : '0';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1467,9 +1467,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 		translator = new ActionTranslator(generator,
 										  "a",
 										  new antlr.CommonToken(ANTLRParser.ACTION,action2),2);
@@ -1480,8 +1480,9 @@ public class TestAttributes extends TestSuite {
 		actionST = new StringTemplate(templates, rawTranslation);
 		found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
-		assertEqual(found, expecting2);
+		assertEquals(expecting2, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testUnknownDynamicAttribute() throws Exception {
@@ -1497,7 +1498,7 @@ public class TestAttributes extends TestSuite {
 				"  int n;\n" +
 				"} : {"+action+"}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1511,7 +1512,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE;
 		Object expectedArg = "a";
@@ -1534,7 +1535,7 @@ public class TestAttributes extends TestSuite {
 				"}\n" +
 				"a : {'+action+'}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1548,7 +1549,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE;
 		Object expectedArg = "Symbols";
@@ -1573,7 +1574,7 @@ public class TestAttributes extends TestSuite {
 				"  ;\n" +
 				"b : {'+action+'}\n" +
 				"  ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator =
 			new ActionTranslator(generator,
@@ -1585,7 +1586,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
 		int expectedMsgID = ErrorManager.MSG_UNKNOWN_SIMPLE_ATTRIBUTE;
 		Object expectedArg = "n";
@@ -1670,7 +1671,7 @@ public class TestAttributes extends TestSuite {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 				"a : ids+=ID ( COMMA ids+=ID {"+action+"})* ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1684,9 +1685,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testPlusEqualStringLabel() throws Exception {
@@ -1699,7 +1700,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : ids+='if' ( ',' ids+=ID {"+action+"})* ;" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1713,9 +1714,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testPlusEqualSetLabel() throws Exception {
@@ -1728,7 +1729,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : ids+=('a'|'b') ( ',' ids+=ID {"+action+"})* ;" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -1742,9 +1743,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testPlusEqualWildcardLabel() throws Exception {
@@ -1757,7 +1758,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : ids+=. ( ',' ids+=ID {"+action+"})* ;" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator =
 			new ActionTranslator(generator,
@@ -1771,9 +1772,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testImplicitTokenLabel() throws Exception {
@@ -1786,7 +1787,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : ID {"+action+"} ;" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 
@@ -1802,9 +1803,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testImplicitRuleLabel() throws Exception {
@@ -1817,7 +1818,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : r {###"+action+"!!!} ;" +
 				"r : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1826,9 +1827,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate codeST = generator.getRecognizerST();
 		String code = codeST.toString();
 		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testReuseExistingLabelWithImplicitRuleLabel() throws Exception {
@@ -1841,7 +1842,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : x=r {###"+action+"!!!} ;" +
 				"r : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1850,9 +1851,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate codeST = generator.getRecognizerST();
 		String code = codeST.toString();
 		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testReuseExistingListLabelWithImplicitRuleLabel() throws Exception {
@@ -1866,7 +1867,7 @@ public class TestAttributes extends TestSuite {
 				"options {output=AST;}\n" +
 				"a : x+=r {###"+action+"!!!} ;" +
 				"r : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1875,9 +1876,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate codeST = generator.getRecognizerST();
 		String code = codeST.toString();
 		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testReuseExistingLabelWithImplicitTokenLabel() throws Exception {
@@ -1890,7 +1891,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : x=ID {"+action+"} ;" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1904,9 +1905,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testReuseExistingListLabelWithImplicitTokenLabel() throws Exception {
@@ -1919,7 +1920,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : x+=ID {"+action+"} ;" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1933,9 +1934,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testMissingArgs() throws Exception {
@@ -1945,7 +1946,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : r ;" +
 				"r[int i] : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1966,7 +1967,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : r[32,34] ;" +
 				"r : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1987,16 +1988,16 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 			"a : r ;\n" +
 			"r returns [int x=0] : 'a' {$x = 4;} ;\n");
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 
 		Rule r = g.getRule("r");
 		AttributeScope retScope = r.returnScope;
 		List parameters = retScope.getAttributes();
-		assertTrue(parameters!=null, "missing return action");
-		assertEqual(parameters.size(), 1);
+		assertNotNull("missing return action", parameters);
+		assertEquals(1, parameters.size());
 		String found = parameters.get(0).toString();
 		String expecting = "int x=0";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testMultipleReturnInitValue() throws Exception {
@@ -2006,16 +2007,16 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 			"a : r ;\n" +
 			"r returns [int x=0, int y, String s=new String(\"foo\")] : 'a' {$x = 4;} ;\n");
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 
 		Rule r = g.getRule("r");
 		AttributeScope retScope = r.returnScope;
 		List parameters = retScope.getAttributes();
-		assertTrue(parameters!=null, "missing return action");
-		assertEqual(parameters.size(), 3);
-		assertEqual(parameters.get(0).toString(), "int x=0");
-		assertEqual(parameters.get(1).toString(), "int y");
-		assertEqual(parameters.get(2).toString(), "String s=new String(\"foo\")");
+		assertNotNull("missing return action", parameters);
+		assertEquals(3, parameters.size());
+		assertEquals("int x=0", parameters.get(0).toString());
+		assertEquals("int y", parameters.get(1).toString());
+		assertEquals("String s=new String(\"foo\")", parameters.get(2).toString());
 	}
 
 	public void testCStyleReturnInitValue() throws Exception {
@@ -2025,16 +2026,16 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 			"a : r ;\n" +
 			"r returns [int (*x)()=NULL] : 'a' ;\n");
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 
 		Rule r = g.getRule("r");
 		AttributeScope retScope = r.returnScope;
 		List parameters = retScope.getAttributes();
-		assertTrue(parameters!=null, "missing return action");
-		assertEqual(parameters.size(), 1);
+		assertNotNull("missing return action", parameters);
+		assertEquals(1, parameters.size());
 		String found = parameters.get(0).toString();
 		String expecting = "int (*)() x=NULL";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testArgsWithInitValues() throws Exception {
@@ -2044,7 +2045,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : r[32,34] ;" +
 				"r[int x, int y=3] : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2065,7 +2066,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : ID[32,34] ;" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2086,7 +2087,7 @@ public class TestAttributes extends TestSuite {
 			"lexer grammar t;\n"+
 				"R : 'z' ID[32,34] ;" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2109,7 +2110,7 @@ public class TestAttributes extends TestSuite {
 			"lexer grammar t;\n"+
 				"R : 'z' i=ID {"+action+"};" +
 				"fragment ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -2124,9 +2125,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRefToRuleRefInLexer() throws Exception {
@@ -2138,7 +2139,7 @@ public class TestAttributes extends TestSuite {
 			"lexer grammar t;\n"+
 				"R : 'z' ID {"+action+"};" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -2153,9 +2154,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testRefToRuleRefInLexerNoAttribute() throws Exception {
@@ -2167,7 +2168,7 @@ public class TestAttributes extends TestSuite {
 			"lexer grammar t;\n"+
 				"R : 'z' ID {"+action+"};" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -2182,9 +2183,9 @@ public class TestAttributes extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals(expecting, found);
 
-		assertEqual(found, expecting);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testCharLabelInLexer() throws Exception {
@@ -2194,11 +2195,12 @@ public class TestAttributes extends TestSuite {
 			"lexer grammar t;\n"+
 				"R : x='z' ;\n");
 
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testCharListLabelInLexer() throws Exception {
@@ -2208,11 +2210,11 @@ public class TestAttributes extends TestSuite {
 			"lexer grammar t;\n"+
 				"R : x+='z' ;\n");
 
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testWildcardCharLabelInLexer() throws Exception {
@@ -2222,11 +2224,11 @@ public class TestAttributes extends TestSuite {
 			"lexer grammar t;\n"+
 				"R : x=. ;\n");
 
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testWildcardCharListLabelInLexer() throws Exception {
@@ -2236,11 +2238,11 @@ public class TestAttributes extends TestSuite {
 			"lexer grammar t;\n"+
 				"R : x+=. ;\n");
 
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testMissingArgsInLexer() throws Exception {
@@ -2250,7 +2252,7 @@ public class TestAttributes extends TestSuite {
 			"lexer grammar t;\n"+
 				"A : R ;" +
 				"R[int i] : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2282,7 +2284,7 @@ public class TestAttributes extends TestSuite {
 		lexerGrammar.setGrammarContent(sr);
 		sr.close();
 
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, lexerGrammar, "Java");
 		lexerGrammar.setCodeGenerator(generator);
@@ -2313,7 +2315,7 @@ public class TestAttributes extends TestSuite {
 		lexerGrammar.setGrammarContent(sr);
 		sr.close();
 
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, lexerGrammar, "Java");
 		lexerGrammar.setCodeGenerator(generator);
@@ -2340,7 +2342,7 @@ public class TestAttributes extends TestSuite {
 				"a : id=ID {"+action+"} ;\n" +
 				"ID : 'a';\n");
 
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslator translator =
@@ -2355,9 +2357,9 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testTokenRefTreeProperty() throws Exception {
@@ -2370,7 +2372,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : ID {"+action+"} ;" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2384,7 +2386,7 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testAmbiguousTokenRef() throws Exception {
@@ -2397,7 +2399,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : ID ID {"+action+"};" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2420,7 +2422,7 @@ public class TestAttributes extends TestSuite {
 			"grammar t;\n"+
 				"a : ID ID {"+action+"};" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2445,7 +2447,7 @@ public class TestAttributes extends TestSuite {
 				"scope { StringTemplate x; }\n" +
 				"    :   'y' {"+action+"}\n" +
 				"    ;\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -2458,16 +2460,16 @@ public class TestAttributes extends TestSuite {
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	// S U P P O R T
 
 	protected void checkError(ErrorQueue equeue,
 							  GrammarSemanticsMessage expectedMessage)
-		throws FailedAssertionException
+		throws Exception
 	{
 		/*
 		System.out.println(equeue.infos);
@@ -2481,12 +2483,11 @@ public class TestAttributes extends TestSuite {
 				foundMsg = m;
 			}
 		}
-		assertTrue(equeue.errors.size()>0, "no error; "+expectedMessage.msgID+" expected");
-		//assertTrue(equeue.errors.size()<=1, "too many errors; "+equeue.errors);
-		assertTrue(foundMsg!=null, "couldn't find expected error: "+expectedMessage.msgID);
-		assertTrue(foundMsg instanceof GrammarSemanticsMessage,
-				   "error is not a GrammarSemanticsMessage");
-		assertEqual(foundMsg.arg, expectedMessage.arg);
-		assertEqual(foundMsg.arg2, expectedMessage.arg2);
+		assertTrue("no error; "+expectedMessage.msgID+" expected", equeue.errors.size() > 0);
+		assertNotNull("couldn't find expected error: "+expectedMessage.msgID, foundMsg);
+		assertTrue("error is not a GrammarSemanticsMessage",
+				   foundMsg instanceof GrammarSemanticsMessage);
+		assertEquals(expectedMessage.arg, foundMsg.arg);
+		assertEquals(expectedMessage.arg2, foundMsg.arg2);
 	}
 }

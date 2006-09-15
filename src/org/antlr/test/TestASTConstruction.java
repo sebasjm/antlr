@@ -27,10 +27,9 @@
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 
-public class TestASTConstruction extends TestSuite {
+public class TestASTConstruction extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestASTConstruction() {
@@ -43,7 +42,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT A <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testNakeRulePlusInLexer() throws Exception {
@@ -54,7 +53,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule A ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT B <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("A").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testRulePlus() throws Exception {
@@ -65,7 +64,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testNakedRulePlus() throws Exception {
@@ -76,7 +75,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testRuleOptional() throws Exception {
@@ -87,7 +86,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testNakedRuleOptional() throws Exception {
@@ -98,7 +97,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testRuleStar() throws Exception {
@@ -109,7 +108,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testNakedRuleStar() throws Exception {
@@ -120,7 +119,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT b <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testCharStar() throws Exception {
@@ -130,7 +129,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testCharStarInLexer() throws Exception {
@@ -140,7 +139,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule B ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testStringStar() throws Exception {
@@ -150,7 +149,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'while' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testStringStarInLexer() throws Exception {
@@ -160,7 +159,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule B ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT 'while' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testCharPlus() throws Exception {
@@ -170,7 +169,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testCharPlusInLexer() throws Exception {
@@ -180,7 +179,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule B ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testCharOptional() throws Exception {
@@ -190,7 +189,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule a ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT 'a' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("a").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testCharOptionalInLexer() throws Exception {
@@ -200,7 +199,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule B ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT 'b' <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("B").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testCharRangePlus() throws Exception {
@@ -210,7 +209,7 @@ public class TestASTConstruction extends TestSuite {
 		String expecting =
 			" ( rule ID ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT ( .. 'a' 'z' ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
 		String found = g.getRule("ID").tree.toStringTree();
-		assertEqual(found,expecting);
+		assertEquals(expecting, found);
 	}
 
 }

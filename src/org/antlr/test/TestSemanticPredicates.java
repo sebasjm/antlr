@@ -27,18 +27,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
-import org.antlr.Tool;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.DecisionProbe;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.BitSet;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.*;
 
 import java.util.List;
 
-public class TestSemanticPredicates extends TestSuite {
+public class TestSemanticPredicates extends BaseTest {
 
 	/** Public default constructor used by TestRig */
 	public TestSemanticPredicates() {
@@ -197,7 +194,7 @@ public class TestSemanticPredicates extends TestSuite {
 		DecisionProbe.verbose=true; // make sure we get all error info
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
-		CodeGenerator generator = new CodeGenerator(new Tool(), g, "Java");
+		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
@@ -207,14 +204,12 @@ public class TestSemanticPredicates extends TestSuite {
 		DFA dfa = g.getLookaheadDFA(1);
 		FASerializer serializer = new FASerializer(g);
 		String result = serializer.serialize(dfa.startState);
-		assertEqual(result, expecting);
+		assertEquals(expecting, result);
 
-		assertTrue(equeue.size()==1,
-				   "unexpected number of expected problems: "+equeue.size()+
-				   "; expecting "+1);
+		assertEquals("unexpected number of expected problems", 1, equeue.size());
 		Message msg = (Message)equeue.warnings.get(0);
-		assertTrue(msg instanceof RecursionOverflowMessage,
-				   "warning must be a recursion overflow msg");
+		assertTrue("warning must be a recursion overflow msg",
+				    msg instanceof RecursionOverflowMessage);
 	}
 
 	public void testIgnorePredFromLL2AltLastAltIsDefaultTrue() throws Exception {
@@ -319,16 +314,14 @@ public class TestSemanticPredicates extends TestSuite {
 		DecisionProbe.verbose=true; // make sure we get all error info
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
-		CodeGenerator generator = new CodeGenerator(new Tool(), g, "Java");
+		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
 			g.createLookaheadDFAs();
 		}
 
-		assertTrue(equeue.size()==0,
-				   "unexpected number of expected problems: "+equeue.size()+
-				   "; expecting "+0+": "+equeue);
+		assertEquals("unexpected number of expected problems", 0, equeue.size());
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
@@ -602,12 +595,12 @@ public class TestSemanticPredicates extends TestSuite {
 								 int[] expectingInsufficientPredAlts,
 								 int[] expectingDanglingAlts,
 								 int expectingNumWarnings)
-		throws FailedAssertionException
+		throws Exception
 	{
 		DecisionProbe.verbose=true; // make sure we get all error info
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
-		CodeGenerator generator = new CodeGenerator(new Tool(), g, "Java");
+		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
 		g.setCodeGenerator(generator);
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
@@ -619,9 +612,8 @@ public class TestSemanticPredicates extends TestSuite {
 			System.err.println("Warnings issued: "+equeue);
 		}
 
-		assertTrue(equeue.size()==expectingNumWarnings,
-				   "unexpected number of expected problems: "+equeue.size()+
-				   "; expecting "+expectingNumWarnings);
+		assertEquals("unexpected number of expected problems",
+				   expectingNumWarnings, equeue.size());
 
 		DFA dfa = g.getLookaheadDFA(decision);
 		FASerializer serializer = new FASerializer(g);
@@ -635,35 +627,32 @@ public class TestSemanticPredicates extends TestSuite {
 			s.addAll(expectingUnreachableAlts);
 			BitSet s2 = new BitSet();
 			s2.addAll(unreachableAlts);
-			assertTrue(s.equals(s2), "unreachable alts mismatch; expecting "+s+
-									 " found "+s2);
+			assertEquals("unreachable alts mismatch", s, s2);
 		}
 		else {
-			assertTrue(unreachableAlts.size()==0,
-					   "unreachable alts mismatch; expecting none found "+
-					   unreachableAlts);
+			assertEquals("unreachable alts mismatch", 0, unreachableAlts.size());
 		}
 
 		// check conflicting input
 		if ( expectingAmbigInput!=null ) {
 			// first, find nondet message
 			Message msg = (Message)equeue.warnings.get(0);
-			assertTrue(msg instanceof GrammarNonDeterminismMessage,
-					   "expecting nondeterminism; found "+msg.getClass().getName());
+			assertTrue("expecting nondeterminism; found "+msg.getClass().getName(),
+			msg instanceof GrammarNonDeterminismMessage);
 			GrammarNonDeterminismMessage nondetMsg =
 				getNonDeterminismMessage(equeue.warnings);
 			List labels =
 				nondetMsg.probe.getSampleNonDeterministicInputSequence(nondetMsg.problemState);
 			String input = nondetMsg.probe.getInputSequenceDisplay(labels);
-			assertEqual(input, expectingAmbigInput);
+			assertEquals(expectingAmbigInput, input);
 		}
 
 		// check nondet alts
 		if ( expectingNonDetAlts!=null ) {
 			GrammarNonDeterminismMessage nondetMsg =
 				getNonDeterminismMessage(equeue.warnings);
-			assertTrue(nondetMsg!=null, "found no nondet alts; expecting: "+
-										str(expectingNonDetAlts));
+			assertNotNull("found no nondet alts; expecting: "+
+										str(expectingNonDetAlts), nondetMsg);
 			List nonDetAlts =
 				nondetMsg.probe.getNonDeterministicAltsForState(nondetMsg.problemState);
 			// compare nonDetAlts with expectingNonDetAlts
@@ -671,16 +660,16 @@ public class TestSemanticPredicates extends TestSuite {
 			s.addAll(expectingNonDetAlts);
 			BitSet s2 = new BitSet();
 			s2.addAll(nonDetAlts);
-			assertTrue(s.equals(s2), "nondet alts mismatch; expecting "+s+" found "+s2);
+			assertEquals("nondet alts mismatch", s, s2);
 		}
 		else {
 			// not expecting any nondet alts, make sure there are none
 			GrammarNonDeterminismMessage nondetMsg =
 				getNonDeterminismMessage(equeue.warnings);
-			assertTrue(nondetMsg==null, "found nondet alts, but expecting none");
+			assertNull("found nondet alts, but expecting none", nondetMsg);
 		}
 
-		assertEqual(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	protected GrammarNonDeterminismMessage getNonDeterminismMessage(List warnings) {

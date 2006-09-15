@@ -27,7 +27,6 @@
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
 import org.antlr.misc.IntervalSet;
 import org.antlr.analysis.Label;
 
@@ -36,7 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
-public class TestIntervalSet extends TestSuite {
+public class TestIntervalSet extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestIntervalSet() {
@@ -45,7 +44,7 @@ public class TestIntervalSet extends TestSuite {
     public void testSingleElement() throws Exception {
         IntervalSet s = IntervalSet.of(99);
         String expecting = "99";
-        assertEqual(s.toString(), expecting);
+        assertEquals(s.toString(), expecting);
     }
 
     public void testIsolatedElements() throws Exception {
@@ -54,7 +53,7 @@ public class TestIntervalSet extends TestSuite {
         s.add('z');
         s.add('\uFFF0');
         String expecting = "{1, 122, 65520}";
-        assertEqual(s.toString(), expecting);
+        assertEquals(s.toString(), expecting);
     }
 
     public void testMixedRangesAndElements() throws Exception {
@@ -63,7 +62,7 @@ public class TestIntervalSet extends TestSuite {
         s.add('a','z');
         s.add('0','9');
         String expecting = "{1, 48..57, 97..122}";
-        assertEqual(s.toString(), expecting);
+        assertEquals(s.toString(), expecting);
     }
 
     public void testSimpleAnd() throws Exception {
@@ -71,7 +70,7 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of(13,15);
         String expecting = "13..15";
         String result = (s.and(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testRangeAndIsolatedElement() throws Exception {
@@ -79,7 +78,7 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of('d');
         String expecting = "100";
         String result = (s.and(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testEmptyIntersection() throws Exception {
@@ -87,7 +86,7 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of('0','9');
         String expecting = "{}";
         String result = (s.and(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testNotSingleElement() throws Exception {
@@ -96,7 +95,7 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s = IntervalSet.of(50,50);
         String expecting = "{1..49, 51..1000, 2000..3000}";
         String result = (s.complement(vocabulary)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
 	public void testNotSet() throws Exception {
@@ -106,7 +105,7 @@ public class TestIntervalSet extends TestSuite {
 		s.add(250,300);
 		String expecting = "{1..4, 6..49, 61..249, 301..1000}";
 		String result = (s.complement(vocabulary)).toString();
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testNotEqualSet() throws Exception {
@@ -114,7 +113,7 @@ public class TestIntervalSet extends TestSuite {
 		IntervalSet s = IntervalSet.of(1,1000);
 		String expecting = "{}";
 		String result = (s.complement(vocabulary)).toString();
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testNotSetEdgeElement() throws Exception {
@@ -122,7 +121,7 @@ public class TestIntervalSet extends TestSuite {
 		IntervalSet s = IntervalSet.of(1);
 		String expecting = "2";
 		String result = (s.complement(vocabulary)).toString();
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
     public void testNotSetFragmentedVocabulary() throws Exception {
@@ -135,7 +134,7 @@ public class TestIntervalSet extends TestSuite {
         s.add(10000); // this is outside range of vocab and should be ignored
         String expecting = "{1..2, 4..49, 61..249, 1000..2000, 9999}";
         String result = (s.complement(vocabulary)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testSubtractOfCompletelyContainedRange() throws Exception {
@@ -143,7 +142,7 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of(12,15);
         String expecting = "{10..11, 16..20}";
         String result = (s.subtract(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testSubtractOfOverlappingRangeFromLeft() throws Exception {
@@ -151,12 +150,12 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of(5,11);
         String expecting = "12..20";
         String result = (s.subtract(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
 
         IntervalSet s3 = IntervalSet.of(5,10);
         expecting = "11..20";
         result = (s.subtract(s3)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testSubtractOfOverlappingRangeFromRight() throws Exception {
@@ -164,12 +163,12 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of(15,25);
         String expecting = "10..14";
         String result = (s.subtract(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
 
         IntervalSet s3 = IntervalSet.of(20,25);
         expecting = "10..19";
         result = (s.subtract(s3)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testSubtractOfCompletelyCoveredRange() throws Exception {
@@ -177,7 +176,7 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of(1,25);
         String expecting = "{}";
         String result = (s.subtract(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testSubtractOfRangeSpanningMultipleRanges() throws Exception {
@@ -187,12 +186,12 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of(5,55); // covers one and touches 2nd range
         String expecting = "56..60";
         String result = (s.subtract(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
 
         IntervalSet s3 = IntervalSet.of(15,55); // touches both
         expecting = "{10..14, 56..60}";
         result = (s.subtract(s3)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
 	/** The following was broken:
@@ -205,7 +204,7 @@ public class TestIntervalSet extends TestSuite {
 		s2.add(117,200);
 		String expecting = "116";
 		String result = (s.subtract(s2)).toString();
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
     public void testSimpleEquals() throws Exception {
@@ -213,12 +212,12 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of(10,20);
         Boolean expecting = new Boolean(true);
         Boolean result = new Boolean(s.equals(s2));
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
 
         IntervalSet s3 = IntervalSet.of(15,55);
         expecting = new Boolean(false);
         result = new Boolean(s.equals(s3));
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testEquals() throws Exception {
@@ -230,13 +229,13 @@ public class TestIntervalSet extends TestSuite {
         s2.add(499,501);
         Boolean expecting = new Boolean(true);
         Boolean result = new Boolean(s.equals(s2));
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
 
         IntervalSet s3 = IntervalSet.of(10,20);
         s3.add(2);
         expecting = new Boolean(false);
         result = new Boolean(s.equals(s3));
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testSingleElementMinusDisjointSet() throws Exception {
@@ -245,7 +244,7 @@ public class TestIntervalSet extends TestSuite {
         s2.add(10,20);
         String expecting = "{}"; // 15 - {1..5, 10..20} = {}
         String result = s.subtract(s2).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testMembership() throws Exception {
@@ -268,7 +267,7 @@ public class TestIntervalSet extends TestSuite {
         s2.add(18);
         String expecting = "{15, 18}";
         String result = (s.and(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testIntersectionWithTwoContainedElementsReversed() throws Exception {
@@ -278,7 +277,7 @@ public class TestIntervalSet extends TestSuite {
         s2.add(18);
         String expecting = "{15, 18}";
         String result = (s2.and(s)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testComplement() throws Exception {
@@ -287,7 +286,7 @@ public class TestIntervalSet extends TestSuite {
         IntervalSet s2 = IntervalSet.of(100,102);
         String expecting = "102";
         String result = (s.complement(s2)).toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
 	public void testComplement2() throws Exception {
@@ -295,7 +294,7 @@ public class TestIntervalSet extends TestSuite {
 		IntervalSet s2 = IntervalSet.of(100,102);
 		String expecting = "102";
 		String result = (s.complement(s2)).toString();
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testComplement3() throws Exception {
@@ -303,7 +302,7 @@ public class TestIntervalSet extends TestSuite {
 		s.add(99,65534);
 		String expecting = "97..98";
 		String result = (s.complement(1,Label.MAX_CHAR_VALUE)).toString();
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
     public void testMergeOfRangesAndSingleValues() throws Exception {
@@ -313,7 +312,7 @@ public class TestIntervalSet extends TestSuite {
         s.add(43,65534);
         String expecting = "0..65534";
         String result = s.toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testMergeOfRangesAndSingleValuesReverse() throws Exception {
@@ -322,7 +321,7 @@ public class TestIntervalSet extends TestSuite {
         s.add(0,41);
         String expecting = "0..65534";
         String result = s.toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
     public void testMergeWhereAdditionMergesTwoExistingIntervals() throws Exception {
@@ -334,7 +333,7 @@ public class TestIntervalSet extends TestSuite {
         s.add(11,41);
         String expecting = "0..65534";
         String result = s.toString();
-        assertEqual(result, expecting);
+        assertEquals(result, expecting);
     }
 
 	public void testMergeWithDoubleOverlap() throws Exception {
@@ -343,7 +342,7 @@ public class TestIntervalSet extends TestSuite {
 		s.add(5,25); // overlaps two!
 		String expecting = "1..30";
 		String result = s.toString();
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testSize() throws Exception {
@@ -352,7 +351,7 @@ public class TestIntervalSet extends TestSuite {
 		s.add(5,19);
 		String expecting = "32";
 		String result = String.valueOf(s.size());
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testToList() throws Exception {
@@ -362,7 +361,7 @@ public class TestIntervalSet extends TestSuite {
 		String expecting = "[5, 20, 21, 22, 23, 24, 25, 50, 51, 52, 53, 54, 55]";
 		List foo = new ArrayList();
 		String result = String.valueOf(s.toList());
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	/** The following was broken:
@@ -378,7 +377,7 @@ public class TestIntervalSet extends TestSuite {
 		s2.add('s',200);
 		String expecting = "{0..113, 115, 117..200}";
 		String result = (s.and(s2)).toString();
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 }

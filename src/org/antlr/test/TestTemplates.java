@@ -1,9 +1,34 @@
+/*
+ [The "BSD licence"]
+ Copyright (c) 2005-2006 Terence Parr
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 package org.antlr.test;
 
 import org.antlr.tool.*;
 import org.antlr.Tool;
-import org.antlr.test.unit.TestSuite;
-import org.antlr.test.unit.FailedAssertionException;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
@@ -11,7 +36,7 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.codegen.ActionTranslator;
 
 /** Test templates in actions; %... shorthands */
-public class TestTemplates extends TestSuite {
+public class TestTemplates extends BaseTest {
 
 	public void testTemplateConstructor() throws Exception {
 		String action = "x = %foo(name={$ID.text});";
@@ -30,7 +55,7 @@ public class TestTemplates extends TestSuite {
 				"  ;\n" +
 				"\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -45,9 +70,9 @@ public class TestTemplates extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertNoErrors(equeue);
 
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testTemplateConstructorNoArgs() throws Exception {
@@ -66,7 +91,7 @@ public class TestTemplates extends TestSuite {
 				"  ;\n" +
 				"\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -81,9 +106,9 @@ public class TestTemplates extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertNoErrors(equeue);
 
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testIndirectTemplateConstructor() throws Exception {
@@ -103,7 +128,7 @@ public class TestTemplates extends TestSuite {
 				"  ;\n" +
 				"\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -118,9 +143,9 @@ public class TestTemplates extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertNoErrors(equeue);
 
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testStringConstructor() throws Exception {
@@ -139,7 +164,7 @@ public class TestTemplates extends TestSuite {
 				"  ;\n" +
 				"\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -153,9 +178,9 @@ public class TestTemplates extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertNoErrors(equeue);
 
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testSetAttr() throws Exception {
@@ -174,7 +199,7 @@ public class TestTemplates extends TestSuite {
 				"  ;\n" +
 				"\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -189,9 +214,9 @@ public class TestTemplates extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertNoErrors(equeue);
 
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testSetAttrOfExpr() throws Exception {
@@ -210,7 +235,7 @@ public class TestTemplates extends TestSuite {
 				"  ;\n" +
 				"\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -224,9 +249,9 @@ public class TestTemplates extends TestSuite {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 
-		assertTrue(equeue.errors.size()==0, "unexpected errors: "+equeue);
+		assertNoErrors(equeue);
 
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testCannotHaveSpaceBeforeDot() throws Exception {
@@ -245,7 +270,7 @@ public class TestTemplates extends TestSuite {
 				"  ;\n" +
 				"\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -273,7 +298,7 @@ public class TestTemplates extends TestSuite {
 				"  ;\n" +
 				"\n" +
 				"ID : 'a';\n");
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
@@ -287,7 +312,7 @@ public class TestTemplates extends TestSuite {
 
 	protected void checkError(ErrorQueue equeue,
 							  GrammarSemanticsMessage expectedMessage)
-		throws FailedAssertionException
+		throws Exception
 	{
 		/*
 		System.out.println(equeue.infos);
@@ -301,12 +326,17 @@ public class TestTemplates extends TestSuite {
 				foundMsg = m;
 			}
 		}
-		assertTrue(equeue.errors.size()>0, "no error; "+expectedMessage.msgID+" expected");
-		assertTrue(equeue.errors.size()<=1, "too many errors; "+equeue.errors);
-		assertTrue(foundMsg!=null, "couldn't find expected error: "+expectedMessage.msgID);
-		assertTrue(foundMsg instanceof GrammarSemanticsMessage,
-				   "error is not a GrammarSemanticsMessage");
-		assertEqual(foundMsg.arg, expectedMessage.arg);
-		assertEqual(foundMsg.arg2, expectedMessage.arg2);
+		assertTrue("no error; "+expectedMessage.msgID+" expected", equeue.errors.size()>0);
+		assertTrue("too many errors; "+equeue.errors, equeue.errors.size()<=1);
+		assertTrue("couldn't find expected error: "+expectedMessage.msgID, foundMsg!=null);
+		assertTrue("error is not a GrammarSemanticsMessage",
+				    foundMsg instanceof GrammarSemanticsMessage);
+		assertEquals(expectedMessage.arg, foundMsg.arg);
+		assertEquals(expectedMessage.arg2, foundMsg.arg2);
+	}
+
+	// S U P P O R T
+	private void assertNoErrors(ErrorQueue equeue) {
+		assertTrue("unexpected errors: "+equeue, equeue.errors.size()==0);
 	}
 }

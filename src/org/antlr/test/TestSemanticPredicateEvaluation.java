@@ -27,20 +27,16 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-
-public class TestSemanticPredicateEvaluation extends TestSuite {
+public class TestSemanticPredicateEvaluation extends BaseTest {
 	public void testSimpleCyclicDFAWithPredicate() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"a : {false}? 'x'* 'y' {System.out.println(\"alt1\");}\n" +
 			"  | {true}?  'x'* 'y' {System.out.println(\"alt2\");}\n" +
 			"  ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "xxxy", false);
-		String expecting = "alt2\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "xxxy", false);
+		assertEquals("alt2\n", found);
 	}
 
 	public void testSimpleCyclicDFAWithInstanceVarPredicate() throws Exception {
@@ -50,11 +46,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"a : {false}? 'x'* 'y' {System.out.println(\"alt1\");}\n" +
 			"  | {v}?     'x'* 'y' {System.out.println(\"alt2\");}\n" +
 			"  ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "xxxy", false);
-		String expecting = "alt2\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "xxxy", false);
+		assertEquals("alt2\n", found);
 	}
 
 	public void testPredicateValidation() throws Exception {
@@ -68,11 +62,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"\n" +
 			"a : {false}? 'x'\n" +
 			"  ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "x", false);
-		String expecting = "error: FailedPredicateException(a,{false}?)\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "x", false);
+		assertEquals("error: FailedPredicateException(a,{false}?)\n", found);
 	}
 
 	public void testLexerPreds() throws Exception {
@@ -82,12 +74,10 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"a : (A|B)+ ;\n" +
 			"A : {p}? 'a'  {System.out.println(\"token 1\");} ;\n" +
 			"B : {!p}? 'a' {System.out.println(\"token 2\");} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "a", false);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "a", false);
 		// "a" is ambig; can match both A, B.  Pred says match 2
-		String expecting = "token 2\n";
-		assertEqual(found, expecting);
+		assertEquals("token 2\n", found);
 	}
 
 	public void testLexerPreds2() throws Exception {
@@ -97,12 +87,10 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"a : (A|B)+ ;\n" +
 			"A : {p}? 'a' {System.out.println(\"token 1\");} ;\n" +
 			"B : ('a'|'b')+ {System.out.println(\"token 2\");} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "a", false);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "a", false);
 		// "a" is ambig; can match both A, B.  Pred says match 1
-		String expecting = "token 1\n";
-		assertEqual(found, expecting);
+		assertEquals("token 1\n", found);
 	}
 
 	public void testLexerPredInExitBranch() throws Exception {
@@ -114,11 +102,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"A : ('a' {System.out.print(\"1\");})*\n" +
 			"    {p}?\n" +
 			"    ('a' {System.out.print(\"2\");})* ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "aaa", false);
-		String expecting = "222\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "aaa", false);
+		assertEquals("222\n", found);
 	}
 
 	public void testLexerPredInExitBranch2() throws Exception {
@@ -128,11 +114,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"a : (A|B)+ ;\n" +
 			"A : ({p}? 'a' {System.out.print(\"1\");})*\n" +
 			"    ('a' {System.out.print(\"2\");})* ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "aaa", false);
-		String expecting = "111\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "aaa", false);
+		assertEquals("111\n", found);
 	}
 
 	public void testLexerPredInExitBranch3() throws Exception {
@@ -142,11 +126,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"a : (A|B)+ ;\n" +
 			"A : ({p}? 'a' {System.out.print(\"1\");} | )\n" +
 			"    ('a' {System.out.print(\"2\");})* ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "aaa", false);
-		String expecting = "122\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "aaa", false);
+		assertEquals("122\n", found);
 	}
 
 	public void testLexerPredInExitBranch4() throws Exception {
@@ -155,11 +137,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"a : (A|B)+ ;\n" +
 			"A @init {int n=0;} : ({n<2}? 'a' {System.out.print(n++);})+\n" +
 			"    ('a' {System.out.print(\"x\");})* ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "aaaaa", false);
-		String expecting = "01xxx\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "aaaaa", false);
+		assertEquals("01xxx\n", found);
 	}
 
 	public void testLexerPredsInCyclicDFA() throws Exception {
@@ -169,11 +149,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"a : (A|B)+ ;\n" +
 			"A : {p}? ('a')+ 'x'  {System.out.println(\"token 1\");} ;\n" +
 			"B :      ('a')+ 'x' {System.out.println(\"token 2\");} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "aax", false);
-		String expecting = "token 2\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "aax", false);
+		assertEquals("token 2\n", found);
 	}
 
 	public void testLexerPredsInCyclicDFA2() throws Exception {
@@ -183,11 +161,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"a : (A|B)+ ;\n" +
 			"A : {p}? ('a')+ 'x' ('y')? {System.out.println(\"token 1\");} ;\n" +
 			"B :      ('a')+ 'x' {System.out.println(\"token 2\");} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "aax", false);
-		String expecting = "token 2\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "aax", false);
+		assertEquals("token 2\n", found);
 	}
 
 	public void testGatedPred() throws Exception {
@@ -196,12 +172,10 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"a : (A|B)+ ;\n" +
 			"A : {true}?=> 'a' {System.out.println(\"token 1\");} ;\n" +
 			"B : {false}?=>('a'|'b')+ {System.out.println(\"token 2\");} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "aa", false);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "aa", false);
 		// "a" is ambig; can match both A, B.  Pred says match A twice
-		String expecting = "token 1\ntoken 1\n";
-		assertEqual(found, expecting);
+		assertEquals("token 1\ntoken 1\n", found);
 	}
 
 	public void testGatedPred2() throws Exception {
@@ -212,11 +186,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"A : 'a' {System.out.print(\"A\"); sig=true;} ;\n" +
 			"B : 'b' ;\n" +
 			"C : {sig}?=> ('a'|'b') {System.out.print(\"C\");} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "aa", false);
-		String expecting = "AC\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "aa", false);
+		assertEquals("AC\n", found);
 	}
 
 	public void testPredWithActionTranslation() throws Exception {
@@ -227,11 +199,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"  : {$i==1}?   'a' {System.out.println(\"alt 1\");}\n" +
 			"  | {$b.i==2}? 'a' {System.out.println(\"alt 2\");}\n" +
 			"  ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "aa", false);
-		String expecting = "alt 2\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+				    "a", "aa", false);
+		assertEquals("alt 2\n", found);
 	}
 
 
@@ -245,11 +215,9 @@ public class TestSemanticPredicateEvaluation extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", false);
-		String expecting = "\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", false);
+		assertEquals("\n", found);
 	}
 
 }

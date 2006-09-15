@@ -30,11 +30,10 @@ package org.antlr.test;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.TokenRewriteStream;
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
 
-public class TestTokenRewriteStream extends TestSuite {
+public class TestTokenRewriteStream extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestTokenRewriteStream() {
@@ -53,7 +52,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertBefore(0, "0");
 		String result = tokens.toString();
 		String expecting = "0abc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testInsertAfterLastIndex() throws Exception {
@@ -69,7 +68,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertAfter(2, "x");
 		String result = tokens.toString();
 		String expecting = "abcx";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void test2InsertBeforeAfterMiddleIndex() throws Exception {
@@ -86,7 +85,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertAfter(1, "x");
 		String result = tokens.toString();
 		String expecting = "axbxc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceIndex0() throws Exception {
@@ -102,7 +101,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(0, "x");
 		String result = tokens.toString();
 		String expecting = "xbc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceLastIndex() throws Exception {
@@ -118,7 +117,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(2, "x");
 		String result = tokens.toString();
 		String expecting = "abx";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceMiddleIndex() throws Exception {
@@ -134,7 +133,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(1, "x");
 		String result = tokens.toString();
 		String expecting = "axc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void test2ReplaceMiddleIndex() throws Exception {
@@ -151,7 +150,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(1, "y");
 		String result = tokens.toString();
 		String expecting = "ayc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceThenDeleteMiddleIndex() throws Exception {
@@ -168,7 +167,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.delete(1);
 		String result = tokens.toString();
 		String expecting = "ac";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceThenInsertSameIndex() throws Exception {
@@ -185,7 +184,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertBefore(0, "0");
 		String result = tokens.toString();
 		String expecting = "0xbc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceThen2InsertSameIndex() throws Exception {
@@ -203,7 +202,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertBefore(0, "z");
 		String result = tokens.toString();
 		String expecting = "zyxbc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testInsertThenReplaceSameIndex() throws Exception {
@@ -220,7 +219,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(0, "x");
 		String result = tokens.toString();
 		String expecting = "0xbc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void test2InsertMiddleIndex() throws Exception {
@@ -237,7 +236,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertBefore(1, "y");
 		String result = tokens.toString();
 		String expecting = "ayxbc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void test2InsertThenReplaceIndex0() throws Exception {
@@ -255,7 +254,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(0, "z");
 		String result = tokens.toString();
 		String expecting = "yxzbc";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceThenInsertBeforeLastIndex() throws Exception {
@@ -272,7 +271,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertBefore(2, "y");
 		String result = tokens.toString();
 		String expecting = "abyx";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testInsertThenReplaceLastIndex() throws Exception {
@@ -289,7 +288,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(2, "x");
 		String result = tokens.toString();
 		String expecting = "abyx";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceThenInsertAfterLastIndex() throws Exception {
@@ -306,7 +305,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertAfter(2, "y");
 		String result = tokens.toString();
 		String expecting = "abxy";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceRangeThenInsertInMiddle() throws Exception {
@@ -323,7 +322,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertBefore(3, "y"); // no effect; can't insert in middle of replaced region
 		String result = tokens.toString();
 		String expecting = "abxba";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceRangeThenInsertAtLeftEdge() throws Exception {
@@ -340,7 +339,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertBefore(2, "y");
 		String result = tokens.toString();
 		String expecting = "abyxba";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceRangeThenInsertAtRightEdge() throws Exception {
@@ -357,7 +356,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertBefore(4, "y"); // no effect; within range of a replace
 		String result = tokens.toString();
 		String expecting = "abxba";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceRangeThenInsertAfterRightEdge() throws Exception {
@@ -374,7 +373,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.insertAfter(4, "y");
 		String result = tokens.toString();
 		String expecting = "abxyba";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceAll() throws Exception {
@@ -390,7 +389,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(0, 6, "x");
 		String result = tokens.toString();
 		String expecting = "x";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceSubsetThenFetch() throws Exception {
@@ -406,7 +405,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(2, 4, "xyz");
 		String result = tokens.toString(0,6);
 		String expecting = "abxyzba";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceThenReplaceSuperset() throws Exception {
@@ -423,7 +422,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(2, 5, "foo"); // kills previous replace
 		String result = tokens.toString();
 		String expecting = "abfooa";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceThenReplaceLowerIndexedSuperset() throws Exception {
@@ -440,7 +439,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(1, 3, "foo"); // executes first since 1<2; then ignores replace@2 as it skips over 1..3
 		String result = tokens.toString();
 		String expecting = "afoocba";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testReplaceSingleMiddleThenOverlappingSuperset() throws Exception {
@@ -457,7 +456,7 @@ public class TestTokenRewriteStream extends TestSuite {
 		tokens.replace(0, 3, "foo");
 		String result = tokens.toString();
 		String expecting = "fooa";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 }

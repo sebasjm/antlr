@@ -1,9 +1,33 @@
+/*
+[The "BSD licence"]
+Copyright (c) 2005-2006 Terence Parr
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-import org.antlr.stringtemplate.StringTemplate;
-
-public class TestAutoAST extends TestSuite {
+public class TestAutoAST extends BaseTest {
 	protected boolean debug = false;
 
 	public void testTokenList() throws Exception {
@@ -14,11 +38,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "abc 34", debug);
-		String expecting = "abc 34\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+								  "a", "abc 34", debug);
+		assertEquals("abc 34\n", found);
 	}
 
 	public void testTokenListInSingleAltBlock() throws Exception {
@@ -29,11 +51,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "abc 34", debug);
-		String expecting = "abc 34\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+								  "a", "abc 34", debug);
+		assertEquals("abc 34\n", found);
 	}
 
 	public void testSimpleRootAtOuterLevel() throws Exception {
@@ -44,11 +64,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "abc 34", debug);
-		String expecting = "(abc 34)\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+								  "a", "abc 34", debug);
+		assertEquals("(abc 34)\n", found);
 	}
 
 	public void testSimpleRootAtOuterLevelReverse() throws Exception {
@@ -59,11 +77,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "34 abc", debug);
-		String expecting = "(abc 34)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "34 abc", debug);
+		assertEquals("(abc 34)\n", found);
 	}
 
 	public void testBang() throws Exception {
@@ -74,11 +90,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34 dag 4532", debug);
-		String expecting = "abc 4532\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "abc 34 dag 4532", debug);
+		assertEquals("abc 4532\n", found);
 	}
 
 	public void testLoopRoot() throws Exception {
@@ -89,11 +103,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b 2 c 3", debug);
-		String expecting = "(a 1) (b 2) (c 3)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a 1 b 2 c 3", debug);
+		assertEquals("(a 1) (b 2) (c 3)\n", found);
 	}
 
 	public void testLoopRootReverse() throws Exception {
@@ -104,11 +116,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b 2 c 3", debug);
-		String expecting = "(1 a) (2 b) (3 c)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a 1 b 2 c 3", debug);
+		assertEquals("(1 a) (2 b) (3 c)\n", found);
 	}
 
 	public void testPlusLoopRoot() throws Exception {
@@ -119,11 +129,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b 2 c 3", debug);
-		String expecting = "(a 1) (b 2) (c 3)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a 1 b 2 c 3", debug);
+		assertEquals("(a 1) (b 2) (c 3)\n", found);
 	}
 
 	public void testPlusLoopRootReverse() throws Exception {
@@ -134,11 +142,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b 2 c 3", debug);
-		String expecting = "(a 1) (b 2) (c 3)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a 1 b 2 c 3", debug);
+		assertEquals("(a 1) (b 2) (c 3)\n", found);
 	}
 
 	public void testOptionalThenRoot() throws Exception {
@@ -149,11 +155,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 1 b", debug);
-		String expecting = "(b a 1)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a 1 b", debug);
+		assertEquals("(b a 1)\n", found);
 	}
 
 	public void testLabeledStringRoot() throws Exception {
@@ -164,11 +168,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "void foo;", debug);
-		String expecting = "(void foo ;)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "void foo;", debug);
+		assertEquals("(void foo ;)\n", found);
 	}
 
 	public void testWildcard() throws Exception {
@@ -179,11 +181,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "void foo;", debug);
-		String expecting = "(void foo ;)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "void foo;", debug);
+		assertEquals("(void foo ;)\n", found);
 	}
 
 	public void testWildcardRoot() throws Exception {
@@ -194,11 +194,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "void foo;", debug);
-		String expecting = "(foo void ;)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "void foo;", debug);
+		assertEquals("(foo void ;)\n", found);
 	}
 
 	public void testRootRoot() throws Exception {
@@ -209,11 +207,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 34 c", debug);
-		String expecting = "(34 a c)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a 34 c", debug);
+		assertEquals("(34 a c)\n", found);
 	}
 
 	public void testRootRoot2() throws Exception {
@@ -224,11 +220,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a 34 c", debug);
-		String expecting = "(c (34 a))\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a 34 c", debug);
+		assertEquals("(c (34 a))\n", found);
 	}
 
 	public void testNestedSubrule() throws Exception {
@@ -239,11 +233,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "void a b;", debug);
-		String expecting = "void a b ;\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "void a b;", debug);
+		assertEquals("void a b ;\n", found);
 	}
 
 	public void testInvokeRule() throws Exception {
@@ -255,11 +247,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "int a", debug);
-		String expecting = "int a\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "int a", debug);
+		assertEquals("int a\n", found);
 	}
 
 	public void testInvokeRuleAsRoot() throws Exception {
@@ -271,11 +261,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "int a", debug);
-		String expecting = "(int a)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "int a", debug);
+		assertEquals("(int a)\n", found);
 	}
 
 	public void testRuleRootInLoop() throws Exception {
@@ -286,11 +274,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a+b+c+d", debug);
-		String expecting = "(+ (+ (+ a b) c) d)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a+b+c+d", debug);
+		assertEquals("(+ (+ (+ a b) c) d)\n", found);
 	}
 
 	public void testRuleInvocationRuleRootInLoop() throws Exception {
@@ -302,11 +288,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a+b+c-d", debug);
-		String expecting = "(- (+ (+ a b) c) d)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a+b+c-d", debug);
+		assertEquals("(- (+ (+ a b) c) d)\n", found);
 	}
 
 	public void testTailRecursion() throws Exception {
@@ -319,11 +303,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "s", "3 exp 4 exp 5", debug);
-		String expecting = "(exp 3 (exp 4 5))\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "s", "3 exp 4 exp 5", debug);
+		assertEquals("(exp 3 (exp 4 5))\n", found);
 	}
 
 	public void testSet() throws Exception {
@@ -334,11 +316,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc", debug);
-		String expecting = "abc\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "abc", debug);
+		assertEquals("abc\n", found);
 	}
 
 	public void testSetRoot() throws Exception {
@@ -349,11 +329,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "+abc", debug);
-		String expecting = "(+ abc)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "+abc", debug);
+		assertEquals("(+ abc)\n", found);
 	}
 
 	public void testSetAsRuleRootInLoop() throws Exception {
@@ -364,11 +342,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a+b-c", debug);
-		String expecting = "(- (+ a b) c)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a+b-c", debug);
+		assertEquals("(- (+ a b) c)\n", found);
 	}
 
 	public void testNotSet() throws Exception {
@@ -379,11 +355,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "34+2", debug);
-		String expecting = "34 + 2\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "34+2", debug);
+		assertEquals("34 + 2\n", found);
 	}
 
 	public void testNotSetRoot() throws Exception {
@@ -394,11 +368,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "34 55", debug);
-		String expecting = "(34 55)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "34 55", debug);
+		assertEquals("(34 55)\n", found);
 	}
 
 	public void testNotSetRuleRootInLoop() throws Exception {
@@ -410,11 +382,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "3+4+5", debug);
-		String expecting = "(+ (+ 3 4) 5)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "3+4+5", debug);
+		assertEquals("(+ (+ 3 4) 5)\n", found);
 	}
 
 	public void testTokenLabelReuse() throws Exception {
@@ -426,11 +396,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b", debug);
-		String expecting = "2nd id=b;a b\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a b", debug);
+		assertEquals("2nd id=b;a b\n", found);
 	}
 
 	public void testTokenLabelReuse2() throws Exception {
@@ -442,11 +410,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b", debug);
-		String expecting = "2nd id=b;(b a)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a b", debug);
+		assertEquals("2nd id=b;(b a)\n", found);
 	}
 
 	public void testTokenListLabelReuse() throws Exception {
@@ -459,11 +425,10 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b", debug);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a b", debug);
 		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];a b\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testTokenListLabelReuse2() throws Exception {
@@ -476,11 +441,10 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b", debug);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a b", debug);
 		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];(a b)\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testTokenListLabelRuleRoot() throws Exception {
@@ -491,11 +455,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a", debug);
-		String expecting = "a\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a", debug);
+		assertEquals("a\n", found);
 	}
 
 	public void testTokenListLabelBang() throws Exception {
@@ -506,11 +468,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a", debug);
-		String expecting = "nil\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a", debug);
+		assertEquals("nil\n", found);
 	}
 
 	public void testRuleListLabel() throws Exception {
@@ -524,11 +484,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b", debug);
-		String expecting = "2nd x=b;a b\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a b", debug);
+		assertEquals("2nd x=b;a b\n", found);
 	}
 
 	public void testRuleListLabelRoot() throws Exception {
@@ -542,11 +500,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b", debug);
-		String expecting = "x=b;a b\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a b", debug);
+		assertEquals("x=b;a b\n", found);
 	}
 
 	public void testRuleListLabelRuleRoot() throws Exception {
@@ -560,11 +516,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b", debug);
-		String expecting = "x=(b a);(b a)\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a b", debug);
+		assertEquals("x=(b a);(b a)\n", found);
 	}
 
 	public void testRuleListLabelBang() throws Exception {
@@ -578,11 +532,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b", debug);
-		String expecting = "1st x=a;b\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a b", debug);
+		assertEquals("1st x=a;b\n", found);
 	}
 
 	public void testComplicatedMelange() throws Exception {
@@ -596,11 +548,9 @@ public class TestAutoAST extends TestSuite {
 			"C : 'c' ;\n" +
 			"D : 'd' ;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "a b b c c d", debug);
-		String expecting = "a b b c c d\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+								  "a", "a b b c c d", debug);
+		assertEquals("a b b c c d\n", found);
 	}
 
 	public void testReturnValueWithAST() throws Exception {
@@ -612,11 +562,9 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("foo.g", grammar, "foo", "fooLexer",
-												 "a", "abc 34", debug);
-		String expecting = "34\nabc 34\n";
-		assertEqual(found, expecting);
+		String found = execParser("foo.g", grammar, "foo", "fooLexer",
+								  "a", "abc 34", debug);
+		assertEquals("34\nabc 34\n", found);
 	}
 
 
@@ -630,11 +578,8 @@ public class TestAutoAST extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer", "a", "abc 34", debug);
+		assertEquals("\n", found);
 	}
 
 }

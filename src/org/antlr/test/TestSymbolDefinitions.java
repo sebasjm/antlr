@@ -29,14 +29,12 @@ package org.antlr.test;
 
 import org.antlr.Tool;
 import org.antlr.analysis.Label;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.*;
 
 import java.io.StringReader;
 import java.util.*;
 
-public class TestSymbolDefinitions extends TestSuite {
+public class TestSymbolDefinitions extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestSymbolDefinitions() {
@@ -148,7 +146,7 @@ public class TestSymbolDefinitions extends TestSuite {
 				"a : '\\n';\n");
 		Set literals = g.getStringLiterals();
 		// must store literals how they appear in the antlr grammar
-		assertEqual(literals.toArray()[0], "'\\n'");
+		assertEquals("'\\n'", literals.toArray()[0]);
 	}
 
 	// T E S T  E R R O R S
@@ -339,7 +337,7 @@ public class TestSymbolDefinitions extends TestSuite {
 		Grammar g = new Grammar(
 				"parser grammar t;\n"+
 				"x : ID ;");
-        assertTrue(equeue.errors.size()==0, "should not be an error");
+        assertEquals("should not be an error", 0, equeue.errors.size());
 	}
 
 	public void testUndefinedRule() throws Exception {
@@ -641,7 +639,7 @@ public class TestSymbolDefinitions extends TestSuite {
 	public void testBadGrammarOption() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
-		Tool antlr = new Tool();
+		Tool antlr = newTool();
 		Grammar g = new Grammar(antlr,
 								"t",
 								new StringReader(
@@ -691,15 +689,13 @@ public class TestSymbolDefinitions extends TestSuite {
 
 	protected void checkError(ErrorQueue equeue,
 							  GrammarSemanticsMessage expectedMessage)
-		throws FailedAssertionException
+		throws Exception
 	{
 		/*
 		System.out.println(equeue.infos);
 		System.out.println(equeue.warnings);
 		System.out.println(equeue.errors);
-		assertTrue(equeue.errors.size()==n,
-				   "number of errors mismatch; expecting "+n+"; found "+
-				   equeue.errors.size());
+		assertTrue("number of errors mismatch", n, equeue.errors.size());
 				   */
 		Message foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
@@ -708,17 +704,17 @@ public class TestSymbolDefinitions extends TestSuite {
 				foundMsg = m;
 			}
 		}
-		assertTrue(foundMsg!=null, "no error; "+expectedMessage.msgID+" expected");
-		assertTrue(foundMsg instanceof GrammarSemanticsMessage,
-				   "error is not a GrammarSemanticsMessage");
-		assertEqual(foundMsg.arg, expectedMessage.arg);
+		assertNotNull("no error; "+expectedMessage.msgID+" expected", foundMsg);
+		assertTrue("error is not a GrammarSemanticsMessage",
+				   foundMsg instanceof GrammarSemanticsMessage);
+		assertEquals(expectedMessage.arg, foundMsg.arg);
 	}
 
 	protected void checkPlusEqualsLabels(Grammar g,
 										 String ruleName,
 										 String tokenLabelsStr,
 										 String ruleLabelsStr)
-		throws FailedAssertionException
+		throws Exception
 	{
 		// make sure expected += labels are there
 		Rule r = g.getRule(ruleName);
@@ -740,24 +736,24 @@ public class TestSymbolDefinitions extends TestSuite {
 				ruleLabels.add(labelName);
 			}
 		}
-		assertTrue((tokenLabels!=null && r.tokenListLabels!=null) ||
-				   (tokenLabels==null && r.tokenListLabels==null),
-				   "token += labels mismatch; "+tokenLabels+"!="+r.tokenListLabels);
-		assertTrue((ruleLabels!=null && r.ruleListLabels!=null) ||
-				   (ruleLabels==null && r.ruleListLabels==null),
-				   "rule += labels mismatch; "+ruleLabels+"!="+r.ruleListLabels);
+		assertTrue("token += labels mismatch; "+tokenLabels+"!="+r.tokenListLabels,
+				   (tokenLabels!=null && r.tokenListLabels!=null) ||
+				   (tokenLabels==null && r.tokenListLabels==null));
+		assertTrue("rule += labels mismatch; "+ruleLabels+"!="+r.ruleListLabels,
+				   (ruleLabels!=null && r.ruleListLabels!=null) ||
+				   (ruleLabels==null && r.ruleListLabels==null));
 		if ( tokenLabels!=null ) {
-			assertEqual(tokenLabels, r.tokenListLabels.keySet());
+			assertEquals(tokenLabels, r.tokenListLabels.keySet());
 		}
 		if ( ruleLabels!=null ) {
-			assertEqual(ruleLabels, r.ruleListLabels.keySet());
+			assertEquals(ruleLabels, r.ruleListLabels.keySet());
 		}
 	}
 
 	protected void checkSymbols(Grammar g,
 								String rulesStr,
 								String tokensStr)
-		throws FailedAssertionException
+		throws Exception
 	{
 		Set tokens = g.getTokenDisplayNames();
 
@@ -765,15 +761,15 @@ public class TestSymbolDefinitions extends TestSuite {
 		StringTokenizer st = new StringTokenizer(tokensStr, ", ");
 		while ( st.hasMoreTokens() ) {
 			String tokenName = st.nextToken();
-			assertTrue(g.getTokenType(tokenName)!=Label.INVALID,
-					   "token "+tokenName+" expected");
+			assertTrue("token "+tokenName+" expected",
+					   g.getTokenType(tokenName)!=Label.INVALID);
 			tokens.remove(tokenName);
 		}
 		// make sure there are not any others (other than <EOF> etc...)
         for (Iterator iter = tokens.iterator(); iter.hasNext();) {
 			String tokenName = (String) iter.next();
-			assertTrue(g.getTokenType(tokenName)<Label.MIN_TOKEN_TYPE,
-					   "unexpected token name "+tokenName);
+			assertTrue("unexpected token name "+tokenName,
+					    g.getTokenType(tokenName)<Label.MIN_TOKEN_TYPE);
 		}
 
 		// make sure all expected rules are there
@@ -781,14 +777,13 @@ public class TestSymbolDefinitions extends TestSuite {
 		int n = 0;
 		while ( st.hasMoreTokens() ) {
 			String ruleName = st.nextToken();
-			assertTrue(g.getRule(ruleName)!=null, "rule "+ruleName+" expected");
+			assertNotNull("rule "+ruleName+" expected", g.getRule(ruleName));
 			n++;
 		}
 		Collection rules = g.getRules();
 		System.out.println("rules="+rules);
 		// make sure there are no extra rules
-		assertTrue(rules.size()==n,
-				   "number of rules mismatch; expecting "+n+"; found "+rules.size());
+		assertEquals("number of rules mismatch; expecting "+n+"; found "+rules.size(), n, rules.size());
 
 	}
 

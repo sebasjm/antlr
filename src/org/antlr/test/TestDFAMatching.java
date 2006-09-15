@@ -30,10 +30,9 @@ package org.antlr.test;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.NFA;
 import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 
-public class TestDFAMatching extends TestSuite {
+public class TestDFAMatching extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestDFAMatching() {
@@ -96,7 +95,7 @@ public class TestDFAMatching extends TestSuite {
         throws Exception
     {
         ANTLRStringStream stream = new ANTLRStringStream(input);
-        assertEqual(dfa.predict(stream), expected);
+        assertEquals(dfa.predict(stream), expected);
     }
 
 }

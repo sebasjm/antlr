@@ -1,47 +1,55 @@
 /*
-[The "BSD licence"]
-Copyright (c) 2005-2006 Terence Parr
-All rights reserved.
+ [The "BSD licence"]
+ Copyright (c) 2005-2006 Terence Parr
+ All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-1. Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-3. The name of the author may not be used to endorse or promote products
-derived from this software without specific prior written permission.
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
-import org.antlr.tool.Grammar;
+import junit.framework.TestCase;
 import org.antlr.Tool;
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.tool.Grammar;
 
 import java.io.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-public class TestCompileAndExecSupport {
-	public static final String jikes = "/usr/bin/jikes";
+public abstract class BaseTest extends TestCase {
+
+	public static final String jikes = null;//"/usr/bin/jikes";
 	public static final String pathSep = System.getProperty("path.separator");
 	public static final String CLASSPATH = System.getProperty("java.class.path");
-	public static final String tmpdir = System.getProperty("java.io.tmpdir");
+	public static final String tmpdir = new File(System.getProperty("java.io.tmpdir"), "antlr3").getAbsolutePath();
 
-	public static boolean compile(String fileNames) {
+	protected Tool newTool() {
+		Tool tool = new Tool();
+		tool.setOutputDirectory(tmpdir);
+		return tool;
+	}
+
+	protected boolean compile(String fileName) {
 		String compiler = "javac";
 		String classpathOption = "-classpath";
 
@@ -50,12 +58,17 @@ public class TestCompileAndExecSupport {
 			classpathOption = "-bootclasspath";
 		}
 
-		String cmdLine = compiler+" -d "+tmpdir+" "+classpathOption+" "+tmpdir+pathSep+CLASSPATH+" "+fileNames;
+		String[] args = new String[] {
+					compiler, "-d", tmpdir,
+					classpathOption, tmpdir+pathSep+CLASSPATH,
+					tmpdir+"/"+fileName
+		};
+		String cmdLine = compiler+" -d "+tmpdir+" "+classpathOption+" "+tmpdir+pathSep+CLASSPATH+" "+fileName;
 		//System.out.println("compile: "+cmdLine);
 		File outputDir = new File(tmpdir);
 		try {
 			Process process =
-				Runtime.getRuntime().exec(cmdLine , null, outputDir);
+				Runtime.getRuntime().exec(args, null, outputDir);
 			StreamVacuum stdout = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderr = new StreamVacuum(process.getErrorStream());
 			stdout.start();
@@ -79,7 +92,7 @@ public class TestCompileAndExecSupport {
 		}
 	}
 
-	public static void antlr(String fileName, String grammarStr, boolean debug) {
+	protected void antlr(String fileName, String grammarStr, boolean debug) {
 		writeFile(tmpdir, fileName, grammarStr);
 		try {
 			Grammar g = new Grammar(grammarStr);
@@ -101,7 +114,7 @@ public class TestCompileAndExecSupport {
 		}
 	}
 
-	public static String execParser(String grammarFileName,
+	protected String execParser(String grammarFileName,
 									String grammarStr,
 									String parserName,
 									String lexerName,
@@ -129,7 +142,7 @@ public class TestCompileAndExecSupport {
 								 debug);
 	}
 
-	public static String execTreeParser(String parserGrammarFileName,
+	protected String execTreeParser(String parserGrammarFileName,
 										String parserGrammarStr,
 										String parserName,
 										String treeParserGrammarFileName,
@@ -153,7 +166,7 @@ public class TestCompileAndExecSupport {
 							  false);
 	}
 
-	public static String execTreeParser(String parserGrammarFileName,
+	protected String execTreeParser(String parserGrammarFileName,
 										String parserGrammarStr,
 										String parserName,
 										String treeParserGrammarFileName,
@@ -197,7 +210,7 @@ public class TestCompileAndExecSupport {
 								 debug);
 	}
 
-	protected static void rawGenerateAndBuildRecognizer(String grammarFileName,
+	protected void rawGenerateAndBuildRecognizer(String grammarFileName,
 														String grammarStr,
 														String parserName,
 														String lexerName,
@@ -205,14 +218,15 @@ public class TestCompileAndExecSupport {
 	{
 		antlr(grammarFileName, grammarStr, debug);
 		if ( lexerName!=null ) {
-			compile(parserName+".java "+lexerName+".java");
+			compile(parserName+".java");
+			compile(lexerName+".java");
 		}
 		else {
 			compile(parserName+".java");
 		}
 	}
 
-	protected static String rawExecRecognizer(String parserName,
+	protected String rawExecRecognizer(String parserName,
 											  String treeParserName,
 											  String lexerName,
 											  String parserStartRuleName,
@@ -244,10 +258,14 @@ public class TestCompileAndExecSupport {
 
 		compile("Test.java");
 		try {
-			String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test /tmp/input";
+			String[] args = new String[] {
+				"java", "-classpath", CLASSPATH+pathSep+tmpdir,
+				"Test", new File(tmpdir, "input").getAbsolutePath()
+			};
+			String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test " + new File(tmpdir, "input").getAbsolutePath();
 			//System.out.println("execParser: "+cmdLine);
 			Process process =
-				Runtime.getRuntime().exec(cmdLine, null, new File(tmpdir));
+				Runtime.getRuntime().exec(args, null, new File(tmpdir));
 			StreamVacuum stdout = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderr = new StreamVacuum(process.getErrorStream());
 			stdout.start();
@@ -302,7 +320,7 @@ public class TestCompileAndExecSupport {
 		}
 	}
 
-	public static void writeFile(String dir, String fileName, String content) {
+	protected void writeFile(String dir, String fileName, String content) {
 		try {
 			File f = new File(dir, fileName);
 			FileWriter w = new FileWriter(f);
@@ -317,7 +335,7 @@ public class TestCompileAndExecSupport {
 		}
 	}
 
-	public static void writeTestFile(String parserName,
+	protected void writeTestFile(String parserName,
 									 String lexerName,
 									 String parserStartRuleName,
 									 boolean debug)
@@ -357,7 +375,7 @@ public class TestCompileAndExecSupport {
 		writeFile(tmpdir, "Test.java", outputFileST.toString());
 	}
 
-	public static void writeTreeTestFile(String parserName,
+	protected void writeTreeTestFile(String parserName,
 										 String treeParserName,
 										 String lexerName,
 										 String parserStartRuleName,
@@ -409,7 +427,7 @@ public class TestCompileAndExecSupport {
 		writeFile(tmpdir, "Test.java", outputFileST.toString());
 	}
 
-	public static void writeTemplateTestFile(String parserName,
+	protected void writeTemplateTestFile(String parserName,
 											 String lexerName,
 											 String parserStartRuleName,
 											 boolean debug)
@@ -462,7 +480,7 @@ public class TestCompileAndExecSupport {
 		writeFile(tmpdir, "Test.java", outputFileST.toString());
 	}
 
-	public static void eraseFiles(final String filesEndingWith) {
+	protected void eraseFiles(final String filesEndingWith) {
 		File tmpdirF = new File(tmpdir);
 		String[] files = tmpdirF.list();
 		for(int i = 0; i < files.length; i++) {
@@ -471,5 +489,10 @@ public class TestCompileAndExecSupport {
 			}
 		}
 	}
+
+	/*public void tearDown() {
+		eraseFiles(".class");
+		eraseFiles(".java");
+	}*/
 
 }

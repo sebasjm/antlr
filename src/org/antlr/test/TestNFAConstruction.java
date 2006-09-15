@@ -28,12 +28,10 @@
 package org.antlr.test;
 
 import org.antlr.analysis.State;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.FASerializer;
 import org.antlr.tool.Grammar;
 
-public class TestNFAConstruction extends TestSuite {
+public class TestNFAConstruction extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestNFAConstruction() {
@@ -661,7 +659,7 @@ public class TestNFAConstruction extends TestSuite {
 		String expectingGrammarStr =
 			"1:8: parser grammar P;\n" +
 			"a : ~ A ;";
-		assertEqual(g.toString(), expectingGrammarStr);
+		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	public void testNotSingletonBlockSet() throws Exception {
@@ -680,7 +678,7 @@ public class TestNFAConstruction extends TestSuite {
 		String expectingGrammarStr =
 			"1:8: parser grammar P;\n" +
 			"a : ~ A ;";
-		assertEqual(g.toString(), expectingGrammarStr);
+		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	public void testNotCharSet() throws Exception {
@@ -699,7 +697,7 @@ public class TestNFAConstruction extends TestSuite {
 			"1:7: lexer grammar P;\n" +
 				"A : ~ '3' ;\n"+
 				"Tokens : A ;";
-		assertEqual(g.toString(), expectingGrammarStr);
+		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	public void testNotBlockSet() throws Exception {
@@ -718,7 +716,7 @@ public class TestNFAConstruction extends TestSuite {
 			"1:7: lexer grammar P;\n" +
 			"A : ~ ('3'|'b');\n" +
 			"Tokens : A ;";
-		assertEqual(g.toString(), expectingGrammarStr);
+		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	public void testNotSetLoop() throws Exception {
@@ -743,7 +741,7 @@ public class TestNFAConstruction extends TestSuite {
 			"1:7: lexer grammar P;\n" +
 			"A : (~ '3' )* ;\n" +
 			"Tokens : A ;";
-		assertEqual(g.toString(), expectingGrammarStr);
+		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	public void testNotBlockSetLoop() throws Exception {
@@ -768,7 +766,7 @@ public class TestNFAConstruction extends TestSuite {
 			"1:7: lexer grammar P;\n" +
 			"A : (~ ('3'|'b'))* ;\n" +
 			"Tokens : A ;";
-		assertEqual(g.toString(), expectingGrammarStr);
+		assertEquals(expectingGrammarStr, g.toString());
 	}
 
 	public void testSetsInCombinedGrammarSentToLexer() throws Exception {
@@ -782,7 +780,7 @@ public class TestNFAConstruction extends TestSuite {
 			"\n" +
 			"// $ANTLR src \"<string>\" 2\n"+
 			"A : '{' ~('}')* '}';\n";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testEscapedCharLiteral() throws Exception {
@@ -1093,7 +1091,6 @@ public class TestNFAConstruction extends TestSuite {
 
 
 	private void checkRule(Grammar g, String rule, String expecting)
-            throws FailedAssertionException
     {
         g.createNFAs();
         State startState = g.getRuleStartState(rule);
@@ -1101,7 +1098,7 @@ public class TestNFAConstruction extends TestSuite {
         String result = serializer.serialize(startState);
 
         //System.out.print(result);
-        assertEqual(result, expecting);
+        assertEquals(expecting, result);
     }
 
 }

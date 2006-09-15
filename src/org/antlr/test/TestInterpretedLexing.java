@@ -27,12 +27,11 @@
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
 import org.antlr.runtime.*;
 
-public class TestInterpretedLexing extends TestSuite {
+public class TestInterpretedLexing extends BaseTest {
 
 	/*
 	static class Tracer implements ANTLRDebugInterface {
@@ -81,10 +80,10 @@ public class TestInterpretedLexing extends TestSuite {
         Interpreter engine = new Interpreter(g, new ANTLRStringStream("a"));
         engine = new Interpreter(g, new ANTLRStringStream("b"));
 		Token result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("c"));
 		result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
     }
 
     public void testSingleRuleRef() throws Exception {
@@ -95,7 +94,7 @@ public class TestInterpretedLexing extends TestSuite {
 		final int Atype = g.getTokenType("A");
 		Interpreter engine = new Interpreter(g, new ANTLRStringStream("abc")); // should ignore the x
 		Token result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
     }
 
     public void testSimpleLoop() throws Exception {
@@ -106,10 +105,10 @@ public class TestInterpretedLexing extends TestSuite {
 		final int INTtype = g.getTokenType("INT");
 		Interpreter engine = new Interpreter(g, new ANTLRStringStream("12x")); // should ignore the x
 		Token result = engine.scan("INT");
-		assertEqual(result.getType(), INTtype);
+		assertEquals(result.getType(), INTtype);
 		engine = new Interpreter(g, new ANTLRStringStream("1234"));
 		result = engine.scan("INT");
-		assertEqual(result.getType(), INTtype);
+		assertEquals(result.getType(), INTtype);
     }
 
     public void testMultAltLoop() throws Exception {
@@ -121,22 +120,22 @@ public class TestInterpretedLexing extends TestSuite {
 		Token result = engine.scan("A");
         engine = new Interpreter(g, new ANTLRStringStream("a"));
 		result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
 		engine = new Interpreter(g, new ANTLRStringStream("1234"));
 		result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("aaa"));
 		result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("aaaa9"));
 		result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("b"));
 		result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
         engine = new Interpreter(g, new ANTLRStringStream("baa"));
 		result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
     }
 
 	public void testSimpleLoops() throws Exception {
@@ -147,7 +146,7 @@ public class TestInterpretedLexing extends TestSuite {
 		CharStream input = new ANTLRStringStream("1234.5");
 		Interpreter engine = new Interpreter(g, input);
 		Token result = engine.scan("A");
-		assertEqual(result.getType(), Atype);
+		assertEquals(result.getType(), Atype);
 	}
 
 	public void testTokensRules() throws Exception {
@@ -169,7 +168,7 @@ public class TestInterpretedLexing extends TestSuite {
 		String result = tokens.toString();
 		//System.out.println(result);
 		String expecting = "123 139.52";
-		assertEqual(result,expecting);
+		assertEquals(result,expecting);
 	}
 
 }

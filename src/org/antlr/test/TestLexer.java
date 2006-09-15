@@ -27,9 +27,7 @@
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-
-public class TestLexer extends TestSuite {
+public class TestLexer extends BaseTest {
 	protected boolean debug = false;
 
 	/** Public default constructor used by TestRig */
@@ -44,12 +42,9 @@ public class TestLexer extends TestSuite {
 			"a : A {System.out.println(input);} ;\n"+
 			"A : '\\\\' 't' {setText(\"\t\");} ;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;";
-		String found =
-			TestCompileAndExecSupport.execParser("P.g", grammar, "P",
-												 "PLexer",
-												 "a", "\\t", debug);
-		String expecting = "\t\n";
-		assertEqual(found,expecting);
+		String found = execParser("P.g", grammar, "P", "PLexer",
+				    "a", "\\t", debug);
+		assertEquals("\t\n", found);
 	}
 
 	public void testRefToRuleDoesNotSetTokenNorEmitAnother() throws Exception {
@@ -61,12 +56,9 @@ public class TestLexer extends TestSuite {
 			"A : '-' I ;\n" +
 			"I : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\n') {channel=99;} ;";
-		String found =
-			TestCompileAndExecSupport.execParser("P.g", grammar, "P",
-												 "PLexer",
-												 "a", "-34", debug);
-		String expecting = "-34\n";
-		assertEqual(found,expecting);
+		String found = execParser("P.g", grammar, "P", "PLexer",
+				    "a", "-34", debug);
+		assertEquals("-34\n", found);
 	}
 
 	public void testRefToFragment() throws Exception {
@@ -78,12 +70,9 @@ public class TestLexer extends TestSuite {
 			"A : '-' I ;\n" +
 			"fragment I : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\n') {channel=99;} ;";
-		String found =
-			TestCompileAndExecSupport.execParser("P.g", grammar, "P",
-												 "PLexer",
-												 "a", "-34", debug);
-		String expecting = "-34\n";
-		assertEqual(found,expecting);
+		String found = execParser("P.g", grammar, "P", "PLexer",
+				    "a", "-34", debug);
+		assertEquals("-34\n", found);
 	}
 
 	public void testMultipleRefToFragment() throws Exception {
@@ -95,12 +84,9 @@ public class TestLexer extends TestSuite {
 			"A : I '.' I ;\n" +
 			"fragment I : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\n') {channel=99;} ;";
-		String found =
-			TestCompileAndExecSupport.execParser("P.g", grammar, "P",
-												 "PLexer",
-												 "a", "3.14159", debug);
-		String expecting = "3.14159\n";
-		assertEqual(found,expecting);
+		String found = execParser("P.g", grammar, "P", "PLexer",
+				    "a", "3.14159", debug);
+		assertEquals("3.14159\n", found);
 	}
 
 }

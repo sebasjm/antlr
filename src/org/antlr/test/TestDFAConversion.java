@@ -30,13 +30,11 @@ package org.antlr.test;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.DecisionProbe;
 import org.antlr.misc.BitSet;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.*;
 
 import java.util.*;
 
-public class TestDFAConversion extends TestSuite {
+public class TestDFAConversion extends BaseTest {
 
 	/** Public default constructor used by TestRig */
 	public TestDFAConversion() {
@@ -137,20 +135,20 @@ public class TestDFAConversion extends TestSuite {
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules =
 			new HashSet() {{add("a"); add("b");}};
-		assertEqual(leftRecursive, expectedRules);
+		assertEquals(expectedRules, leftRecursive);
 
 		g.createLookaheadDFAs();
 
 		Message msg = (Message)equeue.warnings.get(0);
-		assertTrue(msg!=null && msg instanceof LeftRecursionCyclesMessage,
-				   "expecting left recursion cycles; found "+msg.getClass().getName());
+		assertTrue("expecting left recursion cycles; found "+msg.getClass().getName(),
+				    msg instanceof LeftRecursionCyclesMessage);
 		LeftRecursionCyclesMessage cyclesMsg = (LeftRecursionCyclesMessage)msg;
 
 		// cycle of [a, b]
 		Collection result = cyclesMsg.cycles;
 		List expecting = new ArrayList();
 		expecting.add(new HashSet() {{add("a"); add("b");}});
-		assertEqual(result,expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testIndirectRecursionLoop2() throws Exception {
@@ -168,20 +166,20 @@ public class TestDFAConversion extends TestSuite {
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules =
 			new HashSet() {{add("a"); add("b");}};
-		assertEqual(leftRecursive, expectedRules);
+		assertEquals(expectedRules, leftRecursive);
 
 		g.createLookaheadDFAs();
 
 		Message msg = (Message)equeue.warnings.get(0);
-		assertTrue(msg!=null && msg instanceof LeftRecursionCyclesMessage,
-				   "expecting left recursion cycles; found "+msg.getClass().getName());
+		assertTrue("expecting left recursion cycles; found "+msg.getClass().getName(),
+				    msg instanceof LeftRecursionCyclesMessage);
 		LeftRecursionCyclesMessage cyclesMsg = (LeftRecursionCyclesMessage)msg;
 
 		// cycle of [a, b]
 		Collection result = cyclesMsg.cycles;
 		List expecting = new ArrayList();
 		expecting.add(new HashSet() {{add("a"); add("b");}});
-		assertEqual(result,expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testIndirectRecursionLoop3() throws Exception {
@@ -201,11 +199,11 @@ public class TestDFAConversion extends TestSuite {
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules =
 			new HashSet() {{add("a"); add("b"); add("e"); add("d");}};
-		assertEqual(leftRecursive, expectedRules);
+		assertEquals(expectedRules, leftRecursive);
 
 		Message msg = (Message)equeue.warnings.get(0);
-		assertTrue(msg!=null && msg instanceof LeftRecursionCyclesMessage,
-				   "expecting left recursion cycles; found "+msg.getClass().getName());
+		assertTrue("expecting left recursion cycles; found "+msg.getClass().getName(),
+				    msg instanceof LeftRecursionCyclesMessage);
 		LeftRecursionCyclesMessage cyclesMsg = (LeftRecursionCyclesMessage)msg;
 
 		// cycle of [a, b]
@@ -213,7 +211,7 @@ public class TestDFAConversion extends TestSuite {
 		List expecting = new ArrayList();
 		expecting.add(new HashSet() {{add("a"); add("b");}});
 		expecting.add(new HashSet() {{add("d"); add("e");}});
-		assertEqual(result,expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testifThenElse() throws Exception {
@@ -345,7 +343,7 @@ public class TestDFAConversion extends TestSuite {
 
 		String expecting =
 			"grammar t: no start rule (no rule can obviously be followed by EOF)";
-		assertEqual(equeue.errors.get(0).toString(), expecting);
+		assertEquals(expecting, equeue.errors.get(0).toString());
 	}
 
 	public void testAStar_immediateTailRecursion2() throws Exception {
@@ -373,7 +371,7 @@ public class TestDFAConversion extends TestSuite {
 			"a : a A | B;");
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules = new HashSet() {{add("a");}};
-		assertEqual(leftRecursive, expectedRules);
+		assertEquals(expectedRules, leftRecursive);
 	}
 
 	public void testIndirectLeftRecursion() throws Exception {
@@ -385,7 +383,7 @@ public class TestDFAConversion extends TestSuite {
 			"c : a | C ;\n");
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules = new HashSet() {{add("a"); add("b"); add("c");}};
-		assertEqual(leftRecursive, expectedRules);
+		assertEquals(expectedRules, leftRecursive);
 	}
 
 	public void testLeftRecursionInMultipleCycles() throws Exception {
@@ -400,7 +398,7 @@ public class TestDFAConversion extends TestSuite {
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules =
 			new HashSet() {{add("a"); add("b"); add("c"); add("x"); add("y");}};
-		assertEqual(leftRecursive, expectedRules);
+		assertEquals(expectedRules, leftRecursive);
 	}
 
 	public void testCycleInsideRuleDoesNotForceInfiniteRecursion() throws Exception {
@@ -412,7 +410,7 @@ public class TestDFAConversion extends TestSuite {
 		// forever inside of a rule if there was an epsilon loop.
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules = new HashSet();
-		assertEqual(leftRecursive, expectedRules);
+		assertEquals(expectedRules, leftRecursive);
 	}
 
 	// L O O P S
@@ -720,8 +718,7 @@ public class TestDFAConversion extends TestSuite {
 		);
 		String expecting =
 			" ( grammar t ( rule a ARG RET scope ( BLOCK ( ALT ( SET A B C ) <end-of-alt> ) <end-of-block> ) <end-of-rule> ) )";
-		assertEqual(g.getGrammarTree().toStringTree(),
-					expecting);
+		assertEquals(expecting, g.getGrammarTree().toStringTree());
 	}
 
 	public void testTokensRuleAltsDoNotCollapse() throws Exception {
@@ -994,7 +991,7 @@ As a result, alternative(s) 2 were disabled for that input
 								 String expectingAmbigInput,
 								 int[] expectingDanglingAlts,
 								 int expectingNumWarnings)
-		throws FailedAssertionException
+		throws Exception
 	{
 		DecisionProbe.verbose=true; // make sure we get all error info
 		ErrorQueue equeue = new ErrorQueue();
@@ -1010,12 +1007,11 @@ As a result, alternative(s) 2 were disabled for that input
 			System.err.println("Warnings issued: "+equeue);
 		}
 
-		assertTrue(equeue.size()==expectingNumWarnings,
-				   "unexpected number of expected problems: "+equeue.size()+
-				   "; expecting "+expectingNumWarnings);
+		assertEquals("unexpected number of expected problems",
+				   expectingNumWarnings, equeue.size());
 
 		DFA dfa = g.getLookaheadDFA(decision);
-		assertTrue(dfa!=null, "no DFA for decision "+decision);
+		assertNotNull("no DFA for decision "+decision, dfa);
 		FASerializer serializer = new FASerializer(g);
 		String result = serializer.serialize(dfa.startState);
 
@@ -1027,27 +1023,24 @@ As a result, alternative(s) 2 were disabled for that input
 			s.addAll(expectingUnreachableAlts);
 			BitSet s2 = new BitSet();
 			s2.addAll(unreachableAlts);
-			assertTrue(s.equals(s2), "unreachable alts mismatch; expecting "+s+
-									 " found "+s2);
+			assertEquals("unreachable alts mismatch", s, s2);
 		}
 		else {
-			assertTrue(unreachableAlts.size()==0,
-					   "unreachable alts mismatch; expecting none found "+
-					   unreachableAlts);
+			assertEquals("number of unreachable alts", 0, unreachableAlts.size());
 		}
 
 		// check conflicting input
 		if ( expectingAmbigInput!=null ) {
 			// first, find nondet message
 			Message msg = (Message)equeue.warnings.get(0);
-			assertTrue(msg instanceof GrammarNonDeterminismMessage,
-					   "expecting nondeterminism; found "+msg.getClass().getName());
+			assertTrue("expecting nondeterminism; found "+msg.getClass().getName(),
+					    msg instanceof GrammarNonDeterminismMessage);
 			GrammarNonDeterminismMessage nondetMsg =
 				getNonDeterminismMessage(equeue.warnings);
 			List labels =
 				nondetMsg.probe.getSampleNonDeterministicInputSequence(nondetMsg.problemState);
 			String input = nondetMsg.probe.getInputSequenceDisplay(labels);
-			assertEqual(input, expectingAmbigInput);
+			assertEquals(expectingAmbigInput, input);
 		}
 
 		// check nondet alts
@@ -1071,18 +1064,19 @@ As a result, alternative(s) 2 were disabled for that input
 			s.addAll(expectingNonDetAlts);
 			BitSet s2 = new BitSet();
 			s2.addAll(nonDetAlts);
-			assertTrue(s.equals(s2), "nondet alts mismatch; expecting "+s+" found "+s2);
-			assertTrue(nondetMsg!=null||recMsg!=null, "found no nondet alts; expecting: "+
-										str(expectingNonDetAlts));
+			assertEquals("nondet alts mismatch", s, s2);
+			assertTrue("found no nondet alts; expecting: "+
+					    str(expectingNonDetAlts),
+					    nondetMsg!=null||recMsg!=null);
 		}
 		else {
 			// not expecting any nondet alts, make sure there are none
 			GrammarNonDeterminismMessage nondetMsg =
 				getNonDeterminismMessage(equeue.warnings);
-			assertTrue(nondetMsg==null, "found nondet alts, but expecting none");
+			assertNull("found nondet alts, but expecting none", nondetMsg);
 		}
 
-		assertEqual(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	protected GrammarNonDeterminismMessage getNonDeterminismMessage(List warnings) {

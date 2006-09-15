@@ -27,9 +27,7 @@
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-
-public class TestRewriteTemplates extends TestSuite {
+public class TestRewriteTemplates extends BaseTest {
 	protected boolean debug = false;
 
 	public void testDelete() throws Exception {
@@ -40,11 +38,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("", found);
 	}
 
 	public void testAction() throws Exception {
@@ -55,11 +51,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "abc\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("abc\n", found);
 	}
 
 	public void testEmbeddedLiteralConstructor() throws Exception {
@@ -70,11 +64,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "abc\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("abc\n", found);
 	}
 
 	public void testInlineTemplate() throws Exception {
@@ -85,11 +77,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "x:abc, y:34;\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("x:abc, y:34;\n", found);
 	}
 
 	public void testNamedTemplate() throws Exception {
@@ -102,11 +92,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "abc 34\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("abc 34\n", found);
 	}
 
 	public void testIndirectTemplate() throws Exception {
@@ -119,11 +107,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "abc 34\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("abc 34\n", found);
 	}
 
 	public void testInlineTemplateInvokingLib() throws Exception {
@@ -134,11 +120,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "abc 34\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("abc 34\n", found);
 	}
 
 	public void testPredicatedAlts() throws Exception {
@@ -153,11 +137,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "hi abc\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("hi abc\n", found);
 	}
 
 	public void testTemplateReturn() throws Exception {
@@ -169,11 +151,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "abc 34\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("abc 34\n", found);
 	}
 
 	public void testReturnValueWithTemplate() throws Exception {
@@ -185,11 +165,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "8\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("8\n", found);
 	}
 
 	public void testTemplateRefToDynamicAttributes() throws Exception {
@@ -203,11 +181,9 @@ public class TestRewriteTemplates extends TestSuite {
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {channel=99;} ;\n";
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "T", "TLexer",
-												 "a", "abc 34", debug);
-		String expecting = "abc \n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "T", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("abc \n", found);
 	}
 
 

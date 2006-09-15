@@ -30,13 +30,11 @@ package org.antlr.test;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.DFAOptimizer;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.test.unit.FailedAssertionException;
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.*;
 
 import java.util.List;
 
-public class TestCharDFAConversion extends TestSuite {
+public class TestCharDFAConversion extends BaseTest {
 
 	/** Public default constructor used by TestRig */
 	public TestCharDFAConversion() {
@@ -168,14 +166,13 @@ public class TestCharDFAConversion extends TestSuite {
 
 		checkDecision(g, 1, expecting, new int[] {2});
 
-		assertTrue(equeue.size()==1,
-				   "unexpected number of expected problems: "+equeue.size()+
-				   "; expecting "+1);
+		assertEquals("unexpected number of expected problems",
+				    1, equeue.size());
 		Message msg = (Message)equeue.warnings.get(0);
-		assertTrue(msg instanceof GrammarUnreachableAltsMessage,
-				   "warning must be an unreachable alt");
+		assertTrue("warning must be an unreachable alt",
+				    msg instanceof GrammarUnreachableAltsMessage);
 		GrammarUnreachableAltsMessage u = (GrammarUnreachableAltsMessage)msg;
-		assertEqual(u.alts.toString(), "[2]");
+		assertEquals("[2]", u.alts.toString());
 	}
 
 	public void testAdjacentNotCharLoops() throws Exception {
@@ -226,7 +223,7 @@ public class TestCharDFAConversion extends TestSuite {
 		DFA dfa = g.getLookaheadDFA(1);
 		String result = serializer.serialize(dfa.startState);
 		expecting = ".s0-'x'->:s1=>1\n";
-		assertEqual(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	// N O N G R E E D Y
@@ -348,14 +345,13 @@ public class TestCharDFAConversion extends TestSuite {
 
 		checkDecision(g, 1, expecting, new int[] {1});
 
-		assertTrue(equeue.size()==1,
-				   "unexpected number of expected problems: "+equeue.size()+
-				   "; expecting "+1);
+		assertEquals("unexpected number of expected problems",
+				    1, equeue.size());
 		Message msg = (Message)equeue.warnings.get(0);
-		assertTrue(msg instanceof GrammarUnreachableAltsMessage,
-				   "warning must be an unreachable alt");
+		assertTrue("warning must be an unreachable alt",
+				   msg instanceof GrammarUnreachableAltsMessage);
 		GrammarUnreachableAltsMessage u = (GrammarUnreachableAltsMessage)msg;
-		assertEqual(u.alts.toString(), "[1]");
+		assertEquals("[1]", u.alts.toString());
 	}
 
 	public void testRecursive() throws Exception {
@@ -427,7 +423,7 @@ public class TestCharDFAConversion extends TestSuite {
 								 int decision,
 								 String expecting,
 								 int[] expectingUnreachableAlts)
-		throws FailedAssertionException
+		throws Exception
 	{
 
 		// mimic actions of org.antlr.Tool first time for grammar g
@@ -439,7 +435,7 @@ public class TestCharDFAConversion extends TestSuite {
 		}
 
 		DFA dfa = g.getLookaheadDFA(decision);
-		assertTrue(dfa!=null, "unknown decision #"+decision);
+		assertNotNull("unknown decision #"+decision, dfa);
 		FASerializer serializer = new FASerializer(g);
 		String result = serializer.serialize(dfa.startState);
 		//System.out.print(result);
@@ -448,15 +444,14 @@ public class TestCharDFAConversion extends TestSuite {
 
 		// first make sure nondeterministic alts are as expected
 		if ( expectingUnreachableAlts==null ) {
-			assertTrue(nonDetAlts.size()==0, "unreachable alts mismatch; should be empty: "+nonDetAlts);
+			assertEquals("unreachable alts mismatch", 0, nonDetAlts.size());
 		}
 		else {
 			for (int i=0; i<expectingUnreachableAlts.length; i++) {
-				assertTrue(nonDetAlts.contains(new Integer(expectingUnreachableAlts[i])),
-						   "unreachable alts mismatch");
+				assertTrue("unreachable alts mismatch", nonDetAlts.contains(new Integer(expectingUnreachableAlts[i])));
 			}
 		}
-		assertEqual(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 }

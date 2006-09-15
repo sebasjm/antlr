@@ -27,13 +27,12 @@
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.ParseTree;
 
-public class TestInterpretedParsing extends TestSuite {
+public class TestInterpretedParsing extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestInterpretedParsing() {
@@ -70,7 +69,7 @@ public class TestInterpretedParsing extends TestSuite {
 		String result = t.toStringTree();
 		String expecting =
 			"(<grammar p> (prog [@0,0:4='while',<4>,1:0] [@2,6:6='x',<5>,1:6] [@4,8:8='{',<6>,1:8] (assign [@6,10:10='i',<5>,1:10] [@7,11:11='=',<8>,1:11] (expr [@8,12:12='1',<10>,1:12]) [@9,13:13=';',<9>,1:13]) (assign [@11,15:15='y',<5>,1:15] [@12,16:16='=',<8>,1:16] (expr [@13,17:20='3.42',<11>,1:17]) [@14,21:21=';',<9>,1:21]) (assign [@16,23:23='z',<5>,1:23] [@17,24:24='=',<8>,1:24] (expr [@18,25:25='y',<5>,1:25]) [@19,26:26=';',<9>,1:26]) [@21,28:28='}',<7>,1:28] [@0,0:0='<no text>',<-1>,0:-1]))";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testMismatchedTokenError() throws Exception {
@@ -104,7 +103,7 @@ public class TestInterpretedParsing extends TestSuite {
 		String result = t.toStringTree();
 		String expecting =
 			"(<grammar p> (prog [@0,0:4='while',<4>,1:0] [@2,6:6='x',<5>,1:6] [@4,8:8='{',<6>,1:8] (assign [@6,10:10='i',<5>,1:10] [@7,11:11='=',<8>,1:11] (expr [@8,12:12='1',<10>,1:12]) MismatchedTokenException(5!=9))))";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testMismatchedSetError() throws Exception {
@@ -138,7 +137,7 @@ public class TestInterpretedParsing extends TestSuite {
 		String result = t.toStringTree();
 		String expecting =
 			"(<grammar p> (prog [@0,0:4='while',<4>,1:0] [@2,6:6='x',<5>,1:6] [@4,8:8='{',<6>,1:8] (assign [@6,10:10='i',<5>,1:10] [@7,11:11='=',<8>,1:11] (expr MismatchedSetException(9!={5, 10..11})))))";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 	public void testNoViableAltError() throws Exception {
@@ -172,7 +171,7 @@ public class TestInterpretedParsing extends TestSuite {
 		String result = t.toStringTree();
 		String expecting =
 			"(<grammar p> (prog [@0,0:4='while',<4>,1:0] [@2,6:6='x',<5>,1:6] [@4,8:8='{',<6>,1:8] (assign [@6,10:10='i',<5>,1:10] [@7,11:11='=',<8>,1:11] (expr NoViableAltException(9!=[4:1: expr : ( INT | FLOAT | ID );])))))";
-		assertEqual(result, expecting);
+		assertEquals(result, expecting);
 	}
 
 }

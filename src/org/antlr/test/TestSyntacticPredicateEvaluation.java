@@ -27,9 +27,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
-import org.antlr.test.unit.TestSuite;
-
-public class TestSyntacticPredicateEvaluation extends TestSuite {
+public class TestSyntacticPredicateEvaluation extends BaseTest {
 	public void testTwoPredsWithNakedAlt() throws Exception {
 		String grammar =
 			"grammar t;\n" +
@@ -50,28 +48,25 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"   : '(' c ')' | 'x' ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "a", "(x) ;", false);
+		String found = execParser("t.g", grammar, "t", "tLexer",
+				    "a", "(x) ;", false);
 		String expecting =
 			"enter b\n" +
 			"enter b\n" +
 			"enter b\n" +
 			"alt 2\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "a", "(x). ;", false);
+		found = execParser("t.g", grammar, "t", "tLexer",
+			    "a", "(x). ;", false);
 		expecting =
 			"enter b\n" +
 			"enter b\n" +
 			"alt 1\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "a", "((x)) ;", false);
+		found = execParser("t.g", grammar, "t", "tLexer",
+			    "a", "((x)) ;", false);
 		expecting =
 			"enter b\n" +
 			"enter b\n" +
@@ -79,7 +74,7 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"enter c\n" +
 			"enter c\n" +
 			"alt 3\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testTwoPredsWithNakedAltNotLast() throws Exception {
@@ -102,35 +97,32 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"   : '(' c ')' | 'x' ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "a", "(x) ;", false);
+		String found = execParser("t.g", grammar, "t", "tLexer",
+				    "a", "(x) ;", false);
 		String expecting =
 			"enter b\n" +
 			"enter c\n" +
 			"enter c\n" +
 			"alt 2\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "a", "(x). ;", false);
+		found = execParser("t.g", grammar, "t", "tLexer",
+			    "a", "(x). ;", false);
 		expecting =
 			"enter b\n" +
 			"enter b\n" +
 			"alt 1\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 
-		found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "a", "((x)) ;", false);
+		found = execParser("t.g", grammar, "t", "tLexer",
+			    "a", "((x)) ;", false);
 		expecting =
 			"enter b\n" +
 			"enter c\n" +
 			"enter c\n" +
 			"enter c\n" +
 			"alt 2\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testLexerPred() throws Exception {
@@ -143,19 +135,15 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"  ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "s", "xxx", false);
-		String expecting =
-			"alt2\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "t", "tLexer",
+				    "s", "xxx", false);
 
-		found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "s", "xxx.", false);
-		expecting =
-			"alt1\n";
-		assertEqual(found, expecting);
+		assertEquals("alt2\n", found);
+
+		found = execParser("t.g", grammar, "t", "tLexer",
+			    "s", "xxx.", false);
+
+		assertEquals("alt1\n", found);
 	}
 
 	public void testLexerPredCyclicPrediction() throws Exception {
@@ -168,12 +156,10 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"  ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "s", "xxx", false);
-		String expecting =
-			"alt1\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "t", "tLexer",
+				    "s", "xxx", false);
+
+		assertEquals("alt1\n", found);
 	}
 
 	public void testLexerPredCyclicPrediction2() throws Exception {
@@ -186,12 +172,9 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"  ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "s", "xxx", false);
-		String expecting =
-			"alt2\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "t", "tLexer",
+				    "s", "xxx", false);
+		assertEquals("alt2\n", found);
 	}
 
 	public void testSimpleNestedPred() throws Exception {
@@ -214,9 +197,8 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"INT: '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "s", "(34)x;", false);
+		String found = execParser("t.g", grammar, "t", "tLexer",
+				    "s", "(34)x;", false);
 		String expecting =
 			"enter expr (\n" +
 			"enter atom (\n" +
@@ -227,7 +209,7 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"enter expr 34\n" +
 			"enter atom 34\n" +
 			"enter atom 34\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testTripleNestedPredInLexer() throws Exception {
@@ -250,9 +232,8 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"fragment INT: '0'..'9'+ ;\n" +
 			"fragment WS : (' '|'\\n')+ \n" +
 			"   ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "s", "((34)x)x", false);
+		String found = execParser("t.g", grammar, "t", "tLexer",
+				    "s", "((34)x)x", false);
 		String expecting = // has no memoization
 			"enter expr (\n" +
 			"enter atom (\n" +
@@ -279,7 +260,7 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"ATOM x\n" +
 			"ATOM x\n" +
 			"done\n";
-		assertEqual(found, expecting);
+		assertEquals(expecting, found);
 	}
 
 	public void testSynPredWithOutputTemplate() throws Exception {
@@ -296,12 +277,10 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"  ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "a", "xxxy", false);
-		String expecting =
-			"1:xxxy;\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "t", "tLexer",
+				    "a", "xxxy", false);
+
+		assertEquals("1:xxxy;\n", found);
 	}
 
 	public void testSynPredWithOutputAST() throws Exception {
@@ -318,12 +297,10 @@ public class TestSyntacticPredicateEvaluation extends TestSuite {
 			"  ;\n" +
 			"WS : (' '|'\\n')+ {channel=99;}\n" +
 			"   ;\n" ;
-		String found =
-			TestCompileAndExecSupport.execParser("t.g", grammar, "t", "tLexer",
-												 "a", "xxxy", false);
-		String expecting =
-			"x x x y\n";
-		assertEqual(found, expecting);
+		String found = execParser("t.g", grammar, "t", "tLexer",
+				    "a", "xxxy", false);
+
+		assertEquals("x x x y\n", found);
 	}
 
 }
