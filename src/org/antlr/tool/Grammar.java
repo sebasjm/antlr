@@ -499,6 +499,10 @@ public class Grammar {
 		parser.grammar(this);
 		grammarTree = (GrammarAST)parser.getAST();
 		setFileName(lexer.getFilename()); // the lexer #src might change name
+		if ( getRules().size()==0 ) {
+			ErrorManager.error(ErrorManager.MSG_NO_RULES, getFileName());
+			return;
+		}
 
 		// Get syn pred rules and add to existing tree
 		List synpredRules =
@@ -710,6 +714,9 @@ public class Grammar {
 		//System.out.println("### create NFAs");
 		if ( nfa!=null ) {
 			// don't let it create more than once; has side-effects
+			return;
+		}
+		if ( getRules().size()==0 ) {
 			return;
 		}
 		nfa = new NFA(this); // create NFA that TreeToNFAConverter'll fill in

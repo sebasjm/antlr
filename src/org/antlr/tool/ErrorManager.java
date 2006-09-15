@@ -163,6 +163,7 @@ public class ErrorManager {
 	public static final int MSG_MISSING_ATTRIBUTE_NAME = 147;
 	public static final int MSG_ARG_INIT_VALUES_ILLEGAL = 148;
 	public static final int MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION = 149;
+	public static final int MSG_NO_RULES = 150;
 
 
 	// GRAMMAR WARNINGS
@@ -189,6 +190,7 @@ public class ErrorManager {
 			add(MSG_UNDEFINED_RULE_REF);
 			add(MSG_LEFT_RECURSION_CYCLES);
 			add(MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION);
+			add(MSG_NO_RULES);
 			// TODO: ...
 		}
 	};
