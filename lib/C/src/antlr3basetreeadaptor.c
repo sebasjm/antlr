@@ -296,5 +296,5 @@ static	pANTLR3_UINT64
 static	ANTLR3_UINT64	
    getUniqueID		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE node)
 {
-	return	(ANTLR3_UINT64) node;
+	return	ANTLR3_UINT64_CAST(node);
 }

@@ -96,7 +96,7 @@ ANTLR3_MALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, size_t request)
 	tr->size    = request;
 	tr->type    = 0;
 	sprintf((char *)tr->file, "%.256s", file);
-	memtrace->put(memtrace, (ANTLR3_UINT64)m, (void *)tr, free);
+	memtrace->put(memtrace, ANTLR3_UINT64_CAST(m), (void *)tr, free);
 	record = 1;
     }
     
@@ -119,13 +119,13 @@ ANTLR3_REALLOC_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, void * current, ANTLR
     if	(record && !reporting && m != current)
     {
 	record = 0;
-	memtrace->del(memtrace, (ANTLR3_UINT64)current);
+	memtrace->del(memtrace, ANTLR3_UINT64_CAST(current));
 	tr  = (struct  memrec *)malloc(sizeof(struct memrec));
 	tr->line    = line;
 	tr->size    = request;
 	tr->type    = 1;
 	sprintf((char *)tr->file, "%.256s", file);
-	memtrace->put(memtrace, (ANTLR3_UINT64)m, (void *)tr, free);
+	memtrace->put(memtrace, ANTLR3_UINT64_CAST(m), (void *)tr, free);
 	record = 1;
     }
     
@@ -139,7 +139,7 @@ ANTLR3_FREE_DBG(void * ptr)
     if	(record && !reporting)
     {
 	record = 0;
-	memtrace->del(memtrace, (ANTLR3_UINT64)ptr);
+	memtrace->del(memtrace, ANTLR3_UINT64_CAST(ptr));
 	record = 1;
     }
     free(ptr);
@@ -166,7 +166,7 @@ ANTLR3_STRDUP_DBG(pANTLR3_UINT8 file, ANTLR3_UINT32 line, pANTLR3_UINT8 instr)
 	tr->size    = strlen((const char *)instr);
 	tr->type    = 2;
 	sprintf((char *)tr->file, "%.256s", file);
-	memtrace->put(memtrace, (ANTLR3_UINT64)m, (void *)tr, free);
+	memtrace->put(memtrace, ANTLR3_UINT64_CAST(m), (void *)tr, free);
 	record = 1;
     }
     return m;
@@ -190,7 +190,7 @@ ANTLR3_MEM_REPORT(ANTLR3_BOOLEAN cleanup)
 	first	= 2;
 
 	/* Enumerate all entries */
-	while   (en->next(en, &addr, &tr) == ANTLR3_SUCCESS)
+	while   (en->next(en, (void *)(&addr), (void *)(&tr)) == ANTLR3_SUCCESS)
 	{
 	    if	(first == 2)
 	    {

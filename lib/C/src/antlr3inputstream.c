@@ -300,7 +300,7 @@ antlr3AsciiMark	(pANTLR3_INT_STREAM is)
     /* New mark point 
      */
     input->markDepth++;
-    sprintf(key, "%d", input->markDepth);
+    sprintf((char *)key, "%lld", (ANTLR3_INT64)(input->markDepth));
 
     /* See if we are revisitng a mark as we can just reuse the hashtable
      * entry if we are, otherwise, we need a new one
@@ -415,7 +415,7 @@ antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
      * input point, then we assume that we are reseting from a mark
      * and do not need to scan, but can just set to there.
      */
-    if	(((pANTLR3_UINT8)seekPoint) <= ((pANTLR3_UINT8)input->nextChar))
+    if	(seekPoint <= ANTLR3_UINT64_CAST(input->nextChar))
     {
 	input->nextChar	= ((pANTLR3_UINT8)input->data) + seekPoint;
     }

@@ -90,6 +90,7 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)(ptr)
 #define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)((ANTLR3_UINT64)(ptr))
 #define	ANTLR3_UINT64_LIT(lit)	    lit##ULL
+
 #ifdef	ANTLR3_WIN32
 #endif
 
@@ -124,7 +125,7 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #include    <sys/stat.h>
 #include	<string.h>
 
-/* Some platforms define a macor, index() in string.h. AIX is
+/* Some platforms define a macro, index() in string.h. AIX is
  * one of these for instance. we must get rid of that definition
  * as we use ->index all over the place.
  */
@@ -137,20 +138,20 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define ANTLR3_API
 #define	ANTLR3_API_FUNC (void *)
 
-typedef int		    ANTLR3_CHAR,    *pANTLR3_CHAR;
-typedef unsigned int	    ANTLR3_UCHAR,   *pANTLR3_UCHAR;
+typedef int32_t		    ANTLR3_CHAR,    *pANTLR3_CHAR;
+typedef uint32_t	    ANTLR3_UCHAR,   *pANTLR3_UCHAR;
 
-typedef char		    ANTLR3_INT8,    *pANTLR3_INT8;
-typedef short		    ANTLR3_INT16,   *pANTLR3_INT16;
-typedef int		    ANTLR3_INT32,   *pANTLR3_INT32;
-typedef long long	    ANTLR3_INT64,   *pANTLR3_INT64;
+typedef int8_t		    ANTLR3_INT8,    *pANTLR3_INT8;
+typedef int16_t		    ANTLR3_INT16,   *pANTLR3_INT16;
+typedef int32_t		    ANTLR3_INT32,   *pANTLR3_INT32;
+typedef int64_t		    ANTLR3_INT64,   *pANTLR3_INT64;
 
-typedef unsigned char       ANTLR3_UINT8,   *pANTLR3_UINT8;
-typedef unsigned short      ANTLR3_UINT16,  *pANTLR3_UINT16;
-typedef unsigned int        ANTLR3_UINT32,  *pANTLR3_UINT32;
-typedef unsigned long long  ANTLR3_UINT64,  *pANTLR3_UINT64;
+typedef uint8_t	    	    ANTLR3_UINT8,   *pANTLR3_UINT8;
+typedef uint16_t      	    ANTLR3_UINT16,  *pANTLR3_UINT16;
+typedef uint32_t	    ANTLR3_UINT32,  *pANTLR3_UINT32;
+typedef uint64_t	    ANTLR3_UINT64,  *pANTLR3_UINT64;
 
-typedef unsigned int	    ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
+typedef uint32_t	    ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
 
 #define ANTLR3_INLINE   inline
 #define	ANTLR3_API
@@ -166,16 +167,8 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define	ANTLR3_FUNC_PTR(ptr) (void *)((ANTLR3_UINT32)(ptr))
 #define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)((ANTLR3_UINT32)(ptr))
 #define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)(ptr)
+#endif
 #define	ANTLR3_UINT64_LIT(lit)	    lit##ULL
-#endif
-
-#endif
-
-#ifdef	ANTLR3_VMS
-
-#define	_stat	stat
-
-#define	ANTLR3_API
 
 #endif
 
