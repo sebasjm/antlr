@@ -499,7 +499,7 @@ public class Grammar {
 		parser.grammar(this);
 		grammarTree = (GrammarAST)parser.getAST();
 		setFileName(lexer.getFilename()); // the lexer #src might change name
-		if ( getRules().size()==0 ) {
+		if ( grammarTree.findFirstType(ANTLRParser.RULE)==null ) {
 			ErrorManager.error(ErrorManager.MSG_NO_RULES, getFileName());
 			return;
 		}
