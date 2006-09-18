@@ -1,4 +1,4 @@
-<!-- Contributed by Oliver Zeigermann 
+<!-- Contributed by Oliver Zeigermann
 	Modified by Jean Bovet
 	Library dependency: install library http://jakarta.apache.org/bcel/ in $ANT_HOME/lib
 -->
@@ -27,14 +27,14 @@
 	<condition property="bcel.available">
 		<available classname="org.apache.bcel.Constants"/>
 	</condition>
-	
+
     <target name="clean" description="Deletes all class files">
         <delete dir="${build.dir}"/>
     </target>
 
    <target name="generator">
         <antlr target="${antlr.g}" />
-		<copy file="${tool.dir}/ANTLRTokenTypes.txt" todir="${codegen.dir}"/>
+		  <copy file="${tool.dir}/ANTLRTokenTypes.txt" todir="${codegen.dir}"/>
         <antlr target="${antlr.print.g}" />
         <antlr target="${assign.types.g}" />
         <antlr target="${buildnfa.g}" />
@@ -44,47 +44,53 @@
 
    <target name="compile" depends="generator">
         <mkdir dir="${build.dir}"/>
-        <javac 
-            destdir="${build.dir}" 
+        <javac
+            destdir="${build.dir}"
             debug="${compile.debug}"
             debuglevel="${compile.debuglevel}"
-            deprecation="${compile.deprecation}" 
+            deprecation="${compile.deprecation}"
             optimize="${compile.optimize}"
-			source="1.4"
-			target="1.4">
-            <classpath refid="classpath"/>
+				source="1.4"
+				target="1.4">
+         <classpath refid="classpath"/>
 			<src path="${src.dir}"/>
-        </javac>
+			</javac>
    </target>
 
-   <target name="build" depends="compile, version, version-bcel" description="Creates the ANTLR3 jar">
-        <mkdir dir="${lib.dir}"/>
+	<target name="templates">
+		<copy todir="${build.dir}">
+			<fileset dir="${src.dir}" includes="**/*.stg, **/*.st, **/*.sti"/>
+		</copy>
+	</target>
 
-        <jar jarfile="${antlr3.jar}">
+	<target name="build" depends="compile, templates, version, version-bcel" description="Creates the ANTLR3 jar">
+		<mkdir dir="${lib.dir}"/>
+
+		<jar jarfile="${antlr3.jar}">
 			<fileset dir="${basedir}" includes="LICENSE.txt"/>
 			<fileset dir="${src.dir}" includes="**/*.stg, **/*.st, **/*.sti"/>
 			<fileset dir="${build.dir}" includes="**/*.class"/>
 			<manifest>
-				<attribute name="Version" value="${version}"/>
+			<attribute name="Version" value="${version}"/>
 			</manifest>
 		</jar>
-   </target>
-   
+	</target>
+
 	<target name="version" unless="bcel.available">
 		<echo>Install bcel in the classpath to have automatic version in jar name</echo>
 		<property name="antlr3.jar" value="${lib.dir}/antlr.jar" />
 	</target>
-	
+
 	<target name="version-bcel" if="bcel.available">
-		
+
 		<property name="tool.class" location="${build.dir}/org/antlr/Tool.class"/>
 
 		<loadproperties srcfile="${tool.class}">
 			<filterchain>
-			<classconstants/>
-			<prefixlines prefix="Tool."/>
+				<classconstants/>
+				<prefixlines prefix="Tool."/>
 			</filterchain>
-		</loadproperties>	
+		</loadproperties>
 
 		<property name="antlr3.jar" value="${lib.dir}/antlr-${Tool.VERSION}.jar" />
 	</target>
