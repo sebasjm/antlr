@@ -59,8 +59,7 @@ public class CTarget extends Target {
 			 							   StringTemplate headerFileST)
 		throws IOException
 	{
-
-            generator.write(headerFileST, grammar.name+".h");
+            generator.write(headerFileST, grammar.name+ Grammar.grammarTypeToFileNameSuffix[grammar.type] +".h");
 	}
         
         protected StringTemplate chooseWhereCyclicDFAsGo(Tool tool,
