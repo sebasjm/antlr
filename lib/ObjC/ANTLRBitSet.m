@@ -195,7 +195,7 @@
 
 - (id) copyWithZone:(NSZone *) theZone
 {
-	ANTLRBitSet *newBitSet = [[ANTLRBitSet alloc] initWithBitVector:CFBitVectorCreateMutableCopy(kCFAllocatorDefault,0,bitVector)];
+	ANTLRBitSet *newBitSet = [[ANTLRBitSet allocWithZone:theZone] initWithBitVector:CFBitVectorCreateMutableCopy(kCFAllocatorDefault,0,bitVector)];
 	return newBitSet;
 }
 
