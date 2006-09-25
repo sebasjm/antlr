@@ -25,6 +25,7 @@ static	ANTLR3_UINT32		getType			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE
 static	void			setType			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type);
 static	pANTLR3_STRING		getText			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	void			setText			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
+static	void			setText8		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
 static	pANTLR3_BASE_TREE	getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT64 i);
 static	pANTLR3_UINT64		getChildCount		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT64		getUniqueID		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
@@ -51,6 +52,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor)
 	adaptor->getType		= ANTLR3_API_FUNC getType;
 	adaptor->setType		= ANTLR3_API_FUNC setType;
 	adaptor->getText		= ANTLR3_API_FUNC getText;
+	adaptor->setText8		= ANTLR3_API_FUNC setText8;
 	adaptor->setText		= ANTLR3_API_FUNC setText;
 	adaptor->getChild		= ANTLR3_API_FUNC getChild;
 	adaptor->getChildCount		= ANTLR3_API_FUNC getChildCount;
@@ -222,7 +224,7 @@ static	pANTLR3_BASE_TREE
 
 	/* Set the text of the token accoridngly
 	 */
-	fromToken->setText(fromToken, text);
+	fromToken->setText8(fromToken, text);
 
 	/* Return a new node based upon this token
 	 */
@@ -272,6 +274,13 @@ static	pANTLR3_STRING
  */
 static	void		
    setText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t)
+{
+	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
+}
+/** Dummy implementation - will be supplied by super class
+ */
+static	void		
+setText8		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
 }

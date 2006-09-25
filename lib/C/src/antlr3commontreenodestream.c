@@ -80,7 +80,7 @@ antlr3CommonTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint)
 {
     pANTLR3_COMMON_TREE_NODE_STREAM stream;
 
-    stream = antlr3CommonTreeNodeStreamNew(hint);
+    stream = antlr3CommonTreeNodeStreamNew(tree->strFactory, hint);
 
     if	(stream == (pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM)
     {
@@ -92,7 +92,7 @@ antlr3CommonTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint)
 }
 
 ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM
-antlr3CommonTreeNodeStreamNew(ANTLR3_UINT32 hint)
+antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 hint)
 {
     pANTLR3_COMMON_TREE_NODE_STREAM stream;
     pANTLR3_COMMON_TOKEN	    token;
@@ -108,12 +108,7 @@ antlr3CommonTreeNodeStreamNew(ANTLR3_UINT32 hint)
 
      /* String factory for tree walker
      */
-    stream->stringFactory		= antlr3StringFactoryNew();
-
-    if	(stream->stringFactory == (pANTLR3_STRING_FACTORY) ANTLR3_ERR_NOMEM)
-    {
-	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
-    }
+    stream->stringFactory		= strFactory;
 
     /* Create an adaptor for the common tree node stream
      */
@@ -858,7 +853,7 @@ toNodesOnlyString	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 
 	t = ctns->next(ctns);
 
-	buf->append (buf, " ");
+	buf->append8(buf, " ");
 	buf->addi   (buf, t->getType(t));
     }
 
@@ -904,8 +899,8 @@ toStringWork	(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TR
 	{
 	    text = tns->ctns->stringFactory->newRaw(tns->ctns->stringFactory);
 
-	    text->append    (text, " ");
-	    text->addi	    (text, p->getType(p));
+	    text->addc	(text, ' ');
+	    text->addi	(text, p->getType(p));
 	}
 
 	buf->appendS(buf, text);
@@ -920,7 +915,7 @@ toStringWork	(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TR
 
     if	(n > 0 && ! p->isNil(p) )
     {
-	buf->append (buf, " ");
+	buf->addc   (buf, ' ');
 	buf->addi   (buf, ANTLR3_TOKEN_DOWN);
     }
 
@@ -934,7 +929,7 @@ toStringWork	(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TR
 
     if	(n > 0 && ! p->isNil(p) )
     {
-	buf->append (buf, " ");
+	buf->addc   (buf, ' ');
 	buf->addi   (buf, ANTLR3_TOKEN_UP);
     }
 }

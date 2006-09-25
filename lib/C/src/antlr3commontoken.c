@@ -303,6 +303,44 @@ static  pANTLR3_STRING  getText			(pANTLR3_COMMON_TOKEN token)
      */
     return NULL;
 }
+static  void		setText8		(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
+{
+    if	(token->text == NULL)
+    {
+	/* Do we have a string factory to build a new string with?
+	 */
+	if  (token->input == NULL || token->input->strFactory == NULL)
+	{
+	    /* There was no input stream for this token, or
+	     * it did not pay the rent on a string factory.
+	     */
+
+	    /* There was no string factory, therefore, if this is not a factory made
+	     * token, we assume no resizing etc will go on and just set the text as it is given.
+	     */
+	    if	(token->factoryMade == ANTLR3_FALSE)
+	    {
+		token->text	    = (pANTLR3_STRING) ANTLR3_MALLOC(sizeof(ANTLR3_STRING));
+		token->text->len    = (ANTLR3_UINT32)strlen((const char *)text);
+		token->text->size   = token->text->len ;
+		token->text->chars  = text;
+	    }
+	    return;
+	}
+
+	/* We can make a new string from the supplied text then
+	 */
+	token->text = token->input->strFactory->newStr8(token->input->strFactory, text);
+    }
+    else
+    {
+	token->text->set8(token->text, (const char *)text);
+    }
+
+    /* We are done 
+     */
+    return;
+}
 
 static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
 {
@@ -331,7 +369,7 @@ static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
 
 	/* We can make a new string from the supplied text then
 	 */
-	token->text = token->input->strFactory->newPtr(token->input->strFactory, text, (ANTLR3_UINT32)strlen((const char *)text));
+	token->text = token->input->strFactory->newStr(token->input->strFactory, text);
     }
     else
     {
@@ -435,23 +473,23 @@ static  pANTLR3_STRING    toString		(pANTLR3_COMMON_TOKEN token)
      * the reporting string
      * return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
      */
-    outtext->append (outtext, "[@");
+    outtext->append8(outtext, "[@");
     outtext->addi   (outtext, (ANTLR3_INT32)token->getTokenIndex(token));
-    outtext->append (outtext, " (");
+    outtext->append8(outtext, " (");
     outtext->addi   (outtext, (ANTLR3_INT32)token->getStartIndex(token));
     outtext->addc   (outtext, ':');
     outtext->addi   (outtext, (ANTLR3_INT32)token->getStopIndex(token));
-    outtext->append (outtext, ") ='");
+    outtext->append8(outtext, ") ='");
     outtext->appendS(outtext, text);
-    outtext->append (outtext, "', <");
+    outtext->append8(outtext, "', <");
     outtext->addi   (outtext, token->type);
-    outtext->append (outtext, "> ");
+    outtext->append8(outtext, "> ");
 
     if	(token->getChannel(token) > ANTLR3_TOKEN_DEFAULT_CHANNEL)
     {
-	outtext->append	(outtext, "(channel = ");
+	outtext->append8(outtext, "(channel = ");
 	outtext->addi	(outtext, (ANTLR3_INT32)token->getChannel(token));
-	outtext->append	(outtext, ") ");
+	outtext->append8(outtext, ") ");
     }
 
     outtext->addi   (outtext, (ANTLR3_INT32)token->getLine(token));

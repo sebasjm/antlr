@@ -29,10 +29,14 @@ static  ANTLR3_UINT64   getTokenStopIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pA
 /** Create a new tree adaptor. Note that despite the fact that this is
  *  creating a new COMMON_TREE adaptor, we return the address of the
  *  BASE_TREE interface, as should any other adaptor that wishes to be 
- *  used as the tree element of a tree parse/build.
+ *  used as the tree element of a tree parse/build. It needs to be given the
+ *  address of a valid string factory as we do not known that the originating
+ *  input stream encoding type was. This way we can rely on just using
+ *  the original input stream's string factory or one of the correct type
+ *  which the user supplies us.
  */
 ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR
-ANTLR3_TREE_ADAPTORNew()
+ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
 {
     pANTLR3_COMMON_TREE_ADAPTOR	cta;
 
@@ -67,11 +71,11 @@ ANTLR3_TREE_ADAPTORNew()
 
     /* Install a tree factory for creating new tree nodes
      */
-    cta->arboretum  = antlr3ArboretumNew();
+    cta->arboretum  = antlr3ArboretumNew(strFactory);
 
     /* Allow the base tree adaptor to share the tree factory's string factory.
      */
-    cta->baseAdaptor.strFactory	= cta->arboretum->unTruc.baseTree.strFactory;
+    cta->baseAdaptor.strFactory	= strFactory;
 
     /* Return the address of the base adaptor interface.
      */
@@ -124,7 +128,7 @@ createToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR
 	/* Create the text using our own string factory to avoid complicating
 	 * commontoken.
 	 */
-	newToken->text	= adaptor->strFactory->newPtr(adaptor->strFactory, text, (ANTLR3_UINT32)strlen((const char *)text));
+	newToken->text	= adaptor->strFactory->newStr8(adaptor->strFactory, text);
     }
 
     return  newToken;

@@ -5,37 +5,49 @@
 
 /* Factory API
  */
-static    pANTLR3_STRING    newRaw	(pANTLR3_STRING_FACTORY factory);
-static    pANTLR3_STRING    newSize	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size);
-static    pANTLR3_STRING    newPtr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
+static    pANTLR3_STRING    newRaw8	(pANTLR3_STRING_FACTORY factory);
+static    pANTLR3_STRING    newRaw16	(pANTLR3_STRING_FACTORY factory);
+static    pANTLR3_STRING    newSize8	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size);
+static    pANTLR3_STRING    newSize16	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size);
 static    pANTLR3_STRING    newPtr8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
-static    pANTLR3_STRING    newStr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string);
+static    pANTLR3_STRING    newPtr16_8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
+static    pANTLR3_STRING    newPtr16_16	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
 static    pANTLR3_STRING    newStr8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string);
+static    pANTLR3_STRING    newStr16_8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string);
+static    pANTLR3_STRING    newStr16_16	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string);
 static    void		    destroy	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
-static    pANTLR3_STRING    printable	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
+static    pANTLR3_STRING    printable8	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
+static    pANTLR3_STRING    printable16	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
 static    void		    close	(pANTLR3_STRING_FACTORY factory);
 
 /* String API
  */
-static    pANTLR3_UINT8	    set		(pANTLR3_STRING string, const char * chars);
 static    pANTLR3_UINT8	    set8	(pANTLR3_STRING string, const char * chars);
-static    pANTLR3_UINT8	    append	(pANTLR3_STRING string, const char * newbit);
+static    pANTLR3_UINT8	    set16_8	(pANTLR3_STRING string, const char * chars);
+static    pANTLR3_UINT8	    set16_16	(pANTLR3_STRING string, const char * chars);
 static    pANTLR3_UINT8	    append8	(pANTLR3_STRING string, const char * newbit);
-static	  pANTLR3_UINT8	    insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit);
+static    pANTLR3_UINT8	    append16_8	(pANTLR3_STRING string, const char * newbit);
+static    pANTLR3_UINT8	    append16_16	(pANTLR3_STRING string, const char * newbit);
 static	  pANTLR3_UINT8	    insert8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit);
+static	  pANTLR3_UINT8	    insert16_8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit);
+static	  pANTLR3_UINT8	    insert16_16	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit);
 
 static    pANTLR3_UINT8	    setS	(pANTLR3_STRING string, pANTLR3_STRING chars);
 static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbit);
 static	  pANTLR3_UINT8	    insertS	(pANTLR3_STRING string, ANTLR3_UINT32 point, pANTLR3_STRING newbit);
 
-static    pANTLR3_UINT8	    addc	(pANTLR3_STRING string, ANTLR3_UINT32 c);
-static    pANTLR3_UINT8	    addi	(pANTLR3_STRING string, ANTLR3_INT32 i);
-static	  pANTLR3_UINT8	    inserti	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i);
+static    pANTLR3_UINT8	    addc8	(pANTLR3_STRING string, ANTLR3_UINT32 c);
+static    pANTLR3_UINT8	    addc16	(pANTLR3_STRING string, ANTLR3_UINT32 c);
+static    pANTLR3_UINT8	    addi8	(pANTLR3_STRING string, ANTLR3_INT32 i);
+static    pANTLR3_UINT8	    addi16	(pANTLR3_STRING string, ANTLR3_INT32 i);
+static	  pANTLR3_UINT8	    inserti8	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i);
+static	  pANTLR3_UINT8	    inserti16	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i);
 
 /* Local helpers
  */
-static	void	stringInit  (pANTLR3_STRING string);
-static	void	stringFree  (pANTLR3_STRING string);
+static	void	stringInit8	(pANTLR3_STRING string);
+static	void	stringInit16	(pANTLR3_STRING string);
+static	void	stringFree	(pANTLR3_STRING string);
 
 ANTLR3_API pANTLR3_STRING_FACTORY 
 antlr3StringFactoryNew()
@@ -63,14 +75,17 @@ antlr3StringFactoryNew()
 	return	(pANTLR3_STRING_FACTORY)(ANTLR3_ERR_NOMEM);
     }
 
-    /* Install the API
+    /* Install the API (8 bit assumed)
      */
-    factory->newRaw	= ANTLR3_API_FUNC newRaw;
-    factory->newPtr	= ANTLR3_API_FUNC newPtr;
-    factory->newStr	= ANTLR3_API_FUNC newStr;
-    factory->newSize	= ANTLR3_API_FUNC newSize;
+    factory->newRaw	= ANTLR3_API_FUNC newRaw8;
+    factory->newSize	= ANTLR3_API_FUNC newSize8;
+
+    factory->newPtr	= ANTLR3_API_FUNC newPtr8;
+    factory->newPtr8	= ANTLR3_API_FUNC newPtr8;
+    factory->newStr	= ANTLR3_API_FUNC newStr8;
+    factory->newStr8	= ANTLR3_API_FUNC newStr8;
     factory->destroy	= ANTLR3_API_FUNC destroy;
-    factory->printable	= ANTLR3_API_FUNC printable;
+    factory->printable	= ANTLR3_API_FUNC printable8;
     factory->destroy	= ANTLR3_API_FUNC destroy;
     factory->close	= ANTLR3_API_FUNC close;
 
@@ -84,16 +99,32 @@ antlr3UCS2StringFactoryNew()
 {
      pANTLR3_STRING_FACTORY  factory;
 
-    /* Allocate an 8 bit faCTORY
+    /* Allocate an 8 bit factory, then override with 16 bit UCS2 functions where we 
+     * need to.
      */
-    factory	= (pANTLR3_STRING_FACTORY) ANTLR3_MALLOC(sizeof(ANTLR3_STRING_FACTORY));
+    factory	= antlr3StringFactoryNew();
 
     if	(factory == NULL)
     {
 	return	(pANTLR3_STRING_FACTORY)(ANTLR3_ERR_NOMEM);
     }
 
-    // In progress...
+    /* Override the 8 bit API with the UCS2 (mostly just 16 bit) API
+     */
+    factory->newRaw	= ANTLR3_API_FUNC newRaw16;
+    factory->newSize	= ANTLR3_API_FUNC newSize16;
+
+    factory->newPtr	= ANTLR3_API_FUNC newPtr16_16;
+    factory->newPtr8	= ANTLR3_API_FUNC newPtr16_8;
+    factory->newStr	= ANTLR3_API_FUNC newStr16_16;
+    factory->newStr8	= ANTLR3_API_FUNC newStr16_8;
+    factory->printable	= ANTLR3_API_FUNC printable16;
+
+    factory->destroy	= ANTLR3_API_FUNC destroy;
+    factory->destroy	= ANTLR3_API_FUNC destroy;
+    factory->close	= ANTLR3_API_FUNC close;
+
+    return  factory;
 }
 
 /**
@@ -102,7 +133,7 @@ antlr3UCS2StringFactoryNew()
  * \return 
  */
 static    pANTLR3_STRING    
-newRaw	(pANTLR3_STRING_FACTORY factory)
+newRaw8	(pANTLR3_STRING_FACTORY factory)
 {
     pANTLR3_STRING  string;
 
@@ -115,7 +146,7 @@ newRaw	(pANTLR3_STRING_FACTORY factory)
 
     /* Structure is allocated, now fill in the API etc.
      */
-    stringInit(string);
+    stringInit8(string);
     string->factory = factory;
 
     /* Add the string into the allocated list
@@ -125,7 +156,35 @@ newRaw	(pANTLR3_STRING_FACTORY factory)
 
     return string;
 }
+/**
+ *
+ * \param factory 
+ * \return 
+ */
+static    pANTLR3_STRING    
+newRaw16	(pANTLR3_STRING_FACTORY factory)
+{
+    pANTLR3_STRING  string;
 
+    string  = (pANTLR3_STRING) ANTLR3_MALLOC(sizeof(ANTLR3_STRING));
+
+    if	(string == NULL)
+    {
+	return	(pANTLR3_STRING)(ANTLR3_ERR_NOMEM);
+    }
+
+    /* Structure is allocated, now fill in the API etc.
+     */
+    stringInit16(string);
+    string->factory = factory;
+
+    /* Add the string into the allocated list
+     */
+    factory->strings->put(factory->strings, factory->index, (void *) string, ANTLR3_API_FUNC stringFree);
+    string->index   = factory->index++;
+
+    return string;
+}
 static	void	stringFree  (pANTLR3_STRING string)
 {
     /* First free the string itself if there was anything in it
@@ -147,7 +206,66 @@ static	void	stringFree  (pANTLR3_STRING string)
  * \return 
  */
 static	void
-stringInit  (pANTLR3_STRING string)
+stringInit8  (pANTLR3_STRING string)
+{
+    string->len	    = 0;
+    string->size    = 0;
+    string->chars   = NULL;
+
+    /* API for 8 bit strings*/
+
+    string->set	    = set8;
+    string->set8    = set8;
+    string->append  = append8;
+    string->append8 = append8;
+    string->insert  = insert8;
+    string->insert8 = insert8;
+    string->addi    = addi8;
+    string->inserti = inserti8;
+    string->addc    = addc8;
+    
+    string->setS    = setS;
+    string->appendS = appendS;
+    string->insertS = insertS;
+
+}
+/**
+ *
+ * \param string 
+ * \return 
+ */
+static	void
+stringInit16  (pANTLR3_STRING string)
+{
+    string->len	    = 0;
+    string->size    = 0;
+    string->chars   = NULL;
+
+    /* API for 16 bit strings */
+
+    string->set	    = set16_16;
+    string->set8    = set16_8;
+    string->append  = append16_16;
+    string->append8 = append16_8;
+    string->insert  = insert16_16;
+    string->insert8 = insert16_8;
+
+    string->addi    = addi16;
+    string->inserti = inserti16;
+    string->addc    = addc16;
+
+    string->setS    = setS;
+    string->appendS = appendS;
+    string->insertS = insertS;
+}
+/**
+ *
+ * \param string 
+ * \return 
+ * TODO: Implement UTF-8
+ */
+static	void
+stringInitUTF8  (pANTLR3_STRING string)
 {
     string->len	    = 0;
     string->size    = 0;
@@ -155,29 +273,17 @@ stringInit  (pANTLR3_STRING string)
 
     /* API */
 
-    string->set	    = set;
-    string->append  = append;
-    string->insert  = insert;
-
-    string->setS    = setS;
-    string->appendS = appendS;
-    string->insertS = insertS;
-
-    string->addi    = addi;
-    string->inserti = inserti;
-
-    string->addc    = addc;
-
 }
 
 /**
+ * Creates a new string with enough capacity for size 8 bit characters plus a terminator.
  *
- * \param factory 
- * \param size 
- * \return 
+ * \param[in] factory - POitner to the string factory that owns strings
+ * \param[in] size - In characters
+ * \return pointer to the new string.
  */
 static    pANTLR3_STRING    
-newSize	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
+newSize8	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
 {
     pANTLR3_STRING  string;
 
@@ -190,14 +296,46 @@ newSize	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
 
     /* Always add one more byte for a terminator ;-)
      */
-    string->chars   = (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)size+1);
+    string->chars   = (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_UINT8) * (size+1)));
+    string->size    = size + 1;
+
+    return string;
+}
+/**
+ * Creates a new string with enough capacity for size 18 bit characters plus a terminator.
+ *
+ * \param[in] factory - POitner to the string factory that owns strings
+ * \param[in] size - In characters
+ * \return pointer to the new string.
+ */
+static    pANTLR3_STRING    
+newSize16	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
+{
+    pANTLR3_STRING  string;
+
+    string  = factory->newRaw(factory);
+
+    if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    {
+	return	string;
+    }
+
+    /* Always add one more byte for a terminator ;-)
+     */
+    string->chars   = (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_UINT16) * (size+1)));
     string->size    = size + 1;
 
     return string;
 }
 
+/** Creates a new 8 bit string initialized with the 8 bit characters at the 
+ *  supplied ptr, of pre-determined size.
+ * \param[in] factory - Pointer to the string factory that owns the strings
+ * \param[in] ptr - Pointer to 8 bit encoded characters
+ * \return pointer to the new string
+ */
 static    pANTLR3_STRING    
-newPtr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size)
+newPtr8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size)
 {
     pANTLR3_STRING  string;
 
@@ -223,10 +361,129 @@ newPtr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size)
     return  string;
 }
 
+/** Creates a new 16 bit string initialized with the 8 bit characters at the 
+ *  supplied 8 bit character ptr, of pre-determined size.
+ * \param[in] factory - Pointer to the string factory that owns the strings
+ * \param[in] ptr - Pointer to 8 bit encoded characters
+ * \return pointer to the new string
+ */
 static    pANTLR3_STRING    
-newStr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr)
+newPtr16_8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size)
 {
-    return factory->newPtr(factory, ptr, (ANTLR3_UINT32)strlen((const char *)ptr));
+    pANTLR3_STRING  string;
+
+    string  = factory->newSize(factory, size);
+
+    if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    {
+	return	string;
+    }
+
+    if	(size <= 0)
+    {
+	return	string;
+    }
+
+    if	(ptr != NULL)
+    {
+	pANTLR3_UINT16	    out;
+
+	out = (pANTLR3_UINT16)(string->chars);
+
+	while	(size-- > 0)
+	{
+	    *out++ = (ANTLR3_UINT16)(*ptr++);
+	}
+
+	/* Terminate, these strings are usually used for Token streams and printing etc.	
+	 */
+	*(((pANTLR3_UINT16)(string->chars)) + size) = '\0';
+
+	string->len = size;
+    }
+
+    return  string;
+}
+
+/** Creates a new 16 bit string initialized with the 16 bit characters at the 
+ *  supplied ptr, of pre-determined size.
+ * \param[in] factory - Pointer to the string factory that owns the strings
+ * \param[in] ptr - Pointer to 16 bit encoded characters
+ * \return pointer to the new string
+ */
+static    pANTLR3_STRING    
+newPtr16_16	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size)
+{
+    pANTLR3_STRING  string;
+
+    string  = factory->newSize(factory, size);
+
+    if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    {
+	return	string;
+    }
+
+    if	(size <= 0)
+    {
+	return	string;
+    }
+
+    if	(ptr != NULL)
+    {
+	ANTLR3_MEMMOVE(string->chars, (const void *)ptr, (size * sizeof(ANTLR3_UINT16)));
+
+	/* Terminate, these strings are usually used for Token streams and printing etc.	
+	 */
+	*(((pANTLR3_UINT16)(string->chars)) + size) = '\0';	    
+	string->len = size;
+    }
+
+    return  string;
+}
+
+/** Create a new 8 bit string from the supplied, null terminated, 8 bit string pointer.
+ * \param[in] factory - Pointer to the string factory that owns strings.
+ * \param[in] ptr - Pointer to the 8 bit encoded string
+ * \return Pointer to the newly initialized string
+ */
+static    pANTLR3_STRING    
+newStr8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr)
+{
+    return factory->newPtr8(factory, ptr, (ANTLR3_UINT32)strlen((const char *)ptr));
+}
+
+/** Create a new 16 bit string from the supplied, null terminated, 8 bit string pointer.
+ * \param[in] factory - Pointer to the string factory that owns strings.
+ * \param[in] ptr - Pointer to the 8 bit encoded string
+ * \return POinter to the newly initialized string
+ */
+static    pANTLR3_STRING    
+newStr16_8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr)
+{
+    return factory->newPtr8(factory, ptr, (ANTLR3_UINT32)strlen((const char *)ptr));
+}
+
+/** Create a new 16 bit string from the supplied, null terminated, 16 bit string pointer.
+ * \param[in] factory - Pointer to the string factory that owns strings.
+ * \param[in] ptr - Pointer to the 16 bit encoded string
+ * \return Pointer to the newly initialized string
+ */
+static    pANTLR3_STRING    
+newStr16_16	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr)
+{
+    pANTLR3_UINT16  in;
+    ANTLR3_UINT32   count;
+
+    /** First, determine the length of the input string
+     */
+    in	    = (pANTLR3_UINT16)ptr;
+    count   = 0;
+
+    while   (*in++ != '\0')
+    {
+	count++;
+    }
+    return factory->newPtr(factory, ptr, count);
 }
 
 static    void		    
@@ -236,7 +493,7 @@ destroy	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string)
 }
 
 static    pANTLR3_STRING    
-printable(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
+printable8(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
 {
     pANTLR3_STRING  string;
     
@@ -264,12 +521,7 @@ printable(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
 	else if (*(instr->chars + i) == '\r')
 	{
 	    *scannedText++ = '\\';
-	    *scannedText++ = 'n';
-	}
-	else if (*(instr->chars + i) == '\r')
-	{
-	    *scannedText++ = '\\';
-	    *scannedText++ = 'n';
+	    *scannedText++ = 'r';
 	}
 	else if	(!isprint(*(instr->chars +i)))
 	{
@@ -283,6 +535,61 @@ printable(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
     *scannedText  = '\0';
 
     string->len	= (ANTLR3_UINT32)(scannedText - string->chars);
+    
+    return  string;
+}
+
+static    pANTLR3_STRING    
+printable16(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
+{
+    pANTLR3_STRING  string;
+    
+    /* We don't need to be too efficient here, this is mostly for error messages and so on.
+     */
+    pANTLR3_UINT16  scannedText;
+    pANTLR3_UINT16  inText;
+    ANTLR3_UINT32   i;
+    ANTLR3_UINT32   outLen;
+
+    /* Assume we need as much as twice as much space to parse out the control characters
+     */
+    string  = factory->newSize(factory, instr->len *2 + 1);
+
+    /* Scan through and replace unprintable (in terms of this routine)
+     * characters
+     */
+    scannedText = (pANTLR3_UINT16)(string->chars);
+    inText	= (pANTLR3_UINT16)(instr->chars);
+    outLen	= 0;
+
+    for	(i = 0; i < instr->len; i++)
+    {
+	if (*(inText + i) == '\n')
+	{
+	    *scannedText++   = '\\';
+	    *scannedText++   = 'n';
+	    outLen	    += 2;
+	}
+	else if (*(inText + i) == '\r')
+	{
+	    *scannedText++   = '\\';
+	    *scannedText++   = 'r';
+	    outLen	    += 2;
+	}
+	else if	(!isprint(*(inText +i)))
+	{
+	    *scannedText++ = '?';
+	    outLen++;
+	}
+	else
+	{
+	    *scannedText++ = *(inText + i);
+	    outLen++;
+	}
+    }
+    *scannedText  = '\0';
+
+    string->len	= outLen;
     
     return  string;
 }
@@ -301,7 +608,7 @@ close	(pANTLR3_STRING_FACTORY factory)
 }
 
 static    pANTLR3_UINT8   
-append	(pANTLR3_STRING string, const char * newbit)
+append8	(pANTLR3_STRING string, const char * newbit)
 {
     ANTLR3_UINT32 len;
 
@@ -322,7 +629,55 @@ append	(pANTLR3_STRING string, const char * newbit)
 }
 
 static    pANTLR3_UINT8   
-set	(pANTLR3_STRING string, const char * chars)
+append16_8	(pANTLR3_STRING string, const char * newbit)
+{
+    ANTLR3_UINT32   len;
+    pANTLR3_UINT16  apPoint;
+    ANTLR3_UINT32   count;
+
+    len	= (ANTLR3_UINT32)strlen(newbit);
+
+    if	(string->size < (string->len + len + 1))
+    {
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)((sizeof(ANTLR3_UINT16)*(string->len + len + 1))));
+	string->size	= string->len + len + 1;
+    }
+
+    apPoint = ((pANTLR3_UINT16)string->chars) + string->len;
+    string->len	+= len;
+
+    for	(count = 0; count < string->len; count++)
+    {
+	*apPoint++   = *(newbit + count);
+    }
+    *apPoint = '\0';
+
+    return string->chars;
+}
+
+static    pANTLR3_UINT8   
+append16_16	(pANTLR3_STRING string, const char * newbit)
+{
+    ANTLR3_UINT32 len;
+
+    len	= (ANTLR3_UINT32)strlen(newbit);
+
+    if	(string->size < (string->len + len + 1))
+    {
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)( sizeof(ANTLR3_UINT16) *(string->len + len + 1) ));
+	string->size	= string->len + len + 1;
+    }
+
+    /* Note we copy one more byte than the strlen in order to get the trailing delimiter
+     */
+    ANTLR3_MEMMOVE((void *)(string->chars + string->len), newbit, (ANTLR3_UINT64)(len+1));
+    string->len	+= len;
+
+    return string->chars;
+}
+
+static    pANTLR3_UINT8   
+set8	(pANTLR3_STRING string, const char * chars)
 {
     ANTLR3_UINT32	len;
 
@@ -343,7 +698,63 @@ set	(pANTLR3_STRING string, const char * chars)
 }
 
 static    pANTLR3_UINT8   
-addc	(pANTLR3_STRING string, ANTLR3_UINT32 c)
+set16_8	(pANTLR3_STRING string, const char * chars)
+{
+    ANTLR3_UINT32	len;
+    ANTLR3_UINT32	count;
+    pANTLR3_UINT16	apPoint;
+
+    len = (ANTLR3_UINT32)strlen(chars);
+    if	(string->size < len + 1)
+    {
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(len + 1)));
+	string->size	= len + 1;
+    }
+    apPoint = ((pANTLR3_UINT16)string->chars);
+    string->len	= len;
+
+    for	(count = 0; count < string->len; count++)
+    {
+	*apPoint++   = *(chars + count);
+    }
+    *apPoint = '\0';
+
+    return  string->chars;
+}
+
+static    pANTLR3_UINT8   
+set16_16    (pANTLR3_STRING string, const char * chars)
+{
+    ANTLR3_UINT32   len;
+    pANTLR3_UINT16  in;
+
+    /** First, determine the length of the input string
+     */
+    in	    = (pANTLR3_UINT16)chars;
+    len   = 0;
+
+    while   (*in++ != '\0')
+    {
+	len++;
+    }
+
+    if	(string->size < len + 1)
+    {
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(len + 1)));
+	string->size	= len + 1;
+    }
+
+    /* Note we copy one more byte than the strlen in order to get the trailing '\0'
+     */
+    ANTLR3_MEMMOVE((void *)(string->chars), chars, (ANTLR3_UINT64)(len * sizeof(ANTLR3_UINT16)));
+    string->len	    = len;
+
+    return  string->chars;
+
+}
+
+static    pANTLR3_UINT8   
+addc8	(pANTLR3_STRING string, ANTLR3_UINT32 c)
 {
     if	(string->size < string->len + 2)
     {
@@ -358,26 +769,62 @@ addc	(pANTLR3_STRING string, ANTLR3_UINT32 c)
 }
 
 static    pANTLR3_UINT8   
-addi	(pANTLR3_STRING string, ANTLR3_INT32 i)
+addc16	(pANTLR3_STRING string, ANTLR3_UINT32 c)
+{
+    pANTLR3_UINT16  ptr;
+
+    if	(string->size < string->len + 2)
+    {
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16) * (string->len + 2)));
+	string->size	= string->len + 2;
+    }
+    ptr	= (pANTLR3_UINT16)(string->chars);
+
+    *(ptr + string->len)	= (ANTLR3_UINT16)c;
+    *(ptr + string->len + 1)	= '\0';
+    string->len++;
+
+    return  string->chars;
+}
+
+static    pANTLR3_UINT8   
+addi8	(pANTLR3_STRING string, ANTLR3_INT32 i)
 {
     ANTLR3_UINT8	    newbit[32];
 
     sprintf((char *)newbit, "%d", i);
 
-    return  string->append(string, (const char *)newbit);
+    return  string->append8(string, (const char *)newbit);
+}
+static    pANTLR3_UINT8   
+addi16	(pANTLR3_STRING string, ANTLR3_INT32 i)
+{
+    ANTLR3_UINT8	    newbit[32];
+
+    sprintf((char *)newbit, "%d", i);
+
+    return  string->append8(string, (const char *)newbit);
 }
 
 static	  pANTLR3_UINT8
-inserti	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i)
+inserti8    (pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i)
 {
     ANTLR3_UINT8	    newbit[32];
 
     sprintf((char *)newbit, "%d", i);
-    return  string->insert(string, point, (const char *)newbit);
+    return  string->insert8(string, point, (const char *)newbit);
+}
+static	  pANTLR3_UINT8
+inserti16    (pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i)
+{
+    ANTLR3_UINT8	    newbit[32];
+
+    sprintf((char *)newbit, "%d", i);
+    return  string->insert8(string, point, (const char *)newbit);
 }
 
 static	pANTLR3_UINT8
-insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
+insert8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
 {
     ANTLR3_UINT32	len;
 
@@ -412,10 +859,97 @@ insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
     return  string->chars;
 }
 
+static	pANTLR3_UINT8
+insert16_8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
+{
+    ANTLR3_UINT32	len;
+    ANTLR3_UINT32	count;
+    pANTLR3_UINT16	inPoint;
+
+    if	(point >= string->len)
+    {
+	return	string->append8(string, newbit);
+    }
+ 
+    len	= (ANTLR3_UINT32)strlen(newbit);
+
+    if	(len == 0)
+    {
+	return	string->chars;
+    }
+
+    if	(string->size < (string->len + len + 1))
+    {
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(string->len + len + 1)));
+	string->size	= string->len + len + 1;
+    }
+
+    /* Move the characters we are inserting before, including the delimiter
+     */
+    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + point + len), (void *)(((pANTLR3_UINT16)string->chars) + point), (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(string->len - point)));
+
+    string->len += len;
+    
+    inPoint = ((pANTLR3_UINT16)(string->chars))+point;
+    for	(count = 0; count<len; count++)
+    {
+	*(inPoint + count) = (ANTLR3_UINT16)(*(newbit+count));
+    }
+
+    return  string->chars;
+}
+
+static	pANTLR3_UINT8
+insert16_16	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
+{
+    ANTLR3_UINT32	len;
+    pANTLR3_UINT16	in;
+
+    if	(point >= string->len)
+    {
+	return	string->append(string, newbit);
+    }
+ 
+    /** First, determine the length of the input string
+     */
+    in	    = (pANTLR3_UINT16)newbit;
+    len	    = 0;
+
+    while   (*in++ != '\0')
+    {
+	len++;
+    }
+
+    if	(len == 0)
+    {
+	return	string->chars;
+    }
+
+    if	(string->size < (string->len + len + 1))
+    {
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(string->len + len + 1)));
+	string->size	= string->len + len + 1;
+    }
+
+    /* Move the characters we are inserting before, including the delimiter
+     */
+    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + point + len), (void *)(((pANTLR3_UINT16)string->chars) + point), (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(string->len - point)));
+
+
+    /* Note we copy the exact number of characters
+     */
+    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + point), newbit, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(len)));
+    
+    string->len += len;
+
+    return  string->chars;
+}
+
 static    pANTLR3_UINT8	    setS	(pANTLR3_STRING string, pANTLR3_STRING chars)
 {
-    return  set(string, (const char *)(chars->chars));
+    return  string->set(string, (const char *)(chars->chars));
 }
+
 static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbit)
 {
     /* We may be passed an empty string, in which case we just return the current pointer
@@ -426,10 +960,10 @@ static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbi
     }
     else
     {
-	return  append(string, (const char *)(newbit->chars));
+	return  string->append(string, (const char *)(newbit->chars));
     }
 }
 static	  pANTLR3_UINT8	    insertS	(pANTLR3_STRING string, ANTLR3_UINT32 point, pANTLR3_STRING newbit)
 {
-    return  insert(string, point, (const char *)(newbit->chars));
+    return  string->insert(string, point, (const char *)(newbit->chars));
 }

@@ -36,11 +36,11 @@ antlr3BaseTreeNew(pANTLR3_BASE_TREE  tree)
     tree->dupTree	    = ANTLR3_API_FUNC dupTree;
     tree->toStringTree	    = ANTLR3_API_FUNC toStringTree;
     tree->createChildrenList= ANTLR3_API_FUNC createChildrenList;
+    
     tree->getCharPositionInLine
 			    = ANTLR3_API_FUNC getCharPositionInLine;
-    tree->getLine
-			    = ANTLR3_API_FUNC getLine;
-   
+    tree->getLine	    = ANTLR3_API_FUNC getLine;
+
     tree->getFirstChildWithType
 			    = ANTLR3_API_FUNC getFirstChildWithType;
     tree->children	    = NULL;
@@ -280,9 +280,9 @@ toStringTree	(pANTLR3_BASE_TREE tree)
 
     if	(tree->isNil(tree) == ANTLR3_FALSE)
     {
-	string->append	(string, "(");
+	string->append8	(string, "(");
 	string->appendS	(string, tree->toString(tree));
-	string->append	(string, " ");
+	string->append8	(string, " ");
     }
     if	(tree->children != NULL)
     {
@@ -294,14 +294,14 @@ toStringTree	(pANTLR3_BASE_TREE tree)
     	
 	    if  (i > 0)
 	    {
-		string->append(string, " ");
+		string->append8(string, " ");
 	    }
 	    string->appendS(string, t->toStringTree(t));
 	}
     }
     if	(tree->isNil(tree) == ANTLR3_FALSE)
     {
-	string->append(string,")");
+	string->append8(string,")");
     }
 
     return  string;

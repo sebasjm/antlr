@@ -140,11 +140,20 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
     /** Pointer to a function that 'might' be able to set the text associated
      *  with a token. Imaginary tokens such as an ANTLR3_CLASSIC_TOKEN may actually
      *  do this, however many tokens such as ANTLR3_COMMON_TOKEN do not actaully have
-     *  strings associated with them but just poit into the current input stream. These
+     *  strings associated with them but just point into the current input stream. These
      *  tokens will implement this function with a function that errors out (probably
      *  drastically.
      */
     void	    (*setText)(struct ANTLR3_COMMON_TOKEN_struct * token, pANTLR3_UINT8 text);
+
+    /** Pointer to a function that 'might' be able to set the text associated
+     *  with a token. Imaginary tokens such as an ANTLR3_CLASSIC_TOKEN may actually
+     *  do this, however many tokens such as ANTLR3_COMMON_TOKEN do not actully have
+     *  strings associated with them but just point into the current input stream. These
+     *  tokens will implement this function with a function that errors out (probably
+     *  drastically.
+     */
+    void	    (*setText8)(struct ANTLR3_COMMON_TOKEN_struct * token, pANTLR3_UINT8 text);
 
     /** Pointer to a function that returns the token type of this token
      */

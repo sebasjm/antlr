@@ -39,7 +39,7 @@ pANTLR3_BASE_TREE_ADAPTOR	adaptor;
  */
 @genericParser.apifuncs() ::= <<
 <if(PARSER)>
-ctx->adaptor	= ANTLR3_TREE_ADAPTORNew();
+ctx->adaptor	= ANTLR3_TREE_ADAPTORNew(theInput()->strFactory);
 <else>
 ctx->adaptor	= instream->adaptor;
 <endif>

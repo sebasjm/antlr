@@ -25,7 +25,7 @@ static pANTLR3_BASE_TREE    newFromToken		(pANTLR3_ARBORETUM factory, pANTLR3_CO
 static void		    factoryClose		(pANTLR3_ARBORETUM factory);
 
 ANTLR3_API pANTLR3_ARBORETUM
-antlr3ArboretumNew()
+antlr3ArboretumNew(pANTLR3_STRING_FACTORY strFactory)
 {
     pANTLR3_ARBORETUM   factory;
 
@@ -60,7 +60,7 @@ antlr3ArboretumNew()
      * that we can use later for converting trees to strings.
      */
     factory->unTruc.factoryMade		= ANTLR3_TRUE;
-    factory->unTruc.baseTree.strFactory	= antlr3StringFactoryNew();
+    factory->unTruc.baseTree.strFactory	= strFactory;
     
     return  factory;
 
