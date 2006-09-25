@@ -8,7 +8,9 @@
 static    pANTLR3_STRING    newRaw	(pANTLR3_STRING_FACTORY factory);
 static    pANTLR3_STRING    newSize	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size);
 static    pANTLR3_STRING    newPtr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
+static    pANTLR3_STRING    newPtr8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
 static    pANTLR3_STRING    newStr	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string);
+static    pANTLR3_STRING    newStr8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 string);
 static    void		    destroy	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
 static    pANTLR3_STRING    printable	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
 static    void		    close	(pANTLR3_STRING_FACTORY factory);
@@ -16,8 +18,11 @@ static    void		    close	(pANTLR3_STRING_FACTORY factory);
 /* String API
  */
 static    pANTLR3_UINT8	    set		(pANTLR3_STRING string, const char * chars);
+static    pANTLR3_UINT8	    set8	(pANTLR3_STRING string, const char * chars);
 static    pANTLR3_UINT8	    append	(pANTLR3_STRING string, const char * newbit);
+static    pANTLR3_UINT8	    append8	(pANTLR3_STRING string, const char * newbit);
 static	  pANTLR3_UINT8	    insert	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit);
+static	  pANTLR3_UINT8	    insert8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit);
 
 static    pANTLR3_UINT8	    setS	(pANTLR3_STRING string, pANTLR3_STRING chars);
 static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbit);
@@ -71,7 +76,26 @@ antlr3StringFactoryNew()
 
     return  factory;
 }
- 
+
+/** Create a string factory that is UCS2 (16 bit) encodingn based
+ */
+ANTLR3_API pANTLR3_STRING_FACTORY 
+antlr3UCS2StringFactoryNew()
+{
+     pANTLR3_STRING_FACTORY  factory;
+
+    /* Allocate an 8 bit faCTORY
+     */
+    factory	= (pANTLR3_STRING_FACTORY) ANTLR3_MALLOC(sizeof(ANTLR3_STRING_FACTORY));
+
+    if	(factory == NULL)
+    {
+	return	(pANTLR3_STRING_FACTORY)(ANTLR3_ERR_NOMEM);
+    }
+
+    // In progress...
+}
+
 /**
  *
  * \param factory 

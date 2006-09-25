@@ -47,6 +47,16 @@ antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
      */
     input->strFactory	= antlr3StringFactoryNew();
 
+    /* Default stream set up is for ASCII, therefore ther eis nothign else
+     * to do but set it up as such
+     */
+    antlr3GenericSetupStream(input, type);
+}
+
+void
+antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
+{
+
     /* Install function pointers for an 8 bit ASCII input
      */
 
@@ -189,7 +199,7 @@ antlr3AsciiConsume(pANTLR3_INT_STREAM is)
 
     input   = ((pANTLR3_INPUT_STREAM) (is->super));
 
-    if	((pANTLR3_UCHAR)(input->nextChar) < (((pANTLR3_UCHAR)input->data) + input->sizeBuf))
+    if	((pANTLR3_UINT8)(input->nextChar) < (((pANTLR3_UINT8)input->data) + input->sizeBuf))
     {	
 	/* Indicate one more character in this line
 	 */
@@ -201,7 +211,7 @@ antlr3AsciiConsume(pANTLR3_INT_STREAM is)
 	     */
 	    input->line++;
 	    input->charPositionInLine	= 0;
-	    input->currentLine		= (void *)(((pANTLR3_INT8)input->nextChar) + 1);
+	    input->currentLine		= (void *)(((pANTLR3_UINT8)input->nextChar) + 1);
 	}
 
 	/* Increment to next character position
@@ -266,7 +276,7 @@ antlr3AsciiIndex(pANTLR3_INT_STREAM is)
 
     input   = ((pANTLR3_INPUT_STREAM) (is->super));
 
-    return  (ANTLR3_INT64)(((pANTLR3_INT8)input->nextChar) - ((pANTLR3_INT8)input->data));
+    return  (ANTLR3_INT64)(((pANTLR3_UINT8)input->nextChar) - ((pANTLR3_UINT8)input->data));
 }
 
 /** \brief Return the size of the current input stream, as an Ascii file

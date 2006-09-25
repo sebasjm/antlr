@@ -239,6 +239,7 @@ ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringCopyStream	(pANTLR3_UINT
 ANTLR3_API pANTLR3_INT_STREAM	    antlr3IntStreamNew		    ();
 
 ANTLR3_API pANTLR3_STRING_FACTORY   antlr3StringFactoryNew	    ();
+ANTLR3_API pANTLR3_STRING_FACTORY   antlr3UCS2StringFactoryNew	    ();
 
 ANTLR3_API pANTLR3_COMMON_TOKEN	    antlr3CommonTokenNew	    (ANTLR3_UINT32 ttype);
 ANTLR3_API pANTLR3_TOKEN_FACTORY    antlr3TokenFactoryNew	    (pANTLR3_INPUT_STREAM input);
