@@ -234,6 +234,7 @@ ANTLR3_API void			  * ANTLR3_MEMSET		    (void * target, ANTLR3_UINT8 byte, ANTL
 
 
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
+ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewUCS2StringInPlaceStream	(pANTLR3_UINT16 inString, ANTLR3_UINT64 size, pANTLR3_UINT16 name);
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringCopyStream	(pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
 
 ANTLR3_API pANTLR3_INT_STREAM	    antlr3IntStreamNew		    ();

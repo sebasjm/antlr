@@ -207,6 +207,7 @@ typedef	struct	ANTLR3_LEX_STATE_struct
     /* Prototypes 
      */
     void	    antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type);
+    void	    antlr3UCS2SetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type);
     void	    antlr3GenericSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type);
 
 #endif	/* _ANTLR3_INPUT_H  */

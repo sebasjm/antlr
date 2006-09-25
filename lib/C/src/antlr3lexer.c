@@ -274,6 +274,14 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
 	lexer->tokFactory	= antlr3TokenFactoryNew(input);
     }
 
+    /* Propagate the string factory so that we preserve the encoding form from
+     * the input stream.
+     */
+    if	(lexer->tokSource->strFactory == NULL)
+    {
+	lexer->tokSource->strFactory	= input->strFactory;
+    }
+
     /* Need to create the EOF token
      */
     input->istream->eofToken	= lexer->tokFactory->newToken(lexer->tokFactory);
