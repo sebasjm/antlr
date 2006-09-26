@@ -50,6 +50,8 @@ objcTypeInitMap ::= [
 	default:"nil" // anything other than an atomic type
 ]
 
+className() ::= "<name><if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<endif>Parser<endif>"
+
 /** The overall file structure of a recognizer; stores methods for rules
  *  and cyclic DFAs plus support code.
  */
@@ -63,7 +65,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
 <@imports>
-#import "<name>.h"
+#import "<name><if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<endif>Parser<endif>.h"
 <@end>
 
 <docComment>
@@ -92,7 +94,7 @@ headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 <parserHeaderFile(...)>
 <endif>
 <if(TREE_PARSER)>
-<parserHeaderFile(...)>
+<treeParserHeaderFile(...)>
 <endif>
 >>
 
@@ -111,7 +113,7 @@ lexerHeaderFile() ::=
 #pragma mark Tokens
 <tokens:{#define <name>_<it.name>	<it.type>}; separator="\n">
 
-@interface <name> : ANTLRLexer {
+@interface <className()> : ANTLRLexer {
 	<cyclicDFAs:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
 	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
 	<actions.lexer.ivars>
@@ -139,7 +141,7 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="ANTLRToken *",
 }>
 #pragma mark Rule return scopes end
 */
-@implementation <name>
+@implementation <className()>
 
 <actions.lexer.methods>
 
@@ -218,6 +220,13 @@ filteringNextToken() ::= <<
 
 filteringActionGate() ::= "backtracking==1"
 
+treeParserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
+           recognizer, name, tokens, tokenNames, rules, cyclicDFAs,
+           bitsets, buildTemplate, profile, backtracking, synpreds,
+           memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass="ANTLRTreeParser") ::= <<
+<parserHeaderFile(...)>
+>>
+
 parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
            recognizer, name, tokens, tokenNames, rules, cyclicDFAs,
            bitsets, buildTemplate, profile, backtracking, synpreds,
@@ -240,7 +249,7 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 #pragma mark Rule return scopes end
 
 
-@interface <name> : <@superClassName><superClass><@end> {
+@interface <className()> : <@superClassName><superClass><@end> {
 
 	<cyclicDFAs:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
 	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
@@ -281,16 +290,22 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 <rule.ruleDescriptor:returnScope(ruleDescriptor=rule.ruleDescriptor)>
 }>
 
-@implementation <name>
+@implementation <className()>
 
 + (void) initialize
 {
 	<bitsets:bitsetInit(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
 }
 
+<if(PARSER)>
 - (id) initWithTokenStream:(id\<ANTLRTokenStream>)aStream
 {
 	if ((self = [super initWithTokenStream:aStream])) {
+<else><!TREE_PARSER!>
+- (id) initWithTreeNodeStream:(id\<ANTLRTreeNodeStream>)aStream
+{
+	if ((self = [super initWithTreeNodeStream:aStream])) {
+<endif><\n>
 		tokenNames = [[NSArray alloc] initWithObjects:@"\<invalid>", @"\<EOR>", @"\<DOWN>", @"\<UP>", <tokenNames:{@<it>}; separator=", ", wrap="    ">, nil];
 <if(backtracking)>
 		ruleMemo = [[NSMutableDictionary alloc] init];
@@ -358,6 +373,15 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 }
 >>
 
+/** How to test for failure and return from rule */
+checkRuleBacktrackFailure() ::= <<
+<if(backtracking)>if (failed) return <ruleReturnValue()>;<endif>
+>>
+
+/** This rule has failed, exit indicating failure during backtrack */
+ruleBacktrackFailure() ::= <<
+<if(backtracking)>if (backtracking > 0) {failed=YES; return <ruleReturnValue()>;}<endif>
+>>
 
 synpred(name) ::= <<
 <name>SyntacticPredicate = @selector(m<name>);
@@ -834,13 +858,28 @@ match(EOF); <checkRuleBacktrackFailure()>
 
 /** match ^(root children) in tree parser */
 tree(root, children,nullableChildList) ::= <<
-#warning Tree stuff incomplete!
+<root:element()>
+<if(nullableChildList)>
+if ( [input LA:1] == ANTLRTokenTypeDOWN ) {
+    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; <checkRuleBacktrackFailure()>
+    <children:element()>
+    [self match:input tokenType:ANTLRTokenTypeUP follow:nil]; <checkRuleBacktrackFailure()>
+}
+<else>
+[self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; <checkRuleBacktrackFailure()>
+<children:element()>
+[self match:input tokenType:ANTLRTokenTypeUP follow:nil]; <checkRuleBacktrackFailure()>
+<endif>
 >>
 
 /** Every predicate is used as a validating predicate (even when it is
  *  also hoisted into a prediction expression).
  */
 validateSemanticPredicate(pred,description) ::= <<
+if ( !(<evalPredicate(...)>) ) {
+    <ruleBacktrackFailure()>
+    @throw [ANTLRFailedPredicateException exceptionWithRuleName:@"<ruleName>" reason:@"<description>" stream:input];
+}
 >>
 
 // F i x e d  D F A  (if-then-else)
@@ -1171,7 +1210,7 @@ ruleAttributeScopeDealloc(scope) ::= <<
 
 returnTypeName() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<name><ruleDescriptor.name>_return
+<className()>_<ruleDescriptor.name>_return
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnType>
@@ -1190,7 +1229,7 @@ returnType() ::= <<
  */
 ruleLabelType(referencedRule) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-<name><referencedRule.name>_return *
+<className()>_<referencedRule.name>_return *
 <else>
 <if(referencedRule.hasSingleReturnValue)>
 <referencedRule.singleValueReturnType>

@@ -1,4 +1,4 @@
-// $ANTLR 3.0b4 simplec.g 2006-09-13 21:39:47
+// $ANTLR 3.0b5 simplec.g 2006-09-25 01:49:16
 
 #import "SimpleCLexer.h"
 #pragma mark Cyclic DFAs
@@ -27,7 +27,7 @@
 - (void) mT21
 {
 	@try {
-		int type = SimpleCLexer_T21;
+		int type = SimpleC_T21;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -60,7 +60,7 @@
 - (void) mT22
 {
 	@try {
-		int type = SimpleCLexer_T22;
+		int type = SimpleC_T22;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -93,7 +93,7 @@
 - (void) mT23
 {
 	@try {
-		int type = SimpleCLexer_T23;
+		int type = SimpleC_T23;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -126,7 +126,7 @@
 - (void) mT24
 {
 	@try {
-		int type = SimpleCLexer_T24;
+		int type = SimpleC_T24;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -159,7 +159,7 @@
 - (void) mT25
 {
 	@try {
-		int type = SimpleCLexer_T25;
+		int type = SimpleC_T25;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -192,7 +192,7 @@
 - (void) mT26
 {
 	@try {
-		int type = SimpleCLexer_T26;
+		int type = SimpleC_T26;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -225,7 +225,7 @@
 - (void) mFOR
 {
 	@try {
-		int type = SimpleCLexer_FOR;
+		int type = SimpleC_FOR;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -258,7 +258,7 @@
 - (void) mINT_TYPE
 {
 	@try {
-		int type = SimpleCLexer_INT_TYPE;
+		int type = SimpleC_INT_TYPE;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -291,7 +291,7 @@
 - (void) mCHAR
 {
 	@try {
-		int type = SimpleCLexer_CHAR;
+		int type = SimpleC_CHAR;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -324,7 +324,7 @@
 - (void) mVOID
 {
 	@try {
-		int type = SimpleCLexer_VOID;
+		int type = SimpleC_VOID;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -357,7 +357,7 @@
 - (void) mID
 {
 	@try {
-		int type = SimpleCLexer_ID;
+		int type = SimpleC_ID;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -424,7 +424,7 @@
 - (void) mINT
 {
 	@try {
-		int type = SimpleCLexer_INT;
+		int type = SimpleC_INT;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -482,7 +482,7 @@
 - (void) mEQ
 {
 	@try {
-		int type = SimpleCLexer_EQ;
+		int type = SimpleC_EQ;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -515,7 +515,7 @@
 - (void) mEQEQ
 {
 	@try {
-		int type = SimpleCLexer_EQEQ;
+		int type = SimpleC_EQEQ;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -548,7 +548,7 @@
 - (void) mLT
 {
 	@try {
-		int type = SimpleCLexer_LT;
+		int type = SimpleC_LT;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -581,7 +581,7 @@
 - (void) mPLUS
 {
 	@try {
-		int type = SimpleCLexer_PLUS;
+		int type = SimpleC_PLUS;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
@@ -614,7 +614,7 @@
 - (void) mWS
 {
 	@try {
-		int type = SimpleCLexer_WS;
+		int type = SimpleC_WS;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];

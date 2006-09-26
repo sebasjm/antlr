@@ -42,7 +42,7 @@ public class ObjCTarget extends Target {
 										   StringTemplate headerFileST)
 	throws IOException
 	{
-		generator.write(headerFileST, grammar.name+".h");
+		generator.write(headerFileST, grammar.name + Grammar.grammarTypeToFileNameSuffix[grammar.type] + ".h");
 	}
 
 	public String getTargetCharLiteralFromANTLRCharLiteral(CodeGenerator generator,

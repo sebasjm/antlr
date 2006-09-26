@@ -1,7 +1,8 @@
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
 #import "SimpleCLexer.h"
-#import "SimpleC.h"
+#import "SimpleCParser.h"
+#import "SimpleCTreeParser.h"
 
 int main() {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -17,13 +18,18 @@ int main() {
 	//	}
 	
 	ANTLRCommonTokenStream *tokenStream = [[ANTLRCommonTokenStream alloc] initWithTokenSource:lexer];
-	SimpleC *parser = [[SimpleC alloc] initWithTokenStream:tokenStream];
+	SimpleCParser *parser = [[SimpleCParser alloc] initWithTokenStream:tokenStream];
 	ANTLRCommonTree *program_tree = [[parser program] tree];
 	NSLog(@"%@", [program_tree treeDescription]);
+	ANTLRCommonTreeNodeStream *treeStream = [[ANTLRCommonTreeNodeStream alloc] initWithTree:program_tree];
+	SimpleCTreeParser *walker = [[SimpleCTreeParser alloc] initWithTreeNodeStream:treeStream];
+	[walker program];
 	[lexer release];
 	[stream release];
 	[tokenStream release];
 	[parser release];
+	[treeStream release];
+	[walker release];
 	
 	[pool release];
 	return 0;

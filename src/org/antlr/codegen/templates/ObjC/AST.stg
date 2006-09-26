@@ -566,7 +566,7 @@ rewriteRuleLabelRef(label) ::= <<
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-[adaptor addChild:[(<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope *)[list_<label> objectAtIndex:i_<rewriteBlockLevel>] tree] toTree:root_<treeLevel>];<\n>
+[adaptor addChild:[(ANTLR<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope *)[list_<label> objectAtIndex:i_<rewriteBlockLevel>] tree] toTree:root_<treeLevel>];<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
@@ -576,5 +576,5 @@ root_<treeLevel> = (<ASTLabelType>)[adaptor makeNode:[<label> tree] parentOf:roo
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)[adaptor makeNode:[(<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope *)[list_<label> objectAtIndex:i_<rewriteBlockLevel>] tree] parentOf:root_<treeLevel>];<\n>
+root_<treeLevel> = (<ASTLabelType>)[adaptor makeNode:[(ANTLR<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope *)[list_<label> objectAtIndex:i_<rewriteBlockLevel>] tree] parentOf:root_<treeLevel>];<\n>
 >>

@@ -37,17 +37,17 @@
 @end
 @interface ANTLRTreeNavigationNodeDown : ANTLRTreeNavigationNode {
 }
-- (int) type;
+- (int) tokenType;
 - (NSString *) description;
 @end
 @interface ANTLRTreeNavigationNodeUp : ANTLRTreeNavigationNode {
 }
-- (int) type;
+- (int) tokenType;
 - (NSString *) description;
 @end
 @interface ANTLRTreeNavigationNodeEOF : ANTLRTreeNavigationNode {
 }
-- (int) type;
+- (int) tokenType;
 - (NSString *) description;
 @end
 
@@ -158,7 +158,8 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 	ANTLRCommonTree *node = [self LT:i];
 	if (!node) 
 		return ANTLRTokenTypeInvalid;
-	return [node tokenType];
+	int ttype = [node tokenType];
+	return ttype;
 }
 
 - (unsigned int) mark;
@@ -274,8 +275,9 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 {
 	unsigned int n = [self lookaheadSize];
 	unsigned int i;
-	for (i=1; i <= k-n; i++) {
-		[self nextObject];
+	id lookaheadObject = self; // any valid object would do.
+	for (i=1; i <= k-n && lookaheadObject != nil; i++) {
+		lookaheadObject = [self nextObject];
 	}
 }
 
@@ -406,17 +408,17 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 @end
 
 @implementation ANTLRTreeNavigationNodeDown
-- (int) type { return ANTLRTokenTypeDOWN; }
+- (int) tokenType { return ANTLRTokenTypeDOWN; }
 - (NSString *) description { return @"DOWN"; }
 @end
 
 @implementation ANTLRTreeNavigationNodeUp
-- (int) type { return ANTLRTokenTypeUP; }
+- (int) tokenType { return ANTLRTokenTypeUP; }
 - (NSString *) description { return @"UP"; }
 @end
 
 @implementation ANTLRTreeNavigationNodeEOF
-- (int) type { return ANTLRTokenTypeEOF; }
+- (int) tokenType { return ANTLRTokenTypeEOF; }
 - (NSString *) description { return @"EOF"; }
 @end
 

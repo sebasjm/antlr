@@ -91,7 +91,8 @@
 	 tokenType:(ANTLRTokenType) ttype
 		follow:(ANTLRBitSet *)follow
 {
-	if ([input LA:1] == ttype) {
+	ANTLRTokenType _ttype = [input LA:1];
+	if (_ttype == ttype) {
 		[input consume];
 		errorRecovery = NO;
 		failed = NO;

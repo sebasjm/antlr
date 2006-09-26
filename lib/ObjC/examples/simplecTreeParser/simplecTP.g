@@ -1,6 +1,7 @@
-tree grammar SimpleCTreeParser;
+tree grammar SimpleC;
 options {
     tokenVocab=SimpleC;
+	language=ObjC;
 }
 
 program
