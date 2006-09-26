@@ -330,7 +330,7 @@ element returns [StateCluster g=null]
         	g = factory.build_CharRange(#c1.getText(), #c2.getText());
         }
         }
-    |	#(ASSIGN ID g=atom)
+    |	#(ASSIGN ID g=atom_or_notatom)
     |	#(PLUS_ASSIGN ID g=atom)
     |   g=ebnf
     |   g=tree
@@ -424,6 +424,56 @@ StateCluster e=null;
 		   }
 		 )
     ;
+
+atom_or_notatom returns [StateCluster g=null]
+	:	g=atom
+	|	#(  n:NOT
+            (  c:CHAR_LITERAL (ast1:ast_suffix)?
+	           {
+	            int ttype=0;
+     			if ( grammar.type==Grammar.LEXER ) {
+        			ttype = Grammar.getCharValueFromGrammarCharLiteral(#c.getText());
+     			}
+     			else {
+        			ttype = grammar.getTokenType(#c.getText());
+        		}
+                IntSet notAtom = grammar.complement(ttype);
+                if ( notAtom.isNil() ) {
+                    ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
+					  			              grammar,
+								              #c.token,
+									          #c.getText());
+                }
+	            g=factory.build_Set(notAtom);
+	           }
+            |  t:TOKEN_REF (ast3:ast_suffix)?
+	           {
+	           int ttype = grammar.getTokenType(t.getText());
+               IntSet notAtom = grammar.complement(ttype);
+               if ( notAtom.isNil() ) {
+                  ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
+				  			              grammar,
+							              #t.token,
+								          #t.getText());
+               }
+	           g=factory.build_Set(notAtom);
+	           }
+            |  g=set
+	           {
+	           GrammarAST stNode = (GrammarAST)n.getFirstChild();
+               IntSet notSet = grammar.complement(stNode.getSetValue());
+               stNode.setSetValue(notSet);
+               if ( notSet.isNil() ) {
+                  ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
+				  			              grammar,
+							              #n.token);
+               }
+	           g=factory.build_Set(notSet);
+	           }
+            )
+        	{#n.followingNFAState = g.right;}
+         )
+	;
 
 atom returns [StateCluster g=null]
     :   #( r:RULE_REF (rarg:ARG_ACTION)? (as1:ast_suffix)? )

@@ -601,7 +601,59 @@ element returns [StringTemplate code=null]
          code.setAttribute("b", high);
         }
 
-    |	#(ASSIGN label:ID code=atom[#label.getText()])
+    |	#(ASSIGN label:ID (#(assign_n:NOT
+    		( assign_c:CHAR_LITERAL (assign_ast1:ast_suffix)?
+	           {
+	            int ttype=0;
+     			if ( grammar.type==Grammar.LEXER ) {
+        			ttype = Grammar.getCharValueFromGrammarCharLiteral(assign_c.getText());
+     			}
+     			else {
+        			ttype = grammar.getTokenType(assign_c.getText());
+        		}
+	            elements = grammar.complement(ttype);
+	            ast = #assign_ast1;
+	           }
+            |  assign_s:STRING_LITERAL (assign_ast2:ast_suffix)?
+	           {
+	            int ttype=0;
+     			if ( grammar.type==Grammar.LEXER ) {
+        			// TODO: error!
+     			}
+     			else {
+        			ttype = grammar.getTokenType(assign_s.getText());
+        		}
+	            elements = grammar.complement(ttype);
+	            ast = #assign_ast2;
+	           }
+            |  assign_t:TOKEN_REF (assign_ast3:ast_suffix)?
+	           {
+	           int ttype = grammar.getTokenType(assign_t.getText());
+	           elements = grammar.complement(ttype);
+	           ast = #assign_ast3;
+	           }
+            |  assign_st:SET (setElement)+ (assign_ast4:ast_suffix)?
+               {
+               // SETs are not precomplemented by buildnfa.g like
+               // simple elements.
+               elements = st.getSetValue();
+	           ast = #assign_ast4;
+               }
+            )
+            {
+            code = getTokenElementST("matchSet",
+                        "set",
+                        (GrammarAST)#assign_n.getFirstChild(),
+                        ast,
+                        #label.getText());
+            code.setAttribute("s", generator.genSetExpr(templates,elements,1,false));
+		 	code.setAttribute("elementIndex", ((TokenWithIndex)#assign_n.getToken()).getIndex());
+			if ( grammar.type!=Grammar.LEXER ) {
+		 		generator.generateLocalFOLLOW(#assign_n,"set",currentRuleName);
+        	}
+            }
+            )
+    	|code=atom[#label.getText()]))
 
     |	#(	PLUS_ASSIGN label2:ID code=atom[#label2.getText()]
          )

@@ -371,8 +371,11 @@ element
     |   #(NOT atom)
     |   #(RANGE atom atom)
     |   #(CHAR_RANGE atom atom)
-    |	#(ASSIGN id:ID a:atom )
+    |	#(ASSIGN id:ID (#(NOT not_a:atom)|a:atom) )
     	{
+    	if (not_a != null) {
+    		a = not_a;	// "hoist" up the ~atom for name inspection - is this valid?
+    	}
     	if ( #a.getType()==RULE_REF ) {
     		grammar.defineRuleRefLabel(currentRuleName,#id.getToken(),a);
     	}

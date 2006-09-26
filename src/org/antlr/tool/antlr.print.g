@@ -292,7 +292,7 @@ element
     |   #(NOT {out("~");} atom) 
     |   #(RANGE atom {out("..");} atom)
     |   #(CHAR_RANGE atom {out("..");} atom)
-    |	#(ASSIGN id:ID {out(#id.getText()+"=");} atom) 
+    |	#(ASSIGN id:ID {out(#id.getText()+"=");} (#(NOT{out("~");} atom)|atom)) 
     |	#(PLUS_ASSIGN id2:ID {out(#id2.getText()+"+=");} atom)
     |   ebnf
     |   tree
