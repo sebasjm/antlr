@@ -776,9 +776,9 @@ public class TestNFAConstruction extends BaseTest {
 			"A : '{' ~('}')* '}';\n");
 		String result = g.getLexerGrammar();
 		String expecting =
-			"lexer grammar tLexer;\n" +
+			"lexer grammar t;\n" +
 			"\n" +
-			"// $ANTLR src \"<string>\" 2\n"+
+			"// $ANTLR src \"__string\" 2\n"+
 			"A : '{' ~('}')* '}';\n";
 		assertEquals(result, expecting);
 	}
