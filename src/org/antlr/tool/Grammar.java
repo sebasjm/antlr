@@ -402,7 +402,7 @@ public class Grammar {
 	public Grammar(String grammarString)
 			throws antlr.RecognitionException, antlr.TokenStreamException
 	{
-		this(null, "$string", new StringReader(grammarString));
+		this(null, "__string", new StringReader(grammarString));
 	}
 
 	public Grammar(String fileName, String grammarString)
@@ -2240,7 +2240,12 @@ public class Grammar {
 		}
 		if ( transition0.label.isSet() ) {
 			IntSet sl = transition0.label.getSet();
-			return new LookaheadSet(sl);
+			LookaheadSet laSet = new LookaheadSet(sl);
+			if ( laSet.member(Label.EOF) ) {
+				laSet.remove(Label.EOF);
+				laSet.hasEOF = true;
+			}
+			return laSet;
 		}
         LookaheadSet tset = _LOOK((NFAState)transition0.target);
 		if ( tset.member(Label.EOR_TOKEN_TYPE) ) {
