@@ -1,4 +1,4 @@
-tree grammar SimpleC;
+tree grammar SimpleCTP;
 options {
     tokenVocab=SimpleC;
 	language=ObjC;
