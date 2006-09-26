@@ -155,7 +155,7 @@ public class TestInterpretedLexing extends BaseTest {
 			"a : (INT|FLOAT|WS)+;\n");
 		Grammar g = new Grammar();
 		g.importTokenVocabulary(pg);
-		g.setFileName("$string");
+		g.setFileName("__string");
 		g.setGrammarContent(
 			"lexer grammar t;\n"+
 			"INT : (DIGIT)+ ;\n"+

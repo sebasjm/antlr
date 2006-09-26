@@ -46,7 +46,7 @@ public class TestInterpretedParsing extends BaseTest {
 			"expr : INT | FLOAT | ID ;\n");
 		Grammar g = new Grammar();
 		g.importTokenVocabulary(pg);
-		g.setFileName("$string");
+		g.setFileName("__string");
 		g.setGrammarContent(
 			"lexer grammar t;\n"+
 			"WHILE : 'while';\n"+
@@ -80,7 +80,7 @@ public class TestInterpretedParsing extends BaseTest {
 			"assign : ID ASSIGN expr SEMI ;\n" +
 			"expr : INT | FLOAT | ID ;\n");
 		Grammar g = new Grammar();
-		g.setFileName("$string");
+		g.setFileName("__string");
 		g.importTokenVocabulary(pg);
 		g.setGrammarContent(
 			"lexer grammar t;\n"+
@@ -116,7 +116,7 @@ public class TestInterpretedParsing extends BaseTest {
 			"expr : INT | FLOAT | ID ;\n");
 		Grammar g = new Grammar();
 		g.importTokenVocabulary(pg);
-		g.setFileName("$string");
+		g.setFileName("__string");
 		g.setGrammarContent(
 			"lexer grammar t;\n"+
 			"WHILE : 'while';\n"+
@@ -151,7 +151,7 @@ public class TestInterpretedParsing extends BaseTest {
 			"expr : {;}INT | FLOAT | ID ;\n");
 		Grammar g = new Grammar();
 		g.importTokenVocabulary(pg);
-		g.setFileName("$string");
+		g.setFileName("__string");
 		g.setGrammarContent(
 			"lexer grammar t;\n"+
 			"WHILE : 'while';\n"+

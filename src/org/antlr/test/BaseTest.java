@@ -93,6 +93,7 @@ public abstract class BaseTest extends TestCase {
 	}
 
 	protected void antlr(String fileName, String grammarStr, boolean debug) {
+		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
 		try {
 			Grammar g = new Grammar(grammarStr);
@@ -335,6 +336,11 @@ public abstract class BaseTest extends TestCase {
 		}
 	}
 
+	protected void mkdir(String dir) {
+		File f = new File(dir);
+		f.mkdirs();
+	}
+
 	protected void writeTestFile(String parserName,
 									 String lexerName,
 									 String parserStartRuleName,
@@ -483,16 +489,10 @@ public abstract class BaseTest extends TestCase {
 	protected void eraseFiles(final String filesEndingWith) {
 		File tmpdirF = new File(tmpdir);
 		String[] files = tmpdirF.list();
-		for(int i = 0; i < files.length; i++) {
+		for(int i = 0; files!=null && i < files.length; i++) {
 			if ( files[i].endsWith(filesEndingWith) ) {
         		new File(tmpdir+"/"+files[i]).delete();
 			}
 		}
 	}
-
-	/*public void tearDown() {
-		eraseFiles(".class");
-		eraseFiles(".java");
-	}*/
-
 }
