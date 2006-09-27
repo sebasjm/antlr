@@ -18,7 +18,7 @@ static    pANTLR3_STRING    newStr16_16	(pANTLR3_STRING_FACTORY factory, pANTLR3
 static    void		    destroy	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
 static    pANTLR3_STRING    printable8	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
 static    pANTLR3_STRING    printable16	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string);
-static    void		    close	(pANTLR3_STRING_FACTORY factory);
+static    void		    closeFactory(pANTLR3_STRING_FACTORY factory);
 
 /* String API
  */
@@ -87,7 +87,7 @@ antlr3StringFactoryNew()
     factory->destroy	= ANTLR3_API_FUNC destroy;
     factory->printable	= ANTLR3_API_FUNC printable8;
     factory->destroy	= ANTLR3_API_FUNC destroy;
-    factory->close	= ANTLR3_API_FUNC close;
+    factory->close	= ANTLR3_API_FUNC closeFactory;
 
     return  factory;
 }
@@ -122,7 +122,7 @@ antlr3UCS2StringFactoryNew()
 
     factory->destroy	= ANTLR3_API_FUNC destroy;
     factory->destroy	= ANTLR3_API_FUNC destroy;
-    factory->close	= ANTLR3_API_FUNC close;
+    factory->close	= ANTLR3_API_FUNC closeFactory;
 
     return  factory;
 }
@@ -595,7 +595,7 @@ printable16(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
 }
 
 static    void		    
-close	(pANTLR3_STRING_FACTORY factory)
+closeFactory	(pANTLR3_STRING_FACTORY factory)
 {
     /* Delete the hash table we were tracking teh strings with,this will
      * causes all the allocated strings to be deallocated too
