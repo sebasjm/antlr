@@ -50,8 +50,7 @@ AC_PROG_RANLIB
 
 # Checks for header files.
 AC_INCLUDES_DEFAULT()
-AC_HEADER_STDC
-AC_CHECK_HEADERS([sys/malloc.h malloc.h stdlib.h string.h])
+AC_CHECK_HEADERS([malloc.h sys/malloc.h stdarg.h sys/stat.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
