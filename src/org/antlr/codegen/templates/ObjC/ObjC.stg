@@ -50,7 +50,7 @@ objcTypeInitMap ::= [
 	default:"nil" // anything other than an atomic type
 ]
 
-className() ::= "<name><if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<endif>Parser<endif>"
+className() ::= "<name><! if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<endif>Parser<endif !>"
 
 /** The overall file structure of a recognizer; stores methods for rules
  *  and cyclic DFAs plus support code.
@@ -65,7 +65,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
 <@imports>
-#import "<name><if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<endif>Parser<endif>.h"
+#import "<name><!if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<endif>Parser<endif!>.h"
 <@end>
 
 <docComment>

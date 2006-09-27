@@ -31,9 +31,9 @@ formalParameter
     ;
 
 type
-    :   'int'
-    |   'char'
-    |   'void'
+    :   INT_TYPE
+    |   CHAR
+    |   VOID
     |   ID        
     ;
 
@@ -47,7 +47,7 @@ stat: forStat
     ;
 
 forStat
-    :   ^('for' expr expr expr block)
+    :   ^(FOR expr expr expr block)
     ;
 
 expr:   ^(EQEQ expr expr)

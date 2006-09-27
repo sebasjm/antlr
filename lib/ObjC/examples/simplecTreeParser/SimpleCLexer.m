@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 simplec.g 2006-09-25 01:49:16
+// $ANTLR 3.0b5 SimpleC.g 2006-09-27 02:50:35
 
 #import "SimpleCLexer.h"
 #pragma mark Cyclic DFAs
@@ -27,13 +27,13 @@
 - (void) mT21
 {
 	@try {
-		int type = SimpleC_T21;
+		int type = SimpleCLexer_T21;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:7:7: ( ';' ) // ruleBlockSingleAlt
-		// simplec.g:7:7: ';' // alt
+		// SimpleC.g:7:7: ( ';' ) // ruleBlockSingleAlt
+		// SimpleC.g:7:7: ';' // alt
 		{
 		[self matchChar:';'];
 
@@ -60,13 +60,13 @@
 - (void) mT22
 {
 	@try {
-		int type = SimpleC_T22;
+		int type = SimpleCLexer_T22;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:8:7: ( '(' ) // ruleBlockSingleAlt
-		// simplec.g:8:7: '(' // alt
+		// SimpleC.g:8:7: ( '(' ) // ruleBlockSingleAlt
+		// SimpleC.g:8:7: '(' // alt
 		{
 		[self matchChar:'('];
 
@@ -93,13 +93,13 @@
 - (void) mT23
 {
 	@try {
-		int type = SimpleC_T23;
+		int type = SimpleCLexer_T23;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:9:7: ( ',' ) // ruleBlockSingleAlt
-		// simplec.g:9:7: ',' // alt
+		// SimpleC.g:9:7: ( ',' ) // ruleBlockSingleAlt
+		// SimpleC.g:9:7: ',' // alt
 		{
 		[self matchChar:','];
 
@@ -126,13 +126,13 @@
 - (void) mT24
 {
 	@try {
-		int type = SimpleC_T24;
+		int type = SimpleCLexer_T24;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:10:7: ( ')' ) // ruleBlockSingleAlt
-		// simplec.g:10:7: ')' // alt
+		// SimpleC.g:10:7: ( ')' ) // ruleBlockSingleAlt
+		// SimpleC.g:10:7: ')' // alt
 		{
 		[self matchChar:')'];
 
@@ -159,13 +159,13 @@
 - (void) mT25
 {
 	@try {
-		int type = SimpleC_T25;
+		int type = SimpleCLexer_T25;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:11:7: ( '{' ) // ruleBlockSingleAlt
-		// simplec.g:11:7: '{' // alt
+		// SimpleC.g:11:7: ( '{' ) // ruleBlockSingleAlt
+		// SimpleC.g:11:7: '{' // alt
 		{
 		[self matchChar:'{'];
 
@@ -192,13 +192,13 @@
 - (void) mT26
 {
 	@try {
-		int type = SimpleC_T26;
+		int type = SimpleCLexer_T26;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:12:7: ( '}' ) // ruleBlockSingleAlt
-		// simplec.g:12:7: '}' // alt
+		// SimpleC.g:12:7: ( '}' ) // ruleBlockSingleAlt
+		// SimpleC.g:12:7: '}' // alt
 		{
 		[self matchChar:'}'];
 
@@ -225,13 +225,13 @@
 - (void) mFOR
 {
 	@try {
-		int type = SimpleC_FOR;
+		int type = SimpleCLexer_FOR;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:92:7: ( 'for' ) // ruleBlockSingleAlt
-		// simplec.g:92:7: 'for' // alt
+		// SimpleC.g:92:7: ( 'for' ) // ruleBlockSingleAlt
+		// SimpleC.g:92:7: 'for' // alt
 		{
 		[self matchString:@"for"];
 
@@ -258,13 +258,13 @@
 - (void) mINT_TYPE
 {
 	@try {
-		int type = SimpleC_INT_TYPE;
+		int type = SimpleCLexer_INT_TYPE;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:93:12: ( 'int' ) // ruleBlockSingleAlt
-		// simplec.g:93:12: 'int' // alt
+		// SimpleC.g:93:12: ( 'int' ) // ruleBlockSingleAlt
+		// SimpleC.g:93:12: 'int' // alt
 		{
 		[self matchString:@"int"];
 
@@ -291,13 +291,13 @@
 - (void) mCHAR
 {
 	@try {
-		int type = SimpleC_CHAR;
+		int type = SimpleCLexer_CHAR;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:94:7: ( 'char' ) // ruleBlockSingleAlt
-		// simplec.g:94:7: 'char' // alt
+		// SimpleC.g:94:7: ( 'char' ) // ruleBlockSingleAlt
+		// SimpleC.g:94:7: 'char' // alt
 		{
 		[self matchString:@"char"];
 
@@ -324,13 +324,13 @@
 - (void) mVOID
 {
 	@try {
-		int type = SimpleC_VOID;
+		int type = SimpleCLexer_VOID;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:95:7: ( 'void' ) // ruleBlockSingleAlt
-		// simplec.g:95:7: 'void' // alt
+		// SimpleC.g:95:7: ( 'void' ) // ruleBlockSingleAlt
+		// SimpleC.g:95:7: 'void' // alt
 		{
 		[self matchString:@"void"];
 
@@ -357,13 +357,13 @@
 - (void) mID
 {
 	@try {
-		int type = SimpleC_ID;
+		int type = SimpleCLexer_ID;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:97:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* ) // ruleBlockSingleAlt
-		// simplec.g:97:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* // alt
+		// SimpleC.g:97:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* ) // ruleBlockSingleAlt
+		// SimpleC.g:97:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* // alt
 		{
 		if (([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			[input consume];
@@ -383,7 +383,7 @@
 
 		    switch (alt1) {
 			case 1 :
-			    // simplec.g:97:34: ('a'..'z'|'A'..'Z'|'0'..'9'|'_') // alt
+			    // SimpleC.g:97:34: ('a'..'z'|'A'..'Z'|'0'..'9'|'_') // alt
 			    {
 			    if (([input LA:1]>='0' && [input LA:1]<='9')||([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			    	[input consume];
@@ -424,15 +424,15 @@
 - (void) mINT
 {
 	@try {
-		int type = SimpleC_INT;
+		int type = SimpleCLexer_INT;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:100:7: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
-		// simplec.g:100:7: ( '0' .. '9' )+ // alt
+		// SimpleC.g:100:7: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
+		// SimpleC.g:100:7: ( '0' .. '9' )+ // alt
 		{
-		// simplec.g:100:7: ( '0' .. '9' )+	// positiveClosureBlock
+		// SimpleC.g:100:7: ( '0' .. '9' )+	// positiveClosureBlock
 		int cnt2=0;
 
 		do {
@@ -445,7 +445,7 @@
 
 		    switch (alt2) {
 			case 1 :
-			    // simplec.g:100:8: '0' .. '9' // alt
+			    // SimpleC.g:100:8: '0' .. '9' // alt
 			    {
 			    [self matchRangeFromChar:'0' to:'9'];
 
@@ -482,13 +482,13 @@
 - (void) mEQ
 {
 	@try {
-		int type = SimpleC_EQ;
+		int type = SimpleCLexer_EQ;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:103:8: ( '=' ) // ruleBlockSingleAlt
-		// simplec.g:103:8: '=' // alt
+		// SimpleC.g:103:8: ( '=' ) // ruleBlockSingleAlt
+		// SimpleC.g:103:8: '=' // alt
 		{
 		[self matchChar:'='];
 
@@ -515,13 +515,13 @@
 - (void) mEQEQ
 {
 	@try {
-		int type = SimpleC_EQEQ;
+		int type = SimpleCLexer_EQEQ;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:104:8: ( '==' ) // ruleBlockSingleAlt
-		// simplec.g:104:8: '==' // alt
+		// SimpleC.g:104:8: ( '==' ) // ruleBlockSingleAlt
+		// SimpleC.g:104:8: '==' // alt
 		{
 		[self matchString:@"=="];
 
@@ -548,13 +548,13 @@
 - (void) mLT
 {
 	@try {
-		int type = SimpleC_LT;
+		int type = SimpleCLexer_LT;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:105:8: ( '<' ) // ruleBlockSingleAlt
-		// simplec.g:105:8: '<' // alt
+		// SimpleC.g:105:8: ( '<' ) // ruleBlockSingleAlt
+		// SimpleC.g:105:8: '<' // alt
 		{
 		[self matchChar:'<'];
 
@@ -581,13 +581,13 @@
 - (void) mPLUS
 {
 	@try {
-		int type = SimpleC_PLUS;
+		int type = SimpleCLexer_PLUS;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:106:8: ( '+' ) // ruleBlockSingleAlt
-		// simplec.g:106:8: '+' // alt
+		// SimpleC.g:106:8: ( '+' ) // ruleBlockSingleAlt
+		// SimpleC.g:106:8: '+' // alt
 		{
 		[self matchChar:'+'];
 
@@ -614,15 +614,15 @@
 - (void) mWS
 {
 	@try {
-		int type = SimpleC_WS;
+		int type = SimpleCLexer_WS;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// simplec.g:108:9: ( ( (' '|'\\t'|'\\r'|'\\n'))+ ) // ruleBlockSingleAlt
-		// simplec.g:108:9: ( (' '|'\\t'|'\\r'|'\\n'))+ // alt
+		// SimpleC.g:108:9: ( ( (' '|'\\t'|'\\r'|'\\n'))+ ) // ruleBlockSingleAlt
+		// SimpleC.g:108:9: ( (' '|'\\t'|'\\r'|'\\n'))+ // alt
 		{
-		// simplec.g:108:9: ( (' '|'\\t'|'\\r'|'\\n'))+	// positiveClosureBlock
+		// SimpleC.g:108:9: ( (' '|'\\t'|'\\r'|'\\n'))+	// positiveClosureBlock
 		int cnt3=0;
 
 		do {
@@ -635,7 +635,7 @@
 
 		    switch (alt3) {
 			case 1 :
-			    // simplec.g:108:13: (' '|'\\t'|'\\r'|'\\n') // alt
+			    // SimpleC.g:108:13: (' '|'\\t'|'\\r'|'\\n') // alt
 			    {
 			    if (([input LA:1]>='\t' && [input LA:1]<='\n')||[input LA:1]=='\r'||[input LA:1]==' ') {
 			    	[input consume];
@@ -677,7 +677,7 @@
 
 - (void) mTokens
 {
-    // simplec.g:1:10: ( T21 | T22 | T23 | T24 | T25 | T26 | FOR | INT_TYPE | CHAR | VOID | ID | INT | EQ | EQEQ | LT | PLUS | WS ) //ruleblock
+    // SimpleC.g:1:10: ( T21 | T22 | T23 | T24 | T25 | T26 | FOR | INT_TYPE | CHAR | VOID | ID | INT | EQ | EQEQ | LT | PLUS | WS ) //ruleblock
     int alt4=17;
     switch ([input LA:1]) {
     	case ';':
@@ -901,7 +901,7 @@
     	}}
     switch (alt4) {
     	case 1 :
-    	    // simplec.g:1:10: T21 // alt
+    	    // SimpleC.g:1:10: T21 // alt
     	    {
     	    [self mT21];
 
@@ -910,7 +910,7 @@
     	    }
     	    break;
     	case 2 :
-    	    // simplec.g:1:14: T22 // alt
+    	    // SimpleC.g:1:14: T22 // alt
     	    {
     	    [self mT22];
 
@@ -919,7 +919,7 @@
     	    }
     	    break;
     	case 3 :
-    	    // simplec.g:1:18: T23 // alt
+    	    // SimpleC.g:1:18: T23 // alt
     	    {
     	    [self mT23];
 
@@ -928,7 +928,7 @@
     	    }
     	    break;
     	case 4 :
-    	    // simplec.g:1:22: T24 // alt
+    	    // SimpleC.g:1:22: T24 // alt
     	    {
     	    [self mT24];
 
@@ -937,7 +937,7 @@
     	    }
     	    break;
     	case 5 :
-    	    // simplec.g:1:26: T25 // alt
+    	    // SimpleC.g:1:26: T25 // alt
     	    {
     	    [self mT25];
 
@@ -946,7 +946,7 @@
     	    }
     	    break;
     	case 6 :
-    	    // simplec.g:1:30: T26 // alt
+    	    // SimpleC.g:1:30: T26 // alt
     	    {
     	    [self mT26];
 
@@ -955,7 +955,7 @@
     	    }
     	    break;
     	case 7 :
-    	    // simplec.g:1:34: FOR // alt
+    	    // SimpleC.g:1:34: FOR // alt
     	    {
     	    [self mFOR];
 
@@ -964,7 +964,7 @@
     	    }
     	    break;
     	case 8 :
-    	    // simplec.g:1:38: INT_TYPE // alt
+    	    // SimpleC.g:1:38: INT_TYPE // alt
     	    {
     	    [self mINT_TYPE];
 
@@ -973,7 +973,7 @@
     	    }
     	    break;
     	case 9 :
-    	    // simplec.g:1:47: CHAR // alt
+    	    // SimpleC.g:1:47: CHAR // alt
     	    {
     	    [self mCHAR];
 
@@ -982,7 +982,7 @@
     	    }
     	    break;
     	case 10 :
-    	    // simplec.g:1:52: VOID // alt
+    	    // SimpleC.g:1:52: VOID // alt
     	    {
     	    [self mVOID];
 
@@ -991,7 +991,7 @@
     	    }
     	    break;
     	case 11 :
-    	    // simplec.g:1:57: ID // alt
+    	    // SimpleC.g:1:57: ID // alt
     	    {
     	    [self mID];
 
@@ -1000,7 +1000,7 @@
     	    }
     	    break;
     	case 12 :
-    	    // simplec.g:1:60: INT // alt
+    	    // SimpleC.g:1:60: INT // alt
     	    {
     	    [self mINT];
 
@@ -1009,7 +1009,7 @@
     	    }
     	    break;
     	case 13 :
-    	    // simplec.g:1:64: EQ // alt
+    	    // SimpleC.g:1:64: EQ // alt
     	    {
     	    [self mEQ];
 
@@ -1018,7 +1018,7 @@
     	    }
     	    break;
     	case 14 :
-    	    // simplec.g:1:67: EQEQ // alt
+    	    // SimpleC.g:1:67: EQEQ // alt
     	    {
     	    [self mEQEQ];
 
@@ -1027,7 +1027,7 @@
     	    }
     	    break;
     	case 15 :
-    	    // simplec.g:1:72: LT // alt
+    	    // SimpleC.g:1:72: LT // alt
     	    {
     	    [self mLT];
 
@@ -1036,7 +1036,7 @@
     	    }
     	    break;
     	case 16 :
-    	    // simplec.g:1:75: PLUS // alt
+    	    // SimpleC.g:1:75: PLUS // alt
     	    {
     	    [self mPLUS];
 
@@ -1045,7 +1045,7 @@
     	    }
     	    break;
     	case 17 :
-    	    // simplec.g:1:80: WS // alt
+    	    // SimpleC.g:1:80: WS // alt
     	    {
     	    [self mWS];
 
