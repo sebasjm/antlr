@@ -84,7 +84,7 @@ public class ObjCTarget extends Target {
 		if ( name.charAt(0)=='\'' ) {
 			return String.valueOf(ttype);
 		}
-		return generator.grammar.name.concat("_").concat(name);
+		return generator.grammar.name + Grammar.grammarTypeToFileNameSuffix[generator.grammar.type] + "_" + name;
 		//return super.getTokenTypeAsTargetLabel(generator, ttype);
 		//return this.getTokenTextAndTypeAsTargetLabel(generator, null, ttype);
 	}
@@ -100,7 +100,7 @@ public class ObjCTarget extends Target {
 		if (textEquivalent.charAt(0) >= '0' && textEquivalent.charAt(0) <= '9') {
 			return textEquivalent;
 		} else {
-			return generator.grammar.name.concat("_").concat(textEquivalent);
+			return generator.grammar.name + Grammar.grammarTypeToFileNameSuffix[generator.grammar.type] + "_" + textEquivalent;
 		}
 	}
 
