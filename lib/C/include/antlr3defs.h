@@ -111,23 +111,64 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
  */
 #include	<antlr3config.h>
 
-#include    <stdio.h>
-#include	<stdlib.h>
+#include <stdio.h>
+
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+
+#if STDC_HEADERS
+# include   <stdlib.h>
+# include   <stddef.h>
+# include   <stdarg.h>
+#else
+# if HAVE_STDLIB_H
+#  include  <stdlib.h>
+# endif
+# if HAVE_STDARG_H
+#  include  <stdarg.h>
+# endif
+#endif
+
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+
+#if HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+
 #ifdef	HAVE_MALLOC_H
-#include    <malloc.h>
+# include    <malloc.h>
+#else
+# ifdef	HAVE_SYS_MALLOC_H
+#  include    <sys/malloc.h>
+# endif
 #endif
-
-#ifdef	HAVE_SYS_MALLOC_H
-#include    <sys/malloc.h>
-#endif
-
-#include    <stdarg.h>
-#include    <sys/stat.h>
-#include	<string.h>
 
 /* Some platforms define a macro, index() in string.h. AIX is
- * one of these for instance. we must get rid of that definition
- * as we use ->index all over the place.
+ * one of these for instance. We must get rid of that definition
+ * as we use ->index all over the place. definig macros like this in system header
+ * files is a really bad idea, but I doubt that IBM will listen to me ;-)
  */
 #ifdef	index
 #undef	index
@@ -138,6 +179,8 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define ANTLR3_API
 #define	ANTLR3_API_FUNC (void *)
 
+/* Inherit type definitions for autoconf
+ */
 typedef int32_t		    ANTLR3_CHAR,    *pANTLR3_CHAR;
 typedef uint32_t	    ANTLR3_UCHAR,   *pANTLR3_UCHAR;
 
