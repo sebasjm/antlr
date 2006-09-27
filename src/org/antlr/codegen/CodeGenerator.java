@@ -791,6 +791,8 @@ public class CodeGenerator {
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7
 	 *  FOR=8
+	 *  'for'=8
+	 * 
 	 *  This is independent of the target language; used by antlr internally
 	 */
 	protected StringTemplate genTokenVocabOutput() {

@@ -346,7 +346,7 @@ public class Grammar {
 	 */
 	protected StringTemplate lexerGrammarST =
 		new StringTemplate(
-			"lexer grammar <name>;\n" +
+			"lexer grammar <name>__;\n" +
 			"<if(options)>" +
 			"options {\n" +
 			"  <options:{<it.name>=<it.value>;<\\n>}>\n" +
@@ -1502,7 +1502,7 @@ public class Grammar {
             I = (Integer)tokenIDToTypeMap.get(tokenName);
         }
         int i = (I!=null)?I.intValue():Label.INVALID;
-		//System.out.println("grammar type "+getType()+" "+tokenName+"->"+i);
+		//System.out.println("grammar type "+type+" "+tokenName+"->"+i);
         return i;
     }
 
@@ -1685,7 +1685,7 @@ public class Grammar {
 				}
 				int tokenType = (int)tokenizer.nval;
 				token = tokenizer.nextToken();
-				// System.out.println("import "+tokenID+"="+tokenType);
+				//System.out.println("import "+tokenID+"="+tokenType);
 				maxTokenType = Math.max(maxTokenType,tokenType);
 				defineToken(tokenID, tokenType);
 				lineNum++;

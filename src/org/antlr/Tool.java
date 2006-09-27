@@ -267,7 +267,7 @@ public class Tool {
 
 				String lexerGrammarStr = grammar.getLexerGrammar();
 				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
-					String lexerGrammarFileName = grammar.name+"__Lexer"+Grammar.GRAMMAR_FILE_EXTENSION;
+					String lexerGrammarFileName = grammar.name+"__"+Grammar.GRAMMAR_FILE_EXTENSION;
 					Writer w = getOutputFile(grammar,lexerGrammarFileName);
 					w.write(lexerGrammarStr);
 					w.close();
