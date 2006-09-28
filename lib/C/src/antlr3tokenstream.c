@@ -41,9 +41,9 @@ static void		    antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM    stream);
 
 /* Helpers */
 static void		    fillBuffer			(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
-static ANTLR3_UINT64	    skipOffTokenChannels	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 i);
-static ANTLR3_UINT64	    skipOffTokenChannelsReverse	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 i);
-static pANTLR3_COMMON_TOKEN LB				(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 i);
+static ANTLR3_UINT64	    skipOffTokenChannels	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
+static ANTLR3_UINT64	    skipOffTokenChannelsReverse	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
+static pANTLR3_COMMON_TOKEN LB				(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
 
 ANTLR3_API pANTLR3_TOKEN_STREAM
 antlr3TokenStreamNew()
@@ -281,7 +281,7 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
 #endif
 
 static	pANTLR3_COMMON_TOKEN
-LB  (pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 k)
+LB  (pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT64 k)
 {
     ANTLR3_INT64    i;
     ANTLR3_INT32    n;
@@ -730,9 +730,9 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
  *  token.
  */
 static ANTLR3_UINT64
-skipOffTokenChannels(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 i)
+skipOffTokenChannels(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i)
 {
-    ANTLR3_UINT64	    n;
+    ANTLR3_INT64	    n;
     pANTLR3_COMMON_TOKEN    tok;
 
     n	= tokenStream->tstream->istream->size(tokenStream->tstream->istream);
@@ -754,7 +754,7 @@ skipOffTokenChannels(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 i)
 }
 
 static ANTLR3_UINT64
-skipOffTokenChannelsReverse(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 x)
+skipOffTokenChannelsReverse(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 x)
 {
     pANTLR3_COMMON_TOKEN    tok;
 

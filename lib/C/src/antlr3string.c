@@ -372,7 +372,7 @@ newPtr16_8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 siz
 {
     pANTLR3_STRING  string;
 
-    string  = factory->newSize(factory, size);
+    string  = factory->newSize(factory, size * sizeof(ANTLR3_UINT16));
 
     if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
     {
