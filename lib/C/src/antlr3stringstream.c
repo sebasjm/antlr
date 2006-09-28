@@ -105,14 +105,14 @@ antlr3NewUCS2StringInPlaceStream   (pANTLR3_UINT16 inString, ANTLR3_UINT64 size,
     if	(name == NULL)
     {
 	input->fileName	= ANTLR3_MALLOC(sizeof(ANTLR3_UINT16) * 9);
-	ANTLR3_MEMMOVE((void *)defaultName, input->fileName, sizeof(ANTLR3_UINT16) * 9);
+	ANTLR3_MEMMOVE(input->fileName, (void *)defaultName, sizeof(ANTLR3_UINT16) * 9);
     }
     else
     {
 	count = 0;
 	while (*(name+count) != '\0') { count++;}
 	input->fileName  = ANTLR3_MALLOC(sizeof(ANTLR3_UINT16) * (count +1));
-	ANTLR3_MEMMOVE((void *)name, input->fileName, sizeof(ANTLR3_UINT16) * (count+1));
+	ANTLR3_MEMMOVE(input->fileName, (void *)name, sizeof(ANTLR3_UINT16) * (count+1));
 	*(name+count+1) = '\0';
     }
 
