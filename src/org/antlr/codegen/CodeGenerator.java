@@ -436,7 +436,10 @@ public class CodeGenerator {
 			// write out the vocab interchange file; used by antlr,
 			// does not change per target
 			StringTemplate tokenVocabSerialization = genTokenVocabOutput();
-			write(tokenVocabSerialization, getVocabFileName());
+			String vocabFileName = getVocabFileName();
+			if ( vocabFileName!=null ) {
+				write(tokenVocabSerialization, vocabFileName);
+			}
 			//System.out.println(outputFileST.getDOTForDependencyGraph(false));
 		}
 		catch (IOException ioe) {
@@ -792,7 +795,7 @@ public class CodeGenerator {
 	 *  ID=7
 	 *  FOR=8
 	 *  'for'=8
-	 * 
+	 *
 	 *  This is independent of the target language; used by antlr internally
 	 */
 	protected StringTemplate genTokenVocabOutput() {
@@ -1069,7 +1072,13 @@ public class CodeGenerator {
 		return grammar.name+suffix+extST.toString();
 	}
 
+	/** What is the name of the vocab file generated for this grammar?
+	 *  Returns null if no .tokens file should be generated.
+	 */
 	public String getVocabFileName() {
+		if ( grammar.isBuiltFromString() ) {
+			return null;
+		}
 		return grammar.name+VOCAB_FILE_EXTENSION;
 	}
 
