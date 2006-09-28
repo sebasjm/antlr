@@ -4,97 +4,98 @@
 -->
 
 <project name="antlr3" default="build" basedir=".">
-    <property file="./build.properties" />
+  <property file="./build.properties" />
 
-    <property name="build.dir" value="${basedir}/build" />
-    <property name="lib.dir" value="${basedir}/lib" />
+  <property name="build.dir" value="${basedir}/build" />
+  <property name="lib.dir" value="${basedir}/lib" />
 
-    <property name="src.dir" value="${basedir}/src" />
-    <property name="tool.dir" value="${src.dir}/org/antlr/tool" />
-    <property name="codegen.dir" value="${src.dir}/org/antlr/codegen" />
+  <property name="src.dir" value="${basedir}/src" />
+  <property name="tool.dir" value="${src.dir}/org/antlr/tool" />
+  <property name="codegen.dir" value="${src.dir}/org/antlr/codegen" />
 
-    <property name="codegen.g" value="${codegen.dir}/codegen.g" />
-    <property name="antlr.g" value="${tool.dir}/antlr.g" />
-    <property name="antlr.print.g" value="${tool.dir}/antlr.print.g" />
-    <property name="assign.types.g" value="${tool.dir}/assign.types.g" />
-    <property name="buildnfa.g" value="${tool.dir}/buildnfa.g" />
-    <property name="define.g" value="${tool.dir}/define.g" />
+  <property name="codegen.g" value="${codegen.dir}/codegen.g" />
+  <property name="antlr.g" value="${tool.dir}/antlr.g" />
+  <property name="antlr.print.g" value="${tool.dir}/antlr.print.g" />
+  <property name="assign.types.g" value="${tool.dir}/assign.types.g" />
+  <property name="buildnfa.g" value="${tool.dir}/buildnfa.g" />
+  <property name="define.g" value="${tool.dir}/define.g" />
 
-    <path id="classpath">
-        <pathelement location="${stringtemplate.jar}"/>
-    </path>
+  <path id="classpath">
+	 <pathelement location="${stringtemplate.jar}"/>
+	 <pathelement location="${junit.jar}"/>
+  </path>
 
-	<condition property="bcel.available">
-		<available classname="org.apache.bcel.Constants"/>
-	</condition>
+  <condition property="bcel.available">
+	 <available classname="org.apache.bcel.Constants"/>
+  </condition>
 
-    <target name="clean" description="Deletes all class files">
-        <delete dir="${build.dir}"/>
-    </target>
+  <target name="clean" description="Deletes all class files">
+	 <delete dir="${build.dir}"/>
+  </target>
 
-   <target name="generator">
-        <antlr target="${antlr.g}" />
-		  <copy file="${tool.dir}/ANTLRTokenTypes.txt" todir="${codegen.dir}"/>
-        <antlr target="${antlr.print.g}" />
-        <antlr target="${assign.types.g}" />
-        <antlr target="${buildnfa.g}" />
-        <antlr target="${define.g}" />
-        <antlr target="${codegen.g}" />
-   </target>
+  <target name="generator">
+	 <antlr target="${antlr.g}" />
+	 <copy file="${tool.dir}/ANTLRTokenTypes.txt" todir="${codegen.dir}"/>
+	 <antlr target="${antlr.print.g}" />
+	 <antlr target="${assign.types.g}" />
+	 <antlr target="${buildnfa.g}" />
+	 <antlr target="${define.g}" />
+	 <antlr target="${codegen.g}" />
+  </target>
 
-   <target name="compile" depends="generator">
-        <mkdir dir="${build.dir}"/>
-        <javac
-            destdir="${build.dir}"
-            debug="${compile.debug}"
-            debuglevel="${compile.debuglevel}"
-            deprecation="${compile.deprecation}"
-            optimize="${compile.optimize}"
-				source="1.4"
-				target="1.4">
-         <classpath refid="classpath"/>
-			<src path="${src.dir}"/>
-			</javac>
-   </target>
+  <target name="compile" depends="generator">
+	 <mkdir dir="${build.dir}"/>
+	 <javac
+		  destdir="${build.dir}"
+		  debug="${compile.debug}"
+		  debuglevel="${compile.debuglevel}"
+		  deprecation="${compile.deprecation}"
+		  optimize="${compile.optimize}"
+		  source="1.4"
+		  target="1.4">
+		<classpath refid="classpath"/>
+		<src path="${src.dir}"/>
+	 </javac>
+  </target>
 
-	<target name="templates">
-		<copy todir="${build.dir}">
-			<fileset dir="${src.dir}" includes="**/*.stg, **/*.st, **/*.sti"/>
-		</copy>
-	</target>
+  <target name="templates">
+	 <copy todir="${build.dir}">
+		<fileset dir="${src.dir}" includes="**/*.stg, **/*.st, **/*.sti"/>
+	 </copy>
+  </target>
 
-	<target name="build" depends="compile, templates, version, version-bcel" description="Creates the ANTLR3 jar">
-		<mkdir dir="${lib.dir}"/>
+  <target name="build" depends="compile, templates, version, version-bcel" description="Creates the ANTLR3 jar">
+	 <mkdir dir="${lib.dir}"/>
 
-		<jar jarfile="${antlr3.jar}">
-			<fileset dir="${basedir}" includes="LICENSE.txt"/>
-			<fileset dir="${src.dir}" includes="**/*.stg, **/*.st, **/*.sti"/>
-			<fileset dir="${build.dir}" includes="**/*.class"/>
-			<manifest>
-			<attribute name="Version" value="${version}"/>
-			</manifest>
-		</jar>
-	</target>
+	 <jar jarfile="${antlr3.jar}">
+		<fileset dir="${basedir}" includes="LICENSE.txt"/>
+		<fileset dir="${src.dir}" includes="**/*.stg, **/*.st, **/*.sti"/>
+		<fileset dir="${build.dir}" includes="**/*.class"/>
+		<manifest>
+		  <attribute name="Version" value="${version}"/>
+		</manifest>
+	 </jar>
+  </target>
 
-	<target name="version" unless="bcel.available">
-		<echo>Install bcel in the classpath to have automatic version in jar name</echo>
-		<property name="antlr3.jar" value="${lib.dir}/antlr.jar" />
-	</target>
+  <target name="version" unless="bcel.available">
+	 <echo>Install bcel in the classpath to have automatic version in jar name</echo>
+	 <property name="antlr3.jar" value="${lib.dir}/antlr.jar" />
+  </target>
 
-	<target name="version-bcel" if="bcel.available">
+  <target name="version-bcel" if="bcel.available">
 
-		<property name="tool.class" location="${build.dir}/org/antlr/Tool.class"/>
+	 <property name="tool.class" location="${build.dir}/org/antlr/Tool.class"/>
 
-		<loadproperties srcfile="${tool.class}">
-			<filterchain>
-				<classconstants/>
-				<prefixlines prefix="Tool."/>
-			</filterchain>
-		</loadproperties>
+	 <loadproperties srcfile="${tool.class}">
+		<filterchain>
+		  <classconstants/>
+		  <prefixlines prefix="Tool."/>
+		</filterchain>
+	 </loadproperties>
 
-		<property name="antlr3.jar" value="${lib.dir}/antlr-${Tool.VERSION}.jar" />
-	</target>
+	 <property name="antlr3.jar" value="${lib.dir}/antlr-${Tool.VERSION}.jar" />
+  </target>
 
-   <target name="rebuild" depends="clean,build" />
+  <target name="rebuild" depends="clean,build" />
 
 </project>
