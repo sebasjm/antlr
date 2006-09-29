@@ -75,9 +75,9 @@
 		F763D4490A666D3D0061CD35 /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F763D51D0A6676590061CD35 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F763D51E0A66765B0061CD35 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
-		F7715A020AC74AA300ED984D /* SimpleCLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F77159FD0AC74AA300ED984D /* SimpleCLexer.m */; };
-		F7715A030AC74AA300ED984D /* SimpleCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F77159FF0AC74AA300ED984D /* SimpleCParser.m */; };
-		F7715AF00AC74F7400ED984D /* SimpleCTreeParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715AEF0AC74F7300ED984D /* SimpleCTreeParser.m */; };
+		F7715D340AC9DE9E00ED984D /* SimpleCLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715D2F0AC9DE9E00ED984D /* SimpleCLexer.m */; };
+		F7715D350AC9DE9E00ED984D /* SimpleCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715D310AC9DE9E00ED984D /* SimpleCParser.m */; };
+		F7715D360AC9DE9E00ED984D /* SimpleCTPTreeParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715D330AC9DE9E00ED984D /* SimpleCTPTreeParser.m */; };
 		F7754E3F0A5C0A0500D0873A /* ANTLRDFA.h in Headers */ = {isa = PBXBuildFile; fileRef = F7754E3D0A5C0A0500D0873A /* ANTLRDFA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F7754E400A5C0A0500D0873A /* ANTLRDFA.m in Sources */ = {isa = PBXBuildFile; fileRef = F7754E3E0A5C0A0500D0873A /* ANTLRDFA.m */; };
 		F77765CC09DC583000517181 /* ANTLRToken.h in Headers */ = {isa = PBXBuildFile; fileRef = F77765CA09DC583000517181 /* ANTLRToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -264,8 +264,6 @@
 		F72C5E2F0AB7529C00282574 /* input */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
 		F72C5E300AB7529C00282574 /* Main.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Main.java; sourceTree = "<group>"; };
 		F72C5E310AB7529C00282574 /* output */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output; sourceTree = "<group>"; };
-		F72C5E320AB7529C00282574 /* simplec.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = simplec.g; sourceTree = "<group>"; };
-		F72C5E3A0AB7529C00282574 /* simplecTP.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = simplecTP.g; sourceTree = "<group>"; };
 		F72C5E560AB7E41000282574 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F72C5E690AB7E4C900282574 /* simplectree */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = simplectree; sourceTree = BUILT_PRODUCTS_DIR; };
 		F72C5ECC0AB7E5A500282574 /* ANTLRParserRuleReturnScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRParserRuleReturnScope.h; sourceTree = "<group>"; };
@@ -275,12 +273,16 @@
 		F7492DED09C00E4500B25E30 /* TestStringStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestStringStream.h; sourceTree = "<group>"; };
 		F7492DEE09C00E4500B25E30 /* TestStringStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestStringStream.m; sourceTree = "<group>"; };
 		F7568FAE0AAB8C6E00F6FB41 /* ANTLRTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRTree.m; sourceTree = "<group>"; };
-		F77159FC0AC74AA300ED984D /* SimpleCLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCLexer.h; sourceTree = "<group>"; };
-		F77159FD0AC74AA300ED984D /* SimpleCLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleCLexer.m; sourceTree = "<group>"; };
-		F77159FE0AC74AA300ED984D /* SimpleCParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCParser.h; sourceTree = "<group>"; };
-		F77159FF0AC74AA300ED984D /* SimpleCParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleCParser.m; sourceTree = "<group>"; };
-		F7715AEE0AC74F7300ED984D /* SimpleCTreeParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCTreeParser.h; sourceTree = "<group>"; };
-		F7715AEF0AC74F7300ED984D /* SimpleCTreeParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleCTreeParser.m; sourceTree = "<group>"; };
+		F7715D1A0AC9DCE400ED984D /* SimpleC.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleC.g; sourceTree = "<group>"; };
+		F7715D1B0AC9DCE500ED984D /* SimpleCTP.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleCTP.g; sourceTree = "<group>"; };
+		F7715D1C0AC9DDD800ED984D /* SimpleC.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleC.tokens; sourceTree = "<group>"; };
+		F7715D1D0AC9DDD800ED984D /* SimpleCTP.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleCTP.tokens; sourceTree = "<group>"; };
+		F7715D2E0AC9DE9E00ED984D /* SimpleCLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCLexer.h; sourceTree = "<group>"; };
+		F7715D2F0AC9DE9E00ED984D /* SimpleCLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleCLexer.m; sourceTree = "<group>"; };
+		F7715D300AC9DE9E00ED984D /* SimpleCParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCParser.h; sourceTree = "<group>"; };
+		F7715D310AC9DE9E00ED984D /* SimpleCParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleCParser.m; sourceTree = "<group>"; };
+		F7715D320AC9DE9E00ED984D /* SimpleCTPTreeParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCTPTreeParser.h; sourceTree = "<group>"; };
+		F7715D330AC9DE9E00ED984D /* SimpleCTPTreeParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleCTPTreeParser.m; sourceTree = "<group>"; };
 		F7754E3D0A5C0A0500D0873A /* ANTLRDFA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDFA.h; sourceTree = "<group>"; };
 		F7754E3E0A5C0A0500D0873A /* ANTLRDFA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRDFA.m; sourceTree = "<group>"; };
 		F77765CA09DC583000517181 /* ANTLRToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRToken.h; sourceTree = "<group>"; };
@@ -625,18 +627,20 @@
 		F72C5E2D0AB7529C00282574 /* simplecTreeParser */ = {
 			isa = PBXGroup;
 			children = (
-				F77159FC0AC74AA300ED984D /* SimpleCLexer.h */,
-				F77159FD0AC74AA300ED984D /* SimpleCLexer.m */,
-				F77159FE0AC74AA300ED984D /* SimpleCParser.h */,
-				F77159FF0AC74AA300ED984D /* SimpleCParser.m */,
-				F7715AEE0AC74F7300ED984D /* SimpleCTreeParser.h */,
-				F7715AEF0AC74F7300ED984D /* SimpleCTreeParser.m */,
+				F7715D2E0AC9DE9E00ED984D /* SimpleCLexer.h */,
+				F7715D2F0AC9DE9E00ED984D /* SimpleCLexer.m */,
+				F7715D300AC9DE9E00ED984D /* SimpleCParser.h */,
+				F7715D310AC9DE9E00ED984D /* SimpleCParser.m */,
+				F7715D320AC9DE9E00ED984D /* SimpleCTPTreeParser.h */,
+				F7715D330AC9DE9E00ED984D /* SimpleCTPTreeParser.m */,
 				F72C5E2E0AB7529C00282574 /* files */,
 				F72C5E2F0AB7529C00282574 /* input */,
 				F72C5E300AB7529C00282574 /* Main.java */,
 				F72C5E310AB7529C00282574 /* output */,
-				F72C5E320AB7529C00282574 /* simplec.g */,
-				F72C5E3A0AB7529C00282574 /* simplecTP.g */,
+				F7715D1C0AC9DDD800ED984D /* SimpleC.tokens */,
+				F7715D1D0AC9DDD800ED984D /* SimpleCTP.tokens */,
+				F7715D1A0AC9DCE400ED984D /* SimpleC.g */,
+				F7715D1B0AC9DCE500ED984D /* SimpleCTP.g */,
 				F72C5E560AB7E41000282574 /* main.m */,
 			);
 			path = simplecTreeParser;
@@ -1129,9 +1133,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				F72C5E6B0AB7E50300282574 /* main.m in Sources */,
-				F7715A020AC74AA300ED984D /* SimpleCLexer.m in Sources */,
-				F7715A030AC74AA300ED984D /* SimpleCParser.m in Sources */,
-				F7715AF00AC74F7400ED984D /* SimpleCTreeParser.m in Sources */,
+				F7715D340AC9DE9E00ED984D /* SimpleCLexer.m in Sources */,
+				F7715D350AC9DE9E00ED984D /* SimpleCParser.m in Sources */,
+				F7715D360AC9DE9E00ED984D /* SimpleCTPTreeParser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
