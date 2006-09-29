@@ -110,7 +110,14 @@ public class ANTLRStringStream implements CharStream {
     }
 
     public int LA(int i) {
-        if ( (p+i-1) >= n ) {
+		if ( i==0 ) {
+			return 0; // undefined
+		}
+		if ( i<0 ) {
+			i++; // e.g., translate LA(-1) to use offset 0 
+		}
+
+		if ( (p+i-1) >= n ) {
             //System.out.println("char LA("+i+")=EOF; p="+p);
             return CharStream.EOF;
         }
