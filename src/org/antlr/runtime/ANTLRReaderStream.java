@@ -55,7 +55,7 @@ public class ANTLRReaderStream extends ANTLRStringStream {
 				numRead = r.read(data, p, readChunkSize);
 				// System.out.println("read "+numRead+" chars");
 				p += numRead;
-			} while (numRead==readChunkSize);
+			} while (numRead!=-1); // while not EOF
 			super.n = p; // set the actual size of the data that is available
 		}
 		finally {
