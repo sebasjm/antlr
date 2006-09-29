@@ -31,7 +31,7 @@ typedef	struct ANTLR3_BASE_TREE_struct
     /** The list of all the children that belong to this node. They are not part of the node
      *  as they belong to the common tree node that implements this.
      */
-    pANTLR3_LIST    children;
+    pANTLR3_VECTOR  children;
 
     /** This is used to store teh current child index position while descending
      *  and ascending trees as the tree walk progresses.

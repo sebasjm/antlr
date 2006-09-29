@@ -986,12 +986,19 @@ ANTLR3_API p<name>
     <recognizer.scopes:{<if(it.isDynamicGlobalScope)>
 <globalAttributeScopeFree(scope=it)><\n>
 <endif>}>
+    
+    <@cleanup>
+    <@end>
 <if(TREE_PARSER)>
-    ctx->pTreeParser->free(ctx->pTreeParser);
+    ctx->pTreeParser->free(ctx->pTreeParser);<\n>
 <else>
-    ctx->pParser->free(ctx->pParser);
+    ctx->pParser->free(ctx->pParser);<\n>
 <endif>
     ANTLR3_FREE(ctx);
+
+    /* Everything is released, so we can return
+     */
+    return;
  }
  
 /** Return token names used by this <grammarType()>
@@ -1280,13 +1287,13 @@ ruleLabelDefs() ::= <<
     :{<labelType>    <it.label.text>;}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{pANTLR3_LIST    list_<it.label.text>;}; separator="\n"
+    :{pANTLR3_VECTOR    list_<it.label.text>;}; separator="\n"
 >
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(label=it); separator="\n"
 >
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{pANTLR3_LIST     list_<it>;}; separator="\n"
+    :{pANTLR3_VECTOR     list_<it>;}; separator="\n"
 >
 >>
 
@@ -1303,7 +1310,7 @@ ruleLabelInitializations() ::= <<
     :ruleLabelInitVal(label=it); separator="\n"
 >
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{list_<it>=antlr3ListNew(ANTLR3_SIZE_HINT);}; separator="\n"
+    :{list_<it>=ctx->vectors->newVector(ctx->vectors);}; separator="\n"
 >
 >>
 
@@ -1634,7 +1641,7 @@ listLabel(label) ::= <<
  */
 if (list_<label> == NULL)
 {
-    list_<label>=antlr3ListNew(ANTLR3_LIST_SIZE_HINT);
+    list_<label>=ctx->vectors->newVector(ctx->vectors);
 }
 list_<label>->add(list_<label>, <label>, NULL);
 >>

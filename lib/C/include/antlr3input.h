@@ -170,6 +170,7 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
      *	   trigger as the comparison will be (INT32)0xFF == (INT32)0xFFFFFFFF
      */
     void		(*SetNewLineChar)	    (struct ANTLR3_INPUT_STREAM_struct * input, ANTLR3_UINT32 newlineChar);
+
 }
 
     ANTLR3_INPUT_STREAM;

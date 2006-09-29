@@ -67,7 +67,8 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
     }
 
     /* No we need to allocate the memory for the number of bits asked for
-     * in multiples of ANTLR3_UINT64.
+     * in multiples of ANTLR3_UINT64. Note, our ANTLR3_MALLOC is acutally 
+     * calloc in disguise, so no need to memset to 0
      */
     numelements	= ((numBits -1) >> ANTLR3_BITSET_LOG_BITS) + 1;
 
@@ -79,8 +80,6 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
 	ANTLR3_FREE(bitset);
 	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
     }
-
-    ANTLR3_MEMSET(bitset->bits, 0x00, (ANTLR3_UINT64)(numelements * sizeof(ANTLR3_UINT64)));
 
     bitset->clone	=   ANTLR3_API_FUNC antlr3BitsetClone;
     bitset->or		=   ANTLR3_API_FUNC antlr3BitsetOR;
@@ -355,14 +354,10 @@ grow(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize)
 {
     pANTLR3_UINT64   newBits;
 
-    /* Space for newly sized bitset - come back to this and iuse realloc, it may
+    /* Space for newly sized bitset - TODO: come back to this and use realloc?, it may
      * be more efficient...
      */
     newBits = (pANTLR3_UINT64) ANTLR3_MALLOC((size_t)(newSize * sizeof(ANTLR3_UINT64)));
-
-    /* Blank them out
-     */
-    ANTLR3_MEMSET(newBits, 0x00, (size_t)(newSize * sizeof(ANTLR3_UINT64)));
 
     if	(bitset->bits != NULL)
     {
@@ -370,12 +365,12 @@ grow(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize)
 	 */
 	ANTLR3_MEMMOVE((void *)newBits, (const void *)bitset->bits, (size_t)(bitset->length * sizeof(ANTLR3_UINT64)));
 
-        /* Out with the old bits
+        /* Out with the old bits... de de de derrr
 	 */
 	ANTLR3_FREE(bitset->bits);
     }
 
-    /* In with the new bits... der der der der.
+    /* In with the new bits... keerrrang.
      */
     bitset->bits    = newBits;
 }

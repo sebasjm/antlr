@@ -4,7 +4,7 @@
 #ifndef	_ANTLR3DEFS_H
 #define	_ANTLR3DEFS_H
 
-#define	ANTLR3_MEM_DEBUG
+// Maintainers only, and only rarely :-) #define	ANTLR3_MEM_DEBUG
 
 /* Following are for genreaed code, they are not referenced internally!!!
  */
@@ -223,28 +223,6 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 
 /* Prototypes
  */
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetNew		    (ANTLR3_UINT32 numBits);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetOf		    (ANTLR3_INT32 bit, ...);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetList		    (pANTLR3_HASH_TABLE list);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetCopy		    (pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetLoad		    (ANTLR3_UINT32 ec, pANTLR3_UINT64 bset);
-
-ANTLR3_API pANTLR3_BASE_RECOGNIZER  antlr3BaseRecognizerNew	    (ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint);
-ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_BASE_RECOGNIZER recognizer);
-ANTLR3_API void			    antlr3MTExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer);
-ANTLR3_API void			    antlr3MTNExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer);
-ANTLR3_API pANTLR3_HASH_TABLE	    antlr3HashTableNew		    (ANTLR3_UINT32 sizeHint);
-ANTLR3_API ANTLR3_UINT32	    antlr3Hash			    (void * key, ANTLR3_UINT32 keylen);
-ANTLR3_API pANTLR3_HASH_ENUM	    antlr3EnumNew		    (pANTLR3_HASH_TABLE table);
-ANTLR3_API pANTLR3_LIST		    antlr3ListNew		    (ANTLR3_UINT32 sizeHint);
-ANTLR3_API pANTLR3_STACK	    antlr3StackNew		    (ANTLR3_UINT32 sizeHint);
-
-ANTLR3_API ANTLR3_UCHAR		    antlr3c8toAntlrc		    (ANTLR3_INT8 inc);
-
-ANTLR3_API pANTLR3_EXCEPTION	    antlr3ExceptionNew		    (ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_BOOLEAN freeMessage);
-
-ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3AsciiFileStreamNew	    (pANTLR3_UINT8 fileName);
-
 
 
 #ifdef	ANTLR3_MEM_DEBUG
@@ -264,17 +242,41 @@ ANTLR3_API void			    ANTLR3_MEM_REPORT		    (ANTLR3_BOOLEAN);
 #else
 
 #define	ANTLR3_MEM_REPORT(x)
-ANTLR3_API void			  * ANTLR3_MALLOC		    (size_t request);
-ANTLR3_API void			  * ANTLR3_REALLOC		    (void * current, ANTLR3_UINT64 request);
-ANTLR3_API void			    ANTLR3_FREE			    (void * ptr);
-#define	ANTLR3_FREE_FUNC	    ANTLR3_FREE
-ANTLR3_API pANTLR3_UINT8	    ANTLR3_STRDUP		    (pANTLR3_UINT8 instr);
+#define	ANTLR3_MALLOC(request)		    calloc  (1, (size_t)(request))
+#define ANTLR3_REALLOC(current, request)    realloc ((void *)(current), (size_t)(request))
+#define	ANTLR3_FREE(ptr)		    free    ((void *)(ptr))
+#define	ANTLR3_FREE_FUNC		    free
+#define	ANTLR3_STRDUP(instr)		    (pANTLR3_UINT8)(strdup  ((const char *)(instr)))
 
 #endif
 
-ANTLR3_API void			  * ANTLR3_MEMMOVE		    (void * target, const void * source, ANTLR3_UINT64 size);
-ANTLR3_API void			  * ANTLR3_MEMSET		    (void * target, ANTLR3_UINT8 byte, ANTLR3_UINT64 size);
+#define	ANTLR3_MEMMOVE(target, source, size)	memmove((void *)(target), (const void *)(source), (size_t)(size))
+#define	ANTLR3_MEMSET(target, byte, size)	memset((void *)(target), (int)(byte), (size_t)(size))
 
+
+ANTLR3_API pANTLR3_BITSET	    antlr3BitsetNew		    (ANTLR3_UINT32 numBits);
+ANTLR3_API pANTLR3_BITSET	    antlr3BitsetOf		    (ANTLR3_INT32 bit, ...);
+ANTLR3_API pANTLR3_BITSET	    antlr3BitsetList		    (pANTLR3_HASH_TABLE list);
+ANTLR3_API pANTLR3_BITSET	    antlr3BitsetCopy		    (pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements);
+ANTLR3_API pANTLR3_BITSET	    antlr3BitsetLoad		    (ANTLR3_UINT32 ec, pANTLR3_UINT64 bset);
+
+ANTLR3_API pANTLR3_BASE_RECOGNIZER  antlr3BaseRecognizerNew	    (ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint);
+ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_BASE_RECOGNIZER recognizer);
+ANTLR3_API void			    antlr3MTExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer);
+ANTLR3_API void			    antlr3MTNExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer);
+ANTLR3_API pANTLR3_HASH_TABLE	    antlr3HashTableNew		    (ANTLR3_UINT32 sizeHint);
+ANTLR3_API ANTLR3_UINT32	    antlr3Hash			    (void * key, ANTLR3_UINT32 keylen);
+ANTLR3_API pANTLR3_HASH_ENUM	    antlr3EnumNew		    (pANTLR3_HASH_TABLE table);
+ANTLR3_API pANTLR3_LIST		    antlr3ListNew		    (ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_VECTOR	    antlr3VectorNew		    (ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_STACK	    antlr3StackNew		    (ANTLR3_UINT32 sizeHint);
+
+ANTLR3_API ANTLR3_UCHAR		    antlr3c8toAntlrc		    (ANTLR3_INT8 inc);
+
+ANTLR3_API pANTLR3_EXCEPTION	    antlr3ExceptionNew		    (ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_BOOLEAN freeMessage);
+
+ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3AsciiFileStreamNew	    (pANTLR3_UINT8 fileName);
 
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewUCS2StringInPlaceStream	(pANTLR3_UINT16 inString, ANTLR3_UINT64 size, pANTLR3_UINT16 name);

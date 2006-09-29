@@ -19,9 +19,15 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
      */
     void	* super;
 
-    /** We need a string factory for creating imaginary tokens
+    /** We need a string factory for creating imaginary tokens, we take this
+     *  from the stream we are supplied to walk.
      */
     pANTLR3_STRING_FACTORY  strFactory;
+
+    /* And we also need a token factory for createing imaginary tokens
+     * this is also taken from teh input source.
+     */
+    pANTLR3_TOKEN_FACTORY   tokenFactory;
 
     pANTLR3_BASE_TREE	    (*nil)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor);
 

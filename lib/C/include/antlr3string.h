@@ -18,7 +18,7 @@
 typedef	struct ANTLR3_STRING_struct
 {
 
-    /** The factor that created this string
+    /** The factory that created this string
      */
     pANTLR3_STRING_FACTORY	factory;
 
@@ -113,6 +113,38 @@ typedef	struct ANTLR3_STRING_struct
      */
     pANTLR3_UINT8   (*addi)	(struct ANTLR3_STRING_struct * string, ANTLR3_INT32 i);
 
+    /** Pointer to function that compares the text of a string to the supplied
+     *  8 bit character string and returns a result a la strcmp()
+     */
+    ANTLR3_UINT32   (*compare8)	(struct ANTLR3_STRING_struct * string, const char * compStr);
+
+    /** Pointer to a function that compares the text of a string with the supplied character string
+     *  (which is assumed to be in the same encoding as the string itself) and returns a result
+     *  a la strcmp()
+     */
+    ANTLR3_UINT32   (*compare)	(struct ANTLR3_STRING_struct * string, const char * compStr);
+
+    /** Pointer to a function that compares the text of a string with the supplied string
+     *  (which is assumed to be in the same encoding as the string itself) and returns a result
+     *  a la strcmp()
+     */
+    ANTLR3_UINT32   (*compareS)	(struct ANTLR3_STRING_struct * string, struct ANTLR3_STRING_struct * compStr);
+
+    /** Pointer to a function that returns the character indexed at the supplied
+     *  offset as a 32 bit character.
+     */
+    ANTLR3_UCHAR    (*charAt)	(struct ANTLR3_STRING_struct * string, ANTLR3_UINT32 offset);
+
+    /** Pointer to a function that returns a substring of the supplied string a la .subString(s,e)
+     *  in java runtimes.
+     */
+    struct ANTLR3_STRING_struct *
+		    (*subString)    (struct ANTLR3_STRING_struct * string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex);
+
+    /** Pointer to a function that returs the integer representation of any numberic characters
+     *  at the begining of the string
+     */
+    ANTLR3_UINT32   (*toInt32)	    (struct ANTLR3_STRING_struct * string);
 
 }
     ANTLR3_STRING;

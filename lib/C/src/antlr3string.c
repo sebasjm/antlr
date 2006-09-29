@@ -43,6 +43,17 @@ static    pANTLR3_UINT8	    addi16	(pANTLR3_STRING string, ANTLR3_INT32 i);
 static	  pANTLR3_UINT8	    inserti8	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i);
 static	  pANTLR3_UINT8	    inserti16	(pANTLR3_STRING string, ANTLR3_UINT32 point, ANTLR3_INT32 i);
 
+static    ANTLR3_UINT32     compare8	(pANTLR3_STRING string, const char * compStr);
+static    ANTLR3_UINT32     compare16_8	(pANTLR3_STRING string, const char * compStr);
+static    ANTLR3_UINT32     compare16_16(pANTLR3_STRING string, const char * compStr);
+static    ANTLR3_UINT32     compareS	(pANTLR3_STRING string, pANTLR3_STRING compStr);
+static    ANTLR3_UCHAR      charAt8	(pANTLR3_STRING string, ANTLR3_UINT32 offset);
+static    ANTLR3_UCHAR      charAt16	(pANTLR3_STRING string, ANTLR3_UINT32 offset);
+static    pANTLR3_STRING    subString8	(pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex);
+static    pANTLR3_STRING    subString16	(pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex);
+static	  ANTLR3_UINT32	    toInt32_8	(pANTLR3_STRING string);
+static	  ANTLR3_UINT32	    toInt32_16  (pANTLR3_STRING string);
+
 /* Local helpers
  */
 static	void	stringInit8	(pANTLR3_STRING string);
@@ -214,19 +225,25 @@ stringInit8  (pANTLR3_STRING string)
 
     /* API for 8 bit strings*/
 
-    string->set	    = set8;
-    string->set8    = set8;
-    string->append  = append8;
-    string->append8 = append8;
-    string->insert  = insert8;
-    string->insert8 = insert8;
-    string->addi    = addi8;
-    string->inserti = inserti8;
-    string->addc    = addc8;
-    
-    string->setS    = setS;
-    string->appendS = appendS;
-    string->insertS = insertS;
+    string->set		= set8;
+    string->set8	= set8;
+    string->append	= append8;
+    string->append8	= append8;
+    string->insert	= insert8;
+    string->insert8	= insert8;
+    string->addi	= addi8;
+    string->inserti	= inserti8;
+    string->addc	= addc8;
+    string->charAt	= charAt8;
+    string->compare	= compare8;
+    string->compare8	= compare8;
+    string->subString	= subString8;
+    string->toInt32	= toInt32_8;
+
+    string->compareS	= compareS;
+    string->setS	= setS;
+    string->appendS	= appendS;
+    string->insertS	= insertS;
 
 }
 /**
@@ -243,20 +260,25 @@ stringInit16  (pANTLR3_STRING string)
 
     /* API for 16 bit strings */
 
-    string->set	    = set16_16;
-    string->set8    = set16_8;
-    string->append  = append16_16;
-    string->append8 = append16_8;
-    string->insert  = insert16_16;
-    string->insert8 = insert16_8;
+    string->set		= set16_16;
+    string->set8	= set16_8;
+    string->append	= append16_16;
+    string->append8	= append16_8;
+    string->insert	= insert16_16;
+    string->insert8	= insert16_8;
+    string->addi	= addi16;
+    string->inserti	= inserti16;
+    string->addc	= addc16;
+    string->charAt	= charAt16;
+    string->compare	= compare16_16;
+    string->compare8	= compare16_8;
+    string->subString	= subString16;
+    string->toInt32	= toInt32_16;
 
-    string->addi    = addi16;
-    string->inserti = inserti16;
-    string->addc    = addc16;
-
-    string->setS    = setS;
-    string->appendS = appendS;
-    string->insertS = insertS;
+    string->compareS	= compareS;
+    string->setS	= setS;
+    string->appendS	= appendS;
+    string->insertS	= insertS;
 }
 /**
  *
@@ -323,7 +345,7 @@ newSize16	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
     /* Always add one more byte for a terminator ;-)
      */
     string->chars   = (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_UINT16) * (size+1)));
-    string->size    = size + 1;
+    string->size    = size+1;	// Size is always in characters, as is len
 
     return string;
 }
@@ -372,7 +394,9 @@ newPtr16_8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 siz
 {
     pANTLR3_STRING  string;
 
-    string  = factory->newSize(factory, size * sizeof(ANTLR3_UINT16));
+    // newSize accepts size in characters, not bytes
+    //
+    string  = factory->newSize(factory, size);
 
     if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
     {
@@ -386,11 +410,13 @@ newPtr16_8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 siz
 
     if	(ptr != NULL)
     {
-	pANTLR3_UINT16	    out;
+	pANTLR3_UINT16	out;
+        ANTLR3_INT32    inSize;
 
 	out = (pANTLR3_UINT16)(string->chars);
+	inSize	= size;
 
-	while	(size-- > 0)
+	while	(inSize-- > 0)
 	{
 	    *out++ = (ANTLR3_UINT16)(*ptr++);
 	}
@@ -646,7 +672,7 @@ append16_8	(pANTLR3_STRING string, const char * newbit)
     apPoint = ((pANTLR3_UINT16)string->chars) + string->len;
     string->len	+= len;
 
-    for	(count = 0; count < string->len; count++)
+    for	(count = 0; count < len; count++)
     {
 	*apPoint++   = *(newbit + count);
     }
@@ -963,7 +989,182 @@ static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbi
 	return  string->append(string, (const char *)(newbit->chars));
     }
 }
+
 static	  pANTLR3_UINT8	    insertS	(pANTLR3_STRING string, ANTLR3_UINT32 point, pANTLR3_STRING newbit)
 {
     return  string->insert(string, point, (const char *)(newbit->chars));
+}
+
+/* Function that compares the text of a string to the supplied
+ * 8 bit character string and returns a result a la strcmp()
+ */
+static ANTLR3_UINT32   
+compare8	(pANTLR3_STRING string, const char * compStr)
+{
+    return  strcmp((const char *)(string->chars), compStr);
+}
+
+/* Function that compares the text of a string with the supplied character string
+ * (which is assumed to be in the same encoding as the string itself) and returns a result
+ * a la strcmp()
+ */
+static ANTLR3_UINT32   
+compare16_8	(pANTLR3_STRING string, const char * compStr)
+{
+    pANTLR3_UINT16  ourString;
+    ANTLR3_UINT32   charDiff;
+
+    ourString	= (pANTLR3_UINT16)(string->chars);
+
+    while   (((ANTLR3_UCHAR)(*ourString) != '\0') && ((ANTLR3_UCHAR)(*compStr) != '\0'))
+    {
+	charDiff = *ourString - *compStr;
+	if  (charDiff != 0)
+	{
+	    return charDiff;
+	}
+	ourString++;
+	compStr++;
+    }
+
+    /* At this point, one of the strings was terminated
+     */
+    return (ANTLR3_UINT32)((ANTLR3_UCHAR)(*ourString) - (ANTLR3_UCHAR)(*compStr));
+
+}
+
+/* Function that compares the text of a string with the supplied character string
+ * (which is assumed to be in the same encoding as the string itself) and returns a result
+ * a la strcmp()
+ */
+static ANTLR3_UINT32   
+compare16_16	(pANTLR3_STRING string, const char * compStr8)
+{
+    pANTLR3_UINT16  ourString;
+    pANTLR3_UINT16  compStr;
+    ANTLR3_UINT32   charDiff;
+
+    ourString	= (pANTLR3_UINT16)(string->chars);
+    compStr	= (pANTLR3_UINT16)(compStr8);
+
+    while   (((ANTLR3_UCHAR)(*ourString) != '\0') && ((ANTLR3_UCHAR)(*((pANTLR3_UINT16)compStr)) != '\0'))
+    {
+	charDiff = *ourString - *compStr;
+	if  (charDiff != 0)
+	{
+	    return charDiff;
+	}
+	ourString++;
+	compStr++;
+    }
+
+    /* At this point, one of the strings was terminated
+     */
+    return (ANTLR3_UINT32)((ANTLR3_UCHAR)(*ourString) - (ANTLR3_UCHAR)(*compStr));
+}
+
+/* Function that compares the text of a string with the supplied string
+ * (which is assumed to be in the same encoding as the string itself) and returns a result
+ * a la strcmp()
+ */
+static ANTLR3_UINT32   
+compareS    (pANTLR3_STRING string, pANTLR3_STRING compStr)
+{
+    return  string->compare(string, (const char *)compStr->chars);
+}
+
+
+/* Function that returns the character indexed at the supplied
+ * offset as a 32 bit character.
+ */
+static ANTLR3_UCHAR    
+charAt8	    (pANTLR3_STRING string, ANTLR3_UINT32 offset)
+{
+    if	(offset > string->len)
+    {
+	return (ANTLR3_UCHAR)'\0';
+    }
+    else
+    {
+	return  (ANTLR3_UCHAR)(*(string->chars + offset));
+    }
+}
+
+/* Function that returns the character indexed at the supplied
+ * offset as a 32 bit character.
+ */
+static ANTLR3_UCHAR    
+charAt16    (pANTLR3_STRING string, ANTLR3_UINT32 offset)
+{
+    if	(offset > string->len)
+    {
+	return (ANTLR3_UCHAR)'\0';
+    }
+    else
+    {
+	return  (ANTLR3_UCHAR)(*((pANTLR3_UINT16)(string->chars) + offset));
+    }
+}
+
+/* Function that returns a substring of the supplied string a la .subString(s,e)
+ * in java runtimes.
+ */
+static pANTLR3_STRING
+subString8   (pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex)
+{
+    pANTLR3_STRING newStr;
+
+    if	(endIndex > string->len)
+    {
+	endIndex = string->len;
+    }
+    newStr  = string->factory->newPtr(string->factory, string->chars + startIndex, endIndex - startIndex);
+
+    return newStr;
+}
+
+/* Returns a substring of the supplied string a la .subString(s,e)
+ * in java runtimes.
+ */
+static pANTLR3_STRING
+subString16  (pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex)
+{
+    pANTLR3_STRING newStr;
+
+    if	(endIndex > string->len)
+    {
+	endIndex = string->len;
+    }
+    newStr  = string->factory->newPtr(string->factory, (pANTLR3_UINT8)((pANTLR3_UINT16)(string->chars) + startIndex), endIndex - startIndex);
+
+    return newStr;
+}
+
+/* Function that can convert the characters in the string to an integer
+ */
+static ANTLR3_UINT32
+toInt32_8	    (struct ANTLR3_STRING_struct * string)
+{
+    return  atoi((const char *)(string->chars));
+}
+
+/* Function that can convert the characters in the string to an integer
+ */
+static ANTLR3_UINT32
+toInt32_16       (struct ANTLR3_STRING_struct * string)
+{
+    pANTLR3_UINT16  input;
+    ANTLR3_UINT32   value;
+
+    value   = 0;
+    input   = (pANTLR3_UINT16)(string->chars);
+
+    while   (*input != '\0' && isdigit(*input))
+    {
+	value	 = value * 10;
+	value	+= ((ANTLR3_UINT32)(*input) - (ANTLR3_UINT32)'0');
+	input++;
+    }
+
+    return value;
 }

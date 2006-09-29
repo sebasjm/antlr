@@ -148,7 +148,7 @@ static	pANTLR3_BASE_TREE
 		{
 			/* TODO: Handle tree exceptions 
 			 */
-			fprintf(stderr, "More than one node as root! ODO: Create tree exception hndling\n");
+			fprintf(stderr, "More than one node as root! TODO: Create tree exception hndling\n");
 			return newRootTree;
 		}
 

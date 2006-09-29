@@ -152,6 +152,65 @@ typedef	struct	ANTLR3_STACK_struct
 }
     ANTLR3_STACK;
 
+/* Structure that represents a vector element
+ */
+typedef struct ANTLR3_VECTOR_ELEMENT_struct
+{
+    void    * element;
+    void (*freeptr)(void *);
+}
+    ANTLR3_VECTOR_ELEMENT, *pANTLR3_VECTOR_ELEMENT;
 
+/* Structure that represents a vector collection. A vector is a simple list
+ * that contains a pointer to the element and a pointer to a function that
+ * that can free the element if it is removed. It auto resizes but does not
+ * use hash techniques as it is referenced by a simple numeric index. It is not a 
+ * sparse list, so if any element is deleted, then the ones following are moved
+ * down in memory and the count is adjusted.
+ */
+typedef struct ANTLR3_VECTOR_struct
+{
+    /** Array of pointers to vector elements
+     */
+    pANTLR3_VECTOR_ELEMENT  elements;
+
+    /** Number of entries currently in the list;
+     */
+    ANTLR3_UINT64   count;
+
+    /** Total number of entires in elements at any point in time
+     */
+    ANTLR3_UINT32   elementsSize;
+
+    void	    (*free)	(struct ANTLR3_VECTOR_struct * vector);
+    void	    (*del)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry);
+    void *	    (*get)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry);
+    void *	    (*remove)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry);
+    ANTLR3_INT32    (*add)	(struct ANTLR3_VECTOR_struct * vector, void * element, void (*freeptr)(void *));
+    ANTLR3_INT32    (*put)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry, void * element, void (*freeptr)(void *));
+    ANTLR3_UINT64   (*size)	(struct ANTLR3_VECTOR_struct * vector);
+}
+    ANTLR3_VECTOR;
+
+/** Structure that tracks vectors in a vector and auto deletes the vectors
+ *  in the vector factory when closed.
+ */
+typedef struct ANTLR3_VECTOR_FACTORY_struct
+{
+    /** Vector of all the vectors created so far
+     */
+    pANTLR3_VECTOR  vectors;
+
+    /** Function to close the vector factory
+     */
+    void	    (*close)	    (struct ANTLR3_VECTOR_FACTORY_struct * factory);
+
+    /** Function to supply a new vector
+     */
+    pANTLR3_VECTOR  (*newVector)    (struct ANTLR3_VECTOR_FACTORY_struct * factory);
+
+}
+    ANTLR3_VECTOR_FACTORY; 
 
 #endif
+

@@ -31,6 +31,7 @@ group CAST;
 @headerFile.members() ::= <<
 /* @headerFile.members() */
 pANTLR3_BASE_TREE_ADAPTOR	adaptor;
+pANTLR3_VECTOR_FACTORY		vectors;
 /* End @headerFile.members() */
 >>
 
@@ -39,9 +40,23 @@ pANTLR3_BASE_TREE_ADAPTOR	adaptor;
  */
 @genericParser.apifuncs() ::= <<
 <if(PARSER)>
-ctx->adaptor	= ANTLR3_TREE_ADAPTORNew(instream->tstream->tokenSource->strFactory);
+ctx->adaptor	= ANTLR3_TREE_ADAPTORNew(instream->tstream->tokenSource->strFactory);<\n>
 <else>
-ctx->adaptor	= instream->adaptor;
+ctx->adaptor	= instream->adaptor;<\n>
+<endif>
+ctx->vectors	= antlr3VectorFactoryNew(64);
+>>
+
+@genericParser.cleanup() ::= <<
+ctx->vectors->close(ctx->vectors);
+<if(PARSER)>
+/* We created the adaptor so we must free it
+ */
+ctx->adaptor->free(ctx->adaptor);
+<else>
+/* Though we utilized the adaptor, we did not create it, therefore
+ * we leave it to the creator to free it.
+ */
 <endif>
 >>
 
@@ -322,7 +337,7 @@ listLabelTrack(label) ::= <<
  */
 if (list_<label> == NULL)
 {
-    list_<label>=antlr3ListNew(ANTLR3_LIST_SIZE_HINT);
+    list_<label>=ctx->vectors->newVector(ctx->vectors);
 }
 list_<label>->add(list_<label>, <label>.tree, NULL);
 >>
@@ -347,7 +362,7 @@ listLabelAST(label) ::= <<
  */
 if (list_<label> == NULL)
 {
-    list_<label>=antlr3ListNew(ANTLR3_LIST_SIZE_HINT);
+    list_<label>=ctx->vectors->newVector(ctx->vectors);
 }
 {
     RETURN_TYPE_<label> * tcopy;

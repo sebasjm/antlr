@@ -26,6 +26,8 @@ static	void		setTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE
 static	ANTLR3_UINT64   getTokenStartIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static  ANTLR3_UINT64   getTokenStopIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
+static	void		ctaFree			(pANTLR3_BASE_TREE_ADAPTOR adaptor);
+
 /** Create a new tree adaptor. Note that despite the fact that this is
  *  creating a new COMMON_TREE adaptor, we return the address of the
  *  BASE_TREE interface, as should any other adaptor that wishes to be 
@@ -64,7 +66,7 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
     cta->baseAdaptor.getTokenStopIndex	    = ANTLR3_API_FUNC getTokenStopIndex;
     cta->baseAdaptor.getText		    = ANTLR3_API_FUNC getText;
     cta->baseAdaptor.getType		    = ANTLR3_API_FUNC getType;
-
+    cta->baseAdaptor.free		    = ANTLR3_API_FUNC ctaFree;
     /* Install the super class pointer
      */
     cta->baseAdaptor.super	    = cta;
@@ -72,6 +74,12 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
     /* Install a tree factory for creating new tree nodes
      */
     cta->arboretum  = antlr3ArboretumNew(strFactory);
+
+    /* Install a token factory for imaginary tokens, these imaginary
+     * tokens do not require access to the input stream so we can
+     * dummy the creation of it.
+     */
+    cta->baseAdaptor.tokenFactory   = antlr3TokenFactoryNew(NULL);
 
     /* Allow the base tree adaptor to share the tree factory's string factory.
      */
@@ -82,6 +90,26 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
     return  &(cta->baseAdaptor);
 }
 
+static void
+ctaFree(pANTLR3_BASE_TREE_ADAPTOR adaptor)
+{
+    pANTLR3_COMMON_TREE_ADAPTOR cta;
+
+    cta	= (pANTLR3_COMMON_TREE_ADAPTOR)(adaptor->super);
+
+    /* Free the tree factory we created
+     */
+    cta->arboretum->close(((pANTLR3_COMMON_TREE_ADAPTOR)(adaptor->super))->arboretum);
+
+    /* Free the token factory we created
+     */
+    adaptor->tokenFactory->close(adaptor->tokenFactory);
+
+    /* Free the super pointer, as it is this that was allocated
+     * and is the common tree structure.
+     */
+    ANTLR3_FREE(adaptor->super);
+}
 
 /* BASE_TREE_ADAPTOR overrides */
 
@@ -98,7 +126,7 @@ create		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN payload)
 {
     pANTLR3_BASE_TREE	ct;
     
-    /* Create a new common tree as this is what this adaptor dels with
+    /* Create a new common tree as this is what this adaptor deals with
      */
     ct = ((pANTLR3_COMMON_TREE_ADAPTOR)(adaptor->super))->arboretum->newFromToken(((pANTLR3_COMMON_TREE_ADAPTOR)(adaptor->super))->arboretum, payload);
 
@@ -121,7 +149,7 @@ createToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR
 {
     pANTLR3_COMMON_TOKEN    newToken;
 
-    newToken	= antlr3CommonTokenNew(tokenType);
+    newToken	= adaptor->tokenFactory->newToken(adaptor->tokenFactory);
 
     if	(newToken != (pANTLR3_COMMON_TOKEN)(ANTLR3_ERR_NOMEM))
     {
@@ -129,6 +157,7 @@ createToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR
 	 * commontoken.
 	 */
 	newToken->text	= adaptor->strFactory->newStr8(adaptor->strFactory, text);
+	newToken->setType(newToken, tokenType);
     }
 
     return  newToken;
@@ -157,7 +186,9 @@ createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fr
 {
     pANTLR3_COMMON_TOKEN    newToken;
 
-    newToken	= antlr3CommonTokenNew(fromToken->getType(fromToken));
+    newToken	= adaptor->tokenFactory->newToken(adaptor->tokenFactory);
+    
+    antlr3CommonTokenNew(fromToken->getType(fromToken));
 
     if	(newToken != (pANTLR3_COMMON_TOKEN)(ANTLR3_ERR_NOMEM))
     {
@@ -165,14 +196,16 @@ createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fr
 	 * commontoken.
 	 */
 	pANTLR3_STRING	text;
-	text		= fromToken->getText(fromToken);
-	newToken->text	= adaptor->strFactory->newPtr(adaptor->strFactory, text->chars, text->len);
+
+	newToken->toString  = fromToken->toString;
+	text		    = fromToken->getText(fromToken);
+	newToken->text	    = adaptor->strFactory->newPtr(adaptor->strFactory, text->chars, text->len);
 
 	newToken->setLine		(newToken, fromToken->getLine(fromToken));
 	newToken->setTokenIndex		(newToken, fromToken->getTokenIndex(fromToken));
 	newToken->setCharPositionInLine	(newToken, fromToken->getCharPositionInLine(fromToken));
 	newToken->setChannel		(newToken, fromToken->getChannel(fromToken));
-	newToken->toString		= fromToken->toString;
+	newToken->setType		(newToken, fromToken->getType(fromToken));
     }
 
     return  newToken;

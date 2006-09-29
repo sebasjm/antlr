@@ -7,45 +7,7 @@
  */
 #include    <antlr3defs.h>
 
-ANTLR3_API void *
-ANTLR3_MEMMOVE(void * target, const void * source, ANTLR3_UINT64 size)
-{
-    return  memmove(target, source, (size_t)size);
-}
-
-ANTLR3_API void *
-ANTLR3_MEMSET(void * target, ANTLR3_UINT8 byte, ANTLR3_UINT64 size)
-{
-    return memset(target, (int)byte, (size_t)size);
-}
-
-#ifndef	ANTLR3_MEM_DEBUG
-
-ANTLR3_API void *
-ANTLR3_MALLOC(size_t request)
-{
-    return  calloc(1, request);
-}
-
-ANTLR3_API void *
-ANTLR3_REALLOC(void * current, ANTLR3_UINT64 request)
-{
-    return  realloc(current, (size_t)request);
-}
-
-ANTLR3_API void
-ANTLR3_FREE(void * ptr)
-{
-    free(ptr);
-}
-
-ANTLR3_API pANTLR3_UINT8
-ANTLR3_STRDUP(pANTLR3_UINT8 instr)
-{
-    return  (pANTLR3_UINT8)strdup((const char *)instr);
-}
-
-#else
+#ifdef	ANTLR3_MEM_DEBUG
 
 #include    <antlr3collections.h>
 #ifdef	WIN32

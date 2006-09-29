@@ -29,7 +29,7 @@ antlr3ArboretumNew(pANTLR3_STRING_FACTORY strFactory)
 {
     pANTLR3_ARBORETUM   factory;
 
-    /* allocate memory
+    /* Allocate memory
      */
     factory	= (pANTLR3_ARBORETUM) ANTLR3_MALLOC((size_t)sizeof(ANTLR3_ARBORETUM));
 
@@ -183,7 +183,25 @@ factoryClose	    (pANTLR3_ARBORETUM factory)
      */
     for	(poolCount = 0; poolCount <= factory->thisPool; poolCount++)
     {
+	ANTLR3_UINT32	tree;
 
+	/* We must free any child vectors or anything else that requires
+	 * freeing by calling the free method on each member of the pool.
+	 * The free method will not release itself as it is factoryMade. So
+	 * we just release them en masse ici.
+	 */
+	for (tree=0; tree< ANTLR3_FACTORY_POOL_SIZE; tree++)
+	{
+	    pANTLR3_BASE_TREE thisTree;
+
+	    thisTree    = &(factory->pools[poolCount][tree].baseTree);
+
+	    if	(thisTree->free == NULL)
+	    {
+		break;	// Found the last allocation in this pool
+	    }
+	    thisTree->free(thisTree);
+	}
 	/* We can now free this pool allocation
 	 */
 	ANTLR3_FREE(factory->pools[poolCount]);
@@ -301,7 +319,7 @@ static void
 freeTree(pANTLR3_BASE_TREE tree)
 {
     /* Call free on all the nodes.
-     * We installed all the nodes as base nodes with a pointer to a function that
+     * We install all the nodes as base nodes with a pointer to a function that
      * knows how to free itself. A function that calls this function in fact. So if we just
      * delete the hash table, then this function will be called for all
      * child nodes, which will delete thier child nodes, and so on
@@ -310,12 +328,13 @@ freeTree(pANTLR3_BASE_TREE tree)
     if	(tree->children != NULL)
     {
 	tree->children->free(tree->children);
+	tree->children = NULL;
     }
     
     if	(((pANTLR3_COMMON_TREE)(tree->super))->factoryMade == ANTLR3_FALSE)
     {
 	/* Now we can free this structure memory, which contains the base tree
-	 * structure also. Later I will expand this to call an public fuciton to release
+	 * structure also. Later I will expand this to call an public function to release
 	 * the base node, so people overriding it will be able to use it more freely.
 	 */
 	ANTLR3_FREE(tree->super);

@@ -24,6 +24,8 @@ typedef struct ANTLR3_HASH_ENUM_struct		    *pANTLR3_HASH_ENUM;
 typedef struct ANTLR3_HASH_TABLE_struct		    *pANTLR3_HASH_TABLE;
 
 typedef struct ANTLR3_LIST_struct		    *pANTLR3_LIST;
+typedef struct ANTLR3_VECTOR_FACTORY_struct	    *pANTLR3_VECTOR_FACTORY;
+typedef struct ANTLR3_VECTOR_struct		    *pANTLR3_VECTOR;
 typedef struct ANTLR3_STACK_struct		    *pANTLR3_STACK;
 
 typedef struct ANTLR3_INPUT_STREAM_struct	    *pANTLR3_INPUT_STREAM;

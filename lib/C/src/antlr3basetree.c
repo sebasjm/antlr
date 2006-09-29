@@ -131,41 +131,29 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 	    return;
 	}
 
-	/* Add all of the childrens children to this list
+	/* Add all of the children's children to this list
 	 */
 	if  (child->children != NULL)
 	{
-	    if	(tree->children != NULL)
+	    if	(tree->children == NULL)
 	    {
-		/* Need to copy the children as we already have children
-		 */
-		n = child->children->size(child->children);
-
-		for (i = 0; i<n; i++)
-		{
-		    void	* entry;
-		    entry	= child->children->get(child->children, i + 1);
-
-		    /* ANTLR3 lists can be sparse, unlike Array Lists
-		     */
-		    if  (entry != NULL)
-		    {
-			tree->children->add(tree->children, entry, (void (*)(void *))child->free);
-		    }
-		}
+		tree->children = antlr3VectorNew(32);
 	    }
-	    else
+	    /* Need to copy the children 
+	     */
+	    n = child->children->size(child->children);
+
+	    for (i = 0; i<n; i++)
 	    {
-		/* The current tree has no children but the child does, so we
-		 * just copy it's pointer.
-		 * TODO: This might be valid in Java as it is a reference but it
-		 * it might cause us problems with memory freeing in C, this might
-		 * need to go back to a copy unless we can catch that it is already
-		 * freed when we come to tear down the tree. I suspect that this means
-		 * the best thing to do is create a tree factory to create and destroy
-		 * trees and nodes.
+		void	* entry;
+		entry	= child->children->get(child->children, i + 1);
+
+		/* ANTLR3 lists can be sparse, unlike Array Lists
 		 */
-		tree->children = child->children;
+		if  (entry != NULL)
+		{
+		    tree->children->add(tree->children, entry, (void (*)(void *))child->free);
+		}
 	    }
 	}
     }
@@ -204,7 +192,7 @@ addChildren	(pANTLR3_BASE_TREE tree, pANTLR3_LIST kids)
 static void
 createChildrenList  (pANTLR3_BASE_TREE tree)
 {
-    tree->children = antlr3ListNew(63);
+    tree->children = antlr3VectorNew(32);
 }
 
 static    void

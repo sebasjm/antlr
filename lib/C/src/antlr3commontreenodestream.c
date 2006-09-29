@@ -116,8 +116,6 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 
     if	(stream->adaptor == (pANTLR3_BASE_TREE_ADAPTOR) ANTLR3_ERR_NOMEM)
     {
-	stream->stringFactory->close	(stream->stringFactory);
-
 	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
     }
 
@@ -127,7 +125,6 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 
     if	(stream->tnstream == (pANTLR3_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM)
     {
-	stream->stringFactory->close	(stream->stringFactory);
 	stream->adaptor->free		(stream->adaptor);
 
 	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
@@ -139,7 +136,6 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
     
     if	(stream->tnstream->istream == (pANTLR3_INT_STREAM) ANTLR3_ERR_NOMEM)
     {
-	stream->stringFactory->close	(stream->stringFactory);
 	stream->adaptor->free		(stream->adaptor);
 	stream->tnstream->free		(stream->tnstream);
 
@@ -234,6 +230,17 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 
 static	void			    antlr3CommonTreeNodeStreamFree  (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 {
+    ctns->adaptor	    ->free  (ctns->adaptor);
+    ctns->tnstream->istream ->free  (ctns->tnstream->istream);
+    ctns->tnstream	    ->free  (ctns->tnstream);
+    ctns->nodeStack	    ->free  (ctns->nodeStack);
+    
+    ANTLR3_FREE(ctns->INVALID_NODE.token);
+    ANTLR3_FREE(ctns->EOF_NODE.token);
+    ANTLR3_FREE(ctns->DOWN.token);
+    ANTLR3_FREE(ctns->UP.token);
+    ANTLR3_FREE(ctns->lookAhead);
+    ANTLR3_FREE(ctns);
 }
 
 /** Reset the input stream to the start of the input nodes.
