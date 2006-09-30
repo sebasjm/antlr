@@ -50,8 +50,8 @@
 - (void) fillBuffer;
 - (void) consume;
 
-- (int) skipOffTokenChannels:(int) i;
-- (int) skipOffTokenChannelsReverse:(int) i;
+- (int) skipOffChannelTokens:(int) i;
+- (int) skipOffChannelTokensReverse:(int) i;
 
 - (void) setTokenType:(int)ttype toChannel:(int)channel;
 - (void) discardTokenType:(int)ttype;
