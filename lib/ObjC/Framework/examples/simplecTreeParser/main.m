@@ -7,7 +7,7 @@
 int main() {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *string = [NSString stringWithContentsOfFile:@"input"];
+	NSString *string = [NSString stringWithContentsOfFile:@"examples/simplecTreeParser/input"];
 	NSLog(@"input is : %@", string);
 	ANTLRStringStream *stream = [[ANTLRStringStream alloc] initWithStringNoCopy:string];
 	SimpleCLexer *lexer = [[SimpleCLexer alloc] initWithCharStream:stream];
