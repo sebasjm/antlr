@@ -220,7 +220,7 @@
 		F700ED950A5FF2A5005D0757 /* ANTLRCommonTokenStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRCommonTokenStream.m; sourceTree = "<group>"; };
 		F7037CEE0A0582FC0070435D /* ANTLRMismatchedRangeException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedRangeException.h; sourceTree = "<group>"; };
 		F7037CEF0A0582FC0070435D /* ANTLRMismatchedRangeException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedRangeException.m; sourceTree = "<group>"; };
-		F7037EA00A05AFB60070435D /* lexertest-simple */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "lexertest-simple"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F7037EA00A05AFB60070435D /* lexertest-simple */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = "lexertest-simple"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7037EBD0A05B06B0070435D /* lexer.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = lexer.g; sourceTree = "<group>"; };
 		F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedSetException.h; sourceTree = "<group>"; };
 		F70380BB0A07FA0D0070435D /* ANTLRMismatchedSetException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedSetException.m; sourceTree = "<group>"; };
