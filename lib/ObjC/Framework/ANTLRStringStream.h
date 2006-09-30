@@ -1,6 +1,5 @@
 // [The "BSD licence"]
-// Copyright (c) 2005-2006 Terence Parr
-// Copyright (c) 2006 Kay Roepke (Objective-C runtime)
+// Copyright (c) 2006 Kay Roepke
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
