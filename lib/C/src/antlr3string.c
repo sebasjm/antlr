@@ -685,8 +685,17 @@ static    pANTLR3_UINT8
 append16_16	(pANTLR3_STRING string, const char * newbit)
 {
     ANTLR3_UINT32 len;
+    pANTLR3_UINT16  in;
 
-    len	= (ANTLR3_UINT32)strlen(newbit);
+    /** First, determine the length of the input string
+     */
+    in	    = (pANTLR3_UINT16)newbit;
+    len   = 0;
+
+    while   (*in++ != '\0')
+    {
+	len++;
+    }
 
     if	(string->size < (string->len + len + 1))
     {
@@ -696,6 +705,7 @@ append16_16	(pANTLR3_STRING string, const char * newbit)
 
     /* Note we copy one more byte than the strlen in order to get the trailing delimiter
      */
+    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + string->len), newbit, (ANTLR3_UINT64)(len+1));
     ANTLR3_MEMMOVE((void *)(string->chars + string->len), newbit, (ANTLR3_UINT64)(len+1));
     string->len	+= len;
 
