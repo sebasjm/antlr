@@ -834,6 +834,10 @@ antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
     vector->remove  = antrl3VectorRemove;
     vector->size    = antlr3VectorSize;
 
+    /** Assume that this is not a factory made vector
+     */
+    vector->factoryMade	= ANTLR3_FALSE;
+
     /* And everything is hunky dory
      */
     return  vector;
@@ -847,7 +851,7 @@ static	void		antlr3VectorFree    (pANTLR3_VECTOR vector)
      * a pointer to a free fucntion then we call it with the
      * the entry pointer
      */
-    for	(entry = 0; entry < vector->elementsSize; entry++)
+    for	(entry = 0; entry < vector->count; entry++)
     {
 	if  (vector->elements[entry].freeptr != NULL)
 	{
@@ -857,14 +861,17 @@ static	void		antlr3VectorFree    (pANTLR3_VECTOR vector)
 	vector->elements[entry].element    = NULL;
     }
 
-    /* The entries are freed, so free the element allocation
-     */
-    ANTLR3_FREE(vector->elements);
-    vector->elements = NULL;
+    if	(vector->factoryMade == ANTLR3_FALSE)
+    {
+	/* The entries are freed, so free the element allocation
+	 */
+	ANTLR3_FREE(vector->elements);
+	vector->elements = NULL;
 
-    /* Finally, free the allocation for the vector itself
-     */
-    ANTLR3_FREE(vector);
+	/* Finally, free the allocation for the vector itself
+	 */
+	ANTLR3_FREE(vector);
+    }
 
 }
 
@@ -986,8 +993,11 @@ static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * elemen
 
 	/* Use realloc so that the pointers are copied for us
 	 */
-	vector->elements = (pANTLR3_VECTOR_ELEMENT)ANTLR3_REALLOC(vector->elements, (sizeof(ANTLR3_VECTOR_ELEMENT)* newSize));
-
+	vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_REALLOC(vector->elements, (sizeof(ANTLR3_VECTOR_ELEMENT)* newSize));
+	/* Reset new pointers etc to 0
+	 */
+	ANTLR3_MEMSET(vector->elements + vector->elementsSize, 0x00, (newSize - vector->elementsSize) * sizeof(ANTLR3_VECTOR_ELEMENT));
+	vector->elementsSize	= newSize;
     }
 
     /* Insert the new entry
@@ -1077,13 +1087,57 @@ ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 si
 static  void		
 closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory)
 {
-    /* First close the vector of vectors, which will cause any entries
-     * to be freed
-     */
-    factory->vectors->free(factory->vectors);
-    factory->vectors	= NULL;
+    ANTLR3_UINT64   entry;
+    pANTLR3_VECTOR  vector;
+    pANTLR3_VECTOR  freeVector;
 
-    /* Now free the memeory for the factory itself
+    /** First we iterate the vectors in the factory and call
+     *  free on each of them. Because they are factory made only
+     *  any installed free pointers for the entries will be called
+     *  and we will be left with just those vectors that were factory made
+     *  to delete the memory allocations for. These are the elment list
+     *  itself.
+     */
+    vector  = factory->vectors;
+
+    /* We must traverse every entry in the vector and if it has
+     * a pointer to a free function then we call it with the
+     * the entry pointer
+     */
+    for	(entry = 0; entry < vector->count; entry++)
+    {
+	if  (vector->elements[entry].freeptr != NULL)
+	{
+	    vector->elements[entry].freeptr(vector->elements[entry].element);
+	}
+    }
+
+    /* Having called free on each of the vectors in the vector factory,
+     * anything that was somewhere buried in the vectors in the factory that
+     * was not factory made, is now deallocated. So, we now need only
+     * traverse each vector in the factory and free its elements, then free this
+     * factory vector.
+     */
+    for	(entry = 0; entry < vector->count; entry++)
+    {
+	freeVector  = (pANTLR3_VECTOR)(vector->elements[entry].element);
+
+	// Anything in here should be factory made, but we do this just
+	// to triple check.
+	//
+	if  (freeVector->factoryMade == ANTLR3_TRUE)
+	{
+	    ANTLR3_FREE(freeVector->elements);
+	    ANTLR3_FREE(freeVector);
+	}
+    }
+
+    /* Free the memory for the factory vector elements, then the factory vector
+     */
+    ANTLR3_FREE(vector->elements);
+    ANTLR3_FREE(vector);
+
+    /* Now free the memory for the factory itself
      */
     ANTLR3_FREE(factory);
 }
@@ -1103,8 +1157,9 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
     }
 
     /* Now add this vector to the factory vector, which will
-     * track it and release it when we claose the factory.
+     * track it and release any entries in it when we close the factory.
      */
+    vector->factoryMade	= ANTLR3_TRUE;
     factory->vectors->add(factory->vectors, (void *)vector, vector->free);
 
     return  vector;

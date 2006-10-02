@@ -178,9 +178,16 @@ typedef struct ANTLR3_VECTOR_struct
      */
     ANTLR3_UINT64   count;
 
+    /** Indicates if the structure was made by a factory, in which
+     *  case only the factory can free the memory for the actual vector,
+     *  though the vector free function is called and wil recurse through its
+     *  entries calling any free pointers for each entry.
+     */
+    ANTLR3_BOOLEAN  factoryMade;
+
     /** Total number of entires in elements at any point in time
      */
-    ANTLR3_UINT32   elementsSize;
+    ANTLR3_UINT64   elementsSize;
 
     void	    (*free)	(struct ANTLR3_VECTOR_struct * vector);
     void	    (*del)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry);
