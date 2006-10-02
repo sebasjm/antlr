@@ -177,7 +177,7 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define _stat   stat
 
 #define ANTLR3_API
-#define	ANTLR3_API_FUNC (void *)
+#define	ANTLR3_API_FUNC 
 
 /* Inherit type definitions for autoconf
  */
