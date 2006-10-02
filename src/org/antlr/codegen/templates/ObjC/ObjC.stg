@@ -152,7 +152,7 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="ANTLRToken *",
 		// init memoize facility
 		<endif>
 		<synpreds:{p | <lexerSynpred(name=p)>};separator="\n">
-		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
+		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] initWithRecognizer:self];}; separator="\n">
 		<actions.lexer.init>
 	}
 	return self;
@@ -384,7 +384,7 @@ ruleBacktrackFailure() ::= <<
 >>
 
 synpred(name) ::= <<
-<name>SyntacticPredicate = @selector(m<name>);
+<!name>SyntacticPredicate = @selector(m<name>); !>
 >>
 
 lexerSynpred(name) ::= <<
@@ -514,7 +514,7 @@ ruleCleanUp() ::= <<
 <endif>
 <if(memoize)>
 <if(backtracking)>
-if ( backtracking>0 ) { [self memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex)]; }
+if ( backtracking>0 ) { [self memoize:input ruleIndex:<ruleDescriptor.index> startIndex:<ruleDescriptor.name>_StartIndex]; }
 <endif>
 <endif>
 >>
@@ -1001,7 +1001,7 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  *  The <name> attribute is inherited via the parser, lexer, ...
  */
 dfaDecision(decisionNumber,description) ::= <<
-alt<decisionNumber> = [dfa<decisionNumber> predict:input];
+alt<decisionNumber> = [dfa<decisionNumber> predict];
 >>
 
 /** Used in headerFile */
@@ -1029,9 +1029,9 @@ const static int <name>dfa<dfa.decisionNumber>_transition[] = {};
 const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<table; separator=", ", wrap="\n	", null="-1">};
 }; null="">
 
-- (id) init
+- (id) initWithRecognizer:(ANTLRBaseRecognizer *) theRecognizer
 {
-	if ((self = [super init]) != nil) {
+	if ((self = [super initWithRecognizer:theRecognizer]) != nil) {
 		eot = <name>dfa<dfa.decisionNumber>_eot;
 		eof = <name>dfa<dfa.decisionNumber>_eof;
 		min = <name>dfa<dfa.decisionNumber>_min;
@@ -1062,8 +1062,8 @@ const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<table; separ
 		return -1;
 	}<\n>
 <endif>
-	ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<dfa.decisionNumber> state:_s stream:input];
-	[self error:nvae];
+	ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<dfa.decisionNumber> state:_s stream:[recognizer input]];
+	<! [self error:nvae]; !> <! for debugger - do later !>
 	@throw nvae;
 }<\n>
 <endif>
@@ -1085,7 +1085,7 @@ const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<table; separ
 
 cyclicDFAState(decisionNumber, stateNumber,edges,needErrorClause,semPredState) ::= <<
 <if(semPredState)>
-input.rewind();<\n>
+[[recognizer input] rewind];<\n>
 <else>
 int LA<decisionNumber>_<stateNumber> = [input LA:1];<\n>
 <endif>
@@ -1119,7 +1119,12 @@ notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
 evalPredicate(pred,description) ::= "<pred>"
 
-evalSynPredicate(pred,description) ::= "[self evaluateSyntacticPredicate:<pred>SyntacticPredicate stream:input]"
+/** synpreds are b0rken in cyclic DFA special states
+ *  Damn! For now, work around with using the selectors directly, and by providing a trampoline evalSynPred method in
+ *  ANTLRDFA
+ */
+/* evalSynPredicate(pred,description) ::= "[self evaluateSyntacticPredicate:<pred>SyntacticPredicate stream:input]" */
+evalSynPredicate(pred,description) ::= "[self evaluateSyntacticPredicate:@selector(m<pred>)]"
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 
