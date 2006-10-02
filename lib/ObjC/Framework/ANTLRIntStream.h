@@ -52,6 +52,7 @@
 // like a stack.  Assume the state the stream was in when this marker
 // was created.
 
+- (void) rewind;
 - (void) rewind:(unsigned int) marker;
 
 // You may want to commit to a backtrack but don't want to force the

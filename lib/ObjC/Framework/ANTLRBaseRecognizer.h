@@ -127,6 +127,6 @@
 
 // support for syntactic predicates. these are called indirectly to support funky stuff in grammars, like
 // supplying selectors instead of writing code directly into the actions of the grammar.
-- (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment stream:(id<ANTLRIntStream>)input;
+- (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment; // stream:(id<ANTLRIntStream>)input;
 
 @end

@@ -36,6 +36,7 @@
 	unsigned  line;
 	unsigned  charPositionInLine;
 	unsigned  markDepth;
+	unsigned lastMarker;
 }
 
 - (id) init;
@@ -63,6 +64,7 @@
 
 // seek and rewind in the stream
 - (unsigned int) mark;
+- (void) rewind;
 - (void) rewind:(unsigned int) marker;
 - (void) release:(unsigned int) marker;
 - (void) seek:(unsigned int) index;

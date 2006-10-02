@@ -1,14 +1,14 @@
 #import <Cocoa/Cocoa.h>
-#import "FuzzyJava.h"
+#import "FuzzyJavaLexer.h"
 #import <ANTLR/ANTLR.h>
 
 int main(int argc, const char * argv[])
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSString *string = [NSString stringWithContentsOfFile:@"input"];
+	NSString *string = [NSString stringWithContentsOfFile:@"examples/fuzzy/input"];
 	NSLog(@"%@", string);
 	ANTLRStringStream *stream = [[ANTLRStringStream alloc] initWithStringNoCopy:string];
-	FuzzyJava *lexer = [[FuzzyJava alloc] initWithCharStream:stream];
+	FuzzyJavaLexer *lexer = [[FuzzyJavaLexer alloc] initWithCharStream:stream];
 	ANTLRToken *currentToken;
 	while (currentToken = [lexer nextToken]) {
 //		NSLog(@"%@", currentToken);

@@ -32,10 +32,20 @@ static BOOL debug = NO;
 
 @implementation ANTLRDFA
 
+- (id) initWithRecognizer:(ANTLRBaseRecognizer *) theRecognizer
+{
+	if ((self = [super init])) {
+		recognizer = theRecognizer;
+	}
+	return self;
+}
+
 // using the tables ANTLR generates for the DFA based prediction this method simulates the DFA
 // and returns the prediction of the alternative to be used.
-- (int) predict:(id<ANTLRIntStream>) stream
+- (int) predict
 {
+	id<ANTLRIntStream> stream = [recognizer input];
+	
 	unsigned int mark = [stream mark];
 	int s = 0;
 	@try {
@@ -67,7 +77,7 @@ static BOOL debug = NO;
 						[stream consume];
 						continue;
 					}
-					[self noViableAlt:s stream:stream];
+					[self noViableAlt:s];
 					return 0;
 				}
 				s = snext;
@@ -87,7 +97,7 @@ static BOOL debug = NO;
 				return accept[eof[s]];
 			}
 			if (debug) NSLog(@"no viable alt!");
-			[self noViableAlt:s stream:stream];
+			[self noViableAlt:s];
 		}
 	}
 	@finally {
@@ -96,13 +106,14 @@ static BOOL debug = NO;
 	return 0; // silence warning
 }
 
-- (void) noViableAlt:(int) state stream:(id<ANTLRIntStream>)theStream
+- (void) noViableAlt:(int) state
 {
+	id<ANTLRIntStream> stream = [recognizer input];
 	if ([recognizer isBacktracking]) {
 		[recognizer setIsFailed:YES];
 		return;
 	}
-	ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:decisionNumber state:state stream:theStream];
+	ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:decisionNumber state:state stream:stream];
 	@throw nvae;
 }
 
@@ -116,5 +127,9 @@ static BOOL debug = NO;
 	return @"subclass responsibility";
 }
 
+- (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment
+{
+	return [recognizer evaluateSyntacticPredicate:synpredFragment];
+}
 
 @end

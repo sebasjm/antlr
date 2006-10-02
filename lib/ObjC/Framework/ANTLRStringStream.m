@@ -130,7 +130,13 @@
 	[state setIndex:p];
 	[state setLine:line];
 	[state setCharPositionInLine:charPositionInLine];
+	lastMarker = markDepth;
 	return markDepth;
+}
+
+- (void) rewind
+{
+	[self rewind:lastMarker];
 }
 
 - (void) rewind:(unsigned int) marker 
@@ -149,9 +155,7 @@
 - (void) release:(unsigned int) marker 
 {
 	// unwind any other markers made after marker and release marker
-	[markers removeObjectsInRange:NSMakeRange(marker+1, [markers count] - marker+1)];
 	markDepth = marker;
-	// release this marker
 	markDepth--;
 }
 

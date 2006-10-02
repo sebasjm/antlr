@@ -42,13 +42,15 @@
 	ANTLRBaseRecognizer *recognizer;
 }
 
+- (id) initWithRecognizer:(ANTLRBaseRecognizer *) theRecognizer;
 // simulate the DFA using the static tables and predict an alternative
-- (int) predict:(id<ANTLRIntStream>) stream;
-- (void) noViableAlt:(int) state stream:(id<ANTLRIntStream>)theStream;
+- (int) predict;
+- (void) noViableAlt:(int) state;
 
 - (int) specialStateTransition:(int) state;
 //- (unichar) specialTransition:(unichar) state symbol:(int) symbol;
 
 - (NSString *) description;
+- (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment;
 
 @end

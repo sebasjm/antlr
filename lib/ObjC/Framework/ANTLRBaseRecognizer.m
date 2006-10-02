@@ -371,10 +371,10 @@
 }
 
 // call a syntactic predicate methods using its selector. this way we can support arbitrary synpreds.
-- (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment stream:(id<ANTLRIntStream>)input
+- (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment // stream:(id<ANTLRIntStream>)input
 {
     backtracking++;
-	int start = [input mark];
+	int start = [[self input] mark];
     @try {
         [self performSelector:synpredFragment];
     }
@@ -382,7 +382,7 @@
         NSLog(@"impossible synpred: %@", re);
     }
     BOOL success = !failed;
-    [input rewind:start];
+    [[self input] rewind:start];
 	backtracking--;
     failed = NO;
     return success;
