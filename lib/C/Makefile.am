@@ -23,7 +23,8 @@ LIBSOURCES		=	src/antlr3baserecognizer.c			\
 					src/antlr3string.c					\
 					src/antlr3stringstream.c			\
 					src/antlr3tokenstream.c				\
-					src/antlr3treeparser.c
+					src/antlr3treeparser.c				\
+					src/antlr3ucs2inputstream.c
 
 libantlr3c_la_SOURCES = $(LIBSOURCES)
 
