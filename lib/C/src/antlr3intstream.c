@@ -20,7 +20,7 @@ antlr3IntStreamNew()
 	return	(pANTLR3_INT_STREAM) ANTLR3_ERR_NOMEM;
     }
 
-    stream->free    = ANTLR3_API_FUNC freeStream;
+    stream->free    =  freeStream;
 
     return stream;
 }

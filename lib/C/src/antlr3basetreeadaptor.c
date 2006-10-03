@@ -39,24 +39,24 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor)
 {
 	/* Initialize the interface
 	 */
-	adaptor->nil			= ANTLR3_API_FUNC nil;
-	adaptor->dupTree		= ANTLR3_API_FUNC dupTree;
-	adaptor->addChild		= ANTLR3_API_FUNC addChild;
-	adaptor->becomeRoot		= ANTLR3_API_FUNC becomeRoot;
-	adaptor->rulePostProcessing	= ANTLR3_API_FUNC rulePostProcessing;
-	adaptor->addChildToken		= ANTLR3_API_FUNC addChildToken;
-	adaptor->becomeRootToken	= ANTLR3_API_FUNC becomeRootToken;
-	adaptor->createTypeToken	= ANTLR3_API_FUNC createTypeToken;
-	adaptor->createTypeTokenText	= ANTLR3_API_FUNC createTypeTokenText;
-	adaptor->createTypeText		= ANTLR3_API_FUNC createTypeText;
-	adaptor->getType		= ANTLR3_API_FUNC getType;
-	adaptor->setType		= ANTLR3_API_FUNC setType;
-	adaptor->getText		= ANTLR3_API_FUNC getText;
-	adaptor->setText8		= ANTLR3_API_FUNC setText8;
-	adaptor->setText		= ANTLR3_API_FUNC setText;
-	adaptor->getChild		= ANTLR3_API_FUNC getChild;
-	adaptor->getChildCount		= ANTLR3_API_FUNC getChildCount;
-	adaptor->getUniqueID		= ANTLR3_API_FUNC getUniqueID;
+	adaptor->nil			=  nil;
+	adaptor->dupTree		=  dupTree;
+	adaptor->addChild		=  addChild;
+	adaptor->becomeRoot		=  becomeRoot;
+	adaptor->rulePostProcessing	=  rulePostProcessing;
+	adaptor->addChildToken		=  addChildToken;
+	adaptor->becomeRootToken	=  becomeRootToken;
+	adaptor->createTypeToken	=  createTypeToken;
+	adaptor->createTypeTokenText	=  createTypeTokenText;
+	adaptor->createTypeText		=  createTypeText;
+	adaptor->getType		=  getType;
+	adaptor->setType		=  setType;
+	adaptor->getText		=  getText;
+	adaptor->setText8		=  setText8;
+	adaptor->setText		=  setText;
+	adaptor->getChild		=  getChild;
+	adaptor->getChildCount		=  getChildCount;
+	adaptor->getUniqueID		=  getUniqueID;
 
 	/* Remaining functions filled in by the caller.
 	 */

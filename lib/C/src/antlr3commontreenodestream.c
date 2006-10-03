@@ -65,7 +65,7 @@ antlr3TreeNodeStreamNew()
 
     /* Install basic API 
      */
-    stream->free    = ANTLR3_API_FUNC antlr3TreeNodeStreamFree;
+    stream->free    =  antlr3TreeNodeStreamFree;
     
     return stream;
 }
@@ -112,7 +112,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 
     /* Create an adaptor for the common tree node stream
      */
-    stream->adaptor	    = ANTLR3_TREE_ADAPTORNew();
+    stream->adaptor	    = ANTLR3_TREE_ADAPTORNew(strFactory);
 
     if	(stream->adaptor == (pANTLR3_BASE_TREE_ADAPTOR) ANTLR3_ERR_NOMEM)
     {
@@ -132,7 +132,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 
     /* Create space for the INT_STREAM interfacce
      */
-    stream->tnstream->istream		    = ANTLR3_API_FUNC antlr3IntStreamNew();
+    stream->tnstream->istream		    =  antlr3IntStreamNew();
     
     if	(stream->tnstream->istream == (pANTLR3_INT_STREAM) ANTLR3_ERR_NOMEM)
     {
@@ -144,54 +144,54 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 
     /* Install the common tree node stream API
      */
-    stream->addLookahead		    = ANTLR3_API_FUNC addLookahead;
-    stream->addNavigationNode		    = ANTLR3_API_FUNC addNavigationNode;
-    stream->fill			    = ANTLR3_API_FUNC fill;
-    stream->getLookaheadSize		    = ANTLR3_API_FUNC getLookaheadSize;
-    stream->handleRootnode		    = ANTLR3_API_FUNC handleRootnode;
-    stream->hasNext			    = ANTLR3_API_FUNC hasNext;
-    stream->hasUniqueNavigationNodes	    = ANTLR3_API_FUNC hasUniqueNavigationNodes;
-    stream->newDownNode			    = ANTLR3_API_FUNC newDownNode;
-    stream->newUpNode			    = ANTLR3_API_FUNC newUpNode;
-    stream->next			    = ANTLR3_API_FUNC next;
-    stream->reset			    = ANTLR3_API_FUNC reset;
-    stream->toNodesOnlyString		    = ANTLR3_API_FUNC toNodesOnlyString;
-    stream->visitChild			    = ANTLR3_API_FUNC visitChild;
+    stream->addLookahead		    =  addLookahead;
+    stream->addNavigationNode		    =  addNavigationNode;
+    stream->fill			    =  fill;
+    stream->getLookaheadSize		    =  getLookaheadSize;
+    stream->handleRootnode		    =  handleRootnode;
+    stream->hasNext			    =  hasNext;
+    stream->hasUniqueNavigationNodes	    =  hasUniqueNavigationNodes;
+    stream->newDownNode			    =  newDownNode;
+    stream->newUpNode			    =  newUpNode;
+    stream->next			    =  next;
+    stream->reset			    =  reset;
+    stream->toNodesOnlyString		    =  toNodesOnlyString;
+    stream->visitChild			    =  visitChild;
     stream->walkBackToMostRecentNodeWithUnvisitedChildren
-					    = ANTLR3_API_FUNC walkBackToMostRecentNodeWithUnvisitedChildren;
+					    =  walkBackToMostRecentNodeWithUnvisitedChildren;
  
-    stream->free			    = ANTLR3_API_FUNC antlr3CommonTreeNodeStreamFree;
+    stream->free			    =  antlr3CommonTreeNodeStreamFree;
 
     /* Install the tree node stream API
      */
-    stream->tnstream->getTreeAdaptor		= ANTLR3_API_FUNC getTreeAdaptor;
-    stream->tnstream->getTreeSource		= ANTLR3_API_FUNC getTreeSource;
-    stream->tnstream->LT			= ANTLR3_API_FUNC LT;
-    stream->tnstream->setUniqueNavigationNodes	= ANTLR3_API_FUNC setUniqueNavigationNodes;
-    stream->tnstream->toString			= ANTLR3_API_FUNC toString;
-    stream->tnstream->toStringSS		= ANTLR3_API_FUNC toStringSS;
-    stream->tnstream->toStringWork		= ANTLR3_API_FUNC toStringWork;
+    stream->tnstream->getTreeAdaptor		=  getTreeAdaptor;
+    stream->tnstream->getTreeSource		=  getTreeSource;
+    stream->tnstream->LT			=  LT;
+    stream->tnstream->setUniqueNavigationNodes	=  setUniqueNavigationNodes;
+    stream->tnstream->toString			=  toString;
+    stream->tnstream->toStringSS		=  toStringSS;
+    stream->tnstream->toStringWork		=  toStringWork;
 
     /* Install INT_STREAM interface
      */
-    stream->tnstream->istream->consume	    = ANTLR3_API_FUNC consume;
-    stream->tnstream->istream->index	    = ANTLR3_API_FUNC tindex;
-    stream->tnstream->istream->LA	    = ANTLR3_API_FUNC LA;
-    stream->tnstream->istream->mark	    = ANTLR3_API_FUNC mark;
-    stream->tnstream->istream->release	    = ANTLR3_API_FUNC release;
-    stream->tnstream->istream->rewind	    = ANTLR3_API_FUNC rewindMark;
-    stream->tnstream->istream->seek	    = ANTLR3_API_FUNC seek;
-    stream->tnstream->istream->size	    = ANTLR3_API_FUNC size;
+    stream->tnstream->istream->consume	    =  consume;
+    stream->tnstream->istream->index	    =  tindex;
+    stream->tnstream->istream->LA	    =  LA;
+    stream->tnstream->istream->mark	    =  mark;
+    stream->tnstream->istream->release	    =  release;
+    stream->tnstream->istream->rewind	    =  rewindMark;
+    stream->tnstream->istream->seek	    =  seek;
+    stream->tnstream->istream->size	    =  size;
 
     
     /* Initialize data elements of INT stream
      */
     stream->tnstream->istream->type	    = ANTLR3_COMMONTREENODE;
-    stream->tnstream->istream->super	    = ANTLR3_API_FUNC (stream->tnstream);
+    stream->tnstream->istream->super	    =  (stream->tnstream);
 
     /* Initialize data elements of TREE stream
      */
-    stream->tnstream->ctns = ANTLR3_API_FUNC stream;
+    stream->tnstream->ctns =  stream;
 
     /* Initialize data elements of the COMMON TREE NODE stream
      */

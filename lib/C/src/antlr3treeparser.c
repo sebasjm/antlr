@@ -49,14 +49,14 @@ antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREA
 
     /* Install our base recognizer overrides
      */
-    parser->rec->mismatch	= ANTLR3_API_FUNC mismatch;
-    parser->rec->exConstruct	= ANTLR3_API_FUNC antlr3MTNExceptionNew;
+    parser->rec->mismatch	=  mismatch;
+    parser->rec->exConstruct	=  antlr3MTNExceptionNew;
 
     /* Install tree parser API
      */
-    parser->getTreeNodeStream	= ANTLR3_API_FUNC getTreeNodeStream;
-    parser->setTreeNodeStream	= ANTLR3_API_FUNC setTreeNodeStream;
-    parser->free		= ANTLR3_API_FUNC freeParser;
+    parser->getTreeNodeStream	=  getTreeNodeStream;
+    parser->setTreeNodeStream	=  setTreeNodeStream;
+    parser->free		=  freeParser;
 
     /* Install the tree node stream
      */

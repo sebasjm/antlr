@@ -40,10 +40,10 @@ antlr3ArboretumNew(pANTLR3_STRING_FACTORY strFactory)
 
     /* Install factory API
      */
-    factory->newTree	    = ANTLR3_API_FUNC newPoolTree;
-    factory->newFromTree    = ANTLR3_API_FUNC newFromTree;
-    factory->newFromToken   = ANTLR3_API_FUNC newFromToken;
-    factory->close	    = ANTLR3_API_FUNC factoryClose;
+    factory->newTree	    =  newPoolTree;
+    factory->newFromTree    =  newFromTree;
+    factory->newFromToken   =  newFromToken;
+    factory->close	    =  factoryClose;
 
     /* Allocate the initial pool
      */
@@ -230,22 +230,22 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
      * the payload and few functions that we
      * provide.
      */
-    tree->baseTree.super    = ANTLR3_API_FUNC tree;
+    tree->baseTree.super    =  tree;
 
     /* Common tree overrides */
 
-    tree->baseTree.free	    = ANTLR3_API_FUNC freeTree;
-    tree->baseTree.isNil    = ANTLR3_API_FUNC isNil;
-    tree->baseTree.toString = ANTLR3_API_FUNC toString;
-    tree->baseTree.dupNode  = ANTLR3_API_FUNC dupNode;
-    tree->baseTree.getLine  = ANTLR3_API_FUNC getLine;
+    tree->baseTree.free	    =  freeTree;
+    tree->baseTree.isNil    =  isNil;
+    tree->baseTree.toString =  toString;
+    tree->baseTree.dupNode  =  (void *(*)(pANTLR3_BASE_TREE))(dupNode);
+    tree->baseTree.getLine  =  getLine;
     tree->baseTree.getCharPositionInLine
-			    = ANTLR3_API_FUNC getCharPositionInLine;
-    tree->baseTree.toString = ANTLR3_API_FUNC toString;
-    tree->baseTree.getType  = ANTLR3_API_FUNC getType;
-    tree->baseTree.getText  = ANTLR3_API_FUNC getText;
+			    =  getCharPositionInLine;
+    tree->baseTree.toString =  toString;
+    tree->baseTree.getType  =  getType;
+    tree->baseTree.getText  =  getText;
 
-    tree->getToken	    = ANTLR3_API_FUNC getToken;
+    tree->getToken	    =  getToken;
 
     tree->token	= NULL;	/* No token as yet */
     tree->startIndex	= 0;

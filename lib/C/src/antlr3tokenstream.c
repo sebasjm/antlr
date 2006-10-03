@@ -61,7 +61,7 @@ antlr3TokenStreamNew()
 
     /* Install basic API 
      */
-    stream->free    = ANTLR3_API_FUNC antlr3TokenStreamFree;
+    stream->free    =  antlr3TokenStreamFree;
 
     
     return stream;
@@ -141,9 +141,9 @@ antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source
      */
     stream->tstream->istream->eofToken	= antlr3CommonTokenNew(ANTLR3_TOKEN_EOF);
     stream->tstream->istream->eofToken->setType(stream->tstream->istream->eofToken, ANTLR3_TOKEN_EOF);
-    stream->tstream->istream->eofToken->freeCustom = ANTLR3_API_FUNC freeEofTOken;
+    stream->tstream->istream->eofToken->freeCustom = (void(*)(void*))(freeEofTOken);
 
-    stream->free		= ANTLR3_API_FUNC antlr3CTSFree;
+    stream->free		=  antlr3CTSFree;
     return  stream;
 }
 
@@ -164,12 +164,12 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
     /* Create space for the token stream interface
      */
     stream->tstream	    = antlr3TokenStreamNew();
-    stream->tstream->super  = ANTLR3_API_FUNC stream;
+    stream->tstream->super  =  stream;
 
     /* Create space for the INT_STREAM interfacce
      */
-    stream->tstream->istream		    = ANTLR3_API_FUNC antlr3IntStreamNew();
-    stream->tstream->istream->super	    = ANTLR3_API_FUNC (stream->tstream);
+    stream->tstream->istream		    =  antlr3IntStreamNew();
+    stream->tstream->istream->super	    =  (stream->tstream);
     stream->tstream->istream->type	    = ANTLR3_TOKENSTREAM;
 
     /* Install the token tracking tables
@@ -182,35 +182,35 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
 
     /* Install the common token stream API
      */
-    stream->setTokenTypeChannel	    = ANTLR3_API_FUNC setTokenTypeChannel;
-    stream->discardTokenType	    = ANTLR3_API_FUNC discardTokenType;
-    stream->discardOffChannelToks   = ANTLR3_API_FUNC discardOffChannel;
-    stream->getTokens		    = ANTLR3_API_FUNC getTokens;
-    stream->getTokenRange	    = ANTLR3_API_FUNC getTokenRange;
-    stream->getTokensSet	    = ANTLR3_API_FUNC getTokensSet;
-    stream->getTokensList	    = ANTLR3_API_FUNC getTokensList;
-    stream->getTokensType	    = ANTLR3_API_FUNC getTokensType;
+    stream->setTokenTypeChannel	    =  setTokenTypeChannel;
+    stream->discardTokenType	    =  discardTokenType;
+    stream->discardOffChannelToks   =  discardOffChannel;
+    stream->getTokens		    =  getTokens;
+    stream->getTokenRange	    =  getTokenRange;
+    stream->getTokensSet	    =  getTokensSet;
+    stream->getTokensList	    =  getTokensList;
+    stream->getTokensType	    =  getTokensType;
 
     /* Install the token stream API
      */
-    stream->tstream->LT			= ANTLR3_API_FUNC tokLT;
-    stream->tstream->get		= ANTLR3_API_FUNC get;
-    stream->tstream->getTokenSource	= ANTLR3_API_FUNC getTokenSource;
-    stream->tstream->setTokenSource	= ANTLR3_API_FUNC setTokenSource;
-    stream->tstream->toString		= ANTLR3_API_FUNC toString;
-    stream->tstream->toStringSS		= ANTLR3_API_FUNC toStringSS;
-    stream->tstream->toStringTT		= ANTLR3_API_FUNC toStringTT;
+    stream->tstream->LT			=  tokLT;
+    stream->tstream->get		=  get;
+    stream->tstream->getTokenSource	=  getTokenSource;
+    stream->tstream->setTokenSource	=  setTokenSource;
+    stream->tstream->toString		=  toString;
+    stream->tstream->toStringSS		=  toStringSS;
+    stream->tstream->toStringTT		=  toStringTT;
 
     /* Install INT_STREAM interface
      */
-    stream->tstream->istream->LA	= ANTLR3_API_FUNC LA;
-    stream->tstream->istream->mark	= ANTLR3_API_FUNC mark;
-    stream->tstream->istream->release	= ANTLR3_API_FUNC release;
-    stream->tstream->istream->size	= ANTLR3_API_FUNC size;
-    stream->tstream->istream->index	= ANTLR3_API_FUNC tindex;
-    stream->tstream->istream->rewind	= ANTLR3_API_FUNC rewindStream;
-    stream->tstream->istream->seek	= ANTLR3_API_FUNC seek;
-    stream->tstream->istream->consume	= ANTLR3_API_FUNC consume;
+    stream->tstream->istream->LA	=  LA;
+    stream->tstream->istream->mark	=  mark;
+    stream->tstream->istream->release	=  release;
+    stream->tstream->istream->size	=  size;
+    stream->tstream->istream->index	=  tindex;
+    stream->tstream->istream->rewind	=  rewindStream;
+    stream->tstream->istream->seek	=  seek;
+    stream->tstream->istream->consume	=  consume;
 
     return  stream;
 }

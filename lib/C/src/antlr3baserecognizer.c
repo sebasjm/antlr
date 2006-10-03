@@ -58,34 +58,34 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
 
     /* Install the BR API
      */
-    recognizer->alreadyParsedRule	    = ANTLR3_API_FUNC alreadyParsedRule;
-    recognizer->beginResync		    = ANTLR3_API_FUNC beginResync;
-    recognizer->combineFollows		    = ANTLR3_API_FUNC combineFollows;
-    recognizer->computeCSRuleFollow	    = ANTLR3_API_FUNC computeCSRuleFollow;
-    recognizer->computeErrorRecoverySet	    = ANTLR3_API_FUNC computeErrorRecoverySet;
-    recognizer->consumeUntil		    = ANTLR3_API_FUNC consumeUntil;
-    recognizer->consumeUntilSet		    = ANTLR3_API_FUNC consumeUntilSet;
-    recognizer->displayRecognitionError	    = ANTLR3_API_FUNC displayRecognitionError;
-    recognizer->endResync		    = ANTLR3_API_FUNC endResync;
-    recognizer->exConstruct		    = ANTLR3_API_FUNC antlr3MTExceptionNew;
-    recognizer->getRuleInvocationStack	    = ANTLR3_API_FUNC getRuleInvocationStack;
-    recognizer->getRuleInvocationStackNamed = ANTLR3_API_FUNC getRuleInvocationStackNamed;
-    recognizer->getRuleMemoization	    = ANTLR3_API_FUNC getRuleMemoization;
-    recognizer->match			    = ANTLR3_API_FUNC match;
-    recognizer->matchAny		    = ANTLR3_API_FUNC matchAny;
-    recognizer->memoize			    = ANTLR3_API_FUNC memoize;
-    recognizer->mismatch		    = ANTLR3_API_FUNC mismatch;
-    recognizer->recover			    = ANTLR3_API_FUNC recover;
-    recognizer->recoverFromMismatchedElement= ANTLR3_API_FUNC recoverFromMismatchedElement;
-    recognizer->recoverFromMismatchedSet    = ANTLR3_API_FUNC recoverFromMismatchedSet;
-    recognizer->recoverFromMismatchedToken  = ANTLR3_API_FUNC recoverFromMismatchedToken;
-    recognizer->reportError		    = ANTLR3_API_FUNC reportError;
-    recognizer->reset			    = ANTLR3_API_FUNC reset;
+    recognizer->alreadyParsedRule	    =  alreadyParsedRule;
+    recognizer->beginResync		    =  beginResync;
+    recognizer->combineFollows		    =  combineFollows;
+    recognizer->computeCSRuleFollow	    =  computeCSRuleFollow;
+    recognizer->computeErrorRecoverySet	    =  computeErrorRecoverySet;
+    recognizer->consumeUntil		    =  consumeUntil;
+    recognizer->consumeUntilSet		    =  consumeUntilSet;
+    recognizer->displayRecognitionError	    =  displayRecognitionError;
+    recognizer->endResync		    =  endResync;
+    recognizer->exConstruct		    =  antlr3MTExceptionNew;
+    recognizer->getRuleInvocationStack	    =  getRuleInvocationStack;
+    recognizer->getRuleInvocationStackNamed =  getRuleInvocationStackNamed;
+    recognizer->getRuleMemoization	    =  getRuleMemoization;
+    recognizer->match			    =  match;
+    recognizer->matchAny		    =  matchAny;
+    recognizer->memoize			    =  memoize;
+    recognizer->mismatch		    =  mismatch;
+    recognizer->recover			    =  recover;
+    recognizer->recoverFromMismatchedElement=  recoverFromMismatchedElement;
+    recognizer->recoverFromMismatchedSet    =  recoverFromMismatchedSet;
+    recognizer->recoverFromMismatchedToken  =  recoverFromMismatchedToken;
+    recognizer->reportError		    =  reportError;
+    recognizer->reset			    =  reset;
 
-    recognizer->synpred			    = ANTLR3_API_FUNC synpred;
-    recognizer->toStrings		    = ANTLR3_API_FUNC toStrings;
+    recognizer->synpred			    =  synpred;
+    recognizer->toStrings		    =  toStrings;
 
-    recognizer->free			    = ANTLR3_API_FUNC freeBR;
+    recognizer->free			    =  freeBR;
 
     /* Initialize variables
      */
@@ -642,7 +642,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
     recognizer->errorCount++;
     theToken	= NULL;		/* Assume there is no token to use  */
 
-    fprintf(stderr, "%s(", recognizer->exception->streamName);
+    fprintf(stderr, "%s(", (char *)(recognizer->exception->streamName));
 
 #ifdef WIN32
     /* shanzzle fraazzle Dick Dastardly */

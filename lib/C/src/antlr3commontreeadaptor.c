@@ -57,16 +57,16 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
 
     /* Install our interface overrides.
      */
-    cta->baseAdaptor.dupNode		    = ANTLR3_API_FUNC dupNode;
-    cta->baseAdaptor.create		    = ANTLR3_API_FUNC create;
-    cta->baseAdaptor.createToken	    = ANTLR3_API_FUNC createToken;
-    cta->baseAdaptor.createTokenFromToken   = ANTLR3_API_FUNC createTokenFromToken;
-    cta->baseAdaptor.setTokenBoundaries	    = ANTLR3_API_FUNC setTokenBoundaries;
-    cta->baseAdaptor.getTokenStartIndex	    = ANTLR3_API_FUNC getTokenStartIndex;
-    cta->baseAdaptor.getTokenStopIndex	    = ANTLR3_API_FUNC getTokenStopIndex;
-    cta->baseAdaptor.getText		    = ANTLR3_API_FUNC getText;
-    cta->baseAdaptor.getType		    = ANTLR3_API_FUNC getType;
-    cta->baseAdaptor.free		    = ANTLR3_API_FUNC ctaFree;
+    cta->baseAdaptor.dupNode		    =  dupNode;
+    cta->baseAdaptor.create		    =  create;
+    cta->baseAdaptor.createToken	    =  createToken;
+    cta->baseAdaptor.createTokenFromToken   =  createTokenFromToken;
+    cta->baseAdaptor.setTokenBoundaries	    =  setTokenBoundaries;
+    cta->baseAdaptor.getTokenStartIndex	    =  getTokenStartIndex;
+    cta->baseAdaptor.getTokenStopIndex	    =  getTokenStopIndex;
+    cta->baseAdaptor.getText		    =  getText;
+    cta->baseAdaptor.getType		    =  getType;
+    cta->baseAdaptor.free		    =  ctaFree;
     /* Install the super class pointer
      */
     cta->baseAdaptor.super	    = cta;

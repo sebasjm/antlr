@@ -73,9 +73,9 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
 
     /* Install factory API
      */
-    factory->newToken	= ANTLR3_API_FUNC newPoolToken;
-    factory->close	= ANTLR3_API_FUNC factoryClose;
-    factory->input	= ANTLR3_API_FUNC input;
+    factory->newToken	=  newPoolToken;
+    factory->close	=  factoryClose;
+    factory->input	=  input;
 
     /* Allocate the initial pool
      */
@@ -91,7 +91,7 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
     /* Set some initial variables for future copying
      */
     factory->unTruc.factoryMade	= ANTLR3_TRUE;
-    factory->unTruc.input	= ANTLR3_API_FUNC input;
+    factory->unTruc.input	=  input;
     
     return  factory;
 

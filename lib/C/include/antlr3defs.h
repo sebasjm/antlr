@@ -64,7 +64,6 @@
 #include    <stdarg.h>
 
 #define	ANTLR3_API  __declspec(dllexport)
-#define	ANTLR3_API_FUNC
 
 typedef	INT32	ANTLR3_CHAR,	*pANTLR3_CHAR;
 typedef	UINT32	ANTLR3_UCHAR,	*pANTLR3_UCHAR;
@@ -177,7 +176,6 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define _stat   stat
 
 #define ANTLR3_API
-#define	ANTLR3_API_FUNC 
 
 /* Inherit type definitions for autoconf
  */
@@ -223,33 +221,11 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 
 /* Prototypes
  */
-
-
-#ifdef	ANTLR3_MEM_DEBUG
-
-ANTLR3_API void			  * ANTLR3_MALLOC_DBG		    (pANTLR3_UINT8 file, ANTLR3_UINT32 line, size_t request);
-ANTLR3_API void			  * ANTLR3_REALLOC_DBG		    (pANTLR3_UINT8 file, ANTLR3_UINT32 line, void * current, ANTLR3_UINT64 request);
-ANTLR3_API void			    ANTLR3_FREE_DBG		    (void * ptr);
-ANTLR3_API pANTLR3_UINT8	    ANTLR3_STRDUP_DBG		    (pANTLR3_UINT8 file, ANTLR3_UINT32 line, pANTLR3_UINT8 instr);
-ANTLR3_API void			    ANTLR3_MEM_REPORT		    (ANTLR3_BOOLEAN);
-
-#define	ANTLR3_MALLOC( s )	ANTLR3_MALLOC_DBG   ((pANTLR3_UINT8) __FILE__ , (ANTLR3_UINT32)__LINE__ , (s))
-#define	ANTLR3_REALLOC( c, s)	ANTLR3_REALLOC_DBG  ((pANTLR3_UINT8) __FILE__ , (ANTLR3_UINT32)__LINE__ , c, s)
-#define	ANTLR3_FREE( p )	ANTLR3_FREE_DBG	    (p)
-#define	ANTLR3_FREE_FUNC	ANTLR3_FREE_DBG	
-#define	ANTLR3_STRDUP( p )	ANTLR3_STRDUP_DBG   ((pANTLR3_UINT8) __FILE__ , (ANTLR3_UINT32)__LINE__ , p)
-
-#else
-
-#define	ANTLR3_MEM_REPORT(x)
 #define	ANTLR3_MALLOC(request)		    calloc  (1, (size_t)(request))
 #define ANTLR3_REALLOC(current, request)    realloc ((void *)(current), (size_t)(request))
 #define	ANTLR3_FREE(ptr)		    free    ((void *)(ptr))
 #define	ANTLR3_FREE_FUNC		    free
 #define	ANTLR3_STRDUP(instr)		    (pANTLR3_UINT8)(strdup  ((const char *)(instr)))
-
-#endif
-
 #define	ANTLR3_MEMMOVE(target, source, size)	memmove((void *)(target), (const void *)(source), (size_t)(size))
 #define	ANTLR3_MEMSET(target, byte, size)	memset((void *)(target), (int)(byte), (size_t)(size))
 
@@ -282,10 +258,10 @@ ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringInPlaceStream   (pANTLR3
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewUCS2StringInPlaceStream	(pANTLR3_UINT16 inString, ANTLR3_UINT64 size, pANTLR3_UINT16 name);
 ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringCopyStream	(pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
 
-ANTLR3_API pANTLR3_INT_STREAM	    antlr3IntStreamNew		    ();
+ANTLR3_API pANTLR3_INT_STREAM	    antlr3IntStreamNew		    (void);
 
-ANTLR3_API pANTLR3_STRING_FACTORY   antlr3StringFactoryNew	    ();
-ANTLR3_API pANTLR3_STRING_FACTORY   antlr3UCS2StringFactoryNew	    ();
+ANTLR3_API pANTLR3_STRING_FACTORY   antlr3StringFactoryNew	    (void);
+ANTLR3_API pANTLR3_STRING_FACTORY   antlr3UCS2StringFactoryNew	    (void);
 
 ANTLR3_API pANTLR3_COMMON_TOKEN	    antlr3CommonTokenNew	    (ANTLR3_UINT32 ttype);
 ANTLR3_API pANTLR3_TOKEN_FACTORY    antlr3TokenFactoryNew	    (pANTLR3_INPUT_STREAM input);
@@ -298,8 +274,8 @@ ANTLR3_API pANTLR3_PARSER	    antlr3ParserNew		    (ANTLR3_UINT32 sizeHint);
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM	antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source);
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM	antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint);
 
-ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR	    ANTLR3_TREE_ADAPTORNew();
-ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNew		    ();
+ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR	    ANTLR3_TREE_ADAPTORNew  (pANTLR3_STRING_FACTORY strFactory);
+ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNew		    (void);
 ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromTree	    (pANTLR3_COMMON_TREE tree);
 ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromToken    (pANTLR3_COMMON_TOKEN tree);
 ANTLR3_API pANTLR3_ARBORETUM	    antlr3ArboretumNew		    (pANTLR3_STRING_FACTORY factory);

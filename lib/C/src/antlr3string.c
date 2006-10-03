@@ -88,17 +88,17 @@ antlr3StringFactoryNew()
 
     /* Install the API (8 bit assumed)
      */
-    factory->newRaw	= ANTLR3_API_FUNC newRaw8;
-    factory->newSize	= ANTLR3_API_FUNC newSize8;
+    factory->newRaw	=  newRaw8;
+    factory->newSize	=  newSize8;
 
-    factory->newPtr	= ANTLR3_API_FUNC newPtr8;
-    factory->newPtr8	= ANTLR3_API_FUNC newPtr8;
-    factory->newStr	= ANTLR3_API_FUNC newStr8;
-    factory->newStr8	= ANTLR3_API_FUNC newStr8;
-    factory->destroy	= ANTLR3_API_FUNC destroy;
-    factory->printable	= ANTLR3_API_FUNC printable8;
-    factory->destroy	= ANTLR3_API_FUNC destroy;
-    factory->close	= ANTLR3_API_FUNC closeFactory;
+    factory->newPtr	=  newPtr8;
+    factory->newPtr8	=  newPtr8;
+    factory->newStr	=  newStr8;
+    factory->newStr8	=  newStr8;
+    factory->destroy	=  destroy;
+    factory->printable	=  printable8;
+    factory->destroy	=  destroy;
+    factory->close	=  closeFactory;
 
     return  factory;
 }
@@ -122,18 +122,18 @@ antlr3UCS2StringFactoryNew()
 
     /* Override the 8 bit API with the UCS2 (mostly just 16 bit) API
      */
-    factory->newRaw	= ANTLR3_API_FUNC newRaw16;
-    factory->newSize	= ANTLR3_API_FUNC newSize16;
+    factory->newRaw	=  newRaw16;
+    factory->newSize	=  newSize16;
 
-    factory->newPtr	= ANTLR3_API_FUNC newPtr16_16;
-    factory->newPtr8	= ANTLR3_API_FUNC newPtr16_8;
-    factory->newStr	= ANTLR3_API_FUNC newStr16_16;
-    factory->newStr8	= ANTLR3_API_FUNC newStr16_8;
-    factory->printable	= ANTLR3_API_FUNC printable16;
+    factory->newPtr	=  newPtr16_16;
+    factory->newPtr8	=  newPtr16_8;
+    factory->newStr	=  newStr16_16;
+    factory->newStr8	=  newStr16_8;
+    factory->printable	=  printable16;
 
-    factory->destroy	= ANTLR3_API_FUNC destroy;
-    factory->destroy	= ANTLR3_API_FUNC destroy;
-    factory->close	= ANTLR3_API_FUNC closeFactory;
+    factory->destroy	=  destroy;
+    factory->destroy	=  destroy;
+    factory->close	=  closeFactory;
 
     return  factory;
 }
@@ -162,7 +162,7 @@ newRaw8	(pANTLR3_STRING_FACTORY factory)
 
     /* Add the string into the allocated list
      */
-    factory->strings->put(factory->strings, factory->index, (void *) string, ANTLR3_API_FUNC stringFree);
+    factory->strings->put(factory->strings, factory->index, (void *) string, (void (*)(void *))(stringFree));
     string->index   = factory->index++;
 
     return string;
@@ -191,7 +191,7 @@ newRaw16	(pANTLR3_STRING_FACTORY factory)
 
     /* Add the string into the allocated list
      */
-    factory->strings->put(factory->strings, factory->index, (void *) string, ANTLR3_API_FUNC stringFree);
+    factory->strings->put(factory->strings, factory->index, (void *) string, (void (*)(void *))(stringFree));
     string->index   = factory->index++;
 
     return string;

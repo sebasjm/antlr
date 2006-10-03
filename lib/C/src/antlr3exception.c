@@ -64,8 +64,8 @@ antlr3ExceptionNew(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_
 
     /* Install the API
      */
-    ex->print	    = ANTLR3_API_FUNC antlr3ExceptionPrint;
-    ex->freeEx	    = ANTLR3_API_FUNC antlr3ExceptionFree;
+    ex->print	    =  antlr3ExceptionPrint;
+    ex->freeEx	    =  antlr3ExceptionFree;
 
     return ex;
 }
@@ -99,7 +99,7 @@ antlr3ExceptionPrint(pANTLR3_EXCEPTION ex)
 	}
 	else
 	{
-	    printf("ANTLR3_EXCEPTION: %s\n", ex->message);
+	    printf("ANTLR3_EXCEPTION: %s\n", (char *)(ex->message));
 	}
 
 	/* Move to next in the chain (if any)

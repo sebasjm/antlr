@@ -51,17 +51,17 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 
     /* Now we need to create the base recognizer
      */
-    lexer->rec	    = ANTLR3_API_FUNC antlr3BaseRecognizerNew(ANTLR3_TYPE_LEXER, sizeHint);
+    lexer->rec	    =  antlr3BaseRecognizerNew(ANTLR3_TYPE_LEXER, sizeHint);
 
     if	(lexer->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_ERR_NOMEM)
     {
 	lexer->free(lexer);
 	return	(pANTLR3_LEXER) ANTLR3_ERR_NOMEM;
     }
-    lexer->rec->super  = ANTLR3_API_FUNC lexer;
+    lexer->rec->super  =  lexer;
 
-    lexer->rec->displayRecognitionError	    = ANTLR3_API_FUNC displayRecognitionError;
-    lexer->rec->reportError		    = ANTLR3_API_FUNC reportError;
+    lexer->rec->displayRecognitionError	    =  displayRecognitionError;
+    lexer->rec->reportError		    =  reportError;
 
     /* Now install the token source interface
      */
@@ -74,33 +74,33 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 
 	return	(pANTLR3_LEXER) ANTLR3_ERR_NOMEM;
     }
-    lexer->tokSource->super    = ANTLR3_API_FUNC lexer;
+    lexer->tokSource->super    =  lexer;
 
     /* Install the default nextToken() method, which may be overridden
      * by generated code, or by anything else in fact.
      */
-    lexer->tokSource->nextToken	    = ANTLR3_API_FUNC nextToken;
+    lexer->tokSource->nextToken	    =  nextToken;
     lexer->tokSource->strFactory    = NULL;
 
     lexer->tokFactory		    = NULL;
 
     /* Install the lexer API
      */
-    lexer->setCharStream	    = ANTLR3_API_FUNC setCharStream;
-    lexer->mTokens		    = ANTLR3_API_FUNC mTokens;
-    lexer->setCharStream	    = ANTLR3_API_FUNC setCharStream;
-    lexer->emit			    = ANTLR3_API_FUNC emit;
-    lexer->emitNew		    = ANTLR3_API_FUNC emitNew;
-    lexer->matchs		    = ANTLR3_API_FUNC matchs;
-    lexer->matchc		    = ANTLR3_API_FUNC matchc;
-    lexer->matchRange		    = ANTLR3_API_FUNC matchRange;
-    lexer->matchAny		    = ANTLR3_API_FUNC matchAny;
-    lexer->recover		    = ANTLR3_API_FUNC recover;
-    lexer->getLine		    = ANTLR3_API_FUNC getLine;
-    lexer->getCharIndex		    = ANTLR3_API_FUNC getCharIndex;
-    lexer->getCharPositionInLine    = ANTLR3_API_FUNC getCharPositionInLine;
-    lexer->getText		    = ANTLR3_API_FUNC getText;
-    lexer->free			    = ANTLR3_API_FUNC freeLexer;
+    lexer->setCharStream	    =  setCharStream;
+    lexer->mTokens		    = (void (*)(void *))(mTokens);
+    lexer->setCharStream	    =  setCharStream;
+    lexer->emit			    =  emit;
+    lexer->emitNew		    =  emitNew;
+    lexer->matchs		    =  matchs;
+    lexer->matchc		    =  matchc;
+    lexer->matchRange		    =  matchRange;
+    lexer->matchAny		    =  matchAny;
+    lexer->recover		    =  recover;
+    lexer->getLine		    =  getLine;
+    lexer->getCharIndex		    =  getCharIndex;
+    lexer->getCharPositionInLine    =  getCharPositionInLine;
+    lexer->getText		    =  getText;
+    lexer->free			    =  freeLexer;
     
     return  lexer;
 }
@@ -228,7 +228,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 * tokenN
 
     lexer   = (pANTLR3_LEXER)(rec->super);
 
-    fprintf(stderr, "%s(", lexer->rec->exception->streamName);
+    fprintf(stderr, "%s(", (char *)(lexer->rec->exception->streamName));
 
 #ifdef WIN32
     /* shanzzle fraazzle Dick Dastardly */

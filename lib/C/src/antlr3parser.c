@@ -37,13 +37,13 @@ antlr3ParserNew		(ANTLR3_UINT32 sizeHint)
 
     /* Parser overrides
      */
-    parser->rec->exConstruct	= ANTLR3_API_FUNC antlr3MTExceptionNew;
+    parser->rec->exConstruct	=  antlr3MTExceptionNew;
 
     /* Install the API
      */
-    parser->setTokenStream		= ANTLR3_API_FUNC setTokenStream;
-    parser->getTokenStream		= ANTLR3_API_FUNC getTokenStream;
-    parser->free			= ANTLR3_API_FUNC freeParser;
+    parser->setTokenStream		=  setTokenStream;
+    parser->getTokenStream		=  getTokenStream;
+    parser->free			=  freeParser;
 
     return parser;
 }

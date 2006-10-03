@@ -45,14 +45,14 @@ antlr3UCS2SetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
 
     /* Intstream API overrides for UCS2
      */
-    input->istream->consume	    = ANTLR3_API_FUNC antlr3UCS2Consume;	    /* Consume the next 16 bit character in the buffer			    */
-    input->istream->LA		    = ANTLR3_API_FUNC antlr3UCS2LA;		    /* Return the UTF32 chracter at offset n (1 based)			    */
-    input->istream->index	    = ANTLR3_API_FUNC antlr3UCS2Index;		    /* Calculate current index in input stream, 16 bit based		    */
-    input->istream->seek	    = ANTLR3_API_FUNC antlr3UCS2Seek;		    /* How to seek to a specific point in the stream			    */
+    input->istream->consume	    =  antlr3UCS2Consume;	    /* Consume the next 16 bit character in the buffer			    */
+    input->istream->LA		    =  antlr3UCS2LA;		    /* Return the UTF32 chracter at offset n (1 based)			    */
+    input->istream->index	    =  antlr3UCS2Index;		    /* Calculate current index in input stream, 16 bit based		    */
+    input->istream->seek	    =  antlr3UCS2Seek;		    /* How to seek to a specific point in the stream			    */
     
     /* Charstream API overrides for UCS2
      */
-    input->substr		    = ANTLR3_API_FUNC antlr3UCS2Substr;	    /* Return a string from the input stream				    */
+    input->substr		    =  antlr3UCS2Substr;	    /* Return a string from the input stream				    */
         
 }
 

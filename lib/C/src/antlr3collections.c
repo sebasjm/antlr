@@ -104,12 +104,12 @@ antlr3HashTableNew(ANTLR3_UINT32 sizeHint)
 
     /* Install the interface
      */
-    table->free		= ANTLR3_API_FUNC antlr3HashFree;
-    table->get		= ANTLR3_API_FUNC antlr3HashGet;
-    table->put		= ANTLR3_API_FUNC antlr3HashPut;
-    table->del		= ANTLR3_API_FUNC antlr3HashDelete;
-    table->size		= ANTLR3_API_FUNC antlr3HashSize;
-    table->remove	= ANTLR3_API_FUNC antlr3HashRemove;
+    table->free		=  antlr3HashFree;
+    table->get		=  antlr3HashGet;
+    table->put		=  antlr3HashPut;
+    table->del		=  antlr3HashDelete;
+    table->size		=  antlr3HashSize;
+    table->remove	=  antlr3HashRemove;
 
     return  table;
 }
@@ -428,8 +428,8 @@ antlr3EnumNew	(pANTLR3_HASH_TABLE table)
 
     /* Install the interface
      */
-    en->free	= ANTLR3_API_FUNC antlr3EnumFree;
-    en->next	= ANTLR3_API_FUNC antlr3EnumNext;
+    en->free	=  antlr3EnumFree;
+    en->next	=  antlr3EnumNext;
 
     /* All is good
      */
@@ -608,13 +608,13 @@ antlr3ListNew	(ANTLR3_UINT32 sizeHint)
 
     /* Allocation was good, install interface
      */
-    list->free	    = ANTLR3_API_FUNC antlr3ListFree;
-    list->del	    = ANTLR3_API_FUNC antlr3ListDelete;
-    list->get	    = ANTLR3_API_FUNC antlr3ListGet;
-    list->add	    = ANTLR3_API_FUNC antlr3ListAdd;
-    list->remove    = ANTLR3_API_FUNC antlr3ListRemove;
-    list->put	    = ANTLR3_API_FUNC antlr3ListPut;
-    list->size	    = ANTLR3_API_FUNC antlr3ListSize;
+    list->free	    =  antlr3ListFree;
+    list->del	    =  antlr3ListDelete;
+    list->get	    =  antlr3ListGet;
+    list->add	    =  antlr3ListAdd;
+    list->remove    =  antlr3ListRemove;
+    list->put	    =  antlr3ListPut;
+    list->size	    =  antlr3ListSize;
 
     return  list;
 }
@@ -725,12 +725,12 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
 
     /* Looks good, now add the interface
      */
-    stack->get	= ANTLR3_API_FUNC antlr3StackGet;
-    stack->free	= ANTLR3_API_FUNC antlr3StackFree;
-    stack->pop	= ANTLR3_API_FUNC antlr3StackPop;
-    stack->push	= ANTLR3_API_FUNC antlr3StackPush;
-    stack->size	= ANTLR3_API_FUNC antlr3StackSize;
-    stack->peek	= ANTLR3_API_FUNC antlr3StackPeek;
+    stack->get	=  antlr3StackGet;
+    stack->free	=  antlr3StackFree;
+    stack->pop	=  antlr3StackPop;
+    stack->push	=  antlr3StackPush;
+    stack->size	=  antlr3StackSize;
+    stack->peek	=  antlr3StackPeek;
 
     return  stack;
 }
@@ -1160,7 +1160,7 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
      * track it and release any entries in it when we close the factory.
      */
     vector->factoryMade	= ANTLR3_TRUE;
-    factory->vectors->add(factory->vectors, (void *)vector, vector->free);
+    factory->vectors->add(factory->vectors, (void *)vector, (void (*)(void *))(vector->free));
 
     return  vector;
 }

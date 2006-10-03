@@ -433,10 +433,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\antlr3memory.c"
-				>
-			</File>
-			<File
 				RelativePath=".\src\antlr3parser.c"
 				>
 			</File>

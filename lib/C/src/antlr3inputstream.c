@@ -62,36 +62,36 @@ antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
 
     /* Allocate stream interface
      */
-    input->istream	    = ANTLR3_API_FUNC antlr3IntStreamNew();
+    input->istream	    =  antlr3IntStreamNew();
     input->istream->type    = ANTLR3_CHARSTREAM;
-    input->istream->super   = ANTLR3_API_FUNC input;
+    input->istream->super   =  input;
 
     input->istream->type	= type;
 
     /* Intstream API
      */
-    input->istream->consume	    = ANTLR3_API_FUNC antlr3AsciiConsume;	    /* Consume the next 8 bit character in the buffer			    */
-    input->istream->LA		    = ANTLR3_API_FUNC antlr3AsciiLA;		    /* Return the UTF32 chracter at offset n (1 based)			    */
-    input->istream->index	    = ANTLR3_API_FUNC antlr3AsciiIndex;		    /* Current index (offset from first character			    */
-    input->istream->mark	    = ANTLR3_API_FUNC antlr3AsciiMark;		    /* Record the current lex state for later restore			    */
-    input->istream->rewind	    = ANTLR3_API_FUNC antlr3AsciiRewind;	    /* How to rewind the input						    */
-    input->istream->seek	    = ANTLR3_API_FUNC antlr3AsciiSeek;		    /* How to seek to a specific point in the stream			    */
-    input->istream->release	    = ANTLR3_API_FUNC antlr3AsciiRelease;	    /* Reset marks after mark n						    */
+    input->istream->consume	    =  antlr3AsciiConsume;	    /* Consume the next 8 bit character in the buffer			    */
+    input->istream->LA		    =  antlr3AsciiLA;		    /* Return the UTF32 chracter at offset n (1 based)			    */
+    input->istream->index	    =  antlr3AsciiIndex;		    /* Current index (offset from first character			    */
+    input->istream->mark	    =  antlr3AsciiMark;		    /* Record the current lex state for later restore			    */
+    input->istream->rewind	    =  antlr3AsciiRewind;	    /* How to rewind the input						    */
+    input->istream->seek	    =  antlr3AsciiSeek;		    /* How to seek to a specific point in the stream			    */
+    input->istream->release	    =  antlr3AsciiRelease;	    /* Reset marks after mark n						    */
 
     /* Charstream API
      */
-    input->close		    = ANTLR3_API_FUNC antlr3InputClose;		    /* Close down the stream completely					    */
-    input->reset		    = ANTLR3_API_FUNC antlr3InputReset;		    /* Reset input to start						    */
-    input->getSourceName	    = ANTLR3_API_FUNC antlr3InputFileName;	    /* Return the source description (filename here)			    */
-    input->LT			    = ANTLR3_API_FUNC antlr3AsciiLT;		    /* Same as LA for 8 bit Ascii file					    */
-    input->size			    = ANTLR3_API_FUNC antlr3AsciiSize;		    /* Return the size of the input buffer				    */
-    input->substr		    = ANTLR3_API_FUNC antlr3AsciiSubstr;	    /* Return a string from the input stream				    */
-    input->getLine		    = ANTLR3_API_FUNC antlr3AsciiGetLine;	    /* Return the current line number in the input stream		    */
-    input->getLineBuf		    = ANTLR3_API_FUNC antlr3AsciiGetLineBuf;	    /* Return a pointer to the start of the current line being consumed	    */
-    input->getCharPositionInLine    = ANTLR3_API_FUNC antlr3AsciiGetCharPosition;   /* Return the offset into the current line of input			    */
-    input->setLine		    = ANTLR3_API_FUNC antlr3AsciiSetLine;	    /* Set the input stream line number (does not set buffer pointers)	    */
-    input->setCharPositionInLine    = ANTLR3_API_FUNC antlr3AsciiSetCharPosition;   /* Set the offset in to the current line (does not set any pointers	)   */
-    input->SetNewLineChar	    = ANTLR3_API_FUNC antlr3AsciiSetNewLineChar;    /* Set the value of the newline trigger character			    */
+    input->close		    =  antlr3InputClose;		    /* Close down the stream completely					    */
+    input->reset		    =  antlr3InputReset;		    /* Reset input to start						    */
+    input->getSourceName	    =  antlr3InputFileName;	    /* Return the source description (filename here)			    */
+    input->LT			    =  antlr3AsciiLT;		    /* Same as LA for 8 bit Ascii file					    */
+    input->size			    =  antlr3AsciiSize;		    /* Return the size of the input buffer				    */
+    input->substr		    =  antlr3AsciiSubstr;	    /* Return a string from the input stream				    */
+    input->getLine		    =  antlr3AsciiGetLine;	    /* Return the current line number in the input stream		    */
+    input->getLineBuf		    =  antlr3AsciiGetLineBuf;	    /* Return a pointer to the start of the current line being consumed	    */
+    input->getCharPositionInLine    =  antlr3AsciiGetCharPosition;   /* Return the offset into the current line of input			    */
+    input->setLine		    =  antlr3AsciiSetLine;	    /* Set the input stream line number (does not set buffer pointers)	    */
+    input->setCharPositionInLine    =  antlr3AsciiSetCharPosition;   /* Set the offset in to the current line (does not set any pointers	)   */
+    input->SetNewLineChar	    =  antlr3AsciiSetNewLineChar;    /* Set the value of the newline trigger character			    */
 
     /* Initialize entries for tables etc
      */
