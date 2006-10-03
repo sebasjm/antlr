@@ -35,7 +35,7 @@
 		Languages = (antlr3);
 		FileTypes = (sourcecode.antlr3);
 		ExecPath = "/usr/bin/java";
-		/* CommandOutputParser = ANTLRCommandOutputParser; */
+		CommandOutputParser = ANTLRToolOutputParser;
 		OptionsForCommandLine = (
 			ANTLR_EXTRA_JAVA_ARGS, ANTLR_FORCE_OUT_DIR, ANTLR_LIB_DIR, ANTLR_VERBOSE, ANTLR_NFA_DOT, ANTLR_DFA_DOT, ANTLR_DEBUG, ANTLR_TRACE, ANTLR_REPORT, 
 			ANTLR_X_GRTREE, ANTLR_X_DFA, ANTLR_X_NOPRUNE, ANTLR_X_NOCOLLAPSE, ANTLR_X_DBGCONVERSION, ANTLR_X_NFA_MULTITHREADED, ANTLR_X_DFAVERBOSE,

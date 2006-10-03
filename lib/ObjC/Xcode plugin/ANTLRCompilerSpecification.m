@@ -74,6 +74,7 @@
 	// TODO: figure out how to support "clean" build phase
 	NSString *grammarNameFromFileName = [[inputPath lastPathComponent] stringByDeletingPathExtension];		// somepath/grammar.g -> grammar
 	NSString *outputDirectory = [context expandedValueForString:@"$(ANTLR_FORCE_OUT_DIR)"];
+	[context createDirectoryAtPath:outputDirectory];
 
 	NSMutableArray *outputFileSuffixes = [[NSMutableArray alloc] initWithCapacity:2];
 	// figure out which grammar types will be generated and put those in the queue

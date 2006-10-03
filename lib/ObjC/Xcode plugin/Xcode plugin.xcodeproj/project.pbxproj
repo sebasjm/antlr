@@ -14,7 +14,10 @@
 		F71CBB790ACF2D4600088951 /* antlr.pblangspec in Resources */ = {isa = PBXBuildFile; fileRef = F71CBB780ACF2D4600088951 /* antlr.pblangspec */; };
 		F71CBB7D0ACF2DAE00088951 /* antlr.pbfilespec in Resources */ = {isa = PBXBuildFile; fileRef = F71CBB7C0ACF2DAE00088951 /* antlr.pbfilespec */; };
 		F71CBB880ACF2EDC00088951 /* org.antlr.Tool.strings in Resources */ = {isa = PBXBuildFile; fileRef = F71CBB870ACF2EDC00088951 /* org.antlr.Tool.strings */; };
-		F770F3780AD16737003EF8FB /* GrammarFilter.g in Resources */ = {isa = PBXBuildFile; fileRef = F7AC63580AD0112000BD7A06 /* GrammarFilter.g */; };
+		F770F43A0AD2FB68003EF8FB /* ANTLRToolOutputParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F770F3DA0AD1887C003EF8FB /* ANTLRToolOutputParser.m */; };
+		F770F43E0AD310A9003EF8FB /* DevToolsSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F770F43D0AD310A9003EF8FB /* DevToolsSupport.framework */; };
+		F770F4A70AD31A62003EF8FB /* GrammarFilterLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7AC63940AD0172A00BD7A06 /* GrammarFilterLexer.m */; };
+		F770F4A80AD31A63003EF8FB /* GrammarFilterLexer.h in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = F7AC63930AD0172A00BD7A06 /* GrammarFilterLexer.h */; };
 		F794E92C0ACF38D900E06CD7 /* antlr.xcbuildrules in Resources */ = {isa = PBXBuildFile; fileRef = F71CBB800ACF2E2900088951 /* antlr.xcbuildrules */; };
 		F794E92D0ACF38DA00E06CD7 /* antlr.pbcompspec in Resources */ = {isa = PBXBuildFile; fileRef = F71CBB750ACF286100088951 /* antlr.pbcompspec */; };
 		F7FBB9A60AD00B9D00497048 /* ANTLR.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = F7FBB9510AD00A9400497048 /* ANTLR.framework */; };
@@ -102,6 +105,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				F7FBB9A60AD00B9D00497048 /* ANTLR.framework in Copy Embedded Frameworks */,
+				F770F4A80AD31A63003EF8FB /* GrammarFilterLexer.h in Copy Embedded Frameworks */,
 			);
 			name = "Copy Embedded Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -127,7 +131,12 @@
 		F71CBB7C0ACF2DAE00088951 /* antlr.pbfilespec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.pbfilespec; path = antlr.pbfilespec; sourceTree = "<group>"; };
 		F71CBB800ACF2E2900088951 /* antlr.xcbuildrules */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = antlr.xcbuildrules; sourceTree = "<group>"; };
 		F71CBB830ACF2EAE00088951 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/org.antlr.Tool.strings; sourceTree = "<group>"; };
-		F7AC63580AD0112000BD7A06 /* GrammarFilter.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GrammarFilter.g; sourceTree = "<group>"; };
+		F770F3D50AD187CC003EF8FB /* OutputParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutputParser.h; sourceTree = "<group>"; };
+		F770F3D90AD1887C003EF8FB /* ANTLRToolOutputParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRToolOutputParser.h; sourceTree = "<group>"; };
+		F770F3DA0AD1887C003EF8FB /* ANTLRToolOutputParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRToolOutputParser.m; sourceTree = "<group>"; };
+		F770F43D0AD310A9003EF8FB /* DevToolsSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DevToolsSupport.framework; path = /System/Library/PrivateFrameworks/DevToolsSupport.framework; sourceTree = "<absolute>"; };
+		F770F4460AD3110B003EF8FB /* RegularExpressions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegularExpressions.h; sourceTree = "<group>"; };
+		F7AC63580AD0112000BD7A06 /* GrammarFilter.g */ = {isa = PBXFileReference; explicitFileType = sourcecode.antlr3; fileEncoding = 4; path = GrammarFilter.g; sourceTree = "<group>"; };
 		F7AC63920AD0172A00BD7A06 /* GrammarFilter.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GrammarFilter.tokens; sourceTree = "<group>"; };
 		F7AC63930AD0172A00BD7A06 /* GrammarFilterLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GrammarFilterLexer.h; sourceTree = "<group>"; };
 		F7AC63940AD0172A00BD7A06 /* GrammarFilterLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GrammarFilterLexer.m; sourceTree = "<group>"; };
@@ -143,6 +152,7 @@
 			files = (
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
 				F71CBB2C0ACEED1900088951 /* DevToolsCore.framework in Frameworks */,
+				F770F43E0AD310A9003EF8FB /* DevToolsSupport.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -192,6 +202,8 @@
 				F7AC63540AD010C400BD7A06 /* Grammar Inspection */,
 				F71CBB680ACEF5E800088951 /* ANTLRCompilerSpecification.h */,
 				F71CBB690ACEF5E800088951 /* ANTLRCompilerSpecification.m */,
+				F770F3D90AD1887C003EF8FB /* ANTLRToolOutputParser.h */,
+				F770F3DA0AD1887C003EF8FB /* ANTLRToolOutputParser.m */,
 				F7FBBA6D0AD00FD100497048 /* ANTLRXCPlugin.h */,
 				F7FBBA6E0AD00FD100497048 /* ANTLRXCPlugin.m */,
 			);
@@ -209,6 +221,7 @@
 		1058C7AEFEA557BF11CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F770F43D0AD310A9003EF8FB /* DevToolsSupport.framework */,
 				F71CBB2B0ACEED1900088951 /* DevToolsCore.framework */,
 				089C167FFE841241C02AAC07 /* AppKit.framework */,
 				089C1672FE841209C02AAC07 /* Foundation.framework */,
@@ -238,6 +251,8 @@
 				F71CBB400ACEEE2300088951 /* BuildSystemInterfaces.h */,
 				F71CBB430ACEEF2500088951 /* DependencyGraph.h */,
 				F71CBB480ACEF14C00088951 /* Specifications.h */,
+				F770F3D50AD187CC003EF8FB /* OutputParser.h */,
+				F770F4460AD3110B003EF8FB /* RegularExpressions.h */,
 			);
 			name = "Xcode Plugin API";
 			sourceTree = "<group>";
@@ -397,7 +412,6 @@
 				F71CBB880ACF2EDC00088951 /* org.antlr.Tool.strings in Resources */,
 				F794E92C0ACF38D900E06CD7 /* antlr.xcbuildrules in Resources */,
 				F794E92D0ACF38DA00E06CD7 /* antlr.pbcompspec in Resources */,
-				F770F3780AD16737003EF8FB /* GrammarFilter.g in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -410,6 +424,8 @@
 			files = (
 				F71CBB6A0ACEF5E800088951 /* ANTLRCompilerSpecification.m in Sources */,
 				F7FBBA700AD00FD100497048 /* ANTLRXCPlugin.m in Sources */,
+				F770F43A0AD2FB68003EF8FB /* ANTLRToolOutputParser.m in Sources */,
+				F770F4A70AD31A62003EF8FB /* GrammarFilterLexer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,8 +461,10 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -477,8 +495,10 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
