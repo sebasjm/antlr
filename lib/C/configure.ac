@@ -30,7 +30,7 @@ AC_COPYRIGHT([
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ])
-AC_CONFIG_SRCDIR(src/antlr3memory.c)
+AC_CONFIG_SRCDIR(src/antlr3parser.c)
 
 AC_ARG_ENABLE([debuginfo],
 		[AS_HELP_STRING([--enable-debuginfo], [Compiles debug info into the library (default no)])],

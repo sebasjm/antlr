@@ -18,7 +18,6 @@ LIBSOURCES		=	src/antlr3baserecognizer.c			\
 					src/antlr3inputstream.c				\
 					src/antlr3intstream.c				\
 					src/antlr3lexer.c					\
-					src/antlr3memory.c					\
 					src/antlr3parser.c					\
 					src/antlr3string.c					\
 					src/antlr3stringstream.c			\
