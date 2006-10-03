@@ -98,7 +98,7 @@
 		[inputNode addIncludedNode:importedTokensNode];	// is this the correct order?
 	}
 	
-	NSLog(@"found grammar %@ in file %@: type:%@ imports tokenVocab: %@", grammarName, inputPath, grammarType, importedVocabName);
+	//NSLog(@"found grammar %@ in file %@: type:%@ imports tokenVocab: %@", grammarName, inputPath, grammarType, importedVocabName);
 
 	// create the command to execute ANTLR and set the necessary arguments
 	XCDependencyCommand *depCmd = [context

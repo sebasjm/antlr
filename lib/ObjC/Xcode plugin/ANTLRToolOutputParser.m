@@ -25,6 +25,8 @@ TSRegularExpression *syntax_error = nil;
 - (id)initWithNextOutputStream:(id)nextOutputStream
 {
 	if ((self = [super initWithNextOutputStream:nextOutputStream])) {
+		// we have not state to track, yet. might have to do this for multiline messages from org.antlr.Tool
+		// even better: add option to ANTLR to emit sane messages...
 	}
 	return self;
 }
@@ -39,13 +41,13 @@ TSRegularExpression *syntax_error = nil;
 {
 	NSString* outputLine = [[[NSString alloc] initWithBytes:string length:length encoding:NSASCIIStringEncoding] autorelease];
 	NSArray *captures;
-	NSLog(@"examining line: %@", outputLine);
+	//NSLog(@"examining line: %@", outputLine);
 	if (nil != (captures = [syntax_error subexpressionsForString:outputLine])) {
 		// we found a syntax error from ANTLR
 		NSString *fileName = [captures objectAtIndex:3];
 		int line = [[captures objectAtIndex:1] intValue];
 		NSString *message = [captures objectAtIndex:4];
-		NSLog(@"found syntax error: %@", captures);
+		//NSLog(@"found syntax error: %@", captures);
 		if (line != 0)
 			[[self delegate] parser:self foundMessageOfType:1	// errors
 							  title:[message UTF8String]
@@ -56,7 +58,7 @@ TSRegularExpression *syntax_error = nil;
 		NSString *fileName = [captures objectAtIndex:1];
 		int line = [[captures objectAtIndex:2] intValue];
 		NSString *message = [captures objectAtIndex:3];
-		NSLog(@"found something: %@", captures);
+		//NSLog(@"found something: %@", captures);
 		if (line != 0)
 			[[self delegate] parser:self foundMessageOfType:2	// warnings
 							  title:[message UTF8String]
