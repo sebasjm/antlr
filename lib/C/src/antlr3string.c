@@ -345,7 +345,7 @@ newSize16	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
     /* Always add one more byte for a terminator ;-)
      */
     string->chars   = (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_UINT16) * (size+1)));
-    string->size    = size+1;	// Size is always in characters, as is len
+    string->size    = size+1;	/* Size is always in characters, as is len */
 
     return string;
 }
@@ -394,8 +394,8 @@ newPtr16_8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 siz
 {
     pANTLR3_STRING  string;
 
-    // newSize accepts size in characters, not bytes
-    //
+    /* newSize accepts size in characters, not bytes
+     */
     string  = factory->newSize(factory, size);
 
     if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))

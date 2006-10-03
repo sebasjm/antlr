@@ -1122,9 +1122,9 @@ closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory)
     {
 	freeVector  = (pANTLR3_VECTOR)(vector->elements[entry].element);
 
-	// Anything in here should be factory made, but we do this just
-	// to triple check.
-	//
+	/* Anything in here should be factory made, but we do this just
+	 * to triple check.
+	 */
 	if  (freeVector->factoryMade == ANTLR3_TRUE)
 	{
 	    ANTLR3_FREE(freeVector->elements);

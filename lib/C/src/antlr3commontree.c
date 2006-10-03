@@ -198,7 +198,7 @@ factoryClose	    (pANTLR3_ARBORETUM factory)
 
 	    if	(thisTree->free == NULL)
 	    {
-		break;	// Found the last allocation in this pool
+		break;	/* Found the last allocation in this pool */
 	    }
 	    thisTree->free(thisTree);
 	}

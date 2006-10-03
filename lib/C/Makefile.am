@@ -59,7 +59,7 @@ include_HEADERS =	include/antlr3.h						\
 
 libantlr3c_la_LDFLAGS = -version-info 0:0:0
 
-INCLUDES = -I include
+INCLUDES = -Iinclude -Iinclude
 
 
 EXTRA_DIST = 	vs2005/rulefiles/antlr3.rules	\
