@@ -37,6 +37,7 @@ AC_ARG_ENABLE([debuginfo],
 		 [CFLAGS="-O2 -g"], [CFLAGS="-O2"])
 
 AM_INIT_AUTOMAKE(gnu)
+AM_MAINTAINER_MODE
 AM_PROG_LIBTOOL
 
 # Checks for programs.
@@ -44,7 +45,6 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 
 # Checks for libraries.
 
