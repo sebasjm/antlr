@@ -714,7 +714,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
     
     /** Install the token matching function
      */
-    lexCtx->pLexer->mTokens = mTokens;
+    lexCtx->pLexer->mTokens = (void (*) (void *))(mTokens);
     
     lexCtx->getGrammarFileName	= getGrammarFileName;
     lexCtx->free		= <name>Free;
