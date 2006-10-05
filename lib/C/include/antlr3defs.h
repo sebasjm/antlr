@@ -4,7 +4,6 @@
 #ifndef	_ANTLR3DEFS_H
 #define	_ANTLR3DEFS_H
 
-// Maintainers only, and only rarely :-) #define	ANTLR3_MEM_DEBUG
 
 /* Following are for genreaed code, they are not referenced internally!!!
  */
