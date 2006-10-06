@@ -1223,7 +1223,7 @@ static	  pANTLR3_STRING    to8_16	(pANTLR3_STRING string)
     {
 	ANTLR3_UCHAR	c;
 
-	c = *((pANTLR3_UINT16)(string->chars + i));
+	c = *(((pANTLR3_UINT16)(string->chars)) + i);
 
 	*(newStr->chars + i) = (ANTLR3_UINT8)(c > 255 ? '_' : c);
     }
