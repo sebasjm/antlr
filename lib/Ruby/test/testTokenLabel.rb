@@ -25,58 +25,41 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'test/unit'
-require 'antlrtest'
+require 'antlr'
+require 'stringio'
 
 class TestTokenLabel < Test::Unit::TestCase
 
     def test_implicit_label
         grammar = <<-END
-			grammar Foo;
-			options {
-			    language = Ruby;
-			}
-
-			a : A { print $A.text };
+			a returns [result] : A { result = $A.text };
 
 			A : ('a'..'z')+;
 	    END
 
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "abcd")
-
-	    assert_equal("abcd", found);
+		parser = Grammar::compile(grammar)
+		assert_equal('abcd', parser.parse('abcd'))
     end
 
     def test_explicit_label
         grammar = <<-END
-            grammar Foo;
-            options {
-                language = Ruby;
-            }
-
-            a : x=A { print $x.text };
+            a returns [result]: x=A { result = $x.text };
 
             A : ('a'..'z')+;
         END
 
-        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "abcd")
-
-        assert_equal("abcd", found);
+		parser = Grammar::compile(grammar)
+		assert_equal('abcd', parser.parse('abcd'))
     end
 
     def test_list_label
         grammar = <<-END
-            grammar Foo;
-            options {
-                language = Ruby;
-            }
-
-            a : (x+=A)+ { print $x.map { |t| t.text }.join(",")};
+            a returns [result]: (x+=A)+ { result = $x.map { |t| t.text }.join(',') };
 
             A : ('a'..'z');
         END
 
-        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "abcd")
-
-        assert_equal("a,b,c,d", found);
+		parser = Grammar::compile(grammar)
+		assert_equal('a,b,c,d', parser.parse('abcd'))
     end
 end

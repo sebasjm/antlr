@@ -31,42 +31,41 @@ require 'fileutils'
 
 include FileUtils
 
-class ANTLRTester
-    def self.execParser(grammar, lexerName, parserName, startRule, input)
+class Grammar
+	def self.compile(grammar)
+		md = /(\w+)/.match(grammar)
+		raise "Cannot find starting rule" if md.nil?
+		top_rule = md[1]
+
+		type = top_rule == top_rule.upcase ? "lexer" : ""
+
+		name = "Grammar#{Time.now.to_i}#{rand(1000)}"
+
+		grammar = <<-GRAMMAR
+			#{type} grammar #{name};
+			options { language = Ruby; }
+
+			#{grammar}
+		GRAMMAR
+
         tempfile = Tempfile.new("antlr")
         dirname = tempfile.path + ".dir"
         Dir.mkdir(dirname)
 
-        cp("../runtime/antlr.rb", dirname)
+		grammar_class = nil
 
-        result = nil
         cd(dirname) do
-            # write the grammar to a file
-            File.open("grammar.g", "w") { |f| f.puts grammar }
+			# write the grammar to a file
+			File.open("#{name}.g", "w") { |f| f.puts grammar }
 
-            # run antlr
-            `java -cp #{ENV['CLASSPATH']} org.antlr.Tool grammar.g`
+	        # run antlr
+		    `java -cp #{ENV['CLASSPATH']} org.antlr.Tool #{name}.g`
 
-            File.open("driver.rb", "w") do |f|
-                f.puts <<-DRIVER
-                    require '#{lexerName}'
-                    require '#{parserName}'
+				class_name = name + (type == "lexer" ? "Lexer" : "Parser")
 
-                    charstream = ANTLR::CharStream.new(STDIN)
-                    lexer = #{lexerName}.new(charstream)
-                    tokenstream = ANTLR::TokenStream.new(lexer)
-                    parser = #{parserName}.new(tokenstream)
+            load(dirname + "/#{class_name}.rb")
 
-                    parser.#{startRule}
-                DRIVER
-            end
-
-            # run the test
-            result = IO.popen("ruby driver.rb", "r+") do |pipe|
-                pipe.print(input)
-                pipe.close_write
-                pipe.gets
-            end
+            grammar_class = Class::const_get(class_name)
 
             # delete created files
             Dir.new(dirname).each { |file|
@@ -76,6 +75,41 @@ class ANTLRTester
 
         Dir.delete(dirname)
 
-        result
+        if type == "lexer"
+            Lexer.new(grammar_class)
+        else
+            Parser.new(grammar_class, top_rule)
+        end
+    end
+
+    class Lexer
+        def initialize(grammar)
+            @grammar = grammar
+        end
+
+        def parse(input)
+            parser = @grammar.new(input)
+
+            tokens = []
+            loop do
+                token = parser.next_token
+                break if token == :EOF
+                tokens << token
+            end
+
+            tokens
+        end
+    end
+
+    class Parser
+        def initialize(grammar, top_rule)
+            @grammar = grammar
+            @top_rule = top_rule
+        end
+
+        def parse(input)
+            @grammar.new(input).send @top_rule
+        end
     end
 end
+

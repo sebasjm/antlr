@@ -24,11 +24,30 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+require 'test/unit'
+require 'antlr'
 
+class TestLexer < Test::Unit::TestCase
 
-# To run this script make sure that ANTLR v3, ANTLR 2.7.5 and StringTemplate are in the CLASSPATH
+    def test_match_any
+	    assert_nothing_raised do
+            Grammar::compile("A: .;").parse('a')
+        end
+    end
 
-require 'testLexer.rb'
-require 'testSemanticPredicateEvaluation.rb'
-require 'testSyntacticPredicateEvaluation.rb'
-require 'testTokenLabel.rb'
+    def test_match_char
+        parser = Grammar::compile("A: 'a';")
+
+        assert_nothing_raised { parser.parse('a') }
+        assert_raises(RuntimeError) { parser.parse('b') }
+    end
+
+    def test_match_string
+        parser = Grammar::compile("A: 'abc';")
+
+        assert_nothing_raised { parser.parse('abc') }
+        assert_raises(RuntimeError) { parser.parse('x') }
+        assert_raises(RuntimeError) { parser.parse('ab') }
+	end        
+
+end

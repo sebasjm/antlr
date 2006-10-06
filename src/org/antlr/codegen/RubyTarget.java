@@ -60,4 +60,14 @@ public class RubyTarget
         // we don't support unicode, yet.
         return 0xFF;
     }
+
+    public String getTokenTypeAsTargetLabel(CodeGenerator generator, int ttype)
+    {
+        String name = generator.grammar.getTokenDisplayName(ttype);
+        // If name is a literal, return the token type instead
+        if ( name.charAt(0)=='\'' ) {
+            return generator.grammar.computeTokenNameFromLiteral(ttype, name);
+        }
+        return name;
+    }
 }

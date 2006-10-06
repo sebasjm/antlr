@@ -25,110 +25,92 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'test/unit'
-require 'antlrtest'
+require 'antlr'
 
 class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
 
     def test_two_preds_with_naked_alt
         grammar = <<-END
-			grammar Foo;
-			options {
-			    language = Ruby;
-			}
-
-
-	        s : (a ';')+ ;
+	        s returns [result]
+	        @init { @out = "" }: (a ';')+ { result = @out };
 
 			a
 			options {
 			  k=1;
 			}
-			  : (b '.')=> b '.' { print "alt 1" }
-			  | (b)=> b { print "alt 2" }
-			  | c       { print "alt 3" }
+			:
+			  (b '.')=> b '.' { @out << "[alt 1]" }
+			| (b)=> b { @out << "[alt 2]" }
+			| c       { @out << "[alt 3]" }
 			  ;
 
 			b
-			@init { print "enter b" }
+			@init { @out << "[enter b]" }
 			   : '(' 'x' ')' ;
 
 			c
-			@init { print "enter c" }
+			@init { @out << "[enter c]" }
 			   : '(' c ')' | 'x' ;
 
 			WS : (' '|'\\n')+ { channel = 99 }
 			   ;
 	    END
 
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "(x) ;");
-	    assert_equal("enter benter benter balt 2", found);
+		parser = Grammar::compile(grammar)
 
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "(x). ;");
-	    assert_equal("enter benter balt 1", found);
-
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "((x)) ;");
-	    assert_equal("enter benter benter center center calt 3", found);
+        assert_equal("[enter b][enter b][enter b][alt 2]", parser.parse('(x) ;'))
+        assert_equal("[enter b][enter b][alt 1]", parser.parse('(x). ;'))
+	    assert_equal("[enter b][enter b][enter c][enter c][enter c][alt 3]", parser.parse('((x)) ;'))
     end
 
     def test_two_preds_with_naked_alt_not_last
         grammar = <<-END
-			grammar Foo;
-			options {
-			    language = Ruby;
-			}
+            s returns [result]
+            @init { @out = "" }: (a ';')+ { result = @out };
 
-
-            s : (a ';')+ ;
 			a
 			options {
 			  k=1;
 			}
-			  : (b '.')=> b '.' { print "alt 1" }
-			  | c       { print "alt 2" }
-			  | (b)=> b { print "alt 3" }
+			  : (b '.')=> b '.' { @out << "[alt 1]" }
+			  | c       { @out << "[alt 2]" }
+			  | (b)=> b { @out << "[alt 3]" }
 			  ;
 			b
-			@init { print "enter b" }
+			@init { @out << "[enter b]" }
 			   : '(' 'x' ')' ;
 			c
-			@init { print "enter c" }
+			@init { @out << "[enter c]" }
 			   : '(' c ')' | 'x' ;
 			WS : (' '|'\\n')+ {channel=99}
 			   ;
 	    END
 
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "(x) ;");
-	    assert_equal("enter benter center calt 2", found);
+		parser = Grammar::compile(grammar)
 
-
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "(x). ;");
-	    assert_equal("enter benter balt 1", found);
-
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "((x)) ;");
-	    assert_equal("enter benter center center calt 2", found);
+	    assert_equal("[enter b][enter c][enter c][alt 2]", parser.parse("(x) ;"))
+	    assert_equal("[enter b][enter b][alt 1]", parser.parse("(x). ;"))
+	    assert_equal("[enter b][enter c][enter c][enter c][alt 2]", parser.parse("((x)) ;"))
     end
 
     def test_lexer_pred
+        Object::const_set('OUT', [])
         grammar = <<-END
-            grammar Foo;
-            options {
-                language = Ruby;
-            }
+            s returns [result]
+            @init { OUT.clear }: A { result = OUT.join };
 
-
-            s : A ;
 			A options {k=1;}
-			  : (B '.')=>B '.' { print "alt1" }
-			  | B { print "alt2" }
+			  : (B '.')=>B '.' { OUT << "alt1" }
+			  | B { OUT << "alt2" }
 			  ;
+
 			fragment
 			B : 'x'+ ;
 	    END
 
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "s", "xxx");
-	    assert_equal("alt2", found);
+		parser = Grammar::compile(grammar)
 
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "s", "xxx.");
-	    assert_equal("alt1", found);
+	    assert_equal("alt2", parser.parse('xxx'))
+	    assert_equal("alt1", parser.parse('xxx.'))
     end
 end
