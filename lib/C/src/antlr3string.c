@@ -241,6 +241,7 @@ stringInit8  (pANTLR3_STRING string)
     string->compare8	= compare8;
     string->subString	= subString8;
     string->toInt32	= toInt32_8;
+    string->to8		= to8_8;
 
     string->compareS	= compareS;
     string->setS	= setS;
@@ -276,6 +277,7 @@ stringInit16  (pANTLR3_STRING string)
     string->compare8	= compare16_8;
     string->subString	= subString16;
     string->toInt32	= toInt32_16;
+    string->to8		= to8_16;
 
     string->compareS	= compareS;
     string->setS	= setS;
@@ -1214,7 +1216,7 @@ static	  pANTLR3_STRING    to8_16	(pANTLR3_STRING string)
     newStr->size    = string->len + 1;
     newStr->len	    = string->len;
 
-    /* Now copy each 16 bit charcter , making it an 8 bit character of 
+    /* Now copy each 16 bit charActer , making it an 8 bit character of 
      * some sort.
      */
     for	(i=0; i<string->len; i++)
