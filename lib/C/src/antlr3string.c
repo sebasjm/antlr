@@ -53,6 +53,8 @@ static    pANTLR3_STRING    subString8	(pANTLR3_STRING string, ANTLR3_UINT32 sta
 static    pANTLR3_STRING    subString16	(pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex);
 static	  ANTLR3_UINT32	    toInt32_8	(pANTLR3_STRING string);
 static	  ANTLR3_UINT32	    toInt32_16  (pANTLR3_STRING string);
+static	  pANTLR3_STRING    to8_8	(pANTLR3_STRING string);
+static	  pANTLR3_STRING    to8_16	(pANTLR3_STRING string);
 
 /* Local helpers
  */
@@ -300,7 +302,7 @@ stringInitUTF8  (pANTLR3_STRING string)
 /**
  * Creates a new string with enough capacity for size 8 bit characters plus a terminator.
  *
- * \param[in] factory - POitner to the string factory that owns strings
+ * \param[in] factory - Poitner to the string factory that owns strings
  * \param[in] size - In characters
  * \return pointer to the new string.
  */
@@ -324,7 +326,7 @@ newSize8	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
     return string;
 }
 /**
- * Creates a new string with enough capacity for size 18 bit characters plus a terminator.
+ * Creates a new string with enough capacity for size 16 bit characters plus a terminator.
  *
  * \param[in] factory - POitner to the string factory that owns strings
  * \param[in] size - In characters
@@ -1176,4 +1178,57 @@ toInt32_16       (struct ANTLR3_STRING_struct * string)
     }
 
     return value;
+}
+
+/* Function that returns a pointer to an 8 bit version of the string,
+ * which in this case is just the string as this is 
+ * 8 bit encodiing anyway.
+ */
+static	  pANTLR3_STRING	    to8_8	(pANTLR3_STRING string)
+{
+    return  string;
+}
+
+/* Function that returns an 8 bit version of the string,
+ * which in this case is returning all the 16 bit characters
+ * narrowed back into 8 bits, with characters that are too large
+ * replaced with '_'
+ */
+static	  pANTLR3_STRING    to8_16	(pANTLR3_STRING string)
+{
+    pANTLR3_STRING  newStr;
+    ANTLR3_UINT32   i;
+
+    /* Create a new 8 bit string
+     */
+    newStr  = newRaw8(string->factory);
+
+    if	(newStr == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    {
+	return	NULL;
+    }
+
+    /* Always add one more byte for a terminator
+     */
+    newStr->chars   = (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)(string->len + 1));
+    newStr->size    = string->len + 1;
+    newStr->len	    = string->len;
+
+    /* Now copy each 16 bit charcter , making it an 8 bit character of 
+     * some sort.
+     */
+    for	(i=0; i<string->len; i++)
+    {
+	ANTLR3_UCHAR	c;
+
+	c = *((pANTLR3_UINT16)(string->chars + i));
+
+	*(newStr->chars + i) = (ANTLR3_UINT8)(c > 255 ? '_' : c);
+    }
+
+    /* Terminate
+     */
+    *(newStr->chars + newStr->len) = '\0';
+
+    return newStr;
 }

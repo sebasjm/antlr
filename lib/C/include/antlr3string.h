@@ -146,6 +146,14 @@ typedef	struct ANTLR3_STRING_struct
      */
     ANTLR3_UINT32   (*toInt32)	    (struct ANTLR3_STRING_struct * string);
 
+    /** Pointer to a function that yields an 8 bit string regardless of the encoding of the supplied
+     *  string. This is useful when you want to use the text of a token in some way that requires an 8 bit
+     *  value, such as the key for a hashtable. The function is required to produce a usable string even
+     *  if the text given as input has characters that do not fit in 8 bit space, it will replace them
+     *  with some arbitrary character such as '?'
+     */
+    struct ANTLR3_STRING_struct *
+		    (*to8)	    (struct ANTLR3_STRING_struct * string);
 }
     ANTLR3_STRING;
 
