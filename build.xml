@@ -65,12 +65,15 @@
                optimize="${compile.optimize}"
                source="1.4" target="1.4"
                classpathref="classpath" />
+    </target>
+
+    <target name="templates">
         <copy todir="${build.classes}">
             <fileset dir="${src.dir}" includes="**/*.stg,**/*.st,**/*.sti" />
         </copy>
     </target>
 
-    <target name="build" depends="compile,version"
+    <target name="build" depends="compile,version,templates"
             description="Creates the ANTLR3 jar">
 
         <property name="antlr3.jar"
@@ -86,7 +89,7 @@
             </manifest>
         </jar>
     </target>
- 
+
     <target name="version" depends="version-bcel" unless="bcel.available">
         <echo>Install bcel in the classpath to have automatic version in jar name</echo>
         <property name="version" value="unknown 3.x build" />
