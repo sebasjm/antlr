@@ -111,8 +111,9 @@ public Token nextToken() {
         if ( input.LA(1)==CharStream.EOF ) {
             return Token.EOF_TOKEN;
         }
-        token=null;
+        token = null;
         tokenStartCharIndex = getCharIndex();
+	text = null;
         try {
             int m = input.mark();
             backtracking=1; <! means we won't throw slow exception !>
