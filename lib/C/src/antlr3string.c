@@ -51,8 +51,8 @@ static    ANTLR3_UCHAR      charAt8	(pANTLR3_STRING string, ANTLR3_UINT32 offset
 static    ANTLR3_UCHAR      charAt16	(pANTLR3_STRING string, ANTLR3_UINT32 offset);
 static    pANTLR3_STRING    subString8	(pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex);
 static    pANTLR3_STRING    subString16	(pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex);
-static	  ANTLR3_UINT32	    toInt32_8	(pANTLR3_STRING string);
-static	  ANTLR3_UINT32	    toInt32_16  (pANTLR3_STRING string);
+static	  ANTLR3_INT32	    toInt32_8	(pANTLR3_STRING string);
+static	  ANTLR3_INT32	    toInt32_16  (pANTLR3_STRING string);
 static	  pANTLR3_STRING    to8_8	(pANTLR3_STRING string);
 static	  pANTLR3_STRING    to8_16	(pANTLR3_STRING string);
 
@@ -1157,7 +1157,7 @@ subString16  (pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 end
 
 /* Function that can convert the characters in the string to an integer
  */
-static ANTLR3_UINT32
+static ANTLR3_INT32
 toInt32_8	    (struct ANTLR3_STRING_struct * string)
 {
     return  atoi((const char *)(string->chars));
@@ -1165,14 +1165,26 @@ toInt32_8	    (struct ANTLR3_STRING_struct * string)
 
 /* Function that can convert the characters in the string to an integer
  */
-static ANTLR3_UINT32
+static ANTLR3_INT32
 toInt32_16       (struct ANTLR3_STRING_struct * string)
 {
     pANTLR3_UINT16  input;
-    ANTLR3_UINT32   value;
+    ANTLR3_INT32   value;
+    ANTLR3_BOOLEAN  negate;
 
     value   = 0;
     input   = (pANTLR3_UINT16)(string->chars);
+    negate  = ANTLR3_FALSE;
+
+    if	(*input == (ANTLR3_UCHAR)'-')
+    {
+	negate = ANTLR3_TRUE;
+	input++;
+    }
+    else if (*input == (ANTLR3_UCHAR)'+')
+    {
+	input++;
+    }
 
     while   (*input != '\0' && isdigit(*input))
     {
@@ -1181,7 +1193,7 @@ toInt32_16       (struct ANTLR3_STRING_struct * string)
 	input++;
     }
 
-    return value;
+    return negate ? -value : value;
 }
 
 /* Function that returns a pointer to an 8 bit version of the string,

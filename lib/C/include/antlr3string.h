@@ -149,7 +149,7 @@ typedef	struct ANTLR3_STRING_struct
     /** Pointer to a function that returs the integer representation of any numberic characters
      *  at the begining of the string
      */
-    ANTLR3_UINT32   (*toInt32)	    (struct ANTLR3_STRING_struct * string);
+    ANTLR3_INT32   (*toInt32)	    (struct ANTLR3_STRING_struct * string);
 
     /** Pointer to a function that yields an 8 bit string regardless of the encoding of the supplied
      *  string. This is useful when you want to use the text of a token in some way that requires an 8 bit
