@@ -42,6 +42,11 @@ typedef	struct ANTLR3_STRING_struct
      */
     ANTLR3_UINT32		index;
 
+    /** Occasionally it is useful to know what the encoding of the string
+     *  actually is, hence it is stored here as one the ANTLR3_ENCODING_ values
+     */
+    ANTLR3_UINT8		encoding;
+
     /** Pointer to function that sets the string value to a specific string in the default encoding
      *  for this string. For instance, if this is ASCII 8 bit, then this function is the same as set8
      *  but if the encoding is 16 bit, then the pointer is assumed to point to 16 bit characters not

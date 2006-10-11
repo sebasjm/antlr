@@ -38,6 +38,11 @@
  */
 #include    <antlr3errors.h>
 
+#define	ANTLR3_ENCODING_LATIN1	0
+#define ANTLR3_ENCODING_UCS2	1
+#define	ANTLR3_ENCODING_UTF8	2
+#define	ANTLR3_ENCODING_UTF32	3
+
 /* Work out what operating system/compiler this is. We just do this once
  * here and use an internal symbol after this.
  */

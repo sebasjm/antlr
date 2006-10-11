@@ -221,9 +221,10 @@ static	void	stringFree  (pANTLR3_STRING string)
 static	void
 stringInit8  (pANTLR3_STRING string)
 {
-    string->len	    = 0;
-    string->size    = 0;
-    string->chars   = NULL;
+    string->len		= 0;
+    string->size	= 0;
+    string->chars	= NULL;
+    string->encoding	= ANTLR3_ENCODING_LATIN1;
 
     /* API for 8 bit strings*/
 
@@ -257,9 +258,10 @@ stringInit8  (pANTLR3_STRING string)
 static	void
 stringInit16  (pANTLR3_STRING string)
 {
-    string->len	    = 0;
-    string->size    = 0;
-    string->chars   = NULL;
+    string->len		= 0;
+    string->size	= 0;
+    string->chars	= NULL;
+    string->encoding	= ANTLR3_ENCODING_UCS2;
 
     /* API for 16 bit strings */
 
