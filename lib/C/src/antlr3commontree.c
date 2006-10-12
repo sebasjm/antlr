@@ -202,6 +202,14 @@ factoryClose	    (pANTLR3_ARBORETUM factory)
 	    }
 	    thisTree->free(thisTree);
 	}
+    }
+
+    /* We must free the pools after we have traversed all the entries in all the
+     * the pools as we cannot guarantee that the trees in the pool will not be referenced as children
+     * of other trees until all have been asked to free themselves.
+     */
+    for	(poolCount = 0; poolCount <= factory->thisPool; poolCount++)
+    {
 	/* We can now free this pool allocation
 	 */
 	ANTLR3_FREE(factory->pools[poolCount]);
