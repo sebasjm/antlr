@@ -217,6 +217,7 @@ public class ErrorManager {
 
 	/** Messages should be sensitive to the locale. */
 	private static Locale locale;
+	private static String formatName;
 
 	/** Each thread might need it's own error listener; e.g., a GUI with
 	 *  multiple window frames holding multiple grammars.
@@ -227,8 +228,13 @@ public class ErrorManager {
 		public int errors;
 		public int warnings;
 		public int infos;
-		/** Track all error level msgIDs; we use to abort later if necessary */
+		/** Track all msgIDs; we use to abort later if necessary
+		 *  also used in Message to find out what type of message it is via getMessageType()
+		 */
 		public BitSet errorMsgIDs = new BitSet();
+		public BitSet warningMsgIDs = new BitSet();
+		// TODO: figure out how to do info messages. these do not have IDs...kr
+		//public BitSet infoMsgIDs = new BitSet();
 	}
 
 	/** Track the number of errors regardless of the listener but track
@@ -244,6 +250,8 @@ public class ErrorManager {
 
 	/** The group of templates that represent all possible ANTLR errors. */
 	private static StringTemplateGroup messages;
+	/** The group of templates that represent the current message format. */
+	private static StringTemplateGroup format;
 
 	/** From a msgID how can I get the name of the template that describes
 	 *  the error or warning?
@@ -252,19 +260,34 @@ public class ErrorManager {
 
 	static ANTLRErrorListener theDefaultErrorListener = new ANTLRErrorListener() {
 		public void info(String msg) {
+			if (formatWantsSingleLineMessage()) {
+				msg = msg.replaceAll("\n", " ");
+			}
 			System.err.println(msg);
 		}
 
 		public void error(Message msg) {
-			System.err.println(msg);
+			String outputMsg = msg.toString();
+			if (formatWantsSingleLineMessage()) {
+				outputMsg = outputMsg.replaceAll("\n", " ");
+			}
+			System.err.println(outputMsg);
 		}
 
 		public void warning(Message msg) {
-			System.err.println(msg);
+			String outputMsg = msg.toString();
+			if (formatWantsSingleLineMessage()) {
+				outputMsg = outputMsg.replaceAll("\n", " ");
+			}
+			System.err.println(outputMsg);
 		}
 
 		public void error(ToolMessage msg) {
-			System.err.println(msg);
+			String outputMsg = msg.toString();
+			if (formatWantsSingleLineMessage()) {
+				outputMsg = outputMsg.replaceAll("\n", " ");
+			}
+			System.err.println(outputMsg);
 		}
 	};
 
@@ -326,6 +349,10 @@ public class ErrorManager {
 		// require that a user call an init() function or something.  I prefer
 		// that this class be ready to go when loaded as I'm absentminded ;)
 		setLocale(Locale.getDefault());
+		// try to load the message format group
+		// the user might have specified one on the command line
+		// if not, or if the user has given an illegal value, we will fall back to "antlr"
+		setFormat("antlr");
 	}
 
     public static StringTemplateErrorListener getStringTemplateErrorListener() {
@@ -340,7 +367,7 @@ public class ErrorManager {
 	public static void setLocale(Locale locale) {
 		ErrorManager.locale = locale;
 		String language = locale.getLanguage();
-		String fileName = "org/antlr/tool/templates/messages/"+language+".stg";
+		String fileName = "org/antlr/tool/templates/messages/languages/"+language+".stg";
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		InputStream is = cl.getResourceAsStream(fileName);
 		if ( is==null ) {
@@ -376,6 +403,50 @@ public class ErrorManager {
 		}
 		else if ( !messagesOK ) {
 			setLocale(Locale.US); // try US to see if that will work
+		}
+	}
+
+	/** The format gets reset either from the Tool if the user supplied a command line option to that effect
+	 *  Otherwise we just use the default "antlr".
+	 */
+	public static void setFormat(String formatName) {
+		ErrorManager.formatName = formatName;
+		String fileName = "org/antlr/tool/templates/messages/formats/"+formatName+".stg";
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		InputStream is = cl.getResourceAsStream(fileName);
+		if ( is==null ) {
+			cl = ErrorManager.class.getClassLoader();
+			is = cl.getResourceAsStream(fileName);
+		}
+		if ( is==null && formatName.equals("antlr") ) {
+			rawError("ANTLR installation corrupted; cannot find ANTLR messages format file "+fileName);
+			panic();
+		}
+		else if ( is==null ) {
+			rawError("no such message format file "+fileName+" retrying with default ANTLR format");
+			setFormat("antlr"); // recurse on this rule, trying the default message format
+			return;
+		}
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(is));
+			format = new StringTemplateGroup(br,
+											   AngleBracketTemplateLexer.class,
+											   initSTListener);
+			br.close();
+		}
+		catch (IOException ioe) {
+			rawError("cannot close message format file "+fileName, ioe);
+		}
+
+		format.setErrorListener(blankSTListener);
+		boolean formatOK = verifyFormat();
+		if ( !formatOK && formatName.equals("antlr") ) {
+			rawError("ANTLR installation corrupted; ANTLR messages format file "+formatName+".stg incomplete");
+			panic();
+		}
+		else if ( !formatOK ) {
+			setFormat("antlr"); // recurse on this rule, trying the default message format
 		}
 	}
 
@@ -428,6 +499,32 @@ public class ErrorManager {
 	public static StringTemplate getMessage(int msgID) {
         String msgName = idToMessageTemplateName[msgID];
 		return messages.getInstanceOf(msgName);
+	}
+	public static String getMessageType(int msgID) {
+		if (getErrorState().warningMsgIDs.member(msgID)) {
+			return messages.getInstanceOf("warning").toString();
+		}
+		else if (getErrorState().errorMsgIDs.member(msgID)) {
+			return messages.getInstanceOf("error").toString();
+		}
+		assertTrue(false, "Assertion failed! Message ID " + msgID + " created but is not present in errorMsgIDs or warningMsgIDs.");
+		return "";
+	}
+
+	/** Return a StringTemplate that refers to the current format used for
+	 * emitting messages.
+	 */
+	public static StringTemplate getLocationFormat() {
+		return format.getInstanceOf("location");
+	}
+	public static StringTemplate getReportFormat() {
+		return format.getInstanceOf("report");
+	}
+	public static StringTemplate getMessageFormat() {
+		return format.getInstanceOf("message");
+	}
+	public static boolean formatWantsSingleLineMessage() {
+		return format.getInstanceOf("wantsSingleLineMessage").toString().equals("true");
 	}
 
 	public static ANTLRErrorListener getErrorListener() {
@@ -491,6 +588,7 @@ public class ErrorManager {
 
 	public static void warning(int msgID, Object arg) {
 		getErrorState().warnings++;
+		getErrorState().warningMsgIDs.add(msgID);
 		getErrorListener().warning(new ToolMessage(msgID, arg));
 	}
 
@@ -498,6 +596,7 @@ public class ErrorManager {
 									  DFAState d)
 	{
 		getErrorState().warnings++;
+		getErrorState().warningMsgIDs.add(ErrorManager.MSG_GRAMMAR_NONDETERMINISM);
 		getErrorListener().warning(
 			new GrammarNonDeterminismMessage(probe,d)
 		);
@@ -507,6 +606,7 @@ public class ErrorManager {
 									 DFAState d)
 	{
 		getErrorState().warnings++;
+		getErrorState().warningMsgIDs.add(ErrorManager.MSG_DANGLING_STATE);
 		Set seen = (Set)emitSingleError.get("danglingState");
 		if ( !seen.contains(d.dfa.decisionNumber+"|"+d.getAltSet()) ) {
 			getErrorListener().warning(
@@ -520,6 +620,7 @@ public class ErrorManager {
 	public static void analysisAborted(DecisionProbe probe)
 	{
 		getErrorState().warnings++;
+		getErrorState().warningMsgIDs.add(ErrorManager.MSG_ANALYSIS_ABORTED);
 		getErrorListener().warning(
 			new GrammarAnalysisAbortedMessage(probe)
 		);
@@ -529,6 +630,7 @@ public class ErrorManager {
 									   List alts)
 	{
 		getErrorState().warnings++;
+		getErrorState().warningMsgIDs.add(ErrorManager.MSG_UNREACHABLE_ALTS);
 		getErrorListener().warning(
 			new GrammarUnreachableAltsMessage(probe,alts)
 		);
@@ -538,6 +640,7 @@ public class ErrorManager {
 											  List alts)
 	{
 		getErrorState().warnings++;
+		getErrorState().warningMsgIDs.add(ErrorManager.MSG_INSUFFICIENT_PREDICATES);
 		getErrorListener().warning(
 			new GrammarInsufficientPredicatesMessage(probe,alts)
 		);
@@ -558,6 +661,7 @@ public class ErrorManager {
 										 Collection callSiteStates)
 	{
 		getErrorState().warnings++;
+		getErrorState().warningMsgIDs.add(ErrorManager.MSG_RECURSION_OVERLOW);
 		getErrorListener().warning(
 			new RecursionOverflowMessage(probe,sampleBadState, alt,
 										 targetRules, callSiteStates)
@@ -570,6 +674,7 @@ public class ErrorManager {
 									 Collection callSiteStates)
 	{
 		getErrorState().warnings++;
+		getErrorState().warningMsgIDs.add(ErrorManager.MSG_LEFT_RECURSION);
 		getErrorListener().warning(
 			new LeftRecursionMessage(probe, alt, targetRules, callSiteStates)
 		);
@@ -717,6 +822,33 @@ public class ErrorManager {
 					ok = false;
 				}
 			}
+		}
+		// check for special templates
+		if (!messages.isDefined("warning")) {
+			System.err.println("Message template 'warning' not found in locale "+ locale);
+			ok = false;
+		}
+		if (!messages.isDefined("error")) {
+			System.err.println("Message template 'error' not found in locale "+ locale);
+			ok = false;
+		}
+		return ok;
+	}
+
+	/** Verify the message format template group */
+	protected static boolean verifyFormat() {
+		boolean ok = true;
+		if (!format.isDefined("location")) {
+			System.err.println("Format template 'location' not found in " + formatName);
+			ok = false;
+		}
+		if (!format.isDefined("message")) {
+			System.err.println("Format template 'message' not found in " + formatName);
+			ok = false;
+		}
+		if (!format.isDefined("report")) {
+			System.err.println("Format template 'report' not found in " + formatName);
+			ok = false;
 		}
 		return ok;
 	}

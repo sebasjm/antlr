@@ -48,6 +48,6 @@ public class LeftRecursionCyclesMessage extends Message {
 	public String toString() {
 		StringTemplate st = getMessageTemplate();
 		st.setAttribute("listOfCycles", cycles);
-		return st.toString();
+		return super.toString(st);
 	}
 }

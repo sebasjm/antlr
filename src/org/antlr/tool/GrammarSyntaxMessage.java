@@ -57,19 +57,21 @@ public class GrammarSyntaxMessage extends Message {
 	}
 
 	public String toString() {
-		int line = 0;
-		int col = 0;
+		line = 0;
+		column = 0;
 		if ( offendingToken!=null ) {
 			line = offendingToken.getLine();
-			col = offendingToken.getColumn();
+			column = offendingToken.getColumn();
 		}
-		//String fileName = g.getFileName();
+		// TODO: actually set the right Grammar instance to get the filename
+		// TODO: have to update all v2 grammar files for this. or use errormanager and tool to get the current grammar
+		if (g != null) {
+			file = g.getFileName();
+		}
 		StringTemplate st = getMessageTemplate();
 		if ( arg!=null ) {
 			st.setAttribute("arg", arg);
 		}
-		st.setAttribute("line", new Integer(line));
-		st.setAttribute("col", new Integer(col));
-		return st.toString();
+		return super.toString(st);
 	}
 }

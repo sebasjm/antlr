@@ -59,13 +59,14 @@ public class GrammarUnreachableAltsMessage extends Message {
 
 	public String toString() {
 		GrammarAST decisionASTNode = probe.dfa.getDecisionASTNode();
-		int line = decisionASTNode.getLine();
-		int col = decisionASTNode.getColumn();
+		line = decisionASTNode.getLine();
+		column = decisionASTNode.getColumn();
 		String fileName = probe.dfa.nfa.grammar.getFileName();
-		StringTemplate st = getMessageTemplate();
 		if ( fileName!=null ) {
-			st.setAttribute("file", fileName);
+			file = fileName;
 		}
+
+		StringTemplate st = getMessageTemplate();
 
 		if ( probe.dfa.isTokensRuleDecision() ) {
 			// alts are token rules, convert to the names instead of numbers
@@ -77,7 +78,7 @@ public class GrammarUnreachableAltsMessage extends Message {
 				NFAState ruleStart =
 					probe.dfa.nfa.grammar.getRuleStartState(tokenName);
 				line = ruleStart.getAssociatedASTNode().getLine();
-				col = ruleStart.getAssociatedASTNode().getColumn();
+				column = ruleStart.getAssociatedASTNode().getColumn();
 				st.setAttribute("tokens", tokenName);
 			}
 		}
@@ -86,9 +87,7 @@ public class GrammarUnreachableAltsMessage extends Message {
 			st.setAttribute("alts", alts);
 		}
 
-		st.setAttribute("line", new Integer(line));
-		st.setAttribute("col", new Integer(col));
-		return st.toString();
+		return super.toString(st);
 	}
 
 }

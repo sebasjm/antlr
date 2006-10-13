@@ -153,6 +153,15 @@ public class Tool {
 			else if (args[i].equals("-print")) {
 				printGrammar = true;
 			}
+			else if (args[i].equals("-message-format")) {
+				if (i + 1 >= args.length) {
+					System.err.println("missing output format with -message-format option; using default");
+				}
+				else {
+					i++;
+					ErrorManager.setFormat(args[i]);
+				}
+			}
 			else if (args[i].equals("-Xgrtree")) {
 				internalOption_PrintGrammarTree=true; // print grammar tree
 			}
@@ -379,16 +388,17 @@ public class Tool {
 
 	private static void help() {
         System.err.println("usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]");
-		System.err.println("  -o outputDir   specify output directory where all output is generated");
-		System.err.println("  -fo outputDir  same as -o but force even files with relative paths to dir");
-		System.err.println("  -lib dir       specify location of token files");
-		System.err.println("  -report        print out a report about the grammar(s) processed");
-		System.err.println("  -print         print out the grammar without actions");
-		System.err.println("  -debug         generate a parser that emits debugging events");
-		System.err.println("  -profile       generate a parser that computes profiling information");
-		System.err.println("  -nfa           generate an NFA for each rule");
-		System.err.println("  -dfa           generate a DFA for each decision point");
-		System.err.println("  -X             display extended argument list");
+		System.err.println("  -o outputDir          specify output directory where all output is generated");
+		System.err.println("  -fo outputDir         same as -o but force even files with relative paths to dir");
+		System.err.println("  -lib dir              specify location of token files");
+		System.err.println("  -report               print out a report about the grammar(s) processed");
+		System.err.println("  -print                print out the grammar without actions");
+		System.err.println("  -debug                generate a parser that emits debugging events");
+		System.err.println("  -profile              generate a parser that computes profiling information");
+		System.err.println("  -nfa                  generate an NFA for each rule");
+		System.err.println("  -dfa                  generate a DFA for each decision point");
+		System.err.println("  -message-format name  specify output style for messages");
+		System.err.println("  -X                    display extended argument list");
     }
 
 	private static void Xhelp() {

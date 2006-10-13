@@ -341,9 +341,9 @@ public class TestDFAConversion extends BaseTest {
 		g.createNFAs();
 		g.createLookaheadDFAs();
 
-		String expecting =
-			"grammar t: no start rule (no rule can obviously be followed by EOF)";
-		assertEquals(expecting, equeue.errors.get(0).toString());
+		Message msg = (Message)equeue.errors.get(0);
+		assertTrue("expecting no start rules; found "+msg.getClass().getName(),
+				   msg instanceof GrammarSemanticsMessage);
 	}
 
 	public void testAStar_immediateTailRecursion2() throws Exception {

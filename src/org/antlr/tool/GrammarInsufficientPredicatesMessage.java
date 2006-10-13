@@ -52,19 +52,16 @@ public class GrammarInsufficientPredicatesMessage extends Message {
 
 	public String toString() {
 		GrammarAST decisionASTNode = probe.dfa.getDecisionASTNode();
-		int line = decisionASTNode.getLine();
-		int col = decisionASTNode.getColumn();
+		line = decisionASTNode.getLine();
+		column = decisionASTNode.getColumn();
 		String fileName = probe.dfa.nfa.grammar.getFileName();
-		StringTemplate st = getMessageTemplate();
 		if ( fileName!=null ) {
-			st.setAttribute("file", fileName);
+			file = fileName;
 		}
-		st.setAttribute("line", new Integer(line));
-		st.setAttribute("col", new Integer(col));
-
+		StringTemplate st = getMessageTemplate();
 		st.setAttribute("alts", alts);
 
-		return st.toString();
+		return super.toString(st);
 	}
 
 }

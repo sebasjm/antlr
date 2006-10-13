@@ -59,16 +59,14 @@ public class RecursionOverflowMessage extends Message {
 
 	public String toString() {
 		GrammarAST decisionASTNode = probe.dfa.getDecisionASTNode();
-		int line = decisionASTNode.getLine();
-		int col = decisionASTNode.getColumn();
+		line = decisionASTNode.getLine();
+		column = decisionASTNode.getColumn();
 		String fileName = probe.dfa.nfa.grammar.getFileName();
-		StringTemplate st = getMessageTemplate();
 		if ( fileName!=null ) {
-			st.setAttribute("file", fileName);
+			file = fileName;
 		}
-		st.setAttribute("line", new Integer(line));
-		st.setAttribute("col", new Integer(col));
 
+		StringTemplate st = getMessageTemplate();
 		st.setAttribute("targetRules", targetRules);
 		st.setAttribute("alt", alt);
 		st.setAttribute("callSiteStates", callSiteStates);
@@ -78,7 +76,7 @@ public class RecursionOverflowMessage extends Message {
 		String input = probe.getInputSequenceDisplay(labels);
 		st.setAttribute("input", input);
 
-		return st.toString();
+		return super.toString(st);
 	}
 
 }

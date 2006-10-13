@@ -1302,7 +1302,7 @@ SRC	:	"src" ' ' file:ACTION_STRING_LITERAL ' ' line:INT
 		{
 		newline();
 		setFilename(file.getText().substring(1,file.getText().length()-1));
-		setLine(Integer.parseInt(line.getText()));
+		setLine(Integer.parseInt(line.getText())-1);  // -1 because SL_COMMENT will increment the line no. KR
 		$setType(Token.SKIP); // don't let this go to the parser
 		}
 	;

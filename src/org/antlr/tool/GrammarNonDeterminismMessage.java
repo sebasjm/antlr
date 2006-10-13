@@ -57,16 +57,14 @@ public class GrammarNonDeterminismMessage extends Message {
 
 	public String toString() {
 		GrammarAST decisionASTNode = probe.dfa.getDecisionASTNode();
-		int line = decisionASTNode.getLine();
-		int col = decisionASTNode.getColumn();
+		line = decisionASTNode.getLine();
+		column = decisionASTNode.getColumn();
 		String fileName = probe.dfa.nfa.grammar.getFileName();
-		StringTemplate st = getMessageTemplate();
 		if ( fileName!=null ) {
-			st.setAttribute("file", fileName);
+			file = fileName;
 		}
-		st.setAttribute("line", new Integer(line));
-		st.setAttribute("col", new Integer(col));
 
+		StringTemplate st = getMessageTemplate();
 		// Now fill template with information about problemState
 		List labels = probe.getSampleNonDeterministicInputSequence(problemState);
 		String input = probe.getInputSequenceDisplay(labels);
@@ -82,7 +80,7 @@ public class GrammarNonDeterminismMessage extends Message {
 				NFAState ruleStart =
 					probe.dfa.nfa.grammar.getRuleStartState(tokenName);
 				line = ruleStart.getAssociatedASTNode().getLine();
-				col = ruleStart.getAssociatedASTNode().getColumn();
+				column = ruleStart.getAssociatedASTNode().getColumn();
 				st.setAttribute("disabled", tokenName);
 			}
 		}
@@ -124,7 +122,7 @@ public class GrammarNonDeterminismMessage extends Message {
 				}
 			}
 		}
-		return st.toString();
+		return super.toString(st);
 	}
 
 }

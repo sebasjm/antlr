@@ -70,6 +70,6 @@ public class ToolMessage extends Message {
 			st.setAttribute("exception", e);
 			st.setAttribute("stackTrace", e.getStackTrace());
 		}
-		return st.toString();
+		return super.toString(st);
 	}
 }

@@ -45,16 +45,14 @@ public class NonRegularDecisionMessage extends Message {
 
 	public String toString() {
 		GrammarAST decisionASTNode = probe.dfa.getDecisionASTNode();
-		int line = decisionASTNode.getLine();
-		int col = decisionASTNode.getColumn();
+		line = decisionASTNode.getLine();
+		column = decisionASTNode.getColumn();
 		String fileName = probe.dfa.nfa.grammar.getFileName();
-		StringTemplate st = getMessageTemplate();
 		if ( fileName!=null ) {
-			st.setAttribute("file", fileName);
+			file = fileName;
 		}
-		st.setAttribute("line", new Integer(line));
-		st.setAttribute("col", new Integer(col));
 
+		StringTemplate st = getMessageTemplate();
 		String ruleName = probe.dfa.getNFADecisionStartState().getEnclosingRule();
 		st.setAttribute("ruleName", ruleName);
 		List sortedAlts = new ArrayList();
@@ -62,7 +60,7 @@ public class NonRegularDecisionMessage extends Message {
 		Collections.sort(sortedAlts); // make sure it's 1, 2, ...
 		st.setAttribute("alts", sortedAlts);
 
-		return st.toString();
+		return super.toString(st);
 	}
 
 }

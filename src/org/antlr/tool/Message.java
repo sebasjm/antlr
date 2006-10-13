@@ -39,11 +39,21 @@ import org.antlr.stringtemplate.StringTemplate;
  *  To get a printable error/warning message, call toString().
  */
 public abstract class Message {
+	// msgST is the actual text of the message
 	public StringTemplate msgST;
+	// these are for supporting different output formats
+	public StringTemplate locationST;
+	public StringTemplate reportST;
+	public StringTemplate messageFormatST;
+
 	public int msgID;
 	public Object arg;
 	public Object arg2;
 	public Throwable e;
+	// used for location template
+	public String file;
+	public int line = -1;
+	public int column = -1;
 
 	public Message() {
 	}
@@ -61,6 +71,9 @@ public abstract class Message {
 	public void setMessageID(int msgID) {
 		this.msgID = msgID;
 		msgST = ErrorManager.getMessage(msgID);
+		locationST = ErrorManager.getLocationFormat();
+		reportST = ErrorManager.getReportFormat();
+		messageFormatST = ErrorManager.getMessageFormat();
 	}
 
 	/** Return a new template instance every time someone tries to print
@@ -70,4 +83,38 @@ public abstract class Message {
 		return msgST.getInstanceOf();
 	}
 
+	/** Return a new template instance for the location part of a Message.
+	 *  TODO: Is this really necessary? -Kay
+	 */
+	public StringTemplate getLocationTemplate() {
+		return locationST.getInstanceOf();
+	}
+
+	public String toString(StringTemplate messageST) {
+		// setup the location
+		boolean locationValid = false;
+		if (line != -1) {
+			locationST.setAttribute("line", line);
+			locationValid = true;
+		}
+		if (column != -1) {
+			locationST.setAttribute("column", column);
+			locationValid = true;
+		}
+		if (file != null) {
+			locationST.setAttribute("file", file);
+			locationValid = true;
+		}
+
+		messageFormatST.setAttribute("id", msgID);
+		messageFormatST.setAttribute("text", messageST);
+
+		if (locationValid) {
+			reportST.setAttribute("location", locationST);
+		}
+		reportST.setAttribute("message", messageFormatST);
+		reportST.setAttribute("type", ErrorManager.getMessageType(msgID));
+
+		return reportST.toString();
+	}
 }

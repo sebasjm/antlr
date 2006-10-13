@@ -51,19 +51,17 @@ public class GrammarAnalysisAbortedMessage extends Message {
 
 	public String toString() {
 		GrammarAST decisionASTNode = probe.dfa.getDecisionASTNode();
-		int line = decisionASTNode.getLine();
-		int col = decisionASTNode.getColumn();
+		line = decisionASTNode.getLine();
+		column = decisionASTNode.getColumn();
 		String fileName = probe.dfa.nfa.grammar.getFileName();
+		if ( fileName!=null ) {
+			file = fileName;
+		}
 		StringTemplate st = getMessageTemplate();
 		st.setAttribute("enclosingRule",
 						probe.dfa.getNFADecisionStartState().getEnclosingRule());
-		if ( fileName!=null ) {
-			st.setAttribute("file", fileName);
-		}
-		st.setAttribute("line", new Integer(line));
-		st.setAttribute("col", new Integer(col));
 
-		return st.toString();
+		return super.toString(st);
 	}
 
 }
