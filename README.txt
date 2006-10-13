@@ -274,7 +274,27 @@ to me.  I use Intellij so I never type anything actually to build.
 
 CHANGES
 
+3.0b5 - ??
+
+September 29, 2006
+
+* ANTLRReaderStream improperly checked for end of input.
+
+September 28, 2006
+
+* For ANTLRStringStream, LA(-1) was off by one...gave you LA(-2).
+
 3.0b4 - August 24, 2006
+
+* error when no rules in grammar.  doesn't crash now.
+
+* Token is now an interface.
+
+* remove dependence on non runtime classes in runtime package.
+
+* filename and grammar name must be same Foo in Foo.g.  Generates FooParser,
+  FooLexer, ...  Combined grammar Foo generates Foo$Lexer.g which generates
+  FooLexer.java.  tree grammars generate FooTreeParser.java
 
 August 24, 2006
 
