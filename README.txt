@@ -195,17 +195,18 @@ Running ANTLR with no parameters shows you:
 
 ANTLR Parser Generator   Early Access Version 3.0b4 (August 24, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
-  -o outputDir   specify output directory where all output is generated
-  -lib dir       specify location of token files
-  -report        print out a report about the grammar(s) processed
-  -print         print out the grammar without actions
-  -debug         generate a parser that emits debugging events
-  -profile       generate a parser that computes profiling information
-  -nfa           generate an NFA for each rule
-  -dfa           generate a DFA for each decision point
-  -X             display extended argument list
+  -o outputDir          specify output directory where all output is generated
+  -lib dir              specify location of token files
+  -report               print out a report about the grammar(s) processed
+  -print                print out the grammar without actions
+  -debug                generate a parser that emits debugging events
+  -profile              generate a parser that computes profiling information
+  -nfa                  generate an NFA for each rule
+  -dfa                  generate a DFA for each decision point
+  -message-format name  specify output style for messages
+  -X                    display extended argument list
 
-For example, consider how to make the LL-star example from the examples 
+For example, consider how to make the LL-star example from the examples
 tarball you can get at http://www.antlr.org/download/examples-v3.tar.gz
 
 $ cd examples/java/LL-star
@@ -275,6 +276,17 @@ to me.  I use Intellij so I never type anything actually to build.
 CHANGES
 
 3.0b5 - ??
+
+October 12, 2006
+
+* ANTLR now has a customizable message format for errors and warnings,
+  to make it easier to fulfill requirements by IDEs and such.
+  The format to be used can be specified via the '-message-format name'
+  command line switch. The default for name is 'antlr', also available
+  at the moment is 'gnu'. This is done via StringTemplate, for details
+  on the requirements look in org/antlr/tool/templates/messages/formats/
+
+* line numbers for lexers in combined grammars are now reported correctly.
 
 September 29, 2006
 
@@ -429,7 +441,7 @@ July 7, 2006
 
 * There is a bug in merging of DFA stop states related to gated
   preds...turned it off for now.
- 
+
 3.0b2 - July 5, 2006
 
 July 5, 2006
@@ -447,7 +459,7 @@ July 5, 2006
 
 * Bug in tables.  Short are signed so min/max tables for DFA are now
   char[].  Bizarre.
-  
+
 July 3, 2006
 
 * Added a method to reset the tool error state for current thread.
@@ -591,7 +603,7 @@ June 13, 2006
 
 * ^(ROOT ID?) Didn't work; nor did any other nullable child list such as
   ^(ROOT ID* INT?).  Now, I check to see if child list is nullable using
-  Grammar.LOOK() and, if so, I generate an "IF lookahead is DOWN" gate 
+  Grammar.LOOK() and, if so, I generate an "IF lookahead is DOWN" gate
   around the child list so the whole thing is optional.
 
 * Fixed a bug in LOOK that made it not look through nullable rules.
@@ -602,7 +614,7 @@ June 13, 2006
 * References to EOF ended up with improper -1 refs instead of EOF in output.
 
 * didn't warn of ambig ref to $expr in rewrite; fixed.
-list 
+list
      :	'[' expr 'for' type ID 'in' expr ']'
 	-> comprehension(expr={$expr.st},type={},list={},i={})
 	;
@@ -739,7 +751,7 @@ May 27, 2006
 
 May 26, 2006
 
-* Fixed NFA construction so it generates NFA for (A*)* such that ANTLRWorks 
+* Fixed NFA construction so it generates NFA for (A*)* such that ANTLRWorks
   can display it properly.
 
 May 25, 2006
@@ -748,7 +760,7 @@ May 25, 2006
   taking too long.
 
 May 24, 2006
- 
+
 * added method to get left recursive rules from grammar without doing full
   grammar analysis.
 
@@ -1343,4 +1355,4 @@ Bug fixes
 
 3.0ea1 - June 1, 2005
 
-Initial early access release 
+Initial early access release
