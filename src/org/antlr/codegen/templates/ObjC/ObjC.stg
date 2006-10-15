@@ -358,7 +358,7 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
  */
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
-- (void) m<ruleName>
+- (void) <ruleName>
 {
     <if(trace)>NSLog(@"enter <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);
     @try {
@@ -384,7 +384,7 @@ ruleBacktrackFailure() ::= <<
 >>
 
 synpred(name) ::= <<
-<!name>SyntacticPredicate = @selector(m<name>); !>
+<!name>SyntacticPredicate = @selector(<name>); !>
 >>
 
 lexerSynpred(name) ::= <<
@@ -488,11 +488,13 @@ ruleLabelDefs() ::= <<
 >>
 
 ruleReturnValue() ::= <<
+<if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasReturnValue)>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnName>
 <else>
 retval
+<endif>
 <endif>
 <endif>
 >>
@@ -638,7 +640,7 @@ do {
 	default :
 	    if ( cnt<decisionNumber> >= 1 )  goto loop<decisionNumber>;
 	    <if(backtracking)>
-            if (backtracking>0) { failed = YES; return; }
+            <ruleBacktrackFailure()>
             <endif>
 			ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:<decisionNumber>];
 			<@earlyExitException()>
@@ -712,7 +714,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)[input LT:1];<\n>
 <endif>
-[self match:input tokenType:<token> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <if(backtracking)> if (failed) return;<endif>
+[self match:input tokenType:<token> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <checkRuleBacktrackFailure()>
 >>
 
 /** ids+=ID */
@@ -734,11 +736,11 @@ charRef(char,label) ::= <<
 int <label> = [input LA:1];<\n>
 <endif>
 [self matchChar:<char>];
-<if(backtracking)>if (failed) return;<endif><\n>
+<checkRuleBacktrackFailure()><\n>
 >>
 
 /** match a character range */
-charRangeRef(a,b) ::= "[self matchRangeFromChar:<a> to:<b>];<if(backtracking)> if (failed) return;<endif>"
+charRangeRef(a,b) ::= "[self matchRangeFromChar:<a> to:<b>];<checkRuleBacktrackFailure()>"
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
@@ -748,14 +750,12 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 if (<s>) {
 	<postmatchCode>
 	[input consume];
+<if(!LEXER)>
 	errorRecovery = NO;
+<endif>
 	<if(backtracking)>failed = NO;<endif>
 } else {
-	<if(backtracking)>if (backtracking > 0) {
-		failed = YES;
-		return;
-	}
-	<endif>
+	<ruleBacktrackFailure()>
 	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
 <if(LEXER)>
 	[self recover:mse];
@@ -776,11 +776,11 @@ lexerStringRef(string,label) ::= <<
 <if(label)>
 int <label>Start = [self charIndex];
 [self matchString:<string>];
-<if(backtracking)>if (failed) return;<endif><\n>
+<ruleBacktrackFailure()>
 <label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:<label>Start, stop:[self charIndex]];
 <else>
 [self matchString:<string>];
-<if(backtracking)>if (failed) return;<endif><\n>
+<ruleBacktrackFailure()><\n>
 <endif>
 >>
 
@@ -789,7 +789,7 @@ wildcard(label,elementIndex) ::= <<
 <label> = (<labelType>)[input LT:1];<\n>
 <endif>
 [self matchAny:input];
-<if(backtracking)>if (failed) return;<endif><\n>
+<ruleBacktrackFailure()>
 >>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
@@ -803,7 +803,7 @@ wildcardChar(label, elementIndex) ::= <<
 int <label> = [input LA:1];<\n>
 <endif>
 [self matchAny];
-<if(backtracking)>if (failed) return;<endif><\n>
+<ruleBacktrackFailure()><\n>
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
@@ -822,7 +822,7 @@ ruleRef(rule,label,elementIndex,args) ::= <<
 [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
 <endif>
 [following removeLastObject];
-<if(backtracking)>if (failed) return;<endif><\n>
+<ruleBacktrackFailure()><\n>
 >>
 
 /** ids+=ID */
@@ -836,11 +836,11 @@ lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
 int <label>Start = [self charIndex];
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
-<if(backtracking)>if (failed) return;<endif><\n>
+<ruleBacktrackFailure()><\n>
 <label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:<label>Start stop:[self charIndex]];
 <else>
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
-<if(backtracking)>if (failed) return;<endif><\n>
+<ruleBacktrackFailure()><\n>
 <endif>
 >>
 
@@ -892,12 +892,7 @@ else {
 <if(eotPredictsAlt)>
 	alt<decisionNumber> = <eotPredictsAlt>;
 <else>
-	<if(backtracking)>
-	if (backtracking > 0) {
-		failed = YES;
-		return;
-	}
-	<endif>
+	<ruleBacktrackFailure()>
     ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<decisionNumber> state:<stateNumber> stream:input];
 	<@noViableAltException()>
 	@throw nvae;<\n>
@@ -912,8 +907,10 @@ else {
  *  expect "if ( LA(1)==X ) match(X);" and that's it.
  */
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
-<edges; separator="\nelse ">
+{
+	int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
+	<edges; separator="\nelse ">
+}
 >>
 
 /** A DFA state that is actually the loopback decision of a closure
@@ -957,12 +954,7 @@ default:
 <if(eotPredictsAlt)>
 	alt<decisionNumber> = <eotPredictsAlt>;
 <else> {
-	<if(backtracking)>
-	if (backtracking > 0) {
-		failed = YES;
-		return;
-	}
-	<endif>
+	<ruleBacktrackFailure()>
     ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<decisionNumber> state:<stateNumber> stream:input];
 	<@noViableAltException()>
 	@throw nvae;<\n>
@@ -1124,7 +1116,7 @@ evalPredicate(pred,description) ::= "<pred>"
  *  ANTLRDFA
  */
 /* evalSynPredicate(pred,description) ::= "[self evaluateSyntacticPredicate:<pred>SyntacticPredicate stream:input]" */
-evalSynPredicate(pred,description) ::= "[self evaluateSyntacticPredicate:@selector(m<pred>)]"
+evalSynPredicate(pred,description) ::= "[self evaluateSyntacticPredicate:@selector(<pred>)]"
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber>==<atom>"
 
@@ -1214,6 +1206,7 @@ ruleAttributeScopeDealloc(scope) ::= <<
 
 
 returnTypeName() ::= <<
+<if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <className()>_<ruleDescriptor.name>_return
 <else>
@@ -1223,10 +1216,13 @@ returnTypeName() ::= <<
 void
 <endif>
 <endif>
+<else>
+void<! for synpreds this is always void !>
+<endif>
 >>
 
 returnType() ::= <<
-<returnTypeName()><if(ruleDescriptor.hasMultipleReturnValues)> *<endif>
+<returnTypeName()><if(!ruleDescriptor.isSynPred)><if(ruleDescriptor.hasMultipleReturnValues)> *<endif><endif>
 >>
 
 /** Generate the Objective-C type associated with a single or multiple return
@@ -1261,6 +1257,7 @@ ruleLabelDef(label) ::= <<
  *  subgroups to stick in members.
  */
 returnScopeInterface(ruleDescriptor) ::= <<
+<if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 @interface <returnTypeName()> : ANTLR<if(TREE_PARSER)>Tree<endif>ParserRuleReturnScope {
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
@@ -1269,13 +1266,16 @@ returnScopeInterface(ruleDescriptor) ::= <<
 <@methods()>
 @end
 <endif>
+<endif>
 >>
 
 returnScope(ruleDescriptor) ::= <<
+<if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 @implementation <returnTypeName()>
 <@methods()>
 @end
+<endif>
 <endif>
 >>
 
