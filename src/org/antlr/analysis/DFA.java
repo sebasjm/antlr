@@ -405,7 +405,7 @@ public class DFA {
 				createMinMaxTables(s);
 				createTransitionTableEntryForState(s);
 				createSpecialTable(generator, s);
-				createEOTTable(s);
+				createEOTAndEOFTables(s);
 			}
 		}
 
@@ -425,6 +425,8 @@ public class DFA {
 		testEncodeDecode(special);
 		System.out.println("min="+min);
 		System.out.println("max="+max);
+		System.out.println("eot="+eot);
+		System.out.println("eof="+eof);
 		System.out.println("accept="+accept);
 		System.out.println("special="+special);
 		System.out.println("transition="+transition);
@@ -433,7 +435,7 @@ public class DFA {
 
 	/*
 	private void testEncodeDecode(List data) {
-		//System.out.println("data="+data);
+		System.out.println("data="+data);
 		List encoded = getRunLengthEncoding(data);
 		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < encoded.size(); i++) {
@@ -448,7 +450,7 @@ public class DFA {
 			buf.append((char)v);
 		}
 		String encodedS = buf.toString();
-		short[] decoded = DFA_.unpackEncodedString(encodedS);
+		short[] decoded = org.antlr.runtime.DFA.unpackEncodedString(encodedS);
 		//System.out.println("decoded:");
 		for (int i = 0; i < decoded.length; i++) {
 			short x = decoded[i];
@@ -459,7 +461,7 @@ public class DFA {
 		}
 		//System.out.println();
 	}
-*/
+	*/
 
 	protected void createMinMaxTables(DFAState s) {
 		int smin = Label.MAX_CHAR_VALUE + 1;
@@ -479,7 +481,9 @@ public class DFA {
 			}
 			else if ( label.isSet() ) {
 				IntervalSet labels = (IntervalSet)label.getSet();
-				if ( labels.getMinElement()<smin ) {
+				int lmin = labels.getMinElement();
+				// if valid char (don't do EOF) and less than current min
+				if ( lmin<smin && lmin>=Label.MIN_CHAR_VALUE ) {
 					smin = labels.getMinElement();
 				}
 				if ( labels.getMaxElement()>smax ) {
@@ -497,7 +501,7 @@ public class DFA {
 		min.set(s.stateNumber, new Integer((char)smin));
 		max.set(s.stateNumber, new Integer((char)smax));
 
-		if ( smax<0 || smin>Label.MAX_CHAR_VALUE ) {
+		if ( smax<0 || smin>Label.MAX_CHAR_VALUE || smin<0 ) {
 			ErrorManager.internalError("messed up: min="+min+", max="+max);
 		}
 	}
@@ -509,6 +513,7 @@ public class DFA {
 		*/
 		int smax = ((Integer)max.get(s.stateNumber)).intValue();
 		int smin = ((Integer)min.get(s.stateNumber)).intValue();
+
 		Vector stateTransitions = new Vector(smax-smin+1);
 		stateTransitions.setSize(smax-smin+1);
 		transition.set(s.stateNumber, stateTransitions);
@@ -524,9 +529,12 @@ public class DFA {
 				IntervalSet labels = (IntervalSet)label.getSet();
 				int[] atoms = labels.toArray();
 				for (int a = 0; a < atoms.length; a++) {
-					int labelIndex = atoms[a]-smin; // offset from 0
-					stateTransitions.set(labelIndex,
-										 new Integer(edge.target.stateNumber));
+					// set the transition if the label is valid (don't do EOF)
+					if ( label.getAtom()>=Label.MIN_CHAR_VALUE ) {
+						int labelIndex = atoms[a]-smin; // offset from 0
+						stateTransitions.set(labelIndex,
+											 new Integer(edge.target.stateNumber));
+					}
 				}
 			}
 		}
@@ -552,7 +560,10 @@ public class DFA {
 		}
 	}
 
-	protected void createEOTTable(DFAState s) {
+	/** Set up the EOT and EOF tables; we cannot put -1 min/max values so
+	 *  we need another way to test that in the DFA transition function.
+	 */
+	protected void createEOTAndEOFTables(DFAState s) {
 		for (int j = 0; j < s.getNumberOfTransitions(); j++) {
 			Transition edge = (Transition) s.transition(j);
 			Label label = edge.label;
@@ -564,6 +575,19 @@ public class DFA {
 				else if ( label.getAtom()==Label.EOF ) {
 					// eof[s] points to accept state
 					eof.set(s.stateNumber, new Integer(edge.target.stateNumber));
+				}
+			}
+			else if ( label.isSet() ) {
+				IntervalSet labels = (IntervalSet)label.getSet();
+				int[] atoms = labels.toArray();
+				for (int a = 0; a < atoms.length; a++) {
+					if ( atoms[a]==Label.EOT ) {
+						// eot[s] points to accept state
+						eot.set(s.stateNumber, new Integer(edge.target.stateNumber));
+					}
+					else if ( atoms[a]==Label.EOF ) {
+						eof.set(s.stateNumber, new Integer(edge.target.stateNumber));
+					}
 				}
 			}
 		}
