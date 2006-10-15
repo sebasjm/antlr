@@ -53,10 +53,13 @@ public class ANTLRReaderStream extends ANTLRStringStream {
 					data = newdata;
 				}
 				numRead = r.read(data, p, readChunkSize);
-				// System.out.println("read "+numRead+" chars");
+				// System.out.println("read "+numRead+" chars; p was "+p+" is now "+(p+numRead));
 				p += numRead;
 			} while (numRead!=-1); // while not EOF
-			super.n = p; // set the actual size of the data that is available
+			// set the actual size of the data available;
+			// EOF subtracted one above in p+=numRead; add one back
+			super.n = p+1;
+			//System.out.println("n="+n);
 		}
 		finally {
 			if ( r!=null ) {
