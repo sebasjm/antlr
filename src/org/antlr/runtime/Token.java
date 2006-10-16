@@ -53,6 +53,11 @@ public interface Token {
 	 *  so that whitespace etc... can go to the parser on a "hidden" channel.
 	 */
 	public static final int DEFAULT_CHANNEL = 0;
+	
+	/** Anything on different channel than DEFAULT_CHANNEL is not parsed
+	 *  by parser.
+	 */
+	public static final int HIDDEN_CHANNEL = 99;
 
 	/** Get the text of the token */
 	public abstract String getText();
