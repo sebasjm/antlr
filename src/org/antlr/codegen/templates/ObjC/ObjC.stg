@@ -920,13 +920,15 @@ dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredStat
  *  anything other than 'a' predicts exiting.
  */
 dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
-<edges; separator="\nelse "><\n>
-<if(eotPredictsAlt)>
-else {
-    alt<decisionNumber> = <eotPredictsAlt>;
-}<\n>
-<endif>
+{
+	int LA<decisionNumber>_<stateNumber> = [input LA:<k>];
+	<edges; separator="\nelse "><\n>
+	<if(eotPredictsAlt)>
+	else {
+	    alt<decisionNumber> = <eotPredictsAlt>;
+	}<\n>
+	<endif>
+}
 >>
 
 /** An accept state indicates a unique alternative has been predicted */
