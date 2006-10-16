@@ -114,4 +114,12 @@
 	return copy;
 }
 
+- (NSString *) description
+{
+	if (type == ANTLRTokenTypeEOF) {
+		return @"EOFToken";
+	}
+	return @"unknown token - something is foul";
+}
+
 @end

@@ -550,7 +550,7 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block, memoize) ::= <<
 <endif>
 	}
 	@finally {
-        <if(trace)>NSLog(@"exit <ruleName> %@ failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);<endif>
+        <if(trace)>NSLog(@"exit <ruleName> %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);<endif>
         // rule cleanup
 		<ruleCleanUp()>
 <if(backtracking)>
