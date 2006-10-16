@@ -41,7 +41,6 @@
 		lastErrorIndex = -1;
 		failed = NO;
 		backtracking = 0;
-		ruleMemo = [[NSMutableArray alloc] initWithCapacity:ANTLR_INITIAL_FOLLOW_STACK_SIZE];
 	}
 	return self;
 }
@@ -49,7 +48,6 @@
 - (void) dealloc
 {
 	[following release];
-	[ruleMemo release];
 	[super dealloc];
 }
 

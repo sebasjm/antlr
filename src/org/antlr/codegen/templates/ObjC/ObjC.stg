@@ -308,7 +308,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 <endif><\n>
 		tokenNames = [[NSArray alloc] initWithObjects:@"\<invalid>", @"\<EOR>", @"\<DOWN>", @"\<UP>", <tokenNames:{@<it>}; separator=", ", wrap="    ">, nil];
 <if(backtracking)>
-		ruleMemo = [[NSMutableDictionary alloc] init];
+		ruleMemo = [[NSMutableDictionary alloc] initWithCapacity:ANTLR_INITIAL_FOLLOW_STACK_SIZE];
 <endif>
 		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
 		<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeInit(scope=it)><endif>}>
