@@ -360,12 +360,12 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
 - (void) <ruleName>
 {
-    <if(trace)>NSLog(@"enter <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);
+    <if(trace)>NSLog(@"enter <ruleName> %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
     @try {
         <block>
     }
     @finally {
-        NSLog(@"exit <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);
+        NSLog(@"exit <ruleName> %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
     }
 <else>
     <block>
@@ -640,7 +640,7 @@ do {
 	default :
 	    if ( cnt<decisionNumber> >= 1 )  goto loop<decisionNumber>;
 	    <if(backtracking)>
-            <ruleBacktrackFailure()>
+            <checkRuleBacktrackFailure()>
             <endif>
 			ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:<decisionNumber>];
 			<@earlyExitException()>
@@ -755,7 +755,7 @@ if (<s>) {
 <endif>
 	<if(backtracking)>failed = NO;<endif>
 } else {
-	<ruleBacktrackFailure()>
+	<checkRuleBacktrackFailure()>
 	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
 <if(LEXER)>
 	[self recover:mse];
@@ -776,11 +776,11 @@ lexerStringRef(string,label) ::= <<
 <if(label)>
 int <label>Start = [self charIndex];
 [self matchString:<string>];
-<ruleBacktrackFailure()>
+<checkRuleBacktrackFailure()>
 <label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:<label>Start, stop:[self charIndex]];
 <else>
 [self matchString:<string>];
-<ruleBacktrackFailure()><\n>
+<checkRuleBacktrackFailure()><\n>
 <endif>
 >>
 
@@ -789,7 +789,7 @@ wildcard(label,elementIndex) ::= <<
 <label> = (<labelType>)[input LT:1];<\n>
 <endif>
 [self matchAny:input];
-<ruleBacktrackFailure()>
+<checkRuleBacktrackFailure()>
 >>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
@@ -803,7 +803,7 @@ wildcardChar(label, elementIndex) ::= <<
 int <label> = [input LA:1];<\n>
 <endif>
 [self matchAny];
-<ruleBacktrackFailure()><\n>
+<checkRuleBacktrackFailure()><\n>
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
@@ -822,7 +822,7 @@ ruleRef(rule,label,elementIndex,args) ::= <<
 [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
 <endif>
 [following removeLastObject];
-<ruleBacktrackFailure()><\n>
+<checkRuleBacktrackFailure()><\n>
 >>
 
 /** ids+=ID */
@@ -836,11 +836,11 @@ lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
 int <label>Start = [self charIndex];
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
-<ruleBacktrackFailure()><\n>
+<checkRuleBacktrackFailure()><\n>
 <label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:<label>Start stop:[self charIndex]];
 <else>
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
-<ruleBacktrackFailure()><\n>
+<checkRuleBacktrackFailure()><\n>
 <endif>
 >>
 
@@ -892,7 +892,7 @@ else {
 <if(eotPredictsAlt)>
 	alt<decisionNumber> = <eotPredictsAlt>;
 <else>
-	<ruleBacktrackFailure()>
+	<checkRuleBacktrackFailure()>
     ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<decisionNumber> state:<stateNumber> stream:input];
 	<@noViableAltException()>
 	@throw nvae;<\n>
@@ -956,7 +956,7 @@ default:
 <if(eotPredictsAlt)>
 	alt<decisionNumber> = <eotPredictsAlt>;
 <else> {
-	<ruleBacktrackFailure()>
+	<checkRuleBacktrackFailure()>
     ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<decisionNumber> state:<stateNumber> stream:input];
 	<@noViableAltException()>
 	@throw nvae;<\n>
