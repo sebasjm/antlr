@@ -396,7 +396,8 @@ rewriteClosureBlock(
 // <fileName>:<description>
 {
 <rewriteBlockCardinalityCheck()>
-for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+int i_<rewriteBlockLevel>;
+for (i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
     <alt>
 }
 }<\n>
@@ -415,7 +416,8 @@ rewritePositiveClosureBlock(
 {
 <rewriteBlockCardinalityCheck()>
 if ( n_<rewriteBlockLevel>==0 ) @throw [NSException exceptionWithName:@"ANTLRTreeRewriteException" reason:@"Must have more than one element for (...)+ loops" userInfo:nil];
-for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+int i_<rewriteBlockLevel>;
+for (i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
     <alt>
 }
 }<\n>

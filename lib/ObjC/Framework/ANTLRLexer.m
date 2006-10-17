@@ -35,7 +35,7 @@
 - (id) initWithCharStream:(id<ANTLRCharStream>)anInput
 {
 	if (nil != (self = [super init])) {
-		input = anInput;
+		[self setInput:anInput];
 		tokenStartCharIndex = -1;
 	}
 	return self;

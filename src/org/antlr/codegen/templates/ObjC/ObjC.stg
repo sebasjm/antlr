@@ -640,7 +640,7 @@ do {
 	default :
 	    if ( cnt<decisionNumber> >= 1 )  goto loop<decisionNumber>;
 	    <if(backtracking)>
-            <checkRuleBacktrackFailure()>
+            <ruleBacktrackFailure()>
             <endif>
 			ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:<decisionNumber>];
 			<@earlyExitException()>
@@ -1062,10 +1062,10 @@ const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<table; separ
 }<\n>
 <endif>
 
-- (void) release
+- (void) dealloc
 {
 	free(transition);
-	[super release];
+	[super dealloc];
 }
 
 - (NSString *) description
