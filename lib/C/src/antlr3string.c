@@ -995,7 +995,7 @@ static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbi
 {
     /* We may be passed an empty string, in which case we just return the current pointer
      */
-    if	(newbit->len == 0 || newbit->size == 0 || newbit->chars == NULL)
+    if	(newbit == NULL || newbit->len == 0 || newbit->size == 0 || newbit->chars == NULL)
     {
 	return	string->chars;
     }
