@@ -956,6 +956,8 @@ ANTLR3_API p<name>
     <@end>
     
     <actions.parser.apifuncs>
+    <actions.treeparser.apifuncs>
+	
     /* Install the token table
      */
     rec->tokenNames   = <name>TokenNames;
