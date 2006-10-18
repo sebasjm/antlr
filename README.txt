@@ -277,6 +277,25 @@ CHANGES
 
 3.0b5 - ??
 
+October 18, 2006
+
+* moved resetStateNumbersToBeContiguous() to after issuing of warnings;
+  an internal error in that routine should make more sense as issues
+  with decision will appear first.
+
+* fixed cut/paste bug I introduced when fixed EOF in min/max
+  bug. Prevented C grammar from working briefly.
+
+October 17, 2006
+
+* Removed a failsafe that seems to be unnecessary that ensure DFA didn't
+  get too big.  It was resulting in some failures in code generation that
+  led me on quite a strange debugging trip.
+
+October 16, 2006
+
+* Use channel=HIDDEN not channel=99 to put tokens on hidden channel.
+
 October 12, 2006
 
 * ANTLR now has a customizable message format for errors and warnings,

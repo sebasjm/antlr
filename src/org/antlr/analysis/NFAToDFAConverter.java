@@ -275,12 +275,14 @@ public class NFAToDFAConverter {
 			// FAILSAFE: so we cannot hit an exponentiality in
 			// the NFA conversion; don't let averate number of states
 			// per alt in this decision to exceed a max
+			/*
 			int statesPerAltRatio = t.stateNumber/dfa.getNumberOfAlts();
 			if ( statesPerAltRatio>DFA.MAX_STATES_PER_ALT_IN_DFA ) {
 				terminateConversion = true;
 				dfa.probe.reportEarlyTermination();
 				break;
 			}
+			*/
 
 			/*
 			System.out.println("DFA state after closure "+d+"-"+

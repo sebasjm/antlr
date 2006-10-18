@@ -27,9 +27,7 @@
 */
 package org.antlr.tool;
 
-import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.analysis.*;
-import org.antlr.tool.Grammar;
 
 import java.util.*;
 
@@ -62,7 +60,11 @@ public class FASerializer {
         this.grammar = grammar;
     }
 
-    /** Return a string representation of a state machine.  Two identical
+	public String serialize(State s) {
+		return serialize(s, true);
+	}
+
+	/** Return a string representation of a state machine.  Two identical
      *  NFAs or DFAs will have identical serialized representations.  The
      *  state numbers inside the state are not used; instead, a new number
      *  is computed and because the serialization will walk the two
@@ -70,12 +72,14 @@ public class FASerializer {
      *  will be identical.  Accept states are distinguished from regular
      *  states.
      */
-    public String serialize(State s) {
+    public String serialize(State s, boolean renumber) {
         markedStates = new HashSet();
         stateCounter = 0;
-        stateNumberTranslator = new HashMap();
-        walkFANormalizingStateNumbers(s);
-        List lines = new ArrayList();
+		if ( renumber ) {
+			stateNumberTranslator = new HashMap();
+        	walkFANormalizingStateNumbers(s);
+		}
+		List lines = new ArrayList();
         if ( s.getNumberOfTransitions()>0 ) {
 			walkSerializingFA(lines, s);
 		}
@@ -92,8 +96,7 @@ public class FASerializer {
             String line = (String) lines.get(i);
             buf.append(line);
         }
-        String output = buf.toString();
-        return output;
+        return buf.toString();
     }
 
     /** In stateNumberTranslator, get a map from State to new, normalized
@@ -132,10 +135,13 @@ public class FASerializer {
 
         markedStates.add(s); // mark this node as completed.
 
-        Integer normalizedStateNumberI = (Integer)stateNumberTranslator.get(s);
-        int normalizedStateNumber = normalizedStateNumberI.intValue();
+		int normalizedStateNumber = s.stateNumber;
+		if ( stateNumberTranslator!=null ) {
+	        Integer normalizedStateNumberI = (Integer)stateNumberTranslator.get(s);
+			normalizedStateNumber = normalizedStateNumberI.intValue();
+		}
 
-        String stateStr = getStateString(normalizedStateNumber, s);
+		String stateStr = getStateString(normalizedStateNumber, s);
 
         // depth first walk each transition, printing its edge first
         for (int i = 0; i < s.getNumberOfTransitions(); i++) {
@@ -164,10 +170,13 @@ public class FASerializer {
 				buf.append("-"+edge.label.toString(grammar)+predsStr+"->");
 			}
 
-			Integer normalizedTargetStateNumberI =
-				(Integer)stateNumberTranslator.get(edge.target);
-			int normalizedTargetStateNumber = normalizedTargetStateNumberI.intValue();
-            buf.append(getStateString(normalizedTargetStateNumber, edge.target));
+			int normalizedTargetStateNumber = edge.target.stateNumber;
+			if ( stateNumberTranslator!=null ) {
+				Integer normalizedTargetStateNumberI =
+					(Integer)stateNumberTranslator.get(edge.target);
+				normalizedTargetStateNumber = normalizedTargetStateNumberI.intValue();
+			}
+			buf.append(getStateString(normalizedTargetStateNumber, edge.target));
             buf.append("\n");
             lines.add(buf.toString());
 

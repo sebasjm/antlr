@@ -87,6 +87,10 @@ public class DFA {
 	 *  s3 -> s1 in this table.  This is how cycles occur.  If fixed k,
 	 *  then these states will all be unique as states[i] always points
 	 *  at state i when no cycles exist.
+	 *
+	 *  This is managed in parallel with uniqueStates and simply provides
+	 *  a way to go from state number to DFAState rather than via a
+	 *  hash lookup.
 	 */
 	protected Vector states = new Vector();
 
@@ -216,15 +220,18 @@ public class DFA {
 		// figure out if there are problems with decision
 		verify();
 
-		// must be after verify as it computes cyclic, needed by this routine
-		resetStateNumbersToBeContiguous();
-
 		if ( !probe.isDeterministic() ||
 			 probe.analysisAborted() ||
 			 probe.analysisOverflowed() )
 		{
 			probe.issueWarnings();
 		}
+
+		// must be after verify as it computes cyclic, needed by this routine
+		// should be after warnings because early termination or something
+		// will not allow the reset to operate properly in some cases.
+		resetStateNumbersToBeContiguous();
+
 		//long stop = System.currentTimeMillis();
 		//System.out.println("verify cost: "+(int)(stop-start)+" ms");
 
@@ -241,38 +248,124 @@ public class DFA {
 	 *  in states list.  State i might be identical to a previous state j and
 	 *  will result in states[i] == states[j].  We don't want to waste a state
 	 *  number on this.  Useful mostly for code generation in tables.
+	 *
+	 *  At the start of this routine, states[i].stateNumber <= i by definition.
+	 *  If states[50].stateNumber is 50 then a cycle during conversion may
+	 *  try to add state 103, but we find that an identical DFA state, named
+	 *  50, already exists, hence, states[103]==states[50] and both have
+	 *  stateNumber 50 as they point at same object.  Afterwards, the set
+	 *  of state numbers from all states should represent a contiguous range
+	 *  from 0..n-1 where n is the number of unique states.
 	 */
 	public void resetStateNumbersToBeContiguous() {
-		/*
-		if ( !isCyclic() ) {
-			return;
-		}
-		*/
 		if ( getUserMaxLookahead()>0 ) {
 			// all numbers are unique already; no states are thrown out.
 			return;
 		}
-		int snum=0;
 		/*
-		if ( decisionNumber==30 ) {
+		if ( decisionNumber==46 ) {
 			System.out.println("DFA :"+decisionNumber+" "+this);
-			System.out.println("unique states: "+getUniqueStates());
-			System.out.println("states: "+states);
+			System.out.println("DFA start state :"+startState);
+			System.out.println("unique state numbers: ");
+			Set s = getUniqueStates().keySet();
+			for (Iterator it = s.iterator(); it.hasNext();) {
+				DFAState d = (DFAState) it.next();
+				System.out.print(d.stateNumber+" ");
+			}
+			System.out.println();
+
+			System.out.println("size="+s.size());
+			System.out.println("continguous states: ");
+			for (Iterator it = states.iterator(); it.hasNext();) {
+				DFAState d = (DFAState) it.next();
+				System.out.print(d.stateNumber+" ");
+			}
+			System.out.println();
+
+			//Set a = new HashSet();
+			List a = new ArrayList();
+			System.out.println("unique set from states table: ");
+			for (int i = 0; i <= getMaxStateNumber(); i++) {
+				DFAState d = getState(i);
+				boolean found=false;
+				for (int j=0; j<a.size(); j++) {
+					DFAState old = (DFAState)a.get(j);
+					if ( old.equals(d) ) {
+						if ( old.stateNumber!=d.stateNumber ) {
+							System.out.println("WHAT! state["+i+"]="+d+" prev in list as "+old);
+						}
+						found=true;
+					}
+				}
+				if ( !found ) {
+					a.add(d);
+				}
+			}
+			for (Iterator it = a.iterator(); it.hasNext();) {
+				DFAState d = (DFAState) it.next();
+				System.out.print(d.stateNumber+" ");
+			}
+			System.out.println();
+			System.out.println("size="+a.size());
+
+			if ( a.equals(s) ) {
+				System.out.println("both sets same");
+			}
+			else {
+				System.out.println("sets NOT same");
+			}
 			System.out.println("stateCounter="+stateCounter);
 		}
 		*/
-		Map states = getUniqueStates();
+
+		// walk list of DFAState objects by state number,
+		// setting state numbers to 0..n-1
+		int snum=0;
 		for (int i = 0; i <= getMaxStateNumber(); i++) {
 			DFAState s = getState(i);
-			// if valid and it's not already been renumbered
-			if ( states.containsValue(s) && s.stateNumber>=i ) {
+			/*
+			// some states are unused after creation most commonly due to cycles,
+			// only deal with states in uniqueStates
+			boolean valid = getUniqueStates().containsValue(s);
+			*/
+			// state i is mapped to DFAState with state number set to i originally
+			// so if it's less than i, then we renumbered it already; that
+			// happens when states have been merged or cycles occurred I think.
+			// states[50] will point to DFAState with s50 in it but
+			// states[103] might also point at this same DFAState.  Since
+			// 50 < 103 then it's already been renumbered as it points downwards.
+			boolean alreadyRenumbered = s.stateNumber<i;
+			//if ( valid && !alreadyRenumbered ) {
+			if ( !alreadyRenumbered ) {
 				// state i is a valid state, reset it's state number
-				s.stateNumber = snum++; // rewrite state numbers to be 0..n-1
+				s.stateNumber = snum; // rewrite state numbers to be 0..n-1
+				snum++;
 			}
 		}
+		/*
+		if ( decisionNumber==46 ) {
+			System.out.println("max state num: "+maxStateNumber);
+			System.out.println("after renum, DFA :"+decisionNumber+" "+this);
+			System.out.println("uniq states.size="+uniqueStates.size());
+
+			Set a = new HashSet();
+			System.out.println("after renumber; unique set from states table: ");
+			for (int i = 0; i <= getMaxStateNumber(); i++) {
+				DFAState d = getState(i);
+				a.add(d);
+			}
+			for (Iterator it = a.iterator(); it.hasNext();) {
+				DFAState d = (DFAState) it.next();
+				System.out.print(d.stateNumber+" ");
+			}
+			System.out.println();
+			System.out.println("size="+a.size());
+		}
+*/
 		if ( snum!=getNumberOfStates() ) {
-			ErrorManager.internalError("DFA "+decisionNumber+": "+decisionNFAStartState.getDescription()+" max state num "+getNumberOfStates()+
-				"!= max renumbered state "+snum);
+			ErrorManager.internalError("DFA "+decisionNumber+": "+
+				decisionNFAStartState.getDescription()+" num unique states "+getNumberOfStates()+
+				"!= num renumbered states "+snum);
 		}
 	}
 
@@ -385,23 +478,12 @@ public class DFA {
 		}
 		while ( it.hasNext() ) {
 			DFAState s = (DFAState)it.next();
-			// init EOT/EOF tables; need to be -1
-			/*
-			eot.set(s.stateNumber, new Integer(-1));
-			eof.set(s.stateNumber, new Integer(-1));
-			*/
 			if ( s.isAcceptState() ) {
 				// can't compute min,max,special,transition on accepts
 				accept.set(s.stateNumber,
 						   new Integer(s.getUniquelyPredictedAlt()));
-				/*
-				special.set(s.stateNumber, new Integer(-1)); // not special
-				min.set(s.stateNumber, new Integer(0));
-				max.set(s.stateNumber, new Integer(0));
-				*/
 			}
 			else {
-				//accept.set(s.stateNumber, new Integer(0)); // doesn't predict
 				createMinMaxTables(s);
 				createTransitionTableEntryForState(s);
 				createSpecialTable(generator, s);
@@ -510,7 +592,7 @@ public class DFA {
 		/*
 		System.out.println("createTransitionTableEntryForState s"+s.stateNumber+
 			" dec "+s.dfa.decisionNumber+" cyclic="+s.dfa.isCyclic());
-		*/
+			*/
 		int smax = ((Integer)max.get(s.stateNumber)).intValue();
 		int smin = ((Integer)min.get(s.stateNumber)).intValue();
 
@@ -530,7 +612,7 @@ public class DFA {
 				int[] atoms = labels.toArray();
 				for (int a = 0; a < atoms.length; a++) {
 					// set the transition if the label is valid (don't do EOF)
-					if ( label.getAtom()>=Label.MIN_CHAR_VALUE ) {
+					if ( a>=Label.MIN_CHAR_VALUE ) {
 						int labelIndex = atoms[a]-smin; // offset from 0
 						stateTransitions.set(labelIndex,
 											 new Integer(edge.target.stateNumber));
@@ -658,7 +740,7 @@ public class DFA {
 		}
 
 		// if not there, then add new state.
-        uniqueStates.put(d,d);
+		uniqueStates.put(d,d);
         numberOfStates++;
 		return d;
 	}
@@ -940,7 +1022,7 @@ public class DFA {
 		if ( startState==null ) {
 			return "";
 		}
-		return serializer.serialize(startState);
+		return serializer.serialize(startState, false);
 	}
 
 	/** EOT (end of token) is a label that indicates when the DFA conversion

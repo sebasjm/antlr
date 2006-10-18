@@ -272,8 +272,27 @@ public class Tool {
 					grammar.printGrammar(System.out);
 				}
 
-				// now handle the lexer if one was created for a merged spec
+				if ( generate_NFA_dot ) {
+					generateNFAs(grammar);
+				}
+				if ( generate_DFA_dot ) {
+					generateDFAs(grammar);
+				}
+				if ( report ) {
+					GrammarReport report = new GrammarReport(grammar);
+					System.out.println(report.toString());
+					// print out a backtracking report too (that is not encoded into log)
+					System.out.println(report.getBacktrackingReport());
+					// same for aborted NFA->DFA conversions
+					System.out.println(report.getEarlyTerminationReport());
+				}
+				if ( profile ) {
+					GrammarReport report = new GrammarReport(grammar);
+					Stats.writeReport(GrammarReport.GRAMMAR_STATS_FILENAME,
+											  report.toNotifyString());
+				}
 
+				// now handle the lexer if one was created for a merged spec
 				String lexerGrammarStr = grammar.getLexerGrammar();
 				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
 					String lexerGrammarFileName =
@@ -293,26 +312,6 @@ public class Tool {
 					lexerGrammar.setGrammarContent(sr);
 					sr.close();
 					processGrammar(lexerGrammar);
-				}
-
-				if ( generate_NFA_dot ) {
-					generateNFAs(grammar);
-				}
-				if ( generate_DFA_dot ) {
-					generateDFAs(grammar);
-				}
-				if ( report ) {
-					GrammarReport report = new GrammarReport(grammar);
-					System.out.println(report.toString());
-					// print out a backtracking report too (that is not encoded into log)
-					System.out.println(report.getBacktrackingReport());
-					// same for aborted NFA->DFA conversions
-					System.out.println(report.getEarlyTerminationReport());
-				}
-				if ( profile ) {
-					GrammarReport report = new GrammarReport(grammar);
-					Stats.writeReport(GrammarReport.GRAMMAR_STATS_FILENAME,
-											  report.toNotifyString());
 				}
 			}
 			catch (Exception e) {
