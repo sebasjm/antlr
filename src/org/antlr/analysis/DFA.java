@@ -612,7 +612,7 @@ public class DFA {
 				int[] atoms = labels.toArray();
 				for (int a = 0; a < atoms.length; a++) {
 					// set the transition if the label is valid (don't do EOF)
-					if ( a>=Label.MIN_CHAR_VALUE ) {
+					if ( atoms[a]>=Label.MIN_CHAR_VALUE ) {
 						int labelIndex = atoms[a]-smin; // offset from 0
 						stateTransitions.set(labelIndex,
 											 new Integer(edge.target.stateNumber));
