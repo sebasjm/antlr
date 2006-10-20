@@ -506,12 +506,21 @@ public class IntervalSet implements IntSet {
 		return last.b;
 	}
 
+	/** Return minimum element >= 0 */
 	public int getMinElement() {
 		if ( isNil() ) {
 			return Label.INVALID;
 		}
-		Interval first = (Interval)intervals.get(0);
-		return first.a;
+		Iterator iter = this.intervals.iterator();
+		while (iter.hasNext()) {
+			Interval I = (Interval) iter.next();
+			int a = I.a;
+			int b = I.b;
+			for (int v=a; v<=b; v++) {
+				if ( v>=0 ) return v;
+			}
+		}
+		return Label.INVALID;
 	}
 
     /** Return a list of Interval objects. */
