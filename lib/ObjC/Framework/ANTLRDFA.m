@@ -132,4 +132,9 @@ static BOOL debug = NO;
 	return [recognizer evaluateSyntacticPredicate:synpredFragment];
 }
 
++ (void) setIsEmittingDebugInfo:(BOOL) shouldEmitDebugInfo
+{
+	debug = shouldEmitDebugInfo;
+}
+
 @end

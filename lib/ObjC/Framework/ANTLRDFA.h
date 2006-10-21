@@ -53,4 +53,6 @@
 - (NSString *) description;
 - (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment;
 
++ (void) setIsEmittingDebugInfo:(BOOL) shouldEmitDebugInfo;
+
 @end
