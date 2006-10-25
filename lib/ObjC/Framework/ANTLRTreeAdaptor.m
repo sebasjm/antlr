@@ -25,7 +25,7 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import "ANTLRTreeAdaptor.h"
-
+#import <ANTLR/ANTLRTreeException.h>
 
 @implementation ANTLRTreeAdaptor
 
@@ -60,9 +60,7 @@
 		return newRootNode;
 	if ([newRootNode isEmpty]) {
 		if ([newRootNode childCount] > 1) {
-			@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"new root has too many children" userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
-				newRootNode, @"ANTLRTreeNewRoot",
-				oldRoot, @"ANTLRTreeOldRoot", nil]];
+			@throw [ANTLRTreeException exceptionWithOldRoot:oldRoot newRoot:newRootNode];
 		}
 		// TODO: double check memory management with respect to code generation
 		// remove the empty node, placing its sole child in its role.

@@ -45,6 +45,7 @@
 
 + (ANTLRRecognitionException *) exceptionWithStream:(id<ANTLRIntStream>) anInputStream; 
 - (id) initWithStream:(id<ANTLRIntStream>)anInputStream;
+- (id) initWithStream:(id<ANTLRIntStream>)anInputStream reason:(NSString *)aReason;
 - (int) unexpectedType;
 
 - (id<ANTLRIntStream>) stream;

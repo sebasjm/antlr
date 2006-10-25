@@ -34,12 +34,12 @@
 	return [[[self alloc] initWithStream:anInputStream] autorelease];
 }
 
-- (id) initWithStream:(id<ANTLRIntStream>)anInputStream
+- (id) initWithStream:(id<ANTLRIntStream>)anInputStream reason:(NSString *)aReason
 {
-	if (nil != (self = [super initWithName:NSStringFromClass([self class]) reason:@"" userInfo:nil])) {
+	if (nil != (self = [super initWithName:NSStringFromClass([self class]) reason:aReason userInfo:nil])) {
 		[self setStream:anInputStream];
 		index = [anInputStream index];
-	
+		
 		Class inputClass = [input class];
 		if ([inputClass conformsToProtocol:@protocol(ANTLRTokenStream)]) {
 			[self setToken:[(id<ANTLRTokenStream>)input LT:1]];
@@ -56,6 +56,13 @@
 		} else {
 			c = (unichar)[input LA:1];
 		}
+	}
+	return self;
+}
+
+- (id) initWithStream:(id<ANTLRIntStream>)anInputStream
+{
+	if (nil != (self = [self initWithStream:anInputStream reason:@""])) {
 	}
 	return self;
 }

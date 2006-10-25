@@ -42,6 +42,8 @@
 #import <ANTLR/ANTLRMismatchedRangeException.h>
 #import <ANTLR/ANTLRMismatchedTreeNodeException.h>
 #import <ANTLR/ANTLRNoViableAltException.h>
+#import <ANTLR/ANTLRFailedPredicateException.h>
+#import <ANTLR/ANTLRTreeException.h>
 
 #import <ANTLR/ANTLRLexerRuleReturnScope.h>
 #import <ANTLR/ANTLRParserRuleReturnScope.h>

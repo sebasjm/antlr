@@ -24,54 +24,21 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "ANTLRMismatchedSetException.h"
+#import <Cocoa/Cocoa.h>
+#import <ANTLR/ANTLRRecognitionException.h>
 
 
-@implementation ANTLRMismatchedSetException
-
-+ (id) exceptionWithSet:(NSSet *) theExpectedSet stream:(id<ANTLRIntStream>) theStream
-{
-	return [[[self alloc] initWithSet:theExpectedSet stream:theStream] autorelease];
+@interface ANTLRFailedPredicateException : ANTLRRecognitionException {
+	NSString *predicate;
+	NSString *ruleName;
 }
 
-- (id) initWithSet:(NSSet *) theExpectedSet stream:(id<ANTLRIntStream>) theStream
-{
-	if (nil != (self = [super initWithStream:theStream])) {
-		[self setExpectedSet:theExpectedSet];
-	}
-	return self;
-}
++ (ANTLRFailedPredicateException *) exceptionWithRuleName:(NSString *)theRuleName predicate:(NSString *)thePredicate stream:(id<ANTLRIntStream>)theStream;
+- (ANTLRFailedPredicateException *) initWithRuleName:(NSString *)theRuleName predicate:(NSString *)thePredicate stream:(id<ANTLRIntStream>)theStream;
 
-- (void) dealloc
-{
-	[self setExpectedSet:nil];
-	[super dealloc];
-}
-
-- (NSString *) description
-{
-	NSMutableString *desc =(NSMutableString *)[super description];
-	[desc appendFormat:@" set:%@", expectedSet];
-	return desc;
-}
-
-
-//---------------------------------------------------------- 
-//  expectedSet 
-//---------------------------------------------------------- 
-- (NSSet *) expectedSet
-{
-    return expectedSet; 
-}
-
-- (void) setExpectedSet: (NSSet *) anExpectedSet
-{
-    if (expectedSet != anExpectedSet) {
-        [anExpectedSet retain];
-        [expectedSet release];
-        expectedSet = anExpectedSet;
-    }
-}
-
+- (NSString *) predicate;
+- (void) setPredicate:(NSString *)thePredicate;
+- (NSString *) ruleName;
+- (void) setRuleName:(NSString *)theRuleName;
 
 @end
