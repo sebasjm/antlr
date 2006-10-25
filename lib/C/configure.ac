@@ -32,7 +32,6 @@ AC_COPYRIGHT([
 ])
 AC_CONFIG_SRCDIR(src/antlr3parser.c)
 
-AC_LANG(C)
 
 AC_ARG_ENABLE([debuginfo],
 		[AS_HELP_STRING([--enable-debuginfo], [Compiles debug info into the library (default no)])],
@@ -42,15 +41,17 @@ AC_ARG_ENABLE([64bit],
 		[AS_HELP_STRING([--enable-64bit], [Turns on flags that produce 64 bit object code if any are required (default no)])],
 		[BIT64=1], [BIT64=0])
 
-AM_INIT_AUTOMAKE(gnu)
-AM_MAINTAINER_MODE
-AM_PROG_LIBTOOL
 
+
+AM_INIT_AUTOMAKE(gnu)
+AC_LANG(C)
+AC_PROG_CC([xlc aCC gcc cc])
 # Checks for programs.
-AC_PROG_CC([xlc aCC cc gcc])
+echo "Compiler base seesm to be $cc_basename"
 AC_MSG_CHECKING([Compiler flags required for compiling ANTLR with $CC C compiler])
 
-if test "$CC" = xlc; then
+case $CC in
+xlc*)
  CPPCMNTFLAGS="-qcpluscmt"
  if test "$BIT64" = 1; then
   CCFLAGS64="-q64"
@@ -59,32 +60,41 @@ if test "$CC" = xlc; then
  if test "$DEBUGINF" = 1; then
   DEBUGFLAGS="-g"
  fi
-elif test "$CC" = aCC; then
+ ;;
+
+aCC*)
  CPPCMNTFLAGS=
  CCFLAGS64=
  OPTIMFLAGS="-O"
  if test $DEBUGINF = 1; then
   DEBUGFLAGS="-g"
  fi
-elif test $CC = gcc; then
+ ;;
+
+gcc*)
  CPPCMNTFLAGS=
  CCFLAGS64=
  OPTIMFLAGS="-O2"
  if test $DEBUGINF = 1; then
   DEBUGFLAGS="-g"
  fi
-else
-  CPPCMNTFLAGS=
+ ;;
+
+*)
+ CPPCMNTFLAGS=
  CCFLAGS64=
  OPTIMFLAGS="-O"
  if test $DEBUGINF = 1; then
   DEBUGFLAGS='-g'
  fi
-fi
+ ;;
 
+esac
 
 CFLAGS="$CCFLAGS64 $CPPCMNTFLAGS $OPTIMFLAGS $DEBUGFLAGS"
 AC_MSG_RESULT([$CFLAGS])
+AM_MAINTAINER_MODE
+AM_PROG_LIBTOOL
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
