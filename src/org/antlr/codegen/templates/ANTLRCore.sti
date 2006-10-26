@@ -39,7 +39,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
 	   scopes, superClass, literals);
 
-optional 
+optional
 headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs,
@@ -288,6 +288,7 @@ setTest(ranges);
 parameterAttributeRef(attr);
 
 scopeAttributeRef(scope,attr,index,negIndex);
+scopeSetAttributeRef(scope,attr,expr,index,negIndex);
 
 /** $x is either global scope or x is rule with dynamic scope; refers
  *  to stack itself not top of stack.  This is useful for predicates
@@ -299,6 +300,7 @@ isolatedDynamicScopeRef(scope);
 ruleLabelRef(referencedRule,scope,attr);
 
 returnAttributeRef(ruleDescriptor,attr);
+returnSetAttributeRef(ruleDescriptor,attr,expr);
 
 /** How to translate $tokenLabel */
 tokenLabelRef(label);
@@ -339,6 +341,13 @@ rulePropertyRef_stop(scope,attr);
 rulePropertyRef_tree(scope,attr);
 rulePropertyRef_text(scope,attr);
 rulePropertyRef_st(scope,attr);
+
+ruleSetPropertyRef_start(scope,attr,expr);
+ruleSetPropertyRef_stop(scope,attr,expr);
+ruleSetPropertyRef_tree(scope,attr,expr);
+// text cannot be set right now
+//ruleSetPropertyRef_text(scope,attr,expr);
+ruleSetPropertyRef_st(scope,attr,expr);
 
 /** How to execute an action */
 execAction(action);

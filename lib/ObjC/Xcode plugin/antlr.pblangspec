@@ -30,11 +30,35 @@
 		Name = "ANTLR";
 		Description = "ANTLR v3 grammar";
 		BasedOn = "pbx_root_language";
-		SourceScannerClassName = PBXCSourceScanner;
 		SupportsIndentation = NO;
 		Indentation = {
 		};
 		SyntaxColoring = {
+            CaseSensitive = YES;
+            UnicodeSymbols = NO;
+            IndexedSymbols = NO;
+            CommentsCanBeNested = NO;
+            IdentifierStartChars = "@";
+            IdentifierChars = "_";
+            SingleLineComment = (  "//" );
+            MultiLineComment = (
+                ( "/*", "*/" )
+            );
+            EscapeCharacter = "\\";
+            String = (
+                ( "\'", "\'" )
+            );
+			Keywords = (
+                "grammar",
+                "tokens",
+				"options",
+				"@lexer",
+				"@parser",
+				"@init",
+				"scope",
+				"returns",
+				"fragment"
+			);
 		};
 	}
 )

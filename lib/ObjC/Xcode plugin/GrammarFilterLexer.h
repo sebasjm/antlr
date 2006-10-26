@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g 2006-10-02 14:34:53
+// $ANTLR 3.0b5 GrammarFilter.g 2006-10-16 21:18:06
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
@@ -51,9 +51,9 @@
 - (void) mID;
 - (void) mWS;
 - (void) mTokens;
-- (void) msynpred3;
-- (void) msynpred7;
-- (void) msynpred8;
+- (void) synpred3;
+- (void) synpred7;
+- (void) synpred8;
 
 
 

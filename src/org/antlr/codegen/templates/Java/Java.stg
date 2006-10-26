@@ -1064,6 +1064,18 @@ scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <endif>
 >>
 
+scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
+<if(negIndex)>
+((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name> =<expr>;
+<else>
+<if(index)>
+((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name> =<expr>;
+<else>
+((<scope>_scope)<scope>_stack.peek()).<attr.name> =<expr>;
+<endif>
+<endif>
+>>
+
 /** $x is either global scope or x is rule with dynamic scope; refers
  *  to stack itself not top of stack.  This is useful for predicates
  *  like {$function.size()>0 && $function::name.equals("foo")}?
@@ -1084,6 +1096,14 @@ returnAttributeRef(ruleDescriptor,attr) ::= <<
 retval.<attr.name>
 <else>
 <attr.name>
+<endif>
+>>
+
+returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
+<if(ruleDescriptor.hasMultipleReturnValues)>
+retval.<attr.name> = <expr>;
+<else>
+<attr.name> = <expr>;
 <endif>
 >>
 
@@ -1127,6 +1147,13 @@ rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval.stop)"
 rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)retval.tree)"
 rulePropertyRef_text(scope,attr) ::= "input.toString(retval.start,input.LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "retval.st"
+
+ruleSetPropertyRef_start(scope,attr,expr) ::= "retval.start =<expr>;"
+ruleSetPropertyRef_stop(scope,attr,expr) ::= "retval.stop =<expr>;"
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree =<expr>;"
+// this should probably be illegal. flag as error in ActionTranslatorLexer for now. kay
+//ruleSetPropertyRef_text(scope,attr,expr) ::= "input.toString(retval.start,input.LT(-1))"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st =<expr>;"
 
 
 /** How to execute an action */

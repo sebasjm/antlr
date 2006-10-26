@@ -164,6 +164,7 @@ public class ErrorManager {
 	public static final int MSG_ARG_INIT_VALUES_ILLEGAL = 148;
 	public static final int MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION = 149;
 	public static final int MSG_NO_RULES = 150;
+	public static final int MSG_WRITE_TO_READONLY_ATTR = 151;
 
 
 	// GRAMMAR WARNINGS

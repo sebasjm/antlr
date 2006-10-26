@@ -829,7 +829,7 @@ public class CodeGenerator {
 	public List translateAction(String ruleName,
 								  GrammarAST actionTree)
 	{
-		ActionTranslator translator = new ActionTranslator(this,ruleName,actionTree);
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(this,ruleName,actionTree);
 		return translator.translateToChunks();
 	}
 
@@ -847,10 +847,10 @@ public class CodeGenerator {
 		List args = new ArrayList();
 		while ( argTokens.hasMoreTokens() ) {
 			String arg = (String)argTokens.nextToken();
-			ActionTranslator translator =
-				new ActionTranslator(this,ruleName,
-									 new antlr.CommonToken(ANTLRParser.ACTION,arg),
-									 actionTree.outerAltNum);
+			ActionTranslatorLexer translator =
+				new ActionTranslatorLexer(this,ruleName,
+										  new antlr.CommonToken(ANTLRParser.ACTION,arg),
+										  actionTree.outerAltNum);
 			List chunks = translator.translateToChunks();
 			args.add(chunks);
 		}

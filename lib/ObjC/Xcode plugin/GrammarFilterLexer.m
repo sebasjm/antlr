@@ -1,38 +1,36 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g 2006-10-02 14:34:53
+// $ANTLR 3.0b5 GrammarFilter.g 2006-10-16 21:18:06
 
 #import "GrammarFilterLexer.h"
 #pragma mark Cyclic DFAs
 @implementation GrammarFilterLexerDFA13
-const static int GrammarFilterLexerdfa13_eot[25] =
+const static int GrammarFilterLexerdfa13_eot[24] =
     {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-     -1,-1};
-const static int GrammarFilterLexerdfa13_eof[25] =
+     -1};
+const static int GrammarFilterLexerdfa13_eof[24] =
     {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-     -1,-1};
-const static unichar GrammarFilterLexerdfa13_min[25] =
-    {9,9,0,42,9,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0};
-const static unichar GrammarFilterLexerdfa13_max[25] =
+     -1};
+const static unichar GrammarFilterLexerdfa13_min[24] =
+    {9,9,0,42,9,0,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0};
+const static unichar GrammarFilterLexerdfa13_max[24] =
     {125,125,0,47,122,0,0,0,122,122,122,122,122,122,122,122,122,61,122,122,
-     122,122,59,0,0};
-const static int GrammarFilterLexerdfa13_accept[25] =
-    {-1,-1,5,-1,-1,4,2,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-     3};
-const static int GrammarFilterLexerdfa13_special[25] =
-    {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-     0,-1};
+     122,59,0,0};
+const static int GrammarFilterLexerdfa13_accept[24] =
+    {-1,-1,5,-1,-1,4,2,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,3};
+const static int GrammarFilterLexerdfa13_special[24] =
+    {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,
+     -1};
 const static int GrammarFilterLexerdfa13_transition[] = {};
-const static int GrammarFilterLexerdfa13_transition0[] = {22, 22, -1, -1, 
+const static int GrammarFilterLexerdfa13_transition0[] = {5, 5, -1, -1, 
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 22, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 21, 
-	21, 21, 21, 21, 21, 21, 21, 21, 21, -1, 23, -1, -1, -1, -1, -1, 21, 21, 
-	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
-	21, 21, 21, 21, 21, 21, -1, -1, -1, -1, 21, -1, 21, 21, 21, 21, 21, 21, 
-	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 
-	21, 21};
-const static int GrammarFilterLexerdfa13_transition1[] = {17, 17, -1, -1, 
+	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
+	5, -1, 5, 16, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5};
+const static int GrammarFilterLexerdfa13_transition1[] = {21, 21, -1, -1, 
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 17, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 18};
+	-1, 21, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 22};
 const static int GrammarFilterLexerdfa13_transition2[] = {5, 5, -1, -1, 
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
@@ -40,98 +38,99 @@ const static int GrammarFilterLexerdfa13_transition2[] = {5, 5, -1, -1,
 	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
 	5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 9, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
 	5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition3[] = {6, -1, -1, -1, 
-	-1, 7};
-const static int GrammarFilterLexerdfa13_transition4[] = {1, 1, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, 
-	-1, -1, -1, 5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
-	5, 4, 5, 5, 5, 5, 5, 5, -1, -1, 2};
-const static int GrammarFilterLexerdfa13_transition5[] = {5, 5, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
-	5, -1, 5, 5, 14, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition6[] = {22, 22, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 22, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 23};
-const static int GrammarFilterLexerdfa13_transition7[] = {5, 5, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
-	5, -1, 15, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition8[] = {5, 5, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
-	5, -1, 5, 16, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition9[] = {5, 5, -1, -1, 
+const static int GrammarFilterLexerdfa13_transition3[] = {5, 5, -1, -1, 
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
 	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
 	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
 	5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 13, 5, 5, 5, 5, 5, 5, 
 	5, 5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition10[] = {1, 1, -1, -1, 
+const static int GrammarFilterLexerdfa13_transition4[] = {6, -1, -1, -1, 
+	-1, 7};
+const static int GrammarFilterLexerdfa13_transition5[] = {19, 19, -1, -1, 
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 3, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, 
-	-1, -1, 5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
-	4, 5, 5, 5, 5, 5, 5, -1, -1, 2};
-const static int GrammarFilterLexerdfa13_transition11[] = {19, 19, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 19, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 20, 20, 
+	-1, 19, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 20, 
+	20, 20, 20, 20, 20, 20, 20, 20, 20, -1, -1, -1, -1, -1, -1, -1, 20, 20, 
 	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 
 	20, 20, 20, 20, 20, 20, -1, -1, -1, -1, 20, -1, 20, 20, 20, 20, 20, 20, 
 	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 
 	20, 20};
-const static int GrammarFilterLexerdfa13_transition12[] = {5, 5, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
-	5, -1, 5, 5, 5, 5, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition13[] = {17, 17, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 17, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 18, -1, -1, -1, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 
-	-1, 5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition14[] = {5, 5, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
-	5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 11, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition15[] = {5, 5, -1, -1, 
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
-	5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 8, 5, 5, 5, 5, 5, 5, 5, 
-	5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition16[] = {5, 5, -1, -1, 
+const static int GrammarFilterLexerdfa13_transition6[] = {5, 5, -1, -1, 
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
 	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
 	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 12, 5, 5, 5, 5, -1, -1, -1, -1, 
 	5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
 	5, 5, 5, 5};
-const static int GrammarFilterLexerdfa13_transition17[] = {-1};
+const static int GrammarFilterLexerdfa13_transition7[] = {5, 5, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
+	5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 8, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5};
+const static int GrammarFilterLexerdfa13_transition8[] = {5, 5, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
+	5, -1, 5, 5, 14, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5};
+const static int GrammarFilterLexerdfa13_transition9[] = {1, 1, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 3, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
+	5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 
+	5, 5, 5, 5, -1, -1, 2};
+const static int GrammarFilterLexerdfa13_transition10[] = {1, 1, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
+	5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 5, 5, 
+	5, 5, 5, 5, -1, -1, 2};
+const static int GrammarFilterLexerdfa13_transition11[] = {-1};
+const static int GrammarFilterLexerdfa13_transition12[] = {5, 5, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
+	5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 11, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5};
+const static int GrammarFilterLexerdfa13_transition13[] = {5, 5, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
+	5, -1, 15, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5};
+const static int GrammarFilterLexerdfa13_transition14[] = {17, 17, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 17, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 18, -1, -1, -1, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 
+	-1, 5, -1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5};
+const static int GrammarFilterLexerdfa13_transition15[] = {21, 21, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 21, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 20, 
+	20, 20, 20, 20, 20, 20, 20, 20, 20, -1, 22, -1, -1, -1, -1, -1, 20, 20, 
+	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 
+	20, 20, 20, 20, 20, 20, -1, -1, -1, -1, 20, -1, 20, 20, 20, 20, 20, 20, 
+	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 
+	20, 20};
+const static int GrammarFilterLexerdfa13_transition16[] = {17, 17, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 17, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 18};
+const static int GrammarFilterLexerdfa13_transition17[] = {5, 5, -1, -1, 
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+	-1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, 5, -1, -1, -1, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1, -1, -1, -1, 
+	5, -1, 5, 5, 5, 5, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 5, 5, 5};
 
 
 - (id) initWithRecognizer:(ANTLRBaseRecognizer *) theRecognizer
@@ -143,35 +142,34 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		max = GrammarFilterLexerdfa13_max;
 		accept = GrammarFilterLexerdfa13_accept;
 		special = GrammarFilterLexerdfa13_special;
-		if (!(transition = calloc(25, sizeof(void*)))) {
+		if (!(transition = calloc(24, sizeof(void*)))) {
 			[self release];
 			return nil;
 		}
-		transition[0] = GrammarFilterLexerdfa13_transition10;
-		transition[1] = GrammarFilterLexerdfa13_transition4;
+		transition[0] = GrammarFilterLexerdfa13_transition9;
+		transition[1] = GrammarFilterLexerdfa13_transition10;
 		transition[2] = GrammarFilterLexerdfa13_transition;
-		transition[3] = GrammarFilterLexerdfa13_transition3;
-		transition[4] = GrammarFilterLexerdfa13_transition15;
+		transition[3] = GrammarFilterLexerdfa13_transition4;
+		transition[4] = GrammarFilterLexerdfa13_transition7;
 		transition[5] = GrammarFilterLexerdfa13_transition;
 		transition[6] = GrammarFilterLexerdfa13_transition;
 		transition[7] = GrammarFilterLexerdfa13_transition;
 		transition[8] = GrammarFilterLexerdfa13_transition2;
-		transition[9] = GrammarFilterLexerdfa13_transition12;
-		transition[10] = GrammarFilterLexerdfa13_transition14;
-		transition[11] = GrammarFilterLexerdfa13_transition16;
-		transition[12] = GrammarFilterLexerdfa13_transition9;
-		transition[13] = GrammarFilterLexerdfa13_transition5;
-		transition[14] = GrammarFilterLexerdfa13_transition7;
-		transition[15] = GrammarFilterLexerdfa13_transition8;
-		transition[16] = GrammarFilterLexerdfa13_transition13;
-		transition[17] = GrammarFilterLexerdfa13_transition1;
-		transition[18] = GrammarFilterLexerdfa13_transition11;
-		transition[19] = GrammarFilterLexerdfa13_transition11;
-		transition[20] = GrammarFilterLexerdfa13_transition0;
-		transition[21] = GrammarFilterLexerdfa13_transition0;
-		transition[22] = GrammarFilterLexerdfa13_transition6;
-		transition[23] = GrammarFilterLexerdfa13_transition17;
-		transition[24] = GrammarFilterLexerdfa13_transition;
+		transition[9] = GrammarFilterLexerdfa13_transition17;
+		transition[10] = GrammarFilterLexerdfa13_transition12;
+		transition[11] = GrammarFilterLexerdfa13_transition6;
+		transition[12] = GrammarFilterLexerdfa13_transition3;
+		transition[13] = GrammarFilterLexerdfa13_transition8;
+		transition[14] = GrammarFilterLexerdfa13_transition13;
+		transition[15] = GrammarFilterLexerdfa13_transition0;
+		transition[16] = GrammarFilterLexerdfa13_transition14;
+		transition[17] = GrammarFilterLexerdfa13_transition16;
+		transition[18] = GrammarFilterLexerdfa13_transition5;
+		transition[19] = GrammarFilterLexerdfa13_transition5;
+		transition[20] = GrammarFilterLexerdfa13_transition15;
+		transition[21] = GrammarFilterLexerdfa13_transition1;
+		transition[22] = GrammarFilterLexerdfa13_transition11;
+		transition[23] = GrammarFilterLexerdfa13_transition;
 	}
 	return self;
 }
@@ -183,7 +181,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
  				case 0 : 
  				[[recognizer input] rewind];
  				s = -1;
- 				if ( ([self evaluateSyntacticPredicate:@selector(msynpred3)]) ) {s = 24;}
+ 				if ( ([self evaluateSyntacticPredicate:@selector(synpred3)]) ) {s = 23;}
 
  				else if ( (YES) ) {s = 5;}
 
@@ -277,6 +275,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mGRAMMAR
 {
+NSLog(@"enter GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	ANTLRToken * grammarType = nil;
 	ANTLRToken * grammarName = nil;
 
@@ -286,10 +285,10 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:25:4: ( (grammarType= GRAMMAR_TYPE WS | ) 'grammar' WS grammarName= ID ( WS )? ';' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:25:4: (grammarType= GRAMMAR_TYPE WS | ) 'grammar' WS grammarName= ID ( WS )? ';' // alt
+		// GrammarFilter.g:25:4: ( (grammarType= GRAMMAR_TYPE WS | ) 'grammar' WS grammarName= ID ( WS )? ';' ) // ruleBlockSingleAlt
+		// GrammarFilter.g:25:4: (grammarType= GRAMMAR_TYPE WS | ) 'grammar' WS grammarName= ID ( WS )? ';' // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:25:4: (grammarType= GRAMMAR_TYPE WS | ) // block
+		// GrammarFilter.g:25:4: (grammarType= GRAMMAR_TYPE WS | ) // block
 		int alt1=2;
 		{
 			int LA1_0 = [input LA:1];
@@ -300,34 +299,31 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 				alt1 = 2;
 			}
 		else {
-			if (backtracking > 0) {
-				failed = YES;
-				return;
-			}
+			if (failed) return ;
 		    ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:1 state:0 stream:input];
 			@throw nvae;
 			}
 		}
 		switch (alt1) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:25:6: grammarType= GRAMMAR_TYPE WS // alt
+			    // GrammarFilter.g:25:6: grammarType= GRAMMAR_TYPE WS // alt
 			    {
 			    int grammarTypeStart = [self charIndex];
 			    [self mGRAMMAR_TYPE];
-			    if (failed) return;
+			    if (failed) return ;
 
 			    grammarType = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:grammarTypeStart stop:[self charIndex]];
 			    if ( backtracking==0 ) {
 			      [delegate setGrammarType:[grammarType text]]; 
 			    }
 			    [self mWS];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
 			    break;
 			case 2 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:26:53:  // alt
+			    // GrammarFilter.g:26:53:  // alt
 			    {
 			    if ( backtracking==0 ) {
 			      [delegate setGrammarType:@"parser"]; [delegate setIsCombinedGrammar:NO]; 
@@ -339,31 +335,33 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		}
 
 		[self matchString:@"grammar"];
-		if (failed) return;
+		if (failed) return ;
 
 		[self mWS];
-		if (failed) return;
+		if (failed) return ;
 
 		int grammarNameStart = [self charIndex];
 		[self mID];
-		if (failed) return;
+		if (failed) return ;
 
 		grammarName = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:grammarNameStart stop:[self charIndex]];
 		if ( backtracking==0 ) {
 		   [delegate setGrammarName:[grammarName text]]; 
 		}
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:28:80: ( WS )? // block
+		// GrammarFilter.g:28:80: ( WS )? // block
 		int alt2=2;
-		int LA2_0 = [input LA:1];
-		if ( (LA2_0>='\t' && LA2_0<='\n')||LA2_0==' ' ) {
-			alt2 = 1;
+		{
+			int LA2_0 = [input LA:1];
+			if ( (LA2_0>='\t' && LA2_0<='\n')||LA2_0==' ' ) {
+				alt2 = 1;
+			}
 		}
 		switch (alt2) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:28:80: WS // alt
+			    // GrammarFilter.g:28:80: WS // alt
 			    {
 			    [self mWS];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -372,7 +370,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		}
 
 		[self matchChar:';'];
-		if (failed) return;
+		if (failed) return ;
 
 
 		}
@@ -380,6 +378,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
 	}
 	@finally {
+NSLog(@"exit GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		[grammarType release];
@@ -399,11 +398,12 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mGRAMMAR_TYPE
 {
+NSLog(@"enter GRAMMAR_TYPE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:5: ( ( 'lexer' | 'parser' | 'tree' ) ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:5: ( 'lexer' | 'parser' | 'tree' ) // alt
+		// GrammarFilter.g:33:5: ( ( 'lexer' | 'parser' | 'tree' ) ) // ruleBlockSingleAlt
+		// GrammarFilter.g:33:5: ( 'lexer' | 'parser' | 'tree' ) // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:5: ( 'lexer' | 'parser' | 'tree' ) // block
+		// GrammarFilter.g:33:5: ( 'lexer' | 'parser' | 'tree' ) // block
 		int alt3=3;
 		switch ([input LA:1]) {
 			case 'l':
@@ -417,38 +417,35 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 				break;
 		default:
 		 {
-			if (backtracking > 0) {
-				failed = YES;
-				return;
-			}
+			if (failed) return ;
 		    ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:3 state:0 stream:input];
 			@throw nvae;
 
 			}}
 		switch (alt3) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:6: 'lexer' // alt
+			    // GrammarFilter.g:33:6: 'lexer' // alt
 			    {
 			    [self matchString:@"lexer"];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
 			    break;
 			case 2 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:14: 'parser' // alt
+			    // GrammarFilter.g:33:14: 'parser' // alt
 			    {
 			    [self matchString:@"parser"];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
 			    break;
 			case 3 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:23: 'tree' // alt
+			    // GrammarFilter.g:33:23: 'tree' // alt
 			    {
 			    [self matchString:@"tree"];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -461,6 +458,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 	}
 	@finally {
+NSLog(@"exit GRAMMAR_TYPE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -478,6 +476,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mOPTIONS
 {
+NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	ANTLRToken * tokenVocab = nil;
 
 	@try {
@@ -486,24 +485,26 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:38:4: ( 'options' ( WS )? '{' ( ( ( WS )? '//' )=> SL_COMMENT | ( ( WS )? '/*' )=> COMMENT | ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' | ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' )* ( WS )? '}' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:38:4: 'options' ( WS )? '{' ( ( ( WS )? '//' )=> SL_COMMENT | ( ( WS )? '/*' )=> COMMENT | ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' | ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' )* ( WS )? '}' // alt
+		// GrammarFilter.g:38:4: ( 'options' ( WS )? '{' ( ( ( WS )? '//' )=> SL_COMMENT | ( ( WS )? '/*' )=> COMMENT | ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' | ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' )* ( WS )? '}' ) // ruleBlockSingleAlt
+		// GrammarFilter.g:38:4: 'options' ( WS )? '{' ( ( ( WS )? '//' )=> SL_COMMENT | ( ( WS )? '/*' )=> COMMENT | ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' | ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' )* ( WS )? '}' // alt
 		{
 		[self matchString:@"options"];
-		if (failed) return;
+		if (failed) return ;
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:38:14: ( WS )? // block
+		// GrammarFilter.g:38:14: ( WS )? // block
 		int alt4=2;
-		int LA4_0 = [input LA:1];
-		if ( (LA4_0>='\t' && LA4_0<='\n')||LA4_0==' ' ) {
-			alt4 = 1;
+		{
+			int LA4_0 = [input LA:1];
+			if ( (LA4_0>='\t' && LA4_0<='\n')||LA4_0==' ' ) {
+				alt4 = 1;
+			}
 		}
 		switch (alt4) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:38:14: WS // alt
+			    // GrammarFilter.g:38:14: WS // alt
 			    {
 			    [self mWS];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -512,45 +513,47 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		}
 
 		[self matchChar:'{'];
-		if (failed) return;
+		if (failed) return ;
 
 		do {
 		    int alt13=5;
 		    alt13 = [dfa13 predict];
 		    switch (alt13) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:39:5: ( ( WS )? '//' )=> SL_COMMENT // alt
+			    // GrammarFilter.g:39:5: ( ( WS )? '//' )=> SL_COMMENT // alt
 			    {
 			    [self mSL_COMMENT];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
 			    break;
 			case 2 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:40:5: ( ( WS )? '/*' )=> COMMENT // alt
+			    // GrammarFilter.g:40:5: ( ( WS )? '/*' )=> COMMENT // alt
 			    {
 			    [self mCOMMENT];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
 			    break;
 			case 3 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:5: ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' // alt
+			    // GrammarFilter.g:41:5: ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' // alt
 			    {
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:27: ( WS )? // block
+			    // GrammarFilter.g:41:27: ( WS )? // block
 			    int alt5=2;
-			    int LA5_0 = [input LA:1];
-			    if ( (LA5_0>='\t' && LA5_0<='\n')||LA5_0==' ' ) {
-			    	alt5 = 1;
+			    {
+			    	int LA5_0 = [input LA:1];
+			    	if ( (LA5_0>='\t' && LA5_0<='\n')||LA5_0==' ' ) {
+			    		alt5 = 1;
+			    	}
 			    }
 			    switch (alt5) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:27: WS // alt
+			    	    // GrammarFilter.g:41:27: WS // alt
 			    	    {
 			    	    [self mWS];
-			    	    if (failed) return;
+			    	    if (failed) return ;
 
 
 			    	    }
@@ -559,20 +562,22 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 			    }
 
 			    [self matchString:@"tokenVocab"];
-			    if (failed) return;
+			    if (failed) return ;
 
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:44: ( WS )? // block
+			    // GrammarFilter.g:41:44: ( WS )? // block
 			    int alt6=2;
-			    int LA6_0 = [input LA:1];
-			    if ( (LA6_0>='\t' && LA6_0<='\n')||LA6_0==' ' ) {
-			    	alt6 = 1;
+			    {
+			    	int LA6_0 = [input LA:1];
+			    	if ( (LA6_0>='\t' && LA6_0<='\n')||LA6_0==' ' ) {
+			    		alt6 = 1;
+			    	}
 			    }
 			    switch (alt6) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:44: WS // alt
+			    	    // GrammarFilter.g:41:44: WS // alt
 			    	    {
 			    	    [self mWS];
-			    	    if (failed) return;
+			    	    if (failed) return ;
 
 
 			    	    }
@@ -581,20 +586,22 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 			    }
 
 			    [self matchChar:'='];
-			    if (failed) return;
+			    if (failed) return ;
 
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:52: ( WS )? // block
+			    // GrammarFilter.g:41:52: ( WS )? // block
 			    int alt7=2;
-			    int LA7_0 = [input LA:1];
-			    if ( (LA7_0>='\t' && LA7_0<='\n')||LA7_0==' ' ) {
-			    	alt7 = 1;
+			    {
+			    	int LA7_0 = [input LA:1];
+			    	if ( (LA7_0>='\t' && LA7_0<='\n')||LA7_0==' ' ) {
+			    		alt7 = 1;
+			    	}
 			    }
 			    switch (alt7) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:52: WS // alt
+			    	    // GrammarFilter.g:41:52: WS // alt
 			    	    {
 			    	    [self mWS];
-			    	    if (failed) return;
+			    	    if (failed) return ;
 
 
 			    	    }
@@ -604,21 +611,23 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 			    int tokenVocabStart = [self charIndex];
 			    [self mID];
-			    if (failed) return;
+			    if (failed) return ;
 
 			    tokenVocab = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:tokenVocabStart stop:[self charIndex]];
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:70: ( WS )? // block
+			    // GrammarFilter.g:41:70: ( WS )? // block
 			    int alt8=2;
-			    int LA8_0 = [input LA:1];
-			    if ( (LA8_0>='\t' && LA8_0<='\n')||LA8_0==' ' ) {
-			    	alt8 = 1;
+			    {
+			    	int LA8_0 = [input LA:1];
+			    	if ( (LA8_0>='\t' && LA8_0<='\n')||LA8_0==' ' ) {
+			    		alt8 = 1;
+			    	}
 			    }
 			    switch (alt8) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:70: WS // alt
+			    	    // GrammarFilter.g:41:70: WS // alt
 			    	    {
 			    	    [self mWS];
-			    	    if (failed) return;
+			    	    if (failed) return ;
 
 
 			    	    }
@@ -627,7 +636,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 			    }
 
 			    [self matchChar:';'];
-			    if (failed) return;
+			    if (failed) return ;
 
 			    if ( backtracking==0 ) {
 			       [delegate setDependsOnVocab:[tokenVocab text]]; 
@@ -636,20 +645,22 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 			    }
 			    break;
 			case 4 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:5: ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' // alt
+			    // GrammarFilter.g:42:5: ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' // alt
 			    {
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:5: ( WS )? // block
+			    // GrammarFilter.g:42:5: ( WS )? // block
 			    int alt9=2;
-			    int LA9_0 = [input LA:1];
-			    if ( (LA9_0>='\t' && LA9_0<='\n')||LA9_0==' ' ) {
-			    	alt9 = 1;
+			    {
+			    	int LA9_0 = [input LA:1];
+			    	if ( (LA9_0>='\t' && LA9_0<='\n')||LA9_0==' ' ) {
+			    		alt9 = 1;
+			    	}
 			    }
 			    switch (alt9) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:5: WS // alt
+			    	    // GrammarFilter.g:42:5: WS // alt
 			    	    {
 			    	    [self mWS];
-			    	    if (failed) return;
+			    	    if (failed) return ;
 
 
 			    	    }
@@ -658,20 +669,22 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 			    }
 
 			    [self mID];
-			    if (failed) return;
+			    if (failed) return ;
 
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:12: ( WS )? // block
+			    // GrammarFilter.g:42:12: ( WS )? // block
 			    int alt10=2;
-			    int LA10_0 = [input LA:1];
-			    if ( (LA10_0>='\t' && LA10_0<='\n')||LA10_0==' ' ) {
-			    	alt10 = 1;
+			    {
+			    	int LA10_0 = [input LA:1];
+			    	if ( (LA10_0>='\t' && LA10_0<='\n')||LA10_0==' ' ) {
+			    		alt10 = 1;
+			    	}
 			    }
 			    switch (alt10) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:12: WS // alt
+			    	    // GrammarFilter.g:42:12: WS // alt
 			    	    {
 			    	    [self mWS];
-			    	    if (failed) return;
+			    	    if (failed) return ;
 
 
 			    	    }
@@ -680,20 +693,22 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 			    }
 
 			    [self matchChar:'='];
-			    if (failed) return;
+			    if (failed) return ;
 
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:20: ( WS )? // block
+			    // GrammarFilter.g:42:20: ( WS )? // block
 			    int alt11=2;
-			    int LA11_0 = [input LA:1];
-			    if ( (LA11_0>='\t' && LA11_0<='\n')||LA11_0==' ' ) {
-			    	alt11 = 1;
+			    {
+			    	int LA11_0 = [input LA:1];
+			    	if ( (LA11_0>='\t' && LA11_0<='\n')||LA11_0==' ' ) {
+			    		alt11 = 1;
+			    	}
 			    }
 			    switch (alt11) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:20: WS // alt
+			    	    // GrammarFilter.g:42:20: WS // alt
 			    	    {
 			    	    [self mWS];
-			    	    if (failed) return;
+			    	    if (failed) return ;
 
 
 			    	    }
@@ -702,20 +717,22 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 			    }
 
 			    [self mID];
-			    if (failed) return;
+			    if (failed) return ;
 
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:27: ( WS )? // block
+			    // GrammarFilter.g:42:27: ( WS )? // block
 			    int alt12=2;
-			    int LA12_0 = [input LA:1];
-			    if ( (LA12_0>='\t' && LA12_0<='\n')||LA12_0==' ' ) {
-			    	alt12 = 1;
+			    {
+			    	int LA12_0 = [input LA:1];
+			    	if ( (LA12_0>='\t' && LA12_0<='\n')||LA12_0==' ' ) {
+			    		alt12 = 1;
+			    	}
 			    }
 			    switch (alt12) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:27: WS // alt
+			    	    // GrammarFilter.g:42:27: WS // alt
 			    	    {
 			    	    [self mWS];
-			    	    if (failed) return;
+			    	    if (failed) return ;
 
 
 			    	    }
@@ -724,7 +741,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 			    }
 
 			    [self matchChar:';'];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -735,18 +752,20 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		    }
 		} while (YES); loop13: ;
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:44:3: ( WS )? // block
+		// GrammarFilter.g:44:3: ( WS )? // block
 		int alt14=2;
-		int LA14_0 = [input LA:1];
-		if ( (LA14_0>='\t' && LA14_0<='\n')||LA14_0==' ' ) {
-			alt14 = 1;
+		{
+			int LA14_0 = [input LA:1];
+			if ( (LA14_0>='\t' && LA14_0<='\n')||LA14_0==' ' ) {
+				alt14 = 1;
+			}
 		}
 		switch (alt14) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:44:3: WS // alt
+			    // GrammarFilter.g:44:3: WS // alt
 			    {
 			    [self mWS];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -755,7 +774,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		}
 
 		[self matchChar:'}'];
-		if (failed) return;
+		if (failed) return ;
 
 
 		}
@@ -763,6 +782,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
 	}
 	@finally {
+NSLog(@"exit OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		[tokenVocab release];
@@ -781,34 +801,37 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mLEXER_RULE
 {
+NSLog(@"enter LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
 		int type = GrammarFilterLexer_LEXER_RULE;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:4: ( ( 'A' .. 'Z' ) ( ID )? ( WS )? ':' ( options {greedy=false; } : . )* ';' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:4: ( 'A' .. 'Z' ) ( ID )? ( WS )? ':' ( options {greedy=false; } : . )* ';' // alt
+		// GrammarFilter.g:49:4: ( ( 'A' .. 'Z' ) ( ID )? ( WS )? ':' ( options {greedy=false; } : . )* ';' ) // ruleBlockSingleAlt
+		// GrammarFilter.g:49:4: ( 'A' .. 'Z' ) ( ID )? ( WS )? ':' ( options {greedy=false; } : . )* ';' // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:4: ( 'A' .. 'Z' ) // blockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:5: 'A' .. 'Z' // alt
+		// GrammarFilter.g:49:4: ( 'A' .. 'Z' ) // blockSingleAlt
+		// GrammarFilter.g:49:5: 'A' .. 'Z' // alt
 		{
-		[self matchRangeFromChar:'A' to:'Z']; if (failed) return;
+		[self matchRangeFromChar:'A' to:'Z'];if (failed) return ;
 
 		}
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:15: ( ID )? // block
+		// GrammarFilter.g:49:15: ( ID )? // block
 		int alt15=2;
-		int LA15_0 = [input LA:1];
-		if ( (LA15_0>='A' && LA15_0<='Z')||LA15_0=='_'||(LA15_0>='a' && LA15_0<='z') ) {
-			alt15 = 1;
+		{
+			int LA15_0 = [input LA:1];
+			if ( (LA15_0>='0' && LA15_0<='9')||(LA15_0>='A' && LA15_0<='Z')||LA15_0=='_'||(LA15_0>='a' && LA15_0<='z') ) {
+				alt15 = 1;
+			}
 		}
 		switch (alt15) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:15: ID // alt
+			    // GrammarFilter.g:49:15: ID // alt
 			    {
 			    [self mID];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -816,18 +839,20 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 		}
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:19: ( WS )? // block
+		// GrammarFilter.g:49:19: ( WS )? // block
 		int alt16=2;
-		int LA16_0 = [input LA:1];
-		if ( (LA16_0>='\t' && LA16_0<='\n')||LA16_0==' ' ) {
-			alt16 = 1;
+		{
+			int LA16_0 = [input LA:1];
+			if ( (LA16_0>='\t' && LA16_0<='\n')||LA16_0==' ' ) {
+				alt16 = 1;
+			}
 		}
 		switch (alt16) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:19: WS // alt
+			    // GrammarFilter.g:49:19: WS // alt
 			    {
 			    [self mWS];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -836,25 +861,26 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		}
 
 		[self matchChar:':'];
-		if (failed) return;
+		if (failed) return ;
 
 		do {
 		    int alt17=2;
-		    int LA17_0 = [input LA:1];
-		    if ( LA17_0==';' ) {
-		    	alt17 = 2;
-		    }
-		    else if ( (LA17_0>=0x0000 && LA17_0<=':')||(LA17_0>='<' && LA17_0<=0xFFFE) ) {
-		    	alt17 = 1;
-		    }
+		    {
+		    	int LA17_0 = [input LA:1];
+		    	if ( LA17_0==';' ) {
+		    		alt17 = 2;
+		    	}
+		    	else if ( (LA17_0>=0x0000 && LA17_0<=':')||(LA17_0>='<' && LA17_0<=0xFFFE) ) {
+		    		alt17 = 1;
+		    	}
 
-
+		    }
 		    switch (alt17) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:54: . // alt
+			    // GrammarFilter.g:49:54: . // alt
 			    {
 			    [self matchAny];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -866,7 +892,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		} while (YES); loop17: ;
 
 		[self matchChar:';'];
-		if (failed) return;
+		if (failed) return ;
 
 		if ( backtracking==0 ) {
 		   [delegate setIsCombinedGrammar:YES]; 
@@ -877,6 +903,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
 	}
 	@finally {
+NSLog(@"exit LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -894,43 +921,46 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mCOMMENT
 {
+NSLog(@"enter COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
 		int type = GrammarFilterLexer_COMMENT;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:54:9: ( '/*' ( options {greedy=false; } : . )* '*/' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:54:9: '/*' ( options {greedy=false; } : . )* '*/' // alt
+		// GrammarFilter.g:54:9: ( '/*' ( options {greedy=false; } : . )* '*/' ) // ruleBlockSingleAlt
+		// GrammarFilter.g:54:9: '/*' ( options {greedy=false; } : . )* '*/' // alt
 		{
 		[self matchString:@"/*"];
-		if (failed) return;
+		if (failed) return ;
 
 		do {
 		    int alt18=2;
-		    int LA18_0 = [input LA:1];
-		    if ( LA18_0=='*' ) {
-		    	int LA18_1 = [input LA:2];
-		    	if ( LA18_1=='/' ) {
-		    		alt18 = 2;
+		    {
+		    	int LA18_0 = [input LA:1];
+		    	if ( LA18_0=='*' ) {
+		    		{
+		    			int LA18_1 = [input LA:2];
+		    			if ( LA18_1=='/' ) {
+		    				alt18 = 2;
+		    			}
+		    			else if ( (LA18_1>=0x0000 && LA18_1<='.')||(LA18_1>='0' && LA18_1<=0xFFFE) ) {
+		    				alt18 = 1;
+		    			}
+
+		    		}
 		    	}
-		    	else if ( (LA18_1>=0x0000 && LA18_1<='.')||(LA18_1>='0' && LA18_1<=0xFFFE) ) {
+		    	else if ( (LA18_0>=0x0000 && LA18_0<=')')||(LA18_0>='+' && LA18_0<=0xFFFE) ) {
 		    		alt18 = 1;
 		    	}
 
-
 		    }
-		    else if ( (LA18_0>=0x0000 && LA18_0<=')')||(LA18_0>='+' && LA18_0<=0xFFFE) ) {
-		    	alt18 = 1;
-		    }
-
-
 		    switch (alt18) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:54:41: . // alt
+			    // GrammarFilter.g:54:41: . // alt
 			    {
 			    [self matchAny];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -942,7 +972,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		} while (YES); loop18: ;
 
 		[self matchString:@"*/"];
-		if (failed) return;
+		if (failed) return ;
 
 
 		}
@@ -950,6 +980,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
 	}
 	@finally {
+NSLog(@"exit COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -967,35 +998,37 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mSL_COMMENT
 {
+NSLog(@"enter SL_COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
 		int type = GrammarFilterLexer_SL_COMMENT;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:58:9: ( '//' ( options {greedy=false; } : . )* '\\n' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:58:9: '//' ( options {greedy=false; } : . )* '\\n' // alt
+		// GrammarFilter.g:58:9: ( '//' ( options {greedy=false; } : . )* '\\n' ) // ruleBlockSingleAlt
+		// GrammarFilter.g:58:9: '//' ( options {greedy=false; } : . )* '\\n' // alt
 		{
 		[self matchString:@"//"];
-		if (failed) return;
+		if (failed) return ;
 
 		do {
 		    int alt19=2;
-		    int LA19_0 = [input LA:1];
-		    if ( LA19_0=='\n' ) {
-		    	alt19 = 2;
-		    }
-		    else if ( (LA19_0>=0x0000 && LA19_0<='\t')||(LA19_0>=0x000B && LA19_0<=0xFFFE) ) {
-		    	alt19 = 1;
-		    }
+		    {
+		    	int LA19_0 = [input LA:1];
+		    	if ( LA19_0=='\n' ) {
+		    		alt19 = 2;
+		    	}
+		    	else if ( (LA19_0>=0x0000 && LA19_0<='\t')||(LA19_0>=0x000B && LA19_0<=0xFFFE) ) {
+		    		alt19 = 1;
+		    	}
 
-
+		    }
 		    switch (alt19) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:58:41: . // alt
+			    // GrammarFilter.g:58:41: . // alt
 			    {
 			    [self matchAny];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -1007,7 +1040,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		} while (YES); loop19: ;
 
 		[self matchChar:'\n'];
-		if (failed) return;
+		if (failed) return ;
 
 
 		}
@@ -1015,6 +1048,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
 	}
 	@finally {
+NSLog(@"exit SL_COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1032,35 +1066,37 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mACTION
 {
+NSLog(@"enter ACTION %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
 		int type = GrammarFilterLexer_ACTION;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:63:4: ( '{' ( options {greedy=false; } : . )* '}' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:63:4: '{' ( options {greedy=false; } : . )* '}' // alt
+		// GrammarFilter.g:63:4: ( '{' ( options {greedy=false; } : . )* '}' ) // ruleBlockSingleAlt
+		// GrammarFilter.g:63:4: '{' ( options {greedy=false; } : . )* '}' // alt
 		{
 		[self matchChar:'{'];
-		if (failed) return;
+		if (failed) return ;
 
 		do {
 		    int alt20=2;
-		    int LA20_0 = [input LA:1];
-		    if ( LA20_0=='}' ) {
-		    	alt20 = 2;
-		    }
-		    else if ( (LA20_0>=0x0000 && LA20_0<='|')||(LA20_0>='~' && LA20_0<=0xFFFE) ) {
-		    	alt20 = 1;
-		    }
+		    {
+		    	int LA20_0 = [input LA:1];
+		    	if ( LA20_0=='}' ) {
+		    		alt20 = 2;
+		    	}
+		    	else if ( (LA20_0>=0x0000 && LA20_0<='|')||(LA20_0>='~' && LA20_0<=0xFFFE) ) {
+		    		alt20 = 1;
+		    	}
 
-
+		    }
 		    switch (alt20) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:63:35: . // alt
+			    // GrammarFilter.g:63:35: . // alt
 			    {
 			    [self matchAny];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -1072,7 +1108,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		} while (YES); loop20: ;
 
 		[self matchChar:'}'];
-		if (failed) return;
+		if (failed) return ;
 
 
 		}
@@ -1080,6 +1116,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
 	}
 	@finally {
+NSLog(@"exit ACTION %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1097,35 +1134,37 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mSTRING
 {
+NSLog(@"enter STRING %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
 		int type = GrammarFilterLexer_STRING;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:67:4: ( '\\'' ( options {greedy=false; } : . )* '\\'' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:67:4: '\\'' ( options {greedy=false; } : . )* '\\'' // alt
+		// GrammarFilter.g:67:4: ( '\\'' ( options {greedy=false; } : . )* '\\'' ) // ruleBlockSingleAlt
+		// GrammarFilter.g:67:4: '\\'' ( options {greedy=false; } : . )* '\\'' // alt
 		{
 		[self matchChar:'\''];
-		if (failed) return;
+		if (failed) return ;
 
 		do {
 		    int alt21=2;
-		    int LA21_0 = [input LA:1];
-		    if ( LA21_0=='\'' ) {
-		    	alt21 = 2;
-		    }
-		    else if ( (LA21_0>=0x0000 && LA21_0<='&')||(LA21_0>='(' && LA21_0<=0xFFFE) ) {
-		    	alt21 = 1;
-		    }
+		    {
+		    	int LA21_0 = [input LA:1];
+		    	if ( LA21_0=='\'' ) {
+		    		alt21 = 2;
+		    	}
+		    	else if ( (LA21_0>=0x0000 && LA21_0<='&')||(LA21_0>='(' && LA21_0<=0xFFFE) ) {
+		    		alt21 = 1;
+		    	}
 
-
+		    }
 		    switch (alt21) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:67:36: . // alt
+			    // GrammarFilter.g:67:36: . // alt
 			    {
 			    [self matchAny];
-			    if (failed) return;
+			    if (failed) return ;
 
 
 			    }
@@ -1137,7 +1176,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		} while (YES); loop21: ;
 
 		[self matchChar:'\''];
-		if (failed) return;
+		if (failed) return ;
 
 
 		}
@@ -1145,6 +1184,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
 	}
 	@finally {
+NSLog(@"exit STRING %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1162,44 +1202,32 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mID
 {
+NSLog(@"enter ID %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:71:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))* ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:71:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))* // alt
+		// GrammarFilter.g:71:9: ( ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))+ ) // ruleBlockSingleAlt
+		// GrammarFilter.g:71:9: ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))+ // alt
 		{
-		if (([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
-			[input consume];
-			errorRecovery = NO;
-		failed = NO;
-		} else {
-		if (backtracking > 0) {
-				failed = YES;
-				return;
-			}
-			ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
-			[self recover:mse];	@throw mse;
-		}
+		// GrammarFilter.g:71:9: ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))+	// positiveClosureBlock
+		int cnt22=0;
 
 		do {
 		    int alt22=2;
-		    int LA22_0 = [input LA:1];
-		    if ( (LA22_0>='0' && LA22_0<='9')||(LA22_0>='A' && LA22_0<='Z')||LA22_0=='_'||(LA22_0>='a' && LA22_0<='z') ) {
-		    	alt22 = 1;
+		    {
+		    	int LA22_0 = [input LA:1];
+		    	if ( (LA22_0>='0' && LA22_0<='9')||(LA22_0>='A' && LA22_0<='Z')||LA22_0=='_'||(LA22_0>='a' && LA22_0<='z') ) {
+		    		alt22 = 1;
+		    	}
+
 		    }
-
-
 		    switch (alt22) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:71:34: ('a'..'z'|'A'..'Z'|'_'|'0'..'9') // alt
+			    // GrammarFilter.g:71:10: ('a'..'z'|'A'..'Z'|'_'|'0'..'9') // alt
 			    {
 			    if (([input LA:1]>='0' && [input LA:1]<='9')||([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			    	[input consume];
-			    	errorRecovery = NO;
 			    failed = NO;
 			    } else {
-			    if (backtracking > 0) {
-			    		failed = YES;
-			    		return;
-			    	}
+			    	if (failed) return ;
 			    	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
 			    	[self recover:mse];	@throw mse;
 			    }
@@ -1209,8 +1237,12 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 			    break;
 
 			default :
-			    goto loop22;
+			    if ( cnt22 >= 1 )  goto loop22;
+		            if (failed) return ;
+					ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:22];
+					@throw eee;
 		    }
+		    cnt22++;
 		} while (YES); loop22: ;
 
 
@@ -1218,6 +1250,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 	}
 	@finally {
+NSLog(@"exit ID %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1235,39 +1268,37 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mWS
 {
+NSLog(@"enter WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
 		int type = GrammarFilterLexer_WS;
 		int start = [self charIndex];
 		int line = [self line];
 		int charPosition = [self charPositionInLine];
 		int channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:74:9: ( ( (' '|'\\t'|'\\n'))+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:74:9: ( (' '|'\\t'|'\\n'))+ // alt
+		// GrammarFilter.g:74:9: ( ( (' '|'\\t'|'\\n'))+ ) // ruleBlockSingleAlt
+		// GrammarFilter.g:74:9: ( (' '|'\\t'|'\\n'))+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:74:9: ( (' '|'\\t'|'\\n'))+	// positiveClosureBlock
+		// GrammarFilter.g:74:9: ( (' '|'\\t'|'\\n'))+	// positiveClosureBlock
 		int cnt23=0;
 
 		do {
 		    int alt23=2;
-		    int LA23_0 = [input LA:1];
-		    if ( (LA23_0>='\t' && LA23_0<='\n')||LA23_0==' ' ) {
-		    	alt23 = 1;
+		    {
+		    	int LA23_0 = [input LA:1];
+		    	if ( (LA23_0>='\t' && LA23_0<='\n')||LA23_0==' ' ) {
+		    		alt23 = 1;
+		    	}
+
 		    }
-
-
 		    switch (alt23) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:74:10: (' '|'\\t'|'\\n') // alt
+			    // GrammarFilter.g:74:10: (' '|'\\t'|'\\n') // alt
 			    {
 			    if (([input LA:1]>='\t' && [input LA:1]<='\n')||[input LA:1]==' ') {
 			    	[input consume];
-			    	errorRecovery = NO;
 			    failed = NO;
 			    } else {
-			    if (backtracking > 0) {
-			    		failed = YES;
-			    		return;
-			    	}
+			    	if (failed) return ;
 			    	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
 			    	[self recover:mse];	@throw mse;
 			    }
@@ -1278,7 +1309,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 			default :
 			    if ( cnt23 >= 1 )  goto loop23;
-		            if (backtracking>0) { failed = YES; return; }
+		            if (failed) return ;
 					ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:23];
 					@throw eee;
 		    }
@@ -1291,6 +1322,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
 	}
 	@finally {
+NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1306,7 +1338,7 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 - (void) mTokens
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:25: ( ( GRAMMAR )=> GRAMMAR | ( OPTIONS )=> OPTIONS | ( LEXER_RULE )=> LEXER_RULE | ( COMMENT )=> COMMENT | ( SL_COMMENT )=> SL_COMMENT | ( ACTION )=> ACTION | ( STRING )=> STRING | ( WS )=> WS ) //ruleblock
+    // GrammarFilter.g:1:25: ( ( GRAMMAR )=> GRAMMAR | ( OPTIONS )=> OPTIONS | ( LEXER_RULE )=> LEXER_RULE | ( COMMENT )=> COMMENT | ( SL_COMMENT )=> SL_COMMENT | ( ACTION )=> ACTION | ( STRING )=> STRING | ( WS )=> WS ) //ruleblock
     int alt24=8;
     switch ([input LA:1]) {
     	case 'g':
@@ -1349,17 +1381,14 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
     	case '/':
     		{
     			int LA24_7 = [input LA:2];
-    			if ( [self evaluateSyntacticPredicate:@selector(msynpred7)] ) {
+    			if ( [self evaluateSyntacticPredicate:@selector(synpred7)] ) {
     				alt24 = 4;
     			}
-    			else if ( [self evaluateSyntacticPredicate:@selector(msynpred8)] ) {
+    			else if ( [self evaluateSyntacticPredicate:@selector(synpred8)] ) {
     				alt24 = 5;
     			}
     		else {
-    			if (backtracking > 0) {
-    				failed = YES;
-    				return;
-    			}
+    			if (failed) return ;
     		    ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:24 state:7 stream:input];
     			@throw nvae;
     			}
@@ -1378,83 +1407,80 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
     		break;
     default:
      {
-    	if (backtracking > 0) {
-    		failed = YES;
-    		return;
-    	}
+    	if (failed) return ;
         ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:24 state:0 stream:input];
     	@throw nvae;
 
     	}}
     switch (alt24) {
     	case 1 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:25: ( GRAMMAR )=> GRAMMAR // alt
+    	    // GrammarFilter.g:1:25: ( GRAMMAR )=> GRAMMAR // alt
     	    {
     	    [self mGRAMMAR];
-    	    if (failed) return;
+    	    if (failed) return ;
 
 
     	    }
     	    break;
     	case 2 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:44: ( OPTIONS )=> OPTIONS // alt
+    	    // GrammarFilter.g:1:44: ( OPTIONS )=> OPTIONS // alt
     	    {
     	    [self mOPTIONS];
-    	    if (failed) return;
+    	    if (failed) return ;
 
 
     	    }
     	    break;
     	case 3 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:63: ( LEXER_RULE )=> LEXER_RULE // alt
+    	    // GrammarFilter.g:1:63: ( LEXER_RULE )=> LEXER_RULE // alt
     	    {
     	    [self mLEXER_RULE];
-    	    if (failed) return;
+    	    if (failed) return ;
 
 
     	    }
     	    break;
     	case 4 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:88: ( COMMENT )=> COMMENT // alt
+    	    // GrammarFilter.g:1:88: ( COMMENT )=> COMMENT // alt
     	    {
     	    [self mCOMMENT];
-    	    if (failed) return;
+    	    if (failed) return ;
 
 
     	    }
     	    break;
     	case 5 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:107: ( SL_COMMENT )=> SL_COMMENT // alt
+    	    // GrammarFilter.g:1:107: ( SL_COMMENT )=> SL_COMMENT // alt
     	    {
     	    [self mSL_COMMENT];
-    	    if (failed) return;
+    	    if (failed) return ;
 
 
     	    }
     	    break;
     	case 6 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:132: ( ACTION )=> ACTION // alt
+    	    // GrammarFilter.g:1:132: ( ACTION )=> ACTION // alt
     	    {
     	    [self mACTION];
-    	    if (failed) return;
+    	    if (failed) return ;
 
 
     	    }
     	    break;
     	case 7 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:149: ( STRING )=> STRING // alt
+    	    // GrammarFilter.g:1:149: ( STRING )=> STRING // alt
     	    {
     	    [self mSTRING];
-    	    if (failed) return;
+    	    if (failed) return ;
 
 
     	    }
     	    break;
     	case 8 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:166: ( WS )=> WS // alt
+    	    // GrammarFilter.g:1:166: ( WS )=> WS // alt
     	    {
     	    [self mWS];
-    	    if (failed) return;
+    	    if (failed) return ;
 
 
     	    }
@@ -1464,59 +1490,79 @@ const static int GrammarFilterLexerdfa13_transition17[] = {-1};
 
 }
 
-- (void) msynpred3
+- (void) synpred3
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:5: ( ( WS )? 'tokenVocab' ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:6: ( WS )? 'tokenVocab' // alt
-    {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:6: ( WS )? // block
-    int alt27=2;
-    int LA27_0 = [input LA:1];
-    if ( (LA27_0>='\t' && LA27_0<='\n')||LA27_0==' ' ) {
-    	alt27 = 1;
+NSLog(@"enter synpred3 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
+    @try {
+        // GrammarFilter.g:41:5: ( ( WS )? 'tokenVocab' ) // ruleBlockSingleAlt
+        // GrammarFilter.g:41:6: ( WS )? 'tokenVocab' // alt
+        {
+        // GrammarFilter.g:41:6: ( WS )? // block
+        int alt27=2;
+        {
+        	int LA27_0 = [input LA:1];
+        	if ( (LA27_0>='\t' && LA27_0<='\n')||LA27_0==' ' ) {
+        		alt27 = 1;
+        	}
+        }
+        switch (alt27) {
+        	case 1 :
+        	    // GrammarFilter.g:41:6: WS // alt
+        	    {
+        	    [self mWS];
+        	    if (failed) return ;
+
+
+        	    }
+        	    break;
+
+        }
+
+        [self matchString:@"tokenVocab"];
+        if (failed) return ;
+
+
+        }
+
     }
-    switch (alt27) {
-    	case 1 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:6: WS // alt
-    	    {
-    	    [self mWS];
-    	    if (failed) return;
+    @finally {
+        NSLog(@"exit synpred3 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
+    }}
 
-
-    	    }
-    	    break;
-
-    }
-
-    [self matchString:@"tokenVocab"];
-    if (failed) return;
-
-
-    }
-}
-
-- (void) msynpred7
+- (void) synpred7
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:88: ( COMMENT ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:89: COMMENT // alt
-    {
-    [self mCOMMENT];
-    if (failed) return;
+NSLog(@"enter synpred7 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
+    @try {
+        // GrammarFilter.g:1:88: ( COMMENT ) // ruleBlockSingleAlt
+        // GrammarFilter.g:1:89: COMMENT // alt
+        {
+        [self mCOMMENT];
+        if (failed) return ;
 
+
+        }
 
     }
-}
+    @finally {
+        NSLog(@"exit synpred7 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
+    }}
 
-- (void) msynpred8
+- (void) synpred8
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:107: ( SL_COMMENT ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:108: SL_COMMENT // alt
-    {
-    [self mSL_COMMENT];
-    if (failed) return;
+NSLog(@"enter synpred8 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
+    @try {
+        // GrammarFilter.g:1:107: ( SL_COMMENT ) // ruleBlockSingleAlt
+        // GrammarFilter.g:1:108: SL_COMMENT // alt
+        {
+        [self mSL_COMMENT];
+        if (failed) return ;
 
+
+        }
 
     }
-}
+    @finally {
+        NSLog(@"exit synpred8 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
+    }}
 
 @end

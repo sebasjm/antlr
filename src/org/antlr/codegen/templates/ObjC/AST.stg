@@ -87,7 +87,7 @@ parserMethods() ::= <<
 /** the interface of returnScope methods */
 @returnScopeInterface.methods() ::= <<
 - (<recognizer.ASTLabelType; null="id">) tree;
-- (void) setTree:(<recognizer.ASTLabelType>)aTree;
+- (void) setTree:(<recognizer.ASTLabelType; null="id">)aTree;
 >>
 
 /** the implementation of returnScope methods */

@@ -277,6 +277,20 @@ CHANGES
 
 3.0b5 - ??
 
+October 26, 2006
+
+* renamed action.g to ActionTranslator.g
+  the ActionTranslator class is now called ActionTranslatorLexer, as ANTLR
+  generates this classname now. Fixed rest of codebase accordingly.
+
+* added rules recognizing setting of scopes' attributes to ActionTranslator.g
+  the Objective C target needed access to the right-hand side of the assignment
+  in order to generate correct code
+
+* changed ANTLRCore.sti to reflect the new mandatory templates to support the above
+  namely: scopeSetAttributeRef, returnSetAttributeRef and the ruleSetPropertyRef_*
+  templates, with the exception of ruleSetPropertyRef_text. we cannot set this attribute
+
 October 18, 2006
 
 * moved resetStateNumbersToBeContiguous() to after issuing of warnings;

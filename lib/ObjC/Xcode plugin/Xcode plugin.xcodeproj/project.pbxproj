@@ -17,7 +17,7 @@
 		F770F43E0AD310A9003EF8FB /* DevToolsSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F770F43D0AD310A9003EF8FB /* DevToolsSupport.framework */; };
 		F794E92C0ACF38D900E06CD7 /* antlr.xcbuildrules in Resources */ = {isa = PBXBuildFile; fileRef = F71CBB800ACF2E2900088951 /* antlr.xcbuildrules */; };
 		F794E92D0ACF38DA00E06CD7 /* antlr.pbcompspec in Resources */ = {isa = PBXBuildFile; fileRef = F71CBB750ACF286100088951 /* antlr.pbcompspec */; };
-		F7EAB83A0AE40FF00056465F /* GrammarFilterLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7AC63940AD0172A00BD7A06 /* GrammarFilterLexer.m */; };
+		F7D1DEE20AEBC81D003563F0 /* GrammarFilterLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7AC63940AD0172A00BD7A06 /* GrammarFilterLexer.m */; };
 		F7FBB9A60AD00B9D00497048 /* ANTLR.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = F7FBB9510AD00A9400497048 /* ANTLR.framework */; };
 		F7FBBA700AD00FD100497048 /* ANTLRXCPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = F7FBBA6E0AD00FD100497048 /* ANTLRXCPlugin.m */; };
 /* End PBXBuildFile section */
@@ -137,6 +137,17 @@
 		F7AC63920AD0172A00BD7A06 /* GrammarFilter.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GrammarFilter.tokens; sourceTree = "<group>"; };
 		F7AC63930AD0172A00BD7A06 /* GrammarFilterLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GrammarFilterLexer.h; sourceTree = "<group>"; };
 		F7AC63940AD0172A00BD7A06 /* GrammarFilterLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GrammarFilterLexer.m; sourceTree = "<group>"; };
+		F7BCC9150AEB106800CB336F /* Grammar.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Grammar.g; sourceTree = "<group>"; };
+		F7BCC91B0AEB1E0300CB336F /* ANTLRGrammar.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ANTLRGrammar.g; sourceTree = "<group>"; };
+		F7BCC94D0AEB1F5900CB336F /* ANTLRGrammar.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ANTLRGrammar.tokens; sourceTree = "<group>"; };
+		F7BCC94E0AEB1F5900CB336F /* ANTLRGrammarLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRGrammarLexer.h; sourceTree = "<group>"; };
+		F7BCC94F0AEB1F5900CB336F /* ANTLRGrammarLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRGrammarLexer.m; sourceTree = "<group>"; };
+		F7BCC9500AEB1F5900CB336F /* ANTLRGrammarParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRGrammarParser.h; sourceTree = "<group>"; };
+		F7BCC9510AEB1F5900CB336F /* ANTLRGrammarParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRGrammarParser.m; sourceTree = "<group>"; };
+		F7C141C80AEAE2A000A2228F /* ANTLRGrammarSourceScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRGrammarSourceScanner.h; sourceTree = "<group>"; };
+		F7C141C90AEAE2A000A2228F /* ANTLRGrammarSourceScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRGrammarSourceScanner.m; sourceTree = "<group>"; };
+		F7C141CD0AEAE2CE00A2228F /* ANTLRGrammarSourceLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRGrammarSourceLexer.h; sourceTree = "<group>"; };
+		F7C141CE0AEAE2CE00A2228F /* ANTLRGrammarSourceLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRGrammarSourceLexer.m; sourceTree = "<group>"; };
 		F7C6F9390AD5828F005F4794 /* ScannerLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScannerLexer.h; sourceTree = "<group>"; };
 		F7FBB9390AD00A9400497048 /* ANTLR.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ANTLR.xcodeproj; path = ../Framework/ANTLR.xcodeproj; sourceTree = SOURCE_ROOT; };
 		F7FBBA6D0AD00FD100497048 /* ANTLRXCPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRXCPlugin.h; sourceTree = "<group>"; };
@@ -197,6 +208,7 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				F7C141CC0AEAE2AA00A2228F /* Syntax Highlighting */,
 				F7AC63540AD010C400BD7A06 /* Grammar Inspection */,
 				F71CBB680ACEF5E800088951 /* ANTLRCompilerSpecification.h */,
 				F71CBB690ACEF5E800088951 /* ANTLRCompilerSpecification.m */,
@@ -265,6 +277,24 @@
 				F7AC63580AD0112000BD7A06 /* GrammarFilter.g */,
 			);
 			name = "Grammar Inspection";
+			sourceTree = "<group>";
+		};
+		F7C141CC0AEAE2AA00A2228F /* Syntax Highlighting */ = {
+			isa = PBXGroup;
+			children = (
+				F7BCC94D0AEB1F5900CB336F /* ANTLRGrammar.tokens */,
+				F7BCC94E0AEB1F5900CB336F /* ANTLRGrammarLexer.h */,
+				F7BCC94F0AEB1F5900CB336F /* ANTLRGrammarLexer.m */,
+				F7BCC9500AEB1F5900CB336F /* ANTLRGrammarParser.h */,
+				F7BCC9510AEB1F5900CB336F /* ANTLRGrammarParser.m */,
+				F7C141C80AEAE2A000A2228F /* ANTLRGrammarSourceScanner.h */,
+				F7C141C90AEAE2A000A2228F /* ANTLRGrammarSourceScanner.m */,
+				F7C141CD0AEAE2CE00A2228F /* ANTLRGrammarSourceLexer.h */,
+				F7C141CE0AEAE2CE00A2228F /* ANTLRGrammarSourceLexer.m */,
+				F7BCC9150AEB106800CB336F /* Grammar.g */,
+				F7BCC91B0AEB1E0300CB336F /* ANTLRGrammar.g */,
+			);
+			name = "Syntax Highlighting";
 			sourceTree = "<group>";
 		};
 		F7FBB93A0AD00A9400497048 /* Products */ = {
@@ -423,7 +453,7 @@
 			files = (
 				F71CBB6A0ACEF5E800088951 /* ANTLRCompilerSpecification.m in Sources */,
 				F7FBBA700AD00FD100497048 /* ANTLRXCPlugin.m in Sources */,
-				F7EAB83A0AE40FF00056465F /* GrammarFilterLexer.m in Sources */,
+				F7D1DEE20AEBC81D003563F0 /* GrammarFilterLexer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

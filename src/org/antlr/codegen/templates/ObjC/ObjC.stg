@@ -239,14 +239,18 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 #pragma mark Tokens
 <tokens:{#define <name>_<it.name>	<it.type>}; separator="\n">
 
-#pragma mark Dynamic Scopes
+#pragma mark Dynamic Global Scopes
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDecl(scope=it)><endif>}>
 
-#pragma mark Rule return scopes start
+#pragma mark Dynamic Rule Scopes
+<rules:{rule |
+<rule.ruleDescriptor.ruleScope:ruleAttributeScopeDecl(scope=it)>
+}>
+
+#pragma mark Rule Return Scopes
 <rules:{rule |
 <rule.ruleDescriptor:returnScopeInterface(ruleDescriptor=rule.ruleDescriptor)>
 }>
-#pragma mark Rule return scopes end
 
 
 @interface <className()> : <@superClassName><superClass><@end> {
@@ -254,7 +258,9 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 	<cyclicDFAs:{dfa | <name>DFA<dfa.decisionNumber> *dfa<dfa.decisionNumber>;}; separator="\n">
 	<synpreds:{p | SEL <p>SyntacticPredicate;}; separator="\n">
 	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeIVar(scope=it)><endif>}>
-
+	<rules:{rule |
+	<rule.ruleDescriptor.ruleScope:ruleAttributeScopeIVar(scope=it)>
+	}>
 	<@ivars()>
 
 	<actions.parser.ivars>
@@ -282,8 +288,13 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 #pragma mark Bitsets
 <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
 
-#pragma mark Scopes
+#pragma mark Dynamic Global Scopes
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeImpl(scope=it)><endif>}>
+
+#pragma mark Dynamic Rule Scopes
+<rules:{rule |
+<rule.ruleDescriptor.ruleScope:ruleAttributeScopeImpl(scope=it)>
+}>
 
 #pragma mark Rule return scopes start
 <rules:{rule |
@@ -312,6 +323,9 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 <endif>
 		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
 		<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeInit(scope=it)><endif>}>
+		<rules:{rule |
+		<rule.ruleDescriptor.ruleScope:ruleAttributeScopeInit(scope=it)>
+		}>
 		<actions.parser.init>
 		<@init()>
 	}
@@ -393,7 +407,7 @@ lexerSynpred(name) ::= <<
 
 ruleMemoization(name) ::= <<
 <if(memoize)>
-if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { return <ruleReturnValue()>; }
+if ( backtracking>0 && [self alreadyParsedRule:input ruleIndex:<ruleDescriptor.index>] ) { return <ruleReturnValue()>; }
 <endif>
 >>
 
@@ -402,8 +416,6 @@ if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { retu
  *  The return type aggregates are declared in the header file (headerFile template)
  */
 rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions, memoize) ::= <<
-<ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
-
 // $ANTLR start <ruleName>
 // <fileName>:<description>
 - (<returnType()>) <ruleName><ruleDescriptor.parameterScope:parameterScope(scope=it)>
@@ -501,11 +513,11 @@ retval
 
 ruleCleanUp() ::= <<
 // token labels
-<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]:{[<it.label.text> release];}; separator="\n">
+<[ruleDescriptor.tokenLabels]:{[<it.label.text> release];}; separator="\n">
 // token+rule list labels
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]:{[list_<it.label.text> release];}; separator="\n">
 // rule labels
-<[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]:{[<it.label.text> release];}; separator="\n">
+<[ruleDescriptor.ruleLabels]:{[<it.label.text> release];}; separator="\n">
 // rule refs in alts with rewrites
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
 	:{[list_<it> release];}; separator="\n">
@@ -526,8 +538,6 @@ if ( backtracking>0 ) { [self memoize:input ruleIndex:<ruleDescriptor.index> sta
  *  fragment rules.
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block, memoize) ::= <<
-
-<ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 
 - (void) m<ruleName><if(ruleDescriptor.parameterScope)><ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>
 {
@@ -712,7 +722,8 @@ element() ::= <<
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
-<label>=(<labelType>)[input LT:1];<\n>
+<label>=(<labelType>)[input LT:1];
+[<label> retain];<\n>
 <endif>
 [self match:input tokenType:<token> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <checkRuleBacktrackFailure()>
 >>
@@ -755,7 +766,7 @@ if (<s>) {
 <endif>
 	<if(backtracking)>failed = NO;<endif>
 } else {
-	<checkRuleBacktrackFailure()>
+	<ruleBacktrackFailure()>
 	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
 <if(LEXER)>
 	[self recover:mse];
@@ -838,6 +849,7 @@ int <label>Start = [self charIndex];
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
 <checkRuleBacktrackFailure()><\n>
 <label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:<label>Start stop:[self charIndex]];
+[<label> setLine:[self line]];
 <else>
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
 <checkRuleBacktrackFailure()><\n>
@@ -846,13 +858,15 @@ int <label>Start = [self charIndex];
 
 /** EOF in the lexer */
 lexerMatchEOF(label) ::= <<
-#warning ObjCify!
 <if(label)>
-int <label>Start = getCharIndex();
-match(EOF); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+int <label>Start = [self charIndex];
+[self matchChar:ANTLRCharStreamEOF];
+<checkRuleBacktrackFailure()><\n>
+<labelType> <label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeEOF channel:ANTLRTokenChannelDefault start:<label>Start stop:[self charIndex]];
+[<label> setLine:[self line]];
 <else>
-match(EOF); <checkRuleBacktrackFailure()>
+[self matchChar:ANTLRCharStreamEOF];
+<checkRuleBacktrackFailure()><\n>
 <endif>
 >>
 
@@ -878,7 +892,7 @@ if ( [input LA:1] == ANTLRTokenTypeDOWN ) {
 validateSemanticPredicate(pred,description) ::= <<
 if ( !(<evalPredicate(...)>) ) {
     <ruleBacktrackFailure()>
-    @throw [ANTLRFailedPredicateException exceptionWithRuleName:@"<ruleName>" reason:@"<description>" stream:input];
+    @throw [ANTLRFailedPredicateException exceptionWithRuleName:@"<ruleName>" predicate:@"<description>" stream:input];
 }
 >>
 
@@ -1137,15 +1151,6 @@ setTest(ranges) ::= "<ranges; separator=\"||\">"
 
 // A T T R I B U T E S
 
-globalAttributeScope(scope) ::= <<
-<if(scope.attributes)>
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
-<endif>
->>
-
 globalAttributeScopeDecl(scope) ::= <<
 @interface <name>_<scope.name>_scope : NSObject {
 	<scope.attributes:{<it.decl>;}; separator="\n">
@@ -1171,22 +1176,14 @@ globalAttributeScopeDealloc(scope) ::= <<
 [<name>_<scope.name>_stack release];
 >>
 
-
-ruleAttributeScope(scope) ::= <<
-<if(scope.attributes)>
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
-<endif>
->>
-
 ruleAttributeScopeDecl(scope) ::= <<
+<if(scope.attributes)>
 @interface <name>_<scope.name>_scope : NSObject {
 	<scope.attributes:{<it.decl>;}; separator="\n">
 }
 // use KVC to access attributes!
 @end
+<endif>
 >>
 
 ruleAttributeScopeIVar(scope) ::= <<
@@ -1194,8 +1191,10 @@ NSMutableArray *<name>_<scope.name>_stack;
 >>
 
 ruleAttributeScopeImpl(scope) ::= <<
+<if(scope.attributes)>
 @implementation <name>_<scope.name>_scope
 @end
+<endif>
 >>
 
 ruleAttributeScopeInit(scope) ::= <<
@@ -1285,30 +1284,24 @@ parameterScope(scope) ::= <<
 <scope.attributes:{:(<it.type>)<it.name>}; separator=" ">
 >>
 
-/** Used in codegen.g to translate $x.y references.
- *  I could have left actions as StringTemplates to be inserted in
- *  the output (so they could use attributes inherited from surrounding
- *  templates), but really wanted to pass in AttributeScope and Attribute
- *  objects so this translation could query them.  So, translation of
- *  $x.y to executable code occurs before recognizerST.toString() occurs.
- *  I.e., actions are just text strings during final code generation.
-globalAttributeRef(scope,attr) ::= <<
-[[(<scope>)<name>_<scope>_stack lastObject] valueForKey:@"<attr.name>"]
->>
- */
-
 parameterAttributeRef(attr) ::= "<attr.name>"
 
-scopeAttributeRef(scope,attr,index,negIndex) ::= <<
-#warning TODO scopes
+scopeAttributeRef(scope,attr,rhs,index,negIndex) ::= <<
+[<scopeAttributeRefStack()> valueForKey:@"<attr.name>"]
+>>
+
+scopeSetAttributeRef(scope,attr,expr,index,negIndex) :: <<
+[<scopeAttributeRefStack()> setValue:<expr> forKey:@"<attr.name>"];
+>>
+
+scopeAttributeRefStack() ::= <<
 <if(negIndex)>
-[[<name>_<scope>_stack objectAtIndex:[<name>_<scope>_stack count]<negIndex>-1] valueForKey:@"<attr.name>"]
-((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()<negIndex>-1)).<attr.name>
+[<name>_<scope>_stack objectAtIndex:[<name>_<scope>_stack count]<negIndex>-1]
 <else>
 <if(index)>
-[[<name>_<scope>_stack objectAtIndex:<index>] valueForKey:@"<attr.name>"]
+[<name>_<scope>_stack objectAtIndex:<index>]
 <else>
-[[<name>_<scope>_stack lastObject] valueForKey:@"<attr.name>"]
+[<name>_<scope>_stack lastObject]
 <endif>
 <endif>
 >>
@@ -1336,6 +1329,13 @@ returnAttributeRef(ruleDescriptor,attr) ::= <<
 <endif>
 >>
 
+returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
+<if(ruleDescriptor.hasMultipleReturnValues)>
+[retval setValue:<expr> forKey:@"<attr.name>"];
+<else>
+<attr.name> =<expr>;
+<endif>
+>>
 /** How to translate $tokenLabel */
 tokenLabelRef(label) ::= "<label>"
 
@@ -1376,6 +1376,12 @@ rulePropertyRef_stop(scope,attr) ::= "[retval stop]"
 rulePropertyRef_tree(scope,attr) ::= "[retval tree]"
 rulePropertyRef_text(scope,attr) ::= "[input substringWithRange:NSMakeRange(start, [input index]-start)]"
 rulePropertyRef_st(scope,attr) ::= "[retval st]"
+
+ruleSetPropertyRef_start(scope,attr,expr) ::= "[retval setValue:<expr> forKey:@\"start\"]"
+ruleSetPropertyRef_stop(scope,attr,expr) ::= "[retval setValue:<expr> forKey:@\"stop\"]"
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "[retval setValue:<expr> forKey:@\"tree\"]"
+//ruleSetPropertyRef_text(scope,attr,expr) ::= "[input substringWithRange:NSMakeRange(start, [input index]-start)]"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "<\n>#error StringTemplates are unsupported<\n>"
 
 
 /** How to execute an action */
