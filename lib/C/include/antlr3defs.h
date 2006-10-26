@@ -168,6 +168,10 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 # endif
 #endif
 
+#ifdef  HAVE_CTYPE_H
+# include   <ctype.h>
+#endif
+
 /* Some platforms define a macro, index() in string.h. AIX is
  * one of these for instance. We must get rid of that definition
  * as we use ->index all over the place. definig macros like this in system header

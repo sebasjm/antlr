@@ -47,8 +47,7 @@ AM_INIT_AUTOMAKE(gnu)
 AC_LANG(C)
 AC_PROG_CC([xlc aCC gcc cc])
 # Checks for programs.
-echo "Compiler base seesm to be $cc_basename"
-AC_MSG_CHECKING([Compiler flags required for compiling ANTLR with $CC C compiler])
+AC_MSG_CHECKING([compiler flags required for compiling ANTLR with $CC C compiler])
 
 case $CC in
 xlc*)
@@ -104,7 +103,7 @@ AC_PROG_MAKE_SET
 
 # Checks for header files.
 AC_INCLUDES_DEFAULT()
-AC_CHECK_HEADERS([malloc.h sys/malloc.h stdarg.h sys/stat.h])
+AC_CHECK_HEADERS([malloc.h sys/malloc.h stdarg.h sys/stat.h ctype.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
