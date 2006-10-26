@@ -46,7 +46,10 @@ AC_ARG_ENABLE([64bit],
 AM_INIT_AUTOMAKE(gnu)
 AC_LANG(C)
 AC_PROG_CC([xlc aCC gcc cc])
+
+OBJECT_MODE=
 # Checks for programs.
+AC_SUBST([OBJECT_MODE])
 AC_MSG_CHECKING([compiler flags required for compiling ANTLR with $CC C compiler])
 
 case $CC in
@@ -54,6 +57,7 @@ xlc*)
  CPPCMNTFLAGS="-qcpluscmt"
  if test "$BIT64" = 1; then
   CCFLAGS64="-q64 -Wl,-b64"
+  OBJECT_MODE="64"
  fi
  OPTIMFLAGS="-O2"
  if test "$DEBUGINF" = 1; then
@@ -92,6 +96,8 @@ esac
 
 CFLAGS="$CCFLAGS64 $CPPCMNTFLAGS $OPTIMFLAGS $DEBUGFLAGS"
 AC_MSG_RESULT([$CFLAGS])
+
+
 AM_MAINTAINER_MODE
 AM_PROG_LIBTOOL
 

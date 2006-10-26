@@ -65,3 +65,5 @@ EXTRA_DIST = 	vs2005/rulefiles/antlr3.rules	\
 			 	C.sln C.vcproj C.vcproj.vspscc	\
 				C.vssscc
 
+export OBJECT_MODE
+
