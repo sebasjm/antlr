@@ -53,7 +53,7 @@ case $CC in
 xlc*)
  CPPCMNTFLAGS="-qcpluscmt"
  if test "$BIT64" = 1; then
-  CCFLAGS64="-q64"
+  CCFLAGS64="-q64 -Wl,-b64"
  fi
  OPTIMFLAGS="-O2"
  if test "$DEBUGINF" = 1; then
