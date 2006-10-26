@@ -279,6 +279,9 @@ CHANGES
 
 October 26, 2006
 
+* Fixed bug where EOT transitions led to no NFA configs in a DFA state,
+  yielding an error in DFA table generation.
+
 * renamed action.g to ActionTranslator.g
   the ActionTranslator class is now called ActionTranslatorLexer, as ANTLR
   generates this classname now. Fixed rest of codebase accordingly.

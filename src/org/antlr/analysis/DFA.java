@@ -262,10 +262,10 @@ public class DFA {
 			// all numbers are unique already; no states are thrown out.
 			return;
 		}
-		/*
-		if ( decisionNumber==46 ) {
+        /*
+        if ( decisionNumber==14 ) {
 			System.out.println("DFA :"+decisionNumber+" "+this);
-			System.out.println("DFA start state :"+startState);
+            //System.out.println("DFA start state :"+startState);
 			System.out.println("unique state numbers: ");
 			Set s = getUniqueStates().keySet();
 			for (Iterator it = s.iterator(); it.hasNext();) {
@@ -278,7 +278,9 @@ public class DFA {
 			System.out.println("continguous states: ");
 			for (Iterator it = states.iterator(); it.hasNext();) {
 				DFAState d = (DFAState) it.next();
-				System.out.print(d.stateNumber+" ");
+				if ( d!=null ) {
+                    System.out.print(d.stateNumber+" ");
+                }
 			}
 			System.out.println();
 
@@ -287,7 +289,10 @@ public class DFA {
 			System.out.println("unique set from states table: ");
 			for (int i = 0; i <= getMaxStateNumber(); i++) {
 				DFAState d = getState(i);
-				boolean found=false;
+                if ( d==null ) {
+                    continue;
+                }
+                boolean found=false;
 				for (int j=0; j<a.size(); j++) {
 					DFAState old = (DFAState)a.get(j);
 					if ( old.equals(d) ) {
@@ -303,8 +308,10 @@ public class DFA {
 			}
 			for (Iterator it = a.iterator(); it.hasNext();) {
 				DFAState d = (DFAState) it.next();
-				System.out.print(d.stateNumber+" ");
-			}
+                if ( d!=null ) {
+                    System.out.print(d.stateNumber+" ");
+                }
+            }
 			System.out.println();
 			System.out.println("size="+a.size());
 
@@ -316,18 +323,18 @@ public class DFA {
 			}
 			System.out.println("stateCounter="+stateCounter);
 		}
-		*/
+        */
 
-		// walk list of DFAState objects by state number,
+        // walk list of DFAState objects by state number,
 		// setting state numbers to 0..n-1
 		int snum=0;
 		for (int i = 0; i <= getMaxStateNumber(); i++) {
 			DFAState s = getState(i);
-			/*
-			// some states are unused after creation most commonly due to cycles,
-			// only deal with states in uniqueStates
-			boolean valid = getUniqueStates().containsValue(s);
-			*/
+            // some states are unused after creation most commonly due to cycles
+            // or conflict resolution.
+            if ( s==null ) {
+                continue;
+            }
 			// state i is mapped to DFAState with state number set to i originally
 			// so if it's less than i, then we renumbered it already; that
 			// happens when states have been merged or cycles occurred I think.
@@ -335,16 +342,15 @@ public class DFA {
 			// states[103] might also point at this same DFAState.  Since
 			// 50 < 103 then it's already been renumbered as it points downwards.
 			boolean alreadyRenumbered = s.stateNumber<i;
-			//if ( valid && !alreadyRenumbered ) {
 			if ( !alreadyRenumbered ) {
 				// state i is a valid state, reset it's state number
 				s.stateNumber = snum; // rewrite state numbers to be 0..n-1
 				snum++;
 			}
 		}
-		/*
-		if ( decisionNumber==46 ) {
-			System.out.println("max state num: "+maxStateNumber);
+        /*
+        if ( decisionNumber==14 ) {
+			//System.out.println("max state num: "+maxStateNumber);
 			System.out.println("after renum, DFA :"+decisionNumber+" "+this);
 			System.out.println("uniq states.size="+uniqueStates.size());
 
@@ -356,13 +362,15 @@ public class DFA {
 			}
 			for (Iterator it = a.iterator(); it.hasNext();) {
 				DFAState d = (DFAState) it.next();
-				System.out.print(d.stateNumber+" ");
+				if ( d!=null ) {
+                    System.out.print(d.stateNumber+" ");
+                }
 			}
 			System.out.println();
 			System.out.println("size="+a.size());
 		}
-*/
-		if ( snum!=getNumberOfStates() ) {
+        */
+        if ( snum!=getNumberOfStates() ) {
 			ErrorManager.internalError("DFA "+decisionNumber+": "+
 				decisionNFAStartState.getDescription()+" num unique states "+getNumberOfStates()+
 				"!= num renumbered states "+snum);
@@ -727,7 +735,11 @@ public class DFA {
 	 *  indicates it's a new state.
      */
     protected DFAState addState(DFAState d) {
-		//System.out.println("addState: "+d);
+		/*
+		if ( decisionNumber==14 ) {
+            System.out.println("addState: "+d.stateNumber);
+        }
+        */
 		if ( getUserMaxLookahead()>0 ) {
 			return d;
 		}
@@ -735,7 +747,11 @@ public class DFA {
 		// except its state number?
 		DFAState existing = (DFAState)uniqueStates.get(d);
 		if ( existing != null ) {
-			// already there...get the existing DFA state
+            /*
+            System.out.println("state "+d.stateNumber+" exists as state "+
+                existing.stateNumber);
+                */
+            // already there...get the existing DFA state
 			return existing;
 		}
 

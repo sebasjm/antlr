@@ -254,13 +254,14 @@ public class NFAToDFAConverter {
 				System.out.println("DFA state after reach "+d+"-" +
 								   label.toString(dfa.nfa.grammar)+"->"+t);
 			}
-			if ( t.getNFAConfigurations().size()==0 ) {
-				// nothing was reached by label due to conflict resolution
+			//if ( t.getNFAConfigurations().size()==0 ) {
+            if ( t==null ) {
+                // nothing was reached by label due to conflict resolution
 				// EOT also seems to be in here occasionally probably due
 				// to an end-of-rule state seeing it even though we'll pop
 				// an invoking state off the state; don't bother to conflict
 				// as this labels set is a covering approximation only.
-				continue;
+                continue;
 			}
 			if ( t.getUniqueAlt()==NFA.INVALID_ALT_NUMBER ) {
 				// Only compute closure if a unique alt number is not known.
@@ -873,14 +874,19 @@ public class NFAToDFAConverter {
 			if ( matched ) {
 				// found a transition with label;
 				// add NFA target to (potentially) new DFA state
-				labelDFATarget.addNFAConfiguration(
+                labelDFATarget.addNFAConfiguration(
 					(NFAState)edge.target,
 					c.alt,
 					c.context,
 					c.semanticContext);
 			}
 		}
-		return labelDFATarget;
+        if ( labelDFATarget.getNFAConfigurations().size()==0 ) {
+            // kill; it's empty
+            dfa.setState(labelDFATarget.stateNumber, null);
+            labelDFATarget = null;
+        }
+        return labelDFATarget;
 	}
 
 	/** Walk the configurations of this DFA state d looking for the
@@ -1167,7 +1173,13 @@ public class NFAToDFAConverter {
 		// created in NFAFactory.build_EOFState
 		NFAConfiguration anyConfig;
 		Iterator itr = d.nfaConfigurations.iterator();
-		anyConfig = (NFAConfiguration)itr.next();
+        /*
+        if ( !itr.hasNext() ) {
+            System.err.println("what? DFA "+d.dfa.decisionNumber+
+                    " state "+d.stateNumber+" has no configs");
+        }
+        */
+        anyConfig = (NFAConfiguration)itr.next();
 		NFAState anyState = dfa.nfa.getState(anyConfig.state);
 		// if d is target of EOT and more than one predicted alt
 		// indicate that d is nondeterministic on all alts otherwise
