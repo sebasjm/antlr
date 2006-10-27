@@ -277,6 +277,11 @@ CHANGES
 
 3.0b5 - ??
 
+October 27, 2006
+
+* Altered how ANTLR figures out what decision is associated with which
+  block of grammar.  Makes ANTLRWorks correctly find DFA for a block.
+
 October 26, 2006
 
 * Fixed bug where EOT transitions led to no NFA configs in a DFA state,

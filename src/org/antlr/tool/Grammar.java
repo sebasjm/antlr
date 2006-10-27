@@ -844,7 +844,7 @@ public class Grammar {
 		setLookaheadDFA(decision, lookaheadDFA);
 
 		// create map from line:col to decision DFA (for ANTLRWorks)
-		GrammarAST decisionAST = lookaheadDFA.getDecisionASTNode();
+		GrammarAST decisionAST = nfa.grammar.getDecisionBlockAST(lookaheadDFA.decisionNumber);
 		int line = decisionAST.getLine();
 		int col = decisionAST.getColumn();
 		lineColumnToLookaheadDFAMap.put(new StringBuffer().append(line + ":")
@@ -1995,6 +1995,10 @@ public class Grammar {
 		for(Iterator iter = lineColumnToLookaheadDFAMap.keySet().iterator();
 			iter.hasNext(); ) {
 			String key = (String)iter.next();
+
+			DFA v = (DFA)lineColumnToLookaheadDFAMap.get(key);
+			 System.out.println(key+"=>DFA"+v.decisionNumber);
+
 			if(key.startsWith(prefix)) {
 				columns.add(Integer.valueOf(key.substring(prefix.length())));
 			}
@@ -2071,6 +2075,7 @@ public class Grammar {
 	}
 
 	public void setDecisionBlockAST(int decision, GrammarAST blockAST) {
+		System.out.println("setDecisionBlockAST("+decision+", "+blockAST.token);
 		Decision d = createDecision(decision);
 		d.blockAST = blockAST;
 	}
