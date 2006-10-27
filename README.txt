@@ -294,6 +294,11 @@ October 26, 2006
   namely: scopeSetAttributeRef, returnSetAttributeRef and the ruleSetPropertyRef_*
   templates, with the exception of ruleSetPropertyRef_text. we cannot set this attribute
 
+October 19, 2006
+
+* Fixed 2 bugs in DFA conversion that caused exceptions.
+  altered functionality of getMinElement so it ignores elements<0.
+
 October 18, 2006
 
 * moved resetStateNumbersToBeContiguous() to after issuing of warnings;
