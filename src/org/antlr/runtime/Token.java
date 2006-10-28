@@ -68,7 +68,7 @@ public interface Token {
     public abstract int getLine();
     public abstract void setLine(int line);
 
-	/** The index of the character relative to the beginning of the line 0..n-1 */
+	/** The index of the first character relative to the beginning of the line 0..n-1 */
 	public abstract int getCharPositionInLine();
 	public abstract void setCharPositionInLine(int pos);
 
