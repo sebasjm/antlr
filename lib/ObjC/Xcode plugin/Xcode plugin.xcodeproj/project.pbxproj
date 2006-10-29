@@ -17,7 +17,7 @@
 		F770F43E0AD310A9003EF8FB /* DevToolsSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F770F43D0AD310A9003EF8FB /* DevToolsSupport.framework */; };
 		F794E92C0ACF38D900E06CD7 /* antlr.xcbuildrules in Resources */ = {isa = PBXBuildFile; fileRef = F71CBB800ACF2E2900088951 /* antlr.xcbuildrules */; };
 		F794E92D0ACF38DA00E06CD7 /* antlr.pbcompspec in Resources */ = {isa = PBXBuildFile; fileRef = F71CBB750ACF286100088951 /* antlr.pbcompspec */; };
-		F7D1DEE20AEBC81D003563F0 /* GrammarFilterLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7AC63940AD0172A00BD7A06 /* GrammarFilterLexer.m */; };
+		F7F224830AF4EE5F003A5133 /* GrammarFilter.g in Sources */ = {isa = PBXBuildFile; fileRef = F7AC63580AD0112000BD7A06 /* GrammarFilter.g */; };
 		F7FBB9A60AD00B9D00497048 /* ANTLR.framework in Copy Embedded Frameworks */ = {isa = PBXBuildFile; fileRef = F7FBB9510AD00A9400497048 /* ANTLR.framework */; };
 		F7FBBA700AD00FD100497048 /* ANTLRXCPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = F7FBBA6E0AD00FD100497048 /* ANTLRXCPlugin.m */; };
 /* End PBXBuildFile section */
@@ -453,7 +453,7 @@
 			files = (
 				F71CBB6A0ACEF5E800088951 /* ANTLRCompilerSpecification.m in Sources */,
 				F7FBBA700AD00FD100497048 /* ANTLRXCPlugin.m in Sources */,
-				F7D1DEE20AEBC81D003563F0 /* GrammarFilterLexer.m in Sources */,
+				F7F224830AF4EE5F003A5133 /* GrammarFilter.g in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
