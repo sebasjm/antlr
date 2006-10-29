@@ -207,31 +207,32 @@ SET_ENCLOSING_RULE_SCOPE_ATTR
 		StringTemplate st = null;
 		AttributeScope scope = enclosingRule.getLocalAttributeScope($y.text);
 		if ( scope.isPredefinedRuleScope ) {
-			if ( $y.text == "text") {
-				ErrorManager.grammarError(ErrorManager. MSG_WRITE_TO_READONLY_ATTR,
-										  grammar,
-										  actionToken,
-										  $x.text,
-										  $y.text);
-			} else {
+			if ( $y.text.equals("st") || $y.text.equals("tree") ) {
 				st = template("ruleSetPropertyRef_"+$y.text);
 				grammar.referenceRuleLabelPredefinedAttribute($x.text);
 				st.setAttribute("scope", $x.text);
 				st.setAttribute("attr", $y.text);
 				st.setAttribute("expr", translateAction($expr.text));
+			} else {
+				ErrorManager.grammarError(ErrorManager.MSG_WRITE_TO_READONLY_ATTR,
+										  grammar,
+										  actionToken,
+										  $x.text,
+										  $y.text);
 			}
 		}
 	    else if ( scope.isPredefinedLexerRuleScope ) {
-	    	// perhaps not the most precise error message to use, but...
-			ErrorManager.grammarError(ErrorManager.MSG_RULE_HAS_NO_ARGS,
+	    	// this is a better message to emit than the previous one...
+			ErrorManager.grammarError(ErrorManager.MSG_WRITE_TO_READONLY_ATTR,
 									  grammar,
 									  actionToken,
-									  $x.text);
+									  $x.text,
+									  $y.text);
 	    }
 		else if ( scope.isParameterScope ) {
-			// TODO: do we want to support write access to parameter scope?
-			st = template("parameterAttributeRef");
+			st = template("parameterSetAttributeRef");
 			st.setAttribute("attr", scope.getAttribute($y.text));
+			st.setAttribute("expr", translateAction($expr.text));
 		}
 		else { // must be return value
 			st = template("returnSetAttributeRef");
@@ -274,6 +275,22 @@ ENCLOSING_RULE_SCOPE_ATTR
 		}
 	;
 
+/** Setting $tokenlabel.attr or $tokenref.attr where attr is predefined property of a token is an error. */
+SET_TOKEN_SCOPE_ATTR
+	:	'$' x=ID '.' y=ID WS? '='
+							 {enclosingRule!=null &&
+	                         (enclosingRule.getTokenLabel($x.text)!=null||
+	                          isTokenRefInAlt($x.text)) &&
+	                         AttributeScope.tokenScope.getAttribute($y.text)!=null}?
+		//{System.out.println("found \$tokenlabel.attr or \$tokenref.attr");}
+		{
+		ErrorManager.grammarError(ErrorManager.MSG_WRITE_TO_READONLY_ATTR,
+								  grammar,
+								  actionToken,
+								  $x.text,
+								  $y.text);
+		}
+	;
 /** $tokenlabel.attr or $tokenref.attr where attr is predefined property of a token. */
 TOKEN_SCOPE_ATTR
 	:	'$' x=ID '.' y=ID	{enclosingRule!=null &&
@@ -298,6 +315,23 @@ TOKEN_SCOPE_ATTR
 		StringTemplate st = template("tokenLabelPropertyRef_"+$y.text);
 		st.setAttribute("scope", label);
 		st.setAttribute("attr", AttributeScope.tokenScope.getAttribute($y.text));
+		}
+	;
+
+/** Setting $rulelabel.attr or $ruleref.attr where attr is a predefined property is an error. */
+SET_RULE_SCOPE_ATTR
+@init {
+Grammar.LabelElementPair pair=null;
+String refdRuleName=null;
+}
+	:	'$' x=ID '.' y=ID WS? '=' {enclosingRule!=null}?
+		//{System.out.println("found \$rulelabel.attr or \$ruleref.attr: "+$x.text+"."+$y.text);}
+		{
+		ErrorManager.grammarError(ErrorManager.MSG_WRITE_TO_READONLY_ATTR,
+								  grammar,
+								  actionToken,
+								  $x.text,
+								  $y.text);
 		}
 	;
 
@@ -437,20 +471,30 @@ ISOLATED_LEXER_RULE_REF
  */
  SET_LOCAL_ATTR
  	:	'$' ID WS? '=' expr=ATTR_VALUE_EXPR ';' {enclosingRule!=null && enclosingRule.getLocalAttributeScope($ID.text)!=null}?
- 		// {System.out.println("found \$localattr");}
+ 		//{System.out.println("found \$localattr");}
  		{
  		StringTemplate st;
  		AttributeScope scope = enclosingRule.getLocalAttributeScope($ID.text);
  		if ( scope.isPredefinedRuleScope ) {
- 			st = template("ruleSetPropertyRef_"+$ID.text);
- 			grammar.referenceRuleLabelPredefinedAttribute(enclosingRule.name);
- 			st.setAttribute("scope", enclosingRule.name);
- 			st.setAttribute("attr", $ID.text);
- 			st.setAttribute("expr", translateAction($expr.text));
+ 			if ($ID.text.equals("tree") || $ID.text.equals("st")) {
+ 				st = template("ruleSetPropertyRef_"+$ID.text);
+ 				grammar.referenceRuleLabelPredefinedAttribute(enclosingRule.name);
+ 				st.setAttribute("scope", enclosingRule.name);
+ 				st.setAttribute("attr", $ID.text);
+ 				st.setAttribute("expr", translateAction($expr.text));
+ 			} else {
+				ErrorManager.grammarError(ErrorManager.MSG_WRITE_TO_READONLY_ATTR,
+										 grammar,
+										 actionToken,
+										 $ID.text,
+										 "");
+ 			}
+
  		}
  		else if ( scope.isParameterScope ) {
- 			st = template("parameterAttributeRef");
+ 			st = template("parameterSetAttributeRef");
  			st.setAttribute("attr", scope.getAttribute($ID.text));
+ 			st.setAttribute("expr", translateAction($expr.text));
  		}
  		else {
  			st = template("returnSetAttributeRef");

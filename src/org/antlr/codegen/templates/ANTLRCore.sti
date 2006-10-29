@@ -286,6 +286,7 @@ setTest(ranges);
 // A T T R I B U T E S
 
 parameterAttributeRef(attr);
+parameterSetAttributeRef(attr,expr);
 
 scopeAttributeRef(scope,attr,index,negIndex);
 scopeSetAttributeRef(scope,attr,expr,index,negIndex);
@@ -342,11 +343,7 @@ rulePropertyRef_tree(scope,attr);
 rulePropertyRef_text(scope,attr);
 rulePropertyRef_st(scope,attr);
 
-ruleSetPropertyRef_start(scope,attr,expr);
-ruleSetPropertyRef_stop(scope,attr,expr);
 ruleSetPropertyRef_tree(scope,attr,expr);
-// text cannot be set right now
-//ruleSetPropertyRef_text(scope,attr,expr);
 ruleSetPropertyRef_st(scope,attr,expr);
 
 /** How to execute an action */

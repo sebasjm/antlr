@@ -125,8 +125,8 @@ INVALID_RULE_SCOPE_ATTRIBUTE_REF(arg,arg2) ::=
 	"cannot access rule <arg>'s dynamically-scoped attribute: <arg2>"
 SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE(arg) ::=
 	"symbol <arg> conflicts with global dynamic scope with same name"
-WRITE_TO_READONLY_ATTR(arg) ::=
-	"cannot write to read only attribute: $<arg>::<arg2>"
+WRITE_TO_READONLY_ATTR(arg,arg2,arg3) ::=
+	"cannot write to read only attribute: $<arg><if(arg2)>.<arg2><endif>"
 LABEL_CONFLICTS_WITH_RULE(arg) ::=
 	"label <arg> conflicts with rule with same name"
 LABEL_CONFLICTS_WITH_TOKEN(arg) ::=

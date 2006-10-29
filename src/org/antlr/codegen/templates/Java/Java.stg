@@ -1051,6 +1051,7 @@ globalAttributeRef(scope,attr) ::= <<
  */
 
 parameterAttributeRef(attr) ::= "<attr.name>"
+parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
@@ -1101,9 +1102,9 @@ retval.<attr.name>
 
 returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval.<attr.name> = <expr>;
+retval.<attr.name> =<expr>;
 <else>
-<attr.name> = <expr>;
+<attr.name> =<expr>;
 <endif>
 >>
 
@@ -1148,11 +1149,8 @@ rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)retval.tree)"
 rulePropertyRef_text(scope,attr) ::= "input.toString(retval.start,input.LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
-ruleSetPropertyRef_start(scope,attr,expr) ::= "retval.start =<expr>;"
-ruleSetPropertyRef_stop(scope,attr,expr) ::= "retval.stop =<expr>;"
+// setting $st and $tree is allowed in local rule. everything else is flagged as error
 ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree =<expr>;"
-// this should probably be illegal. flag as error in ActionTranslatorLexer for now. kay
-//ruleSetPropertyRef_text(scope,attr,expr) ::= "input.toString(retval.start,input.LT(-1))"
 ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st =<expr>;"
 
 
