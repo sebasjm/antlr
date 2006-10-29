@@ -277,6 +277,14 @@ CHANGES
 
 3.0b5 - ??
 
+October 29, 2006
+
+* Altered ActionTranslator to emit errors on setting read-only attributes
+  such as $start, $stop, $text in a rule. Also forbid setting any attributes
+  in rules/tokens referenced by a label or name.
+  Setting dynamic scopes's attributes and your own parameter attributes
+  is legal.
+
 October 27, 2006
 
 * Altered how ANTLR figures out what decision is associated with which
