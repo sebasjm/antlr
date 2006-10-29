@@ -2075,7 +2075,7 @@ public class Grammar {
 	}
 
 	public void setDecisionBlockAST(int decision, GrammarAST blockAST) {
-		System.out.println("setDecisionBlockAST("+decision+", "+blockAST.token);
+		//System.out.println("setDecisionBlockAST("+decision+", "+blockAST.token);
 		Decision d = createDecision(decision);
 		d.blockAST = blockAST;
 	}
