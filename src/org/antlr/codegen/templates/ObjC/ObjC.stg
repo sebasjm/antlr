@@ -1285,6 +1285,7 @@ parameterScope(scope) ::= <<
 >>
 
 parameterAttributeRef(attr) ::= "<attr.name>"
+parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,rhs,index,negIndex) ::= <<
 [<scopeAttributeRefStack()> valueForKey:@"<attr.name>"]
@@ -1377,10 +1378,7 @@ rulePropertyRef_tree(scope,attr) ::= "[retval tree]"
 rulePropertyRef_text(scope,attr) ::= "[input substringWithRange:NSMakeRange(start, [input index]-start)]"
 rulePropertyRef_st(scope,attr) ::= "[retval st]"
 
-ruleSetPropertyRef_start(scope,attr,expr) ::= "[retval setValue:<expr> forKey:@\"start\"]"
-ruleSetPropertyRef_stop(scope,attr,expr) ::= "[retval setValue:<expr> forKey:@\"stop\"]"
-ruleSetPropertyRef_tree(scope,attr,expr) ::= "[retval setValue:<expr> forKey:@\"tree\"]"
-//ruleSetPropertyRef_text(scope,attr,expr) ::= "[input substringWithRange:NSMakeRange(start, [input index]-start)]"
+uleSetPropertyRef_tree(scope,attr,expr) ::= "[retval setValue:<expr> forKey:@\"tree\"]"
 ruleSetPropertyRef_st(scope,attr,expr) ::= "<\n>#error StringTemplates are unsupported<\n>"
 
 
