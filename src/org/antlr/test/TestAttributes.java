@@ -2677,20 +2677,20 @@ public class TestAttributes extends BaseTest {
 
 	public void testAssignToTreeNodeAttribute() throws Exception {
 		String action = "$tree.scope = localScope;";
-		String expecting = "((MantraAST)retval.tree).scope = localScope;";
+		String expecting = "(()retval.tree).scope = localScope;";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar a;\n" +
 			"options { output=AST; }" +
-			"rule returns\n" +
+			"rule\n" +
 			"@init {\n" +
 			"   Scope localScope=null;\n" +
 			"}\n" +
 			"@finally {\n" +
 			"   $tree.scope = localScope;\n" +
 			"}\n" +
-			"   : 'a'\n" +
+			"   : 'a' -> ^('a')\n" +
 			";");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
