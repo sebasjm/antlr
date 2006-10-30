@@ -318,14 +318,30 @@ TOKEN_SCOPE_ATTR
 		}
 	;
 
-/** Setting $rulelabel.attr or $ruleref.attr where attr is a predefined property is an error. */
+/** Setting $rulelabel.attr or $ruleref.attr where attr is a predefined property is an error
+ *  This must also fail, if we try to access a local attribute's field, like $tree.scope = localObject
+ *  That must be handled by LOCAL_ATTR below. ANTLR only concerns itself with the top-level scope
+ *  attributes declared in scope {} or parameters, return values and the like.
+ */
 SET_RULE_SCOPE_ATTR
 @init {
 Grammar.LabelElementPair pair=null;
 String refdRuleName=null;
 }
 	:	'$' x=ID '.' y=ID WS? '=' {enclosingRule!=null}?
-		//{System.out.println("found \$rulelabel.attr or \$ruleref.attr: "+$x.text+"."+$y.text);}
+		{
+		pair = enclosingRule.getRuleLabel($x.text);
+		refdRuleName = $x.text;
+		if ( pair!=null ) {
+			refdRuleName = pair.referencedRuleName;
+		}
+		}
+		// supercomplicated because I can't exec the above action.
+		// This asserts that if it's a label or a ref to a rule proceed but only if the attribute
+		// is valid for that rule's scope
+		{(enclosingRule.getRuleLabel($x.text)!=null || isRuleRefInAlt($x.text)) &&
+	      getRuleLabelAttribute(enclosingRule.getRuleLabel($x.text)!=null?enclosingRule.getRuleLabel($x.text).referencedRuleName:$x.text,$y.text)!=null}?
+		//{System.out.println("found set \$rulelabel.attr or \$ruleref.attr: "+$x.text+"."+$y.text);}
 		{
 		ErrorManager.grammarError(ErrorManager.MSG_WRITE_TO_READONLY_ATTR,
 								  grammar,
@@ -469,44 +485,43 @@ ISOLATED_LEXER_RULE_REF
  *
  *	TODO: this might get the dynamic scope's elements too.!!!!!!!!!
  */
- SET_LOCAL_ATTR
- 	:	'$' ID WS? '=' expr=ATTR_VALUE_EXPR ';' {enclosingRule!=null && enclosingRule.getLocalAttributeScope($ID.text)!=null}?
- 		//{System.out.println("found \$localattr");}
- 		{
- 		StringTemplate st;
- 		AttributeScope scope = enclosingRule.getLocalAttributeScope($ID.text);
- 		if ( scope.isPredefinedRuleScope ) {
- 			if ($ID.text.equals("tree") || $ID.text.equals("st")) {
- 				st = template("ruleSetPropertyRef_"+$ID.text);
- 				grammar.referenceRuleLabelPredefinedAttribute(enclosingRule.name);
- 				st.setAttribute("scope", enclosingRule.name);
- 				st.setAttribute("attr", $ID.text);
- 				st.setAttribute("expr", translateAction($expr.text));
- 			} else {
+SET_LOCAL_ATTR
+	:	'$' ID WS? '=' expr=ATTR_VALUE_EXPR ';' {enclosingRule!=null && enclosingRule.getLocalAttributeScope($ID.text)!=null}?
+		//{System.out.println("found set \$localattr");}
+		{
+		StringTemplate st;
+		AttributeScope scope = enclosingRule.getLocalAttributeScope($ID.text);
+		if ( scope.isPredefinedRuleScope ) {
+			if ($ID.text.equals("tree") || $ID.text.equals("st")) {
+				st = template("ruleSetPropertyRef_"+$ID.text);
+				grammar.referenceRuleLabelPredefinedAttribute(enclosingRule.name);
+				st.setAttribute("scope", enclosingRule.name);
+				st.setAttribute("attr", $ID.text);
+				st.setAttribute("expr", translateAction($expr.text));
+			} else {
 				ErrorManager.grammarError(ErrorManager.MSG_WRITE_TO_READONLY_ATTR,
 										 grammar,
 										 actionToken,
 										 $ID.text,
 										 "");
- 			}
-
- 		}
- 		else if ( scope.isParameterScope ) {
- 			st = template("parameterSetAttributeRef");
- 			st.setAttribute("attr", scope.getAttribute($ID.text));
- 			st.setAttribute("expr", translateAction($expr.text));
- 		}
- 		else {
- 			st = template("returnSetAttributeRef");
- 			st.setAttribute("ruleDescriptor", enclosingRule);
- 			st.setAttribute("attr", scope.getAttribute($ID.text));
+			}
+		}
+		else if ( scope.isParameterScope ) {
+			st = template("parameterSetAttributeRef");
+			st.setAttribute("attr", scope.getAttribute($ID.text));
 			st.setAttribute("expr", translateAction($expr.text));
- 		}
- 		}
- 	;
+		}
+		else {
+			st = template("returnSetAttributeRef");
+			st.setAttribute("ruleDescriptor", enclosingRule);
+			st.setAttribute("attr", scope.getAttribute($ID.text));
+			st.setAttribute("expr", translateAction($expr.text));
+			}
+		}
+	;
 LOCAL_ATTR
 	:	'$' ID {enclosingRule!=null && enclosingRule.getLocalAttributeScope($ID.text)!=null}?
-		// {System.out.println("found \$localattr");}
+		//{System.out.println("found \$localattr");}
 		{
 		StringTemplate st;
 		AttributeScope scope = enclosingRule.getLocalAttributeScope($ID.text);

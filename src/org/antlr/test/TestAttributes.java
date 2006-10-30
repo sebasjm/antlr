@@ -2675,6 +2675,40 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testAssignToTreeNodeAttribute() throws Exception {
+		String action = "$tree.scope = localScope;";
+		String expecting = "((MantraAST)retval.tree).scope = localScope;";
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar a;\n" +
+			"options { output=AST; }" +
+			"rule returns\n" +
+			"@init {\n" +
+			"   Scope localScope=null;\n" +
+			"}\n" +
+			"@finally {\n" +
+			"   $tree.scope = localScope;\n" +
+			"}\n" +
+			"   : 'a'\n" +
+			";");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,
+																	 "rule",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+		assertEquals(expecting, found);
+	}
+
 	// S U P P O R T
 
 	protected void checkError(ErrorQueue equeue,
