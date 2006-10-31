@@ -1995,10 +1995,6 @@ public class Grammar {
 		for(Iterator iter = lineColumnToLookaheadDFAMap.keySet().iterator();
 			iter.hasNext(); ) {
 			String key = (String)iter.next();
-
-			DFA v = (DFA)lineColumnToLookaheadDFAMap.get(key);
-			 System.out.println(key+"=>DFA"+v.decisionNumber);
-
 			if(key.startsWith(prefix)) {
 				columns.add(Integer.valueOf(key.substring(prefix.length())));
 			}
