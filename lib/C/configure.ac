@@ -68,7 +68,9 @@ xlc*)
 
 aCC*)
  CPPCMNTFLAGS=
- CCFLAGS64=
+ if test "$BIT64" = 1; then
+  CCFLAGS64="+DD64"
+ fi
  OPTIMFLAGS="-O"
  if test $DEBUGINF = 1; then
   DEBUGFLAGS="-g"
