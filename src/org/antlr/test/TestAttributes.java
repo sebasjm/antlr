@@ -2711,6 +2711,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDoNotTranslateAttributeCompare() throws Exception {
 		String action = "$a.line == $b.line";
+		String expecting = "a.getLine() == b.getLine()";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2734,6 +2735,7 @@ public class TestAttributes extends BaseTest {
 		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
 		String found = actionST.toString();
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+		assertEquals(expecting, found);
 	}
 
 	// S U P P O R T
