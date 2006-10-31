@@ -2709,6 +2709,33 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	public void testDoNotTranslateAttributeCompare() throws Exception {
+		String action = "$a.line == $b.line";
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"lexer grammar a;\n" +
+				"RULE:\n" +
+				"     a=ID b=ID {" + action + "}" +
+				"    ;\n" +
+				"ID : 'id';"
+		);
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,
+																	 "RULE",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 	// S U P P O R T
 
 	protected void checkError(ErrorQueue equeue,

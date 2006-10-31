@@ -278,7 +278,7 @@ ENCLOSING_RULE_SCOPE_ATTR
 /** Setting $tokenlabel.attr or $tokenref.attr where attr is predefined property of a token is an error. */
 SET_TOKEN_SCOPE_ATTR
 	:	'$' x=ID '.' y=ID WS? '='
-							 {enclosingRule!=null &&
+							 {enclosingRule!=null && input.LA(1)!='=' &&
 	                         (enclosingRule.getTokenLabel($x.text)!=null||
 	                          isTokenRefInAlt($x.text)) &&
 	                         AttributeScope.tokenScope.getAttribute($y.text)!=null}?

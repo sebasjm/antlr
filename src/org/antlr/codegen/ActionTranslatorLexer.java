@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 ActionTranslator.g 2006-10-30 21:01:30
+// $ANTLR 3.0b5 ActionTranslator.g 2006-11-01 00:10:09
 
 package org.antlr.codegen;
 import org.antlr.stringtemplate.StringTemplate;
@@ -463,12 +463,12 @@ public class ActionTranslatorLexer extends Lexer {
             }
 
             match('='); if (failed) return ;
-            if ( !(enclosingRule!=null &&
+            if ( !(enclosingRule!=null && input.LA(1)!='=' &&
             	                         (enclosingRule.getTokenLabel(x.getText())!=null||
             	                          isTokenRefInAlt(x.getText())) &&
             	                         AttributeScope.tokenScope.getAttribute(y.getText())!=null) ) {
                 if (backtracking>0) {failed=true; return ;}
-                throw new FailedPredicateException(input, "SET_TOKEN_SCOPE_ATTR", "enclosingRule!=null &&\n\t                         (enclosingRule.getTokenLabel($x.text)!=null||\n\t                          isTokenRefInAlt($x.text)) &&\n\t                         AttributeScope.tokenScope.getAttribute($y.text)!=null");
+                throw new FailedPredicateException(input, "SET_TOKEN_SCOPE_ATTR", "enclosingRule!=null && input.LA(1)!='=' &&\n\t                         (enclosingRule.getTokenLabel($x.text)!=null||\n\t                          isTokenRefInAlt($x.text)) &&\n\t                         AttributeScope.tokenScope.getAttribute($y.text)!=null");
             }
             if ( backtracking==1 ) {
 
