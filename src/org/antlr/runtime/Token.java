@@ -65,7 +65,8 @@ public interface Token {
 
 	public abstract int getType();
 	public abstract void setType(int ttype);
-    public abstract int getLine();
+	/**  The line number on which this token was matched; line=1..n */
+	public abstract int getLine();
     public abstract void setLine(int line);
 
 	/** The index of the first character relative to the beginning of the line 0..n-1 */
