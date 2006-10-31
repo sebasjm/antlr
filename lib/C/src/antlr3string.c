@@ -1131,7 +1131,7 @@ subString8   (pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 end
 
     if	(endIndex > string->len)
     {
-	endIndex = string->len;
+	endIndex = string->len + 1;
     }
     newStr  = string->factory->newPtr(string->factory, string->chars + startIndex, endIndex - startIndex);
 
@@ -1148,7 +1148,7 @@ subString16  (pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 end
 
     if	(endIndex > string->len)
     {
-	endIndex = string->len;
+	endIndex = string->len + 1;
     }
     newStr  = string->factory->newPtr(string->factory, (pANTLR3_UINT8)((pANTLR3_UINT16)(string->chars) + startIndex), endIndex - startIndex);
 
