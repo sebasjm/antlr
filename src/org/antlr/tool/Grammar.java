@@ -1250,7 +1250,8 @@ public class Grammar {
 	/** To yield smaller, more readable code, track which rules have their
 	 *  predefined attributes accessed.  If the rule has no user-defined
 	 *  return values, then don't generate the return value scope classes
-	 *  etc...  Make the rule have void return value.
+	 *  etc...  Make the rule have void return value.  Don't track for lexer
+	 *  rules. 
 	 */
 	public void referenceRuleLabelPredefinedAttribute(String ruleName) {
 		Rule r = getRule(ruleName);
