@@ -566,6 +566,9 @@ typedef struct ANTLR3_TOKEN_STRUCT_struct
     TOKEN_STRUCT;
     
 #endif
+
+/* END - Note:Keep extra linefeed to satisfy UNIX systems */
+
 >>
 
 grammarType() ::= <<
