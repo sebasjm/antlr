@@ -277,6 +277,12 @@ CHANGES
 
 3.0b5 - ??
 
+October 32, 2006
+
+* Finally actions now execute before dynamic scopes are popped it in the
+  rule. Previously was not possible to access the rules scoped variables
+  in a finally action.
+
 October 29, 2006
 
 * Altered ActionTranslator to emit errors on setting read-only attributes

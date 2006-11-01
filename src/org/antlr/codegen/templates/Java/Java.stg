@@ -277,6 +277,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::=
 // <fileName>:<description>
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
     <if(trace)>System.out.println("enter <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
+    <ruleScopeSetUp()>
     <ruleDeclarations()>
     <ruleLabelDefs()>
     <ruleDescriptor.actions.init>
@@ -303,7 +304,8 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
         <if(trace)>System.out.println("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
         <(ruleDescriptor.actions.finally):execAction()>
-    }
+        <ruleScopeCleanUp()>
+   }
     <@postamble()>
     return <ruleReturnValue()>;
 }
@@ -317,8 +319,6 @@ catch (<e.decl>) {
 >>
 
 ruleDeclarations() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.push(new <it>_scope());}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval = new <returnType()>();
 retval.start = input.LT(1);<\n>
@@ -330,6 +330,16 @@ retval.start = input.LT(1);<\n>
 <if(memoize)>
 int <ruleDescriptor.name>_StartIndex = input.index();
 <endif>
+>>
+
+ruleScopeSetUp() ::= <<
+<ruleDescriptor.useScopes:{<it>_stack.push(new <it>_scope());}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
+>>
+
+ruleScopeCleanUp() ::= <<
+<ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
 >>
 
 ruleLabelDefs() ::= <<
@@ -360,8 +370,6 @@ retval
 >>
 
 ruleCleanUp() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 retval.stop = input.LT(-1);<\n>
 <endif>
