@@ -56,7 +56,7 @@ include_HEADERS =	include/antlr3.h						\
 					include/antlr3treeparser.h				\
 					antlr3config.h
 
-libantlr3c_la_LDFLAGS = -version-info 0:0:0
+libantlr3c_la_LDFLAGS = -avoid-version
 
 INCLUDES = -Iinclude -Iinclude
 
