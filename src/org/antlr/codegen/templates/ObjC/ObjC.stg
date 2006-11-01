@@ -321,7 +321,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 <if(backtracking)>
 		ruleMemo = [[NSMutableDictionary alloc] initWithCapacity:ANTLR_INITIAL_FOLLOW_STACK_SIZE];
 <endif>
-		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] init];}; separator="\n">
+		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] initWithRecognizer:self];}; separator="\n">
 		<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeInit(scope=it)><endif>}>
 		<rules:{rule |
 		<rule.ruleDescriptor.ruleScope:ruleAttributeScopeInit(scope=it)>
@@ -469,8 +469,8 @@ catch (<e.decl>) {
 >>
 
 ruleDeclarations() ::= <<
-<ruleDescriptor.useScopes:{[<name>_<it>_stack addObject:[[[<name>_<it>_scope alloc] init] autorelease]];}; separator="\n">
-<ruleDescriptor.ruleScope:{[<name>_<it.name>_stack addObject:[[[<name>_<it.name>_scope alloc] init] autorelease]];}; separator="\n">
+<ruleDescriptor.useScopes:{[<name>_<it>_stack addObject:[[[<name><it>Scope alloc] init] autorelease]];}; separator="\n">
+<ruleDescriptor.ruleScope:{[<name>_<it.name>_stack addObject:[[[<name><it.name>Scope alloc] init] autorelease]];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval = [[<returnTypeName()> alloc] init]; <! retvals are released in the calling rule! !>
 [retval setStart:[input LT:1]];<\n>
@@ -1152,7 +1152,7 @@ setTest(ranges) ::= "<ranges; separator=\"||\">"
 // A T T R I B U T E S
 
 globalAttributeScopeDecl(scope) ::= <<
-@interface <name>_<scope.name>_scope : NSObject {
+@interface <name><scope.name>Scope : NSObject {
 	<scope.attributes:{<it.decl>;}; separator="\n">
 }
 // use KVC to access attributes!
@@ -1164,7 +1164,7 @@ NSMutableArray *<name>_<scope.name>_stack;
 >>
 
 globalAttributeScopeImpl(scope) ::= <<
-@implementation <name>_<scope.name>_scope
+@implementation <name><scope.name>Scope
 @end
 >>
 
@@ -1178,7 +1178,7 @@ globalAttributeScopeDealloc(scope) ::= <<
 
 ruleAttributeScopeDecl(scope) ::= <<
 <if(scope.attributes)>
-@interface <name>_<scope.name>_scope : NSObject {
+@interface <name><scope.name>Scope : NSObject {
 	<scope.attributes:{<it.decl>;}; separator="\n">
 }
 // use KVC to access attributes!
@@ -1192,7 +1192,7 @@ NSMutableArray *<name>_<scope.name>_stack;
 
 ruleAttributeScopeImpl(scope) ::= <<
 <if(scope.attributes)>
-@implementation <name>_<scope.name>_scope
+@implementation <name><scope.name>Scope
 @end
 <endif>
 >>
@@ -1297,7 +1297,7 @@ scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 
 scopeAttributeRefStack() ::= <<
 <if(negIndex)>
-[<name>_<scope>_stack objectAtIndex:[<name>_<scope>_stack count]<negIndex>-1]
+[<name>_<scope>_stack objectAtIndex:[<name>_<scope>_stack count]-<negIndex>-1]
 <else>
 <if(index)>
 [<name>_<scope>_stack objectAtIndex:<index>]
