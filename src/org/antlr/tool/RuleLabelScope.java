@@ -35,27 +35,27 @@ public class RuleLabelScope extends AttributeScope {
 	 */
 	public static AttributeScope predefinedRulePropertiesScope =
 		new AttributeScope("RulePredefined",null) {{
-		addAttribute("text", null);
-		addAttribute("start", null);
-		addAttribute("stop", null);
-		addAttribute("tree", null);
-		addAttribute("st", null);
-		isPredefinedRuleScope = true;
-	}};
+			addAttribute("text", null);
+			addAttribute("start", null);
+			addAttribute("stop", null);
+			addAttribute("tree", null);
+			addAttribute("st", null);
+			isPredefinedRuleScope = true;
+		}};
 
 	/** Rules have a predefined set of attributes as well as
 	 *  the return values.  'text' needs to be computed though so.
 	 */
 	public static AttributeScope predefinedLexerRulePropertiesScope =
-		new AttributeScope("RulePredefined",null) {{
-		addAttribute("text", null);
-		addAttribute("type", null);
-		addAttribute("line", null);
-		addAttribute("index", null);
-		addAttribute("pos", null);
-		addAttribute("channel", null);
-		isPredefinedLexerRuleScope = true;
-	}};
+		new AttributeScope("LexerRulePredefined",null) {{
+			addAttribute("text", null);
+			addAttribute("type", null);
+			addAttribute("line", null);
+			addAttribute("index", null);
+			addAttribute("pos", null);
+			addAttribute("channel", null);
+			isPredefinedLexerRuleScope = true;
+		}};
 
 	public Rule referencedRule;
 

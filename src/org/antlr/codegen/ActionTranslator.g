@@ -245,7 +245,7 @@ SET_ENCLOSING_RULE_SCOPE_ATTR
 ENCLOSING_RULE_SCOPE_ATTR
 	:	'$' x=ID '.' y=ID	{enclosingRule!=null &&
 	                         $x.text.equals(enclosingRule.name) &&
-	                         enclosingRule.getLocalAttributeScope($y.text)!=null}? 
+	                         enclosingRule.getLocalAttributeScope($y.text)!=null}?
 		//{System.out.println("found \$rule.attr");}
 		{
 		StringTemplate st = null;
@@ -357,7 +357,7 @@ RULE_SCOPE_ATTR
 Grammar.LabelElementPair pair=null;
 String refdRuleName=null;
 }
-	:	'$' x=ID '.' y=ID {enclosingRule!=null}?	                         
+	:	'$' x=ID '.' y=ID {enclosingRule!=null}?
 		{
 		pair = enclosingRule.getRuleLabel($x.text);
 		refdRuleName = $x.text;
@@ -405,13 +405,13 @@ String refdRuleName=null;
 		}
 		else {
 			st = template("ruleLabelRef");
-			st.setAttribute("referencedRule", refdRule);		
+			st.setAttribute("referencedRule", refdRule);
 			st.setAttribute("scope", label);
 			st.setAttribute("attr", scope.getAttribute($y.text));
-		}		
+		}
 		}
 	;
-	
+
 
 /** $label	either a token label or token/rule list label like label+=expr */
 LABEL_REF
@@ -528,6 +528,11 @@ LOCAL_ATTR
 		if ( scope.isPredefinedRuleScope ) {
 			st = template("rulePropertyRef_"+$ID.text);
 			grammar.referenceRuleLabelPredefinedAttribute(enclosingRule.name);
+			st.setAttribute("scope", enclosingRule.name);
+			st.setAttribute("attr", $ID.text);
+		}
+		else if ( scope.isPredefinedLexerRuleScope ) {
+			st = template("lexerRulePropertyRef_"+$ID.text);
 			st.setAttribute("scope", enclosingRule.name);
 			st.setAttribute("attr", $ID.text);
 		}

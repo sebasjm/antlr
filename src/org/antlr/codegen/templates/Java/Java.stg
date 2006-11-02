@@ -1157,7 +1157,15 @@ rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)retval.tree)"
 rulePropertyRef_text(scope,attr) ::= "input.toString(retval.start,input.LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
-// setting $st and $tree is allowed in local rule. everything else is flagged as error
+lexerRulePropertyRef_text(scope,attr) ::= "getText()"
+lexerRulePropertyRef_type(scope,attr) ::= "type"
+lexerRulePropertyRef_line(scope,attr) ::= "line"
+lexerRulePropertyRef_pos(scope,attr) ::= "charPosition"
+lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
+lexerRulePropertyRef_channel(scope,attr) ::= "channel"
+
+// setting $st and $tree is allowed in local rule. everything else
+// is flagged as error
 ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree =<expr>;"
 ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st =<expr>;"
 

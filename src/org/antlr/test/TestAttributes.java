@@ -2295,6 +2295,34 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testLexerRulePropertyRefs() throws Exception {
+		String action = "$text $type $line $pos $channel $index";
+		String expecting = "getText() type line charPosition channel -1";
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+				"R : 'r' {"+action+"};\n");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator =
+			new ActionTranslatorLexer(generator,
+									  "R",
+									  new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 	public void testArgsOnTokenInLexerRuleOfCombined() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);

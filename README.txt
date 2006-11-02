@@ -277,6 +277,10 @@ CHANGES
 
 3.0b5 - ??
 
+November 1, 2006
+
+* $text, $line, etc... were not working properly within lexer rule.
+
 October 32, 2006
 
 * Finally actions now execute before dynamic scopes are popped it in the
