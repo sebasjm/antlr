@@ -165,6 +165,7 @@ public class ErrorManager {
 	public static final int MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION = 149;
 	public static final int MSG_NO_RULES = 150;
 	public static final int MSG_WRITE_TO_READONLY_ATTR = 151;
+	public static final int MSG_MISSING_AST_TYPE_IN_TREE_GRAMMAR = 152;
 
 
 	// GRAMMAR WARNINGS

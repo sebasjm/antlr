@@ -277,6 +277,18 @@ CHANGES
 
 3.0b5 - ??
 
+November 2, 2006
+
+* Added error if you don't specify what the AST type is; actions in tree
+  grammar won't work without it.
+
+  $ cat x.g
+  tree grammar x;
+  a : ID {String s = $ID.text;} ;
+
+  ANTLR Parser Generator   Early Access Version 3.0b5 (??, 2006)  1989-2006
+  error: x.g:0:0: (152) tree grammar x has no ASTLabelType option
+
 November 1, 2006
 
 * $text, $line, etc... were not working properly within lexer rule.
