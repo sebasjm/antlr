@@ -277,6 +277,11 @@ CHANGES
 
 3.0b5 - ??
 
+November 3, 2006
+
+* $text, $line, etc... were not working in assignments. Fixed and added
+  test case.
+
 November 2, 2006
 
 * Added error if you don't specify what the AST type is; actions in tree

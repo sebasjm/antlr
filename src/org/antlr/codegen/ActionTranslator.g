@@ -486,7 +486,9 @@ ISOLATED_LEXER_RULE_REF
  *	TODO: this might get the dynamic scope's elements too.!!!!!!!!!
  */
 SET_LOCAL_ATTR
-	:	'$' ID WS? '=' expr=ATTR_VALUE_EXPR ';' {enclosingRule!=null && enclosingRule.getLocalAttributeScope($ID.text)!=null}?
+	:	'$' ID WS? '=' expr=ATTR_VALUE_EXPR ';' {enclosingRule!=null
+													&& enclosingRule.getLocalAttributeScope($ID.text)!=null
+													&& !enclosingRule.getLocalAttributeScope($ID.text).isPredefinedLexerRuleScope}?
 		//{System.out.println("found set \$localattr");}
 		{
 		StringTemplate st;
