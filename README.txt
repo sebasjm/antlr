@@ -282,6 +282,8 @@ November 3, 2006
 * $text, $line, etc... were not working in assignments. Fixed and added
   test case.
 
+* $label.text translated to label.getText in lexer even if label was on a char
+
 November 2, 2006
 
 * Added error if you don't specify what the AST type is; actions in tree
