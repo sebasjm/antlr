@@ -291,12 +291,18 @@ SET_TOKEN_SCOPE_ATTR
 								  $y.text);
 		}
 	;
-/** $tokenlabel.attr or $tokenref.attr where attr is predefined property of a token. */
+
+/** $tokenlabel.attr or $tokenref.attr where attr is predefined property of a token.
+ *  If in lexer grammar, only translate for strings and tokens (rule refs)
+ */
 TOKEN_SCOPE_ATTR
 	:	'$' x=ID '.' y=ID	{enclosingRule!=null &&
 	                         (enclosingRule.getTokenLabel($x.text)!=null||
 	                          isTokenRefInAlt($x.text)) &&
-	                         AttributeScope.tokenScope.getAttribute($y.text)!=null}?
+	                         AttributeScope.tokenScope.getAttribute($y.text)!=null &&
+	                         (grammar.type!=Grammar.LEXER ||
+	                         getElementLabel($x.text).elementRef.token.getType()==ANTLRParser.TOKEN_REF ||
+	                         getElementLabel($x.text).elementRef.token.getType()==ANTLRParser.STRING_LITERAL)}?
 		// {System.out.println("found \$tokenlabel.attr or \$tokenref.attr");}
 		{
 		String label = $x.text;

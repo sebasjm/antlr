@@ -1046,18 +1046,6 @@ parameterScope(scope) ::= <<
 <scope.attributes:{<it.decl>}; separator=", ">
 >>
 
-/** Used in codegen.g to translate $x.y references.
- *  I could have left actions as StringTemplates to be inserted in
- *  the output (so they could use attributes inherited from surrounding
- *  templates), but really wanted to pass in AttributeScope and Attribute
- *  objects so this translation could query them.  So, translation of
- *  $x.y to executable code occurs before recognizerST.toString() occurs.
- *  I.e., actions are just text strings during final code generation.
-globalAttributeRef(scope,attr) ::= <<
-((<scope>)<scope>_stack.peek()).<attr.name>
->>
- */
-
 parameterAttributeRef(attr) ::= "<attr.name>"
 parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
