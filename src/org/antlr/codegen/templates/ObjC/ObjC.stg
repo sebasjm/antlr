@@ -421,6 +421,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions, memoize) ::
 - (<returnType()>) <ruleName><ruleDescriptor.parameterScope:parameterScope(scope=it)>
 {
     <if(trace)>NSLog(@"enter <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);<endif>
+    <ruleScopeSetUp()>
     <ruleDeclarations()>
     <ruleLabelDefs()>
     <ruleDescriptor.actions.init>
@@ -434,30 +435,23 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions, memoize) ::
 <else>
 <if(!emptyRule)>
 <if(actions.(actionScope).rulecatch)>
-    <actions.(actionScope).rulecatch>
+	<actions.(actionScope).rulecatch>
 <else>
-    @catch (ANTLRRecognitionException *re) {
-        [self reportError:re];
-        [self recover:input exception:re];
-    }<\n>
+	@catch (ANTLRRecognitionException *re) {
+		[self reportError:re];
+		[self recover:input exception:re];
+	}<\n>
 <endif>
 <endif>
 <endif>
-    @finally {
-        <if(trace)>NSLog(@"exit <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);<endif>
-        <ruleCleanUp()>
-<if(ruleDescriptor.actions.finally)>
-<if(backtracking)>
-        if ( backtracking==0 ) {
-            <ruleDescriptor.actions.finally>
-        }<\n>
-<else>
-        <ruleDescriptor.actions.finally>
-<endif>
-<endif>
-    }
-    <@postamble()>
-    return <ruleReturnValue()>;
+	@finally {
+		<if(trace)>NSLog(@"exit <ruleName> %@ failed=%@ backtracking=%d", [input LT:1], failed ? @"YES" : @"NO", backtracking);<endif>
+		<ruleCleanUp()>
+		<(ruleDescriptor.actions.finally):execAction()>
+		<ruleScopeCleanUp()>
+	}
+	<@postamble()>
+	return <ruleReturnValue()>;
 }
 // $ANTLR end <ruleName>
 >>
@@ -469,11 +463,9 @@ catch (<e.decl>) {
 >>
 
 ruleDeclarations() ::= <<
-<ruleDescriptor.useScopes:{[<name>_<it>_stack addObject:[[[<name><it>Scope alloc] init] autorelease]];}; separator="\n">
-<ruleDescriptor.ruleScope:{[<name>_<it.name>_stack addObject:[[[<name><it.name>Scope alloc] init] autorelease]];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<returnType()> retval = [[<returnTypeName()> alloc] init]; <! retvals are released in the calling rule! !>
-[retval setStart:[input LT:1]];<\n>
+<returnType()> _retval = [[<returnTypeName()> alloc] init]; <! retvals are released in the calling rule! !>
+[_retval setStart:[input LT:1]];<\n>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <returnType()> <ruleDescriptor.singleValueReturnName>;
@@ -484,18 +476,28 @@ int <ruleDescriptor.name>_StartIndex = [input index];
 <endif>
 >>
 
+ruleScopeSetUp() ::= <<
+<ruleDescriptor.useScopes:{[<name>_<it>_stack addObject:[[[<name><it>Scope alloc] init] autorelease]];}; separator="\n">
+<ruleDescriptor.ruleScope:{[<name>_<it.name>_stack addObject:[[[<name><it.name>Scope alloc] init] autorelease]];}; separator="\n">
+>>
+
+ruleScopeCleanUp() ::= <<
+<ruleDescriptor.useScopes:{[<name>_<it>_stack removeLastObject];}; separator="\n">
+<ruleDescriptor.ruleScope:{[<name>_<it.name>_stack removeLastObject];}; separator="\n">
+>>
+
 ruleLabelDefs() ::= <<
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
-    :{<labelType> <it.label.text> = nil;}; separator="\n"
+    :{<labelType> _<it.label.text> = nil;}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{NSMutableArray *list_<it.label.text> = nil;}; separator="\n"
+    :{NSMutableArray *_list_<it.label.text> = nil;}; separator="\n"
 >
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(label=it); separator="\n"
 >
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{NSMutableArray *list_<it> = [[NSMutableArray alloc] init];}; separator="\n"
+    :{NSMutableArray *_list_<it> = [[NSMutableArray alloc] init];}; separator="\n"
 >
 >>
 
@@ -503,9 +505,9 @@ ruleReturnValue() ::= <<
 <if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasReturnValue)>
 <if(ruleDescriptor.hasSingleReturnValue)>
-<ruleDescriptor.singleValueReturnName>
+_<ruleDescriptor.singleValueReturnName>
 <else>
-retval
+_retval
 <endif>
 <endif>
 <endif>
@@ -513,18 +515,16 @@ retval
 
 ruleCleanUp() ::= <<
 // token labels
-<[ruleDescriptor.tokenLabels]:{[<it.label.text> release];}; separator="\n">
+<[ruleDescriptor.tokenLabels]:{[_<it.label.text> release];}; separator="\n">
 // token+rule list labels
-<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]:{[list_<it.label.text> release];}; separator="\n">
+<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]:{[_list_<it.label.text> release];}; separator="\n">
 // rule labels
-<[ruleDescriptor.ruleLabels]:{[<it.label.text> release];}; separator="\n">
+<[ruleDescriptor.ruleLabels]:{[_<it.label.text> release];}; separator="\n">
 // rule refs in alts with rewrites
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-	:{[list_<it> release];}; separator="\n">
-<ruleDescriptor.useScopes:{[<name>_<it>_stack removeLastObject];}; separator="\n">
-<ruleDescriptor.ruleScope:{[<name>_<it.name>_stack removeLastObject];}; separator="\n">
+	:{[_list_<it> release];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
-[retval setStop:[input LT:-1]];<\n>
+[_retval setStop:[input LT:-1]];<\n>
 <endif>
 <if(memoize)>
 <if(backtracking)>
@@ -550,13 +550,13 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block, memoize) ::= <<
         <ruleMemoization(name=ruleName)>
 		<block><\n>
 <else>
-		int type = <name>_<ruleName>;
-		int start = [self charIndex];
-		int line = [self line];
-		int charPosition = [self charPositionInLine];
-		int channel = [ANTLRToken defaultChannel];
+		int _type = <name>_<ruleName>;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
 		<block>
-		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}<\n>
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}<\n>
 <endif>
 	}
 	@finally {
@@ -722,8 +722,8 @@ element() ::= <<
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
-<label>=(<labelType>)[input LT:1];
-[<label> retain];<\n>
+_<label>=(<labelType>)[input LT:1];
+[_<label> retain];<\n>
 <endif>
 [self match:input tokenType:<token> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <checkRuleBacktrackFailure()>
 >>
@@ -735,16 +735,16 @@ tokenRefAndListLabel(token,label,elementIndex) ::= <<
 >>
 
 listLabel(label) ::= <<
-if (list_<label> == nil)
-	list_<label> = [[NSMutableArray alloc] initWithObjects:<label>, nil];
+if (_list_<label> == nil)
+	_list_<label> = [[NSMutableArray alloc] initWithObjects:_<label>, nil];
 else
-	[list_<label> addObject:<label>];
+	[_list_<label> addObject:_<label>];
 >>
 
 /** match a character */
 charRef(char,label) ::= <<
 <if(label)>
-int <label> = [input LA:1];<\n>
+int _<label> = [input LA:1];<\n>
 <endif>
 [self matchChar:<char>];
 <checkRuleBacktrackFailure()><\n>
@@ -756,7 +756,7 @@ charRangeRef(a,b) ::= "[self matchRangeFromChar:<a> to:<b>];<checkRuleBacktrackF
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
-<label> = (<labelType>)[input LT:1];<\n>
+_<label> = (<labelType>)[input LT:1];<\n>
 <endif>
 if (<s>) {
 	<postmatchCode>
@@ -785,10 +785,10 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
 <if(label)>
-int <label>Start = [self charIndex];
+int _<label>Start = [self charIndex];
 [self matchString:<string>];
 <checkRuleBacktrackFailure()>
-<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:<label>Start, stop:[self charIndex]];
+_<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_<label>Start, stop:[self charIndex]];
 <else>
 [self matchString:<string>];
 <checkRuleBacktrackFailure()><\n>
@@ -797,7 +797,7 @@ int <label>Start = [self charIndex];
 
 wildcard(label,elementIndex) ::= <<
 <if(label)>
-<label> = (<labelType>)[input LT:1];<\n>
+_<label> = (<labelType>)[input LT:1];<\n>
 <endif>
 [self matchAny:input];
 <checkRuleBacktrackFailure()>
@@ -811,7 +811,7 @@ wildcardAndListLabel(label,elementIndex) ::= <<
 /** Match . wildcard in lexer */
 wildcardChar(label, elementIndex) ::= <<
 <if(label)>
-int <label> = [input LA:1];<\n>
+int _<label> = [input LA:1];<\n>
 <endif>
 [self matchAny];
 <checkRuleBacktrackFailure()><\n>
@@ -828,7 +828,7 @@ wildcardCharListLabel(label, elementIndex) ::= <<
 ruleRef(rule,label,elementIndex,args) ::= <<
 [following addObject:FOLLOW_<rule>_in_<ruleName><elementIndex>];
 <if(label)>
-<label> = [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
+_<label> = [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
 <else>
 [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
 <endif>
@@ -845,11 +845,11 @@ ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 /** A lexer rule reference */
 lexerRuleRef(rule,label,args) ::= <<
 <if(label)>
-int <label>Start = [self charIndex];
+int _<label>Start = [self charIndex];
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
 <checkRuleBacktrackFailure()><\n>
-<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:<label>Start stop:[self charIndex]];
-[<label> setLine:[self line]];
+_<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_<label>Start stop:[self charIndex]];
+[_<label> setLine:[self line]];
 <else>
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
 <checkRuleBacktrackFailure()><\n>
@@ -859,11 +859,11 @@ int <label>Start = [self charIndex];
 /** EOF in the lexer */
 lexerMatchEOF(label) ::= <<
 <if(label)>
-int <label>Start = [self charIndex];
+int _<label>Start = [self charIndex];
 [self matchChar:ANTLRCharStreamEOF];
 <checkRuleBacktrackFailure()><\n>
-<labelType> <label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeEOF channel:ANTLRTokenChannelDefault start:<label>Start stop:[self charIndex]];
-[<label> setLine:[self line]];
+<labelType> _<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeEOF channel:ANTLRTokenChannelDefault start:_<label>Start stop:[self charIndex]];
+[_<label> setLine:[self line]];
 <else>
 [self matchChar:ANTLRCharStreamEOF];
 <checkRuleBacktrackFailure()><\n>
@@ -1250,7 +1250,7 @@ initValue(typeName) ::= <<
 
 /** Define a rule label including default value */
 ruleLabelDef(label) ::= <<
-<ruleLabelType(referencedRule=label.referencedRule)> <label.label.text> = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n>
+<ruleLabelType(referencedRule=label.referencedRule)> _<label.label.text> = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n>
 >>
 
 /** Define a return struct for a rule if the code needs to access its
@@ -1324,70 +1324,82 @@ ruleLabelRef(referencedRule,scope,attr) ::= <<
 
 returnAttributeRef(ruleDescriptor,attr) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-[retval setValue: forKey:@"<attr.name>"];
+[_retval setValue: forKey:@"<attr.name>"];
 <else>
-<attr.name>
+_<attr.name>
 <endif>
 >>
 
 returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-[retval setValue:<expr> forKey:@"<attr.name>"];
+[_retval setValue:<expr> forKey:@"<attr.name>"];
 <else>
-<attr.name> =<expr>;
+_<attr.name> =<expr>;
 <endif>
 >>
 /** How to translate $tokenLabel */
-tokenLabelRef(label) ::= "<label>"
+tokenLabelRef(label) ::= "_<label>"
 
 /** ids+=ID {$ids} or e+=expr {$e} */
-listLabelRef(label) ::= "list_<label>"
+listLabelRef(label) ::= "_list_<label>"
 
 
 // not sure the next are the right approach; and they are evaluated early;
 // they cannot see TREE_PARSER or PARSER attributes for example. :(
 
-tokenLabelPropertyRef_text(scope,attr) ::= "[<scope> text]"
-tokenLabelPropertyRef_type(scope,attr) ::= "[<scope> type]"
-tokenLabelPropertyRef_line(scope,attr) ::= "[<scope> line]"
-tokenLabelPropertyRef_pos(scope,attr) ::= "[<scope> charPositionInLine]"
-tokenLabelPropertyRef_channel(scope,attr) ::= "[<scope> channel]"
-tokenLabelPropertyRef_index(scope,attr) ::= "[<scope> tokenIndex]"
-tokenLabelPropertyRef_tree(scope,attr) ::= "[<scope>_tree]"
+tokenLabelPropertyRef_text(scope,attr) ::= "[_<scope> text]"
+tokenLabelPropertyRef_type(scope,attr) ::= "[_<scope> type]"
+tokenLabelPropertyRef_line(scope,attr) ::= "[_<scope> line]"
+tokenLabelPropertyRef_pos(scope,attr) ::= "[_<scope> charPositionInLine]"
+tokenLabelPropertyRef_channel(scope,attr) ::= "[_<scope> channel]"
+tokenLabelPropertyRef_index(scope,attr) ::= "[_<scope> tokenIndex]"
+tokenLabelPropertyRef_tree(scope,attr) ::= "_<scope>_tree"
 
-ruleLabelPropertyRef_start(scope,attr) ::= "[<scope> start]"
-ruleLabelPropertyRef_stop(scope,attr) ::= "[<scope> stop]"
-ruleLabelPropertyRef_tree(scope,attr) ::= "[<scope> tree]"
-ruleLabelPropertyRef_text(scope,attr) ::= "[input substringWithRange:NSMakeRange([<scope> start], [<scope> stop]-[<scope> start])]"
-ruleLabelPropertyRef_st(scope,attr) ::= "[<scope> st]"
+ruleLabelPropertyRef_start(scope,attr) ::= "[_<scope> start]"
+ruleLabelPropertyRef_stop(scope,attr) ::= "[_<scope> stop]"
+ruleLabelPropertyRef_tree(scope,attr) ::= "[_<scope> tree]"
+ruleLabelPropertyRef_text(scope,attr) ::= "[input substringWithRange:NSMakeRange([_<scope> start], [_<scope> stop]-[_<scope> start])]"
+ruleLabelPropertyRef_st(scope,attr) ::= "[_<scope> st]"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
-lexerRuleLabel(label) ::= "<label>"
+lexerRuleLabel(label) ::= "_<label>"
 
-lexerRuleLabelPropertyRef_type(scope,attr) ::= "[<scope> type]"
-lexerRuleLabelPropertyRef_line(scope,attr) ::= "[<scope> line]"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= "[<scope> charPositionInLine]"
-lexerRuleLabelPropertyRef_channel(scope,attr) ::= "[<scope> channel]"
-lexerRuleLabelPropertyRef_index(scope,attr) ::= "[<scope> tokenIndex]"
-lexerRuleLabelPropertyRef_text(scope,attr) ::= "[<scope> text]"
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "[_<scope> type]"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "[_<scope> line]"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "[_<scope> charPositionInLine]"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "[_<scope> channel]"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "[_<scope> tokenIndex]"
+lexerRuleLabelPropertyRef_text(scope,attr) ::= "[_<scope> text]"
 
 // Somebody may ref $template or $tree or $stop within a rule:
-rulePropertyRef_start(scope,attr) ::= "[retval start]"
-rulePropertyRef_stop(scope,attr) ::= "[retval stop]"
-rulePropertyRef_tree(scope,attr) ::= "[retval tree]"
-rulePropertyRef_text(scope,attr) ::= "[input substringWithRange:NSMakeRange(start, [input index]-start)]"
-rulePropertyRef_st(scope,attr) ::= "[retval st]"
+rulePropertyRef_start(scope,attr) ::= "[_retval start]"
+rulePropertyRef_stop(scope,attr) ::= "[_retval stop]"
+rulePropertyRef_tree(scope,attr) ::= "[_retval tree]"
+rulePropertyRef_text(scope,attr) ::= "[input substringWithRange:NSMakeRange(_start, [input index]-_start)]"
+rulePropertyRef_st(scope,attr) ::= "[_retval st]"
 
-ruleSetPropertyRef_tree(scope,attr,expr) ::= "[retval setValue:<expr> forKey:@\"tree\"]"
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "[_retval setValue:<expr> forKey:@\"tree\"]"
 ruleSetPropertyRef_st(scope,attr,expr) ::= "<\n>#error StringTemplates are unsupported<\n>"
 
+lexerRulePropertyRef_text(scope,attr) ::= "[self text]"
+lexerRulePropertyRef_type(scope,attr) ::= "_type"
+lexerRulePropertyRef_line(scope,attr) ::= "_line"
+lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
+lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
+lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
 
 /** How to execute an action */
 execAction(action) ::= <<
 <if(backtracking)>
+<if(actions.(actionScope).synpredgate)>
+if ( <actions.(actionScope).synpredgate> ) {
+  <action>
+}
+<else>
 if ( backtracking==0 ) {
   <action>
 }
+<endif>
 <else>
 <action>
 <endif>
