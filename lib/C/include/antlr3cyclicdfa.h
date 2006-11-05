@@ -20,11 +20,11 @@ typedef struct ANTLR3_CYCLIC_DFA_struct
      */
     const pANTLR3_UCHAR		description;
 
-    ANTLR3_INT32		(*specialStateTransition)   (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, struct ANTLR3_CYCLIC_DFA_struct * dfa, ANTLR3_UINT32 s);
+    ANTLR3_INT32		(*specialStateTransition)   (void * ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, struct ANTLR3_CYCLIC_DFA_struct * dfa, ANTLR3_UINT32 s);
 
-    ANTLR3_INT32		(*specialTransition)	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, struct ANTLR3_CYCLIC_DFA_struct * dfa, ANTLR3_UINT32 s);
+    ANTLR3_INT32		(*specialTransition)	    (void * ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, struct ANTLR3_CYCLIC_DFA_struct * dfa, ANTLR3_UINT32 s);
 
-    ANTLR3_INT32		(*predict)		    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, struct ANTLR3_CYCLIC_DFA_struct * dfa);
+    ANTLR3_INT32		(*predict)		    (void * ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, struct ANTLR3_CYCLIC_DFA_struct * dfa);
 
     const ANTLR3_INT16		    * const eot;
     const ANTLR3_INT16		    * const eof;
@@ -36,5 +36,7 @@ typedef struct ANTLR3_CYCLIC_DFA_struct
 
 }
     ANTLR3_CYCLIC_DFA;
+
+typedef ANTLR3_INT32		(*CDFA_SPECIAL_FUNC)   (void * , pANTLR3_BASE_RECOGNIZER , pANTLR3_INT_STREAM , struct ANTLR3_CYCLIC_DFA_struct * , ANTLR3_UINT32);
 
 #endif

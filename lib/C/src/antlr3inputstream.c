@@ -11,6 +11,7 @@ static	    ANTLR3_UCHAR    antlr3AsciiLA		(pANTLR3_INT_STREAM is, ANTLR3_INT64 l
 static	    ANTLR3_INT64    antlr3AsciiIndex		(pANTLR3_INT_STREAM is);
 static	    ANTLR3_UINT64   antlr3AsciiMark		(pANTLR3_INT_STREAM is);
 static	    void	    antlr3AsciiRewind		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
+static	    void	    antlr3AsciiRewindLast	(pANTLR3_INT_STREAM is);
 static	    void	    antlr3AsciiRelease		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
 static	    void	    antlr3AsciiSeek		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint);
 
@@ -72,9 +73,10 @@ antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
      */
     input->istream->consume	    =  antlr3AsciiConsume;	    /* Consume the next 8 bit character in the buffer			    */
     input->istream->LA		    =  antlr3AsciiLA;		    /* Return the UTF32 chracter at offset n (1 based)			    */
-    input->istream->index	    =  antlr3AsciiIndex;		    /* Current index (offset from first character			    */
+    input->istream->index	    =  antlr3AsciiIndex;	    /* Current index (offset from first character			    */
     input->istream->mark	    =  antlr3AsciiMark;		    /* Record the current lex state for later restore			    */
     input->istream->rewind	    =  antlr3AsciiRewind;	    /* How to rewind the input						    */
+    input->istream->rewindLast	    =  antlr3AsciiRewindLast;	    /* How to rewind the input						    */
     input->istream->seek	    =  antlr3AsciiSeek;		    /* How to seek to a specific point in the stream			    */
     input->istream->release	    =  antlr3AsciiRelease;	    /* Reset marks after mark n						    */
 
@@ -340,9 +342,23 @@ antlr3AsciiMark	(pANTLR3_INT_STREAM is)
     state->line			= input->line;
     state->nextChar		= input->nextChar;
 
+    is->lastMarker  = input->markDepth;
+
     /* And that's it
      */
     return  input->markDepth;
+}
+/** \brief Rewind the lexer input to the state specified by the last produced mark.
+ * 
+ * \param[in] input Input stream context pointer
+ *
+ * \remark
+ * Assumes ASCII (or at least, 8 Bit) input stream.
+ */
+static void
+antlr3AsciiRewindLast	(pANTLR3_INT_STREAM is)
+{
+    is->rewind(is, is->lastMarker);
 }
 
 /** \brief Rewind the lexer input to the state specified by the supplied mark.

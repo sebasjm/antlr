@@ -21,7 +21,6 @@ static	pANTLR3_BASE_TREE	    newDownNode			(pANTLR3_COMMON_TREE_NODE_STREAM ctns
 static	pANTLR3_BASE_TREE	    newUpNode			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	pANTLR3_BASE_TREE	    next			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	void			    reset			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	void			    rewindInput			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	pANTLR3_STRING		    toNodesOnlyString		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	pANTLR3_BASE_TREE	    visitChild			(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT64 child);
 static	void			    walkBackToMostRecentNodeWithUnvisitedChildren   
@@ -42,6 +41,7 @@ static	ANTLR3_UINT32		    LA				(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
 static	ANTLR3_UINT64		    mark			(pANTLR3_INT_STREAM is);
 static	void			    release			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
 static	void			    rewindMark			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
+static	void			    rewindLast			(pANTLR3_INT_STREAM is);
 static	void			    seek			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
 static	ANTLR3_UINT64		    size			(pANTLR3_INT_STREAM is);
 
@@ -554,9 +554,9 @@ rewindMark	    (pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 }
 
 static	void		    
-rewindInput	(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+rewindLast	(pANTLR3_INT_STREAM is)
 {
-    ctns->tnstream->istream->rewind(ctns->tnstream->istream, ctns->lastMarker);
+   is->rewind(is, is->lastMarker);
 }
 
 /** consume() ahead until we hit index.  Can't just jump ahead--must

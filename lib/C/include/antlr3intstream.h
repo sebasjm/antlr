@@ -72,6 +72,9 @@ typedef	struct ANTLR3_INT_STREAM_struct
      */
     pANTLR3_COMMON_TOKEN    eofToken;
     
+    /** Last marker postion allocated
+     */
+    ANTLR3_UINT64	    lastMarker;
 
     /** Consume the next 'ANTR3_UINT32' in the stream
      */
@@ -102,6 +105,11 @@ typedef	struct ANTLR3_INT_STREAM_struct
      *  was created.
      */
     void		    (*rewind)	    (struct ANTLR3_INT_STREAM_struct * intStream, ANTLR3_UINT64 marker);
+
+    /** Reset the stream to the last marker position, witouh destryoing the
+     *  last marker position.
+     */
+    void		    (*rewindLast)   (struct ANTLR3_INT_STREAM_struct * intStream);
 
     /** You may want to commit to a backtrack but don't want to force the
      *  stream to keep bookkeeping objects around for a marker that is

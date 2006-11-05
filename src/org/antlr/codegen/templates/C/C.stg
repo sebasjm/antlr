@@ -117,7 +117,7 @@ outputFile( LEXER,
 /* -----------------------------------------
  * Include the ANTLR3 generated header file.
  */
-#include    \<<name>.h\>
+#include    "<name>.h"
 
 /* ----------------------------------------- */
 
@@ -401,6 +401,8 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #undef	    lrecover
 #undef	    markMyWords
 #undef	    rewindInput
+#undef	    rewindLast
+#undef	    backtracking
 
 #define	    lexr		    ctx->pLexer
 #define	    rec			    lexr->rec
@@ -416,7 +418,8 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    matchAny()		    rec->matchAny(rec)
 #define	    ltoken()		    lexr->token
 #define	    hasFailed()		    (rec->failed == ANTLR3_TRUE)
-#define	    failedFlag()	    rec->failed
+#define	    backtracking	    rec->backtracking
+#define	    failedFlag		    rec->failed
 #define	    theInput()		    lexr->input
 #define	    strStream		    theInput()
 #define	    LA(n)		    theInput()->istream->LA(lexr->input->istream, n)
@@ -427,6 +430,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    lrecover()		    lexr->recover(lexr)
 #define	    markMyWords()	    theInput()->istream->mark(theInput()->istream)
 #define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream, m)
+#define	    rewindLast()	    theInput()->istream->rewindLast(theInput()->istream)
 <endif>
 
 <if(PARSER)>
@@ -453,6 +457,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #undef	    inputConsume
 #undef	    markMyWords
 #undef	    rewindInput
+#undef	    rewindLast
 #undef	    perrorRecovery
 #undef	    hasFailed
 #undef	    failedFlag
@@ -479,6 +484,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    inputConsume()	    theInput()->istream->consume(theInput()->istream)
 #define	    markMyWords()	    theInput()->istream->mark(theInput()->istream)
 #define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream, m)
+#define	    rewindLast()	    theInput()->istream->rewindLast(theInput()->istream)
 #define	    perrorRecovery()	    rec->errorRecovery
 #define	    _fsp		    rec->_fsp
 #define	    failedFlag		    rec->failed
@@ -512,12 +518,13 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #undef	    inputConsume
 #undef	    markMyWords
 #undef	    rewindInput
-#undef	    rewind
+#undef	    rewindLast
 #undef	    perrorRecovery
 #undef	    hasFailed
 #undef	    failedFlag
 #undef	    precoverFromMismatchedSet
 #undef	    precoverFromMismatchedElement
+#undef	    backtracking
 
 #define	    prsr		    ctx->pTreeParser  
 #define	    rec			    prsr->rec
@@ -539,7 +546,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    inputConsume()	    theInput()->tnstream->istream->consume(theInput()->tnstream->istream)
 #define	    markMyWords()	    theInput()->tnstream->istream->mark(theInput()->tnstream->istream)
 #define	    rewindInput(m)	    theInput()->tnstream->istream->rewind(theInput()->tnstream->istream, m)
-#define	    rewind()		    theInput()->rewind(theInput())
+#define	    rewindLast(m)	    theInput()->tnstream->istream->rewindLast(theInput()->tnstream->istream)
 #define	    perrorRecovery()	    rec->errorRecovery
 #define	    _fsp		    rec->_fsp
 #define	    failedFlag		    rec->failed
@@ -609,12 +616,6 @@ lexer(  grammar,
         numRules, 
         labelType="pANTLR3_COMMON_TOKEN",
         filterMode) ::= <<
-<if(backtracking)>
-        // Left here to check it Jim - Jim
-        ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
-        
-<endif>
-
 
 <if(filterMode)>
 /* Forward declare implementation function for ANTLR3_TOKEN_SOURCE interface.
@@ -782,14 +783,14 @@ filteringNextToken() ::= <<
 static ANTLR3_TOKEN 
 <name>nextToken(p<name> lexCtx) 
 {
-    ltoken  = NULL;
-    tokenStartCharIndex = getCharIndex();
+
     while (true) {
         if ( LA(1)==CharStream.EOF ) {
             return ANTLR_EOF_TOKEN;
         }
-        token=null;
-        tokenStartCharIndex = getCharIndex();
+    ltoken  = NULL;
+    tokenStartCharIndex = getCharIndex();
+	text = NULL;
         try {
             int m = input.mark();
             backtracking=1; <! means we won't throw slow exception !>
@@ -1241,7 +1242,6 @@ static <returnType()>
 <endif>
 <endif>
     <if(trace)>System.out.println("exit <ruleName> "+LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
-
     <ruleDescriptor.actions.finally:execAction()>
     <@postamble()>
     return <ruleReturnValue()>;
@@ -2052,7 +2052,7 @@ dfaEdgeSwitch(labels, targetState) ::= <<
 dfaDecision(decisionNumber,description) ::= <<
 /* dfaDecision(decisionNumber,description)
  */
-alt<decisionNumber> = cdfa<decisionNumber>.predict(rec, theInput()->istream, &cdfa<decisionNumber>);
+alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, rec, theInput()->istream, &cdfa<decisionNumber>);
 >>
 
 /* Dump DFA tables as static initialized arrays of shorts(16 bits)/characters(8 bits)
@@ -2108,7 +2108,7 @@ static const ANTLR3_INT16 * const dfa<dfa.decisionNumber>_transitions[] =
 };
 
 <if(dfa.specialStateSTs)>
-static ANTLR3_INT16 dfa<dfa.decisionNumber>_sst(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s)
+static ANTLR3_INT16 dfa<dfa.decisionNumber>_sst(p<name> ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s)
 {
     ANTLR3_INT16    _s;
     
@@ -2123,11 +2123,17 @@ static ANTLR3_INT16 dfa<dfa.decisionNumber>_sst(pANTLR3_BASE_RECOGNIZER recogniz
 <if(backtracking)>
     if (backtracking > 0)
     {
-	failed = ANTLR3_TRUE;
+	failedFlag = ANTLR3_TRUE;
 	return	-1;
     }
 <endif>
-    <newNVException()> 
+    
+    exConstruct();
+    theException()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
+    theException()->message      = "<dfa.description>";
+    theException()->decisionNum  = <dfa.decisionNumber>;
+    theException()->state        = _s;
+    <@noViableAltException()>
     return -1;
 }
 <endif>
@@ -2142,10 +2148,11 @@ ANTLR3_CYCLIC_DFA cdfa<dfa.decisionNumber>
 	    /* Which decision this represents:   */
 	    (const pANTLR3_UCHAR)"<dfa.description>",	
 <if(dfa.specialStateSTs)>
-	    dfa<dfa.decisionNumber>_sst,
+	    (CDFA_SPECIAL_FUNC) dfa<dfa.decisionNumber>_sst,
 <else>
-	    antlr3dfaspecialStateTransition,	/* Default special state transition function	*/
+	    (CDFA_SPECIAL_FUNC) antlr3dfaspecialStateTransition,	/* Default special state transition function	*/
 <endif>
+
 	    antlr3dfaspecialTransition,		/* DFA specialTransition is currently just a default function in the runtime */
 	    antlr3dfapredict,			/* DFA simulator function is in the runtime */
 	    dfa<dfa.decisionNumber>_eot,	    /* EOT table			    */
@@ -2168,7 +2175,7 @@ ANTLR3_CYCLIC_DFA cdfa<dfa.decisionNumber>
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
 {
     <if(semPredState)>
-    is->rewind(is);<\n>
+    rewindLast();<\n>
     <else>
     int LA<decisionNumber>_<stateNumber> = LA(1);<\n>
     <endif>
@@ -2593,6 +2600,7 @@ globalAttributeRef(scope,attr) ::= <<
  */
 
 parameterAttributeRef(attr) ::= "<attr.name>"
+parameterSetAttributeRef(attr,expr) ::= "<attr.name> = <expr>;"
 
 /** Note that the scopeAttributeRef does not have access to the
  * grammar name directly
@@ -2605,6 +2613,18 @@ scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 ((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), (ANTLR3_UINT64)<index>))-><attr.name>
 <else>
 SCOPE_TOP(<scope>)-><attr.name>
+<endif>
+<endif>
+>>
+
+scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
+<if(negIndex)>
+((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope))-<negIndex>-1)-><attr.name> = <expr>;
+<else>
+<if(index)>
+((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), (ANTLR3_UINT64)<index>))-><attr.name> = <expr>;
+<else>
+SCOPE_TOP(<scope>)-><attr.name> = <expr>;
 <endif>
 <endif>
 >>
@@ -2629,6 +2649,14 @@ returnAttributeRef(ruleDescriptor,attr) ::= <<
 retval.<attr.name>
 <else>
 <attr.name>
+<endif>
+>>
+
+returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
+<if(ruleDescriptor.hasMultipleReturnValues)>
+retval.<attr.name> = <expr>;
+<else>
+<attr.name> = <expr>;
 <endif>
 >>
 
@@ -2672,6 +2700,10 @@ rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval).stop"
 rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval).tree"
 rulePropertyRef_text(scope,attr) ::= "strStream->toString(retval.start,LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "retval.st"
+
+// setting $st and $tree is allowed in local rule. everything else is flagged as error
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "((<labelType>)retval).tree = <expr>;"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st = <expr>;"
 
 
 /** How to execute an action */
