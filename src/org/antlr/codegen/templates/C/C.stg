@@ -423,6 +423,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    theInput()		    lexr->input
 #define	    strStream		    theInput()
 #define	    LA(n)		    theInput()->istream->LA(lexr->input->istream, n)
+#define	    EOF_TOKEN		    theInput()->istream->eofToken
 #define	    hasException()	    (rec->error == ANTLR3_TRUE)
 #define	    theException()	    rec->exception
 #define	    exConstruct()	    rec->exConstruct(rec)
