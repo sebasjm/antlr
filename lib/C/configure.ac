@@ -87,6 +87,18 @@ gcc*)
  ;;
 
 *)
+
+case $host in
+sparc*-*solaris*)
+ CPPCMNTFLAGS=
+ CCFLAGS64=-xtarget=ultra4 -xarch=v9a -fast
+ OPTIMFLAGS="-O"
+ if test $DEBUGINF = 1; then
+  DEBUGFLAGS='-g'
+ fi
+ ;;
+
+*)
  CPPCMNTFLAGS=
  CCFLAGS64=
  OPTIMFLAGS="-O"
@@ -94,7 +106,9 @@ gcc*)
   DEBUGFLAGS='-g'
  fi
  ;;
+esac
 
+ ;;
 esac
 
 CFLAGS="$CCFLAGS64 $CPPCMNTFLAGS $OPTIMFLAGS $DEBUGFLAGS"
