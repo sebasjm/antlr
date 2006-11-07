@@ -96,7 +96,9 @@ gcc*)
 case $host in
 sparc*-*solaris*)
  CPPCMNTFLAGS=
- CCFLAGS64=-xtarget=ultra4 -xarch=v9a -fast
+ if test "$BIT64" = 1; then
+  CCFLAGS64=-xtarget=ultra4 -xarch=v9a -fast
+ fi
  OPTIMFLAGS="-O"
  if test $DEBUGINF = 1; then
   DEBUGFLAGS='-g'
