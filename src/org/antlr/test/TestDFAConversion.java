@@ -89,9 +89,8 @@ public class TestDFAConversion extends BaseTest {
 			"    | B\n" +
 			"    ;");
 		String expecting =
-			".s0-B->.s4\n" +
+			".s0-B->.s3\n" +
 			".s0-L->.s1\n" +
-			".s1-B->.s3\n" +
 			".s1-L->.s2\n";
 		int[] unreachableAlts = new int[] {1,2};
 		int[] nonDetAlts = null;
@@ -900,9 +899,7 @@ As a result, alternative(s) 2 were disabled for that input
 			"  ;\n");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-A->.s2\n" +
-			".s1-X->:s4=>1\n" +
-			".s1-Y->:s3=>2\n";
+			".s1-A->.s2\n";
 		int[] unreachableAlts = new int[] {1,2};
 		int[] nonDetAlts = null;
 		String ambigInput = null;

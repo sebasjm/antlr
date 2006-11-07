@@ -254,7 +254,6 @@ public class NFAToDFAConverter {
 				System.out.println("DFA state after reach "+d+"-" +
 								   label.toString(dfa.nfa.grammar)+"->"+t);
 			}
-			//if ( t.getNFAConfigurations().size()==0 ) {
             if ( t==null ) {
                 // nothing was reached by label due to conflict resolution
 				// EOT also seems to be in here occasionally probably due
@@ -273,18 +272,6 @@ public class NFAToDFAConverter {
 				closure(t);  // add any NFA states reachable via epsilon
 			}
 
-			// FAILSAFE: so we cannot hit an exponentiality in
-			// the NFA conversion; don't let averate number of states
-			// per alt in this decision to exceed a max
-			/*
-			int statesPerAltRatio = t.stateNumber/dfa.getNumberOfAlts();
-			if ( statesPerAltRatio>DFA.MAX_STATES_PER_ALT_IN_DFA ) {
-				terminateConversion = true;
-				dfa.probe.reportEarlyTermination();
-				break;
-			}
-			*/
-
 			/*
 			System.out.println("DFA state after closure "+d+"-"+
 							   label.toString(dfa.nfa.grammar)+
@@ -298,6 +285,12 @@ public class NFAToDFAConverter {
 
 			// lookahead of target must be one larger than d's k
 			targetState.setLookaheadDepth(d.getLookaheadDepth() + 1);
+
+			if ( terminateConversion ) {
+				// closure had to terminate early; quit working on this state
+				// keep walking back out, we're in the process of terminating
+				return;
+			}
 		}
 
 		//System.out.println("DFA after reach / closures:\n"+dfa);
