@@ -46,10 +46,15 @@ AC_ARG_ENABLE([64bit],
 AM_INIT_AUTOMAKE(gnu)
 AC_LANG(C)
 AC_PROG_CC([xlc aCC gcc cc])
+AM_MAINTAINER_MODE
+AM_PROG_LIBTOOL
+
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
 
 OBJECT_MODE=
 # Checks for programs.
-AC_MSG_CHECKING([compiler flags required for compiling ANTLR with $CC C compiler])
+AC_MSG_CHECKING([compiler flags required for compiling ANTLR with $CC C compiler on host $host])
 
 case $CC in
 xlc*)
@@ -116,8 +121,6 @@ AC_MSG_RESULT([$CFLAGS])
 AC_SUBST([OBJECT_MODE])
 
 
-AM_MAINTAINER_MODE
-AM_PROG_LIBTOOL
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
