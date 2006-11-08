@@ -266,7 +266,7 @@ The following sets of rules are mutually left-recursive <listOfCycles:{c| [<c:{r
 >>
 
 NONREGULAR_DECISION(ruleName,alts) ::= <<
-[fatal] rule <ruleName> has non-LL(*) decision due to recursive rule invocations reachable from alts <alts; separator=",">.  Resolve by left-factoring or using syntactic predicates with fixed k lookahead or using backtrack=true option.
+[fatal] rule <ruleName> has non-LL(*) decision due to recursive rule invocations reachable from alts <alts; separator=",">.  Resolve by left-factoring or using syntactic predicates or using backtrack=true option.
 >>
 
 /* l10n for message levels */

@@ -78,7 +78,7 @@ public class NFAToDFAConverter {
 		dfa.startState = computeStartState();
 
 		// while more DFA states to check, process them
-		while ( !terminateConversion && work.size()>0 ) {
+		while ( work.size()>0 ) {
 			DFAState d = (DFAState) work.get(0);
 			if ( dfa.nfa.grammar.getWatchNFAConversion() ) {
 				System.out.println("convert DFA state "+d.stateNumber+
@@ -244,10 +244,14 @@ public class NFAToDFAConverter {
 		}
 		*/
 
-		// for each label that could possibly emanate from NFAStates of d
 		int numberOfEdgesEmanating = 0;
 		Map targetToLabelMap = new HashMap();
-		for (int i=0; i<labels.size(); i++) {
+		// for each label that could possibly emanate from NFAStates of d
+		// (abort if we find any closure operation on a configuration of d
+		//  that finds multiple alts with recursion, non-LL(*), as we cannot
+		//  trust any reach operations from d since we are blind to some
+		//  paths.  Leave state a dead-end and try to resolve with preds)
+		for (int i=0; !d.abortedDueToMultipleRecursiveAlts && i<labels.size(); i++) {
 			Label label = (Label)labels.get(i);
 			DFAState t = reach(d, label);
 			if ( debug ) {
@@ -278,7 +282,10 @@ public class NFAToDFAConverter {
 							   "->"+t);
 							   */
 
-			DFAState targetState = addDFAStateToWorkList(t); // add if not in DFA yet
+			// add if not in DFA yet even if its closure aborts due to non-LL(*);
+			// getting to the state is ok, we just can't see where to go next--it's
+			// a blind alley.
+			DFAState targetState = addDFAStateToWorkList(t);
 
 			numberOfEdgesEmanating +=
 				addTransition(d, label, targetState, targetToLabelMap);
@@ -286,10 +293,13 @@ public class NFAToDFAConverter {
 			// lookahead of target must be one larger than d's k
 			targetState.setLookaheadDepth(d.getLookaheadDepth() + 1);
 
-			if ( terminateConversion ) {
-				// closure had to terminate early; quit working on this state
-				// keep walking back out, we're in the process of terminating
-				return;
+			// closure(t) might have aborted, but addDFAStateToWorkList will try
+			// to resolve t with predicates.  If that fails, must give an error
+			// Note: this is tested on the target of d not d.
+			if ( t.abortedDueToMultipleRecursiveAlts && !t.isResolvedWithPredicates() ) {
+				// no predicates to resolve non-LL(*) decision, report
+				//System.out.println("non-LL(*) state "+d);
+				t.dfa.probe.reportNonRegularDecision(t.dfa);
 			}
 		}
 
@@ -436,9 +446,9 @@ public class NFAToDFAConverter {
 		// must clone initial list so we know when to stop doing closure
 		// TODO: expensive, try to get around this alloc / copy
 		configs.addAll(d.getNFAConfigurations());
-		// for each NFA configuration in d
+		// for each NFA configuration in d (abort if we detect non-LL(*) state)
 		Iterator iter = configs.iterator();
-		while (!terminateConversion && iter.hasNext() ) {
+		while (!d.abortedDueToMultipleRecursiveAlts && iter.hasNext() ) {
 			NFAConfiguration c = (NFAConfiguration)iter.next();
 			if ( c.singleAtomTransitionEmanating ) {
 				continue; // ignore NFA states w/o epsilon transitions
@@ -572,11 +582,14 @@ public class NFAToDFAConverter {
 							   );
 		}
 
-		if ( terminateConversion ) {
+		if ( d.abortedDueToMultipleRecursiveAlts ) {
 			// keep walking back out, we're in the process of terminating
+			// this closure operation on NFAState p contained with DFAState d
 			return;
 		}
 
+		/* NOTE SURE WE NEED THIS FAILSAFE NOW 11/8/2006 and it complicates
+		   MY ALGORITHM TO HAVE TO ABORT ENTIRE DFA CONVERSION
 		if ( DFA.MAX_TIME_PER_DFA_CREATION>0 &&
 			 System.currentTimeMillis() - d.dfa.conversionStartTime >=
 			 DFA.MAX_TIME_PER_DFA_CREATION )
@@ -586,6 +599,7 @@ public class NFAToDFAConverter {
 			dfa.probe.reportEarlyTermination();
 			return;
 		}
+		*/
 
 		NFAConfiguration proposedNFAConfiguration =
 				new NFAConfiguration(p.stateNumber,
@@ -619,13 +633,14 @@ public class NFAToDFAConverter {
 				d.dfa.recursiveAltSet.add(alt); // indicate that this alt is recursive
 				if ( d.dfa.recursiveAltSet.size()>1 ) {
 					//System.out.println("recursive alts: "+d.dfa.recursiveAltSet.toString());
-					d.dfa.probe.reportNonRegularDecision(d.dfa);
-					terminateConversion = true;
+					d.abortedDueToMultipleRecursiveAlts = true;
+					return;
 				}
 				/*
 				System.out.println("alt "+alt+" in rule "+p.enclosingRule+" dec "+d.dfa.decisionNumber+
-					" recursing to "+ruleTarget.enclosingRule+" ctx: "+context);
-					*/
+					" ctx: "+context);
+				System.out.println("d="+d);
+				*/
 			}
 			// Detect an attempt to recurse too high
 			// if this context has hit the max recursions for p.stateNumber,
@@ -972,7 +987,8 @@ public class NFAToDFAConverter {
 		// the start state to the nondet state
 		if ( DFAOptimizer.MERGE_STOP_STATES &&
 			d.getNondeterministicAlts()==null &&
-			!d.abortedDueToRecursionOverflow )
+			!d.abortedDueToRecursionOverflow &&
+			!d.abortedDueToMultipleRecursiveAlts )
 		{
 			// check to see if we already have an accept state for this alt
 			// [must do this after we resolve nondeterminisms in general]
@@ -1166,12 +1182,6 @@ public class NFAToDFAConverter {
 		// created in NFAFactory.build_EOFState
 		NFAConfiguration anyConfig;
 		Iterator itr = d.nfaConfigurations.iterator();
-        /*
-        if ( !itr.hasNext() ) {
-            System.err.println("what? DFA "+d.dfa.decisionNumber+
-                    " state "+d.stateNumber+" has no configs");
-        }
-        */
         anyConfig = (NFAConfiguration)itr.next();
 		NFAState anyState = dfa.nfa.getState(anyConfig.state);
 		// if d is target of EOT and more than one predicted alt
@@ -1197,9 +1207,10 @@ public class NFAToDFAConverter {
 		}
 
 		// if we're not a conflicting lexer rule and we didn't abort, report ambig
+		// We should get a report for abort so don't give another
 		if ( !d.abortedDueToRecursionOverflow && !conflictingLexerRules ) {
 			// TODO: with k=x option set, this is called twice for same state
-			dfa.probe.reportNondeterminism(d);
+			dfa.probe.reportNondeterminism(d, nondeterministicAlts);
 			// TODO: how to turn off when it's only the FOLLOW that is
 			// conflicting.  This used to shut off even alts i,j < n
 			// conflict warnings. :(
@@ -1218,12 +1229,6 @@ public class NFAToDFAConverter {
 		}
 
 		// ATTEMPT TO RESOLVE WITH SEMANTIC PREDICATES
-
-		// If we aborted, assume all alts mentioned in this DFA state are hosed
-		if ( d.abortedDueToRecursionOverflow ) {
-			nondeterministicAlts = d.getAltSet();
-		}
-
 		boolean resolved =
 			tryToResolveWithSemanticPredicates(d, nondeterministicAlts);
 		if ( resolved ) {
@@ -1233,10 +1238,15 @@ public class NFAToDFAConverter {
 		}
 
 		// RESOLVE SYNTACTIC CONFLICT BY REMOVING ALL BUT ONE ALT
+		resolveByChoosingFirstAlt(d, nondeterministicAlts);
 
+		//System.out.println("state "+d.stateNumber+" resolved to alt "+winningAlt);
+	}
+
+	protected int resolveByChoosingFirstAlt(DFAState d, Set nondeterministicAlts) {
 		int winningAlt = 0;
 		if ( dfa.isGreedy() ) {
-	        winningAlt = resolveByPickingMinAlt(d,nondeterministicAlts);
+			winningAlt = resolveByPickingMinAlt(d,nondeterministicAlts);
 		}
 		else {
 			// If nongreedy, the exit alt shout win, but only if it's
@@ -1257,7 +1267,7 @@ public class NFAToDFAConverter {
 				winningAlt = resolveByPickingMinAlt(d,nondeterministicAlts);
 			}
 		}
-		//System.out.println("state "+d.stateNumber+" resolved to alt "+winningAlt);
+		return winningAlt;
 	}
 
 	/** Turn off all configurations associated with the

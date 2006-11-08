@@ -102,6 +102,18 @@ public class DFAState extends State {
 	 */
 	protected boolean abortedDueToRecursionOverflow = false;
 
+	/** If we detect recursion on more than one alt, decision is non-LL(*),
+	 *  but try to isolate it to only those states whose closure operations
+	 *  detect recursion.  There may be other alts that are cool:
+	 *
+	 *  a : recur '.'
+	 *    | recur ';'
+	 *    | X Y  // LL(2) decision; don't abort and use k=1 plus backtracking
+	 *    | X Z
+	 *    ;
+	 */
+	protected boolean abortedDueToMultipleRecursiveAlts = false;
+
 	/** Build up the hash code for this state as NFA configurations
      *  are added as it's monotonically increasing list of configurations.
      */
@@ -479,6 +491,10 @@ public class DFAState extends State {
 			// if we have hit the max lookahead
 			return getAltSet();
 		}
+		else if ( abortedDueToMultipleRecursiveAlts || abortedDueToRecursionOverflow ) {
+			// if we had to abort for non-LL(*) state assume all alts are a problem
+			return getAltSet();
+		}
 		else {
 			return getConflictingAlts();
 		}
@@ -547,7 +563,6 @@ public class DFAState extends State {
 					System.out.println("potential conflict in state "+stateI+
 									   " configs: "+configsForState);
 					*/
-					NFAState s = dfa.nfa.getState(stateI.intValue());
 					// 11/28/2005: don't report closures that pinch back
 					// together in Tokens rule.  We want to silently resolve
 					// to the first token definition ala lex/flex by ignoring
@@ -563,6 +578,7 @@ public class DFAState extends State {
 			if ( !thisStateHasPotentialProblem ) {
 				// remove NFA state's configurations from
 				// further checking; no issues with it
+				// (can't remove as it's concurrent modification; set to null)
 				stateToConfigListMap.put(stateI, null);
 			}
 		}
@@ -574,8 +590,9 @@ public class DFAState extends State {
 
 		// we have a potential problem, so now go through config lists again
 		// looking for different alts (only states with potential issues
-		// are left in the states set).  For example, the list of configs
-		// for NFA state 3 in some DFA state might be:
+		// are left in the states set).  Now we will check context.
+		// For example, the list of configs for NFA state 3 in some DFA
+		// state might be:
 		//   [3|2|[28 18 $], 3|1|[28 $], 3|1, 3|2]
 		// I want to create a map from context to alts looking for overlap:
 		//   [28 18 $] -> 2

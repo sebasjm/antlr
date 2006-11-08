@@ -69,12 +69,12 @@ public class TestDFAConversion extends BaseTest {
 		// nondeterministic from left edge; no stop state
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-A->.s2\n"; // gets this after failing to do LL(*)
+			".s1-A->:s2=>1\n"; // gets this after failing to do LL(*)
 		int[] unreachableAlts = new int[] {1,2};
-		int[] nonDetAlts = null;
+		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = null;
 		int[] danglingAlts = new int[] {1,2};
-		int numWarnings = 1;
+		int numWarnings = 2; // non-LL(*) abort and ambig upon A A
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -89,14 +89,144 @@ public class TestDFAConversion extends BaseTest {
 			"    | B\n" +
 			"    ;");
 		String expecting =
-			".s0-B->.s3\n" +
-			".s0-L->.s1\n" +
-			".s1-L->.s2\n";
+			".s0-B->.s6\n" +
+				".s0-L->.s1\n" +
+				".s1-B->.s3\n" +
+				".s1-L->:s2=>1\n" +
+				".s3-R->.s4\n" +
+				".s4-X->:s2=>1\n" +
+				".s4-Y->:s5=>2\n" +
+				".s6-X->:s2=>1\n" +
+				".s6-Y->:s5=>2\n";
 		int[] unreachableAlts = new int[] {1,2};
+		int[] nonDetAlts = new int[] {1,2};
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 2;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testSynPredResolvesRecursion() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"x   : (y X)=> y X\n" +
+			"    | y Y\n" +
+			"    ;\n" +
+			"y   : L y R\n" +
+			"    | B\n" +
+			"    ;");
+		String expecting =
+			".s0-B->.s7\n" +
+				".s0-L->.s1\n" +
+				".s1-B->.s5\n" +
+				".s1-L->.s2\n" +
+				".s2-{synpred1}?->:s3=>1\n" +
+				".s2-{true}?->:s4=>2\n" +
+				".s5-R->.s6\n" +
+				".s6-X->:s3=>1\n" +
+				".s6-Y->:s4=>2\n" +
+				".s7-X->:s3=>1\n" +
+				".s7-Y->:s4=>2\n";
+		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 1;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testSynPredResolvesRecursionInLexer() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A :     (B ';')=> B ';'\n" +
+			"  |     B '.'\n" +
+			"  ;\n" +
+			"fragment\n" +
+			"B :     '(' B ')'\n" +
+			"  |     'x'\n" +
+			"  ;\n");
+		String expecting =
+			".s0-'('->.s1\n" +
+			".s0-'x'->.s7\n" +
+			".s1-'('->.s2\n" +
+			".s1-'x'->.s5\n" +
+			".s2-{synpred1}?->:s3=>1\n" +
+			".s2-{true}?->:s4=>2\n" +
+			".s5-')'->.s6\n" +
+			".s6-'.'->:s4=>2\n" +
+			".s6-';'->:s3=>1\n" +
+			".s7-'.'->:s4=>2\n" +
+			".s7-';'->:s3=>1\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testAutoBacktrackResolvesRecursionInLexer() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"options {backtrack=true;}\n"+
+			"A :     B ';'\n" +
+			"  |     B '.'\n" +
+			"  ;\n" +
+			"fragment\n" +
+			"B :     '(' B ')'\n" +
+			"  |     'x'\n" +
+			"  ;\n");
+		String expecting =
+			".s0-'('->.s1\n" +
+			".s0-'x'->.s7\n" +
+			".s1-'('->.s2\n" +
+			".s1-'x'->.s5\n" +
+			".s2-{synpred1}?->:s3=>1\n" +
+			".s2-{true}?->:s4=>2\n" +
+			".s5-')'->.s6\n" +
+			".s6-'.'->:s4=>2\n" +
+			".s6-';'->:s3=>1\n" +
+			".s7-'.'->:s4=>2\n" +
+			".s7-';'->:s3=>1\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testAutoBacktrackResolvesRecursion() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"x   : y X\n" +
+			"    | y Y\n" +
+			"    ;\n" +
+			"y   : L y R\n" +
+			"    | B\n" +
+			"    ;");
+		String expecting =
+			".s0-B->.s7\n" +
+				".s0-L->.s1\n" +
+				".s1-B->.s5\n" +
+				".s1-L->.s2\n" +
+				".s2-{synpred1}?->:s3=>1\n" +
+				".s2-{true}?->:s4=>2\n" +
+				".s5-R->.s6\n" +
+				".s6-X->:s3=>1\n" +
+				".s6-Y->:s4=>2\n" +
+				".s7-X->:s3=>1\n" +
+				".s7-Y->:s4=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -899,12 +1029,13 @@ As a result, alternative(s) 2 were disabled for that input
 			"  ;\n");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-A->.s2\n";
+				".s1-Y->:s3=>2\n" +
+				".s1-{X, A}->:s2=>1\n";
 		int[] unreachableAlts = new int[] {1,2};
-		int[] nonDetAlts = null;
+		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 1;
+		int numWarnings = 2;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}

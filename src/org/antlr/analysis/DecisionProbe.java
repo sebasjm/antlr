@@ -623,8 +623,8 @@ public class DecisionProbe {
 		}
 	}
 
-	public void reportNondeterminism(DFAState d) {
-		altsWithProblem.addAll(d.getNondeterministicAlts()); // track overall list
+	public void reportNondeterminism(DFAState d, Set nondeterministicAlts) {
+		altsWithProblem.addAll(nondeterministicAlts); // track overall list
 		statesWithSyntacticallyAmbiguousAltsSet.add(d);
 		dfa.nfa.grammar.setOfNondeterministicDecisionNumbers.add(
 			new Integer(dfa.getDecisionNumber())
