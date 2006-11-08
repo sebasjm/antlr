@@ -277,6 +277,10 @@ CHANGES
 
 3.0b5 - ??
 
+November 8, 2006
+
+* Syntactic predicates did not get hoisting properly upon non-LL(*) decision.  Other hoisting issues fixed.  Cleaned up code.
+
 November 3, 2006
 
 * $text, $line, etc... were not working in assignments. Fixed and added
