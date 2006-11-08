@@ -198,7 +198,7 @@ protected StringTemplate template(String name) {
  * 				;
  */
 SET_ENCLOSING_RULE_SCOPE_ATTR
-	:	'$' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
+	:	'$' x=ID '.' y=ID WS? '=' {input.LA(1)!='='}? expr=ATTR_VALUE_EXPR ';'
 							{enclosingRule!=null &&
 	                         $x.text.equals(enclosingRule.name) &&
 	                         enclosingRule.getLocalAttributeScope($y.text)!=null}?
@@ -334,7 +334,7 @@ SET_RULE_SCOPE_ATTR
 Grammar.LabelElementPair pair=null;
 String refdRuleName=null;
 }
-	:	'$' x=ID '.' y=ID WS? '=' {enclosingRule!=null}?
+	:	'$' x=ID '.' y=ID WS? '=' {enclosingRule!=null && input.LA(1)!='='}?
 		{
 		pair = enclosingRule.getRuleLabel($x.text);
 		refdRuleName = $x.text;
@@ -492,7 +492,7 @@ ISOLATED_LEXER_RULE_REF
  *	TODO: this might get the dynamic scope's elements too.!!!!!!!!!
  */
 SET_LOCAL_ATTR
-	:	'$' ID WS? '=' expr=ATTR_VALUE_EXPR ';' {enclosingRule!=null
+	:	'$' ID WS? '=' {input.LA(1)!='='}? expr=ATTR_VALUE_EXPR ';' {enclosingRule!=null
 													&& enclosingRule.getLocalAttributeScope($ID.text)!=null
 													&& !enclosingRule.getLocalAttributeScope($ID.text).isPredefinedLexerRuleScope}?
 		//{System.out.println("found set \$localattr");}
@@ -569,7 +569,7 @@ LOCAL_ATTR
  * 				;
  */
 SET_DYNAMIC_SCOPE_ATTR
-	:	'$' x=ID '::' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
+	:	'$' x=ID '::' y=ID WS? '=' {input.LA(1)!='='}? expr=ATTR_VALUE_EXPR ';'
 						   {resolveDynamicScope($x.text)!=null &&
 						     resolveDynamicScope($x.text).getAttribute($y.text)!=null}?
 		//{System.out.println("found set \$scope::attr "+ $x.text + "::" + $y.text + " to " + $expr.text);}

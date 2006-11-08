@@ -2823,6 +2823,52 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	public void testDoNotTranslateScopeAttributeCompare() throws Exception {
+		String action = "if ($rule::foo == \"foo\" || 1) { System.out.println(\"ouch\"); }";
+		String expecting = "if (((rule_scope)rule_stack.peek()).foo == \"foo\" || 1) { System.out.println(\"ouch\"); }";
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+				"grammar a;\n" +
+				"rule\n" +
+				"scope {\n" +
+				"   String foo;" +
+				"} :\n" +
+				"     twoIDs" +
+				"    ;\n" +
+				"twoIDs:\n" +
+				"    ID ID {" + action + "}\n" +
+				"    ;\n" +
+				"ID : 'id';"
+		);
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,
+																	 "twoIDs",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		// check that we didn't use scopeSetAttributeRef int translation!
+		boolean foundScopeSetAttributeRef = false;
+		for (int i = 0; i < translator.chunks.size(); i++) {
+			Object chunk = translator.chunks.get(i);
+			if (chunk instanceof StringTemplate) {
+				if (((StringTemplate)chunk).getName().equals("scopeSetAttributeRef")) {
+					foundScopeSetAttributeRef = true;
+				}
+			}
+		}
+		assertFalse("action translator used scopeSetAttributeRef template in comparison!", foundScopeSetAttributeRef);
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+		assertEquals(expecting, found);
+	}
+
 	// S U P P O R T
 
 	protected void checkError(ErrorQueue equeue,
