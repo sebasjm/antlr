@@ -198,7 +198,7 @@ protected StringTemplate template(String name) {
  * 				;
  */
 SET_ENCLOSING_RULE_SCOPE_ATTR
-	:	'$' x=ID '.' y=ID WS? '=' {input.LA(1)!='='}? expr=ATTR_VALUE_EXPR ';'
+	:	'$' x=ID '.' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
 							{enclosingRule!=null &&
 	                         $x.text.equals(enclosingRule.name) &&
 	                         enclosingRule.getLocalAttributeScope($y.text)!=null}?
@@ -492,7 +492,7 @@ ISOLATED_LEXER_RULE_REF
  *	TODO: this might get the dynamic scope's elements too.!!!!!!!!!
  */
 SET_LOCAL_ATTR
-	:	'$' ID WS? '=' {input.LA(1)!='='}? expr=ATTR_VALUE_EXPR ';' {enclosingRule!=null
+	:	'$' ID WS? '=' expr=ATTR_VALUE_EXPR ';' {enclosingRule!=null
 													&& enclosingRule.getLocalAttributeScope($ID.text)!=null
 													&& !enclosingRule.getLocalAttributeScope($ID.text).isPredefinedLexerRuleScope}?
 		//{System.out.println("found set \$localattr");}
@@ -569,7 +569,7 @@ LOCAL_ATTR
  * 				;
  */
 SET_DYNAMIC_SCOPE_ATTR
-	:	'$' x=ID '::' y=ID WS? '=' {input.LA(1)!='='}? expr=ATTR_VALUE_EXPR ';'
+	:	'$' x=ID '::' y=ID WS? '=' expr=ATTR_VALUE_EXPR ';'
 						   {resolveDynamicScope($x.text)!=null &&
 						     resolveDynamicScope($x.text).getAttribute($y.text)!=null}?
 		//{System.out.println("found set \$scope::attr "+ $x.text + "::" + $y.text + " to " + $expr.text);}
@@ -737,9 +737,10 @@ SET_ATTRIBUTE
 		}
 	;
 
+/** Don't allow an = as first char to prevent $x == 3; kind of stuff. */
 fragment
 ATTR_VALUE_EXPR
-	:	(~';')+
+	:	~'=' (~';')*
 	;
 	
 /** %{string-expr} anonymous template from string expr */
