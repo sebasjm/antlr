@@ -75,12 +75,14 @@ public class CPPTarget extends Target {
 	 */
 	public String escapeString(String s)
 	{
-		String retval = new String();
-		for (int i = 0; i < s.length(); i++)
-			retval += escapeChar(s.charAt(i));
+		StringBuffer retval = new StringBuffer();
+		for (int i = 0; i < s.length(); i++) {
+			retval.append(escapeChar(s.charAt(i)));
+		}
 
-		return retval;
+		return retval.toString();
 	}
+
 	protected void genRecognizerHeaderFile(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
@@ -93,6 +95,7 @@ public class CPPTarget extends Target {
 		String ext = templates.getInstanceOf("headerFileExtension").toString();
 		generator.write(headerFileST, grammar.name+ext);
 	}
+
 	/** Convert from an ANTLR char literal found in a grammar file to
 	 *  an equivalent char literal in the target language.  For Java, this
 	 *  is the identify translation; i.e., '\n' -> '\n'.  Most languages
