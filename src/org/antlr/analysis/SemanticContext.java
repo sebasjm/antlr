@@ -239,6 +239,7 @@ public abstract class SemanticContext {
 		}
 	}
 
+	/*
 	public static class FalsePredicate extends Predicate {
 		public FalsePredicate() {
 			super();
@@ -257,6 +258,7 @@ public abstract class SemanticContext {
 			return "false"; // not used for code gen, just DOT and print outs
 		}
 	}
+	*/
 
 	public static class AND extends SemanticContext {
 		protected SemanticContext left,right;

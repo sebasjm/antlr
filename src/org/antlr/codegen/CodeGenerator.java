@@ -133,9 +133,6 @@ public class CodeGenerator {
 	 */
 	protected boolean profile;
 
-	/** Cache rule invocation results during backtracking */
-	protected boolean memoize = true;
-
 	protected int lineWidth = 72;
 
 	/** I have factored out the generation of acyclic DFAs to separate class */
@@ -1080,11 +1077,6 @@ public class CodeGenerator {
 			return null;
 		}
 		return grammar.name+VOCAB_FILE_EXTENSION;
-	}
-
-	/** TODO: add the package to the name; language sensitive? */
-	public String getClassName() {
-		return grammar.name;
 	}
 
 	public void write(StringTemplate code, String fileName) throws IOException {

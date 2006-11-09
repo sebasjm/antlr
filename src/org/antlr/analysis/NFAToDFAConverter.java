@@ -37,9 +37,6 @@ public class NFAToDFAConverter {
 	/** A list of DFA states we still need to process during NFA conversion */
 	protected List work = new LinkedList();
 
-	/** Have we found a condition that renders DFA useless?  If so, terminate */
-	protected boolean terminateConversion = false;
-
 	/** While converting NFA, we must track states that
 	 *  reference other rule's NFAs so we know what to do
 	 *  at the end of a rule.  We need to know what context invoked

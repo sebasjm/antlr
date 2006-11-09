@@ -51,10 +51,7 @@ import java.util.Map;
  * @author Terence Parr
  */
 public class BitSet implements IntSet, Cloneable {
-	public static final BitSet empty = new BitSet();
-
     protected final static int BITS = 64;    // number of bits / long
-    protected final static int NIBBLE = 4;
     protected final static int LOG_BITS = 6; // 2^6 == 64
 
     /* We will often need to do a mod operator (i mod nbits).  Its

@@ -47,8 +47,6 @@ import java.util.*;
  *  The ranges are ordered and disjoint so that 2..6 appears before 101..103.
  */
 public class IntervalSet implements IntSet {
-    public static final IntervalSet empty = new IntervalSet();
-
     /** The list of sorted, disjoint intervals. */
     protected List intervals;
 

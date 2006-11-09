@@ -37,9 +37,6 @@ import java.util.*;
 
 /** The main ANTLR entry point.  Read a grammar and generate a parser. */
 public class Tool {
-    /** If hasError, cannot continue processing */
-    protected boolean hasError;
-
 	public static final String VERSION = "3.0b5";
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
@@ -482,10 +479,6 @@ public class Tool {
         FileWriter fw = new FileWriter(new File(outputDir, fileName));
 		return new BufferedWriter(fw);
     }
-
-	public String getOutputDirectory() {
-		return outputDirectory;
-	}
 
 	/** Open a file in the -lib dir.  For now, it's just .tokens files */
 	public BufferedReader getLibraryFile(String fileName) throws IOException {

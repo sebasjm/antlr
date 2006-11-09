@@ -244,7 +244,6 @@ public class DFAOptimizer {
 
 	/** Walk DFA states, unlinking the nfa configs and whatever else I
 	 *  can to reduce memory footprint.
-	 */
 	protected void unlinkUnneededStateData(DFAState d) {
 		Integer sI = new Integer(d.stateNumber);
 		if ( visited.contains(sI) ) {
@@ -258,5 +257,6 @@ public class DFAOptimizer {
 			unlinkUnneededStateData(edgeTarget);
 		}
 	}
+	 */
 
 }
