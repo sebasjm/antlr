@@ -547,11 +547,11 @@ public class IntervalSet implements IntSet {
 
     public String toString(Grammar g) {
         StringBuffer buf = new StringBuffer();
+		if ( this.intervals==null || this.intervals.size()==0 ) {
+			return "{}";
+		}
         if ( this.intervals.size()>1 ) {
             buf.append("{");
-        }
-        if ( this.intervals==null || this.intervals.size()==0 ) {
-            return "{}";
         }
         Iterator iter = this.intervals.iterator();
         while (iter.hasNext()) {
