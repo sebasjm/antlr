@@ -318,7 +318,6 @@ public class Tool {
     }
 
 	protected void processGrammar(Grammar grammar)
-		throws IOException
 	{
 		String language = (String)grammar.getOption("language");
 		if ( language!=null ) {
@@ -327,13 +326,6 @@ public class Tool {
 			generator.setDebug(debug);
 			generator.setProfile(profile);
 			generator.setTrace(trace);
-
-			/*
-			if ( grammar.type==Grammar.LEXER ) {
-				grammar.addArtificialMatchTokensRule();
-			}
-			*/
-
 			generator.genRecognizer();
 		}
 	}

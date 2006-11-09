@@ -68,7 +68,7 @@ public class NFAToDFAConverter {
 		initContextTrees(nAlts);
 	}
 
-	public void convert(NFAState blockStart) {
+	public void convert() {
 		dfa.conversionStartTime = System.currentTimeMillis();
 
 		// create the DFA start state
@@ -385,10 +385,10 @@ public class NFAToDFAConverter {
 	 *  are actions in that rule.  For now, since I am not preventing
 	 *  backtracking from Tokens rule, I will simply allow the optimization.
 	 */
-	protected int addTransition(DFAState d,
-								Label label,
-								DFAState targetState,
-								Map targetToLabelMap)
+	protected static int addTransition(DFAState d,
+									   Label label,
+									   DFAState targetState,
+									   Map targetToLabelMap)
 	{
 		//System.out.println(d.stateNumber+"-"+label.toString(dfa.nfa.grammar)+"->"+targetState.stateNumber);
 		int n = 0;
@@ -605,7 +605,7 @@ public class NFAToDFAConverter {
 						semanticContext);
 
 		// Avoid infinite recursion
-		if ( closureIsBusy(d,p,proposedNFAConfiguration) ) {
+		if ( closureIsBusy(d, proposedNFAConfiguration) ) {
 			if ( debug ) {
 				System.out.println("avoid visiting exact closure computation NFA config: "+proposedNFAConfiguration);
 				System.out.println("state is "+d.dfa.decisionNumber+"."+d);
@@ -786,9 +786,8 @@ public class NFAToDFAConverter {
 	 *
 	 *  If the semantic context is different, then allow new computation.
 	 */
-	public boolean closureIsBusy(DFAState d,
-								 NFAState p,
-								 NFAConfiguration proposedNFAConfiguration)
+	public static boolean closureIsBusy(DFAState d,
+										NFAConfiguration proposedNFAConfiguration)
 	{
 		// Check epsilon cycle (same state, same alt, same context)
 		return d.closureBusy.contains(proposedNFAConfiguration);
@@ -1304,7 +1303,7 @@ public class NFAToDFAConverter {
 	/** turn off all states associated with alts other than the good one
 	 *  (as long as they are one of the nondeterministic ones)
 	 */
-	protected void turnOffOtherAlts(DFAState d, int min, Set nondeterministicAlts) {
+	protected static void turnOffOtherAlts(DFAState d, int min, Set nondeterministicAlts) {
 		Iterator iter = d.nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
@@ -1319,7 +1318,7 @@ public class NFAToDFAConverter {
 		}
 	}
 
-	protected int getMinAlt(DFAState d) {
+	protected static int getMinAlt(DFAState d) {
 		int min = Integer.MAX_VALUE;
 		Iterator iter = d.nfaConfigurations.iterator();
 		NFAConfiguration configuration;
@@ -1332,7 +1331,7 @@ public class NFAToDFAConverter {
 		return min;
 	}
 
-	protected int getMinAlt(Set nondeterministicAlts) {
+	protected static int getMinAlt(Set nondeterministicAlts) {
 		int min = Integer.MAX_VALUE;
 		Iterator iter = nondeterministicAlts.iterator();
 		while (iter.hasNext()) {
@@ -1611,7 +1610,7 @@ public class NFAToDFAConverter {
 	/** OR together all predicates from the alts.  Note that the predicate
 	 *  for an alt could itself be a combination of predicates.
 	 */
-	protected SemanticContext getUnionOfPredicates(Map altToPredMap) {
+	protected static SemanticContext getUnionOfPredicates(Map altToPredMap) {
 		Iterator iter;
 		SemanticContext unionOfPredicatesFromAllAlts = null;
 		iter = altToPredMap.values().iterator();

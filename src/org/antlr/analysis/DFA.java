@@ -215,7 +215,7 @@ public class DFA {
 
 		//long start = System.currentTimeMillis();
         nfaConverter = new NFAToDFAConverter(this);
-		nfaConverter.convert(decisionStartState);
+		nfaConverter.convert();
 
 		// figure out if there are problems with decision
 		verify();
@@ -494,7 +494,7 @@ public class DFA {
 			else {
 				createMinMaxTables(s);
 				createTransitionTableEntryForState(s);
-				createSpecialTable(generator, s);
+				createSpecialTable(s);
 				createEOTAndEOFTables(s);
 			}
 		}
@@ -683,7 +683,7 @@ public class DFA {
 		}
 	}
 
-	protected void createSpecialTable(CodeGenerator generator, DFAState s) {
+	protected void createSpecialTable(DFAState s) {
 		// number all special states from 0...n-1 instead of their usual numbers
 		boolean hasSemPred = false;
 

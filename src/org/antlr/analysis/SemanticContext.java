@@ -207,10 +207,6 @@ public abstract class SemanticContext {
 		}
 
 		public String toString() {
-			return toString(null);
-		}
-
-		public String toString(StringTemplateGroup templates) {
 			if ( predicate==null ) {
 				return "<nopred>";
 			}
