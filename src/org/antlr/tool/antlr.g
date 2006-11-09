@@ -214,6 +214,7 @@ tokens {
 		}
 		ErrorManager.syntaxError(
 			ErrorManager.MSG_SYNTAX_ERROR,
+			grammar,
 			token,
 			"antlr: "+ex.toString(),
 			ex);

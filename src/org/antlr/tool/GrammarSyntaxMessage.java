@@ -40,13 +40,15 @@ public class GrammarSyntaxMessage extends Message {
 	public antlr.RecognitionException exception;
 
 	public GrammarSyntaxMessage(int msgID,
+								Grammar grammar,
 								Token offendingToken,
 								antlr.RecognitionException exception)
 	{
-		this(msgID,offendingToken,null,exception);
+		this(msgID,grammar,offendingToken,null,exception);
 	}
 
 	public GrammarSyntaxMessage(int msgID,
+								Grammar grammar,
 								Token offendingToken,
 								Object arg,
 								antlr.RecognitionException exception)
@@ -54,6 +56,7 @@ public class GrammarSyntaxMessage extends Message {
 		super(msgID, arg, null);
 		this.offendingToken = offendingToken;
 		this.exception = exception;
+		this.g = grammar;
 	}
 
 	public String toString() {

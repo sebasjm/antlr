@@ -100,6 +100,7 @@ options {
 		}
         ErrorManager.syntaxError(
             ErrorManager.MSG_SYNTAX_ERROR,
+            grammar,
             token,
             "assign.types: "+ex.toString(),
             ex);

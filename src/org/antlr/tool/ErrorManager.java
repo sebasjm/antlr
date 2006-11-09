@@ -709,6 +709,7 @@ public class ErrorManager {
 	}
 
 	public static void syntaxError(int msgID,
+								   Grammar grammar,
 								   Token token,
 								   Object arg,
 								   antlr.RecognitionException re)
@@ -716,7 +717,7 @@ public class ErrorManager {
 		getErrorState().errors++;
 		getErrorState().errorMsgIDs.add(msgID);
 		getErrorListener().error(
-			new GrammarSyntaxMessage(msgID,token,arg,re)
+			new GrammarSyntaxMessage(msgID,grammar,token,arg,re)
 		);
 	}
 

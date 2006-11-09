@@ -63,6 +63,7 @@ options {
 		}
         ErrorManager.syntaxError(
             ErrorManager.MSG_SYNTAX_ERROR,
+            grammar,
             token,
             "antlr.print: "+ex.toString(),
             ex);

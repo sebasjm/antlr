@@ -55,6 +55,7 @@ protected int blockLevel = 0;
 		}
         ErrorManager.syntaxError(
             ErrorManager.MSG_SYNTAX_ERROR,
+            grammar,
             token,
             "define: "+ex.toString(),
             ex);

@@ -118,6 +118,7 @@ protected void finish() {
 		}
         ErrorManager.syntaxError(
             ErrorManager.MSG_SYNTAX_ERROR,
+            grammar,
             token,
             "buildnfa: "+ex.toString(),
             ex);

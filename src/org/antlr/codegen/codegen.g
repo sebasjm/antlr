@@ -77,6 +77,7 @@ options {
 		}
         ErrorManager.syntaxError(
             ErrorManager.MSG_SYNTAX_ERROR,
+            grammar,
             token,
             "codegen: "+ex.toString(),
             ex);
