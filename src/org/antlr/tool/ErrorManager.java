@@ -598,22 +598,20 @@ public class ErrorManager {
 									  DFAState d)
 	{
 		getErrorState().warnings++;
-		getErrorState().warningMsgIDs.add(ErrorManager.MSG_GRAMMAR_NONDETERMINISM);
-		getErrorListener().warning(
-			new GrammarNonDeterminismMessage(probe,d)
-		);
+		Message msg = new GrammarNonDeterminismMessage(probe,d);
+		getErrorState().warningMsgIDs.add(msg.msgID);
+		getErrorListener().warning(msg);
 	}
 
 	public static void danglingState(DecisionProbe probe,
 									 DFAState d)
 	{
 		getErrorState().warnings++;
-		getErrorState().warningMsgIDs.add(ErrorManager.MSG_DANGLING_STATE);
+		Message msg = new GrammarDanglingStateMessage(probe,d);
+		getErrorState().warningMsgIDs.add(msg.msgID);
 		Set seen = (Set)emitSingleError.get("danglingState");
 		if ( !seen.contains(d.dfa.decisionNumber+"|"+d.getAltSet()) ) {
-			getErrorListener().warning(
-				new GrammarDanglingStateMessage(probe,d)
-			);
+			getErrorListener().warning(msg);
 			// we've seen this decision and this alt set; never again
 			seen.add(d.dfa.decisionNumber+"|"+d.getAltSet());
 		}
@@ -622,38 +620,34 @@ public class ErrorManager {
 	public static void analysisAborted(DecisionProbe probe)
 	{
 		getErrorState().warnings++;
-		getErrorState().warningMsgIDs.add(ErrorManager.MSG_ANALYSIS_ABORTED);
-		getErrorListener().warning(
-			new GrammarAnalysisAbortedMessage(probe)
-		);
+		Message msg = new GrammarAnalysisAbortedMessage(probe);
+		getErrorState().warningMsgIDs.add(msg.msgID);
+		getErrorListener().warning(msg);
 	}
 
 	public static void unreachableAlts(DecisionProbe probe,
 									   List alts)
 	{
 		getErrorState().warnings++;
-		getErrorState().warningMsgIDs.add(ErrorManager.MSG_UNREACHABLE_ALTS);
-		getErrorListener().warning(
-			new GrammarUnreachableAltsMessage(probe,alts)
-		);
+		Message msg = new GrammarUnreachableAltsMessage(probe,alts);
+		getErrorState().warningMsgIDs.add(msg.msgID);
+		getErrorListener().warning(msg);
 	}
 
 	public static void insufficientPredicates(DecisionProbe probe,
 											  List alts)
 	{
 		getErrorState().warnings++;
-		getErrorState().warningMsgIDs.add(ErrorManager.MSG_INSUFFICIENT_PREDICATES);
-		getErrorListener().warning(
-			new GrammarInsufficientPredicatesMessage(probe,alts)
-		);
+		Message msg = new GrammarInsufficientPredicatesMessage(probe,alts);
+		getErrorState().warningMsgIDs.add(msg.msgID);
+		getErrorListener().warning(msg);
 	}
 
 	public static void nonRegularDecision(DecisionProbe probe) {
 		getErrorState().errors++;
-		getErrorState().errorMsgIDs.add(MSG_NONREGULAR_DECISION);
-		getErrorListener().error(
-			new NonRegularDecisionMessage(probe, probe.getNonDeterministicAlts())
-		);
+		Message msg = new NonRegularDecisionMessage(probe, probe.getNonDeterministicAlts());
+		getErrorState().errorMsgIDs.add(msg.msgID);
+		getErrorListener().error(msg);
 	}
 
 	public static void recursionOverflow(DecisionProbe probe,
@@ -663,11 +657,10 @@ public class ErrorManager {
 										 Collection callSiteStates)
 	{
 		getErrorState().warnings++;
-		getErrorState().warningMsgIDs.add(ErrorManager.MSG_RECURSION_OVERLOW);
-		getErrorListener().warning(
-			new RecursionOverflowMessage(probe,sampleBadState, alt,
-										 targetRules, callSiteStates)
-		);
+		Message msg = new RecursionOverflowMessage(probe,sampleBadState, alt,
+										 targetRules, callSiteStates);
+		getErrorState().warningMsgIDs.add(msg.msgID);
+		getErrorListener().warning(msg);
 	}
 
 	public static void leftRecursion(DecisionProbe probe,
@@ -676,18 +669,16 @@ public class ErrorManager {
 									 Collection callSiteStates)
 	{
 		getErrorState().warnings++;
-		getErrorState().warningMsgIDs.add(ErrorManager.MSG_LEFT_RECURSION);
-		getErrorListener().warning(
-			new LeftRecursionMessage(probe, alt, targetRules, callSiteStates)
-		);
+		Message msg = new LeftRecursionMessage(probe, alt, targetRules, callSiteStates);
+		getErrorState().warningMsgIDs.add(msg.msgID);
+		getErrorListener().warning(msg);
 	}
 
 	public static void leftRecursionCycles(Collection cycles) {
 		getErrorState().errors++;
-		getErrorState().errorMsgIDs.add(MSG_LEFT_RECURSION_CYCLES);
-		getErrorListener().warning(
-			new LeftRecursionCyclesMessage(cycles)
-		);
+		Message msg = new LeftRecursionCyclesMessage(cycles);
+		getErrorState().errorMsgIDs.add(msg.msgID);
+		getErrorListener().warning(msg);
 	}
 
 	public static void grammarError(int msgID,
@@ -697,10 +688,9 @@ public class ErrorManager {
 									Object arg2)
 	{
 		getErrorState().errors++;
+		Message msg = new GrammarSemanticsMessage(msgID,g,token,arg,arg2);
 		getErrorState().errorMsgIDs.add(msgID);
-		getErrorListener().error(
-			new GrammarSemanticsMessage(msgID,g,token,arg,arg2)
-		);
+		getErrorListener().error(msg);
 	}
 
 	public static void grammarError(int msgID,

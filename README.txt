@@ -281,6 +281,8 @@ November 8, 2006
 
 * Syntactic predicates did not get hoisting properly upon non-LL(*) decision.  Other hoisting issues fixed.  Cleaned up code.
 
+* Removed failsafe that check to see if I'm spending too much time on a single DFA; I don't think we need it anymore.
+
 November 3, 2006
 
 * $text, $line, etc... were not working in assignments. Fixed and added
