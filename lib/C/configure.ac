@@ -97,7 +97,7 @@ case $host in
 sparc*-*solaris*)
  CPPCMNTFLAGS=
  if test "$BIT64" = 1; then
-  CCFLAGS64=-xtarget=ultra4 -xarch=v9a -fast
+  CCFLAGS64="-fast -xtarget=ultra4 -xarch=v9a"
  fi
  OPTIMFLAGS="-O"
  if test $DEBUGINF = 1; then
@@ -151,8 +151,6 @@ AC_C_INLINE
 
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memmove memset strdup])
 
 AC_CONFIG_HEADERS(antlr3config.h)
