@@ -243,7 +243,7 @@ public class DecisionProbe {
 	 *  Note that predicates may resolve the conflict.
 	 */
 	public List getNonDeterministicAltsForState(DFAState targetState) {
-		Set nondetAlts = targetState.getNondeterministicAlts();
+		Set nondetAlts = targetState.getNonDeterministicAlts();
 		if ( nondetAlts==null ) {
 			return null;
 		}

@@ -65,13 +65,10 @@ public class ANTLRFileStream extends ANTLRStringStream {
 		}
 		try {
 			data = new char[size];
-			isr.read(data);
-			super.n = size;
+			super.n = isr.read(data);
 		}
 		finally {
-			if ( isr!=null ) {
-				isr.close();
-			}
+			isr.close();
 		}
 	}
 

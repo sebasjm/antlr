@@ -394,7 +394,17 @@ public class ErrorManager {
 			br.close();
 		}
 		catch (IOException ioe) {
-			rawError("cannot close message file "+fileName, ioe);
+			rawError("error reading message file "+fileName, ioe);
+		}
+		finally {
+			if ( br!=null ) {
+				try {
+					br.close();
+				}
+				catch (IOException ioe) {
+					rawError("cannot close message file "+fileName, ioe);
+				}
+			}
 		}
 
 		messages.setErrorListener(blankSTListener);
@@ -435,10 +445,16 @@ public class ErrorManager {
 			format = new StringTemplateGroup(br,
 											   AngleBracketTemplateLexer.class,
 											   initSTListener);
-			br.close();
 		}
-		catch (IOException ioe) {
-			rawError("cannot close message format file "+fileName, ioe);
+		finally {
+			try {
+				if ( br!=null ) {
+					br.close();
+				}
+			}
+			catch (IOException ioe) {
+				rawError("cannot close message format file "+fileName, ioe);
+			}
 		}
 
 		format.setErrorListener(blankSTListener);

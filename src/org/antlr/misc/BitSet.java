@@ -346,7 +346,6 @@ public class BitSet implements IntSet, Cloneable {
 	}
 
     public static BitSet of(Map elements) {
-        BitSet s = new BitSet();
         return BitSet.of(elements.keySet());
     }
 
@@ -526,18 +525,20 @@ public class BitSet implements IntSet, Cloneable {
      * This generates a comma-separated list of C++-like unsigned long constants.
      */
     public String toStringOfHalfWords() {
-        String s = new String();
+        StringBuffer s = new StringBuffer();
         for (int i = 0; i < bits.length; i++) {
-            if (i != 0) s += ", ";
+            if (i != 0) s.append(", ");
             long tmp = bits[i];
             tmp &= 0xFFFFFFFFL;
-            s += (tmp + "UL");
-            s += ", ";
+            s.append(tmp);
+			s.append("UL");
+            s.append(", ");
             tmp = bits[i] >>> 32;
             tmp &= 0xFFFFFFFFL;
-            s += (tmp + "UL");
+			s.append(tmp);
+			s.append("UL");
         }
-        return s;
+		return s.toString();
     }
 
     /**
@@ -545,12 +546,13 @@ public class BitSet implements IntSet, Cloneable {
      * This generates a comma-separated list of Java-like long int constants.
      */
     public String toStringOfWords() {
-        String s = new String();
+		StringBuffer s = new StringBuffer();
         for (int i = 0; i < bits.length; i++) {
-            if (i != 0) s += ", ";
-            s += (bits[i] + "L");
+            if (i != 0) s.append(", ");
+            s.append(bits[i]);
+			s.append("L");
         }
-        return s;
+        return s.toString();
     }
 
     public String toStringWithRanges() {

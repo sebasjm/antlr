@@ -85,7 +85,7 @@ public class ACyclicDFACodeGenerator {
 		dfaST.setAttribute("k", new Integer(k));
 		dfaST.setAttribute("stateNumber", new Integer(s.stateNumber));
 		dfaST.setAttribute("semPredState",
-							new Boolean(s.isResolvedWithPredicates()));
+							Boolean.valueOf(s.isResolvedWithPredicates()));
 		String description = dfa.getNFADecisionStartState().getDescription();
 		description = parentGenerator.target.getTargetStringLiteralFromString(description);
 		//System.out.println("DFA: "+description+" associated with AST "+decisionASTNode);

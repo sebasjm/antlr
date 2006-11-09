@@ -62,9 +62,7 @@ public class ANTLRReaderStream extends ANTLRStringStream {
 			//System.out.println("n="+n);
 		}
 		finally {
-			if ( r!=null ) {
-				r.close();
-			}
+			r.close();
 		}
 	}
 }

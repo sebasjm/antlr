@@ -409,9 +409,7 @@ public class GrammarAST extends BaseAST {
 		}
 		GrammarAST result = dup(t);		// make copy of root
 		// copy all children of root.
-		if (t != null) {
-			result.setFirstChild(dupListNoActions((GrammarAST)t.getFirstChild(), t));
-		}
+		result.setFirstChild(dupListNoActions((GrammarAST)t.getFirstChild(), t));
 		return result;
 	}
 

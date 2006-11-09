@@ -63,7 +63,7 @@ import org.antlr.runtime.tree.CommonTree;
  */
 public class RecognitionException extends Exception {
 	/** What input stream did the error occur in? */
-	public IntStream input;
+	public transient IntStream input;
 
 	/** What is index of token/char were we looking at when the error occurred? */
 	public int index;

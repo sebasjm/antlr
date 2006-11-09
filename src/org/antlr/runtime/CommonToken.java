@@ -27,38 +27,40 @@
 */
 package org.antlr.runtime;
 
-public class CommonToken implements Token {
-    protected int type;
+import java.io.Serializable;
+
+public class CommonToken implements Token, Serializable {
+	protected int type;
 	protected int line;
 	protected int charPositionInLine = -1; // set to invalid position
 	protected int channel=DEFAULT_CHANNEL;
-	protected CharStream input;
+	protected transient CharStream input;
 	/** We need to be able to change the text once in a while.  If
 	 *  this is non-null, then getText should return this.  Note that
 	 *  start/stop are not affected by changing this.
- 	 */
+	  */
 	protected String text;
 
 	/** What token number is this from 0..n-1 tokens */
 	protected int index;
 
-    /** The char position into the input buffer where this token starts */
+	/** The char position into the input buffer where this token starts */
 	protected int start;
-	
+
 	/** The char position into the input buffer where this token stops */
 	protected int stop;
 
-    public CommonToken(int type) {
-        this.type = type;
-    }
+	public CommonToken(int type) {
+		this.type = type;
+	}
 
-    public CommonToken(CharStream input, int type, int channel, int start, int stop) {
+	public CommonToken(CharStream input, int type, int channel, int start, int stop) {
 		this.input = input;
-        this.type = type;
+		this.type = type;
 		this.channel = channel;
 		this.start = start;
 		this.stop = stop;
-    }
+	}
 
 	public CommonToken(int type, String text) {
 		this.type = type;
@@ -76,22 +78,22 @@ public class CommonToken implements Token {
 	}
 
 	public int getType() {
-        return type;
-    }
+		return type;
+	}
 
 	public void setLine(int line) {
 		this.line = line;
 	}
 
-    public String getText() {
+	public String getText() {
 		if ( text!=null ) {
 			return text;
 		}
 		if ( input==null ) {
 			return null;
 		}
-        return input.substring(start,stop);
-    }
+		return input.substring(start,stop);
+	}
 
 	/** Override the text for this token.  getText() will return this text
 	 *  rather than pulling from the buffer.  Note that this does not mean
@@ -101,14 +103,14 @@ public class CommonToken implements Token {
 	public void setText(String text) {
 		this.text = text;
 	}
-	
-    public int getLine() {
-        return line;
-    }
 
-    public int getCharPositionInLine() {
-        return charPositionInLine;
-    }
+	public int getLine() {
+		return line;
+	}
+
+	public int getCharPositionInLine() {
+		return charPositionInLine;
+	}
 
 	public void setCharPositionInLine(int charPositionInLine) {
 		this.charPositionInLine = charPositionInLine;
@@ -122,9 +124,9 @@ public class CommonToken implements Token {
 		this.channel = channel;
 	}
 
-    public void setType(int type) {
-        this.type = type;
-    }
+	public void setType(int type) {
+		this.type = type;
+	}
 
 	public int getStartIndex() {
 		return start;
@@ -150,7 +152,7 @@ public class CommonToken implements Token {
 		this.index = index;
 	}
 
-    public String toString() {
+	public String toString() {
 		String channelStr = "";
 		if ( channel>0 ) {
 			channelStr=",channel="+channel;
@@ -164,6 +166,6 @@ public class CommonToken implements Token {
 		else {
 			txt = "<no text>";
 		}
-        return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
-    }
+		return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+	}
 }

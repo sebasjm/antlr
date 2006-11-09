@@ -101,6 +101,9 @@ public class NFAConfiguration {
      *  everything.
      */
     public boolean equals(Object o) {
+		if ( o==null ) {
+			return false;
+		}
         NFAConfiguration other = (NFAConfiguration)o;
         return this.state==other.state &&
                this.alt==other.alt &&

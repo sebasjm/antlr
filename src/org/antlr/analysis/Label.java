@@ -282,21 +282,17 @@ public class Label implements Comparable, Cloneable {
     }
 
     public boolean equals(Object o) {
-        // labels must be the same even if epsilon or set or sempred etc...
+		if ( o==null ) {
+			return false;
+		}
+		// labels must be the same even if epsilon or set or sempred etc...
         if ( label!=((Label)o).label ) {
             return false;
         }
-        switch (label) {
-            case EPSILON :
-                return true;
-            case SET :
-                return this.labelSet.equals(((Label)o).labelSet);
-            case SEMPRED :
-                return false; // not used
-                //return predicatesEquals(((Label)o).getPredicates());
-            default :
-                return true;
-        }
+		if ( label==SET ) {
+			return this.labelSet.equals(((Label)o).labelSet);
+		}
+		return true;  // label values are same, so true
     }
 
     public int compareTo(Object o) {

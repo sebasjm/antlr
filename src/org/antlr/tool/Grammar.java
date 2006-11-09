@@ -1011,7 +1011,6 @@ public class Grammar {
 			case Grammar.LEXER :
 				return "lexer";
 			case Grammar.PARSER :
-				return "parser";
 			case Grammar.COMBINED :
 				return "parser";
 			case Grammar.TREE_PARSER :
@@ -1251,7 +1250,7 @@ public class Grammar {
 	 *  predefined attributes accessed.  If the rule has no user-defined
 	 *  return values, then don't generate the return value scope classes
 	 *  etc...  Make the rule have void return value.  Don't track for lexer
-	 *  rules. 
+	 *  rules.
 	 */
 	public void referenceRuleLabelPredefinedAttribute(String ruleName) {
 		Rule r = getRule(ruleName);

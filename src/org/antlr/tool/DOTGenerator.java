@@ -75,7 +75,7 @@ public class DOTGenerator {
 			dot.setAttribute("startState",
 					new Integer(startState.stateNumber));
 			dot.setAttribute("useBox",
-							 new Boolean(Tool.internalOption_ShowNFConfigsInDFA));
+							 Boolean.valueOf(Tool.internalOption_ShowNFConfigsInDFA));
 			walkCreatingDFADOT(dot, (DFAState)startState);
         }
         else {
@@ -280,12 +280,10 @@ public class DOTGenerator {
 				((DFAState)target).getGatedPredicatesInNFAConfigurations();
 			if ( preds!=null ) {
 				String predsStr = "";
-				if ( preds!=null ) {
-					predsStr = "&&{"+
-						preds.genExpr(grammar.generator,
-										 grammar.generator.getTemplates(), null).toString()
-						+"}?";
-				}
+				predsStr = "&&{"+
+					preds.genExpr(grammar.generator,
+								  grammar.generator.getTemplates(), null).toString()
+					+"}?";
 				label += predsStr;
 			}
 		}

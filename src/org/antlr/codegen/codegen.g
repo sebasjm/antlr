@@ -376,7 +376,7 @@ rule returns [StringTemplate code=null]
 			code = templates.getInstanceOf(stName);
 			if ( code.getName().equals("rule") ) {
 				code.setAttribute("emptyRule",
-					new Boolean(grammar.isEmptyRule(block)));
+					Boolean.valueOf(grammar.isEmptyRule(block)));
 			}
 			code.setAttribute("ruleDescriptor", ruleDescr);
 			String memo = (String)#rule.getOption("memoize");
@@ -387,7 +387,7 @@ rule returns [StringTemplate code=null]
 			     (stName.equals("rule")||stName.equals("lexerRule")) )
 			{
             	code.setAttribute("memoize",
-            		new Boolean(memo!=null && memo.equals("true")));
+            		Boolean.valueOf(memo!=null && memo.equals("true")));
             }
 			}
 
@@ -400,7 +400,7 @@ rule returns [StringTemplate code=null]
 		    	boolean naked =
 		    		r.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ||
 		    	    (mod!=null&&mod.getText().equals(Grammar.FRAGMENT_RULE_MODIFIER));
-		    	code.setAttribute("nakedBlock", new Boolean(naked));
+		    	code.setAttribute("nakedBlock", Boolean.valueOf(naked));
 			}
 			else {
 				description =
@@ -473,7 +473,7 @@ block[String blockTemplateName, DFA dfa]
               code.setAttribute("alts",alt);
               alt.setAttribute("altNum", new Integer(altNum));
               alt.setAttribute("outerAlt",
-                  new Boolean(blockNestingLevel==RULE_BLOCK_NESTING_LEVEL));
+                  Boolean.valueOf(blockNestingLevel==RULE_BLOCK_NESTING_LEVEL));
               altNum++;
               }
             )+
@@ -518,7 +518,7 @@ String description = grammar.grammarTreeToString(#alternative, false);
 description = generator.target.getTargetStringLiteralFromString(description);
 code.setAttribute("description", description);
 if ( !currentAltHasASTRewrite && grammar.buildAST() ) {
-	code.setAttribute("autoAST", new Boolean(true));
+	code.setAttribute("autoAST", Boolean.valueOf(true));
 }
 StringTemplate e;
 }
@@ -1076,7 +1076,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     		}
     		else {
     			// we found a ref to the same rule in the same -> rewrite
-    			code.setAttribute("dup", new Boolean(true));
+    			code.setAttribute("dup", Boolean.valueOf(true));
     		}
 			currentBlockST.setAttribute("referencedRules", ruleRefName);
 		}

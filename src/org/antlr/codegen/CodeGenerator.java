@@ -189,7 +189,7 @@ public class CodeGenerator {
 			classpathTemplateRootDirectoryName+"/"+language;
 		//System.out.println("targets="+templateDirs.toString());
 		StringTemplateGroupLoader loader =
-			new CommonGroupLoader(templateDirs.toString(),
+			new CommonGroupLoader(templateDirs,
 								  ErrorManager.getStringTemplateErrorListener());
 		StringTemplateGroup.registerGroupLoader(loader);
 		StringTemplateGroup.registerDefaultLexer(AngleBracketTemplateLexer.class);
@@ -341,14 +341,14 @@ public class CodeGenerator {
 		headerFileST.setAttribute("actions", actions);
 		outputFileST.setAttribute("actions", actions);
 
-		outputFileST.setAttribute("backtracking", new Boolean(canBacktrack));
-		headerFileST.setAttribute("backtracking", new Boolean(canBacktrack));
+		outputFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
+		headerFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
 		String memoize = (String)grammar.getOption("memoize");
 		outputFileST.setAttribute("memoize",
-								  new Boolean(memoize!=null&&memoize.equals("true")&&
+								  Boolean.valueOf(memoize!=null&&memoize.equals("true")&&
 									          canBacktrack));
 		headerFileST.setAttribute("memoize",
-								  new Boolean(memoize!=null&&memoize.equals("true")&&
+								  Boolean.valueOf(memoize!=null&&memoize.equals("true")&&
 									          canBacktrack));
 
 		Set synpredNames = null;
@@ -358,31 +358,31 @@ public class CodeGenerator {
 		outputFileST.setAttribute("synpreds", synpredNames);
 		headerFileST.setAttribute("synpreds", synpredNames);
 
-		outputFileST.setAttribute("trace", new Boolean(trace));
-		headerFileST.setAttribute("trace", new Boolean(trace));
+		outputFileST.setAttribute("trace", Boolean.valueOf(trace));
+		headerFileST.setAttribute("trace", Boolean.valueOf(trace));
 
-		outputFileST.setAttribute("profile", new Boolean(profile));
-		headerFileST.setAttribute("profile", new Boolean(profile));
+		outputFileST.setAttribute("profile", Boolean.valueOf(profile));
+		headerFileST.setAttribute("profile", Boolean.valueOf(profile));
 
 		// RECOGNIZER
 		if ( grammar.type==Grammar.LEXER ) {
 			recognizerST = templates.getInstanceOf("lexer");
-			outputFileST.setAttribute("LEXER", new Boolean(true));
-			headerFileST.setAttribute("LEXER", new Boolean(true));
+			outputFileST.setAttribute("LEXER", Boolean.valueOf(true));
+			headerFileST.setAttribute("LEXER", Boolean.valueOf(true));
 			recognizerST.setAttribute("filterMode",
-									  new Boolean(filterMode));
+									  Boolean.valueOf(filterMode));
 		}
 		else if ( grammar.type==Grammar.PARSER ||
 			grammar.type==Grammar.COMBINED )
 		{
 			recognizerST = templates.getInstanceOf("parser");
-			outputFileST.setAttribute("PARSER", new Boolean(true));
-			headerFileST.setAttribute("PARSER", new Boolean(true));
+			outputFileST.setAttribute("PARSER", Boolean.valueOf(true));
+			headerFileST.setAttribute("PARSER", Boolean.valueOf(true));
 		}
 		else {
 			recognizerST = templates.getInstanceOf("treeParser");
-			outputFileST.setAttribute("TREE_PARSER", new Boolean(true));
-			headerFileST.setAttribute("TREE_PARSER", new Boolean(true));
+			outputFileST.setAttribute("TREE_PARSER", Boolean.valueOf(true));
+			headerFileST.setAttribute("TREE_PARSER", Boolean.valueOf(true));
 		}
 		outputFileST.setAttribute("recognizer", recognizerST);
 		headerFileST.setAttribute("recognizer", recognizerST);
@@ -617,9 +617,9 @@ public class CodeGenerator {
 	public StringTemplate generateSpecialState(DFAState s) {
 		StringTemplate stateST;
 		stateST = templates.getInstanceOf("cyclicDFAState");
-		stateST.setAttribute("needErrorClause", new Boolean(true));
+		stateST.setAttribute("needErrorClause", Boolean.valueOf(true));
 		stateST.setAttribute("semPredState",
-							 new Boolean(s.isResolvedWithPredicates()));
+							 Boolean.valueOf(s.isResolvedWithPredicates()));
 		stateST.setAttribute("stateNumber", s.stateNumber);
 		stateST.setAttribute("decisionNumber", s.dfa.decisionNumber);
 

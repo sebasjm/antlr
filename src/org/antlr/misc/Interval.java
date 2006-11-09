@@ -35,6 +35,9 @@ public class Interval {
     public Interval(int a, int b) { this.a=a; this.b=b; }
 
     public boolean equals(Object o) {
+		if ( o==null ) {
+			return false;
+		}
         Interval other = (Interval)o;
         return this.a==other.a && this.b==other.b;
     }

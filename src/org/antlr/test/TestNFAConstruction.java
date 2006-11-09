@@ -224,7 +224,7 @@ public class TestNFAConstruction extends BaseTest {
         checkRule(g, "a", expecting);
     }
 
-	public void testAoptional() throws Exception {
+	public void testAOptional() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
 				"a : (A)?;");
@@ -369,7 +369,7 @@ public class TestNFAConstruction extends BaseTest {
         checkRule(g, "a", expecting);
     }
 
-	public void testAstar() throws Exception {
+	public void testAStar() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
 				"a : (A)*;");

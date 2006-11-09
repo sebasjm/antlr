@@ -986,7 +986,7 @@ public class NFAToDFAConverter {
 		// Later, the error reporting may want to trace the path from
 		// the start state to the nondet state
 		if ( DFAOptimizer.MERGE_STOP_STATES &&
-			d.getNondeterministicAlts()==null &&
+			d.getNonDeterministicAlts()==null &&
 			!d.abortedDueToRecursionOverflow &&
 			!d.abortedDueToMultipleRecursiveAlts )
 		{
@@ -1170,7 +1170,7 @@ public class NFAToDFAConverter {
 			System.out.println("resolveNonDeterminisms "+d.toString());
 		}
 		boolean conflictingLexerRules = false;
-		Set nondeterministicAlts = d.getNondeterministicAlts();
+		Set nondeterministicAlts = d.getNonDeterministicAlts();
 		if ( debug && nondeterministicAlts!=null ) {
 			System.out.println("nondet alts="+nondeterministicAlts);
 		}

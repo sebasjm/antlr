@@ -375,6 +375,8 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		// already walked entire tree; nothing to return
 		if ( currentNode==null ) {
 			addLookahead(EOF_NODE);
+			// this is infinite stream returning EOF at end forever
+			// so don't throw NoSuchElementException
 			return null;
 		}
 

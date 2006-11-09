@@ -388,7 +388,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testinvokeRule() throws Exception {
+	public void testInvokeRule() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : b A\n" +

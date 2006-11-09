@@ -347,7 +347,7 @@ public class CommonTokenStream implements TokenStream {
 			stop = tokens.size()-1;
 		}
  		StringBuffer buf = new StringBuffer();
-		for (int i = start; tokens!=null && i <= stop; i++) {
+		for (int i = start; i <= stop; i++) {
 			Token t = (Token)tokens.get(i);
 			buf.append(t.getText());
 		}

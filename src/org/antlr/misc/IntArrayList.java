@@ -133,7 +133,7 @@ public class IntArrayList extends AbstractList implements Cloneable {
 	}
 
     public Object clone() throws CloneNotSupportedException {
-        IntArrayList a = new IntArrayList();
+		IntArrayList a = (IntArrayList)super.clone();
         a.n = this.n;
         System.arraycopy(this.elements, 0, a.elements, 0, this.elements.length);
         return a;
