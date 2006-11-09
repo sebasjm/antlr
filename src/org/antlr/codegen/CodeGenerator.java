@@ -695,10 +695,10 @@ public class CodeGenerator {
 									 int k,
 									 boolean partOfDFA)
 	{
-		IntervalSet iset = (IntervalSet)set;
-		if ( !(iset instanceof IntervalSet) ) {
+		if ( !(set instanceof IntervalSet) ) {
 			throw new IllegalArgumentException("unable to generate expressions for non IntervalSet objects");
 		}
+		IntervalSet iset = (IntervalSet)set;
 		if ( iset.getIntervals()==null || iset.getIntervals().size()==0 ) {
 			StringTemplate emptyST = new StringTemplate(templates, "");
 			emptyST.setName("empty-set-expr");

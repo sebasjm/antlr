@@ -185,7 +185,7 @@ public class IntervalSet implements IntSet {
 		if ( set==null ) {
 			return;
 		}
-        if ( !(set instanceof IntSet) ) {
+        if ( !(set instanceof IntervalSet) ) {
             throw new IllegalArgumentException("can't add non IntSet ("+
 											   set.getClass().getName()+
 											   ") to IntervalSet");

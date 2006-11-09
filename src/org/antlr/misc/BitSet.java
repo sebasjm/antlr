@@ -27,10 +27,13 @@
 */
 package org.antlr.misc;
 
-import java.util.*;
-
 import org.antlr.analysis.Label;
 import org.antlr.tool.Grammar;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**A BitSet to replace java.util.BitSet.
  *
@@ -413,7 +416,7 @@ public class BitSet implements IntSet, Cloneable {
 
     /**Is this contained within a? */
     public boolean subset(BitSet a) {
-        if (a == null || !(a instanceof BitSet)) return false;
+        if (a == null) return false;
         return this.and(a).equals(this);
     }
 
