@@ -335,7 +335,7 @@ optionValue returns [Object value=null]
                           value=vs.substring(1,vs.length()-1);}
     |   c:CHAR_LITERAL   {String vs = #c.getText();
                           value=vs.substring(1,vs.length()-1);}
-    |   i:INT            {value = Utils.integer(#i.getText());}
+    |   i:INT            {value = new Integer(#i.getText());}
     |	ss:STAR			 {#ss.setType(STRING_LITERAL); value = "*";} // used for k=*
 //  |   cs:charSet       {value = #cs;} // return set AST in this case
     ;

@@ -29,6 +29,7 @@ header {
 	package org.antlr.tool;
 	import java.util.*;
 	import org.antlr.analysis.*;
+	import org.antlr.misc.*;
 	import java.io.*;
 }
 
@@ -347,7 +348,7 @@ optionValue returns [Object value=null]
     :   id:ID			 {value = #id.getText();}
     |   s:STRING_LITERAL {value = #s.getText();}
     |   c:CHAR_LITERAL   {value = #c.getText();}
-    |   i:INT            {value = Utils.integer(#i.getText());}
+    |   i:INT            {value = new Integer(#i.getText());}
 //  |   cs:charSet       {value = #cs;} // return set AST in this case
     ;
 
