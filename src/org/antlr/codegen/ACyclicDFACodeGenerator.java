@@ -30,6 +30,7 @@ package org.antlr.codegen;
 import org.antlr.analysis.*;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.antlr.misc.Utils;
 
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class ACyclicDFACodeGenerator {
 		*/
 		if ( s.isAcceptState() ) {
 			StringTemplate dfaST = templates.getInstanceOf("dfaAcceptState");
-			dfaST.setAttribute("alt", new Integer(s.getUniquelyPredictedAlt()));
+			dfaST.setAttribute("alt", Utils.integer(s.getUniquelyPredictedAlt()));
 			return dfaST;
 		}
 
@@ -82,8 +83,8 @@ public class ACyclicDFACodeGenerator {
 		else if ( dfa.getNFADecisionStartState().decisionStateType==NFAState.OPTIONAL_BLOCK_START ) {
 			dfaST = templates.getInstanceOf(dfaOptionalBlockStateName);
 		}
-		dfaST.setAttribute("k", new Integer(k));
-		dfaST.setAttribute("stateNumber", new Integer(s.stateNumber));
+		dfaST.setAttribute("k", Utils.integer(k));
+		dfaST.setAttribute("stateNumber", Utils.integer(s.stateNumber));
 		dfaST.setAttribute("semPredState",
 							Boolean.valueOf(s.isResolvedWithPredicates()));
 		String description = dfa.getNFADecisionStartState().getDescription();
@@ -158,7 +159,7 @@ public class ACyclicDFACodeGenerator {
 		// HANDLE EOT EDGE
 		if ( EOTPredicts!=NFA.INVALID_ALT_NUMBER ) {
 			// EOT unique predicts an alt
-			dfaST.setAttribute("eotPredictsAlt", new Integer(EOTPredicts));
+			dfaST.setAttribute("eotPredictsAlt", Utils.integer(EOTPredicts));
 		}
 		else if ( EOTTarget!=null && EOTTarget.getNumberOfTransitions()>0 ) {
 			// EOT state has transitions so must split on predicates.

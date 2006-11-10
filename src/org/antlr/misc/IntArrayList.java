@@ -95,7 +95,7 @@ public class IntArrayList extends AbstractList implements Cloneable {
 	}
 
 	public Object get(int i) {
-		return new Integer(element(i));
+		return Utils.integer(element(i));
 	}
 
 	public int element(int i) {

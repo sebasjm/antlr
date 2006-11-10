@@ -52,7 +52,7 @@ public class IntervalSet implements IntSet {
 
     /** Create a set with no elements */
     public IntervalSet() {
-        intervals = new LinkedList();
+        intervals = new ArrayList();
     }
 
     /** Create a set with a single element, el. */
@@ -390,11 +390,9 @@ public class IntervalSet implements IntSet {
      *  list lengths n and m.
      */
     public IntSet and(IntSet other) {
-        if ( other==null || !(other instanceof IntervalSet) ) {
+        if ( other==null ) { //|| !(other instanceof IntervalSet) ) {
             return null; // nothing in common with null set
         }
-
-        IntervalSet intersection = new IntervalSet();
 
         // iterate down both interval lists looking for nondisjoint intervals
         ListIterator thisIter = this.intervals.listIterator();
@@ -407,6 +405,8 @@ public class IntervalSet implements IntSet {
         if ( otherIter.hasNext() ) {
             theirs = (Interval)otherIter.next();
         }
+
+		IntervalSet intersection = new IntervalSet();
         while ( mine!=null && theirs!=null ) {
             //System.out.println("mine="+mine+" and theirs="+theirs);
             if ( mine.startsBeforeDisjoint(theirs) ) {
@@ -602,7 +602,7 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
-				values.add(new Integer(v));
+				values.add(Utils.integer(v));
 			}
 		}
 		return values;

@@ -29,6 +29,7 @@ package org.antlr.analysis;
 
 import org.antlr.misc.IntSet;
 import org.antlr.misc.OrderedHashSet;
+import org.antlr.misc.Utils;
 
 import java.util.*;
 
@@ -394,7 +395,7 @@ public class NFAToDFAConverter {
 		int n = 0;
 		if ( DFAOptimizer.COLLAPSE_ALL_PARALLEL_EDGES ) {
 			// track which targets we've hit
-			Integer tI = new Integer(targetState.stateNumber);
+			Integer tI = Utils.integer(targetState.stateNumber);
 			Transition oldTransition = (Transition)targetToLabelMap.get(tI);
 			if ( oldTransition!=null ) {
 				//System.out.println("extra transition to "+tI+" upon "+label.toString(dfa.nfa.grammar));
@@ -1254,7 +1255,7 @@ public class NFAToDFAConverter {
 			System.out.println("exit alt "+exitAlt);
 			*/
 			int exitAlt = dfa.getNumberOfAlts();
-			if ( nondeterministicAlts.contains(new Integer(exitAlt)) ) {
+			if ( nondeterministicAlts.contains(Utils.integer(exitAlt)) ) {
 				// if nongreedy and exit alt is one of those nondeterministic alts
 				// predicted, resolve in favor of what follows block
 				winningAlt = resolveByPickingExitAlt(d,nondeterministicAlts);
@@ -1310,7 +1311,7 @@ public class NFAToDFAConverter {
 			configuration = (NFAConfiguration) iter.next();
 			if ( configuration.alt!=min ) {
 				if ( nondeterministicAlts==null ||
-					 nondeterministicAlts.contains(new Integer(configuration.alt)) )
+					 nondeterministicAlts.contains(Utils.integer(configuration.alt)) )
 				{
 					configuration.resolved = true;
 				}
@@ -1431,7 +1432,7 @@ public class NFAToDFAConverter {
 
 			//System.out.println("covering naked alt="+nakedAlt+" with "+nakedAltPred);
 
-			altToPredMap.put(new Integer(nakedAlt), nakedAltPred);
+			altToPredMap.put(Utils.integer(nakedAlt), nakedAltPred);
 			// set all config with alt=nakedAlt to have the computed predicate
 			Iterator iter = d.nfaConfigurations.iterator();
 			NFAConfiguration configuration;
@@ -1456,19 +1457,19 @@ public class NFAToDFAConverter {
 			while (iter.hasNext()) {
 				configuration = (NFAConfiguration) iter.next();
 				SemanticContext semCtx = (SemanticContext)
-						altToPredMap.get(new Integer(configuration.alt));
+						altToPredMap.get(Utils.integer(configuration.alt));
 				if ( semCtx!=null ) {
 					// resolve (first found) with pred
 					// and remove alt from problem list
 					configuration.resolveWithPredicate = true;
 					configuration.semanticContext = semCtx; // reset to combined
-					altToPredMap.remove(new Integer(configuration.alt));
+					altToPredMap.remove(Utils.integer(configuration.alt));
 					// notify grammar that we've used the preds contained in semCtx
 					if ( semCtx.isSyntacticPredicate() ) {
 						dfa.nfa.grammar.synPredUsedInDFA(dfa, semCtx);
 					}
 				}
-				else if ( nondeterministicAlts.contains(new Integer(configuration.alt)) ) {
+				else if ( nondeterministicAlts.contains(Utils.integer(configuration.alt)) ) {
 					// resolve all configurations for nondeterministic alts
 					// for which there is no predicate context by turning it off
 					configuration.resolved = true;
@@ -1514,7 +1515,7 @@ public class NFAToDFAConverter {
 		// (one w/o a predicate); tracks tautologies like p1||true
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
-			Integer altI = new Integer(configuration.alt);
+			Integer altI = Utils.integer(configuration.alt);
 			// if alt is nondeterministic, combine its predicates
 			if ( nondeterministicAlts.contains(altI) ) {
 				// if there is a predicate for this NFA configuration, OR in
@@ -1523,7 +1524,7 @@ public class NFAToDFAConverter {
 				{
 					/*
 					SemanticContext altsExistingPred =(SemanticContext)
-							altToPredicateContextMap.get(new Integer(configuration.alt));
+							altToPredicateContextMap.get(Utils.integer(configuration.alt));
 					if ( altsExistingPred!=null ) {
 						// must merge all predicates from configs with same alt
 						SemanticContext combinedContext =
@@ -1534,14 +1535,14 @@ public class NFAToDFAConverter {
 										   configuration.semanticContext+
 										   "="+combinedContext);
 						altToPredicateContextMap.put(
-								new Integer(configuration.alt),
+								Utils.integer(configuration.alt),
 								combinedContext
 						);
 					}
 					else {
 						// not seen before, just add it
 						altToPredicateContextMap.put(
-								new Integer(configuration.alt),
+								Utils.integer(configuration.alt),
 								configuration.semanticContext
 						);
 					}

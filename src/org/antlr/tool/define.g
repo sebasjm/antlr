@@ -184,7 +184,7 @@ optionValue returns [Object value=null]
                           value=vs.substring(1,vs.length()-1);}
     |   c:CHAR_LITERAL   {String vs = #c.getText();
                           value=vs.substring(1,vs.length()-1);}
-    |   i:INT            {value = new Integer(#i.getText());}
+    |   i:INT            {value = Utils.integer(#i.getText());}
 //  |   cs:charSet       {value = #cs;} // return set AST in this case
     ;
 
@@ -427,7 +427,7 @@ dotLoop
         if ( grammar.type!=Grammar.LEXER ) {
             // parser grammars assume k=1 for .* loops
             // otherwise they look til EOF!
-            opts.put("k", new Integer(1));
+            opts.put("k", Utils.integer(1));
         }
         block.setOptions(grammar,opts);
         }

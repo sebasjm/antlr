@@ -29,6 +29,7 @@ package org.antlr.analysis;
 
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
+import org.antlr.misc.Utils;
 
 import java.util.*;
 
@@ -135,9 +136,9 @@ public class DecisionProbe {
 
 	/** Used to find paths through syntactically ambiguous DFA. */
 	protected Map stateReachable;
-	public static final Integer REACHABLE_BUSY = new Integer(-1);
-	public static final Integer REACHABLE_NO = new Integer(0);
-	public static final Integer REACHABLE_YES = new Integer(1);
+	public static final Integer REACHABLE_BUSY = Utils.integer(-1);
+	public static final Integer REACHABLE_NO = Utils.integer(0);
+	public static final Integer REACHABLE_YES = Utils.integer(1);
 
 	/** Used while finding a path through an NFA whose edge labels match
 	 *  an input sequence.  Tracks the input position
@@ -275,13 +276,13 @@ public class DecisionProbe {
 	 *  to shut off the warning that would be generated.
 	 */
 	public void removeRecursiveOverflowState(DFAState d) {
-		Integer stateI = new Integer(d.stateNumber);
+		Integer stateI = Utils.integer(d.stateNumber);
 		stateToRecursiveOverflowConfigurationsMap.remove(stateI);
 	}
 
 	/*
 	public boolean dfaStateHasRecursionOverflow(DFAState d) {
-		Integer stateI = new Integer(d.stateNumber);
+		Integer stateI = Utils.integer(d.stateNumber);
 		return stateToRecursiveOverflowConfigurationsMap.get(stateI)!=null;
 	}
 	*/
@@ -381,7 +382,7 @@ public class DecisionProbe {
 		if ( altToPredMap==null ) {
 			return null;
 		}
-		return (SemanticContext)altToPredMap.get(new Integer(alt));
+		return (SemanticContext)altToPredMap.get(Utils.integer(alt));
 	}
 
 	public Set getNondeterministicStatesResolvedWithSemanticPredicate() {
@@ -532,7 +533,7 @@ public class DecisionProbe {
 				Transition transition0 = ruleInvocationState.transition(0);
 				RuleClosureTransition ref = (RuleClosureTransition)transition0;
 				String targetRule = ((NFAState)ref.target).getEnclosingRule();
-				Integer altI = new Integer(c.alt);
+				Integer altI = Utils.integer(c.alt);
 				Map targetToCallSiteMap =
 					(Map)altToTargetToCallSitesMap.get(altI);
 				if ( targetToCallSiteMap==null ) {
@@ -560,7 +561,7 @@ public class DecisionProbe {
 		for (Iterator it = dfaStatesWithRecursionProblems.iterator(); it.hasNext();) {
 			Integer stateI = (Integer) it.next();
 			DFAState d = dfa.getState(stateI.intValue());
-			dfaStatesUnaliased.add(new Integer(d.stateNumber));
+			dfaStatesUnaliased.add(Utils.integer(d.stateNumber));
 		}
 		return dfaStatesUnaliased;
 	}
@@ -594,7 +595,7 @@ public class DecisionProbe {
 	{
 		// track the state number rather than the state as d will change
 		// out from underneath us; hash wouldn't return any value
-		Integer stateI = new Integer(d.stateNumber);
+		Integer stateI = Utils.integer(d.stateNumber);
 		List configs = (List)stateToRecursiveOverflowConfigurationsMap.get(stateI);
 		if ( configs==null ) {
 			configs = new ArrayList();
@@ -611,7 +612,7 @@ public class DecisionProbe {
 	{
 		// track the state number rather than the state as d will change
 		// out from underneath us; hash wouldn't return any value
-		Integer stateI = new Integer(d.stateNumber);
+		Integer stateI = Utils.integer(d.stateNumber);
 		List configs = (List)stateToLeftRecursiveConfigurationsMap.get(stateI);
 		if ( configs==null ) {
 			configs = new ArrayList();
@@ -627,7 +628,7 @@ public class DecisionProbe {
 		altsWithProblem.addAll(nondeterministicAlts); // track overall list
 		statesWithSyntacticallyAmbiguousAltsSet.add(d);
 		dfa.nfa.grammar.setOfNondeterministicDecisionNumbers.add(
-			new Integer(dfa.getDecisionNumber())
+			Utils.integer(dfa.getDecisionNumber())
 		);
 	}
 
@@ -644,7 +645,7 @@ public class DecisionProbe {
 		statesResolvedWithSemanticPredicatesSet.add(d);
 		//System.out.println("resolved with pred: "+d);
 		dfa.nfa.grammar.setOfNondeterministicDecisionNumbersResolvedWithPredicates.add(
-			new Integer(dfa.getDecisionNumber())
+			Utils.integer(dfa.getDecisionNumber())
 		);
 	}
 
@@ -732,7 +733,7 @@ public class DecisionProbe {
 			for (Iterator configIter = configs.iterator(); configIter.hasNext();) {
 				NFAConfiguration c = (NFAConfiguration) configIter.next();
 				if ( alt==0 || c.alt==alt ) {
-					nfaStates.add(new Integer(c.state));
+					nfaStates.add(Utils.integer(c.state));
 				}
 			}
 		}

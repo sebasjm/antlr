@@ -38,6 +38,7 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.IntSet;
 import org.antlr.misc.IntervalSet;
 import org.antlr.misc.Barrier;
+import org.antlr.misc.Utils;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 
@@ -698,15 +699,15 @@ public class Grammar {
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "<EOR>");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.DOWN-1, "Token.DOWN");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.UP-1, "Token.UP");
-        tokenIDToTypeMap.put("<INVALID>", new Integer(Label.INVALID));
-        tokenIDToTypeMap.put("<EOT>", new Integer(Label.EOT));
-        tokenIDToTypeMap.put("<SEMPRED>", new Integer(Label.SEMPRED));
-        tokenIDToTypeMap.put("<SET>", new Integer(Label.SET));
-        tokenIDToTypeMap.put("<EPSILON>", new Integer(Label.EPSILON));
-		tokenIDToTypeMap.put("EOF", new Integer(Label.EOF));
-		tokenIDToTypeMap.put("<EOR>", new Integer(Label.EOR_TOKEN_TYPE));
-		tokenIDToTypeMap.put("DOWN", new Integer(Label.DOWN));
-		tokenIDToTypeMap.put("UP", new Integer(Label.UP));
+        tokenIDToTypeMap.put("<INVALID>", Utils.integer(Label.INVALID));
+        tokenIDToTypeMap.put("<EOT>", Utils.integer(Label.EOT));
+        tokenIDToTypeMap.put("<SEMPRED>", Utils.integer(Label.SEMPRED));
+        tokenIDToTypeMap.put("<SET>", Utils.integer(Label.SET));
+        tokenIDToTypeMap.put("<EPSILON>", Utils.integer(Label.EPSILON));
+		tokenIDToTypeMap.put("EOF", Utils.integer(Label.EOF));
+		tokenIDToTypeMap.put("<EOR>", Utils.integer(Label.EOR_TOKEN_TYPE));
+		tokenIDToTypeMap.put("DOWN", Utils.integer(Label.DOWN));
+		tokenIDToTypeMap.put("UP", Utils.integer(Label.UP));
     }
 
     /** Walk the list of options, altering this Grammar object according
@@ -833,7 +834,7 @@ public class Grammar {
 			decisionsWhoseDFAsUsesSynPreds.remove(lookaheadDFA);
 			// TODO: clean up synPredNamesUsedInDFA also (harder)
 			lookaheadDFA = null; // make sure other memory is "free" before redoing
-			d.blockAST.setOption(this, "k", new Integer(1));
+			d.blockAST.setOption(this, "k", Utils.integer(1));
 			//System.out.println("trying decision "+decision+" again with k=1");
 			lookaheadDFA = new DFA(decision, decisionStartState);
 			if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
@@ -883,10 +884,10 @@ public class Grammar {
 		// the index in the typeToTokenList table is actually shifted to
 		// hold faux labels as you cannot have negative indices.
         if ( text.charAt(0)=='\'' ) {
-            stringLiteralToTypeMap.put(text, new Integer(tokenType));
+            stringLiteralToTypeMap.put(text, Utils.integer(tokenType));
         }
         else { // must be a label like ID
-            tokenIDToTypeMap.put(text, new Integer(tokenType));
+            tokenIDToTypeMap.put(text, Utils.integer(tokenType));
         }
 		int index = Label.NUM_FAUX_LABELS+tokenType-1;
 		//System.out.println("defining "+name+" token "+text+" at type="+tokenType+", index="+index);
@@ -1082,7 +1083,7 @@ public class Grammar {
 	{
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									tokenID,
-									new Integer(tokenType),
+									Utils.integer(tokenType),
 									literal);
 		// track this lexer rule's name
 		lexerRules.add(tokenID);
@@ -1092,7 +1093,7 @@ public class Grammar {
 		//System.out.println("defineLexerRuleForStringLiteral: "+literal+" "+tokenType);
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									computeTokenNameFromLiteral(tokenType,literal),
-									new Integer(tokenType),
+									Utils.integer(tokenType),
 									literal);
 	}
 
@@ -1100,7 +1101,7 @@ public class Grammar {
 	public void defineLexerRuleForCharLiteral(String literal, int tokenType) {
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									computeTokenNameFromLiteral(tokenType,literal),
-									new Integer(tokenType),
+									Utils.integer(tokenType),
 									literal);
 	}
 	*/
@@ -1532,7 +1533,7 @@ public class Grammar {
 		for (int t =Label.MIN_TOKEN_TYPE; t<=getMaxTokenType(); t++) {
 			String name = getTokenDisplayName(t);
 			if ( name.charAt(0)=='\'' ) {
-				types.add(new Integer(t));
+				types.add(Utils.integer(t));
 			}
 		}
 		return types;
@@ -1672,7 +1673,7 @@ public class Grammar {
 				else {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
 									   vocabName+".tokens",
-									   new Integer(lineNum));
+									   Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
@@ -1681,7 +1682,7 @@ public class Grammar {
 				if ( token != '=' ) {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
 									   vocabName+".tokens",
-									   new Integer(lineNum));
+									   Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
@@ -1690,7 +1691,7 @@ public class Grammar {
 				if ( token != StreamTokenizer.TT_NUMBER ) {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
 									   vocabName+".tokens",
-									   new Integer(lineNum));
+									   Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;
@@ -1704,7 +1705,7 @@ public class Grammar {
 				if ( token != StreamTokenizer.TT_EOL ) {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
 									   vocabName+".tokens",
-									   new Integer(lineNum));
+									   Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
 					continue;

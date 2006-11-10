@@ -115,8 +115,8 @@ protected Map tokens = new LinkedHashMap();         // Map<name,Integer>
 protected Set tokenRuleDefs = new HashSet();        // Set<name>
 protected Map aliases = new LinkedHashMap();        // Map<name,literal>
 protected String currentRuleName;
-protected static final Integer UNASSIGNED = new Integer(-1);
-protected static final Integer UNASSIGNED_IN_PARSER_RULE = new Integer(-2);
+protected static final Integer UNASSIGNED = Utils.integer(-1);
+protected static final Integer UNASSIGNED_IN_PARSER_RULE = Utils.integer(-2);
 
 /** Track string literals in any non-lexer rule (could be in tokens{} section) */
 protected void trackString(GrammarAST t) {
@@ -236,7 +236,7 @@ protected void assignTypes() {
 			Integer oldTypeI = (Integer)stringLiterals.get(lit);
 			int oldType = oldTypeI.intValue();
 			if ( oldType<Label.MIN_TOKEN_TYPE ) {
-				Integer typeI = new Integer(grammar.getNewTokenType());
+				Integer typeI = Utils.integer(grammar.getNewTokenType());
 				stringLiterals.put(lit, typeI);
 				// if string referenced in combined grammar parser rule,
 				// automatically define in the generated lexer
@@ -272,7 +272,7 @@ protected void assignTypes() {
 		for (Iterator it = s.iterator(); it.hasNext();) {
 			String tokenID = (String) it.next();
 			if ( tokens.get(tokenID)==UNASSIGNED ) {
-				tokens.put(tokenID, new Integer(grammar.getNewTokenType()));
+				tokens.put(tokenID, Utils.integer(grammar.getNewTokenType()));
 			}
 		}
 	}
@@ -347,7 +347,7 @@ optionValue returns [Object value=null]
     :   id:ID			 {value = #id.getText();}
     |   s:STRING_LITERAL {value = #s.getText();}
     |   c:CHAR_LITERAL   {value = #c.getText();}
-    |   i:INT            {value = new Integer(#i.getText());}
+    |   i:INT            {value = Utils.integer(#i.getText());}
 //  |   cs:charSet       {value = #cs;} // return set AST in this case
     ;
 

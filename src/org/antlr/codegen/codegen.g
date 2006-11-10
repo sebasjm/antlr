@@ -467,11 +467,11 @@ block[String blockTemplateName, DFA dfa]
               // add the rewrite code as just another element in the alt :)
     		  if ( rew!=null ) {
     		  	alt.setAttribute("elements.{el,line,pos}",
-    		  		rew, new Integer(r.getLine()), new Integer(r.getColumn()));
+    		  		rew, Utils.integer(r.getLine()), Utils.integer(r.getColumn()));
     		  }
     		  // add this alt to the list of alts for this block
               code.setAttribute("alts",alt);
-              alt.setAttribute("altNum", new Integer(altNum));
+              alt.setAttribute("altNum", Utils.integer(altNum));
               alt.setAttribute("outerAlt",
                   Boolean.valueOf(blockNestingLevel==RULE_BLOCK_NESTING_LEVEL));
               altNum++;
@@ -529,8 +529,8 @@ StringTemplate e;
     			if ( e!=null ) {
 					code.setAttribute("elements.{el,line,pos}",
 									  e,
-									  new Integer(elAST.getLine()),
-									  new Integer(elAST.getColumn())
+									  Utils.integer(elAST.getLine()),
+									  Utils.integer(elAST.getColumn())
 									 );
     			}
     			}
@@ -730,8 +730,8 @@ if ( s.member(Label.UP) ) {
            {
            code.setAttribute("root.{el,line,pos}",
 							  el,
-							  new Integer(elAST.getLine()),
-							  new Integer(elAST.getColumn())
+							  Utils.integer(elAST.getLine()),
+							  Utils.integer(elAST.getColumn())
 							  );
            }
            ( {elAST=(GrammarAST)_t;}
@@ -739,8 +739,8 @@ if ( s.member(Label.UP) ) {
            	 {
 			 code.setAttribute("children.{el,line,pos}",
 							  el,
-							  new Integer(elAST.getLine()),
-							  new Integer(elAST.getColumn())
+							  Utils.integer(elAST.getLine()),
+							  Utils.integer(elAST.getColumn())
 							  );
 			 }
            )*
@@ -889,8 +889,8 @@ if ( #rewrite.getType()==REWRITE ) {
 	}
 	else {
 		code = templates.getInstanceOf("rewriteCode");
-		code.setAttribute("treeLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
-		code.setAttribute("rewriteBlockLevel", new Integer(OUTER_REWRITE_NESTING_LEVEL));
+		code.setAttribute("treeLevel", Utils.integer(OUTER_REWRITE_NESTING_LEVEL));
+		code.setAttribute("rewriteBlockLevel", Utils.integer(OUTER_REWRITE_NESTING_LEVEL));
 		currentBlockST = code;
 	}
 }
@@ -949,16 +949,16 @@ StringTemplate el,st;
     				el=rewrite_element
 					{code.setAttribute("elements.{el,line,pos}",
 					 					el,
-    							  		new Integer(elAST.getLine()),
-    							  		new Integer(elAST.getColumn())
+    							  		Utils.integer(elAST.getLine()),
+    							  		Utils.integer(elAST.getColumn())
 					 					);
 					}
 				)+
     		|	EPSILON
     			{code.setAttribute("elements.{el,line,pos}",
     							   templates.getInstanceOf("rewriteEmptyAlt"),
-    							   new Integer(#a.getLine()),
-    							   new Integer(#a.getColumn())
+    							   Utils.integer(#a.getLine()),
+    							   Utils.integer(#a.getColumn())
 					 			   );
 				}
     		)
@@ -1020,8 +1020,8 @@ GrammarAST elAST=null;
 			r=rewrite_atom[true]
 			{code.setAttribute("root.{el,line,pos}",
 							   r,
-							   new Integer(elAST.getLine()),
-							   new Integer(elAST.getColumn())
+							   Utils.integer(elAST.getLine()),
+							   Utils.integer(elAST.getColumn())
 							  );
 			}
 			( {elAST=(GrammarAST)_t;}
@@ -1029,8 +1029,8 @@ GrammarAST elAST=null;
 			  {
 			  code.setAttribute("children.{el,line,pos}",
 							    el,
-							    new Integer(elAST.getLine()),
-							    new Integer(elAST.getColumn())
+							    Utils.integer(elAST.getLine()),
+							    Utils.integer(elAST.getColumn())
 							    );
 			  }
 			)*

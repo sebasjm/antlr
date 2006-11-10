@@ -29,6 +29,7 @@ package org.antlr.analysis;
 
 import org.antlr.misc.IntSet;
 import org.antlr.misc.OrderedHashSet;
+import org.antlr.misc.Utils;
 import org.antlr.tool.Grammar;
 
 import java.util.*;
@@ -462,7 +463,7 @@ public class DFAState extends State {
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
 			if ( configuration.resolved ) {
-				disabled.add(new Integer(configuration.alt));
+				disabled.add(Utils.integer(configuration.alt));
 			}
 		}
 		return disabled;
@@ -536,7 +537,7 @@ public class DFAState extends State {
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
-			Integer stateI = new Integer(configuration.state);
+			Integer stateI = Utils.integer(configuration.state);
 			List prevConfigs = (List)stateToConfigListMap.get(stateI);
 			if ( prevConfigs==null ) {
 				prevConfigs = new ArrayList();
@@ -614,8 +615,8 @@ public class DFAState extends State {
 					// suffix of t.ctx or vice versa (if alts differ).
 					// Also a conflict if s.ctx or t.ctx is empty
 					if ( s.alt != t.alt && s.context.conflictsWith(t.context) ) {
-						nondeterministicAlts.add(new Integer(s.alt));
-						nondeterministicAlts.add(new Integer(t.alt));
+						nondeterministicAlts.add(Utils.integer(s.alt));
+						nondeterministicAlts.add(Utils.integer(t.alt));
 					}
 				}
 			}
@@ -636,7 +637,7 @@ public class DFAState extends State {
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
-			alts.add(new Integer(configuration.alt));
+			alts.add(Utils.integer(configuration.alt));
 		}
 		if ( alts.size()==0 ) {
 			return null;
@@ -654,7 +655,7 @@ public class DFAState extends State {
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
 			if ( configuration.alt == alt ) {
-				alts.add(new Integer(configuration.state));
+				alts.add(Utils.integer(configuration.state));
 			}
 		}
 		return alts;

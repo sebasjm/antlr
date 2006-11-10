@@ -33,10 +33,8 @@ import antlr.TokenWithIndex;
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
+import org.antlr.misc.*;
 import org.antlr.misc.BitSet;
-import org.antlr.misc.IntSet;
-import org.antlr.misc.Interval;
-import org.antlr.misc.IntervalSet;
 import org.antlr.stringtemplate.CommonGroupLoader;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -559,17 +557,17 @@ public class CodeGenerator {
 								  referencedElementName,
 								  enclosingRuleName,
 								  wordStrings,
-								  new Integer(i));
+								  Utils.integer(i));
 		outputFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
 								  referencedElementName,
 								  enclosingRuleName,
 								  wordStrings,
-								  new Integer(i));
+								  Utils.integer(i));
 		headerFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
 								  referencedElementName,
 								  enclosingRuleName,
 								  wordStrings,
-								  new Integer(i));
+								  Utils.integer(i));
 	}
 
 	// L O O K A H E A D  D E C I S I O N  G E N E R A T I O N
@@ -600,7 +598,7 @@ public class CodeGenerator {
 				decisionST.setAttribute("description", description);
 			}
 			decisionST.setAttribute("decisionNumber",
-									new Integer(dfa.getDecisionNumber()));
+									Utils.integer(dfa.getDecisionNumber()));
 		}
 		return decisionST;
 	}
@@ -636,9 +634,9 @@ public class CodeGenerator {
 					genLabelExpr(templates,edge,1);
 				edgeST.setAttribute("labelExpr", exprST);
 			}
-			edgeST.setAttribute("edgeNumber", new Integer(i+1));
+			edgeST.setAttribute("edgeNumber", Utils.integer(i+1));
 			edgeST.setAttribute("targetStateNumber",
-								 new Integer(edge.target.stateNumber));
+								 Utils.integer(edge.target.stateNumber));
 			// stick in any gated predicates for any edge if not already a pred
 			if ( !edge.label.isSemanticPredicate() ) {
 				DFAState t = (DFAState)edge.target;
@@ -670,8 +668,8 @@ public class CodeGenerator {
 		// must be simple label
 		StringTemplate eST = templates.getInstanceOf("lookaheadTest");
 		eST.setAttribute("atom", getTokenTypeAsTargetLabel(label.getAtom()));
-		eST.setAttribute("atomAsInt", new Integer(label.getAtom()));
-		eST.setAttribute("k", new Integer(k));
+		eST.setAttribute("atomAsInt", Utils.integer(label.getAtom()));
+		eST.setAttribute("k", Utils.integer(k));
 		return eST;
 	}
 
@@ -718,18 +716,18 @@ public class CodeGenerator {
 			if ( a==b ) {
 				eST = templates.getInstanceOf(testSTName);
 				eST.setAttribute("atom", getTokenTypeAsTargetLabel(a));
-				eST.setAttribute("atomAsInt", new Integer(a));
-				//eST.setAttribute("k",new Integer(k));
+				eST.setAttribute("atomAsInt", Utils.integer(a));
+				//eST.setAttribute("k",Utils.integer(k));
 			}
 			else {
 				eST = templates.getInstanceOf(testRangeSTName);
 				eST.setAttribute("lower",getTokenTypeAsTargetLabel(a));
-				eST.setAttribute("lowerAsInt", new Integer(a));
+				eST.setAttribute("lowerAsInt", Utils.integer(a));
 				eST.setAttribute("upper",getTokenTypeAsTargetLabel(b));
-				eST.setAttribute("upperAsInt", new Integer(b));
-				eST.setAttribute("rangeNumber",new Integer(rangeNumber));
+				eST.setAttribute("upperAsInt", Utils.integer(b));
+				eST.setAttribute("rangeNumber",Utils.integer(rangeNumber));
 			}
-			eST.setAttribute("k",new Integer(k));
+			eST.setAttribute("k",Utils.integer(k));
 			setST.setAttribute("ranges", eST);
 			rangeNumber++;
 		}
@@ -752,7 +750,7 @@ public class CodeGenerator {
 				 tokenType>=Label.MIN_TOKEN_TYPE )
 			{
 				// don't do FAUX labels 'cept EOF
-				code.setAttribute("tokens.{name,type}", tokenID, new Integer(tokenType));
+				code.setAttribute("tokens.{name,type}", tokenID, Utils.integer(tokenType));
 			}
 		}
 	}
@@ -806,7 +804,7 @@ public class CodeGenerator {
 			String tokenID = (String) tokenIDs.next();
 			int tokenType = grammar.getTokenType(tokenID);
 			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
-				vocabFileST.setAttribute("tokens.{name,type}", tokenID, new Integer(tokenType));
+				vocabFileST.setAttribute("tokens.{name,type}", tokenID, Utils.integer(tokenType));
 			}
 		}
 
@@ -816,7 +814,7 @@ public class CodeGenerator {
 			String literal = (String) literals.next();
 			int tokenType = grammar.getTokenType(literal);
 			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
-				vocabFileST.setAttribute("tokens.{name,type}", literal, new Integer(tokenType));
+				vocabFileST.setAttribute("tokens.{name,type}", literal, Utils.integer(tokenType));
 			}
 		}
 

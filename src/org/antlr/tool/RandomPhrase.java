@@ -5,6 +5,7 @@ import org.antlr.analysis.RuleClosureTransition;
 import org.antlr.analysis.Transition;
 import org.antlr.analysis.Label;
 import org.antlr.misc.IntSet;
+import org.antlr.misc.Utils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -104,7 +105,7 @@ public class RandomPhrase {
 			return (Integer)typeList.get(randomIndex);
 		}
 		else {
-			return new Integer(label.getAtom());
+			return Utils.integer(label.getAtom());
 		}
 		//System.out.println(t0.label.toString(g));
 	}

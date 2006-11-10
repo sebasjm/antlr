@@ -29,6 +29,7 @@ package org.antlr.tool;
 
 import org.antlr.analysis.DFA;
 import org.antlr.runtime.misc.Stats;
+import org.antlr.misc.Utils;
 
 import java.util.*;
 
@@ -222,10 +223,10 @@ public class GrammarReport {
 		while ( it.hasNext() ) {
 			DFA dfa = (DFA) it.next();
 			// if we aborted a DFA and redid with k=1, the backtrackin
-			if ( decisions.contains(new Integer(dfa.decisionNumber)) ) {
+			if ( decisions.contains(Utils.integer(dfa.decisionNumber)) ) {
 				continue;
 			}
-			decisions.add(new Integer(dfa.decisionNumber));
+			decisions.add(Utils.integer(dfa.decisionNumber));
 			buf.append("Rule ");
 			buf.append(dfa.decisionNFAStartState.getEnclosingRule());
 			buf.append(" decision ");

@@ -28,6 +28,7 @@
 package org.antlr.analysis;
 
 import org.antlr.tool.Grammar;
+import org.antlr.misc.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -179,7 +180,7 @@ public class DFAOptimizer {
     }
 
 	protected void optimizeExitBranches(DFAState d) {
-		Integer sI = new Integer(d.stateNumber);
+		Integer sI = Utils.integer(d.stateNumber);
 		if ( visited.contains(sI) ) {
 			return; // already visited
 		}
@@ -209,7 +210,7 @@ public class DFAOptimizer {
 	}
 
 	protected void optimizeEOTBranches(DFAState d) {
-		Integer sI = new Integer(d.stateNumber);
+		Integer sI = Utils.integer(d.stateNumber);
 		if ( visited.contains(sI) ) {
 			return; // already visited
 		}
@@ -245,7 +246,7 @@ public class DFAOptimizer {
 	/** Walk DFA states, unlinking the nfa configs and whatever else I
 	 *  can to reduce memory footprint.
 	protected void unlinkUnneededStateData(DFAState d) {
-		Integer sI = new Integer(d.stateNumber);
+		Integer sI = Utils.integer(d.stateNumber);
 		if ( visited.contains(sI) ) {
 			return; // already visited
 		}

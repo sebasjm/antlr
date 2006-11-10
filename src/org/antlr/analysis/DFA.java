@@ -31,6 +31,7 @@ import org.antlr.Tool;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.IntervalSet;
 import org.antlr.misc.IntSet;
+import org.antlr.misc.Utils;
 import org.antlr.runtime.IntStream;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
@@ -418,7 +419,7 @@ public class DFA {
 			empty.add("");
 			return empty;
 		}
-		Integer negOneI = new Integer(-1);
+		Integer negOneI = Utils.integer(-1);
 		int size = Math.max(2,data.size()/2);
 		List encoded = new ArrayList(size); // guess at size
 		// scan values looking for runs
@@ -489,7 +490,7 @@ public class DFA {
 			if ( s.isAcceptState() ) {
 				// can't compute min,max,special,transition on accepts
 				accept.set(s.stateNumber,
-						   new Integer(s.getUniquelyPredictedAlt()));
+						   Utils.integer(s.getUniquelyPredictedAlt()));
 			}
 			else {
 				createMinMaxTables(s);
@@ -588,8 +589,8 @@ public class DFA {
 			smax = Label.MIN_CHAR_VALUE;
 		}
 
-		min.set(s.stateNumber, new Integer((char)smin));
-		max.set(s.stateNumber, new Integer((char)smax));
+		min.set(s.stateNumber, Utils.integer((char)smin));
+		max.set(s.stateNumber, Utils.integer((char)smax));
 
 		if ( smax<0 || smin>Label.MAX_CHAR_VALUE || smin<0 ) {
 			ErrorManager.internalError("messed up: min="+min+", max="+max);
@@ -613,7 +614,7 @@ public class DFA {
 			if ( label.isAtom() && label.getAtom()>=Label.MIN_CHAR_VALUE ) {
 				int labelIndex = label.getAtom()-smin; // offset from 0
 				stateTransitions.set(labelIndex,
-									 new Integer(edge.target.stateNumber));
+									 Utils.integer(edge.target.stateNumber));
 			}
 			else if ( label.isSet() ) {
 				IntervalSet labels = (IntervalSet)label.getSet();
@@ -623,7 +624,7 @@ public class DFA {
 					if ( atoms[a]>=Label.MIN_CHAR_VALUE ) {
 						int labelIndex = atoms[a]-smin; // offset from 0
 						stateTransitions.set(labelIndex,
-											 new Integer(edge.target.stateNumber));
+											 Utils.integer(edge.target.stateNumber));
 					}
 				}
 			}
@@ -637,13 +638,13 @@ public class DFA {
 		else {
 			/*
 			if ( stateTransitions.size()>255 ) {
-				System.out.println("edge edgeTable "+stateTransitions.size()+" s"+s.stateNumber+": "+new Integer(edgeTransitionClass));
+				System.out.println("edge edgeTable "+stateTransitions.size()+" s"+s.stateNumber+": "+Utils.integer(edgeTransitionClass));
 			}
 			else {
 				System.out.println("stateTransitions="+stateTransitions);
 			}
 			*/
-			edgeClass = new Integer(edgeTransitionClass);
+			edgeClass = Utils.integer(edgeTransitionClass);
 			transitionEdgeTables.set(s.stateNumber, edgeClass);
 			edgeTransitionClassMap.put(stateTransitions, edgeClass);
 			edgeTransitionClass++;
@@ -660,11 +661,11 @@ public class DFA {
 			if ( label.isAtom() ) {
 				if ( label.getAtom()==Label.EOT ) {
 					// eot[s] points to accept state
-					eot.set(s.stateNumber, new Integer(edge.target.stateNumber));
+					eot.set(s.stateNumber, Utils.integer(edge.target.stateNumber));
 				}
 				else if ( label.getAtom()==Label.EOF ) {
 					// eof[s] points to accept state
-					eof.set(s.stateNumber, new Integer(edge.target.stateNumber));
+					eof.set(s.stateNumber, Utils.integer(edge.target.stateNumber));
 				}
 			}
 			else if ( label.isSet() ) {
@@ -673,10 +674,10 @@ public class DFA {
 				for (int a = 0; a < atoms.length; a++) {
 					if ( atoms[a]==Label.EOT ) {
 						// eot[s] points to accept state
-						eot.set(s.stateNumber, new Integer(edge.target.stateNumber));
+						eot.set(s.stateNumber, Utils.integer(edge.target.stateNumber));
 					}
 					else if ( atoms[a]==Label.EOF ) {
-						eof.set(s.stateNumber, new Integer(edge.target.stateNumber));
+						eof.set(s.stateNumber, Utils.integer(edge.target.stateNumber));
 					}
 				}
 			}
@@ -705,12 +706,12 @@ public class DFA {
 		int smin = ((Integer)min.get(s.stateNumber)).intValue();
 		if ( hasSemPred || smax-smin>MAX_STATE_TRANSITIONS_FOR_TABLE ) {
 			special.set(s.stateNumber,
-						new Integer(uniqueCompressedSpecialStateNum));
+						Utils.integer(uniqueCompressedSpecialStateNum));
 			uniqueCompressedSpecialStateNum++;
 			specialStates.add(s);
 		}
 		else {
-			special.set(s.stateNumber, new Integer(-1)); // not special
+			special.set(s.stateNumber, Utils.integer(-1)); // not special
 		}
 	}
 
@@ -915,7 +916,7 @@ public class DFA {
             d.setAcceptStateReachable(REACHABLE_YES);
             // this alt is uniquely predicted, remove from nondeterministic list
             int predicts = d.getUniquelyPredictedAlt();
-            unreachableAlts.remove(new Integer(predicts));
+            unreachableAlts.remove(Utils.integer(predicts));
             return true;
         }
 
@@ -1028,7 +1029,7 @@ public class DFA {
     protected void initAltRelatedInfo() {
         unreachableAlts = new LinkedList();
         for (int i = 1; i <= nAlts; i++) {
-            unreachableAlts.add(new Integer(i));
+            unreachableAlts.add(Utils.integer(i));
         }
 		altToAcceptState = new DFAState[nAlts+1];
     }
@@ -1094,5 +1095,5 @@ public class DFA {
 		return containsAllChar;
 	}
 	 */
- }
+}
 

@@ -28,6 +28,7 @@
 package org.antlr.tool;
 
 import org.antlr.analysis.*;
+import org.antlr.misc.Utils;
 
 import java.util.*;
 
@@ -112,7 +113,7 @@ public class FASerializer {
             return; // already did this state
         }
         // assign a new state number for this node if there isn't one
-        stateNumberTranslator.put(s, new Integer(stateCounter));
+        stateNumberTranslator.put(s, Utils.integer(stateCounter));
         stateCounter++;
 
         // visit nodes pointed to by each transition;

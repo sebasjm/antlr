@@ -73,7 +73,7 @@ public class DOTGenerator {
         if ( startState instanceof DFAState ) {
             dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/dfa");
 			dot.setAttribute("startState",
-					new Integer(startState.stateNumber));
+					Utils.integer(startState.stateNumber));
 			dot.setAttribute("useBox",
 							 Boolean.valueOf(Tool.internalOption_ShowNFConfigsInDFA));
 			walkCreatingDFADOT(dot, (DFAState)startState);
@@ -81,7 +81,7 @@ public class DOTGenerator {
         else {
             dot = stlib.getInstanceOf("org/antlr/tool/templates/dot/nfa");
 			dot.setAttribute("startState",
-					new Integer(startState.stateNumber));
+					Utils.integer(startState.stateNumber));
 			walkRuleNFACreatingDOT(dot, startState);
         }
 		dot.setAttribute("rankdir", rankdir);
@@ -97,7 +97,7 @@ public class DOTGenerator {
 
         markedStates = new HashSet();
         dot.setAttribute("startState",
-                new Integer(startState.stateNumber));
+                Utils.integer(startState.stateNumber));
         walkRuleNFACreatingDOT(dot, startState);
         return dot.toString();
     }
@@ -110,11 +110,11 @@ public class DOTGenerator {
     protected void walkCreatingDFADOT(StringTemplate dot,
 									  DFAState s)
     {
-		if ( markedStates.contains(new Integer(s.stateNumber)) ) {
+		if ( markedStates.contains(Utils.integer(s.stateNumber)) ) {
 			return; // already visited this node
         }
 
-		markedStates.add(new Integer(s.stateNumber)); // mark this node as completed.
+		markedStates.add(Utils.integer(s.stateNumber)); // mark this node as completed.
 
         // first add this node
         StringTemplate st;
