@@ -47,12 +47,14 @@ import java.util.*;
  *  The ranges are ordered and disjoint so that 2..6 appears before 101..103.
  */
 public class IntervalSet implements IntSet {
-    /** The list of sorted, disjoint intervals. */
+	public static final IntervalSet empty = new IntervalSet();
+
+	/** The list of sorted, disjoint intervals. */
     protected List intervals;
 
     /** Create a set with no elements */
     public IntervalSet() {
-        intervals = new ArrayList();
+        intervals = new ArrayList(2); // most sets are 1 or 2 elements
     }
 
     /** Create a set with a single element, el. */
@@ -84,102 +86,97 @@ public class IntervalSet implements IntSet {
      *  {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
      */
     public void add(int a, int b) {
-        add(new Interval(a,b));
+        add(Interval.create(a,b));
     }
 
-    /*
-    protected void add(Interval addition) {
-        if ( addition.getB()<addition.getA() ) {
-            return;
-        }
-        // find position in list
-        for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
-            Interval r = (Interval) iter.next();
-            if ( addition.adjacent(r) ) {
-                // next to each other, make a single larger interval
-                iter.set(addition.union(r));
-                return;
-            }
-            if ( addition.startsBeforeDisjoint(r) ) {
-                // insert before r
-                iter.previous();
-                iter.add(addition);
-                return;
-            }
-            if ( !addition.disjoint(r) ) {
-                // overlap: make a single larger interval
-                iter.set(addition.union(r));
-                return;
-            }
-            // if disjoint and after r, a future iteration will handle it
-        }
-        // ok, must be after last interval (and disjoint from last interval)
-        // just add it
-        intervals.add(addition);
-    }
-    */
+	protected void add(Interval addition) {
+		//System.out.println("add "+addition+" to "+intervals.toString());
+		if ( addition.b<addition.a ) {
+			return;
+		}
+		// find position in list
+		// Use iterators as we modify list in place
+		for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
+			Interval r = (Interval) iter.next();
+			if ( addition.equals(r) ) {
+				return;
+			}
+			if ( addition.adjacent(r) || !addition.disjoint(r) ) {
+				// next to each other, make a single larger interval
+				Interval bigger = addition.union(r);
+				iter.set(bigger);
+				// make sure we didn't just create an interval that
+				// should be merged with next interval in list
+				if ( iter.hasNext() ) {
+					Interval next = (Interval) iter.next();
+					if ( bigger.adjacent(next)||!bigger.disjoint(next) ) {
+						// if we bump up against or overlap next, merge
+						iter.remove();   // remove this one
+						iter.previous(); // move backwards to what we just set
+						iter.set(bigger.union(next)); // set to 3 merged ones
+					}
+				}
+				return;
+			}
+			if ( addition.startsBeforeDisjoint(r) ) {
+				// insert before r
+				iter.previous();
+				iter.add(addition);
+				return;
+			}
+			// if disjoint and after r, a future iteration will handle it
+		}
+		// ok, must be after last interval (and disjoint from last interval)
+		// just add it
+		intervals.add(addition);
+	}
 
-    protected void add(Interval addition) {
+	/*
+	protected void add(Interval addition) {
         //System.out.println("add "+addition+" to "+intervals.toString());
         if ( addition.b<addition.a ) {
             return;
         }
         // find position in list
-        for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
-            Interval r = (Interval) iter.next();
+        //for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
+		int n = intervals.size();
+		for (int i=0; i<n; i++) {
+			Interval r = (Interval)intervals.get(i);
             if ( addition.equals(r) ) {
                 return;
             }
             if ( addition.adjacent(r) || !addition.disjoint(r) ) {
                 // next to each other, make a single larger interval
                 Interval bigger = addition.union(r);
-                iter.set(bigger);
+				intervals.set(i, bigger);
                 // make sure we didn't just create an interval that
                 // should be merged with next interval in list
-                if ( iter.hasNext() ) {
-                    Interval next = (Interval) iter.next();
+				if ( (i+1)<n ) {
+					i++;
+					Interval next = (Interval)intervals.get(i);
                     if ( bigger.adjacent(next)||!bigger.disjoint(next) ) {
                         // if we bump up against or overlap next, merge
-                        iter.remove();   // remove this one
-                        iter.previous(); // move backwards to what we just set
-                        iter.set(bigger.union(next)); // set to 3 merged ones
+						intervals.remove(i); // remove next one
+						i--;
+						intervals.set(i, bigger.union(next)); // set to 3 merged ones
                     }
                 }
                 return;
             }
             if ( addition.startsBeforeDisjoint(r) ) {
                 // insert before r
-                iter.previous();
-                iter.add(addition);
+				intervals.add(i, addition);
                 return;
             }
-            /*
-            if ( !addition.disjoint(r) ) {
-                // next to each other, make a single larger interval
-                Interval bigger = addition.union(r);
-                iter.set(bigger);
-                // make sure we didn't just create an interval that
-                // should be merged with next interval in list
-                if ( iter.hasNext() ) {
-                    Interval next = (Interval) iter.next();
-                    if ( bigger.adjacent(next)||!bigger.disjoint(next) ) {
-                        // if we bump up against or overlap next, merge
-                        iter.remove();   // remove this one
-                        iter.previous(); // move backwards to what we just set
-                        iter.set(bigger.union(next)); // set to 3 merged ones
-                    }
-                }
-                return;
-            }
-            */
             // if disjoint and after r, a future iteration will handle it
         }
         // ok, must be after last interval (and disjoint from last interval)
         // just add it
         intervals.add(addition);
     }
+*/
 
-    public void addAll(IntSet set) {
+	public void addAll(IntSet set) {
 		if ( set==null ) {
 			return;
 		}
@@ -389,58 +386,52 @@ public class IntervalSet implements IntSet {
      *  just walk them together.  This is roughly O(min(n,m)) for interval
      *  list lengths n and m.
      */
-    public IntSet and(IntSet other) {
-        if ( other==null ) { //|| !(other instanceof IntervalSet) ) {
-            return null; // nothing in common with null set
-        }
+	public IntSet and(IntSet other) {
+		if ( other==null ) { //|| !(other instanceof IntervalSet) ) {
+			return null; // nothing in common with null set
+		}
 
-        // iterate down both interval lists looking for nondisjoint intervals
-        ListIterator thisIter = this.intervals.listIterator();
-        ListIterator otherIter = ((IntervalSet)other).intervals.listIterator();
-        Interval mine=null;
-        Interval theirs=null;
-        if ( thisIter.hasNext() ) {
-            mine = (Interval)thisIter.next();
-        }
-        if ( otherIter.hasNext() ) {
-            theirs = (Interval)otherIter.next();
-        }
-
-		IntervalSet intersection = new IntervalSet();
-        while ( mine!=null && theirs!=null ) {
-            //System.out.println("mine="+mine+" and theirs="+theirs);
-            if ( mine.startsBeforeDisjoint(theirs) ) {
-                // move this iterator looking for interval that might overlap
-                mine = null;
-                if ( thisIter.hasNext() ) {
-                    mine = (Interval)thisIter.next();
-                }
-            }
-            else if ( theirs.startsBeforeDisjoint(mine) ) {
-                // move other iterator looking for interval that might overlap
-                theirs = null;
-                if ( otherIter.hasNext() ) {
-                    theirs = (Interval)otherIter.next();
-                }
-            }
-            else if ( mine.properlyContains(theirs) ) {
-                // overlap, add intersection, get next theirs
-                intersection.add(mine.intersection(theirs));
-                theirs = null;
-                if ( otherIter.hasNext() ) {
-                    theirs = (Interval)otherIter.next();
-                }
-            }
-            else if ( theirs.properlyContains(mine) ) {
+		ArrayList myIntervals = (ArrayList)this.intervals;
+		ArrayList theirIntervals = (ArrayList)((IntervalSet)other).intervals;
+		IntervalSet intersection = null;
+		int mySize = myIntervals.size();
+		int theirSize = theirIntervals.size();
+		int i = 0;
+		int j = 0;
+		// iterate down both interval lists looking for nondisjoint intervals
+		while ( i<mySize && j<theirSize ) {
+			Interval mine = (Interval)myIntervals.get(i);
+			Interval theirs = (Interval)theirIntervals.get(j);
+			//System.out.println("mine="+mine+" and theirs="+theirs);
+			if ( mine.startsBeforeDisjoint(theirs) ) {
+				// move this iterator looking for interval that might overlap
+				i++;
+			}
+			else if ( theirs.startsBeforeDisjoint(mine) ) {
+				// move other iterator looking for interval that might overlap
+				j++;
+			}
+			else if ( mine.properlyContains(theirs) ) {
+				// overlap, add intersection, get next theirs
+				if ( intersection==null ) {
+					intersection = new IntervalSet();
+				}
+				intersection.add(mine.intersection(theirs));
+				j++;
+			}
+			else if ( theirs.properlyContains(mine) ) {
 				// overlap, add intersection, get next mine
-                intersection.add(mine.intersection(theirs));
-                mine = null;
-                if ( thisIter.hasNext() ) {
-                    mine = (Interval)thisIter.next();
-                }
-            }
-            else if ( !mine.disjoint(theirs) ) {
-                // overlap, add intersection
+				if ( intersection==null ) {
+					intersection = new IntervalSet();
+				}
+				intersection.add(mine.intersection(theirs));
+				i++;
+			}
+			else if ( !mine.disjoint(theirs) ) {
+				// overlap, add intersection
+				if ( intersection==null ) {
+					intersection = new IntervalSet();
+				}
 				intersection.add(mine.intersection(theirs));
 				// Move the iterator of lower range [a..b], but not
 				// the upper range as it may contain elements that will collide
@@ -448,7 +439,90 @@ public class IntervalSet implements IntSet {
 				// theirs=[115..200], then intersection is 115 and move mine
 				// but not theirs as theirs may collide with the next range
 				// in thisIter.
-                // move both iterators to next ranges
+				// move both iterators to next ranges
+				if ( mine.startsAfterNonDisjoint(theirs) ) {
+					j++;
+				}
+				else if ( theirs.startsAfterNonDisjoint(mine) ) {
+					i++;
+				}
+			}
+		}
+		if ( intersection==null ) {
+			return empty;
+		}
+		return intersection;
+	}
+
+	public IntSet and_OLD(IntSet other) {
+		if ( other==null ) { //|| !(other instanceof IntervalSet) ) {
+			return null; // nothing in common with null set
+		}
+
+		// iterate down both interval lists looking for nondisjoint intervals
+		ListIterator thisIter = this.intervals.listIterator();
+		ListIterator otherIter = ((IntervalSet)other).intervals.listIterator();
+		Interval mine=null;
+		Interval theirs=null;
+		if ( thisIter.hasNext() ) {
+			mine = (Interval)thisIter.next();
+		}
+		if ( otherIter.hasNext() ) {
+			theirs = (Interval)otherIter.next();
+		}
+
+		IntervalSet intersection = null;
+		while ( mine!=null && theirs!=null ) {
+			//System.out.println("mine="+mine+" and theirs="+theirs);
+			if ( mine.startsBeforeDisjoint(theirs) ) {
+				// move this iterator looking for interval that might overlap
+				mine = null;
+				if ( thisIter.hasNext() ) {
+					mine = (Interval)thisIter.next();
+				}
+			}
+			else if ( theirs.startsBeforeDisjoint(mine) ) {
+				// move other iterator looking for interval that might overlap
+				theirs = null;
+				if ( otherIter.hasNext() ) {
+					theirs = (Interval)otherIter.next();
+				}
+			}
+			else if ( mine.properlyContains(theirs) ) {
+				// overlap, add intersection, get next theirs
+				if ( intersection==null ) {
+					intersection = new IntervalSet();
+				}
+				intersection.add(mine.intersection(theirs));
+				theirs = null;
+				if ( otherIter.hasNext() ) {
+					theirs = (Interval)otherIter.next();
+				}
+			}
+			else if ( theirs.properlyContains(mine) ) {
+				// overlap, add intersection, get next mine
+				if ( intersection==null ) {
+					intersection = new IntervalSet();
+				}
+				intersection.add(mine.intersection(theirs));
+				mine = null;
+				if ( thisIter.hasNext() ) {
+					mine = (Interval)thisIter.next();
+				}
+			}
+			else if ( !mine.disjoint(theirs) ) {
+				// overlap, add intersection
+				if ( intersection==null ) {
+					intersection = new IntervalSet();
+				}
+				intersection.add(mine.intersection(theirs));
+				// Move the iterator of lower range [a..b], but not
+				// the upper range as it may contain elements that will collide
+				// with the next iterator. So, if mine=[0..115] and
+				// theirs=[115..200], then intersection is 115 and move mine
+				// but not theirs as theirs may collide with the next range
+				// in thisIter.
+				// move both iterators to next ranges
 				if ( mine.startsAfterNonDisjoint(theirs) ) {
 					theirs = null;
 					if ( otherIter.hasNext() ) {
@@ -461,10 +535,13 @@ public class IntervalSet implements IntSet {
 						mine = (Interval)thisIter.next();
 					}
 				}
-            }
-        }
-        return intersection;
-    }
+			}
+		}
+		if ( intersection==null ) {
+			return empty;
+		}
+		return intersection;
+	}
 
     /** Is el in any range of this set? */
     public boolean member(int el) {
@@ -627,4 +704,11 @@ public class IntervalSet implements IntSet {
 	public void remove(int el) {
         throw new NoSuchMethodError("IntervalSet.remove() unimplemented");
     }
+
+	/*
+	protected void finalize() throws Throwable {
+		super.finalize();
+		System.out.println("size "+intervals.size()+" "+size());
+	}
+	*/
 }
