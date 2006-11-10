@@ -289,28 +289,16 @@ public class TestSemanticPredicates extends BaseTest {
 			"e : '(' e ')' | INT ;\n");
 		String expecting =
 			".s0-'('->.s1\n" +
-			".s0-INT->.s16\n" +
+			".s0-INT->.s7\n" +
 			".s1-'('->.s2\n" +
-			".s1-INT->.s15\n" +
-			".s10-')'->.s11\n" +
-			".s11-')'->.s12\n" +
-			".s12-'.'->:s6=>1\n" +
-			".s12-':'->:s7=>2\n" +
-			".s13-')'->.s10\n" +
-			".s14-')'->.s11\n" +
-			".s15-')'->.s12\n" +
-			".s16-'.'->:s6=>1\n" +
-			".s16-':'->:s7=>2\n" +
-			".s2-'('->.s3\n" +
-			".s2-INT->.s14\n" +
-			".s3-'('->.s4\n" +
-			".s3-INT->.s13\n" +
-			".s4-'('->.s5\n" +
-			".s4-INT->.s8\n" +
-			".s5-{p1}?->:s6=>1\n" +
-			".s5-{p2}?->:s7=>2\n" +
-			".s8-')'->.s9\n" +
-			".s9-')'->.s10\n";
+			".s1-INT->.s5\n" +
+			".s2-{p1}?->:s3=>1\n" +
+			".s2-{p2}?->:s4=>2\n" +
+			".s5-')'->.s6\n" +
+			".s6-'.'->:s3=>1\n" +
+			".s6-':'->:s4=>2\n" +
+			".s7-'.'->:s3=>1\n" +
+			".s7-':'->:s4=>2\n";
 		DecisionProbe.verbose=true; // make sure we get all error info
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
