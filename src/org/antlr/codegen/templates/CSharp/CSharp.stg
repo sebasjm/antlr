@@ -53,7 +53,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            bitsets, buildTemplate, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
-	   scopes, superClass) ::=
+	   scopes, superClass, literals) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 <if(actions.(actionScope).namespace)>
@@ -109,7 +109,7 @@ public class <name> : Lexer
 <endif>
     }
     
-    public string GrammarFileName
+    override public string GrammarFileName
     {
     	get { return "<fileName>";} 
     }
@@ -141,7 +141,7 @@ public class <name> : Lexer
  *  at backtracking==1.
  */
 filteringNextToken() ::= <<
-override public Token NextToken() 
+override public IToken NextToken() 
 {
     while (true) 
 	{
@@ -152,6 +152,7 @@ override public Token NextToken()
 
 	    token = null;
 	    tokenStartCharIndex = CharIndex;
+	    text = null;
         try 
 		{
             int m = input.Mark();
@@ -182,13 +183,13 @@ override public Token NextToken()
     }
 }
 
-public void Memoize(IIntStream input, int ruleIndex, int ruleStartIndex)
+override public void Memoize(IIntStream input, int ruleIndex, int ruleStartIndex)
 {
 	if ( backtracking > 1 ) 
 		base.Memoize(input, ruleIndex, ruleStartIndex);
 }
 
-public bool AlreadyParsedRule(IIntStream input, int ruleIndex)
+override public bool AlreadyParsedRule(IIntStream input, int ruleIndex)
 {
 	if ( backtracking>1 ) 
 		return base.AlreadyParsedRule(input, ruleIndex);
@@ -233,7 +234,7 @@ public class <name> : <@superClassName><superClass><@end>
 		get { return tokenNames; }
 	}
 
-    public string GrammarFileName
+    override public string GrammarFileName
 	{
 		get { return "<fileName>"; }
 	}
@@ -258,7 +259,7 @@ public class <name> : <@superClassName><superClass><@end>
 }
 >>
 
-parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="Parser", labelType="IToken", members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="ITokenStream", ...)>
 >>
 
@@ -360,6 +361,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::=
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) // throws RecognitionException [1]
 {   
     <if(trace)>Console.Out.WriteLine("enter <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
+    <ruleScopeSetUp()>
     <ruleDeclarations()>
     <ruleLabelDefs()>
     <ruleDescriptor.actions.init>
@@ -389,6 +391,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
         <if(trace)>Console.Out.WriteLine("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
         <ruleCleanUp()>
 		<(ruleDescriptor.actions.finally):execAction()>
+		<ruleScopeCleanUp()>
     }
     <@postamble()>
     return <ruleReturnValue()>;
@@ -404,8 +407,6 @@ catch (<e.decl>)
 >>
 
 ruleDeclarations() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.Push(new <it>_scope());}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.Push(new <it.name>_scope());}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval = new <returnType()>();
 retval.start = input.LT(1);<\n>
@@ -417,6 +418,16 @@ retval.start = input.LT(1);<\n>
 <if(memoize)>
 int <ruleDescriptor.name>_StartIndex = input.Index();
 <endif>
+>>
+
+ruleScopeSetUp() ::= <<
+<ruleDescriptor.useScopes:{<it>_stack.Push(new <it>_scope());}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>_stack.Push(new <it.name>_scope());}; separator="\n">
+>>
+
+ruleScopeCleanUp() ::= <<
+<ruleDescriptor.useScopes:{<it>_stack.Pop();}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>_stack.Pop();}; separator="\n">
 >>
 
 ruleLabelDefs() ::= <<
@@ -447,8 +458,6 @@ retval
 >>
 
 ruleCleanUp() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.Pop();}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.Pop();}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 retval.stop = input.LT(-1);<\n>
 <endif>
@@ -479,11 +488,11 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
         <ruleMemoization(name=ruleName)>
         <block><\n>
 <else>
-        int type = <ruleName>;
-        int start = CharIndex;
-        int line = Line;
-        int charPosition = CharPositionInLine;
-        int channel = Token.DEFAULT_CHANNEL;
+        int _type = <ruleName>;
+        int _start = CharIndex;
+        int _line = Line;
+        int _charPosition = CharPositionInLine;
+        int _channel = Token.DEFAULT_CHANNEL;
         <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
         <block>
@@ -493,7 +502,7 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
         <execAction({
         if ( (token == null) && (ruleNestingLevel == 1) )
         {
-            Emit(type, line, charPosition, channel, start, CharIndex-1);
+            Emit(_type, _line, _charPosition, _channel, _start, CharIndex-1);
         }<\n>
         })>
 <endif>
@@ -583,7 +592,7 @@ do
     switch (alt<decisionNumber>) 
 	{
 		<alts:altSwitchCase()>
-		default :
+		default:
 		    if ( cnt<decisionNumber> >= 1 ) goto loop<decisionNumber>;
 		    <ruleBacktrackFailure()>
 	            EarlyExitException eee =
@@ -615,7 +624,7 @@ do
     switch (alt<decisionNumber>) 
 	{
 		<alts:altSwitchCase()>
-		default :
+		default:
 		    goto loop<decisionNumber>;
     }
 } while (true);
@@ -911,6 +920,7 @@ switch ( input.LA(<k>) )
 	default:
 <if(eotPredictsAlt)>
     	alt<decisionNumber> = <eotPredictsAlt>;
+    	break;
 <else>
 	    <ruleBacktrackFailure()>
 	    NoViableAltException nvae_d<decisionNumber>s<stateNumber> =
@@ -1168,19 +1178,8 @@ parameterScope(scope) ::= <<
 <scope.attributes:{<it.decl>}; separator=", ">
 >>
 
-/** Used in codegen.g to translate $x.y references.
- *  I could have left actions as StringTemplates to be inserted in
- *  the output (so they could use attributes inherited from surrounding
- *  templates), but really wanted to pass in AttributeScope and Attribute
- *  objects so this translation could query them.  So, translation of
- *  $x.y to executable code occurs before recognizerST.toString() occurs.
- *  I.e., actions are just text strings during final code generation.
-globalAttributeRef(scope,attr) ::= <<
-((<scope>)<scope>_stack.Peek()).<attr.name>
->>
- */
-
 parameterAttributeRef(attr) ::= "<attr.name>"
+parameterSetAttributeRef(attr,expr) ::= "<attr.name> = <expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
@@ -1190,6 +1189,18 @@ scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 ((<scope>_scope)<scope>_stack[<index>]).<attr.name>
 <else>
 ((<scope>_scope)<scope>_stack.Peek()).<attr.name>
+<endif>
+<endif>
+>>
+
+scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
+<if(negIndex)>
+((<scope>_scope)<scope>_stack[<scope>_stack.Count-<negIndex>-1]).<attr.name> = <expr>;
+<else>
+<if(index)>
+((<scope>_scope)<scope>_stack[<index>]).<attr.name> = <expr>;
+<else>
+((<scope>_scope)<scope>_stack.Peek()).<attr.name> = <expr>;
 <endif>
 <endif>
 >>
@@ -1214,6 +1225,14 @@ returnAttributeRef(ruleDescriptor,attr) ::= <<
 retval.<attr.name>
 <else>
 <attr.name>
+<endif>
+>>
+
+returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
+<if(ruleDescriptor.hasMultipleReturnValues)>
+retval.<attr.name> = <expr>;
+<else>
+<attr.name> = <expr>;
 <endif>
 >>
 
@@ -1257,6 +1276,18 @@ rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval.stop)"
 rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)retval.tree)"
 rulePropertyRef_text(scope,attr) ::= "input.ToString(retval.start,input.LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "retval.st"
+
+lexerRulePropertyRef_text(scope,attr) ::= "Text"
+lexerRulePropertyRef_type(scope,attr) ::= "_type"
+lexerRulePropertyRef_line(scope,attr) ::= "_line"
+lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
+lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
+lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
+
+// setting $st and $tree is allowed in local rule. everything else
+// is flagged as error
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree = <expr>;"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st = <expr>;"
 
 
 /** How to execute an action */

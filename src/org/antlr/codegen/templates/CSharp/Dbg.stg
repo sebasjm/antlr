@@ -56,12 +56,12 @@ public <name>(<inputStreamType> input)
 <endif>
 }
 <if(profile)>
-public bool AlreadyParsedRule(IIntStream input, int ruleIndex)
+override public bool AlreadyParsedRule(IIntStream input, int ruleIndex)
 {
     ((Profiler)dbg).ExamineRuleMemoization(input, ruleIndex, ruleNames[ruleIndex]);
     return base.AlreadyParsedRule(input, ruleIndex);
 }<\n>
-public void Memoize(IIntStream input,
+override public void Memoize(IIntStream input,
                     int ruleIndex,
                     int ruleStartIndex)
 {
@@ -183,7 +183,7 @@ catch (NoViableAltException nvae)
 >>
 
 @cyclicDFA.errorMethod() ::= <<
-public void Error(NoViableAltException nvae) 
+public virtual void Error(NoViableAltException nvae) 
 {
     dbg.RecognitionException(nvae);
 }
