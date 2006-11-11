@@ -37,7 +37,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ID INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
@@ -50,7 +50,7 @@ public class TestAutoAST extends BaseTest {
 			"a : (ID INT) ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
@@ -63,7 +63,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ID^ INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc 34", debug);
 		assertEquals("(abc 34)\n", found);
@@ -76,7 +76,7 @@ public class TestAutoAST extends BaseTest {
 			"a : INT ID^ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "34 abc", debug);
 		assertEquals("(abc 34)\n", found);
@@ -89,7 +89,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ID INT! ID! INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "abc 34 dag 4532", debug);
 		assertEquals("abc 4532\n", found);
@@ -102,7 +102,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ( ID^ INT )* ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a 1 b 2 c 3", debug);
 		assertEquals("(a 1) (b 2) (c 3)\n", found);
@@ -115,7 +115,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ( ID INT^ )* ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a 1 b 2 c 3", debug);
 		assertEquals("(1 a) (2 b) (3 c)\n", found);
@@ -128,7 +128,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ( ID^ INT )+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a 1 b 2 c 3", debug);
 		assertEquals("(a 1) (b 2) (c 3)\n", found);
@@ -141,7 +141,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ( ID^ INT )+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a 1 b 2 c 3", debug);
 		assertEquals("(a 1) (b 2) (c 3)\n", found);
@@ -154,7 +154,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ( ID INT )? ID^ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a 1 b", debug);
 		assertEquals("(b a 1)\n", found);
@@ -167,7 +167,7 @@ public class TestAutoAST extends BaseTest {
 			"a : v='void'^ ID ';' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "void foo;", debug);
 		assertEquals("(void foo ;)\n", found);
@@ -180,7 +180,7 @@ public class TestAutoAST extends BaseTest {
 			"a : v='void'^ . ';' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "void foo;", debug);
 		assertEquals("(void foo ;)\n", found);
@@ -193,7 +193,7 @@ public class TestAutoAST extends BaseTest {
 			"a : v='void' .^ ';' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "void foo;", debug);
 		assertEquals("(foo void ;)\n", found);
@@ -206,7 +206,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ID^ INT^ ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a 34 c", debug);
 		assertEquals("(34 a c)\n", found);
@@ -219,7 +219,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ID INT^ ID^ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a 34 c", debug);
 		assertEquals("(c (34 a))\n", found);
@@ -232,7 +232,7 @@ public class TestAutoAST extends BaseTest {
 			"a : 'void' (({;}ID|INT) ID | 'null' ) ';' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "void a b;", debug);
 		assertEquals("void a b ;\n", found);
@@ -246,7 +246,7 @@ public class TestAutoAST extends BaseTest {
 			"type : {;}'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "int a", debug);
 		assertEquals("int a\n", found);
@@ -260,7 +260,7 @@ public class TestAutoAST extends BaseTest {
 			"type : {;}'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "int a", debug);
 		assertEquals("(int a)\n", found);
@@ -273,7 +273,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ID ('+'^^ ID)* ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a+b+c+d", debug);
 		assertEquals("(+ (+ (+ a b) c) d)\n", found);
@@ -287,7 +287,7 @@ public class TestAutoAST extends BaseTest {
 			"op : {;}'+' | '-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a+b+c-d", debug);
 		assertEquals("(- (+ (+ a b) c) d)\n", found);
@@ -302,7 +302,7 @@ public class TestAutoAST extends BaseTest {
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "s", "3 exp 4 exp 5", debug);
 		assertEquals("(exp 3 (exp 4 5))\n", found);
@@ -315,7 +315,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ID|INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "abc", debug);
 		assertEquals("abc\n", found);
@@ -328,7 +328,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ('+' | '-')^ ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "+abc", debug);
 		assertEquals("(+ abc)\n", found);
@@ -341,7 +341,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ID (('+'|'-')^^ ID)* ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a+b-c", debug);
 		assertEquals("(- (+ a b) c)\n", found);
@@ -354,7 +354,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ~ID '+' INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "34+2", debug);
 		assertEquals("34 + 2\n", found);
@@ -367,7 +367,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ~'+'^ INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "34 55", debug);
 		assertEquals("(34 55)\n", found);
@@ -381,7 +381,7 @@ public class TestAutoAST extends BaseTest {
 			"blort : '+' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "3+4+5", debug);
 		assertEquals("(+ (+ 3 4) 5)\n", found);
@@ -395,7 +395,7 @@ public class TestAutoAST extends BaseTest {
 			"a : id=ID id=ID {System.out.print(\"2nd id=\"+$id.text+';');} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a b", debug);
 		assertEquals("2nd id=b;a b\n", found);
@@ -409,7 +409,7 @@ public class TestAutoAST extends BaseTest {
 			"a : id=ID id=ID^ {System.out.print(\"2nd id=\"+$id.text+';');} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a b", debug);
 		assertEquals("2nd id=b;(b a)\n", found);
@@ -424,7 +424,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ids+=ID ids+=ID {System.out.print(\"id list=\"+$ids+';');} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a b", debug);
 		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];a b\n";
@@ -440,7 +440,7 @@ public class TestAutoAST extends BaseTest {
 			"a : ids+=ID^ ids+=ID {System.out.print(\"id list=\"+$ids+';');} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a b", debug);
 		String expecting = "id list=[[@0,0:0='a',<4>,1:0], [@2,2:2='b',<4>,1:2]];(a b)\n";
@@ -454,7 +454,7 @@ public class TestAutoAST extends BaseTest {
 			"a : id+=ID^^ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a", debug);
 		assertEquals("a\n", found);
@@ -467,7 +467,7 @@ public class TestAutoAST extends BaseTest {
 			"a : id+=ID! ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a", debug);
 		assertEquals("nil\n", found);
@@ -483,7 +483,7 @@ public class TestAutoAST extends BaseTest {
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a b", debug);
 		assertEquals("2nd x=b;a b\n", found);
@@ -499,7 +499,7 @@ public class TestAutoAST extends BaseTest {
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a b", debug);
 		assertEquals("x=b;a b\n", found);
@@ -515,7 +515,7 @@ public class TestAutoAST extends BaseTest {
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a b", debug);
 		assertEquals("x=(b a);(b a)\n", found);
@@ -531,7 +531,7 @@ public class TestAutoAST extends BaseTest {
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a b", debug);
 		assertEquals("1st x=a;b\n", found);
@@ -547,7 +547,7 @@ public class TestAutoAST extends BaseTest {
 			"B : 'b' ;\n" +
 			"C : 'c' ;\n" +
 			"D : 'd' ;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a b b c c d", debug);
 		assertEquals("a b b c c d\n", found);
@@ -561,7 +561,7 @@ public class TestAutoAST extends BaseTest {
 			"b returns [int i] : INT {$i=Integer.parseInt($INT.text);} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc 34", debug);
 		assertEquals("34\nabc 34\n", found);
@@ -577,7 +577,7 @@ public class TestAutoAST extends BaseTest {
 			"a :  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer", "a", "abc 34", debug);
 		assertEquals("\n", found);
 	}

@@ -29,6 +29,8 @@ package org.antlr.analysis;
 
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
+import org.antlr.tool.GrammarAST;
+import org.antlr.tool.ANTLRParser;
 import org.antlr.misc.Utils;
 
 import java.util.*;
@@ -422,7 +424,13 @@ public class DecisionProbe {
 				DFAState d = (DFAState) it.next();
 				// don't report problem if resolved
 				if ( resolvedStates==null || !resolvedStates.contains(d) ) {
-					ErrorManager.nondeterminism(this,d);
+					// first strip last alt from disableAlts if it's wildcard
+					// then don't print error if no more disable alts
+					Set disabledAlts = getDisabledAlternatives(d);
+					stripWildCardAlts(disabledAlts);
+					if ( disabledAlts.size()>0 ) {
+						ErrorManager.nondeterminism(this,d);
+					}
 				}
 				List insufficientAlts = getIncompletelyCoveredAlts(d);
 				if ( insufficientAlts!=null && insufficientAlts.size()>0 ) {
@@ -445,6 +453,36 @@ public class DecisionProbe {
 			if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
 				ErrorManager.unreachableAlts(this,unreachableAlts);
 			}
+		}
+	}
+
+	/** Get the last disabled alt number and check in the grammar to see
+	 *  if that alt is a simple wildcard.  If so, treat like an else clause
+	 *  and don't emit the error.  Strip out the last alt if it's wildcard.
+	 */
+	protected void stripWildCardAlts(Set disabledAlts) {
+		List sortedDisableAlts = new ArrayList(disabledAlts);
+		Collections.sort(sortedDisableAlts);
+		Integer lastAlt =
+			(Integer)sortedDisableAlts.get(sortedDisableAlts.size()-1);
+		GrammarAST blockAST =
+			dfa.nfa.grammar.getDecisionBlockAST(dfa.decisionNumber);
+		//System.out.println("block with error = "+blockAST.toStringTree());
+		GrammarAST lastAltAST = null;
+		if ( blockAST.getChild(0).getType()==ANTLRParser.OPTIONS ) {
+			// if options, skip first child: ( options { ( = greedy false ) )
+			lastAltAST = blockAST.getChild(lastAlt.intValue());
+		}
+		else {
+			lastAltAST = blockAST.getChild(lastAlt.intValue()-1);
+		}
+		//System.out.println("last alt is "+lastAltAST.toStringTree());
+		// if last alt looks like ( ALT . <end-of-alt> ) then wildcard
+		if ( lastAltAST.getChild(0).getType()== ANTLRParser.WILDCARD &&
+			 lastAltAST.getChild(1).getType()== ANTLRParser.EOA )
+		{
+			//System.out.println("wildcard");
+			disabledAlts.remove(lastAlt);
 		}
 	}
 

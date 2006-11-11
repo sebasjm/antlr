@@ -299,6 +299,26 @@ CHANGES
 
 3.0b5 - ??
 
+November 10, 2006
+
+* No grammar nondeterminism warning now when wildcard '.' is final alt.
+  Examples:
+
+	a : A | B | . ;
+
+	A : 'a'
+	  | .
+	  ;
+
+	SL_COMMENT
+	    : '//' (options {greedy=false;} : .)* '\r'? '\n'
+	    ;
+
+	SL_COMMENT2
+	    : '//' (options {greedy=false;} : 'x'|.)* '\r'? '\n'
+	    ;
+
+
 November 8, 2006
 
 * Syntactic predicates did not get hoisting properly upon non-LL(*) decision.  Other hoisting issues fixed.  Cleaned up code.
