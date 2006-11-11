@@ -116,15 +116,8 @@ public interface TreeAdaptor {
 	/** For identifying trees.
 	 *
 	 *  How to identify nodes so we can say "add node to a prior node"?
-	 *  Even becomeRoot is an issue. Ok, number the nodes as they are created?
-	 *  Use a Map<Tree,Integer> or can we get away with a node's hashCode?
-	 *  Two identical nodes could be in tree and hashCode would be same
-	 *  if they implement that method. Damn...no way to get address. I wonder
-	 *  if we can check to see if they implement hashCode and if so use the
-	 *  super's hashCode. Nope...node.super.hashCode() doesn't parse.
-	 *  Let's assume hashCode for now. Equals will have to be implemented,
-	 *  but hashCode must remain unimplemented against Java doc. No biggie as
-	 *  it's unlikely that people will add AST nodes to HashMaps.
+	 *  Even becomeRoot is an issue.  Use System.identityHashCode(node)
+	 *  usually.
 	 */
 	public int getUniqueID(Object node);
 

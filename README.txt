@@ -299,6 +299,10 @@ CHANGES
 
 3.0b5 - ??
 
+November 11, 2006
+
+* getUniqueID for TreeAdaptor now uses identityHashCode instead of hashCode.
+
 November 10, 2006
 
 * No grammar nondeterminism warning now when wildcard '.' is final alt.
