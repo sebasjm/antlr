@@ -12,7 +12,6 @@
 		F7009ADC0A1BE4AE002EDD5D /* ANTLRLexerRuleReturnScope.m in Sources */ = {isa = PBXBuildFile; fileRef = F7009ADA0A1BE4AE002EDD5D /* ANTLRLexerRuleReturnScope.m */; };
 		F700E61B0A5F66EC005D0757 /* ANTLREarlyExitException.h in Headers */ = {isa = PBXBuildFile; fileRef = F700E6190A5F66EC005D0757 /* ANTLREarlyExitException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F700E61C0A5F66EC005D0757 /* ANTLREarlyExitException.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E61A0A5F66EC005D0757 /* ANTLREarlyExitException.m */; };
-		F700E86B0A5FA34D005D0757 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E86A0A5FA34D005D0757 /* main.m */; };
 		F700E8FB0A5FAD21005D0757 /* ANTLRParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F700E8F90A5FAD21005D0757 /* ANTLRParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F700E8FC0A5FAD21005D0757 /* ANTLRParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E8FA0A5FAD21005D0757 /* ANTLRParser.m */; };
 		F700EC670A5FDF0D005D0757 /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
@@ -20,7 +19,6 @@
 		F700ECA50A5FDF1A005D0757 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F700ECD90A5FE19A005D0757 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
 		F700ECDA0A5FE19A005D0757 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
-		F700ECE80A5FE25D005D0757 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F700ECE70A5FE25D005D0757 /* main.m */; };
 		F700ED7F0A5FF17C005D0757 /* ANTLRTokenSource.h in Headers */ = {isa = PBXBuildFile; fileRef = F700ED7E0A5FF17C005D0757 /* ANTLRTokenSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F700ED960A5FF2A5005D0757 /* ANTLRCommonTokenStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F700ED940A5FF2A5005D0757 /* ANTLRCommonTokenStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F700ED970A5FF2A5005D0757 /* ANTLRCommonTokenStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F700ED950A5FF2A5005D0757 /* ANTLRCommonTokenStream.m */; };
@@ -29,6 +27,8 @@
 		F7037EA60A05AFD70070435D /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F70380BC0A07FA0D0070435D /* ANTLRMismatchedSetException.h in Headers */ = {isa = PBXBuildFile; fileRef = F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F70380BD0A07FA0D0070435D /* ANTLRMismatchedSetException.m in Sources */ = {isa = PBXBuildFile; fileRef = F70380BB0A07FA0D0070435D /* ANTLRMismatchedSetException.m */; };
+		F7048FF80B07D05400D2F326 /* TestLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7048FF70B07D05400D2F326 /* TestLexer.m */; };
+		F7048FF90B07D05800D2F326 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7E983940A0D6A5F00F16093 /* main.m */; };
 		F70AA7A609AA2A6900C3FD5E /* ANTLR.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7A509AA2A6900C3FD5E /* ANTLR.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F70AA7AF09AA2AC000C3FD5E /* ANTLRIntStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7AD09AA2AC000C3FD5E /* ANTLRIntStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F70AA7C709AA339900C3FD5E /* ANTLRStringStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7C509AA339900C3FD5E /* ANTLRStringStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -39,13 +39,6 @@
 		F70BB39D098E62740054FEF8 /* TestBitSet.m in Sources */ = {isa = PBXBuildFile; fileRef = F70BB39C098E62740054FEF8 /* TestBitSet.m */; };
 		F71F6A0509A8159F003221F4 /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F71F6B9009A81E6F003221F4 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
-		F7278F7D0A881AFA00575EAE /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
-		F7278F7E0A881AFA00575EAE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
-		F7278F7F0A881AFA00575EAE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
-		F7278F800A881AFA00575EAE /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
-		F72B8D0C0AD01DCB0013F1E2 /* FuzzyJava.tokens in CopyFiles */ = {isa = PBXBuildFile; fileRef = F72B8D090AD01DCB0013F1E2 /* FuzzyJava.tokens */; };
-		F72B8D0D0AD01DCB0013F1E2 /* FuzzyJavaLexer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = F72B8D0A0AD01DCB0013F1E2 /* FuzzyJavaLexer.h */; };
-		F72B8D0E0AD01DCB0013F1E2 /* FuzzyJavaLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F72B8D0B0AD01DCB0013F1E2 /* FuzzyJavaLexer.m */; };
 		F72C56DD0AB3411000282574 /* ANTLRTreeAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = F72C56DC0AB3411000282574 /* ANTLRTreeAdaptor.m */; };
 		F72C58EA0AB3911D00282574 /* ANTLRCommonTree.h in Headers */ = {isa = PBXBuildFile; fileRef = F72C58E80AB3911D00282574 /* ANTLRCommonTree.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F72C58EB0AB3911D00282574 /* ANTLRCommonTree.m in Sources */ = {isa = PBXBuildFile; fileRef = F72C58E90AB3911D00282574 /* ANTLRCommonTree.m */; };
@@ -67,6 +60,26 @@
 		F72C5E6B0AB7E50300282574 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F72C5E560AB7E41000282574 /* main.m */; };
 		F72C5ECE0AB7E5A500282574 /* ANTLRParserRuleReturnScope.h in Headers */ = {isa = PBXBuildFile; fileRef = F72C5ECC0AB7E5A500282574 /* ANTLRParserRuleReturnScope.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F72C5ECF0AB7E5A500282574 /* ANTLRParserRuleReturnScope.m in Sources */ = {isa = PBXBuildFile; fileRef = F72C5ECD0AB7E5A500282574 /* ANTLRParserRuleReturnScope.m */; };
+		F738D1770B07AEAA001813C4 /* ANTLRFailedPredicateException.h in Headers */ = {isa = PBXBuildFile; fileRef = F738D1730B07AEAA001813C4 /* ANTLRFailedPredicateException.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F738D1780B07AEAA001813C4 /* ANTLRFailedPredicateException.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D1740B07AEAA001813C4 /* ANTLRFailedPredicateException.m */; };
+		F738D1790B07AEAA001813C4 /* ANTLRTreeException.h in Headers */ = {isa = PBXBuildFile; fileRef = F738D1750B07AEAA001813C4 /* ANTLRTreeException.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F738D17A0B07AEAA001813C4 /* ANTLRTreeException.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D1760B07AEAA001813C4 /* ANTLRTreeException.m */; };
+		F738D1BD0B07AFEB001813C4 /* SimpleCTPTreeParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715D330AC9DE9E00ED984D /* SimpleCTPTreeParser.m */; };
+		F738D1BE0B07AFEC001813C4 /* SimpleCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715D310AC9DE9E00ED984D /* SimpleCParser.m */; };
+		F738D1BF0B07AFED001813C4 /* SimpleCLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715D2F0AC9DE9E00ED984D /* SimpleCLexer.m */; };
+		F738D1FC0B07B1BD001813C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD07800A7B67A7006A006C /* main.m */; };
+		F738D20D0B07B265001813C4 /* SymbolTableParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D2010B07B1CE001813C4 /* SymbolTableParser.m */; };
+		F738D20E0B07B266001813C4 /* SymbolTableLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D1FF0B07B1CE001813C4 /* SymbolTableLexer.m */; };
+		F738D2120B07B32D001813C4 /* T.g in Sources */ = {isa = PBXBuildFile; fileRef = F7DD05E40A7B14BE006A006C /* T.g */; };
+		F738D2220B07B39F001813C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD05E70A7B1572006A006C /* main.m */; };
+		F738D3190B07BDB7001813C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F700ECE70A5FE25D005D0757 /* main.m */; };
+		F738D3450B07C072001813C4 /* SimpleCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D2510B07B842001813C4 /* SimpleCParser.m */; };
+		F738D3460B07C073001813C4 /* SimpleCLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D2810B07B9B6001813C4 /* SimpleCLexer.m */; };
+		F738D3610B07C105001813C4 /* CombinedLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D35E0B07C105001813C4 /* CombinedLexer.m */; };
+		F738D3620B07C105001813C4 /* CombinedParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D3600B07C105001813C4 /* CombinedParser.m */; };
+		F738D3630B07C10A001813C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E86A0A5FA34D005D0757 /* main.m */; };
+		F738D37E0B07C3BD001813C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F79D56C00A0E287500EA3CEE /* main.m */; };
+		F738D3900B07C42A001813C4 /* FuzzyJava.g in Sources */ = {isa = PBXBuildFile; fileRef = F72B8CFA0AD01D380013F1E2 /* FuzzyJava.g */; };
 		F73E2B740A9CFE6A005D6267 /* ANTLRTree.h in Headers */ = {isa = PBXBuildFile; fileRef = F73E2B720A9CFE6A005D6267 /* ANTLRTree.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F73E2B7C0A9D0AFC005D6267 /* ANTLRTreeAdaptor.h in Headers */ = {isa = PBXBuildFile; fileRef = F73E2B7A0A9D0AFC005D6267 /* ANTLRTreeAdaptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F7492DF109C00E4800B25E30 /* TestStringStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F7492DEE09C00E4500B25E30 /* TestStringStream.m */; };
@@ -76,9 +89,6 @@
 		F763D4490A666D3D0061CD35 /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F763D51D0A6676590061CD35 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F763D51E0A66765B0061CD35 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
-		F7715D340AC9DE9E00ED984D /* SimpleCLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715D2F0AC9DE9E00ED984D /* SimpleCLexer.m */; };
-		F7715D350AC9DE9E00ED984D /* SimpleCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715D310AC9DE9E00ED984D /* SimpleCParser.m */; };
-		F7715D360AC9DE9E00ED984D /* SimpleCTPTreeParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7715D330AC9DE9E00ED984D /* SimpleCTPTreeParser.m */; };
 		F7754E3F0A5C0A0500D0873A /* ANTLRDFA.h in Headers */ = {isa = PBXBuildFile; fileRef = F7754E3D0A5C0A0500D0873A /* ANTLRDFA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F7754E400A5C0A0500D0873A /* ANTLRDFA.m in Sources */ = {isa = PBXBuildFile; fileRef = F7754E3E0A5C0A0500D0873A /* ANTLRDFA.m */; };
 		F77765CC09DC583000517181 /* ANTLRToken.h in Headers */ = {isa = PBXBuildFile; fileRef = F77765CA09DC583000517181 /* ANTLRToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -93,29 +103,19 @@
 		F777678C09DD616600517181 /* ANTLRCharStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7B509AA2B8800C3FD5E /* ANTLRCharStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F777678E09DD618000517181 /* ANTLRLexer.h in Headers */ = {isa = PBXBuildFile; fileRef = F7A4099109659BFB002CC781 /* ANTLRLexer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F777678F09DD618100517181 /* ANTLRLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A4099209659BFB002CC781 /* ANTLRLexer.m */; };
-		F79D56C10A0E287500EA3CEE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F79D56C00A0E287500EA3CEE /* main.m */; };
 		F79D598B0A0E51AB00EA3CEE /* ANTLRNoViableAltException.h in Headers */ = {isa = PBXBuildFile; fileRef = F79D59890A0E51AB00EA3CEE /* ANTLRNoViableAltException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F79D598C0A0E51AB00EA3CEE /* ANTLRNoViableAltException.m in Sources */ = {isa = PBXBuildFile; fileRef = F79D598A0A0E51AB00EA3CEE /* ANTLRNoViableAltException.m */; };
 		F79D5AF60A0E634900EA3CEE /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F79D5AF70A0E634A00EA3CEE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F79D5AF80A0E634A00EA3CEE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
-		F7A2E91A0A76AB9F0066CA1D /* SimpleC.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A2E9170A76AB9F0066CA1D /* SimpleC.m */; };
-		F7A2E91B0A76AB9F0066CA1D /* SimpleCLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A2E9190A76AB9F0066CA1D /* SimpleCLexer.m */; };
 		F7DD06040A7B1663006A006C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F7DD06070A7B1664006A006C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
 		F7DD06300A7B1665006A006C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F7DD06C50A7B1691006A006C /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
-		F7DD06C60A7B16A5006A006C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD05E70A7B1572006A006C /* main.m */; };
-		F7DD06E90A7B1700006A006C /* T.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD06E60A7B1700006A006C /* T.m */; };
-		F7DD06EA0A7B1701006A006C /* TLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD06E80A7B1700006A006C /* TLexer.m */; };
 		F7DD074C0A7B6656006A006C /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F7DD074D0A7B665C006A006C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F7DD074E0A7B665D006A006C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F7DD074F0A7B665D006A006C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
-		F7DD07810A7B67A7006A006C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD07800A7B67A7006A006C /* main.m */; };
-		F7DD07A60A7B6998006A006C /* SymtabTestParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD07A30A7B6998006A006C /* SymtabTestParser.m */; };
-		F7DD07A70A7B6998006A006C /* SymtabTestParserLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD07A50A7B6998006A006C /* SymtabTestParserLexer.m */; };
-		F7E983950A0D6A5F00F16093 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7E983940A0D6A5F00F16093 /* main.m */; };
 		F7E985580A0D865E00F16093 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F7E985590A0D866000F16093 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F7F218F0097AFB1A000472E9 /* ANTLRBitSet.h in Headers */ = {isa = PBXBuildFile; fileRef = F7F218EE097AFB1A000472E9 /* ANTLRBitSet.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -139,13 +139,6 @@
 			remoteInfo = ANTLR;
 		};
 		F7037EA40A05AFCB0070435D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = ANTLR;
-		};
-		F7278F770A881AFA00575EAE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -189,8 +182,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				F72B8D0C0AD01DCB0013F1E2 /* FuzzyJava.tokens in CopyFiles */,
-				F72B8D0D0AD01DCB0013F1E2 /* FuzzyJavaLexer.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,14 +198,14 @@
 		F7009ADA0A1BE4AE002EDD5D /* ANTLRLexerRuleReturnScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRLexerRuleReturnScope.m; sourceTree = "<group>"; };
 		F700E6190A5F66EC005D0757 /* ANTLREarlyExitException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLREarlyExitException.h; sourceTree = "<group>"; };
 		F700E61A0A5F66EC005D0757 /* ANTLREarlyExitException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLREarlyExitException.m; sourceTree = "<group>"; };
-		F700E85E0A5FA2DE005D0757 /* Combined.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = Combined.g; path = combined/Combined.g; sourceTree = "<group>"; };
+		F700E85E0A5FA2DE005D0757 /* Combined.g */ = {isa = PBXFileReference; explicitFileType = sourcecode.antlr3; fileEncoding = 30; name = Combined.g; path = combined/Combined.g; sourceTree = "<group>"; };
 		F700E8640A5FA31D005D0757 /* combined */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = combined; sourceTree = BUILT_PRODUCTS_DIR; };
 		F700E86A0A5FA34D005D0757 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = combined/main.m; sourceTree = "<group>"; };
 		F700E8F90A5FAD21005D0757 /* ANTLRParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRParser.h; sourceTree = "<group>"; };
 		F700E8FA0A5FAD21005D0757 /* ANTLRParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRParser.m; sourceTree = "<group>"; };
 		F700ECCF0A5FE176005D0757 /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
 		F700ECD00A5FE176005D0757 /* output */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = output; sourceTree = "<group>"; };
-		F700ECD10A5FE176005D0757 /* simplec.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = simplec.g; sourceTree = "<group>"; };
+		F700ECD10A5FE176005D0757 /* SimpleC.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.antlr3; path = SimpleC.g; sourceTree = "<group>"; };
 		F700ECD70A5FE186005D0757 /* LL-star */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "LL-star"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F700ECE70A5FE25D005D0757 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F700ED7E0A5FF17C005D0757 /* ANTLRTokenSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRTokenSource.h; sourceTree = "<group>"; };
@@ -223,9 +214,12 @@
 		F7037CEE0A0582FC0070435D /* ANTLRMismatchedRangeException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedRangeException.h; sourceTree = "<group>"; };
 		F7037CEF0A0582FC0070435D /* ANTLRMismatchedRangeException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedRangeException.m; sourceTree = "<group>"; };
 		F7037EA00A05AFB60070435D /* lexertest-simple */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "lexertest-simple"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F7037EBD0A05B06B0070435D /* lexer.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = lexer.g; sourceTree = "<group>"; };
+		F7037EBD0A05B06B0070435D /* Test.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.antlr3; path = Test.g; sourceTree = "<group>"; };
 		F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedSetException.h; sourceTree = "<group>"; };
 		F70380BB0A07FA0D0070435D /* ANTLRMismatchedSetException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedSetException.m; sourceTree = "<group>"; };
+		F7048FF50B07D05400D2F326 /* Test.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Test.tokens; sourceTree = "<group>"; };
+		F7048FF60B07D05400D2F326 /* TestLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestLexer.h; sourceTree = "<group>"; };
+		F7048FF70B07D05400D2F326 /* TestLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestLexer.m; sourceTree = "<group>"; };
 		F706A55B0A0EC307008999AB /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
 		F70AA7A509AA2A6900C3FD5E /* ANTLR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLR.h; sourceTree = "<group>"; };
 		F70AA7AD09AA2AC000C3FD5E /* ANTLRIntStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRIntStream.h; sourceTree = "<group>"; };
@@ -240,8 +234,7 @@
 		F70BB39B098E62740054FEF8 /* TestBitSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestBitSet.h; path = tests/TestBitSet.h; sourceTree = "<group>"; };
 		F70BB39C098E62740054FEF8 /* TestBitSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBitSet.m; path = tests/TestBitSet.m; sourceTree = "<group>"; };
 		F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
-		F7278F840A881AFA00575EAE /* returnscopes */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = returnscopes; sourceTree = BUILT_PRODUCTS_DIR; };
-		F72B8CFA0AD01D380013F1E2 /* FuzzyJava.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = FuzzyJava.g; sourceTree = "<group>"; };
+		F72B8CFA0AD01D380013F1E2 /* FuzzyJava.g */ = {isa = PBXFileReference; explicitFileType = sourcecode.antlr3; fileEncoding = 30; path = FuzzyJava.g; sourceTree = "<group>"; };
 		F72B8D090AD01DCB0013F1E2 /* FuzzyJava.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = FuzzyJava.tokens; sourceTree = "<group>"; };
 		F72B8D0A0AD01DCB0013F1E2 /* FuzzyJavaLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FuzzyJavaLexer.h; sourceTree = "<group>"; };
 		F72B8D0B0AD01DCB0013F1E2 /* FuzzyJavaLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FuzzyJavaLexer.m; sourceTree = "<group>"; };
@@ -259,7 +252,6 @@
 		F72C5D550AB63C1D00282574 /* ANTLRTreeParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRTreeParser.m; sourceTree = "<group>"; };
 		F72C5D600AB63E0B00282574 /* ANTLRMismatchedTreeNodeException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedTreeNodeException.h; sourceTree = "<group>"; };
 		F72C5D610AB63E0B00282574 /* ANTLRMismatchedTreeNodeException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRMismatchedTreeNodeException.m; sourceTree = "<group>"; };
-		F72C5E2E0AB7529C00282574 /* files */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = files; sourceTree = "<group>"; };
 		F72C5E2F0AB7529C00282574 /* input */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
 		F72C5E300AB7529C00282574 /* Main.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Main.java; sourceTree = "<group>"; };
 		F72C5E310AB7529C00282574 /* output */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output; sourceTree = "<group>"; };
@@ -267,13 +259,34 @@
 		F72C5E690AB7E4C900282574 /* simplectree */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = simplectree; sourceTree = BUILT_PRODUCTS_DIR; };
 		F72C5ECC0AB7E5A500282574 /* ANTLRParserRuleReturnScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRParserRuleReturnScope.h; sourceTree = "<group>"; };
 		F72C5ECD0AB7E5A500282574 /* ANTLRParserRuleReturnScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRParserRuleReturnScope.m; sourceTree = "<group>"; };
+		F738D1730B07AEAA001813C4 /* ANTLRFailedPredicateException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRFailedPredicateException.h; sourceTree = "<group>"; };
+		F738D1740B07AEAA001813C4 /* ANTLRFailedPredicateException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRFailedPredicateException.m; sourceTree = "<group>"; };
+		F738D1750B07AEAA001813C4 /* ANTLRTreeException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRTreeException.h; sourceTree = "<group>"; };
+		F738D1760B07AEAA001813C4 /* ANTLRTreeException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRTreeException.m; sourceTree = "<group>"; };
+		F738D1FD0B07B1CE001813C4 /* SymbolTable.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SymbolTable.tokens; sourceTree = "<group>"; };
+		F738D1FE0B07B1CE001813C4 /* SymbolTableLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SymbolTableLexer.h; sourceTree = "<group>"; };
+		F738D1FF0B07B1CE001813C4 /* SymbolTableLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SymbolTableLexer.m; sourceTree = "<group>"; };
+		F738D2000B07B1CE001813C4 /* SymbolTableParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SymbolTableParser.h; sourceTree = "<group>"; };
+		F738D2010B07B1CE001813C4 /* SymbolTableParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SymbolTableParser.m; sourceTree = "<group>"; };
+		F738D2230B07B3BC001813C4 /* TParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TParser.h; sourceTree = "<group>"; };
+		F738D2240B07B3BC001813C4 /* TParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TParser.m; sourceTree = "<group>"; };
+		F738D2510B07B842001813C4 /* SimpleCParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimpleCParser.m; sourceTree = "<group>"; };
+		F738D27F0B07B9B6001813C4 /* SimpleC.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleC.tokens; sourceTree = "<group>"; };
+		F738D2800B07B9B6001813C4 /* SimpleCLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCLexer.h; sourceTree = "<group>"; };
+		F738D2810B07B9B6001813C4 /* SimpleCLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleCLexer.m; sourceTree = "<group>"; };
+		F738D2820B07B9B6001813C4 /* SimpleCParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCParser.h; sourceTree = "<group>"; };
+		F738D35C0B07C105001813C4 /* Combined.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Combined.tokens; path = combined/Combined.tokens; sourceTree = "<group>"; };
+		F738D35D0B07C105001813C4 /* CombinedLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CombinedLexer.h; path = combined/CombinedLexer.h; sourceTree = "<group>"; };
+		F738D35E0B07C105001813C4 /* CombinedLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CombinedLexer.m; path = combined/CombinedLexer.m; sourceTree = "<group>"; };
+		F738D35F0B07C105001813C4 /* CombinedParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CombinedParser.h; path = combined/CombinedParser.h; sourceTree = "<group>"; };
+		F738D3600B07C105001813C4 /* CombinedParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CombinedParser.m; path = combined/CombinedParser.m; sourceTree = "<group>"; };
 		F73E2B720A9CFE6A005D6267 /* ANTLRTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRTree.h; sourceTree = "<group>"; };
 		F73E2B7A0A9D0AFC005D6267 /* ANTLRTreeAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRTreeAdaptor.h; sourceTree = "<group>"; };
 		F7492DED09C00E4500B25E30 /* TestStringStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestStringStream.h; path = tests/TestStringStream.h; sourceTree = "<group>"; };
 		F7492DEE09C00E4500B25E30 /* TestStringStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestStringStream.m; path = tests/TestStringStream.m; sourceTree = "<group>"; };
 		F7568FAE0AAB8C6E00F6FB41 /* ANTLRTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRTree.m; sourceTree = "<group>"; };
-		F7715D1A0AC9DCE400ED984D /* SimpleC.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleC.g; sourceTree = "<group>"; };
-		F7715D1B0AC9DCE500ED984D /* SimpleCTP.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleCTP.g; sourceTree = "<group>"; };
+		F7715D1A0AC9DCE400ED984D /* SimpleC.g */ = {isa = PBXFileReference; explicitFileType = sourcecode.antlr3; fileEncoding = 4; path = SimpleC.g; sourceTree = "<group>"; };
+		F7715D1B0AC9DCE500ED984D /* SimpleCTP.g */ = {isa = PBXFileReference; explicitFileType = sourcecode.antlr3; fileEncoding = 4; path = SimpleCTP.g; sourceTree = "<group>"; };
 		F7715D1C0AC9DDD800ED984D /* SimpleC.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleC.tokens; sourceTree = "<group>"; };
 		F7715D1D0AC9DDD800ED984D /* SimpleCTP.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleCTP.tokens; sourceTree = "<group>"; };
 		F7715D2E0AC9DE9E00ED984D /* SimpleCLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleCLexer.h; sourceTree = "<group>"; };
@@ -297,32 +310,22 @@
 		F79D56C00A0E287500EA3CEE /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F79D59890A0E51AB00EA3CEE /* ANTLRNoViableAltException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRNoViableAltException.h; sourceTree = "<group>"; };
 		F79D598A0A0E51AB00EA3CEE /* ANTLRNoViableAltException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRNoViableAltException.m; sourceTree = "<group>"; };
-		F7A2E9160A76AB9F0066CA1D /* SimpleC.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SimpleC.h; sourceTree = "<group>"; };
-		F7A2E9170A76AB9F0066CA1D /* SimpleC.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SimpleC.m; sourceTree = "<group>"; };
-		F7A2E9180A76AB9F0066CA1D /* SimpleCLexer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SimpleCLexer.h; sourceTree = "<group>"; };
-		F7A2E9190A76AB9F0066CA1D /* SimpleCLexer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SimpleCLexer.m; sourceTree = "<group>"; };
 		F7A4098B09659BF3002CC781 /* ANTLRBaseRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRBaseRecognizer.h; sourceTree = "<group>"; };
 		F7A4098C09659BF3002CC781 /* ANTLRBaseRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRBaseRecognizer.m; sourceTree = "<group>"; };
 		F7A4099109659BFB002CC781 /* ANTLRLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRLexer.h; sourceTree = "<group>"; };
 		F7A4099209659BFB002CC781 /* ANTLRLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRLexer.m; sourceTree = "<group>"; };
 		F7DD05E20A7B14BE006A006C /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
 		F7DD05E30A7B14BE006A006C /* output */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = output; sourceTree = "<group>"; };
-		F7DD05E40A7B14BE006A006C /* t.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = t.g; sourceTree = "<group>"; };
+		F7DD05E40A7B14BE006A006C /* T.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.antlr3; path = T.g; sourceTree = "<group>"; };
 		F7DD05E70A7B1572006A006C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F7DD05EE0A7B15E1006A006C /* hoistedPredicates */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = hoistedPredicates; sourceTree = BUILT_PRODUCTS_DIR; };
-		F7DD06E50A7B1700006A006C /* T.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = T.h; sourceTree = "<group>"; };
-		F7DD06E60A7B1700006A006C /* T.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = T.m; sourceTree = "<group>"; };
 		F7DD06E70A7B1700006A006C /* TLexer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = TLexer.h; sourceTree = "<group>"; };
 		F7DD06E80A7B1700006A006C /* TLexer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = TLexer.m; sourceTree = "<group>"; };
 		F7DD073C0A7B660A006A006C /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
 		F7DD073D0A7B660A006A006C /* output */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = output; sourceTree = "<group>"; };
-		F7DD073E0A7B660A006A006C /* symtab.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = symtab.g; sourceTree = "<group>"; };
+		F7DD073E0A7B660A006A006C /* SymbolTable.g */ = {isa = PBXFileReference; explicitFileType = sourcecode.antlr3; fileEncoding = 30; path = SymbolTable.g; sourceTree = "<group>"; };
 		F7DD07440A7B6618006A006C /* scopes */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = scopes; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7DD07800A7B67A7006A006C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		F7DD07A20A7B6998006A006C /* SymtabTestParser.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SymtabTestParser.h; sourceTree = "<group>"; };
-		F7DD07A30A7B6998006A006C /* SymtabTestParser.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SymtabTestParser.m; sourceTree = "<group>"; };
-		F7DD07A40A7B6998006A006C /* SymtabTestParserLexer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SymtabTestParserLexer.h; sourceTree = "<group>"; };
-		F7DD07A50A7B6998006A006C /* SymtabTestParserLexer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SymtabTestParserLexer.m; sourceTree = "<group>"; };
 		F7E983940A0D6A5F00F16093 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F7F218EE097AFB1A000472E9 /* ANTLRBitSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRBitSet.h; sourceTree = "<group>"; };
 		F7F218EF097AFB1A000472E9 /* ANTLRBitSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRBitSet.m; sourceTree = "<group>"; };
@@ -376,17 +379,6 @@
 				F71F6A0509A8159F003221F4 /* ANTLR.framework in Frameworks */,
 				F70BB391098E5BB80054FEF8 /* SenTestingKit.framework in Frameworks */,
 				F71F6B9009A81E6F003221F4 /* CoreFoundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F7278F7C0A881AFA00575EAE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F7278F7D0A881AFA00575EAE /* ANTLR.framework in Frameworks */,
-				F7278F7E0A881AFA00575EAE /* Foundation.framework in Frameworks */,
-				F7278F7F0A881AFA00575EAE /* Cocoa.framework in Frameworks */,
-				F7278F800A881AFA00575EAE /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,7 +439,6 @@
 				F700ECD70A5FE186005D0757 /* LL-star */,
 				F7DD05EE0A7B15E1006A006C /* hoistedPredicates */,
 				F7DD07440A7B6618006A006C /* scopes */,
-				F7278F840A881AFA00575EAE /* returnscopes */,
 				F72C5E690AB7E4C900282574 /* simplectree */,
 			);
 			name = Products;
@@ -530,6 +521,11 @@
 		F700E85D0A5FA2C0005D0757 /* combined */ = {
 			isa = PBXGroup;
 			children = (
+				F738D35C0B07C105001813C4 /* Combined.tokens */,
+				F738D35D0B07C105001813C4 /* CombinedLexer.h */,
+				F738D35E0B07C105001813C4 /* CombinedLexer.m */,
+				F738D35F0B07C105001813C4 /* CombinedParser.h */,
+				F738D3600B07C105001813C4 /* CombinedParser.m */,
 				F700E85E0A5FA2DE005D0757 /* Combined.g */,
 				F700E86A0A5FA34D005D0757 /* main.m */,
 			);
@@ -539,13 +535,14 @@
 		F700ECCE0A5FE176005D0757 /* LL-star */ = {
 			isa = PBXGroup;
 			children = (
-				F7A2E9160A76AB9F0066CA1D /* SimpleC.h */,
-				F7A2E9170A76AB9F0066CA1D /* SimpleC.m */,
-				F7A2E9180A76AB9F0066CA1D /* SimpleCLexer.h */,
-				F7A2E9190A76AB9F0066CA1D /* SimpleCLexer.m */,
+				F738D27F0B07B9B6001813C4 /* SimpleC.tokens */,
+				F738D2800B07B9B6001813C4 /* SimpleCLexer.h */,
+				F738D2810B07B9B6001813C4 /* SimpleCLexer.m */,
+				F738D2820B07B9B6001813C4 /* SimpleCParser.h */,
+				F738D2510B07B842001813C4 /* SimpleCParser.m */,
 				F700ECCF0A5FE176005D0757 /* input */,
 				F700ECD00A5FE176005D0757 /* output */,
-				F700ECD10A5FE176005D0757 /* simplec.g */,
+				F700ECD10A5FE176005D0757 /* SimpleC.g */,
 				F700ECE70A5FE25D005D0757 /* main.m */,
 			);
 			path = "LL-star";
@@ -568,7 +565,10 @@
 		F7037EBC0A05B06B0070435D /* lexertest-simple */ = {
 			isa = PBXGroup;
 			children = (
-				F7037EBD0A05B06B0070435D /* lexer.g */,
+				F7048FF50B07D05400D2F326 /* Test.tokens */,
+				F7048FF60B07D05400D2F326 /* TestLexer.h */,
+				F7048FF70B07D05400D2F326 /* TestLexer.m */,
+				F7037EBD0A05B06B0070435D /* Test.g */,
 				F7E983940A0D6A5F00F16093 /* main.m */,
 			);
 			path = "lexertest-simple";
@@ -616,7 +616,6 @@
 				F7715D310AC9DE9E00ED984D /* SimpleCParser.m */,
 				F7715D320AC9DE9E00ED984D /* SimpleCTPTreeParser.h */,
 				F7715D330AC9DE9E00ED984D /* SimpleCTPTreeParser.m */,
-				F72C5E2E0AB7529C00282574 /* files */,
 				F72C5E2F0AB7529C00282574 /* input */,
 				F72C5E300AB7529C00282574 /* Main.java */,
 				F72C5E310AB7529C00282574 /* output */,
@@ -671,6 +670,8 @@
 		F7A4094C096597C4002CC781 /* Exceptions */ = {
 			isa = PBXGroup;
 			children = (
+				F738D1730B07AEAA001813C4 /* ANTLRFailedPredicateException.h */,
+				F738D1740B07AEAA001813C4 /* ANTLRFailedPredicateException.m */,
 				F7037CEE0A0582FC0070435D /* ANTLRMismatchedRangeException.h */,
 				F7037CEF0A0582FC0070435D /* ANTLRMismatchedRangeException.m */,
 				F70380BA0A07FA0D0070435D /* ANTLRMismatchedSetException.h */,
@@ -685,6 +686,8 @@
 				F777669209DC72D600517181 /* ANTLRRecognitionException.m */,
 				F700E6190A5F66EC005D0757 /* ANTLREarlyExitException.h */,
 				F700E61A0A5F66EC005D0757 /* ANTLREarlyExitException.m */,
+				F738D1750B07AEAA001813C4 /* ANTLRTreeException.h */,
+				F738D1760B07AEAA001813C4 /* ANTLRTreeException.m */,
 			);
 			name = Exceptions;
 			sourceTree = "<group>";
@@ -720,13 +723,13 @@
 		F7DD05E10A7B14BE006A006C /* hoistedPredicates */ = {
 			isa = PBXGroup;
 			children = (
-				F7DD06E50A7B1700006A006C /* T.h */,
-				F7DD06E60A7B1700006A006C /* T.m */,
+				F738D2230B07B3BC001813C4 /* TParser.h */,
+				F738D2240B07B3BC001813C4 /* TParser.m */,
 				F7DD06E70A7B1700006A006C /* TLexer.h */,
 				F7DD06E80A7B1700006A006C /* TLexer.m */,
 				F7DD05E20A7B14BE006A006C /* input */,
 				F7DD05E30A7B14BE006A006C /* output */,
-				F7DD05E40A7B14BE006A006C /* t.g */,
+				F7DD05E40A7B14BE006A006C /* T.g */,
 				F7DD05E70A7B1572006A006C /* main.m */,
 			);
 			path = hoistedPredicates;
@@ -735,13 +738,14 @@
 		F7DD073B0A7B660A006A006C /* scopes */ = {
 			isa = PBXGroup;
 			children = (
-				F7DD07A20A7B6998006A006C /* SymtabTestParser.h */,
-				F7DD07A30A7B6998006A006C /* SymtabTestParser.m */,
-				F7DD07A40A7B6998006A006C /* SymtabTestParserLexer.h */,
-				F7DD07A50A7B6998006A006C /* SymtabTestParserLexer.m */,
+				F738D1FD0B07B1CE001813C4 /* SymbolTable.tokens */,
+				F738D1FE0B07B1CE001813C4 /* SymbolTableLexer.h */,
+				F738D1FF0B07B1CE001813C4 /* SymbolTableLexer.m */,
+				F738D2000B07B1CE001813C4 /* SymbolTableParser.h */,
+				F738D2010B07B1CE001813C4 /* SymbolTableParser.m */,
 				F7DD073C0A7B660A006A006C /* input */,
 				F7DD073D0A7B660A006A006C /* output */,
-				F7DD073E0A7B660A006A006C /* symtab.g */,
+				F7DD073E0A7B660A006A006C /* SymbolTable.g */,
 				F7DD07800A7B67A7006A006C /* main.m */,
 			);
 			path = scopes;
@@ -795,6 +799,8 @@
 				F72C5D560AB63C1D00282574 /* ANTLRTreeParser.h in Headers */,
 				F72C5D620AB63E0B00282574 /* ANTLRMismatchedTreeNodeException.h in Headers */,
 				F72C5ECE0AB7E5A500282574 /* ANTLRParserRuleReturnScope.h in Headers */,
+				F738D1770B07AEAA001813C4 /* ANTLRFailedPredicateException.h in Headers */,
+				F738D1790B07AEAA001813C4 /* ANTLRTreeException.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -889,23 +895,6 @@
 			productReference = F70BB380098E5AFF0054FEF8 /* Test.octest */;
 			productType = "com.apple.product-type.bundle";
 		};
-		F7278F750A881AFA00575EAE /* returnscopes */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F7278F810A881AFA00575EAE /* Build configuration list for PBXNativeTarget "returnscopes" */;
-			buildPhases = (
-				F7278F780A881AFA00575EAE /* Sources */,
-				F7278F7C0A881AFA00575EAE /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				F7278F760A881AFA00575EAE /* PBXTargetDependency */,
-			);
-			name = returnscopes;
-			productName = scopes;
-			productReference = F7278F840A881AFA00575EAE /* returnscopes */;
-			productType = "com.apple.product-type.tool";
-		};
 		F72C5E5A0AB7E4C900282574 /* simplec tree */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F72C5E660AB7E4C900282574 /* Build configuration list for PBXNativeTarget "simplec tree" */;
@@ -994,7 +983,6 @@
 				F700ECD60A5FE186005D0757 /* LL-star */,
 				F7DD05ED0A7B15E1006A006C /* hoistedPredicates */,
 				F7DD07430A7B6618006A006C /* scopes */,
-				F7278F750A881AFA00575EAE /* returnscopes */,
 				F72C5E5A0AB7E4C900282574 /* simplec tree */,
 			);
 		};
@@ -1065,6 +1053,8 @@
 				F72C5D570AB63C1D00282574 /* ANTLRTreeParser.m in Sources */,
 				F72C5D630AB63E0B00282574 /* ANTLRMismatchedTreeNodeException.m in Sources */,
 				F72C5ECF0AB7E5A500282574 /* ANTLRParserRuleReturnScope.m in Sources */,
+				F738D1780B07AEAA001813C4 /* ANTLRFailedPredicateException.m in Sources */,
+				F738D17A0B07AEAA001813C4 /* ANTLRTreeException.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1072,7 +1062,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F700E86B0A5FA34D005D0757 /* main.m in Sources */,
+				F738D3610B07C105001813C4 /* CombinedLexer.m in Sources */,
+				F738D3620B07C105001813C4 /* CombinedParser.m in Sources */,
+				F738D3630B07C10A001813C4 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1080,9 +1072,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F700ECE80A5FE25D005D0757 /* main.m in Sources */,
-				F7A2E91A0A76AB9F0066CA1D /* SimpleC.m in Sources */,
-				F7A2E91B0A76AB9F0066CA1D /* SimpleCLexer.m in Sources */,
+				F738D3190B07BDB7001813C4 /* main.m in Sources */,
+				F738D3450B07C072001813C4 /* SimpleCParser.m in Sources */,
+				F738D3460B07C073001813C4 /* SimpleCLexer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1090,7 +1082,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F7E983950A0D6A5F00F16093 /* main.m in Sources */,
+				F7048FF80B07D05400D2F326 /* TestLexer.m in Sources */,
+				F7048FF90B07D05800D2F326 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1103,21 +1096,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F7278F780A881AFA00575EAE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F72C5E5D0AB7E4C900282574 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				F72C5E6B0AB7E50300282574 /* main.m in Sources */,
-				F7715D340AC9DE9E00ED984D /* SimpleCLexer.m in Sources */,
-				F7715D350AC9DE9E00ED984D /* SimpleCParser.m in Sources */,
-				F7715D360AC9DE9E00ED984D /* SimpleCTPTreeParser.m in Sources */,
+				F738D1BD0B07AFEB001813C4 /* SimpleCTPTreeParser.m in Sources */,
+				F738D1BE0B07AFEC001813C4 /* SimpleCParser.m in Sources */,
+				F738D1BF0B07AFED001813C4 /* SimpleCLexer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1125,8 +1111,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F79D56C10A0E287500EA3CEE /* main.m in Sources */,
-				F72B8D0E0AD01DCB0013F1E2 /* FuzzyJavaLexer.m in Sources */,
+				F738D37E0B07C3BD001813C4 /* main.m in Sources */,
+				F738D3900B07C42A001813C4 /* FuzzyJava.g in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1134,9 +1120,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F7DD06C60A7B16A5006A006C /* main.m in Sources */,
-				F7DD06E90A7B1700006A006C /* T.m in Sources */,
-				F7DD06EA0A7B1701006A006C /* TLexer.m in Sources */,
+				F738D2120B07B32D001813C4 /* T.g in Sources */,
+				F738D2220B07B39F001813C4 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1144,9 +1129,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F7DD07810A7B67A7006A006C /* main.m in Sources */,
-				F7DD07A60A7B6998006A006C /* SymtabTestParser.m in Sources */,
-				F7DD07A70A7B6998006A006C /* SymtabTestParserLexer.m in Sources */,
+				F738D1FC0B07B1BD001813C4 /* main.m in Sources */,
+				F738D20D0B07B265001813C4 /* SymbolTableParser.m in Sources */,
+				F738D20E0B07B266001813C4 /* SymbolTableLexer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1167,11 +1152,6 @@
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* ANTLR */;
 			targetProxy = F7037EA40A05AFCB0070435D /* PBXContainerItemProxy */;
-		};
-		F7278F760A881AFA00575EAE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8DC2EF4F0486A6940098B216 /* ANTLR */;
-			targetProxy = F7278F770A881AFA00575EAE /* PBXContainerItemProxy */;
 		};
 		F72C5E5B0AB7E4C900282574 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1268,6 +1248,7 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_EXTRA_JAVA_ARGS = "/Users/kroepke/Projects/idea/antlr3/classes:/Users/kroepke/Projects/idea/stringtemplate/classes:/usr/local/lib/antlr.jar";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DEBUGGING_SYMBOLS = full;
@@ -1300,6 +1281,8 @@
 		F700E86D0A5FA34D005D0757 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/combined";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/combined";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1346,6 +1329,9 @@
 		F700ECDD0A5FE1BF005D0757 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/LL-star";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/LL-star";
+				ANTLR_X_DEBUG_ST = NO;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1397,6 +1383,8 @@
 		F7037EB90A05AFEF0070435D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/lexertest-simple";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/lexertest-simple";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1496,55 +1484,11 @@
 			};
 			name = Release;
 		};
-		F7278F820A881AFA00575EAE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INSTALL_PATH = "$(HOME)/bin";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = returnscopes;
-				ZERO_LINK = NO;
-			};
-			name = Debug;
-		};
-		F7278F830A881AFA00575EAE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INSTALL_PATH = "$(HOME)/bin";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = scopes;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 		F72C5E670AB7E4C900282574 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/simpleCTreeParser";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/simpleCTreeParser";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1591,6 +1535,10 @@
 		F79D56700A0E23D600EA3CEE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/fuzzy";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/fuzzy";
+				ANTLR_TRACE = NO;
+				ANTLR_X_DEBUG_ST = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1640,6 +1588,8 @@
 		F7DD05F10A7B1640006A006C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/hoistedPredicates";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/hoistedPredicates";
 				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1690,6 +1640,8 @@
 		F7DD077A0A7B6682006A006C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/scopes";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/scopes";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1786,15 +1738,6 @@
 			buildConfigurations = (
 				F70BB383098E5B040054FEF8 /* Debug */,
 				F70BB384098E5B040054FEF8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		F7278F810A881AFA00575EAE /* Build configuration list for PBXNativeTarget "returnscopes" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F7278F820A881AFA00575EAE /* Debug */,
-				F7278F830A881AFA00575EAE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

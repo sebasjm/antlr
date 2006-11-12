@@ -60,7 +60,8 @@
 		return newRootNode;
 	if ([newRootNode isEmpty]) {
 		if ([newRootNode childCount] > 1) {
-			@throw [ANTLRTreeException exceptionWithOldRoot:oldRoot newRoot:newRootNode];
+#warning Find a way to the current input stream here!
+			@throw [ANTLRTreeException exceptionWithOldRoot:oldRoot newRoot:newRootNode stream:nil];
 		}
 		// TODO: double check memory management with respect to code generation
 		// remove the empty node, placing its sole child in its role.

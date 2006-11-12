@@ -1,13 +1,12 @@
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
 #import "SimpleCLexer.h"
-#import "SimpleC.h"
-#import <Foundation/NSDebug.h>
+#import "SimpleCParser.h"
 
 int main() {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-	NSString *string = [NSString stringWithContentsOfFile:@"input"];
+	NSString *string = [NSString stringWithContentsOfFile:@"examples/LL-star/input"];
 	NSLog(@"input is: %@", string);
 	ANTLRStringStream *stream = [[ANTLRStringStream alloc] initWithStringNoCopy:string];
 	SimpleCLexer *lexer = [[SimpleCLexer alloc] initWithCharStream:stream];
@@ -18,7 +17,7 @@ int main() {
 //	}
 	
 	ANTLRCommonTokenStream *tokenStream = [[ANTLRCommonTokenStream alloc] initWithTokenSource:lexer];
-	SimpleC *parser = [[SimpleC alloc] initWithTokenStream:tokenStream];
+	SimpleCParser *parser = [[SimpleCParser alloc] initWithTokenStream:tokenStream];
 	[parser program];
 	[lexer release];
 	[stream release];

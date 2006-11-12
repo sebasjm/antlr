@@ -1,5 +1,5 @@
 #import <Cocoa/Cocoa.h>
-#import "test.h"
+#import "TestLexer.h"
 #import <ANTLR/ANTLR.h>
 
 int main(int argc, const char * argv[])
@@ -7,7 +7,7 @@ int main(int argc, const char * argv[])
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	ANTLRStringStream *stream = [[ANTLRStringStream alloc] initWithStringNoCopy:@"abB9Cdd44"];
-	Test *lexer = [[Test alloc] initWithCharStream:stream];
+	TestLexer *lexer = [[TestLexer alloc] initWithCharStream:stream];
 	ANTLRToken *currentToken;
 	while (currentToken = [lexer nextToken]) {
 		NSLog(@"%@", currentToken);

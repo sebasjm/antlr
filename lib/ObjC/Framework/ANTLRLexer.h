@@ -39,6 +39,7 @@
 	id<ANTLRCharStream> input;
 	ANTLRToken *token;
 	unsigned int tokenStartCharIndex;
+	unsigned int ruleNestingLevel;
 }
 
 #pragma mark Initializer

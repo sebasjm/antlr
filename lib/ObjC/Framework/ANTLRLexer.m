@@ -37,6 +37,7 @@
 	if (nil != (self = [super init])) {
 		[self setInput:anInput];
 		tokenStartCharIndex = -1;
+		ruleNestingLevel = 0;
 	}
 	return self;
 }
@@ -44,6 +45,7 @@
 - (void) reset
 {
 	tokenStartCharIndex = -1;
+	ruleNestingLevel = 0;
 	[super reset];
 }
 

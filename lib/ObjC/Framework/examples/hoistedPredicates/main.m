@@ -1,12 +1,12 @@
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
 #import "TLexer.h"
-#import "T.h"
+#import "TParser.h"
 
 int main() {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *string = [NSString stringWithContentsOfFile:@"input"];
+	NSString *string = [NSString stringWithContentsOfFile:@"examples/hoistedPredicates/input"];
 	NSLog(@"input is : %@", string);
 	ANTLRStringStream *stream = [[ANTLRStringStream alloc] initWithStringNoCopy:string];
 	TLexer *lexer = [[TLexer alloc] initWithCharStream:stream];
@@ -17,7 +17,7 @@ int main() {
 	//	}
 	
 	ANTLRCommonTokenStream *tokenStream = [[ANTLRCommonTokenStream alloc] initWithTokenSource:lexer];
-	T *parser = [[T alloc] initWithTokenStream:tokenStream];
+	TParser *parser = [[TParser alloc] initWithTokenStream:tokenStream];
 	[parser stat];
 	[lexer release];
 	[stream release];

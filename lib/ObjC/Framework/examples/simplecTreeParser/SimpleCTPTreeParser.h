@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 SimpleCTP.g 2006-09-29 20:54:18
+// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g 2006-11-12 20:38:47
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
@@ -27,15 +27,16 @@
 #define SimpleCTPTreeParser_ID	10
 #define SimpleCTPTreeParser_VAR_DEF	4
 
-#pragma mark Dynamic Scopes
+#pragma mark Dynamic Global Scopes
 
-#pragma mark Rule return scopes start
-#pragma mark Rule return scopes end
+#pragma mark Dynamic Rule Scopes
+
+#pragma mark Rule Return Scopes
 
 
 @interface SimpleCTPTreeParser : ANTLRTreeParser {
 
-
+													
 
  }
 

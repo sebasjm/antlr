@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 SimpleC.g 2006-09-29 20:54:15
+// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g 2006-11-12 20:37:38
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
@@ -29,107 +29,108 @@
 #define SimpleCParser_VAR_DEF	4
 #define SimpleCParser_ID	10
 
-#pragma mark Dynamic Scopes
+#pragma mark Dynamic Global Scopes
 
-#pragma mark Rule return scopes start
+#pragma mark Dynamic Rule Scopes
+
+#pragma mark Rule Return Scopes
 @interface SimpleCParser_program_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_declaration_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_variable_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_declarator_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_functionHeader_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_formalParameter_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_type_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_block_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_stat_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_forStat_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_assignStat_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_expr_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_condExpr_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_aexpr_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 @interface SimpleCParser_atom_return : ANTLRParserRuleReturnScope {
     id tree;
 }
 - (id) tree;
-- (void) setTree:()aTree;
+- (void) setTree:(id)aTree;
 @end
 
-#pragma mark Rule return scopes end
 
 
 @interface SimpleCParser : ANTLRParser {
 
 	SimpleCParserDFA2 *dfa2;
-
+																
 	Class adaptor;
 
  }

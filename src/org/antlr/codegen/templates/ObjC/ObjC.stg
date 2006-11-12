@@ -189,23 +189,22 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="ANTLRToken *",
 filteringNextToken() ::= <<
 - (ANTLRToken *) nextToken
 {
-	[self setToken:nil];
-    tokenStartCharIndex = [self charIndex];
     while (YES) {
         if ( [input LA:1] == ANTLRCharStreamEOF ) {
             return nil; // should really be a +eofToken call here -> go figure
         }
+        [self setToken:nil];
+        tokenStartCharIndex = [self charIndex];
         @try {
             int m = [input mark];
             backtracking = 1;
             failed = NO;
             [self mTokens];
             backtracking = 0;
-            [input rewind:m];
             if ( failed ) {
+                [input rewind:m];
                 [input consume]; <! // advance one char and try again !>
             } else {
-                [self mTokens];
                 return token;
             }
         }
@@ -468,7 +467,7 @@ ruleDeclarations() ::= <<
 [_retval setStart:[input LT:1]];<\n>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
-<returnType()> <ruleDescriptor.singleValueReturnName>;
+<returnType()> _<ruleDescriptor.singleValueReturnName>;
 <endif>
 <endif>
 <if(memoize)>
@@ -545,6 +544,7 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block, memoize) ::= <<
 	<ruleDeclarations()>
 	<ruleLabelDefs()>
 	@try {
+		ruleNestingLevel++;
 <ruleDescriptor.actions.init>
 <if(nakedBlock)>
         <ruleMemoization(name=ruleName)>
@@ -556,10 +556,11 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block, memoize) ::= <<
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
 		<block>
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}<\n>
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}<\n>
 <endif>
 	}
 	@finally {
+		ruleNestingLevel--;
         <if(trace)>NSLog(@"exit <ruleName> %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);<endif>
         // rule cleanup
 		<ruleCleanUp()>
@@ -906,7 +907,7 @@ else {
 <if(eotPredictsAlt)>
 	alt<decisionNumber> = <eotPredictsAlt>;
 <else>
-	<checkRuleBacktrackFailure()>
+	<ruleBacktrackFailure()>
     ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<decisionNumber> state:<stateNumber> stream:input];
 	<@noViableAltException()>
 	@throw nvae;<\n>
@@ -970,7 +971,7 @@ default:
 <if(eotPredictsAlt)>
 	alt<decisionNumber> = <eotPredictsAlt>;
 <else> {
-	<checkRuleBacktrackFailure()>
+	<ruleBacktrackFailure()>
     ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:<decisionNumber> state:<stateNumber> stream:input];
 	<@noViableAltException()>
 	@throw nvae;<\n>
@@ -1318,7 +1319,7 @@ ruleLabelRef(referencedRule,scope,attr) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
 [<scope> valueForKey:@"<attr.name>"]
 <else>
-<scope>
+_<scope>
 <endif>
 >>
 
@@ -1335,6 +1336,8 @@ returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
 [_retval setValue:<expr> forKey:@"<attr.name>"];
 <else>
 _<attr.name> =<expr>;
+// double check this after beta release!
+[_<attr.name> retain];
 <endif>
 >>
 /** How to translate $tokenLabel */

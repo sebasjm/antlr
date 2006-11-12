@@ -2,6 +2,7 @@ tree grammar SimpleCTP;
 options {
     tokenVocab=SimpleC;
 	language=ObjC;
+	ASTLabelType=ANTLRCommonTree;
 }
 
 program

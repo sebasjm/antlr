@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g 2006-11-12 20:37:40
+// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g 2006-11-12 21:48:44
 
 #import "SimpleCLexer.h"
 #pragma mark Cyclic DFAs
@@ -23,16 +23,16 @@
 }
 
 
-- (void) mT21
+- (void) mT7
 {
 	@try {
-		int _type = SimpleCLexer_T21;
+		int _type = SimpleCLexer_T7;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:7:7: ( ';' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:7:7: ';' // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:7:6: ( ';' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:7:6: ';' // alt
 		{
 		[self matchChar:';'];
 
@@ -52,19 +52,19 @@
 	}
 	return;
 }
-// $ANTLR end T21
+// $ANTLR end T7
 
 
-- (void) mT22
+- (void) mT8
 {
 	@try {
-		int _type = SimpleCLexer_T22;
+		int _type = SimpleCLexer_T8;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:8:7: ( '(' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:8:7: '(' // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:8:6: ( '(' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:8:6: '(' // alt
 		{
 		[self matchChar:'('];
 
@@ -84,19 +84,19 @@
 	}
 	return;
 }
-// $ANTLR end T22
+// $ANTLR end T8
 
 
-- (void) mT23
+- (void) mT9
 {
 	@try {
-		int _type = SimpleCLexer_T23;
+		int _type = SimpleCLexer_T9;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:9:7: ( ',' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:9:7: ',' // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:9:6: ( ',' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:9:6: ',' // alt
 		{
 		[self matchChar:','];
 
@@ -116,19 +116,19 @@
 	}
 	return;
 }
-// $ANTLR end T23
+// $ANTLR end T9
 
 
-- (void) mT24
+- (void) mT10
 {
 	@try {
-		int _type = SimpleCLexer_T24;
+		int _type = SimpleCLexer_T10;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:10:7: ( ')' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:10:7: ')' // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:10:7: ( ')' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:10:7: ')' // alt
 		{
 		[self matchChar:')'];
 
@@ -148,115 +148,19 @@
 	}
 	return;
 }
-// $ANTLR end T24
+// $ANTLR end T10
 
 
-- (void) mT25
+- (void) mT11
 {
 	@try {
-		int _type = SimpleCLexer_T25;
+		int _type = SimpleCLexer_T11;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:11:7: ( '{' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:11:7: '{' // alt
-		{
-		[self matchChar:'{'];
-
-
-
-		}
-
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-        // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
-
-	}
-	return;
-}
-// $ANTLR end T25
-
-
-- (void) mT26
-{
-	@try {
-		int _type = SimpleCLexer_T26;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:12:7: ( '}' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:12:7: '}' // alt
-		{
-		[self matchChar:'}'];
-
-
-
-		}
-
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-        // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
-
-	}
-	return;
-}
-// $ANTLR end T26
-
-
-- (void) mFOR
-{
-	@try {
-		int _type = SimpleCLexer_FOR;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:91:7: ( 'for' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:91:7: 'for' // alt
-		{
-		[self matchString:@"for"];
-
-
-
-		}
-
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-        // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
-
-	}
-	return;
-}
-// $ANTLR end FOR
-
-
-- (void) mINT_TYPE
-{
-	@try {
-		int _type = SimpleCLexer_INT_TYPE;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:92:12: ( 'int' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:92:12: 'int' // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:11:7: ( 'int' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:11:7: 'int' // alt
 		{
 		[self matchString:@"int"];
 
@@ -276,19 +180,19 @@
 	}
 	return;
 }
-// $ANTLR end INT_TYPE
+// $ANTLR end T11
 
 
-- (void) mCHAR
+- (void) mT12
 {
 	@try {
-		int _type = SimpleCLexer_CHAR;
+		int _type = SimpleCLexer_T12;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:93:7: ( 'char' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:93:7: 'char' // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:12:7: ( 'char' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:12:7: 'char' // alt
 		{
 		[self matchString:@"char"];
 
@@ -308,19 +212,19 @@
 	}
 	return;
 }
-// $ANTLR end CHAR
+// $ANTLR end T12
 
 
-- (void) mVOID
+- (void) mT13
 {
 	@try {
-		int _type = SimpleCLexer_VOID;
+		int _type = SimpleCLexer_T13;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:94:7: ( 'void' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:94:7: 'void' // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:13:7: ( 'void' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:13:7: 'void' // alt
 		{
 		[self matchString:@"void"];
 
@@ -340,7 +244,231 @@
 	}
 	return;
 }
-// $ANTLR end VOID
+// $ANTLR end T13
+
+
+- (void) mT14
+{
+	@try {
+		int _type = SimpleCLexer_T14;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:14:7: ( '{' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:14:7: '{' // alt
+		{
+		[self matchChar:'{'];
+
+
+
+		}
+
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+	}
+	@finally {
+        // rule cleanup
+		// token labels
+		// token+rule list labels
+		// rule labels
+		// rule refs in alts with rewrites
+
+	}
+	return;
+}
+// $ANTLR end T14
+
+
+- (void) mT15
+{
+	@try {
+		int _type = SimpleCLexer_T15;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:15:7: ( '}' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:15:7: '}' // alt
+		{
+		[self matchChar:'}'];
+
+
+
+		}
+
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+	}
+	@finally {
+        // rule cleanup
+		// token labels
+		// token+rule list labels
+		// rule labels
+		// rule refs in alts with rewrites
+
+	}
+	return;
+}
+// $ANTLR end T15
+
+
+- (void) mT16
+{
+	@try {
+		int _type = SimpleCLexer_T16;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:16:7: ( 'for' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:16:7: 'for' // alt
+		{
+		[self matchString:@"for"];
+
+
+
+		}
+
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+	}
+	@finally {
+        // rule cleanup
+		// token labels
+		// token+rule list labels
+		// rule labels
+		// rule refs in alts with rewrites
+
+	}
+	return;
+}
+// $ANTLR end T16
+
+
+- (void) mT17
+{
+	@try {
+		int _type = SimpleCLexer_T17;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:17:7: ( '=' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:17:7: '=' // alt
+		{
+		[self matchChar:'='];
+
+
+
+		}
+
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+	}
+	@finally {
+        // rule cleanup
+		// token labels
+		// token+rule list labels
+		// rule labels
+		// rule refs in alts with rewrites
+
+	}
+	return;
+}
+// $ANTLR end T17
+
+
+- (void) mT18
+{
+	@try {
+		int _type = SimpleCLexer_T18;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:18:7: ( '==' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:18:7: '==' // alt
+		{
+		[self matchString:@"=="];
+
+
+
+		}
+
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+	}
+	@finally {
+        // rule cleanup
+		// token labels
+		// token+rule list labels
+		// rule labels
+		// rule refs in alts with rewrites
+
+	}
+	return;
+}
+// $ANTLR end T18
+
+
+- (void) mT19
+{
+	@try {
+		int _type = SimpleCLexer_T19;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:19:7: ( '<' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:19:7: '<' // alt
+		{
+		[self matchChar:'<'];
+
+
+
+		}
+
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+	}
+	@finally {
+        // rule cleanup
+		// token labels
+		// token+rule list labels
+		// rule labels
+		// rule refs in alts with rewrites
+
+	}
+	return;
+}
+// $ANTLR end T19
+
+
+- (void) mT20
+{
+	@try {
+		int _type = SimpleCLexer_T20;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:20:7: ( '+' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:20:7: '+' // alt
+		{
+		[self matchChar:'+'];
+
+
+
+		}
+
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+	}
+	@finally {
+        // rule cleanup
+		// token labels
+		// token+rule list labels
+		// rule labels
+		// rule refs in alts with rewrites
+
+	}
+	return;
+}
+// $ANTLR end T20
 
 
 - (void) mID
@@ -351,8 +479,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:96:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:96:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:94:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:94:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* // alt
 		{
 		if (([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			[input consume];
@@ -373,7 +501,7 @@
 		    }
 		    switch (alt1) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:96:34: ('a'..'z'|'A'..'Z'|'0'..'9'|'_') // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:94:34: ('a'..'z'|'A'..'Z'|'0'..'9'|'_') // alt
 			    {
 			    if (([input LA:1]>='0' && [input LA:1]<='9')||([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			    	[input consume];
@@ -418,10 +546,10 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:99:7: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:99:7: ( '0' .. '9' )+ // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:97:7: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:97:7: ( '0' .. '9' )+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:99:7: ( '0' .. '9' )+	// positiveClosureBlock
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:97:7: ( '0' .. '9' )+	// positiveClosureBlock
 		int cnt2=0;
 
 		do {
@@ -435,7 +563,7 @@
 		    }
 		    switch (alt2) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:99:8: '0' .. '9' // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:97:8: '0' .. '9' // alt
 			    {
 			    [self matchRangeFromChar:'0' to:'9'];
 
@@ -468,134 +596,6 @@
 // $ANTLR end INT
 
 
-- (void) mEQ
-{
-	@try {
-		int _type = SimpleCLexer_EQ;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:102:8: ( '=' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:102:8: '=' // alt
-		{
-		[self matchChar:'='];
-
-
-
-		}
-
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-        // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
-
-	}
-	return;
-}
-// $ANTLR end EQ
-
-
-- (void) mEQEQ
-{
-	@try {
-		int _type = SimpleCLexer_EQEQ;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:103:8: ( '==' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:103:8: '==' // alt
-		{
-		[self matchString:@"=="];
-
-
-
-		}
-
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-        // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
-
-	}
-	return;
-}
-// $ANTLR end EQEQ
-
-
-- (void) mLT
-{
-	@try {
-		int _type = SimpleCLexer_LT;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:104:8: ( '<' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:104:8: '<' // alt
-		{
-		[self matchChar:'<'];
-
-
-
-		}
-
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-        // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
-
-	}
-	return;
-}
-// $ANTLR end LT
-
-
-- (void) mPLUS
-{
-	@try {
-		int _type = SimpleCLexer_PLUS;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:105:8: ( '+' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:105:8: '+' // alt
-		{
-		[self matchChar:'+'];
-
-
-
-		}
-
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-        // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
-
-	}
-	return;
-}
-// $ANTLR end PLUS
-
-
 - (void) mWS
 {
 	@try {
@@ -604,10 +604,10 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:107:9: ( ( (' '|'\\t'|'\\r'|'\\n'))+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:107:9: ( (' '|'\\t'|'\\r'|'\\n'))+ // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:100:9: ( ( (' '|'\\t'|'\\r'|'\\n'))+ ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:100:9: ( (' '|'\\t'|'\\r'|'\\n'))+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:107:9: ( (' '|'\\t'|'\\r'|'\\n'))+	// positiveClosureBlock
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:100:9: ( (' '|'\\t'|'\\r'|'\\n'))+	// positiveClosureBlock
 		int cnt3=0;
 
 		do {
@@ -621,7 +621,7 @@
 		    }
 		    switch (alt3) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:107:13: (' '|'\\t'|'\\r'|'\\n') // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:100:13: (' '|'\\t'|'\\r'|'\\n') // alt
 			    {
 			    if (([input LA:1]>='\t' && [input LA:1]<='\n')||[input LA:1]=='\r'||[input LA:1]==' ') {
 			    	[input consume];
@@ -663,7 +663,7 @@
 
 - (void) mTokens
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:10: ( T21 | T22 | T23 | T24 | T25 | T26 | FOR | INT_TYPE | CHAR | VOID | ID | INT | EQ | EQEQ | LT | PLUS | WS ) //ruleblock
+    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:10: ( T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | T15 | T16 | T17 | T18 | T19 | T20 | ID | INT | WS ) //ruleblock
     int alt4=17;
     switch ([input LA:1]) {
     	case ';':
@@ -678,121 +678,137 @@
     	case ')':
     		alt4 = 4;
     		break;
-    	case '{':
-    		alt4 = 5;
-    		break;
-    	case '}':
-    		alt4 = 6;
-    		break;
-    	case 'f':
+    	case 'i':
     		{
-    			int LA4_7 = [input LA:2];
-    			if ( LA4_7=='o' ) {
+    			int LA4_5 = [input LA:2];
+    			if ( LA4_5=='n' ) {
     				{
     					int LA4_17 = [input LA:3];
-    					if ( LA4_17=='r' ) {
+    					if ( LA4_17=='t' ) {
     						{
     							int LA4_23 = [input LA:4];
     							if ( (LA4_23>='0' && LA4_23<='9')||(LA4_23>='A' && LA4_23<='Z')||LA4_23=='_'||(LA4_23>='a' && LA4_23<='z') ) {
-    								alt4 = 11;
+    								alt4 = 15;
     							}
     						else {
-    							alt4 = 7;	}
+    							alt4 = 5;	}
     						}
     					}
     				else {
-    					alt4 = 11;	}
+    					alt4 = 15;	}
     				}
     			}
     		else {
-    			alt4 = 11;	}
-    		}
-    		break;
-    	case 'i':
-    		{
-    			int LA4_8 = [input LA:2];
-    			if ( LA4_8=='n' ) {
-    				{
-    					int LA4_18 = [input LA:3];
-    					if ( LA4_18=='t' ) {
-    						{
-    							int LA4_24 = [input LA:4];
-    							if ( (LA4_24>='0' && LA4_24<='9')||(LA4_24>='A' && LA4_24<='Z')||LA4_24=='_'||(LA4_24>='a' && LA4_24<='z') ) {
-    								alt4 = 11;
-    							}
-    						else {
-    							alt4 = 8;	}
-    						}
-    					}
-    				else {
-    					alt4 = 11;	}
-    				}
-    			}
-    		else {
-    			alt4 = 11;	}
+    			alt4 = 15;	}
     		}
     		break;
     	case 'c':
     		{
-    			int LA4_9 = [input LA:2];
-    			if ( LA4_9=='h' ) {
+    			int LA4_6 = [input LA:2];
+    			if ( LA4_6=='h' ) {
     				{
-    					int LA4_19 = [input LA:3];
-    					if ( LA4_19=='a' ) {
+    					int LA4_18 = [input LA:3];
+    					if ( LA4_18=='a' ) {
     						{
-    							int LA4_25 = [input LA:4];
-    							if ( LA4_25=='r' ) {
+    							int LA4_24 = [input LA:4];
+    							if ( LA4_24=='r' ) {
     								{
-    									int LA4_29 = [input LA:5];
-    									if ( (LA4_29>='0' && LA4_29<='9')||(LA4_29>='A' && LA4_29<='Z')||LA4_29=='_'||(LA4_29>='a' && LA4_29<='z') ) {
-    										alt4 = 11;
+    									int LA4_28 = [input LA:5];
+    									if ( (LA4_28>='0' && LA4_28<='9')||(LA4_28>='A' && LA4_28<='Z')||LA4_28=='_'||(LA4_28>='a' && LA4_28<='z') ) {
+    										alt4 = 15;
     									}
     								else {
-    									alt4 = 9;	}
+    									alt4 = 6;	}
     								}
     							}
     						else {
-    							alt4 = 11;	}
+    							alt4 = 15;	}
     						}
     					}
     				else {
-    					alt4 = 11;	}
+    					alt4 = 15;	}
     				}
     			}
     		else {
-    			alt4 = 11;	}
+    			alt4 = 15;	}
     		}
     		break;
     	case 'v':
+    		{
+    			int LA4_7 = [input LA:2];
+    			if ( LA4_7=='o' ) {
+    				{
+    					int LA4_19 = [input LA:3];
+    					if ( LA4_19=='i' ) {
+    						{
+    							int LA4_25 = [input LA:4];
+    							if ( LA4_25=='d' ) {
+    								{
+    									int LA4_29 = [input LA:5];
+    									if ( (LA4_29>='0' && LA4_29<='9')||(LA4_29>='A' && LA4_29<='Z')||LA4_29=='_'||(LA4_29>='a' && LA4_29<='z') ) {
+    										alt4 = 15;
+    									}
+    								else {
+    									alt4 = 7;	}
+    								}
+    							}
+    						else {
+    							alt4 = 15;	}
+    						}
+    					}
+    				else {
+    					alt4 = 15;	}
+    				}
+    			}
+    		else {
+    			alt4 = 15;	}
+    		}
+    		break;
+    	case '{':
+    		alt4 = 8;
+    		break;
+    	case '}':
+    		alt4 = 9;
+    		break;
+    	case 'f':
     		{
     			int LA4_10 = [input LA:2];
     			if ( LA4_10=='o' ) {
     				{
     					int LA4_20 = [input LA:3];
-    					if ( LA4_20=='i' ) {
+    					if ( LA4_20=='r' ) {
     						{
     							int LA4_26 = [input LA:4];
-    							if ( LA4_26=='d' ) {
-    								{
-    									int LA4_30 = [input LA:5];
-    									if ( (LA4_30>='0' && LA4_30<='9')||(LA4_30>='A' && LA4_30<='Z')||LA4_30=='_'||(LA4_30>='a' && LA4_30<='z') ) {
-    										alt4 = 11;
-    									}
-    								else {
-    									alt4 = 10;	}
-    								}
+    							if ( (LA4_26>='0' && LA4_26<='9')||(LA4_26>='A' && LA4_26<='Z')||LA4_26=='_'||(LA4_26>='a' && LA4_26<='z') ) {
+    								alt4 = 15;
     							}
     						else {
-    							alt4 = 11;	}
+    							alt4 = 10;	}
     						}
     					}
     				else {
-    					alt4 = 11;	}
+    					alt4 = 15;	}
     				}
+    			}
+    		else {
+    			alt4 = 15;	}
+    		}
+    		break;
+    	case '=':
+    		{
+    			int LA4_11 = [input LA:2];
+    			if ( LA4_11=='=' ) {
+    				alt4 = 12;
     			}
     		else {
     			alt4 = 11;	}
     		}
+    		break;
+    	case '<':
+    		alt4 = 13;
+    		break;
+    	case '+':
+    		alt4 = 14;
     		break;
     	case 'A':
     	case 'B':
@@ -843,7 +859,7 @@
     	case 'x':
     	case 'y':
     	case 'z':
-    		alt4 = 11;
+    		alt4 = 15;
     		break;
     	case '0':
     	case '1':
@@ -855,22 +871,6 @@
     	case '7':
     	case '8':
     	case '9':
-    		alt4 = 12;
-    		break;
-    	case '=':
-    		{
-    			int LA4_13 = [input LA:2];
-    			if ( LA4_13=='=' ) {
-    				alt4 = 14;
-    			}
-    		else {
-    			alt4 = 13;	}
-    		}
-    		break;
-    	case '<':
-    		alt4 = 15;
-    		break;
-    	case '+':
     		alt4 = 16;
     		break;
     	case '\t':
@@ -887,97 +887,133 @@
     	}}
     switch (alt4) {
     	case 1 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:10: T21 // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:10: T7 // alt
     	    {
-    	    [self mT21];
+    	    [self mT7];
 
 
 
     	    }
     	    break;
     	case 2 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:14: T22 // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:13: T8 // alt
     	    {
-    	    [self mT22];
+    	    [self mT8];
 
 
 
     	    }
     	    break;
     	case 3 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:18: T23 // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:16: T9 // alt
     	    {
-    	    [self mT23];
+    	    [self mT9];
 
 
 
     	    }
     	    break;
     	case 4 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:22: T24 // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:19: T10 // alt
     	    {
-    	    [self mT24];
+    	    [self mT10];
 
 
 
     	    }
     	    break;
     	case 5 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:26: T25 // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:23: T11 // alt
     	    {
-    	    [self mT25];
+    	    [self mT11];
 
 
 
     	    }
     	    break;
     	case 6 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:30: T26 // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:27: T12 // alt
     	    {
-    	    [self mT26];
+    	    [self mT12];
 
 
 
     	    }
     	    break;
     	case 7 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:34: FOR // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:31: T13 // alt
     	    {
-    	    [self mFOR];
+    	    [self mT13];
 
 
 
     	    }
     	    break;
     	case 8 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:38: INT_TYPE // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:35: T14 // alt
     	    {
-    	    [self mINT_TYPE];
+    	    [self mT14];
 
 
 
     	    }
     	    break;
     	case 9 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:47: CHAR // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:39: T15 // alt
     	    {
-    	    [self mCHAR];
+    	    [self mT15];
 
 
 
     	    }
     	    break;
     	case 10 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:52: VOID // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:43: T16 // alt
     	    {
-    	    [self mVOID];
+    	    [self mT16];
 
 
 
     	    }
     	    break;
     	case 11 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:57: ID // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:47: T17 // alt
+    	    {
+    	    [self mT17];
+
+
+
+    	    }
+    	    break;
+    	case 12 :
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:51: T18 // alt
+    	    {
+    	    [self mT18];
+
+
+
+    	    }
+    	    break;
+    	case 13 :
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:55: T19 // alt
+    	    {
+    	    [self mT19];
+
+
+
+    	    }
+    	    break;
+    	case 14 :
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:59: T20 // alt
+    	    {
+    	    [self mT20];
+
+
+
+    	    }
+    	    break;
+    	case 15 :
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:63: ID // alt
     	    {
     	    [self mID];
 
@@ -985,8 +1021,8 @@
 
     	    }
     	    break;
-    	case 12 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:60: INT // alt
+    	case 16 :
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:66: INT // alt
     	    {
     	    [self mINT];
 
@@ -994,44 +1030,8 @@
 
     	    }
     	    break;
-    	case 13 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:64: EQ // alt
-    	    {
-    	    [self mEQ];
-
-
-
-    	    }
-    	    break;
-    	case 14 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:67: EQEQ // alt
-    	    {
-    	    [self mEQEQ];
-
-
-
-    	    }
-    	    break;
-    	case 15 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:72: LT // alt
-    	    {
-    	    [self mLT];
-
-
-
-    	    }
-    	    break;
-    	case 16 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:75: PLUS // alt
-    	    {
-    	    [self mPLUS];
-
-
-
-    	    }
-    	    break;
     	case 17 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:1:80: WS // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:70: WS // alt
     	    {
     	    [self mWS];
 

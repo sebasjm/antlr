@@ -1,15 +1,15 @@
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
-#import "SymtabTestParserLexer.h"
-#import "SymtabTestParser.h"
+#import "SymbolTableLexer.h"
+#import "SymbolTableParser.h"
 
 int main() {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	NSString *string = [NSString stringWithContentsOfFile:@"input"];
+	NSString *string = [NSString stringWithContentsOfFile:@"examples/scopes/input"];
 	NSLog(@"input is : %@", string);
 	ANTLRStringStream *stream = [[ANTLRStringStream alloc] initWithStringNoCopy:string];
-	SymtabTestParserLexer *lexer = [[SymtabTestParserLexer alloc] initWithCharStream:stream];
+	SymbolTableLexer *lexer = [[SymbolTableLexer alloc] initWithCharStream:stream];
 	
 	//	ANTLRToken *currentToken;
 	//	while (currentToken = [lexer nextToken]) {
@@ -17,7 +17,7 @@ int main() {
 	//	}
 	
 	ANTLRCommonTokenStream *tokenStream = [[ANTLRCommonTokenStream alloc] initWithTokenSource:lexer];
-	SymtabTestParser *parser = [[SymtabTestParser alloc] initWithTokenStream:tokenStream];
+	SymbolTableParser *parser = [[SymbolTableParser alloc] initWithTokenStream:tokenStream];
 	[parser prog];
 	[lexer release];
 	[stream release];
