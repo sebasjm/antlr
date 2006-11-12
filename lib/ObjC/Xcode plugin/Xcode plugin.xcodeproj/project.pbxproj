@@ -132,23 +132,10 @@
 		F71CBB830ACF2EAE00088951 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/org.antlr.Tool.strings; sourceTree = "<group>"; };
 		F770F3D50AD187CC003EF8FB /* OutputParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutputParser.h; sourceTree = "<group>"; };
 		F770F43D0AD310A9003EF8FB /* DevToolsSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DevToolsSupport.framework; path = /System/Library/PrivateFrameworks/DevToolsSupport.framework; sourceTree = "<absolute>"; };
-		F770F4460AD3110B003EF8FB /* RegularExpressions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegularExpressions.h; sourceTree = "<group>"; };
 		F7AC63580AD0112000BD7A06 /* GrammarFilter.g */ = {isa = PBXFileReference; explicitFileType = sourcecode.antlr3; fileEncoding = 4; path = GrammarFilter.g; sourceTree = "<group>"; };
 		F7AC63920AD0172A00BD7A06 /* GrammarFilter.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GrammarFilter.tokens; sourceTree = "<group>"; };
 		F7AC63930AD0172A00BD7A06 /* GrammarFilterLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GrammarFilterLexer.h; sourceTree = "<group>"; };
 		F7AC63940AD0172A00BD7A06 /* GrammarFilterLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GrammarFilterLexer.m; sourceTree = "<group>"; };
-		F7BCC9150AEB106800CB336F /* Grammar.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Grammar.g; sourceTree = "<group>"; };
-		F7BCC91B0AEB1E0300CB336F /* ANTLRGrammar.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ANTLRGrammar.g; sourceTree = "<group>"; };
-		F7BCC94D0AEB1F5900CB336F /* ANTLRGrammar.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ANTLRGrammar.tokens; sourceTree = "<group>"; };
-		F7BCC94E0AEB1F5900CB336F /* ANTLRGrammarLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRGrammarLexer.h; sourceTree = "<group>"; };
-		F7BCC94F0AEB1F5900CB336F /* ANTLRGrammarLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRGrammarLexer.m; sourceTree = "<group>"; };
-		F7BCC9500AEB1F5900CB336F /* ANTLRGrammarParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRGrammarParser.h; sourceTree = "<group>"; };
-		F7BCC9510AEB1F5900CB336F /* ANTLRGrammarParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRGrammarParser.m; sourceTree = "<group>"; };
-		F7C141C80AEAE2A000A2228F /* ANTLRGrammarSourceScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRGrammarSourceScanner.h; sourceTree = "<group>"; };
-		F7C141C90AEAE2A000A2228F /* ANTLRGrammarSourceScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRGrammarSourceScanner.m; sourceTree = "<group>"; };
-		F7C141CD0AEAE2CE00A2228F /* ANTLRGrammarSourceLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRGrammarSourceLexer.h; sourceTree = "<group>"; };
-		F7C141CE0AEAE2CE00A2228F /* ANTLRGrammarSourceLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRGrammarSourceLexer.m; sourceTree = "<group>"; };
-		F7C6F9390AD5828F005F4794 /* ScannerLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScannerLexer.h; sourceTree = "<group>"; };
 		F7FBB9390AD00A9400497048 /* ANTLR.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ANTLR.xcodeproj; path = ../Framework/ANTLR.xcodeproj; sourceTree = SOURCE_ROOT; };
 		F7FBBA6D0AD00FD100497048 /* ANTLRXCPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRXCPlugin.h; sourceTree = "<group>"; };
 		F7FBBA6E0AD00FD100497048 /* ANTLRXCPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRXCPlugin.m; sourceTree = "<group>"; };
@@ -208,7 +195,6 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				F7C141CC0AEAE2AA00A2228F /* Syntax Highlighting */,
 				F7AC63540AD010C400BD7A06 /* Grammar Inspection */,
 				F71CBB680ACEF5E800088951 /* ANTLRCompilerSpecification.h */,
 				F71CBB690ACEF5E800088951 /* ANTLRCompilerSpecification.m */,
@@ -260,8 +246,6 @@
 				F71CBB430ACEEF2500088951 /* DependencyGraph.h */,
 				F71CBB480ACEF14C00088951 /* Specifications.h */,
 				F770F3D50AD187CC003EF8FB /* OutputParser.h */,
-				F770F4460AD3110B003EF8FB /* RegularExpressions.h */,
-				F7C6F9390AD5828F005F4794 /* ScannerLexer.h */,
 			);
 			name = "Xcode Plugin API";
 			sourceTree = "<group>";
@@ -275,24 +259,6 @@
 				F7AC63580AD0112000BD7A06 /* GrammarFilter.g */,
 			);
 			name = "Grammar Inspection";
-			sourceTree = "<group>";
-		};
-		F7C141CC0AEAE2AA00A2228F /* Syntax Highlighting */ = {
-			isa = PBXGroup;
-			children = (
-				F7BCC94D0AEB1F5900CB336F /* ANTLRGrammar.tokens */,
-				F7BCC94E0AEB1F5900CB336F /* ANTLRGrammarLexer.h */,
-				F7BCC94F0AEB1F5900CB336F /* ANTLRGrammarLexer.m */,
-				F7BCC9500AEB1F5900CB336F /* ANTLRGrammarParser.h */,
-				F7BCC9510AEB1F5900CB336F /* ANTLRGrammarParser.m */,
-				F7C141C80AEAE2A000A2228F /* ANTLRGrammarSourceScanner.h */,
-				F7C141C90AEAE2A000A2228F /* ANTLRGrammarSourceScanner.m */,
-				F7C141CD0AEAE2CE00A2228F /* ANTLRGrammarSourceLexer.h */,
-				F7C141CE0AEAE2CE00A2228F /* ANTLRGrammarSourceLexer.m */,
-				F7BCC9150AEB106800CB336F /* Grammar.g */,
-				F7BCC91B0AEB1E0300CB336F /* ANTLRGrammar.g */,
-			);
-			name = "Syntax Highlighting";
 			sourceTree = "<group>";
 		};
 		F7FBB93A0AD00A9400497048 /* Products */ = {
