@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 GrammarFilter.g 2006-10-16 21:18:06
+// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g 2006-11-12 20:15:18
 
 #import "GrammarFilterLexer.h"
 #pragma mark Cyclic DFAs
@@ -197,10 +197,10 @@ const static int GrammarFilterLexerdfa13_transition17[] = {5, 5, -1, -1,
 	@throw nvae;
 }
 
-- (void) release
+- (void) dealloc
 {
 	free(transition);
-	[super release];
+	[super dealloc];
 }
 
 - (NSString *) description
@@ -272,23 +272,21 @@ const static int GrammarFilterLexerdfa13_transition17[] = {5, 5, -1, -1,
     }
 }
 
-
 - (void) mGRAMMAR
 {
-NSLog(@"enter GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
-	ANTLRToken * grammarType = nil;
-	ANTLRToken * grammarName = nil;
+	ANTLRToken * _grammarType = nil;
+	ANTLRToken * _grammarName = nil;
 
 	@try {
-		int type = GrammarFilterLexer_GRAMMAR;
-		int start = [self charIndex];
-		int line = [self line];
-		int charPosition = [self charPositionInLine];
-		int channel = [ANTLRToken defaultChannel];
-		// GrammarFilter.g:25:4: ( (grammarType= GRAMMAR_TYPE WS | ) 'grammar' WS grammarName= ID ( WS )? ';' ) // ruleBlockSingleAlt
-		// GrammarFilter.g:25:4: (grammarType= GRAMMAR_TYPE WS | ) 'grammar' WS grammarName= ID ( WS )? ';' // alt
+		int _type = GrammarFilterLexer_GRAMMAR;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:25:4: ( (grammarType= GRAMMAR_TYPE WS | ) 'grammar' WS grammarName= ID ( WS )? ';' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:25:4: (grammarType= GRAMMAR_TYPE WS | ) 'grammar' WS grammarName= ID ( WS )? ';' // alt
 		{
-		// GrammarFilter.g:25:4: (grammarType= GRAMMAR_TYPE WS | ) // block
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:25:4: (grammarType= GRAMMAR_TYPE WS | ) // block
 		int alt1=2;
 		{
 			int LA1_0 = [input LA:1];
@@ -306,15 +304,16 @@ NSLog(@"enter GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 		}
 		switch (alt1) {
 			case 1 :
-			    // GrammarFilter.g:25:6: grammarType= GRAMMAR_TYPE WS // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:25:6: grammarType= GRAMMAR_TYPE WS // alt
 			    {
-			    int grammarTypeStart = [self charIndex];
+			    int _grammarTypeStart = [self charIndex];
 			    [self mGRAMMAR_TYPE];
 			    if (failed) return ;
 
-			    grammarType = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:grammarTypeStart stop:[self charIndex]];
-			    if ( backtracking==0 ) {
-			      [delegate setGrammarType:[grammarType text]]; 
+			    _grammarType = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_grammarTypeStart stop:[self charIndex]];
+			    [_grammarType setLine:[self line]];
+			    if ( backtracking==1 ) {
+			      [delegate setGrammarType:[_grammarType text]]; 
 			    }
 			    [self mWS];
 			    if (failed) return ;
@@ -323,9 +322,9 @@ NSLog(@"enter GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    break;
 			case 2 :
-			    // GrammarFilter.g:26:53:  // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:26:53:  // alt
 			    {
-			    if ( backtracking==0 ) {
+			    if ( backtracking==1 ) {
 			      [delegate setGrammarType:@"parser"]; [delegate setIsCombinedGrammar:NO]; 
 			    }
 
@@ -340,15 +339,16 @@ NSLog(@"enter GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 		[self mWS];
 		if (failed) return ;
 
-		int grammarNameStart = [self charIndex];
+		int _grammarNameStart = [self charIndex];
 		[self mID];
 		if (failed) return ;
 
-		grammarName = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:grammarNameStart stop:[self charIndex]];
-		if ( backtracking==0 ) {
-		   [delegate setGrammarName:[grammarName text]]; 
+		_grammarName = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_grammarNameStart stop:[self charIndex]];
+		[_grammarName setLine:[self line]];
+		if ( backtracking==1 ) {
+		   [delegate setGrammarName:[_grammarName text]]; 
 		}
-		// GrammarFilter.g:28:80: ( WS )? // block
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:28:80: ( WS )? // block
 		int alt2=2;
 		{
 			int LA2_0 = [input LA:1];
@@ -358,7 +358,7 @@ NSLog(@"enter GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 		}
 		switch (alt2) {
 			case 1 :
-			    // GrammarFilter.g:28:80: WS // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:28:80: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -375,14 +375,13 @@ NSLog(@"enter GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
-NSLog(@"exit GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
-		[grammarType release];
-		[grammarName release];
+		[_grammarType release];
+		[_grammarName release];
 		// token+rule list labels
 		// rule labels
 		// rule refs in alts with rewrites
@@ -395,15 +394,13 @@ NSLog(@"exit GRAMMAR %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [se
 // $ANTLR end GRAMMAR
 
 
-
 - (void) mGRAMMAR_TYPE
 {
-NSLog(@"enter GRAMMAR_TYPE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		// GrammarFilter.g:33:5: ( ( 'lexer' | 'parser' | 'tree' ) ) // ruleBlockSingleAlt
-		// GrammarFilter.g:33:5: ( 'lexer' | 'parser' | 'tree' ) // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:5: ( ( 'lexer' | 'parser' | 'tree' ) ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:5: ( 'lexer' | 'parser' | 'tree' ) // alt
 		{
-		// GrammarFilter.g:33:5: ( 'lexer' | 'parser' | 'tree' ) // block
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:5: ( 'lexer' | 'parser' | 'tree' ) // block
 		int alt3=3;
 		switch ([input LA:1]) {
 			case 'l':
@@ -424,7 +421,7 @@ NSLog(@"enter GRAMMAR_TYPE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1
 			}}
 		switch (alt3) {
 			case 1 :
-			    // GrammarFilter.g:33:6: 'lexer' // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:6: 'lexer' // alt
 			    {
 			    [self matchString:@"lexer"];
 			    if (failed) return ;
@@ -433,7 +430,7 @@ NSLog(@"enter GRAMMAR_TYPE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1
 			    }
 			    break;
 			case 2 :
-			    // GrammarFilter.g:33:14: 'parser' // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:14: 'parser' // alt
 			    {
 			    [self matchString:@"parser"];
 			    if (failed) return ;
@@ -442,7 +439,7 @@ NSLog(@"enter GRAMMAR_TYPE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1
 			    }
 			    break;
 			case 3 :
-			    // GrammarFilter.g:33:23: 'tree' // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:33:23: 'tree' // alt
 			    {
 			    [self matchString:@"tree"];
 			    if (failed) return ;
@@ -458,7 +455,6 @@ NSLog(@"enter GRAMMAR_TYPE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1
 
 	}
 	@finally {
-NSLog(@"exit GRAMMAR_TYPE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -473,25 +469,23 @@ NSLog(@"exit GRAMMAR_TYPE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1]
 // $ANTLR end GRAMMAR_TYPE
 
 
-
 - (void) mOPTIONS
 {
-NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
-	ANTLRToken * tokenVocab = nil;
+	ANTLRToken * _tokenVocab = nil;
 
 	@try {
-		int type = GrammarFilterLexer_OPTIONS;
-		int start = [self charIndex];
-		int line = [self line];
-		int charPosition = [self charPositionInLine];
-		int channel = [ANTLRToken defaultChannel];
-		// GrammarFilter.g:38:4: ( 'options' ( WS )? '{' ( ( ( WS )? '//' )=> SL_COMMENT | ( ( WS )? '/*' )=> COMMENT | ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' | ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' )* ( WS )? '}' ) // ruleBlockSingleAlt
-		// GrammarFilter.g:38:4: 'options' ( WS )? '{' ( ( ( WS )? '//' )=> SL_COMMENT | ( ( WS )? '/*' )=> COMMENT | ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' | ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' )* ( WS )? '}' // alt
+		int _type = GrammarFilterLexer_OPTIONS;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:38:4: ( 'options' ( WS )? '{' ( ( ( WS )? '//' )=> SL_COMMENT | ( ( WS )? '/*' )=> COMMENT | ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' | ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' )* ( WS )? '}' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:38:4: 'options' ( WS )? '{' ( ( ( WS )? '//' )=> SL_COMMENT | ( ( WS )? '/*' )=> COMMENT | ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' | ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' )* ( WS )? '}' // alt
 		{
 		[self matchString:@"options"];
 		if (failed) return ;
 
-		// GrammarFilter.g:38:14: ( WS )? // block
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:38:14: ( WS )? // block
 		int alt4=2;
 		{
 			int LA4_0 = [input LA:1];
@@ -501,7 +495,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 		}
 		switch (alt4) {
 			case 1 :
-			    // GrammarFilter.g:38:14: WS // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:38:14: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -520,7 +514,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 		    alt13 = [dfa13 predict];
 		    switch (alt13) {
 			case 1 :
-			    // GrammarFilter.g:39:5: ( ( WS )? '//' )=> SL_COMMENT // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:39:5: ( ( WS )? '//' )=> SL_COMMENT // alt
 			    {
 			    [self mSL_COMMENT];
 			    if (failed) return ;
@@ -529,7 +523,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    break;
 			case 2 :
-			    // GrammarFilter.g:40:5: ( ( WS )? '/*' )=> COMMENT // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:40:5: ( ( WS )? '/*' )=> COMMENT // alt
 			    {
 			    [self mCOMMENT];
 			    if (failed) return ;
@@ -538,9 +532,9 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    break;
 			case 3 :
-			    // GrammarFilter.g:41:5: ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:5: ( ( WS )? 'tokenVocab' )=> ( WS )? 'tokenVocab' ( WS )? '=' ( WS )? tokenVocab= ID ( WS )? ';' // alt
 			    {
-			    // GrammarFilter.g:41:27: ( WS )? // block
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:27: ( WS )? // block
 			    int alt5=2;
 			    {
 			    	int LA5_0 = [input LA:1];
@@ -550,7 +544,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    switch (alt5) {
 			    	case 1 :
-			    	    // GrammarFilter.g:41:27: WS // alt
+			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:27: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -564,7 +558,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    [self matchString:@"tokenVocab"];
 			    if (failed) return ;
 
-			    // GrammarFilter.g:41:44: ( WS )? // block
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:44: ( WS )? // block
 			    int alt6=2;
 			    {
 			    	int LA6_0 = [input LA:1];
@@ -574,7 +568,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    switch (alt6) {
 			    	case 1 :
-			    	    // GrammarFilter.g:41:44: WS // alt
+			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:44: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -588,7 +582,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    [self matchChar:'='];
 			    if (failed) return ;
 
-			    // GrammarFilter.g:41:52: ( WS )? // block
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:52: ( WS )? // block
 			    int alt7=2;
 			    {
 			    	int LA7_0 = [input LA:1];
@@ -598,7 +592,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    switch (alt7) {
 			    	case 1 :
-			    	    // GrammarFilter.g:41:52: WS // alt
+			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:52: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -609,12 +603,13 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 
 			    }
 
-			    int tokenVocabStart = [self charIndex];
+			    int _tokenVocabStart = [self charIndex];
 			    [self mID];
 			    if (failed) return ;
 
-			    tokenVocab = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:tokenVocabStart stop:[self charIndex]];
-			    // GrammarFilter.g:41:70: ( WS )? // block
+			    _tokenVocab = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_tokenVocabStart stop:[self charIndex]];
+			    [_tokenVocab setLine:[self line]];
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:70: ( WS )? // block
 			    int alt8=2;
 			    {
 			    	int LA8_0 = [input LA:1];
@@ -624,7 +619,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    switch (alt8) {
 			    	case 1 :
-			    	    // GrammarFilter.g:41:70: WS // alt
+			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:70: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -638,16 +633,16 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    [self matchChar:';'];
 			    if (failed) return ;
 
-			    if ( backtracking==0 ) {
-			       [delegate setDependsOnVocab:[tokenVocab text]]; 
+			    if ( backtracking==1 ) {
+			       [delegate setDependsOnVocab:[_tokenVocab text]]; 
 			    }
 
 			    }
 			    break;
 			case 4 :
-			    // GrammarFilter.g:42:5: ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:5: ( WS )? ID ( WS )? '=' ( WS )? ID ( WS )? ';' // alt
 			    {
-			    // GrammarFilter.g:42:5: ( WS )? // block
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:5: ( WS )? // block
 			    int alt9=2;
 			    {
 			    	int LA9_0 = [input LA:1];
@@ -657,7 +652,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    switch (alt9) {
 			    	case 1 :
-			    	    // GrammarFilter.g:42:5: WS // alt
+			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:5: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -671,7 +666,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    [self mID];
 			    if (failed) return ;
 
-			    // GrammarFilter.g:42:12: ( WS )? // block
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:12: ( WS )? // block
 			    int alt10=2;
 			    {
 			    	int LA10_0 = [input LA:1];
@@ -681,7 +676,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    switch (alt10) {
 			    	case 1 :
-			    	    // GrammarFilter.g:42:12: WS // alt
+			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:12: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -695,7 +690,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    [self matchChar:'='];
 			    if (failed) return ;
 
-			    // GrammarFilter.g:42:20: ( WS )? // block
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:20: ( WS )? // block
 			    int alt11=2;
 			    {
 			    	int LA11_0 = [input LA:1];
@@ -705,7 +700,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    switch (alt11) {
 			    	case 1 :
-			    	    // GrammarFilter.g:42:20: WS // alt
+			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:20: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -719,7 +714,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    [self mID];
 			    if (failed) return ;
 
-			    // GrammarFilter.g:42:27: ( WS )? // block
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:27: ( WS )? // block
 			    int alt12=2;
 			    {
 			    	int LA12_0 = [input LA:1];
@@ -729,7 +724,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 			    }
 			    switch (alt12) {
 			    	case 1 :
-			    	    // GrammarFilter.g:42:27: WS // alt
+			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:42:27: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -752,7 +747,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 		    }
 		} while (YES); loop13: ;
 
-		// GrammarFilter.g:44:3: ( WS )? // block
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:44:3: ( WS )? // block
 		int alt14=2;
 		{
 			int LA14_0 = [input LA:1];
@@ -762,7 +757,7 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 		}
 		switch (alt14) {
 			case 1 :
-			    // GrammarFilter.g:44:3: WS // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:44:3: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -779,13 +774,12 @@ NSLog(@"enter OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
-NSLog(@"exit OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
-		[tokenVocab release];
+		[_tokenVocab release];
 		// token+rule list labels
 		// rule labels
 		// rule refs in alts with rewrites
@@ -798,27 +792,25 @@ NSLog(@"exit OPTIONS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [se
 // $ANTLR end OPTIONS
 
 
-
 - (void) mLEXER_RULE
 {
-NSLog(@"enter LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		int type = GrammarFilterLexer_LEXER_RULE;
-		int start = [self charIndex];
-		int line = [self line];
-		int charPosition = [self charPositionInLine];
-		int channel = [ANTLRToken defaultChannel];
-		// GrammarFilter.g:49:4: ( ( 'A' .. 'Z' ) ( ID )? ( WS )? ':' ( options {greedy=false; } : . )* ';' ) // ruleBlockSingleAlt
-		// GrammarFilter.g:49:4: ( 'A' .. 'Z' ) ( ID )? ( WS )? ':' ( options {greedy=false; } : . )* ';' // alt
+		int _type = GrammarFilterLexer_LEXER_RULE;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:4: ( ( 'A' .. 'Z' ) ( ID )? ( WS )? ':' ( options {greedy=false; } : . )* ';' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:4: ( 'A' .. 'Z' ) ( ID )? ( WS )? ':' ( options {greedy=false; } : . )* ';' // alt
 		{
-		// GrammarFilter.g:49:4: ( 'A' .. 'Z' ) // blockSingleAlt
-		// GrammarFilter.g:49:5: 'A' .. 'Z' // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:4: ( 'A' .. 'Z' ) // blockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:5: 'A' .. 'Z' // alt
 		{
 		[self matchRangeFromChar:'A' to:'Z'];if (failed) return ;
 
 		}
 
-		// GrammarFilter.g:49:15: ( ID )? // block
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:15: ( ID )? // block
 		int alt15=2;
 		{
 			int LA15_0 = [input LA:1];
@@ -828,7 +820,7 @@ NSLog(@"enter LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1],
 		}
 		switch (alt15) {
 			case 1 :
-			    // GrammarFilter.g:49:15: ID // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:15: ID // alt
 			    {
 			    [self mID];
 			    if (failed) return ;
@@ -839,7 +831,7 @@ NSLog(@"enter LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1],
 
 		}
 
-		// GrammarFilter.g:49:19: ( WS )? // block
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:19: ( WS )? // block
 		int alt16=2;
 		{
 			int LA16_0 = [input LA:1];
@@ -849,7 +841,7 @@ NSLog(@"enter LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1],
 		}
 		switch (alt16) {
 			case 1 :
-			    // GrammarFilter.g:49:19: WS // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:19: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -877,7 +869,7 @@ NSLog(@"enter LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1],
 		    }
 		    switch (alt17) {
 			case 1 :
-			    // GrammarFilter.g:49:54: . // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:49:54: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -894,16 +886,15 @@ NSLog(@"enter LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1],
 		[self matchChar:';'];
 		if (failed) return ;
 
-		if ( backtracking==0 ) {
+		if ( backtracking==1 ) {
 		   [delegate setIsCombinedGrammar:YES]; 
 		}
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
-NSLog(@"exit LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -918,18 +909,16 @@ NSLog(@"exit LEXER_RULE %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], 
 // $ANTLR end LEXER_RULE
 
 
-
 - (void) mCOMMENT
 {
-NSLog(@"enter COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		int type = GrammarFilterLexer_COMMENT;
-		int start = [self charIndex];
-		int line = [self line];
-		int charPosition = [self charPositionInLine];
-		int channel = [ANTLRToken defaultChannel];
-		// GrammarFilter.g:54:9: ( '/*' ( options {greedy=false; } : . )* '*/' ) // ruleBlockSingleAlt
-		// GrammarFilter.g:54:9: '/*' ( options {greedy=false; } : . )* '*/' // alt
+		int _type = GrammarFilterLexer_COMMENT;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:54:9: ( '/*' ( options {greedy=false; } : . )* '*/' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:54:9: '/*' ( options {greedy=false; } : . )* '*/' // alt
 		{
 		[self matchString:@"/*"];
 		if (failed) return ;
@@ -957,7 +946,7 @@ NSLog(@"enter COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 		    }
 		    switch (alt18) {
 			case 1 :
-			    // GrammarFilter.g:54:41: . // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:54:41: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -977,10 +966,9 @@ NSLog(@"enter COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [s
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
-NSLog(@"exit COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -995,18 +983,16 @@ NSLog(@"exit COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [se
 // $ANTLR end COMMENT
 
 
-
 - (void) mSL_COMMENT
 {
-NSLog(@"enter SL_COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		int type = GrammarFilterLexer_SL_COMMENT;
-		int start = [self charIndex];
-		int line = [self line];
-		int charPosition = [self charPositionInLine];
-		int channel = [ANTLRToken defaultChannel];
-		// GrammarFilter.g:58:9: ( '//' ( options {greedy=false; } : . )* '\\n' ) // ruleBlockSingleAlt
-		// GrammarFilter.g:58:9: '//' ( options {greedy=false; } : . )* '\\n' // alt
+		int _type = GrammarFilterLexer_SL_COMMENT;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:58:9: ( '//' ( options {greedy=false; } : . )* '\\n' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:58:9: '//' ( options {greedy=false; } : . )* '\\n' // alt
 		{
 		[self matchString:@"//"];
 		if (failed) return ;
@@ -1025,7 +1011,7 @@ NSLog(@"enter SL_COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1],
 		    }
 		    switch (alt19) {
 			case 1 :
-			    // GrammarFilter.g:58:41: . // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:58:41: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -1045,10 +1031,9 @@ NSLog(@"enter SL_COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1],
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
-NSLog(@"exit SL_COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1063,18 +1048,16 @@ NSLog(@"exit SL_COMMENT %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], 
 // $ANTLR end SL_COMMENT
 
 
-
 - (void) mACTION
 {
-NSLog(@"enter ACTION %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		int type = GrammarFilterLexer_ACTION;
-		int start = [self charIndex];
-		int line = [self line];
-		int charPosition = [self charPositionInLine];
-		int channel = [ANTLRToken defaultChannel];
-		// GrammarFilter.g:63:4: ( '{' ( options {greedy=false; } : . )* '}' ) // ruleBlockSingleAlt
-		// GrammarFilter.g:63:4: '{' ( options {greedy=false; } : . )* '}' // alt
+		int _type = GrammarFilterLexer_ACTION;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:63:4: ( '{' ( options {greedy=false; } : . )* '}' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:63:4: '{' ( options {greedy=false; } : . )* '}' // alt
 		{
 		[self matchChar:'{'];
 		if (failed) return ;
@@ -1093,7 +1076,7 @@ NSLog(@"enter ACTION %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [se
 		    }
 		    switch (alt20) {
 			case 1 :
-			    // GrammarFilter.g:63:35: . // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:63:35: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -1113,10 +1096,9 @@ NSLog(@"enter ACTION %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [se
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
-NSLog(@"exit ACTION %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1131,18 +1113,16 @@ NSLog(@"exit ACTION %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [sel
 // $ANTLR end ACTION
 
 
-
 - (void) mSTRING
 {
-NSLog(@"enter STRING %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		int type = GrammarFilterLexer_STRING;
-		int start = [self charIndex];
-		int line = [self line];
-		int charPosition = [self charPositionInLine];
-		int channel = [ANTLRToken defaultChannel];
-		// GrammarFilter.g:67:4: ( '\\'' ( options {greedy=false; } : . )* '\\'' ) // ruleBlockSingleAlt
-		// GrammarFilter.g:67:4: '\\'' ( options {greedy=false; } : . )* '\\'' // alt
+		int _type = GrammarFilterLexer_STRING;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:67:4: ( '\\'' ( options {greedy=false; } : . )* '\\'' ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:67:4: '\\'' ( options {greedy=false; } : . )* '\\'' // alt
 		{
 		[self matchChar:'\''];
 		if (failed) return ;
@@ -1161,7 +1141,7 @@ NSLog(@"enter STRING %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [se
 		    }
 		    switch (alt21) {
 			case 1 :
-			    // GrammarFilter.g:67:36: . // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:67:36: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -1181,10 +1161,9 @@ NSLog(@"enter STRING %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [se
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
-NSLog(@"exit STRING %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1199,15 +1178,13 @@ NSLog(@"exit STRING %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [sel
 // $ANTLR end STRING
 
 
-
 - (void) mID
 {
-NSLog(@"enter ID %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		// GrammarFilter.g:71:9: ( ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))+ ) // ruleBlockSingleAlt
-		// GrammarFilter.g:71:9: ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))+ // alt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:71:9: ( ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))+ ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:71:9: ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))+ // alt
 		{
-		// GrammarFilter.g:71:9: ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))+	// positiveClosureBlock
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:71:9: ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))+	// positiveClosureBlock
 		int cnt22=0;
 
 		do {
@@ -1221,13 +1198,13 @@ NSLog(@"enter ID %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self l
 		    }
 		    switch (alt22) {
 			case 1 :
-			    // GrammarFilter.g:71:10: ('a'..'z'|'A'..'Z'|'_'|'0'..'9') // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:71:10: ('a'..'z'|'A'..'Z'|'_'|'0'..'9') // alt
 			    {
 			    if (([input LA:1]>='0' && [input LA:1]<='9')||([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			    	[input consume];
 			    failed = NO;
 			    } else {
-			    	if (failed) return ;
+			    	if (backtracking > 0) {failed=YES; return ;}
 			    	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
 			    	[self recover:mse];	@throw mse;
 			    }
@@ -1238,7 +1215,7 @@ NSLog(@"enter ID %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self l
 
 			default :
 			    if ( cnt22 >= 1 )  goto loop22;
-		            if (failed) return ;
+		            if (backtracking > 0) {failed=YES; return ;}
 					ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:22];
 					@throw eee;
 		    }
@@ -1250,7 +1227,6 @@ NSLog(@"enter ID %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self l
 
 	}
 	@finally {
-NSLog(@"exit ID %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1265,20 +1241,18 @@ NSLog(@"exit ID %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
 // $ANTLR end ID
 
 
-
 - (void) mWS
 {
-NSLog(@"enter WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
 	@try {
-		int type = GrammarFilterLexer_WS;
-		int start = [self charIndex];
-		int line = [self line];
-		int charPosition = [self charPositionInLine];
-		int channel = [ANTLRToken defaultChannel];
-		// GrammarFilter.g:74:9: ( ( (' '|'\\t'|'\\n'))+ ) // ruleBlockSingleAlt
-		// GrammarFilter.g:74:9: ( (' '|'\\t'|'\\n'))+ // alt
+		int _type = GrammarFilterLexer_WS;
+		int _start = [self charIndex];
+		int _line = [self line];
+		int _charPosition = [self charPositionInLine];
+		int _channel = [ANTLRToken defaultChannel];
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:74:9: ( ( (' '|'\\t'|'\\n'))+ ) // ruleBlockSingleAlt
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:74:9: ( (' '|'\\t'|'\\n'))+ // alt
 		{
-		// GrammarFilter.g:74:9: ( (' '|'\\t'|'\\n'))+	// positiveClosureBlock
+		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:74:9: ( (' '|'\\t'|'\\n'))+	// positiveClosureBlock
 		int cnt23=0;
 
 		do {
@@ -1292,13 +1266,13 @@ NSLog(@"enter WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self l
 		    }
 		    switch (alt23) {
 			case 1 :
-			    // GrammarFilter.g:74:10: (' '|'\\t'|'\\n') // alt
+			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:74:10: (' '|'\\t'|'\\n') // alt
 			    {
 			    if (([input LA:1]>='\t' && [input LA:1]<='\n')||[input LA:1]==' ') {
 			    	[input consume];
 			    failed = NO;
 			    } else {
-			    	if (failed) return ;
+			    	if (backtracking > 0) {failed=YES; return ;}
 			    	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
 			    	[self recover:mse];	@throw mse;
 			    }
@@ -1309,7 +1283,7 @@ NSLog(@"enter WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self l
 
 			default :
 			    if ( cnt23 >= 1 )  goto loop23;
-		            if (failed) return ;
+		            if (backtracking > 0) {failed=YES; return ;}
 					ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:23];
 					@throw eee;
 		    }
@@ -1319,10 +1293,9 @@ NSLog(@"enter WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self l
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:type line:line charPosition:charPosition channel:channel start:start stop:[self charIndex]];}
+		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
-NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -1338,7 +1311,7 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
 
 - (void) mTokens
 {
-    // GrammarFilter.g:1:25: ( ( GRAMMAR )=> GRAMMAR | ( OPTIONS )=> OPTIONS | ( LEXER_RULE )=> LEXER_RULE | ( COMMENT )=> COMMENT | ( SL_COMMENT )=> SL_COMMENT | ( ACTION )=> ACTION | ( STRING )=> STRING | ( WS )=> WS ) //ruleblock
+    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:25: ( ( GRAMMAR )=> GRAMMAR | ( OPTIONS )=> OPTIONS | ( LEXER_RULE )=> LEXER_RULE | ( COMMENT )=> COMMENT | ( SL_COMMENT )=> SL_COMMENT | ( ACTION )=> ACTION | ( STRING )=> STRING | ( WS )=> WS ) //ruleblock
     int alt24=8;
     switch ([input LA:1]) {
     	case 'g':
@@ -1414,7 +1387,7 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
     	}}
     switch (alt24) {
     	case 1 :
-    	    // GrammarFilter.g:1:25: ( GRAMMAR )=> GRAMMAR // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:25: ( GRAMMAR )=> GRAMMAR // alt
     	    {
     	    [self mGRAMMAR];
     	    if (failed) return ;
@@ -1423,7 +1396,7 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
     	    }
     	    break;
     	case 2 :
-    	    // GrammarFilter.g:1:44: ( OPTIONS )=> OPTIONS // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:44: ( OPTIONS )=> OPTIONS // alt
     	    {
     	    [self mOPTIONS];
     	    if (failed) return ;
@@ -1432,7 +1405,7 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
     	    }
     	    break;
     	case 3 :
-    	    // GrammarFilter.g:1:63: ( LEXER_RULE )=> LEXER_RULE // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:63: ( LEXER_RULE )=> LEXER_RULE // alt
     	    {
     	    [self mLEXER_RULE];
     	    if (failed) return ;
@@ -1441,7 +1414,7 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
     	    }
     	    break;
     	case 4 :
-    	    // GrammarFilter.g:1:88: ( COMMENT )=> COMMENT // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:88: ( COMMENT )=> COMMENT // alt
     	    {
     	    [self mCOMMENT];
     	    if (failed) return ;
@@ -1450,7 +1423,7 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
     	    }
     	    break;
     	case 5 :
-    	    // GrammarFilter.g:1:107: ( SL_COMMENT )=> SL_COMMENT // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:107: ( SL_COMMENT )=> SL_COMMENT // alt
     	    {
     	    [self mSL_COMMENT];
     	    if (failed) return ;
@@ -1459,7 +1432,7 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
     	    }
     	    break;
     	case 6 :
-    	    // GrammarFilter.g:1:132: ( ACTION )=> ACTION // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:132: ( ACTION )=> ACTION // alt
     	    {
     	    [self mACTION];
     	    if (failed) return ;
@@ -1468,7 +1441,7 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
     	    }
     	    break;
     	case 7 :
-    	    // GrammarFilter.g:1:149: ( STRING )=> STRING // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:149: ( STRING )=> STRING // alt
     	    {
     	    [self mSTRING];
     	    if (failed) return ;
@@ -1477,7 +1450,7 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
     	    }
     	    break;
     	case 8 :
-    	    // GrammarFilter.g:1:166: ( WS )=> WS // alt
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:166: ( WS )=> WS // alt
     	    {
     	    [self mWS];
     	    if (failed) return ;
@@ -1492,77 +1465,59 @@ NSLog(@"exit WS %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self li
 
 - (void) synpred3
 {
-NSLog(@"enter synpred3 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
-    @try {
-        // GrammarFilter.g:41:5: ( ( WS )? 'tokenVocab' ) // ruleBlockSingleAlt
-        // GrammarFilter.g:41:6: ( WS )? 'tokenVocab' // alt
-        {
-        // GrammarFilter.g:41:6: ( WS )? // block
-        int alt27=2;
-        {
-        	int LA27_0 = [input LA:1];
-        	if ( (LA27_0>='\t' && LA27_0<='\n')||LA27_0==' ' ) {
-        		alt27 = 1;
-        	}
-        }
-        switch (alt27) {
-        	case 1 :
-        	    // GrammarFilter.g:41:6: WS // alt
-        	    {
-        	    [self mWS];
-        	    if (failed) return ;
+    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:5: ( ( WS )? 'tokenVocab' ) // ruleBlockSingleAlt
+    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:6: ( WS )? 'tokenVocab' // alt
+    {
+    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:6: ( WS )? // block
+    int alt27=2;
+    {
+    	int LA27_0 = [input LA:1];
+    	if ( (LA27_0>='\t' && LA27_0<='\n')||LA27_0==' ' ) {
+    		alt27 = 1;
+    	}
+    }
+    switch (alt27) {
+    	case 1 :
+    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:41:6: WS // alt
+    	    {
+    	    [self mWS];
+    	    if (failed) return ;
 
 
-        	    }
-        	    break;
-
-        }
-
-        [self matchString:@"tokenVocab"];
-        if (failed) return ;
-
-
-        }
+    	    }
+    	    break;
 
     }
-    @finally {
-        NSLog(@"exit synpred3 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
-    }}
+
+    [self matchString:@"tokenVocab"];
+    if (failed) return ;
+
+
+    }
+}
 
 - (void) synpred7
 {
-NSLog(@"enter synpred7 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
-    @try {
-        // GrammarFilter.g:1:88: ( COMMENT ) // ruleBlockSingleAlt
-        // GrammarFilter.g:1:89: COMMENT // alt
-        {
-        [self mCOMMENT];
-        if (failed) return ;
+    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:88: ( COMMENT ) // ruleBlockSingleAlt
+    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:89: COMMENT // alt
+    {
+    [self mCOMMENT];
+    if (failed) return ;
 
-
-        }
 
     }
-    @finally {
-        NSLog(@"exit synpred7 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
-    }}
+}
 
 - (void) synpred8
 {
-NSLog(@"enter synpred8 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
-    @try {
-        // GrammarFilter.g:1:107: ( SL_COMMENT ) // ruleBlockSingleAlt
-        // GrammarFilter.g:1:108: SL_COMMENT // alt
-        {
-        [self mSL_COMMENT];
-        if (failed) return ;
+    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:107: ( SL_COMMENT ) // ruleBlockSingleAlt
+    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Xcode plugin/GrammarFilter.g:1:108: SL_COMMENT // alt
+    {
+    [self mSL_COMMENT];
+    if (failed) return ;
 
-
-        }
 
     }
-    @finally {
-        NSLog(@"exit synpred8 %d failed=%@ backtracking=%d", [input LA:1], failed ? @"YES" : @"NO", backtracking);
-    }}
+}
 
 @end
