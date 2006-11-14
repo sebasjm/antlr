@@ -68,6 +68,14 @@ public abstract class Message {
 		this.arg2 = arg2;
 	}
 
+	public void setLine(int line) {
+		this.line = line;
+	}
+
+	public void setColumn(int column) {
+		this.column = column;
+	}
+
 	public void setMessageID(int msgID) {
 		this.msgID = msgID;
 		msgST = ErrorManager.getMessage(msgID);
@@ -94,25 +102,50 @@ public abstract class Message {
 		// setup the location
 		boolean locationValid = false;
 		if (line != -1) {
+			if (locationST.getAttribute("line") != null) {
+				locationST.removeAttribute("line");
+			}
 			locationST.setAttribute("line", line);
 			locationValid = true;
 		}
 		if (column != -1) {
+			if (locationST.getAttribute("column") != null) {
+				locationST.removeAttribute("column");
+			}
 			locationST.setAttribute("column", column);
 			locationValid = true;
 		}
 		if (file != null) {
+			if (locationST.getAttribute("file") != null) {
+				locationST.removeAttribute("file");
+			}
 			locationST.setAttribute("file", file);
 			locationValid = true;
 		}
 
+		if (messageFormatST.getAttribute("id") != null) {
+			messageFormatST.removeAttribute("id");
+		}
 		messageFormatST.setAttribute("id", msgID);
+		if (messageFormatST.getAttribute("text") != null) {
+			messageFormatST.removeAttribute("text");
+		}
 		messageFormatST.setAttribute("text", messageST);
 
 		if (locationValid) {
+			if (reportST.getAttribute("location") != null) {
+				reportST.removeAttribute("location");
+			}
 			reportST.setAttribute("location", locationST);
 		}
+		if (reportST.getAttribute("message") != null) {
+			reportST.removeAttribute("message");
+		}
 		reportST.setAttribute("message", messageFormatST);
+
+		if (reportST.getAttribute("type") != null) {
+			reportST.removeAttribute("type");
+		}
 		reportST.setAttribute("type", ErrorManager.getMessageType(msgID));
 
 		return reportST.toString();
