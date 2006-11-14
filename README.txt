@@ -299,6 +299,10 @@ CHANGES
 
 3.0b5 - ??
 
+November 14, 2006
+
+* Force token index to be -1 for CommonIndex in case not set.
+
 November 11, 2006
 
 * getUniqueID for TreeAdaptor now uses identityHashCode instead of hashCode.
