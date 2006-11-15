@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0b4
-August 24, 2006
+ANTLR 3.0b5
+November 15, 2006
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -8,11 +8,11 @@ University of San Francisco
 
 INTRODUCTION 
 
-Welcome to ANTLR v3!  I've been working on this for 3 years and it's
+Welcome to ANTLR v3!  I've been working on this for nearly 4 years and it's
 almost ready!  I plan no feature additions between this beta and first
 3.0 release.  I have lots of features to add later, but this will be
 the first set.  Ultimately, I need to rewrite ANTLR v3 in itself (it's
-written in 2.7.6 at the moment and also needs StringTemplate 2.3b9 or
+written in 2.7.7 at the moment and also needs StringTemplate 3.0 or
 later).
 
 You should use v3 in conjunction with ANTLRWorks:
@@ -175,12 +175,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0b4/README.txt (this file)
-antlr-3.0b4/LICENSE.txt
-antlr-3.0b4/src/org/antlr/...
-antlr-3.0b4/lib/stringtemplate-2.3b9.jar (3.0b4 needs 2.3b9)
-antlr-3.0b4/lib/antlr-2.7.6.jar
-antlr-3.0b4/lib/antlr-3.0b4.jar
+antlr-3.0b5/README.txt (this file)
+antlr-3.0b5/LICENSE.txt
+antlr-3.0b5/src/org/antlr/...
+antlr-3.0b5/lib/stringtemplate-3.0.jar (3.0b5 needs 3.0)
+antlr-3.0b5/lib/antlr-2.7.7.jar
+antlr-3.0b5/lib/antlr-3.0b5.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -193,7 +193,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0b4 (August 24, 2006) 1989-2006
+ANTLR Parser Generator   Early Access Version 3.0b5 (August 24, 2006) 1989-2006
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir          specify output directory where all output is generated
   -lib dir              specify location of token files
@@ -260,10 +260,10 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0b4/lib/stringtemplate-2.3b9.jar
-antlr-3.0b4/lib/antlr-2.7.6.jar
+antlr-3.0b5/lib/stringtemplate-2.3b9.jar
+antlr-3.0b5/lib/antlr-2.7.6.jar
 
-then jump into antlr-3.0b4/src directory and then type:
+then jump into antlr-3.0b5/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -297,7 +297,7 @@ C# Target Notes
 
 CHANGES
 
-3.0b5 - ??
+3.0b5 - November 15, 2006
 
 November 14, 2006
 
