@@ -262,6 +262,7 @@ Make sure the following two jars are in your CLASSPATH
 
 antlr-3.0b5/lib/stringtemplate-2.3b9.jar
 antlr-3.0b5/lib/antlr-2.7.6.jar
+junit.jar [if you want to build the test directories]
 
 then jump into antlr-3.0b5/src directory and then type:
 
@@ -270,6 +271,9 @@ $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 Takes 9 seconds on my 1Ghz laptop or 4 seconds with jikes.  Later I'll
 have a real build mechanism, though I must admit the one-liner appeals
 to me.  I use Intellij so I never type anything actually to build.
+
+There is also an ANT build.xml file, but I know nothing of ANT; contributed
+by others (I'm opposed to any tool with an XML interface for Humans).
 
 -----------------------------------------------------------------------
 C# Target Notes
@@ -289,6 +293,7 @@ C# Target Notes
    be replaced. See [antlr-dev] list archives.
 
 3. 'ruby' sample - error on input (seems grammar isn't robust enough yet?)
+   [TJP: that is actually an unfinished grammar]
 
 4. 'tweak' sample - enters infinite loop (only started with the Early
    Access Version 3.0ea9 release)
