@@ -478,7 +478,11 @@ public class DecisionProbe {
 		}
 		//System.out.println("last alt is "+lastAltAST.toStringTree());
 		// if last alt looks like ( ALT . <end-of-alt> ) then wildcard
-		if ( lastAltAST.getChild(0).getType()== ANTLRParser.WILDCARD &&
+		// Avoid looking at optional blocks etc... that have last alt
+		// as the EOB:
+		// ( BLOCK ( ALT 'else' statement <end-of-alt> ) <end-of-block> )
+		if ( lastAltAST.getType()!=ANTLRParser.EOB &&
+			 lastAltAST.getChild(0).getType()== ANTLRParser.WILDCARD &&
 			 lastAltAST.getChild(1).getType()== ANTLRParser.EOA )
 		{
 			//System.out.println("wildcard");

@@ -63,7 +63,7 @@ public class Tool {
 	public static boolean internalOption_watchNFAConversion = false;
 
     public static void main(String[] args) {
-		ErrorManager.info("ANTLR Parser Generator   Early Access Version " +
+		ErrorManager.info("ANTLR Parser Generator  Version " +
 						  VERSION + " (November 15, 2006)  1989-2006");
 		Tool antlr = new Tool(args);
 		antlr.process();
