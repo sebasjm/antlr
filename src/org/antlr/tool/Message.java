@@ -79,9 +79,6 @@ public abstract class Message {
 	public void setMessageID(int msgID) {
 		this.msgID = msgID;
 		msgST = ErrorManager.getMessage(msgID);
-		locationST = ErrorManager.getLocationFormat();
-		reportST = ErrorManager.getReportFormat();
-		messageFormatST = ErrorManager.getMessageFormat();
 	}
 
 	/** Return a new template instance every time someone tries to print
@@ -100,52 +97,30 @@ public abstract class Message {
 
 	public String toString(StringTemplate messageST) {
 		// setup the location
+		locationST = ErrorManager.getLocationFormat();
+		reportST = ErrorManager.getReportFormat();
+		messageFormatST = ErrorManager.getMessageFormat();
 		boolean locationValid = false;
 		if (line != -1) {
-			if (locationST.getAttribute("line") != null) {
-				locationST.removeAttribute("line");
-			}
 			locationST.setAttribute("line", line);
 			locationValid = true;
 		}
 		if (column != -1) {
-			if (locationST.getAttribute("column") != null) {
-				locationST.removeAttribute("column");
-			}
 			locationST.setAttribute("column", column);
 			locationValid = true;
 		}
 		if (file != null) {
-			if (locationST.getAttribute("file") != null) {
-				locationST.removeAttribute("file");
-			}
 			locationST.setAttribute("file", file);
 			locationValid = true;
 		}
 
-		if (messageFormatST.getAttribute("id") != null) {
-			messageFormatST.removeAttribute("id");
-		}
 		messageFormatST.setAttribute("id", msgID);
-		if (messageFormatST.getAttribute("text") != null) {
-			messageFormatST.removeAttribute("text");
-		}
 		messageFormatST.setAttribute("text", messageST);
 
 		if (locationValid) {
-			if (reportST.getAttribute("location") != null) {
-				reportST.removeAttribute("location");
-			}
 			reportST.setAttribute("location", locationST);
 		}
-		if (reportST.getAttribute("message") != null) {
-			reportST.removeAttribute("message");
-		}
 		reportST.setAttribute("message", messageFormatST);
-
-		if (reportST.getAttribute("type") != null) {
-			reportST.removeAttribute("type");
-		}
 		reportST.setAttribute("type", ErrorManager.getMessageType(msgID));
 
 		return reportST.toString();
