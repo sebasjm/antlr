@@ -167,15 +167,15 @@ public class DOTGenerator {
         markedStates.add(s); // mark this node as completed.
 
         // first add this node
-        StringTemplate st;
+        StringTemplate stateST;
         if ( s.isAcceptState() ) {
-            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/stopstate");
+            stateST = stlib.getInstanceOf("org/antlr/tool/templates/dot/stopstate");
         }
         else {
-            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/state");
+            stateST = stlib.getInstanceOf("org/antlr/tool/templates/dot/state");
         }
-        st.setAttribute("name", getStateLabel(s));
-        dot.setAttribute("states", st);
+        stateST.setAttribute("name", getStateLabel(s));
+        dot.setAttribute("states", stateST);
 
         if ( s.isAcceptState() )  {
             return; // don't go past end of rule node to the follow states
@@ -186,10 +186,10 @@ public class DOTGenerator {
 		if ( ((NFAState)s).isDecisionState() ) {
 			GrammarAST n = ((NFAState)s).getAssociatedASTNode();
 			if ( n!=null && n.getType()!=ANTLRParser.EOB ) {
-				st = stlib.getInstanceOf("org/antlr/tool/templates/dot/decision-rank");
+				StringTemplate rankST = stlib.getInstanceOf("org/antlr/tool/templates/dot/decision-rank");
 				NFAState alt = (NFAState)s;
 				while ( alt!=null ) {
-					st.setAttribute("states", getStateLabel(alt));
+					rankST.setAttribute("states", getStateLabel(alt));
 					if ( alt.transition(1)!=null ) {
 						alt = (NFAState)alt.transition(1).target;
 					}
@@ -197,31 +197,37 @@ public class DOTGenerator {
 						alt=null;
 					}
 				}
-				dot.setAttribute("decisionRanks", st);
+				dot.setAttribute("decisionRanks", rankST);
 			}
 		}
 
         // make a DOT edge for each transition
-        for (int i = 0; i < s.getNumberOfTransitions(); i++) {
+		StringTemplate edgeST = null;
+		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
             Transition edge = (Transition) s.transition(i);
             if ( edge instanceof RuleClosureTransition ) {
                 RuleClosureTransition rr = ((RuleClosureTransition)edge);
                 // don't jump to other rules, but display edge to follow node
-                st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
-                st.setAttribute("label", "<"+grammar.getRuleName(rr.getRuleIndex())+">");
-                st.setAttribute("src", getStateLabel(s));
-                st.setAttribute("target", getStateLabel(rr.getFollowState()));
-				st.setAttribute("arrowhead", arrowhead);
-                dot.setAttribute("edges", st);
+                edgeST = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
+                edgeST.setAttribute("label", "<"+grammar.getRuleName(rr.getRuleIndex())+">");
+                edgeST.setAttribute("src", getStateLabel(s));
+                edgeST.setAttribute("target", getStateLabel(rr.getFollowState()));
+				edgeST.setAttribute("arrowhead", arrowhead);
+                dot.setAttribute("edges", edgeST);
                 walkRuleNFACreatingDOT(dot, rr.getFollowState());
                 continue;
             }
-            st = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
-            st.setAttribute("label", getEdgeLabel(edge));
-            st.setAttribute("src", getStateLabel(s));
-			st.setAttribute("target", getStateLabel(edge.target));
-			st.setAttribute("arrowhead", arrowhead);
-            dot.setAttribute("edges", st);
+			if ( edge.isEpsilon() ) {
+				edgeST = stlib.getInstanceOf("org/antlr/tool/templates/dot/epsilon-edge");				
+			}
+			else {
+				edgeST = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
+			}
+			edgeST.setAttribute("label", getEdgeLabel(edge));
+            edgeST.setAttribute("src", getStateLabel(s));
+			edgeST.setAttribute("target", getStateLabel(edge.target));
+			edgeST.setAttribute("arrowhead", arrowhead);
+            dot.setAttribute("edges", edgeST);
             walkRuleNFACreatingDOT(dot, edge.target); // keep walkin'
         }
     }
