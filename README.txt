@@ -279,30 +279,25 @@ by others (I'm opposed to any tool with an XML interface for Humans).
 C# Target Notes
 
 1. Auto-generated lexers do not inherit parent parser's @namespace
-   {...} value.
-
-   I can fix this this by altering the template used for generated
-   lexers but, it is a global fix and seems like an ugly hack.  Would
-   this perhaps be better delegated to targets?
-
-2. 'python' sample - error because generated code currently attempts
-   to run semantic predicates in the DFA.State context rather
-   than in the lexer/parser's context.
-
-   Work on proposed fix halted as current DFA representation is due to
-   be replaced. See [antlr-dev] list archives.
-
-3. 'ruby' sample - error on input (seems grammar isn't robust enough yet?)
-   [TJP: that is actually an unfinished grammar]
-
-4. 'tweak' sample - enters infinite loop (only started with the Early
-   Access Version 3.0ea9 release)
+   {...} value.  Use @lexer::namespace{...}.
 
 -----------------------------------------------------------------------
 
 CHANGES
 
+3.0b6 - ??
+
+November 15, 2006
+
+* updated DOT files for DFA generation to make smaller circles.
+
 3.0b5 - November 15, 2006
+
+The biggest thing is that your grammar file names must match the grammar name
+inside (your generated class names will also be different) and we use
+$channel=HIDDEN now instead of channel=99 inside lexer actions.
+Should be compatible other than that.   Please look at complete list of
+changes.
 
 November 14, 2006
 
