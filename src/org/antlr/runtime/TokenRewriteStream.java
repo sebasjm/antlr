@@ -339,7 +339,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	public void replace(String programName, int from, int to, String text) {
-		addToSortedRewriteList(new ReplaceOp(from, to, text));
+		addToSortedRewriteList(programName, new ReplaceOp(from, to, text));
 		/*
 		// replace from..to by deleting from..to-1 and then do a replace
 		// on last index
