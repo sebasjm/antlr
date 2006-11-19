@@ -1055,18 +1055,19 @@ As a result, alternative(s) 2 were disabled for that input
 	}
 
 	public void testWildcardStarK1AndNonGreedyByDefaultInParser() throws Exception {
+		// no error because .* assumes it should finish when it sees R
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
-			"s : A block B+ EOF ;\n" +
+			"s : A block EOF ;\n" +
 			"block : L .* R ;");
 		String expecting =
-			".s0-B->:s2=>1\n" +
-			".s0-EOF->:s1=>2\n";
+			".s0-A..L->:s2=>1\n" +
+			".s0-R->:s1=>2\n";
 		int[] unreachableAlts = null;
-		int[] nonDetAlts = new int[] {1,2};
-		String ambigInput = "R";
+		int[] nonDetAlts = null;
+		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 1;
+		int numWarnings = 0;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -1074,16 +1075,16 @@ As a result, alternative(s) 2 were disabled for that input
 	public void testWildcardPlusK1AndNonGreedyByDefaultInParser() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
-			"s : A block B+ EOF ;\n" +
+			"s : A block EOF ;\n" +
 			"block : L .+ R ;");
 		String expecting =
-			".s0-B->:s2=>1\n" +
-			".s0-EOF->:s1=>2\n";
+			".s0-A..L->:s2=>1\n" +
+			".s0-R->:s1=>2\n";
 		int[] unreachableAlts = null;
-		int[] nonDetAlts = new int[] {1,2};
-		String ambigInput = "R";
+		int[] nonDetAlts = null;
+		String ambigInput = null;
 		int[] danglingAlts = null;
-		int numWarnings = 1;
+		int numWarnings = 0;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}

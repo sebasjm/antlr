@@ -524,6 +524,7 @@ public class DecisionProbe {
 										   callSiteStates);
 		}
 
+		/* All  recursion determines now before analysis
 		// LEFT RECURSION
 		// TODO: hideous cut/paste of code; try to refactor
 
@@ -558,6 +559,7 @@ public class DecisionProbe {
 									   targetRules,
 									   callSiteStates);
 		}
+		*/
 	}
 
 	private void computeAltToProblemMaps(Set dfaStatesUnaliased,

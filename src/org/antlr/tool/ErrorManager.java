@@ -679,6 +679,8 @@ public class ErrorManager {
 		getErrorListener().warning(msg);
 	}
 
+	/*
+	// TODO: we can remove I think.  All detected now with cycles check.
 	public static void leftRecursion(DecisionProbe probe,
 									 int alt,
 									 Collection targetRules,
@@ -689,6 +691,7 @@ public class ErrorManager {
 		getErrorState().warningMsgIDs.add(msg.msgID);
 		getErrorListener().warning(msg);
 	}
+	*/
 
 	public static void leftRecursionCycles(Collection cycles) {
 		getErrorState().errors++;

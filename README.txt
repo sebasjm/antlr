@@ -287,9 +287,21 @@ CHANGES
 
 3.0b6 - ??
 
+November 19, 2006
+
+* Removed LeftRecursionMessage and apparatus because it seems that I check
+  for left recursion upfront before analysis and everything gets specified as
+  recursion cycles at this point.
+
+November 16, 2006
+
+* TokenRewriteStream.replace was not passing programName to next method.
+
 November 15, 2006
 
 * updated DOT files for DFA generation to make smaller circles.
+
+* made epsilon edges italics in the NFA diagrams.
 
 3.0b5 - November 15, 2006
 
