@@ -108,7 +108,7 @@
 // use this to emit custom tokens from a lexer rule
 - (void) emit:(ANTLRToken *)aToken
 {
-	[self setToken:aToken];
+	[self setToken:[aToken autorelease]];
 }
 
 // this method is used by the code generator to automatically emit tokens from the lexer.
