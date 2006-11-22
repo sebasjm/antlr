@@ -76,11 +76,11 @@ public class Attribute {
 		// walk backwards looking for start of an ID
 		for (int i=rightEdgeOfDeclarator; i>=0; i--) {
 			// if we haven't found the end yet, keep going
-			if ( !inID && Character.isLetter(decl.charAt(i)) ) {
+			if ( !inID && Character.isLetterOrDigit(decl.charAt(i)) ) {
 			    inID = true;
 			}
 			else if ( inID &&
-				      !(Character.isLetter(decl.charAt(i))||
+				      !(Character.isLetterOrDigit(decl.charAt(i))||
 				       decl.charAt(i)=='_') ) {
 				start = i+1;
 				break;
@@ -96,7 +96,7 @@ public class Attribute {
 		int stop=-1;
 		for (int i=start; i<=rightEdgeOfDeclarator; i++) {
 			// if we haven't found the end yet, keep going
-			if ( !(Character.isLetter(decl.charAt(i))||
+			if ( !(Character.isLetterOrDigit(decl.charAt(i))||
 				decl.charAt(i)=='_') )
 			{
 				stop = i;

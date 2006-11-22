@@ -287,6 +287,11 @@ CHANGES
 
 3.0b6 - ??
 
+November 22, 2006
+
+* attribute names containing digits were not allowed, this is now fixed,
+  allowing attributes like 'name1' but not '1name1'.
+
 November 19, 2006
 
 * Removed LeftRecursionMessage and apparatus because it seems that I check

@@ -216,6 +216,37 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
+	public void testReturnValueWithNumber() throws Exception {
+		String action = "$x.i1";
+		String expecting = "x";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n"+
+				"a returns [int i1]\n" +
+				"        : 'a'\n" +
+				"        ;\n" +
+				"b : x=a {"+action+"} ;\n");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator =
+			new ActionTranslatorLexer(generator,
+									  "b",
+									  new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 	public void testReturnValues() throws Exception {
 		String action = "$i; $i.x; $u; $u.x";
 		String expecting = "retval.i; retval.i.x; retval.u; retval.u.x";
