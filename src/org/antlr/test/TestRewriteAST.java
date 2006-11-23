@@ -44,7 +44,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID INT -> ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("", found);
@@ -57,7 +57,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID -> ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc", debug);
 		assertEquals("abc\n", found);
@@ -70,7 +70,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : 'c' -> 'c';\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "c", debug);
 		assertEquals("c\n", found);
@@ -83,7 +83,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : 'ick' -> 'ick';\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "ick", debug);
 		assertEquals("ick\n", found);
@@ -97,7 +97,7 @@ public class TestRewriteAST extends BaseTest {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc", debug);
 		assertEquals("abc\n", found);
@@ -110,7 +110,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID INT -> INT ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("34 abc\n", found);
@@ -124,7 +124,7 @@ public class TestRewriteAST extends BaseTest {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("34 abc\n", found);
@@ -137,7 +137,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID INT -> ^(INT ID);\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("(34 abc)\n", found);
@@ -150,7 +150,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : 'void' ID INT -> 'void' ^(INT ID);\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "void abc 34", debug);
 		assertEquals("void (34 abc)\n", found);
@@ -165,7 +165,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID INT ID INT -> ^( DUH ID ^( DUH INT) )+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a 1 b 2", debug);
 		assertEquals("(DUH a (DUH 1)) (DUH b (DUH 2))\n", found);
@@ -178,7 +178,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID -> ID? ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc", debug);
 		assertEquals("abc\n", found);
@@ -191,7 +191,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID ID -> ID* ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		assertEquals("a b\n", found);
@@ -204,7 +204,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID ID -> ID+ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		assertEquals("a b\n", found);
@@ -218,7 +218,7 @@ public class TestRewriteAST extends BaseTest {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc", debug);
 		assertEquals("abc\n", found);
@@ -232,7 +232,7 @@ public class TestRewriteAST extends BaseTest {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		assertEquals("a b\n", found);
@@ -246,7 +246,7 @@ public class TestRewriteAST extends BaseTest {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		assertEquals("a b\n", found);
@@ -259,7 +259,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : (x=ID)? -> $x?;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a", debug);
 		assertEquals("a\n", found);
@@ -273,7 +273,7 @@ public class TestRewriteAST extends BaseTest {
 			"b : ID ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		assertEquals("a b\n", found);
@@ -286,7 +286,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID -> {true}? ID -> ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc", debug);
 		assertEquals("abc\n", found);
@@ -299,7 +299,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : ID -> {false}? ID -> ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc", debug);
 		assertEquals("", found);
@@ -315,7 +315,7 @@ public class TestRewriteAST extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a 2", debug);
 		assertEquals("2\n", found);
@@ -331,7 +331,7 @@ public class TestRewriteAST extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a 2", debug);
 		assertEquals("(2 a)\n", found);
@@ -345,7 +345,7 @@ public class TestRewriteAST extends BaseTest {
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "-34", debug);
 		assertEquals("(- 34)\n", found);
@@ -359,7 +359,7 @@ public class TestRewriteAST extends BaseTest {
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "+ 34", debug);
 		assertEquals("(34 +)\n", found);
@@ -373,7 +373,7 @@ public class TestRewriteAST extends BaseTest {
 			"op : '+'|'-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "int a,b,c;", debug);
 		assertEquals("(int a b c)\n", found);
@@ -387,7 +387,7 @@ public class TestRewriteAST extends BaseTest {
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "var a:int; b:float;", debug);
 		assertEquals("(var (: a int) (: b float))\n", found);
@@ -402,7 +402,7 @@ public class TestRewriteAST extends BaseTest {
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a,b,c", debug);
 		assertEquals("(VAR a) (VAR b) (VAR c)\n", found);
@@ -417,7 +417,7 @@ public class TestRewriteAST extends BaseTest {
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a,b,c", debug);
 		assertEquals("(var a) (var b) (var c)\n", found);
@@ -432,7 +432,7 @@ public class TestRewriteAST extends BaseTest {
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "{a b c}", debug);
 		assertEquals("({ a b c)\n", found);
@@ -447,7 +447,7 @@ public class TestRewriteAST extends BaseTest {
 			"type : 'int' | 'float' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "{a b c}", debug);
 		assertEquals("(block a b c)\n", found);
@@ -464,7 +464,7 @@ public class TestRewriteAST extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a 1 2", debug);
 		assertEquals("(2 1 a)\n", found);
@@ -480,7 +480,7 @@ public class TestRewriteAST extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a 1 2 3", debug);
 		assertEquals("1 a 2 3\n", found);
@@ -500,7 +500,7 @@ public class TestRewriteAST extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "int a; int b=3;", debug);
 		assertEquals("(TYPE int a) (TYPE int b 3)\n", found);
@@ -517,7 +517,7 @@ public class TestRewriteAST extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b c d; 42", debug);
 		assertEquals("d 42\n", found);
@@ -531,7 +531,7 @@ public class TestRewriteAST extends BaseTest {
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "3", debug);
 		assertEquals("(9 3)\n", found);
@@ -545,7 +545,7 @@ public class TestRewriteAST extends BaseTest {
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "3", debug);
 		assertEquals("9 3\n", found);
@@ -560,7 +560,7 @@ public class TestRewriteAST extends BaseTest {
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "3+4+5", debug);
 		assertEquals("(+ (+ 3 4) 5)\n", found);
@@ -575,7 +575,7 @@ public class TestRewriteAST extends BaseTest {
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "3", debug);
 		assertEquals("(3 3)\n", found);
@@ -592,7 +592,7 @@ public class TestRewriteAST extends BaseTest {
 			"B : 'b' ;\n" +
 			"C : 'c' ;\n" +
 			"D : 'd' ;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a a b b b c c c d", debug);
 		assertEquals("a a b b b c c c d\n", found);
@@ -606,7 +606,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : x+=b x+=b -> $x+;\n"+
 			"b : ID ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		assertEquals("a b\n", found);
@@ -620,7 +620,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : x=b (y=b)? -> $x $y?;\n"+
 			"b : ID ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a", debug);
 		assertEquals("a\n", found);
@@ -634,7 +634,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : x=ID (y=b)? -> $x $y?;\n"+
 			"b : ID ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		assertEquals("a b\n", found);
@@ -648,7 +648,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : x=ID (y=b)? -> ($x $y)?;\n"+
 			"b : ID ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		assertEquals("a b\n", found);
@@ -662,7 +662,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : x+=ID (y=b)? -> ($x $y)?;\n"+
 			"b : ID ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		assertEquals("a b\n", found);
@@ -676,7 +676,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : x+=b x+=b -> {new Object()};\n"+
 			"b : ID ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
 		//assertEquals("[not sure what this should be!]\n", found);
@@ -696,7 +696,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : INT -> ugh ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = newTool();
@@ -725,7 +725,7 @@ public class TestRewriteAST extends BaseTest {
 			"b : 'b' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = newTool();
@@ -753,7 +753,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : INT -> ICK ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = newTool();
@@ -781,7 +781,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : INT -> $foo ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = newTool();
@@ -809,7 +809,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : INT -> 'a' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = newTool();
@@ -837,7 +837,7 @@ public class TestRewriteAST extends BaseTest {
 			"a : INT -> 'foo' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
 		Grammar g = new Grammar(grammar);
 		Tool antlr = newTool();
