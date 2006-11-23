@@ -289,6 +289,9 @@ CHANGES
 
 November 22, 2006
 
+* fixed bug that prevented var = $rule.some_retval from working in anything
+  but the first alternative of a rule or subrule.
+
 * attribute names containing digits were not allowed, this is now fixed,
   allowing attributes like 'name1' but not '1name1'.
 

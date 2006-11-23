@@ -275,6 +275,50 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
+	/* regression test for ANTLR-46 */
+	public void testReturnWithMultipleRuleRefs() throws Exception {
+		String action1 = "$obj = $rule2.obj;";
+		String action2 = "$obj = $rule3.obj;";
+		String expecting1 = "obj = rule21;";
+		String expecting2 = "obj = rule32;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n" +
+			"rule1 returns [ Object obj ]\n" +
+			":	rule2 { "+action1+" }\n" +
+			"|	rule3 { "+action2+" }\n" +
+			";\n"+
+			"rule2 returns [ Object obj ]\n"+
+			":	foo='foo' { $obj = $foo.text; }\n"+
+			";\n"+
+			"rule3 returns [ Object obj ]\n"+
+			":	bar='bar' { $obj = $bar.text; }\n"+
+			";");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		int i = 0;
+		String action = action1;
+		String expecting = expecting1;
+		do {
+			ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"rule1",
+																		 new antlr.CommonToken(ANTLRParser.ACTION,action),i+1);
+			String rawTranslation =
+					translator.translate();
+			StringTemplateGroup templates =
+					new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+			StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+			String found = actionST.toString();
+			assertEquals(expecting, found);
+			action = action2;
+			expecting = expecting2;
+		} while (i++ < 1);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 	public void testInvalidReturnValues() throws Exception {
 		String action = "$x";
 		String expecting = action;

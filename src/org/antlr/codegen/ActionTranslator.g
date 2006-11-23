@@ -114,7 +114,7 @@ public List translateAction(String action) {
     ActionTranslatorLexer translator =
         new ActionTranslatorLexer(generator,
                                   enclosingRule.name,
-                                  new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+                                  new antlr.CommonToken(ANTLRParser.ACTION,action),outerAltNum);
     return translator.translateToChunks();
 }
 

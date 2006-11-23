@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 ActionTranslator.g 2006-11-08 09:57:01
+// $ANTLR 3.0b5 ActionTranslator.g 2006-11-23 01:51:22
 
 package org.antlr.codegen;
 import org.antlr.stringtemplate.StringTemplate;
@@ -124,7 +124,7 @@ public class ActionTranslatorLexer extends Lexer {
         ActionTranslatorLexer translator =
             new ActionTranslatorLexer(generator,
                                       enclosingRule.name,
-                                      new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+                                      new antlr.CommonToken(ANTLRParser.ACTION,action),outerAltNum);
         return translator.translateToChunks();
     }
 
