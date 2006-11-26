@@ -458,6 +458,9 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 				currentChildIndex>=currentNode.getChildCount() )
 		{
 			currentNode = (Tree)nodeStack.pop();
+			if ( currentNode==null ) { // hit the root?
+				return;
+			}
 			currentChildIndex = ((Integer)indexStack.pop()).intValue();
 			currentChildIndex++; // move to next child
 			if ( currentChildIndex>=currentNode.getChildCount() ) {
