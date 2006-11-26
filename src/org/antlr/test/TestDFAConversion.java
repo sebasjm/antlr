@@ -61,6 +61,34 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
+	public void testAB_or_AC_k2() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n" +
+			"options {k=2;}\n"+
+			"a : A B | A C;");
+		String expecting =
+			".s0-A->.s1\n" +
+			".s1-B->:s3=>1\n" +
+			".s1-C->:s2=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, 0);
+	}
+
+	public void testAB_or_AC_k1() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n" +
+			"options {k=1;}\n"+
+			"a : A B | A C;");
+		String expecting =
+			".s0-A->:s1=>1\n";
+		int[] unreachableAlts = new int[] {2};
+		int[] nonDetAlts = new int[] {1,2};
+		String ambigInput = "A" ;
+		int[] danglingAlts = new int[] {2};
+		int numWarnings = 2; // non-LL(1) abort and ambig upon A
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
 	public void testselfRecurseNonDet() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
