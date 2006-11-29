@@ -287,6 +287,10 @@ CHANGES
 
 3.0b6 - ??
 
+November 29, 2006
+
+*  optimized semantic predicate evaluation so that p||!p yields true.
+
 November 22, 2006
 
 * fixed bug that prevented var = $rule.some_retval from working in anything

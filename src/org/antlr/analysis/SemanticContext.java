@@ -340,7 +340,8 @@ public abstract class SemanticContext {
 				SemanticContext semctx = (SemanticContext) it.next();
 				SemanticContext gatedPred = semctx.getGatedPredicateContext();
 				if ( gatedPred!=null ) {
-					result = new OR(result, gatedPred);
+					result = or(result, gatedPred);
+					// result = new OR(result, gatedPred);
 				}
 			}
 			return result;
@@ -433,6 +434,26 @@ public abstract class SemanticContext {
 		}
 		if ( b==EMPTY_SEMANTIC_CONTEXT || b==null ) {
 			return a;
+		}
+		if ( a instanceof TruePredicate ) {
+			return a;
+		}
+		if ( b instanceof TruePredicate ) {
+			return b;
+		}
+		if ( a instanceof NOT && b instanceof Predicate ) {
+			NOT n = (NOT)a;
+			// check for !p||p
+			if ( n.ctx.equals(b) ) {
+				return new TruePredicate();
+			}
+		}
+		else if ( b instanceof NOT && a instanceof Predicate ) {
+			NOT n = (NOT)b;
+			// check for p||!p
+			if ( n.ctx.equals(a) ) {
+				return new TruePredicate();
+			}
 		}
 		return new OR(a,b);
 	}
