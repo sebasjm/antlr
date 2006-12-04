@@ -161,6 +161,8 @@
 	return theCopy;
 }
 
+#pragma mark ANTLRTree abstract base class
+
 	// Return a token type; needed for tree parsing
 - (int) tokenType
 {
@@ -193,7 +195,6 @@
 	return @"";
 }
 
-#pragma mark ANTLRTree abstract base class
 
 @end
 

@@ -91,6 +91,9 @@
 		F763D51E0A66765B0061CD35 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
 		F7754E3F0A5C0A0500D0873A /* ANTLRDFA.h in Headers */ = {isa = PBXBuildFile; fileRef = F7754E3D0A5C0A0500D0873A /* ANTLRDFA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F7754E400A5C0A0500D0873A /* ANTLRDFA.m in Sources */ = {isa = PBXBuildFile; fileRef = F7754E3E0A5C0A0500D0873A /* ANTLRDFA.m */; };
+		F77744050B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = F77744030B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F77744060B234A3400D1F89B /* ANTLRToken+DebuggerSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = F77744040B234A3400D1F89B /* ANTLRToken+DebuggerSupport.m */; };
+		F77747560B23A70600D1F89B /* ANTLRDebug.h in Headers */ = {isa = PBXBuildFile; fileRef = F77747550B23A70600D1F89B /* ANTLRDebug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F77765CC09DC583000517181 /* ANTLRToken.h in Headers */ = {isa = PBXBuildFile; fileRef = F77765CA09DC583000517181 /* ANTLRToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F77765CD09DC583000517181 /* ANTLRToken.m in Sources */ = {isa = PBXBuildFile; fileRef = F77765CB09DC583000517181 /* ANTLRToken.m */; };
 		F777660509DC5CF400517181 /* ANTLRCommonToken.h in Headers */ = {isa = PBXBuildFile; fileRef = F777660309DC5CF400517181 /* ANTLRCommonToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -108,6 +111,7 @@
 		F79D5AF60A0E634900EA3CEE /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F79D5AF70A0E634A00EA3CEE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F79D5AF80A0E634A00EA3CEE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		F7CECD7E0B1E5C370054CC3B /* ANTLRDebugEventListener.h in Headers */ = {isa = PBXBuildFile; fileRef = F7CECD7D0B1E5C370054CC3B /* ANTLRDebugEventListener.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F7DD06040A7B1663006A006C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F7DD06070A7B1664006A006C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
 		F7DD06300A7B1665006A006C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
@@ -116,6 +120,18 @@
 		F7DD074D0A7B665C006A006C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F7DD074E0A7B665D006A006C /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F7DD074F0A7B665D006A006C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
+		F7E261160B1E44320013F640 /* ANTLRDebugParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F7E261140B1E44320013F640 /* ANTLRDebugParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F7E261170B1E44320013F640 /* ANTLRDebugParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7E261150B1E44320013F640 /* ANTLRDebugParser.m */; };
+		F7E2611A0B1E443D0013F640 /* ANTLRDebugTreeParser.h in Headers */ = {isa = PBXBuildFile; fileRef = F7E261180B1E443C0013F640 /* ANTLRDebugTreeParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F7E2611B0B1E443D0013F640 /* ANTLRDebugTreeParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7E261190B1E443C0013F640 /* ANTLRDebugTreeParser.m */; };
+		F7E261200B1E44E80013F640 /* ANTLRDebugTokenStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F7E2611E0B1E44E80013F640 /* ANTLRDebugTokenStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F7E261210B1E44E80013F640 /* ANTLRDebugTokenStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F7E2611F0B1E44E80013F640 /* ANTLRDebugTokenStream.m */; };
+		F7E261240B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F7E261220B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F7E261250B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F7E261230B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.m */; };
+		F7E261280B1E45070013F640 /* ANTLRDebugTreeAdaptor.h in Headers */ = {isa = PBXBuildFile; fileRef = F7E261260B1E45070013F640 /* ANTLRDebugTreeAdaptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F7E261290B1E45070013F640 /* ANTLRDebugTreeAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = F7E261270B1E45070013F640 /* ANTLRDebugTreeAdaptor.m */; };
+		F7E261390B1E45580013F640 /* ANTLRDebugEventProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = F7E261370B1E45580013F640 /* ANTLRDebugEventProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F7E2613A0B1E45580013F640 /* ANTLRDebugEventProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = F7E261380B1E45580013F640 /* ANTLRDebugEventProxy.m */; };
 		F7E985580A0D865E00F16093 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F7E985590A0D866000F16093 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F7F218F0097AFB1A000472E9 /* ANTLRBitSet.h in Headers */ = {isa = PBXBuildFile; fileRef = F7F218EE097AFB1A000472E9 /* ANTLRBitSet.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -297,6 +313,9 @@
 		F7715D330AC9DE9E00ED984D /* SimpleCTPTreeParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleCTPTreeParser.m; sourceTree = "<group>"; };
 		F7754E3D0A5C0A0500D0873A /* ANTLRDFA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDFA.h; sourceTree = "<group>"; };
 		F7754E3E0A5C0A0500D0873A /* ANTLRDFA.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRDFA.m; sourceTree = "<group>"; };
+		F77744030B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ANTLRToken+DebuggerSupport.h"; sourceTree = "<group>"; };
+		F77744040B234A3400D1F89B /* ANTLRToken+DebuggerSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ANTLRToken+DebuggerSupport.m"; sourceTree = "<group>"; };
+		F77747550B23A70600D1F89B /* ANTLRDebug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebug.h; sourceTree = "<group>"; };
 		F77765CA09DC583000517181 /* ANTLRToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRToken.h; sourceTree = "<group>"; };
 		F77765CB09DC583000517181 /* ANTLRToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRToken.m; sourceTree = "<group>"; };
 		F777660309DC5CF400517181 /* ANTLRCommonToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRCommonToken.h; sourceTree = "<group>"; };
@@ -314,6 +333,7 @@
 		F7A4098C09659BF3002CC781 /* ANTLRBaseRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRBaseRecognizer.m; sourceTree = "<group>"; };
 		F7A4099109659BFB002CC781 /* ANTLRLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRLexer.h; sourceTree = "<group>"; };
 		F7A4099209659BFB002CC781 /* ANTLRLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRLexer.m; sourceTree = "<group>"; };
+		F7CECD7D0B1E5C370054CC3B /* ANTLRDebugEventListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebugEventListener.h; sourceTree = "<group>"; };
 		F7DD05E20A7B14BE006A006C /* input */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
 		F7DD05E30A7B14BE006A006C /* output */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = output; sourceTree = "<group>"; };
 		F7DD05E40A7B14BE006A006C /* T.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.antlr3; path = T.g; sourceTree = "<group>"; };
@@ -326,6 +346,18 @@
 		F7DD073E0A7B660A006A006C /* SymbolTable.g */ = {isa = PBXFileReference; explicitFileType = sourcecode.antlr3; fileEncoding = 30; path = SymbolTable.g; sourceTree = "<group>"; };
 		F7DD07440A7B6618006A006C /* scopes */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = scopes; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7DD07800A7B67A7006A006C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F7E261140B1E44320013F640 /* ANTLRDebugParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebugParser.h; sourceTree = "<group>"; };
+		F7E261150B1E44320013F640 /* ANTLRDebugParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRDebugParser.m; sourceTree = "<group>"; };
+		F7E261180B1E443C0013F640 /* ANTLRDebugTreeParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebugTreeParser.h; sourceTree = "<group>"; };
+		F7E261190B1E443C0013F640 /* ANTLRDebugTreeParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRDebugTreeParser.m; sourceTree = "<group>"; };
+		F7E2611E0B1E44E80013F640 /* ANTLRDebugTokenStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebugTokenStream.h; sourceTree = "<group>"; };
+		F7E2611F0B1E44E80013F640 /* ANTLRDebugTokenStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRDebugTokenStream.m; sourceTree = "<group>"; };
+		F7E261220B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebugTreeNodeStream.h; sourceTree = "<group>"; };
+		F7E261230B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRDebugTreeNodeStream.m; sourceTree = "<group>"; };
+		F7E261260B1E45070013F640 /* ANTLRDebugTreeAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebugTreeAdaptor.h; sourceTree = "<group>"; };
+		F7E261270B1E45070013F640 /* ANTLRDebugTreeAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRDebugTreeAdaptor.m; sourceTree = "<group>"; };
+		F7E261370B1E45580013F640 /* ANTLRDebugEventProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebugEventProxy.h; sourceTree = "<group>"; };
+		F7E261380B1E45580013F640 /* ANTLRDebugEventProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRDebugEventProxy.m; sourceTree = "<group>"; };
 		F7E983940A0D6A5F00F16093 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F7F218EE097AFB1A000472E9 /* ANTLRBitSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRBitSet.h; sourceTree = "<group>"; };
 		F7F218EF097AFB1A000472E9 /* ANTLRBitSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRBitSet.m; sourceTree = "<group>"; };
@@ -488,6 +520,7 @@
 				F7A4098809659BE5002CC781 /* Recognizer */,
 				F7A40951096597D2002CC781 /* DFA */,
 				F7A4094C096597C4002CC781 /* Exceptions */,
+				F7E2610F0B1E43E60013F640 /* Debugging */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -514,6 +547,7 @@
 			children = (
 				32DBCF5E0370ADEE00C91783 /* ANTLR_Prefix.pch */,
 				F70AA7A509AA2A6900C3FD5E /* ANTLR.h */,
+				F77747550B23A70600D1F89B /* ANTLRDebug.h */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";
@@ -654,6 +688,15 @@
 			name = Tokens;
 			sourceTree = "<group>";
 		};
+		F77744070B234A3B00D1F89B /* Debugging Categories */ = {
+			isa = PBXGroup;
+			children = (
+				F77744030B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h */,
+				F77744040B234A3400D1F89B /* ANTLRToken+DebuggerSupport.m */,
+			);
+			name = "Debugging Categories";
+			sourceTree = "<group>";
+		};
 		F79D56590A0E238100EA3CEE /* fuzzy */ = {
 			isa = PBXGroup;
 			children = (
@@ -751,6 +794,27 @@
 			path = scopes;
 			sourceTree = "<group>";
 		};
+		F7E2610F0B1E43E60013F640 /* Debugging */ = {
+			isa = PBXGroup;
+			children = (
+				F77744070B234A3B00D1F89B /* Debugging Categories */,
+				F7CECD7D0B1E5C370054CC3B /* ANTLRDebugEventListener.h */,
+				F7E261370B1E45580013F640 /* ANTLRDebugEventProxy.h */,
+				F7E261380B1E45580013F640 /* ANTLRDebugEventProxy.m */,
+				F7E261140B1E44320013F640 /* ANTLRDebugParser.h */,
+				F7E261150B1E44320013F640 /* ANTLRDebugParser.m */,
+				F7E2611E0B1E44E80013F640 /* ANTLRDebugTokenStream.h */,
+				F7E2611F0B1E44E80013F640 /* ANTLRDebugTokenStream.m */,
+				F7E261180B1E443C0013F640 /* ANTLRDebugTreeParser.h */,
+				F7E261190B1E443C0013F640 /* ANTLRDebugTreeParser.m */,
+				F7E261220B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.h */,
+				F7E261230B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.m */,
+				F7E261260B1E45070013F640 /* ANTLRDebugTreeAdaptor.h */,
+				F7E261270B1E45070013F640 /* ANTLRDebugTreeAdaptor.m */,
+			);
+			name = Debugging;
+			sourceTree = "<group>";
+		};
 		F7F218EB097AFB0C000472E9 /* Misc */ = {
 			isa = PBXGroup;
 			children = (
@@ -801,6 +865,15 @@
 				F72C5ECE0AB7E5A500282574 /* ANTLRParserRuleReturnScope.h in Headers */,
 				F738D1770B07AEAA001813C4 /* ANTLRFailedPredicateException.h in Headers */,
 				F738D1790B07AEAA001813C4 /* ANTLRTreeException.h in Headers */,
+				F7E261160B1E44320013F640 /* ANTLRDebugParser.h in Headers */,
+				F7E2611A0B1E443D0013F640 /* ANTLRDebugTreeParser.h in Headers */,
+				F7E261200B1E44E80013F640 /* ANTLRDebugTokenStream.h in Headers */,
+				F7E261240B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.h in Headers */,
+				F7E261280B1E45070013F640 /* ANTLRDebugTreeAdaptor.h in Headers */,
+				F7E261390B1E45580013F640 /* ANTLRDebugEventProxy.h in Headers */,
+				F7CECD7E0B1E5C370054CC3B /* ANTLRDebugEventListener.h in Headers */,
+				F77744050B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h in Headers */,
+				F77747560B23A70600D1F89B /* ANTLRDebug.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1055,6 +1128,13 @@
 				F72C5ECF0AB7E5A500282574 /* ANTLRParserRuleReturnScope.m in Sources */,
 				F738D1780B07AEAA001813C4 /* ANTLRFailedPredicateException.m in Sources */,
 				F738D17A0B07AEAA001813C4 /* ANTLRTreeException.m in Sources */,
+				F7E261170B1E44320013F640 /* ANTLRDebugParser.m in Sources */,
+				F7E2611B0B1E443D0013F640 /* ANTLRDebugTreeParser.m in Sources */,
+				F7E261210B1E44E80013F640 /* ANTLRDebugTokenStream.m in Sources */,
+				F7E261250B1E44FA0013F640 /* ANTLRDebugTreeNodeStream.m in Sources */,
+				F7E261290B1E45070013F640 /* ANTLRDebugTreeAdaptor.m in Sources */,
+				F7E2613A0B1E45580013F640 /* ANTLRDebugEventProxy.m in Sources */,
+				F77744060B234A3400D1F89B /* ANTLRToken+DebuggerSupport.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

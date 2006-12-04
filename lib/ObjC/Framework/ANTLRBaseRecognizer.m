@@ -148,7 +148,6 @@
 
 
 // hooks for debugger
-// TODO
 - (void) beginResync
 {
 }

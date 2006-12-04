@@ -29,7 +29,7 @@
 - (void) consume;
 
 // Get unichar at current input pointer + i ahead where i=1 is next character as int for including ANTLRCharStreamEOF (-1) in the data range
-- (int) LA:(unsigned int) i;
+- (int) LA:(int) i;
 
 // Tell the stream to start buffering if it hasn't already.  Return
 // current input position, index(), or some other marker so that
@@ -37,12 +37,12 @@
 // rewind(mark()) should not affect the input cursor.
 // TODO: problem in that lexer stream returns not index but some marker 
 
-- (unsigned int) mark;
+- (int) mark;
 
 // Return the current input symbol index 0..n where n indicates the
 // last symbol has been read.
 
-- (unsigned int) index;
+- (int) index;
 
 // Reset the stream so that next call to index would return marker.
 // The marker will usually be -index but it doesn't have to be.  It's
@@ -53,14 +53,14 @@
 // was created.
 
 - (void) rewind;
-- (void) rewind:(unsigned int) marker;
+- (void) rewind:(int) marker;
 
 // You may want to commit to a backtrack but don't want to force the
 // stream to keep bookkeeping objects around for a marker that is
 // no longer necessary.  This will have the same behavior as
 // rewind() except it releases resources without the backward seek.
 
-- (void) release:(unsigned int) marker;
+- (void) release:(int) marker;
 
 // Set the input cursor to the position indicated by index.  This is
 // normally used to seek ahead in the input stream.  No buffering is
@@ -77,7 +77,7 @@
 // Currently, this method is only used for efficient backtracking, but
 // in the future it may be used for incremental parsing.
 
-- (void) seek:(unsigned int) index;
+- (void) seek:(int) index;
 
 // Only makes sense for streams that buffer everything up probably, but
 // might be useful to display the entire stream or for testing.

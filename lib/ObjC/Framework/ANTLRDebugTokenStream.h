@@ -24,27 +24,27 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#import <Cocoa/Cocoa.h>
+#import <ANTLR/ANTLRParser.h>
+#import <ANTLR/ANTLRTokenStream.h>
+#import <ANTLR/ANTLRDebugTokenStream.h>
+#import <ANTLR/ANTLRDebugEventListener.h>
 
-#import <ANTLR/ANTLRIntStream.h>
-#import <ANTLR/ANTLRToken.h>
+@interface ANTLRDebugTokenStream : NSObject <ANTLRTokenStream> {
+	id<ANTLRDebugEventListener> debugListener;
+	id<ANTLRTokenStream> tokenStream;
+	BOOL initialStreamState;
+}
 
-@protocol ANTLRTokenStream < ANTLRIntStream >
+- (id) initWithTokenStream:(id<ANTLRTokenStream>)theStream debugListener:(id<ANTLRDebugEventListener>)debugger;
 
-// Get Token at current input pointer + i ahead where i=1 is next Token.
-// i<0 indicates tokens in the past.  So -1 is previous token and -2 is
-// two tokens ago. LT:0 is undefined.  For i>=n, return Token.EOFToken.
-// Return null for LT:0 and any index that results in an absolute address
-// that is negative.
+- (id<ANTLRDebugEventListener>) debugListener;
+- (void) setDebugListener: (id<ANTLRDebugEventListener>) aDebugListener;
 
-- (ANTLRToken *) LT:(int) i;
+- (id<ANTLRTokenStream>) tokenStream;
+- (void) setTokenStream: (id<ANTLRTokenStream>) aTokenStream;
 
-- (ANTLRToken *) tokenAtIndex:(unsigned int) i;
 
-- (id) tokenSource;
-
-- (NSString *) stringValue;
-- (NSString *) stringValueWithRange:(NSRange) aRange;
-- (NSString *) stringValueFromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken;
 
 
 @end
