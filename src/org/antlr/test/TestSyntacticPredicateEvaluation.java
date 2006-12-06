@@ -46,7 +46,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"c\n" +
 			"@init {System.out.println(\"enter c\");}\n" +
 			"   : '(' c ')' | 'x' ;\n" +
-			"WS : (' '|'\\n')+ {channel=99;}\n" +
+			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
 		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "a", "(x) ;", false);
@@ -95,7 +95,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"c\n" +
 			"@init {System.out.println(\"enter c\");}\n" +
 			"   : '(' c ')' | 'x' ;\n" +
-			"WS : (' '|'\\n')+ {channel=99;}\n" +
+			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
 		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "a", "(x) ;", false);
@@ -195,7 +195,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"   | INT\n" +
 			"   ;\n" +
 			"INT: '0'..'9'+ ;\n" +
-			"WS : (' '|'\\n')+ {channel=99;}\n" +
+			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
 		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "s", "(34)x;", false);
@@ -275,7 +275,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  : ('x'+ 'y')=> 'x'+ 'y' -> template(a={$text}) <<1:<a>;>>\n" +
 			"  | 'x'+ 'z' -> template(a={$text}) <<2:<a>;>>\n"+
 			"  ;\n" +
-			"WS : (' '|'\\n')+ {channel=99;}\n" +
+			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
 		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "a", "xxxy", false);
@@ -295,7 +295,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  : ('x'+ 'y')=> 'x'+ 'y'\n" +
 			"  | 'x'+ 'z'\n"+
 			"  ;\n" +
-			"WS : (' '|'\\n')+ {channel=99;}\n" +
+			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
 		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "a", "xxxy", false);

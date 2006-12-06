@@ -37,7 +37,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"a : ID INT -> ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("", found);
@@ -50,7 +50,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"a : ID INT -> {new StringTemplate($ID.text)} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc\n", found);
@@ -63,7 +63,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"a : ID INT -> {%{$ID.text}} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc\n", found);
@@ -76,7 +76,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"a : ID INT -> template(x={$ID},y={$INT}) <<x:<x.text>, y:<y.text>;>> ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("x:abc, y:34;\n", found);
@@ -91,7 +91,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"a : ID INT -> foo(x={$ID.text},y={$INT.text}) ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
@@ -106,7 +106,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"a : ID INT -> ({\"foo\"})(x={$ID.text},y={$INT.text}) ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
@@ -119,7 +119,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"a : ID INT -> template(x={$ID.text},y={$INT.text}) \"<foo(...)>\" ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
@@ -136,7 +136,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"  ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("hi abc\n", found);
@@ -150,7 +150,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"b : ID INT -> foo(x={$ID.text},y={$INT.text}) ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
@@ -164,7 +164,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"b returns [int i] : ID INT {$i=8;} ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("8\n", found);
@@ -180,7 +180,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"b : INT -> foo(x={$a::id}) ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {channel=99;} ;\n";
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("t.g", grammar, "TParser", "TLexer",
 				    "a", "abc 34", debug);
 		assertEquals("abc \n", found);

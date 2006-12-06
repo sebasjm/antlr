@@ -291,6 +291,11 @@ December 6, 2006
 
 * updated build.xml for future Ant compatibility, thanks to Matt Benson.
 
+* various tests in TestRewriteTemplate and TestSyntacticPredicateEvaluation
+  were using the old 'channel' vs. new '$channel' notation.
+  TestInterpretedParsing didn't pick up an earlier change to CommonToken.
+  Reported by Matt Benson.
+
 November 29, 2006
 
 *  optimized semantic predicate evaluation so that p||!p yields true.
