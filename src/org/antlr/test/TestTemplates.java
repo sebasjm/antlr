@@ -37,11 +37,12 @@ import org.antlr.codegen.ActionTranslatorLexer;
 
 /** Test templates in actions; %... shorthands */
 public class TestTemplates extends BaseTest {
+	private static final String LINE_SEP = System.getProperty("line.separator");
 
 	public void testTemplateConstructor() throws Exception {
 		String action = "x = %foo(name={$ID.text});";
-		String expecting = "x = templateLib.getInstanceOf(\"foo\",\n" +
-						   "  new STAttrMap().put(\"name\", ID1.getText()));";
+		String expecting = "x = templateLib.getInstanceOf(\"foo\"," +
+			LINE_SEP + "  new STAttrMap().put(\"name\", ID1.getText()));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -113,8 +114,8 @@ public class TestTemplates extends BaseTest {
 
 	public void testIndirectTemplateConstructor() throws Exception {
 		String action = "x = %({\"foo\"})(name={$ID.text});";
-		String expecting = "x = templateLib.getInstanceOf(\"foo\",\n" +
-						   "  new STAttrMap().put(\"name\", ID1.getText()));";
+		String expecting = "x = templateLib.getInstanceOf(\"foo\"," +
+			LINE_SEP + "  new STAttrMap().put(\"name\", ID1.getText()));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);

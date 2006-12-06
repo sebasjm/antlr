@@ -296,6 +296,9 @@ December 6, 2006
   TestInterpretedParsing didn't pick up an earlier change to CommonToken.
   Reported by Matt Benson.
 
+* fixed platform dependent test failures in TestTemplates, supplied by Matt
+  Benson.
+
 November 29, 2006
 
 *  optimized semantic predicate evaluation so that p||!p yields true.
