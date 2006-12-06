@@ -287,6 +287,10 @@ CHANGES
 
 3.0b6 - ??
 
+December 6, 2006
+
+* updated build.xml for future Ant compatibility, thanks to Matt Benson.
+
 November 29, 2006
 
 *  optimized semantic predicate evaluation so that p||!p yields true.
