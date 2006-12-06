@@ -98,7 +98,14 @@
 
     <target name="version-bcel" if="bcel.available">
 
-        <loadproperties srcfile="${tool.class}">
+        <condition property="enc" value="ISO-8859-1" else="${file.encoding}">
+            <!-- ironically, the AntVersion condition would tell us what
+                 we need to know, so we use its absence to indicate
+                 an Ant version prior to 1.7.0: -->
+            <available classname="org.apache.tools.ant.taskdefs.condition.AntVersion" />
+        </condition>
+
+        <loadproperties srcfile="${tool.class}" encoding="${enc}">
             <filterchain>
                 <classconstants/>
                 <prefixlines prefix="Tool." />
