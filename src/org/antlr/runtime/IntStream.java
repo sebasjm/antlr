@@ -33,7 +33,11 @@ package org.antlr.runtime;
 public interface IntStream {
 	void consume();
 
-	/** Get int at current input pointer + i ahead where i=1 is next int */
+	/** Get int at current input pointer + i ahead where i=1 is next int.
+	 *  Negative indexes are allowed.  LA(-1) is previous token (token
+	 *  just matched).  LA(-i) where i is before first token should
+	 *  yield -1, invalid char / EOF.
+	 */
 	int LA(int i);
 
 	/** Tell the stream to start buffering if it hasn't already.  Return

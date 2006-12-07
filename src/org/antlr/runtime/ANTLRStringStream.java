@@ -114,15 +114,19 @@ public class ANTLRStringStream implements CharStream {
 			return 0; // undefined
 		}
 		if ( i<0 ) {
-			i++; // e.g., translate LA(-1) to use offset 0 
+			i++; // e.g., translate LA(-1) to use offset i=0; then data[p+0-1]
+			if ( (p+i-1) < 0 ) {
+				return CharStream.EOF; // invalid; no char before first char
+			}
 		}
 
 		if ( (p+i-1) >= n ) {
             //System.out.println("char LA("+i+")=EOF; p="+p);
             return CharStream.EOF;
         }
-        //System.out.println("char LA("+i+")="+data.charAt(p+i-1)+"; p="+p);
-        return data[p+i-1];
+        //System.out.println("char LA("+i+")="+(char)data[p+i-1]+"; p="+p);
+		//System.out.println("LA("+i+"); p="+p+" n="+n+" data.length="+data.length);
+		return data[p+i-1];
     }
 
 	public int LT(int i) {
