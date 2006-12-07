@@ -29,12 +29,14 @@
 #include <string.h>
 
 static NSData *newlineData = nil;
+static unsigned lengthOfUTF8Ack = 0;
 
 @implementation ANTLRDebugEventProxy
 
 + (void) initialize
 {
 	if (!newlineData) newlineData = [@"\n" dataUsingEncoding:NSUTF8StringEncoding];
+	if (!lengthOfUTF8Ack) lengthOfUTF8Ack = [[@"ack\n" dataUsingEncoding:NSUTF8StringEncoding] length];
 }
 
 - (id) init
@@ -67,12 +69,12 @@ static NSData *newlineData = nil;
 - (void) waitForDebuggerConnection
 {
 	if (serverSocket == -1) {
-		serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+		serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		
 		NSAssert1(serverSocket != -1, @"Failed to create debugger socket. %s", strerror(errno));
 		
 		int yes = 1;
-		setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR|TCP_NODELAY, (void *)&yes, sizeof(int));
+		setsockopt(serverSocket, SOL_SOCKET, SO_KEEPALIVE|SO_REUSEADDR|TCP_NODELAY, (void *)&yes, sizeof(int));
 
 		struct sockaddr_in server_addr;
 		bzero(&server_addr, sizeof(struct sockaddr_in));
@@ -94,12 +96,17 @@ static NSData *newlineData = nil;
 
 - (void) waitForAck
 {
+	NSString *response;
 	@try {
-		NSData *newLine = [debuggerFH availableData];
-		if ([newLine length] > 1) @throw [NSException exceptionWithName:@"ANTLRDebugEventProxy" reason:@"illegal response from debugger" userInfo:nil];
+		NSData *newLine = [debuggerFH readDataOfLength:lengthOfUTF8Ack];
+		response = [[NSString alloc] initWithData:newLine encoding:NSUTF8StringEncoding];
+		if (![response isEqualToString:@"ack\n"]) @throw [NSException exceptionWithName:@"ANTLRDebugEventProxy" reason:@"illegal response from debugger" userInfo:nil];
 	}
 	@catch (NSException *e) {
-		NSLog(@"socket died or debugger misbehaved: %@", e);
+		NSLog(@"socket died or debugger misbehaved: %@ read <%@>", e, response);
+	}
+	@finally {
+		[response release];
 	}
 }
 
@@ -185,7 +192,7 @@ static NSData *newlineData = nil;
 
 - (void) enterAlt:(int)alt
 {
-	[self sendToDebugger:[NSString stringWithFormat:@"enterAlt: %d", alt]]; 
+	[self sendToDebugger:[NSString stringWithFormat:@"enterAlt %d", alt]]; 
 }
 
 - (void) exitRule:(NSString *)ruleName

@@ -73,8 +73,6 @@
 		F738D2120B07B32D001813C4 /* T.g in Sources */ = {isa = PBXBuildFile; fileRef = F7DD05E40A7B14BE006A006C /* T.g */; };
 		F738D2220B07B39F001813C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7DD05E70A7B1572006A006C /* main.m */; };
 		F738D3190B07BDB7001813C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F700ECE70A5FE25D005D0757 /* main.m */; };
-		F738D3450B07C072001813C4 /* SimpleCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D2510B07B842001813C4 /* SimpleCParser.m */; };
-		F738D3460B07C073001813C4 /* SimpleCLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D2810B07B9B6001813C4 /* SimpleCLexer.m */; };
 		F738D3610B07C105001813C4 /* CombinedLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D35E0B07C105001813C4 /* CombinedLexer.m */; };
 		F738D3620B07C105001813C4 /* CombinedParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F738D3600B07C105001813C4 /* CombinedParser.m */; };
 		F738D3630B07C10A001813C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F700E86A0A5FA34D005D0757 /* main.m */; };
@@ -106,6 +104,7 @@
 		F777678C09DD616600517181 /* ANTLRCharStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7B509AA2B8800C3FD5E /* ANTLRCharStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F777678E09DD618000517181 /* ANTLRLexer.h in Headers */ = {isa = PBXBuildFile; fileRef = F7A4099109659BFB002CC781 /* ANTLRLexer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F777678F09DD618100517181 /* ANTLRLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A4099209659BFB002CC781 /* ANTLRLexer.m */; };
+		F798B5940B278A0E005BCA94 /* SimpleC.g in Sources */ = {isa = PBXBuildFile; fileRef = F700ECD10A5FE176005D0757 /* SimpleC.g */; };
 		F79D598B0A0E51AB00EA3CEE /* ANTLRNoViableAltException.h in Headers */ = {isa = PBXBuildFile; fileRef = F79D59890A0E51AB00EA3CEE /* ANTLRNoViableAltException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F79D598C0A0E51AB00EA3CEE /* ANTLRNoViableAltException.m in Sources */ = {isa = PBXBuildFile; fileRef = F79D598A0A0E51AB00EA3CEE /* ANTLRNoViableAltException.m */; };
 		F79D5AF60A0E634900EA3CEE /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
@@ -1153,8 +1152,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F738D3190B07BDB7001813C4 /* main.m in Sources */,
-				F738D3450B07C072001813C4 /* SimpleCParser.m in Sources */,
-				F738D3460B07C073001813C4 /* SimpleCLexer.m in Sources */,
+				F798B5940B278A0E005BCA94 /* SimpleC.g in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1409,6 +1407,7 @@
 		F700ECDD0A5FE1BF005D0757 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_DEBUG = NO;
 				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/LL-star";
 				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/LL-star";
 				ANTLR_X_DEBUG_ST = NO;

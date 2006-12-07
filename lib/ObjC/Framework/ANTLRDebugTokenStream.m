@@ -102,6 +102,7 @@
 		[self consumeInitialHiddenTokens];
 	int a = [tokenStream index];
 	ANTLRToken *token = [tokenStream LT:1];
+	[tokenStream consume];
 	int b = [tokenStream index];
 	[debugListener consumeToken:token];
 	if (b > a+1) // must have consumed hidden tokens

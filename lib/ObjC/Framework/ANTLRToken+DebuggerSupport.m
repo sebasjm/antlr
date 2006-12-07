@@ -25,7 +25,7 @@
 		escapedText = [NSMutableString stringWithString:@""];
 	}
 	// format is tokenIndex, type, channel, line, col, (escaped)text
-	return [NSString stringWithFormat:@"%u %d %u %u %u %@", 
+	return [NSString stringWithFormat:@"%u %d %u %u %u \"%@", 
 		[self tokenIndex],
 		[self type],
 		[self channel],
