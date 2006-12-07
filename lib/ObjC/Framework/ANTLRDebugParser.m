@@ -31,25 +31,25 @@
 
 - (id) initWithTokenStream:(id<ANTLRTokenStream>)theStream
 {
-	return [self initWithTokenStream:theStream debugListener:nil portNumber:-1];
+	return [self initWithTokenStream:theStream debugListener:nil debuggerPort:-1];
 }
 
 - (id) initWithTokenStream:(id<ANTLRTokenStream>)theStream
 			  debuggerPort:(int)portNumber
 {
-	return [self initWithTokenStream:theStream debugListener:nil port:portNumber];
+	return [self initWithTokenStream:theStream debugListener:nil debuggerPort:portNumber];
 }
 
 - (id) initWithTokenStream:(id<ANTLRTokenStream>)theStream
 			 debugListener:(id<ANTLRDebugEventListener>)theDebugListener
-					  port:(int)debuggerPort
+			  debuggerPort:(int)portNumber
 {
 	id<ANTLRDebugEventListener,NSObject> debugger = nil;
 	id<ANTLRTokenStream> tokenStream = nil;
 	if (theDebugListener) {
 		debugger = [(id<ANTLRDebugEventListener,NSObject>)theDebugListener retain];
 	} else {
-		debugger = [[ANTLRDebugEventProxy alloc] initWithGrammarName:[self grammarFileName] debuggerPort:debuggerPort];
+		debugger = [[ANTLRDebugEventProxy alloc] initWithGrammarName:[self grammarFileName] debuggerPort:portNumber];
 	}
 	if (theStream && ![theStream isKindOfClass:[ANTLRDebugTokenStream class]]) {
 		tokenStream = [[ANTLRDebugTokenStream alloc] initWithTokenStream:theStream debugListener:debugger];
@@ -61,6 +61,7 @@
 		[self setDebugListener:debugger];
 		[debugger release];
 		[tokenStream release];
+		[debugListener waitForDebuggerConnection];
 	}
 	return self;
 }
@@ -97,6 +98,15 @@
 {
 	[debugListener endResync];
 }
+- (void)beginBacktracking:(int)level
+{
+	[debugListener beginBacktrack:level];
+}
+
+- (void)endBacktracking:(int)level wasSuccessful:(BOOL)successful
+{
+	[debugListener endBacktrack:level wasSuccessful:successful];
+}
 
 - (void) recoverFromMismatchedToken:(id<ANTLRIntStream>)inputStream 
 						  exception:(NSException *)e 
@@ -113,18 +123,6 @@
 {
 #warning TODO: recoverFromMismatchedSet in debugger
 	[super recoverFromMismatchedSet:inputStream exception:e follow:follow];
-}
-
-#pragma mark Additional methods
-
-- (void)beginBacktracking:(int)level
-{
-	[debugListener beginBacktrack:level];
-}
-
-- (void)endBacktracking:(int)level wasSuccessful:(BOOL)successful
-{
-	[debugListener endBacktrack:level wasSuccessful:successful];
 }
 
 @end

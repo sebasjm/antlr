@@ -39,13 +39,9 @@
 // designated initializer
 - (id) initWithTokenStream:(id<ANTLRTokenStream>)theStream
 			 debugListener:(id<ANTLRDebugEventListener>)theDebugListener
-					  port:(int)debuggerPort;
+			  debuggerPort:(int)portNumber;
 
 - (id<ANTLRDebugEventListener>) debugListener;
 - (void) setDebugListener: (id<ANTLRDebugEventListener>) aDebugListener;
-
-- (void)beginBacktracking:(int)level;
-- (void)endBacktracking:(int)level wasSuccessful:(BOOL)successful;
-
 
 @end

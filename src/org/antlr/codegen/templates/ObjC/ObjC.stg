@@ -82,8 +82,10 @@ headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
+<@imports>
 #import \<Cocoa/Cocoa.h>
 #import \<ANTLR/ANTLR.h>
+<@end>
 
 <actions.(actionScope).header>
 
@@ -163,6 +165,11 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="ANTLRToken *",
 	<cyclicDFAs:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
 <actions.lexer.dealloc>
 	[super dealloc];
+}
+
+- (NSString *) grammarFileName
+{
+	return @"<fileName>";
 }
 
 <if(actions.lexer.reset)>
@@ -271,7 +278,7 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 - (<rule.ruleDescriptor:{ruleDescriptor|<returnType()>}>) <rule.ruleName><if(rule.ruleDescriptor.parameterScope)><rule.ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>;
 }>
 
-<@methods()>
+<@methodsdecl()>
 
 @end
 >>
@@ -308,17 +315,17 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 }
 
 <if(PARSER)>
-- (id) initWithTokenStream:(id\<ANTLRTokenStream>)aStream
+- (id) initWithTokenStream:(<inputStreamType>)aStream
 {
 	if ((self = [super initWithTokenStream:aStream])) {
 <else><!TREE_PARSER!>
-- (id) initWithTreeNodeStream:(id\<ANTLRTreeNodeStream>)aStream
+- (id) initWithTreeNodeStream:(<inputStreamType>)aStream
 {
 	if ((self = [super initWithTreeNodeStream:aStream])) {
 <endif><\n>
-		tokenNames = [[NSArray alloc] initWithObjects:@"\<invalid>", @"\<EOR>", @"\<DOWN>", @"\<UP>", <tokenNames:{@<it>}; separator=", ", wrap="    ">, nil];
-<if(backtracking)>
-		ruleMemo = [[NSMutableDictionary alloc] initWithCapacity:ANTLR_INITIAL_FOLLOW_STACK_SIZE];
+		tokenNames = [[NSArray alloc] initWithObjects:@"\<invalid>", @"\<EOR>", @"\<DOWN>", @"\<UP>", <tokenNames:{@<it>}; separator=", ", wrap="\n	">, nil];
+<if(memoize)>
+		ruleMemo = [[NSMutableDictionary alloc] initWithCapacity:<numRules>+1];
 <endif>
 		<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = [[<name>DFA<dfa.decisionNumber> alloc] initWithRecognizer:self];}; separator="\n">
 		<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeInit(scope=it)><endif>}>
@@ -334,7 +341,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 - (void) dealloc
 {
 	[tokenNames release];
-<if(backtracking)>
+<if(memoize)>
 	[ruleMemo release];
 <endif>
 	<cyclicDFAs:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
@@ -342,6 +349,11 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 	<actions.parser.dealloc>
 	<@dealloc()>
 	[super dealloc];
+}
+
+- (NSString *) grammarFileName
+{
+	return @"<fileName>";
 }
 
 <actions.parser.methods>
@@ -356,11 +368,11 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 >>
 
 parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="ANTLRParser", labelType="ANTLRToken *", members={<actions.parser.members>}) ::= <<
-<genericParser(inputStreamType="ANTLRTokenStream *", ...)>
+<genericParser(inputStreamType="id\<ANTLRTokenStream>", ...)>
 >>
 
 treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ANTLRASTLabelType>}, ASTLabelType="id", superClass="ANTLRTreeParser", members={<actions.treeparser.members>}) ::= <<
-<genericParser(inputStreamType="ANTLRTreeNodeStream *", ...)>
+<genericParser(inputStreamType="id\<ANTLRTreeNodeStream>", ...)>
 >>
 /** A simpler version of a rule template that is specific to the imaginary
  *  rules created for syntactic predicates.  As they never have return values
@@ -769,6 +781,7 @@ if (<s>) {
 } else {
 	<ruleBacktrackFailure()>
 	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
+	<@mismatchedSetException()>
 <if(LEXER)>
 	[self recover:mse];
 <else>
@@ -1087,6 +1100,8 @@ const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<table; separ
 {
 	return @"<dfa.description>";
 }
+
+<@errorMethod()>
 
 @end
 <\n>

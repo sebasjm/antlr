@@ -34,8 +34,7 @@ static NSData *newlineData = nil;
 
 + (void) initialize
 {
-	char newline = '\n';
-	if (!newlineData) newlineData = [[NSData alloc] initWithBytesNoCopy:&newline length:1 freeWhenDone:NO];
+	if (!newlineData) newlineData = [@"\n" dataUsingEncoding:NSUTF8StringEncoding];
 }
 
 - (id) init
@@ -68,29 +67,28 @@ static NSData *newlineData = nil;
 - (void) waitForDebuggerConnection
 {
 	if (serverSocket == -1) {
-		serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 		
 		NSAssert1(serverSocket != -1, @"Failed to create debugger socket. %s", strerror(errno));
 		
-		NSAssert1(listen(serverSocket,50) == 0, @"listen(2) failed. %s", strerror(errno));
-		
 		int yes = 1;
-		setsockopt(serverSocket, IPPROTO_TCP, SO_REUSEADDR|TCP_NODELAY, (void *)&yes, sizeof(yes));
+		setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR|TCP_NODELAY, (void *)&yes, sizeof(int));
 
 		struct sockaddr_in server_addr;
-		bzero(&server_addr, sizeof(server_addr));
-		server_addr.sin_len = sizeof(server_addr);
+		bzero(&server_addr, sizeof(struct sockaddr_in));
 		server_addr.sin_family = AF_INET;
 		server_addr.sin_port = htons([self debuggerPort]);
 		server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-		NSAssert1( bind(serverSocket, &server_addr, sizeof(server_addr)) != -1, @"bind(2) failed. %s", strerror(errno));
+		NSAssert1( bind(serverSocket, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) != -1, @"bind(2) failed. %s", strerror(errno));
+
+		NSAssert1(listen(serverSocket,50) == 0, @"listen(2) failed. %s", strerror(errno));
 		
 		debuggerSocket = accept(serverSocket, &debugger_sockaddr, &debugger_socklen);
 		NSAssert1( debuggerSocket != -1, @"accept(2) failed. %s", strerror(errno));
 		
 		debuggerFH = [[NSFileHandle alloc] initWithFileDescriptor:debuggerSocket];
-		[self sendToDebugger:[NSString stringWithFormat:@"ANTLR %d", ANTLRDebugProtocolVersion]];
-		[self sendToDebugger:[NSString stringWithFormat:@"grammar \"%@", [self grammarName]]];
+		[self sendToDebugger:[NSString stringWithFormat:@"ANTLR %d", ANTLRDebugProtocolVersion] waitForResponse:NO];
+		[self sendToDebugger:[NSString stringWithFormat:@"grammar \"%@", [self grammarName]] waitForResponse:NO];
 	}
 }
 
@@ -107,10 +105,15 @@ static NSData *newlineData = nil;
 
 - (void) sendToDebugger:(NSString *)message
 {
+	[self sendToDebugger:message waitForResponse:YES];
+}
+
+- (void) sendToDebugger:(NSString *)message waitForResponse:(BOOL)wait
+{
 	if (! debuggerFH ) return;
 	[debuggerFH writeData:[message dataUsingEncoding:NSUTF8StringEncoding]];
 	[debuggerFH writeData:newlineData];
-	[self waitForAck];
+	if (wait) [self waitForAck];
 }
 
 - (int) serverSocket

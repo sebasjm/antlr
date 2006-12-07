@@ -146,7 +146,7 @@
 	[self endResync];
 }
 
-
+// code smell...:(
 // hooks for debugger
 - (void) beginResync
 {
@@ -156,6 +156,15 @@
 {
 }
 
+- (void)beginBacktracking:(int)level
+{
+}
+
+- (void)endBacktracking:(int)level wasSuccessful:(BOOL)successful
+{
+}
+
+// end hooks for debugger
 
 - (ANTLRBitSet *)computeErrorRecoverySet
 {
@@ -371,6 +380,7 @@
 - (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment // stream:(id<ANTLRIntStream>)input
 {
     backtracking++;
+	[self beginBacktracking:backtracking];
 	int start = [[self input] mark];
     @try {
         [self performSelector:synpredFragment];
@@ -380,6 +390,7 @@
     }
     BOOL success = !failed;
     [[self input] rewind:start];
+	[self endBacktracking:backtracking wasSuccessful:success];
 	backtracking--;
     failed = NO;
     return success;

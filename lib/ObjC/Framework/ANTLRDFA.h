@@ -27,6 +27,7 @@
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLRBaseRecognizer.h>
 #import <ANTLR/ANTLRIntStream.h>
+#import <ANTLR/ANTLRNoViableAltException.h>
 
 @interface ANTLRDFA : NSObject {
 	// the tables are set by subclasses to their own static versions.
@@ -49,6 +50,9 @@
 
 - (int) specialStateTransition:(int) state;
 //- (unichar) specialTransition:(unichar) state symbol:(int) symbol;
+
+// hook for debugger support
+- (void) error:(ANTLRNoViableAltException *)nvae;
 
 - (NSString *) description;
 - (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment;

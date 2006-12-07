@@ -52,6 +52,7 @@
 - (void) waitForDebuggerConnection;
 - (void) waitForAck;
 - (void) sendToDebugger:(NSString *)message;
+- (void) sendToDebugger:(NSString *)message waitForResponse:(BOOL)wait;
 
 - (int) serverSocket;
 - (void) setServerSocket: (int) aServerSocket;

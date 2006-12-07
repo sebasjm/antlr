@@ -114,12 +114,18 @@ static BOOL debug = NO;
 		return;
 	}
 	ANTLRNoViableAltException *nvae = [ANTLRNoViableAltException exceptionWithDecision:decisionNumber state:state stream:stream];
+	[self error:nvae];
 	@throw nvae;
 }
 
 - (int) specialStateTransition:(int) state
 {
 	return 0;
+}
+
+- (void) error:(ANTLRNoViableAltException *)nvae
+{
+	// empty, hook for debugger support
 }
 
 - (NSString *) description

@@ -74,8 +74,12 @@
 - (void) reportError:(NSException *)e;
 - (void) displayRecognitionError:(NSString *)name tokenNames:(NSArray *)tokenNames exception:(NSException *)e;
 - (void) recover:(id<ANTLRIntStream>)input exception:(NSException *)e;
+// begin hooks for debugger
 - (void) beginResync;
 - (void) endResync;
+- (void) beginBacktracking:(int)level;
+- (void) endBacktracking:(int)level wasSuccessful:(BOOL)successful;
+// end hoos for debugger
 
 // compute the bitsets necessary to do matching and recovery
 - (ANTLRBitSet *)computeContextSensitiveRuleFOLLOW;
