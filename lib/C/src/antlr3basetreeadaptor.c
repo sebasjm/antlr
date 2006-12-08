@@ -132,6 +132,15 @@ static	void
 static	pANTLR3_BASE_TREE	
    becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pANTLR3_BASE_TREE oldRootTree)
 {
+	/* Protect against tree rewrites if we are in some sort of error
+	 * state, but have tried to recover. In C we can end up with a null pointer
+	 * for a tree that was not produced.
+	 */
+	if	(newRootTree == NULL)
+	{
+		return	oldRootTree;
+	}
+
 	/* root is just the new tree as is if there is no
 	 * current root tree.
 	 */
