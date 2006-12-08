@@ -289,7 +289,7 @@ matchSetRoot(s,label,elementIndex,debug) ::= <<
 
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 /* matchSetRuleRoot(s,label,elementIndex,debug) */
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_0);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (pANTLR3_BASE_TREE)adaptor.becomeRoot(adaptor.create(<label>), root_0);})>
 /* End: matchSetRuleRoot(s,label,elementIndex,debug) */
 >>
 
@@ -472,8 +472,8 @@ if ( backtracking==0 ) <\n>
 <endif>
 {
 	ANTLR3_UINT64	i_0	    = 0;
-	<prevRuleRootRef()>.tree    = root_0;
 	root_0			    = ctx->adaptor->nil(ctx->adaptor);
+	<prevRuleRootRef()>.tree    = root_0;
 	<alts:rewriteAlt(); separator="else ">
 }
 /* End: rewriteCode(
@@ -697,11 +697,11 @@ root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, list_<token>->get
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ctx->adaptor->createTypeText(ctx->adaptor, <token>, (pANTLR3_UINT8)<args; separator=", (pANTLR3_UINT8)"><if(!args)>"<token>"<endif>));<\n>
+ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ctx->adaptor->createTypeText(ctx->adaptor, <token>, (pANTLR3_UINT8)<args><if(!args)>"<token>"<endif>));<\n>
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->createTypeText(ctx->adaptor, <token>, (pANTLR3_UINT8)<args; separator=", (pANTLR3_UINT8)"><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
+root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->createTypeText(ctx->adaptor, <token>, (pANTLR3_UINT8)<args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
 >>
 
 /** plain -> {foo} action */

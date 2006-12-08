@@ -2601,7 +2601,7 @@ globalAttributeRef(scope,attr) ::= <<
  */
 
 parameterAttributeRef(attr) ::= "<attr.name>"
-parameterSetAttributeRef(attr,expr) ::= "<attr.name> = <expr>;"
+parameterSetAttributeRef(attr,expr) ::= "<attr.name>=<expr>;"
 
 /** Note that the scopeAttributeRef does not have access to the
  * grammar name directly
@@ -2625,7 +2625,7 @@ scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 <if(index)>
 ((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), (ANTLR3_UINT64)<index>))-><attr.name> = <expr>;
 <else>
-SCOPE_TOP(<scope>)-><attr.name> = <expr>;
+SCOPE_TOP(<scope>)-><attr.name>=<expr>;
 <endif>
 <endif>
 >>
@@ -2655,9 +2655,9 @@ retval.<attr.name>
 
 returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval.<attr.name> = <expr>;
+retval.<attr.name>=<expr>;
 <else>
-<attr.name> = <expr>;
+<attr.name>=<expr>;
 <endif>
 >>
 
@@ -2681,7 +2681,7 @@ tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>->tree"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "((<labelType>)<scope>.start)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
-ruleLabelPropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)<scope>.tree)"
+ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>.tree)"
 ruleLabelPropertyRef_text(scope,attr) ::= "strStream->toString(<scope>.start,<scope>.stop)"
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
@@ -2703,8 +2703,8 @@ rulePropertyRef_text(scope,attr) ::= "strStream->toString(retval.start,LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 // setting $st and $tree is allowed in local rule. everything else is flagged as error
-ruleSetPropertyRef_tree(scope,attr,expr) ::= "((<labelType>)retval).tree = <expr>;"
-ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st = <expr>;"
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "((<labelType>)retval).tree=<expr>;"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st=<expr>;"
 
 
 /** How to execute an action */
