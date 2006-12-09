@@ -1382,18 +1382,18 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
         
     <block><\n>
 <else>
-    ANTLR3_UINT32	    type;
-    ANTLR3_UINT64	    start;
-    ANTLR3_UINT64	    line;
-    ANTLR3_UINT32	    charPosition;
-    ANTLR3_UINT32	    channel;
+    ANTLR3_UINT32	    _type;
+    ANTLR3_UINT64	    _start;
+    ANTLR3_UINT64	    _line;
+    ANTLR3_UINT32	    _charPosition;
+    ANTLR3_UINT32	    _channel;
 
     ctx->pLexer->ruleNestingLevel++;
-    type	    = <ruleName>;
-    start	    = getCharIndex();
-    line	    = getLine();
-    charPosition    = getCharPositionInLine();
-    channel	    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
+    _type	    = <ruleName>;
+    _start	    = getCharIndex();
+    _line	    = getLine();
+    _charPosition   = getCharPositionInLine();
+    _channel	    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
         
     <ruleDescriptor.actions.init>
     <ruleMemoization(name=ruleName)>
@@ -1403,7 +1403,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <execAction({     
     if ( ltoken() == NULL && !hasException()) 
     {
-		emitNew(type,line,charPosition,channel,start,getCharIndex()-1);
+		emitNew(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
     }<\n>
     }
     )>
@@ -2588,18 +2588,6 @@ parameterScope(scope) ::= <<
 <scope.attributes:{<it.decl>}; separator=", ">
 >>
 
-/** Used in codegen.g to translate $x.y references.
- *  I could have left actions as StringTemplates to be inserted in
- *  the output (so they could use attributes inherited from surrounding
- *  templates), but really wanted to pass in AttributeScope and Attribute
- *  objects so this translation could query them.  So, translation of
- *  $x.y to executable code occurs before recognizerST.toString() occurs.
- *  I.e., actions are just text strings during final code generation.
-globalAttributeRef(scope,attr) ::= <<
-(ctx-><scopeTop(sname=scope,...)>)-><attr.name>
->>
- */
-
 parameterAttributeRef(attr) ::= "<attr.name>"
 parameterSetAttributeRef(attr,expr) ::= "<attr.name>=<expr>;"
 
@@ -2701,6 +2689,15 @@ rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval).stop"
 rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval).tree"
 rulePropertyRef_text(scope,attr) ::= "strStream->toString(retval.start,LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "retval.st"
+
+lexerRulePropertyRef_text(scope,attr) ::= "ltoken()->getText(ltoken())"
+lexerRulePropertyRef_type(scope,attr) ::= "_type"
+lexerRulePropertyRef_line(scope,attr) ::= "_line"
+lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
+lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
+lexerRulePropertyRef_start(scope,attr) ::= "_start"
+lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
+
 
 // setting $st and $tree is allowed in local rule. everything else is flagged as error
 ruleSetPropertyRef_tree(scope,attr,expr) ::= "((<labelType>)retval).tree=<expr>;"
