@@ -410,6 +410,14 @@ public abstract class SemanticContext {
 		public void trackUseOfSyntacticPredicates(Grammar g) {
 			ctx.trackUseOfSyntacticPredicates(g);
 		}
+
+		public boolean equals(Object object) {
+			if ( !(object instanceof NOT) ) {
+				return false;
+			}
+			return this.ctx.equals(((NOT)object).ctx);
+		}
+
 		public String toString() {
 			return "!("+ctx+")";
 		}
@@ -454,6 +462,9 @@ public abstract class SemanticContext {
 			if ( n.ctx.equals(a) ) {
 				return new TruePredicate();
 			}
+		}
+		else if ( a.equals(b) ) {
+			return a;
 		}
 		return new OR(a,b);
 	}
