@@ -420,7 +420,7 @@ public class DecisionProbe {
 		if ( problemStates.size()>0 ) {
 			Iterator it =
 				problemStates.iterator();
-			while (	it.hasNext() ) {
+			while (	it.hasNext() && !dfa.nfa.grammar.NFAToDFAConversionExternallyAborted() ) {
 				DFAState d = (DFAState) it.next();
 				// don't report problem if resolved
 				if ( resolvedStates==null || !resolvedStates.contains(d) ) {

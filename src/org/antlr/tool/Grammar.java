@@ -860,11 +860,11 @@ public class Grammar {
 
 	/** Terminate DFA creation (grammar analysis).
 	 */
-	public void abortNFAToDFAConversion() {
+	public void externallyAbortNFAToDFAConversion() {
 		externalAnalysisAbort = true;
 	}
 
-	public boolean NFAToDFAConversionAborted() {
+	public boolean NFAToDFAConversionExternallyAborted() {
 		return externalAnalysisAbort;
 	}
 

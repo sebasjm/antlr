@@ -76,7 +76,7 @@ public class NFAToDFAConverter {
 		dfa.startState = computeStartState();
 
 		// while more DFA states to check, process them
-		while ( work.size()>0 && !dfa.nfa.grammar.NFAToDFAConversionAborted() ) {
+		while ( work.size()>0 && !dfa.nfa.grammar.NFAToDFAConversionExternallyAborted() ) {
 			DFAState d = (DFAState) work.get(0);
 			if ( dfa.nfa.grammar.getWatchNFAConversion() ) {
 				System.out.println("convert DFA state "+d.stateNumber+
