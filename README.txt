@@ -287,6 +287,10 @@ CHANGES
 
 3.0b6 - ??
 
+December 9, 2006
+
+* fixed bug in OrderedHashSet.add().  It didn't track elements correctly.
+
 December 6, 2006
 
 * updated build.xml for future Ant compatibility, thanks to Matt Benson.

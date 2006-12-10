@@ -61,13 +61,18 @@ public class OrderedHashSet extends HashSet {
      */
     public boolean add(Object value) {
         boolean result = super.add(value);
-		elements.add(value);
+		if ( result ) {  // only track if new element not in set
+			elements.add(value);
+		}
 		return result;
     }
 
     public boolean remove(Object o) {
-        elements.remove(o);
+		throw new UnsupportedOperationException();
+		/*
+		elements.remove(o);
         return super.remove(o);
+        */
     }
 
     public void clear() {
