@@ -858,11 +858,14 @@ public class Grammar {
 		}
 	}
 
-	/** Terminate DFA creation (grammar analysis).  Happens on DFA creation
-	 *  boundaries so it might take DFA.MAX_TIME_PER_DFA_CREATION ms.
+	/** Terminate DFA creation (grammar analysis).
 	 */
 	public void abortNFAToDFAConversion() {
 		externalAnalysisAbort = true;
+	}
+
+	public boolean NFAToDFAConversionAborted() {
+		return externalAnalysisAbort;
 	}
 
 	/** Return a new unique integer in the token type space */

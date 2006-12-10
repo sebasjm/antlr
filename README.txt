@@ -287,6 +287,10 @@ CHANGES
 
 3.0b6 - ??
 
+December 10, 2006
+
+* Made Grammar.abortNFAToDFAConversion() abort in middle of a DFA.
+
 December 9, 2006
 
 * fixed bug in OrderedHashSet.add().  It didn't track elements correctly.
