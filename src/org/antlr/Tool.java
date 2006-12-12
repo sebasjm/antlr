@@ -295,7 +295,7 @@ public class Tool {
 					String lexerGrammarFileName =
 						grammar.name+
 						Grammar.IGNORE_STRING_IN_GRAMMAR_FILE_NAME +
-						Grammar.GRAMMAR_FILE_EXTENSION;
+						Grammar.LEXER_GRAMMAR_FILE_EXTENSION;
 					Writer w = getOutputFile(grammar,lexerGrammarFileName);
 					w.write(lexerGrammarStr);
 					w.close();

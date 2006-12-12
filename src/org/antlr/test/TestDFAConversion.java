@@ -36,10 +36,6 @@ import java.util.*;
 
 public class TestDFAConversion extends BaseTest {
 
-	/** Public default constructor used by TestRig */
-	public TestDFAConversion() {
-	}
-
 	public void testA() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+

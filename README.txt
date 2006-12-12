@@ -287,6 +287,12 @@ CHANGES
 
 3.0b6 - ??
 
+December 12, 2006
+
+* Temp lexer now end in .gl (T__.gl, for example)
+
+* TreeParser suffix no longer generated for tree grammars
+
 December 10, 2006
 
 * Made Grammar.abortNFAToDFAConversion() abort in middle of a DFA.

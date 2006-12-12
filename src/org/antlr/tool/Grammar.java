@@ -49,8 +49,10 @@ import java.util.*;
 public class Grammar {
 	public static final String SYNPRED_RULE_PREFIX = "synpred";
 
-	/** used for generating lexer temp files and looking for supergrammars */
 	public static final String GRAMMAR_FILE_EXTENSION = ".g";
+
+	/** used for generating lexer temp files */
+	public static final String LEXER_GRAMMAR_FILE_EXTENSION = ".gl";
 
 	public static final int INITIAL_DECISION_LIST_SIZE = 300;
 	public static final int INVALID_RULE_INDEX = -1;
@@ -111,7 +113,7 @@ public class Grammar {
 		"<invalid>",
 		"Lexer",
 		"Parser",
-		"TreeParser",
+		"", // no suffix for tree grammars
 		"Parser" // if combined grammar, gen Parser and Lexer will be done later
 	};
 
