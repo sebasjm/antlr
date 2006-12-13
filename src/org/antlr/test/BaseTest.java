@@ -30,7 +30,6 @@ package org.antlr.test;
 import junit.framework.TestCase;
 import org.antlr.Tool;
 import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.tool.Grammar;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -92,18 +91,19 @@ public abstract class BaseTest extends TestCase {
 		}
 	}
 
-	protected void antlr(String fileName, String grammarStr, boolean debug) {
+	protected void antlr(String fileName, String grammarFileName, String grammarStr, boolean debug) {
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
 		try {
-			Grammar g = new Grammar(grammarStr);
 			List options = new ArrayList();
 			if ( debug ) {
 				options.add("-debug");
 			}
 			options.add("-o");
 			options.add(tmpdir);
-			options.add(new File(tmpdir,g.name+Grammar.GRAMMAR_FILE_EXTENSION).toString());
+			options.add("-lib");
+			options.add(tmpdir);
+			options.add(new File(tmpdir,grammarFileName).toString());
 			String[] optionsA = new String[options.size()];
 			options.toArray(optionsA);
 			Tool antlr = new Tool(optionsA);
@@ -217,7 +217,7 @@ public abstract class BaseTest extends TestCase {
 														String lexerName,
 														boolean debug)
 	{
-		antlr(grammarFileName, grammarStr, debug);
+		antlr(grammarFileName, grammarFileName, grammarStr, debug);
 		if ( lexerName!=null ) {
 			compile(parserName+".java");
 			compile(lexerName+".java");
