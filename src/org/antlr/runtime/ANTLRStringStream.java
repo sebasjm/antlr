@@ -56,6 +56,7 @@ public class ANTLRStringStream implements CharStream {
 	/** A list of CharStreamState objects that tracks the stream state
 	 *  values line, charPositionInLine, and p that can change as you
 	 *  move through the input stream.  Indexed from 1..markDepth.
+     *  A null is kept @ index 0.  Create upon first call to mark().
 	 */
 	protected List markers;
 
@@ -63,8 +64,6 @@ public class ANTLRStringStream implements CharStream {
 	protected int lastMarker;
 
 	public ANTLRStringStream() {
-		markers = new ArrayList();
-		markers.add(null); // depth 0 means no backtracking, leave blank
 	}
 
 	/** Copy data in string to a local char array */
@@ -146,7 +145,11 @@ public class ANTLRStringStream implements CharStream {
 	}
 
 	public int mark() {
-		markDepth++;
+        if ( markers==null ) {
+            markers = new ArrayList();
+            markers.add(null); // depth 0 means no backtracking, leave blank
+        }
+        markDepth++;
 		CharStreamState state = null;
 		if ( markDepth>=markers.size() ) {
 			state = new CharStreamState();

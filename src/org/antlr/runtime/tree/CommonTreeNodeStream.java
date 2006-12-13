@@ -154,6 +154,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	/** Calls to mark() may be nested so we have to track a stack of
 	 *  them.  The marker is an index into this stack.
 	 *  This is a List<TreeWalkState>.  Indexed from 1..markDepth.
+     *  A null is kept @ index 0.  Create upon first call to mark().
 	 */
 	protected List markers;
 
@@ -278,6 +279,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	public int mark() {
 		if ( markers==null ) {
 			markers = new ArrayList();
+            markers.add(null); // depth 0 means no backtracking, leave blank
 		}
 		markDepth++;
 		TreeWalkState state = null;
@@ -322,7 +324,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		if ( markers==null ) {
 			return;
 		}
-		TreeWalkState state = (TreeWalkState)markers.get(marker-1);
+		TreeWalkState state = (TreeWalkState)markers.get(marker);
 		absoluteNodeIndex = state.absoluteNodeIndex;
 		currentChildIndex = state.currentChildIndex;
 		currentNode = state.currentNode;
