@@ -47,7 +47,6 @@ public class Parser extends BaseRecognizer {
 	/** Set the token stream and reset the parser */
 	public void setTokenStream(TokenStream input) {
 		this.input = input;
-		reset();
 	}
 
     public TokenStream getTokenStream() {

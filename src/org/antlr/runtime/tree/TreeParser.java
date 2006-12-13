@@ -23,10 +23,9 @@ public class TreeParser extends BaseRecognizer {
 		}
 	}
 
-	/** Set the input stream and reset the parser */
+	/** Set the input stream */
 	public void setTreeNodeStream(TreeNodeStream input) {
 		this.input = input;
-		reset();
 	}
 
 	public TreeNodeStream getTreeNodeStream() {
