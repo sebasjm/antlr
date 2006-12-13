@@ -29,10 +29,10 @@ package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
 
-import java.util.Iterator;
-import java.util.Stack;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind.
  *  The stream can be accessed as an Iterator or via LT(1)/consume or
@@ -104,9 +104,6 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 */
 	protected Stack indexStack = new Stack();
 
-	/** Track the last mark() call result value for use in rewind(). */
-	protected int lastMarker;
-
 	/** Which node are we currently visiting? */
 	protected Tree currentNode;
 
@@ -155,10 +152,16 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	}
 
 	/** Calls to mark() may be nested so we have to track a stack of
-	 *  them.  The marker is an index into this stack.  Index 0 is
-	 *  the first marker.  This is a List<TreeWalkState>
+	 *  them.  The marker is an index into this stack.
+	 *  This is a List<TreeWalkState>.  Indexed from 1..markDepth.
 	 */
 	protected List markers;
+
+	/** tracks how deep mark() calls are nested */
+	protected int markDepth = 0;
+
+	/** Track the last mark() call result value for use in rewind(). */
+	protected int lastMarker;
 
 	public CommonTreeNodeStream(Tree tree) {
 		this(new CommonTreeAdaptor(), tree);
@@ -269,13 +272,22 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	}
 
 	/** Record the current state of the tree walk which includes
-	 *  the current node and stack state.
+	 *  the current node and stack state as well as the lookahead
+	 *  buffer.
 	 */
 	public int mark() {
 		if ( markers==null ) {
 			markers = new ArrayList();
 		}
-		TreeWalkState state = new TreeWalkState();
+		markDepth++;
+		TreeWalkState state = null;
+		if ( markDepth>=markers.size() ) {
+			state = new TreeWalkState();
+			markers.add(state);
+		}
+		else {
+			state = (TreeWalkState)markers.get(markDepth);
+		}
 		state.absoluteNodeIndex = absoluteNodeIndex;
 		state.currentChildIndex = currentChildIndex;
 		state.currentNode = currentNode;
@@ -289,12 +301,15 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		for (int k=1; k<=n; k++,i++) {
 			state.lookahead[i] = (Tree)LT(k);
 		}
-		markers.add(state);
-		return markers.size(); // markers go 1..depth
+		lastMarker = markDepth;
+		return markDepth;
 	}
 
 	public void release(int marker) {
-		throw new NoSuchMethodError("can't release tree parse; email parrt@antlr.org");
+		// unwind any other markers made after marker and release marker
+		markDepth = marker;
+		// release this marker
+		markDepth--;
 	}
 
 	/** Rewind the current state of the tree walk to the state it
@@ -304,11 +319,10 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 *  upon mark().
 	 */
 	public void rewind(int marker) {
-		if ( markers==null || markers.size()<marker ) {
-			return; // do nothing upon error; perhaps this should throw exception?
+		if ( markers==null ) {
+			return;
 		}
 		TreeWalkState state = (TreeWalkState)markers.get(marker-1);
-		markers.remove(marker-1); // "pop" state from stack
 		absoluteNodeIndex = state.absoluteNodeIndex;
 		currentChildIndex = state.currentChildIndex;
 		currentNode = state.currentNode;
@@ -320,6 +334,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		for (; tail<state.lookahead.length; tail++) {
 			lookahead[tail] = state.lookahead[tail];
 		}
+		release(marker);
 	}
 
 	public void rewind() {

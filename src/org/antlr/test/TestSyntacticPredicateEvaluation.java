@@ -263,6 +263,56 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	public void testTreeParserWithSynPred() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT+ (PERIOD|SEMI);\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"SEMI : ';' ;\n"+
+			"PERIOD : '.' ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n" +
+			"options {k=1; backtrack=true; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+			"a : ID INT+ PERIOD {System.out.print(\"alt 1\");}"+
+			"  | ID INT+ SEMI   {System.out.print(\"alt 2\");}\n" +
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "a 1 2 3;");
+		assertEquals("alt 2\n", found);
+	}
+
+	public void testTreeParserWithNestedSynPred() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT+ (PERIOD|SEMI);\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"SEMI : ';' ;\n"+
+			"PERIOD : '.' ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		// backtracks in a and b due to k=1
+		String treeGrammar =
+			"tree grammar TP;\n" +
+			"options {k=1; backtrack=true; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+			"a : ID b {System.out.print(\" a:alt 1\");}"+
+			"  | ID INT+ SEMI   {System.out.print(\" a:alt 2\");}\n" +
+			"  ;\n" +
+			"b : INT PERIOD  {System.out.print(\"b:alt 1\");}" + // choose this alt for just one INT
+			"  | INT+ PERIOD {System.out.print(\"b:alt 2\");}" +
+			"  ;";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "a 1 2 3.");
+		assertEquals("b:alt 2 a:alt 1\n", found);
+	}
+
 	public void testSynPredWithOutputTemplate() throws Exception {
 		// really just seeing if it will compile
 		String grammar =

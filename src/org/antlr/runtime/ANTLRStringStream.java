@@ -163,12 +163,12 @@ public class ANTLRStringStream implements CharStream {
     }
 
     public void rewind(int m) {
-		release(m);
 		CharStreamState state = (CharStreamState)markers.get(m);
 		// restore stream state
 		seek(state.p);
 		line = state.line;
 		charPositionInLine = state.charPositionInLine;
+		release(m);
 	}
 
 	public void rewind() {

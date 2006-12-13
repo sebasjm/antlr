@@ -287,6 +287,12 @@ CHANGES
 
 3.0b6 - ??
 
+December 13, 2006
+ 
+* Changed the way mark()/rewind() work in CommonTreeNode stream to mirror
+  more flexible solution in ANTLRStringStream.  Forgot to set lastMarker
+  anyway.  Now you can rewind to non-most-recent marker.
+
 December 12, 2006
 
 * Temp lexer now end in .gl (T__.gl, for example)
