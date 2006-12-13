@@ -27,7 +27,8 @@
 */
 
 /*
- * This code generating template was produced by Jim "Any relation to Eric?" Idle. 
+ * This code generating template and the assocated C runtime was produced by:
+ * Jim Idle jimi|hereisanat|idle|dotgoeshere|ws. 
  * If it does cause the destruction of the UniVerse, it will be pretty cool so long as 
  * I am in a different one at the time. 
  */
@@ -134,222 +135,6 @@ outputFile( LEXER,
 
 <endif>
 
-/* =============================================================================
- * Functions to create and destroy scopes. First come the rule scopes, followed
- * by the global declared scopes.
- */
-
-<rules: {r |<if(r.ruleDescriptor.ruleScope)>
-<ruleAttributeScopeFuncDecl(scope=r.ruleDescriptor.ruleScope)>
-<ruleAttributeScopeFuncs(scope=r.ruleDescriptor.ruleScope)>
-<endif>}>
-
-<recognizer.scopes:{<if(it.isDynamicGlobalScope)>
-<ruleAttributeScopeDef(scope=it)>
-<globalAttributeScopeFuncDecl(scope=it)>
-<globalAttributeScopeFuncs(scope=it)>
-<endif>}>
-
-/* ============================================================================= */
-
-/* =============================================================================
- * Start of recognizer
- */
-
-<recognizer>
-
-/* End of code
- * =============================================================================
- */
-
->>
-
-headerFile( LEXER,
-            PARSER,
-            TREE_PARSER,
-            actionScope, 
-            actions,
-            docComment, 
-            recognizer,
-            name, 
-            tokens, 
-            tokenNames, 
-            rules,
-            cyclicDFAs,
-            bitsets,
-            buildTemplate,
-            profile,
-            backtracking, 
-            synpreds, 
-            memoize, 
-            numRules,
-            fileName,
-            ANTLRVersion,
-            generatedTimestamp,
-            scopes,
-	    superClass,
-            trace,
-            literals
-        ) ::=
-<<
-<leadIn("C header")>
-<if(PARSER)>
- * The parser <mainName()>
-<endif>
-<if(LEXER)>
- * The lexer <mainName()>
-<endif>
-<if(TREE_PARSER)>
- * The tree parser <mainName()>
-<endif>
-has the callable functions (rules) shown below,
- * which will invoke the code for the associated rule in the source grammar
- * assuming that the input stream is pointing to a token/text stream that could begin
- * this rule.
- * 
- * For instance if you call the first (topmost) rule in a parser grammar, you will
- * get the results of a full parse, but calling a rule half way through the grammar will
- * allow you to pass part of a full token stream to the parser, such as for syntax checking
- * in editors and so on.
- *
- * The parser entry points are called indirectly (by function pointer to function) via
- * a parser context typedef p<name>, which is returned from a call to <name>New().
- *
-<if(LEXER)>
- * As this is a generated lexer, it is unlikely you will call it 'manually'. However
- * the entry points are provided anyway.
- *
-<endif>
- * The entry points for <name> are  as follows:
- *
- * <rules: {r |  - <headerReturnType(ruleDescriptor=r.ruleDescriptor,...)>      p<name>-><r.ruleDescriptor.name>(p<name>)}; separator="\n * ">
- *
- * The return type for any particular rule is of course determined by the source
- * grammar file.
- */
-#ifndef	_<name>_H
-#define _<name>_H
-<actions.(actionScope).preincludes>
-/* =============================================================================
- * Standard antlr3 C runtime definitions
- */
-#include    \<antlr3.h>
-
-/* End of standard antlr 3 runtime definitions
- * =============================================================================
- */
-<actions.(actionScope).includes>
-<actions.(actionScope).header>
-
-#ifdef	WIN32
-// Disable: Unreferenced parameter,                - Rules with parameters that are not used
-//          constant conditional,                  - ANTLR realizes that a prediction is always true (synpred usually)
-//          initialized but unused variable        - tree rewrite vairables declared but not needed
-//          potentially unitialized variable used  - retval always returned from a rule 
-//
-// These are only really displayed at waring level /W4 but that is the code ideal I am aiming at
-// and the codegen must generate some of these warnings by necessity, apart from 4100, which is
-// usually generated when a parser rule is given a parameter that it does not use. Mostly though
-// this is a matter of orthogonality hence I disable that one.
-//
-#pragma warning( disable : 4100 )
-#pragma warning( disable : 4127 )
-#pragma warning( disable : 4189 )
-#pragma warning( disable : 4701 )
-#endif
-<if(backtracking)>
-
-/* ========================
- * BACKTRACKING IS ENABLED
- * ========================
- */
-<endif>
-
-<rules:{r |<headerReturnScope(ruleDescriptor=r.ruleDescriptor,...)>}>
-
-<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDecl(scope=it)><endif>}>
-<rules:{r |<ruleAttributeScopeDecl(scope=r.ruleDescriptor.ruleScope)>}>
-<rules:{r |<ruleAttributeScopeFuncMacro(scope=r.ruleDescriptor.ruleScope)>}>
-
-/** Context tracking structure for <mainName()>
- */
-typedef struct <name>_Ctx_struct
-{
-    /** Built in ANTLR3 context tracker contains all the generic elements
-     *  required for context tracking.
-     */
-<if(PARSER)>
-    pANTLR3_PARSER   pParser;
-<endif>
-<if(LEXER)>
-    pANTLR3_LEXER    pLexer;
-<endif>
-<if(TREE_PARSER)>
-    pANTLR3_TREE_PARSER	    pTreeParser;
-<endif>
-<scopes:{<if(it.isDynamicGlobalScope)>
-    <globalAttributeScopeDef(scope=it)>
-<endif>}; separator="\n\n">
-<rules: {r |<if(r.ruleDescriptor.ruleScope)>
-    <ruleAttributeScopeDef(scope=r.ruleDescriptor.ruleScope)>
-<endif>}>
-
-<if(LEXER)>
-    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*m<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
-<endif>
-<if(PARSER)>
-    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
-<endif>
-<if(TREE_PARSER)>
-    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
-<endif>
-    unsigned char * (*getGrammarFileName)();
-    void	    (*free)   (struct <name>_Ctx_struct * ctx);
-    <@members>
-
-    <@end>
-}
-    <name>, * p<name>;
-
-<if(LEXER)>
-/* Function protoypes for the lexer functions that external translation units
- * may wish to call.
- */
-ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream);
-<endif>
-<if(PARSER)>
-/* Function protoypes for the parser functions that external translation units
- * may wish to call.
- */
-ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
-<endif>
-<if(TREE_PARSER)>
-/* Function protoypes for the treeparser functions that external translation units
- * may wish to call.
- */
-ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instream);
-<endif>
-/** Symbolic definitions of all the tokens that the <grammarType()> will work with.
- * \{
- *
- * Antlr will define EOF, but we can't use that as it it is too common in
- * in C header files and that would be confusing. There is no way to filter this out at the moment
- * so we just undef it here for now. That isn't the value we get back from C recognizers
- * anyway. We are looking for ANTLR3_TOKEN_EOF.
- */
-#ifdef	EOF
-#undef	EOF
-#endif
-#ifdef	Tokens
-#undef	Tokens
-#endif 
-<tokens:{#define <it.name>      <it.type>}; separator="\n">
-
-
-/* End of token definitions for <name>
- * =============================================================================
- */
-/** \} */
 
 /* Work arounds because ruleScopeRef() does not have access to <name>
  */
@@ -370,8 +155,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
  * probably more readable than ctx->input->istream->input(snarfle0->blarg) and allows me to rejig
  * the runtime interfaces without changing the generated code too often, without
  * confusing the reader of the generated output, who may not wish to know the gory
- * details of the interface inheritence and without nailing anybody to a cross for 
- * suggesting we just be nice to each other.
+ * details of the interface inheritence.
  */
 <if(LEXER)>
  
@@ -557,7 +341,6 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #define	    precoverFromMismatchedElement(e)	rec->recoverFromMismatchedElement(rec, s)
 <endif>
 
-#endif
 
 #ifndef	ANTLR3_TOKEN_STRUCT
 #define ANTLR3_TOKEN_STRUCT
@@ -575,6 +358,225 @@ typedef struct ANTLR3_TOKEN_STRUCT_struct
     
 #endif
 
+
+/* =============================================================================
+ * Functions to create and destroy scopes. First come the rule scopes, followed
+ * by the global declared scopes.
+ */
+
+<rules: {r |<if(r.ruleDescriptor.ruleScope)>
+<ruleAttributeScopeFuncDecl(scope=r.ruleDescriptor.ruleScope)>
+<ruleAttributeScopeFuncs(scope=r.ruleDescriptor.ruleScope)>
+<endif>}>
+
+<recognizer.scopes:{<if(it.isDynamicGlobalScope)>
+<ruleAttributeScopeDef(scope=it)>
+<globalAttributeScopeFuncDecl(scope=it)>
+<globalAttributeScopeFuncs(scope=it)>
+<endif>}>
+
+/* ============================================================================= */
+
+/* =============================================================================
+ * Start of recognizer
+ */
+
+<recognizer>
+
+/* End of code
+ * =============================================================================
+ */
+
+>>
+
+headerFile( LEXER,
+            PARSER,
+            TREE_PARSER,
+            actionScope, 
+            actions,
+            docComment, 
+            recognizer,
+            name, 
+            tokens, 
+            tokenNames, 
+            rules,
+            cyclicDFAs,
+            bitsets,
+            buildTemplate,
+            profile,
+            backtracking, 
+            synpreds, 
+            memoize, 
+            numRules,
+            fileName,
+            ANTLRVersion,
+            generatedTimestamp,
+            scopes,
+	    superClass,
+            trace,
+            literals
+        ) ::=
+<<
+<leadIn("C header")>
+<if(PARSER)>
+ * The parser <mainName()>
+<endif>
+<if(LEXER)>
+ * The lexer <mainName()>
+<endif>
+<if(TREE_PARSER)>
+ * The tree parser <mainName()>
+<endif>
+has the callable functions (rules) shown below,
+ * which will invoke the code for the associated rule in the source grammar
+ * assuming that the input stream is pointing to a token/text stream that could begin
+ * this rule.
+ * 
+ * For instance if you call the first (topmost) rule in a parser grammar, you will
+ * get the results of a full parse, but calling a rule half way through the grammar will
+ * allow you to pass part of a full token stream to the parser, such as for syntax checking
+ * in editors and so on.
+ *
+ * The parser entry points are called indirectly (by function pointer to function) via
+ * a parser context typedef p<name>, which is returned from a call to <name>New().
+ *
+<if(LEXER)>
+ * As this is a generated lexer, it is unlikely you will call it 'manually'. However
+ * the entry points are provided anyway.
+ *
+<endif>
+ * The entry points for <name> are  as follows:
+ *
+ * <rules: {r |  - <headerReturnType(ruleDescriptor=r.ruleDescriptor,...)>      p<name>-><r.ruleDescriptor.name>(p<name>)}; separator="\n * ">
+ *
+ * The return type for any particular rule is of course determined by the source
+ * grammar file.
+ */
+#ifndef	_<name>_H
+#define _<name>_H
+<actions.(actionScope).preincludes>
+/* =============================================================================
+ * Standard antlr3 C runtime definitions
+ */
+#include    \<antlr3.h>
+
+/* End of standard antlr 3 runtime definitions
+ * =============================================================================
+ */
+<actions.(actionScope).includes>
+<actions.(actionScope).header>
+
+#ifdef	WIN32
+// Disable: Unreferenced parameter,                - Rules with parameters that are not used
+//          constant conditional,                  - ANTLR realizes that a prediction is always true (synpred usually)
+//          initialized but unused variable        - tree rewrite vairables declared but not needed
+//          potentially unitialized variable used  - retval always returned from a rule 
+//
+// These are only really displayed at warning level /W4 but that is the code ideal I am aiming at
+// and the codegen must generate some of these warnings by necessity, apart from 4100, which is
+// usually generated when a parser rule is given a parameter that it does not use. Mostly though
+// this is a matter of orthogonality hence I disable that one.
+//
+#pragma warning( disable : 4100 )
+#pragma warning( disable : 4127 )
+#pragma warning( disable : 4189 )
+#pragma warning( disable : 4701 )
+#endif
+<if(backtracking)>
+
+/* ========================
+ * BACKTRACKING IS ENABLED
+ * ========================
+ */
+<endif>
+
+<rules:{r |<headerReturnScope(ruleDescriptor=r.ruleDescriptor,...)>}>
+
+<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDecl(scope=it)><endif>}>
+<rules:{r |<ruleAttributeScopeDecl(scope=r.ruleDescriptor.ruleScope)>}>
+<rules:{r |<ruleAttributeScopeFuncMacro(scope=r.ruleDescriptor.ruleScope)>}>
+
+/** Context tracking structure for <mainName()>
+ */
+typedef struct <name>_Ctx_struct
+{
+    /** Built in ANTLR3 context tracker contains all the generic elements
+     *  required for context tracking.
+     */
+<if(PARSER)>
+    pANTLR3_PARSER   pParser;
+<endif>
+<if(LEXER)>
+    pANTLR3_LEXER    pLexer;
+<endif>
+<if(TREE_PARSER)>
+    pANTLR3_TREE_PARSER	    pTreeParser;
+<endif>
+<scopes:{<if(it.isDynamicGlobalScope)>
+    <globalAttributeScopeDef(scope=it)>
+<endif>}; separator="\n\n">
+<rules: {r |<if(r.ruleDescriptor.ruleScope)>
+    <ruleAttributeScopeDef(scope=r.ruleDescriptor.ruleScope)>
+<endif>}>
+
+<if(LEXER)>
+    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*m<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+<endif>
+<if(PARSER)>
+    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+<endif>
+<if(TREE_PARSER)>
+    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+<endif>
+    unsigned char * (*getGrammarFileName)();
+    void	    (*free)   (struct <name>_Ctx_struct * ctx);
+    <@members>
+
+    <@end>
+}
+    <name>, * p<name>;
+
+<if(LEXER)>
+/* Function protoypes for the lexer functions that external translation units
+ * may wish to call.
+ */
+ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream);
+<endif>
+<if(PARSER)>
+/* Function protoypes for the parser functions that external translation units
+ * may wish to call.
+ */
+ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TOKEN_STREAM     instream);
+<endif>
+<if(TREE_PARSER)>
+/* Function protoypes for the treeparser functions that external translation units
+ * may wish to call.
+ */
+ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instream);
+<endif>
+/** Symbolic definitions of all the tokens that the <grammarType()> will work with.
+ * \{
+ *
+ * Antlr will define EOF, but we can't use that as it it is too common in
+ * in C header files and that would be confusing. There is no way to filter this out at the moment
+ * so we just undef it here for now. That isn't the value we get back from C recognizers
+ * anyway. We are looking for ANTLR3_TOKEN_EOF.
+ */
+#ifdef	EOF
+#undef	EOF
+#endif
+#ifdef	Tokens
+#undef	Tokens
+#endif 
+<tokens:{#define <it.name>      <it.type>}; separator="\n">
+
+
+/* End of token definitions for <name>
+ * =============================================================================
+ */
+/** \} */
+
+#endif
 /* END - Note:Keep extra linefeed to satisfy UNIX systems */
 
 >>
@@ -781,38 +783,64 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
  *  at backtracking==1.
  */
 filteringNextToken() ::= <<
-static ANTLR3_TOKEN 
-<name>nextToken(p<name> lexCtx) 
+static pANTLR3_COMMON_TOKEN 
+<name>nextToken(p<name> ctx) 
 {
+    /* Get rid of any previous token (token factory takes care of
+     * any deallocation when this token is finally used up.
+     */
+    lexr->token		    = NULL;
+    lexr->rec->error	    = ANTLR3_FALSE;	    /* Start out without an exception	*/
+    lexr->rec->failed	    = ANTLR3_FALSE;
 
-    while (true) {
-        if ( LA(1)==CharStream.EOF ) {
-            return ANTLR_EOF_TOKEN;
-        }
-    ltoken  = NULL;
-    tokenStartCharIndex = getCharIndex();
-	text = NULL;
-        try {
-            int m = input.mark();
-            backtracking=1; <! means we won't throw slow exception !>
-            failed=false;
-            mTokens();
-            backtracking=0;
-            <! mTokens backtracks with synpred at backtracking==2
+    /* Record the start of the token in our input stream.
+     */
+    lexer->tokenStartCharIndex	= lexer->getCharIndex(lexer);   
+
+    /* Now call the matching rules and see if we can generate a new token
+     */
+    for	(;;)
+    {
+	if  (lexr->input->istream->LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
+	{
+	    /* Reached the end of the stream, nothing more to do.
+	     */
+	    pANTLR3_COMMON_TOKEN    teof = lexer->input->istream->eofToken;
+
+	    teof->setStartIndex (teof, lexr->getCharIndex(lexr));
+	    teof->setStopIndex  (teof, lexr->getCharIndex(lexr));
+	    teof->setLine	(teof, lexr->getLine(lexr));
+	    return  teof;
+	}
+	
+	ltoken()			= NULL;
+	lexr->rec->error		= ANTLR3_FALSE;	    /* Start out without an exception	*/
+	
+	{
+	    ANTLR3_UINT64   m;
+	    
+	    m			= markMyWords();
+	    backtracking	= 1;
+	    failedFlag		= ANTLR3_FALSE;
+	 
+	    /* Call the generated lexer, see if it can get a new token together.
+	     */
+    	    lexer->mTokens(lexer->ctx);   
+    	    backtracking	= 0;
+    	    
+    	    <! mTokens backtracks with synpred at backtracking==2
                and we set the synpredgate to allow actions at level 1. !>
-            if ( failed ) {
-                input.rewind(m);
-                input.consume(); <! advance one char and try again !>
-            }
-            else {
-                return token;
-            }
-        }
-        catch (RecognitionException re) {
-            // shouldn't happen in backtracking mode, but...
-            reportError(re);
-            recover(re);
-        }
+               
+            if	(hasFailed())
+            {
+		rewindInput(m);
+		inputConsume(); <! advance one char and try again !>
+	    }
+	    else
+	    {
+		return	ltoken();
+	    }	
+	}
     }
 }
 
@@ -1132,9 +1160,9 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:parameterScope(scope=it)>) 
 {   
 <if(trace)>
-	printf("enter <ruleName> %d failed = %d, backtracking = %d\\n",input.LT(1),failed,backtracking);
-        <block>
-        printf("exit <ruleName> %d, failed = %d, backtracking = %d\\n",input.LT(1),failed,backtracking);
+    printf("enter <ruleName> %d failed = %d, backtracking = %d\\n",input.LT(1),failed,backtracking);
+    <block>
+    printf("exit <ruleName> %d, failed = %d, backtracking = %d\\n",input.LT(1),failed,backtracking);
     
 <else>
     <block>
@@ -1142,7 +1170,6 @@ static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:param
 <ruleCleanUp()>
 }
 // $ANTLR end <ruleName>
-/* End synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) */
 >>
 
 synpred(predname) ::= <<
@@ -1180,8 +1207,6 @@ if ( backtracking>0 && haveAlreadyParsedRule(<ruleDescriptor.index>) )
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
 <if(backtracking)>
-/* checkRuleBacktrackFailure()
- */
 if (hasFailed())
 {
     return <ruleReturnValue()>;
@@ -1192,8 +1217,6 @@ if (hasFailed())
 /** This rule has failed, exit indicating failure during backtrack */
 ruleBacktrackFailure() ::= <<
 <if(backtracking)>
-/* ruleBacktrackFailure()
- */
 if (backtracking>0)
 {
     failedFlag = <true()>; 
@@ -1206,8 +1229,7 @@ if (backtracking>0)
  *  data aggregates required for multiple return values.
  */
 rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::= <<
-/* rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions)
- * 
+/** 
  * $ANTLR start <ruleName>
  * <fileName>:<description>
  */
@@ -1247,7 +1269,7 @@ static <returnType()>
     <@postamble()>
     return <ruleReturnValue()>;
 }
-// $ANTLR end <ruleName>
+/* $ANTLR end <ruleName> */
 >>
 
 catch(decl,action) ::= <<
@@ -1260,8 +1282,6 @@ if  (hasException() && theException()->type == <e.decl> )
 >>
 
 ruleDeclarations() ::= <<
-/* ruleDeclarations()
- */
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval;
 <else>
@@ -1275,20 +1295,16 @@ ANTLR3_UINT64 <ruleDescriptor.name>_StartIndex;
 >>
 
 ruleInitializations() ::= <<
-/* Initilalize rule variables
+/* Initialize rule variables
  */
 <if(memoize)>
 <ruleDescriptor.name>_StartIndex = theInput()->index(theInput());
 <endif>
 <ruleDescriptor.useScopes:{<scopeTop(sname=it.name)> = <scopePush(sname=it.name)>;}; separator="\n">
 <ruleDescriptor.ruleScope:{<scopeTop(sname=it.name)> = <scopePush(sname=it.name)>;}; separator="\n">
-/* End ruleDeclarations()
- */
 >>
 
 ruleLabelDefs() ::= <<
-/* ruleLabelDefs()
- */
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
     :{<labelType>    <it.label.text>;}; separator="\n"
 >
@@ -1304,8 +1320,6 @@ ruleLabelDefs() ::= <<
 >>
 
 ruleLabelInitializations() ::= <<
-/* ruleLabelInitializations()
- */
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
     :{<it.label.text>       = NULL;}; separator="\n"
 >
@@ -1333,8 +1347,6 @@ retval
 >>
 
 ruleCleanUp() ::= <<
-/* ruleCleanUp()
- */
 <if(memoize)>
 <if(backtracking)>
 if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
@@ -1352,8 +1364,6 @@ rule<ruleDescriptor.name>Ex: ;
  *  fragment rules, which do not produce tokens.
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
-/* lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) 
- */
 /** \brief Lexer rule generated by ANTLR3
  *
  * $ANTLR start <ruleName>
@@ -1384,6 +1394,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
 <else>
     ANTLR3_UINT32	    _type;
     ANTLR3_UINT64	    _start;
+    ANTLR3_UINT64	    _end;
     ANTLR3_UINT64	    _line;
     ANTLR3_UINT32	    _charPosition;
     ANTLR3_UINT32	    _channel;
@@ -1391,6 +1402,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     ctx->pLexer->ruleNestingLevel++;
     _type	    = <ruleName>;
     _start	    = getCharIndex();
+    _end	    = 0;
     _line	    = getLine();
     _charPosition   = getCharPositionInLine();
     _channel	    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
@@ -1403,7 +1415,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <execAction({     
     if ( ltoken() == NULL && !hasException()) 
     {
-		emitNew(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
+		emitNew(_type,_line,_charPosition,_channel,_start, (_end==0 ? getCharIndex()-1 : _end));
     }<\n>
     }
     )>
@@ -1421,8 +1433,6 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
  *  that chooses between lexer rules.
  */
 tokensRule(ruleName,nakedBlock,args,block,ruleDescriptor) ::= <<
-/* tokensRule(ruleName,nakedBlock,args,block,ruleDescriptor)
- */
 /** This is the entry point in to the lexer from an object that
  *  wants to generate the next token, such as a pCOMMON_TOKEN_STREAM
  */
@@ -1441,10 +1451,7 @@ ruleTokensEx: ;
 /** A (...) subrule with multiple alternatives */
 block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 
-/* block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description)
- *
- * <fileName>:<description>
- */
+/* <fileName>:<description> */
 {
     int alt<decisionNumber>=<maxAlt>;
     <decls>
@@ -1463,10 +1470,8 @@ block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,max
 /** A rule block with multiple alternatives */
 ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 {
-    /* ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description)
-    *
-    * <fileName>:<description>
-    */
+    /*  <fileName>:<description>    */
+    
     ANTLR3_UINT32 alt<decisionNumber>;
 
     alt<decisionNumber>=<maxAlt>;
@@ -1483,9 +1488,7 @@ ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK
 >>
 
 ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-/* ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description)
- * <fileName>:<description>
- */
+/* <fileName>:<description> */
 <decls>
 <@prealt()>
 <alts>
@@ -1494,9 +1497,7 @@ ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNu
 
 /** A special case of a (...) subrule with a single alternative */
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-/* blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) 
- * <fileName>:<description>
- */
+/* <fileName>:<description> */
 <decls>
 <@prealt()>
 <alts>
@@ -1505,9 +1506,7 @@ blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber
 
 /** A (..)+ block with 1 or more alternatives */
 positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
-/* positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) 
- * <fileName>:<description>
- */
+/* <fileName>:<description> */
 {
     int cnt<decisionNumber>=0;
     <decls>
@@ -1553,10 +1552,7 @@ positiveClosureBlockSingleAlt ::= positiveClosureBlock
 /** A (..)* block with 1 or more alternatives */
 closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
 
-/* closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) 
- *
- * <fileName>:<description>
- */
+/* <fileName>:<description> */
 <decls>
 
 <@preloop()>
@@ -1592,8 +1588,6 @@ optionalBlockSingleAlt ::= block
  *  does the jump to the code that actually matches that alternative.
  */
 altSwitchCase() ::= <<
-/* altSwitchCase()
- */
 case <i>:
     <@prealt()>
     <it>
@@ -1602,9 +1596,7 @@ case <i>:
 
 /** An alternative is just a list of elements; at outermost level */
 alt(elements,altNum,description,autoAST,outerAlt) ::= <<
-/* alt(elements,altNum,description,autoAST,outerAlt)
- * <fileName>:<description>
- */
+/* <fileName>:<description> */
 {
     <@declarations()>
     <@initializations()>
@@ -1617,16 +1609,12 @@ alt(elements,altNum,description,autoAST,outerAlt) ::= <<
 
 /** Dump the elements one per line */
 element() ::= <<
-/* element()
- */
 <@prematch()>
 <it.el><\n>
 >>
 
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex) ::= <<
-/* tokenRef(token,label,elementIndex)
- */
 <if(label)>
 <label> = (<labelType>)LT(1);<\n>
 <endif>
@@ -1636,15 +1624,11 @@ tmatch(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>);
 
 /** ids+=ID */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
-/* tokenRefAndListLabel(token,label,elementIndex)
- */
 <tokenRef(...)>
 <listLabel(...)>
 >>
 
 listLabel(label) ::= <<
-/* listLabel(label)
- */
 if (list_<label> == NULL)
 {
     list_<label>=ctx->vectors->newVector(ctx->vectors);
@@ -1655,8 +1639,6 @@ list_<label>->add(list_<label>, <label>, NULL);
 
 /** match a character */
 charRef(char,label) ::= <<
-/* charRef(char,label)
- */
 <if(label)>
 <label> = LA(1);<\n>
 <endif>
@@ -1666,16 +1648,12 @@ matchc(<char>);
 
 /** match a character range */
 charRangeRef(a,b) ::= <<
-/* charRangeRef(a,b)
- */
 matchRange(<a>, <b>); 
 <checkRuleBacktrackFailure()>
 >>
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
-/* matchSet(s,label,elementIndex,postmatchCode="")
- */
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
@@ -1703,8 +1681,6 @@ else
 >>
 
 mismatchedSetEx() ::= <<
-/* mismatchedSetEx()
- */
 exConstruct();
 theException()->type         = ANTLR3_MISMATCHED_SET_EXCEPTION;
 theException()->name         = ANTLR3_MISMATCHED_SET_NAME;
@@ -1714,16 +1690,12 @@ theException()->expectingSet = FOLLOW_set_in_<ruleName><elementIndex>;
 >>
 
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
-/* matchSetAndListLabel(s,label,elementIndex,postmatchCode)
- */
 <matchSet(...)>
 <listLabel(...)>
 >>
 
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
-/* lexerStringRef(string,label)
- */
 <if(label)>
 int <label>Start = getCharIndex();
 matchs(<string>); 
@@ -1740,8 +1712,6 @@ matchs(<string>);
 >>
 
 wildcard(label,elementIndex) ::= <<
-/* wildcard(label,elementIndex)
- */
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
@@ -1750,16 +1720,12 @@ tmatchAny();
 >>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
-/* wildcardAndListLabel(label,elementIndex)
- */
 <wildcard(...)>
 <listLabel(...)>
 >>
 
 /** Match . wildcard in lexer */
 wildcardChar(label, elementIndex) ::= <<
-/* wildcardChar(label, elementIndex)
- */
 <if(label)>
 int <label> = LA(1);<\n>
 <endif>
@@ -1768,8 +1734,6 @@ matchAny();
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
-/* wildcardCharListLabel(label, elementIndex)
- */
 <wildcardChar(...)>
 <listLabel(...)>
 >>
@@ -1778,8 +1742,6 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  and a return value or values.
  */
 ruleRef(rule,label,elementIndex,args) ::= <<
-/* ruleRef(rule,label,elementIndex,args)
- */
 followPush(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
 <label>=<rule>(ctx<if(args)>, <args; separator=", "><endif>);<\n>
@@ -1796,17 +1758,13 @@ _fsp--;
 
 /** ids+=ID */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
-/* ruleRefAndListLabel(rule,label,elementIndex,args)
- */
 <ruleRef(...)>
 <listLabel(...)>
 >>
 
 /** A lexer rule reference */
 lexerRuleRef(rule,label,args) ::= <<
-/* lexerRuleRef(rule,label,args)
- * From: <description>
- */
+/* <description> */
 <if(label)>
 {
     ANTLR3_UINT64 <label>Start = getCharIndex();
@@ -1826,8 +1784,6 @@ m<rule>(ctx <if(args)>, <endif><args; separator=", ">);
 
 /** EOF in the lexer */
 lexerMatchEOF(label) ::= <<
-/* lexerMatchEOF(label)
- */
 <if(label)>
 {
     int <label>Start = getCharIndex();
@@ -1848,8 +1804,6 @@ lexerMatchEOF(label) ::= <<
 
 /** match ^(root children) in tree parser */
 tree(root, children, nullableChildList) ::= <<
-/* tree(root, children)
- */
 <root:element()>
 <if(nullableChildList)>
 if ( LA(1)==ANTLR3_TOKEN_DOWN ) {
@@ -1872,8 +1826,6 @@ tmatch(ANTLR3_TOKEN_UP, NULL);
  *  also hoisted into a prediction expression).
  */
 validateSemanticPredicate(pred,description) ::= <<
-/* validateSemanticPredicate(pred,description) 
- */
 if ( !(<evalPredicate(...)>) ) 
 {
     <ruleBacktrackFailure()>
@@ -1882,8 +1834,6 @@ if ( !(<evalPredicate(...)>) )
 >>
 
 newFPE() ::= <<
-    /* newFPE()
-     */
     exConstruct();
     theException()->type         = ANTLR3_FAILED_PREDICATE_EXCEPTION;
     theException()->message      = "<description>";
@@ -1895,8 +1845,6 @@ newFPE() ::= <<
 
 dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 
-/* dfaState(k,edges,eotPredictsAlt,description,stateNumber)
- */
 {
 <if(!semPredState)>
     int LA<decisionNumber>_<stateNumber> = LA(<k>);
@@ -1918,8 +1866,6 @@ dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 >>
 
 newNVException() ::= <<
-/* newNVException()
- */
 exConstruct();
 theException()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
 theException()->message      = "<description>";
@@ -1935,8 +1881,6 @@ theException()->state        = <stateNumber>;
  *  expect "if ( LA(1)==X ) match(X);" and that's it.
  */
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-/* dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,sempredState)
- */
 {
     <if(!semPredState)>
     int LA<decisionNumber>_<stateNumber> = LA(<k>);
@@ -1953,8 +1897,6 @@ dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredStat
  */
 
 dfaLoopbackStateDecls()::= <<
-/* dfaLoopbackStateDecls(decisionNumber)
- */
 ANTLR3_UINT32   LA<decisionNumber>_<stateNumber>;
 >>
 dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
@@ -1975,15 +1917,13 @@ dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::
 >>
 
 /** An accept state indicates a unique alternative has been predicted */
-dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>; /* dfaAcceptState(alt) */"
+dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>;"
 
 /** A simple edge with an expression.  If the expression is satisfied,
  *  enter to the target state.  To handle gated productions, we may
  *  have to evaluate some predicates for this edge.
  */
 dfaEdge(labelExpr, targetState, predicates) ::= <<
-/* dfaEdge(labelExpr, targetState, predicates)
- */
 if ( (<labelExpr>) <if(predicates)>&& (<predicates>)<endif>) 
 {
     <targetState>
@@ -1996,8 +1936,6 @@ if ( (<labelExpr>) <if(predicates)>&& (<predicates>)<endif>)
  *  decides if this is possible: CodeGenerator.canGenerateSwitch().
  */
 dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-/* dfaStateSwitch(k,edges,eotPredictsAlt,description,stateNumber,semPredState)
- */
 switch ( LA(<k>) ) 
 {
 <edges; separator="\n">
@@ -2014,8 +1952,6 @@ default:
 >>
 
 dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-/* dfaOptionalBlockStateSwitch(k,edges,eotPredictsAlt,description,stateNumber)
- */
 switch ( LA(<k>) ) 
 {
     <edges; separator="\n">
@@ -2023,8 +1959,6 @@ switch ( LA(<k>) )
 >>
 
 dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-/* dfaLoopbackStateSwitch(k, edges,eotPredictsAlt,description,stateNumber,semPredState)
- */
 switch ( LA(<k>) ) 
 {
 <edges; separator="\n"><\n>
@@ -2037,8 +1971,6 @@ default:
 >>
 
 dfaEdgeSwitch(labels, targetState) ::= <<
-/* dfaEdgeSwitch(labels, targetState)
- */
 <labels:{case <it>:}; separator="\n">
     <targetState>
     break;
@@ -2051,8 +1983,6 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  *  The <name> attribute is inherited via the parser, lexer, ...
  */
 dfaDecision(decisionNumber,description) ::= <<
-/* dfaDecision(decisionNumber,description)
- */
 alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, rec, theInput()->istream, &cdfa<decisionNumber>);
 >>
 
@@ -2194,8 +2124,6 @@ break;
  *  state to jump to next if successful.
  */
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates) ::= <<
-/* cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates)
- */
 if ( <labelExpr> <if(predicates)>&& <predicates><endif>)
 {
     s = <targetStateNumber>;
@@ -2696,6 +2624,7 @@ lexerRulePropertyRef_line(scope,attr) ::= "_line"
 lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
 lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
 lexerRulePropertyRef_start(scope,attr) ::= "_start"
+lexerRulePropertyRef_end(scope,attr) ::= "_end"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 
 
@@ -2706,8 +2635,6 @@ ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st=<expr>;"
 
 /** How to execute an action */
 execAction(action) ::= <<
-/* execAction(action)
- */
 <if(backtracking)>
 <if(actions.(actionScope).synpredgate)>
 if ( <actions.(actionScope).synpredgate> ) 
