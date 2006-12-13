@@ -16,6 +16,13 @@ public class TreeParser extends BaseRecognizer {
 		setTreeNodeStream(input);
 	}
 
+	public void reset() {
+		super.reset(); // reset all recognizer state variables
+		if ( input!=null ) {
+			input.seek(0); // rewind the input
+		}
+	}
+
 	/** Set the input stream and reset the parser */
 	public void setTreeNodeStream(TreeNodeStream input) {
 		this.input = input;

@@ -56,10 +56,18 @@ public abstract class BaseRecognizer {
 	 */
 	protected Map[] ruleMemo;
 
-	/** reset the parser's state */
+	/** reset the parser's state; subclasses must rewinds the input stream */
 	public void reset() {
-		// TODO: implement this!
-		//following.setSize(0);
+		// wack everything related to error recovery
+		_fsp = -1;
+		errorRecovery = false;
+		lastErrorIndex = -1;
+		failed = false;
+		// wack everything related to backtracking and memoization
+		backtracking = 0;
+		for (int i = 0; ruleMemo!=null && i < ruleMemo.length; i++) { // wipe cache
+			ruleMemo[i] = null;
+		}
 	}
 
 	/** Match current input symbol against ttype.  Upon error, do one token

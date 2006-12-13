@@ -293,6 +293,8 @@ December 12, 2006
 
 * TreeParser suffix no longer generated for tree grammars
 
+* Defined reset for lexer, parser, tree parser; rewinds the input stream also
+
 December 10, 2006
 
 * Made Grammar.abortNFAToDFAConversion() abort in middle of a DFA.

@@ -71,6 +71,18 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		this.input = input;
 	}
 
+	public void reset() {
+		super.reset(); // reset all recognizer state variables
+		// wack Lexer state variables
+		token = null;
+		tokenStartCharIndex = -1;
+		text = null;
+		ruleNestingLevel = 0;
+		if ( input!=null ) {
+			input.seek(0); // rewind the input
+		}
+	}
+
 	/** Return a token from this source; i.e., match a token on the char
 	 *  stream.
 	 */
