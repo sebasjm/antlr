@@ -27,6 +27,8 @@
 */
 package org.antlr.runtime.tree;
 
+import org.antlr.stringtemplate.StringTemplate;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -156,7 +158,8 @@ public abstract class BaseTree implements Tree {
 		return newTree;
 	}
 
-	public String toStringTree() {
+    /** Print out a whole tree not just a node */
+    public String toStringTree() {
 		if ( children==null || children.size()==0 ) {
 			return this.toString();
 		}
@@ -179,7 +182,7 @@ public abstract class BaseTree implements Tree {
 		return buf.toString();
 	}
 
-	public int getLine() {
+    public int getLine() {
 		return 0;
 	}
 

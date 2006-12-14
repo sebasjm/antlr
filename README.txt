@@ -289,6 +289,20 @@ CHANGES
 
 December 13, 2006
  
+* Added org.antlr.runtime.tree.DOTTreeGenerator so you can generate DOT
+  diagrams easily from trees.
+
+	CharStream input = new ANTLRInputStream(System.in);
+	TLexer lex = new TLexer(input);
+	CommonTokenStream tokens = new CommonTokenStream(lex);
+	TParser parser = new TParser(tokens);
+	TParser.e_return r = parser.e();
+	Tree t = (Tree)r.tree;
+	System.out.println(t.toStringTree());
+	DOTTreeGenerator gen = new DOTTreeGenerator();
+	StringTemplate st = gen.toDOT(t);
+	System.out.println(st);
+
 * Changed the way mark()/rewind() work in CommonTreeNode stream to mirror
   more flexible solution in ANTLRStringStream.  Forgot to set lastMarker
   anyway.  Now you can rewind to non-most-recent marker.

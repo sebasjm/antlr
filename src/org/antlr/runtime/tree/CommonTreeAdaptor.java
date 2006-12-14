@@ -90,7 +90,16 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 		return ((Tree)t).getText();
 	}
 
-	public int getType(Object t) {
+    public int getType(Object t) {
 		return ((Tree)t).getType();
 	}
+
+    public Object getChild(Object t, int i) {
+        return ((Tree)t).getChild(i);
+    }
+
+    public int getChildCount(Object t) {
+        return ((Tree)t).getChildCount();
+    }
+
 }
