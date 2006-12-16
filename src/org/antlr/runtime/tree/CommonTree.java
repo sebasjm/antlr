@@ -93,6 +93,22 @@ public class CommonTree extends BaseTree {
 		return token.getCharPositionInLine();
 	}
 
+	public int getTokenStartIndex() {
+		return startIndex;
+	}
+
+	public void setTokenStartIndex(int index) {
+		startIndex = index;
+	}
+
+	public int getTokenStopIndex() {
+		return stopIndex;
+	}
+
+	public void setTokenStopIndex(int index) {
+		stopIndex = index;
+	}
+
 	public String toString() {
 		if ( isNil() ) {
 			return "nil";

@@ -55,6 +55,10 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	protected static abstract class DummyTree extends BaseTree {
 		public Tree dupNode() {return null;}
+		public int getTokenStartIndex() { return 0; }
+		public void setTokenStartIndex(int index) {}
+		public int getTokenStopIndex() { return 0; }
+		public void setTokenStopIndex(int index) {}
 	}
 
 	// all these navigation nodes are shared and hence they

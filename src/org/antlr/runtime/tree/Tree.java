@@ -30,6 +30,20 @@ public interface Tree {
 	 */
 	boolean isNil();
 
+	/**  What is the smallest token index (indexing from 0) for this node
+	 *   and its children?
+	 */
+	int getTokenStartIndex();
+
+	void setTokenStartIndex(int index);
+
+	/**  What is the largest token index (indexing from 0) for this node
+	 *   and its children?
+	 */
+	int getTokenStopIndex();
+
+	void setTokenStopIndex(int index);
+
 	Tree dupTree();
 
 	Tree dupNode();

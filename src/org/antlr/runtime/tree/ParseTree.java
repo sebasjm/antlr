@@ -50,6 +50,20 @@ public class ParseTree extends BaseTree {
 		return toString();
 	}
 
+	public int getTokenStartIndex() {
+		return 0;
+	}
+
+	public void setTokenStartIndex(int index) {
+	}
+
+	public int getTokenStopIndex() {
+		return 0;
+	}
+
+	public void setTokenStopIndex(int index) {
+	}
+
 	public String toString() {
 		return payload.toString();
 	}

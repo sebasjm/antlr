@@ -287,6 +287,34 @@ CHANGES
 
 3.0b6 - ??
 
+December 15, 2006
+
+* [BREAKS ANY TREE IMPLEMENTATION]
+  org.antlr.runtime.tree.Tree; needed to add get/set for token start/stop
+  index so CommonTreeAdaptor can assume Tree interface not CommonTree
+  implementation.  Otherwise, no way to create your own nodes that satisfy
+  Tree because CommonTreeAdaptor was doing 
+
+	public int getTokenStartIndex(Object t) {
+		return ((CommonTree)t).startIndex;
+	}
+
+  Added to Tree:
+
+	/**  What is the smallest token index (indexing from 0) for this node
+	 *   and its children?
+	 */
+	int getTokenStartIndex();
+
+	void setTokenStartIndex(int index);
+
+	/**  What is the largest token index (indexing from 0) for this node
+	 *   and its children?
+	 */
+	int getTokenStopIndex();	
+
+	void setTokenStopIndex(int index);
+
 December 13, 2006
  
 * Added org.antlr.runtime.tree.DOTTreeGenerator so you can generate DOT

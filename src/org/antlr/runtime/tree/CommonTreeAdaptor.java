@@ -58,7 +58,7 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	}
 
 	/** Track start/stop token for subtree root created for a rule.
-	 *  Only works with CommonTree nodes.  For rules that match nothing,
+	 *  Only works with Tree nodes.  For rules that match nothing,
 	 *  seems like this will yield start=i and stop=i-1 in a nil node.
 	 *  Might be useful info so I'll not force to be i..i.
 	 */
@@ -74,16 +74,16 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 		if ( stopToken!=null ) {
 			stop = stopToken.getTokenIndex();
 		}
-		((CommonTree)t).startIndex = start;
-		((CommonTree)t).stopIndex = stop;
+		((Tree)t).setTokenStartIndex(start);
+		((Tree)t).setTokenStopIndex(stop);
 	}
 
 	public int getTokenStartIndex(Object t) {
-		return ((CommonTree)t).startIndex;
+		return ((Tree)t).getTokenStartIndex();
 	}
 
 	public int getTokenStopIndex(Object t) {
-		return ((CommonTree)t).stopIndex;
+		return ((Tree)t).getTokenStopIndex();
 	}
 
 	public String getText(Object t) {
