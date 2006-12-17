@@ -43,8 +43,8 @@ public class TestTreeParsing extends BaseTest {
 			"    {System.out.println($ID+\", \"+$INT);}\n" +
 			"  ;\n";
 
-		String found = execTreeParser("t.g", grammar, "TParser", "tp.g",
-				    treeGrammar, "TPTreeParser", "TLexer", "a", "a", "abc 34");
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
 		assertEquals("abc, 34\n", found);
 	}
 
@@ -63,8 +63,8 @@ public class TestTreeParsing extends BaseTest {
 			"    {System.out.println($ID+\", \"+$INT);}\n" +
 			"  ;\n";
 
-		String found = execTreeParser("t.g", grammar, "TParser", "tp.g",
-				    treeGrammar, "TPTreeParser", "TLexer", "a", "a", "abc 34");
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
 		assertEquals("abc, 34\n", found);
 	}
 
@@ -86,8 +86,8 @@ public class TestTreeParsing extends BaseTest {
 			"  | ^(ID INT) {System.out.print(\"^(\"+$ID+\" \"+$INT+')');}\n" +
 			"  ;\n";
 
-		String found = execTreeParser("t.g", grammar, "TParser", "tp.g",
-				    treeGrammar, "TPTreeParser", "TLexer", "a", "a", "a 1 b 2");
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "a 1 b 2");
 		assertEquals("^(a 1)b 2\n", found);
 	}
 
@@ -109,8 +109,8 @@ public class TestTreeParsing extends BaseTest {
 			"  | ^(x=ID (y=INT)+) {System.out.print(\"^(\"+$x+' '+$y+')');}\n" +
 			"  ;\n";
 
-		String found = execTreeParser("t.g", grammar, "TParser", "tp.g",
-				    treeGrammar, "TPTreeParser", "TLexer", "a", "a",
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a",
 				    "a 1 2 3 b 4 5");
 		assertEquals("^(a 3)b 5\n", found);
 	}
@@ -132,8 +132,8 @@ public class TestTreeParsing extends BaseTest {
 			"  | ID INT+ SEMI   {System.out.print(\"alt 2\");}\n" +
 			"  ;\n";
 
-		String found = execTreeParser("t.g", grammar, "TParser", "tp.g",
-				    treeGrammar, "TPTreeParser", "TLexer", "a", "a", "a 1 2 3.");
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "a 1 2 3.");
 		assertEquals("alt 1\n", found);
 	}
 
@@ -153,8 +153,8 @@ public class TestTreeParsing extends BaseTest {
 			"a : ID INT -> {new StringTemplate($INT.text)}\n" +
 			"  ;\n";
 
-		String found = execTreeParser("t.g", grammar, "TParser", "tp.g",
-				    treeGrammar, "TPTreeParser", "TLexer", "a", "s", "abc 34");
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
 		assertEquals("34\n", found);
 	}
 
@@ -173,8 +173,8 @@ public class TestTreeParsing extends BaseTest {
 			"    {System.out.println($ID);}\n" +
 			"  ;\n";
 
-		String found = execTreeParser("t.g", grammar, "TParser", "tp.g",
-				    treeGrammar, "TPTreeParser", "TLexer", "a", "a", "abc");
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "abc");
 		assertEquals("abc\n", found);
 	}
 
@@ -194,8 +194,8 @@ public class TestTreeParsing extends BaseTest {
 			"    {System.out.println($ID);}\n" +
 			"  ;\n";
 
-		String found = execTreeParser("t.g", grammar, "TParser", "tp.g",
-				    treeGrammar, "TPTreeParser", "TLexer", "a", "a", "abc;");
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "abc;");
 		assertEquals("abc\n", found);
 	}
 
@@ -216,8 +216,8 @@ public class TestTreeParsing extends BaseTest {
 			"  ;\n"+
 			"b : ID? ;\n";
 
-		String found = execTreeParser("t.g", grammar, "TParser", "tp.g",
-				    treeGrammar, "TPTreeParser", "TLexer", "a", "a", "abc def;");
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "abc def;");
 		assertEquals("abc, def\n", found);
 	}
 
