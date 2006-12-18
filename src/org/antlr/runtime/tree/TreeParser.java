@@ -59,4 +59,12 @@ public class TreeParser extends BaseRecognizer {
 		recoverFromMismatchedToken(input, mte, ttype, follow);
 	}
 
+	public void traceIn(String ruleName, int ruleIndex)  {
+		super.traceIn(ruleName, ruleIndex, input.LT(1));
+	}
+
+	public void traceOut(String ruleName, int ruleIndex)  {
+		super.traceOut(ruleName, ruleIndex, input.LT(1));
+	}
+
 }

@@ -27,6 +27,8 @@
 */
 package org.antlr.runtime.tree;
 
+import org.antlr.runtime.Token;
+
 /** A record of the rules used to match a token sequence.  The tokens
  *  end up as the leaves of this tree and rule nodes are the interior nodes.
  *  This really adds no functionality, it is just an alias for CommonTree
@@ -65,6 +67,13 @@ public class ParseTree extends BaseTree {
 	}
 
 	public String toString() {
+		if ( payload instanceof Token ) {
+			Token t = (Token)payload;
+			if ( t.getType() == Token.EOF ) {
+				return "<EOF>";
+			}
+			return t.getText();
+		}
 		return payload.toString();
 	}
 }

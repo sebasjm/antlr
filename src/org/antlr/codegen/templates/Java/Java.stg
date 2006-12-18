@@ -212,13 +212,13 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
 // $ANTLR start <ruleName>
 public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
-    <if(trace)>System.out.println("enter <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
 <if(trace)>
+    traceIn("<ruleName>_fragment", <ruleDescriptor.index>);
     try {
         <block>
     }
     finally {
-        System.out.println("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);
+        traceOut("<ruleName>_fragment", <ruleDescriptor.index>);
     }
 <else>
     <block>
@@ -275,8 +275,8 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::=
 
 // $ANTLR start <ruleName>
 // <fileName>:<description>
-public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
-    <if(trace)>System.out.println("enter <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
+public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
+    <if(trace)>traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleScopeSetUp()>
     <ruleDeclarations()>
     <ruleLabelDefs()>
@@ -301,11 +301,11 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 <endif>
 <endif>
     finally {
-        <if(trace)>System.out.println("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
+        <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
         <ruleCleanUp()>
         <(ruleDescriptor.actions.finally):execAction()>
         <ruleScopeCleanUp()>
-   }
+    }
     <@postamble()>
     return <ruleReturnValue()>;
 }
@@ -386,7 +386,7 @@ if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.n
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
 // $ANTLR start <ruleName>
 public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
-    <if(trace)>System.out.println("enter <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+    <if(trace)>traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleDeclarations()>
     try {
         ruleNestingLevel++;
@@ -414,7 +414,7 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
     }
     finally {
         ruleNestingLevel--;
-        <if(trace)>System.out.println("exit <ruleName> '"+(char)input.LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+        <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
         <ruleCleanUp()>
         <(ruleDescriptor.actions.finally):execAction()>
     }

@@ -25,39 +25,56 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime;
+package org.antlr.runtime.debug;
 
-/** A parser for TokenStreams.  "parser grammars" result in a subclass
- *  of this.
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.ParseTree;
+
+import java.util.Stack;
+
+/** This parser listener tracks rule entry/exit and token matches
+ *  to build a simple parse tree using ParseTree nodes.
  */
-public class Parser extends BaseRecognizer {
-    protected TokenStream input;
+public class ParseTreeBuilder extends BlankDebugEventListener {
+	Stack callStack = new Stack();
 
-	public Parser(TokenStream input) {
-        setTokenStream(input);
-    }
-
-	public void reset() {
-		super.reset(); // reset all recognizer state variables
-		if ( input!=null ) {
-			input.seek(0); // rewind the input
-		}
+	public ParseTreeBuilder(String grammarName) {
+		ParseTree root = create("<grammar "+grammarName+">");
+		callStack.push(root);
 	}
 
-	/** Set the token stream and reset the parser */
-	public void setTokenStream(TokenStream input) {
-		this.input = input;
+	public ParseTree getTree() {
+		return (ParseTree)callStack.elementAt(0);
 	}
 
-    public TokenStream getTokenStream() {
-		return input;
+	/**  What kind of node to create.  You might want to override
+	 *   so I factored out creation here.
+	 */
+	public ParseTree create(Object payload) {
+		return new ParseTree(payload);
 	}
 
-	public void traceIn(String ruleName, int ruleIndex)  {
-		super.traceIn(ruleName, ruleIndex, input.LT(1));
+	public void enterRule(String ruleName) {
+		ParseTree parentRuleNode = (ParseTree)callStack.peek();
+		ParseTree ruleNode = create(ruleName);
+		parentRuleNode.addChild(ruleNode);
+		callStack.push(ruleNode);
 	}
 
-	public void traceOut(String ruleName, int ruleIndex)  {
-		super.traceOut(ruleName, ruleIndex, input.LT(1));
+	public void exitRule(String ruleName) {
+		callStack.pop();
+	}
+
+	public void consumeToken(Token token) {
+		ParseTree ruleNode = (ParseTree)callStack.peek();
+		ParseTree elementNode = create(token);
+		ruleNode.addChild(elementNode);
+	}
+
+	public void recognitionException(RecognitionException e) {
+		ParseTree ruleNode = (ParseTree)callStack.peek();
+		ParseTree errorNode = create(e);
+		ruleNode.addChild(errorNode);
 	}
 }

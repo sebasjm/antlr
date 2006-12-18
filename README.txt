@@ -287,6 +287,15 @@ CHANGES
 
 3.0b6 - ??
 
+December 17, 2006
+
+* Added traceIn/Out methods to recognizers so that you can override them;
+  previously they were in-line print statements. The message has also
+  been slightly improved.
+
+* Factored BuildParseTree into debug package; cleaned stuff up. Fixed
+  unit tests.
+
 December 15, 2006
 
 * [BREAKS ANY TREE IMPLEMENTATION]

@@ -333,4 +333,13 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		input.consume();
 	}
 
+	public void traceIn(String ruleName, int ruleIndex)  {
+		String inputSymbol = ((char)input.LT(1))+" line="+getLine()+":"+getCharPositionInLine();
+		super.traceIn(ruleName, ruleIndex, inputSymbol);
+	}
+
+	public void traceOut(String ruleName, int ruleIndex)  {
+		String inputSymbol = ((char)input.LT(1))+" line="+getLine()+":"+getCharPositionInLine();
+		super.traceOut(ruleName, ruleIndex, inputSymbol);
+	}
 }

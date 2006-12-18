@@ -699,6 +699,31 @@ public abstract class BaseRecognizer {
 		return n;
 	}
 
+	public void traceIn(String ruleName, int ruleIndex, Object inputSymbol)  {
+		System.out.print("enter "+ruleName+" "+inputSymbol);
+		if ( failed ) {
+			System.out.println(" failed="+failed);
+		}
+		if ( backtracking>0 ) {
+			System.out.print(" backtracking="+backtracking);
+		}
+		System.out.println();
+	}
+
+	public void traceOut(String ruleName,
+						 int ruleIndex,
+						 Object inputSymbol)
+	{
+		System.out.print("exit "+ruleName+" "+inputSymbol);
+		if ( failed ) {
+			System.out.println(" failed="+failed);
+		}
+		if ( backtracking>0 ) {
+			System.out.print(" backtracking="+backtracking);
+		}
+		System.out.println();
+	}
+
 	/** A syntactic predicate.  Returns true/false depending on whether
 	 *  the specified grammar fragment matches the current input stream.
 	 *  This resets the failed instance var afterwards.

@@ -33,6 +33,7 @@ import org.antlr.runtime.*;
 import org.antlr.runtime.debug.DebugEventListener;
 import org.antlr.runtime.debug.BlankDebugEventListener;
 import org.antlr.runtime.tree.ParseTree;
+import org.antlr.runtime.debug.ParseTreeBuilder;
 
 import java.util.List;
 import java.util.Stack;
@@ -65,41 +66,6 @@ public class Interpreter implements TokenSource {
 				int channel = Token.DEFAULT_CHANNEL;
 				token = new CommonToken((CharStream)input,type,channel,0,0);
 			}
-		}
-	}
-
-	/** This parser listener tracks rule entry/exit and token matches
-	 *  to build a simple parse tree using the standard ANTLR Tree interface
-	 */
-	class BuildParseTree extends BlankDebugEventListener {
-		Grammar g;
-		Stack callStack = new Stack();
-		public BuildParseTree(Grammar g) {
-			this.g = g;
-			ParseTree root = new ParseTree("<grammar "+g.name+">");
-			callStack.push(root);
-		}
-		public ParseTree getTree() {
-			return (ParseTree)callStack.elementAt(0);
-		}
-		public void enterRule(String ruleName) {
-			ParseTree parentRuleNode = (ParseTree)callStack.peek();
-			ParseTree ruleNode = new ParseTree(ruleName);
-			parentRuleNode.addChild(ruleNode);
-			callStack.push(ruleNode);
-		}
-		public void exitRule(String ruleName) {
-			callStack.pop();
-		}
-		public void consumeToken(Token token) {
-			ParseTree ruleNode = (ParseTree)callStack.peek();
-			ParseTree elementNode = new ParseTree(token);
-			ruleNode.addChild(elementNode);
-		}
-		public void recognitionException(RecognitionException e) {
-			ParseTree ruleNode = (ParseTree)callStack.peek();
-			ParseTree errorNode = new ParseTree(e);
-			ruleNode.addChild(errorNode);
 		}
 	}
 
@@ -227,7 +193,7 @@ public class Interpreter implements TokenSource {
 	public ParseTree parse(String startRule, List visitedStates)
 		throws RecognitionException
 	{
-		BuildParseTree actions = new BuildParseTree(grammar);
+		ParseTreeBuilder actions = new ParseTreeBuilder(grammar.name);
 		try {
 			parse(startRule, actions, visitedStates);
 		}
