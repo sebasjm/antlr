@@ -61,7 +61,7 @@
 #pragma mark ANTLRTreeNodeStream conformance
 
 - (id) LT:(int)k;
-- (ANTLRTreeAdaptor *) treeAdaptor;
+- (id<ANTLRTreeAdaptor>) treeAdaptor;
 - (void) setUsesUniqueNavigationNodes:(BOOL)flag;
 
 #pragma mark ANTLRIntStream conformance

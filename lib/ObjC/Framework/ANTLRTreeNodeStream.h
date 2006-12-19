@@ -32,7 +32,7 @@
 @protocol ANTLRTreeNodeStream < ANTLRIntStream > 
 
 - (id) LT:(int)k;
-- (ANTLRTreeAdaptor *) treeAdaptor;
+- (id<ANTLRTreeAdaptor>) treeAdaptor;
 - (void) setUsesUniqueNavigationNodes:(BOOL)flag;
 
 @end

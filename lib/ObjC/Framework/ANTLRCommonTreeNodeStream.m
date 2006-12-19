@@ -75,7 +75,10 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 {
 	if ((self = [super init]) != nil) {
 		[self setRoot:theTree];
-		[self setTreeAdaptor:theAdaptor];
+		if (!theAdaptor) 
+			[self setTreeAdaptor:[[[ANTLRCommonTreeAdaptor alloc] init] autorelease]];
+		else
+			[self setTreeAdaptor:theAdaptor];
 		nodeStack = [[NSMutableArray alloc] init];
 		indexStack = [[NSMutableArray alloc] init];
 		markers = [[NSMutableArray alloc] initWithObjects:[NSNull null], nil];	// markers is one based - maybe fix this later
@@ -131,7 +134,7 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 	return [lookahead objectAtIndex:(head+k-1) % [lookahead count]];
 }
 
-- (ANTLRTreeAdaptor *) treeAdaptor;
+- (id<ANTLRTreeAdaptor>) treeAdaptor;
 {
 	return treeAdaptor;
 }

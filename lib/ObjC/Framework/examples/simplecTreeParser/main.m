@@ -2,7 +2,7 @@
 #import <ANTLR/ANTLR.h>
 #import "SimpleCLexer.h"
 #import "SimpleCParser.h"
-#import "SimpleCTPTreeParser.h"
+#import "SimpleCTP.h"
 
 int main() {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -22,7 +22,7 @@ int main() {
 	ANTLRCommonTree *program_tree = [[parser program] tree];
 	NSLog(@"%@", [program_tree treeDescription]);
 	ANTLRCommonTreeNodeStream *treeStream = [[ANTLRCommonTreeNodeStream alloc] initWithTree:program_tree];
-	SimpleCTPTreeParser *walker = [[SimpleCTPTreeParser alloc] initWithTreeNodeStream:treeStream];
+	SimpleCTP *walker = [[SimpleCTP alloc] initWithTreeNodeStream:treeStream];
 	[walker program];
 	[lexer release];
 	[stream release];

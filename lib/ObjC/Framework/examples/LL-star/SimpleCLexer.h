@@ -1,8 +1,7 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g 2006-11-12 21:48:44
+// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g 2006-12-12 20:50:20
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
-
 
 #pragma mark Cyclic DFA start
 #pragma mark Cyclic DFA end

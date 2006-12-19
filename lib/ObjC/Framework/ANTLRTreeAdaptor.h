@@ -32,47 +32,47 @@
 
 #pragma mark Construction
 
-+ (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *) payload;
-+ (id<ANTLRTree>) emptyTree;
+- (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *) payload;
+- (id<ANTLRTree>) emptyTree;
 
-+ (id) copyNode:(id<ANTLRTree>)aNode;	// copies just the node
-+ (id) copyTree:(id<ANTLRTree>)aTree;	// copies the entire subtree, recursively
+- (id) copyNode:(id<ANTLRTree>)aNode;	// copies just the node
+- (id) copyTree:(id<ANTLRTree>)aTree;	// copies the entire subtree, recursively
 
-+ (void) addChild:(id<ANTLRTree>)child toTree:(id<ANTLRTree>)aTree;
-+ (id) makeNode:(id<ANTLRTree>)newRoot parentOf:(id<ANTLRTree>)oldRoot;
+- (void) addChild:(id<ANTLRTree>)child toTree:(id<ANTLRTree>)aTree;
+- (id) makeNode:(id<ANTLRTree>)newRoot parentOf:(id<ANTLRTree>)oldRoot;
 
-+ (id<ANTLRTree>) postProcessTree:(id<ANTLRTree>)aTree;
+- (id<ANTLRTree>) postProcessTree:(id<ANTLRTree>)aTree;
 
-+ (unsigned int) uniqueIdForTree:(id<ANTLRTree>)aNode;
+- (unsigned int) uniqueIdForTree:(id<ANTLRTree>)aNode;
 
 #pragma mark Rewrite Rules
 
-+ (void) addTokenAsChild:(ANTLRToken *)child toTree:(id<ANTLRTree>)aTree;
-+ (id<ANTLRTree>) makeToken:(ANTLRToken *)newRoot parentOf:(id<ANTLRTree>)oldRoot;
+- (void) addTokenAsChild:(ANTLRToken *)child toTree:(id<ANTLRTree>)aTree;
+- (id<ANTLRTree>) makeToken:(ANTLRToken *)newRoot parentOf:(id<ANTLRTree>)oldRoot;
 
-+ (id<ANTLRTree>) newTreeWithTokenType:(int)tokenType;
-+ (id<ANTLRTree>) newTreeWithTokenType:(int)tokenType text:(NSString *)tokenText;
-+ (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken tokenType:(int)tokenType;
-+ (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken tokenType:(int)tokenType text:(NSString *)tokenText;
-+ (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken text:(NSString *)tokenText;
+- (id<ANTLRTree>) newTreeWithTokenType:(int)tokenType;
+- (id<ANTLRTree>) newTreeWithTokenType:(int)tokenType text:(NSString *)tokenText;
+- (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken tokenType:(int)tokenType;
+- (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken tokenType:(int)tokenType text:(NSString *)tokenText;
+- (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken text:(NSString *)tokenText;
 
 #pragma mark Content
 
-+ (int) tokenTypeForNode:(id<ANTLRTree>)aNode;
-+ (void) setTokenType:(int)tokenType forNode:(id)aNode;
+- (int) tokenTypeForNode:(id<ANTLRTree>)aNode;
+- (void) setTokenType:(int)tokenType forNode:(id)aNode;
 
-+ (NSString *) textForNode:(id<ANTLRTree>)aNode;
-+ (void) setText:(NSString *)tokenText forNode:(id<ANTLRTree>)aNode;
+- (NSString *) textForNode:(id<ANTLRTree>)aNode;
+- (void) setText:(NSString *)tokenText forNode:(id<ANTLRTree>)aNode;
 
-+ (void) setBoundariesForTree:(id<ANTLRTree>)aTree fromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken;
-+ (int) tokenStartIndexForTree:(id<ANTLRTree>)aTree;
-+ (int) tokenStopIndexForTree:(id<ANTLRTree>)aTree;
+- (void) setBoundariesForTree:(id<ANTLRTree>)aTree fromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken;
+- (int) tokenStartIndexForTree:(id<ANTLRTree>)aTree;
+- (int) tokenStopIndexForTree:(id<ANTLRTree>)aTree;
 
 
 #pragma mark Navigation / Tree Parsing
 
-+ (id<ANTLRTree>) childForNode:(id<ANTLRTree>) aNode atIndex:(int) i;
-+ (int) childCountForTree:(id<ANTLRTree>) aTree;
+- (id<ANTLRTree>) childForNode:(id<ANTLRTree>) aNode atIndex:(int) i;
+- (int) childCountForTree:(id<ANTLRTree>) aTree;
 
 @end
 
@@ -82,56 +82,51 @@
 
 #pragma mark Construction
 
-+ (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *) payload;
-+ (id<ANTLRTree>) emptyTree;
+- (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *) payload;
+- (id<ANTLRTree>) emptyTree;
 
-+ (id) copyNode:(id<ANTLRTree>)aNode;	// copies just the node
-+ (id) copyTree:(id<ANTLRTree>)aTree;	// copies the entire subtree, recursively
+- (id) copyNode:(id<ANTLRTree>)aNode;	// copies just the node
+- (id) copyTree:(id<ANTLRTree>)aTree;	// copies the entire subtree, recursively
 
-+ (void) addChild:(id<ANTLRTree>)child toTree:(id<ANTLRTree>)aTree;
-+ (id) makeNode:(id<ANTLRTree>)newRoot parentOf:(id<ANTLRTree>)oldRoot;
+- (void) addChild:(id<ANTLRTree>)child toTree:(id<ANTLRTree>)aTree;
+- (id) makeNode:(id<ANTLRTree>)newRoot parentOf:(id<ANTLRTree>)oldRoot;
 
-+ (id<ANTLRTree>) postProcessTree:(id<ANTLRTree>)aTree;
+- (id<ANTLRTree>) postProcessTree:(id<ANTLRTree>)aTree;
 
-+ (unsigned int) uniqueIdForTree:(id<ANTLRTree>)aNode;
-
-// these are not part of the protocol, but used internally in the out-of-the-box provided implementation
-// this is done to minimize the impact for custom trees
-+ (ANTLRToken *) newTokenWithToken:(ANTLRToken *)fromToken;
-+ (ANTLRToken *) newTokenWithTokenType:(int)tokenType text:(NSString *)tokenText;
+- (unsigned int) uniqueIdForTree:(id<ANTLRTree>)aNode;
 
 #pragma mark Rewrite Rules
 
-+ (void) addTokenAsChild:(ANTLRToken *)child toTree:(id<ANTLRTree>)aTree;
-+ (id<ANTLRTree>) makeToken:(ANTLRToken *)newRoot parentOf:(id<ANTLRTree>)oldRoot;
+- (void) addTokenAsChild:(ANTLRToken *)child toTree:(id<ANTLRTree>)aTree;
+- (id<ANTLRTree>) makeToken:(ANTLRToken *)newRoot parentOf:(id<ANTLRTree>)oldRoot;
 
-+ (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken tokenType:(int)tokenType;
-+ (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken tokenType:(int)tokenType text:(NSString *)tokenText;
-+ (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken text:(NSString *)tokenText;
+- (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken tokenType:(int)tokenType;
+- (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken tokenType:(int)tokenType text:(NSString *)tokenText;
+- (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *)fromToken text:(NSString *)tokenText;
 
 // these are not part of the protocol, but are here for the benefit of ANTLRCommonTreeAdaptor
-// strictly, they are not required for ANTLR trees. simply an implementation detail, leave'em out in your
+// only, they are not required for ANTLR trees. simply an implementation detail, leave'em out in your
 // custom tree adaptors if you wish.
-+ (ANTLRToken *) newTokenWithToken:(ANTLRToken *)fromToken;
-+ (ANTLRToken *) newTokenWithTokenType:(int)tokenType text:(NSString *)tokenText;
+- (ANTLRToken *) newTokenWithToken:(ANTLRToken *)fromToken;
+- (ANTLRToken *) newTokenWithTokenType:(int)tokenType text:(NSString *)tokenText;
 
 #pragma mark Content
 
-+ (int) tokenTypeForNode:(id<ANTLRTree>)aNode;
-+ (void) setTokenType:(int)tokenType forNode:(id)aNode;
+- (int) tokenTypeForNode:(id<ANTLRTree>)aNode;
+- (void) setTokenType:(int)tokenType forNode:(id)aNode;
 
-+ (NSString *) textForNode:(id<ANTLRTree>)aNode;
-+ (void) setText:(NSString *)tokenText forNode:(id<ANTLRTree>)aNode;
+- (NSString *) textForNode:(id<ANTLRTree>)aNode;
+- (void) setText:(NSString *)tokenText forNode:(id<ANTLRTree>)aNode;
 
-+ (void) setBoundariesForTree:(id<ANTLRTree>)aTree fromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken;
-+ (int) tokenStartIndexForTree:(id<ANTLRTree>)aTree;
-+ (int) tokenStopIndexForTree:(id<ANTLRTree>)aTree;
+- (void) setBoundariesForTree:(id<ANTLRTree>)aTree fromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken;
+- (int) tokenStartIndexForTree:(id<ANTLRTree>)aTree;
+- (int) tokenStopIndexForTree:(id<ANTLRTree>)aTree;
 
 
 #pragma mark Navigation / Tree Parsing
 
-+ (id<ANTLRTree>) childForNode:(id<ANTLRTree>) aNode atIndex:(int) i;
-+ (int) childCountForTree:(id<ANTLRTree>) aTree;
+- (id<ANTLRTree>) childForNode:(id<ANTLRTree>) aNode atIndex:(int) i;
+- (int) childCountForTree:(id<ANTLRTree>) aTree;
 
 
 @end

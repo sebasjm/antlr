@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g 2006-11-12 20:37:38
+// $ANTLR 3.0b5 SimpleC.g 2006-12-19 16:11:24
 
 #import "SimpleCParser.h"
 
@@ -74,6 +74,7 @@ const static int SimpleCParserdfa2_transition8[] = {9, -1, -1, -1, 8};
 {
 	return @"20:1: declaration : ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) );";
 }
+
 
 @end
 
@@ -478,10 +479,13 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 {
 	if ((self = [super initWithTokenStream:aStream])) {
 
-		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>",     @"VAR_DEF",     @"ARG_DEF",     @"FUNC_HDR",     @"FUNC_DECL",     @"FUNC_DEF",     @"BLOCK",     @"ID",     @"EQ",     @"INT",     @"FOR",     @"INT_TYPE",     @"CHAR",     @"VOID",     @"EQEQ",     @"LT",     @"PLUS",     @"WS",     @"';'",     @"'('",     @"','",     @"')'",     @"'{'",     @"'}'", nil];
+		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>", 
+	@"VAR_DEF", @"ARG_DEF", @"FUNC_HDR", @"FUNC_DECL", @"FUNC_DEF", @"BLOCK", 
+	@"ID", @"EQ", @"INT", @"FOR", @"INT_TYPE", @"CHAR", @"VOID", @"EQEQ", @"LT", 
+	@"PLUS", @"WS", @"';'", @"'('", @"','", @"')'", @"'{'", @"'}'", nil];
 		dfa2 = [[SimpleCParserDFA2 alloc] initWithRecognizer:self];
 																																
-		[self setAdaptor:[ANTLRCommonTreeAdaptor class]];
+		[self setTreeAdaptor:[[[ANTLRCommonTreeAdaptor alloc] init] autorelease]];
 	}
 	return self;
 }
@@ -490,12 +494,19 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 {
 	[tokenNames release];
 	[dfa2 release];
+	[self setTreeAdaptor:nil];
+
 	[super dealloc];
+}
+
+- (NSString *) grammarFileName
+{
+	return @"SimpleC.g";
 }
 
 
 // $ANTLR start program
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:16:1: program : ( declaration )+ ;
+// SimpleC.g:16:1: program : ( declaration )+ ;
 - (SimpleCParser_program_return *) program
 {
     SimpleCParser_program_return * _retval = [[SimpleCParser_program_return alloc] init]; 
@@ -508,12 +519,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:17:9: ( ( declaration )+ ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:17:9: ( declaration )+ // alt
+        // SimpleC.g:17:9: ( ( declaration )+ ) // ruleBlockSingleAlt
+        // SimpleC.g:17:9: ( declaration )+ // alt
         {
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
 
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:17:9: ( declaration )+	// positiveClosureBlock
+        // SimpleC.g:17:9: ( declaration )+	// positiveClosureBlock
         int cnt1=0;
 
         do {
@@ -527,18 +538,18 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
             }
             switch (alt1) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:17:9: declaration // alt
+        	    // SimpleC.g:17:9: declaration // alt
         	    {
-        	    id root_1 = (id)[adaptor emptyTree];
+        	    id root_1 = (id)[treeAdaptor emptyTree];
 
         	    [following addObject:FOLLOW_declaration_in_program85];
         	    _declaration1 = [self declaration];
         	    [following removeLastObject];
 
 
-        	    [adaptor addChild:[_declaration1 tree] toTree:root_1];
+        	    [treeAdaptor addChild:[_declaration1 tree] toTree:root_1];
 
-        	    [adaptor addChild:root_1 toTree:root_0];
+        	    [treeAdaptor addChild:root_1 toTree:root_0];
 
         	    }
         	    break;
@@ -567,8 +578,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		// rule refs in alts with rewrites
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -576,7 +587,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end program
 
 // $ANTLR start declaration
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:20:1: declaration : ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) );
+// SimpleC.g:20:1: declaration : ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) );
 - (SimpleCParser_declaration_return *) declaration
 {
     SimpleCParser_declaration_return * _retval = [[SimpleCParser_declaration_return alloc] init]; 
@@ -599,26 +610,26 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _char_literal4_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:21:9: ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) ) //ruleblock
+        // SimpleC.g:21:9: ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) ) //ruleblock
         int alt2=3;
         alt2 = [dfa2 predict];
         switch (alt2) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:21:9: variable // alt
+        	    // SimpleC.g:21:9: variable // alt
         	    {
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    [following addObject:FOLLOW_variable_in_declaration105];
         	    _variable2 = [self variable];
         	    [following removeLastObject];
 
 
-        	    [adaptor addChild:[_variable2 tree] toTree:root_0];
+        	    [treeAdaptor addChild:[_variable2 tree] toTree:root_0];
 
         	    }
         	    break;
         	case 2 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:22:9: functionHeader ';' // alt
+        	    // SimpleC.g:22:9: functionHeader ';' // alt
         	    {
         	    [following addObject:FOLLOW_functionHeader_in_declaration115];
         	    _functionHeader3 = [self functionHeader];
@@ -635,17 +646,17 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    // AST REWRITE
         	    int i_0 = 0;
         	    [_retval setTree:root_0];
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
         	    // 22:28: -> ^( FUNC_DECL functionHeader )
         	    {
-        	        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:22:31: ^( FUNC_DECL functionHeader )
+        	        // SimpleC.g:22:31: ^( FUNC_DECL functionHeader )
         	        {
-        	        id root_1 = (id)[adaptor emptyTree];
-        	        root_1 = (id)[adaptor makeNode:[adaptor newTreeWithTokenType:SimpleCParser_FUNC_DECL text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DECL]] parentOf:root_1];
+        	        id root_1 = (id)[treeAdaptor emptyTree];
+        	        root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DECL text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DECL]] parentOf:root_1];
 
-        	        [adaptor addChild:(id<ANTLRTree>)[_list_functionHeader objectAtIndex:i_0] toTree:root_1];
+        	        [treeAdaptor addChild:(id<ANTLRTree>)[_list_functionHeader objectAtIndex:i_0] toTree:root_1];
 
-        	        [adaptor addChild:root_1 toTree:root_0];
+        	        [treeAdaptor addChild:root_1 toTree:root_0];
         	        }
 
         	    }
@@ -655,7 +666,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    }
         	    break;
         	case 3 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:23:9: functionHeader block // alt
+        	    // SimpleC.g:23:9: functionHeader block // alt
         	    {
         	    [following addObject:FOLLOW_functionHeader_in_declaration135];
         	    _functionHeader5 = [self functionHeader];
@@ -673,18 +684,18 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    // AST REWRITE
         	    int i_0 = 0;
         	    [_retval setTree:root_0];
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
         	    // 23:30: -> ^( FUNC_DEF functionHeader block )
         	    {
-        	        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:23:33: ^( FUNC_DEF functionHeader block )
+        	        // SimpleC.g:23:33: ^( FUNC_DEF functionHeader block )
         	        {
-        	        id root_1 = (id)[adaptor emptyTree];
-        	        root_1 = (id)[adaptor makeNode:[adaptor newTreeWithTokenType:SimpleCParser_FUNC_DEF text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DEF]] parentOf:root_1];
+        	        id root_1 = (id)[treeAdaptor emptyTree];
+        	        root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DEF text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DEF]] parentOf:root_1];
 
-        	        [adaptor addChild:(id<ANTLRTree>)[_list_functionHeader objectAtIndex:i_0] toTree:root_1];
-        	        [adaptor addChild:(id<ANTLRTree>)[_list_block objectAtIndex:i_0] toTree:root_1];
+        	        [treeAdaptor addChild:(id<ANTLRTree>)[_list_functionHeader objectAtIndex:i_0] toTree:root_1];
+        	        [treeAdaptor addChild:(id<ANTLRTree>)[_list_block objectAtIndex:i_0] toTree:root_1];
 
-        	        [adaptor addChild:root_1 toTree:root_0];
+        	        [treeAdaptor addChild:root_1 toTree:root_0];
         	        }
 
         	    }
@@ -715,8 +726,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[_list_21 release];
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -724,7 +735,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end declaration
 
 // $ANTLR start variable
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:26:1: variable : type declarator ';' -> ^( VAR_DEF type declarator ) ;
+// SimpleC.g:26:1: variable : type declarator ';' -> ^( VAR_DEF type declarator ) ;
 - (SimpleCParser_variable_return *) variable
 {
     SimpleCParser_variable_return * _retval = [[SimpleCParser_variable_return alloc] init]; 
@@ -743,8 +754,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _char_literal9_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:27:9: ( type declarator ';' -> ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:27:9: type declarator ';' // alt
+        // SimpleC.g:27:9: ( type declarator ';' -> ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
+        // SimpleC.g:27:9: type declarator ';' // alt
         {
         [following addObject:FOLLOW_type_in_variable166];
         _type7 = [self type];
@@ -767,18 +778,18 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         // AST REWRITE
         int i_0 = 0;
         [_retval setTree:root_0];
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
         // 27:29: -> ^( VAR_DEF type declarator )
         {
-            // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:27:32: ^( VAR_DEF type declarator )
+            // SimpleC.g:27:32: ^( VAR_DEF type declarator )
             {
-            id root_1 = (id)[adaptor emptyTree];
-            root_1 = (id)[adaptor makeNode:[adaptor newTreeWithTokenType:SimpleCParser_VAR_DEF text:[tokenNames objectAtIndex:SimpleCParser_VAR_DEF]] parentOf:root_1];
+            id root_1 = (id)[treeAdaptor emptyTree];
+            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_VAR_DEF text:[tokenNames objectAtIndex:SimpleCParser_VAR_DEF]] parentOf:root_1];
 
-            [adaptor addChild:(id<ANTLRTree>)[_list_type objectAtIndex:i_0] toTree:root_1];
-            [adaptor addChild:(id<ANTLRTree>)[_list_declarator objectAtIndex:i_0] toTree:root_1];
+            [treeAdaptor addChild:(id<ANTLRTree>)[_list_type objectAtIndex:i_0] toTree:root_1];
+            [treeAdaptor addChild:(id<ANTLRTree>)[_list_declarator objectAtIndex:i_0] toTree:root_1];
 
-            [adaptor addChild:root_1 toTree:root_0];
+            [treeAdaptor addChild:root_1 toTree:root_0];
             }
 
         }
@@ -805,8 +816,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[_list_21 release];
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -814,7 +825,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end variable
 
 // $ANTLR start declarator
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:30:1: declarator : ID ;
+// SimpleC.g:30:1: declarator : ID ;
 - (SimpleCParser_declarator_return *) declarator
 {
     SimpleCParser_declarator_return * _retval = [[SimpleCParser_declarator_return alloc] init]; 
@@ -827,16 +838,16 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _ID10_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:31:9: ( ID ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:31:9: ID // alt
+        // SimpleC.g:31:9: ( ID ) // ruleBlockSingleAlt
+        // SimpleC.g:31:9: ID // alt
         {
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
 
         _ID10=(ANTLRToken *)[input LT:1];
         [_ID10 retain];
         [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_declarator199]; 
-        _ID10_tree = (id)[adaptor newTreeWithToken:_ID10];
-        [adaptor addChild:_ID10_tree toTree:root_0];
+        _ID10_tree = (id)[treeAdaptor newTreeWithToken:_ID10];
+        [treeAdaptor addChild:_ID10_tree toTree:root_0];
 
 
         }
@@ -854,8 +865,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		// rule refs in alts with rewrites
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -863,7 +874,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end declarator
 
 // $ANTLR start functionHeader
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:34:1: functionHeader : type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ;
+// SimpleC.g:34:1: functionHeader : type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ;
 - (SimpleCParser_functionHeader_return *) functionHeader
 {
     SimpleCParser_functionHeader_return * _retval = [[SimpleCParser_functionHeader_return alloc] init]; 
@@ -893,8 +904,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _char_literal17_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:35:9: ( type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:35:9: type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' // alt
+        // SimpleC.g:35:9: ( type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
+        // SimpleC.g:35:9: type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' // alt
         {
         [following addObject:FOLLOW_type_in_functionHeader219];
         _type11 = [self type];
@@ -912,7 +923,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         [self match:input tokenType:22 follow:FOLLOW_22_in_functionHeader223]; 
         [_list_22 addObject:_char_literal13];
 
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:35:21: ( formalParameter ( ',' formalParameter )* )? // block
+        // SimpleC.g:35:21: ( formalParameter ( ',' formalParameter )* )? // block
         int alt4=2;
         {
         	int LA4_0 = [input LA:1];
@@ -922,7 +933,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         }
         switch (alt4) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:35:23: formalParameter ( ',' formalParameter )* // alt
+        	    // SimpleC.g:35:23: formalParameter ( ',' formalParameter )* // alt
         	    {
         	    [following addObject:FOLLOW_formalParameter_in_functionHeader227];
         	    _formalParameter14 = [self formalParameter];
@@ -941,7 +952,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	        }
         	        switch (alt3) {
         	    	case 1 :
-        	    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:35:41: ',' formalParameter // alt
+        	    	    // SimpleC.g:35:41: ',' formalParameter // alt
         	    	    {
         	    	    _char_literal15=(ANTLRToken *)[input LT:1];
         	    	    [_char_literal15 retain];
@@ -978,17 +989,17 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         // AST REWRITE
         int i_0 = 0;
         [_retval setTree:root_0];
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
         // 36:9: -> ^( FUNC_HDR type ID ( formalParameter )+ )
         {
-            // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:36:12: ^( FUNC_HDR type ID ( formalParameter )+ )
+            // SimpleC.g:36:12: ^( FUNC_HDR type ID ( formalParameter )+ )
             {
-            id root_1 = (id)[adaptor emptyTree];
-            root_1 = (id)[adaptor makeNode:[adaptor newTreeWithTokenType:SimpleCParser_FUNC_HDR text:[tokenNames objectAtIndex:SimpleCParser_FUNC_HDR]] parentOf:root_1];
+            id root_1 = (id)[treeAdaptor emptyTree];
+            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_HDR text:[tokenNames objectAtIndex:SimpleCParser_FUNC_HDR]] parentOf:root_1];
 
-            [adaptor addChild:(id<ANTLRTree>)[_list_type objectAtIndex:i_0] toTree:root_1];
-            [adaptor addTokenAsChild:(ANTLRToken *)[_list_SimpleCParser_ID objectAtIndex:i_0] toTree:root_1];
-            // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:36:31: ( formalParameter )+
+            [treeAdaptor addChild:(id<ANTLRTree>)[_list_type objectAtIndex:i_0] toTree:root_1];
+            [treeAdaptor addTokenAsChild:(ANTLRToken *)[_list_SimpleCParser_ID objectAtIndex:i_0] toTree:root_1];
+            // SimpleC.g:36:31: ( formalParameter )+
             {
             int n_1 = _list_formalParameter == nil ? 0 : [_list_formalParameter count];
              
@@ -997,12 +1008,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
             if ( n_1==0 ) @throw [NSException exceptionWithName:@"ANTLRTreeRewriteException" reason:@"Must have more than one element for (...)+ loops" userInfo:nil];
             int i_1;
             for (i_1=0; i_1<n_1; i_1++) {
-                [adaptor addChild:(id<ANTLRTree>)[_list_formalParameter objectAtIndex:i_1] toTree:root_1];
+                [treeAdaptor addChild:(id<ANTLRTree>)[_list_formalParameter objectAtIndex:i_1] toTree:root_1];
 
             }
             }
 
-            [adaptor addChild:root_1 toTree:root_0];
+            [treeAdaptor addChild:root_1 toTree:root_0];
             }
 
         }
@@ -1036,8 +1047,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[_list_23 release];
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -1045,7 +1056,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end functionHeader
 
 // $ANTLR start formalParameter
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:39:1: formalParameter : type declarator -> ^( ARG_DEF type declarator ) ;
+// SimpleC.g:39:1: formalParameter : type declarator -> ^( ARG_DEF type declarator ) ;
 - (SimpleCParser_formalParameter_return *) formalParameter
 {
     SimpleCParser_formalParameter_return * _retval = [[SimpleCParser_formalParameter_return alloc] init]; 
@@ -1061,8 +1072,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     NSMutableArray *_list_declarator = [[NSMutableArray alloc] init];
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:40:9: ( type declarator -> ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:40:9: type declarator // alt
+        // SimpleC.g:40:9: ( type declarator -> ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
+        // SimpleC.g:40:9: type declarator // alt
         {
         [following addObject:FOLLOW_type_in_formalParameter281];
         _type18 = [self type];
@@ -1080,18 +1091,18 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         // AST REWRITE
         int i_0 = 0;
         [_retval setTree:root_0];
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
         // 40:25: -> ^( ARG_DEF type declarator )
         {
-            // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:40:28: ^( ARG_DEF type declarator )
+            // SimpleC.g:40:28: ^( ARG_DEF type declarator )
             {
-            id root_1 = (id)[adaptor emptyTree];
-            root_1 = (id)[adaptor makeNode:[adaptor newTreeWithTokenType:SimpleCParser_ARG_DEF text:[tokenNames objectAtIndex:SimpleCParser_ARG_DEF]] parentOf:root_1];
+            id root_1 = (id)[treeAdaptor emptyTree];
+            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_ARG_DEF text:[tokenNames objectAtIndex:SimpleCParser_ARG_DEF]] parentOf:root_1];
 
-            [adaptor addChild:(id<ANTLRTree>)[_list_type objectAtIndex:i_0] toTree:root_1];
-            [adaptor addChild:(id<ANTLRTree>)[_list_declarator objectAtIndex:i_0] toTree:root_1];
+            [treeAdaptor addChild:(id<ANTLRTree>)[_list_type objectAtIndex:i_0] toTree:root_1];
+            [treeAdaptor addChild:(id<ANTLRTree>)[_list_declarator objectAtIndex:i_0] toTree:root_1];
 
-            [adaptor addChild:root_1 toTree:root_0];
+            [treeAdaptor addChild:root_1 toTree:root_0];
             }
 
         }
@@ -1116,8 +1127,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[_list_declarator release];
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -1125,7 +1136,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end formalParameter
 
 // $ANTLR start type
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:43:1: type : ('int'|'char'|'void'|ID);
+// SimpleC.g:43:1: type : ('int'|'char'|'void'|ID);
 - (SimpleCParser_type_return *) type
 {
     SimpleCParser_type_return * _retval = [[SimpleCParser_type_return alloc] init]; 
@@ -1138,14 +1149,14 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _set20_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:44:5: ( ('int'|'char'|'void'|ID)) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:44:9: ('int'|'char'|'void'|ID) // alt
+        // SimpleC.g:44:5: ( ('int'|'char'|'void'|ID)) // ruleBlockSingleAlt
+        // SimpleC.g:44:9: ('int'|'char'|'void'|ID) // alt
         {
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
 
         _set20 = (ANTLRToken *)[input LT:1];
         if ([input LA:1]==SimpleCParser_ID||([input LA:1]>=SimpleCParser_INT_TYPE && [input LA:1]<=SimpleCParser_VOID)) {
-        	[adaptor addChild:[adaptor newTreeWithToken:_set20] toTree:root_0];
+        	[treeAdaptor addChild:[treeAdaptor newTreeWithToken:_set20] toTree:root_0];
         	[input consume];
         	errorRecovery = NO;
         } else {
@@ -1169,8 +1180,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		// rule refs in alts with rewrites
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -1178,7 +1189,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end type
 
 // $ANTLR start block
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:50:1: block : lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,"BLOCK"] ( variable )* ( stat )* ) ;
+// SimpleC.g:50:1: block : lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,"BLOCK"] ( variable )* ( stat )* ) ;
 - (SimpleCParser_block_return *) block
 {
     SimpleCParser_block_return * _retval = [[SimpleCParser_block_return alloc] init]; 
@@ -1200,8 +1211,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _char_literal23_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:51:9: (lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,\"BLOCK\"] ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:51:9: lc= '{' ( variable )* ( stat )* '}' // alt
+        // SimpleC.g:51:9: (lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,\"BLOCK\"] ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
+        // SimpleC.g:51:9: lc= '{' ( variable )* ( stat )* '}' // alt
         {
         _lc=(ANTLRToken *)[input LT:1];
         [_lc retain];
@@ -1228,7 +1239,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
             }
             switch (alt5) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:52:13: variable // alt
+        	    // SimpleC.g:52:13: variable // alt
         	    {
         	    [following addObject:FOLLOW_variable_in_block390];
         	    _variable21 = [self variable];
@@ -1256,7 +1267,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
             }
             switch (alt6) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:53:13: stat // alt
+        	    // SimpleC.g:53:13: stat // alt
         	    {
         	    [following addObject:FOLLOW_stat_in_block405];
         	    _stat22 = [self stat];
@@ -1282,15 +1293,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         // AST REWRITE
         int i_0 = 0;
         [_retval setTree:root_0];
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
         // 55:9: -> ^( BLOCK[$lc,\"BLOCK\"] ( variable )* ( stat )* )
         {
-            // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:55:12: ^( BLOCK[$lc,\"BLOCK\"] ( variable )* ( stat )* )
+            // SimpleC.g:55:12: ^( BLOCK[$lc,\"BLOCK\"] ( variable )* ( stat )* )
             {
-            id root_1 = (id)[adaptor emptyTree];
-            root_1 = (id)[adaptor makeNode:[adaptor newTreeWithTokenType:SimpleCParser_BLOCK text:[_lc text]] parentOf:root_1];
+            id root_1 = (id)[treeAdaptor emptyTree];
+            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_BLOCK text:[_lc text]] parentOf:root_1];
 
-            // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:55:33: ( variable )*
+            // SimpleC.g:55:33: ( variable )*
             {
             int n_1 = _list_variable == nil ? 0 : [_list_variable count];
              
@@ -1298,11 +1309,11 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
             int i_1;
             for (i_1=0; i_1<n_1; i_1++) {
-                [adaptor addChild:(id<ANTLRTree>)[_list_variable objectAtIndex:i_1] toTree:root_1];
+                [treeAdaptor addChild:(id<ANTLRTree>)[_list_variable objectAtIndex:i_1] toTree:root_1];
 
             }
             }
-            // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:55:43: ( stat )*
+            // SimpleC.g:55:43: ( stat )*
             {
             int n_1 = _list_stat == nil ? 0 : [_list_stat count];
              
@@ -1310,12 +1321,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
             int i_1;
             for (i_1=0; i_1<n_1; i_1++) {
-                [adaptor addChild:(id<ANTLRTree>)[_list_stat objectAtIndex:i_1] toTree:root_1];
+                [treeAdaptor addChild:(id<ANTLRTree>)[_list_stat objectAtIndex:i_1] toTree:root_1];
 
             }
             }
 
-            [adaptor addChild:root_1 toTree:root_0];
+            [treeAdaptor addChild:root_1 toTree:root_0];
             }
 
         }
@@ -1344,8 +1355,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[_list_25 release];
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -1353,7 +1364,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end block
 
 // $ANTLR start stat
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:58:1: stat : ( forStat | expr ';'! | block | assignStat ';'! | ';'! );
+// SimpleC.g:58:1: stat : ( forStat | expr ';'! | block | assignStat ';'! | ';'! );
 - (SimpleCParser_stat_return *) stat
 {
     SimpleCParser_stat_return * _retval = [[SimpleCParser_stat_return alloc] init]; 
@@ -1378,7 +1389,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _char_literal30_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:58:7: ( forStat | expr ';'! | block | assignStat ';'! | ';'! ) //ruleblock
+        // SimpleC.g:58:7: ( forStat | expr ';'! | block | assignStat ';'! | ';'! ) //ruleblock
         int alt7=5;
         switch ([input LA:1]) {
         	case SimpleCParser_FOR:
@@ -1417,30 +1428,30 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	}}
         switch (alt7) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:58:7: forStat // alt
+        	    // SimpleC.g:58:7: forStat // alt
         	    {
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    [following addObject:FOLLOW_forStat_in_stat449];
         	    _forStat24 = [self forStat];
         	    [following removeLastObject];
 
 
-        	    [adaptor addChild:[_forStat24 tree] toTree:root_0];
+        	    [treeAdaptor addChild:[_forStat24 tree] toTree:root_0];
 
         	    }
         	    break;
         	case 2 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:59:7: expr ';'! // alt
+        	    // SimpleC.g:59:7: expr ';'! // alt
         	    {
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    [following addObject:FOLLOW_expr_in_stat457];
         	    _expr25 = [self expr];
         	    [following removeLastObject];
 
 
-        	    [adaptor addChild:[_expr25 tree] toTree:root_0];
+        	    [treeAdaptor addChild:[_expr25 tree] toTree:root_0];
         	    _char_literal26=(ANTLRToken *)[input LT:1];
         	    [_char_literal26 retain];
         	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat459]; 
@@ -1448,30 +1459,30 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    }
         	    break;
         	case 3 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:60:7: block // alt
+        	    // SimpleC.g:60:7: block // alt
         	    {
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    [following addObject:FOLLOW_block_in_stat468];
         	    _block27 = [self block];
         	    [following removeLastObject];
 
 
-        	    [adaptor addChild:[_block27 tree] toTree:root_0];
+        	    [treeAdaptor addChild:[_block27 tree] toTree:root_0];
 
         	    }
         	    break;
         	case 4 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:61:7: assignStat ';'! // alt
+        	    // SimpleC.g:61:7: assignStat ';'! // alt
         	    {
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    [following addObject:FOLLOW_assignStat_in_stat476];
         	    _assignStat28 = [self assignStat];
         	    [following removeLastObject];
 
 
-        	    [adaptor addChild:[_assignStat28 tree] toTree:root_0];
+        	    [treeAdaptor addChild:[_assignStat28 tree] toTree:root_0];
         	    _char_literal29=(ANTLRToken *)[input LT:1];
         	    [_char_literal29 retain];
         	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat478]; 
@@ -1479,9 +1490,9 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    }
         	    break;
         	case 5 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:62:7: ';'! // alt
+        	    // SimpleC.g:62:7: ';'! // alt
         	    {
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    _char_literal30=(ANTLRToken *)[input LT:1];
         	    [_char_literal30 retain];
@@ -1510,8 +1521,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		// rule refs in alts with rewrites
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -1519,7 +1530,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end stat
 
 // $ANTLR start forStat
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:65:1: forStat : 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block -> ^( 'for' $start expr $next block ) ;
+// SimpleC.g:65:1: forStat : 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block -> ^( 'for' $start expr $next block ) ;
 - (SimpleCParser_forStat_return *) forStat
 {
     SimpleCParser_forStat_return * _retval = [[SimpleCParser_forStat_return alloc] init]; 
@@ -1554,8 +1565,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _char_literal36_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:66:9: ( 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block -> ^( 'for' $start expr $next block ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:66:9: 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block // alt
+        // SimpleC.g:66:9: ( 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block -> ^( 'for' $start expr $next block ) ) // ruleBlockSingleAlt
+        // SimpleC.g:66:9: 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block // alt
         {
         _string_literal31=(ANTLRToken *)[input LT:1];
         [_string_literal31 retain];
@@ -1610,20 +1621,20 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         // AST REWRITE
         int i_0 = 0;
         [_retval setTree:root_0];
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
         // 67:9: -> ^( 'for' $start expr $next block )
         {
-            // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:67:12: ^( 'for' $start expr $next block )
+            // SimpleC.g:67:12: ^( 'for' $start expr $next block )
             {
-            id root_1 = (id)[adaptor emptyTree];
-            root_1 = (id)[adaptor makeToken:(ANTLRToken *)[_list_SimpleCParser_FOR objectAtIndex:i_0] parentOf:root_1];
+            id root_1 = (id)[treeAdaptor emptyTree];
+            root_1 = (id)[treeAdaptor makeToken:(ANTLRToken *)[_list_SimpleCParser_FOR objectAtIndex:i_0] parentOf:root_1];
 
-            [adaptor addChild:[_start tree] toTree:root_1];
-            [adaptor addChild:(id<ANTLRTree>)[_list_expr objectAtIndex:i_0] toTree:root_1];
-            [adaptor addChild:[_next tree] toTree:root_1];
-            [adaptor addChild:(id<ANTLRTree>)[_list_block objectAtIndex:i_0] toTree:root_1];
+            [treeAdaptor addChild:[_start tree] toTree:root_1];
+            [treeAdaptor addChild:(id<ANTLRTree>)[_list_expr objectAtIndex:i_0] toTree:root_1];
+            [treeAdaptor addChild:[_next tree] toTree:root_1];
+            [treeAdaptor addChild:(id<ANTLRTree>)[_list_block objectAtIndex:i_0] toTree:root_1];
 
-            [adaptor addChild:root_1 toTree:root_0];
+            [treeAdaptor addChild:root_1 toTree:root_0];
             }
 
         }
@@ -1660,8 +1671,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[_list_22 release];
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -1669,7 +1680,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end forStat
 
 // $ANTLR start assignStat
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:70:1: assignStat : ID EQ expr -> ^( EQ ID expr ) ;
+// SimpleC.g:70:1: assignStat : ID EQ expr -> ^( EQ ID expr ) ;
 - (SimpleCParser_assignStat_return *) assignStat
 {
     SimpleCParser_assignStat_return * _retval = [[SimpleCParser_assignStat_return alloc] init]; 
@@ -1688,8 +1699,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _EQ39_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:71:9: ( ID EQ expr -> ^( EQ ID expr ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:71:9: ID EQ expr // alt
+        // SimpleC.g:71:9: ( ID EQ expr -> ^( EQ ID expr ) ) // ruleBlockSingleAlt
+        // SimpleC.g:71:9: ID EQ expr // alt
         {
         _ID38=(ANTLRToken *)[input LT:1];
         [_ID38 retain];
@@ -1711,18 +1722,18 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         // AST REWRITE
         int i_0 = 0;
         [_retval setTree:root_0];
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
         // 71:20: -> ^( EQ ID expr )
         {
-            // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:71:23: ^( EQ ID expr )
+            // SimpleC.g:71:23: ^( EQ ID expr )
             {
-            id root_1 = (id)[adaptor emptyTree];
-            root_1 = (id)[adaptor makeToken:(ANTLRToken *)[_list_SimpleCParser_EQ objectAtIndex:i_0] parentOf:root_1];
+            id root_1 = (id)[treeAdaptor emptyTree];
+            root_1 = (id)[treeAdaptor makeToken:(ANTLRToken *)[_list_SimpleCParser_EQ objectAtIndex:i_0] parentOf:root_1];
 
-            [adaptor addTokenAsChild:(ANTLRToken *)[_list_SimpleCParser_ID objectAtIndex:i_0] toTree:root_1];
-            [adaptor addChild:(id<ANTLRTree>)[_list_expr objectAtIndex:i_0] toTree:root_1];
+            [treeAdaptor addTokenAsChild:(ANTLRToken *)[_list_SimpleCParser_ID objectAtIndex:i_0] toTree:root_1];
+            [treeAdaptor addChild:(id<ANTLRTree>)[_list_expr objectAtIndex:i_0] toTree:root_1];
 
-            [adaptor addChild:root_1 toTree:root_0];
+            [treeAdaptor addChild:root_1 toTree:root_0];
             }
 
         }
@@ -1749,8 +1760,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[_list_SimpleCParser_ID release];
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -1758,7 +1769,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end assignStat
 
 // $ANTLR start expr
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:74:1: expr : condExpr ;
+// SimpleC.g:74:1: expr : condExpr ;
 - (SimpleCParser_expr_return *) expr
 {
     SimpleCParser_expr_return * _retval = [[SimpleCParser_expr_return alloc] init]; 
@@ -1771,17 +1782,17 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:74:9: ( condExpr ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:74:9: condExpr // alt
+        // SimpleC.g:74:9: ( condExpr ) // ruleBlockSingleAlt
+        // SimpleC.g:74:9: condExpr // alt
         {
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
 
         [following addObject:FOLLOW_condExpr_in_expr598];
         _condExpr41 = [self condExpr];
         [following removeLastObject];
 
 
-        [adaptor addChild:[_condExpr41 tree] toTree:root_0];
+        [treeAdaptor addChild:[_condExpr41 tree] toTree:root_0];
 
         }
 
@@ -1798,8 +1809,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		// rule refs in alts with rewrites
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -1807,7 +1818,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end expr
 
 // $ANTLR start condExpr
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:77:1: condExpr : aexpr ( ( '=='^^ | '<'^^ ) aexpr )? ;
+// SimpleC.g:77:1: condExpr : aexpr ( ( '=='^^ | '<'^^ ) aexpr )? ;
 - (SimpleCParser_condExpr_return *) condExpr
 {
     SimpleCParser_condExpr_return * _retval = [[SimpleCParser_condExpr_return alloc] init]; 
@@ -1826,18 +1837,18 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _char_literal44_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:78:9: ( aexpr ( ( '=='^^ | '<'^^ ) aexpr )? ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:78:9: aexpr ( ( '=='^^ | '<'^^ ) aexpr )? // alt
+        // SimpleC.g:78:9: ( aexpr ( ( '=='^^ | '<'^^ ) aexpr )? ) // ruleBlockSingleAlt
+        // SimpleC.g:78:9: aexpr ( ( '=='^^ | '<'^^ ) aexpr )? // alt
         {
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
 
         [following addObject:FOLLOW_aexpr_in_condExpr617];
         _aexpr42 = [self aexpr];
         [following removeLastObject];
 
 
-        [adaptor addChild:[_aexpr42 tree] toTree:root_0];
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:78:15: ( ( '=='^^ | '<'^^ ) aexpr )? // block
+        [treeAdaptor addChild:[_aexpr42 tree] toTree:root_0];
+        // SimpleC.g:78:15: ( ( '=='^^ | '<'^^ ) aexpr )? // block
         int alt9=2;
         {
         	int LA9_0 = [input LA:1];
@@ -1847,11 +1858,11 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         }
         switch (alt9) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:78:17: ( '=='^^ | '<'^^ ) aexpr // alt
+        	    // SimpleC.g:78:17: ( '=='^^ | '<'^^ ) aexpr // alt
         	    {
-        	    id root_1 = (id)[adaptor emptyTree];
+        	    id root_1 = (id)[treeAdaptor emptyTree];
 
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:78:17: ( '=='^^ | '<'^^ ) // block
+        	    // SimpleC.g:78:17: ( '=='^^ | '<'^^ ) // block
         	    int alt8=2;
         	    {
         	    	int LA8_0 = [input LA:1];
@@ -1868,34 +1879,34 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    }
         	    switch (alt8) {
         	    	case 1 :
-        	    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:78:18: '=='^^ // alt
+        	    	    // SimpleC.g:78:18: '=='^^ // alt
         	    	    {
-        	    	    id root_2 = (id)[adaptor emptyTree];
+        	    	    id root_2 = (id)[treeAdaptor emptyTree];
 
         	    	    _string_literal43=(ANTLRToken *)[input LT:1];
         	    	    [_string_literal43 retain];
         	    	    [self match:input tokenType:SimpleCParser_EQEQ follow:FOLLOW_SimpleCParser_EQEQ_in_condExpr622]; 
-        	    	    _string_literal43_tree = (id)[adaptor newTreeWithToken:_string_literal43];
-        	    	    root_0 = (id)[adaptor makeNode:_string_literal43_tree parentOf:root_0];
+        	    	    _string_literal43_tree = (id)[treeAdaptor newTreeWithToken:_string_literal43];
+        	    	    root_0 = (id)[treeAdaptor makeNode:_string_literal43_tree parentOf:root_0];
 
 
-        	    	    [adaptor addChild:root_2 toTree:root_1];
+        	    	    [treeAdaptor addChild:root_2 toTree:root_1];
 
         	    	    }
         	    	    break;
         	    	case 2 :
-        	    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:78:27: '<'^^ // alt
+        	    	    // SimpleC.g:78:27: '<'^^ // alt
         	    	    {
-        	    	    id root_2 = (id)[adaptor emptyTree];
+        	    	    id root_2 = (id)[treeAdaptor emptyTree];
 
         	    	    _char_literal44=(ANTLRToken *)[input LT:1];
         	    	    [_char_literal44 retain];
         	    	    [self match:input tokenType:SimpleCParser_LT follow:FOLLOW_SimpleCParser_LT_in_condExpr627]; 
-        	    	    _char_literal44_tree = (id)[adaptor newTreeWithToken:_char_literal44];
-        	    	    root_0 = (id)[adaptor makeNode:_char_literal44_tree parentOf:root_0];
+        	    	    _char_literal44_tree = (id)[treeAdaptor newTreeWithToken:_char_literal44];
+        	    	    root_0 = (id)[treeAdaptor makeNode:_char_literal44_tree parentOf:root_0];
 
 
-        	    	    [adaptor addChild:root_2 toTree:root_1];
+        	    	    [treeAdaptor addChild:root_2 toTree:root_1];
 
         	    	    }
         	    	    break;
@@ -1907,9 +1918,9 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    [following removeLastObject];
 
 
-        	    [adaptor addChild:[_aexpr45 tree] toTree:root_1];
+        	    [treeAdaptor addChild:[_aexpr45 tree] toTree:root_1];
 
-        	    [adaptor addChild:root_1 toTree:root_0];
+        	    [treeAdaptor addChild:root_1 toTree:root_0];
 
         	    }
         	    break;
@@ -1935,8 +1946,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		// rule refs in alts with rewrites
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -1944,7 +1955,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end condExpr
 
 // $ANTLR start aexpr
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:81:1: aexpr : atom ( '+'^^ atom )* ;
+// SimpleC.g:81:1: aexpr : atom ( '+'^^ atom )* ;
 - (SimpleCParser_aexpr_return *) aexpr
 {
     SimpleCParser_aexpr_return * _retval = [[SimpleCParser_aexpr_return alloc] init]; 
@@ -1961,17 +1972,17 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _char_literal47_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:82:9: ( atom ( '+'^^ atom )* ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:82:9: atom ( '+'^^ atom )* // alt
+        // SimpleC.g:82:9: ( atom ( '+'^^ atom )* ) // ruleBlockSingleAlt
+        // SimpleC.g:82:9: atom ( '+'^^ atom )* // alt
         {
-        root_0 = (id)[adaptor emptyTree];
+        root_0 = (id)[treeAdaptor emptyTree];
 
         [following addObject:FOLLOW_atom_in_aexpr653];
         _atom46 = [self atom];
         [following removeLastObject];
 
 
-        [adaptor addChild:[_atom46 tree] toTree:root_0];
+        [treeAdaptor addChild:[_atom46 tree] toTree:root_0];
         do {
             int alt10=2;
             {
@@ -1983,24 +1994,24 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
             }
             switch (alt10) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:82:16: '+'^^ atom // alt
+        	    // SimpleC.g:82:16: '+'^^ atom // alt
         	    {
-        	    id root_1 = (id)[adaptor emptyTree];
+        	    id root_1 = (id)[treeAdaptor emptyTree];
 
         	    _char_literal47=(ANTLRToken *)[input LT:1];
         	    [_char_literal47 retain];
         	    [self match:input tokenType:SimpleCParser_PLUS follow:FOLLOW_SimpleCParser_PLUS_in_aexpr657]; 
-        	    _char_literal47_tree = (id)[adaptor newTreeWithToken:_char_literal47];
-        	    root_0 = (id)[adaptor makeNode:_char_literal47_tree parentOf:root_0];
+        	    _char_literal47_tree = (id)[treeAdaptor newTreeWithToken:_char_literal47];
+        	    root_0 = (id)[treeAdaptor makeNode:_char_literal47_tree parentOf:root_0];
 
         	    [following addObject:FOLLOW_atom_in_aexpr660];
         	    _atom48 = [self atom];
         	    [following removeLastObject];
 
 
-        	    [adaptor addChild:[_atom48 tree] toTree:root_1];
+        	    [treeAdaptor addChild:[_atom48 tree] toTree:root_1];
 
-        	    [adaptor addChild:root_1 toTree:root_0];
+        	    [treeAdaptor addChild:root_1 toTree:root_0];
 
         	    }
         	    break;
@@ -2028,8 +2039,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		// rule refs in alts with rewrites
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -2037,7 +2048,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end aexpr
 
 // $ANTLR start atom
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:85:1: atom : ( ID | INT | '(' expr ')' -> expr );
+// SimpleC.g:85:1: atom : ( ID | INT | '(' expr ')' -> expr );
 - (SimpleCParser_atom_return *) atom
 {
     SimpleCParser_atom_return * _retval = [[SimpleCParser_atom_return alloc] init]; 
@@ -2060,7 +2071,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
     id _char_literal53_tree = nil;
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:86:7: ( ID | INT | '(' expr ')' -> expr ) //ruleblock
+        // SimpleC.g:86:7: ( ID | INT | '(' expr ')' -> expr ) //ruleblock
         int alt11=3;
         switch ([input LA:1]) {
         	case SimpleCParser_ID:
@@ -2080,35 +2091,35 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	}}
         switch (alt11) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:86:7: ID // alt
+        	    // SimpleC.g:86:7: ID // alt
         	    {
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    _ID49=(ANTLRToken *)[input LT:1];
         	    [_ID49 retain];
         	    [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_atom680]; 
-        	    _ID49_tree = (id)[adaptor newTreeWithToken:_ID49];
-        	    [adaptor addChild:_ID49_tree toTree:root_0];
+        	    _ID49_tree = (id)[treeAdaptor newTreeWithToken:_ID49];
+        	    [treeAdaptor addChild:_ID49_tree toTree:root_0];
 
 
         	    }
         	    break;
         	case 2 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:87:7: INT // alt
+        	    // SimpleC.g:87:7: INT // alt
         	    {
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    _INT50=(ANTLRToken *)[input LT:1];
         	    [_INT50 retain];
         	    [self match:input tokenType:SimpleCParser_INT follow:FOLLOW_SimpleCParser_INT_in_atom694]; 
-        	    _INT50_tree = (id)[adaptor newTreeWithToken:_INT50];
-        	    [adaptor addChild:_INT50_tree toTree:root_0];
+        	    _INT50_tree = (id)[treeAdaptor newTreeWithToken:_INT50];
+        	    [treeAdaptor addChild:_INT50_tree toTree:root_0];
 
 
         	    }
         	    break;
         	case 3 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g:88:7: '(' expr ')' // alt
+        	    // SimpleC.g:88:7: '(' expr ')' // alt
         	    {
         	    _char_literal51=(ANTLRToken *)[input LT:1];
         	    [_char_literal51 retain];
@@ -2130,10 +2141,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    // AST REWRITE
         	    int i_0 = 0;
         	    [_retval setTree:root_0];
-        	    root_0 = (id)[adaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor emptyTree];
         	    // 88:20: -> expr
         	    {
-        	        [adaptor addChild:(id<ANTLRTree>)[_list_expr objectAtIndex:i_0] toTree:root_0];
+        	        [treeAdaptor addChild:(id<ANTLRTree>)[_list_expr objectAtIndex:i_0] toTree:root_0];
 
         	    }
 
@@ -2163,8 +2174,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[_list_22 release];
 		[_retval setStop:[input LT:-1]];
 
-		    [_retval setTree:(id)[adaptor postProcessTree:root_0]];
-		    [adaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
+		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
+		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
 
 	}
 	return _retval;
@@ -2172,14 +2183,18 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end atom
 
 
-- (Class) adaptor
+- (id<ANTLRTreeAdaptor>) treeAdaptor
 {
-	return adaptor;
+	return treeAdaptor;
 }
 
-- (void) setAdaptor:(Class)theAdaptor
+- (void) setTreeAdaptor:(id<ANTLRTreeAdaptor>)aTreeAdaptor
 {
-	adaptor = theAdaptor;
+	if (aTreeAdaptor != treeAdaptor) {
+		[aTreeAdaptor retain];
+		[treeAdaptor release];
+		treeAdaptor = aTreeAdaptor;
+	}
 }
 
 @end

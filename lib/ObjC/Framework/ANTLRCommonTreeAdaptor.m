@@ -10,7 +10,7 @@
 
 @implementation ANTLRCommonTreeAdaptor
 
-+ (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *) payload
+- (id<ANTLRTree>) newTreeWithToken:(ANTLRToken *) payload
 {
 	// I simply don't get the warning here...gcc says:
 	// warning: class 'ANTLRCommonToken' does not implement the 'ANTLRTree' protocol
@@ -19,12 +19,12 @@
 	return [[ANTLRCommonTree alloc] initWithToken:(ANTLRCommonToken *)payload];
 }
 
-+ (ANTLRToken *) newTokenWithToken:(ANTLRToken *)fromToken
+- (ANTLRToken *) newTokenWithToken:(ANTLRToken *)fromToken
 {
 	return [[ANTLRCommonToken alloc] initWithToken:(ANTLRCommonToken *)fromToken];
 }
 
-+ (ANTLRToken *) newTokenWithTokenType:(int)tokenType text:(NSString *)tokenText
+- (ANTLRToken *) newTokenWithTokenType:(int)tokenType text:(NSString *)tokenText
 {
 	ANTLRCommonToken *newToken = [[ANTLRCommonToken alloc] init];
 	[newToken setType:tokenType];
@@ -32,7 +32,7 @@
 	return newToken;
 }
 
-+ (void) setBoundariesForTree:(id<ANTLRTree>)aTree fromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken
+- (void) setBoundariesForTree:(id<ANTLRTree>)aTree fromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken
 {
 	ANTLRCommonTree *tmpTree = (ANTLRCommonTree *)aTree;
 	[tmpTree setStartIndex:[startToken tokenIndex]];
@@ -40,12 +40,12 @@
 		
 }
 
-+ (int) tokenStartIndexForTree:(id<ANTLRTree>)aTree
+- (int) tokenStartIndexForTree:(id<ANTLRTree>)aTree
 {
 	return [(ANTLRCommonTree *)aTree startIndex];
 }
 
-+ (int) tokenStopIndexForTree:(id<ANTLRTree>)aTree
+- (int) tokenStopIndexForTree:(id<ANTLRTree>)aTree
 {
 	return [(ANTLRCommonTree *)aTree stopIndex];
 }

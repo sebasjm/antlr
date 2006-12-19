@@ -1,8 +1,8 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g 2006-11-12 21:48:43
+// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g 2006-12-12 20:50:18
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
-
+#import <ANTLR/ANTLRDebug.h>
 
 
 #pragma mark Cyclic DFA
@@ -22,10 +22,12 @@
 #pragma mark Rule Return Scopes
 
 
-@interface SimpleCParser : ANTLRParser {
+@interface SimpleCParser : ANTLRDebugParser {
 
 	SimpleCParserDFA2 *dfa2;
 																
+	int ruleLevel;
+	NSArray *ruleNames;
 
  }
 
@@ -46,6 +48,8 @@
 - (void) aexpr;
 - (void) atom;
 
+
+-(BOOL) evalPredicate:(NSString *)predicate matched:(BOOL)result;
 
 
 @end

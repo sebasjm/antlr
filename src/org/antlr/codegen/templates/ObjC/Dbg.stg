@@ -61,7 +61,7 @@ ruleNames = [[NSArray alloc] initWithObjects:<rules:{rST | @"<rST.ruleName>"}; s
 >>
 
 /* bug: can't use @super.superClassName()> */
-@parserHeaderFile.superClassName() ::= "ANTLRDebugParser"
+@parserHeaderFile.superClassName() ::= "ANTLRDebug<if(TREE_PARSER)>Tree<endif>Parser"
 
 @rule.preamble() ::= <<
 @try { [debugListener enterRule:@"<ruleName>"];

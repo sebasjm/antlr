@@ -1,8 +1,7 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g 2006-11-12 20:37:40
+// $ANTLR 3.0b5 SimpleC.g 2006-12-19 16:11:26
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
-
 
 #pragma mark Cyclic DFA start
 #pragma mark Cyclic DFA end

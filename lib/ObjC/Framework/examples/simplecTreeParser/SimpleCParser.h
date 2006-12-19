@@ -1,8 +1,7 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleC.g 2006-11-12 20:37:38
+// $ANTLR 3.0b5 SimpleC.g 2006-12-19 16:11:24
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
-
 
 
 #pragma mark Cyclic DFA
@@ -131,7 +130,7 @@
 
 	SimpleCParserDFA2 *dfa2;
 																
-	Class adaptor;
+	id<ANTLRTreeAdaptor> treeAdaptor;
 
  }
 
@@ -153,7 +152,7 @@
 - (SimpleCParser_atom_return *) atom;
 
 
-- (Class) adaptor;
-- (void) setAdaptor:(Class)theAdaptor;
+- (id<ANTLRTreeAdaptor>) treeAdaptor;
+- (void) setTreeAdaptor:(id<ANTLRTreeAdaptor>)theTreeAdaptor;
 
 @end

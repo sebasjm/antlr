@@ -1,6 +1,6 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g 2006-11-12 20:38:47
+// $ANTLR 3.0b5 SimpleCTP.g 2006-12-19 16:35:47
 
-#import "SimpleCTPTreeParser.h"
+#import "SimpleCTP.h"
 
 #pragma mark Cyclic DFA
 
@@ -9,42 +9,42 @@ const static unsigned long long FOLLOW_declaration_in_program43_data[] = {0x0000
 static ANTLRBitSet *FOLLOW_declaration_in_program43;
 const static unsigned long long FOLLOW_variable_in_declaration63_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_variable_in_declaration63;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_FUNC_DECL_in_declaration74_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_FUNC_DECL_in_declaration74;
+const static unsigned long long FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74;
 const static unsigned long long FOLLOW_functionHeader_in_declaration76_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_functionHeader_in_declaration76;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_FUNC_DEF_in_declaration88_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_FUNC_DEF_in_declaration88;
+const static unsigned long long FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88;
 const static unsigned long long FOLLOW_functionHeader_in_declaration90_data[] = {0x0000000000000200LL};
 static ANTLRBitSet *FOLLOW_functionHeader_in_declaration90;
 const static unsigned long long FOLLOW_block_in_declaration92_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_block_in_declaration92;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_VAR_DEF_in_variable113_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_VAR_DEF_in_variable113;
+const static unsigned long long FOLLOW_SimpleCTP_VAR_DEF_in_variable113_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_VAR_DEF_in_variable113;
 const static unsigned long long FOLLOW_type_in_variable115_data[] = {0x0000000000000400LL};
 static ANTLRBitSet *FOLLOW_type_in_variable115;
 const static unsigned long long FOLLOW_declarator_in_variable117_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_declarator_in_variable117;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_ID_in_declarator137_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_ID_in_declarator137;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_FUNC_HDR_in_functionHeader158_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_FUNC_HDR_in_functionHeader158;
+const static unsigned long long FOLLOW_SimpleCTP_ID_in_declarator137_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_ID_in_declarator137;
+const static unsigned long long FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158;
 const static unsigned long long FOLLOW_type_in_functionHeader160_data[] = {0x0000000000000400LL};
 static ANTLRBitSet *FOLLOW_type_in_functionHeader160;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_ID_in_functionHeader162_data[] = {0x0000000000000020LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_ID_in_functionHeader162;
+const static unsigned long long FOLLOW_SimpleCTP_ID_in_functionHeader162_data[] = {0x0000000000000020LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_ID_in_functionHeader162;
 const static unsigned long long FOLLOW_formalParameter_in_functionHeader164_data[] = {0x0000000000000028LL};
 static ANTLRBitSet *FOLLOW_formalParameter_in_functionHeader164;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_ARG_DEF_in_formalParameter186_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_ARG_DEF_in_formalParameter186;
+const static unsigned long long FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186;
 const static unsigned long long FOLLOW_type_in_formalParameter188_data[] = {0x0000000000000400LL};
 static ANTLRBitSet *FOLLOW_type_in_formalParameter188;
 const static unsigned long long FOLLOW_declarator_in_formalParameter190_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_declarator_in_formalParameter190;
 const static unsigned long long FOLLOW_set_in_type210_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_set_in_type210;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_BLOCK_in_block273_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_BLOCK_in_block273;
+const static unsigned long long FOLLOW_SimpleCTP_BLOCK_in_block273_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_BLOCK_in_block273;
 const static unsigned long long FOLLOW_variable_in_block275_data[] = {0x00000000000E3E18LL};
 static ANTLRBitSet *FOLLOW_variable_in_block275;
 const static unsigned long long FOLLOW_stat_in_block278_data[] = {0x00000000000E3E08LL};
@@ -55,8 +55,8 @@ const static unsigned long long FOLLOW_expr_in_stat300_data[] = {0x0000000000000
 static ANTLRBitSet *FOLLOW_expr_in_stat300;
 const static unsigned long long FOLLOW_block_in_stat308_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_block_in_stat308;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_FOR_in_forStat328_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_FOR_in_forStat328;
+const static unsigned long long FOLLOW_SimpleCTP_FOR_in_forStat328_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_FOR_in_forStat328;
 const static unsigned long long FOLLOW_expr_in_forStat330_data[] = {0x00000000000E1C00LL};
 static ANTLRBitSet *FOLLOW_expr_in_forStat330;
 const static unsigned long long FOLLOW_expr_in_forStat332_data[] = {0x00000000000E1C00LL};
@@ -65,28 +65,28 @@ const static unsigned long long FOLLOW_expr_in_forStat334_data[] = {0x0000000000
 static ANTLRBitSet *FOLLOW_expr_in_forStat334;
 const static unsigned long long FOLLOW_block_in_forStat336_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_block_in_forStat336;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_EQEQ_in_expr352_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_EQEQ_in_expr352;
+const static unsigned long long FOLLOW_SimpleCTP_EQEQ_in_expr352_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_EQEQ_in_expr352;
 const static unsigned long long FOLLOW_expr_in_expr354_data[] = {0x00000000000E1C00LL};
 static ANTLRBitSet *FOLLOW_expr_in_expr354;
 const static unsigned long long FOLLOW_expr_in_expr356_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_expr_in_expr356;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_LT_in_expr368_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_LT_in_expr368;
+const static unsigned long long FOLLOW_SimpleCTP_LT_in_expr368_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_LT_in_expr368;
 const static unsigned long long FOLLOW_expr_in_expr370_data[] = {0x00000000000E1C00LL};
 static ANTLRBitSet *FOLLOW_expr_in_expr370;
 const static unsigned long long FOLLOW_expr_in_expr372_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_expr_in_expr372;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_PLUS_in_expr384_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_PLUS_in_expr384;
+const static unsigned long long FOLLOW_SimpleCTP_PLUS_in_expr384_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_PLUS_in_expr384;
 const static unsigned long long FOLLOW_expr_in_expr386_data[] = {0x00000000000E1C00LL};
 static ANTLRBitSet *FOLLOW_expr_in_expr386;
 const static unsigned long long FOLLOW_expr_in_expr388_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_expr_in_expr388;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_EQ_in_expr400_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_EQ_in_expr400;
-const static unsigned long long FOLLOW_SimpleCTPTreeParser_ID_in_expr402_data[] = {0x00000000000E1C00LL};
-static ANTLRBitSet *FOLLOW_SimpleCTPTreeParser_ID_in_expr402;
+const static unsigned long long FOLLOW_SimpleCTP_EQ_in_expr400_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_EQ_in_expr400;
+const static unsigned long long FOLLOW_SimpleCTP_ID_in_expr402_data[] = {0x00000000000E1C00LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_ID_in_expr402;
 const static unsigned long long FOLLOW_expr_in_expr404_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_expr_in_expr404;
 const static unsigned long long FOLLOW_atom_in_expr415_data[] = {0x0000000000000002LL};
@@ -101,51 +101,51 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 
 #pragma mark Rule return scopes start
 
-@implementation SimpleCTPTreeParser
+@implementation SimpleCTP
 
 + (void) initialize
 {
 	FOLLOW_declaration_in_program43 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declaration_in_program43_data count:1];
 	FOLLOW_variable_in_declaration63 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_declaration63_data count:1];
-	FOLLOW_SimpleCTPTreeParser_FUNC_DECL_in_declaration74 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_FUNC_DECL_in_declaration74_data count:1];
+	FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74_data count:1];
 	FOLLOW_functionHeader_in_declaration76 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_functionHeader_in_declaration76_data count:1];
-	FOLLOW_SimpleCTPTreeParser_FUNC_DEF_in_declaration88 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_FUNC_DEF_in_declaration88_data count:1];
+	FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88_data count:1];
 	FOLLOW_functionHeader_in_declaration90 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_functionHeader_in_declaration90_data count:1];
 	FOLLOW_block_in_declaration92 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_declaration92_data count:1];
-	FOLLOW_SimpleCTPTreeParser_VAR_DEF_in_variable113 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_VAR_DEF_in_variable113_data count:1];
+	FOLLOW_SimpleCTP_VAR_DEF_in_variable113 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_VAR_DEF_in_variable113_data count:1];
 	FOLLOW_type_in_variable115 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_variable115_data count:1];
 	FOLLOW_declarator_in_variable117 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_variable117_data count:1];
-	FOLLOW_SimpleCTPTreeParser_ID_in_declarator137 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_ID_in_declarator137_data count:1];
-	FOLLOW_SimpleCTPTreeParser_FUNC_HDR_in_functionHeader158 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_FUNC_HDR_in_functionHeader158_data count:1];
+	FOLLOW_SimpleCTP_ID_in_declarator137 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_declarator137_data count:1];
+	FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158_data count:1];
 	FOLLOW_type_in_functionHeader160 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_functionHeader160_data count:1];
-	FOLLOW_SimpleCTPTreeParser_ID_in_functionHeader162 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_ID_in_functionHeader162_data count:1];
+	FOLLOW_SimpleCTP_ID_in_functionHeader162 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_functionHeader162_data count:1];
 	FOLLOW_formalParameter_in_functionHeader164 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_formalParameter_in_functionHeader164_data count:1];
-	FOLLOW_SimpleCTPTreeParser_ARG_DEF_in_formalParameter186 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_ARG_DEF_in_formalParameter186_data count:1];
+	FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186_data count:1];
 	FOLLOW_type_in_formalParameter188 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_formalParameter188_data count:1];
 	FOLLOW_declarator_in_formalParameter190 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_formalParameter190_data count:1];
 	FOLLOW_set_in_type210 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_type210_data count:1];
-	FOLLOW_SimpleCTPTreeParser_BLOCK_in_block273 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_BLOCK_in_block273_data count:1];
+	FOLLOW_SimpleCTP_BLOCK_in_block273 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_BLOCK_in_block273_data count:1];
 	FOLLOW_variable_in_block275 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_block275_data count:1];
 	FOLLOW_stat_in_block278 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_stat_in_block278_data count:1];
 	FOLLOW_forStat_in_stat292 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_forStat_in_stat292_data count:1];
 	FOLLOW_expr_in_stat300 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_stat300_data count:1];
 	FOLLOW_block_in_stat308 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_stat308_data count:1];
-	FOLLOW_SimpleCTPTreeParser_FOR_in_forStat328 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_FOR_in_forStat328_data count:1];
+	FOLLOW_SimpleCTP_FOR_in_forStat328 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FOR_in_forStat328_data count:1];
 	FOLLOW_expr_in_forStat330 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat330_data count:1];
 	FOLLOW_expr_in_forStat332 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat332_data count:1];
 	FOLLOW_expr_in_forStat334 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat334_data count:1];
 	FOLLOW_block_in_forStat336 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_forStat336_data count:1];
-	FOLLOW_SimpleCTPTreeParser_EQEQ_in_expr352 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_EQEQ_in_expr352_data count:1];
+	FOLLOW_SimpleCTP_EQEQ_in_expr352 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_EQEQ_in_expr352_data count:1];
 	FOLLOW_expr_in_expr354 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr354_data count:1];
 	FOLLOW_expr_in_expr356 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr356_data count:1];
-	FOLLOW_SimpleCTPTreeParser_LT_in_expr368 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_LT_in_expr368_data count:1];
+	FOLLOW_SimpleCTP_LT_in_expr368 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_LT_in_expr368_data count:1];
 	FOLLOW_expr_in_expr370 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr370_data count:1];
 	FOLLOW_expr_in_expr372 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr372_data count:1];
-	FOLLOW_SimpleCTPTreeParser_PLUS_in_expr384 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_PLUS_in_expr384_data count:1];
+	FOLLOW_SimpleCTP_PLUS_in_expr384 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_PLUS_in_expr384_data count:1];
 	FOLLOW_expr_in_expr386 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr386_data count:1];
 	FOLLOW_expr_in_expr388 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr388_data count:1];
-	FOLLOW_SimpleCTPTreeParser_EQ_in_expr400 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_EQ_in_expr400_data count:1];
-	FOLLOW_SimpleCTPTreeParser_ID_in_expr402 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTPTreeParser_ID_in_expr402_data count:1];
+	FOLLOW_SimpleCTP_EQ_in_expr400 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_EQ_in_expr400_data count:1];
+	FOLLOW_SimpleCTP_ID_in_expr402 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_expr402_data count:1];
 	FOLLOW_expr_in_expr404 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr404_data count:1];
 	FOLLOW_atom_in_expr415 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_expr415_data count:1];
 	FOLLOW_set_in_atom432 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_atom432_data count:1];
@@ -157,7 +157,10 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 {
 	if ((self = [super initWithTreeNodeStream:aStream])) {
 
-		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>",     @"VAR_DEF",     @"ARG_DEF",     @"FUNC_HDR",     @"FUNC_DECL",     @"FUNC_DEF",     @"BLOCK",     @"ID",     @"EQ",     @"INT",     @"FOR",     @"INT_TYPE",     @"CHAR",     @"VOID",     @"EQEQ",     @"LT",     @"PLUS",     @"WS",     @"';'",     @"'('",     @"','",     @"')'",     @"'{'",     @"'}'", nil];
+		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>", 
+	@"VAR_DEF", @"ARG_DEF", @"FUNC_HDR", @"FUNC_DECL", @"FUNC_DEF", @"BLOCK", 
+	@"ID", @"EQ", @"INT", @"FOR", @"INT_TYPE", @"CHAR", @"VOID", @"EQEQ", @"LT", 
+	@"PLUS", @"WS", @"';'", @"'('", @"','", @"')'", @"'{'", @"'}'", nil];
 
 																										
 	}
@@ -171,30 +174,35 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 	[super dealloc];
 }
 
+- (NSString *) grammarFileName
+{
+	return @"SimpleCTP.g";
+}
+
 
 // $ANTLR start program
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:8:1: program : ( declaration )+ ;
+// SimpleCTP.g:8:1: program : ( declaration )+ ;
 - (void) program
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:9:9: ( ( declaration )+ ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:9:9: ( declaration )+ // alt
+        // SimpleCTP.g:9:9: ( ( declaration )+ ) // ruleBlockSingleAlt
+        // SimpleCTP.g:9:9: ( declaration )+ // alt
         {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:9:9: ( declaration )+	// positiveClosureBlock
+        // SimpleCTP.g:9:9: ( declaration )+	// positiveClosureBlock
         int cnt1=0;
 
         do {
             int alt1=2;
             {
             	int LA1_0 = [input LA:1];
-            	if ( LA1_0==SimpleCTPTreeParser_VAR_DEF||(LA1_0>=SimpleCTPTreeParser_FUNC_DECL && LA1_0<=SimpleCTPTreeParser_FUNC_DEF) ) {
+            	if ( LA1_0==SimpleCTP_VAR_DEF||(LA1_0>=SimpleCTP_FUNC_DECL && LA1_0<=SimpleCTP_FUNC_DEF) ) {
             		alt1 = 1;
             	}
 
             }
             switch (alt1) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:9:9: declaration // alt
+        	    // SimpleCTP.g:9:9: declaration // alt
         	    {
         	    [following addObject:FOLLOW_declaration_in_program43];
         	    [self declaration];
@@ -233,20 +241,20 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end program
 
 // $ANTLR start declaration
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:12:1: declaration : ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) );
+// SimpleCTP.g:12:1: declaration : ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) );
 - (void) declaration
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:13:9: ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) ) //ruleblock
+        // SimpleCTP.g:13:9: ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) ) //ruleblock
         int alt2=3;
         switch ([input LA:1]) {
-        	case SimpleCTPTreeParser_VAR_DEF:
+        	case SimpleCTP_VAR_DEF:
         		alt2 = 1;
         		break;
-        	case SimpleCTPTreeParser_FUNC_DECL:
+        	case SimpleCTP_FUNC_DECL:
         		alt2 = 2;
         		break;
-        	case SimpleCTPTreeParser_FUNC_DEF:
+        	case SimpleCTP_FUNC_DEF:
         		alt2 = 3;
         		break;
         default:
@@ -257,7 +265,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	}}
         switch (alt2) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:13:9: variable // alt
+        	    // SimpleCTP.g:13:9: variable // alt
         	    {
         	    [following addObject:FOLLOW_variable_in_declaration63];
         	    [self variable];
@@ -268,9 +276,9 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	    }
         	    break;
         	case 2 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:14:9: ^( FUNC_DECL functionHeader ) // alt
+        	    // SimpleCTP.g:14:9: ^( FUNC_DECL functionHeader ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTPTreeParser_FUNC_DECL follow:FOLLOW_SimpleCTPTreeParser_FUNC_DECL_in_declaration74]; 
+        	    [self match:input tokenType:SimpleCTP_FUNC_DECL follow:FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         	    [following addObject:FOLLOW_functionHeader_in_declaration76];
@@ -284,9 +292,9 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	    }
         	    break;
         	case 3 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:15:9: ^( FUNC_DEF functionHeader block ) // alt
+        	    // SimpleCTP.g:15:9: ^( FUNC_DEF functionHeader block ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTPTreeParser_FUNC_DEF follow:FOLLOW_SimpleCTPTreeParser_FUNC_DEF_in_declaration88]; 
+        	    [self match:input tokenType:SimpleCTP_FUNC_DEF follow:FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         	    [following addObject:FOLLOW_functionHeader_in_declaration90];
@@ -323,14 +331,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end declaration
 
 // $ANTLR start variable
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:18:1: variable : ^( VAR_DEF type declarator ) ;
+// SimpleCTP.g:18:1: variable : ^( VAR_DEF type declarator ) ;
 - (void) variable
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:19:9: ( ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:19:9: ^( VAR_DEF type declarator ) // alt
+        // SimpleCTP.g:19:9: ( ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
+        // SimpleCTP.g:19:9: ^( VAR_DEF type declarator ) // alt
         {
-        [self match:input tokenType:SimpleCTPTreeParser_VAR_DEF follow:FOLLOW_SimpleCTPTreeParser_VAR_DEF_in_variable113]; 
+        [self match:input tokenType:SimpleCTP_VAR_DEF follow:FOLLOW_SimpleCTP_VAR_DEF_in_variable113]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         [following addObject:FOLLOW_type_in_variable115];
@@ -365,14 +373,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end variable
 
 // $ANTLR start declarator
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:22:1: declarator : ID ;
+// SimpleCTP.g:22:1: declarator : ID ;
 - (void) declarator
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:23:9: ( ID ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:23:9: ID // alt
+        // SimpleCTP.g:23:9: ( ID ) // ruleBlockSingleAlt
+        // SimpleCTP.g:23:9: ID // alt
         {
-        [self match:input tokenType:SimpleCTPTreeParser_ID follow:FOLLOW_SimpleCTPTreeParser_ID_in_declarator137]; 
+        [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_declarator137]; 
 
         }
 
@@ -393,14 +401,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end declarator
 
 // $ANTLR start functionHeader
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:26:1: functionHeader : ^( FUNC_HDR type ID ( formalParameter )+ ) ;
+// SimpleCTP.g:26:1: functionHeader : ^( FUNC_HDR type ID ( formalParameter )+ ) ;
 - (void) functionHeader
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:27:9: ( ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:27:9: ^( FUNC_HDR type ID ( formalParameter )+ ) // alt
+        // SimpleCTP.g:27:9: ( ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
+        // SimpleCTP.g:27:9: ^( FUNC_HDR type ID ( formalParameter )+ ) // alt
         {
-        [self match:input tokenType:SimpleCTPTreeParser_FUNC_HDR follow:FOLLOW_SimpleCTPTreeParser_FUNC_HDR_in_functionHeader158]; 
+        [self match:input tokenType:SimpleCTP_FUNC_HDR follow:FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         [following addObject:FOLLOW_type_in_functionHeader160];
@@ -408,22 +416,22 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         [following removeLastObject];
 
 
-        [self match:input tokenType:SimpleCTPTreeParser_ID follow:FOLLOW_SimpleCTPTreeParser_ID_in_functionHeader162]; 
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:27:28: ( formalParameter )+	// positiveClosureBlock
+        [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_functionHeader162]; 
+        // SimpleCTP.g:27:28: ( formalParameter )+	// positiveClosureBlock
         int cnt3=0;
 
         do {
             int alt3=2;
             {
             	int LA3_0 = [input LA:1];
-            	if ( LA3_0==SimpleCTPTreeParser_ARG_DEF ) {
+            	if ( LA3_0==SimpleCTP_ARG_DEF ) {
             		alt3 = 1;
             	}
 
             }
             switch (alt3) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:27:28: formalParameter // alt
+        	    // SimpleCTP.g:27:28: formalParameter // alt
         	    {
         	    [following addObject:FOLLOW_formalParameter_in_functionHeader164];
         	    [self formalParameter];
@@ -464,14 +472,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end functionHeader
 
 // $ANTLR start formalParameter
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:30:1: formalParameter : ^( ARG_DEF type declarator ) ;
+// SimpleCTP.g:30:1: formalParameter : ^( ARG_DEF type declarator ) ;
 - (void) formalParameter
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:31:9: ( ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:31:9: ^( ARG_DEF type declarator ) // alt
+        // SimpleCTP.g:31:9: ( ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
+        // SimpleCTP.g:31:9: ^( ARG_DEF type declarator ) // alt
         {
-        [self match:input tokenType:SimpleCTPTreeParser_ARG_DEF follow:FOLLOW_SimpleCTPTreeParser_ARG_DEF_in_formalParameter186]; 
+        [self match:input tokenType:SimpleCTP_ARG_DEF follow:FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         [following addObject:FOLLOW_type_in_formalParameter188];
@@ -506,14 +514,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end formalParameter
 
 // $ANTLR start type
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:34:1: type : ('int'|'char'|'void'|ID);
+// SimpleCTP.g:34:1: type : ('int'|'char'|'void'|ID);
 - (void) type
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:35:5: ( ('int'|'char'|'void'|ID)) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:35:9: ('int'|'char'|'void'|ID) // alt
+        // SimpleCTP.g:35:5: ( ('int'|'char'|'void'|ID)) // ruleBlockSingleAlt
+        // SimpleCTP.g:35:9: ('int'|'char'|'void'|ID) // alt
         {
-        if ([input LA:1]==SimpleCTPTreeParser_ID||([input LA:1]>=SimpleCTPTreeParser_INT_TYPE && [input LA:1]<=SimpleCTPTreeParser_VOID)) {
+        if ([input LA:1]==SimpleCTP_ID||([input LA:1]>=SimpleCTP_INT_TYPE && [input LA:1]<=SimpleCTP_VOID)) {
         	[input consume];
         	errorRecovery = NO;
         } else {
@@ -541,14 +549,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end type
 
 // $ANTLR start block
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:41:1: block : ^( BLOCK ( variable )* ( stat )* ) ;
+// SimpleCTP.g:41:1: block : ^( BLOCK ( variable )* ( stat )* ) ;
 - (void) block
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:42:9: ( ^( BLOCK ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:42:9: ^( BLOCK ( variable )* ( stat )* ) // alt
+        // SimpleCTP.g:42:9: ( ^( BLOCK ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
+        // SimpleCTP.g:42:9: ^( BLOCK ( variable )* ( stat )* ) // alt
         {
-        [self match:input tokenType:SimpleCTPTreeParser_BLOCK follow:FOLLOW_SimpleCTPTreeParser_BLOCK_in_block273]; 
+        [self match:input tokenType:SimpleCTP_BLOCK follow:FOLLOW_SimpleCTP_BLOCK_in_block273]; 
 
         if ( [input LA:1] == ANTLRTokenTypeDOWN ) {
             [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
@@ -556,14 +564,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
                 int alt4=2;
                 {
                 	int LA4_0 = [input LA:1];
-                	if ( LA4_0==SimpleCTPTreeParser_VAR_DEF ) {
+                	if ( LA4_0==SimpleCTP_VAR_DEF ) {
                 		alt4 = 1;
                 	}
 
                 }
                 switch (alt4) {
             	case 1 :
-            	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:42:17: variable // alt
+            	    // SimpleCTP.g:42:17: variable // alt
             	    {
             	    [following addObject:FOLLOW_variable_in_block275];
             	    [self variable];
@@ -583,14 +591,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
                 int alt5=2;
                 {
                 	int LA5_0 = [input LA:1];
-                	if ( (LA5_0>=SimpleCTPTreeParser_BLOCK && LA5_0<=SimpleCTPTreeParser_FOR)||(LA5_0>=SimpleCTPTreeParser_EQEQ && LA5_0<=SimpleCTPTreeParser_PLUS) ) {
+                	if ( (LA5_0>=SimpleCTP_BLOCK && LA5_0<=SimpleCTP_FOR)||(LA5_0>=SimpleCTP_EQEQ && LA5_0<=SimpleCTP_PLUS) ) {
                 		alt5 = 1;
                 	}
 
                 }
                 switch (alt5) {
             	case 1 :
-            	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:42:27: stat // alt
+            	    // SimpleCTP.g:42:27: stat // alt
             	    {
             	    [following addObject:FOLLOW_stat_in_block278];
             	    [self stat];
@@ -629,25 +637,25 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end block
 
 // $ANTLR start stat
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:45:1: stat : ( forStat | expr | block );
+// SimpleCTP.g:45:1: stat : ( forStat | expr | block );
 - (void) stat
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:45:7: ( forStat | expr | block ) //ruleblock
+        // SimpleCTP.g:45:7: ( forStat | expr | block ) //ruleblock
         int alt6=3;
         switch ([input LA:1]) {
-        	case SimpleCTPTreeParser_FOR:
+        	case SimpleCTP_FOR:
         		alt6 = 1;
         		break;
-        	case SimpleCTPTreeParser_ID:
-        	case SimpleCTPTreeParser_EQ:
-        	case SimpleCTPTreeParser_INT:
-        	case SimpleCTPTreeParser_EQEQ:
-        	case SimpleCTPTreeParser_LT:
-        	case SimpleCTPTreeParser_PLUS:
+        	case SimpleCTP_ID:
+        	case SimpleCTP_EQ:
+        	case SimpleCTP_INT:
+        	case SimpleCTP_EQEQ:
+        	case SimpleCTP_LT:
+        	case SimpleCTP_PLUS:
         		alt6 = 2;
         		break;
-        	case SimpleCTPTreeParser_BLOCK:
+        	case SimpleCTP_BLOCK:
         		alt6 = 3;
         		break;
         default:
@@ -658,7 +666,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	}}
         switch (alt6) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:45:7: forStat // alt
+        	    // SimpleCTP.g:45:7: forStat // alt
         	    {
         	    [following addObject:FOLLOW_forStat_in_stat292];
         	    [self forStat];
@@ -669,7 +677,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	    }
         	    break;
         	case 2 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:46:7: expr // alt
+        	    // SimpleCTP.g:46:7: expr // alt
         	    {
         	    [following addObject:FOLLOW_expr_in_stat300];
         	    [self expr];
@@ -680,7 +688,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	    }
         	    break;
         	case 3 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:47:7: block // alt
+        	    // SimpleCTP.g:47:7: block // alt
         	    {
         	    [following addObject:FOLLOW_block_in_stat308];
         	    [self block];
@@ -709,14 +717,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end stat
 
 // $ANTLR start forStat
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:50:1: forStat : ^( 'for' expr expr expr block ) ;
+// SimpleCTP.g:50:1: forStat : ^( 'for' expr expr expr block ) ;
 - (void) forStat
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:51:9: ( ^( 'for' expr expr expr block ) ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:51:9: ^( 'for' expr expr expr block ) // alt
+        // SimpleCTP.g:51:9: ( ^( 'for' expr expr expr block ) ) // ruleBlockSingleAlt
+        // SimpleCTP.g:51:9: ^( 'for' expr expr expr block ) // alt
         {
-        [self match:input tokenType:SimpleCTPTreeParser_FOR follow:FOLLOW_SimpleCTPTreeParser_FOR_in_forStat328]; 
+        [self match:input tokenType:SimpleCTP_FOR follow:FOLLOW_SimpleCTP_FOR_in_forStat328]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         [following addObject:FOLLOW_expr_in_forStat330];
@@ -761,27 +769,27 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end forStat
 
 // $ANTLR start expr
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:54:1: expr : ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom );
+// SimpleCTP.g:54:1: expr : ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom );
 - (void) expr
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:54:9: ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom ) //ruleblock
+        // SimpleCTP.g:54:9: ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom ) //ruleblock
         int alt7=5;
         switch ([input LA:1]) {
-        	case SimpleCTPTreeParser_EQEQ:
+        	case SimpleCTP_EQEQ:
         		alt7 = 1;
         		break;
-        	case SimpleCTPTreeParser_LT:
+        	case SimpleCTP_LT:
         		alt7 = 2;
         		break;
-        	case SimpleCTPTreeParser_PLUS:
+        	case SimpleCTP_PLUS:
         		alt7 = 3;
         		break;
-        	case SimpleCTPTreeParser_EQ:
+        	case SimpleCTP_EQ:
         		alt7 = 4;
         		break;
-        	case SimpleCTPTreeParser_ID:
-        	case SimpleCTPTreeParser_INT:
+        	case SimpleCTP_ID:
+        	case SimpleCTP_INT:
         		alt7 = 5;
         		break;
         default:
@@ -792,9 +800,9 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	}}
         switch (alt7) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:54:9: ^( EQEQ expr expr ) // alt
+        	    // SimpleCTP.g:54:9: ^( EQEQ expr expr ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTPTreeParser_EQEQ follow:FOLLOW_SimpleCTPTreeParser_EQEQ_in_expr352]; 
+        	    [self match:input tokenType:SimpleCTP_EQEQ follow:FOLLOW_SimpleCTP_EQEQ_in_expr352]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         	    [following addObject:FOLLOW_expr_in_expr354];
@@ -813,9 +821,9 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	    }
         	    break;
         	case 2 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:55:9: ^( LT expr expr ) // alt
+        	    // SimpleCTP.g:55:9: ^( LT expr expr ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTPTreeParser_LT follow:FOLLOW_SimpleCTPTreeParser_LT_in_expr368]; 
+        	    [self match:input tokenType:SimpleCTP_LT follow:FOLLOW_SimpleCTP_LT_in_expr368]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         	    [following addObject:FOLLOW_expr_in_expr370];
@@ -834,9 +842,9 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	    }
         	    break;
         	case 3 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:56:9: ^( PLUS expr expr ) // alt
+        	    // SimpleCTP.g:56:9: ^( PLUS expr expr ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTPTreeParser_PLUS follow:FOLLOW_SimpleCTPTreeParser_PLUS_in_expr384]; 
+        	    [self match:input tokenType:SimpleCTP_PLUS follow:FOLLOW_SimpleCTP_PLUS_in_expr384]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         	    [following addObject:FOLLOW_expr_in_expr386];
@@ -855,12 +863,12 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	    }
         	    break;
         	case 4 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:57:9: ^( EQ ID expr ) // alt
+        	    // SimpleCTP.g:57:9: ^( EQ ID expr ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTPTreeParser_EQ follow:FOLLOW_SimpleCTPTreeParser_EQ_in_expr400]; 
+        	    [self match:input tokenType:SimpleCTP_EQ follow:FOLLOW_SimpleCTP_EQ_in_expr400]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [self match:input tokenType:SimpleCTPTreeParser_ID follow:FOLLOW_SimpleCTPTreeParser_ID_in_expr402]; 
+        	    [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_expr402]; 
         	    [following addObject:FOLLOW_expr_in_expr404];
         	    [self expr];
         	    [following removeLastObject];
@@ -872,7 +880,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
         	    }
         	    break;
         	case 5 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:58:9: atom // alt
+        	    // SimpleCTP.g:58:9: atom // alt
         	    {
         	    [following addObject:FOLLOW_atom_in_expr415];
         	    [self atom];
@@ -901,14 +909,14 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end expr
 
 // $ANTLR start atom
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:61:1: atom : (ID|INT);
+// SimpleCTP.g:61:1: atom : (ID|INT);
 - (void) atom
 {
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:62:5: ( (ID|INT)) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/simplecTreeParser/SimpleCTP.g:62:7: (ID|INT) // alt
+        // SimpleCTP.g:62:5: ( (ID|INT)) // ruleBlockSingleAlt
+        // SimpleCTP.g:62:7: (ID|INT) // alt
         {
-        if ([input LA:1]==SimpleCTPTreeParser_ID||[input LA:1]==SimpleCTPTreeParser_INT) {
+        if ([input LA:1]==SimpleCTP_ID||[input LA:1]==SimpleCTP_INT) {
         	[input consume];
         	errorRecovery = NO;
         } else {

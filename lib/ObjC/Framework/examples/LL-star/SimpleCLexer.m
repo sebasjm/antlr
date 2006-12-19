@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g 2006-11-12 21:48:44
+// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g 2006-12-12 20:50:20
 
 #import "SimpleCLexer.h"
 #pragma mark Cyclic DFAs
@@ -22,10 +22,16 @@
 	[super dealloc];
 }
 
+- (NSString *) grammarFileName
+{
+	return @"/Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g";
+}
+
 
 - (void) mT7
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T7;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -40,9 +46,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -58,6 +65,7 @@
 - (void) mT8
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T8;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -72,9 +80,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -90,6 +99,7 @@
 - (void) mT9
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T9;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -104,9 +114,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -122,6 +133,7 @@
 - (void) mT10
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T10;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -136,9 +148,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -154,6 +167,7 @@
 - (void) mT11
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T11;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -168,9 +182,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -186,6 +201,7 @@
 - (void) mT12
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T12;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -200,9 +216,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -218,6 +235,7 @@
 - (void) mT13
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T13;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -232,9 +250,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -250,6 +269,7 @@
 - (void) mT14
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T14;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -264,9 +284,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -282,6 +303,7 @@
 - (void) mT15
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T15;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -296,9 +318,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -314,6 +337,7 @@
 - (void) mT16
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T16;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -328,9 +352,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -346,6 +371,7 @@
 - (void) mT17
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T17;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -360,9 +386,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -378,6 +405,7 @@
 - (void) mT18
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T18;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -392,9 +420,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -410,6 +439,7 @@
 - (void) mT19
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T19;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -424,9 +454,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -442,6 +473,7 @@
 - (void) mT20
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_T20;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -456,9 +488,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -474,6 +507,7 @@
 - (void) mID
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_ID;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -523,9 +557,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -541,6 +576,7 @@
 - (void) mINT
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_INT;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -581,9 +617,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -599,6 +636,7 @@
 - (void) mWS
 {
 	@try {
+		ruleNestingLevel++;
 		int _type = SimpleCLexer_WS;
 		int _start = [self charIndex];
 		int _line = [self line];
@@ -647,9 +685,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
