@@ -58,7 +58,7 @@ public class DOTTreeGenerator {
 			"  ordering=out;\n" +
 			"  ranksep=.4;\n" +
 			"  node [shape=plaintext, fixedsize=true, fontsize=11, fontname=\"Courier\",\n" +
-			"        width=.4, height=.2];\n" +
+			"        width=.25, height=.25];\n" +
 			"  edge [arrowsize=.5]\n" +
 			"  $nodes$\n" +
 			"  $edges$\n" +
