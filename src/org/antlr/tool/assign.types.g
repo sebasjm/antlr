@@ -471,7 +471,6 @@ atom
 
 ast_suffix
 	:	ROOT
-	|	RULEROOT
 	|	BANG
 	;
 

@@ -397,7 +397,6 @@ public class GrammarAST extends BaseAST {
 		if ( ttype==ANTLRParser.BANG ||
 			ttype==ANTLRParser.ROOT ||
 			ttype==ANTLRParser.REWRITE ||
-			ttype==ANTLRParser.RULEROOT ||
 			ttype==ANTLRParser.ACTION )
 		{
 			return null;

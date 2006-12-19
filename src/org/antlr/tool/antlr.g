@@ -772,7 +772,6 @@ GrammarAST ebnfRoot=null, subrule=null;
 
 ast_suffix
 	:	ROOT
-	|	RULEROOT
 	|	BANG
 	;
 
@@ -1077,8 +1076,6 @@ REWRITE : "->" ;
 SEMI:	';' ;
 
 ROOT : '^' ;
-
-RULEROOT : "^^" ;
 
 BANG : '!' ;
 

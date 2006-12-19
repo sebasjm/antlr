@@ -355,7 +355,6 @@ atom
 
 ast_suffix
 	:	ROOT {out("^");}
-	|	RULEROOT {out("^^");}
 	|	BANG  {out("!");}
 	;
 

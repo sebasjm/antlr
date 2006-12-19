@@ -548,7 +548,6 @@ if ( grammar.getOption("output")==null ) {
 }
 }
 	:	ROOT
-	|	RULEROOT
 	|	BANG
 	;
 

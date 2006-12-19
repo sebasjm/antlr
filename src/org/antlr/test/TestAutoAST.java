@@ -95,58 +95,6 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("abc 4532\n", found);
 	}
 
-	public void testLoopRoot() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : ( ID^ INT )* ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "a", "a 1 b 2 c 3", debug);
-		assertEquals("(a 1) (b 2) (c 3)\n", found);
-	}
-
-	public void testLoopRootReverse() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : ( ID INT^ )* ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "a", "a 1 b 2 c 3", debug);
-		assertEquals("(1 a) (2 b) (3 c)\n", found);
-	}
-
-	public void testPlusLoopRoot() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : ( ID^ INT )+ ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "a", "a 1 b 2 c 3", debug);
-		assertEquals("(a 1) (b 2) (c 3)\n", found);
-	}
-
-	public void testPlusLoopRootReverse() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : ( ID^ INT )+ ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "a", "a 1 b 2 c 3", debug);
-		assertEquals("(a 1) (b 2) (c 3)\n", found);
-	}
-
 	public void testOptionalThenRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -270,7 +218,7 @@ public class TestAutoAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ID ('+'^^ ID)* ;\n" +
+			"a : ID ('+'^ ID)* ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -283,7 +231,7 @@ public class TestAutoAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ID (op^^ ID)* ;\n" +
+			"a : ID (op^ ID)* ;\n" +
 			"op : {;}'+' | '-' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -298,7 +246,7 @@ public class TestAutoAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"s : a ;\n" +
-			"a : atom ('exp'^^ a)? ;\n" +
+			"a : atom ('exp'^ a)? ;\n" +
 			"atom : INT ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -338,7 +286,7 @@ public class TestAutoAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ID (('+'|'-')^^ ID)* ;\n" +
+			"a : ID (('+'|'-')^ ID)* ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -377,7 +325,7 @@ public class TestAutoAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : INT (~INT^^ INT)* ;\n" +
+			"a : INT (~INT^ INT)* ;\n" +
 			"blort : '+' ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -451,7 +399,7 @@ public class TestAutoAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : id+=ID^^ ;\n" +
+			"a : id+=ID^ ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -489,27 +437,11 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("2nd x=b;a b\n", found);
 	}
 
-	public void testRuleListLabelRoot() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : ( x+=b^ )+ {" +
-			"b_return ret=(b_return)$x.get(1);" +
-			"System.out.print(\"x=\"+((CommonTree)ret.tree).toStringTree()+';');} ;\n" +
-			"b : ID;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "a", "a b", debug);
-		assertEquals("x=b;a b\n", found);
-	}
-
 	public void testRuleListLabelRuleRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : ( x+=b^^ )+ {" +
+			"a : ( x+=b^ )+ {" +
 			"b_return ret=(b_return)$x.get(1);" +
 			"System.out.print(\"x=\"+((CommonTree)ret.tree).toStringTree()+';');} ;\n" +
 			"b : ID;\n" +

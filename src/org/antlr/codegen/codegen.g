@@ -192,9 +192,6 @@ options {
 		}
 		if ( ast_suffix!=null ) {
 			if ( ast_suffix.getType()==ANTLRParser.ROOT ) {
-    			operatorPart = "Root";
-    		}
-    		else if ( ast_suffix.getType()==ANTLRParser.RULEROOT ) {
     			operatorPart = "RuleRoot";
     		}
     		else if ( ast_suffix.getType()==ANTLRParser.BANG ) {
@@ -849,7 +846,6 @@ atom[String label] returns [StringTemplate code=null]
 
 ast_suffix
 	:	ROOT
-	|	RULEROOT
 	|	BANG
 	;
 
