@@ -27,8 +27,6 @@
 */
 package org.antlr.runtime.tree;
 
-import org.antlr.stringtemplate.StringTemplate;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,11 +73,11 @@ public abstract class BaseTree implements Tree {
 		return children.size();
 	}
 
-	/** Warning: if t has no children, but child does
-	 *  and child isNil then it is ok to move children to t via
-	 *  t.children = child.children; i.e., without copying the array.  This
-	 *  is for construction and I'm not sure it's completely general for
-	 *  a tree's addChild method to work this way.
+	/** Add t as child of this node.
+	 *
+	 *  Warning: if t has no children, but child does
+	 *  and child isNil then this routine moves children to t via
+	 *  t.children = child.children; i.e., without copying the array.
 	 */
 	public void addChild(Tree t) {
 		//System.out.println("add "+t.toStringTree()+" as child to "+this.toStringTree());
