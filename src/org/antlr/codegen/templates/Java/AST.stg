@@ -90,16 +90,6 @@ if ( backtracking==0 ) {<\n>
 <if(autoAST)>
 <if(outerAlt)>
 root_0 = (<ASTLabelType>)adaptor.nil();<\n>
-<else>
-<ASTLabelType> root_<blockLevel> = (<ASTLabelType>)adaptor.nil();<\n>
-<endif>
-<endif>
->>
-
-@alt.cleanup() ::= <<
-<if(autoAST)>
-<if(!outerAlt)>
-<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
 <endif>
 <endif>
 >>
@@ -111,7 +101,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.create(<label>);
-adaptor.addChild(root_<blockLevel>, <label>_tree);
+adaptor.addChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
 >>
 
@@ -173,11 +163,11 @@ tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 // I have more time.
 
 matchSet(s,label,elementIndex,postmatchCode) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_<blockLevel>, adaptor.create(<label>));})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_0, adaptor.create(<label>));})>
 >>
 
 matchSetRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_<blockLevel>);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_0);})>
 >>
 
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
@@ -189,7 +179,7 @@ matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_<blockLevel>, <label>.tree);
+<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_0, <label>.tree);
 >>
 
 /** rule! is same as normal rule ref */
@@ -237,7 +227,7 @@ wildcard(label,elementIndex) ::= <<
 <super.wildcard(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.create(<label>);
-adaptor.addChild(root_<blockLevel>, <label>_tree);
+adaptor.addChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
 >>
 
@@ -245,7 +235,7 @@ wildcardRoot(label,elementIndex) ::= <<
 <super.wildcard(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.create(<label>);
-root_<blockLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_<blockLevel>);
+root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
 >>
 
