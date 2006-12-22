@@ -287,6 +287,13 @@ CHANGES
 
 3.0b6 - ??
 
+December 22, 2006
+
+* [BREAKS ANY TREE IMPLEMENTATION]
+  made CommonTreeNodeStream work with any tree node type.  TreeAdaptor
+  now implements isNil so must add; trivial, but does break back
+  compatibility.
+
 December 17, 2006
 
 * Added traceIn/Out methods to recognizers so that you can override them;
