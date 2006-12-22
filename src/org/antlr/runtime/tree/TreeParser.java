@@ -10,6 +10,9 @@ import java.util.ArrayList;
  *  the BaseRecognizer superclass.
 */
 public class TreeParser extends BaseRecognizer {
+	public static final int DOWN = Token.DOWN;
+	public static final int UP = Token.UP;
+	
 	protected TreeNodeStream input;
 
 	public TreeParser(TreeNodeStream input) {

@@ -147,7 +147,7 @@ public class TestTreeParsing extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
 		String treeGrammar =
-			"tree grammar TP; options {ASTLabelType=CommonTree;}\n" +
+			"tree grammar TP;\n" +
 			"options {output=template; ASTLabelType=CommonTree;}\n" +
 			"s : a {System.out.println($a.st);};\n" +
 			"a : ID INT -> {new StringTemplate($INT.text)}\n" +
