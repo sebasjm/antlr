@@ -107,7 +107,8 @@ public interface IntStream {
 	void seek(int index);
 
 	/** Only makes sense for streams that buffer everything up probably, but
-	 *  might be useful to display the entire stream or for testing.
+	 *  might be useful to display the entire stream or for testing.  This
+	 *  value includes a single EOF.
 	 */
 	int size();
 }
