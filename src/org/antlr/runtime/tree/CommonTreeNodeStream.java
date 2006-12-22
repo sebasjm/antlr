@@ -547,7 +547,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	protected void toStringWork(Object p, Object stop, StringBuffer buf) {
 		if ( !adaptor.isNil(p) ) {
-			String text = p.toString();
+			String text = adaptor.getText(p);
 			if ( text==null ) {
 				text = " "+String.valueOf(adaptor.getType(p));
 			}
