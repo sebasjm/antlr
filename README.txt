@@ -289,6 +289,13 @@ CHANGES
 
 December 22, 2006
 
+* New CommonTreeNodeStream buffers all nodes in stream for fast jumping
+  around.  It now has push/pop methods to invoke other locations in
+  the stream for building interpreters.
+
+* Moved CommonTreeNodeStream to UnBufferedTreeNodeStream and removed
+  Iterator implementation.  moved toNodesOnlyString() to TestTreeNodeStream
+
 * [BREAKS ANY TREE IMPLEMENTATION]
   made CommonTreeNodeStream work with any tree node type.  TreeAdaptor
   now implements isNil so must add; trivial, but does break back
