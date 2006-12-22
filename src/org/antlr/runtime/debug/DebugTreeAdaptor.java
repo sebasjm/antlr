@@ -46,6 +46,10 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 		return n;
 	}
 
+	public boolean isNil(Object tree) {
+		return adaptor.isNil(tree);
+	}
+
 	public void addChild(Object t, Object child) {
 		adaptor.addChild(t,child);
 		dbg.addChild(adaptor.getUniqueID(t), adaptor.getUniqueID(child));

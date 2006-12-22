@@ -7,6 +7,10 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		return create(null);
 	}
 
+	public boolean isNil(Object tree) {
+		return ((Tree)tree).isNil();
+	}
+
 	public Object dupTree(Object tree) {
 		return ((Tree)tree).dupTree();
 	}
@@ -114,23 +118,23 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	public void setType(Object t, int type) {
-		throw new NoSuchMethodError("can't do this yet");
+		throw new NoSuchMethodError("don't know enough about Tree node");
 	}
 
 	public String getText(Object t) {
-		throw new NoSuchMethodError("can't do this yet");
+		return ((Tree)t).getText();
 	}
 
 	public void setText(Object t, String text) {
-		throw new NoSuchMethodError("can't do this yet");
+		throw new NoSuchMethodError("don't know enough about Tree node");
 	}
 
 	public Object getChild(Object t, int i) {
-		throw new NoSuchMethodError("can't do this yet");
+		return ((Tree)t).getChild(i);
 	}
 
 	public int getChildCount(Object t) {
-		throw new NoSuchMethodError("can't do this yet");
+		return ((Tree)t).getChildCount();
 	}
 
 	public int getUniqueID(Object node) {

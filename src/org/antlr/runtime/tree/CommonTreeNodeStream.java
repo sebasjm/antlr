@@ -34,7 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-/** A stream of tree nodes, accessing nodes from a tree of some kind.
+/** A stream of tree nodes, accessing nodes from a tree of ANY kind.
  *  The stream can be accessed as an Iterator or via LT(1)/consume or
  *  LT(i).  No new nodes should be created during the walk.  A small buffer
  *  of tokens is kept to efficiently and easily handle LT(i) calls, though
@@ -49,6 +49,8 @@ import java.util.Stack;
  *  a for loop looking for nodes.  When using the Iterator
  *  interface methods you do not get DOWN and UP imaginary nodes that
  *  are used for parsing via TreeNodeStream interface.
+ *
+ *  @see BufferedTreeNodeStream
  */
 public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	public static final int INITIAL_LOOKAHEAD_BUFFER_SIZE = 5;
@@ -92,7 +94,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	protected boolean uniqueNavigationNodes = false;
 
 	/** Pull nodes from which tree? */
-	protected Tree root;
+	protected Object root;
 
 	/** What tree adaptor was used to build these trees */
 	TreeAdaptor adaptor;
@@ -109,10 +111,10 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	protected Stack indexStack = new Stack();
 
 	/** Which node are we currently visiting? */
-	protected Tree currentNode;
+	protected Object currentNode;
 
 	/** Which node did we visit last?  Used for LT(-1) calls. */
-	protected Tree previousNode;
+	protected Object previousNode;
 
 	/** Which child are we currently visiting?  If -1 we have not visited
 	 *  this node yet; next consume() request will set currentIndex to 0.
@@ -128,7 +130,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 *  to fit new lookahead depths, but consume() wraps like a circular
 	 *  buffer.
 	 */
-	protected Tree[] lookahead = new Tree[INITIAL_LOOKAHEAD_BUFFER_SIZE];
+	protected Object[] lookahead = new Object[INITIAL_LOOKAHEAD_BUFFER_SIZE];
 
 	/** lookahead[head] is the first symbol of lookahead, LT(1). */
 	protected int head;
@@ -146,13 +148,13 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	protected class TreeWalkState {
 		int currentChildIndex;
 		int absoluteNodeIndex;
-		Tree currentNode;
-		Tree previousNode;
+		Object currentNode;
+		Object previousNode;
 		/** Record state of the nodeStack */
 		int nodeStackSize;
 		/** Record state of the indexStack */
 		int indexStackSize;
-		Tree[] lookahead;
+		Object[] lookahead;
 	}
 
 	/** Calls to mark() may be nested so we have to track a stack of
@@ -168,11 +170,11 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	/** Track the last mark() call result value for use in rewind(). */
 	protected int lastMarker;
 
-	public CommonTreeNodeStream(Tree tree) {
+	public CommonTreeNodeStream(Object tree) {
 		this(new CommonTreeAdaptor(), tree);
 	}
 
-	public CommonTreeNodeStream(TreeAdaptor adaptor, Tree tree) {
+	public CommonTreeNodeStream(TreeAdaptor adaptor, Object tree) {
 		this.root = tree;
 		this.adaptor = adaptor;
 		reset();
@@ -234,14 +236,14 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 *  and copy all the nodes over plus reset head, tail.  After
 	 *  this method, LT(1) will be lookahead[0].
 	 */
-	protected void addLookahead(Tree node) {
+	protected void addLookahead(Object node) {
 		//System.out.println("addLookahead head="+head+", tail="+tail);
 		lookahead[tail] = node;
 		tail = (tail+1)%lookahead.length;
 		if ( tail==head ) {
 			// buffer overflow: tail caught up with head
 			// allocate a buffer 2x as big
-			Tree[] bigger = new Tree[2*lookahead.length];
+			Object[] bigger = new Object[2*lookahead.length];
 			// copy head to end of buffer to beginning of bigger buffer
 			int remainderHeadToEnd = lookahead.length-head;
 			System.arraycopy(lookahead, head, bigger, 0, remainderHeadToEnd);
@@ -269,11 +271,11 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	}
 
 	public int LA(int i) {
-		Tree t = (Tree)LT(i);
+		Object t = LT(i);
 		if ( t==null ) {
 			return Token.INVALID_TOKEN_TYPE;
 		}
-		return t.getType();
+		return adaptor.getType(t);
 	}
 
 	/** Record the current state of the tree walk which includes
@@ -303,9 +305,9 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		// take snapshot of lookahead buffer
 		int n = getLookaheadSize();
 		int i=0;
-		state.lookahead = new Tree[n];
+		state.lookahead = new Object[n];
 		for (int k=1; k<=n; k++,i++) {
-			state.lookahead[i] = (Tree)LT(k);
+			state.lookahead[i] = LT(k);
 		}
 		lastMarker = markDepth;
 		return markDepth;
@@ -407,7 +409,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		}
 
 		// index is in the child list?
-		if ( currentChildIndex<currentNode.getChildCount() ) {
+		if ( currentChildIndex<adaptor.getChildCount(currentNode) ) {
 			return visitChild(currentChildIndex);
 		}
 
@@ -420,18 +422,18 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		return null;
 	}
 
-	protected Tree handleRootNode() {
-		Tree node;
+	protected Object handleRootNode() {
+		Object node;
 		node = currentNode;
 		// point to first child in prep for subsequent next()
 		currentChildIndex = 0;
-		if ( node.isNil() ) {
+		if ( adaptor.isNil(node) ) {
 			// don't count this root nil node
 			node = visitChild(currentChildIndex);
 		}
 		else {
 			addLookahead(node);
-			if ( currentNode.getChildCount()==0 ) {
+			if ( adaptor.getChildCount(currentNode)==0 ) {
 				// single node case
 				currentNode = null; // say we're done
 			}
@@ -439,16 +441,16 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 		return node;
 	}
 
-	protected Tree visitChild(int child) {
-		Tree node = null;
+	protected Object visitChild(int child) {
+		Object node = null;
 		// save state
 		nodeStack.push(currentNode);
 		indexStack.push(new Integer(child));
-		if ( child==0 && !currentNode.isNil() ) {
+		if ( child==0 && !adaptor.isNil(currentNode) ) {
 			addNavigationNode(Token.DOWN);
 		}
 		// visit child
-		currentNode = (Tree)currentNode.getChild(child);
+		currentNode = adaptor.getChild(currentNode,child);
 		currentChildIndex = 0;
 		node = currentNode;  // record node to return
 		addLookahead(node);
@@ -461,7 +463,7 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	 *  so instantiate new ones when uniqueNavigationNodes is true.
 	 */
 	protected void addNavigationNode(final int ttype) {
-		Tree node = null;
+		Object node = null;
 		if ( ttype==Token.DOWN ) {
 			if ( hasUniqueNavigationNodes() ) node = new NavDownNode();
 			else node = DOWN;
@@ -476,16 +478,16 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 	/** Walk upwards looking for a node with more children to walk. */
 	protected void walkBackToMostRecentNodeWithUnvisitedChildren() {
 		while ( currentNode!=null &&
-				currentChildIndex>=currentNode.getChildCount() )
+				currentChildIndex>=adaptor.getChildCount(currentNode) )
 		{
-			currentNode = (Tree)nodeStack.pop();
+			currentNode = nodeStack.pop();
 			if ( currentNode==null ) { // hit the root?
 				return;
 			}
 			currentChildIndex = ((Integer)indexStack.pop()).intValue();
 			currentChildIndex++; // move to next child
-			if ( currentChildIndex>=currentNode.getChildCount() ) {
-				if ( !currentNode.isNil() ) {
+			if ( currentChildIndex>=adaptor.getChildCount(currentNode) ) {
+				if ( !adaptor.isNil(currentNode) ) {
 					addNavigationNode(Token.UP);
 				}
 				if ( currentNode==root ) { // we done yet?
@@ -539,31 +541,31 @@ public class CommonTreeNodeStream implements TreeNodeStream, Iterator {
 
 	public String toString(Object start, Object stop) {
 		StringBuffer buf = new StringBuffer();
-		toStringWork((Tree)start, (Tree)stop, buf);
+		toStringWork(start, stop, buf);
 		return buf.toString();
 	}
 
-	protected void toStringWork(Tree p, Tree stop, StringBuffer buf) {
-		if ( !p.isNil() ) {
+	protected void toStringWork(Object p, Object stop, StringBuffer buf) {
+		if ( !adaptor.isNil(p) ) {
 			String text = p.toString();
 			if ( text==null ) {
-				text = " "+String.valueOf(p.getType());
+				text = " "+String.valueOf(adaptor.getType(p));
 			}
 			buf.append(text); // ask the node to go to string
 		}
 		if ( p==stop ) {
 			return;
 		}
-		int n = p.getChildCount();
-		if ( n>0 && !p.isNil() ) {
+		int n = adaptor.getChildCount(p);
+		if ( n>0 && !adaptor.isNil(p) ) {
 			buf.append(" ");
 			buf.append(Token.DOWN);
 		}
 		for (int c=0; c<n; c++) {
-			Tree child = p.getChild(c);
+			Object child = adaptor.getChild(p,c);
 			toStringWork(child, stop, buf);
 		}
-		if ( n>0 && !p.isNil() ) {
+		if ( n>0 && !adaptor.isNil(p) ) {
 			buf.append(" ");
 			buf.append(Token.UP);
 		}

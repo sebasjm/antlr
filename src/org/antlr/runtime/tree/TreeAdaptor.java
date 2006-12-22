@@ -59,6 +59,9 @@ public interface TreeAdaptor {
 	 */
 	public Object nil();
 
+	/** Is tree considered a nil node used to make lists of child nodes? */ 
+	public boolean isNil(Object tree);
+
 	/** Add a child to the tree t.  If child is a flat tree (a list), make all
 	 *  in list children of t.  Warning: if t has no children, but child does
 	 *  and child isNil then you can decide it is ok to move children to t via

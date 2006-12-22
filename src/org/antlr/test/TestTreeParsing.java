@@ -31,7 +31,7 @@ public class TestTreeParsing extends BaseTest {
 	public void testFlatList() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
+			"options {output=AST; ASTLabelType=CommonTree;}\n" +
 			"a : ID INT;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -51,7 +51,7 @@ public class TestTreeParsing extends BaseTest {
 	public void testSimpleTree() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
+			"options {output=AST; ASTLabelType=CommonTree;}\n" +
 			"a : ID INT -> ^(ID INT);\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -71,7 +71,7 @@ public class TestTreeParsing extends BaseTest {
 	public void testFlatVsTreeDecision() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
+			"options {output=AST; ASTLabelType=CommonTree;}\n" +
 			"a : b c ;\n" +
 			"b : ID INT -> ^(ID INT);\n" +
 			"c : ID INT;\n" +
@@ -94,7 +94,7 @@ public class TestTreeParsing extends BaseTest {
 	public void testFlatVsTreeDecision2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
+			"options {output=AST; ASTLabelType=CommonTree;}\n" +
 			"a : b c ;\n" +
 			"b : ID INT+ -> ^(ID INT+);\n" +
 			"c : ID INT+;\n" +
@@ -118,7 +118,7 @@ public class TestTreeParsing extends BaseTest {
 	public void testCyclicDFALookahead() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
+			"options {output=AST; ASTLabelType=CommonTree;}\n" +
 			"a : ID INT+ PERIOD;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -140,7 +140,7 @@ public class TestTreeParsing extends BaseTest {
 	public void testTemplateOutput() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
+			"options {output=AST; ASTLabelType=CommonTree;}\n" +
 			"a : ID INT;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -161,7 +161,7 @@ public class TestTreeParsing extends BaseTest {
 	public void testNullableChildList() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
+			"options {output=AST; ASTLabelType=CommonTree;}\n" +
 			"a : ID INT? -> ^(ID INT?);\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -181,7 +181,7 @@ public class TestTreeParsing extends BaseTest {
 	public void testNullableChildList2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
+			"options {output=AST; ASTLabelType=CommonTree;}\n" +
 			"a : ID INT? SEMI -> ^(ID INT?) SEMI ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -202,7 +202,7 @@ public class TestTreeParsing extends BaseTest {
 	public void testNullableChildList3() throws Exception {
 		String grammar =
 			"grammar T;\n" +
-			"options {output=AST;}\n" +
+			"options {output=AST; ASTLabelType=CommonTree;}\n" +
 			"a : x=ID INT? (y=ID)? SEMI -> ^($x INT? $y?) SEMI ;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
