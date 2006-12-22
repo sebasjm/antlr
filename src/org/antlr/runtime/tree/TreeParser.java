@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class TreeParser extends BaseRecognizer {
 	public static final int DOWN = Token.DOWN;
 	public static final int UP = Token.UP;
-	
+
 	protected TreeNodeStream input;
 
 	public TreeParser(TreeNodeStream input) {
@@ -33,6 +33,36 @@ public class TreeParser extends BaseRecognizer {
 
 	public TreeNodeStream getTreeNodeStream() {
 		return input;
+	}
+
+	/** Match '.' in tree parser has special meaning.  Skip node or
+	 *  entire tree if node has children.  If children, scan until
+	 *  corresponding UP node.
+	 */
+	public void matchAny(IntStream ignore) { // ignore stream, copy of this.input
+		errorRecovery = false;
+		failed = false;
+		Object look = input.LT(1);
+		if ( input.getTreeAdaptor().getChildCount(look)==0 ) {
+			input.consume(); // not subtree, consume 1 node and return
+			return;
+		}
+		// current node is a subtree, skip to corresponding UP.
+		// must count nesting level to get right UP
+		int level=0;
+		int tokenType = input.getTreeAdaptor().getType(look);
+		while ( tokenType!=Token.EOF && !(tokenType==UP && level==0) ) {
+			input.consume();
+			look = input.LT(1);
+			tokenType = input.getTreeAdaptor().getType(look);
+			if ( tokenType == DOWN ) {
+				level++;
+			}
+			else if ( tokenType == UP ) {
+				level--;
+			}
+		}
+		input.consume(); // consume UP
 	}
 
 	/** Convert a List<RuleReturnScope> to List<StringTemplate> by copying
