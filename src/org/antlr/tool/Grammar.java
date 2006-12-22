@@ -699,8 +699,8 @@ public class Grammar {
         typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EPSILON, Label.EPSILON_STR);
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "EOF");
 		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "<EOR>");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.DOWN-1, "Token.DOWN");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.UP-1, "Token.UP");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.DOWN-1, "DOWN");
+		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.UP-1, "UP");
         tokenIDToTypeMap.put("<INVALID>", Utils.integer(Label.INVALID));
         tokenIDToTypeMap.put("<EOT>", Utils.integer(Label.EOT));
         tokenIDToTypeMap.put("<SEMPRED>", Utils.integer(Label.SEMPRED));
