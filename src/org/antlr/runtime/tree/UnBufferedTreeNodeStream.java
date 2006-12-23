@@ -148,6 +148,10 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 
 	// Satisfy TreeNodeStream
 
+	public Object get(int i) {
+		throw new UnsupportedOperationException("stream is unbuffered");
+	}
+
 	/** Get tree node at current input pointer + i ahead where i=1 is next node.
 	 *  i<0 indicates nodes in the past.  So -1 is previous node and -2 is
 	 *  two nodes ago. LT(0) is undefined.  For i>=n, return null.

@@ -69,6 +69,10 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 		dbg.consumeNode(ID, text, type);
 	}
 
+	public Object get(int i) {
+		return input.get(i);
+	}
+
 	public Object LT(int i) {
 		Object node = input.LT(i);
 		int ID = adaptor.getUniqueID(node);

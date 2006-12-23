@@ -289,6 +289,22 @@ CHANGES
 
 December 22, 2006
 
+* Altered Tree.Parser.matchAny() so that it skips entire trees if
+  node has children otherwise skips one node.  Now this works to
+  skip entire body of function if single-rooted subtree:
+  ^(FUNC name=ID arg=ID .)
+
+* Added "reverse index" from node to stream index.  Override
+  fillReverseIndex() in CommonTreeNodeStream if you want to change.
+  Use getNodeIndex(node) to find stream index for a specific tree node.
+  See getNodeIndex(), reverseIndex(Set tokenTypes),
+  reverseIndex(int tokenType), fillReverseIndex().  The indexing
+  costs time and memory to fill, but pulling stuff out will be lots
+  faster as it can jump from a node ptr straight to a stream index.
+
+* Added TreeNodeStream.get(index) to make it easier for interpreters to
+  jump around in tree node stream.
+
 * New CommonTreeNodeStream buffers all nodes in stream for fast jumping
   around.  It now has push/pop methods to invoke other locations in
   the stream for building interpreters.

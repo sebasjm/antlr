@@ -31,6 +31,12 @@ import org.antlr.runtime.IntStream;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind */
 public interface TreeNodeStream extends IntStream {
+	/** Get a tree node at an absolute index i; 0..n-1.
+	 *  If you don't want to buffer up nodes, then this method makes no
+	 *  sense for you.
+	 */
+	public Object get(int i);
+
 	/** Get tree node at current input pointer + i ahead where i=1 is next node.
 	 *  i<0 indicates nodes in the past.  So LT(-1) is previous node, but
 	 *  implementations are not required to provide results for k < -1.
