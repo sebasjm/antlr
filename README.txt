@@ -287,6 +287,11 @@ CHANGES
 
 3.0b6 - ??
 
+December 23, 2006
+
+* made BaseRecognizer.displayRecognitionError nonstatic so people can
+  override it. Not sure why it was static before.
+
 December 22, 2006
 
 * Altered Tree.Parser.matchAny() so that it skips entire trees if

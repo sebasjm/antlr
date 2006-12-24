@@ -141,9 +141,9 @@ public abstract class BaseRecognizer {
 								e);
 	}
 
-	public static void displayRecognitionError(String name,
-											   String[] tokenNames,
-											   RecognitionException e)
+	public void displayRecognitionError(String name,
+										String[] tokenNames,
+										RecognitionException e)
 	{
 		System.err.print(getRuleInvocationStack(e, name)+
 						 ": line "+e.line+":"+e.charPositionInLine+" ");
