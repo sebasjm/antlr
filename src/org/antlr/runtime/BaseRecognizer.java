@@ -110,11 +110,7 @@ public abstract class BaseRecognizer {
 		recoverFromMismatchedToken(input, mte, ttype, follow);
 	}
 
-	/** Report a recognition problem.  Java is not polymorphic on the
-	 *  argument types so you have to check the type of exception yourself.
-	 *  That's not very clean but it's better than generating a bunch of
-	 *  catch clauses in each rule and makes it easy to extend with
-	 *  more exceptions w/o breaking old code.
+	/** Report a recognition problem.
 	 *
 	 *  This method sets errorRecovery to indicate the parser is recovering
 	 *  not parsing.  Once in recovery mode, no errors are generated.
@@ -136,30 +132,47 @@ public abstract class BaseRecognizer {
 		}
 		errorRecovery = true;
 
-		displayRecognitionError(this.getClass().getName(),
-								this.getTokenNames(),
-								e);
+		displayRecognitionError(this.getTokenNames(), e);
 	}
 
-	public void displayRecognitionError(String name,
-										String[] tokenNames,
+	public void displayRecognitionError(String[] tokenNames,
 										RecognitionException e)
 	{
-		System.err.print(getRuleInvocationStack(e, name)+
-						 ": line "+e.line+":"+e.charPositionInLine+" ");
+		String hdr = getErrorHeader(e);
+		String msg = getErrorMessage(e, tokenNames);
+		emitErrorMessage(hdr+" "+msg);
+	}
+
+	/** What error message should be generated for the various
+	 *  exception types?
+	 *
+	 *  Not very object-oriented code, but I like having all error message
+	 *  generation within one method rather than spread among all of the
+	 *  exception classes. This also makes it much easier for the exception
+	 *  handling because the exception classes do not have to have pointers back
+	 *  to this object to access utility routines and so on. Also, changing
+	 *  the message for an exception type would be difficult because you
+	 *  would have to subclassing exception, but then somehow get ANTLR
+	 *  to make those kinds of exception objects instead of the default.
+	 *  This looks weird, but trust me--it makes the most sense in terms
+	 *  of flexibility.
+	 *
+	 *  Override this to change the message generated for one or more
+	 *  exception types.
+	 */
+	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
+		String msg = null;
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			String tokenName="<unknown>";
-			if ( mte.expecting==Token.EOF ) {
+			if ( mte.expecting== Token.EOF ) {
 				tokenName = "EOF";
 			}
 			else {
 				tokenName = tokenNames[mte.expecting];
 			}
-			System.err.println("mismatched token: "+
-							   e.token+
-							   "; expecting type "+
-							   tokenName);
+			msg = "mismatched token: "+getTokenErrorDisplay(e.token)+
+				"; expecting type "+tokenName;
 		}
 		else if ( e instanceof MismatchedTreeNodeException ) {
 			MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
@@ -170,43 +183,67 @@ public abstract class BaseRecognizer {
 			else {
 				tokenName = tokenNames[mtne.expecting];
 			}
-			System.err.println("mismatched tree node: "+
-							   mtne.foundNode+
-							   "; expecting type "+
-							   tokenName);
+			msg = "mismatched tree node: "+mtne.foundNode+
+				"; expecting type "+tokenName;
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;
-			System.err.println(//"decision=<<"+nvae.grammarDecisionDescription+">>"+
-							   "state "+nvae.stateNumber+
-							   " (decision="+nvae.decisionNumber+
-							   ") no viable alt; token="+
-							   e.token);
+			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
+			// and "(decision="+nvae.decisionNumber+") and
+			// "state "+nvae.stateNumber
+			msg = "no viable alt; token="+getTokenErrorDisplay(e.token);
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;
-			System.err.println("required (...)+ loop (decision="+
-							   eee.decisionNumber+
-							   ") did not match anything; token="+
-							   e.token);
+			// for development, can add "(decision="+eee.decisionNumber+")"
+			msg = "required (...)+ loop did not match anything; token="+
+				getTokenErrorDisplay(e.token);
 		}
 		else if ( e instanceof MismatchedSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
-			System.err.println("mismatched token: "+
-							   e.token+
-							   "; expecting set "+mse.expecting);
+			msg = "mismatched token: "+getTokenErrorDisplay(e.token)+
+				"; expecting set "+mse.expecting;
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
 			MismatchedNotSetException mse = (MismatchedNotSetException)e;
-			System.err.println("mismatched token: "+
-							   e.token+
-							   "; expecting set "+mse.expecting);
+			msg = "mismatched token: "+getTokenErrorDisplay(e.token)+
+				"; expecting set "+mse.expecting;
 		}
 		else if ( e instanceof FailedPredicateException ) {
 			FailedPredicateException fpe = (FailedPredicateException)e;
-			System.err.println("rule "+fpe.ruleName+" failed predicate: {"+
-							   fpe.predicateText+"}?");
+			msg = "rule "+fpe.ruleName+" failed predicate: {"+
+				fpe.predicateText+"}?";
 		}
+		return msg;
+	}
+
+	public String getErrorHeader(RecognitionException e) {
+		return getRuleInvocationStack(e, this.getClass().getName())+
+			": line "+e.line+":"+e.charPositionInLine;
+	}
+
+	/** How should a token be displayed in an error message? The default
+	 *  is to display just the text, but during development you might
+	 *  want to have a lot of information spit out.  Override in that case
+	 *  to use t.toString() (which, for CommonToken, dumps everything about
+	 *  the token).
+	 */
+	public String getTokenErrorDisplay(Token t) {
+		String s = t.getText();
+		if ( s==null ) {
+			if ( t.getType()==Token.EOF ) {
+				s = "<EOF>";
+			}
+			else {
+				s = "<"+t.getType()+">";
+			}
+		}
+		return "'"+s+"'";
+	}
+
+	/** Override this method to change where error messages go */
+	public void emitErrorMessage(String msg) {
+		System.err.println(msg);
 	}
 
 	/** Recover from an error found on the input stream.  Mostly this is

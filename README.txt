@@ -292,6 +292,19 @@ December 23, 2006
 * made BaseRecognizer.displayRecognitionError nonstatic so people can
   override it. Not sure why it was static before.
 
+* Removed state/decision message that comes out of no 
+  viable alternative exceptions, as that was too much.
+  removed the decision number from the early exit exception
+  also.  During development, you can simply override
+  displayRecognitionError from BaseRecognizer to add the stuff
+  back in if you want.
+
+* made output go to an output method you can override: emitErrorMessage()
+
+* general cleanup of the error emitting code in BaseRecognizer.  Lots
+  more stuff you can override: getErrorHeader, getTokenErrorDisplay,
+  emitErrorMessage, getErrorMessage.
+
 December 22, 2006
 
 * Altered Tree.Parser.matchAny() so that it skips entire trees if
