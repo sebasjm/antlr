@@ -157,6 +157,11 @@ public abstract class BaseRecognizer {
 	 *  This looks weird, but trust me--it makes the most sense in terms
 	 *  of flexibility.
 	 *
+	 *  For grammar debugging, you will want to override this to add
+	 *  more information such as the stack frame with
+	 *  getRuleInvocationStack(e, this.getClass().getName()) and,
+	 *  for no viable alts, the decision description and state etc...
+	 *
 	 *  Override this to change the message generated for one or more
 	 *  exception types.
 	 */
@@ -172,7 +177,7 @@ public abstract class BaseRecognizer {
 				tokenName = tokenNames[mte.expecting];
 			}
 			msg = "mismatched token: "+getTokenErrorDisplay(e.token)+
-				"; expecting type "+tokenName;
+				" expecting type "+tokenName;
 		}
 		else if ( e instanceof MismatchedTreeNodeException ) {
 			MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
@@ -184,30 +189,30 @@ public abstract class BaseRecognizer {
 				tokenName = tokenNames[mtne.expecting];
 			}
 			msg = "mismatched tree node: "+mtne.foundNode+
-				"; expecting type "+tokenName;
+				" expecting type "+tokenName;
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;
 			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
 			// and "(decision="+nvae.decisionNumber+") and
 			// "state "+nvae.stateNumber
-			msg = "no viable alt; token="+getTokenErrorDisplay(e.token);
+			msg = "no viable alt, token="+getTokenErrorDisplay(e.token);
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;
 			// for development, can add "(decision="+eee.decisionNumber+")"
-			msg = "required (...)+ loop did not match anything; token="+
+			msg = "required (...)+ loop did not match anything, token="+
 				getTokenErrorDisplay(e.token);
 		}
 		else if ( e instanceof MismatchedSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
 			msg = "mismatched token: "+getTokenErrorDisplay(e.token)+
-				"; expecting set "+mse.expecting;
+				" expecting set "+mse.expecting;
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
 			MismatchedNotSetException mse = (MismatchedNotSetException)e;
 			msg = "mismatched token: "+getTokenErrorDisplay(e.token)+
-				"; expecting set "+mse.expecting;
+				" expecting set "+mse.expecting;
 		}
 		else if ( e instanceof FailedPredicateException ) {
 			FailedPredicateException fpe = (FailedPredicateException)e;
@@ -217,9 +222,9 @@ public abstract class BaseRecognizer {
 		return msg;
 	}
 
+	/** What is the error header, normally line/character position information? */
 	public String getErrorHeader(RecognitionException e) {
-		return getRuleInvocationStack(e, this.getClass().getName())+
-			": line "+e.line+":"+e.charPositionInLine;
+		return "line "+e.line+":"+e.charPositionInLine;
 	}
 
 	/** How should a token be displayed in an error message? The default
@@ -237,6 +242,12 @@ public abstract class BaseRecognizer {
 			else {
 				s = "<"+t.getType()+">";
 			}
+		}
+		else if ( s.indexOf('\n')>=0 ) {
+			s = s.replaceAll("\n", "\\\\n");
+		}
+		else if ( s.indexOf('\t')>=0 ) {
+			s = s.replaceAll("\t", "\\\\t");
 		}
 		return "'"+s+"'";
 	}
