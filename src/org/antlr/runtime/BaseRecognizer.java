@@ -243,12 +243,9 @@ public abstract class BaseRecognizer {
 				s = "<"+t.getType()+">";
 			}
 		}
-		else if ( s.indexOf('\n')>=0 ) {
-			s = s.replaceAll("\n", "\\\\n");
-		}
-		else if ( s.indexOf('\t')>=0 ) {
-			s = s.replaceAll("\t", "\\\\t");
-		}
+		s = s.replaceAll("\n","\\\\n");
+		s = s.replaceAll("\r","\\\\r");
+		s = s.replaceAll("\t","\\\\t");
 		return "'"+s+"'";
 	}
 
