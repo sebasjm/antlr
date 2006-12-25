@@ -1,6 +1,9 @@
 package org.antlr.runtime;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** A generic recognizer that can handle recognizers generated from
  *  lexer, parser, and tree grammars.  This is all the parsing
@@ -100,7 +103,9 @@ public abstract class BaseRecognizer {
 	}
 
 	/** factor out what to do upon token mismatch so tree parsers can behave
-	 *  differently.
+	 *  differently.  Override this method in your parser to do things
+	 *  like bailing out after the first error; just throw the mte object
+	 *  instead of calling the recovery method.
 	 */
 	protected void mismatch(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException
@@ -176,8 +181,8 @@ public abstract class BaseRecognizer {
 			else {
 				tokenName = tokenNames[mte.expecting];
 			}
-			msg = "mismatched token: "+getTokenErrorDisplay(e.token)+
-				" expecting type "+tokenName;
+			msg = "mismatched input "+getTokenErrorDisplay(e.token)+
+				" expecting "+tokenName;
 		}
 		else if ( e instanceof MismatchedTreeNodeException ) {
 			MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
@@ -188,30 +193,30 @@ public abstract class BaseRecognizer {
 			else {
 				tokenName = tokenNames[mtne.expecting];
 			}
-			msg = "mismatched tree node: "+mtne.foundNode+
-				" expecting type "+tokenName;
+			msg = "mismatched tree node: "+mtne.node+
+				" expecting "+tokenName;
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;
 			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
 			// and "(decision="+nvae.decisionNumber+") and
 			// "state "+nvae.stateNumber
-			msg = "no viable alt, token="+getTokenErrorDisplay(e.token);
+			msg = "no viable alt at input "+getTokenErrorDisplay(e.token);
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;
 			// for development, can add "(decision="+eee.decisionNumber+")"
-			msg = "required (...)+ loop did not match anything, token="+
+			msg = "required (...)+ loop did not match anything at input "+
 				getTokenErrorDisplay(e.token);
 		}
 		else if ( e instanceof MismatchedSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
-			msg = "mismatched token: "+getTokenErrorDisplay(e.token)+
+			msg = "mismatched input "+getTokenErrorDisplay(e.token)+
 				" expecting set "+mse.expecting;
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
 			MismatchedNotSetException mse = (MismatchedNotSetException)e;
-			msg = "mismatched token: "+getTokenErrorDisplay(e.token)+
+			msg = "mismatched input "+getTokenErrorDisplay(e.token)+
 				" expecting set "+mse.expecting;
 		}
 		else if ( e instanceof FailedPredicateException ) {
@@ -231,7 +236,9 @@ public abstract class BaseRecognizer {
 	 *  is to display just the text, but during development you might
 	 *  want to have a lot of information spit out.  Override in that case
 	 *  to use t.toString() (which, for CommonToken, dumps everything about
-	 *  the token).
+	 *  the token). This is better than forcing you to override a method in
+	 *  your token objects because you don't have to go modify your lexer
+	 *  so that it creates a new Java type.
 	 */
 	public String getTokenErrorDisplay(Token t) {
 		String s = t.getText();

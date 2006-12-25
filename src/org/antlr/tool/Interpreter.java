@@ -34,6 +34,7 @@ import org.antlr.runtime.debug.DebugEventListener;
 import org.antlr.runtime.debug.BlankDebugEventListener;
 import org.antlr.runtime.tree.ParseTree;
 import org.antlr.runtime.debug.ParseTreeBuilder;
+import org.antlr.misc.IntervalSet;
 
 import java.util.List;
 import java.util.Stack;
@@ -332,7 +333,8 @@ public class Interpreter implements TokenSource {
 				}
 				else if ( label.isSet() ) {
 					MismatchedSetException mse =
-						new MismatchedSetException(label.getSet(), input);
+						new MismatchedSetException(((IntervalSet)label.getSet()).toRuntimeBitSet(),
+												   input);
 					if ( actions!=null ) {
 						actions.recognitionException(mse);
 					}
@@ -414,9 +416,10 @@ public class Interpreter implements TokenSource {
 
 	public void reportScanError(RecognitionException re) {
 		CharStream cs = (CharStream)input;
+		// print as good of a message is we can't, given that we do not have
+		// a Lexer object and, hence, cannot call the routine to get a
+		// decent error message.
 		System.err.println("problem matching token at "+
-			cs.getLine()+":"+cs.getCharPositionInLine());
-		// don't report to ANTLR tool itself; make people override to redirect
-		Lexer.displayRecognitionError(grammar.name,re);
+			cs.getLine()+":"+cs.getCharPositionInLine()+" "+re.getClass().getName());
 	}
 }

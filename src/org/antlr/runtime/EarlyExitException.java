@@ -27,6 +27,7 @@
 */
 package org.antlr.runtime;
 
+/**  The recognizer did not match anything for a (..)+ loop. */
 public class EarlyExitException extends RecognitionException {
 	public int decisionNumber;
 

@@ -287,6 +287,29 @@ CHANGES
 
 3.0b6 - ??
 
+December 24, 2006
+
+* Cleaned up some comments and removed field treeNode
+  from MismatchedTreeNodeException class.  It is "node" in
+  RecognitionException.
+
+* Changed type from Object to BitSet for expecting fields in
+  MismatchedSetException and MismatchedNotSetException
+
+* Cleaned up error printing in lexers and the messages that it creates.
+
+* Added this to TreeAdaptor:
+	/** Return the token object from which this node was created.
+	 *  Currently used only for printing an error message.
+	 *  The error display routine in BaseRecognizer needs to
+	 *  display where the input the error occurred. If your
+	 *  tree of limitation does not store information that can
+	 *  lead you to the token, you can create a token filled with
+	 *  the appropriate information and pass that back.  See
+	 *  BaseRecognizer.getErrorMessage().
+	 */
+	public Token getToken(Object t);
+
 December 23, 2006
 
 * made BaseRecognizer.displayRecognitionError nonstatic so people can

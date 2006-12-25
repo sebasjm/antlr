@@ -48,9 +48,8 @@ import org.antlr.runtime.tree.CommonTree;
  *  ANTLR generates code that throws exceptions upon recognition error and
  *  also generates code to catch these exceptions in each rule.  If you
  *  want to quit upon first error, you can turn off the automatic error
- *  handling mechanism.  If you want an ANTLR-generated recognizer to bail
- *  out after another kind of error, then just throw an exception not
- *  under this hierarchy.
+ *  handling mechanism using rulecatch action, but you still need to
+ *  override methods mismatch and recoverFromMismatchSet.
  *
  *  In general, the recognition exceptions can track where in a grammar a
  *  problem occurred and/or what was the expected input.  While the parser

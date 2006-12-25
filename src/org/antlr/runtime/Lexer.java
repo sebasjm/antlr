@@ -240,12 +240,6 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		this.text = text;
 	}
 
-	/** Report a recognition problem.  Java is not polymorphic on the
-	 *  argument types so you have to check the type of exception yourself.
-	 *  That's not very clean but it's better than generating a bunch of
-	 *  catch clauses in each rule and makes it easy to extend with
-	 *  more exceptions w/o breaking old code.
-	 */
 	public void reportError(RecognitionException e) {
 		/** TODO: not thought about recovery in lexer yet.
 		 *
@@ -258,68 +252,63 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		errorRecovery = true;
 		 */
 
-		displayRecognitionError(this.getClass().getName(),e);
+		displayRecognitionError(this.getTokenNames(), e);
 	}
 
-	public static void displayRecognitionError(String name,
-											   RecognitionException e)
-	{
-		System.err.print(getRuleInvocationStack(e, name)+
-						 ": line "+e.line+":"+e.charPositionInLine+" ");
-
+	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
+		String msg = null;
 		if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
-			System.err.println("mismatched char: '"+
-							   ((char)e.c)+
-							   "' on line "+e.line+
-							   "; expecting char '"+(char)mte.expecting+"'");
+			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting "+getCharErrorDisplay(mte.expecting);
 		}
 		else if ( e instanceof NoViableAltException ) {
 			NoViableAltException nvae = (NoViableAltException)e;
-			System.err.println(nvae.grammarDecisionDescription+
-							   " state "+nvae.stateNumber+
-							   " (decision="+nvae.decisionNumber+
-							   ") no viable alt line "+e.line+":"+e.charPositionInLine+"; char='"+
-							   ((char)e.c)+"'");
+			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
+			// and "(decision="+nvae.decisionNumber+") and
+			// "state "+nvae.stateNumber
+			msg = "no viable alt at character "+getCharErrorDisplay(e.c);
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;
-			System.err.println("required (...)+ loop (decision="+
-							   eee.decisionNumber+
-							   ") did not match anything; on line "+
-							   e.line+":"+e.charPositionInLine+" char="+
-							   ((char)e.c)+"'");
+			// for development, can add "(decision="+eee.decisionNumber+")"
+			msg = "required (...)+ loop did not match anything at character "+getCharErrorDisplay(e.c);
 		}
 		else if ( e instanceof MismatchedSetException ) {
 			MismatchedSetException mse = (MismatchedSetException)e;
-			System.err.println("mismatched char: '"+
-							   ((char)e.c)+
-							   "' on line "+e.line+
-							   ":"+e.charPositionInLine+
-							   "; expecting set "+mse.expecting);
+			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+mse.expecting;
 		}
 		else if ( e instanceof MismatchedNotSetException ) {
-			MismatchedSetException mse = (MismatchedSetException)e;
-			System.err.println("mismatched char: '"+
-							   ((char)e.c)+
-							   "' on line "+e.line+
-							   ":"+e.charPositionInLine+
-							   "; expecting set "+mse.expecting);
+			MismatchedNotSetException mse = (MismatchedNotSetException)e;
+			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+mse.expecting;
 		}
 		else if ( e instanceof MismatchedRangeException ) {
 			MismatchedRangeException mre = (MismatchedRangeException)e;
-			System.err.println("mismatched char: '"+
-							   ((char)e.c)+
-							   "' on line "+e.line+
-							   ":"+e.charPositionInLine+
-							   "; expecting set '"+(char)mre.a+"'..'"+
-							   (char)mre.b+"'");
+			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+
+				getCharErrorDisplay(mre.a)+".."+getCharErrorDisplay(mre.b);
 		}
-		else if ( e instanceof FailedPredicateException ) {
-			FailedPredicateException fpe = (FailedPredicateException)e;
-			System.err.println("rule "+fpe.ruleName+" failed predicate: {"+
-							   fpe.predicateText+"}?");			
+		else {
+			msg = super.getErrorMessage(e, tokenNames);
 		}
+		return msg;
+	}
+
+	public String getCharErrorDisplay(int c) {
+		String s = String.valueOf((char)c);
+		switch ( c ) {
+			case Token.EOF :
+				s = "<EOF>";
+				break;
+			case '\n' :
+				s = "\\n";
+				break;
+			case '\t' :
+				s = "\\t";
+				break;
+			case '\r' :
+				s = "\\r";
+				break;
+		}
+		return "'"+s+"'";
 	}
 
 	/** Lexers can normally match any char in it's vocabulary after matching

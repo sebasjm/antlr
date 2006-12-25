@@ -94,7 +94,18 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 		return ((Tree)t).getType();
 	}
 
-    public Object getChild(Object t, int i) {
+	/** What is the Token associated with this node?  If
+	 *  you are not using CommonTree, then you must
+	 *  override this in your own adaptor.
+	 */
+	public Token getToken(Object t) {
+		if ( t instanceof CommonTree ) {
+			return ((CommonTree)t).getToken();
+		}
+		return null; // no idea what to do
+	}
+
+	public Object getChild(Object t, int i) {
         return ((Tree)t).getChild(i);
     }
 

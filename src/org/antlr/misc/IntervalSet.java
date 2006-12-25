@@ -701,6 +701,23 @@ public class IntervalSet implements IntSet {
 		return values;
 	}
 
+	public org.antlr.runtime.BitSet toRuntimeBitSet() {
+		org.antlr.runtime.BitSet s =
+			new org.antlr.runtime.BitSet(getMaxElement()+1);
+		Iterator iter = this.intervals.iterator();
+		int i = 0;
+		while (iter.hasNext()) {
+			Interval I = (Interval) iter.next();
+			int a = I.a;
+			int b = I.b;
+			for (int v=a; v<=b; v++) {
+				s.add(v);
+				i++;
+			}
+		}
+		return s;
+	}
+
 	public void remove(int el) {
         throw new NoSuchMethodError("IntervalSet.remove() unimplemented");
     }

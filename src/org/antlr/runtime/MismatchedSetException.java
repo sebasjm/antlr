@@ -28,12 +28,12 @@
 package org.antlr.runtime;
 
 public class MismatchedSetException extends RecognitionException {
-	public Object /* is IntSet */ expecting;
+	public BitSet expecting;
 
 	/** Used for remote debugger deserialization */
 	public MismatchedSetException() {;}
 
-	public MismatchedSetException(Object expecting, IntStream input) {
+	public MismatchedSetException(BitSet expecting, IntStream input) {
 		super(input);
 		this.expecting = expecting;
 	}

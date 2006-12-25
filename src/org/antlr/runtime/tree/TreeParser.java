@@ -92,6 +92,21 @@ public class TreeParser extends BaseRecognizer {
 		recoverFromMismatchedToken(input, mte, ttype, follow);
 	}
 
+	/** Tree parsers parse nodes they usually have a token object as
+	 *  payload. Set the exception token and do the default behavior.
+	 */
+	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
+		if ( this instanceof TreeParser ) {
+			TreeAdaptor adaptor = ((TreeNodeStream)e.input).getTreeAdaptor();
+			e.token = adaptor.getToken(e.node);
+			if ( e.token==null ) { // could be an UP/DOWN node
+				e.token = new CommonToken(adaptor.getType(e.node),
+										  adaptor.getText(e.node));
+			}
+		}
+		return super.getErrorMessage(e, tokenNames);
+	}
+
 	public void traceIn(String ruleName, int ruleIndex)  {
 		super.traceIn(ruleName, ruleIndex, input.LT(1));
 	}

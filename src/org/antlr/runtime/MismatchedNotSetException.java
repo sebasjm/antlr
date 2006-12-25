@@ -27,14 +27,11 @@
 */
 package org.antlr.runtime;
 
-import org.antlr.misc.IntSet;
-
 public class MismatchedNotSetException extends MismatchedSetException {
-
 	/** Used for remote debugger deserialization */
 	public MismatchedNotSetException() {;}
 
-	public MismatchedNotSetException(IntSet expecting, IntStream input) {
+	public MismatchedNotSetException(BitSet expecting, IntStream input) {
 		super(expecting, input);
 	}
 

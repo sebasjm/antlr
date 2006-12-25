@@ -139,7 +139,7 @@ public class TestInterpretedParsing extends BaseTest {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toStringTree();
 		String expecting =
-			"(<grammar p> (prog while x { (assign i = (expr MismatchedSetException(9!={5, 10..11})))))";
+			"(<grammar p> (prog while x { (assign i = (expr MismatchedSetException(9!={5,10,11})))))";
 		assertEquals(expecting, result);
 	}
 
