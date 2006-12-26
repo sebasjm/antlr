@@ -92,6 +92,14 @@ public class TreeParser extends BaseRecognizer {
 		recoverFromMismatchedToken(input, mte, ttype, follow);
 	}
 
+	/** Prefix error message with the grammar name because message is
+	 *  always intended for the programmer because the parser built
+	 *  the input tree not the user.
+	 */
+	public String getErrorHeader(RecognitionException e) {
+		return getGrammarFileName()+": node from line "+e.line+":"+e.charPositionInLine;
+	}
+
 	/** Tree parsers parse nodes they usually have a token object as
 	 *  payload. Set the exception token and do the default behavior.
 	 */
