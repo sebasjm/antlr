@@ -266,7 +266,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
 			// and "(decision="+nvae.decisionNumber+") and
 			// "state "+nvae.stateNumber
-			msg = "no viable alt at character "+getCharErrorDisplay(e.c);
+			msg = "no viable alternative at character "+getCharErrorDisplay(e.c);
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;

@@ -201,7 +201,7 @@ public abstract class BaseRecognizer {
 			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
 			// and "(decision="+nvae.decisionNumber+") and
 			// "state "+nvae.stateNumber
-			msg = "no viable alt at input "+getTokenErrorDisplay(e.token);
+			msg = "no viable alternative at input "+getTokenErrorDisplay(e.token);
 		}
 		else if ( e instanceof EarlyExitException ) {
 			EarlyExitException eee = (EarlyExitException)e;
