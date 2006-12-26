@@ -150,8 +150,8 @@ public abstract class BaseTree implements Tree {
 		Tree newTree = this.dupNode();
 		for (int i = 0; children!=null && i < children.size(); i++) {
 			Tree t = (Tree) children.get(i);
-			Tree newNode = t.dupNode();
-			newTree.addChild(newNode);
+			Tree newSubTree = t.dupTree();
+			newTree.addChild(newSubTree);
 		}
 		return newTree;
 	}

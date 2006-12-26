@@ -287,6 +287,10 @@ CHANGES
 
 3.0b6 - ??
 
+December 26, 2006
+
+* BaseTree.dupTree didn't dup recursively.
+
 December 24, 2006
 
 * Cleaned up some comments and removed field treeNode
