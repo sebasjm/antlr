@@ -336,6 +336,9 @@ public class CodeGenerator {
 		headerFileST.setAttribute("actions", actions);
 		outputFileST.setAttribute("actions", actions);
 
+		headerFileST.setAttribute("buildTemplate", new Boolean(grammar.buildTemplate()));
+		outputFileST.setAttribute("buildTemplate", new Boolean(grammar.buildTemplate()));
+
 		outputFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
 		headerFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
 		String memoize = (String)grammar.getOption("memoize");
