@@ -75,10 +75,19 @@ rewriteTemplate(alts) ::= <<
 <if(backtracking)>
 if ( backtracking==0 ) {
   <alts:rewriteTemplateAlt(); separator="else ">
+  <if(rewrite)><replaceTextInLine()><endif>
 }
 <else>
 <alts:rewriteTemplateAlt(); separator="else ">
+<if(rewrite)><replaceTextInLine()><endif>
 <endif>
+>>
+
+replaceTextInLine() ::= <<
+((TokenRewriteStream)input).replace(
+          ((Token)retval.start).getTokenIndex(),
+          input.LT(-1).getTokenIndex(),
+          retval.st);
 >>
 
 rewriteTemplateAlt() ::= <<

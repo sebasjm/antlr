@@ -181,7 +181,7 @@ public class Grammar {
 		new HashSet() {
 			{
 				add("output"); add("ASTLabelType"); add("superClass");
-			 	add("k"); add("backtrack"); add("memoize");
+			 	add("k"); add("backtrack"); add("memoize"); add("rewrite");
 			}
 		};
 

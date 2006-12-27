@@ -287,6 +287,36 @@ CHANGES
 
 3.0b6 - ??
 
+December 27, 2006
+
+* Fixed http://www.antlr.org:8888/browse/ANTLR-76 for Java.
+  Enhanced TokenRewriteStream so it accepts any object; converts
+  to string at last second.  Allows you to rewrite with StringTemplate
+  templates now :)
+
+* added rewrite option that makes -> template rewrites do replace ops for
+  TokenRewriteStream input stream.  In output=template and rewrite=true mode
+  same as before 'cept that the parser does
+
+    ((TokenRewriteStream)input).replace(
+	      ((Token)retval.start).getTokenIndex(),
+	      input.LT(-1).getTokenIndex(),
+	      retval.st);
+
+  after each rewrite so that the input stream is altered.  Later refs to
+  $text will have rewrites.  Here's a sample test program for grammar Rew.
+
+        FileReader groupFileR = new FileReader("Rew.stg");
+        StringTemplateGroup templates = new StringTemplateGroup(groupFileR);
+        ANTLRInputStream input = new ANTLRInputStream(System.in);
+        RewLexer lexer = new RewLexer(input);
+        TokenRewriteStream tokens = new TokenRewriteStream(lexer);
+        RewParser parser = new RewParser(tokens);
+        parser.setTemplateLib(templates);
+        parser.program();
+        System.out.println(tokens.toString());
+        groupFileR.close();
+
 December 26, 2006
 
 * BaseTree.dupTree didn't dup recursively.
