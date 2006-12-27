@@ -89,8 +89,8 @@ public class TokenRewriteStream extends CommonTokenStream {
 
 	static class RewriteOperation {
 		protected int index;
-		protected String text;
-		protected RewriteOperation(int index, String text) {
+		protected Object text;
+		protected RewriteOperation(int index, Object text) {
 			this.index = index;
 			this.text = text;
 		}
@@ -109,7 +109,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	static class InsertBeforeOp extends RewriteOperation {
-		public InsertBeforeOp(int index, String text) {
+		public InsertBeforeOp(int index, Object text) {
 			super(index,text);
 		}
 		public int execute(StringBuffer buf) {
@@ -131,7 +131,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	 */
 	static class ReplaceOp extends RewriteOperation {
 		protected int lastIndex;
-		public ReplaceOp(int from, int to, String text) {
+		public ReplaceOp(int from, int to, Object text) {
 			super(from,text);
 			lastIndex = to;
 		}
@@ -288,57 +288,57 @@ public class TokenRewriteStream extends CommonTokenStream {
 		//System.out.println("after, rewrites="+rewrites);
 	}
 
-	public void insertAfter(Token t, String text) {
+	public void insertAfter(Token t, Object text) {
 		insertAfter(DEFAULT_PROGRAM_NAME, t, text);
 	}
 
-	public void insertAfter(int index, String text) {
+	public void insertAfter(int index, Object text) {
 		insertAfter(DEFAULT_PROGRAM_NAME, index, text);
 	}
 
-	public void insertAfter(String programName, Token t, String text) {
+	public void insertAfter(String programName, Token t, Object text) {
 		insertAfter(programName,t.getTokenIndex(), text);
 	}
 
-	public void insertAfter(String programName, int index, String text) {
+	public void insertAfter(String programName, int index, Object text) {
 		// to insert after, just insert before next index (even if past end)
 		insertBefore(programName,index+1, text);
 		//addToSortedRewriteList(programName, new InsertAfterOp(index,text));
 	}
 
-	public void insertBefore(Token t, String text) {
+	public void insertBefore(Token t, Object text) {
 		insertBefore(DEFAULT_PROGRAM_NAME, t, text);
 	}
 
-	public void insertBefore(int index, String text) {
+	public void insertBefore(int index, Object text) {
 		insertBefore(DEFAULT_PROGRAM_NAME, index, text);
 	}
 
-	public void insertBefore(String programName, Token t, String text) {
+	public void insertBefore(String programName, Token t, Object text) {
 		insertBefore(programName, t.getTokenIndex(), text);
 	}
 
-	public void insertBefore(String programName, int index, String text) {
+	public void insertBefore(String programName, int index, Object text) {
 		addToSortedRewriteList(programName, new InsertBeforeOp(index,text));
 	}
 
-	public void replace(int index, String text) {
+	public void replace(int index, Object text) {
 		replace(DEFAULT_PROGRAM_NAME, index, index, text);
 	}
 
-	public void replace(int from, int to, String text) {
+	public void replace(int from, int to, Object text) {
 		replace(DEFAULT_PROGRAM_NAME, from, to, text);
 	}
 
-	public void replace(Token indexT, String text) {
+	public void replace(Token indexT, Object text) {
 		replace(DEFAULT_PROGRAM_NAME, indexT, indexT, text);
 	}
 
-	public void replace(Token from, Token to, String text) {
+	public void replace(Token from, Token to, Object text) {
 		replace(DEFAULT_PROGRAM_NAME, from, to, text);
 	}
 
-	public void replace(String programName, int from, int to, String text) {
+	public void replace(String programName, int from, int to, Object text) {
 		addToSortedRewriteList(programName, new ReplaceOp(from, to, text));
 		/*
 		// replace from..to by deleting from..to-1 and then do a replace
@@ -350,7 +350,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		*/
 	}
 
-	public void replace(String programName, Token from, Token to, String text) {
+	public void replace(String programName, Token from, Token to, Object text) {
 		replace(programName,
 				from.getTokenIndex(),
 				to.getTokenIndex(),
@@ -432,6 +432,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	public String toString(int start, int end) {
+		System.out.println("toString in TRS: "+start+", "+end);
 		return toString(DEFAULT_PROGRAM_NAME, start, end);
 	}
 
