@@ -338,6 +338,14 @@ public class CodeGenerator {
 
 		headerFileST.setAttribute("buildTemplate", new Boolean(grammar.buildTemplate()));
 		outputFileST.setAttribute("buildTemplate", new Boolean(grammar.buildTemplate()));
+		headerFileST.setAttribute("buildAST", new Boolean(grammar.buildAST()));
+		outputFileST.setAttribute("buildAST", new Boolean(grammar.buildAST()));
+
+		String rewrite = (String)grammar.getOption("rewrite");
+		outputFileST.setAttribute("rewrite",
+								  Boolean.valueOf(rewrite!=null&&rewrite.equals("true")));
+		headerFileST.setAttribute("rewrite",
+								  Boolean.valueOf(rewrite!=null&&rewrite.equals("true")));
 
 		outputFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
 		headerFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
