@@ -727,6 +727,33 @@ public class ErrorManager {
 		grammarError(msgID,g,token,null,null);
 	}
 
+	public static void grammarWarning(int msgID,
+									  Grammar g,
+									  Token token,
+									  Object arg,
+									  Object arg2)
+	{
+		getErrorState().errors++;
+		Message msg = new GrammarSemanticsMessage(msgID,g,token,arg,arg2);
+		getErrorState().warningMsgIDs.add(msgID);
+		getErrorListener().warning(msg);
+	}
+
+	public static void grammarWarning(int msgID,
+									  Grammar g,
+									  Token token,
+									  Object arg)
+	{
+		grammarError(msgID,g,token,arg,null);
+	}
+
+	public static void grammarWarning(int msgID,
+									  Grammar g,
+									  Token token)
+	{
+		grammarError(msgID,g,token,null,null);
+	}
+
 	public static void syntaxError(int msgID,
 								   Grammar grammar,
 								   Token token,

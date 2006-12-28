@@ -2976,6 +2976,33 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testRefToTextAttributeForCurrentTreeRule() throws Exception {
+		String action = "$text";
+		String expecting = "input.getTokenStream().toString(\n" +
+			"              input.getTreeAdaptor().getTokenStartIndex(retval.start),\n" +
+			"              input.getTreeAdaptor().getTokenStopIndex(retval.start))";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"tree grammar t;\n" +
+			"a : {###"+action+"!!!}\n" +
+			"  ;\n");
+
+		Tool antlr = newTool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // codegen phase sets some vars we need
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
+	}
+
+
 	// S U P P O R T
 
 	protected void checkError(ErrorQueue equeue,
