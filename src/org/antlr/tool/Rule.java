@@ -330,18 +330,15 @@ public class Rule {
 		if ( returnScope!=null && returnScope.getAttribute(name)!=null ) {
 			scope = returnScope;
 		}
-		if ( parameterScope!=null && parameterScope.getAttribute(name)!=null ) {
+		else if ( parameterScope!=null && parameterScope.getAttribute(name)!=null ) {
 			scope = parameterScope;
 		}
-		if ( grammar.type != Grammar.LEXER &&
-			 RuleLabelScope.predefinedRulePropertiesScope.getAttribute(name)!=null )
-		{
-			scope = RuleLabelScope.predefinedRulePropertiesScope;
-		}
-		if ( grammar.type == Grammar.LEXER &&
-			 RuleLabelScope.predefinedLexerRulePropertiesScope.getAttribute(name)!=null )
-		{
-			scope = RuleLabelScope.predefinedLexerRulePropertiesScope;
+		else {
+			AttributeScope rulePropertiesScope =
+				RuleLabelScope.grammarTypeToRulePropertiesScope[grammar.type];
+			if ( rulePropertiesScope.getAttribute(name)!=null ) {
+				scope = rulePropertiesScope;
+			}
 		}
 		return scope;
 	}

@@ -149,22 +149,8 @@ public void checkElementRefUniqueness(String ref, boolean isToken) {
  */
 public Attribute getRuleLabelAttribute(String ruleName, String attrName) {
 	Rule r = grammar.getRule(ruleName);
-	AttributeScope scope = null;
-	// is it a return value?
-	if ( r.returnScope!=null && r.returnScope.getAttribute(attrName)!=null ) {
-		scope = r.returnScope;
-	}
-	else if ( grammar.type != Grammar.LEXER &&
-		 RuleLabelScope.predefinedRulePropertiesScope.getAttribute(attrName)!=null )
-	{
-		scope = RuleLabelScope.predefinedRulePropertiesScope;
-	}
-	else if ( grammar.type == Grammar.LEXER &&
-		 RuleLabelScope.predefinedLexerRulePropertiesScope.getAttribute(attrName)!=null )
-	{
-		scope = RuleLabelScope.predefinedLexerRulePropertiesScope;
-	}
-	if ( scope!=null ) {
+	AttributeScope scope = r.getLocalAttributeScope(attrName);
+	if ( scope!=null && !scope.isParameterScope ) {
 		return scope.getAttribute(attrName);
 	}
 	return null;

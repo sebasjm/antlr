@@ -1,17 +1,13 @@
 // $ANTLR 3.0b5 ActionTranslator.g 2006-11-23 01:51:22
 
 package org.antlr.codegen;
-import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.runtime.*;
+import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
 
-
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 public class ActionTranslatorLexer extends Lexer {
     public static final int LOCAL_ATTR=17;
     public static final int SET_DYNAMIC_SCOPE_ATTR=18;
@@ -159,22 +155,8 @@ public class ActionTranslatorLexer extends Lexer {
      */
     public Attribute getRuleLabelAttribute(String ruleName, String attrName) {
     	Rule r = grammar.getRule(ruleName);
-    	AttributeScope scope = null;
-    	// is it a return value?
-    	if ( r.returnScope!=null && r.returnScope.getAttribute(attrName)!=null ) {
-    		scope = r.returnScope;
-    	}
-    	else if ( grammar.type != Grammar.LEXER &&
-    		 RuleLabelScope.predefinedRulePropertiesScope.getAttribute(attrName)!=null )
-    	{
-    		scope = RuleLabelScope.predefinedRulePropertiesScope;
-    	}
-    	else if ( grammar.type == Grammar.LEXER &&
-    		 RuleLabelScope.predefinedLexerRulePropertiesScope.getAttribute(attrName)!=null )
-    	{
-    		scope = RuleLabelScope.predefinedLexerRulePropertiesScope;
-    	}
-    	if ( scope!=null ) {
+    	AttributeScope scope = r.getLocalAttributeScope(attrName);
+    	if ( scope!=null && !scope.isParameterScope ) {
     		return scope.getAttribute(attrName);
     	}
     	return null;
@@ -726,7 +708,7 @@ public class ActionTranslatorLexer extends Lexer {
               		}
               		else if ( scope.isParameterScope ) {
               			// TODO: error!
-              		}
+					  }
               		else {
               			st = template("ruleLabelRef");
               			st.setAttribute("referencedRule", refdRule);

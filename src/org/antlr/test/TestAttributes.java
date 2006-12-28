@@ -2944,6 +2944,38 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	public void testTreeRuleStopAttributeIsInvalid() throws Exception {
+		String action = "$r.x; $r.start; $r.stop;";
+		String expecting = "r.x; ((Object)r.start); $r.stop;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"tree grammar t;\n"+
+				"a returns [int x]\n" +
+				"  :\n" +
+				"  ;\n"+
+				"b : r=a {###"+action+"!!!}\n" +
+				"  ;");
+		Tool antlr = newTool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // codegen phase sets some vars we need
+		StringTemplate codeST = generator.getRecognizerST();
+		String code = codeST.toString();
+		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
+		assertEquals(expecting, found);
+
+		int expectedMsgID = ErrorManager.MSG_UNKNOWN_RULE_ATTRIBUTE;
+		Object expectedArg = "a";
+		Object expectedArg2 = "stop";
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		System.out.println("equeue:"+equeue);
+		checkError(equeue, expectedMessage);
+	}
+
 	// S U P P O R T
 
 	protected void checkError(ErrorQueue equeue,

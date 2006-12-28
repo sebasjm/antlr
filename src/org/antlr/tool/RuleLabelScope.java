@@ -43,9 +43,15 @@ public class RuleLabelScope extends AttributeScope {
 			isPredefinedRuleScope = true;
 		}};
 
-	/** Rules have a predefined set of attributes as well as
-	 *  the return values.  'text' needs to be computed though so.
-	 */
+	public static AttributeScope predefinedTreeRulePropertiesScope =
+		new AttributeScope("RulePredefined",null) {{
+			addAttribute("text", null);
+			addAttribute("start", null); // note: no stop; not meaningful
+			addAttribute("tree", null);
+			addAttribute("st", null);
+			isPredefinedRuleScope = true;
+		}};
+
 	public static AttributeScope predefinedLexerRulePropertiesScope =
 		new AttributeScope("LexerRulePredefined",null) {{
 			addAttribute("text", null);
@@ -56,6 +62,15 @@ public class RuleLabelScope extends AttributeScope {
 			addAttribute("channel", null);
 			isPredefinedLexerRuleScope = true;
 		}};
+
+	public static AttributeScope[] grammarTypeToRulePropertiesScope =
+		{
+			null,
+			predefinedLexerRulePropertiesScope,	// LEXER
+			predefinedRulePropertiesScope,		// PARSER
+			predefinedTreeRulePropertiesScope,		// TREE_PARSER
+			predefinedRulePropertiesScope,		// COMBINED
+		};
 
 	public Rule referencedRule;
 
@@ -68,16 +83,12 @@ public class RuleLabelScope extends AttributeScope {
 	 *  return values as well as any predefined attributes.
 	 */
 	public Attribute getAttribute(String name) {
-		Attribute predefinedAttr =
-			predefinedRulePropertiesScope.getAttribute(name);
-		if ( predefinedAttr!=null ) {
-			return predefinedAttr;
+		AttributeScope rulePropertiesScope =
+			RuleLabelScope.grammarTypeToRulePropertiesScope[grammar.type];
+		if ( rulePropertiesScope.getAttribute(name)!=null ) {
+			return rulePropertiesScope.getAttribute(name);
 		}
-		predefinedAttr =
-			predefinedLexerRulePropertiesScope.getAttribute(name);
-		if ( predefinedAttr!=null ) {
-			return predefinedAttr;
-		}
+
 		if ( referencedRule.returnScope!=null ) {
 			return referencedRule.returnScope.getAttribute(name);
 		}
