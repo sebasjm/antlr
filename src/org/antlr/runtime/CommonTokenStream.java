@@ -340,6 +340,9 @@ public class CommonTokenStream implements TokenStream {
 	}
 
 	public String toString(int start, int stop) {
+		if ( start<0 || stop<0 ) {
+			return null;
+		}
 		if ( p == -1 ) {
 			fillBuffer();
 		}
