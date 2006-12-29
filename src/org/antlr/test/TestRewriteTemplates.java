@@ -261,10 +261,11 @@ public class TestRewriteTemplates extends BaseTest {
 		Grammar g = new Grammar(
 			"tree grammar TP;\n"+
 			"options {ASTLabelType=CommonTree; output=template; rewrite=true;}\n" +
-			"a: {action} {action2} x=ID -> {ick}\n" +
-			" | {pred1}? y+=ID -> {ick}\n" +
-			" | {pred2}?=> z+=ID -> {ick}\n" +
-			" | (ID)=> ^(A B) -> {ick}\n" +
+			"a: {action} {action2} x=A -> {ick}\n" +
+			" | {pred1}? y+=B -> {ick}\n" +
+			" | C {action} -> {ick}\n" +
+			" | {pred2}?=> z+=D -> {ick}\n" +
+			" | (E)=> ^(F G) -> {ick}\n" +
 			" ;\n"
 		);
 		Tool antlr = newTool();

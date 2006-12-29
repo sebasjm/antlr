@@ -232,7 +232,7 @@ public class GrammarSanity {
 	{
 		if ( isValidSimpleElementNode(elementAST) ) {
 			GrammarAST next = (GrammarAST)elementAST.getNextSibling();
-			if ( next.getType()!=ANTLRParser.EOA ) {
+			if ( !isNextNonActionElementEOA(next)) {
 				ErrorManager.grammarWarning(ErrorManager.MSG_REWRITE_FOR_MULTI_ELEMENT_ALT,
 											grammar,
 											next.token,
@@ -274,5 +274,17 @@ public class GrammarSanity {
 			default :
 				return false;
 		}
+	}
+
+	protected boolean isNextNonActionElementEOA(GrammarAST t) {
+		while ( t.getType()==ANTLRParser.ACTION ||
+				t.getType()==ANTLRParser.SEMPRED )
+		{
+			t = (GrammarAST)t.getNextSibling();
+		}
+		if ( t.getType()==ANTLRParser.EOA ) {
+			return true;
+		}
+		return false;
 	}
 }
