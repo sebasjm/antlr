@@ -345,7 +345,7 @@ if ( grammar.type!=Grammar.LEXER && grammar.getOption("output")!=null && blockLe
 		  #alternative.getNextSibling().getType()==REWRITE) )
 	{
 		Rule r = grammar.getRule(currentRuleName);
-		r.trackAltsWithRewrites(this.outerAltNum);
+		r.trackAltsWithRewrites(#alternative,this.outerAltNum);
 	}
 }
 }

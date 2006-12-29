@@ -339,6 +339,9 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	public void replace(String programName, int from, int to, Object text) {
+		if ( from > to || from<0 || to<0 ) {
+			return;
+		}
 		addToSortedRewriteList(programName, new ReplaceOp(from, to, text));
 		/*
 		// replace from..to by deleting from..to-1 and then do a replace
@@ -432,7 +435,6 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	public String toString(int start, int end) {
-		System.out.println("toString in TRS: "+start+", "+end);
 		return toString(DEFAULT_PROGRAM_NAME, start, end);
 	}
 

@@ -101,10 +101,10 @@ protected void finish() {
     rules.addAll(grammar.getRules());
     int numEntryPoints = factory.build_EOFStates(rules);
     if ( numEntryPoints==0 ) {
-        ErrorManager.grammarError(ErrorManager.MSG_NO_GRAMMAR_START_RULE,
-                                  grammar,
-                                  null,
-                                  grammar.name);
+        ErrorManager.grammarWarning(ErrorManager.MSG_NO_GRAMMAR_START_RULE,
+                                   grammar,
+                                   null,
+                                   grammar.name);
     }
 }
 

@@ -166,6 +166,7 @@ public class ErrorManager {
 	public static final int MSG_NO_RULES = 150;
 	public static final int MSG_WRITE_TO_READONLY_ATTR = 151;
 	public static final int MSG_MISSING_AST_TYPE_IN_TREE_GRAMMAR = 152;
+	public static final int MSG_REWRITE_FOR_MULTI_ELEMENT_ALT = 153;
 
 
 	// GRAMMAR WARNINGS
@@ -744,14 +745,14 @@ public class ErrorManager {
 									  Token token,
 									  Object arg)
 	{
-		grammarError(msgID,g,token,arg,null);
+		grammarWarning(msgID,g,token,arg,null);
 	}
 
 	public static void grammarWarning(int msgID,
 									  Grammar g,
 									  Token token)
 	{
-		grammarError(msgID,g,token,null,null);
+		grammarWarning(msgID,g,token,null,null);
 	}
 
 	public static void syntaxError(int msgID,

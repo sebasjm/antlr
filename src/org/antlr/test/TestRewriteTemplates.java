@@ -27,6 +27,11 @@
 */
 package org.antlr.test;
 
+import org.antlr.Tool;
+import org.antlr.codegen.CodeGenerator;
+import org.antlr.tool.ErrorManager;
+import org.antlr.tool.Grammar;
+
 public class TestRewriteTemplates extends BaseTest {
 	protected boolean debug = false;
 
@@ -39,7 +44,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("", found);
 	}
 
@@ -52,7 +57,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("abc\n", found);
 	}
 
@@ -65,7 +70,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("abc\n", found);
 	}
 
@@ -78,7 +83,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("x:abc, y:34;\n", found);
 	}
 
@@ -93,7 +98,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
 	}
 
@@ -108,7 +113,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
 	}
 
@@ -121,7 +126,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
 	}
 
@@ -138,7 +143,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("hi abc\n", found);
 	}
 
@@ -152,7 +157,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("abc 34\n", found);
 	}
 
@@ -166,7 +171,7 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("8\n", found);
 	}
 
@@ -182,9 +187,132 @@ public class TestRewriteTemplates extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "abc 34", debug);
+								  "a", "abc 34", debug);
 		assertEquals("abc \n", found);
 	}
 
+	// tests for rewriting templates in tree parsers
+
+	public void testSingleNode() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {ASTLabelType=CommonTree; output=template;}\n" +
+			"s : a {System.out.println($a.st);} ;\n" +
+			"a : ID -> template(x={$ID.text}) <<|<x>|>> ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "abc");
+		assertEquals("|abc|\n", found);
+	}
+
+	/** tree parsing with output=template and rewrite=true */
+	public void testSingleNodeRewriteMode() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {ASTLabelType=CommonTree; output=template; rewrite=true;}\n" +
+			"s : a {System.out.println(input.getTokenStream().toString(0,0));} ;\n" +
+			"a : ID -> template(x={$ID.text}) <<|<x>|>> ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "abc");
+		assertEquals("|abc|\n", found);
+	}
+
+	public void testRewriteRuleAndRewriteModeOnSimpleElements() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"tree grammar TP;\n"+
+			"options {ASTLabelType=CommonTree; output=template; rewrite=true;}\n" +
+			"a: ^(A B) -> {ick}\n" +
+			" | y+=INT -> {ick}\n" +
+			" | x=ID -> {ick}\n" +
+			" | BLORT -> {ick}\n" +
+			" ;\n"
+		);
+		Tool antlr = newTool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.warnings.size());
+	}
+
+	public void testRewriteRuleAndRewriteModeIgnoreActionsPredicates() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"tree grammar TP;\n"+
+			"options {ASTLabelType=CommonTree; output=template; rewrite=true;}\n" +
+			"a: {action} {action2} x=ID -> {ick}\n" +
+			" | {pred1}? y+=ID -> {ick}\n" +
+			" | {pred2}?=> z+=ID -> {ick}\n" +
+			" | (ID)=> ^(A B) -> {ick}\n" +
+			" ;\n"
+		);
+		Tool antlr = newTool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.warnings.size());
+	}
+
+	public void testRewriteRuleAndRewriteModeNotSimple() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"tree grammar TP;\n"+
+			"options {ASTLabelType=CommonTree; output=template; rewrite=true;}\n" +
+			"a  : ID+ -> {ick}\n" +
+			"   | INT INT -> {ick}\n" +
+			"   ;\n"
+		);
+		Tool antlr = newTool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		assertEquals("unexpected errors: "+equeue, 2, equeue.warnings.size());
+	}
+
+	public void testRewriteRuleAndRewriteModeRefRule() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"tree grammar TP;\n"+
+			"options {ASTLabelType=CommonTree; output=template; rewrite=true;}\n" +
+			"a  : b+ -> {ick}\n" +
+			"   | b b A -> {ick}\n" +
+			"   ;\n" +
+			"b  : B ;\n"
+		);
+		Tool antlr = newTool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		assertEquals("unexpected errors: "+equeue, 2, equeue.warnings.size());
+	}
 
 }

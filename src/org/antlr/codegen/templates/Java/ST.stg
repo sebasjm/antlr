@@ -84,10 +84,17 @@ if ( backtracking==0 ) {
 >>
 
 replaceTextInLine() ::= <<
+<if(TREE_PARSER)>
+((TokenRewriteStream)input.getTokenStream()).replace(
+  input.getTreeAdaptor().getTokenStartIndex(retval.start),
+  input.getTreeAdaptor().getTokenStopIndex(retval.start),
+  retval.st);
+<else>
 ((TokenRewriteStream)input).replace(
-          ((Token)retval.start).getTokenIndex(),
-          input.LT(-1).getTokenIndex(),
-          retval.st);
+  ((Token)retval.start).getTokenIndex(),
+  input.LT(-1).getTokenIndex(),
+  retval.st);
+<endif>
 >>
 
 rewriteTemplateAlt() ::= <<

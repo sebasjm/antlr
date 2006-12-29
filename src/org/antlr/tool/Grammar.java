@@ -406,6 +406,9 @@ public class Grammar {
 	 */
 	protected boolean builtFromString = false;
 
+	/** Factored out the sanity checking code; delegate to it. */
+	GrammarSanity sanity = new GrammarSanity(this);
+
 	public Grammar() {
 		initTokenSymbolTables();
 		builtFromString = true;
@@ -1268,70 +1271,8 @@ public class Grammar {
 		}
 	}
 
-	public void checkRuleReference(GrammarAST refAST,
-								   GrammarAST argsAST,
-								   String currentRuleName)
-	{
-		Rule r = getRule(refAST.getText());
-		if ( refAST.getType()==ANTLRParser.RULE_REF ) {
-			if ( argsAST!=null ) {
-				// rule[args]; ref has args
-                if ( r!=null && r.argActionAST==null ) {
-					// but rule def has no args
-					ErrorManager.grammarError(
-						ErrorManager.MSG_RULE_HAS_NO_ARGS,
-						this,
-						argsAST.getToken(),
-						r.name);
-				}
-			}
-			else {
-				// rule ref has no args
-				if ( r!=null && r.argActionAST!=null ) {
-					// but rule def has args
-					ErrorManager.grammarError(
-						ErrorManager.MSG_MISSING_RULE_ARGS,
-						this,
-						refAST.getToken(),
-						r.name);
-				}
-			}
-		}
-		else if ( refAST.getType()==ANTLRParser.TOKEN_REF ) {
-			if ( type!=LEXER ) {
-				if ( argsAST!=null ) {
-					// args on a token ref not in a lexer rule
-					ErrorManager.grammarError(
-						ErrorManager.MSG_ARGS_ON_TOKEN_REF,
-						this,
-						refAST.getToken(),
-						refAST.getText());
-				}
-				return; // ignore token refs in nonlexers
-			}
-			if ( argsAST!=null ) {
-				// tokenRef[args]; ref has args
-				if ( r!=null && r.argActionAST==null ) {
-					// but token rule def has no args
-					ErrorManager.grammarError(
-						ErrorManager.MSG_RULE_HAS_NO_ARGS,
-						this,
-						argsAST.getToken(),
-						r.name);
-				}
-			}
-			else {
-				// token ref has no args
-				if ( r!=null && r.argActionAST!=null ) {
-					// but token rule def has args
-					ErrorManager.grammarError(
-						ErrorManager.MSG_MISSING_RULE_ARGS,
-						this,
-						refAST.getToken(),
-						r.name);
-				}
-			}
-		}
+	public List checkAllRulesForLeftRecursion() {
+		return sanity.checkAllRulesForLeftRecursion();
 	}
 
 	/** Return a list of left-recursive rules; no analysis can be done
@@ -1345,142 +1286,15 @@ public class Grammar {
 		if ( leftRecursiveRules!=null ) {
 			return leftRecursiveRules;
 		}
-		checkAllRulesForLeftRecursion();
+		sanity.checkAllRulesForLeftRecursion();
 		return leftRecursiveRules;
 	}
 
-	/** Check all rules for infinite left recursion before analysis. Return list
-	 *  of troublesome rule cycles.  This method has two side-effects: it notifies
-	 *  the error manager that we have problems and it sets the list of
-	 *  recursive rules that we should ignore during analysis.
-	 *
-	 *  Return type: List<Set<String(rule-name)>>.
-	 */
-	public List checkAllRulesForLeftRecursion() {
-		createNFAs(); // make sure we have NFAs
-		leftRecursiveRules = new HashSet();
-		List listOfRecursiveCycles = new ArrayList(); // List<Set<String(rule-name)>>
-		for (int i = 0; i < ruleIndexToRuleList.size(); i++) {
-			String ruleName = (String)ruleIndexToRuleList.elementAt(i);
-			if ( ruleName!=null ) {
-				NFAState s = getRuleStartState(ruleName);
-				visitedDuringRecursionCheck = new HashSet();
-				visitedDuringRecursionCheck.add(ruleName);
-				Set visitedStates = new HashSet();
-				traceStatesLookingForLeftRecursion(s, visitedStates, listOfRecursiveCycles);
-			}
-		}
-		if ( listOfRecursiveCycles.size()>0 ) {
-			ErrorManager.leftRecursionCycles(listOfRecursiveCycles);
-		}
-		return listOfRecursiveCycles;
-	}
-
-	/** From state s, look for any transition to a rule that is currently
-	 *  being traced.  When tracing r, visitedDuringRecursionCheck has r
-	 *  initially.  If you reach an accept state, return but notify the
-	 *  invoking rule that it is nullable, which implies that invoking
-	 *  rule must look at follow transition for that invoking state.
-	 *  The visitedStates tracks visited states within a single rule so
-	 *  we can avoid epsilon-loop-induced infinite recursion here.  Keep
-	 *  filling the cycles in listOfRecursiveCycles and also, as a
-	 *  side-effect, set leftRecursiveRules.
-	 */
-	protected boolean traceStatesLookingForLeftRecursion(NFAState s,
-														 Set visitedStates,
-														 List listOfRecursiveCycles)
+	public void checkRuleReference(GrammarAST refAST,
+								   GrammarAST argsAST,
+								   String currentRuleName)
 	{
-		if ( s.isAcceptState() ) {
-			// this rule must be nullable!
-			// At least one epsilon edge reached accept state
-			return true;
-		}
-		if ( visitedStates.contains(s) ) {
-			// within same rule, we've hit same state; quit looping
-			return false;
-		}
-		visitedStates.add(s);
-		boolean stateReachesAcceptState = false;
-		Transition t0 = s.transition(0);
-		if ( t0 instanceof RuleClosureTransition ) {
-			String targetRuleName = ((NFAState)t0.target).getEnclosingRule();
-			if ( visitedDuringRecursionCheck.contains(targetRuleName) ) {
-				// record left-recursive rule, but don't go back in
-				leftRecursiveRules.add(targetRuleName);
-				/*
-				System.out.println("already visited "+targetRuleName+", calling from "+
-								   s.getEnclosingRule());
-				*/
-				addRulesToCycle(targetRuleName,
-								s.getEnclosingRule(),
-								listOfRecursiveCycles);
-			}
-			else {
-				// must visit if not already visited; send new visitedStates set
-				visitedDuringRecursionCheck.add(targetRuleName);
-				boolean callReachedAcceptState =
-					traceStatesLookingForLeftRecursion((NFAState)t0.target,
-													   new HashSet(),
-													   listOfRecursiveCycles);
-				// we're back from visiting that rule
-				visitedDuringRecursionCheck.remove(targetRuleName);
-				// must keep going in this rule then
-				if ( callReachedAcceptState ) {
-					NFAState followingState =
-						((RuleClosureTransition)t0).getFollowState();
-					stateReachesAcceptState |=
-						traceStatesLookingForLeftRecursion(followingState,
-														   visitedStates,
-														   listOfRecursiveCycles);
-				}
-			}
-		}
-		else if ( t0.label.isEpsilon() ) {
-			stateReachesAcceptState |=
-				traceStatesLookingForLeftRecursion((NFAState)t0.target, visitedStates, listOfRecursiveCycles);
-		}
-		// else it has a labeled edge
-
-		// now do the other transition if it exists
-		Transition t1 = s.transition(1);
-		if ( t1!=null ) {
-			stateReachesAcceptState |=
-				traceStatesLookingForLeftRecursion((NFAState)t1.target,
-												   visitedStates,
-												   listOfRecursiveCycles);
-		}
-		return stateReachesAcceptState;
-	}
-
-	/** enclosingRuleName calls targetRuleName, find the cycle containing
-	 *  the target and add the caller.  Find the cycle containing the caller
-	 *  and add the target.  If no cycles contain either, then create a new
-	 *  cycle.  listOfRecursiveCycles is List<Set<String>> that holds a list
-	 *  of cycles (sets of rule names).
-	 */
-	protected void addRulesToCycle(String targetRuleName,
-								   String enclosingRuleName,
-								   List listOfRecursiveCycles)
-	{
-		boolean foundCycle = false;
-		for (int i = 0; i < listOfRecursiveCycles.size(); i++) {
-			Set rulesInCycle = (Set)listOfRecursiveCycles.get(i);
-			// ensure both rules are in same cycle
-			if ( rulesInCycle.contains(targetRuleName) ) {
-				rulesInCycle.add(enclosingRuleName);
-				foundCycle = true;
-			}
-			if ( rulesInCycle.contains(enclosingRuleName) ) {
-				rulesInCycle.add(targetRuleName);
-				foundCycle = true;
-			}
-		}
-		if ( !foundCycle ) {
-			Set cycle = new HashSet();
-			cycle.add(targetRuleName);
-			cycle.add(enclosingRuleName);
-			listOfRecursiveCycles.add(cycle);
-		}
+		sanity.checkRuleReference(refAST, argsAST, currentRuleName);
 	}
 
 	/** Rules like "a : ;" and "a : {...} ;" should not generate

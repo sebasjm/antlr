@@ -233,10 +233,10 @@ grammar[Grammar g,
 		recognizerST.setAttribute("ASTLabelType", g.getOption("ASTLabelType"));
 	}
     if ( g.type==Grammar.TREE_PARSER && g.getOption("ASTLabelType")==null ) {
-		ErrorManager.grammarError(ErrorManager.MSG_MISSING_AST_TYPE_IN_TREE_GRAMMAR,
-								  g,
-								  null,
-								  g.name);
+		ErrorManager.grammarWarning(ErrorManager.MSG_MISSING_AST_TYPE_IN_TREE_GRAMMAR,
+								   g,
+								   null,
+								   g.name);
 	}
     if ( g.type!=Grammar.TREE_PARSER ) {
 		recognizerST.setAttribute("labelType", g.getOption("TokenLabelType"));

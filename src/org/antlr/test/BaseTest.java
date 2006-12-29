@@ -400,7 +400,7 @@ public abstract class BaseTest extends TestCase {
 			"    public static void main(String[] args) throws Exception {\n" +
 			"        CharStream input = new ANTLRFileStream(args[0]);\n" +
 			"        $lexerName$ lex = new $lexerName$(input);\n" +
-			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+			"        TokenRewriteStream tokens = new TokenRewriteStream(lex);\n" +
 			"        $createParser$\n"+
 			"        $parserName$.$parserStartRuleName$_return r = parser.$parserStartRuleName$();\n" +
 			"        $if(!treeParserStartRuleName)$\n" +
@@ -408,6 +408,7 @@ public abstract class BaseTest extends TestCase {
 			"            System.out.println(((Tree)r.tree).toStringTree());\n" +
 			"        $else$\n" +
 			"        CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);\n" +
+			"        nodes.setTokenStream(tokens);\n" +
 			"        $treeParserName$ walker = new $treeParserName$(nodes);\n" +
 			"        walker.$treeParserStartRuleName$();\n" +
 			"        $endif$\n" +

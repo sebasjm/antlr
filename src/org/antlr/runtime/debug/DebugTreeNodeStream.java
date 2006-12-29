@@ -29,6 +29,7 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.tree.TreeAdaptor;
 import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.runtime.TokenStream;
 
 /** Debug any tree node stream.  The constructor accepts the stream
  *  and a debug listener.  As node stream calls come in, debug events
@@ -126,6 +127,10 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 
 	public Object getTreeSource() {
 		return input;
+	}
+
+	public TokenStream getTokenStream() {
+		return input.getTokenStream();
 	}
 
 	/** It is normally this object that instructs the node stream to

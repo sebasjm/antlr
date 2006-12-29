@@ -308,7 +308,22 @@ public class Rule {
 		return rules;
 	}
 
-	public void trackAltsWithRewrites(int outerAltNum) {
+	/** Track which rules have rewrite rules.  Pass in the ALT node
+	 *  for the alt so we can check for problems when output=template,
+	 *  rewrite=true, and grammar type is tree parser.
+	 */
+	public void trackAltsWithRewrites(GrammarAST altAST, int outerAltNum) {
+		if ( grammar.type==Grammar.TREE_PARSER &&
+			 grammar.buildTemplate() &&
+			 grammar.getOption("rewrite")!=null &&
+			 grammar.getOption("rewrite").equals("true")
+			)
+		{
+			GrammarAST firstElementAST = (GrammarAST)altAST.getFirstChild();
+			grammar.sanity.ensureAltIsSimpleNodeOrTree(altAST,
+													   firstElementAST,
+													   outerAltNum);
+		}
 		altsWithRewrites[outerAltNum] = true;
 	}
 

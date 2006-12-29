@@ -287,7 +287,42 @@ CHANGES
 
 3.0b6 - ??
 
+December 28, 2006
+
+* errors that are now warnings: missing AST label type in trees.
+  Also "no start rule detected" is warning.
+
+* tree grammars also can do rewrite=true for output=template.
+  Only works for alts with single node or tree as alt elements.
+  If you are going to use $text in a tree grammar or do rewrite=true
+  for templates, you must use in your main:
+
+  nodes.setTokenStream(tokens);
+
+* You get a warning for tree grammars that do rewrite=true and
+  output=template and have -> for alts that are not simple nodes
+  or simple trees.  new unit tests in TestRewriteTemplates at end.
+
 December 27, 2006
+
+* Error message appears when you use -> in tree grammar with
+  output=template and rewrite=true for alt that is not simple
+  node or tree ref.
+
+* no more $stop attribute for tree parsers; meaningless/useless.
+  Removed from TreeRuleReturnScope also.
+
+* rule text attribute in tree parser must pull from token buffer.
+  Makes no sense otherwise.  added getTokenStream to TreeNodeStream
+  so rule $text attr works.  CommonTreeNodeStream etc... now let
+  you set the token stream so you can access later from tree parser.
+  $text is not well-defined for rules like
+
+     slist : stat+ ;
+
+  because stat is not a single node nor rooted with a single node.
+  $slist.text will get only first stat.  I need to add a warning about
+  this...
 
 * Fixed http://www.antlr.org:8888/browse/ANTLR-76 for Java.
   Enhanced TokenRewriteStream so it accepts any object; converts

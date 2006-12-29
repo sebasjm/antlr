@@ -91,6 +91,9 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	}
 
     public int getType(Object t) {
+		if ( t==null ) {
+			return Token.INVALID_TOKEN_TYPE;
+		}
 		return ((Tree)t).getType();
 	}
 

@@ -94,6 +94,9 @@ public class CommonTree extends BaseTree {
 	}
 
 	public int getTokenStartIndex() {
+		if ( startIndex==-1 && token!=null ) {
+			return token.getTokenIndex();
+		}
 		return startIndex;
 	}
 
@@ -102,6 +105,9 @@ public class CommonTree extends BaseTree {
 	}
 
 	public int getTokenStopIndex() {
+		if ( stopIndex==-1 && token!=null ) {
+			return token.getTokenIndex();
+		}
 		return stopIndex;
 	}
 

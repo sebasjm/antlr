@@ -371,7 +371,9 @@ retval
 
 ruleCleanUp() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
+<if(!TREE_PARSER)>
 retval.stop = input.LT(-1);<\n>
+<endif>
 <endif>
 <if(memoize)>
 <if(backtracking)>
@@ -1111,8 +1113,7 @@ tokenLabelRef(label) ::= "<label>"
 listLabelRef(label) ::= "list_<label>"
 
 
-// not sure the next are the right approach; and they are evaluated early;
-// they cannot see TREE_PARSER or PARSER attributes for example. :(
+// not sure the next are the right approach
 
 tokenLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
 tokenLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
@@ -1125,7 +1126,16 @@ tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 ruleLabelPropertyRef_start(scope,attr) ::= "((<labelType>)<scope>.start)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)<scope>.tree)"
-ruleLabelPropertyRef_text(scope,attr) ::= "input.toString(<scope>.start,<scope>.stop)"
+ruleLabelPropertyRef_text(scope,attr) ::= <<
+<if(TREE_PARSER)>
+input.getTokenStream().toString(
+  input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
+  input.getTreeAdaptor().getTokenStopIndex(<scope>.start))
+<else>
+input.toString(<scope>.start,<scope>.stop)
+<endif>
+>>
+
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
@@ -1142,7 +1152,15 @@ lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
 rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval.start)"
 rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval.stop)"
 rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)retval.tree)"
-rulePropertyRef_text(scope,attr) ::= "input.toString(retval.start,input.LT(-1))"
+rulePropertyRef_text(scope,attr) ::= <<
+<if(TREE_PARSER)>
+input.getTokenStream().toString(
+  input.getTreeAdaptor().getTokenStartIndex(retval.start),
+  input.getTreeAdaptor().getTokenStopIndex(retval.start))
+<else>
+input.toString(retval.start,input.LT(-1))
+<endif>
+>>
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "getText()"

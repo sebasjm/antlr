@@ -28,6 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.antlr.runtime.tree;
 
 import org.antlr.runtime.IntStream;
+import org.antlr.runtime.TokenStream;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind */
 public interface TreeNodeStream extends IntStream {
@@ -52,10 +53,15 @@ public interface TreeNodeStream extends IntStream {
 
 	/** Where is this stream pulling nodes from?  This is not the name, but
 	 *  the object that provides node objects.
-	 *
-	 *  TODO: do we really need this?
 	 */
 	public Object getTreeSource();
+
+	/** If the tree associated with this stream was created from a TokenStream,
+	 *  you can specify it here.  Used to do rule $text attribute in tree
+	 *  parser.  Optional unless you use tree parser rule text attribute
+	 *  or output=template and rewrite=true options.
+	 */
+	public TokenStream getTokenStream();
 
 	/** What adaptor can tell me how to interpret/navigate nodes and
 	 *  trees.  E.g., get text of a node.

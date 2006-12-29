@@ -28,6 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
 
 import java.util.*;
 
@@ -117,6 +118,9 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 
 	/** Pull nodes from which tree? */
 	protected Object root;
+
+	/** IF this tree (root) was created from a token stream, track it. */
+	protected TokenStream tokens;
 
 	/** What tree adaptor was used to build these trees */
 	TreeAdaptor adaptor;
@@ -359,6 +363,25 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		return nodes.get(p+k-1);
 	}
 
+/*
+	public Object getLastTreeNode() {
+		int i = index();
+		if ( i>=size() ) {
+			i--; // if at EOF, have to start one back
+		}
+		System.out.println("start last node: "+i+" size=="+nodes.size());
+		while ( i>=0 &&
+			(adaptor.getType(get(i))==Token.EOF ||
+			 adaptor.getType(get(i))==Token.UP ||
+			 adaptor.getType(get(i))==Token.DOWN) )
+		{
+			i--;
+		}
+		System.out.println("stop at node: "+i+" "+nodes.get(i));
+		return nodes.get(i);
+	}
+*/
+	
 	/** Look backwards k nodes */
 	protected Object LB(int k) {
 		if ( k==0 ) {
@@ -372,6 +395,14 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 
 	public Object getTreeSource() {
 		return root;
+	}
+
+	public TokenStream getTokenStream() {
+		return tokens;
+	}
+
+	public void setTokenStream(TokenStream tokens) {
+		this.tokens = tokens;
 	}
 
 	public TreeAdaptor getTreeAdaptor() {
@@ -488,6 +519,29 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		}
 		if ( p==-1 ) {
 			fillBuffer();
+		}
+		System.out.println("stop: "+stop);
+		if ( start instanceof CommonTree )
+			System.out.print("toString: "+((CommonTree)start).getToken()+", ");
+		else
+			System.out.println(start);
+		if ( stop instanceof CommonTree )
+			System.out.println(((CommonTree)stop).getToken());
+		else
+			System.out.println(stop);
+		// if we have the token stream, use that to dump text in order
+		if ( tokens!=null ) {
+			int beginTokenIndex = adaptor.getTokenStartIndex(start);
+			int endTokenIndex = adaptor.getTokenStopIndex(stop);
+			// if it's a tree, use start/stop index from start node
+			// else use token range from start/stop nodes
+			if ( adaptor.getType(stop)==Token.UP ) {
+				endTokenIndex = adaptor.getTokenStopIndex(start);
+			}
+			else if ( adaptor.getType(stop)==Token.EOF ) {
+				endTokenIndex = size()-2; // don't use EOF
+			}
+			return tokens.toString(beginTokenIndex, endTokenIndex);
 		}
 		// walk nodes looking for start
 		Object t = null;

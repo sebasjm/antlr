@@ -28,6 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,9 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 
 	/** Pull nodes from which tree? */
 	protected Object root;
+
+	/** IF this tree (root) was created from a token stream, track it. */
+	protected TokenStream tokens;
 
 	/** What tree adaptor was used to build these trees */
 	TreeAdaptor adaptor;
@@ -182,6 +186,14 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 	 */
 	public Object getTreeSource() {
 		return root;
+	}
+
+	public TokenStream getTokenStream() {
+		return tokens;
+	}
+
+	public void setTokenStream(TokenStream tokens) {
+		this.tokens = tokens;
 	}
 
 	/** Make sure we have at least k symbols in lookahead buffer */
@@ -480,6 +492,21 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 	}
 
 	public String toString(Object start, Object stop) {
+		if ( start==null || stop==null ) {
+			return null;
+		}
+		// if we have the token stream, use that to dump text in order
+		if ( tokens!=null ) {
+			// don't trust stop node as it's often an UP node etc...
+			// walk backwards until you find a non-UP, non-DOWN node
+			// and ask for it's token index.
+			int beginTokenIndex = adaptor.getTokenStartIndex(start);
+			int endTokenIndex = adaptor.getTokenStopIndex(stop);
+			if ( adaptor.getType(stop)==Token.UP ) {
+				endTokenIndex = adaptor.getTokenStopIndex(start);
+			}
+			return tokens.toString(beginTokenIndex, endTokenIndex);
+		}
 		StringBuffer buf = new StringBuffer();
 		toStringWork(start, stop, buf);
 		return buf.toString();
