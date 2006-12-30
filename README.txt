@@ -287,6 +287,10 @@ CHANGES
 
 3.0b6 - ??
 
+December 30, 2006
+
+* Allow \" to work correctly in "..." template.
+
 December 28, 2006
 
 * errors that are now warnings: missing AST label type in trees.
