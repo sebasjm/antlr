@@ -1102,11 +1102,11 @@ CHAR_LITERAL
 	;
 
 DOUBLE_QUOTE_STRING_LITERAL
-	:	'"' (ESC|'\n'{newline();}|~'"')* '"'
+	:	'"' ('\\'! '"'|'\n'{newline();}|~'"')* '"'
 	;
 
 DOUBLE_ANGLE_STRING_LITERAL
-	:	"<<" (options {greedy=false;}:ESC|'\n'{newline();}|.)* ">>"
+	:	"<<" (options {greedy=false;}:'\n'{newline();}|.)* ">>"
 	;
 
 protected
