@@ -41,6 +41,7 @@ import java.util.HashMap;
 @returnScope.ruleReturnMembers() ::= <<
 public StringTemplate st;
 public StringTemplate getTemplate() { return st; }
+public String toString() { return getTemplate().toString(); }
 >>
 
 @genericParser.members() ::= <<
