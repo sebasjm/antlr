@@ -151,19 +151,10 @@ if ( backtracking == 0 ) {<\n>
 <if(autoAST)>
 <if(outerAlt)>
 root_0 = (<ASTLabelType>)[treeAdaptor emptyTree];<\n>
-<else>
-<ASTLabelType> root_<blockLevel> = (<ASTLabelType>)[treeAdaptor emptyTree];<\n>
 <endif>
 <endif>
 >>
 
-@alt.cleanup() ::= <<
-<if(autoAST)>
-<if(!outerAlt)>
-<if(backtracking)>if ( backtracking == 0 ) <endif>[treeAdaptor addChild:root_<blockLevel> toTree:root_<enclosingBlockLevel>];<\n>
-<endif>
-<endif>
->>
 
 // TOKEN AST STUFF
 
@@ -172,7 +163,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( backtracking == 0 ) {<endif>
 _<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-[treeAdaptor addChild:_<label>_tree toTree:root_<blockLevel>];
+[treeAdaptor addChild:_<label>_tree toTree:root0];
 <if(backtracking)>}<endif>
 >>
 
@@ -180,15 +171,6 @@ _<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
 tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
 /** ID^ and output=AST */
-tokenRefRoot(token,label,elementIndex) ::= <<
-<super.tokenRef(...)>
-<if(backtracking)>if ( backtracking == 0 ) {<endif>
-_<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-root_<blockLevel> = (<ASTLabelType>)[treeAdaptor makeNode:_<label>_tree parentOf:root_<blockLevel>];
-<if(backtracking)>}<endif>
->>
-
-/** ID^^ and output=AST */
 tokenRefRuleRoot(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( backtracking == 0 ) {<endif>
@@ -210,12 +192,6 @@ tokenRefAndListLabel(token,label,elementIndex) ::= <<
 >>
 
 /** Match label+=TOKEN^ when output=AST but not rewrite alt */
-tokenRefRootAndListLabel(token,label,elementIndex) ::= <<
-<tokenRefRoot(...)>
-<listLabel(...)>
->>
-
-/** Match label+=TOKEN^^ when output=AST but not rewrite alt */
 tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefRuleRoot(...)>
 <listLabel(...)>
@@ -249,11 +225,11 @@ tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 // I have more time.
 
 matchSet(s,label,elementIndex,postmatchCode) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if (backtracking == 0) <endif>[treeAdaptor addChild:[treeAdaptor newTreeWithToken:_<label>] toTree:root_<blockLevel>];})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if (backtracking == 0) <endif>[treeAdaptor addChild:[treeAdaptor newTreeWithToken:_<label>] toTree:root_0];})>
 >>
 
 matchSetRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if (backtracking == 0) <endif>root_<blockLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[treeAdaptor newTreeWithToken:_<label> parentOf:root_<blockLevel>];})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if (backtracking == 0) <endif>root_0 = (<ASTLabelType>)[treeAdaptor makeNode:[treeAdaptor newTreeWithToken:_<label> parentOf:root_0];})>
 >>
 
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
@@ -265,19 +241,13 @@ matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if (backtracking == 0) <endif>[treeAdaptor addChild:[_<label> tree] toTree:root_<blockLevel>];
+<if(backtracking)>if (backtracking == 0) <endif>[treeAdaptor addChild:[_<label> tree] toTree:root_0];
 >>
 
 /** rule! is same as normal rule ref */
 ruleRefBang(rule,label,elementIndex,args) ::= "<super.ruleRef(...)>"
 
 /** rule^ */
-ruleRefRoot(rule,label,elementIndex,args) ::= <<
-<super.ruleRef(...)>
-<if(backtracking)>if (backtracking == 0) <endif>root_<blockLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[_<label> tree] parentOf:root_<blockLevel>];
->>
-
-/** rule^^ */
 ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
 <if(backtracking)>if (backtracking == 0) <endif>root_0 = (<ASTLabelType>)[treeAdaptor makeNode:[_<label> tree] parentOf:root_0];
@@ -308,13 +278,6 @@ ruleRefBangAndListLabel(rule,label,elementIndex,args) ::= <<
 >>
 
 /** x+=rule^ */
-ruleRefRootAndListLabel(rule,label,elementIndex,args) ::= <<
-<super.ruleRef(...)>
-root_<blockLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[_<label> tree] parentOf:root_<blockLevel>];<\n>
-<listLabel(...)>
->>
-
-/** x+=rule^^ */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRefRuleRoot(...)>
 <listLabel(...)>
@@ -326,7 +289,7 @@ wildcard(label,elementIndex) ::= <<
 <super.wildcard(...)>
 <if(backtracking)>if (backtracking == 0) {<endif>
 _<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-[treeAdaptor addChild:_<label>_tree toTree:root_<blockLevel>];
+[treeAdaptor addChild:_<label>_tree toTree:root_0];
 <if(backtracking)>}<endif>
 >>
 
@@ -334,7 +297,7 @@ wildcardRoot(label,elementIndex) ::= <<
 <super.wildcard(...)>
 <if(backtracking)>if (backtracking == 0) {<endif>
 _<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-root_<blockLevel> = (<ASTLabelType>)[treeAdaptor makeNode:_<label>_tree parentOf:root_<blockLevel>];
+root_0 = (<ASTLabelType>)[treeAdaptor makeNode:_<label>_tree parentOf:root_0];
 <if(backtracking)>}<endif>
 >>
 

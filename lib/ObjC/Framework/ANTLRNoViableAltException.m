@@ -1,5 +1,5 @@
 // [The "BSD licence"]
-// Copyright (c) 2006 Kay Roepke
+// Copyright (c) 2006-2007 Kay Roepke
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
