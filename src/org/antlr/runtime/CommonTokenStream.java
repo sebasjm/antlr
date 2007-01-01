@@ -94,6 +94,14 @@ public class CommonTokenStream implements TokenStream {
 		Token t = tokenSource.nextToken();
 		while ( t!=null && t.getType()!=CharStream.EOF ) {
 			boolean discard = false;
+			// is there a channel override for token type?
+			if ( channelOverrideMap!=null ) {
+				Integer channelI = (Integer)
+					channelOverrideMap.get(new Integer(t.getType()));
+				if ( channelI!=null ) {
+					t.setChannel(channelI.intValue());
+				}
+			}
 			if ( discardSet!=null &&
 				 discardSet.contains(new Integer(t.getType())) )
 			{
@@ -101,14 +109,6 @@ public class CommonTokenStream implements TokenStream {
 			}
 			else if ( discardOffChannelTokens && t.getChannel()!=this.channel ) {
 				discard = true;
-			}
-			// is there a channel override for token type?
-			else if ( channelOverrideMap!=null ) {
-				Integer channelI = (Integer)
-					channelOverrideMap.get(new Integer(t.getType()));
-				if ( channelI!=null ) {
-					t.setChannel(channelI.intValue());
-				}
 			}
 			if ( !discard )	{
 				t.setTokenIndex(index);
