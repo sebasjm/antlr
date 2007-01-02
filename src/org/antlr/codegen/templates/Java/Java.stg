@@ -349,9 +349,8 @@ ruleLabelDefs() ::= <<
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
     :{List list_<it.label.text>=null;}; separator="\n"
 >
-<[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
-    :ruleLabelDef(label=it); separator="\n"
->
+<ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
+<ruleDescriptor.ruleListLabels:{ll|RuleReturnScope <ll.label.text> = null;}; separator="\n">
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
     :{List list_<it>=new ArrayList();}; separator="\n"
 >
@@ -578,12 +577,12 @@ match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBackt
 /** ids+=ID */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
 <tokenRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
-listLabel(label) ::= <<
+listLabel(label,elem) ::= <<
 if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<label>);<\n>
+list_<label>.add(<elem>);<\n>
 >>
 
 /** match a character */
@@ -626,7 +625,7 @@ else {
 
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 <matchSet(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match a string literal */
@@ -649,7 +648,7 @@ matchAny(input); <checkRuleBacktrackFailure()>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
 <wildcard(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match . wildcard in lexer */
@@ -662,7 +661,7 @@ matchAny(); <checkRuleBacktrackFailure()>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
 <wildcardChar(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match a rule reference by invoking it possibly with arguments
@@ -682,7 +681,7 @@ _fsp--;
 /** ids+=ID */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** A lexer rule reference */

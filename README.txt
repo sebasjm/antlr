@@ -287,6 +287,13 @@ CHANGES
 
 3.0b6 - ??
 
+January 1, 2007
+
+* += labels for rules only work for output option; previously elements
+  of list were the return value structs, but are now either the tree or
+  StringTemplate return value.  You can label different rules now
+  x+=a x+=b.
+
 December 30, 2006
 
 * Allow \" to work correctly in "..." template.

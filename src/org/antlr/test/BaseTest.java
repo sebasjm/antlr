@@ -30,6 +30,8 @@ package org.antlr.test;
 import junit.framework.TestCase;
 import org.antlr.Tool;
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.tool.ErrorManager;
+import org.antlr.tool.Message;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -95,7 +97,7 @@ public abstract class BaseTest extends TestCase {
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
 		try {
-			List options = new ArrayList();
+			final List options = new ArrayList();
 			if ( debug ) {
 				options.add("-debug");
 			}
@@ -104,10 +106,19 @@ public abstract class BaseTest extends TestCase {
 			options.add("-lib");
 			options.add(tmpdir);
 			options.add(new File(tmpdir,grammarFileName).toString());
-			String[] optionsA = new String[options.size()];
+			final String[] optionsA = new String[options.size()];
 			options.toArray(optionsA);
+			final ErrorQueue equeue = new ErrorQueue();
+			ErrorManager.setErrorListener(equeue);
 			Tool antlr = new Tool(optionsA);
 			antlr.process();
+			if ( equeue.errors.size()>0 ) {
+				System.err.println("antlr reports errors from "+options);
+				for (int i = 0; i < equeue.errors.size(); i++) {
+					Message msg = (Message) equeue.errors.get(i);
+					System.err.println(msg);
+				}
+			}
 		}
 		catch (Exception e) {
 			System.err.println("problems building grammar: "+e);

@@ -31,6 +31,8 @@ import org.antlr.analysis.DFA;
 import org.antlr.analysis.DecisionProbe;
 import org.antlr.misc.BitSet;
 import org.antlr.tool.*;
+import org.antlr.Tool;
+import org.antlr.codegen.CodeGenerator;
 
 import java.util.*;
 
@@ -484,17 +486,19 @@ public class TestDFAConversion extends BaseTest {
 	}
 
 	public void testNoStartRule() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : A a | X;"); // single rule 'a' refers to itself; no start rule
 
-		DecisionProbe.verbose=true; // make sure we get all error info
-		ErrorQueue equeue = new ErrorQueue();
-		ErrorManager.setErrorListener(equeue);
-		g.createNFAs();
-		g.createLookaheadDFAs();
+		Tool antlr = newTool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
 
-		Message msg = (Message)equeue.errors.get(0);
+		Message msg = (Message)equeue.warnings.get(0);
 		assertTrue("expecting no start rules; found "+msg.getClass().getName(),
 				   msg instanceof GrammarSemanticsMessage);
 	}

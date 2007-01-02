@@ -131,7 +131,7 @@ tokenRef(token,label,elementIndex);
 /** ids+=ID */
 tokenRefAndListLabel(token,label,elementIndex);
 
-listLabel(label);
+listLabel(label,elem);
 
 /** match a character */
 charRef(char,label);

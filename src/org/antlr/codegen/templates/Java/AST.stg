@@ -120,19 +120,19 @@ root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 /** ids+=ID! and output=AST */
 tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefBang(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** label+=TOKEN when output=AST but not rewrite alt */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
 <tokenRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match label+=TOKEN^ when output=AST but not rewrite alt */
 tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefRuleRoot(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** ID but track it for use in a rewrite rule */
@@ -146,7 +146,7 @@ tokenRefTrack(token,label,elementIndex) ::= <<
  */
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefTrack(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 // SET AST
@@ -179,7 +179,7 @@ matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_0, <label>.tree);
+<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_0, <label>.getTree());
 >>
 
 /** rule! is same as normal rule ref */
@@ -188,37 +188,37 @@ ruleRefBang(rule,label,elementIndex,args) ::= "<super.ruleRef(...)>"
 /** rule^ */
 ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_0);
+<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>.getTree(), root_0);
 >>
 
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>list_<rule>.add(<label>.tree);
+<if(backtracking)>if ( backtracking==0 ) <endif>list_<rule>.add(<label>.getTree());
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
 ruleRefTrackAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRefTrack(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** x+=rule when output=AST */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRef(...)>
-<listLabel(...)>
+<listLabel(elem=label+".getTree()",...)>
 >>
 
 /** x+=rule! when output=AST is a rule ref with list addition */
 ruleRefBangAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRefBang(...)>
-<listLabel(...)>
+<listLabel(elem=label+".getTree()",...)>
 >>
 
 /** x+=rule^ */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRefRuleRoot(...)>
-<listLabel(...)>
+<listLabel(elem=label+".getTree()",...)>
 >>
 
 // WILDCARD AST

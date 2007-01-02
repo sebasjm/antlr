@@ -160,7 +160,7 @@ NONCHAR_RANGE() ::=
 ILLEGAL_OPTION(arg) ::=
 	"illegal option <arg>"
 LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT(arg) ::=
-	"rule '+=' list labels are not allowed unless building trees: <arg>"
+	"rule '+=' list labels are not allowed w/o output option: <arg>"
 UNDEFINED_TOKEN_REF_IN_REWRITE(arg) ::=
   "reference to undefined token in rewrite rule: <arg>"
 REWRITE_ELEMENT_NOT_PRESENT_ON_LHS(arg) ::=

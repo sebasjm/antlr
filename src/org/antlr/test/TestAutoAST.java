@@ -426,8 +426,8 @@ public class TestAutoAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : x+=b x+=b {" +
-				"b_return ret=(b_return)$x.get(1);" +
-				"System.out.print(\"2nd x=\"+((CommonTree)ret.tree).toStringTree()+';');} ;\n" +
+				"Tree t=(Tree)$x.get(1);" +
+				"System.out.print(\"2nd x=\"+t.toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -442,8 +442,7 @@ public class TestAutoAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : ( x+=b^ )+ {" +
-			"b_return ret=(b_return)$x.get(1);" +
-			"System.out.print(\"x=\"+((CommonTree)ret.tree).toStringTree()+';');} ;\n" +
+			"System.out.print(\"x=\"+((CommonTree)$x.get(1)).toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -458,8 +457,7 @@ public class TestAutoAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : x+=b! x+=b {" +
-			"b_return ret=(b_return)$x.get(0);" +
-			"System.out.print(\"1st x=\"+((CommonTree)ret.tree).toStringTree()+';');} ;\n" +
+			"System.out.print(\"1st x=\"+((CommonTree)$x.get(0)).toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +

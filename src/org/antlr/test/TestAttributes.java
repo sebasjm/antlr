@@ -2042,6 +2042,57 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
+	public void testRuleLabelWithoutOutputOption() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar T;\n"+
+			"s : x+=a ;" +
+			"a : 'a';\n"+
+			"b : 'b';\n"+
+			"WS : ' '|'\n';\n");
+		Tool antlr = newTool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		int expectedMsgID = ErrorManager.MSG_LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT;
+		Object expectedArg = "x";
+		Object expectedArg2 = null;
+		GrammarSemanticsMessage expectedMessage =
+			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
+		checkError(equeue, expectedMessage);
+	}
+
+	public void testRuleLabelOnTwoDifferentRulesAST() throws Exception {
+		String grammar =
+			"grammar T;\n"+
+			"options {output=AST;}\n"+
+			"s : x+=a x+=b {System.out.println($x);} ;" +
+			"a : 'a';\n"+
+			"b : 'b';\n"+
+			"WS : (' '|'\n') {skip();};\n";
+		String expecting = "[a, b]\na b\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "s", "a b", false);
+		assertEquals(expecting, found);
+	}
+
+	public void testRuleLabelOnTwoDifferentRulesTemplate() throws Exception {
+		String grammar =
+			"grammar T;\n"+
+			"options {output=template;}\n"+
+			"s : x+=a x+=b {System.out.println($x);} ;" +
+			"a : 'a' -> {%{\"hi\"}} ;\n"+
+			"b : 'b' -> {%{\"mom\"}} ;\n"+
+			"WS : (' '|'\n') {skip();};\n";
+		String expecting = "[hi, mom]\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "s", "a b", false);
+		assertEquals(expecting, found);
+	}
+
 	public void testMissingArgs() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -2945,18 +2996,19 @@ public class TestAttributes extends BaseTest {
 	}
 
 	public void testTreeRuleStopAttributeIsInvalid() throws Exception {
-		String action = "$r.x; $r.start; $r.stop;";
-		String expecting = "r.x; ((Object)r.start); $r.stop;";
+		String action = "$r.x; $r.start; $r.stop";
+		String expecting = "r.x; ((CommonTree)r.start); $r.stop";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
-			"tree grammar t;\n"+
-				"a returns [int x]\n" +
-				"  :\n" +
-				"  ;\n"+
-				"b : r=a {###"+action+"!!!}\n" +
-				"  ;");
+			"tree grammar t;\n" +
+			"options {ASTLabelType=CommonTree;}\n"+
+			"a returns [int x]\n" +
+			"  :\n" +
+			"  ;\n"+
+			"b : r=a {###"+action+"!!!}\n" +
+			"  ;");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2986,6 +3038,7 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"tree grammar t;\n" +
+			"options {ASTLabelType=CommonTree;}\n" +
 			"a : {###"+action+"!!!}\n" +
 			"  ;\n");
 
@@ -2999,7 +3052,7 @@ public class TestAttributes extends BaseTest {
 		String found = code.substring(code.indexOf("###")+3,code.indexOf("!!!"));
 		assertEquals(expecting, found);
 
-		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 
