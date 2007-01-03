@@ -402,6 +402,8 @@ rule returns [StringTemplate code=null]
 			else {
 				description =
 					grammar.grammarTreeToString(#rule,false);
+				description =
+				    generator.target.getTargetStringLiteralFromString(description);
 				code.setAttribute("description", description);
 			}
 			Rule theRule = grammar.getRule(r);
