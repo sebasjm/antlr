@@ -289,6 +289,11 @@ CHANGES
 
 January 1, 2007
 
+* analysis failsafe is back on; if a decision takes too long, it bails out
+  and uses k=1
+
+January 1, 2007
+
 * += labels for rules only work for output option; previously elements
   of list were the return value structs, but are now either the tree or
   StringTemplate return value.  You can label different rules now

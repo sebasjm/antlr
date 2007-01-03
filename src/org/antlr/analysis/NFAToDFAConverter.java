@@ -588,16 +588,15 @@ public class NFAToDFAConverter {
 
 		/* NOTE SURE WE NEED THIS FAILSAFE NOW 11/8/2006 and it complicates
 		   MY ALGORITHM TO HAVE TO ABORT ENTIRE DFA CONVERSION
+		   */
 		if ( DFA.MAX_TIME_PER_DFA_CREATION>0 &&
 			 System.currentTimeMillis() - d.dfa.conversionStartTime >=
 			 DFA.MAX_TIME_PER_DFA_CREATION )
 		{
 			// report and back your way out; we've blown up somehow
-			terminateConversion = true;
 			dfa.probe.reportEarlyTermination();
 			return;
 		}
-		*/
 
 		NFAConfiguration proposedNFAConfiguration =
 				new NFAConfiguration(p.stateNumber,
