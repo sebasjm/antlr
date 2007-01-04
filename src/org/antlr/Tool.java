@@ -241,7 +241,7 @@ public class Tool {
 
     public void process()  {
 		int numFiles = grammarFileNames.size();
-		for (int i = 0; i < grammarFileNames.size(); i++) {
+		for (int i = 0; i < numFiles; i++) {
 			String grammarFileName = (String) grammarFileNames.get(i);
 			if ( numFiles > 1 ) {
 			    System.out.println(grammarFileName);
@@ -418,8 +418,8 @@ public class Tool {
 	 *
 	 *  The output dir -o spec takes precedence if it's absolute.
 	 *  E.g., if the grammar file dir is absolute the output dir is given
-	 *  precendence. "-o /tmp /usr/lib/t.g3" results in "/tmp/T.java" as
-	 *  output (assuming t.g3 holds T.java).
+	 *  precendence. "-o /tmp /usr/lib/t.g" results in "/tmp/T.java" as
+	 *  output (assuming t.g holds T.java).
 	 *
 	 *  If no -o is specified, then just write to the directory where the
 	 *  grammar file was found.
