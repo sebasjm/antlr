@@ -1,0 +1,23 @@
+- setup.py
+- implement more examples
+- run tests with all installed python versions
+- antlr features
+  - backtracking
+  - memoize
+  - ASTs
+  - error handling & recovery
+  - scopes
+- turn some methods into attributes
+  - (String|CommonToken)Stream.index()
+  - (String|CommonToken)Stream.size() --> __len__
+- proper indention of actions
+- documentation in docstrings
+- document differences to java API
+- add methods to emulate java API, but mark 'em as deprecated
+- optimizations which should be explored:
+  - DFA: perhaps zip() the lists into a tuple 
+    (eot, eof, min, max, accept, special, transition)
+    for each state. checkout potential performance gain.
+  - StringStream: look into optimizing LA(). Perhaps use LAk instead of LA(k)
+    and create the attributes when needed.
+- ...

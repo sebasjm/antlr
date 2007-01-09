@@ -1,0 +1,45 @@
+# -*- mode: Makefile -*-
+
+CLASSPATH=$(BASE)/../antlr-2.7.7.jar:$(BASE)/../junit-4.2.jar:$(BASE)/../stringtemplate-3.0.jar
+
+JAVAC=/opt/jdk1.6.0/bin/javac -classpath $(CLASSPATH)
+JAVA=/opt/jdk1.6.0/bin/java
+
+ANTLR=$(JAVA) -classpath $(CLASSPATH):$(BASE)/../../src org.antlr.Tool
+ANTLR2=$(JAVA) -classpath $(BASE)/../antlr-2.7.7.jar antlr.Tool
+SRC=$(BASE)/../../src
+
+$(SRC)/org/antlr/tool/ANTLRParser.java: $(SRC)/org/antlr/tool/antlr.g
+	cd $(dir $<); $(ANTLR2) $<
+
+$(SRC)/org/antlr/tool/AssignTokenTypesWalkerTokenTypes.java: $(SRC)/org/antlr/tool/assign.types.g
+	cd $(dir $<); $(ANTLR2) $<
+
+$(SRC)/org/antlr/tool/DefineGrammarItemsWalker.java: $(SRC)/org/antlr/tool/define.g
+	cd $(dir $<); $(ANTLR2) $<
+
+$(SRC)/org/antlr/tool/TreeToNFAConverter.java: $(SRC)/org/antlr/tool/buildnfa.g
+	cd $(dir $<); $(ANTLR2) $<
+
+$(SRC)/org/antlr/tool/ANTLRTreePrinter.java: $(SRC)/org/antlr/tool/antlr.print.g
+	cd $(dir $<); $(ANTLR2) $<
+
+$(SRC)/org/antlr/codegen/CodeGenTreeWalker.java: $(SRC)/org/antlr/codegen/ANTLRTokenTypes.txt
+
+$(SRC)/org/antlr/codegen/ANTLRTokenTypes.txt: $(SRC)/org/antlr/tool/ANTLRParser.java
+	cp $(SRC)/org/antlr/tool/ANTLRTokenTypes.txt $(SRC)/org/antlr/codegen/ANTLRTokenTypes.txt
+
+$(SRC)/org/antlr/codegen/CodeGenTreeWalker.java: $(SRC)/org/antlr/codegen/codegen.g 
+
+	cd $(dir $<); $(ANTLR2) $<
+
+
+
+.PHONY: build
+build: $(SRC)/org/antlr/tool/ANTLRParser.java \
+       $(SRC)/org/antlr/tool/AssignTokenTypesWalkerTokenTypes.java \
+       $(SRC)/org/antlr/tool/DefineGrammarItemsWalker.java \
+       $(SRC)/org/antlr/tool/TreeToNFAConverter.java \
+       $(SRC)/org/antlr/tool/ANTLRTreePrinter.java \
+       $(SRC)/org/antlr/codegen/CodeGenTreeWalker.java
+	cd $(BASE)/../../src; $(JAVAC) -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
