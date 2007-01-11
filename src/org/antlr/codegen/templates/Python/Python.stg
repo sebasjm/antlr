@@ -302,19 +302,20 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
     <ruleDescriptor.actions.init>
     <@preamble()>
     try:
-        <ruleMemoization(name=ruleName)>
-        <block>
+        try:
+            <ruleMemoization(name=ruleName)>
+            <block>
 
 <if(exceptions)>
-    <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
+        <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
 <else>
 <if(!emptyRule)>
 <if(actions.(actionScope).rulecatch)>
-    <actions.(actionScope).rulecatch>
+        <actions.(actionScope).rulecatch>
 <else>
-    except antlr3.RecognitionException, re:
-        self.reportError(re);
-        self.recover(self.input, re)
+        except antlr3.RecognitionException, re:
+            self.reportError(re);
+            self.recover(self.input, re)
 
 <endif>
 <endif>

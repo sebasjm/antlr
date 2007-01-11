@@ -1,6 +1,5 @@
 - setup.py
 - implement more examples
-- run tests with all installed python versions
 - antlr features
   - backtracking
   - memoize
@@ -20,4 +19,5 @@
     for each state. checkout potential performance gain.
   - StringStream: look into optimizing LA(). Perhaps use LAk instead of LA(k)
     and create the attributes when needed.
+  - Perform some magic to improve dfaStateSwitch.
 - ...

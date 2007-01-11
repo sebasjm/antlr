@@ -1,8 +1,6 @@
 
 import unittest
 
-from brokentest import broken_test_XXX
-
 import antlr3
 
 
@@ -132,20 +130,20 @@ class TestStringStream(unittest.TestCase):
         self.failUnlessEqual(stream.LA(1), 'b')
 
 
-    @broken_test_XXX("Not yet implemented", AssertionError)
-    def testSeekBackward(self):
-        """StringStream.seek(): backward"""
+##     # not yet implemented
+##     def testSeekBackward(self):
+##         """StringStream.seek(): backward"""
 
-        stream = antlr3.StringStream('foo\nbar')
+##         stream = antlr3.StringStream('foo\nbar')
 
-        stream.seek(4)
-        stream.seek(1)
+##         stream.seek(4)
+##         stream.seek(1)
         
-        self.failUnlessEqual(stream.index(), 1)
-        self.failUnlessEqual(stream.line, 1)
-        self.failUnlessEqual(stream.charPositionInLine, 1)
-        self.failUnlessEqual(stream.LA(1), 'o')
-        
+##         self.failUnlessEqual(stream.index(), 1)
+##         self.failUnlessEqual(stream.line, 1)
+##         self.failUnlessEqual(stream.charPositionInLine, 1)
+##         self.failUnlessEqual(stream.LA(1), 'o')
+
 
     def testMark(self):
         """StringStream.mark()"""
@@ -337,23 +335,23 @@ class TestCommonTokenStream(unittest.TestCase):
         self.failUnlessEqual(lt1.type, antlr3.EOF)
         
 
-    @broken_test_XXX("Not implemented", NotImplementedError)
-    def testLTNegative(self):
-        """CommonTokenStream.LT(-1): look back"""
+##     # not yet implemented
+##     def testLTNegative(self):
+##         """CommonTokenStream.LT(-1): look back"""
 
-        self.source.tokens.append(
-            antlr3.CommonToken(type=12)
-            )
+##         self.source.tokens.append(
+##             antlr3.CommonToken(type=12)
+##             )
         
-        self.source.tokens.append(
-            antlr3.CommonToken(type=13)
-            )
+##         self.source.tokens.append(
+##             antlr3.CommonToken(type=13)
+##             )
         
-        stream = antlr3.CommonTokenStream(self.source)
+##         stream = antlr3.CommonTokenStream(self.source)
 
-        lt1 = stream.LT(-1)
-        self.failUnlessEqual(lt1.type, antlr3.EOF)
-        
+##         lt1 = stream.LT(-1)
+##         self.failUnlessEqual(lt1.type, antlr3.EOF)
+
 
     def testLTZero(self):
         """CommonTokenStream.LT(0)"""

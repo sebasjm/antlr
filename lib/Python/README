@@ -1,1 +1,5 @@
 The Python target is not yet ready to use. Please be a bit more patient.
+
+Documentation (as far as it exists) can be found in the wiki
+<http://www.antlr.org/wiki/display/ANTLR3/Antlr3PythonTarget> and the
+source of antlr3.py.

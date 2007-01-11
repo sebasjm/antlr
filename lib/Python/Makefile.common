@@ -1,5 +1,7 @@
 # -*- mode: Makefile -*-
 
+PYTHON?=python2.5
+
 CLASSPATH=$(BASE)/../antlr-2.7.7.jar:$(BASE)/../junit-4.2.jar:$(BASE)/../stringtemplate-3.0.jar
 
 JAVAC=/opt/jdk1.6.0/bin/javac -classpath $(CLASSPATH)

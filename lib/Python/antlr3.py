@@ -29,6 +29,13 @@
 from cStringIO import StringIO
 
 
+try:
+    set = set
+    frozenset = frozenset
+except NameError:
+    # for pre-2.4 compatibility
+    from sets import Set as set, ImmutableSet as frozenset
+
 
 ##############################################################################
 #
@@ -236,9 +243,9 @@ class StringStream(object):
         return self.n
 
 
-    @property
     def markDepth(self):
         return len(self._markers)
+    markDepth = property(markDepth)
 
 
     def mark(self):
