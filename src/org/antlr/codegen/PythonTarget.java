@@ -28,13 +28,29 @@
 
 package org.antlr.codegen;
 
-public class PythonTarget
-        extends Target
-{
+public class PythonTarget extends Target {
+    /** Target must be able to override the labels used for token types */
+    public String getTokenTypeAsTargetLabel(CodeGenerator generator,
+					    int ttype) {
+	// use ints for predefined types;
+	// <invalid> <EOR> <DOWN> <UP>
+	if ( ttype >= 0 && ttype <= 3 ) {
+	    return String.valueOf(ttype);
+	}
+
+	String name = generator.grammar.getTokenDisplayName(ttype);
+
+	// If name is a literal, return the token type instead
+	if ( name.charAt(0)=='\'' ) {
+	    return String.valueOf(ttype);
+	}
+
+	return name;
+    }
+
     public String getTargetCharLiteralFromANTLRCharLiteral(
             CodeGenerator generator,
-            String literal)
-    {
+            String literal) {
 	return "u" + literal;
     }
 }

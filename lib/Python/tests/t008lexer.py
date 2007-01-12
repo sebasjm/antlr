@@ -25,3 +25,19 @@ assert token.text == 'f', token.text
 
 token = lexer.nextToken()
 assert token.type == EOF
+
+
+# malformed input
+stream = antlr3.StringStream('fafb')
+lexer = Lexer(stream)
+
+lexer.nextToken()
+lexer.nextToken()
+try:
+    token = lexer.nextToken()
+    raise AssertionError, token
+
+except antlr3.MismatchedTokenException, exc:
+    assert exc.unexpectedType == 'b', repr(exc.unexpectedType)
+    assert exc.charPositionInLine == 3, repr(exc.charPositionInLine)
+    assert exc.line == 1, repr(exc.line)

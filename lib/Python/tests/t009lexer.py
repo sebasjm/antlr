@@ -25,3 +25,20 @@ assert token.text == '5', token.text
 
 token = lexer.nextToken()
 assert token.type == EOF
+
+
+# malformed input
+stream = antlr3.StringStream('2a')
+lexer = Lexer(stream)
+
+lexer.nextToken()
+try:
+    token = lexer.nextToken()
+    raise AssertionError, token
+
+except antlr3.MismatchedRangeException, exc:
+    assert exc.a == '0', repr(exc.a)
+    assert exc.b == '9', repr(exc.b)
+    assert exc.unexpectedType == 'a', repr(exc.unexpectedType)
+    assert exc.charPositionInLine == 1, repr(exc.charPositionInLine)
+    assert exc.line == 1, repr(exc.line)

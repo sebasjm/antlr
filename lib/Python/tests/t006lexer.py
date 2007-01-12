@@ -19,3 +19,20 @@ assert token.text == 'faaooa', token.text
 
 token = lexer.nextToken()
 assert token.type == EOF
+
+
+# malformed input
+stream = antlr3.StringStream('fofoaooaoa2')
+lexer = Lexer(stream)
+
+lexer.nextToken()
+lexer.nextToken()
+try:
+    token = lexer.nextToken()
+    raise AssertionError, token
+
+except antlr3.MismatchedTokenException, exc:
+    assert exc.expecting == 'f', repr(exc.expecting)
+    assert exc.unexpectedType == '2', repr(exc.unexpectedType)
+    assert exc.charPositionInLine == 10, repr(exc.charPositionInLine)
+    assert exc.line == 1, repr(exc.line)

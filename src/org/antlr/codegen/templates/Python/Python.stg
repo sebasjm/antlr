@@ -51,7 +51,6 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            scopes, superClass, literals) ::=
 <<
 # $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
-<actions.(actionScope).header>
 
 <@imports>
 import antlr3
@@ -59,6 +58,8 @@ import antlr3
 #import org.antlr.runtime.tree.*;
 <endif>
 <@end>
+
+<actions.(actionScope).header>
 
 <! <docComment> !>
 
@@ -78,17 +79,19 @@ class <name>(antlr3.Lexer):
 
     grammarFileName = "<fileName>"
 
-    <actions.lexer.members>
-
-
     def __init__(self, input=None):
         antlr3.Lexer.__init__(self, input)
 <if(backtracking)>
-        raise NotImplementedError("lexer: backtracking")
-        ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
+        #raise NotImplementedError("lexer: backtracking")
+        #ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
 
         <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; seperator="\n">
+
+	<actions.lexer.init>
+
+
+    <actions.lexer.members>
 
 
 <if(filterMode)>
@@ -110,65 +113,68 @@ class <name>(antlr3.Lexer):
  *  at backtracking==1.
  */
 filteringNextToken() ::= <<
-raise NotImplementedError("filteringNextToken")
->>
-//public Token nextToken() {
-//    while (true) {
-//        if ( input.LA(1)==CharStream.EOF ) {
-//            return Token.EOF_TOKEN;
-//        }
-//        token = null;
-//        tokenStartCharIndex = getCharIndex();
-//	text = null;
-//        try {
-//            int m = input.mark();
-//            backtracking=1; <! means we won't throw slow exception !>
-//            failed=false;
-//            mTokens();
-//            backtracking=0;
-//            <! mTokens backtracks with synpred at backtracking==2
-//               and we set the synpredgate to allow actions at level 1. !>
-//            if ( failed ) {
-//                input.rewind(m);
-//                input.consume(); <! advance one char and try again !>
-//            }
-//            else {
-//                return token;
-//            }
-//        }
-//        catch (RecognitionException re) {
-//            # shouldn't happen in backtracking mode, but...
-//            reportError(re);
-//            recover(re);
-//        }
-//    }
-//}
-//
-//public void memoize(IntStream input,
-//	        int ruleIndex,
-//	        int ruleStartIndex)
-//{
-//if ( backtracking>1 ) super.memoize(input, ruleIndex, ruleStartIndex);
-//}
-//
-//public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
-//if ( backtracking>1 ) return super.alreadyParsedRule(input, ruleIndex);
-//return false;
-//}
-//>>
+def nextToken(self):
+    while True:
+        if self.input.LA(1) == antlr3.EOF:
+            return antlr3.EOF_TOKEN
 
-filteringActionGate() ::= "backtracking==1"
+        self.token = None
+        self.tokenStartCharIndex = self.getCharIndex()
+        self.text = None
+        try:
+            m = self.input.mark()
+            self.backtracking = 1 <! means we won't throw slow exception !>
+            self.failed = False
+            self.mTokens()
+            self.backtracking = 0
+
+            <! mTokens backtracks with synpred at backtracking==2
+               and we set the synpredgate to allow actions at level 1. !>
+            if self.failed:
+                self.input.rewind(m)
+                self.input.consume() <! advance one char and try again !>
+
+            else:
+                return self.token
+
+        except antlr3.RecognitionException, re:
+            # shouldn't happen in backtracking mode, but...
+            self.reportError(re)
+            self.recover(re)
+
+
+def memoize(self, input, ruleIndex, ruleStartIndex):
+    if self.backtracking > 1:
+        # is antlr3.Lexer always superclass?
+        antlr3.Lexer.memoize(self, input, ruleIndex, ruleStartIndex)
+
+
+def alreadyParsedRule(self, input, ruleIndex):
+    if self.backtracking > 1:
+        return antlr3.Lexer.alreadyParsedRule(self, input, ruleIndex)
+    return False
+
+
+>>
+
+filteringActionGate() ::= "self.backtracking == 1"
 
 /** How to generate a parser */
+
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType, members) ::= <<
-class <name>(antlr3.<superClass>):
-    tokenNames = [
-        "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
-    ]
-    <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
+# token names
+tokenNames = [
+    "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", 
+    <tokenNames; wrap, separator=", ">
+]
 
+<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeClass(scope=it)><endif>}>
+
+<rules:{<ruleAttributeScopeClass(scope=it.ruleDescriptor.ruleScope)>}>
+
+class <name>(antlr3.<superClass>):
     grammarFileName = "<fileName>"
 
     def __init__(self, input):
@@ -178,6 +184,12 @@ class <name>(antlr3.<superClass>):
         ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
 
+        <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; seperator="\n">
+
+        <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeStack(scope=it)><endif>}>
+	<rules:{<ruleAttributeScopeStack(scope=it.ruleDescriptor.ruleScope)>}>
+
+        <actions.parser.init>
 
 
     <members>
@@ -186,12 +198,14 @@ class <name>(antlr3.<superClass>):
 
     <synpreds:{p | <synpred(p)>}>
 
-    <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
     <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
 
+    <bitsets:{FOLLOW_<it.name>_in_<it.inName><it.tokenIndex> = set([<it.tokens:{<it>};separator=", ">])<\n>}>
+
+    <!
     <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
                     words64=it.bits)>
-
+    !>
 
 >>
 
@@ -215,45 +229,40 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
  */
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
-raise NotImplementedError("synpredRule")
+# $ANTLR start <ruleName>
+def <ruleName>_fragment(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
+<if(trace)>
+    raise NotImplementedError("synpredRule: trace")
+#    traceIn("<ruleName>_fragment", <ruleDescriptor.index>);
+#    try {
+#        <block>
+#    }
+#    finally {
+#        traceOut("<ruleName>_fragment", <ruleDescriptor.index>);
+#    }
+<else>
+    <block>
+<endif>
+# $ANTLR end <ruleName>
+
+
 >>
-//# $ANTLR start <ruleName>
-//public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {   
-//<if(trace)>
-//    traceIn("<ruleName>_fragment", <ruleDescriptor.index>);
-//    try {
-//        <block>
-//    }
-//    finally {
-//        traceOut("<ruleName>_fragment", <ruleDescriptor.index>);
-//    }
-//<else>
-//    <block>
-//<endif>
-//}
-//# $ANTLR end <ruleName>
-//>>
 
 synpred(name) ::= <<
-raise NotImplementedError("synpred")
+def <name>(self):
+    self.backtracking += 1
+    <@start()>
+    start = self.input.mark()
+    self.<name>_fragment()
+    success = not self.failed
+    self.input.rewind(start)
+    <@stop()>
+    self.backtracking -= 1
+    self.failed = False
+    return success
+
+
 >>
-//public boolean <name>() {
-//    backtracking++;
-//    <@start()>
-//    int start = input.mark();
-//    try {
-//        <name>_fragment(); # can never throw exception
-//    } catch (RecognitionException re) {
-//        System.err.println("impossible: "+re);
-//    }
-//    boolean success = !failed;
-//    input.rewind(start);
-//    <@stop()>
-//    backtracking--;
-//    failed=false;
-//    return success;
-//}<\n>
-//>>
 
 lexerSynpred(name) ::= <<
 <synpred(name)>
@@ -269,8 +278,7 @@ if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { retu
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
 <if(backtracking)>
-raise NotImplementedError("checkRuleBacktrackFailure: backtracking")
-if failed:
+if self.failed:
     return <ruleReturnValue()>
 <endif>
 >>
@@ -278,9 +286,8 @@ if failed:
 /** This rule has failed, exit indicating failure during backtrack */
 ruleBacktrackFailure() ::= <<
 <if(backtracking)>
-raise NotImplementedError("ruleBacktrackFailure")
 if self.backtracking > 0:
-    failed=true
+    self.failed = True
     return <ruleReturnValue()><\n>
 <endif>
 >>
@@ -289,8 +296,7 @@ if self.backtracking > 0:
  *  data aggregates required for multiple return values.
  */
 rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::= <<
-<ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
-<returnScope(scope=ruleDescriptor.returnScope)>
+<rules:{<returnScope(scope=ruleDescriptor.returnScope)>}>
 
 # $ANTLR start <ruleName>
 # <fileName>:<description>
@@ -356,13 +362,13 @@ int <ruleDescriptor.name>_StartIndex = input.index();
 >>
 
 ruleScopeSetUp() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.push(new <it>_scope());}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
+<ruleDescriptor.useScopes:{self.<it>_stack.append(<it>_scope())}; separator="\n">
+<ruleDescriptor.ruleScope:{self.<it.name>_stack.append(<it.name>_scope())}; separator="\n">
 >>
 
 ruleScopeCleanUp() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.pop();}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.pop();}; separator="\n">
+<ruleDescriptor.useScopes:{self.<it>_stack.pop()}; separator="\n">
+<ruleDescriptor.ruleScope:{self.<it.name>_stack.pop()}; separator="\n">
 >>
 
 ruleLabelDefs() ::= <<
@@ -499,14 +505,12 @@ ruleBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNu
 
 /** A special case of a (...) subrule with a single alternative */
 blockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,description) ::= <<
-raise NotImplementedError("blockSingleAlt")
+# <fileName>:<description>
+<decls>
+<@prealt()>
+<alts>
+<@postalt()>
 >>
-//# <fileName>:<description>
-//<decls>
-//<@prealt()>
-//<alts>
-//<@postalt()>
-//>>
 
 /** A (..)+ block with 1 or more alternatives */
 positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::= <<
@@ -644,7 +648,9 @@ if <s>:
 <if(!LEXER)>
     self.errorRecovery = False
 <endif>
-    <if(backtracking)>self.failed = False<endif>
+<if(backtracking)>
+    self.failed = False
+<endif>
 
 else:
     <ruleBacktrackFailure()>
@@ -790,13 +796,11 @@ raise NotImplementedError("tree")
  *  also hoisted into a prediction expression).
  */
 validateSemanticPredicate(pred,description) ::= <<
-raise NotImplementedError("validateSemanticPredicate")
+if not (<evalPredicate(...)>):
+    <ruleBacktrackFailure()>
+    raise FailedPredicateException(self.input, "<ruleName>", "<description>")
+
 >>
-//if ( !(<evalPredicate(...)>) ) {
-//    <ruleBacktrackFailure()>
-//    throw new FailedPredicateException(input, "<ruleName>", "<description>");
-//}
-//>>
 
 // F i x e d  D F A  (if-then-else)
 
@@ -810,7 +814,7 @@ else:
     alt<decisionNumber> = <eotPredictsAlt>
 <else>
     <ruleBacktrackFailure()>
-    nvae = antlr3.NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input)<\n>
+    nvae = antlr3.NoViableAltException("<description>", <decisionNumber>, <stateNumber>, self.input)<\n>
     <@noViableAltException()>
     raise nvae<\n>
 <endif>
@@ -878,7 +882,7 @@ else:
     alt<decisionNumber> = <eotPredictsAlt>
 <else>
     <ruleBacktrackFailure()>
-    nvae = antlr3.NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input)<\n>
+    nvae = antlr3.NoViableAltException("<description>", <decisionNumber>, <stateNumber>, self.input)<\n>
     <@noViableAltException()>
     raise nvae<\n>
 <endif>
@@ -990,7 +994,7 @@ self.dfa<dfa.decisionNumber> = self.DFA<dfa.decisionNumber>(
     accept = self.DFA<dfa.decisionNumber>_accept,
     special = self.DFA<dfa.decisionNumber>_special,
     transition = self.DFA<dfa.decisionNumber>_transition
-    )
+    )<\n>
 >>
 
 /** A state in a cyclic DFA; it's a special state and part of a big switch on
@@ -1037,9 +1041,9 @@ orPredicates(operands) ::= "FIXME(orPredicates) (<first(operands)><rest(operands
 
 notPredicate(pred) ::= "FIXME(notPredicate) !(<evalPredicate(...)>)"
 
-evalPredicate(pred,description) ::= "FIXME(evalPredicate) <pred>"
+evalPredicate(pred,description) ::= "<pred>"
 
-evalSynPredicate(pred,description) ::= "FIXME(evalSynPredicate) <pred>()"
+evalSynPredicate(pred,description) ::= "self.<pred>()"
 
 lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber> == <atom>"
 
@@ -1058,27 +1062,32 @@ setTest(ranges) ::= "<ranges; separator=\" or \">"
 
 // A T T R I B U T E S
 
-globalAttributeScope(scope) ::= <<
+globalAttributeScopeClass(scope) ::= <<
 <if(scope.attributes)>
-raise NotImplementedError("globalAttributeScope: scope.attributes")
-<!
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
-!>
+class <scope.name>_scope(object):
+    def __init__(self):
+        <scope.attributes:{self.<it.decl> = None}; separator="\n">
+
 <endif>
 >>
 
-ruleAttributeScope(scope) ::= <<
+globalAttributeScopeStack(scope) ::= <<
 <if(scope.attributes)>
-raise NotImplementedError("ruleAttributeScope: scope.attributes")
-<!
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
-!>
+self.<scope.name>_stack = []<\n>
+<endif>
+>>
+
+ruleAttributeScopeClass(scope) ::= <<
+<if(scope.attributes)>
+class <scope.name>_scope(object):
+    def __init__(self):
+        <scope.attributes:{self.<it.decl> = None}; separator="\n">
+<endif>
+>>
+
+ruleAttributeScopeStack(scope) ::= <<
+<if(scope.attributes)>
+self.<scope.name>_stack = []<\n>
 <endif>
 >>
 
@@ -1151,32 +1160,32 @@ parameterAttributeRef(attr) ::= "FIXME(parameterAttributeRef) <attr.name>"
 parameterSetAttributeRef(attr,expr) ::= "FIXME(parameterSetAttributeRef) <attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
-raise NotImplementedError("scopeAttributeRef")
+<if(negIndex)>
+raise NotImplementedError("scopeAttributeRef: negIndex")
+#((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>
+<else>
+<if(index)>
+raise NotImplementedError("scopeAttributeRef: index")
+#((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>
+<else>
+self.<scope>_stack[-1].<attr.name>
+<endif>
+<endif>
 >>
-//<if(negIndex)>
-//((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>
-//<else>
-//<if(index)>
-//((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>
-//<else>
-//((<scope>_scope)<scope>_stack.peek()).<attr.name>
-//<endif>
-//<endif>
-//>>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
-raise NotImplementedError("scopeSetAttributeRef")
+<if(negIndex)>
+raise NotImplementedError("scopeSetAttributeRef: negIndex")
+#((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name> =<expr>;
+<else>
+<if(index)>
+raise NotImplementedError("scopeSetAttributeRef: index")
+#((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name> =<expr>;
+<else>
+self.<scope>_stack[-1].<attr.name> = <expr>
+<endif>
+<endif>
 >>
-//<if(negIndex)>
-//((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name> =<expr>;
-//<else>
-//<if(index)>
-//((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name> =<expr>;
-//<else>
-//((<scope>_scope)<scope>_stack.peek()).<attr.name> =<expr>;
-//<endif>
-//<endif>
-//>>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
  *  to stack itself not top of stack.  This is useful for predicates
@@ -1186,24 +1195,20 @@ isolatedDynamicScopeRef(scope) ::= "FIXME(isolatedDynamicScopeRef) <scope>_stack
 
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
-raise NotImplementedError("ruleLabelRef")
+<if(referencedRule.hasMultipleReturnValues)>
+<scope>.<attr.name>
+<else>
+<scope>
+<endif>
 >>
-//<if(referencedRule.hasMultipleReturnValues)>
-//<scope>.<attr.name>
-//<else>
-//<scope>
-//<endif>
-//>>
 
 returnAttributeRef(ruleDescriptor,attr) ::= <<
-raise NotImplementedError("returnAttributeRef")
+<if(ruleDescriptor.hasMultipleReturnValues)>
+retval.<attr.name>
+<else>
+<attr.name>
+<endif>
 >>
-//<if(ruleDescriptor.hasMultipleReturnValues)>
-//retval.<attr.name>
-//<else>
-//<attr.name>
-//<endif>
-//>>
 
 returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
 raise NotImplementedError("returnSetAttributeRef")
@@ -1216,7 +1221,7 @@ raise NotImplementedError("returnSetAttributeRef")
 //>>
 
 /** How to translate $tokenLabel */
-tokenLabelRef(label) ::= "FIXME(tokenLabelRef) <label>"
+tokenLabelRef(label) ::= "<label>"
 
 /** ids+=ID {$ids} or e+=expr {$e} */
 listLabelRef(label) ::= "FIXME(listLabelRef) list_<label>"
@@ -1272,12 +1277,10 @@ ruleSetPropertyRef_st(scope,attr,expr) ::= "FIXME(ruleSetPropertyRef_st) retval.
 /** How to execute an action */
 execAction(action) ::= <<
 <if(backtracking)>
-raise NotImplementedError("execAction: backtracking")
 <if(actions.(actionScope).synpredgate)>
-raise NotImplementedError("execAction: synpredgate")
-if ( <actions.(actionScope).synpredgate> ) {
-  <action>
-}
+if <actions.(actionScope).synpredgate>:
+    <action>
+
 <else>
 raise NotImplementedError("execAction: !synpredgate")
 if ( backtracking==0 ) {

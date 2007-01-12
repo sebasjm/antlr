@@ -106,12 +106,29 @@ class RecognitionException(Exception):
 
 
         if input is not None:
-            self.input = input;
-            self.index = input.index();
-##             if isinstance(input, TokenStream):
-##                 self.token = input.LT(1)
-##                 self.line = token.line
-##                 self.charPositionInLine = token.charPositionInLine
+            self.input = input
+            self.index = input.index()
+
+            # Get current lookahead, where the error occured.
+            # This may be a token or character.
+            lt = input.LT(1)           
+            try:
+                lt.text
+
+            except AttributeError:
+                # we have not a token, so we assume it's a character
+                # once we have tree parsers, we also have to handle nodes
+
+                self.c = lt
+                self.line = input.line
+                self.charPositionInLine = input.charPositionInLine
+                
+            else:
+                # it's a token
+                
+                self.token = lt
+                self.line = lt.line
+                self.charPositionInLine = lt.charPositionInLine
 
 ##             if isinstance(input, CommonTreeNodeStream):
 ##                 self.node = input.LT(1)
@@ -137,6 +154,8 @@ class RecognitionException(Exception):
         except AttributeError:
             return self.c
 
+    unexpectedType = property(getUnexpectedType)
+    
 
 class MismatchedTokenException(RecognitionException):
     def __init__(self, expecting, input):
@@ -147,6 +166,47 @@ class MismatchedTokenException(RecognitionException):
     def __str__(self):
         #return "MismatchedTokenException("+self.expecting+")"
         return "MismatchedTokenException(%r!=%r)" % (self.getUnexpectedType(), self.expecting)
+    __repr__ = __str__
+    
+
+class MismatchedRangeException(RecognitionException):
+    def __init__(self, a, b, input):
+        RecognitionException.__init__(self, input)
+
+        self.a = a
+        self.b = b
+        
+
+    def __str__(self):
+        return "MismatchedRangeException(%r not in [%r..%r])" % (self.getUnexpectedType(), self.a, self.b)
+    __repr__ = __str__
+    
+
+class MismatchedSetException(RecognitionException):
+    def __init__(self, expecting, input):
+        RecognitionException.__init__(self, input)
+
+        self.expecting = expecting
+        
+
+    def __str__(self):
+        return "MismatchedSetException(%r not in %r)" % (self.getUnexpectedType(), self.expecting)
+    __repr__ = __str__
+
+
+class NoViableAltException(RecognitionException):
+    def __init__(self, grammarDecisionDescription, decisionNumber, stateNumber, input):
+        RecognitionException.__init__(self, input)
+
+	self.grammarDecisionDescription = grammarDecisionDescription
+	self.decisionNumber = decisionNumber
+	self.stateNumber = stateNumber
+
+
+    def __str__(self):
+        return "NoViableAltException(%r!=[%r])" % (
+            self.unexpectedType, self.grammarDecisionDescription
+            )
     __repr__ = __str__
     
 
@@ -607,6 +667,9 @@ class CommonTokenStream(object):
         # to consume).  p==-1 indicates that the tokens list is empty
         self.p = -1
 
+        # Remember last marked position
+        self.lastMarker = None
+        
 
     def setTokenSource(self, tokenSource):
         """Reset this token stream by setting its token source."""
@@ -710,12 +773,9 @@ class CommonTokenStream(object):
 ##         channelOverrideMap.put(new Integer(ttype), new Integer(channel));
 ## 	}
 
-## 	public void discardTokenType(int ttype) {
-## 		if ( discardSet==null ) {
-## 			discardSet = new HashSet();
-## 		}
-##         discardSet.add(new Integer(ttype));
-## 	}
+    def discardTokenType(self, ttype):
+        self.discardSet.add(ttype)
+
 
 ## 	public void discardOffChannelTokens(boolean discardOffChannelTokens) {
 ## 		this.discardOffChannelTokens = discardOffChannelTokens;
@@ -791,8 +851,8 @@ class CommonTokenStream(object):
         if self.p + k - 1 >= len(self.tokens):
             return EOF_TOKEN
 
-        i = self.p;
-        n = 1;
+        i = self.p
+        n = 1
         # find k good tokens
         while n < k:
             # skip off-channel tokens
@@ -801,7 +861,7 @@ class CommonTokenStream(object):
         
         if i >= len(self.tokens):
             return EOF_TOKEN
-        
+
         return self.tokens[i]
 
 
@@ -843,14 +903,15 @@ class CommonTokenStream(object):
         return self.LT(i).type
 
 
-##     public int mark() {
-##         lastMarker = index();
-## 		return lastMarker;
-## 	}
+    def mark(self):
+        self.lastMarker = self.index()
+        return self.lastMarker
+    
 
-## 	public void release(int marker) {
-## 		// no resources to release
-## 	}
+    def release(self, marker):
+        # no resources to release
+        pass
+    
 
 ## 	public int size() {
 ## 		return tokens.size();
@@ -860,17 +921,13 @@ class CommonTokenStream(object):
         return self.p
 
 
-## 	public void rewind(int marker) {
-## 		seek(marker);
-## 	}
+    def rewind(self, marker):
+        self.seek(marker)
 
-## 	public void rewind() {
-## 		seek(lastMarker);
-## 	}
 
-## 	public void seek(int index) {
-## 		p = index;
-## 	}
+    def seek(self, index):
+        self.p = index
+
 
 ## 	public TokenSource getTokenSource() {
 ## 		return tokenSource;
@@ -1006,13 +1063,13 @@ class BaseRecognizer(object):
         return
 
 
-    def matchAny(input):
+    def matchAny(self, input):
         self.errorRecovery = False
         self.failed = False
         self.input.consume()
 
 
-    def mismatch(input, ttype, follow):
+    def mismatch(self, input, ttype, follow):
         """
         factor out what to do upon token mismatch so tree parsers can behave
         differently.  Override this method in your parser to do things
@@ -1021,10 +1078,10 @@ class BaseRecognizer(object):
         """
         
         mte = MismatchedTokenException(ttype, input)
-        recoverFromMismatchedToken(input, mte, ttype, follow)
+        self.recoverFromMismatchedToken(input, mte, ttype, follow)
 
 
-    def reportError(e):
+    def reportError(self, e):
         """Report a recognition problem.
             
         This method sets errorRecovery to indicate the parser is recovering
@@ -1057,7 +1114,7 @@ class BaseRecognizer(object):
         self.emitErrorMessage(hdr+" "+msg)
 
 
-    def getErrorMessage(e, tokenNames):
+    def getErrorMessage(self, e, tokenNames):
         """
         What error message should be generated for the various
         exception types?
@@ -1081,6 +1138,7 @@ class BaseRecognizer(object):
         Override this to change the message generated for one or more
 	exception types.
         """
+        
         raise NotImplementedError
     
 ## 		String msg = null;
@@ -1140,7 +1198,7 @@ class BaseRecognizer(object):
 ## 	}
 
 
-    def getErrorHeader(e):
+    def getErrorHeader(self, e):
         """
         What is the error header, normally line/character position information?
         """
@@ -1374,58 +1432,54 @@ class BaseRecognizer(object):
 ## 		return followSet;
 ## 	}
 
-## 	/** Attempt to recover from a single missing or extra token.
-## 	 *
-## 	 *  EXTRA TOKEN
-## 	 *
-## 	 *  LA(1) is not what we are looking for.  If LA(2) has the right token,
-## 	 *  however, then assume LA(1) is some extra spurious token.  Delete it
-## 	 *  and LA(2) as if we were doing a normal match(), which advances the
-## 	 *  input.
-## 	 *
-## 	 *  MISSING TOKEN
-## 	 *
-## 	 *  If current token is consistent with what could come after
-## 	 *  ttype then it is ok to "insert" the missing token, else throw
-## 	 *  exception For example, Input "i=(3;" is clearly missing the
-## 	 *  ')'.  When the parser returns from the nested call to expr, it
-## 	 *  will have call chain:
-## 	 *
-## 	 *    stat -> expr -> atom
-## 	 *
-## 	 *  and it will be trying to match the ')' at this point in the
-## 	 *  derivation:
-## 	 *
-## 	 *       => ID '=' '(' INT ')' ('+' atom)* ';'
-## 	 *                          ^
-## 	 *  match() will see that ';' doesn't match ')' and report a
-## 	 *  mismatched token error.  To recover, it sees that LA(1)==';'
-## 	 *  is in the set of tokens that can follow the ')' token
-## 	 *  reference in rule atom.  It can assume that you forgot the ')'.
-## 	 */
-## 	public void recoverFromMismatchedToken(IntStream input,
-## 										   RecognitionException e,
-## 										   int ttype,
-## 										   BitSet follow)
-## 		throws RecognitionException
-## 	{
-## 		// if next token is what we are looking for then "delete" this token
-## 		if ( input.LA(2)==ttype ) {
-## 			reportError(e);
-## 			/*
-## 			System.err.println("recoverFromMismatchedToken deleting "+input.LT(1)+
-## 							   " since "+input.LT(2)+" is what we want");
-## 			*/
-## 			beginResync();
-## 			input.consume(); // simply delete extra token
-## 			endResync();
-## 			input.consume(); // move past ttype token as if all were ok
-## 			return;
-## 		}
-## 		if ( !recoverFromMismatchedElement(input,e,follow) ) {
-## 			throw e;
-## 		}
-## 	}
+
+    def recoverFromMismatchedToken(self, input, e, ttype, follow):
+        """Attempt to recover from a single missing or extra token.
+
+        EXTRA TOKEN
+
+        LA(1) is not what we are looking for.  If LA(2) has the right token,
+        however, then assume LA(1) is some extra spurious token.  Delete it
+        and LA(2) as if we were doing a normal match(), which advances the
+        input.
+
+        MISSING TOKEN
+
+        If current token is consistent with what could come after
+        ttype then it is ok to "insert" the missing token, else throw
+        exception For example, Input "i=(3;" is clearly missing the
+        ')'.  When the parser returns from the nested call to expr, it
+        will have call chain:
+
+          stat -> expr -> atom
+
+        and it will be trying to match the ')' at this point in the
+        derivation:
+
+             => ID '=' '(' INT ')' ('+' atom)* ';'
+                                ^
+        match() will see that ';' doesn't match ')' and report a
+        mismatched token error.  To recover, it sees that LA(1)==';'
+        is in the set of tokens that can follow the ')' token
+        reference in rule atom.  It can assume that you forgot the ')'.
+        """
+                                         
+        # if next token is what we are looking for then "delete" this token
+        if input.LA(2) == ttype:
+            raise NotImplementError
+            self.reportError(e)
+
+            self.beginResync()
+            input.consume() # simply delete extra token
+            endResync()
+            input.consume()  # move past ttype token as if all were ok
+            return
+
+        if not self.recoverFromMismatchedElement(input, e, follow):
+            raise NotImplementError
+            raise e
+
+
 
 ## 	public void recoverFromMismatchedSet(IntStream input,
 ## 										 RecognitionException e,
@@ -1443,18 +1497,15 @@ class BaseRecognizer(object):
 ## 	 *  both.  No tokens are consumed to recover from insertions.  Return
 ## 	 *  true if recovery was possible else return false.
 ## 	 */
-## 	protected boolean recoverFromMismatchedElement(IntStream input,
-## 												   RecognitionException e,
-## 												   BitSet follow)
-## 	{
-## 		if ( follow==null ) {
-## 			// we have no information about the follow; we can only consume
-## 			// a single token and hope for the best
-## 			return false;
-## 		}
-## 		//System.out.println("recoverFromMismatchedElement");
-## 		// compute what can follow this grammar element reference
-## 		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
+    def recoverFromMismatchedElement(self, input, e, follow):
+        if follow is None:
+            # we have no information about the follow; we can only consume
+            # a single token and hope for the best
+            return False
+
+        # compute what can follow this grammar element reference
+        raise NotImplementedError, repr(follow)
+##        if follow.member(Token.EOR_TOKEN_TYPE):
 ## 			BitSet viableTokensFollowingThisRule =
 ## 				computeContextSensitiveRuleFOLLOW();
 ## 			follow = follow.or(viableTokensFollowingThisRule);
@@ -1851,7 +1902,7 @@ class Lexer(BaseRecognizer):
                     return
                 
                 mte = MismatchedTokenException(s[i], self.input)
-                self.recover(mte);
+                self.recover(mte)
                 raise mte
 
             i += 1
@@ -1869,7 +1920,7 @@ class Lexer(BaseRecognizer):
                 self.failed = True
                 return
 
-            mre = MismatchedRangeException(a, b, input)
+            mre = MismatchedRangeException(a, b, self.input)
             self.recover(mre)
             raise mre
 
@@ -2085,8 +2136,13 @@ class DFA(object):
                 if LA == EOF:
                     c = 0xffff
                 else:
-                    c = ord(LA)
-                #print "LA = %d" % c
+                    try:
+                        c = ord(LA)
+                    except TypeError:
+                        # LA is a token type (int), not a char
+                        c = LA
+                        
+                #print "LA = %d (%r)" % (c, unichr(c))
                 #print "range = %d..%d" % (self.min[s], self.max[s])
 
                 if c >= self.min[s] and c <= self.max[s]:
@@ -2131,38 +2187,42 @@ class DFA(object):
                     #print "EOF Transition to accept state %d" % self.accept[self.eof[s]]
                     return self.accept[self.eof[s]]
 
+                # not in range and not EOF/EOT, must be invalid symbol
+                self.noViableAlt(s, input)
+                return 0
+            
         finally:
             input.rewind(mark)
 
 
-	def noViableAlt(self, s, input):
-            if self.recognizer.backtracking > 0:
-                self.recognizer.failed = True
-                return
-            
-            nvae = NoViableAltException(
-                self.getDescription(),
-                self.decisionNumber,
-                s,
-                input
-                )
-            
-            self.error(nvae)
-            raise nvae
+    def noViableAlt(self, s, input):
+        if self.recognizer.backtracking > 0:
+            self.recognizer.failed = True
+            return
+
+        nvae = NoViableAltException(
+            self.getDescription(),
+            self.decisionNumber,
+            s,
+            input
+            )
+
+        self.error(nvae)
+        raise nvae
 
 
-        def error(self, nvae):
-            """A hook for debugging interface"""
-            pass
+    def error(self, nvae):
+        """A hook for debugging interface"""
+        pass
 
 
-        def specialStateTransition(self, s):
-            return -1
+    def specialStateTransition(self, s):
+        return -1
 
 
-        def getDescription(self):
-            return "n/a"
+    def getDescription(self):
+        return "n/a"
 
 
-        def specialTransition(self, state, symbol):
-            return 0
+    def specialTransition(self, state, symbol):
+        return 0

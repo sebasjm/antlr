@@ -37,3 +37,18 @@ assert token.text == 'A12sdf', token.text
 
 token = lexer.nextToken()
 assert token.type == EOF
+
+
+# malformed input
+stream = antlr3.StringStream('a-b')
+lexer = Lexer(stream)
+
+lexer.nextToken()
+try:
+    token = lexer.nextToken()
+    raise AssertionError, token
+
+except antlr3.NoViableAltException, exc:
+    assert exc.unexpectedType == '-', repr(exc.unexpectedType)
+    assert exc.charPositionInLine == 1, repr(exc.charPositionInLine)
+    assert exc.line == 1, repr(exc.line)

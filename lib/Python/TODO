@@ -1,11 +1,13 @@
-- setup.py
 - implement more examples
+- dedent actions
+- comments in actions?
 - antlr features
   - backtracking
   - memoize
   - ASTs
   - error handling & recovery
   - scopes
+- setup.py
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()
   - (String|CommonToken)Stream.size() --> __len__
@@ -20,4 +22,9 @@
   - StringStream: look into optimizing LA(). Perhaps use LAk instead of LA(k)
     and create the attributes when needed.
   - Perform some magic to improve dfaStateSwitch.
+  - in lexer rules:
+    LA == u'a' or LA == u'b' or LA == u'c'...
+    -> LA in (u'a', u'b', u'c', ...)
+    or "LA in self.set_xyz" with set_xyz as a class member
+  - lexer: operate on ordinals not character strings
 - ...

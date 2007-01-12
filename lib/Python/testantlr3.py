@@ -426,6 +426,58 @@ class TestCommonTokenStream(unittest.TestCase):
         self.failUnlessEqual(stream.LA(1), antlr3.EOF)
         
         
+    def testSeek(self):
+        """CommonTokenStream.seek()"""
+
+        self.source.tokens.append(
+            antlr3.CommonToken(type=12)
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=13)
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=antlr3.EOF)
+            )
+        
+        stream = antlr3.CommonTokenStream(self.source)
+        self.failUnlessEqual(stream.LA(1), 12)
+
+        stream.seek(2)
+        self.failUnlessEqual(stream.LA(1), antlr3.EOF)
+
+        stream.seek(0)
+        self.failUnlessEqual(stream.LA(1), 12)
+        
+        
+    def testMarkRewind(self):
+        """CommonTokenStream.mark()/rewind()"""
+
+        self.source.tokens.append(
+            antlr3.CommonToken(type=12)
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=13)
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=antlr3.EOF)
+            )
+        
+        stream = antlr3.CommonTokenStream(self.source)
+        stream.fillBuffer()
+        
+        stream.consume()
+        marker = stream.mark()
+        
+        stream.consume()
+        stream.rewind(marker)
+        
+        self.failUnlessEqual(stream.LA(1), 13)
+
+
         
 class TestDFA(unittest.TestCase):
     """Test case for the DFA class."""

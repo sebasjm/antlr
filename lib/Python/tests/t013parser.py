@@ -20,3 +20,19 @@ parser = TestParser(tStream)
 parser.document()
 
 assert parser.identifiers == ['foobar']
+
+
+# malformed input
+cStream = antlr3.StringStream('')
+lexer = Lexer(cStream)
+tStream = antlr3.CommonTokenStream(lexer)
+parser = TestParser(tStream)
+
+try:
+    parser.document()
+    raise AssertionError
+
+except antlr3.NoViableAltException, exc:
+    assert exc.unexpectedType == '-', repr(exc.unexpectedType)
+    assert exc.charPositionInLine == 1, repr(exc.charPositionInLine)
+    assert exc.line == 1, repr(exc.line)

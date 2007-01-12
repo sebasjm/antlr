@@ -38,5 +38,136 @@ if not success:
     for l in r:
         sys.stderr.write(l.encode('ascii', 'backslashreplace'))
     
-sys.exit(not success)
+    sys.exit(1)
 
+
+# malformed input
+input = """\
+<?xml version='1.0'?>
+<document d>
+</document>
+"""
+
+stream = antlr3.StringStream(input)
+lexer = TestLexer(stream)
+
+try:
+    while True:
+        token = lexer.nextToken()
+        if token.type == EOF:
+            break
+
+    raise AssertionError
+
+except antlr3.NoViableAltException, exc:
+    assert exc.unexpectedType == '>', repr(exc.unexpectedType)
+    assert exc.charPositionInLine == 11, repr(exc.charPositionInLine)
+    assert exc.line == 2, repr(exc.line)
+
+
+input = """\
+<?tml version='1.0'?>
+<document>
+</document>
+"""
+
+stream = antlr3.StringStream(input)
+lexer = TestLexer(stream)
+
+try:
+    while True:
+        token = lexer.nextToken()
+        if token.type == EOF:
+            break
+
+    raise AssertionError
+
+except antlr3.MismatchedSetException, exc:
+    assert exc.unexpectedType == 't', repr(exc.unexpectedType)
+    assert exc.charPositionInLine == 2, repr(exc.charPositionInLine)
+    assert exc.line == 1, repr(exc.line)
+    
+
+input = """\
+<?xml version='1.0'?>
+<docu ment attr="foo">
+</document>
+"""
+
+stream = antlr3.StringStream(input)
+lexer = TestLexer(stream)
+
+try:
+    while True:
+        token = lexer.nextToken()
+        if token.type == EOF:
+            break
+
+    raise AssertionError
+
+except antlr3.NoViableAltException, exc:
+    assert exc.unexpectedType == 'a', repr(exc.unexpectedType)
+    assert exc.charPositionInLine == 11, repr(exc.charPositionInLine)
+    assert exc.line == 2, repr(exc.line)
+    
+
+## # run an infinite loop with randomly mangled input
+## while True:
+##     print "ping"
+
+##     input = """\
+## <?xml version='1.0'?>
+## <!DOCTYPE component [
+## <!ELEMENT component (PCDATA|sub)*>
+## <!ATTLIST component
+##           attr CDATA #IMPLIED
+##           attr2 CDATA #IMPLIED
+## >
+## <!ELMENT sub EMPTY>
+
+## ]>
+## <component attr="val'ue" attr2='val"ue'>
+## <!-- This is a comment -->
+## Text
+## <![CDATA[huhu]]>
+## &amp;
+## &lt;
+## <?xtal cursor='11'?>
+## <sub/>
+## <sub></sub>
+## </component>
+## """
+
+##     import random
+##     input = list(input) # make it mutable
+##     for _ in range(3):
+##         p1 = random.randrange(len(input))
+##         p2 = random.randrange(len(input))
+
+##         c1 = input[p1]
+##         input[p1] = input[p2]
+##         input[p2] = c1
+##     input = ''.join(input) # back to string
+        
+##     stream = antlr3.StringStream(input)
+##     lexer = TestLexer(stream)
+
+##     try:
+##         while True:
+##             token = lexer.nextToken()
+##             if token.type == EOF:
+##                 break
+
+##     except antlr3.RecognitionException, exc:
+##         print exc
+##         for l in input.splitlines()[0:exc.line]:
+##             print l
+##         print ' '*exc.charPositionInLine + '^'
+
+##     except BaseException, exc:
+##         print '\n'.join(['%02d: %s' % (idx+1, l) for idx, l in enumerate(input.splitlines())])
+##         print "%s at %d:%d" % (exc, stream.line, stream.charPositionInLine)
+##         print
+        
+##         raise
+    
