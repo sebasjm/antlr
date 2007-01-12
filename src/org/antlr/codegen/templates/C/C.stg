@@ -199,7 +199,7 @@ outputFile( LEXER,
 #define	    matchc(c)		    lexr->matchc(lexr, c)
 #define	    matchs(s)		    lexr->matchs(lexr, s)
 #define	    matchRange(c1,c2)	    lexr->matchRange(lexr, c1, c2)
-#define	    matchAny()		    rec->matchAny(rec)
+#define	    matchAny()		    lexr->matchAny(lexr)
 #define	    ltoken()		    lexr->token
 #define	    hasFailed()		    (rec->failed == ANTLR3_TRUE)
 #define	    backtracking	    rec->backtracking
@@ -1383,9 +1383,10 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleDeclarations()>
     <ruleLabelDefs()>
+
+<if(nakedBlock)>
     <ruleInitializations()>
     <ruleLabelInitializations()>
-<if(nakedBlock)>
     ctx->pLexer->ruleNestingLevel++;
     <ruleDescriptor.actions.init>
     <ruleMemoization(name=ruleName)>
@@ -1398,7 +1399,9 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     ANTLR3_UINT64	    _line;
     ANTLR3_UINT32	    _charPosition;
     ANTLR3_UINT32	    _channel;
-
+    
+    <ruleInitializations()>
+    <ruleLabelInitializations()>
     ctx->pLexer->ruleNestingLevel++;
     _type	    = <ruleName>;
     _start	    = getCharIndex();
