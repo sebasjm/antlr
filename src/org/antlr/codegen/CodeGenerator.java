@@ -550,35 +550,41 @@ public class CodeGenerator {
 		}
 		//System.out.println(" "+follow);
 
-		long[] words = null;
-		if ( follow==null || follow.tokenTypeSet==null ) {
+        List tokenTypeList = null;
+        long[] words = null;
+		if ( follow.tokenTypeSet==null ) {
 			words = new long[1];
-		}
+            tokenTypeList = new ArrayList();
+        }
 		else {
 			BitSet bits = BitSet.of(follow.tokenTypeSet);
 			words = bits.toPackedArray();
-		}
+            tokenTypeList = follow.tokenTypeSet.toList();
+        }
 		// use the target to convert to hex strings (typically)
 		String[] wordStrings = new String[words.length];
 		for (int j = 0; j < words.length; j++) {
 			long w = words[j];
 			wordStrings[j] = target.getTarget64BitStringFromValue(w);
 		}
-		recognizerST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
-								  referencedElementName,
-								  enclosingRuleName,
-								  wordStrings,
-								  Utils.integer(i));
-		outputFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
-								  referencedElementName,
-								  enclosingRuleName,
-								  wordStrings,
-								  Utils.integer(i));
-		headerFileST.setAttribute("bitsets.{name,inName,bits,tokenIndex}",
-								  referencedElementName,
-								  enclosingRuleName,
-								  wordStrings,
-								  Utils.integer(i));
+        recognizerST.setAttribute("bitsets.{name,inName,bits,tokenTypes,tokenIndex}",
+                referencedElementName,
+                enclosingRuleName,
+                wordStrings,
+                tokenTypeList,
+                Utils.integer(i));
+        outputFileST.setAttribute("bitsets.{name,inName,bits,tokenTypes,tokenIndex}",
+                referencedElementName,
+                enclosingRuleName,
+                wordStrings,
+                tokenTypeList,
+                Utils.integer(i));
+        headerFileST.setAttribute("bitsets.{name,inName,bits,tokenTypes,tokenIndex}",
+                referencedElementName,
+                enclosingRuleName,
+                wordStrings,
+                tokenTypeList,
+                Utils.integer(i));
 	}
 
 	// L O O K A H E A D  D E C I S I O N  G E N E R A T I O N
