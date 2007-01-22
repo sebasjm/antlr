@@ -2422,8 +2422,8 @@ public class TestAttributes extends BaseTest {
 	}
 
 	public void testLexerRulePropertyRefs() throws Exception {
-		String action = "$text $type $line $pos $channel $index";
-		String expecting = "getText() _type _line _charPosition _channel -1";
+		String action = "$text $type $line $pos $channel $index $start $stop";
+		String expecting = "getText() _type _line _charPosition _channel -1 _start (getCharIndex()-1)";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(

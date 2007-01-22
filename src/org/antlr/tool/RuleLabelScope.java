@@ -60,6 +60,8 @@ public class RuleLabelScope extends AttributeScope {
 			addAttribute("index", null);
 			addAttribute("pos", null);
 			addAttribute("channel", null);
+			addAttribute("start", null);
+			addAttribute("stop", null);
 			isPredefinedLexerRuleScope = true;
 		}};
 

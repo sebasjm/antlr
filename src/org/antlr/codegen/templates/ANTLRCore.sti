@@ -350,6 +350,8 @@ lexerRulePropertyRef_pos(scope,attr);
 /** Undefined, but present for consistency with Token attributes; set to -1 */
 lexerRulePropertyRef_index(scope,attr);
 lexerRulePropertyRef_channel(scope,attr);
+lexerRulePropertyRef_start(scope,attr);
+lexerRulePropertyRef_stop(scope,attr);
 
 ruleSetPropertyRef_tree(scope,attr,expr);
 ruleSetPropertyRef_st(scope,attr,expr);

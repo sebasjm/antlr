@@ -1168,6 +1168,8 @@ lexerRulePropertyRef_line(scope,attr) ::= "_line"
 lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
+lexerRulePropertyRef_start(scope,attr) ::= "_start"
+lexerRulePropertyRef_stop(scope,attr) ::= "(getCharIndex()-1)"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error

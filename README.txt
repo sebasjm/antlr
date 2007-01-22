@@ -287,6 +287,10 @@ CHANGES
 
 3.0b6 - ??
 
+January 22, 2007
+
+* Added lexer rule properties: start, stop
+
 January 1, 2007
 
 * analysis failsafe is back on; if a decision takes too long, it bails out
