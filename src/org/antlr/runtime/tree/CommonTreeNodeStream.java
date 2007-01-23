@@ -52,32 +52,6 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	public static final int DEFAULT_INITIAL_BUFFER_SIZE = 100;
 	public static final int INITIAL_CALL_STACK_SIZE = 10;
 
-	protected static abstract class DummyTree extends BaseTree {
-		public Tree dupNode() {return null;}
-		public int getTokenStartIndex() { return 0; }
-		public void setTokenStartIndex(int index) {}
-		public int getTokenStopIndex() { return 0; }
-		public void setTokenStopIndex(int index) {}
-	}
-
-	public static class NavDownNode extends DummyTree {
-		public int getType() {return Token.DOWN;}
-		public String getText() {return "DOWN";}
-		public String toString() {return "DOWN";}
-	}
-
-	public static class NavUpNode extends DummyTree {
-		public int getType() {return Token.UP;}
-		public String getText() {return "UP";}
-		public String toString() {return "UP";}
-	}
-
-	public static class EOFNode extends DummyTree {
-		public int getType() {return Token.EOF;}
-		public String getText() {return "EOF";}
-		public String toString() {return "EOF";}
-	}
-
 	protected class StreamIterator implements Iterator {
 		int i = 0;
 		public boolean hasNext() {
@@ -90,7 +64,7 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 			if ( current < nodes.size() ) {
 				return nodes.get(current);
 			}
-			return EOF_NODE;
+			return eof;
 		}
 
 		public void remove() {
@@ -101,9 +75,9 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	// all these navigation nodes are shared and hence they
 	// cannot contain any line/column info
 
-	public static final DummyTree DOWN = new NavDownNode();
-	public static final DummyTree UP = new NavUpNode();
-	public static final DummyTree EOF_NODE = new EOFNode();
+	protected Object down;
+	protected Object up;
+	protected Object eof;
 
 	/** The complete mapping from stream index to tree node.
 	 *  This buffer includes pointers to DOWN, UP, and EOF nodes.
@@ -177,6 +151,9 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		this.root = tree;
 		this.adaptor = adaptor;
 		nodes = new ArrayList(initialBufferSize);
+		down = adaptor.create(Token.DOWN, "DOWN");
+		up = adaptor.create(Token.UP, "UP");
+		eof = adaptor.create(Token.EOF, "EOF");
 	}
 
 	/** Walk tree with depth-first-search and fill nodes buffer.
@@ -328,13 +305,21 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	 */
 	protected void addNavigationNode(final int ttype) {
 		Object navNode = null;
-		if ( ttype== Token.DOWN ) {
-			if ( hasUniqueNavigationNodes() ) navNode = new CommonTreeNodeStream.NavDownNode();
-			else navNode = CommonTreeNodeStream.DOWN;
+		if ( ttype==Token.DOWN ) {
+			if ( hasUniqueNavigationNodes() ) {
+				navNode = adaptor.create(Token.DOWN, "DOWN");
+			}
+			else {
+				navNode = down;
+			}
 		}
 		else {
-			if ( hasUniqueNavigationNodes() ) navNode = new CommonTreeNodeStream.NavUpNode();
-			else navNode = CommonTreeNodeStream.UP;
+			if ( hasUniqueNavigationNodes() ) {
+				navNode = adaptor.create(Token.UP, "UP");
+			}
+			else {
+				navNode = up;
+			}
 		}
 		nodes.add(navNode);
 	}
@@ -358,7 +343,7 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		}
 		//System.out.print("LT(p="+p+","+k+")=");
 		if ( (p+k-1) >= nodes.size() ) {
-			return CommonTreeNodeStream.EOF_NODE;
+			return eof;
 		}
 		return nodes.get(p+k-1);
 	}

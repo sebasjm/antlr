@@ -287,6 +287,11 @@ CHANGES
 
 3.0b6 - ??
 
+January 23, 2007
+
+* Made tree node streams use adaptor to create navigation nodes.
+  Thanks to Emond Papegaaij.
+
 January 22, 2007
 
 * Added lexer rule properties: start, stop

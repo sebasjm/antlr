@@ -132,6 +132,12 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 	/** Track the last mark() call result value for use in rewind(). */
 	protected int lastMarker;
 
+	// navigation nodes
+
+	protected Object down;
+	protected Object up;
+	protected Object eof;
+
 	public UnBufferedTreeNodeStream(Object tree) {
 		this(new CommonTreeAdaptor(), tree);
 	}
@@ -140,6 +146,9 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 		this.root = tree;
 		this.adaptor = adaptor;
 		reset();
+		down = adaptor.create(Token.DOWN, "DOWN");
+		up = adaptor.create(Token.UP, "UP");
+		eof = adaptor.create(Token.EOF, "EOF");
 	}
 
 	public void reset() {
@@ -367,7 +376,7 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 	public Object next() {
 		// already walked entire tree; nothing to return
 		if ( currentNode==null ) {
-			addLookahead(CommonTreeNodeStream.EOF_NODE);
+			addLookahead(eof);
 			// this is infinite stream returning EOF at end forever
 			// so don't throw NoSuchElementException
 			return null;
@@ -433,16 +442,24 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 	 *  so instantiate new ones when uniqueNavigationNodes is true.
 	 */
 	protected void addNavigationNode(final int ttype) {
-		Object node = null;
+		Object navNode = null;
 		if ( ttype==Token.DOWN ) {
-			if ( hasUniqueNavigationNodes() ) node = new CommonTreeNodeStream.NavDownNode();
-			else node = CommonTreeNodeStream.DOWN;
+			if ( hasUniqueNavigationNodes() ) {
+				navNode = adaptor.create(Token.DOWN, "DOWN");
+			}
+			else {
+				navNode = down;
+			}
 		}
 		else {
-			if ( hasUniqueNavigationNodes() ) node = new CommonTreeNodeStream.NavUpNode();
-			else node = CommonTreeNodeStream.UP;
+			if ( hasUniqueNavigationNodes() ) {
+				navNode = adaptor.create(Token.UP, "UP");
+			}
+			else {
+				navNode = up;
+			}
 		}
-		addLookahead(node);
+		addLookahead(navNode);
 	}
 
 	/** Walk upwards looking for a node with more children to walk. */
@@ -492,7 +509,7 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 	}
 
 	public String toString(Object start, Object stop) {
-		if ( start==null || stop==null ) {
+		if ( start==null ) {
 			return null;
 		}
 		// if we have the token stream, use that to dump text in order
@@ -502,8 +519,11 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 			// and ask for it's token index.
 			int beginTokenIndex = adaptor.getTokenStartIndex(start);
 			int endTokenIndex = adaptor.getTokenStopIndex(stop);
-			if ( adaptor.getType(stop)==Token.UP ) {
+			if ( stop!=null && adaptor.getType(stop)==Token.UP ) {
 				endTokenIndex = adaptor.getTokenStopIndex(start);
+			}
+			else {
+				endTokenIndex = size()-1;
 			}
 			return tokens.toString(beginTokenIndex, endTokenIndex);
 		}
