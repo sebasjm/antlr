@@ -287,6 +287,11 @@ CHANGES
 
 3.0b6 - ??
 
+January 30, 2007
+
+* Fixed bug in IntervalSet.and: it returned the same empty set all the time
+  rather than new empty set.  Code altered the same empty set.
+
 January 23, 2007
 
 * Made tree node streams use adaptor to create navigation nodes.

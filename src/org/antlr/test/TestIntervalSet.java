@@ -27,13 +27,11 @@
 */
 package org.antlr.test;
 
-import org.antlr.misc.IntervalSet;
 import org.antlr.analysis.Label;
+import org.antlr.misc.IntervalSet;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TestIntervalSet extends BaseTest {
 
@@ -81,13 +79,21 @@ public class TestIntervalSet extends BaseTest {
         assertEquals(result, expecting);
     }
 
-    public void testEmptyIntersection() throws Exception {
-        IntervalSet s = IntervalSet.of('a','z');
-        IntervalSet s2 = IntervalSet.of('0','9');
-        String expecting = "{}";
-        String result = (s.and(s2)).toString();
-        assertEquals(result, expecting);
-    }
+	public void testEmptyIntersection() throws Exception {
+		IntervalSet s = IntervalSet.of('a','z');
+		IntervalSet s2 = IntervalSet.of('0','9');
+		String expecting = "{}";
+		String result = (s.and(s2)).toString();
+		assertEquals(result, expecting);
+	}
+
+	public void testEmptyIntersectionSingleElements() throws Exception {
+		IntervalSet s = IntervalSet.of('a');
+		IntervalSet s2 = IntervalSet.of('d');
+		String expecting = "{}";
+		String result = (s.and(s2)).toString();
+		assertEquals(result, expecting);
+	}
 
     public void testNotSingleElement() throws Exception {
         IntervalSet vocabulary = IntervalSet.of(1,1000);
