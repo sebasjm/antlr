@@ -887,7 +887,7 @@ public class DFA {
 	 *  4. if sem preds, nondeterministic alts must be sufficiently covered
 	 */
 	public void verify() {
-		if ( !probe.nonRegularDecision ) {
+		if ( !probe.nonLLStarDecision ) { // avoid if non-LL(*)
 			doesStateReachAcceptState(startState);
 		}
 	}
@@ -906,10 +906,10 @@ public class DFA {
      *  TODO: I call getUniquelyPredicatedAlt too much; cache predicted alt
      */
     protected boolean doesStateReachAcceptState(DFAState d) {
-        /*
-        System.out.println("doesStateReachAcceptState processing DFA state "+
-                d.getStateNumber());
-        */
+		if ( d.dfa.decisionNumber==35 ) {
+		System.out.println("doesStateReachAcceptState processing DFA state "+
+                d.stateNumber);
+		}
 
 		if ( d.isAcceptState() ) {
             // accept states have no edges emanating from them so we can return

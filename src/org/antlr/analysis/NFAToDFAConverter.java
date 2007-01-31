@@ -76,7 +76,11 @@ public class NFAToDFAConverter {
 		dfa.startState = computeStartState();
 
 		// while more DFA states to check, process them
-		while ( work.size()>0 && !dfa.nfa.grammar.NFAToDFAConversionExternallyAborted() ) {
+		while ( work.size()>0 &&
+			    !dfa.probe.analysisAborted() &&
+				!dfa.probe.nonLLStarDecision &&
+				!dfa.nfa.grammar.NFAToDFAConversionExternallyAborted() )
+		{
 			DFAState d = (DFAState) work.get(0);
 			if ( dfa.nfa.grammar.getWatchNFAConversion() ) {
 				System.out.println("convert DFA state "+d.stateNumber+
@@ -296,8 +300,7 @@ public class NFAToDFAConverter {
 			// Note: this is tested on the target of d not d.
 			if ( t.abortedDueToMultipleRecursiveAlts && !t.isResolvedWithPredicates() ) {
 				// no predicates to resolve non-LL(*) decision, report
-				//System.out.println("non-LL(*) state "+d);
-				t.dfa.probe.reportNonRegularDecision(t.dfa);
+				t.dfa.probe.reportNonLLStarDecision(t.dfa);
 			}
 		}
 

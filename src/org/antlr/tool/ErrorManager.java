@@ -660,7 +660,7 @@ public class ErrorManager {
 		getErrorListener().warning(msg);
 	}
 
-	public static void nonRegularDecision(DecisionProbe probe) {
+	public static void nonLLStarDecision(DecisionProbe probe) {
 		getErrorState().errors++;
 		Message msg = new NonRegularDecisionMessage(probe, probe.getNonDeterministicAlts());
 		getErrorState().errorMsgIDs.add(msg.msgID);

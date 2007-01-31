@@ -28,9 +28,9 @@
 package org.antlr.codegen;
 
 import org.antlr.analysis.*;
+import org.antlr.misc.Utils;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.misc.Utils;
 
 import java.util.List;
 
@@ -44,6 +44,9 @@ public class ACyclicDFACodeGenerator {
 	public StringTemplate genFixedLookaheadDecision(StringTemplateGroup templates,
 													DFA dfa)
 	{
+		if ( dfa.decisionNumber==35 ) {
+			System.out.println("DFA 35 =\n"+dfa);
+		}
 		return walkFixedDFAGeneratingStateMachine(templates, dfa, dfa.startState, 1);
 	}
 
@@ -53,10 +56,10 @@ public class ACyclicDFACodeGenerator {
 			DFAState s,
 			int k)
 	{
-		/*
-		System.out.println("walkFixedDFAGeneratingStateMachine DFA.state "+
-						   dfa.decisionNumber+"."+s.stateNumber);
-		*/
+		if ( dfa.decisionNumber==35 ) {
+			System.out.println("walkFixedDFAGeneratingStateMachine DFA.state "+
+							   dfa.decisionNumber+"."+s.stateNumber);
+		}
 		if ( s.isAcceptState() ) {
 			StringTemplate dfaST = templates.getInstanceOf("dfaAcceptState");
 			dfaST.setAttribute("alt", Utils.integer(s.getUniquelyPredictedAlt()));

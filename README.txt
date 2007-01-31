@@ -292,6 +292,23 @@ January 30, 2007
 * Fixed bug in IntervalSet.and: it returned the same empty set all the time
   rather than new empty set.  Code altered the same empty set.
 
+* Made analysis terminate faster upon a decision that takes too long;
+  it seemed to keep doing work for a while.  Refactored some names
+  and updated comments.  Also made it terminate when it realizes it's
+  non-LL(*) due to recursion.  just added terminate conditions to loop
+  in convert().
+
+* Sometimes fatal non-LL(*) messages didn't appear; instead you got
+  "antlr couldn't analyze", which is actually untrue.  I had the
+  order of some prints wrong in the DecisionProbe.
+
+* The code generator incorrectly detected when it could use a fixed,
+  acyclic inline DFA (i.e., using an IF).  Upon non-LL(*) decisions
+  with predicates, analysis made cyclic DFA.  But this stops
+  the computation detecting whether they are cyclic.  I just added
+  a protection in front of the acyclic DFA generator to avoid if
+  non-LL(*).  Updated comments.
+
 January 23, 2007
 
 * Made tree node streams use adaptor to create navigation nodes.

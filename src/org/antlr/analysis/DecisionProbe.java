@@ -116,10 +116,11 @@ public class DecisionProbe {
 	 */
 	protected Set altsWithProblem = new HashSet();
 
-	/** If we decision > 1 alt with recursion, nonregular; those alts are
-	 *  store in altsWithProblem.
+	/** If decision with > 1 alt has recursion in > 1 alt, it's nonregular
+	 *  lookahead.  The decision cannot be made with a DFA.
+	 *  the alts are stored in altsWithProblem.
 	 */
-	protected boolean nonRegularDecision = false;
+	protected boolean nonLLStarDecision = false;
 
 	/** Recursion is limited to a particular depth.  If that limit is exceeded
 	 *  the proposed new NFAConfiguration is recorded for the associated DFA state.
@@ -211,8 +212,8 @@ public class DecisionProbe {
 		return stateToRecursiveOverflowConfigurationsMap.size()>0;
 	}
 
-	public boolean nonRegularDecision() {
-		return nonRegularDecision;
+	public boolean isNonLLStarDecision() {
+		return nonLLStarDecision;
 	}
 
 	/** How many states does the DFA predictor have? */
@@ -399,17 +400,20 @@ public class DecisionProbe {
 	}
 
 	public void issueWarnings() {
+		// NONREGULAR DUE TO RECURSION > 1 ALTS
+		// Issue this before aborted analysis, which might also occur
+		// if we take too long to terminate
+		if ( nonLLStarDecision && !dfa.getAutoBacktrackMode() ) {
+			ErrorManager.nonLLStarDecision(this);
+		}
+
 		if ( analysisAborted() ) {
 			// only report early termination errors if !backtracking
 			if ( !dfa.getAutoBacktrackMode() ) {
 				ErrorManager.analysisAborted(this);
 			}
+			// now just return...if we bailed out, don't spew other messages
 			return;
-		}
-
-		// NONREGULAR DUE TO RECURSION > 1 ALTS
-		if ( nonRegularDecision && !dfa.getAutoBacktrackMode() ) {
-			ErrorManager.nonRegularDecision(this);
 		}
 
 		issueRecursionWarnings();
@@ -448,7 +452,7 @@ public class DecisionProbe {
 			}
 		}
 
-		if ( !nonRegularDecision ) {
+		if ( !nonLLStarDecision ) {
 			List unreachableAlts = dfa.getUnreachableAlts();
 			if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
 				ErrorManager.unreachableAlts(this,unreachableAlts);
@@ -629,8 +633,9 @@ public class DecisionProbe {
 	/** Report that at least 2 alts have recursive constructs.  There is
 	 *  no way to build a DFA so we terminated.
 	 */
-	public void reportNonRegularDecision(DFA dfa) {
-		nonRegularDecision = true;
+	public void reportNonLLStarDecision(DFA dfa) {
+		System.out.println("non-LL(*) DFA "+dfa.decisionNumber);
+		nonLLStarDecision = true;
 		altsWithProblem.addAll(dfa.recursiveAltSet.toList());
 	}
 

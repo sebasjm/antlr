@@ -831,7 +831,7 @@ public class Grammar {
 		DFA lookaheadDFA = new DFA(decision, decisionStartState);
 		if ( (lookaheadDFA.analysisAborted() && // did analysis bug out?
 			 lookaheadDFA.getUserMaxLookahead()!=1) || // either k=* or k>1
-			 (lookaheadDFA.probe.nonRegularDecision() && // >1 alt recurses, k=*
+			 (lookaheadDFA.probe.isNonLLStarDecision() && // >1 alt recurses, k=*
 		      lookaheadDFA.getAutoBacktrackMode()) )
 		{
 			// set k=1 option if not already k=1 and try again

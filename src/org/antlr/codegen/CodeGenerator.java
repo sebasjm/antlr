@@ -80,7 +80,7 @@ public class CodeGenerator {
 	public int MAX_SWITCH_CASE_LABELS = 300;
 	public int MIN_SWITCH_ALTS = 3;
 	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
-	public static boolean GEN_FIXED_DFA_INLINE = true;
+	public static boolean GEN_ACYCLIC_DFA_INLINE = true;
 	public static boolean EMIT_TEMPLATE_DELIMITERS = false;
 
 	public String classpathTemplateRootDirectoryName =
@@ -600,11 +600,18 @@ public class CodeGenerator {
 											   DFA dfa)
 	{
 		StringTemplate decisionST;
-		if ( GEN_FIXED_DFA_INLINE && !dfa.isCyclic() /* TODO: and ! too big */ ) {
+		// If we are doing inline DFA and this one is acyclic and LL(*)
+		// I have to check for is-non-LL(*) because if non-LL(*) the cyclic
+		// check is not done by DFA.verify(); that is, verify() avoids
+		// doesStateReachAcceptState() if non-LL(*)
+		if ( GEN_ACYCLIC_DFA_INLINE && !dfa.isCyclic() &&
+		     !dfa.probe.isNonLLStarDecision() ) /* TODO: and ! too big */
+		{
 			decisionST =
 				acyclicDFAGenerator.genFixedLookaheadDecision(getTemplates(), dfa);
 		}
 		else {
+			// generate any kind of DFA here (cyclic or acyclic)
 			dfa.createStateTables(this);
 			outputFileST.setAttribute("cyclicDFAs", dfa);
 			headerFileST.setAttribute("cyclicDFAs", dfa);
