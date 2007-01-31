@@ -1,0 +1,24 @@
+lexer grammar T;
+options {
+  language=ObjC;
+
+}
+
+T7 : 'enum' ;
+
+// $ANTLR src "T.g" 37
+ID  :   ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+    ;
+
+// $ANTLR src "T.g" 40
+INT :	('0'..'9')+
+    ;
+
+// $ANTLR src "T.g" 43
+WS  :   (   ' '
+        |   '\t'
+        |   '\r'
+        |   '\n'
+        )+
+        { $channel=99; }
+    ;    
