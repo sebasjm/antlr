@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g 2006-11-12 22:52:36
+// $ANTLR 3.0b6 FuzzyJava.gl 2007-01-30 22:43:26
 
 #import "FuzzyJavaLexer.h"
 #pragma mark Cyclic DFAs
@@ -29,6 +29,11 @@
 - (void) dealloc
 {
 	[super dealloc];
+}
+
+- (NSString *) grammarFileName
+{
+	return @"FuzzyJava.gl";
 }
 
 - (ANTLRToken *) nextToken
@@ -62,7 +67,12 @@
 
 - (void) mIMPORT
 {
+	// token labels
 	ANTLRToken * _name = nil;
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
 
 	@try {
 		ruleNestingLevel++;
@@ -71,8 +81,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:9:4: ( 'import' WS name= QIDStar ( WS )? ';' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:9:4: 'import' WS name= QIDStar ( WS )? ';' // alt
+		// FuzzyJava.gl:5:4: ( 'import' WS name= QIDStar ( WS )? ';' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:5:4: 'import' WS name= QIDStar ( WS )? ';' // alt
 		{
 		[self matchString:@"import"];
 		if (failed) return ;
@@ -86,7 +96,7 @@
 
 		_name = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_nameStart stop:[self charIndex]];
 		[_name setLine:[self line]];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:9:29: ( WS )? // block
+		// FuzzyJava.gl:5:29: ( WS )? // block
 		int alt1=2;
 		{
 			int LA1_0 = [input LA:1];
@@ -96,7 +106,7 @@
 		}
 		switch (alt1) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:9:29: WS // alt
+			    // FuzzyJava.gl:5:29: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -134,6 +144,12 @@
 
 - (void) mRETURN
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = FuzzyJavaLexer_RETURN;
@@ -141,8 +157,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:14:4: ( 'return' ( options {greedy=false; } : . )* ';' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:14:4: 'return' ( options {greedy=false; } : . )* ';' // alt
+		// FuzzyJava.gl:10:4: ( 'return' ( options {greedy=false; } : . )* ';' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:10:4: 'return' ( options {greedy=false; } : . )* ';' // alt
 		{
 		[self matchString:@"return"];
 		if (failed) return ;
@@ -161,7 +177,7 @@
 		    }
 		    switch (alt2) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:14:38: . // alt
+			    // FuzzyJava.gl:10:38: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -201,7 +217,12 @@
 
 - (void) mCLASS
 {
+	// token labels
 	ANTLRToken * _name = nil;
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
 
 	@try {
 		ruleNestingLevel++;
@@ -210,8 +231,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:18:4: ( 'class' WS name= ID ( WS )? ( 'extends' WS QID ( WS )? )? ( 'implements' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? '{' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:18:4: 'class' WS name= ID ( WS )? ( 'extends' WS QID ( WS )? )? ( 'implements' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? '{' // alt
+		// FuzzyJava.gl:14:4: ( 'class' WS name= ID ( WS )? ( 'extends' WS QID ( WS )? )? ( 'implements' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? '{' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:14:4: 'class' WS name= ID ( WS )? ( 'extends' WS QID ( WS )? )? ( 'implements' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? '{' // alt
 		{
 		[self matchString:@"class"];
 		if (failed) return ;
@@ -225,7 +246,7 @@
 
 		_name = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_nameStart stop:[self charIndex]];
 		[_name setLine:[self line]];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:18:23: ( WS )? // block
+		// FuzzyJava.gl:14:23: ( WS )? // block
 		int alt3=2;
 		{
 			int LA3_0 = [input LA:1];
@@ -235,7 +256,7 @@
 		}
 		switch (alt3) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:18:23: WS // alt
+			    // FuzzyJava.gl:14:23: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -246,7 +267,7 @@
 
 		}
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:18:27: ( 'extends' WS QID ( WS )? )? // block
+		// FuzzyJava.gl:14:27: ( 'extends' WS QID ( WS )? )? // block
 		int alt5=2;
 		{
 			int LA5_0 = [input LA:1];
@@ -256,7 +277,7 @@
 		}
 		switch (alt5) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:18:28: 'extends' WS QID ( WS )? // alt
+			    // FuzzyJava.gl:14:28: 'extends' WS QID ( WS )? // alt
 			    {
 			    [self matchString:@"extends"];
 			    if (failed) return ;
@@ -267,7 +288,7 @@
 			    [self mQID];
 			    if (failed) return ;
 
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:18:45: ( WS )? // block
+			    // FuzzyJava.gl:14:45: ( WS )? // block
 			    int alt4=2;
 			    {
 			    	int LA4_0 = [input LA:1];
@@ -277,7 +298,7 @@
 			    }
 			    switch (alt4) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:18:45: WS // alt
+			    	    // FuzzyJava.gl:14:45: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -294,7 +315,7 @@
 
 		}
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:19:3: ( 'implements' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? // block
+		// FuzzyJava.gl:15:3: ( 'implements' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? // block
 		int alt10=2;
 		{
 			int LA10_0 = [input LA:1];
@@ -304,7 +325,7 @@
 		}
 		switch (alt10) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:19:4: 'implements' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* // alt
+			    // FuzzyJava.gl:15:4: 'implements' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* // alt
 			    {
 			    [self matchString:@"implements"];
 			    if (failed) return ;
@@ -315,7 +336,7 @@
 			    [self mQID];
 			    if (failed) return ;
 
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:19:24: ( WS )? // block
+			    // FuzzyJava.gl:15:24: ( WS )? // block
 			    int alt6=2;
 			    {
 			    	int LA6_0 = [input LA:1];
@@ -325,7 +346,7 @@
 			    }
 			    switch (alt6) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:19:24: WS // alt
+			    	    // FuzzyJava.gl:15:24: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -347,12 +368,12 @@
 			        }
 			        switch (alt9) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:19:29: ',' ( WS )? QID ( WS )? // alt
+			    	    // FuzzyJava.gl:15:29: ',' ( WS )? QID ( WS )? // alt
 			    	    {
 			    	    [self matchChar:','];
 			    	    if (failed) return ;
 
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:19:33: ( WS )? // block
+			    	    // FuzzyJava.gl:15:33: ( WS )? // block
 			    	    int alt7=2;
 			    	    {
 			    	    	int LA7_0 = [input LA:1];
@@ -362,7 +383,7 @@
 			    	    }
 			    	    switch (alt7) {
 			    	    	case 1 :
-			    	    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:19:33: WS // alt
+			    	    	    // FuzzyJava.gl:15:33: WS // alt
 			    	    	    {
 			    	    	    [self mWS];
 			    	    	    if (failed) return ;
@@ -376,7 +397,7 @@
 			    	    [self mQID];
 			    	    if (failed) return ;
 
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:19:41: ( WS )? // block
+			    	    // FuzzyJava.gl:15:41: ( WS )? // block
 			    	    int alt8=2;
 			    	    {
 			    	    	int LA8_0 = [input LA:1];
@@ -386,7 +407,7 @@
 			    	    }
 			    	    switch (alt8) {
 			    	    	case 1 :
-			    	    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:19:41: WS // alt
+			    	    	    // FuzzyJava.gl:15:41: WS // alt
 			    	    	    {
 			    	    	    [self mWS];
 			    	    	    if (failed) return ;
@@ -442,7 +463,12 @@
 
 - (void) mMETHOD
 {
+	// token labels
 	ANTLRToken * _name = nil;
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
 
 	@try {
 		ruleNestingLevel++;
@@ -451,8 +477,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:9: ( TYPE WS name= ID ( WS )? '(' ( ARG ( WS )? ( ',' ( WS )? ARG ( WS )? )* )? ')' ( WS )? ( 'throws' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? '{' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:9: TYPE WS name= ID ( WS )? '(' ( ARG ( WS )? ( ',' ( WS )? ARG ( WS )? )* )? ')' ( WS )? ( 'throws' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? '{' // alt
+		// FuzzyJava.gl:20:9: ( TYPE WS name= ID ( WS )? '(' ( ARG ( WS )? ( ',' ( WS )? ARG ( WS )? )* )? ')' ( WS )? ( 'throws' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? '{' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:20:9: TYPE WS name= ID ( WS )? '(' ( ARG ( WS )? ( ',' ( WS )? ARG ( WS )? )* )? ')' ( WS )? ( 'throws' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? '{' // alt
 		{
 		[self mTYPE];
 		if (failed) return ;
@@ -466,7 +492,7 @@
 
 		_name = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_nameStart stop:[self charIndex]];
 		[_name setLine:[self line]];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:25: ( WS )? // block
+		// FuzzyJava.gl:20:25: ( WS )? // block
 		int alt11=2;
 		{
 			int LA11_0 = [input LA:1];
@@ -476,7 +502,7 @@
 		}
 		switch (alt11) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:25: WS // alt
+			    // FuzzyJava.gl:20:25: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -490,7 +516,7 @@
 		[self matchChar:'('];
 		if (failed) return ;
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:33: ( ARG ( WS )? ( ',' ( WS )? ARG ( WS )? )* )? // block
+		// FuzzyJava.gl:20:33: ( ARG ( WS )? ( ',' ( WS )? ARG ( WS )? )* )? // block
 		int alt16=2;
 		{
 			int LA16_0 = [input LA:1];
@@ -500,12 +526,12 @@
 		}
 		switch (alt16) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:35: ARG ( WS )? ( ',' ( WS )? ARG ( WS )? )* // alt
+			    // FuzzyJava.gl:20:35: ARG ( WS )? ( ',' ( WS )? ARG ( WS )? )* // alt
 			    {
 			    [self mARG];
 			    if (failed) return ;
 
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:39: ( WS )? // block
+			    // FuzzyJava.gl:20:39: ( WS )? // block
 			    int alt12=2;
 			    {
 			    	int LA12_0 = [input LA:1];
@@ -515,7 +541,7 @@
 			    }
 			    switch (alt12) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:39: WS // alt
+			    	    // FuzzyJava.gl:20:39: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -537,12 +563,12 @@
 			        }
 			        switch (alt15) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:44: ',' ( WS )? ARG ( WS )? // alt
+			    	    // FuzzyJava.gl:20:44: ',' ( WS )? ARG ( WS )? // alt
 			    	    {
 			    	    [self matchChar:','];
 			    	    if (failed) return ;
 
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:48: ( WS )? // block
+			    	    // FuzzyJava.gl:20:48: ( WS )? // block
 			    	    int alt13=2;
 			    	    {
 			    	    	int LA13_0 = [input LA:1];
@@ -552,7 +578,7 @@
 			    	    }
 			    	    switch (alt13) {
 			    	    	case 1 :
-			    	    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:48: WS // alt
+			    	    	    // FuzzyJava.gl:20:48: WS // alt
 			    	    	    {
 			    	    	    [self mWS];
 			    	    	    if (failed) return ;
@@ -566,7 +592,7 @@
 			    	    [self mARG];
 			    	    if (failed) return ;
 
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:56: ( WS )? // block
+			    	    // FuzzyJava.gl:20:56: ( WS )? // block
 			    	    int alt14=2;
 			    	    {
 			    	    	int LA14_0 = [input LA:1];
@@ -576,7 +602,7 @@
 			    	    }
 			    	    switch (alt14) {
 			    	    	case 1 :
-			    	    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:56: WS // alt
+			    	    	    // FuzzyJava.gl:20:56: WS // alt
 			    	    	    {
 			    	    	    [self mWS];
 			    	    	    if (failed) return ;
@@ -605,7 +631,7 @@
 		[self matchChar:')'];
 		if (failed) return ;
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:69: ( WS )? // block
+		// FuzzyJava.gl:20:69: ( WS )? // block
 		int alt17=2;
 		{
 			int LA17_0 = [input LA:1];
@@ -615,7 +641,7 @@
 		}
 		switch (alt17) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:24:69: WS // alt
+			    // FuzzyJava.gl:20:69: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -626,7 +652,7 @@
 
 		}
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:25:8: ( 'throws' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? // block
+		// FuzzyJava.gl:21:8: ( 'throws' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* )? // block
 		int alt22=2;
 		{
 			int LA22_0 = [input LA:1];
@@ -636,7 +662,7 @@
 		}
 		switch (alt22) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:25:9: 'throws' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* // alt
+			    // FuzzyJava.gl:21:9: 'throws' WS QID ( WS )? ( ',' ( WS )? QID ( WS )? )* // alt
 			    {
 			    [self matchString:@"throws"];
 			    if (failed) return ;
@@ -647,7 +673,7 @@
 			    [self mQID];
 			    if (failed) return ;
 
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:25:25: ( WS )? // block
+			    // FuzzyJava.gl:21:25: ( WS )? // block
 			    int alt18=2;
 			    {
 			    	int LA18_0 = [input LA:1];
@@ -657,7 +683,7 @@
 			    }
 			    switch (alt18) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:25:25: WS // alt
+			    	    // FuzzyJava.gl:21:25: WS // alt
 			    	    {
 			    	    [self mWS];
 			    	    if (failed) return ;
@@ -679,12 +705,12 @@
 			        }
 			        switch (alt21) {
 			    	case 1 :
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:25:30: ',' ( WS )? QID ( WS )? // alt
+			    	    // FuzzyJava.gl:21:30: ',' ( WS )? QID ( WS )? // alt
 			    	    {
 			    	    [self matchChar:','];
 			    	    if (failed) return ;
 
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:25:34: ( WS )? // block
+			    	    // FuzzyJava.gl:21:34: ( WS )? // block
 			    	    int alt19=2;
 			    	    {
 			    	    	int LA19_0 = [input LA:1];
@@ -694,7 +720,7 @@
 			    	    }
 			    	    switch (alt19) {
 			    	    	case 1 :
-			    	    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:25:34: WS // alt
+			    	    	    // FuzzyJava.gl:21:34: WS // alt
 			    	    	    {
 			    	    	    [self mWS];
 			    	    	    if (failed) return ;
@@ -708,7 +734,7 @@
 			    	    [self mQID];
 			    	    if (failed) return ;
 
-			    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:25:42: ( WS )? // block
+			    	    // FuzzyJava.gl:21:42: ( WS )? // block
 			    	    int alt20=2;
 			    	    {
 			    	    	int LA20_0 = [input LA:1];
@@ -718,7 +744,7 @@
 			    	    }
 			    	    switch (alt20) {
 			    	    	case 1 :
-			    	    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:25:42: WS // alt
+			    	    	    // FuzzyJava.gl:21:42: WS // alt
 			    	    	    {
 			    	    	    [self mWS];
 			    	    	    if (failed) return ;
@@ -774,7 +800,12 @@
 
 - (void) mFIELD
 {
+	// token labels
 	ANTLRToken * _name = nil;
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
 
 	@try {
 		ruleNestingLevel++;
@@ -783,8 +814,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:30:9: ( TYPE WS name= ID ( '[]' )? ( WS )? (';'|'=')) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:30:9: TYPE WS name= ID ( '[]' )? ( WS )? (';'|'=') // alt
+		// FuzzyJava.gl:26:9: ( TYPE WS name= ID ( '[]' )? ( WS )? (';'|'=')) // ruleBlockSingleAlt
+		// FuzzyJava.gl:26:9: TYPE WS name= ID ( '[]' )? ( WS )? (';'|'=') // alt
 		{
 		[self mTYPE];
 		if (failed) return ;
@@ -798,7 +829,7 @@
 
 		_name = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_nameStart stop:[self charIndex]];
 		[_name setLine:[self line]];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:30:25: ( '[]' )? // block
+		// FuzzyJava.gl:26:25: ( '[]' )? // block
 		int alt23=2;
 		{
 			int LA23_0 = [input LA:1];
@@ -808,7 +839,7 @@
 		}
 		switch (alt23) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:30:25: '[]' // alt
+			    // FuzzyJava.gl:26:25: '[]' // alt
 			    {
 			    [self matchString:@"[]"];
 			    if (failed) return ;
@@ -819,7 +850,7 @@
 
 		}
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:30:31: ( WS )? // block
+		// FuzzyJava.gl:26:31: ( WS )? // block
 		int alt24=2;
 		{
 			int LA24_0 = [input LA:1];
@@ -829,7 +860,7 @@
 		}
 		switch (alt24) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:30:31: WS // alt
+			    // FuzzyJava.gl:26:31: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -876,6 +907,12 @@
 
 - (void) mSTAT
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = FuzzyJavaLexer_STAT;
@@ -883,10 +920,10 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:34:7: ( ( 'if' | 'while' | 'switch' | 'for' ) ( WS )? '(' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:34:7: ( 'if' | 'while' | 'switch' | 'for' ) ( WS )? '(' // alt
+		// FuzzyJava.gl:30:7: ( ( 'if' | 'while' | 'switch' | 'for' ) ( WS )? '(' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:30:7: ( 'if' | 'while' | 'switch' | 'for' ) ( WS )? '(' // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:34:7: ( 'if' | 'while' | 'switch' | 'for' ) // block
+		// FuzzyJava.gl:30:7: ( 'if' | 'while' | 'switch' | 'for' ) // block
 		int alt25=4;
 		switch ([input LA:1]) {
 			case 'i':
@@ -910,7 +947,7 @@
 			}}
 		switch (alt25) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:34:8: 'if' // alt
+			    // FuzzyJava.gl:30:8: 'if' // alt
 			    {
 			    [self matchString:@"if"];
 			    if (failed) return ;
@@ -919,7 +956,7 @@
 			    }
 			    break;
 			case 2 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:34:13: 'while' // alt
+			    // FuzzyJava.gl:30:13: 'while' // alt
 			    {
 			    [self matchString:@"while"];
 			    if (failed) return ;
@@ -928,7 +965,7 @@
 			    }
 			    break;
 			case 3 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:34:21: 'switch' // alt
+			    // FuzzyJava.gl:30:21: 'switch' // alt
 			    {
 			    [self matchString:@"switch"];
 			    if (failed) return ;
@@ -937,7 +974,7 @@
 			    }
 			    break;
 			case 4 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:34:30: 'for' // alt
+			    // FuzzyJava.gl:30:30: 'for' // alt
 			    {
 			    [self matchString:@"for"];
 			    if (failed) return ;
@@ -948,7 +985,7 @@
 
 		}
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:34:37: ( WS )? // block
+		// FuzzyJava.gl:30:37: ( WS )? // block
 		int alt26=2;
 		{
 			int LA26_0 = [input LA:1];
@@ -958,7 +995,7 @@
 		}
 		switch (alt26) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:34:37: WS // alt
+			    // FuzzyJava.gl:30:37: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -995,7 +1032,12 @@
 
 - (void) mCALL
 {
+	// token labels
 	ANTLRToken * _name = nil;
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
 
 	@try {
 		ruleNestingLevel++;
@@ -1004,8 +1046,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:37:9: (name= QID ( WS )? '(' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:37:9: name= QID ( WS )? '(' // alt
+		// FuzzyJava.gl:33:9: (name= QID ( WS )? '(' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:33:9: name= QID ( WS )? '(' // alt
 		{
 		int _nameStart = [self charIndex];
 		[self mQID];
@@ -1013,7 +1055,7 @@
 
 		_name = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_nameStart stop:[self charIndex]];
 		[_name setLine:[self line]];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:37:18: ( WS )? // block
+		// FuzzyJava.gl:33:18: ( WS )? // block
 		int alt27=2;
 		{
 			int LA27_0 = [input LA:1];
@@ -1023,7 +1065,7 @@
 		}
 		switch (alt27) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:37:18: WS // alt
+			    // FuzzyJava.gl:33:18: WS // alt
 			    {
 			    [self mWS];
 			    if (failed) return ;
@@ -1064,6 +1106,12 @@
 
 - (void) mCOMMENT
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = FuzzyJavaLexer_COMMENT;
@@ -1071,8 +1119,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:42:9: ( '/*' ( options {greedy=false; } : . )* '*/' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:42:9: '/*' ( options {greedy=false; } : . )* '*/' // alt
+		// FuzzyJava.gl:38:9: ( '/*' ( options {greedy=false; } : . )* '*/' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:38:9: '/*' ( options {greedy=false; } : . )* '*/' // alt
 		{
 		[self matchString:@"/*"];
 		if (failed) return ;
@@ -1100,7 +1148,7 @@
 		    }
 		    switch (alt28) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:42:41: . // alt
+			    // FuzzyJava.gl:38:41: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -1143,6 +1191,12 @@
 
 - (void) mSL_COMMENT
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = FuzzyJavaLexer_SL_COMMENT;
@@ -1150,8 +1204,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:47:9: ( '//' ( options {greedy=false; } : . )* '\\n' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:47:9: '//' ( options {greedy=false; } : . )* '\\n' // alt
+		// FuzzyJava.gl:43:9: ( '//' ( options {greedy=false; } : . )* '\\n' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:43:9: '//' ( options {greedy=false; } : . )* '\\n' // alt
 		{
 		[self matchString:@"//"];
 		if (failed) return ;
@@ -1170,7 +1224,7 @@
 		    }
 		    switch (alt29) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:47:41: . // alt
+			    // FuzzyJava.gl:43:41: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -1213,6 +1267,12 @@
 
 - (void) mSTRING
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = FuzzyJavaLexer_STRING;
@@ -1220,8 +1280,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:52:4: ( '\"' ( options {greedy=false; } : ESC | . )* '\"' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:52:4: '\"' ( options {greedy=false; } : ESC | . )* '\"' // alt
+		// FuzzyJava.gl:48:4: ( '\"' ( options {greedy=false; } : ESC | . )* '\"' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:48:4: '\"' ( options {greedy=false; } : ESC | . )* '\"' // alt
 		{
 		[self matchChar:'"'];
 		if (failed) return ;
@@ -1258,7 +1318,7 @@
 		    }
 		    switch (alt30) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:52:34: ESC // alt
+			    // FuzzyJava.gl:48:34: ESC // alt
 			    {
 			    [self mESC];
 			    if (failed) return ;
@@ -1267,7 +1327,7 @@
 			    }
 			    break;
 			case 2 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:52:40: . // alt
+			    // FuzzyJava.gl:48:40: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -1307,6 +1367,12 @@
 
 - (void) mCHAR
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = FuzzyJavaLexer_CHAR;
@@ -1314,8 +1380,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:56:4: ( '\\'' ( options {greedy=false; } : ESC | . )* '\\'' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:56:4: '\\'' ( options {greedy=false; } : ESC | . )* '\\'' // alt
+		// FuzzyJava.gl:52:4: ( '\\'' ( options {greedy=false; } : ESC | . )* '\\'' ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:52:4: '\\'' ( options {greedy=false; } : ESC | . )* '\\'' // alt
 		{
 		[self matchChar:'\''];
 		if (failed) return ;
@@ -1352,7 +1418,7 @@
 		    }
 		    switch (alt31) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:56:35: ESC // alt
+			    // FuzzyJava.gl:52:35: ESC // alt
 			    {
 			    [self mESC];
 			    if (failed) return ;
@@ -1361,7 +1427,7 @@
 			    }
 			    break;
 			case 2 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:56:41: . // alt
+			    // FuzzyJava.gl:52:41: . // alt
 			    {
 			    [self matchAny];
 			    if (failed) return ;
@@ -1401,6 +1467,12 @@
 
 - (void) mWS
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = FuzzyJavaLexer_WS;
@@ -1408,10 +1480,10 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:59:9: ( ( (' '|'\\t'|'\\n'))+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:59:9: ( (' '|'\\t'|'\\n'))+ // alt
+		// FuzzyJava.gl:55:9: ( ( (' '|'\\t'|'\\n'))+ ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:55:9: ( (' '|'\\t'|'\\n'))+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:59:9: ( (' '|'\\t'|'\\n'))+	// positiveClosureBlock
+		// FuzzyJava.gl:55:9: ( (' '|'\\t'|'\\n'))+	// positiveClosureBlock
 		int cnt32=0;
 
 		do {
@@ -1425,7 +1497,7 @@
 		    }
 		    switch (alt32) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:59:10: (' '|'\\t'|'\\n') // alt
+			    // FuzzyJava.gl:55:10: (' '|'\\t'|'\\n') // alt
 			    {
 			    if (([input LA:1]>='\t' && [input LA:1]<='\n')||[input LA:1]==' ') {
 			    	[input consume];
@@ -1472,10 +1544,16 @@
 
 - (void) mQID
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:63:7: ( ID ( '.' ID )* ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:63:7: ID ( '.' ID )* // alt
+		// FuzzyJava.gl:59:7: ( ID ( '.' ID )* ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:59:7: ID ( '.' ID )* // alt
 		{
 		[self mID];
 		if (failed) return ;
@@ -1491,7 +1569,7 @@
 		    }
 		    switch (alt33) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:63:11: '.' ID // alt
+			    // FuzzyJava.gl:59:11: '.' ID // alt
 			    {
 			    [self matchChar:'.'];
 			    if (failed) return ;
@@ -1530,10 +1608,16 @@
 
 - (void) mQIDStar
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:72:4: ( ID ( '.' ID )* ( '.*' )? ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:72:4: ID ( '.' ID )* ( '.*' )? // alt
+		// FuzzyJava.gl:68:4: ( ID ( '.' ID )* ( '.*' )? ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:68:4: ID ( '.' ID )* ( '.*' )? // alt
 		{
 		[self mID];
 		if (failed) return ;
@@ -1555,7 +1639,7 @@
 		    }
 		    switch (alt34) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:72:8: '.' ID // alt
+			    // FuzzyJava.gl:68:8: '.' ID // alt
 			    {
 			    [self matchChar:'.'];
 			    if (failed) return ;
@@ -1572,7 +1656,7 @@
 		    }
 		} while (YES); loop34: ;
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:72:17: ( '.*' )? // block
+		// FuzzyJava.gl:68:17: ( '.*' )? // block
 		int alt35=2;
 		{
 			int LA35_0 = [input LA:1];
@@ -1582,7 +1666,7 @@
 		}
 		switch (alt35) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:72:17: '.*' // alt
+			    // FuzzyJava.gl:68:17: '.*' // alt
 			    {
 			    [self matchString:@".*"];
 			    if (failed) return ;
@@ -1615,15 +1699,21 @@
 
 - (void) mTYPE
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:76:9: ( QID ( '[]' )? ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:76:9: QID ( '[]' )? // alt
+		// FuzzyJava.gl:72:9: ( QID ( '[]' )? ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:72:9: QID ( '[]' )? // alt
 		{
 		[self mQID];
 		if (failed) return ;
 
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:76:13: ( '[]' )? // block
+		// FuzzyJava.gl:72:13: ( '[]' )? // block
 		int alt36=2;
 		{
 			int LA36_0 = [input LA:1];
@@ -1633,7 +1723,7 @@
 		}
 		switch (alt36) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:76:13: '[]' // alt
+			    // FuzzyJava.gl:72:13: '[]' // alt
 			    {
 			    [self matchString:@"[]"];
 			    if (failed) return ;
@@ -1666,10 +1756,16 @@
 
 - (void) mARG
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:80:9: ( TYPE WS ID ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:80:9: TYPE WS ID // alt
+		// FuzzyJava.gl:76:9: ( TYPE WS ID ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:76:9: TYPE WS ID // alt
 		{
 		[self mTYPE];
 		if (failed) return ;
@@ -1702,10 +1798,16 @@
 
 - (void) mID
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:84:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))* ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:84:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))* // alt
+		// FuzzyJava.gl:80:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))* ) // ruleBlockSingleAlt
+		// FuzzyJava.gl:80:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'_'|'0'..'9'))* // alt
 		{
 		if (([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			[input consume];
@@ -1727,7 +1829,7 @@
 		    }
 		    switch (alt37) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:84:34: ('a'..'z'|'A'..'Z'|'_'|'0'..'9') // alt
+			    // FuzzyJava.gl:80:34: ('a'..'z'|'A'..'Z'|'_'|'0'..'9') // alt
 			    {
 			    if (([input LA:1]>='0' && [input LA:1]<='9')||([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			    	[input consume];
@@ -1769,10 +1871,16 @@
 
 - (void) mESC
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:88:7: ( '\\\\' ('\"'|'\\''|'\\\\')) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:88:7: '\\\\' ('\"'|'\\''|'\\\\') // alt
+		// FuzzyJava.gl:84:7: ( '\\\\' ('\"'|'\\''|'\\\\')) // ruleBlockSingleAlt
+		// FuzzyJava.gl:84:7: '\\\\' ('\"'|'\\''|'\\\\') // alt
 		{
 		[self matchChar:'\\'];
 		if (failed) return ;
@@ -1807,7 +1915,7 @@
 
 - (void) mTokens
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:25: ( ( IMPORT )=> IMPORT | ( RETURN )=> RETURN | ( CLASS )=> CLASS | ( METHOD )=> METHOD | ( FIELD )=> FIELD | ( STAT )=> STAT | ( CALL )=> CALL | ( COMMENT )=> COMMENT | ( SL_COMMENT )=> SL_COMMENT | ( STRING )=> STRING | ( CHAR )=> CHAR | ( WS )=> WS ) //ruleblock
+    // FuzzyJava.gl:1:25: ( ( IMPORT )=> IMPORT | ( RETURN )=> RETURN | ( CLASS )=> CLASS | ( METHOD )=> METHOD | ( FIELD )=> FIELD | ( STAT )=> STAT | ( CALL )=> CALL | ( COMMENT )=> COMMENT | ( SL_COMMENT )=> SL_COMMENT | ( STRING )=> STRING | ( CHAR )=> CHAR | ( WS )=> WS ) //ruleblock
     int alt38=12;
     switch ([input LA:1]) {
     	case 'i':
@@ -2046,7 +2154,7 @@
     	}}
     switch (alt38) {
     	case 1 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:25: ( IMPORT )=> IMPORT // alt
+    	    // FuzzyJava.gl:1:25: ( IMPORT )=> IMPORT // alt
     	    {
     	    [self mIMPORT];
     	    if (failed) return ;
@@ -2055,7 +2163,7 @@
     	    }
     	    break;
     	case 2 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:42: ( RETURN )=> RETURN // alt
+    	    // FuzzyJava.gl:1:42: ( RETURN )=> RETURN // alt
     	    {
     	    [self mRETURN];
     	    if (failed) return ;
@@ -2064,7 +2172,7 @@
     	    }
     	    break;
     	case 3 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:59: ( CLASS )=> CLASS // alt
+    	    // FuzzyJava.gl:1:59: ( CLASS )=> CLASS // alt
     	    {
     	    [self mCLASS];
     	    if (failed) return ;
@@ -2073,7 +2181,7 @@
     	    }
     	    break;
     	case 4 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:74: ( METHOD )=> METHOD // alt
+    	    // FuzzyJava.gl:1:74: ( METHOD )=> METHOD // alt
     	    {
     	    [self mMETHOD];
     	    if (failed) return ;
@@ -2082,7 +2190,7 @@
     	    }
     	    break;
     	case 5 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:91: ( FIELD )=> FIELD // alt
+    	    // FuzzyJava.gl:1:91: ( FIELD )=> FIELD // alt
     	    {
     	    [self mFIELD];
     	    if (failed) return ;
@@ -2091,7 +2199,7 @@
     	    }
     	    break;
     	case 6 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:106: ( STAT )=> STAT // alt
+    	    // FuzzyJava.gl:1:106: ( STAT )=> STAT // alt
     	    {
     	    [self mSTAT];
     	    if (failed) return ;
@@ -2100,7 +2208,7 @@
     	    }
     	    break;
     	case 7 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:119: ( CALL )=> CALL // alt
+    	    // FuzzyJava.gl:1:119: ( CALL )=> CALL // alt
     	    {
     	    [self mCALL];
     	    if (failed) return ;
@@ -2109,7 +2217,7 @@
     	    }
     	    break;
     	case 8 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:132: ( COMMENT )=> COMMENT // alt
+    	    // FuzzyJava.gl:1:132: ( COMMENT )=> COMMENT // alt
     	    {
     	    [self mCOMMENT];
     	    if (failed) return ;
@@ -2118,7 +2226,7 @@
     	    }
     	    break;
     	case 9 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:151: ( SL_COMMENT )=> SL_COMMENT // alt
+    	    // FuzzyJava.gl:1:151: ( SL_COMMENT )=> SL_COMMENT // alt
     	    {
     	    [self mSL_COMMENT];
     	    if (failed) return ;
@@ -2127,7 +2235,7 @@
     	    }
     	    break;
     	case 10 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:176: ( STRING )=> STRING // alt
+    	    // FuzzyJava.gl:1:176: ( STRING )=> STRING // alt
     	    {
     	    [self mSTRING];
     	    if (failed) return ;
@@ -2136,7 +2244,7 @@
     	    }
     	    break;
     	case 11 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:193: ( CHAR )=> CHAR // alt
+    	    // FuzzyJava.gl:1:193: ( CHAR )=> CHAR // alt
     	    {
     	    [self mCHAR];
     	    if (failed) return ;
@@ -2145,7 +2253,7 @@
     	    }
     	    break;
     	case 12 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:206: ( WS )=> WS // alt
+    	    // FuzzyJava.gl:1:206: ( WS )=> WS // alt
     	    {
     	    [self mWS];
     	    if (failed) return ;
@@ -2160,8 +2268,8 @@
 
 - (void) synpred1
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:25: ( IMPORT ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:26: IMPORT // alt
+    // FuzzyJava.gl:1:25: ( IMPORT ) // ruleBlockSingleAlt
+    // FuzzyJava.gl:1:26: IMPORT // alt
     {
     [self mIMPORT];
     if (failed) return ;
@@ -2172,8 +2280,8 @@
 
 - (void) synpred2
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:42: ( RETURN ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:43: RETURN // alt
+    // FuzzyJava.gl:1:42: ( RETURN ) // ruleBlockSingleAlt
+    // FuzzyJava.gl:1:43: RETURN // alt
     {
     [self mRETURN];
     if (failed) return ;
@@ -2184,8 +2292,8 @@
 
 - (void) synpred3
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:59: ( CLASS ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:60: CLASS // alt
+    // FuzzyJava.gl:1:59: ( CLASS ) // ruleBlockSingleAlt
+    // FuzzyJava.gl:1:60: CLASS // alt
     {
     [self mCLASS];
     if (failed) return ;
@@ -2196,8 +2304,8 @@
 
 - (void) synpred4
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:74: ( METHOD ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:75: METHOD // alt
+    // FuzzyJava.gl:1:74: ( METHOD ) // ruleBlockSingleAlt
+    // FuzzyJava.gl:1:75: METHOD // alt
     {
     [self mMETHOD];
     if (failed) return ;
@@ -2208,8 +2316,8 @@
 
 - (void) synpred5
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:91: ( FIELD ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:92: FIELD // alt
+    // FuzzyJava.gl:1:91: ( FIELD ) // ruleBlockSingleAlt
+    // FuzzyJava.gl:1:92: FIELD // alt
     {
     [self mFIELD];
     if (failed) return ;
@@ -2220,8 +2328,8 @@
 
 - (void) synpred6
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:106: ( STAT ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:107: STAT // alt
+    // FuzzyJava.gl:1:106: ( STAT ) // ruleBlockSingleAlt
+    // FuzzyJava.gl:1:107: STAT // alt
     {
     [self mSTAT];
     if (failed) return ;
@@ -2232,8 +2340,8 @@
 
 - (void) synpred7
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:119: ( CALL ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:120: CALL // alt
+    // FuzzyJava.gl:1:119: ( CALL ) // ruleBlockSingleAlt
+    // FuzzyJava.gl:1:120: CALL // alt
     {
     [self mCALL];
     if (failed) return ;
@@ -2244,8 +2352,8 @@
 
 - (void) synpred8
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:132: ( COMMENT ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:133: COMMENT // alt
+    // FuzzyJava.gl:1:132: ( COMMENT ) // ruleBlockSingleAlt
+    // FuzzyJava.gl:1:133: COMMENT // alt
     {
     [self mCOMMENT];
     if (failed) return ;
@@ -2256,8 +2364,8 @@
 
 - (void) synpred9
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:151: ( SL_COMMENT ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g:1:152: SL_COMMENT // alt
+    // FuzzyJava.gl:1:151: ( SL_COMMENT ) // ruleBlockSingleAlt
+    // FuzzyJava.gl:1:152: SL_COMMENT // alt
     {
     [self mSL_COMMENT];
     if (failed) return ;

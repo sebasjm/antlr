@@ -75,11 +75,11 @@ expr:   condExpr
     ;
 
 condExpr
-    :   aexpr ( ('=='^^ | '<'^^) aexpr )?
+    :   aexpr ( ('=='^ | '<'^) aexpr )?
     ;
 
 aexpr
-    :   atom ( '+'^^ atom )*
+    :   atom ( '+'^ atom )*
     ;
 
 atom

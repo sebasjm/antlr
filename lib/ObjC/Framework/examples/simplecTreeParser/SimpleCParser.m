@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 SimpleC.g 2006-12-19 16:11:24
+// $ANTLR 3.0b6 SimpleC.g 2007-01-31 22:04:18
 
 #import "SimpleCParser.h"
 
@@ -514,8 +514,13 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
+    // token+rule list labels
+    // rule labels
     SimpleCParser_declaration_return * _declaration1 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
 
 
     @try {
@@ -540,16 +545,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	case 1 :
         	    // SimpleC.g:17:9: declaration // alt
         	    {
-        	    id root_1 = (id)[treeAdaptor emptyTree];
-
         	    [following addObject:FOLLOW_declaration_in_program85];
         	    _declaration1 = [self declaration];
         	    [following removeLastObject];
 
 
-        	    [treeAdaptor addChild:[_declaration1 tree] toTree:root_1];
-
-        	    [treeAdaptor addChild:root_1 toTree:root_0];
+        	    [treeAdaptor addChild:[_declaration1 tree] toTree:root_0];
 
         	    }
         	    break;
@@ -595,7 +596,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _char_literal4 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_variable_return * _variable2 = nil;
 
     SimpleCParser_functionHeader_return * _functionHeader3 = nil;
@@ -604,6 +608,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     SimpleCParser_block_return * _block6 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
     NSMutableArray *_list_functionHeader = [[NSMutableArray alloc] init];
     NSMutableArray *_list_block = [[NSMutableArray alloc] init];
     NSMutableArray *_list_21 = [[NSMutableArray alloc] init];
@@ -743,11 +749,16 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _char_literal9 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_type_return * _type7 = nil;
 
     SimpleCParser_declarator_return * _declarator8 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
     NSMutableArray *_list_type = [[NSMutableArray alloc] init];
     NSMutableArray *_list_declarator = [[NSMutableArray alloc] init];
     NSMutableArray *_list_21 = [[NSMutableArray alloc] init];
@@ -833,7 +844,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _ID10 = nil;
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
 
     id _ID10_tree = nil;
 
@@ -882,16 +898,21 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _ID12 = nil;
     ANTLRToken * _char_literal13 = nil;
     ANTLRToken * _char_literal15 = nil;
     ANTLRToken * _char_literal17 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_type_return * _type11 = nil;
 
     SimpleCParser_formalParameter_return * _formalParameter14 = nil;
 
     SimpleCParser_formalParameter_return * _formalParameter16 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
     NSMutableArray *_list_formalParameter = [[NSMutableArray alloc] init];
     NSMutableArray *_list_type = [[NSMutableArray alloc] init];
     NSMutableArray *_list_24 = [[NSMutableArray alloc] init];
@@ -1064,10 +1085,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
+    // token+rule list labels
+    // rule labels
     SimpleCParser_type_return * _type18 = nil;
 
     SimpleCParser_declarator_return * _declarator19 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
     NSMutableArray *_list_type = [[NSMutableArray alloc] init];
     NSMutableArray *_list_declarator = [[NSMutableArray alloc] init];
 
@@ -1144,7 +1170,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _set20 = nil;
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
 
     id _set20_tree = nil;
 
@@ -1189,7 +1220,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end type
 
 // $ANTLR start block
-// SimpleC.g:50:1: block : lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,"BLOCK"] ( variable )* ( stat )* ) ;
+// SimpleC.g:50:1: block : lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,\"BLOCK\"] ( variable )* ( stat )* ) ;
 - (SimpleCParser_block_return *) block
 {
     SimpleCParser_block_return * _retval = [[SimpleCParser_block_return alloc] init]; 
@@ -1197,12 +1228,17 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _lc = nil;
     ANTLRToken * _char_literal23 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_variable_return * _variable21 = nil;
 
     SimpleCParser_stat_return * _stat22 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
     NSMutableArray *_list_stat = [[NSMutableArray alloc] init];
     NSMutableArray *_list_variable = [[NSMutableArray alloc] init];
     NSMutableArray *_list_26 = [[NSMutableArray alloc] init];
@@ -1372,9 +1408,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _char_literal26 = nil;
     ANTLRToken * _char_literal29 = nil;
     ANTLRToken * _char_literal30 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_forStat_return * _forStat24 = nil;
 
     SimpleCParser_expr_return * _expr25 = nil;
@@ -1383,6 +1422,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     SimpleCParser_assignStat_return * _assignStat28 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
 
     id _char_literal26_tree = nil;
     id _char_literal29_tree = nil;
@@ -1538,11 +1579,14 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _string_literal31 = nil;
     ANTLRToken * _char_literal32 = nil;
     ANTLRToken * _char_literal33 = nil;
     ANTLRToken * _char_literal35 = nil;
     ANTLRToken * _char_literal36 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_assignStat_return * _start = nil;
 
     SimpleCParser_assignStat_return * _next = nil;
@@ -1551,6 +1595,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     SimpleCParser_block_return * _block37 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
     NSMutableArray *_list_expr = [[NSMutableArray alloc] init];
     NSMutableArray *_list_assignStat = [[NSMutableArray alloc] init];
     NSMutableArray *_list_block = [[NSMutableArray alloc] init];
@@ -1688,10 +1734,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _ID38 = nil;
     ANTLRToken * _EQ39 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_expr_return * _expr40 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
     NSMutableArray *_list_expr = [[NSMutableArray alloc] init];
     NSMutableArray *_list_SimpleCParser_EQ = [[NSMutableArray alloc] init];
     NSMutableArray *_list_SimpleCParser_ID = [[NSMutableArray alloc] init];
@@ -1777,8 +1828,13 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
+    // token+rule list labels
+    // rule labels
     SimpleCParser_condExpr_return * _condExpr41 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
 
 
     @try {
@@ -1818,7 +1874,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end expr
 
 // $ANTLR start condExpr
-// SimpleC.g:77:1: condExpr : aexpr ( ( '=='^^ | '<'^^ ) aexpr )? ;
+// SimpleC.g:77:1: condExpr : aexpr ( ( '=='^ | '<'^ ) aexpr )? ;
 - (SimpleCParser_condExpr_return *) condExpr
 {
     SimpleCParser_condExpr_return * _retval = [[SimpleCParser_condExpr_return alloc] init]; 
@@ -1826,19 +1882,24 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _string_literal43 = nil;
     ANTLRToken * _char_literal44 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_aexpr_return * _aexpr42 = nil;
 
     SimpleCParser_aexpr_return * _aexpr45 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
 
     id _string_literal43_tree = nil;
     id _char_literal44_tree = nil;
 
     @try {
-        // SimpleC.g:78:9: ( aexpr ( ( '=='^^ | '<'^^ ) aexpr )? ) // ruleBlockSingleAlt
-        // SimpleC.g:78:9: aexpr ( ( '=='^^ | '<'^^ ) aexpr )? // alt
+        // SimpleC.g:78:9: ( aexpr ( ( '=='^ | '<'^ ) aexpr )? ) // ruleBlockSingleAlt
+        // SimpleC.g:78:9: aexpr ( ( '=='^ | '<'^ ) aexpr )? // alt
         {
         root_0 = (id)[treeAdaptor emptyTree];
 
@@ -1848,7 +1909,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
 
         [treeAdaptor addChild:[_aexpr42 tree] toTree:root_0];
-        // SimpleC.g:78:15: ( ( '=='^^ | '<'^^ ) aexpr )? // block
+        // SimpleC.g:78:15: ( ( '=='^ | '<'^ ) aexpr )? // block
         int alt9=2;
         {
         	int LA9_0 = [input LA:1];
@@ -1858,11 +1919,9 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         }
         switch (alt9) {
         	case 1 :
-        	    // SimpleC.g:78:17: ( '=='^^ | '<'^^ ) aexpr // alt
+        	    // SimpleC.g:78:17: ( '=='^ | '<'^ ) aexpr // alt
         	    {
-        	    id root_1 = (id)[treeAdaptor emptyTree];
-
-        	    // SimpleC.g:78:17: ( '=='^^ | '<'^^ ) // block
+        	    // SimpleC.g:78:17: ( '=='^ | '<'^ ) // block
         	    int alt8=2;
         	    {
         	    	int LA8_0 = [input LA:1];
@@ -1879,10 +1938,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    }
         	    switch (alt8) {
         	    	case 1 :
-        	    	    // SimpleC.g:78:18: '=='^^ // alt
+        	    	    // SimpleC.g:78:18: '=='^ // alt
         	    	    {
-        	    	    id root_2 = (id)[treeAdaptor emptyTree];
-
         	    	    _string_literal43=(ANTLRToken *)[input LT:1];
         	    	    [_string_literal43 retain];
         	    	    [self match:input tokenType:SimpleCParser_EQEQ follow:FOLLOW_SimpleCParser_EQEQ_in_condExpr622]; 
@@ -1890,23 +1947,17 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    	    root_0 = (id)[treeAdaptor makeNode:_string_literal43_tree parentOf:root_0];
 
 
-        	    	    [treeAdaptor addChild:root_2 toTree:root_1];
-
         	    	    }
         	    	    break;
         	    	case 2 :
-        	    	    // SimpleC.g:78:27: '<'^^ // alt
+        	    	    // SimpleC.g:78:26: '<'^ // alt
         	    	    {
-        	    	    id root_2 = (id)[treeAdaptor emptyTree];
-
         	    	    _char_literal44=(ANTLRToken *)[input LT:1];
         	    	    [_char_literal44 retain];
         	    	    [self match:input tokenType:SimpleCParser_LT follow:FOLLOW_SimpleCParser_LT_in_condExpr627]; 
         	    	    _char_literal44_tree = (id)[treeAdaptor newTreeWithToken:_char_literal44];
         	    	    root_0 = (id)[treeAdaptor makeNode:_char_literal44_tree parentOf:root_0];
 
-
-        	    	    [treeAdaptor addChild:root_2 toTree:root_1];
 
         	    	    }
         	    	    break;
@@ -1918,9 +1969,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    [following removeLastObject];
 
 
-        	    [treeAdaptor addChild:[_aexpr45 tree] toTree:root_1];
-
-        	    [treeAdaptor addChild:root_1 toTree:root_0];
+        	    [treeAdaptor addChild:[_aexpr45 tree] toTree:root_0];
 
         	    }
         	    break;
@@ -1955,7 +2004,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // $ANTLR end condExpr
 
 // $ANTLR start aexpr
-// SimpleC.g:81:1: aexpr : atom ( '+'^^ atom )* ;
+// SimpleC.g:81:1: aexpr : atom ( '+'^ atom )* ;
 - (SimpleCParser_aexpr_return *) aexpr
 {
     SimpleCParser_aexpr_return * _retval = [[SimpleCParser_aexpr_return alloc] init]; 
@@ -1963,17 +2012,22 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _char_literal47 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_atom_return * _atom46 = nil;
 
     SimpleCParser_atom_return * _atom48 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
 
     id _char_literal47_tree = nil;
 
     @try {
-        // SimpleC.g:82:9: ( atom ( '+'^^ atom )* ) // ruleBlockSingleAlt
-        // SimpleC.g:82:9: atom ( '+'^^ atom )* // alt
+        // SimpleC.g:82:9: ( atom ( '+'^ atom )* ) // ruleBlockSingleAlt
+        // SimpleC.g:82:9: atom ( '+'^ atom )* // alt
         {
         root_0 = (id)[treeAdaptor emptyTree];
 
@@ -1994,10 +2048,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
             }
             switch (alt10) {
         	case 1 :
-        	    // SimpleC.g:82:16: '+'^^ atom // alt
+        	    // SimpleC.g:82:16: '+'^ atom // alt
         	    {
-        	    id root_1 = (id)[treeAdaptor emptyTree];
-
         	    _char_literal47=(ANTLRToken *)[input LT:1];
         	    [_char_literal47 retain];
         	    [self match:input tokenType:SimpleCParser_PLUS follow:FOLLOW_SimpleCParser_PLUS_in_aexpr657]; 
@@ -2009,9 +2061,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    [following removeLastObject];
 
 
-        	    [treeAdaptor addChild:[_atom48 tree] toTree:root_1];
-
-        	    [treeAdaptor addChild:root_1 toTree:root_0];
+        	    [treeAdaptor addChild:[_atom48 tree] toTree:root_0];
 
         	    }
         	    break;
@@ -2056,12 +2106,17 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
     id root_0 = nil;
 
+    // token labels
     ANTLRToken * _ID49 = nil;
     ANTLRToken * _INT50 = nil;
     ANTLRToken * _char_literal51 = nil;
     ANTLRToken * _char_literal53 = nil;
+    // token+rule list labels
+    // rule labels
     SimpleCParser_expr_return * _expr52 = nil;
 
+    // rule list labels
+    // rule refs in alts with rewrites
     NSMutableArray *_list_expr = [[NSMutableArray alloc] init];
     NSMutableArray *_list_24 = [[NSMutableArray alloc] init];
     NSMutableArray *_list_22 = [[NSMutableArray alloc] init];

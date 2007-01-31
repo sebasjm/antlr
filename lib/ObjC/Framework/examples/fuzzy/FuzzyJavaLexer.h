@@ -1,8 +1,7 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/fuzzy/FuzzyJava.g 2006-11-12 22:52:36
+// $ANTLR 3.0b6 FuzzyJava.gl 2007-01-30 22:43:26
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
-
 
 #pragma mark Cyclic DFA start
 #pragma mark Cyclic DFA end
