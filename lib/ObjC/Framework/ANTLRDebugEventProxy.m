@@ -74,7 +74,7 @@ static unsigned lengthOfUTF8Ack = 0;
 		NSAssert1(serverSocket != -1, @"Failed to create debugger socket. %s", strerror(errno));
 		
 		int yes = 1;
-		setsockopt(serverSocket, SOL_SOCKET, SO_KEEPALIVE|SO_REUSEADDR|TCP_NODELAY, (void *)&yes, sizeof(int));
+		setsockopt(serverSocket, SOL_SOCKET, SO_KEEPALIVE|SO_REUSEPORT|SO_REUSEADDR|TCP_NODELAY, (void *)&yes, sizeof(int));
 
 		struct sockaddr_in server_addr;
 		bzero(&server_addr, sizeof(struct sockaddr_in));
@@ -84,6 +84,8 @@ static unsigned lengthOfUTF8Ack = 0;
 		NSAssert1( bind(serverSocket, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) != -1, @"bind(2) failed. %s", strerror(errno));
 
 		NSAssert1(listen(serverSocket,50) == 0, @"listen(2) failed. %s", strerror(errno));
+		
+		NSLog(@"ANTLR waiting for debugger attach (grammar %@)", [self grammarName]);
 		
 		debuggerSocket = accept(serverSocket, &debugger_sockaddr, &debugger_socklen);
 		NSAssert1( debuggerSocket != -1, @"accept(2) failed. %s", strerror(errno));

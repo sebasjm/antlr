@@ -1,8 +1,7 @@
-// $ANTLR 3.0b5 SimpleCTP.g 2006-12-19 19:06:42
+// $ANTLR 3.0b6 SimpleCTP.gtp 2007-01-31 21:58:34
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
-#import <ANTLR/ANTLRDebug.h>
 
 
 #pragma mark Cyclic DFA
@@ -34,11 +33,9 @@
 #pragma mark Rule Return Scopes
 
 
-@interface SimpleCTP : ANTLRDebugTreeParser {
+@interface SimpleCTP : ANTLRTreeParser {
 
 													
-	int ruleLevel;
-	NSArray *ruleNames;
 
  }
 
@@ -56,8 +53,6 @@
 - (void) expr;
 - (void) atom;
 
-
--(BOOL) evalPredicate:(NSString *)predicate matched:(BOOL)result;
 
 
 @end
