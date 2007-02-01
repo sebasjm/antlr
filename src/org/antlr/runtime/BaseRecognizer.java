@@ -665,7 +665,9 @@ public abstract class BaseRecognizer {
 	 *
 	 *    a : ids+=rule -> foo(ids={toTemplates($ids)})
 	 *      ;
-	 */
+	 *  TJP: this is not needed anymore.  $ids is a List of templates
+	 *  when output=template
+	 * 
 	public List toTemplates(List retvals) {
 		if ( retvals==null ) return null;
 		List strings = new ArrayList(retvals.size());
@@ -674,6 +676,7 @@ public abstract class BaseRecognizer {
 		}
 		return strings;
 	}
+	 */
 
 	/** Given a rule number and a start token index number, return
 	 *  MEMO_RULE_UNKNOWN if the rule has not parsed input starting from
