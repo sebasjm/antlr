@@ -906,11 +906,6 @@ public class DFA {
      *  TODO: I call getUniquelyPredicatedAlt too much; cache predicted alt
      */
     protected boolean doesStateReachAcceptState(DFAState d) {
-		if ( d.dfa.decisionNumber==35 ) {
-		System.out.println("doesStateReachAcceptState processing DFA state "+
-                d.stateNumber);
-		}
-
 		if ( d.isAcceptState() ) {
             // accept states have no edges emanating from them so we can return
             d.setAcceptStateReachable(REACHABLE_YES);
