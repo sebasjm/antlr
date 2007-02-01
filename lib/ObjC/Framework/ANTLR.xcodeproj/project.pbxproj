@@ -194,42 +194,42 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F76287450B7151E3006AA7EF /* Regenerate fuzzy */;
+			remoteGlobalIDString = F76287450B7151E3006AA7EF;
 			remoteInfo = "Regenerate fuzzy";
 		};
 		F76287A60B7157C2006AA7EF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F762877E0B71559C006AA7EF /* Regenerate combined */;
+			remoteGlobalIDString = F762877E0B71559C006AA7EF;
 			remoteInfo = "Regenerate combined";
 		};
 		F76287A80B7157C2006AA7EF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F76287820B71559F006AA7EF /* Regenerate LL-star */;
+			remoteGlobalIDString = F76287820B71559F006AA7EF;
 			remoteInfo = "Regenerate LL-star";
 		};
 		F76287AA0B7157C2006AA7EF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F76287860B7155A2006AA7EF /* Regenerate hoistedPredicates */;
+			remoteGlobalIDString = F76287860B7155A2006AA7EF;
 			remoteInfo = "Regenerate hoistedPredicates";
 		};
 		F76287AC0B7157C2006AA7EF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F762878A0B7155AB006AA7EF /* Regenerate scopes */;
+			remoteGlobalIDString = F762878A0B7155AB006AA7EF;
 			remoteInfo = "Regenerate scopes";
 		};
 		F76287AE0B7157C2006AA7EF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F762878E0B7155AF006AA7EF /* Regenerate simplec tree */;
+			remoteGlobalIDString = F762878E0B7155AF006AA7EF;
 			remoteInfo = "Regenerate simplec tree";
 		};
 		F79D5AF10A0E632A00EA3CEE /* PBXContainerItemProxy */ = {
