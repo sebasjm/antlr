@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0b5
-November 15, 2006
+ANTLR 3.0b6
+January 31, 2007
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -19,18 +19,27 @@ You should use v3 in conjunction with ANTLRWorks:
 
     http://www.antlr.org/works/index.html 
 
-WARNING: There is no documentation yet (I plan on starting a book,
-which will be available online as I write it) and only the examples
-plus the source to guide you.
+WARNING: We have bits of documentation started, but nothing super-complete
+yet.  The book will be printed May 2007:
+
+http://www.pragmaticprogrammer.com/titles/tpantlr/index.html
+
+but we should have a beta PDF available on that page in Feb 2007.
+
+You also have the examples plus the source to guide you.
 
 See the new wiki FAQ:
 
     http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
+and general doc root:
+
+    http://www.antlr.org/wiki/display/ANTLR3/ANTLR+3+Wiki+Home
+
 Please help add/update FAQ entries.
 
 I have made very little effort at this point to deal well with
-erroneous input (e.g., bad syntax makes ANTLR crash).  I will clean
+erroneous input (e.g., bad syntax might make ANTLR crash).  I will clean
 this up after I've rewritten v3 in v3.
 
 Per the license in LICENSE.txt, this software is not guaranteed to
@@ -70,13 +79,16 @@ What is ANTLR?
 ANTLR stands for (AN)other (T)ool for (L)anguage (R)ecognition and was
 originally known as PCCTS.  ANTLR is a language tool that provides a
 framework for constructing recognizers, compilers, and translators
-from grammatical descriptions containing actions (this release only
-allows Java actions).  See http://www.antlr.org/v3 for a list of
-targets/contributors.
+from grammatical descriptions containing actions.  Target language list:
+
+http://www.antlr.org/wiki/display/ANTLR3/Code+Generation+Targets
 
 ----------------------------------------------------------------------
 
 How is ANTLR v3 different than ANTLR v2?
+
+See migration guide:
+    http://www.antlr.org/wiki/display/ANTLR3/Migrating+from+ANTLR+2+to+ANTLR+3
 
 ANTLR v3 has a far superior parsing algorithm called LL(*) that
 handles many more grammars than v2 does.  In practice, it means you
@@ -175,12 +187,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0b5/README.txt (this file)
-antlr-3.0b5/LICENSE.txt
-antlr-3.0b5/src/org/antlr/...
-antlr-3.0b5/lib/stringtemplate-3.0.jar (3.0b5 needs 3.0)
-antlr-3.0b5/lib/antlr-2.7.7.jar
-antlr-3.0b5/lib/antlr-3.0b5.jar
+antlr-3.0b6/README.txt (this file)
+antlr-3.0b6/LICENSE.txt
+antlr-3.0b6/src/org/antlr/...
+antlr-3.0b6/lib/stringtemplate-3.0.jar (3.0b6 needs 3.0)
+antlr-3.0b6/lib/antlr-2.7.7.jar
+antlr-3.0b6/lib/antlr-3.0b6.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -193,7 +205,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0b5 (August 24, 2006) 1989-2006
+ANTLR Parser Generator   Early Access Version 3.0b6 (Jan 31, 2007) 1989-2007
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir          specify output directory where all output is generated
   -lib dir              specify location of token files
@@ -260,11 +272,11 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0b5/lib/stringtemplate-2.3b9.jar
-antlr-3.0b5/lib/antlr-2.7.6.jar
+antlr-3.0b6/lib/stringtemplate-3.0.jar
+antlr-3.0b6/lib/antlr-2.7.7.jar
 junit.jar [if you want to build the test directories]
 
-then jump into antlr-3.0b5/src directory and then type:
+then jump into antlr-3.0b6/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -285,7 +297,7 @@ C# Target Notes
 
 CHANGES
 
-3.0b6 - ??
+3.0b6 - January 31, 2007
 
 January 30, 2007
 
