@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 T.g 2007-01-31 23:22:22
+// $ANTLR 3.0b6 T.g 2007-02-01 01:27:58
 
 #import "TParser.h"
 /** Demonstrates how semantic predicates get hoisted out of the rule in 

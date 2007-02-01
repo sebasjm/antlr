@@ -1,8 +1,7 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g 2006-11-12 20:47:00
+// $ANTLR 3.0b6 SymbolTable.g 2007-02-01 01:28:00
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
-
 
 
 #pragma mark Cyclic DFA

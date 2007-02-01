@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g 2006-11-12 20:47:02
+// $ANTLR 3.0b6 SymbolTable.g 2007-02-01 01:28:00
 
 #import "SymbolTableLexer.h"
 #pragma mark Cyclic DFAs
@@ -22,17 +22,29 @@
 	[super dealloc];
 }
 
+- (NSString *) grammarFileName
+{
+	return @"SymbolTable.g";
+}
+
 
 - (void) mT7
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_T7;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:7:6: ( 'method' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:7:6: 'method' // alt
+		// SymbolTable.g:7:6: ( 'method' ) // ruleBlockSingleAlt
+		// SymbolTable.g:7:6: 'method' // alt
 		{
 		[self matchString:@"method"];
 
@@ -40,9 +52,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -57,14 +70,21 @@
 
 - (void) mT8
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_T8;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:8:6: ( '(' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:8:6: '(' // alt
+		// SymbolTable.g:8:6: ( '(' ) // ruleBlockSingleAlt
+		// SymbolTable.g:8:6: '(' // alt
 		{
 		[self matchChar:'('];
 
@@ -72,9 +92,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -89,14 +110,21 @@
 
 - (void) mT9
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_T9;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:9:6: ( ')' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:9:6: ')' // alt
+		// SymbolTable.g:9:6: ( ')' ) // ruleBlockSingleAlt
+		// SymbolTable.g:9:6: ')' // alt
 		{
 		[self matchChar:')'];
 
@@ -104,9 +132,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -121,14 +150,21 @@
 
 - (void) mT10
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_T10;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:10:7: ( '{' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:10:7: '{' // alt
+		// SymbolTable.g:10:7: ( '{' ) // ruleBlockSingleAlt
+		// SymbolTable.g:10:7: '{' // alt
 		{
 		[self matchChar:'{'];
 
@@ -136,9 +172,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -153,14 +190,21 @@
 
 - (void) mT11
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_T11;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:11:7: ( '}' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:11:7: '}' // alt
+		// SymbolTable.g:11:7: ( '}' ) // ruleBlockSingleAlt
+		// SymbolTable.g:11:7: '}' // alt
 		{
 		[self matchChar:'}'];
 
@@ -168,9 +212,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -185,14 +230,21 @@
 
 - (void) mT12
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_T12;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:12:7: ( '=' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:12:7: '=' // alt
+		// SymbolTable.g:12:7: ( '=' ) // ruleBlockSingleAlt
+		// SymbolTable.g:12:7: '=' // alt
 		{
 		[self matchChar:'='];
 
@@ -200,9 +252,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -217,14 +270,21 @@
 
 - (void) mT13
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_T13;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:13:7: ( ';' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:13:7: ';' // alt
+		// SymbolTable.g:13:7: ( ';' ) // ruleBlockSingleAlt
+		// SymbolTable.g:13:7: ';' // alt
 		{
 		[self matchChar:';'];
 
@@ -232,9 +292,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -249,14 +310,21 @@
 
 - (void) mT14
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_T14;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:14:7: ( 'int' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:14:7: 'int' // alt
+		// SymbolTable.g:14:7: ( 'int' ) // ruleBlockSingleAlt
+		// SymbolTable.g:14:7: 'int' // alt
 		{
 		[self matchString:@"int"];
 
@@ -264,9 +332,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -281,16 +350,23 @@
 
 - (void) mID
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_ID;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:66:9: ( ( 'a' .. 'z' )+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:66:9: ( 'a' .. 'z' )+ // alt
+		// SymbolTable.g:66:9: ( ( 'a' .. 'z' )+ ) // ruleBlockSingleAlt
+		// SymbolTable.g:66:9: ( 'a' .. 'z' )+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:66:9: ( 'a' .. 'z' )+	// positiveClosureBlock
+		// SymbolTable.g:66:9: ( 'a' .. 'z' )+	// positiveClosureBlock
 		int cnt1=0;
 
 		do {
@@ -304,7 +380,7 @@
 		    }
 		    switch (alt1) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:66:10: 'a' .. 'z' // alt
+			    // SymbolTable.g:66:10: 'a' .. 'z' // alt
 			    {
 			    [self matchRangeFromChar:'a' to:'z'];
 
@@ -322,9 +398,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -339,16 +416,23 @@
 
 - (void) mINT
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_INT;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:69:9: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:69:9: ( '0' .. '9' )+ // alt
+		// SymbolTable.g:69:9: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
+		// SymbolTable.g:69:9: ( '0' .. '9' )+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:69:9: ( '0' .. '9' )+	// positiveClosureBlock
+		// SymbolTable.g:69:9: ( '0' .. '9' )+	// positiveClosureBlock
 		int cnt2=0;
 
 		do {
@@ -362,7 +446,7 @@
 		    }
 		    switch (alt2) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:69:10: '0' .. '9' // alt
+			    // SymbolTable.g:69:10: '0' .. '9' // alt
 			    {
 			    [self matchRangeFromChar:'0' to:'9'];
 
@@ -380,9 +464,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -397,16 +482,23 @@
 
 - (void) mWS
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = SymbolTableLexer_WS;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:72:9: ( ( (' '|'\\n'|'\\r'))+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:72:9: ( (' '|'\\n'|'\\r'))+ // alt
+		// SymbolTable.g:72:9: ( ( (' '|'\\n'|'\\r'))+ ) // ruleBlockSingleAlt
+		// SymbolTable.g:72:9: ( (' '|'\\n'|'\\r'))+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:72:9: ( (' '|'\\n'|'\\r'))+	// positiveClosureBlock
+		// SymbolTable.g:72:9: ( (' '|'\\n'|'\\r'))+	// positiveClosureBlock
 		int cnt3=0;
 
 		do {
@@ -420,7 +512,7 @@
 		    }
 		    switch (alt3) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:72:10: (' '|'\\n'|'\\r') // alt
+			    // SymbolTable.g:72:10: (' '|'\\n'|'\\r') // alt
 			    {
 			    if ([input LA:1]=='\n'||[input LA:1]=='\r'||[input LA:1]==' ') {
 			    	[input consume];
@@ -446,9 +538,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -462,7 +555,7 @@
 
 - (void) mTokens
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:10: ( T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | ID | INT | WS ) //ruleblock
+    // SymbolTable.g:1:10: ( T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | ID | INT | WS ) //ruleblock
     int alt4=11;
     switch ([input LA:1]) {
     	case 'm':
@@ -603,7 +696,7 @@
     	}}
     switch (alt4) {
     	case 1 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:10: T7 // alt
+    	    // SymbolTable.g:1:10: T7 // alt
     	    {
     	    [self mT7];
 
@@ -612,7 +705,7 @@
     	    }
     	    break;
     	case 2 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:13: T8 // alt
+    	    // SymbolTable.g:1:13: T8 // alt
     	    {
     	    [self mT8];
 
@@ -621,7 +714,7 @@
     	    }
     	    break;
     	case 3 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:16: T9 // alt
+    	    // SymbolTable.g:1:16: T9 // alt
     	    {
     	    [self mT9];
 
@@ -630,7 +723,7 @@
     	    }
     	    break;
     	case 4 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:19: T10 // alt
+    	    // SymbolTable.g:1:19: T10 // alt
     	    {
     	    [self mT10];
 
@@ -639,7 +732,7 @@
     	    }
     	    break;
     	case 5 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:23: T11 // alt
+    	    // SymbolTable.g:1:23: T11 // alt
     	    {
     	    [self mT11];
 
@@ -648,7 +741,7 @@
     	    }
     	    break;
     	case 6 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:27: T12 // alt
+    	    // SymbolTable.g:1:27: T12 // alt
     	    {
     	    [self mT12];
 
@@ -657,7 +750,7 @@
     	    }
     	    break;
     	case 7 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:31: T13 // alt
+    	    // SymbolTable.g:1:31: T13 // alt
     	    {
     	    [self mT13];
 
@@ -666,7 +759,7 @@
     	    }
     	    break;
     	case 8 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:35: T14 // alt
+    	    // SymbolTable.g:1:35: T14 // alt
     	    {
     	    [self mT14];
 
@@ -675,7 +768,7 @@
     	    }
     	    break;
     	case 9 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:39: ID // alt
+    	    // SymbolTable.g:1:39: ID // alt
     	    {
     	    [self mID];
 
@@ -684,7 +777,7 @@
     	    }
     	    break;
     	case 10 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:42: INT // alt
+    	    // SymbolTable.g:1:42: INT // alt
     	    {
     	    [self mINT];
 
@@ -693,7 +786,7 @@
     	    }
     	    break;
     	case 11 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:1:46: WS // alt
+    	    // SymbolTable.g:1:46: WS // alt
     	    {
     	    [self mWS];
 

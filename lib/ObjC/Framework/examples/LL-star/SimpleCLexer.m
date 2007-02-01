@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g 2006-12-12 20:50:20
+// $ANTLR 3.0b6 SimpleC.g 2007-02-01 01:27:57
 
 #import "SimpleCLexer.h"
 #pragma mark Cyclic DFAs
@@ -24,12 +24,18 @@
 
 - (NSString *) grammarFileName
 {
-	return @"/Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g";
+	return @"SimpleC.g";
 }
 
 
 - (void) mT7
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T7;
@@ -37,8 +43,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:7:6: ( ';' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:7:6: ';' // alt
+		// SimpleC.g:7:6: ( ';' ) // ruleBlockSingleAlt
+		// SimpleC.g:7:6: ';' // alt
 		{
 		[self matchChar:';'];
 
@@ -64,6 +70,12 @@
 
 - (void) mT8
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T8;
@@ -71,8 +83,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:8:6: ( '(' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:8:6: '(' // alt
+		// SimpleC.g:8:6: ( '(' ) // ruleBlockSingleAlt
+		// SimpleC.g:8:6: '(' // alt
 		{
 		[self matchChar:'('];
 
@@ -98,6 +110,12 @@
 
 - (void) mT9
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T9;
@@ -105,8 +123,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:9:6: ( ',' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:9:6: ',' // alt
+		// SimpleC.g:9:6: ( ',' ) // ruleBlockSingleAlt
+		// SimpleC.g:9:6: ',' // alt
 		{
 		[self matchChar:','];
 
@@ -132,6 +150,12 @@
 
 - (void) mT10
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T10;
@@ -139,8 +163,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:10:7: ( ')' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:10:7: ')' // alt
+		// SimpleC.g:10:7: ( ')' ) // ruleBlockSingleAlt
+		// SimpleC.g:10:7: ')' // alt
 		{
 		[self matchChar:')'];
 
@@ -166,6 +190,12 @@
 
 - (void) mT11
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T11;
@@ -173,8 +203,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:11:7: ( 'int' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:11:7: 'int' // alt
+		// SimpleC.g:11:7: ( 'int' ) // ruleBlockSingleAlt
+		// SimpleC.g:11:7: 'int' // alt
 		{
 		[self matchString:@"int"];
 
@@ -200,6 +230,12 @@
 
 - (void) mT12
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T12;
@@ -207,8 +243,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:12:7: ( 'char' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:12:7: 'char' // alt
+		// SimpleC.g:12:7: ( 'char' ) // ruleBlockSingleAlt
+		// SimpleC.g:12:7: 'char' // alt
 		{
 		[self matchString:@"char"];
 
@@ -234,6 +270,12 @@
 
 - (void) mT13
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T13;
@@ -241,8 +283,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:13:7: ( 'void' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:13:7: 'void' // alt
+		// SimpleC.g:13:7: ( 'void' ) // ruleBlockSingleAlt
+		// SimpleC.g:13:7: 'void' // alt
 		{
 		[self matchString:@"void"];
 
@@ -268,6 +310,12 @@
 
 - (void) mT14
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T14;
@@ -275,8 +323,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:14:7: ( '{' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:14:7: '{' // alt
+		// SimpleC.g:14:7: ( '{' ) // ruleBlockSingleAlt
+		// SimpleC.g:14:7: '{' // alt
 		{
 		[self matchChar:'{'];
 
@@ -302,6 +350,12 @@
 
 - (void) mT15
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T15;
@@ -309,8 +363,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:15:7: ( '}' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:15:7: '}' // alt
+		// SimpleC.g:15:7: ( '}' ) // ruleBlockSingleAlt
+		// SimpleC.g:15:7: '}' // alt
 		{
 		[self matchChar:'}'];
 
@@ -336,6 +390,12 @@
 
 - (void) mT16
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T16;
@@ -343,8 +403,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:16:7: ( 'for' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:16:7: 'for' // alt
+		// SimpleC.g:16:7: ( 'for' ) // ruleBlockSingleAlt
+		// SimpleC.g:16:7: 'for' // alt
 		{
 		[self matchString:@"for"];
 
@@ -370,6 +430,12 @@
 
 - (void) mT17
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T17;
@@ -377,8 +443,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:17:7: ( '=' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:17:7: '=' // alt
+		// SimpleC.g:17:7: ( '=' ) // ruleBlockSingleAlt
+		// SimpleC.g:17:7: '=' // alt
 		{
 		[self matchChar:'='];
 
@@ -404,6 +470,12 @@
 
 - (void) mT18
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T18;
@@ -411,8 +483,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:18:7: ( '==' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:18:7: '==' // alt
+		// SimpleC.g:18:7: ( '==' ) // ruleBlockSingleAlt
+		// SimpleC.g:18:7: '==' // alt
 		{
 		[self matchString:@"=="];
 
@@ -438,6 +510,12 @@
 
 - (void) mT19
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T19;
@@ -445,8 +523,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:19:7: ( '<' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:19:7: '<' // alt
+		// SimpleC.g:19:7: ( '<' ) // ruleBlockSingleAlt
+		// SimpleC.g:19:7: '<' // alt
 		{
 		[self matchChar:'<'];
 
@@ -472,6 +550,12 @@
 
 - (void) mT20
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_T20;
@@ -479,8 +563,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:20:7: ( '+' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:20:7: '+' // alt
+		// SimpleC.g:20:7: ( '+' ) // ruleBlockSingleAlt
+		// SimpleC.g:20:7: '+' // alt
 		{
 		[self matchChar:'+'];
 
@@ -506,6 +590,12 @@
 
 - (void) mID
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_ID;
@@ -513,8 +603,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:94:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:94:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* // alt
+		// SimpleC.g:94:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* ) // ruleBlockSingleAlt
+		// SimpleC.g:94:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* // alt
 		{
 		if (([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			[input consume];
@@ -535,7 +625,7 @@
 		    }
 		    switch (alt1) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:94:34: ('a'..'z'|'A'..'Z'|'0'..'9'|'_') // alt
+			    // SimpleC.g:94:34: ('a'..'z'|'A'..'Z'|'0'..'9'|'_') // alt
 			    {
 			    if (([input LA:1]>='0' && [input LA:1]<='9')||([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			    	[input consume];
@@ -575,6 +665,12 @@
 
 - (void) mINT
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_INT;
@@ -582,10 +678,10 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:97:7: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:97:7: ( '0' .. '9' )+ // alt
+		// SimpleC.g:97:7: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
+		// SimpleC.g:97:7: ( '0' .. '9' )+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:97:7: ( '0' .. '9' )+	// positiveClosureBlock
+		// SimpleC.g:97:7: ( '0' .. '9' )+	// positiveClosureBlock
 		int cnt2=0;
 
 		do {
@@ -599,7 +695,7 @@
 		    }
 		    switch (alt2) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:97:8: '0' .. '9' // alt
+			    // SimpleC.g:97:8: '0' .. '9' // alt
 			    {
 			    [self matchRangeFromChar:'0' to:'9'];
 
@@ -635,6 +731,12 @@
 
 - (void) mWS
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
 		ruleNestingLevel++;
 		int _type = SimpleCLexer_WS;
@@ -642,10 +744,10 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:100:9: ( ( (' '|'\\t'|'\\r'|'\\n'))+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:100:9: ( (' '|'\\t'|'\\r'|'\\n'))+ // alt
+		// SimpleC.g:100:9: ( ( (' '|'\\t'|'\\r'|'\\n'))+ ) // ruleBlockSingleAlt
+		// SimpleC.g:100:9: ( (' '|'\\t'|'\\r'|'\\n'))+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:100:9: ( (' '|'\\t'|'\\r'|'\\n'))+	// positiveClosureBlock
+		// SimpleC.g:100:9: ( (' '|'\\t'|'\\r'|'\\n'))+	// positiveClosureBlock
 		int cnt3=0;
 
 		do {
@@ -659,7 +761,7 @@
 		    }
 		    switch (alt3) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:100:13: (' '|'\\t'|'\\r'|'\\n') // alt
+			    // SimpleC.g:100:13: (' '|'\\t'|'\\r'|'\\n') // alt
 			    {
 			    if (([input LA:1]>='\t' && [input LA:1]<='\n')||[input LA:1]=='\r'||[input LA:1]==' ') {
 			    	[input consume];
@@ -702,7 +804,7 @@
 
 - (void) mTokens
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:10: ( T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | T15 | T16 | T17 | T18 | T19 | T20 | ID | INT | WS ) //ruleblock
+    // SimpleC.g:1:10: ( T7 | T8 | T9 | T10 | T11 | T12 | T13 | T14 | T15 | T16 | T17 | T18 | T19 | T20 | ID | INT | WS ) //ruleblock
     int alt4=17;
     switch ([input LA:1]) {
     	case ';':
@@ -926,7 +1028,7 @@
     	}}
     switch (alt4) {
     	case 1 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:10: T7 // alt
+    	    // SimpleC.g:1:10: T7 // alt
     	    {
     	    [self mT7];
 
@@ -935,7 +1037,7 @@
     	    }
     	    break;
     	case 2 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:13: T8 // alt
+    	    // SimpleC.g:1:13: T8 // alt
     	    {
     	    [self mT8];
 
@@ -944,7 +1046,7 @@
     	    }
     	    break;
     	case 3 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:16: T9 // alt
+    	    // SimpleC.g:1:16: T9 // alt
     	    {
     	    [self mT9];
 
@@ -953,7 +1055,7 @@
     	    }
     	    break;
     	case 4 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:19: T10 // alt
+    	    // SimpleC.g:1:19: T10 // alt
     	    {
     	    [self mT10];
 
@@ -962,7 +1064,7 @@
     	    }
     	    break;
     	case 5 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:23: T11 // alt
+    	    // SimpleC.g:1:23: T11 // alt
     	    {
     	    [self mT11];
 
@@ -971,7 +1073,7 @@
     	    }
     	    break;
     	case 6 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:27: T12 // alt
+    	    // SimpleC.g:1:27: T12 // alt
     	    {
     	    [self mT12];
 
@@ -980,7 +1082,7 @@
     	    }
     	    break;
     	case 7 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:31: T13 // alt
+    	    // SimpleC.g:1:31: T13 // alt
     	    {
     	    [self mT13];
 
@@ -989,7 +1091,7 @@
     	    }
     	    break;
     	case 8 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:35: T14 // alt
+    	    // SimpleC.g:1:35: T14 // alt
     	    {
     	    [self mT14];
 
@@ -998,7 +1100,7 @@
     	    }
     	    break;
     	case 9 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:39: T15 // alt
+    	    // SimpleC.g:1:39: T15 // alt
     	    {
     	    [self mT15];
 
@@ -1007,7 +1109,7 @@
     	    }
     	    break;
     	case 10 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:43: T16 // alt
+    	    // SimpleC.g:1:43: T16 // alt
     	    {
     	    [self mT16];
 
@@ -1016,7 +1118,7 @@
     	    }
     	    break;
     	case 11 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:47: T17 // alt
+    	    // SimpleC.g:1:47: T17 // alt
     	    {
     	    [self mT17];
 
@@ -1025,7 +1127,7 @@
     	    }
     	    break;
     	case 12 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:51: T18 // alt
+    	    // SimpleC.g:1:51: T18 // alt
     	    {
     	    [self mT18];
 
@@ -1034,7 +1136,7 @@
     	    }
     	    break;
     	case 13 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:55: T19 // alt
+    	    // SimpleC.g:1:55: T19 // alt
     	    {
     	    [self mT19];
 
@@ -1043,7 +1145,7 @@
     	    }
     	    break;
     	case 14 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:59: T20 // alt
+    	    // SimpleC.g:1:59: T20 // alt
     	    {
     	    [self mT20];
 
@@ -1052,7 +1154,7 @@
     	    }
     	    break;
     	case 15 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:63: ID // alt
+    	    // SimpleC.g:1:63: ID // alt
     	    {
     	    [self mID];
 
@@ -1061,7 +1163,7 @@
     	    }
     	    break;
     	case 16 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:66: INT // alt
+    	    // SimpleC.g:1:66: INT // alt
     	    {
     	    [self mINT];
 
@@ -1070,7 +1172,7 @@
     	    }
     	    break;
     	case 17 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/LL-star/SimpleC.g:1:70: WS // alt
+    	    // SimpleC.g:1:70: WS // alt
     	    {
     	    [self mWS];
 

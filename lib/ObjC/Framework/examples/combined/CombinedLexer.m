@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g 2006-11-12 21:51:45
+// $ANTLR 3.0b6 Combined.g 2007-02-01 01:27:56
 
 #import "CombinedLexer.h"
 #pragma mark Cyclic DFAs
@@ -22,17 +22,29 @@
 	[super dealloc];
 }
 
+- (NSString *) grammarFileName
+{
+	return @"Combined.g";
+}
+
 
 - (void) mID
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = CombinedLexer_ID;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:14:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:14:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* // alt
+		// Combined.g:14:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* ) // ruleBlockSingleAlt
+		// Combined.g:14:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* // alt
 		{
 		if (([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			[input consume];
@@ -53,7 +65,7 @@
 		    }
 		    switch (alt1) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:14:34: ('a'..'z'|'A'..'Z'|'0'..'9'|'_') // alt
+			    // Combined.g:14:34: ('a'..'z'|'A'..'Z'|'0'..'9'|'_') // alt
 			    {
 			    if (([input LA:1]>='0' && [input LA:1]<='9')||([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			    	[input consume];
@@ -75,9 +87,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -92,16 +105,23 @@
 
 - (void) mINT
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = CombinedLexer_INT;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:17:9: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:17:9: ( '0' .. '9' )+ // alt
+		// Combined.g:17:9: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
+		// Combined.g:17:9: ( '0' .. '9' )+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:17:9: ( '0' .. '9' )+	// positiveClosureBlock
+		// Combined.g:17:9: ( '0' .. '9' )+	// positiveClosureBlock
 		int cnt2=0;
 
 		do {
@@ -115,7 +135,7 @@
 		    }
 		    switch (alt2) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:17:10: '0' .. '9' // alt
+			    // Combined.g:17:10: '0' .. '9' // alt
 			    {
 			    [self matchRangeFromChar:'0' to:'9'];
 
@@ -133,9 +153,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -150,16 +171,23 @@
 
 - (void) mWS
 {
+	// token labels
+	// token+rule list labels
+	// rule labels
+	// rule list labels
+	// rule refs in alts with rewrites
+
 	@try {
+		ruleNestingLevel++;
 		int _type = CombinedLexer_WS;
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:20:9: ( ( (' '|'\\t'|'\\r'|'\\n'))+ ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:20:9: ( (' '|'\\t'|'\\r'|'\\n'))+ // alt
+		// Combined.g:20:9: ( ( (' '|'\\t'|'\\r'|'\\n'))+ ) // ruleBlockSingleAlt
+		// Combined.g:20:9: ( (' '|'\\t'|'\\r'|'\\n'))+ // alt
 		{
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:20:9: ( (' '|'\\t'|'\\r'|'\\n'))+	// positiveClosureBlock
+		// Combined.g:20:9: ( (' '|'\\t'|'\\r'|'\\n'))+	// positiveClosureBlock
 		int cnt3=0;
 
 		do {
@@ -173,7 +201,7 @@
 		    }
 		    switch (alt3) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:20:13: (' '|'\\t'|'\\r'|'\\n') // alt
+			    // Combined.g:20:13: (' '|'\\t'|'\\r'|'\\n') // alt
 			    {
 			    if (([input LA:1]>='\t' && [input LA:1]<='\n')||[input LA:1]=='\r'||[input LA:1]==' ') {
 			    	[input consume];
@@ -199,9 +227,10 @@
 
 		}
 
-		if ( token == nil ) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
+		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
 	}
 	@finally {
+		ruleNestingLevel--;
         // rule cleanup
 		// token labels
 		// token+rule list labels
@@ -215,7 +244,7 @@
 
 - (void) mTokens
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:1:10: ( ID | INT | WS ) //ruleblock
+    // Combined.g:1:10: ( ID | INT | WS ) //ruleblock
     int alt4=3;
     switch ([input LA:1]) {
     	case 'A':
@@ -299,7 +328,7 @@
     	}}
     switch (alt4) {
     	case 1 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:1:10: ID // alt
+    	    // Combined.g:1:10: ID // alt
     	    {
     	    [self mID];
 
@@ -308,7 +337,7 @@
     	    }
     	    break;
     	case 2 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:1:13: INT // alt
+    	    // Combined.g:1:13: INT // alt
     	    {
     	    [self mINT];
 
@@ -317,7 +346,7 @@
     	    }
     	    break;
     	case 3 :
-    	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:1:17: WS // alt
+    	    // Combined.g:1:17: WS // alt
     	    {
     	    [self mWS];
 

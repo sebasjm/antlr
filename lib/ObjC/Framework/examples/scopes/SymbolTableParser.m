@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g 2006-11-12 20:47:00
+// $ANTLR 3.0b6 SymbolTable.g 2007-02-01 01:28:00
 
 #import "SymbolTableParser.h"
 
@@ -86,7 +86,9 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 {
 	if ((self = [super initWithTokenStream:aStream])) {
 
-		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>",     @"ID",     @"INT",     @"WS",     @"'method'",     @"'('",     @"')'",     @"'{'",     @"'}'",     @"'='",     @"';'",     @"'int'", nil];
+		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>", 
+	@"ID", @"INT", @"WS", @"'method'", @"'('", @"')'", @"'{'", @"'}'", @"'='", 
+	@"';'", @"'int'", nil];
 
 		SymbolTableParser_Symbols_stack = [[NSMutableArray alloc] init];
 														
@@ -105,14 +107,25 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 	[super dealloc];
 }
 
+- (NSString *) grammarFileName
+{
+	return @"SymbolTable.g";
+}
+
 
 // $ANTLR start prog
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:25:1: prog : globals ( method )* ;
+// SymbolTable.g:25:1: prog : globals ( method )* ;
 - (void) prog
 {
+    // token labels
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
+
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:25:9: ( globals ( method )* ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:25:9: globals ( method )* // alt
+        // SymbolTable.g:25:9: ( globals ( method )* ) // ruleBlockSingleAlt
+        // SymbolTable.g:25:9: globals ( method )* // alt
         {
         [following addObject:FOLLOW_globals_in_prog44];
         [self globals];
@@ -130,7 +143,7 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
             }
             switch (alt1) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:25:18: method // alt
+        	    // SymbolTable.g:25:18: method // alt
         	    {
         	    [following addObject:FOLLOW_method_in_prog47];
         	    [self method];
@@ -166,18 +179,24 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 // $ANTLR end prog
 
 // $ANTLR start globals
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:28:1: globals : ( decl )* ;
+// SymbolTable.g:28:1: globals : ( decl )* ;
 - (void) globals
 {
     [SymbolTableParser_Symbols_stack addObject:[[[SymbolTableParserSymbolsScope alloc] init] autorelease]];
+
+    // token labels
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
 
 
         level++;
         [[SymbolTableParser_Symbols_stack lastObject] setValue: [[NSMutableArray alloc] init] forKey:@"names"];
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:34:9: ( ( decl )* ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:34:9: ( decl )* // alt
+        // SymbolTable.g:34:9: ( ( decl )* ) // ruleBlockSingleAlt
+        // SymbolTable.g:34:9: ( decl )* // alt
         {
         do {
             int alt2=2;
@@ -190,7 +209,7 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
             }
             switch (alt2) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:34:10: decl // alt
+        	    // SymbolTable.g:34:10: decl // alt
         	    {
         	    [following addObject:FOLLOW_decl_in_globals79];
         	    [self decl];
@@ -232,12 +251,18 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 // $ANTLR end globals
 
 // $ANTLR start method
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:41:1: method : 'method' ID '(' ')' block ;
+// SymbolTable.g:41:1: method : 'method' ID '(' ')' block ;
 - (void) method
 {
+    // token labels
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
+
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:42:9: ( 'method' ID '(' ')' block ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:42:9: 'method' ID '(' ')' block // alt
+        // SymbolTable.g:42:9: ( 'method' ID '(' ')' block ) // ruleBlockSingleAlt
+        // SymbolTable.g:42:9: 'method' ID '(' ')' block // alt
         {
         [self match:input tokenType:7 follow:FOLLOW_7_in_method110]; 
         [self match:input tokenType:SymbolTableParser_ID follow:FOLLOW_SymbolTableParser_ID_in_method112]; 
@@ -268,18 +293,24 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 // $ANTLR end method
 
 // $ANTLR start block
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:45:1: block : '{' ( decl )* ( stat )* '}' ;
+// SymbolTable.g:45:1: block : '{' ( decl )* ( stat )* '}' ;
 - (void) block
 {
     [SymbolTableParser_Symbols_stack addObject:[[[SymbolTableParserSymbolsScope alloc] init] autorelease]];
+
+    // token labels
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
 
 
         level++;
         [[SymbolTableParser_Symbols_stack lastObject] setValue: [[NSMutableArray alloc] init] forKey:@"names"];
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:51:9: ( '{' ( decl )* ( stat )* '}' ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:51:9: '{' ( decl )* ( stat )* '}' // alt
+        // SymbolTable.g:51:9: ( '{' ( decl )* ( stat )* '}' ) // ruleBlockSingleAlt
+        // SymbolTable.g:51:9: '{' ( decl )* ( stat )* '}' // alt
         {
         [self match:input tokenType:10 follow:FOLLOW_10_in_block147]; 
         do {
@@ -293,7 +324,7 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
             }
             switch (alt3) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:51:14: decl // alt
+        	    // SymbolTable.g:51:14: decl // alt
         	    {
         	    [following addObject:FOLLOW_decl_in_block150];
         	    [self decl];
@@ -320,7 +351,7 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
             }
             switch (alt4) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:51:22: stat // alt
+        	    // SymbolTable.g:51:22: stat // alt
         	    {
         	    [following addObject:FOLLOW_stat_in_block155];
         	    [self stat];
@@ -363,11 +394,17 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 // $ANTLR end block
 
 // $ANTLR start stat
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:58:1: stat : ( ID '=' INT ';' | block );
+// SymbolTable.g:58:1: stat : ( ID '=' INT ';' | block );
 - (void) stat
 {
+    // token labels
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
+
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:58:9: ( ID '=' INT ';' | block ) //ruleblock
+        // SymbolTable.g:58:9: ( ID '=' INT ';' | block ) //ruleblock
         int alt5=2;
         {
         	int LA5_0 = [input LA:1];
@@ -384,7 +421,7 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
         }
         switch (alt5) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:58:9: ID '=' INT ';' // alt
+        	    // SymbolTable.g:58:9: ID '=' INT ';' // alt
         	    {
         	    [self match:input tokenType:SymbolTableParser_ID follow:FOLLOW_SymbolTableParser_ID_in_stat183]; 
         	    [self match:input tokenType:12 follow:FOLLOW_12_in_stat185]; 
@@ -394,7 +431,7 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
         	    }
         	    break;
         	case 2 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:59:9: block // alt
+        	    // SymbolTable.g:59:9: block // alt
         	    {
         	    [following addObject:FOLLOW_block_in_stat199];
         	    [self block];
@@ -423,14 +460,19 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 // $ANTLR end stat
 
 // $ANTLR start decl
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:62:1: decl : 'int' ID ';' ;
+// SymbolTable.g:62:1: decl : 'int' ID ';' ;
 - (void) decl
 {
+    // token labels
     ANTLRToken * _ID1 = nil;
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
 
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:62:9: ( 'int' ID ';' ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/scopes/SymbolTable.g:62:9: 'int' ID ';' // alt
+        // SymbolTable.g:62:9: ( 'int' ID ';' ) // ruleBlockSingleAlt
+        // SymbolTable.g:62:9: 'int' ID ';' // alt
         {
         [self match:input tokenType:14 follow:FOLLOW_14_in_decl213]; 
         _ID1=(ANTLRToken *)[input LT:1];

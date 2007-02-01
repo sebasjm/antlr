@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 FuzzyJava.gl 2007-01-30 22:43:26
+// $ANTLR 3.0b6 FuzzyJava.gl 2007-02-01 01:27:55
 
 #import "FuzzyJavaLexer.h"
 #pragma mark Cyclic DFAs

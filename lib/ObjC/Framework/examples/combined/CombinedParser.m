@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g 2006-11-12 21:51:44
+// $ANTLR 3.0b6 Combined.g 2007-02-01 01:27:56
 
 #import "CombinedParser.h"
 
@@ -30,7 +30,8 @@ static ANTLRBitSet *FOLLOW_CombinedParser_ID_in_identifier35;
 {
 	if ((self = [super initWithTokenStream:aStream])) {
 
-		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>",     @"ID",     @"INT",     @"WS", nil];
+		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>", 
+	@"ID", @"INT", @"WS", nil];
 
 						
 	}
@@ -44,16 +45,27 @@ static ANTLRBitSet *FOLLOW_CombinedParser_ID_in_identifier35;
 	[super dealloc];
 }
 
+- (NSString *) grammarFileName
+{
+	return @"Combined.g";
+}
+
 
 // $ANTLR start stat
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:7:1: stat : ( identifier )+ ;
+// Combined.g:7:1: stat : ( identifier )+ ;
 - (void) stat
 {
+    // token labels
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
+
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:7:7: ( ( identifier )+ ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:7:7: ( identifier )+ // alt
+        // Combined.g:7:7: ( ( identifier )+ ) // ruleBlockSingleAlt
+        // Combined.g:7:7: ( identifier )+ // alt
         {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:7:7: ( identifier )+	// positiveClosureBlock
+        // Combined.g:7:7: ( identifier )+	// positiveClosureBlock
         int cnt1=0;
 
         do {
@@ -67,7 +79,7 @@ static ANTLRBitSet *FOLLOW_CombinedParser_ID_in_identifier35;
             }
             switch (alt1) {
         	case 1 :
-        	    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:7:7: identifier // alt
+        	    // Combined.g:7:7: identifier // alt
         	    {
         	    [following addObject:FOLLOW_identifier_in_stat20];
         	    [self identifier];
@@ -106,12 +118,18 @@ static ANTLRBitSet *FOLLOW_CombinedParser_ID_in_identifier35;
 // $ANTLR end stat
 
 // $ANTLR start identifier
-// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:9:1: identifier : ID ;
+// Combined.g:9:1: identifier : ID ;
 - (void) identifier
 {
+    // token labels
+    // token+rule list labels
+    // rule labels
+    // rule list labels
+    // rule refs in alts with rewrites
+
     @try {
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:10:7: ( ID ) // ruleBlockSingleAlt
-        // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/combined/Combined.g:10:7: ID // alt
+        // Combined.g:10:7: ( ID ) // ruleBlockSingleAlt
+        // Combined.g:10:7: ID // alt
         {
         [self match:input tokenType:CombinedParser_ID follow:FOLLOW_CombinedParser_ID_in_identifier35]; 
 
