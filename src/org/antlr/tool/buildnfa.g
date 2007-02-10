@@ -251,15 +251,16 @@ alternative returns [StateCluster g=null]
     ;
 
 exceptionGroup
-	:	( exceptionSpec )+
-    ;
-
-exceptionSpec
-    :   #("exception" ( ARG_ACTION )? ( exceptionHandler )*)
+	:	( exceptionHandler )+ (finallyClause)?
+	|	finallyClause
     ;
 
 exceptionHandler
     :    #("catch" ARG_ACTION ACTION)
+    ;
+
+finallyClause
+    :    #("finally" ACTION)
     ;
 
 rewrite

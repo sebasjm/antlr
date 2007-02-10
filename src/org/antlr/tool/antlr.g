@@ -555,7 +555,7 @@ alternative
     altRoot.setLine(LT(1).getLine());
     altRoot.setColumn(LT(1).getColumn());
 }
-    :   ( el:element )+ ( exceptionSpecNoLabel! )?
+    :   ( el:element )+
         {
             if ( #alternative==null ) {
                 #alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);
@@ -574,21 +574,17 @@ alternative
     ;
 
 exceptionGroup
-	:	( exceptionSpec )+
-    ;
-
-exceptionSpec
-    :   "exception"^ ( ARG_ACTION )?
-        ( exceptionHandler )*
-    ;
-
-exceptionSpecNoLabel
-    :   "exception" ( exceptionHandler )*
+	:	( exceptionHandler )+ ( finallyClause )?
+	|	finallyClause
     ;
 
 exceptionHandler
-   :    "catch"^ ARG_ACTION ACTION
-   ;
+    :    "catch"^ ARG_ACTION ACTION
+    ;
+
+finallyClause
+    :    "finally"^ ACTION
+    ;
 
 element
 	:	elementNoOptionSpec //(elementOptionSpec!)?

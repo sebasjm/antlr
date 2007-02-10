@@ -74,7 +74,7 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock);
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize);
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize);
 
 /** How to generate a rule in the lexer; naked blocks are used for
  *  fragment rules.

@@ -482,11 +482,8 @@ block[String blockTemplateName, DFA dfa]
     ;
 
 exceptionGroup[StringTemplate ruleST]
-	:	( exceptionSpec[ruleST] )+  // we only handle one group now
-    ;
-
-exceptionSpec[StringTemplate ruleST]
-    :   #("exception" ( ARG_ACTION )? ( exceptionHandler[ruleST] )*)
+	:	( exceptionHandler[ruleST] )+ (finallyClause[ruleST])?
+	|   finallyClause[ruleST]
     ;
 
 exceptionHandler[StringTemplate ruleST]
@@ -494,6 +491,14 @@ exceptionHandler[StringTemplate ruleST]
     	{
     	List chunks = generator.translateAction(currentRuleName,#ACTION);
     	ruleST.setAttribute("exceptions.{decl,action}",#ARG_ACTION.getText(),chunks);
+    	}
+    ;
+
+finallyClause[StringTemplate ruleST]
+    :    #("finally" ACTION)
+    	{
+    	List chunks = generator.translateAction(currentRuleName,#ACTION);
+    	ruleST.setAttribute("finally",chunks);
     	}
     ;
 

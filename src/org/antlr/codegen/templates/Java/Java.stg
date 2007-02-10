@@ -269,7 +269,7 @@ ruleBacktrackFailure() ::= <<
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::= <<
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
@@ -285,6 +285,8 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     try {
         <ruleMemoization(name=ruleName)>
         <block>
+        <ruleCleanUp()>
+        <(ruleDescriptor.actions.after):execAction()>
     }
 <if(exceptions)>
     <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
@@ -302,9 +304,9 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 <endif>
     finally {
         <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
-        <ruleCleanUp()>
-        <(ruleDescriptor.actions.finally):execAction()>
+        <memoize()>
         <ruleScopeCleanUp()>
+        <finally>
     }
     <@postamble()>
     return <ruleReturnValue()>;
@@ -374,6 +376,9 @@ ruleCleanUp() ::= <<
 retval.stop = input.LT(-1);<\n>
 <endif>
 <endif>
+>>
+
+memoize() ::= <<
 <if(memoize)>
 <if(backtracking)>
 if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
@@ -411,13 +416,14 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
         }<\n>
         }
         )>
+        <ruleCleanUp()>
+        <(ruleDescriptor.actions.after):execAction()>
 <endif>
     }
     finally {
         ruleNestingLevel--;
         <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
-        <ruleCleanUp()>
-        <(ruleDescriptor.actions.finally):execAction()>
+        <memoize()>
     }
 }
 // $ANTLR end <ruleName>

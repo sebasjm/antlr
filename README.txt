@@ -297,6 +297,31 @@ C# Target Notes
 
 CHANGES
 
+February 10, 2007
+
+* changed @finally to be @after and added a finally clause to the
+  exception stuff.  I also removed the superfluous "exception"
+  keyword.  Here's what the new syntax looks like:
+
+  a
+  @after { System.out.println("ick"); }
+    : 'a'
+    ;        
+    catch[RecognitionException e] { System.out.println("foo"); }
+    catch[IOException e] { System.out.println("io"); }
+    finally { System.out.println("foobar"); }
+
+  @after executes after bookkeeping to set $rule.stop, $rule.tree but
+  before scopes pop and any memoization happens.  Dynamic scopes and
+  memoization are still in generated finally block because they must
+  exec even if error in rule.  The @after action and tree setting
+  stuff can technically be skipped upon syntax error in rule.  [Later
+  we might add something to finally to stick an ERROR token in the
+  tree and set the return value.]  Sequence goes: set $stop, $tree (if
+  any), @after (if any), pop scopes (if any), memoize (if needed),
+  grammar finally clause.  Last 3 are in generated code's finally
+  clause.
+
 3.0b6 - January 31, 2007
 
 January 30, 2007

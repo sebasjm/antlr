@@ -2898,7 +2898,7 @@ public class TestAttributes extends BaseTest {
 			"@init {\n" +
 			"   Scope localScope=null;\n" +
 			"}\n" +
-			"@finally {\n" +
+			"@after {\n" +
 			"   $tree.scope = localScope;\n" +
 			"}\n" +
 			"   : 'a' -> ^('a')\n" +
