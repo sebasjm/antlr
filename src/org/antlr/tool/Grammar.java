@@ -52,7 +52,7 @@ public class Grammar {
 	public static final String GRAMMAR_FILE_EXTENSION = ".g";
 
 	/** used for generating lexer temp files */
-	public static final String LEXER_GRAMMAR_FILE_EXTENSION = ".gl";
+	public static final String LEXER_GRAMMAR_FILE_EXTENSION = ".g";
 
 	public static final int INITIAL_DECISION_LIST_SIZE = 300;
 	public static final int INVALID_RULE_INDEX = -1;

@@ -299,6 +299,8 @@ CHANGES
 
 February 10, 2007
 
+* no more .gl files generated.  All .g all the time.
+
 * changed @finally to be @after and added a finally clause to the
   exception stuff.  I also removed the superfluous "exception"
   keyword.  Here's what the new syntax looks like:
