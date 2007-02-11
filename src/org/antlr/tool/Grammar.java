@@ -249,7 +249,7 @@ public class Grammar {
 	 */
 	Map lineColumnToLookaheadDFAMap = new HashMap();
 
-	protected Tool tool;
+	public Tool tool;
 
 	/** The unique set of all rule references in any rule; set of Token
 	 *  objects so two refs to same rule can exist but at different line/position.
@@ -478,17 +478,6 @@ public class Grammar {
 		this.name = name;
 	}
 
-	/** Return the directory containing the grammar file for this grammar.
-	 *  normally this is a relative path from current directory.  People will
-	 *  often do "java org.antlr.Tool grammars/*.g3"  So the file will be
-	 *  "grammar/foo.g3" etc...  This method returns "grammar".
-	 */
-	public String getFileDirectory() {
-		File f = new File(fileName);
-		String parentDir = f.getParent();
-		return parentDir;
-	}
-
 	public void setGrammarContent(String grammarString)
 		throws antlr.RecognitionException, antlr.TokenStreamException
 	{
@@ -593,6 +582,19 @@ public class Grammar {
 			}
 		}
 		return lexerGrammarST.toString();
+	}
+
+	public String getImplicitlyGeneratedLexerFileName() {
+		return name+
+			IGNORE_STRING_IN_GRAMMAR_FILE_NAME +
+			LEXER_GRAMMAR_FILE_EXTENSION;
+	}
+
+	public File getImportedVocabFileName(String vocabName) {
+		return new File(tool.getLibraryDirectory(),
+						File.separator+
+							vocabName+
+							CodeGenerator.VOCAB_FILE_EXTENSION);
 	}
 
 	/** Parse a rule we add artificially that is a list of the other lexer
@@ -1466,9 +1468,10 @@ public class Grammar {
 
 	/** Load a vocab file <vocabName>.tokens and return max token type found. */
 	public int importTokenVocabulary(String vocabName) {
-		String fullName = tool.getLibraryDirectory()+File.separator+vocabName+".tokens";
+		File fullFile = getImportedVocabFileName(vocabName);
 		try {
-			BufferedReader br = tool.getLibraryFile(vocabName+".tokens");
+			BufferedReader br =
+				tool.getLibraryFile(fullFile.toString());
 			StreamTokenizer tokenizer = new StreamTokenizer(br);
 			tokenizer.parseNumbers();
 			tokenizer.wordChars('_', '_');
@@ -1535,16 +1538,16 @@ public class Grammar {
 		}
 		catch (FileNotFoundException fnfe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_FIND_TOKENS_FILE,
-							   fullName);
+							   fullFile);
 		}
 		catch (IOException ioe) {
 			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   fullName,
+							   fullFile,
 							   ioe);
 		}
 		catch (Exception e) {
 			ErrorManager.error(ErrorManager.MSG_ERROR_READING_TOKENS_FILE,
-							   fullName,
+							   fullFile,
 							   e);
 		}
 		return maxTokenType;

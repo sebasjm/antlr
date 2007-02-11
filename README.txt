@@ -297,6 +297,48 @@ C# Target Notes
 
 CHANGES
 
+February 11, 2007
+
+* Added -depend command-line option that, instead of processing files,
+  it shows you what files the input grammar(s) depend on and what files
+  they generate. For combined grammar T.g:
+
+  $ java org.antlr.Tool -depend T.g
+
+  You get:
+
+  TParser.java : T.g
+  T.tokens : T.g
+  T__.g : T.g
+
+  Now, assuming U.g is a tree grammar ref'd T's tokens:
+
+  $ java org.antlr.Tool -depend T.g U.g
+
+  TParser.java : T.g
+  T.tokens : T.g
+  T__.g : T.g
+  U.g: T.tokens
+  U.java : U.g
+  U.tokens : U.g
+
+  Handles spaces by escaping them.  Pays attention to -o, -fo and -lib.
+  Dir 'x y' is a valid dir in current dir.
+
+  $ java org.antlr.Tool -depend -lib /usr/local/lib -o 'x y' T.g U.g
+  x\ y/TParser.java : T.g
+  x\ y/T.tokens : T.g
+  x\ y/T__.g : T.g
+  U.g: /usr/local/lib/T.tokens
+  x\ y/U.java : U.g
+  x\ y/U.tokens : U.g
+
+  You have API access via org.antlr.tool.BuildDependencyGenerator class:
+  getGeneratedFileList(), getDependenciesFileList().  You can also access
+  the output template: getDependencies().  The file
+  org/antlr/tool/templates/depend.stg contains the template.  You can
+  modify as you want.  File objects go in so you can play with path etc...
+
 February 10, 2007
 
 * no more .gl files generated.  All .g all the time.

@@ -177,7 +177,7 @@ public class CodeGenerator {
 	}
 
 	/** load the main language.stg template group file */
-	protected void loadTemplates(String language) {
+	public void loadTemplates(String language) {
 		// get a group loader containing main templates dir and target subdir
 		String templateDirs =
 			classpathTemplateRootDirectoryName+":"+

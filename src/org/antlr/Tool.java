@@ -53,6 +53,7 @@ public class Tool {
 	protected boolean profile = false;
 	protected boolean report = false;
 	protected boolean printGrammar = false;
+	protected boolean depend = false;
 	protected boolean forceAllFilesToOutputDir = false;
 
 	// the internal options are for my use on the command line during dev
@@ -149,6 +150,9 @@ public class Tool {
 			}
 			else if (args[i].equals("-print")) {
 				printGrammar = true;
+			}
+			else if (args[i].equals("-depend")) {
+				depend=true;
 			}
 			else if (args[i].equals("-message-format")) {
 				if (i + 1 >= args.length) {
@@ -247,22 +251,17 @@ public class Tool {
 			    System.out.println(grammarFileName);
 			}
 			try {
-				//StringTemplate.setLintMode(true);
-				FileReader fr = null;
-				try {
-					fr = new FileReader(grammarFileName);
-				}
-				catch (IOException ioe) {
-					ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE,
-									   grammarFileName);
+				if ( depend ) {
+					BuildDependencyGenerator dep =
+						new BuildDependencyGenerator(this, grammarFileName);
+					List outputFiles = dep.getGeneratedFileList();
+					List dependents = dep.getDependenciesFileList();
+					System.out.println("output: "+outputFiles);
+					System.out.println("dependents: "+dependents);
+					System.out.println(dep.getDependencies());
 					continue;
 				}
-				BufferedReader br = new BufferedReader(fr);
-				Grammar grammar = new Grammar(this,grammarFileName,br);
-				grammar.setWatchNFAConversion(internalOption_watchNFAConversion);
-				br.close();
-				fr.close();
-
+				Grammar grammar = getGrammar(grammarFileName);
 				processGrammar(grammar);
 
 				if ( printGrammar ) {
@@ -293,9 +292,7 @@ public class Tool {
 				String lexerGrammarStr = grammar.getLexerGrammar();
 				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
 					String lexerGrammarFileName =
-						grammar.name+
-						Grammar.IGNORE_STRING_IN_GRAMMAR_FILE_NAME +
-						Grammar.LEXER_GRAMMAR_FILE_EXTENSION;
+						grammar.getImplicitlyGeneratedLexerFileName();
 					Writer w = getOutputFile(grammar,lexerGrammarFileName);
 					w.write(lexerGrammarStr);
 					w.close();
@@ -303,7 +300,7 @@ public class Tool {
 					Grammar lexerGrammar = new Grammar();
 					lexerGrammar.setTool(this);
 					File lexerGrammarFullFile =
-						new File(grammar.getFileDirectory(),lexerGrammarFileName);
+						new File(getFileDirectory(lexerGrammarFileName),lexerGrammarFileName);
 					lexerGrammar.setFileName(lexerGrammarFullFile.toString());
 					lexerGrammar.importTokenVocabulary(grammar);
 					lexerGrammar.setGrammarContent(sr);
@@ -311,11 +308,29 @@ public class Tool {
 					processGrammar(lexerGrammar);
 				}
 			}
+			catch (IOException e) {
+				ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE,
+								   grammarFileName);
+			}
 			catch (Exception e) {
 				ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
 			}
 		}
     }
+
+	public Grammar getGrammar(String grammarFileName)
+		throws IOException, antlr.TokenStreamException, antlr.RecognitionException
+	{
+		//StringTemplate.setLintMode(true);
+		FileReader fr = null;
+		fr = new FileReader(grammarFileName);
+		BufferedReader br = new BufferedReader(fr);
+		Grammar grammar = new Grammar(this,grammarFileName,br);
+		grammar.setWatchNFAConversion(internalOption_watchNFAConversion);
+		br.close();
+		fr.close();
+		return grammar;
+	}
 
 	protected void processGrammar(Grammar grammar)
 	{
@@ -379,6 +394,7 @@ public class Tool {
 		System.err.println("  -o outputDir          specify output directory where all output is generated");
 		System.err.println("  -fo outputDir         same as -o but force even files with relative paths to dir");
 		System.err.println("  -lib dir              specify location of token files");
+		System.err.println("  -depend               generate file dependencies");
 		System.err.println("  -report               print out a report about the grammar(s) processed");
 		System.err.println("  -print                print out the grammar without actions");
 		System.err.println("  -debug                generate a parser that emits debugging events");
@@ -430,8 +446,19 @@ public class Tool {
 		if ( outputDirectory==null ) {
 			return new StringWriter();
 		}
+		File outputDir = getOutputDirectory(fileName);
+		File outputFile = new File(outputDir, fileName);
+
+		if( !outputDir.exists() ) {
+			outputDir.mkdirs();
+		}
+        FileWriter fw = new FileWriter(outputFile);
+		return new BufferedWriter(fw);
+    }
+
+	public File getOutputDirectory(String fileName) {
 		File outputDir = new File(outputDirectory);
-		String fileDirectory = g.getFileDirectory();
+		String fileDirectory = getFileDirectory(fileName);
 		if ( outputDirectory!=UNINITIALIZED_DIR ) {
 			// -o /tmp /var/lib/t.g => /tmp/T.java
 			// -o subdir/output /usr/lib/t.g => subdir/output/T.java
@@ -464,13 +491,8 @@ public class Tool {
 			}
 			outputDir = new File(dir);
 		}
-
-		if( !outputDir.exists() ) {
-			outputDir.mkdirs();
-		}
-        FileWriter fw = new FileWriter(new File(outputDir, fileName));
-		return new BufferedWriter(fw);
-    }
+		return outputDir;
+	}
 
 	/** Open a file in the -lib dir.  For now, it's just .tokens files */
 	public BufferedReader getLibraryFile(String fileName) throws IOException {
@@ -482,6 +504,16 @@ public class Tool {
 
 	public String getLibraryDirectory() {
 		return libDirectory;
+	}
+
+	/** Return the directory containing the grammar file for this grammar.
+	 *  normally this is a relative path from current directory.  People will
+	 *  often do "java org.antlr.Tool grammars/*.g3"  So the file will be
+	 *  "grammars/foo.g3" etc...  This method returns "grammars".
+	 */
+	public String getFileDirectory(String fileName) {
+		File f = new File(fileName);
+		return f.getParent();
 	}
 
 	/** If the tool needs to panic/exit, how do we do that? */
