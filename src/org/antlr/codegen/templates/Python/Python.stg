@@ -299,7 +299,7 @@ if self.backtracking > 0:
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::= <<
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize) ::= <<
 <rules:{<returnScope(scope=ruleDescriptor.returnScope)>}>
 
 # $ANTLR start <ruleName>
@@ -315,6 +315,8 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         try:
             <ruleMemoization(name=ruleName)>
             <block>
+            <ruleCleanUp()>
+            <(ruleDescriptor.actions.after):execAction()>
 
 <if(exceptions)>
         <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
@@ -332,9 +334,9 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <endif>
     finally:
         <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
-        <ruleCleanUp()>
-        <(ruleDescriptor.actions.finally):execAction()>
+        <memoize()>
         <ruleScopeCleanUp()>
+        <finally>
         pass
 
     <@postamble()>
@@ -405,8 +407,13 @@ retval
 ruleCleanUp() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 raise NotImplementedError("ruleCleanUp: hasMultipleReturnValues")
+<if(!TREE_PARSER)>
 retval.stop = input.LT(-1);<\n>
 <endif>
+<endif>
+>>
+
+memoize() ::= <<
 <if(memoize)>
 raise NotImplementedError("ruleCleanUp: memoize")
 <if(backtracking)>
@@ -450,13 +457,14 @@ if self.token is None and self.ruleNestingLevel == 1:
         _start, self.getCharIndex()-1
     )
 })>
+        <ruleCleanUp()>
+        <(ruleDescriptor.actions.after):execAction()>
 <endif>
 
     finally:
         self.ruleNestingLevel -= 1
         <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
-        <ruleCleanUp()>
-        <(ruleDescriptor.actions.finally):execAction()>
+	<memoize()>
 
 # $ANTLR end <ruleName>
 
@@ -1265,12 +1273,14 @@ rulePropertyRef_tree(scope,attr) ::= "FIXME(rulePropertyRef_tree) ((<ASTLabelTyp
 rulePropertyRef_text(scope,attr) ::= "FIXME(rulePropertyRef_text) input.toString(retval.start,input.LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "FIXME(rulePropertyRef_st) retval.st"
 
-lexerRulePropertyRef_text(scope,attr) ::= "FIXME(lexerRulePropertyRef_text) getText()"
+lexerRulePropertyRef_text(scope,attr) ::= "self.getText()"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "FIXME(lexerRulePropertyRef_line) _line"
-lexerRulePropertyRef_pos(scope,attr) ::= "FIXME(lexerRulePropertyRef_pos) _charPosition"
-lexerRulePropertyRef_index(scope,attr) ::= "FIXME(lexerRulePropertyRef_index) -1" // undefined token index in lexer
+lexerRulePropertyRef_line(scope,attr) ::= "_line"
+lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
+lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
+lexerRulePropertyRef_start(scope,attr) ::= "_start"
+lexerRulePropertyRef_stop(scope,attr) ::= "(self.getCharIndex()-1)"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error

@@ -1,4 +1,3 @@
-- integrate changes from http://www.antlr.org:8080/pipermail/antlr-dev/2007-February/000950.html
 - dedent actions
 - comments in actions?
 - implement more examples

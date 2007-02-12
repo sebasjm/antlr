@@ -28,3 +28,8 @@ test_%: tests/%.g
 	$(ANTLR) $< \
 	&& PYTHONPATH=. $(PYTHON) $(subst .g,.py,$<) \
 	&& echo "Ok"
+
+
+clean:
+	$(MAKE) -C tests clean
+	rm -f *~ *.pyc
