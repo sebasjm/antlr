@@ -1,12 +1,11 @@
-- implement more examples
+- integrate changes from http://www.antlr.org:8080/pipermail/antlr-dev/2007-February/000950.html
 - dedent actions
 - comments in actions?
+- implement more examples
 - antlr features
   - backtracking
   - memoize
   - ASTs
-  - error handling & recovery
-  - scopes
 - setup.py
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()
@@ -15,6 +14,8 @@
 - documentation in docstrings
 - document differences to java API
 - add methods to emulate java API, but mark 'em as deprecated
+- using Stream.index as a state for 'error-already-reported' or memoization
+  will be a problem when the stream is not a linear buffer
 - optimizations which should be explored:
   - DFA: perhaps zip() the lists into a tuple 
     (eot, eof, min, max, accept, special, transition)

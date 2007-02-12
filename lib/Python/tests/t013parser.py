@@ -7,18 +7,24 @@ class TestParser(Parser):
         Parser.__init__(self, *args, **kwargs)
 
         self.identifiers = []
-
+        self.reportedErrors = []
+        
 
     def foundIdentifier(self, name):
         self.identifiers.append(name)
 
+
+    def emitErrorMessage(self, msg):
+        self.reportedErrors.append(msg)
         
+    
 cStream = antlr3.StringStream('foobar')
 lexer = Lexer(cStream)
 tStream = antlr3.CommonTokenStream(lexer)
 parser = TestParser(tStream)
 parser.document()
 
+assert len(parser.reportedErrors) == 0, parser.reportedErrors
 assert parser.identifiers == ['foobar']
 
 
@@ -28,11 +34,8 @@ lexer = Lexer(cStream)
 tStream = antlr3.CommonTokenStream(lexer)
 parser = TestParser(tStream)
 
-try:
-    parser.document()
-    raise AssertionError
+parser.document()
 
-except antlr3.NoViableAltException, exc:
-    assert exc.unexpectedType == '-', repr(exc.unexpectedType)
-    assert exc.charPositionInLine == 1, repr(exc.charPositionInLine)
-    assert exc.line == 1, repr(exc.line)
+# FIXME: currently strings with formatted errors are collected
+# can't check error locations yet
+assert len(parser.reportedErrors) == 1, parser.reportedErrors

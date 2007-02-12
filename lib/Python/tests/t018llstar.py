@@ -33,5 +33,44 @@ if not success:
     r = d.compare(output.splitlines(1), testOutput.splitlines(1))
     for l in r:
         sys.stderr.write(l.encode('ascii', 'backslashreplace'))
+
     
+## # run an infinite loop with randomly mangled input
+## while True:
+##     print "ping"
+
+##     input = open(inputPath).read()
+
+##     import random
+##     input = list(input) # make it mutable
+##     for _ in range(3):
+##         p1 = random.randrange(len(input))
+##         p2 = random.randrange(len(input))
+
+##         c1 = input[p1]
+##         input[p1] = input[p2]
+##         input[p2] = c1
+##     input = ''.join(input) # back to string
+
+        
+##     try:
+##         cStream = antlr3.StringStream(input)
+##         lexer = Lexer(cStream)
+##         tStream = antlr3.CommonTokenStream(lexer)
+##         parser = TestParser(tStream)
+##         parser.program()
+
+##     except antlr3.RecognitionException, exc:
+##         print exc
+##         for l in input.splitlines()[0:exc.line]:
+##             print l
+##         print ' '*exc.charPositionInLine + '^'
+
+##     except BaseException, exc:
+##         print '\n'.join(['%02d: %s' % (idx+1, l) for idx, l in enumerate(input.splitlines())])
+##         print "%s at %d:%d" % (exc, cStream.line, cStream.charPositionInLine)
+##         print
+        
+##         raise
+
 sys.exit(not success)

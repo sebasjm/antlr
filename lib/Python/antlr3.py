@@ -26,15 +26,24 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import sys
 from cStringIO import StringIO
 
-
+# compatibility stuff
 try:
     set = set
     frozenset = frozenset
 except NameError:
-    # for pre-2.4 compatibility
     from sets import Set as set, ImmutableSet as frozenset
+
+
+try:
+    reversed = reversed
+except NameError:
+    def reversed(l):
+        l = l[:]
+        l.reverse()
+        return l
 
 
 ##############################################################################
@@ -502,17 +511,15 @@ DEFAULT_CHANNEL = 0
 # by parser.
 HIDDEN_CHANNEL = 99
 
-class Token(object):
-    EOR_TOKEN_TYPE = 1
+# Predefined token types
+EOR_TOKEN_TYPE = 1
 
-    # imaginary tree navigation type; traverse "get child" link
-    DOWN = 2
-    # imaginary tree navigation type; finish with a child list
-    UP = 3
+# imaginary tree navigation type; traverse "get child" link
+DOWN = 2
+# imaginary tree navigation type; finish with a child list
+UP = 3
 
-    MIN_TOKEN_TYPE = UP+1
-
-
+MIN_TOKEN_TYPE = UP+1
 	
 
 ## 	/** Get the text of the token */
@@ -1096,17 +1103,15 @@ class BaseRecognizer(object):
         5. next match() will reset errorRecovery mode
         """
         
-        raise NotImplementedError
-## 		// if we've already reported an error and have not matched a token
-## 		// yet successfully, don't report any errors.
-## 		if ( errorRecovery ) {
-## 			//System.err.print("[SPURIOUS] ");
-## 			return;
-## 		}
-## 		errorRecovery = true;
+        # if we've already reported an error and have not matched a token
+        # yet successfully, don't report any errors.
+        if self.errorRecovery:
+            return
 
-## 		displayRecognitionError(this.getTokenNames(), e);
-## 	}
+        self.errorRecovery = True
+
+        self.displayRecognitionError(self.getTokenNames(), e)
+
 
     def displayRecognitionError(self, tokenNames, e):
         hdr = self.getErrorHeader(e)
@@ -1138,8 +1143,9 @@ class BaseRecognizer(object):
         Override this to change the message generated for one or more
 	exception types.
         """
-        
-        raise NotImplementedError
+
+        # FIXME: correct implentation
+        return str(e)
     
 ## 		String msg = null;
 ## 		if ( e instanceof MismatchedTokenException ) {
@@ -1203,7 +1209,7 @@ class BaseRecognizer(object):
         What is the error header, normally line/character position information?
         """
         
-        return "line "+e.line+":"+e.charPositionInLine
+        return "line %d:%d" % (e.line, e.charPositionInLine)
 
 
 ## 	/** How should a token be displayed in an error message? The default
@@ -1230,207 +1236,217 @@ class BaseRecognizer(object):
 ## 		return "'"+s+"'";
 ## 	}
 
-## 	/** Override this method to change where error messages go */
-## 	public void emitErrorMessage(String msg) {
-## 		System.err.println(msg);
-## 	}
+    def emitErrorMessage(self, msg):
+	"""Override this method to change where error messages go"""
+        sys.stderr.write(msg + '\n')
 
-## 	/** Recover from an error found on the input stream.  Mostly this is
-## 	 *  NoViableAlt exceptions, but could be a mismatched token that
-## 	 *  the match() routine could not recover from.
-## 	 */
-## 	public void recover(IntStream input, RecognitionException re) {
-## 		if ( lastErrorIndex==input.index() ) {
-## 			// uh oh, another error at same token index; must be a case
-## 			// where LT(1) is in the recovery token set so nothing is
-## 			// consumed; consume a single token so at least to prevent
-## 			// an infinite loop; this is a failsafe.
-## 			input.consume();
-## 		}
-## 		lastErrorIndex = input.index();
-## 		BitSet followSet = computeErrorRecoverySet();
-## 		beginResync();
-## 		consumeUntil(input, followSet);
-## 		endResync();
-## 	}
 
-## 	/** A hook to listen in on the token consumption during error recovery.
-## 	 *  The DebugParser subclasses this to fire events to the listenter.
-## 	 */
-## 	public void beginResync() {
-## 	}
+    def recover(self, input, re):
+        """
+        Recover from an error found on the input stream.  Mostly this is
+        NoViableAlt exceptions, but could be a mismatched token that
+        the match() routine could not recover from.
+        """
+        
+        # PROBLEM? what if input stream is not the same as last time
+        # perhaps make lastErrorIndex a member of input
+        if self.lastErrorIndex == input.index():
+            # uh oh, another error at same token index; must be a case
+            # where LT(1) is in the recovery token set so nothing is
+            # consumed; consume a single token so at least to prevent
+            # an infinite loop; this is a failsafe.
+            input.consume()
 
-## 	public void endResync() {
-## 	}
+        self.lastErrorIndex = input.index()
+        followSet = self.computeErrorRecoverySet()
+        
+        self.beginResync()
+        self.consumeUntil(input, followSet)
+        self.endResync()
 
-## 	/*  Compute the error recovery set for the current rule.  During
-## 	 *  rule invocation, the parser pushes the set of tokens that can
-## 	 *  follow that rule reference on the stack; this amounts to
-## 	 *  computing FIRST of what follows the rule reference in the
-## 	 *  enclosing rule. This local follow set only includes tokens
-## 	 *  from within the rule; i.e., the FIRST computation done by
-## 	 *  ANTLR stops at the end of a rule.
-## 	 *
-## 	 *  EXAMPLE
-## 	 *
-## 	 *  When you find a "no viable alt exception", the input is not
-## 	 *  consistent with any of the alternatives for rule r.  The best
-## 	 *  thing to do is to consume tokens until you see something that
-## 	 *  can legally follow a call to r *or* any rule that called r.
-## 	 *  You don't want the exact set of viable next tokens because the
-## 	 *  input might just be missing a token--you might consume the
-## 	 *  rest of the input looking for one of the missing tokens.
-## 	 *
-## 	 *  Consider grammar:
-## 	 *
-## 	 *  a : '[' b ']'
-## 	 *    | '(' b ')'
-## 	 *    ;
-## 	 *  b : c '^' INT ;
-## 	 *  c : ID
-## 	 *    | INT
-## 	 *    ;
-## 	 *
-## 	 *  At each rule invocation, the set of tokens that could follow
-## 	 *  that rule is pushed on a stack.  Here are the various "local"
-## 	 *  follow sets:
-## 	 *
-## 	 *  FOLLOW(b1_in_a) = FIRST(']') = ']'
-## 	 *  FOLLOW(b2_in_a) = FIRST(')') = ')'
-## 	 *  FOLLOW(c_in_b) = FIRST('^') = '^'
-## 	 *
-## 	 *  Upon erroneous input "[]", the call chain is
-## 	 *
-## 	 *  a -> b -> c
-## 	 *
-## 	 *  and, hence, the follow context stack is:
-## 	 *
-## 	 *  depth  local follow set     after call to rule
-## 	 *    0         <EOF>                    a (from main())
-## 	 *    1          ']'                     b
-## 	 *    3          '^'                     c
-## 	 *
-## 	 *  Notice that ')' is not included, because b would have to have
-## 	 *  been called from a different context in rule a for ')' to be
-## 	 *  included.
-## 	 *
-## 	 *  For error recovery, we cannot consider FOLLOW(c)
-## 	 *  (context-sensitive or otherwise).  We need the combined set of
-## 	 *  all context-sensitive FOLLOW sets--the set of all tokens that
-## 	 *  could follow any reference in the call chain.  We need to
-## 	 *  resync to one of those tokens.  Note that FOLLOW(c)='^' and if
-## 	 *  we resync'd to that token, we'd consume until EOF.  We need to
-## 	 *  sync to context-sensitive FOLLOWs for a, b, and c: {']','^'}.
-## 	 *  In this case, for input "[]", LA(1) is in this set so we would
-## 	 *  not consume anything and after printing an error rule c would
-## 	 *  return normally.  It would not find the required '^' though.
-## 	 *  At this point, it gets a mismatched token error and throws an
-## 	 *  exception (since LA(1) is not in the viable following token
-## 	 *  set).  The rule exception handler tries to recover, but finds
-## 	 *  the same recovery set and doesn't consume anything.  Rule b
-## 	 *  exits normally returning to rule a.  Now it finds the ']' (and
-## 	 *  with the successful match exits errorRecovery mode).
-## 	 *
-## 	 *  So, you cna see that the parser walks up call chain looking
-## 	 *  for the token that was a member of the recovery set.
-## 	 *
-## 	 *  Errors are not generated in errorRecovery mode.
-## 	 *
-## 	 *  ANTLR's error recovery mechanism is based upon original ideas:
-## 	 *
-## 	 *  "Algorithms + Data Structures = Programs" by Niklaus Wirth
-## 	 *
-## 	 *  and
-## 	 *
-## 	 *  "A note on error recovery in recursive descent parsers":
-## 	 *  http://portal.acm.org/citation.cfm?id=947902.947905
-## 	 *
-## 	 *  Later, Josef Grosch had some good ideas:
-## 	 *
-## 	 *  "Efficient and Comfortable Error Recovery in Recursive Descent
-## 	 *  Parsers":
-## 	 *  ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
-## 	 *
-## 	 *  Like Grosch I implemented local FOLLOW sets that are combined
-## 	 *  at run-time upon error to avoid overhead during parsing.
-## 	 */
-## 	protected BitSet computeErrorRecoverySet() {
-## 		return combineFollows(false);
-## 	}
 
-## 	/** Compute the context-sensitive FOLLOW set for current rule.
-## 	 *  This is set of token types that can follow a specific rule
-## 	 *  reference given a specific call chain.  You get the set of
-## 	 *  viable tokens that can possibly come next (lookahead depth 1)
-## 	 *  given the current call chain.  Contrast this with the
-## 	 *  definition of plain FOLLOW for rule r:
-## 	 *
-## 	 *   FOLLOW(r)={x | S=>*alpha r beta in G and x in FIRST(beta)}
-## 	 *
-## 	 *  where x in T* and alpha, beta in V*; T is set of terminals and
-## 	 *  V is the set of terminals and nonterminals.  In other words,
-## 	 *  FOLLOW(r) is the set of all tokens that can possibly follow
-## 	 *  references to r in *any* sentential form (context).  At
-## 	 *  runtime, however, we know precisely which context applies as
-## 	 *  we have the call chain.  We may compute the exact (rather
-## 	 *  than covering superset) set of following tokens.
-## 	 *
-## 	 *  For example, consider grammar:
-## 	 *
-## 	 *  stat : ID '=' expr ';'      // FOLLOW(stat)=={EOF}
-## 	 *       | "return" expr '.'
-## 	 *       ;
-## 	 *  expr : atom ('+' atom)* ;   // FOLLOW(expr)=={';','.',')'}
-## 	 *  atom : INT                  // FOLLOW(atom)=={'+',')',';','.'}
-## 	 *       | '(' expr ')'
-## 	 *       ;
-## 	 *
-## 	 *  The FOLLOW sets are all inclusive whereas context-sensitive
-## 	 *  FOLLOW sets are precisely what could follow a rule reference.
-## 	 *  For input input "i=(3);", here is the derivation:
-## 	 *
-## 	 *  stat => ID '=' expr ';'
-## 	 *       => ID '=' atom ('+' atom)* ';'
-## 	 *       => ID '=' '(' expr ')' ('+' atom)* ';'
-## 	 *       => ID '=' '(' atom ')' ('+' atom)* ';'
-## 	 *       => ID '=' '(' INT ')' ('+' atom)* ';'
-## 	 *       => ID '=' '(' INT ')' ';'
-## 	 *
-## 	 *  At the "3" token, you'd have a call chain of
-## 	 *
-## 	 *    stat -> expr -> atom -> expr -> atom
-## 	 *
-## 	 *  What can follow that specific nested ref to atom?  Exactly ')'
-## 	 *  as you can see by looking at the derivation of this specific
-## 	 *  input.  Contrast this with the FOLLOW(atom)={'+',')',';','.'}.
-## 	 *
-## 	 *  You want the exact viable token set when recovering from a
-## 	 *  token mismatch.  Upon token mismatch, if LA(1) is member of
-## 	 *  the viable next token set, then you know there is most likely
-## 	 *  a missing token in the input stream.  "Insert" one by just not
-## 	 *  throwing an exception.
-## 	 */
-## 	protected BitSet computeContextSensitiveRuleFOLLOW() {
-## 		return combineFollows(true);
-## 	}
+    def beginResync(self):
+	"""
+        A hook to listen in on the token consumption during error recovery.
+        The DebugParser subclasses this to fire events to the listenter.
+        """
 
-## 	protected BitSet combineFollows(boolean exact) {
-## 		int top = _fsp;
-## 		BitSet followSet = new BitSet();
-## 		for (int i=top; i>=0; i--) {
-## 			BitSet localFollowSet = (BitSet) following[i];
-## 			/*
-## 			System.out.println("local follow depth "+i+"="+
-## 							   localFollowSet.toString(getTokenNames())+")");
-## 			*/
-## 			followSet.orInPlace(localFollowSet);
-## 			if ( exact && !localFollowSet.member(Token.EOR_TOKEN_TYPE) ) {
-## 				break;
-## 			}
-## 		}
-## 		followSet.remove(Token.EOR_TOKEN_TYPE);
-## 		return followSet;
-## 	}
+        pass
+
+
+    def endResync(self):
+	"""
+        A hook to listen in on the token consumption during error recovery.
+        The DebugParser subclasses this to fire events to the listenter.
+        """
+
+        pass
+
+
+    def computeErrorRecoverySet(self):
+        """
+        Compute the error recovery set for the current rule.  During
+        rule invocation, the parser pushes the set of tokens that can
+        follow that rule reference on the stack; this amounts to
+        computing FIRST of what follows the rule reference in the
+        enclosing rule. This local follow set only includes tokens
+        from within the rule; i.e., the FIRST computation done by
+        ANTLR stops at the end of a rule.
+
+        EXAMPLE
+
+        When you find a "no viable alt exception", the input is not
+        consistent with any of the alternatives for rule r.  The best
+        thing to do is to consume tokens until you see something that
+        can legally follow a call to r *or* any rule that called r.
+        You don't want the exact set of viable next tokens because the
+        input might just be missing a token--you might consume the
+        rest of the input looking for one of the missing tokens.
+
+        Consider grammar:
+
+        a : '[' b ']'
+          | '(' b ')'
+          ;
+        b : c '^' INT ;
+        c : ID
+          | INT
+          ;
+
+        At each rule invocation, the set of tokens that could follow
+        that rule is pushed on a stack.  Here are the various "local"
+        follow sets:
+
+        FOLLOW(b1_in_a) = FIRST(']') = ']'
+        FOLLOW(b2_in_a) = FIRST(')') = ')'
+        FOLLOW(c_in_b) = FIRST('^') = '^'
+
+        Upon erroneous input "[]", the call chain is
+
+        a -> b -> c
+
+        and, hence, the follow context stack is:
+
+        depth  local follow set     after call to rule
+          0         <EOF>                    a (from main())
+          1          ']'                     b
+          3          '^'                     c
+
+        Notice that ')' is not included, because b would have to have
+        been called from a different context in rule a for ')' to be
+        included.
+
+        For error recovery, we cannot consider FOLLOW(c)
+        (context-sensitive or otherwise).  We need the combined set of
+        all context-sensitive FOLLOW sets--the set of all tokens that
+        could follow any reference in the call chain.  We need to
+        resync to one of those tokens.  Note that FOLLOW(c)='^' and if
+        we resync'd to that token, we'd consume until EOF.  We need to
+        sync to context-sensitive FOLLOWs for a, b, and c: {']','^'}.
+        In this case, for input "[]", LA(1) is in this set so we would
+        not consume anything and after printing an error rule c would
+        return normally.  It would not find the required '^' though.
+        At this point, it gets a mismatched token error and throws an
+        exception (since LA(1) is not in the viable following token
+        set).  The rule exception handler tries to recover, but finds
+        the same recovery set and doesn't consume anything.  Rule b
+        exits normally returning to rule a.  Now it finds the ']' (and
+        with the successful match exits errorRecovery mode).
+
+        So, you cna see that the parser walks up call chain looking
+        for the token that was a member of the recovery set.
+
+        Errors are not generated in errorRecovery mode.
+
+        ANTLR's error recovery mechanism is based upon original ideas:
+
+        "Algorithms + Data Structures = Programs" by Niklaus Wirth
+
+        and
+
+        "A note on error recovery in recursive descent parsers":
+        http://portal.acm.org/citation.cfm?id=947902.947905
+
+        Later, Josef Grosch had some good ideas:
+
+        "Efficient and Comfortable Error Recovery in Recursive Descent
+        Parsers":
+        ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
+
+        Like Grosch I implemented local FOLLOW sets that are combined
+        at run-time upon error to avoid overhead during parsing.
+        """
+        
+        return self.combineFollows(False)
+
+        
+    def computeContextSensitiveRuleFOLLOW(self):
+        """
+        Compute the context-sensitive FOLLOW set for current rule.
+        This is set of token types that can follow a specific rule
+        reference given a specific call chain.  You get the set of
+        viable tokens that can possibly come next (lookahead depth 1)
+        given the current call chain.  Contrast this with the
+        definition of plain FOLLOW for rule r:
+
+         FOLLOW(r)={x | S=>*alpha r beta in G and x in FIRST(beta)}
+
+        where x in T* and alpha, beta in V*; T is set of terminals and
+        V is the set of terminals and nonterminals.  In other words,
+        FOLLOW(r) is the set of all tokens that can possibly follow
+        references to r in *any* sentential form (context).  At
+        runtime, however, we know precisely which context applies as
+        we have the call chain.  We may compute the exact (rather
+        than covering superset) set of following tokens.
+
+        For example, consider grammar:
+
+        stat : ID '=' expr ';'      // FOLLOW(stat)=={EOF}
+             | "return" expr '.'
+             ;
+        expr : atom ('+' atom)* ;   // FOLLOW(expr)=={';','.',')'}
+        atom : INT                  // FOLLOW(atom)=={'+',')',';','.'}
+             | '(' expr ')'
+             ;
+
+        The FOLLOW sets are all inclusive whereas context-sensitive
+        FOLLOW sets are precisely what could follow a rule reference.
+        For input input "i=(3);", here is the derivation:
+
+        stat => ID '=' expr ';'
+             => ID '=' atom ('+' atom)* ';'
+             => ID '=' '(' expr ')' ('+' atom)* ';'
+             => ID '=' '(' atom ')' ('+' atom)* ';'
+             => ID '=' '(' INT ')' ('+' atom)* ';'
+             => ID '=' '(' INT ')' ';'
+
+        At the "3" token, you'd have a call chain of
+
+          stat -> expr -> atom -> expr -> atom
+
+        What can follow that specific nested ref to atom?  Exactly ')'
+        as you can see by looking at the derivation of this specific
+        input.  Contrast this with the FOLLOW(atom)={'+',')',';','.'}.
+
+        You want the exact viable token set when recovering from a
+        token mismatch.  Upon token mismatch, if LA(1) is member of
+        the viable next token set, then you know there is most likely
+        a missing token in the input stream.  "Insert" one by just not
+        throwing an exception.
+        """
+
+        return self.combineFollows(True)
+
+
+    def combineFollows(self, exact):
+        followSet = set()
+        for localFollowSet in reversed(self.following):
+            followSet |= localFollowSet
+            if exact and EOR_TOKEN_TYPE not in localFollowSet:
+                break
+
+        followSet -= set([EOR_TOKEN_TYPE])
+        return followSet
 
 
     def recoverFromMismatchedToken(self, input, e, ttype, follow):
@@ -1466,17 +1482,15 @@ class BaseRecognizer(object):
                                          
         # if next token is what we are looking for then "delete" this token
         if input.LA(2) == ttype:
-            raise NotImplementError
             self.reportError(e)
 
             self.beginResync()
             input.consume() # simply delete extra token
-            endResync()
+            self.endResync()
             input.consume()  # move past ttype token as if all were ok
             return
 
         if not self.recoverFromMismatchedElement(input, e, follow):
-            raise NotImplementError
             raise e
 
 
@@ -1504,44 +1518,38 @@ class BaseRecognizer(object):
             return False
 
         # compute what can follow this grammar element reference
-        raise NotImplementedError, repr(follow)
-##        if follow.member(Token.EOR_TOKEN_TYPE):
-## 			BitSet viableTokensFollowingThisRule =
-## 				computeContextSensitiveRuleFOLLOW();
-## 			follow = follow.or(viableTokensFollowingThisRule);
-## 			follow.remove(Token.EOR_TOKEN_TYPE);
-## 		}
-## 		// if current token is consistent with what could come after set
-## 		// then it is ok to "insert" the missing token, else throw exception
-## 		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
-## 		if ( follow.member(input.LA(1)) ) {
-## 			//System.out.println("LT(1)=="+input.LT(1)+" is consistent with what follows; inserting...");
-## 			reportError(e);
-## 			return true;
-## 		}
-## 		//System.err.println("nothing to do; throw exception");
-## 		return false;
-## 	}
+        if EOR_TOKEN_TYPE in follow:
+            viableTokensFollowingThisRule = \
+                self.computeContextSensitiveRuleFOLLOW()
+            
+            follow = (follow | viableTokensFollowingThisRule) - set([EOR_TOKEN_TYPE])
 
-## 	public void consumeUntil(IntStream input, int tokenType) {
-## 		//System.out.println("consumeUntil "+tokenType);
-## 		int ttype = input.LA(1);
-## 		while (ttype != Token.EOF && ttype != tokenType) {
-## 			input.consume();
-## 			ttype = input.LA(1);
-## 		}
-## 	}
+        # if current token is consistent with what could come after set
+        # then it is ok to "insert" the missing token, else throw exception
+        if input.LA(1) in follow:
+ 	    self.reportError(e)
+            return True
 
-## 	/** Consume tokens until one matches the given token set */
-## 	public void consumeUntil(IntStream input, BitSet set) {
-## 		//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
-## 		int ttype = input.LA(1);
-## 		while (ttype != Token.EOF && !set.member(ttype) ) {
-## 			//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
-## 			input.consume();
-## 			ttype = input.LA(1);
-## 		}
-## 	}
+        # nothing to do; throw exception
+        return False
+
+
+    def consumeUntil(self, input, tokenTypes):
+        """
+        Consume tokens until one matches the given token or token set
+
+        tokenTypes can be a single token type or a set of token types
+        
+        """
+        
+        if not isinstance(tokenTypes, (set, frozenset)):
+            tokenTypes = frozenset([tokenTypes])
+
+        ttype = input.LA(1)
+        while ttype != EOF and ttype not in tokenTypes:
+            input.consume()
+            ttype = input.LA(1)
+
 
 ## 	/** Return List<String> of the rules in your parser instance
 ## 	 *  leading up to a call to this method.  You could override if
@@ -1589,13 +1597,15 @@ class BaseRecognizer(object):
 ## 		return backtracking;
 ## 	}
 
-## 	/** Used to print out token names like ID during debugging and
-## 	 *  error reporting.  The generated parsers implement a method
-## 	 *  that overrides this to point to their String[] tokenNames.
-## 	 */
-## 	public String[] getTokenNames() {
-## 		return null;
-## 	}
+    def getTokenNames(self):
+        """
+        Used to print out token names like ID during debugging and
+	error reporting.  The generated parsers implement a method
+	that overrides this to point to their String[] tokenNames.
+	"""
+        
+        return None
+
 
 ## 	/** For debugging and other purposes, might want the grammar name.
 ## 	 *  Have ANTLR generate an implementation for this method.

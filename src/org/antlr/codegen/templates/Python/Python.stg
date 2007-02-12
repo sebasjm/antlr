@@ -54,7 +54,16 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 
 <@imports>
 import antlr3
+
+try:
+    set = set
+    frozenset = frozenset
+except NameError:
+    # for pre-2.4 compatibility
+    from sets import Set as set, ImmutableSet as frozenset
+
 <if(TREE_PARSER)>
+raise NotImplementedError("TREE_PARSER")
 #import org.antlr.runtime.tree.*;
 <endif>
 <@end>
@@ -200,12 +209,7 @@ class <name>(antlr3.<superClass>):
 
     <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
 
-    <bitsets:{FOLLOW_<it.name>_in_<it.inName><it.tokenIndex> = set([<it.tokens:{<it>};separator=", ">])<\n>}>
-
-    <!
-    <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
-                    words64=it.bits)>
-    !>
+    <bitsets:{FOLLOW_<it.name>_in_<it.inName><it.tokenIndex> = frozenset([<it.tokenTypes:{<it>};separator=", ">])<\n>}>
 
 >>
 
@@ -1295,10 +1299,6 @@ if ( backtracking==0 ) {
 >>
 
 // M I S C (properties, etc...)
-
-bitset(name, words64) ::= <<
-<name> = [<words64:{<it>L};separator=",">]<\n>
->>
 
 codeFileExtension() ::= ".py"
 
