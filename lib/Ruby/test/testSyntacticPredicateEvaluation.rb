@@ -34,59 +34,59 @@ class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
 	        s returns [result]
 	        @init { @out = "" }: (a ';')+ { result = @out };
 
-			a
-			options {
-			  k=1;
-			}
-			:
-			  (b '.')=> b '.' { @out << "[alt 1]" }
-			| (b)=> b { @out << "[alt 2]" }
-			| c       { @out << "[alt 3]" }
-			  ;
+    			a
+    			options {
+    			  k=1;
+    			}
+    			:
+    			  (b '.')=> b '.' { @out << "[alt 1]" }
+    			| (b)=> b { @out << "[alt 2]" }
+    			| c       { @out << "[alt 3]" }
+    			  ;
 
-			b
-			@init { @out << "[enter b]" }
-			   : '(' 'x' ')' ;
+    			b
+    			@init { @out << "[enter b]" }
+    			   : '(' 'x' ')' ;
 
-			c
-			@init { @out << "[enter c]" }
-			   : '(' c ')' | 'x' ;
+    			c
+    			@init { @out << "[enter c]" }
+    			   : '(' c ')' | 'x' ;
 
-			WS : (' '|'\\n')+ { channel = 99 }
-			   ;
+    			WS : (' '|'\\n')+ { channel = 99 }
+    			   ;
 	    END
 
-		parser = Grammar::compile(grammar)
+		  parser = Grammar::compile(grammar, "s")
 
-        assert_equal("[enter b][enter b][enter b][alt 2]", parser.parse('(x) ;'))
-        assert_equal("[enter b][enter b][alt 1]", parser.parse('(x). ;'))
+      assert_equal("[enter b][enter b][enter b][alt 2]", parser.parse('(x) ;'))
+      assert_equal("[enter b][enter b][alt 1]", parser.parse('(x). ;'))
 	    assert_equal("[enter b][enter b][enter c][enter c][enter c][alt 3]", parser.parse('((x)) ;'))
     end
 
     def test_two_preds_with_naked_alt_not_last
         grammar = <<-END
-            s returns [result]
-            @init { @out = "" }: (a ';')+ { result = @out };
+          s returns [result]
+          @init { @out = "" }: (a ';')+ { result = @out };
 
-			a
-			options {
-			  k=1;
-			}
-			  : (b '.')=> b '.' { @out << "[alt 1]" }
-			  | c       { @out << "[alt 2]" }
-			  | (b)=> b { @out << "[alt 3]" }
-			  ;
-			b
-			@init { @out << "[enter b]" }
-			   : '(' 'x' ')' ;
-			c
-			@init { @out << "[enter c]" }
-			   : '(' c ')' | 'x' ;
-			WS : (' '|'\\n')+ {channel=99}
-			   ;
+    			a
+    			options {
+    			  k=1;
+    			}
+    			  : (b '.')=> b '.' { @out << "[alt 1]" }
+    			  | c       { @out << "[alt 2]" }
+    			  | (b)=> b { @out << "[alt 3]" }
+    			  ;
+    			b
+    			@init { @out << "[enter b]" }
+    			   : '(' 'x' ')' ;
+    			c
+    			@init { @out << "[enter c]" }
+    			   : '(' c ')' | 'x' ;
+    			WS : (' '|'\\n')+ {channel=99}
+    			   ;
 	    END
 
-		parser = Grammar::compile(grammar)
+		  parser = Grammar::compile(grammar, "s")
 
 	    assert_equal("[enter b][enter c][enter c][alt 2]", parser.parse("(x) ;"))
 	    assert_equal("[enter b][enter b][alt 1]", parser.parse("(x). ;"))
@@ -108,7 +108,7 @@ class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
 			B : 'x'+ ;
 	    END
 
-		parser = Grammar::compile(grammar)
+		  parser = Grammar::compile(grammar, "s")
 
 	    assert_equal("alt2", parser.parse('xxx'))
 	    assert_equal("alt1", parser.parse('xxx.'))

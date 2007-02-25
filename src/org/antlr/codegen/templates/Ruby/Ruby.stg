@@ -32,9 +32,9 @@ group Ruby implements ANTLRCore;
  *  and cyclic DFAs plus support code.
  */
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
-           docComment, recognizer,
-           name, tokens, tokenNames, rules, cyclicDFAs,
-	   bitsets, buildTemplate, profile,
+		   docComment, recognizer,
+		   name, tokens, tokenNames, rules, cyclicDFAs,
+	   bitsets, buildTemplate, buildAST, rewrite, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
 	   scopes, superClass, literals) ::=
@@ -280,6 +280,8 @@ parser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
 require '<grammar.name>Lexer'
 
 class <name>
+	attr_reader :lexer
+	
     TOKENS = [
         <tokenNames: {[<it>, <i>]}; separator=",\n">
     ].inject({}) { |hash, pair|
@@ -302,6 +304,7 @@ class <name>
             input = <grammar.name>Lexer.new(input)
         end
 
+		@lexer = input
         @input = TokenStream.new(input)
         @backtracking = 0
         @failed = false
@@ -434,7 +437,7 @@ end
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::=
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize) ::=
 <<
 # <description>
 def <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
@@ -475,19 +478,21 @@ end
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::=
 <<
 def match_<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
-<if(nakedBlock)>
-    <block><\n>
-<else>
-    start = @input.index
-    line = @input.line
-    column = @input.column
-    channel = nil
-    <block>
-    if @token.nil?
-        text = @input.substring(start, @input.index - 1)
-        @token = Token.new(:<ruleName>, line, column, text, channel)
-    end<\n>
-<endif>
+	<ruleDescriptor.actions.init>
+
+	<if(nakedBlock)>
+		<block><\n>
+	<else>
+		start = @input.index
+		line = @input.line
+		column = @input.column
+		channel = nil
+		<block>
+		if @token.nil?
+			text = @input.substring(start, @input.index - 1)
+			@token = Token.new(:<ruleName>, line, column, text, channel)
+		end<\n>
+	<endif>
 end
 >>
 
@@ -615,7 +620,7 @@ tokenRefAndListLabel(token,label,elementIndex)::=
 >>
 
 
-listLabel(label)::=
+listLabel(label,elem)::=
 <<
 list_<label> ||= []
 list_<label> \<\< _<label>
@@ -1024,19 +1029,23 @@ setTest(ranges) ::=
 
 parameterAttributeRef(attr)::=
 <<
-    ---- parameterAttributeRef ----
-    attr: <attr>
-    ---- /parameterAttributeRef ----
+	raise "parameterAttributeRef not implemented"
 >>
+
+parameterSetAttributeRef(attr,expr) ::=
+<<
+	raise "parameterSetAttributeRef not implemented"
+>>
+
 
 scopeAttributeRef(scope,attr,index,negIndex)::=
 <<
-    ---- scopeAttributeRef ----
-    scope: <scope>
-    attr: <attr>
-    index: <index>
-    negIndex: <negIndex>
-    ---- /scopeAttributeRef ----
+	raise "scopeAttributeRef not implemented"
+>>
+
+scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::=
+<<
+	raise "scopeSetAttributeRef not implemented"
 >>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
@@ -1045,28 +1054,25 @@ scopeAttributeRef(scope,attr,index,negIndex)::=
  */
 isolatedDynamicScopeRef(scope)::=
 <<
-    ---- isolatedDynamicScopeRef ----
-    scope: <scope>
-    ---- /isolatedDynamicScopeRef ----
+	raise "isolatedDynamicScopeRef not implemented"
 >>
 
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr)::=
 <<
-    ---- ruleLabelRef ----
-    referencedRule: <referenceRule>
-    scope: <scope>
-    attr: <attr>
-    ---- /ruleLabelRef ----
+	raise "ruleLabelRef not implemented"
 >>
 
 returnAttributeRef(ruleDescriptor,attr)::=
 <<
-    ---- returnAttributeRef ----
-    ruleDescriptor: <ruleDescriptor>
-    attr: <attr>
-    ---- /returnAttributeRef ----
+	raise "returnAttributeRef not implemented"
 >>
+
+returnSetAttributeRef(ruleDescriptor,attr,expr) ::=
+<<
+	raise "returnSetAttributeRef not implemented"
+>>
+
 
 /** How to translate $tokenLabel */
 tokenLabelRef(label)::= "_<label>"
@@ -1132,98 +1138,99 @@ ruleLabelPropertyRef_st(scope,attr)::=
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label)::=
 <<
-    ---- lexerRuleLabel ----
-    label: <label>
-    ---- /lexerRuleLabel ----
+	raise "lexerRuleLabel not implemented"
 >>
 
 lexerRuleLabelPropertyRef_type(scope,attr)::=
 <<
-    ---- lexerRuleLabelPropertyRef_type ----
-    scope: <scope>
-    attr: <attr>
-    ---- /lexerRuleLabelPropertyRef_type ----
+	raise "lexerRuleLabelPropertyRef_type not implemented"
 >>
 
 lexerRuleLabelPropertyRef_line(scope,attr)::=
 <<
-    ---- lexerRuleLabelPropertyRef_line ----
-    scope: <scope>
-    attr: <attr>
-    ---- /lexerRuleLabelPropertyRef_line ----
+	raise "lexerRuleLabelPropertyRef_line not implemented"
 >>
 
 lexerRuleLabelPropertyRef_pos(scope,attr)::=
 <<
-    ---- lexerRuleLabelPropertyRef_pos ----
-    scope: <scope>
-    attr: <attr>
-    ---- /lexerRuleLabelPropertyRef_pos ----
+	raise "lexerRuleLabelPropertyRef_pos not implemented"
 >>
 
 lexerRuleLabelPropertyRef_channel(scope,attr)::=
 <<
-    ---- lexerRuleLabelPropertyRef_channel ----
-    scope: <scope>
-    attr: <attr>
-    ---- /lexerRuleLabelPropertyRef_channel ----
+	raise "lexerRuleLabelPropertyRef_channel not implemented"
 >>
 
 lexerRuleLabelPropertyRef_index(scope,attr)::=
 <<
-    ---- lexerRuleLabelPropertyRef_index ----
-    scope: <scope>
-    attr: <attr>
-    ---- /lexerRuleLabelPropertyRef_index ----
+	raise "lexerRuleLabelPropertyRef_index not implemented"
 >>
 
 lexerRuleLabelPropertyRef_text(scope,attr)::=
 <<
-    ---- lexerRuleLabelPropertyRef_text ----
-    scope: <scope>
-    attr: <attr>
-    ---- /lexerRuleLabelPropertyRef_text ----
+	raise "lexerRuleLabelPropertyRef_text not implemented"
 >>
+
+lexerRulePropertyRef_text(scope,attr) ::= <<
+	raise "lexerRulePropertyRef_text not implemented"
+>>
+lexerRulePropertyRef_type(scope,attr) ::= <<
+	raise "lexerRulePropertyRef_type not implemented"
+>>
+lexerRulePropertyRef_line(scope,attr) ::= <<
+	raise "lexerRulePropertyRef_line not implemented"
+>>
+lexerRulePropertyRef_pos(scope,attr) ::= <<
+	raise "lexerRulePropertyRef_pos not implemented"
+>>
+
+lexerRulePropertyRef_index(scope,attr) ::= <<
+	raise "lexerRulePropertyRef_index not implemented"
+>>
+lexerRulePropertyRef_channel(scope,attr) ::= <<
+	raise "lexerRulePropertyRef_channel not implemented"
+>>
+lexerRulePropertyRef_start(scope,attr) ::= <<
+	raise "lexerRulePropertyRef_start not implemented"
+>>
+lexerRulePropertyRef_stop(scope,attr) ::= <<
+	raise "lexerRulePropertyRef_stop not implemented"
+>>
+
+
+ruleSetPropertyRef_tree(scope,attr,expr) ::= <<
+	raise "ruleSetPropertyRef_tree not implemented"
+>>
+ruleSetPropertyRef_st(scope,attr,expr) ::= <<
+	raise "ruleSetPropertyRef_st not implemented"
+>>
+
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr)::=
 <<
-    ---- rulePropertyRef_start ----
-    scope: <scope>
-    attr: <attr>
-    ---- /rulePropertyRef_start ----
+	raise "rulePropertyRef_start not implemented"
 >>
 
 rulePropertyRef_stop(scope,attr)::=
 <<
-    ---- rulePropertyRef_stop ----
-    scope: <scope>
-    attr: <attr>
-    ---- /rulePropertyRef_stop ----
+	raise "rulePropertyRef_stop not implemented"
 >>
 
 rulePropertyRef_tree(scope,attr)::=
 <<
-    ---- rulePropertyRef_tree ----
-    scope: <scope>
-    attr: <attr>
-    ---- /rulePropertyRef_tree ----
+	raise "rulePropertyRef_tree not implemented"
 >>
 
 rulePropertyRef_text(scope,attr)::=
 <<
-    ---- rulePropertyRef_text ----
-    scope: <scope>
-    attr: <attr>
-    ---- /rulePropertyRef_text ----
+	raise "rulePropertyRef_text not implemented"
 >>
+
 
 rulePropertyRef_st(scope,attr)::=
 <<
-    ---- rulePropertyRef_st ----
-    scope: <scope>
-    attr: <attr>
-    ---- /rulePropertyRef_st ----
+	raise "rulePropertyRef_st not implemented"
 >>
 
 /** How to execute an action */

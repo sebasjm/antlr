@@ -25,237 +25,283 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'test/unit'
-require 'antlrtest'
+require 'antlr'
 
 class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
-    def test_simple_cyclic_DFA_with_predicate
-        grammar = <<-END
-			grammar Foo;
-			options {
-			    language = Ruby;
-			}
+  def test_simple_cyclic_DFA_with_predicate
+    grammar = <<-END
+      s returns [result]
+      @init { @out = "" }: a { result = @out };
+      
+      a : {false}? 'x'* 'y' { @out << "alt1"}
+      | {true}?  'x'* 'y' { @out << "alt2"}
+      ;
+    END
 
-			a : {false}? 'x'* 'y' {print "alt1"}
-			  | {true}?  'x'* 'y' {print "alt2"}
-			  ;
-	    END
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("alt2", parser.parse("xxxy"));
+  end
 
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "xxxy")
 
-	    assert_equal("alt2", found);
+  def test_simple_cyclic_DFA_with_instance_var_predicate
+    grammar = <<-END
+      @members {
+        @v = true
+      }
+
+      s returns [result]
+      @init { @out = "" }: a { result = @out };
+
+      a : {false}? 'x'* 'y' { @out << "alt1"}
+        | {@v}?  'x'* 'y'   { @out << "alt2"}
+      ;
+    END
+
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("alt2", parser.parse("xxxy"));
+  end
+
+
+  def test_predicate_validation
+    grammar = <<-END
+      s : {false}? 'x';
+    END
+
+    parser = Grammar::compile(grammar, "s")
+    assert_raise RuntimeError do 
+      parser.parse("x")
     end
+  end
+
+  def test_lexer_preds
+    grammar = <<-END
+      @lexer::members {
+        def out
+          @out
+        end
+      }
+  
+      @lexer::init {
+        @p = false
+        @out = ""
+      }
+
+      s returns [result]
+        : a { result = lexer.out };
 
 
-    def test_simple_cyclic_DFA_with_instance_var_predicate
-        grammar = <<-END
-            grammar Foo;
-            options {
-                language = Ruby;
-            }
+      a : (A|B)+ ;
+      A : {@p}? 'a'  { @out << "token 1" } ;
+      B : {!@p}? 'a' { @out << "token 2" } ;
+    END
 
-			@members {
-			    @v = true
-			}
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("token 2", parser.parse("a"));
+  end
 
-            a : {false}? 'x'* 'y' {print "alt1"}
-              | {@v}?  'x'* 'y' {print "alt2"}
-              ;
-        END
+  def test_lexer_preds2
+    grammar = <<-END
+      @lexer::members {
+        def out
+          @out
+        end
+      }
+    
+      @lexer::init {
+        @p = true
+        @out = ""
+      }
 
-        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "xxxy")
-        assert_equal("alt2", found);
-    end
-
-
-	def test_predicate_validation
-	    grammar = <<-END
-	        grammar Foo;
-            options {
-               language = Ruby;
-            }
-
-			@members {
-			    def report_error(e)
-			        print "error: FailedPredicateException(a,{false}?)"
-			    end
-			}
-
-			a : {false}? 'x';
-		END
-
-        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "x")
-        assert_equal("error: FailedPredicateException(a,{false}?)", found);
-	end
-
-	def test_lexer_preds
-        grammar = <<-END
-            grammar Foo;
-            options {
-               language = Ruby;
-            }
-
-			@lexer::members {
-                @p = false
-    	    }
-
-			a : (A|B)+ ;
-			A : {@p}? 'a'  { print "token 1" } ;
-			B : {!@p}? 'a' { print "token 2" } ;
-		END
-
-		found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "a")
-        assert_equal("token 2", found);
-    end
-
-    def test_lexer_preds2
-        grammar = <<-END
-            grammar Foo;
-            options {
-               language = Ruby;
-            }
-
-            @lexer::members {
-                @p = true
-    	    }
-
-			a : (A|B)+ ;
-			A : {@p}? 'a' { print "token 1" } ;
-			B : ('a'|'b')+ { print "token 2"} ;
-        END
-
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "a")
-        assert_equal("token 1", found);
-    end
-
-    def test_lexer_pred_in_exit_branch
-        grammar = <<-END
-            grammar Foo;
-            options {
-               language = Ruby;
-            }
+      s returns [result]
+        : a { result = lexer.out };
 
 
-            @lexer::members {
-                @p = true
-            }
+      a : (A|B)+ ;
+      A : {@p}? 'a' { @out << "token 1" } ;
+      B : ('a'|'b')+ { @out << "token 2"} ;
+    END
 
-			a : (A|B)+ ;
-			A : ('a' { print "1" })*
-			    {@p}?
-			    ('a' { print "2" })* ;
-	    END
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("token 1", parser.parse("a"));
+  end
 
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "aaa")
-        assert_equal("222", found);
-    end
+  def test_lexer_pred_in_exit_branch
+    grammar = <<-END
+      @lexer::members {
+        def out
+          @out
+        end
+      }
+    
+      @lexer::init {
+        @p = true
+        @out = ""
+      }
 
-
-    def test_lexer_pred_in_exit_branch2
-        grammar = <<-END
-            grammar Foo;
-            options {
-               language = Ruby;
-            }
-
-
-            @lexer::members {
-                @p = true
-            }
-
-			a : (A|B)+ ;
-			A : ({@p}? 'a' { print "1" })*
-			    ('a' { print "2" })* ;
-	    END
-
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "aaa")
-        assert_equal("111", found);
-    end
+      s returns [result]
+        : a { result = lexer.out };
 
 
-    def test_lexer_pred_in_exit_branch3
-        grammar = <<-END
-            grammar Foo;
-            options {
-               language = Ruby;
-            }
+      a : (A|B)+ ;
+      A : ('a' { @out << "1" })*
+          {@p}? ('a' { @out << "2" })* ;
+    END
 
-            @lexer::members {
-                @p = true
-            }
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("222", parser.parse("aaa"));
+  end
 
-			a : (A|B)+ ;
-			A : ({@p}? 'a' { print "1" } | )
-			    ('a' { print "2" })* ;
-        END
 
-        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "aaa")
-        assert_equal("122", found);
-    end
+  def test_lexer_pred_in_exit_branch2
+    grammar = <<-END
+      @lexer::members {
+        def out
+          @out
+        end
+      }
+    
+      @lexer::init {
+        @p = true
+        @out = ""
+      }
 
-    def test_lexer_pred_in_exit_branch4
-        grammar = <<-END
-            grammar Foo;
-            options {
-               language = Ruby;
-            }
+      s returns [result]
+        : a { result = lexer.out };
 
-            a : (A|B)+ ;
-			A @init { n = 0 } : ({ n < 2 }? 'a' { print n; n = n + 1})+
-			    ('a' { print "x" })* ;
-        END
+      a : (A|B)+ ;
+      A : ({@p}? 'a' { @out << "1" })*
+          ('a' { @out <<"2" })* ;
+    END
 
-        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "aaaaa")
-        assert_equal("01xxx", found);
-    end
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("111", parser.parse("aaa"));
+  end
 
-    def test_lexer_pred_in_cyclic_DFA
-        grammar = <<-END
-            grammar Foo;
-            options {
-               language = Ruby;
-            }
 
-			@lexer::members { @p = false }
-            a : (A|B)+ ;
-            A : {@p}? ('a')+ 'x'  { print "token 1" } ;
-            B :      ('a')+ 'x' { print "token 2" };
-        END
+  def test_lexer_pred_in_exit_branch3
+    grammar = <<-END
+      @lexer::members {
+        def out
+          @out
+        end
+      }
+      
+      @lexer::init {
+        @p = true
+        @out = ""
+      }
 
-        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "aax")
-        assert_equal("token 2", found);
-    end
+      s returns [result]
+        : a { result = lexer.out };
 
-    def test_lexer_pred_in_cyclic_DFA2
-        grammar = <<-END
-            grammar Foo;
-            options {
-               language = Ruby;
-            }
+      a : (A|B)+ ;
+      A : ({@p}? 'a' { @out << "1" } | )
+          ('a' { @out << "2" })* ;
+    END
 
-            @lexer::members { @p = false }
-            a : (A|B)+ ;
-            A : {@p}? ('a')+ 'x' ('y')? { print "token 1" } ;
-            B :      ('a')+ 'x' { print "token 2" } ;
-        END
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("122", parser.parse("aaa"));
+  end
 
-        found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "aax")
-        assert_equal("token 2", found);
-    end
+  def test_lexer_pred_in_exit_branch4
+    grammar = <<-END
+      @lexer::members {
+        def out
+          @out
+        end
+      }
+  
+      @lexer::init {
+        @out = ""
+      }
 
-    def test_gated_pred
-        grammar = <<-END
-            grammar Foo;
-            options {
-               language = Ruby;
-            }
+      s returns [result]
+        : a { result = lexer.out };
 
-            a : (A|B)+ ;
-			A : {true}?=> 'a' { print "token 1" } ;
-			B : {false}?=>('a'|'b')+ { print "token 2" } ;
-	    END
+      a : (A|B)+ ;
+      A @init { n = 0 } : ({ n < 2 }? 'a' { @out << n.to_s; n = n + 1})+
+                          ('a' { @out << "x" })* ;
+    END
 
-	    found = ANTLRTester.execParser(grammar, "FooLexer", "Foo", "a", "aa")
-        assert_equal("token 1token 1", found);
-    end
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("01xxx", parser.parse("aaaaa"));
+  end
+
+  def test_lexer_pred_in_cyclic_DFA
+    grammar = <<-END
+      @lexer::members {
+        def out
+          @out
+        end
+      }
+  
+      @lexer::init {
+        @p = false
+        @out = ""
+      }
+
+      s returns [result]
+        : a { result = lexer.out };
+
+      
+      a : (A|B)+ ;
+      A : {@p}? ('a')+ 'x'  { @out << "token 1" } ;
+      B :      ('a')+ 'x' { @out << "token 2" };
+    END
+
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("token 2", parser.parse("aax"));
+  end
+
+  def test_lexer_pred_in_cyclic_DFA2
+    grammar = <<-END
+      @lexer::members {
+        def out
+          @out
+        end
+      }
+  
+      @lexer::init {
+        @p = false
+        @out = ""
+      }
+
+      s returns [result]
+        : a { result = lexer.out };
+
+      
+      a : (A|B)+ ;
+      A : {@p}? ('a')+ 'x' ('y')? { @out << "token 1" } ;
+      B :      ('a')+ 'x' { @out << "token 2" } ;
+    END
+
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("token 2", parser.parse("aax"));
+  end
+
+  def test_gated_pred
+    grammar = <<-END
+      @lexer::members {
+        def out
+          @out
+        end
+      }
+  
+      @lexer::init {
+        @out = ""
+      }
+
+      s returns [result]
+        : a { result = lexer.out };
+
+    
+      a : (A|B)+ ;
+      A : {true}?=> 'a' { @out << "token 1" } ;
+      B : {false}?=>('a'|'b')+ { @out << "token 2" } ;
+    END
+
+    parser = Grammar::compile(grammar, "s")
+    assert_equal("token 1token 1", parser.parse("aa"));
+  end
 end

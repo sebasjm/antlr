@@ -32,84 +32,90 @@ require 'fileutils'
 include FileUtils
 
 class Grammar
-	def self.compile(grammar)
-		md = /(\w+)/.match(grammar)
-		raise "Cannot find starting rule" if md.nil?
-		top_rule = md[1]
+  def self.debug= value
+    @debug = value
+  end
+  
+  def self.compile(grammar, top_rule = nil)
+    type = ""
+    type = "lexer" if top_rule.nil?
 
-		type = top_rule == top_rule.upcase ? "lexer" : ""
+    name = "Grammar#{Time.now.to_i}#{rand(1000)}"
 
-		name = "Grammar#{Time.now.to_i}#{rand(1000)}"
+    grammar = <<-GRAMMAR
+      #{type} grammar #{name};
+      options { language = Ruby; }
 
-		grammar = <<-GRAMMAR
-			#{type} grammar #{name};
-			options { language = Ruby; }
+      #{grammar}
+    GRAMMAR
 
-			#{grammar}
-		GRAMMAR
+    tempfile = Tempfile.new("antlr")
+    dirname = tempfile.path + ".dir"
+    
+    puts dirname if @debug
+    
+    Dir.mkdir(dirname)
 
-        tempfile = Tempfile.new("antlr")
-        dirname = tempfile.path + ".dir"
-        Dir.mkdir(dirname)
+    grammar_class = nil
 
-		grammar_class = nil
+    cd(dirname) do
+      # write the grammar to a file
+      File.open("#{name}.g", "w") { |f| f.puts grammar }
 
-        cd(dirname) do
-			# write the grammar to a file
-			File.open("#{name}.g", "w") { |f| f.puts grammar }
+      # run antlr
+      `java -cp #{ENV['CLASSPATH']} org.antlr.Tool #{name}.g`
 
-	        # run antlr
-		    `java -cp #{ENV['CLASSPATH']} org.antlr.Tool #{name}.g`
+      class_name = name + (type == "lexer" ? "Lexer" : "Parser")
 
-				class_name = name + (type == "lexer" ? "Lexer" : "Parser")
+      load(dirname + "/#{class_name}.rb")
 
-            load(dirname + "/#{class_name}.rb")
+      grammar_class = Class::const_get(class_name)
 
-            grammar_class = Class::const_get(class_name)
-
-            # delete created files
-            Dir.new(dirname).each { |file|
-                rm_f(file) if file != ".." && file != "."
-            }
-        end
-
-        Dir.delete(dirname)
-
-        if type == "lexer"
-            Lexer.new(grammar_class)
-        else
-            Parser.new(grammar_class, top_rule)
-        end
+      # delete created files
+      Dir.new(dirname).each { |file|
+        rm_f(file) if file != ".." && file != "."
+      } unless @debug
     end
 
-    class Lexer
-        def initialize(grammar)
-            @grammar = grammar
-        end
+    Dir.delete(dirname) unless @debug
 
-        def parse(input)
-            parser = @grammar.new(input)
+    if type == "lexer"
+      Lexer.new(grammar_class)
+    else
+      Parser.new(grammar_class, top_rule)
+    end
+  end
 
-            tokens = []
-            loop do
-                token = parser.next_token
-                break if token == :EOF
-                tokens << token
-            end
-
-            tokens
-        end
+  class Lexer
+    def initialize(grammar)
+      @grammar = grammar
     end
 
-    class Parser
-        def initialize(grammar, top_rule)
-            @grammar = grammar
-            @top_rule = top_rule
-        end
+    def parse(input)
+      parser = @grammar.new(input)
 
-        def parse(input)
-            @grammar.new(input).send @top_rule
-        end
+      tokens = []
+      loop do
+        token = parser.next_token
+        break if token == :EOF
+        tokens << token
+      end
+
+      tokens
     end
+  end
+
+  class Parser
+    attr_reader :top_rule
+    
+    def initialize(grammar, top_rule)
+      @grammar = grammar
+      @top_rule = top_rule
+    end
+
+    def parse(input)
+      @grammar.new(input).send @top_rule
+    end
+  end
 end
 
