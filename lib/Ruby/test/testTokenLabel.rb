@@ -30,36 +30,36 @@ require 'stringio'
 
 class TestTokenLabel < Test::Unit::TestCase
 
-    def test_implicit_label
-        grammar = <<-END
-			a returns [result] : A { result = $A.text };
+  def test_implicit_label
+    grammar = <<-END
+      a returns [result] : A { result = $A.text };
 
-			A : ('a'..'z')+;
-	    END
+      A : ('a'..'z')+;
+    END
 
-		parser = Grammar::compile(grammar)
-		assert_equal('abcd', parser.parse('abcd'))
-    end
+    parser = Grammar::compile(grammar, "a")
+    assert_equal('abcd', parser.parse('abcd'))
+  end
 
-    def test_explicit_label
-        grammar = <<-END
-            a returns [result]: x=A { result = $x.text };
+  def test_explicit_label
+    grammar = <<-END
+      a returns [result]: x=A { result = $x.text };
 
-            A : ('a'..'z')+;
-        END
+      A : ('a'..'z')+;
+    END
 
-		parser = Grammar::compile(grammar)
-		assert_equal('abcd', parser.parse('abcd'))
-    end
+    parser = Grammar::compile(grammar, "a")
+    assert_equal('abcd', parser.parse('abcd'))
+  end
 
-    def test_list_label
-        grammar = <<-END
-            a returns [result]: (x+=A)+ { result = $x.map { |t| t.text }.join(',') };
+  def test_list_label
+    grammar = <<-END
+      a returns [result]: (x+=A)+ { result = $x.map { |t| t.text }.join(',') };
 
-            A : ('a'..'z');
-        END
+      A : ('a'..'z');
+    END
 
-		parser = Grammar::compile(grammar)
-		assert_equal('a,b,c,d', parser.parse('abcd'))
-    end
+    parser = Grammar::compile(grammar, "a")
+    assert_equal('a,b,c,d', parser.parse('abcd'))
+  end
 end

@@ -29,25 +29,69 @@ require 'antlr'
 
 class TestLexer < Test::Unit::TestCase
 
-    def test_match_any
-	    assert_nothing_raised do
-            Grammar::compile("A: .;").parse('a')
-        end
+  def test_match_any
+    parser = Grammar::compile("A: .;")
+    
+    assert_nothing_raised do
+      assert_equal :A, parser.parse('a').first.token_type
     end
+  end
 
-    def test_match_char
-        parser = Grammar::compile("A: 'a';")
+  def test_match_char
+    parser = Grammar::compile("A: 'a';")
 
-        assert_nothing_raised { parser.parse('a') }
-        assert_raises(RuntimeError) { parser.parse('b') }
+    assert_nothing_raised do
+      assert_equal :A, parser.parse('a').first.token_type
     end
+    
+    assert_raises(RuntimeError) { parser.parse('b') }
+  end
 
-    def test_match_string
-        parser = Grammar::compile("A: 'abc';")
+  def test_match_string
+    parser = Grammar::compile("A: 'abc';")
 
-        assert_nothing_raised { parser.parse('abc') }
-        assert_raises(RuntimeError) { parser.parse('x') }
-        assert_raises(RuntimeError) { parser.parse('ab') }
-	end        
-
+    assert_nothing_raised do 
+      assert_equal :A, parser.parse('abc').first.token_type
+    end
+    
+    assert_raises(RuntimeError) { parser.parse('x') }
+    assert_raises(RuntimeError) { parser.parse('ab') }
+  end
+  
+  def test_conditional
+    parser = Grammar.compile("A: 'a'? 'bc';");
+  
+    assert_nothing_raised do
+      assert_equal :A, parser.parse("abc").first.token_type
+      assert_equal :A, parser.parse("bc").first.token_type
+    end
+    
+    assert_raises(RuntimeError) { parser.parse('c') }
+  end
+  
+  def test_positive_closure
+    parser = Grammar.compile("A: 'a'+ 'bc';");
+  
+    assert_nothing_raised do
+      assert_equal :A, parser.parse("aaabc").first.token_type
+      assert_equal :A, parser.parse("aabc").first.token_type  
+      assert_equal :A, parser.parse("abc").first.token_type
+    end
+    
+    assert_raises(RuntimeError) { parser.parse('c') }
+    assert_raises(RuntimeError) { parser.parse('bc') }
+  end
+  
+  def test_closure
+    parser = Grammar.compile("A: 'a'* 'bc';");
+  
+    assert_nothing_raised do
+      assert_equal :A, parser.parse("aaabc").first.token_type
+      assert_equal :A, parser.parse("aabc").first.token_type  
+      assert_equal :A, parser.parse("abc").first.token_type
+      assert_equal :A, parser.parse("bc").first.token_type
+    end
+    
+    assert_raises(RuntimeError) { parser.parse('c') }
+  end
 end

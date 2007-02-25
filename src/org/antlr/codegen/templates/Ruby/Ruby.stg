@@ -56,6 +56,8 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType, filterMode) ::=
 class <name>
     require 'stringio'
 
+	<tokens:{<it.name>=<it.type>}; separator="\n">
+	
     def initialize(input)
         input = StringIO.new(input) if input.respond_to?(:to_str)
         @input = CharStream.new(input)
@@ -86,18 +88,22 @@ class <name>
 
     class Token
         attr_reader :token_type
+        attr_reader :int_type
         attr_reader :line
         attr_reader :pos
         attr_reader :text
         attr_reader :channel
 
-        def initialize(token_type, line, pos, text, channel = nil)
+        def initialize(token_type, int_type, line, pos, text, channel = nil)
             @token_type = token_type
+            @int_type = int_type
             @line = line
             @pos = pos
             @text = text
             @channel = channel
         end
+
+		alias :to_i :int_type
     end
 
     <actions.lexer.members>
@@ -198,77 +204,9 @@ class <name>
 
     <rules; separator="\n\n">
 
-
-    <if(cyclicDFAs)>
-    class DFA
-        def initialize(eot, eof, min, max, accept, special, transition)
-            @eot = eot
-            @eof = eof
-            @min = min
-            @max = max
-            @accept = accept
-            @special = special
-            @transition = transition
-        end
-
-        def predict(input)
-            mark = input.mark()
-            s = 0 # we always start at s0
-            begin
-                loop do
-                    special_state = @special[s]
-                    if special_state >= 0
-                        raise "Special states not yet supported"
-                        s = special_state_transition(special_state)
-                        input.consume()
-                        next
-                    end
-
-                    if @accept[s] >= 1
-                        return @accept[s]
-                    end
-
-                    # look for a normal char transition
-                    c = input.look_ahead(1)
-                    if c != :EOF && c >= @min[s] && c \<= @max[s]
-                        next_state = @transition[s][c - @min[s]] # move to next state
-                        if next_state \< 0
-                            # was in range but not a normal transition
-                            # must check EOT, which is like the else clause.
-                            # eot[s]>=0 indicates that an EOT edge goes to another
-                            # state.
-                            if @eot[s] >= 0  # EOT Transition to accept state?
-                                s = @eot[s]
-                                input.consume()
-                                next
-                            end
-                            raise "No viable alt"
-                        end
-                        s = next_state
-                        input.consume()
-                        next
-                    end
-                    if @eot[s] >= 0   # EOT Transition?
-                        s = @eot[s]
-                        input.consume()
-                        next
-                    end
-                    if c == :EOF && @eof[s] >= 0   # EOF Transition to accept state?
-                        return @accept[@eof[s]]
-                    end
-
-                    # not in range and not EOF/EOT, must be invalid symbol
-                    raise "No viable alt"
-                end
-            ensure
-                input.rewind(mark)
-            end
-        end
-    end
-    <endif>
-
 	<synpreds: synpred(); separator="\n\n">
 
+	<dfaClass()>
     <cyclicDFAs: cyclicDFA()>
 end
 >>
@@ -387,6 +325,9 @@ class <name>
     end
 
     <synpreds: synpred(); separator="\n\n">
+
+	<dfaClass()>
+    <cyclicDFAs: cyclicDFA()>
 end
 >>
 
@@ -397,26 +338,7 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules,
           numRules, bitsets, labelType, ASTLabelType,
           superClass, members) ::=
 <<
-    ---- treeParser ----
-    grammar: <grammar>
-    name: <name>
-    scopes:
-        <scopes; separator="\n">
-    tokens:
-        <tokens:token(); separator="\n">
-    tokenNames: <tokenNames>
-    globalAction: <globalAction>
-    rules:
-        <rules; separator="\n">
-    numRules: <numRules>
-    bitsets:
-        <bitsets:bitset(); separator="\n">
-    labelType: <labelType>
-    ASTLabelType: <ASTLabelType>
-    superClass: <superClass>
-    members:
-        <members; separator="\n">
-    ---- /treeParser ----
+	raise "treeParser not implemented"
 >>
 
 /** A simpler version of a rule template that is specific to the imaginary
@@ -490,7 +412,7 @@ def match_<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 		<block>
 		if @token.nil?
 			text = @input.substring(start, @input.index - 1)
-			@token = Token.new(:<ruleName>, line, column, text, channel)
+			@token = Token.new(:<ruleName>, <ruleName>, line, column, text, channel)
 		end<\n>
 	<endif>
 end
@@ -506,12 +428,12 @@ tokensRule(ruleName,nakedBlock,args,block,ruleDescriptor) ::=
 
 filteringNextToken() ::=
 <<
-    ---- filteringNextToken/ ----
+    raise "filteringNextToken not implemented"
 >>
 
 filteringActionGate() ::=
 <<
-    ---- filteringActionGate/ ----
+    raise "filteringActionGate not implemented"
 >>
 
 // S U B R U L E S
@@ -698,10 +620,7 @@ match()
 
 wildcardCharListLabel(label, elementIndex)::=
 <<
-    ---- wildcardCharListLabel ----
-    label: <label>
-    elementIndex: <elementIndex>
-    ---- /wildcardCharListLabel ----
+	raise "wildcardCharListLabel not implemented"
 >>
 
 /** Match a rule reference by invoking it possibly with arguments
@@ -719,12 +638,7 @@ ruleRef(rule,label,elementIndex,args)::=
 /** ids+=ID */
 ruleRefAndListLabel(rule,label,elementIndex,args)::=
 <<
-    ---- ruleRefAndListLabel ----
-    rule: <rule>
-    label: <label>
-    elementIndex: <elementIndex>
-    args: <args>
-    ---- /ruleRefAndListLabel ----
+	raise "ruleRefAndListLabel not implemented"
 >>
 
 
@@ -747,11 +661,7 @@ match(:EOF)
 /** match ^(root children) in tree parser */
 tree(root, children, nullableChildList)::=
 <<
-    ---- tree ----
-    root: <root>
-    children: <children>
-    nullableChildList: <nullableChildList>
-    ---- /tree ----
+	raise "tree not implemented"
 >>
 
 /** Every predicate is used as a validating predicate (even when it is
@@ -907,7 +817,7 @@ when <labels:{<it>}; separator=","><\n>
  */
 dfaDecision(decisionNumber,description)::=
 <<
-alt<decisionNumber> = DFA<decisionNumber>.predict(@input)
+alt<decisionNumber> = DFA<decisionNumber>.predict(self, @input)
 >>
 
 /** Generate the tables and support code needed for the DFAState object
@@ -931,6 +841,21 @@ DFA<dfa.decisionNumber> = DFA.new(
         <dfa.transition:{s | [<s; wrap="\n     ", separator=",", null="-1">]}; separator=",\n", null="">
     ])
 
+def special_state_transition(s)
+	<if(dfa.specialStateSTs)>
+		case s
+			<dfa.specialStateSTs:{state |
+			when <i0>
+				<state>}; separator="\n">
+		end
+
+		raise "Expected: <dfa.description>"
+	<else>
+		-1
+	<endif>
+end
+
+public :special_state_transition
 >>
 
 /** A special state in a cyclic DFA; special means has a semantic predicate
@@ -938,7 +863,14 @@ DFA<dfa.decisionNumber> = DFA.new(
  */
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState)::=
 <<
-    raise "cyclicDFAState not yet implemented"
+	<if(semPredState)>
+	@input.rewind(0)
+	<else>
+	look_ahead_<decisionNumber>_<stateNumber> = <LA(1)>
+	<endif>
+	s = -1
+	<edges>
+	return s if s >= 0 
 >>
 
 /** Just like a fixed DFA edge, test the lookahead and indicate what
@@ -947,7 +879,7 @@ cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState)::=
  */
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates)::=
 <<
-s = <targetStateNumber> if (<labelExpr>) <if(predicates)>&& (<predicates>)<endif><\n>
+return s = <targetStateNumber> if (<labelExpr>) <if(predicates)>&& (<predicates>)<endif><\n>
 >>
 
 /** An edge pointing at end-of-token; essentially matches any char;
@@ -1092,46 +1024,33 @@ tokenLabelPropertyRef_channel(scope,attr)::= "_<scope>.channel"
 tokenLabelPropertyRef_index(scope,attr)::= "_<scope>.index"
 
 
-tokenLabelPropertyRef_tree(scope,attr)::= "----- tokenLablePropertyRef_tree / ----"
+tokenLabelPropertyRef_tree(scope,attr)::= <<
+	raise "tokenLabelPropertyRef_tree not implemented"	
+>>
 
 ruleLabelPropertyRef_start(scope,attr)::=
 <<
-    ---- ruleLabelPropertyRef_start ----
-    scope: <scope>
-    attr: <attr>
-    ---- /ruleLabelPropertyRef_start ----
+	raise "ruleLabelPropertyRef_start not implemented"
 >>
 
 ruleLabelPropertyRef_stop(scope,attr)::=
 <<
-    ---- ruleLabelPropertyRef_stop ----
-    scope: <scope>
-    attr: <attr>
-    ---- /ruleLabelPropertyRef_stop ----
+	raise "ruleLabelPropertyRef_stop not implemented"
 >>
 
 ruleLabelPropertyRef_tree(scope,attr)::=
 <<
-    ---- ruleLabelPropertyRef_tree ----
-    scope: <scope>
-    attr: <attr>
-    ---- /ruleLabelPropertyRef_tree ----
+	raise "ruleLabelPropertyRef_tree not implemented"
 >>
 
 ruleLabelPropertyRef_text(scope,attr)::=
 <<
-    ---- ruleLabelPropertyRef_text ----
-    scope: <scope>
-    attr: <attr>
-    ---- /ruleLabelPropertyRef_text ----
+	raise "ruleLabelPropertyRef_text not implemented"
 >>
 
 ruleLabelPropertyRef_st(scope,attr)::=
 <<
-    ---- ruleLabelPropertyRef_st ----
-    scope: <scope>
-    attr: <attr>
-    ---- /ruleLabelPropertyRef_st ----
+	raise "ruleLabelPropertyRef_st not implemented"
 >>
 
 
@@ -1254,12 +1173,7 @@ false()::= "false"
 
 bitset()::=
 <<
-    ---- bitset ----
-    name: <it.name>
-    inName: <it.inName>
-    bits: <it.bits>
-    tokenIndex: <it.tokenIndex>
-    ---- /bitset ----
+	raise "bitset not implemented"
 >>
 
 
@@ -1315,4 +1229,74 @@ end
 
 parameterScope(scope) ::= <<
 <scope.attributes:{<it.decl>}; separator=", ">
+>>
+
+
+dfaClass() ::= <<
+<if(cyclicDFAs)>
+    class DFA
+        def initialize(eot, eof, min, max, accept, special, transition)
+            @eot = eot
+            @eof = eof
+            @min = min
+            @max = max
+            @accept = accept
+            @special = special
+            @transition = transition
+        end
+
+        def predict(parser, input)
+            mark = input.mark()
+            s = 0 # we always start at s0
+            begin
+                loop do
+                    special_state = @special[s]
+                    if special_state >= 0
+                        s = parser.special_state_transition(special_state)
+                        input.consume()
+                        next
+                    end
+
+                    if @accept[s] >= 1
+                        return @accept[s]
+                    end
+
+                    # look for a normal char transition
+                    c = input.look_ahead(1).to_i
+                    if c != :EOF && c >= @min[s] && c \<= @max[s]
+                        next_state = @transition[s][c - @min[s]] # move to next state
+                        if next_state \< 0
+                            # was in range but not a normal transition
+                            # must check EOT, which is like the else clause.
+                            # eot[s]>=0 indicates that an EOT edge goes to another
+                            # state.
+                            if @eot[s] >= 0  # EOT Transition to accept state?
+                                s = @eot[s]
+                                input.consume()
+                                next
+                            end
+                            raise "No viable alt"
+                        end
+                        s = next_state
+                        input.consume()
+                        next
+                    end
+                    if @eot[s] >= 0   # EOT Transition?
+                        s = @eot[s]
+                        input.consume()
+                        next
+                    end
+                    if c == :EOF && @eof[s] >= 0   # EOF Transition to accept state?
+                        return @accept[@eof[s]]
+                    end
+
+                    # not in range and not EOF/EOT, must be invalid symbol
+                    raise "No viable alt"
+                end
+            ensure
+                input.rewind(mark)
+            end
+        end
+    end
+    <endif>
 >>

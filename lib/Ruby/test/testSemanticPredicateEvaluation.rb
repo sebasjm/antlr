@@ -46,7 +46,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_simple_cyclic_DFA_with_instance_var_predicate
     grammar = <<-END
-      @members {
+      @init {
         @v = true
       }
 
