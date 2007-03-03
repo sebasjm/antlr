@@ -1470,8 +1470,8 @@ public class Grammar {
 	public int importTokenVocabulary(String vocabName) {
 		File fullFile = getImportedVocabFileName(vocabName);
 		try {
-			BufferedReader br =
-				tool.getLibraryFile(fullFile.toString());
+			FileReader fr = new FileReader(fullFile);
+			BufferedReader br = new BufferedReader(fr);
 			StreamTokenizer tokenizer = new StreamTokenizer(br);
 			tokenizer.parseNumbers();
 			tokenizer.wordChars('_', '_');
