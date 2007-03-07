@@ -413,8 +413,7 @@ ebnf:   (dotLoop)=> dotLoop // .* or .+
     |   #( POSITIVE_CLOSURE block )
     ;
 
-/** Track the .* and .+ idioms and make them greedy by default.
- *  If someone specifies an option, it won't match these
+/** Track the .* and .+ idioms and make them nongreedy by default.
  */
 dotLoop
 {
@@ -428,7 +427,7 @@ dotLoop
         opts.put("greedy", "false");
         if ( grammar.type!=Grammar.LEXER ) {
             // parser grammars assume k=1 for .* loops
-            // otherwise they look til EOF!
+            // otherwise they (analysis?) look til EOF!
             opts.put("k", Utils.integer(1));
         }
         block.setOptions(grammar,opts);
