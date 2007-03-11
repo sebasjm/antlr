@@ -41,6 +41,7 @@ import java.util.HashMap;
 @returnScope.ruleReturnMembers() ::= <<
 public StringTemplate st;
 public StringTemplate getTemplate() { return st; }
+public String toString() { return st==null?null:st.toString(); }
 >>
 
 @genericParser.members() ::= <<
@@ -69,15 +70,37 @@ public static class STAttrMap extends HashMap {
 }
 >>
 
+/** x+=rule when output=template */
+ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
+<ruleRef(...)>
+<listLabel(elem=label+".getTemplate()",...)>
+>>
+
 rewriteTemplate(alts) ::= <<
 
 // TEMPLATE REWRITE
 <if(backtracking)>
 if ( backtracking==0 ) {
   <alts:rewriteTemplateAlt(); separator="else ">
+  <if(rewrite)><replaceTextInLine()><endif>
 }
 <else>
 <alts:rewriteTemplateAlt(); separator="else ">
+<if(rewrite)><replaceTextInLine()><endif>
+<endif>
+>>
+
+replaceTextInLine() ::= <<
+<if(TREE_PARSER)>
+((TokenRewriteStream)input.getTokenStream()).replace(
+  input.getTreeAdaptor().getTokenStartIndex(retval.start),
+  input.getTreeAdaptor().getTokenStopIndex(retval.start),
+  retval.st);
+<else>
+((TokenRewriteStream)input).replace(
+  ((Token)retval.start).getTokenIndex(),
+  input.LT(-1).getTokenIndex(),
+  retval.st);
 <endif>
 >>
 

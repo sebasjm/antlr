@@ -63,12 +63,6 @@ ctx->adaptor->free(ctx->adaptor);
 @returnScope.ruleReturnMembers() ::= <<
 /* @returnScope.ruleReturnMembers() */
 pANTLR3_BASE_TREE	tree;
-<if(PARSER)>
-/* Parser return tracks tokens
- */
-pANTLR3_COMMON_TOKEN	start;
-pANTLR3_COMMON_TOKEN	stop;
-<endif>
 <if(TREE_PARSER)>
 /* Tree parser return tracks tree nodes
  */
@@ -145,8 +139,6 @@ if ( backtracking==0 ) {<\n>
 /* @alt.declarations() */
 <if(autoAST)>
 <if(outerAlt)>
-<else>
-pANTLR3_BASE_TREE	root_<blockLevel>;<\n>
 <endif>
 <endif>
 /* End: @alt.declarations() */
@@ -157,21 +149,9 @@ pANTLR3_BASE_TREE	root_<blockLevel>;<\n>
 <if(autoAST)>
 <if(outerAlt)>
 root_0 = ctx->adaptor->nil(ctx->adaptor);<\n>
-<else>
-root_<blockLevel> = ctx->adaptor->nil(ctx->adaptor);<\n>
 <endif>
 <endif>
 /* End: @alt.initializations() */
->>
-
-@alt.cleanup() ::= <<
-/* @alt.cleanup() */
-<if(autoAST)>
-<if(!outerAlt)>
-<if(backtracking)>if ( backtracking==0 ) <endif>ctx->adaptor->addChild(ctx->adaptor, root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
-<endif>
-<endif>
-/* End: @alt.cleanup() */
 >>
 
 // TOKEN AST STUFF
@@ -182,7 +162,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = ctx->adaptor->create(ctx->adaptor, <label>);
-ctx->adaptor->addChild(ctx->adaptor, root_<blockLevel>, <label>_tree);
+ctx->adaptor->addChild(ctx->adaptor, root_0, <label>_tree);
 <if(backtracking)>}<endif>
 /* End: tokenRef(token,label,elementIndex) */
 >>
@@ -191,17 +171,6 @@ ctx->adaptor->addChild(ctx->adaptor, root_<blockLevel>, <label>_tree);
 tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
 /** ID^ and output=AST */
-tokenRefRoot(token,label,elementIndex) ::= <<
-/* tokenRefRoot(token,label,elementIndex) */
-<super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
-<label>_tree = ctx->adaptor->create(ctx->adaptor, <label>);
-root_<blockLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <label>_tree, root_<blockLevel>);
-<if(backtracking)>}<endif>
-/* End: tokenRefRoot(token,label,elementIndex) */
->>
-
-/** ID^^ and output=AST */
 tokenRefRuleRoot(token,label,elementIndex) ::= <<
 /* tokenRefRuleRoot(token,label,elementIndex) */
 <super.tokenRef(...)>
@@ -216,7 +185,7 @@ root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, <label>_tree, root_0);
 tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
 /* tokenRefBangAndListLabel(token,label,elementIndex) */
 <tokenRefBang(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 /* End: tokenRefBangAndListLabel(token,label,elementIndex) */
 >>
 
@@ -224,23 +193,15 @@ tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
 /* tokenRefAndListLabel(token,label,elementIndex) */
 <tokenRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 /* End: tokenRefAndListLabel(token,label,elementIndex) */
 >>
 
 /** Match label+=TOKEN^ when output=AST but not rewrite alt */
-tokenRefRootAndListLabel(token,label,elementIndex) ::= <<
-/* tokenRefRootAndListLabel(token,label,elementIndex) */
-<tokenRefRoot(...)>
-<listLabel(...)>
-/* End: tokenRefRootAndListLabel(token,label,elementIndex) */
->>
-
-/** Match label+=TOKEN^^ when output=AST but not rewrite alt */
 tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 /* tokenRefRuleRootAndListLabel(token,label,elementIndex) */
 <tokenRefRuleRoot(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 /* End: tokenRefRuleRootAndListLabel(token,label,elementIndex) */
 >>
 
@@ -258,7 +219,7 @@ tokenRefTrack(token,label,elementIndex) ::= <<
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 /* tokenRefTrackAndListLabel(token,label,elementIndex) */
 <tokenRefTrack(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 /* End: tokenRefTrackAndListLabel(token,label,elementIndex) */
 >>
 
@@ -277,19 +238,19 @@ tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 
 matchSet(s,label,elementIndex,postmatchCode) ::= <<
 /* matchSet(s,label,elementIndex,postmatchCode) */
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>ctx->adaptor->addChild(ctx->adaptor, root_<blockLevel>, ctx->adaptor->create(ctx->adaptor, <label>));})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>ctx->adaptor->addChild(ctx->adaptor, root_0, ctx->adaptor->create(ctx->adaptor, <label>));})>
 /* End: matchSet(s,label,elementIndex,postmatchCode) */
 >>
 
 matchSetRoot(s,label,elementIndex,debug) ::= <<
 /* matchSetRoot(s,label,elementIndex,debug) */
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_<blockLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->create(ctx->adaptor, <label>), root_<blockLevel>);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->create(ctx->adaptor, <label>), root_0);})>
 /* End: matchSetRoot(s,label,elementIndex,debug) */
 >>
 
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 /* matchSetRuleRoot(s,label,elementIndex,debug) */
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (pANTLR3_BASE_TREE)adaptor.becomeRoot(adaptor.create(<label>), root_0);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->create(ctx->adaptor, <label>), root_0);})>
 /* End: matchSetRuleRoot(s,label,elementIndex,debug) */
 >>
 
@@ -299,7 +260,7 @@ matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 ruleRef(rule,label,elementIndex,args) ::= <<
 /* ruleRef(rule,label,elementIndex,args) */
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>ctx->adaptor->addChild(ctx->adaptor, root_<blockLevel>, <label>.tree);
+<if(backtracking)>if ( backtracking==0 ) <endif>ctx->adaptor->addChild(ctx->adaptor, root_0, <label>.tree);
 /* End: ruleRef(rule,label,elementIndex,args) */
 >>
 
@@ -307,14 +268,6 @@ ruleRef(rule,label,elementIndex,args) ::= <<
 ruleRefBang(rule,label,elementIndex,args) ::= "<super.ruleRef(...)>"
 
 /** rule^ */
-ruleRefRoot(rule,label,elementIndex,args) ::= <<
-/* ruleRefRoot(rule,label,elementIndex,args) */
-<super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>root_<blockLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <label>.tree, root_<blockLevel>);
-/* End: ruleRefRoot(rule,label,elementIndex,args) */
->>
-
-/** rule^^ */
 ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
 /* ruleRefRuleRoot(rule,label,elementIndex,args) */
 <super.ruleRef(...)>
@@ -397,15 +350,6 @@ ruleRefBangAndListLabel(rule,label,elementIndex,args) ::= <<
 >>
 
 /** x+=rule^ */
-ruleRefRootAndListLabel(rule,label,elementIndex,args) ::= <<
-/* ruleRefRootAndListLabel(rule,label,elementIndex,args) */
-<super.ruleRef(...)>
-root_<blockLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <label>.tree, root_<blockLevel>);<\n>
-<listLabelAST(...)>
-/* End: ruleRefRootAndListLabel(rule,label,elementIndex,args) */
->>
-
-/** x+=rule^^ */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
 /* ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) */
 <ruleRefRuleRoot(...)>
@@ -420,7 +364,7 @@ wildcard(label,elementIndex) ::= <<
 <super.wildcard(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = ctx->adaptor->create(ctx->adaptor, <label>);
-ctx->adaptor->addChild(ctx->adaptor, root_<blockLevel>, <label>_tree);
+ctx->adaptor->addChild(ctx->adaptor, root_0, <label>_tree);
 <if(backtracking)>}<endif>
 /* End: wildcard(label,elementIndex) */
 >>
@@ -430,7 +374,7 @@ wildcardRoot(label,elementIndex) ::= <<
 <super.wildcard(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = ctx->adaptor->create(ctx->adaptor, <label>);
-root_<blockLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <label>_tree, root_<blockLevel>);
+root_<blockLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <label>_tree, root_0);
 <if(backtracking)>}<endif>
 /* End: wildcardRoot(label,elementIndex) */
 >>
@@ -600,7 +544,7 @@ rewriteBlockCardinalityCheck() ::= <<
 <first([referencedTokens,referencedListLabels,referencedRules]):{ANTLR3_UINT64 n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == NULL ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>->size(list_<first([referencedTokens,referencedListLabels,referencedRules])>);}>
 /* Now check the cardinality
  */
-<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>->size(list_<it>)!=n_<rewriteBlockLevel> ) fprintf(stderr, "rewrite element list '<it>' differs in size from other elements!\n");<\n>}>
+<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>->size(list_<it>)!=n_<rewriteBlockLevel> ) fprintf(stderr, "rewriteBlockCardinalityCheck: rewrite element list '<it>' differs in size from other elements!\n");<\n>}>
 <endif>
 <!
    If no lists above, then we need to define n to be 0 or 1 depending on presence
@@ -614,13 +558,13 @@ rewriteBlockCardinalityCheck() ::= <<
 <first(referencedTokenLabels):{label | ANTLR3_UINT64 n_<rewriteBlockLevel> = <first([referencedTokenLabels,referencedRuleLabels])> == NULL ? 0 : 1; }>
 /* Now, check cardinality of non-list labels matches cardinality of other labels for rewrite
  */
-<rest(referencedRuleLabels):{label| if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label>.tree != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element list '<label>' differs in size from other elements!\n");}>
-<rest(referencedTokenLabels):{label| if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label> != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element list '<label>' differs in size from other elements!\n");}>
+<rest(referencedRuleLabels):{label| if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label>.tree != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element label '<label>.tree' differs in size from other elements!\n");}>
+<rest(referencedTokenLabels):{label| if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label> != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element label '<label>' differs in size from other elements!\n");}>
 <else> <! There were some list labels !>
 /* Now, ensure list labels match cardinality of lists
  */
-<referencedRuleLabels:{label| if ( (<label>.tree == NULL && n_<rewriteBlockLevel> \> 0) || (<label>.tree != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element list '<label>' differs in size from other elements!\n");}>
-<referencedTokenLabels:{label| if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label> != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element list '<label>' differs in size from other elements!\n");}>
+<referencedRuleLabels:{label| if ( (<label>.tree == NULL && n_<rewriteBlockLevel> \> 0) || (<label>.tree != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element list label '<label>.tree' differs in size from other elements!\n");}>
+<referencedTokenLabels:{label| if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label> != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element list label '<label>' differs in size from other elements!\n");}>
 <endif>
 /* End: rewriteBlockCardinalityCheck */
 >>
@@ -729,9 +673,9 @@ ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, list_<rule>->get(list_<ru
 rewriteRuleRefRoot(rule,dup) ::= <<
 /* rewriteRuleRefRoot(rule,dup) */
 <if(dup)>
-root_<treeLevel> = list_<rule>->becomeRoot(ctx->adaptor, ctx->adaptor->dupTree(atx->adaptor, list_<rule>->get(list_<rule>, i_<rewriteBlockLevel>+1)), root_<treeLevel>);<\n>
+root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->dupTree(atx->adaptor, list_<rule>->get(list_<rule>, i_<rewriteBlockLevel>+1)), root_<treeLevel>);<\n>
 <else>
-root_<treeLevel> = list_<rule>->becomeRoot(list_<rule>->get(list_<rule>, i_<rewriteBlockLevel> + 1), root_<treeLevel>);<\n>
+root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, list_<rule>->get(list_<rule>, i_<rewriteBlockLevel> + 1), root_<treeLevel>);<\n>
 <endif>
 /* End: rewriteRuleRefRoot(rule,dup) */
 >>

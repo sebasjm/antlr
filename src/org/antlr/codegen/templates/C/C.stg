@@ -88,6 +88,8 @@ outputFile( LEXER,
             cyclicDFAs,
             bitsets,
             buildTemplate,
+            buildAST,
+            rewrite,
             profile,
             backtracking,
             synpreds,
@@ -342,21 +344,16 @@ outputFile( LEXER,
 <endif>
 
 
-#ifndef	ANTLR3_TOKEN_STRUCT
-#define ANTLR3_TOKEN_STRUCT
-/** Work around because Token.UP and Token.DOWN are defined
- *  literally to dfaEdge() - consult with Ter on this one.
+/* The 4 tokens defined below may well clash with your own #defines or token types. If so
+ * then for the present you must use different names for your defines as these are hard coded
+ * in the code generator. It woudl be better not to use such names internally, and maybe
+ * we can change this in a forthcoming release. I deliberately do not #undef these
+ * here as this will at least give you a redefined error somewhere if they clash.
  */
-typedef struct ANTLR3_TOKEN_STRUCT_struct
-{
-    ANTLR3_INT32   INVALID;
-    ANTLR3_INT32   EOR;
-    ANTLR3_INT32   DOWN;
-    ANTLR3_INT32   UP;
-}
-    TOKEN_STRUCT;
-    
-#endif
+#define	    UP	    ANTLR3_TOKEN_UP
+#define	    DOWN    ANTLR3_TOKEN_DOWN
+#define	    EOR	    ANTLR3_TOKEN_EOR
+#define	    INVALID ANTLR3_TOKEN_INVALID
 
 
 /* =============================================================================
@@ -403,6 +400,8 @@ headerFile( LEXER,
             cyclicDFAs,
             bitsets,
             buildTemplate,
+            buildAST,
+            rewrite,
             profile,
             backtracking, 
             synpreds, 
@@ -887,11 +886,6 @@ static pANTLR3_UINT8   <name>TokenNames[]
         <tokenNames:{(pANTLR3_UINT8) <it>}; separator=",\n">
        };
 
-/* Work around invalid dfaEdge() attribute passing
- * in tree parser
- */
- static TOKEN_STRUCT Token = {ANTLR3_TOKEN_INVALID, ANTLR3_EOR_TOKEN_TYPE, ANTLR3_TOKEN_DOWN, ANTLR3_TOKEN_UP };
-
     <@members>
 
     <@end>
@@ -1357,6 +1351,11 @@ rule<ruleDescriptor.name>Ex: ;
 <ruleDescriptor.useScopes:{<scopePop(sname=it)>;}; separator="\n">
 <ruleDescriptor.ruleScope:{<scopePop(sname=it.name)>;}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
+<if(!TREE_PARSER)>
+<if(!ruleDescriptor.isSynPred)>
+retval.stop = LT(-1);<\n>
+<endif>
+<endif>
 <endif>
 >>
 
@@ -1628,15 +1627,15 @@ tmatch(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>);
 /** ids+=ID */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
 <tokenRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
-listLabel(label) ::= <<
+listLabel(label,elem) ::= <<
 if (list_<label> == NULL)
 {
     list_<label>=ctx->vectors->newVector(ctx->vectors);
 }
-list_<label>->add(list_<label>, <label>, NULL);
+list_<label>->add(list_<label>, <elem>, NULL);
 >>
 
 
@@ -1694,7 +1693,7 @@ theException()->expectingSet = FOLLOW_set_in_<ruleName><elementIndex>;
 
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 <matchSet(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match a string literal */
@@ -1724,7 +1723,7 @@ tmatchAny();
 
 wildcardAndListLabel(label,elementIndex) ::= <<
 <wildcard(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match . wildcard in lexer */
@@ -1738,7 +1737,7 @@ matchAny();
 
 wildcardCharListLabel(label, elementIndex) ::= <<
 <wildcardChar(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match a rule reference by invoking it possibly with arguments
@@ -1762,7 +1761,7 @@ _fsp--;
 /** ids+=ID */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** A lexer rule reference */
@@ -2505,8 +2504,12 @@ returnScope() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 typedef struct <returnType(...)>_struct
 {
-    /** Generic return elements for ANTLR3 rules
+<if(!TREE_PARSER)>
+    /** Generic return elements for ANTLR3 rules that are not in tree parsers or returning trees
      */
+    pANTLR3_COMMON_TOKEN    start;
+    pANTLR3_COMMON_TOKEN    stop;
+<endif>
     <@ruleReturnMembers()>   
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
 }
@@ -2587,9 +2590,8 @@ tokenLabelRef(label) ::= "<label>"
 listLabelRef(label) ::= "list_<label>"
 
 
-// not sure the next are the right approach; and they are evaluated early;
-// they cannot see TREE_PARSER or PARSER attributes for example. :(
-
+// not sure the next are the right approach
+//
 tokenLabelPropertyRef_text(scope,attr) ::= "<scope>->getText(<scope>)"
 tokenLabelPropertyRef_type(scope,attr) ::= "<scope>->getType(<scope>)"
 tokenLabelPropertyRef_line(scope,attr) ::= "<scope>->getLine(<scope>)"
@@ -2601,7 +2603,14 @@ tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>->tree"
 ruleLabelPropertyRef_start(scope,attr) ::= "((<labelType>)<scope>.start)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>.tree)"
-ruleLabelPropertyRef_text(scope,attr) ::= "strStream->toString(<scope>.start,<scope>.stop)"
+ruleLabelPropertyRef_text(scope,attr) ::= <<
+<if(TREE_PARSER)>
+strStream->toString(strStream->getTokenStartIndex(<scope>.start), strStream->getTokenStopIndex(<scope>.start))
+<else>
+strStream->toString(<scope>.start,<scope>.stop)
+<endif>
+>>
+
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
@@ -2618,7 +2627,13 @@ lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>->getText(<scope>)"
 rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval).start"
 rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval).stop"
 rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval).tree"
-rulePropertyRef_text(scope,attr) ::= "strStream->toString(retval.start,LT(-1))"
+rulePropertyRef_text(scope,attr) ::= <<
+<if(TREE_PARSER)>
+strStream->toString(strStream->getTokenStartIndex(retval.start), strStream->getTokenStopIndex(retval.start))
+<else>
+strStream->toString(retval.start,LT(-1))
+<endif>
+>>
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "ltoken()->getText(ltoken())"
@@ -2627,7 +2642,7 @@ lexerRulePropertyRef_line(scope,attr) ::= "_line"
 lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
 lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
 lexerRulePropertyRef_start(scope,attr) ::= "_start"
-lexerRulePropertyRef_end(scope,attr) ::= "_end"
+lexerRulePropertyRef_stop(scope,attr) ::= "_end"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 
 
