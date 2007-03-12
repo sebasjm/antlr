@@ -34,6 +34,7 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.Grammar;
 
 import java.io.IOException;
+import java.util.List;
 
 /** The code generator for ANTLR can usually be retargeted just by providing
  *  a new X.stg file for language X, however, sometimes the files that must
@@ -83,12 +84,13 @@ public class Target {
 	}
 
 	protected void genRecognizerFile(Tool tool,
-									CodeGenerator generator,
-									Grammar grammar,
-									StringTemplate outputFileST)
+									 CodeGenerator generator,
+									 Grammar grammar,
+									 StringTemplate outputFileST)
 		throws IOException
 	{
-		String fileName = generator.getRecognizerFileName();
+		String fileName =
+			generator.getRecognizerFileName(grammar.name, grammar.type);
 		generator.write(outputFileST, fileName);
 	}
 
@@ -171,7 +173,7 @@ public class Target {
 			buf.append(targetCharValueEscape[c]);
 		}
 		else if ( Character.UnicodeBlock.of((char)c)==
-			      Character.UnicodeBlock.BASIC_LATIN &&
+				  Character.UnicodeBlock.BASIC_LATIN &&
 				  !Character.isISOControl((char)c) )
 		{
 			// normal char
@@ -280,4 +282,12 @@ public class Target {
 	public int getMaxCharValue(CodeGenerator generator) {
 		return Label.MAX_CHAR_VALUE;
 	}
+
+	/** Give target a chance to do some postprocessing on actions.
+	 *  Python for example will have to fix the indention.
+	 */
+	public List postProcessAction(List chunks, antlr.Token actionToken) {
+		return chunks;
+	}
+
 }

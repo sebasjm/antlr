@@ -49,7 +49,7 @@ public class CTarget extends Target {
                 //
                 outputFileST.setAttribute("literals", strings);
                 //System.out.println(outputFileST.toStructureString());
-		String fileName = generator.getRecognizerFileName();
+		String fileName = generator.getRecognizerFileName(grammar.name, grammar.type);
 		generator.write(outputFileST, fileName);
 	}
                 

@@ -247,7 +247,7 @@ public class Tool {
 		int numFiles = grammarFileNames.size();
 		for (int i = 0; i < numFiles; i++) {
 			String grammarFileName = (String) grammarFileNames.get(i);
-			if ( numFiles > 1 ) {
+			if ( numFiles > 1 && !depend ) {
 			    System.out.println(grammarFileName);
 			}
 			try {
@@ -256,8 +256,8 @@ public class Tool {
 						new BuildDependencyGenerator(this, grammarFileName);
 					List outputFiles = dep.getGeneratedFileList();
 					List dependents = dep.getDependenciesFileList();
-					System.out.println("output: "+outputFiles);
-					System.out.println("dependents: "+dependents);
+					//System.out.println("output: "+outputFiles);
+					//System.out.println("dependents: "+dependents);
 					System.out.println(dep.getDependencies());
 					continue;
 				}

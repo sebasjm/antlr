@@ -849,7 +849,9 @@ public class CodeGenerator {
 								  GrammarAST actionTree)
 	{
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(this,ruleName,actionTree);
-		return translator.translateToChunks();
+		List chunks = translator.translateToChunks();
+		chunks = target.postProcessAction(chunks, actionTree.token);
+		return chunks;
 	}
 
 	/** Translate an action like [3,"foo",a[3]] and return a List of the
@@ -866,11 +868,13 @@ public class CodeGenerator {
 		List args = new ArrayList();
 		while ( argTokens.hasMoreTokens() ) {
 			String arg = (String)argTokens.nextToken();
+			antlr.Token actionToken = new antlr.CommonToken(ANTLRParser.ACTION,arg);
 			ActionTranslatorLexer translator =
 				new ActionTranslatorLexer(this,ruleName,
-										  new antlr.CommonToken(ANTLRParser.ACTION,arg),
+										  actionToken,
 										  actionTree.outerAltNum);
 			List chunks = translator.translateToChunks();
+			chunks = target.postProcessAction(chunks, actionToken);
 			args.add(chunks);
 		}
 		if ( args.size()==0 ) {
@@ -1085,10 +1089,10 @@ public class CodeGenerator {
 		return outputFileST;
 	}
 
-	public String getRecognizerFileName() {
+	public String getRecognizerFileName(String name, int type) {
 		StringTemplate extST = templates.getInstanceOf("codeFileExtension");
-		String suffix = Grammar.grammarTypeToFileNameSuffix[grammar.type];
-		return grammar.name+suffix+extST.toString();
+		String suffix = Grammar.grammarTypeToFileNameSuffix[type];
+		return name+suffix+extST.toString();
 	}
 
 	/** What is the name of the vocab file generated for this grammar?

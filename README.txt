@@ -297,6 +297,11 @@ C# Target Notes
 
 CHANGES
 
+March 12, 2007
+
+* Altered -depend.  No longer printing grammar files for multiple input
+  files with -depend.  Doesn't show T__.g temp file anymore.
+
 February 11, 2007
 
 * Added -depend command-line option that, instead of processing files,
