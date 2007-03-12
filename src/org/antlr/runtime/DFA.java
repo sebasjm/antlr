@@ -44,7 +44,7 @@ public class DFA {
 				if ( specialState>=0 ) {
 					if ( debug ) System.err.println("DFA "+decisionNumber+
 						" state "+s+" is special state "+specialState);
-					s = specialStateTransition(specialState);
+					s = specialStateTransition(specialState,input);
 					input.consume();
 					continue;
 				}
@@ -126,7 +126,9 @@ public class DFA {
 	/** A hook for debugging interface */
 	protected void error(NoViableAltException nvae) { ; }
 
-	public int specialStateTransition(int s) throws NoViableAltException {
+	public int specialStateTransition(int s, IntStream input)
+		throws NoViableAltException
+	{
 		return -1;
 	}
 

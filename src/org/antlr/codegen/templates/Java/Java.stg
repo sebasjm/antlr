@@ -901,7 +901,7 @@ class DFA<dfa.decisionNumber> extends DFA {
     }
     <@errorMethod()>
 <if(dfa.specialStateSTs)>
-    public int specialStateTransition(int s) throws NoViableAltException {
+    public int specialStateTransition(int s, IntStream input) throws NoViableAltException {
     	int _s = s;
         switch ( s ) {
         <dfa.specialStateSTs:{state |
