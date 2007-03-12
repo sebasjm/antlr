@@ -245,6 +245,7 @@ public class CodeGenerator {
 		if ( EMIT_TEMPLATE_DELIMITERS ) {
 			templates.emitDebugStartStopStrings(true);
 			templates.doNotEmitDebugStringsForTemplate("codeFileExtension");
+			templates.doNotEmitDebugStringsForTemplate("headerFileExtension");
 		}
 	}
 
@@ -438,7 +439,10 @@ public class CodeGenerator {
 		// WRITE FILES
 		try {
 			target.genRecognizerFile(tool,this,grammar,outputFileST);
-			target.genRecognizerHeaderFile(tool,this,grammar,headerFileST);
+			if ( templates.isDefined("headerFile") ) {
+				StringTemplate extST = templates.getInstanceOf("headerFileExtension");
+				target.genRecognizerHeaderFile(tool,this,grammar,headerFileST,extST.toString());
+			}
 			// write out the vocab interchange file; used by antlr,
 			// does not change per target
 			StringTemplate tokenVocabSerialization = genTokenVocabOutput();

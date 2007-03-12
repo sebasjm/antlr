@@ -56,10 +56,11 @@ public class CTarget extends Target {
 	protected void genRecognizerHeaderFile(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
-			 							   StringTemplate headerFileST)
+										   StringTemplate headerFileST,
+										   String extName)
 		throws IOException
 	{
-            generator.write(headerFileST, grammar.name+ Grammar.grammarTypeToFileNameSuffix[grammar.type] +".h");
+            generator.write(headerFileST, grammar.name+ Grammar.grammarTypeToFileNameSuffix[grammar.type] +extName);
 	}
         
         protected StringTemplate chooseWhereCyclicDFAsGo(Tool tool,

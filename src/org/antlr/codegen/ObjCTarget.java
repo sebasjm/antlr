@@ -39,10 +39,11 @@ public class ObjCTarget extends Target {
 	protected void genRecognizerHeaderFile(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
-										   StringTemplate headerFileST)
+										   StringTemplate headerFileST,
+										   String extName)
 	throws IOException
 	{
-		generator.write(headerFileST, grammar.name + Grammar.grammarTypeToFileNameSuffix[grammar.type] + ".h");
+		generator.write(headerFileST, grammar.name + Grammar.grammarTypeToFileNameSuffix[grammar.type] + extName);
 	}
 
 	public String getTargetCharLiteralFromANTLRCharLiteral(CodeGenerator generator,

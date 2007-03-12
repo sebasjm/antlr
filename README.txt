@@ -300,7 +300,8 @@ CHANGES
 March 12, 2007
 
 * Altered -depend.  No longer printing grammar files for multiple input
-  files with -depend.  Doesn't show T__.g temp file anymore.
+  files with -depend.  Doesn't show T__.g temp file anymore. Added
+  TLexer.tokens.  Added .h files if defined.
 
 February 11, 2007
 

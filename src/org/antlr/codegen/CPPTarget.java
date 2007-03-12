@@ -86,14 +86,12 @@ public class CPPTarget extends Target {
 	protected void genRecognizerHeaderFile(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
-										   StringTemplate headerFileST)
+										   StringTemplate headerFileST,
+										   String extName)
 		throws IOException
 	{
 		StringTemplateGroup templates = generator.getTemplates();
-		/// @TODO this could better be moved into CodeGenerator.java
-		templates.doNotEmitDebugStringsForTemplate("headerFileExtension");	
-		String ext = templates.getInstanceOf("headerFileExtension").toString();
-		generator.write(headerFileST, grammar.name+ext);
+		generator.write(headerFileST, grammar.name+extName);
 	}
 
 	/** Convert from an ANTLR char literal found in a grammar file to

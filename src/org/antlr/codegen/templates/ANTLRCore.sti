@@ -39,6 +39,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
 	   scopes, superClass, literals);
 
+/** The header file; make sure to define headerFileExtension() below */
 optional
 headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
@@ -362,5 +363,9 @@ execAction(action);
 // M I S C (properties, etc...)
 
 codeFileExtension();
+
+/** Your language needs a header file; e.g., ".h" */
+optional headerFileExtension();
+
 true();
 false();

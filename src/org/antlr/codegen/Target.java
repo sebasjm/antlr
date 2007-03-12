@@ -97,7 +97,8 @@ public class Target {
 	protected void genRecognizerHeaderFile(Tool tool,
 										   CodeGenerator generator,
 										   Grammar grammar,
-										   StringTemplate headerFileST)
+										   StringTemplate headerFileST,
+										   String extName) // e.g., ".h"
 		throws IOException
 	{
 		// no header file by default

@@ -1494,7 +1494,7 @@ public class Grammar {
 				}
 				else {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
+									   vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
 									   Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
@@ -1503,7 +1503,7 @@ public class Grammar {
 				token = tokenizer.nextToken();
 				if ( token != '=' ) {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
+									   vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
 									   Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
@@ -1512,7 +1512,7 @@ public class Grammar {
 				token = tokenizer.nextToken(); // skip '='
 				if ( token != StreamTokenizer.TT_NUMBER ) {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
+									   vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
 									   Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
@@ -1526,7 +1526,7 @@ public class Grammar {
 				lineNum++;
 				if ( token != StreamTokenizer.TT_EOL ) {
 					ErrorManager.error(ErrorManager.MSG_TOKENS_FILE_SYNTAX_ERROR,
-									   vocabName+".tokens",
+									   vocabName+CodeGenerator.VOCAB_FILE_EXTENSION,
 									   Utils.integer(lineNum));
 					while ( tokenizer.nextToken() != StreamTokenizer.TT_EOL ) {;}
 					token = tokenizer.nextToken();
