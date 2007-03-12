@@ -1,5 +1,4 @@
 - dedent actions
-- comments in actions?
 - implement more examples
 - antlr features
   - backtracking
@@ -9,7 +8,6 @@
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()
   - (String|CommonToken)Stream.size() --> __len__
-- proper indention of actions
 - documentation in docstrings
 - document differences to java API
 - add methods to emulate java API, but mark 'em as deprecated
@@ -19,6 +17,8 @@
   - DFA: perhaps zip() the lists into a tuple 
     (eot, eof, min, max, accept, special, transition)
     for each state. checkout potential performance gain.
+  - raise exception for failed backtracking, get rid of 
+    "if self.failed: return"
   - StringStream: look into optimizing LA(). Perhaps use LAk instead of LA(k)
     and create the attributes when needed.
   - Perform some magic to improve dfaStateSwitch.
@@ -27,4 +27,6 @@
     -> LA in (u'a', u'b', u'c', ...)
     or "LA in self.set_xyz" with set_xyz as a class member
   - lexer: operate on ordinals not character strings
+  - compatibility with pypy's "resticted python"
+  - psycho??
 - ...

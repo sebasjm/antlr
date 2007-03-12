@@ -928,7 +928,10 @@ class CommonTokenStream(object):
         return self.p
 
 
-    def rewind(self, marker):
+    def rewind(self, marker=None):
+        if marker is None:
+            marker = self.lastMarker
+            
         self.seek(marker)
 
 
@@ -1110,7 +1113,7 @@ class BaseRecognizer(object):
 
         self.errorRecovery = True
 
-        self.displayRecognitionError(self.getTokenNames(), e)
+        self.displayRecognitionError(self.tokenNames, e)
 
 
     def displayRecognitionError(self, tokenNames, e):
@@ -1597,16 +1600,6 @@ class BaseRecognizer(object):
 ## 		return backtracking;
 ## 	}
 
-    def getTokenNames(self):
-        """
-        Used to print out token names like ID during debugging and
-	error reporting.  The generated parsers implement a method
-	that overrides this to point to their String[] tokenNames.
-	"""
-        
-        return None
-
-
 ## 	/** For debugging and other purposes, might want the grammar name.
 ## 	 *  Have ANTLR generate an implementation for this method.
 ## 	 */
@@ -1904,21 +1897,35 @@ class Lexer(BaseRecognizer):
 
 
     def match(self, s):
-        i = 0;
-        while i < len(s):
-            if self.input.LA(1) != s[i]:
+        if isinstance(s, basestring):
+            i = 0;
+            while i < len(s):
+                if self.input.LA(1) != s[i]:
+                    if self.backtracking > 0:
+                        self.failed = True
+                        return
+
+                    mte = MismatchedTokenException(s[i], self.input)
+                    self.recover(mte)
+                    raise mte
+
+                i += 1
+                self.input.consume()
+                self.failed = False
+
+        else:
+            if self.input.LA(1) != s:
                 if self.backtracking > 0:
                     self.failed = True
                     return
-                
-                mte = MismatchedTokenException(s[i], self.input)
-                self.recover(mte)
-                raise mte
 
-            i += 1
+                mte = MismatchedTokenException(s, self.input)
+                self.recover(mte);
+                raise mte
+        
             self.input.consume()
             self.failed = False
-
+            
 
     def matchAny(self):
         self.input.consume()
@@ -1982,7 +1989,7 @@ class Lexer(BaseRecognizer):
         ## 
         ## self.errorRecovery = True
 
-        self.displayRecognitionError(self.getTokenNames(), e)
+        self.displayRecognitionError(self.tokenNames, e)
 
 
     def getErrorMessage(self, e, tokenNames):
@@ -2133,7 +2140,7 @@ class DFA(object):
                 specialState = self.special[s]
                 if specialState >= 0:
                     #print "is special"
-                    s = self.specialStateTransition(specialState)
+                    s = self.specialStateTransition(specialState, input)
                     input.consume()
                     continue
 
@@ -2143,8 +2150,9 @@ class DFA(object):
 
                 # look for a normal char transition
                 LA = input.LA(1)
+                #print LA, repr(input.LT(1)), input.LT(1).text
                 if LA == EOF:
-                    c = 0xffff
+                    c = -1 #0xffff
                 else:
                     try:
                         c = ord(LA)
@@ -2226,7 +2234,7 @@ class DFA(object):
         pass
 
 
-    def specialStateTransition(self, s):
+    def specialStateTransition(self, s, input):
         return -1
 
 

@@ -185,6 +185,7 @@ tokenNames = [
 
 class <name>(antlr3.<superClass>):
     grammarFileName = "<fileName>"
+    tokenNames = tokenNames
 
     def __init__(self, input):
         antlr3.<superClass>.__init__(self, input)
@@ -775,16 +776,16 @@ self.m<rule>(<args; separator=", ">)
 
 /** EOF in the lexer */
 lexerMatchEOF(label) ::= <<
-raise NotImplementedError("lexerMatchEOF")
+<if(label)>
+raise NotImplementedError("lexerMatchEOF: label")
+#int <label>Start = getCharIndex();
+#match(EOF); <checkRuleBacktrackFailure()>
+#<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<else>
+self.match(EOF)
+<checkRuleBacktrackFailure()>
+<endif>
 >>
-//<if(label)>
-//int <label>Start = getCharIndex();
-//match(EOF); <checkRuleBacktrackFailure()>
-//<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
-//<else>
-//match(EOF); <checkRuleBacktrackFailure()>
-//<endif>
-//>>
 
 /** match ^(root children) in tree parser */
 tree(root, children, nullableChildList) ::= <<
@@ -810,7 +811,7 @@ raise NotImplementedError("tree")
 validateSemanticPredicate(pred,description) ::= <<
 if not (<evalPredicate(...)>):
     <ruleBacktrackFailure()>
-    raise FailedPredicateException(self.input, "<ruleName>", "<description>")
+    raise antlr3.FailedPredicateException(self.input, "<ruleName>", "<description>")
 
 >>
 
@@ -890,7 +891,6 @@ LA<decisionNumber> = self.input.LA(<k>)
 <edges; separator="\nel">
 else:
 <if(eotPredictsAlt)>
-    raise NotImplementedError("dfaStateSwitch: eotPredictsAlt")
     alt<decisionNumber> = <eotPredictsAlt>
 <else>
     <ruleBacktrackFailure()>
@@ -975,21 +975,25 @@ DFA<dfa.decisionNumber>_transition = [
 
 <if(dfa.specialStateSTs)>
 class DFA<dfa.decisionNumber>(antlr3.DFA):
-    def specialStateTransition(self, s) {
-	raise NotImplementedError("cyclicDFA: specialStateTransition")
-    	#int _s = s;
-        #switch ( s ) {
-        #<dfa.specialStateSTs:{state |
-        #case <i0> : <! compressed special state numbers 0..n-1 !>
-        #    <state>}; separator="\n">
-        #}
+    def specialStateTransition(self_, s, input):
+        # pretend we are a member of the recognizer
+        # thus semantic predicates can be evaluated
+        self = self_.recognizer
+
+        _s = s
+
+        <dfa.specialStateSTs:{state |
+if s == <i0>: <! compressed special state numbers 0..n-1 !>
+    <state>}; separator="\nel">
+
 <if(backtracking)>
-        #if (backtracking>0) {failed=true; return -1;}<\n>
+        if self.backtracking >0:
+            self.failed = True
+            return -1<\n>
 <endif>
-        #NoViableAltException nvae =
-        #    new NoViableAltException(getDescription(), <dfa.decisionNumber>, _s, input);
-        #error(nvae);
-        #throw nvae;
+        nvae = antlr3.NoViableAltException(self_.getDescription(), <dfa.decisionNumber>, _s, input)
+        self_.error(nvae)
+        raise nvae
 <else>
 DFA<dfa.decisionNumber> = antlr3.DFA
 <endif>
@@ -1013,27 +1017,24 @@ self.dfa<dfa.decisionNumber> = self.DFA<dfa.decisionNumber>(
  *  state.
  */
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
-raise NotImplementedError("cyclicDFAState")
+<if(semPredState)>
+input.rewind()<\n>
+<else>
+LA<decisionNumber>_<stateNumber> = self.input.LA(1)<\n>
+<endif>
+s = -1
+<edges; separator="\nel">
+if s >= 0:
+    return s
 >>
-//<if(semPredState)>
-//input.rewind();<\n>
-//<else>
-//int LA<decisionNumber>_<stateNumber> = input.LA(1);<\n>
-//<endif>
-//s = -1;
-//<edges; separator="\nelse ">
-//if ( s>=0 ) return s;
-//break;
-//>>
 
 /** Just like a fixed DFA edge, test the lookahead and indicate what
  *  state to jump to next if successful.
  */
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates) ::= <<
-raise NotImplementedError("cyclicDFAEdge")
+if (<labelExpr>)<if(predicates)> and (<predicates>)<endif>:
+    s = <targetStateNumber><\n>
 >>
-//if ( (<labelExpr>) <if(predicates)>&& (<predicates>)<endif>) {s = <targetStateNumber>;}<\n>
-//>>
 
 /** An edge pointing at end-of-token; essentially matches any char;
  *  always jump to the target.
@@ -1296,10 +1297,9 @@ if <actions.(actionScope).synpredgate>:
     <action>
 
 <else>
-raise NotImplementedError("execAction: !synpredgate")
-if ( backtracking==0 ) {
-  <action>
-}
+if self.backtracking == 0:
+    <action>
+
 <endif>
 <else>
 #action start
