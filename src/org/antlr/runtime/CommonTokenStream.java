@@ -81,6 +81,7 @@ public class CommonTokenStream implements TokenStream {
 	/** Reset this token stream by setting its token source. */
 	public void setTokenSource(TokenSource tokenSource) {
 		this.tokenSource = tokenSource;
+		tokens.clear();
 		p = -1;
 		channel = Token.DEFAULT_CHANNEL;
 	}

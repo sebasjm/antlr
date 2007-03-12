@@ -299,6 +299,9 @@ CHANGES
 
 March 12, 2007
 
+* setTokenSource in CommonTokenStream didn't clear tokens list.
+  setCharStream calls reset in Lexer.
+
 * Altered -depend.  No longer printing grammar files for multiple input
   files with -depend.  Doesn't show T__.g temp file anymore. Added
   TLexer.tokens.  Added .h files if defined.

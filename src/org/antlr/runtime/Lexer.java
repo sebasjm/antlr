@@ -122,10 +122,9 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 
 	/** Set the char stream and reset the lexer */
 	public void setCharStream(CharStream input) {
+		this.input = null;
+		reset();
 		this.input = input;
-		token = null;
-		tokenStartCharIndex = -1;
-		ruleNestingLevel = 0;
 	}
 
 	/** Currently does not support multiple emits per nextToken invocation
