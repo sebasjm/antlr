@@ -641,7 +641,7 @@ antlr3ListDelete    (pANTLR3_LIST list, ANTLR3_UINT64 key)
 {
     ANTLR3_UINT8    charKey[32];
 
-    sprintf((char *)charKey, "%d", key);
+    sprintf((char *)charKey, "%lld", key);
 
     list->table->del(list->table, charKey);
 }
@@ -651,7 +651,7 @@ antlr3ListGet	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
 {
     ANTLR3_UINT8    charKey[32];
 
-    sprintf((char *)charKey, "%d", key);
+    sprintf((char *)charKey, "%lld", key);
 
     return list->table->get(list->table, charKey);
 }
@@ -675,7 +675,7 @@ antlr3ListRemove	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
     pANTLR3_HASH_ENTRY	    entry;
     ANTLR3_UINT8    charKey[32];
 
-    sprintf((char *)charKey, "%d", key);
+    sprintf((char *)charKey, "%lld", key);
 
     entry = list->table->remove(list->table, charKey);
 
