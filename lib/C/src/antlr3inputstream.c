@@ -383,7 +383,7 @@ antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
 
     /* Find the supplied mark state 
      */
-    sprintf ((char *)key, "%d", mark);
+    sprintf ((char *)key, "%lld", mark);
     state   = (pANTLR3_LEX_STATE)input->markers->get(input->markers, &key);
 
     /* Seek input pointer to the requested point (note we supply the void *pointer
