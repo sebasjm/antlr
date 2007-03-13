@@ -694,7 +694,7 @@ antlr3ListPut	    (pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (*
 {
     ANTLR3_UINT8    charKey[32];
 
-    sprintf((char *)charKey, "%d", key);
+    sprintf((char *)charKey, "%lld", key);
 
     return  list->table->put(list->table, (void *)charKey, element, freeptr);
 }
