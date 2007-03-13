@@ -634,7 +634,7 @@ public class DecisionProbe {
 	 *  no way to build a DFA so we terminated.
 	 */
 	public void reportNonLLStarDecision(DFA dfa) {
-		System.out.println("non-LL(*) DFA "+dfa.decisionNumber);
+		//System.out.println("non-LL(*) DFA "+dfa.decisionNumber);
 		nonLLStarDecision = true;
 		altsWithProblem.addAll(dfa.recursiveAltSet.toList());
 	}
