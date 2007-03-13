@@ -63,6 +63,33 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
+	public void testSingleTokenToImaginary() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID -> ID[\"x\"];\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "abc", debug);
+		assertEquals("x\n", found);
+	}
+
+	public void testSingleTokenToImaginary2() throws Exception {
+		// currently this Fails.  Allow creation of new nodes w/o args.
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID -> ID[ ];\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "abc", debug);
+		assertEquals("abc\n", found);
+	}
+
 	public void testSingleCharLiteral() throws Exception {
 		String grammar =
 			"grammar T;\n" +

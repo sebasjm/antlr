@@ -402,8 +402,8 @@ rewriteElement(e) ::= <<
 >>
 
 /** Gen ID */
-rewriteTokenRef(token,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, (<labelType>)list_<token>.get(i_<rewriteBlockLevel>));<\n>
+rewriteTokenRef(token,elementIndex,args) ::= <<
+adaptor.addChild(root_<treeLevel>, <if(args)>adaptor.create(<token>,<args; separator=", ">)<else>(<labelType>)list_<token>.get(i_<rewriteBlockLevel>)<endif>);<\n>
 >>
 
 /** Gen $label ... where defined via label=ID */
