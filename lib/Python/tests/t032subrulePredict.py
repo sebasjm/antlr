@@ -10,33 +10,22 @@ class TParser(Parser):
 
 
 cStream = antlr3.StringStream(
-    textwrap.dedent('''\
-    <!SGML "ISO 8879:1986"
-
-    CHARSET
-      BASESET  "ISO bla bla"
-      DESCSET 0 65536 0        
-    >
-    '''
-                    ))
+    'BEGIN A END'
+    )
 
 lexer = Lexer(cStream)
 tStream = antlr3.CommonTokenStream(lexer)
 parser = TParser(tStream)
-events = parser.rSgmlDeclaration()
+events = parser.a()
 
 
 cStream = antlr3.StringStream(
-    textwrap.dedent('''\
-    CHARSET
-      BASESET  "ISO bla bla"
-      DESCSET 0 65536 0        
-    '''
-                    ))
+    'BEGIN A'
+    )
 
 lexer = Lexer(cStream)
 tStream = antlr3.CommonTokenStream(lexer)
 parser = TParser(tStream)
-events = parser.rDocumentCharacterSet()
+events = parser.b()
 
 

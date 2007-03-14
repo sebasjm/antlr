@@ -3,36 +3,6 @@ options {
   language = Python;
 }
 
-
-rSgmlDeclaration
-   : '<!' 'SGML' WS+ 
-        PI WS+
-        rDocumentCharacterSet WS+ 
-       '>'
-   ;
-
-rDocumentCharacterSet
-    : 'CHARSET' WS+ rCharacterSetDescription
-    ;
-
-rCharacterSetDescription
-    : rBaseCharacterSet WS+ rDescribedCharacterSetPortion
-        ( WS+ rBaseCharacterSet WS+ rDescribedCharacterSetPortion )*
-    ;
-
-rBaseCharacterSet
-    : 'BASESET' WS+ PI
-    ;
-
-rDescribedCharacterSetPortion
-    : 'DESCSET' ( WS+ rCharacterDescription )+
-    ;
-
-rCharacterDescription
-    : NUMBER WS+ NUMBER WS+ NUMBER
-    ;
-
-
-WS: (' ' | '\n' | '\r' | '\t')+;
-NUMBER: ('0'..'9')+;
-PI: '"' ~('"')* '"';
+a: 'BEGIN' b WS+ 'END';
+b: ( WS+ 'A' )+;
+WS: ' ';

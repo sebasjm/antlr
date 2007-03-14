@@ -25,7 +25,7 @@ testAllPy:
 
 test_%: tests/%.g
 	@echo -e "\n*** Test case $<:"; \
-	$(ANTLR) $< \
+	$(ANTLR) -o tests/ $< \
 	&& PYTHONPATH=. $(PYTHON) $(subst .g,.py,$<) \
 	&& echo "Ok"
 
