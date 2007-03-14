@@ -376,7 +376,7 @@ public class IntervalSet implements IntSet {
 
     /** TODO: implement this! */
 	public IntSet or(IntSet a) {
-        return null;
+		throw new NoSuchMethodError();
     }
 
     /** Return a new set with the intersection of this set with other.  Because
