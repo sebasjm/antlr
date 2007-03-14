@@ -411,7 +411,7 @@ public class Tool {
 	private static void Xhelp() {
 		System.err.println("  -Xgrtree               print the grammar AST");
 		System.err.println("  -Xdfa                  print DFA as text ");
-		System.err.println("  -Xnoprune              do not test EBNF block exit branches");
+		System.err.println("  -Xnoprune              test lookahead against EBNF block exit branches");
 		System.err.println("  -Xnocollapse           collapse incident edges into DFA states");
 		System.err.println("  -Xdbgconversion        dump lots of info during NFA conversion");
 		System.err.println("  -Xmultithreaded        run the analysis in 2 threads");
