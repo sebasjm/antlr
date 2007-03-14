@@ -2005,8 +2005,8 @@ public class Grammar {
 		IntSet elements = null;
 		try {
 			elements = nfabuilder.setRule(r.tree);
-			System.out.println("parsed tree: "+r.tree.toStringTree());
-			System.out.println("elements="+elements);
+			//System.out.println("parsed tree: "+r.tree.toStringTree());
+			//System.out.println("elements="+elements);
 		}
 		catch (RecognitionException re) {
 			throw re;
