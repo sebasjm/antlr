@@ -396,7 +396,9 @@ public class DFA {
 		// walk Vector<Vector<FormattedInteger>> which is the transition[][] table
 		for (int i = 0; i < transition.size(); i++) {
 			Vector transitionsForState = (Vector) transition.elementAt(i);
-			encoded.add(getRunLengthEncoding(transitionsForState));
+			int maxOrExitAlt = nAlts;
+			Integer maxOrExitState = (Integer)accept.elementAt(maxOrExitAlt);
+			encoded.add(getRunLengthEncoding(transitionsForState, maxOrExitState));
 		}
 		return encoded;
 	}
@@ -411,7 +413,12 @@ public class DFA {
 	 *  and \uFFFF for 16bit.  Hideous and specific to Java, but it is the
 	 *  only target bad enough to need it.
 	 */
-	public static List getRunLengthEncoding(List data) {
+	public List getRunLengthEncoding(List data) {
+		Integer emptyValue = Utils.integer(-1);
+		return getRunLengthEncoding(data, emptyValue);
+	}
+
+	public List getRunLengthEncoding(List data, Integer defaultValue) {
 		if ( data==null || data.size()==0 ) {
 			// for states with no transitions we want an empty string ""
 			// to hold its place in the transitions array.
@@ -419,7 +426,6 @@ public class DFA {
 			empty.add("");
 			return empty;
 		}
-		Integer negOneI = Utils.integer(-1);
 		int size = Math.max(2,data.size()/2);
 		List encoded = new ArrayList(size); // guess at size
 		// scan values looking for runs
@@ -427,14 +433,14 @@ public class DFA {
 		while ( i < data.size() ) {
 			Integer I = (Integer)data.get(i);
 			if ( I==null ) {
-				I = negOneI; // empty values become -1
+				I = defaultValue;
 			}
 			// count how many v there are?
 			int n = 0;
 			for (int j = i; j < data.size(); j++) {
 				Integer v = (Integer)data.get(j);
 				if ( v==null ) {
-					v = negOneI; // empty values become -1
+					v = defaultValue;
 				}
 				if ( I.equals(v) ) {
 					n++;
@@ -806,6 +812,13 @@ public class DFA {
     public boolean isCyclic() {
         return cyclic && getUserMaxLookahead()==0;
     }
+
+	public boolean canInlineDecision() {
+		// TODO: and ! too big
+		return CodeGenerator.GEN_ACYCLIC_DFA_INLINE &&
+			!isCyclic() &&
+		    !probe.isNonLLStarDecision();
+	}
 
 	/** Is this DFA derived from the NFA for the Tokens rule? */
 	public boolean isTokensRuleDecision() {

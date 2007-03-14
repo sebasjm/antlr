@@ -303,7 +303,12 @@ March 14, 2007
 
 * Added -Xnoinlinedfa make all DFA with tables; no inline prediction with IFs
 
-* Fixed ANTLR-91.  Sem pred states didn't define lookahead vars.
+* Fixed http://www.antlr.org:8888/browse/ANTLR-80.
+  Sem pred states didn't define lookahead vars.
+
+* Fixed http://www.antlr.org:8888/browse/ANTLR-91.  
+  When forcing some acyclic DFA to be state tables, they broke.
+  Forcing all DFA to be state tables should give same results.
 
 March 12, 2007
 

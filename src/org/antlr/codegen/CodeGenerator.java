@@ -608,9 +608,7 @@ public class CodeGenerator {
 		// I have to check for is-non-LL(*) because if non-LL(*) the cyclic
 		// check is not done by DFA.verify(); that is, verify() avoids
 		// doesStateReachAcceptState() if non-LL(*)
-		if ( GEN_ACYCLIC_DFA_INLINE && !dfa.isCyclic() &&
-		     !dfa.probe.isNonLLStarDecision() ) /* TODO: and ! too big */
-		{
+		if ( dfa.canInlineDecision() ) {
 			decisionST =
 				acyclicDFAGenerator.genFixedLookaheadDecision(getTemplates(), dfa);
 		}

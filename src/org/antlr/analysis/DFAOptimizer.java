@@ -151,11 +151,11 @@ public class DFAOptimizer {
 						   " num states="+dfa.getNumberOfStates());
 		*/
 		//long start = System.currentTimeMillis();
-		if ( PRUNE_EBNF_EXIT_BRANCHES ) {
+		if ( PRUNE_EBNF_EXIT_BRANCHES && dfa.canInlineDecision() ) {
 			visited.clear();
 			int decisionType =
 				dfa.getNFADecisionStartState().decisionStateType;
-			if ( dfa.isGreedy() && !dfa.isCyclic() &&
+			if ( dfa.isGreedy() &&
 				 (decisionType==NFAState.OPTIONAL_BLOCK_START ||
 				 decisionType==NFAState.LOOPBACK) )
 			{
