@@ -396,9 +396,7 @@ public class DFA {
 		// walk Vector<Vector<FormattedInteger>> which is the transition[][] table
 		for (int i = 0; i < transition.size(); i++) {
 			Vector transitionsForState = (Vector) transition.elementAt(i);
-			int maxOrExitAlt = nAlts;
-			Integer maxOrExitState = (Integer)accept.elementAt(maxOrExitAlt);
-			encoded.add(getRunLengthEncoding(transitionsForState, maxOrExitState));
+			encoded.add(getRunLengthEncoding(transitionsForState));
 		}
 		return encoded;
 	}
@@ -414,11 +412,6 @@ public class DFA {
 	 *  only target bad enough to need it.
 	 */
 	public List getRunLengthEncoding(List data) {
-		Integer emptyValue = Utils.integer(-1);
-		return getRunLengthEncoding(data, emptyValue);
-	}
-
-	public List getRunLengthEncoding(List data, Integer defaultValue) {
 		if ( data==null || data.size()==0 ) {
 			// for states with no transitions we want an empty string ""
 			// to hold its place in the transitions array.
@@ -430,17 +423,18 @@ public class DFA {
 		List encoded = new ArrayList(size); // guess at size
 		// scan values looking for runs
 		int i = 0;
+		Integer emptyValue = Utils.integer(-1);
 		while ( i < data.size() ) {
 			Integer I = (Integer)data.get(i);
 			if ( I==null ) {
-				I = defaultValue;
+				I = emptyValue;
 			}
 			// count how many v there are?
 			int n = 0;
 			for (int j = i; j < data.size(); j++) {
 				Integer v = (Integer)data.get(j);
 				if ( v==null ) {
-					v = defaultValue;
+					v = emptyValue;
 				}
 				if ( I.equals(v) ) {
 					n++;
@@ -493,6 +487,11 @@ public class DFA {
 		}
 		while ( it.hasNext() ) {
 			DFAState s = (DFAState)it.next();
+			if ( s==null ) {
+				// ignore null states; some acylic DFA see this condition
+				// when inlining DFA (due to lacking of exit branch pruning?)
+				continue;
+			}
 			if ( s.isAcceptState() ) {
 				// can't compute min,max,special,transition on accepts
 				accept.set(s.stateNumber,
