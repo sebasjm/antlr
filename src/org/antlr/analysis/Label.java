@@ -144,7 +144,12 @@ public class Label implements Comparable, Cloneable {
 
     /** Make a set label */
     public Label(IntSet labelSet) {
-        int singleAtom = labelSet.getSingleElement();
+		if ( labelSet==null ) {
+			this.label = SET;
+			this.labelSet = IntervalSet.of(INVALID);
+			return;
+		}
+		int singleAtom = labelSet.getSingleElement();
         if ( singleAtom!=INVALID ) {
             // convert back to a single atomic element if |labelSet|==1
             label = singleAtom;

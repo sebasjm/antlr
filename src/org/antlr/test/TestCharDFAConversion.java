@@ -407,11 +407,61 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
+	public void testNotFragmentInLexer() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar T;\n"+
+			"A : 'a' | ~B {;} ;\n" +
+			"fragment B : 'a' ;\n");
+		g.createLookaheadDFAs();
+		String expecting =
+			".s0-'a'->:s1=>1\n" +
+			".s0-{'\\u0000'..'`', 'b'..'\\uFFFE'}->:s2=>2\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testNotSetFragmentInLexer() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar T;\n"+
+			"A : B | ~B {;} ;\n" +
+			"fragment B : 'a'|'b' ;\n");
+		g.createLookaheadDFAs();
+		String expecting =
+			".s0-'a'..'b'->:s1=>1\n" +
+			".s0-{'\\u0000'..'`', 'c'..'\\uFFFE'}->:s2=>2\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testNotTokenInLexer() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar T;\n"+
+			"A : 'x' ('a' | ~B {;}) ;\n" +
+			"B : 'a' ;\n");
+		g.createLookaheadDFAs();
+		String expecting =
+			".s0-'a'->:s1=>1\n" +
+			".s0-{'\\u0000'..'`', 'b'..'\\uFFFE'}->:s2=>2\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+	public void testNotComplicatedSetRuleInLexer() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar T;\n"+
+			"A : B | ~B {;} ;\n" +
+			"fragment B : 'a'|'b'|'c'..'e'|C ;\n" +
+			"fragment C : 'f' ;\n"); // has to seen from B to C
+		g.createLookaheadDFAs();
+		String expecting =
+			".s0-'a'..'f'->:s1=>1\n" +
+			".s0-{'\\u0000'..'`', 'g'..'\\uFFFE'}->:s2=>2\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
+
 	// S U P P O R T
 
 	public void _template() throws Exception {
 		Grammar g = new Grammar(
-			"grammar t;\n"+
+			"grammar T;\n"+
 			"a : A | B;");
 		g.createLookaheadDFAs();
 		String expecting =

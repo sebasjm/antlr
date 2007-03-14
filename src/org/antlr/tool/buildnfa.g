@@ -276,8 +276,8 @@ rewrite
 	;
 
 element returns [StateCluster g=null]
-    :   g=atom
-    |   #(  n:NOT
+    :   g=atom_or_notatom
+    /*
             (  #( c:CHAR_LITERAL (ast1:ast_suffix)? )
 	           {
 	            int ttype=0;
@@ -323,6 +323,7 @@ element returns [StateCluster g=null]
             )
         	{#n.followingNFAState = g.right;}
          )
+         */
     |   #(RANGE a:atom b:atom)
         {g = factory.build_Range(grammar.getTokenType(#a.getText()),
                                  grammar.getTokenType(#b.getText()));}
@@ -450,9 +451,25 @@ atom_or_notatom returns [StateCluster g=null]
 	           }
             |  t:TOKEN_REF (ast3:ast_suffix)?
 	           {
-	           int ttype = grammar.getTokenType(t.getText());
-               IntSet notAtom = grammar.complement(ttype);
-               if ( notAtom.isNil() ) {
+	            int ttype=0;
+                IntSet notAtom = null;
+     			if ( grammar.type==Grammar.LEXER ) {
+        			notAtom = grammar.getSetFromRule(this,#t.getText());
+        	   		if ( notAtom==null ) {
+                  		ErrorManager.grammarError(ErrorManager.MSG_RULE_INVALID_SET,
+				  			              grammar,
+							              #t.token,
+								          #t.getText());
+        	   		}
+        	   		else {
+	            		notAtom = grammar.complement(notAtom);
+	            	}
+     			}
+     			else {
+        			ttype = grammar.getTokenType(#t.getText());
+	            	notAtom = grammar.complement(ttype);
+        		}
+               if ( notAtom==null || notAtom.isNil() ) {
                   ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
 				  			              grammar,
 							              #t.token,
@@ -565,6 +582,26 @@ IntSet elements=new IntervalSet();
 		//{System.out.println("set elements="+elements.toString(grammar));}
     ;
 
+
+setRule returns [IntSet elements=new IntervalSet()]
+{IntSet s=null;}
+	:	#( RULE id:ID (modifier)? ARG RET ( OPTIONS )? ( ruleScopeSpec )?
+		   	(AMPERSAND)*
+           	#( BLOCK ( OPTIONS )?
+           	   ( #(ALT (setElement[elements]|s=setRuleSet {elements.addAll(s);})) )+
+           	   EOB
+           	 )
+           	(exceptionGroup)?
+           	EOR
+         )
+    ;
+    exception
+    	catch[RecognitionException re] {throw re;}
+
+setRuleSet returns [IntSet elements=new IntervalSet()]
+	:	#( s:SET (setElement[elements])+ ( ast:ast_suffix )? )
+    ;
+
 setElement[IntSet elements]
 {
     int ttype;
@@ -587,15 +624,31 @@ setElement[IntSet elements]
         }
     |   t:TOKEN_REF
         {
-        ttype = grammar.getTokenType(t.getText());
-        if ( elements.member(ttype) ) {
-			ErrorManager.grammarError(ErrorManager.MSG_DUPLICATE_SET_ENTRY,
-									  grammar,
-									  #t.token,
-									  #t.getText());
+		if ( grammar.type==Grammar.LEXER ) {
+			// recursively will invoke this rule to match elements in target rule ref
+			IntSet ruleSet = grammar.getSetFromRule(this,#t.getText());
+			if ( ruleSet==null ) {
+				ErrorManager.grammarError(ErrorManager.MSG_RULE_INVALID_SET,
+								  grammar,
+								  #t.token,
+								  #t.getText());
+			}
+			else {
+				elements.addAll(ruleSet);
+			}
+		}
+		else {
+			ttype = grammar.getTokenType(t.getText());
+			if ( elements.member(ttype) ) {
+				ErrorManager.grammarError(ErrorManager.MSG_DUPLICATE_SET_ENTRY,
+										  grammar,
+										  #t.token,
+										  #t.getText());
+			}
+			elements.add(ttype);
+			}
         }
-        elements.add(ttype);
-        }
+
     |   s:STRING_LITERAL
         {
         ttype = grammar.getTokenType(s.getText());

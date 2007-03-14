@@ -77,7 +77,6 @@ tokens {
     EOR;
     EOB;
     EOA; // end of alt
-    CHARSET;
     SET;
     ID;
     ARG;
@@ -347,20 +346,6 @@ optionValue
 	|	CHAR_LITERAL
 	|	INT
 //	|   cs:charSet       {value = #cs;} // return set AST in this case
-	;
-*/
-
-/*
-will probably need for char vocab spec later
-charSet
-	:   LPAREN^ {#LPAREN.setType(CHARSET);}
-	        charSetElement ( OR^ charSetElement )*
-	    RPAREN!
-	;
-
-charSetElement
-	:   c1:CHAR_LITERAL
-	|   c2:CHAR_LITERAL RANGE^ c3:CHAR_LITERAL
 	;
 */
 

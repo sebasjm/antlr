@@ -27,10 +27,7 @@
 */
 package org.antlr.tool;
 
-import antlr.RecognitionException;
-import antlr.TokenStreamRewriteEngine;
-import antlr.TokenWithIndex;
-import antlr.Token;
+import antlr.*;
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
@@ -1989,7 +1986,51 @@ public class Grammar {
         return complement(IntervalSet.of(atom));
     }
 
-    /** Decisions are linked together with transition(1).  Count how
+	/** Get the set equivalent (if any) of the indicated rule from this
+	 *  grammar.  Mostly used in the lexer to do ~T for some fragment rule
+	 *  T.  If the rule AST has a SET use that.  If the rule is a single char
+	 *  convert it to a set and return.  If rule is not a simple set (w/o actions)
+	 *  then return null.
+	 *  Rules have AST form:
+	 *
+	 *		^( RULE ID modifier ARG RET SCOPE block EORAST )
+	 */
+	public IntSet getSetFromRule(TreeToNFAConverter nfabuilder, String ruleName)
+		throws RecognitionException
+	{
+		Rule r = getRule(ruleName);
+		if ( r==null ) {
+			return null;
+		}
+		IntSet elements = null;
+		try {
+			elements = nfabuilder.setRule(r.tree);
+			System.out.println("parsed tree: "+r.tree.toStringTree());
+			System.out.println("elements="+elements);
+		}
+		catch (RecognitionException re) {
+			throw re;
+		}
+		return elements;
+		/*
+		GrammarAST setNode = r.tree.findFirstType(ANTLRParser.SET);
+		if ( setNode!=null ) {
+			try {
+				nfabuilder.set(setNode); // set r.tree's set value
+				if ( setNode.setValue!=null ) {
+					return setNode.setValue;
+				}
+			}
+			catch (RecognitionException re) {
+				throw re;
+			}
+		}
+		// check to see if it's a single char (no action)
+		return null;
+		*/
+	}
+
+	/** Decisions are linked together with transition(1).  Count how
      *  many there are.  This is here rather than in NFAState because
      *  a grammar decides how NFAs are put together to form a decision.
      */

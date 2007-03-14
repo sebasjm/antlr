@@ -167,6 +167,7 @@ public class ErrorManager {
 	public static final int MSG_WRITE_TO_READONLY_ATTR = 151;
 	public static final int MSG_MISSING_AST_TYPE_IN_TREE_GRAMMAR = 152;
 	public static final int MSG_REWRITE_FOR_MULTI_ELEMENT_ALT = 153;
+	public static final int MSG_RULE_INVALID_SET = 154;
 
 
 	// GRAMMAR WARNINGS
