@@ -6,7 +6,7 @@ testantlr3:
 	$(PYTHON) testantlr3.py
 
 .PHONY: test
-test: testantlr3 $(subst tests/,test_,$(subst .g,,$(wildcard tests/t*.g)))
+test: clean testantlr3 $(subst tests/,test_,$(subst .g,,$(filter-out %__.g,$(wildcard tests/t*.g))))
 
 
 # python <= 2.2 would need a custom set() class
