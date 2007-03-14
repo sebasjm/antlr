@@ -297,6 +297,10 @@ C# Target Notes
 
 CHANGES
 
+March 14, 2007
+
+* Fixed bug in lexer where ~T didn't compute the set from rule T.
+
 March 12, 2007
 
 * setTokenSource in CommonTokenStream didn't clear tokens list.
