@@ -91,8 +91,7 @@ class <name>(antlr3.Lexer):
     def __init__(self, input=None):
         antlr3.Lexer.__init__(self, input)
 <if(backtracking)>
-        #raise NotImplementedError("lexer: backtracking")
-        #ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
+        self.ruleMemo = {}
 <endif>
 
         <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; seperator="\n">
@@ -190,8 +189,7 @@ class <name>(antlr3.<superClass>):
     def __init__(self, input):
         antlr3.<superClass>.__init__(self, input)
 <if(backtracking)>
-        raise NotImplementedError("genericParser: backtracking")
-        ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
+        self.ruleMemo = {}
 <endif>
 
         <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; seperator="\n">
@@ -275,8 +273,9 @@ lexerSynpred(name) ::= <<
 
 ruleMemoization(name) ::= <<
 <if(memoize)>
-raise NotImplementedError("ruleMemoization: memoize")
-if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { return <ruleReturnValue()>; }
+if self.backtracking > 0 and self.alreadyParsedRule(self.input, <ruleDescriptor.index>):
+    return <ruleReturnValue()>
+
 <endif>
 >>
 
@@ -363,8 +362,7 @@ retval.start = input.LT(1);<\n>
 }>
 <endif>
 <if(memoize)>
-raise NotImplementedError("ruleDeclarations: memoize")
-int <ruleDescriptor.name>_StartIndex = input.index();
+<ruleDescriptor.name>_StartIndex = self.input.index()
 <endif>
 >>
 
@@ -416,10 +414,10 @@ retval.stop = input.LT(-1);<\n>
 
 memoize() ::= <<
 <if(memoize)>
-raise NotImplementedError("ruleCleanUp: memoize")
 <if(backtracking)>
-raise NotImplementedError("ruleCleanUp: backtracking")
-if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
+if self.backtracking > 0:
+    self.memoize(self.input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex)
+
 <endif>
 <endif>
 >>
@@ -540,7 +538,7 @@ while True:
     <alts:altSwitchCase(); separator="\nel">
     else:
         if cnt<decisionNumber> >= 1:
-            # FIXME: could this be nested?
+            <! FIXME: could this be nested? !>
             break #loop<decisionNumber>
 
         <ruleBacktrackFailure()>
@@ -568,7 +566,7 @@ while True:
     <@postdecision()>
     <alts:altSwitchCase(); separator="\nel">
     else:
-        # FIXME: could this be nested?
+        <! FIXME: could this be nested? !>
         break #loop<decisionNumber>
 
 <@postloop()>
@@ -659,10 +657,10 @@ if <s>:
     <postmatchCode>
     self.input.consume();
 <if(!LEXER)>
-    self.errorRecovery = False
+    self.errorRecovery = False<\n>
 <endif>
 <if(backtracking)>
-    self.failed = False
+    self.failed = False<\n>
 <endif>
 
 else:
@@ -1048,11 +1046,11 @@ raise NotImplementedError("eotDFAEdge")
 
 // D F A  E X P R E S S I O N S
 
-andPredicates(left,right) ::= "FIXME(andPredicates) (<left>&&<right>)"
+andPredicates(left,right) ::= "(<left> and <right>)"
 
-orPredicates(operands) ::= "FIXME(orPredicates) (<first(operands)><rest(operands):{o | ||<o>}>)"
+orPredicates(operands) ::= "(<first(operands)><rest(operands):{o |  or <o>}>)"
 
-notPredicate(pred) ::= "FIXME(notPredicate) !(<evalPredicate(...)>)"
+notPredicate(pred) ::= "not (<evalPredicate(...)>)"
 
 evalPredicate(pred,description) ::= "<pred>"
 
@@ -1204,7 +1202,7 @@ self.<scope>_stack[-1].<attr.name> = <expr>
  *  to stack itself not top of stack.  This is useful for predicates
  *  like {$function.size()>0 && $function::name.equals("foo")}?
  */
-isolatedDynamicScopeRef(scope) ::= "FIXME(isolatedDynamicScopeRef) <scope>_stack"
+isolatedDynamicScopeRef(scope) ::= "self.<scope>_stack"
 
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<

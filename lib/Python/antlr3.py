@@ -990,7 +990,6 @@ class BaseRecognizer(object):
 
     MEMO_RULE_FAILED = -2
     MEMO_RULE_UNKNOWN = -1
-    INITIAL_FOLLOW_STACK_SIZE = 100
 
     # copies from Token object for convenience in actions
     DEFAULT_TOKEN_CHANNEL = DEFAULT_CHANNEL
@@ -1046,8 +1045,7 @@ class BaseRecognizer(object):
         # wack everything related to backtracking and memoization
         self.backtracking = 0
         if self.ruleMemo is not None:
-            for idx in xrange(0, len(self.ruleMemo)):
-                self.ruleMemo[idx] = None
+            self.ruleMemo = {}
 
 
     def match(self, input, ttype, follow):
@@ -1635,67 +1633,68 @@ class BaseRecognizer(object):
 ## 		return strings;
 ## 	}
 
-## 	/** Given a rule number and a start token index number, return
-## 	 *  MEMO_RULE_UNKNOWN if the rule has not parsed input starting from
-## 	 *  start index.  If this rule has parsed input starting from the
-## 	 *  start index before, then return where the rule stopped parsing.
-## 	 *  It returns the index of the last token matched by the rule.
-## 	 *
-## 	 *  For now we use a hashtable and just the slow Object-based one.
-## 	 *  Later, we can make a special one for ints and also one that
-## 	 *  tosses out data after we commit past input position i.
-## 	 */
-## 	public int getRuleMemoization(int ruleIndex, int ruleStartIndex) {
-## 		if ( ruleMemo[ruleIndex]==null ) {
-## 			ruleMemo[ruleIndex] = new HashMap();
-## 		}
-## 		Integer stopIndexI =
-## 			(Integer)ruleMemo[ruleIndex].get(new Integer(ruleStartIndex));
-## 		if ( stopIndexI==null ) {
-## 			return MEMO_RULE_UNKNOWN;
-## 		}
-## 		return stopIndexI.intValue();
-## 	}
+    def getRuleMemoization(self, ruleIndex, ruleStartIndex):
+	"""
+        Given a rule number and a start token index number, return
+        MEMO_RULE_UNKNOWN if the rule has not parsed input starting from
+        start index.  If this rule has parsed input starting from the
+        start index before, then return where the rule stopped parsing.
+        It returns the index of the last token matched by the rule.
 
-## 	/** Has this rule already parsed input at the current index in the
-## 	 *  input stream?  Return the stop token index or MEMO_RULE_UNKNOWN.
-## 	 *  If we attempted but failed to parse properly before, return
-## 	 *  MEMO_RULE_FAILED.
-## 	 *
-## 	 *  This method has a side-effect: if we have seen this input for
-## 	 *  this rule and successfully parsed before, then seek ahead to
-## 	 *  1 past the stop token matched for this rule last time.
-## 	 */
-## 	public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
-## 		int stopIndex = getRuleMemoization(ruleIndex, input.index());
-## 		if ( stopIndex==MEMO_RULE_UNKNOWN ) {
-## 			return false;
-## 		}
-## 		if ( stopIndex==MEMO_RULE_FAILED ) {
-## 			//System.out.println("rule "+ruleIndex+" will never succeed");
-## 			failed=true;
-## 		}
-## 		else {
-## 			//System.out.println("seen rule "+ruleIndex+" before; skipping ahead to @"+(stopIndex+1)+" failed="+failed);
-## 			input.seek(stopIndex+1); // jump to one past stop token
-## 		}
-## 		return true;
-## 	}
+        For now we use a hashtable and just the slow Object-based one.
+        Later, we can make a special one for ints and also one that
+        tosses out data after we commit past input position i.
+	"""
+        
+        if ruleIndex not in self.ruleMemo:
+            self.ruleMemo[ruleIndex] = {}
+		
+        stopIndex = self.ruleMemo[ruleIndex].get(ruleStartIndex, None)
+        if stopIndex is None:
+            return self.MEMO_RULE_UNKNOWN
 
-## 	/** Record whether or not this rule parsed the input at this position
-## 	 *  successfully.  Use a standard java hashtable for now.
-## 	 */
-## 	public void memoize(IntStream input,
-## 						int ruleIndex,
-## 						int ruleStartIndex)
-## 	{
-## 		int stopTokenIndex = failed?MEMO_RULE_FAILED:input.index()-1;
-## 		if ( ruleMemo[ruleIndex]!=null ) {
-## 			ruleMemo[ruleIndex].put(
-## 				new Integer(ruleStartIndex), new Integer(stopTokenIndex)
-## 			);
-## 		}
-## 	}
+        return stopIndex
+
+
+    def alreadyParsedRule(self, input, ruleIndex):
+	"""
+        Has this rule already parsed input at the current index in the
+        input stream?  Return the stop token index or MEMO_RULE_UNKNOWN.
+        If we attempted but failed to parse properly before, return
+        MEMO_RULE_FAILED.
+
+        This method has a side-effect: if we have seen this input for
+        this rule and successfully parsed before, then seek ahead to
+        1 past the stop token matched for this rule last time.
+        """
+        
+        stopIndex = self.getRuleMemoization(ruleIndex, input.index())
+        if stopIndex == self.MEMO_RULE_UNKNOWN:
+            return False
+
+        if stopIndex == self.MEMO_RULE_FAILED:
+            self.failed = True
+
+        else:
+            input.seek(stopIndex + 1)
+
+        return True;
+
+
+    def memoize(self, input, ruleIndex, ruleStartIndex):
+	"""
+        Record whether or not this rule parsed the input at this position
+	successfully.
+	"""
+
+        if self.failed:
+            stopTokenIndex = self.MEMO_RULE_FAILED
+        else:
+            stopTokenIndex = input.index() - 1
+        
+        if ruleIndex in self.ruleMemo:
+            self.ruleMemo[ruleIndex][ruleStartIndex] = stopTokenIndex
+
 
 ## 	/** return how many rule/input-index pairs there are in total.
 ## 	 *  TODO: this includes synpreds. :(
