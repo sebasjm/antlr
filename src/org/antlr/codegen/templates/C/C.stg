@@ -385,6 +385,7 @@ outputFile( LEXER,
  */
 
 >>
+headerFileExtension() ::= ".h"
 
 headerFile( LEXER,
             PARSER,
@@ -1222,7 +1223,7 @@ if (backtracking>0)
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::= <<
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize) ::= <<
 /** 
  * $ANTLR start <ruleName>
  * <fileName>:<description>
@@ -1244,7 +1245,14 @@ static <returnType()>
     
     <ruleCleanUp()>
 <if(exceptions)>
-    <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
+    if	(hasException())
+    {
+	<exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
+    }
+    else
+    {
+	<(ruleDescriptor.actions.after):execAction()>
+    }
 <else>
 <if(!emptyRule)>
 <if(actions.(actionScope).rulecatch)>
@@ -1254,12 +1262,17 @@ static <returnType()>
     {
         preportError();
         precover();
+    }
+    else
+    {
+	<(ruleDescriptor.actions.after):execAction()>
     }<\n>
 <endif>
 <endif>
 <endif>
     <if(trace)>System.out.println("exit <ruleName> "+LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
-    <ruleDescriptor.actions.finally:execAction()>
+    <memoize()>
+    <finally>
     <@postamble()>
     return <ruleReturnValue()>;
 }
@@ -1340,12 +1353,16 @@ retval
 <endif>
 >>
 
-ruleCleanUp() ::= <<
+memoize() ::= <<
 <if(memoize)>
 <if(backtracking)>
 if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
 <endif>
 <endif>
+>>
+
+ruleCleanUp() ::= <<
+
 goto rule<ruleDescriptor.name>Ex; /* Prevent compiler warnings */
 rule<ruleDescriptor.name>Ex: ;
 <ruleDescriptor.useScopes:{<scopePop(sname=it)>;}; separator="\n">
@@ -1415,7 +1432,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <block>
     <! create token if none exists *and* we are an outermost token rule !>
     <execAction({     
-    if ( ltoken() == NULL && !hasException()) 
+    if ( ltoken() == NULL && !hasException() && ctx->pLexer->ruleNestingLevel==1) 
     {
 		emitNew(_type,_line,_charPosition,_channel,_start, (_end==0 ? getCharIndex()-1 : _end));
     }<\n>
@@ -1423,10 +1440,10 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     )>
 <endif>
     ctx->pLexer->ruleNestingLevel--;
-    <if(trace)> -- Convert to C Jim!!! System.out.println("exit <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+    <if(trace)> // Convert to C Jim!!! System.out.println("exit <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleCleanUp()>
-    <(ruleDescriptor.actions.finally):execAction()>
-
+    <(ruleDescriptor.actions.after):execAction()>
+    <memoize>
 }
 // $ANTLR end <ruleName>
 >>

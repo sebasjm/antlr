@@ -28,7 +28,7 @@
 /** Template subgroup to add template rewrite output
  *  If debugging, then you'll also get STDbg.stg loaded.
  */
-group CST;
+group ST;
 
 @outputFile.imports() ::= <<
 <@super.imports()>

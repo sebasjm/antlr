@@ -605,10 +605,10 @@ rewriteElement(e) ::= <<
 >>
 
 /** Gen ID */
-rewriteTokenRef(token,elementIndex) ::= <<
+rewriteTokenRef(token,elementIndex,args) ::= <<
 /* rewriteTokenRef(token,elementIndex) */
-// Is this a token actaully and not a tree list?
-ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, list_<token>->get(list_<token>, i_<rewriteBlockLevel> + 1));<\n>
+// Is this a token actually and not a tree list?
+ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, <if(args)>ctx->adaptor->createToken(ctx->adaptor, <args; separator=", ">)<else>list_<token>->get(list_<token>, i_<rewriteBlockLevel> + 1)<endif>);<\n>
 /* End: rewriteTokenRef(token,elementIndex) */
 >>
 
