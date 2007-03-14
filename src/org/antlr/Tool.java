@@ -193,6 +193,9 @@ public class Tool {
 			else if (args[i].equals("-XdbgST")) {
 				CodeGenerator.EMIT_TEMPLATE_DELIMITERS = true;
 			}
+			else if (args[i].equals("-Xnoinlinedfa")) {
+				CodeGenerator.GEN_ACYCLIC_DFA_INLINE = false;
+			}
 			else if (args[i].equals("-Xm")) {
 				if (i + 1 >= args.length) {
 					System.err.println("missing max recursion with -Xm option; ignoring");
@@ -419,6 +422,7 @@ public class Tool {
 		System.err.println("  -Xm m                  max number of rule invocations during conversion");
 		System.err.println("  -Xmaxdfaedges m        max \"comfortable\" number of edges for single DFA state");
 		System.err.println("  -Xconversiontimeout t  set NFA conversion timeout for each decision");
+		System.err.println("  -Xnoinlinedfa          make all DFA with tables; no inline prediction with IFs");
     }
 
 	public void setOutputDirectory(String outputDirectory) {
