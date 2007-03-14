@@ -115,15 +115,10 @@ public class TestDFAConversion extends BaseTest {
 			"    | B\n" +
 			"    ;");
 		String expecting =
-			".s0-B->.s6\n" +
-				".s0-L->.s1\n" +
-				".s1-B->.s3\n" +
-				".s1-L->:s2=>1\n" +
-				".s3-R->.s4\n" +
-				".s4-X->:s2=>1\n" +
-				".s4-Y->:s5=>2\n" +
-				".s6-X->:s2=>1\n" +
-				".s6-Y->:s5=>2\n";
+			".s0-B->.s4\n" +
+			".s0-L->.s1\n" +
+			".s1-B->.s3\n" +
+			".s1-L->:s2=>1\n";
 		int[] unreachableAlts = new int[] {1,2};
 		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = null;
