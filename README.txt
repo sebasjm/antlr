@@ -303,6 +303,8 @@ March 14, 2007
 
 * Added -Xnoinlinedfa make all DFA with tables; no inline prediction with IFs
 
+* Fixed ANTLR-91.  Sem pred states didn't define lookahead vars.
+
 March 12, 2007
 
 * setTokenSource in CommonTokenStream didn't clear tokens list.

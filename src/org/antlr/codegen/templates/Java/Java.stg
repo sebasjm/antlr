@@ -741,9 +741,7 @@ if ( !(<evalPredicate(...)>) ) {
 // F i x e d  D F A  (if-then-else)
 
 dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-<if(!semPredState)>
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
-<endif>
 <edges; separator="\nelse ">
 else {
 <if(eotPredictsAlt)>
@@ -764,9 +762,7 @@ else {
  *  expect "if ( LA(1)==X ) match(X);" and that's it.
  */
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-<if(!semPredState)>
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
-<endif>
 <edges; separator="\nelse ">
 >>
 
@@ -777,9 +773,7 @@ int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
  *  anything other than 'a' predicts exiting.
  */
 dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-<if(!semPredState)>
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
-<endif>
 <edges; separator="\nelse "><\n>
 <if(eotPredictsAlt)>
 else {
@@ -926,9 +920,8 @@ class DFA<dfa.decisionNumber> extends DFA {
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
 <if(semPredState)>
 input.rewind();<\n>
-<else>
-int LA<decisionNumber>_<stateNumber> = input.LA(1);<\n>
 <endif>
+int LA<decisionNumber>_<stateNumber> = input.LA(1);<\n>
 s = -1;
 <edges; separator="\nelse ">
 if ( s>=0 ) return s;
