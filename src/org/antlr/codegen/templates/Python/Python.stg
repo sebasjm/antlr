@@ -1142,13 +1142,11 @@ class <returnType()>(object):
 >>
 
 parameterScope(scope) ::= <<
-raise NotImplementedError("parameterScope")
+<scope.attributes:{<it.decl>}; separator=", ">
 >>
-//<scope.attributes:{<it.decl>}; separator=", ">
-//>>
 
-parameterAttributeRef(attr) ::= "FIXME(parameterAttributeRef) <attr.name>"
-parameterSetAttributeRef(attr,expr) ::= "FIXME(parameterSetAttributeRef) <attr.name> =<expr>;"
+parameterAttributeRef(attr) ::= "<attr.name>"
+parameterSetAttributeRef(attr,expr) ::= "<attr.name> = <expr>"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
