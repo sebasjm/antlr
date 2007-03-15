@@ -1865,9 +1865,7 @@ newFPE() ::= <<
 dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 
 {
-<if(!semPredState)>
     int LA<decisionNumber>_<stateNumber> = LA(<k>);
-<endif>
     <edges; separator="\nelse ">
     else 
     {
@@ -1901,9 +1899,7 @@ theException()->state        = <stateNumber>;
  */
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 {
-    <if(!semPredState)>
     int LA<decisionNumber>_<stateNumber> = LA(<k>);
-    <endif>
     <edges; separator="\nelse ">
 }
 >>
@@ -1922,9 +1918,7 @@ dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::
 {
    /* dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState)
     */
-    <if(!semPredState)>
     int LA<decisionNumber>_<stateNumber> = LA(<k>);
-    <endif>
     <edges; separator="\nelse "><\n>
     <if(eotPredictsAlt)>
     else 
@@ -2126,9 +2120,8 @@ cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::
 {
     <if(semPredState)>
     rewindLast();<\n>
-    <else>
-    int LA<decisionNumber>_<stateNumber> = LA(1);<\n>
     <endif>
+    int LA<decisionNumber>_<stateNumber> = LA(1);<\n>
     s = -1;
     <edges; separator="\nelse ">
     if ( s>=0 ) 
