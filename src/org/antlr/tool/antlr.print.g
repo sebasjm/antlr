@@ -312,6 +312,7 @@ element
     	  block(predAST, true);
     	  out("=>");
     	}
+    |   BACKTRACK_SEMPRED // don't print anything (auto backtrack stuff)
     |   gpred:GATED_SEMPRED
     	{
     	if ( showActions ) {out("{"); out(gpred.getText()); out("}? =>");}

@@ -146,6 +146,28 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("alt1\n", found);
 	}
 
+	public void testLexerWithPredLongerThanAlt() throws Exception {
+		String grammar =
+			"grammar t;\n" +
+			"s : A ;\n" +
+			"A options {k=1;}\n" + // force backtracking
+			"  : (B '.')=>B {System.out.println(\"alt1\");}\n" +
+			"  | B {System.out.println(\"alt2\");}" +
+			"  ;\n" +
+			"D : '.' {System.out.println(\"D\");} ;\n" +
+			"fragment\n" +
+			"B : 'x'+ ;\n" ;
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
+				    "s", "xxx", false);
+
+		assertEquals("alt2\n", found);
+
+		found = execParser("t.g", grammar, "tParser", "tLexer",
+			    "s", "xxx.", false);
+
+		assertEquals("alt1\nD\n", found);
+	}
+
 	public void testLexerPredCyclicPrediction() throws Exception {
 		String grammar =
 			"grammar t;\n" +

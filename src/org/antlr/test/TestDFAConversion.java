@@ -139,16 +139,16 @@ public class TestDFAConversion extends BaseTest {
 			"    ;");
 		String expecting =
 			".s0-B->.s7\n" +
-				".s0-L->.s1\n" +
-				".s1-B->.s5\n" +
-				".s1-L->.s2\n" +
-				".s2-{synpred1}?->:s3=>1\n" +
-				".s2-{true}?->:s4=>2\n" +
-				".s5-R->.s6\n" +
-				".s6-X->:s3=>1\n" +
-				".s6-Y->:s4=>2\n" +
-				".s7-X->:s3=>1\n" +
-				".s7-Y->:s4=>2\n";
+			".s0-L->.s1\n" +
+			".s1-B->.s5\n" +
+			".s1-L->.s2\n" +
+			".s2-{synpred1}?->:s3=>1\n" +
+			".s2-{true}?->:s4=>2\n" +
+			".s5-R->.s6\n" +
+			".s6-X&&{synpred1}?->:s3=>1\n" +
+			".s6-Y->:s4=>2\n" +
+			".s7-X&&{synpred1}?->:s3=>1\n" +
+			".s7-Y->:s4=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -177,9 +177,9 @@ public class TestDFAConversion extends BaseTest {
 			".s2-{true}?->:s4=>2\n" +
 			".s5-')'->.s6\n" +
 			".s6-'.'->:s4=>2\n" +
-			".s6-';'->:s3=>1\n" +
+			".s6-';'&&{synpred1}?->:s3=>1\n" +
 			".s7-'.'->:s4=>2\n" +
-			".s7-';'->:s3=>1\n";
+			".s7-';'&&{synpred1}?->:s3=>1\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -1154,6 +1154,8 @@ As a result, alternative(s) 2 were disabled for that input
 			g.createNFAs();
 			g.createLookaheadDFAs();
 		}
+		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
+		g.setCodeGenerator(generator);
 
 		if ( equeue.size()!=expectingNumWarnings ) {
 			System.err.println("Warnings issued: "+equeue);

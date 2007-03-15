@@ -119,8 +119,12 @@ public abstract class SemanticContext {
 
 		public Predicate(GrammarAST predicate) {
 			this.predicate = predicate;
-			this.gated = predicate.getType()==ANTLRParser.GATED_SEMPRED;
-			this.synpred = predicate.getType()==ANTLRParser.SYN_SEMPRED;
+			this.gated =
+				predicate.getType()==ANTLRParser.GATED_SEMPRED ||
+				predicate.getType()==ANTLRParser.SYN_SEMPRED ;
+			this.synpred =
+				predicate.getType()==ANTLRParser.SYN_SEMPRED ||
+				predicate.getType()==ANTLRParser.BACKTRACK_SEMPRED;
 		}
 
 		public Predicate(Predicate p) {
@@ -197,7 +201,9 @@ public abstract class SemanticContext {
 		}
 
 		public boolean isSyntacticPredicate() {
-			return predicate!=null && predicate.getType()==ANTLRParser.SYN_SEMPRED;
+			return predicate!=null &&
+				( predicate.getType()==ANTLRParser.SYN_SEMPRED ||
+				  predicate.getType()==ANTLRParser.BACKTRACK_SEMPRED );
 		}
 
 		public void trackUseOfSyntacticPredicates(Grammar g) {

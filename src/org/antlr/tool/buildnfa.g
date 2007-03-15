@@ -341,6 +341,7 @@ element returns [StateCluster g=null]
     |   ACTION
     |   pred:SEMPRED {g = factory.build_SemanticPredicate(#pred);}
     |   spred:SYN_SEMPRED {g = factory.build_SemanticPredicate(#spred);}
+    |   bpred:BACKTRACK_SEMPRED {g = factory.build_SemanticPredicate(#bpred);}
     |   gpred:GATED_SEMPRED {g = factory.build_SemanticPredicate(#gpred);}
     |   EPSILON {g = factory.build_Epsilon();}
     ;

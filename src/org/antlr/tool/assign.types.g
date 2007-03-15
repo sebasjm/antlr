@@ -448,6 +448,7 @@ element
     |   ACTION
     |   SEMPRED
     |   SYN_SEMPRED
+    |   BACKTRACK_SEMPRED
     |   GATED_SEMPRED
     |   EPSILON 
     ;

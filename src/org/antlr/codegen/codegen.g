@@ -691,6 +691,8 @@ element returns [StringTemplate code=null]
 
     |	SYN_SEMPRED // used only in lookahead; don't generate validating pred
 
+    |	BACKTRACK_SEMPRED
+
     |   EPSILON
     ;
 

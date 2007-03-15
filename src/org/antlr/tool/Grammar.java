@@ -616,7 +616,7 @@ public class Grammar {
 		if ( filterMode ) {
 			matchTokenRuleST = new StringTemplate(
 					ARTIFICIAL_TOKENS_RULENAME+
-						" options {k=1;} : <rules:{r| (<r>)=><r>}; separator=\"|\">;",
+						" options {k=1; backtrack=true;} : <rules:{r| <r>}; separator=\"|\">;",
 					AngleBracketTemplateLexer.class);
 		}
 		else {
@@ -1058,7 +1058,8 @@ public class Grammar {
 			}
 			else if ( t.getType()==ANTLRParser.SEMPRED ||
 				t.getType()==ANTLRParser.SYN_SEMPRED ||
-				t.getType()==ANTLRParser.GATED_SEMPRED )
+				t.getType()==ANTLRParser.GATED_SEMPRED ||
+				t.getType()==ANTLRParser.BACKTRACK_SEMPRED )
 			{
 				buf.append("{");
 				buf.append(t.getText());

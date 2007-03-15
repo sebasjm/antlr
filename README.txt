@@ -299,6 +299,11 @@ CHANGES
 
 March 14, 2007
 
+* Manually-specified (...)=> force backtracking eval of that predicate.
+  backtracking=true mode does not however.  Added unit test.
+
+March 14, 2007
+
 * Fixed bug in lexer where ~T didn't compute the set from rule T.
 
 * Added -Xnoinlinedfa make all DFA with tables; no inline prediction with IFs

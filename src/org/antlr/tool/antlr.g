@@ -91,7 +91,8 @@ tokens {
     TEMPLATE;
     SCOPE="scope";
     GATED_SEMPRED; // {p}? =>
-    SYN_SEMPRED; // (...) =>   it's a synpred converted to sempred
+    SYN_SEMPRED; // (...) =>   it's a manually-specified synpred converted to sempred
+    BACKTRACK_SEMPRED; // auto backtracking mode syn pred converted to sempred
     FRAGMENT="fragment";
 }
 
@@ -158,24 +159,27 @@ tokens {
 			// duplicate alt and make a synpred block around that dup'd alt
 			GrammarAST synpredBlockAST = createBlockFromDupAlt(alt);
 
-			// Create a SYN_SEMPRED node as if user had typed this in
+			// Create a BACKTRACK_SEMPRED node as if user had typed this in
 			// Effectively we replace (xxx)=>xxx with {synpredxxx}? xxx
-			GrammarAST synpredAST = createSynSemPredFromBlock(synpredBlockAST);
+			GrammarAST synpredAST = createSynSemPredFromBlock(synpredBlockAST,
+															  BACKTRACK_SEMPRED);
 
-			// insert SYN_SEMPRED as first element of alt
+			// insert BACKTRACK_SEMPRED as first element of alt
 			synpredAST.getLastSibling().setNextSibling(alt.getFirstChild());
 			alt.setFirstChild(synpredAST);
 		}
 	}
 
-	protected GrammarAST createSynSemPredFromBlock(GrammarAST synpredBlockAST) {
+	protected GrammarAST createSynSemPredFromBlock(GrammarAST synpredBlockAST,
+												   int synpredTokenType)
+	{
 		// add grammar fragment to a list so we can make fake rules for them
 		// later.
 		String predName = grammar.defineSyntacticPredicate(synpredBlockAST,currentRuleName);
 		// convert (alpha)=> into {synpredN}? where N is some pred count
 		// during code gen we convert to function call with templates
 		String synpredinvoke = predName;
-		GrammarAST p = #[SYN_SEMPRED,synpredinvoke];
+		GrammarAST p = #[synpredTokenType,synpredinvoke];
 		p.setEnclosingRule(currentRuleName);
 		// track how many decisions have synpreds
 		grammar.blocksWithSynPreds.add(currentBlockAST);
@@ -683,19 +687,8 @@ ebnf!
 		    	#ebnf = #(#[SYNPRED,"=>"],#b); // ignore for lexer rules in combined
 		    }
 		    else {
-		    	#ebnf = createSynSemPredFromBlock(#b);
-		    	/*
-				// add grammar fragment to a list so we can make fake rules for them
-				// later.
-				String predName = grammar.defineSyntacticPredicate(#b,currentRuleName);
-				// convert (alpha)=> into {synpredN}? where N is some pred count
-				// during code gen we convert to function call with templates
-				String synpredinvoke = predName;
-				#ebnf = #[SYN_SEMPRED,synpredinvoke];
-				#ebnf.setEnclosingRule(currentRuleName);
-				// track how many decisions have synpreds
-				grammar.blocksWithSynPreds.add(currentBlockAST);
-				*/
+		    	// create manually specified (...)=> predicate; convert to sempred
+		    	#ebnf = createSynSemPredFromBlock(#b, SYN_SEMPRED);
 			}
 			}
         |   {#ebnf = #b;}

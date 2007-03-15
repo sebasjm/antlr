@@ -250,6 +250,7 @@ public class GrammarSanity {
 			case ANTLRParser.ACTION :		// skip past actions
 			case ANTLRParser.SEMPRED :
 			case ANTLRParser.SYN_SEMPRED :
+			case ANTLRParser.BACKTRACK_SEMPRED :
 			case ANTLRParser.GATED_SEMPRED :
 				ensureAltIsSimpleNodeOrTree(altAST,
 											(GrammarAST)elementAST.getNextSibling(),
