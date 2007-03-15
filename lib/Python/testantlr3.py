@@ -335,23 +335,43 @@ class TestCommonTokenStream(unittest.TestCase):
         self.failUnlessEqual(lt1.type, antlr3.EOF)
         
 
-##     # not yet implemented
-##     def testLTNegative(self):
-##         """CommonTokenStream.LT(-1): look back"""
+    # not yet implemented
+    def testLTNegative(self):
+        """CommonTokenStream.LT(-1): look back"""
 
-##         self.source.tokens.append(
-##             antlr3.CommonToken(type=12)
-##             )
+        self.source.tokens.append(
+            antlr3.CommonToken(type=12)
+            )
         
-##         self.source.tokens.append(
-##             antlr3.CommonToken(type=13)
-##             )
+        self.source.tokens.append(
+            antlr3.CommonToken(type=13)
+            )
         
-##         stream = antlr3.CommonTokenStream(self.source)
+        stream = antlr3.CommonTokenStream(self.source)
+        stream.fillBuffer()
+        stream.consume()
+        
+        lt1 = stream.LT(-1)
+        self.failUnlessEqual(lt1.type, 12)
 
-##         lt1 = stream.LT(-1)
-##         self.failUnlessEqual(lt1.type, antlr3.EOF)
 
+    def testLB1(self):
+        """CommonTokenStream.LB(1)"""
+
+        self.source.tokens.append(
+            antlr3.CommonToken(type=12)
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=13)
+            )
+        
+        stream = antlr3.CommonTokenStream(self.source)
+        stream.fillBuffer()
+        stream.consume()
+        
+        self.failUnlessEqual(stream.LB(1).type, 12)
+        
 
     def testLTZero(self):
         """CommonTokenStream.LT(0)"""
@@ -368,6 +388,33 @@ class TestCommonTokenStream(unittest.TestCase):
 
         lt1 = stream.LT(0)
         self.failUnless(lt1 is None)
+        
+
+    def testLBBeyondBegin(self):
+        """CommonTokenStream.LB(-1): beyond begin"""
+
+        self.source.tokens.append(
+            antlr3.CommonToken(type=12)
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=12, channel=antlr3.HIDDEN_CHANNEL)
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=12, channel=antlr3.HIDDEN_CHANNEL)
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=13)
+            )
+        
+        stream = antlr3.CommonTokenStream(self.source)
+        self.failUnless(stream.LB(1) is None)
+
+        stream.consume()
+        stream.consume()
+        self.failUnless(stream.LB(3) is None)
         
 
     def testFillBuffer(self):
@@ -478,6 +525,31 @@ class TestCommonTokenStream(unittest.TestCase):
         self.failUnlessEqual(stream.LA(1), 13)
 
 
+    def testToString(self):
+        """CommonTokenStream.toString()"""
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=12, text="foo")
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=13, text="bar")
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=14, text="gnurz")
+            )
+        
+        self.source.tokens.append(
+            antlr3.CommonToken(type=15, text="blarz")
+            )
+        
+        stream = antlr3.CommonTokenStream(self.source)
+
+        assert stream.toString() == "foobargnurzblarz"
+        assert stream.toString(1, 2) == "bargnurz"
+        assert stream.toString(stream.tokens[1], stream.tokens[-2]) == "bargnurz"
+        
         
 class TestDFA(unittest.TestCase):
     """Test case for the DFA class."""

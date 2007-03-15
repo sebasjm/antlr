@@ -353,9 +353,8 @@ except <e.decl>:
 
 ruleDeclarations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-raise NotImplementedError("ruleDeclarations: hasMultipleReturnValues")
-<returnType()> retval = new <returnType()>();
-retval.start = input.LT(1);<\n>
+retval = self.<returnType()>()
+retval.start = self.input.LT(1)<\n>
 <else>
 <ruleDescriptor.returnScope.attributes:{ a |
 <a.name> = <if(a.initValue)><a.initValue><else><initValue(a.type)><endif>
@@ -381,7 +380,7 @@ ruleLabelDefs() ::= <<
     :{<it.label.text> = None}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{2-List list_<it.label.text>=null;}; separator="\n"
+    :{list_<it.label.text> = None}; separator="\n"
 >
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(label=it); separator="\n"
@@ -405,9 +404,8 @@ retval
 
 ruleCleanUp() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-raise NotImplementedError("ruleCleanUp: hasMultipleReturnValues")
 <if(!TREE_PARSER)>
-retval.stop = input.LT(-1);<\n>
+retval.stop = self.input.LT(-1)<\n>
 <endif>
 <endif>
 >>
@@ -618,24 +616,20 @@ self.match(self.input, <token>, self.FOLLOW_<token>_in_<ruleName><elementIndex>)
 
 /** ids+=ID */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
-raise NotImplementedError("tokenRefAndListLabel")
+<tokenRef(...)>
+<listLabel(...)>
 >>
-//<tokenRef(...)>
-//<listLabel(...)>
-//>>
 
 listLabel(label, elem) ::= <<
-raise NotImplementedError("listLabel")
+if list_<label> is None:
+    list_<label> = []
+list_<label>.append(<label>)<\n>
 >>
-//if (list_<label>==null) list_<label>=new ArrayList();
-//list_<label>.add(<label>);<\n>
-//>>
 
 /** match a character */
 charRef(char,label) ::= <<
 <if(label)>
-raise NotImplementedError("charRef: label")
-int <label> = input.LA(1);<\n>
+<label> = self.input.LA(1)<\n>
 <endif>
 self.match(<char>)
 <checkRuleBacktrackFailure()>
@@ -650,8 +644,7 @@ self.matchRange(<a>, <b>)
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
-raise NotImplementedError("matchSet: label")
-#<label>=(<labelType>)input.LT(1);<\n>
+<label> = self.input.LT(1)<\n>
 <endif>
 if <s>:
     <postmatchCode>
@@ -679,19 +672,17 @@ else:
 >>
 
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
-raise NotImplementedError("matchSetAndListLabel")
+<matchSet(...)>
+<listLabel(...)>
 >>
-//<matchSet(...)>
-//<listLabel(...)>
-//>>
 
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
 <if(label)>
-raise NotImplementedError("lexerStringRef: label")
-int <label>Start = getCharIndex();
-match(<string>); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<label>Start = self.getCharIndex()
+self.match(<string>)
+<checkRuleBacktrackFailure()>
+<label> = antlr3.CommonToken(input=self.input, type=antlr3.INVALID_TOKEN_TYPE, channel=antlr3.DEFAULT_CHANNEL, start=<label>Start, stop=self.getCharIndex()-1)
 <else>
 self.match(<string>)
 <checkRuleBacktrackFailure()><\n>
@@ -700,25 +691,21 @@ self.match(<string>)
 
 wildcard(label,elementIndex) ::= <<
 <if(label)>
-raise NotImplementedError("wildcard: label")
-#<label>=(<labelType>)input.LT(1);<\n>
+<label> = self.input.LT(1)<\n>
 <endif>
 self.matchAny(self.input)
 <checkRuleBacktrackFailure()>
 >>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
-raise NotImplementedError("wildcardAndListLabel")
+<wildcard(...)>
+<listLabel(...)>
 >>
-//<wildcard(...)>
-//<listLabel(...)>
-//>>
 
 /** Match . wildcard in lexer */
 wildcardChar(label, elementIndex) ::= <<
 <if(label)>
-raise NotImplementedError("wildcardChar: label")
-#int <label> = input.LA(1);<\n>
+<label> = self.input.LA(1)<\n>
 <endif>
 self.matchAny()
 <checkRuleBacktrackFailure()>
@@ -745,13 +732,12 @@ self.following.pop()
 <checkRuleBacktrackFailure()>
 >>
 
-/** ids+=ID */
+/** ids+=rule */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 raise NotImplementedError("ruleRefAndListLabel")
+<ruleRef(...)>
+<listLabel(...)>
 >>
-//<ruleRef(...)>
-//<listLabel(...)>
-//>>
 
 /** A lexer rule reference */
 lexerRuleRef(rule,label,args) ::= <<
@@ -775,10 +761,10 @@ self.m<rule>(<args; separator=", ">)
 /** EOF in the lexer */
 lexerMatchEOF(label) ::= <<
 <if(label)>
-raise NotImplementedError("lexerMatchEOF: label")
-#int <label>Start = getCharIndex();
-#match(EOF); <checkRuleBacktrackFailure()>
-#<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<label>Start = self.getCharIndex()
+self.match(EOF)
+<checkRuleBacktrackFailure()>
+<label> = antlr3.CommonToken(input=self.input, type=EOF, channel=antlr3.DEFAULT_CHANNEL, start=<label>Start, stop=self.getCharIndex()-1)
 <else>
 self.match(EOF)
 <checkRuleBacktrackFailure()>
@@ -1103,18 +1089,18 @@ self.<scope.name>_stack = []<\n>
 >>
 
 returnType() ::= <<
-raise NotImplementedError("returnType")
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<ruleDescriptor.name>_return
+<else>
+<if(ruleDescriptor.hasSingleReturnValue)>
+raise NotImplementedError("returnType: !hasSingleReturnValue")
+#<ruleDescriptor.singleValueReturnType>
+<else>
+raise NotImplementedError("returnType: !hasSingleReturnValue")
+#void
+<endif>
+<endif>
 >>
-//<if(ruleDescriptor.hasMultipleReturnValues)>
-//<ruleDescriptor.name>_return
-//<else>
-//<if(ruleDescriptor.hasSingleReturnValue)>
-//<ruleDescriptor.singleValueReturnType>
-//<else>
-//void
-//<endif>
-//<endif>
-//>>
 
 /** Generate the Java type associated with a single or multiple return
  *  values.
@@ -1151,13 +1137,14 @@ ruleLabelDef(label) ::= <<
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-raise NotImplementedError("returnScope: ruleDescriptor.hasMultipleReturnValues")
-<!
-public static class <returnType()> extends <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope {
-    <scope.attributes:{public <it.decl>;}; separator="\n">
-    <@ruleReturnMembers()>
-};
-!>
+class <returnType()>(object):
+    def __init__(self):
+        self.start = None
+        self.stop = None
+
+        <scope.attributes:{self.<it.decl> = None}; separator="\n">
+        <@ruleReturnMembers()>
+
 <endif>
 >>
 
@@ -1235,41 +1222,50 @@ raise NotImplementedError("returnSetAttributeRef")
 tokenLabelRef(label) ::= "<label>"
 
 /** ids+=ID {$ids} or e+=expr {$e} */
-listLabelRef(label) ::= "FIXME(listLabelRef) list_<label>"
+listLabelRef(label) ::= "list_<label>"
 
 
 // not sure the next are the right approach; and they are evaluated early;
 // they cannot see TREE_PARSER or PARSER attributes for example. :(
 
 tokenLabelPropertyRef_text(scope,attr) ::= "<scope>.text"
-tokenLabelPropertyRef_type(scope,attr) ::= "FIXME(tokenLabelPropertyRef_type) <scope>.getType()"
-tokenLabelPropertyRef_line(scope,attr) ::= "FIXME(tokenLabelPropertyRef_line) <scope>.getLine()"
-tokenLabelPropertyRef_pos(scope,attr) ::= "FIXME(tokenLabelPropertyRef_pos) <scope>.getCharPositionInLine()"
-tokenLabelPropertyRef_channel(scope,attr) ::= "FIXME(tokenLabelPropertyRef_channel) <scope>.getChannel()"
-tokenLabelPropertyRef_index(scope,attr) ::= "FIXME(tokenLabelPropertyRef_index) <scope>.getTokenIndex()"
+tokenLabelPropertyRef_type(scope,attr) ::= "<scope>.type"
+tokenLabelPropertyRef_line(scope,attr) ::= "<scope>.line"
+tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>.charPositionInLine"
+tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>.channel"
+tokenLabelPropertyRef_index(scope,attr) ::= "<scope>.index"
 tokenLabelPropertyRef_tree(scope,attr) ::= "FIXME(tokenLabelPropertyRef_tree) <scope>_tree"
 
-ruleLabelPropertyRef_start(scope,attr) ::= "FIXME(ruleLabelPropertyRef_start) ((<labelType>)<scope>.start)"
-ruleLabelPropertyRef_stop(scope,attr) ::= "FIXME(ruleLabelPropertyRef_stop) ((<labelType>)<scope>.stop)"
+ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
+ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "FIXME(ruleLabelPropertyRef_tree) ((<ASTLabelType>)<scope>.tree)"
-ruleLabelPropertyRef_text(scope,attr) ::= "FIXME(ruleLabelPropertyRef_text) input.toString(<scope>.start,<scope>.stop)"
+ruleLabelPropertyRef_text(scope,attr) ::= <<
+<if(TREE_PARSER)>
+raise NotImplementedError("ruleLabelPropertyRef_text: TREE_PARSER")
+#input.getTokenStream().toString(
+#  input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
+#  input.getTreeAdaptor().getTokenStopIndex(<scope>.start))
+<else>
+self.input.toString(<scope>.start,<scope>.stop)
+<endif>
+>>
 ruleLabelPropertyRef_st(scope,attr) ::= "FIXME(ruleLabelPropertyRef_st) <scope>.st"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
-lexerRuleLabel(label) ::= "FIXME(lexerRuleLabel) <label>"
+lexerRuleLabel(label) ::= "<label>"
 
-lexerRuleLabelPropertyRef_type(scope,attr) ::= "FIXME(lexerRuleLabelPropertyRef_type) <scope>.getType()"
-lexerRuleLabelPropertyRef_line(scope,attr) ::= "FIXME(lexerRuleLabelPropertyRef_line) <scope>.getLine()"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= "FIXME(lexerRuleLabelPropertyRef_pos) <scope>.getCharPositionInLine()"
-lexerRuleLabelPropertyRef_channel(scope,attr) ::= "FIXME(lexerRuleLabelPropertyRef_channel) <scope>.getChannel()"
-lexerRuleLabelPropertyRef_index(scope,attr) ::= "FIXME(lexerRuleLabelPropertyRef_index) <scope>.getTokenIndex()"
-lexerRuleLabelPropertyRef_text(scope,attr) ::= "FIXME(lexerRuleLabelPropertyRef_text) <scope>.getText()"
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "<scope>.type"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "<scope>.line"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "<scope>.charPositionInLine"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "<scope>.channel"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>.index"
+lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>.text"
 
 // Somebody may ref $template or $tree or $stop within a rule:
-rulePropertyRef_start(scope,attr) ::= "FIXME(rulePropertyRef_start) ((<labelType>)retval.start)"
-rulePropertyRef_stop(scope,attr) ::= "FIXME(rulePropertyRef_stop) ((<labelType>)retval.stop)"
+rulePropertyRef_start(scope,attr) ::= "retval.start"
+rulePropertyRef_stop(scope,attr) ::= "retval.stop" //mmm... or input.LT(-1)??
 rulePropertyRef_tree(scope,attr) ::= "FIXME(rulePropertyRef_tree) ((<ASTLabelType>)retval.tree)"
-rulePropertyRef_text(scope,attr) ::= "FIXME(rulePropertyRef_text) input.toString(retval.start,input.LT(-1))"
+rulePropertyRef_text(scope,attr) ::= "self.input.toString(retval.start, self.input.LT(-1))"
 rulePropertyRef_st(scope,attr) ::= "FIXME(rulePropertyRef_st) retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "self.getText()"

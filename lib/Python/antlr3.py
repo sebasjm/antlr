@@ -760,12 +760,12 @@ class CommonTokenStream(object):
         return i
 
 
-## 	protected int skipOffTokenChannelsReverse(int i) {
-## 		while ( i>=0 && ((Token)tokens.get(i)).getChannel()!=channel ) {
-## 			i--;
-## 		}
-## 		return i;
-## 	}
+    def skipOffTokenChannelsReverse(self, i):
+        while i >= 0 and self.tokens[i].channel != self.channel:
+            i -= 1
+
+        return i;
+
 
 ## 	/** A simple filter mechanism whereby you can tell this token stream
 ## 	 *  to force all tokens of type ttype to be on channel.  For example,
@@ -852,7 +852,6 @@ class CommonTokenStream(object):
             return None
 
         if k < 0:
-            raise NotImplementedError
             return self.LB(-k)
                 
         if self.p + k - 1 >= len(self.tokens):
@@ -872,32 +871,31 @@ class CommonTokenStream(object):
         return self.tokens[i]
 
 
-## 	/** Look backwards k tokens on-channel tokens */
-## 	protected Token LB(int k) {
-## 		//System.out.print("LB(p="+p+","+k+") ");
-## 		if ( p == -1 ) {
-## 			fillBuffer();
-## 		}
-## 		if ( k==0 ) {
-## 			return null;
-## 		}
-## 		if ( (p-k)<0 ) {
-## 			return null;
-## 		}
+    def LB(self, k):
+	"""Look backwards k tokens on-channel tokens"""
 
-## 		int i = p;
-## 		int n = 1;
-## 		// find k good tokens looking backwards
-## 		while ( n<=k ) {
-## 			// skip off-channel tokens
-## 			i = skipOffTokenChannelsReverse(i-1); // leave p on valid token
-## 			n++;
-## 		}
-## 		if ( i<0 ) {
-## 			return null;
-## 		}
-## 		return (Token)tokens.get(i);
-## 	}
+        if self.p == -1:
+            self.fillBuffer();
+
+        if k==0:
+            return None
+
+        if self.p - k < 0:
+            return None
+
+        i = self.p
+        n = 1
+        # find k good tokens looking backwards
+        while n <= k:
+            # skip off-channel tokens
+            i = self.skipOffTokenChannelsReverse(i-1) # leave p on valid token
+            n += 1
+
+        if i < 0:
+            return None
+            
+        return self.tokens[i]
+
 
 ## 	/** Return absolute token i; ignore which channel the tokens are on;
 ## 	 *  that is, count all tokens not just on-channel tokens.
@@ -950,28 +948,26 @@ class CommonTokenStream(object):
 ## 		return toString(0, tokens.size()-1);
 ## 	}
 
-## 	public String toString(int start, int stop) {
-## 		if ( p == -1 ) {
-## 			fillBuffer();
-## 		}
-## 		if ( stop>=tokens.size() ) {
-## 			stop = tokens.size()-1;
-## 		}
-##  		StringBuffer buf = new StringBuffer();
-## 		for (int i = start; i <= stop; i++) {
-## 			Token t = (Token)tokens.get(i);
-## 			buf.append(t.getText());
-## 		}
-## 		return buf.toString();
-## 	}
+    def toString(self, start=None, stop=None):
+        if self.p == -1:
+            self.fillBuffer()
 
-## 	public String toString(Token start, Token stop) {
-## 		if ( start!=null && stop!=null ) {
-## 			return toString(start.getTokenIndex(), stop.getTokenIndex());
-## 		}
-## 		return null;
-## 	}
+        if start is None:
+            start = 0
+        elif not isinstance(start, int):
+            start = start.index
 
+        if stop is None:
+            stop = len(self.tokens) - 1
+        elif not isinstance(stop, int):
+            stop = stop.index
+        
+        if stop >= len(self.tokens):
+            stop = len(self.tokens) - 1
+
+        return ''.join([t.text for t in self.tokens[start:stop+1]])
+
+    
 
 ##############################################################################
 #
