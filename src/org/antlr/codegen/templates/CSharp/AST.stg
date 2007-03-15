@@ -94,16 +94,7 @@ if ( backtracking==0 )
 <if(autoAST)>
 <if(outerAlt)>
 root_0 = (<ASTLabelType>)adaptor.GetNilNode();<\n>
-<else>
-<ASTLabelType> root_<blockLevel> = (<ASTLabelType>)adaptor.GetNilNode();<\n>
-<endif>
-<endif>
->>
 
-@alt.cleanup() ::= <<
-<if(autoAST)>
-<if(!outerAlt)>
-<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.AddChild(root_<enclosingBlockLevel>, root_<blockLevel>);<\n>
 <endif>
 <endif>
 >>
@@ -115,23 +106,17 @@ tokenRef(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.Create(<label>);
-adaptor.AddChild(root_<blockLevel>, <label>_tree);
+adaptor.AddChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
 >>
 
 /** ID! and output=AST (same as plain tokenRef) */
 tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
-/** ID^ and output=AST */
-tokenRefRoot(token,label,elementIndex) ::= <<
-<super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
-<label>_tree = (<ASTLabelType>)adaptor.Create(<label>);
-root_<blockLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_<blockLevel>);
-<if(backtracking)>}<endif>
->>
 
-/** ID^^ and output=AST */
+
+/** ID^ and output=AST */
+
 tokenRefRuleRoot(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
@@ -143,25 +128,19 @@ root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_0);
 /** ids+=ID! and output=AST */
 tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefBang(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** label+=TOKEN when output=AST but not rewrite alt */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
 <tokenRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match label+=TOKEN^ when output=AST but not rewrite alt */
-tokenRefRootAndListLabel(token,label,elementIndex) ::= <<
-<tokenRefRoot(...)>
-<listLabel(...)>
->>
-
-/** Match label+=TOKEN^^ when output=AST but not rewrite alt */
 tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefRuleRoot(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** ID but track it for use in a rewrite rule */
@@ -175,7 +154,7 @@ tokenRefTrack(token,label,elementIndex) ::= <<
  */
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefTrack(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 // SET AST
@@ -192,11 +171,11 @@ tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 // I have more time.
 
 matchSet(s,label,elementIndex,postmatchCode) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.AddChild(root_<blockLevel>, adaptor.Create(<label>));})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.AddChild(root_0, adaptor.Create(<label>));})>
 >>
 
 matchSetRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_<blockLevel> = (<ASTLabelType>)adaptor.BecomeRoot(adaptor.Create(<label>), root_<blockLevel>);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.BecomeRoot(adaptor.Create(<label>), root_0);})>
 >>
 
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
@@ -208,19 +187,13 @@ matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.AddChild(root_<blockLevel>, <label>.Tree);
+<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.AddChild(root_0, <label>.Tree);
 >>
 
 /** rule! is same as normal rule ref */
 ruleRefBang(rule,label,elementIndex,args) ::= "<super.ruleRef(...)>"
 
 /** rule^ */
-ruleRefRoot(rule,label,elementIndex,args) ::= <<
-<super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>root_<blockLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>.Tree, root_<blockLevel>);
->>
-
-/** rule^^ */
 ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
 <if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>.Tree, root_0);
@@ -235,32 +208,25 @@ ruleRefTrack(rule,label,elementIndex,args) ::= <<
 /** x+=rule when output=AST and tracking for rewrite */
 ruleRefTrackAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRefTrack(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** x+=rule when output=AST */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRef(...)>
-<listLabel(...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 /** x+=rule! when output=AST is a rule ref with list addition */
 ruleRefBangAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRefBang(...)>
-<listLabel(...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 /** x+=rule^ */
-ruleRefRootAndListLabel(rule,label,elementIndex,args) ::= <<
-<super.ruleRef(...)>
-root_<blockLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>.Tree, root_<blockLevel>);<\n>
-<listLabel(...)>
->>
-
-/** x+=rule^^ */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRefRuleRoot(...)>
-<listLabel(...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 // WILDCARD AST
@@ -269,7 +235,7 @@ wildcard(label,elementIndex) ::= <<
 <super.wildcard(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.Create(<label>);
-adaptor.AddChild(root_<blockLevel>, <label>_tree);
+adaptor.AddChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
 >>
 
@@ -277,7 +243,7 @@ wildcardRoot(label,elementIndex) ::= <<
 <super.wildcard(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.Create(<label>);
-root_<blockLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_<blockLevel>);
+root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
 >>
 
@@ -289,7 +255,7 @@ root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
 >>
 
-// ugh, am i really missing the combinations for Track and ListLabel?
+// TODO: ugh, am i really missing the combinations for Track and ListLabel?
 // there's got to be a better way
 
 // R e w r i t e
@@ -419,8 +385,7 @@ if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n_<rewrite
 rewriteAlt(a) ::= <<
 // <a.description>
 <if(a.pred)>
-if (<a.pred>)
-{
+if (<a.pred>) {
     <a.alt>
 }<\n>
 <else>
@@ -451,8 +416,8 @@ rewriteElement(e) ::= <<
 >>
 
 /** Gen ID */
-rewriteTokenRef(token,elementIndex) ::= <<
-adaptor.AddChild(root_<treeLevel>, (<labelType>)list_<token>[i_<rewriteBlockLevel>]);<\n>
+rewriteTokenRef(args,token,elementIndex) ::= <<
+adaptor.AddChild(root_<treeLevel>, <if(args)>adaptor.Create(<token>, <args; separator=", ">)<endif><if(!args)>(<labelType>)list_<token>[i_<rewriteBlockLevel>]<endif>);<\n>
 >>
 
 /** Gen $label ... where defined via label=ID */
