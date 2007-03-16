@@ -1063,20 +1063,6 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testNoSetForTokenRefsInLexer() throws Exception {
-		Grammar g = new Grammar(
-			"lexer grammar P;\n"+
-			"A : (B | C) ;\n"+
-			"fragment B : 'b' ;\n" +
-			"fragment C : 'c' ;\n"
-		);
-		String expecting =
-			".s0-'b'->:s1=>1\n" +  // must not collapse set!
-			".s0-'c'->:s2=>2\n";
-		// no decision if (B|C) collapses; must not collapse
-		checkDecision(g, 1, expecting, null, null, null, null, 0);
-	}
-
 	public void testWildcardStarK1AndNonGreedyByDefaultInParser() throws Exception {
 		// no error because .* assumes it should finish when it sees R
 		Grammar g = new Grammar(
