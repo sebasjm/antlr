@@ -652,7 +652,7 @@ setNoParens
 
 setElement
     :   CHAR_LITERAL
-    |   {gtype!=LEXER_GRAMMAR}? TOKEN_REF
+    |   TOKEN_REF
     |   {gtype!=LEXER_GRAMMAR}? STRING_LITERAL
     |   range
     ;

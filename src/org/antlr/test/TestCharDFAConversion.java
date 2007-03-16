@@ -456,6 +456,19 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
+	public void testNotSetWithRuleInLexer() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar T;\n"+
+			"T : ~('a' | B) | 'a';\n" +
+			"fragment\n" +
+			"B : 'b' ;\n"); // has to seen from B to C
+		g.createLookaheadDFAs();
+		String expecting =
+			".s0-'a'->:s2=>2\n" +
+			".s0-{'\\u0000'..'`', 'c'..'\\uFFFE'}->:s1=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
 
 	// S U P P O R T
 
