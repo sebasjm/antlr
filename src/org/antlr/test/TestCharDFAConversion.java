@@ -461,7 +461,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"lexer grammar T;\n"+
 			"T : ~('a' | B) | 'a';\n" +
 			"fragment\n" +
-			"B : 'b' ;\n"); // has to seen from B to C
+			"B : 'b' ;\n");
 		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'a'->:s2=>2\n" +
@@ -469,6 +469,20 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
+	public void testSynPredInLexer() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar T;\n"+
+			"LT:  '<' ' '*\n" +
+			"  |  ('<' IDENT) => '<' IDENT '>'\n" + // this was causing syntax error
+			"  ;\n" +
+			"IDENT:    'a'+;\n");
+		// basically, Tokens rule should not do set compression test
+		g.createLookaheadDFAs();
+		String expecting =
+			".s0-'<'->:s1=>1\n" +
+			".s0-'a'->:s2=>2\n";
+		checkDecision(g, 4, expecting, null); // 4 is Tokens rule
+	}
 
 	// S U P P O R T
 

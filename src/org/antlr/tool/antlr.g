@@ -420,7 +420,8 @@ Map opts = null;
 	blkRoot.setColumn(colon.getColumn());
 	eob = #[EOB,"<end-of-block>"];
     }
-	(	(setNoParens SEMI) => s:setNoParens // try to collapse sets
+	(	{!currentRuleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME)}?
+		(setNoParens SEMI) => s:setNoParens // try to collapse sets
 		{
 		blk = #(blkRoot,#(#[ALT,"ALT"],#s,#[EOA,"<end-of-alt>"]),eob);
 		}

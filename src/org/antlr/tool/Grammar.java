@@ -616,7 +616,7 @@ public class Grammar {
 		if ( filterMode ) {
 			matchTokenRuleST = new StringTemplate(
 					ARTIFICIAL_TOKENS_RULENAME+
-						" options {k=1; backtrack=true;} : <rules:{r| <r>}; separator=\"|\">;",
+						" options {k=1; backtrack=true;} : <rules; separator=\"|\">;",
 					AngleBracketTemplateLexer.class);
 		}
 		else {
@@ -626,11 +626,9 @@ public class Grammar {
 		}
 
 		// Now add token rule references
-		int numAlts = 0;
 		for (int i = 0; i < ruleNames.size(); i++) {
 			String rname = (String) ruleNames.get(i);
 			matchTokenRuleST.setAttribute("rules", rname);
-			numAlts++;
 		}
 		//System.out.println("tokens rule: "+matchTokenRuleST.toString());
 
@@ -2005,30 +2003,14 @@ public class Grammar {
 		}
 		IntSet elements = null;
 		try {
-			elements = nfabuilder.setRule(r.tree);
 			//System.out.println("parsed tree: "+r.tree.toStringTree());
+			elements = nfabuilder.setRule(r.tree);
 			//System.out.println("elements="+elements);
 		}
 		catch (RecognitionException re) {
 			throw re;
 		}
 		return elements;
-		/*
-		GrammarAST setNode = r.tree.findFirstType(ANTLRParser.SET);
-		if ( setNode!=null ) {
-			try {
-				nfabuilder.set(setNode); // set r.tree's set value
-				if ( setNode.setValue!=null ) {
-					return setNode.setValue;
-				}
-			}
-			catch (RecognitionException re) {
-				throw re;
-			}
-		}
-		// check to see if it's a single char (no action)
-		return null;
-		*/
 	}
 
 	/** Decisions are linked together with transition(1).  Count how

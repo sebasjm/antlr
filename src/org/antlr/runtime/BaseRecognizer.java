@@ -19,6 +19,8 @@ public abstract class BaseRecognizer {
 	public static final int DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 	public static final int HIDDEN = Token.HIDDEN_CHANNEL;
 
+	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
+	
 	/** Track the set of token types that can follow any rule invocation.
 	 *  Stack grows upwards.  When it hits the max, it grows 2x in size
 	 *  and keeps going.
@@ -617,7 +619,7 @@ public abstract class BaseRecognizer {
 			if ( t.getClassName().startsWith("org.antlr.runtime.") ) {
 				continue; // skip support code such as this method
 			}
-			if ( t.getMethodName().equals("nextToken") ) {
+			if ( t.getMethodName().equals(NEXT_TOKEN_RULE_NAME) ) {
 				continue;
 			}
 			if ( !t.getClassName().equals(recognizerClassName) ) {
