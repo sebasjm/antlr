@@ -1,5 +1,6 @@
 /*
  [The "BSD licence"]
+ Copyright (c) 2007 Jonathan DeKlotz
  Copyright (c) 2005-2006 Kunle Odutola
  Copyright (c) 2005 Terence Parr
  All rights reserved.
@@ -94,7 +95,6 @@ if ( backtracking==0 )
 <if(autoAST)>
 <if(outerAlt)>
 root_0 = (<ASTLabelType>)adaptor.GetNilNode();<\n>
-
 <endif>
 <endif>
 >>
@@ -113,10 +113,7 @@ adaptor.AddChild(root_0, <label>_tree);
 /** ID! and output=AST (same as plain tokenRef) */
 tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
-
-
 /** ID^ and output=AST */
-
 tokenRefRuleRoot(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( backtracking==0 ) {<endif>
@@ -255,7 +252,7 @@ root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
 >>
 
-// TODO: ugh, am i really missing the combinations for Track and ListLabel?
+// ugh, am i really missing the combinations for Track and ListLabel?
 // there's got to be a better way
 
 // R e w r i t e
@@ -385,7 +382,8 @@ if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n_<rewrite
 rewriteAlt(a) ::= <<
 // <a.description>
 <if(a.pred)>
-if (<a.pred>) {
+if (<a.pred>)
+{
     <a.alt>
 }<\n>
 <else>
@@ -416,8 +414,8 @@ rewriteElement(e) ::= <<
 >>
 
 /** Gen ID */
-rewriteTokenRef(args,token,elementIndex) ::= <<
-adaptor.AddChild(root_<treeLevel>, <if(args)>adaptor.Create(<token>, <args; separator=", ">)<endif><if(!args)>(<labelType>)list_<token>[i_<rewriteBlockLevel>]<endif>);<\n>
+rewriteTokenRef(token,elementIndex) ::= <<
+adaptor.AddChild(root_<treeLevel>, (<labelType>)list_<token>[i_<rewriteBlockLevel>]);<\n>
 >>
 
 /** Gen $label ... where defined via label=ID */
