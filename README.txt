@@ -297,6 +297,10 @@ C# Target Notes
 
 CHANGES
 
+March 17, 2007
+
+* Jonathan DeKlotz updated C# templates to be 3.0b6 current
+
 March 14, 2007
 
 * Manually-specified (...)=> force backtracking eval of that predicate.
