@@ -589,7 +589,7 @@ setRule returns [IntSet elements=new IntervalSet()]
 	:	#( RULE id:ID (modifier)? ARG RET ( OPTIONS )? ( ruleScopeSpec )?
 		   	(AMPERSAND)*
            	#( BLOCK ( OPTIONS )?
-           	   ( #(ALT (setElement[elements]|s=setRuleSet {elements.addAll(s);})) )+
+           	   ( #(ALT setElement[elements]) )+
            	   EOB
            	 )
            	(exceptionGroup)?
@@ -598,10 +598,6 @@ setRule returns [IntSet elements=new IntervalSet()]
     ;
     exception
     	catch[RecognitionException re] {throw re;}
-
-setRuleSet returns [IntSet elements=new IntervalSet()]
-	:	#( s:SET (setElement[elements])+ ( ast:ast_suffix )? )
-    ;
 
 setElement[IntSet elements]
 {
@@ -669,4 +665,14 @@ setElement[IntSet elements]
     		elements.addAll(IntervalSet.of(a,b));
      	}
     	}
+
+	|   #( SET (setElement[elements])+ )
+
+    |   #(  NOT {IntSet ns=new IntervalSet();}
+            setElement[ns]
+            {
+                IntSet not = grammar.complement(ns);
+                elements.addAll(not);
+            }
+        )
     ;

@@ -469,6 +469,18 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
+	public void testSetCallsRuleWithNot() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar A;\n" +
+			"T : ~'x' ;\n" +
+			"S : 'x' (T | 'y') ;\n");
+		g.createLookaheadDFAs();
+		String expecting =
+			".s0-'x'->:s2=>2\n" +
+			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
+		checkDecision(g, 1, expecting, null);
+	}
+
 	public void testSynPredInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar T;\n"+

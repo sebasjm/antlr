@@ -27,14 +27,17 @@
 */
 package org.antlr.tool;
 
-import antlr.*;
+import antlr.RecognitionException;
+import antlr.Token;
+import antlr.TokenStreamRewriteEngine;
+import antlr.TokenWithIndex;
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
 import org.antlr.codegen.CodeGenerator;
+import org.antlr.misc.Barrier;
 import org.antlr.misc.IntSet;
 import org.antlr.misc.IntervalSet;
-import org.antlr.misc.Barrier;
 import org.antlr.misc.Utils;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
@@ -545,6 +548,17 @@ public class Grammar {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
+
+		/*
+		// OPTIMIZE TREE; COLLAPSE BLOCKS TO SETS
+		System.out.println("### optimize");
+		ASTEnumeration setNodes =
+			grammarTree.findAllPartial(new ASTFactory().create(ANTLRParser.SET,"SET"));
+		while ( setNodes.hasMoreNodes() ) {
+			GrammarAST s = (GrammarAST)setNodes.nextNode();
+			System.out.println("set="+s.toStringTree());
+		}
+		*/
 
 		nameSpaceChecker.checkConflicts();
 	}
@@ -2003,12 +2017,12 @@ public class Grammar {
 		}
 		IntSet elements = null;
 		try {
-			//System.out.println("parsed tree: "+r.tree.toStringTree());
+			// System.out.println("parsed tree: "+r.tree.toStringTree());
 			elements = nfabuilder.setRule(r.tree);
-			//System.out.println("elements="+elements);
+			// System.out.println("elements="+elements);
 		}
 		catch (RecognitionException re) {
-			throw re;
+			// The rule did not parse as a set, return null; ignore exception
 		}
 		return elements;
 	}
