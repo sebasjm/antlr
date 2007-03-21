@@ -43,7 +43,7 @@ AC_ARG_ENABLE([64bit],
 
 
 
-AM_INIT_AUTOMAKE(other)
+AM_INIT_AUTOMAKE(foreign)
 AC_LANG(C)
 AC_PROG_CC([xlc aCC gcc cc])
 AM_MAINTAINER_MODE
