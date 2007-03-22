@@ -473,7 +473,7 @@ public class TestCharDFAConversion extends BaseTest {
 		Grammar g = new Grammar(
 			"lexer grammar A;\n" +
 			"T : ~'x' ;\n" +
-			"S : 'x' (T | 'y') ;\n");
+			"S : 'x' (T | 'x') ;\n");
 		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'x'->:s2=>2\n" +

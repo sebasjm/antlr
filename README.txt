@@ -297,6 +297,12 @@ C# Target Notes
 
 CHANGES
 
+March 22, 2007
+
+* Working with Egor Ushakov from Sun Optimization / NetBeans team I
+  made all the Java lexer transition tables static w/o screwing up
+  ability to reference semantic predicates etc...  Only changed Java.stg
+
 March 17, 2007
 
 * Jonathan DeKlotz updated C# templates to be 3.0b6 current

@@ -858,37 +858,50 @@ alt<decisionNumber> = dfa<decisionNumber>.predict(input);
  * the encoding methods.
  */
 cyclicDFA(dfa) ::= <<
-public static final String DFA<dfa.decisionNumber>_eotS =
+static final String DFA<dfa.decisionNumber>_eotS =
     "<dfa.javaCompressedEOT; wrap="\"+\n    \"">";
-public static final String DFA<dfa.decisionNumber>_eofS =
+static final String DFA<dfa.decisionNumber>_eofS =
     "<dfa.javaCompressedEOF; wrap="\"+\n    \"">";
-public static final String DFA<dfa.decisionNumber>_minS =
+static final String DFA<dfa.decisionNumber>_minS =
     "<dfa.javaCompressedMin; wrap="\"+\n    \"">";
-public static final String DFA<dfa.decisionNumber>_maxS =
+static final String DFA<dfa.decisionNumber>_maxS =
     "<dfa.javaCompressedMax; wrap="\"+\n    \"">";
-public static final String DFA<dfa.decisionNumber>_acceptS =
+static final String DFA<dfa.decisionNumber>_acceptS =
     "<dfa.javaCompressedAccept; wrap="\"+\n    \"">";
-public static final String DFA<dfa.decisionNumber>_specialS =
+static final String DFA<dfa.decisionNumber>_specialS =
     "<dfa.javaCompressedSpecial; wrap="\"+\n    \"">}>";
-public static final String[] DFA<dfa.decisionNumber>_transition = {
-    <dfa.javaCompressedTransition:{s|"<s; wrap="\"+\n\"">"}; separator=",\n">
+static final String[] DFA<dfa.decisionNumber>_transitionS = {
+        <dfa.javaCompressedTransition:{s|"<s; wrap="\"+\n\"">"}; separator=",\n">
 };
 
+static final short[] DFA<dfa.decisionNumber>_eot = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eotS);
+static final short[] DFA<dfa.decisionNumber>_eof = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eofS);
+static final char[] DFA<dfa.decisionNumber>_min = DFA.unpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_minS);
+static final char[] DFA<dfa.decisionNumber>_max = DFA.unpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_maxS);
+static final short[] DFA<dfa.decisionNumber>_accept = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_acceptS);
+static final short[] DFA<dfa.decisionNumber>_special = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_specialS);
+static final short[][] DFA<dfa.decisionNumber>_transition;
+
+static {
+    int numStates = DFA<dfa.decisionNumber>_transitionS.length;
+    DFA<dfa.decisionNumber>_transition = new short[numStates][];
+    for (int i=0; i\<numStates; i++) {
+        DFA<dfa.decisionNumber>_transition[i] = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_transitionS[i]);
+    }
+}
+
 class DFA<dfa.decisionNumber> extends DFA {
+
     public DFA<dfa.decisionNumber>(BaseRecognizer recognizer) {
         this.recognizer = recognizer;
         this.decisionNumber = <dfa.decisionNumber>;
-        this.eot = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eotS);
-        this.eof = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eofS);
-        this.min = DFA.unpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_minS);
-        this.max = DFA.unpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_maxS);
-        this.accept = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_acceptS);
-        this.special = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_specialS);
-        int numStates = DFA<dfa.decisionNumber>_transition.length;
-        this.transition = new short[numStates][];
-        for (int i=0; i\<numStates; i++) {
-            transition[i] = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_transition[i]);
-        }
+        this.eot = DFA<dfa.decisionNumber>_eot;
+        this.eof = DFA<dfa.decisionNumber>_eof;
+        this.min = DFA<dfa.decisionNumber>_min;
+        this.max = DFA<dfa.decisionNumber>_max;
+        this.accept = DFA<dfa.decisionNumber>_accept;
+        this.special = DFA<dfa.decisionNumber>_special;
+        this.transition = DFA<dfa.decisionNumber>_transition;
     }
     public String getDescription() {
         return "<dfa.description>";
