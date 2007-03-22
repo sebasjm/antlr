@@ -468,8 +468,8 @@ antlr3BitsetSize(pANTLR3_BITSET bitset)
 static ANTLR3_BOOLEAN
 antlr3BitsetEquals(pANTLR3_BITSET bitset1, pANTLR3_BITSET bitset2)
 {
-    ANTLR3_UINT32   minimum;
-    ANTLR3_UINT32   i;
+    ANTLR3_INT32   minimum;
+    ANTLR3_INT32   i;
 
     if	(bitset1 == NULL || bitset2 == NULL)
     {
@@ -500,9 +500,9 @@ antlr3BitsetEquals(pANTLR3_BITSET bitset1, pANTLR3_BITSET bitset2)
     /* Now make sure the bits of the larger set are all turned
      * off.
      */
-    if	(bitset1->length > minimum)
+    if	(bitset1->length > (ANTLR3_UINT32)minimum)
     {
-	for (i = minimum ; i < bitset1->length; i++)
+	for (i = minimum ; (ANTLR3_UINT32)i < bitset1->length; i++)
 	{
 	    if	(bitset1->bits[i] != 0)
 	    {
@@ -510,9 +510,9 @@ antlr3BitsetEquals(pANTLR3_BITSET bitset1, pANTLR3_BITSET bitset2)
 	    }
 	}
     }
-    else if (bitset2->length > minimum)
+    else if (bitset2->length > (ANTLR3_UINT32)minimum)
     {
-	for (i = minimum; i < bitset2->length; i++)
+	for (i = minimum; (ANTLR3_UINT32)i < bitset2->length; i++)
 	{
 	    if	(bitset2->bits[i] != 0)
 	    {
@@ -561,7 +561,7 @@ antlr3BitsetRemove(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit)
 static ANTLR3_BOOLEAN
 antlr3BitsetIsNil(pANTLR3_BITSET bitset)
 {
-   ANTLR3_UINT32    i;
+   ANTLR3_INT32    i;
 
    for	(i = bitset->length -1; i>= 0; i--)
    {
@@ -621,7 +621,7 @@ antlr3BitsetToIntList	(pANTLR3_BITSET bitset)
 
     intList[0] = numInts;
 
-    /* Enumerate teh bits that are turned on
+    /* Enumerate the bits that are turned on
      */
     for	(i = 0, index = 1; i<numBits; i++)
     {
