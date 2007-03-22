@@ -92,7 +92,8 @@ public class CommonToken implements Token, Serializable {
 		if ( input==null ) {
 			return null;
 		}
-		return input.substring(start,stop);
+		text = input.substring(start,stop);
+		return text;
 	}
 
 	/** Override the text for this token.  getText() will return this text
