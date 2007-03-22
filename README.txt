@@ -303,6 +303,12 @@ March 22, 2007
   made all the Java lexer transition tables static w/o screwing up
   ability to reference semantic predicates etc...  Only changed Java.stg
 
+* cached text string in CommonToken.getText(); saves on repeated calls;
+  Java mode.
+
+* made all generated methods final; saves a few percent speed according to
+  Egor Ushakov (Java only).
+
 March 17, 2007
 
 * Jonathan DeKlotz updated C# templates to be 3.0b6 current
