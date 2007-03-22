@@ -1233,6 +1233,7 @@ static <returnType()>
 {   
     <if(trace)>printf("enter <ruleName> %s failed=%d, backtracking=%d\n", LT(1), backtracking);<endif>
     <ruleDeclarations()>
+    <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
     <ruleInitializations()>
     <ruleLabelInitializations()>
@@ -1396,9 +1397,10 @@ static
 void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 {
 
-    <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
     <ruleDeclarations()>
+    <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
+    <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
 
 <if(nakedBlock)>
     <ruleInitializations()>
