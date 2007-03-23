@@ -53,7 +53,22 @@ public class ActionTranslatorLexer extends Lexer {
     CodeGenerator generator;
     antlr.Token actionToken;
 
-    	public ActionTranslatorLexer(CodeGenerator generator,
+	int ruleNestingLevel = 0; 
+
+	public Token emit(int tokenType,
+					  int line, int charPosition,
+					  int channel,
+					  int start, int stop)
+	{
+		Token t = new CommonToken(input, tokenType, channel, start, stop);
+		t.setLine(line);
+		t.setText(text);
+		t.setCharPositionInLine(charPosition);
+		emit(t);
+		return t;
+	}
+
+		public ActionTranslatorLexer(CodeGenerator generator,
     								 String ruleName,
     								 GrammarAST actionAST)
     	{

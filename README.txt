@@ -309,6 +309,11 @@ March 22, 2007
 * made all generated methods final; saves a few percent speed according to
   Egor Ushakov (Java only).
 
+* removed most assignments from each lexer rule and even the Lexer.emit()
+  call!  All done in nextToken now.  Saves on code gen size and a wee bit of
+  execution speed probably.  Variables became fields: type, channel, line,
+  etc... Now emit() needs no args even.  Again, Egor helped on this.
+
 March 17, 2007
 
 * Jonathan DeKlotz updated C# templates to be 3.0b6 current

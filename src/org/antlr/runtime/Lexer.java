@@ -52,17 +52,22 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
  	 */
 	protected int tokenStartCharIndex = -1;
 
+	/** The line on which the first character of the token resides */
+	protected int tokenStartLine;
+
+	/** The character position of first character within the line */
+	protected int tokenStartCharPositionInLine;
+
+	/** The channel number for the current token */
+	protected int channel;
+
+	/** The token type for the current token */
+	protected int type;
+
 	/** You can set the text for the current token to override what is in
 	 *  the input char buffer.  Use setText() or can set this instance var.
  	 */
 	protected String text;
-
-	/** We must track the token rule nesting level as we only want to
-	 *  emit a token automatically at the outermost level so we don't get
-	 *  two if FLOAT calls INT.  To save code space and time, do not
-	 *  inc/dec this in fragment rules.
-	 */
-	protected int ruleNestingLevel;
 
 	public Lexer() {
 	}
@@ -75,9 +80,12 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		super.reset(); // reset all recognizer state variables
 		// wack Lexer state variables
 		token = null;
+		type = Token.INVALID_TOKEN_TYPE;
+		channel = Token.DEFAULT_CHANNEL;
 		tokenStartCharIndex = -1;
+		tokenStartCharPositionInLine = -1;
+		tokenStartLine = -1;
 		text = null;
-		ruleNestingLevel = 0;
 		if ( input!=null ) {
 			input.seek(0); // rewind the input
 		}
@@ -89,16 +97,23 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
     public Token nextToken() {
 		while (true) {
 			token = null;
-			tokenStartCharIndex = getCharIndex();
+			channel = Token.DEFAULT_CHANNEL;
+			tokenStartCharIndex = input.index();
+			tokenStartCharPositionInLine = input.getCharPositionInLine();
+			tokenStartLine = input.getLine();
 			text = null;
 			if ( input.LA(1)==CharStream.EOF ) {
                 return Token.EOF_TOKEN;
             }
             try {
                 mTokens();
-				if ( token!=Token.SKIP_TOKEN ) {
-					return token;
+				if ( token==null ) {
+					emit();
 				}
+				else if ( token==Token.SKIP_TOKEN ) {
+					continue;
+				}
+				return token;
 			}
             catch (RecognitionException re) {
                 reportError(re);
@@ -141,15 +156,11 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  char buffer start..stop.  If there is a text override in 'text',
 	 *  use that to set the token's text.
 	 */
-	public Token emit(int tokenType,
-					  int line, int charPosition,
-					  int channel,
-					  int start, int stop)
-	{
-		Token t = new CommonToken(input, tokenType, channel, start, stop);
-		t.setLine(line);
+	public Token emit() {
+		Token t = new CommonToken(input, type, channel, tokenStartCharIndex, getCharIndex()-1);
+		t.setLine(tokenStartLine);
 		t.setText(text);
-		t.setCharPositionInLine(charPosition);
+		t.setCharPositionInLine(tokenStartCharPositionInLine);
 		emit(t);
 		return t;
 	}

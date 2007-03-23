@@ -112,7 +112,10 @@ public Token nextToken() {
             return Token.EOF_TOKEN;
         }
         token = null;
-        tokenStartCharIndex = getCharIndex();
+	channel = Token.DEFAULT_CHANNEL;
+        tokenStartCharIndex = input.index();
+        tokenStartCharPositionInLine = input.getCharPositionInLine();
+        tokenStartLine = input.getLine();
 	text = null;
         try {
             int m = input.mark();
@@ -127,6 +130,7 @@ public Token nextToken() {
                 input.consume(); <! advance one char and try again !>
             }
             else {
+                emit();
                 return token;
             }
         }
@@ -395,33 +399,20 @@ public final void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scop
     <if(trace)>traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleDeclarations()>
     try {
-        ruleNestingLevel++;
 <if(nakedBlock)>
         <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
         <block><\n>
 <else>
-        int _type = <ruleName>;
-        int _start = getCharIndex();
-        int _line = getLine();
-        int _charPosition = getCharPositionInLine();
-        int _channel = Token.DEFAULT_CHANNEL;
+        type = <ruleName>;
         <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
         <block>
-        <! create token if none exists *and* we are an outermost token rule !>
-        <execAction({
-        if ( token==null && ruleNestingLevel==1 ) {
-            emit(_type,_line,_charPosition,_channel,_start,getCharIndex()-1);
-        }<\n>
-        }
-        )>
         <ruleCleanUp()>
         <(ruleDescriptor.actions.after):execAction()>
 <endif>
     }
     finally {
-        ruleNestingLevel--;
         <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
         <memoize()>
     }
@@ -1175,12 +1166,12 @@ input.toString(retval.start,input.LT(-1))
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "getText()"
-lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "_line"
-lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
+lexerRulePropertyRef_type(scope,attr) ::= "type"
+lexerRulePropertyRef_line(scope,attr) ::= "tokenStartLine"
+lexerRulePropertyRef_pos(scope,attr) ::= "tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
-lexerRulePropertyRef_start(scope,attr) ::= "_start"
+lexerRulePropertyRef_channel(scope,attr) ::= "channel"
+lexerRulePropertyRef_start(scope,attr) ::= "tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(getCharIndex()-1)"
 
 // setting $st and $tree is allowed in local rule. everything else

@@ -71,6 +71,19 @@ antlr.Token actionToken;
 	    this.actionToken = actionToken;
 		this.outerAltNum = outerAltNum;
 	}
+	// BACKWARD COMPATIBILITY UNTIL REGENERATING WITH 3.0b7
+	public Token emit(int tokenType,
+					  int line, int charPosition,
+					  int channel,
+					  int start, int stop)
+	{
+		Token t = new CommonToken(input, tokenType, channel, start, stop);
+		t.setLine(line);
+		t.setText(text);
+		t.setCharPositionInLine(charPosition);
+		emit(t);
+		return t;
+	}
 
 /*
 public ActionTranslatorLexer(CharStream input, CodeGenerator generator,
