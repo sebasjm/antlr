@@ -61,6 +61,19 @@ public class TestLexer extends BaseTest {
 		assertEquals("-34\n", found);
 	}
 
+	public void testWeCanSetType() throws Exception {
+		String grammar =
+			"grammar P;\n"+
+			"tokens {X;}\n" +
+			"a : X EOF {System.out.println(input);} ;\n"+
+			"A : '-' I {$type = X;} ;\n" +
+			"I : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;";
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
+				    "a", "-34", debug);
+		assertEquals("-34\n", found);
+	}
+
 	public void testRefToFragment() throws Exception {
 		// this must return A not I to the parser; calling a nonfragment rule
 		// from a nonfragment rule does not set the overall token.

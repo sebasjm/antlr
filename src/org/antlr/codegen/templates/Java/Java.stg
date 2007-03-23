@@ -404,11 +404,12 @@ public final void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scop
         <ruleMemoization(name=ruleName)>
         <block><\n>
 <else>
-        type = <ruleName>;
+        int _type = <ruleName>;
         <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
         <block>
         <ruleCleanUp()>
+        this.type = _type;
         <(ruleDescriptor.actions.after):execAction()>
 <endif>
     }
@@ -1166,7 +1167,7 @@ input.toString(retval.start,input.LT(-1))
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "getText()"
-lexerRulePropertyRef_type(scope,attr) ::= "type"
+lexerRulePropertyRef_type(scope,attr) ::= "_type"
 lexerRulePropertyRef_line(scope,attr) ::= "tokenStartLine"
 lexerRulePropertyRef_pos(scope,attr) ::= "tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
