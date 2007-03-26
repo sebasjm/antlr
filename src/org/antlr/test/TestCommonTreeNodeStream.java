@@ -188,4 +188,16 @@ public class TestCommonTreeNodeStream extends TestTreeNodeStream {
 		assertEquals(Token.EOF, ((Tree)stream.LT(1)).getType());
 	}
 
+	public void testStackStretch() throws Exception {
+		// make more than INITIAL_CALL_STACK_SIZE pushes
+		Tree r0 = new CommonTree(new CommonToken(101));
+		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		// go 1 over initial size
+		for (int i=1; i<=CommonTreeNodeStream.INITIAL_CALL_STACK_SIZE+1; i++) {
+			stream.push(i);
+		}
+		assertEquals(10, stream.pop());
+		assertEquals(9, stream.pop());
+	}
+
 }

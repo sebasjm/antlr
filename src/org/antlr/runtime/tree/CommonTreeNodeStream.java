@@ -454,7 +454,7 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		}
 		else if ( (_sp+1)>=calls.length ) {
 			int[] newStack = new int[calls.length*2];
-			System.arraycopy(calls, 0, newStack, 0, calls.length-1);
+			System.arraycopy(calls, 0, newStack, 0, calls.length);
 			calls = newStack;
 		}
 		calls[++_sp] = p; // save current index
