@@ -297,6 +297,11 @@ C# Target Notes
 
 CHANGES
 
+March 26, 2007
+
+* CommonTreeNodeStream didn't push correctly; couldn't handle very
+  deeply nested trees.
+
 March 22, 2007
 
 * Working with Egor Ushakov from Sun Optimization / NetBeans team I
