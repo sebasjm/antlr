@@ -170,11 +170,9 @@ protected void trackTokenRule(GrammarAST t,
 			tokens.put(t.getText(), UNASSIGNED);
 		}
 		// look for "<TOKEN> : <literal> ;" pattern
-		GrammarAST stringAlias = #(#[BLOCK], #(#[ALT], #[STRING_LITERAL]));
-		GrammarAST charAlias = #(#[BLOCK], #(#[ALT], #[CHAR_LITERAL]));
-		if ( matchesStructure(block,charAlias) ||
-             matchesStructure(block,stringAlias) )
-		{
+		GrammarAST stringAlias = #(#[BLOCK], #(#[ALT], #[STRING_LITERAL], #[EOA]), #[EOB]);
+		GrammarAST charAlias = #(#[BLOCK], #(#[ALT], #[CHAR_LITERAL], #[EOA]), #[EOB]);
+		if ( block.equalsTree(charAlias) || block.equalsTree(stringAlias) ) {
 			alias(t, (GrammarAST)block.getFirstChild().getFirstChild());
 			tokenRuleDefs.add(t.getText());
 		}

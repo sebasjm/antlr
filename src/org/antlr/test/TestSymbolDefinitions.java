@@ -105,6 +105,26 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkSymbols(g, rules, tokenNames);
 	}
 
+	public void testLiteralInParserAndLexer() throws Exception {
+		// 'x' is token and char in lexer rule
+		Grammar g = new Grammar(
+				"grammar t;\n" +
+				"a : 'x' E ; \n" +
+				"E: 'x' '0' ;\n");        // nor is 'c'
+		String literals = "['x']";
+		String foundLiterals = g.getStringLiterals().toString();
+		assertEquals(literals, foundLiterals);
+
+		String implicitLexer =
+			"lexer grammar t;\n" +
+			"\n" +
+			"T5 : 'x' ;\n" +
+			"\n" +
+			"// $ANTLR src \"<string>\" 3\n" +
+			"E: 'x' '0' ;\n";
+		assertEquals(implicitLexer, g.getLexerGrammar());
+	}
+
 	public void testCombinedGrammarWithRefToLiteralButNoTokenIDRef() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+

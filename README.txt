@@ -302,6 +302,8 @@ March 26, 2007
 * CommonTreeNodeStream didn't push correctly; couldn't handle very
   deeply nested trees.
 
+* Fixed bug that E : 'a' 'b' ; made E be seen as an alias of 'a'.
+
 March 22, 2007
 
 * Working with Egor Ushakov from Sun Optimization / NetBeans team I

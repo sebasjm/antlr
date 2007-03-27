@@ -1101,6 +1101,7 @@ public class Grammar {
 													   String literal,
 													   int tokenType)
 	{
+		//System.out.println("defineLexerRuleForAliasedStringLiteral: "+literal+" "+tokenType);
 		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
 									tokenID,
 									Utils.integer(tokenType),
@@ -1116,15 +1117,6 @@ public class Grammar {
 									Utils.integer(tokenType),
 									literal);
 	}
-
-	/*
-	public void defineLexerRuleForCharLiteral(String literal, int tokenType) {
-		lexerGrammarST.setAttribute("literals.{ruleName,type,literal}",
-									computeTokenNameFromLiteral(tokenType,literal),
-									Utils.integer(tokenType),
-									literal);
-	}
-	*/
 
 	public Rule getRule(String ruleName) {
 		Rule r = (Rule)nameToRuleMap.get(ruleName);
