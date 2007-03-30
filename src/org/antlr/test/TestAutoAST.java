@@ -497,6 +497,19 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("34\nabc 34\n", found);
 	}
 
+	public void testSetLoop() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options { output=AST; }\n" +
+			"r : (INT|ID)+ ; \n" +
+			"ID : 'a'..'z' + ;\n" +
+			"INT : '0'..'9' +;\n" +
+			"WS: (' ' | '\\n' | '\\t')+ {$channel = HIDDEN;};\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "r", "abc 34 d", debug);
+		assertEquals("abc 34 d\n", found);
+	}
+
 
 	// S U P P O R T
 

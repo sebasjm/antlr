@@ -459,7 +459,10 @@ block[String blockTemplateName, DFA dfa]
     }
 }
     :   {#block.getSetValue()!=null}? sb=setBlock
-        {code.setAttribute("alts",sb);}
+        {
+            code.setAttribute("alts",sb);
+            blockNestingLevel--;
+        }
 
     |   #(  BLOCK
     	    ( OPTIONS )? // ignore
@@ -511,7 +514,8 @@ if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL && grammar.buildAST() ) {
                              Utils.integer(#s.getColumn())
                             );
         altcode.setAttribute("altNum", Utils.integer(1));
-        altcode.setAttribute("outerAlt", new Boolean(true));
+        altcode.setAttribute("outerAlt",
+           Boolean.valueOf(blockNestingLevel==RULE_BLOCK_NESTING_LEVEL));
         if ( !currentAltHasASTRewrite && grammar.buildAST() ) {
             altcode.setAttribute("autoAST", Boolean.valueOf(true));
         }

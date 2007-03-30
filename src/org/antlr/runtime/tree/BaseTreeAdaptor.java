@@ -23,7 +23,9 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 *  ASTs.
 	 */
 	public void addChild(Object t, Object child) {
-		((Tree)t).addChild((Tree)child);
+		if ( t!=null ) {
+			((Tree)t).addChild((Tree)child);
+		}
 	}
 
 	/** If oldRoot is a nil root, just copy or move the children to newRoot.
