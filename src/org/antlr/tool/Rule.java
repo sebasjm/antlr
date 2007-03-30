@@ -193,6 +193,14 @@ public class Rule {
 		return pair;
 	}
 
+	public Map getRuleLabels() {
+		return ruleLabels;
+	}
+
+	public Map getRuleListLabels() {
+		return ruleListLabels;
+	}
+
 	public Grammar.LabelElementPair getRuleLabel(String name) {
 		Grammar.LabelElementPair pair = null;
 		if ( ruleLabels!=null ) {

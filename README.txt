@@ -297,6 +297,10 @@ C# Target Notes
 
 CHANGES
 
+March 30, 2007
+
+* Fixed ANTLR-8.  Labels to rules w/o return values caused compile errors.
+
 March 29, 2007
 
 * Over last few days, I've gutted how ANTLR handles sets of chars or

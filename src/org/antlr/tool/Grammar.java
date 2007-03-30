@@ -549,6 +549,8 @@ public class Grammar {
 							   re);
 		}
 
+		checkAllRulesForUselessLabels();
+
 		/*
 		// OPTIMIZE TREE; COLLAPSE BLOCKS TO SETS
 		System.out.println("### optimize");
@@ -1221,6 +1223,43 @@ public class Grammar {
 					label,label.getText());
 			}
 			defineLabel(r, label, element, RULE_LIST_LABEL);
+		}
+	}
+
+	/** Remove all labels on rule refs whose target rules have no return value.
+	 *  Do this for all rules in grammar.
+	 */
+	public void checkAllRulesForUselessLabels() {
+		if ( type==LEXER ) {
+			return;
+		}
+		Set rules = nameToRuleMap.keySet();
+		for (Iterator it = rules.iterator(); it.hasNext();) {
+			String ruleName = (String) it.next();
+			Rule r = getRule(ruleName);
+			removeUselessLabels(r.getRuleLabels());
+			removeUselessLabels(r.getRuleListLabels());
+		}
+	}
+
+	protected void removeUselessLabels(Map ruleToElementLabelPairMap) {
+		if ( ruleToElementLabelPairMap==null ) {
+			return;
+		}
+		Collection labels = ruleToElementLabelPairMap.values();
+		List kill = new ArrayList();
+		for (Iterator labelit = labels.iterator(); labelit.hasNext();) {
+			LabelElementPair pair = (LabelElementPair) labelit.next();
+			Rule refdRule = getRule(pair.elementRef.getText());
+			if ( refdRule!=null && !refdRule.getHasReturnValue() ) {
+				//System.out.println(pair.label.getText()+" is useless");
+				kill.add(pair.label.getText());
+			}
+		}
+		for (int i = 0; i < kill.size(); i++) {
+			String labelToKill = (String) kill.get(i);
+			//System.out.println("kill "+labelToKill);
+			ruleToElementLabelPairMap.remove(labelToKill);
 		}
 	}
 

@@ -362,7 +362,7 @@ element
             {
                 #a2 = (GrammarAST)#a2.getFirstChild();
             }
-    	    if ( #a2.getType()!=RULE_REF ) {
+    	    if ( #a2.getType()==RULE_REF ) {
     	    	grammar.defineRuleListLabel(currentRuleName,#id2.getToken(),#a2);
     	    }
     	    else {

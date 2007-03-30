@@ -771,6 +771,11 @@ if ( label!=null ) {
     :   #( r:RULE_REF (rarg:ARG_ACTION)? )
         {
         grammar.checkRuleReference(#r, #rarg, currentRuleName);
+        Rule rdef = grammar.getRule(#r.getText());
+        // don't insert label=r() if $label.attr not used, no ret value, ...
+        if ( !rdef.getHasReturnValue() ) {
+            labelText = null;
+        }
         code = getRuleElementST("ruleRef", #r.getText(), #r, astSuffix, labelText);
 		code.setAttribute("rule", r.getText());
 

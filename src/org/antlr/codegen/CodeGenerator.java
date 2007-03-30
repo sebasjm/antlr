@@ -260,11 +260,11 @@ public class CodeGenerator {
 	 *
 	 *  The target, such as JavaTarget, dictates which files get written.
 	 */
-	public void genRecognizer() {
+	public StringTemplate genRecognizer() {
 		// LOAD OUTPUT TEMPLATES
 		loadTemplates(language);
 		if ( templates==null ) {
-			return;
+			return null;
 		}
 
 		// CHECK FOR LEFT RECURSION; Make sure we can actually do analysis
@@ -272,7 +272,7 @@ public class CodeGenerator {
 
 		// was there a severe problem while reading in grammar?
 		if ( ErrorManager.doNotAttemptAnalysis() ) {
-			return;
+			return null;
 		}
 
 		// CREATE NFA FROM GRAMMAR, CREATE DFA FROM NFA
@@ -280,7 +280,7 @@ public class CodeGenerator {
 
 		// some grammar analysis errors will not yield reliable DFA
 		if ( ErrorManager.doNotAttemptCodeGen() ) {
-			return;
+			return null;
 		}
 
 		// OPTIMIZE DFA
@@ -460,6 +460,8 @@ public class CodeGenerator {
 		System.out.println("num obj.prop refs: "+ ASTExpr.totalObjPropRefs);
 		System.out.println("num reflection lookups: "+ ASTExpr.totalReflectionLookups);
 		*/
+
+		return outputFileST;
 	}
 
 	/** Some targets will have some extra scopes like C++ may have

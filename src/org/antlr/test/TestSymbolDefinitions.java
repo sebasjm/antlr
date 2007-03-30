@@ -29,6 +29,8 @@ package org.antlr.test;
 
 import org.antlr.Tool;
 import org.antlr.analysis.Label;
+import org.antlr.codegen.CodeGenerator;
+import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
 
 import java.io.StringReader;
@@ -210,6 +212,27 @@ public class TestSymbolDefinitions extends BaseTest {
 		assertEquals("a}\n", found);
 	}
 
+
+	public void testRefToRuleWithNoReturnValue() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		String grammarStr =
+			"grammar P;\n" +
+			"a : x=b ;\n" +
+			"b : B ;\n" +
+			"B : 'b' ;\n";
+		Grammar g = new Grammar(grammarStr);
+
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		StringTemplate recogST = generator.genRecognizer();
+		String code = recogST.toString();
+		assertTrue("not expecting label", code.indexOf("x=b();")<0);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
 
 	// T E S T  E R R O R S
 
