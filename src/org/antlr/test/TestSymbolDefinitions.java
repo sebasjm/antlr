@@ -205,7 +205,7 @@ public class TestSymbolDefinitions extends BaseTest {
 			"tokens { B='}'; }\n"+
 			"a : A '}' {System.out.println(input);} ;\n"+
 			"A : 'a' ;\n" +
-			"B : '}' {action} ;\n"+
+			"B : '}' {/* */} ;\n"+
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;";
 		String found = execParser("P.g", grammar, "PParser", "PLexer",
 								  "a", "a}", false);
