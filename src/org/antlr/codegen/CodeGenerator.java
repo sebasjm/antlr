@@ -29,12 +29,11 @@ package org.antlr.codegen;
 
 import antlr.RecognitionException;
 import antlr.TokenStreamRewriteEngine;
-import antlr.TokenWithIndex;
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
-import org.antlr.misc.*;
 import org.antlr.misc.BitSet;
+import org.antlr.misc.*;
 import org.antlr.stringtemplate.CommonGroupLoader;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -534,15 +533,16 @@ public class CodeGenerator {
 	 */
 	public void generateLocalFOLLOW(GrammarAST referencedElementNode,
 									String referencedElementName,
-									String enclosingRuleName)
+									String enclosingRuleName,
+									int elementIndex)
 	{
 		NFAState followingNFAState = referencedElementNode.followingNFAState;
-		int i = ((TokenWithIndex)referencedElementNode.getToken()).getIndex();
-		/*
+/*
 		System.out.print("compute FOLLOW "+referencedElementNode.toString()+
-		" for "+referencedElementName+"#"+i+" in "+
-		enclosingRuleName);
-		*/
+						 " for "+referencedElementName+"#"+elementIndex +" in "+
+						 enclosingRuleName+
+						 " line="+referencedElementNode.getLine());
+*/
 		LookaheadSet follow = null;
 		if ( followingNFAState!=null ) {
 			follow = grammar.LOOK(followingNFAState);
@@ -576,19 +576,19 @@ public class CodeGenerator {
                 enclosingRuleName,
                 wordStrings,
                 tokenTypeList,
-                Utils.integer(i));
+                Utils.integer(elementIndex));
         outputFileST.setAttribute("bitsets.{name,inName,bits,tokenTypes,tokenIndex}",
                 referencedElementName,
                 enclosingRuleName,
                 wordStrings,
                 tokenTypeList,
-                Utils.integer(i));
+                Utils.integer(elementIndex));
         headerFileST.setAttribute("bitsets.{name,inName,bits,tokenTypes,tokenIndex}",
                 referencedElementName,
                 enclosingRuleName,
                 wordStrings,
                 tokenTypeList,
-                Utils.integer(i));
+                Utils.integer(elementIndex));
 	}
 
 	// L O O K A H E A D  D E C I S I O N  G E N E R A T I O N

@@ -290,12 +290,14 @@ rewrite
 	;
 
 element
-    :   atom
-    |   #(NOT {out("~");} atom) 
+    :   #(ROOT element)
+    |   #(BANG element)
+    |   atom
+    |   #(NOT {out("~");} element)
     |   #(RANGE atom {out("..");} atom)
     |   #(CHAR_RANGE atom {out("..");} atom)
-    |	#(ASSIGN id:ID {out(#id.getText()+"=");} (#(NOT{out("~");} atom)|atom)) 
-    |	#(PLUS_ASSIGN id2:ID {out(#id2.getText()+"+=");} atom)
+    |	#(ASSIGN id:ID {out(#id.getText()+"=");} element)
+    |	#(PLUS_ASSIGN id2:ID {out(#id2.getText()+"+=");} element)
     |   ebnf
     |   tree
     |   #( SYNPRED block[true] ) {out("=>");}
@@ -352,29 +354,9 @@ atom
 		)
 		{out(" ");}
     |	LABEL {out(" $"+#LABEL.getText());} // used in -> rewrites
-    |   set
     ;
 
 ast_suffix
 	:	ROOT {out("^");}
 	|	BANG  {out("!");}
 	;
-
-set
-    :   #( SET
-    	   {out("(");} setElement ({out("|");} setElement)* {out(")");}
-           (ast_suffix)?
-    	 )
-    ;
-
-setElement
-    :   (	CHAR_LITERAL    {out(#setElement.toString());}
-		|   TOKEN_REF		{out(#setElement.toString());}
-		|   STRING_LITERAL	{out(#setElement.toString());}
-		)
-    |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
-    	{out(#c1.getText()+
-    	     ".."+
-    	     #c2.getText());
-    	}
-    ;

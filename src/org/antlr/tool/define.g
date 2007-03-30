@@ -165,41 +165,6 @@ optionsSpec
 	:	OPTIONS
 	;
 
-/*
-optionsSpec returns [Map opts=new HashMap()]
-    :   #( OPTIONS (option[opts])+ )
-    ;
-
-option[Map opts]
-{
-    String key=null;
-    Object value=null;
-}
-    :   #( ASSIGN id:ID {key=#id.getText();} value=optionValue )
-        {opts.put(key,value);}
-    ;
-
-optionValue returns [Object value=null]
-    :   id:ID			 {value = #id.getText();}
-    |   s:STRING_LITERAL {String vs = #s.getText();
-                          value=vs.substring(1,vs.length()-1);}
-    |   c:CHAR_LITERAL   {String vs = #c.getText();
-                          value=vs.substring(1,vs.length()-1);}
-    |   i:INT            {value = Utils.integer(#i.getText());}
-//  |   cs:charSet       {value = #cs;} // return set AST in this case
-    ;
-
-charSet
-	:   #( CHARSET charSetElement )
-	;
-
-charSetElement
-	:   c:CHAR_LITERAL
-	|   #( OR c1:CHAR_LITERAL c2:CHAR_LITERAL )
-	|   #( RANGE c3:CHAR_LITERAL c4:CHAR_LITERAL )
-	;
-*/
-
 tokensSpec
 	:	#( TOKENS ( tokenSpec )+ )
 	;
@@ -370,25 +335,24 @@ rewrite
 	;
 
 element
-    :   atom
-    |   #(NOT atom)
+    :   #(ROOT element)
+    |   #(BANG element)
+    |   atom
+    |   #(NOT element)
     |   #(RANGE atom atom)
     |   #(CHAR_RANGE atom atom)
-    |	#(ASSIGN id:ID (#(NOT not_a:atom)|a:atom) )
+    |	#(ASSIGN id:ID el:element)
     	{
-    	if (not_a != null) {
-    		a = not_a;	// "hoist" up the ~atom for name inspection - is this valid?
+    	if ( #el.findFirstType(RULE_REF)!=null ) {
+    		grammar.defineRuleRefLabel(currentRuleName,#id.getToken(),el);
     	}
-    	if ( #a.getType()==RULE_REF ) {
-    		grammar.defineRuleRefLabel(currentRuleName,#id.getToken(),a);
-    	}
-    	else if ( #a.getType()!=CHAR_RANGE ) {
-    		grammar.defineTokenRefLabel(currentRuleName,#id.getToken(),a);
+    	else if ( #el.getType()!=CHAR_RANGE ) {
+    		grammar.defineTokenRefLabel(currentRuleName,#id.getToken(),el);
     	}
     	}
-    |	#(	PLUS_ASSIGN id2:ID a2:atom
+    |	#(	PLUS_ASSIGN id2:ID a2:element
     	    {
-    	    if ( #a2.getType()==RULE_REF ) {
+    	    if ( #a2.findFirstType(RULE_REF)!=null ) {
     	    	grammar.defineRuleListLabel(currentRuleName,#id2.getToken(),#a2);
     	    }
     	    else {
@@ -473,20 +437,9 @@ atom
     	}
     	}
     |   WILDCARD
-    |	set
     ;
 
 ast_suffix
 	:	ROOT
 	|	BANG
 	;
-
-set :   #(SET (setElement)+ (ast_suffix)? )
-    ;
-
-setElement
-    :   c:CHAR_LITERAL
-    |   t:TOKEN_REF
-    |   s:STRING_LITERAL
-    |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
-    ;

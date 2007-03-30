@@ -107,6 +107,11 @@ options {
             ex);
     }
 
+protected GrammarAST stringAlias;
+protected GrammarAST charAlias;
+protected GrammarAST stringAlias2;
+protected GrammarAST charAlias2;
+
 protected Grammar grammar;
 protected Map stringLiterals = new LinkedHashMap(); // Map<literal,Integer>
 protected Map tokens = new LinkedHashMap();         // Map<name,Integer>
@@ -170,34 +175,17 @@ protected void trackTokenRule(GrammarAST t,
 			tokens.put(t.getText(), UNASSIGNED);
 		}
 		// look for "<TOKEN> : <literal> ;" pattern
-		GrammarAST stringAlias = #(#[BLOCK], #(#[ALT], #[STRING_LITERAL], #[EOA]), #[EOB]);
-		GrammarAST charAlias = #(#[BLOCK], #(#[ALT], #[CHAR_LITERAL], #[EOA]), #[EOB]);
-		if ( block.equalsTree(charAlias) || block.equalsTree(stringAlias) ) {
+        // (can have optional action last)
+		if ( block.hasSameTreeStructure(charAlias) ||
+             block.hasSameTreeStructure(stringAlias) ||
+             block.hasSameTreeStructure(charAlias2) ||
+             block.hasSameTreeStructure(stringAlias2) )
+        {
 			alias(t, (GrammarAST)block.getFirstChild().getFirstChild());
 			tokenRuleDefs.add(t.getText());
 		}
 	}
 	// else error
-}
-
-protected boolean matchesStructure(AST a, AST b) {
-	// the empty tree is always a subset of any tree.
-	if (b == null || a==null) {
-		return true;
-	}
-
-	// check roots first.
-	if ( a.getType()!=b.getType() ) {
-		return false;
-	}
-
-	// if roots match, do full list partial match test on children.
-	if (a.getFirstChild() != null) {
-		if (!matchesStructure(a.getFirstChild(),b.getFirstChild())) {
-			return false;
-		}
-	}
-	return true;
 }
 
 protected void alias(GrammarAST t, GrammarAST s) {
@@ -293,6 +281,14 @@ protected void assignTypes() {
 
 	protected void init(Grammar g) {
 		this.grammar = g;
+        stringAlias = 
+            #(#[BLOCK], #(#[ALT], #[STRING_LITERAL], #[EOA]), #[EOB]);
+        charAlias =
+            #(#[BLOCK], #(#[ALT], #[CHAR_LITERAL], #[EOA]), #[EOB]);
+        stringAlias2 =
+            #(#[BLOCK], #(#[ALT], #[STRING_LITERAL], #[ACTION], #[EOA]),#[EOB]);
+        charAlias2 = 
+            #(#[BLOCK], #(#[ALT], #[CHAR_LITERAL], #[ACTION], #[EOA]), #[EOB]);
 	}
 }
 
@@ -434,12 +430,14 @@ rewrite
 	;
 
 element
-    :   atom
-    |   #(NOT atom)
+    :   #(ROOT element)
+    |   #(BANG element)
+    |   atom
+    |   #(NOT element)
     |   #(RANGE atom atom)
     |   #(CHAR_RANGE atom atom)
-    |	#(ASSIGN ID (#(NOT atom)|atom))
-    |	#(PLUS_ASSIGN ID atom)
+    |	#(ASSIGN ID element)
+    |	#(PLUS_ASSIGN ID element)
     |   ebnf
     |   tree
     |   #( SYNPRED block ) 
@@ -466,24 +464,9 @@ atom
     |   c:CHAR_LITERAL   {trackString(c);}
     |   s:STRING_LITERAL {trackString(s);}
     |   WILDCARD
-    |	set
     ;
 
 ast_suffix
 	:	ROOT
 	|	BANG
 	;
-
-set :   #(SET (setElement)+ (ast_suffix)? )
-    ;
-
-setElement
-    :   c:CHAR_LITERAL   {trackString(c);}
-    |   t:TOKEN_REF      {trackToken(t);}
-    |   s:STRING_LITERAL {trackString(s);}
-    |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
-    	{
-    	trackString(c1);
-    	trackString(c2);
-    	}
-    ;

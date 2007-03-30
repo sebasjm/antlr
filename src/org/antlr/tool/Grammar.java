@@ -1991,6 +1991,23 @@ public class Grammar {
         return complement(IntervalSet.of(atom));
     }
 
+	/** Given set tree like ( SET A B ) in lexer, check that A and B
+	 *  are both valid sets themselves, else we must tree like a BLOCK
+	 */
+	public boolean isValidSet(TreeToNFAConverter nfabuilder, GrammarAST t) {
+		boolean valid = true;
+		try {
+			//System.out.println("parse BLOCK as set tree: "+t.toStringTree());
+			nfabuilder.testBlockAsSet(t);
+		}
+		catch (RecognitionException re) {
+			// The rule did not parse as a set, return null; ignore exception
+			valid = false;
+		}
+		//System.out.println("valid? "+valid);
+		return valid;
+	}
+
 	/** Get the set equivalent (if any) of the indicated rule from this
 	 *  grammar.  Mostly used in the lexer to do ~T for some fragment rule
 	 *  T.  If the rule AST has a SET use that.  If the rule is a single char
@@ -1998,7 +2015,7 @@ public class Grammar {
 	 *  then return null.
 	 *  Rules have AST form:
 	 *
-	 *		^( RULE ID modifier ARG RET SCOPE block EORAST )
+	 *		^( RULE ID modifier ARG RET SCOPE block EOR )
 	 */
 	public IntSet getSetFromRule(TreeToNFAConverter nfabuilder, String ruleName)
 		throws RecognitionException
@@ -2008,14 +2025,9 @@ public class Grammar {
 			return null;
 		}
 		IntSet elements = null;
-		try {
-			// System.out.println("parsed tree: "+r.tree.toStringTree());
-			elements = nfabuilder.setRule(r.tree);
-			// System.out.println("elements="+elements);
-		}
-		catch (RecognitionException re) {
-			// The rule did not parse as a set, return null; ignore exception
-		}
+		//System.out.println("parsed tree: "+r.tree.toStringTree());
+	    elements = nfabuilder.setRule(r.tree);
+		//System.out.println("elements="+elements);
 		return elements;
 	}
 

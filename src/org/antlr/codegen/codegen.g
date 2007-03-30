@@ -337,8 +337,7 @@ rule returns [StringTemplate code=null]
                (ia:ACTION {initAction=generator.translateAction(r,#ia);})?
              )
             */
-	     	b=block["ruleBlock", dfa]
-
+            b=block["ruleBlock", dfa]
 			{
 			String description =
 				grammar.grammarTreeToString(#rule.getFirstChildWithType(BLOCK), false);
@@ -452,11 +451,17 @@ block[String blockTemplateName, DFA dfa]
     code.setAttribute("enclosingBlockLevel", blockNestingLevel-1);
     StringTemplate alt = null;
     StringTemplate rew = null;
+    StringTemplate sb = null;
     GrammarAST r = null;
     int altNum = 1;
-	if ( this.blockNestingLevel==RULE_BLOCK_NESTING_LEVEL ) {this.outerAltNum=1;}
+	if ( this.blockNestingLevel==RULE_BLOCK_NESTING_LEVEL ) {
+        this.outerAltNum=1;
+    }
 }
-    :   #(  BLOCK
+    :   {#block.getSetValue()!=null}? sb=setBlock
+        {code.setAttribute("alts",sb);}
+
+    |   #(  BLOCK
     	    ( OPTIONS )? // ignore
             ( alt=alternative {r=(GrammarAST)_t;} rew=rewrite
               {
@@ -479,6 +484,39 @@ block[String blockTemplateName, DFA dfa]
             EOB
          )
     	{blockNestingLevel--;}
+    ;
+
+setBlock returns [StringTemplate code=null]
+{
+if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL && grammar.buildAST() ) {
+    Rule r = grammar.getRule(currentRuleName);
+    currentAltHasASTRewrite = r.hasRewrite(outerAltNum);
+}
+}
+    :   s:BLOCK
+        {
+        StringTemplate setcode =
+            getTokenElementST("matchSet", "set", #s, null, null);
+        // there is only a set in this rule...can use any element index
+		setcode.setAttribute("elementIndex", 1);
+		if ( grammar.type!=Grammar.LEXER ) {
+			generator.generateLocalFOLLOW(#s,"set",currentRuleName,1);
+        }
+        setcode.setAttribute("s",
+            generator.genSetExpr(templates,#s.getSetValue(),1,false));
+        StringTemplate altcode=templates.getInstanceOf("alt");
+		altcode.setAttribute("elements.{el,line,pos}",
+						     setcode,
+                             Utils.integer(#s.getLine()),
+                             Utils.integer(#s.getColumn())
+                            );
+        altcode.setAttribute("altNum", Utils.integer(1));
+        altcode.setAttribute("outerAlt", new Boolean(true));
+        if ( !currentAltHasASTRewrite && grammar.buildAST() ) {
+            altcode.setAttribute("autoAST", Boolean.valueOf(true));
+        }
+        code = altcode;
+        }
     ;
 
 exceptionGroup[StringTemplate ruleST]
@@ -504,6 +542,7 @@ finallyClause[StringTemplate ruleST]
 
 alternative returns [StringTemplate code=templates.getInstanceOf("alt")]
 {
+/*
 // TODO: can we use Rule.altsWithRewrites???
 if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL ) {
 	GrammarAST aRewriteNode = #alternative.findFirstType(REWRITE);
@@ -518,6 +557,11 @@ if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL ) {
 		currentAltHasASTRewrite = false;
 	}
 }
+*/
+if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL && grammar.buildAST() ) {
+    Rule r = grammar.getRule(currentRuleName);
+    currentAltHasASTRewrite = r.hasRewrite(outerAltNum);
+}
 String description = grammar.grammarTreeToString(#alternative, false);
 description = generator.target.getTargetStringLiteralFromString(description);
 code.setAttribute("description", description);
@@ -528,7 +572,7 @@ StringTemplate e;
 }
     :   #(	a:ALT
     		(	{GrammarAST elAST=(GrammarAST)_t;}
-    			e=element
+    			e=element[null,null]
     			{
     			if ( e!=null ) {
 					code.setAttribute("elements.{el,line,pos}",
@@ -543,64 +587,20 @@ StringTemplate e;
     	 )
     ;
 
-element returns [StringTemplate code=null]
+element[GrammarAST label, GrammarAST astSuffix] returns [StringTemplate code=null]
 {
     IntSet elements=null;
     GrammarAST ast = null;
 }
-    :   code=atom[null]
-    |   #(  n:NOT
-            (  #( c:CHAR_LITERAL (ast1:ast_suffix)? )
-	           {
-	            int ttype=0;
-     			if ( grammar.type==Grammar.LEXER ) {
-        			ttype = Grammar.getCharValueFromGrammarCharLiteral(c.getText());
-     			}
-     			else {
-        			ttype = grammar.getTokenType(c.getText());
-        		}
-	            elements = grammar.complement(ttype);
-	            ast = #ast1;
-	           }
-            |  #( s:STRING_LITERAL (ast2:ast_suffix)? )
-	           {
-	            int ttype=0;
-     			if ( grammar.type==Grammar.LEXER ) {
-        			// TODO: error!
-     			}
-     			else {
-        			ttype = grammar.getTokenType(s.getText());
-        		}
-	            elements = grammar.complement(ttype);
-	            ast = #ast2;
-	           }
-            |  #( t:TOKEN_REF (ast3:ast_suffix)? )
-	           {
-	           int ttype = grammar.getTokenType(t.getText());
-	           elements = grammar.complement(ttype);
-	           ast = #ast3;
-	           }
-            |  #( st:SET (setElement)+ (ast4:ast_suffix)? )
-               {
-               // SETs are not precomplemented by buildnfa.g like
-               // simple elements.
-               elements = st.getSetValue();
-	           ast = #ast4;
-               }
-            )
-            {
-            code = getTokenElementST("matchSet",
-                        "set",
-                        (GrammarAST)#n.getFirstChild(),
-                        ast,
-                        null);
-            code.setAttribute("s", generator.genSetExpr(templates,elements,1,false));
-		 	code.setAttribute("elementIndex", ((TokenWithIndex)#n.getToken()).getIndex());
-			if ( grammar.type!=Grammar.LEXER ) {
-		 		generator.generateLocalFOLLOW(#n,"set",currentRuleName);
-        	}
-            }
-         )
+    :   #(ROOT code=element[label,#ROOT])
+
+    |   #(BANG code=element[label,#BANG])
+
+    |   #( n:NOT code=notElement[#n, label, astSuffix] )
+
+    |	#( ASSIGN alabel:ID code=element[#alabel,astSuffix] )
+
+    |	#( PLUS_ASSIGN label2:ID code=element[#label2,astSuffix] )
 
     |   #(CHAR_RANGE a:CHAR_LITERAL b:CHAR_LITERAL)
         {code = templates.getInstanceOf("charRangeRef");
@@ -612,64 +612,10 @@ element returns [StringTemplate code=null]
          code.setAttribute("b", high);
         }
 
-    |	#(ASSIGN label:ID (#(assign_n:NOT
-    		( assign_c:CHAR_LITERAL (assign_ast1:ast_suffix)?
-	           {
-	            int ttype=0;
-     			if ( grammar.type==Grammar.LEXER ) {
-        			ttype = Grammar.getCharValueFromGrammarCharLiteral(assign_c.getText());
-     			}
-     			else {
-        			ttype = grammar.getTokenType(assign_c.getText());
-        		}
-	            elements = grammar.complement(ttype);
-	            ast = #assign_ast1;
-	           }
-            |  assign_s:STRING_LITERAL (assign_ast2:ast_suffix)?
-	           {
-	            int ttype=0;
-     			if ( grammar.type==Grammar.LEXER ) {
-        			// TODO: error!
-     			}
-     			else {
-        			ttype = grammar.getTokenType(assign_s.getText());
-        		}
-	            elements = grammar.complement(ttype);
-	            ast = #assign_ast2;
-	           }
-            |  assign_t:TOKEN_REF (assign_ast3:ast_suffix)?
-	           {
-	           int ttype = grammar.getTokenType(assign_t.getText());
-	           elements = grammar.complement(ttype);
-	           ast = #assign_ast3;
-	           }
-            |  assign_st:SET (setElement)+ (assign_ast4:ast_suffix)?
-               {
-               // SETs are not precomplemented by buildnfa.g like
-               // simple elements.
-               elements = st.getSetValue();
-	           ast = #assign_ast4;
-               }
-            )
-            {
-            code = getTokenElementST("matchSet",
-                        "set",
-                        (GrammarAST)#assign_n.getFirstChild(),
-                        ast,
-                        #label.getText());
-            code.setAttribute("s", generator.genSetExpr(templates,elements,1,false));
-		 	code.setAttribute("elementIndex", ((TokenWithIndex)#assign_n.getToken()).getIndex());
-			if ( grammar.type!=Grammar.LEXER ) {
-		 		generator.generateLocalFOLLOW(#assign_n,"set",currentRuleName);
-        	}
-            }
-            )
-    	|code=atom[#label.getText()]))
+    |   {#element.getSetValue()==null}? code=ebnf
 
-    |	#(	PLUS_ASSIGN label2:ID code=atom[#label2.getText()]
-         )
+    |   code=atom[label, astSuffix]
 
-    |   code=ebnf
     |   code=tree
 
     |   act:ACTION
@@ -694,6 +640,63 @@ element returns [StringTemplate code=null]
     |	BACKTRACK_SEMPRED
 
     |   EPSILON
+    ;
+
+notElement[GrammarAST n, GrammarAST label, GrammarAST astSuffix]
+returns [StringTemplate code=null]
+{
+    IntSet elements=null;
+    String labelText = null;
+    if ( label!=null ) {
+        labelText = label.getText();
+    }
+}
+    :   (assign_c:CHAR_LITERAL
+        {
+        int ttype=0;
+        if ( grammar.type==Grammar.LEXER ) {
+            ttype = Grammar.getCharValueFromGrammarCharLiteral(assign_c.getText());
+        }
+        else {
+            ttype = grammar.getTokenType(assign_c.getText());
+        }
+        elements = grammar.complement(ttype);
+        }
+    |   assign_s:STRING_LITERAL
+        {
+        int ttype=0;
+        if ( grammar.type==Grammar.LEXER ) {
+            // TODO: error!
+        }
+        else {
+            ttype = grammar.getTokenType(assign_s.getText());
+        }
+        elements = grammar.complement(ttype);
+        }
+    |   assign_t:TOKEN_REF
+        {
+        int ttype = grammar.getTokenType(assign_t.getText());
+        elements = grammar.complement(ttype);
+        }
+    |   assign_st:BLOCK
+        {
+        elements = assign_st.getSetValue();
+        elements = grammar.complement(elements);
+        }
+        )
+        {
+        code = getTokenElementST("matchSet",
+                                 "set",
+                                 (GrammarAST)n.getFirstChild(),
+                                 astSuffix,
+                                 labelText);
+        code.setAttribute("s",generator.genSetExpr(templates,elements,1,false));
+        int i = ((TokenWithIndex)n.getToken()).getIndex();
+        code.setAttribute("elementIndex", i);
+        if ( grammar.type!=Grammar.LEXER ) {
+            generator.generateLocalFOLLOW(n,"set",currentRuleName,i);
+        }
+        }
     ;
 
 ebnf returns [StringTemplate code=null]
@@ -732,7 +735,7 @@ if ( s.member(Label.UP) ) {
 }
 }
     :   #( TREE_BEGIN {elAST=(GrammarAST)_t;}
-    	   el=element
+    	   el=element[null,null]
            {
            code.setAttribute("root.{el,line,pos}",
 							  el,
@@ -741,7 +744,7 @@ if ( s.member(Label.UP) ) {
 							  );
            }
            ( {elAST=(GrammarAST)_t;}
-    		 el=element
+    		 el=element[null,null]
            	 {
 			 code.setAttribute("children.{el,line,pos}",
 							  el,
@@ -753,11 +756,18 @@ if ( s.member(Label.UP) ) {
          )
     ;
 
-atom[String label] returns [StringTemplate code=null]
-    :   #( r:RULE_REF (rarg:ARG_ACTION)? (as1:ast_suffix)? )
+atom[GrammarAST label, GrammarAST astSuffix] 
+    returns [StringTemplate code=null]
+{
+String labelText=null;
+if ( label!=null ) {
+    labelText = label.getText();
+}
+}
+    :   #( r:RULE_REF (rarg:ARG_ACTION)? )
         {
         grammar.checkRuleReference(#r, #rarg, currentRuleName);
-        code = getRuleElementST("ruleRef", #r.getText(), #r, #as1, label);
+        code = getRuleElementST("ruleRef", #r.getText(), #r, astSuffix, labelText);
 		code.setAttribute("rule", r.getText());
 
 		if ( #rarg!=null ) {
@@ -765,12 +775,13 @@ atom[String label] returns [StringTemplate code=null]
 			List args = generator.translateArgAction(currentRuleName,#rarg);
 			code.setAttribute("args", args);
 		}
-		code.setAttribute("elementIndex", ((TokenWithIndex)r.getToken()).getIndex());
-		generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName);
+        int i = ((TokenWithIndex)r.getToken()).getIndex();
+		code.setAttribute("elementIndex", i);
+		generator.generateLocalFOLLOW(#r,#r.getText(),currentRuleName,i);
 		#r.code = code;
         }
 
-    |   #( t:TOKEN_REF (targ:ARG_ACTION)? (as2:ast_suffix)? )
+    |   #( t:TOKEN_REF (targ:ARG_ACTION)? )
         {
            grammar.checkRuleReference(#t, #targ, currentRuleName);
 		   if ( grammar.type==Grammar.LEXER ) {
@@ -786,71 +797,68 @@ atom[String label] returns [StringTemplate code=null]
 						code.setAttribute("args", args);
 					}
 				}
-			    if ( label!=null ) code.setAttribute("label", label);
+			    if ( label!=null ) code.setAttribute("label", labelText);
 		   }
 		   else {
-				code = getTokenElementST("tokenRef", #t.getText(), #t, #as2, label);
+				code = getTokenElementST("tokenRef", #t.getText(), #t, astSuffix, labelText);
 				String tokenLabel =
 				   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(t.getText()));
 				code.setAttribute("token",tokenLabel);
-			    code.setAttribute("elementIndex", ((TokenWithIndex)#t.getToken()).getIndex());
-			    generator.generateLocalFOLLOW(#t,tokenLabel,currentRuleName);
+                int i = ((TokenWithIndex)#t.getToken()).getIndex();
+			    code.setAttribute("elementIndex", i);
+			    generator.generateLocalFOLLOW(#t,tokenLabel,currentRuleName,i);
 		   }
 		   #t.code = code;
 		}
 
-    |   #( c:CHAR_LITERAL (as3:ast_suffix)? )
+    |   c:CHAR_LITERAL
         {
 		if ( grammar.type==Grammar.LEXER ) {
 			code = templates.getInstanceOf("charRef");
 			code.setAttribute("char",
 			   generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,c.getText()));
 			if ( label!=null ) {
-				code.setAttribute("label", label);
+				code.setAttribute("label", labelText);
 			}
 		}
 		else { // else it's a token type reference
-			code = getTokenElementST("tokenRef", "char_literal", #c, #as3, label);
+			code = getTokenElementST("tokenRef", "char_literal", #c, astSuffix, labelText);
 			String tokenLabel = generator.getTokenTypeAsTargetLabel(grammar.getTokenType(c.getText()));
 			code.setAttribute("token",tokenLabel);
-			code.setAttribute("elementIndex",
-							  ((TokenWithIndex)#c.getToken()).getIndex());
-			generator.generateLocalFOLLOW(#c,tokenLabel,currentRuleName);
+            int i = ((TokenWithIndex)#c.getToken()).getIndex();
+			code.setAttribute("elementIndex", i);
+			generator.generateLocalFOLLOW(#c,tokenLabel,currentRuleName,i);
 		}
         }
 
-    |   #( s:STRING_LITERAL (as4:ast_suffix)? )
+    |   s:STRING_LITERAL
         {
 		if ( grammar.type==Grammar.LEXER ) {
 			code = templates.getInstanceOf("lexerStringRef");
 			code.setAttribute("string",
 			   generator.target.getTargetStringLiteralFromANTLRStringLiteral(generator,s.getText()));
 			if ( label!=null ) {
-				code.setAttribute("label", label);
+				code.setAttribute("label", labelText);
 			}
 		}
 		else { // else it's a token type reference
-			code = getTokenElementST("tokenRef", "string_literal", #s, #as4, label);
+			code = getTokenElementST("tokenRef", "string_literal", #s, astSuffix, labelText);
 			String tokenLabel =
 			   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(#s.getText()));
 			code.setAttribute("token",tokenLabel);
-			code.setAttribute("elementIndex", ((TokenWithIndex)#s.getToken()).getIndex());
-			generator.generateLocalFOLLOW(#s,tokenLabel,currentRuleName);
+            int i = ((TokenWithIndex)#s.getToken()).getIndex();
+			code.setAttribute("elementIndex", i);
+			generator.generateLocalFOLLOW(#s,tokenLabel,currentRuleName,i);
 		}
 		}
 
-    |   #( w:WILDCARD (as5:ast_suffix)? )
+    |   w:WILDCARD
         {
-		code = getWildcardST(#w,#as5,label);
-		/*
-		if ( label!=null ) {
-		    code.setAttribute("label", label);
-		}
-		*/
+		code = getWildcardST(#w,astSuffix,labelText);
 		code.setAttribute("elementIndex", ((TokenWithIndex)#w.getToken()).getIndex());
 		}
 
-    |	code=set[label]
+    |	code=set[label,astSuffix]
     ;
 
 ast_suffix
@@ -858,21 +866,23 @@ ast_suffix
 	|	BANG
 	;
 
-set[String label] returns [StringTemplate code=null]
-	:   #( s:SET (setElement)+ ( ast:ast_suffix )? )
+
+set[GrammarAST label, GrammarAST astSuffix] returns [StringTemplate code=null]
+{
+String labelText=null;
+if ( label!=null ) {
+    labelText = label.getText();
+}
+}
+	:   s:BLOCK // only care that it's a BLOCK with setValue!=null
         {
-        // TODO: make this work with ast_suffix
-        code = getTokenElementST("matchSet", "set", #s, #ast, label);
-		code.setAttribute("elementIndex", ((TokenWithIndex)#s.getToken()).getIndex());
+        code = getTokenElementST("matchSet", "set", #s, astSuffix, labelText);
+        int i = ((TokenWithIndex)#s.getToken()).getIndex();
+		code.setAttribute("elementIndex", i);
 		if ( grammar.type!=Grammar.LEXER ) {
-			generator.generateLocalFOLLOW(#s,"set",currentRuleName);
+			generator.generateLocalFOLLOW(#s,"set",currentRuleName,i);
         }
         code.setAttribute("s", generator.genSetExpr(templates,#s.getSetValue(),1,false));
-		/*
-		if ( label!=null ) {
-		    code.setAttribute("label", label);
-		}
-		*/
         }
     ;
 

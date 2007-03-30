@@ -297,6 +297,12 @@ C# Target Notes
 
 CHANGES
 
+March 29, 2007
+
+* Over last few days, I've gutted how ANTLR handles sets of chars or
+  tokens.  I cleaned up a lot of stuff in the grammars and added lots
+  of unit tests.
+
 March 26, 2007
 
 * CommonTreeNodeStream didn't push correctly; couldn't handle very

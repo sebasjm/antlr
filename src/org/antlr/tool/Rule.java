@@ -308,6 +308,10 @@ public class Rule {
 		return rules;
 	}
 
+	public boolean hasRewrite(int i) {
+		return altsWithRewrites[i];
+	}
+
 	/** Track which rules have rewrite rules.  Pass in the ALT node
 	 *  for the alt so we can check for problems when output=template,
 	 *  rewrite=true, and grammar type is tree parser.

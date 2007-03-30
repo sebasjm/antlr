@@ -270,7 +270,6 @@ public class GrammarSanity {
 			case ANTLRParser.CHAR_LITERAL :
 			case ANTLRParser.STRING_LITERAL :
 			case ANTLRParser.WILDCARD :
-			case ANTLRParser.SET :
 				return true;
 			default :
 				return false;

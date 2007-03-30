@@ -167,25 +167,16 @@ rule
 		( OPTIONS )?
 		( ruleScopeSpec )?
 		   (AMPERSAND)*
-           #(BLOCK b=block EOB)
+		   {GrammarAST blk = (GrammarAST)_t;}
+		   b=block
            (exceptionGroup)?
            EOR
            {
-           /* 11/28/2005: removed to treat Tokens rule like any other
-           if ( r.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ) {
-                NFAState ruleState = factory.build_ArtificialMatchTokensRuleNFA();
-                if ( grammar.getNumberOfAltsForDecisionNFA(ruleState)>1 ) {
-	                ruleState.setDecisionASTNode(#BLOCK); // always track ast node
-                    int d = grammar.assignDecisionNumber( ruleState );
-                    grammar.setDecisionNFA( d, ruleState );
-                    grammar.setDecisionBlockAST(d, #BLOCK);
+                if ( blk.setValue!=null ) {
+                    // if block comes back as a set not BLOCK, make it
+                    // a single ALT block
+                    b = factory.build_AlternativeBlockFromSet(b);
                 }
-                // hook rule start state for Tokens to its manually-created start
-                NFAState start = grammar.getRuleStartState(r);
-		        start.addTransition(new Transition(Label.EPSILON, ruleState));
-           }
-           else */
-           {
 				if ( Character.isLowerCase(r.charAt(0)) ||
 					 grammar.type==Grammar.LEXER )
 				{
@@ -197,17 +188,16 @@ rule
 					// track decision if > 1 alts
 					if ( grammar.getNumberOfAltsForDecisionNFA(b.left)>1 ) {
 						b.left.setDescription(grammar.grammarTreeToString(#rule,false));
-						b.left.setDecisionASTNode(#BLOCK);
+						b.left.setDecisionASTNode(blk);
 						int d = grammar.assignDecisionNumber( b.left );
 						grammar.setDecisionNFA( d, b.left );
-                    	grammar.setDecisionBlockAST(d, #BLOCK);
+                    	grammar.setDecisionBlockAST(d, blk);
 					}
 
 					// hook to end of rule node
 					NFAState end = grammar.getRuleStopState(r);
 					b.right.addTransition(new Transition(Label.EPSILON,end));
 				}
-           }
            }
          )
     ;
@@ -228,11 +218,12 @@ block returns [StateCluster g = null]
     StateCluster a = null;
     List alts = new LinkedList();
 }
-    :   ( OPTIONS )? // ignore
-		( a=alternative rewrite {alts.add(a);} )+
-        {
-        g = factory.build_AlternativeBlock(alts);
-        }
+    :   {grammar.isValidSet(this,#block) &&
+		 !currentRuleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME)}?
+		g=set
+
+    |	#( BLOCK ( OPTIONS )? ( a=alternative rewrite {alts.add(a);} )+ EOB )
+        {g = factory.build_AlternativeBlock(alts);}
     ;
 
 alternative returns [StateCluster g=null]
@@ -276,54 +267,10 @@ rewrite
 	;
 
 element returns [StateCluster g=null]
-    :   g=atom_or_notatom
-    /*
-            (  #( c:CHAR_LITERAL (ast1:ast_suffix)? )
-	           {
-	            int ttype=0;
-     			if ( grammar.type==Grammar.LEXER ) {
-        			ttype = Grammar.getCharValueFromGrammarCharLiteral(#c.getText());
-     			}
-     			else {
-        			ttype = grammar.getTokenType(#c.getText());
-        		}
-                IntSet notAtom = grammar.complement(ttype);
-                if ( notAtom.isNil() ) {
-                    ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
-					  			              grammar,
-								              #c.token,
-									          #c.getText());
-                }
-	            g=factory.build_Set(notAtom);
-	           }
-            |  #( t:TOKEN_REF (ast3:ast_suffix)? )
-	           {
-	           int ttype = grammar.getTokenType(t.getText());
-               IntSet notAtom = grammar.complement(ttype);
-               if ( notAtom.isNil() ) {
-                  ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
-				  			              grammar,
-							              #t.token,
-								          #t.getText());
-               }
-	           g=factory.build_Set(notAtom);
-	           }
-            |  g=set
-	           {
-	           GrammarAST stNode = (GrammarAST)n.getFirstChild();
-               IntSet notSet = grammar.complement(stNode.getSetValue());
-               stNode.setSetValue(notSet);
-               if ( notSet.isNil() ) {
-                  ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
-				  			              grammar,
-							              #n.token);
-               }
-	           g=factory.build_Set(notSet);
-	           }
-            )
-        	{#n.followingNFAState = g.right;}
-         )
-         */
+    :   #(ROOT g=element)
+    |   #(BANG g=element)
+    |	#(ASSIGN ID g=element)
+    |	#(PLUS_ASSIGN ID g=element)
     |   #(RANGE a:atom b:atom)
         {g = factory.build_Range(grammar.getTokenType(#a.getText()),
                                  grammar.getTokenType(#b.getText()));}
@@ -333,8 +280,7 @@ element returns [StateCluster g=null]
         	g = factory.build_CharRange(#c1.getText(), #c2.getText());
         }
         }
-    |	#(ASSIGN ID g=atom_or_notatom)
-    |	#(PLUS_ASSIGN ID g=atom)
+    |   g=atom_or_notatom
     |   g=ebnf
     |   g=tree
     |   #( SYNPRED block )
@@ -349,38 +295,53 @@ element returns [StateCluster g=null]
 ebnf returns [StateCluster g=null]
 {
     StateCluster b = null;
+    GrammarAST blk = #ebnf;
+    if ( blk.getType()!=BLOCK ) {
+    	blk = (GrammarAST)blk.getFirstChild();
+    }
+    GrammarAST eob = blk.getLastChild();
 }
-    :   #( BLOCK b=block EOB )
+    :   {grammar.isValidSet(this,#ebnf)}? g=set
+
+    |	b=block
         {
         // track decision if > 1 alts
         if ( grammar.getNumberOfAltsForDecisionNFA(b.left)>1 ) {
-            b.left.setDescription(grammar.grammarTreeToString(#BLOCK,false));
-            b.left.setDecisionASTNode(#BLOCK);
+            b.left.setDescription(grammar.grammarTreeToString(blk,false));
+            b.left.setDecisionASTNode(blk);
             int d = grammar.assignDecisionNumber( b.left );
             grammar.setDecisionNFA( d, b.left );
-            grammar.setDecisionBlockAST(d, #BLOCK);
+            grammar.setDecisionBlockAST(d, blk);
         }
         g = b;
         }
-    |   #( OPTIONAL #( blk:BLOCK b=block EOB ) )
+    |   #( OPTIONAL b=block )
         {
+        if ( blk.setValue!=null ) {
+            // if block comes back SET not BLOCK, make it
+            // a single ALT block
+            b = factory.build_AlternativeBlockFromSet(b);
+        }
         g = factory.build_Aoptional(b);
     	g.left.setDescription(grammar.grammarTreeToString(#ebnf,false));
         // there is always at least one alt even if block has just 1 alt
         int d = grammar.assignDecisionNumber( g.left );
 		grammar.setDecisionNFA(d, g.left);
-        grammar.setDecisionBlockAST(d, #blk);
+        grammar.setDecisionBlockAST(d, blk);
         g.left.setDecisionASTNode(#ebnf);
     	}
-    |   #( CLOSURE #( BLOCK b=block eob:EOB ) )
+    |   #( CLOSURE b=block )
         {
+        if ( blk.setValue!=null ) {
+            b = factory.build_AlternativeBlockFromSet(b);
+        }
         g = factory.build_Astar(b);
 		// track the loop back / exit decision point
     	b.right.setDescription("()* loopback of "+grammar.grammarTreeToString(#ebnf,false));
         int d = grammar.assignDecisionNumber( b.right );
 		grammar.setDecisionNFA(d, b.right);
-        grammar.setDecisionBlockAST(d, #BLOCK);
-        b.right.setDecisionASTNode(#eob);
+        grammar.setDecisionBlockAST(d, blk);
+        b.right.setDecisionASTNode(eob);
         // make block entry state also have same decision for interpreting grammar
         NFAState altBlockState = (NFAState)g.left.transition(0).target;
         altBlockState.setDecisionASTNode(#ebnf);
@@ -388,16 +349,19 @@ ebnf returns [StateCluster g=null]
         g.left.setDecisionNumber(d); // this is the bypass decision (2 alts)
         g.left.setDecisionASTNode(#ebnf);
     	}
-    |   #( POSITIVE_CLOSURE #( blk2:BLOCK b=block eob3:EOB ) )
+    |   #( POSITIVE_CLOSURE b=block )
         {
+        if ( blk.setValue!=null ) {
+            b = factory.build_AlternativeBlockFromSet(b);
+        }
         g = factory.build_Aplus(b);
         // don't make a decision on left edge, can reuse loop end decision
 		// track the loop back / exit decision point
     	b.right.setDescription("()+ loopback of "+grammar.grammarTreeToString(#ebnf,false));
         int d = grammar.assignDecisionNumber( b.right );
 		grammar.setDecisionNFA(d, b.right);
-        grammar.setDecisionBlockAST(d, #blk2);
-        b.right.setDecisionASTNode(#eob3);
+        grammar.setDecisionBlockAST(d, blk);
+        b.right.setDecisionASTNode(eob);
         // make block entry state also have same decision for interpreting grammar
         NFAState altBlockState = (NFAState)g.left.transition(0).target;
         altBlockState.setDecisionASTNode(#ebnf);
@@ -408,19 +372,21 @@ ebnf returns [StateCluster g=null]
 tree returns [StateCluster g=null]
 {
 StateCluster e=null;
+GrammarAST el=null;
+StateCluster down=null, up=null;
 }
 	:   #( TREE_BEGIN
-		   {GrammarAST el=(GrammarAST)_t;}
+		   {el=(GrammarAST)_t;}
 		   g=element
 		   {
-           StateCluster down = factory.build_Atom(Label.DOWN);
+           down = factory.build_Atom(Label.DOWN);
            // TODO set following states for imaginary nodes?
            //el.followingNFAState = down.right;
 		   g = factory.build_AB(g,down);
 		   }
 		   ( {el=(GrammarAST)_t;} e=element {g = factory.build_AB(g,e);} )*
 		   {
-           StateCluster up = factory.build_Atom(Label.UP);
+           up = factory.build_Atom(Label.UP);
            //el.followingNFAState = up.right;
 		   g = factory.build_AB(g,up);
 		   // tree roots point at right edge of DOWN for LOOK computation later
@@ -481,14 +447,19 @@ atom_or_notatom returns [StateCluster g=null]
             |  g=set
 	           {
 	           GrammarAST stNode = (GrammarAST)n.getFirstChild();
-               IntSet notSet = grammar.complement(stNode.getSetValue());
-               stNode.setSetValue(notSet);
-               if ( notSet.isNil() ) {
+               //IntSet notSet = grammar.complement(stNode.getSetValue());
+               // let code generator complement the sets
+               IntSet s = stNode.getSetValue();
+               stNode.setSetValue(s);
+               // let code gen do the complement again; here we compute
+               // for NFA construction
+               s = grammar.complement(s);
+               if ( s.isNil() ) {
                   ErrorManager.grammarError(ErrorManager.MSG_EMPTY_COMPLEMENT,
 				  			              grammar,
 							              #n.token);
                }
-	           g=factory.build_Set(notSet);
+	           g=factory.build_Set(s);
 	           }
             )
         	{#n.followingNFAState = g.right;}
@@ -556,7 +527,7 @@ atom returns [StateCluster g=null]
 
     |   #( w:WILDCARD (as5:ast_suffix)? )    {g = factory.build_Wildcard();}
 
-	|	g=set
+	//|	g=set
 	;
 
 ast_suffix
@@ -575,21 +546,35 @@ set returns [StateCluster g=null]
 IntSet elements=new IntervalSet();
 #set.setSetValue(elements); // track set for use by code gen
 }
-	:	#( s:SET (setElement[elements])+ ( ast:ast_suffix )? )
+	:	#( b:BLOCK
+           (#(ALT (BACKTRACK_SEMPRED)? setElement[elements] EOA))+
+           EOB
+         )
         {
         g = factory.build_Set(elements);
-        #s.followingNFAState = g.right;
+        #b.followingNFAState = g.right;
+        #b.setValue = elements; // track set value of this block
         }
 		//{System.out.println("set elements="+elements.toString(grammar));}
-    ;
+	;
 
+setAsBlock returns [StateCluster g=null]
+{
+    List alts = new LinkedList();
+    StateCluster a=null;
+}
+	:	#( BLOCK ( a=element {alts.add(a);} )+ )
+        {
+        g = factory.build_AlternativeBlock(alts);
+        }
+	;
 
 setRule returns [IntSet elements=new IntervalSet()]
 {IntSet s=null;}
 	:	#( RULE id:ID (modifier)? ARG RET ( OPTIONS )? ( ruleScopeSpec )?
 		   	(AMPERSAND)*
            	#( BLOCK ( OPTIONS )?
-           	   ( #(ALT setElement[elements]) )+
+           	   ( #(ALT setElement[elements] EOA) )+
            	   EOB
            	 )
            	(exceptionGroup)?
@@ -602,6 +587,8 @@ setRule returns [IntSet elements=new IntervalSet()]
 setElement[IntSet elements]
 {
     int ttype;
+    IntSet ns=null;
+    StateCluster gset;
 }
     :   c:CHAR_LITERAL
         {
@@ -666,9 +653,13 @@ setElement[IntSet elements]
      	}
     	}
 
-	|   #( SET (setElement[elements])+ )
+	|   gset=set
+        {
+		Transition setTrans = gset.left.transition(0);
+        elements.addAll(setTrans.label.getSet());
+        }
 
-    |   #(  NOT {IntSet ns=new IntervalSet();}
+    |   #(  NOT {ns=new IntervalSet();}
             setElement[ns]
             {
                 IntSet not = grammar.complement(ns);
@@ -676,3 +667,55 @@ setElement[IntSet elements]
             }
         )
     ;
+
+testBlockAsSet
+{
+    int nAlts=0;
+}
+	:   #( BLOCK
+           ( #(ALT (BACKTRACK_SEMPRED)? testSetElement {nAlts++;} EOA) )+
+           EOB
+        )
+        {nAlts>1}? // set of 1 element is not good
+	;
+    exception
+    	catch[RecognitionException re] {throw re;}
+
+testSetRule
+	:	#( RULE id:ID (modifier)? ARG RET ( OPTIONS )? ( ruleScopeSpec )?
+		   	(AMPERSAND)*
+            #( BLOCK
+                ( #(ALT (BACKTRACK_SEMPRED)? testSetElement EOA) )+
+                EOB
+            )
+           	(exceptionGroup)?
+           	EOR
+         )
+    ;
+    exception
+    	catch[RecognitionException re] {throw re;}
+
+/** Match just an element; no ast suffix etc.. */
+testSetElement
+{
+AST r = _t;
+}
+    :   c:CHAR_LITERAL
+    |   t:TOKEN_REF
+        {
+		if ( grammar.type==Grammar.LEXER ) {
+	        Rule rule = grammar.getRule(#t.getText());
+	        if ( rule==null ) {
+	        	throw new RecognitionException("invalid rule");
+	        }
+			// recursively will invoke this rule to match elements in target rule ref
+	        testSetRule(rule.tree);
+		}
+        }
+    |   {grammar.type!=Grammar.LEXER}? s:STRING_LITERAL 
+    |	#(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
+	|   testBlockAsSet
+    |   #( NOT testSetElement )
+    ;
+    exception
+     	catch[RecognitionException re] {throw re;}

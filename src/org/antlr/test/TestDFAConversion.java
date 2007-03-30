@@ -814,7 +814,7 @@ public class TestDFAConversion extends BaseTest {
 	public void testComplement() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-			"a : ~(A | B | C) | C;\n" +
+			"a : ~(A | B | C) | C {;} ;\n" +
 			"b : X Y Z ;");
 		String expecting =
 			".s0-C->:s2=>2\n" +
@@ -825,7 +825,7 @@ public class TestDFAConversion extends BaseTest {
 	public void testComplementToken() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-			"a : ~C | C;\n" +
+			"a : ~C | C {;} ;\n" +
 			"b : X Y Z ;");
 		String expecting =
 			".s0-C->:s2=>2\n" +
@@ -836,7 +836,7 @@ public class TestDFAConversion extends BaseTest {
 	public void testComplementChar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : ~'x' | 'x';\n");
+			"A : ~'x' | 'x' {;} ;\n");
 		String expecting =
 			".s0-'x'->:s2=>2\n" +
 			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
@@ -846,10 +846,11 @@ public class TestDFAConversion extends BaseTest {
 	public void testComplementCharSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-			"A : ~(' '|'\t'|'x') | 'x';\n");
+			"A : ~(' '|'\t'|'x'|'y') | 'x';\n" + // collapse into single set
+			"B : 'y' ;");
 		String expecting =
-			".s0-'x'->:s2=>2\n" +
-			".s0-{'\\u0000'..'\\b', '\\n'..'\\u001F', '!'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
+			".s0-'y'->:s2=>2\n" +
+			".s0-{'\\u0000'..'\\b', '\\n'..'\\u001F', '!'..'x', 'z'..'\\uFFFE'}->:s1=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -868,8 +869,8 @@ public class TestDFAConversion extends BaseTest {
 			"parser grammar t;\n"+
 			"a : A | B | C ;"
 		);
-		String expecting =
-			" ( grammar t ( rule a ARG RET scope ( BLOCK ( ALT ( SET A B C ) <end-of-alt> ) <end-of-block> ) <end-of-rule> ) )";
+		String expecting = // still looks like block
+			" ( grammar t ( rule a ARG RET scope ( BLOCK ( ALT A <end-of-alt> ) ( ALT B <end-of-alt> ) ( ALT C <end-of-alt> ) <end-of-block> ) <end-of-rule> ) )";
 		assertEquals(expecting, g.getGrammarTree().toStringTree());
 	}
 

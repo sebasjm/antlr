@@ -77,7 +77,6 @@ tokens {
     EOR;
     EOB;
     EOA; // end of alt
-    SET;
     ID;
     ARG;
     ARGLIST;
@@ -420,6 +419,7 @@ Map opts = null;
 	blkRoot.setColumn(colon.getColumn());
 	eob = #[EOB,"<end-of-block>"];
     }
+    /*
 	(	{!currentRuleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME)}?
 		(setNoParens SEMI) => s:setNoParens // try to collapse sets
 		{
@@ -427,6 +427,8 @@ Map opts = null;
 		}
 	|	b:altList[opts] {blk = #b;}
 	)
+	*/
+	b:altList[opts] {blk = #b;}
 	semi:SEMI
 	( ex:exceptionGroup )?
     {
@@ -484,9 +486,12 @@ block
 GrammarAST save = currentBlockAST;
 Map opts=null;
 }
-    :   (set) => s:set  // special block like ('a'|'b'|'0'..'9')
+    :   /*
+        (set) => s:set  // special block like ('a'|'b'|'0'..'9')
 
-    |	lp:LPAREN^ {#lp.setType(BLOCK); #lp.setText("BLOCK");}
+    |	*/
+
+    	lp:LPAREN^ {#lp.setType(BLOCK); #lp.setText("BLOCK");}
 		(
 			// 2nd alt and optional branch ambig due to
 			// linear approx LL(2) issue.  COLON ACTION
@@ -577,44 +582,25 @@ finallyClause
     ;
 
 element
-	:	elementNoOptionSpec //(elementOptionSpec!)?
-	;
-
-elementOptionSpec
-	:	OPEN_ELEMENT_OPTION
-		id ASSIGN optionValue
-		(
-			SEMI
-			id ASSIGN optionValue
-		)*
-		CLOSE_ELEMENT_OPTION
+	:	elementNoOptionSpec
 	;
 
 elementNoOptionSpec
 {
     IntSet elements=null;
 }
-	:	(id ASSIGN^)?
-		(   range
-		|   terminal
-		|	notSet
-		|	ebnf
-		)
-
-    |   id PLUS_ASSIGN^ 
-        (   terminal
-		|	notSet
-		|   ebnf
-        )
-
+	:	id ASSIGN^ elementNoOptionSpec
+    |   id PLUS_ASSIGN^ elementNoOptionSpec
+	|   range (ROOT^|BANG^)?
+    |   terminal
+    |	notSet (ROOT^|BANG^)?
+    |	ebnf
 	|   a:ACTION
-
 	|   p:SEMPRED ( IMPLIES! {#p.setType(GATED_SEMPRED);} )?
 		{
 		#p.setEnclosingRule(currentRuleName);
 		grammar.blocksWithSemPreds.add(currentBlockAST);
 		}
-
 	|   t3:tree
 	;
 
@@ -626,37 +612,11 @@ notSet
 }
 	:	n:NOT^
 		(	notTerminal
-        |   // special case: single element is not a set
-            (LPAREN setElement RPAREN)=> LPAREN! setElement RPAREN! 
-        |   set
+        |   block
 		)
         ( subrule=ebnfSuffix[#n,false] {#notSet = subrule;} )?
         {#notSet.setLine(line); #notSet.setColumn(col);}
 	;
-
-/** Match two or more set elements */
-set	:   LPAREN! s:setNoParens RPAREN!
-    	( ast:ast_suffix! {#s.addChild(#ast);} )?
-    ;
-
-setNoParens
-{Token startingToken = LT(1);}
-    :   setElement (OR! setElement)+
-        {
-        GrammarAST ast = new GrammarAST();
-		ast.initialize(new TokenWithIndex(SET, "SET"));
-		((TokenWithIndex)ast.token)
-			.setIndex(((TokenWithIndex)startingToken).getIndex());
-        #setNoParens = #(ast, #setNoParens);
-        }
-    ;
-
-setElement
-    :   CHAR_LITERAL
-    |   TOKEN_REF
-    |   {gtype!=LEXER_GRAMMAR}? STRING_LITERAL
-    |   range
-    ;
 
 tree :
 	TREE_BEGIN^
@@ -671,27 +631,25 @@ ebnf!
     int col = LT(1).getColumn();
 }
 	:	b:block
-		(	(	QUESTION    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
-							 #ebnf=#([OPTIONAL,"?"],#b);}
-			|	STAR	    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
-							 #ebnf=#([CLOSURE,"*"],#b);}
-			|	PLUS	    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
-							 #ebnf=#([POSITIVE_CLOSURE,"+"],#b);}
-			)
-			( BANG )?
+		(	QUESTION    {#ebnf=#([OPTIONAL,"?"],#b);}
+		|	STAR	    {#ebnf=#([CLOSURE,"*"],#b);}
+		|	PLUS	    {#ebnf=#([POSITIVE_CLOSURE,"+"],#b);}
 		|   IMPLIES! // syntactic predicate
 			{
-			if (#b.getType()==SET) #b=setToBlockWithSet(#b);
 			if ( gtype==COMBINED_GRAMMAR &&
 			     Character.isUpperCase(currentRuleName.charAt(0)) )
 		    {
-		    	#ebnf = #(#[SYNPRED,"=>"],#b); // ignore for lexer rules in combined
+                // ignore for lexer rules in combined
+		    	#ebnf = #(#[SYNPRED,"=>"],#b); 
 		    }
 		    else {
-		    	// create manually specified (...)=> predicate; convert to sempred
+		    	// create manually specified (...)=> predicate;
+                // convert to sempred
 		    	#ebnf = createSynSemPredFromBlock(#b, SYN_SEMPRED);
 			}
 			}
+		|   ROOT {#ebnf = #(#ROOT, #b);}
+		|   BANG {#ebnf = #(#BANG, #b);}
         |   {#ebnf = #b;}
 		)
 		{#ebnf.setLine(line); #ebnf.setColumn(col);}
@@ -718,36 +676,31 @@ GrammarAST ebnfRoot=null, subrule=null;
 }
     :   cl:CHAR_LITERAL^
     		(	subrule=ebnfSuffix[#cl,false] {#terminal=subrule;}
-    		|	ast_suffix
+    		|	(ROOT^|BANG^)
     		)?
 
 	|   tr:TOKEN_REF^
 			( ARG_ACTION )?
 			(	subrule=ebnfSuffix[#tr,false] {#terminal=subrule;}
-			|	ast_suffix
+			|	(ROOT^|BANG^)
 			)?
 			// Args are only valid for lexer rules
 
     |   rr:RULE_REF^
 			( ARG_ACTION )?
 			(	subrule=ebnfSuffix[#rr,false] {#terminal=subrule;}
-			|	ast_suffix
+			|	(ROOT^|BANG^)
 			)?
 
-	|   sl:STRING_LITERAL^
+	|   sl:STRING_LITERAL
     		(	subrule=ebnfSuffix[#sl,false] {#terminal=subrule;}
-			|	ast_suffix
+			|	(ROOT^|BANG^)
 			)?
 
-	|   wi:WILDCARD^
+	|   wi:WILDCARD
     		(	subrule=ebnfSuffix[#wi,false] {#terminal=subrule;}
-			|	ast_suffix
+			|	(ROOT^|BANG^)
 			)?
-	;
-
-ast_suffix
-	:	ROOT
-	|	BANG
 	;
 
 ebnfSuffix[GrammarAST elemAST, boolean inRewrite] returns [GrammarAST subrule=null]
@@ -780,11 +733,9 @@ GrammarAST ebnfRoot=null;
     ;
 
 notTerminal
-	:   cl:CHAR_LITERAL^ ( ast_suffix )? // bang could be "no char" in lexer
-
-	|	tr:TOKEN_REF^ (ast_suffix)?
-
-	|	STRING_LITERAL (ast_suffix)?
+	:   cl:CHAR_LITERAL
+	|	tr:TOKEN_REF
+	|	STRING_LITERAL
 	;
 
 idList
@@ -890,12 +841,9 @@ rewrite_ebnf!
     int col = LT(1).getColumn();
 }
 	:	b:rewrite_block
-		(	QUESTION    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
-						 #rewrite_ebnf=#([OPTIONAL,"?"],#b);}
-		|	STAR	    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
-						 #rewrite_ebnf=#([CLOSURE,"*"],#b);}
-		|	PLUS	    {if (#b.getType()==SET) #b=setToBlockWithSet(#b);
-						 #rewrite_ebnf=#([POSITIVE_CLOSURE,"+"],#b);}
+		(	QUESTION    {#rewrite_ebnf=#([OPTIONAL,"?"],#b);}
+		|	STAR	    {#rewrite_ebnf=#([CLOSURE,"*"],#b);}
+		|	PLUS	    {#rewrite_ebnf=#([POSITIVE_CLOSURE,"+"],#b);}
 		)
 		{#rewrite_ebnf.setLine(line); #rewrite_ebnf.setColumn(col);}
 	;

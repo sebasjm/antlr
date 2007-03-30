@@ -131,7 +131,7 @@ public class NFAFactory {
         NFAState right = newState();
         Transition e = new Transition(new Label(set),right);
         left.addTransition(e);
-        StateCluster g = new StateCluster(left, right);
+		StateCluster g = new StateCluster(left, right);
         return g;
 	}
 
@@ -335,7 +335,23 @@ public class NFAFactory {
         return g;
     }
 
-    /** From A|B|..|Z alternative block build
+	/** From a set ('a'|'b') build
+     *
+     *  o->o-'a'..'b'->o->o (last NFAState is blockEndNFAState pointed to by all alts)
+	 */
+	public StateCluster build_AlternativeBlockFromSet(StateCluster set) {
+		if ( set==null ) {
+			return null;
+		}
+
+		// single alt, no decision, just return only alt state cluster
+		NFAState startOfAlt = newState(); // must have this no matter what
+		transitionBetweenStates(startOfAlt, set.left, Label.EPSILON);
+
+		return new StateCluster(startOfAlt,set.right);
+	}
+
+	/** From A|B|..|Z alternative block build
      *
      *  o->o-A->o->o (last NFAState is blockEndNFAState pointed to by all alts)
      *  |          ^

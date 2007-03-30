@@ -676,7 +676,7 @@ _fsp--;
 <checkRuleBacktrackFailure()>
 >>
 
-/** ids+=ID */
+/** ids+=r */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRef(...)>
 <listLabel(elem=label,...)>

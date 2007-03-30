@@ -173,6 +173,7 @@ public class TestCharDFAConversion extends BaseTest {
 				    msg instanceof GrammarUnreachableAltsMessage);
 		GrammarUnreachableAltsMessage u = (GrammarUnreachableAltsMessage)msg;
 		assertEquals("[2]", u.alts.toString());
+
 	}
 
 	public void testAdjacentNotCharLoops() throws Exception {
@@ -310,11 +311,11 @@ public class TestCharDFAConversion extends BaseTest {
 			"DUH : ('x'|'y')* 'xy' ;");
 		String expecting =
 			".s0-'x'->.s1\n" +
-				".s0-'y'->:s3=>1\n" +
-				".s1-'x'->:s3=>1\n" +
-				".s1-'y'->.s2\n" +
-				".s2-'x'..'y'->:s3=>1\n" +
-				".s2-<EOT>->:s4=>2\n";
+			".s0-'y'->:s3=>1\n" +
+			".s1-'x'->:s3=>1\n" +
+			".s1-'y'->.s2\n" +
+			".s2-'x'..'y'->:s3=>1\n" +
+			".s2-<EOT>->:s4=>2\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -461,11 +462,14 @@ public class TestCharDFAConversion extends BaseTest {
 			"lexer grammar T;\n"+
 			"T : ~('a' | B) | 'a';\n" +
 			"fragment\n" +
-			"B : 'b' ;\n");
+			"B : 'b' ;\n" +
+			"C : ~'x'{;} ;"); // force Tokens to not collapse T|C
 		g.createLookaheadDFAs();
 		String expecting =
-			".s0-'a'->:s2=>2\n" +
-			".s0-{'\\u0000'..'`', 'c'..'\\uFFFE'}->:s1=>1\n";
+			".s0-'b'->:s3=>2\n" +
+			".s0-'x'->:s2=>1\n" +
+			".s0-{'\\u0000'..'a', 'c'..'w', 'y'..'\\uFFFE'}->.s1\n" +
+			".s1-<EOT>->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -533,6 +537,9 @@ public class TestCharDFAConversion extends BaseTest {
 
 		// first make sure nondeterministic alts are as expected
 		if ( expectingUnreachableAlts==null ) {
+			if ( nonDetAlts.size()!=0 ) {
+				System.err.println("nondeterministic alts (should be empty): "+nonDetAlts);
+			}
 			assertEquals("unreachable alts mismatch", 0, nonDetAlts.size());
 		}
 		else {

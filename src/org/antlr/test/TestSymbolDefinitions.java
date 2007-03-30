@@ -135,6 +135,17 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkSymbols(g, rules, tokenNames);
 	}
 
+	public void testSetDoesNotMissTokenAliases() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : 'a'|'b' ;\n" +
+				"A : 'a' ;\n" +
+				"B : 'b' ;\n");
+		String rules = "a";
+		String tokenNames = "A, 'a', B, 'b'";
+		checkSymbols(g, rules, tokenNames);
+	}
+
 	public void testSimplePlusEqualLabel() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar t;\n"+
@@ -168,6 +179,37 @@ public class TestSymbolDefinitions extends BaseTest {
 		// must store literals how they appear in the antlr grammar
 		assertEquals("'\\n'", literals.toArray()[0]);
 	}
+
+	public void testTokenInTokensSectionAndTokenRuleDef() throws Exception {
+		// this must return A not I to the parser; calling a nonfragment rule
+		// from a nonfragment rule does not set the overall token.
+		String grammar =
+			"grammar P;\n" +
+			"tokens { B='}'; }\n"+
+			"a : A B {System.out.println(input);} ;\n"+
+			"A : 'a' ;\n" +
+			"B : '}' ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;";
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
+								  "a", "a}", false);
+		assertEquals("a}\n", found);
+	}
+
+	public void testTokenInTokensSectionAndTokenRuleDef2() throws Exception {
+		// this must return A not I to the parser; calling a nonfragment rule
+		// from a nonfragment rule does not set the overall token.
+		String grammar =
+			"grammar P;\n" +
+			"tokens { B='}'; }\n"+
+			"a : A '}' {System.out.println(input);} ;\n"+
+			"A : 'a' ;\n" +
+			"B : '}' {action} ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;";
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
+								  "a", "a}", false);
+		assertEquals("a}\n", found);
+	}
+
 
 	// T E S T  E R R O R S
 
@@ -801,7 +843,7 @@ public class TestSymbolDefinitions extends BaseTest {
 			n++;
 		}
 		Collection rules = g.getRules();
-		System.out.println("rules="+rules);
+		//System.out.println("rules="+rules);
 		// make sure there are no extra rules
 		assertEquals("number of rules mismatch; expecting "+n+"; found "+rules.size(), n, rules.size());
 

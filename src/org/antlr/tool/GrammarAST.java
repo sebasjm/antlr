@@ -361,6 +361,56 @@ public class GrammarAST extends BaseAST {
 			   token.getColumn() == t.getColumn();
 	}
 
+	/** See if tree has exact token types and structure; no text */
+	public boolean hasSameTreeStructure(AST t) {
+		// check roots first.
+		if (this.getType() != t.getType()) return false;
+		// if roots match, do full list match test on children.
+		if (this.getFirstChild() != null) {
+			if (!(((GrammarAST)this.getFirstChild()).hasSameListStructure(t.getFirstChild()))) return false;
+		}
+		// sibling has no kids, make sure t doesn't either
+		else if (t.getFirstChild() != null) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean hasSameListStructure(AST t) {
+		AST sibling;
+
+		// the empty tree is not a match of any non-null tree.
+		if (t == null) {
+			return false;
+		}
+
+		// Otherwise, start walking sibling lists.  First mismatch, return false.
+		for (sibling = this;
+			 sibling != null && t != null;
+			 sibling = sibling.getNextSibling(), t = t.getNextSibling())
+		{
+			// as a quick optimization, check roots first.
+			if (sibling.getType()!=t.getType()) {
+				return false;
+			}
+			// if roots match, do full list match test on children.
+			if (sibling.getFirstChild() != null) {
+				if (!((GrammarAST)sibling.getFirstChild()).hasSameListStructure(t.getFirstChild())) {
+					return false;
+				}
+			}
+			// sibling has no kids, make sure t doesn't either
+			else if (t.getFirstChild() != null) {
+				return false;
+			}
+		}
+		if (sibling == null && t == null) {
+			return true;
+		}
+		// one sibling list has more than the other
+		return false;
+	}
+
 	public static GrammarAST dup(AST t) {
 		if ( t==null ) {
 			return null;
