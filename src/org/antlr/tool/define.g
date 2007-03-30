@@ -343,16 +343,26 @@ element
     |   #(CHAR_RANGE atom atom)
     |	#(ASSIGN id:ID el:element)
     	{
-    	if ( #el.findFirstType(RULE_REF)!=null ) {
-    		grammar.defineRuleRefLabel(currentRuleName,#id.getToken(),el);
+		if ( #el.getType()==ANTLRParser.ROOT ||
+             #el.getType()==ANTLRParser.BANG )
+		{
+            #el = (GrammarAST)#el.getFirstChild();
+        }
+    	if ( #el.getType()==RULE_REF) {
+    		grammar.defineRuleRefLabel(currentRuleName,#id.getToken(),#el);
     	}
     	else if ( #el.getType()!=CHAR_RANGE ) {
-    		grammar.defineTokenRefLabel(currentRuleName,#id.getToken(),el);
+    		grammar.defineTokenRefLabel(currentRuleName,#id.getToken(),#el);
     	}
     	}
     |	#(	PLUS_ASSIGN id2:ID a2:element
     	    {
-    	    if ( #a2.findFirstType(RULE_REF)!=null ) {
+            if ( #a2.getType()==ANTLRParser.ROOT ||
+                 #a2.getType()==ANTLRParser.BANG )
+            {
+                #a2 = (GrammarAST)#a2.getFirstChild();
+            }
+    	    if ( #a2.getType()!=RULE_REF ) {
     	    	grammar.defineRuleListLabel(currentRuleName,#id2.getToken(),#a2);
     	    }
     	    else {
