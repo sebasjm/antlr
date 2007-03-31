@@ -1136,7 +1136,14 @@ public class CodeGenerator {
 			if ( edge.label.isSemanticPredicate() ) {
 				return false;
 			}
-			// can't do a switch if the edges are going to required gated predicates
+			// can't do a switch if the edges are going to require predicates
+			if ( edge.label.getAtom()==Label.EOT ) {
+				int EOTPredicts = ((DFAState)edge.target).getUniquelyPredictedAlt();
+				if ( EOTPredicts==NFA.INVALID_ALT_NUMBER ) {
+					// EOT target has to be a predicate then; no unique alt
+					return false;
+				}
+			}
 			if ( ((DFAState)edge.target).getGatedPredicatesInNFAConfigurations()!=null ) {
 				return false;
 			}

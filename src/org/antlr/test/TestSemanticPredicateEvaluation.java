@@ -204,6 +204,20 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("alt 2\n", found);
 	}
 
+	public void testPredicatesOnEOTTarget() throws Exception {
+		String grammar =
+			"grammar foo; \n" +
+			"@lexer::members {boolean p=true, q=false;}" +
+			"a : B ;\n" +
+			"A: '</'; \n" +
+			"B: {p}? '<!' {System.out.println(\"B\");};\n" +
+			"C: {q}? '<' {System.out.println(\"C\");}; \n" +
+			"D: '<';\n" ;
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+				    "a", "<!", false);
+		assertEquals("B\n", found);
+	}
+
 
 	// S U P P O R T
 
