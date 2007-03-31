@@ -301,6 +301,11 @@ March 30, 2007
 
 * Fixed ANTLR-8.  Labels to rules w/o return values caused compile errors.
 
+* Fixed ANTLR-89; semantic predicates in lexer sometimes
+  caused exception in code gen.
+
+* Fixed ANTLR-36; remove runtime dependency with ST
+
 March 29, 2007
 
 * Over last few days, I've gutted how ANTLR handles sets of chars or
