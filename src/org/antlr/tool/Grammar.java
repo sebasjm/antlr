@@ -1242,7 +1242,10 @@ public class Grammar {
 		}
 	}
 
-	protected void removeUselessLabels(Map ruleToElementLabelPairMap) {
+    /** A label on a rule is useless if the rule has no return value, no
+     *  tree or template output, and it is not referenced in an action
+     */
+    protected void removeUselessLabels(Map ruleToElementLabelPairMap) {
 		if ( ruleToElementLabelPairMap==null ) {
 			return;
 		}
