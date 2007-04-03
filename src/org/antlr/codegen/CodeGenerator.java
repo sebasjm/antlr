@@ -850,8 +850,11 @@ public class CodeGenerator {
 	}
 
 	public List translateAction(String ruleName,
-								  GrammarAST actionTree)
+								GrammarAST actionTree)
 	{
+		if ( actionTree.getType()==ANTLRParser.ARG_ACTION ) {
+			return translateArgAction(ruleName, actionTree);
+		}
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(this,ruleName,actionTree);
 		List chunks = translator.translateToChunks();
 		chunks = target.postProcessAction(chunks, actionTree.token);

@@ -154,6 +154,37 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
+	public void testRuleLabelBeforeRefToPredefinedAttr() throws Exception {
+		// As of Mar 2007, I'm removing unused labels.  Unfortunately,
+		// the action is not seen until code gen.  Can't see $x.text
+		// before stripping unused labels.  We really need to translate
+		// actions first so code gen logic can use info.
+		String action = "$x.text";
+		String expecting = "input.toString(x.start,x.stop)";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : x=b {"+action+"} ;\n" +
+			"b : B ;\n");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 	public void testInvalidArguments() throws Exception {
 		String action = "$x";
 		String expecting = action;

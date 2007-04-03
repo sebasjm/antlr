@@ -98,7 +98,12 @@ public class GrammarAST extends BaseAST {
             new HashMap() {{put("greedy","true");}};
 
 	/** if this is an ACTION node, this is the outermost enclosing
-	 *  alt num in rule
+	 *  alt num in rule.  For actions, define.g sets these (used to
+	 *  be codegen.g).  We need these set so we can examine actions
+	 *  early, before code gen, for refs to rule predefined properties
+	 *  and rule labels.  For most part define.g sets outerAltNum, but
+	 *  codegen.g does the ones for %foo(a={$ID.text}) type refs as
+	 *  the {$ID...} is not seen as an action until code gen pulls apart.
 	 */
 	public int outerAltNum;
 

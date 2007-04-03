@@ -332,23 +332,14 @@ rule returns [StringTemplate code=null]
 			( #(OPTIONS .) )?
 			(ruleScopeSpec)?
 		    (AMPERSAND)*
-		    /*
-            #( INITACTION
-               (ia:ACTION {initAction=generator.translateAction(r,#ia);})?
-             )
-            */
             b=block["ruleBlock", dfa]
 			{
 			String description =
-				grammar.grammarTreeToString(#rule.getFirstChildWithType(BLOCK), false);
-			description = generator.target.getTargetStringLiteralFromString(description);
+				grammar.grammarTreeToString(#rule.getFirstChildWithType(BLOCK),
+                                            false);
+			description =
+                generator.target.getTargetStringLiteralFromString(description);
 			b.setAttribute("description", description);
-			/*
-			System.out.println("rule "+r+" tokens="+
-							   grammar.getRule(r).getAllTokenRefsInAltsWithRewrites());
-			System.out.println("rule "+r+" rules="+
-							   grammar.getRule(r).getAllRuleRefsInAltsWithRewrites());
-			*/
 			// do not generate lexer rules in combined grammar
 			String stName = null;
 			if ( ruleDescr.isSynPred ) {
@@ -624,7 +615,6 @@ element[GrammarAST label, GrammarAST astSuffix] returns [StringTemplate code=nul
 
     |   act:ACTION
         {
-        #act.outerAltNum = this.outerAltNum;
         code = templates.getInstanceOf("execAction");
         code.setAttribute("action", generator.translateAction(currentRuleName,#act));
         }
@@ -632,7 +622,6 @@ element[GrammarAST label, GrammarAST astSuffix] returns [StringTemplate code=nul
     |   (sp:SEMPRED|gsp:GATED_SEMPRED {#sp=#gsp;})
         {
         code = templates.getInstanceOf("validateSemanticPredicate");
-        #sp.outerAltNum = this.outerAltNum;
         code.setAttribute("pred", generator.translateAction(currentRuleName,#sp));
 		String description =
 			generator.target.getTargetStringLiteralFromString(#sp.getText());
@@ -780,8 +769,7 @@ if ( label!=null ) {
 		code.setAttribute("rule", r.getText());
 
 		if ( #rarg!=null ) {
-			#rarg.outerAltNum = this.outerAltNum;
-			List args = generator.translateArgAction(currentRuleName,#rarg);
+			List args = generator.translateAction(currentRuleName,#rarg);
 			code.setAttribute("args", args);
 		}
         int i = ((TokenWithIndex)r.getToken()).getIndex();
@@ -801,8 +789,7 @@ if ( label!=null ) {
 					code = templates.getInstanceOf("lexerRuleRef");
 					code.setAttribute("rule", t.getText());
 					if ( #targ!=null ) {
-						#targ.outerAltNum = this.outerAltNum;
-						List args = generator.translateArgAction(currentRuleName,#targ);
+						List args = generator.translateAction(currentRuleName,#targ);
 						code.setAttribute("args", args);
 					}
 				}
@@ -927,7 +914,6 @@ if ( #rewrite.getType()==REWRITE ) {
 			List predChunks = null;
 			if ( #pred!=null ) {
 				//predText = #pred.getText();
-        		#pred.outerAltNum = this.outerAltNum;
         		predChunks = generator.translateAction(currentRuleName,#pred);
 			}
 			String description =
@@ -1121,8 +1107,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	}
     	code = templates.getInstanceOf(stName);
     	if ( #arg!=null ) {
-	        #arg.outerAltNum = this.outerAltNum;
-			List args = generator.translateArgAction(currentRuleName,#arg);
+			List args = generator.translateAction(currentRuleName,#arg);
 			code.setAttribute("args", args);
     	}
 		code.setAttribute("elementIndex", ((TokenWithIndex)#rewrite_atom.getToken()).getIndex());
@@ -1199,7 +1184,6 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     |	ACTION
         {
         // actions in rewrite rules yield a tree object
-		#ACTION.outerAltNum = this.outerAltNum;
         String actText = #ACTION.getText();
         List chunks = generator.translateAction(currentRuleName,#ACTION);
 		code = templates.getInstanceOf("rewriteNodeAction"+(isRoot?"Root":""));
@@ -1237,6 +1221,9 @@ rewrite_template returns [StringTemplate code=null]
 	       #( ARGLIST
 	       	  ( #( ARG arg:ID a:ACTION
 		   		   {
+                   // must set alt num here rather than in define.g
+                   // because actions like %foo(name={$ID.text}) aren't
+                   // broken up yet into trees.
 				   #a.outerAltNum = this.outerAltNum;
 		   		   List chunks = generator.translateAction(currentRuleName,#a);
 		   		   code.setAttribute("args.{name,value}", #arg.getText(), chunks);
@@ -1263,6 +1250,7 @@ rewrite_template returns [StringTemplate code=null]
 
 	|	act:ACTION
    		{
+        // set alt num for same reason as ARGLIST above
         #act.outerAltNum = this.outerAltNum;
    		code=templates.getInstanceOf("rewriteAction");
    		code.setAttribute("action",

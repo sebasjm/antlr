@@ -35,6 +35,7 @@ import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
 import org.antlr.codegen.CodeGenerator;
+import org.antlr.codegen.ActionAnalysisLexer;
 import org.antlr.misc.Barrier;
 import org.antlr.misc.IntSet;
 import org.antlr.misc.IntervalSet;
@@ -135,6 +136,10 @@ public class Grammar {
 		public antlr.Token label;
 		public GrammarAST elementRef;
 		public String referencedRuleName;
+		/** Has an action referenced the label?  Set by ActionAnalysis.g
+		 *  Currently only set for rule labels.
+		 */
+		public boolean actionReferencesLabel;
 		public int type; // in {RULE_LABEL,TOKEN_LABEL,RULE_LIST_LABEL,TOKEN_LIST_LABEL}
 		public LabelElementPair(antlr.Token label, GrammarAST elementRef) {
 			this.label = label;
@@ -254,15 +259,15 @@ public class Grammar {
 	/** The unique set of all rule references in any rule; set of Token
 	 *  objects so two refs to same rule can exist but at different line/position.
 	 */
-	protected Set ruleRefs = new HashSet();
+	protected Set<antlr.Token> ruleRefs = new HashSet<antlr.Token>();
 
 	/** The unique set of all token ID references in any rule */
-	protected Set tokenIDRefs = new HashSet();
+	protected Set<antlr.Token> tokenIDRefs = new HashSet<antlr.Token>();
 
 	/** If combined or lexer grammar, track the rules; Set<String>.
 	 * 	Track lexer rules so we can warn about undefined tokens.
  	 */
-	protected Set lexerRules = new HashSet();
+	protected Set<String> lexerRules = new HashSet<String>();
 
     /** Be able to assign a number to every decision in grammar;
      *  decisions in 1..n
@@ -549,18 +554,9 @@ public class Grammar {
 							   re);
 		}
 
+		// ANALYZE ACTIONS, LOOKING FOR LABEL AND ATTR REFS
+		examineAllExecutableActions();
 		checkAllRulesForUselessLabels();
-
-		/*
-		// OPTIMIZE TREE; COLLAPSE BLOCKS TO SETS
-		System.out.println("### optimize");
-		ASTEnumeration setNodes =
-			grammarTree.findAllPartial(new ASTFactory().create(ANTLRParser.SET,"SET"));
-		while ( setNodes.hasMoreNodes() ) {
-			GrammarAST s = (GrammarAST)setNodes.nextNode();
-			System.out.println("set="+s.toStringTree());
-		}
-		*/
 
 		nameSpaceChecker.checkConflicts();
 	}
@@ -994,10 +990,10 @@ public class Grammar {
 	/** Given @scope::name {action} define it for this grammar.  Later,
 	 *  the code generator will ask for the actions table.
 	 */
-	public void defineAction(GrammarAST ampersandAST,
-							 String scope,
-							 GrammarAST nameAST,
-							 GrammarAST actionAST)
+	public void defineNamedAction(GrammarAST ampersandAST,
+								  String scope,
+								  GrammarAST nameAST,
+								  GrammarAST actionAST)
 	{
 		if ( scope==null ) {
 			scope = getDefaultActionScope(type);
@@ -1226,6 +1222,34 @@ public class Grammar {
 		}
 	}
 
+	/** Before generating code, we examine all actions that can have
+	 *  $x.y and $y stuff in them because some code generation depends on
+	 *  Rule.referencedPredefinedRuleAttributes.  I need to remove unused
+	 *  rule labels for example.
+	 */
+	protected void examineAllExecutableActions() {
+		Collection rules = getRules();
+		for (Iterator it = rules.iterator(); it.hasNext();) {
+			Rule r = (Rule) it.next();
+			// walk all actions within the rule elements, args, and exceptions
+			List<GrammarAST> actions = r.getInlineActions();
+			for (int i = 0; i < actions.size(); i++) {
+				GrammarAST actionAST = (GrammarAST) actions.get(i);
+				ActionAnalysisLexer sniffer =
+					new ActionAnalysisLexer(this, r.name, actionAST);
+				sniffer.analyze();
+			}
+			// walk any named actions like @init, @after
+			Collection<GrammarAST> namedActions = r.getActions().values();
+			for (Iterator it2 = namedActions.iterator(); it2.hasNext();) {
+				GrammarAST actionAST = (GrammarAST) it2.next();
+				ActionAnalysisLexer sniffer =
+					new ActionAnalysisLexer(this, r.name, actionAST);
+				sniffer.analyze();
+			}
+		}
+	}
+
 	/** Remove all labels on rule refs whose target rules have no return value.
 	 *  Do this for all rules in grammar.
 	 */
@@ -1243,7 +1267,7 @@ public class Grammar {
 	}
 
     /** A label on a rule is useless if the rule has no return value, no
-     *  tree or template output, and it is not referenced in an action
+     *  tree or template output, and it is not referenced in an action.
      */
     protected void removeUselessLabels(Map ruleToElementLabelPairMap) {
 		if ( ruleToElementLabelPairMap==null ) {
@@ -1254,14 +1278,14 @@ public class Grammar {
 		for (Iterator labelit = labels.iterator(); labelit.hasNext();) {
 			LabelElementPair pair = (LabelElementPair) labelit.next();
 			Rule refdRule = getRule(pair.elementRef.getText());
-			if ( refdRule!=null && !refdRule.getHasReturnValue() ) {
+			if ( refdRule!=null && !refdRule.getHasReturnValue() && !pair.actionReferencesLabel ) {
 				//System.out.println(pair.label.getText()+" is useless");
 				kill.add(pair.label.getText());
 			}
 		}
 		for (int i = 0; i < kill.size(); i++) {
 			String labelToKill = (String) kill.get(i);
-			//System.out.println("kill "+labelToKill);
+			// System.out.println("kill "+labelToKill);
 			ruleToElementLabelPairMap.remove(labelToKill);
 		}
 	}

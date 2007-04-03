@@ -84,16 +84,25 @@ public class Rule {
 	/** All labels go in here (plus being split per the above lists) to
 	 *  catch dup label and label type mismatches.
 	 */
-	protected Map labelNameSpace = new HashMap();
+	protected Map<String, Grammar.LabelElementPair> labelNameSpace =
+		new HashMap<String, Grammar.LabelElementPair>();
 
 	/** Map a name to an action for this rule.  Currently init is only
 	 *  one we use, but we can add more in future.
-	 *  Map<String,GrammarAST>>
 	 *  The code generator will use this to fill holes in the rule template.
 	 *  I track the AST node for the action in case I need the line number
-	 *  for errors.
+	 *  for errors.  A better name is probably namedActions, but I don't
+	 *  want everyone to have to change their code gen templates now.
 	 */
-	protected Map actions = new HashMap();
+	protected Map<String, GrammarAST> actions =
+		new HashMap<String, GrammarAST>();
+
+	/** Track all executable actions other than named actions like @init.
+	 *  Also tracks exception handlers, predicates, and rewrite rewrites.
+	 *  We need to examine these actions before code generation so
+	 *  that we can detect refs to $rule.attr etc...
+	 */
+	protected List<GrammarAST> inlineActions = new ArrayList<GrammarAST>();
 
 	public int numberOfAlts;
 
@@ -108,7 +117,7 @@ public class Rule {
 	 *
 	 *  Rewrite rules force tracking of all tokens.
 	 */
-	protected Map[] altToTokenRefMap;
+	protected Map<String, List<GrammarAST>>[] altToTokenRefMap;
 
 	/** Each alt has a Map<ruleRefName,List<ruleRefAST>>; range 1..numberOfAlts
 	 *  So, if there are 3 expr refs in a rule's alt number 2, you'll have
@@ -118,7 +127,7 @@ public class Rule {
 	 *
 	 *  Rewrite rules force tracking of all rule result ASTs. 1..n
 	 */
-	protected Map[] altToRuleRefMap;
+	protected Map<String, List<GrammarAST>>[] altToRuleRefMap;
 
 	/** Track which alts have rewrite rules associated with them. 1..n */
 	protected boolean[] altsWithRewrites;
@@ -143,8 +152,8 @@ public class Rule {
 		altToRuleRefMap = new Map[numberOfAlts+1];
 		altsWithRewrites = new boolean[numberOfAlts+1];
 		for (int alt=1; alt<=numberOfAlts; alt++) {
-			altToTokenRefMap[alt] = new HashMap();
-			altToRuleRefMap[alt] = new HashMap();
+			altToTokenRefMap[alt] = new HashMap<String, List<GrammarAST>>();
+			altToRuleRefMap[alt] = new HashMap<String, List<GrammarAST>>();
 		}
 	}
 
@@ -316,6 +325,10 @@ public class Rule {
 		return rules;
 	}
 
+	public List<GrammarAST> getInlineActions() {
+		return inlineActions;
+	}
+
 	public boolean hasRewrite(int i) {
 		return altsWithRewrites[i];
 	}
@@ -407,7 +420,7 @@ public class Rule {
 			labelName = generator.createUniqueLabel(refdSymbol);
 			CommonToken label = new CommonToken(ANTLRParser.ID, labelName);
 			if ( grammar.type != Grammar.LEXER &&
-			 	 Character.isUpperCase(refdSymbol.charAt(0)) )
+				 Character.isUpperCase(refdSymbol.charAt(0)) )
 			{
 				grammar.defineTokenRefLabel(name, label, uniqueRefAST);
 			}
@@ -434,8 +447,8 @@ public class Rule {
 	public boolean getHasSingleReturnValue() {
 		return
 			!(referencedPredefinedRuleAttributes || grammar.buildAST() ||
-			grammar.buildTemplate()) &&
-			(returnScope!=null && returnScope.attributes.size()==1);
+			  grammar.buildTemplate()) &&
+									   (returnScope!=null && returnScope.attributes.size()==1);
 	}
 
 	public boolean getHasReturnValue() {
@@ -466,9 +479,9 @@ public class Rule {
 	/** Given @scope::name {action} define it for this grammar.  Later,
 	 *  the code generator will ask for the actions table.
 	 */
-	public void defineAction(GrammarAST ampersandAST,
-							 GrammarAST nameAST,
-							 GrammarAST actionAST)
+	public void defineNamedAction(GrammarAST ampersandAST,
+								  GrammarAST nameAST,
+								  GrammarAST actionAST)
 	{
 		//System.out.println("rule @"+nameAST.getText()+"{"+actionAST.getText()+"}");
 		String actionName = nameAST.getText();
@@ -483,11 +496,15 @@ public class Rule {
 		}
 	}
 
-	public Map getActions() {
+	public void trackInlineAction(GrammarAST actionAST) {
+		inlineActions.add(actionAST);
+	}
+
+	public Map<String, GrammarAST> getActions() {
 		return actions;
 	}
 
-	public void setActions(Map actions) {
+	public void setActions(Map<String, GrammarAST> actions) {
 		this.actions = actions;
 	}
 

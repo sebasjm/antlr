@@ -99,6 +99,14 @@ protected int blockLevel = 0;
 		}
 		//System.out.println("root after removal is: "+root.toStringList());
 	}
+
+    protected void trackInlineAction(GrammarAST actionAST) {
+		Rule r = grammar.getRule(currentRuleName);
+        if ( r!=null ) {
+            r.trackInlineAction(actionAST);
+        }
+    }
+
 }
 
 grammar[Grammar g]
@@ -157,7 +165,7 @@ GrammarAST nameAST=null, actionAST=null;
 			)
 		 )
 		 {
-		 grammar.defineAction(#amp,scope,nameAST,actionAST);
+		 grammar.defineNamedAction(#amp,scope,nameAST,actionAST);
 		 }
 	;
 
@@ -241,7 +249,7 @@ countAltsForRule returns [int n=0]
 	;
 
 ruleAction[Rule r]
-	:	#(amp:AMPERSAND id:ID a:ACTION ) {if (r!=null) r.defineAction(#amp,#id,#a);}
+	:	#(amp:AMPERSAND id:ID a:ACTION ) {if (r!=null) r.defineNamedAction(#amp,#id,#a);}
 	;
 
 modifier returns [String mod]
@@ -323,16 +331,12 @@ exceptionGroup
     ;
 
 exceptionHandler
-    :    #("catch" ARG_ACTION ACTION)
+    :   #("catch" ARG_ACTION ACTION) {trackInlineAction(#ACTION);}
     ;
 
 finallyClause
-    :    #("finally" ACTION)
+    :    #("finally" ACTION) {trackInlineAction(#ACTION);}
     ;
-
-rewrite
-	:	( #( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION) ) )*
-	;
 
 element
     :   #(ROOT element)
@@ -374,10 +378,22 @@ element
     |   tree
     |   #( SYNPRED block )
     |   act:ACTION
+        {
+        #act.outerAltNum = this.outerAltNum;
+		trackInlineAction(#act);
+        }
     |   SEMPRED
+        {
+        #SEMPRED.outerAltNum = this.outerAltNum;
+        trackInlineAction(#SEMPRED);
+        }
     |   SYN_SEMPRED
     |   BACKTRACK_SEMPRED
     |   GATED_SEMPRED
+        {
+        #GATED_SEMPRED.outerAltNum = this.outerAltNum;
+        trackInlineAction(#GATED_SEMPRED);
+        }
     |   EPSILON 
     ;
 
@@ -417,10 +433,20 @@ tree:   #(TREE_BEGIN element (element)*)
     ;
 
 atom
-    :   r:RULE_REF
-    	{grammar.altReferencesRule(currentRuleName, #r, this.outerAltNum);}
-    |   t:TOKEN_REF
+    :   #( rr:RULE_REF (rarg:ARG_ACTION)? )
     	{
+        grammar.altReferencesRule(currentRuleName, #rr, this.outerAltNum);
+		if ( #rarg!=null ) {
+            #rarg.outerAltNum = this.outerAltNum;
+            trackInlineAction(#rarg);
+        }
+        }
+    |   #( t:TOKEN_REF (targ:ARG_ACTION )? )
+    	{
+		if ( #targ!=null ) {
+            #targ.outerAltNum = this.outerAltNum;
+            trackInlineAction(#targ);
+        }
     	if ( grammar.type==Grammar.LEXER ) {
     		grammar.altReferencesRule(currentRuleName, #t, this.outerAltNum);
     	}
@@ -452,4 +478,110 @@ atom
 ast_suffix
 	:	ROOT
 	|	BANG
+	;
+
+rewrite
+	:	(
+            #( REWRITE (pred:SEMPRED)? rewrite_alternative )
+            {
+            if ( #pred!=null ) {
+                #pred.outerAltNum = this.outerAltNum;
+                trackInlineAction(#pred);
+            }
+            }
+        )*
+	;
+
+rewrite_block
+    :   #(  BLOCK rewrite_alternative EOB )
+    ;
+
+rewrite_alternative
+    :   {grammar.buildAST()}?
+    	#( a:ALT ( ( rewrite_element )+ | EPSILON ) EOA )
+    |	{grammar.buildTemplate()}? rewrite_template
+    ;
+
+rewrite_element
+    :   rewrite_atom
+
+    |   #(  n:NOT
+            (  c:CHAR_LITERAL
+            |  s:STRING_LITERAL
+            |  t:TOKEN_REF
+            |  #( st:SET (rewrite_setElement)+ )
+            )
+         )
+
+    |   rewrite_ebnf
+
+    |   rewrite_tree
+    ;
+
+rewrite_ebnf
+    :   #( OPTIONAL rewrite_block )
+    |   #( CLOSURE rewrite_block )
+    |   #( POSITIVE_CLOSURE rewrite_block )
+    ;
+
+rewrite_tree
+	:   #(	TREE_BEGIN rewrite_atom ( rewrite_element )* )
+    ;
+
+rewrite_atom
+    :   RULE_REF
+    |   ( #(TOKEN_REF (arg:ARG_ACTION)?) | CHAR_LITERAL | STRING_LITERAL )
+        {
+        if ( #arg!=null ) {
+            #arg.outerAltNum = this.outerAltNum;
+            trackInlineAction(#arg);
+        }
+        }
+    |	rewrite_set
+    |	LABEL
+    |	ACTION
+        {
+            #ACTION.outerAltNum = this.outerAltNum;
+            trackInlineAction(#ACTION);
+        }
+    ;
+
+rewrite_set
+	:   #( s:SET (rewrite_setElement)+ )
+    ;
+
+rewrite_setElement
+    :   c:CHAR_LITERAL
+    |   t:TOKEN_REF
+    |   s:STRING_LITERAL
+    ;
+
+rewrite_template
+    :	#( ALT EPSILON EOA ) 
+   	|	#( TEMPLATE (id:ID|ind:ACTION)
+	       #( ARGLIST
+                ( #( ARG arg:ID a:ACTION )
+                {
+                    #a.outerAltNum = this.outerAltNum;
+                    trackInlineAction(#a);
+                }
+                )*
+            )
+            {
+            if ( #ind!=null ) {
+                #ind.outerAltNum = this.outerAltNum;
+                trackInlineAction(#ind);
+            }
+            }
+
+		   ( DOUBLE_QUOTE_STRING_LITERAL
+		   | DOUBLE_ANGLE_STRING_LITERAL
+		   )?
+	     )
+
+	|	act:ACTION
+        {
+        #act.outerAltNum = this.outerAltNum;
+        trackInlineAction(#act);
+        }
 	;

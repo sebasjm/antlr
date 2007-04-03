@@ -297,6 +297,17 @@ C# Target Notes
 
 CHANGES
 
+April 3, 2007
+
+* Fix a problem in my unused label optimization.  Added new
+  pass over actions to examine them.
+
+* RuleReturnScope has method back:
+  /** Has a value potentially if output=template; Don't use StringTemplate
+   *  type as it then causes a dependency with ST lib.
+   */
+  public Object getTemplate() { return null; }
+
 March 30, 2007
 
 * Fixed ANTLR-8.  Labels to rules w/o return values caused compile errors.

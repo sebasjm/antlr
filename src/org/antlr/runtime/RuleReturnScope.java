@@ -8,4 +8,8 @@ public class RuleReturnScope {
 	public Object getStop() { return null; }
 	/** Has a value potentially if output=AST; */
 	public Object getTree() { return null; }
+	/** Has a value potentially if output=template; Don't use StringTemplate
+	 *  type as it then causes a dependency with ST lib.
+	 */
+	public Object getTemplate() { return null; }
 }
