@@ -63,7 +63,7 @@
                debuglevel="${compile.debuglevel}"
                deprecation="${compile.deprecation}"
                optimize="${compile.optimize}"
-               source="1.4" target="1.4"
+               source="1.5" target="1.4"
                classpathref="classpath" />
     </target>
 
