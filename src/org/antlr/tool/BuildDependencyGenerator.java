@@ -104,9 +104,7 @@ public class BuildDependencyGenerator {
 				String header =	 grammar.name+suffix+headerExtST.toString();
 				files.add(new File(outputDir,header));
 			}
-			// TLexer.tokens
-			String tokens = grammar.name+suffix+CodeGenerator.VOCAB_FILE_EXTENSION;
-			files.add(new File(outputDir,tokens));
+			// for combined, don't generate TLexer.tokens
 		}
 
 		if ( files.size()==0 ) {
