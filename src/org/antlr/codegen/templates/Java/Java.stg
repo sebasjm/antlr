@@ -600,8 +600,8 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <label>=(<labelType>)input.LT(1);<\n>
 <endif>
 if ( <s> ) {
-    <postmatchCode>
     input.consume();
+    <postmatchCode>
 <if(!LEXER)>
     errorRecovery=false;
 <endif>
