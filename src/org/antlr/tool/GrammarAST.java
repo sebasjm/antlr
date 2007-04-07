@@ -28,8 +28,8 @@
 package org.antlr.tool;
 
 import antlr.BaseAST;
-import antlr.CommonToken;
 import antlr.Token;
+import antlr.TokenWithIndex;
 import antlr.collections.AST;
 import org.antlr.analysis.DFA;
 import org.antlr.analysis.NFAState;
@@ -120,7 +120,7 @@ public class GrammarAST extends BaseAST {
 	}
 
 	public void initialize(int i, String s) {
-        token = new CommonToken(i,s);
+        token = new TokenWithIndex(i,s);
     }
 
     public void initialize(AST ast) {

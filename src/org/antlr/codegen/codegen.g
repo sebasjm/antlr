@@ -491,10 +491,10 @@ if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL && grammar.buildAST() ) {
         {
         StringTemplate setcode =
             getTokenElementST("matchSet", "set", #s, null, null);
-        // there is only a set in this rule...can use any element index
-		setcode.setAttribute("elementIndex", 1);
+        int i = ((TokenWithIndex)#s.getToken()).getIndex();
+		setcode.setAttribute("elementIndex", i);
 		if ( grammar.type!=Grammar.LEXER ) {
-			generator.generateLocalFOLLOW(#s,"set",currentRuleName,1);
+			generator.generateLocalFOLLOW(#s,"set",currentRuleName,i);
         }
         setcode.setAttribute("s",
             generator.genSetExpr(templates,#s.getSetValue(),1,false));

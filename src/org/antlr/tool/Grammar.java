@@ -507,6 +507,7 @@ public class Grammar {
 		tokenBuffer.discard(ANTLRParser.COMMENT);
 		tokenBuffer.discard(ANTLRParser.SL_COMMENT);
 		ANTLRParser parser = new ANTLRParser(tokenBuffer);
+		parser.getASTFactory().setASTNodeClass(GrammarAST.class);
 		parser.setFilename(this.getFileName());
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		parser.grammar(this);

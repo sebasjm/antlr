@@ -297,6 +297,10 @@ C# Target Notes
 
 CHANGES
 
+April 7, 2007
+
+* Couldn't have more than one set per rule it seems.  Fixed.
+
 April 3, 2007
 
 * Fix a problem in my unused label optimization.  Added new
