@@ -93,7 +93,9 @@ public abstract class BaseTest extends TestCase {
 		}
 	}
 
-	protected void antlr(String fileName, String grammarFileName, String grammarStr, boolean debug) {
+	/** Return true if all is ok, no errors */
+	protected boolean antlr(String fileName, String grammarFileName, String grammarStr, boolean debug) {
+		boolean allIsWell = true;
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
 		try {
@@ -113,6 +115,7 @@ public abstract class BaseTest extends TestCase {
 			Tool antlr = new Tool(optionsA);
 			antlr.process();
 			if ( equeue.errors.size()>0 ) {
+				allIsWell = false;
 				System.err.println("antlr reports errors from "+options);
 				for (int i = 0; i < equeue.errors.size(); i++) {
 					Message msg = (Message) equeue.errors.get(i);
@@ -121,9 +124,11 @@ public abstract class BaseTest extends TestCase {
 			}
 		}
 		catch (Exception e) {
+			allIsWell = false;
 			System.err.println("problems building grammar: "+e);
 			e.printStackTrace(System.err);
 		}
+		return allIsWell;
 	}
 
 	protected String execParser(String grammarFileName,
@@ -142,8 +147,12 @@ public abstract class BaseTest extends TestCase {
 									  lexerName,
 									  debug);
 		writeFile(tmpdir, "input", input);
-		boolean parserBuildsTrees = grammarStr.indexOf("output=AST")>=0;
-		boolean parserBuildsTemplate = grammarStr.indexOf("output=template")>=0;
+		boolean parserBuildsTrees =
+			grammarStr.indexOf("output=AST")>=0 ||
+			grammarStr.indexOf("output = AST")>=0;
+		boolean parserBuildsTemplate =
+			grammarStr.indexOf("output=template")>=0 ||
+			grammarStr.indexOf("output = template")>=0;
 		return rawExecRecognizer(parserName,
 								 null,
 								 lexerName,
@@ -229,8 +238,8 @@ public abstract class BaseTest extends TestCase {
 													String lexerName,
 													boolean debug)
 	{
-		boolean allIsWell = true;
-		antlr(grammarFileName, grammarFileName, grammarStr, debug);
+		boolean allIsWell =
+			antlr(grammarFileName, grammarFileName, grammarStr, debug);
 		if ( lexerName!=null ) {
 			boolean ok;
 			if ( parserName!=null ) {

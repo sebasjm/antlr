@@ -711,6 +711,19 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("nil\n", found);
 	}
 
+	public void testSet() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options { output = AST; } \n" +
+			"a: (INT|ID)+ -> INT+ ID+ ;\n" +
+			"INT: '0'..'9'+;\n" +
+			"ID : 'a'..'z'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "2 a 34 de", debug);
+		assertEquals("2 34 a de\n", found);
+	}
+
 	// E R R O R S
 
 	public void testUnknownRule() throws Exception {

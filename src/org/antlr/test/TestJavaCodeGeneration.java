@@ -50,11 +50,11 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testLabeledSetsInLexer() {
+	public void testLabeledSetsInLexer2() {
 		// c must be an int
 		String grammar =
 			"lexer grammar t;\n" +
-			"A : c=('-'|'.')\n" +
+			"A : d=~('x'|'y') e='0'..'9'\n" +
 			"  ; \n" ;
 		boolean found =
 			rawGenerateAndBuildRecognizer(
@@ -68,6 +68,19 @@ public class TestJavaCodeGeneration extends BaseTest {
 		String grammar =
 			"lexer grammar t;\n" +
 			"B : x='a' x='b' ;\n" ;
+		boolean found =
+			rawGenerateAndBuildRecognizer(
+				"t.g", grammar, null, "tLexer", false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, found);
+	}
+
+	public void testRepeatedRuleLabelInLexer() {
+		// currently fails; not sure it's worth fixing dup x var def
+		String grammar =
+			"lexer grammar t;\n" +
+			"B : x=A x=A ;\n" +
+			"fragment A : 'a' ;\n" ;
 		boolean found =
 			rawGenerateAndBuildRecognizer(
 				"t.g", grammar, null, "tLexer", false);

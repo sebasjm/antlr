@@ -166,9 +166,8 @@ matchSet(s,label,elementIndex,postmatchCode) ::= <<
 <super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_0, adaptor.create(<label>));})>
 >>
 
-matchSetRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_0);})>
->>
+// note there is no matchSetTrack because -> rewrites force sets to be
+// plain old blocks of alts: (A|B|...|C)
 
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 <super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(adaptor.create(<label>), root_0);})>
@@ -228,14 +227,6 @@ wildcard(label,elementIndex) ::= <<
 <if(backtracking)>if ( backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.create(<label>);
 adaptor.addChild(root_0, <label>_tree);
-<if(backtracking)>}<endif>
->>
-
-wildcardRoot(label,elementIndex) ::= <<
-<super.wildcard(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
-<label>_tree = (<ASTLabelType>)adaptor.create(<label>);
-root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
 >>
 

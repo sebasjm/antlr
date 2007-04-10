@@ -52,6 +52,9 @@ protected Grammar grammar = null;
 
 protected String currentRuleName = null;
 
+protected int outerAltNum = 0;
+protected int blockLevel = 0;
+
 public TreeToNFAConverter(Grammar g, NFA nfa, NFAFactory factory) {
 	this();
 	this.grammar = g;
@@ -217,13 +220,25 @@ block returns [StateCluster g = null]
 {
     StateCluster a = null;
     List alts = new LinkedList();
+    this.blockLevel++;
+    if ( this.blockLevel==1 ) {this.outerAltNum=1;}
 }
     :   {grammar.isValidSet(this,#block) &&
 		 !currentRuleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME)}?
 		g=set
+        {this.blockLevel--;}
 
-    |	#( BLOCK ( OPTIONS )? ( a=alternative rewrite {alts.add(a);} )+ EOB )
+    |	#( BLOCK ( OPTIONS )?
+           ( a=alternative rewrite
+             {
+             alts.add(a);
+             if ( this.blockLevel==1 ) {this.outerAltNum++;}
+             }
+           )+ 
+           EOB
+        )
         {g = factory.build_AlternativeBlock(alts);}
+        {this.blockLevel--;}
     ;
 
 alternative returns [StateCluster g=null]
@@ -558,17 +573,6 @@ IntSet elements=new IntervalSet();
 		//{System.out.println("set elements="+elements.toString(grammar));}
 	;
 
-setAsBlock returns [StateCluster g=null]
-{
-    List alts = new LinkedList();
-    StateCluster a=null;
-}
-	:	#( BLOCK ( a=element {alts.add(a);} )+ )
-        {
-        g = factory.build_AlternativeBlock(alts);
-        }
-	;
-
 setRule returns [IntSet elements=new IntervalSet()]
 {IntSet s=null;}
 	:	#( RULE id:ID (modifier)? ARG RET ( OPTIONS )? ( ruleScopeSpec )?
@@ -668,12 +672,19 @@ setElement[IntSet elements]
         )
     ;
 
+/** Check to see if this block can be a set.  Can't have actions
+ *  etc...  Also can't be in a rule with a rewrite as we need
+ *  to track what's inside set for use in rewrite.
+ */
 testBlockAsSet
 {
     int nAlts=0;
+    Rule r = grammar.getRule(currentRuleName);
 }
 	:   #( BLOCK
-           ( #(ALT (BACKTRACK_SEMPRED)? testSetElement {nAlts++;} EOA) )+
+           (   #(ALT (BACKTRACK_SEMPRED)? testSetElement {nAlts++;} EOA)
+                {!r.hasRewrite(outerAltNum)}?
+           )+
            EOB
         )
         {nAlts>1}? // set of 1 element is not good

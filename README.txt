@@ -299,6 +299,8 @@ CHANGES
 
 April 10, 2007
 
+* Fixed ANTLR-92 bug.  Couldn't use sets with -> tree construction.
+
 * No lexer rule for a token type is now a warning.
 
 * Fixed set labels in lexer; ANTLR-60 bug

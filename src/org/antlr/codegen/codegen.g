@@ -485,6 +485,9 @@ setBlock returns [StringTemplate code=null]
 if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL && grammar.buildAST() ) {
     Rule r = grammar.getRule(currentRuleName);
     currentAltHasASTRewrite = r.hasRewrite(outerAltNum);
+    if ( currentAltHasASTRewrite ) {
+        r.trackTokenReferenceInAlt(#setBlock, outerAltNum);
+    }
 }
 }
     :   s:BLOCK
