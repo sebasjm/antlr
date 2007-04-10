@@ -700,10 +700,13 @@ public class DFAState extends State {
 			configuration = (NFAConfiguration) iter.next();
 			SemanticContext gatedPredExpr =
 				configuration.semanticContext.getGatedPredicateContext();
-			if ( gatedPredExpr==null ) {
+			if ( configuration.semanticContext!=SemanticContext.EMPTY_SEMANTIC_CONTEXT &&
+				 gatedPredExpr==null )
+			{
+				// there is a sempred but it's not gated
 				foundTruePred = true;
 			}
-			if ( gatedPredExpr!=null ) {
+			else {
 				if ( unionOfPredicatesFromAllAlts==null ) {
 					unionOfPredicatesFromAllAlts = gatedPredExpr;
 				}

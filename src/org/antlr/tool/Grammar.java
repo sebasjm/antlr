@@ -383,21 +383,21 @@ public class Grammar {
 	public Set setOfNondeterministicDecisionNumbersResolvedWithPredicates = new HashSet();
 	public Set setOfDFAWhoseConversionTerminatedEarly = new HashSet();
 
-	/** Track decisions with syn preds specified for reporting. Set<GrammarAST>.
+	/** Track decisions with syn preds specified for reporting.
 	 *  This is the a set of BLOCK type AST nodes.
 	 */
-	public Set blocksWithSynPreds = new HashSet();
+	public Set<GrammarAST> blocksWithSynPreds = new HashSet();
 
-	/** Track decisions that actually use the sem preds in the DFA. Set<DFA> */
-	public Set decisionsWhoseDFAsUsesSynPreds = new HashSet();
+	/** Track decisions that actually use the sem preds in the DFA. */
+	public Set<DFA> decisionsWhoseDFAsUsesSynPreds = new HashSet();
 
 	/** Track the names of preds so we can avoid generating preds that are not used */
-	public Set synPredNamesUsedInDFA = new HashSet();
+	public Set<String> synPredNamesUsedInDFA = new HashSet();
 
-	/** Track decisions with syn preds specified for reporting. Set<GrammarAST>.
+	/** Track decisions with syn preds specified for reporting.
 	 *  This is the a set of BLOCK type AST nodes.
 	 */
-	public Set blocksWithSemPreds = new HashSet();
+	public Set<GrammarAST> blocksWithSemPreds = new HashSet();
 
 	/** Track decisions that actually use the syn preds in the DFA. Set<DFA> */
 	public Set decisionsWhoseDFAsUsesSemPreds = new HashSet();

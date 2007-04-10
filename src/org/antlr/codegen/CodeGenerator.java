@@ -357,12 +357,6 @@ public class CodeGenerator {
 								  Boolean.valueOf(memoize!=null&&memoize.equals("true")&&
 									          canBacktrack));
 
-		Set synpredNames = null;
-		if ( grammar.synPredNamesUsedInDFA.size()>0 ) {
-			synpredNames = grammar.synPredNamesUsedInDFA;
-		}
-		outputFileST.setAttribute("synpreds", synpredNames);
-		headerFileST.setAttribute("synpreds", synpredNames);
 
 		outputFileST.setAttribute("trace", Boolean.valueOf(trace));
 		headerFileST.setAttribute("trace", Boolean.valueOf(trace));
@@ -432,6 +426,14 @@ public class CodeGenerator {
 			genTokenTypeNames(headerFileST);
 		}
 
+		// Now that we know what synpreds are used, we can set into template
+		Set synpredNames = null;
+		if ( grammar.synPredNamesUsedInDFA.size()>0 ) {
+			synpredNames = grammar.synPredNamesUsedInDFA;
+		}
+		outputFileST.setAttribute("synpreds", synpredNames);
+		headerFileST.setAttribute("synpreds", synpredNames);
+		
 		// all recognizers can see Grammar object
 		recognizerST.setAttribute("grammar", grammar);
 
@@ -668,8 +670,14 @@ public class CodeGenerator {
 			// stick in any gated predicates for any edge if not already a pred
 			if ( !edge.label.isSemanticPredicate() ) {
 				DFAState t = (DFAState)edge.target;
-				edgeST.setAttribute("predicates",
-									t.getGatedPredicatesInNFAConfigurations());
+				SemanticContext preds =	t.getGatedPredicatesInNFAConfigurations();
+				if ( preds!=null ) {
+					StringTemplate predST = preds.genExpr(this,
+														  getTemplates(),
+														  t.dfa);
+					edgeST.setAttribute("predicates", predST.toString());
+					grammar.synPredUsedInDFA(t.dfa, preds);
+				}
 			}
 			if ( edge.label.getAtom()!=Label.EOT ) {
 				stateST.setAttribute("edges", edgeST);
@@ -1147,6 +1155,8 @@ public class CodeGenerator {
 					return false;
 				}
 			}
+			// if target is a state with gated preds, we need to use preds on
+			// this edge then to reach it.
 			if ( ((DFAState)edge.target).getGatedPredicatesInNFAConfigurations()!=null ) {
 				return false;
 			}

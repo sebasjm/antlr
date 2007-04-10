@@ -297,6 +297,10 @@ C# Target Notes
 
 CHANGES
 
+April 9, 2007
+
+* Gated predicates didn't work properly in cyclic DFA.
+
 April 7, 2007
 
 * Couldn't have more than one set per rule it seems.  Fixed.

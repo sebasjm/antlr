@@ -134,8 +134,8 @@ public class ACyclicDFACodeGenerator {
 					StringTemplate predST = preds.genExpr(parentGenerator,
 														  parentGenerator.getTemplates(),
 														  dfa);
-					edgeST.setAttribute("predicates",
-										predST.toString());
+					edgeST.setAttribute("predicates", predST.toString());
+					parentGenerator.grammar.synPredUsedInDFA(dfa, preds);
 				}
 			}
 

@@ -375,4 +375,16 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("x x x y\n", found);
 	}
 
+	public void testOptionalBlockWithSynPred() throws Exception {
+		String grammar =
+			"grammar t;\n" +
+				"\n" +
+				"a : ( (b)=> b {System.out.println(\"b\");})? b ;\n" +
+				"b : 'x' ;\n" ;
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
+				    "a", "xx", false);
+
+		assertEquals("b\n", found);
+	}
+
 }
