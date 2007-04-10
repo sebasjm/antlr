@@ -297,6 +297,10 @@ C# Target Notes
 
 CHANGES
 
+April 10, 2007
+
+* No lexer rule for a token type is now a warning.
+
 April 9, 2007
 
 * Gated predicates didn't work properly in cyclic DFA.

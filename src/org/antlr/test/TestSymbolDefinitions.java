@@ -413,7 +413,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_NO_TOKEN_DEFINITION;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkWarning(equeue, expectedMessage);
 	}
 
 	public void testUndefinedTokenOkInParser() throws Exception {
@@ -785,6 +785,23 @@ public class TestSymbolDefinitions extends BaseTest {
 		Message foundMsg = null;
 		for (int i = 0; i < equeue.errors.size(); i++) {
 			Message m = (Message)equeue.errors.get(i);
+			if (m.msgID==expectedMessage.msgID ) {
+				foundMsg = m;
+			}
+		}
+		assertNotNull("no error; "+expectedMessage.msgID+" expected", foundMsg);
+		assertTrue("error is not a GrammarSemanticsMessage",
+				   foundMsg instanceof GrammarSemanticsMessage);
+		assertEquals(expectedMessage.arg, foundMsg.arg);
+	}
+
+	protected void checkWarning(ErrorQueue equeue,
+								GrammarSemanticsMessage expectedMessage)
+		throws Exception
+	{
+		Message foundMsg = null;
+		for (int i = 0; i < equeue.warnings.size(); i++) {
+			Message m = (Message)equeue.warnings.get(i);
 			if (m.msgID==expectedMessage.msgID ) {
 				foundMsg = m;
 			}

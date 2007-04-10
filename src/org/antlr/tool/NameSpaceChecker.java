@@ -141,10 +141,10 @@ public class NameSpaceChecker {
 				if ( !grammar.lexerRules.contains(tokenID) &&
 					 grammar.getTokenType(tokenID)!=Label.EOF )
 				{
-					ErrorManager.grammarError(ErrorManager.MSG_NO_TOKEN_DEFINITION,
-											  grammar,
-											  tok,
-											  tokenID);
+					ErrorManager.grammarWarning(ErrorManager.MSG_NO_TOKEN_DEFINITION,
+												grammar,
+												tok,
+												tokenID);
 				}
 			}
 		}
