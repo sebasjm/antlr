@@ -222,20 +222,26 @@ public abstract class BaseTest extends TestCase {
 								 debug);
 	}
 
-	protected void rawGenerateAndBuildRecognizer(String grammarFileName,
-														String grammarStr,
-														String parserName,
-														String lexerName,
-														boolean debug)
+	/** Return true if all is well */
+	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
+													String grammarStr,
+													String parserName,
+													String lexerName,
+													boolean debug)
 	{
+		boolean allIsWell = true;
 		antlr(grammarFileName, grammarFileName, grammarStr, debug);
 		if ( lexerName!=null ) {
-			compile(parserName+".java");
-			compile(lexerName+".java");
+			boolean ok = compile(parserName+".java");
+			if ( !ok ) { allIsWell = false; }
+			ok = compile(lexerName+".java");
+			if ( !ok ) { allIsWell = false; }
 		}
 		else {
-			compile(parserName+".java");
+			boolean ok = compile(parserName+".java");
+			if ( !ok ) { allIsWell = false; }
 		}
+		return allIsWell;
 	}
 
 	protected String rawExecRecognizer(String parserName,

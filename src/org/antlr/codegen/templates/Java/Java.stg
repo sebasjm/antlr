@@ -827,7 +827,9 @@ default:
 
 dfaEdgeSwitch(labels, targetState) ::= <<
 <labels:{case <it>:}; separator="\n">
+    {
     <targetState>
+    }
     break;
 >>
 
