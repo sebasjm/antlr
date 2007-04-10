@@ -166,6 +166,8 @@ matchSet(s,label,elementIndex,postmatchCode) ::= <<
 <super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_0, adaptor.create(<label>));})>
 >>
 
+matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
+
 // note there is no matchSetTrack because -> rewrites force sets to be
 // plain old blocks of alts: (A|B|...|C)
 
@@ -229,6 +231,8 @@ wildcard(label,elementIndex) ::= <<
 adaptor.addChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
 >>
+
+wildcardBang(label,elementIndex) ::= "<super.wildcard(...)>"
 
 wildcardRuleRoot(label,elementIndex) ::= <<
 <super.wildcard(...)>
