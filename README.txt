@@ -301,6 +301,10 @@ April 10, 2007
 
 * No lexer rule for a token type is now a warning.
 
+* Fixed set labels in lexer; ANTLR-60 bug
+
+* Fixed problem with duplicate state variable definitions in switch-case
+
 April 9, 2007
 
 * Gated predicates didn't work properly in cyclic DFA.
