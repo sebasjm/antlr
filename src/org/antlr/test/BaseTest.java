@@ -232,8 +232,11 @@ public abstract class BaseTest extends TestCase {
 		boolean allIsWell = true;
 		antlr(grammarFileName, grammarFileName, grammarStr, debug);
 		if ( lexerName!=null ) {
-			boolean ok = compile(parserName+".java");
-			if ( !ok ) { allIsWell = false; }
+			boolean ok;
+			if ( parserName!=null ) {
+				ok = compile(parserName+".java");
+				if ( !ok ) { allIsWell = false; }
+			}
 			ok = compile(lexerName+".java");
 			if ( !ok ) { allIsWell = false; }
 		}

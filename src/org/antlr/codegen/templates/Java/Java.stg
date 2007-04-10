@@ -597,7 +597,11 @@ charRangeRef(a,b) ::= "matchRange(<a>,<b>); <checkRuleBacktrackFailure()>"
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
+<if(LEXER)>
+int <label>= input.LA(1);<\n>
+<else>
 <label>=(<labelType>)input.LT(1);<\n>
+<endif>
 <endif>
 if ( <s> ) {
     input.consume();

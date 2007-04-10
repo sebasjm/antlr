@@ -49,4 +49,30 @@ public class TestJavaCodeGeneration extends BaseTest {
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}
+
+	public void testLabeledSetsInLexer() {
+		// c must be an int
+		String grammar =
+			"lexer grammar t;\n" +
+			"A : c=('-'|'.')\n" +
+			"  ; \n" ;
+		boolean found =
+			rawGenerateAndBuildRecognizer(
+				"t.g", grammar, null, "tLexer", false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, found);
+	}
+
+	public void testRepeatedLabelInLexer() {
+		// currently fails; not sure it's worth fixing dup x var def
+		String grammar =
+			"lexer grammar t;\n" +
+			"B : x='a' x='b' ;\n" ;
+		boolean found =
+			rawGenerateAndBuildRecognizer(
+				"t.g", grammar, null, "tLexer", false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, found);
+	}
+
 }
