@@ -792,9 +792,9 @@ rewrite_alternative
     altRoot.setLine(LT(1).getLine());
     altRoot.setColumn(LT(1).getColumn());
 }
-    :	( rewrite_template )=> rewrite_template
+    :	{grammar.buildTemplate()}? rewrite_template
 
-    |	( rewrite_element )+
+    |	{grammar.buildAST()}? ( rewrite_element )+
         {
             if ( #rewrite_alternative==null ) {
                 #rewrite_alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);

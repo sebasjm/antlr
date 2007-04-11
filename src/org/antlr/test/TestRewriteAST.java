@@ -700,7 +700,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
-			"a : x+=b x+=b -> {new Object()};\n"+
+			"a : x+=b x+=b -> {new CommonTree()};\n"+
 			"b : ID ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -723,6 +723,22 @@ public class TestRewriteAST extends BaseTest {
 				    "a", "2 a 34 de", debug);
 		assertEquals("2 34 a de\n", found);
 	}
+
+	public void testRewriteAction() throws Exception {
+		String grammar =
+			"grammar T; \n" +
+			"options { output = AST; }\n" +
+			"tokens { FLOAT; }\n" +
+			"r\n" +
+			"    : INT -> {new CommonTree(new CommonToken(FLOAT,$INT.text+\".0\"))} \n" +
+			"    ; \n" +
+			"INT : '0'..'9'+; \n" +
+			"WS: (' ' | '\\n' | '\\t')+ {$channel = HIDDEN;}; \n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "r", "25", debug);
+		assertEquals("25.0\n", found);
+	}
+
 
 	// E R R O R S
 
