@@ -173,6 +173,19 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(c (34 a))\n", found);
 	}
 
+	public void testRootThenRootInLoop() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID^ (INT '*'^ ID)+ ;\n" +
+			"ID  : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "a 34 * b 9 * c", debug);
+		assertEquals("(* (* (a 34) b 9) c)\n", found);
+	}
+
 	public void testNestedSubrule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
