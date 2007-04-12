@@ -406,6 +406,35 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("(int a b c)\n", found);
 	}
 
+	public void testTokenCopyInLoop() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : 'int' ID (',' ID)* ';' -> ^('int' ID)+ ;\n" +
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "int a,b,c;", debug);
+		assertEquals("(int a) (int b) (int c)\n", found);
+	}
+
+	public void testTokenCopyInLoopAgainstTwoOthers() throws Exception {
+		// must smear 'int' copies across as root of multiple trees
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : 'int' ID ':' INT (',' ID ':' INT)* ';' -> ^('int' ID INT)+ ;\n" +
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "int a:1,b:2,c:3;", debug);
+		assertEquals("(int a 1) (int b 2) (int c 3)\n", found);
+	}
+
 	public void testNestedTrees() throws Exception {
 		String grammar =
 			"grammar T;\n" +

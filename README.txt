@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0b6
-January 31, 2007
+ANTLR 3.0b7
+April 12, 2007
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -187,12 +187,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0b6/README.txt (this file)
-antlr-3.0b6/LICENSE.txt
-antlr-3.0b6/src/org/antlr/...
-antlr-3.0b6/lib/stringtemplate-3.0.jar (3.0b6 needs 3.0)
-antlr-3.0b6/lib/antlr-2.7.7.jar
-antlr-3.0b6/lib/antlr-3.0b6.jar
+antlr-3.0b7/README.txt (this file)
+antlr-3.0b7/LICENSE.txt
+antlr-3.0b7/src/org/antlr/...
+antlr-3.0b7/lib/stringtemplate-3.0.jar (3.0b7 needs 3.0)
+antlr-3.0b7/lib/antlr-2.7.7.jar
+antlr-3.0b7/lib/antlr-3.0b7.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -205,7 +205,7 @@ ANTLRWorks GUI)].
 
 Running ANTLR with no parameters shows you:
 
-ANTLR Parser Generator   Early Access Version 3.0b6 (Jan 31, 2007) 1989-2007
+ANTLR Parser Generator   Early Access Version 3.0b7 (Jan 31, 2007) 1989-2007
 usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
   -o outputDir          specify output directory where all output is generated
   -lib dir              specify location of token files
@@ -272,11 +272,11 @@ How do I rebuild ANTLR v3?
 
 Make sure the following two jars are in your CLASSPATH
 
-antlr-3.0b6/lib/stringtemplate-3.0.jar
-antlr-3.0b6/lib/antlr-2.7.7.jar
+antlr-3.0b7/lib/stringtemplate-3.0.jar
+antlr-3.0b7/lib/antlr-2.7.7.jar
 junit.jar [if you want to build the test directories]
 
-then jump into antlr-3.0b6/src directory and then type:
+then jump into antlr-3.0b7/src directory and then type:
 
 $ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 
@@ -296,6 +296,8 @@ C# Target Notes
 -----------------------------------------------------------------------
 
 CHANGES
+
+3.0b7 - April 12, 2007
 
 April 10, 2007
 

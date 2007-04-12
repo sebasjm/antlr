@@ -154,7 +154,8 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	/** The standard method called to automatically emit a token at the
 	 *  outermost lexical rule.  The token object should point into the
 	 *  char buffer start..stop.  If there is a text override in 'text',
-	 *  use that to set the token's text.
+	 *  use that to set the token's text.  Override this method to emit
+	 *  custom Token objects.
 	 */
 	public Token emit() {
 		Token t = new CommonToken(input, type, channel, tokenStartCharIndex, getCharIndex()-1);
