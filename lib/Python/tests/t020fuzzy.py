@@ -5,15 +5,9 @@ import difflib
 import antlr3
 from t020fuzzyLexer import t020fuzzyLexer as Lexer
 
-class TestLexer(Lexer):
-    def __init__(self, *args, **kwargs):
-        Lexer.__init__(self, *args, **kwargs)
-
-        self.output = StringIO()
-        
 inputPath = os.path.splitext(__file__)[0] + '.input'
 stream = antlr3.StringStream(open(inputPath).read())
-lexer = TestLexer(stream)
+lexer = Lexer(stream)
 
 while True:
     token = lexer.nextToken()

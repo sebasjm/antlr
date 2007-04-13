@@ -4,6 +4,14 @@ options {
     language = Python;
 }
 
+@header {
+from cStringIO import StringIO
+}
+
+@init {
+self.output = StringIO()
+}
+
 program
     :   declaration+
     ;

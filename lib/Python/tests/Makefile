@@ -6,4 +6,4 @@ test%:
 
 
 clean:
-	rm -f *~ *.pyc *Lexer.py *Parser.py *.tokens *__.g *__.gl
+	rm -f *~ *.pyc *Lexer.py *Parser.py *.tokens *__.g *__.gl *.stamp

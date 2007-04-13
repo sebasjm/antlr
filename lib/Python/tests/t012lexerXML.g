@@ -4,6 +4,19 @@ options {
   language = Python;
 }
 
+@header {
+from cStringIO import StringIO
+}
+
+@lexer::init {
+self.outbuf = StringIO()
+}
+
+@lexer::members {
+def output(self, line):
+    self.outbuf.write(line.encode('utf-8') + "\n")
+}
+
 DOCUMENT
     :  XMLDECL? WS? DOCTYPE? WS? ELEMENT WS? 
     ;

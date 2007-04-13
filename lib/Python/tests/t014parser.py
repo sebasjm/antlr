@@ -2,22 +2,10 @@ import antlr3
 from t014parserLexer import t014parserLexer as Lexer
 from t014parserParser import t014parserParser as Parser
 
-class TestParser(Parser):
-    def __init__(self, *args, **kwargs):
-        Parser.__init__(self, *args, **kwargs)
-
-        self.events = []
-        self.reportedErrors = []
-
-
-    def emitErrorMessage(self, msg):
-        self.reportedErrors.append(msg)
-
-        
 cStream = antlr3.StringStream('var foobar; gnarz(); var blupp; flupp ( ) ;')
 lexer = Lexer(cStream)
 tStream = antlr3.CommonTokenStream(lexer)
-parser = TestParser(tStream)
+parser = Parser(tStream)
 parser.document()
 
 assert len(parser.reportedErrors) == 0, parser.reportedErrors
@@ -33,7 +21,7 @@ assert parser.events == [
 cStream = antlr3.StringStream('var; foo();')
 lexer = Lexer(cStream)
 tStream = antlr3.CommonTokenStream(lexer)
-parser = TestParser(tStream)
+parser = Parser(tStream)
 
 parser.document()
 
@@ -48,7 +36,7 @@ assert parser.events == [], parser.events
 cStream = antlr3.StringStream('var foobar(); gnarz();')
 lexer = Lexer(cStream)
 tStream = antlr3.CommonTokenStream(lexer)
-parser = TestParser(tStream)
+parser = Parser(tStream)
 
 parser.document()
 
@@ -64,7 +52,7 @@ assert parser.events == [
 cStream = antlr3.StringStream('gnarz(; flupp();')
 lexer = Lexer(cStream)
 tStream = antlr3.CommonTokenStream(lexer)
-parser = TestParser(tStream)
+parser = Parser(tStream)
 
 parser.document()
 

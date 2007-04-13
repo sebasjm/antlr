@@ -1,12 +1,13 @@
 BASE=$(CURDIR)
 include $(BASE)/Makefile.common
 
+TESTS=$(subst tests/,test_,$(subst .g,,$(filter-out %__.g,$(wildcard tests/t*.g))))
 
 testantlr3:
 	$(PYTHON) testantlr3.py
 
 .PHONY: test
-test: clean testantlr3 $(subst tests/,test_,$(subst .g,,$(filter-out %__.g,$(wildcard tests/t*.g))))
+test: clean testantlr3 $(TESTS)
 
 
 # python <= 2.2 would need a custom set() class
@@ -25,10 +26,18 @@ testAllPy:
 
 test_%: tests/%.g
 	@echo -e "\n*** Test case $<:"; \
-	$(ANTLR) -o tests/ $< \
-	&& PYTHONPATH=. $(PYTHON) $(subst .g,.py,$<) \
-	&& echo "Ok"
-
+	if [ $< -nt $(subst .g,.stamp,$<) \
+             -o $(SRC)/build-stamp -nt $(subst .g,.stamp,$<) \
+             -o $(SRC)/org/antlr/codegen/templates/Python/Python.stg -nt $(subst .g,.stamp,$<) \
+             -o $(SRC)/org/antlr/codegen/templates/Python/AST.stg -nt $(subst .g,.stamp,$<) \
+             ]; then \
+	  $(ANTLR) -o tests/ $<; \
+	  touch $(subst .g,.stamp,$<); \
+	fi; \
+	PYTHONPATH=. $(PYTHON) $(subst .g,.py,$<)
+	@if [ -e $(subst .g,Lexer.py,$<) ]; then ! PYTHONPATH=$(BASE) pylint --rcfile=$(BASE)/pylintrc -e $(subst .g,Lexer.py,$<) | grep '^E'; fi
+	@if [ -e $(subst .g,Parser.py,$<) ]; then ! PYTHONPATH=$(BASE) pylint --rcfile=$(BASE)/pylintrc -e $(subst .g,Parser.py,$<) | grep '^E'; fi
+	@echo "Ok"
 
 clean:
 	$(MAKE) -C tests clean

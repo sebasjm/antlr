@@ -199,6 +199,9 @@ class <name>(antlr3.<superClass>):
 
         <actions.parser.init>
 
+        <@members>
+        <@end>
+
 
     <members>
 
@@ -300,7 +303,7 @@ if self.backtracking > 0:
  *  data aggregates required for multiple return values.
  */
 rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize) ::= <<
-<rules:{<returnScope(scope=ruleDescriptor.returnScope)>}>
+<returnScope(scope=ruleDescriptor.returnScope)>
 
 # $ANTLR start <ruleName>
 # <fileName>:<description>
@@ -326,7 +329,7 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         <actions.(actionScope).rulecatch>
 <else>
         except antlr3.RecognitionException, re:
-            self.reportError(re);
+            self.reportError(re)
             self.recover(self.input, re)
 
 <endif>
@@ -386,7 +389,7 @@ ruleLabelDefs() ::= <<
     :ruleLabelDef(label=it); separator="\n"
 >
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{3-List list_<it>=new ArrayList();}; separator="\n"
+    :{list_<it> = []}; separator="\n"
 >
 >>
 
@@ -647,8 +650,8 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <label> = self.input.LT(1)<\n>
 <endif>
 if <s>:
-    <postmatchCode>
     self.input.consume();
+    <postmatchCode>
 <if(!LEXER)>
     self.errorRecovery = False<\n>
 <endif>
@@ -664,7 +667,7 @@ else:
     self.recover(mse)<\n>
 <else>
     self.recoverFromMismatchedSet(
-        self.input, mse, FOLLOW_set_in_<ruleName><elementIndex>
+        self.input, mse, self.FOLLOW_set_in_<ruleName><elementIndex>
         )<\n>
 <endif>
     raise mse
@@ -954,6 +957,9 @@ DFA<dfa.decisionNumber>_transition = [
 <if(dfa.specialStateSTs)>
 class DFA<dfa.decisionNumber>(antlr3.DFA):
     def specialStateTransition(self_, s, input):
+        # convince pylint that my self_ magic is ok ;)
+        # pylint: disable-msg=E0213
+
         # pretend we are a member of the recognizer
         # thus semantic predicates can be evaluated
         self = self_.recognizer
@@ -1134,6 +1140,9 @@ class <returnType()>(object):
     def __init__(self):
         self.start = None
         self.stop = None
+        <if(TREE_PARSER)>
+        self.tree = None
+        <endif>
 
         <scope.attributes:{self.<it.decl> = None}; separator="\n">
         <@ruleReturnMembers()>

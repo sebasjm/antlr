@@ -7,18 +7,11 @@ import antlr3
 from t018llstarLexer import t018llstarLexer as Lexer
 from t018llstarParser import t018llstarParser as Parser
 
-class TestParser(Parser):
-    def __init__(self, *args, **kwargs):
-        Parser.__init__(self, *args, **kwargs)
-
-        self.output = StringIO()
-
-        
 inputPath = os.path.splitext(__file__)[0] + '.input'
 cStream = antlr3.StringStream(open(inputPath).read())
 lexer = Lexer(cStream)
 tStream = antlr3.CommonTokenStream(lexer)
-parser = TestParser(tStream)
+parser = Parser(tStream)
 parser.program()
 
 

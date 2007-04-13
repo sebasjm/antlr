@@ -4,6 +4,14 @@ options {
     filter=true;
 }
 
+@header {
+from cStringIO import StringIO
+}
+
+@init {
+self.output = StringIO()
+}
+
 IMPORT
 	:	'import' WS name=QIDStar WS? ';'
 	;

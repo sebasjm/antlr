@@ -49,3 +49,8 @@ build: $(SRC)/org/antlr/tool/ANTLRParser.java \
        $(SRC)/org/antlr/tool/ANTLRTreePrinter.java \
        $(SRC)/org/antlr/codegen/CodeGenTreeWalker.java
 	cd $(SRC); $(JAVAC) -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
+	touch $(SRC)/build-stamp
+
+
+lint%: %.py
+	PYTHONPATH=$(BASE) pylint --rcfile=$(BASE)/pylintrc $<

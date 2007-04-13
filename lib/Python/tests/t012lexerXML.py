@@ -7,18 +7,9 @@ import antlr3
 from t012lexerXMLLexer import t012lexerXMLLexer as Lexer
 from t012lexerXMLLexer import EOF
 
-class TestLexer(Lexer):
-    def __init__(self, *args, **kwargs):
-        Lexer.__init__(self, *args, **kwargs)
-
-        self.outbuf = StringIO()
-        
-    def output(self, line):
-        self.outbuf.write(line.encode('utf-8') + "\n")
-        
 inputPath = os.path.splitext(__file__)[0] + '.input'
 stream = antlr3.StringStream(unicode(open(inputPath).read(), 'utf-8'))
-lexer = TestLexer(stream)
+lexer = Lexer(stream)
 
 while True:
     token = lexer.nextToken()
@@ -49,7 +40,7 @@ input = """\
 """
 
 stream = antlr3.StringStream(input)
-lexer = TestLexer(stream)
+lexer = Lexer(stream)
 
 try:
     while True:
@@ -72,7 +63,7 @@ input = """\
 """
 
 stream = antlr3.StringStream(input)
-lexer = TestLexer(stream)
+lexer = Lexer(stream)
 
 try:
     while True:
@@ -95,7 +86,7 @@ input = """\
 """
 
 stream = antlr3.StringStream(input)
-lexer = TestLexer(stream)
+lexer = Lexer(stream)
 
 try:
     while True:
@@ -150,7 +141,7 @@ except antlr3.NoViableAltException, exc:
 ##     input = ''.join(input) # back to string
         
 ##     stream = antlr3.StringStream(input)
-##     lexer = TestLexer(stream)
+##     lexer = Lexer(stream)
 
 ##     try:
 ##         while True:

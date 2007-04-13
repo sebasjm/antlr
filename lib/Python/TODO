@@ -1,8 +1,11 @@
 - implement more examples
+- Fix remaining FIXMEs in (Python|AST).stg
+- complete runtime
+- restructure unittests for runtime modules
+- better test coverage for runtime modules
 - antlr features
-  - backtracking
-  - memoize
-  - ASTs
+  - tree parsers
+    - 2nd half of simplecTreeParser example
 - setup.py
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()
@@ -16,6 +19,9 @@
   - DFA: perhaps zip() the lists into a tuple 
     (eot, eof, min, max, accept, special, transition)
     for each state. checkout potential performance gain.
+  - use compressed tables like Java and decompress on import
+    -> uncompressed tables for Java.g create a 15MB JavaLexer.py and Python
+       consumed >800MB and was killed by the kernel trying to compile it 
   - raise exception for failed backtracking, get rid of 
     "if self.failed: return"
   - StringStream: look into optimizing LA(). Perhaps use LAk instead of LA(k)
@@ -26,6 +32,6 @@
     -> LA in (u'a', u'b', u'c', ...)
     or "LA in self.set_xyz" with set_xyz as a class member
   - lexer: operate on ordinals not character strings
-  - compatibility with pypy's "resticted python"
+  - make BaseTree.nil() an attribute? or singleton?
   - psycho??
 - ...

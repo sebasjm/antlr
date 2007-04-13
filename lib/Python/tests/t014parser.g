@@ -3,6 +3,17 @@ options {
   language = Python;
 }
 
+@parser::init {
+self.events = []
+self.reportedErrors = []
+}
+
+@parser::members {
+def emitErrorMessage(self, msg):
+    self.reportedErrors.append(msg)
+}
+        
+
 document:
         ( declaration
         | call

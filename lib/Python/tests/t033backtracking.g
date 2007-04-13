@@ -85,7 +85,7 @@ scope {
 @init {
   $declaration::isTypedef = False
 }
-	: 'typedef' declaration_specifiers? {$declaration::isTypedef=true;}
+	: 'typedef' declaration_specifiers? {$declaration::isTypedef = True}
 	  init_declarator_list ';' // special case, looking for typedef	
 	| declaration_specifiers init_declarator_list? ';'
 	;

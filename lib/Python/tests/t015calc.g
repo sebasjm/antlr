@@ -7,6 +7,15 @@ options {
 import math
 }
 
+@parser::init {
+self.reportedErrors = []
+}
+
+@parser::members {
+def emitErrorMessage(self, msg):
+    self.reportedErrors.append(msg)
+}
+
 evaluate returns [result]: r=expression {result = r};
 
 expression returns [result]: r=mult (
