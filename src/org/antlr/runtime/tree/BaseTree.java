@@ -105,7 +105,7 @@ public abstract class BaseTree implements Tree {
 		}
 		else { // t is not empty and might have children
 			if ( children==null ) {
-				createChildrenList(); // create children list on demand
+				children = createChildrenList(); // create children list on demand
 			}
 			children.add(t);
 		}
@@ -121,7 +121,7 @@ public abstract class BaseTree implements Tree {
 
 	public void setChild(int i, BaseTree t) {
 		if ( children==null ) {
-			createChildrenList();
+			children = createChildrenList();
 		}
 		children.set(i, t);
 	}
@@ -134,8 +134,8 @@ public abstract class BaseTree implements Tree {
 	}
 
 	/** Override in a subclass to change the impl of children list */
-	protected void createChildrenList() {
-		children = new ArrayList();
+	protected List createChildrenList() {
+		return new ArrayList();
 	}
 
 	public boolean isNil() {
@@ -156,7 +156,7 @@ public abstract class BaseTree implements Tree {
 		return newTree;
 	}
 
-    /** Print out a whole tree not just a node */
+	/** Print out a whole tree not just a node */
     public String toStringTree() {
 		if ( children==null || children.size()==0 ) {
 			return this.toString();
