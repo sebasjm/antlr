@@ -1238,7 +1238,7 @@ tokenLabelPropertyRef_tree(scope,attr) ::= "FIXME(tokenLabelPropertyRef_tree) <s
 
 ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
 ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
-ruleLabelPropertyRef_tree(scope,attr) ::= "FIXME(ruleLabelPropertyRef_tree) ((<ASTLabelType>)<scope>.tree)"
+ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 raise NotImplementedError("ruleLabelPropertyRef_text: TREE_PARSER")

@@ -9,6 +9,15 @@ tokens {
     FLOAT;
     EXPR;
     BLOCK;
+    VARIABLE;
+    FIELD;
+    CALL;
+    INDEX;
+    FIELDACCESS;
+}
+
+@init {
+self.flag = False
 }
 
 r1
@@ -134,6 +143,115 @@ r30
     : statement* -> ^(BLOCK statement?)
     ;
 
+r31
+    : modifier type ID ('=' expression)? ';'
+        -> {self.flag == 0}? ^(VARDEF ID modifier* type expression?)
+        -> {self.flag == 1}? ^(VARIABLE ID modifier* type expression?)
+        ->                   ^(FIELD ID modifier* type expression?)
+    ;
+
+r32[which]
+  : ID INT -> {which==1}? ID
+           -> {which==2}? INT
+           -> // yield nothing as else-clause
+  ;
+
+r33
+    :   modifiers! statement
+    ;
+
+r34
+    :   modifiers! r34a[$modifiers.tree]
+    //|   modifiers! r33b[$modifiers.tree]
+    ;
+
+r34a[mod]
+    :   'class' ID ('extends' sup=type)?
+        ( 'implements' i+=type (',' i+=type)*)?
+        '{' statement* '}'
+        -> ^('class' ID {$mod} ^('extends' $sup)? ^('implements' $i+)? statement* )
+    ;
+
+r35
+    : '{' 'extends' (sup=type)? '}'
+        ->  ^('extends' $sup)?
+    ;
+
+r36
+    : 'if' '(' expression ')' s1=statement
+        ( 'else' s2=statement -> ^('if' ^(EXPR expression) $s1 $s2)
+        |                     -> ^('if' ^(EXPR expression) $s1)
+        )
+    ;
+
+r37
+    : (INT -> INT) ('+' i=INT -> ^('+' $r37 $i) )* 
+    ;
+
+r38
+    : INT ('+'^ INT)*
+    ;
+
+r39
+    : (primary->primary) // set return tree to just primary
+        ( '(' arg=expression ')'
+            -> ^(CALL $r39 $arg)
+        | '[' ie=expression ']'
+            -> ^(INDEX $r39 $ie)
+        | '.' p=primary
+            -> ^(FIELDACCESS $r39 $p)
+        )*
+    ;
+
+r40
+    : (INT -> INT) ( ('+' i+=INT)* -> ^('+' $r40 $i*) ) ';'
+    ;
+
+r41
+    : (INT -> INT) ( ('+' i=INT) -> ^($i $r41) )* ';'
+    ;
+
+r42
+    : ids+=ID (','! ids+=ID)*
+    ;
+
+r43 returns [res]
+    : ids+=ID! (','! ids+=ID!)* {$res = [id.text for id in $ids]}
+    ;
+
+r44
+    : ids+=ID^ (','! ids+=ID^)*
+    ;
+
+r45
+    : primary^
+    ;
+
+r46 returns [res]
+    : ids+=primary! (','! ids+=primary!)* {$res = [id.start.text for id in $ids]}
+    ;
+
+r47
+    : ids+=primary (','! ids+=primary)*
+    ;
+
+r48
+    : ids+=. (','! ids+=.)*
+    ;
+
+r49
+    : .^ ID
+    ;
+
+r50
+    : ID 
+        -> ^({antlr3.tree.CommonTree(antlr3.CommonToken(type=FLOAT, text="1.0"))} ID)
+    ;
+
+primary
+    : ID
+    ;
+
 expression
     : r1
     ;
@@ -141,6 +259,15 @@ expression
 statement
     : 'fooze'
     | 'fooze2'
+    ;
+
+modifiers
+    : modifier+
+    ;
+
+modifier
+    : 'public'
+    | 'private'
     ;
 
 type

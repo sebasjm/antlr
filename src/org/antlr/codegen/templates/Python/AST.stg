@@ -78,7 +78,7 @@ root_0 = None<\n>
 ruleLabelDefs() ::= <<
 <super.ruleLabelDefs()>
 <ruleDescriptor.tokenLabels:{<it.label.text>_tree = None}; separator="\n">
-<ruleDescriptor.tokenListLabels:{FIXME(17)<it.label.text>_tree = None}; separator="\n">
+<ruleDescriptor.tokenListLabels:{<it.label.text>_tree = None}; separator="\n">
 >>
 
 ruleCleanUp() ::= <<
@@ -112,23 +112,13 @@ tokenRef(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 
 <label>_tree = self.adaptor.create(<label>)
-self.adaptor.addChild(root_0, <label>_tree)
+self.adaptor.addChild(root_0, <label>_tree)<\n>
 >>
 
 /** ID! and output=AST (same as plain tokenRef) */
 tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
 /** ID^ and output=AST */
-tokenRefRoot(token,label,elementIndex) ::= <<
-FIXME(26)
-<super.tokenRef(...)>
-<finishedBacktracking({
-FIXME(27)
-<label>_tree = self.adaptor.create(<label>)
-root_<blockLevel> = self.adaptor.becomeRoot(<label>_tree, root_<blockLevel>)})>
->>
-
-/** ID^^ and output=AST */
 tokenRefRuleRoot(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 <finishedBacktracking({
@@ -138,28 +128,18 @@ root_0 = self.adaptor.becomeRoot(<label>_tree, root_0)})>
 
 /** ids+=ID! and output=AST */
 tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
-FIXME(30)
 <tokenRefBang(...)>
 <listLabel(...)>
 >>
 
 /** label+=TOKEN when output=AST but not rewrite alt */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
-FIXME(31)
 <tokenRef(...)>
 <listLabel(...)>
 >>
 
 /** Match label+=TOKEN^ when output=AST but not rewrite alt */
-tokenRefRootAndListLabel(token,label,elementIndex) ::= <<
-FIXME(32)
-<tokenRefRoot(...)>
-<listLabel(...)>
->>
-
-/** Match label+=TOKEN^^ when output=AST but not rewrite alt */
 tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
-FIXME(33)
 <tokenRefRuleRoot(...)>
 <listLabel(...)>
 >>
@@ -174,7 +154,6 @@ tokenRefTrack(token,label,elementIndex) ::= <<
  *  to the tracking list list_ID for use in the rewrite.
  */
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
-FIXME(35)
 <tokenRefTrack(...)>
 <listLabel(...)>
 >>
@@ -215,20 +194,12 @@ ruleRef(rule,label,elementIndex,args) ::= <<
 >>
 
 /** rule! is same as normal rule ref */
-ruleRefBang(rule,label,elementIndex,args) ::= "FIXME(43)<super.ruleRef(...)>"
+ruleRefBang(rule,label,elementIndex,args) ::= "<super.ruleRef(...)>"
 
 /** rule^ */
-ruleRefRoot(rule,label,elementIndex,args) ::= <<
-FIXME(44)
-<super.ruleRef(...)>
-<finishedBacktracking({FIXME(45)root_<blockLevel> = self.adaptor.becomeRoot(<label>.tree, root_<blockLevel>)})>
->>
-
-/** rule^^ */
 ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
-FIXME(49)
 <super.ruleRef(...)>
-<finishedBacktracking({FIXME(48)root_0 = self.adaptor.becomeRoot(<label>.tree, root_0)})>
+<finishedBacktracking({root_0 = self.adaptor.becomeRoot(<label>.tree, root_0)})>
 >>
 
 /** rule when output=AST and tracking for rewrite */
@@ -245,28 +216,17 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args) ::= <<
 
 /** x+=rule when output=AST */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
-FIXME(51)
 <ruleRef(...)>
 <listLabel(...)>
 >>
 
 /** x+=rule! when output=AST is a rule ref with list addition */
 ruleRefBangAndListLabel(rule,label,elementIndex,args) ::= <<
-FIXME(52)
 <ruleRefBang(...)>
 <listLabel(...)>
 >>
 
 /** x+=rule^ */
-ruleRefRootAndListLabel(rule,label,elementIndex,args) ::= <<
-FIXME(53)
-<super.ruleRef(...)>
-FIXME(54)
-root_<blockLevel> = self.adaptor.becomeRoot(<label>.tree, root_<blockLevel>);<\n>
-<listLabel(...)>
->>
-
-/** x+=rule^^ */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRefRuleRoot(...)>
 <listLabel(...)>
@@ -274,30 +234,17 @@ ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
 
 // WILDCARD AST
 wildcard(label,elementIndex) ::= <<
-FIXME(55)
 <super.wildcard(...)>
 <finishedBacktracking({
-FIXME(56)
 <label>_tree = self.adaptor.create(<label>)
 self.adaptor.addChild(root_0, <label>_tree)})>
 >>
 
 wildcardBang(label,elementIndex) ::= "<super.wildcard(...)>"
 
-wildcardRoot(label,elementIndex) ::= <<
-FIXME(57)
-<super.wildcard(...)>
-<finishedBacktracking({
-FIXME(58)
-<label>_tree = self.adaptor.create(<label>);
-root_<blockLevel> = self.adaptor.becomeRoot(<label>_tree, root_<blockLevel>)})>
->>
-
 wildcardRuleRoot(label,elementIndex) ::= <<
-FIXME(59)
 <super.wildcard(...)>
 <finishedBacktracking({
-FIXME(60)
 <label>_tree = self.adaptor.create(<label>)
 root_0 = self.adaptor.becomeRoot(<label>_tree, root_0)})>
 >>
@@ -321,7 +268,9 @@ rewriteCode(
 i_0 = 0
 <prevRuleRootRef()>.tree = root_0
 root_0 = self.adaptor.nil()
-<alts:rewriteAlt(); anchor, separator="FIXME(63)else ">})>
+<first(alts):rewriteAltFirst(); anchor>
+
+<rest(alts):{a | el<rewriteAltRest(a)>}; anchor, separator="\n\n">})>
 >>
 
 rewriteOptionalBlock(
@@ -420,19 +369,31 @@ FIXME(76)if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n
 <else> <! there were some list labels !>
 <! Now, gen checks to ensure non-list labels match cardinality of lists !>
 <[referencedTokenLabels,referencedRuleLabels]:{label|
-FIXME(78)if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n_<rewriteBlockLevel>==0) ) raise RuntimeException("rewrite element <label> list differs in size from other elements");
+if (<label> is None and n_<rewriteBlockLevel> \> 0) or (<label> is not None and n_<rewriteBlockLevel> == 0):
+    raise RuntimeError("rewrite element <label> list differs in size from other elements")
 }>
 <endif>
 >>
 
-rewriteAlt(a) ::= <<
-# <a.description>
+rewriteAltRest(a) ::= <<
 <if(a.pred)>
-FIXME(80)
 if <a.pred>:
-    FIXME(81)
+    # <a.description>
     <a.alt>
 <else>
+se: <! little hack to get if .. elif .. else block right !>
+    # <a.description>
+    <a.alt>
+<endif>
+>>
+
+rewriteAltFirst(a) ::= <<
+<if(a.pred)>
+if <a.pred>:
+    # <a.description>
+    <a.alt>
+<else>
+# <a.description>
 <a.alt>
 <endif>
 >>
@@ -445,7 +406,7 @@ rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
 root_<treeLevel> = self.adaptor.nil()
 <root:rewriteElement()>
 <children:rewriteElement()>
-self.adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>)
+self.adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>)<\n>
 >>
 
 rewriteElementList(elements) ::= "<elements:rewriteElement()>"
@@ -462,19 +423,16 @@ self.adaptor.addChild(root_<treeLevel>, list_<token>[i_<rewriteBlockLevel>])<\n>
 
 /** Gen $label ... where defined via label=ID */
 rewriteTokenLabelRef(label,elementIndex) ::= <<
-FIXME(88)
 self.adaptor.addChild(root_<treeLevel>, <label>)<\n>
 >>
 
 /** Gen $label ... where defined via label+=ID */
 rewriteTokenListLabelRef(label,elementIndex) ::= <<
-FIXME(89)
 self.adaptor.addChild(root_<treeLevel>, list_<label>[i_<rewriteBlockLevel>])<\n>
 >>
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-FIXME(90)
 root_<treeLevel> = self.adaptor.becomeRoot(<label>, root_<treeLevel>);<\n>
 >>
 
@@ -527,7 +485,6 @@ self.adaptor.addChild(root_<treeLevel>, <action>)<\n>
 >>
 
 rewriteNodeActionRoot(action) ::= <<
-FIXME(105)
 root_<treeLevel> = self.adaptor.becomeRoot(<action>, root_<treeLevel>)<\n>
 >>
 
