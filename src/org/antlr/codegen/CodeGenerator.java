@@ -34,10 +34,7 @@ import org.antlr.Tool;
 import org.antlr.analysis.*;
 import org.antlr.misc.BitSet;
 import org.antlr.misc.*;
-import org.antlr.stringtemplate.CommonGroupLoader;
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.stringtemplate.StringTemplateGroupLoader;
+import org.antlr.stringtemplate.*;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.tool.*;
 
@@ -1121,14 +1118,15 @@ public class CodeGenerator {
 	}
 
 	public void write(StringTemplate code, String fileName) throws IOException {
-		Writer w = tool.getOutputFile(grammar, fileName);
 		long start = System.currentTimeMillis();
-		String output = code.toString(lineWidth);
-		//String output = code.toString();
+		Writer w = tool.getOutputFile(grammar, fileName);
+		// Write the output to a StringWriter
+		StringTemplateWriter wr = templates.getStringTemplateWriter(w);
+		wr.setLineWidth(lineWidth);
+		code.write(wr);
+		w.close();
 		long stop = System.currentTimeMillis();
 		//System.out.println("render time for "+fileName+": "+(int)(stop-start)+"ms");
-		w.write(output);
-		w.close();
 	}
 
 	/** You can generate a switch rather than if-then-else for a DFA state
