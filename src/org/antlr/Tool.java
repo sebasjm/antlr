@@ -450,7 +450,9 @@ public class Tool {
 		if ( outputDirectory==null ) {
 			return new StringWriter();
 		}
-		File outputDir = getOutputDirectory(fileName);
+		// output directory is a function of where the grammar file lives
+		// for subdir/T.g, you get subdir here.  Well, depends on -o etc...
+		File outputDir = getOutputDirectory(g.getFileName());
 		File outputFile = new File(outputDir, fileName);
 
 		if( !outputDir.exists() ) {
@@ -460,9 +462,9 @@ public class Tool {
 		return new BufferedWriter(fw);
     }
 
-	public File getOutputDirectory(String fileName) {
+	public File getOutputDirectory(String fileNameWithPath) {
 		File outputDir = new File(outputDirectory);
-		String fileDirectory = getFileDirectory(fileName);
+		String fileDirectory = getFileDirectory(fileNameWithPath);
 		if ( outputDirectory!=UNINITIALIZED_DIR ) {
 			// -o /tmp /var/lib/t.g => /tmp/T.java
 			// -o subdir/output /usr/lib/t.g => subdir/output/T.java
