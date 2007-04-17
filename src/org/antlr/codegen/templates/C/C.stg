@@ -1308,7 +1308,7 @@ ruleInitializations() ::= <<
 <if(memoize)>
 <ruleDescriptor.name>_StartIndex = theInput()->index(theInput());
 <endif>
-<ruleDescriptor.useScopes:{<scopeTop(sname=it.name)> = <scopePush(sname=it.name)>;}; separator="\n">
+<ruleDescriptor.useScopes:{<scopeTop(sname=it)> = <scopePush(sname=it)>;}; separator="\n">
 <ruleDescriptor.ruleScope:{<scopeTop(sname=it.name)> = <scopePush(sname=it.name)>;}; separator="\n">
 >>
 
