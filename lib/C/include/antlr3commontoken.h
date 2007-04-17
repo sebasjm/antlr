@@ -46,6 +46,11 @@
  */
 #define	ANTLR3_TOKEN_DEFAULT_CHANNEL	0
 
+/** Reserved channel number for a HIDDEN token - a token that
+ *  is hidden from the parser.
+ */
+#define	HIDDEN				99
+
 /** The definition of an ANTLR3 common token structure, which all implementations
  * of a token stream should provide, installing any firther structures in the
  * custom pointer elment of this structure.
