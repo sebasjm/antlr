@@ -1343,6 +1343,13 @@ ruleLabelInitializations() ::= <<
 <[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
     :{list_<it>=ctx->vectors->newVector(ctx->vectors);}; separator="\n"
 >
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<if(!TREE_PARSER)>
+<if(!ruleDescriptor.isSynPred)>
+retval.start = LT(1);<\n>
+<endif>
+<endif>
+<endif>
 >>
 
 ruleReturnValue() ::= <<
@@ -2620,9 +2627,9 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>.tree)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-strStream->toString(strStream->getTokenStartIndex(<scope>.start), strStream->getTokenStopIndex(<scope>.start))
+strStream->toStringSS(strStream, strStream->getTokenStartIndex(<scope>.start), strStream->getTokenStopIndex(<scope>.start))
 <else>
-strStream->toString(<scope>.start,<scope>.stop)
+strStream->toStringTT(strStream, <scope>.start, <scope>.stop)
 <endif>
 >>
 
@@ -2644,9 +2651,9 @@ rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval).stop"
 rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval).tree"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-strStream->toString(strStream->getTokenStartIndex(retval.start), strStream->getTokenStopIndex(retval.start))
+strStream->toStringSS(strStream, strStream->getTokenStartIndex(retval.start), strStream->getTokenStopIndex(retval.start))
 <else>
-strStream->toString(retval.start,LT(-1))
+strStream->toStringTT(strStream, retval.start, LT(-1))
 <endif>
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.st"
