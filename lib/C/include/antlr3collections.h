@@ -143,7 +143,7 @@ typedef	struct	ANTLR3_STACK_struct
      */
     void *	    top;
     void	    (*free)	(struct ANTLR3_STACK_struct * stack);
-    void 	    (*pop)	(struct ANTLR3_STACK_struct * stack);
+    void *	    (*pop)	(struct ANTLR3_STACK_struct * stack);
     void *	    (*get)	(struct ANTLR3_STACK_struct * stack, ANTLR3_UINT64 key);
     ANTLR3_BOOLEAN  (*push)	(struct ANTLR3_STACK_struct * stack, void * element, void (*freeptr)(void *));
     ANTLR3_UINT64   (*size)	(struct ANTLR3_STACK_struct * stack);

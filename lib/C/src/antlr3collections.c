@@ -34,7 +34,7 @@ static ANTLR3_UINT64	antlr3ListSize	(pANTLR3_LIST list);
 /* Interface functions for Stack
  */
 static void		antlr3StackFree	(pANTLR3_STACK  stack);
-static void		antlr3StackPop	(pANTLR3_STACK	stack);
+static void *		antlr3StackPop	(pANTLR3_STACK	stack);
 static void *		antlr3StackGet	(pANTLR3_STACK	stack, ANTLR3_UINT64 key);
 static ANTLR3_BOOLEAN	antlr3StackPush	(pANTLR3_STACK	stack, void * element, void (*freeptr)(void *));
 static ANTLR3_UINT64	antlr3StackSize	(pANTLR3_STACK	stack);
@@ -752,11 +752,12 @@ antlr3StackFree	(pANTLR3_STACK  stack)
     ANTLR3_FREE(stack);
 }
 
-static void
+static void *
 antlr3StackPop	(pANTLR3_STACK	stack)
 {
    stack->list->del(stack->list, stack->list->table->count);
    stack->top = stack->list->get(stack->list, stack->list->table->count);
+   return stack->top;
 }
 
 static void *

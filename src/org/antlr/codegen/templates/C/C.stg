@@ -138,7 +138,7 @@ outputFile( LEXER,
 <endif>
 
 
-/* Work arounds because ruleScopeRef() does not have access to <name>
+/* Aids in accessing scopes for grammar programmers
  */
 #undef	SCOPE_TYPE
 #undef	SCOPE_STACK
@@ -146,6 +146,8 @@ outputFile( LEXER,
 #define	SCOPE_TYPE(scope)   p<name>_##scope##_SCOPE
 #define SCOPE_STACK(scope)  p<name>_##scope##Stack
 #define	SCOPE_TOP(scope)    ctx->p<name>_##scope##Top
+#define	SCOPE_SIZE(scope)			(ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope)))
+#define SCOPE_INSTANCE(scope, i)	(ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope),i))
 
 /* MACROS that hide the C interface implementations from the
  * generated code, which makes it a little more understandable to the human eye.
@@ -367,7 +369,6 @@ outputFile( LEXER,
 <endif>}>
 
 <recognizer.scopes:{<if(it.isDynamicGlobalScope)>
-<ruleAttributeScopeDef(scope=it)>
 <globalAttributeScopeFuncDecl(scope=it)>
 <globalAttributeScopeFuncs(scope=it)>
 <endif>}>
@@ -493,8 +494,10 @@ has the callable functions (rules) shown below,
 <rules:{r |<headerReturnScope(ruleDescriptor=r.ruleDescriptor,...)>}>
 
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDecl(scope=it)><endif>}>
+<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeFuncMacro(scope=it)><endif>}>
 <rules:{r |<ruleAttributeScopeDecl(scope=r.ruleDescriptor.ruleScope)>}>
 <rules:{r |<ruleAttributeScopeFuncMacro(scope=r.ruleDescriptor.ruleScope)>}>
+
 
 /** Context tracking structure for <mainName()>
  */
@@ -1763,7 +1766,7 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  and a return value or values.
  */
 ruleRef(rule,label,elementIndex,args) ::= <<
-followPush(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+_fsp++; followPush(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
 <label>=<rule>(ctx<if(args)>, <args; separator=", "><endif>);<\n>
 <else>
@@ -1773,7 +1776,7 @@ if  (hasException())
 {
     goto rule<ruleDescriptor.name>Ex;
 }
-_fsp--;
+_fsp--; followPop();
 <checkRuleBacktrackFailure()>
 >>
 
@@ -2246,7 +2249,7 @@ globalAttributeScopeFuncMacro(scope) ::= <<
  */
 /** Macro for popping the top value from a <scopeStack(sname=scope.name)>
  */
-#define <scopePopName(sname=scope.name,...)>()  ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name,...)>)
+#define <scopePopName(sname=scope.name,...)>()  SCOPE_TOP(<scope.name>) = ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name,...)>)
 
 <endif>
 >>
@@ -2285,8 +2288,8 @@ globalAttributeScopeDef(scope) ::=
 pANTLR3_STACK <scopeStack(sname=scope.name)>;
 /** Pointer to the top of the stack for the global scope <scopeStack(sname=scope.name)>
  */
+<scopeType(sname=scope.name,...)>    (*<scopePushName(sname=scope.name,...)>)(struct <name>_Ctx_struct * ctx);
 <scopeType(sname=scope.name,...)>    <scopeTopDecl(sname=scope.name,...)>;
-<scopeType(sname=scope.name,...)>    <scopePushName(sname=scope.name,...)>(struct <name>_Ctx_struct * ctx);
 
 <endif>
 >>
@@ -2568,7 +2571,7 @@ SCOPE_TOP(<scope>)-><attr.name>=<expr>;
  *  to stack itself not top of stack.  This is useful for predicates
  *  like {$function.size()>0 && $function::name.equals("foo")}?
  */
-isolatedDynamicScopeRef(scope) ::= "<scope>_stack"
+isolatedDynamicScopeRef(scope) ::= "ctx->SCOPE_STACK(<scope>)"
 
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
