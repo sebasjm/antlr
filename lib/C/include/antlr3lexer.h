@@ -49,7 +49,7 @@ typedef	struct ANTLR3_LEXER_struct
     void	* super;
 
     /** A generated lexer has an mTokens() function, which needs
-     *  the context pointer of the generated lexr, not the base lexer interface
+     *  the context pointer of the generated lexer, not the base lexer interface
      *  this is stored here and initialized by the generated code (or manually
      *  if this is a manually built lexer.
      */

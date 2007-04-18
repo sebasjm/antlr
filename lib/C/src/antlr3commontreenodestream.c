@@ -28,7 +28,7 @@ static	void			    walkBackToMostRecentNodeWithUnvisitedChildren
 /* TREE NODE STREAM API */
 static	pANTLR3_BASE_TREE_ADAPTOR   getTreeAdaptor		(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_BASE_TREE	    getTreeSource		(pANTLR3_TREE_NODE_STREAM tns);
-static	pANTLR3_BASE_TREE	    LT				(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_UINT64 k);
+static	pANTLR3_BASE_TREE	    _LT				(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_UINT64 k);
 static	void			    setUniqueNavigationNodes	(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_BOOLEAN uniqueNavigationNodes);
 static	pANTLR3_STRING		    toString			(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_STRING		    toStringSS			(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop);
@@ -37,7 +37,7 @@ static	void			    toStringWork		(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE
 /* INT STREAM API */
 static	void			    consume			(pANTLR3_INT_STREAM is);
 static	ANTLR3_INT64		    tindex			(pANTLR3_INT_STREAM is);
-static	ANTLR3_UINT32		    LA				(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
+static	ANTLR3_UINT32		    _LA				(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
 static	ANTLR3_UINT64		    mark			(pANTLR3_INT_STREAM is);
 static	void			    release			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
 static	void			    rewindMark			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
@@ -166,7 +166,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
      */
     stream->tnstream->getTreeAdaptor		=  getTreeAdaptor;
     stream->tnstream->getTreeSource		=  getTreeSource;
-    stream->tnstream->LT			=  LT;
+    stream->tnstream->_LT			=  _LT;
     stream->tnstream->setUniqueNavigationNodes	=  setUniqueNavigationNodes;
     stream->tnstream->toString			=  toString;
     stream->tnstream->toStringSS		=  toStringSS;
@@ -176,7 +176,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
      */
     stream->tnstream->istream->consume	    =  consume;
     stream->tnstream->istream->index	    =  tindex;
-    stream->tnstream->istream->LA	    =  LA;
+    stream->tnstream->istream->_LA	    =  _LA;
     stream->tnstream->istream->mark	    =  mark;
     stream->tnstream->istream->release	    =  release;
     stream->tnstream->istream->rewind	    =  rewindMark;
@@ -262,12 +262,12 @@ reset	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
  *  Return null for LT(0) and any index that results in an absolute address
  *  that is negative.
  *
- *  This is analogus to the LT() method of the TokenStream, but this
+ *  This is analogus to the _LT() method of the TokenStream, but this
  *  returns a tree node instead of a token.  Makes code gen identical
  *  for both parser and tree grammars. :)
  */
 static	pANTLR3_BASE_TREE	    
-LT	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_UINT64 k)
+_LT	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_UINT64 k)
 {
     if	(k == -1)
     {
@@ -387,7 +387,7 @@ consume	(pANTLR3_INT_STREAM is)
 }
 
 static	ANTLR3_UINT32	    
-LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
+_LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 {
     pANTLR3_TREE_NODE_STREAM		tns;
     pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
@@ -398,7 +398,7 @@ LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 
     /* Ask LT for the 'token' at that position
      */
-    t = tns->LT(tns, i);
+    t = tns->_LT(tns, i);
 
     if	(t == NULL)
     {

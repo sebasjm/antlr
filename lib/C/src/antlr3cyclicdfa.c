@@ -74,7 +74,7 @@ antlr3dfapredict (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is
 
 	/* Look for a normal transition stae based upon the input token element
 	 */
-	c = is->LA(is, 1);
+	c = is->_LA(is, 1);
 
 	/* Check against min and max for this state
 	 */

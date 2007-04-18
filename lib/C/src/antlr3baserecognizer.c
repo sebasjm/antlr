@@ -207,7 +207,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
     {
     case    ANTLR3_CHARSTREAM:
 
-	ex->c			= is->LA		    		(is, 1);    /* Current input character			*/
+	ex->c			= is->_LA		    	(is, 1);    /* Current input character			*/
 	ex->line		= ins->getLine			(ins);	    /* Line number comes from stream		*/
 	ex->charPositionInLine	= ins->getCharPositionInLine	(ins);	    /* Line offset also comes from the stream   */
 	ex->index		= is->index			(is);
@@ -217,7 +217,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 
     case    ANTLR3_TOKENSTREAM:
 
-	ex->token		= cts->tstream->LT						(cts->tstream, 1);	    /* Current input token			    */
+	ex->token		= cts->tstream->_LT						(cts->tstream, 1);	    /* Current input token			    */
 	ex->line		= ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine			(ex->token);
 	ex->charPositionInLine	= ((pANTLR3_COMMON_TOKEN)(ex->token))->getCharPositionInLine	(ex->token);
 	ex->index		= cts->tstream->istream->index					(cts->tstream->istream);
@@ -227,7 +227,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 
     case    ANTLR3_COMMONTREENODE:
 
-	ex->token		= tns->LT						    (tns, 1);	    /* Current input tree node			    */
+	ex->token		= tns->_LT						    (tns, 1);	    /* Current input tree node			    */
 	ex->line		= ((pANTLR3_BASE_TREE)(ex->token))->getLine		    (ex->token);
 	ex->charPositionInLine	= ((pANTLR3_BASE_TREE)(ex->token))->getCharPositionInLine   (ex->token);
 	ex->index		= tns->istream->index					    (tns->istream);
@@ -250,7 +250,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
  *  insertion or deletion if possible.  You can override to not recover
  *  here and bail out of the current production to the normal error
  *  exception catch (at the end of the method) by just throwing
- *  MismatchedTokenException upon input.LA(1)!=ttype.
+ *  MismatchedTokenException upon input._LA(1)!=ttype.
  */
 static ANTLR3_BOOLEAN
 match(	pANTLR3_BASE_RECOGNIZER recognizer,
@@ -286,7 +286,7 @@ match(	pANTLR3_BASE_RECOGNIZER recognizer,
 	break;
     }
 
-    if	(is->LA(is, 1) == ttype)
+    if	(is->_LA(is, 1) == ttype)
     {
 	/* The token was the one we were told to expect
 	 */
@@ -864,7 +864,7 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
      * from the stream by consuming it, then consume this next one along too as
      * if nothing had happened.
      */
-    if	( is->LA(is, 2) == ttype)
+    if	( is->_LA(is, 2) == ttype)
     {
 	/* Print out the error
 	 */
@@ -1028,7 +1028,7 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
      * is consistent, then we can "insert" that token by not throwing
      * an exception and assumimng that we saw it. 
      */
-    if	( follow->isMember(follow, is->LA(is, 1)) == ANTLR3_TRUE)
+    if	( follow->isMember(follow, is->_LA(is, 1)) == ANTLR3_TRUE)
     {
 	/* report the error, but don't cause any rules to abort and stuff
 	 */
@@ -1082,14 +1082,14 @@ consumeUntil	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 tokenType)
 
     /* What do have at the moment?
      */
-    ttype	= is->LA(is, 1);
+    ttype	= is->_LA(is, 1);
 
     /* Start eating tokens until we get to the one we want.
      */
     while   (ttype != ANTLR3_TOKEN_EOF && ttype != tokenType)
     {
 	is->consume(is);
-	ttype	= is->LA(is, 1);
+	ttype	= is->_LA(is, 1);
     }
 }
 
@@ -1132,14 +1132,14 @@ consumeUntilSet			    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET set)
 
     /* What do have at the moment?
      */
-    ttype	= is->LA(is, 1);
+    ttype	= is->_LA(is, 1);
 
     /* Start eating tokens until we get to one we want.
      */
     while   (ttype != ANTLR3_TOKEN_EOF && set->isMember(set, ttype) == ANTLR3_FALSE)
     {
 	is->consume(is);
-	ttype	= is->LA(is, 1);
+	ttype	= is->_LA(is, 1);
     }
 }
 

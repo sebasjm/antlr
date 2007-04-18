@@ -72,7 +72,7 @@ antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
     /* Intstream API
      */
     input->istream->consume	    =  antlr3AsciiConsume;	    /* Consume the next 8 bit character in the buffer			    */
-    input->istream->LA		    =  antlr3AsciiLA;		    /* Return the UTF32 chracter at offset n (1 based)			    */
+    input->istream->_LA		    =  antlr3AsciiLA;		    /* Return the UTF32 chracter at offset n (1 based)			    */
     input->istream->index	    =  antlr3AsciiIndex;	    /* Current index (offset from first character			    */
     input->istream->mark	    =  antlr3AsciiMark;		    /* Record the current lex state for later restore			    */
     input->istream->rewind	    =  antlr3AsciiRewind;	    /* How to rewind the input						    */
@@ -85,7 +85,7 @@ antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
     input->close		    =  antlr3InputClose;		    /* Close down the stream completely					    */
     input->reset		    =  antlr3InputReset;		    /* Reset input to start						    */
     input->getSourceName	    =  antlr3InputFileName;	    /* Return the source description (filename here)			    */
-    input->LT			    =  antlr3AsciiLT;		    /* Same as LA for 8 bit Ascii file					    */
+    input->_LT			    =  antlr3AsciiLT;		    /* Same as _LA for 8 bit Ascii file					    */
     input->size			    =  antlr3AsciiSize;		    /* Return the size of the input buffer				    */
     input->substr		    =  antlr3AsciiSubstr;	    /* Return a string from the input stream				    */
     input->getLine		    =  antlr3AsciiGetLine;	    /* Return the current line number in the input stream		    */
@@ -257,15 +257,11 @@ static void *
 antlr3AsciiLT(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 lt)
 {
     /* Casting is horrible but it means no warnings and LT should never be called
-     * on a character stream anyway I think. If it is then, teh void * will need to be 
+     * on a character stream anyway I think. If it is then, the void * will need to be 
      * cast back in a similar manner. Yuck! But this means that LT for Token streams and
-     * tree streams is correct. We do not supply the istream pointer itself to the LA
-     * function as we don't know who is implementing it, we pass the me pointer - this
-     * is true of all calls to interface APIs - if we are referring to ourselves we can
-     * use the pointer we were given in the function call, if calling an API we are holding
-     * an implementation pointer for, then we pass its 'super'.
+     * tree streams is correct.
      */
-    return (ANTLR3_FUNC_PTR(input->istream->LA(input->istream, lt)));
+    return (ANTLR3_FUNC_PTR(input->istream->_LA(input->istream, lt)));
 }
 
 /** \brief Calculate the current index in the output stream.

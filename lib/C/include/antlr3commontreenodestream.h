@@ -32,7 +32,7 @@ typedef	struct ANTLR3_TREE_NODE_STREAM_struct
      */
     pANTLR3_INT_STREAM	    istream;
 
-    pANTLR3_BASE_TREE	    (*LT)			(struct ANTLR3_TREE_NODE_STREAM_struct * tns, ANTLR3_UINT64 k);
+    pANTLR3_BASE_TREE	    (*_LT)			(struct ANTLR3_TREE_NODE_STREAM_struct * tns, ANTLR3_UINT64 k);
 
     pANTLR3_BASE_TREE	    (*getTreeSource)		(struct ANTLR3_TREE_NODE_STREAM_struct * tns);
 

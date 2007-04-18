@@ -148,7 +148,7 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
      */
     for	(;;)
     {
-	if  (lexer->input->istream->LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
+	if  (lexer->input->istream->_LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
 	{
 	    /* Reached the end of the stream, nothing more to do.
 	     */
@@ -373,7 +373,7 @@ matchs(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string)
 {
     while   (*string != ANTLR3_STRING_TERMINATOR)
     {
-	if  (lexer->input->istream->LA(lexer->input->istream, 1) != (*string))
+	if  (lexer->input->istream->_LA(lexer->input->istream, 1) != (*string))
 	{
 	    if	(lexer->rec->backtracking > 0)
 	    {
@@ -414,7 +414,7 @@ matchs(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string)
 static ANTLR3_BOOLEAN
 matchc(pANTLR3_LEXER lexer, ANTLR3_UCHAR c)
 {
-    if	(lexer->input->istream->LA(lexer->input->istream, 1) == c)
+    if	(lexer->input->istream->_LA(lexer->input->istream, 1) == c)
     {
 	/* Matched correctly, do consume it
 	 */
@@ -458,7 +458,7 @@ matchRange(pANTLR3_LEXER lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high)
 
     /* What is in the stream at the moment?
      */
-    c	= lexer->input->istream->LA(lexer->input->istream, 1);
+    c	= lexer->input->istream->_LA(lexer->input->istream, 1);
     if	( c >= low && c <= high)
     {
 	/* Matched correctly, consume it

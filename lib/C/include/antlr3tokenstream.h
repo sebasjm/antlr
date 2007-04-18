@@ -64,7 +64,7 @@ typedef	struct ANTLR3_TOKEN_STREAM_struct
      *  Return null for LT(0) and any index that results in an absolute address
      *  that is negative.
      */
-    pANTLR3_COMMON_TOKEN    (*LT)		(struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_INT64 k);
+    pANTLR3_COMMON_TOKEN    (*_LT)		(struct ANTLR3_TOKEN_STREAM_struct * tokenStream, ANTLR3_INT64 k);
 
     /** Get a token at an absolute index i; 0..n-1.  This is really only
      *  needed for profiling and debugging and token stream rewriting.

@@ -107,10 +107,10 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
     void		(*reset)	(struct	ANTLR3_INPUT_STREAM_struct * input);
 
     /** Pointer to function to return input stream element at 1 based
-     *  offset from nextChar. Same as LA for char stream, but token
+     *  offset from nextChar. Same as _LA for char stream, but token
      *  streams etc. have one of these that does other stuff of course.
      */
-    void *		(*LT)		(struct	ANTLR3_INPUT_STREAM_struct * input, ANTLR3_INT64 lt);
+    void *		(*_LT)		(struct	ANTLR3_INPUT_STREAM_struct * input, ANTLR3_INT64 lt);
 
     /** Pointer to function to return the total size of the input buffer. For streams
      *  this may be just the total we have available so far. This means of course that

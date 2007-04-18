@@ -82,7 +82,7 @@ typedef	struct ANTLR3_INT_STREAM_struct
 
     /** Get ANTLR3_UINT32 at current input pointer + i ahead where i=1 is next ANTLR3_UINT32 
      */
-    ANTLR3_UINT32	    (*LA)	    (struct ANTLR3_INT_STREAM_struct * intStream, ANTLR3_INT64 i);
+    ANTLR3_UINT32	    (*_LA)	    (struct ANTLR3_INT_STREAM_struct * intStream, ANTLR3_INT64 i);
 
     /** Tell the stream to start buffering if it hasn't already.  Return
      *  current input position, index(), or some other marker so that

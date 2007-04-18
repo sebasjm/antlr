@@ -28,7 +28,7 @@ static pANTLR3_STRING	    toStringTT		(pANTLR3_TOKEN_STREAM ts, pANTLR3_COMMON_T
 
 /* INT STREAM API */
 static void		    consume		(pANTLR3_INT_STREAM is);
-static ANTLR3_UINT32	    LA			(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
+static ANTLR3_UINT32	    _LA			(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
 static ANTLR3_UINT64	    mark		(pANTLR3_INT_STREAM is);
 static void		    release		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
 static ANTLR3_UINT64	    size		(pANTLR3_INT_STREAM is);
@@ -194,7 +194,7 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
 
     /* Install the token stream API
      */
-    stream->tstream->LT			=  tokLT;
+    stream->tstream->_LT		=  tokLT;
     stream->tstream->get		=  get;
     stream->tstream->getTokenSource	=  getTokenSource;
     stream->tstream->setTokenSource	=  setTokenSource;
@@ -204,7 +204,7 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
 
     /* Install INT_STREAM interface
      */
-    stream->tstream->istream->LA	=  LA;
+    stream->tstream->istream->_LA	=  _LA;
     stream->tstream->istream->mark	=  mark;
     stream->tstream->istream->release	=  release;
     stream->tstream->istream->size	=  size;
@@ -582,14 +582,14 @@ getTokensType	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANT
 }
 
 static ANTLR3_UINT32	    
-LA  (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
+_LA  (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 {
     pANTLR3_TOKEN_STREAM    ts;
     pANTLR3_COMMON_TOKEN    tok;
 
     ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
 
-    tok	    = ts->LT(ts, i);
+    tok	    = ts->_LT(ts, i);
 
     if	(tok != NULL)
     {

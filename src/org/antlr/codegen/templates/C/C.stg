@@ -127,7 +127,7 @@ outputFile( LEXER,
 <docComment>
 
 <if(literals)>
-/** String literals used by <name> that we must do things like matchs() with.
+/** String literals used by <name> that we must do things like MATCHS() with.
  *  C will normally just lay down 8 bit characters, and you can use L"xxx" to
  *  get wchar_t, but wchar_t is 16 bits on Windows, which is not UTF32 and so
  *  we perform this little trick of defining the literals as arrays of UINT32
@@ -163,192 +163,201 @@ outputFile( LEXER,
  */
 <if(LEXER)>
  
-/* Macros for access things in a lexer
+/* Macros for accessing things in a lexer
  */
-#undef	    lexr
-#undef	    rec		    
-#undef	    ruleMemo		    
-#undef	    getCharIndex
-#undef	    getLine
-#undef	    getCharPositionInLine
-#undef	    emit
-#undef	    emitNew
-#undef	    matchc
-#undef	    matchs
-#undef	    matchRange
-#undef	    ltoken
-#undef	    hasFailed
-#undef	    failedFlag
-#undef	    theInput
-#undef	    strStream
+#undef	    LEXER
+#undef	    RECOGNIZER		    
+#undef	    RULEMEMO		    
+#undef	    GETCHARINDEX
+#undef	    GETLINE
+#undef	    GETCHARPOSITIONINLINE
+#undef	    EMIT
+#undef	    EMITNEW
+#undef	    MATCHC
+#undef	    MATCHS
+#undef	    MATCHRANGE
+#undef	    LTOKEN
+#undef	    HASFAILED
+#undef	    FAILEDFLAG
+#undef	    INPUT
+#undef	    STRSTREAM
 #undef	    LA
-#undef	    hasException
-#undef	    theException
-#undef	    exConstruct
-#undef	    inputConsume
-#undef	    lrecover
-#undef	    markMyWords
-#undef	    rewindInput
-#undef	    rewindLast
-#undef	    backtracking
+#undef	    HASEXCEPTION
+#undef	    EXCEPTION
+#undef	    CONSTRUCTEX
+#undef	    CONSUME
+#undef	    LRECOVER
+#undef	    MARK
+#undef	    REWIND
+#undef	    REWINDLAST
+#undef	    BACKTRACKING
+#undef		MATCHANY
+#undef		MEMOIZE
+#undef		HAVEPARSEDRULE
+#undef		GETTEXT
 
-#define	    lexr		    ctx->pLexer
-#define	    rec			    lexr->rec
-#define	    ruleMemo		    rec->ruleMemo
-#define	    getCharIndex()	    lexr->getCharIndex(lexr)
-#define	    getLine()		    lexr->getLine(lexr)
-#define	    getCharPositionInLine() lexr->getCharPositionInLine(lexr)
-#define	    emit(t)		    lexr->emit(lexr, t)
-#define	    emitNew(t,l,cp,ch,s,i)  lexr->emitNew(lexr, t, l, cp, ch, s, i)
-#define	    matchc(c)		    lexr->matchc(lexr, c)
-#define	    matchs(s)		    lexr->matchs(lexr, s)
-#define	    matchRange(c1,c2)	    lexr->matchRange(lexr, c1, c2)
-#define	    matchAny()		    lexr->matchAny(lexr)
-#define	    ltoken()		    lexr->token
-#define	    hasFailed()		    (rec->failed == ANTLR3_TRUE)
-#define	    backtracking	    rec->backtracking
-#define	    failedFlag		    rec->failed
-#define	    theInput()		    lexr->input
-#define	    strStream		    theInput()
-#define	    LA(n)		    theInput()->istream->LA(lexr->input->istream, n)
-#define	    EOF_TOKEN		    theInput()->istream->eofToken
-#define	    hasException()	    (rec->error == ANTLR3_TRUE)
-#define	    theException()	    rec->exception
-#define	    exConstruct()	    rec->exConstruct(rec)
-#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream)
-#define	    lrecover()		    lexr->recover(lexr)
-#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream)
-#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream, m)
-#define	    rewindLast()	    theInput()->istream->rewindLast(theInput()->istream)
+#define	    LEXER					ctx->pLexer
+#define	    RECOGNIZER			    LEXER->rec
+#define	    RULEMEMO				RECOGNIZER->ruleMemo
+#define	    GETCHARINDEX()			LEXER->getCharIndex(LEXER)
+#define	    GETLINE()				LEXER->getLine(LEXER)
+#define	    GETTEXT()				LEXER->getText(LEXER)
+#define	    GETCHARPOSITIONINLINE() LEXER->getCharPositionInLine(LEXER)
+#define	    EMIT(t)					LEXER->emit(LEXER, t)
+#define	    EMITNEW(t,l,cp,ch,s,i)  LEXER->emitNew(LEXER, t, l, cp, ch, s, i)
+#define	    MATCHC(c)				LEXER->matchc(LEXER, c)
+#define	    MATCHS(s)				LEXER->matchs(LEXER, s)
+#define	    MATCHRANGE(c1,c2)	    LEXER->matchRange(LEXER, c1, c2)
+#define	    MATCHANY()				LEXER->matchAny(LEXER)
+#define	    LTOKEN()				LEXER->token
+#define	    HASFAILED()				(RECOGNIZER->failed == ANTLR3_TRUE)
+#define	    BACKTRACKING			RECOGNIZER->backtracking
+#define	    FAILEDFLAG				RECOGNIZER->failed
+#define	    INPUT()					LEXER->input
+#define	    STRSTREAM				INPUT()
+#define	    LA(n)					INPUT()->istream->_LA(INPUT()->istream, n)
+#define	    EOF_TOKEN				INPUT()->istream->eofToken
+#define	    HASEXCEPTION()			(RECOGNIZER->error == ANTLR3_TRUE)
+#define	    EXCEPTION()				RECOGNIZER->exception
+#define	    CONSTRUCTEX()			RECOGNIZER->exConstruct(RECOGNIZER)
+#define	    CONSUME()				INPUT()->istream->consume(INPUT()->istream)
+#define	    LRECOVER()				LEXER->recover(LEXER)
+#define	    MARK()					INPUT()->istream->mark(INPUT()->istream)
+#define	    REWIND(m)				INPUT()->istream->rewind(INPUT()->istream, m)
+#define	    REWINDLAST()			INPUT()->istream->REWINDLAST(INPUT()->istream)
+#define		MEMOIZE(ri,si)			RECOGNIZER->memoize(RECOGNIZER, ri, si)
+#define		HAVEPARSEDRULE(r)		RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 <endif>
 
 <if(PARSER)>
 /* Macros for accessing things in the parser
  */
  
-#undef	    prsr		    
-#undef	    rec		    
-#undef	    haveAlreadyParsedRule
-#undef	    theInput
-#undef	    strStream
-#undef	    hasException
-#undef	    theException
-#undef	    tmatch
-#undef	    tmatchAny
-#undef	    followStk
-#undef	    followPush
-#undef	    followPop
-#undef	    precover
-#undef	    preportError
+#undef	    PARSER		    
+#undef	    RECOGNIZER		    
+#undef	    HAVEPARSEDRULE
+#undef		MEMOIZE
+#undef	    INPUT
+#undef	    STRSTREAM
+#undef	    HASEXCEPTION
+#undef	    EXCEPTION
+#undef	    MATCHT
+#undef	    MATCHANYT
+#undef	    FOLLOWSTACK
+#undef	    FOLLOWPUSH
+#undef	    FOLLOWPOP
+#undef	    PRECOVER
+#undef	    PREPORTERROR
 #undef	    LA
 #undef	    LT
-#undef	    exConstruct
-#undef	    inputConsume
-#undef	    markMyWords
-#undef	    rewindInput
-#undef	    rewindLast
-#undef	    perrorRecovery
-#undef	    hasFailed
-#undef	    failedFlag
-#undef	    precoverFromMismatchedSet
-#undef	    precoverFromMismatchedElement
+#undef	    CONSTRUCTEX
+#undef	    CONSUME
+#undef	    MARK
+#undef	    REWIND
+#undef	    REWINDLAST
+#undef	    PERRORRECOVERY
+#undef	    HASFAILED
+#undef	    FAILEDFLAG
+#undef	    RECOVERFROMMISMATCHEDSET
+#undef	    RECOVERFROMMISMATCHEDELEMENT
 
-#define	    prsr		    ctx->pParser  
-#define	    rec			    prsr->rec
-#define	    haveAlreadyParsedRule(r) rec->alreadyParsedRule(rec, r)
-#define	    theInput()		    prsr->tstream
-#define	    strStream		    theInput()
-#define	    hasException()	    (rec->error == ANTLR3_TRUE)
-#define	    theException()	    rec->exception
-#define	    tmatch(t, fs)	    rec->match(rec, t, fs)
-#define	    tmatchAny()		    rec->matchAny(rec)
-#define	    followStk()		    rec->following
-#define	    followPush(x)	    followStk()->push(followStk(), ((void *)(x)), NULL)
-#define	    followPop()		    followStk()->pop(followStk())
-#define	    precover()		    rec->recover(rec)
-#define	    preportError()	    rec->reportError(rec)
-#define	    LA(n)		    theInput()->istream->LA(theInput()->istream, n)
-#define	    LT(n)		    theInput()->LT(theInput(), n)
-#define	    exConstruct()	    rec->exConstruct(rec)
-#define	    inputConsume()	    theInput()->istream->consume(theInput()->istream)
-#define	    markMyWords()	    theInput()->istream->mark(theInput()->istream)
-#define	    rewindInput(m)	    theInput()->istream->rewind(theInput()->istream, m)
-#define	    rewindLast()	    theInput()->istream->rewindLast(theInput()->istream)
-#define	    perrorRecovery()	    rec->errorRecovery
-#define	    _fsp		    rec->_fsp
-#define	    failedFlag		    rec->failed
-#define	    hasFailed()		    (failedFlag == ANTLR3_TRUE)
-#define	    backtracking	    rec->backtracking
-#define	    precoverFromMismatchedSet(s)	rec->recoverFromMismatchedSet(rec, s)
-#define	    precoverFromMismatchedElement(e)	rec->recoverFromMismatchedElement(rec, s)
+#define	    PARSER							ctx->pParser  
+#define	    RECOGNIZER						PARSER->rec
+#define	    HAVEPARSEDRULE(r)				RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
+#define		MEMOIZE(ri,si)					RECOGNIZER->memoize(RECOGNIZER, ri, si)
+#define	    INPUT()							PARSER->tstream
+#define	    STRSTREAM						INPUT()
+#define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
+#define	    EXCEPTION()						RECOGNIZER->exception
+#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
+#define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
+#define	    FOLLOWSTACK()					RECOGNIZER->following
+#define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(x)), NULL)
+#define	    FOLLOWPOP()						FOLLOWSTACK()->pop(FOLLOWSTACK())
+#define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
+#define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
+#define	    LA(n)							INPUT()->istream->_LA(INPUT()->istream, n)
+#define	    LT(n)							INPUT()->_LT(INPUT(), n)
+#define	    CONSTRUCTEX()					RECOGNIZER->exConstruct(RECOGNIZER)
+#define	    CONSUME()						INPUT()->istream->consume(INPUT()->istream)
+#define	    MARK()							INPUT()->istream->mark(INPUT()->istream)
+#define	    REWIND(m)						INPUT()->istream->rewind(INPUT()->istream, m)
+#define	    REWINDLAST()					INPUT()->istream->REWINDLAST(INPUT()->istream)
+#define	    PERRORRECOVERY					RECOGNIZER->errorRecovery
+#define	    _fsp							RECOGNIZER->_fsp
+#define	    FAILEDFLAG						RECOGNIZER->failed
+#define	    HASFAILED()						(FAILEDFLAG == ANTLR3_TRUE)
+#define	    BACKTRACKING					RECOGNIZER->backtracking
+#define	    RECOVERFROMMISMATCHEDSET(s)		RECOGNIZER->recoverFromMismatchedSet(RECOGNIZER, s)
+#define	    RECOVERFROMMISMATCHEDELEMENT(e)	RECOGNIZER->recoverFromMismatchedElement(RECOGNIZER, s)
 <endif>
 
 <if(TREE_PARSER)>
 /* Macros for accessing things in the parser
  */
  
-#undef	    prsr
-#undef	    rec		    
-#undef	    haveAlreadyParsedRule
-#undef	    theInput
-#undef	    strStream
-#undef	    hasException
-#undef	    theException
-#undef	    tmatch
-#undef	    tmatchAny
-#undef	    followStk
-#undef	    followPush
-#undef	    followPop
-#undef	    precover
-#undef	    preportError
+#undef	    PARSER
+#undef	    RECOGNIZER		    
+#undef	    HAVEPARSEDRULE
+#undef	    INPUT
+#undef	    STRSTREAM
+#undef	    HASEXCEPTION
+#undef	    EXCEPTION
+#undef	    MATCHT
+#undef	    MATCHANYT
+#undef	    FOLLOWSTACK
+#undef	    FOLLOWPUSH
+#undef	    FOLLOWPOP
+#undef	    PRECOVER
+#undef	    PREPORTERROR
 #undef	    LA
 #undef	    LT
-#undef	    exConstruct
-#undef	    inputConsume
-#undef	    markMyWords
-#undef	    rewindInput
-#undef	    rewindLast
-#undef	    perrorRecovery
-#undef	    hasFailed
-#undef	    failedFlag
-#undef	    precoverFromMismatchedSet
-#undef	    precoverFromMismatchedElement
-#undef	    backtracking
+#undef	    CONSTRUCTEX
+#undef	    CONSUME
+#undef	    MARK
+#undef	    REWIND
+#undef	    REWINDLAST
+#undef	    PERRORRECOVERY
+#undef	    HASFAILED
+#undef	    FAILEDFLAG
+#undef	    RECOVERFROMMISMATCHEDSET
+#undef	    RECOVERFROMMISMATCHEDELEMENT
+#undef	    BACKTRACKING
 
-#define	    prsr		    ctx->pTreeParser  
-#define	    rec			    prsr->rec
-#define	    haveAlreadyParsedRule(r) rec->alreadyParsedRule(rec, r)
-#define	    theInput()		    prsr->ctnstream
-#define	    strStream		    theInput()->tnstream
-#define	    hasException()	    (rec->error == ANTLR3_TRUE)
-#define	    theException()	    rec->exception
-#define	    tmatch(t, fs)	    rec->match(rec, t, fs)
-#define	    tmatchAny()		    rec->matchAny(rec)
-#define	    followStk()		    rec->following
-#define	    followPush(x)	    followStk()->push(followStk(), ((void *)(x)), NULL)
-#define	    followPop()		    followStk()->pop(followStk())
-#define	    precover()		    rec->recover(rec)
-#define	    preportError()	    rec->reportError(rec)
-#define	    LA(n)		    theInput()->tnstream->istream->LA(theInput()->tnstream->istream, n)
-#define	    LT(n)		    theInput()->tnstream->LT(theInput()->tnstream, n)
-#define	    exConstruct()	    rec->exConstruct(rec)
-#define	    inputConsume()	    theInput()->tnstream->istream->consume(theInput()->tnstream->istream)
-#define	    markMyWords()	    theInput()->tnstream->istream->mark(theInput()->tnstream->istream)
-#define	    rewindInput(m)	    theInput()->tnstream->istream->rewind(theInput()->tnstream->istream, m)
-#define	    rewindLast(m)	    theInput()->tnstream->istream->rewindLast(theInput()->tnstream->istream)
-#define	    perrorRecovery()	    rec->errorRecovery
-#define	    _fsp		    rec->_fsp
-#define	    failedFlag		    rec->failed
-#define	    hasFailed()		    (failedFlag == ANTLR3_TRUE)
-#define	    backtracking	    rec->backtracking
-#define	    precoverFromMismatchedSet(s)	rec->recoverFromMismatchedSet(rec, s)
-#define	    precoverFromMismatchedElement(e)	rec->recoverFromMismatchedElement(rec, s)
+#define	    PARSER							ctx->pTreeParser  
+#define	    RECOGNIZER						PARSER->rec
+#define	    HAVEPARSEDRULE(r)				RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
+#define	    INPUT()							PARSER->ctnstream
+#define	    STRSTREAM						INPUT()->tnstream
+#define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
+#define	    EXCEPTION()						RECOGNIZER->exception
+#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
+#define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
+#define	    FOLLOWSTACK()					RECOGNIZER->following
+#define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(x)), NULL)
+#define	    FOLLOWPOP()						FOLLOWSTACK()->pop(FOLLOWSTACK())
+#define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
+#define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
+#define	    LA(n)							INPUT()->tnstream->istream->_LA(INPUT()->tnstream->istream, n)
+#define	    LT(n)							INPUT()->tnstream->_LT(INPUT()->tnstream, n)
+#define	    CONSTRUCTEX()					RECOGNIZER->exConstruct(RECOGNIZER)
+#define	    CONSUME()						INPUT()->tnstream->istream->consume(INPUT()->tnstream->istream)
+#define	    MARK()							INPUT()->tnstream->istream->mark(INPUT()->tnstream->istream)
+#define	    REWIND(m)						INPUT()->tnstream->istream->rewind(INPUT()->tnstream->istream, m)
+#define	    REWINDLAST(m)					INPUT()->tnstream->istream->REWINDLAST(INPUT()->tnstream->istream)
+#define	    PERRORRECOVERY					RECOGNIZER->errorRecovery
+#define	    _fsp							RECOGNIZER->_fsp
+#define	    FAILEDFLAG						RECOGNIZER->failed
+#define	    HASFAILED()						(FAILEDFLAG == ANTLR3_TRUE)
+#define	    BACKTRACKING					RECOGNIZER->backtracking
+#define	    RECOVERFROMMISMATCHEDSET(s)		RECOGNIZER->recoverFromMismatchedSet(RECOGNIZER, s)
+#define	    RECOVERFROMMISMATCHEDELEMENT(e)	RECOGNIZER->recoverFromMismatchedElement(RECOGNIZER, s)
 <endif>
 
 
 /* The 4 tokens defined below may well clash with your own #defines or token types. If so
  * then for the present you must use different names for your defines as these are hard coded
- * in the code generator. It woudl be better not to use such names internally, and maybe
+ * in the code generator. It would be better not to use such names internally, and maybe
  * we can change this in a forthcoming release. I deliberately do not #undef these
  * here as this will at least give you a redefined error somewhere if they clash.
  */
@@ -448,7 +457,7 @@ has the callable functions (rules) shown below,
 <endif>
  * The entry points for <name> are  as follows:
  *
- * <rules: {r |  - <headerReturnType(ruleDescriptor=r.ruleDescriptor,...)>      p<name>-><r.ruleDescriptor.name>(p<name>)}; separator="\n * ">
+ * <rules: {r | <if(!r.ruleDescriptor.isSynPred)> - <headerReturnType(ruleDescriptor=r.ruleDescriptor,...)>      p<name>-><r.ruleDescriptor.name>(p<name>)<endif>}; separator="\n * ">
  *
  * The return type for any particular rule is of course determined by the source
  * grammar file.
@@ -523,7 +532,7 @@ typedef struct <name>_Ctx_struct
 <endif>}>
 
 <if(LEXER)>
-    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*m<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+    <rules:{r | <if(!r.ruleDescriptor.isSynPred)><headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*m<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);<endif>}; separator="\n";>
 <endif>
 <if(PARSER)>
     <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> (*<r.ruleDescriptor.name>)	(struct <name>_Ctx_struct * ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
@@ -624,15 +633,33 @@ lexer(  grammar,
         filterMode) ::= <<
 
 <if(filterMode)>
-/* Forward declare implementation function for ANTLR3_TOKEN_SOURCE interface.
+/* Forward declare implementation function for ANTLR3_TOKEN_SOURCE interface when
+ * this is a fliter mode lexer.
  */
-static pANTLR3_COMMON_TOKEN <name>NextToken   (pANTLR3_LEXER          lexerContext);
+static pANTLR3_COMMON_TOKEN <name>NextToken   (pANTLR3_TOKEN_SOURCE toksource);
+
+/* Override the normal MEMOIZE and HAVEALREADYPARSED macros as this is a filtering
+ * lexer. In filter mode, the memoizing and backtracking are gated at BACKTRACKING > 1 rather
+ * than just BACKTRACKING. IN some cases this might generate code akin to:
+ *   if (BACKTRACKING) if (BACKTRACKING > 1) memoize.
+ * However, I assume that the C compilers/optimizers are smart enough to work this one out
+ * these days - Jim
+ */
+#undef		MEMOIZE
+#define		MEMOIZE(ri,si)			if (BACKTRACKING>1) { RECOGNIZER->memoize(RECOGNIZER, ri, si) }
+#undef		HAVEPARSEDRULE
+#define		HAVEPARSEDRULE(r)		if (BACKTRACKING>1) { RECOGNIZER->alreadyParsedRule(RECOGNIZER, r) }
 <endif>
 
-/* Forward declare the locally static matching functions we have generated.
+/* Forward declare the locally static matching functions we have generated and any predicate functions.
  */
-<rules:{r | static <headerReturnType(ruleDescriptor=r.ruleDescriptor)>	m<r.ruleDescriptor.name>    (p<name> ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+<rules:{r | static <headerReturnType(ruleDescriptor=r.ruleDescriptor)>	<if(!r.ruleDescriptor.isSynPred)>m<endif><r.ruleDescriptor.name>    (p<name> ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
 static void	<name>Free(p<name> ctx);
+
+/* =========================================================================
+ * Lexer matching rules end.
+ * =========================================================================
+ */
 
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 
@@ -642,9 +669,9 @@ static void
 <name>Free  (p<name> ctx)
 {
 <if(memoize)>
-    ruleMemo->free(ruleMemo);
+    RULEMEMO->free(RULEMEMO);
 <endif>
-    lexr->free(lexr);
+    LEXER->free(LEXER);
     
     ANTLR3_FREE(ctx);
 }
@@ -714,7 +741,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 
     /* Install the implementation of our <name> interface
      */
-    <rules:{r | lexCtx->m<r.ruleDescriptor.name>	= m<r.ruleDescriptor.name>;}; separator="\n";>
+    <rules:{r | <if(!r.ruleDescriptor.isSynPred)>lexCtx->m<r.ruleDescriptor.name>	= m<r.ruleDescriptor.name>;<endif>}; separator="\n";>
     
     /** When the nextToken() call is made to this lexer's pANTLR3_TOKEN_SOURCE
      *  it will call mTokens() in this generated code, and will pass it the ctx
@@ -732,7 +759,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 <if(filterMode)>
     /* We have filter mode turned on, so install the filtering nextToken function
      */
-    lexCtx->lexer->tokSource->nextToken = <name>NextToken;
+    lexCtx->pLexer->tokSource->nextToken = <name>NextToken;
 <endif>
 
     /* Return the newly built lexer to the caller
@@ -779,22 +806,27 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 
 >>
 
-/** An override of the lexer's nextToken() method that backtracks over mTokens() looking
- *  for matches.  No error can be generated upon error; just rewind, consume
- *  a token and then try again.  backtracking needs to be set as well.
- *  Make rule memoization happen only at levels above 1 as we start mTokens
- *  at backtracking==1.
- */
+
 filteringNextToken() ::= <<
+/** An override of the lexer's nextToken() method that backtracks over mTokens() looking
+ *  for matches in lexer filterMode.  No error can be generated upon error; just rewind, consume
+ *  a token and then try again.  BACKTRACKING needs to be set as well.
+ *  Make rule memoization happen only at levels above 1 as we start mTokens
+ *  at BACKTRACKING==1.
+ */
 static pANTLR3_COMMON_TOKEN 
-<name>nextToken(p<name> ctx) 
+<name>NextToken(pANTLR3_TOKEN_SOURCE toksource) 
 {
+    pANTLR3_LEXER   lexer;
+
+    lexer   = (pANTLR3_LEXER)(toksource->super);
+    
     /* Get rid of any previous token (token factory takes care of
      * any deallocation when this token is finally used up.
      */
-    lexr->token		    = NULL;
-    lexr->rec->error	    = ANTLR3_FALSE;	    /* Start out without an exception	*/
-    lexr->rec->failed	    = ANTLR3_FALSE;
+    lexer		->token	    = NULL;
+    lexer->rec	->error	    = ANTLR3_FALSE;	    /* Start out without an exception	*/
+    lexer->rec	->failed    = ANTLR3_FALSE;
 
     /* Record the start of the token in our input stream.
      */
@@ -804,63 +836,51 @@ static pANTLR3_COMMON_TOKEN
      */
     for	(;;)
     {
-	if  (lexr->input->istream->LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
-	{
-	    /* Reached the end of the stream, nothing more to do.
-	     */
-	    pANTLR3_COMMON_TOKEN    teof = lexer->input->istream->eofToken;
+		if  (lexer->input->istream->_LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
+		{
+			/* Reached the end of the stream, nothing more to do.
+			 */
+			pANTLR3_COMMON_TOKEN    teof = lexer->input->istream->eofToken;
 
-	    teof->setStartIndex (teof, lexr->getCharIndex(lexr));
-	    teof->setStopIndex  (teof, lexr->getCharIndex(lexr));
-	    teof->setLine	(teof, lexr->getLine(lexr));
-	    return  teof;
-	}
-	
-	ltoken()			= NULL;
-	lexr->rec->error		= ANTLR3_FALSE;	    /* Start out without an exception	*/
-	
-	{
-	    ANTLR3_UINT64   m;
-	    
-	    m			= markMyWords();
-	    backtracking	= 1;
-	    failedFlag		= ANTLR3_FALSE;
-	 
-	    /* Call the generated lexer, see if it can get a new token together.
-	     */
-    	    lexer->mTokens(lexer->ctx);   
-    	    backtracking	= 0;
-    	    
-    	    <! mTokens backtracks with synpred at backtracking==2
-               and we set the synpredgate to allow actions at level 1. !>
-               
-            if	(hasFailed())
-            {
-		rewindInput(m);
-		inputConsume(); <! advance one char and try again !>
-	    }
-	    else
-	    {
-		return	ltoken();
-	    }	
-	}
+			teof->setStartIndex (teof, lexer->getCharIndex(lexer));
+			teof->setStopIndex  (teof, lexer->getCharIndex(lexer));
+			teof->setLine		(teof, lexer->getLine(lexer));
+			return  teof;
+		}
+		
+		lexer->token		= NULL;
+		lexer->rec->error	= ANTLR3_FALSE;	    /* Start out without an exception	*/
+		
+		{
+			ANTLR3_UINT64   m;
+		    
+			m							= lexer->input->istream->mark(lexer->input->istream);
+			lexer->rec->backtracking	= 1;
+			lexer->rec->failed			= ANTLR3_FALSE;
+		 
+			/* Call the generated lexer, see if it can get a new token together.
+			 */
+			lexer->mTokens(lexer->ctx);   
+    		lexer->rec->backtracking	= 0;
+	    	    
+    		<! mTokens backtracks with synpred at BACKTRACKING==2
+				and we set the synpredgate to allow actions at level 1. !>
+	               
+			if	(lexer->rec->failed == ANTLR3_TRUE)
+			{
+				lexer->input->istream->rewind(lexer->input->istream, m);
+				lexer->input->istream->consume(lexer->input->istream); <! advance one char and try again !>
+			}
+			else
+			{
+				return	lexer->token;
+			}	
+		}
     }
-}
-
-public void memoize(IntStream input,
-		int ruleIndex,
-		int ruleStartIndex)
-{
-if ( backtracking>1 ) super.memoize(input, ruleIndex, ruleStartIndex);
-}
-
-public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
-if ( backtracking>1 ) return super.alreadyParsedRule(input, ruleIndex);
-return false;
 }
 >>
 
-filteringActionGate() ::= "backtracking==1"
+filteringActionGate() ::= "BACKTRACKING==1"
 
 /** How to generate a parser */
 genericParser(  grammar,
@@ -991,7 +1011,7 @@ ANTLR3_API p<name>
 	
     /* Install the token table
      */
-    rec->tokenNames   = <name>TokenNames;
+    RECOGNIZER->tokenNames   = <name>TokenNames;
     
     /* Initialize the follow bit sets
      */
@@ -1158,9 +1178,9 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:parameterScope(scope=it)>) 
 {   
 <if(trace)>
-    printf("enter <ruleName> %d failed = %d, backtracking = %d\\n",input.LT(1),failed,backtracking);
+    printf("enter <ruleName> %d failed = %d, backtracking = %d\\n",input.LT(1),failed,BACKTRACKING);
     <block>
-    printf("exit <ruleName> %d, failed = %d, backtracking = %d\\n",input.LT(1),failed,backtracking);
+    printf("exit <ruleName> %d, failed = %d, backtracking = %d\\n",input.LT(1),failed,BACKTRACKING);
     
 <else>
     <block>
@@ -1176,15 +1196,15 @@ static ANTLR3_BOOLEAN <predname>(p<name> ctx)
     ANTLR3_UINT64   start;
     ANTLR3_BOOLEAN  success;
 
-    backtracking++;
+    BACKTRACKING++;
     <@start()>
-    start	= markMyWords();
+    start	= MARK();
     <predname>_fragment(ctx);	    // can never throw exception
-    success	= !(failedFlag);
-    rewindInput(start);
+    success	= !(FAILEDFLAG);
+    REWIND(start);
     <@stop()>
-    backtracking--;
-    failedFlag	= ANTLR3_FALSE;
+    BACKTRACKING--;
+    FAILEDFLAG	= ANTLR3_FALSE;
     return success;
 }<\n>
 >>
@@ -1195,7 +1215,7 @@ lexerSynpred(predname) ::= <<
 
 ruleMemoization(name) ::= <<
 <if(memoize)>
-if ( backtracking>0 && haveAlreadyParsedRule(<ruleDescriptor.index>) )
+if ( BACKTRACKING>0 && HAVEPARSEDRULE(<ruleDescriptor.index>) )
 {
     return <ruleReturnValue()>; 
 }
@@ -1205,7 +1225,7 @@ if ( backtracking>0 && haveAlreadyParsedRule(<ruleDescriptor.index>) )
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
 <if(backtracking)>
-if (hasFailed())
+if (HASFAILED())
 {
     return <ruleReturnValue()>;
 }
@@ -1215,9 +1235,9 @@ if (hasFailed())
 /** This rule has failed, exit indicating failure during backtrack */
 ruleBacktrackFailure() ::= <<
 <if(backtracking)>
-if (backtracking>0)
+if (BACKTRACKING>0)
 {
-    failedFlag = <true()>; 
+    FAILEDFLAG = <true()>; 
     return <ruleReturnValue()>;
 }
 <endif>
@@ -1234,7 +1254,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 static <returnType()>
 <ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 {   
-    <if(trace)>printf("enter <ruleName> %s failed=%d, backtracking=%d\n", LT(1), backtracking);<endif>
+    <if(trace)>printf("enter <ruleName> %s failed=%d, backtracking=%d\n", LT(1), BACKTRACKING);<endif>
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
@@ -1249,7 +1269,7 @@ static <returnType()>
     
     <ruleCleanUp()>
 <if(exceptions)>
-    if	(hasException())
+    if	(HASEXCEPTION())
     {
 	<exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
     }
@@ -1262,10 +1282,10 @@ static <returnType()>
 <if(actions.(actionScope).rulecatch)>
     <actions.(actionScope).rulecatch>
 <else>
-    if (hasException())
+    if (HASEXCEPTION())
     {
-        preportError();
-        precover();
+        PREPORTERROR();
+        PRECOVER();
     }
     else
     {
@@ -1274,7 +1294,7 @@ static <returnType()>
 <endif>
 <endif>
 <endif>
-    <if(trace)>System.out.println("exit <ruleName> "+LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
+    <if(trace)>System.out.println("exit <ruleName> "+LT(1)+" failed="+failed+" backtracking="+BACKTRACKING);<endif>
     <memoize()>
     <finally>
     <@postamble()>
@@ -1286,7 +1306,7 @@ static <returnType()>
 catch(decl,action) ::= <<
 /* catch(decl,action)
  */
-if  (hasException() && theException()->type == <e.decl> )
+if  (HASEXCEPTION() && EXCEPTION()->type == <e.decl> )
 {
     <e.action>
 }
@@ -1309,7 +1329,7 @@ ruleInitializations() ::= <<
 /* Initialize rule variables
  */
 <if(memoize)>
-<ruleDescriptor.name>_StartIndex = theInput()->index(theInput());
+<ruleDescriptor.name>_StartIndex = INPUT()->index(INPUT());
 <endif>
 <ruleDescriptor.useScopes:{<scopeTop(sname=it)> = <scopePush(sname=it)>;}; separator="\n">
 <ruleDescriptor.ruleScope:{<scopeTop(sname=it.name)> = <scopePush(sname=it.name)>;}; separator="\n">
@@ -1367,7 +1387,7 @@ retval
 memoize() ::= <<
 <if(memoize)>
 <if(backtracking)>
-if ( backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
+if ( BACKTRACKING>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
 <endif>
 <endif>
 >>
@@ -1410,7 +1430,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
-    <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+    <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+GETLINE()+":"+GETCHARPOSITIONINLINE()+" failed="+failed+" backtracking="+BACKTRACKING);<endif>
 
 <if(nakedBlock)>
     <ruleInitializations()>
@@ -1432,10 +1452,10 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <ruleLabelInitializations()>
     ctx->pLexer->ruleNestingLevel++;
     _type	    = <ruleName>;
-    _start	    = getCharIndex();
+    _start	    = GETCHARINDEX();
     _end	    = 0;
-    _line	    = getLine();
-    _charPosition   = getCharPositionInLine();
+    _line	    = GETLINE();
+    _charPosition   = GETCHARPOSITIONINLINE();
     _channel	    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
         
     <ruleDescriptor.actions.init>
@@ -1444,15 +1464,15 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <block>
     <! create token if none exists *and* we are an outermost token rule !>
     <execAction({     
-    if ( ltoken() == NULL && !hasException() && ctx->pLexer->ruleNestingLevel==1) 
+    if ( LTOKEN() == NULL && !HASEXCEPTION() && ctx->pLexer->ruleNestingLevel==1) 
     {
-		emitNew(_type,_line,_charPosition,_channel,_start, (_end==0 ? getCharIndex()-1 : _end));
+		EMITNEW(_type,_line,_charPosition,_channel,_start, (_end==0 ? GETCHARINDEX()-1 : _end));
     }<\n>
     }
     )>
 <endif>
     ctx->pLexer->ruleNestingLevel--;
-    <if(trace)> // Convert to C Jim!!! System.out.println("exit <ruleName> '"+(char)LA(1)+"' line="+getLine()+":"+getCharPositionInLine()+" failed="+failed+" backtracking="+backtracking);<endif>
+    <if(trace)> // Convert to C Jim!!! System.out.println("exit <ruleName> '"+(char)LA(1)+"' line="+GETLINE()+":"+GETCHARPOSITIONINLINE()+" failed="+failed+" backtracking="+BACKTRACKING);<endif>
     <ruleCleanUp()>
     <(ruleDescriptor.actions.after):execAction()>
     <memoize>
@@ -1573,9 +1593,9 @@ positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decision
 earlyExitEx() ::= <<
 /* mismatchedSetEx()
  */
-exConstruct();
-theException()->type = ANTLR3_EARLY_EXIT_EXCEPTION;
-theException()->name = ANTLR3_EARLY_EXIT_NAME;
+CONSTRUCTEX();
+EXCEPTION()->type = ANTLR3_EARLY_EXIT_EXCEPTION;
+EXCEPTION()->name = ANTLR3_EARLY_EXIT_NAME;
 <\n>
 >>
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
@@ -1649,7 +1669,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label> = (<labelType>)LT(1);<\n>
 <endif>
-tmatch(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>); 
+MATCHT(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>); 
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1673,13 +1693,13 @@ charRef(char,label) ::= <<
 <if(label)>
 <label> = LA(1);<\n>
 <endif>
-matchc(<char>); 
+MATCHC(<char>); 
 <checkRuleBacktrackFailure()>
 >>
 
 /** match a character range */
 charRangeRef(a,b) ::= <<
-matchRange(<a>, <b>); 
+MATCHRANGE(<a>, <b>); 
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1691,11 +1711,11 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 if ( <s> ) 
 {
     <postmatchCode>
-    inputConsume();
+    CONSUME();
 <if(!LEXER)>
-    perrorRecovery()=ANTLR3_FALSE;
+    PERRORRECOVERY=ANTLR3_FALSE;
 <endif>
-    <if(backtracking)>failedFlag=ANTLR3_FALSE;<\n><endif>
+    <if(backtracking)>FAILEDFLAG=ANTLR3_FALSE;<\n><endif>
 }
 else 
 {
@@ -1703,20 +1723,20 @@ else
     <mismatchedSetEx()>
     <@mismatchedSetException()>
 <if(LEXER)>
-    lrecover();
+    LRECOVER();
 <else>
-    precoverFromMismatchedSet(FOLLOW_set_in_<ruleName><elementIndex>);
+    RECOVERFROMMISMATCHEDSET(FOLLOW_set_in_<ruleName><elementIndex>);
 <endif>
     goto rule<ruleDescriptor.name>Ex;
 }<\n>
 >>
 
 mismatchedSetEx() ::= <<
-exConstruct();
-theException()->type         = ANTLR3_MISMATCHED_SET_EXCEPTION;
-theException()->name         = ANTLR3_MISMATCHED_SET_NAME;
+CONSTRUCTEX();
+EXCEPTION()->type         = ANTLR3_MISMATCHED_SET_EXCEPTION;
+EXCEPTION()->name         = ANTLR3_MISMATCHED_SET_NAME;
 <if(PARSER)>
-theException()->expectingSet = FOLLOW_set_in_<ruleName><elementIndex>;
+EXCEPTION()->expectingSet = FOLLOW_set_in_<ruleName><elementIndex>;
 <endif>
 >>
 
@@ -1728,16 +1748,16 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
 <if(label)>
-int <label>Start = getCharIndex();
-matchs(<string>); 
+int <label>Start = GETCHARINDEX();
+MATCHS(<string>); 
 <checkRuleBacktrackFailure()>
-<labelType> <label> = lexr->tokFactory->newToken(lexr->tokFactory);
+<labelType> <label> = LEXER->tokFactory->newToken(LEXER->tokFactory);
 <label>->setType(<label>, ANTLR3_TOKEN_INVALID);
 <label>->setStartIndex(<label>, <label>Start);
-<label>->setStopIndex(<label>, getCharIndex()-1);
-<label>->input = theInput()->tnstream->istream;
+<label>->setStopIndex(<label>, GETCHARINDEX()-1);
+<label>->input = INPUT()->tnstream->istream;
 <else>
-matchs(<string>); 
+MATCHS(<string>); 
 <checkRuleBacktrackFailure()><\n>
 <endif>
 >>
@@ -1746,7 +1766,7 @@ wildcard(label,elementIndex) ::= <<
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
-tmatchAny(); 
+MATCHANYT(); 
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1760,7 +1780,7 @@ wildcardChar(label, elementIndex) ::= <<
 <if(label)>
 int <label> = LA(1);<\n>
 <endif>
-matchAny(); 
+MATCHANY(); 
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1773,17 +1793,17 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  and a return value or values.
  */
 ruleRef(rule,label,elementIndex,args) ::= <<
-_fsp++; followPush(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+_fsp++; FOLLOWPUSH(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
 <label>=<rule>(ctx<if(args)>, <args; separator=", "><endif>);<\n>
 <else>
 <rule>(ctx<if(args)>, <args; separator=", "><endif>);<\n>
 <endif>
-if  (hasException())
+if  (HASEXCEPTION())
 {
     goto rule<ruleDescriptor.name>Ex;
 }
-_fsp--; followPop();
+_fsp--; FOLLOWPOP();
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1798,14 +1818,14 @@ lexerRuleRef(rule,label,args) ::= <<
 /* <description> */
 <if(label)>
 {
-    ANTLR3_UINT64 <label>Start = getCharIndex();
+    ANTLR3_UINT64 <label>Start = GETCHARINDEX();
     m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
     <checkRuleBacktrackFailure()>
-    <label> = lexr->tokFactory->newToken(lexr->tokFactory);
+    <label> = LEXER->tokFactory->newToken(LEXER->tokFactory);
     <label>->setType(<label>, ANTLR3_TOKEN_INVALID);
     <label>->setStartIndex(<label>, <label>Start);
-    <label>->setStopIndex(<label>, getCharIndex()-1);
-    <label>->input = theInput();
+    <label>->setStopIndex(<label>, GETCHARINDEX()-1);
+    <label>->input = INPUT();
 }
 <else>
 m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
@@ -1817,18 +1837,18 @@ m<rule>(ctx <if(args)>, <endif><args; separator=", ">);
 lexerMatchEOF(label) ::= <<
 <if(label)>
 {
-    int <label>Start = getCharIndex();
+    int <label>Start = GETCHARINDEX();
     <labelType> <label>;
-    matchc(ANTLR3_CHARSTREAM_EOF); 
+    MATCHC(ANTLR3_CHARSTREAM_EOF); 
     <checkRuleBacktrackFailure()>
-    <label> = lexr->tokFactory->newToken(lexr->tokFactory);
+    <label> = LEXER->tokFactory->newToken(LEXER->tokFactory);
     <label>->setType(<label>, ANTLR3_TOKEN_EOF);
     <label>->setStartIndex(<label>, <label>Start);
-    <label>->setStopIndex(<label>, getCharIndex()-1);
-    <label>->input = theInput()->tnstream->istream;
+    <label>->setStopIndex(<label>, GETCHARINDEX()-1);
+    <label>->input = INPUT()->tnstream->istream;
 }
 <else>
-    matchc(ANTLR3_CHARSTREAM_EOF); 
+    MATCHC(ANTLR3_CHARSTREAM_EOF); 
     <checkRuleBacktrackFailure()>
     <endif>
 >>
@@ -1838,17 +1858,17 @@ tree(root, children, nullableChildList) ::= <<
 <root:element()>
 <if(nullableChildList)>
 if ( LA(1)==ANTLR3_TOKEN_DOWN ) {
-    tmatch(ANTLR3_TOKEN_DOWN, NULL); 
+    MATCHT(ANTLR3_TOKEN_DOWN, NULL); 
     <checkRuleBacktrackFailure()>
     <children:element()>
-    tmatch(ANTLR3_TOKEN_UP, NULL); 
+    MATCHT(ANTLR3_TOKEN_UP, NULL); 
     <checkRuleBacktrackFailure()>
 }
 <else>
-tmatch(ANTLR3_TOKEN_DOWN, NULL); 
+MATCHT(ANTLR3_TOKEN_DOWN, NULL); 
 <checkRuleBacktrackFailure()>
 <children:element()>
-tmatch(ANTLR3_TOKEN_UP, NULL); 
+MATCHT(ANTLR3_TOKEN_UP, NULL); 
 <checkRuleBacktrackFailure()>
 <endif>
 >>
@@ -1865,10 +1885,10 @@ if ( !(<evalPredicate(...)>) )
 >>
 
 newFPE() ::= <<
-    exConstruct();
-    theException()->type         = ANTLR3_FAILED_PREDICATE_EXCEPTION;
-    theException()->message      = "<description>";
-    theException()->ruleName	 = "<ruleName>";
+    CONSTRUCTEX();
+    EXCEPTION()->type         = ANTLR3_FAILED_PREDICATE_EXCEPTION;
+    EXCEPTION()->message      = "<description>";
+    EXCEPTION()->ruleName	 = "<ruleName>";
     <\n>
 >>
 
@@ -1895,11 +1915,11 @@ dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 >>
 
 newNVException() ::= <<
-exConstruct();
-theException()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
-theException()->message      = "<description>";
-theException()->decisionNum  = <decisionNumber>;
-theException()->state        = <stateNumber>;
+CONSTRUCTEX();
+EXCEPTION()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
+EXCEPTION()->message      = "<description>";
+EXCEPTION()->decisionNum  = <decisionNumber>;
+EXCEPTION()->state        = <stateNumber>;
 <@noViableAltException()>
 <\n>
 >>
@@ -2008,7 +2028,7 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  *  The <name> attribute is inherited via the parser, lexer, ...
  */
 dfaDecision(decisionNumber,description) ::= <<
-alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, rec, theInput()->istream, &cdfa<decisionNumber>);
+alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, RECOGNIZER, INPUT()->istream, &cdfa<decisionNumber>);
 >>
 
 /* Dump DFA tables as static initialized arrays of shorts(16 bits)/characters(8 bits)
@@ -2077,18 +2097,18 @@ static ANTLR3_INT16 dfa<dfa.decisionNumber>_sst(p<name> ctx, pANTLR3_BASE_RECOGN
 	<state>}; separator="\n">
     }
 <if(backtracking)>
-    if (backtracking > 0)
+    if (BACKTRACKING > 0)
     {
-	failedFlag = ANTLR3_TRUE;
+	FAILEDFLAG = ANTLR3_TRUE;
 	return	-1;
     }
 <endif>
     
-    exConstruct();
-    theException()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
-    theException()->message      = "<dfa.description>";
-    theException()->decisionNum  = <dfa.decisionNumber>;
-    theException()->state        = _s;
+    CONSTRUCTEX();
+    EXCEPTION()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
+    EXCEPTION()->message      = "<dfa.description>";
+    EXCEPTION()->decisionNum  = <dfa.decisionNumber>;
+    EXCEPTION()->state        = _s;
     <@noViableAltException()>
     return -1;
 }
@@ -2131,7 +2151,7 @@ ANTLR3_CYCLIC_DFA cdfa<dfa.decisionNumber>
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
 {
     <if(semPredState)>
-    rewindLast();<\n>
+    REWINDLAST();<\n>
     <endif>
     int LA<decisionNumber>_<stateNumber> = LA(1);<\n>
     s = -1;
@@ -2627,9 +2647,9 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>.tree)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-strStream->toStringSS(strStream, strStream->getTokenStartIndex(<scope>.start), strStream->getTokenStopIndex(<scope>.start))
+STRSTREAM->toStringSS(STRSTREAM, STRSTREAM->getTokenStartIndex(<scope>.start), STRSTREAM->getTokenStopIndex(<scope>.start))
 <else>
-strStream->toStringTT(strStream, <scope>.start, <scope>.stop)
+STRSTREAM->toStringTT(STRSTREAM, <scope>.start, <scope>.stop)
 <endif>
 >>
 
@@ -2651,14 +2671,14 @@ rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval).stop"
 rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval).tree"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-strStream->toStringSS(strStream, strStream->getTokenStartIndex(retval.start), strStream->getTokenStopIndex(retval.start))
+STRSTREAM->toStringSS(STRSTREAM, STRSTREAM->getTokenStartIndex(retval.start), STRSTREAM->getTokenStopIndex(retval.start))
 <else>
-strStream->toStringTT(strStream, retval.start, LT(-1))
+STRSTREAM->toStringTT(STRSTREAM, retval.start, LT(-1))
 <endif>
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
-lexerRulePropertyRef_text(scope,attr) ::= "ltoken()->getText(ltoken())"
+lexerRulePropertyRef_text(scope,attr) ::= "LTOKEN()->getText(LTOKEN())"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
 lexerRulePropertyRef_line(scope,attr) ::= "_line"
 lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
@@ -2682,7 +2702,7 @@ if ( <actions.(actionScope).synpredgate> )
     <action>
 }
 <else>
-if ( backtracking == 0 ) 
+if ( BACKTRACKING == 0 ) 
 {
     <action>
 }
