@@ -2273,7 +2273,7 @@ ruleAttributeScopeFuncMacro(scope) ::= <<
  */
 /** Macro for popping the top value from a <scopeStack(sname=scope.name,...)>
  */
-#define <scopePopName(sname=scope.name,...)>()  ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name)>)
+#define <scopePopName(sname=scope.name,...)>()  SCOPE_TOP(<scope.name>) = ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name)>)
 
 <endif>
 >>
