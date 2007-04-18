@@ -387,4 +387,28 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("b\n", found);
 	}
 
+	public void testSynPredK2() throws Exception {
+		String grammar =
+			"grammar t;\n" +
+				"\n" +
+				"a : (b)=> b {System.out.println(\"alt1\");} | 'a' 'c' ;\n" +
+				"b : 'a' 'b' ;\n" ;
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
+				    "a", "ab", false);
+
+		assertEquals("alt1\n", found);
+	}
+
+	public void testSynPredKStar() throws Exception {
+		String grammar =
+			"grammar t;\n" +
+				"\n" +
+				"a : (b)=> b {System.out.println(\"alt1\");} | 'a'+ 'c' ;\n" +
+				"b : 'a'+ 'b' ;\n" ;
+		String found = execParser("t.g", grammar, "tParser", "tLexer",
+				    "a", "aaab", false);
+
+		assertEquals("alt1\n", found);
+	}
+
 }

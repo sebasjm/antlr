@@ -297,6 +297,24 @@ C# Target Notes
 
 CHANGES
 
+April 17, 2007
+
+* Fixed a major problem with gated semantic predicates.  Added more
+  unit tests.
+
+* Fixed bug in cyclic DFA with syntactic predicates.  Wasn't rewinding
+  properly.  Further, mark() in token stream did not fill buffer so
+  when you rewound back to last marker index was -1 not 0.  At same time
+  I fixed ANTLR-103.  Syn preds evaluated only once now.
+
+* Altered code gen file writing so it writes directly to a file
+  instead of building a big string and then writing that out.  Should
+  be faster and much less memory intensive.
+
+* Fixed so antlr writes files to correct location again.  See:
+
+http://www.antlr.org/wiki/pages/viewpage.action?pageId=1862
+
 3.0b7 - April 12, 2007
 
 April 10, 2007

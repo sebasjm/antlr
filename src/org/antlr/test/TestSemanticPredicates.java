@@ -375,6 +375,29 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 3, expecting, null, null, null, null, null, 0);
 	}
 
+	public void testGatedPredNotActuallyUsedOnEdges() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"A : ('a' | {p}?=> 'a')\n" +
+			"  | 'a' 'b'\n" +
+			"  ;");
+		String expecting1 =
+			".s0-'a'->.s1\n" +
+			".s1-{!(p)}?->:s2=>1\n" +  	// Used to disambig subrule
+			".s1-{p}?->:s3=>2\n";
+		// rule A decision can't test p from s0->1 because 'a' is valid
+		// for alt1 *and* alt2 w/o p.  Can't test p from s1 to s3 because
+		// we might have passed the first alt of subrule.  The same state
+		// is listed in s2 in 2 different configurations: one with and one
+		// w/o p.  Can't test therefore.  p||true == true.
+		String expecting2 =
+			".s0-'a'->.s1\n" +
+			".s1-'b'->:s2=>2\n" +
+			".s1-<EOT>->:s3=>1\n";
+		checkDecision(g, 1, expecting1, null, null, null, null, null, 0);
+		checkDecision(g, 2, expecting2, null, null, null, null, null, 0);
+	}
+
 	public void testGatedPredDoesNotForceAllToBeGated() throws Exception {
 		Grammar g = new Grammar(
 			"grammar w;\n" +

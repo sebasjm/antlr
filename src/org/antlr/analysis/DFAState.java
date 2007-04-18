@@ -689,24 +689,48 @@ public class DFAState extends State {
 	 *  target of an edge so we can gate the edge based upon the predicates
 	 *  associated with taking that path (if any).
 	 *
+	 *  For syntactic predicates, we only want to generate predicate
+	 *  evaluations as it transitions to an accept state; waste to
+	 *  do it earlier.  So, only add gated preds derived from manually-
+	 *  specified syntactic predicates if this is an accept state.
+	 *
+	 *  Also, since configurations w/o gated predicates are like true
+	 *  gated predicates, finding a configuration whose alt has no gated
+	 *  predicate implies we should evaluate the predicate to true. This
+	 *  means the whole edge has to be ungated. Consider:
+	 *
+	 *	 X : ('a' | {p}?=> 'a')
+	 *	   | 'a' 'b'
+	 *	   ;
+	 *
+	 *  Here, you 'a' gets you from s0 to s1 but you can't test p because
+	 *  plain 'a' is ok.  It's also ok for starting alt 2.  Hence, you can't
+	 *  test p.  Even on the edge going to accept state for alt 1 of X, you
+	 *  can't test p.  You can get to the same place with and w/o the context.
+	 *  Therefore, it is never ok to test p in this situation. 
+	 *
 	 *  TODO: cache this as it's called a lot; or at least set bit if >1 present in state
 	 */
 	public SemanticContext getGatedPredicatesInNFAConfigurations() {
 		Iterator iter = nfaConfigurations.iterator();
 		SemanticContext unionOfPredicatesFromAllAlts = null;
 		NFAConfiguration configuration;
-		boolean foundTruePred = false;
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
 			SemanticContext gatedPredExpr =
 				configuration.semanticContext.getGatedPredicateContext();
-			if ( configuration.semanticContext!=SemanticContext.EMPTY_SEMANTIC_CONTEXT &&
-				 gatedPredExpr==null )
-			{
-				// there is a sempred but it's not gated
-				foundTruePred = true;
+			if ( gatedPredExpr==null ) {
+				// if we ever find a configuration w/o a gated predicate
+				// (even if it's a nongated predicate), we cannot gate
+				// the indident edges.
+				return null;
 			}
-			else {
+			else if ( acceptState || !configuration.semanticContext.isSyntacticPredicate() ) {
+				// at this point we have a gated predicate and, due to elseif,
+				// we know it's an accept and not a syn pred.  In this case,
+				// it's safe to add the gated predicate to the union.  We
+				// only want to add syn preds if it's an accept state.  Other
+				// gated preds can be used with edges leading to accept states.
 				if ( unionOfPredicatesFromAllAlts==null ) {
 					unionOfPredicatesFromAllAlts = gatedPredExpr;
 				}
@@ -715,9 +739,6 @@ public class DFAState extends State {
 						SemanticContext.or(unionOfPredicatesFromAllAlts,gatedPredExpr);
 				}
 			}
-		}
-		if ( foundTruePred ) {
-			return null;
 		}
 		if ( unionOfPredicatesFromAllAlts instanceof SemanticContext.TruePredicate ) {
 			return null;

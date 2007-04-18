@@ -301,7 +301,10 @@ public class CommonTokenStream implements TokenStream {
     }
 
     public int mark() {
-        lastMarker = index();
+		if ( p == -1 ) {
+			fillBuffer();
+		}
+		lastMarker = index();
 		return lastMarker;
 	}
 
