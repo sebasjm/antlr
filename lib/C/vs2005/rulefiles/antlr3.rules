@@ -8,8 +8,8 @@
 			Name="Antlr3Lexer"
 			DisplayName="ANTLR 3 Lexer Grammar Translation"
 			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -[Absolute]o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
-			Outputs="[OutputDirectory\]$(InputName)Lexer.c;[OutputDirectory]\$(InputName).h"
-			FileExtensions="*.g3l"
+			Outputs="[OutputDirectory]\$(InputName)Lexer.c;[OutputDirectory]\$(InputName)Lexer.h"
+			FileExtensions="*.g3l;*.gl"
 			ExecutionDescription="Translating to lexer."
 			SupportsFileBatching="true"
 			>
@@ -200,7 +200,7 @@
 			DisplayName="ANTLR 3 Parser Grammar Translation"
 			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -[Absolute]o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
 			Outputs="[OutputDirectory]\$(InputName)Parser.c;[OutputDirectory]\$(InputName)Parser.h"
-			FileExtensions="*.g3p"
+			FileExtensions="*.g3p;*.gp"
 			ExecutionDescription="Translating to parser."
 			SupportsFileBatching="true"
 			>
@@ -393,7 +393,7 @@
 			DisplayName="ANTLR 3 Tree Parser Grammar Translation"
 			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -[Absolute]o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
 			Outputs="[OutputDirectory]\$(InputName)TreeParser.c;[OutputDirectory]\$(InputName)TreeParser.h"
-			FileExtensions="*.g3t"
+			FileExtensions="*.g3t;*.gt"
 			ExecutionDescription="Translating to tree parser."
 			SupportsFileBatching="true"
 			>
@@ -586,7 +586,7 @@
 			DisplayName="ANTLR 3 Parser/Lexer Grammar Translation"
 			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -[Absolute]o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
 			Outputs="[OutputDirectory]\$(InputName)Parser.c;[OutputDirectory]\$(InputName)Parser.h;[OutputDirectory]\$(InputName)Lexer.c;[OutputDirectory]\$(InputName)Lexer.h"
-			FileExtensions="*.g3pl;*.g3"
+			FileExtensions="*.g3pl;*.g3;*.g"
 			ExecutionDescription="Translating to parser/lexer combination"
 			SupportsFileBatching="true"
 			>
