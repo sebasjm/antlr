@@ -721,9 +721,10 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 	{
 	    /* Add it, indicating tthat we will delete it and the table should not
 	     */
+	    tok->setTokenIndex(tok, index);
 	    tokenStream->p++;
 	    tokenStream->tokens->put(tokenStream->tokens, tokenStream->tstream->istream->index(tokenStream->tstream->istream), (void *)tok, NULL);
-	    
+	    index++;
 	}
 	
 	tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource);
