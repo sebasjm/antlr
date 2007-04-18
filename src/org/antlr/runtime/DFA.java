@@ -35,11 +35,12 @@ public class DFA {
 	public int predict(IntStream input)
 		throws RecognitionException
 	{
-		int mark = input.mark();
+		int mark = input.mark(); // remember where decision started in input
 		int s = 0; // we always start at s0
 		try {
 			while ( true ) {
-				if ( debug ) System.err.println("DFA "+decisionNumber+" state "+s+" LA(1)="+(char)input.LA(1)+"("+input.LA(1)+")");
+				if ( debug ) System.err.println("DFA "+decisionNumber+" state "+s+" LA(1)="+(char)input.LA(1)+"("+input.LA(1)+
+												"), index="+input.index());
 				int specialState = special[s];
 				if ( specialState>=0 ) {
 					if ( debug ) System.err.println("DFA "+decisionNumber+
