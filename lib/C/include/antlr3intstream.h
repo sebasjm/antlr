@@ -68,10 +68,6 @@ typedef	struct ANTLR3_INT_STREAM_struct
      */
     void		    * super;
 
-    /** Special token for a token stream to return EOF by
-     */
-    pANTLR3_COMMON_TOKEN    eofToken;
-    
     /** Last marker postion allocated
      */
     ANTLR3_UINT64	    lastMarker;

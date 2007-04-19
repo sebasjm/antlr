@@ -30,6 +30,13 @@ typedef struct ANTLR3_TOKEN_SOURCE_struct
      */
     pANTLR3_STRING_FACTORY  strFactory;
 
+    /** A special preallocated token, which signifies End Of Tokens. Because this must
+     *  be set up with the currrent input index and so on, we embed the structure and 
+     *  return the address of it. It is marked as factoryMade, so that it is never
+     *  attemtped to be freed.
+     */
+    ANTLR3_COMMON_TOKEN	    eofToken;
+
     /** Whatever is supplying the token source interface, needs a pointer to 
      *  itself so that this pointer can be passed to it when the nextToken
      *  function is called.

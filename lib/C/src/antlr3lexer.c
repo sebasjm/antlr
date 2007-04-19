@@ -39,6 +39,7 @@ ANTLR3_API pANTLR3_LEXER
 antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 {
     pANTLR3_LEXER   lexer;
+    pANTLR3_COMMON_TOKEN	eoft;
 
     /* Allocate memory
      */
@@ -102,6 +103,12 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
     lexer->getText		    =  getText;
     lexer->free			    =  freeLexer;
     
+    /* Initialise the eof token
+     */
+    eoft		= &(lexer->tokSource->eofToken);	/* Note interfaces allocated with calloc, everything is 0 */
+    antlr3SetTokenAPI	  (eoft);
+    eoft->setType	  (eoft, ANTLR3_TOKEN_EOF);
+    eoft->factoryMade	= ANTLR3_FALSE;
     return  lexer;
 }
 
@@ -152,11 +159,12 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
 	{
 	    /* Reached the end of the stream, nothing more to do.
 	     */
-	    pANTLR3_COMMON_TOKEN    teof = lexer->input->istream->eofToken;
+	    pANTLR3_COMMON_TOKEN    teof = &(toksource->eofToken);
 
 	    teof->setStartIndex (teof, lexer->getCharIndex(lexer));
 	    teof->setStopIndex  (teof, lexer->getCharIndex(lexer));
 	    teof->setLine	(teof, lexer->getLine(lexer));
+	    teof->factoryMade = ANTLR3_TRUE;	// This isn't really manufactured but it stops things from tying to free it
 	    return  teof;
 	}
 	
@@ -281,11 +289,6 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
     {
 	lexer->tokSource->strFactory	= input->strFactory;
     }
-
-    /* Need to create the EOF token
-     */
-    input->istream->eofToken	= lexer->tokFactory->newToken(lexer->tokFactory);
-    input->istream->eofToken->setType(input->istream->eofToken, ANTLR3_TOKEN_EOF);
 
     /* This is a lexer, install the appropriate exception creator
      */

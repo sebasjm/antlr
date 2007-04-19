@@ -218,7 +218,7 @@ outputFile( LEXER,
 #define	    STRSTREAM				INPUT()
 #define		INDEX()					INPUT()->istream->index(INPUT()->istream)
 #define	    LA(n)					INPUT()->istream->_LA(INPUT()->istream, n)
-#define	    EOF_TOKEN				INPUT()->istream->eofToken
+#define	    EOF_TOKEN				&(LEXER->tokSource->eofToken)
 #define	    HASEXCEPTION()			(RECOGNIZER->error == ANTLR3_TRUE)
 #define	    EXCEPTION()				RECOGNIZER->exception
 #define	    CONSTRUCTEX()			RECOGNIZER->exConstruct(RECOGNIZER)
@@ -273,10 +273,10 @@ outputFile( LEXER,
 #define		INDEX()							INPUT()->istream->index(INPUT()->istream)
 #define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
 #define	    EXCEPTION()						RECOGNIZER->exception
-#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
+#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, &(fs))
 #define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
 #define	    FOLLOWSTACK()					RECOGNIZER->following
-#define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(x)), NULL)
+#define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(&(x))), NULL)
 #define	    FOLLOWPOP()						FOLLOWSTACK()->pop(FOLLOWSTACK())
 #define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
 #define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
@@ -335,10 +335,10 @@ outputFile( LEXER,
 #define	    STRSTREAM						INPUT()->tnstream
 #define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
 #define	    EXCEPTION()						RECOGNIZER->exception
-#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
+#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, &(fs))
 #define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
 #define	    FOLLOWSTACK()					RECOGNIZER->following
-#define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(x)), NULL)
+#define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(&(x))), NULL)
 #define	    FOLLOWPOP()						FOLLOWSTACK()->pop(FOLLOWSTACK())
 #define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
 #define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
@@ -844,7 +844,7 @@ static pANTLR3_COMMON_TOKEN
 		{
 			/* Reached the end of the stream, nothing more to do.
 			 */
-			pANTLR3_COMMON_TOKEN    teof = lexer->input->istream->eofToken;
+			pANTLR3_COMMON_TOKEN    teof = &(toksource->eofToken);
 
 			teof->setStartIndex (teof, lexer->getCharIndex(lexer));
 			teof->setStopIndex  (teof, lexer->getCharIndex(lexer));
@@ -923,13 +923,9 @@ static pANTLR3_UINT8   <name>TokenNames[]
 <rules:{r | static <headerReturnType(ruleDescriptor=r.ruleDescriptor)>	<r.ruleDescriptor.name>    (p<name> ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
 static void	<name>Free(p<name> ctx);
 
-/* Function to initlize bitsets
+/* Function to initialize bitset APIs
  */
 static	void <name>LoadFollowSets();
-
-/* Function to destroy bitsets
- */
-static	void <name>FreeFollowSets();
 
 /* For use in tree output where we are accumulating rule labels via label += ruleRef
  * we need a function that knows how to free a return scope when the list is destroyed. 
@@ -1039,18 +1035,10 @@ ANTLR3_API p<name>
  static void
  <name>Free(p<name> ctx)
  {
-    /* Free any follow sets we created for error recovery
-     */
-    <name>FreeFollowSets();
-
     /* Free any scope memory
      */
-    <rules: {r |<if(r.ruleDescriptor.ruleScope)>
-<ruleAttributeScopeFree(scope=r.ruleDescriptor.ruleScope)><\n>
-<endif>}>
-    <recognizer.scopes:{<if(it.isDynamicGlobalScope)>
-<globalAttributeScopeFree(scope=it)><\n>
-<endif>}>
+    <rules: {r |<if(r.ruleDescriptor.ruleScope)><ruleAttributeScopeFree(scope=r.ruleDescriptor.ruleScope)><\n><endif>}>
+    <recognizer.scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeFree(scope=it)><\n><endif>}>
     
     <@cleanup>
     <@end>
@@ -1093,21 +1081,11 @@ static pANTLR3_UINT8    *getTokenNames()
 static
 void <name>LoadFollowSets()
 {
-
     <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
                     words64=it.bits)>
     return;
 }
 
-/** Free the bitsets used for error recovery and prediction.
- */
-static
-void	<name>FreeFollowSets()
-{
-    <bitsets:bitsetFree(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>})>
-
-    return;
-}
 <if(cyclicDFAs)>
 
 /* =========================================================================
@@ -1737,7 +1715,7 @@ else
 <if(LEXER)>
     LRECOVER();
 <else>
-    RECOVERFROMMISMATCHEDSET(FOLLOW_set_in_<ruleName><elementIndex>);
+    RECOVERFROMMISMATCHEDSET(&FOLLOW_set_in_<ruleName><elementIndex>);
 <endif>
     goto rule<ruleDescriptor.name>Ex;
 }<\n>
@@ -1748,7 +1726,7 @@ CONSTRUCTEX();
 EXCEPTION()->type         = ANTLR3_MISMATCHED_SET_EXCEPTION;
 EXCEPTION()->name         = ANTLR3_MISMATCHED_SET_NAME;
 <if(PARSER)>
-EXCEPTION()->expectingSet = FOLLOW_set_in_<ruleName><elementIndex>;
+EXCEPTION()->expectingSet = &FOLLOW_set_in_<ruleName><elementIndex>;
 <endif>
 >>
 
@@ -2730,24 +2708,14 @@ if ( BACKTRACKING == 0 )
 
 bitsetDeclare(name, words64) ::= <<
 
-/**
- * Bitset defining follow set for error recovery in
- * rule state: <name>
- */
-static  pANTLR3_BITSET <name>;
-static  ANTLR3_UINT64 <name>_bits[] = { <words64:{ANTLR3_UINT64_LIT(<it>)}; separator=", "> };
+/** Bitset defining follow set for error recovery in rule state: <name>  */
+static	ANTLR3_UINT64 <name>_bits[]	= { <words64:{ANTLR3_UINT64_LIT(<it>)}; separator=", "> };
+static  ANTLR3_BITSET <name>	= { <name>_bits, <length(words64)>	};
 >>
 
 bitset(name, words64) ::= <<
-/* bitset(name, words64)
- */
-<name> = antlr3BitsetLoad((sizeof(<name>_bits)/sizeof(ANTLR3_UINT64)), <name>_bits);<\n>
+antlr3BitsetSetAPI(&<name>);<\n>
 >>
-
-bitsetFree(name) ::= <<
-<name>-\>free(<name>);<\n>
->>
-
 
 codeFileExtension() ::= ".c"
 

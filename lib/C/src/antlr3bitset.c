@@ -80,7 +80,17 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
 	ANTLR3_FREE(bitset);
 	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
     }
+    
+    antlr3BitsetSetAPI(bitset);
 
+
+    /* All seems good
+     */
+    return  bitset;
+}
+ANTLR3_API void
+antlr3BitsetSetAPI(pANTLR3_BITSET bitset)
+{
     bitset->clone	=    antlr3BitsetClone;
     bitset->or		=    antlr3BitsetOR;
     bitset->orInPlace	=    antlr3BitsetORInPlace;
@@ -95,10 +105,6 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
     bitset->toIntList	=    antlr3BitsetToIntList;
 
     bitset->free	=    antlr3BitsetFree;
-
-    /* All seems good
-     */
-    return  bitset;
 }
 
 ANTLR3_API pANTLR3_BITSET

@@ -32,7 +32,6 @@ static	pANTLR3_COMMON_TOKEN	newToken	(void);
 
 /* Internal management functions
  */
-static	void			setAPI		(pANTLR3_COMMON_TOKEN token);
 static	void			newPool		(pANTLR3_TOKEN_FACTORY factory);
 static	pANTLR3_COMMON_TOKEN    newPoolToken	(pANTLR3_TOKEN_FACTORY factory);
 
@@ -86,7 +85,7 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
     /* Factory space is good, we now want to initialize our cheating token
      * which one it is initialized is the model for all tokens we manufacture
      */
-    setAPI(&factory->unTruc);
+    antlr3SetTokenAPI(&factory->unTruc);
 
     /* Set some initial variables for future copying
      */
@@ -240,14 +239,14 @@ newToken(void)
 
     /* Install the API
      */
-    setAPI(token);
+    antlr3SetTokenAPI(token);
     token->factoryMade = ANTLR3_FALSE;
 
     return  token;
 }
 
-static void 
-setAPI(pANTLR3_COMMON_TOKEN token)
+ANTLR3_API void
+antlr3SetTokenAPI(pANTLR3_COMMON_TOKEN token)
 {
     token->getText		    = getText;
     token->setText		    = setText;

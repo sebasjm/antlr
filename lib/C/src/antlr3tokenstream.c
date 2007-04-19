@@ -78,17 +78,14 @@ static void
 antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM stream)
 {
    /* We only free up our subordinate interfaces if they belong
-    * to use, otherwise we let whoever owns them deal with them.
+    * to us, otherwise we let whoever owns them deal with them.
     */
     if	(stream->tstream->super == stream)
     {
 	if	(stream->tstream->istream->super == stream->tstream)
 	{
-	    if  (stream->tstream->istream->eofToken != NULL)
-	    {
-		stream->tstream->istream->eofToken->freeCustom((void *)stream->tstream->istream->eofToken);
-	    }
 	    stream->tstream->istream->free(stream->tstream->istream);
+	    stream->tstream->istream = NULL;
 	}
 
 	stream->tstream->free(stream->tstream);
@@ -137,12 +134,6 @@ antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source
     stream->discardOffChannel	= ANTLR3_TRUE;
 
     stream->tstream->setTokenSource(stream->tstream, source);
-
-    /* Need to create the EOF token
-     */
-    stream->tstream->istream->eofToken	= antlr3CommonTokenNew(ANTLR3_TOKEN_EOF);
-    stream->tstream->istream->eofToken->setType(stream->tstream->istream->eofToken, ANTLR3_TOKEN_EOF);
-    stream->tstream->istream->eofToken->freeCustom = (void(*)(void*))(freeEofTOken);
 
     stream->free		=  antlr3CTSFree;
     return  stream;
@@ -245,11 +236,11 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
    
     if	((cts->p + k - 1) >= (ANTLR3_INT64)ts->istream->size(ts->istream))
     {
-	    pANTLR3_COMMON_TOKEN    teof = ts->istream->eofToken;
+	pANTLR3_COMMON_TOKEN    teof = &(ts->tokenSource->eofToken);
 
-	    teof->setStartIndex (teof, ts->istream->index	    (ts->istream));
-	    teof->setStopIndex  (teof, ts->istream->index	    (ts->istream));
-	    return  teof;
+	teof->setStartIndex (teof, ts->istream->index	    (ts->istream));
+	teof->setStopIndex  (teof, ts->istream->index	    (ts->istream));
+	return  teof;
     }
 
     i	= cts->p;
@@ -265,7 +256,7 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
     }
     if	( (ANTLR3_UINT64) i > ts->istream->size(ts->istream))
     {
-	    pANTLR3_COMMON_TOKEN    teof = ts->istream->eofToken;
+	    pANTLR3_COMMON_TOKEN    teof = &(ts->tokenSource->eofToken);
 
 	    teof->setStartIndex (teof, ts->istream->index(ts->istream));
 	    teof->setStopIndex  (teof, ts->istream->index(ts->istream));
