@@ -1185,7 +1185,7 @@ freeList    (void * list)
  *
  * \remark
  * The rule memos are an ANTLR3_LIST of ANTLR3_LISTS, however if this becomes any kind of performance
- * issue (it probably won't teh has tables are pretty quick) then we could make a special int only
+ * issue (it probably won't, the hash tables are pretty quick) then we could make a special int only
  * version of the table.
  */
 static ANTLR3_UINT64	
@@ -1225,9 +1225,8 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 }
 
 /** Has this rule already parsed input at the current index in the
- *  input stream?  Return the stop token index or MEMO_RULE_UNKNOWN.
- *  If we attempted but failed to parse properly before, return
- *  MEMO_RULE_FAILED.
+ *  input stream?  Return ANTLR3_TRUE if we have and ANTLR3_FALSE
+ *  if we have not.
  *
  *  This method has a side-effect: if we have seen this input for
  *  this rule and successfully parsed before, then seek ahead to
@@ -1237,6 +1236,7 @@ static ANTLR3_BOOLEAN
 alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex)
 {
     ANTLR3_UINT64	stopIndex;
+    pANTLR3_LEXER	    lexer;
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;
     pANTLR3_INT_STREAM	    is;
@@ -1247,6 +1247,7 @@ alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIn
 
 	parser  = (pANTLR3_PARSER) (recognizer->super);
 	tparser	= NULL;
+	lexer	= NULL;
 	is	= parser->tstream->istream;
 
 	break;
@@ -1255,9 +1256,17 @@ alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIn
 
 	tparser = (pANTLR3_TREE_PARSER) (recognizer->super);
 	parser	= NULL;
+	lexer	= NULL;
 	is	= tparser->ctnstream->tnstream->istream;
 
 	break;
+
+    case	ANTLR3_TYPE_LEXER:
+
+	lexer	= (pANTLR3_LEXER)   (recognizer->super);
+	parser	= NULL;
+	tparser	= NULL;
+	is	= lexer->input->istream;
 
     default:
 	    
@@ -1300,6 +1309,7 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
      */
     pANTLR3_LIST	    ruleList;
     ANTLR3_UINT64	    stopIndex;
+    pANTLR3_LEXER	    lexer;
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;
     pANTLR3_INT_STREAM	    is;
@@ -1321,6 +1331,13 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 	is	= tparser->ctnstream->tnstream->istream;
 
 	break;
+
+    case	ANTLR3_TYPE_LEXER:
+
+	lexer	= (pANTLR3_LEXER)   (recognizer->super);
+	parser	= NULL;
+	tparser	= NULL;
+	is	= lexer->input->istream;
 
     default:
 	    

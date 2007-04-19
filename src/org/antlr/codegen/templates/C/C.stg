@@ -195,6 +195,7 @@ outputFile( LEXER,
 #undef		MEMOIZE
 #undef		HAVEPARSEDRULE
 #undef		GETTEXT
+#undef		INDEX
 
 #define	    LEXER					ctx->pLexer
 #define	    RECOGNIZER			    LEXER->rec
@@ -215,6 +216,7 @@ outputFile( LEXER,
 #define	    FAILEDFLAG				RECOGNIZER->failed
 #define	    INPUT()					LEXER->input
 #define	    STRSTREAM				INPUT()
+#define		INDEX()					INPUT()->istream->index(INPUT()->istream)
 #define	    LA(n)					INPUT()->istream->_LA(INPUT()->istream, n)
 #define	    EOF_TOKEN				INPUT()->istream->eofToken
 #define	    HASEXCEPTION()			(RECOGNIZER->error == ANTLR3_TRUE)
@@ -260,6 +262,7 @@ outputFile( LEXER,
 #undef	    FAILEDFLAG
 #undef	    RECOVERFROMMISMATCHEDSET
 #undef	    RECOVERFROMMISMATCHEDELEMENT
+#undef		INDEX
 
 #define	    PARSER							ctx->pParser  
 #define	    RECOGNIZER						PARSER->rec
@@ -267,6 +270,7 @@ outputFile( LEXER,
 #define		MEMOIZE(ri,si)					RECOGNIZER->memoize(RECOGNIZER, ri, si)
 #define	    INPUT()							PARSER->tstream
 #define	    STRSTREAM						INPUT()
+#define		INDEX()							INPUT()->istream->index(INPUT()->istream)
 #define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
 #define	    EXCEPTION()						RECOGNIZER->exception
 #define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
@@ -1008,7 +1012,15 @@ ANTLR3_API p<name>
     
     <actions.parser.apifuncs>
     <actions.treeparser.apifuncs>
-	
+<if(memoize)>
+    /* Create a LIST for recording rule memos.
+     */
+<if(TREE_PARSER)>
+    ctx->pTreeParser->rec->ruleMemo    = antlr3ListNew(ANTLR3_SIZE_HINT);<\n>
+<else>
+    ctx->pParser->rec->ruleMemo    = antlr3ListNew(ANTLR3_SIZE_HINT);<\n>
+<endif>
+<endif>	
     /* Install the token table
      */
     RECOGNIZER->tokenNames   = <name>TokenNames;
@@ -1329,7 +1341,7 @@ ruleInitializations() ::= <<
 /* Initialize rule variables
  */
 <if(memoize)>
-<ruleDescriptor.name>_StartIndex = INPUT()->index(INPUT());
+<ruleDescriptor.name>_StartIndex = INDEX();<\n>
 <endif>
 <ruleDescriptor.useScopes:{<scopeTop(sname=it)> = <scopePush(sname=it)>;}; separator="\n">
 <ruleDescriptor.ruleScope:{<scopeTop(sname=it.name)> = <scopePush(sname=it.name)>;}; separator="\n">
@@ -1387,7 +1399,7 @@ retval
 memoize() ::= <<
 <if(memoize)>
 <if(backtracking)>
-if ( BACKTRACKING>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
+if ( BACKTRACKING>0 ) { MEMOIZE(<ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
 <endif>
 <endif>
 >>
