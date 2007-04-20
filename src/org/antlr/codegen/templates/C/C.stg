@@ -273,7 +273,7 @@ outputFile( LEXER,
 #define		INDEX()							INPUT()->istream->index(INPUT()->istream)
 #define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
 #define	    EXCEPTION()						RECOGNIZER->exception
-#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, &(fs))
+#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
 #define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
 #define	    FOLLOWSTACK()					RECOGNIZER->following
 #define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(&(x))), NULL)
@@ -335,7 +335,7 @@ outputFile( LEXER,
 #define	    STRSTREAM						INPUT()->tnstream
 #define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
 #define	    EXCEPTION()						RECOGNIZER->exception
-#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, &(fs))
+#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
 #define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
 #define	    FOLLOWSTACK()					RECOGNIZER->following
 #define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(&(x))), NULL)
@@ -1659,7 +1659,7 @@ tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
 <label> = (<labelType>)LT(1);<\n>
 <endif>
-MATCHT(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>); 
+MATCHT(<token>, &FOLLOW_<token>_in_<ruleName><elementIndex>); 
 <checkRuleBacktrackFailure()>
 >>
 
