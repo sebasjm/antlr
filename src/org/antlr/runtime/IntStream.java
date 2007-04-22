@@ -102,7 +102,9 @@ public interface IntStream {
 	 *  Currently, this method is only used for efficient backtracking using
 	 *  memoization, but in the future it may be used for incremental parsing.
 	 *
-	 *  The index is 0..n-1.
+	 *  The index is 0..n-1.  A seek to position i means that LA(1) will
+	 *  return the ith symbol.  So, seeking to 0 means LA(1) will return the
+	 *  first element in the stream. 
 	 */
 	void seek(int index);
 
