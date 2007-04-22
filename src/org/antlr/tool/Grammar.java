@@ -35,7 +35,6 @@ import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.codegen.ActionAnalysisLexer;
 import org.antlr.misc.Barrier;
 import org.antlr.misc.IntSet;
 import org.antlr.misc.IntervalSet;
