@@ -1,6 +1,7 @@
 <!-- Contributed by Oliver Zeigermann
      Modified by Jean Bovet
      Modified by Matt Benson
+     Modified by Miguel Ping
      Library dependency: install library http://jakarta.apache.org/bcel/ in $ANT_HOME/lib, or other supported 3rd-party lib option
 -->
 
@@ -35,7 +36,11 @@
     <property name="compile.deprecation" value="false" />
     <property name="compile.optimize" value="false" />
 
-    <path id="classpath" path="${stringtemplate.jar}" />
+    <path id="classpath">
+        <fileset dir="${ lib.dir}">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
 
     <condition property="bcel.available">
         <available classname="org.apache.bcel.Constants" />

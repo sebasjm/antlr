@@ -1,6 +1,6 @@
 // $ANTLR 3.0b7 ActionAnalysis.g 2007-04-03 12:25:48
 
-package org.antlr.codegen;
+package org.antlr.tool;
 import org.antlr.runtime.*;
 import org.antlr.tool.AttributeScope;
 import org.antlr.tool.Grammar;
