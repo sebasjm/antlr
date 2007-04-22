@@ -168,6 +168,9 @@ ruleRefAndListLabel(rule,label,elementIndex,args);
 /** A lexer rule reference */
 lexerRuleRef(rule,label,args,elementIndex);
 
+/** i+=INT in lexer */
+lexerRuleRefAndListLabel(rule,label,args,elementIndex);
+
 /** EOF in the lexer */
 lexerMatchEOF(label);
 
