@@ -392,48 +392,6 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("(34 +)\n", found);
 	}
 
-	public void testQueueingOfTokens() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : 'int' ID (',' ID)* ';' -> ^('int' ID+) ;\n" +
-			"op : '+'|'-' ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "int a,b,c;", debug);
-		assertEquals("(int a b c)\n", found);
-	}
-
-	public void testTokenCopyInLoop() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : 'int' ID (',' ID)* ';' -> ^('int' ID)+ ;\n" +
-			"op : '+'|'-' ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "int a,b,c;", debug);
-		assertEquals("(int a) (int b) (int c)\n", found);
-	}
-
-	public void testTokenCopyInLoopAgainstTwoOthers() throws Exception {
-		// must smear 'int' copies across as root of multiple trees
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : 'int' ID ':' INT (',' ID ':' INT)* ';' -> ^('int' ID INT)+ ;\n" +
-			"op : '+'|'-' ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "int a:1,b:2,c:3;", debug);
-		assertEquals("(int a 1) (int b 2) (int c 3)\n", found);
-	}
 
 	public void testNestedTrees() throws Exception {
 		String grammar =
@@ -462,6 +420,21 @@ public class TestRewriteAST extends BaseTest {
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "a,b,c", debug);
 		assertEquals("(VAR a) (VAR b) (VAR c)\n", found);
+	}
+
+	public void testTokenUnreferencedOnLeftButDefined() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {VAR;}\n" +
+			"a : b -> ID ;\n" +
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a", debug);
+		assertEquals("ID\n", found);
 	}
 
 	public void testImaginaryTokenCopySetText() throws Exception {
@@ -542,7 +515,7 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("1 a 2 3\n", found);
 	}
 
-	public void testSubruleWithRewriteReferencingPreviousElement() throws Exception {
+	public void testSubruleWithRewrite2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -637,6 +610,196 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("(3 3)\n", found);
 	}
 
+	public void testCopySemanticsForRules2() throws Exception {
+		// copy type as a root for each invocation of (...)+ in rewrite
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : type ID (',' ID)* ';' -> ^(type ID)+ ;\n" +
+			"type : 'int' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "int a,b,c;", debug);
+		assertEquals("(int a) (int b) (int c)\n", found);
+	}
+
+	public void testCopySemanticsForRules3() throws Exception {
+		// copy type *and* modifier even though it's optional
+		// for each invocation of (...)+ in rewrite
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : modifier? type ID (',' ID)* ';' -> ^(type modifier? ID)+ ;\n" +
+			"type : 'int' ;\n" +
+			"modifier : 'public' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "public int a,b,c;", debug);
+		assertEquals("(int public a) (int public b) (int public c)\n", found);
+	}
+
+	public void testCopySemanticsForRules3Double() throws Exception {
+		// copy type *and* modifier even though it's optional
+		// for each invocation of (...)+ in rewrite
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : modifier? type ID (',' ID)* ';' -> ^(type modifier? ID)+ ^(type modifier? ID)+ ;\n" +
+			"type : 'int' ;\n" +
+			"modifier : 'public' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "public int a,b,c;", debug);
+		assertEquals("(int public a) (int public b) (int public c) (int public a) (int public b) (int public c)\n", found);
+	}
+
+	public void testCopySemanticsForRules4() throws Exception {
+		// copy type *and* modifier even though it's optional
+		// for each invocation of (...)+ in rewrite
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {MOD;}\n" +
+			"a : modifier? type ID (',' ID)* ';' -> ^(type ^(MOD modifier)? ID)+ ;\n" +
+			"type : 'int' ;\n" +
+			"modifier : 'public' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "public int a,b,c;", debug);
+		assertEquals("(int (MOD public) a) (int (MOD public) b) (int (MOD public) c)\n", found);
+	}
+
+	public void testCopySemanticsLists() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {MOD;}\n" +
+			"a : ID (',' ID)* ';' -> ID+ ID+ ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a,b,c;", debug);
+		assertEquals("a b c a b c\n", found);
+	}
+
+	public void testCopyRuleLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : x=b -> $x $x;\n"+
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a", debug);
+		assertEquals("a a\n", found);
+	}
+
+	public void testCopyRuleLabel2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : x=b -> ^($x $x);\n"+
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a", debug);
+		assertEquals("(a a)\n", found);
+	}
+
+	public void testQueueingOfTokens() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : 'int' ID (',' ID)* ';' -> ^('int' ID+) ;\n" +
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "int a,b,c;", debug);
+		assertEquals("(int a b c)\n", found);
+	}
+
+	public void testCopyOfTokens() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : 'int' ID ';' -> 'int' ID 'int' ID ;\n" +
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "int a;", debug);
+		assertEquals("int a int a\n", found);
+	}
+
+	public void testTokenCopyInLoop() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : 'int' ID (',' ID)* ';' -> ^('int' ID)+ ;\n" +
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "int a,b,c;", debug);
+		assertEquals("(int a) (int b) (int c)\n", found);
+	}
+
+	public void testTokenCopyInLoopAgainstTwoOthers() throws Exception {
+		// must smear 'int' copies across as root of multiple trees
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : 'int' ID ':' INT (',' ID ':' INT)* ';' -> ^('int' ID INT)+ ;\n" +
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "int a:1,b:2,c:3;", debug);
+		assertEquals("(int a 1) (int b 2) (int c 3)\n", found);
+	}
+
+	public void testListRefdOneAtATime() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID+ -> ID ID ID ;\n" + // works if 3 input IDs
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a b c", debug);
+		assertEquals("a b c\n", found);
+	}
+
+	public void testSplitListWithLabels() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {VAR;}\n"+
+			"a : first=ID others+=ID* -> $first VAR $others+ ;\n" +
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a b c", debug);
+		assertEquals("a VAR b c\n", found);
+	}
+
 	public void testComplicatedMelange() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -654,12 +817,40 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("a a b b b c c c d\n", found);
 	}
 
+	public void testRuleLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : x=b -> $x;\n"+
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a", debug);
+		assertEquals("a\n", found);
+	}
+
 	public void testRuleListLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
 			"a : x+=b x+=b -> $x+;\n"+
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a b", debug);
+		assertEquals("a b\n", found);
+	}
+
+	public void testRuleListLabel2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : x+=b x+=b -> $x $x*;\n"+
 			"b : ID ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
@@ -724,6 +915,20 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("a b\n", found);
 	}
 
+	public void testOptional5() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : ID -> ID? ;\n"+ // match an ID to optional ID
+			"b : ID ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a", debug);
+		assertEquals("a\n", found);
+	}
+
 	public void testArbitraryExprType() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -768,6 +973,94 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("25.0\n", found);
 	}
 
+	public void testOptionalSubruleWithoutRealElements() throws Exception {
+		// copy type *and* modifier even though it's optional
+		// for each invocation of (...)+ in rewrite
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;} \n" +
+			"tokens {PARMS;} \n" +
+			"\n" +
+			"modulo \n" +
+			" : 'modulo' ID ('(' parms+ ')')? -> ^('modulo' ID ^(PARMS parms+)?) \n" +
+			" ; \n" +
+			"parms : '#'|ID; \n" +
+			"ID : ('a'..'z' | 'A'..'Z')+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "modulo", "modulo abc (x y #)", debug);
+		assertEquals("(modulo abc (PARMS x y #))\n", found);
+	}
+
+	// C A R D I N A L I T Y  I S S U E S
+
+	public void testCardinality() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {BLOCK;}\n" +
+			"a : ID ID INT INT INT -> (ID INT)+;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+; \n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "a b 3 4 5", debug);
+		String expecting =
+			"org.antlr.runtime.tree.RewriteCardinalityException: token ID";
+		String found = getFirstLineOfException();
+		assertEquals(expecting, found);
+	}
+
+	public void testCardinality2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID+ -> ID ID ID ;\n" + // only 2 input IDs
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		execParser("T.g", grammar, "TParser", "TLexer",
+				   "a", "a b", debug);
+		String expecting =
+			"org.antlr.runtime.tree.RewriteCardinalityException: token ID";
+		String found = getFirstLineOfException();
+		assertEquals(expecting, found);
+	}
+
+	public void testCardinality3() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID? INT -> ID INT ;\n" +
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		execParser("T.g", grammar, "TParser", "TLexer",
+				   "a", "3", debug);
+		String expecting =
+			"org.antlr.runtime.tree.RewriteEmptyStreamException: token ID";
+		String found = getFirstLineOfException();
+		assertEquals(expecting, found);
+	}
+
+	public void testLoopCardinality() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID? INT -> ID+ INT ;\n" +
+			"op : '+'|'-' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		execParser("T.g", grammar, "TParser", "TLexer",
+				   "a", "3", debug);
+		String expecting =
+			"org.antlr.runtime.tree.RewriteEarlyExitException";
+		String found = getFirstLineOfException();
+		assertEquals(expecting, found);
+	}
 
 	// E R R O R S
 

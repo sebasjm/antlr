@@ -44,6 +44,9 @@ public abstract class BaseTest extends TestCase {
 	public static final String CLASSPATH = System.getProperty("java.class.path");
 	public static final String tmpdir = new File(System.getProperty("java.io.tmpdir"), "antlr3").getAbsolutePath();
 
+	/** If error during execution, store stderr here */
+	protected String stderr;
+
 	protected Tool newTool() {
 		Tool tool = new Tool();
 		tool.setOutputDirectory(tmpdir);
@@ -294,19 +297,21 @@ public abstract class BaseTest extends TestCase {
 			};
 			String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test " + new File(tmpdir, "input").getAbsolutePath();
 			//System.out.println("execParser: "+cmdLine);
+			this.stderr = null;
 			Process process =
 				Runtime.getRuntime().exec(args, null, new File(tmpdir));
-			StreamVacuum stdout = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderr = new StreamVacuum(process.getErrorStream());
-			stdout.start();
-			stderr.start();
+			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+			stdoutVacuum.start();
+			stderrVacuum.start();
 			process.waitFor();
-			stdout.join();
-			stderr.join();
+			stdoutVacuum.join();
+			stderrVacuum.join();
 			String output = null;
-			output = stdout.toString();
-			if ( stderr.toString().length()>0 ) {
-				System.err.println("exec parser stderr: "+stderr);
+			output = stdoutVacuum.toString();
+			if ( stderrVacuum.toString().length()>0 ) {
+				this.stderr = stderrVacuum.toString();
+				System.err.println("exec parser stderrVacuum: "+ stderrVacuum);
 			}
 			return output;
 		}
@@ -524,5 +529,14 @@ public abstract class BaseTest extends TestCase {
         		new File(tmpdir+"/"+files[i]).delete();
 			}
 		}
+	}
+
+	public String getFirstLineOfException() {
+		if ( this.stderr==null ) {
+			return null;
+		}
+		String[] lines = this.stderr.split("\n");
+		String prefix="Exception in thread \"main\" ";
+		return lines[0].substring(prefix.length(),lines[0].length());
 	}
 }

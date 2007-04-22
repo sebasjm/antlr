@@ -102,4 +102,77 @@ public class TestLexer extends BaseTest {
 		assertEquals("3.14159\n", found);
 	}
 
+	public void testLabelInSubrule() throws Exception {
+		// can we see v outside?
+		String grammar =
+			"grammar P;\n"+
+			"a : A EOF ;\n"+
+			"A : 'hi' WS (v=I)? {$channel=0; System.out.println($v.text);} ;\n" +
+			"fragment I : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;";
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
+				    "a", "hi 342", debug);
+		assertEquals("342\n", found);
+	}
+
+	public void testListLabelInLexer() throws Exception {
+		String grammar =
+			"grammar P;\n"+
+			"a : A ;\n"+
+			"A : i+=I+ {for (Object t : $i) System.out.print(\" \"+((Token)t).getText());} ;\n" +
+			"fragment I : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;";
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
+				    "a", "33 297", debug);
+		assertEquals(" 33 297\n", found);
+	}
+
+	public void testDupListRefInLexer() throws Exception {
+		String grammar =
+			"grammar P;\n"+
+			"a : A ;\n"+
+			"A : i+=I WS i+=I {$channel=0; for (Object t : $i) System.out.print(\" \"+((Token)t).getText());} ;\n" +
+			"fragment I : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;";
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
+				    "a", "33 297", debug);
+		assertEquals(" 33 297\n", found);
+	}
+
+	public void testRepeatedLabelInLexer() {
+		// current fails.  Not sure it's worth fixing for now
+		String grammar =
+			"lexer grammar t;\n" +
+			"B : x='a' x='b' ;\n" ;
+		boolean found =
+			rawGenerateAndBuildRecognizer(
+				"t.g", grammar, null, "tLexer", false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, found);
+	}
+
+	public void testRepeatedRuleLabelInLexer() {
+		String grammar =
+			"lexer grammar t;\n" +
+			"B : x=A x=A ;\n" +
+			"fragment A : 'a' ;\n" ;
+		boolean found =
+			rawGenerateAndBuildRecognizer(
+				"t.g", grammar, null, "tLexer", false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, found);
+	}
+
+	public void testIsolatedEOTEdge() {
+		String grammar =
+			"lexer grammar T;\n" +
+			"QUOTED_CONTENT \n" +
+			"        : 'q' (~'q')* (('x' 'q') )* 'q' ; \n";
+		boolean found =
+			rawGenerateAndBuildRecognizer(
+				"T.g", grammar, null, "TLexer", false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, found);
+	}	
+
 }

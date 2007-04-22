@@ -212,4 +212,129 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	public void testLabel() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x=ID;");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( = x ID ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testLabelOfOptional() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x=ID?;");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( ? ( BLOCK ( ALT ( = x ID ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testLabelOfClosure() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x=ID*;");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT ( = x ID ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testRuleLabel() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x=b;\n" +
+				"b : ID;\n");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( = x b ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testSetLabel() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x=(A|B);\n");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( = x ( BLOCK ( ALT A <end-of-alt> ) ( ALT B <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testNotSetLabel() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x=~(A|B);\n");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( = x ( ~ ( BLOCK ( ALT A <end-of-alt> ) ( ALT B <end-of-alt> ) <end-of-block> ) ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testNotSetListLabel() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x+=~(A|B);\n");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( += x ( ~ ( BLOCK ( ALT A <end-of-alt> ) ( ALT B <end-of-alt> ) <end-of-block> ) ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testNotSetListLabelInLoop() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x+=~(A|B)+;\n");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT ( += x ( ~ ( BLOCK ( ALT A <end-of-alt> ) ( ALT B <end-of-alt> ) <end-of-block> ) ) ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testRuleLabelOfPositiveClosure() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x=b+;\n" +
+				"b : ID;\n");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT ( = x b ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testListLabelOfClosure() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x+=ID*;");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT ( += x ID ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testListLabelOfClosure2() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n"+
+				"a : x+='int'*;");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( * ( BLOCK ( ALT ( += x 'int' ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+	public void testRuleListLabelOfPositiveClosure() throws Exception {
+		Grammar g = new Grammar(
+				"grammar P;\n" +
+				"options {output=AST;}\n"+
+				"a : x+=b+;\n" +
+				"b : ID;\n");
+		String expecting =
+			" ( rule a ARG RET scope ( BLOCK ( ALT ( + ( BLOCK ( ALT ( += x b ) <end-of-alt> ) <end-of-block> ) ) <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("a").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
+
 }

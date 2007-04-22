@@ -90,6 +90,24 @@ public class GrammarAST extends BaseAST {
     /** If this is a BLOCK node, track options here */
     protected Map options;
 
+	/** If this is a BLOCK node for a rewrite rule, track referenced
+	 *  elements here.  Don't track elements in nested subrules.
+	 */
+	public Set<GrammarAST> rewriteRefsShallow;
+
+	/*	If REWRITE node, track EVERY element and label ref to right of ->
+	 *  for this rewrite rule.  There could be multiple of these per
+	 *  rule:
+	 *
+	 *     a : ( ... -> ... | ... -> ... ) -> ... ;
+	 *
+	 *  We may need a list of all refs to do definitions for whole rewrite
+	 *  later.
+	 *
+	 *  If BLOCK then tracks every element at that level and below.
+	 */
+	public Set<GrammarAST> rewriteRefsDeep;	
+
 	public static final Set legalBlockOptions =
 			new HashSet() {{add("k"); add("greedy"); add("backtrack"); add("memoize");}};
 

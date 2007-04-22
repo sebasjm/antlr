@@ -125,20 +125,6 @@ public interface TreeAdaptor {
 
 	// R e w r i t e  R u l e s
 
-	/** Create a node for child and add as a child to root t.  Rather
-	 *  than invoke create directly in the generated code for child,
-	 *  the coder has more flexibility if the token itself is passed in.
-	 *  You might want to do something different during rewrite construction
-	 *  than you do during auto-AST construction (which has create() calls
-	 *  generated in the output).
-	 *
-	 *  Be advised: when debugging ASTs, the DebugTreeAdaptor manually
-	 *  calls create(Token child) and then plain addChild(node, node)
-	 *  because it needs to trap calls to create, but it can't since it delegates
-	 *  to not inherits from the TreeAdaptor.
-	 */
-	public void addChild(Object t, Token child);
-
 	/** Create a node for newRoot make it the root of oldRoot.
 	 *  If oldRoot is a nil root, just copy or move the children to newRoot.
 	 *  If not a nil root, make oldRoot a child of newRoot.

@@ -25,44 +25,11 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.test;
+package org.antlr.runtime.tree;
 
-import junit.framework.TestCase;
-
-/** General code generation testing; compilation and/or execution.
- *  These tests are more about avoiding duplicate var definitions
- *  etc... than testing a particular ANTLR feature.
- */
-public class TestJavaCodeGeneration extends BaseTest {
-	public void testDupVarDefForPinchedState() {
-		// so->s2 and s0->s3->s1 pinches back to s1
-		// LA3_1, s1 state for DFA 3, was defined twice in similar scope
-		// just wrapped in curlies and it's cool.
-		String grammar =
-			"grammar t;\n" +
-			"a : (| A | B) X Y\n" +
-			"  | (| A | B) X Z\n" +
-			"  ;\n" ;
-		boolean found =
-			rawGenerateAndBuildRecognizer(
-				"t.g", grammar, "tParser", null, false);
-		boolean expecting = true; // should be ok
-		assertEquals(expecting, found);
+/** Ref to ID or expr but no tokens in ID stream or subtrees in expr stream */
+public class RewriteEmptyStreamException extends RewriteCardinalityException {
+	public RewriteEmptyStreamException(String elementDescription) {
+		super(elementDescription);
 	}
-
-	public void testLabeledSetsInLexer2() {
-		// c must be an int
-		String grammar =
-			"lexer grammar t;\n" +
-			"A : d=~('x'|'y') e='0'..'9'\n" +
-			"  ; \n" ;
-		boolean found =
-			rawGenerateAndBuildRecognizer(
-				"t.g", grammar, null, "tLexer", false);
-		boolean expecting = true; // should be ok
-		assertEquals(expecting, found);
-	}
-
-
-
 }

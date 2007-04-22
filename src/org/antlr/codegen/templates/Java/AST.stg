@@ -65,6 +65,10 @@ ruleLabelDefs() ::= <<
 <super.ruleLabelDefs()>
 <ruleDescriptor.tokenLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
+<ruleDescriptor.allTokenRefsInAltsWithRewrites
+    :{RewriteRuleTokenStream stream_<it>=new RewriteRuleTokenStream(adaptor,"token <it>");}; separator="\n">
+<ruleDescriptor.allRuleRefsInAltsWithRewrites
+    :{RewriteRuleSubtreeStream stream_<it>=new RewriteRuleSubtreeStream(adaptor,"rule <it>");}; separator="\n">
 >>
 
 ruleCleanUp() ::= <<
@@ -138,11 +142,11 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 /** ID but track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>list_<token>.add(<label>);<\n>
+<if(backtracking)>if ( backtracking==0 ) <endif>stream_<token>.add(<label>);<\n>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
- *  to the tracking list list_ID for use in the rewrite.
+ *  to the tracking list stream_ID for use in the rewrite.
  */
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefTrack(...)>
@@ -195,7 +199,7 @@ ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>list_<rule>.add(<label>.getTree());
+<if(backtracking)>if ( backtracking==0 ) <endif>stream_<rule>.add(<label>.getTree());
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -249,20 +253,25 @@ root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 
 rewriteCode(
 	alts, description,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
+	referencedElementsDeep, // ALL referenced elements to right of ->
 	referencedTokenLabels,
+	referencedTokenListLabels,
 	referencedRuleLabels,
+	referencedRuleListLabels,
 	rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
 <<
 
 // AST REWRITE
+// elements: <referencedElementsDeep; separator=", ">
+// token labels: <referencedTokenLabels; separator=", ">
+// rule labels: <referencedRuleLabels; separator=", ">
+// token list labels: <referencedTokenListLabels; separator=", ">
+// rule list labels: <referencedRuleListLabels; separator=", ">
 <if(backtracking)>
 if ( backtracking==0 ) {<\n>
 <endif>
-int i_0 = 0;
 <prevRuleRootRef()>.tree = root_0;
+<rewriteCodeLabels()>
 root_0 = (<ASTLabelType>)adaptor.nil();
 <alts:rewriteAlt(); separator="else ">
 <if(backtracking)>
@@ -270,97 +279,67 @@ root_0 = (<ASTLabelType>)adaptor.nil();
 <endif>
 >>
 
+rewriteCodeLabels() ::= <<
+<referencedTokenLabels
+    :{RewriteRuleTokenStream stream_<it>=new RewriteRuleTokenStream(adaptor,"token <it>",<it>);};
+    separator="\n"
+>
+<referencedTokenListLabels
+    :{RewriteRuleTokenStream stream_<it>=new RewriteRuleTokenStream(adaptor,"token <it>", list_<it>);};
+    separator="\n"
+>
+<referencedRuleLabels
+    :{RewriteRuleSubtreeStream stream_<it>=new RewriteRuleSubtreeStream(adaptor,"token <it>",<it>!=null?<it>.tree:null);};
+    separator="\n"
+>
+<referencedRuleListLabels
+    :{RewriteRuleSubtreeStream stream_<it>=new RewriteRuleSubtreeStream(adaptor,"token <it>",list_<it>);};
+    separator="\n"
+>
+>>
+
+/** Generate code for an optional rewrite block; note it uses the deep ref'd element
+  *  list rather shallow like other blocks.
+  */
 rewriteOptionalBlock(
 	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	referencedTokenLabels,
-	referencedRuleLabels,
+	referencedElementsDeep, // all nested refs
+	referencedElements, // elements in immediately block; no nested blocks
 	description) ::=
 <<
 // <fileName>:<description>
-{
-<rewriteBlockCardinalityCheck()>
-if ( n_<rewriteBlockLevel> > 1 ) throw new RuntimeException("<first([referencedTokens,referencedListLabels,referencedRules])> list has > 1 elements");
-if ( n_<rewriteBlockLevel>==1 ) {
-    int i_<rewriteBlockLevel> = 0;
+if ( <referencedElementsDeep:{el | stream_<el>.hasNext()}; separator="||"> ) {
     <alt>
-    }
-}<\n>
+}
+<referencedElementsDeep:{el | stream_<el>.reset();<\n>}>
 >>
 
 rewriteClosureBlock(
 	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	referencedTokenLabels,
-	referencedRuleLabels,
+	referencedElementsDeep, // all nested refs
+	referencedElements, // elements in immediately block; no nested blocks
 	description) ::=
 <<
 // <fileName>:<description>
-{
-<rewriteBlockCardinalityCheck()>
-for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+while ( <referencedElements:{el | stream_<el>.hasNext()}; separator="||"> ) {
     <alt>
 }
-}<\n>
+<referencedElements:{el | stream_<el>.reset();<\n>}>
 >>
 
 rewritePositiveClosureBlock(
 	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	referencedTokenLabels,
-	referencedRuleLabels,
+	referencedElementsDeep, // all nested refs
+	referencedElements, // elements in immediately block; no nested blocks
 	description) ::=
 <<
-// <fileName>:<description>
-{
-<rewriteBlockCardinalityCheck()>
-if ( n_<rewriteBlockLevel>==0 ) throw new RuntimeException("Must have more than one element for (...)+ loops");
-for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
+if ( !(<referencedElements:{el | stream_<el>.hasNext()}; separator="||">) ) {
+    throw new RewriteEarlyExitException();
+}
+while ( <referencedElements:{el | stream_<el>.hasNext()}; separator="||"> ) {
     <alt>
 }
-}<\n>
->>
-
-/** Elements referenced in rewrite loops/optional blocks must have
- *  the same size.  Factor this out from rewriteXXXBlock rules.  This
- *  deals both with the lists of stuff and single element labels like id=ID.
- *  The n_xxx var is always defined to either first list_ var or single-value
- *  label.
- */
-rewriteBlockCardinalityCheck() ::= <<
-<! First compute size of lists of stuff !>
-<first([referencedTokens,referencedListLabels,referencedRules]):{int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == null ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>.size();}>
-<! Check cardinality against first size !>
-<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.size()!=n_<rewriteBlockLevel> ) throw new RuntimeException("rewrite element <it> list differs in size from other elements");<\n>}>
-<!
-   Now generate checks for non-list labels
-!>
-<!
-   If no lists above, then we need to define n to be 0 or 1 depending on presence
-   of single-value labels
-!>
-<if(!first([referencedTokens,referencedListLabels,referencedRules]))>
-<first([referencedTokenLabels,referencedRuleLabels]):{label |
-int n_<rewriteBlockLevel> = <first([referencedTokenLabels,referencedRuleLabels])>==null ? 0 : 1;
-}>
-<! Now, gen checks to ensure non-list labels match cardinality of other labels !>
-<rest([referencedTokenLabels,referencedRuleLabels]):{label|
-if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n_<rewriteBlockLevel>==0) ) throw new RuntimeException("rewrite element <label> list differs in size from other elements");
-}>
-
-<else> <! there were some list labels !>
-
-<! Now, gen checks to ensure non-list labels match cardinality of lists !>
-<[referencedTokenLabels,referencedRuleLabels]:{label|
-if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n_<rewriteBlockLevel>==0) ) throw new RuntimeException("rewrite element <label> list differs in size from other elements");
-}>
-<endif>
+<referencedElements:{el | stream_<el>.reset();<\n>}>
 >>
 
 rewriteAlt(a) ::= <<
@@ -398,27 +377,27 @@ rewriteElement(e) ::= <<
 
 /** Gen ID */
 rewriteTokenRef(token,elementIndex,args) ::= <<
-adaptor.addChild(root_<treeLevel>, <if(args)>adaptor.create(<token>,<args; separator=", ">)<else>(<labelType>)list_<token>.get(i_<rewriteBlockLevel>)<endif>);<\n>
+adaptor.addChild(root_<treeLevel>, <if(args)>adaptor.create(<token>,<args; separator=", ">)<else>stream_<token>.next()<endif>);<\n>
 >>
 
 /** Gen $label ... where defined via label=ID */
 rewriteTokenLabelRef(label,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, <label>);<\n>
+adaptor.addChild(root_<treeLevel>, stream_<label>.next());<\n>
 >>
 
 /** Gen $label ... where defined via label+=ID */
 rewriteTokenListLabelRef(label,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, (<labelType>)list_<label>.get(i_<rewriteBlockLevel>));<\n>
+adaptor.addChild(root_<treeLevel>, stream_<label>.next());<\n>
 >>
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(stream_<label>.next(), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^(ID ...) */
 rewriteTokenRefRoot(token,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot((<labelType>)list_<token>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(stream_<token>.next(), root_<treeLevel>);<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
@@ -441,20 +420,12 @@ root_0 = <action>;<\n>
  */
 prevRuleRootRef() ::= "retval"
 
-rewriteRuleRef(rule,dup) ::= <<
-<if(dup)>
-adaptor.addChild(root_<treeLevel>, adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)));<\n>
-<else>
-adaptor.addChild(root_<treeLevel>, list_<rule>.get(i_<rewriteBlockLevel>));<\n>
-<endif>
+rewriteRuleRef(rule) ::= <<
+adaptor.addChild(root_<treeLevel>, stream_<rule>.next());<\n>
 >>
 
-rewriteRuleRefRoot(rule,dup) ::= <<
-<if(dup)>
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(adaptor.dupTree(list_<rule>.get(i_<rewriteBlockLevel>)), root_<treeLevel>);<\n>
-<else>
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(list_<rule>.get(i_<rewriteBlockLevel>), root_<treeLevel>);<\n>
-<endif>
+rewriteRuleRefRoot(rule) ::= <<
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(stream_<rule>.nextNode(), root_<treeLevel>);<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
@@ -467,20 +438,20 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<action>, root_<treeLevel>
 
 /** Gen $ruleLabel ... where defined via ruleLabel=rule */
 rewriteRuleLabelRef(label) ::= <<
-adaptor.addChild(root_<treeLevel>, <label>.tree);<\n>
+adaptor.addChild(root_<treeLevel>, stream_<label>.next());<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-adaptor.addChild(root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)list_<label>.get(i_<rewriteBlockLevel>)).getTree());<\n>
+adaptor.addChild(root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)stream_<label>.next()).getTree());<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
 rewriteRuleLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.tree, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)list_<label>.get(i_<rewriteBlockLevel>)).getTree(), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>);<\n>
 >>

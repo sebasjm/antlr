@@ -43,6 +43,8 @@ options {
 protected Grammar grammar;
 protected GrammarAST root;
 protected String currentRuleName;
+protected GrammarAST currentRewriteBlock;
+protected GrammarAST currentRewriteRule;
 protected int outerAltNum = 0;
 protected int blockLevel = 0;
 
@@ -481,6 +483,12 @@ ast_suffix
 	;
 
 rewrite
+{
+currentRewriteRule = #rewrite; // has to execute during guessing
+if ( grammar.buildAST() ) {
+    #rewrite.rewriteRefsDeep = new HashSet<GrammarAST>();
+}
+}
 	:	(
             #( REWRITE (pred:SEMPRED)? rewrite_alternative )
             {
@@ -490,10 +498,28 @@ rewrite
             }
             }
         )*
+        //{System.out.println("-> refs = "+#rewrite.rewriteRefs);}
 	;
 
 rewrite_block
-    :   #(  BLOCK rewrite_alternative EOB )
+{
+GrammarAST enclosingBlock = currentRewriteBlock;
+if ( inputState.guessing==0 ) {  // don't do if guessing
+    currentRewriteBlock=#rewrite_block; // pts to BLOCK node
+    currentRewriteBlock.rewriteRefsShallow = new HashSet<GrammarAST>();
+    currentRewriteBlock.rewriteRefsDeep = new HashSet<GrammarAST>();
+}
+}
+    :   #( BLOCK rewrite_alternative EOB )
+        //{System.out.println("atoms="+currentRewriteBlock.rewriteRefs);}
+        {
+        // copy the element refs in this block to the surrounding block
+        if ( enclosingBlock!=null ) {
+            enclosingBlock.rewriteRefsDeep
+                .addAll(currentRewriteBlock.rewriteRefsShallow);
+        }
+        currentRewriteBlock = enclosingBlock; // restore old BLOCK ptr
+        }
     ;
 
 rewrite_alternative
@@ -504,17 +530,7 @@ rewrite_alternative
 
 rewrite_element
     :   rewrite_atom
-
-    |   #(  n:NOT
-            (  c:CHAR_LITERAL
-            |  s:STRING_LITERAL
-            |  t:TOKEN_REF
-            |  #( st:SET (rewrite_setElement)+ )
-            )
-         )
-
     |   rewrite_ebnf
-
     |   rewrite_tree
     ;
 
@@ -529,7 +545,28 @@ rewrite_tree
     ;
 
 rewrite_atom
-    :   RULE_REF
+{
+Rule r = grammar.getRule(currentRuleName);
+Set tokenRefsInAlt = r.getTokenRefsInAlt(outerAltNum);
+boolean imaginary =
+    #rewrite_atom.getType()==TOKEN_REF &&
+    !tokenRefsInAlt.contains(#rewrite_atom.getText());
+if ( !imaginary && grammar.buildAST() &&
+     (#rewrite_atom.getType()==RULE_REF ||
+      #rewrite_atom.getType()==LABEL ||
+      #rewrite_atom.getType()==TOKEN_REF ||
+      #rewrite_atom.getType()==CHAR_LITERAL ||
+      #rewrite_atom.getType()==STRING_LITERAL) )
+{
+    // track per block and for entire rewrite rule
+    if ( currentRewriteBlock!=null ) {
+        currentRewriteBlock.rewriteRefsShallow.add(#rewrite_atom);
+        currentRewriteBlock.rewriteRefsDeep.add(#rewrite_atom);
+    }
+    currentRewriteRule.rewriteRefsDeep.add(#rewrite_atom);
+}
+}
+    :   RULE_REF 
     |   ( #(TOKEN_REF (arg:ARG_ACTION)?) | CHAR_LITERAL | STRING_LITERAL )
         {
         if ( #arg!=null ) {
@@ -537,23 +574,14 @@ rewrite_atom
             trackInlineAction(#arg);
         }
         }
-    |	rewrite_set
+
     |	LABEL
+
     |	ACTION
         {
             #ACTION.outerAltNum = this.outerAltNum;
             trackInlineAction(#ACTION);
         }
-    ;
-
-rewrite_set
-	:   #( s:SET (rewrite_setElement)+ )
-    ;
-
-rewrite_setElement
-    :   c:CHAR_LITERAL
-    |   t:TOKEN_REF
-    |   s:STRING_LITERAL
     ;
 
 rewrite_template

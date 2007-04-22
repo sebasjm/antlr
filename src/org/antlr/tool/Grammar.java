@@ -58,6 +58,7 @@ public class Grammar {
 	public static final int INITIAL_DECISION_LIST_SIZE = 300;
 	public static final int INVALID_RULE_INDEX = -1;
 
+	// the various kinds of labels. t=type, id=ID, types+=type ids+=ID
 	public static final int RULE_LABEL = 1;
 	public static final int TOKEN_LABEL = 2;
 	public static final int RULE_LIST_LABEL = 3;
@@ -1221,6 +1222,30 @@ public class Grammar {
 			}
 			defineLabel(r, label, element, RULE_LIST_LABEL);
 		}
+	}
+
+	/** Given a set of all rewrite elements on right of ->, filter for
+	 *  label types such as Grammar.TOKEN_LABEL, Grammar.TOKEN_LIST_LABEL, ...
+	 *  Return a displayable token type name computed from the GrammarAST.
+	 */
+	public Set<String> getLabels(Set<GrammarAST> rewriteElements, int labelType) {
+		Set<String> labels = new HashSet<String>();
+		for (Iterator it = rewriteElements.iterator(); it.hasNext();) {
+			GrammarAST el = (GrammarAST) it.next();
+			if ( el.getType()==ANTLRParser.LABEL ) {
+				Rule r = getRule(el.enclosingRule);
+				String labelName = el.getText();
+				LabelElementPair pair = r.getLabel(labelName);
+				// if valid label and type is what we're looking for
+				// and not ref to old value val $rule, add to list
+				if ( pair!=null && pair.type==labelType &&
+					 !labelName.equals(el.enclosingRule) )
+				{
+					labels.add(labelName);
+				}
+			}
+		}
+		return labels;
 	}
 
 	/** Before generating code, we examine all actions that can have

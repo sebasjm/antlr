@@ -357,9 +357,6 @@ ruleLabelDefs() ::= <<
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
 <ruleDescriptor.ruleListLabels:{ll|RuleReturnScope <ll.label.text> = null;}; separator="\n">
-<[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{List list_<it>=new ArrayList();}; separator="\n"
->
 >>
 
 ruleReturnValue() ::= <<
@@ -400,13 +397,15 @@ public final void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scop
     <ruleDeclarations()>
     try {
 <if(nakedBlock)>
-        <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
+        <ruleLabelDefs()>
+        <ruleDescriptor.actions.init>
         <block><\n>
 <else>
         int _type = <ruleName>;
-        <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
+        <ruleLabelDefs()>
+        <ruleDescriptor.actions.init>
         <block>
         <ruleCleanUp()>
         this.type = _type;
@@ -586,7 +585,7 @@ list_<label>.add(<elem>);<\n>
 /** match a character */
 charRef(char,label) ::= <<
 <if(label)>
-int <label> = input.LA(1);<\n>
+<label> = input.LA(1);<\n>
 <endif>
 match(<char>); <checkRuleBacktrackFailure()>
 >>
@@ -687,22 +686,28 @@ ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 >>
 
 /** A lexer rule reference */
-lexerRuleRef(rule,label,args) ::= <<
+lexerRuleRef(rule,label,args,elementIndex) ::= <<
 <if(label)>
-int <label>Start = getCharIndex();
+int <label>Start<elementIndex> = getCharIndex();
 m<rule>(<args; separator=", ">); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
 <else>
 m<rule>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>
 >>
 
+/** i+=INT in lexer */
+lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::= <<
+<lexerRuleRef(...)>
+<listLabel(elem=label,...)>
+>>
+
 /** EOF in the lexer */
 lexerMatchEOF(label) ::= <<
 <if(label)>
-int <label>Start = getCharIndex();
+int <label>Start<elementIndex> = getCharIndex();
 match(EOF); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
 <else>
 match(EOF); <checkRuleBacktrackFailure()>
 <endif>
@@ -772,9 +777,13 @@ dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
 <edges; separator="\nelse "><\n>
 <if(eotPredictsAlt)>
+<if(!edges)>
+alt<decisionNumber>=<eotPredictsAlt>; <! if no edges, don't gen ELSE !>
+<else>
 else {
     alt<decisionNumber>=<eotPredictsAlt>;
 }<\n>
+<endif>
 <endif>
 >>
 
@@ -929,12 +938,16 @@ class DFA<dfa.decisionNumber> extends DFA {
  *  state.
  */
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
-<if(semPredState)>
+int LA<decisionNumber>_<stateNumber> = input.LA(1);<\n>
+<if(semPredState)> <! get next lookahead symbol to test edges, then rewind !>
+int index<decisionNumber>_<stateNumber> = input.index();
 input.rewind();<\n>
 <endif>
-int LA<decisionNumber>_<stateNumber> = input.LA(1);<\n>
 s = -1;
 <edges; separator="\nelse ">
+<if(semPredState)> <! return input cursor to state before we rewound !>
+input.seek(index<decisionNumber>_<stateNumber>);<\n>
+<endif>
 if ( s>=0 ) return s;
 break;
 >>

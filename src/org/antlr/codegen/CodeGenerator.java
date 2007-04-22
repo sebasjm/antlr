@@ -645,6 +645,7 @@ public class CodeGenerator {
 		stateST.setAttribute("stateNumber", s.stateNumber);
 		stateST.setAttribute("decisionNumber", s.dfa.decisionNumber);
 
+		boolean foundGatedPred = false;
 		StringTemplate eotST = null;
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
@@ -669,6 +670,7 @@ public class CodeGenerator {
 				DFAState t = (DFAState)edge.target;
 				SemanticContext preds =	t.getGatedPredicatesInNFAConfigurations();
 				if ( preds!=null ) {
+					foundGatedPred = true;
 					StringTemplate predST = preds.genExpr(this,
 														  getTemplates(),
 														  t.dfa);
@@ -679,6 +681,11 @@ public class CodeGenerator {
 			if ( edge.label.getAtom()!=Label.EOT ) {
 				stateST.setAttribute("edges", edgeST);
 			}
+		}
+		if ( foundGatedPred ) {
+			// state has >= 1 edge with a gated pred (syn or sem)
+			// must rewind input first, set flag.
+			stateST.setAttribute("semPredState", new Boolean(foundGatedPred));
 		}
 		if ( eotST!=null ) {
 			stateST.setAttribute("edges", eotST);

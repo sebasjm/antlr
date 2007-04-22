@@ -84,10 +84,6 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		return r;
 	}
 
-	public void addChild(Object t, Token child) {
-		addChild(t, create(child));
-	}
-
 	public Object becomeRoot(Token newRoot, Object oldRoot) {
 		return becomeRoot(create(newRoot), oldRoot);
 	}

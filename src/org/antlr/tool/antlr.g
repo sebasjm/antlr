@@ -588,14 +588,14 @@ element
 elementNoOptionSpec
 {
     IntSet elements=null;
+    GrammarAST sub, sub2;
 }
-	:	id ASSIGN^ elementNoOptionSpec
-    |   id PLUS_ASSIGN^ elementNoOptionSpec
-	|   range (ROOT^|BANG^)?
-    |   terminal
-    |	notSet (ROOT^|BANG^)?
+	:	id (ASSIGN^|PLUS_ASSIGN^) (atom|block)
+        ( sub=ebnfSuffix[(GrammarAST)currentAST.root,false]! {#elementNoOptionSpec=sub;} )?
+    |   atom
+        ( sub2=ebnfSuffix[(GrammarAST)currentAST.root,false]! {#elementNoOptionSpec=sub2;} )?
     |	ebnf
-	|   a:ACTION
+	|   ACTION
 	|   p:SEMPRED ( IMPLIES! {#p.setType(GATED_SEMPRED);} )?
 		{
 		#p.setEnclosingRule(currentRuleName);
@@ -603,6 +603,14 @@ elementNoOptionSpec
 		}
 	|   t3:tree
 	;
+
+atom:   range (ROOT^|BANG^)?
+    |   terminal
+    |	notSet (ROOT^|BANG^)?
+    |   rr:RULE_REF^
+		( ARG_ACTION )?
+		(ROOT^|BANG^)?
+    ;
 
 notSet
 {
@@ -614,7 +622,6 @@ notSet
 		(	notTerminal
         |   block
 		)
-        ( subrule=ebnfSuffix[#n,false] {#notSet = subrule;} )?
         {#notSet.setLine(line); #notSet.setColumn(col);}
 	;
 
@@ -667,40 +674,22 @@ GrammarAST subrule=null, root=null;
 		#range = #(r, #c1, #c2);
 		root = #range;
 		}
-    	(subrule=ebnfSuffix[root,false] {#range=subrule;})?
+//    	(subrule=ebnfSuffix[root,false] {#range=subrule;})?
 	;
 
 terminal
 {
 GrammarAST ebnfRoot=null, subrule=null;
 }
-    :   cl:CHAR_LITERAL^
-    		(	subrule=ebnfSuffix[#cl,false] {#terminal=subrule;}
-    		|	(ROOT^|BANG^)
-    		)?
+    :   cl:CHAR_LITERAL^ (ROOT^|BANG^)?
 
 	|   tr:TOKEN_REF^
-			( ARG_ACTION )?
-			(	subrule=ebnfSuffix[#tr,false] {#terminal=subrule;}
-			|	(ROOT^|BANG^)
-			)?
-			// Args are only valid for lexer rules
+			( ARG_ACTION )? // Args are only valid for lexer rules
+            (ROOT^|BANG^)?
 
-    |   rr:RULE_REF^
-			( ARG_ACTION )?
-			(	subrule=ebnfSuffix[#rr,false] {#terminal=subrule;}
-			|	(ROOT^|BANG^)
-			)?
+	|   sl:STRING_LITERAL (ROOT^|BANG^)?
 
-	|   sl:STRING_LITERAL
-    		(	subrule=ebnfSuffix[#sl,false] {#terminal=subrule;}
-			|	(ROOT^|BANG^)
-			)?
-
-	|   wi:WILDCARD
-    		(	subrule=ebnfSuffix[#wi,false] {#terminal=subrule;}
-			|	(ROOT^|BANG^)
-			)?
+	|   wi:WILDCARD (ROOT^|BANG^)?
 	;
 
 ebnfSuffix[GrammarAST elemAST, boolean inRewrite] returns [GrammarAST subrule=null]
@@ -762,7 +751,10 @@ rewrite
 		( options { warnWhenFollowAmbig=false;}
 		: rew:REWRITE pred:SEMPRED alt:rewrite_alternative
 	      {root.addChild( #(#rew, #pred, #alt) );}
-		  {#pred.setEnclosingRule(currentRuleName);}
+		  {
+          #pred.setEnclosingRule(currentRuleName);
+          #rew.setEnclosingRule(currentRuleName);
+          }
 	    )*
 		rew2:REWRITE alt2:rewrite_alternative
         {
@@ -772,7 +764,6 @@ rewrite
 	|
 	;
 
-// DOESNT DO SETS
 rewrite_block
     :   lp:LPAREN^ {#lp.setType(BLOCK); #lp.setText("BLOCK");}
 		rewrite_alternative
@@ -811,14 +802,14 @@ rewrite_element
 {
 GrammarAST subrule=null;
 }
-	:	t:rewrite_terminal
+	:	t:rewrite_atom
     	( subrule=ebnfSuffix[#t,true] {#rewrite_element=subrule;} )?
 	|   rewrite_ebnf
 	|   tr:rewrite_tree
     	( subrule=ebnfSuffix[#tr,true] {#rewrite_element=subrule;} )?
 	;
 
-rewrite_terminal
+rewrite_atom
 {
 GrammarAST subrule=null;
 }
@@ -828,9 +819,10 @@ GrammarAST subrule=null;
 	|   sl:STRING_LITERAL
 	|!  d:DOLLAR i:id // reference to a label in a rewrite rule
 		{
-		#rewrite_terminal = #[LABEL,i_AST.getText()];
-		#rewrite_terminal.setLine(#d.getLine());
-		#rewrite_terminal.setColumn(#d.getColumn());
+		#rewrite_atom = #[LABEL,i_AST.getText()];
+		#rewrite_atom.setLine(#d.getLine());
+		#rewrite_atom.setColumn(#d.getColumn());
+        #rewrite_atom.setEnclosingRule(currentRuleName);
 		}
 	|	ACTION
 	;
@@ -850,7 +842,7 @@ rewrite_ebnf!
 
 rewrite_tree :
 	TREE_BEGIN^
-        rewrite_terminal ( rewrite_element )*
+        rewrite_atom ( rewrite_element )*
     RPAREN!
 	;
 

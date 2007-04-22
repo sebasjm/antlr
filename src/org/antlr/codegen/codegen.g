@@ -160,14 +160,7 @@ options {
 		return elementST;
 	}
 
-	/** Return a non-empty template name suffix if the token is to be
-	 *  tracked, added to a tree, or both.
-	 */
-	protected String getSTSuffix(GrammarAST ast_suffix, String label) {
-		if ( grammar.type==Grammar.LEXER ) {
-			return "";
-		}
-		// handle list label stuff; make element use "Track"
+    public boolean isListLabel(String label) {
 		boolean hasListLabel=false;
 		if ( label!=null ) {
 			Rule r = grammar.getRule(currentRuleName);
@@ -182,6 +175,17 @@ options {
 				}
 			}
 		}
+        return hasListLabel;
+    }
+
+	/** Return a non-empty template name suffix if the token is to be
+	 *  tracked, added to a tree, or both.
+	 */
+	protected String getSTSuffix(GrammarAST ast_suffix, String label) {
+		if ( grammar.type==Grammar.LEXER ) {
+			return "";
+		}
+		// handle list label stuff; make element use "Track"
 
 		String astPart = "";
 		String operatorPart = "";
@@ -201,7 +205,7 @@ options {
 		if ( currentAltHasASTRewrite ) {
 			rewritePart = "Track";
 		}
-		if ( hasListLabel ) {
+		if ( isListLabel(label) ) {
 			listLabelPart = "AndListLabel";
 		}
 		String STsuffix = operatorPart+rewritePart+listLabelPart;
@@ -209,6 +213,30 @@ options {
 
     	return STsuffix;
 	}
+
+    /** Convert rewrite AST lists to target labels list */
+    protected List<String> getTokenTypesAsTargetLabels(Set<GrammarAST> refs) {
+        if ( refs==null || refs.size()==0 ) {
+            return null;
+        }
+        List<String> labels = new ArrayList<String>(refs.size());
+        for (GrammarAST t : refs) {
+            String label;
+            if ( t.getType()==ANTLRParser.RULE_REF ) {
+                label = t.getText();
+            }
+            else if ( t.getType()==ANTLRParser.LABEL ) {
+                label = t.getText();
+            }
+            else {
+                // must be char or string literal
+                label = generator.getTokenTypeAsTargetLabel(
+                            grammar.getTokenType(t.getText()));
+            }
+            labels.add(label);
+        }
+        return labels;
+    }
 
     protected void init(Grammar g) {
         this.grammar = g;
@@ -790,12 +818,17 @@ if ( label!=null ) {
 				}
 			    else {
 					code = templates.getInstanceOf("lexerRuleRef");
+                    if ( isListLabel(labelText) ) {
+                        code = templates.getInstanceOf("lexerRuleRefAndListLabel");
+                    }
 					code.setAttribute("rule", t.getText());
 					if ( #targ!=null ) {
 						List args = generator.translateAction(currentRuleName,#targ);
 						code.setAttribute("args", args);
 					}
 				}
+                int i = ((TokenWithIndex)#t.getToken()).getIndex();
+			    code.setAttribute("elementIndex", i);
 			    if ( label!=null ) code.setAttribute("label", labelText);
 		   }
 		   else {
@@ -905,7 +938,24 @@ if ( #rewrite.getType()==REWRITE ) {
 		code = templates.getInstanceOf("rewriteCode");
 		code.setAttribute("treeLevel", Utils.integer(OUTER_REWRITE_NESTING_LEVEL));
 		code.setAttribute("rewriteBlockLevel", Utils.integer(OUTER_REWRITE_NESTING_LEVEL));
-		currentBlockST = code;
+        code.setAttribute("referencedElementsDeep",
+                          getTokenTypesAsTargetLabels(#rewrite.rewriteRefsDeep));
+        Set<String> tokenLabels =
+            grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.TOKEN_LABEL);
+        Set<String> tokenListLabels =
+            grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.TOKEN_LIST_LABEL);
+        Set<String> ruleLabels =
+            grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.RULE_LABEL);
+        Set<String> ruleListLabels =
+            grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.RULE_LIST_LABEL);
+        // just in case they ref $r for "previous value", make a stream
+        // from retval.tree
+        StringTemplate retvalST = templates.getInstanceOf("prevRuleRootRef");
+        ruleLabels.add(retvalST.toString());
+        code.setAttribute("referencedTokenLabels", tokenLabels);
+        code.setAttribute("referencedTokenListLabels", tokenListLabels);
+        code.setAttribute("referencedRuleLabels", ruleLabels);
+        code.setAttribute("referencedRuleListLabels", ruleListLabels);
 	}
 }
 }
@@ -941,6 +991,12 @@ code.setAttribute("rewriteBlockLevel", rewriteBlockNestingLevel);
 StringTemplate alt=null;
 }
     :   #(  BLOCK
+            {
+            currentBlockST.setAttribute("referencedElementsDeep",
+                getTokenTypesAsTargetLabels(#BLOCK.rewriteRefsDeep));
+            currentBlockST.setAttribute("referencedElements",
+                getTokenTypesAsTargetLabels(#BLOCK.rewriteRefsShallow));
+            }
             alt=rewrite_alternative
             EOB
          )
@@ -986,14 +1042,6 @@ rewrite_element returns [StringTemplate code=null]
     GrammarAST ast = null;
 }
     :   code=rewrite_atom[false]
-
-    |   #(  n:NOT
-            (  c:CHAR_LITERAL
-            |  s:STRING_LITERAL
-            |  t:TOKEN_REF
-            |  #( st:SET (rewrite_setElement)+ )
-            )
-         )
 
     |   code=rewrite_ebnf
 
@@ -1087,11 +1135,6 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     		if ( !rewriteRuleRefs.contains(ruleRefName) ) {
 	    		rewriteRuleRefs.add(ruleRefName);
     		}
-    		else {
-    			// we found a ref to the same rule in the same -> rewrite
-    			code.setAttribute("dup", Boolean.valueOf(true));
-    		}
-			currentBlockST.setAttribute("referencedRules", ruleRefName);
 		}
     	}
 
@@ -1124,15 +1167,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 									  tokenName);
     		code = new StringTemplate(); // blank; no code gen
     	}
-    	else {
-    		// only track this reference if it's valid
-			if ( !imaginary ) {
-				currentBlockST.setAttribute("referencedTokens", tok);
-			}
-		}
     	}
-
-    |	code=rewrite_set
 
     |	LABEL
     	{
@@ -1154,23 +1189,18 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	}
     	else {
 			String stName = null;
-			String refListAttrName = null;
 			switch ( pair.type ) {
 				case Grammar.TOKEN_LABEL :
 					stName = "rewriteTokenLabelRef";
-					refListAttrName = "referencedTokenLabels";
 					break;
 				case Grammar.RULE_LABEL :
 					stName = "rewriteRuleLabelRef";
-					refListAttrName = "referencedRuleLabels";
 					break;
 				case Grammar.TOKEN_LIST_LABEL :
 					stName = "rewriteTokenListLabelRef";
-					refListAttrName = "referencedListLabels";
 					break;
 				case Grammar.RULE_LIST_LABEL :
 					stName = "rewriteRuleListLabelRef";
-					refListAttrName = "referencedListLabels";
 					break;
 			}
 			if ( isRoot ) {
@@ -1178,9 +1208,6 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 			}
 			code = templates.getInstanceOf(stName);
 			code.setAttribute("label", labelName);
-			if ( refListAttrName!=null ) {
-				currentBlockST.setAttribute(refListAttrName, #LABEL.getText());
-			}
 		}
     	}
 
@@ -1192,16 +1219,6 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 		code = templates.getInstanceOf("rewriteNodeAction"+(isRoot?"Root":""));
 		code.setAttribute("action", chunks);
         }
-    ;
-
-rewrite_set returns [StringTemplate code=null]
-	:   #( s:SET (rewrite_setElement)+ )
-    ;
-
-rewrite_setElement
-    :   c:CHAR_LITERAL
-    |   t:TOKEN_REF
-    |   s:STRING_LITERAL
     ;
 
 rewrite_template returns [StringTemplate code=null]

@@ -297,6 +297,30 @@ C# Target Notes
 
 CHANGES
 
+April 21, 2007
+
+* Pushing a huge update that fixes:
+	http://www.antlr.org:8888/browse/ANTLR-112
+	http://www.antlr.org:8888/browse/ANTLR-110
+	http://www.antlr.org:8888/browse/ANTLR-109
+	http://www.antlr.org:8888/browse/ANTLR-103
+	http://www.antlr.org:8888/browse/ANTLR-97
+	http://www.antlr.org:8888/browse/ANTLR-113
+	http://www.antlr.org:8888/browse/ANTLR-66
+	http://www.antlr.org:8888/browse/ANTLR-98
+	http://www.antlr.org:8888/browse/ANTLR-24
+	http://www.antlr.org:8888/browse/ANTLR-114
+	http://www.antlr.org:8888/browse/ANTLR-5
+	http://www.antlr.org:8888/browse/ANTLR-6
+
+  Basically, I gutted the way AST rewrites work.  MUCH better.
+
+* Fixed lots of little label issues in the lexer.  Couldn't do x+=ID
+  in lexer, for example.  Fixed ANTLR-114, ANTLR-112
+
+* Isolated EOT transition in lexer generated dangling else clause.
+  Fixed ANTLR-113.
+
 April 17, 2007
 
 * Fixed a major problem with gated semantic predicates.  Added more
