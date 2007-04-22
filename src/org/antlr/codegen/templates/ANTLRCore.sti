@@ -138,7 +138,7 @@ listLabel(label,elem);
 charRef(char,label);
 
 /** match a character range */
-charRangeRef(a,b);
+charRangeRef(a,b,label);
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode);

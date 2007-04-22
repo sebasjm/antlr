@@ -357,7 +357,7 @@ element
     	if ( #el.getType()==RULE_REF) {
     		grammar.defineRuleRefLabel(currentRuleName,#id.getToken(),#el);
     	}
-    	else if ( #el.getType()!=CHAR_RANGE ) {
+    	else {
     		grammar.defineTokenRefLabel(currentRuleName,#id.getToken(),#el);
     	}
     	}

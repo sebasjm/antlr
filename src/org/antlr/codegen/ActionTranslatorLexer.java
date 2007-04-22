@@ -776,7 +776,9 @@ public class ActionTranslatorLexer extends Lexer {
 
               		StringTemplate st;
               		Grammar.LabelElementPair pair = getElementLabel(ID1.getText());
-              		if ( pair.type==Grammar.TOKEN_LABEL ) {
+              		if ( pair.type==Grammar.TOKEN_LABEL ||
+             			 pair.type==Grammar.CHAR_LABEL )
+					{
               			st = template("tokenLabelRef");
               		}
               		else {

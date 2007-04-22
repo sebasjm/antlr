@@ -115,6 +115,18 @@ public class TestLexer extends BaseTest {
 		assertEquals("342\n", found);
 	}
 
+	public void testRefToTokenInLexer() throws Exception {
+		String grammar =
+			"grammar P;\n"+
+			"a : A EOF ;\n"+
+			"A : I {System.out.println($I.text);} ;\n" +
+			"fragment I : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;";
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
+				    "a", "342", debug);
+		assertEquals("342\n", found);
+	}
+
 	public void testListLabelInLexer() throws Exception {
 		String grammar =
 			"grammar P;\n"+
@@ -139,8 +151,17 @@ public class TestLexer extends BaseTest {
 		assertEquals(" 33 297\n", found);
 	}
 
+	public void testCharLabelInLexer() {
+		String grammar =
+			"grammar T;\n" +
+			"a : B ;\n" +
+			"B : x='a' {System.out.println((char)$x);} ;\n" ;
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "a", debug);
+		assertEquals("a\n", found);
+	}
+
 	public void testRepeatedLabelInLexer() {
-		// current fails.  Not sure it's worth fixing for now
 		String grammar =
 			"lexer grammar t;\n" +
 			"B : x='a' x='b' ;\n" ;

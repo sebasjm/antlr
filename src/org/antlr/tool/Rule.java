@@ -72,6 +72,9 @@ public class Rule {
 	/** A list of all LabelElementPair attached to tokens like id=ID */
 	public LinkedHashMap tokenLabels;
 
+	/** A list of all LabelElementPair attached to single char literals like x='a' */
+	public LinkedHashMap charLabels;
+
 	/** A list of all LabelElementPair attached to rule references like f=field */
 	public LinkedHashMap ruleLabels;
 
@@ -186,8 +189,13 @@ public class Rule {
 				}
 				ruleListLabels.put(label.getText(), pair);
 				break;
+			case Grammar.CHAR_LABEL :
+				if ( charLabels==null ) {
+					charLabels = new LinkedHashMap();
+				}
+				charLabels.put(label.getText(), pair);
+				break;
 		}
-
 	}
 
 	public Grammar.LabelElementPair getLabel(String name) {

@@ -427,7 +427,9 @@ LABEL_REF
 		{
 		StringTemplate st;
 		Grammar.LabelElementPair pair = getElementLabel($ID.text);
-		if ( pair.type==Grammar.TOKEN_LABEL ) {
+		if ( pair.type==Grammar.TOKEN_LABEL ||
+              pair.type==Grammar.CHAR_LABEL )
+        {
 			st = template("tokenLabelRef");
 		}
 		else {

@@ -365,6 +365,7 @@ lexerRuleLabelDefs() ::= <<
   ruleDescriptor.ruleLabels]
     :{<labelType> <it.label.text>=null;}; separator="\n"
 >
+<ruleDescriptor.charLabels:{int <it.label.text>;}; separator="\n">
 <[ruleDescriptor.tokenListLabels,
   ruleDescriptor.ruleListLabels,
   ruleDescriptor.ruleListLabels]
@@ -604,13 +605,18 @@ match(<char>); <checkRuleBacktrackFailure()>
 >>
 
 /** match a character range */
-charRangeRef(a,b) ::= "matchRange(<a>,<b>); <checkRuleBacktrackFailure()>"
+charRangeRef(a,b,label) ::= <<
+<if(label)>
+<label> = input.LA(1);<\n>
+<endif>
+matchRange(<a>,<b>); <checkRuleBacktrackFailure()>
+>>
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
 <if(LEXER)>
-int <label>= input.LA(1);<\n>
+<label>= input.LA(1);<\n>
 <else>
 <label>=(<labelType>)input.LT(1);<\n>
 <endif>
@@ -668,7 +674,7 @@ wildcardAndListLabel(label,elementIndex) ::= <<
 /** Match . wildcard in lexer */
 wildcardChar(label, elementIndex) ::= <<
 <if(label)>
-int <label> = input.LA(1);<\n>
+<label> = input.LA(1);<\n>
 <endif>
 matchAny(); <checkRuleBacktrackFailure()>
 >>

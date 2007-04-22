@@ -63,6 +63,7 @@ public class Grammar {
 	public static final int TOKEN_LABEL = 2;
 	public static final int RULE_LIST_LABEL = 3;
 	public static final int TOKEN_LIST_LABEL = 4;
+	public static final int CHAR_LABEL = 5; // used in lexer for x='a'
 
 	public static String[] LabelTypeToString =
 		{"<invalid>", "rule", "token", "rule-list", "token-list"};
@@ -1185,7 +1186,18 @@ public class Grammar {
 	{
         Rule r = getRule(ruleName);
 		if ( r!=null ) {
-			defineLabel(r, label, tokenRef, TOKEN_LABEL);
+			if ( type==LEXER &&
+				 (tokenRef.getType()==ANTLRParser.CHAR_LITERAL||
+				 tokenRef.getType()==ANTLRParser.BLOCK||
+				 tokenRef.getType()==ANTLRParser.NOT||
+				 tokenRef.getType()==ANTLRParser.CHAR_RANGE||
+				 tokenRef.getType()==ANTLRParser.WILDCARD))
+			{
+				defineLabel(r, label, tokenRef, CHAR_LABEL);				
+			}
+			else {
+				defineLabel(r, label, tokenRef, TOKEN_LABEL);
+			}
 		}
 	}
 

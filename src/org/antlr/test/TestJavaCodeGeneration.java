@@ -50,8 +50,8 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testLabeledSetsInLexer2() {
-		// c must be an int
+	public void testLabeledNotSetsInLexer() {
+		// d must be an int
 		String grammar =
 			"lexer grammar t;\n" +
 			"A : d=~('x'|'y') e='0'..'9'\n" +
@@ -63,6 +63,40 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	public void testLabeledSetsInLexer() {
+		// d must be an int
+		String grammar =
+			"grammar T;\n" +
+			"a : A ;\n" +
+			"A : d=('x'|'y') {System.out.println((char)$d);}\n" +
+			"  ; \n" ;
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "x", false);
+		assertEquals("x\n", found);
+	}
 
+	public void testLabeledRangeInLexer() {
+		// d must be an int
+		String grammar =
+			"grammar T;\n" +
+			"a : A;\n" +
+			"A : d='a'..'z' {System.out.println((char)$d);} \n" +
+			"  ; \n" ;
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "x", false);
+		assertEquals("x\n", found);
+	}
+
+	public void testLabeledWildcardInLexer() {
+		// d must be an int
+		String grammar =
+			"grammar T;\n" +
+			"a : A;\n" +
+			"A : d=. {System.out.println((char)$d);}\n" +
+			"  ; \n" ;
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "x", false);
+		assertEquals("x\n", found);
+	}
 
 }

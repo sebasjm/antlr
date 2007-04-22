@@ -297,6 +297,16 @@ C# Target Notes
 
 CHANGES
 
+April 22, 2007
+
+* Made build.xml ref all jars in antlr lib.  Thanks to Miguel Ping.
+
+* Fixed ANTLR-11
+
+* Now labels on ranges and such in lexer work properly.
+
+* ActionAnalysisLexer was in wrong package.
+
 April 21, 2007
 
 * Pushing a huge update that fixes:

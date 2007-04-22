@@ -636,6 +636,9 @@ element[GrammarAST label, GrammarAST astSuffix] returns [StringTemplate code=nul
 		 	generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,b.getText());
          code.setAttribute("a", low);
          code.setAttribute("b", high);
+         if ( label!=null ) {
+             code.setAttribute("label", label.getText());
+         }
         }
 
     |   {#element.getSetValue()==null}? code=ebnf
