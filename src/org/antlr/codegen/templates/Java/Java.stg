@@ -359,6 +359,19 @@ ruleLabelDefs() ::= <<
 <ruleDescriptor.ruleListLabels:{ll|RuleReturnScope <ll.label.text> = null;}; separator="\n">
 >>
 
+lexerRuleLabelDefs() ::= <<
+<[ruleDescriptor.tokenLabels,
+  ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleLabels]
+    :{<labelType> <it.label.text>=null;}; separator="\n"
+>
+<[ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleListLabels,
+  ruleDescriptor.ruleListLabels]
+    :{List list_<it.label.text>=null;}; separator="\n"
+>
+>>
+
 ruleReturnValue() ::= <<
 <if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasReturnValue)>
@@ -398,13 +411,13 @@ public final void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scop
     try {
 <if(nakedBlock)>
         <ruleMemoization(name=ruleName)>
-        <ruleLabelDefs()>
+        <lexerRuleLabelDefs()>
         <ruleDescriptor.actions.init>
         <block><\n>
 <else>
         int _type = <ruleName>;
         <ruleMemoization(name=ruleName)>
-        <ruleLabelDefs()>
+        <lexerRuleLabelDefs()>
         <ruleDescriptor.actions.init>
         <block>
         <ruleCleanUp()>
