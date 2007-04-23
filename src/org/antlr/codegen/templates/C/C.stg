@@ -2031,27 +2031,27 @@ cyclicDFA(dfa) ::= <<
 /** Static dfa state tables for Cyclic dfa:
  *    <dfa.description>
  */
-static const ANTLR3_INT16 dfa<dfa.decisionNumber>_eot[<dfa.numberOfStates>] =
+static const ANTLR3_INT32 dfa<dfa.decisionNumber>_eot[<dfa.numberOfStates>] =
     {
 	<dfa.eot; wrap="\n", separator=", ", null="-1">
     };
-static const ANTLR3_INT16 dfa<dfa.decisionNumber>_eof[<dfa.numberOfStates>] =
+static const ANTLR3_INT32 dfa<dfa.decisionNumber>_eof[<dfa.numberOfStates>] =
     {
 	<dfa.eof; wrap="\n", separator=", ", null="-1">
     };
-static const ANTLR3_INT16 dfa<dfa.decisionNumber>_min[<dfa.numberOfStates>] =
+static const ANTLR3_INT32 dfa<dfa.decisionNumber>_min[<dfa.numberOfStates>] =
     {
 	<dfa.min; wrap="\n", separator=", ", null="-1">
     };
-static const ANTLR3_INT16 dfa<dfa.decisionNumber>_max[<dfa.numberOfStates>] =
+static const ANTLR3_INT32 dfa<dfa.decisionNumber>_max[<dfa.numberOfStates>] =
     {
 	<dfa.max; wrap="\n", separator=", ", null="-1">
     };
-static const ANTLR3_INT16 dfa<dfa.decisionNumber>_accept[<dfa.numberOfStates>] =
+static const ANTLR3_INT32 dfa<dfa.decisionNumber>_accept[<dfa.numberOfStates>] =
     {
 	<dfa.accept; wrap="\n", separator=", ", null="-1">
     };
-static const ANTLR3_INT16 dfa<dfa.decisionNumber>_special[<dfa.numberOfStates>] =
+static const ANTLR3_INT32 dfa<dfa.decisionNumber>_special[<dfa.numberOfStates>] =
     {	
 	<dfa.special; wrap="\n", separator=", ", null="-1">
     };
@@ -2060,7 +2060,7 @@ static const ANTLR3_INT16 dfa<dfa.decisionNumber>_special[<dfa.numberOfStates>] 
 #define dfa<dfa.decisionNumber>_T_empty	    NULL
 
 <dfa.edgeTransitionClassMap.keys:{ table |
-static const ANTLR3_INT16 dfa<dfa.decisionNumber>_T<i0>[] =
+static const ANTLR3_INT32 dfa<dfa.decisionNumber>_T<i0>[] =
     {
 	<table; separator=", ", wrap="\n", null="-1">
     };}; null = "">
@@ -2068,15 +2068,15 @@ static const ANTLR3_INT16 dfa<dfa.decisionNumber>_T<i0>[] =
 /* Transition tables are a table of sub tables, with some tables
  * reused for efficiency.
  */
-static const ANTLR3_INT16 * const dfa<dfa.decisionNumber>_transitions[] =
+static const ANTLR3_INT32 * const dfa<dfa.decisionNumber>_transitions[] =
 {
     <dfa.transitionEdgeTables:{xref|dfa<dfa.decisionNumber>_T<xref>}; separator=", ", wrap="\n", null="_empty">	
 };
 
 <if(dfa.specialStateSTs)>
-static ANTLR3_INT16 dfa<dfa.decisionNumber>_sst(p<name> ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s)
+static ANTLR3_INT32 dfa<dfa.decisionNumber>_sst(p<name> ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s)
 {
-    ANTLR3_INT16    _s;
+    ANTLR3_INT32    _s;
     
     _s	    = s;
     switch  (s)

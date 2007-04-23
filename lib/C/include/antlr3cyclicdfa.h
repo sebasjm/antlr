@@ -26,13 +26,13 @@ typedef struct ANTLR3_CYCLIC_DFA_struct
 
     ANTLR3_INT32		(*predict)		    (void * ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, struct ANTLR3_CYCLIC_DFA_struct * dfa);
 
-    const ANTLR3_INT16		    * const eot;
-    const ANTLR3_INT16		    * const eof;
-    const ANTLR3_INT16		    * const min;
-    const ANTLR3_INT16		    * const max;
-    const ANTLR3_INT16		    * const accept;
-    const ANTLR3_INT16		    * const special;
-    const ANTLR3_INT16	    * const * const transition;
+    const ANTLR3_INT32		    * const eot;
+    const ANTLR3_INT32		    * const eof;
+    const ANTLR3_INT32		    * const min;
+    const ANTLR3_INT32		    * const max;
+    const ANTLR3_INT32		    * const accept;
+    const ANTLR3_INT32		    * const special;
+    const ANTLR3_INT32	    * const * const transition;
 
 }
     ANTLR3_CYCLIC_DFA;
