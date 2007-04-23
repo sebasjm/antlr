@@ -176,7 +176,7 @@ antlr3InputReset(pANTLR3_INPUT_STREAM input)
 
     /* Install a new markers table
      */
-    input->markers  = antlr3ListNew(63557);	/* May come back and revist the hash size with experience   */
+    input->markers  = antlr3VectorNew(0);
 }
 
 /** \brief Return a pointer to the input stream source name, such as the file.
@@ -311,13 +311,13 @@ antlr3AsciiMark	(pANTLR3_INT_STREAM is)
     /* See if we are revisiting a mark as we can just reuse the hashtable
      * entry if we are, otherwise, we need a new one
      */
-    if	(input->markDepth > input->markers->table->count)
+    if	(input->markDepth > input->markers->count)
     {	
 	state	= ANTLR3_MALLOC(sizeof(ANTLR3_LEX_STATE));
 
 	/* Add it to the table
 	 */
-	input->markers->put(input->markers, input->markDepth, state, ANTLR3_FREE_FUNC);	/* No special structure, just free() on delete */
+	input->markers->add(input->markers, state, ANTLR3_FREE_FUNC);	/* No special structure, just free() on delete */
     }
     else
     {

@@ -157,7 +157,7 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
      *  them.  The marker is an index into this stack.  Index 0 is
      *  the first marker.  This is a List<TreeWalkState>
      */
-    pANTLR3_LIST		markers;
+    pANTLR3_VECTOR		markers;
 
     /* INTERFACE    */
 

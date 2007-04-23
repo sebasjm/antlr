@@ -445,7 +445,7 @@ mark	(pANTLR3_INT_STREAM is)
 
     if	(ctns->markers == NULL)
     {
-	ctns->markers = antlr3ListNew(33);
+	ctns->markers = antlr3VectorNew(0);
     }
 
     state = (pANTLR3_TREE_WALK_STATE)ANTLR3_MALLOC(sizeof(ANTLR3_TREE_WALK_STATE));
@@ -483,7 +483,7 @@ mark	(pANTLR3_INT_STREAM is)
 
     /* Return the current mark point
      */
-    ctns->lastMarker = ctns->markers->size(ctns->markers);
+    ctns->lastMarker = ctns->markers->count;
     return ctns->lastMarker;
 }
 
@@ -510,7 +510,7 @@ rewindMark	    (pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
     tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
     ctns    = tns->ctns;
 
-    if	(ctns->markers == NULL || ctns->markers->size(ctns->markers) < marker)
+    if	(ctns->markers == NULL || ctns->markers->count < marker)
     {
 	return;	    /* No such marker - do nothing */
     }
@@ -547,9 +547,9 @@ rewindMark	    (pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
      * this marker itself. The remove will cuase any space allocated to be returned
      * to the system.
      */
-    for	(m = ctns->markers->size(ctns->markers); m >= marker; m--)
+    for	(m = ctns->markers->count; m >= marker; m--)
     {
-	ctns->markers->remove(ctns->markers, m);
+	ctns->markers->del(ctns->markers, m);
     }
 }
 
