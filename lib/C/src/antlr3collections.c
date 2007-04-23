@@ -9,16 +9,28 @@
 
 /* Interface functions for hash table
  */
+
+/* String based keys */
 static void		    antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key);
 static void *		    antlr3HashGet	(pANTLR3_HASH_TABLE table, void * key);
 static pANTLR3_HASH_ENTRY   antlr3HashRemove    (pANTLR3_HASH_TABLE table, void * key);
 static ANTLR3_INT32	    antlr3HashPut	(pANTLR3_HASH_TABLE table, void * key, void * element, void (*freeptr)(void *));
+
+/* Integer based keys (Lists and so on) */
+
+static void		    antlr3HashDeleteI   (pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key);
+static void *		    antlr3HashGetI	(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key);
+static pANTLR3_HASH_ENTRY   antlr3HashRemoveI   (pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key);
+static ANTLR3_INT32	    antlr3HashPutI	(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
+
 static void		    antlr3HashFree	(pANTLR3_HASH_TABLE table);
 static ANTLR3_UINT64	    antlr3HashSize	(pANTLR3_HASH_TABLE table);
 
+/* ----------- */
+
 /* Interface functions for enumeration
  */
-static int	    antlr3EnumNext	    (pANTLR3_HASH_ENUM en, void ** key, void ** data);
+static int	    antlr3EnumNext	    (pANTLR3_HASH_ENUM en, pANTLR3_HASH_KEY * key, void ** data);
 static void	    antlr3EnumFree	    (pANTLR3_HASH_ENUM en);
 
 /* Interface functions for List
@@ -104,12 +116,19 @@ antlr3HashTableNew(ANTLR3_UINT32 sizeHint)
 
     /* Install the interface
      */
-    table->free		=  antlr3HashFree;
+
     table->get		=  antlr3HashGet;
     table->put		=  antlr3HashPut;
     table->del		=  antlr3HashDelete;
-    table->size		=  antlr3HashSize;
     table->remove	=  antlr3HashRemove;
+
+    table->getI		=  antlr3HashGetI;
+    table->putI		=  antlr3HashPutI;
+    table->delI		=  antlr3HashDeleteI;
+    table->removeI	=  antlr3HashRemoveI;
+
+    table->size		=  antlr3HashSize;
+    table->free		=  antlr3HashFree;
 
     return  table;
 }
@@ -158,9 +177,9 @@ antlr3HashFree(pANTLR3_HASH_TABLE table)
 
 		    /* Free the key memory - we know that we allocated this
 		     */
-		    if	(entry->key != NULL)
+		    if	(entry->keybase.type == ANTLR3_HASH_TYPE_STR && entry->keybase.key.sKey != NULL)
 		    {
-			ANTLR3_FREE(entry->key);
+			ANTLR3_FREE(entry->keybase.key.sKey);
 		    }
 
 		    /* Free this entry
@@ -189,6 +208,62 @@ antlr3HashFree(pANTLR3_HASH_TABLE table)
 static ANTLR3_UINT64	antlr3HashSize	    (pANTLR3_HASH_TABLE table)
 {
     return  table->count;
+}
+
+/** Remove a numeric keyed entry from a hash table if it exists,
+ *  no error if it does not exist.
+ */
+static pANTLR3_HASH_ENTRY   antlr3HashRemoveI   (pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key)
+{
+    ANTLR3_UINT32	    hash;
+    pANTLR3_HASH_BUCKET	    bucket;
+    pANTLR3_HASH_ENTRY	    entry;
+    pANTLR3_HASH_ENTRY	    * nextPointer;
+
+    /* First we need to know the hash of the provided key
+     */
+    hash    = (ANTLR3_UINT32)(key % (ANTLR3_UINT64)(table->modulo));
+
+    /* Knowing the hash, we can find the bucket
+     */
+    bucket  = table->buckets + hash;
+
+    /* Now, we traverse the entries in the bucket until
+     * we find the key or the end of the entires in the bucket. 
+     * We track the element prior to the one we are exmaining
+     * as we need to set its next pointer to the next pointer
+     * of the entry we are deleting (if we find it).
+     */
+    entry	    =   bucket->entries;    /* Entry to examine					    */
+    nextPointer	    = & bucket->entries;    /* Where to put the next pointer of the deleted entry   */
+
+    while   (entry != NULL)
+    {
+	/* See if this is the entry we wish to delete
+	 */
+	if  (entry->keybase.key.iKey == key)
+	{
+	    /* It was the correct entry, so we set the next pointer
+	     * of the previous entry to the next pointer of this
+	     * located one, which takes it out of the chain.
+	     */
+	    (*nextPointer)		= entry->nextEntry;
+
+	    table->count--;
+
+	    return entry;
+	}
+	else
+	{
+	    /* We found an entry but it wasn't the one that was wanted, so
+	     * move to the next one, if any.
+	     */
+	    nextPointer	= & (entry->nextEntry);	    /* Address of the next pointer in the current entry	    */
+	    entry	= entry->nextEntry;	    /* Address of the next element in the bucket (if any)   */
+	}
+    }
+
+    return NULL;  /* Not found */
 }
 
 /** Remove the element in the hash table for a particular
@@ -223,7 +298,7 @@ antlr3HashRemove(pANTLR3_HASH_TABLE table, void * key)
     {
 	/* See if this is the entry we wish to delete
 	 */
-	if  (strcmp((const char *)key, (const char *)entry->key) == 0)
+	if  (strcmp((const char *)key, (const char *)entry->keybase.key.sKey) == 0)
 	{
 	    /* It was the correct entry, so we set the next pointer
 	     * of the previous entry to the next pointer of this
@@ -233,8 +308,8 @@ antlr3HashRemove(pANTLR3_HASH_TABLE table, void * key)
 
 	    /* Release the key - we allocated that
 	     */
-	    ANTLR3_FREE(entry->key);
-	    entry->key	= NULL;
+	    ANTLR3_FREE(entry->keybase.key.sKey);
+	    entry->keybase.key.sKey	= NULL;
 
 	    table->count--;
 
@@ -251,6 +326,30 @@ antlr3HashRemove(pANTLR3_HASH_TABLE table, void * key)
     }
 
     return NULL;  /* Not found */
+}
+
+/** Takes the element with the supplied key out of the list, and deletes the data
+ *  calling the supplied free() routine if any. 
+ */
+static void
+antlr3HashDeleteI    (pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key)
+{
+    pANTLR3_HASH_ENTRY	entry;
+
+    entry = antlr3HashRemoveI(table, key);
+	
+    /* Now we can free the elements and the entry in order
+     */
+    if	(entry != NULL && entry->free != NULL)
+    {
+	/* Call programmer supplied function to release this entry data
+	 */
+	entry->free(entry->data);
+	entry->data = NULL;
+    }
+    /* Finally release the space for this entry block.
+     */
+    ANTLR3_FREE(entry);
 }
 
 /** Takes the element with the supplied key out of the list, and deletes the data
@@ -281,6 +380,45 @@ antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key)
  *  key value, or NULL if it don't exist (or was itself NULL).
  */
 static void *
+antlr3HashGetI(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key)
+{
+    ANTLR3_UINT32	    hash;
+    pANTLR3_HASH_BUCKET	    bucket;
+    pANTLR3_HASH_ENTRY	    entry;
+
+    /* First we need to know the hash of the provided key
+     */
+    hash    = (ANTLR3_UINT32)(key % (ANTLR3_UINT64)(table->modulo));
+
+    /* Knowing the hash, we can find the bucket
+     */
+    bucket  = table->buckets + hash;
+
+    /* Now we can inspect the key at each entry in the bucket
+     * and see if we have a match.
+     */
+    entry   = bucket->entries;
+
+    while   (entry != NULL)
+    {
+	if  (entry->keybase.key.iKey == key)
+	{
+	    /* Match was found, return the data pointer for this entry
+	     */
+	    return  entry->data;
+	}
+	entry = entry->nextEntry;
+    }
+
+    /* If we got here, then we did not find the key
+     */
+    return  NULL;
+}
+
+/** Return the element pointer in the hash table for a particular
+ *  key value, or NULL if it don't exist (or was itself NULL).
+ */
+static void *
 antlr3HashGet(pANTLR3_HASH_TABLE table, void * key)
 {
     ANTLR3_UINT32	    hash;
@@ -303,7 +441,7 @@ antlr3HashGet(pANTLR3_HASH_TABLE table, void * key)
 
     while   (entry != NULL)
     {
-	if  (strcmp((const char *)key, (const char *)entry->key) == 0)
+	if  (strcmp((const char *)key, (const char *)entry->keybase.key.sKey) == 0)
 	{
 	    /* Match was found, return the data pointer for this entry
 	     */
@@ -317,6 +455,75 @@ antlr3HashGet(pANTLR3_HASH_TABLE table, void * key)
     return  NULL;
 }
 
+/** Add the element pointer in to the table, based upon the 
+ *  hash of the provided key.
+ */
+static	ANTLR3_INT32
+antlr3HashPutI(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *))
+{
+    ANTLR3_UINT32	    hash;
+    pANTLR3_HASH_BUCKET	    bucket;
+    pANTLR3_HASH_ENTRY	    entry;
+    pANTLR3_HASH_ENTRY	    * newPointer;
+
+    /* First we need to know the hash of the provided key
+     */
+    hash    = (ANTLR3_UINT32)(key % (ANTLR3_UINT64)(table->modulo));
+
+    /* Knowing the hash, we can find the bucket
+     */
+    bucket  = table->buckets + hash;
+
+    /* Knowign the bucket, we can traverse the entries until we
+     * we find a NULL pointer ofr we find that this is already 
+     * in the table and duplicates were not allowed.
+     */
+    newPointer	= &bucket->entries;
+
+    while   (*newPointer !=  NULL)
+    {
+	/* The value at new pointer is pointing to an existing entry.
+	 * If duplicates are allowed then we don't care what it is, but
+	 * must reject this add if the key is the same as the one we are
+	 * supplied with.
+	 */
+	if  (table->allowDups == ANTLR3_FALSE)
+	{
+	    if	((*newPointer)->keybase.key.iKey == key)
+	    {
+		return	ANTLR3_ERR_HASHDUP;
+	    }
+	}
+
+	/* Point to the next entry pointer of the current entry we
+	 * are traversing, if it is NULL we will create our new
+	 * structure and point this to it.
+	 */
+	newPointer = &((*newPointer)->nextEntry);
+    }
+
+    /* newPointer is now pointing at the pointer where we need to
+     * add our new entry, so let's crate the entry and add it in.
+     */
+    entry   = (pANTLR3_HASH_ENTRY)ANTLR3_MALLOC((size_t)sizeof(ANTLR3_HASH_ENTRY));
+
+    if	(entry == NULL)
+    {
+	return	ANTLR3_ERR_NOMEM;
+    }
+	
+    entry->data			= element;		/* Install the data element supplied			*/
+    entry->free			= freeptr;		/* Function that knows how to release the entry		*/
+    entry->keybase.type		= ANTLR3_HASH_TYPE_INT;	/* Indicate the key type stored here for when we free	*/
+    entry->keybase.key.iKey	= key;			/* Record the key value					*/
+    entry->nextEntry		= NULL;			/* Ensure that the forward pointer ends the chain	*/
+
+    *newPointer	= entry;    /* Install the next entry in this bucket	*/
+
+    table->count++;
+
+    return  ANTLR3_SUCCESS;
+}
 
 
 /** Add the element pointer in to the table, based upon the 
@@ -353,7 +560,7 @@ antlr3HashPut(pANTLR3_HASH_TABLE table, void * key, void * element, void (*freep
 	 */
 	if  (table->allowDups == ANTLR3_FALSE)
 	{
-	    if	(strcmp((const char*) key, (const char *)(*newPointer)->key) == 0)
+	    if	(strcmp((const char*) key, (const char *)(*newPointer)->keybase.key.sKey) == 0)
 	    {
 		return	ANTLR3_ERR_HASHDUP;
 	    }
@@ -376,10 +583,11 @@ antlr3HashPut(pANTLR3_HASH_TABLE table, void * key, void * element, void (*freep
 	return	ANTLR3_ERR_NOMEM;
     }
 	
-    entry->data		= element;		/* Install the data element supplied		    */
-    entry->free		= freeptr;		/* Function that knows how to release the entry	    */
-    entry->key		= ANTLR3_STRDUP(key);	/* Record the key value				    */
-    entry->nextEntry	= NULL;			/* Ensure that the forward pointer ends the chain   */
+    entry->data			= element;		/* Install the data element supplied		    */
+    entry->free			= freeptr;		/* Function that knows how to release the entry	    */
+    entry->keybase.type		= ANTLR3_HASH_TYPE_STR;	/* Indicate the key type stored here for free()	    */
+    entry->keybase.key.sKey	= ANTLR3_STRDUP(key);	/* Record the key value				    */
+    entry->nextEntry		= NULL;			/* Ensure that the forward pointer ends the chain   */
 
     *newPointer	= entry;    /* Install the next entry in this bucket	*/
 
@@ -436,7 +644,7 @@ antlr3EnumNew	(pANTLR3_HASH_TABLE table)
     return  en;
 }
 
-/** \brief Return the next entry in the hashtable ebign traversed by the supplied
+/** \brief Return the next entry in the hashtable beign traversed by the supplied
  *         enumeration.
  *
  * \param[in] en Pointer to the enumeration tracking structure
@@ -450,7 +658,7 @@ antlr3EnumNew	(pANTLR3_HASH_TABLE table)
  *  No checking of input structure is performed!
  */
 static int
-antlr3EnumNext	(pANTLR3_HASH_ENUM en, void ** key, void ** data)
+antlr3EnumNext	(pANTLR3_HASH_ENUM en, pANTLR3_HASH_KEY * key, void ** data)
 {
     /* If the current entry is valid, then use it
      */
@@ -464,7 +672,7 @@ antlr3EnumNext	(pANTLR3_HASH_ENUM en, void ** key, void ** data)
     /* Pointers are already set to the current entry to return, or
      * we would not be at this point in the logic flow.
      */
-    *key	= en->entry->key;
+    *key	= &(en->entry->keybase);
     *data	= en->entry->data;
 
     /* Return pointers are set up, so now we move the element
@@ -639,21 +847,13 @@ antlr3ListFree	(pANTLR3_LIST list)
 static void
 antlr3ListDelete    (pANTLR3_LIST list, ANTLR3_UINT64 key)
 {
-    ANTLR3_UINT8    charKey[32];
-
-    sprintf((char *)charKey, "%lld", key);
-
-    list->table->del(list->table, charKey);
+    list->table->delI(list->table, key);
 }
 
 static void *
 antlr3ListGet	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
 {
-    ANTLR3_UINT8    charKey[32];
-
-    sprintf((char *)charKey, "%lld", key);
-
-    return list->table->get(list->table, charKey);
+    return list->table->getI(list->table, key);
 }
 
 /** Add the supplied element to the list, at the next available key
@@ -673,11 +873,8 @@ static	void *
 antlr3ListRemove	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
 {
     pANTLR3_HASH_ENTRY	    entry;
-    ANTLR3_UINT8    charKey[32];
 
-    sprintf((char *)charKey, "%lld", key);
-
-    entry = list->table->remove(list->table, charKey);
+    entry = list->table->removeI(list->table, key);
 
     if	(entry != NULL)
     {
@@ -692,11 +889,7 @@ antlr3ListRemove	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
 static	ANTLR3_INT32
 antlr3ListPut	    (pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *))
 {
-    ANTLR3_UINT8    charKey[32];
-
-    sprintf((char *)charKey, "%lld", key);
-
-    return  list->table->put(list->table, (void *)charKey, element, freeptr);
+    return  list->table->putI(list->table, key, element, freeptr);
 }
 
 ANTLR3_API  pANTLR3_STACK

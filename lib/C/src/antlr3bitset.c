@@ -176,7 +176,7 @@ antlr3BitsetList(pANTLR3_HASH_TABLE list)
 {
     pANTLR3_BITSET	bitSet;
     pANTLR3_HASH_ENUM	en;
-    pANTLR3_UINT8	key;
+    pANTLR3_HASH_KEY	key;
     ANTLR3_UINT64	bit;
 
     /* We have no idea what exactly is in the list
@@ -187,7 +187,7 @@ antlr3BitsetList(pANTLR3_HASH_TABLE list)
 
     en  = antlr3EnumNew(list);
 
-    while   (en->next(en, (void **)(&key), (void **)(&bit)) == ANTLR3_SUCCESS)
+    while   (en->next(en, &key, (void **)(&bit)) == ANTLR3_SUCCESS)
     {
 	bitSet->add(bitSet, (ANTLR3_UINT32)bit);
     }

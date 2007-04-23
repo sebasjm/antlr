@@ -79,7 +79,7 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
 
     /** List of mark() points in the input stream
      */
-    pANTLR3_HASH_TABLE	markers;
+    pANTLR3_LIST	markers;
 
     /** ASCII (assumed) file name string, set to pointer to memory if
      * you set it manually as it will be free()d

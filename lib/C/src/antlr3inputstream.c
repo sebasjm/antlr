@@ -176,7 +176,7 @@ antlr3InputReset(pANTLR3_INPUT_STREAM input)
 
     /* Install a new markers table
      */
-    input->markers  = antlr3HashTableNew(63);	/* May come back and revist the hash size with experience   */
+    input->markers  = antlr3ListNew(63557);	/* May come back and revist the hash size with experience   */
 }
 
 /** \brief Return a pointer to the input stream source name, such as the file.
@@ -299,7 +299,6 @@ antlr3AsciiSize(pANTLR3_INPUT_STREAM input)
 static ANTLR3_UINT64
 antlr3AsciiMark	(pANTLR3_INT_STREAM is)
 {
-    ANTLR3_INT8		    key[32]; /* If we exceed 32 numeric digits, then I'll be hanged   */
     pANTLR3_LEX_STATE	    state;
     pANTLR3_INPUT_STREAM    input;
 
@@ -308,22 +307,21 @@ antlr3AsciiMark	(pANTLR3_INT_STREAM is)
     /* New mark point 
      */
     input->markDepth++;
-    sprintf((char *)key, "%lld", (ANTLR3_INT64)(input->markDepth));
 
-    /* See if we are revisitng a mark as we can just reuse the hashtable
+    /* See if we are revisiting a mark as we can just reuse the hashtable
      * entry if we are, otherwise, we need a new one
      */
-    if	(input->markDepth > input->markers->count)
+    if	(input->markDepth > input->markers->table->count)
     {	
 	state	= ANTLR3_MALLOC(sizeof(ANTLR3_LEX_STATE));
 
 	/* Add it to the table
 	 */
-	input->markers->put(input->markers, key, state, ANTLR3_FREE_FUNC);	/* No special structure, just free() on delete */
+	input->markers->put(input->markers, input->markDepth, state, ANTLR3_FREE_FUNC);	/* No special structure, just free() on delete */
     }
     else
     {
-	state	= (pANTLR3_LEX_STATE)input->markers->get(input->markers, key);
+	state	= (pANTLR3_LEX_STATE)input->markers->get(input->markers, input->markDepth);
 
 	/* Assume no errors for speed, it will just blow up if the table failed
 	 * for some reasons, hence lots of unit tests on the tables ;-)
@@ -368,7 +366,6 @@ static void
 antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
 {
     pANTLR3_LEX_STATE	state;
-    ANTLR3_UINT8	key[32];
     pANTLR3_INPUT_STREAM input;
 
     input   = ((pANTLR3_INPUT_STREAM) is->super);
@@ -379,8 +376,7 @@ antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
 
     /* Find the supplied mark state 
      */
-    sprintf ((char *)key, "%lld", mark);
-    state   = (pANTLR3_LEX_STATE)input->markers->get(input->markers, &key);
+    state   = (pANTLR3_LEX_STATE)input->markers->get(input->markers, mark);
 
     /* Seek input pointer to the requested point (note we supply the void *pointer
      * to whatever is implementing the int stream to seek).

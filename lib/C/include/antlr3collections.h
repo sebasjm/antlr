@@ -3,6 +3,23 @@
 
 #include    <antlr3defs.h>
 
+
+#define	ANTLR3_HASH_TYPE_INT	0   /**< Indicates the hashed file has integer keys */
+#define	ANTLR3_HASH_TYPE_STR	1   /**< Indicates the hashed file has numeric keys */
+
+typedef struct ANTLR3_HASH_KEY_struct
+{
+    ANTLR3_UINT8	type;	/**< One of ##ANTLR3_HASH_TYPE_INT or ##ANTLR3_HASH_TYPE_STR	*/
+
+    union
+    {
+	pANTLR3_UINT8   sKey;	/**< Used if type is ANTLR3_HASH_TYPE_STR			*/
+	ANTLR3_UINT64   iKey;	/**< used if type is ANTLR3_HASH_TYPE_INT			*/
+    }
+	key;
+
+} ANTLR3_HASH_KEY, *pANTLR3_HASH_KEY;
+
 /** Internal structure representing an element in a hash bucket.
  *  Stores the original key so that duplicate keys can be rejected
  *  if necessary, and contains function can be suported. If the hash key
@@ -12,7 +29,7 @@ typedef	struct	ANTLR3_HASH_ENTRY_struct
 {
     /** Key that created this particular entry
      */
-    pANTLR3_UINT8   key;
+    ANTLR3_HASH_KEY 	keybase;
 
     /** Pointer to the data for this particular entry
      */
@@ -72,10 +89,19 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
     /** Pointer to function to completely delete this table
      */
     void		(*free)	    (struct ANTLR3_HASH_TABLE_struct * table);
+    
+    /* String keyed hashtable functions */
     void		(*del)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key);
     pANTLR3_HASH_ENTRY	(*remove)   (struct ANTLR3_HASH_TABLE_struct * table, void * key);
     void *		(*get)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key);
     ANTLR3_INT32	(*put)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key, void * element, void (*freeptr)(void *));
+
+    /* Integer based hash functions */
+    void		(*delI)	    (struct ANTLR3_HASH_TABLE_struct * table, ANTLR3_UINT64 key);
+    pANTLR3_HASH_ENTRY	(*removeI)  (struct ANTLR3_HASH_TABLE_struct * table, ANTLR3_UINT64 key);
+    void *		(*getI)	    (struct ANTLR3_HASH_TABLE_struct * table, ANTLR3_UINT64 key);
+    ANTLR3_INT32	(*putI)	    (struct ANTLR3_HASH_TABLE_struct * table, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
+
     ANTLR3_UINT64	(*size)	    (struct ANTLR3_HASH_TABLE_struct * table);
 }
     ANTLR3_HASH_TABLE;
@@ -107,7 +133,7 @@ typedef struct	ANTLR3_HASH_ENUM_struct
 
     /* Interface
      */
-    int		(*next)	    (struct ANTLR3_HASH_ENUM_struct * en, void ** key, void ** data);
+    int		(*next)	    (struct ANTLR3_HASH_ENUM_struct * en, pANTLR3_HASH_KEY *key, void ** data);
     void	(*free)	    (struct ANTLR3_HASH_ENUM_struct * table);
 }
     ANTLR3_HASH_ENUM;
