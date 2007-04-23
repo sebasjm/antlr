@@ -163,7 +163,7 @@
 					Description="Maximum number of rule invocations during conversion"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="-Xm [value]"
-					DefaultValue="32767"
+					DefaultValue="65535"
 				/>
 				<IntegerProperty
 					Name="MaxDFAEdges"
@@ -173,7 +173,7 @@
 					Description="Maximum &quot;comfortable&quot; number of edges for single DFA state"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="-Xmaxdfaedges [value]"
-					DefaultValue="32767"
+					DefaultValue="65535"
 				/>
 				<IntegerProperty
 					Name="DFATimeout"
@@ -356,7 +356,7 @@
 					Description="Maximum number of rule invocations during conversion"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="-Xm [value]"
-					DefaultValue="32767"
+					DefaultValue="65535"
 				/>
 				<IntegerProperty
 					Name="MaxDFAEdges"
@@ -366,7 +366,7 @@
 					Description="Maximum &quot;comfortable&quot; number of edges for single DFA state"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="-Xmaxdfaedges [value]"
-					DefaultValue="32767"
+					DefaultValue="65535"
 				/>
 				<IntegerProperty
 					Name="DFATimeout"
@@ -549,7 +549,7 @@
 					Description="Maximum number of rule invocations during conversion"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="-Xm [value]"
-					DefaultValue="32767"
+					DefaultValue="65535"
 				/>
 				<IntegerProperty
 					Name="MaxDFAEdges"
@@ -559,7 +559,7 @@
 					Description="Maximum &quot;comfortable&quot; number of edges for single DFA state"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="-Xmaxdfaedges [value]"
-					DefaultValue="32767"
+					DefaultValue="65535"
 				/>
 				<IntegerProperty
 					Name="DFATimeout"
@@ -589,6 +589,7 @@
 			FileExtensions="*.g3pl;*.g3;*.g"
 			ExecutionDescription="Translating to parser/lexer combination"
 			SupportsFileBatching="true"
+			ShowOnlyRuleProperties="false"
 			>
 			<Properties>
 				<StringProperty
@@ -741,7 +742,7 @@
 					Description="Maximum number of rule invocations during conversion"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="-Xm [value]"
-					DefaultValue="32767"
+					DefaultValue="65535"
 				/>
 				<IntegerProperty
 					Name="MaxDFAEdges"
@@ -751,7 +752,7 @@
 					Description="Maximum &quot;comfortable&quot; number of edges for single DFA state"
 					HelpURL="http://www.antlr.org/wiki/display/ANTLR3/Command+line+options"
 					Switch="-Xmaxdfaedges [value]"
-					DefaultValue="32767"
+					DefaultValue="65535"
 				/>
 				<IntegerProperty
 					Name="DFATimeout"
