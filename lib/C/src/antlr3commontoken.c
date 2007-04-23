@@ -291,6 +291,11 @@ static  pANTLR3_STRING  getText			(pANTLR3_COMMON_TOKEN token)
     {
 	return	token->text;
     }
+    if (token->type == ANTLR3_TOKEN_EOF)
+    {
+	token->setText(token, (pANTLR3_UINT8)"<EOF>");
+	return	token->text;
+    }
     if	(token->input != NULL)
     {
 	return	token->input->substr(	token->input, 
@@ -356,7 +361,7 @@ static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
 	    /* There was no string factory, therefore, if this is not a factory made
 	     * token, we assume no resizing etc will go on and just set the text as it is given.
 	     */
-	    if	(token->factoryMade == ANTLR3_FALSE)
+	    if	(token->factoryMade == ANTLR3_FALSE || token->type == ANTLR3_TOKEN_EOF)
 	    {
 		token->text	    = (pANTLR3_STRING) ANTLR3_MALLOC(sizeof(ANTLR3_STRING));
 		token->text->len    = (ANTLR3_UINT32)strlen((const char *)text);

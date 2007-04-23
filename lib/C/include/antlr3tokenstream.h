@@ -145,7 +145,7 @@ typedef	struct	ANTLR3_COMMON_TOKEN_STREAM_struct
      *  a huge overhead as it only stores pointers anyway, but allows for iterations and 
      *  so on.
      */
-    pANTLR3_LIST	    tokens;
+    pANTLR3_VECTOR	    tokens;
 
     /** Override map of tokens. If a token type has an entry in here, then
      *  the pointer in the table points to an int, being the override channel number
@@ -196,7 +196,7 @@ typedef	struct	ANTLR3_COMMON_TOKEN_STREAM_struct
     /** Function that returns a pointer to the ANTLR3_LIST of all tokens
      *  in the stream (this causes the buffer to fill if we have not get any yet)
      */
-    pANTLR3_LIST	    (*getTokens)	    (struct ANTLR3_COMMON_TOKEN_STREAM_struct * tokenStream);
+    pANTLR3_VECTOR	    (*getTokens)	    (struct ANTLR3_COMMON_TOKEN_STREAM_struct * tokenStream);
 
     /** Function that returns all the tokens between a start and a stop index.
      *  TODO: This is a new list (Ack! Maybe this is a reason to have factories for LISTS adn HASHTABLES etc :-( come back to this)
@@ -208,7 +208,7 @@ typedef	struct	ANTLR3_COMMON_TOKEN_STREAM_struct
     pANTLR3_LIST	    (*getTokensSet)	    (struct ANTLR3_COMMON_TOKEN_STREAM_struct * tokenStream, 
 							ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_BITSET types);
     
-    /** Function that retruns all the tokens indicated by being a member of the supplied List
+    /** Function that returns all the tokens indicated by being a member of the supplied List
      */
     pANTLR3_LIST	    (*getTokensList)	    (struct ANTLR3_COMMON_TOKEN_STREAM_struct * tokenStream, 
 							ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_LIST list);

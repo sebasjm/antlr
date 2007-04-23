@@ -10,7 +10,7 @@
 static void		    setTokenTypeChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT32 ttype, ANTLR3_UINT32 channel);
 static void		    discardTokenType	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT32 ttype);
 static void		    discardOffChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_BOOLEAN discard);
-static pANTLR3_LIST	    getTokens		(pANTLR3_COMMON_TOKEN_STREAM cts);
+static pANTLR3_VECTOR	    getTokens		(pANTLR3_COMMON_TOKEN_STREAM cts);
 static pANTLR3_LIST	    getTokenRange	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
 static pANTLR3_LIST	    getTokensSet	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_BITSET types);
 static pANTLR3_LIST	    getTokensList	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_LIST list);
@@ -166,7 +166,7 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
 
     /* Install the token tracking tables
      */
-    stream->tokens  = antlr3ListNew(hint);
+    stream->tokens  = antlr3VectorNew(0);
 
     /* Defaults
      */
@@ -263,7 +263,7 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
 	    return  teof;
     }
 
-    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i);
+    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i+1);
 }
 
 #ifdef	WIN32
@@ -310,7 +310,7 @@ LB  (pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT64 k)
 	return	NULL;
     }
 
-    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i);
+    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i+1);
 }
 
 static pANTLR3_COMMON_TOKEN 
@@ -320,7 +320,7 @@ get (pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 i)
 
     cts	    = (pANTLR3_COMMON_TOKEN_STREAM)ts->super;
 
-    return  (pANTLR3_COMMON_TOKEN)(cts->tokens->get(cts->tokens, i));
+    return  (pANTLR3_COMMON_TOKEN)(cts->tokens->get(cts->tokens, i+1));  /* Token index is zero based but vectors are 1 based */
 }
 
 static pANTLR3_TOKEN_SOURCE 
@@ -472,7 +472,7 @@ discardOffChannel   (pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_BOOLEAN dis
     tokenStream->discardOffChannel  = discard;
 }
 
-static pANTLR3_LIST	    
+static pANTLR3_VECTOR	    
 getTokens   (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 {
     if	(tokenStream->p == -1)
@@ -714,7 +714,7 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 	     */
 	    tok->setTokenIndex(tok, index);
 	    tokenStream->p++;
-	    tokenStream->tokens->put(tokenStream->tokens, tokenStream->tstream->istream->index(tokenStream->tstream->istream), (void *)tok, NULL);
+	    tokenStream->tokens->add(tokenStream->tokens, (void *)tok, NULL);
 	    index++;
 	}
 	
