@@ -740,7 +740,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 <if(memoize)>
     /* Create a LIST for recording rule memos.
      */
-    lexCtx->pLexer->rec->ruleMemo    = antlr3ListNew(ANTLR3_SIZE_HINT);
+    lexCtx->pLexer->rec->ruleMemo    = antlr3ListNew(65327);
 <endif>
 
     /* Install the implementation of our <name> interface
