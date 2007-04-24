@@ -1699,7 +1699,7 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
-if ( <s> ) 
+if ( <s> ) // It is I
 {
     <postmatchCode>
     CONSUME();
@@ -1962,7 +1962,7 @@ dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>;"
 dfaEdge(labelExpr, targetState, predicates) ::= <<
 if ( (<labelExpr>) <if(predicates)>&& (<predicates>)<endif>) 
 {
-    <targetState>
+    <targetState> // It is I
 }
 >>
 

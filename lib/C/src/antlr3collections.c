@@ -908,10 +908,10 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
 
     /* Now we need to add a new table
      */
-    stack->list	= antlr3ListNew(sizeHint);
-    stack->top	= NULL;
+    stack->vector   = antlr3VectorNew(sizeHint);
+    stack->top	    = NULL;
 
-    if	(stack->list == (pANTLR3_LIST)ANTLR3_ERR_NOMEM)
+    if	(stack->vector == (pANTLR3_VECTOR)ANTLR3_ERR_NOMEM)
     {
 	return	(pANTLR3_STACK)ANTLR3_ERR_NOMEM;
     }
@@ -930,7 +930,7 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
 
 static ANTLR3_UINT64	antlr3StackSize	    (pANTLR3_STACK stack)
 {
-    return  stack->list->size(stack->list);
+    return  stack->vector->count;
 }
 
 
@@ -939,8 +939,9 @@ antlr3StackFree	(pANTLR3_STACK  stack)
 {
     /* Free the list that supports the stack
      */
-    stack->list->free(stack->list);
-    stack->top	= NULL;
+    stack->vector->free(stack->vector);
+    stack->vector   = NULL;
+    stack->top	    = NULL;
 
     ANTLR3_FREE(stack);
 }
@@ -948,15 +949,15 @@ antlr3StackFree	(pANTLR3_STACK  stack)
 static void *
 antlr3StackPop	(pANTLR3_STACK	stack)
 {
-   stack->list->del(stack->list, stack->list->table->count);
-   stack->top = stack->list->get(stack->list, stack->list->table->count);
+   stack->vector->del(stack->vector, stack->vector->count);
+   stack->top = stack->vector->get(stack->vector, stack->vector->count);
    return stack->top;
 }
 
 static void *
 antlr3StackGet	(pANTLR3_STACK stack, ANTLR3_UINT64 key)
 {
-    return  stack->list->get(stack->list, key);
+    return  stack->vector->get(stack->vector, key);
 }
 
 static void *
@@ -968,12 +969,8 @@ antlr3StackPeek	(pANTLR3_STACK	stack)
 static ANTLR3_BOOLEAN 
 antlr3StackPush	(pANTLR3_STACK stack, void * element, void (*freeptr)(void *))
 {
-    ANTLR3_UINT64	pushno;
-
-    pushno  = stack->list->table->count + 1;
-
     stack->top	= element;
-    return stack->list->put(stack->list, pushno, element, freeptr);
+    return stack->vector->add(stack->vector, element, freeptr);
 }
 
 ANTLR3_API  pANTLR3_VECTOR
@@ -1080,10 +1077,11 @@ static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
 
     /* Valid request, check for free pointer and call it if present
      */
-    if	(vector->elements[entry].freeptr != NULL)
+    
+    if	(vector->elements[entry-1].freeptr != NULL)
     {
-	vector->elements[entry].freeptr(vector->elements[entry].element);
-	vector->elements[entry].freeptr    = NULL;
+	vector->elements[entry-1].freeptr(vector->elements[entry-1].element);
+	vector->elements[entry-1].freeptr    = NULL;
     }
 
     if	(entry == vector->count)
@@ -1091,7 +1089,7 @@ static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
 	/* Ensure the pointer is never reused by accident, but othewise just 
 	 * decrement the pointer.
 	 */
-	vector->elements[entry].element    = NULL;
+	vector->elements[entry-1].element    = NULL;
     }
     else
     {
@@ -1137,15 +1135,16 @@ static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
 
     /* Valid request, return the sorted pointer
      */
-    element				    = vector->elements[entry].element;
+
+    element				    = vector->elements[entry-1].element;
 
     if	(entry == vector->count)
     {
 	/* Ensure the pointer is never reused by accident, but otherwise just 
 	 * decrement the pointer.
 	 */
-	vector->elements[entry].element    = NULL;
-	vector->elements[entry].freeptr    = NULL;
+	vector->elements[entry-1].element    = NULL;
+	vector->elements[entry-1].freeptr    = NULL;
     }
     else
     {

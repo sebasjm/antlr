@@ -163,7 +163,7 @@ typedef	struct	ANTLR3_STACK_struct
 {
     /** List that supports the stack structure
      */
-    pANTLR3_LIST    list;
+    pANTLR3_VECTOR  vector;
 
     /** Used for quick access to the top of the stack
      */
