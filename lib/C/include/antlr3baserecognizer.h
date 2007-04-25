@@ -106,15 +106,14 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      */
     ANTLR3_INT32	backtracking;
 
-    /** ANTLR3_LIST of ANTLR3_LIST for rule memoizing.
-     * tracks
-     *  the stop token index for each rule.  ruleMemo[ruleIndex] is
+    /** ANTLR3_VECTOR of ANTLR3_LIST for rule memoizing.
+     *  Tracks  the stop token index for each rule.  ruleMemo[ruleIndex] is
      *  the memoization table for ruleIndex.  For key ruleStartIndex, you
      *  get back the stop token for associated rule or MEMO_RULE_FAILED.
      *
-     *  This is only used if rule memoization is on (which it is by default).
+     *  This is only used if rule memoization is on.
      */
-    pANTLR3_LIST	ruleMemo;
+    pANTLR3_VECTOR	ruleMemo;
 
     /** Pointer to an array of token names
      *  that are generally useful in error reporting. The generated parsers install

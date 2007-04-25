@@ -786,7 +786,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 <if(memoize)>
     /* Create a LIST for recording rule memos.
      */
-    lexCtx->pLexer->rec->ruleMemo    = antlr3ListNew(65327);
+    lexCtx->pLexer->rec->ruleMemo    = antlr3VectorNew(0);	// Will expand as new rules are hit
 <endif>
 
     /* Install the implementation of our <name> interface
@@ -1058,9 +1058,9 @@ ANTLR3_API p<name>
     /* Create a LIST for recording rule memos.
      */
 <if(TREE_PARSER)>
-    ctx->pTreeParser->rec->ruleMemo    = antlr3ListNew(65537);<\n>
+    ctx->pTreeParser->rec->ruleMemo    = antlr3VectorNew(0);<\n>
 <else>
-    ctx->pParser->rec->ruleMemo    = antlr3ListNew(65537);<\n>
+    ctx->pParser->rec->ruleMemo    = antlr3VectorNew(0);<\n>
 <endif>
 <endif>	
     /* Install the token table

@@ -1161,16 +1161,10 @@ static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
     return  element;
 }
 
-/* Add the supplied pointer and freeing function pointer to the list,
- * explanding the vector if needed.
- */
-static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * element, void (ANTLR3_CDECL *freeptr)(void *))
+static  void
+antlr3VectorResize  (pANTLR3_VECTOR vector, ANTLR3_UINT64 hint)
 {
-    /* Do we need to resize the vector table?
-     */
-    if	(vector->count == vector->elementsSize)
-    {
-	ANTLR3_UINT64	newSize;
+    	ANTLR3_UINT64	newSize;
 
 	/* Need to resize the element pointers. We double the allocation
 	 * unless we have reached 1024 elements, in which case we just
@@ -1178,11 +1172,25 @@ static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * elemen
 	 */
 	if  (vector->elementsSize > 1024)
 	{
-	    newSize = vector->elementsSize + 1024;
+	    if (hint == 0)
+	    {
+		newSize = vector->elementsSize + 1024;
+	    }
+	    else
+	    {
+		newSize = hint + 1024;
+	    }
 	}
 	else
 	{
-	    newSize = vector->elementsSize * 2;
+	    if (hint == 0)
+	    {
+		newSize = vector->elementsSize * 2;
+	    }
+	    else
+	    {
+		newSize = hint * 2;	// Add twice what we were asked for
+	    }
 	}
 
 	/* Use realloc so that the pointers are copied for us
@@ -1192,6 +1200,18 @@ static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * elemen
 	 */
 	ANTLR3_MEMSET(vector->elements + vector->elementsSize, 0x00, (newSize - vector->elementsSize) * sizeof(ANTLR3_VECTOR_ELEMENT));
 	vector->elementsSize	= newSize;
+}
+
+/* Add the supplied pointer and freeing function pointer to the list,
+ * explanding the vector if needed.
+ */
+static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * element, void (ANTLR3_CDECL *freeptr)(void *))
+{
+    /* Do we need to resize the vector table?
+     */
+    if	(vector->count == vector->elementsSize)
+    {
+	antlr3VectorResize(vector, 0);	    // Give no hint, we let it add 1024 or double it
     }
 
     /* Insert the new entry
@@ -1212,23 +1232,34 @@ static	ANTLR3_INT32    antlr3VectorPut	    (pANTLR3_VECTOR vector, ANTLR3_UINT64
 {
     /* Validate first
      */
-    if	(entry == 0 || entry > vector->count)
+    if	(entry == 0)
     {
 	return	-1;
     }
 
-    /* Valid request, replace teh current one
+    /* If the vector is currently not big enough, then we expand it
      */
-    if	(vector->elements[entry].freeptr != NULL)
+    if (entry >= vector->elementsSize)
     {
-	vector->elements[entry].freeptr(vector->elements[entry].element);
+	antlr3VectorResize(vector, entry);	// We will get at least this many 
+    }
+
+    /* Valid request, replace the current one
+     */
+    if	(vector->elements[entry-1].freeptr != NULL)
+    {
+	vector->elements[entry-1].freeptr(vector->elements[entry-1].element);
     }
 
     /* Install the new pointers
      */
-    vector->elements[entry].freeptr    = freeptr;
-    vector->elements[entry].element	= element;
+    vector->elements[entry-1].freeptr    = freeptr;
+    vector->elements[entry-1].element	= element;
 
+    if (entry > vector->count)
+    {
+	vector->count = entry;
+    }
     return  (ANTLR3_UINT32)(entry);	    /* Indicates the replacement was successful	*/
 
 }

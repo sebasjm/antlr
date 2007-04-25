@@ -1200,8 +1200,8 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 {
     /* The rule memos are an ANTLR3_LIST of ANTLR3_LIST.
      */
-    pANTLR3_LIST    ruleList;
-
+    pANTLR3_UINT64  ruleList;
+    ANTLR3_UINT32   ind;
     ANTLR3_UINT64   stopIndex;
 
     /* See if we have a list in the ruleMemos for this rule, and if not, then create one
@@ -1211,17 +1211,34 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 
     if	(ruleList == NULL)
     {
-	/* Did not find it, so create a new one
+	/* Did not find it, so create a new one of arbitrary size
 	 */
-	ruleList    = antlr3ListNew(31);
-	recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), freeList);
+	ruleList    = ANTLR3_MALLOC(sizeof(ANTLR3_UINT64) * 258);    /* Allow 64 entries to start with */
+	*ruleList   = 256;   /* Available */
+	*(ruleList+1) = 0;    /* Used	 */
+	recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC);
     }
 
     /* See if there is a stop index associated with the supplied start index.
      * We index on the start position + 1, just in case there is ever a need to 
      * memoize the first token ever, at index 0.
+     *
+     * TODO: Come back and make this a binary chop. Might be useful to have a general
+     * binary search collection based on integer keys?
      */
-    stopIndex	= ANTLR3_UINT64_CAST(ruleList->get(ruleList, ruleParseStart+1));
+    stopIndex	= 0;
+
+    for (ind = 1; ind <= *(ruleList+1); ind++)
+    {
+	ANTLR3_UINT32	ent;
+	ent = ind*2;	/* Start point */
+
+	if ((*ruleList+ent) == ruleParseStart)
+	{
+	    stopIndex	= *(ruleList+ent+1);
+	    break;
+	}
+    }
 
     if	(stopIndex == 0)
     {
@@ -1314,7 +1331,7 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 {
     /* The rule memos are an ANTLR3_LIST of ANTLR3_LIST.
      */
-    pANTLR3_LIST	    ruleList;
+    pANTLR3_UINT64	    ruleList;
     ANTLR3_UINT64	    stopIndex;
     pANTLR3_LEXER	    lexer;
     pANTLR3_PARSER	    parser;
@@ -1360,9 +1377,37 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 
     if	(ruleList != NULL)
     {
-	/* Add one to key in case the start is 0 eveer
+	ANTLR3_UINT32	ind;
+
+	/* Do we have enough room? 
 	 */
-	ruleList->put(ruleList, ruleParseStart+1, ANTLR3_FUNC_PTR(stopIndex), NULL);
+	if (*ruleList == *(ruleList+1))
+	{
+	    ANTLR3_UINT64   newSize;
+	    /* Need to expand the list, so double it 
+	     */
+	    newSize = (*ruleList) * 2;
+	    *ruleList = newSize;
+	    ruleList = ANTLR3_REALLOC(ruleList, (1+newSize) * 2 * sizeof(ANTLR3_UINT64));
+	    recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC);
+	}
+
+	/* If we don't already have this entry, append it 
+	 * TODO: Change this to a binary search
+	 */
+	for (ind = 1; ind <= *(ruleList+1); ind++)
+	{
+	    if (*(ruleList+2*ind) == ruleParseStart)
+	    {
+		return;
+	    }
+	}
+
+	/* Needs to be added
+	 */
+	(*(ruleList+1))++;
+	*(ruleList + 2 * *(ruleList + 1))	= ruleParseStart;
+	*(ruleList + 2 * *(ruleList + 1) + 1)	= stopIndex;
     }
 }
 /** A syntactic predicate.  Returns true/false depending on whether
