@@ -503,7 +503,7 @@ static  pANTLR3_STRING    toString		(pANTLR3_COMMON_TOKEN token)
 
     /* Destroy the printable copy
      */
-    text->factory->destroy(text->factory, text);
+    //text->factory->destroy(text->factory, text);
 
     return  outtext;
 }
