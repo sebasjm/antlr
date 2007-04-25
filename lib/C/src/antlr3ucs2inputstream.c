@@ -147,7 +147,7 @@ antlr3UCS2Seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
      */
     if	(seekPoint <= ANTLR3_UINT64_CAST(input->nextChar))
     {
-	input->nextChar	= ((pANTLR3_UINT16)input->data) + seekPoint;
+	input->nextChar	= ((pANTLR3_UINT16) seekPoint);
     }
     else
     {

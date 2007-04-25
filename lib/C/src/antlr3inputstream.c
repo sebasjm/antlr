@@ -409,7 +409,7 @@ antlr3AsciiRelease	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
     input   = ((pANTLR3_INPUT_STREAM) (is->super));
 
     /* We don't do much here in fact as we never free any higher marks in
-     * the hashtable as we just resuse any memor allocated for them.
+     * the hashtable as we just resuse any memory allocated for them.
      */
     input->markDepth	= mark - 1;
 }
@@ -435,7 +435,7 @@ antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
      */
     if	(seekPoint <= ANTLR3_UINT64_CAST(input->nextChar))
     {
-	input->nextChar	= ((pANTLR3_UINT8)input->data) + seekPoint;
+	input->nextChar	= ((pANTLR3_UINT8) seekPoint);
     }
     else
     {

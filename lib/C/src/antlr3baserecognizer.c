@@ -239,6 +239,10 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
     ex->nextException	= NULL;
     ex->input		= is;
 
+	if	(recognizer->exception != NULL)
+	{
+		ex->nextException = recognizer->exception;	/* So we don't leake the memory */
+	}
     recognizer->exception	= ex;
     recognizer->error		= ANTLR3_TRUE;	    /* Exception is outstanding	*/
 
@@ -1213,7 +1217,7 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
     {
 	/* Did not find it, so create a new one of arbitrary size
 	 */
-	ruleList    = ANTLR3_MALLOC(sizeof(ANTLR3_UINT64) * 258);    /* Allow 64 entries to start with */
+	ruleList    = ANTLR3_MALLOC(sizeof(ANTLR3_UINT64) * 257 * 2);    /* Allow 256 entries to start with */
 	*ruleList   = 256;   /* Available */
 	*(ruleList+1) = 0;    /* Used	 */
 	recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC);
@@ -1388,7 +1392,7 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 	     */
 	    newSize = (*ruleList) * 2;
 	    *ruleList = newSize;
-	    ruleList = ANTLR3_REALLOC(ruleList, (1+newSize) * 2 * sizeof(ANTLR3_UINT64));
+	    ruleList = ANTLR3_REALLOC(ruleList, ((1+newSize) * sizeof(ANTLR3_UINT64))*2);
 	    recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC);
 	}
 
@@ -1406,8 +1410,8 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 	/* Needs to be added
 	 */
 	(*(ruleList+1))++;
-	*(ruleList + 2 * *(ruleList + 1))	= ruleParseStart;
-	*(ruleList + 2 * *(ruleList + 1) + 1)	= stopIndex;
+	*(ruleList + (2 * *(ruleList + 1)))	= ruleParseStart;
+	*(ruleList + (2 * *(ruleList + 1)) + 1)	= stopIndex;
     }
 }
 /** A syntactic predicate.  Returns true/false depending on whether
