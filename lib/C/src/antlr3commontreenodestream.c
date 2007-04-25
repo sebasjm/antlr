@@ -412,7 +412,7 @@ _LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 
 /** Free up the memory used by a mark state
  */
-static	void 
+static	void ANTLR3_CDECL
 markFree(void * memory)
 {
     pANTLR3_TREE_WALK_STATE ts;

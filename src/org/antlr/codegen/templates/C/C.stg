@@ -65,7 +65,7 @@ leadIn(type) ::=
  *
  * Editing it, at least manually, is not wise. 
  *
- * C language generator and runtime by Jim "Any relation to Eric?" Idle - "jimi" at idledotws
+ * C language generator and runtime by Jim Idle, jimi|hereisanat|idle|dotgoeshere|ws.
  *
  * View this file with tabs set to 8 (:set ts=8 in gvim) and indent at 4 (:set sw=4 in gvim)
  *
@@ -217,18 +217,64 @@ outputFile( LEXER,
 #define	    INPUT()					LEXER->input
 #define	    STRSTREAM				INPUT()
 #define		INDEX()					INPUT()->istream->index(INPUT()->istream)
-#define	    LA(n)					INPUT()->istream->_LA(INPUT()->istream, n)
 #define	    EOF_TOKEN				&(LEXER->tokSource->eofToken)
 #define	    HASEXCEPTION()			(RECOGNIZER->error == ANTLR3_TRUE)
 #define	    EXCEPTION()				RECOGNIZER->exception
 #define	    CONSTRUCTEX()			RECOGNIZER->exConstruct(RECOGNIZER)
-#define	    CONSUME()				INPUT()->istream->consume(INPUT()->istream)
 #define	    LRECOVER()				LEXER->recover(LEXER)
 #define	    MARK()					INPUT()->istream->mark(INPUT()->istream)
 #define	    REWIND(m)				INPUT()->istream->rewind(INPUT()->istream, m)
 #define	    REWINDLAST()			INPUT()->istream->REWINDLAST(INPUT()->istream)
 #define		MEMOIZE(ri,si)			RECOGNIZER->memoize(RECOGNIZER, ri, si)
 #define		HAVEPARSEDRULE(r)		RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
+
+/* If we have been told we can rely on the standard 8 bit or 16 bit input
+ * stream, then we can define our macros to use the direct pointers
+ * in the input object, which is much faster than indirect calls. This
+ * is really only significant to lexers wiht a lot of fragment rules (which
+ * do not place LA(1) in a temporary at the moment) and even then
+ * only if there is a lot of input (order of say 1M or so).
+ */
+#if	defined(ANTLR3_INLINE_INPUT_ASCII) || defined(ANTLR3_INLINE_INPUT_UTF16)
+
+# ifdef	ANTLR3_INLINE_INPUT_ASCII
+
+/* 8 bit "ASCII" (actually any 8 bit character set) */
+
+#  define	    NEXTCHAR			((pANTLR3_UINT8)(INPUT()->nextChar))
+#  define	    DATAP				((pANTLR3_UINT8)(INPUT()->data))
+
+# else
+
+#  define	    NEXTCHAR			((pANTLR3_UINT16)(INPUT()->nextChar)) 
+#  define	    DATAP				((pANTLR3_UINT16)(INPUT()->data))
+
+# endif
+
+# define	    LA(n) ((NEXTCHAR + n) > (DATAP + INPUT()->sizeBuf) ? ANTLR3_CHARSTREAM_EOF : (ANTLR3_UCHAR)(*(NEXTCHAR + n - 1)))
+# define	    CONSUME()											\
+{																	\
+    if	(NEXTCHAR \< (DATAP + INPUT()->sizeBuf))					\
+    {																\
+		INPUT()->charPositionInLine++;								\
+		if  ((ANTLR3_UCHAR)(*NEXTCHAR) == INPUT()->newlineChar)		\
+		{															\
+			INPUT()->line++;										\
+			INPUT()->charPositionInLine	= 0;						\
+			INPUT()->currentLine		= (void *)(NEXTCHAR + 1);	\
+		}															\
+		NEXTCHAR++;													\
+    }																\
+}
+
+#else
+
+// Pick up the input character by calling the input stream implementation.
+//
+#define	    CONSUME()				INPUT()->istream->consume(INPUT()->istream)
+#define	    LA(n)					INPUT()->istream->_LA(INPUT()->istream, n)
+
+#endif
 <endif>
 
 <if(PARSER)>
@@ -931,7 +977,7 @@ static	void <name>LoadFollowSets();
  * we need a function that knows how to free a return scope when the list is destroyed. 
  * We cannot just use ANTLR3_FREE because in debug tracking mode, this is a macro.
  */
-static	void freeScope(void * scope)
+static	void ANTLR3_CDECL freeScope(void * scope)
 {
     ANTLR3_FREE(scope);
 }
@@ -1414,7 +1460,7 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
  * \remark
  *  - lexer->error == ANTLR3_TRUE if an exception was thrown.
  */
-static
+static ANTLR3_INLINE
 void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 {
 
@@ -1699,7 +1745,7 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
-if ( <s> ) // It is I
+if ( <s> ) // This is matchSet
 {
     <postmatchCode>
     CONSUME();
@@ -1784,17 +1830,17 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  and a return value or values.
  */
 ruleRef(rule,label,elementIndex,args) ::= <<
-_fsp++; FOLLOWPUSH(FOLLOW_<rule>_in_<ruleName><elementIndex>);
+FOLLOWPUSH(FOLLOW_<rule>_in_<ruleName><elementIndex>);
 <if(label)>
 <label>=<rule>(ctx<if(args)>, <args; separator=", "><endif>);<\n>
 <else>
 <rule>(ctx<if(args)>, <args; separator=", "><endif>);<\n>
 <endif>
+FOLLOWPOP();
 if  (HASEXCEPTION())
 {
     goto rule<ruleDescriptor.name>Ex;
 }
-_fsp--; FOLLOWPOP();
 <checkRuleBacktrackFailure()>
 >>
 

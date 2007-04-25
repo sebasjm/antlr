@@ -40,7 +40,7 @@ typedef	struct	ANTLR3_HASH_ENTRY_struct
      *  that the data pointer does not need to be freed when the entry
      *  is deleted from the table.
      */
-    void	    (*free)(void * data);
+    void	    (ANTLR3_CDECL *free)(void * data);
 
     /** Pointer to the next entry in this bucket if there
      *  is one. Sometimes different keys will hash to the same bucket (especially
@@ -94,13 +94,13 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
     void		(*del)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key);
     pANTLR3_HASH_ENTRY	(*remove)   (struct ANTLR3_HASH_TABLE_struct * table, void * key);
     void *		(*get)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key);
-    ANTLR3_INT32	(*put)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key, void * element, void (*freeptr)(void *));
+    ANTLR3_INT32	(*put)	    (struct ANTLR3_HASH_TABLE_struct * table, void * key, void * element, void (ANTLR3_CDECL *freeptr)(void *));
 
     /* Integer based hash functions */
     void		(*delI)	    (struct ANTLR3_HASH_TABLE_struct * table, ANTLR3_UINT64 key);
     pANTLR3_HASH_ENTRY	(*removeI)  (struct ANTLR3_HASH_TABLE_struct * table, ANTLR3_UINT64 key);
     void *		(*getI)	    (struct ANTLR3_HASH_TABLE_struct * table, ANTLR3_UINT64 key);
-    ANTLR3_INT32	(*putI)	    (struct ANTLR3_HASH_TABLE_struct * table, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
+    ANTLR3_INT32	(*putI)	    (struct ANTLR3_HASH_TABLE_struct * table, ANTLR3_UINT64 key, void * element, void (ANTLR3_CDECL *freeptr)(void *));
 
     ANTLR3_UINT64	(*size)	    (struct ANTLR3_HASH_TABLE_struct * table);
 }
@@ -150,8 +150,8 @@ typedef	struct	ANTLR3_LIST_struct
     void	    (*del)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
     void *	    (*get)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
     void *	    (*remove)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key);
-    ANTLR3_INT32    (*add)	(struct ANTLR3_LIST_struct * list, void * element, void (*freeptr)(void *));
-    ANTLR3_INT32    (*put)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key, void * element, void (*freeptr)(void *));
+    ANTLR3_INT32    (*add)	(struct ANTLR3_LIST_struct * list, void * element, void (ANTLR3_CDECL *freeptr)(void *));
+    ANTLR3_INT32    (*put)	(struct ANTLR3_LIST_struct * list, ANTLR3_UINT64 key, void * element, void (ANTLR3_CDECL *freeptr)(void *));
     ANTLR3_UINT64   (*size)	(struct ANTLR3_LIST_struct * list);
     
 }
@@ -171,7 +171,7 @@ typedef	struct	ANTLR3_STACK_struct
     void	    (*free)	(struct ANTLR3_STACK_struct * stack);
     void *	    (*pop)	(struct ANTLR3_STACK_struct * stack);
     void *	    (*get)	(struct ANTLR3_STACK_struct * stack, ANTLR3_UINT64 key);
-    ANTLR3_BOOLEAN  (*push)	(struct ANTLR3_STACK_struct * stack, void * element, void (*freeptr)(void *));
+    ANTLR3_BOOLEAN  (*push)	(struct ANTLR3_STACK_struct * stack, void * element, void (ANTLR3_CDECL *freeptr)(void *));
     ANTLR3_UINT64   (*size)	(struct ANTLR3_STACK_struct * stack);
     void *	    (*peek)	(struct ANTLR3_STACK_struct * stack);
 
@@ -183,7 +183,7 @@ typedef	struct	ANTLR3_STACK_struct
 typedef struct ANTLR3_VECTOR_ELEMENT_struct
 {
     void    * element;
-    void (*freeptr)(void *);
+    void (ANTLR3_CDECL *freeptr)(void *);
 }
     ANTLR3_VECTOR_ELEMENT, *pANTLR3_VECTOR_ELEMENT;
 
@@ -215,12 +215,12 @@ typedef struct ANTLR3_VECTOR_struct
      */
     ANTLR3_UINT64   elementsSize;
 
-    void	    (*free)	(struct ANTLR3_VECTOR_struct * vector);
+    void	    (ANTLR3_CDECL *free)	(struct ANTLR3_VECTOR_struct * vector);
     void	    (*del)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry);
     void *	    (*get)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry);
     void *	    (*remove)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry);
-    ANTLR3_INT32    (*add)	(struct ANTLR3_VECTOR_struct * vector, void * element, void (*freeptr)(void *));
-    ANTLR3_INT32    (*put)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry, void * element, void (*freeptr)(void *));
+    ANTLR3_INT32    (*add)	(struct ANTLR3_VECTOR_struct * vector, void * element, void (ANTLR3_CDECL *freeptr)(void *));
+    ANTLR3_INT32    (*put)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *));
     ANTLR3_UINT64   (*size)	(struct ANTLR3_VECTOR_struct * vector);
 }
     ANTLR3_VECTOR;

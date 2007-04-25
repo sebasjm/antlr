@@ -152,7 +152,7 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 		 */
 		if  (entry != NULL)
 		{
-		    tree->children->add(tree->children, entry, (void (*)(void *))child->free);
+		    tree->children->add(tree->children, entry, (void (ANTLR3_CDECL *)(void *))child->free);
 		}
 	    }
 	}
@@ -168,7 +168,7 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 	     */
 	    tree->createChildrenList((void *)tree);
 	}
-	tree->children->add(tree->children, child, (void (*)(void *))child->free);
+	tree->children->add(tree->children, child, (void (ANTLR3_CDECL *)(void *))child->free);
     }
 }
 

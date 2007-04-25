@@ -68,6 +68,8 @@
 #include    <stdarg.h>
 
 #define	ANTLR3_API  __declspec(dllexport)
+#define	ANTLR3_CDECL __cdecl
+#define ANTLR3_FASTCALL __fastcall
 
 typedef	INT32	ANTLR3_CHAR,	*pANTLR3_CHAR;
 typedef	UINT32	ANTLR3_UCHAR,	*pANTLR3_UCHAR;
@@ -84,7 +86,7 @@ typedef	UINT64	ANTLR3_UINT64,	*pANTLR3_UINT64;
 
 typedef	UINT32	ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
 
-#define	ANTLR3_INLINE	inline
+#define	ANTLR3_INLINE	_inline
 
 typedef FILE *	    ANTLR3_FDSC;
 typedef	struct stat ANTLR3_FSTAT_STRUCT;
@@ -184,6 +186,8 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define _stat   stat
 
 #define ANTLR3_API
+#define	ANTLR3_CDECL
+#define ANTLR3_FASTCALL
 
 /* Inherit type definitions for autoconf
  */

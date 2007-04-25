@@ -58,9 +58,9 @@ static	  pANTLR3_STRING    to8_16	(pANTLR3_STRING string);
 
 /* Local helpers
  */
-static	void	stringInit8	(pANTLR3_STRING string);
-static	void	stringInit16	(pANTLR3_STRING string);
-static	void	stringFree	(pANTLR3_STRING string);
+static	void			stringInit8	(pANTLR3_STRING string);
+static	void			stringInit16	(pANTLR3_STRING string);
+static	void	ANTLR3_CDECL	stringFree	(pANTLR3_STRING string);
 
 ANTLR3_API pANTLR3_STRING_FACTORY 
 antlr3StringFactoryNew()
@@ -76,13 +76,12 @@ antlr3StringFactoryNew()
 	return	(pANTLR3_STRING_FACTORY)(ANTLR3_ERR_NOMEM);
     }
 
-    /* Now we make a new list to track the strings, 256 will allow thousands
-     * before there is any real performance degradation (until free() ;-).
+    /* Now we make a new list to track the strings.
      */
-    factory->strings	= antlr3ListNew(256);
-    factory->index	= 0;
+    factory->strings	= antlr3VectorNew(0);
+    factory->index	= 1;
 
-    if	(factory->strings == (pANTLR3_LIST)(ANTLR3_ERR_NOMEM))
+    if	(factory->strings == (pANTLR3_VECTOR)(ANTLR3_ERR_NOMEM))
     {
 	ANTLR3_FREE(factory);
 	return	(pANTLR3_STRING_FACTORY)(ANTLR3_ERR_NOMEM);
@@ -164,7 +163,7 @@ newRaw8	(pANTLR3_STRING_FACTORY factory)
 
     /* Add the string into the allocated list
      */
-    factory->strings->put(factory->strings, factory->index, (void *) string, (void (*)(void *))(stringFree));
+    factory->strings->put(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree));
     string->index   = factory->index++;
 
     return string;
@@ -193,12 +192,13 @@ newRaw16	(pANTLR3_STRING_FACTORY factory)
 
     /* Add the string into the allocated list
      */
-    factory->strings->put(factory->strings, factory->index, (void *) string, (void (*)(void *))(stringFree));
+    factory->strings->put(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree));
     string->index   = factory->index++;
 
     return string;
 }
-static	void	stringFree  (pANTLR3_STRING string)
+static	 
+void	ANTLR3_CDECL stringFree  (pANTLR3_STRING string)
 {
     /* First free the string itself if there was anything in it
      */
@@ -626,10 +626,13 @@ printable16(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
     return  string;
 }
 
+/** Fascist Capitalist Pig function created
+ *  to oppress the workers comrade.
+ */
 static    void		    
 closeFactory	(pANTLR3_STRING_FACTORY factory)
 {
-    /* Delete the hash table we were tracking teh strings with,this will
+    /* Delete the vector we were tracking the strings with, this will
      * causes all the allocated strings to be deallocated too
      */
     factory->strings->free(factory->strings);

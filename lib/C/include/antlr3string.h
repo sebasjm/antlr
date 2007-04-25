@@ -169,7 +169,7 @@ typedef struct	ANTLR3_STRING_FACTORY_struct
 {
     /** List of all the strings that have been allocated by the factory
      */
-    pANTLR3_LIST    strings;
+    pANTLR3_VECTOR    strings;
 
     /* Index of next string that we allocate
      */

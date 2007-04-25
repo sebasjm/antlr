@@ -1179,7 +1179,7 @@ toStrings			    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_HASH_TABLE tokens)
 {
     return NULL;
 }
-static	void
+static	void ANTLR3_CDECL
 freeList    (void * list)
 {
     ((pANTLR3_LIST)list)->free(list);
