@@ -59,7 +59,7 @@ static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry);
 static	void *		antlr3VectorGet     (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry);
 static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry);
 static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * element, void (ANTLR3_CDECL *freeptr)(void *));
-static	ANTLR3_INT32    antlr3VectorPut	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *));
+static	ANTLR3_INT32    antlr3VectorPut	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting);
 static	ANTLR3_UINT64   antlr3VectorSize    (pANTLR3_VECTOR vector);
 
 static  void		closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory);
@@ -1228,7 +1228,8 @@ static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * elemen
 /* Replace the element at the specified entry point with the supplied
  * entry.
  */
-static	ANTLR3_INT32    antlr3VectorPut	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *))
+static	ANTLR3_INT32    
+antlr3VectorPut	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting)
 {
     /* Validate first
      */
@@ -1244,9 +1245,9 @@ static	ANTLR3_INT32    antlr3VectorPut	    (pANTLR3_VECTOR vector, ANTLR3_UINT64
 	antlr3VectorResize(vector, entry);	// We will get at least this many 
     }
 
-    /* Valid request, replace the current one
+    /* Valid request, replace the current one, freeing any preior entry if told to
      */
-    if	(vector->elements[entry-1].freeptr != NULL)
+    if	(freeExisting && vector->elements[entry-1].freeptr != NULL)
     {
 	vector->elements[entry-1].freeptr(vector->elements[entry-1].element);
     }

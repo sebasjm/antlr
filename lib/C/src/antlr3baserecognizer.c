@@ -106,9 +106,17 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
 static void	
 freeBR	    (pANTLR3_BASE_RECOGNIZER recognizer)
 {
+    pANTLR3_EXCEPTION thisE;
+
     if	(recognizer->ruleMemo != NULL)
     {
 	recognizer->ruleMemo->free(recognizer->ruleMemo);
+    }
+
+    thisE = recognizer->exception;
+    if	(thisE != NULL)
+    {
+	thisE->freeEx(thisE);
     }
 
     ANTLR3_FREE(recognizer);
@@ -236,15 +244,10 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 	break;
     }
 
-    ex->nextException	= NULL;
-    ex->input		= is;
-
-	if	(recognizer->exception != NULL)
-	{
-		ex->nextException = recognizer->exception;	/* So we don't leake the memory */
-	}
-    recognizer->exception	= ex;
-    recognizer->error		= ANTLR3_TRUE;	    /* Exception is outstanding	*/
+    ex->input		    = is;
+    ex->nextException	    = recognizer->exception;	/* So we don't leak the memory */
+    recognizer->exception   = ex;
+    recognizer->error	    = ANTLR3_TRUE;	    /* Exception is outstanding	*/
 
     return;
 }
@@ -1024,11 +1027,11 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 	/* Knowing that, we can or in the follow set
 	 */
 	newFollow   = follow->or(follow, viableToksFollowingRule);
-
+	
 	/* Remove the EOR token, which we do not wish to compute with
 	 */
 	newFollow->remove(follow, ANTLR3_EOR_TOKEN_TYPE);
-
+	viableToksFollowingRule->free(viableToksFollowingRule);
 	/* We now have the computed set of what can follow the current token
 	 */
 	follow	= newFollow;
@@ -1044,6 +1047,10 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 	/* report the error, but don't cause any rules to abort and stuff
 	 */
 	recognizer->reportError(recognizer);
+	if	(newFollow != NULL)
+	{
+		newFollow->free(newFollow);
+	}
 	recognizer->error			= ANTLR3_FALSE;
 	recognizer->failed			= ANTLR3_FALSE;
 	return ANTLR3_TRUE;	/* Success in recovery	*/
@@ -1220,7 +1227,7 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 	ruleList    = ANTLR3_MALLOC(sizeof(ANTLR3_UINT64) * 257 * 2);    /* Allow 256 entries to start with */
 	*ruleList   = 256;   /* Available */
 	*(ruleList+1) = 0;    /* Used	 */
-	recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC);
+	recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC, ANTLR3_FALSE);
     }
 
     /* See if there is a stop index associated with the supplied start index.
@@ -1393,7 +1400,7 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 	    newSize = (*ruleList) * 2;
 	    *ruleList = newSize;
 	    ruleList = ANTLR3_REALLOC(ruleList, ((1+newSize) * sizeof(ANTLR3_UINT64))*2);
-	    recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC);
+	    recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC, ANTLR3_TRUE);
 	}
 
 	/* If we don't already have this entry, append it 

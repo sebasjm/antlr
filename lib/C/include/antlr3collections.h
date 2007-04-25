@@ -220,7 +220,7 @@ typedef struct ANTLR3_VECTOR_struct
     void *	    (*get)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry);
     void *	    (*remove)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry);
     ANTLR3_INT32    (*add)	(struct ANTLR3_VECTOR_struct * vector, void * element, void (ANTLR3_CDECL *freeptr)(void *));
-    ANTLR3_INT32    (*put)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *));
+    ANTLR3_INT32    (*put)	(struct ANTLR3_VECTOR_struct * vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting);
     ANTLR3_UINT64   (*size)	(struct ANTLR3_VECTOR_struct * vector);
 }
     ANTLR3_VECTOR;

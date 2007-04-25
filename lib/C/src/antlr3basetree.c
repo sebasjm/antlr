@@ -203,7 +203,7 @@ setChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i, void * child)
 	tree->createChildrenList(tree);
     }
     tree->children->remove(tree->children, i + 1);	/* remove any existing node at that position */
-    tree->children->put(tree->children, i+1, child, NULL);
+    tree->children->put(tree->children, i+1, child, NULL, ANTLR3_FALSE);
 }
 
 static void    *

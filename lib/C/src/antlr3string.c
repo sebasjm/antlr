@@ -163,7 +163,7 @@ newRaw8	(pANTLR3_STRING_FACTORY factory)
 
     /* Add the string into the allocated list
      */
-    factory->strings->put(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree));
+    factory->strings->put(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree), ANTLR3_TRUE);
     string->index   = factory->index++;
 
     return string;
@@ -192,7 +192,7 @@ newRaw16	(pANTLR3_STRING_FACTORY factory)
 
     /* Add the string into the allocated list
      */
-    factory->strings->put(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree));
+    factory->strings->put(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree), ANTLR3_TRUE);
     string->index   = factory->index++;
 
     return string;
