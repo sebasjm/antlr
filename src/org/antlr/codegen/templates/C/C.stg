@@ -2262,7 +2262,7 @@ typedef struct  <scopeStruct(sname=scope.name,...)>_struct
      *
      * \param POinter to an instance of this typedef/struct
      */
-    void    (*free)	(struct <scopeStruct(sname=scope.name,...)>_struct * frame);
+    void    (ANTLR3_CDECL *free)	(struct <scopeStruct(sname=scope.name,...)>_struct * frame);
     
     /* =============================================================================
      * Programmer defined variables...
@@ -2466,7 +2466,7 @@ attributeFuncs(scope) ::= <<
 /* attributeFuncs(scope)
  */
 
-static void <scope.name>Free(void * data)
+static void ANTLR3_CDECL <scope.name>Free(void * data)
 {
     ANTLR3_FREE(data);
 }
@@ -2485,7 +2485,7 @@ static void <scope.name>Free(void * data)
  * With lots of comments of course! The routine should be declared in
  * \@members { } as: 
  * \code
- *   void myfunc( <scopeType(sname=scope.name)> ptr). 
+ *   void ANTLR3_CDECL myfunc( <scopeType(sname=scope.name)> ptr). 
  * \endcode
  *
  * It should perform any custom freeing stuff that you need (call ANTLR_FREE, not free()
