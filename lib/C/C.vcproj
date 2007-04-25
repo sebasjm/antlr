@@ -142,6 +142,7 @@
 				WarnAsError="true"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				CallingConvention="1"
 				CompileAs="1"
 			/>
 			<Tool
@@ -224,6 +225,7 @@
 				WarnAsError="true"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				CallingConvention="1"
 				CompileAs="0"
 			/>
 			<Tool
