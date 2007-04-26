@@ -537,7 +537,7 @@ antlr3BitsetMember(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit)
 
     wordNo  = wordNumber(bit);
 
-    if	(wordNo > bitset->length)
+    if	(wordNo >= bitset->length)
     {
 	return	ANTLR3_FALSE;
     }
