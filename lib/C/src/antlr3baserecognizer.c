@@ -1249,7 +1249,7 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 	ANTLR3_UINT32	ent;
 	ent = ind*2;	/* Start point */
 
-	if ((*ruleList+ent) == ruleParseStart)
+	if (*(ruleList+ent) == ruleParseStart)
 	{
 	    stopIndex	= *(ruleList+ent+1);
 	    break;
@@ -1405,7 +1405,7 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 	    newSize = (*ruleList) * 2;
 	    *ruleList = newSize;
 	    ruleList = ANTLR3_REALLOC(ruleList, ((1+newSize) * sizeof(ANTLR3_UINT64))*2);
-	    recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC, ANTLR3_TRUE);
+	    recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC, ANTLR3_FALSE);
 	}
 
 	/* If we don't already have this entry, append it 
