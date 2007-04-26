@@ -1056,6 +1056,11 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 	return ANTLR3_TRUE;	/* Success in recovery	*/
     }
 
+    if	(newFollow != NULL)
+    {
+	newFollow->free(newFollow);
+    }
+
     /* We could not find anything viable to do, so this is going to 
      * cause an exception.
      */
