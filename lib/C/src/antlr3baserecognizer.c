@@ -1233,9 +1233,56 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 
     if	(entry == NULL)
     {
-	/* Did not find it, so create a new one for it
+	pANTLR3_LEXER		lexer;
+	pANTLR3_PARSER		parser;
+	pANTLR3_TREE_PARSER	tparser;
+	pANTLR3_INT_STREAM	is;
+	ANTLR3_UINT32		depth;
+	ANTLR3_UINT64		size;
+
+	/* Did not find it, so create a new one for it, with a bit depth based on the 
+	 * size of the input stream. We need the bit depth to incorporate the number if
+	 * bits required to represen the largest possible stop index in the input, which is the
+	 * last character. An int stream is free to return the largest 64 bit offset if it has
+	 * no idea of the size, but you should remember that this will cause the leftmost
+	 * bit match algorithm to run to 63 bits, whcih will be the whole time spent in the trie ;-)
 	 */
-	ruleList    = antlr3IntTrieNew(63);	/* Depth is theoritcally 64 bits, but probably not ;-)	*/
+	depth = 63;
+	switch	(recognizer->type)
+	{
+	case	ANTLR3_TYPE_PARSER:
+
+	    parser  = (pANTLR3_PARSER) (recognizer->super);
+	    is	= parser->tstream->istream;
+	    size = is->size(is);
+	    while (!(size & ((ANTLR3_UINT64)1 << depth)) && depth > 1) { depth--; }
+	    break;
+
+	case	ANTLR3_TYPE_TREE_PARSER:
+
+	    tparser = (pANTLR3_TREE_PARSER) (recognizer->super);
+	    is	= tparser->ctnstream->tnstream->istream;
+	    size = is->size(is);
+	    while (!(size & ((ANTLR3_UINT64)1 << depth)) && depth > 1) { depth--; }
+	    break;
+
+	case	ANTLR3_TYPE_LEXER:
+
+	    lexer	= (pANTLR3_LEXER)   (recognizer->super);
+	    is	= lexer->input->istream;
+	    size = is->size(is);
+	    while (!(size & ((ANTLR3_UINT64)1 << depth)) && depth > 1) { depth--; }
+	    break;
+
+	default:
+
+	    /* We have no idea as the installer did not set up their recognizer to indicate its type
+	     * so we have to assume a 64 bit depth.
+	     */
+	    break;
+	}
+
+	ruleList    = antlr3IntTrieNew(depth);	/* Depth is theoritcally 64 bits, but probably not ;-)	*/
 
 	if (ruleList != (pANTLR3_INT_TRIE)ANTLR3_ERR_NOMEM)
 	{
