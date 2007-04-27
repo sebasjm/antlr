@@ -1581,7 +1581,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 	 */
 	thisNode = nextNode;
 
-	if (key & ((ANTLR3_UINT64)(1<< nextNode->bitNum)))
+	if (key & (((ANTLR3_UINT64)1)<< nextNode->bitNum))
 	{
 	    /* Bit at the required index was 1, so travers the right node from here
 	     */
@@ -1645,7 +1645,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 	}
 	else
 	{
-	    /* We found the key is lready there and we are not allowed duplicates in this
+	    /* We found the key is already there and we are not allowed duplicates in this
 	     * trie.
 	     */
 	    return  ANTLR3_FALSE;

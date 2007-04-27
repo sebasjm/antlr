@@ -1282,7 +1282,7 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 	    break;
 	}
 
-	ruleList    = antlr3IntTrieNew(depth);	/* Depth is theoritcally 64 bits, but probably not ;-)	*/
+	ruleList    = antlr3IntTrieNew(depth+ (depth == 63 ? 0 : 1));	/* Depth is theoritcally 64 bits, but probably not ;-)	*/
 
 	if (ruleList != (pANTLR3_INT_TRIE)ANTLR3_ERR_NOMEM)
 	{
