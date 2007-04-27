@@ -1530,10 +1530,15 @@ intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
     }
 }
 
+
 static	ANTLR3_BOOLEAN		
 intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
 {
-    printf("Trie del called NYI with handle %08X, key %lld\n", (ANTLR3_UINT32)(ANTLR3_UINT64)trie, key);
+    pANTLR3_INT_TRIE_NODE   p;
+
+    p=trie->root;
+    key = key;
+
     return ANTLR3_FALSE;
 }
 
@@ -1773,9 +1778,78 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
     return  ANTLR3_TRUE;
 
 }
+/** Release memory allocated to this tree.
+ *  Basic algorithm is that we do a depth first left descent and free
+ *  up any nodes that are not backward pointers.
+ */
+static void
+freeIntNode(pANTLR3_INT_TRIE_NODE node)
+{
+    pANTLR3_TRIE_ENTRY	thisEntry;
+    pANTLR3_TRIE_ENTRY	nextEntry;
 
+    /* If this node has a left pointer that is not a backpointer
+     * then recursively call to free this
+     */
+    if (node->bitNum > node->leftN->bitNum)
+    {
+	/* We have a left node that needs descending, so do it.
+	 */
+	freeIntNode(node->leftN);
+    }
+
+    /* The left nodes from here should now be dealt with, so 
+     * we need to descend any right nodes that are not back pointers
+     */
+    if (node->bitNum > node->rightN->bitNum)
+    {
+	/* There are some right nodes to descend and deal with.
+	 */
+	freeIntNode(node->rightN);
+    }
+
+    /* Now all the children are dealt with, we can destroy
+     * this node too
+     */
+    thisEntry	= node->buckets;
+
+    while (thisEntry != NULL)
+    {
+	nextEntry   = thisEntry->next;
+
+	/* Do we need to call a custom free pointer for this string entry?
+	 */
+	if (thisEntry->type == ANTLR3_HASH_TYPE_STR && thisEntry->freeptr != NULL)
+	{
+	    thisEntry->freeptr(thisEntry->data.ptr);
+	}
+
+	/* Now free the data for this bucket entry
+	 */
+	ANTLR3_FREE(thisEntry);
+	thisEntry = nextEntry;	    /* See if there are any more to free    */
+    }
+
+    /* The bucket entry is now gone, so we can free the memory for
+     * the entry itself.
+     */
+    ANTLR3_FREE(node);
+
+    /* And that should be it for everything under this node and itself
+     */
+}
+
+/** Called to free all nodes and the structure itself.
+ */
 static	void			
 intTrieFree	(pANTLR3_INT_TRIE trie)
 {
-    printf("Called triefree with trie at %08X\n", (ANTLR3_UINT32)(ANTLR3_UINT64)trie);
+    /* Descend from the root and free all the nodes
+     */
+    freeIntNode(trie->root);
+
+    /* the nodes are all gone now, so we need only free the memory
+     * for the structure itself
+     */
+    ANTLR3_FREE(trie);
 }
