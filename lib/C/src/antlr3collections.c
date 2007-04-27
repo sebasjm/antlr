@@ -65,6 +65,14 @@ static	ANTLR3_UINT64   antlr3VectorSize    (pANTLR3_VECTOR vector);
 static  void		closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory);
 static	pANTLR3_VECTOR  newVector	    (pANTLR3_VECTOR_FACTORY factory);
 
+
+/* Interface functions for int TRIE
+ */
+static	pANTLR3_TRIE_ENTRY	intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key);
+static	ANTLR3_BOOLEAN		intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key);
+static	ANTLR3_BOOLEAN		intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3_UINT64 intType, void * data, void (ANTLR3_CDECL *freeptr)(void *));
+static	void			intTrieFree	(pANTLR3_INT_TRIE trie);
+
 /* Local function to advance enumeration structure pointers
  */
 static void antlr3EnumNextEntry(pANTLR3_HASH_ENUM en);
@@ -1389,4 +1397,385 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
     factory->vectors->add(factory->vectors, (void *)vector, (void (ANTLR3_CDECL *)(void *))(vector->free));
 
     return  vector;
+}
+
+static ANTLR3_INLINE ANTLR3_UINT64
+bits (ANTLR3_UINT64 bitset, ANTLR3_UINT32 bitStart, ANTLR3_UINT32 numBits)
+{
+    return (bitset >> bitStart) & ~(~((ANTLR3_UINT64)0) << numBits);
+}
+
+/* INT TRIE Implementation of depth 64 bits, being the number of bits
+ * in a 64 bit integer. 
+ */
+
+pANTLR3_INT_TRIE
+antlr3IntTrieNew(ANTLR3_UINT32 depth)
+{
+    pANTLR3_INT_TRIE	trie;
+
+    trie    = (pANTLR3_INT_TRIE) ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE));	/* Base memory required	*/
+
+    if (trie == NULL)
+    {
+	return	(pANTLR3_INT_TRIE) ANTLR3_ERR_NOMEM;
+    }
+
+    /* Now we need to allocate the root node. This makes it easier
+     * to use the tree as we don't have to do anything special 
+     * for the root node.
+     */
+    trie->root	= (pANTLR3_INT_TRIE_NODE) ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE));
+
+    if (trie->root == NULL)
+    {
+	ANTLR3_FREE(trie);
+	return	(pANTLR3_INT_TRIE) ANTLR3_ERR_NOMEM;
+    }
+
+    trie->add	= intTrieAdd;
+    trie->del	= intTrieDel;
+    trie->free	= intTrieFree;
+    trie->get	= intTrieGet;
+    
+    /* Now we seed the root node with the index being the
+     * highest left most bit we want to test, which limits the
+     * keys in the trie. This is the trie 'depth'. The limit for
+     * this implementation is 63 (bits 0..63).
+     */
+    trie->root->bitNum = depth;
+
+    /* And as we have nothing in here yet, we set both child pointers
+     * of the root node to point back to itself.
+     */
+    trie->root->leftN	= trie->root;
+    trie->root->rightN	= trie->root;
+
+    /* Finally, note that the key for this root node is 0 because
+     * we use calloc() to initialise it.
+     */
+
+    return trie;
+}
+
+/** Search the int Trie and return a pointer to the first bucket indexed
+ *  by the key if it is contained in the trie, otherwise NULL.
+ */
+static	pANTLR3_TRIE_ENTRY   
+intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
+{
+    pANTLR3_INT_TRIE_NODE    thisNode; 
+    pANTLR3_INT_TRIE_NODE    nextNode; 
+
+    if (trie->count == 0)
+    {
+	return NULL;	    /* Nothing in this trie yet	*/
+    }
+    /* Starting at the root node in the trie, compare the bit index
+     * of the current node with its next child node (starts left from root).
+     * When the bit index of the child node is greater than the bit index of the current node
+     * then by definition (as the bit index decreases as we descent the trie)
+     * we have reached a 'backward' pointer. A backward pointer means we
+     * have reached the only node that can be reached by the bits given us so far
+     * and it must either be the key we are looking for, or if not then it
+     * means the entry was not in the trie, and we return NULL. A backward pointer
+     * points back in to the tree stucture rather than down (deeper) within the
+     * tree branches.
+     */
+    thisNode	= trie->root;		/* Start at the root node		*/
+    nextNode	= thisNode->leftN;	/* Examine the left node from the root	*/
+
+    /* While we are descending the tree nodes...
+     */
+    while (thisNode->bitNum > nextNode->bitNum)
+    {
+	/* Next node now becomes the new 'current' node
+	 */
+	thisNode    = nextNode;
+
+	/* We now test the bit indicated by the bitmap in the next node
+	 * in the key we are searching for. The new next node is the
+	 * right node if that bit is set and the left node it is not.
+	 */
+	if (key & (((ANTLR3_UINT64)1)<< nextNode->bitNum))
+	{
+	    nextNode = nextNode->rightN;	/* 1 is right	*/
+	}
+	else
+	{
+	    nextNode = nextNode->leftN;		/* 0 is left	*/
+	}
+    }
+
+    /* Here we have reached a node where the bitMap index is lower than
+     * its parent. This means it is pointing backward in the tree and
+     * must therefore be a terminal node, being the only point than can
+     * be reached with the bits seen so far. It is either the actual key
+     * we wnated, or if that key is not in the trie it is another key
+     * that is currently the only one that can be reached by those bits.
+     * That situation would obviously change if the key was to be added
+     * to the trie.
+     *
+     * Hence it only remains to test whether this is actually the key or not.
+     */
+    if (nextNode->key == key)
+    {
+	/* This was the key, so return the entry pointer
+	 */
+	return	nextNode->buckets;
+    }
+    else
+    {
+	return	NULL;	/* That key is not in the trie (note that we set the pointer to -1 if no payload) */
+    }
+}
+
+static	ANTLR3_BOOLEAN		
+intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
+{
+    printf("Trie del called NYI with handle %08X, key %lld\n", (ANTLR3_UINT32)(ANTLR3_UINT64)trie, key);
+    return ANTLR3_FALSE;
+}
+
+/** Add an entry into the INT trie.
+ *  Basically we descend the trie as we do when searching it, which will
+ *  locate the only node in the trie that can be reached by the bit pattern of the
+ *  key. If the key is actually at that node, then if the trie accepts duplicates
+ *  we add the supplied data in a new chained bucket to that data node. If it does
+ *  not accept duplicates then we merely return FALSE in case the caller wants to know
+ *  whether the key was already in the trie.
+ *  If the node we locate is not the key we are looking to add, then we insert a new node
+ *  into the trie with a bit index of the leftmost differing bit and the left or right 
+ *  node pointing to iteself or the data node we are inserting 'before'. 
+ */
+static	ANTLR3_BOOLEAN		
+intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3_UINT64 intVal, void * data, void (ANTLR3_CDECL *freeptr)(void *))
+{
+    pANTLR3_INT_TRIE_NODE   thisNode;
+    pANTLR3_INT_TRIE_NODE   nextNode;
+    pANTLR3_INT_TRIE_NODE   entNode;
+    ANTLR3_UINT32	    depth;
+    pANTLR3_TRIE_ENTRY	    newEnt;
+    pANTLR3_TRIE_ENTRY	    nextEnt;
+    ANTLR3_UINT64	    xorKey;
+
+    /* Cache the bit depth of this trie, which is always the highest index, 
+     * which is in the root node
+     */
+    depth   = trie->root->bitNum;
+
+    thisNode	= trie->root;		/* Start with the root node	    */
+    nextNode	= trie->root->leftN;	/* And assume we start to the left  */
+
+    /* Now find the only node that can be currently reached by the bits in the
+     * key we are being asked to insert.
+     */
+    while (thisNode->bitNum  > nextNode->bitNum)
+    {
+	/* Still descending the structure, next node becomes current.
+	 */
+	thisNode = nextNode;
+
+	if (key & ((ANTLR3_UINT64)(1<< nextNode->bitNum)))
+	{
+	    /* Bit at the required index was 1, so travers the right node from here
+	     */
+	    nextNode = nextNode->rightN;
+	}
+	else
+	{
+	    /* Bit at the required index was 0, so we traverse to the left
+	     */
+	    nextNode = nextNode->leftN;
+	}
+    }
+    /* Here we have located the only node that can be reached by the
+     * bits in the requested key. It could in fact be that key or the node
+     * we need to use to insert the new key.
+     */
+    if (nextNode->key == key)
+    {
+	/* We have located an exact match, but we will only append to the bucket chain
+	 * if this trie accepts duplicate keys.
+	 */
+	if (trie->allowDups ==ANTLR3_TRUE)
+	{
+	    /* Yes, we are accepting duplicates
+	     */
+	    newEnt = (pANTLR3_TRIE_ENTRY)ANTLR3_MALLOC(sizeof(ANTLR3_TRIE_ENTRY));
+
+	    if (newEnt == NULL)
+	    {
+		/* Out of memory, all we can do is return the fact that the insert failed.
+		 */
+		return	ANTLR3_FALSE;
+	    }
+
+	    /* Otherwise insert this in the chain
+	     */
+	    newEnt->type	= type;
+	    newEnt->freeptr	= freeptr;
+	    if (type == ANTLR3_HASH_TYPE_STR)
+	    {
+		newEnt->data.ptr = data;
+	    }
+	    else
+	    {
+		newEnt->data.intVal = intVal;
+	    }
+
+	    /* We want to be able to traverse the stored elements in the order that they were
+	     * added as suplicate keys. We might need to revise this opinioin if we end up having many duplicate keys
+	     * as perhaps reverse order is just as good, so long as it is ordered.
+	     */
+	    nextEnt = nextNode->buckets;
+	    while (nextEnt->next != NULL)
+	    {
+		nextEnt = nextEnt->next;    
+	    }
+	    nextEnt->next = newEnt;
+
+	    trie->count++;
+	    return  ANTLR3_TRUE;
+	}
+	else
+	{
+	    /* We found the key is lready there and we are not allowed duplicates in this
+	     * trie.
+	     */
+	    return  ANTLR3_FALSE;
+	}
+    }
+
+    /* Here we have discovered the only node that can be reached by the bits in the key
+     * but we have found that this node is not the key we need to insert. We must find the
+     * the leftmost bit (starting from the trie depth bits) that the current key for that
+     * node and the new key we are going to insert differ. Using a depth of 64 bits is perhaps
+     * the only thing that can slow us down here, so I may come back and play some mathemactical
+     * and bitwise logical tricks with xor and << if I notice this to be a big deal. However this
+     * will be a maximum of 64 bitwise ands and most processors can deal with that in virtually
+     * no time.
+     */
+    xorKey = (key ^ nextNode->key);   /* Gives 1 bits only where they differ then we find the left most 1 bit*/
+    while (! (xorKey & (((ANTLR3_UINT64)1)<<depth)) )
+    {
+	depth--;
+    }
+
+    /* We have located the leftmost differning bit, indicated by the depth variable. So, we know what
+     * bit index we are to insert the new entry at. There are two cases, being where the two keys
+     * differ at a bit postition that is not currently part of the bit testing, and where they differ on a bit
+     * that is currently being skipped in the indexed comparisons, and where they differ on a bit
+     * that is merely lower down in the current bit search. If the bit index went bit 4, bit 2 and they differ
+     * at bit 3, then we have the "skipped" bit case. But if that chain was Bit 4, Bit 2 and they differ at bit 1
+     * then we have the easy bit <pun>.
+     *
+     * So, set up to descend the tree again, but this time looking for the insert point
+     * according to whether we skip the bit that differs or not.
+     */
+    thisNode	= trie->root;
+    entNode	= trie->root->leftN;
+
+    /* Note the slight difference in the checks here to cover both cases
+     */
+    while (thisNode->bitNum > entNode->bitNum && entNode->bitNum > depth)
+    {
+	/* Still descending the structure, next node becomes current.
+	 */
+	thisNode = entNode;
+
+	if (key & (((ANTLR3_UINT64)1)<< entNode->bitNum))
+	{
+	    /* Bit at the required index was 1, so travers the right node from here
+	     */
+	    entNode = entNode->rightN;
+	}
+	else
+	{
+	    /* Bit at the required index was 0, so we traverse to the left
+	     */
+	    entNode = entNode->leftN;
+	}
+    }
+
+    /* We have located teh correct insert point for this new key, so we need
+     * to allocate our entry and insert it etc.
+     */
+    nextNode	= (pANTLR3_INT_TRIE_NODE)ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE_NODE));
+    if (nextNode == NULL)
+    {
+	/* All that work and no memory - bummer.
+	 */
+	return	ANTLR3_FALSE;
+    }
+
+    /* Build a new entry block for the new node
+     */
+    newEnt = (pANTLR3_TRIE_ENTRY)ANTLR3_MALLOC(sizeof(ANTLR3_TRIE_ENTRY));
+
+    if (newEnt == NULL)
+    {
+	/* Out of memory, all we can do is return the fact that the insert failed.
+	 */
+	return	ANTLR3_FALSE;
+    }
+
+    /* Otherwise enter this in our new node
+    */
+    newEnt->type	= type;
+    newEnt->freeptr	= freeptr;
+    if (type == ANTLR3_HASH_TYPE_STR)
+    {
+	newEnt->data.ptr = data;
+    }
+    else
+    {
+	newEnt->data.intVal = intVal;
+    }
+    /* Install it
+     */
+    nextNode->buckets	= newEnt;
+    nextNode->key	= key;
+    nextNode->bitNum	= depth;
+
+    /* Work out the right and left pointers for this new node, which involve
+     * terminating with the current found node either right or left accorging
+     * to whether the current index bit is 1 or 0
+     */
+    if (key & ( ((ANTLR3_UINT64)1) << depth))
+    {
+	nextNode->leftN	    = entNode;	    /* Terminates at previous position	*/
+	nextNode->rightN    = nextNode;	    /* Terminates with itself		*/
+    }
+    else
+    {
+	nextNode->rightN   = entNode;	    /* Terminates at previous position	*/
+	nextNode->leftN    = nextNode;	    /* Terminates with itself		*/		
+    }
+
+    /* Finally, we need to change the pointers at the node we located
+     * for inserting. If the key bit at its index is set then the right
+     * pointer for that node becomes the newly created node, otherwise the left 
+     * pointer does.
+     */
+    if (key &( ((ANTLR3_UINT64)1) <<thisNode->bitNum) )
+    {
+	thisNode->rightN    = nextNode;
+    }
+    else
+    {
+	thisNode->leftN	    = nextNode;
+    }
+
+    /* Et voila
+     */
+    trie->count++;
+    return  ANTLR3_TRUE;
+
+}
+
+static	void			
+intTrieFree	(pANTLR3_INT_TRIE trie)
+{
+    printf("Called triefree with trie at %08X\n", (ANTLR3_UINT32)(ANTLR3_UINT64)trie);
 }

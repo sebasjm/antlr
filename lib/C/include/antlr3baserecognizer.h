@@ -113,7 +113,7 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *
      *  This is only used if rule memoization is on.
      */
-    pANTLR3_VECTOR	ruleMemo;
+    pANTLR3_INT_TRIE	ruleMemo;
 
     /** Pointer to an array of token names
      *  that are generally useful in error reporting. The generated parsers install

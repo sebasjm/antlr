@@ -786,7 +786,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 <if(memoize)>
     /* Create a LIST for recording rule memos.
      */
-    lexCtx->pLexer->rec->ruleMemo    = antlr3VectorNew(0);	// Will expand as new rules are hit
+    lexCtx->pLexer->rec->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */
 <endif>
 
     /* Install the implementation of our <name> interface
@@ -1058,9 +1058,9 @@ ANTLR3_API p<name>
     /* Create a LIST for recording rule memos.
      */
 <if(TREE_PARSER)>
-    ctx->pTreeParser->rec->ruleMemo    = antlr3VectorNew(0);<\n>
+    ctx->pTreeParser->rec->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */<\n>
 <else>
-    ctx->pParser->rec->ruleMemo    = antlr3VectorNew(0);<\n>
+    ctx->pParser->rec->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */<\n>
 <endif>
 <endif>	
     /* Install the token table

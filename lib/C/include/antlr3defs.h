@@ -241,6 +241,7 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #define	ANTLR3_MEMMOVE(target, source, size)	memmove((void *)(target), (const void *)(source), (size_t)(size))
 #define	ANTLR3_MEMSET(target, byte, size)	memset((void *)(target), (int)(byte), (size_t)(size))
 
+ANTLR3_API pANTLR3_INT_TRIE	    antlr3IntTrieNew		    (ANTLR3_UINT32 depth);
 
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetNew		    (ANTLR3_UINT32 numBits);
 ANTLR3_API pANTLR3_BITSET	    antlr3BitsetOf		    (ANTLR3_INT32 bit, ...);

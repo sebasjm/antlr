@@ -244,6 +244,70 @@ typedef struct ANTLR3_VECTOR_FACTORY_struct
 
 }
     ANTLR3_VECTOR_FACTORY; 
+    
+    
+    /* -------------- TRIE Interfaces ---------------- */
+
+
+/** Structure that holds the payload entry in an ANTLR3_INT_TRIE or ANTLR3_STRING_TRIE
+ */
+typedef struct ANTLR3_TRIE_ENTRY_struct
+{
+    ANTLR3_UINT32   type;
+    void (ANTLR3_CDECL *freeptr)(void *);
+    union
+    {
+	ANTLR3_UINT64     intVal;
+	void		* ptr;
+    } data;
+
+    struct ANTLR3_TRIE_ENTRY_struct	* next;	    /* Allows duplicate entries for same key in insertion order	*/
+}
+    ANTLR3_TRIE_ENTRY, * pANTLR3_TRIE_ENTRY;
+
+
+/** Structure that defines an element/node in an ANTLR3_INT_TRIE
+ */
+typedef struct ANTLR3_INT_TRIE_NODE_struct
+{
+    ANTLR3_UINT32			      bitNum;	/**< This is the left/right bit index for traversal along the nodes		*/
+    ANTLR3_UINT64			      key;	/**< This is the actual key that the entry represents if it is a terminal node  */
+    pANTLR3_TRIE_ENTRY			      buckets;	/**< This is the data bucket(s) that the key indexes, which may be NULL		*/
+    struct ANTLR3_INT_TRIE_NODE_struct	    * leftN;	/**< Pointer to the left node from here when sKey & bitNum = 0			*/
+    struct ANTLR3_INT_TRIE_NODE_struct	    * rightN;	/**< Pointer to the right node from here when sKey & bitNume, = 1		*/
+}
+    ANTLR3_INT_TRIE_NODE, * pANTLR3_INT_TRIE_NODE;
+
+/** Structure that defines an ANTLR3_INT_TRIE. For this particular implementation,
+ *  as you might expect, the key is turned into a "string" by looking at bit(key, depth)
+ *  of the integer key. Using 64 bit keys gives us a depth limit of 64 (or bit 0..63)
+ *  and potentially a huge trie. This is the algorithm for a Patricia Trie.
+ *  Note also that this trie [can] accept multiple entries for the same key and is
+ *  therefore a kind of elastic bucket patricia trie.
+ *
+ *  If you find this code useful, please feel free to 'steal' it for any purpose
+ *  as covered by the BSD license under which ANTLR is issued. You can cut the code
+ *  but as the ANTLR library is only about 50K (Windows Vista), you might find it 
+ *  easier to just link the library. Please keep all comments and licenses and so on
+ *  in any version of this you create of course.
+ *
+ *  Jim Idle.
+ *  
+ */
+typedef struct ANTLR3_INT_TRIE_struct
+{
+    pANTLR3_INT_TRIE_NODE   root;	/* Root node of this integer trie	    */
+    ANTLR3_UINT64	    count;	/* Current entry count			    */
+    ANTLR3_BOOLEAN	    allowDups;	/* Whether this trie accepts duplicate keys */
+
+    
+    pANTLR3_TRIE_ENTRY	    (*get)	(struct ANTLR3_INT_TRIE_struct * trie, ANTLR3_UINT64 key);
+    ANTLR3_BOOLEAN	    (*del)	(struct ANTLR3_INT_TRIE_struct * trie, ANTLR3_UINT64 key);
+    ANTLR3_BOOLEAN	    (*add)	(struct ANTLR3_INT_TRIE_struct * trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3_UINT64 intVal, void * data, void (ANTLR3_CDECL *freeptr)(void *));
+    void		    (*free)	(struct ANTLR3_INT_TRIE_struct * trie);
+
+}
+    ANTLR3_INT_TRIE, * pANTLR3_INT_TRIE;
 
 #endif
 

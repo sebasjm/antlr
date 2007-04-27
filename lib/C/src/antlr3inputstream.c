@@ -381,7 +381,7 @@ antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
     /* Seek input pointer to the requested point (note we supply the void *pointer
      * to whatever is implementing the int stream to seek).
      */
-    is->seek(is, ANTLR3_UINT64_CAST(state->nextChar));
+    antlr3AsciiSeek(is, ANTLR3_UINT64_CAST(state->nextChar));
 
     /* Reset to the reset of the information in the mark
      */
@@ -421,7 +421,7 @@ antlr3AsciiRelease	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
  * \remark
  * Assumes ASCII (or at least, 8 Bit) input stream.
  */
-static void
+static ANTLR3_INLINE void
 antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
 {
     ANTLR3_INT64   count;

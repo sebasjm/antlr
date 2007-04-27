@@ -1200,6 +1200,12 @@ freeList    (void * list)
 {
     ((pANTLR3_LIST)list)->free(list);
 }
+static	void ANTLR3_CDECL
+freeIntTrie    (void * trie)
+{
+    ((pANTLR3_INT_TRIE)trie)->free((pANTLR3_INT_TRIE)trie);
+}
+
 
 /** Pointer to a function to return whether the rule has parsed input starting at the supplied 
  *  start index before. If the rule has not parsed input starting from the supplied start index,
@@ -1216,44 +1222,42 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 {
     /* The rule memos are an ANTLR3_LIST of ANTLR3_LIST.
      */
-    pANTLR3_UINT64  ruleList;
-    ANTLR3_UINT32   ind;
-    ANTLR3_UINT64   stopIndex;
+    pANTLR3_INT_TRIE	ruleList;
+    ANTLR3_UINT64	stopIndex;
+    pANTLR3_TRIE_ENTRY	entry;
 
     /* See if we have a list in the ruleMemos for this rule, and if not, then create one
-     * as we will need it eventually.
+     * as we will need it eventually if we are being asked for the memo here.
      */
-    ruleList	= recognizer->ruleMemo->get(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex);
+    entry	= recognizer->ruleMemo->get(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex);
 
-    if	(ruleList == NULL)
+    if	(entry == NULL)
     {
-	/* Did not find it, so create a new one of arbitrary size
+	/* Did not find it, so create a new one for it
 	 */
-	ruleList    = ANTLR3_MALLOC(sizeof(ANTLR3_UINT64) * 257 * 2);    /* Allow 256 entries to start with */
-	*ruleList   = 256;   /* Available */
-	*(ruleList+1) = 0;    /* Used	 */
-	recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC, ANTLR3_FALSE);
+	ruleList    = antlr3IntTrieNew(63);	/* Depth is theoritcally 64 bits, but probably not ;-)	*/
+
+	if (ruleList != (pANTLR3_INT_TRIE)ANTLR3_ERR_NOMEM)
+	{
+	    recognizer->ruleMemo->add(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_HASH_TYPE_STR, 0, ANTLR3_FUNC_PTR(ruleList), freeIntTrie);
+	}
+
+	/* We cannot have a stopIndex in a trie we have just created of course
+	 */
+	return	MEMO_RULE_UNKNOWN;
     }
 
+    ruleList	= (pANTLR3_INT_TRIE) (entry->data.ptr);
+
     /* See if there is a stop index associated with the supplied start index.
-     * We index on the start position + 1, just in case there is ever a need to 
-     * memoize the first token ever, at index 0.
-     *
-     * TODO: Come back and make this a binary chop. Might be useful to have a general
-     * binary search collection based on integer keys?
      */
     stopIndex	= 0;
 
-    for (ind = 1; ind <= *(ruleList+1); ind++)
+    entry = ruleList->get(ruleList, ruleParseStart);
+    if (entry != NULL)
     {
-	ANTLR3_UINT32	ent;
-	ent = ind*2;	/* Start point */
+	stopIndex = entry->data.intVal;
 
-	if (*(ruleList+ent) == ruleParseStart)
-	{
-	    stopIndex	= *(ruleList+ent+1);
-	    break;
-	}
     }
 
     if	(stopIndex == 0)
@@ -1347,7 +1351,8 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 {
     /* The rule memos are an ANTLR3_LIST of ANTLR3_LIST.
      */
-    pANTLR3_UINT64	    ruleList;
+    pANTLR3_INT_TRIE	    ruleList;
+    pANTLR3_TRIE_ENTRY	    entry;
     ANTLR3_UINT64	    stopIndex;
     pANTLR3_LEXER	    lexer;
     pANTLR3_PARSER	    parser;
@@ -1381,7 +1386,7 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction consumeUntilSet called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizerfunction consumeUntilSet called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
@@ -1389,41 +1394,17 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
     
     stopIndex	= recognizer->failed == ANTLR3_TRUE ? MEMO_RULE_FAILED : is->index(is) - 1;
 
-    ruleList	= recognizer->ruleMemo->get(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex);
+    entry	= recognizer->ruleMemo->get(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex);
 
-    if	(ruleList != NULL)
+    if	(entry != NULL)
     {
-	ANTLR3_UINT32	ind;
+	ruleList = (pANTLR3_INT_TRIE)(entry->data.ptr);
 
-	/* Do we have enough room? 
+	/* If we don't already have this entry, append it. The memoize trie does not
+	 * accept duplicates so it won't add it if already there and we just ignore the
+	 * return code as we don't care if it is there already.
 	 */
-	if (*ruleList == *(ruleList+1))
-	{
-	    ANTLR3_UINT64   newSize;
-	    /* Need to expand the list, so double it 
-	     */
-	    newSize = (*ruleList) * 2;
-	    *ruleList = newSize;
-	    ruleList = ANTLR3_REALLOC(ruleList, ((1+newSize) * sizeof(ANTLR3_UINT64))*2);
-	    recognizer->ruleMemo->put(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_FUNC_PTR(ruleList), ANTLR3_FREE_FUNC, ANTLR3_FALSE);
-	}
-
-	/* If we don't already have this entry, append it 
-	 * TODO: Change this to a binary search
-	 */
-	for (ind = 1; ind <= *(ruleList+1); ind++)
-	{
-	    if (*(ruleList+2*ind) == ruleParseStart)
-	    {
-		return;
-	    }
-	}
-
-	/* Needs to be added
-	 */
-	(*(ruleList+1))++;
-	*(ruleList + (2 * *(ruleList + 1)))	= ruleParseStart;
-	*(ruleList + (2 * *(ruleList + 1)) + 1)	= stopIndex;
+	ruleList->add(ruleList, ruleParseStart, ANTLR3_HASH_TYPE_INT, stopIndex, NULL, NULL);
     }
 }
 /** A syntactic predicate.  Returns true/false depending on whether
