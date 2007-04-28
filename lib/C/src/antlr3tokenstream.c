@@ -234,7 +234,7 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
 	return LB(cts, -k);
     }
    
-    if	((cts->p + k - 1) >= (ANTLR3_INT64)ts->istream->size(ts->istream))
+    if	((cts->p + k - 1) >= (ANTLR3_INT64)ts->istream->cachedSize)
     {
 	pANTLR3_COMMON_TOKEN    teof = &(ts->tokenSource->eofToken);
 
@@ -254,7 +254,7 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
 	i = skipOffTokenChannels(cts, i+1); /* leave p on valid token    */
 	n++;
     }
-    if	( (ANTLR3_UINT64) i > ts->istream->size(ts->istream))
+    if	( (ANTLR3_UINT64) i > ts->istream->cachedSize)
     {
 	    pANTLR3_COMMON_TOKEN    teof = &(ts->tokenSource->eofToken);
 
@@ -611,10 +611,15 @@ size	(pANTLR3_INT_STREAM is)
     pANTLR3_COMMON_TOKEN_STREAM cts;
     pANTLR3_TOKEN_STREAM	ts;
 
+    if (is->cachedSize > 0)
+    {
+	return  is->cachedSize;
+    }
     ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
     cts	    = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
 
-    return  cts->tokens->size(cts->tokens);
+    is->cachedSize =  cts->tokens->count;
+    return  is->cachedSize;
 }
 
 static ANTLR3_INT64    
@@ -710,7 +715,7 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 	 */
 	if  (discard == ANTLR3_FALSE)
 	{
-	    /* Add it, indicating tthat we will delete it and the table should not
+	    /* Add it, indicating that we will delete it and the table should not
 	     */
 	    tok->setTokenIndex(tok, index);
 	    tokenStream->p++;
@@ -726,6 +731,10 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
     tokenStream->p  = 0;
     tokenStream->p  = skipOffTokenChannels(tokenStream, tokenStream->p);
 
+    /* Cache the size so we don't keep doing indirect method calls
+     */
+    tokenStream->tstream->istream->cachedSize = tokenStream->tokens->count;
+
 }
 /** Given a starting index, return the index of the first on-channel
  *  token.
@@ -736,7 +745,7 @@ skipOffTokenChannels(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i)
     ANTLR3_INT64	    n;
     pANTLR3_COMMON_TOKEN    tok;
 
-    n	= tokenStream->tstream->istream->size(tokenStream->tstream->istream);
+    n	= tokenStream->tstream->istream->cachedSize;
 
     while   (	   i < n )
     {

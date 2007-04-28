@@ -136,6 +136,11 @@ typedef	struct ANTLR3_INT_STREAM_struct
      *  might be useful to display the entire stream or for testing.
      */
     ANTLR3_UINT64	    (*size)	    (struct ANTLR3_INT_STREAM_struct * intStream);
+    /** Because the inderect call, though small in individual cases can
+     *  mount up if there are thousands of tokens (very large input streams), callers
+     *  of size can optionally use this cached size field.
+     */
+    ANTLR3_UINT64	    cachedSize;
 
     /** Frees any resources that were allocated for the implementation of this
      *  interface. Usually this is just releasing the memory allocated
