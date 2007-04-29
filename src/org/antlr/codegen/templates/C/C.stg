@@ -1745,10 +1745,10 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
-if ( <s> ) // This is matchSet
+if ( <s> )
 {
-    <postmatchCode>
     CONSUME();
+    <postmatchCode>
 <if(!LEXER)>
     PERRORRECOVERY=ANTLR3_FALSE;
 <endif>
