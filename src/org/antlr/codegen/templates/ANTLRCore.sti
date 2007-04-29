@@ -172,7 +172,7 @@ lexerRuleRef(rule,label,args,elementIndex);
 lexerRuleRefAndListLabel(rule,label,args,elementIndex);
 
 /** EOF in the lexer */
-lexerMatchEOF(label);
+lexerMatchEOF(label,elementIndex);
 
 /** match ^(root children) in tree parser */
 tree(root, children, nullableChildList);

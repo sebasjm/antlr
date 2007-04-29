@@ -722,7 +722,7 @@ lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::= <<
 >>
 
 /** EOF in the lexer */
-lexerMatchEOF(label) ::= <<
+lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 int <label>Start<elementIndex> = getCharIndex();
 match(EOF); <checkRuleBacktrackFailure()>
