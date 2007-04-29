@@ -223,7 +223,7 @@
 				AssemblerListingLocation=".\asm\release"
 				WarningLevel="4"
 				WarnAsError="true"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CallingConvention="1"
 				CompileAs="0"
@@ -316,7 +316,7 @@
 				BrowseInformation="1"
 				WarningLevel="4"
 				WarnAsError="false"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
