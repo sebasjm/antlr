@@ -1399,11 +1399,78 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
     return  vector;
 }
 
-static ANTLR3_INLINE ANTLR3_UINT64
-bits (ANTLR3_UINT64 bitset, ANTLR3_UINT32 bitStart, ANTLR3_UINT32 numBits)
+/** Array of left most significant bit positions for an 8 bit
+ *  element provides an efficient way to find the highest bit
+ *  that is set in an n byte value (n>0). Assuming a reasonable
+ *  amount of CPU cache, the values will all hit the data cache,
+ *  coding without conditional elements should allow branch
+ *  prediction to work well and of course a parallel instruction cache
+ *  will whip through this. Otherwise we must loop shifting a one
+ *  bit and masking. The values we tend to be placing in out integer
+ *  patricia trie are usually a lot lower than the 64 bits we
+ *  allow for the key allows. Hence there is a lot of redundant looping and
+ *  shifting in a while loop. Whereas, the lookup table is just
+ *  a few ands and indirect lookups, while testing for 0. This
+ *  is likely to be done in parallel on many processors available
+ *  when I wrote this. If this code survives as long as yacc, then
+ *  I may already be dead by the time you read this and maybe there is
+ *  a single machine instruction to perform the operation. What
+ *  else are you going to do with all those transitors? Jim 2007
+ *
+ * The table is probably obvious but it is just the number 0..7
+ * of the MSB in each integer value 0..256
+ */
+static ANTLR3_UINT8 bitIndex[256] = 
+{ 
+    0,							    // 0 - Just for padding
+    0,							    // 1
+    1, 1,						    // 2..3
+    2, 2, 2, 2,						    // 4..7
+    3, 3, 3, 3, 3, 3, 3, 3,				    // 8+
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,	    // 16+
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,	    // 32+
+	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,	    
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,	    // 64+
+	6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+	6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+	6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,	    // 128+
+	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7
+};
+
+/** Rather than use the bitindex of a trie node to shift
+ *  0x01 left that many times, then & with the result, it is
+ *  faster to use the bit index as an index into this table
+ *  which holds precomputed masks for any of the 64 bits
+ *  we need to mask off singly. The data values will stay in
+ *  cache while ever a trie is in heavy use, such as in
+ *  memoization. It is also pretty enough to be ASCII art.
+ */
+static ANTLR3_UINT64 bitMask[64] = 
 {
-    return (bitset >> bitStart) & ~(~((ANTLR3_UINT64)0) << numBits);
-}
+    0x0000000000000001, 0x0000000000000002, 0x0000000000000004, 0x0000000000000008,
+    0x0000000000000010, 0x0000000000000020, 0x0000000000000040, 0x0000000000000080,
+    0x0000000000000100, 0x0000000000000200, 0x0000000000000400, 0x0000000000000800,
+    0x0000000000001000, 0x0000000000002000, 0x0000000000004000, 0x0000000000008000,
+    0x0000000000010000, 0x0000000000020000, 0x0000000000040000, 0x0000000000080000,
+    0x0000000000100000, 0x0000000000200000, 0x0000000000400000, 0x0000000000800000,
+    0x0000000001000000, 0x0000000002000000, 0x0000000004000000, 0x0000000008000000,
+    0x0000000010000000, 0x0000000020000000, 0x0000000040000000, 0x0000000080000000,
+    0x0000000100000000, 0x0000000200000000, 0x0000000400000000, 0x0000000800000000,
+    0x0000001000000000, 0x0000002000000000, 0x0000004000000000, 0x0000008000000000,
+    0x0000010000000000, 0x0000020000000000, 0x0000040000000000, 0x0000080000000000,
+    0x0000100000000000, 0x0000200000000000, 0x0000400000000000, 0x0000800000000000,
+    0x0001000000000000, 0x0002000000000000, 0x0004000000000000, 0x0008000000000000,
+    0x0010000000000000, 0x0020000000000000, 0x0040000000000000, 0x0080000000000000,
+    0x0100000000000000, 0x0200000000000000, 0x0400000000000000, 0x0800000000000000,
+    0x1000000000000000, 0x2000000000000000, 0x4000000000000000, 0x8000000000000000,
+};
 
 /* INT TRIE Implementation of depth 64 bits, being the number of bits
  * in a 64 bit integer. 
@@ -1497,7 +1564,7 @@ intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
 	 * in the key we are searching for. The new next node is the
 	 * right node if that bit is set and the left node it is not.
 	 */
-	if (key & (((ANTLR3_UINT64)1)<< nextNode->bitNum))
+	if (key & bitMask[nextNode->bitNum])
 	{
 	    nextNode = nextNode->rightN;	/* 1 is right	*/
 	}
@@ -1581,7 +1648,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 	 */
 	thisNode = nextNode;
 
-	if (key & (((ANTLR3_UINT64)1)<< nextNode->bitNum))
+	if (key & bitMask[nextNode->bitNum])
 	{
 	    /* Bit at the required index was 1, so travers the right node from here
 	     */
@@ -1654,20 +1721,66 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 
     /* Here we have discovered the only node that can be reached by the bits in the key
      * but we have found that this node is not the key we need to insert. We must find the
-     * the leftmost bit (starting from the trie depth bits) that the current key for that
-     * node and the new key we are going to insert differ. Using a depth of 64 bits is perhaps
-     * the only thing that can slow us down here, so I may come back and play some mathemactical
-     * and bitwise logical tricks with xor and << if I notice this to be a big deal. However this
-     * will be a maximum of 64 bitwise ands and most processors can deal with that in virtually
-     * no time.
+     * the leftmost bit by which the current key for that node and the new key we are going 
+     * to insert, differ. While this nested series of ifs may look a bit strange, experimentation
+     * showed that it allows a machine code path that works well with predicated execution
      */
     xorKey = (key ^ nextNode->key);   /* Gives 1 bits only where they differ then we find the left most 1 bit*/
-    while (! (xorKey & (((ANTLR3_UINT64)1)<<depth)) )
+
+    /* Most common case is a 32 bit key really
+     */
+    if	(xorKey & 0xFFFFFFFF00000000)
     {
-	depth--;
+	if  (xorKey & 0xFFFF000000000000)
+	{
+	    if	(xorKey & 0xFF00000000000000)
+	    {
+		depth = 55 + bitIndex[((xorKey & 0xFF00000000000000)>>56)];
+	    }
+	    else
+	    {
+		depth = 47 + bitIndex[((xorKey & 0x00FF000000000000)>>48)];
+	    }
+	}
+	else
+	{
+	    if	(xorKey & 0x0000FF0000000000)
+	    {
+		depth = 39 + bitIndex[((xorKey & 0x0000FF000000000)>>40)];
+	    }
+	    else
+	    {
+		depth = 31 + bitIndex[((xorKey & 0x000000FF0000000)>>32)];
+	    }
+	}
+    }
+    else
+    {
+	if  (xorKey & 0x00000000FFFF0000)
+	{
+	    if	(xorKey & 0x00000000FF000000)
+	    {
+		depth = 23 + bitIndex[((xorKey & 0x000000FF0000000)>>24)];
+	    }
+	    else
+	    {
+		depth = 15 + bitIndex[((xorKey & 0x000000FF0000000)>>16)];
+	    }
+	}
+	else
+	{
+	    if	(xorKey & 0x000000000000FF00)
+	    {
+		depth = 7 + bitIndex[((xorKey & 0x000000FF0000000)>>8)];
+	    }
+	    else
+	    {
+		depth = bitIndex[xorKey & 0x00000000000000FF];
+	    }
+	}
     }
 
-    /* We have located the leftmost differning bit, indicated by the depth variable. So, we know what
+    /* We have located the leftmost differing bit, indicated by the depth variable. So, we know what
      * bit index we are to insert the new entry at. There are two cases, being where the two keys
      * differ at a bit postition that is not currently part of the bit testing, and where they differ on a bit
      * that is currently being skipped in the indexed comparisons, and where they differ on a bit
@@ -1689,7 +1802,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 	 */
 	thisNode = entNode;
 
-	if (key & (((ANTLR3_UINT64)1)<< entNode->bitNum))
+	if (key & bitMask[entNode->bitNum])
 	{
 	    /* Bit at the required index was 1, so travers the right node from here
 	     */
@@ -1747,7 +1860,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
      * terminating with the current found node either right or left accorging
      * to whether the current index bit is 1 or 0
      */
-    if (key & ( ((ANTLR3_UINT64)1) << depth))
+    if (key & bitMask[depth])
     {
 	nextNode->leftN	    = entNode;	    /* Terminates at previous position	*/
 	nextNode->rightN    = nextNode;	    /* Terminates with itself		*/
@@ -1763,7 +1876,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
      * pointer for that node becomes the newly created node, otherwise the left 
      * pointer does.
      */
-    if (key &( ((ANTLR3_UINT64)1) <<thisNode->bitNum) )
+    if (key & bitMask[thisNode->bitNum] )
     {
 	thisNode->rightN    = nextNode;
     }
