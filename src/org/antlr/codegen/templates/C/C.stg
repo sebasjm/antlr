@@ -1467,7 +1467,7 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
 static ANTLR3_INLINE
 void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 {
-
+	ANTLR3_UINT32	_type;
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
@@ -1484,13 +1484,13 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     
     <ruleInitializations()>
     <ruleLabelInitializations()>
-    LEXER->type	    = <ruleName>;
+    _type	    = <ruleName>;
        
     <ruleDescriptor.actions.init>
     <ruleMemoization(name=ruleName)>
     
     <block>
-   
+	LEXER->type = _type;
 <endif>
     <if(trace)> fprintf(stderr, "exit <ruleName> '%c' line=%d:%d failed = %d, backtracking =%d\n",LA(1),GETLINE(),GETCHARPOSITIONINLINE(),failed,BACKTRACKING);<endif>
     <ruleCleanUp()>
@@ -2699,7 +2699,7 @@ STRSTREAM->toStringTT(STRSTREAM, retval.start, LT(-1))
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "LEXER->getText(LEXER)"
-lexerRulePropertyRef_type(scope,attr) ::= "LEXER->type"
+lexerRulePropertyRef_type(scope,attr) ::= "_type"
 lexerRulePropertyRef_line(scope,attr) ::= "LEXER->tokenStartline"
 lexerRulePropertyRef_pos(scope,attr) ::= "LEXER->tokenStartCharPositionInLine"
 lexerRulePropertyRef_channel(scope,attr) ::= "LEXER->channel"
