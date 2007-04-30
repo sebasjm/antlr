@@ -1962,7 +1962,6 @@ freeIntNode(pANTLR3_INT_TRIE_NODE node)
 static	void			
 intTrieFree	(pANTLR3_INT_TRIE trie)
 {
-    printf("Freeing trie at %p\n", trie);
     /* Descend from the root and free all the nodes
      */
     freeIntNode(trie->root);
