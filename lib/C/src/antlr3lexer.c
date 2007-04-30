@@ -11,12 +11,8 @@
 
 static void		    mTokens	    (pANTLR3_LEXER lexer);
 static void		    setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input);
-static void		    emit	    (pANTLR3_LEXER lexer,  pANTLR3_COMMON_TOKEN token);
-static void		    emitNew	    (pANTLR3_LEXER lexer,  ANTLR3_UINT32 ttype,
-						ANTLR3_UINT64 line,	    ANTLR3_UINT32 charPosition, 
-						ANTLR3_UINT32 channel, 
-						ANTLR3_UINT64 start,    ANTLR3_UINT64 stop
-							);
+static void		    emitNew	    (pANTLR3_LEXER lexer,  pANTLR3_COMMON_TOKEN token);
+static pANTLR3_COMMON_TOKEN emit	    (pANTLR3_LEXER lexer);
 static ANTLR3_BOOLEAN	    matchs	    (pANTLR3_LEXER lexer, ANTLR3_UCHAR * string);
 static ANTLR3_BOOLEAN	    matchc	    (pANTLR3_LEXER lexer, ANTLR3_UCHAR c);
 static ANTLR3_BOOLEAN	    matchRange	    (pANTLR3_LEXER lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high);
@@ -31,6 +27,8 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource);
 
 static void		    displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 * tokenNames);
 static void		    reportError			    (pANTLR3_BASE_RECOGNIZER rec);
+
+static void		    reset	    (pANTLR3_BASE_RECOGNIZER rec);
 
 static void		    freeLexer	    (pANTLR3_LEXER lexer);
 
@@ -63,6 +61,7 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
 
     lexer->rec->displayRecognitionError	    =  displayRecognitionError;
     lexer->rec->reportError		    =  reportError;
+    lexer->rec->reset			    =  reset;
 
     /* Now install the token source interface
      */
@@ -112,6 +111,28 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint)
     return  lexer;
 }
 
+static void
+reset	(pANTLR3_BASE_RECOGNIZER rec)
+{
+    pANTLR3_LEXER   lexer;
+
+    lexer   = rec->super;
+
+    lexer->token			= NULL;
+    lexer->type				= ANTLR3_TOKEN_INVALID;
+    lexer->channel			= ANTLR3_TOKEN_DEFAULT_CHANNEL;
+    lexer->tokenStartCharIndex		= -1;
+    lexer->tokenStartCharPositionInLine = -1;
+    lexer->tokenStartLine		= -1;
+
+    lexer->text	    = NULL;
+
+    if (lexer->input != NULL)
+    {
+	lexer->input->istream->seek(lexer->input->istream, 0);
+    }
+}
+
 
 /**
  * \brief
@@ -149,7 +170,11 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
 
     /* Record the start of the token in our input stream.
      */
-    lexer->tokenStartCharIndex	= lexer->getCharIndex(lexer);   
+    lexer->channel			= ANTLR3_TOKEN_DEFAULT_CHANNEL;
+    lexer->tokenStartCharIndex		= lexer->input->istream->index(lexer->input->istream);  
+    lexer->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
+    lexer->tokenStartLine		= lexer->input->getLine(lexer->input);
+    lexer->text				= NULL;
 
     /* Now call the matching rules and see if we can generate a new token
      */
@@ -186,6 +211,12 @@ static pANTLR3_COMMON_TOKEN nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
 	}
 	else
 	{
+	    if (lexer->token == NULL)
+	    {
+		emit(lexer);
+	    }
+	    // TODO: Deal with SKipped token type
+	    //
 	    return  lexer->token;
 	}
     }
@@ -297,30 +328,24 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
     /* Set the current token to nothing
      */
     lexer->token		= NULL;
+    lexer->text			= NULL;
     lexer->tokenStartCharIndex	= -1;
-    lexer->ruleNestingLevel	= 0;
+
 }
 
-static void emit	    (pANTLR3_LEXER lexer,  pANTLR3_COMMON_TOKEN token)
+static void emitNew	    (pANTLR3_LEXER lexer,  pANTLR3_COMMON_TOKEN token)
 {
     lexer->token    = token;	/* Voila!   */
 }
 
-static void emitNew	    (pANTLR3_LEXER lexer,
-					    ANTLR3_UINT32 ttype,
-					    ANTLR3_UINT64 line,	    ANTLR3_UINT32 charPosition, 
-					    ANTLR3_UINT32 channel, 
-					    ANTLR3_UINT64 start,    ANTLR3_UINT64 stop
-							)
+static pANTLR3_COMMON_TOKEN
+emit	    (pANTLR3_LEXER lexer)
 {
     pANTLR3_COMMON_TOKEN	token;
 
     /* We could check pointers to token factories and so on, but
-     * we are not in code tha twe want to run as fast as possible
-     * so we are not checking any errors. I will come round again and 
-     * creates some ANTLR3_DEBUG defs at a later date, but for now, be happy
-     * that I made my fingers hurt almost as badly as Ter's to get this all
-     * done in a week! So make sure you hae installed an input stream befire
+     * we are in code that we want to run as fast as possible
+     * so we are not checking any errors. So make sure you have installed an input stream before
      * trying to emit a new token.
      */
     token   = lexer->tokFactory->newToken(lexer->tokFactory);
@@ -329,15 +354,17 @@ static void emitNew	    (pANTLR3_LEXER lexer,
      * get added automatically, such as the input stream it is assoicated with
      * (though it can all be overridden of course)
      */
-    token->setType		(token, ttype);
-    token->setChannel		(token, channel);
-    token->setStartIndex        (token, start);
-    token->setStopIndex		(token, stop);
-    token->setLine		(token, line);
-    token->setCharPositionInLine(token, charPosition);
+    token->type		    = lexer->type;
+    token->channel	    = lexer->channel;
+    token->start	    = lexer->tokenStartCharIndex;
+    token->stop		    = lexer->getCharIndex(lexer) - 1;
+    token->line		    = lexer->tokenStartLine;
+    token->charPosition	    = lexer->tokenStartCharPositionInLine;
+    token->text		    = lexer->text;
 
-    lexer->emit(lexer, token);
+    lexer->token	    = token;
 
+    return  token;
 }
 
 /**
@@ -525,6 +552,11 @@ static ANTLR3_UINT64	getCharIndex	    (pANTLR3_LEXER lexer)
 static pANTLR3_STRING
 getText	    (pANTLR3_LEXER lexer)
 {
+    if (lexer->text)
+    {
+	return	lexer->text;
+
+    }
     return  lexer->input->substr(
 			    lexer->input, 
 			    lexer->tokenStartCharIndex,

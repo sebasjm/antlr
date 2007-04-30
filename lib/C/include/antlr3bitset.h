@@ -41,7 +41,7 @@ typedef	struct ANTLR3_BITSET_struct
      *	then it should be easy enough to produce a 32 bit (or less) version
      *  of the bitset code.
      */
-    pANTLR3_UINT64   bits;
+    pANTLR3_BITWORD   bits;
 
     /** Length of the current bit set in ANTLR3_UINT64 units.
      */

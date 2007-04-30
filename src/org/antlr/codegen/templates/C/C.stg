@@ -204,8 +204,8 @@ outputFile( LEXER,
 #define	    GETLINE()				LEXER->getLine(LEXER)
 #define	    GETTEXT()				LEXER->getText(LEXER)
 #define	    GETCHARPOSITIONINLINE() LEXER->getCharPositionInLine(LEXER)
-#define	    EMIT(t)					LEXER->emit(LEXER, t)
-#define	    EMITNEW(t,l,cp,ch,s,i)  LEXER->emitNew(LEXER, t, l, cp, ch, s, i)
+#define	    EMIT()					LEXER->emit(LEXER)
+#define	    EMITNEW(t)				LEXER->emitNew(LEXER, t)
 #define	    MATCHC(c)				LEXER->matchc(LEXER, c)
 #define	    MATCHS(s)				LEXER->matchs(LEXER, s)
 #define	    MATCHRANGE(c1,c2)	    LEXER->matchRange(LEXER, c1, c2)
@@ -263,7 +263,7 @@ outputFile( LEXER,
 			INPUT()->charPositionInLine	= 0;						\
 			INPUT()->currentLine		= (void *)(NEXTCHAR + 1);	\
 		}															\
-		NEXTCHAR++;													\
+		INPUT()->nextChar = (void *)(NEXTCHAR + 1);					\
     }																\
 }
 
@@ -880,7 +880,10 @@ static pANTLR3_COMMON_TOKEN
 
     /* Record the start of the token in our input stream.
      */
-    lexer->tokenStartCharIndex	= lexer->getCharIndex(lexer);   
+    lexer->tokenStartCharIndex			= lexer->input->istream->index(lexer->input->istream);
+    lexer->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
+    lexer->tokenStartLine				= lexer->input->getLine(lexer->input);
+    lexer->text							= NULL;
 
     /* Now call the matching rules and see if we can generate a new token
      */
@@ -905,7 +908,7 @@ static pANTLR3_COMMON_TOKEN
 			ANTLR3_UINT64   m;
 		    
 			m							= lexer->input->istream->mark(lexer->input->istream);
-			lexer->rec->backtracking	= 1;
+			lexer->rec->backtracking	= 1;				/* No exceptions */
 			lexer->rec->failed			= ANTLR3_FALSE;
 		 
 			/* Call the generated lexer, see if it can get a new token together.
@@ -923,6 +926,7 @@ static pANTLR3_COMMON_TOKEN
 			}
 			else
 			{
+				lexer->emit(lexer);					/* Assemble the token and emit it to the stream */
 				return	lexer->token;
 			}	
 		}
@@ -1472,44 +1476,23 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
 <if(nakedBlock)>
     <ruleInitializations()>
     <ruleLabelInitializations()>
-    ctx->pLexer->ruleNestingLevel++;
     <ruleDescriptor.actions.init>
     <ruleMemoization(name=ruleName)>
         
     <block><\n>
 <else>
-    ANTLR3_UINT32	    _type;
-    ANTLR3_UINT64	    _start;
-    ANTLR3_UINT64	    _end;
-    ANTLR3_UINT64	    _line;
-    ANTLR3_UINT32	    _charPosition;
-    ANTLR3_UINT32	    _channel;
     
     <ruleInitializations()>
     <ruleLabelInitializations()>
-    ctx->pLexer->ruleNestingLevel++;
-    _type	    = <ruleName>;
-    _start	    = GETCHARINDEX();
-    _end	    = 0;
-    _line	    = GETLINE();
-    _charPosition   = GETCHARPOSITIONINLINE();
-    _channel	    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
-        
+    LEXER->type	    = <ruleName>;
+       
     <ruleDescriptor.actions.init>
     <ruleMemoization(name=ruleName)>
     
     <block>
-    <! create token if none exists *and* we are an outermost token rule !>
-    <execAction({     
-    if ( LTOKEN() == NULL && !HASEXCEPTION() && ctx->pLexer->ruleNestingLevel==1) 
-    {
-		EMITNEW(_type,_line,_charPosition,_channel,_start, (_end==0 ? GETCHARINDEX()-1 : _end));
-    }<\n>
-    }
-    )>
+   
 <endif>
-    ctx->pLexer->ruleNestingLevel--;
-    <if(trace)> // Convert to C Jim!!! System.out.println("exit <ruleName> '"+(char)LA(1)+"' line="+GETLINE()+":"+GETCHARPOSITIONINLINE()+" failed="+failed+" backtracking="+BACKTRACKING);<endif>
+    <if(trace)> fprintf(stderr, "exit <ruleName> '%c' line=%d:%d failed = %d, backtracking =%d\n",LA(1),GETLINE(),GETCHARPOSITIONINLINE(),failed,BACKTRACKING);<endif>
     <ruleCleanUp()>
     <(ruleDescriptor.actions.after):execAction()>
     <memoize>
@@ -2715,13 +2698,13 @@ STRSTREAM->toStringTT(STRSTREAM, retval.start, LT(-1))
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
-lexerRulePropertyRef_text(scope,attr) ::= "LTOKEN()->getText(LTOKEN())"
-lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "_line"
-lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
-lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
-lexerRulePropertyRef_start(scope,attr) ::= "_start"
-lexerRulePropertyRef_stop(scope,attr) ::= "_end"
+lexerRulePropertyRef_text(scope,attr) ::= "LEXER->getText(LEXER)"
+lexerRulePropertyRef_type(scope,attr) ::= "LEXER->type"
+lexerRulePropertyRef_line(scope,attr) ::= "LEXER->tokenStartline"
+lexerRulePropertyRef_pos(scope,attr) ::= "LEXER->tokenStartCharPositionInLine"
+lexerRulePropertyRef_channel(scope,attr) ::= "LEXER->channel"
+lexerRulePropertyRef_start(scope,attr) ::= "LEXER->tokenStartCharIndex"
+lexerRulePropertyRef_stop(scope,attr) ::= "(LEXER->getCharIndex(LEXER)-1)"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 
 
@@ -2756,7 +2739,7 @@ if ( BACKTRACKING == 0 )
 bitsetDeclare(name, words64) ::= <<
 
 /** Bitset defining follow set for error recovery in rule state: <name>  */
-static	ANTLR3_UINT64 <name>_bits[]	= { <words64:{ANTLR3_UINT64_LIT(<it>)}; separator=", "> };
+static	ANTLR3_BITWORD <name>_bits[]	= { <words64:{ANTLR3_UINT64_LIT(<it>)}; separator=", "> };
 static  ANTLR3_BITSET <name>	= { <name>_bits, <length(words64)>	};
 >>
 

@@ -90,11 +90,35 @@ typedef	struct ANTLR3_LEXER_struct
      */
     pANTLR3_TOKEN_SOURCE	tokSource;
 
+    /** The channel number for the current token
+     */
+    ANTLR3_UINT32		channel;
+
+    /** The token type for the current token
+     */
+    ANTLR3_UINT32		type;
+    
+    /** The input line (where it makes sense) on which the first character of the current
+     *  token resides.
+     */
+    ANTLR3_INT64		tokenStartLine;
+
+    /** The character position of the first character of the current token
+     *  within the line specified by tokenStartLine
+     */
+    ANTLR3_INT32		tokenStartCharPositionInLine;
+
     /** What character index in the stream did the current token start at?
      *  Needed, for example, to get the text for current token.  Set at
      *  the start of nextToken.
      */
     ANTLR3_INT64		tokenStartCharIndex;
+
+    /** Text for the current token. This can be overridden by setting this 
+     *  variable directly or by using the SETTEXT() macro (preffered) in your
+     *  lexer rules.
+     */
+    pANTLR3_STRING		text;
 
     /** Pointer to a function that sets the charstream source for the lexer and
      *  causes it to  be reset.
@@ -104,16 +128,11 @@ typedef	struct ANTLR3_LEXER_struct
     /** Pointer to a function that emits the supplied token as the next token in
      *  the stream.
      */
-    void			(*emit)		    (struct ANTLR3_LEXER_struct * lexer, pANTLR3_COMMON_TOKEN token);
+    void			(*emitNew)	    (struct ANTLR3_LEXER_struct * lexer, pANTLR3_COMMON_TOKEN token);
 
-    /** Pointer to a function that constructs a new token from the supplied information 
+    /** Pointer to a function that constructs a new token from the lexer stored information 
      */
-    void			(*emitNew)	    (struct ANTLR3_LEXER_struct * lexer, 
-							ANTLR3_UINT32 ttype,
-							ANTLR3_UINT64 line,	ANTLR3_UINT32 charPosition,
-							ANTLR3_UINT32 channel,
-							ANTLR3_UINT64 start,	ANTLR3_UINT64 stop
-							);
+    pANTLR3_COMMON_TOKEN	(*emit)		    (struct ANTLR3_LEXER_struct * lexer);
 
     /** Pointer to the user provided (either manually or through code generation
      *  function that causes the lexer rules to run the lexing rules and produce 
@@ -166,16 +185,11 @@ typedef	struct ANTLR3_LEXER_struct
      */
     pANTLR3_STRING	(*getText)	    (struct ANTLR3_LEXER_struct * lexer);
 
+
     /** Pointer to a function that knows how to free the resources of a lexer
      */
     void		(*free)		    (struct ANTLR3_LEXER_struct * lexer);
 
-    /** We must track the token rule nesting level as we only want to
-     *  emit a token automatically at the outermost level so we don't get
-     *  two if FLOAT calls INT.  To save code space and time, do not
-     *  inc/dec this in fragment rules.
-     */
-    ANTLR3_INT32	ruleNestingLevel;
 }
     ANTLR3_LEXER;
 

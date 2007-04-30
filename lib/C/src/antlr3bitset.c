@@ -72,7 +72,7 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
      */
     numelements	= ((numBits -1) >> ANTLR3_BITSET_LOG_BITS) + 1;
 
-    bitset->bits    = (pANTLR3_UINT64) ANTLR3_MALLOC((size_t)(numelements * sizeof(ANTLR3_UINT64)));
+    bitset->bits    = (pANTLR3_BITWORD) ANTLR3_MALLOC((size_t)(numelements * sizeof(ANTLR3_BITWORD)));
     bitset->length  = numelements;
 
     if	(bitset->bits	== NULL)
@@ -132,7 +132,7 @@ antlr3BitsetCopy(pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements)
      */
     bitset->length  = numElements;
 
-    bitset->bits    = (pANTLR3_UINT64)ANTLR3_MALLOC((size_t)(numElements * sizeof(ANTLR3_UINT64)));
+    bitset->bits    = (pANTLR3_BITWORD)ANTLR3_MALLOC((size_t)(numElements * sizeof(ANTLR3_BITWORD)));
 
     if	(bitset->bits == NULL)
     {
@@ -140,7 +140,7 @@ antlr3BitsetCopy(pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements)
 	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
     }
 
-    ANTLR3_MEMMOVE(bitset->bits, inSet, (ANTLR3_UINT64)(numElements * sizeof(ANTLR3_UINT64)));
+    ANTLR3_MEMMOVE(bitset->bits, inSet, (ANTLR3_UINT64)(numElements * sizeof(ANTLR3_BITWORD)));
 
     /* All seems good
      */
@@ -163,7 +163,7 @@ antlr3BitsetClone(pANTLR3_BITSET inSet)
 
     /* Install the actual bits in the source set
      */
-    ANTLR3_MEMMOVE(bitset->bits, inSet->bits, (ANTLR3_UINT64)(inSet->length * sizeof(ANTLR3_UINT64)));
+    ANTLR3_MEMMOVE(bitset->bits, inSet->bits, (ANTLR3_UINT64)(inSet->length * sizeof(ANTLR3_BITWORD)));
 
     /* All seems good
      */
@@ -358,18 +358,18 @@ antlr3BitsetAdd(pANTLR3_BITSET bitset, ANTLR3_INT32 bit)
 static void
 grow(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize)
 {
-    pANTLR3_UINT64   newBits;
+    pANTLR3_BITWORD   newBits;
 
     /* Space for newly sized bitset - TODO: come back to this and use realloc?, it may
      * be more efficient...
      */
-    newBits = (pANTLR3_UINT64) ANTLR3_MALLOC((size_t)(newSize * sizeof(ANTLR3_UINT64)));
+    newBits = (pANTLR3_BITWORD) ANTLR3_MALLOC((size_t)(newSize * sizeof(ANTLR3_BITWORD)));
 
     if	(bitset->bits != NULL)
     {
 	/* Copy existing bits
 	 */
-	ANTLR3_MEMMOVE((void *)newBits, (const void *)bitset->bits, (size_t)(bitset->length * sizeof(ANTLR3_UINT64)));
+	ANTLR3_MEMMOVE((void *)newBits, (const void *)bitset->bits, (size_t)(bitset->length * sizeof(ANTLR3_BITWORD)));
 
         /* Out with the old bits... de de de derrr
 	 */
@@ -416,7 +416,7 @@ antlr3BitsetORInPlace(pANTLR3_BITSET bitset, pANTLR3_BITSET bitset2)
      */
     if	(bitset->length < bitset2->length)
     {
-	growToInclude(bitset, (bitset2->length * sizeof(ANTLR3_UINT64)));
+	growToInclude(bitset, (bitset2->length * sizeof(ANTLR3_BITWORD)));
     }
     
     /* Or the miniimum number of bits after any resizing went on
@@ -461,7 +461,7 @@ antlr3BitsetSize(pANTLR3_BITSET bitset)
 	{
 	    for	(bit = ANTLR3_BITSET_BITS - 1; bit >= 0; bit--)
 	    {
-		if  ((bitset->bits[i] & (((ANTLR3_UINT64)1) << bit)) != 0)
+		if  ((bitset->bits[i] & (((ANTLR3_BITWORD)1) << bit)) != 0)
 		{
 		    degree++;
 		}

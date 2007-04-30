@@ -90,6 +90,7 @@ typedef	UINT64	ANTLR3_UINT64,	*pANTLR3_UINT64;
 #else
 typedef	UINT32	ANTLR3_UINT64,	*pANTLR3_UINT64;
 #endif
+typedef UINT64  ANTLR3_BITWORD, *pANTLR3_BITWORD;
 
 typedef	UINT32	ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
 
@@ -204,12 +205,21 @@ typedef uint32_t	    ANTLR3_UCHAR,   *pANTLR3_UCHAR;
 typedef int8_t		    ANTLR3_INT8,    *pANTLR3_INT8;
 typedef int16_t		    ANTLR3_INT16,   *pANTLR3_INT16;
 typedef int32_t		    ANTLR3_INT32,   *pANTLR3_INT32;
+#ifdef	ANTLR3_USE_64BIT
 typedef int64_t		    ANTLR3_INT64,   *pANTLR3_INT64;
+#else
+typedef int32_t		    ANTLR3_INT64,   *pANTLR3_INT64;
+#endif
 
 typedef uint8_t	    	    ANTLR3_UINT8,   *pANTLR3_UINT8;
 typedef uint16_t      	    ANTLR3_UINT16,  *pANTLR3_UINT16;
 typedef uint32_t	    ANTLR3_UINT32,  *pANTLR3_UINT32;
+#ifdef	ANTLR3_USE_64BIT
 typedef uint64_t	    ANTLR3_UINT64,  *pANTLR3_UINT64;
+#else
+typedef uint32_t	    ANTLR3_UINT64,  *pANTLR3_UINT64;
+#endif
+typedef uint64_t	    ANTLR3_BITWORD, *pANTLR3_BITWORD;
 
 typedef uint32_t	    ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
 
