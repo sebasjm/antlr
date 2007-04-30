@@ -1750,11 +1750,11 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 	{
 	    if	(xorKey & 0x0000FF0000000000)
 	    {
-		depth = 39 + bitIndex[((xorKey & 0x0000FF000000000)>>40)];
+		depth = 39 + bitIndex[((xorKey & 0x0000FF0000000000)>>40)];
 	    }
 	    else
 	    {
-		depth = 31 + bitIndex[((xorKey & 0x000000FF0000000)>>32)];
+		depth = 31 + bitIndex[((xorKey & 0x000000FF00000000)>>32)];
 	    }
 	}
     }
@@ -1765,18 +1765,18 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 	{
 	    if	(xorKey & 0x00000000FF000000)
 	    {
-		depth = 23 + bitIndex[((xorKey & 0x000000FF0000000)>>24)];
+		depth = 23 + bitIndex[((xorKey & 0x00000000FF000000)>>24)];
 	    }
 	    else
 	    {
-		depth = 15 + bitIndex[((xorKey & 0x000000FF0000000)>>16)];
+		depth = 15 + bitIndex[((xorKey & 0x0000000000FF0000)>>16)];
 	    }
 	}
 	else
 	{
 	    if	(xorKey & 0x000000000000FF00)
 	    {
-		depth = 7 + bitIndex[((xorKey & 0x000000FF0000000)>>8)];
+		depth = 7 + bitIndex[((xorKey & 0x0000000000000FF00)>>8)];
 	    }
 	    else
 	    {
