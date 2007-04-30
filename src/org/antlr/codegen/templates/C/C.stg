@@ -1408,6 +1408,45 @@ retval.start = LT(1);<\n>
 <endif>
 >>
 
+lexerRuleLabelDefs() ::= <<
+<[ruleDescriptor.tokenLabels,
+  ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleLabels]
+    :{<labelType> <it.label.text>;}; separator="\n"
+>
+<[ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleListLabels,
+  ruleDescriptor.ruleListLabels]
+    :{pANTLR3_INT_TRIE list_<it.label.text>;}; separator="\n"
+>
+>>
+
+lexerRuleLabelInit() ::= <<
+<[ruleDescriptor.tokenLabels,
+  ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleLabels]
+    :{<it.label.text> = NULL;}; separator="\n"
+>
+<[ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleListLabels,
+  ruleDescriptor.ruleListLabels]
+    :{list_<it.label.text> = antlr3IntTrieNew(31);}; separator="\n"
+>
+>>
+
+lexerRuleLabelFree() ::= <<
+<[ruleDescriptor.tokenLabels,
+  ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleLabels]
+    :{<it.label.text> = NULL;}; separator="\n"
+>
+<[ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleListLabels,
+  ruleDescriptor.ruleListLabels]
+    :{list_<it.label.text>->free(list_<it.label.text>);}; separator="\n"
+>
+>>
+
 ruleReturnValue() ::= <<
 <if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasReturnValue)>
@@ -1466,20 +1505,18 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
 	ANTLR3_UINT32	_type;
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
-    <ruleLabelDefs()>
+    <lexerRuleLabelDefs()>
     <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+GETLINE()+":"+GETCHARPOSITIONINLINE()+" failed="+failed+" backtracking="+BACKTRACKING);<endif>
 
 <if(nakedBlock)>
     <ruleMemoization(name=ruleName)>
-    <ruleInitializations()>
-    <ruleLabelInitializations()>
+    <lexerRuleLabelInit()>
     <ruleDescriptor.actions.init>
         
     <block><\n>
 <else>
     <ruleMemoization(name=ruleName)>   
-    <ruleInitializations()>
-    <ruleLabelInitializations()>
+    <lexerRuleLabelInit()>
     _type	    = <ruleName>;
        
     <ruleDescriptor.actions.init>
@@ -1489,6 +1526,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
 <endif>
     <if(trace)> fprintf(stderr, "exit <ruleName> '%c' line=%d:%d failed = %d, backtracking =%d\n",LA(1),GETLINE(),GETCHARPOSITIONINLINE(),failed,BACKTRACKING);<endif>
     <ruleCleanUp()>
+    <lexerRuleLabelFree()>
     <(ruleDescriptor.actions.after):execAction()>
     <memoize>
 }
