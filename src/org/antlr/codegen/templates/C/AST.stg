@@ -242,12 +242,6 @@ matchSet(s,label,elementIndex,postmatchCode) ::= <<
 /* End: matchSet(s,label,elementIndex,postmatchCode) */
 >>
 
-matchSetRoot(s,label,elementIndex,debug) ::= <<
-/* matchSetRoot(s,label,elementIndex,debug) */
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->create(ctx->adaptor, <label>), root_0);})>
-/* End: matchSetRoot(s,label,elementIndex,debug) */
->>
-
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 /* matchSetRuleRoot(s,label,elementIndex,debug) */
 <super.matchSet(..., postmatchCode={<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->create(ctx->adaptor, <label>), root_0);})>
@@ -367,16 +361,6 @@ wildcard(label,elementIndex) ::= <<
 ctx->adaptor->addChild(ctx->adaptor, root_0, <label>_tree);
 <if(backtracking)>}<endif>
 /* End: wildcard(label,elementIndex) */
->>
-
-wildcardRoot(label,elementIndex) ::= <<
-/* wildcardRoot(label,elementIndex) */
-<super.wildcard(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
-<label>_tree = ctx->adaptor->create(ctx->adaptor, <label>);
-root_<blockLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <label>_tree, root_0);
-<if(backtracking)>}<endif>
-/* End: wildcardRoot(label,elementIndex) */
 >>
 
 wildcardRuleRoot(label,elementIndex) ::= <<
