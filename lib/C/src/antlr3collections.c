@@ -1739,22 +1739,22 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 	{
 	    if	(xorKey & 0xFF00000000000000)
 	    {
-		depth = 55 + bitIndex[((xorKey & 0xFF00000000000000)>>56)];
+		depth = 56 + bitIndex[((xorKey & 0xFF00000000000000)>>56)];
 	    }
 	    else
 	    {
-		depth = 47 + bitIndex[((xorKey & 0x00FF000000000000)>>48)];
+		depth = 48 + bitIndex[((xorKey & 0x00FF000000000000)>>48)];
 	    }
 	}
 	else
 	{
 	    if	(xorKey & 0x0000FF0000000000)
 	    {
-		depth = 39 + bitIndex[((xorKey & 0x0000FF0000000000)>>40)];
+		depth = 40 + bitIndex[((xorKey & 0x0000FF0000000000)>>40)];
 	    }
 	    else
 	    {
-		depth = 31 + bitIndex[((xorKey & 0x000000FF00000000)>>32)];
+		depth = 32 + bitIndex[((xorKey & 0x000000FF00000000)>>32)];
 	    }
 	}
     }
@@ -1765,18 +1765,18 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 	{
 	    if	(xorKey & 0x00000000FF000000)
 	    {
-		depth = 23 + bitIndex[((xorKey & 0x00000000FF000000)>>24)];
+		depth = 24 + bitIndex[((xorKey & 0x00000000FF000000)>>24)];
 	    }
 	    else
 	    {
-		depth = 15 + bitIndex[((xorKey & 0x0000000000FF0000)>>16)];
+		depth = 16 + bitIndex[((xorKey & 0x0000000000FF0000)>>16)];
 	    }
 	}
 	else
 	{
 	    if	(xorKey & 0x000000000000FF00)
 	    {
-		depth = 7 + bitIndex[((xorKey & 0x0000000000000FF00)>>8)];
+		depth = 8 + bitIndex[((xorKey & 0x0000000000000FF00)>>8)];
 	    }
 	    else
 	    {
@@ -1962,6 +1962,7 @@ freeIntNode(pANTLR3_INT_TRIE_NODE node)
 static	void			
 intTrieFree	(pANTLR3_INT_TRIE trie)
 {
+    printf("Freeing trie at %p\n", trie);
     /* Descend from the root and free all the nodes
      */
     freeIntNode(trie->root);
