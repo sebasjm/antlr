@@ -196,6 +196,7 @@ outputFile( LEXER,
 #undef		HAVEPARSEDRULE
 #undef		GETTEXT
 #undef		INDEX
+#undef		SEEK
 
 #define	    LEXER					ctx->pLexer
 #define	    RECOGNIZER			    LEXER->rec
@@ -217,6 +218,7 @@ outputFile( LEXER,
 #define	    INPUT()					LEXER->input
 #define	    STRSTREAM				INPUT()
 #define		INDEX()					INPUT()->istream->index(INPUT()->istream)
+#define		SEEK(n)					INPUT()->istream->seek(INPUT()->istream, n)
 #define	    EOF_TOKEN				&(LEXER->tokSource->eofToken)
 #define	    HASEXCEPTION()			(RECOGNIZER->error == ANTLR3_TRUE)
 #define	    EXCEPTION()				RECOGNIZER->exception
@@ -1385,9 +1387,6 @@ ruleLabelDefs() ::= <<
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(label=it); separator="\n"
 >
-<[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{pANTLR3_VECTOR     list_<it>;}; separator="\n"
->
 >>
 
 ruleLabelInitializations() ::= <<
@@ -1399,9 +1398,6 @@ ruleLabelInitializations() ::= <<
 >
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelInitVal(label=it); separator="\n"
->
-<[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{list_<it>=ctx->vectors->newVector(ctx->vectors);}; separator="\n"
 >
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!TREE_PARSER)>
@@ -1474,20 +1470,19 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+GETLINE()+":"+GETCHARPOSITIONINLINE()+" failed="+failed+" backtracking="+BACKTRACKING);<endif>
 
 <if(nakedBlock)>
+    <ruleMemoization(name=ruleName)>
     <ruleInitializations()>
     <ruleLabelInitializations()>
     <ruleDescriptor.actions.init>
-    <ruleMemoization(name=ruleName)>
         
     <block><\n>
 <else>
-    
+    <ruleMemoization(name=ruleName)>   
     <ruleInitializations()>
     <ruleLabelInitializations()>
     _type	    = <ruleName>;
        
     <ruleDescriptor.actions.init>
-    <ruleMemoization(name=ruleName)>
     
     <block>
 	LEXER->type = _type;
@@ -1834,16 +1829,16 @@ ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 >>
 
 /** A lexer rule reference */
-lexerRuleRef(rule,label,args) ::= <<
+lexerRuleRef(rule,label,args,elementIndex) ::= <<
 /* <description> */
 <if(label)>
 {
-    ANTLR3_UINT64 <label>Start = GETCHARINDEX();
+    ANTLR3_UINT64 <label>Start<elementIndex> = GETCHARINDEX();
     m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
     <checkRuleBacktrackFailure()>
     <label> = LEXER->tokFactory->newToken(LEXER->tokFactory);
     <label>->setType(<label>, ANTLR3_TOKEN_INVALID);
-    <label>->setStartIndex(<label>, <label>Start);
+    <label>->setStartIndex(<label>, <label>Start<elementIndex>);
     <label>->setStopIndex(<label>, GETCHARINDEX()-1);
     <label>->input = INPUT();
 }
@@ -1853,17 +1848,24 @@ m<rule>(ctx <if(args)>, <endif><args; separator=", ">);
 <endif>
 >>
 
+/** i+=INT in lexer */
+lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::= <<
+<lexerRuleRef(...)>
+<listLabel(elem=label,...)>
+>>
+
 /** EOF in the lexer */
-lexerMatchEOF(label) ::= <<
+lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 {
-    int <label>Start = GETCHARINDEX();
+    ANTLR3_UINT64 <label>Start<elementIndex>;
     <labelType> <label>;
+    <label>Start<elementIndex> = GETCHARINDEX();
     MATCHC(ANTLR3_CHARSTREAM_EOF); 
     <checkRuleBacktrackFailure()>
     <label> = LEXER->tokFactory->newToken(LEXER->tokFactory);
     <label>->setType(<label>, ANTLR3_TOKEN_EOF);
-    <label>->setStartIndex(<label>, <label>Start);
+    <label>->setStartIndex(<label>, <label>Start<elementIndex>);
     <label>->setStopIndex(<label>, GETCHARINDEX()-1);
     <label>->input = INPUT()->tnstream->istream;
 }
@@ -1973,10 +1975,14 @@ dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::
     int LA<decisionNumber>_<stateNumber> = LA(<k>);
     <edges; separator="\nelse "><\n>
     <if(eotPredictsAlt)>
+    <if(!edges)>
+	alt<decisionNumber>=<eotPredictsAlt>; <! if no edges, don't gen ELSE !>
+	<else>    
     else 
     {
 	alt<decisionNumber>=<eotPredictsAlt>;
     }<\n>
+    <endif>
     <endif>
 }
 >>
@@ -2172,12 +2178,19 @@ ANTLR3_CYCLIC_DFA cdfa<dfa.decisionNumber>
  */
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
 {
-    <if(semPredState)>
+    ANTLR3_UINT32 LA<decisionNumber>_<stateNumber>;<\n>
+    ANTLR3_UINT32 index<decisionNumber>_<stateNumber>;<\n>
+
+	LA<decisionNumber>_<stateNumber> = LA(1);<\n>
+    <if(semPredState)> <! get next lookahead symbol to test edges, then rewind !>
+    index<decisionNumber>_<stateNumber> = INDEX();<\n>
     REWINDLAST();<\n>
     <endif>
-    int LA<decisionNumber>_<stateNumber> = LA(1);<\n>
     s = -1;
     <edges; separator="\nelse ">
+	<if(semPredState)> <! return input cursor to state before we rewound !>
+	SEEK(index<decisionNumber>_<stateNumber>);<\n>
+	<endif>
     if ( s>=0 ) 
     {
 	return s;
