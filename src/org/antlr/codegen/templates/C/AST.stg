@@ -242,6 +242,11 @@ matchSet(s,label,elementIndex,postmatchCode) ::= <<
 /* End: matchSet(s,label,elementIndex,postmatchCode) */
 >>
 
+matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
+
+// note there is no matchSetTrack because -> rewrites force sets to be
+// plain old blocks of alts: (A|B|...|C)
+
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 /* matchSetRuleRoot(s,label,elementIndex,debug) */
 <super.matchSet(..., postmatchCode={<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->create(ctx->adaptor, <label>), root_0);})>
@@ -362,6 +367,8 @@ ctx->adaptor->addChild(ctx->adaptor, root_0, <label>_tree);
 <if(backtracking)>}<endif>
 /* End: wildcard(label,elementIndex) */
 >>
+
+wildcardBang(label,elementIndex) ::= "<super.wildcard(...)>"
 
 wildcardRuleRoot(label,elementIndex) ::= <<
 /* wildcardRuleRoot(label,elementIndex) */
