@@ -34,7 +34,7 @@ group ASTDbg;
 
 parserMembers() ::= <<
 protected ITreeAdaptor adaptor = new DebugTreeAdaptor(dbg, new CommonTreeAdaptor());
-public ITreeAdaptor TreeAdaptor
+public TreeAdaptor TreeAdaptor
 {
 	get { return this.adaptor; }
 	set { this.adaptor = new DebugTreeAdaptor(dbg, value); }

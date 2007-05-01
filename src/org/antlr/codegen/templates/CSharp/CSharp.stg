@@ -1,6 +1,5 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2007 Jonathan DeKlotz
  Copyright (c) 2005-2006 Kunle Odutola
  Copyright (c) 2005 Terence Parr
  All rights reserved.
@@ -51,7 +50,7 @@ csharpTypeInitMap ::= [
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs, 
-           bitsets, buildTemplate, buildAST, rewrite, profile,
+	   bitsets, buildTemplate, buildAST, rewrite, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
 	   scopes, superClass, literals) ::=
@@ -152,7 +151,10 @@ override public IToken NextToken()
         }
 
 	    token = null;
-	    tokenStartCharIndex = CharIndex;
+		channel = Token.DEFAULT_CHANNEL;
+        tokenStartCharIndex = input.Index();
+        tokenStartCharPositionInLine = input.CharPositionInLine;
+        tokenStartLine = input.Line;
 	    text = null;
         try 
 		{
@@ -172,6 +174,7 @@ override public IToken NextToken()
             }
             else 
 			{
+				Emit();
                 return token;
             }
         }
@@ -283,15 +286,15 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 // $ANTLR start <ruleName>
 public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) //throws RecognitionException
 {   
-    <if(trace)>Console.Out.WriteLine("enter <ruleName> " +input.LT(1)+ " failed=" +failed+ " backtracking=" +backtracking);<endif>
 <if(trace)>
+    TraceIn("<ruleName>_fragment", <ruleDescriptor.index>);
     try
     {
         <block>
     }
     finally
     {
-        Console.Out.WriteLine("exit <ruleName> " +input.LT(1)+ " failed=" +failed+ " backtracking=" +backtracking);
+        TraceOut("<ruleName>_fragment", <ruleDescriptor.index>);
     }
 <else>
     <block>
@@ -353,7 +356,7 @@ ruleBacktrackFailure() ::= <<
 /** How to generate code for a rule.  This includes any return type
  *  data aggregates required for multiple return values.
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::= <<
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
@@ -361,7 +364,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,memoize) ::=
 // <fileName>:<description>
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) // throws RecognitionException [1]
 {   
-    <if(trace)>Console.Out.WriteLine("enter <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
+    <if(trace)>TraceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleScopeSetUp()>
     <ruleDeclarations()>
     <ruleLabelDefs()>
@@ -371,6 +374,8 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 	{
 	    <ruleMemoization(name=ruleName)>
         <block>
+        <ruleCleanUp()>
+        <(ruleDescriptor.actions.after):execAction()>
     }
 <if(exceptions)>
     <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
@@ -389,10 +394,10 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 <endif>
     finally 
 	{
-        <if(trace)>Console.Out.WriteLine("exit <ruleName> "+input.LT(1)+" failed="+failed+" backtracking="+backtracking);<endif>
-        <ruleCleanUp()>
-		<(ruleDescriptor.actions.finally):execAction()>
-		<ruleScopeCleanUp()>
+        <if(trace)>TraceOut("<ruleName>", <ruleDescriptor.index>);<endif>
+        <memoize()>
+        <ruleScopeCleanUp()>
+        <finally>
     }
     <@postamble()>
     return <ruleReturnValue()>;
@@ -440,8 +445,19 @@ ruleLabelDefs() ::= <<
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
 <ruleDescriptor.ruleListLabels:{ll|RuleReturnScope <ll.label.text> = null;}; separator="\n">
-<[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{IList list_<it> = new ArrayList();}; separator="\n"
+>>
+
+lexerRuleLabelDefs() ::= <<
+<[ruleDescriptor.tokenLabels,
+  ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleLabels]
+    :{<labelType> <it.label.text> = null;}; separator="\n"
+>
+<ruleDescriptor.charLabels:{int <it.label.text>;}; separator="\n">
+<[ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleListLabels,
+  ruleDescriptor.ruleListLabels]
+    :{IList list_<it.label.text> = null;}; separator="\n"
 >
 >>
 
@@ -463,6 +479,9 @@ ruleCleanUp() ::= <<
 retval.stop = input.LT(-1);<\n>
 <endif>
 <endif>
+>>
+
+memoize() ::= <<
 <if(memoize)>
 <if(backtracking)>
 if ( backtracking > 0 ) 
@@ -480,41 +499,30 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
 // $ANTLR start <ruleName> 
 public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) // throws RecognitionException [2]
 {
-    <if(trace)>Console.Out.WriteLine("enter <ruleName> '"+(char)input.LA(1)+"' line=" +Line+ ":" +CharPositionInLine+ " failed=" +failed+ " backtracking="+backtracking);<endif>
+    <if(trace)>TraceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleDeclarations()>
     try 
 	{
-        ruleNestingLevel++;
 <if(nakedBlock)>
-        <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
+        <lexerRuleLabelDefs()>
+        <ruleDescriptor.actions.init>
         <block><\n>
 <else>
         int _type = <ruleName>;
-        int _start = CharIndex;
-        int _line = Line;
-        int _charPosition = CharPositionInLine;
-        int _channel = Token.DEFAULT_CHANNEL;
-        <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
+        <lexerRuleLabelDefs()>
+        <ruleDescriptor.actions.init>
         <block>
-        <!
-        	create token if none exists *and* we are an outermost token rule 
-        !>
-        <execAction({
-        if ( (token == null) && (ruleNestingLevel == 1) )
-        {
-            Emit(_type, _line, _charPosition, _channel, _start, CharIndex-1);
-        }<\n>
-        })>
+        <ruleCleanUp()>
+        this.type = _type;
+        <(ruleDescriptor.actions.after):execAction()>
 <endif>
     }
     finally 
 	{
-        ruleNestingLevel--;
-        <if(trace)>Console.Out.WriteLine("exit <ruleName> '"+(char)input.LA(1)+"' line=" +Line+ ":" +CharPositionInLine+ " failed="+failed+" backtracking="+backtracking);<endif>
-        <ruleCleanUp()>
-        <(ruleDescriptor.actions.finally):execAction()>
+        <if(trace)>TraceOut("<ruleName>", <ruleDescriptor.index>);<endif>
+        <memoize()>
     }
 }
 // $ANTLR end <ruleName>
@@ -696,23 +704,32 @@ list_<label>.Add(<elem>);<\n>
 /** match a character */
 charRef(char,label) ::= <<
 <if(label)>
-int <label> = input.LA(1);<\n>
+<label> = input.LA(1);<\n>
 <endif>
 Match(<char>); <checkRuleBacktrackFailure()>
 >>
 
 /** match a character range */
-charRangeRef(a,b) ::= "MatchRange(<a>,<b>); <checkRuleBacktrackFailure()>"
+charRangeRef(a,b,label) ::= <<
+<if(label)>
+<label> = input.LA(1);<\n>
+<endif>
+MatchRange(<a>,<b>); <checkRuleBacktrackFailure()>
+>>
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <if(label)>
+<if(LEXER)>
+<label>= input.LA(1);<\n>
+<else>
 <label> = (<labelType>)input.LT(1);<\n>
+<endif>
 <endif>
 if ( <s> ) 
 {
-    <postmatchCode>
     input.Consume();
+    <postmatchCode>
 <if(!LEXER)>
     errorRecovery = false;
 <endif>
@@ -764,7 +781,7 @@ wildcardAndListLabel(label,elementIndex) ::= <<
 /** Match . wildcard in lexer */
 wildcardChar(label, elementIndex) ::= <<
 <if(label)>
-int <label> = input.LA(1);<\n>
+<label> = input.LA(1);<\n>
 <endif>
 MatchAny(); <checkRuleBacktrackFailure()>
 >>
@@ -788,29 +805,35 @@ followingStackPointer_--;
 <checkRuleBacktrackFailure()>
 >>
 
-/** ids+=ID */
+/** ids+=r */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRef(...)>
 <listLabel(elem=label,...)>
 >>
 
 /** A lexer rule reference */
-lexerRuleRef(rule,label,args) ::= <<
+lexerRuleRef(rule,label,args,elementIndex) ::= <<
 <if(label)>
-int <label>Start = CharIndex;
+int <label>Start<elementIndex> = CharIndex;
 m<rule>(<args; separator=", ">); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, CharIndex-1);
+<label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, CharIndex-1);
 <else>
 m<rule>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>
 >>
 
+/** i+=INT in lexer */
+lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::= <<
+<lexerRuleRef(...)>
+<listLabel(elem=label,...)>
+>>
+
 /** EOF in the lexer */
-lexerMatchEOF(label) ::= <<
+lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
-int <label>Start = CharIndex;
+int <label>Start<elementIndex> = CharIndex;
 Match(EOF); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start, CharIndex-1);
+<labelType> <label> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, CharIndex-1);
 <else>
 Match(EOF); <checkRuleBacktrackFailure()>
 <endif>
@@ -847,9 +870,7 @@ if ( !(<evalPredicate(...)>) )
 // F i x e d  D F A  (if-then-else)
 
 dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-<if(!semPredState)>
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
-<endif>
 <edges; separator="\nelse ">
 else 
 {
@@ -871,9 +892,7 @@ else
  *  expect "if ( LA(1)==X ) match(X);" and that's it.
  */
 dfaOptionalBlockState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-<if(!semPredState)>
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
-<endif>
 <edges; separator="\nelse ">
 >>
 
@@ -884,15 +903,17 @@ int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
  *  anything other than 'a' predicts exiting.
  */
 dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
-<if(!semPredState)>
 int LA<decisionNumber>_<stateNumber> = input.LA(<k>);<\n>
-<endif>
 <edges; separator="\nelse "><\n>
 <if(eotPredictsAlt)>
+<if(!edges)>
+alt<decisionNumber>=<eotPredictsAlt>; <! if no edges, don't gen ELSE !>
+<else>
 else 
 {
     alt<decisionNumber> = <eotPredictsAlt>;
 }<\n>
+<endif>
 <endif>
 >>
 
@@ -954,7 +975,9 @@ switch ( input.LA(<k>) )
 
 dfaEdgeSwitch(labels, targetState) ::= <<
 <labels:{case <it>:}; separator="\n">
+	{
     <targetState>
+    }
     break;
 >>
 
@@ -971,32 +994,32 @@ alt<decisionNumber> = dfa<decisionNumber>.Predict(input);
 /* Dump DFA tables.
  */
 cyclicDFA(dfa) ::= <<
-public static readonly short[] DFA<dfa.decisionNumber>_eot = {
+static readonly short[] DFA<dfa.decisionNumber>_eot = {
     <dfa.eot:{n|<n>}; null="-1", wrap="\n", separator=", ">
     };
-public static readonly short[] DFA<dfa.decisionNumber>_eof = {
+static readonly short[] DFA<dfa.decisionNumber>_eof = {
     <dfa.eof:{n|<n>}; null="-1", wrap="\n", separator=", ">
     };
-public static readonly int[] DFA<dfa.decisionNumber>_min = {
+static readonly int[] DFA<dfa.decisionNumber>_min = {
     <dfa.min:{n|<n>}; null="0", wrap="\n", separator=", ">
     };
-public static readonly int[] DFA<dfa.decisionNumber>_max = {
+static readonly int[] DFA<dfa.decisionNumber>_max = {
     <dfa.max:{n|<n>}; null="0", wrap="\n", separator=", ">
     };
-public static readonly short[] DFA<dfa.decisionNumber>_accept = {
+static readonly short[] DFA<dfa.decisionNumber>_accept = {
     <dfa.accept:{n|<n>}; null="-1", wrap="\n", separator=", ">
     };
-public static readonly short[] DFA<dfa.decisionNumber>_special = {
+static readonly short[] DFA<dfa.decisionNumber>_special = {
     <dfa.special:{n|<n>}; null="-1", wrap="\n", separator=", ">
     };
 
-public static readonly short[] dfa<dfa.decisionNumber>_transition_null = null;
+static readonly short[] dfa<dfa.decisionNumber>_transition_null = null;
 <dfa.edgeTransitionClassMap.keys:{table |
-public static readonly short[] dfa<dfa.decisionNumber>_transition<i0> = \{
+static readonly short[] dfa<dfa.decisionNumber>_transition<i0> = \{
 	<table; separator=", ", wrap="\n    ", null="-1">
 	\};}>
 
-public static readonly short[][] DFA<dfa.decisionNumber>_transition = {
+static readonly short[][] DFA<dfa.decisionNumber>_transition = {
 	<dfa.transitionEdgeTables:{whichTable|dfa<dfa.decisionNumber>_transition<whichTable>}; null="_null", separator=",\n">
     };
 
@@ -1024,7 +1047,7 @@ protected class DFA<dfa.decisionNumber> : DFA
 }<\n>
 <if(dfa.specialStateSTs)>
 
-protected internal int DFA<dfa.decisionNumber>_SpecialStateTransition(DFA dfa, int s) //throws NoViableAltException
+protected internal int DFA<dfa.decisionNumber>_SpecialStateTransition(DFA dfa, int s, IIntStream input) //throws NoViableAltException
 {
 	int _s = s;
     switch ( s )
@@ -1048,13 +1071,16 @@ protected internal int DFA<dfa.decisionNumber>_SpecialStateTransition(DFA dfa, i
  *  state.
  */
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
-<if(semPredState)>
-input.Rewind();<\n>
-<else>
 int LA<decisionNumber>_<stateNumber> = input.LA(1);<\n>
+<if(semPredState)> <! get next lookahead symbol to test edges, then rewind !>
+int index<decisionNumber>_<stateNumber> = input.Index();
+input.Rewind();<\n>
 <endif>
 s = -1;
 <edges; separator="\nelse ">
+<if(semPredState)> <! return input cursor to state before we rewound !>
+input.Seek(index<decisionNumber>_<stateNumber>);<\n>
+<endif>
 if ( s >= 0 ) return s;
 break;
 >>
@@ -1245,8 +1271,7 @@ tokenLabelRef(label) ::= "<label>"
 listLabelRef(label) ::= "list_<label>"
 
 
-// not sure the next are the right approach; and they are evaluated early;
-// they cannot see TREE_PARSER or PARSER attributes for example. :(
+// not sure the next are the right approach
 
 tokenLabelPropertyRef_text(scope,attr) ::= "<scope>.Text"
 tokenLabelPropertyRef_type(scope,attr) ::= "<scope>.Type"
@@ -1263,12 +1288,11 @@ ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 input.TokenStream.ToString(
   input.TreeAdaptor.GetTokenStartIndex(<scope>.start),
-  input.TreeAdaptor.GetTokenStopIndex(<scope>.start))
+  input.TreeAdaptor.GetTokenStopIndex(<scope>.start) )
 <else>
 input.ToString(<scope>.start,<scope>.stop)
 <endif>
 >>
-
 ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
@@ -1288,8 +1312,8 @@ rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)retval.tree)"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 input.TokenStream.ToString(
-  input.TreeAdaptor.GetTokenStartIndex(<scope>.start),
-  input.TreeAdaptor.GetTokenStopIndex(<scope>.start))
+  input.TreeAdaptor.GetTokenStartIndex(retval.start),
+  input.TreeAdaptor.GetTokenStopIndex(retval.start) )
 <else>
 input.ToString(retval.start,input.LT(-1))
 <endif>
@@ -1298,12 +1322,12 @@ rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "Text"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "_line"
-lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
+lexerRulePropertyRef_line(scope,attr) ::= "tokenStartLine"
+lexerRulePropertyRef_pos(scope,attr) ::= "tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
-lexerRulePropertyRef_start(scope,attr) ::= "_start"
-lexerRulePropertyRef_stop(scope,attr) ::= "(GetCharIndex()-1)"
+lexerRulePropertyRef_channel(scope,attr) ::= "channel"
+lexerRulePropertyRef_start(scope,attr) ::= "tokenStartCharIndex"
+lexerRulePropertyRef_stop(scope,attr) ::= "(CharIndex-1)"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error

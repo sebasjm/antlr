@@ -1,6 +1,5 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2007 Jonathan DeKlotz
  Copyright (c) 2005-2006 Kunle Odutola
  Copyright (c) 2005 Terence Parr
  All rights reserved.
@@ -43,8 +42,8 @@ using Hashtable = System.Collections.Hashtable;
 /** Add this to each rule's return value struct */
 @returnScope.ruleReturnMembers() ::= <<
 public StringTemplate st;
-public override StringTemplate Template 		{ get { return st; } }
-public string ToString() { return st==null?null:st.ToString(); }
+public override object Template 		{ get { return st; } }
+public override string ToString() 		{ return (st == null) ? null : st.ToString(); }
 >>
 
 @genericParser.members() ::= <<
@@ -77,7 +76,7 @@ protected class STAttrMap : Hashtable
 >>
 
 /** x+=rule when output=template */
-ruleRefAndListLabel(rule, label, elementIndex, args) ::= <<
+ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRef(...)>
 <listLabel(elem=label+".Template",...)>
 >>
@@ -86,7 +85,8 @@ rewriteTemplate(alts) ::= <<
 
 // TEMPLATE REWRITE
 <if(backtracking)>
-if ( backtracking==0 ) {
+if ( backtracking==0 )
+{
   <alts:rewriteTemplateAlt(); separator="else ">
   <if(rewrite)><replaceTextInLine()><endif>
 }
@@ -98,12 +98,12 @@ if ( backtracking==0 ) {
 
 replaceTextInLine() ::= <<
 <if(TREE_PARSER)>
-((TokenRewriteStream)input.TokenStream).replace(
+((TokenRewriteStream)input.TokenStream).Replace(
   input.TreeAdaptor.GetTokenStartIndex(retval.start),
   input.TreeAdaptor.GetTokenStopIndex(retval.start),
   retval.st);
 <else>
-((TokenRewriteStream)input).replace(
+((TokenRewriteStream)input).Replace(
   ((Token)retval.start).TokenIndex,
   input.LT(-1).TokenIndex,
   retval.st);

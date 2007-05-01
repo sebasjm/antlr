@@ -1,7 +1,6 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2007 Jonathan DeKlotz
- Copyright (c) 2005-2006 Kunle Odutola
+ Copyright (c) 2005-2007 Kunle Odutola
  Copyright (c) 2005 Terence Parr
  All rights reserved.
 
@@ -69,6 +68,10 @@ ruleLabelDefs() ::= <<
 <super.ruleLabelDefs()>
 <ruleDescriptor.tokenLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
+<ruleDescriptor.allTokenRefsInAltsWithRewrites
+    :{RewriteRuleTokenStream stream_<it> = new RewriteRuleTokenStream(adaptor,"token <it>");}; separator="\n">
+<ruleDescriptor.allRuleRefsInAltsWithRewrites
+    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor,"rule <it>");}; separator="\n">
 >>
 
 ruleCleanUp() ::= <<
@@ -143,11 +146,11 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 /** ID but track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>list_<token>.Add(<label>);<\n>
+<if(backtracking)>if ( backtracking==0 ) <endif>stream_<token>.Add(<label>);<\n>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
- *  to the tracking list list_ID for use in the rewrite.
+ *  to the tracking list stream_ID for use in the rewrite.
  */
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefTrack(...)>
@@ -171,9 +174,10 @@ matchSet(s,label,elementIndex,postmatchCode) ::= <<
 <super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.AddChild(root_0, adaptor.Create(<label>));})>
 >>
 
-matchSetRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.BecomeRoot(adaptor.Create(<label>), root_0);})>
->>
+matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
+
+// note there is no matchSetTrack because -> rewrites force sets to be
+// plain old blocks of alts: (A|B|...|C)
 
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
 <super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.BecomeRoot(adaptor.Create(<label>), root_0);})>
@@ -199,7 +203,7 @@ ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>list_<rule>.Add(<label>.Tree);
+<if(backtracking)>if ( backtracking==0 ) <endif>stream_<rule>.Add(<label>.Tree);
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -236,13 +240,7 @@ adaptor.AddChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
 >>
 
-wildcardRoot(label,elementIndex) ::= <<
-<super.wildcard(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
-<label>_tree = (<ASTLabelType>)adaptor.Create(<label>);
-root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_0);
-<if(backtracking)>}<endif>
->>
+wildcardBang(label,elementIndex) ::= "<super.wildcard(...)>"
 
 wildcardRuleRoot(label,elementIndex) ::= <<
 <super.wildcard(...)>
@@ -252,27 +250,32 @@ root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
 >>
 
-// ugh, am i really missing the combinations for Track and ListLabel?
+// TODO: ugh, am i really missing the combinations for Track and ListLabel?
 // there's got to be a better way
 
 // R e w r i t e
 
 rewriteCode(
 	alts, description,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
+	referencedElementsDeep, // ALL referenced elements to right of ->
 	referencedTokenLabels,
+	referencedTokenListLabels,
 	referencedRuleLabels,
+	referencedRuleListLabels,
 	rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
 <<
 
 // AST REWRITE
+// elements:          <referencedElementsDeep; separator=", ">
+// token labels:      <referencedTokenLabels; separator=", ">
+// rule labels:       <referencedRuleLabels; separator=", ">
+// token list labels: <referencedTokenListLabels; separator=", ">
+// rule list labels:  <referencedRuleListLabels; separator=", ">
 <if(backtracking)>
 if ( backtracking==0 ) {<\n>
 <endif>
-int i_0 = 0;
 <prevRuleRootRef()>.tree = root_0;
+<rewriteCodeLabels()>
 root_0 = (<ASTLabelType>)adaptor.GetNilNode();
 <alts:rewriteAlt(); separator="else ">
 <if(backtracking)>
@@ -280,103 +283,70 @@ root_0 = (<ASTLabelType>)adaptor.GetNilNode();
 <endif>
 >>
 
+rewriteCodeLabels() ::= <<
+<referencedTokenLabels
+    :{RewriteRuleTokenStream stream_<it> = new RewriteRuleTokenStream(adaptor, "token <it>", <it>);};
+    separator="\n"
+>
+<referencedTokenListLabels
+    :{RewriteRuleTokenStream stream_<it> = new RewriteRuleTokenStream(adaptor,"token <it>", list_<it>);};
+    separator="\n"
+>
+<referencedRuleLabels
+    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor, "token <it>", (<it>!=null ? <it>.Tree : null));};
+    separator="\n"
+>
+<referencedRuleListLabels
+    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor, "token <it>", list_<it>);};
+    separator="\n"
+>
+>>
+
+/** Generate code for an optional rewrite block; note it uses the deep ref'd element
+  *  list rather shallow like other blocks.
+  */
 rewriteOptionalBlock(
 	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	referencedTokenLabels,
-	referencedRuleLabels,
+	referencedElementsDeep, // all nested refs
+	referencedElements,     // elements in immediately block; no nested blocks
 	description) ::=
 <<
 // <fileName>:<description>
+if ( <referencedElementsDeep:{el | stream_<el>.HasNext()}; separator=" || "> )
 {
-<rewriteBlockCardinalityCheck()>
-if ( n_<rewriteBlockLevel> > 1 ) throw new InvalidOperationException("<first([referencedTokens,referencedListLabels,referencedRules])> list has > 1 elements");
-if ( n_<rewriteBlockLevel>==1 ) {
-    int i_<rewriteBlockLevel> = 0;
     <alt>
-    }
-}<\n>
+}
+<referencedElementsDeep:{el | stream_<el>.Reset();<\n>}>
 >>
 
 rewriteClosureBlock(
 	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	referencedTokenLabels,
-	referencedRuleLabels,
+	referencedElementsDeep, // all nested refs
+	referencedElements,     // elements in immediately block; no nested blocks
 	description) ::=
 <<
 // <fileName>:<description>
+while ( <referencedElements:{el | stream_<el>.HasNext()}; separator=" || "> )
 {
-<rewriteBlockCardinalityCheck()>
-for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
     <alt>
 }
-}<\n>
+<referencedElements:{el | stream_<el>.Reset();<\n>}>
 >>
 
 rewritePositiveClosureBlock(
 	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	referencedTokenLabels,
-	referencedRuleLabels,
+	referencedElementsDeep, // all nested refs
+	referencedElements,     // elements in immediately block; no nested blocks
 	description) ::=
 <<
-// <fileName>:<description>
+if ( !(<referencedElements:{el | stream_<el>.HasNext()}; separator=" || ">) ) {
+    throw new RewriteEarlyExitException();
+}
+while ( <referencedElements:{el | stream_<el>.HasNext()}; separator=" || "> )
 {
-<rewriteBlockCardinalityCheck()>
-if ( n_<rewriteBlockLevel>==0 ) throw new InvalidOperationException("Must have more than one element for (...)+ loops");
-for (int i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) {
     <alt>
 }
-}<\n>
->>
-
-/** Elements referenced in rewrite loops/optional blocks must have
- *  the same size.  Factor this out from rewriteXXXBlock rules.  This
- *  deals both with the lists of stuff and single element labels like id=ID.
- *  The n_xxx var is always defined to either first list_ var or single-value 
- *  label.
- */
-rewriteBlockCardinalityCheck() ::= <<
-<!
-	First compute size of lists of stuff
-!>
-<first([referencedTokens,referencedListLabels,referencedRules]):{int n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == null ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>.Count;}>
-<!
-	Then, check cardinality against first size
-!>
-<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>.Count!=n_<rewriteBlockLevel> ) throw new InvalidOperationException("rewrite element <it> list differs in size from other elements");<\n>}>
-<!
-   Now generate checks for non-list labels
-!>
-<!
-   If no lists above, then we need to define n to be 0 or 1 depending on presence
-   of single-value labels
-!>
-<if(!first([referencedTokens,referencedListLabels,referencedRules]))>
-<first([referencedTokenLabels,referencedRuleLabels]):{label |
-int n_<rewriteBlockLevel> = (<first([referencedTokenLabels,referencedRuleLabels])>==null) ? 0 : 1;
-}>
-<!
-	Now, gen checks to ensure non-list labels match cardinality of other labels
-!>
-<rest([referencedTokenLabels,referencedRuleLabels]):{label|
-if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n_<rewriteBlockLevel>==0) ) throw new InvalidOperationException("rewrite element <label> list differs in size from other elements");
-}>
-
-<else> <! there were some list labels !>
-
-<! Now, gen checks to ensure non-list labels match cardinality of lists !>
-<[referencedTokenLabels,referencedRuleLabels]:{label|
-if ( (<label>==null && n_<rewriteBlockLevel>\>0) || (<label>!=null && n_<rewriteBlockLevel>==0) ) throw new InvalidOperationException("rewrite element <label> list differs in size from other elements");
-}>
-<endif>
+<referencedElements:{el | stream_<el>.Reset();<\n>}>
 >>
 
 rewriteAlt(a) ::= <<
@@ -414,28 +384,28 @@ rewriteElement(e) ::= <<
 >>
 
 /** Gen ID */
-rewriteTokenRef(token,elementIndex) ::= <<
-adaptor.AddChild(root_<treeLevel>, (<labelType>)list_<token>[i_<rewriteBlockLevel>]);<\n>
+rewriteTokenRef(token,elementIndex,args) ::= <<
+adaptor.AddChild(root_<treeLevel>, <if(args)>adaptor.Create(<token>,<args; separator=", ">)<else>stream_<token>.Next()<endif>);<\n>
 >>
 
 /** Gen $label ... where defined via label=ID */
 rewriteTokenLabelRef(label,elementIndex) ::= <<
-adaptor.AddChild(root_<treeLevel>, <label>);<\n>
+adaptor.AddChild(root_<treeLevel>, stream_<label>.Next());<\n>
 >>
 
 /** Gen $label ... where defined via label+=ID */
 rewriteTokenListLabelRef(label,elementIndex) ::= <<
-adaptor.AddChild(root_<treeLevel>, (<labelType>)list_<label>[i_<rewriteBlockLevel>]);<\n>
+adaptor.AddChild(root_<treeLevel>, stream_<label>.Next());<\n>
 >>
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.Next(), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^(ID ...) */
 rewriteTokenRefRoot(token,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot((<labelType>)list_<token>[i_<rewriteBlockLevel>], root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<token>.Next(), root_<treeLevel>);<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
@@ -458,20 +428,12 @@ root_0 = <action>;<\n>
  */
 prevRuleRootRef() ::= "retval"
 
-rewriteRuleRef(rule,dup) ::= <<
-<if(dup)>
-adaptor.AddChild(root_<treeLevel>, adaptor.DupTree(list_<rule>[i_<rewriteBlockLevel>]));<\n>
-<else>
-adaptor.AddChild(root_<treeLevel>, list_<rule>[i_<rewriteBlockLevel>]);<\n>
-<endif>
+rewriteRuleRef(rule) ::= <<
+adaptor.AddChild(root_<treeLevel>, stream_<rule>.Next());<\n>
 >>
 
-rewriteRuleRefRoot(rule,dup) ::= <<
-<if(dup)>
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(adaptor.DupTree(list_<rule>[i_<rewriteBlockLevel>]), root_<treeLevel>);<\n>
-<else>
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(list_<rule>[i_<rewriteBlockLevel>], root_<treeLevel>);<\n>
-<endif>
+rewriteRuleRefRoot(rule) ::= <<
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<rule>.nextNode(), root_<treeLevel>);<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
@@ -484,20 +446,20 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<action>, root_<treeLevel>
 
 /** Gen $ruleLabel ... where defined via ruleLabel=rule */
 rewriteRuleLabelRef(label) ::= <<
-adaptor.AddChild(root_<treeLevel>, <label>.Tree);<\n>
+adaptor.AddChild(root_<treeLevel>, stream_<label>.Next());<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-adaptor.AddChild(root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)list_<label>[i_<rewriteBlockLevel>]).Tree);<\n>
+adaptor.AddChild(root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)stream_<label>.Next()).Tree);<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
 rewriteRuleLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>.Tree, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.nextNode(), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)list_<label>[i_<rewriteBlockLevel>]).Tree, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.nextNode(), root_<treeLevel>);<\n>
 >>

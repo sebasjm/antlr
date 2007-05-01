@@ -42,11 +42,14 @@ public static readonly string[] ruleNames = new string[] {
 };<\n>
 public int ruleLevel = 0;
 <! bug: can't use <@super.members()> cut-n-paste instead !>
-public <name>(<inputStreamType> input) : <if(profile)>this(input, new Profiler(null))<else>base(input)<endif>
+public <name>(<inputStreamType> input)
 {
 <if(profile)>
+        this(input, new Profiler(null));
         Profiler p = (Profiler)dbg;
-        p.Parser = this;
+        p.setParser(this);
+<else>
+    super(input);
 <endif><\n>
 <if(memoize)>
     ruleMemo = new IDictionary[<numRules>+1];<\n> <! index from 1..n !>
@@ -66,7 +69,7 @@ override public void Memoize(IIntStream input,
     base.Memoize(input, ruleIndex, ruleStartIndex);
 }<\n>
 <endif>
-public <name>(<inputStreamType> input, IDebugEventListener dbg)
+public <name>(<inputStreamType> input, DebugEventListener dbg)
 	: base(input, dbg)
 {
 }<\n>
