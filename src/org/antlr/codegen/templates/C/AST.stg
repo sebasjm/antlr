@@ -95,6 +95,10 @@ ruleLabelDefs() ::= <<
 <super.ruleLabelDefs()>
 <ruleDescriptor.tokenLabels:{pANTLR3_BASE_TREE <it.label.text>_tree;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{pANTLR3_BASE_TREE <it.label.text>_tree;}; separator="\n">
+<ruleDescriptor.allTokenRefsInAltsWithRewrites
+    :{pANTLR3_REWRITE_RULE_TOKEN_STREAM stream_<it>;}; separator="\n">
+<ruleDescriptor.allRuleRefsInAltsWithRewrites
+    :{pANTLR3_REWRITE_RULE_SUBTREE_STREAM stream;}; separator="\n">
 /* End: ruleLabelDefs() */
 >>
 
@@ -103,6 +107,10 @@ ruleLabelInitializations() ::= <<
 <super.ruleLabelInitializations()>
 <ruleDescriptor.tokenLabels:{<it.label.text>_tree = NULL;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<it.label.text>_tree = NULL;}; separator="\n">
+<ruleDescriptor.allTokenRefsInAltsWithRewrites
+    :{stream_<it>=antlr3RewriteRuleTokenStreamNew(adaptor,"token <it>");}; separator="\n">
+<ruleDescriptor.allRuleRefsInAltsWithRewrites
+    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNew(adaptor,"rule <it>");}; separator="\n">
 /* End: ruleLabelInitializations() */
 >>
 /**  a rule label including default value */
@@ -111,7 +119,7 @@ ruleLabelInitVal(label) ::= <<
 <label.label.text>.tree = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n>
 >>
 ruleCleanUp() ::= <<
-/* ruleCleanUp() */
+/* AST: ruleCleanUp() */
 <super.ruleCleanUp()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(backtracking)>
@@ -125,6 +133,10 @@ if ( BACKTRACKING==0 ) {<\n>
 <if(backtracking)>
 }
 <endif>
+<ruleDescriptor.allTokenRefsInAltsWithRewrites
+    :{stream_<it>->free(stream_<it>);}; separator="\n">
+<ruleDescriptor.allRuleRefsInAltsWithRewrites
+    :{stream_<it>->free(stream_<it>);}; separator="\n">
 <endif>
 
 /* End: ruleCleanUp() */
@@ -209,12 +221,12 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 tokenRefTrack(token,label,elementIndex) ::= <<
 /* tokenRefTrack(token,label,elementIndex) */
 <super.tokenRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>list_<token>->add(list_<token>, <label>, NULL);<\n>
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
 /* End: tokenRefTrack(token,label,elementIndex) */
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
- *  to the tracking list list_ID for use in the rewrite.
+ *  to the tracking list stream_ID for use in the rewrite.
  */
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 /* tokenRefTrackAndListLabel(token,label,elementIndex) */
@@ -278,7 +290,7 @@ ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
 ruleRefTrack(rule,label,elementIndex,args) ::= <<
 /* ruleRefTrack(rule,label,elementIndex,args) */
 <super.ruleRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>list_<rule>->add(list_<rule>, <label>.tree, NULL);
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule>->add(stream_<rule>, <label>.tree, NULL);
 /* End: ruleRefTrack(rule,label,elementIndex,args) */
 >>
 
@@ -387,177 +399,153 @@ root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, <label>_tree, root_0);
 rewriteCode(
 	alts, 
 	description,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
+	referencedElementsDeep, // ALL referenced elements to right of ->
 	referencedTokenLabels,
+	referencedTokenListLabels,
 	referencedRuleLabels,
+	referencedRuleListLabels,
 	rewriteBlockLevel, 
 	enclosingTreeLevel, 
 	treeLevel) ::=
 <<
-/* rewriteCode(
-	alts, description,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules, rewriteBlockLevel, enclosingTreeLevel, treeLevel) */
-// AST REWRITE
+ 
+/* AST REWRITE
+ * elements          : <referencedElementsDeep; separator=", ">
+ * token labels      : <referencedTokenLabels; separator=", ">
+ * rule labels       : <referencedRuleLabels; separator=", ">
+ * token list labels : <referencedTokenListLabels; separator=", ">
+ * rule list labels  : <referencedRuleListLabels; separator=", ">
+ */
 <if(backtracking)>
 if ( BACKTRACKING==0 ) <\n>
 <endif>
 {
-	ANTLR3_UINT64	i_0	    = 0;
 	root_0			    = ctx->adaptor->nil(ctx->adaptor);
+	<rewriteCodeLabelsDecl()>
+	<rewriteCodeLabelsInit()>
 	<prevRuleRootRef()>.tree    = root_0;
 	<alts:rewriteAlt(); separator="else ">
+	<rewriteCodeLabelsFree()>
+
 }
-/* End: rewriteCode(
-	alts, description,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules, rewriteBlockLevel, enclosingTreeLevel, treeLevel) */
 >>
 
+rewriteCodeLabelsDecl() ::= <<
+<referencedTokenLabels
+    :{pANTLR3_REWRITE_RULE_TOKEN_STREAM stream_<it>;};
+    separator="\n"
+>
+<referencedTokenListLabels
+    :{pANTLR3_REWRITE_RULE_TOKEN_STREAM stream_<it>;};
+    separator="\n"
+>
+<referencedRuleLabels
+    :{pANTLR3_REWRITE_RULE_SUBTREE_STREAM stream_<it>;};
+    separator="\n"
+>
+<referencedRuleListLabels
+    :{pANTLR3_REWRITE_RULE_SUBTREE_STREAM stream_<it>;};
+    separator="\n"
+>
+>>
+
+rewriteCodeLabelsInit() ::= <<
+<referencedTokenLabels
+    :{stream_<it>=antlr3RewriteRuleTokenStreamNew(adaptor,"token <it>", <it>);};
+    separator="\n"
+>
+<referencedTokenListLabels
+    :{stream_<it>=antlr3RewriteRuleTokenStreamNew(adaptor,"token <it>", list_<it>);};
+    separator="\n"
+>
+<referencedRuleLabels 
+    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNew(adaptor,"token <it>", <it> != NULL ? <it>.tree : NULL);};
+    separator="\n"
+>
+<referencedRuleListLabels
+    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNew(adaptor,"token <it>", list_<it>);};
+    separator="\n"
+>
+>>
+rewriteCodeLabelsFree() ::= <<
+<referencedTokenLabels
+    :{stream_<it>->free(stream_<it>);};
+    separator="\n"
+>
+<referencedTokenListLabels
+    :{stream_<it>->free(stream_<it>);};
+    separator="\n"
+>
+<referencedRuleLabels 
+    :{stream_<it>->free(stream_<it>);};
+    separator="\n"
+>
+<referencedRuleListLabels
+    :{stream_<it>->free(stream_<it>);};
+    separator="\n"
+>
+>>
+
+/** Generate code for an optional rewrite block; note it uses the deep ref'd element
+  *  list rather shallow like other blocks.
+  */
 rewriteOptionalBlock(
 	alt,
 	rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	referencedTokenLabels,
-	referencedRuleLabels,
+	referencedElementsDeep, // all nested refs
+	referencedElements,		// elements in immediately block; no nested blocks
 	description) ::=
 <<
-/* rewriteOptionalBlock(
-	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	description) */
 // <fileName>:<description>
 {
-    <rewriteBlockCardinalityCheck()>
-    if ( n_<rewriteBlockLevel> > 1 ) fprintf(stderr, "<first([referencedTokens,referencedListLabels,referencedRules])> list has > 1 elements");
-    if ( n_<rewriteBlockLevel>==1 ) 
-    {
-	ANTLR3_UINT64	 i_<rewriteBlockLevel> = 0;
-	<alt>
-    }
+	if ( <referencedElementsDeep:{el | stream_<el>->hasNext(stream_<el>)}; separator="||"> ) 
+	{
+		<alt>
+	}
+	<referencedElementsDeep:{el | stream_<el>->reset(stream_<el>);<\n>}>
 }<\n>
-/* End: rewriteOptionalBlock(
-	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	description) */
 >>
 
 rewriteClosureBlock(
 	alt,
 	rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	referencedTokenLabels,
-	referencedRuleLabels,
+	referencedElementsDeep, // all nested refs
+	referencedElements,		// elements in immediately block; no nested blocks
 	description) ::=
 <<
-/* rewriteClosureBlock(
-	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	description)
-	*/
 // <fileName>:<description>
 {
-    ANTLR3_UINT64   i_<rewriteBlockLevel>;
-    <rewriteBlockCardinalityCheck()>
-    for (i_<rewriteBlockLevel> = 0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) 
-    {
-	<alt>
-    }
+	while ( <referencedElements:{el | stream_<el>->hasNext(stream_<el>)}; separator="||"> ) 
+	{
+		<alt>
+	}
+	<referencedElements:{el | stream_<el>->reset(stream_<el>);<\n>}>
 }<\n>
-/* End: rewriteClosureBlock(
-	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	description)
-	*/
 >>
-
+RewriteEarlyExitException() ::=
+<<
+CONSTRUCTEX();
+EXCEPTION()->type         = ANTLR3_REWRITE_EARLY_EXCEPTION;
+EXCEPTION()->name         = ANTLR3_REWRITE_EARLY_EXCEPTION_NAME;
+>>
 rewritePositiveClosureBlock(
 	alt,
 	rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	referencedTokenLabels,
-	referencedRuleLabels,
+	referencedElementsDeep, // all nested refs
+	referencedElements,		// elements in immediately block; no nested blocks
 	description) ::=
 <<
-/* rewritePositiveClosureBlock(
-	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	description) */
-// <fileName>:<description>
+if ( !(<referencedElements:{el | stream_<el>->hasNext(stream_<el>)}; separator="||">) ) 
 {
-    ANTLR3_UINT64   i_<rewriteBlockLevel>;
-    <rewriteBlockCardinalityCheck()>
-    if ( n_<rewriteBlockLevel>==0 ) fprintf(stderr, "Must have more than one element for (...)+ loops\n");
-    for (i_<rewriteBlockLevel>=0; i_<rewriteBlockLevel>\<n_<rewriteBlockLevel>; i_<rewriteBlockLevel>++) 
-    {
-	<alt>
-    }
-}	<\n>
-/* End: rewritePositiveClosureBlock(
-	alt,rewriteBlockLevel,
-	referencedTokens,
-	referencedListLabels,
-	referencedRules,
-	description) */
->>
-
-/** Elements referenced in rewrite loops/optional blocks must have
- *  the same size.  Factor this out from rewriteXXXBlock rules.  This
- *  deals both with the lists of stuff and single element labels like id=ID.
- *  The n_xxx var is always defined to either first list_ var or single-value
- *  label.
- */
-rewriteBlockCardinalityCheck() ::= <<
-/* Start: rewriteBlockCardinalityCheck */
-<if(first([referencedTokens,referencedListLabels,referencedRules]))>
-/* First compute size of the lists for cardinality checking
- */
-<first([referencedTokens,referencedListLabels,referencedRules]):{ANTLR3_UINT64 n_<rewriteBlockLevel> = list_<first([referencedTokens,referencedListLabels,referencedRules])> == NULL ? 0 : list_<first([referencedTokens,referencedListLabels,referencedRules])>->size(list_<first([referencedTokens,referencedListLabels,referencedRules])>);}>
-/* Now check the cardinality
- */
-<rest([referencedTokens,referencedListLabels,referencedRules]):{if ( list_<it>->size(list_<it>)!=n_<rewriteBlockLevel> ) fprintf(stderr, "rewriteBlockCardinalityCheck: rewrite element list '<it>' differs in size from other elements!\n");<\n>}>
-<endif>
-<!
-   If no lists above, then we need to define n to be 0 or 1 depending on presence
-   of single-value labels
-!>
-<if(!first([referencedTokens,referencedListLabels,referencedRules]))>
-<! No lists !>
-/* Compute cardinality of optional single value labels
- */
-<first(referencedRuleLabels):{label | ANTLR3_UINT64 n_<rewriteBlockLevel> = <first([referencedTokenLabels,referencedRuleLabels])>.tree == NULL ? 0 : 1; }>
-<first(referencedTokenLabels):{label | ANTLR3_UINT64 n_<rewriteBlockLevel> = <first([referencedTokenLabels,referencedRuleLabels])> == NULL ? 0 : 1; }>
-/* Now, check cardinality of non-list labels matches cardinality of other labels for rewrite
- */
-<rest(referencedRuleLabels):{label| if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label>.tree != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element label '<label>.tree' differs in size from other elements!\n");}>
-<rest(referencedTokenLabels):{label| if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label> != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element label '<label>' differs in size from other elements!\n");}>
-<else> <! There were some list labels !>
-/* Now, ensure list labels match cardinality of lists
- */
-<referencedRuleLabels:{label| if ( (<label>.tree == NULL && n_<rewriteBlockLevel> \> 0) || (<label>.tree != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element list label '<label>.tree' differs in size from other elements!\n");}>
-<referencedTokenLabels:{label| if ( (<label> == NULL && n_<rewriteBlockLevel> \> 0) || (<label> != NULL && n_<rewriteBlockLevel> == 0) ) fprintf(stderr, "rewrite element list label '<label>' differs in size from other elements!\n");}>
-<endif>
-/* End: rewriteBlockCardinalityCheck */
+    <RewriteEarlyExitException()>
+}
+else
+{
+	while ( <referencedElements:{el | stream_<el>->hasNext(stream_<el>)}; separator="||"> ) {
+		<alt>
+	}
+	<referencedElements:{el | stream_<el>->reset(stream_<el>);<\n>}>
+}
 >>
 
 rewriteAlt(a) ::= <<
@@ -597,38 +585,27 @@ rewriteElement(e) ::= <<
 
 /** Gen ID */
 rewriteTokenRef(token,elementIndex,args) ::= <<
-/* rewriteTokenRef(token,elementIndex) */
-// Is this a token actually and not a tree list?
-ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, <if(args)>ctx->adaptor->createToken(ctx->adaptor, <args; separator=", ">)<else>list_<token>->get(list_<token>, i_<rewriteBlockLevel> + 1)<endif>);<\n>
-/* End: rewriteTokenRef(token,elementIndex) */
+ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, <if(args)>ctx->adaptor->createToken(ctx->adaptor, <args; separator=", ">)<else>stream_<token>->next(stream_<token>)<endif>);<\n>
 >>
 
 /** Gen $label ... where defined via label=ID */
 rewriteTokenLabelRef(label,elementIndex) ::= <<
-/* rewriteTokenLabelRef(label,elementIndex) */
-ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, <label>);<\n>
-/* End: rewriteTokenLabelRef(label,elementIndex) */
+ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, stream_<label>->next(stream_<label>));<\n>
 >>
 
 /** Gen $label ... where defined via label+=ID */
 rewriteTokenListLabelRef(label,elementIndex) ::= <<
-/* rewriteTokenListLabelRef(label,elementIndex) */
-ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, list_<label>->get(list_<label>, i_<rewriteBlockLevel> + 1));<\n>
-/* Home: rewriteTokenListLabelRef(label,elementIndex) */
+ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, stream_<label>->next(stream_<label>));<\n>
 >>
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-/* rewriteTokenLabelRefRoot(label,elementIndex) */
-root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, <label>, root_<treeLevel>);<\n>
-/* End: rewriteTokenLabelRefRoot(label,elementIndex) */
+root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, stream_<label>->next(stream_<label>), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^(ID ...) */
 rewriteTokenRefRoot(token,elementIndex) ::= <<
-/* rewriteTokenRefRoot(token,elementIndex) */
-root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, list_<token>->get(list_<token>, i_<rewriteBlockLevel> + 1), root_<treeLevel>);<\n>
-/* End: rewriteTokenRefRoot(token,elementIndex) */
+root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, stream_<token>->next(stream_<token>), root_<treeLevel>);<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
@@ -652,61 +629,37 @@ root_0 = <action>;<\n>
 prevRuleRootRef() ::= "retval"
 
 rewriteRuleRef(rule,dup) ::= <<
-/* rewriteRuleRef(rule,dup) */
-<if(dup)>
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ctx->adaptor->dupTree(ctx->adaptor, list_<rule>->get(list_<rule>, i_<rewriteBlockLevel>+1)));<\n>
-<else>
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, list_<rule>->get(list_<rule>, i_<rewriteBlockLevel>+1));<\n>
-<endif>
-/* End: rewriteRuleRef(rule,dup) */
+ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, stream_<rule>->next(stream_<rule>));<\n>
 >>
 
 rewriteRuleRefRoot(rule,dup) ::= <<
-/* rewriteRuleRefRoot(rule,dup) */
-<if(dup)>
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->dupTree(atx->adaptor, list_<rule>->get(list_<rule>, i_<rewriteBlockLevel>+1)), root_<treeLevel>);<\n>
-<else>
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, list_<rule>->get(list_<rule>, i_<rewriteBlockLevel> + 1), root_<treeLevel>);<\n>
-<endif>
-/* End: rewriteRuleRefRoot(rule,dup) */
+root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, stream_<rule>->next(stream_<rule>), root_<treeLevel>);<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
-/* rewriteNodeAction(action) */
 ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, <action>);<\n>
-/* End: rewriteNodeAction(action) */
 >>
 
 rewriteNodeActionRoot(action) ::= <<
-/* rewriteNodeActionRoot(action) */
 root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <action>, root_<treeLevel>);<\n>
-/* End: rewriteNodeActionRoot(action) */
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel=rule */
 rewriteRuleLabelRef(label) ::= <<
-/* rewriteRuleLabelRef(label) */
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, <label>.tree);<\n>
-/* End: rewriteRuleLabelRef(label) */
+ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, stream_<label>->next(stream_<label>));<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-/* rewriteRuleListLabelRef(label) */
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, (pANTLR3_BASE_TREE)(list_<label>->get(list_<label>, i_<rewriteBlockLevel> + 1)));<\n>
-/* End: rewriteRuleListLabelRef(label) */
+ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, (pANTLR3_BASE_TREE)(stream_<label>->next(stream_<label>)));<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
 rewriteRuleLabelRefRoot(label) ::= <<
-/* rewriteRuleLabelRefRoot(label) */
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <label>.tree, root_<treeLevel>);<\n>
-/* End: rewriteRuleLabelRefRoot(label) */
+root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, stream_<label>->nextNode(stream_<label>), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-/* rewriteRuleListLabelRefRoot(label) */
-root_<treeLevel> = ctx->adaptor->becomeRoot((pANTLR3_BASE_TREE)(list_<label>->get(list_<label>, i_<rewriteBlockLevel> + 1)), root_<treeLevel>);<\n>
-/* End: rewriteRuleListLabelRefRoot(label) */
+root_<treeLevel> = ctx->adaptor->becomeRoot((pANTLR3_BASE_TREE)(stream_<label>->nextNode(stream_<label>)), root_<treeLevel>);<\n>
 >>
