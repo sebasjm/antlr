@@ -57,7 +57,7 @@ public class RewriteRuleSubtreeStream extends RewriteRuleElementStream {
 	 *  children; e.g., ^(type ID)+ adds ID to type and then 2nd iteration
 	 *  must dup the type node, but ID has been added.
 	 *
-	 *  Referencing two a rule result twice is ok; dup entire tree as
+	 *  Referencing a rule result twice is ok; dup entire tree as
 	 *  we can't be adding trees; e.g., expr expr. 
 	 */
 	public Object nextNode() {

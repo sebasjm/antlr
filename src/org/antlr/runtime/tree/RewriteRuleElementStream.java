@@ -118,6 +118,8 @@ public abstract class RewriteRuleElementStream {
 
 	/** Return the next element in the stream.  If out of elements, throw
 	 *  an exception unless size()==1.  If size is 1, then return elements[0].
+	 *  Return a duplicate node/subtree if stream is out of elements and
+	 *  size==1.
 	 */
 	public Object next() {
 		if ( cursor>=size() && size()==1 ) {
@@ -130,7 +132,13 @@ public abstract class RewriteRuleElementStream {
 		return el;
 	}
 
-	public Object _next() {
+	/** do the work of getting the next element, making sure that it's
+	 *  a tree node or subtree.  Deal with the optimization of single-
+	 *  element list versus list of size > 1.  Throw an exception
+	 *  if the stream is empty or we're out of elements and size>1.
+	 *  protected so you can override in a subclass if necessary.
+	 */
+	protected Object _next() {
 		if ( size()==0 ) {
 			throw new RewriteEmptyStreamException(elementDescription);
 		}
