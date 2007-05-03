@@ -297,6 +297,11 @@ C# Target Notes
 
 CHANGES
 
+May 2, 2007
+
+* Fixed ANTLR-117. Wasn't building decisions properly for subrules in
+  syntactic predicates.
+
 April 22, 2007
 
 * Made build.xml ref all jars in antlr lib.  Thanks to Miguel Ping.

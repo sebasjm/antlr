@@ -389,7 +389,7 @@ public class Grammar {
 	 */
 	public Set<GrammarAST> blocksWithSynPreds = new HashSet();
 
-	/** Track decisions that actually use the sem preds in the DFA. */
+	/** Track decisions that actually use the syn preds in the DFA. */
 	public Set<DFA> decisionsWhoseDFAsUsesSynPreds = new HashSet();
 
 	/** Track the names of preds so we can avoid generating preds that are not used */
@@ -872,6 +872,7 @@ public class Grammar {
 			System.out.println("cost: "+lookaheadDFA.getNumberOfStates()+
 							   " states, "+(int)(stopDFA-startDFA)+" ms");
 		}
+		//System.out.println("after create DFA; synPredNamesUsedInDFA="+synPredNamesUsedInDFA);
 	}
 
 	/** Terminate DFA creation (grammar analysis).
@@ -984,9 +985,7 @@ public class Grammar {
 	public void synPredUsedInDFA(DFA dfa, SemanticContext semCtx) {
 		decisionsWhoseDFAsUsesSynPreds.add(dfa);
 		semCtx.trackUseOfSyntacticPredicates(this); // walk ctx looking for preds
-		/*
-		System.out.println("after tracking use for dec "+dfa.decisionNumber+": "+
-		 synPredNamesUsedInDFA);*/
+		//System.out.println("after tracking use for dec "+dfa.decisionNumber+": "+synPredNamesUsedInDFA);
 	}
 
 	/** Given @scope::name {action} define it for this grammar.  Later,

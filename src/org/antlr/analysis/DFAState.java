@@ -667,7 +667,6 @@ public class DFAState extends State {
 	 *
 	 *  experimental 11/29/2005
 	 *
-	 *  TODO: cache this as it's called a lot; or at least set bit if >1 present in state
 	public Set getGatedPredicatesInNFAConfigurations() {
 		Set preds = new HashSet();
 		Iterator iter = nfaConfigurations.iterator();
@@ -684,6 +683,27 @@ public class DFAState extends State {
 		return preds;
 	}
 	 */
+
+	public Set getSyntacticPredicatesInNFAConfigurations() {
+		Set synpreds = new HashSet();
+		Iterator iter = nfaConfigurations.iterator();
+		NFAConfiguration configuration;
+		while (iter.hasNext()) {
+			configuration = (NFAConfiguration) iter.next();
+			SemanticContext gatedPredExpr =
+				configuration.semanticContext.getGatedPredicateContext();
+			// if this is a manual syn pred (gated and syn pred), add
+			if ( gatedPredExpr!=null &&
+				 configuration.semanticContext.isSyntacticPredicate() )
+			{
+				synpreds.add(configuration.semanticContext);
+			}
+		}
+		if ( synpreds.size()==0 ) {
+			return null;
+		}
+		return synpreds;
+	}
 
 	/** For gated productions, we need an OR'd list of all predicates for the
 	 *  target of an edge so we can gate the edge based upon the predicates

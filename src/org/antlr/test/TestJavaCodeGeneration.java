@@ -99,4 +99,15 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
+	public void testSynpredWithPlusLoop() {
+		String grammar =
+			"grammar T; \n" +
+			"a : (('x'+)=> 'x'+)?;\n";
+		boolean found =
+			rawGenerateAndBuildRecognizer(
+				"T.g", grammar, "TParser", "TLexer", false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, found);
+	}
+	
 }

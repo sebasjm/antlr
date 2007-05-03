@@ -64,8 +64,7 @@ public class NFAToDFAConverter {
 	public NFAToDFAConverter(DFA dfa) {
 		this.dfa = dfa;
 		NFAState nfaStartState = dfa.getNFADecisionStartState();
-		int nAlts =
-			dfa.nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStartState);
+		int nAlts = dfa.getNumberOfAlts();
 		initContextTrees(nAlts);
 	}
 
@@ -104,6 +103,28 @@ public class NFAToDFAConverter {
 			}
 			work.remove(0); // done with it; remove from work list
 		}
+
+		// walk all accept states and find the synpreds
+		// I used to do this in the code generator, but that is too late.
+		// This converter tries to avoid computing DFA for decisions in
+		// syntactic predicates that are not ever used such as those
+		// created by autobacktrack mode.
+		int nAlts = dfa.getNumberOfAlts();
+		for (int i=1; i<=nAlts; i++) {
+			DFAState a = dfa.getAcceptState(i);
+			if ( a!=null ) {
+				Set synpreds = a.getSyntacticPredicatesInNFAConfigurations();
+				if ( synpreds!=null ) {
+					// add all the predicates we find (should be just one, right?)
+					for (Iterator it = synpreds.iterator(); it.hasNext();) {
+						SemanticContext semctx = (SemanticContext) it.next();
+						// System.out.println("synpreds: "+semctx);
+						dfa.nfa.grammar.synPredUsedInDFA(dfa, semctx);
+					}
+				}
+			}
+		}
+
 	}
 
 	/** From this first NFA state of a decision, create a DFA.
