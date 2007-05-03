@@ -439,6 +439,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\antlr3rewritestreams.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\antlr3string.c"
 				>
 			</File>
@@ -554,6 +558,10 @@
 			</File>
 			<File
 				RelativePath=".\include\antlr3parsetree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\antlr3rewritestreams.h"
 				>
 			</File>
 			<File

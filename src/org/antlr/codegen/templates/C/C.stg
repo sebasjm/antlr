@@ -532,6 +532,7 @@ has the callable functions (rules) shown below,
 // Disable: Unreferenced parameter,                - Rules with parameters that are not used
 //          constant conditional,                  - ANTLR realizes that a prediction is always true (synpred usually)
 //          initialized but unused variable        - tree rewrite vairables declared but not needed
+//          Unreferenced local variable            - lexer rulle decalres but does not always use _type
 //          potentially unitialized variable used  - retval always returned from a rule 
 //
 // These are only really displayed at warning level /W4 but that is the code ideal I am aiming at
@@ -540,6 +541,7 @@ has the callable functions (rules) shown below,
 // this is a matter of orthogonality hence I disable that one.
 //
 #pragma warning( disable : 4100 )
+#pragma warning( disable : 4101 )
 #pragma warning( disable : 4127 )
 #pragma warning( disable : 4189 )
 #pragma warning( disable : 4701 )
