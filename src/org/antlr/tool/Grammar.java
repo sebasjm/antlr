@@ -389,10 +389,17 @@ public class Grammar {
 	 */
 	public Set<GrammarAST> blocksWithSynPreds = new HashSet();
 
-	/** Track decisions that actually use the syn preds in the DFA. */
+	/** Track decisions that actually use the syn preds in the DFA.
+	 *  Computed during NFA to DFA conversion.
+	 */
 	public Set<DFA> decisionsWhoseDFAsUsesSynPreds = new HashSet();
 
-	/** Track the names of preds so we can avoid generating preds that are not used */
+	/** Track names of preds so we can avoid generating preds that aren't used
+	 *  Computed during NFA to DFA conversion.  Just walk accept states
+	 *  and look for synpreds because that is the only state target whose
+	 *  incident edges can have synpreds.  Same is try for
+	 *  decisionsWhoseDFAsUsesSynPreds.
+	 */
 	public Set<String> synPredNamesUsedInDFA = new HashSet();
 
 	/** Track decisions with syn preds specified for reporting.

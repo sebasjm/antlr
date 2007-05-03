@@ -675,7 +675,6 @@ public class CodeGenerator {
 														  getTemplates(),
 														  t.dfa);
 					edgeST.setAttribute("predicates", predST.toString());
-					grammar.synPredUsedInDFA(t.dfa, preds);
 				}
 			}
 			if ( edge.label.getAtom()!=Label.EOT ) {

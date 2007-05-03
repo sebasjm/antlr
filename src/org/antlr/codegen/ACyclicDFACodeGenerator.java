@@ -135,7 +135,6 @@ public class ACyclicDFACodeGenerator {
 														  parentGenerator.getTemplates(),
 														  dfa);
 					edgeST.setAttribute("predicates", predST.toString());
-					parentGenerator.grammar.synPredUsedInDFA(dfa, preds);
 				}
 			}
 
