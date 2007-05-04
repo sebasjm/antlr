@@ -383,7 +383,7 @@ rewriteElement(e) ::= <<
 <e.el>
 >>
 
-/** Gen ID */
+/** Gen ID or ID[args] */
 rewriteTokenRef(token,elementIndex,args) ::= <<
 adaptor.AddChild(root_<treeLevel>, <if(args)>adaptor.Create(<token>,<args; separator=", ">)<else>stream_<token>.Next()<endif>);<\n>
 >>
@@ -403,9 +403,9 @@ rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
 root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.Next(), root_<treeLevel>);<\n>
 >>
 
-/** Gen ^(ID ...) */
-rewriteTokenRefRoot(token,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<token>.Next(), root_<treeLevel>);<\n>
+/** Gen ^(ID ...) or ^(ID[args] ...) */
+rewriteTokenRefRoot(token,elementIndex,args) ::= <<
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<if(args)>adaptor.Create(<token>,<args; separator=", ">)<else>stream_<token>.Next()<endif>, root_<treeLevel>);<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<

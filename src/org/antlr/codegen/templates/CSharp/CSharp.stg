@@ -840,8 +840,9 @@ Match(EOF); <checkRuleBacktrackFailure()>
 >>
 
 /** match ^(root children) in tree parser */
-tree(root, children, nullableChildList) ::= <<
+tree(root, actionsAfterRoot, children, nullableChildList) ::= <<
 <root:element()>
+<actionsAfterRoot:element()>
 <if(nullableChildList)>
 if ( input.LA(1) == Token.DOWN )
 {
