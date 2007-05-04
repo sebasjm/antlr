@@ -221,4 +221,25 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("abc, def\n", found);
 	}
 
+	public void testActionsAfterRoot() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : x=ID INT? SEMI -> ^($x INT?) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"SEMI : ';' ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP; options {ASTLabelType=CommonTree;}\n" +
+			"a @init {int x=0;} : ^(ID {x=1;} {x=2;} INT?)\n" +
+			"    {System.out.println($ID+\", \"+x);}\n" +
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "abc;");
+		assertEquals("abc, 2\n", found);
+	}
+
 }

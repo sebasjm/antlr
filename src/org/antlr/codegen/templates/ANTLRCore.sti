@@ -175,7 +175,7 @@ lexerRuleRefAndListLabel(rule,label,args,elementIndex);
 lexerMatchEOF(label,elementIndex);
 
 /** match ^(root children) in tree parser */
-tree(root, children, nullableChildList);
+tree(root, actionsAfterRoot, children, nullableChildList);
 
 /** Every predicate is used as a validating predicate (even when it is
  *  also hoisted into a prediction expression).

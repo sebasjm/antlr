@@ -647,11 +647,7 @@ element[GrammarAST label, GrammarAST astSuffix] returns [StringTemplate code=nul
 
     |   code=tree
 
-    |   act:ACTION
-        {
-        code = templates.getInstanceOf("execAction");
-        code.setAttribute("action", generator.translateAction(currentRuleName,#act));
-        }
+    |   code=element_action
 
     |   (sp:SEMPRED|gsp:GATED_SEMPRED {#sp=#gsp;})
         {
@@ -667,6 +663,14 @@ element[GrammarAST label, GrammarAST astSuffix] returns [StringTemplate code=nul
     |	BACKTRACK_SEMPRED
 
     |   EPSILON
+    ;
+
+element_action returns [StringTemplate code=null]
+    :   act:ACTION
+        {
+        code = templates.getInstanceOf("execAction");
+        code.setAttribute("action", generator.translateAction(currentRuleName,#act));
+        }
     ;
 
 notElement[GrammarAST n, GrammarAST label, GrammarAST astSuffix]
@@ -750,8 +754,8 @@ ebnf returns [StringTemplate code=null]
 
 tree returns [StringTemplate code=templates.getInstanceOf("tree")]
 {
-StringTemplate el=null;
-GrammarAST elAST=null;
+StringTemplate el=null, act=null;
+GrammarAST elAST=null, actAST=null;
 NFAState afterDOWN = (NFAState)tree_AST_in.NFATreeDownState.transition(0).target;
 LookaheadSet s = grammar.LOOK(afterDOWN);
 if ( s.member(Label.UP) ) {
@@ -770,6 +774,20 @@ if ( s.member(Label.UP) ) {
 							  Utils.integer(elAST.getColumn())
 							  );
            }
+           // push all the immediately-following actions out before children
+           // so actions aren't guarded by the "if (input.LA(1)==Token.DOWN)"
+           // guard in generated code.
+           (    options {greedy=true;}:
+                {actAST=(GrammarAST)_t;}
+                act=element_action
+                {
+                code.setAttribute("actionsAfterRoot.{el,line,pos}",
+                                  act,
+                                  Utils.integer(actAST.getLine()),
+                                  Utils.integer(actAST.getColumn())
+                );
+                }
+           )*
            ( {elAST=(GrammarAST)_t;}
     		 el=element[null,null]
            	 {
@@ -1214,7 +1232,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 		}
     	}
 
-    |	ACTION
+    |   ACTION
         {
         // actions in rewrite rules yield a tree object
         String actText = #ACTION.getText();

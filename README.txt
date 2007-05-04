@@ -297,6 +297,12 @@ C# Target Notes
 
 CHANGES
 
+May 3, 2007
+
+* Fixed ANTLR-82.  Actions after the root were considered part of
+  an optional child.  They were not always executed.  Required a change
+  to the ANTLRCore.sti interface for tree() template.
+
 May 2, 2007
 
 * Fixed ANTLR-117. Wasn't building decisions properly for subrules in
