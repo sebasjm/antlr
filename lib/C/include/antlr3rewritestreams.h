@@ -61,32 +61,32 @@ typedef struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct
     /** Reset the condition of this stream so that it appears we have
      *  not consumed any of its elements.  Elements themselves are untouched.
      */
-    void		(*reset)    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream); 
+    void		(*reset)    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream); 
 
     /** Add a new pANTLR3_BASE_TREE to this stream
      */
-    void		(*add)	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void *el);
+    void		(*add)	    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream, void *el);
 
     /** Return the next element in the stream.  If out of elements, throw
      *  an exception unless size()==1.  If size is 1, then return elements[0].
      */
-    void *		(*next)	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-    void *		(*_next)    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+    void *		(*next)	    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream);
+    void *		(*_next)    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream);
 
     /** When constructing trees, sometimes we need to dup a token or AST
      * 	subtree.  Dup'ing a token means just creating another AST node
      *  around it.  For trees, you must call the adaptor.dupTree().
      */
-    void *		(*dup)	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
+    void *		(*dup)	    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream, void * el);
 
     /** Ensure stream emits trees; tokens must be converted to AST nodes.
      *  AST nodes can be passed through unmolested.
      */
-    pANTLR3_BASE_TREE	(*toTree)   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
+    pANTLR3_BASE_TREE	(*toTree)   (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream, void * el);
 
     /** Returns ANTLR3_TRUE if there is a next element available
      */
-    ANTLR3_BOOLEAN	(*hasNext)  (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+    ANTLR3_BOOLEAN	(*hasNext)  (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream);
 
     /** Treat next element as a single node even if it's a subtree.
      *  This is used instead of next() when the result has to be a
@@ -97,27 +97,30 @@ typedef struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct
      *  Referencing to a rule result twice is ok; dup entire tree as
      *  we can't be adding trees; e.g., expr expr. 
      */
-    pANTLR3_BASE_TREE	(*nextNode) (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+    pANTLR3_BASE_TREE	(*nextNode) (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream);
 
     /** Number of elements avaiable in the stream
      */
-    ANTLR3_UINT32	(*size)	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+    ANTLR3_UINT32	(*size)	    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream);
 
     /** Returns the description string if there is one available (check for NULL).
      */
     pANTLR3_STRING	(*getDescription)
-				    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+				    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream);
+
+    void		(*free)	    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream);
+
 }
     ANTLR3_REWRITE_RULE_ELEMENT_STREAM;
 
 /** This is an implementation of a token stream, which is basically an element
  *  stream that deals wiht tokens only.
  */
-typedef ANTLR3_REWRITE_RULE_ELEMENT_STREAM ANTLR3_REWRITE_RULE_TOKEN_STREAM;
+typedef struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct ANTLR3_REWRITE_RULE_TOKEN_STREAM;
 
 /** This is an implementation of a subtree stream which is a set of trees
  *  modelled as an element stream.
  */
-typedef ANTLR3_REWRITE_RULE_ELEMENT_STREAM ANTLR3_REWRITE_RULE_SUBTREE_STREAM;
+typedef struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct ANTLR3_REWRITE_RULE_SUBTREE_STREAM;
 
 #endif

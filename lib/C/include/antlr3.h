@@ -20,5 +20,6 @@
 #include    <antlr3parser.h>
 #include    <antlr3basetreeadaptor.h>
 #include    <antlr3commontreeadaptor.h>
+#include    <antlr3rewritestreams.h>
 
 #endif

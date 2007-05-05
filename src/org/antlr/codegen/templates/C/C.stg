@@ -211,22 +211,22 @@ outputFile( LEXER,
 #define	    MATCHS(s)				LEXER->matchs(LEXER, s)
 #define	    MATCHRANGE(c1,c2)	    LEXER->matchRange(LEXER, c1, c2)
 #define	    MATCHANY()				LEXER->matchAny(LEXER)
-#define	    LTOKEN()				LEXER->token
+#define	    LTOKEN  				LEXER->token
 #define	    HASFAILED()				(RECOGNIZER->failed == ANTLR3_TRUE)
 #define	    BACKTRACKING			RECOGNIZER->backtracking
 #define	    FAILEDFLAG				RECOGNIZER->failed
-#define	    INPUT()					LEXER->input
-#define	    STRSTREAM				INPUT()
-#define		INDEX()					INPUT()->istream->index(INPUT()->istream)
-#define		SEEK(n)					INPUT()->istream->seek(INPUT()->istream, n)
+#define	    INPUT					LEXER->input
+#define	    STRSTREAM				INPUT
+#define		INDEX()					INPUT->istream->index(INPUT->istream)
+#define		SEEK(n)					INPUT->istream->seek(INPUT->istream, n)
 #define	    EOF_TOKEN				&(LEXER->tokSource->eofToken)
 #define	    HASEXCEPTION()			(RECOGNIZER->error == ANTLR3_TRUE)
-#define	    EXCEPTION()				RECOGNIZER->exception
+#define	    EXCEPTION				RECOGNIZER->exception
 #define	    CONSTRUCTEX()			RECOGNIZER->exConstruct(RECOGNIZER)
 #define	    LRECOVER()				LEXER->recover(LEXER)
-#define	    MARK()					INPUT()->istream->mark(INPUT()->istream)
-#define	    REWIND(m)				INPUT()->istream->rewind(INPUT()->istream, m)
-#define	    REWINDLAST()			INPUT()->istream->REWINDLAST(INPUT()->istream)
+#define	    MARK()					INPUT->istream->mark(INPUT->istream)
+#define	    REWIND(m)				INPUT->istream->rewind(INPUT->istream, m)
+#define	    REWINDLAST()			INPUT->istream->REWINDLAST(INPUT->istream)
 #define		MEMOIZE(ri,si)			RECOGNIZER->memoize(RECOGNIZER, ri, si)
 #define		HAVEPARSEDRULE(r)		RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 
@@ -243,29 +243,29 @@ outputFile( LEXER,
 
 /* 8 bit "ASCII" (actually any 8 bit character set) */
 
-#  define	    NEXTCHAR			((pANTLR3_UINT8)(INPUT()->nextChar))
-#  define	    DATAP				((pANTLR3_UINT8)(INPUT()->data))
+#  define	    NEXTCHAR			((pANTLR3_UINT8)(INPUT->nextChar))
+#  define	    DATAP				((pANTLR3_UINT8)(INPUT->data))
 
 # else
 
-#  define	    NEXTCHAR			((pANTLR3_UINT16)(INPUT()->nextChar)) 
-#  define	    DATAP				((pANTLR3_UINT16)(INPUT()->data))
+#  define	    NEXTCHAR			((pANTLR3_UINT16)(INPUT->nextChar)) 
+#  define	    DATAP				((pANTLR3_UINT16)(INPUT->data))
 
 # endif
 
-# define	    LA(n) ((NEXTCHAR + n) > (DATAP + INPUT()->sizeBuf) ? ANTLR3_CHARSTREAM_EOF : (ANTLR3_UCHAR)(*(NEXTCHAR + n - 1)))
+# define	    LA(n) ((NEXTCHAR + n) > (DATAP + INPUT->sizeBuf) ? ANTLR3_CHARSTREAM_EOF : (ANTLR3_UCHAR)(*(NEXTCHAR + n - 1)))
 # define	    CONSUME()											\
 {																	\
-    if	(NEXTCHAR \< (DATAP + INPUT()->sizeBuf))					\
+    if	(NEXTCHAR \< (DATAP + INPUT->sizeBuf))					\
     {																\
-		INPUT()->charPositionInLine++;								\
-		if  ((ANTLR3_UCHAR)(*NEXTCHAR) == INPUT()->newlineChar)		\
+		INPUT->charPositionInLine++;								\
+		if  ((ANTLR3_UCHAR)(*NEXTCHAR) == INPUT->newlineChar)		\
 		{															\
-			INPUT()->line++;										\
-			INPUT()->charPositionInLine	= 0;						\
-			INPUT()->currentLine		= (void *)(NEXTCHAR + 1);	\
+			INPUT->line++;										\
+			INPUT->charPositionInLine	= 0;						\
+			INPUT->currentLine		= (void *)(NEXTCHAR + 1);	\
 		}															\
-		INPUT()->nextChar = (void *)(NEXTCHAR + 1);					\
+		INPUT->nextChar = (void *)(NEXTCHAR + 1);					\
     }																\
 }
 
@@ -273,8 +273,8 @@ outputFile( LEXER,
 
 // Pick up the input character by calling the input stream implementation.
 //
-#define	    CONSUME()				INPUT()->istream->consume(INPUT()->istream)
-#define	    LA(n)					INPUT()->istream->_LA(INPUT()->istream, n)
+#define	    CONSUME()				INPUT->istream->consume(INPUT->istream)
+#define	    LA(n)					INPUT->istream->_LA(INPUT->istream, n)
 
 #endif
 <endif>
@@ -311,30 +311,31 @@ outputFile( LEXER,
 #undef	    RECOVERFROMMISMATCHEDSET
 #undef	    RECOVERFROMMISMATCHEDELEMENT
 #undef		INDEX
+#undef      ADAPTOR
 
 #define	    PARSER							ctx->pParser  
 #define	    RECOGNIZER						PARSER->rec
 #define	    HAVEPARSEDRULE(r)				RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 #define		MEMOIZE(ri,si)					RECOGNIZER->memoize(RECOGNIZER, ri, si)
-#define	    INPUT()							PARSER->tstream
-#define	    STRSTREAM						INPUT()
-#define		INDEX()							INPUT()->istream->index(INPUT()->istream)
+#define	    INPUT							PARSER->tstream
+#define	    STRSTREAM						INPUT
+#define		INDEX()							INPUT->istream->index(INPUT->istream)
 #define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
-#define	    EXCEPTION()						RECOGNIZER->exception
+#define	    EXCEPTION						RECOGNIZER->exception
 #define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
 #define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
-#define	    FOLLOWSTACK()					RECOGNIZER->following
-#define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(&(x))), NULL)
-#define	    FOLLOWPOP()						FOLLOWSTACK()->pop(FOLLOWSTACK())
+#define	    FOLLOWSTACK					    RECOGNIZER->following
+#define	    FOLLOWPUSH(x)					FOLLOWSTACK->push(FOLLOWSTACK, ((void *)(&(x))), NULL)
+#define	    FOLLOWPOP()						FOLLOWSTACK->pop(FOLLOWSTACK)
 #define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
 #define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
-#define	    LA(n)							INPUT()->istream->_LA(INPUT()->istream, n)
-#define	    LT(n)							INPUT()->_LT(INPUT(), n)
+#define	    LA(n)							INPUT->istream->_LA(INPUT->istream, n)
+#define	    LT(n)							INPUT->_LT(INPUT, n)
 #define	    CONSTRUCTEX()					RECOGNIZER->exConstruct(RECOGNIZER)
-#define	    CONSUME()						INPUT()->istream->consume(INPUT()->istream)
-#define	    MARK()							INPUT()->istream->mark(INPUT()->istream)
-#define	    REWIND(m)						INPUT()->istream->rewind(INPUT()->istream, m)
-#define	    REWINDLAST()					INPUT()->istream->REWINDLAST(INPUT()->istream)
+#define	    CONSUME()						INPUT->istream->consume(INPUT->istream)
+#define	    MARK()							INPUT->istream->mark(INPUT->istream)
+#define	    REWIND(m)						INPUT->istream->rewind(INPUT->istream, m)
+#define	    REWINDLAST()					INPUT->istream->REWINDLAST(INPUT->istream)
 #define	    PERRORRECOVERY					RECOGNIZER->errorRecovery
 #define	    _fsp							RECOGNIZER->_fsp
 #define	    FAILEDFLAG						RECOGNIZER->failed
@@ -342,6 +343,7 @@ outputFile( LEXER,
 #define	    BACKTRACKING					RECOGNIZER->backtracking
 #define	    RECOVERFROMMISMATCHEDSET(s)		RECOGNIZER->recoverFromMismatchedSet(RECOGNIZER, s)
 #define	    RECOVERFROMMISMATCHEDELEMENT(e)	RECOGNIZER->recoverFromMismatchedElement(RECOGNIZER, s)
+#define     ADAPTOR                         ctx->adaptor
 <endif>
 
 <if(TREE_PARSER)>
@@ -375,28 +377,29 @@ outputFile( LEXER,
 #undef	    RECOVERFROMMISMATCHEDSET
 #undef	    RECOVERFROMMISMATCHEDELEMENT
 #undef	    BACKTRACKING
+#undef      ADAPTOR
 
 #define	    PARSER							ctx->pTreeParser  
 #define	    RECOGNIZER						PARSER->rec
 #define	    HAVEPARSEDRULE(r)				RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
-#define	    INPUT()							PARSER->ctnstream
-#define	    STRSTREAM						INPUT()->tnstream
+#define	    INPUT							PARSER->ctnstream
+#define	    STRSTREAM						INPUT->tnstream
 #define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
-#define	    EXCEPTION()						RECOGNIZER->exception
+#define	    EXCEPTION						RECOGNIZER->exception
 #define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
 #define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
-#define	    FOLLOWSTACK()					RECOGNIZER->following
-#define	    FOLLOWPUSH(x)					FOLLOWSTACK()->push(FOLLOWSTACK(), ((void *)(&(x))), NULL)
-#define	    FOLLOWPOP()						FOLLOWSTACK()->pop(FOLLOWSTACK())
+#define	    FOLLOWSTACK					    RECOGNIZER->following
+#define	    FOLLOWPUSH(x)					FOLLOWSTACK->push(FOLLOWSTACK, ((void *)(&(x))), NULL)
+#define	    FOLLOWPOP()						FOLLOWSTACK->pop(FOLLOWSTACK)
 #define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
 #define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
-#define	    LA(n)							INPUT()->tnstream->istream->_LA(INPUT()->tnstream->istream, n)
-#define	    LT(n)							INPUT()->tnstream->_LT(INPUT()->tnstream, n)
+#define	    LA(n)							INPUT->tnstream->istream->_LA(INPUT->tnstream->istream, n)
+#define	    LT(n)							INPUT->tnstream->_LT(INPUT->tnstream, n)
 #define	    CONSTRUCTEX()					RECOGNIZER->exConstruct(RECOGNIZER)
-#define	    CONSUME()						INPUT()->tnstream->istream->consume(INPUT()->tnstream->istream)
-#define	    MARK()							INPUT()->tnstream->istream->mark(INPUT()->tnstream->istream)
-#define	    REWIND(m)						INPUT()->tnstream->istream->rewind(INPUT()->tnstream->istream, m)
-#define	    REWINDLAST(m)					INPUT()->tnstream->istream->REWINDLAST(INPUT()->tnstream->istream)
+#define	    CONSUME()						INPUT->tnstream->istream->consume(INPUT->tnstream->istream)
+#define	    MARK()							INPUT->tnstream->istream->mark(INPUT->tnstream->istream)
+#define	    REWIND(m)						INPUT->tnstream->istream->rewind(INPUT->tnstream->istream, m)
+#define	    REWINDLAST(m)					INPUT->tnstream->istream->REWINDLAST(INPUT->tnstream->istream)
 #define	    PERRORRECOVERY					RECOGNIZER->errorRecovery
 #define	    _fsp							RECOGNIZER->_fsp
 #define	    FAILEDFLAG						RECOGNIZER->failed
@@ -404,6 +407,7 @@ outputFile( LEXER,
 #define	    BACKTRACKING					RECOGNIZER->backtracking
 #define	    RECOVERFROMMISMATCHEDSET(s)		RECOGNIZER->recoverFromMismatchedSet(RECOGNIZER, s)
 #define	    RECOVERFROMMISMATCHEDELEMENT(e)	RECOGNIZER->recoverFromMismatchedElement(RECOGNIZER, s)
+#define     ADAPTOR                         INPUT->adaptor
 <endif>
 
 
@@ -1350,7 +1354,7 @@ static <returnType()>
 catch(decl,action) ::= <<
 /* catch(decl,action)
  */
-if  (HASEXCEPTION() && EXCEPTION()->type == <e.decl> )
+if  (HASEXCEPTION() && EXCEPTION->type == <e.decl> )
 {
     <e.action>
 }
@@ -1402,9 +1406,10 @@ ruleLabelInitializations() ::= <<
     :ruleLabelInitVal(label=it); separator="\n"
 >
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<if(!TREE_PARSER)>
 <if(!ruleDescriptor.isSynPred)>
 retval.start = LT(1);<\n>
+<if(!TREE_PARSER)>
+retval.tree  = NULL;
 <endif>
 <endif>
 <endif>
@@ -1650,8 +1655,8 @@ earlyExitEx() ::= <<
 /* mismatchedSetEx()
  */
 CONSTRUCTEX();
-EXCEPTION()->type = ANTLR3_EARLY_EXIT_EXCEPTION;
-EXCEPTION()->name = ANTLR3_EARLY_EXIT_NAME;
+EXCEPTION->type = ANTLR3_EARLY_EXIT_EXCEPTION;
+EXCEPTION->name = ANTLR3_EARLY_EXIT_NAME;
 <\n>
 >>
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
@@ -1796,10 +1801,10 @@ else
 
 mismatchedSetEx() ::= <<
 CONSTRUCTEX();
-EXCEPTION()->type         = ANTLR3_MISMATCHED_SET_EXCEPTION;
-EXCEPTION()->name         = ANTLR3_MISMATCHED_SET_NAME;
+EXCEPTION->type         = ANTLR3_MISMATCHED_SET_EXCEPTION;
+EXCEPTION->name         = ANTLR3_MISMATCHED_SET_NAME;
 <if(PARSER)>
-EXCEPTION()->expectingSet = &FOLLOW_set_in_<ruleName><elementIndex>;
+EXCEPTION->expectingSet = &FOLLOW_set_in_<ruleName><elementIndex>;
 <endif>
 >>
 
@@ -1818,7 +1823,7 @@ MATCHS(<string>);
 <label>->setType(<label>, ANTLR3_TOKEN_INVALID);
 <label>->setStartIndex(<label>, <label>Start);
 <label>->setStopIndex(<label>, GETCHARINDEX()-1);
-<label>->input = INPUT()->tnstream->istream;
+<label>->input = INPUT->tnstream->istream;
 <else>
 MATCHS(<string>); 
 <checkRuleBacktrackFailure()><\n>
@@ -1888,7 +1893,7 @@ lexerRuleRef(rule,label,args,elementIndex) ::= <<
     <label>->setType(<label>, ANTLR3_TOKEN_INVALID);
     <label>->setStartIndex(<label>, <label>Start<elementIndex>);
     <label>->setStopIndex(<label>, GETCHARINDEX()-1);
-    <label>->input = INPUT();
+    <label>->input = INPUT;
 }
 <else>
 m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
@@ -1915,7 +1920,7 @@ lexerMatchEOF(label,elementIndex) ::= <<
     <label>->setType(<label>, ANTLR3_TOKEN_EOF);
     <label>->setStartIndex(<label>, <label>Start<elementIndex>);
     <label>->setStopIndex(<label>, GETCHARINDEX()-1);
-    <label>->input = INPUT()->tnstream->istream;
+    <label>->input = INPUT->tnstream->istream;
 }
 <else>
     MATCHC(ANTLR3_CHARSTREAM_EOF); 
@@ -1956,9 +1961,9 @@ if ( !(<evalPredicate(...)>) )
 
 newFPE() ::= <<
     CONSTRUCTEX();
-    EXCEPTION()->type         = ANTLR3_FAILED_PREDICATE_EXCEPTION;
-    EXCEPTION()->message      = "<description>";
-    EXCEPTION()->ruleName	 = "<ruleName>";
+    EXCEPTION->type         = ANTLR3_FAILED_PREDICATE_EXCEPTION;
+    EXCEPTION->message      = "<description>";
+    EXCEPTION->ruleName	 = "<ruleName>";
     <\n>
 >>
 
@@ -1986,10 +1991,10 @@ dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 
 newNVException() ::= <<
 CONSTRUCTEX();
-EXCEPTION()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
-EXCEPTION()->message      = "<description>";
-EXCEPTION()->decisionNum  = <decisionNumber>;
-EXCEPTION()->state        = <stateNumber>;
+EXCEPTION->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
+EXCEPTION->message      = "<description>";
+EXCEPTION->decisionNum  = <decisionNumber>;
+EXCEPTION->state        = <stateNumber>;
 <@noViableAltException()>
 <\n>
 >>
@@ -2104,7 +2109,7 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  *  The <name> attribute is inherited via the parser, lexer, ...
  */
 dfaDecision(decisionNumber,description) ::= <<
-alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, RECOGNIZER, INPUT()->istream, &cdfa<decisionNumber>);
+alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, RECOGNIZER, INPUT->istream, &cdfa<decisionNumber>);
 >>
 
 /* Dump DFA tables as static initialized arrays of shorts(16 bits)/characters(8 bits)
@@ -2181,10 +2186,10 @@ static ANTLR3_INT32 dfa<dfa.decisionNumber>_sst(p<name> ctx, pANTLR3_BASE_RECOGN
 <endif>
     
     CONSTRUCTEX();
-    EXCEPTION()->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
-    EXCEPTION()->message      = "<dfa.description>";
-    EXCEPTION()->decisionNum  = <dfa.decisionNumber>;
-    EXCEPTION()->state        = _s;
+    EXCEPTION->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
+    EXCEPTION->message      = "<dfa.description>";
+    EXCEPTION->decisionNum  = <dfa.decisionNumber>;
+    EXCEPTION->state        = _s;
     <@noViableAltException()>
     return -1;
 }
@@ -2634,6 +2639,8 @@ typedef struct <returnType(...)>_struct
      */
     pANTLR3_COMMON_TOKEN    start;
     pANTLR3_COMMON_TOKEN    stop;
+<else>
+    pANTLR3_BASE_TREE       start;
 <endif>
     <@ruleReturnMembers()>   
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
@@ -2730,7 +2737,7 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>.tree)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-STRSTREAM->toStringSS(STRSTREAM, STRSTREAM->getTokenStartIndex(<scope>.start), STRSTREAM->getTokenStopIndex(<scope>.start))
+STRSTREAM->toStringSS(STRSTREAM, <scope>.start, <scope>.start)
 <else>
 STRSTREAM->toStringTT(STRSTREAM, <scope>.start, <scope>.stop)
 <endif>
@@ -2754,7 +2761,7 @@ rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval).stop"
 rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval).tree"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-STRSTREAM->toStringSS(STRSTREAM, STRSTREAM->getTokenStartIndex(retval.start), STRSTREAM->getTokenStopIndex(retval.start))
+INPUT->toStringSS(INPUT, ADAPTOR->getTokenStartIndex(ADAPTOR, retval.start), ADAPTOR->getTokenStopIndex(ADAPTOR, retval.start))
 <else>
 STRSTREAM->toStringTT(STRSTREAM, retval.start, LT(-1))
 <endif>

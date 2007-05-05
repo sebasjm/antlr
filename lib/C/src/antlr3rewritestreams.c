@@ -58,6 +58,7 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
     stream->hasNext	    = hasNext;
     stream->size	    = size;
     stream->getDescription  = getDescription;
+    stream->free	    = freeRS;
 
     /* Install the description
      */
@@ -275,7 +276,7 @@ add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, pANTLR3_BASE_TREE el)
     }
     if (stream->singleElement == NULL)
     {
-	stream->singleElement = NULL;
+	stream->singleElement = el;
 	return;
     }
 

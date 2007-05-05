@@ -675,6 +675,17 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 	is	    = parser->tstream->istream;
 	theToken    = (pANTLR3_COMMON_TOKEN)(recognizer->exception->token);
 	fprintf(stderr, ", at offset %d", recognizer->exception->charPositionInLine);
+	if  (theToken != NULL)
+	{
+	    if (theToken->type == ANTLR3_TOKEN_EOF)
+	    {
+		fprintf(stderr, ", at <EOF>");
+	    }
+	    else
+	    {
+		fprintf(stderr, ", near %s", theToken->toString(theToken)->chars);
+	    }
+	}
 	break;
 
     case	ANTLR3_TYPE_TREE_PARSER:
@@ -703,17 +714,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 	break;
     }
 
-    if  (theToken != NULL)
-    {
-	if (theToken->type == ANTLR3_TOKEN_EOF)
-	{
-	    fprintf(stderr, ", at <EOF>");
-	}
-	else
-	{
-	    fprintf(stderr, ", near %s", theToken->toString(theToken)->chars);
-	}
-    }
+ 
     
     fprintf(stderr, "\n");
 

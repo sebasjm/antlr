@@ -25,7 +25,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-group CAST;
+group AST;
 
 /** Add an adaptor property that knows how to build trees */
 @headerFile.members() ::= <<
@@ -40,9 +40,7 @@ pANTLR3_VECTOR_FACTORY		vectors;
  */
 @genericParser.apifuncs() ::= <<
 <if(PARSER)>
-ctx->adaptor	= ANTLR3_TREE_ADAPTORNew(instream->tstream->tokenSource->strFactory);<\n>
-<else>
-ctx->adaptor	= instream->adaptor;<\n>
+ADAPTOR	= ANTLR3_TREE_ADAPTORNew(instream->tstream->tokenSource->strFactory);<\n>
 <endif>
 ctx->vectors	= antlr3VectorFactoryNew(64);
 >>
@@ -52,23 +50,13 @@ ctx->vectors->close(ctx->vectors);
 <if(PARSER)>
 /* We created the adaptor so we must free it
  */
-ctx->adaptor->free(ctx->adaptor);
-<else>
-/* Though we utilized the adaptor, we did not create it, therefore
- * we leave it to the creator to free it.
- */
+ADAPTOR->free(ADAPTOR);
 <endif>
 >>
 
 @returnScope.ruleReturnMembers() ::= <<
 /* @returnScope.ruleReturnMembers() */
 pANTLR3_BASE_TREE	tree;
-<if(TREE_PARSER)>
-/* Tree parser return tracks tree nodes
- */
-pANTLR3_BASE_TREE	start;
-pANTLR3_BASE_TREE	stop;
-<endif>
 /* End @returnScope.ruleReturnMembers() */
 >>
 
@@ -81,37 +69,28 @@ pANTLR3_BASE_TREE root_0;<\n>
 >>
 
 ruleInitializations() ::= <<
-/* ruleInitializations() */
 <super.ruleInitializations()>
 root_0 = NULL;<\n>
-<if(ruleDescriptor.hasMultipleReturnValues)>
-retval.start = LT(1);<\n>
-<endif>
-/* End ruleInitializations() */
 >>
 
 ruleLabelDefs() ::= <<
-/* ruleLabelDefs() */
 <super.ruleLabelDefs()>
 <ruleDescriptor.tokenLabels:{pANTLR3_BASE_TREE <it.label.text>_tree;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{pANTLR3_BASE_TREE <it.label.text>_tree;}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
     :{pANTLR3_REWRITE_RULE_TOKEN_STREAM stream_<it>;}; separator="\n">
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
-    :{pANTLR3_REWRITE_RULE_SUBTREE_STREAM stream;}; separator="\n">
-/* End: ruleLabelDefs() */
+    :{pANTLR3_REWRITE_RULE_SUBTREE_STREAM stream_<it>;}; separator="\n">
 >>
 
 ruleLabelInitializations() ::= <<
-/* ruleLabelInitializations() */
 <super.ruleLabelInitializations()>
 <ruleDescriptor.tokenLabels:{<it.label.text>_tree = NULL;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<it.label.text>_tree = NULL;}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
-    :{stream_<it>=antlr3RewriteRuleTokenStreamNew(adaptor,"token <it>");}; separator="\n">
+    :{stream_<it>=antlr3RewriteRuleTokenStreamNewAE(ADAPTOR,"token <it>");}; separator="\n">
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
-    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNew(adaptor,"rule <it>");}; separator="\n">
-/* End: ruleLabelInitializations() */
+    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAE(ADAPTOR,"rule <it>");}; separator="\n">
 >>
 /**  a rule label including default value */
 ruleLabelInitVal(label) ::= <<
@@ -119,7 +98,6 @@ ruleLabelInitVal(label) ::= <<
 <label.label.text>.tree = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n>
 >>
 ruleCleanUp() ::= <<
-/* AST: ruleCleanUp() */
 <super.ruleCleanUp()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(backtracking)>
@@ -128,8 +106,8 @@ if ( BACKTRACKING==0 ) {<\n>
 <if(!ruleDescriptor.isSynPred)>
 	retval.stop = LT(-1);<\n>
 <endif>
-	retval.tree = ctx->adaptor->rulePostProcessing(ctx->adaptor, root_0);
-	ctx->adaptor->setTokenBoundaries(ctx->adaptor, retval.tree, retval.start, retval.stop);
+	retval.tree = ADAPTOR->rulePostProcessing(ADAPTOR, root_0);
+	ADAPTOR->setTokenBoundaries(ADAPTOR, retval.tree, retval.start, retval.stop);
 <if(backtracking)>
 }
 <endif>
@@ -138,8 +116,6 @@ if ( BACKTRACKING==0 ) {<\n>
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
     :{stream_<it>->free(stream_<it>);}; separator="\n">
 <endif>
-
-/* End: ruleCleanUp() */
 >>
 
 /** When doing auto AST construction, we must define some variables;
@@ -148,35 +124,29 @@ if ( BACKTRACKING==0 ) {<\n>
  *  block.
  */
 @alt.declarations() ::= <<
-/* @alt.declarations() */
 <if(autoAST)>
 <if(outerAlt)>
 <endif>
 <endif>
-/* End: @alt.declarations() */
 >>
 
 @alt.initializations() ::= <<
-/* @alt.initializations() */
 <if(autoAST)>
 <if(outerAlt)>
-root_0 = ctx->adaptor->nil(ctx->adaptor);<\n>
+root_0 = ADAPTOR->nil(ADAPTOR);<\n>
 <endif>
 <endif>
-/* End: @alt.initializations() */
 >>
 
 // TOKEN AST STUFF
 
 /** ID and output=AST */
 tokenRef(token,label,elementIndex) ::= <<
-/* tokenRef(token,label,elementIndex) */
 <super.tokenRef(...)>
 <if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
-<label>_tree = ctx->adaptor->create(ctx->adaptor, <label>);
-ctx->adaptor->addChild(ctx->adaptor, root_0, <label>_tree);
+<label>_tree = ADAPTOR->create(ADAPTOR, <label>);
+ADAPTOR->addChild(ADAPTOR, root_0, <label>_tree);
 <if(backtracking)>}<endif>
-/* End: tokenRef(token,label,elementIndex) */
 >>
 
 /** ID! and output=AST (same as plain tokenRef) */
@@ -184,55 +154,43 @@ tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
 /** ID^ and output=AST */
 tokenRefRuleRoot(token,label,elementIndex) ::= <<
-/* tokenRefRuleRoot(token,label,elementIndex) */
 <super.tokenRef(...)>
 <if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
-<label>_tree = ctx->adaptor->create(ctx->adaptor, <label>);
-root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, <label>_tree, root_0);
+<label>_tree = ADAPTOR->create(ADAPTOR, <label>);
+root_0 = ADAPTOR->becomeRoot(ADAPTOR, <label>_tree, root_0);
 <if(backtracking)>}<endif>
-/* End: tokenRefRuleRoot(token,label,elementIndex) */
 >>
 
 /** ids+=ID! and output=AST */
 tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
-/* tokenRefBangAndListLabel(token,label,elementIndex) */
 <tokenRefBang(...)>
 <listLabel(elem=label,...)>
-/* End: tokenRefBangAndListLabel(token,label,elementIndex) */
 >>
 
 /** label+=TOKEN when output=AST but not rewrite alt */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
-/* tokenRefAndListLabel(token,label,elementIndex) */
 <tokenRef(...)>
 <listLabel(elem=label,...)>
-/* End: tokenRefAndListLabel(token,label,elementIndex) */
 >>
 
 /** Match label+=TOKEN^ when output=AST but not rewrite alt */
 tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
-/* tokenRefRuleRootAndListLabel(token,label,elementIndex) */
 <tokenRefRuleRoot(...)>
 <listLabel(elem=label,...)>
-/* End: tokenRefRuleRootAndListLabel(token,label,elementIndex) */
 >>
 
 /** ID but track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex) ::= <<
-/* tokenRefTrack(token,label,elementIndex) */
 <super.tokenRef(...)>
 <if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
-/* End: tokenRefTrack(token,label,elementIndex) */
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
  *  to the tracking list stream_ID for use in the rewrite.
  */
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
-/* tokenRefTrackAndListLabel(token,label,elementIndex) */
 <tokenRefTrack(...)>
 <listLabel(elem=label,...)>
-/* End: tokenRefTrackAndListLabel(token,label,elementIndex) */
 >>
 
 // SET AST
@@ -249,9 +207,7 @@ tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 // I have more time.
 
 matchSet(s,label,elementIndex,postmatchCode) ::= <<
-/* matchSet(s,label,elementIndex,postmatchCode) */
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( BACKTRACKING==0 ) <endif>ctx->adaptor->addChild(ctx->adaptor, root_0, ctx->adaptor->create(ctx->adaptor, <label>));})>
-/* End: matchSet(s,label,elementIndex,postmatchCode) */
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( BACKTRACKING==0 ) <endif>ADAPTOR->addChild(ADAPTOR, root_0, ADAPTOR->create(ADAPTOR, <label>));})>
 >>
 
 matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
@@ -260,19 +216,15 @@ matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
 // plain old blocks of alts: (A|B|...|C)
 
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
-/* matchSetRuleRoot(s,label,elementIndex,debug) */
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->create(ctx->adaptor, <label>), root_0);})>
-/* End: matchSetRuleRoot(s,label,elementIndex,debug) */
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = ADAPTOR->becomeRoot(ADAPTOR, ADAPTOR->create(ADAPTOR, <label>), root_0);})>
 >>
 
 // RULE REF AST
 
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args) ::= <<
-/* ruleRef(rule,label,elementIndex,args) */
 <super.ruleRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>ctx->adaptor->addChild(ctx->adaptor, root_0, <label>.tree);
-/* End: ruleRef(rule,label,elementIndex,args) */
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>ADAPTOR->addChild(ADAPTOR, root_0, <label>.tree);
 >>
 
 /** rule! is same as normal rule ref */
@@ -280,18 +232,14 @@ ruleRefBang(rule,label,elementIndex,args) ::= "<super.ruleRef(...)>"
 
 /** rule^ */
 ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
-/* ruleRefRuleRoot(rule,label,elementIndex,args) */
 <super.ruleRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, <label>.tree, root_0);
-/* End: ruleRefRuleRoot(rule,label,elementIndex,args) */
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = ADAPTOR->becomeRoot(ADAPTOR, <label>.tree, root_0);
 >>
 
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args) ::= <<
-/* ruleRefTrack(rule,label,elementIndex,args) */
 <super.ruleRef(...)>
 <if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule>->add(stream_<rule>, <label>.tree, NULL);
-/* End: ruleRefTrack(rule,label,elementIndex,args) */
 >>
 
 /* How to accumulate lists when we are doing rewrite tracking...
@@ -322,8 +270,6 @@ list_<label>->add(list_<label>, <label>.tree, NULL);
  * presume that the user will know to do this using their own factories for the structures they allocate.
  */
 listLabelAST(label) ::= <<
-/* listLabelAST(label)
- */
 if (list_<label> == NULL)
 {
     list_<label>=ctx->vectors->newVector(ctx->vectors);
@@ -338,58 +284,46 @@ if (list_<label> == NULL)
 >>
 /** x+=rule when output=AST and tracking for rewrite */
 ruleRefTrackAndListLabel(rule,label,elementIndex,args) ::= <<
-/* ruleRefTrackAndListLabel(rule,label,elementIndex,args) */
 <ruleRefTrack(...)>
 <listLabelTrack(...)>
-/** End: ruleRefTrackAndListLabel(rule,label,elementIndex,args) */
 >>
 
 /** x+=rule when output=AST */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
-/* ruleRefAndListLabel(rule,label,elementIndex,args) */
 <ruleRef(...)>
 <listLabelAST(...)>
-/* End: ruleRefAndListLabel(rule,label,elementIndex,args) */
 >>
 
 /** x+=rule! when output=AST is a rule ref with list addition */
 ruleRefBangAndListLabel(rule,label,elementIndex,args) ::= <<
-/* ruleRefBangAndListLabel(rule,label,elementIndex,args) */
 <ruleRefBang(...)>
 <listLabelAST(...)>
-/* End: ruleRefBangAndListLabel(rule,label,elementIndex,args) */
 >>
 
 /** x+=rule^ */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
-/* ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) */
 <ruleRefRuleRoot(...)>
 <listLabelAST(...)>
-/* End: ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) */
 >>
 
 // WILDCARD AST
 
 wildcard(label,elementIndex) ::= <<
-/* wildcard(label,elementIndex) */
 <super.wildcard(...)>
 <if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
-<label>_tree = ctx->adaptor->create(ctx->adaptor, <label>);
-ctx->adaptor->addChild(ctx->adaptor, root_0, <label>_tree);
+<label>_tree = ADAPTOR->create(ADAPTOR, <label>);
+ADAPTOR->addChild(ADAPTOR, root_0, <label>_tree);
 <if(backtracking)>}<endif>
-/* End: wildcard(label,elementIndex) */
 >>
 
 wildcardBang(label,elementIndex) ::= "<super.wildcard(...)>"
 
 wildcardRuleRoot(label,elementIndex) ::= <<
-/* wildcardRuleRoot(label,elementIndex) */
 <super.wildcard(...)>
 <if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
-<label>_tree = ctx->adaptor->create(ctx->adaptor, <label>);
-root_0 = ctx->adaptor->becomeRoot(ctx->adaptor, <label>_tree, root_0);
+<label>_tree = ADAPTOR->create(ADAPTOR, <label>);
+root_0 = ADAPTOR->becomeRoot(ADAPTOR, <label>_tree, root_0);
 <if(backtracking)>}<endif>
-/* End: wildcardRuleRoot(label,elementIndex) */
 >>
 
 // there's got to be a better way
@@ -420,9 +354,9 @@ rewriteCode(
 if ( BACKTRACKING==0 ) <\n>
 <endif>
 {
-	root_0			    = ctx->adaptor->nil(ctx->adaptor);
 	<rewriteCodeLabelsDecl()>
 	<rewriteCodeLabelsInit()>
+	root_0			    = ADAPTOR->nil(ADAPTOR);
 	<prevRuleRootRef()>.tree    = root_0;
 	<alts:rewriteAlt(); separator="else ">
 	<rewriteCodeLabelsFree()>
@@ -451,19 +385,19 @@ rewriteCodeLabelsDecl() ::= <<
 
 rewriteCodeLabelsInit() ::= <<
 <referencedTokenLabels
-    :{stream_<it>=antlr3RewriteRuleTokenStreamNew(adaptor,"token <it>", <it>);};
+    :{stream_<it>=antlr3RewriteRuleTokenStreamNewAEE(ADAPTOR, "token <it>", <it>);};
     separator="\n"
 >
 <referencedTokenListLabels
-    :{stream_<it>=antlr3RewriteRuleTokenStreamNew(adaptor,"token <it>", list_<it>);};
+    :{stream_<it>=antlr3RewriteRuleTokenStreamNewAEV(ADAPTOR, "token <it>", list_<it>);};
     separator="\n"
 >
 <referencedRuleLabels 
-    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNew(adaptor,"token <it>", <it> != NULL ? <it>.tree : NULL);};
+    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEV(ADAPTOR, "token <it>", <it>.tree != NULL ? <it>.tree : NULL);};
     separator="\n"
 >
 <referencedRuleListLabels
-    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNew(adaptor,"token <it>", list_<it>);};
+    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEV(ADAPTOR, "token <it>", list_<it>);};
     separator="\n"
 >
 >>
@@ -525,8 +459,8 @@ rewriteClosureBlock(
 RewriteEarlyExitException() ::=
 <<
 CONSTRUCTEX();
-EXCEPTION()->type         = ANTLR3_REWRITE_EARLY_EXCEPTION;
-EXCEPTION()->name         = ANTLR3_REWRITE_EARLY_EXCEPTION_NAME;
+EXCEPTION->type         = ANTLR3_REWRITE_EARLY_EXCEPTION;
+EXCEPTION->name         = ANTLR3_REWRITE_EARLY_EXCEPTION_NAME;
 >>
 rewritePositiveClosureBlock(
 	alt,
@@ -566,13 +500,12 @@ if (<a.pred>)
 rewriteEmptyAlt() ::= "root_0 = NULL; /* \<-- rewriteEmptyAlt()) */"
 
 rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
-/* rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) */
 // <fileName>:<description>
 {
-    pANTLR3_BASE_TREE root_<treeLevel> = ctx->adaptor->nil(ctx->adaptor);
+    pANTLR3_BASE_TREE root_<treeLevel> = ADAPTOR->nil(ADAPTOR);
     <root:rewriteElement()>
     <children:rewriteElement()>
-    ctx->adaptor->addChild(ctx->adaptor, root_<enclosingTreeLevel>, root_<treeLevel>);
+    ADAPTOR->addChild(ADAPTOR, root_<enclosingTreeLevel>, root_<treeLevel>);
 }<\n>
 >>
 
@@ -585,35 +518,39 @@ rewriteElement(e) ::= <<
 
 /** Gen ID */
 rewriteTokenRef(token,elementIndex,args) ::= <<
-ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, <if(args)>ctx->adaptor->createToken(ctx->adaptor, <args; separator=", ">)<else>stream_<token>->next(stream_<token>)<endif>);<\n>
+<if(args)>
+ADAPTOR->addChildToken(ADAPTOR, root_<treeLevel>, ADAPTOR->createToken(ADAPTOR, <args; separator=", ">));<\n>
+<else>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<token>->next(stream_<token>));<\n>
+<endif>
 >>
 
 /** Gen $label ... where defined via label=ID */
 rewriteTokenLabelRef(label,elementIndex) ::= <<
-ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, stream_<label>->next(stream_<label>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->next(stream_<label>));<\n>
 >>
 
 /** Gen $label ... where defined via label+=ID */
 rewriteTokenListLabelRef(label,elementIndex) ::= <<
-ctx->adaptor->addChildToken(ctx->adaptor, root_<treeLevel>, stream_<label>->next(stream_<label>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->next(stream_<label>));<\n>
 >>
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, stream_<label>->next(stream_<label>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, stream_<label>->next(stream_<label>), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^(ID ...) */
 rewriteTokenRefRoot(token,elementIndex) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRootToken(ctx->adaptor, stream_<token>->next(stream_<token>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, stream_<token>->next(stream_<token>), root_<treeLevel>);<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, ctx->adaptor->createTypeText(ctx->adaptor, <token>, (pANTLR3_UINT8)<args><if(!args)>"<token>"<endif>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, ADAPTOR->createTypeText(ADAPTOR, <token>, (pANTLR3_UINT8)<args><if(!args)>"<token>"<endif>));<\n>
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, ctx->adaptor->createTypeText(ctx->adaptor, <token>, (pANTLR3_UINT8)<args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, ADAPTOR->createTypeText(ADAPTOR, <token>, (pANTLR3_UINT8)<args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
 >>
 
 /** plain -> {foo} action */
@@ -629,37 +566,37 @@ root_0 = <action>;<\n>
 prevRuleRootRef() ::= "retval"
 
 rewriteRuleRef(rule,dup) ::= <<
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, stream_<rule>->next(stream_<rule>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<rule>->next(stream_<rule>));<\n>
 >>
 
 rewriteRuleRefRoot(rule,dup) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, stream_<rule>->next(stream_<rule>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<rule>->next(stream_<rule>), root_<treeLevel>);<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, <action>);<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, <action>);<\n>
 >>
 
 rewriteNodeActionRoot(action) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, <action>, root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, <action>, root_<treeLevel>);<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel=rule */
 rewriteRuleLabelRef(label) ::= <<
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, stream_<label>->next(stream_<label>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->next(stream_<label>));<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-ctx->adaptor->addChild(ctx->adaptor, root_<treeLevel>, (pANTLR3_BASE_TREE)(stream_<label>->next(stream_<label>)));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, (pANTLR3_BASE_TREE)(stream_<label>->next(stream_<label>)));<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
 rewriteRuleLabelRefRoot(label) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRoot(ctx->adaptor, stream_<label>->nextNode(stream_<label>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<label>->nextNode(stream_<label>), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = ctx->adaptor->becomeRoot((pANTLR3_BASE_TREE)(stream_<label>->nextNode(stream_<label>)), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot((pANTLR3_BASE_TREE)(stream_<label>->nextNode(stream_<label>)), root_<treeLevel>);<\n>
 >>
