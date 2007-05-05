@@ -1929,8 +1929,9 @@ lexerMatchEOF(label,elementIndex) ::= <<
 >>
 
 /** match ^(root children) in tree parser */
-tree(root, children, nullableChildList) ::= <<
+tree(root, actionsAfterRoot, children, nullableChildList) ::= <<
 <root:element()>
+<actionsAfterRoot:element()>
 <if(nullableChildList)>
 if ( LA(1)==ANTLR3_TOKEN_DOWN ) {
     MATCHT(ANTLR3_TOKEN_DOWN, NULL); 
