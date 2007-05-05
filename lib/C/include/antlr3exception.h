@@ -56,6 +56,8 @@
 #define	ANTLR3_MISMATCHED_TREE_NODE_EXCEPTION	7
 #define	ANTLR3_MISMATCHED_TREE_NODE_NAME    "Mismatched tree node!"
 
+#define	ANTLR3_REWRITE_EARLY_EXCEPTION	7
+#define	ANTLR3_REWRITE_EARLY_EXCEPTION_NAME    "Mismatched tree node!"
 
 /** Base structure for an ANTLR3 exception tracker
  */

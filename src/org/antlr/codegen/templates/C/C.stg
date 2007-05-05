@@ -1408,9 +1408,7 @@ ruleLabelInitializations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!ruleDescriptor.isSynPred)>
 retval.start = LT(1);<\n>
-<if(!TREE_PARSER)>
-retval.tree  = NULL;
-<endif>
+
 <endif>
 <endif>
 >>
