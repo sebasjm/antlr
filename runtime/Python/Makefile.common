@@ -2,8 +2,10 @@
 
 PYTHON?=python2.5
 
-LIB=$(BASE)/..
+LIB=$(BASE)/../../lib
 SRC=$(BASE)/../../src
+RUNTIME=$(BASE)/../Java/src
+BUILD=$(BASE)/build
 CLASSPATH=$(LIB)/antlr-2.7.7.jar:$(LIB)/junit-4.2.jar:$(LIB)/stringtemplate-3.0.jar
 
 ANTLR3VER=3.0b7
@@ -11,34 +13,8 @@ ANTLR3VER=3.0b7
 JAVAC=javac -classpath $(CLASSPATH)
 JAVA=java
 
-ANTLR=$(JAVA) -classpath $(CLASSPATH):$(SRC) org.antlr.Tool
+ANTLR=$(JAVA) -classpath $(CLASSPATH):$(BUILD) org.antlr.Tool
 ANTLR2=$(JAVA) -classpath $(LIB)/antlr-2.7.7.jar antlr.Tool
-
-
-$(SRC)/org/antlr/tool/ANTLRParser.java: $(SRC)/org/antlr/tool/antlr.g
-	cd $(dir $<); $(ANTLR2) $<
-
-$(SRC)/org/antlr/tool/AssignTokenTypesWalkerTokenTypes.java: $(SRC)/org/antlr/tool/assign.types.g
-	cd $(dir $<); $(ANTLR2) $<
-
-$(SRC)/org/antlr/tool/DefineGrammarItemsWalker.java: $(SRC)/org/antlr/tool/define.g
-	cd $(dir $<); $(ANTLR2) $<
-
-$(SRC)/org/antlr/tool/TreeToNFAConverter.java: $(SRC)/org/antlr/tool/buildnfa.g
-	cd $(dir $<); $(ANTLR2) $<
-
-$(SRC)/org/antlr/tool/ANTLRTreePrinter.java: $(SRC)/org/antlr/tool/antlr.print.g
-	cd $(dir $<); $(ANTLR2) $<
-
-$(SRC)/org/antlr/codegen/CodeGenTreeWalker.java: $(SRC)/org/antlr/codegen/ANTLRTokenTypes.txt
-
-$(SRC)/org/antlr/codegen/ANTLRTokenTypes.txt: $(SRC)/org/antlr/tool/ANTLRParser.java
-
-$(SRC)/org/antlr/codegen/CodeGenTreeWalker.java: $(SRC)/org/antlr/codegen/codegen.g 
-
-	cd $(dir $<); $(ANTLR2) $<
-
-
 
 .PHONY:
 generate:
@@ -52,8 +28,8 @@ generate:
 
 .PHONY: build
 build:
-	cd $(SRC); $(JAVAC) -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
-	touch $(SRC)/build-stamp
+	$(JAVAC) -d $(BUILD) $(SRC)/org/antlr/Tool.java $(SRC)/org/antlr/*/*.java $(RUNTIME)/org/antlr/*/*.java $(RUNTIME)/org/antlr/*/*/*.java
+
 
 .PHONY: rebuild
 rebuild: generate build
