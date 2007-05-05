@@ -23,6 +23,7 @@ LIBSOURCES		=	src/antlr3baserecognizer.c			\
 					src/antlr3stringstream.c			\
 					src/antlr3tokenstream.c				\
 					src/antlr3treeparser.c				\
+					src/antlr3rewritestreams.c			\
 					src/antlr3ucs2inputstream.c
 
 libantlr3c_la_SOURCES = $(LIBSOURCES)
@@ -54,6 +55,7 @@ include_HEADERS =	include/antlr3.h						\
 					include/antlr3stringstream.h			\
 					include/antlr3tokenstream.h				\
 					include/antlr3treeparser.h				\
+					include/antlr3rewritestreams.h			\
 					antlr3config.h
 
 libantlr3c_la_LDFLAGS = -avoid-version
