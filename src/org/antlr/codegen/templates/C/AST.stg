@@ -542,7 +542,7 @@ root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, stream_<label>->next(stream
 
 /** Gen ^(ID ...) or ^(ID[args] ...) */
 rewriteTokenRefRoot(token,elementIndex,args) ::= <<
-if(<args>)
+<if(args)>
 root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, ADAPTOR->createToken(ADAPTOR, <args; separator=", ">), root_<treeLevel>);<\n>
 <else>
 root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<token>->next(stream_<token>), root_<treeLevel>);<\n>
