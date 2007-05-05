@@ -9,11 +9,11 @@
 /* Static support function forward declarations for the stream types.
  */
 static    void			reset		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream); 
-static    void			add		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
+static	  void			add		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDECL *freePtr)(void *));
 static    void *		next		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static    void *		_next		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-static	  pANTLR3_BASE_TREE	dupTok		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
-static	  pANTLR3_BASE_TREE	dupTree		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
+static	  void *		dupTok		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
+static	  void *		dupTree		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
 static	  pANTLR3_BASE_TREE	toTreeTree	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element);
 static	  pANTLR3_BASE_TREE	toTreeToken	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element);
 static    ANTLR3_BOOLEAN	hasNext		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
@@ -87,7 +87,7 @@ antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 
     /* Stream seems good so we need to add the supplied element
      */
-    stream->add(stream, oneElement);
+    stream->add(stream, oneElement, NULL);
     return stream;
 }
 
@@ -259,7 +259,7 @@ reset    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 /* Add a new pANTLR3_BASE_TREE to this stream
  */
 static void		
-add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, pANTLR3_BASE_TREE el)
+add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDECL *freePtr)(void *))
 {
     if (el== NULL)
     {
@@ -271,7 +271,7 @@ add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, pANTLR3_BASE_TREE el)
 	 * entries in the stream. So we can just add this new element to the existing
 	 * collection. 
 	 */
-	stream->elements->add(stream->elements, el, NULL);
+	stream->elements->add(stream->elements, el, freePtr);
 	return;
     }
     if (stream->singleElement == NULL)
@@ -371,7 +371,7 @@ _next    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
  * subtree.  Dup'ing a token means just creating another AST node
  * around it.  For trees, you must call the adaptor.dupTree().
  */
-static pANTLR3_BASE_TREE	
+static void *	
 dupTok	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el)
 {
     return stream->adaptor->create(stream->adaptor, (pANTLR3_COMMON_TOKEN)el);
@@ -381,7 +381,7 @@ dupTok	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el)
  * subtree.  Dup'ing a token means just creating another AST node
  * around it.  For trees, you must call the adaptor.dupTree().
  */
-static pANTLR3_BASE_TREE	
+static void *	
 dupTree	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
 {
     return stream->adaptor->dupNode(stream->adaptor, (pANTLR3_BASE_TREE)element);

@@ -307,7 +307,7 @@ typedef struct ANTLR3_INT_TRIE_struct
     void		    (*free)	(struct ANTLR3_INT_TRIE_struct * trie);
 
 }
-    ANTLR3_INT_TRIE, * pANTLR3_INT_TRIE;
+    ANTLR3_INT_TRIE;
 
 #endif
 

@@ -65,7 +65,7 @@ typedef struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct
 
     /** Add a new pANTLR3_BASE_TREE to this stream
      */
-    void		(*add)	    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream, void *el);
+    void		(*add)	    (struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct * stream, void *el, void (ANTLR3_CDECL *freePtr)(void *));
 
     /** Return the next element in the stream.  If out of elements, throw
      *  an exception unless size()==1.  If size is 1, then return elements[0].
