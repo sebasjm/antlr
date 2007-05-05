@@ -26,12 +26,59 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import warnings
 from copy import deepcopy
 
-from antlr3.constants import INVALID_TOKEN_TYPE, UP, DOWN, EOF
+from antlr3.constants import UP, DOWN, EOF
 from antlr3.recognizers import BaseRecognizer
 #from antlr3.streams import IntStream
-from antlr3.tokens import CommonToken, Token
+from antlr3.tokens import CommonToken, Token, INVALID_TOKEN
+
+############################################################################
+#
+# tree related exceptions
+#
+############################################################################
+
+
+class RewriteCardinalityException(RuntimeError):
+    """Base class for all exceptions thrown during AST rewrite construction.
+
+    This signifies a case where the cardinality of two or more elements
+    in a subrule are different: (ID INT)+ where |ID|!=|INT|
+    """
+
+    def __init__(self, elementDescription):
+        RuntimeError.__init__(self, elementDescription)
+
+        self.elementDescription = elementDescription
+
+
+    def getMessage(self):
+        return self.elementDescription
+
+
+class RewriteEarlyExitException(RewriteCardinalityException):
+    """No elements within a (...)+ in a rewrite rule"""
+
+    def __init__(self, elementDescription=None):
+        RewriteCardinalityException.__init__(self, elementDescription)
+
+
+class RewriteEmptyStreamException(RewriteCardinalityException):
+    """
+    Ref to ID or expr but no tokens in ID stream or subtrees in expr stream
+    """
+
+    pass
+
+
+############################################################################
+#
+# basic Tree and TreeAdaptor interfaces
+#
+############################################################################
+
 
 # What does a tree look like?  ANTLR has a number of support classes
 # such as CommonTreeNodeStream that work on these kinds of trees.  You
@@ -47,44 +94,361 @@ from antlr3.tokens import CommonToken, Token
 class Tree(object):
     """Base tree interface."""
     def getChild(self, i):
-        pass
+        raise NotImplementedError
+    
 
     def getChildCount(self):
-        pass
+        raise NotImplementedError
+    
 
     def addChild(self, t):
         """Add t as a child to this node.  If t is null, do nothing.  If t
         is nil, add all children of t to this' children.
         @param t
         """
-        pass
+
+        raise NotImplementedError
+    
 
     def isNil(self):
         """Indicates the node is a nil node but may still have children, meaning
         the tree is a flat list.
         """
-        pass
+
+        raise NotImplementedError
+    
 
     def dupTree(self):
-        pass
+        raise NotImplementedError
+    
 
     def dupNode(self):
-        pass
+        raise NotImplementedError
+    
 
     def getType(self):
         """Return a token type; needed for tree parsing."""
-        pass
+
+        raise NotImplementedError
+    
 
     def getText(self):
-        pass
+        raise NotImplementedError
+    
 
     def getLine(self):
         """In case we don't have a token payload, what is the line for errors?"""
-        pass
+
+        raise NotImplementedError
+    
 
     def getCharPositionInLine(self):
-        pass
+        raise NotImplementedError
 
+
+class TreeAdaptor(object):
+    """
+    How to create and navigate trees.  Rather than have a separate factory
+    and adaptor, I've merged them.  Makes sense to encapsulate.
+
+    This takes the place of the tree construction code generated in the
+    generated code in 2.x and the ASTFactory.
+
+    I do not need to know the type of a tree at all so they are all
+    generic Objects.  This may increase the amount of typecasting needed. :(
+    """
+    
+    ## C o n s t r u c t i o n
+
+    def createWithPayload(self, payload):
+        """
+        Create a tree node from Token object; for CommonTree type trees,
+        then the token just becomes the payload.  This is the most
+        common create call.
+        """
+
+        raise NotImplementedError
+    
+
+    def dupTree(self, tree):
+        """Duplicate tree recursively, using dupNode() for each node"""
+
+        raise NotImplementedError
+
+
+    def dupNode(self, treeNode):
+        """Duplicate a single tree node"""
+
+        raise NotImplementedError
+
+
+    def nil(self):
+        """
+        Return a nil node (an empty but non-null node) that can hold
+        a list of element as the children.  If you want a flat tree (a list)
+        use "t=adaptor.nil(); t.addChild(x); t.addChild(y);"
+	"""
+
+        raise NotImplementedError
+
+
+    def isNil(self, tree):
+        """Is tree considered a nil node used to make lists of child nodes?"""
+
+        raise NotImplementedError
+
+
+    def addChild(self, t, child):
+        """
+        Add a child to the tree t.  If child is a flat tree (a list), make all
+        in list children of t.  Warning: if t has no children, but child does
+        and child isNil then you can decide it is ok to move children to t via
+        t.children = child.children; i.e., without copying the array.  Just
+        make sure that this is consistent with have the user will build
+        ASTs.
+	"""
+
+        raise NotImplementedError
+
+
+    def becomeRoot(self, newRoot, oldRoot):
+        """
+        If oldRoot is a nil root, just copy or move the children to newRoot.
+        If not a nil root, make oldRoot a child of newRoot.
+	
+	   old=^(nil a b c), new=r yields ^(r a b c)
+	   old=^(a b c), new=r yields ^(r ^(a b c))
+
+        If newRoot is a nil-rooted single child tree, use the single
+        child as the new root node.
+
+           old=^(nil a b c), new=^(nil r) yields ^(r a b c)
+	   old=^(a b c), new=^(nil r) yields ^(r ^(a b c))
+
+        If oldRoot was null, it's ok, just return newRoot (even if isNil).
+
+           old=null, new=r yields r
+	   old=null, new=^(nil r) yields ^(nil r)
+
+        Return newRoot.  Throw an exception if newRoot is not a
+        simple node or nil root with a single child node--it must be a root
+        node.  If newRoot is ^(nil x) return x as newRoot.
+
+        Be advised that it's ok for newRoot to point at oldRoot's
+        children; i.e., you don't have to copy the list.  We are
+        constructing these nodes so we should have this control for
+        efficiency.
+        """
+
+        raise NotImplementedError
+
+
+    def rulePostProcessing(self, root):
+        """
+        Given the root of the subtree created for this rule, post process
+        it to do any simplifications or whatever you want.  A required
+        behavior is to convert ^(nil singleSubtree) to singleSubtree
+        as the setting of start/stop indexes relies on a single non-nil root
+        for non-flat trees.
+
+        Flat trees such as for lists like "idlist : ID+ ;" are left alone
+        unless there is only one ID.  For a list, the start/stop indexes
+        are set in the nil node.
+
+        This method is executed after all rule tree construction and right
+        before setTokenBoundaries().
+        """
+
+        raise NotImplementedError
+
+
+    def getUniqueID(self, node):
+        """For identifying trees.
+
+        How to identify nodes so we can say "add node to a prior node"?
+        Even becomeRoot is an issue.  Use System.identityHashCode(node)
+        usually.
+        """
+
+        raise NotImplementedError
+
+
+    # R e w r i t e  R u l e s
+
+    def becomeRoot(self, newRoot, oldRoot):
+        """Create a node for newRoot make it the root of oldRoot.
+
+        If oldRoot is a nil root, just copy or move the children to newRoot.
+        If not a nil root, make oldRoot a child of newRoot.
+
+        Return node created for newRoot.
+
+        Be advised: when debugging ASTs, the DebugTreeAdaptor manually
+        calls create(Token child) and then plain becomeRoot(node, node)
+        because it needs to trap calls to create, but it can't since
+        it delegates to not inherits from the TreeAdaptor.
+        """
+
+        raise NotImplementedError
+
+
+    def createFromToken(self, tokenType, fromToken, text=None):
+        """
+        Create a new node derived from a token, with a new token type and
+        (optionally) new text.
+
+        This is invoked from an imaginary node ref on right side of a
+        rewrite rule as IMAG[$tokenLabel] or IMAG[$tokenLabel "IMAG"].
+
+        This should invoke createToken(Token).
+        """
+
+        raise NotImplementedError
+
+
+    def createFromType(self, tokenType, text):
+        """Create a new node derived from a token, with a new token type.
+
+        This is invoked from an imaginary node ref on right side of a
+        rewrite rule as IMAG["IMAG"].
+
+        This should invoke createToken(int,String).
+	"""
+
+        raise NotImplementedError
+
+
+    # C o n t e n t
+
+    def getType(self, t):
+        """For tree parsing, I need to know the token type of a node"""
+
+        raise NotImplementedError
+
+
+    def setType(self, t, type):
+        """Node constructors can set the type of a node"""
+
+        raise NotImplementedError
+
+
+    def getText(self, t):
+        raise NotImplementedError
+
+    def setText(self, t, text):
+        """Node constructors can set the text of a node"""
+
+        raise NotImplementedError
+
+
+    def getToken(self, t):
+        """Return the token object from which this node was created.
+
+        Currently used only for printing an error message.
+        The error display routine in BaseRecognizer needs to
+        display where the input the error occurred. If your
+        tree of limitation does not store information that can
+        lead you to the token, you can create a token filled with
+        the appropriate information and pass that back.  See
+        BaseRecognizer.getErrorMessage().
+	"""
+
+        raise NotImplementedError
+
+
+    def setTokenBoundaries(self, t, startToken, stopToken):
+        """
+        Where are the bounds in the input token stream for this node and
+        all children?  Each rule that creates AST nodes will call this
+        method right before returning.  Flat trees (i.e., lists) will
+        still usually have a nil root node just to hold the children list.
+        That node would contain the start/stop indexes then.
+	"""
+
+        raise NotImplementedError
+
+
+    def getTokenStartIndex(self, t):
+        """
+        Get the token start index for this subtree; return -1 if no such index
+        """
+
+        raise NotImplementedError
+
+        
+    def getTokenStopIndex(self, t):
+        """
+        Get the token stop index for this subtree; return -1 if no such index
+        """
+
+        raise NotImplementedError
+        
+
+    # N a v i g a t i o n  /  T r e e  P a r s i n g
+
+    def getChild(self, t, i):
+        """Get a child 0..n-1 node"""
+
+        raise NotImplementedError
+
+
+    def getChildCount(self, t):
+        """How many children?  If 0, then this is a leaf node"""
+
+        raise NotImplementedError
+
+
+    ## Misc
+
+    def create(self, *args):
+        """
+        Deprecated, use createWithPayload, createFromToken or createFromType.
+
+        This method only exists to mimic the Java interface of TreeAdaptor.
+        
+        """
+
+        if len(args) == 1 and isinstance(args[0], Token):
+            # Object create(Token payload);
+            warnings.warn(
+                "Using create() is deprecated, use createWithPayload()",
+                DeprecationWarning,
+                stacklevel=2
+                )
+            return self.createWithPayload(args[0])
+
+        if len(args) == 2 and isinstance(args[0], (int, long)) and isinstance(args[1], Token):
+            # Object create(int tokenType, Token fromToken);
+            warnings.warn(
+                "Using create() is deprecated, use createFromToken()",
+                DeprecationWarning,
+                stacklevel=2
+                )
+            return self.createFromToken(args[0], args[1])
+
+        if len(args) == 3 and isinstance(args[0], (int, long)) and isinstance(args[1], Token) and isinstance(args[2], basestring):
+            # Object create(int tokenType, Token fromToken, String text);
+            warnings.warn(
+                "Using create() is deprecated, use createFromToken()",
+                DeprecationWarning,
+                stacklevel=2
+                )
+            return self.createFromToken(args[0], args[1], args[2])
+
+        if len(args) == 2 and isinstance(args[0], (int, long)) and isinstance(args[1], basestring):
+            # Object create(int tokenType, String text);
+            warnings.warn(
+                "Using create() is deprecated, use createFromType()",
+                DeprecationWarning,
+                stacklevel=2
+                )
+            return self.createFromType(args[0], args[1])
+
+        raise TypeError(
+            "No create method with this signature found: %s"
+            % (', '.join(type(v).__name__ for v in args))
+            )
+    
 
 # A generic tree implementation with no payload.  You must subclass to
 # actually have any user data.  ANTLR v3 uses a list of children approach
@@ -165,57 +529,6 @@ class BaseTree(Tree):
     def getCharPositionInLine(self):
         return 0
 
-class TreeAdaptor(object):
-    def create(self, payload, text=None):
-        pass
-
-    def dupTree(self, tree):
-        pass
-
-    def dupNode(self, treeNode):
-        pass 
-
-    def nil(self):
-        pass
-
-    def rulePostProcessing(self, root):
-        pass 
-
-    def getUniqueID(self, node):
-        pass 
-
-    def addChild(self, t, child):
-        pass
-
-    def becomeRoot(self, newRoot, oldRoot):
-        pass
-
-    def getType(self, t):
-        pass
-
-    def setType(self, t, tokenType):
-        pass
-
-    def getText(self, t):
-        pass
-
-    def setText(self, t, text):
-        pass
-
-    def setTokenBoundaries(self, t, startToken, stopToken):
-        pass
-
-    def getTokenStartIndex(self, t):
-        pass
-
-    def getTokenStopIndex(self, t):
-        pass
-
-    def getChild(self, t, i):
-        pass
-
-    def getChildCount(self, t):
-        pass
 
 
 class BaseTreeAdaptor(TreeAdaptor):
@@ -246,7 +559,7 @@ class BaseTreeAdaptor(TreeAdaptor):
     # efficiency.
     def becomeRoot(self, newRoot, oldRoot):
         if not isinstance(newRoot, CommonTree):
-            newRoot = self.create(newRoot)
+            newRoot = self.createWithPayload(newRoot)
 
         # handle ^(nil real-node)
         if newRoot.isNil():
@@ -264,27 +577,35 @@ class BaseTreeAdaptor(TreeAdaptor):
 
     # Transform ^(nil x) to x #
     def rulePostProcessing(self, r):
+        #print ">" + repr(r)
         if r.isNil() and r.getChildCount() == 1:
             r = r.getChild(0)
 
+        #print "<" + str(r)
         return r
 
     def addChild(self, tree, child):
         if isinstance(child, Token):
-            child = self.create(child)
+            child = self.createWithPayload(child)
 
         return tree.addChild(child)
 
-    def create(self, payload, text=None):
-        node = CommonTree(payload)
-
+    def createFromToken(self, tokenType, fromToken, text=None):
+        fromToken = self.createToken(fromToken)
+        fromToken.type = tokenType
         if text is not None:
-            node.text = text
+            fromToken.text = text
+        t = self.createWithPayload(fromToken)
+        return t
 
-        return node
+
+    def createFromType(self, tokenType, text):
+        fromToken = self.createToken(tokenType=tokenType, text=text)
+        t = self.createWithPayload(fromToken)
+        return t
 
     def nil(self):
-        return self.create(None)
+        return self.createWithPayload(None)
 
 
 import traceback
@@ -295,10 +616,23 @@ class CommonTree(BaseTree):
     # and below?
     def __init__(self, token=None):
         BaseTree.__init__(self)
-        self.token = token
+
+        if isinstance(token, CommonTree):
+            self.token = token.token
+        else:
+            self.token = token
+
+        assert self.token is None or 'text' in dir(self.token), self.token
+        #assert hasattr(self.token, 'text'), (repr(self.token), repr(token))
+        
         self.startIndex = -1
         self.stopIndex = -1
+
         
+    def dupNode(self):
+        return CommonTree(self)
+
+
     def getToken(self):
         return self.token
 
@@ -374,18 +708,10 @@ class CommonTreeAdaptor(BaseTreeAdaptor):
         return treeNode.dupNode()
 
     def createToken(self, fromToken=None, tokenType=None, text=None):
-        if fromToken is None and tokenType is not None and text is not None:
-            fromToken = self.create(tokenType, text)
+        if fromToken is not None:
+            return CommonToken(oldToken=fromToken)
 
-        elif tokenType is not None or text is not None:
-            fromToken = self.create(fromToken, fromToken.text)
-            
-            if tokenType is not None:
-                fromToken.type = tokenType
-            if text is not None:
-                fromToken.text = text
-
-        return self.create(fromToken)
+        return CommonToken(type=tokenType, text=text)
 
 
     # Track start/stop token for subtree root created for a rule.
@@ -421,22 +747,26 @@ class CommonTreeAdaptor(BaseTreeAdaptor):
         return t.getType()
 
 
+    def createWithPayload(self, payload):
+        return CommonTree(payload)
+
+
 # A stream of tree nodes, accessing nodes from a tree of some kind #
 class TreeNodeStream(object): #IntStream):
     def LT(self, k):
-        pass
+        raise NotImplementedError
 
     def getTreeSource(self):
-        pass
+        raise NotImplementedError
 
     def getTreeAdaptor(self):
-        pass
+        raise NotImplementedError
 
     def setUniqueNavigationNodes(self, uniqueNavigationNodes):
-        pass
+        raise NotImplementedError
 
     def toString(self, start, stop):
-        pass
+        raise NotImplementedError
 
 
 # A stream of tree nodes, accessing nodes from a tree of some kind.
@@ -837,6 +1167,209 @@ class TreeParser(BaseRecognizer):
         recoverFromMismatchedToken(input, mte, ttype, follow)
 
 
-INVALID_NODE = CommonTree(INVALID_TOKEN_TYPE)
+INVALID_NODE = CommonTree(INVALID_TOKEN)
 
 
+#############################################################################
+#
+# streams for rule rewriting
+#
+#############################################################################
+
+class RewriteRuleElementStream(object):
+    """
+    A generic list of elements tracked in an alternative to be used in
+    a -> rewrite rule.  We need to subclass to fill in the next() method,
+    which returns either an AST node wrapped around a token payload or
+    an existing subtree.
+
+    Once you start next()ing, do not try to add more elements.  It will
+    break the cursor tracking I believe.
+
+    @see org.antlr.runtime.tree.RewriteRuleSubtreeStream
+    @see org.antlr.runtime.tree.RewriteRuleTokenStream
+    
+    TODO: add mechanism to detect/puke on modification after reading from
+    stream
+    """
+
+    def __init__(self, adaptor, elementDescription, elements = None):
+        # Cursor 0..n-1.  If singleElement!=null, cursor is 0 until you next(),
+        # which bumps it to 1 meaning no more elements.
+        self.cursor = 0
+
+	# Track single elements w/o creating a list.  Upon 2nd add, alloc list
+        self.singleElement = None
+
+	# The list of tokens or subtrees we are tracking
+        self.elements = None
+
+	# The element or stream description; usually has name of the token or
+	# rule reference that this list tracks.  Can include rulename too, but
+	# the exception would track that info.
+        self.elementDescription = elementDescription
+
+        self.adaptor = adaptor
+
+        if isinstance(elements, (list, tuple)):
+            # Create a stream, but feed off an existing list
+            self.singleElement = None
+            self.elements = elements
+
+        else:
+            # Create a stream with one element
+            self.add(elements)
+
+
+    def reset(self):
+        """
+        Reset the condition of this stream so that it appears we have
+        not consumed any of its elements.  Elements themselves are untouched.
+        """
+        
+        self.cursor = 0
+
+    def add(self, el):
+        if el is None:
+            return
+
+        if self.elements is not None: # if in list, just add
+            self.elements.append(el)
+            return
+
+        if self.singleElement is None: # no elements yet, track w/o list
+            self.singleElement = el
+            return
+
+        # adding 2nd element, move to list
+        self.elements = []
+        self.elements.append(self.singleElement)
+        self.singleElement = None
+        self.elements.append(el)
+
+
+    def next(self):
+        """
+        Return the next element in the stream.  If out of elements, throw
+        an exception unless size()==1.  If size is 1, then return elements[0].
+        
+        Return a duplicate node/subtree if stream is out of elements and
+        size==1.
+	"""
+        
+        if self.cursor >= len(self) and len(self) == 1:
+            # if out of elements and size is 1, dup
+            el = self._next()
+            return self.dup(el)
+
+        # test size above then fetch
+        el = self._next();
+        return el;
+
+
+    def _next(self):
+        """
+        do the work of getting the next element, making sure that it's
+        a tree node or subtree.  Deal with the optimization of single-
+        element list versus list of size > 1.  Throw an exception
+        if the stream is empty or we're out of elements and size>1.
+        protected so you can override in a subclass if necessary.
+	"""
+
+        if len(self) == 0:
+            raise RewriteEmptyStreamException(self.elementDescription)
+            
+        if self.cursor >= len(self): # out of elements?
+            if len(self) == 1: # if size is 1, it's ok; return and we'll dup 
+                return self.singleElement
+
+            # out of elements and size was not 1, so we can't dup
+            raise RewriteCardinalityException(self.elementDescription)
+
+        # we have elements
+        if self.singleElement is not None:
+            self.cursor += 1 # move cursor even for single element list
+            return self.toTree(self.singleElement)
+
+        # must have more than one in list, pull from elements
+        o = self.toTree(self.elements[self.cursor])
+        self.cursor += 1
+        return o
+
+
+    def dup(self, el):
+        """
+        When constructing trees, sometimes we need to dup a token or AST
+        subtree.  Dup'ing a token means just creating another AST node
+        around it.  For trees, you must call the adaptor.dupTree().
+	"""
+
+        raise NotImplementedError
+    
+
+    def toTree(self, el):
+        """
+        Ensure stream emits trees; tokens must be converted to AST nodes.
+	AST nodes can be passed through unmolested.
+        """
+
+        return el
+
+
+    def hasNext(self):
+        return ( (self.singleElement is not None and self.cursor < 1)
+                 or (self.elements is not None and self.cursor < len(self.elements))
+                 )
+
+                 
+    def size(self):
+        if self.singleElement is not None:
+            return 1
+
+        if self.elements is not None:
+            return len(self.elements)
+
+        return 0
+
+    __len__ = size
+    
+
+    def getDescription(self):
+        """Deprecated. Directly access elementDescription attribute"""
+        
+        return self.elementDescription
+
+
+class RewriteRuleTokenStream(RewriteRuleElementStream):
+    def toTree(self, el):
+        return self.adaptor.createWithPayload(el)
+
+
+    def dup(self, el):
+        return self.adaptor.createWithPayload(el)
+
+
+class RewriteRuleSubtreeStream(RewriteRuleElementStream):
+    def nextNode(self):
+        """
+        Treat next element as a single node even if it's a subtree.
+        This is used instead of next() when the result has to be a
+        tree root node.  Also prevents us from duplicating recently-added
+        children; e.g., ^(type ID)+ adds ID to type and then 2nd iteration
+        must dup the type node, but ID has been added.
+
+        Referencing a rule result twice is ok; dup entire tree as
+        we can't be adding trees; e.g., expr expr. 
+        """
+        
+        el = self._next()
+
+        if self.cursor >= len(self) and len(self) == 1:
+            # if out of elements and size is 1, dup just the node
+            el = self.adaptor.dupNode(el)
+
+        return el
+
+
+    def dup(self, el):
+        return self.adaptor.dupTree(el)

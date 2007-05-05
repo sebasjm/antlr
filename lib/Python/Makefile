@@ -31,7 +31,8 @@ test_%: tests/%.g
              -o $(SRC)/org/antlr/codegen/templates/Python/Python.stg -nt $(subst .g,.stamp,$<) \
              -o $(SRC)/org/antlr/codegen/templates/Python/AST.stg -nt $(subst .g,.stamp,$<) \
              ]; then \
-	  $(ANTLR) -o tests/ $<; \
+	  echo $(ANTLR) $<; \
+	  $(ANTLR) $<; \
 	  touch $(subst .g,.stamp,$<); \
 	fi; \
 	PYTHONPATH=. $(PYTHON) $(subst .g,.py,$<)
@@ -41,4 +42,5 @@ test_%: tests/%.g
 
 clean:
 	$(MAKE) -C tests clean
+	$(MAKE) -C antlr3 clean
 	rm -f *~ *.pyc

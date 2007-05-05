@@ -1,3 +1,4 @@
+- use from antlr3 import * in generated code
 - implement more examples
 - Fix remaining FIXMEs in (Python|AST).stg
 - complete runtime

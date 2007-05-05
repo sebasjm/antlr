@@ -248,6 +248,14 @@ r50
         -> ^({antlr3.tree.CommonTree(antlr3.CommonToken(type=FLOAT, text="1.0"))} ID)
     ;
 
+a: (as+=ID)+ {len($as) == 3}?
+  -> ID ID ID
+  ;
+
+b: ID+
+  -> ID ID ID
+  ;
+
 primary
     : ID
     ;

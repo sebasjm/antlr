@@ -25,6 +25,9 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/* in sync with Java/Java.stg revision 107 */
+
 group Python implements ANTLRCore;
 
 javaTypeInitMap ::= [
@@ -333,6 +336,10 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
             self.recover(self.input, re)
 
 <endif>
+<else>
+        finally:
+            pass
+
 <endif>
 <endif>
     finally:
@@ -388,8 +395,20 @@ ruleLabelDefs() ::= <<
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(label=it); separator="\n"
 >
-<[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{list_<it> = []}; separator="\n"
+<ruleDescriptor.ruleListLabels:{<it.label.text> = None}; separator="\n">
+>>
+
+lexerRuleLabelDefs() ::= <<
+<[ruleDescriptor.tokenLabels,
+  ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleLabels]
+    :{<it.label.text> = None}; separator="\n"
+>
+<ruleDescriptor.charLabels:{<it.label.text> = None}; separator="\n">
+<[ruleDescriptor.tokenListLabels,
+  ruleDescriptor.ruleListLabels,
+  ruleDescriptor.ruleListLabels]
+    :{list_<it.label.text> = None}; separator="\n"
 >
 >>
 
@@ -435,8 +454,9 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         self.ruleNestingLevel += 1
 
 <if(nakedBlock)>
-        <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
+        <lexerRuleLabelDefs()>
+        <ruleDescriptor.actions.init>
         <block><\n>
 <else>
         _type = <ruleName>
@@ -445,8 +465,9 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         _charPosition = self.getCharPositionInLine()
         _channel = antlr3.DEFAULT_CHANNEL
 
-        <ruleDescriptor.actions.init>
         <ruleMemoization(name=ruleName)>
+        <lexerRuleLabelDefs()>
+        <ruleDescriptor.actions.init>
         <block>
         <! create token if none exists *and* we are an outermost token rule !>
         <execAction({
@@ -639,7 +660,10 @@ self.match(<char>)
 >>
 
 /** match a character range */
-charRangeRef(a,b) ::= <<
+charRangeRef(a,b,label) ::= <<
+<if(label)>
+<label> = self.input.LA(1)<\n>
+<endif>
 self.matchRange(<a>, <b>)
 <checkRuleBacktrackFailure()>
 >>
@@ -743,16 +767,16 @@ raise NotImplementedError("ruleRefAndListLabel")
 >>
 
 /** A lexer rule reference */
-lexerRuleRef(rule,label,args) ::= <<
+lexerRuleRef(rule,label,args,elementIndex) ::= <<
 <if(label)>
-<label>Start = self.getCharIndex()
+<label>Start<elementIndex> = self.getCharIndex()
 self.m<rule>(<args; separator=", ">)
 <checkRuleBacktrackFailure()>
 <label> = antlr3.CommonToken(
     input=self.input, 
     type=antlr3.INVALID_TOKEN_TYPE,
     channel=antlr3.DEFAULT_CHANNEL,
-    start=<label>Start,
+    start=<label>Start<elementIndex>,
     stop=self.getCharIndex()-1
     )
 <else>
@@ -761,13 +785,19 @@ self.m<rule>(<args; separator=", ">)
 <endif>
 >>
 
+/** i+=INT in lexer */
+lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::= <<
+<lexerRuleRef(...)>
+<listLabel(elem=label,...)>
+>>
+
 /** EOF in the lexer */
-lexerMatchEOF(label) ::= <<
+lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
-<label>Start = self.getCharIndex()
+<label>Start<elementIndex> = self.getCharIndex()
 self.match(EOF)
 <checkRuleBacktrackFailure()>
-<label> = antlr3.CommonToken(input=self.input, type=EOF, channel=antlr3.DEFAULT_CHANNEL, start=<label>Start, stop=self.getCharIndex()-1)
+<label> = antlr3.CommonToken(input=self.input, type=EOF, channel=antlr3.DEFAULT_CHANNEL, start=<label>Start<elementIndex>, stop=self.getCharIndex()-1)
 <else>
 self.match(EOF)
 <checkRuleBacktrackFailure()>
@@ -775,10 +805,11 @@ self.match(EOF)
 >>
 
 /** match ^(root children) in tree parser */
-tree(root, children, nullableChildList) ::= <<
+tree(root, actionsAfterRoot, children, nullableChildList) ::= <<
 raise NotImplementedError("tree")
 >>
 //<root:element()>
+//<actionsAfterRoot:element()>
 //<if(nullableChildList)>
 //if ( input.LA(1)==Token.DOWN ) {
 //    match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
@@ -838,9 +869,13 @@ dfaLoopbackState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::
 LA<decisionNumber>_<stateNumber> = self.input.LA(<k>)<\n>
 <edges; separator="\nel"><\n>
 <if(eotPredictsAlt)>
+<if(!edges)>
+alt<decisionNumber> = <eotPredictsAlt> <! if no edges, don't gen ELSE !>
+<else>
 else:
     alt<decisionNumber> = <eotPredictsAlt>
 <\n>
+<endif>
 <endif>
 >>
 
@@ -977,7 +1012,7 @@ if s == <i0>: <! compressed special state numbers 0..n-1 !>
 <endif>
         nvae = antlr3.NoViableAltException(self_.getDescription(), <dfa.decisionNumber>, _s, input)
         self_.error(nvae)
-        raise nvae
+        raise nvae<\n>
 <else>
 DFA<dfa.decisionNumber> = antlr3.DFA
 <endif>
@@ -1001,12 +1036,17 @@ self.dfa<dfa.decisionNumber> = self.DFA<dfa.decisionNumber>(
  *  state.
  */
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
-<if(semPredState)>
+LA<decisionNumber>_<stateNumber> = input.LA(1)<\n>
+<if(semPredState)> <! get next lookahead symbol to test edges, then rewind !>
+index<decisionNumber>_<stateNumber> = input.index()
 input.rewind()<\n>
 <endif>
 LA<decisionNumber>_<stateNumber> = self.input.LA(1)<\n>
 s = -1
 <edges; separator="\nel">
+<if(semPredState)> <! return input cursor to state before we rewound !>
+input.seek(index<decisionNumber>_<stateNumber>)<\n>
+<endif>
 if s >= 0:
     return s
 >>

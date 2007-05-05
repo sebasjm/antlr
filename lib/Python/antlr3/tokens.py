@@ -66,7 +66,10 @@ class CommonToken(Token):
             self.channel = oldToken.channel
             self.index = oldToken.index
             self._text = oldToken._text
-
+            self.input = oldToken.input
+            self.start = oldToken.start
+            self.stop = oldToken.stop
+            
         else:
             self.type = type
             self.input = input
@@ -82,12 +85,12 @@ class CommonToken(Token):
             # start/stop are not affected by changing this.
             self._text = text
 
-        # The char position into the input buffer where this token starts
-        self.start = start
+            # The char position into the input buffer where this token starts
+            self.start = start
 
-        # The char position into the input buffer where this token stops
-        # This is the index of the last char, *not* the index after it!
-        self.stop = stop
+            # The char position into the input buffer where this token stops
+            # This is the index of the last char, *not* the index after it!
+            self.stop = stop
 
 
     def getText(self):

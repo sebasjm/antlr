@@ -33,7 +33,6 @@ $(SRC)/org/antlr/tool/ANTLRTreePrinter.java: $(SRC)/org/antlr/tool/antlr.print.g
 $(SRC)/org/antlr/codegen/CodeGenTreeWalker.java: $(SRC)/org/antlr/codegen/ANTLRTokenTypes.txt
 
 $(SRC)/org/antlr/codegen/ANTLRTokenTypes.txt: $(SRC)/org/antlr/tool/ANTLRParser.java
-	cp $(SRC)/org/antlr/tool/ANTLRTokenTypes.txt $(SRC)/org/antlr/codegen/ANTLRTokenTypes.txt
 
 $(SRC)/org/antlr/codegen/CodeGenTreeWalker.java: $(SRC)/org/antlr/codegen/codegen.g 
 
@@ -41,16 +40,24 @@ $(SRC)/org/antlr/codegen/CodeGenTreeWalker.java: $(SRC)/org/antlr/codegen/codege
 
 
 
+.PHONY:
+generate:
+	cd $(SRC)/org/antlr/tool/; $(ANTLR2) antlr.g
+	cd $(SRC)/org/antlr/tool/; $(ANTLR2) antlr.print.g
+	cd $(SRC)/org/antlr/tool/; $(ANTLR2) assign.types.g
+	cd $(SRC)/org/antlr/tool/; $(ANTLR2) define.g
+	cd $(SRC)/org/antlr/tool/; $(ANTLR2) buildnfa.g
+	cp $(SRC)/org/antlr/tool/ANTLRTokenTypes.txt $(SRC)/org/antlr/codegen/ANTLRTokenTypes.txt
+	cd $(SRC)/org/antlr/codegen/; $(ANTLR2) codegen.g
+
 .PHONY: build
-build: $(SRC)/org/antlr/tool/ANTLRParser.java \
-       $(SRC)/org/antlr/tool/AssignTokenTypesWalkerTokenTypes.java \
-       $(SRC)/org/antlr/tool/DefineGrammarItemsWalker.java \
-       $(SRC)/org/antlr/tool/TreeToNFAConverter.java \
-       $(SRC)/org/antlr/tool/ANTLRTreePrinter.java \
-       $(SRC)/org/antlr/codegen/CodeGenTreeWalker.java
+build:
 	cd $(SRC); $(JAVAC) -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
 	touch $(SRC)/build-stamp
 
+.PHONY: rebuild
+rebuild: generate build
+
 
 lint%: %.py
-	PYTHONPATH=$(BASE) pylint --rcfile=$(BASE)/pylintrc $<
+	PYTHONPATH=$(BASE) pylint --rcfile=$(BASE)/pylintrc --output-format=parseable $<
