@@ -516,7 +516,7 @@ rewriteElement(e) ::= <<
 <e.el>
 >>
 
-/** Gen ID */
+/** Gen ID or ID[args] */
 rewriteTokenRef(token,elementIndex,args) ::= <<
 <if(args)>
 ADAPTOR->addChildToken(ADAPTOR, root_<treeLevel>, ADAPTOR->createToken(ADAPTOR, <args; separator=", ">));<\n>
@@ -540,9 +540,13 @@ rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
 root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, stream_<label>->next(stream_<label>), root_<treeLevel>);<\n>
 >>
 
-/** Gen ^(ID ...) */
-rewriteTokenRefRoot(token,elementIndex) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, stream_<token>->next(stream_<token>), root_<treeLevel>);<\n>
+/** Gen ^(ID ...) or ^(ID[args] ...) */
+rewriteTokenRefRoot(token,elementIndex,args) ::= <<
+if(<args>)
+root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, ADAPTOR->createToken(ADAPTOR, <args; separator=", ">), root_<treeLevel>);<\n>
+<else>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<token>->next(stream_<token>), root_<treeLevel>);<\n>
+<endif>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
