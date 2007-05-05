@@ -392,7 +392,7 @@
 			Name="Antlr3TreeParser"
 			DisplayName="ANTLR 3 Tree Parser Grammar Translation"
 			CommandLine="[java] [JavaOptions] [ANTLR3Jar] org.antlr.Tool [LibDir] -[Absolute]o [OutputDirectory] [DFA] [NFA] [Report] [Print] [Debug] [Profile] [AST] [TextDFA] [EBNFExits] [CollapseEdges] [DebugNFA] [MaxRules] [MaxDFAEdges] [DFATimeout] [inputs]"
-			Outputs="[OutputDirectory]\$(InputName)TreeParser.c;[OutputDirectory]\$(InputName)TreeParser.h"
+			Outputs="[OutputDirectory]\$(InputName).c;[OutputDirectory]\$(InputName).h"
 			FileExtensions="*.g3t;*.gt"
 			ExecutionDescription="Translating to tree parser."
 			SupportsFileBatching="true"
