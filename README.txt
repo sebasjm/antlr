@@ -297,6 +297,16 @@ C# Target Notes
 
 CHANGES
 
+May 5, 2007
+
+* moving org.antlr.runtime to runtime/Java/src/org/... Other target
+  source / libs are under runtime/targetname.
+
+May 4, 2007
+
+* You could not use arguments on a token reference that was a route in a
+  tree rewrite rule like -> ^(ID[args] ...).
+
 May 3, 2007
 
 * Fixed ANTLR-82.  Actions after the root were considered part of
