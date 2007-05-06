@@ -205,7 +205,7 @@ outputFile( LEXER,
 #define	    GETLINE()				LEXER->getLine(LEXER)
 #define	    GETTEXT()				LEXER->getText(LEXER)
 #define	    GETCHARPOSITIONINLINE() LEXER->getCharPositionInLine(LEXER)
-#define	    EMIT()					LEXER->emit(LEXER)
+#define	    EMIT()					LEXER->type = _type; LEXER->emit(LEXER)
 #define	    EMITNEW(t)				LEXER->emitNew(LEXER, t)
 #define	    MATCHC(c)				LEXER->matchc(LEXER, c)
 #define	    MATCHS(s)				LEXER->matchs(LEXER, s)
