@@ -1,30 +1,40 @@
 import antlr3
-from t003lexerLexer import t003lexerLexer as Lexer
-from t003lexerLexer import ZERO, FOOZE, ONE, EOF
+import testbase
+import unittest
 
-stream = antlr3.StringStream('0fooze1')
-lexer = Lexer(stream)
+class t003lexer(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+        
+    def testValid(self):
+        stream = antlr3.StringStream('0fooze1')
+        lexer = self.getLexer(stream)
 
-token = lexer.nextToken()
-assert token.type == ZERO
+        token = lexer.nextToken()
+        self.failUnlessEqual(token.type, self.lexerModule.ZERO)
 
-token = lexer.nextToken()
-assert token.type == FOOZE
+        token = lexer.nextToken()
+        self.failUnlessEqual(token.type, self.lexerModule.FOOZE)
 
-token = lexer.nextToken()
-assert token.type == ONE
+        token = lexer.nextToken()
+        self.failUnlessEqual(token.type, self.lexerModule.ONE)
 
-token = lexer.nextToken()
-assert token.type == EOF
+        token = lexer.nextToken()
+        self.failUnlessEqual(token.type, self.lexerModule.EOF)
+        
 
+    def testMalformedInput(self):
+        stream = antlr3.StringStream('2')
+        lexer = self.getLexer(stream)
 
-# malformed input
-stream = antlr3.StringStream('2')
-lexer = Lexer(stream)
+        try:
+            token = lexer.nextToken()
+            self.fail()
 
-try:
-    token = lexer.nextToken()
-    raise AssertionError
+        except antlr3.NoViableAltException, exc:
+            self.failUnlessEqual(exc.unexpectedType, '2')
+            
 
-except antlr3.NoViableAltException, exc:
-    assert exc.unexpectedType == '2', repr(exc.unexpectedType)
+if __name__ == '__main__':
+    unittest.main()

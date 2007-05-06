@@ -1,26 +1,35 @@
 import antlr3
-from t001lexerLexer import t001lexerLexer as Lexer
-from t001lexerLexer import ZERO, EOF
+import testbase
+import unittest
 
-stream = antlr3.StringStream('0')
-lexer = Lexer(stream)
+class t001lexer(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+        
+    def testValid(self):
+        stream = antlr3.StringStream('0')
+        lexer = self.getLexer(stream)
 
-token = lexer.nextToken()
-assert token.type == ZERO
+        token = lexer.nextToken()
+        self.failUnlessEqual(token.type, self.lexerModule.ZERO)
 
-token = lexer.nextToken()
-assert token.type == EOF
+        token = lexer.nextToken()
+        self.failUnlessEqual(token.type, self.lexerModule.EOF)
+        
 
+    def testMalformedInput(self):
+        stream = antlr3.StringStream('1')
+        lexer = self.getLexer(stream)
 
-# malformed input
-stream = antlr3.StringStream('1')
-lexer = Lexer(stream)
+        try:
+            token = lexer.nextToken()
+            self.fail()
 
-try:
-    token = lexer.nextToken()
-    raise AssertionError
+        except antlr3.MismatchedTokenException, exc:
+            self.failUnlessEqual(exc.expecting, '0')
+            self.failUnlessEqual(exc.unexpectedType, '1')
+            
 
-except antlr3.MismatchedTokenException, exc:
-    assert exc.expecting == '0', repr(exc.expecting)
-    assert exc.unexpectedType == '1', repr(exc.unexpectedType)
-
+if __name__ == '__main__':
+    unittest.main()

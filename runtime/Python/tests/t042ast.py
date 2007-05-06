@@ -1,38 +1,43 @@
 import unittest
 import textwrap
 import antlr3
-from t042astLexer import t042astLexer as Lexer
-from t042astParser import t042astParser as Parser
+import testbase
 
-class TLexer(Lexer):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
+class t042ast(testbase.ANTLRTest):
+    def lexerClass(self, base):
+        class TLexer(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
 
-class TParser(Parser):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
+        return TLexer
+    
 
+    def parserClass(self, base):
+        class TParser(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
 
-
-
-class TestAst(unittest.TestCase):
+        return TParser
+    
 
     def parse(self, text, method, rArgs=[], **kwargs):
+        self.compileGrammar()
+        
         cStream = antlr3.StringStream(text)
-        lexer = TLexer(cStream)
-        tStream = antlr3.CommonTokenStream(lexer)
-        parser = TParser(tStream)
+        self.lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(self.lexer)
+        self.parser = self.getParser(tStream)
         
         for attr, val in kwargs.items():
-            setattr(parser, attr, val)
+            setattr(self.parser, attr, val)
             
-        return method(parser, *rArgs)
+        return getattr(self.parser, method)(*rArgs)
 
     
     def testR1(self):
-        r = self.parse("1 + 2", TParser.r1)
+        r = self.parse("1 + 2", 'r1')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(+ 1 2)'
@@ -40,7 +45,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR2a(self):
-        r = self.parse("assert 2+3;", TParser.r2)
+        r = self.parse("assert 2+3;", 'r2')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(assert (+ 2 3))'
@@ -48,7 +53,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR2b(self):
-        r = self.parse("assert 2+3 : 5;", TParser.r2)
+        r = self.parse("assert 2+3 : 5;", 'r2')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(assert (+ 2 3) 5)'
@@ -56,7 +61,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR3a(self):
-        r = self.parse("if 1 fooze", TParser.r3)
+        r = self.parse("if 1 fooze", 'r3')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(if 1 fooze)'
@@ -64,7 +69,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR3b(self):
-        r = self.parse("if 1 fooze else fooze", TParser.r3)
+        r = self.parse("if 1 fooze else fooze", 'r3')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(if 1 fooze fooze)'
@@ -72,7 +77,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR4a(self):
-        r = self.parse("while 2 fooze", TParser.r4)
+        r = self.parse("while 2 fooze", 'r4')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(while 2 fooze)'
@@ -80,7 +85,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR5a(self):
-        r = self.parse("return;", TParser.r5)
+        r = self.parse("return;", 'r5')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'return'
@@ -88,7 +93,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR5b(self):
-        r = self.parse("return 2+3;", TParser.r5)
+        r = self.parse("return 2+3;", 'r5')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(return (+ 2 3))'
@@ -96,7 +101,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR6a(self):
-        r = self.parse("3", TParser.r6)
+        r = self.parse("3", 'r6')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '3'
@@ -104,7 +109,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR6b(self):
-        r = self.parse("3 a", TParser.r6)
+        r = self.parse("3 a", 'r6')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '3 a'
@@ -112,7 +117,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR7(self):
-        r = self.parse("3", TParser.r7)
+        r = self.parse("3", 'r7')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'nil'
@@ -120,7 +125,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR8(self):
-        r = self.parse("var foo:bool", TParser.r8)
+        r = self.parse("var foo:bool", 'r8')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(var bool foo)'
@@ -128,7 +133,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR9(self):
-        r = self.parse("int foo;", TParser.r9)
+        r = self.parse("int foo;", 'r9')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(VARDEF int foo)'
@@ -136,7 +141,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR10(self):
-        r = self.parse("10", TParser.r10)
+        r = self.parse("10", 'r10')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '10.0'
@@ -144,7 +149,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR11a(self):
-        r = self.parse("1+2", TParser.r11)
+        r = self.parse("1+2", 'r11')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(EXPR (+ 1 2))'
@@ -152,7 +157,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR11b(self):
-        r = self.parse("", TParser.r11)
+        r = self.parse("", 'r11')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'EXPR'
@@ -160,7 +165,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR12a(self):
-        r = self.parse("foo", TParser.r12)
+        r = self.parse("foo", 'r12')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'foo'
@@ -168,7 +173,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR12b(self):
-        r = self.parse("foo, bar, gnurz", TParser.r12)
+        r = self.parse("foo, bar, gnurz", 'r12')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'foo bar gnurz'
@@ -176,7 +181,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR13a(self):
-        r = self.parse("int foo;", TParser.r13)
+        r = self.parse("int foo;", 'r13')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(int foo)'
@@ -184,7 +189,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR13b(self):
-        r = self.parse("bool foo, bar, gnurz;", TParser.r13)
+        r = self.parse("bool foo, bar, gnurz;", 'r13')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(bool foo bar gnurz)'
@@ -192,7 +197,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR14a(self):
-        r = self.parse("1+2 int", TParser.r14)
+        r = self.parse("1+2 int", 'r14')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(EXPR (+ 1 2) int)'
@@ -200,7 +205,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR14b(self):
-        r = self.parse("1+2 int bool", TParser.r14)
+        r = self.parse("1+2 int bool", 'r14')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(EXPR (+ 1 2) int bool)'
@@ -208,7 +213,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR14c(self):
-        r = self.parse("int bool", TParser.r14)
+        r = self.parse("int bool", 'r14')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(EXPR int bool)'
@@ -216,7 +221,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR14d(self):
-        r = self.parse("fooze fooze int bool", TParser.r14)
+        r = self.parse("fooze fooze int bool", 'r14')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(EXPR fooze fooze int bool)'
@@ -224,7 +229,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR14e(self):
-        r = self.parse("7+9 fooze fooze int bool", TParser.r14)
+        r = self.parse("7+9 fooze fooze int bool", 'r14')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(EXPR (+ 7 9) fooze fooze int bool)'
@@ -232,7 +237,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR15(self):
-        r = self.parse("7", TParser.r15)
+        r = self.parse("7", 'r15')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '7 7'
@@ -240,7 +245,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR16a(self):
-        r = self.parse("int foo", TParser.r16)
+        r = self.parse("int foo", 'r16')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(int foo)'
@@ -248,7 +253,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR16b(self):
-        r = self.parse("int foo, bar, gnurz", TParser.r16)
+        r = self.parse("int foo, bar, gnurz", 'r16')
             
         self.failUnlessEqual(
             r.tree.toStringTree(),
@@ -257,7 +262,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR17a(self):
-        r = self.parse("for ( fooze ; 1 + 2 ; fooze ) fooze", TParser.r17)
+        r = self.parse("for ( fooze ; 1 + 2 ; fooze ) fooze", 'r17')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(for fooze (+ 1 2) fooze fooze)'
@@ -265,7 +270,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR18a(self):
-        r = self.parse("for", TParser.r18)
+        r = self.parse("for", 'r18')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'BLOCK'
@@ -273,7 +278,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR19a(self):
-        r = self.parse("for", TParser.r19)
+        r = self.parse("for", 'r19')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'for'
@@ -281,7 +286,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR20a(self):
-        r = self.parse("for", TParser.r20)
+        r = self.parse("for", 'r20')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'FOR'
@@ -289,7 +294,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR21a(self):
-        r = self.parse("for", TParser.r21)
+        r = self.parse("for", 'r21')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'BLOCK'
@@ -297,7 +302,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR22a(self):
-        r = self.parse("for", TParser.r22)
+        r = self.parse("for", 'r22')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'for'
@@ -305,7 +310,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR23a(self):
-        r = self.parse("for", TParser.r23)
+        r = self.parse("for", 'r23')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'FOR'
@@ -313,7 +318,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR24a(self):
-        r = self.parse("fooze 1 + 2", TParser.r24)
+        r = self.parse("fooze 1 + 2", 'r24')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(fooze (+ 1 2))'
@@ -321,7 +326,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR25a(self):
-        r = self.parse("fooze, fooze2 1 + 2", TParser.r25)
+        r = self.parse("fooze, fooze2 1 + 2", 'r25')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(fooze (+ 1 2))'
@@ -329,7 +334,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR26a(self):
-        r = self.parse("fooze, fooze2", TParser.r26)
+        r = self.parse("fooze, fooze2", 'r26')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(BLOCK fooze fooze2)'
@@ -337,7 +342,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR27a(self):
-        r = self.parse("fooze 1 + 2", TParser.r27)
+        r = self.parse("fooze 1 + 2", 'r27')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(fooze (fooze (+ 1 2)))'
@@ -345,7 +350,7 @@ class TestAst(unittest.TestCase):
             
 
     def testR28(self):
-        r = self.parse("foo28a", TParser.r28)
+        r = self.parse("foo28a", 'r28')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'nil'
@@ -354,7 +359,7 @@ class TestAst(unittest.TestCase):
 
     def testR29(self):
         try:
-            r = self.parse("", TParser.r29)
+            r = self.parse("", 'r29')
             self.fail()
         except RuntimeError:
             pass
@@ -363,14 +368,14 @@ class TestAst(unittest.TestCase):
 # FIXME: broken upstream?
 ##     def testR30(self):
 ##         try:
-##             r = self.parse("fooze fooze", TParser.r30)
+##             r = self.parse("fooze fooze", 'r30')
 ##             self.fail(r.tree.toStringTree())
 ##         except RuntimeError:
 ##             pass
 
 
     def testR31a(self):
-        r = self.parse("public int gnurz = 1 + 2;", TParser.r31, flag=0)
+        r = self.parse("public int gnurz = 1 + 2;", 'r31', flag=0)
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(VARDEF gnurz public int (+ 1 2))'
@@ -378,7 +383,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR31b(self):
-        r = self.parse("public int gnurz = 1 + 2;", TParser.r31, flag=1)
+        r = self.parse("public int gnurz = 1 + 2;", 'r31', flag=1)
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(VARIABLE gnurz public int (+ 1 2))'
@@ -386,7 +391,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR31c(self):
-        r = self.parse("public int gnurz = 1 + 2;", TParser.r31, flag=2)
+        r = self.parse("public int gnurz = 1 + 2;", 'r31', flag=2)
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(FIELD gnurz public int (+ 1 2))'
@@ -394,7 +399,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR32a(self):
-        r = self.parse("gnurz 32", TParser.r32, [1], flag=2)
+        r = self.parse("gnurz 32", 'r32', [1], flag=2)
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'gnurz'
@@ -402,7 +407,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR32b(self):
-        r = self.parse("gnurz 32", TParser.r32, [2], flag=2)
+        r = self.parse("gnurz 32", 'r32', [2], flag=2)
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '32'
@@ -410,7 +415,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR32b(self):
-        r = self.parse("gnurz 32", TParser.r32, [3], flag=2)
+        r = self.parse("gnurz 32", 'r32', [3], flag=2)
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'nil'
@@ -418,7 +423,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR33a(self):
-        r = self.parse("public private fooze", TParser.r33)
+        r = self.parse("public private fooze", 'r33')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'fooze'
@@ -426,7 +431,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR34a(self):
-        r = self.parse("public class gnurz { fooze fooze2 }", TParser.r34)
+        r = self.parse("public class gnurz { fooze fooze2 }", 'r34')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(class gnurz public fooze fooze2)'
@@ -434,7 +439,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR34b(self):
-        r = self.parse("public class gnurz extends bool implements int, bool { fooze fooze2 }", TParser.r34)
+        r = self.parse("public class gnurz extends bool implements int, bool { fooze fooze2 }", 'r34')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(class gnurz public (extends bool) (implements int bool) fooze fooze2)'
@@ -443,7 +448,7 @@ class TestAst(unittest.TestCase):
 
     def testR35(self):
         try:
-            r = self.parse("{ extends }", TParser.r35)
+            r = self.parse("{ extends }", 'r35')
             self.fail()
             
         except RuntimeError:
@@ -451,7 +456,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR36a(self):
-        r = self.parse("if ( 1 + 2 ) fooze", TParser.r36)
+        r = self.parse("if ( 1 + 2 ) fooze", 'r36')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(if (EXPR (+ 1 2)) fooze)'
@@ -459,7 +464,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR36b(self):
-        r = self.parse("if ( 1 + 2 ) fooze else fooze2", TParser.r36)
+        r = self.parse("if ( 1 + 2 ) fooze else fooze2", 'r36')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(if (EXPR (+ 1 2)) fooze fooze2)'
@@ -467,7 +472,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR37(self):
-        r = self.parse("1 + 2 + 3", TParser.r37)
+        r = self.parse("1 + 2 + 3", 'r37')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(+ (+ 1 2) 3)'
@@ -475,7 +480,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR38(self):
-        r = self.parse("1 + 2 + 3", TParser.r38)
+        r = self.parse("1 + 2 + 3", 'r38')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(+ (+ 1 2) 3)'
@@ -483,7 +488,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR39a(self):
-        r = self.parse("gnurz[1]", TParser.r39)
+        r = self.parse("gnurz[1]", 'r39')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(INDEX gnurz 1)'
@@ -491,7 +496,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR39b(self):
-        r = self.parse("gnurz(2)", TParser.r39)
+        r = self.parse("gnurz(2)", 'r39')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(CALL gnurz 2)'
@@ -499,7 +504,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR39c(self):
-        r = self.parse("gnurz.gnarz", TParser.r39)
+        r = self.parse("gnurz.gnarz", 'r39')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(FIELDACCESS gnurz gnarz)'
@@ -507,7 +512,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR39d(self):
-        r = self.parse("gnurz.gnarz.gnorz", TParser.r39)
+        r = self.parse("gnurz.gnarz.gnorz", 'r39')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(FIELDACCESS (FIELDACCESS gnurz gnarz) gnorz)'
@@ -515,7 +520,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR40(self):
-        r = self.parse("1 + 2 + 3;", TParser.r40)
+        r = self.parse("1 + 2 + 3;", 'r40')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(+ 1 2 3)'
@@ -523,7 +528,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR41(self):
-        r = self.parse("1 + 2 + 3;", TParser.r41)
+        r = self.parse("1 + 2 + 3;", 'r41')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(3 (2 1))'
@@ -531,7 +536,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR42(self):
-        r = self.parse("gnurz, gnarz, gnorz", TParser.r42)
+        r = self.parse("gnurz, gnarz, gnorz", 'r42')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'gnurz gnarz gnorz'
@@ -539,7 +544,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR43(self):
-        r = self.parse("gnurz, gnarz, gnorz", TParser.r43)
+        r = self.parse("gnurz, gnarz, gnorz", 'r43')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'nil'
@@ -551,7 +556,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR44(self):
-        r = self.parse("gnurz, gnarz, gnorz", TParser.r44)
+        r = self.parse("gnurz, gnarz, gnorz", 'r44')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(gnorz (gnarz gnurz))'
@@ -559,7 +564,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR45(self):
-        r = self.parse("gnurz", TParser.r45)
+        r = self.parse("gnurz", 'r45')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'gnurz'
@@ -567,7 +572,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR46(self):
-        r = self.parse("gnurz, gnarz, gnorz", TParser.r46)
+        r = self.parse("gnurz, gnarz, gnorz", 'r46')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'nil'
@@ -579,7 +584,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR47(self):
-        r = self.parse("gnurz, gnarz, gnorz", TParser.r47)
+        r = self.parse("gnurz, gnarz, gnorz", 'r47')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'gnurz gnarz gnorz'
@@ -587,7 +592,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR48(self):
-        r = self.parse("gnurz, gnarz, gnorz", TParser.r48)
+        r = self.parse("gnurz, gnarz, gnorz", 'r48')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             'gnurz gnarz gnorz'
@@ -595,7 +600,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR49(self):
-        r = self.parse("gnurz gnorz", TParser.r49)
+        r = self.parse("gnurz gnorz", 'r49')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(gnurz gnorz)'
@@ -603,7 +608,7 @@ class TestAst(unittest.TestCase):
 
 
     def testR50(self):
-        r = self.parse("gnurz", TParser.r50)
+        r = self.parse("gnurz", 'r50')
         self.failUnlessEqual(
             r.tree.toStringTree(),
             '(1.0 gnurz)'
@@ -611,7 +616,7 @@ class TestAst(unittest.TestCase):
 
 
 ##     def testA(self):
-##         r = self.parse("gnurz gnarz", TParser.a)
+##         r = self.parse("gnurz gnarz", 'a')
 ##         self.failUnlessEqual(
 ##             r.tree.toStringTree(),
 ##             'gnurz gnarz gnorz'
@@ -619,7 +624,7 @@ class TestAst(unittest.TestCase):
 
 
 ##     def testB(self):
-##         r = self.parse("gnurz gnarz", TParser.b)
+##         r = self.parse("gnurz gnarz", 'b')
 ##         self.failUnlessEqual(
 ##             r.tree.toStringTree(),
 ##             'gnurz gnarz gnorz'

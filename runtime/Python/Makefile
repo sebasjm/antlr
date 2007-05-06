@@ -24,23 +24,15 @@ testAllPy:
 	  fi \
 	done
 
-test_%: tests/%.g
-	@echo -e "\n*** Test case $<:"; \
-	if [ $< -nt $(subst .g,.stamp,$<) \
-             -o $(SRC)/build-stamp -nt $(subst .g,.stamp,$<) \
-             -o $(SRC)/org/antlr/codegen/templates/Python/Python.stg -nt $(subst .g,.stamp,$<) \
-             -o $(SRC)/org/antlr/codegen/templates/Python/AST.stg -nt $(subst .g,.stamp,$<) \
-             ]; then \
-	  echo $(ANTLR) $<; \
-	  $(ANTLR) $<; \
-	  touch $(subst .g,.stamp,$<); \
-	fi; \
+test_%: tests/%.py
 	PYTHONPATH=. $(PYTHON) $(subst .g,.py,$<)
-	@if [ -e $(subst .g,Lexer.py,$<) ]; then ! PYTHONPATH=$(BASE) pylint --rcfile=$(BASE)/pylintrc -e $(subst .g,Lexer.py,$<) | grep '^E'; fi
-	@if [ -e $(subst .g,Parser.py,$<) ]; then ! PYTHONPATH=$(BASE) pylint --rcfile=$(BASE)/pylintrc -e $(subst .g,Parser.py,$<) | grep '^E'; fi
-	@echo "Ok"
 
 clean:
 	$(MAKE) -C tests clean
 	$(MAKE) -C antlr3 clean
 	rm -f *~ *.pyc
+
+
+#	@if [ -e $(subst .g,Lexer.py,$<) ]; then ! PYTHONPATH=$(BASE) pylint --rcfile=$(BASE)/pylintrc -e $(subst .g,Lexer.py,$<) | grep '^E'; fi
+#	@if [ -e $(subst .g,Parser.py,$<) ]; then ! PYTHONPATH=$(BASE) pylint --rcfile=$(BASE)/pylintrc -e $(subst .g,Parser.py,$<) | grep '^E'; fi
+#	@echo "Ok"

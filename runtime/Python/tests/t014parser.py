@@ -1,65 +1,75 @@
 import antlr3
-from t014parserLexer import t014parserLexer as Lexer
-from t014parserParser import t014parserParser as Parser
+import testbase
+import unittest
 
-cStream = antlr3.StringStream('var foobar; gnarz(); var blupp; flupp ( ) ;')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
-parser.document()
+class t014parser(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+        
+    def testValid(self):
+        cStream = antlr3.StringStream('var foobar; gnarz(); var blupp; flupp ( ) ;')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        parser.document()
 
-assert len(parser.reportedErrors) == 0, parser.reportedErrors
-assert parser.events == [
-    ('decl', 'foobar'),
-    ('call', 'gnarz'),
-    ('decl', 'blupp'),
-    ('call', 'flupp')
-    ], parser.events
-
-
-# malformed input
-cStream = antlr3.StringStream('var; foo();')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
-
-parser.document()
-
-# FIXME: currently strings with formatted errors are collected
-# can't check error locations yet
-assert len(parser.reportedErrors) == 1, parser.reportedErrors
-# FIXME: shouldn't this be ('call', 'foo')???
-assert parser.events == [], parser.events
+        assert len(parser.reportedErrors) == 0, parser.reportedErrors
+        assert parser.events == [
+            ('decl', 'foobar'),
+            ('call', 'gnarz'),
+            ('decl', 'blupp'),
+            ('call', 'flupp')
+            ], parser.events
 
 
-# malformed input
-cStream = antlr3.StringStream('var foobar(); gnarz();')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
+    def testMalformedInput1(self):
+        cStream = antlr3.StringStream('var; foo();')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
 
-parser.document()
+        parser.document()
 
-# FIXME: currently strings with formatted errors are collected
-# can't check error locations yet
-assert len(parser.reportedErrors) == 1, parser.reportedErrors
-assert parser.events == [
-    ('call', 'gnarz'),
-    ], parser.events
+        # FIXME: currently strings with formatted errors are collected
+        # can't check error locations yet
+        assert len(parser.reportedErrors) == 1, parser.reportedErrors
+        # FIXME: shouldn't this be ('call', 'foo')???
+        assert parser.events == [], parser.events
 
 
-# malformed input
-cStream = antlr3.StringStream('gnarz(; flupp();')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
+    def testMalformedInput2(self):
+        cStream = antlr3.StringStream('var foobar(); gnarz();')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
 
-parser.document()
+        parser.document()
 
-# FIXME: currently strings with formatted errors are collected
-# can't check error locations yet
-assert len(parser.reportedErrors) == 1, parser.reportedErrors
-assert parser.events == [
-    ('call', 'gnarz'),
-    ('call', 'flupp'),
-    ], parser.events
+        # FIXME: currently strings with formatted errors are collected
+        # can't check error locations yet
+        assert len(parser.reportedErrors) == 1, parser.reportedErrors
+        assert parser.events == [
+            ('call', 'gnarz'),
+            ], parser.events
+
+
+    def testMalformedInput3(self):
+        cStream = antlr3.StringStream('gnarz(; flupp();')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+
+        parser.document()
+
+        # FIXME: currently strings with formatted errors are collected
+        # can't check error locations yet
+        assert len(parser.reportedErrors) == 1, parser.reportedErrors
+        assert parser.events == [
+            ('call', 'gnarz'),
+            ('call', 'flupp'),
+            ], parser.events
+            
+
+if __name__ == '__main__':
+    unittest.main()

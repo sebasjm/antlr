@@ -1,35 +1,46 @@
 import antlr3
-from t007lexerLexer import t007lexerLexer as Lexer
-from t007lexerLexer import FOO, EOF
+import testbase
+import unittest
 
-stream = antlr3.StringStream('fofababbooabb')
-lexer = Lexer(stream)
+class t007lexer(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+        
+    def testValid(self):
+        stream = antlr3.StringStream('fofababbooabb')
+        lexer = self.getLexer(stream)
 
-token = lexer.nextToken()
-assert token.type == FOO
-assert token.start == 0, token.start
-assert token.stop == 1, token.stop
-assert token.text == 'fo', token.text
+        token = lexer.nextToken()
+        assert token.type == self.lexerModule.FOO
+        assert token.start == 0, token.start
+        assert token.stop == 1, token.stop
+        assert token.text == 'fo', token.text
 
-token = lexer.nextToken()
-assert token.type == FOO
-assert token.start == 2, token.start
-assert token.stop == 12, token.stop
-assert token.text == 'fababbooabb', token.text
+        token = lexer.nextToken()
+        assert token.type == self.lexerModule.FOO
+        assert token.start == 2, token.start
+        assert token.stop == 12, token.stop
+        assert token.text == 'fababbooabb', token.text
 
-token = lexer.nextToken()
-assert token.type == EOF
+        token = lexer.nextToken()
+        assert token.type == self.lexerModule.EOF
 
 
-# malformed input
-stream = antlr3.StringStream('foaboao')
-lexer = Lexer(stream)
+    def testMalformedInput(self):
+        stream = antlr3.StringStream('foaboao')
+        lexer = self.getLexer(stream)
 
-try:
-    token = lexer.nextToken()
-    raise AssertionError, token
+        try:
+            token = lexer.nextToken()
+            raise AssertionError, token
 
-except antlr3.EarlyExitException, exc:
-    assert exc.unexpectedType == 'o', repr(exc.unexpectedType)
-    assert exc.charPositionInLine == 6, repr(exc.charPositionInLine)
-    assert exc.line == 1, repr(exc.line)
+        except antlr3.EarlyExitException, exc:
+            assert exc.unexpectedType == 'o', repr(exc.unexpectedType)
+            assert exc.charPositionInLine == 6, repr(exc.charPositionInLine)
+            assert exc.line == 1, repr(exc.line)
+            
+
+if __name__ == '__main__':
+    unittest.main()
+

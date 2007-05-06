@@ -1,48 +1,57 @@
 import antlr3
-from t004lexerLexer import t004lexerLexer as Lexer
-from t004lexerLexer import FOO, EOF
+import testbase
+import unittest
 
-stream = antlr3.StringStream('ffofoofooo')
-lexer = Lexer(stream)
+class t004lexer(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+        
+    def testValid(self):
+        stream = antlr3.StringStream('ffofoofooo')
+        lexer = self.getLexer(stream)
 
-token = lexer.nextToken()
-assert token.type == FOO
-assert token.start == 0, token.start
-assert token.stop == 0, token.stop
-assert token.text == 'f', token.text
+        token = lexer.nextToken()
+        assert token.type == self.lexerModule.FOO
+        assert token.start == 0, token.start
+        assert token.stop == 0, token.stop
+        assert token.text == 'f', token.text
 
-token = lexer.nextToken()
-assert token.type == FOO
-assert token.start == 1, token.start
-assert token.stop == 2, token.stop
-assert token.text == 'fo', token.text
+        token = lexer.nextToken()
+        assert token.type == self.lexerModule.FOO
+        assert token.start == 1, token.start
+        assert token.stop == 2, token.stop
+        assert token.text == 'fo', token.text
 
-token = lexer.nextToken()
-assert token.type == FOO
-assert token.start == 3, token.start
-assert token.stop == 5, token.stop
-assert token.text == 'foo', token.text
+        token = lexer.nextToken()
+        assert token.type == self.lexerModule.FOO
+        assert token.start == 3, token.start
+        assert token.stop == 5, token.stop
+        assert token.text == 'foo', token.text
 
-token = lexer.nextToken()
-assert token.type == FOO
-assert token.start == 6, token.start
-assert token.stop == 9, token.stop
-assert token.text == 'fooo', token.text
+        token = lexer.nextToken()
+        assert token.type == self.lexerModule.FOO
+        assert token.start == 6, token.start
+        assert token.stop == 9, token.stop
+        assert token.text == 'fooo', token.text
 
-token = lexer.nextToken()
-assert token.type == EOF
+        token = lexer.nextToken()
+        assert token.type == self.lexerModule.EOF
+        
 
+    def testMalformedInput(self):
+        stream = antlr3.StringStream('2')
+        lexer = self.getLexer(stream)
 
+        try:
+            token = lexer.nextToken()
+            self.fail()
 
+        except antlr3.MismatchedTokenException, exc:
+            self.failUnlessEqual(exc.expecting, 'f')
+            self.failUnlessEqual(exc.unexpectedType, '2')
+            
 
-# malformed input
-stream = antlr3.StringStream('2')
-lexer = Lexer(stream)
+if __name__ == '__main__':
+    unittest.main()
 
-try:
-    token = lexer.nextToken()
-    raise AssertionError
-
-except antlr3.MismatchedTokenException, exc:
-    assert exc.expecting == 'f', repr(exc.expecting)
-    assert exc.unexpectedType == '2', repr(exc.unexpectedType)

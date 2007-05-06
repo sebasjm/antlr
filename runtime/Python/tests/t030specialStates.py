@@ -1,34 +1,47 @@
 import antlr3
-from t030specialStatesParser import t030specialStatesParser as Parser
-from t030specialStatesLexer import t030specialStatesLexer as Lexer
-
-cStream = antlr3.StringStream('foo')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
-events = parser.r()
+import testbase
+import unittest
 
 
-cStream = antlr3.StringStream('foo name1')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
-events = parser.r()
+class t030specialStates(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+
+    def testValid1(self):
+        cStream = antlr3.StringStream('foo')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        events = parser.r()
 
 
-cStream = antlr3.StringStream('bar name1')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
-parser.cond = False
-events = parser.r()
+    def testValid2(self):
+        cStream = antlr3.StringStream('foo name1')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        events = parser.r()
 
 
-cStream = antlr3.StringStream('bar name1 name2')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
-parser.cond = False
-events = parser.r()
+    def testValid3(self):
+        cStream = antlr3.StringStream('bar name1')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        parser.cond = False
+        events = parser.r()
 
+
+    def testValid4(self):
+        cStream = antlr3.StringStream('bar name1 name2')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        parser.cond = False
+        events = parser.r()
+
+
+if __name__ == '__main__':
+    unittest.main()
 

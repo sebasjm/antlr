@@ -1,21 +1,33 @@
-import textwrap
 import antlr3
-from t038lexerRuleLabelLexer import t038lexerRuleLabelLexer as Lexer
+import testbase
+import unittest
 
-class TLexer(Lexer):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
 
-cStream = antlr3.StringStream(
-    'a  2'
-    )
+class t038lexerRuleLabel(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
 
-lexer = TLexer(cStream)
+    def lexerClass(self, base):
+        class TLexer(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
 
-while True:
-    t = lexer.nextToken()
-    if t.type == antlr3.EOF:
-        break
-    print t
+        return TLexer
     
+        
+    def testValid1(self):
+        cStream = antlr3.StringStream('a  2')
+
+        lexer = self.getLexer(cStream)
+
+        while True:
+            t = lexer.nextToken()
+            if t.type == antlr3.EOF:
+                break
+            print t
+
+
+if __name__ == '__main__':
+    unittest.main()

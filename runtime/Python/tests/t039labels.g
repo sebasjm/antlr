@@ -8,16 +8,6 @@ a returns [l]
         { l = ($ids, $w) }
     ;
 
-// b returns [l]
-//     : ids+=c ( ',' ids+=c )*
-//         { l = $ids }
-//     ;
-
-// c returns [r]
-//     : A { $r = $A.text }
-//     | B { $r = $B.text }
-//     ;
-
 A: 'a'..'z';
 B: '0'..'9';
 C: a='A' { print $a };

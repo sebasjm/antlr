@@ -1,9 +1,21 @@
 import antlr3
-from t029synpredgateLexer import t029synpredgateLexer as Lexer
+import testbase
+import unittest
 
-stream = antlr3.StringStream('ac')
-lexer = Lexer(stream)
 
-token = lexer.nextToken()
+class t029synpredgate(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+
+    def testValid1(self):
+        stream = antlr3.StringStream('ac')
+        lexer = self.getLexer(stream)
+        token = lexer.nextToken()
+
+
+if __name__ == '__main__':
+    unittest.main()
+
 
 

@@ -1,31 +1,40 @@
+import antlr3
+import testbase
+import unittest
 import os
 import sys
 from cStringIO import StringIO
 import difflib
 
-import antlr3
-from t018llstarLexer import t018llstarLexer as Lexer
-from t018llstarParser import t018llstarParser as Parser
+class t018llstar(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
 
-inputPath = os.path.splitext(__file__)[0] + '.input'
-cStream = antlr3.StringStream(open(inputPath).read())
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
-parser.program()
+    def testValid(self):
+        inputPath = os.path.splitext(__file__)[0] + '.input'
+        cStream = antlr3.StringStream(open(inputPath).read())
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        parser.program()
 
+        output = parser.output.getvalue()
 
-output = parser.output.getvalue()
+        outputPath = os.path.splitext(__file__)[0] + '.output'
+        testOutput = open(outputPath).read()
 
-outputPath = os.path.splitext(__file__)[0] + '.output'
-testOutput = open(outputPath).read()
+        success = (output == testOutput)
+        if not success:
+            d = difflib.Differ()
+            r = d.compare(output.splitlines(1), testOutput.splitlines(1))
+            self.fail(
+                ''.join([l.encode('ascii', 'backslashreplace') for l in r])
+                )
 
-success = (output == testOutput)
-if not success:
-    d = difflib.Differ()
-    r = d.compare(output.splitlines(1), testOutput.splitlines(1))
-    for l in r:
-        sys.stderr.write(l.encode('ascii', 'backslashreplace'))
+if __name__ == '__main__':
+    unittest.main()
+
 
     
 ## # run an infinite loop with randomly mangled input
@@ -65,5 +74,3 @@ if not success:
 ##         print
         
 ##         raise
-
-sys.exit(not success)

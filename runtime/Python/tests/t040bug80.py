@@ -1,16 +1,33 @@
-import textwrap
 import antlr3
-from t040bug80Lexer import t040bug80Lexer as Lexer
+import testbase
+import unittest
 
-class TLexer(Lexer):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
 
-cStream = antlr3.StringStream('defined')
-lexer = TLexer(cStream)
-while True:
-    t = lexer.nextToken()
-    if t.type == antlr3.EOF:
-        break
-    print t
+class t040bug80(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+
+    def lexerClass(self, base):
+        class TLexer(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
+
+        return TLexer
+    
+        
+    def testValid1(self):
+        cStream = antlr3.StringStream('defined')
+        lexer = self.getLexer(cStream)
+        while True:
+            t = lexer.nextToken()
+            if t.type == antlr3.EOF:
+                break
+            print t
+
+
+if __name__ == '__main__':
+    unittest.main()
+
+

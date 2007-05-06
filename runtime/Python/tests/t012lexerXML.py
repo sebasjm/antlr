@@ -1,106 +1,118 @@
+import antlr3
+import testbase
+import unittest
 import os
 import sys
 from cStringIO import StringIO
 import difflib
+import textwrap
 
-import antlr3
-from t012lexerXMLLexer import t012lexerXMLLexer as Lexer
-from t012lexerXMLLexer import EOF
+class t012lexerXML(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+        
+    def testValid(self):
+        inputPath = os.path.splitext(__file__)[0] + '.input'
+        stream = antlr3.StringStream(unicode(open(inputPath).read(), 'utf-8'))
+        lexer = self.getLexer(stream)
 
-inputPath = os.path.splitext(__file__)[0] + '.input'
-stream = antlr3.StringStream(unicode(open(inputPath).read(), 'utf-8'))
-lexer = Lexer(stream)
-
-while True:
-    token = lexer.nextToken()
-    if token.type == EOF:
-        break
-
-
-output = unicode(lexer.outbuf.getvalue(), 'utf-8')
-
-outputPath = os.path.splitext(__file__)[0] + '.output'
-testOutput = unicode(open(outputPath).read(), 'utf-8')
-
-success = (output == testOutput)
-if not success:
-    d = difflib.Differ()
-    r = d.compare(output.splitlines(1), testOutput.splitlines(1))
-    for l in r:
-        sys.stderr.write(l.encode('ascii', 'backslashreplace'))
-    
-    sys.exit(1)
+        while True:
+            token = lexer.nextToken()
+            if token.type == self.lexerModule.EOF:
+                break
 
 
-# malformed input
-input = """\
-<?xml version='1.0'?>
-<document d>
-</document>
-"""
+        output = unicode(lexer.outbuf.getvalue(), 'utf-8')
 
-stream = antlr3.StringStream(input)
-lexer = Lexer(stream)
+        outputPath = os.path.splitext(__file__)[0] + '.output'
+        testOutput = unicode(open(outputPath).read(), 'utf-8')
 
-try:
-    while True:
-        token = lexer.nextToken()
-        if token.type == EOF:
-            break
-
-    raise AssertionError
-
-except antlr3.NoViableAltException, exc:
-    assert exc.unexpectedType == '>', repr(exc.unexpectedType)
-    assert exc.charPositionInLine == 11, repr(exc.charPositionInLine)
-    assert exc.line == 2, repr(exc.line)
+        success = (output == testOutput)
+        if not success:
+            d = difflib.Differ()
+            r = d.compare(output.splitlines(1), testOutput.splitlines(1))
+            self.fail(
+                ''.join([l.encode('ascii', 'backslashreplace') for l in r])
+                )
 
 
-input = """\
-<?tml version='1.0'?>
-<document>
-</document>
-"""
+    def testMalformedInput1(self):
+        input = textwrap.dedent("""\
+        <?xml version='1.0'?>
+        <document d>
+        </document>
+        """)
 
-stream = antlr3.StringStream(input)
-lexer = Lexer(stream)
+        stream = antlr3.StringStream(input)
+        lexer = self.getLexer(stream)
 
-try:
-    while True:
-        token = lexer.nextToken()
-        if token.type == EOF:
-            break
+        try:
+            while True:
+                token = lexer.nextToken()
+                if token.type == antlr3.EOF:
+                    break
 
-    raise AssertionError
+            raise AssertionError
 
-except antlr3.MismatchedSetException, exc:
-    assert exc.unexpectedType == 't', repr(exc.unexpectedType)
-    assert exc.charPositionInLine == 2, repr(exc.charPositionInLine)
-    assert exc.line == 1, repr(exc.line)
-    
+        except antlr3.NoViableAltException, exc:
+            assert exc.unexpectedType == '>', repr(exc.unexpectedType)
+            assert exc.charPositionInLine == 11, repr(exc.charPositionInLine)
+            assert exc.line == 2, repr(exc.line)
 
-input = """\
-<?xml version='1.0'?>
-<docu ment attr="foo">
-</document>
-"""
 
-stream = antlr3.StringStream(input)
-lexer = Lexer(stream)
+    def testMalformedInput2(self):
+        input = textwrap.dedent("""\
+        <?tml version='1.0'?>
+        <document>
+        </document>
+        """)
 
-try:
-    while True:
-        token = lexer.nextToken()
-        if token.type == EOF:
-            break
+        stream = antlr3.StringStream(input)
+        lexer = self.getLexer(stream)
 
-    raise AssertionError
+        try:
+            while True:
+                token = lexer.nextToken()
+                if token.type == antlr3.EOF:
+                    break
 
-except antlr3.NoViableAltException, exc:
-    assert exc.unexpectedType == 'a', repr(exc.unexpectedType)
-    assert exc.charPositionInLine == 11, repr(exc.charPositionInLine)
-    assert exc.line == 2, repr(exc.line)
-    
+            raise AssertionError
+
+        except antlr3.MismatchedSetException, exc:
+            assert exc.unexpectedType == 't', repr(exc.unexpectedType)
+            assert exc.charPositionInLine == 2, repr(exc.charPositionInLine)
+            assert exc.line == 1, repr(exc.line)
+
+
+    def testMalformedInput3(self):
+        input = textwrap.dedent("""\
+        <?xml version='1.0'?>
+        <docu ment attr="foo">
+        </document>
+        """)
+
+        stream = antlr3.StringStream(input)
+        lexer = self.getLexer(stream)
+
+        try:
+            while True:
+                token = lexer.nextToken()
+                if token.type == antlr3.EOF:
+                    break
+
+            raise AssertionError
+
+        except antlr3.NoViableAltException, exc:
+            assert exc.unexpectedType == 'a', repr(exc.unexpectedType)
+            assert exc.charPositionInLine == 11, repr(exc.charPositionInLine)
+            assert exc.line == 2, repr(exc.line)
+
+            
+
+if __name__ == '__main__':
+    unittest.main()
+
 
 ## # run an infinite loop with randomly mangled input
 ## while True:

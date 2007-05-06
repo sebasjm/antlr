@@ -1,31 +1,44 @@
-import textwrap
 import antlr3
-from t032subrulePredictParser import t032subrulePredictParser as Parser
-from t032subrulePredictLexer import t032subrulePredictLexer as Lexer
-
-class TParser(Parser):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
+import testbase
+import unittest
 
 
-cStream = antlr3.StringStream(
-    'BEGIN A END'
-    )
+class t032subrulePredict(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
 
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = TParser(tStream)
-events = parser.a()
+    def parserClass(self, base):
+        class TParser(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
+
+        return TParser
+    
+        
+    def testValid1(self):
+        cStream = antlr3.StringStream(
+            'BEGIN A END'
+            )
+
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        events = parser.a()
 
 
-cStream = antlr3.StringStream(
-    'BEGIN A'
-    )
+    @testbase.broken("DFA tries to look beyond end of rule b", Exception)
+    def testValid2(self):
+        cStream = antlr3.StringStream(
+            ' A'
+            )
 
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = TParser(tStream)
-events = parser.b()
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        events = parser.b()
 
 
+if __name__ == '__main__':
+    unittest.main()

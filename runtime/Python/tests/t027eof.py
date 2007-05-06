@@ -1,12 +1,25 @@
 import antlr3
-from t027eofLexer import t027eofLexer as Lexer, SPACE, END
+import testbase
+import unittest
 
-cStream = antlr3.StringStream(' ')
-lexer = Lexer(cStream)
 
-tok = lexer.nextToken()
-assert tok.type == SPACE, tok
+class t027eof(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
 
-tok = lexer.nextToken()
-assert tok.type == END, tok
+    @testbase.broken("That's not how EOF is supposed to be used", Exception)
+    def testValid1(self):
+        cStream = antlr3.StringStream(' ')
+        lexer = self.getLexer(cStream)
+        
+        tok = lexer.nextToken()
+        assert tok.type == self.lexerModule.SPACE, tok
+        
+        tok = lexer.nextToken()
+        assert tok.type == self.lexerModule.END, tok
+
+
+if __name__ == '__main__':
+    unittest.main()
 

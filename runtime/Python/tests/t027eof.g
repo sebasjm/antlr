@@ -5,3 +5,4 @@ options {
 }
 
 END: EOF;
+SPACE: ' ';

@@ -1,3 +1,5 @@
+- setup.py
+- create AUTHORS, NEWS, COPYING, INSTALL files
 - use from antlr3 import * in generated code
 - implement more examples
 - Fix remaining FIXMEs in (Python|AST).stg
@@ -7,7 +9,6 @@
 - antlr features
   - tree parsers
     - 2nd half of simplecTreeParser example
-- setup.py
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()
   - (String|CommonToken)Stream.size() --> __len__

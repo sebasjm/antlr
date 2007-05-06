@@ -1,32 +1,47 @@
-import textwrap
 import antlr3
-from t035ruleLabelPropertyRefLexer import t035ruleLabelPropertyRefLexer as Lexer
-from t035ruleLabelPropertyRefParser import t035ruleLabelPropertyRefParser as Parser
-
-class TLexer(Lexer):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
-
-class TParser(Parser):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
+import testbase
+import unittest
 
 
-cStream = antlr3.StringStream(
-    '   a a a a  '
-    )
+class t035ruleLabelPropertyRef(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
 
-lexer = TLexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = TParser(tStream)
-start, stop, text = parser.a()
+    def lexerClass(self, base):
+        class TLexer(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
 
-# first token of rule b is the 2nd token (counting hidden tokens)
-assert start.index == 1, start
+        return TLexer
+    
+        
+    def parserClass(self, base):
+        class TParser(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
 
-# first token of rule b is the 7th token (counting hidden tokens)
-assert stop.index == 7, stop
+        return TParser
+    
+        
+    def testValid1(self):
+        cStream = antlr3.StringStream('   a a a a  ')
 
-assert text == "a a a a", text
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        start, stop, text = parser.a()
+
+        # first token of rule b is the 2nd token (counting hidden tokens)
+        assert start.index == 1, start
+
+        # first token of rule b is the 7th token (counting hidden tokens)
+        assert stop.index == 7, stop
+
+        assert text == "a a a a", text
+
+
+if __name__ == '__main__':
+    unittest.main()

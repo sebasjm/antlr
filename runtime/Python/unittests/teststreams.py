@@ -13,7 +13,7 @@ class TestStringStream(unittest.TestCase):
         stream = antlr3.StringStream('foo')
 
         self.failUnlessEqual(stream.size(), 3)
-        
+
         
     def testIndex(self):
         """StringStream.index()"""
@@ -550,47 +550,7 @@ class TestCommonTokenStream(unittest.TestCase):
         assert stream.toString(1, 2) == "bargnurz"
         assert stream.toString(stream.tokens[1], stream.tokens[-2]) == "bargnurz"
         
-        
-class TestDFA(unittest.TestCase):
-    """Test case for the DFA class."""
 
-    def setUp(self):
-        """Setup test fixure.
-
-        We need a Recognizer in order to instanciate a DFA.
-
-        """
-
-        self.recog = antlr3.BaseRecognizer()
-        
-        
-    def testInit(self):
-        """DFA.__init__()
-
-        Just a smoke test.
-        
-        """
-
-        dfa = antlr3.DFA(
-            self.recog, 1,
-            eot=[],
-            eof=[],
-            min=[],
-            max=[],
-            accept=[],
-            special=[],
-            transition=[]
-            )
-        
-        
-class TestLexer(unittest.TestCase):
-
-    def testInit(self):
-        """Lexer.__init__()"""
-
-        stream = antlr3.StringStream('foo')
-        antlr3.Lexer(stream)
-        
 
 if __name__ == "__main__":
     unittest.main(testRunner=unittest.TextTestRunner(verbosity=2))

@@ -1,10 +1,20 @@
 import antlr3
-from t023scopesLexer import t023scopesLexer as Lexer
-from t023scopesParser import t023scopesParser as Parser
+import testbase
+import unittest
 
-cStream = antlr3.StringStream('foobar')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = Parser(tStream)
-parser.prog()
 
+class t023scopes(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
+
+    def testValid1(self):
+        cStream = antlr3.StringStream('foobar')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        parser.prog()
+
+
+if __name__ == '__main__':
+    unittest.main()

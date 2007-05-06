@@ -1,25 +1,40 @@
-import textwrap
 import antlr3
-from t034tokenLabelPropertyRefLexer import t034tokenLabelPropertyRefLexer as Lexer
-from t034tokenLabelPropertyRefParser import t034tokenLabelPropertyRefParser as Parser
-
-class TLexer(Lexer):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
-
-class TParser(Parser):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
+import testbase
+import unittest
 
 
-cStream = antlr3.StringStream(
-    '   a'
-    )
+class t034tokenLabelPropertyRef(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
 
-lexer = TLexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = TParser(tStream)
-events = parser.a()
+    def lexerClass(self, base):
+        class TLexer(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
+
+        return TLexer
     
+        
+    def parserClass(self, base):
+        class TParser(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
+
+        return TParser
+    
+        
+    def testValid1(self):
+        cStream = antlr3.StringStream('   a')
+
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        events = parser.a()
+
+
+if __name__ == '__main__':
+    unittest.main()
+

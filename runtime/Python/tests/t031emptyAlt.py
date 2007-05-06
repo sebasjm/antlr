@@ -1,44 +1,22 @@
 import antlr3
-from t031emptyAltParser import t031emptyAltParser as Parser
-from t031emptyAltLexer import t031emptyAltLexer as Lexer
+import testbase
+import unittest
 
-class TParser(Parser):
-    def __init__(self, *args, **kwargs):
-        Parser.__init__(self, *args, **kwargs)
 
-        self.cond = True
+class t031emptyAlt(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
         
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise re
 
-cStream = antlr3.StringStream('foo')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = TParser(tStream)
-events = parser.r()
-
-
-cStream = antlr3.StringStream('foo name1')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = TParser(tStream)
-events = parser.r()
+    @testbase.broken("Syntax error in generated code", Exception)
+    def testValid1(self):
+        cStream = antlr3.StringStream('foo')
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        events = parser.r()
 
 
-cStream = antlr3.StringStream('bar name1')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = TParser(tStream)
-parser.cond = False
-events = parser.r()
-
-
-cStream = antlr3.StringStream('bar name1 name2')
-lexer = Lexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = TParser(tStream)
-parser.cond = False
-events = parser.r()
-
+if __name__ == '__main__':
+    unittest.main()
 

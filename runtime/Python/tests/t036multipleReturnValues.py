@@ -1,26 +1,43 @@
-import textwrap
 import antlr3
-from t036multipleReturnValuesLexer import t036multipleReturnValuesLexer as Lexer
-from t036multipleReturnValuesParser import t036multipleReturnValuesParser as Parser
-
-class TLexer(Lexer):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
-
-class TParser(Parser):
-    def recover(self, input, re):
-        # no error recovery yet, just crash!
-        raise
+import testbase
+import unittest
 
 
-cStream = antlr3.StringStream(
-    '   a'
-    )
+class t036multipleReturnValues(testbase.ANTLRTest):
+    def setUp(self):
+        self.compileGrammar()
+        
 
-lexer = TLexer(cStream)
-tStream = antlr3.CommonTokenStream(lexer)
-parser = TParser(tStream)
-ret = parser.a()
-assert ret.foo == 'foo', ret.foo
-assert ret.bar == 'bar', ret.bar
+    def lexerClass(self, base):
+        class TLexer(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
+
+        return TLexer
+    
+        
+    def parserClass(self, base):
+        class TParser(base):
+            def recover(self, input, re):
+                # no error recovery yet, just crash!
+                raise
+
+        return TParser
+    
+        
+    def testValid1(self):
+        cStream = antlr3.StringStream('   a')
+
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        ret = parser.a()
+        assert ret.foo == 'foo', ret.foo
+        assert ret.bar == 'bar', ret.bar
+
+
+if __name__ == '__main__':
+    unittest.main()
+
+
