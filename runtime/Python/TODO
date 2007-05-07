@@ -1,10 +1,15 @@
-- setup.py
+- move all Makefile functions to setup.py
+  - clean: recursivly search for temp files in
+    - antlr3
+    - unittests
+    - tests
+    - example (remove everything but stuff in files)
+- remove Makefiles from depot
 - create AUTHORS, NEWS, COPYING, INSTALL files
 - use from antlr3 import * in generated code
 - implement more examples
 - Fix remaining FIXMEs in (Python|AST).stg
 - complete runtime
-- restructure unittests for runtime modules
 - better test coverage for runtime modules
 - antlr features
   - tree parsers

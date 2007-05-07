@@ -41,39 +41,43 @@ def broken(reason, *exceptions):
 dependencyCache = {}
 
 # setup java CLASSPATH
-cp = []
+if 'CLASSPATH' not in os.environ:
+    cp = []
 
-baseDir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-libDir = os.path.join(baseDir, 'lib')
+    baseDir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+    libDir = os.path.join(baseDir, 'lib')
 
-jar = os.path.join(libDir, 'stringtemplate-3.0.jar')
-if not os.path.isfile(jar):
-    raise DistutilsFileError(
-        "Missing file '%s'. Grap it from a distribution package."
-        % jar,
-        )
-cp.append(jar)
+    jar = os.path.join(libDir, 'stringtemplate-3.0.jar')
+    if not os.path.isfile(jar):
+        raise DistutilsFileError(
+            "Missing file '%s'. Grap it from a distribution package."
+            % jar,
+            )
+    cp.append(jar)
 
-jar = os.path.join(libDir, 'antlr-2.7.7.jar')
-if not os.path.isfile(jar):
-    raise DistutilsFileError(
-        "Missing file '%s'. Grap it from a distribution package."
-        % jar,
-        )
-cp.append(jar)
+    jar = os.path.join(libDir, 'antlr-2.7.7.jar')
+    if not os.path.isfile(jar):
+        raise DistutilsFileError(
+            "Missing file '%s'. Grap it from a distribution package."
+            % jar,
+            )
+    cp.append(jar)
 
-jar = os.path.join(libDir, 'junit-4.2.jar')
-if not os.path.isfile(jar):
-    raise DistutilsFileError(
-        "Missing file '%s'. Grap it from a distribution package."
-        % jar,
-        )
-cp.append(jar)
+    jar = os.path.join(libDir, 'junit-4.2.jar')
+    if not os.path.isfile(jar):
+        raise DistutilsFileError(
+            "Missing file '%s'. Grap it from a distribution package."
+            % jar,
+            )
+    cp.append(jar)
 
-cp.append(os.path.join(baseDir, 'runtime', 'Python', 'build'))
+    cp.append(os.path.join(baseDir, 'runtime', 'Python', 'build'))
 
-classpath = ':'.join([os.path.abspath(p) for p in cp])
+    classpath = '-cp "' + ':'.join([os.path.abspath(p) for p in cp]) + '"'
 
+else:
+    classpath = ''
+    
 
 class ANTLRTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
@@ -96,7 +100,7 @@ class ANTLRTest(unittest.TestCase):
 
         else:
             dependencies = []
-            cmd = ('cd %s; java -cp %s org.antlr.Tool -depend %s 2>/dev/null'
+            cmd = ('cd %s; java %s org.antlr.Tool -depend %s 2>/dev/null'
                    % (testDir, classpath, grammarName)
                    )
             
@@ -127,7 +131,7 @@ class ANTLRTest(unittest.TestCase):
                 rebuild = True
 
         if rebuild:
-            fp = os.popen('cd %s; java -cp %s org.antlr.Tool %s 2>&1'
+            fp = os.popen('cd %s; java %s org.antlr.Tool %s 2>&1'
                           % (testDir, classpath, grammarName)
                           )
             output = ''
