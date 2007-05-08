@@ -30,18 +30,6 @@
 
 group Python implements ANTLRCore;
 
-javaTypeInitMap ::= [
-        "int":"0",
-        "long":"0",
-        "float":"0.0",
-        "double":"0.0",
-        "boolean":"false",
-        "byte":"0",
-        "short":"0",
-        "char":"0",
-        default:"null" // anything other than an atomic type
-]
-
 /** The overall file structure of a recognizer; stores methods for rules
  *  and cyclic DFAs plus support code.
  */
@@ -56,19 +44,11 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 # $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
 <@imports>
-import antlr3
-
-try:
-    set = set
-    frozenset = frozenset
-except NameError:
-    # for pre-2.4 compatibility
-    from sets import Set as set, ImmutableSet as frozenset
-
+from antlr3 import *
 <if(TREE_PARSER)>
-raise NotImplementedError("TREE_PARSER")
-#import org.antlr.runtime.tree.*;
+from antlr3.tree import *<\n>
 <endif>
+from antlr3.compat import set, frozenset
 <@end>
 
 <actions.(actionScope).header>
@@ -76,7 +56,7 @@ raise NotImplementedError("TREE_PARSER")
 <! <docComment> !>
 
 # for convenience in actions
-HIDDEN = antlr3.BaseRecognizer.HIDDEN
+HIDDEN = BaseRecognizer.HIDDEN
 
 # token types
 <tokens:{<it.name>=<it.type>}; separator="\n">
@@ -86,20 +66,20 @@ HIDDEN = antlr3.BaseRecognizer.HIDDEN
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
       filterMode) ::= <<
-class <name>(antlr3.Lexer):
+class <name>(Lexer):
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 
     grammarFileName = "<fileName>"
 
     def __init__(self, input=None):
-        antlr3.Lexer.__init__(self, input)
+        Lexer.__init__(self, input)
 <if(backtracking)>
         self.ruleMemo = {}
 <endif>
 
         <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; seperator="\n">
 
-	<actions.lexer.init>
+        <actions.lexer.init>
 
 
     <actions.lexer.members>
@@ -126,12 +106,15 @@ class <name>(antlr3.Lexer):
 filteringNextToken() ::= <<
 def nextToken(self):
     while True:
-        if self.input.LA(1) == antlr3.EOF:
-            return antlr3.EOF_TOKEN
+        if self.input.LA(1) == EOF:
+            return EOF_TOKEN
 
         self.token = None
-        self.tokenStartCharIndex = self.getCharIndex()
-        self.text = None
+        self.channel = DEFAULT_CHANNEL
+        self.tokenStartCharIndex = self.input.index()
+        self.tokenStartCharPositionInLine = self.input.charPositionInLine
+        self.tokenStartLine = self.input.line
+        self._text = None
         try:
             m = self.input.mark()
             self.backtracking = 1 <! means we won't throw slow exception !>
@@ -146,9 +129,10 @@ def nextToken(self):
                 self.input.consume() <! advance one char and try again !>
 
             else:
+                self.emit()
                 return self.token
 
-        except antlr3.RecognitionException, re:
+        except RecognitionException, re:
             # shouldn't happen in backtracking mode, but...
             self.reportError(re)
             self.recover(re)
@@ -156,13 +140,13 @@ def nextToken(self):
 
 def memoize(self, input, ruleIndex, ruleStartIndex):
     if self.backtracking > 1:
-        # is antlr3.Lexer always superclass?
-        antlr3.Lexer.memoize(self, input, ruleIndex, ruleStartIndex)
+        # is Lexer always superclass?
+        Lexer.memoize(self, input, ruleIndex, ruleStartIndex)
 
 
 def alreadyParsedRule(self, input, ruleIndex):
     if self.backtracking > 1:
-        return antlr3.Lexer.alreadyParsedRule(self, input, ruleIndex)
+        return Lexer.alreadyParsedRule(self, input, ruleIndex)
     return False
 
 
@@ -185,12 +169,12 @@ tokenNames = [
 
 <rules:{<ruleAttributeScopeClass(scope=it.ruleDescriptor.ruleScope)>}>
 
-class <name>(antlr3.<superClass>):
+class <name>(<superClass>):
     grammarFileName = "<fileName>"
     tokenNames = tokenNames
 
     def __init__(self, input):
-        antlr3.<superClass>.__init__(self, input)
+        <superClass>.__init__(self, input)
 <if(backtracking)>
         self.ruleMemo = {}
 <endif>
@@ -241,14 +225,13 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 # $ANTLR start <ruleName>
 def <ruleName>_fragment(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <if(trace)>
-    raise NotImplementedError("synpredRule: trace")
-#    traceIn("<ruleName>_fragment", <ruleDescriptor.index>);
-#    try {
-#        <block>
-#    }
-#    finally {
-#        traceOut("<ruleName>_fragment", <ruleDescriptor.index>);
-#    }
+    self.traceIn("<ruleName>_fragment", <ruleDescriptor.index>)
+    try:
+        <block>
+
+    finally:
+        self.traceOut("<ruleName>_fragment", <ruleDescriptor.index>)
+
 <else>
     <block>
 <endif>
@@ -311,7 +294,9 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 # $ANTLR start <ruleName>
 # <fileName>:<description>
 def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
-    <if(trace)>traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
+<if(trace)>
+    self.traceIn("<ruleName>", <ruleDescriptor.index>)
+<endif>
     <ruleScopeSetUp()>
     <ruleDeclarations()>
     <ruleLabelDefs()>
@@ -331,7 +316,7 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <if(actions.(actionScope).rulecatch)>
         <actions.(actionScope).rulecatch>
 <else>
-        except antlr3.RecognitionException, re:
+        except RecognitionException, re:
             self.reportError(re)
             self.recover(self.input, re)
 
@@ -343,7 +328,9 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <endif>
 <endif>
     finally:
-        <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
+<if(trace)>
+        self.traceOut("<ruleName>", <ruleDescriptor.index>)
+<endif>
         <memoize()>
         <ruleScopeCleanUp()>
         <finally>
@@ -363,11 +350,11 @@ except <e.decl>:
 
 ruleDeclarations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-retval = self.<returnType()>()
+retval = self.<ruleDescriptor.name>_return()
 retval.start = self.input.LT(1)<\n>
 <else>
 <ruleDescriptor.returnScope.attributes:{ a |
-<a.name> = <if(a.initValue)><a.initValue><else><initValue(a.type)><endif>
+<a.name> = <if(a.initValue)><a.initValue><else>None<endif>
 }>
 <endif>
 <if(memoize)>
@@ -448,44 +435,33 @@ if self.backtracking > 0:
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
 # $ANTLR start <ruleName>
 def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
-    <if(trace)>traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
+<if(trace)>
+    self.traceIn("<ruleName>", <ruleDescriptor.index>)
+<endif>
     <ruleDeclarations()>
     try:
-        self.ruleNestingLevel += 1
-
 <if(nakedBlock)>
         <ruleMemoization(name=ruleName)>
         <lexerRuleLabelDefs()>
         <ruleDescriptor.actions.init>
         <block><\n>
 <else>
-        _type = <ruleName>
-        _start = self.getCharIndex()
-        _line = self.getLine()
-        _charPosition = self.getCharPositionInLine()
-        _channel = antlr3.DEFAULT_CHANNEL
+        self.type = <ruleName>
 
         <ruleMemoization(name=ruleName)>
         <lexerRuleLabelDefs()>
         <ruleDescriptor.actions.init>
         <block>
-        <! create token if none exists *and* we are an outermost token rule !>
-        <execAction({
-if self.token is None and self.ruleNestingLevel == 1:
-    self.emit(
-        _type, _line, _charPosition, 
-        _channel, 
-        _start, self.getCharIndex()-1
-    )
-})>
         <ruleCleanUp()>
         <(ruleDescriptor.actions.after):execAction()>
 <endif>
 
     finally:
-        self.ruleNestingLevel -= 1
-        <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
+<if(trace)>
+        self.traceOut("<ruleName>", <ruleDescriptor.index>)
+<endif>
 	<memoize()>
+        pass
 
 # $ANTLR end <ruleName>
 
@@ -564,7 +540,7 @@ while True:
             break #loop<decisionNumber>
 
         <ruleBacktrackFailure()>
-        eee = antlr3.EarlyExitException(<decisionNumber>, self.input)
+        eee = EarlyExitException(<decisionNumber>, self.input)
         <@earlyExitException()>
         raise eee
 
@@ -685,7 +661,7 @@ if <s>:
 
 else:
     <ruleBacktrackFailure()>
-    mse = antlr3.MismatchedSetException(None, self.input)
+    mse = MismatchedSetException(None, self.input)
     <@mismatchedSetException()>
 <if(LEXER)>
     self.recover(mse)<\n>
@@ -709,7 +685,7 @@ lexerStringRef(string,label) ::= <<
 <label>Start = self.getCharIndex()
 self.match(<string>)
 <checkRuleBacktrackFailure()>
-<label> = antlr3.CommonToken(input=self.input, type=antlr3.INVALID_TOKEN_TYPE, channel=antlr3.DEFAULT_CHANNEL, start=<label>Start, stop=self.getCharIndex()-1)
+<label> = CommonToken(input=self.input, type=INVALID_TOKEN_TYPE, channel=DEFAULT_CHANNEL, start=<label>Start, stop=self.getCharIndex()-1)
 <else>
 self.match(<string>)
 <checkRuleBacktrackFailure()><\n>
@@ -739,7 +715,7 @@ self.matchAny()
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
-raise NotImplementedError("wildcardCharListLabel")
+FIXME(208:POSSIBLE AT ALL?)
 >>
 //<wildcardChar(...)>
 //<listLabel(...)>
@@ -761,7 +737,7 @@ self.following.pop()
 
 /** ids+=rule */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
-raise NotImplementedError("ruleRefAndListLabel")
+FIXME(209:POSSIBLE AT ALL?)
 <ruleRef(...)>
 <listLabel(...)>
 >>
@@ -772,10 +748,10 @@ lexerRuleRef(rule,label,args,elementIndex) ::= <<
 <label>Start<elementIndex> = self.getCharIndex()
 self.m<rule>(<args; separator=", ">)
 <checkRuleBacktrackFailure()>
-<label> = antlr3.CommonToken(
+<label> = CommonToken(
     input=self.input, 
-    type=antlr3.INVALID_TOKEN_TYPE,
-    channel=antlr3.DEFAULT_CHANNEL,
+    type=INVALID_TOKEN_TYPE,
+    channel=DEFAULT_CHANNEL,
     start=<label>Start<elementIndex>,
     stop=self.getCharIndex()-1
     )
@@ -797,7 +773,7 @@ lexerMatchEOF(label,elementIndex) ::= <<
 <label>Start<elementIndex> = self.getCharIndex()
 self.match(EOF)
 <checkRuleBacktrackFailure()>
-<label> = antlr3.CommonToken(input=self.input, type=EOF, channel=antlr3.DEFAULT_CHANNEL, start=<label>Start<elementIndex>, stop=self.getCharIndex()-1)
+<label> = CommonToken(input=self.input, type=EOF, channel=DEFAULT_CHANNEL, start=<label>Start<elementIndex>, stop=self.getCharIndex()-1)
 <else>
 self.match(EOF)
 <checkRuleBacktrackFailure()>
@@ -806,22 +782,24 @@ self.match(EOF)
 
 /** match ^(root children) in tree parser */
 tree(root, actionsAfterRoot, children, nullableChildList) ::= <<
-raise NotImplementedError("tree")
+<root:element()>
+<actionsAfterRoot:element()>
+<if(nullableChildList)>
+if self.input.LA(1) == DOWN:
+    self.match(self.input, DOWN, None)
+    <checkRuleBacktrackFailure()>
+    <children:element()>
+    self.match(self.input, UP, None)
+    <checkRuleBacktrackFailure()>
+
+<else>
+self.match(self.input, DOWN, None)
+<checkRuleBacktrackFailure()>
+<children:element()>
+self.match(self.input, UP, None)
+<checkRuleBacktrackFailure()>
+<endif>
 >>
-//<root:element()>
-//<actionsAfterRoot:element()>
-//<if(nullableChildList)>
-//if ( input.LA(1)==Token.DOWN ) {
-//    match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
-//    <children:element()>
-//    match(input, Token.UP, null); <checkRuleBacktrackFailure()>
-//}
-//<else>
-//match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
-//<children:element()>
-//match(input, Token.UP, null); <checkRuleBacktrackFailure()>
-//<endif>
-//>>
 
 /** Every predicate is used as a validating predicate (even when it is
  *  also hoisted into a prediction expression).
@@ -829,7 +807,7 @@ raise NotImplementedError("tree")
 validateSemanticPredicate(pred,description) ::= <<
 if not (<evalPredicate(...)>):
     <ruleBacktrackFailure()>
-    raise antlr3.FailedPredicateException(self.input, "<ruleName>", "<description>")
+    raise FailedPredicateException(self.input, "<ruleName>", "<description>")
 
 >>
 
@@ -843,7 +821,7 @@ else:
     alt<decisionNumber> = <eotPredictsAlt>
 <else>
     <ruleBacktrackFailure()>
-    nvae = antlr3.NoViableAltException("<description>", <decisionNumber>, <stateNumber>, self.input)<\n>
+    nvae = NoViableAltException("<description>", <decisionNumber>, <stateNumber>, self.input)<\n>
     <@noViableAltException()>
     raise nvae<\n>
 <endif>
@@ -910,7 +888,7 @@ else:
     alt<decisionNumber> = <eotPredictsAlt>
 <else>
     <ruleBacktrackFailure()>
-    nvae = antlr3.NoViableAltException("<description>", <decisionNumber>, <stateNumber>, self.input)<\n>
+    nvae = NoViableAltException("<description>", <decisionNumber>, <stateNumber>, self.input)<\n>
     <@noViableAltException()>
     raise nvae<\n>
 <endif>
@@ -927,7 +905,6 @@ LA<decisionNumber> = self.input.LA(<k>)
 <edges; separator="\nel">
 <if(eotPredictsAlt)>
 else:
-    raise NotImplementedError("dfaLoopbackStateSwitch: eotPredictsAlt")
     alt<decisionNumber> = <eotPredictsAlt>
 <endif>
 >>
@@ -990,7 +967,7 @@ DFA<dfa.decisionNumber>_transition = [
 # class definition for DFA #<dfa.decisionNumber>
 
 <if(dfa.specialStateSTs)>
-class DFA<dfa.decisionNumber>(antlr3.DFA):
+class DFA<dfa.decisionNumber>(DFA):
     def specialStateTransition(self_, s, input):
         # convince pylint that my self_ magic is ok ;)
         # pylint: disable-msg=E0213
@@ -1010,11 +987,11 @@ if s == <i0>: <! compressed special state numbers 0..n-1 !>
             self.failed = True
             return -1<\n>
 <endif>
-        nvae = antlr3.NoViableAltException(self_.getDescription(), <dfa.decisionNumber>, _s, input)
+        nvae = NoViableAltException(self_.getDescription(), <dfa.decisionNumber>, _s, input)
         self_.error(nvae)
         raise nvae<\n>
 <else>
-DFA<dfa.decisionNumber> = antlr3.DFA
+DFA<dfa.decisionNumber> = DFA
 <endif>
 
 >>
@@ -1063,10 +1040,8 @@ if (<labelExpr>)<if(predicates)> and (<predicates>)<endif>:
  *  always jump to the target.
  */
 eotDFAEdge(targetStateNumber,edgeNumber, predicates) ::= <<
-raise NotImplementedError("eotDFAEdge")
+s = <targetStateNumber><\n>
 >>
-//s = <targetStateNumber>;<\n>
-//>>
 
 
 // D F A  E X P R E S S I O N S
@@ -1118,6 +1093,7 @@ ruleAttributeScopeClass(scope) ::= <<
 class <scope.name>_scope(object):
     def __init__(self):
         <scope.attributes:{self.<it.decl> = None}; separator="\n">
+
 <endif>
 >>
 
@@ -1127,47 +1103,9 @@ self.<scope.name>_stack = []<\n>
 <endif>
 >>
 
-returnType() ::= <<
-<if(ruleDescriptor.hasMultipleReturnValues)>
-<ruleDescriptor.name>_return
-<else>
-<if(ruleDescriptor.hasSingleReturnValue)>
-raise NotImplementedError("returnType: !hasSingleReturnValue")
-#<ruleDescriptor.singleValueReturnType>
-<else>
-raise NotImplementedError("returnType: !hasSingleReturnValue")
-#void
-<endif>
-<endif>
->>
-
-/** Generate the Java type associated with a single or multiple return
- *  values.
- */
-ruleLabelType(referencedRule) ::= <<
-raise NotImplementedError("ruleLabelType")
->>
-//<if(referencedRule.hasMultipleReturnValues)>
-//<referencedRule.name>_return
-//<else>
-//<if(referencedRule.hasSingleReturnValue)>
-//<referencedRule.singleValueReturnType>
-//<else>
-//void
-//<endif>
-//<endif>
-//>>
-
-/** Using a type to init value map, try to init a type; if not in table
- *  must be an object, default value is "null".
- */
-initValue(typeName) ::= <<
-None
->>
-
 /** Define a rule label including default value */
 ruleLabelDef(label) ::= <<
-<label.label.text> = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))><\n>
+<label.label.text> = None<\n>
 >>
 
 /** Define a return struct for a rule if the code needs to access its
@@ -1176,7 +1114,7 @@ ruleLabelDef(label) ::= <<
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-class <returnType()>(object):
+class <ruleDescriptor.name>_return(object):
     def __init__(self):
         self.start = None
         self.stop = None
@@ -1199,25 +1137,24 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name> = <expr>"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
-raise NotImplementedError("scopeAttributeRef: negIndex")
-#((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>
+self.<scope>_stack[-<negIndex>].<attr.name>
 <else>
 <if(index)>
-raise NotImplementedError("scopeAttributeRef: index")
-#((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>
+self.<scope>_stack[<index>].<attr.name>
 <else>
 self.<scope>_stack[-1].<attr.name>
 <endif>
 <endif>
 >>
 
+
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 <if(negIndex)>
-raise NotImplementedError("scopeSetAttributeRef: negIndex")
+FIXME(218:POSSIBLE AT ALL) <!this seems not to be used by ActionTranslator...!>
 #((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name> =<expr>;
 <else>
 <if(index)>
-raise NotImplementedError("scopeSetAttributeRef: index")
+FIXME(219:POSSIBLE AT ALL) <!this seems not to be used by ActionTranslator...!>
 #((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name> =<expr>;
 <else>
 self.<scope>_stack[-1].<attr.name> = <expr>
@@ -1249,14 +1186,12 @@ retval.<attr.name>
 >>
 
 returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
-raise NotImplementedError("returnSetAttributeRef")
+<if(ruleDescriptor.hasMultipleReturnValues)>
+retval.<attr.name> = <expr>
+<else>
+<attr.name> = <expr>
+<endif>
 >>
-//<if(ruleDescriptor.hasMultipleReturnValues)>
-//retval.<attr.name> =<expr>;
-//<else>
-//<attr.name> =<expr>;
-//<endif>
-//>>
 
 /** How to translate $tokenLabel */
 tokenLabelRef(label) ::= "<label>"
@@ -1274,14 +1209,14 @@ tokenLabelPropertyRef_line(scope,attr) ::= "<scope>.line"
 tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>.charPositionInLine"
 tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>.channel"
 tokenLabelPropertyRef_index(scope,attr) ::= "<scope>.index"
-tokenLabelPropertyRef_tree(scope,attr) ::= "FIXME(tokenLabelPropertyRef_tree) <scope>_tree"
+tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "<scope>.start"
 ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-raise NotImplementedError("ruleLabelPropertyRef_text: TREE_PARSER")
+FIXME(221:TREEPARSER)
 #input.getTokenStream().toString(
 #  input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
 #  input.getTreeAdaptor().getTokenStopIndex(<scope>.start))
@@ -1289,7 +1224,7 @@ raise NotImplementedError("ruleLabelPropertyRef_text: TREE_PARSER")
 self.input.toString(<scope>.start,<scope>.stop)
 <endif>
 >>
-ruleLabelPropertyRef_st(scope,attr) ::= "FIXME(ruleLabelPropertyRef_st) <scope>.st"
+ruleLabelPropertyRef_st(scope,attr) ::= "FIXME(201:ST)<scope>.st"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
@@ -1304,23 +1239,23 @@ lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>.text"
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "retval.start"
 rulePropertyRef_stop(scope,attr) ::= "retval.stop" //mmm... or input.LT(-1)??
-rulePropertyRef_tree(scope,attr) ::= "FIXME(rulePropertyRef_tree) ((<ASTLabelType>)retval.tree)"
+rulePropertyRef_tree(scope,attr) ::= "retval.tree"
 rulePropertyRef_text(scope,attr) ::= "self.input.toString(retval.start, self.input.LT(-1))"
-rulePropertyRef_st(scope,attr) ::= "FIXME(rulePropertyRef_st) retval.st"
+rulePropertyRef_st(scope,attr) ::= "FIXME(203:ST)retval.st"
 
-lexerRulePropertyRef_text(scope,attr) ::= "self.getText()"
-lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "_line"
-lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
+lexerRulePropertyRef_text(scope,attr) ::= "self.text"
+lexerRulePropertyRef_type(scope,attr) ::= "self.type"
+lexerRulePropertyRef_line(scope,attr) ::= "self.tokenStartLine"
+lexerRulePropertyRef_pos(scope,attr) ::= "self.tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
-lexerRulePropertyRef_start(scope,attr) ::= "_start"
+lexerRulePropertyRef_channel(scope,attr) ::= "self.channel"
+lexerRulePropertyRef_start(scope,attr) ::= "self.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(self.getCharIndex()-1)"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error
-ruleSetPropertyRef_tree(scope,attr,expr) ::= "FIXME(ruleSetPropertyRef_tree) retval.tree =<expr>;"
-ruleSetPropertyRef_st(scope,attr,expr) ::= "FIXME(ruleSetPropertyRef_st) retval.st =<expr>;"
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree =<expr>"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "FIXME(205:ST)retval.st =<expr>;"
 
 
 /** How to execute an action */

@@ -1,22 +1,18 @@
-- move all Makefile functions to setup.py
-  - clean: recursivly search for temp files in
-    - antlr3
-    - unittests
-    - tests
-    - example (remove everything but stuff in files)
-- remove Makefiles from depot
-- create AUTHORS, NEWS, COPYING, INSTALL files
-- use from antlr3 import * in generated code
+- complete runtime
+ - tree.DOTTreeGenerator (needs ST)
+ - tree.DoubleLinkTree
+ - tree.ParseTree
+ - tree.UnBufferedTreeNodeStream
+- better test coverage for runtime modules
 - implement more examples
 - Fix remaining FIXMEs in (Python|AST).stg
-- complete runtime
-- better test coverage for runtime modules
 - antlr features
   - tree parsers
     - 2nd half of simplecTreeParser example
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()
   - (String|CommonToken)Stream.size() --> __len__
+- get rid of getter/setter in generated code
 - documentation in docstrings
 - document differences to java API
 - add methods to emulate java API, but mark 'em as deprecated

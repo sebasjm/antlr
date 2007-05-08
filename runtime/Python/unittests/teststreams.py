@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 
+import os
 import unittest
-
+from StringIO import StringIO
 import antlr3
 
 
@@ -237,6 +239,102 @@ class TestStringStream(unittest.TestCase):
         self.failUnlessEqual(stream.line, 2)
         self.failUnlessEqual(stream.charPositionInLine, 1)
         self.failUnlessEqual(stream.LA(1), 'a')
+
+        
+class TestFileStream(unittest.TestCase):
+    """Test case for the FileStream class."""
+
+
+    def testNoEncoding(self):
+        path = os.path.join(os.path.dirname(__file__), 'teststreams.input1')
+        
+        stream = antlr3.FileStream(path)
+
+        stream.seek(4)
+        marker1 = stream.mark()
+        
+        stream.consume()
+        marker2 = stream.mark()
+        
+        stream.consume()
+        marker3 = stream.mark()
+
+        stream.rewind(marker2)
+        self.failUnlessEqual(stream.markDepth, 1)
+        self.failUnlessEqual(stream.index(), 5)
+        self.failUnlessEqual(stream.line, 2)
+        self.failUnlessEqual(stream.charPositionInLine, 1)
+        self.failUnlessEqual(stream.LA(1), 'a')
+
+
+    def testEncoded(self):
+        path = os.path.join(os.path.dirname(__file__), 'teststreams.input2')
+        
+        stream = antlr3.FileStream(path, 'utf-8')
+
+        stream.seek(4)
+        marker1 = stream.mark()
+        
+        stream.consume()
+        marker2 = stream.mark()
+        
+        stream.consume()
+        marker3 = stream.mark()
+
+        stream.rewind(marker2)
+        self.failUnlessEqual(stream.markDepth, 1)
+        self.failUnlessEqual(stream.index(), 5)
+        self.failUnlessEqual(stream.line, 2)
+        self.failUnlessEqual(stream.charPositionInLine, 1)
+        self.failUnlessEqual(stream.LA(1), u'ä')
+
+        
+
+class TestInputStream(unittest.TestCase):
+    """Test case for the InputStream class."""
+
+    def testNoEncoding(self):
+        file = StringIO('foo\nbar')
+        
+        stream = antlr3.InputStream(file)
+
+        stream.seek(4)
+        marker1 = stream.mark()
+        
+        stream.consume()
+        marker2 = stream.mark()
+        
+        stream.consume()
+        marker3 = stream.mark()
+
+        stream.rewind(marker2)
+        self.failUnlessEqual(stream.markDepth, 1)
+        self.failUnlessEqual(stream.index(), 5)
+        self.failUnlessEqual(stream.line, 2)
+        self.failUnlessEqual(stream.charPositionInLine, 1)
+        self.failUnlessEqual(stream.LA(1), 'a')
+
+
+    def testEncoded(self):
+        file = StringIO(u'foo\nbär'.encode('utf-8'))
+        
+        stream = antlr3.InputStream(file, 'utf-8')
+
+        stream.seek(4)
+        marker1 = stream.mark()
+        
+        stream.consume()
+        marker2 = stream.mark()
+        
+        stream.consume()
+        marker3 = stream.mark()
+
+        stream.rewind(marker2)
+        self.failUnlessEqual(stream.markDepth, 1)
+        self.failUnlessEqual(stream.index(), 5)
+        self.failUnlessEqual(stream.line, 2)
+        self.failUnlessEqual(stream.charPositionInLine, 1)
+        self.failUnlessEqual(stream.LA(1), u'ä')
 
         
 class TestCommonTokenStream(unittest.TestCase):
@@ -550,7 +648,6 @@ class TestCommonTokenStream(unittest.TestCase):
         assert stream.toString(1, 2) == "bargnurz"
         assert stream.toString(stream.tokens[1], stream.tokens[-2]) == "bargnurz"
         
-
 
 if __name__ == "__main__":
     unittest.main(testRunner=unittest.TextTestRunner(verbosity=2))

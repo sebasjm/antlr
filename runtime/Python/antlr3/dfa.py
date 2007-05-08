@@ -72,7 +72,7 @@ class DFA(object):
         mark = input.mark()
         s = 0 # we always start at s0
         try:
-            while True:
+            for _ in xrange(50000):
                 #print "***Current state = %d" % s
                 
                 specialState = self.special[s]
@@ -148,6 +148,9 @@ class DFA(object):
                 # not in range and not EOF/EOT, must be invalid symbol
                 self.noViableAlt(s, input)
                 return 0
+
+            else:
+                raise RuntimeError("DFA bang!")
             
         finally:
             input.rewind(mark)

@@ -57,7 +57,7 @@ r9
     ;
 
 r10
-    : INT -> {antlr3.tree.CommonTree(antlr3.CommonToken(type=FLOAT, text=$INT.text + ".0"))}
+    : INT -> {CommonTree(CommonToken(type=FLOAT, text=$INT.text + ".0"))}
     ;
 
 r11
@@ -245,16 +245,73 @@ r49
 
 r50
     : ID 
-        -> ^({antlr3.tree.CommonTree(antlr3.CommonToken(type=FLOAT, text="1.0"))} ID)
+        -> ^({CommonTree(CommonToken(type=FLOAT, text="1.0"))} ID)
     ;
 
-a: (as+=ID)+ {len($as) == 3}?
-  -> ID ID ID
-  ;
+/** templates tested:
+    tokenLabelPropertyRef_tree
+*/
+r51 returns [res]
+    : ID t=ID ID
+        { $res = $t.tree }
+    ;
 
-b: ID+
-  -> ID ID ID
-  ;
+/** templates tested:
+    rulePropertyRef_tree
+*/
+r52 returns [res]
+@after {
+    $res = $tree
+}
+    : ID
+    ;
+
+/** templates tested:
+    ruleLabelPropertyRef_tree
+*/
+r53 returns [res]
+    : t=primary
+        { $res = $t.tree }
+    ;
+
+/** templates tested:
+    ruleSetPropertyRef_tree
+*/
+r54 returns [res]
+@after {
+    $tree = $t.tree;
+}
+    : ID t=expression ID
+    ;
+
+/** backtracking */
+r55
+options { backtrack=true; k=1; }
+    : (modifier+ INT)=> modifier+ expression
+    | modifier+ statement
+    ;
+
+
+/** templates tested:
+    rewriteTokenRef with len(args)>0
+*/
+r56
+    : t=ID* -> ID[$t,'foo']
+    ;
+
+/** templates tested:
+    rewriteTokenRefRoot with len(args)>0
+*/
+r57
+    : t=ID* -> ^(ID[$t,'foo'])
+    ;
+
+/** templates tested:
+    ???
+*/
+r58
+    : ({CommonTree(CommonToken(type=FLOAT, text="2.0"))})^
+    ;
 
 primary
     : ID

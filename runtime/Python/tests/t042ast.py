@@ -23,7 +23,7 @@ class t042ast(testbase.ANTLRTest):
     
 
     def parse(self, text, method, rArgs=[], **kwargs):
-        self.compileGrammar()
+        self.compileGrammar() #options='-trace')
         
         cStream = antlr3.StringStream(text)
         self.lexer = self.getLexer(cStream)
@@ -615,20 +615,69 @@ class t042ast(testbase.ANTLRTest):
             )
 
 
-##     def testA(self):
-##         r = self.parse("gnurz gnarz", 'a')
-##         self.failUnlessEqual(
-##             r.tree.toStringTree(),
-##             'gnurz gnarz gnorz'
-##             )
+    def testR51(self):
+        r = self.parse("gnurza gnurzb gnurzc", 'r51')
+        self.failUnlessEqual(
+            r.res.toStringTree(),
+            'gnurzb'
+            )
 
 
-##     def testB(self):
-##         r = self.parse("gnurz gnarz", 'b')
-##         self.failUnlessEqual(
-##             r.tree.toStringTree(),
-##             'gnurz gnarz gnorz'
-##             )
+    def testR52(self):
+        r = self.parse("gnurz", 'r52')
+        self.failUnlessEqual(
+            r.res.toStringTree(),
+            'gnurz'
+            )
+
+
+    def testR53(self):
+        r = self.parse("gnurz", 'r53')
+        self.failUnlessEqual(
+            r.res.toStringTree(),
+            'gnurz'
+            )
+
+
+    def testR54(self):
+        r = self.parse("gnurza 1 + 2 gnurzb", 'r54')
+        self.failUnlessEqual(
+            r.tree.toStringTree(),
+            '(+ 1 2)'
+            )
+
+
+    def testR55a(self):
+        r = self.parse("public private 1 + 2", 'r55')
+        self.failUnlessEqual(
+            r.tree.toStringTree(),
+            'public private (+ 1 2)'
+            )
+
+
+    def testR55b(self):
+        r = self.parse("public fooze", 'r55')
+        self.failUnlessEqual(
+            r.tree.toStringTree(),
+            'public fooze'
+            )
+
+
+    def testR56(self):
+        r = self.parse("a b c d", 'r56')
+        self.failUnlessEqual(
+            r.tree.toStringTree(),
+            'foo'
+            )
+
+
+    def testR57(self):
+        r = self.parse("a b c d", 'r57')
+        self.failUnlessEqual(
+            r.tree.toStringTree(),
+            'foo'
+            )
+
 
 
 if __name__ == '__main__':

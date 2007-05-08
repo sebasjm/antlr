@@ -5,8 +5,8 @@ options {
 
 a returns [foo, bar]: A
         {
-            $foo = "foo"
-            $bar = "bar"
+            $foo = "foo";
+            $bar = "bar";
         }
     ;
 

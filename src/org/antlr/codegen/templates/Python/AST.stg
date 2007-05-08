@@ -33,17 +33,6 @@ group AST;
 finishedBacktracking(block) ::= <<
 <if(backtracking)>
 if self.backtracking == 0:
-    FIXME(3)
-    <block>
-<else>
-<block>
-<endif>
->>
-
-stillBacktracking(block) ::= <<
-<if(backtracking)>
-if self.backtracking > 0:
-    FIXME(5)
     <block>
 <else>
 <block>
@@ -64,7 +53,7 @@ from antlr3.tree import *<\n>
 
 /** Add an adaptor property that knows how to build trees */
 parserMembers() ::= <<
-self.adaptor = antlr3.tree.CommonTreeAdaptor()<\n>
+self.adaptor = CommonTreeAdaptor()<\n>
 >>
 
 @returnScope.ruleReturnMembers() ::= <<
@@ -179,17 +168,13 @@ tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 // I have more time.
 
 matchSet(s,label,elementIndex,postmatchCode) ::= <<
-<super.matchSet(..., postmatchCode={<stillBacktracking({self.adaptor.addChild(root_0, self.adaptor.createWithPayload(<label>))})>})>
+<super.matchSet(..., postmatchCode={<finishedBacktracking({self.adaptor.addChild(root_0, self.adaptor.createWithPayload(<label>))})>})>
 >>
 
 matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
 
-matchSetRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={<stillBacktracking({FIXME(39)root_<blockLevel> = self.adaptor.becomeRoot(self.adaptor.createWithPayload(<label>), root_<blockLevel>)})>})>
->>
-
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={<stillBacktracking({FIXME(40)root_0 = self.adaptor.becomeRoot(self.adaptor.createWithPayload(<label>), root_0)})>})>
+<super.matchSet(..., postmatchCode={<finishedBacktracking({FIXME(40)root_0 = self.adaptor.becomeRoot(self.adaptor.createWithPayload(<label>), root_0)})>})>
 >>
 
 // RULE REF AST
@@ -397,7 +382,7 @@ rewriteElement(e) ::= <<
 
 /** Gen ID or ID[args] */
 rewriteTokenRef(token,elementIndex,args) ::= <<
-self.adaptor.addChild(root_<treeLevel>, <if(args)>FIXME(182)adaptor.create(<token>,<args; separator=", ">)<else>stream_<token>.next()<endif>)<\n>
+self.adaptor.addChild(root_<treeLevel>, <if(args)>self.adaptor.createFromToken(<token>,<args; separator=", ">)<else>stream_<token>.next()<endif>)<\n>
 >>
 
 /** Gen $label ... where defined via label=ID */
@@ -417,7 +402,7 @@ root_<treeLevel> = self.adaptor.becomeRoot(stream_<label>.next(), root_<treeLeve
 
 /** Gen ^(ID ...) or ^(ID[args] ...) */
 rewriteTokenRefRoot(token,elementIndex,args) ::= <<
-root_<treeLevel> = self.adaptor.becomeRoot(<if(args)>FIXME(188)adaptor.create(<token>,<args; separator=", ">)<else>stream_<token>.next()<endif>, root_<treeLevel>)<\n>
+root_<treeLevel> = self.adaptor.becomeRoot(<if(args)>self.adaptor.createFromToken(<token>,<args; separator=", ">)<else>stream_<token>.next()<endif>, root_<treeLevel>)<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<

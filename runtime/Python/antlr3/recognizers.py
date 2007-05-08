@@ -27,28 +27,16 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import sys
+import inspect
 
 from antlr3.constants import DEFAULT_CHANNEL, HIDDEN_CHANNEL, EOF, \
-     EOR_TOKEN_TYPE
+     EOR_TOKEN_TYPE, INVALID_TOKEN_TYPE
 from antlr3.exceptions import RecognitionException, MismatchedTokenException, \
-     MismatchedRangeException
+     MismatchedRangeException, MismatchedTreeNodeException, \
+     NoViableAltException, EarlyExitException, MismatchedSetException, \
+     MismatchedNotSetException, FailedPredicateException
 from antlr3.tokens import CommonToken, EOF_TOKEN, SKIP_TOKEN
-
-# compatibility stuff
-try:
-    set = set
-    frozenset = frozenset
-except NameError:
-    from sets import Set as set, ImmutableSet as frozenset
-
-
-try:
-    reversed = reversed
-except NameError:
-    def reversed(l):
-        l = l[:]
-        l.reverse()
-        return l
+from antlr3.compat import set, frozenset, reversed
 
 
 class BaseRecognizer(object):
@@ -120,7 +108,6 @@ class BaseRecognizer(object):
         """
         
         # wack everything related to error recovery
-        self._fsp = -1
         self.errorRecovery = False
         self.lastErrorIndex = -1
         self.failed = False
@@ -227,8 +214,60 @@ class BaseRecognizer(object):
 	exception types.
         """
 
-        # FIXME: correct implentation
-        return str(e)
+        msg = None
+        if isinstance(e, MismatchedTokenException):
+            tokenName = "<unknown>"
+            if e.expecting == EOF:
+                tokenName = "EOF"
+            else:
+                tokenName = self.tokenNames[e.expecting]
+
+            msg = "mismatched input " \
+                  + self.getTokenErrorDisplay(e.token) \
+                  + " expecting " \
+                  + tokenName
+
+        elif isinstance(e, MismatchedTreeNodeException):
+            tokenName = "<unknown>"
+            if e.expecting == EOF:
+                tokenName = "EOF"
+            else:
+                tokenName = self.tokenNames[e.expecting]
+
+            msg = "mismatched tree node: " \
+                  + e.node \
+                  + " expecting " \
+                  + tokenName
+
+        elif isinstance(e, NoViableAltException):
+            msg = "no viable alternative at input " \
+                  + self.getTokenErrorDisplay(e.token)
+
+        elif isinstance(e, EarlyExitException):
+            msg = "required (...)+ loop did not match anything at input " \
+                  + self.getTokenErrorDisplay(e.token)
+
+        elif isinstance(e, MismatchedSetException):
+            msg = "mismatched input " \
+                  + self.getTokenErrorDisplay(e.token) \
+                  + " expecting set " \
+                  + e.expecting
+
+        elif isinstance(e, MismatchedNotSetException):
+            msg = "mismatched input " \
+                  + self.getTokenErrorDisplay(e.token) \
+                  + " expecting set " \
+                  + e.expecting
+
+        elif isinstance(e, FailedPredicateException):
+            msg = "rule " \
+                  + e.ruleName \
+                  + " failed predicate: {" \
+                  + e.predicateText \
+                  + "}?"
+
+        
+        return msg
     
 
     def getErrorHeader(self, e):
@@ -250,7 +289,14 @@ class BaseRecognizer(object):
         so that it creates a new Java type.
         """
         
-        raise NotImplementedError
+        s = t.text
+        if s is None:
+            if t.type == EOF:
+                s = "<EOF>"
+            else:
+                s = "<"+t.type+">"
+
+        return repr(s)
     
 
     def emitErrorMessage(self, msg):
@@ -513,7 +559,9 @@ class BaseRecognizer(object):
 
 
     def recoverFromMismatchedSet(self, input, e, follow):
-        raise NotImplementedError
+        # TODO do single token deletion like above for Token mismatch
+        if not self.recoverFromMismatchedElement(input, e, follow):
+            raise e
 
 
     def recoverFromMismatchedElement(self, input, e, follow):
@@ -564,86 +612,92 @@ class BaseRecognizer(object):
             ttype = input.LA(1)
 
 
-## 	/** Return List<String> of the rules in your parser instance
-## 	 *  leading up to a call to this method.  You could override if
-## 	 *  you want more details such as the file/line info of where
-## 	 *  in the parser java code a rule is invoked.
-## 	 *
-## 	 *  This is very useful for error messages and for context-sensitive
-## 	 *  error recovery.
-## 	 */
-## 	public List getRuleInvocationStack() {
-## 		String parserClassName = getClass().getName();
-## 		return getRuleInvocationStack(new Throwable(), parserClassName);
-## 	}
+    def getRuleInvocationStack(self):
+        """
+        Return List<String> of the rules in your parser instance
+        leading up to a call to this method.  You could override if
+        you want more details such as the file/line info of where
+        in the parser java code a rule is invoked.
 
-## 	/** A more general version of getRuleInvocationStack where you can
-## 	 *  pass in, for example, a RecognitionException to get it's rule
-## 	 *  stack trace.  This routine is shared with all recognizers, hence,
-## 	 *  static.
-## 	 *
-## 	 *  TODO: move to a utility class or something; weird having lexer call this
-## 	 */
-## 	public static List getRuleInvocationStack(Throwable e,
-## 											  String recognizerClassName)
-## 	{
-## 		List rules = new ArrayList();
-## 		StackTraceElement[] stack = e.getStackTrace();
-## 		int i = 0;
-## 		for (i=stack.length-1; i>=0; i--) {
-## 			StackTraceElement t = stack[i];
-## 			if ( t.getClassName().startsWith("org.antlr.runtime.") ) {
-## 				continue; // skip support code such as this method
-## 			}
-## 			if ( t.getMethodName().equals("nextToken") ) {
-## 				continue;
-## 			}
-## 			if ( !t.getClassName().equals(recognizerClassName) ) {
-## 				continue; // must not be part of this parser
-## 			}
-##             rules.add(t.getMethodName());
-## 		}
-## 		return rules;
-## 	}
+        This is very useful for error messages and for context-sensitive
+        error recovery.
 
-## 	public int getBacktrackingLevel() {
-## 		return backtracking;
-## 	}
+        You must be careful, if you subclass a generated recognizers.
+        The default implementation will only search the module of self
+        for rules, but the subclass will not contain any rules.
+        You probably want to override this method to look like
 
-## 	/** For debugging and other purposes, might want the grammar name.
-## 	 *  Have ANTLR generate an implementation for this method.
-## 	 */
-## 	public String getGrammarFileName() {
-## 		return null;
-## 	}
+        def getRuleInvocationStack(self):
+            return self._getRuleInvocationStack(<class>.__module__)
 
-## 	/** A convenience method for use most often with template rewrites.
-## 	 *  Convert a List<Token> to List<String>
-## 	 */
-## 	public List toStrings(List tokens) {
-## 		if ( tokens==null ) return null;
-## 		List strings = new ArrayList(tokens.size());
-## 		for (int i=0; i<tokens.size(); i++) {
-## 			strings.add(((Token)tokens.get(i)).getText());
-## 		}
-## 		return strings;
-## 	}
+        where <class> is the class of the generated recognizer, e.g.
+        the superclass of self.
+	"""
 
-## 	/** Convert a List<RuleReturnScope> to List<StringTemplate> by copying
-## 	 *  out the .st property.  Useful when converting from
-## 	 *  list labels to template attributes:
-## 	 *
-## 	 *    a : ids+=rule -> foo(ids={toTemplates($ids)})
-## 	 *      ;
-## 	 */
-## 	public List toTemplates(List retvals) {
-## 		if ( retvals==null ) return null;
-## 		List strings = new ArrayList(retvals.size());
-## 		for (int i=0; i<retvals.size(); i++) {
-## 			strings.add(((RuleReturnScope)retvals.get(i)).getTemplate());
-## 		}
-## 		return strings;
-## 	}
+        return self._getRuleInvocationStack(self.__module__)
+
+
+    def _getRuleInvocationStack(cls, module):
+        """
+        A more general version of getRuleInvocationStack where you can
+        pass in, for example, a RecognitionException to get it's rule
+        stack trace.  This routine is shared with all recognizers, hence,
+        static.
+
+        TODO: move to a utility class or something; weird having lexer call
+        this
+        """
+
+        # mmmhhh,... perhaps look at the first argument
+        # (f_locals[co_varnames[0]]?) and test if it's a (sub)class of
+        # requested recognizer...
+        
+        rules = []
+        for frame in reversed(inspect.stack()):
+            code = frame[0].f_code
+            codeMod = inspect.getmodule(code)
+            if codeMod is None:
+                continue
+
+            # skip frames not in requested module
+            if codeMod.__name__ != module:
+                continue
+
+            # skip some unwanted names
+            if code.co_name in ('nextToken', '<module>'):
+                continue
+
+            rules.append(code.co_name)
+
+        return rules
+        
+    _getRuleInvocationStack = classmethod(_getRuleInvocationStack)
+    
+
+    def getBacktrackingLevel(self):
+        return self.backtracking
+
+
+    def getGrammarFileName(self):
+        """For debugging and other purposes, might want the grammar name.
+        
+        Have ANTLR generate an implementation for this method.
+        """
+
+        return None
+
+
+    def toStrings(self, tokens):
+        """A convenience method for use most often with template rewrites.
+
+        Convert a List<Token> to List<String>
+        """
+
+        if tokens is None:
+            return None
+
+        return [token.text for token in tokens]
+
 
     def getRuleMemoization(self, ruleIndex, ruleStartIndex):
         """
@@ -708,57 +762,58 @@ class BaseRecognizer(object):
             self.ruleMemo[ruleIndex][ruleStartIndex] = stopTokenIndex
 
 
-## 	/** return how many rule/input-index pairs there are in total.
-## 	 *  TODO: this includes synpreds. :(
-## 	 */
-## 	public int getRuleMemoizationCacheSize() {
-## 		int n = 0;
-## 		for (int i = 0; ruleMemo!=null && i < ruleMemo.length; i++) {
-## 			Map ruleMap = ruleMemo[i];
-## 			if ( ruleMap!=null ) {
-## 				n += ruleMap.size(); // how many input indexes are recorded?
-## 			}
-## 		}
-## 		return n;
-## 	}
+    def traceIn(self, ruleName, ruleIndex, inputSymbol):
+        sys.stdout.write("enter %s %s" % (ruleName, inputSymbol))
+        
+        if self.failed:
+            sys.stdout.write(" failed=%s" % self.failed)
 
-## 	public void traceIn(String ruleName, int ruleIndex, Object inputSymbol)  {
-## 		System.out.print("enter "+ruleName+" "+inputSymbol);
-## 		if ( failed ) {
-## 			System.out.println(" failed="+failed);
-## 		}
-## 		if ( backtracking>0 ) {
-## 			System.out.print(" backtracking="+backtracking);
-## 		}
-## 		System.out.println();
-## 	}
+        if self.backtracking > 0:
+            sys.stdout.write(" backtracking=%s" % self.backtracking)
 
-## 	public void traceOut(String ruleName,
-## 						 int ruleIndex,
-## 						 Object inputSymbol)
-## 	{
-## 		System.out.print("exit "+ruleName+" "+inputSymbol);
-## 		if ( failed ) {
-## 			System.out.println(" failed="+failed);
-## 		}
-## 		if ( backtracking>0 ) {
-## 			System.out.print(" backtracking="+backtracking);
-## 		}
-## 		System.out.println();
-## 	}
+        sys.stdout.write('\n')
 
 
-    def synpred(self, input, fragment):
-        """
-        A syntactic predicate.  Returns true/false depending on whether
-        the specified grammar fragment matches the current input stream.
-        This resets the failed instance var afterwards.
+    def traceOut(self, ruleName, ruleIndex, inputSymbol):
+        sys.stdout.write("exit %s %s" % (ruleName, inputSymbol))
+        
+        if self.failed:
+            sys.stdout.write(" failed=%s" % self.failed)
+
+        if self.backtracking > 0:
+            sys.stdout.write(" backtracking=%s" % self.backtracking)
+
+        sys.stdout.write('\n')
+
+
+
+class TokenSource(object):
+    """
+    A source of tokens must provide a sequence of tokens via nextToken()
+    and also must reveal it's source of characters; CommonToken's text is
+    computed from a CharStream; it only store indices into the char stream.
+
+    Errors from the lexer are never passed to the parser.  Either you want
+    to keep going or you do not upon token recognition error.  If you do not
+    want to continue lexing then you do not want to continue parsing.  Just
+    throw an exception not under RecognitionException and Java will naturally
+    toss you all the way out of the recognizers.  If you want to continue
+    lexing then you should not throw an exception to the parser--it has already
+    requested a token.  Keep lexing until you get a valid one.  Just report
+    errors and keep going, looking for a valid token.
+    """
+    
+    def nextToken(self):
+        """Return a Token object from your input stream (usually a CharStream).
+        
+        Do not fail/return upon lexing error; keep chewing on the characters
+        until you get a good one; errors are not passed through to the parser.
         """
 
         raise NotImplementedError
+    
 
-
-class Lexer(BaseRecognizer):
+class Lexer(BaseRecognizer, TokenSource):
     """
     A lexer is recognizer that draws input symbols from a character stream.
     lexer grammars result in a subclass of this object. A Lexer object
@@ -768,6 +823,7 @@ class Lexer(BaseRecognizer):
 
     def __init__(self, input):
         BaseRecognizer.__init__(self)
+        TokenSource.__init__(self)
         
         # Where is the lexer drawing characters from?
         self.input = input
@@ -786,15 +842,21 @@ class Lexer(BaseRecognizer):
 	# the start of nextToken.
         self.tokenStartCharIndex = -1
 
+        # The line on which the first character of the token resides
+        self.tokenStartLine = -1
+
+        # The character position of first character within the line
+        self.tokenStartCharPositionInLine = -1
+
+        # The channel number for the current token
+        self.channel = DEFAULT_CHANNEL
+
+        # The token type for the current token
+        self.type = INVALID_TOKEN_TYPE
+        
         # You can set the text for the current token to override what is in
 	# the input char buffer.  Use setText() or can set this instance var.
-        self.text = None
-
-	# We must track the token rule nesting level as we only want to
-	# emit a token automatically at the outermost level so we don't get
-	# two if FLOAT calls INT.  To save code space and time, do not
-	# inc/dec this in fragment rules.
-        self.ruleNestingLevel = 0
+        self._text = None
 
 
     def reset(self):
@@ -802,9 +864,12 @@ class Lexer(BaseRecognizer):
 
         # wack Lexer state variables
         self.token = None
+        self.type = INVALID_TOKEN_TYPE
+        self.channel = DEFAULT_CHANNEL
         self.tokenStartCharIndex = -1
-        self.text = None
-        self.ruleNestingLevel = 0
+        self.tokenStartLine = -1
+        self.tokenStartCharPositionInLine = -1
+        self._text = None
         if self.input is not None:
             self.input.seek(0) # rewind the input
 
@@ -817,15 +882,24 @@ class Lexer(BaseRecognizer):
         
         while 1:
             self.token = None
-            self.tokenStartCharIndex = self.getCharIndex()
-            self.text = None
+            self.channel = DEFAULT_CHANNEL
+            self.tokenStartCharIndex = self.input.index()
+            self.tokenStartCharPositionInLine = self.input.charPositionInLine
+            self.tokenStartLine = self.input.line
+            self._text = None
             if self.input.LA(1) == EOF:
                 return EOF_TOKEN
 
             try:
                 self.mTokens()
-                if self.token != SKIP_TOKEN:
-                    return self.token
+                
+                if self.token is None:
+                    self.emit()
+                    
+                elif self.token == SKIP_TOKEN:
+                    continue
+
+                return self.token
 
             except RecognitionException, re:
                 raise # no error reporting/recovery
@@ -854,24 +928,12 @@ class Lexer(BaseRecognizer):
 
     def setCharStream(self, input):
         """Set the char stream and reset the lexer"""
+        self.input = None
+        self.reset()
         self.input = input
-        self.token = None
-        self.tokenStartCharIndex = -1
-        self.ruleNestingLevel = 0
 
 
-##     def emit(self, token):
-## 	"""
-##         Currently does not support multiple emits per nextToken invocation
-## 	for efficiency reasons.  Subclass and override this method and
-## 	nextToken (to push tokens into a list and pull from that list rather
-## 	than a single variable as this implementation does).
-## 	"""
-        
-##         self.token = token
-
-
-    def emit(self, tokenType, line, charPosition, channel, start, stop):
+    def emit(self, token=None):
         """
         The standard method called to automatically emit a token at the
 	outermost lexical rule.  The token object should point into the
@@ -879,19 +941,21 @@ class Lexer(BaseRecognizer):
 	use that to set the token's text.
 	"""
 
-        t = CommonToken()
-        t.input = self.input
-        t.type = tokenType
-        t.channel = channel
-        t.start = start
-        t.stop = stop
-        t.line = line
-        t.text = self.text
-        t.charPositionInLine = charPosition
+        if token is None:
+            token = CommonToken(
+                input=self.input,
+                type=self.type,
+                channel=self.channel,
+                start=self.tokenStartCharIndex,
+                stop=self.getCharIndex()-1
+                )
+            token.line = self.tokenStartLine
+            token.text = self.text
+            token.charPositionInLine = self.tokenStartCharPositionInLine
 
-        self.token = t
+        self.token = token
         
-        return t
+        return token
 
 
     def match(self, s):
@@ -962,8 +1026,8 @@ class Lexer(BaseRecognizer):
         Return the text matched so far for the current token or any
         text override.
         """
-        if self.text is not None:
-            return self.text
+        if self._text is not None:
+            return self._text
         
         return self.input.substring(
             self.tokenStartCharIndex,
@@ -976,7 +1040,10 @@ class Lexer(BaseRecognizer):
         Set the complete text of this token; it wipes any previous
 	changes to the text.
 	"""
-        self.text = text
+        self._text = text
+
+
+    text = property(getText, setText)
 
 
     def reportError(self, e):
@@ -994,11 +1061,52 @@ class Lexer(BaseRecognizer):
 
 
     def getErrorMessage(self, e, tokenNames):
-        raise NotImplementedError
+        msg = None
+        
+        if isinstance(e, MismatchedTokenException):
+            msg = "mismatched character " \
+                  + self.getCharErrorDisplay(e.c) \
+                  + " expecting " \
+                  + self.getCharErrorDisplay(e.expecting)
+
+        elif isinstance(e, NoViableAltException):
+            msg = "no viable alternative at character " \
+                  + self.getCharErrorDisplay(e.c)
+
+        elif isinstance(e, EarlyExitException):
+            msg = "required (...)+ loop did not match anything at character " \
+                  + self.getCharErrorDisplay(e.c)
+            
+        elif isinstance(e, MismatchedSetException):
+            msg = "mismatched character " \
+                  + self.getCharErrorDisplay(e.c) \
+                  + " expecting set " \
+                  + e.expecting
+
+        elif isinstance(e, MismatchedNotSetException):
+            msg = "mismatched character " \
+                  + self.getCharErrorDisplay(e.c) \
+                  + " expecting set " \
+                  + e.expecting
+
+        elif isinstance(e, MismatchedRangeException):
+            msg = "mismatched character " \
+                  + self.getCharErrorDisplay(e.c) \
+                  + " expecting set " \
+                  + self.getCharErrorDisplay(e.a) \
+                  + ".." \
+                  + self.getCharErrorDisplay(e.b)
+
+        else:
+            msg = BaseRecognizer.getErrorMessage(self, e, tokenNames)
+
+        return msg
 
 
     def getCharErrorDisplay(self, c):
-        raise NotImplementedError
+        if c == EOF:
+            c = '<EOF>'
+        return repr(c)
 
 
     def recover(self, re):
@@ -1013,11 +1121,21 @@ class Lexer(BaseRecognizer):
 
 
     def traceIn(self, ruleName, ruleIndex):
-        raise NotImplementedError
+        inputSymbol = "%s line=%d:%s" % (self.input.LT(1),
+                                         self.getLine(),
+                                         self.getCharPositionInLine()
+                                         )
+        
+        BaseRecognizer.traceIn(self, ruleName, ruleIndex, inputSymbol)
 
 
     def traceOut(self, ruleName, ruleIndex):
-        raise NotImplementedError
+        inputSymbol = "%s line=%d:%s" % (self.input.LT(1),
+                                         self.getLine(),
+                                         self.getCharPositionInLine()
+                                         )
+
+        BaseRecognizer.traceOut(self, ruleName, ruleIndex, inputSymbol)
 
 
 
@@ -1025,6 +1143,31 @@ class Parser(BaseRecognizer):
     def __init__(self, lexer):
         BaseRecognizer.__init__(self)
 
-        self.input = lexer
+        self.setTokenStream(lexer)
 
+
+    def reset(self):
+        BaseRecognizer.reset(self) # reset all recognizer state variables
+        if self.input is not None:
+            self.input.seek(0) # rewind the input
+
+
+    def setTokenStream(self, input):
+        """Set the token stream and reset the parser"""
+        
+        self.input = None
+        self.reset()
+        self.input = input
+
+
+    def getTokenStream(self):
+        return self.input
+
+
+    def traceIn(self, ruleName, ruleIndex):
+        BaseRecognizer.traceIn(self, ruleName, ruleIndex, self.input.LT(1))
+
+
+    def traceOut(self, ruleName, ruleIndex):
+        BaseRecognizer.traceOut(self, ruleName, ruleIndex, self.input.LT(1))
 

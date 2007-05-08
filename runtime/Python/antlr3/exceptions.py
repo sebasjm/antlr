@@ -94,41 +94,30 @@ class RecognitionException(Exception):
             self.input = input
             self.index = input.index()
 
-            # Get current lookahead, where the error occured.
-            # This may be a token or character.
-            lt = input.LT(1)           
-            try:
-                lt.text
+            # late import to avoid cyclic dependencies
+            from antlr3.streams import TokenStream, CharStream
+            from antlr3.tree import CommonTreeNodeStream, CommonTree
 
-            except AttributeError:
-                # we have not a token, so we assume it's a character
-                # once we have tree parsers, we also have to handle nodes
+            if isinstance(self.input, TokenStream):
+                self.token = self.input.LT(1)
+                self.line = self.token.line
+                self.charPositionInLine = self.token.charPositionInLine
 
-                self.c = lt
-                self.line = input.line
-                self.charPositionInLine = input.charPositionInLine
-                
+            if isinstance(self.input, CommonTreeNodeStream):
+                self.node = self.input.LT(1)
+                if isinstance(self.node, CommonTree):
+                    self.token = self.node.token
+                    self.line = self.token.line
+                    self.charPositionInLine = self.token.charPositionInLine
+
             else:
-                # it's a token
-                
-                self.token = lt
-                self.line = lt.line
-                self.charPositionInLine = lt.charPositionInLine
+                if isinstance(self.input, CharStream):
+                    self.c = self.input.LA(1)
+                    self.line = self.input.line
+                    self.charPositionInLine = self.input.charPositionInLine
 
-##             if isinstance(input, CommonTreeNodeStream):
-##                 self.node = input.LT(1)
-##                 if instanceof(self.node, CommonTree):
-##                     self.token = this.node.token
-##                     self.line = token.line
-##                     self.charPositionInLine = token.charPositionInLine
-
-##             elif instanceof(input, CharStream):
-##                 self.c = input.LA(1);
-##                 self.line = input.line
-##                 self.charPositionInLine = input.charPositionInLine
-
-##             else:
-##                 self.c = input.LA(1)
+                else:
+                    self.c = self.input.LA(1)
 
 
     def getUnexpectedType(self):
@@ -185,6 +174,16 @@ class MismatchedSetException(RecognitionException):
     __repr__ = __str__
 
 
+class MismatchedNotSetException(MismatchedSetException):
+    """Used for remote debugger deserialization"""
+    
+    def __str__(self):
+        return "MismatchedNotSetException(%r!=%r)" % (
+            self.getUnexpectedType(), self.expecting
+            )
+    __repr__ = __str__
+
+
 class NoViableAltException(RecognitionException):
     def __init__(
         self, grammarDecisionDescription, decisionNumber, stateNumber, input
@@ -229,3 +228,23 @@ class FailedPredicateException(RecognitionException):
 
     def __str__(self):
         return "FailedPredicateException("+self.ruleName+",{"+self.predicateText+"}?)"
+
+
+class MismatchedTreeNodeException(RecognitionException):
+    def __init__(self, expecting, input):
+        RecognitionException.__init__(self, input)
+
+        t = input.LT(1)
+        from antlr3.tree import Tree
+        if isinstance(input.LT(1), Tree):
+            self.line = t.line
+            self.charPositionInLine = t.charPositionInLine
+            # TODO: if DOWN/UP, there is no line info currently
+        
+        self.expecting = expecting
+
+    def __str__(self):
+        return "MismatchedTreeNodeException(%r!=%r)" % (
+            self.getUnexpectedType(), self.expecting
+            )
+    __repr__ = __str__

@@ -16,7 +16,7 @@ prog
 }
     :   IDENTIFIER EOF
     ;
-    catch [ antlr3.RecognitionException, exc ] {
+    catch [ RecognitionException, exc ] {
         print "Caboom " + str(exc)
         raise
     }

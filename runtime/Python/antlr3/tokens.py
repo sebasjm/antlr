@@ -28,37 +28,108 @@
 
 from antlr3.constants import EOF, DEFAULT_CHANNEL, INVALID_TOKEN_TYPE
 
+############################################################################
+#
+# basic token interface
+#
+############################################################################
+
 class Token(object):
-    pass
+    ## Get the text of the token
 
-## 	/** Get the text of the token */
-## 	public abstract String getText();
-## 	public abstract void setText(String text);
+    def getText(self):
+        """Using setter/getter methods is deprecated. Use o.text instead."""
 
-## 	public abstract int getType();
-## 	public abstract void setType(int ttype);
-## 	/**  The line number on which this token was matched; line=1..n */
-## 	public abstract int getLine();
-##     public abstract void setLine(int line);
+        raise NotImplementedError
+    
+    def setText(self, text):
+        """Using setter/getter methods is deprecated. Use o.text instead."""
 
-## 	/** The index of the first character relative to the beginning of
-##          the line 0..n-1 */
-## 	public abstract int getCharPositionInLine();
-## 	public abstract void setCharPositionInLine(int pos);
+        raise NotImplementedError
+    
 
-## 	public abstract int getChannel();
-## 	public abstract void setChannel(int channel);
+    ## Get the type of the token
 
-## 	/** An index from 0..n-1 of the token object in the input stream.
-## 	 *  This must be valid in order to use the ANTLRWorks debugger.
-## 	 */
-## 	public abstract int getTokenIndex();
-## 	public abstract void setTokenIndex(int index);
+    def getType(self):
+        """Using setter/getter methods is deprecated. Use o.type instead."""
 
+        raise NotImplementedError
+    
+    def setType(self, ttype):
+        """Using setter/getter methods is deprecated. Use o.type instead."""
+
+        raise NotImplementedError
+    
+    
+    ## The line number on which this token was matched; line=1..n
+
+    def getLine(self):
+        """Using setter/getter methods is deprecated. Use o.line instead."""
+
+        raise NotImplementedError
+    
+    def setLine(self, line):
+        """Using setter/getter methods is deprecated. Use o.line instead."""
+
+        raise NotImplementedError
+    
+    
+    ## The index of the first character relative to the beginning of the
+    ## line 0..n-1 */
+
+    def getCharPositionInLine(self):
+        """Using setter/getter methods is deprecated. Use o.charPositionInLine instead."""
+
+        raise NotImplementedError
+    
+    def setCharPositionInLine(self, pos):
+        """Using setter/getter methods is deprecated. Use o.charPositionInLine instead."""
+
+        raise NotImplementedError
+    
+
+    ## Get the channel of the token
+
+    def getChannel(self):
+        """Using setter/getter methods is deprecated. Use o.channel instead."""
+
+        raise NotImplementedError
+    
+    def setChannel(self, channel):
+        """Using setter/getter methods is deprecated. Use o.channel instead."""
+
+        raise NotImplementedError
+    
+
+    ## An index from 0..n-1 of the token object in the input stream.
+    ## This must be valid in order to use the ANTLRWorks debugger.
+
+    def getTokenIndex(self):
+        """Using setter/getter methods is deprecated. Use o.index instead."""
+
+        raise NotImplementedError
+    
+    def setTokenIndex(self, index):
+        """Using setter/getter methods is deprecated. Use o.index instead."""
+
+        raise NotImplementedError
+
+
+############################################################################
+#
+# token implementations
+#
+# Token
+# +- CommonToken
+# \- ClassicToken
+#
+############################################################################
 
 class CommonToken(Token):
     def __init__(self, type=None, channel=DEFAULT_CHANNEL, text=None,
                  input=None, start=None, stop=None, oldToken=None):
+        Token.__init__(self)
+        
         if oldToken is not None:
             self.type = oldToken.type
             self.line = oldToken.line
@@ -115,6 +186,41 @@ class CommonToken(Token):
     text = property(getText, setText)
 
 
+    def getType(self):
+        return self.type 
+
+    def setType(self, ttype):
+        self.type = ttype
+
+    
+    def getLine(self):
+        return self.line
+    
+    def setLine(self, line):
+        self.line = line
+
+
+    def getCharPositionInLine(self):
+        return self.charPositionInLine
+    
+    def setCharPositionInLine(self, pos):
+        self.charPositionInLine = pos
+
+
+    def getChannel(self):
+        return self.channel
+    
+    def setChannel(self, channel):
+        self.channel = channel
+    
+
+    def getTokenIndex(self):
+        return self.index
+    
+    def setTokenIndex(self, index):
+        self.index = index
+
+
     def __str__(self):
         channelStr = ""
         if self.channel > 0:
@@ -136,6 +242,100 @@ class CommonToken(Token):
             self.line, self.charPositionInLine
             )
     
+
+class ClassicToken(Token):
+    """
+    A Token object like we'd use in ANTLR 2.x; has an actual string created
+    and associated with this object.  These objects are needed for imaginary
+    tree nodes that have payload objects.  We need to create a Token object
+    that has a string; the tree node will point at this token.  CommonToken
+    has indexes into a char stream and hence cannot be used to introduce
+    new strings.
+    """
+
+    def __init__(self, type=None, text=None, channel=DEFAULT_CHANNEL,
+                 oldToken=None
+                 ):
+        Token.__init__(self)
+        
+        if oldToken is not None:
+            self.text = oldToken.text
+            self.type = oldToken.type
+            self.line = oldToken.line
+            self.charPositionInLine = oldToken.charPositionInLine
+            self.channel = oldToken.channel
+            
+        self.text = text
+        self.type = type
+        self.line = None
+        self.charPositionInLine = None
+        self.channel = channel
+        self.index = None
+
+
+    def getText(self):
+        return self.text
+
+    def setText(self, text):
+        self.text = text
+
+
+    def getType(self):
+        return self.type 
+
+    def setType(self, ttype):
+        self.type = ttype
+
+    
+    def getLine(self):
+        return self.line
+    
+    def setLine(self, line):
+        self.line = line
+
+
+    def getCharPositionInLine(self):
+        return self.charPositionInLine
+    
+    def setCharPositionInLine(self, pos):
+        self.charPositionInLine = pos
+
+
+    def getChannel(self):
+        return self.channel
+    
+    def setChannel(self, channel):
+        self.channel = channel
+    
+
+    def getTokenIndex(self):
+        return self.index
+    
+    def setTokenIndex(self, index):
+        self.index = index
+
+
+    def toString(self):
+        channelStr = ""
+        if self.channel > 0:
+            channelStr = ",channel="+self.channel
+            
+        txt = self.text
+        if txt is None:
+            txt = "<no text>"
+
+        return "[@%r,%r,<%r>%s,%r:%r]" % (self.index,
+                                          txt,
+                                          self.type,
+                                          channelStr,
+                                          self.line,
+                                          self.charPositionInLine
+                                          )
+    
+
+    __str__ = toString
+    __repr__ = toString
+
 
 
 EOF_TOKEN = CommonToken(type=EOF)
