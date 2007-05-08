@@ -53,6 +53,10 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 		this(null, DEFAULT_DEBUGGER_PORT);
 	}
 
+	public DebugEventSocketProxy(String grammarFileName) {
+		this(grammarFileName, DEFAULT_DEBUGGER_PORT);
+	}
+
 	public DebugEventSocketProxy(String grammarFileName, int port) {
 		this.grammarFileName = grammarFileName;
 		this.port = port;
