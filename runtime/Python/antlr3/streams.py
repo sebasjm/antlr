@@ -993,7 +993,6 @@ class TokenRewriteStream(CommonTokenStream):
                     i = pos
                     # look for an existing replace
                     while i < len(rewrites):
-                        print i
                         prevOp = rewrites[pos]
                         if prevOp.index != op.index:
                             break
@@ -1114,7 +1113,7 @@ class TokenRewriteStream(CommonTokenStream):
         
 
     def delete(self, *args):
-        self.replace(*(args + [None]))
+        self.replace(*(list(args) + [None]))
 
 
     def getLastRewriteTokenIndex(self, programName=DEFAULT_PROGRAM_NAME):
