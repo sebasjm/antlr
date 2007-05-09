@@ -251,13 +251,13 @@ class BaseRecognizer(object):
             msg = "mismatched input " \
                   + self.getTokenErrorDisplay(e.token) \
                   + " expecting set " \
-                  + e.expecting
+                  + repr(e.expecting)
 
         elif isinstance(e, MismatchedNotSetException):
             msg = "mismatched input " \
                   + self.getTokenErrorDisplay(e.token) \
                   + " expecting set " \
-                  + e.expecting
+                  + repr(e.expecting)
 
         elif isinstance(e, FailedPredicateException):
             msg = "rule " \
@@ -902,9 +902,8 @@ class Lexer(BaseRecognizer, TokenSource):
                 return self.token
 
             except RecognitionException, re:
-                raise # no error reporting/recovery
-                #self.reportError(re)
-                #self.recover(re)
+                self.reportError(re)
+                self.recover(re)
 
 
     def skip(self):
@@ -1081,13 +1080,13 @@ class Lexer(BaseRecognizer, TokenSource):
             msg = "mismatched character " \
                   + self.getCharErrorDisplay(e.c) \
                   + " expecting set " \
-                  + e.expecting
+                  + repr(e.expecting)
 
         elif isinstance(e, MismatchedNotSetException):
             msg = "mismatched character " \
                   + self.getCharErrorDisplay(e.c) \
                   + " expecting set " \
-                  + e.expecting
+                  + repr(e.expecting)
 
         elif isinstance(e, MismatchedRangeException):
             msg = "mismatched character " \

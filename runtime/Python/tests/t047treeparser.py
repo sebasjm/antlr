@@ -27,11 +27,13 @@ class T(testbase.ANTLRTest):
             
         return TWalker
     
-        
-    def testWalker(self):
+
+    def setUp(self):
         self.compileGrammar()
         self.compileGrammar('t047treeparserWalker.g', options='-trace')
 
+        
+    def testWalker(self):
         input = textwrap.dedent(
             '''\
             char c;
@@ -92,6 +94,29 @@ class T(testbase.ANTLRTest):
               '<block', '<declaration', '<program'
               ]
             )
+
+    def testRuleLabelPropertyRefText(self):
+        self.compileGrammar()
+        self.compileGrammar('t047treeparserWalker.g', options='-trace')
+
+        input = textwrap.dedent(
+            '''\
+            char c;
+            ''')
+        
+        cStream = antlr3.StringStream(input)
+        lexer = self.getLexer(cStream)
+        tStream = antlr3.CommonTokenStream(lexer)
+        parser = self.getParser(tStream)
+        r = parser.variable()
+
+        nodes = antlr3.tree.CommonTreeNodeStream(r.tree)
+        nodes.setTokenStream(tStream)
+        walker = self.getWalker(nodes)
+        r = walker.variable()
+
+        self.failUnlessEqual(r, 'c')
+        
 
 if __name__ == '__main__':
     unittest.main()

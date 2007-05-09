@@ -318,7 +318,7 @@ class ClassicToken(Token):
     def toString(self):
         channelStr = ""
         if self.channel > 0:
-            channelStr = ",channel="+self.channel
+            channelStr = ",channel=" + str(self.channel)
             
         txt = self.text
         if txt is None:

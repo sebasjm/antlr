@@ -5,7 +5,6 @@ import testbase
 
 class T(testbase.ANTLRTest):
 
-    @testbase.broken("It screams FIXME", RuntimeError)
     def testbug(self):
         self.compileGrammar()
         

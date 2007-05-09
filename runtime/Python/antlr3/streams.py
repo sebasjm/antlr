@@ -316,7 +316,9 @@ class ANTLRStringStream(CharStream):
         # values line, charPositionInLine, and p that can change as you
         # move through the input stream.  Indexed from 0..markDepth-1.
         self._markers = [ ]
-
+        self.lastMarker = None
+        self.markDepth = 0
+        
 
     def reset(self):
         """
@@ -371,22 +373,23 @@ class ANTLRStringStream(CharStream):
         return self.n
 
 
-    def markDepth(self):
-        return len(self._markers)
-    markDepth = property(markDepth)
-
-
     def mark(self):
         state = (self.p, self.line, self.charPositionInLine)
-        self._markers.append(state)
-
-        return self.markDepth
+        try:
+            self._markers[self.markDepth] = state
+        except IndexError:
+            self._markers.append(state)
+        self.markDepth += 1
+        
+        self.lastMarker = self.markDepth
+        
+        return self.lastMarker
 
 
     def rewind(self, marker=None):
         if marker is None:
-            marker = self.markDepth
-            
+            marker = self.lastMarker
+
         p, line, charPositionInLine = self._markers[marker-1]
 
         self.seek(p)
@@ -397,9 +400,9 @@ class ANTLRStringStream(CharStream):
 
     def release(self, marker=None):
         if marker is None:
-            marker = self.markDepth
-            
-        self._markers = self._markers[:marker-1]
+            marker = self.lastMarker
+
+        self.markDepth = marker-1
 
 
     def seek(self, index):

@@ -991,11 +991,11 @@ class CommonTreeAdaptor(BaseTreeAdaptor):
 
 
     def getTokenStartIndex(self, t):
-        return t.startIndex
+        return t.getTokenStartIndex()
 
 
     def getTokenStopIndex(self, t):
-        return t.stopIndex
+        return t.getTokenStopIndex()
 
 
     def getText(self, t):

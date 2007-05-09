@@ -1,11 +1,10 @@
+- Fix remaining FIXMEs in (Python|AST).stg
 - complete runtime
  - tree.DOTTreeGenerator (needs ST)
  - tree.DoubleLinkTree
  - tree.ParseTree
  - tree.UnBufferedTreeNodeStream
 - better test coverage for runtime modules
-- implement more examples
-- Fix remaining FIXMEs in (Python|AST).stg
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()
   - (String|CommonToken)Stream.size() --> __len__

@@ -15,8 +15,11 @@ declaration
     |   ^(FUNC_DEF functionHeader block)
     ;
 
-variable
+variable returns [res]
     :   ^(VAR_DEF type declarator)
+        { 
+            $res = $declarator.text; 
+        }
     ;
 
 declarator

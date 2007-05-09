@@ -1018,7 +1018,6 @@ LA<decisionNumber>_<stateNumber> = input.LA(1)<\n>
 index<decisionNumber>_<stateNumber> = input.index()
 input.rewind()<\n>
 <endif>
-LA<decisionNumber>_<stateNumber> = self.input.LA(1)<\n>
 s = -1
 <edges; separator="\nel">
 <if(semPredState)> <! return input cursor to state before we rewound !>
@@ -1040,7 +1039,8 @@ if (<labelExpr>)<if(predicates)> and (<predicates>)<endif>:
  *  always jump to the target.
  */
 eotDFAEdge(targetStateNumber,edgeNumber, predicates) ::= <<
-s = <targetStateNumber><\n>
+se:
+    s = <targetStateNumber><\n>
 >>
 
 
@@ -1216,10 +1216,10 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-FIXME(221:TREEPARSER)
-#input.getTokenStream().toString(
-#  input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
-#  input.getTreeAdaptor().getTokenStopIndex(<scope>.start))
+self.input.getTokenStream().toString(
+    self.input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
+    self.input.getTreeAdaptor().getTokenStopIndex(<scope>.start)
+    )
 <else>
 self.input.toString(<scope>.start,<scope>.stop)
 <endif>

@@ -4,6 +4,8 @@ options {
     output = AST;
 }
 
+
+// this rule used to generate an infinite loop in DFA.predict
 r
 options { backtrack=true; }
     : (modifier+ INT)=> modifier+ expression

@@ -178,8 +178,9 @@ class TestStringStream(unittest.TestCase):
         stream.release()
         self.failUnlessEqual(stream.markDepth, 1)
 
+        # release same marker again, nothing has changed
         stream.release()
-        self.failUnlessEqual(stream.markDepth, 0)
+        self.failUnlessEqual(stream.markDepth, 1)
         
 
     def testReleaseNested(self):

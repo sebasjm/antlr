@@ -12,6 +12,19 @@ class t012lexerXML(testbase.ANTLRTest):
         self.compileGrammar()
         
         
+    def lexerClass(self, base):
+        class TLexer(base):
+            def emitErrorMessage(self, msg):
+                # report errors to /dev/null
+                pass
+
+            def recover(self, re):
+                # no error recovery yet, just crash!
+                raise re
+
+        return TLexer
+    
+        
     def testValid(self):
         inputPath = os.path.splitext(__file__)[0] + '.input'
         stream = antlr3.StringStream(unicode(open(inputPath).read(), 'utf-8'))

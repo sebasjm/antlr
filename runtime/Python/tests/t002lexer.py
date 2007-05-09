@@ -7,6 +7,19 @@ class t002lexer(testbase.ANTLRTest):
         self.compileGrammar()
         
         
+    def lexerClass(self, base):
+        class TLexer(base):
+            def emitErrorMessage(self, msg):
+                # report errors to /dev/null
+                pass
+
+            def recover(self, re):
+                # no error recovery yet, just crash!
+                raise re
+
+        return TLexer
+    
+        
     def testValid(self):
         stream = antlr3.StringStream('01')
         lexer = self.getLexer(stream)
