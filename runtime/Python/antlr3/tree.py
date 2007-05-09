@@ -1,4 +1,9 @@
-"""ANTLR3 runtime package, tree module"""
+""" @package antlr3.tree
+@brief ANTLR3 runtime package, tree module
+
+This module contains all support classes for AST construction and tree parsers.
+
+"""
 
 # [The "BSD licence"]
 # Copyright (c) 2005-2006 Terence Parr
@@ -1588,8 +1593,6 @@ class CommonTreeNodeStream(TreeNodeStream):
         
         return ''.join(buf)
     
-
-#########################################################################
 
     ## iterator interface
     def __iter__(self):

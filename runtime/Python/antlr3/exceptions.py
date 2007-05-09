@@ -1,4 +1,4 @@
-"""ANTLR3 runtime package"""
+"""ANTLR3 exception hierarchy"""
 
 # [The "BSD licence"]
 # Copyright (c) 2005-2006 Terence Parr

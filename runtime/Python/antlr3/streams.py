@@ -803,14 +803,14 @@ class CommonTokenStream(TokenStream):
         return ''.join([t.text for t in self.tokens[start:stop+1]])
 
 
-## rewrite operation for TokenRewriteStream
-    
 class RewriteOperation(object):
+    """@brief Helper class used by TokenRewriteStream"""
+    
     def __init__(self, index, text):
         self.index = index
         self.text = text
 
-    def execite(self, buf):
+    def execute(self, buf):
         """Execute the rewrite operation by possibly adding to the buffer.
         Return the index of the next token to operate on.
         """
@@ -825,6 +825,8 @@ class RewriteOperation(object):
 
 
 class InsertBeforeOp(RewriteOperation):
+    """@brief Helper class used by TokenRewriteStream"""
+
     def execute(self, buf):
         buf.write(self.text)
         return self.index
@@ -832,6 +834,8 @@ class InsertBeforeOp(RewriteOperation):
 
 class ReplaceOp(RewriteOperation):
     """
+    @brief Helper class used by TokenRewriteStream
+    
     I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
     instructions.
     """
@@ -846,11 +850,6 @@ class ReplaceOp(RewriteOperation):
             buf.write(self.text)
 
         return self.lastIndex + 1
-
-
-## class DeleteOp(ReplaceOp):
-##     def __init__(self, first, last):
-##         ReplaceOp.__init__(self, first, last, None)
 
 
 class TokenRewriteStream(CommonTokenStream):
