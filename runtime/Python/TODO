@@ -6,9 +6,6 @@
 - better test coverage for runtime modules
 - implement more examples
 - Fix remaining FIXMEs in (Python|AST).stg
-- antlr features
-  - tree parsers
-    - 2nd half of simplecTreeParser example
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()
   - (String|CommonToken)Stream.size() --> __len__
@@ -22,9 +19,6 @@
   - DFA: perhaps zip() the lists into a tuple 
     (eot, eof, min, max, accept, special, transition)
     for each state. checkout potential performance gain.
-  - use compressed tables like Java and decompress on import
-    -> uncompressed tables for Java.g create a 15MB JavaLexer.py and Python
-       consumed >800MB and was killed by the kernel trying to compile it 
   - raise exception for failed backtracking, get rid of 
     "if self.failed: return"
   - StringStream: look into optimizing LA(). Perhaps use LAk instead of LA(k)

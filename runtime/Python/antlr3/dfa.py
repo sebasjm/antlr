@@ -187,3 +187,19 @@ class DFA(object):
 
     def specialTransition(self, state, symbol):
         return 0
+
+
+    def unpack(cls, string):
+        ret = []
+        for i in range(len(string) / 2):
+            (n, v) = ord(string[i*2]), ord(string[i*2+1])
+
+            # Is there a bitwise operation to do this?
+            if v == 0xFFFF:
+                v = -1
+
+            ret += [v] * n
+
+        return ret
+    
+    unpack = classmethod(unpack)

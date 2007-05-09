@@ -295,7 +295,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 # <fileName>:<description>
 def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <if(trace)>
-    self.traceIn("<ruleName>", <ruleDescriptor.index>)
+    self.traceIn("<ruleName>", <ruleDescriptor.index>)<\n>
 <endif>
     <ruleScopeSetUp()>
     <ruleDeclarations()>
@@ -329,7 +329,7 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <endif>
     finally:
 <if(trace)>
-        self.traceOut("<ruleName>", <ruleDescriptor.index>)
+        self.traceOut("<ruleName>", <ruleDescriptor.index>)<\n>
 <endif>
         <memoize()>
         <ruleScopeCleanUp()>
@@ -436,7 +436,7 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
 # $ANTLR start <ruleName>
 def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <if(trace)>
-    self.traceIn("<ruleName>", <ruleDescriptor.index>)
+    self.traceIn("<ruleName>", <ruleDescriptor.index>)<\n>
 <endif>
     <ruleDeclarations()>
     try:
@@ -458,7 +458,7 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 
     finally:
 <if(trace)>
-        self.traceOut("<ruleName>", <ruleDescriptor.index>)
+        self.traceOut("<ruleName>", <ruleDescriptor.index>)<\n>
 <endif>
 	<memoize()>
         pass
@@ -935,33 +935,33 @@ alt<decisionNumber> = self.dfa<decisionNumber>.predict(self.input)
 cyclicDFA(dfa) ::= <<
 # lookup tables for DFA #<dfa.decisionNumber>
 
-DFA<dfa.decisionNumber>_eot = [
-    <dfa.eot; wrap, separator=", ", null="-1">
-]
+DFA<dfa.decisionNumber>_eot = DFA.unpack(
+    u"<dfa.javaCompressedEOT; wrap="\"\n    u\"">"
+    )
 
-DFA<dfa.decisionNumber>_eof = [
-    <dfa.eof; wrap, separator=", ", null="-1">
-]
+DFA<dfa.decisionNumber>_eof = DFA.unpack(
+    u"<dfa.javaCompressedEOF; wrap="\"\n    u\"">"
+    )
 
-DFA<dfa.decisionNumber>_min = [
-    <dfa.min; wrap, separator=", ", null="0">
-]
+DFA<dfa.decisionNumber>_min = DFA.unpack(
+    u"<dfa.javaCompressedMin; wrap="\"\n    u\"">"
+    )
 
-DFA<dfa.decisionNumber>_max = [
-    <dfa.max; wrap, separator=", ", null="0">
-]
+DFA<dfa.decisionNumber>_max = DFA.unpack(
+    u"<dfa.javaCompressedMax; wrap="\"\n    u\"">"
+    )
 
-DFA<dfa.decisionNumber>_accept = [
-    <dfa.accept; wrap, separator=", ", null="-1">
-]
+DFA<dfa.decisionNumber>_accept = DFA.unpack(
+    u"<dfa.javaCompressedAccept; wrap="\"\n    u\"">"
+    )
 
-DFA<dfa.decisionNumber>_special = [
-    <dfa.special; wrap, separator=", ", null="-1">
-]
+DFA<dfa.decisionNumber>_special = DFA.unpack(
+    u"<dfa.javaCompressedSpecial; wrap="\"\n    u\"">"
+    )
 
+        
 DFA<dfa.decisionNumber>_transition = [
-    <dfa.transition:{s | [ <s; wrap="\n  ", separator=", ", null="-1">
-  ]}; separator=",\n", null="">
+    <dfa.javaCompressedTransition:{s|DFA.unpack(u"<s; wrap="\"\nu\"">")}; separator=",\n">
 ]
 
 # class definition for DFA #<dfa.decisionNumber>
@@ -991,7 +991,7 @@ if s == <i0>: <! compressed special state numbers 0..n-1 !>
         self_.error(nvae)
         raise nvae<\n>
 <else>
-DFA<dfa.decisionNumber> = DFA
+DFA<dfa.decisionNumber> = DFA<\n>
 <endif>
 
 >>
