@@ -1,2 +1,2 @@
 include LICENSE AUTHORS ez_setup.py
-prune setup.cfg
+

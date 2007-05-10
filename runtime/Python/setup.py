@@ -238,7 +238,7 @@ class functest(Command):
                 )
             
 
-setup(name='antlr-python-runtime',
+setup(name='antlr_python_runtime',
       version='3.0',
       packages=['antlr3'],
 
