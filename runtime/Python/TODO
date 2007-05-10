@@ -1,10 +1,12 @@
-- Fix remaining FIXMEs in (Python|AST).stg
+- better test coverage for runtime modules
+- do not use Set* templates for properties for Python target
+  - gate with sempred {target.usePropertySetTemplates()}?
+- special template for empty alternative -> pass
 - complete runtime
  - tree.DOTTreeGenerator (needs ST)
  - tree.DoubleLinkTree
  - tree.ParseTree
  - tree.UnBufferedTreeNodeStream
-- better test coverage for runtime modules
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()
   - (String|CommonToken)Stream.size() --> __len__

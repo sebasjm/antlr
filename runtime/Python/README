@@ -58,9 +58,10 @@ Existing bugs may appear someday in the bugtracker:
 
 Only the runtime package can be found here. There are also some StringTemplate
 files in 'src/org/antlr/codegen/templates/Python/' and some Java code in
-'src/org/antlr/codegen/PythonTarget.java'.
+'src/org/antlr/codegen/PythonTarget.java' (of the main ANTLR3 source
+distribution).
 
-If there are not directories 'tests' and 'unittests' in 'runtime/Python', you
+If there are no directories 'tests' and 'unittests' in 'runtime/Python', you
 should fetch the latest ANTLR3 version from the perforce depot. See section
 DOWNLOAD.
 You'll need java and ant in order to compile and use the tool.
