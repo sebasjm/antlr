@@ -383,7 +383,7 @@ public class ErrorManager {
 			panic();
 		}
 		else if ( is==null ) {
-			rawError("no such locale file "+fileName+" retrying with English locale");
+			//rawError("no such locale file "+fileName+" retrying with English locale");
 			setLocale(Locale.US); // recurse on this rule, trying the US locale
 			return;
 		}

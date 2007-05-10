@@ -297,6 +297,11 @@ C# Target Notes
 
 CHANGES
 
+May 10, 2007
+
+* turn off the warning about no local messages:
+ no such locale file org/antlr/tool/templates/messages/languages/ru.stg retrying with English locale
+
 May 5, 2007
 
 * moving org.antlr.runtime to runtime/Java/src/org/... Other target
