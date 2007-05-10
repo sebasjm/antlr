@@ -527,8 +527,7 @@ positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decision
 cnt<decisionNumber> = 0
 <decls>
 <@preloop()>
-#loop<decisionNumber>:
-while True:
+while True: #loop<decisionNumber>
     alt<decisionNumber> = <maxAlt>
     <@predecision()>
     <decision>
@@ -536,7 +535,6 @@ while True:
     <alts:altSwitchCase(); separator="\nel">
     else:
         if cnt<decisionNumber> >= 1:
-            <! FIXME: could this be nested? !>
             break #loop<decisionNumber>
 
         <ruleBacktrackFailure()>
@@ -556,15 +554,13 @@ closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,m
 # <fileName>:<description>
 <decls>
 <@preloop()>
-#loop<decisionNumber>:
-while True:
+while True: #loop<decisionNumber>
     alt<decisionNumber> = <maxAlt>
     <@predecision()>
     <decision>
     <@postdecision()>
     <alts:altSwitchCase(); separator="\nel">
     else:
-        <! FIXME: could this be nested? !>
         break #loop<decisionNumber>
 
 <@postloop()>
@@ -715,11 +711,9 @@ self.matchAny()
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
-FIXME(208:POSSIBLE AT ALL?)
+<wildcardChar(...)>
+<listLabel(...)>
 >>
-//<wildcardChar(...)>
-//<listLabel(...)>
-//>>
 
 /** Match a rule reference by invoking it possibly with arguments
  *  and a return value or values.
@@ -737,7 +731,6 @@ self.following.pop()
 
 /** ids+=rule */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
-FIXME(209:POSSIBLE AT ALL?)
 <ruleRef(...)>
 <listLabel(...)>
 >>
@@ -1150,12 +1143,12 @@ self.<scope>_stack[-1].<attr.name>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 <if(negIndex)>
-FIXME(218:POSSIBLE AT ALL) <!this seems not to be used by ActionTranslator...!>
-#((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name> =<expr>;
+<!FIXME: this seems not to be used by ActionTranslator...!>
+self.<scope>_stack[-<negIndex>].<attr.name> = <expr>
 <else>
 <if(index)>
-FIXME(219:POSSIBLE AT ALL) <!this seems not to be used by ActionTranslator...!>
-#((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name> =<expr>;
+<!FIXME: this seems not to be used by ActionTranslator...!>
+self.<scope>_stack[<index>].<attr.name> = <expr>
 <else>
 self.<scope>_stack[-1].<attr.name> = <expr>
 <endif>
@@ -1224,7 +1217,7 @@ self.input.getTokenStream().toString(
 self.input.toString(<scope>.start,<scope>.stop)
 <endif>
 >>
-ruleLabelPropertyRef_st(scope,attr) ::= "FIXME(201:ST)<scope>.st"
+ruleLabelPropertyRef_st(scope,attr) ::= "<!FIXME(201:ST)!><scope>.st"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
@@ -1241,7 +1234,7 @@ rulePropertyRef_start(scope,attr) ::= "retval.start"
 rulePropertyRef_stop(scope,attr) ::= "retval.stop" //mmm... or input.LT(-1)??
 rulePropertyRef_tree(scope,attr) ::= "retval.tree"
 rulePropertyRef_text(scope,attr) ::= "self.input.toString(retval.start, self.input.LT(-1))"
-rulePropertyRef_st(scope,attr) ::= "FIXME(203:ST)retval.st"
+rulePropertyRef_st(scope,attr) ::= "<!FIXME(203:ST)!>retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "self.text"
 lexerRulePropertyRef_type(scope,attr) ::= "self.type"
@@ -1255,7 +1248,7 @@ lexerRulePropertyRef_stop(scope,attr) ::= "(self.getCharIndex()-1)"
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error
 ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree =<expr>"
-ruleSetPropertyRef_st(scope,attr,expr) ::= "FIXME(205:ST)retval.st =<expr>;"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "<!FIXME(205:ST)!>retval.st =<expr>"
 
 
 /** How to execute an action */

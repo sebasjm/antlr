@@ -174,7 +174,7 @@ matchSet(s,label,elementIndex,postmatchCode) ::= <<
 matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
 
 matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={<finishedBacktracking({FIXME(40)root_0 = self.adaptor.becomeRoot(self.adaptor.createWithPayload(<label>), root_0)})>})>
+<super.matchSet(..., postmatchCode={<finishedBacktracking({<!FIXME(40,untested)!>root_0 = self.adaptor.becomeRoot(self.adaptor.createWithPayload(<label>), root_0)})>})>
 >>
 
 // RULE REF AST
@@ -427,7 +427,7 @@ root_<treeLevel> = self.adaptor.becomeRoot(<if (!args)>self.adaptor.createFromTy
 
 /** plain -> {foo} action */
 rewriteAction(action) ::= <<
-FIXME(96)
+<!FIXME(96,untested)!>
 root_0 = <action><\n>
 >>
 
