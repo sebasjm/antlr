@@ -36,9 +36,7 @@ import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 
 import java.util.*;
 
-/** The DOT (part of graphviz) generation aspect.
- *  TODO: move templates out of test!
- */
+/** The DOT (part of graphviz) generation aspect. */
 public class DOTGenerator {
 	public static final boolean STRIP_NONREDUCED_STATES = false;
 
