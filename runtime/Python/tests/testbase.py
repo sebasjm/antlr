@@ -4,6 +4,7 @@ import os
 import errno
 import sys
 import glob
+import re
 from distutils.errors import *
 
 
@@ -90,6 +91,29 @@ class ANTLRTest(unittest.TestCase):
         self.lexerModule = None
         self.parserModule = None
         
+
+    def _invokeantlr(self, dir, file, options):
+        fp = os.popen('cd %s; java %s org.antlr.Tool %s %s 2>&1'
+                      % (dir, classpath, options, file)
+                      )
+        output = ''
+        failed = False
+        for line in fp:
+            output += line
+
+            if line.startswith('error('):
+                failed = True
+
+        rc = fp.close()
+        if rc is not None:
+            failed = True
+
+        if failed:
+            raise RuntimeError(
+                "Failed to compile grammar '%s':\n\n" % file
+                + output
+                )
+        
         
     def compileGrammar(self, grammarName=None, options=''):
         if grammarName is None:
@@ -165,26 +189,7 @@ class ANTLRTest(unittest.TestCase):
                     
 
             if rebuild:
-                fp = os.popen('cd %s; java %s org.antlr.Tool %s %s 2>&1'
-                              % (testDir, classpath, options, grammarName)
-                              )
-                output = ''
-                failed = False
-                for line in fp:
-                    output += line
-                    
-                    if line.startswith('error('):
-                        failed = True
-
-                rc = fp.close()
-                if rc is not None:
-                    failed = True
-
-                if failed:
-                    raise RuntimeError(
-                        "Failed to compile grammar '%s':\n\n" % grammarName
-                        + output
-                        )
+                self._invokeantlr(testDir, grammarName, options)
 
         except:
             # mark grammar as broken
@@ -255,3 +260,56 @@ class ANTLRTest(unittest.TestCase):
 
         return walker
 
+
+    def compileInlineGrammar(self, grammar, options=''):
+        testDir = os.path.dirname(os.path.abspath(__file__))
+        
+        # get type and name from first grammar line
+        m = re.match(r'\s*((lexer|parser|tree)\s+|)grammar\s+(\S+);', grammar)
+        assert m is not None
+        grammarType = m.group(2)
+        if grammarType is None:
+            grammarType = 'combined'
+        grammarName = m.group(3)
+
+        assert grammarType in ('lexer', 'parser', 'tree', 'combined'), grammarType
+        
+        # dump temp grammar file
+        fp = open(os.path.join(testDir, grammarName + '.g'), 'w')
+        fp.write(grammar)
+        fp.close()
+
+        # compile it
+        self._invokeantlr(testDir, grammarName + '.g', options)
+        
+        if grammarType == 'combined':
+            lexerMod = self.__load_module(grammarName + 'Lexer')
+            lexerCls = getattr(lexerMod, grammarName + 'Lexer')
+            lexerCls = self.lexerClass(lexerCls)
+
+            parserMod = self.__load_module(grammarName + 'Parser')
+            parserCls = getattr(parserMod, grammarName + 'Parser')
+            parserCls = self.parserClass(parserCls)
+
+            return lexerCls, parserCls
+        
+        if grammarType == 'lexer':
+            lexerMod = self.__load_module(grammarName + 'Lexer')
+            lexerCls = getattr(lexerMod, grammarName + 'Lexer')
+            lexerCls = self.lexerClass(lexerCls)
+
+            return lexerCls
+
+        if grammarType == 'parser':
+            parserMod = self.__load_module(grammarName + 'Parser')
+            parserCls = getattr(parserMod, grammarName + 'Parser')
+            parserCls = self.parserClass(parserCls)
+
+            return parserCls
+
+        if grammarType == 'tree':
+            walkerMod = self.__load_module(grammarName)
+            walkerCls = getattr(walkerMod, grammarName)
+            walkerCls = self.walkerClass(walkerCls)
+
+            return walkerCls

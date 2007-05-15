@@ -1525,13 +1525,15 @@ class CommonTreeNodeStream(TreeNodeStream):
         return len(self.nodes)
 
 
-    def __self__(self):
+    def __str__(self):
         """Used for testing, just return the token type stream"""
 
         if self.p == -1:
             self.fillBuffer()
 
-        return ' '.join([self.adaptor.getType(node) for node in self.nodes])
+        return ' '.join([str(self.adaptor.getType(node))
+                         for node in self.nodes
+                         ])
 
 
     def toString(self, start, stop):
