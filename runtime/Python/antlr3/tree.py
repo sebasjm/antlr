@@ -5,6 +5,8 @@ This module contains all support classes for AST construction and tree parsers.
 
 """
 
+# begin[licence]
+#
 # [The "BSD licence"]
 # Copyright (c) 2005-2006 Terence Parr
 # All rights reserved.
@@ -30,6 +32,8 @@ This module contains all support classes for AST construction and tree parsers.
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# end[licence]
 
 # lot's of docstrings are missing, don't complain for now...
 # pylint: disable-msg=C0111
@@ -50,7 +54,8 @@ from antlr3.exceptions import MismatchedTreeNodeException
 
 
 class RewriteCardinalityException(RuntimeError):
-    """Base class for all exceptions thrown during AST rewrite construction.
+    """
+    @brief Base class for all exceptions thrown during AST rewrite construction.
 
     This signifies a case where the cardinality of two or more elements
     in a subrule are different: (ID INT)+ where |ID|!=|INT|
@@ -67,7 +72,7 @@ class RewriteCardinalityException(RuntimeError):
 
 
 class RewriteEarlyExitException(RewriteCardinalityException):
-    """No elements within a (...)+ in a rewrite rule"""
+    """@brief No elements within a (...)+ in a rewrite rule"""
 
     def __init__(self, elementDescription=None):
         RewriteCardinalityException.__init__(self, elementDescription)
@@ -75,7 +80,7 @@ class RewriteEarlyExitException(RewriteCardinalityException):
 
 class RewriteEmptyStreamException(RewriteCardinalityException):
     """
-    Ref to ID or expr but no tokens in ID stream or subtrees in expr stream
+    @brief Ref to ID or expr but no tokens in ID stream or subtrees in expr stream
     """
 
     pass
@@ -89,6 +94,8 @@ class RewriteEmptyStreamException(RewriteCardinalityException):
 
 class Tree(object):
     """
+    @brief Abstract baseclass for tree nodes.
+    
     What does a tree look like?  ANTLR has a number of support classes
     such as CommonTreeNodeStream that work on these kinds of trees.  You
     don't have to make your trees implement this interface, but if you do,
@@ -193,6 +200,8 @@ class Tree(object):
 
 class TreeAdaptor(object):
     """
+    @brief Abstract baseclass for tree adaptors.
+    
     How to create and navigate trees.  Rather than have a separate factory
     and adaptor, I've merged them.  Makes sense to encapsulate.
 
@@ -203,7 +212,7 @@ class TreeAdaptor(object):
     generic Objects.  This may increase the amount of typecasting needed. :(
     """
     
-    ## C o n s t r u c t i o n
+    # C o n s t r u c t i o n
 
     def createWithPayload(self, payload):
         """
@@ -426,7 +435,7 @@ class TreeAdaptor(object):
         raise NotImplementedError
 
 
-    ## Misc
+    # Misc
 
     def create(self, *args):
         """
@@ -503,7 +512,9 @@ class TreeAdaptor(object):
 
 class BaseTree(Tree):
     """
-    A generic tree implementation with no payload.  You must subclass to
+    @brief A generic tree implementation with no payload.
+
+    You must subclass to
     actually have any user data.  ANTLR v3 uses a list of children approach
     instead of the child-sibling approach in v2.  A flat tree (a list) is
     an empty node whose children represent the list.  An empty, but
@@ -637,6 +648,10 @@ class BaseTree(Tree):
 
 
 class BaseTreeAdaptor(TreeAdaptor):
+    """
+    @brief A generic tree adaptor implementation.
+    """
+    
     # BaseTreeAdaptor is abstract, no need to complain about not implemented
     # abstract methods
     # pylint: disable-msg=W0223
@@ -805,7 +820,7 @@ class BaseTreeAdaptor(TreeAdaptor):
 
 
 class CommonTree(BaseTree):
-    """A tree node that is wrapper for a Token object."""
+    """@brief A tree node that is wrapper for a Token object."""
 
     def __init__(self, payload):
         BaseTree.__init__(self)
@@ -923,7 +938,9 @@ INVALID_NODE = CommonTree(INVALID_TOKEN)
 
 class CommonTreeAdaptor(BaseTreeAdaptor):
     """
-    A TreeAdaptor that works with any Tree implementation.  It provides
+    @brief A TreeAdaptor that works with any Tree implementation.
+    
+    It provides
     really just factory methods; all the work is done by BaseTreeAdaptor.
     If you would like to have different tokens created than ClassicToken
     objects, you need to override this and then set the parser tree adaptor to
@@ -1047,7 +1064,10 @@ class CommonTreeAdaptor(BaseTreeAdaptor):
 
 
 class TreeNodeStream(IntStream):
-    """A stream of tree nodes, accessing nodes from a tree of some kind"""
+    """@brief A stream of tree nodes
+
+    It accessing nodes from a tree of some kind.
+    """
     
     # TreeNodeStream is abstract, no need to complain about not implemented
     # abstract methods
@@ -1133,7 +1153,9 @@ class TreeNodeStream(IntStream):
 
 
 class CommonTreeNodeStream(TreeNodeStream):
-    """A buffered stream of tree nodes.  Nodes can be from a tree of ANY kind.
+    """@brief A buffered stream of tree nodes.
+
+    Nodes can be from a tree of ANY kind.
 
     This node stream sucks all nodes out of the tree specified in
     the constructor during construction and makes pointers into
@@ -1612,7 +1634,8 @@ class CommonTreeNodeStream(TreeNodeStream):
 #############################################################################
 
 class TreeParser(BaseRecognizer):
-    """
+    """@brief Baseclass for generated tree parsers.
+    
     A parser for a stream of tree nodes.  "tree grammars" result in a subclass
     of this.  All the error reporting and recovery is shared with Parser via
     the BaseRecognizer superclass.
@@ -1728,7 +1751,8 @@ class TreeParser(BaseRecognizer):
 #############################################################################
 
 class RewriteRuleElementStream(object):
-    """
+    """@brief Internal helper class.
+    
     A generic list of elements tracked in an alternative to be used in
     a -> rewrite rule.  We need to subclass to fill in the next() method,
     which returns either an AST node wrapped around a token payload or
@@ -1892,6 +1916,8 @@ class RewriteRuleElementStream(object):
 
 
 class RewriteRuleTokenStream(RewriteRuleElementStream):
+    """@brief Internal helper class."""
+    
     def toTree(self, el):
         return self.adaptor.createWithPayload(el)
 
@@ -1901,6 +1927,8 @@ class RewriteRuleTokenStream(RewriteRuleElementStream):
 
 
 class RewriteRuleSubtreeStream(RewriteRuleElementStream):
+    """@brief Internal helper class."""
+
     def nextNode(self):
         """
         Treat next element as a single node even if it's a subtree.

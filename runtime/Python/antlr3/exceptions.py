@@ -1,5 +1,7 @@
 """ANTLR3 exception hierarchy"""
 
+# begin[licence]
+#
 # [The "BSD licence"]
 # Copyright (c) 2005-2006 Terence Parr
 # All rights reserved.
@@ -25,10 +27,12 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# end[licence]
 
 
 class RecognitionException(Exception):
-    """The root of the ANTLR exception hierarchy.
+    """@brief The root of the ANTLR exception hierarchy.
 
     To avoid English-only error messages and to generally make things
     as flexible as possible, these exceptions are not created with strings,
@@ -132,6 +136,8 @@ class RecognitionException(Exception):
     
 
 class MismatchedTokenException(RecognitionException):
+    """@brief The next token does not match the expected type."""
+    
     def __init__(self, expecting, input):
         RecognitionException.__init__(self, input)
         self.expecting = expecting
@@ -146,6 +152,8 @@ class MismatchedTokenException(RecognitionException):
     
 
 class MismatchedRangeException(RecognitionException):
+    """@brief The next token does not match a range of expected types."""
+
     def __init__(self, a, b, input):
         RecognitionException.__init__(self, input)
 
@@ -161,6 +169,8 @@ class MismatchedRangeException(RecognitionException):
     
 
 class MismatchedSetException(RecognitionException):
+    """@brief The next token does not match a set of expected types."""
+
     def __init__(self, expecting, input):
         RecognitionException.__init__(self, input)
 
@@ -175,7 +185,7 @@ class MismatchedSetException(RecognitionException):
 
 
 class MismatchedNotSetException(MismatchedSetException):
-    """Used for remote debugger deserialization"""
+    """@brief Used for remote debugger deserialization"""
     
     def __str__(self):
         return "MismatchedNotSetException(%r!=%r)" % (
@@ -185,6 +195,8 @@ class MismatchedNotSetException(MismatchedSetException):
 
 
 class NoViableAltException(RecognitionException):
+    """@brief Unable to decide which alternative to choose."""
+
     def __init__(
         self, grammarDecisionDescription, decisionNumber, stateNumber, input
         ):
@@ -203,7 +215,7 @@ class NoViableAltException(RecognitionException):
     
 
 class EarlyExitException(RecognitionException):
-    """The recognizer did not match anything for a (..)+ loop."""
+    """@brief The recognizer did not match anything for a (..)+ loop."""
 
     def __init__(self, decisionNumber, input):
         RecognitionException.__init__(self, input)
@@ -212,8 +224,9 @@ class EarlyExitException(RecognitionException):
 
 
 class FailedPredicateException(RecognitionException):
-    """
-    A semantic predicate failed during validation.  Validation of predicates
+    """@brief A semantic predicate failed during validation.
+
+    Validation of predicates
     occurs when normally parsing the alternative just like matching a token.
     Disambiguating predicate evaluation occurs when we hoist a predicate into
     a prediction decision.
@@ -231,6 +244,8 @@ class FailedPredicateException(RecognitionException):
 
 
 class MismatchedTreeNodeException(RecognitionException):
+    """@brief The next tree mode does not match the expected type."""
+
     def __init__(self, expecting, input):
         RecognitionException.__init__(self, input)
 

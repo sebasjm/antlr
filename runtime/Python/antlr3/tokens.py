@@ -1,5 +1,7 @@
 """ANTLR3 runtime package"""
 
+# begin[licence]
+#
 # [The "BSD licence"]
 # Copyright (c) 2005-2006 Terence Parr
 # All rights reserved.
@@ -25,6 +27,8 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# end[licence]
 
 from antlr3.constants import EOF, DEFAULT_CHANNEL, INVALID_TOKEN_TYPE
 
@@ -35,82 +39,102 @@ from antlr3.constants import EOF, DEFAULT_CHANNEL, INVALID_TOKEN_TYPE
 ############################################################################
 
 class Token(object):
-    ## Get the text of the token
+    """@brief Abstract token baseclass."""
 
     def getText(self):
-        """Using setter/getter methods is deprecated. Use o.text instead."""
+        """@brief Get the text of the token.
 
+        Using setter/getter methods is deprecated. Use o.text instead.
+        """
         raise NotImplementedError
     
     def setText(self, text):
-        """Using setter/getter methods is deprecated. Use o.text instead."""
+        """@brief Set the text of the token.
 
+        Using setter/getter methods is deprecated. Use o.text instead.
+        """
         raise NotImplementedError
-    
 
-    ## Get the type of the token
 
     def getType(self):
-        """Using setter/getter methods is deprecated. Use o.type instead."""
+        """@brief Get the type of the token.
+
+        Using setter/getter methods is deprecated. Use o.type instead."""
 
         raise NotImplementedError
     
     def setType(self, ttype):
-        """Using setter/getter methods is deprecated. Use o.type instead."""
+        """@brief Get the type of the token.
+
+        Using setter/getter methods is deprecated. Use o.type instead."""
 
         raise NotImplementedError
     
     
-    ## The line number on which this token was matched; line=1..n
-
     def getLine(self):
-        """Using setter/getter methods is deprecated. Use o.line instead."""
+        """@brief Get the line number on which this token was matched
+
+        Lines are numbered 1..n
+        
+        Using setter/getter methods is deprecated. Use o.line instead."""
 
         raise NotImplementedError
     
     def setLine(self, line):
-        """Using setter/getter methods is deprecated. Use o.line instead."""
+        """@brief Set the line number on which this token was matched
+
+        Using setter/getter methods is deprecated. Use o.line instead."""
 
         raise NotImplementedError
     
     
-    ## The index of the first character relative to the beginning of the
-    ## line 0..n-1 */
-
     def getCharPositionInLine(self):
-        """Using setter/getter methods is deprecated. Use o.charPositionInLine instead."""
+        """@brief Get the column of the tokens first character,
+        
+        Columns are numbered 0..n-1
+        
+        Using setter/getter methods is deprecated. Use o.charPositionInLine instead."""
 
         raise NotImplementedError
     
     def setCharPositionInLine(self, pos):
-        """Using setter/getter methods is deprecated. Use o.charPositionInLine instead."""
+        """@brief Set the column of the tokens first character,
+
+        Using setter/getter methods is deprecated. Use o.charPositionInLine instead."""
 
         raise NotImplementedError
     
 
-    ## Get the channel of the token
-
     def getChannel(self):
-        """Using setter/getter methods is deprecated. Use o.channel instead."""
+        """@brief Get the channel of the token
+
+        Using setter/getter methods is deprecated. Use o.channel instead."""
 
         raise NotImplementedError
     
     def setChannel(self, channel):
-        """Using setter/getter methods is deprecated. Use o.channel instead."""
+        """@brief Set the channel of the token
+
+        Using setter/getter methods is deprecated. Use o.channel instead."""
 
         raise NotImplementedError
     
 
-    ## An index from 0..n-1 of the token object in the input stream.
-    ## This must be valid in order to use the ANTLRWorks debugger.
 
     def getTokenIndex(self):
-        """Using setter/getter methods is deprecated. Use o.index instead."""
+        """@brief Get the index in the input stream.
+
+        An index from 0..n-1 of the token object in the input stream.
+        This must be valid in order to use the ANTLRWorks debugger.
+        
+        Using setter/getter methods is deprecated. Use o.index instead."""
 
         raise NotImplementedError
     
     def setTokenIndex(self, index):
-        """Using setter/getter methods is deprecated. Use o.index instead."""
+        """@brief Set the index in the input stream.
+
+        Using setter/getter methods is deprecated. Use o.index instead."""
 
         raise NotImplementedError
 
@@ -126,6 +150,14 @@ class Token(object):
 ############################################################################
 
 class CommonToken(Token):
+    """@brief Basic token implementation.
+
+    This implementation does not copy the text from the input stream upon
+    creation, but keeps start/stop pointers into the stream to avoid
+    unnecessary copy operations.
+
+    """
+    
     def __init__(self, type=None, channel=DEFAULT_CHANNEL, text=None,
                  input=None, start=None, stop=None, oldToken=None):
         Token.__init__(self)
@@ -244,7 +276,8 @@ class CommonToken(Token):
     
 
 class ClassicToken(Token):
-    """
+    """@brief Alternative token implementation.
+    
     A Token object like we'd use in ANTLR 2.x; has an actual string created
     and associated with this object.  These objects are needed for imaginary
     tree nodes that have payload objects.  We need to create a Token object

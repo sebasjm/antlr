@@ -1,5 +1,7 @@
 """ANTLR3 runtime package"""
 
+# begin[licence]
+#
 # [The "BSD licence"]
 # Copyright (c) 2005-2006 Terence Parr
 # All rights reserved.
@@ -25,6 +27,8 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# end[licence]
 
 import sys
 import inspect
@@ -41,6 +45,8 @@ from antlr3.compat import set, frozenset, reversed
 
 class BaseRecognizer(object):
     """
+    @brief Common recognizer functionality.
+    
     A generic recognizer that can handle recognizers generated from
     lexer, parser, and tree grammars.  This is all the parsing
     support code essentially; most of it is error recovery stuff and
@@ -166,11 +172,13 @@ class BaseRecognizer(object):
         To get out of recovery mode, the parser must successfully match
         a token (after a resync).  So it will go:
 
-        1. error occurs
-        2. enter recovery mode, report error
-        3. consume until token found in resynch set
-        4. try to resume parsing
-        5. next match() will reset errorRecovery mode
+        -# error occurs
+        -# enter recovery mode, report error
+        -# consume until token found in resynch set
+        -# try to resume parsing
+        -# next match() will reset errorRecovery mode
+        .
+        
         """
         
         # if we've already reported an error and have not matched a token
@@ -391,7 +399,7 @@ class BaseRecognizer(object):
         and, hence, the follow context stack is:
 
         depth  local follow set     after call to rule
-          0         <EOF>                    a (from main())
+          0         \<EOF>                    a (from main())
           1          ']'                     b
           3          '^'                     c
 
@@ -789,6 +797,8 @@ class BaseRecognizer(object):
 
 class TokenSource(object):
     """
+    @brief Abstract baseclass for token producers.
+    
     A source of tokens must provide a sequence of tokens via nextToken()
     and also must reveal it's source of characters; CommonToken's text is
     computed from a CharStream; it only store indices into the char stream.
@@ -815,6 +825,8 @@ class TokenSource(object):
 
 class Lexer(BaseRecognizer, TokenSource):
     """
+    @brief Baseclass for generated lexer classes.
+    
     A lexer is recognizer that draws input symbols from a character stream.
     lexer grammars result in a subclass of this object. A Lexer object
     uses simplified match() and error recovery mechanisms in the interest
@@ -1139,6 +1151,10 @@ class Lexer(BaseRecognizer, TokenSource):
 
 
 class Parser(BaseRecognizer):
+    """
+    @brief Baseclass for generated parser classes.
+    """
+    
     def __init__(self, lexer):
         BaseRecognizer.__init__(self)
 

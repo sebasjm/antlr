@@ -1,5 +1,7 @@
 """ANTLR3 runtime package"""
 
+# begin[licence]
+#
 # [The "BSD licence"]
 # Copyright (c) 2005-2006 Terence Parr
 # All rights reserved.
@@ -25,6 +27,8 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# end[licence]
 
 import codecs
 from StringIO import StringIO
@@ -46,6 +50,8 @@ from antlr3.tokens import Token, EOF_TOKEN
 
 class IntStream(object):
     """
+    @brief Base interface for streams of integer values.
+
     A simple stream of integers used when all I care about is the char
     or token type sequence (such as interpretation).
     """
@@ -165,7 +171,12 @@ class IntStream(object):
 
 
 class CharStream(IntStream):
-    """A source of characters for an ANTLR lexer"""
+    """
+    @brief A source of characters for an ANTLR lexer.
+
+    This is an abstract class that must be implemented by a subclass.
+    
+    """
 
     # pylint does not realize that this is an interface, too
     #pylint: disable-msg=W0223
@@ -221,7 +232,13 @@ class CharStream(IntStream):
 
 
 class TokenStream(IntStream):
-    """A stream of tokens accessing tokens from a TokenSource"""
+    """
+
+    @brief A stream of tokens accessing tokens from a TokenSource
+
+    This is an abstract class that must be implemented by a subclass.
+    
+    """
     
     # pylint does not realize that this is an interface, too
     #pylint: disable-msg=W0223
@@ -288,12 +305,22 @@ class TokenStream(IntStream):
 
 class ANTLRStringStream(CharStream):
     """
+    @brief CharStream that pull data from a unicode string.
+    
     A pretty quick CharStream that pulls all data from an array
     directly.  Every method call counts in the lexer.
+
     """
 
     
     def __init__(self, data):
+        """
+        @param data This should be a unicode string holding the data you want
+           to parse. If you pass in a byte string, the Lexer will choke on
+           non-ascii data.
+           
+        """
+        
         CharStream.__init__(self)
         
   	# The data being scanned
@@ -446,14 +473,25 @@ class ANTLRStringStream(CharStream):
 
 class ANTLRFileStream(ANTLRStringStream):
     """
+    @brief CharStream that opens a file to read the data.
+    
     This is a char buffer stream that is loaded from a file
     all at once when you construct the object.
     """
 
     def __init__(self, fileName, encoding=None):
+        """
+        @param fileName The path to the file to be opened. The file will be
+           opened with mode 'rb'.
+
+        @param encoding If you set the optional encoding argument, then the
+           data will be decoded on the fly.
+           
+        """
+        
         self.fileName = fileName
 
-        fp = codecs.open(fileName, 'r', encoding)
+        fp = codecs.open(fileName, 'rb', encoding)
         try:
             data = fp.read()
         finally:
@@ -463,11 +501,15 @@ class ANTLRFileStream(ANTLRStringStream):
 
 
     def getSourceName(self):
+        """Deprecated, access o.fileName directly."""
+        
         return self.fileName
 
 
 class ANTLRInputStream(ANTLRStringStream):
     """
+    @brief CharStream that reads data from a file-like object.
+
     This is a char buffer stream that is loaded from a file like object
     all at once when you construct the object.
     
@@ -475,6 +517,15 @@ class ANTLRInputStream(ANTLRStringStream):
     """
 
     def __init__(self, file, encoding=None):
+        """
+        @param file A file-like object holding your input. Only the read()
+           method must be implemented.
+
+        @param encoding If you set the optional encoding argument, then the
+           data will be decoded on the fly.
+           
+        """
+        
         if encoding is not None:
             # wrap input in a decoding reader
             reader = codecs.lookup(encoding)[2]
@@ -505,15 +556,24 @@ InputStream = ANTLRInputStream
 
 class CommonTokenStream(TokenStream):
     """
+    @brief The most common stream of tokens
+    
     The most common stream of tokens is one where every token is buffered up
     and tokens are prefiltered for a certain channel (the parser will only
     see these tokens and cannot change the filter channel number during the
     parse).
-
-    TODO: how to access the full token stream?  How to track all tokens matched per rule?
     """
 
     def __init__(self, tokenSource=None, channel=DEFAULT_CHANNEL):
+        """
+        @param tokenSource A TokenSource instance (usually a Lexer) to pull
+            the tokens from.
+
+        @param channel Skip tokens on any channel but this one; this is how we
+            skip whitespace...
+            
+        """
+        
         TokenStream.__init__(self)
         
         self.tokenSource = tokenSource
@@ -807,7 +867,7 @@ class CommonTokenStream(TokenStream):
 
 
 class RewriteOperation(object):
-    """@brief Helper class used by TokenRewriteStream"""
+    """@brief Internal helper class."""
     
     def __init__(self, index, text):
         self.index = index
@@ -828,7 +888,7 @@ class RewriteOperation(object):
 
 
 class InsertBeforeOp(RewriteOperation):
-    """@brief Helper class used by TokenRewriteStream"""
+    """@brief Internal helper class."""
 
     def execute(self, buf):
         buf.write(self.text)
@@ -837,7 +897,7 @@ class InsertBeforeOp(RewriteOperation):
 
 class ReplaceOp(RewriteOperation):
     """
-    @brief Helper class used by TokenRewriteStream
+    @brief Internal helper class.
     
     I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
     instructions.
@@ -856,7 +916,9 @@ class ReplaceOp(RewriteOperation):
 
 
 class TokenRewriteStream(CommonTokenStream):
-    """Useful for dumping out the input stream after doing some
+    """@brief CommonTokenStream that can be modified.
+
+    Useful for dumping out the input stream after doing some
     augmentation or other manipulations.
 
     You can insert stuff, replace, and delete chunks.  Note that the
