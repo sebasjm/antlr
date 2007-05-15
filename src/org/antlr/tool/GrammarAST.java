@@ -472,12 +472,11 @@ public class GrammarAST extends BaseAST {
 			return null;
 		}
 		int ttype = t.getType();
-		if ( ttype==ANTLRParser.BANG ||
-			ttype==ANTLRParser.ROOT ||
-			ttype==ANTLRParser.REWRITE ||
-			ttype==ANTLRParser.ACTION )
-		{
+		if ( ttype==ANTLRParser.REWRITE || ttype==ANTLRParser.ACTION ) {
 			return null;
+		}
+		if ( ttype==ANTLRParser.BANG || ttype==ANTLRParser.ROOT ) {
+			return (GrammarAST)t.getFirstChild(); // return x from ^(ROOT x)
 		}
 		if ( (ttype==ANTLRParser.ASSIGN||ttype==ANTLRParser.PLUS_ASSIGN) &&
 			 (parent==null||parent.getType()!=ANTLRParser.OPTIONS) )
@@ -486,7 +485,8 @@ public class GrammarAST extends BaseAST {
 		}
 		GrammarAST result = dup(t);		// make copy of root
 		// copy all children of root.
-		result.setFirstChild(dupListNoActions((GrammarAST)t.getFirstChild(), t));
+		GrammarAST kids = dupListNoActions((GrammarAST)t.getFirstChild(), t);
+		result.setFirstChild(kids);
 		return result;
 	}
 
