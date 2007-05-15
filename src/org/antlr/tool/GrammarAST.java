@@ -453,6 +453,9 @@ public class GrammarAST extends BaseAST {
 		GrammarAST nt = result;
 		while (t != null) {						// for each sibling of the root
 			t = (GrammarAST)t.getNextSibling();
+			if ( t!=null && t.getType()==ANTLRParser.ACTION ) {
+				continue;
+			}
 			GrammarAST d = dupTreeNoActions(t, parent);
 			if ( d!=null ) {
 				if ( nt!=null ) {
@@ -472,7 +475,7 @@ public class GrammarAST extends BaseAST {
 			return null;
 		}
 		int ttype = t.getType();
-		if ( ttype==ANTLRParser.REWRITE || ttype==ANTLRParser.ACTION ) {
+		if ( ttype==ANTLRParser.REWRITE ) {
 			return null;
 		}
 		if ( ttype==ANTLRParser.BANG || ttype==ANTLRParser.ROOT ) {

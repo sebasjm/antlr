@@ -302,6 +302,8 @@ May 14, 2007
 * Auto backtracking didn't work with ! and ^ suffixes on first element
   of an alt.
 
+* Auto backtracking didn't work with an action as first element.
+
 May 10, 2007
 
 * turn off the warning about no local messages:

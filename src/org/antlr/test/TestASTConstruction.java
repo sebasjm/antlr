@@ -347,4 +347,15 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	public void testActionInStarLoop() throws Exception {
+		Grammar g = new Grammar(
+				"grammar Expr;\n" +
+				"options { backtrack=true; }\n" +
+				"a : ({blort} 'x')* ;\n");  // bug: the synpred had nothing in it
+		String expecting =
+			" ( rule synpred1 ARG RET scope ( BLOCK ( ALT blort 'x' <end-of-alt> ) <end-of-block> ) <end-of-rule> )";
+		String found = g.getRule("synpred1").tree.toStringTree();
+		assertEquals(expecting, found);
+	}
+
 }
