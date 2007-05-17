@@ -1,6 +1,6 @@
 Early Access ANTLR v3
-ANTLR 3.0b7
-April 12, 2007
+ANTLR 3.0
+May 17, 2007
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -9,22 +9,21 @@ University of San Francisco
 INTRODUCTION 
 
 Welcome to ANTLR v3!  I've been working on this for nearly 4 years and it's
-almost ready!  I plan no feature additions between this beta and first
-3.0 release.  I have lots of features to add later, but this will be
-the first set.  Ultimately, I need to rewrite ANTLR v3 in itself (it's
-written in 2.7.7 at the moment and also needs StringTemplate 3.0 or
-later).
+finally ready!  I have lots of features to add later, but this will be
+the first set.
 
 You should use v3 in conjunction with ANTLRWorks:
 
     http://www.antlr.org/works/index.html 
 
-WARNING: We have bits of documentation started, but nothing super-complete
-yet.  The book will be printed May 2007:
+The book will also help you a great deal (printed May 15, 2007); you
+can also buy the PDF:
 
 http://www.pragmaticprogrammer.com/titles/tpantlr/index.html
 
-but we should have a beta PDF available on that page in Feb 2007.
+See the getting started document:
+
+http://www.antlr.org/wiki/display/ANTLR3/FAQ+-+Getting+Started
 
 You also have the examples plus the source to guide you.
 
@@ -38,9 +37,13 @@ and general doc root:
 
 Please help add/update FAQ entries.
 
+If all else fails, you can buy support or ask the antlr-interest list:
+
+    http://www.antlr.org/support.html
+
 I have made very little effort at this point to deal well with
 erroneous input (e.g., bad syntax might make ANTLR crash).  I will clean
-this up after I've rewritten v3 in v3.
+this up after I've rewritten v3 in v3.  v3 is written in v2 at the moment.
 
 Per the license in LICENSE.txt, this software is not guaranteed to
 work and might even destroy all life on this planet:
@@ -57,9 +60,11 @@ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
 IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
+----------------------------------------------------------------------
+
 EXAMPLES
 
-ANTLR v3 sample grammars:
+ANTLR v3 sample grammars (for C, C#, Java, Python targets):
 
     http://www.antlr.org/download/examples-v3.tar.gz
 
@@ -87,99 +92,13 @@ http://www.antlr.org/wiki/display/ANTLR3/Code+Generation+Targets
 
 How is ANTLR v3 different than ANTLR v2?
 
+See "What is the difference between ANTLR v2 and v3?"
+
+    http://www.antlr.org/wiki/pages/viewpage.action?pageId=719
+
 See migration guide:
+
     http://www.antlr.org/wiki/display/ANTLR3/Migrating+from+ANTLR+2+to+ANTLR+3
-
-ANTLR v3 has a far superior parsing algorithm called LL(*) that
-handles many more grammars than v2 does.  In practice, it means you
-can throw almost any grammar at ANTLR that is non-left-recursive and
-unambiguous (same input can be matched by multiple rules); the cost is
-perhaps a tiny bit of backtracking, but with a DFA not a full parser.
-You can manually set the max lookahead k as an option for any decision
-though.  The LL(*) algorithm ramps up to use more lookahead when it
-needs to and is much more efficient than normal LL backtracking. There
-is support for syntactic predicate (full LL backtracking) when LL(*)
-fails.
-
-Lexers are much easier due to the LL(*) algorithm as well.  Previously
-these two lexer rules would cause trouble because ANTLR couldn't
-distinguish between them with finite lookahead to see the decimal
-point:
-
-INT : ('0'..'9')+ ;
-FLOAT : INT '.' INT ;
-
-The syntax is almost identical for features in common, but you should
-note that labels are always '=' not ':'.  So do id=ID not id:ID.
-
-You can do combined lexer/parser grammars again (ala PCCTS) both lexer
-and parser rules are defined in the same file.  See the examples.
-Really nice.  You can reference strings and characters in the grammar
-and ANTLR will generate the lexer for you.
-
-The attribute structure has been enhanced.  Rules may have multiple
-return values, for example.  Further, there are dynamically scoped
-attributes whereby a rule may define a value usable by any rule it
-invokes directly or indirectly w/o having to pass a parameter all the
-way down.
-
-ANTLR v3 tree construction is far superior--it provides tree rewrite
-rules where the right hand side is simply the tree grammar fragment
-describing the tree you want to build:
-
-formalArgs
-	:	typename declarator (',' typename declarator )*
-		-> ^(ARG typename declarator)+
-	;
-
-That builds tree sequences like:
-
-^(ARG int v1) ^(ARG int v2)
-
-ANTLR v3 also incorporates StringTemplate:
-
-      http://www.stringtemplate.org
-
-just like AST support.  It is useful for generating output.  For
-example this rule creates a template called 'import' for each import
-definition found in the input stream:
-
-grammar Java;
-options {
-  output=template;
-}
-...
-importDefinition
-    :   'import' identifierStar SEMI
-        -> import(name={$identifierStar.st},
-                begin={$identifierStar.start},
-                end={$identifierStar.stop})
-    ;
-
-The attributes are set via assignments in the argument list.  The
-arguments are actions with arbitrary expressions in the target
-language.  The .st label property is the result template from a rule
-reference.  There is a nice shorthand in actions too:
-
-    %foo(a={},b={},...) ctor
-    %({name-expr})(a={},...) indirect template ctor reference
-    %{string-expr} anonymous template from string expr
-    %{expr}.y = z; template attribute y of StringTemplate-typed expr to z
-    %x.y = z; set template attribute y of x (always set never get attr)
-              to z [languages like python without ';' must still use the
-              ';' which the code generator is free to remove during code gen]
-              Same as '(x).setAttribute("y", z);'
-
-For ANTLR v3 I decided to make the most common tasks easy by default
-rather.  This means that some of the basic objects are heavier weight
-than some speed demons would like, but they are free to pare it down
-leaving most programmers the luxury of having it "just work."  For
-example, to read in some input, tweak it, and write it back out
-preserving whitespace, is easy in v3.
-
-The ANTLR source code is much prettier.  You'll also note that the
-run-time classes are conveniently encapsulated in the
-org.antlr.runtime package.
 
 ----------------------------------------------------------------------
 
@@ -187,115 +106,24 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0b7/README.txt (this file)
-antlr-3.0b7/LICENSE.txt
-antlr-3.0b7/src/org/antlr/...
-antlr-3.0b7/lib/stringtemplate-3.0.jar (3.0b7 needs 3.0)
-antlr-3.0b7/lib/antlr-2.7.7.jar
-antlr-3.0b7/lib/antlr-3.0b7.jar
+antlr-3.0/README.txt (this file)
+antlr-3.0/LICENSE.txt
+antlr-3.0/src/org/antlr/...
+antlr-3.0/lib/stringtemplate-3.0.jar (3.0 needs 3.0)
+antlr-3.0/lib/antlr-2.7.7.jar
+antlr-3.0/lib/antlr-3.0.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
-----------------------------------------------------------------------
+Please see the FAQ
 
-How do I use ANTLR v3?
-
-[I am assuming you are only using the command-line (and not the
-ANTLRWorks GUI)].
-
-Running ANTLR with no parameters shows you:
-
-ANTLR Parser Generator   Early Access Version 3.0b7 (Jan 31, 2007) 1989-2007
-usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]
-  -o outputDir          specify output directory where all output is generated
-  -lib dir              specify location of token files
-  -report               print out a report about the grammar(s) processed
-  -print                print out the grammar without actions
-  -debug                generate a parser that emits debugging events
-  -profile              generate a parser that computes profiling information
-  -nfa                  generate an NFA for each rule
-  -dfa                  generate a DFA for each decision point
-  -message-format name  specify output style for messages
-  -X                    display extended argument list
-
-For example, consider how to make the LL-star example from the examples
-tarball you can get at http://www.antlr.org/download/examples-v3.tar.gz
-
-$ cd examples/java/LL-star
-$ java org.antlr.Tool simplec.g
-$ jikes *.java
-
-For input:
-
-char c;
-int x;
-void bar(int x);
-int foo(int y, char d) {
-  int i;
-  for (i=0; i<3; i=i+1) {
-    x=3;
-    y=5;
-  }
-}
-
-you will see output as follows:
-
-$ java Main input
-bar is a declaration
-foo is a definition
-
-What if I want to test my parser without generating code?  Easy.  Just
-run ANTLR in interpreter mode.  It can't execute your actions, but it
-can create a parse tree from your input to show you how it would be
-matched.  Use the org.antlr.tool.Interp main class.  In the following,
-I interpret simplec.g on t.c, which contains "int x;"
-
-$ java org.antlr.tool.Interp simplec.g WS program t.c
-( <grammar SimpleC>
-  ( program
-    ( declaration
-      ( variable
-        ( type [@0,0:2='int',<14>,1:0] )
-        ( declarator [@2,4:4='x',<2>,1:4] )
-        [@3,5:5=';',<5>,1:5]
-      )
-    )
-  )
-)
-
-where I have formatted the output to make it more readable.  I have
-told it to ignore all WS tokens.
+http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
 ----------------------------------------------------------------------
-
-How do I rebuild ANTLR v3?
-
-Make sure the following two jars are in your CLASSPATH
-
-antlr-3.0b7/lib/stringtemplate-3.0.jar
-antlr-3.0b7/lib/antlr-2.7.7.jar
-junit.jar [if you want to build the test directories]
-
-then jump into antlr-3.0b7/src directory and then type:
-
-$ javac -d . org/antlr/Tool.java org/antlr/*/*.java org/antlr/*/*/*.java
-
-Takes 9 seconds on my 1Ghz laptop or 4 seconds with jikes.  Later I'll
-have a real build mechanism, though I must admit the one-liner appeals
-to me.  I use Intellij so I never type anything actually to build.
-
-There is also an ANT build.xml file, but I know nothing of ANT; contributed
-by others (I'm opposed to any tool with an XML interface for Humans).
-
------------------------------------------------------------------------
-C# Target Notes
-
-1. Auto-generated lexers do not inherit parent parser's @namespace
-   {...} value.  Use @lexer::namespace{...}.
-
------------------------------------------------------------------------
 
 CHANGES
+
+3.0 final - May 17, 2007
 
 May 14, 2007
 
