@@ -64,7 +64,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 EXAMPLES
 
-ANTLR v3 sample grammars (for C, C#, Java, Python targets):
+ANTLR v3 sample grammars (currently for C, C#, Java targets):
 
     http://www.antlr.org/download/examples-v3.tar.gz
 
