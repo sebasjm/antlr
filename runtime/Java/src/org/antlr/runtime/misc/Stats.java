@@ -1,8 +1,5 @@
 package org.antlr.runtime.misc;
 
-import org.antlr.tool.ErrorManager;
-import org.antlr.tool.GrammarReport;
-
 import java.io.*;
 
 /** Stats routines needed by profiler etc...
@@ -13,6 +10,8 @@ import java.io.*;
 
  */
 public class Stats {
+	public static final String ANTLRWORKS_DIR = "antlrworks";
+
 	/** Compute the sample (unbiased estimator) standard deviation following:
 	 *
 	 *  Computing Deviations: Standard Accuracy
@@ -95,30 +94,24 @@ public class Stats {
 		return s;
 	}
 
-	public static void writeReport(String filename, String data) {
+	public static void writeReport(String filename, String data) throws IOException {
 		String absoluteFilename = getAbsoluteFileName(filename);
 		File f = new File(absoluteFilename);
 		File parent = f.getParentFile();
 		parent.mkdirs(); // ensure parent dir exists
 		// write file
-		try {
-			FileOutputStream fos = new FileOutputStream(f, true); // append
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			PrintStream ps = new PrintStream(bos);
-			ps.println(data);
-			ps.close();
-			bos.close();
-			fos.close();
-		}
-		catch (IOException ioe) {
-			ErrorManager.internalError("can't write stats to "+absoluteFilename,
-									   ioe);
-		}
+		FileOutputStream fos = new FileOutputStream(f, true); // append
+		BufferedOutputStream bos = new BufferedOutputStream(fos);
+		PrintStream ps = new PrintStream(bos);
+		ps.println(data);
+		ps.close();
+		bos.close();
+		fos.close();
 	}
 
 	public static String getAbsoluteFileName(String filename) {
 		return System.getProperty("user.home")+File.separator+
-					GrammarReport.ANTLRWORKS_DIR +File.separator+
+					ANTLRWORKS_DIR +File.separator+
 					filename;
 	}
 }

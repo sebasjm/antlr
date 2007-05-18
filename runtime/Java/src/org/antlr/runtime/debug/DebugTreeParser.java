@@ -87,7 +87,8 @@ public class DebugTreeParser extends TreeParser {
 	}
 
 	public void reportError(IOException e) {
-		ErrorManager.internalError(e);
+		System.err.println(e);
+		e.printStackTrace(System.err);
 	}
 
 	public void beginResync() {

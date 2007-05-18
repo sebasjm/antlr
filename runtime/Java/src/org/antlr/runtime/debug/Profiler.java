@@ -31,6 +31,7 @@ import org.antlr.runtime.*;
 import org.antlr.runtime.misc.Stats;
 
 import java.util.*;
+import java.io.IOException;
 
 /** Using the debug event interface, track what is happening in the parser
  *  and record statistics about the runtime.
@@ -269,7 +270,13 @@ public class Profiler extends BlankDebugEventListener {
 
 	public void terminate() {
 		String stats = toNotifyString();
-		Stats.writeReport(RUNTIME_STATS_FILENAME,stats);
+		try {
+			Stats.writeReport(RUNTIME_STATS_FILENAME,stats);
+		}
+		catch (IOException ioe) {
+			System.err.println(ioe);
+			ioe.printStackTrace(System.err);
+		}
 		System.out.println(toString(stats));
 	}
 

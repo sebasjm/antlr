@@ -39,7 +39,6 @@ public class GrammarReport {
 	 */
 	public static final String Version = "4";
 	public static final String GRAMMAR_STATS_FILENAME = "grammar.stats";
-	public static final String ANTLRWORKS_DIR = "antlrworks";
 	public static final int NUM_GRAMMAR_STATS = 41;
 
 	public static final String newline = System.getProperty("line.separator");
