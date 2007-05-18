@@ -30,7 +30,6 @@ package org.antlr.runtime.debug;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeParser;
 import org.antlr.runtime.tree.TreeNodeStream;
-import org.antlr.tool.ErrorManager;
 
 import java.io.IOException;
 

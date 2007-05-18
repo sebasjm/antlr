@@ -28,7 +28,6 @@
 package org.antlr.runtime.debug;
 
 import org.antlr.runtime.*;
-import org.antlr.tool.ErrorManager;
 
 import java.io.IOException;
 
