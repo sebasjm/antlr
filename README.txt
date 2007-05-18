@@ -123,6 +123,11 @@ http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
 CHANGES
 
+May 18, 2007
+
+* there were some dependencies with org.antlr.* that I removed from
+  org.antlr.runtime.*
+
 3.0 final - May 17, 2007
 
 May 14, 2007
