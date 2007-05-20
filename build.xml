@@ -12,6 +12,7 @@
     <property name="lib.dir" location="lib" />
 
     <property name="build.classes" location="${build.dir}/classes" />
+    <property name="build.rtclasses" location="${build.dir}/rtclasses" />
     <property name="build.tests" location="${build.dir}/tests" />
     <property name="build.tests.xml" location="${build.tests}/xml" />
     <property name="build.tests.reports" location="${build.tests}/reports" />
@@ -19,15 +20,9 @@
     <property name="includetests" value="org/antlr/test/Test*.java" />
 
     <property name="src.dir" location="src" />
-    <property name="tool.dir" location="${src.dir}/org/antlr/tool" />
-    <property name="codegen.dir" location="${src.dir}/org/antlr/codegen" />
+    <property name="src.rt" location="runtime/Java/src" />
+    <property name="codegen.dir" location="codegen" />
 
-    <property name="codegen.g" location="${codegen.dir}/codegen.g" />
-    <property name="antlr.g" location="${tool.dir}/antlr.g" />
-    <property name="antlr.print.g" location="${tool.dir}/antlr.print.g" />
-    <property name="assign.types.g" location="${tool.dir}/assign.types.g" />
-    <property name="buildnfa.g" location="${tool.dir}/buildnfa.g" />
-    <property name="define.g" location="${tool.dir}/define.g" />
     <property name="tool.class"
               location="${build.classes}/org/antlr/Tool.class" />
 
@@ -36,40 +31,93 @@
     <property name="compile.deprecation" value="false" />
     <property name="compile.optimize" value="false" />
 
+    <path id="src.path">
+        <pathelement location="${src.dir}" />
+        <pathelement location="${codegen.dir}" />
+    </path>
+
+    <path id="rt.classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar" />
+    </path>
+
     <path id="classpath">
-        <fileset dir="${lib.dir}">
-            <include name="**/*.jar" />
-        </fileset>
+        <path refid="rt.classpath" />
+        <pathelement location="${build.rtclasses}" />
     </path>
 
     <condition property="bcel.available">
         <available classname="org.apache.bcel.Constants" />
     </condition>
 
-    <target name="clean" description="Deletes all class files">
-        <delete dir="${build.dir}" />
-    </target>
+    <macrodef name="generate">
+      <attribute name="grammar" />
+      <sequential>
+          <antlr target="${codegen.dir}/@{grammar}" />
+      </sequential>
+    </macrodef>
 
-    <target name="generator">
-        <antlr target="${antlr.g}" />
-        <copy file="${tool.dir}/ANTLRTokenTypes.txt" todir="${codegen.dir}" />
-        <antlr target="${antlr.print.g}" />
-        <antlr target="${assign.types.g}" />
-        <antlr target="${buildnfa.g}" />
-        <antlr target="${define.g}" />
-        <antlr target="${codegen.g}" />
-    </target>
-
-    <target name="compile" depends="generator">
-        <mkdir dir="${build.classes}" />
-        <javac srcdir="${src.dir}"
-               destdir="${build.classes}"
-               debug="${compile.debug}"
+    <presetdef name="myjavac">
+        <javac debug="${compile.debug}"
                debuglevel="${compile.debuglevel}"
                deprecation="${compile.deprecation}"
                optimize="${compile.optimize}"
-               source="1.5" target="jsr14"
-               classpathref="classpath" />
+               source="1.5" target="jsr14" />
+    </presetdef>
+
+    <target name="clean" description="Deletes all generated files">
+        <delete dir="${build.dir}" />
+        <delete dir="${codegen.dir}" />
+    </target>
+
+    <target name="generator-prepare">
+        <mkdir dir="${codegen.dir}" />
+        <copy todir="${codegen.dir}" preservelastmodified="true">
+            <fileset dir="${src.dir}">
+                <include name="org/antlr/tool/antlr.g" />
+                <include name="org/antlr/tool/antlr.print.g" />
+                <include name="org/antlr/tool/assign.types.g" />
+                <include name="org/antlr/tool/buildnfa.g" />
+                <include name="org/antlr/tool/define.g" />
+                <include name="org/antlr/codegen/codegen.g" />
+            </fileset>
+            <flattenmapper />
+        </copy>
+
+        <!--
+            make sure we rebuild anybody who uses ANTLRTokenTypes
+            by deleting all target files younger than antlr.g:
+          -->
+        <delete>
+            <fileset dir="${codegen.dir}" excludes="*.g">
+                <not>
+                    <depend targetdir="${codegen.dir}">
+                        <mapper type="merge" to="antlr.g" />
+                    </depend>
+                </not>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="generator" depends="generator-prepare">
+        <generate grammar="antlr.g" />
+        <generate grammar="antlr.print.g" />
+        <generate grammar="assign.types.g" />
+        <generate grammar="buildnfa.g" />
+        <generate grammar="define.g" />
+        <generate grammar="codegen.g" />
+    </target>
+
+    <target name="compile-rt">
+        <mkdir dir="${build.rtclasses}" />
+        <myjavac srcdir="${src.rt}" destdir="${build.rtclasses}"
+                 classpathref="rt.classpath" />
+    </target>
+
+    <target name="compile" depends="generator,compile-rt">
+        <mkdir dir="${build.classes}" />
+        <myjavac destdir="${build.classes}" classpathref="classpath">
+            <src refid="src.path" />
+        </myjavac>
     </target>
 
     <target name="templates">
@@ -78,22 +126,38 @@
         </copy>
     </target>
 
-    <target name="build" depends="compile,version,templates"
-            description="Creates the ANTLR3 jar">
-
+    <target name="jarnames" depends="version">
         <property name="antlr3.jar"
-                  location="${lib.dir}/antlr${jar.version}.jar" />
+                  location="${build.dir}/antlr${jar.version}.jar" />
+        <property name="antlr3.rt.jar"
+                  location="${build.dir}/antlr${jar.version}-runtime.jar" />
+    </target>
 
-        <mkdir dir="${lib.dir}" />
-
-        <jar jarfile="${antlr3.jar}" index="true" filesonly="true">
+    <target name="build-rt" depends="compile-rt,jarnames"
+            description="Creates the ANTLR3 runtime jar">
+        <jar jarfile="${antlr3.rt.jar}" index="true" filesonly="true">
             <fileset file="LICENSE.txt" />
-            <fileset dir="${build.classes}" excludes="org/antlr/test/**" />
+            <fileset dir="${build.rtclasses}" />
             <manifest>
                 <attribute name="Version" value="${version}" />
             </manifest>
         </jar>
     </target>
+
+    <target name="build" depends="compile,templates,jarnames"
+            description="Creates the ANTLR3 fullversion jar">
+        <jar jarfile="${antlr3.jar}" index="true" filesonly="true">
+            <fileset file="LICENSE.txt" />
+            <fileset dir="${build.classes}" excludes="org/antlr/test/**" />
+            <fileset dir="${build.rtclasses}" />
+            <manifest>
+                <attribute name="Version" value="${version}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="build-all" depends="build,build-rt"
+            description="Creates the ANTLR3 fullversion and runtime jars" />
 
     <target name="version" depends="version-bcel" unless="bcel.available">
         <echo>Install bcel in the classpath to have automatic version in jar name</echo>
@@ -122,6 +186,8 @@
     </target>
 
     <target name="rebuild" depends="clean,build" />
+    <target name="rebuild-rt" depends="clean,build-rt" />
+    <target name="rebuild-all" depends="clean,build-all" />
 
     <target name="run-tests" depends="compile">
         <mkdir dir="${build.tests.xml}" />
