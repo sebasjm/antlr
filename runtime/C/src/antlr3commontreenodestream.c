@@ -28,7 +28,7 @@ static	void			    walkBackToMostRecentNodeWithUnvisitedChildren
 /* TREE NODE STREAM API */
 static	pANTLR3_BASE_TREE_ADAPTOR   getTreeAdaptor		(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_BASE_TREE	    getTreeSource		(pANTLR3_TREE_NODE_STREAM tns);
-static	pANTLR3_BASE_TREE	    _LT				(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_UINT64 k);
+static	pANTLR3_BASE_TREE	    _LT				(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k);
 static	void			    setUniqueNavigationNodes	(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_BOOLEAN uniqueNavigationNodes);
 static	pANTLR3_STRING		    toString			(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_STRING		    toStringSS			(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop);
@@ -267,7 +267,7 @@ reset	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
  *  for both parser and tree grammars. :)
  */
 static	pANTLR3_BASE_TREE	    
-_LT	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_UINT64 k)
+_LT	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k)
 {
     if	(k == -1)
     {
