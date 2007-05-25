@@ -89,7 +89,7 @@ try
 >>
 
 @rule.postamble() ::= <<
-dbg.location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
+dbg.Location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
 }
 finally
 {
