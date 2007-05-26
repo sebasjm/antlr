@@ -162,9 +162,9 @@ enterAlt(n) ::= "dbg.EnterAlt(<n>);<\n>"
 @matchSet.mismatchedSetException() ::=
     "dbg.RecognitionException(mse);"
 
-@dfaState.noViableAltException() ::= "dbg.RecognitionException(nvae);"
+@dfaState.noViableAltException() ::= "dbg.RecognitionException(nvae_d<decisionNumber>s<stateNumber>);"
 
-@dfaStateSwitch.noViableAltException() ::= "dbg.RecognitionException(nvae);"
+@dfaStateSwitch.noViableAltException() ::= "dbg.RecognitionException(nvae_d<decisionNumber>s<stateNumber>);"
 
 dfaDecision(decisionNumber,description) ::= <<
 try 
