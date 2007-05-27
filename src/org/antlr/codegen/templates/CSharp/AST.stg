@@ -433,7 +433,7 @@ adaptor.AddChild(root_<treeLevel>, stream_<rule>.Next());<\n>
 >>
 
 rewriteRuleRefRoot(rule) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<rule>.nextNode(), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<rule>.NextNode(), root_<treeLevel>);<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
@@ -456,10 +456,10 @@ adaptor.AddChild(root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>Rul
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
 rewriteRuleLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.nextNode(), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.NextNode(), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.nextNode(), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.NextNode(), root_<treeLevel>);<\n>
 >>
