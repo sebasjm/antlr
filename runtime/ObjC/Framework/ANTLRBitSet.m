@@ -52,7 +52,7 @@
 - (ANTLRBitSet *) initWithBits:(const unsigned long long *)theBits count:(unsigned int)longCount
 {
 	if (nil != (self = [self init])) {
-		int longNo;
+		unsigned int longNo;
 		CFIndex bitIdx;
 		CFBitVectorSetCount(bitVector,sizeof(unsigned long long)*8*longCount);
 
