@@ -235,14 +235,20 @@
 	ANTLRBitSet *localFollow = follow;
 	if ([follow isMember:ANTLRTokenTypeEOR]) {
 		ANTLRBitSet *viableTokensFollowingThisRule = [self computeContextSensitiveRuleFOLLOW];
-		ANTLRBitSet *localFollow = [follow or:viableTokensFollowingThisRule];
+		localFollow = [follow or:viableTokensFollowingThisRule];
 		[localFollow remove:ANTLRTokenTypeEOR];
 	}
 	// if the current token could follow the missing token we tell the user and proceed with matching
 	if ([localFollow isMember:[input LA:1]]) {
 		[self reportError:e];
+		// clean up the temporary follow set, if we created one
+		if (localFollow != follow)
+			[localFollow release];
 		return YES;
 	}
+	// clean up the temporary follow set, if we created one
+	if (localFollow != follow)
+		[localFollow release];
 	// otherwise the match fails
 	return NO;
 }
