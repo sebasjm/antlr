@@ -1,6 +1,6 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2006 Kay Roepke
+ Copyright (c) 2006,2007 Kay Roepke
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -58,9 +58,10 @@ className() ::= "<name><! if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<endif>Parse
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs,
-	   bitsets, buildTemplate, profile,
+	   bitsets, buildTemplate, buildAST, rewrite, profile,
 	   backtracking, synpreds, memoize, numRules,
-	   fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass,literals) ::=
+	   fileName, ANTLRVersion, generatedTimestamp, trace,
+	   scopes, superClass,literals) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
@@ -76,9 +77,10 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs,
-	   bitsets, buildTemplate, profile,
+	   bitsets, buildTemplate, buildAST, rewrite, profile,
 	   backtracking, synpreds, memoize, numRules,
-	   fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass,literals) ::=
+	   fileName, ANTLRVersion, generatedTimestamp, trace,
+	   scopes, superClass,literals) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
@@ -426,7 +428,7 @@ if ( backtracking>0 && [self alreadyParsedRule:input ruleIndex:<ruleDescriptor.i
 /** How to generate code for a rule.
  *  The return type aggregates are declared in the header file (headerFile template)
  */
-rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions, memoize) ::= <<
+rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize) ::= <<
 // $ANTLR start <ruleName>
 // <fileName>:<description>
 - (<returnType()>) <ruleName><ruleDescriptor.parameterScope:parameterScope(scope=it)>
@@ -747,11 +749,11 @@ tokenRefAndListLabel(token,label,elementIndex) ::= <<
 <listLabel(...)>
 >>
 
-listLabel(label) ::= <<
+listLabel(label,elem) ::= <<
 if (_list_<label> == nil)
 	_list_<label> = [[NSMutableArray alloc] initWithObjects:_<label>, nil];
 else
-	[_list_<label> addObject:_<label>];
+	[_list_<label> addObject:_<elem>];
 >>
 
 /** match a character */
@@ -764,7 +766,12 @@ int _<label> = [input LA:1];<\n>
 >>
 
 /** match a character range */
-charRangeRef(a,b) ::= "[self matchRangeFromChar:<a> to:<b>];<checkRuleBacktrackFailure()>"
+charRangeRef(a,b,label) ::= <<
+<if(label)>
+_<label> = [input LA:1];<\n>
+<endif>
+[self matchRangeFromChar:<a> to:<b>];<checkRuleBacktrackFailure()>
+>>
 
 /** For now, sets are interval tests and must be tested inline */
 matchSet(s,label,elementIndex,postmatchCode="") ::= <<
@@ -850,19 +857,19 @@ _<label> = [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
 <checkRuleBacktrackFailure()><\n>
 >>
 
-/** ids+=ID */
+/** ids+=r */
 ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
 <ruleRef(...)>
 <listLabel(...)>
 >>
 
 /** A lexer rule reference */
-lexerRuleRef(rule,label,args) ::= <<
+lexerRuleRef(rule,label,args,elementIndex) ::= <<
 <if(label)>
-int _<label>Start = [self charIndex];
+int _<label>Start<elementIndex> = [self charIndex];
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
 <checkRuleBacktrackFailure()><\n>
-_<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_<label>Start stop:[self charIndex]];
+_<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_<label>Start<elementIndex> stop:[self charIndex]-1];
 [_<label> setLine:[self line]];
 <else>
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
@@ -870,13 +877,19 @@ _<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTyp
 <endif>
 >>
 
+/** i+=INT in lexer */
+lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::= <<
+<lexerRuleRef(...)>
+<listLabel(elem=label,...)>
+>>
+
 /** EOF in the lexer */
-lexerMatchEOF(label) ::= <<
+lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
-int _<label>Start = [self charIndex];
+int _<label>Start<elementIndex> = [self charIndex];
 [self matchChar:ANTLRCharStreamEOF];
 <checkRuleBacktrackFailure()><\n>
-<labelType> _<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeEOF channel:ANTLRTokenChannelDefault start:_<label>Start stop:[self charIndex]];
+<labelType> _<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeEOF channel:ANTLRTokenChannelDefault start:_<label>Start<elementIndex> stop:[self charIndex]-1];
 [_<label> setLine:[self line]];
 <else>
 [self matchChar:ANTLRCharStreamEOF];
@@ -885,8 +898,9 @@ int _<label>Start = [self charIndex];
 >>
 
 /** match ^(root children) in tree parser */
-tree(root, children,nullableChildList) ::= <<
+tree(root,actionsAfterRoot,children,nullableChildList) ::= <<
 <root:element()>
+<actionsAfterRoot:element()>
 <if(nullableChildList)>
 if ( [input LA:1] == ANTLRTokenTypeDOWN ) {
     [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; <checkRuleBacktrackFailure()>
@@ -1405,6 +1419,8 @@ lexerRulePropertyRef_line(scope,attr) ::= "_line"
 lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
+lexerRulePropertyRef_start(scope,attr) ::= "tokenStartCharIndex"
+lexerRulePropertyRef_stop(scope,attr) ::= "([self charIndex]-1)"
 
 /** How to execute an action */
 execAction(action) ::= <<
@@ -1443,6 +1459,7 @@ bitsetInit(name, words64) ::= <<
 >>
 
 codeFileExtension() ::= ".m"
+headerFileExtension() ::= ".h"
 
 true() ::= "YES"
 false() ::= "NO"
