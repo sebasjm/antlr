@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 Combined.g 2007-02-01 01:27:56
+// $ANTLR 3.0 Combined.g 2007-06-03 02:18:31
 
 #import "CombinedLexer.h"
 #pragma mark Cyclic DFAs
@@ -30,12 +30,6 @@
 
 - (void) mID
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
 	@try {
 		ruleNestingLevel++;
 		int _type = CombinedLexer_ID;
@@ -43,8 +37,8 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// Combined.g:14:9: ( ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* ) // ruleBlockSingleAlt
-		// Combined.g:14:9: ('a'..'z'|'A'..'Z'|'_') ( ('a'..'z'|'A'..'Z'|'0'..'9'|'_'))* // alt
+		// Combined.g:14:9: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* ) // ruleBlockSingleAlt
+		// Combined.g:14:9: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* // alt
 		{
 		if (([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			[input consume];
@@ -65,7 +59,7 @@
 		    }
 		    switch (alt1) {
 			case 1 :
-			    // Combined.g:14:34: ('a'..'z'|'A'..'Z'|'0'..'9'|'_') // alt
+			    // Combined.g: // alt
 			    {
 			    if (([input LA:1]>='0' && [input LA:1]<='9')||([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
 			    	[input consume];
@@ -105,12 +99,6 @@
 
 - (void) mINT
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
 	@try {
 		ruleNestingLevel++;
 		int _type = CombinedLexer_INT;
@@ -171,12 +159,6 @@
 
 - (void) mWS
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
 	@try {
 		ruleNestingLevel++;
 		int _type = CombinedLexer_WS;
@@ -184,10 +166,10 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// Combined.g:20:9: ( ( (' '|'\\t'|'\\r'|'\\n'))+ ) // ruleBlockSingleAlt
-		// Combined.g:20:9: ( (' '|'\\t'|'\\r'|'\\n'))+ // alt
+		// Combined.g:20:9: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ ) // ruleBlockSingleAlt
+		// Combined.g:20:9: ( ' ' | '\\t' | '\\r' | '\\n' )+ // alt
 		{
-		// Combined.g:20:9: ( (' '|'\\t'|'\\r'|'\\n'))+	// positiveClosureBlock
+		// Combined.g:20:9: ( ' ' | '\\t' | '\\r' | '\\n' )+	// positiveClosureBlock
 		int cnt3=0;
 
 		do {
@@ -201,7 +183,7 @@
 		    }
 		    switch (alt3) {
 			case 1 :
-			    // Combined.g:20:13: (' '|'\\t'|'\\r'|'\\n') // alt
+			    // Combined.g: // alt
 			    {
 			    if (([input LA:1]>='\t' && [input LA:1]<='\n')||[input LA:1]=='\r'||[input LA:1]==' ') {
 			    	[input consume];

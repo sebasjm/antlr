@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 Combined.g 2007-02-01 01:27:56
+// $ANTLR 3.0 Combined.g 2007-06-03 02:18:30
 
 #import "CombinedParser.h"
 
@@ -55,12 +55,6 @@ static ANTLRBitSet *FOLLOW_CombinedParser_ID_in_identifier35;
 // Combined.g:7:1: stat : ( identifier )+ ;
 - (void) stat
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // Combined.g:7:7: ( ( identifier )+ ) // ruleBlockSingleAlt
         // Combined.g:7:7: ( identifier )+ // alt
@@ -121,12 +115,6 @@ static ANTLRBitSet *FOLLOW_CombinedParser_ID_in_identifier35;
 // Combined.g:9:1: identifier : ID ;
 - (void) identifier
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // Combined.g:10:7: ( ID ) // ruleBlockSingleAlt
         // Combined.g:10:7: ID // alt

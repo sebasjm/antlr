@@ -316,6 +316,7 @@ root_0 = (<ASTLabelType>)[treeAdaptor makeNode:_<label>_tree parentOf:root_0];
 
 rewriteCode(
 	alts, description,
+	referencedElementsDeep, // ALL referenced elements to right of ->
 	referencedTokens,
 	referencedListLabels,
 	referencedRules,
@@ -325,6 +326,11 @@ rewriteCode(
 <<
 
 // AST REWRITE
+// elements: <referencedElementsDeep; separator=", ">
+// token labels: <referencedTokenLabels; separator=", ">
+// rule labels: <referencedRuleLabels; separator=", ">
+// token list labels: <referencedTokenListLabels; separator=", ">
+// rule list labels: <referencedRuleListLabels; separator=", ">
 <if(backtracking)>
 if (backtracking == 0) {<\n>
 <endif>

@@ -1,8 +1,7 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g 2006-11-12 22:57:12
+// $ANTLR 3.0 Test.gl 2007-06-02 22:06:43
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
-
 
 #pragma mark Cyclic DFA start
 #pragma mark Cyclic DFA end

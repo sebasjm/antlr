@@ -960,12 +960,12 @@
 		};
 		F76287780B71557E006AA7EF /* Regenerate lexertest-simple */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "-cp $ANTLR_EXTRA_JAVA_ARGS org.antlr.Tool FuzzyJava.gl";
+			buildArgumentsString = "-cp $ANTLR_EXTRA_JAVA_ARGS org.antlr.Tool Test.gl";
 			buildConfigurationList = F76287790B71557E006AA7EF /* Build configuration list for PBXLegacyTarget "Regenerate lexertest-simple" */;
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/java;
-			buildWorkingDirectory = "$(PROJECT_DIR)/examples/fuzzy";
+			buildWorkingDirectory = "$(PROJECT_DIR)/examples/lexertest-simple";
 			dependencies = (
 			);
 			name = "Regenerate lexertest-simple";
@@ -1541,7 +1541,15 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = NO;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
@@ -1557,7 +1565,14 @@
 				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
@@ -1859,7 +1874,7 @@
 		F762877A0B71557E006AA7EF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				PRODUCT_NAME = fuzzy;
+				PRODUCT_NAME = "lexertest-simple";
 			};
 			name = Debug;
 		};

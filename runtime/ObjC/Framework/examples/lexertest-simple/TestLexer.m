@@ -1,4 +1,4 @@
-// $ANTLR 3.0b5 /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g 2006-11-12 22:57:12
+// $ANTLR 3.0 Test.gl 2007-06-02 22:06:43
 
 #import "TestLexer.h"
 #pragma mark Cyclic DFAs
@@ -22,6 +22,11 @@
 	[super dealloc];
 }
 
+- (NSString *) grammarFileName
+{
+	return @"Test.gl";
+}
+
 
 - (void) mID
 {
@@ -32,39 +37,32 @@
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
 		int _channel = [ANTLRToken defaultChannel];
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:8:6: ( LETTER ( LETTER | DIGIT )* ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:8:6: LETTER ( LETTER | DIGIT )* // alt
+		// Test.gl:8:6: ( LETTER ( LETTER | DIGIT )* ) // ruleBlockSingleAlt
+		// Test.gl:8:6: LETTER ( LETTER | DIGIT )* // alt
 		{
 		[self mLETTER];
 
 
 		do {
-		    int alt1=3;
+		    int alt1=2;
 		    {
 		    	int LA1_0 = [input LA:1];
-		    	if ( (LA1_0>='A' && LA1_0<='Z')||(LA1_0>='a' && LA1_0<='z') ) {
+		    	if ( (LA1_0>='0' && LA1_0<='9')||(LA1_0>='A' && LA1_0<='Z')||(LA1_0>='a' && LA1_0<='z') ) {
 		    		alt1 = 1;
-		    	}
-		    	else if ( (LA1_0>='0' && LA1_0<='9') ) {
-		    		alt1 = 2;
 		    	}
 
 		    }
 		    switch (alt1) {
 			case 1 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:8:14: LETTER // alt
+			    // Test.gl: // alt
 			    {
-			    [self mLETTER];
+			    if (([input LA:1]>='0' && [input LA:1]<='9')||([input LA:1]>='A' && [input LA:1]<='Z')||([input LA:1]>='a' && [input LA:1]<='z')) {
+			    	[input consume];
 
-
-
+			    } else {
+			    	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
+			    	[self recover:mse];	@throw mse;
 			    }
-			    break;
-			case 2 :
-			    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:8:23: DIGIT // alt
-			    {
-			    [self mDIGIT];
-
 
 
 			    }
@@ -98,8 +96,8 @@
 {
 	@try {
 		ruleNestingLevel++;
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:11:18: ( '0' .. '9' ) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:11:18: '0' .. '9' // alt
+		// Test.gl:11:18: ( '0' .. '9' ) // ruleBlockSingleAlt
+		// Test.gl:11:18: '0' .. '9' // alt
 		{
 		[self matchRangeFromChar:'0' to:'9'];
 
@@ -124,8 +122,8 @@
 {
 	@try {
 		ruleNestingLevel++;
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:15:2: ( ('a'..'z'|'A'..'Z')) // ruleBlockSingleAlt
-		// /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:15:4: ('a'..'z'|'A'..'Z') // alt
+		// Test.gl:15:4: ( 'a' .. 'z' | 'A' .. 'Z' ) // ruleBlockSingleAlt
+		// Test.gl: // alt
 		{
 		if (([input LA:1]>='A' && [input LA:1]<='Z')||([input LA:1]>='a' && [input LA:1]<='z')) {
 			[input consume];
@@ -154,8 +152,8 @@
 
 - (void) mTokens
 {
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:1:10: ( ID ) // ruleBlockSingleAlt
-    // /Users/kroepke/Projects/antlr3/code/antlr/main/lib/ObjC/Framework/examples/lexertest-simple/Test.g:1:10: ID // alt
+    // Test.gl:1:10: ( ID ) // ruleBlockSingleAlt
+    // Test.gl:1:10: ID // alt
     {
     [self mID];
 
