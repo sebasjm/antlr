@@ -127,9 +127,6 @@ public class Tool {
 					}
 				}
 			}
-			else if (args[i].equals("-verbose")) {
-				DecisionProbe.verbose=true;
-			}
 			else if (args[i].equals("-nfa")) {
 				generate_NFA_dot=true;
 			}
@@ -223,6 +220,9 @@ public class Tool {
 					DFA.MAX_TIME_PER_DFA_CREATION = Integer.parseInt(args[i]);
 				}
 			}
+			else if (args[i].equals("-Xnfastates")) {
+				DecisionProbe.verbose=true;
+			}			
 			else if (args[i].equals("-X")) {
 				Xhelp();
 			}
@@ -423,6 +423,7 @@ public class Tool {
 		System.err.println("  -Xmaxdfaedges m        max \"comfortable\" number of edges for single DFA state");
 		System.err.println("  -Xconversiontimeout t  set NFA conversion timeout for each decision");
 		System.err.println("  -Xnoinlinedfa          make all DFA with tables; no inline prediction with IFs");
+		System.err.println("  -Xnfastates            for nondeterminisms, list NFA states for each path");
     }
 
 	public void setOutputDirectory(String outputDirectory) {
