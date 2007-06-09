@@ -558,7 +558,7 @@ match(<char>)
 >>
 
 /** match a character range */
-charRangeRef(a,b)::=
+charRangeRef(a,b,label)::=
 <<
 match_range(<a>, <b>)
 >>
@@ -643,14 +643,19 @@ ruleRefAndListLabel(rule,label,elementIndex,args)::=
 
 
 /** A lexer rule reference */
-lexerRuleRef(rule,label,args)::=
+lexerRuleRef(rule,label,args,elementIndex)::=
 <<
 match_<rule>(<args; separator=", ">)
 >>
 
 
+lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::=
+<<
+	raise "lexerRuleRefAndListLabel not implemented"
+>>
+
 /** EOF in the lexer */
-lexerMatchEOF(label)::=
+lexerMatchEOF(label,elementIndex)::=
 <<
 <if(label)>
 _<label> = :EOF<\n>
@@ -659,7 +664,7 @@ match(:EOF)
 >>
 
 /** match ^(root children) in tree parser */
-tree(root, children, nullableChildList)::=
+tree(root, actionsAfterRoot, children, nullableChildList) ::=
 <<
 	raise "tree not implemented"
 >>
