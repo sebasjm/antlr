@@ -118,19 +118,14 @@ public class CTarget extends Target {
 		String literal)
 	{
                 
-                
-                
-                
                 if  (literal.startsWith("'\\u") )
                 {
                     literal = "0x" +literal.substring(3, 7);
                 }
                 else
                 {
-					// hi, Jim.  I think:
-					// int c = Character.valueOf(literal.charAt(1));
-					// should be just:
-					int c = literal.charAt(1); // TJP
+                    int c = literal.charAt(1);
+                      
                     if  (c < 32 || c > 127) {
                         literal  =  "0x" + Integer.toHexString(c);
                     }
@@ -140,29 +135,88 @@ public class CTarget extends Target {
 	}
         
 	/** Convert from an ANTLR string literal found in a grammar file to
-	 *  an equivalent string literal in the target language.  For Java, this
-	 *  is the translation 'a\n"' -> "a\n\"".  Expect single quotes
-	 *  around the incoming literal.  Just flip the quotes and replace
-	 *  double quotes with \"
+	 *  an equivalent string literal in the C target.
+         *  Because we msut support Unicode character sets and have chosen
+         *  to have the lexer match UTF32 characters, then we must encode
+         *  string matches to use 32 bit character arrays. Here then we
+         *  must produce the C array and cater for the case where the 
+         *  lexer has been eoncded with a string such as "xyz\n", which looks
+         *  slightly incogrous to me but is not incorrect.
 	 */
 	public String getTargetStringLiteralFromANTLRStringLiteral(
 		CodeGenerator generator,
 		String literal)
 	{
-            int index;
-	
-            String bytes;
-            
-            StringBuffer buf = new StringBuffer();
+            int             index;
+            int             outc;
+            String          bytes;
+            StringBuffer    buf     = new StringBuffer();
             
             buf.append("{ ");
             
+            // We need ot lose any escaped characters of the form \x and just
+            // replace them with their actual values as well as lose the surrounding
+            // quote marks.
+            //
             for (int i = 1; i< literal.length()-1; i++)
             {
                 buf.append("0x");
-                buf.append(Integer.toHexString((int)literal.charAt(i)));
-                buf.append(", ");
-               
+                                
+                if  (literal.charAt(i) == '\\') 
+                {
+                    i++; // Assume that there is a next character, this will just yield
+                         // invalid strings if not, which is what the input would be of course - invalid
+                    switch (literal.charAt(i))
+                    {
+                        case 'u':
+                        case 'U':
+                            buf.append(literal.substring(i+1, i+5));  // Already a hex string
+                            i = i + 5;                                // Move to next string/char/escape
+                            break;
+                            
+                        case    'n':
+                        case    'N':
+                            
+                            buf.append("0A");
+                            break;
+                            
+                        case    'r':
+                        case    'R':
+                            
+                            buf.append("0D");
+                            break;
+                            
+                        case    't':
+                        case    'T':
+                            
+                            buf.append("09");
+                            break;
+                        
+                        case    'b':
+                        case    'B':
+                            
+                            buf.append("08");
+                            break;
+                            
+                        case    'f':
+                        case    'F':
+                            
+                            buf.append("0C");
+                            break;
+                            
+                        default:
+                            
+                            // Anything else is what it is!
+                            //
+                            buf.append(Integer.toHexString((int)literal.charAt(i)).toUpperCase());
+                            break;
+                    }
+                }
+                else
+                {
+                    buf.append(Integer.toHexString((int)literal.charAt(i)).toUpperCase());
+                }
+                buf.append(", ");               
             }
             buf.append(" ANTLR3_STRING_TERMINATOR}");
             
