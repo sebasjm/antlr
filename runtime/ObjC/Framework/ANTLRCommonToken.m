@@ -48,12 +48,36 @@
 	return [aToken copy];
 }
 
+// return the singleton EOF Token 
++ (id<ANTLRToken>) eofToken
+{
+	static ANTLRCommonToken *eofToken = nil;
+	if (eofToken != nil) {
+		return eofToken;
+	}
+	eofToken = [[ANTLRCommonToken alloc] init];
+	if (eofToken) {
+		[eofToken setType:ANTLRTokenTypeEOF];
+		return eofToken;
+	}
+	return nil;
+}
+
+
+// the default channel for this class of Tokens
++ (ANTLRTokenChannel) defaultChannel
+{
+	return ANTLRTokenChannelDefault;
+}
+
+
 // create a copy, including the text if available
 // the input stream is *not* copied!
 - (id) copyWithZone:(NSZone *)theZone
 {
-	ANTLRCommonToken *copy = [super copyWithZone:theZone];
-	if (copy) {
+	ANTLRCommonToken *copy = [[[self class] allocWithZone:theZone] init];
+    if (copy) {
+        [copy setType:type];
 		[copy setChannel:channel];
 		if (text) {
 			NSString *copyOfText = [text copyWithZone:theZone];
@@ -62,7 +86,7 @@
 		}
 		[copy setStart:start];
 		[copy setStop:stop];
-		[copy setIndex:index];
+		[copy setTokenIndex:index];
 		[copy setLine:line];
 		[copy setCharPositionInLine:charPositionInLine];
 		[copy setInput:input];		// not a copy, but a reference to the original input stream!
@@ -70,7 +94,6 @@
 	return copy;
 }
 
-// inherited from ANTLRToken
 //---------------------------------------------------------- 
 //  text 
 //---------------------------------------------------------- 
@@ -97,12 +120,12 @@
 //---------------------------------------------------------- 
 //  type 
 //---------------------------------------------------------- 
-- (unsigned int) type
+- (int) type
 {
     return type;
 }
 
-- (void) setType: (unsigned int) aType
+- (void) setType: (int) aType
 {
     type = aType;
 }
@@ -146,9 +169,6 @@
     channel = aChannel;
 }
 
-
-
-// end inherited
 
 //---------------------------------------------------------- 
 //  input 
@@ -197,14 +217,14 @@
 //---------------------------------------------------------- 
 //  index 
 //---------------------------------------------------------- 
-- (unsigned int) index
+- (unsigned int) tokenIndex;
 {
     return index;
 }
 
-- (void) setIndex: (unsigned int) anIndex
+- (void) setTokenIndex: (unsigned int) aTokenIndex;
 {
-    index = anIndex;
+    index = aTokenIndex;
 }
 
 

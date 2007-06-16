@@ -290,7 +290,7 @@
 - (NSArray *) ruleInvocationStack:(id) exception
 					   recognizer:(Class) recognizerClass
 {
-	// todo
+#warning TODO: ruleInvocationStack:recognizer:
 	return [NSArray arrayWithObject:[@"not implemented yet: " stringByAppendingString:NSStringFromClass(recognizerClass)]];
 }
 
@@ -315,7 +315,7 @@
 	NSEnumerator *tokensEnumerator = [tokens objectEnumerator];
 	id value;
 	while (nil != (value = [tokensEnumerator nextObject])) {
-		[strings addObject:[(ANTLRToken *)value text]];
+		[strings addObject:[(id<ANTLRToken>)value text]];
 	}
 	return strings;
 }
@@ -325,7 +325,7 @@
 - (NSArray *) toTemplates:(NSArray *)retvals
 {
 	return nil;
-#warning Templates are not yet supported in ObjC!
+#warning TODO: Templates are not yet supported in ObjC!
 }
 
 // the following methods handle the "memoization" caching functionality

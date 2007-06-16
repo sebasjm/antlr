@@ -68,13 +68,13 @@
 /** An input token was consumed; matched by any kind of element.
 *  Trigger after the token was matched by things like match(), matchAny().
 */
-- (void) consumeToken:(ANTLRToken *)t;
+- (void) consumeToken:(id<ANTLRToken>)t;
 
 /** An off-channel input token was consumed.
 *  Trigger after the token was matched by things like match(), matchAny().
 *  (unless of course the hidden token is first stuff in the input stream).
 */
-- (void) consumeHiddenToken:(ANTLRToken *)t;
+- (void) consumeHiddenToken:(id<ANTLRToken>)t;
 
 /** Somebody (anybody) looked ahead.  Note that this actually gets
 *  triggered by both LA and LT calls.  The debugger will want to know
@@ -83,7 +83,7 @@
 *  ahead into a file it doesn't have so LT events must pass the token
 *  even if the info is redundant.
 */
-- (void) LT:(int)i foundToken:(ANTLRToken *)t;
+- (void) LT:(int)i foundToken:(id<ANTLRToken>)t;
 
 /** The parser is going to look arbitrarily ahead; mark this location,
 *  the token stream's marker is sent in case you need it.
@@ -269,5 +269,7 @@
 
 /** Set the token start/stop token index for a subtree root or node */
 - (void) setTokenBoundariesForTree:(unsigned)nodeHash start:(int)tokenStartIndex stop:(int)tokenStopIndex;
+
+- (void) waitForDebuggerConnection;
 
 @end

@@ -27,6 +27,7 @@
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLRTokenStream.h>
 #import <ANTLR/ANTLRToken.h>
+#import <ANTLR/ANTLRCommonToken.h>
 #import <ANTLR/ANTLRTokenSource.h>
 #import <ANTLR/ANTLRBitSet.h>
 
@@ -63,11 +64,11 @@
 - (NSArray *) tokensInRange:(NSRange)aRange withTypes:(NSArray *)tokenTypes;
 - (NSArray *) tokensInRange:(NSRange)aRange withType:(int)tokenType;
 
-- (ANTLRToken *) LT:(int)k;
-- (ANTLRToken *) LB:(int)k;
+- (id<ANTLRToken>) LT:(int)k;
+- (id<ANTLRToken>) LB:(int)k;
 - (int) LA:(int)k;
 
-- (ANTLRToken *) tokenAtIndex:(int)i;
+- (id<ANTLRToken>) tokenAtIndex:(int)i;
 
 - (int) mark;
 - (void) release:(int)marker;
@@ -80,6 +81,6 @@
 
 - (NSString *) stringValue;
 - (NSString *) stringValueWithRange:(NSRange) aRange;
-- (NSString *) stringValueFromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken;
+- (NSString *) stringValueFromToken:(id<ANTLRToken>)startToken toToken:(id<ANTLRToken>)stopToken;
 
 @end

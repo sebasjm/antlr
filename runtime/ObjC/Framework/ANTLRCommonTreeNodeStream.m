@@ -174,7 +174,7 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 	[state setCurrentChildIndex:currentChildIndex];
 	[state setAbsoluteNodeIndex:absoluteNodeIndex];
 	unsigned int lookaheadSize = [self lookaheadSize];
-	int k;
+	unsigned int k;
 	for ( k = 1; k <= lookaheadSize; k++) {
 		[state addToLookahead:[self LT:k]];
 	}

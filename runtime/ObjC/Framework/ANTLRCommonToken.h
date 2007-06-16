@@ -29,10 +29,10 @@
 #import <ANTLR/ANTLRToken.h>
 #import <ANTLR/ANTLRCharStream.h>
 
-@interface ANTLRCommonToken : ANTLRToken <NSCopying> {
+@interface ANTLRCommonToken : NSObject < ANTLRToken > {
 	NSString *text;
 	
-//	int type;					// inherited from ANTLRToken!
+	int type;
 	// information about the Token's position in the input stream
 	unsigned int line;
 	unsigned int charPositionInLine;
@@ -61,8 +61,9 @@
 - (unsigned int) stop;
 - (void) setStop: (unsigned int) aStop;
 
-- (unsigned int) index;
-- (void) setIndex: (unsigned int) anIndex;
+// the index of this Token into the TokenStream
+- (unsigned int) tokenIndex;
+- (void) setTokenIndex: (unsigned int) aTokenIndex;
 
 // conform to NSCopying
 - (id) copyWithZone:(NSZone *)theZone;

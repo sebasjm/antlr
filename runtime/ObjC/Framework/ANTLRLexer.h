@@ -37,7 +37,7 @@
 @protocol ANTLRTokenSource;
 @interface ANTLRLexer : ANTLRBaseRecognizer <ANTLRTokenSource> {
 	id<ANTLRCharStream> input;
-	ANTLRToken *token;
+	id<ANTLRToken> token;
 	unsigned int tokenStartCharIndex;
 	unsigned int ruleNestingLevel;
 }
@@ -46,13 +46,13 @@
 - (id) initWithCharStream:(id<ANTLRCharStream>)anInput;
 
 #pragma mark Tokens
-- (ANTLRToken *) token;
-- (void) setToken: (ANTLRToken *) aToken;
-- (ANTLRToken *) nextToken;
+- (id<ANTLRToken>) token;
+- (void) setToken: (id<ANTLRToken>) aToken;
+- (id<ANTLRToken>) nextToken;
 - (void) mTokens;		// abstract, defined in generated sources
 - (id<ANTLRCharStream>) input;
 - (void) setInput:(id<ANTLRCharStream>)aCharStream;
-- (void) emit:(ANTLRToken *)aToken;
+- (void) emit:(id<ANTLRToken>)aToken;
 - (void) emitTokenWithType:(ANTLRTokenType)aTType 
 					  line:(unsigned int)aLine 
 			  charPosition:(unsigned int)aCharPos 

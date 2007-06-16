@@ -64,7 +64,7 @@
 - (void) fillBuffer
 {
 	int index = 0;
-	ANTLRToken *token = [tokenSource nextToken];
+	id<ANTLRToken> token = [tokenSource nextToken];
 	while ( token && [token type] != ANTLRTokenTypeEOF ) {
 		BOOL discard = NO;
 		NSNumber *tokenType = [NSNumber numberWithInt:[token type]];
@@ -116,7 +116,7 @@
 {
 	int n = [tokens count];
 	int tmp = i;
-	while ( tmp < n && [(ANTLRToken *)[tokens objectAtIndex:tmp] channel] != channel ) {
+	while ( tmp < n && [(id<ANTLRToken>)[tokens objectAtIndex:tmp] channel] != channel ) {
 		tmp++;
 	}
 	return tmp;
@@ -125,7 +125,7 @@
 - (int) skipOffChannelTokensReverse:(int) i
 {
 	int tmp = i;
-	while ( tmp >= 0 && [(ANTLRToken *)[tokens objectAtIndex:tmp] channel] != channel ) {
+	while ( tmp >= 0 && [(id<ANTLRToken>)[tokens objectAtIndex:tmp] channel] != channel ) {
 		tmp--;
 	}
 	return tmp;
@@ -175,7 +175,7 @@
 	NSMutableArray *filteredTokens = [[NSMutableArray alloc] init];
 	int i=0;
 	for (i = start; i<=stop; i++) {
-		ANTLRToken *token = [tokens objectAtIndex:i];
+		id<ANTLRToken> token = [tokens objectAtIndex:i];
 		if (aBitSet == nil || [aBitSet isMember:[token type]]) {
 			[filteredTokens addObject:token];
 		}
@@ -205,7 +205,7 @@
 	return returnTokens;
 }
 
-- (ANTLRToken *) tokenAtIndex:(int)i
+- (id<ANTLRToken>) tokenAtIndex:(int)i
 {
 	return [tokens objectAtIndex:i];
 }
@@ -217,7 +217,7 @@
 
 #pragma mark Lookahead
 
-- (ANTLRToken *) LT:(int)k
+- (id<ANTLRToken>) LT:(int)k
 {
 	if ( p == -1 ) {
 		[self fillBuffer];
@@ -229,7 +229,7 @@
 		return [self LB:k];
 	}
 	if ( (p+k-1) >= [tokens count] ) {
-		return [ANTLRToken eofToken];
+		return [ANTLRCommonToken eofToken];
 	}
 	int i = p;
 	int n = 1;
@@ -238,12 +238,12 @@
 		n++;
 	}
 	if ( i >= [tokens count] ) {
-		return [ANTLRToken eofToken];
+		return [ANTLRCommonToken eofToken];
 	}
 	return [tokens objectAtIndex:i];
 }
 
-- (ANTLRToken *) LB:(int)k
+- (id<ANTLRToken>) LB:(int)k
 {
 	if ( p == -1 ) {
 		[self fillBuffer];
@@ -255,7 +255,7 @@
 		return nil;
 	}
 	if ( (p+k-1) >= [tokens count] ) {
-		return [ANTLRToken eofToken];
+		return [ANTLRCommonToken eofToken];
 	}
 	int i = p;
 	int n = 1;
@@ -331,7 +331,7 @@
 	}
 	NSArray *tokensInRange = [self tokensInRange:aRange];
 	NSEnumerator *tokenEnum = [tokensInRange objectEnumerator];
-	ANTLRToken *token;
+	id<ANTLRToken> token;
 	NSMutableString *stringValue = [[NSMutableString alloc] init];
 	while ((token = [tokenEnum nextObject])) {
 		[stringValue appendString:[token text]];
@@ -339,7 +339,7 @@
 	return [stringValue autorelease];
 }
 
-- (NSString *) stringValueFromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken
+- (NSString *) stringValueFromToken:(id<ANTLRToken>)startToken toToken:(id<ANTLRToken>)stopToken
 {
 	if (startToken && stopToken) {
 		int start = [startToken tokenIndex];

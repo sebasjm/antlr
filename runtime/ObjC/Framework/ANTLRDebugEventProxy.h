@@ -78,9 +78,9 @@
 - (void) exitSubRule:(int)decisionNumber;
 - (void) enterDecision:(int)decisionNumber;
 - (void) exitDecision:(int)decisionNumber;
-- (void) consumeToken:(ANTLRToken *)t;
-- (void) consumeHiddenToken:(ANTLRToken *)t;
-- (void) LT:(int)i foundToken:(ANTLRToken *)t;
+- (void) consumeToken:(id<ANTLRToken>)t;
+- (void) consumeHiddenToken:(id<ANTLRToken>)t;
+- (void) LT:(int)i foundToken:(id<ANTLRToken>)t;
 - (void) mark:(int)marker;
 - (void) rewind:(int)marker;
 - (void) rewind;

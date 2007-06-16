@@ -29,12 +29,12 @@
 
 @implementation ANTLRParserRuleReturnScope
 
-- (ANTLRToken *) start
+- (id<ANTLRToken>) start
 {
     return start; 
 }
 
-- (void) setStart: (ANTLRToken *) aStart
+- (void) setStart: (id<ANTLRToken>) aStart
 {
     if (start != aStart) {
         [aStart retain];
@@ -43,12 +43,12 @@
     }
 }
 
-- (ANTLRToken *) stop
+- (id<ANTLRToken>) stop
 {
     return stop; 
 }
 
-- (void) setStop: (ANTLRToken *) aStop
+- (void) setStop: (id<ANTLRToken>) aStop
 {
     if (stop != aStop) {
         [aStop retain];

@@ -36,15 +36,15 @@
 // Return null for LT:0 and any index that results in an absolute address
 // that is negative.
 
-- (ANTLRToken *) LT:(int) i;
+- (id<ANTLRToken>) LT:(int) i;
 
-- (ANTLRToken *) tokenAtIndex:(unsigned int) i;
+- (id<ANTLRToken>) tokenAtIndex:(unsigned int) i;
 
 - (id) tokenSource;
 
 - (NSString *) stringValue;
 - (NSString *) stringValueWithRange:(NSRange) aRange;
-- (NSString *) stringValueFromToken:(ANTLRToken *)startToken toToken:(ANTLRToken *)stopToken;
+- (NSString *) stringValueFromToken:(id<ANTLRToken>)startToken toToken:(id<ANTLRToken>)stopToken;
 
 
 @end

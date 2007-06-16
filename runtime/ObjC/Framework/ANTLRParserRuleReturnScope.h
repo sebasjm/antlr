@@ -28,14 +28,14 @@
 #import <ANTLR/ANTLRToken.h>
 
 @interface ANTLRParserRuleReturnScope : NSObject {
-	ANTLRToken *start;
-	ANTLRToken *stop;
+	id<ANTLRToken> start;
+	id<ANTLRToken> stop;
 }
 
-- (ANTLRToken *) start;
-- (void) setStart: (ANTLRToken *) aStart;
+- (id<ANTLRToken>) start;
+- (void) setStart: (id<ANTLRToken>) aStart;
 
-- (ANTLRToken *) stop;
-- (void) setStop: (ANTLRToken *) aStop;
+- (id<ANTLRToken>) stop;
+- (void) setStop: (id<ANTLRToken>) aStop;
 
 @end

@@ -101,7 +101,7 @@
 	if ( initialStreamState )
 		[self consumeInitialHiddenTokens];
 	int a = [tokenStream index];
-	ANTLRToken *token = [tokenStream LT:1];
+	id<ANTLRToken> token = [tokenStream LT:1];
 	[tokenStream consume];
 	int b = [tokenStream index];
 	[debugListener consumeToken:token];
@@ -129,7 +129,7 @@
 	[tokenStream rewind:marker];
 }
 
-- (ANTLRToken *) LT:(int)k
+- (id<ANTLRToken>) LT:(int)k
 {
 	if ( initialStreamState )
 		[self consumeInitialHiddenTokens];

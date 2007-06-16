@@ -30,6 +30,6 @@
 // a proxy for a remotely running token source (database, lexer, whatever).
 @protocol ANTLRTokenSource
 
-- (ANTLRToken *) nextToken;
+- (id<ANTLRToken>) nextToken;
 
 @end

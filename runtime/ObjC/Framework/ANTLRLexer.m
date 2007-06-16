@@ -52,12 +52,12 @@
 	// token stuff
 #pragma mark Tokens
 
-- (ANTLRToken *) token
+- (id<ANTLRToken>) token
 {
     return token; 
 }
 
-- (void) setToken: (ANTLRToken *) aToken
+- (void) setToken: (id<ANTLRToken>) aToken
 {
     if (token != aToken) {
         [aToken retain];
@@ -68,7 +68,7 @@
 
 
 // this method may be overridden in the generated lexer if we generate a filtering lexer.
-- (ANTLRToken *) nextToken
+- (id<ANTLRToken>) nextToken
 {
 	token = nil;
 	tokenStartCharIndex = [self charIndex];
@@ -106,7 +106,7 @@
 }
 
 // use this to emit custom tokens from a lexer rule
-- (void) emit:(ANTLRToken *)aToken
+- (void) emit:(id<ANTLRToken>)aToken
 {
 	[self setToken:aToken];
 }
@@ -121,7 +121,7 @@
 					 start:(unsigned int)theStart
 					  stop:(unsigned int)theStop
 {
-	ANTLRToken *aToken = [[ANTLRCommonToken alloc] initWithInput:input 
+	id<ANTLRToken> aToken = [[ANTLRCommonToken alloc] initWithInput:input 
 													   tokenType:aTType 
 														 channel:aChannel
 														   start:theStart

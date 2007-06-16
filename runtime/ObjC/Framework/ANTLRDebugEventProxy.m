@@ -222,17 +222,17 @@ static unsigned lengthOfUTF8Ack = 0;
 	[self sendToDebugger:[NSString stringWithFormat:@"exitDecision %d", decisionNumber]];
 }
 
-- (void) consumeToken:(ANTLRToken *)t
+- (void) consumeToken:(id<ANTLRToken>)t
 {
 	[self sendToDebugger:[NSString stringWithFormat:@"consumeToken %@", [self escapeNewlines:[t debuggerDescription]]]];
 }
 
-- (void) consumeHiddenToken:(ANTLRToken *)t
+- (void) consumeHiddenToken:(id<ANTLRToken>)t
 {
 	[self sendToDebugger:[NSString stringWithFormat:@"consumeHiddenToken %@", [self escapeNewlines:[t debuggerDescription]]]];
 }
 
-- (void) LT:(int)i foundToken:(ANTLRToken *)t
+- (void) LT:(int)i foundToken:(id<ANTLRToken>)t
 {
 	[self sendToDebugger:[NSString stringWithFormat:@"LT %d %@", i, [self escapeNewlines:[t debuggerDescription]]]];
 }

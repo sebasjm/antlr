@@ -118,12 +118,12 @@
 //---------------------------------------------------------- 
 //  token 
 //---------------------------------------------------------- 
-- (ANTLRToken *) token
+- (id<ANTLRToken>) token
 {
     return token; 
 }
 
-- (void) setToken: (ANTLRToken *) aToken
+- (void) setToken: (id<ANTLRToken>) aToken
 {
     if (token != aToken) {
         [aToken retain];

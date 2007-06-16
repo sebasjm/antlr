@@ -36,7 +36,7 @@
 @interface ANTLRRecognitionException : NSException {
 	id<ANTLRIntStream> input;
 	int index;
-	ANTLRToken *token;
+	id<ANTLRToken> token;
 	id<ANTLRTree> node;
 	unichar c;
 	int line;
@@ -51,8 +51,8 @@
 - (id<ANTLRIntStream>) stream;
 - (void) setStream: (id<ANTLRIntStream>) aStream;
 
-- (ANTLRToken *) token;
-- (void) setToken: (ANTLRToken *) aToken;
+- (id<ANTLRToken>) token;
+- (void) setToken: (id<ANTLRToken>) aToken;
 
 - (id<ANTLRTree>) node;
 - (void) setNode: (id<ANTLRTree>) aNode;
