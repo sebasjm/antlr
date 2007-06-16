@@ -333,7 +333,7 @@
 // that way, when we are about to parse a rule and have parsed the rule previously, e.g. in prediction,
 // we don't have to do it again but can simply return the token index to continue up parsing at.
 
-- (int) ruleMemoization:(int)ruleIndex startIndex:(int)ruleStartIndex
+- (int) ruleMemoization:(unsigned int)ruleIndex startIndex:(int)ruleStartIndex
 {
 	if ([ruleMemo count] < ruleIndex) {
 		[ruleMemo setObject:[NSMutableDictionary dictionary] forKey:[NSNumber numberWithInt:ruleIndex]];
@@ -346,7 +346,7 @@
 	}
 }
 
-- (BOOL) alreadyParsedRule:(id<ANTLRIntStream>)input ruleIndex:(int)ruleIndex
+- (BOOL) alreadyParsedRule:(id<ANTLRIntStream>)input ruleIndex:(unsigned int)ruleIndex
 {
 	int stopIndex = [self ruleMemoization:ruleIndex startIndex:[input index]];
 	if (stopIndex == ANTLR_MEMO_RULE_UNKNOWN) {

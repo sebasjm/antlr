@@ -118,9 +118,9 @@
 - (NSArray *) toTemplates:(NSArray *)retvals;
 
 // support for memoization
-- (int) ruleMemoization:(int)ruleIndex startIndex:(int)ruleStartIndex;
+- (int) ruleMemoization:(unsigned int)ruleIndex startIndex:(int)ruleStartIndex;
 
-- (BOOL) alreadyParsedRule:(id<ANTLRIntStream>)input ruleIndex:(int)ruleIndex;
+- (BOOL) alreadyParsedRule:(id<ANTLRIntStream>)input ruleIndex:(unsigned int)ruleIndex;
 
 - (void) memoize:(id<ANTLRIntStream>)input
 	   ruleIndex:(int)ruleIndex
