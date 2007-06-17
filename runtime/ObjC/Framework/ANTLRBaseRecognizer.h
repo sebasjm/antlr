@@ -66,6 +66,10 @@
 // reset this recognizer - might be extended by codegeneration/grammar
 - (void) reset;
 
+// where do we get our input from - subclass responsibility
+- (id) input;
+- (void) setInput:(id)theInput;
+
 // do actual matching of tokens/characters
 - (void) match:(id<ANTLRIntStream>)input tokenType:(ANTLRTokenType) ttype follow:(ANTLRBitSet *)follow;
 - (void) matchAny:(id<ANTLRIntStream>)input;

@@ -121,6 +121,7 @@
 					 start:(unsigned int)theStart
 					  stop:(unsigned int)theStop
 {
+#warning TODO: Return the correct token object here, not ANTLRCommonToken 
 	id<ANTLRToken> aToken = [[ANTLRCommonToken alloc] initWithInput:input 
 													   tokenType:aTType 
 														 channel:aChannel

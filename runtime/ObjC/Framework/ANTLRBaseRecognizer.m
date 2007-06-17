@@ -83,6 +83,17 @@
 	[ruleMemo removeAllObjects];
 }
 
+// where do we get our input from - subclass responsibility
+- (id) input {
+    // subclass responsibility
+    return nil;
+}
+
+- (void) setInput:(id)theInput
+{
+    // subclass responsibility
+}
+
 // match the next token on the input stream. try to recover with the FOLLOW set is there is a mismatch
 - (void) match:(id<ANTLRIntStream>)input 
 	 tokenType:(ANTLRTokenType) ttype
