@@ -200,7 +200,7 @@
 {
 	[treeAdaptor setBoundariesForTree:aTree fromToken:startToken toToken:stopToken];
 	if (aTree && startToken && stopToken) {
-		[debugListener setBoundariesForTree:aTree fromToken:startToken toToken:stopToken];
+		[debugListener setTokenBoundariesForTree:[aTree hash] start:[startToken tokenIndex] stop:[stopToken tokenIndex]];
 	}
 }
 /* handled by forwardInvocation:

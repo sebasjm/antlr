@@ -268,7 +268,7 @@
 - (void) addChild:(unsigned)childHash toTree:(unsigned)treeHash;
 
 /** Set the token start/stop token index for a subtree root or node */
-- (void) setTokenBoundariesForTree:(unsigned)nodeHash start:(int)tokenStartIndex stop:(int)tokenStopIndex;
+- (void) setTokenBoundariesForTree:(unsigned)nodeHash start:(unsigned int)tokenStartIndex stop:(unsigned int)tokenStopIndex;
 
 - (void) waitForDebuggerConnection;
 
