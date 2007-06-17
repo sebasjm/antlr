@@ -164,8 +164,8 @@
 
 - (NSArray *) tokensInRange:(NSRange)aRange inBitSet:(ANTLRBitSet *)aBitSet
 {
-	int start = aRange.location;
-	int stop = aRange.location+aRange.length;
+	unsigned int start = aRange.location;
+	unsigned int stop = aRange.location+aRange.length;
 	if ( p == -1 ) {
 		[self fillBuffer];
 	}
@@ -173,7 +173,7 @@
 		stop = [tokens count] - 1;
 	}
 	NSMutableArray *filteredTokens = [[NSMutableArray alloc] init];
-	int i=0;
+	unsigned int i=0;
 	for (i = start; i<=stop; i++) {
 		id<ANTLRToken> token = [tokens objectAtIndex:i];
 		if (aBitSet == nil || [aBitSet isMember:[token type]]) {
@@ -228,7 +228,7 @@
 	if ( k < 0 ) {
 		return [self LB:k];
 	}
-	if ( (p+k-1) >= [tokens count] ) {
+	if ( (p+k-1) >= (int)[tokens count] ) {
 		return [ANTLRCommonToken eofToken];
 	}
 	int i = p;
@@ -237,7 +237,7 @@
 		i = [self skipOffChannelTokens:i+1];
 		n++;
 	}
-	if ( i >= [tokens count] ) {
+	if ( i >= (int)[tokens count] ) {
 		return [ANTLRCommonToken eofToken];
 	}
 	return [tokens objectAtIndex:i];
@@ -254,7 +254,7 @@
 	if ( (p-k)<0 ) {
 		return nil;
 	}
-	if ( (p+k-1) >= [tokens count] ) {
+	if ( (p+k-1) >= (int)[tokens count] ) {
 		return [ANTLRCommonToken eofToken];
 	}
 	int i = p;
@@ -278,7 +278,7 @@
 
 - (void) consume
 {
-	if (p < [tokens count]) {
+	if (p < (int)[tokens count]) {
 		p++;
 		p = [self skipOffChannelTokens:p];
 	}

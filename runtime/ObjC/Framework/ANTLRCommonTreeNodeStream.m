@@ -293,7 +293,7 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 	if (currentChildIndex == -1) {
 		return [self handleRootNode];
 	}
-	if (currentChildIndex < [currentNode childCount]) {
+	if (currentChildIndex < (int)[currentNode childCount]) {
 		return [self visitChild:currentChildIndex];
 	}
 	[self walkBackToMostRecentNodeWithUnvisitedChildren];
@@ -339,14 +339,14 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 
 - (void) walkBackToMostRecentNodeWithUnvisitedChildren;
 {
-	while (currentNode != nil && currentChildIndex >= [currentNode childCount])
+	while (currentNode != nil && currentChildIndex >= (int)[currentNode childCount])
 	{
 		currentNode = (ANTLRCommonTree *)[nodeStack lastObject];
 		[nodeStack removeLastObject];
 		currentChildIndex = [(NSNumber *)[indexStack lastObject] intValue];
 		[indexStack removeLastObject];
 		currentChildIndex++; // move to next child
-		if (currentChildIndex >= [currentNode childCount]) {
+		if (currentChildIndex >= (int)[currentNode childCount]) {
 			if (![currentNode isEmpty]) {
 				[self addNavigationNodeWithType:ANTLRTokenTypeUP];
 			}

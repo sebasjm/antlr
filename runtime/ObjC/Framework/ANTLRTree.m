@@ -62,7 +62,7 @@
 	[super dealloc];
 }
 
-- (id<ANTLRTree>) childAtIndex:(int) index
+- (id<ANTLRTree>) childAtIndex:(unsigned int) index
 {
 	if (children && index < [children count]) {
 		return [children objectAtIndex:index];
@@ -70,7 +70,7 @@
 	return nil;
 }
 
-- (int) childCount
+- (unsigned int) childCount
 {
 	if (children) 
 		return [children count];
@@ -151,7 +151,7 @@
 	
 	NSArray *childrenCopy = [[theCopy allChildren] copy];
 	[theCopy removeAllChildren];
-	int childIdx = 0;
+	unsigned int childIdx = 0;
 	for (childIdx = 0; childIdx < [childrenCopy count]; childIdx++) {
 		id<ANTLRTree> childCopy = [[childrenCopy objectAtIndex:childIdx] deepCopyWithZone:aZone];
 		[theCopy addChild:childCopy];

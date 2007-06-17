@@ -57,7 +57,7 @@
 		CFBitVectorSetCount(bitVector,sizeof(unsigned long long)*8*longCount);
 
 		for (longNo = 0; longNo < longCount; longNo++) {
-			for (bitIdx = 0; bitIdx < sizeof(unsigned long long)*8; bitIdx++) {
+			for (bitIdx = 0; bitIdx < (CFIndex)sizeof(unsigned long long)*8; bitIdx++) {
 				unsigned long long swappedBits = CFSwapInt64HostToBig(theBits[longNo]);
 				if (swappedBits & (1LL << bitIdx)) {
 					CFBitVectorSetBitAtIndex(bitVector,bitIdx+(longNo*sizeof(unsigned long long)*8),1);
@@ -122,7 +122,7 @@
 // set a bit, grow the bit vector if necessary
 - (void) add:(unsigned int) bit
 {
-	if (bit > CFBitVectorGetCount(bitVector))
+	if ((CFIndex)bit > CFBitVectorGetCount(bitVector))
 		CFBitVectorSetCount(bitVector,bit);
 	CFBitVectorSetBitAtIndex(bitVector,bit,1);
 }

@@ -28,8 +28,8 @@
 
 + (id<ANTLRTree>) invalidNode;
 
-- (id<ANTLRTree>) childAtIndex:(int) index;
-- (int) childCount;
+- (id<ANTLRTree>) childAtIndex:(unsigned int) index;
+- (unsigned int) childCount;
 
 - (NSArray *) allChildren;
 // Add t as a child to this node.  If t is null, do nothing.  If t
@@ -73,8 +73,8 @@
 + (id<ANTLRTree>) invalidNode;
 - (id<ANTLRTree>) init;
 
-- (id<ANTLRTree>) childAtIndex:(int) index;
-- (int) childCount;
+- (id<ANTLRTree>) childAtIndex:(unsigned int) index;
+- (unsigned int) childCount;
 - (NSArray *) allChildren;
 - (void) removeAllChildren;
 
