@@ -399,7 +399,7 @@ outputFile( LEXER,
 #define	    CONSUME()						INPUT->tnstream->istream->consume(INPUT->tnstream->istream)
 #define	    MARK()							INPUT->tnstream->istream->mark(INPUT->tnstream->istream)
 #define	    REWIND(m)						INPUT->tnstream->istream->rewind(INPUT->tnstream->istream, m)
-#define	    REWINDLAST(m)					INPUT->tnstream->istream->REWINDLAST(INPUT->tnstream->istream)
+#define	    REWINDLAST(m)					INPUT->tnstream->istream->rewindLast(INPUT->tnstream->istream)
 #define	    PERRORRECOVERY					RECOGNIZER->errorRecovery
 #define	    _fsp							RECOGNIZER->_fsp
 #define	    FAILEDFLAG						RECOGNIZER->failed

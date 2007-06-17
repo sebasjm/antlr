@@ -681,9 +681,9 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 	discard	    = ANTLR3_FALSE;	/* Assume we are not discarding	*/
 
 	/* I employ a bit of a trick, or perhaps hack here. Rather than
-	 * store a poitner to a structure in the override map and discard set
-	 * we store the value + 1 cast to a void *. Hence on systesm where NULL = (void *)0
-	 * we can distingusih not being there with being channel or type 0
+	 * store a pointer to a structure in the override map and discard set
+	 * we store the value + 1 cast to a void *. Hence on systems where NULL = (void *)0
+	 * we can distinguish "not being there" from "being channel or type 0"
 	 */
 
 	if  (	tokenStream->discardSet							    != NULL

@@ -362,7 +362,7 @@ _next    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
     // More than just a single element so we extract it from the 
     // vector.
     //
-    t = stream->toTree(stream, stream->elements->get(stream->elements, stream->cursor));  // TODO: Why not just cursor++ ?
+    t = stream->toTree(stream, stream->elements->get(stream->elements, stream->cursor+1));  // TODO: Why not just cursor++ ?
     stream->cursor++;
     return t;
 }
