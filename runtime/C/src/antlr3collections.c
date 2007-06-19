@@ -92,7 +92,7 @@ antlr3HashTableNew(ANTLR3_UINT32 sizeHint)
     /* Error out if no memory left */
     if	(table	== NULL)
     {
-	return	(pANTLR3_HASH_TABLE) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_HASH_TABLE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Allocate memory for the buckets
@@ -102,7 +102,7 @@ antlr3HashTableNew(ANTLR3_UINT32 sizeHint)
     if	(table->buckets == NULL)
     {
 	ANTLR3_FREE((void *)table);
-	return	(pANTLR3_HASH_TABLE) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_HASH_TABLE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Modulo of the table, (bucket count).
@@ -622,7 +622,7 @@ antlr3EnumNew	(pANTLR3_HASH_TABLE table)
      */
     if	(en == NULL)
     {
-	return	(pANTLR3_HASH_ENUM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_HASH_ENUM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
     
     /* Initialize the start pointers
@@ -810,16 +810,16 @@ antlr3ListNew	(ANTLR3_UINT32 sizeHint)
 
     if	(list == NULL)
     {
-	return	(pANTLR3_LIST)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_LIST)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Now we need to add a new table
      */
     list->table	= antlr3HashTableNew(sizeHint);
 
-    if	(list->table == (pANTLR3_HASH_TABLE)ANTLR3_ERR_NOMEM)
+    if	(list->table == (pANTLR3_HASH_TABLE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return	(pANTLR3_LIST)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_LIST)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Allocation was good, install interface
@@ -911,7 +911,7 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
 
     if	(stack == NULL)
     {
-	return	(pANTLR3_STACK)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_STACK)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Now we need to add a new table
@@ -919,9 +919,9 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
     stack->vector   = antlr3VectorNew(sizeHint);
     stack->top	    = NULL;
 
-    if	(stack->vector == (pANTLR3_VECTOR)ANTLR3_ERR_NOMEM)
+    if	(stack->vector == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return	(pANTLR3_STACK)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_STACK)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Looks good, now add the interface
@@ -1004,7 +1004,7 @@ antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
 
     if	(vector == NULL)
     {
-	return	(pANTLR3_VECTOR)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Now fill in the defaults
@@ -1014,7 +1014,7 @@ antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
     if	(vector->elements == NULL)
     {
 	ANTLR3_FREE(vector);
-	return	(pANTLR3_VECTOR)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Memory allocated succesfully
@@ -1290,7 +1290,7 @@ ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 si
 
     if	(factory == NULL)
     {
-	return	(pANTLR3_VECTOR_FACTORY)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_VECTOR_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Factory memory is good, so create a new vector
@@ -1304,10 +1304,10 @@ ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 si
      */
     factory->vectors	= antlr3VectorNew(sizeHint);
 
-    if	(factory->vectors == (pANTLR3_VECTOR)ANTLR3_ERR_NOMEM)
+    if	(factory->vectors == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	ANTLR3_FREE(factory);
-	return	(pANTLR3_VECTOR_FACTORY)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_VECTOR_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install the API
@@ -1385,7 +1385,7 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
      */
     vector  = antlr3VectorNew(0);
 
-    if	(vector == (pANTLR3_VECTOR)(ANTLR3_ERR_NOMEM))
+    if	(vector == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return vector;
     }
@@ -1488,7 +1488,7 @@ antlr3IntTrieNew(ANTLR3_UINT32 depth)
 
     if (trie == NULL)
     {
-	return	(pANTLR3_INT_TRIE) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_INT_TRIE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Now we need to allocate the root node. This makes it easier
@@ -1500,7 +1500,7 @@ antlr3IntTrieNew(ANTLR3_UINT32 depth)
     if (trie->root == NULL)
     {
 	ANTLR3_FREE(trie);
-	return	(pANTLR3_INT_TRIE) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_INT_TRIE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     trie->add	= intTrieAdd;

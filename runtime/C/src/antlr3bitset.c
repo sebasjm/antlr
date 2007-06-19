@@ -56,7 +56,7 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
 
     if	(bitset == NULL)
     {
-	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Avoid memory thrashing at the up front expense of a few bytes
@@ -78,7 +78,7 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
     if	(bitset->bits	== NULL)
     {
 	ANTLR3_FREE(bitset);
-	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
     
     antlr3BitsetSetAPI(bitset);
@@ -118,7 +118,7 @@ antlr3BitsetCopy(pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements)
 
     if	(bitset == NULL)
     {
-	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Avoid memory thrashing at the expense of a few more bytes
@@ -137,7 +137,7 @@ antlr3BitsetCopy(pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements)
     if	(bitset->bits == NULL)
     {
 	ANTLR3_FREE(bitset);
-	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     ANTLR3_MEMMOVE(bitset->bits, inSet, (ANTLR3_UINT64)(numElements * sizeof(ANTLR3_BITWORD)));
@@ -158,7 +158,7 @@ antlr3BitsetClone(pANTLR3_BITSET inSet)
 
     if	(bitset == NULL)
     {
-	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install the actual bits in the source set
@@ -235,7 +235,7 @@ antlr3BitsetLoad(ANTLR3_UINT32 ec, pANTLR3_UINT64 bset)
 
     if	(bitset == NULL)
     {
-	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Now we can add the element bits into the set
@@ -296,7 +296,7 @@ antlr3BitsetOf(ANTLR3_INT32 bit, ...)
 
     if	(bitset == NULL)
     {
-	return	(pANTLR3_BITSET) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Now we can add the element bits into the set

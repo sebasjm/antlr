@@ -51,7 +51,7 @@ antlr3ExceptionNew(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_
      */
     if	(ex == NULL)
     {
-	return	(pANTLR3_EXCEPTION)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_EXCEPTION)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     ex->name		= name;		/* Install exception name	*/

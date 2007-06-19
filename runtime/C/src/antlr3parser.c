@@ -20,17 +20,17 @@ antlr3ParserNew		(ANTLR3_UINT32 sizeHint)
 
     if	(parser == NULL)
     {
-	return	(pANTLR3_PARSER) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install a base parser
      */
     parser->rec =  antlr3BaseRecognizerNew(ANTLR3_TYPE_PARSER, sizeHint);
 
-    if	(parser->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_ERR_NOMEM)
+    if	(parser->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	parser->free(parser);
-	return	(pANTLR3_PARSER) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     parser->rec->super	= parser;
@@ -55,9 +55,9 @@ antlr3ParserNewStream	(ANTLR3_UINT32 sizeHint, pANTLR3_TOKEN_STREAM tstream)
 
     parser  = antlr3ParserNew(sizeHint);
 
-    if	(parser == (pANTLR3_PARSER) ANTLR3_ERR_NOMEM)
+    if	(parser == (pANTLR3_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return	(pANTLR3_PARSER) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Everything seems to be hunky dory so we can install the 

@@ -1,6 +1,7 @@
 /*
  [The "BSD licence"]
  Copyright (c) 2005-2006 Terence Parr
+ Templates and C runtime Copyright (c) 2006-2007 Jim Idle
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -29,7 +30,7 @@
 /*
  * This code generating template and the assocated C runtime was produced by:
  * Jim Idle jimi|hereisanat|idle|dotgoeshere|ws. 
- * If it does cause the destruction of the UniVerse, it will be pretty cool so long as 
+ * If it does cause the destruction of the Universe, it will be pretty cool so long as 
  * I am in a different one at the time. 
  */
 group C implements ANTLRCore ;
@@ -197,6 +198,8 @@ outputFile( LEXER,
 #undef		GETTEXT
 #undef		INDEX
 #undef		SEEK
+#undef		PUSHSTREAM
+#undef		POPSTREAM
 
 #define	    LEXER					ctx->pLexer
 #define	    RECOGNIZER			    LEXER->rec
@@ -226,9 +229,11 @@ outputFile( LEXER,
 #define	    LRECOVER()				LEXER->recover(LEXER)
 #define	    MARK()					INPUT->istream->mark(INPUT->istream)
 #define	    REWIND(m)				INPUT->istream->rewind(INPUT->istream, m)
-#define	    REWINDLAST()			INPUT->istream->REWINDLAST(INPUT->istream)
+#define	    REWINDLAST()			INPUT->istream->RewindLast(INPUT->istream)
 #define		MEMOIZE(ri,si)			RECOGNIZER->memoize(RECOGNIZER, ri, si)
 #define		HAVEPARSEDRULE(r)		RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
+#define		PUSHSTREAM(str)			LEXER->pushCharStream(LEXER, str)
+#define		POPSTREAM()				LEXER->popCharStream(LEXER)
 
 /* If we have been told we can rely on the standard 8 bit or 16 bit input
  * stream, then we can define our macros to use the direct pointers
@@ -312,6 +317,7 @@ outputFile( LEXER,
 #undef	    RECOVERFROMMISMATCHEDELEMENT
 #undef		INDEX
 #undef      ADAPTOR
+#undef		SEEK
 
 #define	    PARSER							ctx->pParser  
 #define	    RECOGNIZER						PARSER->rec
@@ -335,7 +341,8 @@ outputFile( LEXER,
 #define	    CONSUME()						INPUT->istream->consume(INPUT->istream)
 #define	    MARK()							INPUT->istream->mark(INPUT->istream)
 #define	    REWIND(m)						INPUT->istream->rewind(INPUT->istream, m)
-#define	    REWINDLAST()					INPUT->istream->REWINDLAST(INPUT->istream)
+#define	    REWINDLAST()					INPUT->istream->RewindLast(INPUT->istream)
+#define		SEEK(n)							INPUT->istream->seek(INPUT->istream, n)
 #define	    PERRORRECOVERY					RECOGNIZER->errorRecovery
 #define	    _fsp							RECOGNIZER->_fsp
 #define	    FAILEDFLAG						RECOGNIZER->failed
@@ -711,7 +718,7 @@ static pANTLR3_COMMON_TOKEN <name>NextToken   (pANTLR3_TOKEN_SOURCE toksource);
 
 /* Forward declare the locally static matching functions we have generated and any predicate functions.
  */
-<rules:{r | static <headerReturnType(ruleDescriptor=r.ruleDescriptor)>	<if(!r.ruleDescriptor.isSynPred)>m<endif><r.ruleDescriptor.name>    (p<name> ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
+<rules:{r | static ANTLR3_INLINE <headerReturnType(ruleDescriptor=r.ruleDescriptor)>	<if(!r.ruleDescriptor.isSynPred)>m<endif><r.ruleDescriptor.name>    (p<name> ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
 static void	<name>Free(p<name> ctx);
 
 /* =========================================================================
@@ -2164,7 +2171,7 @@ static const ANTLR3_INT32 * const dfa<dfa.decisionNumber>_transitions[] =
 };
 
 <if(dfa.specialStateSTs)>
-static ANTLR3_INT32 dfa<dfa.decisionNumber>_sst(p<name> ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s)
+static ANTLR3_INT32 dfa<dfa.decisionNumber>_sst(p<name> ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_INT32 s)
 {
     ANTLR3_INT32    _s;
     

@@ -73,7 +73,7 @@ antlr3StringFactoryNew()
 
     if	(factory == NULL)
     {
-	return	(pANTLR3_STRING_FACTORY)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_STRING_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Now we make a new list to track the strings.
@@ -81,10 +81,10 @@ antlr3StringFactoryNew()
     factory->strings	= antlr3VectorNew(0);
     factory->index	= 1;
 
-    if	(factory->strings == (pANTLR3_VECTOR)(ANTLR3_ERR_NOMEM))
+    if	(factory->strings == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	ANTLR3_FREE(factory);
-	return	(pANTLR3_STRING_FACTORY)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_STRING_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install the API (8 bit assumed)
@@ -118,7 +118,7 @@ antlr3UCS2StringFactoryNew()
 
     if	(factory == NULL)
     {
-	return	(pANTLR3_STRING_FACTORY)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_STRING_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Override the 8 bit API with the UCS2 (mostly just 16 bit) API
@@ -153,7 +153,7 @@ newRaw8	(pANTLR3_STRING_FACTORY factory)
 
     if	(string == NULL)
     {
-	return	(pANTLR3_STRING)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_STRING)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Structure is allocated, now fill in the API etc.
@@ -182,7 +182,7 @@ newRaw16	(pANTLR3_STRING_FACTORY factory)
 
     if	(string == NULL)
     {
-	return	(pANTLR3_STRING)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_STRING)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Structure is allocated, now fill in the API etc.
@@ -317,7 +317,7 @@ newSize8	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
 
     string  = factory->newRaw(factory);
 
-    if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    if	(string == (pANTLR3_STRING)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return	string;
     }
@@ -343,7 +343,7 @@ newSize16	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
 
     string  = factory->newRaw(factory);
 
-    if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    if	(string == (pANTLR3_STRING)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return	string;
     }
@@ -369,7 +369,7 @@ newPtr8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 size)
 
     string  = factory->newSize(factory, size);
 
-    if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    if	(string == (pANTLR3_STRING)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return	string;
     }
@@ -404,7 +404,7 @@ newPtr16_8	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 siz
      */
     string  = factory->newSize(factory, size);
 
-    if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    if	(string == (pANTLR3_STRING)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return	string;
     }
@@ -450,7 +450,7 @@ newPtr16_16	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr, ANTLR3_UINT32 si
 
     string  = factory->newSize(factory, size);
 
-    if	(string == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    if	(string == (pANTLR3_STRING)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return	string;
     }
@@ -1222,7 +1222,7 @@ static	  pANTLR3_STRING    to8_16	(pANTLR3_STRING string)
      */
     newStr  = newRaw8(string->factory);
 
-    if	(newStr == (pANTLR3_STRING)(ANTLR3_ERR_NOMEM))
+    if	(newStr == (pANTLR3_STRING)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return	NULL;
     }

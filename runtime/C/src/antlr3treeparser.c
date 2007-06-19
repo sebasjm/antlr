@@ -28,17 +28,17 @@ antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREA
 
     if	(parser == NULL)
     {
-	return	(pANTLR3_TREE_PARSER) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_TREE_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Create and install a base recognizer which does most of the work for us
      */
     parser->rec =  antlr3BaseRecognizerNew(ANTLR3_TYPE_PARSER, sizeHint);
 
-    if	(parser->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_ERR_NOMEM)
+    if	(parser->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	parser->free(parser);
-	return	(pANTLR3_TREE_PARSER) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_TREE_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
     
     /* Ensure we can track back to the tree parser super structure

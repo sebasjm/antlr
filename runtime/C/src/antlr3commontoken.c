@@ -28,6 +28,7 @@ static  pANTLR3_STRING  toString		(pANTLR3_COMMON_TOKEN token);
 /* Factory API
  */
 static	void			factoryClose	(pANTLR3_TOKEN_FACTORY factory);
+static  void			setInputStream	(pANTLR3_TOKEN_FACTORY factory, pANTLR3_INPUT_STREAM input);
 static	pANTLR3_COMMON_TOKEN	newToken	(void);
 
 /* Internal management functions
@@ -46,7 +47,7 @@ antlr3CommonTokenNew(ANTLR3_UINT32 ttype)
      */
     token   = newToken();
 
-    if	(token != (pANTLR3_COMMON_TOKEN)(ANTLR3_ERR_NOMEM))
+    if	(token != (pANTLR3_COMMON_TOKEN)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	token->setType(token, ttype);
     }
@@ -67,15 +68,15 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
 
     if	(factory == NULL)
     {
-	return	(pANTLR3_TOKEN_FACTORY)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_TOKEN_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install factory API
      */
-    factory->newToken	=  newPoolToken;
-    factory->close	=  factoryClose;
-    factory->input	=  input;
-
+    factory->newToken	    =  newPoolToken;
+    factory->close	    =  factoryClose;
+    factory->setInputStream = setInputStream;
+    
     /* Allocate the initial pool
      */
     factory->thisPool	= -1;
@@ -90,10 +91,16 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
     /* Set some initial variables for future copying
      */
     factory->unTruc.factoryMade	= ANTLR3_TRUE;
-    factory->unTruc.input	=  input;
+    setInputStream(factory, input);
     
     return  factory;
 
+}
+static void
+setInputStream	(pANTLR3_TOKEN_FACTORY factory, pANTLR3_INPUT_STREAM input)
+{
+    factory->input	    =  input;
+    factory->unTruc.input   =  input;
 }
 
 static void
@@ -234,7 +241,7 @@ newToken(void)
 
     if	(token == NULL)
     {
-	return	(pANTLR3_COMMON_TOKEN)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_COMMON_TOKEN)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install the API

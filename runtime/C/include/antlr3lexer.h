@@ -120,11 +120,28 @@ typedef	struct ANTLR3_LEXER_struct
      */
     pANTLR3_STRING		text;
 
+    /** Input stream stack, which allows the C programmer to switch input streams 
+     *  easily and allow the standard nextToken() implementation to deal with it
+     *  as this is a common requirement.
+     */
+    pANTLR3_STACK		streams;
+
     /** Pointer to a function that sets the charstream source for the lexer and
      *  causes it to  be reset.
      */
     void			(*setCharStream)    (struct ANTLR3_LEXER_struct * lexer, pANTLR3_INPUT_STREAM input);
     
+    /** Pointer to a function that switches the current character input stream to 
+     *  a new one, saving the old one, which we will revert to at the end of this 
+     *  new one.
+     */
+    void			(*pushCharStream)   (struct ANTLR3_LEXER_struct * lexer, pANTLR3_INPUT_STREAM input);
+
+    /** Pointer to a function that abandons the current input stream, whether it
+     *  is empty or not and reverts to the previous stacked input stream.
+     */
+    void			(*popCharStream)    (struct ANTLR3_LEXER_struct * lexer);
+
     /** Pointer to a function that emits the supplied token as the next token in
      *  the stream.
      */

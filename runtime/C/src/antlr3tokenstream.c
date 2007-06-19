@@ -57,7 +57,7 @@ antlr3TokenStreamNew()
 
     if	(stream == NULL)
     {
-	return	(pANTLR3_TOKEN_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_TOKEN_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install basic API 
@@ -150,7 +150,7 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
 
     if	(stream == NULL)
     {
-	return	(pANTLR3_COMMON_TOKEN_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_COMMON_TOKEN_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Create space for the token stream interface

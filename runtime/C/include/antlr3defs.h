@@ -53,6 +53,11 @@
 #endif
 #endif
 
+#ifdef	_WIN64
+#define	ANTLR3_WIN64
+#define	ANTLR3_USE_64BIT
+#endif
+
 #ifdef	ANTLR3_WINDOWS 
 
 #define	WINDOWS_LEAN_AND_MEAN
@@ -319,8 +324,8 @@ ANTLR3_API void			    antlr3BaseTreeAdaptorInit	    (pANTLR3_BASE_TREE_ADAPTOR a
 
 ANTLR3_API pANTLR3_TREE_PARSER	    antlr3TreeParserNewStream	    (ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREAM ctnstream);
 
-ANTLR3_API ANTLR3_INT32		    antlr3dfaspecialTransition	    (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s);
-ANTLR3_API ANTLR3_INT32		    antlr3dfaspecialStateTransition (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s);
+ANTLR3_API ANTLR3_INT32		    antlr3dfaspecialTransition	    (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_INT32 s);
+ANTLR3_API ANTLR3_INT32		    antlr3dfaspecialStateTransition (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_INT32 s);
 ANTLR3_API ANTLR3_INT32		    antlr3dfapredict		    (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA cdfa);
 
 ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM  antlr3CommonTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint);

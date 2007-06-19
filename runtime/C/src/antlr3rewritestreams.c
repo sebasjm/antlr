@@ -46,7 +46,7 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
 
     if	(stream == NULL)
     {
-	return	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Populate the generic interface */
@@ -80,7 +80,7 @@ antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
      */
     stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
-    if (stream == (pANTLR3_REWRITE_RULE_ELEMENT_STREAM)(ANTLR3_ERR_NOMEM))
+    if (stream == (pANTLR3_REWRITE_RULE_ELEMENT_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return stream;
     }
@@ -100,7 +100,7 @@ antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
      */
     stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
-    if (stream == (pANTLR3_REWRITE_RULE_ELEMENT_STREAM)(ANTLR3_ERR_NOMEM))
+    if (stream == (pANTLR3_REWRITE_RULE_ELEMENT_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return stream;
     }
@@ -125,7 +125,7 @@ antlr3RewriteRuleTokenStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UIN
      */
     stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
-    if (stream == (pANTLR3_REWRITE_RULE_TOKEN_STREAM)(ANTLR3_ERR_NOMEM))
+    if (stream == (pANTLR3_REWRITE_RULE_TOKEN_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return stream;
     }
@@ -186,7 +186,7 @@ antlr3RewriteRuleSubtreeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
      */
     stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
-    if (stream == (pANTLR3_REWRITE_RULE_SUBTREE_STREAM)(ANTLR3_ERR_NOMEM))
+    if (stream == (pANTLR3_REWRITE_RULE_SUBTREE_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return stream;
     }
@@ -209,7 +209,7 @@ antlr3RewriteRuleSubtreeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
      */
     stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
 
-    if (stream == (pANTLR3_REWRITE_RULE_SUBTREE_STREAM)(ANTLR3_ERR_NOMEM))
+    if (stream == (pANTLR3_REWRITE_RULE_SUBTREE_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return stream;
     }
@@ -232,7 +232,7 @@ antlr3RewriteRuleSubtreeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
      */
     stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
 
-    if (stream == (pANTLR3_REWRITE_RULE_SUBTREE_STREAM)(ANTLR3_ERR_NOMEM))
+    if (stream == (pANTLR3_REWRITE_RULE_SUBTREE_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	return stream;
     }
@@ -330,7 +330,7 @@ _next    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
     {
 	// This means that the stream is empty
 	//
-	return (pANTLR3_BASE_TREE)-1;	// Caller must cope with this
+	return (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(-1);	// Caller must cope with this
     }
 
     // Traversed all the available elements already?
@@ -348,7 +348,7 @@ _next    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 	// that we just duplicate the entry n times (such as ID ent+ -> ^(ID ent)+)
 	// THis means we ran out of elements earlier than was expected.
 	//
-	return (pANTLR3_BASE_TREE)(-2);	// Caller must cope with this
+	return (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(-2);	// Caller must cope with this
     }
 
     // Elements available either for duping or just available
@@ -479,7 +479,7 @@ size	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 
     if (stream->elements != NULL)
     {
-	return stream->elements->count;
+	return (ANTLR3_UINT32)(stream->elements->count);
     }
 
     return n;

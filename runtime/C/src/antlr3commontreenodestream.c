@@ -60,7 +60,7 @@ antlr3TreeNodeStreamNew()
 
     if	(stream == NULL)
     {
-	return	(pANTLR3_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install basic API 
@@ -82,9 +82,9 @@ antlr3CommonTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint)
 
     stream = antlr3CommonTreeNodeStreamNew(tree->strFactory, hint);
 
-    if	(stream == (pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM)
+    if	(stream == (pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
     stream->root    = tree;
 
@@ -103,7 +103,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 
     if	(stream == NULL)
     {
-	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
      /* String factory for tree walker
@@ -114,32 +114,32 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
      */
     stream->adaptor	    = ANTLR3_TREE_ADAPTORNew(strFactory);
 
-    if	(stream->adaptor == (pANTLR3_BASE_TREE_ADAPTOR) ANTLR3_ERR_NOMEM)
+    if	(stream->adaptor == (pANTLR3_BASE_TREE_ADAPTOR) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Create space for the tree node stream interface
      */
     stream->tnstream	    = antlr3TreeNodeStreamNew();
 
-    if	(stream->tnstream == (pANTLR3_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM)
+    if	(stream->tnstream == (pANTLR3_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	stream->adaptor->free		(stream->adaptor);
 
-	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Create space for the INT_STREAM interfacce
      */
     stream->tnstream->istream		    =  antlr3IntStreamNew();
     
-    if	(stream->tnstream->istream == (pANTLR3_INT_STREAM) ANTLR3_ERR_NOMEM)
+    if	(stream->tnstream->istream == (pANTLR3_INT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	stream->adaptor->free		(stream->adaptor);
 	stream->tnstream->free		(stream->tnstream);
 
-	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install the common tree node stream API

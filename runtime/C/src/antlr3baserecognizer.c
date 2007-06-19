@@ -53,7 +53,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint)
     {
 	/* Allocation failed
 	 */
-	return	(pANTLR3_BASE_RECOGNIZER) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BASE_RECOGNIZER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install the BR API
@@ -1031,7 +1031,7 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 	
 	/* Remove the EOR token, which we do not wish to compute with
 	 */
-	newFollow->remove(follow, ANTLR3_EOR_TOKEN_TYPE);
+	newFollow->remove(newFollow, ANTLR3_EOR_TOKEN_TYPE);
 	viableToksFollowingRule->free(viableToksFollowingRule);
 	/* We now have the computed set of what can follow the current token
 	 */
@@ -1243,7 +1243,7 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 	 */
 	ruleList    = antlr3IntTrieNew(63);	/* Depth is theoretically 64 bits, but probably not ;-)	*/
 
-	if (ruleList != (pANTLR3_INT_TRIE)ANTLR3_ERR_NOMEM)
+	if (ruleList != (pANTLR3_INT_TRIE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
 	{
 	    recognizer->ruleMemo->add(recognizer->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_HASH_TYPE_STR, 0, ANTLR3_FUNC_PTR(ruleList), freeIntTrie);
 	}
@@ -1492,7 +1492,7 @@ reset(pANTLR3_BASE_RECOGNIZER recognizer)
 
     /* Install a new following set
      */
-    recognizer->following   = antlr3StackNew(64);
+    recognizer->following   = antlr3StackNew(8);
 }
 
 #ifdef	WIN32

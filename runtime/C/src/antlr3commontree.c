@@ -35,7 +35,7 @@ antlr3ArboretumNew(pANTLR3_STRING_FACTORY strFactory)
 
     if	(factory == NULL)
     {
-	return	(pANTLR3_ARBORETUM)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_ARBORETUM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Install factory API
@@ -142,9 +142,9 @@ newFromTree(pANTLR3_ARBORETUM factory, pANTLR3_COMMON_TREE tree)
 
     newTree = factory->newTree(factory);
 
-    if	(newTree == (pANTLR3_BASE_TREE)ANTLR3_ERR_NOMEM)
+    if	(newTree == (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return	(pANTLR3_BASE_TREE)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Pick up the payload we had in the supplied tree
@@ -162,9 +162,9 @@ newFromToken(pANTLR3_ARBORETUM factory, pANTLR3_COMMON_TOKEN token)
 
     newTree = factory->newTree(factory);
 
-    if	(newTree == (pANTLR3_BASE_TREE)ANTLR3_ERR_NOMEM)
+    if	(newTree == (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return	(pANTLR3_BASE_TREE)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Pick up the payload we had in the supplied tree
@@ -274,9 +274,9 @@ antlr3CommonTreeNewFromTree(pANTLR3_COMMON_TREE tree)
 
     newTree = antlr3CommonTreeNew();
 
-    if	(newTree == (pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM)
+    if	(newTree == (pANTLR3_COMMON_TREE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return	(pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_COMMON_TREE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Pick up the payload we had in the supplied tree
@@ -294,9 +294,9 @@ antlr3CommonTreeNewFromToken(pANTLR3_COMMON_TOKEN token)
 
     newTree = antlr3CommonTreeNew();
 
-    if	(newTree == (pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM)
+    if	(newTree == (pANTLR3_COMMON_TREE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return	(pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_COMMON_TREE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Pick up the payload we had in the supplied tree
@@ -315,7 +315,7 @@ antlr3CommonTreeNew()
 
     if	(tree == NULL)
     {
-	return (pANTLR3_COMMON_TREE)ANTLR3_ERR_NOMEM;
+	return (pANTLR3_COMMON_TREE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     antlr3SetCTAPI(tree);

@@ -50,7 +50,7 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 
     if	(input == NULL)
     {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     input->fileName  = ANTLR3_STRDUP(fileName);

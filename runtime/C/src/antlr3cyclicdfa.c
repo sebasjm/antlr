@@ -138,7 +138,7 @@ antlr3dfapredict (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is
 /** Default special state implementation
  */
 ANTLR3_API ANTLR3_INT32	
-antlr3dfaspecialStateTransition   (void * ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s)
+antlr3dfaspecialStateTransition   (void * ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_INT32 s)
 {
     return -1;
 }
@@ -146,7 +146,7 @@ antlr3dfaspecialStateTransition   (void * ctx, pANTLR3_BASE_RECOGNIZER recognize
 /* Default special transition implementation
  */
 ANTLR3_API ANTLR3_INT32
-antlr3dfaspecialTransition    (void * ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_UINT32 s)
+antlr3dfaspecialTransition    (void * ctx, pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_INT32 s)
 {
     return 0;
 }

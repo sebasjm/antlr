@@ -554,11 +554,19 @@ root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<token>->next(stream_<tok
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, ADAPTOR->createTypeText(ADAPTOR, <token>, (pANTLR3_UINT8)<args><if(!args)>"<token>"<endif>));<\n>
+<if(args)>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, ADAPTOR->createTypeTokenText(ADAPTOR, <token>, <args; separator=", ">));<\n>
+<else>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, ADAPTOR->createTypeText(ADAPTOR, <token>, (pANTLR3_UINT8)"<token>"));<\n>
+<endif>
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, ADAPTOR->createTypeText(ADAPTOR, <token>, (pANTLR3_UINT8)<args><if(!args)>"<token>"<endif>), root_<treeLevel>);<\n>
+<if(args)>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, ADAPTOR->createTypeTokenText(ADAPTOR, <token>, <args; separator=", ">), root_<treeLevel>);<\n>
+<else>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, ADAPTOR->createTypeText(ADAPTOR, <token>, (pANTLR3_UINT8)"<token>"), root_<treeLevel>);<\n>
+<endif>
 >>
 
 /** plain -> {foo} action */

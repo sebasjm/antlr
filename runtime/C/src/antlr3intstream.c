@@ -17,7 +17,7 @@ antlr3IntStreamNew()
 
     if	(stream == NULL)
     {
-	return	(pANTLR3_INT_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_INT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     stream->free    =  freeStream;

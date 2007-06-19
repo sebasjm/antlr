@@ -37,7 +37,7 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size,
 
     if	(input == NULL)
     {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     if	(name == NULL)
@@ -99,7 +99,7 @@ antlr3NewUCS2StringInPlaceStream   (pANTLR3_UINT16 inString, ANTLR3_UINT64 size,
 
     if	(input == NULL)
     {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     if	(name == NULL)
@@ -158,7 +158,7 @@ pANTLR3_INPUT_STREAM	antlr3NewAsciiStringCopyStream	    (pANTLR3_UINT8 inString,
 
     if	(input == NULL)
     {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_ERR_NOMEM;
+	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     if	(name == NULL)
@@ -177,7 +177,7 @@ pANTLR3_INPUT_STREAM	antlr3NewAsciiStringCopyStream	    (pANTLR3_UINT8 inString,
 
     if	(input->data == NULL)
     {
-	return	    (pANTLR3_INPUT_STREAM) ANTLR3_ERR_NOMEM;
+	return	    (pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Structure was allocated correctly, now we can install the pointer and set the size.

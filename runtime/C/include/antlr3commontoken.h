@@ -260,6 +260,10 @@ typedef	struct ANTLR3_TOKEN_FACTORY_struct
      */
     pANTLR3_COMMON_TOKEN    (*newToken)	    (struct ANTLR3_TOKEN_FACTORY_struct * factory);
 
+    /** Pointer to a function that changes teh curent inptu stream so that
+     *  new tokens are created with reference to their originating text.
+     */
+    void		    (*setInputStream)	(struct ANTLR3_TOKEN_FACTORY_struct * factory, pANTLR3_INPUT_STREAM input);
     /** Pointer to a function the destroys the factory
      */
     void		    (*close)	    (struct ANTLR3_TOKEN_FACTORY_struct * factory);

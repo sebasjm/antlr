@@ -48,7 +48,7 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
 
     if	(cta == NULL)
     {
-	return	(pANTLR3_BASE_TREE_ADAPTOR)(ANTLR3_ERR_NOMEM);
+	return	(pANTLR3_BASE_TREE_ADAPTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
     /* Memory is initialized, so initialize the base tree adaptor
@@ -151,7 +151,7 @@ createToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR
 
     newToken	= adaptor->tokenFactory->newToken(adaptor->tokenFactory);
 
-    if	(newToken != (pANTLR3_COMMON_TOKEN)(ANTLR3_ERR_NOMEM))
+    if	(newToken != (pANTLR3_COMMON_TOKEN)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	/* Create the text using our own string factory to avoid complicating
 	 * commontoken.
@@ -190,7 +190,7 @@ createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fr
     
     antlr3CommonTokenNew(fromToken->getType(fromToken));
 
-    if	(newToken != (pANTLR3_COMMON_TOKEN)(ANTLR3_ERR_NOMEM))
+    if	(newToken != (pANTLR3_COMMON_TOKEN)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	/* Create the text using our own string factory to avoid complicating
 	 * commontoken.
