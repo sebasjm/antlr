@@ -188,8 +188,6 @@ createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fr
 
     newToken	= adaptor->tokenFactory->newToken(adaptor->tokenFactory);
     
-    antlr3CommonTokenNew(fromToken->getType(fromToken));
-
     if	(newToken != (pANTLR3_COMMON_TOKEN)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
 	/* Create the text using our own string factory to avoid complicating

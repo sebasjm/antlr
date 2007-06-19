@@ -262,7 +262,7 @@ nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
 
 	lexer   = (pANTLR3_LEXER)(toksource->super);
 
-	if  (lexer->streams->size(lexer->streams) > 0)
+	if  (lexer->streams != NULL && lexer->streams->size(lexer->streams) > 0)
 	{
 	    // We have another input stream in the stack so we
 	    // need to revert to it.

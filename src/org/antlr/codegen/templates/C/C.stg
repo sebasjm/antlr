@@ -417,6 +417,7 @@ outputFile( LEXER,
 #define     ADAPTOR                         INPUT->adaptor
 <endif>
 
+#define		TOKTEXT(tok, txt)				tok, (pANTLR3_UINT8)txt
 
 /* The 4 tokens defined below may well clash with your own #defines or token types. If so
  * then for the present you must use different names for your defines as these are hard coded

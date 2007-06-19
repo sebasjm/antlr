@@ -9,6 +9,7 @@
  */
 static  pANTLR3_STRING	getText			(pANTLR3_COMMON_TOKEN token);
 static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text);
+static  void		setText8		(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text);
 static	ANTLR3_UINT32   getType			(pANTLR3_COMMON_TOKEN token);
 static  void		setType			(pANTLR3_COMMON_TOKEN token, ANTLR3_UINT32 type);
 static  ANTLR3_UINT64   getLine			(pANTLR3_COMMON_TOKEN token);
@@ -257,6 +258,7 @@ antlr3SetTokenAPI(pANTLR3_COMMON_TOKEN token)
 {
     token->getText		    = getText;
     token->setText		    = setText;
+    token->setText8		    = setText8;
     token->getType		    = getType;
     token->setType		    = setType;
     token->getLine		    = getLine;
