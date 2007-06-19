@@ -172,7 +172,7 @@ class <name>
             when value.nil?
                 @input.consume()
             when value.respond_to?(:to_str)
-                catch (:done) do
+                catch(:done) do
                     value.each_byte do |c|
                         @failed ||= !(<isolatedLookaheadTest(atom="c", k=1)>)
                         @input.consume() if !@failed

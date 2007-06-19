@@ -32,6 +32,8 @@ require 'fileutils'
 include FileUtils
 
 class Grammar
+  @debug = ENV['ANTLR_DEBUG']
+  
   def self.debug= value
     @debug = value
   end

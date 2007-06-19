@@ -31,6 +31,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_simple_cyclic_DFA_with_predicate
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       s returns [result]
       @init { @out = "" }: a { result = @out };
       
@@ -46,6 +47,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_simple_cyclic_DFA_with_instance_var_predicate
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       @init {
         @v = true
       }
@@ -65,6 +67,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_predicate_validation
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       s : {false}? 'x';
     END
 
@@ -76,6 +79,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_lexer_preds
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       @lexer::members {
         def out
           @out
@@ -102,6 +106,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_lexer_preds2
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       @lexer::members {
         def out
           @out
@@ -128,7 +133,8 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_lexer_pred_in_exit_branch
     grammar = <<-END
-      @lexer::members {
+      // #{__FILE__}:#{__LINE__}
+     @lexer::members {
         def out
           @out
         end
@@ -155,6 +161,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_lexer_pred_in_exit_branch2
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       @lexer::members {
         def out
           @out
@@ -181,6 +188,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_lexer_pred_in_exit_branch3
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       @lexer::members {
         def out
           @out
@@ -206,6 +214,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_lexer_pred_in_exit_branch4
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       @lexer::members {
         def out
           @out
@@ -230,6 +239,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_lexer_pred_in_cyclic_DFA
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       @lexer::members {
         def out
           @out
@@ -256,6 +266,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_lexer_pred_in_cyclic_DFA2
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       @lexer::members {
         def out
           @out
@@ -282,6 +293,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
 
   def test_gated_pred
     grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
       @lexer::members {
         def out
           @out
