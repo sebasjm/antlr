@@ -1,11 +1,12 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(libantlr3c, 3.0.0-rc8, jimi@idle.ws)
+AC_INIT(libantlr3c, 3.0.1, jimi@idle.ws)
 AC_PREREQ(2.60)
 AC_COPYRIGHT([
  (The "BSD licence")
  Copyright (c) 2005-2006 Terence Parr
+ ANTLR C templates and runtime Copyright (c) 2005-2006 Jim Idle
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
