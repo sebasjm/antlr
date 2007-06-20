@@ -957,9 +957,18 @@ antlr3StackFree	(pANTLR3_STACK  stack)
 static void *
 antlr3StackPop	(pANTLR3_STACK	stack)
 {
-   stack->vector->del(stack->vector, stack->vector->count);
-   stack->top = stack->vector->get(stack->vector, stack->vector->count);
-   return stack->top;
+    // Delete the element that is currently at the top of the stack
+    //
+    stack->vector->del(stack->vector, stack->vector->count);
+
+    // And get the element that is the now the top of the stack (if anything)
+    // NOTE! This is not quite like a 'real' stack, which would normally return you
+    // the current top of the stack, then remove it from the stack.
+    // TODO: Review this, it is correct for followsets which is waht this was done for
+    //       but is not as obvious when using it as a 'real'stack.
+    //
+    stack->top = stack->vector->get(stack->vector, stack->vector->count);
+    return stack->top;
 }
 
 static void *

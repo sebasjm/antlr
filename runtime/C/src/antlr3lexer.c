@@ -426,7 +426,7 @@ pushCharStream  (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
 	if  (lexer->streams == ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
 	{
 	    // Could not do this, we just fail to push it.
-	    // TODO: Consider if this is what we wwant todo, but then
+	    // TODO: Consider if this is what we want to do, but then
 	    //       any programmer can override this method to do somthing else.
 	    return;
 	}
@@ -470,8 +470,11 @@ popCharStream   (pANTLR3_LEXER lexer)
 	// We just leave the current stream to its fate, we do not close
 	// it or anything as we do not know what the programmer intended
 	// for it. This method can always be overridden of course.
+	// So just find out what was currently saved on the stack and use
+	// that now, then pop it from the stack.
 	//
-	input	= (pANTLR3_INPUT_STREAM)(lexer->streams->pop(lexer->streams));
+	input	= (pANTLR3_INPUT_STREAM)(lexer->streams->top);
+	lexer->streams->pop(lexer->streams);
 
 	// Now install the stream as the current one.
 	//

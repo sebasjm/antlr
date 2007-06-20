@@ -229,7 +229,7 @@ outputFile( LEXER,
 #define	    LRECOVER()				LEXER->recover(LEXER)
 #define	    MARK()					INPUT->istream->mark(INPUT->istream)
 #define	    REWIND(m)				INPUT->istream->rewind(INPUT->istream, m)
-#define	    REWINDLAST()			INPUT->istream->RewindLast(INPUT->istream)
+#define	    REWINDLAST()			INPUT->istream->rewindLast(INPUT->istream)
 #define		MEMOIZE(ri,si)			RECOGNIZER->memoize(RECOGNIZER, ri, si)
 #define		HAVEPARSEDRULE(r)		RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 #define		PUSHSTREAM(str)			LEXER->pushCharStream(LEXER, str)
@@ -341,7 +341,7 @@ outputFile( LEXER,
 #define	    CONSUME()						INPUT->istream->consume(INPUT->istream)
 #define	    MARK()							INPUT->istream->mark(INPUT->istream)
 #define	    REWIND(m)						INPUT->istream->rewind(INPUT->istream, m)
-#define	    REWINDLAST()					INPUT->istream->RewindLast(INPUT->istream)
+#define	    REWINDLAST()					INPUT->istream->rewindLast(INPUT->istream)
 #define		SEEK(n)							INPUT->istream->seek(INPUT->istream, n)
 #define	    PERRORRECOVERY					RECOGNIZER->errorRecovery
 #define	    _fsp							RECOGNIZER->_fsp
