@@ -56,9 +56,6 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType, filterMode) ::=
 class <name>
     require 'stringio'
 
-	DEFAULT_CHANNEL = nil
-	HIDDEN_CHANNEL = 99
-	
 	<tokens:{<it.name>=<it.type>}; separator="\n">
 	
     def initialize(input)
@@ -73,7 +70,7 @@ class <name>
     def next_token
     	# TODO: catch exceptions
 		@token = nil
-		@channel = DEFAULT_CHANNEL
+		@channel = nil
 		@text = nil
 
 		@start = @input.index

@@ -52,7 +52,7 @@ class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
     			@init { @out << "[enter c]" }
     			   : '(' c ')' | 'x' ;
 
-    			WS : (' '|'\\n')+ { $channel = HIDDEN_CHANNEL }
+    			WS : (' '|'\\n')+ { $channel = :hidden }
     			   ;
 	    END
 
@@ -82,7 +82,7 @@ class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
     			c
     			@init { @out << "[enter c]" }
     			   : '(' c ')' | 'x' ;
-    			WS : (' '|'\\n')+ {$channel=HIDDEN_CHANNEL}
+    			WS : (' '|'\\n')+ {$channel = :hidden}
     			   ;
 	    END
 

@@ -96,9 +96,9 @@ class TestLexer < Test::Unit::TestCase
   end
 
   def test_hidden_channel
-    parser = Grammar.compile("A: 'a' {$channel = HIDDEN_CHANNEL};");
+    parser = Grammar.compile("A: 'a' {$channel = :hidden};");
   
-	 assert_equal parser.grammar::HIDDEN_CHANNEL, parser.parse("a").first.channel;
+	 assert_equal :hidden, parser.parse("a").first.channel;
     
   end
 
