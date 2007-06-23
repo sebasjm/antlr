@@ -94,4 +94,29 @@ class TestLexer < Test::Unit::TestCase
     
     assert_raises(RuntimeError) { parser.parse('c') }
   end
+
+  def test_hidden_channel
+    parser = Grammar.compile("A: 'a' {$channel = HIDDEN_CHANNEL};");
+  
+	 assert_equal parser.grammar::HIDDEN_CHANNEL, parser.parse("a").first.channel;
+    
+  end
+
+  def test_line
+    parser = Grammar.compile("A: 'a' {$line = 2};");
+
+	 assert_equal 2, parser.parse("a").first.line;
+  end
+
+  def test_pos
+    parser = Grammar.compile("A: 'a' {$pos = 2};");
+
+	 assert_equal 2, parser.parse("a").first.pos;
+  end
+
+  def test_text
+    parser = Grammar.compile("A: 'a' {$text='b'};");
+  
+	 assert_equal 'b', parser.parse("a").first.text;
+  end  
 end

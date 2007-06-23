@@ -28,6 +28,8 @@
 
 # To run this script make sure that ANTLR v3, ANTLR 2.7.5 and StringTemplate are in the CLASSPATH
 
+require 'testParser.rb'
+require 'testParams.rb'
 require 'testLexer.rb'
 require 'testSemanticPredicateEvaluation.rb'
 require 'testSyntacticPredicateEvaluation.rb'

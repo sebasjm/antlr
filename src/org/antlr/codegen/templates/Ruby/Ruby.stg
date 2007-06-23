@@ -56,6 +56,9 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType, filterMode) ::=
 class <name>
     require 'stringio'
 
+	DEFAULT_CHANNEL = nil
+	HIDDEN_CHANNEL = 99
+	
 	<tokens:{<it.name>=<it.type>}; separator="\n">
 	
     def initialize(input)
@@ -68,21 +71,30 @@ class <name>
     end
 
     def next_token
-        @token = nil
+    	# TODO: catch exceptions
+		@token = nil
+		@channel = DEFAULT_CHANNEL
+		@text = nil
 
-        if <LA(1)> == :EOF
-            <if(trace)>
-            puts "Token => EOF"
-            <endif>
-            return :EOF
-        end
+		@start = @input.index
+		@line = @input.line
+		@pos = @input.column
 
-        match_Tokens()
+		@type = nil
+		@type_int = nil
 
-        <if(trace)>
-        puts "Token => #{@token.token_type} ('#{@token.text}')"
-        <endif>
+		return :EOF if <LA(1)> == :EOF
 
+		match_Tokens()
+
+		if @token == nil
+			@text ||= @input.substring(@start, @input.index - 1)
+			@token = Token.new(@type, @type_int, @line, @pos, @text, @channel)
+		end
+
+		<if(trace)>
+			puts @token.inspect
+		<endif>
         return @token
     end
 
@@ -363,31 +375,32 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 <<
 # <description>
 def <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
+	<ruleDescriptor.returnScope.attributes:{ a |
+		_retval_<a.name> = nil
+	}>
+
     <if(trace)>
-        puts " " * @indent + "<ruleName>"
+        puts " " * @indent + "+<ruleName>"
         @indent += 1
     <endif>
 
 	<ruleDescriptor.actions.init>
 
-    <if(!ruleDescriptor.isSynPred)>
-    <if(ruleDescriptor.hasReturnValue)>
-    <if(ruleDescriptor.hasSingleReturnValue)>
-    <ruleDescriptor.singleValueReturnName> = nil
-    <endif>
-    <endif>
-    <endif>
-
     <block>
 
     <if(trace)>
         @indent -= 1
+        puts " " * @indent + "-<ruleName>"
     <endif>
+
 
     <if(!ruleDescriptor.isSynPred)>
     <if(ruleDescriptor.hasReturnValue)>
-    <if(ruleDescriptor.hasSingleReturnValue)>
-    <ruleDescriptor.singleValueReturnName>
+    <if(ruleDescriptor.hasMultipleReturnValues)>
+    return {<ruleDescriptor.returnScope.attributes:{ a | :<a.name> => _retval_<a.name> }; separator = ",">}
+   # TODO: need "Attribute.index" for this to work: return <ruleDescriptor.returnScope.attributes:{ a | _retval_<a.name> }; separator = ",">
+    <else>
+    return _retval_<ruleDescriptor.singleValueReturnName>
     <endif>
     <endif>
     <endif>
@@ -405,15 +418,9 @@ def match_<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 	<if(nakedBlock)>
 		<block><\n>
 	<else>
-		start = @input.index
-		line = @input.line
-		column = @input.column
-		channel = nil
+		@type = :<ruleName>
+		@type_int = <ruleName>
 		<block>
-		if @token.nil?
-			text = @input.substring(start, @input.index - 1)
-			@token = Token.new(:<ruleName>, <ruleName>, line, column, text, channel)
-		end<\n>
 	<endif>
 end
 >>
@@ -448,7 +455,7 @@ block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,max
 ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description) ::=
 <<
 <switchBlock(...)>
->>
+>>                    
 
 
 /**
@@ -964,16 +971,8 @@ setTest(ranges) ::=
 
 // A T T R I B U T E S
 
-parameterAttributeRef(attr)::=
-<<
-	raise "parameterAttributeRef not implemented"
->>
-
-parameterSetAttributeRef(attr,expr) ::=
-<<
-	raise "parameterSetAttributeRef not implemented"
->>
-
+parameterAttributeRef(attr)::= "<attr.name>"
+parameterSetAttributeRef(attr,expr) ::= "<attr.name> = <expr>"
 
 scopeAttributeRef(scope,attr,index,negIndex)::=
 <<
@@ -997,17 +996,30 @@ isolatedDynamicScopeRef(scope)::=
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr)::=
 <<
-	raise "ruleLabelRef not implemented"
+<if(referencedRule.hasMultipleReturnValues)>
+<scope>[:<attr.name>]
+<else>
+<scope>
+<endif>
 >>
+
+/**
+<if(referencedRule.hasMultipleReturnValues)>
+<scope>[<attr.index>] # TODO: need "Attribute.index" for this to work
+<else>
+<scope>
+<endif>
+>>
+**/
 
 returnAttributeRef(ruleDescriptor,attr)::=
 <<
-	raise "returnAttributeRef not implemented"
+	_retval_<attr.name>
 >>
 
 returnSetAttributeRef(ruleDescriptor,attr,expr) ::=
 <<
-	raise "returnSetAttributeRef not implemented"
+	_retval_<attr.name> = <expr>
 >>
 
 
@@ -1095,28 +1107,20 @@ lexerRuleLabelPropertyRef_text(scope,attr)::=
 	raise "lexerRuleLabelPropertyRef_text not implemented"
 >>
 
-lexerRulePropertyRef_text(scope,attr) ::= <<
-	raise "lexerRulePropertyRef_text not implemented"
->>
+lexerRulePropertyRef_text(scope,attr) ::= "@text"
 lexerRulePropertyRef_type(scope,attr) ::= <<
 	raise "lexerRulePropertyRef_type not implemented"
 >>
-lexerRulePropertyRef_line(scope,attr) ::= <<
-	raise "lexerRulePropertyRef_line not implemented"
->>
-lexerRulePropertyRef_pos(scope,attr) ::= <<
-	raise "lexerRulePropertyRef_pos not implemented"
->>
+
+lexerRulePropertyRef_line(scope,attr) ::= "@line"
+lexerRulePropertyRef_pos(scope,attr) ::= "@pos"
 
 lexerRulePropertyRef_index(scope,attr) ::= <<
 	raise "lexerRulePropertyRef_index not implemented"
 >>
-lexerRulePropertyRef_channel(scope,attr) ::= <<
-	raise "lexerRulePropertyRef_channel not implemented"
->>
-lexerRulePropertyRef_start(scope,attr) ::= <<
-	raise "lexerRulePropertyRef_start not implemented"
->>
+lexerRulePropertyRef_channel(scope,attr) ::= "@channel"
+
+lexerRulePropertyRef_start(scope,attr) ::= "@start"
 lexerRulePropertyRef_stop(scope,attr) ::= <<
 	raise "lexerRulePropertyRef_stop not implemented"
 >>

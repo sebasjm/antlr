@@ -32,7 +32,7 @@ class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
     def test_two_preds_with_naked_alt
         grammar = <<-END
 	        s returns [result]
-	        @init { @out = "" }: (a ';')+ { result = @out };
+	        @init { @out = "" }: (a ';')+ { $result = @out };
 
     			a
     			options {
@@ -52,7 +52,7 @@ class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
     			@init { @out << "[enter c]" }
     			   : '(' c ')' | 'x' ;
 
-    			WS : (' '|'\\n')+ { channel = 99 }
+    			WS : (' '|'\\n')+ { $channel = HIDDEN_CHANNEL }
     			   ;
 	    END
 
@@ -66,7 +66,7 @@ class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
     def test_two_preds_with_naked_alt_not_last
         grammar = <<-END
           s returns [result]
-          @init { @out = "" }: (a ';')+ { result = @out };
+          @init { @out = "" }: (a ';')+ { $result = @out };
 
     			a
     			options {
@@ -82,7 +82,7 @@ class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
     			c
     			@init { @out << "[enter c]" }
     			   : '(' c ')' | 'x' ;
-    			WS : (' '|'\\n')+ {channel=99}
+    			WS : (' '|'\\n')+ {$channel=HIDDEN_CHANNEL}
     			   ;
 	    END
 
@@ -97,7 +97,7 @@ class TestSyntacticPredicateEvaluation < Test::Unit::TestCase
         Object::const_set('OUT', [])
         grammar = <<-END
             s returns [result]
-            @init { OUT.clear }: A { result = OUT.join };
+            @init { OUT.clear }: A { $result = OUT.join };
 
 			A options {k=1;}
 			  : (B '.')=>B '.' { OUT << "alt1" }

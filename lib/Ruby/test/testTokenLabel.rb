@@ -32,7 +32,7 @@ class TestTokenLabel < Test::Unit::TestCase
 
   def test_implicit_label
     grammar = <<-END
-      a returns [result] : A { result = $A.text };
+      a returns [result] : A { $result = $A.text };
 
       A : ('a'..'z')+;
     END
@@ -43,7 +43,7 @@ class TestTokenLabel < Test::Unit::TestCase
 
   def test_explicit_label
     grammar = <<-END
-      a returns [result]: x=A { result = $x.text };
+      a returns [result]: x=A { $result = $x.text };
 
       A : ('a'..'z')+;
     END
@@ -54,7 +54,7 @@ class TestTokenLabel < Test::Unit::TestCase
 
   def test_list_label
     grammar = <<-END
-      a returns [result]: (x+=A)+ { result = $x.map { |t| t.text }.join(',') };
+      a returns [result]: (x+=A)+ { $result = $x.map { |t| t.text }.join(',') };
 
       A : ('a'..'z');
     END

@@ -33,7 +33,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
     grammar = <<-END
       // #{__FILE__}:#{__LINE__}
       s returns [result]
-      @init { @out = "" }: a { result = @out };
+      @init { @out = "" }: a { $result = @out };
       
       a : {false}? 'x'* 'y' { @out << "alt1"}
       | {true}?  'x'* 'y' { @out << "alt2"}
@@ -53,7 +53,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-      @init { @out = "" }: a { result = @out };
+      @init { @out = "" }: a { $result = @out };
 
       a : {false}? 'x'* 'y' { @out << "alt1"}
         | {@v}?  'x'* 'y'   { @out << "alt2"}
@@ -92,7 +92,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-        : a { result = lexer.out };
+        : a { $result = lexer.out };
 
 
       a : (A|B)+ ;
@@ -119,7 +119,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-        : a { result = lexer.out };
+        : a { $result = lexer.out };
 
 
       a : (A|B)+ ;
@@ -146,7 +146,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-        : a { result = lexer.out };
+        : a { $result = lexer.out };
 
 
       a : (A|B)+ ;
@@ -174,7 +174,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-        : a { result = lexer.out };
+        : a { $result = lexer.out };
 
       a : (A|B)+ ;
       A : ({@p}? 'a' { @out << "1" })*
@@ -201,7 +201,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-        : a { result = lexer.out };
+        : a { $result = lexer.out };
 
       a : (A|B)+ ;
       A : ({@p}? 'a' { @out << "1" } | )
@@ -226,7 +226,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-        : a { result = lexer.out };
+        : a { $result = lexer.out };
 
       a : (A|B)+ ;
       A @init { n = 0 } : ({ n < 2 }? 'a' { @out << n.to_s; n = n + 1})+
@@ -252,7 +252,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-        : a { result = lexer.out };
+        : a { $result = lexer.out };
 
       
       a : (A|B)+ ;
@@ -279,7 +279,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-        : a { result = lexer.out };
+        : a { $result = lexer.out };
 
       
       a : (A|B)+ ;
@@ -305,7 +305,7 @@ class TestSemanticPredicateEvaluation < Test::Unit::TestCase
       }
 
       s returns [result]
-        : a { result = lexer.out };
+        : a { $result = lexer.out };
 
     
       a : (A|B)+ ;

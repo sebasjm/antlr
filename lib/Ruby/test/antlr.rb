@@ -38,7 +38,7 @@ class Grammar
     @debug = value
   end
   
-  def self.compile(grammar, top_rule = nil)
+  def self.compile(grammar, top_rule = nil, debug = false)
     type = ""
     type = "lexer" if top_rule.nil?
 
@@ -65,7 +65,9 @@ class Grammar
       File.open("#{name}.g", "w") { |f| f.puts grammar }
 
       # run antlr
-      `java -cp #{ENV['CLASSPATH']} org.antlr.Tool #{name}.g`
+      params = []
+      params << '-trace' if debug
+      `java -cp #{ENV['CLASSPATH']} org.antlr.Tool #{params.join(' ')} #{name}.g`
 
       class_name = name + (type == "lexer" ? "Lexer" : "Parser")
 
@@ -89,9 +91,12 @@ class Grammar
   end
 
   class Lexer
+	 attr_reader :grammar
+
     def initialize(grammar)
       @grammar = grammar
     end
+
 
     def parse(input)
       parser = @grammar.new(input)
