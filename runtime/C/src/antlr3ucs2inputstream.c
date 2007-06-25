@@ -1,5 +1,5 @@
 /** \file
- * Base functions to initalize and manipulate any input stream
+ * Base functions to initialize and manipulate a UCS2 input stream
  */
 #include    <antlr3input.h>
 
@@ -21,19 +21,19 @@ static	    pANTLR3_STRING  antlr3UCS2Substr		(pANTLR3_INPUT_STREAM input, ANTLR3
  *
  * \remark
  *   - Strictly speaking, there is no such thing as a UCS2 input stream as the term
- *     tends to confues the notions of character encoding, unicode and so on. However
+ *     tends to confuse the notions of character encoding, unicode and so on. However
  *     because there will probably be a need for a UTF-16 stream, I needed to identify 16 bit
- *     streams that do not support surrogate encodings and UCS2 is how it is mostly referredto.
+ *     streams that do not support surrogate encodings and UCS2 is how it is mostly referred to.
  *     For instance Java, Oracle and others use a 16 bit encoding of characters and so this type
  *     of stream is very common.
- *     Take it to mean therefore, a stright 16 bit uncomplicated encoding of Unicode code points.
+ *     Take it to mean, therefore, a straight 16 bit uncomplicated encoding of Unicode code points.
  *
  */
 void 
 antlr3UCS2SetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
 {
     /* Build a string factory for this stream. This is a 16 bit string "UCS2" factory which is a standard
-     * part of the ANTLR3 string. Teh string factory is then passed through the whoel chain of lexer->parser->tree->treeparser
+     * part of the ANTLR3 string. The string factory is then passed through the whole chain of lexer->parser->tree->treeparser
      * and so on.
      */
     input->strFactory	= antlr3UCS2StringFactoryNew();

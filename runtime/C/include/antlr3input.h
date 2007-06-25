@@ -1,9 +1,10 @@
 /** \file
  * Defines the basic structures used to manipulate character
  * streams from any input source. The first implementation of
- * this stream was ASCII 8 bit, but any chracter size and envoding
+ * this stream was ASCII 8 bit, but any character size and encoding
  * can in theory be used, so long as they can return a 32 bit Integer
- * representation of their characters.
+ * representation of their characters amd efficiently mark and revert
+ * to specific offsets into their input streams.
  */
 #ifndef	_ANTLR3_INPUT_H
 #define	_ANTLR3_INPUT_H
@@ -30,7 +31,7 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
      */
     void	      * super;
 
-    /** Pointer the start of the input string, chracters may be
+    /** Pointer the start of the input string, characters may be
      *  taken as offsets from here and in original input format encoding.
      */
     void	      *	data;
@@ -60,7 +61,7 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
     ANTLR3_UINT64	sizeBuf;
 
     /** The line number we are traversing in the input file. This gets incremented
-     *  by a newline() call in the lexer grammer actions.
+     *  by a newline() call in the lexer grammar actions.
      */
     ANTLR3_UINT64	line;
 
@@ -81,10 +82,10 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
      */
     pANTLR3_VECTOR	markers;
 
-    /** ASCII (assumed) file name string, set to pointer to memory if
+    /** File name string, set to pointer to memory if
      * you set it manually as it will be free()d
      */
-    pANTLR3_UINT8	fileName;
+    pANTLR3_STRING	fileName;
 
     /** Character that automatically causes an internal line count
      *  increment.
@@ -94,11 +95,7 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
     /* API */
 
 
-    /** Pointer to function that returns the source file name (if any)
-     */
-    pANTLR3_UINT8	(*getSourceName)(struct	ANTLR3_INPUT_STREAM_struct * input);
-
-    /** Pointer to function that closes the input stream
+   /** Pointer to function that closes the input stream
      */
     void		(*close)	(struct	ANTLR3_INPUT_STREAM_struct * input);
 

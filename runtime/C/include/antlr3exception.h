@@ -16,7 +16,7 @@
  */
 #define	ANTLR3_RECOGNITION_EX_NAME  "Recognition Exception"
 
-/** Inidicates that the recognizer was expecting one token and found a
+/** Indicates that the recognizer was expecting one token and found a
  *  a different one.
  */
 #define	ANTLR3_MISMATCHED_TOKEN_EXCEPTION   2
@@ -72,17 +72,17 @@ typedef	struct ANTLR3_EXCEPTION_struct
     void    *	    name;
 
     /** The printable message that goes with this exception, in your preferred
-     *  encoding format. ANTLR just uses ASCII by deafult but you cna ignore these
-     *  messages or convert them to another ofrat or whatever of course. They are
-     *  really internal messges that you then decide how to print out in a form that
+     *  encoding format. ANTLR just uses ASCII by default but you can ignore these
+     *  messages or convert them to another format or whatever of course. They are
+     *  really internal messages that you then decide how to print out in a form that
      *  the users of your product will understand, as they are unlikely to know what
      *  to do with "Recognition exception at: [[TOK_GERUND..... " ;-)
      */
     void    *	    message;
 
-    /** Name of the file/input source for reporting
+    /** Name of the file/input source for reporting. Note that this may be NULL!!
      */
-    void    *	    streamName;
+    pANTLR3_STRING streamName;
 
     /** If set to ANTLR3_TRUE, this indicates that the message element of this structure
      *  should be freed by calling ANTLR3_FREE() when the exception is destroyed.
@@ -100,22 +100,22 @@ typedef	struct ANTLR3_EXCEPTION_struct
      */
     void	* token;
 
-    /** Indicates the token we were expecting to see next when the error occured
+    /** Indicates the token we were expecting to see next when the error occurred
      */
     ANTLR3_UINT32   expecting;
 
     /** Indicates a set of tokens that we were expecting to see one of when the
-     *  error occured. It is a following bitset, so you can use ->toIntList() on it
+     *  error occurred. It is a following bitset, so you can use ->toIntList() on it
      *  to generate an array of integers that it represents.
      */
     pANTLR3_BITSET  expectingSet;
 
-    /** If this is a tree parser exception then the node is set to point ot the node
+    /** If this is a tree parser exception then the node is set to point to the node
      * that caused the issue.
      */
     void	* node;
 
-    /** The current character when an error ocurred - for lexers.
+    /** The current character when an error occurred - for lexers.
      */
     ANTLR3_UCHAR   c;
 
@@ -137,7 +137,7 @@ typedef	struct ANTLR3_EXCEPTION_struct
      */
     ANTLR3_UINT32   state;
 
-    /** Rule name for failed prediacte exception
+    /** Rule name for failed predicate exception
      */
     void	    * ruleName;
 

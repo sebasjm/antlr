@@ -358,7 +358,7 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
      */
     lexer->input	= input;
 
-    /* We may need a token factory for the lexer; we don't destory any existing factory
+    /* We may need a token factory for the lexer; we don't destroy any existing factory
      * until the lexer is destroyed, as people may still be using the tokens it produced.
      * TODO: Later I will provide a dup() method for a token so that it can extract itself
      * out of the factory. 
@@ -370,10 +370,10 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
     else
     {
 	/* When the input stream is being changed on the fly, rather than
-	 * at the start of a new lexer, then we must tell teh tokenFactory
-	 * which input stream to adorn the tkoens with so that when they
-	 * are asked to provide their original intput strings they can
-	 * do so from the correct textr stream.
+	 * at the start of a new lexer, then we must tell the tokenFactory
+	 * which input stream to adorn the tokens with so that when they
+	 * are asked to provide their original input strings they can
+	 * do so from the correct text stream.
 	 */
 	lexer->tokFactory->setInputStream(lexer->tokFactory, input);
     }
@@ -396,7 +396,11 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
     lexer->text			= NULL;
     lexer->tokenStartCharIndex	= -1;
 
+    /* Copy the name of the char stream to the token source
+     */
+    lexer->tokSource->fileName = input->fileName;
 }
+
 /*!
  * \brief
  * Change to a new input stream, remembering the old one.
@@ -502,7 +506,7 @@ emit	    (pANTLR3_LEXER lexer)
     token   = lexer->tokFactory->newToken(lexer->tokFactory);
 
     /* Install the supplied information, and some other bits we already know
-     * get added automatically, such as the input stream it is assoicated with
+     * get added automatically, such as the input stream it is associated with
      * (though it can all be overridden of course)
      */
     token->type		    = lexer->type;
@@ -512,6 +516,7 @@ emit	    (pANTLR3_LEXER lexer)
     token->line		    = lexer->tokenStartLine;
     token->charPosition	    = lexer->tokenStartCharPositionInLine;
     token->text		    = lexer->text;
+    token->lineStart	    = lexer->input->currentLine;
 
     lexer->token	    = token;
 

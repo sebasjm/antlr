@@ -189,7 +189,7 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 
 /* Some platforms define a macro, index() in string.h. AIX is
  * one of these for instance. We must get rid of that definition
- * as we use ->index all over the place. definig macros like this in system header
+ * as we use ->index all over the place. defining macros like this in system header
  * files is a really bad idea, but I doubt that IBM will listen to me ;-)
  */
 #ifdef	index

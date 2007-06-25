@@ -1,5 +1,5 @@
 /** \file
- * Implementation of superclass elments of an ANTLR3 int stream.
+ * Implementation of superclass elements of an ANTLR3 int stream.
  * The only methods required are an allocator and a destructor.
  */
 #include    <antlr3intstream.h>

@@ -153,9 +153,7 @@ newPoolToken	    (pANTLR3_TOKEN_FACTORY factory)
     }
 
     /* Assuming everything went well (we are trying for performance here so doing minimal
-     * error checking - we might introduce a DEBUG flag set that turns on tracing and things
-     * later, but I have typed this entire runtime in in 3 days so far :-(), <breath>, then
-     * we can work out what the pointer is to the next token.
+     * error checking. Then we can work out what the pointer is to the next token.
      */
     token   = factory->pools[factory->thisPool] + factory->nextToken;
     factory->nextToken++;
@@ -486,15 +484,15 @@ static  pANTLR3_STRING    toString		(pANTLR3_COMMON_TOKEN token)
      * the reporting string
      * return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
      */
-    outtext->append8(outtext, "[@");
+    outtext->append8(outtext, "[Index: ");
     outtext->addi   (outtext, (ANTLR3_INT32)token->getTokenIndex(token));
-    outtext->append8(outtext, " (");
+    outtext->append8(outtext, " (Start: ");
     outtext->addi   (outtext, (ANTLR3_INT32)token->getStartIndex(token));
-    outtext->addc   (outtext, ':');
+    outtext->append8(outtext, "-Stop: ");
     outtext->addi   (outtext, (ANTLR3_INT32)token->getStopIndex(token));
     outtext->append8(outtext, ") ='");
     outtext->appendS(outtext, text);
-    outtext->append8(outtext, "', <");
+    outtext->append8(outtext, "', type<");
     outtext->addi   (outtext, token->type);
     outtext->append8(outtext, "> ");
 
@@ -505,14 +503,11 @@ static  pANTLR3_STRING    toString		(pANTLR3_COMMON_TOKEN token)
 	outtext->append8(outtext, ") ");
     }
 
+    outtext->append8(outtext, "Line: ");
     outtext->addi   (outtext, (ANTLR3_INT32)token->getLine(token));
-    outtext->addc   (outtext, ':');
+    outtext->append8(outtext, " LinePos:");
     outtext->addi   (outtext, token->getCharPositionInLine(token));
     outtext->addc   (outtext, ']');
-
-    /* Destroy the printable copy
-     */
-    //text->factory->destroy(text->factory, text);
 
     return  outtext;
 }

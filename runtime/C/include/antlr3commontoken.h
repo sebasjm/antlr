@@ -52,8 +52,8 @@
 #define	HIDDEN				99
 
 /** The definition of an ANTLR3 common token structure, which all implementations
- * of a token stream should provide, installing any firther structures in the
- * custom pointer elment of this structure.
+ * of a token stream should provide, installing any further structures in the
+ * custom pointer element of this structure.
  *
  * \remark
  * Token streams are in essence provided by lexers or other programs that serve
@@ -65,7 +65,7 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
      */
     ANTLR3_UINT32   type;
 
-    /** Indicates that a token was produced from the token factory and therefor
+    /** Indicates that a token was produced from the token factory and therefore
      *  the the freeToken() method should not do anything itself because
      *  token factory is responsible for deleting it.
      */
@@ -75,7 +75,12 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
      */
     ANTLR3_UINT64   line;
 
-    /** The charaacter position in the line that this token was derived from
+    /** The offset into the input stream that the line in which this
+     *  token resides starts.
+     */
+    void	    * lineStart;
+
+    /** The character position in the line that this token was derived from
      */
     ANTLR3_INT32    charPosition;
 
@@ -91,12 +96,12 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
      */
     ANTLR3_UINT64   index;
 
-    /** The chracter offset in the input stream where the text for this token
+    /** The character offset in the input stream where the text for this token
      *  starts.
      */
     ANTLR3_UINT64   start;
 
-    /** The chracter offset in the input stream where the text for this token
+    /** The character offset in the input stream where the text for this token
      *  stops.
      */
     ANTLR3_UINT64   stop;

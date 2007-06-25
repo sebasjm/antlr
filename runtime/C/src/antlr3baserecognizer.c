@@ -134,7 +134,7 @@ freeBR	    (pANTLR3_BASE_RECOGNIZER recognizer)
 ANTLR3_API	void
 antlr3MTExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 {
-    /* Create a basic recognition exception strucuture
+    /* Create a basic recognition exception structure
      */
     antlr3RecognitionExceptionNew(recognizer);
 
@@ -195,13 +195,13 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction antlr3RecognitionExceptionNew called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function antlr3RecognitionExceptionNew called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
     }
 
-    /* Create a basic exception strucuture
+    /* Create a basic exception structure
      */
     ex = antlr3ExceptionNew(ANTLR3_RECOGNITION_EXCEPTION,
 				(void *)ANTLR3_RECOGNITION_EX_NAME,
@@ -219,7 +219,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 	ex->line		= ins->getLine			(ins);	    /* Line number comes from stream		*/
 	ex->charPositionInLine	= ins->getCharPositionInLine	(ins);	    /* Line offset also comes from the stream   */
 	ex->index		= is->index			(is);
-	ex->streamName		= ins->getSourceName		(ins);
+	ex->streamName		= ins->fileName;
 	ex->message		= "Unexpected character";
 	break;
 
@@ -229,7 +229,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 	ex->line		= ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine			(ex->token);
 	ex->charPositionInLine	= ((pANTLR3_COMMON_TOKEN)(ex->token))->getCharPositionInLine	(ex->token);
 	ex->index		= cts->tstream->istream->index					(cts->tstream->istream);
-	ex->streamName		= "Token stream: fix this Jim, pick p name from input stream into token stream!";
+	ex->streamName		= ((pANTLR3_COMMON_TOKEN)(ex->token))->input->fileName;
 	ex->message		= "Unexpected token";
 	break;
 
@@ -239,8 +239,24 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 	ex->line		= ((pANTLR3_BASE_TREE)(ex->token))->getLine		    (ex->token);
 	ex->charPositionInLine	= ((pANTLR3_BASE_TREE)(ex->token))->getCharPositionInLine   (ex->token);
 	ex->index		= tns->istream->index					    (tns->istream);
-	ex->streamName		= "Treenode stream: fix this Jim, pick p name from input stream into token stream!";
-	ex->message		= "Unexpected node";
+
+	// Are you ready for this? Deep breath now...
+	//
+	{
+	    pANTLR3_COMMON_TREE tnode;
+
+	    tnode		= ((pANTLR3_COMMON_TREE)(((pANTLR3_BASE_TREE)(ex->token))->super));
+
+	    if	(tnode->token    == NULL)
+	    {
+		ex->streamName = ((pANTLR3_BASE_TREE)(ex->token))->strFactory->newStr(((pANTLR3_BASE_TREE)(ex->token))->strFactory, (pANTLR3_UINT8)"-unknown source-");
+	    }
+	    else
+	    {
+		ex->streamName		= tnode->token->input->fileName;
+	    }
+	    ex->message		= "Unexpected node";
+	}
 	break;
     }
 
@@ -287,7 +303,7 @@ match(	pANTLR3_BASE_RECOGNIZER recognizer,
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction 'match' called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function 'match' called by unknown parser type - provide override for this function\n");
 	return ANTLR3_FALSE;
 
 	break;
@@ -303,7 +319,7 @@ match(	pANTLR3_BASE_RECOGNIZER recognizer,
 	return ANTLR3_TRUE;				/* We are done				    */
     }
 
-    /* We did not find the expectd token type, if we are backtracking then
+    /* We did not find the expected token type, if we are backtracking then
      * we just set the failed flag and return.
      */
     if	(recognizer->backtracking > 0)
@@ -358,7 +374,7 @@ matchAny(pANTLR3_BASE_RECOGNIZER recognizer)
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction 'matchAny' called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function 'matchAny' called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
@@ -397,7 +413,7 @@ mismatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction 'mismatch' called by unknown parser type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function 'mismatch' called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
@@ -540,16 +556,16 @@ computeErrorRecoverySet	    (pANTLR3_BASE_RECOGNIZER recognizer)
 }
 
 /** Compute the context-sensitive FOLLOW set for current rule.
- *  This is set of token types that can follow a specific rule
+ *  This is the set of token types that can follow a specific rule
  *  reference given a specific call chain.  You get the set of
- *  viable tokens that can possibly come next (lookahead depth 1)
+ *  viable tokens that can possibly come next (look ahead depth 1)
  *  given the current call chain.  Contrast this with the
  *  definition of plain FOLLOW for rule r:
  *
  *   FOLLOW(r)={x | S=>*alpha r beta in G and x in FIRST(beta)}
  *
  *  where x in T* and alpha, beta in V*; T is set of terminals and
- *  V is the set of terminals and nonterminals.  In other words,
+ *  V is the set of terminals and non terminals.  In other words,
  *  FOLLOW(r) is the set of all tokens that can possibly follow
  *  references to r in *any* sentential form (context).  At
  *  runtime, however, we know precisely which context applies as
@@ -630,9 +646,6 @@ combineFollows		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_BOOLEAN exact)
 
     return  followSet;
 }
-#ifdef	WIN32
-#pragma warning( disable : 4100 )
-#endif
 
 static void			
 displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 * tokenNames)
@@ -640,40 +653,68 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;
     pANTLR3_INT_STREAM	    is;
+    pANTLR3_STRING	    ttext;
+    pANTLR3_STRING	    ftext;
+    pANTLR3_EXCEPTION	    ex;
     pANTLR3_COMMON_TOKEN    theToken;
     pANTLR3_BASE_TREE	    theBaseTree;
     pANTLR3_COMMON_TREE	    theCommonTree;
+    
+    // Retrieve some info for easy reading.
+    //
+    ex	    =		recognizer->exception;
+    ttext   =		NULL;
 
     /* Indicate this recognizer had an error while processing.
      */
     recognizer->errorCount++;
-    theToken	= NULL;		/* Assume there is no token to use  */
 
-    fprintf(stderr, "%s(", (char *)(recognizer->exception->streamName));
-
-#ifdef WIN32
-    /* shanzzle fraazzle Dick Dastardly */
+    // See if there is a 'filename' we can use
+    //
+    if	(ex->name == NULL)
+    {
+	fprintf(stderr, "-unknown source-(");
+    }
+    else
+    {
+	ftext = ex->streamName->to8(ex->streamName);
+	fprintf(stderr, "%s(", ftext->chars);
+    }
+    
+    // Next comes the line number
+    //
+#ifdef ANTLR3_WIN64
+    // shnazzle fraazzle Dick Dastardly
+    //
     fprintf(stderr, "%I64d) ", recognizer->exception->line);
 #else
-    fprintf(stderr, "%lld) ", recognizer->exception->type);
+#ifdef ANTLR3_USE_64BIT
+    fprintf(stderr, "%lld) ", recognizer->exception->line);
+#else
+    fprintf(stderr, "%d) ", recognizer->exception->line);
+#endif
 #endif
 
-    fprintf(stderr, ": error %d : %s", 
+    fprintf(stderr, " : error %d : %s", 
 					    recognizer->exception->type,
 		    (pANTLR3_UINT8)	   (recognizer->exception->message));
 					    
 
-    /* How we determine the next piece is dependent on which thign raised the
+    /* How we determine the next piece is dependent on which thing raised the
      * error.
      */
     switch	(recognizer->type)
     {
     case	ANTLR3_TYPE_PARSER:
 
+	// Prepare the knowledge we know we have
+	//
 	parser	    = (pANTLR3_PARSER) (recognizer->super);
 	tparser	    = NULL;
 	is	    = parser->tstream->istream;
 	theToken    = (pANTLR3_COMMON_TOKEN)(recognizer->exception->token);
+	ttext	    = theToken->toString(theToken);
+
 	fprintf(stderr, ", at offset %d", recognizer->exception->charPositionInLine);
 	if  (theToken != NULL)
 	{
@@ -683,7 +724,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 	    }
 	    else
 	    {
-		fprintf(stderr, ", near %s", theToken->toString(theToken)->chars);
+		fprintf(stderr, "\n    near %s\n    ", ttext->chars);
 	    }
 	}
 	break;
@@ -694,6 +735,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 	parser		= NULL;
 	is		= tparser->ctnstream->tnstream->istream;
 	theBaseTree	= (pANTLR3_BASE_TREE)(recognizer->exception->token);
+	ttext		= theBaseTree->toStringTree(theBaseTree);
 
 	if  (theBaseTree != NULL)
 	{
@@ -704,23 +746,149 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		theToken	= (pANTLR3_COMMON_TOKEN)    theCommonTree->getToken(theBaseTree);
 	    }
 	    fprintf(stderr, ", at offset %d", theBaseTree->getCharPositionInLine(theBaseTree));
+	    fprintf(stderr, ", near %s", ttext->chars);
 	}
 	break;
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction displayRecognitionError called by unknown parser type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function displayRecognitionError called by unknown parser type - provide override for this function\n");
 	return;
 	break;
     }
 
- 
-    
-    fprintf(stderr, "\n");
+    // Although this function should generally be provided by the implementation, this one
+    // should be as helpful as possible for grammar developers and serve as an example
+    // of what you can do with each exception type. In general, when you make up your
+    // 'real' handler, you should debug the routine with all possible errors you expect
+    // which will then let you be as specific as possible about all circumstances.
+    //
+    // Note that in the general case, errors thrown by tree parsers indicate a problem
+    // with the output of the parser or with the tree grammar itself. Th job of the parser
+    // is to produce a perfect (in traversal terms) syntactically correct tree, so errors
+    // at that stage should really be semantic errors that your own code determines and handles
+    // in whatever way is appropriate.
+    //
+    switch  (ex->type)
+    {
+	case	ANTLR3_RECOGNITION_EXCEPTION:
+	
+	    // Indicates that the recognizer received a token
+	    // in the input that was not predicted. This is the basic exception type 
+	    // from which all others are derived. So we assume it was a syntax error.
+	    // You may get this if there are not more tokens and more are needed
+	    // to complete a parse for instance.
+	    //
+	    fprintf(stderr, " : syntax error...\n");    
+	    break;
 
-    /* TODO: Improve error output acccording to the exception type, though generally
-     *       the implementor will want their own function to replace this.
-     */
+        case    ANTLR3_MISMATCHED_TOKEN_EXCEPTION:
+
+	    // We were expecting to see one thing and got another. This is
+	    // most common error, and here you can spend your efforts to
+	    // derive more useful error messages based on the expected
+	    // token set and the last token and so on. The error following
+	    // bitmaps do a good job of reducing the set that we were looking
+	    // for down to something small. Knowing what you are parsing may be
+	    // able to allow you to be even more specific about an error.
+	    //
+	    if	(tokenNames == NULL)
+	    {
+		fprintf(stderr, " : syntax error...\n");
+	    }
+	    else
+	    {
+		fprintf(stderr, " : expected %s ...\n", tokenNames[ex->expecting]);
+	    }
+	    break;
+
+	case	ANTLR3_NO_VIABLE_ALT_EXCEPTION:
+
+	    // We could not pick any alt decision from the input given
+	    // so god knows what happened - however when you examine your grammar,
+	    // you should. It means that at the point where the current token occurred
+	    // that the DFA indicates nowhere to go from here.
+	    //
+	    fprintf(stderr, " : cannot match to any predicted input...\n");
+	    
+	    break;
+
+	case	ANTLR3_MISMATCHED_SET_EXCEPTION:
+
+	    {
+		ANTLR3_UINT32	  count;
+		ANTLR3_UINT32	  bit;
+		ANTLR3_UINT32	  size;
+		ANTLR3_UINT32	  numbits;
+
+		// This means we were able to deal with one of a set of
+		// possible tokens at this point, but we did not see any
+		// member of that set.
+		//
+		fprintf(stderr, " : unexpected input...\n  expected one of : ");
+		
+		// What tokens could we have accepted at this point in the
+		// parse?
+		//
+		count   = 0;
+		numbits = ex->expectingSet->numBits	(ex->expectingSet);
+		size    = ex->expectingSet->size	(ex->expectingSet);
+
+		if  (size > 0)
+		{
+		    // However many tokens we could have dealt with here, it is usually
+		    // not useful to print ALL of the set here. I arbitrarily chose 8
+		    // here, but you should do whatever makes sense for you of course.
+		    // No token number 0, so look for bit 1 and on.
+		    //
+		    for	(bit = 1; bit < numbits && count < 8 && count < size; bit++)
+		    {
+			if  (tokenNames[bit])
+			{
+			    fprintf(stderr, "%%s", count > 0 ? ", " : "", tokenNames[bit]); 
+			    count++;
+			}
+		    }
+		    fprintf(stderr, "\n");
+		}
+		else
+		{
+		    fprintf(stderr, "Actually dude, we didn't seem to be expecting anything here, or at least\n");
+		    fprintf(stderr, "I could not work out what I was expecting, like so many of us these days!\n");
+		}
+	    }
+	    break;
+
+	case	ANTLR3_EARLY_EXIT_EXCEPTION:
+
+	    // We entered a loop requiring a number of token sequences
+	    // but found a token that ended that sequence earlier than
+	    // we should have done.
+	    //
+	    fprintf(stderr, " : missing elements...\n");
+	    break;
+
+	default:
+
+	    // We don't handle any other exceptions here, but you can
+	    // if you wish. If we get an exception that hits this point
+	    // then we are just going to report what we know about the
+	    // token.
+	    //
+	    fprintf(stderr, " : syntax not recognized...\n");
+	    break;
+    }
+
+    // Here you have the token that was in error which if this is
+    // the standard implementation will tell you the line and offset
+    // and also record the address of the start of the line in the
+    // input stream. You could therefore print the source line and so on.
+    // Generally though, I would expect that your lexer/parser will keep
+    // its own map of lines and source pointers or whatever as there
+    // are a lot of specific things you need to know about the input
+    // to do something like that.
+    // Here is where you do it though :-).
+    //
 }
 
 /** Recover from an error found on the input stream.  Mostly this is
@@ -757,7 +925,7 @@ recover			    (pANTLR3_BASE_RECOGNIZER recognizer)
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction recover called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function recover called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
@@ -804,6 +972,7 @@ recover			    (pANTLR3_BASE_RECOGNIZER recognizer)
     /* Reset the in error bit so we don't re-report the exception
      */
     recognizer->error	= ANTLR3_FALSE;
+    recognizer->failed  = ANTLR3_FALSE;
 }
 
 
@@ -836,9 +1005,9 @@ recover			    (pANTLR3_BASE_RECOGNIZER recognizer)
  *  is in the set of tokens that can follow the ')' token
  *  reference in rule atom.  It can assume that you forgot the ')'.
  *
- * May need ot come back and look at the exception stuff here, I am assuming 
+ * May need to come back and look at the exception stuff here, I am assuming 
  * that the exception that was passed in in the java implementation is
- * sotred in the recognizer exception stack. To 'throw' it we set the
+ * sorted in the recognizer exception stack. To 'throw' it we set the
  * error flag and rules can cascade back when this is set.
  */
 static void			
@@ -868,7 +1037,7 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction recoverFromMismatchedToken called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function recoverFromMismatchedToken called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
@@ -947,7 +1116,7 @@ recoverFromMismatchedSet	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction recoverFromMismatchedSet called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function recoverFromMismatchedSet called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
@@ -997,7 +1166,7 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction recover called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function recover called by unknown parser type - provide override for this function\n");
 	return ANTLR3_FALSE;
 
 	break;
@@ -1041,7 +1210,7 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
     /* We can now see if the current token works with the set of tokens
      * that could follow the current grammar reference. If it looks like it
      * is consistent, then we can "insert" that token by not throwing
-     * an exception and assumimng that we saw it. 
+     * an exception and assuming that we saw it. 
      */
     if	( follow->isMember(follow, is->_LA(is, 1)) == ANTLR3_TRUE)
     {
@@ -1098,7 +1267,7 @@ consumeUntil	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 tokenType)
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction 'consumeUntil' called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function 'consumeUntil' called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
@@ -1148,7 +1317,7 @@ consumeUntilSet			    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET set)
 
     default:
 	    
-	fprintf(stderr, "Base recognizerfunction 'consumeUntilSet' called by unknown paresr type - provide override for this function\n");
+	fprintf(stderr, "Base recognizer function 'consumeUntilSet' called by unknown parser type - provide override for this function\n");
 	return;
 
 	break;
@@ -1167,14 +1336,14 @@ consumeUntilSet			    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET set)
     }
 }
 
-/** Return the rule invokation stack (how we got here in the parse.
+/** Return the rule invocation stack (how we got here in the parse.
  *  In the java version Ter just asks the JVM for all the information
  *  but it C we don't get this information, so I am going to do nothing 
- *  right now, but when the genrated code is there I will look to see how much 
- *  overhead is involved in pushing and popping this informatino on rule entry
+ *  right now, but when the generated code is there I will look to see how much 
+ *  overhead is involved in pushing and popping this information on rule entry
  *  and exit. It is only good for error reporting and error recovery, though
- *  I don;t see that we are using it in errory recovery yet anyway as the context
- *  sensitive recvoery just calls the normal recoery funtions.
+ *  I don't see that we are using it in error recovery anyway as the context
+ *  sensitive recovery just calls the normal recovery functions.
  *  TODO: Consult with Ter on this one as to usefulness, it is easy but do I need it?
  */
 static pANTLR3_STACK	
@@ -1196,6 +1365,7 @@ toStrings			    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_HASH_TABLE tokens)
 {
     return NULL;
 }
+
 static	void ANTLR3_CDECL
 freeList    (void * list)
 {

@@ -1,6 +1,6 @@
 /** \file
- * Defines teh interface for an ANTLR3 common token stream. Custom token streams shuld creaet
- * one of these and then override any funcitnos by installing their own pointers
+ * Defines the interface for an ANTLR3 common token stream. Custom token streams should create
+ * one of these and then override any functions by installing their own pointers
  * to implement the various functions.
  */
 #ifndef	_ANTLR3_TOKENSTREAM_H
@@ -16,7 +16,7 @@
 /** Definition of a token source, which has a pointer to a function that 
  *  returns the next token (using a token factory if it is going to be
  *  efficient) and a pointer to an ANTLR3_INPUT_STREAM. This is slightly
- *  differnt to the Java interface because we have no way to implement
+ *  different to the Java interface because we have no way to implement
  *  multiple interfaces without defining them in the interface structure
  *  or casting (void *), which is too convoluted.
  */
@@ -30,10 +30,10 @@ typedef struct ANTLR3_TOKEN_SOURCE_struct
      */
     pANTLR3_STRING_FACTORY  strFactory;
 
-    /** A special preallocated token, which signifies End Of Tokens. Because this must
-     *  be set up with the currrent input index and so on, we embed the structure and 
+    /** A special pre-allocated token, which signifies End Of Tokens. Because this must
+     *  be set up with the current input index and so on, we embed the structure and 
      *  return the address of it. It is marked as factoryMade, so that it is never
-     *  attemtped to be freed.
+     *  attempted to be freed.
      */
     ANTLR3_COMMON_TOKEN	    eofToken;
 
@@ -42,12 +42,19 @@ typedef struct ANTLR3_TOKEN_SOURCE_struct
      *  function is called.
      */
     void		    * super;
+
+    /** When the token source is constructed, it is populated with the file
+     *  name from whence the tokens were produced by the lexer. This pointer is a
+     *  copy of the one supplied by the CharStream (and may be NULL) so should
+     *  not be manipulated other than to copy or print it.
+     */
+    pANTLR3_STRING	    fileName;
 }
     ANTLR3_TOKEN_SOURCE;
 
-/** Definition of the ANTLR3 commont token stream interface.
+/** Definition of the ANTLR3 common token stream interface.
  * \remark
- * Much of the documentation for tihs interface is stolen from Ter's Java implementation.
+ * Much of the documentation for this interface is stolen from Ter's Java implementation.
  */
 typedef	struct ANTLR3_TOKEN_STREAM_struct
 {
@@ -85,7 +92,7 @@ typedef	struct ANTLR3_TOKEN_STREAM_struct
     /** Where is this stream pulling tokens from?  This is not the name, but
      *  a pointer into an interface that contains a ANTLR3_TOKEN_SOURCE interface.
      *  The Token Source interface contains a pointer to the input stream and a pointer
-     *  to a function that retusn the next token.
+     *  to a function that returns the next token.
      */
     pANTLR3_TOKEN_SOURCE    (*getTokenSource)	(struct ANTLR3_TOKEN_STREAM_struct * tokenStream);
 
@@ -127,7 +134,7 @@ typedef	struct ANTLR3_TOKEN_STREAM_struct
 typedef	struct	ANTLR3_COMMON_TOKEN_STREAM_struct
 {
     /** The ANTLR3_TOKEN_STREAM interface implementation, which also includes
-     *  the intstream implementation. We coudl duplicate the pANTLR_INT_STREAM
+     *  the intstream implementation. We could duplicate the pANTLR_INT_STREAM
      *  in this interface and initialize it to a copy, but this could be confusing
      *  it just results in one more level of indirection and I think that with
      *  judicial use of 'const' later, the optimizer will do decent job.
@@ -141,7 +148,7 @@ typedef	struct	ANTLR3_COMMON_TOKEN_STREAM_struct
 
     /** Records every single token pulled from the source indexed by the token index.
      *  There might be more efficient ways to do this, such as referencing directly in to
-     *  the token factory pools, but for now this is convienent and the ANTLR3_LIST is not
+     *  the token factory pools, but for now this is convenient and the ANTLR3_LIST is not
      *  a huge overhead as it only stores pointers anyway, but allows for iterations and 
      *  so on.
      */
@@ -165,7 +172,7 @@ typedef	struct	ANTLR3_COMMON_TOKEN_STREAM_struct
     ANTLR3_UINT32	    channel;
 
     /** If this flag is set to ANTLR3_TRUE, then tokens that the stream sees that are not
-     *  in thechannel that this stream is tuned to, are not tracked in the
+     *  in the channel that this stream is tuned to, are not tracked in the
      *  tokens table. When set to false, ALL tokens are added to the tracking.
      */
     ANTLR3_BOOLEAN	    discardOffChannel;
@@ -199,7 +206,7 @@ typedef	struct	ANTLR3_COMMON_TOKEN_STREAM_struct
     pANTLR3_VECTOR	    (*getTokens)	    (struct ANTLR3_COMMON_TOKEN_STREAM_struct * tokenStream);
 
     /** Function that returns all the tokens between a start and a stop index.
-     *  TODO: This is a new list (Ack! Maybe this is a reason to have factories for LISTS adn HASHTABLES etc :-( come back to this)
+     *  TODO: This is a new list (Ack! Maybe this is a reason to have factories for LISTS and HASHTABLES etc :-( come back to this)
      */
     pANTLR3_LIST	    (*getTokenRange)	    (struct ANTLR3_COMMON_TOKEN_STREAM_struct * tokenStream, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
 

@@ -4,9 +4,9 @@
  */
 #include    <antlr3.h>
 
-/** \brief Create an inplace ASCII string stream as input to ANTLR 3.
+/** \brief Create an in-place ASCII string stream as input to ANTLR 3.
  *
- * An inplace string steam is the preferred method of suplying strings to ANTLR as input 
+ * An in-place string steam is the preferred method of supplying strings to ANTLR as input 
  * for lexing and compiling. This is because we make no copies of the input string but
  * read from it right where it is.
  *
@@ -39,31 +39,26 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size,
     {
 	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
-
-    if	(name == NULL)
-    {
-	input->fileName	= ANTLR3_STRDUP((pANTLR3_UINT8)"-memory-");
-    }
-    else
-    {
-	input->fileName  = ANTLR3_STRDUP(name);
-    }
-
+    
     /* Structure was allocated correctly, now we can install the pointer.
      */
     input->data	    = inString;
     input->sizeBuf  = size;
 
-    /* Call the common 8 bit ASCII input stream handler intializer.
+    /* Call the common 8 bit ASCII input stream handler initializer.
      */
     antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
+
+    /* Now we can set up the file name
+     */
+    input->fileName = input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)"-memory-" : name);
 
     return  input;
 }
 
-/** \brief Create an inplace UCS2 string stream as input to ANTLR 3.
+/** \brief Create an in-place UCS2 string stream as input to ANTLR 3.
  *
- * An inplace string steam is the preferred method of supplying strings to ANTLR as input 
+ * An in-place string steam is the preferred method of supplying strings to ANTLR as input 
  * for lexing and compiling. This is because we make no copies of the input string but
  * read from it right where it is.
  *
@@ -86,7 +81,6 @@ antlr3NewUCS2StringInPlaceStream   (pANTLR3_UINT16 inString, ANTLR3_UINT64 size,
     /* Pointer to the input stream we are going to create
      */
     pANTLR3_INPUT_STREAM    input;
-    ANTLR3_UINT32	    count;
 
     /* Layout default file name string in correct encoding
      */
@@ -102,29 +96,17 @@ antlr3NewUCS2StringInPlaceStream   (pANTLR3_UINT16 inString, ANTLR3_UINT64 size,
 	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
-    if	(name == NULL)
-    {
-	input->fileName	= ANTLR3_MALLOC(sizeof(ANTLR3_UINT16) * 9);
-	ANTLR3_MEMMOVE(input->fileName, (void *)defaultName, sizeof(ANTLR3_UINT16) * 9);
-    }
-    else
-    {
-	count = 0;
-	while (*(name+count) != '\0') { count++;}
-	input->fileName  = ANTLR3_MALLOC(sizeof(ANTLR3_UINT16) * (count +1));
-	ANTLR3_MEMMOVE(input->fileName, (void *)name, sizeof(ANTLR3_UINT16) * (count+1));
-	*(name+count+1) = '\0';
-    }
-
     /* Structure was allocated correctly, now we can install the pointer.
      */
     input->data	    = inString;
     input->sizeBuf  = size;
 
-    /* Call the common 18 bit input stream handler intializer.
+    /* Call the common 16 bit input stream handler initializer.
      */
     antlr3UCS2SetupStream   (input, ANTLR3_CHARSTREAM);
-
+    
+    input->fileName	= input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)defaultName : (pANTLR3_UINT8)name);
+    
     return  input;
 }
 
@@ -161,15 +143,6 @@ pANTLR3_INPUT_STREAM	antlr3NewAsciiStringCopyStream	    (pANTLR3_UINT8 inString,
 	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
-    if	(name == NULL)
-    {
-	input->fileName	= ANTLR3_STRDUP((pANTLR3_UINT8)"-memory-");
-    }
-    else
-    {
-	input->fileName	= ANTLR3_STRDUP(name);
-    }
-
     /* Indicate that we allocated this input and allocate it
      */
     input->isAllocated	    = ANTLR3_TRUE;
@@ -186,9 +159,11 @@ pANTLR3_INPUT_STREAM	antlr3NewAsciiStringCopyStream	    (pANTLR3_UINT8 inString,
     input->sizeBuf  = size;
 
     /* Call the common 8 bit ASCII input stream handler
-     * intializer type thingy doobry function.
+     * initializer type thingy doobry function.
      */
     antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
+
+    input->fileName	= input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)"-memory-" : name);
 
     return  input;
 }

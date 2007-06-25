@@ -34,7 +34,7 @@
 #include    <antlr3defs.h>
 #include    <antlr3commontoken.h>
 
-/** Type inidicator for a character stream
+/** Type indicator for a character stream
  * \remark if a custom stream is created but it can be treated as
  * a char stream, then you may OR in this value to your type indicator
  */
@@ -63,12 +63,19 @@ typedef	struct ANTLR3_INT_STREAM_struct
      */
     ANTLR3_UINT32	    type;
 
+    /** Potentially useful in error reporting and so on, this string is
+     *  an identification of the input source. It may be NULL, so anything
+     *  attempting to access it needs to check this and substitute a sensible
+     *  default.
+     */
+    pANTLR3_STRING	      streamName;
+
     /** Pointer to the super structure that contains this interface. This
      *  will usually be a token stream or a tree stream.
      */
     void		    * super;
 
-    /** Last marker postion allocated
+    /** Last marker position allocated
      */
     ANTLR3_UINT64	    lastMarker;
 
@@ -136,7 +143,8 @@ typedef	struct ANTLR3_INT_STREAM_struct
      *  might be useful to display the entire stream or for testing.
      */
     ANTLR3_UINT64	    (*size)	    (struct ANTLR3_INT_STREAM_struct * intStream);
-    /** Because the inderect call, though small in individual cases can
+
+    /** Because the indirect call, though small in individual cases can
      *  mount up if there are thousands of tokens (very large input streams), callers
      *  of size can optionally use this cached size field.
      */

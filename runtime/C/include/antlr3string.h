@@ -185,25 +185,25 @@ typedef struct	ANTLR3_STRING_FACTORY_struct
     pANTLR3_STRING  (*newSize)	(struct ANTLR3_STRING_FACTORY_struct * factory, ANTLR3_UINT32 size);
 
     /** Pointer to function that manufactures a string from a given pointer and length. The pointer is assumed
-     *  to point to characters in the same encodign as the string type, hence if this is a 16 bit string the
+     *  to point to characters in the same encoding as the string type, hence if this is a 16 bit string the
      *  pointer should point to 16 bit characters.
      */
     pANTLR3_STRING  (*newPtr)	(struct ANTLR3_STRING_FACTORY_struct * factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
 
     /** Pointer to function that manufactures a string from a given pointer and length. The pointer is assumed to
-     *  point at 8 bit charaters which must be converted on the fly to the encoding of the actual string.
+     *  point at 8 bit characters which must be converted on the fly to the encoding of the actual string.
      */
     pANTLR3_STRING  (*newPtr8)	(struct ANTLR3_STRING_FACTORY_struct * factory, pANTLR3_UINT8 string, ANTLR3_UINT32 size);
 
-    /** Pointer to function that manufactures a string from a given pointer and length. The pointer is 
-     *  assumed to point to characteres in the same encoding as the string itself, i.e. 16 bit if a 16 bit
+    /** Pointer to function that manufactures a string from a given pointer and works out the length. The pointer is 
+     *  assumed to point to characters in the same encoding as the string itself, i.e. 16 bit if a 16 bit
      *  string and so on.
      */
     pANTLR3_STRING  (*newStr)	(struct ANTLR3_STRING_FACTORY_struct * factory, pANTLR3_UINT8 string);
 
     /** Pointer to function that manufactures a string from a given pointer and length. The pointer should
-     *  point to 8 bit characters regardless of the actaul encoding of the string. The 8 bit characters
-     *  will be converted to the actaul strign encoding on the fly.
+     *  point to 8 bit characters regardless of the actual encoding of the string. The 8 bit characters
+     *  will be converted to the actual string encoding on the fly.
      */
     pANTLR3_STRING  (*newStr8)	(struct ANTLR3_STRING_FACTORY_struct * factory, pANTLR3_UINT8 string);
 

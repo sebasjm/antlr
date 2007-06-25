@@ -1,5 +1,5 @@
 /** \file
- * Base functions to initalize and manipulate any input stream
+ * Base functions to initialize and manipulate any input stream
  */
 #include    <antlr3input.h>
 
@@ -36,8 +36,8 @@ static	    void	    antlr3AsciiSetNewLineChar	(pANTLR3_INPUT_STREAM input, ANTLR
  *
  * \remark
  *   - Many of the 8 bit ASCII oriented file stream handling functions will be usable
- *     by any or at least some other input streams. Therefore it is perfectly acceptible
- *     to call this funcinto to install teh ASCII handler then override just those functions
+ *     by any or at least some other input streams. Therefore it is perfectly acceptable
+ *     to call this function to install the ASCII handler then override just those functions
  *     that would not work for the particular input encoding, such as consume for instance.
  *  
  */
@@ -48,7 +48,7 @@ antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
      */
     input->strFactory	= antlr3StringFactoryNew();
 
-    /* Default stream set up is for ASCII, therefore ther eis nothign else
+    /* Default stream set up is for ASCII, therefore there is nothing else
      * to do but set it up as such
      */
     antlr3GenericSetupStream(input, type);
@@ -72,7 +72,7 @@ antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
     /* Intstream API
      */
     input->istream->consume	    =  antlr3AsciiConsume;	    /* Consume the next 8 bit character in the buffer			    */
-    input->istream->_LA		    =  antlr3AsciiLA;		    /* Return the UTF32 chracter at offset n (1 based)			    */
+    input->istream->_LA		    =  antlr3AsciiLA;		    /* Return the UTF32 character at offset n (1 based)			    */
     input->istream->index	    =  antlr3AsciiIndex;	    /* Current index (offset from first character			    */
     input->istream->mark	    =  antlr3AsciiMark;		    /* Record the current lex state for later restore			    */
     input->istream->rewind	    =  antlr3AsciiRewind;	    /* How to rewind the input						    */
@@ -82,18 +82,17 @@ antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
 
     /* Charstream API
      */
-    input->close		    =  antlr3InputClose;		    /* Close down the stream completely					    */
-    input->reset		    =  antlr3InputReset;		    /* Reset input to start						    */
-    input->getSourceName	    =  antlr3InputFileName;	    /* Return the source description (filename here)			    */
+    input->close		    =  antlr3InputClose;	    /* Close down the stream completely					    */
+    input->reset		    =  antlr3InputReset;	    /* Reset input to start						    */
     input->_LT			    =  antlr3AsciiLT;		    /* Same as _LA for 8 bit Ascii file					    */
     input->size			    =  antlr3AsciiSize;		    /* Return the size of the input buffer				    */
     input->substr		    =  antlr3AsciiSubstr;	    /* Return a string from the input stream				    */
     input->getLine		    =  antlr3AsciiGetLine;	    /* Return the current line number in the input stream		    */
     input->getLineBuf		    =  antlr3AsciiGetLineBuf;	    /* Return a pointer to the start of the current line being consumed	    */
-    input->getCharPositionInLine    =  antlr3AsciiGetCharPosition;   /* Return the offset into the current line of input			    */
+    input->getCharPositionInLine    =  antlr3AsciiGetCharPosition;  /* Return the offset into the current line of input			    */
     input->setLine		    =  antlr3AsciiSetLine;	    /* Set the input stream line number (does not set buffer pointers)	    */
-    input->setCharPositionInLine    =  antlr3AsciiSetCharPosition;   /* Set the offset in to the current line (does not set any pointers	)   */
-    input->SetNewLineChar	    =  antlr3AsciiSetNewLineChar;    /* Set the value of the newline trigger character			    */
+    input->setCharPositionInLine    =  antlr3AsciiSetCharPosition;  /* Set the offset in to the current line (does not set any pointers	)   */
+    input->SetNewLineChar	    =  antlr3AsciiSetNewLineChar;   /* Set the value of the newline trigger character			    */
 
     /* Initialize entries for tables etc
      */
@@ -141,11 +140,7 @@ antlr3InputClose(pANTLR3_INPUT_STREAM input)
     
     input->istream->free(input->istream);
 
-    /* We always allocate the memory for the stream name
-     */
-    ANTLR3_FREE(input->fileName);
-
-    /* Finaly, free the space for teh structure itself
+    /* Finally, free the space for the structure itself
      */
     ANTLR3_FREE(input);
 
@@ -153,7 +148,7 @@ antlr3InputClose(pANTLR3_INPUT_STREAM input)
      */
 }
 
-/** \brief Reset a restartable input stream to the start
+/** \brief Reset a re-startable input stream to the start
  *
  * \param input Input stream context pointer
  */
@@ -177,17 +172,6 @@ antlr3InputReset(pANTLR3_INPUT_STREAM input)
     /* Install a new markers table
      */
     input->markers  = antlr3VectorNew(0);
-}
-
-/** \brief Return a pointer to the input stream source name, such as the file.
- *
- * \param input Input stream context pointer
- * \return Pointer to 8 bit ascii (assumed here at least) stream name
- */
-static pANTLR3_UINT8
-antlr3InputFileName(pANTLR3_INPUT_STREAM input)
-{
-    return  input->fileName;
 }
 
 /** \brief Consume the next character in an 8 bit ASCII input stream
@@ -222,7 +206,7 @@ antlr3AsciiConsume(pANTLR3_INT_STREAM is)
     }
 }
 
-/** \brief Return the input element assuming an 8 bit ascii iinput
+/** \brief Return the input element assuming an 8 bit ascii input
  *
  * \param[in] input Input stream context pointer
  * \param[in] la 1 based offset of next input stream element
@@ -246,7 +230,7 @@ antlr3AsciiLA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
     }
 }
 
-/** \brief Return the input element assuming an 8 bit ascii iinput
+/** \brief Return the input element assuming an 8 bit ascii input
  *
  * \param[in] input Input stream context pointer
  * \param[in] lt 1 based offset of next input stream element
@@ -279,7 +263,7 @@ antlr3AsciiIndex(pANTLR3_INT_STREAM is)
 
 /** \brief Return the size of the current input stream, as an Ascii file
  *   which in this case is the total input. Other implementations may provide
- *   more sophisticated implemenatins to deal with non-recoverable streams 
+ *   more sophisticated implementations to deal with non-recoverable streams 
  *   and so on.
  *
  * \param[in] input Input stream context pointer
@@ -294,7 +278,7 @@ antlr3AsciiSize(pANTLR3_INPUT_STREAM input)
  *  such as a file stream, where all the input is available in the
  *  buffer.
  *
- * \param[in] input Input stream context pointer
+ * \param[in] is Input stream context pointer
  */
 static ANTLR3_UINT64
 antlr3AsciiMark	(pANTLR3_INT_STREAM is)
@@ -447,7 +431,7 @@ antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
 	}
     }
 }
-/** \brief Retrun a substring of the ASCII (8 bit) input stream in
+/** \brief Return a substring of the ASCII (8 bit) input stream in
  *  newly allocated memory.
  *
  * \param input Input stream context pointer
@@ -463,7 +447,7 @@ antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 start, ANTLR3_INT64
 /** \brief Return the line number as understood by the 8 bit/ASCII input stream.
  *
  * \param input Input stream context pointer
- * \return	Line number in input stream that we belive we are working on.
+ * \return	Line number in input stream that we believe we are working on.
  */
 static ANTLR3_UINT64   
 antlr3AsciiGetLine		(pANTLR3_INPUT_STREAM input)
@@ -503,7 +487,7 @@ antlr3AsciiGetCharPosition	(pANTLR3_INPUT_STREAM input)
  *  This function does not change any pointers, it just allows the programmer to set the
  *  line number according to some external criterion, such as finding a lexed directive
  *  like: #nnn "file.c" for instance, such that error reporting and so on in is in sync
- *  with some oringial source format.
+ *  with some original source format.
  */
 static void
 antlr3AsciiSetLine		(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 line)
@@ -511,13 +495,13 @@ antlr3AsciiSetLine		(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 line)
     input->line	= line;
 }
 
-/** \Brief Set the current offset in the current line to be a paricular setting.
+/** \Brief Set the current offset in the current line to be a particular setting.
  *
  * \param[in] input    Input stream context pointer
  * \param[in] position New setting for current offset.
  *
  * \remark
- * This does not set the actaul pointers in the input stream, it is purely for reporting
+ * This does not set the actual pointers in the input stream, it is purely for reporting
  * purposes and so on as per antlr3AsciiSetLine();
  */
 static void
@@ -526,7 +510,7 @@ antlr3AsciiSetCharPosition	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 position)
     input->charPositionInLine = position;
 }
 
-/** \brief set the newline trigger chacter in the input stream to the supplied paramter.
+/** \brief set the newline trigger character in the input stream to the supplied parameter.
  *
  * \param[in] input	    Input stream context pointer
  * \param[in] newlineChar   Character to set to be the newline trigger.
@@ -534,7 +518,7 @@ antlr3AsciiSetCharPosition	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 position)
  * \remark
  *  - The supplied newLineChar is in UTF32 encoding (which means ASCII and latin1 etc
  *    are the same encodings), but the input stream catered to by this function is 8 bit
- *    only, so it is up to the programmer ti ensure that the character supplied is valid.
+ *    only, so it is up to the programmer to ensure that the character supplied is valid.
  */
 static void 
 antlr3AsciiSetNewLineChar	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 newlineChar)
