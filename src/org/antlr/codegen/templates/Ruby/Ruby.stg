@@ -201,9 +201,9 @@ class <name>
     def match_range(from, to)
         char = <LA(1)>
 
-        if char \>= from || char \<= to
-	        @failed = false
-            match()
+        if char != :EOF && (char \>= from || char \<= to)
+			@failed = false
+			match()
         elsif @backtracking > 0
             @failed = true
         else
@@ -372,9 +372,10 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 <<
 # <description>
 def <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
-	<ruleDescriptor.returnScope.attributes:{ a |
-		_retval_<a.name> = nil
-	}>
+	<ruleDescriptor.returnScope.attributes:
+		{ _retval_<it.name> = nil }; separator = "\n"
+	>
+	<ruleLabelDefs()>
 
     <if(trace)>
         puts " " * @indent + "+<ruleName>"
@@ -404,6 +405,15 @@ def <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 end
 >>
 
+ruleLabelDefs() ::= <<
+<ruleDescriptor.tokenLabels :{_<it.label.text> = nil}; separator="\n">
+<[ruleDescriptor.tokenListLabels, ruleDescriptor.ruleListLabels]
+    :{list_<it.label.text> = nil}; separator="\n"
+>
+>>
+
+
+
 /** How to generate a rule in the lexer; naked blocks are used for
  *  fragment rules.
  */
@@ -412,6 +422,7 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::=
 def match_<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 	<ruleDescriptor.actions.init>
 
+	<lexerRuleLabelDefs()>
 	<if(nakedBlock)>
 		<block><\n>
 	<else>
@@ -421,6 +432,17 @@ def match_<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 	<endif>
 end
 >>
+
+lexerRuleLabelDefs() ::= <<
+<[ruleDescriptor.tokenLabels, ruleDescriptor.ruleLabels]
+    :{<it.label.text> = nil}; separator="\n"
+>
+<ruleDescriptor.charLabels:{<it.label.text> = nil}; separator="\n">
+<[ruleDescriptor.tokenListLabels, ruleDescriptor.ruleListLabels]
+    :{list_<it.label.text> = nil}; separator="\n"
+>
+>>
+
 
 /** How to generate code for the implicitly-defined lexer grammar rule
  *  that chooses between lexer rules.
@@ -542,14 +564,14 @@ match(:<token>)
 tokenRefAndListLabel(token,label,elementIndex)::=
 <<
 <tokenRef(...)>
-<listLabel(...)>
+<listLabel(elem=label, ...)>
 >>
 
 
 listLabel(label,elem)::=
 <<
 list_<label> ||= []
-list_<label> \<\< _<label>
+list_<label> \<\< _<elem>
 >>
 
 /** match a character */
@@ -564,6 +586,9 @@ match(<char>)
 /** match a character range */
 charRangeRef(a,b,label)::=
 <<
+<if(label)>
+_<label> = <LA(1)><\n>
+<endif>
 match_range(<a>, <b>)
 >>
 
@@ -574,8 +599,8 @@ matchSet(s,label,elementIndex,postmatchCode)::=
 _<label> = <LA(1)><\n>
 <endif>
 if <s>
-    <postmatchCode>
     match()
+    <postmatchCode>
 else
     raise "Expected set"
 end
@@ -584,7 +609,7 @@ end
 matchSetAndListLabel(s,label,elementIndex,postmatchCode)::=
 <<
 <matchSet(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match a string literal */
@@ -592,9 +617,8 @@ lexerStringRef(string,label)::=
 <<
 <if(label)>
 _<label> = <string><\n>
-<else>
-match(<string>)<\n>
 <endif>
+match(<string>)<\n>
 >>
 
 wildcard(label, elementIndex)::=
@@ -609,7 +633,7 @@ match()
 wildcardAndListLabel(label,elementIndex)::=
 <<
 <wildcard(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 
@@ -633,7 +657,7 @@ wildcardCharListLabel(label, elementIndex)::=
 ruleRef(rule,label,elementIndex,args)::=
 <<
 <if(label)>
-<label> = <rule>(<args; separator=", ">)<\n>
+_<label> = <rule>(<args; separator=", ">)<\n>
 <else>
 <rule>(<args; separator=", ">)<\n>
 <endif>
@@ -642,20 +666,40 @@ ruleRef(rule,label,elementIndex,args)::=
 /** ids+=ID */
 ruleRefAndListLabel(rule,label,elementIndex,args)::=
 <<
-	raise "ruleRefAndListLabel not implemented"
+<ruleRef(...)>
+<listLabel(elem=label,...)>
 >>
 
 
-/** A lexer rule reference */
+/**
+
+A: b=B;
+B: .;
+
+TODO: Should we use a real token type instead of :invalid? How do we get it?
+ 
+*/
 lexerRuleRef(rule,label,args,elementIndex)::=
 <<
+<if(label)>
+_<label>_start_<elementIndex> = @input.index
+_<label>_line_<elementIndex> = @input.line
+_<label>_pos_<elementIndex> = @input.column
 match_<rule>(<args; separator=", ">)
+_<label> = Token.new(:invalid, 0,
+                     _<label>_line_<elementIndex>,
+                     _<label>_pos_<elementIndex>,
+                     @input.substring(_<label>_start_<elementIndex>, @input.index - 1), nil)
+<else>
+match_<rule>(<args; separator=", ">)
+<endif>
 >>
 
 
 lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::=
 <<
-	raise "lexerRuleRefAndListLabel not implemented"
+<lexerRuleRef(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** EOF in the lexer */
@@ -994,9 +1038,9 @@ isolatedDynamicScopeRef(scope)::=
 ruleLabelRef(referencedRule,scope,attr)::=
 <<
 <if(referencedRule.hasMultipleReturnValues)>
-<scope>[:<attr.name>]
+_<scope>[:<attr.name>]
 <else>
-<scope>
+_<scope>
 <endif>
 >>
 

@@ -172,5 +172,19 @@ class TestParser < Test::Unit::TestCase
       assert_equal("dbc", parser.parse('dbc'))
     end
 
+    def test_token_list_label
+        grammar = <<-END
+          s returns [result]
+            : ids+=ID (',' ids+=ID)* { $result = $ids }
+            ;
+
+          ID: 'a' | 'b';
+      END
+
+  	  parser = Grammar::compile(grammar, "s")
+
+      assert_equal %w{a b a b}, parser.parse('a,b,a,b').map { |t| t.text };
+    end
+    
 
 end

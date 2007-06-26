@@ -62,4 +62,16 @@ class TestTokenLabel < Test::Unit::TestCase
     parser = Grammar::compile(grammar, "a")
     assert_equal('a,b,c,d', parser.parse('abcd'))
   end
+  
+  def test_set_and_list_label
+    grammar = <<-END
+      a returns [result]: (x+=A)+ { $result = $x.map { |t| t.text }.join(',') };
+
+      A : ('a'|'b');
+    END
+
+    parser = Grammar::compile(grammar, "a")
+    assert_equal('a,b,a,b', parser.parse('abab'))
+  end
+  
 end

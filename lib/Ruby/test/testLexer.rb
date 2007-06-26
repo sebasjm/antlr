@@ -119,4 +119,131 @@ class TestLexer < Test::Unit::TestCase
   
 	 assert_equal 'b', parser.parse("a").first.text;
   end  
+
+  def test_match_any_with_label
+    grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
+      @lexer::members {
+        attr_reader :a
+      }
+  
+      @lexer::init {
+        @a = nil
+      }
+
+      A : a=. { @a = $a };
+    END
+
+	  parser = Grammar::compile(grammar)
+
+    assert_equal '0', parser.parse('0').first.text
+    assert_equal ?0, parser.instance.a
+  end
+  
+  def test_match_char_with_label
+    grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
+      @lexer::members {
+        attr_reader :a
+      }
+  
+      @lexer::init {
+        @a = nil
+      }
+
+      A : a='a' { @a = $a };
+    END
+
+	  parser = Grammar::compile(grammar)
+
+    assert_equal 'a', parser.parse('a').first.text
+    assert_equal ?a, parser.instance.a
+  end
+  
+  def test_match_range_with_label
+    grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
+      @lexer::members {
+        attr_reader :a
+      }
+  
+      @lexer::init {
+        @a = nil
+      }
+
+      A : a='0'..'9' { @a = $a };
+    END
+
+	  parser = Grammar::compile(grammar)
+
+    assert_equal '0', parser.parse('0').first.text
+    assert_equal ?0, parser.instance.a
+  end
+  
+  def test_match_string_with_label
+    grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
+      @lexer::members {
+        attr_reader :a
+      }
+  
+      @lexer::init {
+        @a = nil
+      }
+
+      A : a='abc' { @a = $a };
+    END
+
+	  parser = Grammar::compile(grammar)
+
+    assert_equal 'abc', parser.parse('abc').first.text
+    assert_equal 'abc', parser.instance.a
+  end
+  
+  def test_match_set_with_label
+    grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
+      @lexer::members {
+        attr_reader :a
+      }
+
+      @lexer::init {
+        @a = nil
+      }
+
+      A : a+=ID a+=ID { @a = $a };
+      
+      fragment
+      ID: '0'|'1';
+    END
+
+	  parser = Grammar::compile(grammar)
+
+    assert_equal '01', parser.parse('01').first.text
+    assert_equal ['0', '1'], parser.instance.a.map { |t| t.text }
+  end
+  
+  def test_lexer_rule_ref
+    grammar = <<-END
+      // #{__FILE__}:#{__LINE__}
+      @lexer::members {
+        attr_reader :a
+      }
+  
+      @lexer::init {
+        @a = nil
+      }
+
+      A : a=ID { @a = $a };
+      
+      fragment
+      ID: '0';
+    END
+
+	  parser = Grammar::compile(grammar)
+
+    assert_equal '0', parser.parse('0').first.text
+    assert_equal '0', parser.instance.a.text
+  end
+  
 end

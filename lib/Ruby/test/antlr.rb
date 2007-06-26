@@ -91,19 +91,19 @@ class Grammar
   end
 
   class Lexer
-	 attr_reader :grammar
+	  attr_reader :grammar   # the grammar class
+	  attr_reader :instance  # the parser instance
 
     def initialize(grammar)
       @grammar = grammar
     end
 
-
     def parse(input)
-      parser = @grammar.new(input)
+      @instance = @grammar.new(input)
 
       tokens = []
       loop do
-        token = parser.next_token
+        token = @instance.next_token
         break if token == :EOF
         tokens << token
       end
