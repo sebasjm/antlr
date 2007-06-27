@@ -1416,7 +1416,6 @@ ruleLabelInitializations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!ruleDescriptor.isSynPred)>
 retval.start = LT(1);<\n>
-
 <endif>
 <endif>
 >>
@@ -2057,7 +2056,7 @@ dfaAcceptState(alt) ::= "alt<decisionNumber>=<alt>;"
 dfaEdge(labelExpr, targetState, predicates) ::= <<
 if ( (<labelExpr>) <if(predicates)>&& (<predicates>)<endif>) 
 {
-    <targetState> // It is I
+    <targetState>
 }
 >>
 
@@ -2600,8 +2599,8 @@ ANTLR3_BOOLEAN
 <endif>
 >>
 
-/** Generate the Java type associated with a single or multiple return
- *  values.
+/** Generate the C type associated with a single or multiple return
+ *  value(s).
  */
 ruleLabelType(referencedRule) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
@@ -2628,8 +2627,11 @@ ruleLabelDef(label) ::= <<
 #undef	RETURN_TYPE_<label.label.text>
 #define	RETURN_TYPE_<label.label.text> <ruleLabelType(referencedRule=label.referencedRule)><\n>
 >>
-/**  a rule label including default value */
+/**  Rule label default value */
 ruleLabelInitVal(label) ::= <<
+<if(label.referencedRule.hasSingleReturnValue)>
+<label.label.text> = initValue(<label.referencedRule.singleValueReturnType>);
+<endif>
 >>
 
 /** Define a return struct for a rule if the code needs to access its

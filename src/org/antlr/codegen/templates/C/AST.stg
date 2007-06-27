@@ -62,10 +62,8 @@ pANTLR3_BASE_TREE	tree;
 
 /** Add a variable to track rule's return AST */
 ruleDeclarations() ::= <<
-/* ruleDeclarations() */
 <super.ruleDeclarations()>
 pANTLR3_BASE_TREE root_0;<\n>
-/* End ruleDeclarations() */
 >>
 
 ruleInitializations() ::= <<
