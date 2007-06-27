@@ -1283,6 +1283,7 @@ checkRuleBacktrackFailure() ::= <<
 <if(backtracking)>
 if (HASFAILED())
 {
+    <scopeClean()>
     return <ruleReturnValue()>;
 }
 <endif>
@@ -1294,6 +1295,7 @@ ruleBacktrackFailure() ::= <<
 if (BACKTRACKING>0)
 {
     FAILEDFLAG = <true()>; 
+    <scopeClean()>
     return <ruleReturnValue()>;
 }
 <endif>
@@ -1314,11 +1316,11 @@ static <returnType()>
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
+    <ruleMemoization(name=ruleName)>
     <ruleInitializations()>
     <ruleLabelInitializations()>
     <ruleDescriptor.actions.init>
     <@preamble()>
-    <ruleMemoization(name=ruleName)>
     {
         <block>
     }
@@ -1343,10 +1345,12 @@ static <returnType()>
         PREPORTERROR();
         PRECOVER();
     }
+<if(ruleDescriptor.actions.after)>
     else
     {
 	<(ruleDescriptor.actions.after):execAction()>
     }<\n>
+<endif>
 <endif>
 <endif>
 <endif>
@@ -1482,10 +1486,11 @@ if ( BACKTRACKING>0 ) { MEMOIZE(<ruleDescriptor.index>, <ruleDescriptor.name>_St
 
 ruleCleanUp() ::= <<
 
+// This is where rules clean up and exit
+//
 goto rule<ruleDescriptor.name>Ex; /* Prevent compiler warnings */
 rule<ruleDescriptor.name>Ex: ;
-<ruleDescriptor.useScopes:{<scopePop(sname=it)>;}; separator="\n">
-<ruleDescriptor.ruleScope:{<scopePop(sname=it.name)>;}; separator="\n">
+<scopeClean()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!TREE_PARSER)>
 <if(!ruleDescriptor.isSynPred)>
@@ -1495,6 +1500,10 @@ retval.stop = LT(-1);<\n>
 <endif>
 >>
 
+scopeClean() ::= <<
+<ruleDescriptor.useScopes:{<scopePop(sname=it)>;}; separator="\n">
+<ruleDescriptor.ruleScope:{<scopePop(sname=it.name)>;}; separator="\n">
+>>
 /** How to generate a rule in the lexer; naked blocks are used for
  *  fragment rules, which do not produce tokens.
  */
@@ -1642,7 +1651,7 @@ positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decision
 	    
 		if ( cnt<decisionNumber> >= 1 )
 		{
-		    goto loop<decisionNumber>; /* Ah well, generated code or I'd shoot myself */
+		    goto loop<decisionNumber>;
 		}
 		<ruleBacktrackFailure()>
 		<earlyExitEx()>
