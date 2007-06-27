@@ -158,7 +158,7 @@ filteringActionGate() ::= "self.backtracking == 1"
 
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
-              ASTLabelType="Object", labelType, members) ::= <<
+              ASTLabelType="Object", labelType, members, init) ::= <<
 # token names
 tokenNames = [
     "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", 
@@ -184,7 +184,7 @@ class <name>(<superClass>):
         <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeStack(scope=it)><endif>}>
 	<rules:{<ruleAttributeScopeStack(scope=it.ruleDescriptor.ruleScope)>}>
 
-        <actions.parser.init>
+        <init>
 
         <@members>
         <@end>
@@ -203,14 +203,14 @@ class <name>(<superClass>):
 >>
 
 parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
-<genericParser(inputStreamType="TokenStream", ...)>
+<genericParser(inputStreamType="TokenStream", init={<actions.parser.init>}, ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
 treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser", members={<actions.treeparser.members>}) ::= <<
-<genericParser(inputStreamType="TreeNodeStream", ...)>
+<genericParser(inputStreamType="TreeNodeStream", init={<actions.treeparser.init>}, ...)>
 >>
 
 /** A simpler version of a rule template that is specific to the imaginary
@@ -293,6 +293,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 
 # $ANTLR start <ruleName>
 # <fileName>:<description>
+<ruleDescriptor.actions.decorate>
 def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <if(trace)>
     self.traceIn("<ruleName>", <ruleDescriptor.index>)<\n>
@@ -1057,10 +1058,10 @@ lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber> == <atom>"
 isolatedLookaheadTest(atom,k,atomAsInt) ::= "self.input.LA(<k>) == <atom>"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
-(LA<decisionNumber>_<stateNumber> \>= <lower> and LA<decisionNumber>_<stateNumber> \<= <upper>)
+(<lower> \<= LA<decisionNumber>_<stateNumber> \<= <upper>)
 >>
 
-isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "(self.input.LA(<k>) \>= <lower> and self.input.LA(<k>) \<= <upper>)"
+isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "(<lower> \<= self.input.LA(<k>) \<= <upper>)"
 
 setTest(ranges) ::= "<ranges; separator=\" or \">"
 
