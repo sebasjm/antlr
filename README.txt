@@ -123,6 +123,10 @@ http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
 CHANGES
 
+June 28, 2007
+
+* Added ability to set the port number in the constructor for the debug parser.
+
 June 5, 2007
 
 * Changed (hidden) option -verbose to -Xnfastates; this just prints out the NFA states along each nondeterministic path for nondeterminism warnings.

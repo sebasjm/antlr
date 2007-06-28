@@ -41,17 +41,21 @@ public static final String[] ruleNames = new String[] {
 };<\n>
 public int ruleLevel = 0;
 <! bug: can't use <@super.members()> cut-n-paste instead !>
-public <name>(<inputStreamType> input) {
+public <name>(<inputStreamType> input, int port) {
 <if(profile)>
         this(input, new Profiler(null));
         Profiler p = (Profiler)dbg;
         p.setParser(this);
 <else>
-        super(input);
+        super(input, port);
 <endif><\n>
 <if(memoize)>
         ruleMemo = new Map[<numRules>+1];<\n><! index from 1..n !>
 <endif>
+}
+
+public <name>(<inputStreamType> input) {
+        this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT);
 }
 <if(profile)>
 public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
