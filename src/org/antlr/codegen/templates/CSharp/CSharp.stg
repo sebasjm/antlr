@@ -40,7 +40,7 @@ csharpTypeInitMap ::= [
 	"sbyte":"0",
 	"short":"0",
 	"ushort":"0",
-	"char":"0",
+	"char":"char.MinValue",
 	default:"null" // anything other than an atomic type
 ]
 
