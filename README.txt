@@ -123,6 +123,10 @@ http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
 CHANGES
 
+July 7, 2007
+
+* fixed wrong order of test for exceptions in Lexer.getErrorMessage()
+
 June 28, 2007
 
 * Added ability to set the port number in the constructor for the debug parser.

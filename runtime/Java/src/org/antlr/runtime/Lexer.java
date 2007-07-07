@@ -284,12 +284,12 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 			// for development, can add "(decision="+eee.decisionNumber+")"
 			msg = "required (...)+ loop did not match anything at character "+getCharErrorDisplay(e.c);
 		}
-		else if ( e instanceof MismatchedSetException ) {
-			MismatchedSetException mse = (MismatchedSetException)e;
-			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+mse.expecting;
-		}
 		else if ( e instanceof MismatchedNotSetException ) {
 			MismatchedNotSetException mse = (MismatchedNotSetException)e;
+			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+mse.expecting;
+		}
+		else if ( e instanceof MismatchedSetException ) {
+			MismatchedSetException mse = (MismatchedSetException)e;
 			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+mse.expecting;
 		}
 		else if ( e instanceof MismatchedRangeException ) {
