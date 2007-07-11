@@ -471,10 +471,13 @@ static  pANTLR3_STRING    toString		(pANTLR3_COMMON_TOKEN token)
     
     if	(text == NULL)
     {
-	return NULL;
+		return NULL;
     }
 
-    text = text->factory->printable(text->factory, text);	/* Get text associated with the token in printable form	*/
+	if	(text->factory == NULL)
+	{
+		return text;		// This usall ymeans it is the EOF token
+	}
 
     /* A new empty string to assemble all the stuff in
      */

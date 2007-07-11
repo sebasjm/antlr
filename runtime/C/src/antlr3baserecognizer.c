@@ -229,7 +229,14 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 	ex->line		= ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine			(ex->token);
 	ex->charPositionInLine	= ((pANTLR3_COMMON_TOKEN)(ex->token))->getCharPositionInLine	(ex->token);
 	ex->index		= cts->tstream->istream->index					(cts->tstream->istream);
-	ex->streamName		= ((pANTLR3_COMMON_TOKEN)(ex->token))->input->fileName;
+	if	(((pANTLR3_COMMON_TOKEN)(ex->token))->type == ANTLR3_TOKEN_EOF)
+	{
+		ex->streamName		= NULL;
+	}
+	else
+	{
+		ex->streamName		= ((pANTLR3_COMMON_TOKEN)(ex->token))->input->fileName;
+	}
 	ex->message		= "Unexpected token";
 	break;
 
@@ -671,9 +678,16 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 
     // See if there is a 'filename' we can use
     //
-    if	(ex->name == NULL)
+    if	(ex->streamName == NULL)
     {
-	fprintf(stderr, "-unknown source-(");
+		if	(((pANTLR3_COMMON_TOKEN)(ex->token))->type == ANTLR3_TOKEN_EOF)
+		{
+			fprintf(stderr, "-end of input-(");
+		}
+		else
+		{
+			fprintf(stderr, "-unknown source-(");
+		}
     }
     else
     {

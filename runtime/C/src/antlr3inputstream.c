@@ -8,12 +8,13 @@
  */
 static	    void	    antlr3AsciiConsume		(pANTLR3_INT_STREAM is);
 static	    ANTLR3_UCHAR    antlr3AsciiLA		(pANTLR3_INT_STREAM is, ANTLR3_INT64 la);
-static	    ANTLR3_INT64    antlr3AsciiIndex		(pANTLR3_INT_STREAM is);
+static	    ANTLR3_UCHAR    antlr3AsciiLA_ucase	(pANTLR3_INT_STREAM is, ANTLR3_INT64 la);
+static	    ANTLR3_INT64    antlr3AsciiIndex	(pANTLR3_INT_STREAM is);
 static	    ANTLR3_UINT64   antlr3AsciiMark		(pANTLR3_INT_STREAM is);
 static	    void	    antlr3AsciiRewind		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
 static	    void	    antlr3AsciiRewindLast	(pANTLR3_INT_STREAM is);
 static	    void	    antlr3AsciiRelease		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
-static	    void	    antlr3AsciiSeek		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint);
+static	    void	    antlr3AsciiSeek			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint);
 
 /* ASCII Charstream API functions
  */
@@ -29,6 +30,7 @@ static	    ANTLR3_UINT32   antlr3AsciiGetCharPosition	(pANTLR3_INPUT_STREAM inpu
 static	    void	    antlr3AsciiSetLine		(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 line);
 static	    void	    antlr3AsciiSetCharPosition	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 position);
 static	    void	    antlr3AsciiSetNewLineChar	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 newlineChar);
+static		void		antlr3AsciiSetUcaseLA		(pANTLR3_INPUT_STREAM input, ANTLR3_BOOLEAN flag);
 
 /** \brief Common function to setup function interface for an 8 bit ASCII input stream.
  *
@@ -54,6 +56,7 @@ antlr3AsciiSetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
     antlr3GenericSetupStream(input, type);
 }
 
+
 void
 antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
 {
@@ -71,28 +74,29 @@ antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
 
     /* Intstream API
      */
-    input->istream->consume	    =  antlr3AsciiConsume;	    /* Consume the next 8 bit character in the buffer			    */
-    input->istream->_LA		    =  antlr3AsciiLA;		    /* Return the UTF32 character at offset n (1 based)			    */
-    input->istream->index	    =  antlr3AsciiIndex;	    /* Current index (offset from first character			    */
-    input->istream->mark	    =  antlr3AsciiMark;		    /* Record the current lex state for later restore			    */
-    input->istream->rewind	    =  antlr3AsciiRewind;	    /* How to rewind the input						    */
-    input->istream->rewindLast	    =  antlr3AsciiRewindLast;	    /* How to rewind the input						    */
-    input->istream->seek	    =  antlr3AsciiSeek;		    /* How to seek to a specific point in the stream			    */
-    input->istream->release	    =  antlr3AsciiRelease;	    /* Reset marks after mark n						    */
+    input->istream->consume			=  antlr3AsciiConsume;			/* Consume the next 8 bit character in the buffer			*/
+    input->istream->_LA				=  antlr3AsciiLA;				/* Return the UTF32 character at offset n (1 based)			*/
+    input->istream->index			=  antlr3AsciiIndex;			/* Current index (offset from first character			    */
+    input->istream->mark			=  antlr3AsciiMark;				/* Record the current lex state for later restore			*/
+    input->istream->rewind			=  antlr3AsciiRewind;			/* How to rewind the input									*/
+    input->istream->rewindLast		=  antlr3AsciiRewindLast;		/* How to rewind the input									*/
+    input->istream->seek			=  antlr3AsciiSeek;				/* How to seek to a specific point in the stream		    */
+    input->istream->release			=  antlr3AsciiRelease;			/* Reset marks after mark n									*/
 
     /* Charstream API
      */
-    input->close		    =  antlr3InputClose;	    /* Close down the stream completely					    */
-    input->reset		    =  antlr3InputReset;	    /* Reset input to start						    */
-    input->_LT			    =  antlr3AsciiLT;		    /* Same as _LA for 8 bit Ascii file					    */
-    input->size			    =  antlr3AsciiSize;		    /* Return the size of the input buffer				    */
-    input->substr		    =  antlr3AsciiSubstr;	    /* Return a string from the input stream				    */
-    input->getLine		    =  antlr3AsciiGetLine;	    /* Return the current line number in the input stream		    */
-    input->getLineBuf		    =  antlr3AsciiGetLineBuf;	    /* Return a pointer to the start of the current line being consumed	    */
-    input->getCharPositionInLine    =  antlr3AsciiGetCharPosition;  /* Return the offset into the current line of input			    */
-    input->setLine		    =  antlr3AsciiSetLine;	    /* Set the input stream line number (does not set buffer pointers)	    */
+    input->close					=  antlr3InputClose;			/* Close down the stream completely										*/
+    input->reset					=  antlr3InputReset;			/* Reset input to start													*/
+    input->_LT						=  antlr3AsciiLT;				/* Same as _LA for 8 bit Ascii file										*/
+    input->size						=  antlr3AsciiSize;				/* Return the size of the input buffer									*/
+    input->substr					=  antlr3AsciiSubstr;			/* Return a string from the input stream								*/
+    input->getLine					=  antlr3AsciiGetLine;			/* Return the current line number in the input stream					*/
+    input->getLineBuf				=  antlr3AsciiGetLineBuf;	    /* Return a pointer to the start of the current line being consumed	    */
+    input->getCharPositionInLine    =  antlr3AsciiGetCharPosition;  /* Return the offset into the current line of input						*/
+    input->setLine					=  antlr3AsciiSetLine;			/* Set the input stream line number (does not set buffer pointers)	    */
     input->setCharPositionInLine    =  antlr3AsciiSetCharPosition;  /* Set the offset in to the current line (does not set any pointers	)   */
-    input->SetNewLineChar	    =  antlr3AsciiSetNewLineChar;   /* Set the value of the newline trigger character			    */
+    input->SetNewLineChar			=  antlr3AsciiSetNewLineChar;   /* Set the value of the newline trigger character						*/
+	input->setUcaseLA				= antlr3AsciiSetUcaseLA;
 
     /* Initialize entries for tables etc
      */
@@ -147,6 +151,24 @@ antlr3InputClose(pANTLR3_INPUT_STREAM input)
     /* Done
      */
 }
+
+static void		
+antlr3AsciiSetUcaseLA		(pANTLR3_INPUT_STREAM input, ANTLR3_BOOLEAN flag)
+{
+	if	(flag)
+	{
+		// Return the upper case version of the characters
+		//
+		input->istream->_LA		    =  antlr3AsciiLA_ucase;
+	}
+	else
+	{
+		// Return the raw characters as they are in the buffer
+		//
+		input->istream->_LA		    =  antlr3AsciiLA;
+	}
+}
+
 
 /** \brief Reset a re-startable input stream to the start
  *
@@ -217,18 +239,46 @@ static ANTLR3_UCHAR
 antlr3AsciiLA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
 {
     pANTLR3_INPUT_STREAM input;
-
+	
     input   = ((pANTLR3_INPUT_STREAM) (is->super));
 
     if	(( ((pANTLR3_UINT8)input->nextChar) + la - 1) >= (((pANTLR3_UINT8)input->data) + input->sizeBuf))
     {
-	return	ANTLR3_CHARSTREAM_EOF;
+		return	ANTLR3_CHARSTREAM_EOF;
     }
     else
     {
-	return	(ANTLR3_UCHAR)(*((pANTLR3_UINT8)input->nextChar + la - 1));
+		return	(ANTLR3_UCHAR)(*((pANTLR3_UINT8)input->nextChar + la - 1));
     }
 }
+
+/** \brief Return the input element assuming an 8 bit ASCII input and
+ *         always return the UPPER CASE character.
+ *		   Note that this is 8 bit and so we assume that the toupper
+ *		   function will use the correct locale for 8 bits.
+ *
+ * \param[in] input Input stream context pointer
+ * \param[in] la 1 based offset of next input stream element
+ *
+ * \return Next input character in internal ANTLR3 encoding (UTF32)
+ */
+static ANTLR3_UCHAR
+antlr3AsciiLA_ucase	(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
+{
+    pANTLR3_INPUT_STREAM input;
+	
+    input   = ((pANTLR3_INPUT_STREAM) (is->super));
+
+    if	(( ((pANTLR3_UINT8)input->nextChar) + la - 1) >= (((pANTLR3_UINT8)input->data) + input->sizeBuf))
+    {
+		return	ANTLR3_CHARSTREAM_EOF;
+    }
+    else
+    {
+		return	(ANTLR3_UCHAR)toupper((*((pANTLR3_UINT8)input->nextChar + la - 1)));
+    }
+}
+
 
 /** \brief Return the input element assuming an 8 bit ascii input
  *

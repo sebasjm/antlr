@@ -647,7 +647,10 @@ ANTLR3_API p<name> <name>New         (pANTLR3_COMMON_TREE_NODE_STREAM     instre
 #undef	Tokens
 #endif 
 <tokens:{#define <it.name>      <it.type>}; separator="\n">
-
+#ifdef	EOF
+#undef	EOF
+#define	EOF	ANTLR3_TOKEN_EOF
+#endif
 
 /* End of token definitions for <name>
  * =============================================================================
@@ -1271,7 +1274,7 @@ lexerSynpred(predname) ::= <<
 
 ruleMemoization(name) ::= <<
 <if(memoize)>
-if ( BACKTRACKING>0 && HAVEPARSEDRULE(<ruleDescriptor.index>) )
+if ( (BACKTRACKING>0) && (HAVEPARSEDRULE(<ruleDescriptor.index>)) )
 {
     return <ruleReturnValue()>; 
 }
@@ -1366,7 +1369,7 @@ static <returnType()>
 catch(decl,action) ::= <<
 /* catch(decl,action)
  */
-if  (HASEXCEPTION() && EXCEPTION->type == <e.decl> )
+if  ((HASEXCEPTION()) && (EXCEPTION->type == <e.decl>) )
 {
     <e.action>
 }
@@ -1513,10 +1516,9 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
  *
  * $ANTLR start <ruleName>
  *
- * Looks to match the chracters the constitute the token <ruleName>
+ * Looks to match the characters the constitute the token <ruleName>
  * from the attached input stream.
  *
-
  *
  * \remark
  *  - lexer->error == ANTLR3_TRUE if an exception was thrown.
@@ -2271,7 +2273,7 @@ break;
  *  state to jump to next if successful.
  */
 cyclicDFAEdge(labelExpr, targetStateNumber, edgeNumber, predicates) ::= <<
-if ( <labelExpr> <if(predicates)>&& <predicates><endif>)
+if ( (<labelExpr>) <if(predicates)>&& (<predicates>)<endif>)
 {
     s = <targetStateNumber>;
 }<\n>
@@ -2287,9 +2289,9 @@ eotDFAEdge(targetStateNumber,edgeNumber, predicates) ::= <<
 
 // D F A  E X P R E S S I O N S
 
-andPredicates(left,right) ::= "( <left> && <right> )"
+andPredicates(left,right) ::= "( (<left>) && (<right>) )"
 
-orPredicates(operands) ::= "(<first(operands)><rest(operands):{o | ||<o>}>)"
+orPredicates(operands) ::= "((<first(operands)>)<rest(operands):{o | ||(<o>)}>)"
 
 notPredicate(pred) ::= "!( <evalPredicate(...)> )"
 
@@ -2305,10 +2307,10 @@ lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber> == <atom>"
 isolatedLookaheadTest(atom,k,atomAsInt) ::= "LA(<k>) == <atom>"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
-(LA<decisionNumber>_<stateNumber> \>= <lower> && LA<decisionNumber>_<stateNumber> \<= <upper>)
+((LA<decisionNumber>_<stateNumber> \>= <lower>) && (LA<decisionNumber>_<stateNumber>) \<= <upper>)
 >>
 
-isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "(LA(<k>) \>= <lower> && LA(<k>) \<= <upper>)"
+isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "((LA(<k>) \>= <lower>) && (LA(<k>) \<= <upper>))"
 
 setTest(ranges) ::= "<ranges; separator=\" || \">"
 
