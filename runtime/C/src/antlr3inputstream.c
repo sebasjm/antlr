@@ -455,7 +455,7 @@ antlr3AsciiRelease	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
  * \remark
  * Assumes ASCII (or at least, 8 Bit) input stream.
  */
-static ANTLR3_INLINE void
+static void
 antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
 {
     ANTLR3_INT64   count;
