@@ -609,7 +609,7 @@ typedef struct <name>_Ctx_struct
     unsigned char * (*getGrammarFileName)();
     void	    (*free)   (struct <name>_Ctx_struct * ctx);
     <@members>
-
+<actions.(actionScope).context>
     <@end>
 }
     <name>, * p<name>;
