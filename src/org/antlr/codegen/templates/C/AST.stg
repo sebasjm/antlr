@@ -553,7 +553,7 @@ root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<token>->next(stream_<tok
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
 <if(args)>
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, ADAPTOR->createTypeTokenText(ADAPTOR, <token>, TOKTTEXT(<args; separator=", ">)));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, ADAPTOR->createTypeTokenText(ADAPTOR, <token>, TOKTEXT(<args; separator=", ">)));<\n>
 <else>
 ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, ADAPTOR->createTypeText(ADAPTOR, <token>, (pANTLR3_UINT8)"<token>"));<\n>
 <endif>
