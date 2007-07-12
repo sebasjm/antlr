@@ -1942,6 +1942,10 @@ public class Grammar {
 			new StringBuffer().append(line + ":").append(col).toString());
 	}
 
+	public Map getLineColumnToLookaheadDFAMap() {
+		return lineColumnToLookaheadDFAMap;
+	}
+
 	/*
 	public void setDecisionOptions(int decision, Map options) {
 		Decision d = createDecision(decision);

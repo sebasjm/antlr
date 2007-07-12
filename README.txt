@@ -123,6 +123,10 @@ http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
 CHANGES
 
+July 12, 2007
+
+* added get method for the line/col to DFA map in Grammar.java
+
 July 7, 2007
 
 * fixed wrong order of test for exceptions in Lexer.getErrorMessage()
