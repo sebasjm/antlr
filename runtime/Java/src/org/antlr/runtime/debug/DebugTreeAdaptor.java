@@ -51,6 +51,9 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public void addChild(Object t, Object child) {
+		if ( t==null || child==null ) {
+			return;
+		}
 		adaptor.addChild(t,child);
 		dbg.addChild(adaptor.getUniqueID(t), adaptor.getUniqueID(child));
 	}

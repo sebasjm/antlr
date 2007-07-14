@@ -23,7 +23,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 *  ASTs.
 	 */
 	public void addChild(Object t, Object child) {
-		if ( t!=null ) {
+		if ( t!=null && child!=null ) {
 			((Tree)t).addChild((Tree)child);
 		}
 	}

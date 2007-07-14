@@ -67,7 +67,7 @@ public interface TreeAdaptor {
 	 *  and child isNil then you can decide it is ok to move children to t via
 	 *  t.children = child.children; i.e., without copying the array.  Just
 	 *  make sure that this is consistent with have the user will build
-	 *  ASTs.
+	 *  ASTs.  Do nothing if t or child is null.
 	 */
 	public void addChild(Object t, Object child);
 

@@ -123,6 +123,12 @@ http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
 CHANGES
 
+July 14, 2007
+
+* null child in TreeAdaptor does nothing now.  Changed interface and
+  implementation.  Changed DebugTreeAdaptor to not fire events on null add
+  as well.
+
 July 12, 2007
 
 * added get method for the line/col to DFA map in Grammar.java
