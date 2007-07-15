@@ -55,6 +55,7 @@ public class TreeWizard {
 	protected Map tokenNameToTypeMap;
 
 	public interface ContextVisitor {
+		// TODO: should this be called visit or something else?
 		public void visit(Object t, Object parent, int childIndex, Map labels);
 	}
 
@@ -206,6 +207,14 @@ public class TreeWizard {
 			}
 		});
 		return subtrees;
+	}
+
+	public Object findFirst(Object t, int ttype) {
+		return null;
+	}
+
+	public Object findFirst(Object t, String pattern) {
+		return null;
 	}
 
 	/** Visit every ttype node in t, invoking the visitor.  This is a quicker
