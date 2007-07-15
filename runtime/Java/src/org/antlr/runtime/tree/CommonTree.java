@@ -70,7 +70,10 @@ public class CommonTree extends BaseTree {
 	}
 
 	public String getText() {
-		return toString();
+		if ( token==null ) {
+			return null;
+		}
+		return token.getText();
 	}
 
 	public int getLine() {

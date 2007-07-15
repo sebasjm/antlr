@@ -19,8 +19,11 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	 *  I could use reflection to prevent having to override this
 	 *  but reflection is slow.
 	 */
-	public Object dupNode(Object treeNode) {
-		return ((Tree)treeNode).dupNode();
+	public Object dupNode(Object t) {
+		if ( t==null ) {
+			return null;
+		}
+		return ((Tree)t).dupNode();
 	}
 
 	public Object create(Token payload) {
@@ -79,14 +82,23 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	}
 
 	public int getTokenStartIndex(Object t) {
+		if ( t==null ) {
+			return -1;
+		}
 		return ((Tree)t).getTokenStartIndex();
 	}
 
 	public int getTokenStopIndex(Object t) {
+		if ( t==null ) {
+			return -1;
+		}
 		return ((Tree)t).getTokenStopIndex();
 	}
 
 	public String getText(Object t) {
+		if ( t==null ) {
+			return null;
+		}
 		return ((Tree)t).getText();
 	}
 
@@ -109,10 +121,16 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	}
 
 	public Object getChild(Object t, int i) {
+		if ( t==null ) {
+			return null;
+		}
         return ((Tree)t).getChild(i);
     }
 
     public int getChildCount(Object t) {
+		if ( t==null ) {
+			return 0;
+		}
         return ((Tree)t).getChildCount();
     }
 
