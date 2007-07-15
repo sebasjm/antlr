@@ -123,6 +123,10 @@ http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
 CHANGES
 
+July 15, 2007
+
+* added null ptr protection in CommonTreeAdaptor.
+
 July 14, 2007
 
 * null child in TreeAdaptor does nothing now.  Changed interface and
