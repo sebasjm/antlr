@@ -60,18 +60,18 @@ public class BlankDebugEventListener implements DebugEventListener {
 
 	// Tree parsing stuff
 
-	public void consumeNode(int ID, String text, int type) {}
-	public void LT(int i, int ID, String text, int type) {}
+	public void consumeNode(Object t) {}
+	public void LT(int i, Object t) {}
 
 	// AST Stuff
 
-	public void nilNode(int ID) {}
+	public void nilNode(Object t) {}
 	//public void setSubTreeRoot(String name, int ID) {}
-	public void createNode(int ID, String text, int type) {}
-	public void createNode(int ID, int tokenIndex) {}
-	public void becomeRoot(int newRootID, int oldRootID) {}
-	public void addChild(int rootID, int childID) {}
-	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex) {}
+	public void createNode(Object t) {}
+	public void createNode(Object node, Token token) {}
+	public void becomeRoot(Object newRoot, Object oldRoot) {}
+	public void addChild(Object root, Object child) {}
+	public void setTokenBoundaries(Object t, int tokenStartIndex, int tokenStopIndex) {}
 }
 
 

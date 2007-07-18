@@ -52,21 +52,8 @@ public class DebugParser extends Parser {
 		this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT);
 	}
 
-	/** Create a proxy to marshall events across socket to another
-	 *  listener.  This constructor returns after handshaking with
-	 *  debugger so programmer does not have to manually invoke handshake.
-	 */
 	public DebugParser(TokenStream input, int port) {
 		super(new DebugTokenStream(input,null));
-		DebugEventSocketProxy proxy =
-			new DebugEventSocketProxy(getGrammarFileName(), port);
-		setDebugListener(proxy);
-		try {
-			proxy.handshake();
-		}
-		catch (IOException ioe) {
-			reportError(ioe);
-		}
 	}
 
 	/** Provide a new debug event listener for this parser.  Notify the
@@ -110,6 +97,7 @@ public class DebugParser extends Parser {
 										   BitSet follow)
 		throws RecognitionException
 	{
+		System.err.println("recoverFromMismatchedToken");
 		dbg.recognitionException(mte);
 		super.recoverFromMismatchedToken(input,mte,ttype,follow);
 	}

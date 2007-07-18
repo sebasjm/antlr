@@ -197,62 +197,62 @@ public class DebugEventHub implements DebugEventListener {
 
 	// Tree parsing stuff
 
-	public void consumeNode(int ID, String text, int type) {
+	public void consumeNode(Object t) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.consumeNode(ID, text, type);
+			listener.consumeNode(t);
 		}
 	}
 
-	public void LT(int index, int ID, String text, int type) {
+	public void LT(int index, Object t) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.LT(index, ID, text, type);
+			listener.LT(index, t);
 		}
 	}
 
 
 	// AST Stuff
 
-	public void nilNode(int ID) {
+	public void nilNode(Object t) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.nilNode(ID);
+			listener.nilNode(t);
 		}
 	}
 
-	public void createNode(int ID, String text, int type) {
+	public void createNode(Object t) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.createNode(ID, text, type);
+			listener.createNode(t);
 		}
 	}
 
-	public void createNode(int ID, int tokenIndex) {
+	public void createNode(Object node, Token token) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.createNode(ID, tokenIndex);
+			listener.createNode(node, token);
 		}
 	}
 
-	public void becomeRoot(int newRootID, int oldRootID) {
+	public void becomeRoot(Object newRoot, Object oldRoot) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.becomeRoot(newRootID, oldRootID);
+			listener.becomeRoot(newRoot, oldRoot);
 		}
 	}
 
-	public void addChild(int rootID, int childID) {
+	public void addChild(Object root, Object child) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.addChild(rootID, childID);
+			listener.addChild(root, child);
 		}
 	}
 
-	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex) {
+	public void setTokenBoundaries(Object t, int tokenStartIndex, int tokenStopIndex) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.setTokenBoundaries(ID, tokenStartIndex, tokenStopIndex);
+			listener.setTokenBoundaries(t, tokenStartIndex, tokenStopIndex);
 		}
 	}
 }

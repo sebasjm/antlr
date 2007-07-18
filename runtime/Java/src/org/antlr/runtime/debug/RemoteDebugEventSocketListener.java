@@ -29,6 +29,9 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.BaseTree;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.tool.ErrorManager;
 
 import java.io.*;
 import java.net.ConnectException;
@@ -60,6 +63,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		int line;
 		int charPos;
 		String text;
+		public ProxyToken(int index) { this.index = index; }		
 		public ProxyToken(int index, int type, int channel,
 						  int line, int charPos, String text)
 		{
@@ -108,10 +112,41 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		}
 		public String toString() {
 			String channelStr = "";
-			if ( channel>0 ) {
+			if ( channel!=Token.DEFAULT_CHANNEL ) {
 				channelStr=",channel="+channel;
 			}
-			return "["+getText()+"/<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+			return "["+getText()+"/<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+",@"+index+"]";
+		}
+	}
+
+	public static class ProxyTree extends BaseTree {
+		public int ID;
+		public int type;
+		public int line = 0;
+		public int charPos = -1;
+		public int tokenIndex = -1;
+		public String text;
+		
+		public ProxyTree(int ID, int type, int line, int charPos, int tokenIndex, String text) {
+			this.ID = ID;
+			this.type = type;
+			this.line = line;
+			this.charPos = charPos;
+			this.tokenIndex = tokenIndex;
+			this.text = text;
+		}
+
+		public ProxyTree(int ID) { this.ID = ID; }
+
+		public int getTokenStartIndex() { return tokenIndex; }
+		public void setTokenStartIndex(int index) {	}
+		public int getTokenStopIndex() { return 0; }
+		public void setTokenStopIndex(int index) { }
+		public Tree dupNode() {	return null; }
+		public int getType() { return type; }
+		public String getText() { return text; }
+		public String toString() {
+			return "fix this";
 		}
 	}
 
@@ -241,7 +276,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 							  Integer.parseInt(elements[2]));
 		}
 		else if ( elements[0].equals("consumeToken") ) {
-			Token t = deserializeToken(elements, 1);
+			ProxyToken t = deserializeToken(elements, 1);
 			if ( t.getTokenIndex() == previousTokenIndex ) {
 				tokenIndexesInvalid = true;
 			}
@@ -249,7 +284,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			listener.consumeToken(t);
 		}
 		else if ( elements[0].equals("consumeHiddenToken") ) {
-			Token t = deserializeToken(elements, 1);
+			ProxyToken t = deserializeToken(elements, 1);
 			if ( t.getTokenIndex() == previousTokenIndex ) {
 				tokenIndexesInvalid = true;
 			}
@@ -324,50 +359,71 @@ public class RemoteDebugEventSocketListener implements Runnable {
 									   predicateText);
 		}
 		else if ( elements[0].equals("consumeNode") ) {
-			String tokenText = elements[3];
-			tokenText = unEscapeNewlines(tokenText);
-			listener.consumeNode(Integer.parseInt(elements[1]),
-								 tokenText,
-								 Integer.parseInt(elements[2]));
+			ProxyTree node = deserializeNode(elements, 1);
+			listener.consumeNode(node);
 		}
 		else if ( elements[0].equals("LN") ) {
-			String tokenText = elements[4];
-			tokenText = unEscapeNewlines(tokenText);
-			listener.LT(Integer.parseInt(elements[1]),
-						Integer.parseInt(elements[2]),
-						tokenText,
-						Integer.parseInt(elements[3]));
+			int i = Integer.valueOf(elements[1]);
+			ProxyTree node = deserializeNode(elements, 2);
+			listener.LT(i, node);
 		}
-		else if ( elements[0].equals("createNodeFromToken") ) {
-			String tokenText = elements[3];
-			tokenText = unEscapeNewlines(tokenText);
-			listener.createNode(Integer.parseInt(elements[1]),
-								tokenText,
-								Integer.parseInt(elements[2]));
+		else if ( elements[0].equals("createNodeFromTokenElements") ) {
+			int ID = Integer.valueOf(elements[1]);
+			int type = Integer.valueOf(elements[2]);
+			String text = elements[3];
+			text = unEscapeNewlines(text);
+			ProxyTree node = new ProxyTree(ID, type, -1, -1, -1, text);
+			listener.createNode(node);
 		}
 		else if ( elements[0].equals("createNode") ) {
-			listener.createNode(Integer.parseInt(elements[1]),
-								Integer.parseInt(elements[2]));
+			int ID = Integer.valueOf(elements[1]);
+			int tokenIndex = Integer.valueOf(elements[2]);
+			// create dummy node/token filled with ID, tokenIndex
+			ProxyTree node = new ProxyTree(ID);
+			ProxyToken token = new ProxyToken(tokenIndex);
+			listener.createNode(node, token);
 		}
 		else if ( elements[0].equals("nilNode") ) {
-			listener.nilNode(Integer.parseInt(elements[1]));
+			int ID = Integer.valueOf(elements[1]);
+			ProxyTree node = new ProxyTree(ID);
+			listener.nilNode(node);
 		}
 		else if ( elements[0].equals("becomeRoot") ) {
-			listener.becomeRoot(Integer.parseInt(elements[1]),
-								Integer.parseInt(elements[2]));
+			int newRootID = Integer.valueOf(elements[1]);
+			int oldRootID = Integer.valueOf(elements[2]);
+			ProxyTree newRoot = new ProxyTree(newRootID);
+			ProxyTree oldRoot = new ProxyTree(oldRootID);
+			listener.becomeRoot(newRoot, oldRoot);
 		}
 		else if ( elements[0].equals("addChild") ) {
-			listener.addChild(Integer.parseInt(elements[1]),
-							  Integer.parseInt(elements[2]));
+			int rootID = Integer.valueOf(elements[1]);
+			int childID = Integer.valueOf(elements[2]);
+			ProxyTree root = new ProxyTree(rootID);
+			ProxyTree child = new ProxyTree(childID);
+			listener.addChild(root, child);
 		}
 		else if ( elements[0].equals("setTokenBoundaries") ) {
-			listener.setTokenBoundaries(Integer.parseInt(elements[1]),
-										Integer.parseInt(elements[2]),
-										Integer.parseInt(elements[3]));
+			int ID = Integer.valueOf(elements[1]);
+			ProxyTree node = new ProxyTree(ID);
+			listener.setTokenBoundaries(
+				node,
+				Integer.parseInt(elements[2]),
+				Integer.parseInt(elements[3]));
 		}
 		else {
 			System.err.println("unknown debug event: "+line);
 		}
+	}
+
+	protected ProxyTree deserializeNode(String[] elements, int offset) {
+		int ID = Integer.valueOf(elements[offset+0]);
+		int type = Integer.valueOf(elements[offset+1]);
+		int tokenLine = Integer.valueOf(elements[offset+2]);
+		int charPositionInLine = Integer.valueOf(elements[offset+3]);
+		int tokenIndex = Integer.valueOf(elements[offset+4]);
+		String text = elements[offset+5];
+		text = unEscapeNewlines(text);
+		return new ProxyTree(ID, type, tokenLine, charPositionInLine, tokenIndex, text);
 	}
 
 	protected ProxyToken deserializeToken(String[] elements,
@@ -422,6 +478,10 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			StringTokenizer st = new StringTokenizer(event, " \t", false);
 			int i = 0;
 			while ( st.hasMoreTokens() ) {
+				if ( i>=MAX_EVENT_ELEMENTS ) {
+					ErrorManager.internalError("event has more than "+MAX_EVENT_ELEMENTS+" args: "+event);
+					return elements;
+				}
 				elements[i] = st.nextToken();
 				i++;
 			}

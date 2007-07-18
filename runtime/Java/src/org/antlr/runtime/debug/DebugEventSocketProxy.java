@@ -29,6 +29,8 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.tree.TreeAdaptor;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -49,16 +51,22 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 	protected PrintWriter out;
 	protected BufferedReader in;
 
-	public DebugEventSocketProxy() {
-		this(null, DEFAULT_DEBUGGER_PORT);
+	/** Who am i debugging? */
+	protected BaseRecognizer recognizer;
+
+	/** Almost certainly the recognizer will have adaptor set, but
+	 *  we don't know how to cast it (Parser or TreeParser) to get
+	 *  the adaptor field.  Must be set with a constructor. :(
+	 */
+	protected TreeAdaptor adaptor;
+
+	public DebugEventSocketProxy(BaseRecognizer recognizer, TreeAdaptor adaptor) {
+		this(recognizer, DEFAULT_DEBUGGER_PORT, adaptor);
 	}
 
-	public DebugEventSocketProxy(String grammarFileName) {
-		this(grammarFileName, DEFAULT_DEBUGGER_PORT);
-	}
-
-	public DebugEventSocketProxy(String grammarFileName, int port) {
-		this.grammarFileName = grammarFileName;
+	public DebugEventSocketProxy(BaseRecognizer recognizer, int port, TreeAdaptor adaptor) {
+		this.grammarFileName = recognizer.getGrammarFileName();
+		this.adaptor = adaptor;
 		this.port = port;
 	}
 
@@ -200,75 +208,99 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 	}
 
 	public void semanticPredicate(boolean result, String predicate) {
-		predicate = escapeNewlines(predicate);
 		StringBuffer buf = new StringBuffer(50);
 		buf.append("semanticPredicate ");
 		buf.append(result);
-		buf.append(" ");
-		buf.append(predicate);
+		serializeText(buf, predicate);
 		transmit(buf.toString());
 	}
 
 	// A S T  P a r s i n g  E v e n t s
 
-	public void consumeNode(int ID, String text, int type) {
-		text = escapeNewlines(text);
+	public void consumeNode(Object t) {
 		StringBuffer buf = new StringBuffer(50);
-		buf.append("consumeNode ");
-		buf.append(ID);
-		buf.append(" ");
-		buf.append(type);
-		buf.append(" ");
-		buf.append(text);
+		buf.append("consumeNode");
+		serializeNode(buf, t);
 		transmit(buf.toString());
 	}
 
-	public void LT(int i, int ID, String text, int type) {
-		text = escapeNewlines(text);
+	public void LT(int i, Object t) {
+		int ID = adaptor.getUniqueID(t);
+		String text = adaptor.getText(t);
+		int type = adaptor.getType(t);
 		StringBuffer buf = new StringBuffer(50);
 		buf.append("LN "); // lookahead node; distinguish from LT in protocol
 		buf.append(i);
+		serializeNode(buf, t);
+		transmit(buf.toString());
+	}
+
+	protected void serializeNode(StringBuffer buf, Object t) {
+		int ID = adaptor.getUniqueID(t);
+		String text = adaptor.getText(t);
+		int type = adaptor.getType(t);
 		buf.append(" ");
 		buf.append(ID);
 		buf.append(" ");
 		buf.append(type);
+		Token token = adaptor.getToken(t);
+		int line = -1;
+		int pos = -1;
+		if ( token!=null ) {
+			line = token.getLine();
+			pos = token.getCharPositionInLine();
+		}
 		buf.append(" ");
-		buf.append(text);
-		transmit(buf.toString());
+		buf.append(line);
+		buf.append(" ");
+		buf.append(pos);
+		int tokenIndex = adaptor.getTokenStartIndex(t);
+		buf.append(" ");
+		buf.append(tokenIndex);
+		serializeText(buf, text);
 	}
 
 	
 	// A S T  E v e n t s
 
-	public void nilNode(int ID) {
+	public void nilNode(Object t) {
+		int ID = adaptor.getUniqueID(t);
 		transmit("nilNode "+ID);
 	}
 
-	public void createNode(int ID, String text, int type) {
-		text = escapeNewlines(text);
+	public void createNode(Object t) {
+		int ID = adaptor.getUniqueID(t);
+		String text = adaptor.getText(t);
+		int type = adaptor.getType(t);
 		StringBuffer buf = new StringBuffer(50);
-		buf.append("createNodeFromToken ");
+		buf.append("createNodeFromTokenElements ");
 		buf.append(ID);
 		buf.append(" ");
 		buf.append(type);
-		buf.append(" ");
-		buf.append(text);
+		serializeText(buf, text);
 		transmit(buf.toString());
 	}
 
-	public void createNode(int ID, int tokenIndex) {
+	public void createNode(Object node, Token token) {
+		int ID = adaptor.getUniqueID(node);
+		int tokenIndex = token.getTokenIndex();
 		transmit("createNode "+ID+" "+tokenIndex);
 	}
 
-	public void becomeRoot(int newRootID, int oldRootID) {
+	public void becomeRoot(Object newRoot, Object oldRoot) {
+		int newRootID = adaptor.getUniqueID(newRoot);
+		int oldRootID = adaptor.getUniqueID(oldRoot);
 		transmit("becomeRoot "+newRootID+" "+oldRootID);
 	}
 
-	public void addChild(int rootID, int childID) {
+	public void addChild(Object root, Object child) {
+		int rootID = adaptor.getUniqueID(root);
+		int childID = adaptor.getUniqueID(child);
 		transmit("addChild "+rootID+" "+childID);
 	}
 
-	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex) {
+	public void setTokenBoundaries(Object t, int tokenStartIndex, int tokenStopIndex) {
+		int ID = adaptor.getUniqueID(t);
 		transmit("setTokenBoundaries "+ID+" "+tokenStartIndex+" "+tokenStopIndex);
 	}
 
@@ -280,16 +312,20 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 		buf.append(t.getType()); buf.append(' ');
 		buf.append(t.getChannel()); buf.append(' ');
 		buf.append(t.getLine()); buf.append(' ');
-		buf.append(t.getCharPositionInLine()); buf.append(" \"");
-		String txt = t.getText();
-		if ( txt==null ) {
-			txt = "";
+		buf.append(t.getCharPositionInLine());
+		serializeText(buf, t.getText());
+		return buf.toString();
+	}
+
+	protected void serializeText(StringBuffer buf, String text) {
+		buf.append(" \"");
+		if ( text==null ) {
+			text = "";
 		}
 		// escape \n and \r all text for token appears to exist on one line
 		// this escape is slow but easy to understand
-		txt = escapeNewlines(txt);
-		buf.append(txt);
-		return buf.toString();
+		text = escapeNewlines(text);
+		buf.append(text);
 	}
 
 	protected String escapeNewlines(String txt) {

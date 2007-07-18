@@ -44,17 +44,17 @@ public class DebugEventRepeater implements DebugEventListener {
 
 	// Tree parsing stuff
 
-	public void consumeNode(int ID, String text, int type) { listener.consumeNode(ID, text, type); }
-	public void LT(int i, int ID, String text, int type) { listener.LT(i, ID, text, type); }
+	public void consumeNode(Object t) { listener.consumeNode(t); }
+	public void LT(int i, Object t) { listener.LT(i, t); }
 
 	// AST Stuff
 
-	public void nilNode(int ID) { listener.nilNode(ID); }
-	public void createNode(int ID, String text, int type) { listener.createNode(ID, text, type); }
-	public void createNode(int ID, int tokenIndex) { listener.createNode(ID, tokenIndex); }
-	public void becomeRoot(int newRootID, int oldRootID) { listener.becomeRoot(newRootID, oldRootID); }
-	public void addChild(int rootID, int childID) { listener.addChild(rootID, childID); }
-	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex) {
-		listener.setTokenBoundaries(ID, tokenStartIndex, tokenStopIndex);
+	public void nilNode(Object t) { listener.nilNode(t); }
+	public void createNode(Object t) { listener.createNode(t); }
+	public void createNode(Object node, Token token) { listener.createNode(node, token); }
+	public void becomeRoot(Object newRoot, Object oldRoot) { listener.becomeRoot(newRoot, oldRoot); }
+	public void addChild(Object root, Object child) { listener.addChild(root, child); }
+	public void setTokenBoundaries(Object t, int tokenStartIndex, int tokenStopIndex) {
+		listener.setTokenBoundaries(t, tokenStartIndex, tokenStopIndex);
 	}
 }

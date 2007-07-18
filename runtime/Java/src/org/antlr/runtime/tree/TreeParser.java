@@ -105,7 +105,8 @@ public class TreeParser extends BaseRecognizer {
 	 *  the input tree not the user.
 	 */
 	public String getErrorHeader(RecognitionException e) {
-		return getGrammarFileName()+": node from line "+e.line+":"+e.charPositionInLine;
+		return getGrammarFileName()+": node from "+
+			   (e.approximateLineInfo?"after ":"")+"line "+e.line+":"+e.charPositionInLine;
 	}
 
 	/** Tree parsers parse nodes they usually have a token object as

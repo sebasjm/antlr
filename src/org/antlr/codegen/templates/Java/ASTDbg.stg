@@ -32,13 +32,33 @@
 group ASTDbg;
 
 parserMembers() ::= <<
-protected TreeAdaptor adaptor =
-    new DebugTreeAdaptor(dbg,new CommonTreeAdaptor());
+protected DebugTreeAdaptor adaptor =
+	  new DebugTreeAdaptor(null,new CommonTreeAdaptor());
 public void setTreeAdaptor(TreeAdaptor adaptor) {
     this.adaptor = new DebugTreeAdaptor(dbg,adaptor);
 }
 public TreeAdaptor getTreeAdaptor() {
     return adaptor;
+}<\n>
+>>
+
+createListenerAndHandshake() ::= <<
+DebugEventSocketProxy proxy =
+    new DebugEventSocketProxy(this, port, adaptor);
+setDebugListener(proxy);
+adaptor.setDebugEventListener(proxy);
+try {
+    proxy.handshake();
+}
+catch (IOException ioe) {
+    reportError(ioe);
+}
+>>
+
+ctorForPredefinedListener() ::= <<
+public <name>(<inputStreamType> input, DebugEventListener dbg) {
+    super(input, dbg);
+    adaptor.setDebugEventListener(dbg);
 }<\n>
 >>
 

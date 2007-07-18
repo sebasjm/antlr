@@ -53,11 +53,15 @@ public class RewriteRuleTokenStream extends RewriteRuleElementStream {
 		super(adaptor, elementDescription, elements);
 	}
 
+	public Object next() {
+		return _next();
+	}
+
 	protected Object toTree(Object el) {
 		return adaptor.create((Token)el);
 	}
 
 	protected Object dup(Object el) {
-		return adaptor.create((Token)el);
+		throw new UnsupportedOperationException("dup can't be called for a token stream.");
 	}
 }

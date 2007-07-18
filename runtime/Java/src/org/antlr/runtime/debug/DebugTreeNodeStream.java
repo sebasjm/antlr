@@ -64,10 +64,7 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 	public void consume() {
 		Object node = input.LT(1);
 		input.consume();
-		int ID = adaptor.getUniqueID(node);
-		String text = adaptor.getText(node);
-		int type = adaptor.getType(node);
-		dbg.consumeNode(ID, text, type);
+		dbg.consumeNode(node);
 	}
 
 	public Object get(int i) {
@@ -79,7 +76,7 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 		int ID = adaptor.getUniqueID(node);
 		String text = adaptor.getText(node);
 		int type = adaptor.getType(node);
-		dbg.LT(i, ID, text, type);
+		dbg.LT(i, node);
 		return node;
 	}
 
@@ -88,7 +85,7 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 		int ID = adaptor.getUniqueID(node);
 		String text = adaptor.getText(node);
 		int type = adaptor.getType(node);
-		dbg.LT(i, ID, text, type);
+		dbg.LT(i, node);
 		return type;
 	}
 

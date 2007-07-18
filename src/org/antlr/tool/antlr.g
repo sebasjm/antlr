@@ -528,8 +528,8 @@ altList[Map opts]
 {
 	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
 	blkRoot.options = opts;
-	blkRoot.setLine(LT(1).getLine());
-	blkRoot.setColumn(LT(1).getColumn());
+	blkRoot.setLine(LT(0).getLine()); // set to : or (
+	blkRoot.setColumn(LT(0).getColumn());
 	GrammarAST save = currentBlockAST;
 	currentBlockAST = #blkRoot;
 }

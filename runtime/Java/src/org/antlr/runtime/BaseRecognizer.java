@@ -497,6 +497,7 @@ public abstract class BaseRecognizer {
 										   BitSet follow)
 		throws RecognitionException
 	{
+		System.err.println("BR.recoverFromMismatchedToken");		
 		// if next token is what we are looking for then "delete" this token
 		if ( input.LA(2)==ttype ) {
 			reportError(e);

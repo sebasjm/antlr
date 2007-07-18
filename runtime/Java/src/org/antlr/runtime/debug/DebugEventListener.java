@@ -236,14 +236,15 @@ public interface DebugEventListener {
 	 *  not implemented.  If the type is UP or DOWN, then
 	 *  the ID is not really meaningful as it's fixed--there is
 	 *  just one UP node and one DOWN navigation node.
+	 * @param t
 	 */
-	public void consumeNode(int ID, String text, int type);
+	public void consumeNode(Object t);
 
 	/** The tree parser lookedahead.  If the type is UP or DOWN,
 	 *  then the ID is not really meaningful as it's fixed--there is
 	 *  just one UP node and one DOWN navigation node.
 	 */
-	public void LT(int i, int ID, String text, int type);
+	public void LT(int i, Object t);
 
 
 	// A S T  E v e n t s
@@ -253,14 +254,27 @@ public interface DebugEventListener {
 	 *  seems to be uniquely triggered when starting a new subtree
 	 *  such as when entering a subrule in automatic mode and when
 	 *  building a tree in rewrite mode.
+     *
+ 	 *  If you are receiving this event over a socket via
+	 *  RemoteDebugEventSocketListener then only t.ID is set.
 	 */
-	public void nilNode(int ID);
+	public void nilNode(Object t);
 
-	/** Announce a new node built from text */
-	public void createNode(int ID, String text, int type);
+	/** Announce a new node built from token elements such as type etc...
+	 * 
+	 *  If you are receiving this event over a socket via
+	 *  RemoteDebugEventSocketListener then only t.ID, type, text are
+	 *  set.
+	 */
+	public void createNode(Object t);
 
-	/** Announce a new node built from an existing token */
-	public void createNode(int ID, int tokenIndex);
+	/** Announce a new node built from an existing token.
+	 *
+	 *  If you are receiving this event over a socket via
+	 *  RemoteDebugEventSocketListener then only node.ID and token.tokenIndex
+	 *  are set.
+	 */
+	public void createNode(Object node, Token token);
 
 	/** Make a node the new root of an existing root.  See
 	 *
@@ -272,16 +286,27 @@ public interface DebugEventListener {
 	 *  The listener should assume that this event occurs
 	 *  only when the current subrule (or rule) subtree is
 	 *  being reset to newRootID.
+	 * 
+	 *  If you are receiving this event over a socket via
+	 *  RemoteDebugEventSocketListener then only IDs are set.
 	 *
 	 *  @see org.antlr.runtime.tree.TreeAdaptor.becomeRoot()
 	 */
-	public void becomeRoot(int newRootID, int oldRootID);
+	public void becomeRoot(Object newRoot, Object oldRoot);
 
 	/** Make childID a child of rootID.
+	 *
+	 *  If you are receiving this event over a socket via
+	 *  RemoteDebugEventSocketListener then only IDs are set.
+	 * 
 	 *  @see org.antlr.runtime.tree.TreeAdaptor.addChild()
 	 */
-	public void addChild(int rootID, int childID);
+	public void addChild(Object root, Object child);
 
-	/** Set the token start/stop token index for a subtree root or node */
-	public void setTokenBoundaries(int ID, int tokenStartIndex, int tokenStopIndex);
+	/** Set the token start/stop token index for a subtree root or node.
+	 *
+	 *  If you are receiving this event over a socket via
+	 *  RemoteDebugEventSocketListener then only t.ID is set.
+	 */
+	public void setTokenBoundaries(Object t, int tokenStartIndex, int tokenStopIndex);
 }

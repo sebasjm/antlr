@@ -25,9 +25,9 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object create(Token payload) {
-		Object n = adaptor.create(payload);
-		dbg.createNode(adaptor.getUniqueID(n), payload.getTokenIndex());
-		return n;
+		Object node = adaptor.create(payload);
+		dbg.createNode(node, payload);
+		return node;
 	}
 
 	public Object dupTree(Object tree) {
@@ -41,9 +41,9 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object nil() {
-		Object n = adaptor.nil();
-		dbg.nilNode(adaptor.getUniqueID(n));
-		return n;
+		Object node = adaptor.nil();
+		dbg.nilNode(node);
+		return node;
 	}
 
 	public boolean isNil(Object tree) {
@@ -55,12 +55,12 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 			return;
 		}
 		adaptor.addChild(t,child);
-		dbg.addChild(adaptor.getUniqueID(t), adaptor.getUniqueID(child));
+		dbg.addChild(t, child);
 	}
 
 	public Object becomeRoot(Object newRoot, Object oldRoot) {
 		Object n = adaptor.becomeRoot(newRoot, oldRoot);
-		dbg.becomeRoot(adaptor.getUniqueID(n), adaptor.getUniqueID(oldRoot));
+		dbg.becomeRoot(newRoot, oldRoot);
 		return n;
 	}
 
@@ -76,26 +76,26 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	public Object becomeRoot(Token newRoot, Object oldRoot) {
 		Object n = this.create(newRoot);
 		adaptor.becomeRoot(n, oldRoot);
-		dbg.becomeRoot(adaptor.getUniqueID(n), adaptor.getUniqueID(oldRoot));
+		dbg.becomeRoot(newRoot, oldRoot);
 		return n;
 	}
 
 	public Object create(int tokenType, Token fromToken) {
-		Object n = adaptor.create(tokenType, fromToken);
-		dbg.createNode(adaptor.getUniqueID(n), fromToken.getText(), tokenType);
-		return n;
+		Object node = adaptor.create(tokenType, fromToken);
+		dbg.createNode(node);
+		return node;
 	}
 
 	public Object create(int tokenType, Token fromToken, String text) {
-		Object n = adaptor.create(tokenType, fromToken, text);
-		dbg.createNode(adaptor.getUniqueID(n), text, tokenType);
-		return n;
+		Object node = adaptor.create(tokenType, fromToken, text);
+		dbg.createNode(node);
+		return node;
 	}
 
 	public Object create(int tokenType, String text) {
-		Object n = adaptor.create(tokenType, text);
-		dbg.createNode(adaptor.getUniqueID(n), text, tokenType);
-		return n;
+		Object node = adaptor.create(tokenType, text);
+		dbg.createNode(node);
+		return node;
 	}
 
 	public int getType(Object t) {
@@ -121,9 +121,9 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	public void setTokenBoundaries(Object t, Token startToken, Token stopToken) {
 		adaptor.setTokenBoundaries(t, startToken, stopToken);
 		if ( t!=null && startToken!=null && stopToken!=null ) {
-			dbg.setTokenBoundaries(adaptor.getUniqueID(t),
-								   startToken.getTokenIndex(),
-								   stopToken.getTokenIndex());
+			dbg.setTokenBoundaries(
+				t, startToken.getTokenIndex(),
+				stopToken.getTokenIndex());
 		}
 	}
 
@@ -154,8 +154,11 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 		return dbg;
 	}
 
+	public void setDebugEventListener(DebugEventListener dbg) {
+		this.dbg = dbg;
+	}
+
 	public TreeAdaptor getTreeAdaptor() {
 		return adaptor;
 	}
-
 }

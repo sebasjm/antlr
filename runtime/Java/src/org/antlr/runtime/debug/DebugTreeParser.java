@@ -30,6 +30,7 @@ package org.antlr.runtime.debug;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.TreeParser;
 import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.runtime.tree.TreeAdaptor;
 
 import java.io.IOException;
 
@@ -54,21 +55,8 @@ public class DebugTreeParser extends TreeParser {
 		this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT);
 	}
 
-	/** Create a proxy to marshall events across socket to another
-	 *  listener.  This constructor returns after handshaking with
-	 *  debugger so programmer does not have to manually invoke handshake.
-	 */
 	public DebugTreeParser(TreeNodeStream input, int port) {
 		super(new DebugTreeNodeStream(input,null));
-		DebugEventSocketProxy proxy =
-			new DebugEventSocketProxy(getGrammarFileName(), port);
-		setDebugListener(proxy);
-		try {
-			proxy.handshake();
-		}
-		catch (IOException ioe) {
-			reportError(ioe);
-		}
 	}
 
 	/** Provide a new debug event listener for this parser.  Notify the
@@ -107,9 +95,9 @@ public class DebugTreeParser extends TreeParser {
 	}
 
 	public void recoverFromMismatchedToken(IntStream input,
-										   MismatchedTokenException mte,
+										   RecognitionException mte,
 										   int ttype,
-										   org.antlr.runtime.BitSet follow)
+										   BitSet follow)
 		throws RecognitionException
 	{
 		dbg.recognitionException(mte);

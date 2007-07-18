@@ -13,12 +13,6 @@ public class MismatchedTreeNodeException extends RecognitionException {
 
 	public MismatchedTreeNodeException(int expecting, TreeNodeStream input) {
 		super(input);
-		Tree t = (Tree)input.LT(1);
-		if ( input.LT(1) instanceof Tree ) {
-			line = t.getLine();
-			charPositionInLine = t.getCharPositionInLine();
-			// TODO: if DOWN/UP, there is no line info currently
-		}
 		this.expecting = expecting;
 	}
 

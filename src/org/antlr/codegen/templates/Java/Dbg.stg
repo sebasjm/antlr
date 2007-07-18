@@ -33,6 +33,7 @@ group Dbg;
 @outputFile.imports() ::= <<
 <@super.imports()>
 import org.antlr.runtime.debug.*;
+import java.io.IOException;
 >>
 
 @genericParser.members() ::= <<
@@ -48,15 +49,16 @@ public <name>(<inputStreamType> input, int port) {
         p.setParser(this);
 <else>
         super(input, port);
+        <createListenerAndHandshake()>
 <endif><\n>
 <if(memoize)>
         ruleMemo = new Map[<numRules>+1];<\n><! index from 1..n !>
 <endif>
 }
-
 public <name>(<inputStreamType> input) {
-        this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT);
+    this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT);
 }
+<ctorForPredefinedListener()>
 <if(profile)>
 public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
     ((Profiler)dbg).examineRuleMemoization(input, ruleIndex, ruleNames[ruleIndex]);
@@ -70,12 +72,32 @@ public void memoize(IntStream input,
     super.memoize(input, ruleIndex, ruleStartIndex);
 }<\n>
 <endif>
-public <name>(<inputStreamType> input, DebugEventListener dbg) {
-    super(input, dbg);
-}<\n>
 protected boolean evalPredicate(boolean result, String predicate) {
     dbg.semanticPredicate(result, predicate);
     return result;
+}<\n>
+>>
+
+createListenerAndHandshake() ::= <<
+<if(TREE_PARSER)>
+DebugEventSocketProxy proxy =
+    new DebugEventSocketProxy(this, port, input.getTreeAdaptor());
+<else>
+DebugEventSocketProxy proxy =
+    new DebugEventSocketProxy(this, port, null);
+<endif>
+setDebugListener(proxy);
+try {
+    proxy.handshake();
+}
+catch (IOException ioe) {
+    reportError(ioe);
+}
+>>
+
+ctorForPredefinedListener() ::= <<
+public <name>(<inputStreamType> input, DebugEventListener dbg) {
+    super(input, dbg);
 }<\n>
 >>
 

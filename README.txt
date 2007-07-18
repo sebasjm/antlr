@@ -123,6 +123,80 @@ http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
 CHANGES
 
+INCOMPATIBILITY WARNING -- templates have changed; must regen output from
+                           grammars.  Runtime libraries have also changed.
+                           Debug event listener interface has changed also.
+
+July 17, 2007
+
+* Added line/charposition to node socket events and event dump so
+  we have more info during tree parsing.  Only works if your
+  tree adaptor returns a value Token object from getToken(treenode)
+  with line/col set.  Refactored consumeNode/LN to use deserializeNode().
+
+* Fixed mismatched tree node exceptions; for imaginary nodes, it said
+  "missing null".  Now prints the token type we found.
+
+* Cleaned up exception stuff. MismatchedTreeNodeException was setting
+  line/col, but only RecognitionException should do that.
+
+* If imaginary token gets a mismatch, there is no line info.  Search
+  backwards in stream if input node stream supports to find last
+  node with good line/col info. E.g.,
+
+ANTLRv3Tree.g: node from after line 156:72 mismatched tree node: EOA expecting <UP>
+
+  which used to be:
+
+ANTLRv3Tree.g: node from line 0:0 mismatched tree node: null expecting <UP>
+
+* mismatched tree node exceptions were not sent to the debug event stream.
+  Due to a type being slightly different on recoverFromMismatchedToken()
+  in DebugTreeParser.  Was calling BaseRecognizer version not subclass.
+  Now we get:
+
+  9459:   Recognition exception MismatchedTreeNodeException(0!=0)
+
+* List labels were not allowed as root nodes in tree rewrites like
+  ^($listlabel ...).  Had to add a template to AST.stg:
+
+  /** Gen ^($label ...) where label+=... */
+  rewriteTokenListLabelRefRoot ::= rewriteTokenLabelRefRoot
+
+
+July 16, 2007
+
+* fixed nextNode in RewriteRuleSubtreeStream was dup'ing too much,
+  screwing up debug event stream.  Also there was a bug in how
+  the rewrite tree stream stuff decided to dup nodes.
+
+* fixed bug in LT for tree parsing; text was not transmitted properly;
+  only single words worked.
+
+* made decision for rule put line/col on colon not first token of first alt.
+
+* remote ProxyToken now emits token index for easier debugging when looking
+  at AW's event stream.  For example, the @5 here is the token index:
+
+  31	Consume hidden [ /<64>,channel=99,30:7, @5]
+
+* same is true for consume nodes now:
+
+  25586	Consume node [')'/, <44>, 4712040,@1749]	25
+
+  When debugging tree parsers, it helps to track errors when you know
+  what corresponding input symbol created this tree node.
+
+* Changed debug events associated with trees quite a bit.  Passes nodes around
+  now rather than text, type, unique IDs etc...  Mostly affects internal stuff.
+  Target developers will have some work in their runtime to do to match
+  this change. :(  BUT, there is only a slight tweak in the Dbg.stg
+  and ASTDbg.stg templates.
+  Interface just didn't make sense as is.  If you turn on debugging, and
+  want to track a node creation, you want the node pointer not its ID,
+  text, etc...
+  Added ProxyTree for passing across socket.  Has line/charpos and tokenIndex
+
 July 15, 2007
 
 * added null ptr protection in CommonTreeAdaptor.
