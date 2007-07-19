@@ -127,6 +127,11 @@ INCOMPATIBILITY WARNING -- templates have changed; must regen output from
                            grammars.  Runtime libraries have also changed.
                            Debug event listener interface has changed also.
 
+July 19, 2007
+
+* implemented new unique ID; GC was causing non unique hash codes.  Debugging
+  tree grammars was messing up.
+
 July 17, 2007
 
 * Added line/charposition to node socket events and event dump so
