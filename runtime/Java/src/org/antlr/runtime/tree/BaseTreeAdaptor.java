@@ -2,7 +2,17 @@ package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
 
+import java.util.Map;
+import java.util.HashMap;
+
 public abstract class BaseTreeAdaptor implements TreeAdaptor {
+	/** System.identityHashCode() is not always unique due to GC; we have to
+	 *  track ourselves.  That's ok, it's only for debugging, though it's
+	 *  expensive: we have to create a hashtable with all tree nodes in it.
+	 */
+	protected Map treeToUniqueIDMap;
+	protected int uniqueNodeID = 1;
+
 	public Object nil() {
 		return create(null);
 	}
@@ -136,7 +146,19 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	public int getUniqueID(Object node) {
-		return System.identityHashCode(node);
+		if ( treeToUniqueIDMap==null ) {
+			 treeToUniqueIDMap = new HashMap();
+		}
+		Integer prevID = (Integer)treeToUniqueIDMap.get(node);
+		if ( prevID!=null ) {
+			return prevID.intValue();
+		}
+		int ID = uniqueNodeID;
+		treeToUniqueIDMap.put(node, new Integer(ID));
+		uniqueNodeID++;
+		return ID;
+		// GC makes these nonunique:
+		// return System.identityHashCode(node);
 	}
 
 	/** Tell me how to create a token for use with imaginary token nodes.
