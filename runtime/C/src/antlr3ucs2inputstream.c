@@ -123,7 +123,7 @@ antlr3UCS2Index(pANTLR3_INT_STREAM is)
 
     input   = ((pANTLR3_INPUT_STREAM) (is->super));
 
-    return  (ANTLR3_INT64)(((pANTLR3_UINT16)input->nextChar) - ((pANTLR3_UINT16)input->data));
+    return  (ANTLR3_INT64)(((pANTLR3_UINT16)input->nextChar));
 }
 
 /** \brief Rewind the lexer input to the state specified by the supplied mark.
@@ -136,28 +136,28 @@ antlr3UCS2Index(pANTLR3_INT_STREAM is)
 static void
 antlr3UCS2Seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
 {
-    ANTLR3_INT64   count;
-    pANTLR3_INPUT_STREAM input;
+	ANTLR3_INT64   count;
+	pANTLR3_INPUT_STREAM input;
 
-    input   = ((pANTLR3_INPUT_STREAM) is->super);
+	input   = ((pANTLR3_INPUT_STREAM) is->super);
 
-    /* If the requested seek point is less than the current
-     * input point, then we assume that we are reseting from a mark
-     * and do not need to scan, but can just set to there.
-     */
-    if	(seekPoint <= ANTLR3_UINT64_CAST(input->nextChar))
-    {
-	input->nextChar	= ((pANTLR3_UINT16) seekPoint);
-    }
-    else
-    {
-	count	= seekPoint - ANTLR3_UINT64_CAST(((pANTLR3_UINT16)(input->nextChar)));
-
-	while (count--)
+	/* If the requested seek point is less than the current
+	 * input point, then we assume that we are reseting from a mark
+	 * and do not need to scan, but can just set to there.
+	 */
+	if	(seekPoint <= ANTLR3_UINT64_CAST(input->nextChar))
 	{
-	    is->consume(is);
+		input->nextChar	= ((pANTLR3_UINT16) seekPoint);
 	}
-    }
+	else
+	{
+		count	= seekPoint - ANTLR3_UINT64_CAST(((pANTLR3_UINT16)(input->nextChar)));
+
+		while (count--)
+		{
+			is->consume(is);
+		}
+	}
 }
 /** \brief Retrun a substring of the ucs2 (16 bit) input stream in
  *  newly allocated memory.
@@ -169,5 +169,5 @@ antlr3UCS2Seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
 static pANTLR3_STRING
 antlr3UCS2Substr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 start, ANTLR3_INT64 stop)
 {
-    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)((pANTLR3_UINT16)(input->data)+start), (ANTLR3_UINT32)(stop - start + 1));
+    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)(start), (ANTLR3_UINT32)(((stop - start)/2) + 1));
 }

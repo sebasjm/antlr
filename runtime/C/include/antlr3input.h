@@ -87,6 +87,10 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
      */
     pANTLR3_STRING	fileName;
 
+	/** File number, needs to be set manually to some file index of your devising.
+	 */
+	ANTLR3_UINT32	fileNo;
+
     /** Character that automatically causes an internal line count
      *  increment.
      */

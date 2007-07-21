@@ -24,7 +24,7 @@ static	pANTLR3_BASE_TREE	createTypeText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANT
 static	ANTLR3_UINT32		getType			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	void			setType			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type);
 static	pANTLR3_STRING		getText			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	void			setText			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
+static	void			setText			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_STRING t);
 static	void			setText8		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
 static	pANTLR3_BASE_TREE	getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT64 i);
 static	pANTLR3_UINT64		getChildCount		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
@@ -282,7 +282,7 @@ static	pANTLR3_STRING
 /** Dummy implementation - will be supplied by super class
  */
 static	void		
-   setText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t)
+   setText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_STRING t)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
 }

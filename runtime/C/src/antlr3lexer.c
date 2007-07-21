@@ -360,7 +360,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 	{
 		ANTLR3_INT32	width;
 
-		width	= (ANTLR3_INT32)(lexer->input->size(lexer->input)) - (ANTLR3_INT32)(ex->index);
+		width	= (ANTLR3_INT32)(ANTLR3_INT64)(((pANTLR3_UINT8)(lexer->input->data)+(lexer->input->size(lexer->input))) - (ANTLR3_INT32)(ex->index));
 
 		if	(width >= 1)
 		{			
@@ -372,7 +372,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 			{
 				fprintf(stderr, "near char(%#02X) :\n", (ANTLR3_UINT8)(ex->c));
 			}
-			fprintf(stderr, "\t%.*s\n", width > 20 ? 20 : width ,((pANTLR3_UINT8)(lexer->input->data) + ex->index));
+			fprintf(stderr, "\t%.*s\n", width > 20 ? 20 : width ,((pANTLR3_UINT8)ex->index));
 		}
 		else
 		{
@@ -381,11 +381,11 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 								(ANTLR3_UINT32)(lexer->tokenStartLine),
 								(ANTLR3_UINT32)(lexer->tokenStartCharPositionInLine)
 								);
-			width = (ANTLR3_INT32)(lexer->input->size(lexer->input)) - (ANTLR3_INT32)(lexer->tokenStartCharIndex);
+			width = (ANTLR3_INT32)(ANTLR3_INT64)(((pANTLR3_UINT8)(lexer->input->data)+(lexer->input->size(lexer->input))) - (ANTLR3_INT32)(lexer->tokenStartCharIndex));
 
 			if	(width >= 1)
 			{
-				fprintf(stderr, "looks like this:\n\t\t%.*s\n", width > 20 ? 20 : width ,((pANTLR3_UINT8)(lexer->input->data) + (ANTLR3_INT32)(lexer->tokenStartCharIndex)));
+				fprintf(stderr, "looks like this:\n\t\t%.*s\n", width > 20 ? 20 : width ,(pANTLR3_UINT8)(lexer->tokenStartCharIndex));
 			}
 			else
 			{
@@ -557,9 +557,13 @@ emit	    (pANTLR3_LEXER lexer)
     token->start	    = lexer->tokenStartCharIndex;
     token->stop		    = lexer->getCharIndex(lexer) - 1;
     token->line		    = lexer->tokenStartLine;
-    token->charPosition	    = lexer->tokenStartCharPositionInLine;
+    token->charPosition	= lexer->tokenStartCharPositionInLine;
     token->text		    = lexer->text;
-    token->lineStart	    = lexer->input->currentLine;
+    token->lineStart	= lexer->input->currentLine;
+	token->user1		= lexer->user1;
+	token->user2		= lexer->user2;
+	token->user3		= lexer->user3;
+	token->custom		= lexer->custom;
 
     lexer->token	    = token;
 
@@ -572,22 +576,26 @@ emit	    (pANTLR3_LEXER lexer)
 static void 
 freeLexer    (pANTLR3_LEXER lexer)
 {
-    if	(lexer->tokFactory != NULL)
-    {
-	lexer->tokFactory->close(lexer->tokFactory);
-	lexer->tokFactory = NULL;
-    }
-    if	(lexer->tokSource != NULL)
-    {
-	ANTLR3_FREE(lexer->tokSource);
-	lexer->tokSource = NULL;
-    }
-    if	(lexer->rec != NULL)
-    {
-	lexer->rec->free(lexer->rec);
-	lexer->rec = NULL;
-    }
-    ANTLR3_FREE(lexer);
+	if	(lexer->streams != NULL)
+	{
+		lexer->streams->free(lexer->streams);
+	}
+	if	(lexer->tokFactory != NULL)
+	{
+		lexer->tokFactory->close(lexer->tokFactory);
+		lexer->tokFactory = NULL;
+	}
+	if	(lexer->tokSource != NULL)
+	{
+		ANTLR3_FREE(lexer->tokSource);
+		lexer->tokSource = NULL;
+	}
+	if	(lexer->rec != NULL)
+	{
+		lexer->rec->free(lexer->rec);
+		lexer->rec = NULL;
+	}
+	ANTLR3_FREE(lexer);
 }
 
 /** Implementation of matchs for the lexer, overrides any

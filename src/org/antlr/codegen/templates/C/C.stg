@@ -122,7 +122,7 @@ outputFile( LEXER,
  * Include the ANTLR3 generated header file.
  */
 #include    "<name>.h"
-
+<actions.(actionScope).postinclude>
 /* ----------------------------------------- */
 
 <docComment>
@@ -200,6 +200,8 @@ outputFile( LEXER,
 #undef		SEEK
 #undef		PUSHSTREAM
 #undef		POPSTREAM
+#undef		SETTEXT
+#undef		SETTEXT8
 
 #define	    LEXER					ctx->pLexer
 #define	    RECOGNIZER			    LEXER->rec
@@ -234,6 +236,11 @@ outputFile( LEXER,
 #define		HAVEPARSEDRULE(r)		RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 #define		PUSHSTREAM(str)			LEXER->pushCharStream(LEXER, str)
 #define		POPSTREAM()				LEXER->popCharStream(LEXER)
+#define		SETTEXT(str)			LEXER->text = str
+#define		USER1					LEXER->user1
+#define		USER2					LEXER->user2
+#define		USER3					LEXER->user3
+#define		CUSTOM					LEXER->custom
 
 /* If we have been told we can rely on the standard 8 bit or 16 bit input
  * stream, then we can define our macros to use the direct pointers
@@ -537,7 +544,7 @@ has the callable functions (rules) shown below,
 /* End of standard antlr 3 runtime definitions
  * =============================================================================
  */
-<actions.(actionScope).includes>
+ <actions.(actionScope).includes>
 <actions.(actionScope).header>
 
 #ifdef	WIN32
@@ -1276,6 +1283,11 @@ ruleMemoization(name) ::= <<
 <if(memoize)>
 if ( (BACKTRACKING>0) && (HAVEPARSEDRULE(<ruleDescriptor.index>)) )
 {
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<if(!ruleDescriptor.isSynPred)>
+	retval.start = 0;<\n>
+<endif>
+<endif>
     return <ruleReturnValue()>; 
 }
 <endif>
@@ -1319,10 +1331,10 @@ static <returnType()>
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
-    <ruleMemoization(name=ruleName)>
-    <ruleInitializations()>
-    <ruleLabelInitializations()>
     <ruleDescriptor.actions.init>
+    <ruleInitializations()>
+    <ruleMemoization(name=ruleName)>
+    <ruleLabelInitializations()>
     <@preamble()>
     {
         <block>
@@ -1377,7 +1389,7 @@ if  ((HASEXCEPTION()) && (EXCEPTION->type == <e.decl>) )
 
 ruleDeclarations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<returnType()> retval;
+<returnType()> retval;<\n>
 <else>
 <ruleDescriptor.returnScope.attributes:{ a |
 <a.type> <a.name> = <if(a.initValue)><a.initValue><else><initValue(a.type)><endif>;
@@ -2216,6 +2228,7 @@ static ANTLR3_INT32 dfa<dfa.decisionNumber>_sst(p<name> ctx, pANTLR3_BASE_RECOGN
 
 /* Declare tracking structure for Cyclic DFA <dfa.decisionNumber>
  */
+static
 ANTLR3_CYCLIC_DFA cdfa<dfa.decisionNumber>
     =	{
 	    <dfa.decisionNumber>,		    /* Decision number of this dfa	    */
@@ -2641,7 +2654,7 @@ ruleLabelDef(label) ::= <<
 /**  Rule label default value */
 ruleLabelInitVal(label) ::= <<
 <if(label.referencedRule.hasSingleReturnValue)>
-<label.label.text> = initValue(<label.referencedRule.singleValueReturnType>);
+<label.label.text> = <initValue(label.referencedRule.singleValueReturnType)>;
 <endif>
 >>
 
@@ -2790,7 +2803,7 @@ rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "LEXER->getText(LEXER)"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "LEXER->tokenStartline"
+lexerRulePropertyRef_line(scope,attr) ::= "LEXER->tokenStartLine"
 lexerRulePropertyRef_pos(scope,attr) ::= "LEXER->tokenStartCharPositionInLine"
 lexerRulePropertyRef_channel(scope,attr) ::= "LEXER->channel"
 lexerRulePropertyRef_start(scope,attr) ::= "LEXER->tokenStartCharIndex"

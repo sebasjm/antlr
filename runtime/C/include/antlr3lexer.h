@@ -120,6 +120,12 @@ typedef	struct ANTLR3_LEXER_struct
      */
     pANTLR3_STRING		text;
 
+	/** User controlled variables tha twill be installed in a newly created
+	 * token.
+	 */
+	ANTLR3_UINT32		user1, user2, user3;
+	void				* custom;
+
     /** Input stream stack, which allows the C programmer to switch input streams 
      *  easily and allow the standard nextToken() implementation to deal with it
      *  as this is a common requirement.

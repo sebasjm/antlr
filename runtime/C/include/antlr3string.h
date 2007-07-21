@@ -146,8 +146,8 @@ typedef	struct ANTLR3_STRING_struct
     struct ANTLR3_STRING_struct *
 		    (*subString)    (struct ANTLR3_STRING_struct * string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex);
 
-    /** Pointer to a function that returs the integer representation of any numberic characters
-     *  at the begining of the string
+    /** Pointer to a function that returns the integer representation of any numeric characters
+     *  at the beginning of the string
      */
     ANTLR3_INT32   (*toInt32)	    (struct ANTLR3_STRING_struct * string);
 

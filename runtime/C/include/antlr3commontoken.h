@@ -154,7 +154,7 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
      *  tokens will implement this function with a function that errors out (probably
      *  drastically.
      */
-    void	    (*setText)(struct ANTLR3_COMMON_TOKEN_struct * token, pANTLR3_UINT8 text);
+    void	    (*setText)(struct ANTLR3_COMMON_TOKEN_struct * token, pANTLR3_STRING text);
 
     /** Pointer to a function that 'might' be able to set the text associated
      *  with a token. Imaginary tokens such as an ANTLR3_CLASSIC_TOKEN may actually

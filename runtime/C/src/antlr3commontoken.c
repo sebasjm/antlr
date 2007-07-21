@@ -8,7 +8,7 @@
 /* Token API
  */
 static  pANTLR3_STRING	getText			(pANTLR3_COMMON_TOKEN token);
-static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text);
+static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_STRING text);
 static  void		setText8		(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text);
 static	ANTLR3_UINT32   getType			(pANTLR3_COMMON_TOKEN token);
 static  void		setType			(pANTLR3_COMMON_TOKEN token, ANTLR3_UINT32 type);
@@ -300,14 +300,14 @@ static  pANTLR3_STRING  getText			(pANTLR3_COMMON_TOKEN token)
     }
     if (token->type == ANTLR3_TOKEN_EOF)
     {
-	token->setText(token, (pANTLR3_UINT8)"<EOF>");
+	token->setText8(token, (pANTLR3_UINT8)"<EOF>");
 	return	token->text;
     }
     if	(token->input != NULL)
     {
 	return	token->input->substr(	token->input, 
-					(ANTLR3_UINT32)token->getStartIndex(token), 
- 					(ANTLR3_UINT32)token->getStopIndex(token));
+					token->getStartIndex(token), 
+ 					token->getStopIndex(token));
     }
 
     /* Nothing to return
@@ -353,43 +353,21 @@ static  void		setText8		(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
     return;
 }
 
-static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
+/** \brief Install the supplied text string as teh text for the token.
+ * The method assumes that the existing text (if any) was created by a factory
+ * and so does not attempt to release any memory it is using.Text not created
+ * by a string fctory (not advised) should be released prior to this call.
+ */
+static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_STRING text)
 {
-    if	(token->text == NULL)
-    {
-	/* Do we have a string factory to build a new string with?
-	 */
-	if  (token->input == NULL || token->input->strFactory == NULL)
-	{
-	    /* There was no input stream for this token, or
-	     * it did not pay the rent on a string factory.
-	     */
+	// Merely replaces and existing pre-defined text with the supplied
+	// string
+	//
+	token->text	= text;
 
-	    /* There was no string factory, therefore, if this is not a factory made
-	     * token, we assume no resizing etc will go on and just set the text as it is given.
-	     */
-	    if	(token->factoryMade == ANTLR3_FALSE || token->type == ANTLR3_TOKEN_EOF)
-	    {
-		token->text	    = (pANTLR3_STRING) ANTLR3_MALLOC(sizeof(ANTLR3_STRING));
-		token->text->len    = (ANTLR3_UINT32)strlen((const char *)text);
-		token->text->size   = token->text->len ;
-		token->text->chars  = text;
-	    }
-	    return;
-	}
-
-	/* We can make a new string from the supplied text then
-	 */
-	token->text = token->input->strFactory->newStr(token->input->strFactory, text);
-    }
-    else
-    {
-	token->text->set(token->text, (const char *)text);
-    }
-
-    /* We are done 
-     */
-    return;
+	/* We are done 
+	*/
+	return;
 }
 
 static	ANTLR3_UINT32   getType			(pANTLR3_COMMON_TOKEN token)
@@ -444,7 +422,7 @@ static  void		setTokenIndex		(pANTLR3_COMMON_TOKEN token, ANTLR3_UINT64 index)
 
 static  ANTLR3_UINT64   getStartIndex		(pANTLR3_COMMON_TOKEN token)
 {
-    return  token->start;
+	return  token->start == (ANTLR3_UINT64)-1 ? (ANTLR3_UINT64)(token->input->data) : token->start;  // TODO: correct this -1 business
 }
 
 static  void		setStartIndex		(pANTLR3_COMMON_TOKEN token, ANTLR3_UINT64 start)

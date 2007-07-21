@@ -652,12 +652,12 @@ antlr3EnumNew	(pANTLR3_HASH_TABLE table)
     return  en;
 }
 
-/** \brief Return the next entry in the hashtable beign traversed by the supplied
+/** \brief Return the next entry in the hashtable being traversed by the supplied
  *         enumeration.
  *
  * \param[in] en Pointer to the enumeration tracking structure
  * \param key	 Pointer to void pointer, where the key pointer is returned.
- * \param data	 Pointer to void pointer where the data poitner is returned.
+ * \param data	 Pointer to void pointer where the data pointer is returned.
  * \return 
  *	- ANTLR3_SUCCESS if there was a next key
  *	- ANTLR3_FAIL	 if there were no more keys
@@ -691,13 +691,13 @@ antlr3EnumNext	(pANTLR3_HASH_ENUM en, pANTLR3_HASH_KEY * key, void ** data)
     return	ANTLR3_SUCCESS;
 }
 
-/** \brief Local function to avance the entry pointer of an enumeration 
- * structure to the next vlaid entry (if there is one).
+/** \brief Local function to advance the entry pointer of an enumeration 
+ * structure to the next valid entry (if there is one).
  *
- * \param[in] enum Pointer to ANTLR3 enumeratio structure returned by antlr3EnumNew()
+ * \param[in] enum Pointer to ANTLR3 enumeration structure returned by antlr3EnumNew()
  *
  * \remark
- *   - The function always leaves the pointers pointing at a valid enrty if there
+ *   - The function always leaves the pointers pointing at a valid entry if there
  *     is one, so if the entry pointer is NULL when this function exits, there were
  *     no more entries in the table.
  */
@@ -706,11 +706,11 @@ antlr3EnumNextEntry(pANTLR3_HASH_ENUM en)
 {
     pANTLR3_HASH_BUCKET	bucket;
 
-    /* See if the current entry pointer is valid fisrt of all
+    /* See if the current entry pointer is valid first of all
      */
     if	(en->entry != NULL)
     {
-	/* Current entry was a vlaid point, see if ther eis another
+	/* Current entry was a valid point, see if there is another
 	 * one in the chain.
 	 */
 	if  (en->entry->nextEntry != NULL)
@@ -750,13 +750,13 @@ antlr3EnumNextEntry(pANTLR3_HASH_ENUM en)
     }
 
     /* Here we have exhausted all buckets and the enumeration pointer will 
-     * have its bucket count = table->modulo whicih signifies that we are done.
+     * have its bucket count = table->modulo which signifies that we are done.
      */
 }
 
 /** \brief Frees up the memory structures that represent a hash table
  *  enumeration.
- * \param[in] enum Pointer to ANTLR3 enumeratio structure returned by antlr3EnumNew()
+ * \param[in] enum Pointer to ANTLR3 enumeration structure returned by antlr3EnumNew()
  */
 static void
 antlr3EnumFree	(pANTLR3_HASH_ENUM en)
@@ -1410,8 +1410,7 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
 
 /** Array of left most significant bit positions for an 8 bit
  *  element provides an efficient way to find the highest bit
- *  that is set in an n byte value (n>0). Assuming a reasonable
- *  amount of CPU cache, the values will all hit the data cache,
+ *  that is set in an n byte value (n>0). Assuming the values will all hit the data cache,
  *  coding without conditional elements should allow branch
  *  prediction to work well and of course a parallel instruction cache
  *  will whip through this. Otherwise we must loop shifting a one
@@ -1424,18 +1423,18 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
  *  when I wrote this. If this code survives as long as yacc, then
  *  I may already be dead by the time you read this and maybe there is
  *  a single machine instruction to perform the operation. What
- *  else are you going to do with all those transitors? Jim 2007
+ *  else are you going to do with all those transistors? Jim 2007
  *
  * The table is probably obvious but it is just the number 0..7
  * of the MSB in each integer value 0..256
  */
 static ANTLR3_UINT8 bitIndex[256] = 
 { 
-    0,							    // 0 - Just for padding
-    0,							    // 1
-    1, 1,						    // 2..3
-    2, 2, 2, 2,						    // 4..7
-    3, 3, 3, 3, 3, 3, 3, 3,				    // 8+
+    0,													// 0 - Just for padding
+    0,													// 1
+    1, 1,												// 2..3
+    2, 2, 2, 2,											// 4..7
+    3, 3, 3, 3, 3, 3, 3, 3,								// 8+
     4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,	    // 16+
     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,	    // 32+
 	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,	    
@@ -1491,50 +1490,50 @@ static ANTLR3_UINT64 bitMask[64] =
 pANTLR3_INT_TRIE
 antlr3IntTrieNew(ANTLR3_UINT32 depth)
 {
-    pANTLR3_INT_TRIE	trie;
+	pANTLR3_INT_TRIE	trie;
 
-    trie    = (pANTLR3_INT_TRIE) ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE));	/* Base memory required	*/
+	trie    = (pANTLR3_INT_TRIE) ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE));	/* Base memory required	*/
 
-    if (trie == NULL)
-    {
-	return	(pANTLR3_INT_TRIE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if (trie == NULL)
+	{
+		return	(pANTLR3_INT_TRIE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	}
 
-    /* Now we need to allocate the root node. This makes it easier
-     * to use the tree as we don't have to do anything special 
-     * for the root node.
-     */
-    trie->root	= (pANTLR3_INT_TRIE_NODE) ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE));
+	/* Now we need to allocate the root node. This makes it easier
+	 * to use the tree as we don't have to do anything special 
+	 * for the root node.
+	 */
+	trie->root	= (pANTLR3_INT_TRIE_NODE) ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE));
 
-    if (trie->root == NULL)
-    {
-	ANTLR3_FREE(trie);
-	return	(pANTLR3_INT_TRIE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if (trie->root == NULL)
+	{
+		ANTLR3_FREE(trie);
+		return	(pANTLR3_INT_TRIE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	}
 
-    trie->add	= intTrieAdd;
-    trie->del	= intTrieDel;
-    trie->free	= intTrieFree;
-    trie->get	= intTrieGet;
-    
-    /* Now we seed the root node with the index being the
-     * highest left most bit we want to test, which limits the
-     * keys in the trie. This is the trie 'depth'. The limit for
-     * this implementation is 63 (bits 0..63).
-     */
-    trie->root->bitNum = depth;
+	trie->add	= intTrieAdd;
+	trie->del	= intTrieDel;
+	trie->free	= intTrieFree;
+	trie->get	= intTrieGet;
 
-    /* And as we have nothing in here yet, we set both child pointers
-     * of the root node to point back to itself.
-     */
-    trie->root->leftN	= trie->root;
-    trie->root->rightN	= trie->root;
+	/* Now we seed the root node with the index being the
+	 * highest left most bit we want to test, which limits the
+	 * keys in the trie. This is the trie 'depth'. The limit for
+	 * this implementation is 63 (bits 0..63).
+	 */
+	trie->root->bitNum = depth;
 
-    /* Finally, note that the key for this root node is 0 because
-     * we use calloc() to initialise it.
-     */
+	/* And as we have nothing in here yet, we set both child pointers
+	 * of the root node to point back to itself.
+	 */
+	trie->root->leftN	= trie->root;
+	trie->root->rightN	= trie->root;
 
-    return trie;
+	/* Finally, note that the key for this root node is 0 because
+	 * we use calloc() to initialise it.
+	 */
+
+	return trie;
 }
 
 /** Search the int Trie and return a pointer to the first bucket indexed
@@ -1543,70 +1542,70 @@ antlr3IntTrieNew(ANTLR3_UINT32 depth)
 static	pANTLR3_TRIE_ENTRY   
 intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
 {
-    pANTLR3_INT_TRIE_NODE    thisNode; 
-    pANTLR3_INT_TRIE_NODE    nextNode; 
+	pANTLR3_INT_TRIE_NODE    thisNode; 
+	pANTLR3_INT_TRIE_NODE    nextNode; 
 
-    if (trie->count == 0)
-    {
-	return NULL;	    /* Nothing in this trie yet	*/
-    }
-    /* Starting at the root node in the trie, compare the bit index
-     * of the current node with its next child node (starts left from root).
-     * When the bit index of the child node is greater than the bit index of the current node
-     * then by definition (as the bit index decreases as we descent the trie)
-     * we have reached a 'backward' pointer. A backward pointer means we
-     * have reached the only node that can be reached by the bits given us so far
-     * and it must either be the key we are looking for, or if not then it
-     * means the entry was not in the trie, and we return NULL. A backward pointer
-     * points back in to the tree stucture rather than down (deeper) within the
-     * tree branches.
-     */
-    thisNode	= trie->root;		/* Start at the root node		*/
-    nextNode	= thisNode->leftN;	/* Examine the left node from the root	*/
-
-    /* While we are descending the tree nodes...
-     */
-    while (thisNode->bitNum > nextNode->bitNum)
-    {
-	/* Next node now becomes the new 'current' node
-	 */
-	thisNode    = nextNode;
-
-	/* We now test the bit indicated by the bitmap in the next node
-	 * in the key we are searching for. The new next node is the
-	 * right node if that bit is set and the left node it is not.
-	 */
-	if (key & bitMask[nextNode->bitNum])
+	if (trie->count == 0)
 	{
-	    nextNode = nextNode->rightN;	/* 1 is right	*/
+		return NULL;	    /* Nothing in this trie yet	*/
+	}
+	/* Starting at the root node in the trie, compare the bit index
+	 * of the current node with its next child node (starts left from root).
+	 * When the bit index of the child node is greater than the bit index of the current node
+	 * then by definition (as the bit index decreases as we descent the trie)
+	 * we have reached a 'backward' pointer. A backward pointer means we
+	 * have reached the only node that can be reached by the bits given us so far
+	 * and it must either be the key we are looking for, or if not then it
+	 * means the entry was not in the trie, and we return NULL. A backward pointer
+	 * points back in to the tree structure rather than down (deeper) within the
+	 * tree branches.
+	 */
+	thisNode	= trie->root;		/* Start at the root node		*/
+	nextNode	= thisNode->leftN;	/* Examine the left node from the root	*/
+
+	/* While we are descending the tree nodes...
+	 */
+	while (thisNode->bitNum > nextNode->bitNum)
+	{
+		/* Next node now becomes the new 'current' node
+		 */
+		thisNode    = nextNode;
+
+		/* We now test the bit indicated by the bitmap in the next node
+		 * in the key we are searching for. The new next node is the
+		 * right node if that bit is set and the left node it is not.
+		 */
+		if (key & bitMask[nextNode->bitNum])
+		{
+			nextNode = nextNode->rightN;	/* 1 is right	*/
+		}
+		else
+		{
+			nextNode = nextNode->leftN;		/* 0 is left	*/
+		}
+	}
+
+	/* Here we have reached a node where the bitMap index is lower than
+	 * its parent. This means it is pointing backward in the tree and
+	 * must therefore be a terminal node, being the only point than can
+	 * be reached with the bits seen so far. It is either the actual key
+	 * we wanted, or if that key is not in the trie it is another key
+	 * that is currently the only one that can be reached by those bits.
+	 * That situation would obviously change if the key was to be added
+	 * to the trie.
+	 *
+	 * Hence it only remains to test whether this is actually the key or not.
+	 */
+	if (nextNode->key == key)
+	{
+		/* This was the key, so return the entry pointer
+		 */
+		return	nextNode->buckets;
 	}
 	else
 	{
-	    nextNode = nextNode->leftN;		/* 0 is left	*/
+		return	NULL;	/* That key is not in the trie (note that we set the pointer to -1 if no payload) */
 	}
-    }
-
-    /* Here we have reached a node where the bitMap index is lower than
-     * its parent. This means it is pointing backward in the tree and
-     * must therefore be a terminal node, being the only point than can
-     * be reached with the bits seen so far. It is either the actual key
-     * we wnated, or if that key is not in the trie it is another key
-     * that is currently the only one that can be reached by those bits.
-     * That situation would obviously change if the key was to be added
-     * to the trie.
-     *
-     * Hence it only remains to test whether this is actually the key or not.
-     */
-    if (nextNode->key == key)
-    {
-	/* This was the key, so return the entry pointer
-	 */
-	return	nextNode->buckets;
-    }
-    else
-    {
-	return	NULL;	/* That key is not in the trie (note that we set the pointer to -1 if no payload) */
-    }
 }
 
 
@@ -1630,7 +1629,7 @@ intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
  *  whether the key was already in the trie.
  *  If the node we locate is not the key we are looking to add, then we insert a new node
  *  into the trie with a bit index of the leftmost differing bit and the left or right 
- *  node pointing to iteself or the data node we are inserting 'before'. 
+ *  node pointing to itself or the data node we are inserting 'before'. 
  */
 static	ANTLR3_BOOLEAN		
 intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3_UINT64 intVal, void * data, void (ANTLR3_CDECL *freeptr)(void *))
@@ -1915,7 +1914,7 @@ freeIntNode(pANTLR3_INT_TRIE_NODE node)
     pANTLR3_TRIE_ENTRY	thisEntry;
     pANTLR3_TRIE_ENTRY	nextEntry;
 
-    /* If this node has a left pointer that is not a backpointer
+    /* If this node has a left pointer that is not a back pointer
      * then recursively call to free this
      */
     if (node->bitNum > node->leftN->bitNum)

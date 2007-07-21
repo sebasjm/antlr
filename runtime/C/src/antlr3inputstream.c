@@ -308,7 +308,7 @@ antlr3AsciiIndex(pANTLR3_INT_STREAM is)
 
     input   = ((pANTLR3_INPUT_STREAM) (is->super));
 
-    return  (ANTLR3_INT64)(((pANTLR3_UINT8)input->nextChar) - ((pANTLR3_UINT8)input->data));
+    return  (ANTLR3_INT64)(((pANTLR3_UINT8)input->nextChar));
 }
 
 /** \brief Return the size of the current input stream, as an Ascii file
@@ -491,7 +491,7 @@ antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
 static pANTLR3_STRING
 antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 start, ANTLR3_INT64 stop)
 {
-    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)(input->data)+start, (ANTLR3_UINT32)(stop - start + 1));
+    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)start, (ANTLR3_UINT32)(stop - start + 1));
 }
 
 /** \brief Return the line number as understood by the 8 bit/ASCII input stream.
