@@ -408,6 +408,7 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
 // $ANTLR start <ruleName>
 public final void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
     <if(trace)>traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
+    <ruleScopeSetUp()>
     <ruleDeclarations()>
     try {
 <if(nakedBlock)>
@@ -428,6 +429,7 @@ public final void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scop
     }
     finally {
         <if(trace)>traceOut("<ruleName>", <ruleDescriptor.index>);<endif>
+        <ruleScopeCleanUp()>
         <memoize()>
     }
 }

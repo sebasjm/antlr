@@ -127,6 +127,11 @@ INCOMPATIBILITY WARNING -- templates have changed; must regen output from
                            grammars.  Runtime libraries have also changed.
                            Debug event listener interface has changed also.
 
+July 22, 2007
+
+* fixed dynamic scope implementation in lexers. They were not creating new scope
+  entries on the stack.
+
 July 19, 2007
 
 * implemented new unique ID; GC was causing non unique hash codes.  Debugging
