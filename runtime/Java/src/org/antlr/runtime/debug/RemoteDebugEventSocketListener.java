@@ -31,7 +31,6 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.BaseTree;
 import org.antlr.runtime.tree.Tree;
-import org.antlr.tool.ErrorManager;
 
 import java.io.*;
 import java.net.ConnectException;
@@ -479,7 +478,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			int i = 0;
 			while ( st.hasMoreTokens() ) {
 				if ( i>=MAX_EVENT_ELEMENTS ) {
-					ErrorManager.internalError("event has more than "+MAX_EVENT_ELEMENTS+" args: "+event);
+					// ErrorManager.internalError("event has more than "+MAX_EVENT_ELEMENTS+" args: "+event);
 					return elements;
 				}
 				elements[i] = st.nextToken();
