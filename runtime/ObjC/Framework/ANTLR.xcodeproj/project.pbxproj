@@ -54,8 +54,14 @@
 		F70AA7C809AA339900C3FD5E /* ANTLRStringStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F70AA7C609AA339900C3FD5E /* ANTLRStringStream.m */; };
 		F70AA7CF09AA379300C3FD5E /* ANTLRStringStreamState.h in Headers */ = {isa = PBXBuildFile; fileRef = F70AA7CD09AA379300C3FD5E /* ANTLRStringStreamState.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F70AA7D009AA379300C3FD5E /* ANTLRStringStreamState.m in Sources */ = {isa = PBXBuildFile; fileRef = F70AA7CE09AA379300C3FD5E /* ANTLRStringStreamState.m */; };
+		F70B11BD0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F70B11BB0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F70B11BE0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F70B11BC0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.m */; };
+		F70B11C30C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F70B11C10C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F70B11C40C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F70B11C20C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.m */; };
 		F70BB391098E5BB80054FEF8 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F70BB390098E5BB80054FEF8 /* SenTestingKit.framework */; };
 		F70BB39D098E62740054FEF8 /* TestBitSet.m in Sources */ = {isa = PBXBuildFile; fileRef = F70BB39C098E62740054FEF8 /* TestBitSet.m */; };
+		F71325880C4A060900B99F2D /* ANTLRRewriteRuleElementStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F71325860C4A060900B99F2D /* ANTLRRewriteRuleElementStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F71325890C4A060900B99F2D /* ANTLRRewriteRuleElementStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F71325870C4A060900B99F2D /* ANTLRRewriteRuleElementStream.m */; };
 		F71F6A0509A8159F003221F4 /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F71F6B9009A81E6F003221F4 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
 		F72C56DD0AB3411000282574 /* ANTLRTreeAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = F72C56DC0AB3411000282574 /* ANTLRTreeAdaptor.m */; };
@@ -308,11 +314,17 @@
 		F70AA7C609AA339900C3FD5E /* ANTLRStringStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRStringStream.m; sourceTree = "<group>"; };
 		F70AA7CD09AA379300C3FD5E /* ANTLRStringStreamState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRStringStreamState.h; sourceTree = "<group>"; };
 		F70AA7CE09AA379300C3FD5E /* ANTLRStringStreamState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRStringStreamState.m; sourceTree = "<group>"; };
+		F70B11BB0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRRewriteRuleSubtreeStream.h; sourceTree = "<group>"; };
+		F70B11BC0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRRewriteRuleSubtreeStream.m; sourceTree = "<group>"; };
+		F70B11C10C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRRewriteRuleTokenStream.h; sourceTree = "<group>"; };
+		F70B11C20C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRRewriteRuleTokenStream.m; sourceTree = "<group>"; };
 		F70BB380098E5AFF0054FEF8 /* Test.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Test.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F70BB381098E5B000054FEF8 /* Test-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Test-Info.plist"; sourceTree = "<group>"; };
 		F70BB390098E5BB80054FEF8 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = /System/Library/Frameworks/SenTestingKit.framework; sourceTree = "<absolute>"; };
 		F70BB39B098E62740054FEF8 /* TestBitSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestBitSet.h; path = tests/TestBitSet.h; sourceTree = "<group>"; };
 		F70BB39C098E62740054FEF8 /* TestBitSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBitSet.m; path = tests/TestBitSet.m; sourceTree = "<group>"; };
+		F71325860C4A060900B99F2D /* ANTLRRewriteRuleElementStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRRewriteRuleElementStream.h; sourceTree = "<group>"; };
+		F71325870C4A060900B99F2D /* ANTLRRewriteRuleElementStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRRewriteRuleElementStream.m; sourceTree = "<group>"; };
 		F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		F72B8CFA0AD01D380013F1E2 /* FuzzyJava.gl */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = FuzzyJava.gl; sourceTree = "<group>"; };
 		F72B8D090AD01DCB0013F1E2 /* FuzzyJava.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = FuzzyJava.tokens; sourceTree = "<group>"; };
@@ -676,6 +688,7 @@
 		F70AA7AA09AA2AAB00C3FD5E /* Streams */ = {
 			isa = PBXGroup;
 			children = (
+				F71325850C4A05DC00B99F2D /* Trees */,
 				F70AA7AD09AA2AC000C3FD5E /* ANTLRIntStream.h */,
 				F70AA7B509AA2B8800C3FD5E /* ANTLRCharStream.h */,
 				F77766AE09DD53E800517181 /* ANTLRTokenStream.h */,
@@ -704,6 +717,19 @@
 				F7492DEE09C00E4500B25E30 /* TestStringStream.m */,
 			);
 			name = Tests;
+			sourceTree = "<group>";
+		};
+		F71325850C4A05DC00B99F2D /* Trees */ = {
+			isa = PBXGroup;
+			children = (
+				F71325860C4A060900B99F2D /* ANTLRRewriteRuleElementStream.h */,
+				F71325870C4A060900B99F2D /* ANTLRRewriteRuleElementStream.m */,
+				F70B11BB0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.h */,
+				F70B11BC0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.m */,
+				F70B11C10C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.h */,
+				F70B11C20C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.m */,
+			);
+			name = Trees;
 			sourceTree = "<group>";
 		};
 		F72C5E2D0AB7529C00282574 /* simplecTreeParser */ = {
@@ -938,6 +964,9 @@
 				F7CECD7E0B1E5C370054CC3B /* ANTLRDebugEventListener.h in Headers */,
 				F77744050B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h in Headers */,
 				F77747560B23A70600D1F89B /* ANTLRDebug.h in Headers */,
+				F71325880C4A060900B99F2D /* ANTLRRewriteRuleElementStream.h in Headers */,
+				F70B11BD0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.h in Headers */,
+				F70B11C30C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1308,6 +1337,9 @@
 				F7E261290B1E45070013F640 /* ANTLRDebugTreeAdaptor.m in Sources */,
 				F7E2613A0B1E45580013F640 /* ANTLRDebugEventProxy.m in Sources */,
 				F77744060B234A3400D1F89B /* ANTLRToken+DebuggerSupport.m in Sources */,
+				F71325890C4A060900B99F2D /* ANTLRRewriteRuleElementStream.m in Sources */,
+				F70B11BE0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.m in Sources */,
+				F70B11C40C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1493,6 +1525,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ANTLR_Prefix.pch;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				PRODUCT_NAME = ANTLR;
@@ -1800,6 +1833,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INSTALL_PATH = "$(HOME)/bin";
 				OTHER_LDFLAGS = (
 					"-framework",

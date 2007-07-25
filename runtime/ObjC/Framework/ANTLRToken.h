@@ -37,7 +37,8 @@ typedef enum {
 } ANTLRTokenType;
 
 typedef enum {
-	ANTLRTokenChannelDefault = 0
+	ANTLRTokenChannelDefault = 0,
+    ANTLRTokenChannelHidden = 99
 } ANTLRTokenChannel;
 
 

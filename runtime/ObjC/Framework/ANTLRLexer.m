@@ -73,6 +73,7 @@
 	token = nil;
 	tokenStartCharIndex = [self charIndex];
 	while (YES) {
+        [self setText:nil];
 		if ([input LA:1] == ANTLRCharStreamEOF) {
 //			return [ANTLRToken eofToken];
 			return nil;
@@ -129,6 +130,8 @@
 															stop:theStop];
 	[aToken setLine:aLine];
 	[aToken setCharPositionInLine:aCharPos];
+    if (text != nil)
+        [aToken setText:text];
 	[self emit:aToken];
 	[aToken release];
 }
@@ -213,6 +216,13 @@
 - (NSString *) text
 {
 	return [input substringWithRange:NSMakeRange(tokenStartCharIndex, [self charIndex]-tokenStartCharIndex)];
+}
+- (void) setText:(NSString *) theText
+{
+    if (theText != text) {
+        [text release];
+        text = [theText retain];
+    }
 }
 
 	// error handling

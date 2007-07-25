@@ -24,36 +24,42 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-#import <ANTLR/ANTLRBitSet.h>
-#import <ANTLR/ANTLRBaseRecognizer.h>
-#import <ANTLR/ANTLRLexer.h>
-#import <ANTLR/ANTLRParser.h>
-#import <ANTLR/ANTLRTreeParser.h>
-#import <ANTLR/ANTLRDFA.h>
-#import <ANTLR/ANTLRStringStream.h>
-#import <ANTLR/ANTLRTokenSource.h>
-#import <ANTLR/ANTLRCommonTokenStream.h>
-
-#import <ANTLR/ANTLRRecognitionException.h>
-#import <ANTLR/ANTLREarlyExitException.h>
-#import <ANTLR/ANTLRMismatchedSetException.h>
-#import <ANTLR/ANTLRMismatchedTokenException.h>
-#import <ANTLR/ANTLRMismatchedRangeException.h>
-#import <ANTLR/ANTLRMismatchedTreeNodeException.h>
-#import <ANTLR/ANTLRNoViableAltException.h>
-#import <ANTLR/ANTLRFailedPredicateException.h>
-#import <ANTLR/ANTLRTreeException.h>
-
-#import <ANTLR/ANTLRLexerRuleReturnScope.h>
-#import <ANTLR/ANTLRParserRuleReturnScope.h>
-
-#import <ANTLR/ANTLRTree.h>
-#import <ANTLR/ANTLRCommonTree.h>
+#import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLRTreeAdaptor.h>
-#import <ANTLR/ANTLRCommonTreeAdaptor.h>
-#import <ANTLR/ANTLRTreeNodeStream.h>
-#import <ANTLR/ANTLRCommonTreeNodeStream.h>
 
-#import <ANTLR/ANTLRRewriteRuleSubtreeStream.h>
-#import <ANTLR/ANTLRRewriteRuleTokenStream.h>
+// TODO: this should be separated into stream and enumerator classes
+@interface ANTLRRewriteRuleElementStream : NSObject {
+    @public
+    int cursor;
+    
+    BOOL isSingleElement;
+    union {
+        id single;
+        NSMutableArray *multiple;
+    } elements;
+    
+    NSString *elementDescription;
+    id<ANTLRTreeAdaptor> treeAdaptor;
+}
+
+- (id) initWithTreeAdaptor:(id<ANTLRTreeAdaptor>)aTreeAdaptor description:(NSString *)anElementDescription;
+- (id) initWithTreeAdaptor:(id<ANTLRTreeAdaptor>)aTreeAdaptor description:(NSString *)anElementDescription element:(id)anElement;
+- (id) initWithTreeAdaptor:(id<ANTLRTreeAdaptor>)aTreeAdaptor description:(NSString *)anElementDescription elements:(NSArray *)theElements;
+
+- (void) reset;
+
+- (void) addElement:(id)anElement;
+- (unsigned int) count;
+ 
+- (BOOL) hasNext;
+- (id) next;
+- (id) _next;       // internal: TODO: redesign if necessary. maybe delegate
+
+- (id) copyElement:(id)element;
+- (id) toTree:(id)element;
+
+- (NSString *) description;
+- (void) setDescription:(NSString *) description;
+
+@end
+

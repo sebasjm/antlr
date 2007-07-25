@@ -24,36 +24,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#import <Cocoa/Cocoa.h>
+#import "ANTLR/ANTLRRewriteRuleElementStream.h"
 
-#import <ANTLR/ANTLRBitSet.h>
-#import <ANTLR/ANTLRBaseRecognizer.h>
-#import <ANTLR/ANTLRLexer.h>
-#import <ANTLR/ANTLRParser.h>
-#import <ANTLR/ANTLRTreeParser.h>
-#import <ANTLR/ANTLRDFA.h>
-#import <ANTLR/ANTLRStringStream.h>
-#import <ANTLR/ANTLRTokenSource.h>
-#import <ANTLR/ANTLRCommonTokenStream.h>
 
-#import <ANTLR/ANTLRRecognitionException.h>
-#import <ANTLR/ANTLREarlyExitException.h>
-#import <ANTLR/ANTLRMismatchedSetException.h>
-#import <ANTLR/ANTLRMismatchedTokenException.h>
-#import <ANTLR/ANTLRMismatchedRangeException.h>
-#import <ANTLR/ANTLRMismatchedTreeNodeException.h>
-#import <ANTLR/ANTLRNoViableAltException.h>
-#import <ANTLR/ANTLRFailedPredicateException.h>
-#import <ANTLR/ANTLRTreeException.h>
+@interface ANTLRRewriteRuleTokenStream : ANTLRRewriteRuleElementStream {
 
-#import <ANTLR/ANTLRLexerRuleReturnScope.h>
-#import <ANTLR/ANTLRParserRuleReturnScope.h>
+}
 
-#import <ANTLR/ANTLRTree.h>
-#import <ANTLR/ANTLRCommonTree.h>
-#import <ANTLR/ANTLRTreeAdaptor.h>
-#import <ANTLR/ANTLRCommonTreeAdaptor.h>
-#import <ANTLR/ANTLRTreeNodeStream.h>
-#import <ANTLR/ANTLRCommonTreeNodeStream.h>
-
-#import <ANTLR/ANTLRRewriteRuleSubtreeStream.h>
-#import <ANTLR/ANTLRRewriteRuleTokenStream.h>
+@end

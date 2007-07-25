@@ -38,8 +38,10 @@
 @interface ANTLRLexer : ANTLRBaseRecognizer <ANTLRTokenSource> {
 	id<ANTLRCharStream> input;
 	id<ANTLRToken> token;
+    unsigned int _channel;
 	unsigned int tokenStartCharIndex;
 	unsigned int ruleNestingLevel;
+    NSString *text;
 }
 
 #pragma mark Initializer
@@ -71,6 +73,7 @@
 - (unsigned int) charPositionInLine;
 - (unsigned int) charIndex;
 - (NSString *) text;
+- (void) setText:(NSString *) theText;
 
 // error handling
 - (void) reportError:(ANTLRRecognitionException *)e;
