@@ -104,9 +104,7 @@ headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 
 lexerHeaderFile() ::=
 <<
-#pragma mark Cyclic DFA start
 <cyclicDFAs:cyclicDFAInterface()>
-#pragma mark Cyclic DFA end
 
 #pragma mark Rule return scopes start
 <rules:{rule |
@@ -135,7 +133,6 @@ lexerHeaderFile() ::=
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="ANTLRToken *",
       filterMode) ::= <<
-#pragma mark Cyclic DFAs
 <cyclicDFAs:cyclicDFA()>
 
 /** As per Terence: No returns for lexer rules!
@@ -241,7 +238,6 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
            memoize, numRules, fileName, ANTLRVersion, generatedTimestamp, trace, scopes, superClass="ANTLRParser") ::=
 <<
 
-#pragma mark Cyclic DFA
 <cyclicDFAs:cyclicDFAInterface()>
 
 #pragma mark Tokens
@@ -290,7 +286,6 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
               cyclicDFAs, bitsets, inputStreamType, superClass,
               ASTLabelType="id", labelType, members) ::= <<
 
-#pragma mark Cyclic DFA
 <cyclicDFAs:cyclicDFA()>
 
 #pragma mark Bitsets
@@ -506,12 +501,8 @@ ruleLabelDefs() ::= <<
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
     :{NSMutableArray *_list_<it.label.text> = nil;}; separator="\n"
 >
-<[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
-    :ruleLabelDef(label=it); separator="\n"
->
-<[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-    :{NSMutableArray *_list_<it> = [[NSMutableArray alloc] init];}; separator="\n"
->
+<ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
+<ruleDescriptor.ruleListLabels:{ll|ANTLRRuleReturnScope <ll.label.text> = nil;}; separator="\n">
 >>
 
 ruleReturnValue() ::= <<
@@ -533,9 +524,6 @@ ruleCleanUp() ::= <<
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]:{[_list_<it.label.text> release];}; separator="\n">
 // rule labels
 <[ruleDescriptor.ruleLabels]:{[_<it.label.text> release];}; separator="\n">
-// rule refs in alts with rewrites
-<[ruleDescriptor.allRuleRefsInAltsWithRewrites,ruleDescriptor.allTokenRefsInAltsWithRewrites]
-	:{[_list_<it> release];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 [_retval setStop:[input LT:-1]];<\n>
 <endif>
@@ -568,7 +556,7 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block, memoize) ::= <<
 		int _start = [self charIndex];
 		int _line = [self line];
 		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
+		_channel = [ANTLRToken defaultChannel];
 		<block>
 		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}<\n>
 <endif>
@@ -1042,11 +1030,14 @@ alt<decisionNumber> = [dfa<decisionNumber> predict];
 
 /** Used in headerFile */
 cyclicDFAInterface(dfa) ::= <<
+#pragma mark Cyclic DFA interface start <name>DFA<dfa.decisionNumber>
 @interface <name>DFA<dfa.decisionNumber> : ANTLRDFA {} @end<\n>
+#pragma mark Cyclic DFA interface end <name>DFA<dfa.decisionNumber>
 >>
 
 /** Used in lexer/parser implementation files */
 cyclicDFA(dfa) ::= <<
+#pragma mark Cyclic DFA implementation start <name>DFA<dfa.decisionNumber>
 @implementation <name>DFA<dfa.decisionNumber>
 const static int <name>dfa<dfa.decisionNumber>_eot[<dfa.numberOfStates>] =
     {<dfa.eot; wrap="\n     ", separator=",", null="-1">};
@@ -1118,6 +1109,7 @@ const static int <name>dfa<dfa.decisionNumber>_transition<i0>[] = {<table; separ
 <@errorMethod()>
 
 @end
+#pragma mark Cyclic DFA implementation end <name>DFA<dfa.decisionNumber>
 <\n>
 >>
 
