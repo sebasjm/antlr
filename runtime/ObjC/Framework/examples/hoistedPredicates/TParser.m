@@ -1,4 +1,4 @@
-// $ANTLR 3.0b6 T.g 2007-02-01 01:27:58
+// $ANTLR 3.0 T.g 2007-07-25 20:12:43
 
 #import "TParser.h"
 /** Demonstrates how semantic predicates get hoisted out of the rule in 
@@ -10,7 +10,6 @@
  * the T_dec-1.dot file to see the predicates in action.
  */
 
-#pragma mark Cyclic DFA
 
 #pragma mark Bitsets
 const static unsigned long long FOLLOW_identifier_in_stat34_data[] = {0x0000000000000002LL};
@@ -78,12 +77,6 @@ static ANTLRBitSet *FOLLOW_7_in_enumAsID100;
 // T.g:24:1: stat : ( identifier | enumAsKeyword );
 - (void) stat
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // T.g:24:7: ( identifier | enumAsKeyword ) //ruleblock
         int alt1=2;
@@ -148,7 +141,6 @@ static ANTLRBitSet *FOLLOW_7_in_enumAsID100;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -159,12 +151,6 @@ static ANTLRBitSet *FOLLOW_7_in_enumAsID100;
 // T.g:28:1: identifier : ( ID | enumAsID );
 - (void) identifier
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // T.g:29:7: ( ID | enumAsID ) //ruleblock
         int alt2=2;
@@ -211,7 +197,6 @@ static ANTLRBitSet *FOLLOW_7_in_enumAsID100;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -222,12 +207,6 @@ static ANTLRBitSet *FOLLOW_7_in_enumAsID100;
 // T.g:33:1: enumAsKeyword : {...}? 'enum' ;
 - (void) enumAsKeyword
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // T.g:33:17: ({...}? 'enum' ) // ruleBlockSingleAlt
         // T.g:33:17: {...}? 'enum' // alt
@@ -248,7 +227,6 @@ static ANTLRBitSet *FOLLOW_7_in_enumAsID100;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -259,12 +237,6 @@ static ANTLRBitSet *FOLLOW_7_in_enumAsID100;
 // T.g:35:1: enumAsID : {...}? 'enum' ;
 - (void) enumAsID
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // T.g:35:12: ({...}? 'enum' ) // ruleBlockSingleAlt
         // T.g:35:12: {...}? 'enum' // alt
@@ -285,7 +257,6 @@ static ANTLRBitSet *FOLLOW_7_in_enumAsID100;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;

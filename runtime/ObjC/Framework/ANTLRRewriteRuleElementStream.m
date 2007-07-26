@@ -104,7 +104,7 @@
 - (BOOL) hasNext
 {
     return (isSingleElement && elements.single != nil && cursor < 1) ||
-            (elements.multiple != nil && cursor < [elements.multiple count]);
+            (isSingleElement == NO && elements.multiple != nil && cursor < [elements.multiple count]);
 }
 
 - (id) next

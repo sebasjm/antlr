@@ -1,8 +1,7 @@
-// $ANTLR 3.0 Combined.g 2007-06-03 02:18:30
+// $ANTLR 3.0 Combined.g 2007-07-25 20:12:40
 
 #import "CombinedParser.h"
 
-#pragma mark Cyclic DFA
 
 #pragma mark Bitsets
 const static unsigned long long FOLLOW_identifier_in_stat20_data[] = {0x0000000000000012LL};
@@ -104,7 +103,6 @@ static ANTLRBitSet *FOLLOW_CombinedParser_ID_in_identifier35;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -132,7 +130,6 @@ static ANTLRBitSet *FOLLOW_CombinedParser_ID_in_identifier35;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;

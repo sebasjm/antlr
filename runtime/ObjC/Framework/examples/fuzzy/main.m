@@ -9,8 +9,8 @@ int main(int argc, const char * argv[])
 	NSLog(@"%@", string);
 	ANTLRStringStream *stream = [[ANTLRStringStream alloc] initWithStringNoCopy:string];
 	FuzzyJavaLexer *lexer = [[FuzzyJavaLexer alloc] initWithCharStream:stream];
-	ANTLRToken *currentToken;
-	while (currentToken = [lexer nextToken]) {
+	id<ANTLRToken> currentToken;
+	while ((currentToken = [lexer nextToken]) && [currentToken type] != ANTLRTokenTypeEOF) {
 //		NSLog(@"%@", currentToken);
 	}
 	[lexer release];

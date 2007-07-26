@@ -1,10 +1,9 @@
-// $ANTLR 3.0b6 SimpleCTP.gtp 2007-02-01 01:28:02
+// $ANTLR 3.0 SimpleCTP.gtp 2007-07-25 20:23:14
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
 
 
-#pragma mark Cyclic DFA
 
 #pragma mark Tokens
 #define SimpleCTP_FUNC_DEF	8

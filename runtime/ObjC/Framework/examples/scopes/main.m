@@ -12,7 +12,7 @@ int main() {
 	SymbolTableLexer *lexer = [[SymbolTableLexer alloc] initWithCharStream:stream];
 	
 	//	ANTLRToken *currentToken;
-	//	while (currentToken = [lexer nextToken]) {
+	//	while ((currentToken = [lexer nextToken]) && [currentToken type] != ANTLRTokenTypeEOF) {
 	//		NSLog(@"%@", currentToken);
 	//	}
 	

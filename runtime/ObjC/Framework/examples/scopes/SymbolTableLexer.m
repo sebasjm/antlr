@@ -1,7 +1,6 @@
-// $ANTLR 3.0b6 SymbolTable.g 2007-02-01 01:28:00
+// $ANTLR 3.0 SymbolTable.g 2007-07-25 20:12:44
 
 #import "SymbolTableLexer.h"
-#pragma mark Cyclic DFAs
 
 /** As per Terence: No returns for lexer rules!
 #pragma mark Rule return scopes start
@@ -30,526 +29,405 @@
 
 - (void) mT7
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_T7;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:7:6: ( 'method' ) // ruleBlockSingleAlt
-		// SymbolTable.g:7:6: 'method' // alt
-		{
-		[self matchString:@"method"];
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_T7;
+        // SymbolTable.g:7:6: ( 'method' ) // ruleBlockSingleAlt
+        // SymbolTable.g:7:6: 'method' // alt
+        {
+        [self matchString:@"method"];
 
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end T7
 
 
 - (void) mT8
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_T8;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:8:6: ( '(' ) // ruleBlockSingleAlt
-		// SymbolTable.g:8:6: '(' // alt
-		{
-		[self matchChar:'('];
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_T8;
+        // SymbolTable.g:8:6: ( '(' ) // ruleBlockSingleAlt
+        // SymbolTable.g:8:6: '(' // alt
+        {
+        [self matchChar:'('];
 
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end T8
 
 
 - (void) mT9
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_T9;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:9:6: ( ')' ) // ruleBlockSingleAlt
-		// SymbolTable.g:9:6: ')' // alt
-		{
-		[self matchChar:')'];
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_T9;
+        // SymbolTable.g:9:6: ( ')' ) // ruleBlockSingleAlt
+        // SymbolTable.g:9:6: ')' // alt
+        {
+        [self matchChar:')'];
 
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end T9
 
 
 - (void) mT10
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_T10;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:10:7: ( '{' ) // ruleBlockSingleAlt
-		// SymbolTable.g:10:7: '{' // alt
-		{
-		[self matchChar:'{'];
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_T10;
+        // SymbolTable.g:10:7: ( '{' ) // ruleBlockSingleAlt
+        // SymbolTable.g:10:7: '{' // alt
+        {
+        [self matchChar:'{'];
 
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end T10
 
 
 - (void) mT11
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_T11;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:11:7: ( '}' ) // ruleBlockSingleAlt
-		// SymbolTable.g:11:7: '}' // alt
-		{
-		[self matchChar:'}'];
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_T11;
+        // SymbolTable.g:11:7: ( '}' ) // ruleBlockSingleAlt
+        // SymbolTable.g:11:7: '}' // alt
+        {
+        [self matchChar:'}'];
 
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end T11
 
 
 - (void) mT12
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_T12;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:12:7: ( '=' ) // ruleBlockSingleAlt
-		// SymbolTable.g:12:7: '=' // alt
-		{
-		[self matchChar:'='];
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_T12;
+        // SymbolTable.g:12:7: ( '=' ) // ruleBlockSingleAlt
+        // SymbolTable.g:12:7: '=' // alt
+        {
+        [self matchChar:'='];
 
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end T12
 
 
 - (void) mT13
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_T13;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:13:7: ( ';' ) // ruleBlockSingleAlt
-		// SymbolTable.g:13:7: ';' // alt
-		{
-		[self matchChar:';'];
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_T13;
+        // SymbolTable.g:13:7: ( ';' ) // ruleBlockSingleAlt
+        // SymbolTable.g:13:7: ';' // alt
+        {
+        [self matchChar:';'];
 
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end T13
 
 
 - (void) mT14
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
-
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_T14;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:14:7: ( 'int' ) // ruleBlockSingleAlt
-		// SymbolTable.g:14:7: 'int' // alt
-		{
-		[self matchString:@"int"];
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_T14;
+        // SymbolTable.g:14:7: ( 'int' ) // ruleBlockSingleAlt
+        // SymbolTable.g:14:7: 'int' // alt
+        {
+        [self matchString:@"int"];
 
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end T14
 
 
 - (void) mID
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_ID;
+        // SymbolTable.g:66:9: ( ( 'a' .. 'z' )+ ) // ruleBlockSingleAlt
+        // SymbolTable.g:66:9: ( 'a' .. 'z' )+ // alt
+        {
+        // SymbolTable.g:66:9: ( 'a' .. 'z' )+	// positiveClosureBlock
+        int cnt1=0;
 
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_ID;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:66:9: ( ( 'a' .. 'z' )+ ) // ruleBlockSingleAlt
-		// SymbolTable.g:66:9: ( 'a' .. 'z' )+ // alt
-		{
-		// SymbolTable.g:66:9: ( 'a' .. 'z' )+	// positiveClosureBlock
-		int cnt1=0;
+        do {
+            int alt1=2;
+            {
+            	int LA1_0 = [input LA:1];
+            	if ( (LA1_0>='a' && LA1_0<='z') ) {
+            		alt1 = 1;
+            	}
 
-		do {
-		    int alt1=2;
-		    {
-		    	int LA1_0 = [input LA:1];
-		    	if ( (LA1_0>='a' && LA1_0<='z') ) {
-		    		alt1 = 1;
-		    	}
+            }
+            switch (alt1) {
+        	case 1 :
+        	    // SymbolTable.g:66:10: 'a' .. 'z' // alt
+        	    {
+        	    [self matchRangeFromChar:'a' to:'z'];
 
-		    }
-		    switch (alt1) {
-			case 1 :
-			    // SymbolTable.g:66:10: 'a' .. 'z' // alt
-			    {
-			    [self matchRangeFromChar:'a' to:'z'];
+        	    }
+        	    break;
 
-			    }
-			    break;
-
-			default :
-			    if ( cnt1 >= 1 )  goto loop1;
-					ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:1];
-					@throw eee;
-		    }
-		    cnt1++;
-		} while (YES); loop1: ;
+        	default :
+        	    if ( cnt1 >= 1 )  goto loop1;
+        			ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:1];
+        			@throw eee;
+            }
+            cnt1++;
+        } while (YES); loop1: ;
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end ID
 
 
 - (void) mINT
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_INT;
+        // SymbolTable.g:69:9: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
+        // SymbolTable.g:69:9: ( '0' .. '9' )+ // alt
+        {
+        // SymbolTable.g:69:9: ( '0' .. '9' )+	// positiveClosureBlock
+        int cnt2=0;
 
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_INT;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:69:9: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
-		// SymbolTable.g:69:9: ( '0' .. '9' )+ // alt
-		{
-		// SymbolTable.g:69:9: ( '0' .. '9' )+	// positiveClosureBlock
-		int cnt2=0;
+        do {
+            int alt2=2;
+            {
+            	int LA2_0 = [input LA:1];
+            	if ( (LA2_0>='0' && LA2_0<='9') ) {
+            		alt2 = 1;
+            	}
 
-		do {
-		    int alt2=2;
-		    {
-		    	int LA2_0 = [input LA:1];
-		    	if ( (LA2_0>='0' && LA2_0<='9') ) {
-		    		alt2 = 1;
-		    	}
+            }
+            switch (alt2) {
+        	case 1 :
+        	    // SymbolTable.g:69:10: '0' .. '9' // alt
+        	    {
+        	    [self matchRangeFromChar:'0' to:'9'];
 
-		    }
-		    switch (alt2) {
-			case 1 :
-			    // SymbolTable.g:69:10: '0' .. '9' // alt
-			    {
-			    [self matchRangeFromChar:'0' to:'9'];
+        	    }
+        	    break;
 
-			    }
-			    break;
-
-			default :
-			    if ( cnt2 >= 1 )  goto loop2;
-					ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:2];
-					@throw eee;
-		    }
-		    cnt2++;
-		} while (YES); loop2: ;
+        	default :
+        	    if ( cnt2 >= 1 )  goto loop2;
+        			ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:2];
+        			@throw eee;
+            }
+            cnt2++;
+        } while (YES); loop2: ;
 
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end INT
 
 
 - (void) mWS
 {
-	// token labels
-	// token+rule list labels
-	// rule labels
-	// rule list labels
-	// rule refs in alts with rewrites
+    @try {
+        ruleNestingLevel++;
+        int _type = SymbolTableLexer_WS;
+        // SymbolTable.g:72:9: ( ( ' ' | '\\n' | '\\r' )+ ) // ruleBlockSingleAlt
+        // SymbolTable.g:72:9: ( ' ' | '\\n' | '\\r' )+ // alt
+        {
+        // SymbolTable.g:72:9: ( ' ' | '\\n' | '\\r' )+	// positiveClosureBlock
+        int cnt3=0;
 
-	@try {
-		ruleNestingLevel++;
-		int _type = SymbolTableLexer_WS;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		int _channel = [ANTLRToken defaultChannel];
-		// SymbolTable.g:72:9: ( ( (' '|'\\n'|'\\r'))+ ) // ruleBlockSingleAlt
-		// SymbolTable.g:72:9: ( (' '|'\\n'|'\\r'))+ // alt
-		{
-		// SymbolTable.g:72:9: ( (' '|'\\n'|'\\r'))+	// positiveClosureBlock
-		int cnt3=0;
+        do {
+            int alt3=2;
+            {
+            	int LA3_0 = [input LA:1];
+            	if ( LA3_0=='\n'||LA3_0=='\r'||LA3_0==' ' ) {
+            		alt3 = 1;
+            	}
 
-		do {
-		    int alt3=2;
-		    {
-		    	int LA3_0 = [input LA:1];
-		    	if ( LA3_0=='\n'||LA3_0=='\r'||LA3_0==' ' ) {
-		    		alt3 = 1;
-		    	}
+            }
+            switch (alt3) {
+        	case 1 :
+        	    // SymbolTable.g: // alt
+        	    {
+        	    if ([input LA:1]=='\n'||[input LA:1]=='\r'||[input LA:1]==' ') {
+        	    	[input consume];
 
-		    }
-		    switch (alt3) {
-			case 1 :
-			    // SymbolTable.g:72:10: (' '|'\\n'|'\\r') // alt
-			    {
-			    if ([input LA:1]=='\n'||[input LA:1]=='\r'||[input LA:1]==' ') {
-			    	[input consume];
-
-			    } else {
-			    	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
-			    	[self recover:mse];	@throw mse;
-			    }
+        	    } else {
+        	    	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
+        	    	[self recover:mse];	@throw mse;
+        	    }
 
 
-			    }
-			    break;
+        	    }
+        	    break;
 
-			default :
-			    if ( cnt3 >= 1 )  goto loop3;
-					ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:3];
-					@throw eee;
-		    }
-		    cnt3++;
-		} while (YES); loop3: ;
+        	default :
+        	    if ( cnt3 >= 1 )  goto loop3;
+        			ANTLREarlyExitException *eee = [ANTLREarlyExitException exceptionWithStream:input decisionNumber:3];
+        			@throw eee;
+            }
+            cnt3++;
+        } while (YES); loop3: ;
 
-		_channel=99;
+        _channel=99;
 
-		}
+        }
 
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}
-	}
-	@finally {
-		ruleNestingLevel--;
+        self->_tokenType = _type;
+    }
+    @finally {
+        ruleNestingLevel--;
         // rule cleanup
-		// token labels
-		// token+rule list labels
-		// rule labels
-		// rule refs in alts with rewrites
+        // token labels
+        // token+rule list labels
+        // rule labels
 
-	}
-	return;
+    }
+    return;
 }
 // $ANTLR end WS
 

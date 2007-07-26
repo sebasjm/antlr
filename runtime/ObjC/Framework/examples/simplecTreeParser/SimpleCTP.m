@@ -1,8 +1,7 @@
-// $ANTLR 3.0b6 SimpleCTP.gtp 2007-02-01 01:28:02
+// $ANTLR 3.0 SimpleCTP.gtp 2007-07-25 20:23:14
 
 #import "SimpleCTP.h"
 
-#pragma mark Cyclic DFA
 
 #pragma mark Bitsets
 const static unsigned long long FOLLOW_declaration_in_program43_data[] = {0x0000000000000192LL};
@@ -41,8 +40,8 @@ const static unsigned long long FOLLOW_type_in_formalParameter188_data[] = {0x00
 static ANTLRBitSet *FOLLOW_type_in_formalParameter188;
 const static unsigned long long FOLLOW_declarator_in_formalParameter190_data[] = {0x0000000000000008LL};
 static ANTLRBitSet *FOLLOW_declarator_in_formalParameter190;
-const static unsigned long long FOLLOW_set_in_type210_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_set_in_type210;
+const static unsigned long long FOLLOW_set_in_type0_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_set_in_type0;
 const static unsigned long long FOLLOW_SimpleCTP_BLOCK_in_block273_data[] = {0x0000000000000004LL};
 static ANTLRBitSet *FOLLOW_SimpleCTP_BLOCK_in_block273;
 const static unsigned long long FOLLOW_variable_in_block275_data[] = {0x00000000000E3E18LL};
@@ -91,8 +90,8 @@ const static unsigned long long FOLLOW_expr_in_expr404_data[] = {0x0000000000000
 static ANTLRBitSet *FOLLOW_expr_in_expr404;
 const static unsigned long long FOLLOW_atom_in_expr415_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_atom_in_expr415;
-const static unsigned long long FOLLOW_set_in_atom432_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_set_in_atom432;
+const static unsigned long long FOLLOW_set_in_atom0_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_set_in_atom0;
 
 
 #pragma mark Dynamic Global Scopes
@@ -123,7 +122,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 	FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186_data count:1];
 	FOLLOW_type_in_formalParameter188 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_formalParameter188_data count:1];
 	FOLLOW_declarator_in_formalParameter190 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_formalParameter190_data count:1];
-	FOLLOW_set_in_type210 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_type210_data count:1];
+	FOLLOW_set_in_type0 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_type0_data count:1];
 	FOLLOW_SimpleCTP_BLOCK_in_block273 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_BLOCK_in_block273_data count:1];
 	FOLLOW_variable_in_block275 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_block275_data count:1];
 	FOLLOW_stat_in_block278 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_stat_in_block278_data count:1];
@@ -148,7 +147,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 	FOLLOW_SimpleCTP_ID_in_expr402 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_expr402_data count:1];
 	FOLLOW_expr_in_expr404 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr404_data count:1];
 	FOLLOW_atom_in_expr415 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_expr415_data count:1];
-	FOLLOW_set_in_atom432 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_atom432_data count:1];
+	FOLLOW_set_in_atom0 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_atom0_data count:1];
 
 }
 
@@ -184,12 +183,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:8:1: program : ( declaration )+ ;
 - (void) program
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:9:9: ( ( declaration )+ ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:9:9: ( declaration )+ // alt
@@ -239,7 +232,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -250,12 +242,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:12:1: declaration : ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) );
 - (void) declaration
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:13:9: ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) ) //ruleblock
         int alt2=3;
@@ -335,7 +321,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -346,12 +331,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:18:1: variable : ^( VAR_DEF type declarator ) ;
 - (void) variable
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:19:9: ( ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:19:9: ^( VAR_DEF type declarator ) // alt
@@ -383,7 +362,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -394,12 +372,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:22:1: declarator : ID ;
 - (void) declarator
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:23:9: ( ID ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:23:9: ID // alt
@@ -417,7 +389,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -428,12 +399,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:26:1: functionHeader : ^( FUNC_HDR type ID ( formalParameter )+ ) ;
 - (void) functionHeader
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:27:9: ( ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:27:9: ^( FUNC_HDR type ID ( formalParameter )+ ) // alt
@@ -494,7 +459,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -505,12 +469,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:30:1: formalParameter : ^( ARG_DEF type declarator ) ;
 - (void) formalParameter
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:31:9: ( ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:31:9: ^( ARG_DEF type declarator ) // alt
@@ -542,7 +500,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -550,25 +507,19 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end formalParameter
 
 // $ANTLR start type
-// SimpleCTP.gtp:34:1: type : ('int'|'char'|'void'|ID);
+// SimpleCTP.gtp:34:1: type : ( 'int' | 'char' | 'void' | ID );
 - (void) type
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
-        // SimpleCTP.gtp:35:5: ( ('int'|'char'|'void'|ID)) // ruleBlockSingleAlt
-        // SimpleCTP.gtp:35:9: ('int'|'char'|'void'|ID) // alt
+        // SimpleCTP.gtp:35:9: ( 'int' | 'char' | 'void' | ID ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp: // alt
         {
         if ([input LA:1]==SimpleCTP_ID||([input LA:1]>=SimpleCTP_INT_TYPE && [input LA:1]<=SimpleCTP_VOID)) {
         	[input consume];
         	errorRecovery = NO;
         } else {
         	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
-        	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_type210];	@throw mse;
+        	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_type0];	@throw mse;
         }
 
 
@@ -583,7 +534,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -594,12 +544,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:41:1: block : ^( BLOCK ( variable )* ( stat )* ) ;
 - (void) block
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:42:9: ( ^( BLOCK ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:42:9: ^( BLOCK ( variable )* ( stat )* ) // alt
@@ -677,7 +621,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -688,12 +631,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:45:1: stat : ( forStat | expr | block );
 - (void) stat
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:45:7: ( forStat | expr | block ) //ruleblock
         int alt6=3;
@@ -763,7 +700,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -774,12 +710,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:50:1: forStat : ^( 'for' expr expr expr block ) ;
 - (void) forStat
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:51:9: ( ^( 'for' expr expr expr block ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:51:9: ^( 'for' expr expr expr block ) // alt
@@ -821,7 +751,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -832,12 +761,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // SimpleCTP.gtp:54:1: expr : ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom );
 - (void) expr
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleCTP.gtp:54:9: ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom ) //ruleblock
         int alt7=5;
@@ -967,7 +890,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -975,25 +897,19 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 // $ANTLR end expr
 
 // $ANTLR start atom
-// SimpleCTP.gtp:61:1: atom : (ID|INT);
+// SimpleCTP.gtp:61:1: atom : ( ID | INT );
 - (void) atom
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
-        // SimpleCTP.gtp:62:5: ( (ID|INT)) // ruleBlockSingleAlt
-        // SimpleCTP.gtp:62:7: (ID|INT) // alt
+        // SimpleCTP.gtp:62:7: ( ID | INT ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp: // alt
         {
         if ([input LA:1]==SimpleCTP_ID||[input LA:1]==SimpleCTP_INT) {
         	[input consume];
         	errorRecovery = NO;
         } else {
         	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
-        	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_atom432];	@throw mse;
+        	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_atom0];	@throw mse;
         }
 
 
@@ -1008,7 +924,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom432;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;

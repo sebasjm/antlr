@@ -1,10 +1,9 @@
-// $ANTLR 3.0b6 SymbolTable.g 2007-02-01 01:28:00
+// $ANTLR 3.0 SymbolTable.g 2007-07-25 20:12:44
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
 
 
-#pragma mark Cyclic DFA
 
 #pragma mark Tokens
 #define SymbolTableParser_INT	5

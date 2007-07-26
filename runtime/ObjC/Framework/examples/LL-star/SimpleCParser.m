@@ -1,8 +1,8 @@
-// $ANTLR 3.0b6 SimpleC.g 2007-02-01 01:27:57
+// $ANTLR 3.0 SimpleC.g 2007-07-25 20:12:41
 
 #import "SimpleCParser.h"
 
-#pragma mark Cyclic DFA
+#pragma mark Cyclic DFA implementation start SimpleCParserDFA2
 @implementation SimpleCParserDFA2
 const static int SimpleCParserdfa2_eot[13] =
     {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
@@ -75,6 +75,7 @@ const static int SimpleCParserdfa2_transition8[] = {9, -1, -1, -1, -1, -1,
 
 
 @end
+#pragma mark Cyclic DFA implementation end SimpleCParserDFA2
 
 
 
@@ -117,8 +118,8 @@ const static unsigned long long FOLLOW_type_in_formalParameter194_data[] = {0x00
 static ANTLRBitSet *FOLLOW_type_in_formalParameter194;
 const static unsigned long long FOLLOW_declarator_in_formalParameter196_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_declarator_in_formalParameter196;
-const static unsigned long long FOLLOW_set_in_type223_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_set_in_type223;
+const static unsigned long long FOLLOW_set_in_type0_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_set_in_type0;
 const static unsigned long long FOLLOW_14_in_block285_data[] = {0x000000000001F9B0LL};
 static ANTLRBitSet *FOLLOW_14_in_block285;
 const static unsigned long long FOLLOW_variable_in_block299_data[] = {0x000000000001F9B0LL};
@@ -169,8 +170,8 @@ const static unsigned long long FOLLOW_condExpr_in_expr467_data[] = {0x000000000
 static ANTLRBitSet *FOLLOW_condExpr_in_expr467;
 const static unsigned long long FOLLOW_aexpr_in_condExpr486_data[] = {0x00000000000C0002LL};
 static ANTLRBitSet *FOLLOW_aexpr_in_condExpr486;
-const static unsigned long long FOLLOW_set_in_condExpr491_data[] = {0x0000000000000130LL};
-static ANTLRBitSet *FOLLOW_set_in_condExpr491;
+const static unsigned long long FOLLOW_set_in_condExpr490_data[] = {0x0000000000000130LL};
+static ANTLRBitSet *FOLLOW_set_in_condExpr490;
 const static unsigned long long FOLLOW_aexpr_in_condExpr498_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_aexpr_in_condExpr498;
 const static unsigned long long FOLLOW_atom_in_aexpr520_data[] = {0x0000000000100002LL};
@@ -220,7 +221,7 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 	FOLLOW_10_in_functionHeader172 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_10_in_functionHeader172_data count:1];
 	FOLLOW_type_in_formalParameter194 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_formalParameter194_data count:1];
 	FOLLOW_declarator_in_formalParameter196 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_formalParameter196_data count:1];
-	FOLLOW_set_in_type223 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_type223_data count:1];
+	FOLLOW_set_in_type0 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_type0_data count:1];
 	FOLLOW_14_in_block285 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_14_in_block285_data count:1];
 	FOLLOW_variable_in_block299 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_block299_data count:1];
 	FOLLOW_stat_in_block314 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_stat_in_block314_data count:1];
@@ -246,7 +247,7 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 	FOLLOW_expr_in_assignStat445 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_assignStat445_data count:1];
 	FOLLOW_condExpr_in_expr467 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_condExpr_in_expr467_data count:1];
 	FOLLOW_aexpr_in_condExpr486 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_aexpr_in_condExpr486_data count:1];
-	FOLLOW_set_in_condExpr491 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_condExpr491_data count:1];
+	FOLLOW_set_in_condExpr490 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_condExpr490_data count:1];
 	FOLLOW_aexpr_in_condExpr498 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_aexpr_in_condExpr498_data count:1];
 	FOLLOW_atom_in_aexpr520 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_aexpr520_data count:1];
 	FOLLOW_20_in_aexpr524 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_20_in_aexpr524_data count:1];
@@ -289,12 +290,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:7:1: program : ( declaration )+ ;
 - (void) program
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:8:9: ( ( declaration )+ ) // ruleBlockSingleAlt
         // SimpleC.g:8:9: ( declaration )+ // alt
@@ -344,7 +339,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -355,15 +349,10 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:11:1: declaration : ( variable | functionHeader ';' | functionHeader block );
 - (void) declaration
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
     NSString* _functionHeader1 = nil;
 
     NSString* _functionHeader2 = nil;
 
-    // rule list labels
-    // rule refs in alts with rewrites
 
     @try {
         // SimpleC.g:21:9: ( variable | functionHeader ';' | functionHeader block ) //ruleblock
@@ -424,7 +413,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// rule labels
 		[_functionHeader1 release];
 		[_functionHeader2 release];
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -435,12 +423,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:28:1: variable : type declarator ';' ;
 - (void) variable
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:29:9: ( type declarator ';' ) // ruleBlockSingleAlt
         // SimpleC.g:29:9: type declarator ';' // alt
@@ -468,7 +450,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -479,12 +460,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:32:1: declarator : ID ;
 - (void) declarator
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:33:9: ( ID ) // ruleBlockSingleAlt
         // SimpleC.g:33:9: ID // alt
@@ -502,7 +477,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -514,12 +488,7 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 - (NSString*) functionHeader
 {
     NSString* _name;
-    // token labels
-    ANTLRToken * _ID3 = nil;
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
+    id<ANTLRToken>  _ID3 = nil;
 
 
         _name =nil;
@@ -535,7 +504,7 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
         [following removeLastObject];
 
 
-        _ID3=(ANTLRToken *)[input LT:1];
+        _ID3=(id<ANTLRToken> )[input LT:1];
         [_ID3 retain];
         [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_functionHeader152]; 
         [self match:input tokenType:8 follow:FOLLOW_8_in_functionHeader154]; 
@@ -607,7 +576,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		[_ID3 release];
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return _name;
@@ -618,12 +586,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:44:1: formalParameter : type declarator ;
 - (void) formalParameter
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:45:9: ( type declarator ) // ruleBlockSingleAlt
         // SimpleC.g:45:9: type declarator // alt
@@ -650,7 +612,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -658,25 +619,19 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // $ANTLR end formalParameter
 
 // $ANTLR start type
-// SimpleC.g:48:1: type : ('int'|'char'|'void'|ID);
+// SimpleC.g:48:1: type : ( 'int' | 'char' | 'void' | ID );
 - (void) type
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
-        // SimpleC.g:49:5: ( ('int'|'char'|'void'|ID)) // ruleBlockSingleAlt
-        // SimpleC.g:49:9: ('int'|'char'|'void'|ID) // alt
+        // SimpleC.g:49:9: ( 'int' | 'char' | 'void' | ID ) // ruleBlockSingleAlt
+        // SimpleC.g: // alt
         {
         if ([input LA:1]==SimpleCParser_ID||([input LA:1]>=11 && [input LA:1]<=13)) {
         	[input consume];
         	errorRecovery = NO;
         } else {
         	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
-        	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_type223];	@throw mse;
+        	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_type0];	@throw mse;
         }
 
 
@@ -691,7 +646,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -702,12 +656,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:55:1: block : '{' ( variable )* ( stat )* '}' ;
 - (void) block
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:56:9: ( '{' ( variable )* ( stat )* '}' ) // ruleBlockSingleAlt
         // SimpleC.g:56:9: '{' ( variable )* ( stat )* '}' // alt
@@ -789,7 +737,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -800,12 +747,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:62:1: stat : ( forStat | expr ';' | block | assignStat ';' | ';' );
 - (void) stat
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:62:7: ( forStat | expr ';' | block | assignStat ';' | ';' ) //ruleblock
         int alt7=5;
@@ -909,7 +850,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -920,12 +860,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:69:1: forStat : 'for' '(' assignStat ';' expr ';' assignStat ')' block ;
 - (void) forStat
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:70:9: ( 'for' '(' assignStat ';' expr ';' assignStat ')' block ) // ruleBlockSingleAlt
         // SimpleC.g:70:9: 'for' '(' assignStat ';' expr ';' assignStat ')' block // alt
@@ -967,7 +901,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -978,12 +911,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:73:1: assignStat : ID '=' expr ;
 - (void) assignStat
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:74:9: ( ID '=' expr ) // ruleBlockSingleAlt
         // SimpleC.g:74:9: ID '=' expr // alt
@@ -1007,7 +934,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -1018,12 +944,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:77:1: expr : condExpr ;
 - (void) expr
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:77:9: ( condExpr ) // ruleBlockSingleAlt
         // SimpleC.g:77:9: condExpr // alt
@@ -1045,7 +965,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -1053,25 +972,19 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // $ANTLR end expr
 
 // $ANTLR start condExpr
-// SimpleC.g:80:1: condExpr : aexpr ( ('=='|'<') aexpr )? ;
+// SimpleC.g:80:1: condExpr : aexpr ( ( '==' | '<' ) aexpr )? ;
 - (void) condExpr
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
-        // SimpleC.g:81:9: ( aexpr ( ('=='|'<') aexpr )? ) // ruleBlockSingleAlt
-        // SimpleC.g:81:9: aexpr ( ('=='|'<') aexpr )? // alt
+        // SimpleC.g:81:9: ( aexpr ( ( '==' | '<' ) aexpr )? ) // ruleBlockSingleAlt
+        // SimpleC.g:81:9: aexpr ( ( '==' | '<' ) aexpr )? // alt
         {
         [following addObject:FOLLOW_aexpr_in_condExpr486];
         [self aexpr];
         [following removeLastObject];
 
 
-        // SimpleC.g:81:15: ( ('=='|'<') aexpr )? // block
+        // SimpleC.g:81:15: ( ( '==' | '<' ) aexpr )? // block
         int alt8=2;
         {
         	int LA8_0 = [input LA:1];
@@ -1081,14 +994,14 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
         }
         switch (alt8) {
         	case 1 :
-        	    // SimpleC.g:81:17: ('=='|'<') aexpr // alt
+        	    // SimpleC.g:81:17: ( '==' | '<' ) aexpr // alt
         	    {
         	    if (([input LA:1]>=18 && [input LA:1]<=19)) {
         	    	[input consume];
         	    	errorRecovery = NO;
         	    } else {
         	    	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
-        	    	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_condExpr491];	@throw mse;
+        	    	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_condExpr490];	@throw mse;
         	    }
 
         	    [following addObject:FOLLOW_aexpr_in_condExpr498];
@@ -1114,7 +1027,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -1125,12 +1037,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:84:1: aexpr : atom ( '+' atom )* ;
 - (void) aexpr
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:85:9: ( atom ( '+' atom )* ) // ruleBlockSingleAlt
         // SimpleC.g:85:9: atom ( '+' atom )* // alt
@@ -1180,7 +1086,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -1191,12 +1096,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 // SimpleC.g:88:1: atom : ( ID | INT | '(' expr ')' );
 - (void) atom
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SimpleC.g:89:7: ( ID | INT | '(' expr ')' ) //ruleblock
         int alt10=3;
@@ -1255,7 +1154,6 @@ static ANTLRBitSet *FOLLOW_10_in_atom578;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;

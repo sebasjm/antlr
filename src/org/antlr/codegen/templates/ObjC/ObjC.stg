@@ -193,7 +193,7 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="id<ANTLRToken> 
  *  a token and then try again.  backtracking needs to be set as well.
  */
 filteringNextToken() ::= <<
-- (id<ANTLRToken>) nextToken
+- (id\<ANTLRToken>) nextToken
 {
     while (YES) {
         if ( [input LA:1] == ANTLRCharStreamEOF ) {
@@ -214,6 +214,7 @@ filteringNextToken() ::= <<
                 [input rewind:m];
                 [input consume]; <! // advance one char and try again !>
             } else {
+                [self emit];
                 return token;
             }
         }

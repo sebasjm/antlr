@@ -1,10 +1,9 @@
-// $ANTLR 3.0b6 T.g 2007-02-01 01:27:58
+// $ANTLR 3.0 T.g 2007-07-25 20:12:43
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
 
 
-#pragma mark Cyclic DFA
 
 #pragma mark Tokens
 #define TParser_INT	5

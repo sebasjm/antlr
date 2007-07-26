@@ -1,10 +1,8 @@
-// $ANTLR 3.0b6 FuzzyJava.gl 2007-02-01 01:27:55
+// $ANTLR 3.0 FuzzyJava.gl 2007-07-25 20:12:38
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
 
-#pragma mark Cyclic DFA start
-#pragma mark Cyclic DFA end
 
 #pragma mark Rule return scopes start
 #pragma mark Rule return scopes end

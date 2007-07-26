@@ -122,7 +122,7 @@
                                                           tokenType:_tokenType 
                                                             channel:_channel
                                                               start:tokenStartCharIndex
-                                                               stop:[self charIndex]];
+                                                               stop:[self charIndex]-1];
 	[aToken setLine:_tokenStartLine];
 	[aToken setCharPositionInLine:_tokenCharPositionInLine];
     if (text != nil)

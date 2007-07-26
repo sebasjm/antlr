@@ -1,12 +1,13 @@
-// $ANTLR 3.0b6 SimpleC.g 2007-02-01 01:28:01
+// $ANTLR 3.0 SimpleC.g 2007-07-25 20:23:13
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
 
 
-#pragma mark Cyclic DFA
+#pragma mark Cyclic DFA interface start SimpleCParserDFA2
 @interface SimpleCParserDFA2 : ANTLRDFA {} @end
 
+#pragma mark Cyclic DFA interface end SimpleCParserDFA2
 
 #pragma mark Tokens
 #define SimpleCParser_FUNC_DEF	8

@@ -1,8 +1,7 @@
-// $ANTLR 3.0b6 SymbolTable.g 2007-02-01 01:28:00
+// $ANTLR 3.0 SymbolTable.g 2007-07-25 20:12:44
 
 #import "SymbolTableParser.h"
 
-#pragma mark Cyclic DFA
 
 #pragma mark Bitsets
 const static unsigned long long FOLLOW_globals_in_prog44_data[] = {0x0000000000000082LL};
@@ -117,12 +116,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 // SymbolTable.g:25:1: prog : globals ( method )* ;
 - (void) prog
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SymbolTable.g:25:9: ( globals ( method )* ) // ruleBlockSingleAlt
         // SymbolTable.g:25:9: globals ( method )* // alt
@@ -171,7 +164,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -183,12 +175,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 - (void) globals
 {
     [SymbolTableParser_Symbols_stack addObject:[[[SymbolTableParserSymbolsScope alloc] init] autorelease]];
-
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
 
 
         level++;
@@ -241,7 +227,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 		[SymbolTableParser_Symbols_stack removeLastObject];
 
@@ -254,12 +239,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 // SymbolTable.g:41:1: method : 'method' ID '(' ')' block ;
 - (void) method
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SymbolTable.g:42:9: ( 'method' ID '(' ')' block ) // ruleBlockSingleAlt
         // SymbolTable.g:42:9: 'method' ID '(' ')' block // alt
@@ -285,7 +264,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -297,12 +275,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 - (void) block
 {
     [SymbolTableParser_Symbols_stack addObject:[[[SymbolTableParserSymbolsScope alloc] init] autorelease]];
-
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
 
 
         level++;
@@ -384,7 +356,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 		[SymbolTableParser_Symbols_stack removeLastObject];
 
@@ -397,12 +368,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 // SymbolTable.g:58:1: stat : ( ID '=' INT ';' | block );
 - (void) stat
 {
-    // token labels
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
-
     @try {
         // SymbolTable.g:58:9: ( ID '=' INT ';' | block ) //ruleblock
         int alt5=2;
@@ -452,7 +417,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 		// token labels
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;
@@ -463,19 +427,14 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 // SymbolTable.g:62:1: decl : 'int' ID ';' ;
 - (void) decl
 {
-    // token labels
-    ANTLRToken * _ID1 = nil;
-    // token+rule list labels
-    // rule labels
-    // rule list labels
-    // rule refs in alts with rewrites
+    id<ANTLRToken>  _ID1 = nil;
 
     @try {
         // SymbolTable.g:62:9: ( 'int' ID ';' ) // ruleBlockSingleAlt
         // SymbolTable.g:62:9: 'int' ID ';' // alt
         {
         [self match:input tokenType:14 follow:FOLLOW_14_in_decl213]; 
-        _ID1=(ANTLRToken *)[input LT:1];
+        _ID1=(id<ANTLRToken> )[input LT:1];
         [_ID1 retain];
         [self match:input tokenType:SymbolTableParser_ID follow:FOLLOW_SymbolTableParser_ID_in_decl215]; 
         [self match:input tokenType:13 follow:FOLLOW_13_in_decl217]; 
@@ -493,7 +452,6 @@ static ANTLRBitSet *FOLLOW_13_in_decl217;
 		[_ID1 release];
 		// token+rule list labels
 		// rule labels
-		// rule refs in alts with rewrites
 
 	}
 	return ;

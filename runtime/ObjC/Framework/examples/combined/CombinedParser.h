@@ -1,10 +1,9 @@
-// $ANTLR 3.0 Combined.g 2007-06-03 02:18:30
+// $ANTLR 3.0 Combined.g 2007-07-25 20:12:40
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
 
 
-#pragma mark Cyclic DFA
 
 #pragma mark Tokens
 #define CombinedParser_INT	5

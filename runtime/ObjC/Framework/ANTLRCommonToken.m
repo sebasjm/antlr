@@ -105,7 +105,7 @@
 	if (input == nil) {
 		return nil;
 	}
-	return [input substringWithRange:NSMakeRange(start,stop-start)];
+	return [input substringWithRange:NSMakeRange(start,stop-start+1)];
 }
 
 - (void) setText: (NSString *) aText

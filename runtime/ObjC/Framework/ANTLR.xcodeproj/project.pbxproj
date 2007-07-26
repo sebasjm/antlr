@@ -13,6 +13,7 @@
 			buildPhases = (
 			);
 			dependencies = (
+				F79EFB140C5845A300ABAB3D /* PBXTargetDependency */,
 				F762874C0B715417006AA7EF /* PBXTargetDependency */,
 				F76287A70B7157C2006AA7EF /* PBXTargetDependency */,
 				F76287A90B7157C2006AA7EF /* PBXTargetDependency */,
@@ -122,7 +123,6 @@
 		F77744060B234A3400D1F89B /* ANTLRToken+DebuggerSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = F77744040B234A3400D1F89B /* ANTLRToken+DebuggerSupport.m */; };
 		F77747560B23A70600D1F89B /* ANTLRDebug.h in Headers */ = {isa = PBXBuildFile; fileRef = F77747550B23A70600D1F89B /* ANTLRDebug.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F77765CC09DC583000517181 /* ANTLRToken.h in Headers */ = {isa = PBXBuildFile; fileRef = F77765CA09DC583000517181 /* ANTLRToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F77765CD09DC583000517181 /* ANTLRToken.m in Sources */ = {isa = PBXBuildFile; fileRef = F77765CB09DC583000517181 /* ANTLRToken.m */; };
 		F777660509DC5CF400517181 /* ANTLRCommonToken.h in Headers */ = {isa = PBXBuildFile; fileRef = F777660309DC5CF400517181 /* ANTLRCommonToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F777660609DC5CF400517181 /* ANTLRCommonToken.m in Sources */ = {isa = PBXBuildFile; fileRef = F777660409DC5CF400517181 /* ANTLRCommonToken.m */; };
 		F777668209DC719C00517181 /* ANTLRMismatchedTokenException.h in Headers */ = {isa = PBXBuildFile; fileRef = F777668009DC719C00517181 /* ANTLRMismatchedTokenException.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -245,6 +245,13 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = ANTLR;
 		};
+		F79EFB130C5845A300ABAB3D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F76287780B71557E006AA7EF /* Regenerate lexertest-simple */;
+			remoteInfo = "Regenerate lexertest-simple";
+		};
 		F7DD05F30A7B1649006A006C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -347,7 +354,7 @@
 		F72C5E2F0AB7529C00282574 /* input */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input; sourceTree = "<group>"; };
 		F72C5E310AB7529C00282574 /* output */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = output; sourceTree = "<group>"; };
 		F72C5E560AB7E41000282574 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		F72C5E690AB7E4C900282574 /* simplectree */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = simplectree; sourceTree = BUILT_PRODUCTS_DIR; };
+		F72C5E690AB7E4C900282574 /* simplectree */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = simplectree; sourceTree = BUILT_PRODUCTS_DIR; };
 		F72C5ECC0AB7E5A500282574 /* ANTLRParserRuleReturnScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRParserRuleReturnScope.h; sourceTree = "<group>"; };
 		F72C5ECD0AB7E5A500282574 /* ANTLRParserRuleReturnScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRParserRuleReturnScope.m; sourceTree = "<group>"; };
 		F738D1730B07AEAA001813C4 /* ANTLRFailedPredicateException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRFailedPredicateException.h; sourceTree = "<group>"; };
@@ -393,7 +400,6 @@
 		F77744040B234A3400D1F89B /* ANTLRToken+DebuggerSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ANTLRToken+DebuggerSupport.m"; sourceTree = "<group>"; };
 		F77747550B23A70600D1F89B /* ANTLRDebug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebug.h; sourceTree = "<group>"; };
 		F77765CA09DC583000517181 /* ANTLRToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRToken.h; sourceTree = "<group>"; };
-		F77765CB09DC583000517181 /* ANTLRToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRToken.m; sourceTree = "<group>"; };
 		F777660309DC5CF400517181 /* ANTLRCommonToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRCommonToken.h; sourceTree = "<group>"; };
 		F777660409DC5CF400517181 /* ANTLRCommonToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRCommonToken.m; sourceTree = "<group>"; };
 		F777668009DC719C00517181 /* ANTLRMismatchedTokenException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRMismatchedTokenException.h; sourceTree = "<group>"; };
@@ -771,7 +777,6 @@
 			isa = PBXGroup;
 			children = (
 				F77765CA09DC583000517181 /* ANTLRToken.h */,
-				F77765CB09DC583000517181 /* ANTLRToken.m */,
 				F777660309DC5CF400517181 /* ANTLRCommonToken.h */,
 				F777660409DC5CF400517181 /* ANTLRCommonToken.m */,
 			);
@@ -1306,7 +1311,6 @@
 				F70AA7C809AA339900C3FD5E /* ANTLRStringStream.m in Sources */,
 				F70AA7D009AA379300C3FD5E /* ANTLRStringStreamState.m in Sources */,
 				F7492F5C09C016A200B25E30 /* ANTLRBaseRecognizer.m in Sources */,
-				F77765CD09DC583000517181 /* ANTLRToken.m in Sources */,
 				F777660609DC5CF400517181 /* ANTLRCommonToken.m in Sources */,
 				F777668309DC719C00517181 /* ANTLRMismatchedTokenException.m in Sources */,
 				F777669409DC72D600517181 /* ANTLRRecognitionException.m in Sources */,
@@ -1480,6 +1484,11 @@
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* ANTLR */;
 			targetProxy = F79D5AF10A0E632A00EA3CEE /* PBXContainerItemProxy */;
+		};
+		F79EFB140C5845A300ABAB3D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F76287780B71557E006AA7EF /* Regenerate lexertest-simple */;
+			targetProxy = F79EFB130C5845A300ABAB3D /* PBXContainerItemProxy */;
 		};
 		F7DD05F40A7B1649006A006C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
