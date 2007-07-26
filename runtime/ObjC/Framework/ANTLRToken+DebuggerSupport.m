@@ -9,7 +9,7 @@
 #import "ANTLRToken+DebuggerSupport.h"
 
 
-@implementation ANTLRToken(DebuggerSupport)
+@implementation ANTLRCommonToken(DebuggerSupport)
 
 - (NSString *)debuggerDescription
 {

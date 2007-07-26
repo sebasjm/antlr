@@ -8,8 +8,9 @@
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLRToken.h>
+#import <ANTLR/ANTLRCommonToken.h>
 
-@interface ANTLRToken(DebuggerSupport)
+@interface ANTLRCommonToken(DebuggerSupport)
 
 - (NSString *)debuggerDescription;
 

@@ -71,15 +71,21 @@
 - (id<ANTLRToken>) nextToken
 {
 	token = nil;
+    _channel = ANTLRTokenChannelDefault;
+    _tokenStartLine = [input line];
+    _tokenCharPositionInLine = [input charPositionInLine];
 	tokenStartCharIndex = [self charIndex];
+    
 	while (YES) {
         [self setText:nil];
 		if ([input LA:1] == ANTLRCharStreamEOF) {
-//			return [ANTLRToken eofToken];
+			return [ANTLRCommonToken eofToken];
 			return nil;
 		}
 		@try {
 			[self mTokens];
+            if (token == nil)
+                [self emit];
 			return token;
 		}
 		@catch (ANTLRRecognitionException *e) {
@@ -106,37 +112,32 @@
 	tokenStartCharIndex = -1;
 }
 
-// use this to emit custom tokens from a lexer rule
-- (void) emit:(id<ANTLRToken>)aToken
-{
-	[self setToken:aToken];
-}
-
 // this method is used by the code generator to automatically emit tokens from the lexer.
 // for now it will always return ANTLRCommonTokens
-// use a manual emit: in the grammar to return custom tokens
-- (void) emitTokenWithType:(ANTLRTokenType)aTType 
-					  line:(unsigned int)aLine 
-			  charPosition:(unsigned int)aCharPos 
-				   channel:(unsigned int)aChannel
-					 start:(unsigned int)theStart
-					  stop:(unsigned int)theStop
+// use a manual emit: in the grammar to return custom tokens or override this method in your
+// lexer
+- (void) emit
 {
-#warning TODO: Return the correct token object here, not ANTLRCommonToken 
 	id<ANTLRToken> aToken = [[ANTLRCommonToken alloc] initWithInput:input 
-													   tokenType:aTType 
-														 channel:aChannel
-														   start:theStart
-															stop:theStop];
-	[aToken setLine:aLine];
-	[aToken setCharPositionInLine:aCharPos];
+                                                          tokenType:_tokenType 
+                                                            channel:_channel
+                                                              start:tokenStartCharIndex
+                                                               stop:[self charIndex]];
+	[aToken setLine:_tokenStartLine];
+	[aToken setCharPositionInLine:_tokenCharPositionInLine];
     if (text != nil)
         [aToken setText:text];
 	[self emit:aToken];
 	[aToken release];
 }
 
-	// matching
+// use this to emit custom tokens from a lexer rule
+- (void) emit:(id<ANTLRToken>)aToken
+{
+	[self setToken:aToken];
+}
+
+// matching
 #pragma mark Matching
 - (void) matchString:(NSString *)aString
 {

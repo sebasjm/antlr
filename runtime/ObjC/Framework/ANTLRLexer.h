@@ -36,12 +36,16 @@
 
 @protocol ANTLRTokenSource;
 @interface ANTLRLexer : ANTLRBaseRecognizer <ANTLRTokenSource> {
-	id<ANTLRCharStream> input;
-	id<ANTLRToken> token;
-    unsigned int _channel;
-	unsigned int tokenStartCharIndex;
+	id<ANTLRCharStream> input;      ///< The character stream we pull tokens out of.
+	id<ANTLRToken> token;           ///< The current token that will be emitted next.
+    
+    unsigned int _tokenType;        ///< The type of the current token.
+    unsigned int _channel;          ///< The token channel number to be used for the current token.
+    unsigned int _tokenStartLine;   ///< The line number of the first character of the current token appeared in.
+    unsigned int _tokenCharPositionInLine;  ///< The character index of the first character of the current token within the current line.
+	unsigned int tokenStartCharIndex;       ///< The index of the first character of the current token. Default is -1 for an undefined value.
 	unsigned int ruleNestingLevel;
-    NSString *text;
+    NSString *text;                 ///< The text for the current token to be emitted next. If nil, we just refer to the start and stop indices into the character stream.
 }
 
 #pragma mark Initializer
@@ -54,13 +58,9 @@
 - (void) mTokens;		// abstract, defined in generated sources
 - (id<ANTLRCharStream>) input;
 - (void) setInput:(id<ANTLRCharStream>)aCharStream;
+
+- (void) emit;
 - (void) emit:(id<ANTLRToken>)aToken;
-- (void) emitTokenWithType:(ANTLRTokenType)aTType 
-					  line:(unsigned int)aLine 
-			  charPosition:(unsigned int)aCharPos 
-				   channel:(unsigned int)aChannel
-					 start:(unsigned int)theStart
-					  stop:(unsigned int)theStop;
 
 #pragma mark Matching
 - (void) matchString:(NSString *)aString;

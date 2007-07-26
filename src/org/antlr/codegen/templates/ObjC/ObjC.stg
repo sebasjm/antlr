@@ -131,7 +131,7 @@ lexerHeaderFile() ::=
 @end
 >>
 
-lexer(grammar, name, tokens, scopes, rules, numRules, labelType="ANTLRToken *",
+lexer(grammar, name, tokens, scopes, rules, numRules, labelType="id<ANTLRToken> ",
       filterMode) ::= <<
 <cyclicDFAs:cyclicDFA()>
 
@@ -193,13 +193,16 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="ANTLRToken *",
  *  a token and then try again.  backtracking needs to be set as well.
  */
 filteringNextToken() ::= <<
-- (ANTLRToken *) nextToken
+- (id<ANTLRToken>) nextToken
 {
     while (YES) {
         if ( [input LA:1] == ANTLRCharStreamEOF ) {
             return nil; // should really be a +eofToken call here -> go figure
         }
         [self setToken:nil];
+        _channel = ANTLRTokenChannelDefault;
+        _tokenStartLine = [input line];
+        _tokenCharPositionInLine = [input charPositionInLine];
         tokenStartCharIndex = [self charIndex];
         @try {
             int m = [input mark];
@@ -364,7 +367,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 @end
 >>
 
-parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="ANTLRParser", labelType="ANTLRToken *", members={<actions.parser.members>}) ::= <<
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="ANTLRParser", labelType="id<ANTLRToken> ", members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="id\<ANTLRTokenStream>", ...)>
 >>
 
@@ -543,38 +546,28 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block, memoize) ::= <<
 - (void) m<ruleName><if(ruleDescriptor.parameterScope)><ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>
 {
     <if(trace)>NSLog(@"enter <ruleName> %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);<endif>
-	<ruleDeclarations()>
-	<ruleLabelDefs()>
-	@try {
-		ruleNestingLevel++;
+    <ruleDeclarations()>
+    <ruleLabelDefs()>
+    <ruleMemoization(name=ruleName)>
+    @try {
+        ruleNestingLevel++;
 <ruleDescriptor.actions.init>
 <if(nakedBlock)>
-        <ruleMemoization(name=ruleName)>
-		<block><\n>
+        <block><\n>
 <else>
-		int _type = <name>_<ruleName>;
-		int _start = [self charIndex];
-		int _line = [self line];
-		int _charPosition = [self charPositionInLine];
-		_channel = [ANTLRToken defaultChannel];
-		<block>
-		if ( token == nil && ruleNestingLevel == 1) { [self emitTokenWithType:_type line:_line charPosition:_charPosition channel:_channel start:_start stop:[self charIndex]];}<\n>
+        int _type = <name>_<ruleName>;
+        <block>
+        self->_tokenType = _type;<\n>
 <endif>
-	}
-	@finally {
-		ruleNestingLevel--;
+    }
+    @finally {
+        ruleNestingLevel--;
         <if(trace)>NSLog(@"exit <ruleName> %C line=%d:%d failed=%@ backtracking=%d", [input LA:1], [self line], [self charPositionInLine], failed ? @"YES" : @"NO", backtracking);<endif>
         // rule cleanup
-		<ruleCleanUp()>
-<if(backtracking)>
-		if ( backtracking == 0 ) {
-			<ruleDescriptor.actions.finally>
-		}<\n>
-<else>
-		<ruleDescriptor.actions.finally>
-<endif>
-	}
-	return;
+        <ruleCleanUp()>
+        <(ruleDescriptor.actions.finally):execAction()>
+    }
+    return;
 }
 // $ANTLR end <ruleName>
 >>
@@ -797,7 +790,7 @@ lexerStringRef(string,label) ::= <<
 int _<label>Start = [self charIndex];
 [self matchString:<string>];
 <checkRuleBacktrackFailure()>
-_<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_<label>Start, stop:[self charIndex]];
+_<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_<label>Start stop:[self charIndex]];
 <else>
 [self matchString:<string>];
 <checkRuleBacktrackFailure()><\n>
@@ -1431,12 +1424,6 @@ if ( backtracking==0 ) {
 <endif>
 >>
 
-
-// L E X E R  A C T I O N S
-
-emit(type) ::= "[self emit:<type>];"
-
-setType(type) ::= "[self setType:<type>];"
 
 // M I S C (properties, etc...)
 
