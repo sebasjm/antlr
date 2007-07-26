@@ -38,8 +38,16 @@
 	ANTLRBitSet *bitSet = [[ANTLRBitSet alloc] initWithBits:bitData count:2];
 	CFMutableBitVectorRef bitVector = [bitSet _bitVector];
 	NSLog(@"%@", [bitSet toString]);
-	NSLog(@"countofbit %d getcount %d", CFBitVectorGetCountOfBit(bitVector,CFRangeMake(0,CFBitVectorGetCount(bitVector)),1), CFBitVectorGetCount(bitVector));
-	STAssertEquals(CFBitVectorGetCountOfBit(bitVector,CFRangeMake(0,CFBitVectorGetCount(bitVector)),1), (CFIndex)3, @"There should be three bits set in bitvector. But I have %d",CFBitVectorGetCountOfBit(bitVector,CFRangeMake(0,CFBitVectorGetCount(bitVector)),1));
+    NSLog(@"getcount %d", CFBitVectorGetCount(bitVector));
+    
+    CFIndex actual = CFBitVectorGetCountOfBit(bitVector,CFRangeMake(0,CFBitVectorGetCount(bitVector)),1);
+    CFIndex expected = 3;
+	
+    STAssertEquals(actual,
+                   expected,
+                   @"There should be three bits set in bitvector. But I have %d",
+                   CFBitVectorGetCountOfBit(bitVector,CFRangeMake(0,CFBitVectorGetCount(bitVector)),1)
+                   );
 }
 
 @end
