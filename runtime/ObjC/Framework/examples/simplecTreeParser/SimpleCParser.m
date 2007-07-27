@@ -1,4 +1,4 @@
-// $ANTLR 3.0 SimpleC.g 2007-07-25 20:23:13
+// $ANTLR 3.0 SimpleC.g 2007-07-26 00:05:44
 
 #import "SimpleCParser.h"
 
@@ -72,7 +72,7 @@ const static int SimpleCParserdfa2_transition8[] = {9, -1, -1, -1, 8};
 
 - (NSString *) description
 {
-	return @"20:1: declaration : ( variable | functionHeader ';' -> ^( FUNC_DECL[$functionHeader.start] functionHeader ) | functionHeader block -> ^( FUNC_DEF[$functionHeader.start] functionHeader block ) );";
+	return @"20:1: declaration : ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) );";
 }
 
 
@@ -90,110 +90,110 @@ const static unsigned long long FOLLOW_functionHeader_in_declaration115_data[] =
 static ANTLRBitSet *FOLLOW_functionHeader_in_declaration115;
 const static unsigned long long FOLLOW_21_in_declaration117_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_21_in_declaration117;
-const static unsigned long long FOLLOW_functionHeader_in_declaration136_data[] = {0x0000000002000000LL};
-static ANTLRBitSet *FOLLOW_functionHeader_in_declaration136;
-const static unsigned long long FOLLOW_block_in_declaration138_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_block_in_declaration138;
-const static unsigned long long FOLLOW_type_in_variable168_data[] = {0x0000000000000400LL};
-static ANTLRBitSet *FOLLOW_type_in_variable168;
-const static unsigned long long FOLLOW_declarator_in_variable170_data[] = {0x0000000000200000LL};
-static ANTLRBitSet *FOLLOW_declarator_in_variable170;
-const static unsigned long long FOLLOW_21_in_variable172_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_21_in_variable172;
-const static unsigned long long FOLLOW_SimpleCParser_ID_in_declarator202_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_ID_in_declarator202;
-const static unsigned long long FOLLOW_type_in_functionHeader222_data[] = {0x0000000000000400LL};
-static ANTLRBitSet *FOLLOW_type_in_functionHeader222;
-const static unsigned long long FOLLOW_SimpleCParser_ID_in_functionHeader224_data[] = {0x0000000000400000LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_ID_in_functionHeader224;
-const static unsigned long long FOLLOW_22_in_functionHeader226_data[] = {0x000000000101C400LL};
-static ANTLRBitSet *FOLLOW_22_in_functionHeader226;
-const static unsigned long long FOLLOW_formalParameter_in_functionHeader230_data[] = {0x0000000001800000LL};
-static ANTLRBitSet *FOLLOW_formalParameter_in_functionHeader230;
-const static unsigned long long FOLLOW_23_in_functionHeader234_data[] = {0x000000000001C400LL};
-static ANTLRBitSet *FOLLOW_23_in_functionHeader234;
-const static unsigned long long FOLLOW_formalParameter_in_functionHeader236_data[] = {0x0000000001800000LL};
-static ANTLRBitSet *FOLLOW_formalParameter_in_functionHeader236;
-const static unsigned long long FOLLOW_24_in_functionHeader244_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_24_in_functionHeader244;
-const static unsigned long long FOLLOW_type_in_formalParameter285_data[] = {0x0000000000000400LL};
-static ANTLRBitSet *FOLLOW_type_in_formalParameter285;
-const static unsigned long long FOLLOW_declarator_in_formalParameter287_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_declarator_in_formalParameter287;
+const static unsigned long long FOLLOW_functionHeader_in_declaration135_data[] = {0x0000000002000000LL};
+static ANTLRBitSet *FOLLOW_functionHeader_in_declaration135;
+const static unsigned long long FOLLOW_block_in_declaration137_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_block_in_declaration137;
+const static unsigned long long FOLLOW_type_in_variable166_data[] = {0x0000000000000400LL};
+static ANTLRBitSet *FOLLOW_type_in_variable166;
+const static unsigned long long FOLLOW_declarator_in_variable168_data[] = {0x0000000000200000LL};
+static ANTLRBitSet *FOLLOW_declarator_in_variable168;
+const static unsigned long long FOLLOW_21_in_variable170_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_21_in_variable170;
+const static unsigned long long FOLLOW_SimpleCParser_ID_in_declarator199_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_ID_in_declarator199;
+const static unsigned long long FOLLOW_type_in_functionHeader219_data[] = {0x0000000000000400LL};
+static ANTLRBitSet *FOLLOW_type_in_functionHeader219;
+const static unsigned long long FOLLOW_SimpleCParser_ID_in_functionHeader221_data[] = {0x0000000000400000LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_ID_in_functionHeader221;
+const static unsigned long long FOLLOW_22_in_functionHeader223_data[] = {0x000000000101C400LL};
+static ANTLRBitSet *FOLLOW_22_in_functionHeader223;
+const static unsigned long long FOLLOW_formalParameter_in_functionHeader227_data[] = {0x0000000001800000LL};
+static ANTLRBitSet *FOLLOW_formalParameter_in_functionHeader227;
+const static unsigned long long FOLLOW_23_in_functionHeader231_data[] = {0x000000000001C400LL};
+static ANTLRBitSet *FOLLOW_23_in_functionHeader231;
+const static unsigned long long FOLLOW_formalParameter_in_functionHeader233_data[] = {0x0000000001800000LL};
+static ANTLRBitSet *FOLLOW_formalParameter_in_functionHeader233;
+const static unsigned long long FOLLOW_24_in_functionHeader241_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_24_in_functionHeader241;
+const static unsigned long long FOLLOW_type_in_formalParameter281_data[] = {0x0000000000000400LL};
+static ANTLRBitSet *FOLLOW_type_in_formalParameter281;
+const static unsigned long long FOLLOW_declarator_in_formalParameter283_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_declarator_in_formalParameter283;
 const static unsigned long long FOLLOW_set_in_type0_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_set_in_type0;
-const static unsigned long long FOLLOW_25_in_block381_data[] = {0x000000000661F400LL};
-static ANTLRBitSet *FOLLOW_25_in_block381;
-const static unsigned long long FOLLOW_variable_in_block395_data[] = {0x000000000661F400LL};
-static ANTLRBitSet *FOLLOW_variable_in_block395;
-const static unsigned long long FOLLOW_stat_in_block410_data[] = {0x0000000006603400LL};
-static ANTLRBitSet *FOLLOW_stat_in_block410;
-const static unsigned long long FOLLOW_26_in_block421_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_26_in_block421;
-const static unsigned long long FOLLOW_forStat_in_stat454_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_forStat_in_stat454;
-const static unsigned long long FOLLOW_expr_in_stat462_data[] = {0x0000000000200000LL};
-static ANTLRBitSet *FOLLOW_expr_in_stat462;
-const static unsigned long long FOLLOW_21_in_stat464_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_21_in_stat464;
-const static unsigned long long FOLLOW_block_in_stat473_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_block_in_stat473;
-const static unsigned long long FOLLOW_assignStat_in_stat481_data[] = {0x0000000000200000LL};
-static ANTLRBitSet *FOLLOW_assignStat_in_stat481;
-const static unsigned long long FOLLOW_21_in_stat483_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_21_in_stat483;
-const static unsigned long long FOLLOW_21_in_stat492_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_21_in_stat492;
-const static unsigned long long FOLLOW_SimpleCParser_FOR_in_forStat512_data[] = {0x0000000000400000LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_FOR_in_forStat512;
-const static unsigned long long FOLLOW_22_in_forStat514_data[] = {0x0000000000000400LL};
-static ANTLRBitSet *FOLLOW_22_in_forStat514;
-const static unsigned long long FOLLOW_assignStat_in_forStat518_data[] = {0x0000000000200000LL};
-static ANTLRBitSet *FOLLOW_assignStat_in_forStat518;
-const static unsigned long long FOLLOW_21_in_forStat520_data[] = {0x0000000000401400LL};
-static ANTLRBitSet *FOLLOW_21_in_forStat520;
-const static unsigned long long FOLLOW_expr_in_forStat522_data[] = {0x0000000000200000LL};
-static ANTLRBitSet *FOLLOW_expr_in_forStat522;
-const static unsigned long long FOLLOW_21_in_forStat524_data[] = {0x0000000000000400LL};
-static ANTLRBitSet *FOLLOW_21_in_forStat524;
-const static unsigned long long FOLLOW_assignStat_in_forStat528_data[] = {0x0000000001000000LL};
-static ANTLRBitSet *FOLLOW_assignStat_in_forStat528;
-const static unsigned long long FOLLOW_24_in_forStat530_data[] = {0x0000000002000000LL};
-static ANTLRBitSet *FOLLOW_24_in_forStat530;
-const static unsigned long long FOLLOW_block_in_forStat532_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_block_in_forStat532;
-const static unsigned long long FOLLOW_SimpleCParser_ID_in_assignStat575_data[] = {0x0000000000000800LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_ID_in_assignStat575;
-const static unsigned long long FOLLOW_SimpleCParser_EQ_in_assignStat577_data[] = {0x0000000000401400LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_EQ_in_assignStat577;
-const static unsigned long long FOLLOW_expr_in_assignStat579_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_expr_in_assignStat579;
-const static unsigned long long FOLLOW_condExpr_in_expr603_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_condExpr_in_expr603;
-const static unsigned long long FOLLOW_aexpr_in_condExpr622_data[] = {0x0000000000060002LL};
-static ANTLRBitSet *FOLLOW_aexpr_in_condExpr622;
-const static unsigned long long FOLLOW_SimpleCParser_EQEQ_in_condExpr627_data[] = {0x0000000000401400LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_EQEQ_in_condExpr627;
-const static unsigned long long FOLLOW_SimpleCParser_LT_in_condExpr632_data[] = {0x0000000000401400LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_LT_in_condExpr632;
-const static unsigned long long FOLLOW_aexpr_in_condExpr636_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_aexpr_in_condExpr636;
-const static unsigned long long FOLLOW_atom_in_aexpr658_data[] = {0x0000000000080002LL};
-static ANTLRBitSet *FOLLOW_atom_in_aexpr658;
-const static unsigned long long FOLLOW_SimpleCParser_PLUS_in_aexpr662_data[] = {0x0000000000401400LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_PLUS_in_aexpr662;
-const static unsigned long long FOLLOW_atom_in_aexpr665_data[] = {0x0000000000080002LL};
-static ANTLRBitSet *FOLLOW_atom_in_aexpr665;
-const static unsigned long long FOLLOW_SimpleCParser_ID_in_atom685_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_ID_in_atom685;
-const static unsigned long long FOLLOW_SimpleCParser_INT_in_atom699_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_SimpleCParser_INT_in_atom699;
-const static unsigned long long FOLLOW_22_in_atom713_data[] = {0x0000000000401400LL};
-static ANTLRBitSet *FOLLOW_22_in_atom713;
-const static unsigned long long FOLLOW_expr_in_atom715_data[] = {0x0000000001000000LL};
-static ANTLRBitSet *FOLLOW_expr_in_atom715;
-const static unsigned long long FOLLOW_24_in_atom717_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_24_in_atom717;
+const static unsigned long long FOLLOW_25_in_block376_data[] = {0x000000000661F400LL};
+static ANTLRBitSet *FOLLOW_25_in_block376;
+const static unsigned long long FOLLOW_variable_in_block390_data[] = {0x000000000661F400LL};
+static ANTLRBitSet *FOLLOW_variable_in_block390;
+const static unsigned long long FOLLOW_stat_in_block405_data[] = {0x0000000006603400LL};
+static ANTLRBitSet *FOLLOW_stat_in_block405;
+const static unsigned long long FOLLOW_26_in_block416_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_26_in_block416;
+const static unsigned long long FOLLOW_forStat_in_stat449_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_forStat_in_stat449;
+const static unsigned long long FOLLOW_expr_in_stat457_data[] = {0x0000000000200000LL};
+static ANTLRBitSet *FOLLOW_expr_in_stat457;
+const static unsigned long long FOLLOW_21_in_stat459_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_21_in_stat459;
+const static unsigned long long FOLLOW_block_in_stat468_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_block_in_stat468;
+const static unsigned long long FOLLOW_assignStat_in_stat476_data[] = {0x0000000000200000LL};
+static ANTLRBitSet *FOLLOW_assignStat_in_stat476;
+const static unsigned long long FOLLOW_21_in_stat478_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_21_in_stat478;
+const static unsigned long long FOLLOW_21_in_stat487_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_21_in_stat487;
+const static unsigned long long FOLLOW_SimpleCParser_FOR_in_forStat507_data[] = {0x0000000000400000LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_FOR_in_forStat507;
+const static unsigned long long FOLLOW_22_in_forStat509_data[] = {0x0000000000000400LL};
+static ANTLRBitSet *FOLLOW_22_in_forStat509;
+const static unsigned long long FOLLOW_assignStat_in_forStat513_data[] = {0x0000000000200000LL};
+static ANTLRBitSet *FOLLOW_assignStat_in_forStat513;
+const static unsigned long long FOLLOW_21_in_forStat515_data[] = {0x0000000000401400LL};
+static ANTLRBitSet *FOLLOW_21_in_forStat515;
+const static unsigned long long FOLLOW_expr_in_forStat517_data[] = {0x0000000000200000LL};
+static ANTLRBitSet *FOLLOW_expr_in_forStat517;
+const static unsigned long long FOLLOW_21_in_forStat519_data[] = {0x0000000000000400LL};
+static ANTLRBitSet *FOLLOW_21_in_forStat519;
+const static unsigned long long FOLLOW_assignStat_in_forStat523_data[] = {0x0000000001000000LL};
+static ANTLRBitSet *FOLLOW_assignStat_in_forStat523;
+const static unsigned long long FOLLOW_24_in_forStat525_data[] = {0x0000000002000000LL};
+static ANTLRBitSet *FOLLOW_24_in_forStat525;
+const static unsigned long long FOLLOW_block_in_forStat527_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_block_in_forStat527;
+const static unsigned long long FOLLOW_SimpleCParser_ID_in_assignStat570_data[] = {0x0000000000000800LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_ID_in_assignStat570;
+const static unsigned long long FOLLOW_SimpleCParser_EQ_in_assignStat572_data[] = {0x0000000000401400LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_EQ_in_assignStat572;
+const static unsigned long long FOLLOW_expr_in_assignStat574_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_expr_in_assignStat574;
+const static unsigned long long FOLLOW_condExpr_in_expr598_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_condExpr_in_expr598;
+const static unsigned long long FOLLOW_aexpr_in_condExpr617_data[] = {0x0000000000060002LL};
+static ANTLRBitSet *FOLLOW_aexpr_in_condExpr617;
+const static unsigned long long FOLLOW_SimpleCParser_EQEQ_in_condExpr622_data[] = {0x0000000000401400LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_EQEQ_in_condExpr622;
+const static unsigned long long FOLLOW_SimpleCParser_LT_in_condExpr627_data[] = {0x0000000000401400LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_LT_in_condExpr627;
+const static unsigned long long FOLLOW_aexpr_in_condExpr631_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_aexpr_in_condExpr631;
+const static unsigned long long FOLLOW_atom_in_aexpr653_data[] = {0x0000000000080002LL};
+static ANTLRBitSet *FOLLOW_atom_in_aexpr653;
+const static unsigned long long FOLLOW_SimpleCParser_PLUS_in_aexpr657_data[] = {0x0000000000401400LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_PLUS_in_aexpr657;
+const static unsigned long long FOLLOW_atom_in_aexpr660_data[] = {0x0000000000080002LL};
+static ANTLRBitSet *FOLLOW_atom_in_aexpr660;
+const static unsigned long long FOLLOW_SimpleCParser_ID_in_atom680_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_ID_in_atom680;
+const static unsigned long long FOLLOW_SimpleCParser_INT_in_atom694_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_SimpleCParser_INT_in_atom694;
+const static unsigned long long FOLLOW_22_in_atom708_data[] = {0x0000000000401400LL};
+static ANTLRBitSet *FOLLOW_22_in_atom708;
+const static unsigned long long FOLLOW_expr_in_atom710_data[] = {0x0000000001000000LL};
+static ANTLRBitSet *FOLLOW_expr_in_atom710;
+const static unsigned long long FOLLOW_24_in_atom712_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_24_in_atom712;
 
 
 #pragma mark Dynamic Global Scopes
@@ -421,58 +421,58 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 	FOLLOW_variable_in_declaration105 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_declaration105_data count:1];
 	FOLLOW_functionHeader_in_declaration115 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_functionHeader_in_declaration115_data count:1];
 	FOLLOW_21_in_declaration117 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_declaration117_data count:1];
-	FOLLOW_functionHeader_in_declaration136 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_functionHeader_in_declaration136_data count:1];
-	FOLLOW_block_in_declaration138 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_declaration138_data count:1];
-	FOLLOW_type_in_variable168 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_variable168_data count:1];
-	FOLLOW_declarator_in_variable170 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_variable170_data count:1];
-	FOLLOW_21_in_variable172 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_variable172_data count:1];
-	FOLLOW_SimpleCParser_ID_in_declarator202 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_ID_in_declarator202_data count:1];
-	FOLLOW_type_in_functionHeader222 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_functionHeader222_data count:1];
-	FOLLOW_SimpleCParser_ID_in_functionHeader224 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_ID_in_functionHeader224_data count:1];
-	FOLLOW_22_in_functionHeader226 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_22_in_functionHeader226_data count:1];
-	FOLLOW_formalParameter_in_functionHeader230 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_formalParameter_in_functionHeader230_data count:1];
-	FOLLOW_23_in_functionHeader234 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_23_in_functionHeader234_data count:1];
-	FOLLOW_formalParameter_in_functionHeader236 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_formalParameter_in_functionHeader236_data count:1];
-	FOLLOW_24_in_functionHeader244 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_24_in_functionHeader244_data count:1];
-	FOLLOW_type_in_formalParameter285 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_formalParameter285_data count:1];
-	FOLLOW_declarator_in_formalParameter287 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_formalParameter287_data count:1];
+	FOLLOW_functionHeader_in_declaration135 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_functionHeader_in_declaration135_data count:1];
+	FOLLOW_block_in_declaration137 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_declaration137_data count:1];
+	FOLLOW_type_in_variable166 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_variable166_data count:1];
+	FOLLOW_declarator_in_variable168 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_variable168_data count:1];
+	FOLLOW_21_in_variable170 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_variable170_data count:1];
+	FOLLOW_SimpleCParser_ID_in_declarator199 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_ID_in_declarator199_data count:1];
+	FOLLOW_type_in_functionHeader219 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_functionHeader219_data count:1];
+	FOLLOW_SimpleCParser_ID_in_functionHeader221 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_ID_in_functionHeader221_data count:1];
+	FOLLOW_22_in_functionHeader223 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_22_in_functionHeader223_data count:1];
+	FOLLOW_formalParameter_in_functionHeader227 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_formalParameter_in_functionHeader227_data count:1];
+	FOLLOW_23_in_functionHeader231 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_23_in_functionHeader231_data count:1];
+	FOLLOW_formalParameter_in_functionHeader233 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_formalParameter_in_functionHeader233_data count:1];
+	FOLLOW_24_in_functionHeader241 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_24_in_functionHeader241_data count:1];
+	FOLLOW_type_in_formalParameter281 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_formalParameter281_data count:1];
+	FOLLOW_declarator_in_formalParameter283 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_formalParameter283_data count:1];
 	FOLLOW_set_in_type0 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_type0_data count:1];
-	FOLLOW_25_in_block381 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_25_in_block381_data count:1];
-	FOLLOW_variable_in_block395 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_block395_data count:1];
-	FOLLOW_stat_in_block410 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_stat_in_block410_data count:1];
-	FOLLOW_26_in_block421 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_26_in_block421_data count:1];
-	FOLLOW_forStat_in_stat454 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_forStat_in_stat454_data count:1];
-	FOLLOW_expr_in_stat462 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_stat462_data count:1];
-	FOLLOW_21_in_stat464 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_stat464_data count:1];
-	FOLLOW_block_in_stat473 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_stat473_data count:1];
-	FOLLOW_assignStat_in_stat481 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_assignStat_in_stat481_data count:1];
-	FOLLOW_21_in_stat483 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_stat483_data count:1];
-	FOLLOW_21_in_stat492 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_stat492_data count:1];
-	FOLLOW_SimpleCParser_FOR_in_forStat512 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_FOR_in_forStat512_data count:1];
-	FOLLOW_22_in_forStat514 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_22_in_forStat514_data count:1];
-	FOLLOW_assignStat_in_forStat518 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_assignStat_in_forStat518_data count:1];
-	FOLLOW_21_in_forStat520 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_forStat520_data count:1];
-	FOLLOW_expr_in_forStat522 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat522_data count:1];
-	FOLLOW_21_in_forStat524 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_forStat524_data count:1];
-	FOLLOW_assignStat_in_forStat528 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_assignStat_in_forStat528_data count:1];
-	FOLLOW_24_in_forStat530 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_24_in_forStat530_data count:1];
-	FOLLOW_block_in_forStat532 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_forStat532_data count:1];
-	FOLLOW_SimpleCParser_ID_in_assignStat575 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_ID_in_assignStat575_data count:1];
-	FOLLOW_SimpleCParser_EQ_in_assignStat577 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_EQ_in_assignStat577_data count:1];
-	FOLLOW_expr_in_assignStat579 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_assignStat579_data count:1];
-	FOLLOW_condExpr_in_expr603 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_condExpr_in_expr603_data count:1];
-	FOLLOW_aexpr_in_condExpr622 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_aexpr_in_condExpr622_data count:1];
-	FOLLOW_SimpleCParser_EQEQ_in_condExpr627 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_EQEQ_in_condExpr627_data count:1];
-	FOLLOW_SimpleCParser_LT_in_condExpr632 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_LT_in_condExpr632_data count:1];
-	FOLLOW_aexpr_in_condExpr636 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_aexpr_in_condExpr636_data count:1];
-	FOLLOW_atom_in_aexpr658 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_aexpr658_data count:1];
-	FOLLOW_SimpleCParser_PLUS_in_aexpr662 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_PLUS_in_aexpr662_data count:1];
-	FOLLOW_atom_in_aexpr665 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_aexpr665_data count:1];
-	FOLLOW_SimpleCParser_ID_in_atom685 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_ID_in_atom685_data count:1];
-	FOLLOW_SimpleCParser_INT_in_atom699 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_INT_in_atom699_data count:1];
-	FOLLOW_22_in_atom713 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_22_in_atom713_data count:1];
-	FOLLOW_expr_in_atom715 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_atom715_data count:1];
-	FOLLOW_24_in_atom717 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_24_in_atom717_data count:1];
+	FOLLOW_25_in_block376 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_25_in_block376_data count:1];
+	FOLLOW_variable_in_block390 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_block390_data count:1];
+	FOLLOW_stat_in_block405 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_stat_in_block405_data count:1];
+	FOLLOW_26_in_block416 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_26_in_block416_data count:1];
+	FOLLOW_forStat_in_stat449 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_forStat_in_stat449_data count:1];
+	FOLLOW_expr_in_stat457 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_stat457_data count:1];
+	FOLLOW_21_in_stat459 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_stat459_data count:1];
+	FOLLOW_block_in_stat468 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_stat468_data count:1];
+	FOLLOW_assignStat_in_stat476 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_assignStat_in_stat476_data count:1];
+	FOLLOW_21_in_stat478 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_stat478_data count:1];
+	FOLLOW_21_in_stat487 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_stat487_data count:1];
+	FOLLOW_SimpleCParser_FOR_in_forStat507 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_FOR_in_forStat507_data count:1];
+	FOLLOW_22_in_forStat509 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_22_in_forStat509_data count:1];
+	FOLLOW_assignStat_in_forStat513 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_assignStat_in_forStat513_data count:1];
+	FOLLOW_21_in_forStat515 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_forStat515_data count:1];
+	FOLLOW_expr_in_forStat517 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat517_data count:1];
+	FOLLOW_21_in_forStat519 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_21_in_forStat519_data count:1];
+	FOLLOW_assignStat_in_forStat523 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_assignStat_in_forStat523_data count:1];
+	FOLLOW_24_in_forStat525 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_24_in_forStat525_data count:1];
+	FOLLOW_block_in_forStat527 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_forStat527_data count:1];
+	FOLLOW_SimpleCParser_ID_in_assignStat570 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_ID_in_assignStat570_data count:1];
+	FOLLOW_SimpleCParser_EQ_in_assignStat572 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_EQ_in_assignStat572_data count:1];
+	FOLLOW_expr_in_assignStat574 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_assignStat574_data count:1];
+	FOLLOW_condExpr_in_expr598 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_condExpr_in_expr598_data count:1];
+	FOLLOW_aexpr_in_condExpr617 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_aexpr_in_condExpr617_data count:1];
+	FOLLOW_SimpleCParser_EQEQ_in_condExpr622 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_EQEQ_in_condExpr622_data count:1];
+	FOLLOW_SimpleCParser_LT_in_condExpr627 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_LT_in_condExpr627_data count:1];
+	FOLLOW_aexpr_in_condExpr631 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_aexpr_in_condExpr631_data count:1];
+	FOLLOW_atom_in_aexpr653 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_aexpr653_data count:1];
+	FOLLOW_SimpleCParser_PLUS_in_aexpr657 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_PLUS_in_aexpr657_data count:1];
+	FOLLOW_atom_in_aexpr660 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_aexpr660_data count:1];
+	FOLLOW_SimpleCParser_ID_in_atom680 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_ID_in_atom680_data count:1];
+	FOLLOW_SimpleCParser_INT_in_atom694 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCParser_INT_in_atom694_data count:1];
+	FOLLOW_22_in_atom708 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_22_in_atom708_data count:1];
+	FOLLOW_expr_in_atom710 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_atom710_data count:1];
+	FOLLOW_24_in_atom712 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_24_in_atom712_data count:1];
 
 }
 
@@ -583,7 +583,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 // $ANTLR end program
 
 // $ANTLR start declaration
-// SimpleC.g:20:1: declaration : ( variable | functionHeader ';' -> ^( FUNC_DECL[$functionHeader.start] functionHeader ) | functionHeader block -> ^( FUNC_DEF[$functionHeader.start] functionHeader block ) );
+// SimpleC.g:20:1: declaration : ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) );
 - (SimpleCParser_declaration_return *) declaration
 {
     SimpleCParser_declaration_return * _retval = [[SimpleCParser_declaration_return alloc] init]; 
@@ -607,7 +607,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
     ANTLRRewriteRuleSubtreeStream *_stream_block=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule block"];
 
     @try {
-        // SimpleC.g:21:9: ( variable | functionHeader ';' -> ^( FUNC_DECL[$functionHeader.start] functionHeader ) | functionHeader block -> ^( FUNC_DEF[$functionHeader.start] functionHeader block ) ) //ruleblock
+        // SimpleC.g:21:9: ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) ) //ruleblock
         int alt2=3;
         alt2 = [dfa2 predict];
         switch (alt2) {
@@ -651,19 +651,20 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
         	    root_0 = (id)[treeAdaptor emptyTree];
-        	    // 22:28: -> ^( FUNC_DECL[$functionHeader.start] functionHeader )
+        	    // 22:28: -> ^( FUNC_DECL functionHeader )
         	    {
-        	        // SimpleC.g:22:31: ^( FUNC_DECL[$functionHeader.start] functionHeader )
+        	        // SimpleC.g:22:31: ^( FUNC_DECL functionHeader )
         	        {
         	        id root_1 = (id)[treeAdaptor emptyTree];
 
-        	        root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DECL text:[[_functionHeader3 start] text]] parentOf:root_1];
+        	        root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DECL text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DECL]] parentOf:root_1];
         	        [treeAdaptor addChild:[_stream_functionHeader next] toTree:root_1];
         	        [treeAdaptor addChild:root_1 toTree:root_0];
         	        }
 
         	    }
 
+        	    [_stream_retval release];
 
 
         	    }
@@ -671,13 +672,13 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	case 3 :
         	    // SimpleC.g:23:9: functionHeader block // alt
         	    {
-        	    [following addObject:FOLLOW_functionHeader_in_declaration136];
+        	    [following addObject:FOLLOW_functionHeader_in_declaration135];
         	    _functionHeader5 = [self functionHeader];
         	    [following removeLastObject];
 
 
         	    [_stream_functionHeader addElement:[_functionHeader5 tree]];
-        	    [following addObject:FOLLOW_block_in_declaration138];
+        	    [following addObject:FOLLOW_block_in_declaration137];
         	    _block6 = [self block];
         	    [following removeLastObject];
 
@@ -695,19 +696,20 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
         	    root_0 = (id)[treeAdaptor emptyTree];
-        	    // 23:30: -> ^( FUNC_DEF[$functionHeader.start] functionHeader block )
+        	    // 23:30: -> ^( FUNC_DEF functionHeader block )
         	    {
-        	        // SimpleC.g:23:33: ^( FUNC_DEF[$functionHeader.start] functionHeader block )
+        	        // SimpleC.g:23:33: ^( FUNC_DEF functionHeader block )
         	        {
         	        id root_1 = (id)[treeAdaptor emptyTree];
 
-        	        root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DEF text:[[_functionHeader5 start] text]] parentOf:root_1];
+        	        root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DEF text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DEF]] parentOf:root_1];
         	        [treeAdaptor addChild:[_stream_functionHeader next] toTree:root_1];[treeAdaptor addChild:[_stream_block next] toTree:root_1];
         	        [treeAdaptor addChild:root_1 toTree:root_0];
         	        }
 
         	    }
 
+        	    [_stream_retval release];
 
 
         	    }
@@ -739,7 +741,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 // $ANTLR end declaration
 
 // $ANTLR start variable
-// SimpleC.g:26:1: variable : type declarator ';' -> ^( VAR_DEF[$type.start] type declarator ) ;
+// SimpleC.g:26:1: variable : type declarator ';' -> ^( VAR_DEF type declarator ) ;
 - (SimpleCParser_variable_return *) variable
 {
     SimpleCParser_variable_return * _retval = [[SimpleCParser_variable_return alloc] init]; 
@@ -759,16 +761,16 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
     ANTLRRewriteRuleSubtreeStream *_stream_declarator=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule declarator"];
 
     @try {
-        // SimpleC.g:27:9: ( type declarator ';' -> ^( VAR_DEF[$type.start] type declarator ) ) // ruleBlockSingleAlt
+        // SimpleC.g:27:9: ( type declarator ';' -> ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleC.g:27:9: type declarator ';' // alt
         {
-        [following addObject:FOLLOW_type_in_variable168];
+        [following addObject:FOLLOW_type_in_variable166];
         _type7 = [self type];
         [following removeLastObject];
 
 
         [_stream_type addElement:[_type7 tree]];
-        [following addObject:FOLLOW_declarator_in_variable170];
+        [following addObject:FOLLOW_declarator_in_variable168];
         _declarator8 = [self declarator];
         [following removeLastObject];
 
@@ -776,7 +778,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         [_stream_declarator addElement:[_declarator8 tree]];
         _char_literal9=(id<ANTLRToken> )[input LT:1];
         [_char_literal9 retain];
-        [self match:input tokenType:21 follow:FOLLOW_21_in_variable172]; 
+        [self match:input tokenType:21 follow:FOLLOW_21_in_variable170]; 
         [_stream_21 addElement:_char_literal9];
 
 
@@ -791,19 +793,20 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
         root_0 = (id)[treeAdaptor emptyTree];
-        // 27:29: -> ^( VAR_DEF[$type.start] type declarator )
+        // 27:29: -> ^( VAR_DEF type declarator )
         {
-            // SimpleC.g:27:32: ^( VAR_DEF[$type.start] type declarator )
+            // SimpleC.g:27:32: ^( VAR_DEF type declarator )
             {
             id root_1 = (id)[treeAdaptor emptyTree];
 
-            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_VAR_DEF text:[[_type7 start] text]] parentOf:root_1];
+            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_VAR_DEF text:[tokenNames objectAtIndex:SimpleCParser_VAR_DEF]] parentOf:root_1];
             [treeAdaptor addChild:[_stream_type next] toTree:root_1];[treeAdaptor addChild:[_stream_declarator next] toTree:root_1];
             [treeAdaptor addChild:root_1 toTree:root_0];
             }
 
         }
 
+        [_stream_retval release];
 
 
         }
@@ -851,7 +854,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         _ID10=(id<ANTLRToken> )[input LT:1];
         [_ID10 retain];
-        [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_declarator202]; 
+        [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_declarator199]; 
         _ID10_tree = (id)[treeAdaptor newTreeWithToken:_ID10];
         [treeAdaptor addChild:_ID10_tree toTree:root_0];
 
@@ -879,7 +882,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 // $ANTLR end declarator
 
 // $ANTLR start functionHeader
-// SimpleC.g:34:1: functionHeader : type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR[$ID] type ID ( formalParameter )+ ) ;
+// SimpleC.g:34:1: functionHeader : type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ;
 - (SimpleCParser_functionHeader_return *) functionHeader
 {
     SimpleCParser_functionHeader_return * _retval = [[SimpleCParser_functionHeader_return alloc] init]; 
@@ -910,10 +913,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
     ANTLRRewriteRuleSubtreeStream *_stream_type=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule type"];
 
     @try {
-        // SimpleC.g:35:9: ( type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR[$ID] type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
+        // SimpleC.g:35:9: ( type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
         // SimpleC.g:35:9: type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' // alt
         {
-        [following addObject:FOLLOW_type_in_functionHeader222];
+        [following addObject:FOLLOW_type_in_functionHeader219];
         _type11 = [self type];
         [following removeLastObject];
 
@@ -921,12 +924,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         [_stream_type addElement:[_type11 tree]];
         _ID12=(id<ANTLRToken> )[input LT:1];
         [_ID12 retain];
-        [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_functionHeader224]; 
+        [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_functionHeader221]; 
         [_stream_SimpleCParser_ID addElement:_ID12];
 
         _char_literal13=(id<ANTLRToken> )[input LT:1];
         [_char_literal13 retain];
-        [self match:input tokenType:22 follow:FOLLOW_22_in_functionHeader226]; 
+        [self match:input tokenType:22 follow:FOLLOW_22_in_functionHeader223]; 
         [_stream_22 addElement:_char_literal13];
 
         // SimpleC.g:35:21: ( formalParameter ( ',' formalParameter )* )? // block
@@ -941,7 +944,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	case 1 :
         	    // SimpleC.g:35:23: formalParameter ( ',' formalParameter )* // alt
         	    {
-        	    [following addObject:FOLLOW_formalParameter_in_functionHeader230];
+        	    [following addObject:FOLLOW_formalParameter_in_functionHeader227];
         	    _formalParameter14 = [self formalParameter];
         	    [following removeLastObject];
 
@@ -962,10 +965,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    	    {
         	    	    _char_literal15=(id<ANTLRToken> )[input LT:1];
         	    	    [_char_literal15 retain];
-        	    	    [self match:input tokenType:23 follow:FOLLOW_23_in_functionHeader234]; 
+        	    	    [self match:input tokenType:23 follow:FOLLOW_23_in_functionHeader231]; 
         	    	    [_stream_23 addElement:_char_literal15];
 
-        	    	    [following addObject:FOLLOW_formalParameter_in_functionHeader236];
+        	    	    [following addObject:FOLLOW_formalParameter_in_functionHeader233];
         	    	    _formalParameter16 = [self formalParameter];
         	    	    [following removeLastObject];
 
@@ -988,7 +991,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         _char_literal17=(id<ANTLRToken> )[input LT:1];
         [_char_literal17 retain];
-        [self match:input tokenType:24 follow:FOLLOW_24_in_functionHeader244]; 
+        [self match:input tokenType:24 follow:FOLLOW_24_in_functionHeader241]; 
         [_stream_24 addElement:_char_literal17];
 
 
@@ -1003,15 +1006,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
         root_0 = (id)[treeAdaptor emptyTree];
-        // 36:9: -> ^( FUNC_HDR[$ID] type ID ( formalParameter )+ )
+        // 36:9: -> ^( FUNC_HDR type ID ( formalParameter )+ )
         {
-            // SimpleC.g:36:12: ^( FUNC_HDR[$ID] type ID ( formalParameter )+ )
+            // SimpleC.g:36:12: ^( FUNC_HDR type ID ( formalParameter )+ )
             {
             id root_1 = (id)[treeAdaptor emptyTree];
 
-            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_HDR text:[_ID12 text]] parentOf:root_1];
+            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_HDR text:[tokenNames objectAtIndex:SimpleCParser_FUNC_HDR]] parentOf:root_1];
             [treeAdaptor addChild:[_stream_type next] toTree:root_1];[treeAdaptor addTokenAsChild:(id<ANTLRToken> )[_stream_SimpleCParser_ID next] toTree:root_1];
-            // SimpleC.g:36:36: ( formalParameter )+
+            // SimpleC.g:36:31: ( formalParameter )+
             {
             if ( !([_stream_formalParameter hasNext]) ) {
                 @throw [NSException exceptionWithName:@"RewriteEarlyExitException" reason:nil userInfo:nil];
@@ -1027,6 +1030,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         }
 
+        [_stream_retval release];
 
 
         }
@@ -1058,7 +1062,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 // $ANTLR end functionHeader
 
 // $ANTLR start formalParameter
-// SimpleC.g:39:1: formalParameter : type declarator -> ^( ARG_DEF[$type.start] type declarator ) ;
+// SimpleC.g:39:1: formalParameter : type declarator -> ^( ARG_DEF type declarator ) ;
 - (SimpleCParser_formalParameter_return *) formalParameter
 {
     SimpleCParser_formalParameter_return * _retval = [[SimpleCParser_formalParameter_return alloc] init]; 
@@ -1075,16 +1079,16 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
     ANTLRRewriteRuleSubtreeStream *_stream_declarator=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule declarator"];
 
     @try {
-        // SimpleC.g:40:9: ( type declarator -> ^( ARG_DEF[$type.start] type declarator ) ) // ruleBlockSingleAlt
+        // SimpleC.g:40:9: ( type declarator -> ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleC.g:40:9: type declarator // alt
         {
-        [following addObject:FOLLOW_type_in_formalParameter285];
+        [following addObject:FOLLOW_type_in_formalParameter281];
         _type18 = [self type];
         [following removeLastObject];
 
 
         [_stream_type addElement:[_type18 tree]];
-        [following addObject:FOLLOW_declarator_in_formalParameter287];
+        [following addObject:FOLLOW_declarator_in_formalParameter283];
         _declarator19 = [self declarator];
         [following removeLastObject];
 
@@ -1102,19 +1106,20 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
         root_0 = (id)[treeAdaptor emptyTree];
-        // 40:25: -> ^( ARG_DEF[$type.start] type declarator )
+        // 40:25: -> ^( ARG_DEF type declarator )
         {
-            // SimpleC.g:40:28: ^( ARG_DEF[$type.start] type declarator )
+            // SimpleC.g:40:28: ^( ARG_DEF type declarator )
             {
             id root_1 = (id)[treeAdaptor emptyTree];
 
-            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_ARG_DEF text:[[_type18 start] text]] parentOf:root_1];
+            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_ARG_DEF text:[tokenNames objectAtIndex:SimpleCParser_ARG_DEF]] parentOf:root_1];
             [treeAdaptor addChild:[_stream_type next] toTree:root_1];[treeAdaptor addChild:[_stream_declarator next] toTree:root_1];
             [treeAdaptor addChild:root_1 toTree:root_0];
             }
 
         }
 
+        [_stream_retval release];
 
 
         }
@@ -1221,7 +1226,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         {
         _lc=(id<ANTLRToken> )[input LT:1];
         [_lc retain];
-        [self match:input tokenType:25 follow:FOLLOW_25_in_block381]; 
+        [self match:input tokenType:25 follow:FOLLOW_25_in_block376]; 
         [_stream_25 addElement:_lc];
 
         do {
@@ -1246,7 +1251,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	case 1 :
         	    // SimpleC.g:52:13: variable // alt
         	    {
-        	    [following addObject:FOLLOW_variable_in_block395];
+        	    [following addObject:FOLLOW_variable_in_block390];
         	    _variable21 = [self variable];
         	    [following removeLastObject];
 
@@ -1274,7 +1279,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	case 1 :
         	    // SimpleC.g:53:13: stat // alt
         	    {
-        	    [following addObject:FOLLOW_stat_in_block410];
+        	    [following addObject:FOLLOW_stat_in_block405];
         	    _stat22 = [self stat];
         	    [following removeLastObject];
 
@@ -1291,7 +1296,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         _char_literal23=(id<ANTLRToken> )[input LT:1];
         [_char_literal23 retain];
-        [self match:input tokenType:26 follow:FOLLOW_26_in_block421]; 
+        [self match:input tokenType:26 follow:FOLLOW_26_in_block416]; 
         [_stream_26 addElement:_char_literal23];
 
 
@@ -1329,6 +1334,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         }
 
+        [_stream_retval release];
 
 
         }
@@ -1425,7 +1431,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    {
         	    root_0 = (id)[treeAdaptor emptyTree];
 
-        	    [following addObject:FOLLOW_forStat_in_stat454];
+        	    [following addObject:FOLLOW_forStat_in_stat449];
         	    _forStat24 = [self forStat];
         	    [following removeLastObject];
 
@@ -1439,7 +1445,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    {
         	    root_0 = (id)[treeAdaptor emptyTree];
 
-        	    [following addObject:FOLLOW_expr_in_stat462];
+        	    [following addObject:FOLLOW_expr_in_stat457];
         	    _expr25 = [self expr];
         	    [following removeLastObject];
 
@@ -1447,7 +1453,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    [treeAdaptor addChild:[_expr25 tree] toTree:root_0];
         	    _char_literal26=(id<ANTLRToken> )[input LT:1];
         	    [_char_literal26 retain];
-        	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat464]; 
+        	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat459]; 
 
         	    }
         	    break;
@@ -1456,7 +1462,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    {
         	    root_0 = (id)[treeAdaptor emptyTree];
 
-        	    [following addObject:FOLLOW_block_in_stat473];
+        	    [following addObject:FOLLOW_block_in_stat468];
         	    _block27 = [self block];
         	    [following removeLastObject];
 
@@ -1470,7 +1476,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    {
         	    root_0 = (id)[treeAdaptor emptyTree];
 
-        	    [following addObject:FOLLOW_assignStat_in_stat481];
+        	    [following addObject:FOLLOW_assignStat_in_stat476];
         	    _assignStat28 = [self assignStat];
         	    [following removeLastObject];
 
@@ -1478,7 +1484,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    [treeAdaptor addChild:[_assignStat28 tree] toTree:root_0];
         	    _char_literal29=(id<ANTLRToken> )[input LT:1];
         	    [_char_literal29 retain];
-        	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat483]; 
+        	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat478]; 
 
         	    }
         	    break;
@@ -1489,7 +1495,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         	    _char_literal30=(id<ANTLRToken> )[input LT:1];
         	    [_char_literal30 retain];
-        	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat492]; 
+        	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat487]; 
 
         	    }
         	    break;
@@ -1563,15 +1569,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         {
         _string_literal31=(id<ANTLRToken> )[input LT:1];
         [_string_literal31 retain];
-        [self match:input tokenType:SimpleCParser_FOR follow:FOLLOW_SimpleCParser_FOR_in_forStat512]; 
+        [self match:input tokenType:SimpleCParser_FOR follow:FOLLOW_SimpleCParser_FOR_in_forStat507]; 
         [_stream_SimpleCParser_FOR addElement:_string_literal31];
 
         _char_literal32=(id<ANTLRToken> )[input LT:1];
         [_char_literal32 retain];
-        [self match:input tokenType:22 follow:FOLLOW_22_in_forStat514]; 
+        [self match:input tokenType:22 follow:FOLLOW_22_in_forStat509]; 
         [_stream_22 addElement:_char_literal32];
 
-        [following addObject:FOLLOW_assignStat_in_forStat518];
+        [following addObject:FOLLOW_assignStat_in_forStat513];
         _start = [self assignStat];
         [following removeLastObject];
 
@@ -1579,10 +1585,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         [_stream_assignStat addElement:[_start tree]];
         _char_literal33=(id<ANTLRToken> )[input LT:1];
         [_char_literal33 retain];
-        [self match:input tokenType:21 follow:FOLLOW_21_in_forStat520]; 
+        [self match:input tokenType:21 follow:FOLLOW_21_in_forStat515]; 
         [_stream_21 addElement:_char_literal33];
 
-        [following addObject:FOLLOW_expr_in_forStat522];
+        [following addObject:FOLLOW_expr_in_forStat517];
         _expr34 = [self expr];
         [following removeLastObject];
 
@@ -1590,10 +1596,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         [_stream_expr addElement:[_expr34 tree]];
         _char_literal35=(id<ANTLRToken> )[input LT:1];
         [_char_literal35 retain];
-        [self match:input tokenType:21 follow:FOLLOW_21_in_forStat524]; 
+        [self match:input tokenType:21 follow:FOLLOW_21_in_forStat519]; 
         [_stream_21 addElement:_char_literal35];
 
-        [following addObject:FOLLOW_assignStat_in_forStat528];
+        [following addObject:FOLLOW_assignStat_in_forStat523];
         _next = [self assignStat];
         [following removeLastObject];
 
@@ -1601,10 +1607,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         [_stream_assignStat addElement:[_next tree]];
         _char_literal36=(id<ANTLRToken> )[input LT:1];
         [_char_literal36 retain];
-        [self match:input tokenType:24 follow:FOLLOW_24_in_forStat530]; 
+        [self match:input tokenType:24 follow:FOLLOW_24_in_forStat525]; 
         [_stream_24 addElement:_char_literal36];
 
-        [following addObject:FOLLOW_block_in_forStat532];
+        [following addObject:FOLLOW_block_in_forStat527];
         _block37 = [self block];
         [following removeLastObject];
 
@@ -1639,6 +1645,9 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         }
 
+        [_stream_start release];
+        [_stream_next release];
+        [_stream_retval release];
 
 
         }
@@ -1697,15 +1706,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         {
         _ID38=(id<ANTLRToken> )[input LT:1];
         [_ID38 retain];
-        [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_assignStat575]; 
+        [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_assignStat570]; 
         [_stream_SimpleCParser_ID addElement:_ID38];
 
         _EQ39=(id<ANTLRToken> )[input LT:1];
         [_EQ39 retain];
-        [self match:input tokenType:SimpleCParser_EQ follow:FOLLOW_SimpleCParser_EQ_in_assignStat577]; 
+        [self match:input tokenType:SimpleCParser_EQ follow:FOLLOW_SimpleCParser_EQ_in_assignStat572]; 
         [_stream_SimpleCParser_EQ addElement:_EQ39];
 
-        [following addObject:FOLLOW_expr_in_assignStat579];
+        [following addObject:FOLLOW_expr_in_assignStat574];
         _expr40 = [self expr];
         [following removeLastObject];
 
@@ -1737,6 +1746,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         }
 
+        [_stream_retval release];
 
 
         }
@@ -1782,7 +1792,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         {
         root_0 = (id)[treeAdaptor emptyTree];
 
-        [following addObject:FOLLOW_condExpr_in_expr603];
+        [following addObject:FOLLOW_condExpr_in_expr598];
         _condExpr41 = [self condExpr];
         [following removeLastObject];
 
@@ -1836,7 +1846,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         {
         root_0 = (id)[treeAdaptor emptyTree];
 
-        [following addObject:FOLLOW_aexpr_in_condExpr622];
+        [following addObject:FOLLOW_aexpr_in_condExpr617];
         _aexpr42 = [self aexpr];
         [following removeLastObject];
 
@@ -1875,7 +1885,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    	    {
         	    	    _string_literal43=(id<ANTLRToken> )[input LT:1];
         	    	    [_string_literal43 retain];
-        	    	    [self match:input tokenType:SimpleCParser_EQEQ follow:FOLLOW_SimpleCParser_EQEQ_in_condExpr627]; 
+        	    	    [self match:input tokenType:SimpleCParser_EQEQ follow:FOLLOW_SimpleCParser_EQEQ_in_condExpr622]; 
         	    	    _string_literal43_tree = (id)[treeAdaptor newTreeWithToken:_string_literal43];
         	    	    root_0 = (id)[treeAdaptor makeNode:_string_literal43_tree parentOf:root_0];
 
@@ -1887,7 +1897,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    	    {
         	    	    _char_literal44=(id<ANTLRToken> )[input LT:1];
         	    	    [_char_literal44 retain];
-        	    	    [self match:input tokenType:SimpleCParser_LT follow:FOLLOW_SimpleCParser_LT_in_condExpr632]; 
+        	    	    [self match:input tokenType:SimpleCParser_LT follow:FOLLOW_SimpleCParser_LT_in_condExpr627]; 
         	    	    _char_literal44_tree = (id)[treeAdaptor newTreeWithToken:_char_literal44];
         	    	    root_0 = (id)[treeAdaptor makeNode:_char_literal44_tree parentOf:root_0];
 
@@ -1897,7 +1907,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         	    }
 
-        	    [following addObject:FOLLOW_aexpr_in_condExpr636];
+        	    [following addObject:FOLLOW_aexpr_in_condExpr631];
         	    _aexpr45 = [self aexpr];
         	    [following removeLastObject];
 
@@ -1958,7 +1968,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         {
         root_0 = (id)[treeAdaptor emptyTree];
 
-        [following addObject:FOLLOW_atom_in_aexpr658];
+        [following addObject:FOLLOW_atom_in_aexpr653];
         _atom46 = [self atom];
         [following removeLastObject];
 
@@ -1979,11 +1989,11 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    {
         	    _char_literal47=(id<ANTLRToken> )[input LT:1];
         	    [_char_literal47 retain];
-        	    [self match:input tokenType:SimpleCParser_PLUS follow:FOLLOW_SimpleCParser_PLUS_in_aexpr662]; 
+        	    [self match:input tokenType:SimpleCParser_PLUS follow:FOLLOW_SimpleCParser_PLUS_in_aexpr657]; 
         	    _char_literal47_tree = (id)[treeAdaptor newTreeWithToken:_char_literal47];
         	    root_0 = (id)[treeAdaptor makeNode:_char_literal47_tree parentOf:root_0];
 
-        	    [following addObject:FOLLOW_atom_in_aexpr665];
+        	    [following addObject:FOLLOW_atom_in_aexpr660];
         	    _atom48 = [self atom];
         	    [following removeLastObject];
 
@@ -2074,7 +2084,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         	    _ID49=(id<ANTLRToken> )[input LT:1];
         	    [_ID49 retain];
-        	    [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_atom685]; 
+        	    [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_atom680]; 
         	    _ID49_tree = (id)[treeAdaptor newTreeWithToken:_ID49];
         	    [treeAdaptor addChild:_ID49_tree toTree:root_0];
 
@@ -2088,7 +2098,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
 
         	    _INT50=(id<ANTLRToken> )[input LT:1];
         	    [_INT50 retain];
-        	    [self match:input tokenType:SimpleCParser_INT follow:FOLLOW_SimpleCParser_INT_in_atom699]; 
+        	    [self match:input tokenType:SimpleCParser_INT follow:FOLLOW_SimpleCParser_INT_in_atom694]; 
         	    _INT50_tree = (id)[treeAdaptor newTreeWithToken:_INT50];
         	    [treeAdaptor addChild:_INT50_tree toTree:root_0];
 
@@ -2100,10 +2110,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    {
         	    _char_literal51=(id<ANTLRToken> )[input LT:1];
         	    [_char_literal51 retain];
-        	    [self match:input tokenType:22 follow:FOLLOW_22_in_atom713]; 
+        	    [self match:input tokenType:22 follow:FOLLOW_22_in_atom708]; 
         	    [_stream_22 addElement:_char_literal51];
 
-        	    [following addObject:FOLLOW_expr_in_atom715];
+        	    [following addObject:FOLLOW_expr_in_atom710];
         	    _expr52 = [self expr];
         	    [following removeLastObject];
 
@@ -2111,7 +2121,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	    [_stream_expr addElement:[_expr52 tree]];
         	    _char_literal53=(id<ANTLRToken> )[input LT:1];
         	    [_char_literal53 retain];
-        	    [self match:input tokenType:24 follow:FOLLOW_24_in_atom717]; 
+        	    [self match:input tokenType:24 follow:FOLLOW_24_in_atom712]; 
         	    [_stream_24 addElement:_char_literal53];
 
 
@@ -2131,6 +2141,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom717;
         	        [treeAdaptor addChild:[_stream_expr next] toTree:root_0];
         	    }
 
+        	    [_stream_retval release];
 
 
         	    }

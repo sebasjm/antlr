@@ -19,12 +19,12 @@ program
 
 declaration
     :   variable
-    |   functionHeader ';' -> ^(FUNC_DECL[$functionHeader.start] functionHeader)
-    |   functionHeader block -> ^(FUNC_DEF[$functionHeader.start] functionHeader block)
+    |   functionHeader ';' -> ^(FUNC_DECL functionHeader)
+    |   functionHeader block -> ^(FUNC_DEF functionHeader block)
     ;
 
 variable
-    :   type declarator ';' -> ^(VAR_DEF[$type.start] type declarator)
+    :   type declarator ';' -> ^(VAR_DEF type declarator)
     ;
 
 declarator
@@ -33,11 +33,11 @@ declarator
 
 functionHeader
     :   type ID '(' ( formalParameter ( ',' formalParameter )* )? ')'
-        -> ^(FUNC_HDR[$ID] type ID formalParameter+)
+        -> ^(FUNC_HDR type ID formalParameter+)
     ;
 
 formalParameter
-    :   type declarator -> ^(ARG_DEF[$type.start] type declarator)
+    :   type declarator -> ^(ARG_DEF type declarator)
     ;
 
 type
