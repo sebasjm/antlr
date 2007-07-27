@@ -13,7 +13,7 @@
 
 - (id) nextNode
 {
-    if (cursor >= [self count] && [self count] == 1)
+    if (shouldCopyElements || (cursor >= [self count] && [self count] == 1))
         return [treeAdaptor copyNode:[self _next]];
     else 
         return [self _next];

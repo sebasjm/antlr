@@ -1,5 +1,5 @@
 // [The "BSD licence"]
-// Copyright (c) 2006-2007 Kay Roepke
+// Copyright (c) 2007 Kay Roepke
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,30 +24,19 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#import <SenTestingKit/SenTestingKit.h>
+#import <ANTLR/ANTLRCommonTreeAdaptor.h>
+#import <ANTLR/ANTLRRewriteRuleTokenStream.h>
+#import <ANTLR/ANTLRCommonToken.h>
 
-#import "TestBitSet.h"
-#import "ANTLRBitSet.h"
-#import <CoreFoundation/CoreFoundation.h>
-#import <CoreFoundation/CFBitVector.h>
-
-@implementation TestBitSet
-
-- (void) testBitSetCreationFromLongs
-{
-	static const unsigned long long bitData[] = {3LL, 1LL};
-	ANTLRBitSet *bitSet = [[ANTLRBitSet alloc] initWithBits:bitData count:2];
-	CFMutableBitVectorRef bitVector = [bitSet _bitVector];
-	NSLog(@"%@", [bitSet toString]);
-    NSLog(@"getcount %d", CFBitVectorGetCount(bitVector));
+@interface TestRewriteRuleTokenStream : SenTestCase {
+    ANTLRCommonTreeAdaptor *treeAdaptor;
+    ANTLRRewriteRuleTokenStream *stream;
     
-    CFIndex actual = CFBitVectorGetCountOfBit(bitVector,CFRangeMake(0,CFBitVectorGetCount(bitVector)),1);
-    CFIndex expected = 3;
-	
-    STAssertEquals(actual,
-                   expected,
-                   @"There should be three bits set in bitvector. But I have %d",
-                   CFBitVectorGetCountOfBit(bitVector,CFRangeMake(0,CFBitVectorGetCount(bitVector)),1)
-                   );
+    ANTLRCommonToken *token1;
+    ANTLRCommonToken *token2;
+    ANTLRCommonToken *token3;
+    ANTLRCommonToken *token4;
 }
 
 @end

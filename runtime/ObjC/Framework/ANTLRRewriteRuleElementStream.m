@@ -39,6 +39,8 @@
     self = [super init];
     if (self) {
         [self setDescription:anElementDescription];
+        [self setTreeAdaptor:aTreeAdaptor];
+        shouldCopyElements = NO;
         isSingleElement = YES;
         elements.single = [anElement retain];
     }
@@ -50,6 +52,8 @@
     self = [super init];
     if (self) {
         [self setDescription:anElementDescription];
+        [self setTreeAdaptor:aTreeAdaptor];
+        shouldCopyElements = NO;
         isSingleElement = NO;
         elements.multiple = [[NSMutableArray alloc] initWithArray:theElements];
     }
@@ -63,13 +67,29 @@
     else
         [elements.multiple release];
     [self setDescription:nil];
+    [self setTreeAdaptor:nil];
     [super dealloc];
 }
 
 - (void) reset
 {
     cursor = 0;
+    shouldCopyElements = YES;
 }
+
+- (id<ANTLRTreeAdaptor>) treeAdaptor
+{
+    return treeAdaptor;
+}
+
+- (void) setTreeAdaptor:(id<ANTLRTreeAdaptor>)aTreeAdaptor
+{
+    if (treeAdaptor != aTreeAdaptor) {
+        [treeAdaptor release];
+        treeAdaptor = [aTreeAdaptor retain];
+    }
+}
+
 
 - (void) addElement: (id)anElement
 {
@@ -109,12 +129,12 @@
 
 - (id) next
 {
-    if (cursor>=[self count] && [self count]==1) {
+    if (shouldCopyElements || (cursor>=[self count] && [self count]==1)) {
         id element = [self _next];
         return [self copyElement:element];
     }
     id element = [self _next];
-    return element;
+    return [self toTree:element];
 }
 
 - (id) _next       // internal: TODO: redesign if necessary. maybe delegate
@@ -124,15 +144,15 @@
     }
     if ( cursor >= [self count] ) {
         if ( [self count] == 1 ) {
-            return [self toTree:elements.single];
+            return elements.single; // will be dup'ed in -next
         }
         @throw [NSException exceptionWithName:@"RewriteCardinalityException" reason:nil userInfo:nil];// TODO: fill in real exception
     }
     if (isSingleElement && elements.single != nil) {
         cursor++;
-        return [self toTree:elements.single];
+        return elements.single;
     }
-    id el = [self toTree:[elements.multiple objectAtIndex:cursor]];
+    id el = [elements.multiple objectAtIndex:cursor];
     cursor++;
     return el;
 }

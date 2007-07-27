@@ -31,6 +31,7 @@
 @interface ANTLRRewriteRuleElementStream : NSObject {
     @public
     int cursor;
+    BOOL shouldCopyElements;        ///< indicates whether the stream should return copies of its elements, set to true after a call to -reset
     
     BOOL isSingleElement;
     union {
@@ -47,6 +48,9 @@
 - (id) initWithTreeAdaptor:(id<ANTLRTreeAdaptor>)aTreeAdaptor description:(NSString *)anElementDescription elements:(NSArray *)theElements;
 
 - (void) reset;
+
+- (id<ANTLRTreeAdaptor>) treeAdaptor;
+- (void) setTreeAdaptor:(id<ANTLRTreeAdaptor>)aTreeAdaptor;
 
 - (void) addElement:(id)anElement;
 - (unsigned int) count;
