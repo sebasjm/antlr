@@ -321,50 +321,50 @@ next	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 static void *
 _next    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-    ANTLR3_UINT32	s;
-    pANTLR3_BASE_TREE	t;
+	ANTLR3_UINT32	s;
+	pANTLR3_BASE_TREE	t;
 
-    s = stream->size(stream);
+	s = stream->size(stream);
 
-    if (s == 0)
-    {
-	// This means that the stream is empty
-	//
-	return (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(-1);	// Caller must cope with this
-    }
-
-    // Traversed all the available elements already?
-    //
-    if (stream->cursor >= s)
-    {
-	if (s == 1)
+	if (s == 0)
 	{
-	    // Special case when size is single element, it will just dup a lot
-	    //
-	    return stream->singleElement;
+		// This means that the stream is empty
+		//
+		return (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(NULL);	// Caller must cope with this
 	}
 
-	// OUt of elements and the size is not 1, so we cannot assume
-	// that we just duplicate the entry n times (such as ID ent+ -> ^(ID ent)+)
-	// THis means we ran out of elements earlier than was expected.
+	// Traversed all the available elements already?
 	//
-	return (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(-2);	// Caller must cope with this
-    }
+	if (stream->cursor >= s)
+	{
+		if (s == 1)
+		{
+			// Special case when size is single element, it will just dup a lot
+			//
+			return stream->singleElement;
+		}
 
-    // Elements available either for duping or just available
-    //
-    if (stream->singleElement != NULL)
-    {
-	stream->cursor++;   // Cursor advances even for insgle element as this tells us to dup()
-	return stream->toTree(stream, stream->singleElement);
-    }
+		// OUt of elements and the size is not 1, so we cannot assume
+		// that we just duplicate the entry n times (such as ID ent+ -> ^(ID ent)+)
+		// THis means we ran out of elements earlier than was expected.
+		//
+		return (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(NULL);	// Caller must cope with this
+	}
 
-    // More than just a single element so we extract it from the 
-    // vector.
-    //
-    t = stream->toTree(stream, stream->elements->get(stream->elements, stream->cursor+1));  // TODO: Why not just cursor++ ?
-    stream->cursor++;
-    return t;
+	// Elements available either for duping or just available
+	//
+	if (stream->singleElement != NULL)
+	{
+		stream->cursor++;   // Cursor advances even for single element as this tells us to dup()
+		return stream->toTree(stream, stream->singleElement);
+	}
+
+	// More than just a single element so we extract it from the 
+	// vector.
+	//
+	t = stream->toTree(stream, stream->elements->get(stream->elements, stream->cursor+1));  // TODO: Why not just cursor++ ?
+	stream->cursor++;
+	return t;
 }
 
 /* When constructing trees, sometimes we need to dup a token or AST
@@ -419,14 +419,14 @@ toTreeTree   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
 static ANTLR3_BOOLEAN	
 hasNext  (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-    if (   (stream->singleElement != NULL && stream->cursor < 1)
-	|| stream->elements != NULL && stream->cursor < stream->elements->size(stream->elements))
+    if (	  (stream->singleElement != NULL && stream->cursor < 1)
+			|| stream->elements != NULL && stream->cursor < stream->elements->size(stream->elements))
     {
-	return ANTLR3_TRUE;
+		return ANTLR3_TRUE;
     }
     else
     {
-	return ANTLR3_FALSE;
+		return ANTLR3_FALSE;
     }
 }
 
@@ -443,46 +443,45 @@ static pANTLR3_BASE_TREE
 nextNode (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
 
-    ANTLR3_UINT32	s;
-    pANTLR3_BASE_TREE	el = stream->_next(stream);
+	ANTLR3_UINT32	s;
+	pANTLR3_BASE_TREE	el = stream->_next(stream);
 
-    s = stream->size(stream);
-    if (stream->cursor > s && s == 1)
-    {
-	// We are out of elements and the size is 1, whihc means we just 
-	// dup the node that we have
+	s = stream->size(stream);
+	if (stream->cursor > s && s == 1)
+	{
+		// We are out of elements and the size is 1, which means we just 
+		// dup the node that we have
+		//
+		return	stream->adaptor->dupNode(stream->adaptor, el);
+	}
+
+	// We were not out of nodes, so the one we received is the one to return
 	//
-	return	stream->adaptor->dupNode(stream->adaptor, el);
-
-    }
-
-    // We were not out of nodes, so the one we received is the one to return
-    //
-    return  el;
+	return  el;
 }
 
-/* Number of elements avaiable in the stream
- */
+/* Number of elements available in the stream
+*/
 static ANTLR3_UINT32	
 size	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-    ANTLR3_UINT32   n = 0;
+	ANTLR3_UINT32   n = 0;
 
-    /* Should be a count of one if singleElement is set. I copied this
-     * logic from the java implementation, which I suspect is just guarding
-     * against someone setting singleElement and forgetting to NULL it out
-     */
-    if (stream->singleElement != NULL)
-    {
-	n = 1;
-    }
+	/* Should be a count of one if singleElement is set. I copied this
+	 * logic from the java implementation, which I suspect is just guarding
+	 * against someone setting singleElement and forgetting to NULL it out
+	 */
+	if (stream->singleElement != NULL)
+	{
+		n = 1;
+	}
 
-    if (stream->elements != NULL)
-    {
-	return (ANTLR3_UINT32)(stream->elements->count);
-    }
+	if (stream->elements != NULL)
+	{
+		return (ANTLR3_UINT32)(stream->elements->count);
+	}
 
-    return n;
+	return n;
 }
 
 /* Returns the description string if there is one available (check for NULL).

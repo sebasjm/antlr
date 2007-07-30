@@ -49,90 +49,105 @@ antlr3dfapredict (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is
     mark	= is->mark(is);	    /* Store where we are right now	*/
     s		= 0;		    /* Always start with state 0	*/
     
-    for (;;)
-    {
-	/* Pick out any special state entry for this state
-	 */
-	specialState	= cdfa->special[s];
-	
-	/* Transition the special state and consume an input token
-	 */
-	if  (specialState >= 0)
+	for (;;)
 	{
-	    s = cdfa->specialStateTransition(ctx, rec, is, cdfa, specialState);
-	    is->consume(is);
-	    continue;
-	}
+		/* Pick out any special state entry for this state
+		 */
+		specialState	= cdfa->special[s];
 
-	/* Accept state?
-	 */
-	if  (cdfa->accept[s] >= 1)
-	{
-	    is->rewind(is, mark);
-	    return  cdfa->accept[s];
-	}
+		/* Transition the special state and consume an input token
+		 */
+		if  (specialState >= 0)
+		{
+			s = cdfa->specialStateTransition(ctx, rec, is, cdfa, specialState);
 
-	/* Look for a normal transition stae based upon the input token element
-	 */
-	c = is->_LA(is, 1);
+			// Error?
+			//
+			if	(s<0)
+			{
+				// If the predicate/rule raised an exception then we leave it
+				// in tact, else we have an NVA.
+				//
+				if	(rec->error != ANTLR3_TRUE)
+				{
+					noViableAlt(rec,cdfa, s);
+				}
+				is->rewind(is, mark);
+				return	0;
+			}
+			is->consume(is);
+			continue;
+		}
 
-	/* Check against min and max for this state
-	 */
-	if  (c>= cdfa->min[s] && c <= cdfa->max[s])
-	{
-	    ANTLR3_INT32   snext;
+		/* Accept state?
+		 */
+		if  (cdfa->accept[s] >= 1)
+		{
+			is->rewind(is, mark);
+			return  cdfa->accept[s];
+		}
 
-	    /* What is the next state?
-	     */
-	    snext = cdfa->transition[s][c - cdfa->min[s]];
+		/* Look for a normal transition stae based upon the input token element
+		 */
+		c = is->_LA(is, 1);
 
-	    if	(snext < 0)
-	    {
-		/* was in range but not a normal transition
-		 * must check EOT, which is like the else clause.
-		 * eot[s]>=0 indicates that an EOT edge goes to another
-		 * state.
+		/* Check against min and max for this state
+		 */
+		if  (c>= cdfa->min[s] && c <= cdfa->max[s])
+		{
+			ANTLR3_INT32   snext;
+
+			/* What is the next state?
+			 */
+			snext = cdfa->transition[s][c - cdfa->min[s]];
+
+			if	(snext < 0)
+			{
+				/* was in range but not a normal transition
+				 * must check EOT, which is like the else clause.
+				 * eot[s]>=0 indicates that an EOT edge goes to another
+				 * state.
+				 */
+				if  (cdfa->eot[s] >= 0)
+				{
+					s = cdfa->eot[s];
+					is->consume(is);
+					continue;
+				}
+				noViableAlt(rec,cdfa, s);
+				is->rewind(is, mark);
+				return	0;
+			}
+
+			/* New current state - move to it
+			 */
+			s	= snext;
+			is->consume(is);
+			continue;
+		}
+		/* EOT Transistion?
 		 */
 		if  (cdfa->eot[s] >= 0)
 		{
-		    s = cdfa->eot[s];
-		    is->consume(is);
-		    continue;
+			s	= cdfa->eot[s];
+			is->consume(is);
+			continue;
 		}
-		noViableAlt(rec,cdfa, s);
+		/* EOF transition to accept state?
+		 */
+		if  ( c == ANTLR3_TOKEN_EOF && cdfa->eof[s] >= 0)
+		{
+			is->rewind(is, mark);
+			return  cdfa->accept[cdfa->eof[s]];
+		}
+
+		/* No alt, so bomb
+		 */
+		noViableAlt(rec, cdfa, s);
 		is->rewind(is, mark);
-		return	0;
-	    }
-
-	    /* New current state - move to it
-	     */
-	    s	= snext;
-	    is->consume(is);
-	    continue;
-	}
-	/* EOT Transistion?
-	 */
-	if  (cdfa->eot[s] >= 0)
-	{
-	    s	= cdfa->eot[s];
-	    is->consume(is);
-	    continue;
-	}
-	/* EOF transition to accept state?
-	 */
-	if  ( c == ANTLR3_TOKEN_EOF && cdfa->eof[s] >= 0)
-	{
-	    is->rewind(is, mark);
-	    return  cdfa->accept[cdfa->eof[s]];
+		return 0;
 	}
 
-	/* No alt, so bomb
-	 */
-	noViableAlt(rec, cdfa, s);
-        is->rewind(is, mark);
-	return 0;
-    }
-    
 }
 
 /** Default special state implementation

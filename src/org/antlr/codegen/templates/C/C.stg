@@ -616,8 +616,8 @@ typedef struct <name>_Ctx_struct
     unsigned char * (*getGrammarFileName)();
     void	    (*free)   (struct <name>_Ctx_struct * ctx);
     <@members>
-<actions.(actionScope).context>
     <@end>
+    <actions.(actionScope).context>
 }
     <name>, * p<name>;
 
@@ -838,6 +838,8 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
     lexCtx->pLexer->tokSource->nextToken = <name>NextToken;
 <endif>
 
+	 <actions.lexer.apifuncs>
+	 
     /* Return the newly built lexer to the caller
      */
     return  lexCtx;
@@ -1285,7 +1287,8 @@ if ( (BACKTRACKING>0) && (HAVEPARSEDRULE(<ruleDescriptor.index>)) )
 {
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!ruleDescriptor.isSynPred)>
-	retval.start = 0;<\n>
+	retval.start = 0;
+	<scopeClean()><\n>
 <endif>
 <endif>
     return <ruleReturnValue()>; 
@@ -1331,8 +1334,8 @@ static <returnType()>
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
-    <ruleDescriptor.actions.init>
     <ruleInitializations()>
+    <ruleDescriptor.actions.init>
     <ruleMemoization(name=ruleName)>
     <ruleLabelInitializations()>
     <@preamble()>
@@ -1516,8 +1519,9 @@ retval.stop = LT(-1);<\n>
 >>
 
 scopeClean() ::= <<
-<ruleDescriptor.useScopes:{<scopePop(sname=it)>;}; separator="\n">
-<ruleDescriptor.ruleScope:{<scopePop(sname=it.name)>;}; separator="\n">
+<ruleDescriptor.useScopes:{<scopePop(sname=it)>}; separator="\n">
+<ruleDescriptor.ruleScope:{<scopePop(sname=it.name)>}; separator="\n">
+
 >>
 /** How to generate a rule in the lexer; naked blocks are used for
  *  fragment rules, which do not produce tokens.
@@ -2320,7 +2324,7 @@ lookaheadTest(atom,k,atomAsInt) ::= "LA<decisionNumber>_<stateNumber> == <atom>"
 isolatedLookaheadTest(atom,k,atomAsInt) ::= "LA(<k>) == <atom>"
 
 lookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= <<
-((LA<decisionNumber>_<stateNumber> \>= <lower>) && (LA<decisionNumber>_<stateNumber>) \<= <upper>)
+((LA<decisionNumber>_<stateNumber> \>= <lower>) && (LA<decisionNumber>_<stateNumber> \<= <upper>))
 >>
 
 isolatedLookaheadRangeTest(lower,upper,k,rangeNumber,lowerAsInt,upperAsInt) ::= "((LA(<k>) \>= <lower>) && (LA(<k>) \<= <upper>))"

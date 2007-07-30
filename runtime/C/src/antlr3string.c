@@ -734,7 +734,7 @@ set8	(pANTLR3_STRING string, const char * chars)
 
     /* Note we copy one more byte than the strlen in order to get the trailing '\0'
      */
-    ANTLR3_MEMMOVE((void *)(string->chars), chars, (ANTLR3_UINT64)(len));
+    ANTLR3_MEMMOVE((void *)(string->chars), chars, (ANTLR3_UINT64)(len+1));
     string->len	    = len;
 
     return  string->chars;

@@ -16,14 +16,14 @@
  *
  * So then, we set up a lexer in a sequence akin to:
  *
- *  - Create a chracter stream (somethign which implements ANTLR3_INPUT_STREAM)
+ *  - Create a character stream (something which implements ANTLR3_INPUT_STREAM)
  *    and initialize it.
- *  - Create a lexer interface and tell it wher it its input stream is.
+ *  - Create a lexer interface and tell it where it its input stream is.
  *    This will cause the creation of a base recognizer class, which it will 
  *    override with its own implementations of some methods. The lexer creator
  *    can also then in turn override anything it likes. 
  *  - The lexer token source interface is then passed to some interface that
- *    knows how to use it, byt calling for a next token. 
+ *    knows how to use it, byte calling for a next token. 
  *  - When a next token is called, let ze lexing begin.
  *
  */
@@ -58,7 +58,7 @@ typedef	struct ANTLR3_LEXER_struct
     /** A pointer to the character stream whence this lexer is receiving
      *  characters. 
      *  TODO: I may come back to this and implement charstream outside
-     *  the input stream as per the java implementatio.
+     *  the input stream as per the java implementation.
      */
     pANTLR3_INPUT_STREAM	input;
 

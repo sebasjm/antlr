@@ -165,7 +165,7 @@ nextTokenStr	    (pANTLR3_TOKEN_SOURCE toksource)
     lexer   = (pANTLR3_LEXER)(toksource->super);
 
     /* Get rid of any previous token (token factory takes care of
-     * any deallocation when this token is finally used up.
+     * any de-allocation when this token is finally used up.
      */
     lexer->token		    = NULL;
     lexer->rec->error		    = ANTLR3_FALSE;	    /* Start out without an exception	*/
