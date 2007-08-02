@@ -77,8 +77,10 @@
 
 - (int) unexpectedType
 {
-	if ([input conformsToProtocol:@protocol(ANTLRTokenStream)]) {
+	if (token) {
 		return [token type];
+    } else if (node) {
+        return [node tokenType];
 	} else {
 		return c;
 	}

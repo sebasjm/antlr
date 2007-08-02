@@ -46,6 +46,7 @@
 - (void) mismatch:(id<ANTLRIntStream>)aStream tokenType:(int)aTType follow:(ANTLRBitSet *)aBitset
 {
 	ANTLRMismatchedTreeNodeException *mte = [ANTLRMismatchedTreeNodeException exceptionWithTokenType:aTType stream:aStream];
+    [mte setNode:[((id<ANTLRTreeNodeStream>)aStream) LT:1]];
 	[self recoverFromMismatchedToken:aStream exception:mte tokenType:aTType follow:aBitset];
 }
 

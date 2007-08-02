@@ -116,7 +116,7 @@
 - (id<ANTLRTree>) newTreeWithToken:(id<ANTLRToken>)fromToken tokenType:(int)tokenType
 {
 	id<ANTLRToken> newToken = [self newTokenWithToken:fromToken];
-	[newToken setTokenIndex:tokenType];
+	[newToken setType:tokenType];
 
 	id<ANTLRTree> newTree = [self newTreeWithToken:newToken];
 	[newToken release];
@@ -126,7 +126,7 @@
 - (id<ANTLRTree>) newTreeWithToken:(id<ANTLRToken>)fromToken tokenType:(int)tokenType text:(NSString *)tokenText
 {
 	id<ANTLRToken> newToken = [self newTokenWithToken:fromToken];
-	[newToken setTokenIndex:tokenType];
+	[newToken setType:tokenType];
 	[newToken setText:tokenText];
 
 	id<ANTLRTree> newTree = [self newTreeWithToken:newToken];
