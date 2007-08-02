@@ -134,7 +134,7 @@
         return [self copyElement:element];
     }
     id element = [self _next];
-    return [self toTree:element];
+    return element;
 }
 
 - (id) _next       // internal: TODO: redesign if necessary. maybe delegate
@@ -144,17 +144,17 @@
     }
     if ( cursor >= [self count] ) {
         if ( [self count] == 1 ) {
-            return elements.single; // will be dup'ed in -next
+            return [self toTree:elements.single]; // will be dup'ed in -next
         }
         @throw [NSException exceptionWithName:@"RewriteCardinalityException" reason:nil userInfo:nil];// TODO: fill in real exception
     }
     if (isSingleElement && elements.single != nil) {
         cursor++;
-        return elements.single;
+        return [self toTree:elements.single];
     }
     id el = [elements.multiple objectAtIndex:cursor];
     cursor++;
-    return el;
+    return [self toTree:el];
 }
 
 - (id) copyElement:(id)element

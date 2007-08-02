@@ -95,16 +95,6 @@
 
 #pragma mark Rewrite Rules
 
-- (void) addTokenAsChild:(id<ANTLRToken>)child toTree:(id<ANTLRTree>)aTree
-{
-	[self addChild:[self newTreeWithToken:child] toTree:aTree];
-}
-
-- (id<ANTLRTree>) makeToken:(id<ANTLRToken>)newRoot parentOf:(id<ANTLRTree>)oldRoot
-{
-	return [self makeNode:[self newTreeWithToken:newRoot] parentOf:oldRoot];
-}
-
 - (id<ANTLRTree>) newTreeWithTokenType:(int)tokenType
 {
 	id<ANTLRToken> newToken = [self newTokenWithTokenType:tokenType text:nil];

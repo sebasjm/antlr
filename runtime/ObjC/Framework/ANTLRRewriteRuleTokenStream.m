@@ -11,10 +11,9 @@
 
 @implementation ANTLRRewriteRuleTokenStream
 
-
-- (id) copyElement:(id)element
+- (id) next
 {
-    return [treeAdaptor newTreeWithToken:element];
+    return [self _next];
 }
 
 - (id) toTree:(id)element
