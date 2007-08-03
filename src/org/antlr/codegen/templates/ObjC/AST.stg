@@ -492,9 +492,9 @@ root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:(<labelType>)[_stream_<
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
 <if(first(rest(args)))><! got two arguments - means create from token with custom text!>
-[treeAdaptor addChild:[treeAdaptor newTreeWithToken:<first(args)> text:<first(rest(args))>] toTree:root_<treeLevel>];<\n>
+[treeAdaptor addChild:[treeAdaptor newTreeWithToken:<first(args)> tokenType:<token> text:<first(rest(args))>] toTree:root_<treeLevel>];<\n>
 <else><! at most one argument !>
-<if(first(args))>[treeAdaptor addChild:[treeAdaptor newTreeWithToken:<first(args)>] toTree:root_<treeLevel>];<\n>
+<if(first(args))>[treeAdaptor addChild:[treeAdaptor newTreeWithToken:<first(args)> tokenType:<token>] toTree:root_<treeLevel>];<\n>
 <else><! no argument at all !>[treeAdaptor addChild:[treeAdaptor newTreeWithTokenType:<token> text:[tokenNames objectAtIndex:<token>]] toTree:root_<treeLevel>];<\n>
 <endif><! one arg !>
 <endif><! two args !>
@@ -502,9 +502,9 @@ rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
 
 rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
 <if(first(rest(args)))><! got two arguments - means create from token with custom text!>
-root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[treeAdaptor newTreeWithToken:<first(args)> text:<first(rest(args))>] parentOf:root_<treeLevel>];<\n>
+root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[treeAdaptor newTreeWithToken:<first(args)> tokenType:<token> text:<first(rest(args))>] parentOf:root_<treeLevel>];<\n>
 <else><! at most one argument !>
-<if(first(args))>root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[treeAdaptor newTreeWithToken:<first(args)>] parentOf:root_<treeLevel>];<\n>
+<if(first(args))>root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[treeAdaptor newTreeWithToken:<first(args)> tokenType:<token>] parentOf:root_<treeLevel>];<\n>
 <else><! no argument at all !>root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:<token> text:[tokenNames objectAtIndex:<token>]] parentOf:root_<treeLevel>];<\n>
 <endif><! one arg !>
 <endif><! two args !>
