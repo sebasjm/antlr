@@ -28,7 +28,7 @@
 
 #import <ANTLR/ANTLRToken.h>
 #pragma warning tree/node diction is broken.
-@protocol ANTLRTreeAdaptor
+@protocol ANTLRTreeAdaptor <NSObject>
 
 #pragma mark Construction
 
