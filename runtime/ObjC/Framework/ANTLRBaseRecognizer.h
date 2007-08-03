@@ -49,7 +49,6 @@
 	int backtracking;					// the level of backtracking
 	NSMutableDictionary *ruleMemo;		// store previous results of matching rules so we don't have to do it again. Hook in incremental stuff here, too.
 	
-	NSArray *tokenNames;				// textual representation of the tokens for this grammar. filled in by codegeneration
 	NSString *grammarFileName;			// where did the grammar come from. filled in by codegeneration
 	
 }
@@ -115,6 +114,9 @@
 - (NSArray *) ruleInvocationStack:(id) exception
 					   recognizer:(Class) recognizerClass;
 
++ (NSString *) tokenNameForType:(int)aTokenType;
+- (NSString *) tokenNameForType:(int)aTokenType;
++ (NSArray *) tokenNames;
 - (NSArray *) tokenNames;
 - (NSString *) grammarFileName;
 

@@ -305,10 +305,26 @@
 	return [NSArray arrayWithObject:[@"not implemented yet: " stringByAppendingString:NSStringFromClass(recognizerClass)]];
 }
 
++ (NSString *) tokenNameForType:(int)aTokenType
+{
+    // subclass responsibility
+    return nil;
+}
+
+- (NSString *) tokenNameForType:(int)aTokenType
+{
+    return [[self class] tokenNameForType:aTokenType];
+}
+
++ (NSArray *) tokenNames
+{
+    // subclass responsibility
+    return nil;
+}
 
 - (NSArray *) tokenNames
 {
-	return tokenNames;
+    return [[self class] tokenNames];
 }
 
 - (NSString *) grammarFileName
