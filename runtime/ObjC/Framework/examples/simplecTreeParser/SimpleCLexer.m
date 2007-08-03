@@ -1,4 +1,4 @@
-// $ANTLR 3.0 SimpleC.g 2007-08-03 01:27:25
+// $ANTLR 3.0 SimpleC.g 2007-08-03 17:29:29
 
 #import "SimpleCLexer.h"
 
@@ -8,6 +8,14 @@
 */
 @implementation SimpleCLexer
 
+static NSArray *tokenNames;
+
+
++ (void) initialize
+{
+    // todo: get tokenNames into lexer - requires changes to CodeGenerator.java and ANTLRCore.sti
+    tokenNames = [[NSArray alloc] init];
+}
 
 - (id) initWithCharStream:(id<ANTLRCharStream>)anInput
 {
@@ -19,6 +27,16 @@
 - (void) dealloc
 {
 	[super dealloc];
+}
+
++ (NSString *) tokenNameForType:(int)aTokenType
+{
+    return nil;
+}
+
++ (NSArray *) tokenNames
+{
+    return tokenNames;
 }
 
 - (NSString *) grammarFileName
@@ -46,9 +64,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -75,9 +91,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -104,9 +118,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -133,9 +145,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -162,9 +172,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -191,9 +199,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -220,9 +226,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -249,9 +253,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -278,9 +280,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -307,9 +307,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -371,9 +369,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -383,13 +379,16 @@
 
 - (void) mINT
 {
+    id<ANTLRToken>  _int = nil;
+    NSMutableArray *_list_int = nil;
+
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_INT;
-        // SimpleC.g:99:7: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
-        // SimpleC.g:99:7: ( '0' .. '9' )+ // alt
+        // SimpleC.g:99:7: ( (int+= ( '0' .. '9' ) )+ ) // ruleBlockSingleAlt
+        // SimpleC.g:99:7: (int+= ( '0' .. '9' ) )+ // alt
         {
-        // SimpleC.g:99:7: ( '0' .. '9' )+	// positiveClosureBlock
+        // SimpleC.g:99:10: (int+= ( '0' .. '9' ) )+	// positiveClosureBlock
         int cnt2=0;
 
         do {
@@ -403,9 +402,15 @@
             }
             switch (alt2) {
         	case 1 :
-        	    // SimpleC.g:99:8: '0' .. '9' // alt
+        	    // SimpleC.g:99:10: int+= ( '0' .. '9' ) // alt
+        	    {
+        	    // SimpleC.g:99:12: ( '0' .. '9' ) // blockSingleAlt
+        	    // SimpleC.g:99:13: '0' .. '9' // alt
         	    {
         	    [self matchRangeFromChar:'0' to:'9'];
+
+        	    }
+
 
         	    }
         	    break;
@@ -418,6 +423,7 @@
             cnt2++;
         } while (YES); loop2: ;
 
+        NSLog(@"%@", _list_int);
 
         }
 
@@ -426,9 +432,8 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
+        [_list_int release];
 
     }
     return;
@@ -455,9 +460,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -484,9 +487,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -513,9 +514,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -542,9 +541,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -605,9 +602,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;

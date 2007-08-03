@@ -1,4 +1,4 @@
-// $ANTLR 3.0 SimpleCTP.gtp 2007-08-03 01:27:25
+// $ANTLR 3.0 SimpleCTP.gtp 2007-08-03 17:29:29
 
 #import "SimpleCTP.h"
 
@@ -102,6 +102,8 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 
 @implementation SimpleCTP
 
+static NSArray *tokenNames;
+
 + (void) initialize
 {
 	FOLLOW_declaration_in_program43 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declaration_in_program43_data count:1];
@@ -149,6 +151,10 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 	FOLLOW_atom_in_expr415 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_expr415_data count:1];
 	FOLLOW_set_in_atom0 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_atom0_data count:1];
 
+	tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>", 
+	@"VAR_DEF", @"ARG_DEF", @"FUNC_HDR", @"FUNC_DECL", @"FUNC_DEF", @"BLOCK", 
+	@"ID", @"EQ", @"INT", @"FOR", @"INT_TYPE", @"CHAR", @"VOID", @"EQEQ", @"LT", 
+	@"PLUS", @"WS", @"';'", @"'('", @"','", @"')'", @"'{'", @"'}'", nil];
 }
 
 
@@ -156,10 +162,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 {
 	if ((self = [super initWithTreeNodeStream:aStream])) {
 
-		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>", 
-	@"VAR_DEF", @"ARG_DEF", @"FUNC_HDR", @"FUNC_DECL", @"FUNC_DEF", @"BLOCK", 
-	@"ID", @"EQ", @"INT", @"FOR", @"INT_TYPE", @"CHAR", @"VOID", @"EQEQ", @"LT", 
-	@"PLUS", @"WS", @"';'", @"'('", @"','", @"')'", @"'{'", @"'}'", nil];
 
 																										
 	}
@@ -168,7 +170,6 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 
 - (void) dealloc
 {
-	[tokenNames release];
 
 	[super dealloc];
 }
@@ -229,9 +230,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -318,9 +317,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -359,9 +356,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -386,9 +381,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -456,9 +449,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -497,9 +488,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -531,9 +520,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -618,9 +605,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -697,9 +682,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -748,9 +731,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -887,9 +868,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;
@@ -921,9 +900,7 @@ static ANTLRBitSet *FOLLOW_set_in_atom0;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
 
 	}
 	return ;

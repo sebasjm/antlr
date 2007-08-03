@@ -495,7 +495,7 @@ catch (<e.decl>) {
 
 ruleDeclarations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<returnType()> _retval = [[<returnTypeName()> alloc] init]; <! retvals are released in the calling rule! !>
+<returnType()> _retval = [[[<returnTypeName()> alloc] init] autorelease];
 [_retval setStart:[input LT:1]];<\n>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
@@ -541,12 +541,8 @@ _retval
 >>
 
 ruleCleanUp() ::= <<
-// token labels
-<[ruleDescriptor.tokenLabels]:{[_<it.label.text> release];}; separator="\n">
 // token+rule list labels
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]:{[_list_<it.label.text> release];}; separator="\n">
-// rule labels
-<[ruleDescriptor.ruleLabels]:{[_<it.label.text> release];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 [_retval setStop:[input LT:-1]];<\n>
 <endif>
@@ -738,8 +734,7 @@ element() ::= <<
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex) ::= <<
 <if(label)>
-_<label>=(<labelType>)[input LT:1];
-[_<label> retain];<\n>
+_<label>=(<labelType>)[input LT:1];<\n>
 <endif>
 [self match:input tokenType:<token> follow:FOLLOW_<token>_in_<ruleName><elementIndex>]; <checkRuleBacktrackFailure()>
 >>
@@ -747,14 +742,13 @@ _<label>=(<labelType>)[input LT:1];
 /** ids+=ID */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
 <tokenRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 listLabel(label,elem) ::= <<
 if (_list_<label> == nil)
-	_list_<label> = [[NSMutableArray alloc] initWithObjects:_<label>, nil];
-else
-	[_list_<label> addObject:_<elem>];
+	_list_<label> = [[NSMutableArray alloc] init];
+[_list_<label> addObject:_<elem>];
 >>
 
 /** match a character */

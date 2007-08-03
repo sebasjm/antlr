@@ -1,4 +1,4 @@
-// $ANTLR 3.0 SimpleC.g 2007-08-03 01:27:24
+// $ANTLR 3.0 SimpleC.g 2007-08-03 17:29:28
 
 #import "SimpleCParser.h"
 
@@ -415,6 +415,8 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
 @implementation SimpleCParser
 
+static NSArray *tokenNames;
+
 + (void) initialize
 {
 	FOLLOW_declaration_in_program85 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declaration_in_program85_data count:1];
@@ -474,16 +476,16 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 	FOLLOW_expr_in_atom710 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_atom710_data count:1];
 	FOLLOW_24_in_atom712 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_24_in_atom712_data count:1];
 
+	tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>", 
+	@"VAR_DEF", @"ARG_DEF", @"FUNC_HDR", @"FUNC_DECL", @"FUNC_DEF", @"BLOCK", 
+	@"ID", @"EQ", @"INT", @"FOR", @"INT_TYPE", @"CHAR", @"VOID", @"EQEQ", @"LT", 
+	@"PLUS", @"WS", @"';'", @"'('", @"','", @"')'", @"'{'", @"'}'", nil];
 }
 
 - (id) initWithTokenStream:(id<ANTLRTokenStream>)aStream
 {
 	if ((self = [super initWithTokenStream:aStream])) {
 
-		tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>", 
-	@"VAR_DEF", @"ARG_DEF", @"FUNC_HDR", @"FUNC_DECL", @"FUNC_DEF", @"BLOCK", 
-	@"ID", @"EQ", @"INT", @"FOR", @"INT_TYPE", @"CHAR", @"VOID", @"EQEQ", @"LT", 
-	@"PLUS", @"WS", @"';'", @"'('", @"','", @"')'", @"'{'", @"'}'", nil];
 		dfa2 = [[SimpleCParserDFA2 alloc] initWithRecognizer:self];
 																																
 		[self setTreeAdaptor:[[[ANTLRCommonTreeAdaptor alloc] init] autorelease]];
@@ -493,7 +495,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
 - (void) dealloc
 {
-	[tokenNames release];
 	[dfa2 release];
 	[self setTreeAdaptor:nil];
 
@@ -510,7 +511,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:16:1: program : ( declaration )+ ;
 - (SimpleCParser_program_return *) program
 {
-    SimpleCParser_program_return * _retval = [[SimpleCParser_program_return alloc] init]; 
+    SimpleCParser_program_return * _retval = [[[SimpleCParser_program_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -568,10 +569,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
-		[_declaration1 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -586,7 +584,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:20:1: declaration : ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) );
 - (SimpleCParser_declaration_return *) declaration
 {
-    SimpleCParser_declaration_return * _retval = [[SimpleCParser_declaration_return alloc] init]; 
+    SimpleCParser_declaration_return * _retval = [[[SimpleCParser_declaration_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -635,7 +633,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
         	    [_stream_functionHeader addElement:[_functionHeader3 tree]];
         	    _char_literal4=(id<ANTLRToken> )[input LT:1];
-        	    [_char_literal4 retain];
         	    [self match:input tokenType:21 follow:FOLLOW_21_in_declaration117]; 
         	    [_stream_21 addElement:_char_literal4];
 
@@ -727,14 +724,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_char_literal4 release];
 		// token+rule list labels
-		// rule labels
-		[_variable2 release];
-		[_functionHeader3 release];
-		[_functionHeader5 release];
-		[_block6 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -749,7 +739,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:26:1: variable : type declarator ';' -> ^( VAR_DEF type declarator ) ;
 - (SimpleCParser_variable_return *) variable
 {
-    SimpleCParser_variable_return * _retval = [[SimpleCParser_variable_return alloc] init]; 
+    SimpleCParser_variable_return * _retval = [[[SimpleCParser_variable_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -782,7 +772,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
         [_stream_declarator addElement:[_declarator8 tree]];
         _char_literal9=(id<ANTLRToken> )[input LT:1];
-        [_char_literal9 retain];
         [self match:input tokenType:21 follow:FOLLOW_21_in_variable170]; 
         [_stream_21 addElement:_char_literal9];
 
@@ -825,12 +814,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_char_literal9 release];
 		// token+rule list labels
-		// rule labels
-		[_type7 release];
-		[_declarator8 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -845,7 +829,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:30:1: declarator : ID ;
 - (SimpleCParser_declarator_return *) declarator
 {
-    SimpleCParser_declarator_return * _retval = [[SimpleCParser_declarator_return alloc] init]; 
+    SimpleCParser_declarator_return * _retval = [[[SimpleCParser_declarator_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -861,7 +845,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         root_0 = (id)[treeAdaptor emptyTree];
 
         _ID10=(id<ANTLRToken> )[input LT:1];
-        [_ID10 retain];
         [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_declarator199]; 
         _ID10_tree = (id)[treeAdaptor newTreeWithToken:_ID10];
         [treeAdaptor addChild:_ID10_tree toTree:root_0];
@@ -875,10 +858,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_ID10 release];
 		// token+rule list labels
-		// rule labels
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -893,7 +873,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:34:1: functionHeader : type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ;
 - (SimpleCParser_functionHeader_return *) functionHeader
 {
-    SimpleCParser_functionHeader_return * _retval = [[SimpleCParser_functionHeader_return alloc] init]; 
+    SimpleCParser_functionHeader_return * _retval = [[[SimpleCParser_functionHeader_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -931,12 +911,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
         [_stream_type addElement:[_type11 tree]];
         _ID12=(id<ANTLRToken> )[input LT:1];
-        [_ID12 retain];
         [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_functionHeader221]; 
         [_stream_SimpleCParser_ID addElement:_ID12];
 
         _char_literal13=(id<ANTLRToken> )[input LT:1];
-        [_char_literal13 retain];
         [self match:input tokenType:22 follow:FOLLOW_22_in_functionHeader223]; 
         [_stream_22 addElement:_char_literal13];
 
@@ -972,7 +950,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    	    // SimpleC.g:35:41: ',' formalParameter // alt
         	    	    {
         	    	    _char_literal15=(id<ANTLRToken> )[input LT:1];
-        	    	    [_char_literal15 retain];
         	    	    [self match:input tokenType:23 follow:FOLLOW_23_in_functionHeader231]; 
         	    	    [_stream_23 addElement:_char_literal15];
 
@@ -998,7 +975,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         }
 
         _char_literal17=(id<ANTLRToken> )[input LT:1];
-        [_char_literal17 retain];
         [self match:input tokenType:24 follow:FOLLOW_24_in_functionHeader241]; 
         [_stream_24 addElement:_char_literal17];
 
@@ -1052,16 +1028,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_ID12 release];
-		[_char_literal13 release];
-		[_char_literal15 release];
-		[_char_literal17 release];
 		// token+rule list labels
-		// rule labels
-		[_type11 release];
-		[_formalParameter14 release];
-		[_formalParameter16 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -1076,7 +1043,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:39:1: formalParameter : type declarator -> ^( ARG_DEF type declarator ) ;
 - (SimpleCParser_formalParameter_return *) formalParameter
 {
-    SimpleCParser_formalParameter_return * _retval = [[SimpleCParser_formalParameter_return alloc] init]; 
+    SimpleCParser_formalParameter_return * _retval = [[[SimpleCParser_formalParameter_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -1144,11 +1111,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
-		[_type18 release];
-		[_declarator19 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -1163,7 +1126,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:43:1: type : ( 'int' | 'char' | 'void' | ID );
 - (SimpleCParser_type_return *) type
 {
-    SimpleCParser_type_return * _retval = [[SimpleCParser_type_return alloc] init]; 
+    SimpleCParser_type_return * _retval = [[[SimpleCParser_type_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -1197,10 +1160,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_set20 release];
 		// token+rule list labels
-		// rule labels
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -1215,7 +1175,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:50:1: block : lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,@\"BLOCK\"] ( variable )* ( stat )* ) ;
 - (SimpleCParser_block_return *) block
 {
-    SimpleCParser_block_return * _retval = [[SimpleCParser_block_return alloc] init]; 
+    SimpleCParser_block_return * _retval = [[[SimpleCParser_block_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -1239,7 +1199,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         // SimpleC.g:51:9: lc= '{' ( variable )* ( stat )* '}' // alt
         {
         _lc=(id<ANTLRToken> )[input LT:1];
-        [_lc retain];
         [self match:input tokenType:25 follow:FOLLOW_25_in_block376]; 
         [_stream_25 addElement:_lc];
 
@@ -1309,7 +1268,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         } while (YES); loop6: ;
 
         _char_literal23=(id<ANTLRToken> )[input LT:1];
-        [_char_literal23 retain];
         [self match:input tokenType:26 follow:FOLLOW_26_in_block416]; 
         [_stream_26 addElement:_char_literal23];
 
@@ -1362,13 +1320,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_lc release];
-		[_char_literal23 release];
 		// token+rule list labels
-		// rule labels
-		[_variable21 release];
-		[_stat22 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -1383,7 +1335,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:58:1: stat : ( forStat | expr ';' | block | assignStat ';' | ';' );
 - (SimpleCParser_stat_return *) stat
 {
-    SimpleCParser_stat_return * _retval = [[SimpleCParser_stat_return alloc] init]; 
+    SimpleCParser_stat_return * _retval = [[[SimpleCParser_stat_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -1469,7 +1421,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
         	    [treeAdaptor addChild:[_expr25 tree] toTree:root_0];
         	    _char_literal26=(id<ANTLRToken> )[input LT:1];
-        	    [_char_literal26 retain];
         	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat459]; 
 
         	    }
@@ -1500,7 +1451,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
         	    [treeAdaptor addChild:[_assignStat28 tree] toTree:root_0];
         	    _char_literal29=(id<ANTLRToken> )[input LT:1];
-        	    [_char_literal29 retain];
         	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat478]; 
 
         	    }
@@ -1511,7 +1461,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    _char_literal30=(id<ANTLRToken> )[input LT:1];
-        	    [_char_literal30 retain];
         	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat487]; 
 
         	    }
@@ -1524,16 +1473,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_char_literal26 release];
-		[_char_literal29 release];
-		[_char_literal30 release];
 		// token+rule list labels
-		// rule labels
-		[_forStat24 release];
-		[_expr25 release];
-		[_block27 release];
-		[_assignStat28 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -1548,7 +1488,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:65:1: forStat : 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block -> ^( 'for' $start expr $next block ) ;
 - (SimpleCParser_forStat_return *) forStat
 {
-    SimpleCParser_forStat_return * _retval = [[SimpleCParser_forStat_return alloc] init]; 
+    SimpleCParser_forStat_return * _retval = [[[SimpleCParser_forStat_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -1585,12 +1525,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         // SimpleC.g:66:9: 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block // alt
         {
         _string_literal31=(id<ANTLRToken> )[input LT:1];
-        [_string_literal31 retain];
         [self match:input tokenType:SimpleCParser_FOR follow:FOLLOW_SimpleCParser_FOR_in_forStat507]; 
         [_stream_SimpleCParser_FOR addElement:_string_literal31];
 
         _char_literal32=(id<ANTLRToken> )[input LT:1];
-        [_char_literal32 retain];
         [self match:input tokenType:22 follow:FOLLOW_22_in_forStat509]; 
         [_stream_22 addElement:_char_literal32];
 
@@ -1601,7 +1539,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
         [_stream_assignStat addElement:[_start tree]];
         _char_literal33=(id<ANTLRToken> )[input LT:1];
-        [_char_literal33 retain];
         [self match:input tokenType:21 follow:FOLLOW_21_in_forStat515]; 
         [_stream_21 addElement:_char_literal33];
 
@@ -1612,7 +1549,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
         [_stream_expr addElement:[_expr34 tree]];
         _char_literal35=(id<ANTLRToken> )[input LT:1];
-        [_char_literal35 retain];
         [self match:input tokenType:21 follow:FOLLOW_21_in_forStat519]; 
         [_stream_21 addElement:_char_literal35];
 
@@ -1623,7 +1559,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
         [_stream_assignStat addElement:[_next tree]];
         _char_literal36=(id<ANTLRToken> )[input LT:1];
-        [_char_literal36 retain];
         [self match:input tokenType:24 follow:FOLLOW_24_in_forStat525]; 
         [_stream_24 addElement:_char_literal36];
 
@@ -1652,7 +1587,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
             // SimpleC.g:67:12: ^( 'for' $start expr $next block )
             {
             id root_1 = (id)[treeAdaptor emptyTree];
-            root_1 = (id)[treeAdaptor makeNode:(id<ANTLRToken> )[_stream_SimpleCParser_FOR next] parentOf:root_1];
+            root_1 = (id)[treeAdaptor makeNode:[_stream_SimpleCParser_FOR next] parentOf:root_1];
 
             [treeAdaptor addChild:[_start tree] toTree:root_1];
             [treeAdaptor addChild:[_stream_expr next] toTree:root_1];
@@ -1677,18 +1612,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_string_literal31 release];
-		[_char_literal32 release];
-		[_char_literal33 release];
-		[_char_literal35 release];
-		[_char_literal36 release];
 		// token+rule list labels
-		// rule labels
-		[_start release];
-		[_next release];
-		[_expr34 release];
-		[_block37 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -1703,7 +1627,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:70:1: assignStat : ID EQ expr -> ^( EQ ID expr ) ;
 - (SimpleCParser_assignStat_return *) assignStat
 {
-    SimpleCParser_assignStat_return * _retval = [[SimpleCParser_assignStat_return alloc] init]; 
+    SimpleCParser_assignStat_return * _retval = [[[SimpleCParser_assignStat_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -1724,12 +1648,10 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         // SimpleC.g:71:9: ID EQ expr // alt
         {
         _ID38=(id<ANTLRToken> )[input LT:1];
-        [_ID38 retain];
         [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_assignStat570]; 
         [_stream_SimpleCParser_ID addElement:_ID38];
 
         _EQ39=(id<ANTLRToken> )[input LT:1];
-        [_EQ39 retain];
         [self match:input tokenType:SimpleCParser_EQ follow:FOLLOW_SimpleCParser_EQ_in_assignStat572]; 
         [_stream_SimpleCParser_EQ addElement:_EQ39];
 
@@ -1756,7 +1678,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
             // SimpleC.g:71:23: ^( EQ ID expr )
             {
             id root_1 = (id)[treeAdaptor emptyTree];
-            root_1 = (id)[treeAdaptor makeNode:(id<ANTLRToken> )[_stream_SimpleCParser_EQ next] parentOf:root_1];
+            root_1 = (id)[treeAdaptor makeNode:[_stream_SimpleCParser_EQ next] parentOf:root_1];
 
             [treeAdaptor addChild:[_stream_SimpleCParser_ID next] toTree:root_1];
             [treeAdaptor addChild:[_stream_expr next] toTree:root_1];
@@ -1777,12 +1699,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_ID38 release];
-		[_EQ39 release];
 		// token+rule list labels
-		// rule labels
-		[_expr40 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -1797,7 +1714,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:74:1: expr : condExpr ;
 - (SimpleCParser_expr_return *) expr
 {
-    SimpleCParser_expr_return * _retval = [[SimpleCParser_expr_return alloc] init]; 
+    SimpleCParser_expr_return * _retval = [[[SimpleCParser_expr_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -1827,10 +1744,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
 		// token+rule list labels
-		// rule labels
-		[_condExpr41 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -1845,7 +1759,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:77:1: condExpr : aexpr ( ( '==' | '<' ) aexpr )? ;
 - (SimpleCParser_condExpr_return *) condExpr
 {
-    SimpleCParser_condExpr_return * _retval = [[SimpleCParser_condExpr_return alloc] init]; 
+    SimpleCParser_condExpr_return * _retval = [[[SimpleCParser_condExpr_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -1904,7 +1818,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    	    // SimpleC.g:78:18: '==' // alt
         	    	    {
         	    	    _string_literal43=(id<ANTLRToken> )[input LT:1];
-        	    	    [_string_literal43 retain];
         	    	    [self match:input tokenType:SimpleCParser_EQEQ follow:FOLLOW_SimpleCParser_EQEQ_in_condExpr622]; 
         	    	    _string_literal43_tree = (id)[treeAdaptor newTreeWithToken:_string_literal43];
         	    	    root_0 = (id)[treeAdaptor makeNode:_string_literal43_tree parentOf:root_0];
@@ -1916,7 +1829,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    	    // SimpleC.g:78:26: '<' // alt
         	    	    {
         	    	    _char_literal44=(id<ANTLRToken> )[input LT:1];
-        	    	    [_char_literal44 retain];
         	    	    [self match:input tokenType:SimpleCParser_LT follow:FOLLOW_SimpleCParser_LT_in_condExpr627]; 
         	    	    _char_literal44_tree = (id)[treeAdaptor newTreeWithToken:_char_literal44];
         	    	    root_0 = (id)[treeAdaptor makeNode:_char_literal44_tree parentOf:root_0];
@@ -1948,13 +1860,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_string_literal43 release];
-		[_char_literal44 release];
 		// token+rule list labels
-		// rule labels
-		[_aexpr42 release];
-		[_aexpr45 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -1969,7 +1875,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:81:1: aexpr : atom ( '+' atom )* ;
 - (SimpleCParser_aexpr_return *) aexpr
 {
-    SimpleCParser_aexpr_return * _retval = [[SimpleCParser_aexpr_return alloc] init]; 
+    SimpleCParser_aexpr_return * _retval = [[[SimpleCParser_aexpr_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -2008,7 +1914,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    // SimpleC.g:82:16: '+' atom // alt
         	    {
         	    _char_literal47=(id<ANTLRToken> )[input LT:1];
-        	    [_char_literal47 retain];
         	    [self match:input tokenType:SimpleCParser_PLUS follow:FOLLOW_SimpleCParser_PLUS_in_aexpr657]; 
         	    _char_literal47_tree = (id)[treeAdaptor newTreeWithToken:_char_literal47];
         	    root_0 = (id)[treeAdaptor makeNode:_char_literal47_tree parentOf:root_0];
@@ -2037,12 +1942,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_char_literal47 release];
 		// token+rule list labels
-		// rule labels
-		[_atom46 release];
-		[_atom48 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
@@ -2057,7 +1957,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 // SimpleC.g:85:1: atom : ( ID | INT | '(' expr ')' -> expr );
 - (SimpleCParser_atom_return *) atom
 {
-    SimpleCParser_atom_return * _retval = [[SimpleCParser_atom_return alloc] init]; 
+    SimpleCParser_atom_return * _retval = [[[SimpleCParser_atom_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
     id root_0 = nil;
@@ -2103,7 +2003,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    _ID49=(id<ANTLRToken> )[input LT:1];
-        	    [_ID49 retain];
         	    [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_atom680]; 
         	    _ID49_tree = (id)[treeAdaptor newTreeWithToken:_ID49];
         	    [treeAdaptor addChild:_ID49_tree toTree:root_0];
@@ -2117,7 +2016,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    root_0 = (id)[treeAdaptor emptyTree];
 
         	    _INT50=(id<ANTLRToken> )[input LT:1];
-        	    [_INT50 retain];
         	    [self match:input tokenType:SimpleCParser_INT follow:FOLLOW_SimpleCParser_INT_in_atom694]; 
         	    _INT50_tree = (id)[treeAdaptor newTreeWithToken:_INT50];
         	    [treeAdaptor addChild:_INT50_tree toTree:root_0];
@@ -2129,7 +2027,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
         	    // SimpleC.g:88:7: '(' expr ')' // alt
         	    {
         	    _char_literal51=(id<ANTLRToken> )[input LT:1];
-        	    [_char_literal51 retain];
         	    [self match:input tokenType:22 follow:FOLLOW_22_in_atom708]; 
         	    [_stream_22 addElement:_char_literal51];
 
@@ -2140,7 +2037,6 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 
         	    [_stream_expr addElement:[_expr52 tree]];
         	    _char_literal53=(id<ANTLRToken> )[input LT:1];
-        	    [_char_literal53 retain];
         	    [self match:input tokenType:24 follow:FOLLOW_24_in_atom712]; 
         	    [_stream_24 addElement:_char_literal53];
 
@@ -2175,14 +2071,7 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[self recover:input exception:re];
 	}
 	@finally {
-		// token labels
-		[_ID49 release];
-		[_INT50 release];
-		[_char_literal51 release];
-		[_char_literal53 release];
 		// token+rule list labels
-		// rule labels
-		[_expr52 release];
 		[_retval setStop:[input LT:-1]];
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
