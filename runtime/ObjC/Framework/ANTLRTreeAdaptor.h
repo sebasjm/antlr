@@ -94,9 +94,8 @@
 
 #pragma mark Rewrite Rules
 
-- (void) addTokenAsChild:(id<ANTLRToken>)child toTree:(id<ANTLRTree>)aTree;
-- (id<ANTLRTree>) makeToken:(id<ANTLRToken>)newRoot parentOf:(id<ANTLRTree>)oldRoot;
-
+- (id<ANTLRTree>) newTreeWithTokenType:(int)tokenType;
+- (id<ANTLRTree>) newTreeWithTokenType:(int)tokenType text:(NSString *)tokenText;
 - (id<ANTLRTree>) newTreeWithToken:(id<ANTLRToken>)fromToken tokenType:(int)tokenType;
 - (id<ANTLRTree>) newTreeWithToken:(id<ANTLRToken>)fromToken tokenType:(int)tokenType text:(NSString *)tokenText;
 - (id<ANTLRTree>) newTreeWithToken:(id<ANTLRToken>)fromToken text:(NSString *)tokenText;
