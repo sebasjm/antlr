@@ -487,7 +487,7 @@ root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[_stream_<label> next] 
 
 /** Gen ^(ID ...) */
 rewriteTokenRefRoot(token,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:(<labelType>)[_stream_<token> next] parentOf:root_<treeLevel>];<\n>
+root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[_stream_<token> next] parentOf:root_<treeLevel>];<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<

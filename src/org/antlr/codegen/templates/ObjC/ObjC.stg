@@ -144,7 +144,15 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="id<ANTLRToken> 
 */
 @implementation <className()>
 
+static NSArray *tokenNames;
+
 <actions.lexer.methods>
+
++ (void) initialize
+{
+    // todo: get tokenNames into lexer - requires changes to CodeGenerator.java and ANTLRCore.sti
+    tokenNames = [[NSArray alloc] init];
+}
 
 - (id) initWithCharStream:(id\<ANTLRCharStream>)anInput
 {
@@ -164,6 +172,16 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="id<ANTLRToken> 
 	<cyclicDFAs:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
 <actions.lexer.dealloc>
 	[super dealloc];
+}
+
++ (NSString *) tokenNameForType:(int)aTokenType
+{
+    return nil;
+}
+
++ (NSArray *) tokenNames
+{
+    return tokenNames;
 }
 
 - (NSString *) grammarFileName
@@ -310,9 +328,12 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 
 @implementation <className()>
 
+static NSArray *tokenNames;
+
 + (void) initialize
 {
 	<bitsets:bitsetInit(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>
+	tokenNames = [[NSArray alloc] initWithObjects:@"\<invalid>", @"\<EOR>", @"\<DOWN>", @"\<UP>", <tokenNames:{@<it>}; separator=", ", wrap="\n	">, nil];
 }
 
 <if(PARSER)>
@@ -324,7 +345,6 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 {
 	if ((self = [super initWithTreeNodeStream:aStream])) {
 <endif><\n>
-		tokenNames = [[NSArray alloc] initWithObjects:@"\<invalid>", @"\<EOR>", @"\<DOWN>", @"\<UP>", <tokenNames:{@<it>}; separator=", ", wrap="\n	">, nil];
 <if(memoize)>
 		ruleMemo = [[NSMutableDictionary alloc] initWithCapacity:<numRules>+1];
 <endif>
@@ -341,7 +361,6 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 
 - (void) dealloc
 {
-	[tokenNames release];
 <if(memoize)>
 	[ruleMemo release];
 <endif>
