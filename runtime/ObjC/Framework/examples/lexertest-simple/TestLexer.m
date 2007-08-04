@@ -1,4 +1,4 @@
-// $ANTLR 3.0 Test.gl 2007-07-25 20:12:37
+// $ANTLR 3.0 Test.gl 2007-08-04 15:59:43
 
 #import "TestLexer.h"
 
@@ -8,6 +8,14 @@
 */
 @implementation TestLexer
 
+static NSArray *tokenNames;
+
+
++ (void) initialize
+{
+    // todo: get tokenNames into lexer - requires changes to CodeGenerator.java and ANTLRCore.sti
+    tokenNames = [[NSArray alloc] init];
+}
 
 - (id) initWithCharStream:(id<ANTLRCharStream>)anInput
 {
@@ -19,6 +27,16 @@
 - (void) dealloc
 {
 	[super dealloc];
+}
+
++ (NSString *) tokenNameForType:(int)aTokenType
+{
+    return nil;
+}
+
++ (NSArray *) tokenNames
+{
+    return tokenNames;
 }
 
 - (NSString *) grammarFileName
@@ -76,9 +94,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -101,9 +117,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;
@@ -133,9 +147,7 @@
     @finally {
         ruleNestingLevel--;
         // rule cleanup
-        // token labels
         // token+rule list labels
-        // rule labels
 
     }
     return;

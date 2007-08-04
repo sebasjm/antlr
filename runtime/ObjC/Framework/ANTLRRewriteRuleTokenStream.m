@@ -18,7 +18,7 @@
 
 - (id) toTree:(id)element
 {
-    return [treeAdaptor newTreeWithToken:element];
+    return [[treeAdaptor newTreeWithToken:element] autorelease];
 }
 
 

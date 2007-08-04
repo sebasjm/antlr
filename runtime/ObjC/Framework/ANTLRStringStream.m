@@ -59,6 +59,7 @@
 {
 	[markers release];
 	markers = nil;
+    [self setData:nil];
 	[super dealloc];
 }
 

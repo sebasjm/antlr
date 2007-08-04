@@ -49,6 +49,14 @@
 	[super reset];
 }
 
+- (void) dealloc
+{
+    [self setToken:nil];
+    [self setInput:nil];
+    [self setText:nil];
+    [super dealloc];
+}
+
 	// token stuff
 #pragma mark Tokens
 
@@ -70,7 +78,7 @@
 // this method may be overridden in the generated lexer if we generate a filtering lexer.
 - (id<ANTLRToken>) nextToken
 {
-	token = nil;
+	[self setToken:nil];
     _channel = ANTLRTokenChannelDefault;
     _tokenStartLine = [input line];
     _tokenCharPositionInLine = [input charPositionInLine];

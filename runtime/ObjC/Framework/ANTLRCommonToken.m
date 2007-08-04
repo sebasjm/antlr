@@ -48,6 +48,13 @@
 	return [aToken copy];
 }
 
+- (void) dealloc
+{
+    [self setInput:nil];
+    [self setText:nil];
+    [super dealloc];
+}
+
 // return the singleton EOF Token 
 + (id<ANTLRToken>) eofToken
 {

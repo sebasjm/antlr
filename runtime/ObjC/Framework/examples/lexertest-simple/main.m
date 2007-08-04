@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #import "TestLexer.h"
 #import <ANTLR/ANTLR.h>
+#import <unistd.h>
 
 int main(int argc, const char * argv[])
 {
@@ -16,5 +17,7 @@ int main(int argc, const char * argv[])
 	[stream release];
 	
 	[pool release];
+    // sleep for objectalloc
+    while (1) sleep(60);
 	return 0;
 }

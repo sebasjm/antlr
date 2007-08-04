@@ -33,7 +33,7 @@
 #pragma mark Construction
 
 - (id<ANTLRTree>) newTreeWithToken:(id<ANTLRToken>) payload;
-- (id<ANTLRTree>) emptyTree;
+- (id<ANTLRTree>) newEmptyTree;
 
 - (id) copyNode:(id<ANTLRTree>)aNode;	// copies just the node
 - (id) copyTree:(id<ANTLRTree>)aTree;	// copies the entire subtree, recursively
@@ -80,7 +80,7 @@
 #pragma mark Construction
 
 - (id<ANTLRTree>) newTreeWithToken:(id<ANTLRToken>) payload;
-- (id<ANTLRTree>) emptyTree;
+- (id<ANTLRTree>) newEmptyTree;
 
 - (id) copyNode:(id<ANTLRTree>)aNode;	// copies just the node
 - (id) copyTree:(id<ANTLRTree>)aTree;	// copies the entire subtree, recursively

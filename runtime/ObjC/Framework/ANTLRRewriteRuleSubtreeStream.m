@@ -14,7 +14,7 @@
 - (id) nextNode
 {
     if (shouldCopyElements || (cursor >= [self count] && [self count] == 1))
-        return [treeAdaptor copyNode:[self _next]];
+        return [[treeAdaptor copyNode:[self _next]] autorelease];
     else 
         return [self _next];
 }

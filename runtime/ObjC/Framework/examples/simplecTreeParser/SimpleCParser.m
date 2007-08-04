@@ -1,4 +1,4 @@
-// $ANTLR 3.0 SimpleC.g 2007-08-03 17:29:28
+// $ANTLR 3.0 SimpleC.g 2007-08-04 17:54:23
 
 #import "SimpleCParser.h"
 
@@ -214,6 +214,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		tree = aTree;
 	}
 }
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
+}
 @end
 @implementation SimpleCParser_declaration_return
 - (id) tree
@@ -227,6 +233,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[tree release];
 		tree = aTree;
 	}
+}
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
 }
 @end
 @implementation SimpleCParser_variable_return
@@ -242,6 +254,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		tree = aTree;
 	}
 }
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
+}
 @end
 @implementation SimpleCParser_declarator_return
 - (id) tree
@@ -255,6 +273,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[tree release];
 		tree = aTree;
 	}
+}
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
 }
 @end
 @implementation SimpleCParser_functionHeader_return
@@ -270,6 +294,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		tree = aTree;
 	}
 }
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
+}
 @end
 @implementation SimpleCParser_formalParameter_return
 - (id) tree
@@ -283,6 +313,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[tree release];
 		tree = aTree;
 	}
+}
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
 }
 @end
 @implementation SimpleCParser_type_return
@@ -298,6 +334,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		tree = aTree;
 	}
 }
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
+}
 @end
 @implementation SimpleCParser_block_return
 - (id) tree
@@ -311,6 +353,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[tree release];
 		tree = aTree;
 	}
+}
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
 }
 @end
 @implementation SimpleCParser_stat_return
@@ -326,6 +374,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		tree = aTree;
 	}
 }
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
+}
 @end
 @implementation SimpleCParser_forStat_return
 - (id) tree
@@ -339,6 +393,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[tree release];
 		tree = aTree;
 	}
+}
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
 }
 @end
 @implementation SimpleCParser_assignStat_return
@@ -354,6 +414,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		tree = aTree;
 	}
 }
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
+}
 @end
 @implementation SimpleCParser_expr_return
 - (id) tree
@@ -367,6 +433,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[tree release];
 		tree = aTree;
 	}
+}
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
 }
 @end
 @implementation SimpleCParser_condExpr_return
@@ -382,6 +454,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		tree = aTree;
 	}
 }
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
+}
 @end
 @implementation SimpleCParser_aexpr_return
 - (id) tree
@@ -396,6 +474,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		tree = aTree;
 	}
 }
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
+}
 @end
 @implementation SimpleCParser_atom_return
 - (id) tree
@@ -409,6 +493,12 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 		[tree release];
 		tree = aTree;
 	}
+}
+
+- (void) dealloc
+{
+    [self setTree:nil];
+    [super dealloc];
 }
 @end
 
@@ -524,7 +614,7 @@ static NSArray *tokenNames;
         // SimpleC.g:17:9: ( ( declaration )+ ) // ruleBlockSingleAlt
         // SimpleC.g:17:9: ( declaration )+ // alt
         {
-        root_0 = (id)[treeAdaptor emptyTree];
+        root_0 = (id)[treeAdaptor newEmptyTree];
 
         // SimpleC.g:17:9: ( declaration )+	// positiveClosureBlock
         int cnt1=0;
@@ -574,7 +664,7 @@ static NSArray *tokenNames;
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -612,7 +702,7 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleC.g:21:9: variable // alt
         	    {
-        	    root_0 = (id)[treeAdaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
 
         	    [following addObject:FOLLOW_variable_in_declaration105];
         	    _variable2 = [self variable];
@@ -644,21 +734,24 @@ static NSArray *tokenNames;
         	    // token list labels: 
         	    // rule list labels: 
         	    int i_0 = 0;
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
         	    [_retval setTree:root_0];
         	    ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
-        	    root_0 = (id)[treeAdaptor emptyTree];
         	    // 22:28: -> ^( FUNC_DECL functionHeader )
         	    {
         	        // SimpleC.g:22:31: ^( FUNC_DECL functionHeader )
         	        {
-        	        id root_1 = (id)[treeAdaptor emptyTree];
+        	        id root_1 = (id)[treeAdaptor newEmptyTree];
 
-        	        root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DECL text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DECL]] parentOf:root_1];
+        	        id<ANTLRTree> _SimpleCParser_FUNC_DECL_tree = [treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DECL text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DECL]];
+        	        root_1 = (id)[treeAdaptor makeNode:_SimpleCParser_FUNC_DECL_tree parentOf:root_1];
+        	        [_SimpleCParser_FUNC_DECL_tree release];
 
         	        [treeAdaptor addChild:[_stream_functionHeader next] toTree:root_1];
 
         	        [treeAdaptor addChild:root_1 toTree:root_0];
+        	        [root_1 release];
         	        }
 
         	    }
@@ -691,22 +784,25 @@ static NSArray *tokenNames;
         	    // token list labels: 
         	    // rule list labels: 
         	    int i_0 = 0;
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
         	    [_retval setTree:root_0];
         	    ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
-        	    root_0 = (id)[treeAdaptor emptyTree];
         	    // 23:30: -> ^( FUNC_DEF functionHeader block )
         	    {
         	        // SimpleC.g:23:33: ^( FUNC_DEF functionHeader block )
         	        {
-        	        id root_1 = (id)[treeAdaptor emptyTree];
+        	        id root_1 = (id)[treeAdaptor newEmptyTree];
 
-        	        root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DEF text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DEF]] parentOf:root_1];
+        	        id<ANTLRTree> _SimpleCParser_FUNC_DEF_tree = [treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_DEF text:[tokenNames objectAtIndex:SimpleCParser_FUNC_DEF]];
+        	        root_1 = (id)[treeAdaptor makeNode:_SimpleCParser_FUNC_DEF_tree parentOf:root_1];
+        	        [_SimpleCParser_FUNC_DEF_tree release];
 
         	        [treeAdaptor addChild:[_stream_functionHeader next] toTree:root_1];
         	        [treeAdaptor addChild:[_stream_block next] toTree:root_1];
 
         	        [treeAdaptor addChild:root_1 toTree:root_0];
+        	        [root_1 release];
         	        }
 
         	    }
@@ -727,9 +823,12 @@ static NSArray *tokenNames;
 		// token+rule list labels
 		[_retval setStop:[input LT:-1]];
 
+		[_stream_21 release];
+		[_stream_functionHeader release];
+		[_stream_block release];
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -783,22 +882,25 @@ static NSArray *tokenNames;
         // token list labels: 
         // rule list labels: 
         int i_0 = 0;
+        root_0 = (id)[treeAdaptor newEmptyTree];
         [_retval setTree:root_0];
         ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
-        root_0 = (id)[treeAdaptor emptyTree];
         // 27:29: -> ^( VAR_DEF type declarator )
         {
             // SimpleC.g:27:32: ^( VAR_DEF type declarator )
             {
-            id root_1 = (id)[treeAdaptor emptyTree];
+            id root_1 = (id)[treeAdaptor newEmptyTree];
 
-            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_VAR_DEF text:[tokenNames objectAtIndex:SimpleCParser_VAR_DEF]] parentOf:root_1];
+            id<ANTLRTree> _SimpleCParser_VAR_DEF_tree = [treeAdaptor newTreeWithTokenType:SimpleCParser_VAR_DEF text:[tokenNames objectAtIndex:SimpleCParser_VAR_DEF]];
+            root_1 = (id)[treeAdaptor makeNode:_SimpleCParser_VAR_DEF_tree parentOf:root_1];
+            [_SimpleCParser_VAR_DEF_tree release];
 
             [treeAdaptor addChild:[_stream_type next] toTree:root_1];
             [treeAdaptor addChild:[_stream_declarator next] toTree:root_1];
 
             [treeAdaptor addChild:root_1 toTree:root_0];
+            [root_1 release];
             }
 
         }
@@ -817,9 +919,12 @@ static NSArray *tokenNames;
 		// token+rule list labels
 		[_retval setStop:[input LT:-1]];
 
+		[_stream_21 release];
+		[_stream_type release];
+		[_stream_declarator release];
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -842,12 +947,13 @@ static NSArray *tokenNames;
         // SimpleC.g:31:9: ( ID ) // ruleBlockSingleAlt
         // SimpleC.g:31:9: ID // alt
         {
-        root_0 = (id)[treeAdaptor emptyTree];
+        root_0 = (id)[treeAdaptor newEmptyTree];
 
         _ID10=(id<ANTLRToken> )[input LT:1];
         [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_declarator199]; 
         _ID10_tree = (id)[treeAdaptor newTreeWithToken:_ID10];
         [treeAdaptor addChild:_ID10_tree toTree:root_0];
+        [_ID10_tree release];
 
 
         }
@@ -863,7 +969,7 @@ static NSArray *tokenNames;
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -986,20 +1092,23 @@ static NSArray *tokenNames;
         // token list labels: 
         // rule list labels: 
         int i_0 = 0;
+        root_0 = (id)[treeAdaptor newEmptyTree];
         [_retval setTree:root_0];
         ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
-        root_0 = (id)[treeAdaptor emptyTree];
         // 36:9: -> ^( FUNC_HDR type ID ( formalParameter )+ )
         {
             // SimpleC.g:36:12: ^( FUNC_HDR type ID ( formalParameter )+ )
             {
-            id root_1 = (id)[treeAdaptor emptyTree];
+            id root_1 = (id)[treeAdaptor newEmptyTree];
 
-            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_HDR text:[tokenNames objectAtIndex:SimpleCParser_FUNC_HDR]] parentOf:root_1];
+            id<ANTLRTree> _SimpleCParser_FUNC_HDR_tree = [treeAdaptor newTreeWithTokenType:SimpleCParser_FUNC_HDR text:[tokenNames objectAtIndex:SimpleCParser_FUNC_HDR]];
+            root_1 = (id)[treeAdaptor makeNode:_SimpleCParser_FUNC_HDR_tree parentOf:root_1];
+            [_SimpleCParser_FUNC_HDR_tree release];
 
             [treeAdaptor addChild:[_stream_type next] toTree:root_1];
             [treeAdaptor addChild:[_stream_SimpleCParser_ID next] toTree:root_1];
+
             // SimpleC.g:36:31: ( formalParameter )+
             {
             if ( !([_stream_formalParameter hasNext]) ) {
@@ -1013,6 +1122,7 @@ static NSArray *tokenNames;
 
             }
             [treeAdaptor addChild:root_1 toTree:root_0];
+            [root_1 release];
             }
 
         }
@@ -1031,9 +1141,15 @@ static NSArray *tokenNames;
 		// token+rule list labels
 		[_retval setStop:[input LT:-1]];
 
+		[_stream_24 release];
+		[_stream_SimpleCParser_ID release];
+		[_stream_22 release];
+		[_stream_23 release];
+		[_stream_formalParameter release];
+		[_stream_type release];
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -1080,22 +1196,25 @@ static NSArray *tokenNames;
         // token list labels: 
         // rule list labels: 
         int i_0 = 0;
+        root_0 = (id)[treeAdaptor newEmptyTree];
         [_retval setTree:root_0];
         ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
-        root_0 = (id)[treeAdaptor emptyTree];
         // 40:25: -> ^( ARG_DEF type declarator )
         {
             // SimpleC.g:40:28: ^( ARG_DEF type declarator )
             {
-            id root_1 = (id)[treeAdaptor emptyTree];
+            id root_1 = (id)[treeAdaptor newEmptyTree];
 
-            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithTokenType:SimpleCParser_ARG_DEF text:[tokenNames objectAtIndex:SimpleCParser_ARG_DEF]] parentOf:root_1];
+            id<ANTLRTree> _SimpleCParser_ARG_DEF_tree = [treeAdaptor newTreeWithTokenType:SimpleCParser_ARG_DEF text:[tokenNames objectAtIndex:SimpleCParser_ARG_DEF]];
+            root_1 = (id)[treeAdaptor makeNode:_SimpleCParser_ARG_DEF_tree parentOf:root_1];
+            [_SimpleCParser_ARG_DEF_tree release];
 
             [treeAdaptor addChild:[_stream_type next] toTree:root_1];
             [treeAdaptor addChild:[_stream_declarator next] toTree:root_1];
 
             [treeAdaptor addChild:root_1 toTree:root_0];
+            [root_1 release];
             }
 
         }
@@ -1114,9 +1233,11 @@ static NSArray *tokenNames;
 		// token+rule list labels
 		[_retval setStop:[input LT:-1]];
 
+		[_stream_type release];
+		[_stream_declarator release];
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -1139,11 +1260,15 @@ static NSArray *tokenNames;
         // SimpleC.g:44:9: ( 'int' | 'char' | 'void' | ID ) // ruleBlockSingleAlt
         // SimpleC.g: // alt
         {
-        root_0 = (id)[treeAdaptor emptyTree];
+        root_0 = (id)[treeAdaptor newEmptyTree];
 
         _set20 = (id<ANTLRToken> )[input LT:1];
         if ([input LA:1]==SimpleCParser_ID||([input LA:1]>=SimpleCParser_INT_TYPE && [input LA:1]<=SimpleCParser_VOID)) {
-        	[treeAdaptor addChild:[treeAdaptor newTreeWithToken:_set20] toTree:root_0];
+
+        	_set20_tree = (id)[treeAdaptor newTreeWithToken:_set20];
+        	[treeAdaptor addChild:_set20_tree toTree:root_0];
+        	[_set20_tree release];
+
         	[input consume];
         	errorRecovery = NO;
         } else {
@@ -1165,7 +1290,7 @@ static NSArray *tokenNames;
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -1279,17 +1404,19 @@ static NSArray *tokenNames;
         // token list labels: 
         // rule list labels: 
         int i_0 = 0;
+        root_0 = (id)[treeAdaptor newEmptyTree];
         [_retval setTree:root_0];
         ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
-        root_0 = (id)[treeAdaptor emptyTree];
         // 55:9: -> ^( BLOCK[$lc,@\"BLOCK\"] ( variable )* ( stat )* )
         {
             // SimpleC.g:55:12: ^( BLOCK[$lc,@\"BLOCK\"] ( variable )* ( stat )* )
             {
-            id root_1 = (id)[treeAdaptor emptyTree];
+            id root_1 = (id)[treeAdaptor newEmptyTree];
 
-            root_1 = (id)[treeAdaptor makeNode:[treeAdaptor newTreeWithToken:_lc tokenType:SimpleCParser_BLOCK text:@"BLOCK"] parentOf:root_1];
+            id<ANTLRTree> _SimpleCParser_BLOCK_tree = [treeAdaptor newTreeWithToken:_lc tokenType:SimpleCParser_BLOCK text:@"BLOCK"];
+            root_1 = (id)[treeAdaptor makeNode:_SimpleCParser_BLOCK_tree parentOf:root_1];
+            [_SimpleCParser_BLOCK_tree release];
 
             // SimpleC.g:55:34: ( variable )*
             while ( [_stream_variable hasNext] ) {
@@ -1305,6 +1432,7 @@ static NSArray *tokenNames;
             [_stream_stat reset];
 
             [treeAdaptor addChild:root_1 toTree:root_0];
+            [root_1 release];
             }
 
         }
@@ -1323,9 +1451,13 @@ static NSArray *tokenNames;
 		// token+rule list labels
 		[_retval setStop:[input LT:-1]];
 
+		[_stream_26 release];
+		[_stream_25 release];
+		[_stream_stat release];
+		[_stream_variable release];
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -1398,7 +1530,7 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleC.g:58:7: forStat // alt
         	    {
-        	    root_0 = (id)[treeAdaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
 
         	    [following addObject:FOLLOW_forStat_in_stat449];
         	    _forStat24 = [self forStat];
@@ -1412,7 +1544,7 @@ static NSArray *tokenNames;
         	case 2 :
         	    // SimpleC.g:59:7: expr ';' // alt
         	    {
-        	    root_0 = (id)[treeAdaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
 
         	    [following addObject:FOLLOW_expr_in_stat457];
         	    _expr25 = [self expr];
@@ -1428,7 +1560,7 @@ static NSArray *tokenNames;
         	case 3 :
         	    // SimpleC.g:60:7: block // alt
         	    {
-        	    root_0 = (id)[treeAdaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
 
         	    [following addObject:FOLLOW_block_in_stat468];
         	    _block27 = [self block];
@@ -1442,7 +1574,7 @@ static NSArray *tokenNames;
         	case 4 :
         	    // SimpleC.g:61:7: assignStat ';' // alt
         	    {
-        	    root_0 = (id)[treeAdaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
 
         	    [following addObject:FOLLOW_assignStat_in_stat476];
         	    _assignStat28 = [self assignStat];
@@ -1458,7 +1590,7 @@ static NSArray *tokenNames;
         	case 5 :
         	    // SimpleC.g:62:7: ';' // alt
         	    {
-        	    root_0 = (id)[treeAdaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
 
         	    _char_literal30=(id<ANTLRToken> )[input LT:1];
         	    [self match:input tokenType:21 follow:FOLLOW_21_in_stat487]; 
@@ -1478,7 +1610,7 @@ static NSArray *tokenNames;
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -1576,17 +1708,17 @@ static NSArray *tokenNames;
         // token list labels: 
         // rule list labels: 
         int i_0 = 0;
+        root_0 = (id)[treeAdaptor newEmptyTree];
         [_retval setTree:root_0];
         ANTLRRewriteRuleSubtreeStream *_stream_start=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token start" element:_start!=nil?[_start tree]:nil];
         ANTLRRewriteRuleSubtreeStream *_stream_next=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token next" element:_next!=nil?[_next tree]:nil];
         ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
-        root_0 = (id)[treeAdaptor emptyTree];
         // 67:9: -> ^( 'for' $start expr $next block )
         {
             // SimpleC.g:67:12: ^( 'for' $start expr $next block )
             {
-            id root_1 = (id)[treeAdaptor emptyTree];
+            id root_1 = (id)[treeAdaptor newEmptyTree];
             root_1 = (id)[treeAdaptor makeNode:[_stream_SimpleCParser_FOR next] parentOf:root_1];
 
             [treeAdaptor addChild:[_start tree] toTree:root_1];
@@ -1595,6 +1727,7 @@ static NSArray *tokenNames;
             [treeAdaptor addChild:[_stream_block next] toTree:root_1];
 
             [treeAdaptor addChild:root_1 toTree:root_0];
+            [root_1 release];
             }
 
         }
@@ -1615,9 +1748,16 @@ static NSArray *tokenNames;
 		// token+rule list labels
 		[_retval setStop:[input LT:-1]];
 
+		[_stream_21 release];
+		[_stream_24 release];
+		[_stream_SimpleCParser_FOR release];
+		[_stream_22 release];
+		[_stream_expr release];
+		[_stream_assignStat release];
+		[_stream_block release];
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -1669,21 +1809,23 @@ static NSArray *tokenNames;
         // token list labels: 
         // rule list labels: 
         int i_0 = 0;
+        root_0 = (id)[treeAdaptor newEmptyTree];
         [_retval setTree:root_0];
         ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
-        root_0 = (id)[treeAdaptor emptyTree];
         // 71:20: -> ^( EQ ID expr )
         {
             // SimpleC.g:71:23: ^( EQ ID expr )
             {
-            id root_1 = (id)[treeAdaptor emptyTree];
+            id root_1 = (id)[treeAdaptor newEmptyTree];
             root_1 = (id)[treeAdaptor makeNode:[_stream_SimpleCParser_EQ next] parentOf:root_1];
 
             [treeAdaptor addChild:[_stream_SimpleCParser_ID next] toTree:root_1];
+
             [treeAdaptor addChild:[_stream_expr next] toTree:root_1];
 
             [treeAdaptor addChild:root_1 toTree:root_0];
+            [root_1 release];
             }
 
         }
@@ -1702,9 +1844,12 @@ static NSArray *tokenNames;
 		// token+rule list labels
 		[_retval setStop:[input LT:-1]];
 
+		[_stream_SimpleCParser_EQ release];
+		[_stream_SimpleCParser_ID release];
+		[_stream_expr release];
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -1727,7 +1872,7 @@ static NSArray *tokenNames;
         // SimpleC.g:74:9: ( condExpr ) // ruleBlockSingleAlt
         // SimpleC.g:74:9: condExpr // alt
         {
-        root_0 = (id)[treeAdaptor emptyTree];
+        root_0 = (id)[treeAdaptor newEmptyTree];
 
         [following addObject:FOLLOW_condExpr_in_expr598];
         _condExpr41 = [self condExpr];
@@ -1749,7 +1894,7 @@ static NSArray *tokenNames;
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -1778,7 +1923,7 @@ static NSArray *tokenNames;
         // SimpleC.g:78:9: ( aexpr ( ( '==' | '<' ) aexpr )? ) // ruleBlockSingleAlt
         // SimpleC.g:78:9: aexpr ( ( '==' | '<' ) aexpr )? // alt
         {
-        root_0 = (id)[treeAdaptor emptyTree];
+        root_0 = (id)[treeAdaptor newEmptyTree];
 
         [following addObject:FOLLOW_aexpr_in_condExpr617];
         _aexpr42 = [self aexpr];
@@ -1821,6 +1966,7 @@ static NSArray *tokenNames;
         	    	    [self match:input tokenType:SimpleCParser_EQEQ follow:FOLLOW_SimpleCParser_EQEQ_in_condExpr622]; 
         	    	    _string_literal43_tree = (id)[treeAdaptor newTreeWithToken:_string_literal43];
         	    	    root_0 = (id)[treeAdaptor makeNode:_string_literal43_tree parentOf:root_0];
+        	    	    [_string_literal43_tree release];
 
 
         	    	    }
@@ -1832,6 +1978,7 @@ static NSArray *tokenNames;
         	    	    [self match:input tokenType:SimpleCParser_LT follow:FOLLOW_SimpleCParser_LT_in_condExpr627]; 
         	    	    _char_literal44_tree = (id)[treeAdaptor newTreeWithToken:_char_literal44];
         	    	    root_0 = (id)[treeAdaptor makeNode:_char_literal44_tree parentOf:root_0];
+        	    	    [_char_literal44_tree release];
 
 
         	    	    }
@@ -1865,7 +2012,7 @@ static NSArray *tokenNames;
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -1892,7 +2039,7 @@ static NSArray *tokenNames;
         // SimpleC.g:82:9: ( atom ( '+' atom )* ) // ruleBlockSingleAlt
         // SimpleC.g:82:9: atom ( '+' atom )* // alt
         {
-        root_0 = (id)[treeAdaptor emptyTree];
+        root_0 = (id)[treeAdaptor newEmptyTree];
 
         [following addObject:FOLLOW_atom_in_aexpr653];
         _atom46 = [self atom];
@@ -1917,6 +2064,7 @@ static NSArray *tokenNames;
         	    [self match:input tokenType:SimpleCParser_PLUS follow:FOLLOW_SimpleCParser_PLUS_in_aexpr657]; 
         	    _char_literal47_tree = (id)[treeAdaptor newTreeWithToken:_char_literal47];
         	    root_0 = (id)[treeAdaptor makeNode:_char_literal47_tree parentOf:root_0];
+        	    [_char_literal47_tree release];
 
         	    [following addObject:FOLLOW_atom_in_aexpr660];
         	    _atom48 = [self atom];
@@ -1947,7 +2095,7 @@ static NSArray *tokenNames;
 
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }
@@ -2000,12 +2148,13 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleC.g:86:7: ID // alt
         	    {
-        	    root_0 = (id)[treeAdaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
 
         	    _ID49=(id<ANTLRToken> )[input LT:1];
         	    [self match:input tokenType:SimpleCParser_ID follow:FOLLOW_SimpleCParser_ID_in_atom680]; 
         	    _ID49_tree = (id)[treeAdaptor newTreeWithToken:_ID49];
         	    [treeAdaptor addChild:_ID49_tree toTree:root_0];
+        	    [_ID49_tree release];
 
 
         	    }
@@ -2013,12 +2162,13 @@ static NSArray *tokenNames;
         	case 2 :
         	    // SimpleC.g:87:7: INT // alt
         	    {
-        	    root_0 = (id)[treeAdaptor emptyTree];
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
 
         	    _INT50=(id<ANTLRToken> )[input LT:1];
         	    [self match:input tokenType:SimpleCParser_INT follow:FOLLOW_SimpleCParser_INT_in_atom694]; 
         	    _INT50_tree = (id)[treeAdaptor newTreeWithToken:_INT50];
         	    [treeAdaptor addChild:_INT50_tree toTree:root_0];
+        	    [_INT50_tree release];
 
 
         	    }
@@ -2048,10 +2198,10 @@ static NSArray *tokenNames;
         	    // token list labels: 
         	    // rule list labels: 
         	    int i_0 = 0;
+        	    root_0 = (id)[treeAdaptor newEmptyTree];
         	    [_retval setTree:root_0];
         	    ANTLRRewriteRuleSubtreeStream *_stream_retval=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"token retval" element:_retval!=nil?[_retval tree]:nil];
 
-        	    root_0 = (id)[treeAdaptor emptyTree];
         	    // 88:20: -> expr
         	    {
         	        [treeAdaptor addChild:[_stream_expr next] toTree:root_0];
@@ -2074,9 +2224,12 @@ static NSArray *tokenNames;
 		// token+rule list labels
 		[_retval setStop:[input LT:-1]];
 
+		[_stream_24 release];
+		[_stream_22 release];
+		[_stream_expr release];
 		    [_retval setTree:(id)[treeAdaptor postProcessTree:root_0]];
 		    [treeAdaptor setBoundariesForTree:[_retval tree] fromToken:[_retval start] toToken:[_retval stop]];
-
+		[root_0 release];
 	}
 	return _retval;
 }

@@ -42,7 +42,7 @@
         [self setTreeAdaptor:aTreeAdaptor];
         shouldCopyElements = NO;
         isSingleElement = YES;
-        elements.single = [anElement retain];
+        [self addElement:anElement];
     }
     return self;
 }
@@ -131,7 +131,7 @@
 {
     if (shouldCopyElements || (cursor>=[self count] && [self count]==1)) {
         id element = [self _next];
-        return [self copyElement:element];
+        return [[self copyElement:element] autorelease];
     }
     id element = [self _next];
     return element;

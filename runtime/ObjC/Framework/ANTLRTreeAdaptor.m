@@ -30,7 +30,7 @@
 @implementation ANTLRTreeAdaptor
 
 
-- (id<ANTLRTree>) emptyTree
+- (id<ANTLRTree>) newEmptyTree
 {
 	return [self newTreeWithToken:nil];
 }
@@ -58,6 +58,7 @@
 
 	if (oldRoot == nil)
 		return newRootNode;
+    // handles ^(nil real-node) case
 	if ([newRootNode isEmpty]) {
 		if ([newRootNode childCount] > 1) {
 #warning TODO: Find a way to the current input stream here!
@@ -69,16 +70,22 @@
 		[newRootNode release];
 		newRootNode = tmpRootNode;		
 	}
-	// the handling of and empty node at the root of oldRoot happens in addChild:
+	// the handling of an empty node at the root of oldRoot happens in addChild:
 	[newRootNode addChild:oldRoot];
-	return newRootNode;
+    // this release relies on the fact that the ANTLR code generator always assigns the return value of this method
+    // to the variable originally holding oldRoot. If we don't release we leak the reference.
+    // FIXME: this is totally non-obvious. maybe do it in calling code by comparing pointers and conditionally releasing
+    // the old object
+    [oldRoot release];
+    
+    // what happens to newRootNode's retain count? Should we be autoreleasing this one? Probably.
+	return [newRootNode retain];
 }
 
 
 - (id<ANTLRTree>) postProcessTree:(id<ANTLRTree>)aTree
 {
 	id<ANTLRTree> processedNode = aTree;
-	// TODO: double check memory management with respect to code generation
 	if (aTree != nil && [aTree isEmpty] != NO && [aTree childCount] == 1) {
 		processedNode = [aTree childAtIndex:0];
 	}

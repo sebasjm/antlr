@@ -34,6 +34,13 @@
     return start; 
 }
 
+- (void) dealloc
+{
+    [self setStart:nil];
+    [self setStop:nil];
+    [super dealloc];
+}
+
 - (void) setStart: (id<ANTLRToken>) aStart
 {
     if (start != aStart) {
