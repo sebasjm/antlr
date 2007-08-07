@@ -439,6 +439,7 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <if(trace)>
     self.traceIn("<ruleName>", <ruleDescriptor.index>)<\n>
 <endif>
+    <ruleScopeSetUp()>
     <ruleDeclarations()>
     try:
 <if(nakedBlock)>
@@ -461,7 +462,8 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <if(trace)>
         self.traceOut("<ruleName>", <ruleDescriptor.index>)<\n>
 <endif>
-	<memoize()>
+	<ruleScopeCleanUp()>
+        <memoize()>
         pass
 
 # $ANTLR end <ruleName>

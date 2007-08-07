@@ -242,10 +242,8 @@ class BaseRecognizer(object):
             else:
                 tokenName = self.tokenNames[e.expecting]
 
-            msg = "mismatched tree node: " \
-                  + e.node \
-                  + " expecting " \
-                  + tokenName
+            msg = "mismatched tree node: %s expecting %s" \
+                  % (e.node, tokenName)
 
         elif isinstance(e, NoViableAltException):
             msg = "no viable alternative at input " \
@@ -692,7 +690,7 @@ class BaseRecognizer(object):
         Have ANTLR generate an implementation for this method.
         """
 
-        return None
+        return self.grammarFileName
 
 
     def toStrings(self, tokens):
@@ -1088,13 +1086,13 @@ class Lexer(BaseRecognizer, TokenSource):
             msg = "required (...)+ loop did not match anything at character " \
                   + self.getCharErrorDisplay(e.c)
             
-        elif isinstance(e, MismatchedSetException):
+        elif isinstance(e, MismatchedNotSetException):
             msg = "mismatched character " \
                   + self.getCharErrorDisplay(e.c) \
                   + " expecting set " \
                   + repr(e.expecting)
 
-        elif isinstance(e, MismatchedNotSetException):
+        elif isinstance(e, MismatchedSetException):
             msg = "mismatched character " \
                   + self.getCharErrorDisplay(e.c) \
                   + " expecting set " \

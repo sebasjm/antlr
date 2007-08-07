@@ -93,26 +93,28 @@ class RecognitionException(Exception):
 
         self.charPositionInLine = None
 
+        # If you are parsing a tree node stream, you will encounter som
+        # imaginary nodes w/o line/col info.  We now search backwards looking
+        # for most recent token with line/col info, but notify getErrorHeader()
+        # that info is approximate.
+        self.approximateLineInfo = False
 
+        
         if input is not None:
             self.input = input
             self.index = input.index()
 
             # late import to avoid cyclic dependencies
             from antlr3.streams import TokenStream, CharStream
-            from antlr3.tree import CommonTreeNodeStream, CommonTree
+            from antlr3.tree import TreeNodeStream
 
             if isinstance(self.input, TokenStream):
                 self.token = self.input.LT(1)
                 self.line = self.token.line
                 self.charPositionInLine = self.token.charPositionInLine
 
-            if isinstance(self.input, CommonTreeNodeStream):
-                self.node = self.input.LT(1)
-                if isinstance(self.node, CommonTree):
-                    self.token = self.node.token
-                    self.line = self.token.line
-                    self.charPositionInLine = self.token.charPositionInLine
+            if isinstance(self.input, TreeNodeStream):
+                self.extractInformationFromTreeNodeStream(self.input)
 
             else:
                 if isinstance(self.input, CharStream):
@@ -123,13 +125,61 @@ class RecognitionException(Exception):
                 else:
                     self.c = self.input.LA(1)
 
+    def extractInformationFromTreeNodeStream(self, nodes):
+        from antlr3.tree import Tree, CommonTree
+        from antlr3.tokens import CommonToken
+        
+        self.node = nodes.LT(1)
+        adaptor = nodes.treeAdaptor
+        payload = adaptor.getToken(self.node)
+        if payload is not None:
+            self.token = payload
+            if payload.line <= 0:
+                # imaginary node; no line/pos info; scan backwards
+                i = -1
+                priorNode = nodes.LT(i)
+                while priorNode is not None:
+                    priorPayload = adaptor.getToken(priorNode)
+                    if priorPayload is not None and priorPayload.line > 0:
+                        # we found the most recent real line / pos info
+                        self.line = priorPayload.line
+                        self.charPositionInLine = priorPayload.charPositionInLine
+                        self.approximateLineInfo = True
+                        break
+                    
+                    i -= 1
+                    priorNode = nodes.LT(i)
+                    
+            else: # node created from real token
+                self.line = payload.line
+                self.charPositionInLine = payload.charPositionInLine
+                
+        elif isinstance(self.node, Tree):
+            self.line = self.node.line
+            self.charPositionInLine = self.node.charPositionInLine
+            if isinstance(self.node, CommonTree):
+                self.token = self.node.token
 
+        else:
+            type = adaptor.getType(self.node)
+            text = adaptor.getText(self.node)
+            self.token = CommonToken(type=type, text=text)
+
+     
     def getUnexpectedType(self):
         """Return the token type or char of the unexpected input element"""
 
-        try:
+        from antlr3.streams import TokenStream
+        from antlr3.tree import TreeNodeStream
+
+        if isinstance(self.input, TokenStream):
             return self.token.type
-        except AttributeError:
+
+        elif isinstance(self.input, TreeNodeStream):
+            adaptor = self.input.treeAdaptor
+            return adaptor.getType(self.node)
+
+        else:
             return self.c
 
     unexpectedType = property(getUnexpectedType)
@@ -248,13 +298,6 @@ class MismatchedTreeNodeException(RecognitionException):
 
     def __init__(self, expecting, input):
         RecognitionException.__init__(self, input)
-
-        t = input.LT(1)
-        from antlr3.tree import Tree
-        if isinstance(input.LT(1), Tree):
-            self.line = t.line
-            self.charPositionInLine = t.charPositionInLine
-            # TODO: if DOWN/UP, there is no line info currently
         
         self.expecting = expecting
 

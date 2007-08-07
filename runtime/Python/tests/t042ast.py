@@ -679,6 +679,14 @@ class t042ast(testbase.ANTLRTest):
             )
 
 
+    def testR59(self):
+        r = self.parse("a b c fooze", 'r59')
+        self.failUnlessEqual(
+            r.tree.toStringTree(),
+            '(a fooze) (b fooze) (c fooze)'
+            )
+
+
 
 if __name__ == '__main__':
     unittest.main()

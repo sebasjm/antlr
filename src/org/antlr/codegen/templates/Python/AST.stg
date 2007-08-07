@@ -400,6 +400,9 @@ rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
 root_<treeLevel> = self.adaptor.becomeRoot(stream_<label>.next(), root_<treeLevel>)<\n>
 >>
 
+/** Gen ^($label ...) where label+=... */
+rewriteTokenListLabelRefRoot ::= rewriteTokenLabelRefRoot
+
 /** Gen ^(ID ...) or ^(ID[args] ...) */
 rewriteTokenRefRoot(token,elementIndex,args) ::= <<
 root_<treeLevel> = self.adaptor.becomeRoot(<if(args)>self.adaptor.createFromToken(<token>,<args; separator=", ">)<else>stream_<token>.next()<endif>, root_<treeLevel>)<\n>

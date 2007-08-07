@@ -313,6 +313,13 @@ r58
     : ({CommonTree(CommonToken(type=FLOAT, text="2.0"))})^
     ;
 
+/** templates tested:
+    rewriteTokenListLabelRefRoot
+*/
+r59
+    : (t+=ID)+ statement -> ^($t statement)+
+    ;
+
 primary
     : ID
     ;

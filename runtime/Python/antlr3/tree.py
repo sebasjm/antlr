@@ -8,7 +8,7 @@ This module contains all support classes for AST construction and tree parsers.
 # begin[licence]
 #
 # [The "BSD licence"]
-# Copyright (c) 2005-2006 Terence Parr
+# Copyright (c) 2005-2007 Terence Parr
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -259,7 +259,7 @@ class TreeAdaptor(object):
         and child isNil then you can decide it is ok to move children to t via
         t.children = child.children; i.e., without copying the array.  Just
         make sure that this is consistent with have the user will build
-        ASTs.
+        ASTs. Do nothing if t or child is null.
         """
 
         raise NotImplementedError
@@ -681,7 +681,7 @@ class BaseTreeAdaptor(TreeAdaptor):
         #if isinstance(child, Token):
         #    child = self.createWithPayload(child)
         
-        if tree is not None:
+        if tree is not None and child is not None:
             tree.addChild(child)
 
 
@@ -860,12 +860,15 @@ class CommonTree(BaseTree):
 
 
     def getText(self):
-        return self.toString()
+        if self.token is None:
+            return None
+        
+        return self.token.text
 
 
     def getLine(self):
         if self.token is None or self.token.getLine() == 0:
-            if len(self.getChildCount()) > 0:
+            if self.getChildCount():
                 return self.getChild(0).getLine()
             else:
                 return 0
@@ -958,6 +961,9 @@ class CommonTreeAdaptor(BaseTreeAdaptor):
         I could use reflection to prevent having to override this
         but reflection is slow.
         """
+
+        if treeNode is None:
+            return None
         
         return treeNode.dupNode()
 
@@ -1008,14 +1014,20 @@ class CommonTreeAdaptor(BaseTreeAdaptor):
 
 
     def getTokenStartIndex(self, t):
+        if t is None:
+            return -1
         return t.getTokenStartIndex()
 
 
     def getTokenStopIndex(self, t):
+        if t is None:
+            return -1
         return t.getTokenStopIndex()
 
 
     def getText(self, t):
+        if t is None:
+            return None
         return t.getText()
 
 
@@ -1040,10 +1052,14 @@ class CommonTreeAdaptor(BaseTreeAdaptor):
 
 
     def getChild(self, t, i):
+        if t is None:
+            return None
         return t.getChild(i)
 
 
     def getChildCount(self, t):
+        if t is None:
+            return 0
         return t.getChildCount()
 
 
@@ -1713,10 +1729,13 @@ class TreeParser(BaseRecognizer):
         the input tree not the user.
         """
 
-        return self.getGrammarFileName() \
-               + ": node from line " \
-               + e.line + ":" + e.charPositionInLine
-
+        return (self.getGrammarFileName() +
+                ": node from %sline %s:%s"
+                % (['', "after "][e.approximateLineInfo],
+                   e.line,
+                   e.charPositionInLine
+                   )
+                )
 
     def getErrorMessage(self, e, tokenNames):
         """
@@ -1733,7 +1752,7 @@ class TreeParser(BaseRecognizer):
                     text=adaptor.getText(e.node)
                     )
 
-        return BaseRecognizer.getErrorMessage(e, tokenNames)
+        return BaseRecognizer.getErrorMessage(self, e, tokenNames)
 
 
     def traceIn(self, ruleName, ruleIndex):
@@ -1779,6 +1798,12 @@ class RewriteRuleElementStream(object):
         # The list of tokens or subtrees we are tracking
         self.elements = None
 
+        # Once a node / subtree has been used in a stream, it must be dup'd
+        # from then on.  Streams are reset after subrules so that the streams
+        # can be reused in future subrules.  So, reset must set a dirty bit.
+        # If dirty, then next() always returns a dup.
+        self.dirty = False
+        
         # The element or stream description; usually has name of the token or
         # rule reference that this list tracks.  Can include rulename too, but
         # the exception would track that info.
@@ -1800,10 +1825,14 @@ class RewriteRuleElementStream(object):
         """
         Reset the condition of this stream so that it appears we have
         not consumed any of its elements.  Elements themselves are untouched.
+        Once we reset the stream, any future use will need duplicates.  Set
+        the dirty bit.
         """
         
         self.cursor = 0
+        self.dirty = True
 
+        
     def add(self, el):
         if el is None:
             return
@@ -1829,10 +1858,12 @@ class RewriteRuleElementStream(object):
         an exception unless size()==1.  If size is 1, then return elements[0].
         
         Return a duplicate node/subtree if stream is out of elements and
-        size==1.
+        size==1. If we've already used the element, dup (dirty bit set).
         """
         
-        if self.cursor >= len(self) and len(self) == 1:
+        if (self.dirty
+            or (self.cursor >= len(self) and len(self) == 1)
+            ):
             # if out of elements and size is 1, dup
             el = self._next()
             return self.dup(el)
@@ -1856,7 +1887,7 @@ class RewriteRuleElementStream(object):
             
         if self.cursor >= len(self): # out of elements?
             if len(self) == 1: # if size is 1, it's ok; return and we'll dup 
-                return self.singleElement
+                return self.toTree(self.singleElement)
 
             # out of elements and size was not 1, so we can't dup
             raise RewriteCardinalityException(self.elementDescription)
@@ -1876,7 +1907,8 @@ class RewriteRuleElementStream(object):
         """
         When constructing trees, sometimes we need to dup a token or AST
         subtree.  Dup'ing a token means just creating another AST node
-        around it.  For trees, you must call the adaptor.dupTree().
+        around it.  For trees, you must call the adaptor.dupTree() unless
+        the element is for a tree root; then it must be a node dup.
         """
 
         raise NotImplementedError
@@ -1922,8 +1954,12 @@ class RewriteRuleTokenStream(RewriteRuleElementStream):
         return self.adaptor.createWithPayload(el)
 
 
+    def next(self):
+        return self._next()
+
+    
     def dup(self, el):
-        return self.adaptor.createWithPayload(el)
+        raise TypeError("dup can't be called for a token stream.")
 
 
 class RewriteRuleSubtreeStream(RewriteRuleElementStream):
@@ -1938,15 +1974,23 @@ class RewriteRuleSubtreeStream(RewriteRuleElementStream):
         must dup the type node, but ID has been added.
 
         Referencing a rule result twice is ok; dup entire tree as
-        we can't be adding trees; e.g., expr expr. 
+        we can't be adding trees as root; e.g., expr expr.
+
+        Hideous code duplication here with super.next().  Can't think of
+        a proper way to refactor.  This needs to always call dup node
+        and super.next() doesn't know which to call: dup node or dup tree.
         """
         
+        if (self.dirty
+            or (self.cursor >= len(self) and len(self) == 1)
+            ):
+            # if out of elements and size is 1, dup (at most a single node
+            # since this is for making root nodes).
+            el = self._next()
+            return self.adaptor.dupNode(el)
+
+        # test size above then fetch
         el = self._next()
-
-        if self.cursor >= len(self) and len(self) == 1:
-            # if out of elements and size is 1, dup just the node
-            el = self.adaptor.dupNode(el)
-
         return el
 
 
