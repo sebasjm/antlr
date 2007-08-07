@@ -1414,10 +1414,10 @@ ruleSetPropertyRef_st(scope,attr,expr) ::= "<\n>#error StringTemplates are unsup
 
 lexerRulePropertyRef_text(scope,attr) ::= "[self text]"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "_line"
-lexerRulePropertyRef_pos(scope,attr) ::= "_charPosition"
+lexerRulePropertyRef_line(scope,attr) ::= "self->_tokenStartLine"
+lexerRulePropertyRef_pos(scope,attr) ::= "self->_tokenCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
+lexerRulePropertyRef_channel(scope,attr) ::= "self->_channel"
 lexerRulePropertyRef_start(scope,attr) ::= "tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "([self charIndex]-1)"
 
