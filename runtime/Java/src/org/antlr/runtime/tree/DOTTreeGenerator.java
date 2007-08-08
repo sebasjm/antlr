@@ -186,6 +186,7 @@ public class DOTTreeGenerator {
 		StringTemplate nodeST = _nodeST.getInstanceOf();
 		String uniqueName = "n"+getNodeNumber(t);
 		nodeST.setAttribute("name", uniqueName);
+		if (text!=null) text = text.replaceAll("\"", "\\\\\"");
 		nodeST.setAttribute("text", text);
 		return nodeST;
 	}

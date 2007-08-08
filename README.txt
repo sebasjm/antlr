@@ -127,6 +127,10 @@ INCOMPATIBILITY WARNING -- templates have changed; must regen output from
                            grammars.  Runtime libraries have also changed.
                            Debug event listener interface has changed also.
 
+August 7, 2007
+
+* added escaping of double quotes in DOTTreeGenerator
+
 July 22, 2007
 
 * fixed dynamic scope implementation in lexers. They were not creating new scope
