@@ -149,130 +149,137 @@ antlr3MTExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 ANTLR3_API	void
 antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 {
-    pANTLR3_EXCEPTION		    ex;
-    pANTLR3_LEXER		    lexer;
-    pANTLR3_PARSER		    parser;
-    pANTLR3_TREE_PARSER		    tparser;
-    
-    pANTLR3_INPUT_STREAM	    ins;
-    pANTLR3_INT_STREAM		    is;
-    pANTLR3_COMMON_TOKEN_STREAM	    cts;
-    pANTLR3_TREE_NODE_STREAM	    tns;
+	pANTLR3_EXCEPTION		    ex;
+	pANTLR3_LEXER		    lexer;
+	pANTLR3_PARSER		    parser;
+	pANTLR3_TREE_PARSER		    tparser;
 
-    ins	    = NULL;
-    cts	    = NULL;
-    tns	    = NULL;
-    is	    = NULL;
-    lexer   = NULL;
-    parser  = NULL;
-    tparser = NULL;
+	pANTLR3_INPUT_STREAM	    ins;
+	pANTLR3_INT_STREAM		    is;
+	pANTLR3_COMMON_TOKEN_STREAM	    cts;
+	pANTLR3_TREE_NODE_STREAM	    tns;
 
-    switch	(recognizer->type)
-    {
-    case	ANTLR3_TYPE_LEXER:
+	ins	    = NULL;
+	cts	    = NULL;
+	tns	    = NULL;
+	is	    = NULL;
+	lexer   = NULL;
+	parser  = NULL;
+	tparser = NULL;
 
-	lexer	= (pANTLR3_LEXER) (recognizer->super);
-	ins	= lexer->input;
-	is	= ins->istream;
+	switch	(recognizer->type)
+	{
+	case	ANTLR3_TYPE_LEXER:
 
-	break;
+		lexer	= (pANTLR3_LEXER) (recognizer->super);
+		ins	= lexer->input;
+		is	= ins->istream;
 
-    case	ANTLR3_TYPE_PARSER:
+		break;
 
-	parser  = (pANTLR3_PARSER) (recognizer->super);
-	cts	= (pANTLR3_COMMON_TOKEN_STREAM)(parser->tstream->super);
-	is	= parser->tstream->istream;
+	case	ANTLR3_TYPE_PARSER:
 
-	break;
+		parser  = (pANTLR3_PARSER) (recognizer->super);
+		cts	= (pANTLR3_COMMON_TOKEN_STREAM)(parser->tstream->super);
+		is	= parser->tstream->istream;
 
-    case	ANTLR3_TYPE_TREE_PARSER:
+		break;
 
-	tparser = (pANTLR3_TREE_PARSER) (recognizer->super);
-	tns	= tparser->ctnstream->tnstream;
-	is	= tns->istream;
+	case	ANTLR3_TYPE_TREE_PARSER:
 
-	break;
+		tparser = (pANTLR3_TREE_PARSER) (recognizer->super);
+		tns	= tparser->ctnstream->tnstream;
+		is	= tns->istream;
 
-    default:
-	    
-	fprintf(stderr, "Base recognizer function antlr3RecognitionExceptionNew called by unknown parser type - provide override for this function\n");
+		break;
+
+	default:
+
+		fprintf(stderr, "Base recognizer function antlr3RecognitionExceptionNew called by unknown parser type - provide override for this function\n");
+		return;
+
+		break;
+	}
+
+	/* Create a basic exception structure
+	 */
+	ex = antlr3ExceptionNew(ANTLR3_RECOGNITION_EXCEPTION,
+		(void *)ANTLR3_RECOGNITION_EX_NAME,
+		NULL,
+		ANTLR3_FALSE);
+
+	/* Rest of information depends on the base type of the 
+	 * input stream.
+	 */
+	switch  (is->type & ANTLR3_INPUT_MASK)
+	{
+	case    ANTLR3_CHARSTREAM:
+
+		ex->c			= is->_LA		    	(is, 1);					/* Current input character			*/
+		ex->line		= ins->getLine			(ins);						/* Line number comes from stream		*/
+		ex->charPositionInLine	= ins->getCharPositionInLine	(ins);	    /* Line offset also comes from the stream   */
+		ex->index		= is->index			(is);
+		ex->streamName		= ins->fileName;
+		ex->message		= "Unexpected character";
+		break;
+
+	case    ANTLR3_TOKENSTREAM:
+
+		ex->token		= cts->tstream->_LT						(cts->tstream, 1);	    /* Current input token			    */
+		ex->line		= ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine			(ex->token);
+		ex->charPositionInLine	= ((pANTLR3_COMMON_TOKEN)(ex->token))->getCharPositionInLine	(ex->token);
+		ex->index		= cts->tstream->istream->index					(cts->tstream->istream);
+		if	(((pANTLR3_COMMON_TOKEN)(ex->token))->type == ANTLR3_TOKEN_EOF)
+		{
+			ex->streamName		= NULL;
+		}
+		else
+		{
+			ex->streamName		= ((pANTLR3_COMMON_TOKEN)(ex->token))->input->fileName;
+		}
+		ex->message		= "Unexpected token";
+		break;
+
+	case    ANTLR3_COMMONTREENODE:
+
+		ex->token		= tns->_LT						    (tns, 1);	    /* Current input tree node			    */
+		ex->line		= ((pANTLR3_BASE_TREE)(ex->token))->getLine		    (ex->token);
+		ex->charPositionInLine	= ((pANTLR3_BASE_TREE)(ex->token))->getCharPositionInLine   (ex->token);
+		ex->index		= tns->istream->index					    (tns->istream);
+
+		// Are you ready for this? Deep breath now...
+		//
+		{
+			pANTLR3_COMMON_TREE tnode;
+
+			tnode		= ((pANTLR3_COMMON_TREE)(((pANTLR3_BASE_TREE)(ex->token))->super));
+
+			if	(tnode->token    == NULL)
+			{
+				ex->streamName = ((pANTLR3_BASE_TREE)(ex->token))->strFactory->newStr(((pANTLR3_BASE_TREE)(ex->token))->strFactory, (pANTLR3_UINT8)"-unknown source-");
+			}
+			else
+			{
+				if	(tnode->token->input == NULL)
+				{
+					ex->streamName		= tnode->token->text->factory->newStr8(tnode->token->text->factory, (pANTLR3_UINT8)"-Imaginary-");
+				}
+				else
+				{
+					ex->streamName		= tnode->token->input->fileName;
+				}
+			}
+			ex->message		= "Unexpected node";
+		}
+		break;
+	}
+
+	ex->input		    = is;
+	ex->nextException	    = recognizer->exception;	/* So we don't leak the memory */
+	recognizer->exception   = ex;
+	recognizer->error	    = ANTLR3_TRUE;	    /* Exception is outstanding	*/
+
 	return;
-
-	break;
-    }
-
-    /* Create a basic exception structure
-     */
-    ex = antlr3ExceptionNew(ANTLR3_RECOGNITION_EXCEPTION,
-				(void *)ANTLR3_RECOGNITION_EX_NAME,
-				NULL,
-				ANTLR3_FALSE);
-
-    /* Rest of information depends on the base type of the 
-     * input stream.
-     */
-    switch  (is->type & ANTLR3_INPUT_MASK)
-    {
-    case    ANTLR3_CHARSTREAM:
-
-	ex->c			= is->_LA		    	(is, 1);    /* Current input character			*/
-	ex->line		= ins->getLine			(ins);	    /* Line number comes from stream		*/
-	ex->charPositionInLine	= ins->getCharPositionInLine	(ins);	    /* Line offset also comes from the stream   */
-	ex->index		= is->index			(is);
-	ex->streamName		= ins->fileName;
-	ex->message		= "Unexpected character";
-	break;
-
-    case    ANTLR3_TOKENSTREAM:
-
-	ex->token		= cts->tstream->_LT						(cts->tstream, 1);	    /* Current input token			    */
-	ex->line		= ((pANTLR3_COMMON_TOKEN)(ex->token))->getLine			(ex->token);
-	ex->charPositionInLine	= ((pANTLR3_COMMON_TOKEN)(ex->token))->getCharPositionInLine	(ex->token);
-	ex->index		= cts->tstream->istream->index					(cts->tstream->istream);
-	if	(((pANTLR3_COMMON_TOKEN)(ex->token))->type == ANTLR3_TOKEN_EOF)
-	{
-		ex->streamName		= NULL;
-	}
-	else
-	{
-		ex->streamName		= ((pANTLR3_COMMON_TOKEN)(ex->token))->input->fileName;
-	}
-	ex->message		= "Unexpected token";
-	break;
-
-    case    ANTLR3_COMMONTREENODE:
-
-	ex->token		= tns->_LT						    (tns, 1);	    /* Current input tree node			    */
-	ex->line		= ((pANTLR3_BASE_TREE)(ex->token))->getLine		    (ex->token);
-	ex->charPositionInLine	= ((pANTLR3_BASE_TREE)(ex->token))->getCharPositionInLine   (ex->token);
-	ex->index		= tns->istream->index					    (tns->istream);
-
-	// Are you ready for this? Deep breath now...
-	//
-	{
-	    pANTLR3_COMMON_TREE tnode;
-
-	    tnode		= ((pANTLR3_COMMON_TREE)(((pANTLR3_BASE_TREE)(ex->token))->super));
-
-	    if	(tnode->token    == NULL)
-	    {
-		ex->streamName = ((pANTLR3_BASE_TREE)(ex->token))->strFactory->newStr(((pANTLR3_BASE_TREE)(ex->token))->strFactory, (pANTLR3_UINT8)"-unknown source-");
-	    }
-	    else
-	    {
-		ex->streamName		= tnode->token->input->fileName;
-	    }
-	    ex->message		= "Unexpected node";
-	}
-	break;
-    }
-
-    ex->input		    = is;
-    ex->nextException	    = recognizer->exception;	/* So we don't leak the memory */
-    recognizer->exception   = ex;
-    recognizer->error	    = ANTLR3_TRUE;	    /* Exception is outstanding	*/
-
-    return;
 }
 
 
