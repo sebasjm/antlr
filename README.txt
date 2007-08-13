@@ -1,12 +1,14 @@
 Early Access ANTLR v3
-ANTLR 3.0
-May 17, 2007
+ANTLR 3.0.1
+August 13, 2007
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
 University of San Francisco
 
 INTRODUCTION 
+
+[Java, C, Python, C# targets are available; others coming soon]
 
 Welcome to ANTLR v3!  I've been working on this for nearly 4 years and it's
 finally ready!  I have lots of features to add later, but this will be
@@ -106,12 +108,12 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.0/README.txt (this file)
-antlr-3.0/LICENSE.txt
-antlr-3.0/src/org/antlr/...
-antlr-3.0/lib/stringtemplate-3.0.jar (3.0 needs 3.0)
-antlr-3.0/lib/antlr-2.7.7.jar
-antlr-3.0/lib/antlr-3.0.jar
+antlr-3.0.1/README.txt (this file)
+antlr-3.0.1/LICENSE.txt
+antlr-3.0.1/src/org/antlr/...
+antlr-3.0.1/lib/stringtemplate-3.0.jar (3.0.1 needs 3.0)
+antlr-3.0.1/lib/antlr-2.7.7.jar
+antlr-3.0.1/lib/antlr-3.0.1.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
@@ -127,6 +129,10 @@ INCOMPATIBILITY WARNING -- templates have changed; must regen output from
                            grammars.  Runtime libraries have also changed.
                            Debug event listener interface has changed also.
 
+3.0.1 - August 13, 2007
+
+[See target pages on the wiki for more information on the non-Java targets]
+
 August 7, 2007
 
 * added escaping of double quotes in DOTTreeGenerator
@@ -134,7 +140,7 @@ August 7, 2007
 July 22, 2007
 
 * fixed dynamic scope implementation in lexers. They were not creating new scope
-  entries on the stack.
+  entries on the stack.  Unsupported feature!
 
 July 19, 2007
 
