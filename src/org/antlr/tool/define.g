@@ -144,6 +144,7 @@ Token optionsStartToken=null;
         ( {optionsStartToken=((GrammarAST)_t).getToken();}
           optionsSpec
         )?
+        (delegateGrammars)?
         (tokensSpec)?
         (attrScope)*
         (actions)?
@@ -173,6 +174,10 @@ GrammarAST nameAST=null, actionAST=null;
 
 optionsSpec
 	:	OPTIONS
+	;
+
+delegateGrammars
+	:	#( "import" ( #(ASSIGN ID ID) | ID )+ )
 	;
 
 tokensSpec
@@ -343,10 +348,10 @@ finallyClause
 element
     :   #(ROOT element)
     |   #(BANG element)
-    |   atom
+    |   atom[null]
     |   #(NOT element)
-    |   #(RANGE atom atom)
-    |   #(CHAR_RANGE atom atom)
+    |   #(RANGE atom[null] atom[null])
+    |   #(CHAR_RANGE atom[null] atom[null])
     |	#(ASSIGN id:ID el:element)
     	{
 		if ( #el.getType()==ANTLRParser.ROOT ||
@@ -434,29 +439,29 @@ dotBlock
 tree:   #(TREE_BEGIN element (element)*)
     ;
 
-atom
+atom[GrammarAST scope]
     :   #( rr:RULE_REF (rarg:ARG_ACTION)? )
     	{
-        grammar.altReferencesRule(currentRuleName, #rr, this.outerAltNum);
+        grammar.altReferencesRule(currentRuleName, scope, #rr, this.outerAltNum);
 		if ( #rarg!=null ) {
             #rarg.outerAltNum = this.outerAltNum;
             trackInlineAction(#rarg);
         }
         }
-    |   #( t:TOKEN_REF (targ:ARG_ACTION )? )
+    |   #( t:TOKEN_REF (harg:HETERO_TYPE)? (targ:ARG_ACTION )? )
     	{
 		if ( #targ!=null ) {
             #targ.outerAltNum = this.outerAltNum;
             trackInlineAction(#targ);
         }
     	if ( grammar.type==Grammar.LEXER ) {
-    		grammar.altReferencesRule(currentRuleName, #t, this.outerAltNum);
+    		grammar.altReferencesRule(currentRuleName, scope, #t, this.outerAltNum);
     	}
     	else {
     		grammar.altReferencesTokenID(currentRuleName, #t, this.outerAltNum);
     	}
     	}
-    |   c:CHAR_LITERAL
+    |   #(c:CHAR_LITERAL (harg2:HETERO_TYPE)?)
     	{
     	if ( grammar.type!=Grammar.LEXER ) {
     		Rule rule = grammar.getRule(currentRuleName);
@@ -465,7 +470,7 @@ atom
     		}
     	}
     	}
-    |   s:STRING_LITERAL
+    |   #(s:STRING_LITERAL (harg3:HETERO_TYPE)?)
     	{
     	if ( grammar.type!=Grammar.LEXER ) {
     		Rule rule = grammar.getRule(currentRuleName);
@@ -475,6 +480,7 @@ atom
     	}
     	}
     |   WILDCARD
+    |   #(DOT ID atom[#ID]) // scope override on rule
     ;
 
 ast_suffix
@@ -567,7 +573,13 @@ if ( !imaginary && grammar.buildAST() &&
 }
 }
     :   RULE_REF 
-    |   ( #(TOKEN_REF (arg:ARG_ACTION)?) | CHAR_LITERAL | STRING_LITERAL )
+    |   ( #(TOKEN_REF
+            (harg:HETERO_TYPE)?
+            (arg:ARG_ACTION)?
+           )
+        | CHAR_LITERAL (harg2:HETERO_TYPE)?
+        | STRING_LITERAL (harg3:HETERO_TYPE)?
+        )
         {
         if ( #arg!=null ) {
             #arg.outerAltNum = this.outerAltNum;

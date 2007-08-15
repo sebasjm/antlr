@@ -29,21 +29,34 @@ package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
 
-/** A tree node that is wrapper for a Token object. */
+/** A tree node that is wrapper for a Token object.  After 3.0 release
+ *  while building tree rewrite stuff, it became clear that computing
+ *  parent and child index is very difficult and cumbersome.  Better to
+ *  spend the space in every tree node.  If you don't want these extra
+ *  fields, it's easy to cut them out in your own BaseTree subclass.
+ */
 public class CommonTree extends BaseTree {
+	/** A single token is the payload */
+	public Token token;
+
 	/** What token indexes bracket all tokens associated with this node
 	 *  and below?
 	 */
-	public int startIndex=-1, stopIndex=-1;
+	protected int startIndex=-1, stopIndex=-1;
 
-	/** A single token is the payload */
-	public Token token;
+	/** Who is the parent node of this node; if null, implies node is root */
+	public CommonTree parent;
+
+	/** What index is this node in the child list? Range: 0..n-1 */
+	public int childIndex = -1;
 
 	public CommonTree() { }
 	
 	public CommonTree(CommonTree node) {
 		super(node);
 		this.token = node.token;
+		this.startIndex = node.startIndex;
+		this.stopIndex = node.stopIndex;
 	}
 
 	public CommonTree(Token t) {
@@ -116,6 +129,22 @@ public class CommonTree extends BaseTree {
 
 	public void setTokenStopIndex(int index) {
 		stopIndex = index;
+	}
+
+	public int getChildIndex() {
+		return childIndex;
+	}
+
+	public Tree getParent() {
+		return parent;
+	}
+
+	public void setParent(Tree t) {
+		this.parent = (CommonTree)t;
+	}
+
+	public void setChildIndex(int index) {
+		this.childIndex = index;
 	}
 
 	public String toString() {

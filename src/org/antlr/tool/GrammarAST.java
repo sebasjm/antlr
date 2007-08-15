@@ -60,7 +60,7 @@ public class GrammarAST extends BaseAST {
 	/** This AST node was created from what token? */
     public Token token = null;
 
-    protected String enclosingRule = null;
+    public Rule enclosingRule = null;
 
 	/** If this is a RULE node then track rule's start, stop tokens' index. */
 	public int ruleStartTokenIndex;
@@ -284,15 +284,7 @@ public class GrammarAST extends BaseAST {
         token.setColumn(col);
     }
 
-    public void setEnclosingRule(String rule) {
-        this.enclosingRule = rule;
-    }
-
-    public String getEnclosingRule() {
-        return enclosingRule;
-    }
-
-    public IntSet getSetValue() {
+ 	public IntSet getSetValue() {
         return setValue;
     }
 

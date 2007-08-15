@@ -496,6 +496,10 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 		this.uniqueNavigationNodes = uniqueNavigationNodes;
 	}
 
+	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
+		throw new UnsupportedOperationException("can't do stream rewrites yet");
+	}
+
 	/** Print out the entire tree including DOWN/UP nodes.  Uses
 	 *  a recursive walk.  Mostly useful for testing as it yields
 	 *  the token types not text.

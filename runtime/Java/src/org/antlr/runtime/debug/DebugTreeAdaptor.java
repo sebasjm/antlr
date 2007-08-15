@@ -2,6 +2,7 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.TreeAdaptor;
+import org.antlr.runtime.tree.BaseTree;
 
 /** A TreeAdaptor proxy that fires debugging events to a DebugEventListener
  *  delegate and uses the TreeAdaptor delegate to do the actual work.  All
@@ -139,6 +140,14 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 		return adaptor.getChild(t, i);
 	}
 
+	public void setChild(Object t, int i, Object child) {
+		adaptor.setChild(t, i, child);
+	}
+
+	public Object deleteChild(Object t, int i) {
+		return deleteChild(t, i);
+	}
+
 	public int getChildCount(Object t) {
 		return adaptor.getChildCount(t);
 	}
@@ -147,7 +156,26 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 		return adaptor.getUniqueID(node);
 	}
 
-	
+	public Object getParent(Object t) {
+		return adaptor.getParent(t);
+	}
+
+	public int getChildIndex(Object t) {
+		return adaptor.getChildIndex(t);
+	}
+
+	public void setParent(Object t, Object parent) {
+		adaptor.setParent(t, parent);
+	}
+
+	public void setChildIndex(Object t, int index) {
+		adaptor.setChildIndex(t, index);
+	}
+
+	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
+		adaptor.replaceChildren(parent, startChildIndex, stopChildIndex, t);
+	}
+
 	// support
 
 	public DebugEventListener getDebugEventListener() {

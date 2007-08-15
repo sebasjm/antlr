@@ -166,7 +166,7 @@ public abstract class SemanticContext {
 					eST = templates.getInstanceOf("evalPredicate");
 					generator.grammar.decisionsWhoseDFAsUsesSemPreds.add(dfa);
 				}
-				String predEnclosingRuleName = predicate.getEnclosingRule();
+				String predEnclosingRuleName = predicate.enclosingRule.name;
 				/*
 				String decisionEnclosingRuleName =
 					dfa.getNFADecisionStartState().getEnclosingRule();

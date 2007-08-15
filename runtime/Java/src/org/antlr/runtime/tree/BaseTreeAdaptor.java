@@ -5,6 +5,7 @@ import org.antlr.runtime.Token;
 import java.util.Map;
 import java.util.HashMap;
 
+/** A TreeAdaptor that works with any Tree implementation. */
 public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	/** System.identityHashCode() is not always unique due to GC; we have to
 	 *  track ourselves.  That's ok, it's only for debugging, though it's
@@ -22,7 +23,28 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object dupTree(Object tree) {
-		return ((Tree)tree).dupTree();
+		return dupTree(tree, null);
+	}
+
+	/** This is generic in the sense that it will work with any kind of
+	 *  tree (not just Tree interface).  It invokes the adaptor routines
+	 *  not the tree node routines to do the construction.  
+	 */
+	public Object dupTree(Object t, Object parent) {
+		if ( t==null ) {
+			return null;
+		}
+		Object newTree = dupNode(t);
+		// ensure new subtree root has parent/child index set
+		setChildIndex(newTree, getChildIndex(t)); // same index in new tree
+		setParent(newTree, parent);
+		int n = getChildCount(t);
+		for (int i = 0; i < n; i++) {
+			Object child = getChild(t, i);
+			Object newSubTree = dupTree(child, t);
+			addChild(newTree, newSubTree);
+		}
+		return newTree;
 	}
 
 	/** Add a child to the tree t.  If child is a flat tree (a list), make all
@@ -85,11 +107,20 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 		return newRootTree;
 	}
 
-	/** Transform ^(nil x) to x */
+	/** Transform ^(nil x) to x and nil to null */
 	public Object rulePostProcessing(Object root) {
 		Tree r = (Tree)root;
-		if ( r!=null && r.isNil() && r.getChildCount()==1 ) {
-			r = (Tree)r.getChild(0);
+		if ( r!=null && r.isNil() ) {
+			if ( r.getChildCount()==0 ) {
+				r = null;
+			}
+			else if ( r.getChildCount()==1 ) {
+				Tree oldParent = r.getParent();
+				r = (Tree)r.getChild(0);
+				// whoever invokes rule will set parent and child index
+				r.setParent(null);
+				r.setChildIndex(-1);
+			}
 		}
 		return r;
 	}
@@ -139,6 +170,14 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 
 	public Object getChild(Object t, int i) {
 		return ((Tree)t).getChild(i);
+	}
+
+	public void setChild(Object t, int i, Object child) {
+		((Tree)t).setChild(i, (Tree)child);
+	}
+
+	public Object deleteChild(Object t, int i) {
+		return ((Tree)t).deleteChild(i);
 	}
 
 	public int getChildCount(Object t) {

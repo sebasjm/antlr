@@ -218,9 +218,12 @@ $block.tree.setOptions(grammar,opts);
 		( (opts=optionsSpec)? ':' )?
 		{currentBlockAST = lp;}
 		a1=alternative rewrite
-		{if (LA(1)==OR||(LA(2)==QUESTION||LA(2)==PLUS||LA(2)==STAR)) prefixWithSynPred(#a1);}
+		{
+		int la1 = input.LA(1), la2=input.LA(2);
+		if (la1==OR||(la2==QUESTION||la2==PLUS||la2==STAR)) prefixWithSynPred($a1.tree);
+		}
 		( '|' a2=alternative rewrite
-		  {if (LA(1)==OR||(LA(2)==QUESTION||LA(2)==PLUS||LA(2)==STAR)) prefixWithSynPred(#a2);}
+		  {if (la1==OR||(la2==QUESTION||la2==PLUS||la2==STAR)) prefixWithSynPred($a1.tree);}
 		)*
         rp=')'
         {
@@ -231,29 +234,33 @@ $block.tree.setOptions(grammar,opts);
 
 altList[Map opts]
 @init {
-	GrammarAST blkRoot = #[BLOCK,'BLOCK'];
-	blkRoot.setLine(LT(1).getLine());
-	blkRoot.setColumn(LT(1).getColumn());
+	// must create manually as it's used by invoked rules
+        GrammarAST blkRoot = (GrammarAST)adaptor.create(BLOCK,"BLOCK");
+        blkRoot.setLine(input.LT(1).getLine());
+        blkRoot.setColumn(input.LT(1).getColumn());
 	GrammarAST save = currentBlockAST;
 	currentBlockAST = #blkRoot;
 }
     :   a1=alternative rewrite
-		{if (LA(1)==OR||(LA(2)==QUESTION||LA(2)==PLUS||LA(2)==STAR)) prefixWithSynPred($a1.tree);}
+	{
+	int la1 = input.LA(1), la2=input.la2;
+	if (la1==OR||(la2==QUESTION||la2==PLUS||la2==STAR)) prefixWithSynPred($a1.tree);
+	}
     	( '|' a2=alternative rewrite
-    	  {if (LA(1)==OR||(LA(2)==QUESTION||LA(2)==PLUS||LA(2)==STAR)) prefixWithSynPred($a2.tree);}
+    	  {if (la1==OR||(la2==QUESTION||la2==PLUS||la2==STAR)) prefixWithSynPred($a2.tree);}
     	)*
         {
         currentBlockAST = save;
         }
-		-> ^( {blkRoot} (alternative rewrite)+ EOB["<end-of-block>"] )
+	-> ^( {blkRoot} (alternative rewrite)+ EOB["EOB"] )
     ;
 
 alternative
 @init {
 	Token firstToken = input.LT(1);
 }
-    :   ( el=element )+ -> ^(ALT[firstToken] element+ EOA["<end-of-alt>"])
-    |   -> ^(ALT[input.LT(1)] EPSILON[input.LT(-1)] EOA["<end-of-alt>"])
+    :   ( el=element )+ -> ^(ALT[firstToken] element+ EOA["EOA"])
+    |   -> ^(ALT[input.LT(1)] EPSILON[input.LT(-1)] EOA["EOA"])
     ;
 
 exceptionGroup
@@ -274,15 +281,13 @@ element
 	;
 
 elementNoOptionSpec
-@init {
-    IntSet elements=null;
-    GrammarAST sub, sub2;
-}
-	:	id ('='^|'+='^) (atom|block)
-        ( sub=ebnfSuffix[(GrammarAST)currentAST.root,false]! {#elementNoOptionSpec=sub;} )?
-    |   atom
-        ( sub2=ebnfSuffix[(GrammarAST)currentAST.root,false]! {#elementNoOptionSpec=sub2;} )?
-    |	ebnf
+	:	id labelOp=('='|'+=') atom ebnfSuffix
+		-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] ^($labelOp id atom) EOA["EOA"]) EOB["EOB"]))
+	|	id labelOp=('='|'+=') block ebnfSuffix
+		-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] ^($labelOp id block) EOA["EOA"]) EOB["EOB"]))
+	|	atom ebnfSuffix
+	|	atom
+	|	ebnf
 	|   ACTION
 	|   p=SEMPRED ( '=>' ! {#p.setType(GATED_SEMPRED);} )?
 		{
@@ -398,7 +403,7 @@ GrammarAST ebnfRoot=null;
        	GrammarAST eob = #[EOB,'<end-of-block>'];
 		eob.setLine(elemAST.getLine());
 		eob.setColumn(elemAST.getColumn());
-		GrammarAST alt = #(#[ALT,'ALT'],elemAST,#[EOA,"<end-of-alt>"]);
+		GrammarAST alt = #(#[ALT,'ALT'],elemAST,#[EOA,EOA]);
     	if ( !inRewrite ) {
     		prefixWithSynPred(alt);
     	}
@@ -445,7 +450,7 @@ rewrite_block
 		rewrite_alternative
         ')'!
         {
-        GrammarAST eob = #[EOB,"<end-of-block>"];
+        GrammarAST eob = #[EOB,EOB];
         eob.setLine(lp.getLine());
         eob.setColumn(lp.getColumn());
         #rewrite_block.addChild(eob);
@@ -454,7 +459,7 @@ rewrite_block
 
 rewrite_alternative
 @init {
-    GrammarAST eoa = #[EOA, "<end-of-alt>"];
+    GrammarAST eoa = #[EOA, EOA];
     GrammarAST altRoot = #[ALT,"ALT"];
     altRoot.setLine(LT(1).getLine());
     altRoot.setColumn(LT(1).getColumn());
@@ -584,6 +589,11 @@ id	:	TOKEN_REF -> ID[$TOKEN_REF]
 	;
 
 // L E X I C A L   R U L E S
+
+OR	:	'|' ;
+QUESTION:	'?' ;
+PLUS	:	'+' ;
+STAR	:	'*' ;
 
 SL_COMMENT
  	:	'//'

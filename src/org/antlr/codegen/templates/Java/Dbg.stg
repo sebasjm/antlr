@@ -42,21 +42,22 @@ public static final String[] ruleNames = new String[] {
 };<\n>
 public int ruleLevel = 0;
 <! bug: can't use <@super.members()> cut-n-paste instead !>
-public <name>(<inputStreamType> input, int port) {
+<! Same except we add port number and profile stuff !>
+public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>) {
+    this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, null<grammar.delegators:{g|, <g:delegateName()>}>);
+}
+public <name>(<inputStreamType> input, int port, RecognizerSharedState state<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>) {
 <if(profile)>
         this(input, new Profiler(null));
         Profiler p = (Profiler)dbg;
         p.setParser(this);
 <else>
-        super(input, port);
-        <createListenerAndHandshake()>
-<endif><\n>
-<if(memoize)>
-        ruleMemo = new Map[<numRules>+1];<\n><! index from 1..n !>
+    super(input, port, state);
 <endif>
-}
-public <name>(<inputStreamType> input) {
-    this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT);
+    <parserCtorBody()>
+    <grammar.directDelegates:
+     {g|<g:delegateName()> = new <g.name><superClass>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+    <createListenerAndHandshake()>
 }
 <ctorForPredefinedListener()>
 <if(profile)>
@@ -95,6 +96,7 @@ catch (IOException ioe) {
 }
 >>
 
+/** TODO: make this deal with delegates */
 ctorForPredefinedListener() ::= <<
 public <name>(<inputStreamType> input, DebugEventListener dbg) {
     super(input, dbg);

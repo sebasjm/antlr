@@ -134,4 +134,25 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
         return ((Tree)t).getChildCount();
     }
 
+	public Object getParent(Object t) {
+		return ((Tree)t).getParent();
+	}
+
+	public void setParent(Object t, Object parent) {
+		((Tree)t).setParent((Tree)parent);
+	}
+
+	public int getChildIndex(Object t) {
+		return ((Tree)t).getChildIndex();
+	}
+
+	public void setChildIndex(Object t, int index) {
+		((Tree)t).setChildIndex(index);
+	}
+
+	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
+		if ( parent!=null ) {
+			((Tree)parent).replaceChildren(startChildIndex, stopChildIndex, t);
+		}
+	}
 }

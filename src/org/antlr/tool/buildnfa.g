@@ -70,20 +70,21 @@ protected void init() {
         String ruleName = r.name;
         NFAState ruleBeginState = factory.newState();
         ruleBeginState.setDescription("rule "+ruleName+" start");
-		ruleBeginState.setEnclosingRuleName(ruleName);
-        grammar.setRuleStartState(ruleName, ruleBeginState);
+		ruleBeginState.enclosingRule = r;
+        r.startState = ruleBeginState;
         NFAState ruleEndState = factory.newState();
         ruleEndState.setDescription("rule "+ruleName+" end");
         ruleEndState.setAcceptState(true);
-		ruleEndState.setEnclosingRuleName(ruleName);
-        grammar.setRuleStopState(ruleName, ruleEndState);
+		ruleEndState.enclosingRule = r;
+        r.stopState = ruleEndState;
     }
 }
 
 protected void addFollowTransition(String ruleName, NFAState following) {
      //System.out.println("adding follow link to rule "+ruleName);
      // find last link in FOLLOW chain emanating from rule
-     NFAState end = grammar.getRuleStopState(ruleName);
+     Rule r = grammar.getRule(ruleName);
+     NFAState end = r.stopState;
      while ( end.transition(1)!=null ) {
          end = (NFAState)end.transition(1).target;
      }
@@ -146,6 +147,7 @@ grammarSpec
 	:	ID
 		(cmt:DOC_COMMENT)?
         ( #(OPTIONS .) )?
+        ( #("import" .) )?
         ( #(TOKENS .) )?
         (attrScope)*
         (AMPERSAND)* // skip actions
@@ -163,7 +165,10 @@ rule
     String r=null;
 }
     :   #( RULE id:ID {r=#id.getText();}
-		{currentRuleName = r; factory.currentRuleName = r;}
+		{
+        currentRuleName = r;
+        factory.currentRule = grammar.getLocallyDefinedRule(r);
+        }
 		(modifier)?
         (ARG (ARG_ACTION)?)
         (RET (ARG_ACTION)?)
@@ -184,7 +189,8 @@ rule
 					 grammar.type==Grammar.LEXER )
 				{
 					// attach start node to block for this rule
-					NFAState start = grammar.getRuleStartState(r);
+                    Rule thisR = grammar.getLocallyDefinedRule(r);
+					NFAState start = thisR.startState;
 					start.setAssociatedASTNode(#id);
 					start.addTransition(new Transition(Label.EPSILON, b.left));
 
@@ -198,7 +204,7 @@ rule
 					}
 
 					// hook to end of rule node
-					NFAState end = grammar.getRuleStopState(r);
+					NFAState end = thisR.stopState;
 					b.right.addTransition(new Transition(Label.EPSILON,end));
 				}
            }
@@ -286,7 +292,7 @@ element returns [StateCluster g=null]
     |   #(BANG g=element)
     |	#(ASSIGN ID g=element)
     |	#(PLUS_ASSIGN ID g=element)
-    |   #(RANGE a:atom b:atom)
+    |   #(RANGE a:atom[null] b:atom[null])
         {g = factory.build_Range(grammar.getTokenType(#a.getText()),
                                  grammar.getTokenType(#b.getText()));}
     |   #(CHAR_RANGE c1:CHAR_LITERAL c2:CHAR_LITERAL)
@@ -411,7 +417,7 @@ StateCluster down=null, up=null;
     ;
 
 atom_or_notatom returns [StateCluster g=null]
-	:	g=atom
+	:	g=atom[null]
 	|	#(  n:NOT
             (  c:CHAR_LITERAL (ast1:ast_suffix)?
 	           {
@@ -481,13 +487,13 @@ atom_or_notatom returns [StateCluster g=null]
          )
 	;
 
-atom returns [StateCluster g=null]
+atom[String scopeName] returns [StateCluster g=null]
     :   #( r:RULE_REF (rarg:ARG_ACTION)? (as1:ast_suffix)? )
         {
-        NFAState start = grammar.getRuleStartState(r.getText());
+        NFAState start = grammar.getRuleStartState(scopeName,r.getText());
         if ( start!=null ) {
-            int ruleIndex = grammar.getRuleIndex(r.getText());
-            g = factory.build_RuleRef(ruleIndex, start);
+            Rule rr = grammar.getRule(scopeName,r.getText());
+            g = factory.build_RuleRef(rr, start);
             r.followingNFAState = g.right;
             if ( g.left.transition(0) instanceof RuleClosureTransition
             	 && grammar.type!=Grammar.LEXER )
@@ -498,13 +504,13 @@ atom returns [StateCluster g=null]
         }
         }
 
-    |   #( t:TOKEN_REF (targ:ARG_ACTION)? (as2:ast_suffix)? )
+    |   #( t:TOKEN_REF (harg:HETERO_TYPE)? (targ:ARG_ACTION)? (as2:ast_suffix)? )
         {
         if ( grammar.type==Grammar.LEXER ) {
-            NFAState start = grammar.getRuleStartState(t.getText());
+            NFAState start = grammar.getRuleStartState(scopeName,t.getText());
             if ( start!=null ) {
-                int ruleIndex = grammar.getRuleIndex(t.getText());
-                g = factory.build_RuleRef(ruleIndex, start);
+                Rule rr = grammar.getRule(scopeName,t.getText());
+                g = factory.build_RuleRef(rr, start);
                 // don't add FOLLOW transitions in the lexer;
                 // only exact context should be used.
             }
@@ -516,7 +522,7 @@ atom returns [StateCluster g=null]
         }
         }
 
-    |   #( c:CHAR_LITERAL (as3:ast_suffix)? )
+    |   #( c:CHAR_LITERAL (HETERO_TYPE)? (as3:ast_suffix)? )
     	{
     	if ( grammar.type==Grammar.LEXER ) {
     		g = factory.build_CharLiteralAtom(c.getText());
@@ -528,7 +534,7 @@ atom returns [StateCluster g=null]
     	}
     	}
 
-    |   #( s:STRING_LITERAL (as4:ast_suffix)? )
+    |   #( s:STRING_LITERAL (HETERO_TYPE)? (as4:ast_suffix)? )
     	{
      	if ( grammar.type==Grammar.LEXER ) {
      		g = factory.build_StringLiteralAtom(s.getText());
@@ -542,7 +548,7 @@ atom returns [StateCluster g=null]
 
     |   #( w:WILDCARD (as5:ast_suffix)? )    {g = factory.build_Wildcard();}
 
-	//|	g=set
+    |   #( DOT scope:ID g=atom[#scope.getText()] ) // scope override
 	;
 
 ast_suffix
@@ -679,7 +685,7 @@ setElement[IntSet elements]
 testBlockAsSet
 {
     int nAlts=0;
-    Rule r = grammar.getRule(currentRuleName);
+    Rule r = grammar.getLocallyDefinedRule(currentRuleName);
 }
 	:   #( BLOCK
            (   #(ALT (BACKTRACK_SEMPRED)? testSetElement {nAlts++;} EOA)

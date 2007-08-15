@@ -19,11 +19,36 @@ public interface Tree {
 
 	int getChildCount();
 
+	// Tree tracks parent and child index now > 3.0
+
+	public Tree getParent();
+
+	public void setParent(Tree t);
+
+	/** This node is what child index? 0..n-1 */
+	public int getChildIndex();
+
+	public void setChildIndex(int index);
+
+	/** Set the parent and child index values for all children */
+	public void freshenParentAndChildIndexes();
+
 	/** Add t as a child to this node.  If t is null, do nothing.  If t
 	 *  is nil, add all children of t to this' children.
-	 * @param t
 	 */
 	void addChild(Tree t);
+
+	/** Set ith child (0..n-1) to t; t must be non-null and non-nil node */
+	public void setChild(int i, Tree t);
+
+	public Object deleteChild(int i);
+
+	/** Delete children from start to stop and replace with t even if t is
+	 *  a list (nil-root tree).  num of children can increase or decrease.
+	 *  For huge child lists, inserting children can force walking rest of
+	 *  children to set their childindex; could be slow.
+	 */
+	public void replaceChildren(int startChildIndex, int stopChildIndex, Object t);	
 
 	/** Indicates the node is a nil node but may still have children, meaning
 	 *  the tree is a flat list.
@@ -43,8 +68,6 @@ public interface Tree {
 	int getTokenStopIndex();
 
 	void setTokenStopIndex(int index);
-
-	Tree dupTree();
 
 	Tree dupNode();
 

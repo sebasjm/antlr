@@ -227,7 +227,7 @@ public class GrammarReport {
 			}
 			decisions.add(Utils.integer(dfa.decisionNumber));
 			buf.append("Rule ");
-			buf.append(dfa.decisionNFAStartState.getEnclosingRule());
+			buf.append(dfa.decisionNFAStartState.enclosingRule.name);
 			buf.append(" decision ");
 			buf.append(dfa.decisionNumber);
 			buf.append(" location ");

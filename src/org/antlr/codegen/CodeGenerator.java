@@ -1,6 +1,6 @@
 /*
 [The "BSD licence"]
-Copyright (c) 2005-2006 Terence Parr
+Copyright (c) 2005-2007 Terence Parr
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -196,7 +196,7 @@ public class CodeGenerator {
 		}
 
 		// dynamically add subgroups that act like filters to apply to
-		// their supergroup.  E.g., Java:Dbg:AST:ASTDbg.
+		// their supergroup.  E.g., Java:Dbg:AST:ASTParser::ASTDbg.
 		String outputOption = (String)grammar.getOption("output");
 		if ( outputOption!=null && outputOption.equals("AST") ) {
 			if ( debug && grammar.type!=Grammar.LEXER ) {
@@ -205,12 +205,36 @@ public class CodeGenerator {
 				baseTemplates = dbgTemplates;
 				StringTemplateGroup astTemplates =
 					StringTemplateGroup.loadGroup("AST",dbgTemplates);
+				StringTemplateGroup astParserTemplates = astTemplates;
+				if ( !grammar.rewriteMode() ) {
+					if ( grammar.type==Grammar.TREE_PARSER ) {
+						astParserTemplates =
+							StringTemplateGroup.loadGroup("ASTTreeParser", astTemplates);
+					}
+					else {
+						astParserTemplates =
+							StringTemplateGroup.loadGroup("ASTParser", astTemplates);
+					}
+				}
 				StringTemplateGroup astDbgTemplates =
-					StringTemplateGroup.loadGroup("ASTDbg", astTemplates);
+					StringTemplateGroup.loadGroup("ASTDbg", astParserTemplates);
 				templates = astDbgTemplates;
 			}
 			else {
-				templates = StringTemplateGroup.loadGroup("AST", coreTemplates);
+				StringTemplateGroup astTemplates =
+					StringTemplateGroup.loadGroup("AST", coreTemplates);
+				StringTemplateGroup astParserTemplates = astTemplates;
+				if ( !grammar.rewriteMode() ) {
+					if ( grammar.type==Grammar.TREE_PARSER ) {
+						astParserTemplates =
+							StringTemplateGroup.loadGroup("ASTTreeParser", astTemplates);
+					}
+					else {
+						astParserTemplates =
+							StringTemplateGroup.loadGroup("ASTParser", astTemplates);
+					}
+				}
+				templates = astParserTemplates;
 			}
 		}
 		else if ( outputOption!=null && outputOption.equals("template") ) {
@@ -338,11 +362,8 @@ public class CodeGenerator {
 		headerFileST.setAttribute("buildAST", new Boolean(grammar.buildAST()));
 		outputFileST.setAttribute("buildAST", new Boolean(grammar.buildAST()));
 
-		String rewrite = (String)grammar.getOption("rewrite");
-		outputFileST.setAttribute("rewrite",
-								  Boolean.valueOf(rewrite!=null&&rewrite.equals("true")));
-		headerFileST.setAttribute("rewrite",
-								  Boolean.valueOf(rewrite!=null&&rewrite.equals("true")));
+		outputFileST.setAttribute("rewriteMode", Boolean.valueOf(grammar.rewriteMode()));
+		headerFileST.setAttribute("rewriteMode", Boolean.valueOf(grammar.rewriteMode()));
 
 		outputFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
 		headerFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
@@ -413,6 +434,7 @@ public class CodeGenerator {
 			ErrorManager.error(ErrorManager.MSG_BAD_AST_STRUCTURE,
 							   re);
 		}
+
 		genTokenTypeConstants(recognizerST);
 		genTokenTypeConstants(outputFileST);
 		genTokenTypeConstants(headerFileST);
@@ -538,14 +560,16 @@ public class CodeGenerator {
 									int elementIndex)
 	{
 		NFAState followingNFAState = referencedElementNode.followingNFAState;
-/*
+		/*
 		System.out.print("compute FOLLOW "+referencedElementNode.toString()+
 						 " for "+referencedElementName+"#"+elementIndex +" in "+
 						 enclosingRuleName+
 						 " line="+referencedElementNode.getLine());
-*/
+		*/
 		LookaheadSet follow = null;
 		if ( followingNFAState!=null ) {
+			// compute follow for this element and, as side-effect, track
+			// the rule LOOK sensitivity.
 			follow = grammar.LOOK(followingNFAState);
 		}
 
@@ -553,7 +577,8 @@ public class CodeGenerator {
 			ErrorManager.internalError("no follow state or cannot compute follow");
 			follow = new LookaheadSet();
 		}
-		//System.out.println(" "+follow);
+		// System.out.println(" "+follow);
+		// System.out.println("visited rules "+grammar.getRuleNamesVisitedDuringLOOK());
 
         List tokenTypeList = null;
         long[] words = null;

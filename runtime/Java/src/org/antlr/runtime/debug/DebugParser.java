@@ -49,11 +49,11 @@ public class DebugParser extends Parser {
 	}
 
 	public DebugParser(TokenStream input) {
-		this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT);
+		this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, null);
 	}
 
-	public DebugParser(TokenStream input, int port) {
-		super(new DebugTokenStream(input,null));
+	public DebugParser(TokenStream input, int port, RecognizerSharedState state) {
+		super(new DebugTokenStream(input,null), state);
 	}
 
 	/** Provide a new debug event listener for this parser.  Notify the

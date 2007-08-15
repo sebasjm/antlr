@@ -36,39 +36,6 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	/** Where is the lexer drawing characters from? */
     protected CharStream input;
 
-	/** The goal of all lexer rules/methods is to create a token object.
-	 *  This is an instance variable as multiple rules may collaborate to
-	 *  create a single token.  nextToken will return this object after
-	 *  matching lexer rule(s).  If you subclass to allow multiple token
-	 *  emissions, then set this to the last token to be matched or
-	 *  something nonnull so that the auto token emit mechanism will not
-	 *  emit another token.
-	 */
-    protected Token token;
-
-	/** What character index in the stream did the current token start at?
-	 *  Needed, for example, to get the text for current token.  Set at
-	 *  the start of nextToken.
- 	 */
-	protected int tokenStartCharIndex = -1;
-
-	/** The line on which the first character of the token resides */
-	protected int tokenStartLine;
-
-	/** The character position of first character within the line */
-	protected int tokenStartCharPositionInLine;
-
-	/** The channel number for the current token */
-	protected int channel;
-
-	/** The token type for the current token */
-	protected int type;
-
-	/** You can set the text for the current token to override what is in
-	 *  the input char buffer.  Use setText() or can set this instance var.
- 	 */
-	protected String text;
-
 	public Lexer() {
 	}
 
@@ -79,13 +46,13 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	public void reset() {
 		super.reset(); // reset all recognizer state variables
 		// wack Lexer state variables
-		token = null;
-		type = Token.INVALID_TOKEN_TYPE;
-		channel = Token.DEFAULT_CHANNEL;
-		tokenStartCharIndex = -1;
-		tokenStartCharPositionInLine = -1;
-		tokenStartLine = -1;
-		text = null;
+		state.token = null;
+		state.type = Token.INVALID_TOKEN_TYPE;
+		state.channel = Token.DEFAULT_CHANNEL;
+		state.tokenStartCharIndex = -1;
+		state.tokenStartCharPositionInLine = -1;
+		state.tokenStartLine = -1;
+		state.text = null;
 		if ( input!=null ) {
 			input.seek(0); // rewind the input
 		}
@@ -96,24 +63,24 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 */
     public Token nextToken() {
 		while (true) {
-			token = null;
-			channel = Token.DEFAULT_CHANNEL;
-			tokenStartCharIndex = input.index();
-			tokenStartCharPositionInLine = input.getCharPositionInLine();
-			tokenStartLine = input.getLine();
-			text = null;
+			state.token = null;
+			state.channel = Token.DEFAULT_CHANNEL;
+			state.tokenStartCharIndex = input.index();
+			state.tokenStartCharPositionInLine = input.getCharPositionInLine();
+			state.tokenStartLine = input.getLine();
+			state.text = null;
 			if ( input.LA(1)==CharStream.EOF ) {
                 return Token.EOF_TOKEN;
             }
             try {
                 mTokens();
-				if ( token==null ) {
+				if ( state.token==null ) {
 					emit();
 				}
-				else if ( token==Token.SKIP_TOKEN ) {
+				else if ( state.token==Token.SKIP_TOKEN ) {
 					continue;
 				}
-				return token;
+				return state.token;
 			}
             catch (RecognitionException re) {
                 reportError(re);
@@ -129,7 +96,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  and emits it.
 	 */
 	public void skip() {
-		token = Token.SKIP_TOKEN;
+		state.token = Token.SKIP_TOKEN;
 	}
 
 	/** This is the lexer entry point that sets instance var 'token' */
@@ -148,7 +115,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  than a single variable as this implementation does).
 	 */
 	public void emit(Token token) {
-		this.token = token;
+		state.token = token;
 	}
 
 	/** The standard method called to automatically emit a token at the
@@ -158,10 +125,10 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  custom Token objects.
 	 */
 	public Token emit() {
-		Token t = new CommonToken(input, type, channel, tokenStartCharIndex, getCharIndex()-1);
-		t.setLine(tokenStartLine);
-		t.setText(text);
-		t.setCharPositionInLine(tokenStartCharPositionInLine);
+		Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
+		t.setLine(state.tokenStartLine);
+		t.setText(state.text);
+		t.setCharPositionInLine(state.tokenStartCharPositionInLine);
 		emit(t);
 		return t;
 	}
@@ -170,8 +137,8 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
         int i = 0;
         while ( i<s.length() ) {
             if ( input.LA(1)!=s.charAt(i) ) {
-				if ( backtracking>0 ) {
-					failed = true;
+				if ( state.backtracking>0 ) {
+					state.failed = true;
 					return;
 				}
 				MismatchedTokenException mte =
@@ -181,7 +148,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
             }
             i++;
             input.consume();
-			failed = false;
+			state.failed = false;
         }
     }
 
@@ -191,8 +158,8 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 
     public void match(int c) throws MismatchedTokenException {
         if ( input.LA(1)!=c ) {
-			if ( backtracking>0 ) {
-				failed = true;
+			if ( state.backtracking>0 ) {
+				state.failed = true;
 				return;
 			}
 			MismatchedTokenException mte =
@@ -201,15 +168,15 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 			throw mte;
         }
         input.consume();
-		failed = false;
+		state.failed = false;
     }
 
     public void matchRange(int a, int b)
 		throws MismatchedRangeException
 	{
         if ( input.LA(1)<a || input.LA(1)>b ) {
-			if ( backtracking>0 ) {
-				failed = true;
+			if ( state.backtracking>0 ) {
+				state.failed = true;
 				return;
 			}
             MismatchedRangeException mre =
@@ -218,7 +185,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 			throw mre;
         }
         input.consume();
-		failed = false;
+		state.failed = false;
     }
 
     public int getLine() {
@@ -238,17 +205,17 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  text override.
 	 */
 	public String getText() {
-		if ( text!=null ) {
-			return text;
+		if ( state.text!=null ) {
+			return state.text;
 		}
-		return input.substring(tokenStartCharIndex,getCharIndex()-1);
+		return input.substring(state.tokenStartCharIndex,getCharIndex()-1);
 	}
 
 	/** Set the complete text of this token; it wipes any previous
 	 *  changes to the text.
 	 */
 	public void setText(String text) {
-		this.text = text;
+		state.text = text;
 	}
 
 	public void reportError(RecognitionException e) {

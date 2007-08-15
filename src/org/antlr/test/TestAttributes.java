@@ -2454,7 +2454,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testLexerRulePropertyRefs() throws Exception {
 		String action = "$text $type $line $pos $channel $index $start $stop";
-		String expecting = "getText() _type tokenStartLine tokenStartCharPositionInLine channel -1 tokenStartCharIndex (getCharIndex()-1)";
+		String expecting = "getText() _type state.tokenStartLine state.tokenStartCharPositionInLine channel -1 state.tokenStartCharIndex (getCharIndex()-1)";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2511,7 +2511,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testSettingLexerRulePropertyRefs() throws Exception {
 		String action = "$text $type=1 $line=1 $pos=1 $channel=1 $index";
-		String expecting = "getText() _type=1 tokenStartLine=1 tokenStartCharPositionInLine=1 channel=1 -1";
+		String expecting = "getText() _type=1 state.tokenStartLine=1 state.tokenStartCharPositionInLine=1 channel=1 -1";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2551,7 +2551,8 @@ public class TestAttributes extends BaseTest {
 		Grammar lexerGrammar = new Grammar();
 		lexerGrammar.setFileName("<internally-generated-lexer>");
 		lexerGrammar.importTokenVocabulary(g);
-		lexerGrammar.setGrammarContent(sr);
+		lexerGrammar.parseAndBuildAST(sr);
+		lexerGrammar.analyzeGrammar();
 		sr.close();
 
 		Tool antlr = newTool();
@@ -2582,7 +2583,8 @@ public class TestAttributes extends BaseTest {
 		Grammar lexerGrammar = new Grammar();
 		lexerGrammar.setFileName("<internally-generated-lexer>");
 		lexerGrammar.importTokenVocabulary(g);
-		lexerGrammar.setGrammarContent(sr);
+		lexerGrammar.parseAndBuildAST(sr);
+		lexerGrammar.analyzeGrammar();
 		sr.close();
 
 		Tool antlr = newTool();

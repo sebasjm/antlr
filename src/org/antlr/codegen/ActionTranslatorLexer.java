@@ -8,7 +8,7 @@ import org.antlr.tool.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-public class ActionTranslatorLexer extends Lexer {
+public class ActionTranslatorLexer extends Lexer2 {
     public static final int LOCAL_ATTR=17;
     public static final int SET_DYNAMIC_SCOPE_ATTR=18;
     public static final int ISOLATED_DYNAMIC_SCOPE=24;
@@ -88,7 +88,7 @@ public class ActionTranslatorLexer extends Lexer {
     		this(new ANTLRStringStream(actionToken.getText()));
     		this.generator = generator;
     		grammar = generator.grammar;
-    	    this.enclosingRule = grammar.getRule(ruleName);
+    	    this.enclosingRule = grammar.getLocallyDefinedRule(ruleName);
     	    this.actionToken = actionToken;
     		this.outerAltNum = outerAltNum;
     	}

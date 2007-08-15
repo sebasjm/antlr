@@ -147,6 +147,32 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(foo void ;)\n", found);
 	}
 
+	public void testWildcardRootWithLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : v='void' x=.^ ';' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "void foo;", debug);
+		assertEquals("(foo void ;)\n", found);
+	}
+
+	public void testWildcardRootWithListLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : v='void' x=.^ ';' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "void foo;", debug);
+		assertEquals("(foo void ;)\n", found);
+	}
+
 	public void testRootRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -227,6 +253,34 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(int a)\n", found);
 	}
 
+	public void testInvokeRuleAsRootWithLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a  : x=type^ ID ;\n" +
+			"type : {;}'int' | 'float' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "int a", debug);
+		assertEquals("(int a)\n", found);
+	}
+
+	public void testInvokeRuleAsRootWithListLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a  : x+=type^ ID ;\n" +
+			"type : {;}'int' | 'float' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "int a", debug);
+		assertEquals("(int a)\n", found);
+	}
+
 	public void testRuleRootInLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -295,6 +349,20 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(+ abc)\n", found);
 	}
 
+	public void testSetRootWithLabel() throws Exception {
+		// FAILS until I rebuild the antlr.g in v3
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : x=('+' | '-')^ ID ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "+abc", debug);
+		assertEquals("(+ abc)\n", found);
+	}
+
 	public void testSetAsRuleRootInLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
@@ -321,7 +389,59 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("34 + 2\n", found);
 	}
 
+	public void testNotSetWithLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : x=~ID '+' INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "34+2", debug);
+		assertEquals("34 + 2\n", found);
+	}
+
+	public void testNotSetWithListLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : x=~ID '+' INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "34+2", debug);
+		assertEquals("34 + 2\n", found);
+	}
+
 	public void testNotSetRoot() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ~'+'^ INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "34 55", debug);
+		assertEquals("(34 55)\n", found);
+	}
+
+	public void testNotSetRootWithLabel() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ~'+'^ INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+								  "a", "34 55", debug);
+		assertEquals("(34 55)\n", found);
+	}
+
+	public void testNotSetRootWithListLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -431,7 +551,7 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 								  "a", "a", debug);
-		assertEquals("nil\n", found);
+		assertEquals("", found);
 	}
 
 	public void testRuleListLabel() throws Exception {
@@ -522,7 +642,6 @@ public class TestAutoAST extends BaseTest {
 								  "r", "abc 34 d", debug);
 		assertEquals("abc 34 d\n", found);
 	}
-
 
 	// S U P P O R T
 

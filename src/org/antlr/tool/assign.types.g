@@ -306,9 +306,10 @@ grammar[Grammar g]
 
 grammarSpec
 {Map opts=null;}
-	:	id:ID {grammar.setName(#id.getText());}
+	:	id:ID
 		(cmt:DOC_COMMENT)?
 		(optionsSpec)?
+        (delegateGrammars)?
         (tokensSpec)?
         (attrScope)*
         (AMPERSAND)* // skip actions
@@ -354,6 +355,15 @@ charSetElement
 	:   c:CHAR_LITERAL
 	|   #( OR c1:CHAR_LITERAL c2:CHAR_LITERAL )
 	|   #( RANGE c3:CHAR_LITERAL c4:CHAR_LITERAL )
+	;
+
+delegateGrammars
+	:	#( "import"
+            (   #(ASSIGN lab:ID g:ID)
+                {grammar.importGrammar(#g.getText(), #lab.getText());}
+            |   g2:ID {grammar.importGrammar(#g2.getText(),null);}
+            )+
+        )
 	;
 
 tokensSpec
@@ -464,6 +474,7 @@ atom
     |   c:CHAR_LITERAL   {trackString(c);}
     |   s:STRING_LITERAL {trackString(s);}
     |   WILDCARD
+    |   #(DOT ID atom) // scope override on rule
     ;
 
 ast_suffix

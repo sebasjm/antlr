@@ -89,10 +89,12 @@ tokens {
     LABEL; // $x used in rewrite rules
     TEMPLATE;
     SCOPE="scope";
+    IMPORT="import";
     GATED_SEMPRED; // {p}? =>
     SYN_SEMPRED; // (...) =>   it's a manually-specified synpred converted to sempred
     BACKTRACK_SEMPRED; // auto backtracking mode syn pred converted to sempred
     FRAGMENT="fragment";
+    DOT;
 }
 
 {
@@ -117,6 +119,8 @@ tokens {
 	*/
 	protected List lexerRuleNames = new ArrayList();
 	public List getLexerRuleNames() { return lexerRuleNames; }
+
+	protected List<String> delegateNames = new ArrayList();
 
 	protected GrammarAST setToBlockWithSet(GrammarAST b) {
 		GrammarAST alt = #(#[ALT,"ALT"],#b,#[EOA,"<end-of-alt>"]);
@@ -179,7 +183,7 @@ tokens {
 		// during code gen we convert to function call with templates
 		String synpredinvoke = predName;
 		GrammarAST p = #[synpredTokenType,synpredinvoke];
-		p.setEnclosingRule(currentRuleName);
+		p.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
 		// track how many decisions have synpreds
 		grammar.blocksWithSynPreds.add(currentBlockAST);
 		return p;
@@ -225,10 +229,12 @@ tokens {
     public void cleanup(GrammarAST root) {
 		if ( gtype==LEXER_GRAMMAR ) {
 			String filter = (String)grammar.getOption("filter");
+            System.out.println("delegates: "+delegateNames);
 			GrammarAST tokensRuleAST =
 			    grammar.addArtificialMatchTokensRule(
 			    	root,
 			    	lexerRuleNames,
+                    delegateNames,
 			    	filter!=null&&filter.equals("true"));
 		}
     }
@@ -244,18 +250,19 @@ grammar![Grammar g]
    :    //hdr:headerSpec
         ( ACTION )?
 	    ( cmt:DOC_COMMENT  )?
-        gr:grammarType gid:id SEMI
+        gr:grammarType gid:id {grammar.setName(#gid.getText());} SEMI
 			( {optionsStartToken=LT(1);}
 			  opts=optionsSpec {grammar.setOptions(opts, optionsStartToken);}
 			  {opt=(GrammarAST)returnAST;}
 			)?
+            (ig:delegateGrammars)?
 		    (ts:tokensSpec!)?
         	scopes:attrScopes
 		    (a:actions)?
 	        r:rules
         EOF
         {
-        #grammar = #(null, #(#gr, #gid, #cmt, opt, #ts, #scopes, #a, #r));
+        #grammar = #(null, #(#gr, #gid, #cmt, opt, #ig, #ts, #scopes, #a, #r));
         cleanup(#grammar);
         }
 	;
@@ -342,15 +349,14 @@ optionValue returns [Object value=null]
 //  |   cs:charSet       {value = #cs;} // return set AST in this case
     ;
 
-/*
-optionValue
-	:	id
-	|   STRING_LITERAL
-	|	CHAR_LITERAL
-	|	INT
-//	|   cs:charSet       {value = #cs;} // return set AST in this case
-	;
-*/
+delegateGrammars
+    :   "import"^ delegateGrammar (COMMA! delegateGrammar)* SEMI!
+    ;
+
+delegateGrammar
+    :   lab:id ASSIGN^ id {delegateNames.add(#lab.getText());}
+    |   d:id              {delegateNames.add(#d.getText());}
+    ;
 
 tokensSpec
 	:	TOKENS^
@@ -436,7 +442,7 @@ Map opts = null;
 	eob.setLine(semi.getLine());
 	eob.setColumn(semi.getColumn());
     GrammarAST eor = #[EOR,"<end-of-rule>"];
-   	eor.setEnclosingRule(#ruleName.getText());
+   	eor.enclosingRule = grammar.getLocallyDefinedRule(#ruleName.getText());
 	eor.setLine(semi.getLine());
 	eor.setColumn(semi.getColumn());
 	GrammarAST root = #[RULE,"rule"];
@@ -598,18 +604,28 @@ elementNoOptionSpec
 	|   ACTION
 	|   p:SEMPRED ( IMPLIES! {#p.setType(GATED_SEMPRED);} )?
 		{
-		#p.setEnclosingRule(currentRuleName);
+		#p.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
 		grammar.blocksWithSemPreds.add(currentBlockAST);
 		}
 	|   t3:tree
 	;
 
-atom:   range (ROOT^|BANG^)?
-    |   terminal
+atom
+    :   range (ROOT^|BANG^)?
+    |   (   options {
+            // TOKEN_REF WILDCARD could match terminal here then WILDCARD next
+            generateAmbigWarnings=false;
+        }
+        :   // grammar.rule
+            id w:WILDCARD^ (terminal|ruleref) {#w.setType(DOT);}
+        |   terminal
+        |   ruleref
+        )
     |	notSet (ROOT^|BANG^)?
-    |   rr:RULE_REF^
-		( ARG_ACTION )?
-		(ROOT^|BANG^)?
+    ;
+
+ruleref
+    :   RULE_REF^ ( ARG_ACTION )? (ROOT^|BANG^)?
     ;
 
 notSet
@@ -681,13 +697,14 @@ terminal
 {
 GrammarAST ebnfRoot=null, subrule=null;
 }
-    :   cl:CHAR_LITERAL^ (ROOT^|BANG^)?
+    :   cl:CHAR_LITERAL^ ( HETERO_TYPE )? (ROOT^|BANG^)?
 
 	|   tr:TOKEN_REF^
+            ( HETERO_TYPE )?
 			( ARG_ACTION )? // Args are only valid for lexer rules
             (ROOT^|BANG^)?
 
-	|   sl:STRING_LITERAL (ROOT^|BANG^)?
+	|   sl:STRING_LITERAL^ ( HETERO_TYPE )? (ROOT^|BANG^)?
 
 	|   wi:WILDCARD (ROOT^|BANG^)?
 	;
@@ -735,12 +752,6 @@ id	:	TOKEN_REF {#id.setType(ID);}
 	|	RULE_REF  {#id.setType(ID);}
 	;
 
-/** Match anything that looks like an ID and return tree as token type ID */
-idToken
-    :	TOKEN_REF {#idToken.setType(ID);}
-	|	RULE_REF  {#idToken.setType(ID);}
-	;
-
 // R E W R I T E  S Y N T A X
 
 rewrite
@@ -752,8 +763,8 @@ rewrite
 		: rew:REWRITE pred:SEMPRED alt:rewrite_alternative
 	      {root.addChild( #(#rew, #pred, #alt) );}
 		  {
-          #pred.setEnclosingRule(currentRuleName);
-          #rew.setEnclosingRule(currentRuleName);
+          #pred.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
+          #rew.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
           }
 	    )*
 		rew2:REWRITE alt2:rewrite_alternative
@@ -813,16 +824,16 @@ rewrite_atom
 {
 GrammarAST subrule=null;
 }
-    :   cl:CHAR_LITERAL
-	|   tr:TOKEN_REF^ (ARG_ACTION)? // for imaginary nodes
+    :   tr:TOKEN_REF^ (HETERO_TYPE)? (ARG_ACTION)? // for imaginary nodes
     |   rr:RULE_REF
-	|   sl:STRING_LITERAL
+	|   cl:CHAR_LITERAL^ (HETERO_TYPE)?
+	|   sl:STRING_LITERAL^ (HETERO_TYPE)?
 	|!  d:DOLLAR i:id // reference to a label in a rewrite rule
 		{
 		#rewrite_atom = #[LABEL,i_AST.getText()];
 		#rewrite_atom.setLine(#d.getLine());
 		#rewrite_atom.setColumn(#d.getColumn());
-        #rewrite_atom.setEnclosingRule(currentRuleName);
+        #rewrite_atom.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
 		}
 	|	ACTION
 	;
@@ -1077,6 +1088,8 @@ XDIGIT :
 
 INT	:	('0'..'9')+
 	;
+
+HETERO_TYPE : '<'! ~'<' (~'>')* '>'! ;
 
 ARG_ACTION
    :

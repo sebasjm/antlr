@@ -134,7 +134,7 @@ public abstract class RewriteRuleElementStream {
 	 *  Return a duplicate node/subtree if stream is out of elements and
 	 *  size==1.  If we've already used the element, dup (dirty bit set).
 	 */
-	public Object next() {
+	public Object nextTree() {
 		int n = size();
 		if ( dirty || (cursor>=n && n==1) ) {
 			// if out of elements and size is 1, dup

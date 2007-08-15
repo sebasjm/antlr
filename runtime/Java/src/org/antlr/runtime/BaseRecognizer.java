@@ -23,57 +23,38 @@ public abstract class BaseRecognizer {
 
 	public static final String NEXT_TOKEN_RULE_NAME = "nextToken";
 
-	/** Track the set of token types that can follow any rule invocation.
-	 *  Stack grows upwards.  When it hits the max, it grows 2x in size
-	 *  and keeps going.
+	/** State of a lexer, parser, or tree parser are collected into a state
+	 *  object so the state can be shared.  This sharing is needed to
+	 *  have one grammar import others and share same error variables
+	 *  and other state variables.  It's a kind of explicit multiple
+	 *  inheritance via delegation of methods and shared state.
 	 */
-	protected BitSet[] following = new BitSet[INITIAL_FOLLOW_STACK_SIZE];
-	protected int _fsp = -1;
+	protected RecognizerSharedState state;
 
-	/** This is true when we see an error and before having successfully
-	 *  matched a token.  Prevents generation of more than one error message
-	 *  per error.
-	 */
-	protected boolean errorRecovery = false;
+	public BaseRecognizer() {
+		state = new RecognizerSharedState();
+	}
 
-	/** The index into the input stream where the last error occurred.
-	 * 	This is used to prevent infinite loops where an error is found
-	 *  but no token is consumed during recovery...another error is found,
-	 *  ad naseum.  This is a failsafe mechanism to guarantee that at least
-	 *  one token/tree node is consumed for two errors.
-	 */
-	protected int lastErrorIndex = -1;
-
-	/** In lieu of a return value, this indicates that a rule or token
-	 *  has failed to match.  Reset to false upon valid token match.
-	 */
-	protected boolean failed = false;
-
-	/** If 0, no backtracking is going on.  Safe to exec actions etc...
-	 *  If >0 then it's the level of backtracking.
-	 */
-	protected int backtracking = 0;
-
-	/** An array[size num rules] of Map<Integer,Integer> that tracks
-	 *  the stop token index for each rule.  ruleMemo[ruleIndex] is
-	 *  the memoization table for ruleIndex.  For key ruleStartIndex, you
-	 *  get back the stop token for associated rule or MEMO_RULE_FAILED.
-	 *
-	 *  This is only used if rule memoization is on (which it is by default).
-	 */
-	protected Map[] ruleMemo;
+	public BaseRecognizer(RecognizerSharedState state) {
+		if ( state!=null ) { // don't ever let us have a null state
+			this.state = state;
+		}
+		else {
+			this.state = new RecognizerSharedState();			
+		}
+	}
 
 	/** reset the parser's state; subclasses must rewinds the input stream */
 	public void reset() {
 		// wack everything related to error recovery
-		_fsp = -1;
-		errorRecovery = false;
-		lastErrorIndex = -1;
-		failed = false;
+		state._fsp = -1;
+		state.errorRecovery = false;
+		state.lastErrorIndex = -1;
+		state.failed = false;
 		// wack everything related to backtracking and memoization
-		backtracking = 0;
-		for (int i = 0; ruleMemo!=null && i < ruleMemo.length; i++) { // wipe cache
-			ruleMemo[i] = null;
+		state.backtracking = 0;
+		for (int i = 0; state.ruleMemo!=null && i < state.ruleMemo.length; i++) { // wipe cache
+			state.ruleMemo[i] = null;
 		}
 	}
 
@@ -88,12 +69,12 @@ public abstract class BaseRecognizer {
 	{
 		if ( input.LA(1)==ttype ) {
 			input.consume();
-			errorRecovery = false;
-			failed = false;
+			state.errorRecovery = false;
+			state.failed = false;
 			return;
 		}
-		if ( backtracking>0 ) {
-			failed = true;
+		if ( state.backtracking>0 ) {
+			state.failed = true;
 			return;
 		}
 		mismatch(input, ttype, follow);
@@ -101,8 +82,8 @@ public abstract class BaseRecognizer {
 	}
 
 	public void matchAny(IntStream input) {
-		errorRecovery = false;
-		failed = false;
+		state.errorRecovery = false;
+		state.failed = false;
 		input.consume();
 	}
 
@@ -135,11 +116,11 @@ public abstract class BaseRecognizer {
 	public void reportError(RecognitionException e) {
 		// if we've already reported an error and have not matched a token
 		// yet successfully, don't report any errors.
-		if ( errorRecovery ) {
+		if ( state.errorRecovery ) {
 			//System.err.print("[SPURIOUS] ");
 			return;
 		}
-		errorRecovery = true;
+		state.errorRecovery = true;
 
 		displayRecognitionError(this.getTokenNames(), e);
 	}
@@ -270,14 +251,14 @@ public abstract class BaseRecognizer {
 	 *  the match() routine could not recover from.
 	 */
 	public void recover(IntStream input, RecognitionException re) {
-		if ( lastErrorIndex==input.index() ) {
+		if ( state.lastErrorIndex==input.index() ) {
 			// uh oh, another error at same token index; must be a case
 			// where LT(1) is in the recovery token set so nothing is
 			// consumed; consume a single token so at least to prevent
 			// an infinite loop; this is a failsafe.
 			input.consume();
 		}
-		lastErrorIndex = input.index();
+		state.lastErrorIndex = input.index();
 		BitSet followSet = computeErrorRecoverySet();
 		beginResync();
 		consumeUntil(input, followSet);
@@ -445,10 +426,10 @@ public abstract class BaseRecognizer {
 	}
 
 	protected BitSet combineFollows(boolean exact) {
-		int top = _fsp;
+		int top = state._fsp;
 		BitSet followSet = new BitSet();
 		for (int i=top; i>=0; i--) {
-			BitSet localFollowSet = (BitSet) following[i];
+			BitSet localFollowSet = (BitSet)state.following[i];
 			/*
 			System.out.println("local follow depth "+i+"="+
 							   localFollowSet.toString(getTokenNames())+")");
@@ -497,7 +478,6 @@ public abstract class BaseRecognizer {
 										   BitSet follow)
 		throws RecognitionException
 	{
-		System.err.println("BR.recoverFromMismatchedToken");		
 		// if next token is what we are looking for then "delete" this token
 		if ( input.LA(2)==ttype ) {
 			reportError(e);
@@ -583,12 +563,12 @@ public abstract class BaseRecognizer {
 
 	/** Push a rule's follow set using our own hardcoded stack */
 	protected void pushFollow(BitSet fset) {
-		if ( (_fsp +1)>=following.length ) {
-			BitSet[] f = new BitSet[following.length*2];
-			System.arraycopy(following, 0, f, 0, following.length-1);
-			following = f;
+		if ( (state._fsp +1)>=state.following.length ) {
+			BitSet[] f = new BitSet[state.following.length*2];
+			System.arraycopy(state.following, 0, f, 0, state.following.length-1);
+			state.following = f;
 		}
-		following[++_fsp] = fset;
+		state.following[++state._fsp] = fset;
 	}
 
 	/** Return List<String> of the rules in your parser instance
@@ -634,7 +614,7 @@ public abstract class BaseRecognizer {
 	}
 
 	public int getBacktrackingLevel() {
-		return backtracking;
+		return state.backtracking;
 	}
 
 	/** Used to print out token names like ID during debugging and
@@ -694,11 +674,11 @@ public abstract class BaseRecognizer {
 	 *  tosses out data after we commit past input position i.
 	 */
 	public int getRuleMemoization(int ruleIndex, int ruleStartIndex) {
-		if ( ruleMemo[ruleIndex]==null ) {
-			ruleMemo[ruleIndex] = new HashMap();
+		if ( state.ruleMemo[ruleIndex]==null ) {
+			state.ruleMemo[ruleIndex] = new HashMap();
 		}
 		Integer stopIndexI =
-			(Integer)ruleMemo[ruleIndex].get(new Integer(ruleStartIndex));
+			(Integer)state.ruleMemo[ruleIndex].get(new Integer(ruleStartIndex));
 		if ( stopIndexI==null ) {
 			return MEMO_RULE_UNKNOWN;
 		}
@@ -721,10 +701,10 @@ public abstract class BaseRecognizer {
 		}
 		if ( stopIndex==MEMO_RULE_FAILED ) {
 			//System.out.println("rule "+ruleIndex+" will never succeed");
-			failed=true;
+			state.failed=true;
 		}
 		else {
-			//System.out.println("seen rule "+ruleIndex+" before; skipping ahead to @"+(stopIndex+1)+" failed="+failed);
+			//System.out.println("seen rule "+ruleIndex+" before; skipping ahead to @"+(stopIndex+1)+" failed="+state.failed);
 			input.seek(stopIndex+1); // jump to one past stop token
 		}
 		return true;
@@ -737,9 +717,9 @@ public abstract class BaseRecognizer {
 						int ruleIndex,
 						int ruleStartIndex)
 	{
-		int stopTokenIndex = failed?MEMO_RULE_FAILED:input.index()-1;
-		if ( ruleMemo[ruleIndex]!=null ) {
-			ruleMemo[ruleIndex].put(
+		int stopTokenIndex = state.failed?MEMO_RULE_FAILED:input.index()-1;
+		if ( state.ruleMemo[ruleIndex]!=null ) {
+			state.ruleMemo[ruleIndex].put(
 				new Integer(ruleStartIndex), new Integer(stopTokenIndex)
 			);
 		}
@@ -748,7 +728,7 @@ public abstract class BaseRecognizer {
 	/** Assume failure in case a rule bails out with an exception.
 	 *  Reset to rule stop index if successful.
 	public void memoizeFailure(int ruleIndex, int ruleStartIndex) {
-		ruleMemo[ruleIndex].put(
+		state.ruleMemo[ruleIndex].put(
 			new Integer(ruleStartIndex), MEMO_RULE_FAILED_I
 		);
 	}
@@ -761,7 +741,7 @@ public abstract class BaseRecognizer {
 							   int ruleIndex,
 							   int ruleStartIndex)
 	{
-		ruleMemo[ruleIndex].put(
+		state.ruleMemo[ruleIndex].put(
 			new Integer(ruleStartIndex), new Integer(input.index()-1)
 		);
 	}
@@ -772,8 +752,8 @@ public abstract class BaseRecognizer {
 	 */
 	public int getRuleMemoizationCacheSize() {
 		int n = 0;
-		for (int i = 0; ruleMemo!=null && i < ruleMemo.length; i++) {
-			Map ruleMap = ruleMemo[i];
+		for (int i = 0; state.ruleMemo!=null && i < state.ruleMemo.length; i++) {
+			Map ruleMap = state.ruleMemo[i];
 			if ( ruleMap!=null ) {
 				n += ruleMap.size(); // how many input indexes are recorded?
 			}
@@ -783,11 +763,11 @@ public abstract class BaseRecognizer {
 
 	public void traceIn(String ruleName, int ruleIndex, Object inputSymbol)  {
 		System.out.print("enter "+ruleName+" "+inputSymbol);
-		if ( failed ) {
-			System.out.println(" failed="+failed);
+		if ( state.failed ) {
+			System.out.println(" failed="+state.failed);
 		}
-		if ( backtracking>0 ) {
-			System.out.print(" backtracking="+backtracking);
+		if ( state.backtracking>0 ) {
+			System.out.print(" backtracking="+state.backtracking);
 		}
 		System.out.println();
 	}
@@ -797,11 +777,11 @@ public abstract class BaseRecognizer {
 						 Object inputSymbol)
 	{
 		System.out.print("exit "+ruleName+" "+inputSymbol);
-		if ( failed ) {
-			System.out.println(" failed="+failed);
+		if ( state.failed ) {
+			System.out.println(" failed="+state.failed);
 		}
-		if ( backtracking>0 ) {
-			System.out.print(" backtracking="+backtracking);
+		if ( state.backtracking>0 ) {
+			System.out.print(" backtracking="+state.backtracking);
 		}
 		System.out.println();
 	}

@@ -28,6 +28,7 @@
 package org.antlr.analysis;
 
 import org.antlr.tool.GrammarAST;
+import org.antlr.tool.Rule;
 
 /** A state within an NFA. At most 2 transitions emanate from any NFA state. */
 public class NFAState extends State {
@@ -71,7 +72,7 @@ public class NFAState extends State {
 	public int decisionStateType;
 
 	/** What rule do we live in? */
-	protected String enclosingRule;
+	public Rule enclosingRule;
 
 	/** During debugging and for nondeterminism warnings, it's useful
 	 *  to know what relationship this node has to the original grammar.
@@ -106,6 +107,9 @@ public class NFAState extends State {
 	}
 
 	public void addTransition(Transition e) {
+		if ( e==null ) {
+			throw new IllegalArgumentException("You can't add a null transition");			
+		}
 		if ( numTransitions>transition.length ) {
 			throw new IllegalArgumentException("You can only have "+transition.length+" transitions");
 		}
@@ -119,6 +123,9 @@ public class NFAState extends State {
 	 *  transition another state has.
 	 */
 	public void setTransition0(Transition e) {
+		if ( e==null ) {
+			throw new IllegalArgumentException("You can't use a solitary null transition");
+		}
 		transition[0] = e;
 		transition[1] = null;
 		numTransitions = 1;
@@ -222,14 +229,6 @@ public class NFAState extends State {
 
 	public void setDecisionNumber(int decisionNumber) {
 		this.decisionNumber = decisionNumber;
-	}
-
-	public void setEnclosingRuleName(String rule) {
-		this.enclosingRule = rule;
-	}
-
-	public String getEnclosingRule() {
-		return enclosingRule;
 	}
 
 	public boolean isEOTTargetState() {

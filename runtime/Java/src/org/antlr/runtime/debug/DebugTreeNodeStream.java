@@ -139,6 +139,10 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 		input.setUniqueNavigationNodes(uniqueNavigationNodes);
 	}
 
+	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
+		input.replaceChildren(parent, startChildIndex, stopChildIndex, t);
+	}
+
 	public String toString(Object start, Object stop) {
 		return input.toString(start,stop);
 	}

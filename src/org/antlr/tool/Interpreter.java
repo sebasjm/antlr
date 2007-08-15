@@ -217,7 +217,7 @@ public class Interpreter implements TokenSource {
 		throws RecognitionException
 	{
 		if ( actions!=null ) {
-			actions.enterRule(start.getEnclosingRule());
+			actions.enterRule(start.enclosingRule.name);
 		}
 		NFAState s = start;
 		int t = input.LA(1);
@@ -272,7 +272,7 @@ public class Interpreter implements TokenSource {
 			// CASE 2: finished matching a rule
 			if ( s.isAcceptState() ) { // end of rule node
 				if ( actions!=null ) {
-					actions.exitRule(s.getEnclosingRule());
+					actions.exitRule(s.enclosingRule.name);
 				}
 				if ( ruleInvocationStack.empty() ) {
 					// done parsing.  Hit the start state.
@@ -284,7 +284,7 @@ public class Interpreter implements TokenSource {
 				RuleClosureTransition invokingTransition =
 						(RuleClosureTransition)invokingState.transition(0);
 				// move to node after state that invoked this rule
-				s = invokingTransition.getFollowState();
+				s = invokingTransition.followState;
 				continue;
 			}
 
@@ -297,7 +297,7 @@ public class Interpreter implements TokenSource {
 					ruleInvocationStack.push(s);
 					s = (NFAState)trans.target;
 					if ( actions!=null ) {
-						actions.enterRule(s.getEnclosingRule());
+						actions.enterRule(s.enclosingRule.name);
 					}
 				}
 				// CASE 3b: plain old epsilon transition, just move
@@ -344,7 +344,7 @@ public class Interpreter implements TokenSource {
 				else if ( label.isSemanticPredicate() ) {
 					FailedPredicateException fpe =
 						new FailedPredicateException(input,
-													 s.getEnclosingRule(),
+													 s.enclosingRule.name,
 													 label.getSemanticContext().toString());
 					if ( actions!=null ) {
 						actions.recognitionException(fpe);
@@ -359,7 +359,7 @@ public class Interpreter implements TokenSource {
 		}
 		//System.out.println("hit stop state for "+stop.getEnclosingRule());
 		if ( actions!=null ) {
-			actions.exitRule(stop.getEnclosingRule());
+			actions.exitRule(stop.enclosingRule.name);
 		}
 	}
 

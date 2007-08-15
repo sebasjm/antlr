@@ -168,6 +168,9 @@ public class ErrorManager {
 	public static final int MSG_MISSING_AST_TYPE_IN_TREE_GRAMMAR = 152;
 	public static final int MSG_REWRITE_FOR_MULTI_ELEMENT_ALT = 153;
 	public static final int MSG_RULE_INVALID_SET = 154;
+	public static final int MSG_HETERO_ILLEGAL_IN_REWRITE_ALT = 155;
+	public static final int MSG_NO_SUCH_GRAMMAR_SCOPE = 156;
+	public static final int MSG_NO_SUCH_RULE_IN_SCOPE = 157;
 
 
 	// GRAMMAR WARNINGS
@@ -187,7 +190,7 @@ public class ErrorManager {
 
 	public static final int MAX_MESSAGE_NUMBER = 211;
 
-	/** Do not do perform analysis and code gen if one of these happens */
+	/** Do not do perform analysis if one of these happens */
 	public static final BitSet ERRORS_FORCING_NO_ANALYSIS = new BitSet() {
 		{
 			add(MSG_RULE_REDEFINITION);
@@ -195,11 +198,13 @@ public class ErrorManager {
 			add(MSG_LEFT_RECURSION_CYCLES);
 			add(MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION);
 			add(MSG_NO_RULES);
+			add(MSG_NO_SUCH_GRAMMAR_SCOPE);
+			add(MSG_NO_SUCH_RULE_IN_SCOPE);
 			// TODO: ...
 		}
 	};
 
-	/** Do not do perform analysis and code gen if one of these happens */
+	/** Do not do code gen if one of these happens */
 	public static final BitSet ERRORS_FORCING_NO_CODEGEN = new BitSet() {
 		{
 			add(MSG_NONREGULAR_DECISION);

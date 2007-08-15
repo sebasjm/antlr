@@ -14,7 +14,7 @@ import java.util.HashMap;
  *  rules have predefined prefs referenced.  I need this so I can
  *  remove unusued labels.
  */
-public class ActionAnalysisLexer extends Lexer {
+public class ActionAnalysisLexer extends Lexer2 {
     public static final int X_Y=5;
     public static final int EOF=-1;
     public static final int Tokens=8;
@@ -31,7 +31,7 @@ public class ActionAnalysisLexer extends Lexer {
     	{
     		this(new ANTLRStringStream(actionAST.token.getText()));
     		this.grammar = grammar;
-    	    this.enclosingRule = grammar.getRule(ruleName);
+    	    this.enclosingRule = grammar.getLocallyDefinedRule(ruleName);
     	    this.actionToken = actionAST.token;
     	    this.outerAltNum = actionAST.outerAltNum;
     	}

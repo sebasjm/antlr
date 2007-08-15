@@ -54,7 +54,7 @@ public class RandomPhrase {
 				RuleClosureTransition invokingTransition =
 					(RuleClosureTransition)invokingState.transition(0);
 				// move to node after state that invoked this rule
-				state = invokingTransition.getFollowState();
+				state = invokingTransition.followState;
 				continue;
 			}
 			if ( state.getNumberOfTransitions()==1 ) {
@@ -63,7 +63,6 @@ public class RandomPhrase {
 				if ( t0 instanceof RuleClosureTransition ) {
 					ruleInvocationStack.push(state);
 					// System.out.println("push state "+state);
-					int ruleIndex = ((RuleClosureTransition)t0).getRuleIndex();
 					//System.out.println("invoke "+g.getRuleName(ruleIndex));
 				}
 				else if ( !t0.label.isEpsilon() ) {

@@ -47,10 +47,7 @@ public class NFAFactory {
      */
 	NFA nfa = null;
 
-	String currentRuleName = null;
-
-    /** Used to assign state numbers */
-    protected int stateCounter = 0;
+	Rule currentRule = null;
 
 	public NFAFactory(NFA nfa) {
         nfa.setFactory(this);
@@ -59,16 +56,11 @@ public class NFAFactory {
 
     public NFAState newState() {
         NFAState n = new NFAState(nfa);
-        int state = stateCounter;
+        int state = nfa.getNewNFAStateNumber();
         n.stateNumber = state;
-        stateCounter++;
         nfa.addState(n);
-		n.setEnclosingRuleName(currentRuleName);
-        return n;
-    }
-
-    public int getNumberOfStates() {
-        return stateCounter;
+		n.enclosingRule = currentRule;
+		return n;
     }
 
 	/** Optimize an alternative (list of grammar elements).
@@ -89,7 +81,7 @@ public class NFAFactory {
 			}
 			Transition t = s.transition(0);
 			if ( t instanceof RuleClosureTransition ) {
-				s = ((RuleClosureTransition)t).getFollowState();
+				s = ((RuleClosureTransition) t).followState;
 				continue;
 			}
 			if ( t.label.isEpsilon() && s.getNumberOfTransitions()==1 ) {
@@ -219,16 +211,15 @@ public class NFAFactory {
      *
      *  TODO add to codegen: collapse alt blks that are sets into single matchSet
      */
-    public StateCluster build_RuleRef(int ruleIndex, NFAState ruleStart) {
-        /*
-        System.out.println("building ref to rule "+ruleIndex+": "+
-                nfa.getGrammar().getRuleName(ruleIndex));
-        */
+    public StateCluster build_RuleRef(Rule refDef, NFAState ruleStart) {
+        /*System.out.println("building ref to rule "+ruleIndex+": "+
+                nfa.grammar.getRuleName(ruleIndex));
+                */
         NFAState left = newState();
         // left.setDescription("ref to "+ruleStart.getDescription());
         NFAState right = newState();
         // right.setDescription("NFAState following ref to "+ruleStart.getDescription());
-        Transition e = new RuleClosureTransition(ruleIndex,ruleStart,right);
+        Transition e = new RuleClosureTransition(refDef,ruleStart,right);
         left.addTransition(e);
         StateCluster g = new StateCluster(left, right);
         return g;
@@ -275,7 +266,7 @@ public class NFAFactory {
         for (Iterator iterator = rules.iterator(); iterator.hasNext();) {
 			Rule r = (Rule) iterator.next();
 			String ruleName = r.name;
-			NFAState endNFAState = nfa.grammar.getRuleStopState(ruleName);
+			NFAState endNFAState = r.stopState;
             // Is this rule a start symbol?  (no follow links)
             if ( endNFAState.transition(0)==null ) {
                 // if so, then don't let algorithm fall off the end of

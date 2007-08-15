@@ -37,7 +37,7 @@ import java.util.*;
 
 /** The main ANTLR entry point.  Read a grammar and generate a parser. */
 public class Tool {
-	public static final String VERSION = "3.0.1";
+	public static final String VERSION = "3.1b1";
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
 
@@ -65,7 +65,7 @@ public class Tool {
 
     public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator  Version " +
-						  VERSION + " (August 13, 2007)  1989-2007");
+						  VERSION + " (??)  1989-2007");
 		Tool antlr = new Tool(args);
 		antlr.process();
 		System.exit(0);
@@ -306,7 +306,8 @@ public class Tool {
 						new File(getFileDirectory(lexerGrammarFileName),lexerGrammarFileName);
 					lexerGrammar.setFileName(lexerGrammarFullFile.toString());
 					lexerGrammar.importTokenVocabulary(grammar);
-					lexerGrammar.setGrammarContent(sr);
+					lexerGrammar.parseAndBuildAST(sr);
+					lexerGrammar.analyzeGrammar();
 					sr.close();
 					processGrammar(lexerGrammar);
 				}
@@ -328,8 +329,14 @@ public class Tool {
 		FileReader fr = null;
 		fr = new FileReader(grammarFileName);
 		BufferedReader br = new BufferedReader(fr);
-		Grammar grammar = new Grammar(this,grammarFileName,br);
+		// grammars mentioned on command line are either roots or single grammars.
+		// create the necessary composite in case its got delegates; even
+		// single grammar needs it to get token types.
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar grammar = new Grammar(this,grammarFileName,br,composite);
+		composite.setDelegationRoot(grammar);
 		grammar.setWatchNFAConversion(internalOption_watchNFAConversion);
+		grammar.analyzeGrammar();
 		br.close();
 		fr.close();
 		return grammar;
@@ -345,6 +352,13 @@ public class Tool {
 			generator.setProfile(profile);
 			generator.setTrace(trace);
 			generator.genRecognizer();
+			List<Grammar> delegates = grammar.getDelegates();
+			for (int i = 0; i < delegates.size(); i++) {
+				Grammar delegate = (Grammar)delegates.get(i);
+				if ( delegate!=grammar ) { // already processing this one
+					processGrammar(delegate);
+				}
+			}
 		}
 	}
 
@@ -356,7 +370,7 @@ public class Tool {
 			}
 			DOTGenerator dotGenerator = new DOTGenerator(g);
 			String dot = dotGenerator.getDOT( dfa.startState );
-			String dotFileName = g.name+"_dec-"+d;
+			String dotFileName = "dec-"+d;
 			try {
 				writeDOTFile(g, dotFileName, dot);
 			}
@@ -370,20 +384,21 @@ public class Tool {
 
 	protected void generateNFAs(Grammar g) {
 		DOTGenerator dotGenerator = new DOTGenerator(g);
-		Collection rules = g.getRules();
+		Collection rules = g.getAllImportedRules();
+		rules.addAll(g.getRules());
 		for (Iterator itr = rules.iterator(); itr.hasNext();) {
 			Rule r = (Rule) itr.next();
-			String ruleName = r.name;
 			try {
-				writeDOTFile(
-					g,
-					ruleName,
-					dotGenerator.getDOT(g.getRuleStartState(ruleName)));
+				writeDOTFile(g,	r, dotGenerator.getDOT(r.startState));
 			}
 			catch (IOException ioe) {
 				ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE, ioe);
 			}
 		}
+	}
+
+	protected void writeDOTFile(Grammar g, Rule r, String dot) throws IOException {
+		writeDOTFile(g, r.grammar.name+"."+r.name, dot);
 	}
 
 	protected void writeDOTFile(Grammar g, String name, String dot) throws IOException {

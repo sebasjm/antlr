@@ -95,7 +95,7 @@ public class DFA {
 	 */
 	protected Vector states = new Vector();
 
-	/** Unique state numbers */
+	/** Unique state numbers per DFA */
 	protected int stateCounter = 0;
 
 	/** count only new states not states that were rejected as already present */
@@ -126,7 +126,7 @@ public class DFA {
      *  and then in method doesStateReachAcceptState() I remove the alts I
      *  know to be uniquely predicted.
      */
-    protected List unreachableAlts;
+    protected List<Integer> unreachableAlts;
 
 	protected int nAlts = 0;
 
@@ -884,7 +884,7 @@ public class DFA {
      *  be computed or for which no single DFA accept state predicts those
      *  alts.  Must call verify() first before this makes sense.
      */
-    public List getUnreachableAlts() {
+    public List<Integer> getUnreachableAlts() {
         return unreachableAlts;
     }
 

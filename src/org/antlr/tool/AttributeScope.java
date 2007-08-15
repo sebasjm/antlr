@@ -78,7 +78,7 @@ public class AttributeScope {
 	
 	/** The list of Attribute objects */
 
-	protected LinkedHashMap attributes = new LinkedHashMap();
+	protected LinkedHashMap<String,Attribute> attributes = new LinkedHashMap();
 
 	public AttributeScope(String name, Token derivedFromToken) {
 		this(null,name,derivedFromToken);

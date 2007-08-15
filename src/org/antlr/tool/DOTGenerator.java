@@ -207,12 +207,17 @@ public class DOTGenerator {
                 RuleClosureTransition rr = ((RuleClosureTransition)edge);
                 // don't jump to other rules, but display edge to follow node
                 edgeST = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");
-                edgeST.setAttribute("label", "<"+grammar.getRuleName(rr.getRuleIndex())+">");
-                edgeST.setAttribute("src", getStateLabel(s));
-                edgeST.setAttribute("target", getStateLabel(rr.getFollowState()));
+				if ( rr.rule.grammar != grammar ) {
+					edgeST.setAttribute("label", "<"+rr.rule.grammar.name+"."+rr.rule.name+">");
+				}
+				else {
+					edgeST.setAttribute("label", "<"+rr.rule.name+">");
+				}
+				edgeST.setAttribute("src", getStateLabel(s));
+				edgeST.setAttribute("target", getStateLabel(rr.followState));
 				edgeST.setAttribute("arrowhead", arrowhead);
                 dot.setAttribute("edges", edgeST);
-                walkRuleNFACreatingDOT(dot, rr.getFollowState());
+				walkRuleNFACreatingDOT(dot, rr.followState);
                 continue;
             }
 			if ( edge.isEpsilon() ) {

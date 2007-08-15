@@ -685,7 +685,7 @@ public class NFAToDFAConverter {
 			// pushed on the stack).
 			// Reset the context to reflect the fact we invoked rule
 			NFAContext newContext = new NFAContext(context, p);
-			// System.out.print("invoking rule "+nfa.getGrammar().getRuleName(ref.getRuleIndex()));
+			//System.out.println("invoking rule "+ref.rule.name);
 			// System.out.println(" context="+context);
 			// traverse epsilon edge to new rule
 			NFAState ruleTarget = (NFAState)ref.target;
@@ -696,7 +696,7 @@ public class NFAToDFAConverter {
 			NFAState whichStateInvokedRule = context.invokingState;
 			RuleClosureTransition edgeToRule =
 				(RuleClosureTransition)whichStateInvokedRule.transition(0);
-			NFAState continueState = edgeToRule.getFollowState();
+			NFAState continueState = edgeToRule.followState;
 			NFAContext newContext = context.parent; // "pop" invoking state
 			closure(continueState, alt, newContext, semanticContext, d, collectPredicates);
 		}
@@ -860,6 +860,7 @@ public class NFAToDFAConverter {
 	 *  accept states if the rule was invoked by somebody.
 	 */
 	public DFAState reach(DFAState d, Label label) {
+		//System.out.println("reach "+label.toString(dfa.nfa.grammar));
 		DFAState labelDFATarget = dfa.newState();
 		// for each NFA state in d, add in target states for label
 		int intLabel = label.getAtom();

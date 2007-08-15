@@ -31,10 +31,16 @@ package org.antlr.runtime;
  *  of this.
  */
 public class Parser extends BaseRecognizer {
-    protected TokenStream input;
+	public TokenStream input;
 
 	public Parser(TokenStream input) {
-        setTokenStream(input);
+		super(); // highlight that we go to super to set state object
+		setTokenStream(input);
+    }
+
+	public Parser(TokenStream input, RecognizerSharedState state) {
+		super(state); // share the state object with another parser
+		setTokenStream(input);
     }
 
 	public void reset() {

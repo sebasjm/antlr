@@ -226,7 +226,7 @@ public class DecisionProbe {
 	 *  is the overall list of unreachable alternatives (either due to
 	 *  conflict resolution or alts w/o accept states).
 	 */
-	public List getUnreachableAlts() {
+	public List<Integer> getUnreachableAlts() {
 		return dfa.getUnreachableAlts();
 	}
 
@@ -453,7 +453,7 @@ public class DecisionProbe {
 		}
 
 		if ( !nonLLStarDecision ) {
-			List unreachableAlts = dfa.getUnreachableAlts();
+			List<Integer> unreachableAlts = dfa.getUnreachableAlts();
 			if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
 				ErrorManager.unreachableAlts(this,unreachableAlts);
 			}
@@ -580,7 +580,7 @@ public class DecisionProbe {
 				NFAState ruleInvocationState = dfa.nfa.getState(c.state);
 				Transition transition0 = ruleInvocationState.transition(0);
 				RuleClosureTransition ref = (RuleClosureTransition)transition0;
-				String targetRule = ((NFAState)ref.target).getEnclosingRule();
+				String targetRule = ((NFAState) ref.target).enclosingRule.name;
 				Integer altI = Utils.integer(c.alt);
 				Map targetToCallSiteMap =
 					(Map)altToTargetToCallSitesMap.get(altI);
@@ -936,6 +936,6 @@ public class DecisionProbe {
 			(RuleClosureTransition)decisionLeft.transition(0);
 		NFAState ruleStartState = (NFAState)ruleCallEdge.target;
 		//System.out.println("alt = "+decisionLeft.getEnclosingRule());
-		return ruleStartState.getEnclosingRule();
+		return ruleStartState.enclosingRule.name;
 	}
 }

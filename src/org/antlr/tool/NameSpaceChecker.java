@@ -43,11 +43,10 @@ public class NameSpaceChecker {
 
 	public void checkConflicts() {
 		for (int i = 0; i < grammar.ruleIndexToRuleList.size(); i++) {
-			String ruleName = (String) grammar.ruleIndexToRuleList.elementAt(i);
-			if ( ruleName==null ) {
+			Rule r = grammar.ruleIndexToRuleList.elementAt(i);
+			if ( r==null ) {
 				continue;
 			}
-			Rule r = grammar.getRule(ruleName);
 			// walk all labels for Rule r
 			if ( r.labelNameSpace!=null ) {
 				Iterator it = r.labelNameSpace.values().iterator();
@@ -116,6 +115,8 @@ public class NameSpaceChecker {
 	}
 
 	/** If ref to undefined rule, give error at first occurrence.
+	 * 
+	 *  Give error if you cannot find the scope override on a rule reference.
 	 *
 	 *  If you ref ID in a combined grammar and don't define ID as a lexer rule
 	 *  it is an error.
@@ -125,9 +126,13 @@ public class NameSpaceChecker {
 		for (Iterator iter = grammar.ruleRefs.iterator(); iter.hasNext();) {
 			Token tok = (Token) iter.next();
 			String ruleName = tok.getText();
-			if ( grammar.getRule(ruleName)==null &&
-			     grammar.getTokenType(ruleName)!=Label.EOF )
-			{
+			Rule localRule = grammar.getLocallyDefinedRule(ruleName);
+			Rule rule = grammar.getRule(ruleName);
+			if ( localRule==null && rule!=null ) { // imported rule?
+				grammar.delegatedRuleReferences.add(rule);
+				rule.imported = true;
+			}
+			if ( rule==null && grammar.getTokenType(ruleName)!=Label.EOF ) {
 				ErrorManager.grammarError(ErrorManager.MSG_UNDEFINED_RULE_REF,
 										  grammar,
 										  tok,
@@ -145,6 +150,30 @@ public class NameSpaceChecker {
 												grammar,
 												tok,
 												tokenID);
+				}
+			}
+		}
+		// check scopes and scoped rule refs
+		for (Iterator it = grammar.scopedRuleRefs.iterator(); it.hasNext();) {
+			GrammarAST scopeAST = (GrammarAST)it.next(); // ^(DOT ID atom)
+			Grammar scopeG = grammar.composite.getGrammar(scopeAST.getText());
+			GrammarAST refAST = scopeAST.getChild(1);
+			String ruleName = refAST.getText();
+			if ( scopeG==null ) {
+				ErrorManager.grammarError(ErrorManager.MSG_NO_SUCH_GRAMMAR_SCOPE,
+										  grammar,
+										  scopeAST.getToken(),
+										  scopeAST.getText(),
+										  ruleName);
+			}
+			else {
+				Rule rule = grammar.getRule(scopeG.name, ruleName);
+				if ( rule==null ) {
+					ErrorManager.grammarError(ErrorManager.MSG_NO_SUCH_RULE_IN_SCOPE,
+											  grammar,
+											  scopeAST.getToken(),
+											  scopeAST.getText(),
+											  ruleName);
 				}
 			}
 		}

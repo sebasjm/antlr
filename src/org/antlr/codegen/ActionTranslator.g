@@ -54,7 +54,7 @@ antlr.Token actionToken;
 		this(new ANTLRStringStream(actionAST.token.getText()));
 		this.generator = generator;
 		this.grammar = generator.grammar;
-	    this.enclosingRule = grammar.getRule(ruleName);
+	    this.enclosingRule = grammar.getLocallyDefinedRule(ruleName);
 	    this.actionToken = actionAST.token;
 	    this.outerAltNum = actionAST.outerAltNum;
 	}

@@ -27,10 +27,7 @@
 */
 package org.antlr.tool;
 
-import antlr.RecognitionException;
-import antlr.Token;
-import antlr.TokenStreamRewriteEngine;
-import antlr.TokenWithIndex;
+import antlr.*;
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
@@ -217,38 +214,29 @@ public class Grammar {
      */
     protected NFA nfa;
 
-    /** Token names and literal tokens like "void" are uniquely indexed.
-     *  with -1 implying EOF.  Characters are different; they go from
-     *  -1 (EOF) to \uFFFE.  For example, 0 could be a binary byte you
-     *  want to lexer.  Labels of DFA/NFA transitions can be both tokens
-     *  and characters.  I use negative numbers for bookkeeping labels
-     *  like EPSILON. Char/String literals and token types overlap in the same
-	 *  space, however.
-     */
-    protected int maxTokenType = Label.MIN_TOKEN_TYPE-1;
+	/** If this grammar is part of a larger composite grammar via delegate
+	 *  statement, then this points at the composite.  The composite holds
+	 *  a global list of rules, token types, decision numbers, etc...
+	 */
+	public CompositeGrammar composite;
+
+	/** If this is a delegate of another grammar, this is the label used
+	 *  as an instance var by that grammar to point at this grammar. null
+	 *  if no label was specified in the delegate statement.
+	 */
+	public String label;
+
+	/** The list of all rules referenced in this grammar, not defined here,
+	 *  and defined in a delegate grammar.  Not all of these will be generated
+	 *  in the recognizer for this file; only those that are affected by rule
+	 *  definitions in this grammar.  I am not sure the Java target will need
+	 *  this but I'm leaving in case other targets need it.
+	 *  @see NameSpaceChecker.lookForReferencesToUndefinedSymbols
+	 */
+	protected Set<Rule> delegatedRuleReferences = new HashSet();
 
 	/** TODO: hook this to the charVocabulary option */
 	protected IntSet charVocabulary = null;
-
-    /** Map token like ID (but not literals like "while") to its token type */
-    protected Map tokenIDToTypeMap = new HashMap();
-
-    /** Map token literals like "while" to its token type.  It may be that
-     *  WHILE="while"=35, in which case both tokenNameToTypeMap and this
-     *  field will have entries both mapped to 35.
-     */
-    protected Map stringLiteralToTypeMap = new HashMap();
-
-    /** Map a token type to its token name.
-	 *  Must subtract MIN_TOKEN_TYPE from index.
-	 */
-    protected Vector typeToTokenList = new Vector();
-
-	/** For interpreting and testing, you sometimes want to import token
-	 *  definitions from another grammar (instead of reading token defs from
-	 *  a file).
-	 */
-	protected Grammar importTokenVocabularyFromGrammar;
 
 	/** For ANTLRWorks, we want to be able to map a line:col to a specific
 	 *  decision DFA so it can display DFA.
@@ -261,6 +249,8 @@ public class Grammar {
 	 *  objects so two refs to same rule can exist but at different line/position.
 	 */
 	protected Set<antlr.Token> ruleRefs = new HashSet<antlr.Token>();
+
+	protected Set<GrammarAST> scopedRuleRefs = new HashSet();
 
 	/** The unique set of all token ID references in any rule */
 	protected Set<antlr.Token> tokenIDRefs = new HashSet<antlr.Token>();
@@ -275,8 +265,8 @@ public class Grammar {
      */
     protected int decisionNumber = 0;
 
-    /** Rules are uniquely labeled from 1..n */
-    protected int ruleIndex = 1;
+	/** Rules are uniquely labeled from 1..n */
+	protected int ruleIndex = 1;	
 
 	/** A list of all rules that are in any left-recursive cycle.  There
 	 *  could be multiple cycles, but this is a flat list of all problematic
@@ -299,7 +289,7 @@ public class Grammar {
 
 	/** Map a rule to it's Rule object
 	 */
-	protected LinkedHashMap nameToRuleMap = new LinkedHashMap();
+	protected LinkedHashMap<String,Rule> nameToRuleMap = new LinkedHashMap();
 
 	/** Track the scopes defined outside of rules and the scopes associated
 	 *  with all rules (even if empty).
@@ -311,7 +301,7 @@ public class Grammar {
 	 *  I need a specific guaranteed index, which the Collections stuff
 	 *  won't let me have.
 	 */
-	protected Vector ruleIndexToRuleList = new Vector();
+	protected Vector<Rule> ruleIndexToRuleList = new Vector();
 
     /** An AST that records entire input grammar with all rules.  A simple
      *  grammar with one rule, "grammar t; a : A | B ;", looks like:
@@ -335,11 +325,6 @@ public class Grammar {
 
 	/** Used during LOOK to detect computation cycles */
 	protected Set lookBusy = new HashSet();
-
-	/** The checkForLeftRecursion method needs to track what rules it has
-	 *  visited to track infinite recursion.
-	 */
-	protected Set visitedDuringRecursionCheck = null;
 
 	protected boolean watchNFAConversion = false;
 
@@ -407,8 +392,8 @@ public class Grammar {
 	 */
 	public Set<GrammarAST> blocksWithSemPreds = new HashSet();
 
-	/** Track decisions that actually use the syn preds in the DFA. Set<DFA> */
-	public Set decisionsWhoseDFAsUsesSemPreds = new HashSet();
+	/** Track decisions that actually use the syn preds in the DFA. */
+	public Set<DFA> decisionsWhoseDFAsUsesSemPreds = new HashSet();
 
 	protected boolean allDecisionDFACreated = false;
 
@@ -423,37 +408,49 @@ public class Grammar {
 	GrammarSanity sanity = new GrammarSanity(this);
 
 	public Grammar() {
-		initTokenSymbolTables();
 		builtFromString = true;
+		composite = new CompositeGrammar(this);
 	}
 
 	public Grammar(String grammarString)
 			throws antlr.RecognitionException, antlr.TokenStreamException
 	{
-		builtFromString = true;
-		initTokenSymbolTables();
+		this();
 		setFileName("<string>");
-		setGrammarContent(new StringReader(grammarString));
+		StringReader r = new StringReader(grammarString);
+		parseAndBuildAST(r);
+		analyzeGrammar();
 	}
 
+	/*
 	public Grammar(String fileName, String grammarString)
 			throws antlr.RecognitionException, antlr.TokenStreamException
 	{
 		this(null, fileName, new StringReader(grammarString));
 	}
+	*/
 
-    /** Create a grammar from a Reader.  Parse the grammar, building a tree
+	/** Create a grammar from a Reader.  Parse the grammar, building a tree
      *  and loading a symbol table of sorts here in Grammar.  Then create
      *  an NFA and associated factory.  Walk the AST representing the grammar,
-     *  building the state clusters of the NFA.
+     *  building the state clusters of the NFA.  Reader r is not closed.
+	 *
+	 *  If this grammar is being constructed as delegate, pass in composite
+	 *  grammar overseer.
      */
-    public Grammar(Tool tool, String fileName, Reader r)
+    public Grammar(Tool tool, String fileName, Reader r, CompositeGrammar composite)
             throws antlr.RecognitionException, antlr.TokenStreamException
     {
-		initTokenSymbolTables();
+		this.composite = composite;
 		setTool(tool);
 		setFileName(fileName);
-		setGrammarContent(r);
+		parseAndBuildAST(r);
+	}
+
+	public Grammar(Tool tool, String fileName, Reader r)
+			throws antlr.RecognitionException, antlr.TokenStreamException
+	{
+		this(tool, fileName, r, null);
 	}
 
 	public void setFileName(String fileName) {
@@ -494,10 +491,12 @@ public class Grammar {
 	public void setGrammarContent(String grammarString)
 		throws antlr.RecognitionException, antlr.TokenStreamException
 	{
-		setGrammarContent(new StringReader(grammarString));
+		StringReader r = new StringReader(grammarString);
+		parseAndBuildAST(r);
+		analyzeGrammar();
 	}
 
-	public void setGrammarContent(Reader r)
+	public void parseAndBuildAST(Reader r)
 		throws antlr.RecognitionException, antlr.TokenStreamException
 	{
 		ErrorManager.resetErrorState(); // reset in case > 1 grammar in same thread
@@ -525,7 +524,6 @@ public class Grammar {
 			ErrorManager.error(ErrorManager.MSG_NO_RULES, getFileName());
 			return;
 		}
-
 		// Get syn pred rules and add to existing tree
 		List synpredRules =
 			getArtificialRulesForSyntacticPredicates(parser,
@@ -534,7 +532,9 @@ public class Grammar {
 			GrammarAST rAST = (GrammarAST) synpredRules.get(i);
 			grammarTree.addChild(rAST);
 		}
+	}
 
+	public void analyzeGrammar() {
 		if ( Tool.internalOption_PrintGrammarTree ) {
 			System.out.println(grammarTree.toStringList());
 		}
@@ -626,12 +626,13 @@ public class Grammar {
 	 *
 	 *  The ANTLRParser antlr.g file now invokes this when parsing a lexer
 	 *  grammar, which I think is proper even though it peeks at the info
-	 *  that later phases will compute.  It gets a list of lexer rules
+	 *  that later phases will (re)compute.  It gets a list of lexer rules
 	 *  and builds a string representing the rule; then it creates a parser
 	 *  and adds the resulting tree to the grammar's tree.
      */
     public GrammarAST addArtificialMatchTokensRule(GrammarAST grammarAST,
 												   List ruleNames,
+												   List<String> delegateNames,
 												   boolean filterMode) {
 		StringTemplate matchTokenRuleST = null;
 		if ( filterMode ) {
@@ -651,7 +652,11 @@ public class Grammar {
 			String rname = (String) ruleNames.get(i);
 			matchTokenRuleST.setAttribute("rules", rname);
 		}
-		//System.out.println("tokens rule: "+matchTokenRuleST.toString());
+		for (int i = 0; i < delegateNames.size(); i++) {
+			String dname = (String) delegateNames.get(i);
+			matchTokenRuleST.setAttribute("rules", dname+".Tokens");			
+		}
+		System.out.println("tokens rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
@@ -707,31 +712,6 @@ public class Grammar {
 		}
 		return rules;
 	}
-
-	protected void initTokenSymbolTables() {
-        // the faux token types take first NUM_FAUX_LABELS positions
-		// then we must have room for the predefined runtime token types
-		// like DOWN/UP used for tree parsing.
-        typeToTokenList.setSize(Label.NUM_FAUX_LABELS+Label.MIN_TOKEN_TYPE-1);
-        typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.INVALID, "<INVALID>");
-        typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOT, "<EOT>");
-        typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SEMPRED, "<SEMPRED>");
-        typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.SET, "<SET>");
-        typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EPSILON, Label.EPSILON_STR);
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOF, "EOF");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.EOR_TOKEN_TYPE-1, "<EOR>");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.DOWN-1, "DOWN");
-		typeToTokenList.set(Label.NUM_FAUX_LABELS+Label.UP-1, "UP");
-        tokenIDToTypeMap.put("<INVALID>", Utils.integer(Label.INVALID));
-        tokenIDToTypeMap.put("<EOT>", Utils.integer(Label.EOT));
-        tokenIDToTypeMap.put("<SEMPRED>", Utils.integer(Label.SEMPRED));
-        tokenIDToTypeMap.put("<SET>", Utils.integer(Label.SET));
-        tokenIDToTypeMap.put("<EPSILON>", Utils.integer(Label.EPSILON));
-		tokenIDToTypeMap.put("EOF", Utils.integer(Label.EOF));
-		tokenIDToTypeMap.put("<EOR>", Utils.integer(Label.EOR_TOKEN_TYPE));
-		tokenIDToTypeMap.put("DOWN", Utils.integer(Label.DOWN));
-		tokenIDToTypeMap.put("UP", Utils.integer(Label.UP));
-    }
 
     /** Walk the list of options, altering this Grammar object according
      *  to any I recognize.
@@ -831,8 +811,8 @@ public class Grammar {
 
 	public void createLookaheadDFA(int decision) {
 		Decision d = getDecision(decision);
-		String enclosingRule = d.startState.getEnclosingRule();
-		Rule r = getRule(enclosingRule);
+		String enclosingRule = d.startState.enclosingRule.name;
+		Rule r = d.startState.enclosingRule;
 
 		//System.out.println("createLookaheadDFA(): "+enclosingRule+" dec "+decision+"; synprednames prev used "+synPredNamesUsedInDFA);
 		if ( r.isSynPred && !synPredNamesUsedInDFA.contains(enclosingRule) ) {
@@ -894,16 +874,16 @@ public class Grammar {
 
 	/** Return a new unique integer in the token type space */
 	public int getNewTokenType() {
-		maxTokenType++;
-		return maxTokenType;
+		composite.maxTokenType++;
+		return composite.maxTokenType;
 	}
 
 	/** Define a token at a particular token type value.  Blast an
-	 *  old value with a new one.  This is called directly during import vocab
-     *  operation to set up tokens with specific values.
+	 *  old value with a new one.  This is called normal grammar processsing
+	 *  and during import vocab operations to set tokens with specific values.
      */
     public void defineToken(String text, int tokenType) {
-		if ( tokenIDToTypeMap.get(text)!=null ) {
+		if ( composite.tokenIDToTypeMap.get(text)!=null ) {
 			// already defined?  Must be predefined one like EOF;
 			// do nothing
 			return;
@@ -911,21 +891,21 @@ public class Grammar {
 		// the index in the typeToTokenList table is actually shifted to
 		// hold faux labels as you cannot have negative indices.
         if ( text.charAt(0)=='\'' ) {
-            stringLiteralToTypeMap.put(text, Utils.integer(tokenType));
+            composite.stringLiteralToTypeMap.put(text, Utils.integer(tokenType));
         }
         else { // must be a label like ID
-            tokenIDToTypeMap.put(text, Utils.integer(tokenType));
+            composite.tokenIDToTypeMap.put(text, Utils.integer(tokenType));
         }
 		int index = Label.NUM_FAUX_LABELS+tokenType-1;
 		//System.out.println("defining "+name+" token "+text+" at type="+tokenType+", index="+index);
-		this.maxTokenType = Math.max(this.maxTokenType, tokenType);
-        if ( index>=typeToTokenList.size() ) {
-			typeToTokenList.setSize(index+1);
+		composite.maxTokenType = Math.max(composite.maxTokenType, tokenType);
+        if ( index>=composite.typeToTokenList.size() ) {
+			composite.typeToTokenList.setSize(index+1);
 		}
-		String prevToken = (String)typeToTokenList.get(index);
+		String prevToken = (String)composite.typeToTokenList.get(index);
 		if ( prevToken==null || prevToken.charAt(0)=='\'' ) {
 			// only record if nothing there before or if thing before was a literal
-			typeToTokenList.set(index, text);
+			composite.typeToTokenList.set(index, text);
 		}
     }
 
@@ -940,23 +920,23 @@ public class Grammar {
 						   int numAlts)
 	{
 		String ruleName = ruleToken.getText();
-		/*
-		System.out.println("defineRule("+ruleName+",modifier="+modifier+
-						   "): index="+ruleIndex);
-		*/
-		if ( getRule(ruleName)!=null ) {
+		if ( getLocallyDefinedRule(ruleName)!=null ) {
 			ErrorManager.grammarError(ErrorManager.MSG_RULE_REDEFINITION,
 									  this, ruleToken, ruleName);
         }
 
 		Rule r = new Rule(this, ruleName, ruleIndex, numAlts);
+		/*
+		System.out.println("defineRule("+ruleName+",modifier="+modifier+
+						   "): index="+r.index+", nalts="+numAlts);
+						   */
 		r.modifier = modifier;
         nameToRuleMap.put(ruleName, r);
 		setRuleAST(ruleName, tree);
 		r.setOptions(options, ruleToken);
 		r.argActionAST = argActionAST;
         ruleIndexToRuleList.setSize(ruleIndex+1);
-        ruleIndexToRuleList.set(ruleIndex, ruleName);
+        ruleIndexToRuleList.set(ruleIndex, r);
         ruleIndex++;
 		if ( ruleName.startsWith(SYNPRED_RULE_PREFIX) ) {
 			r.isSynPred = true;
@@ -995,6 +975,12 @@ public class Grammar {
 		//System.out.println("after tracking use for dec "+dfa.decisionNumber+": "+synPredNamesUsedInDFA);
 	}
 
+	/*
+	public Set<Rule> getRuleNamesVisitedDuringLOOK() {
+		return rulesSensitiveToOtherRules;
+	}
+	*/
+	
 	/** Given @scope::name {action} define it for this grammar.  Later,
 	 *  the code generator will ask for the actions table.
 	 */
@@ -1124,22 +1110,57 @@ public class Grammar {
 									literal);
 	}
 
-	public Rule getRule(String ruleName) {
-		Rule r = (Rule)nameToRuleMap.get(ruleName);
+	public Rule getLocallyDefinedRule(String ruleName) {
+		Rule r = nameToRuleMap.get(ruleName);
 		return r;
 	}
 
-    public int getRuleIndex(String ruleName) {
-		Rule r = getRule(ruleName);
+	public Rule getRule(String ruleName) {
+		return composite.getRule(ruleName);
+	}
+
+	public Rule getRule(String scopeName, String ruleName) {
+		if ( scopeName!=null ) { // scope override
+			Grammar scope = composite.getGrammar(scopeName);
+			if ( scope==null ) {
+				return null;
+			}
+			return scope.getLocallyDefinedRule(ruleName);
+		}
+		return getRule(ruleName);
+	}
+
+	public int getRuleIndex(String scopeName, String ruleName) {
+		Rule r = getRule(scopeName, ruleName);
 		if ( r!=null ) {
 			return r.index;
 		}
         return INVALID_RULE_INDEX;
+	}
+
+	public int getRuleIndex(String ruleName) {
+		return getRuleIndex(null, ruleName);
     }
 
     public String getRuleName(int ruleIndex) {
-        return (String)ruleIndexToRuleList.get(ruleIndex);
-    }
+        Rule r = ruleIndexToRuleList.get(ruleIndex);
+		if ( r!=null ) {
+			return r.name;
+		}
+		return null;
+	}
+
+	/** Should codegen.g gen rule for ruleName?
+	 * 	If synpred, only gen if used in a DFA.
+	 *  If regular rule, only gen if not overridden in delegator
+	 *  Always gen Tokens rule though.
+	 */
+	public boolean generateMethodForRule(String ruleName) {
+		Rule r = getLocallyDefinedRule(ruleName);
+		return ruleName.equals("Tokens") ||
+			   (!r.isSynPred&&r.grammar==this) ||
+			   (r.isSynPred&&synPredNamesUsedInDFA.contains(ruleName));
+	}
 
 	public AttributeScope defineGlobalScope(String name, Token scopeAction) {
 		AttributeScope scope = new AttributeScope(this, name, scopeAction);
@@ -1189,7 +1210,7 @@ public class Grammar {
 									antlr.Token label,
 									GrammarAST tokenRef)
 	{
-        Rule r = getRule(ruleName);
+        Rule r = getLocallyDefinedRule(ruleName);
 		if ( r!=null ) {
 			if ( type==LEXER &&
 				 (tokenRef.getType()==ANTLRParser.CHAR_LITERAL||
@@ -1210,7 +1231,7 @@ public class Grammar {
 								   antlr.Token label,
 								   GrammarAST ruleRef)
 	{
-		Rule r = getRule(ruleName);
+		Rule r = getLocallyDefinedRule(ruleName);
 		if ( r!=null ) {
 			defineLabel(r, label, ruleRef, RULE_LABEL);
 		}
@@ -1220,7 +1241,7 @@ public class Grammar {
 									 antlr.Token label,
 									 GrammarAST element)
 	{
-		Rule r = getRule(ruleName);
+		Rule r = getLocallyDefinedRule(ruleName);
 		if ( r!=null ) {
 			defineLabel(r, label, element, TOKEN_LIST_LABEL);
 		}
@@ -1230,7 +1251,7 @@ public class Grammar {
 									antlr.Token label,
 									GrammarAST element)
 	{
-		Rule r = getRule(ruleName);
+		Rule r = getLocallyDefinedRule(ruleName);
 		if ( r!=null ) {
 			if ( !r.getHasMultipleReturnValues() ) {
 				ErrorManager.grammarError(
@@ -1250,9 +1271,8 @@ public class Grammar {
 		for (Iterator it = rewriteElements.iterator(); it.hasNext();) {
 			GrammarAST el = (GrammarAST) it.next();
 			if ( el.getType()==ANTLRParser.LABEL ) {
-				Rule r = getRule(el.enclosingRule);
 				String labelName = el.getText();
-				LabelElementPair pair = r.getLabel(labelName);
+				LabelElementPair pair = el.enclosingRule.getLabel(labelName);
 				// if valid label and type is what we're looking for
 				// and not ref to old value val $rule, add to list
 				if ( pair!=null && pair.type==labelType &&
@@ -1339,10 +1359,24 @@ public class Grammar {
 	 *
 	 *  This data is also used to verify that all rules have been defined.
 	 */
-	public void altReferencesRule(String ruleName, GrammarAST refAST, int outerAltNum) {
-		Rule r = getRule(ruleName);
+	public void altReferencesRule(String enclosingRuleName,
+								  GrammarAST refScopeAST,
+								  GrammarAST refAST,
+								  int outerAltNum)
+	{
+		/* Do nothing for now; not sure need; track S.x as x
+		String scope = null;
+		Grammar scopeG = null;
+		if ( refScopeAST!=null ) {
+			if ( !scopedRuleRefs.contains(refScopeAST) ) {
+				scopedRuleRefs.add(refScopeAST);
+			}
+			scope = refScopeAST.getText();
+		}
+		*/
+		Rule r = getRule(enclosingRuleName);
 		if ( r==null ) {
-			return;
+			return; // no error here; see NameSpaceChecker
 		}
 		r.trackRuleReferenceInAlt(refAST, outerAltNum);
 		antlr.Token refToken = refAST.getToken();
@@ -1358,7 +1392,7 @@ public class Grammar {
 	 *  Rewrite rules force tracking of all tokens.
 	 */
 	public void altReferencesTokenID(String ruleName, GrammarAST refAST, int outerAltNum) {
-		Rule r = getRule(ruleName);
+		Rule r = getLocallyDefinedRule(ruleName);
 		if ( r==null ) {
 			return;
 		}
@@ -1403,11 +1437,12 @@ public class Grammar {
 		return leftRecursiveRules;
 	}
 
-	public void checkRuleReference(GrammarAST refAST,
+	public void checkRuleReference(GrammarAST scopeAST,
+								   GrammarAST refAST,
 								   GrammarAST argsAST,
 								   String currentRuleName)
 	{
-		sanity.checkRuleReference(refAST, argsAST, currentRuleName);
+		sanity.checkRuleReference(scopeAST, refAST, argsAST, currentRuleName);
 	}
 
 	/** Rules like "a : ;" and "a : {...} ;" should not generate
@@ -1441,10 +1476,10 @@ public class Grammar {
     public int getTokenType(String tokenName) {
         Integer I = null;
         if ( tokenName.charAt(0)=='\'') {
-            I = (Integer)stringLiteralToTypeMap.get(tokenName);
+            I = (Integer)composite.stringLiteralToTypeMap.get(tokenName);
         }
         else { // must be a label like ID
-            I = (Integer)tokenIDToTypeMap.get(tokenName);
+            I = (Integer)composite.tokenIDToTypeMap.get(tokenName);
         }
         int i = (I!=null)?I.intValue():Label.INVALID;
 		//System.out.println("grammar type "+type+" "+tokenName+"->"+i);
@@ -1453,7 +1488,7 @@ public class Grammar {
 
 	/** Get the list of tokens that are IDs like BLOCK and LPAREN */
 	public Set getTokenIDs() {
-		return tokenIDToTypeMap.keySet();
+		return composite.tokenIDToTypeMap.keySet();
 	}
 
 	/** Return an ordered integer list of token types that have no
@@ -1560,21 +1595,80 @@ public class Grammar {
 
 	/** Pull your token definitions from an existing grammar in memory.
 	 *  You must use Grammar() ctor then this method then setGrammarContent()
-	 *  to make this work.  This is useful primarily for testing and
-	 *  interpreting grammars.  Return the max token type found.
+	 *  to make this work.  This was useful primarily for testing and
+	 *  interpreting grammars until I added import grammar functionality.
+	 *  When you import a grammar you implicitly import its vocabulary as well
+	 *  and keep the same token type values.
+	 *
+	 *  Returns the max token type found.
 	 */
 	public int importTokenVocabulary(Grammar importFromGr) {
 		Set importedTokenIDs = importFromGr.getTokenIDs();
 		for (Iterator it = importedTokenIDs.iterator(); it.hasNext();) {
 			String tokenID = (String) it.next();
 			int tokenType = importFromGr.getTokenType(tokenID);
-			maxTokenType = Math.max(maxTokenType,tokenType);
+			composite.maxTokenType = Math.max(composite.maxTokenType,tokenType);
 			if ( tokenType>=Label.MIN_TOKEN_TYPE ) {
-				//System.out.println("import token from grammar "+tokenID+"="+tokenType);
+				// System.out.println("import token from grammar "+tokenID+"="+tokenType);
 				defineToken(tokenID, tokenType);
 			}
 		}
-		return maxTokenType; // return max found
+		return composite.maxTokenType; // return max found
+	}
+
+	/** Import the rules/tokens of a delegate grammar. All delegate grammars are
+	 *  read during the ctor of first Grammar created so we must set master
+	 *  here to the first one encountered.  I.e., can't set after ctor finishes
+	 *  as most work is done by then. 
+	 */
+	public void importGrammar(String grammarName, String label) {
+		File gfile = new File(tool.getLibraryDirectory(),
+							  File.separator+
+							  grammarName+
+							  GRAMMAR_FILE_EXTENSION);
+		BufferedReader br = null;
+		try {
+			FileReader fr = new FileReader(gfile);
+			br = new BufferedReader(fr);
+			Grammar delegateGrammar = null;
+			try {
+				delegateGrammar = new Grammar(tool, gfile.getName(), br, composite);
+				delegateGrammar.label = label;
+				composite.addGrammar(this,delegateGrammar);
+				delegateGrammar.analyzeGrammar();
+				importTokenVocabulary(delegateGrammar);
+				delegateGrammar.createNFAs();
+				// don't gen code for delegates here, generate in processGrammar
+			}
+			catch (TokenStreamException tse) {
+				System.err.println("fskljaflkjdsfa");
+				// #### ADD ERRORS HERE
+			}
+			catch (RecognitionException re) {
+				System.err.println("fskljafdsflkjdsfa");
+				// #### ADD ERRORS HERE
+			}
+			System.out.println("Got grammar:\n"+delegateGrammar);
+			br.close();
+			// #### FIX THESE EXCEPTION; ADD TO ERRORS SAYING WHERE GRAMMARS ARE LOOKED FOR
+		}
+		catch (IOException ioe) {
+			ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE,
+							   gfile,
+							   ioe);
+		}
+		finally {
+			if ( br!=null ) {
+				try {
+					br.close();
+				}
+				catch (IOException ioe) {
+					ErrorManager.error(ErrorManager.MSG_CANNOT_CLOSE_FILE,
+									   gfile,
+									   ioe);
+				}
+			}
+		}
 	}
 
 	/** Load a vocab file <vocabName>.tokens and return max token type found. */
@@ -1632,7 +1726,7 @@ public class Grammar {
 				int tokenType = (int)tokenizer.nval;
 				token = tokenizer.nextToken();
 				//System.out.println("import "+tokenID+"="+tokenType);
-				maxTokenType = Math.max(maxTokenType,tokenType);
+				composite.maxTokenType = Math.max(composite.maxTokenType,tokenType);
 				defineToken(tokenID, tokenType);
 				lineNum++;
 				if ( token != StreamTokenizer.TT_EOL ) {
@@ -1661,7 +1755,7 @@ public class Grammar {
 							   fullFile,
 							   e);
 		}
-		return maxTokenType;
+		return composite.maxTokenType;
 	}
 
 	/** Given a token type, get a meaningful name for it such as the ID
@@ -1679,27 +1773,27 @@ public class Grammar {
 		}
 		// faux label?
 		else if ( ttype<0 ) {
-			tokenName = (String)typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
+			tokenName = (String)composite.typeToTokenList.get(Label.NUM_FAUX_LABELS+ttype);
 		}
 		else {
 			// compute index in typeToTokenList for ttype
 			index = ttype-1; // normalize to 0..n-1
 			index += Label.NUM_FAUX_LABELS;     // jump over faux tokens
 
-			if ( index<typeToTokenList.size() ) {
-				tokenName = (String)typeToTokenList.get(index);
+			if ( index<composite.typeToTokenList.size() ) {
+				tokenName = (String)composite.typeToTokenList.get(index);
 			}
 			else {
 				tokenName = String.valueOf(ttype);
 			}
 		}
-		//System.out.println("getTokenDisplaYanme ttype="+ttype+", index="+index+", name="+tokenName);
+		//System.out.println("getTokenDisplayName ttype="+ttype+", index="+index+", name="+tokenName);
 		return tokenName;
 	}
 
 	/** Get the list of ANTLR String literals */
 	public Set getStringLiterals() {
-		return stringLiteralToTypeMap.keySet();
+		return composite.stringLiteralToTypeMap.keySet();
 	}
 
 	public int getGrammarMaxLookahead() {
@@ -1792,6 +1886,14 @@ public class Grammar {
 		return false;
 	}
 
+	public boolean rewriteMode() {
+		String outputType = (String)getOption("rewrite");
+		if ( outputType!=null ) {
+			return outputType.equals("true");
+		}
+		return false;
+	}
+
 	public boolean isBuiltFromString() {
 		return builtFromString;
 	}
@@ -1804,34 +1906,76 @@ public class Grammar {
 		return false;
 	}
 
-    public Collection getRules() {
+    public Collection<Rule> getRules() {
         return nameToRuleMap.values();
     }
 
+	/** Get the set of Rules that need to have manual delegations
+	 *  like "void rule() { importedGrammar.rule(); }"
+	 *
+	 *  If this grammar is master, get list of all rule definitions from all
+	 *  delegate grammars.  Only master has complete interface from combined
+	 *  grammars...we will generated delegates as helper objects.
+	 *
+	 *  Composite grammars that are not the root/master do not have complete
+	 *  interfaces.  It is not my intention that people use subcomposites.
+	 *  Only the outermost grammar should be used from outside code.  The
+	 *  other grammar components are specifically generated to work only
+	 *  with the master/root. 
+	 *
+	 *  delegatedRules = imported - overridden
+	 */
+	public Set<Rule> getDelegatedRules() {
+		return composite.getDelegatedRules(this);
+	}
+
+	/** Get set of all rules imported from all delegate grammars even if
+	 *  indirectly delegated.
+	 */
+	public Set<Rule> getAllImportedRules() {
+		return composite.getAllImportedRules(this);
+	}
+
+	/** Get list of all delegates from all grammars directly or indirectly
+	 *  imported into this grammar.
+	 */
+	public List<Grammar> getDelegates() {
+		return composite.getDelegates(this);
+	}
+
+	public List<Grammar> getDirectDelegates() {
+		return composite.getDirectDelegates(this);
+	}
+
+	/** Get list of all delegators.  This amounts to the grammars on the path
+	 *  to the root of the delegation tree.
+	 */
+	public List<Grammar> getDelegators() {
+		return composite.getDelegators(this);
+	}
+
+	public Set<Rule> getDelegatedRuleReferences() {
+		return delegatedRuleReferences;
+	}
+
+	public boolean getGrammarIsMaster() {
+		return composite.delegateGrammarTreeRoot.grammar == this;
+	}
+
 	public void setRuleAST(String ruleName, GrammarAST t) {
-		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		Rule r = getLocallyDefinedRule(ruleName);
 		if ( r!=null ) {
 			r.tree = t;
 			r.EORNode = t.getLastChild();
 		}
 	}
 
-    public void setRuleStartState(String ruleName, NFAState startState) {
-		Rule r = (Rule)nameToRuleMap.get(ruleName);
-		if ( r!=null ) {
-	        r.startState = startState;
-		}
-    }
-
-    public void setRuleStopState(String ruleName, NFAState stopState) {
-		Rule r = (Rule)nameToRuleMap.get(ruleName);
-		if ( r!=null ) {
-	        r.stopState = stopState;
-		}
-    }
-
 	public NFAState getRuleStartState(String ruleName) {
-		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		return getRuleStartState(null, ruleName);
+	}
+
+	public NFAState getRuleStartState(String scopeName, String ruleName) {
+		Rule r = getRule(scopeName, ruleName);
 		if ( r!=null ) {
 			return r.startState;
 		}
@@ -1839,7 +1983,7 @@ public class Grammar {
 	}
 
 	public String getRuleModifier(String ruleName) {
-		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		Rule r = getRule(ruleName);
 		if ( r!=null ) {
 			return r.modifier;
 		}
@@ -1847,7 +1991,7 @@ public class Grammar {
 	}
 
     public NFAState getRuleStopState(String ruleName) {
-		Rule r = (Rule)nameToRuleMap.get(ruleName);
+		Rule r = getRule(ruleName);
 		if ( r!=null ) {
 			return r.stopState;
 		}
@@ -2020,7 +2164,7 @@ public class Grammar {
 
 	/** How many token types have been allocated so far? */
     public int getMaxTokenType() {
-        return maxTokenType;
+        return composite.maxTokenType;
     }
 
 	/** What is the max char value possible for this grammar's target?  Use
@@ -2192,26 +2336,85 @@ public class Grammar {
         return null;
     }
 
-	/** From an NFA state, s, find the set of all labels reachable from s.
-	 *  This computes FIRST, FOLLOW and any other lookahead computation
-	 *  depending on where s is.
-	 *
-	 *  Record, with EOR_TOKEN_TYPE, if you hit the end of a rule so we can
-	 *  know at runtime (when these sets are used) to start walking up the
-	 *  follow chain to compute the real, correct follow set.
-	 *
-	 *  This routine will only be used on parser and tree parser grammars.
-	 *
-	 *  TODO: it does properly handle a : b A ; where b is nullable
-	 *  Actually it stops at end of rules, returning EOR.  Hmm...
-	 *  should check for that and keep going.
-	 */
-	public LookaheadSet LOOK(NFAState s) {
-		lookBusy.clear();
-		return _LOOK(s);
+	/*
+	public void computeRuleFIRSTSets() {
+		if ( getNumberOfDecisions()==0 ) {
+			createNFAs();
+		}
+		for (Iterator it = getRules().iterator(); it.hasNext();) {
+			Rule r = (Rule)it.next();
+			r.FIRST = LOOK(r.startState);
+		}
 	}
 
+
+	public Set<String> getOverriddenRulesWithDifferentFIRST() {
+		// walk every rule in this grammar and compare FIRST set with
+		// those in imported grammars.
+		Set<String> rules = new HashSet();
+		for (Iterator it = getRules().iterator(); it.hasNext();) {
+			Rule r = (Rule)it.next();
+			//System.out.println(r.name+" FIRST="+r.FIRST);
+			for (int i = 0; i < delegates.size(); i++) {
+				Grammar g = delegates.get(i);
+				Rule importedRule = g.getRule(r.name);
+				if ( importedRule != null ) { // exists in imported grammar
+					// System.out.println(r.name+" exists in imported grammar: FIRST="+importedRule.FIRST);
+					if ( !r.FIRST.equals(importedRule.FIRST) ) {
+						rules.add(r.name);
+					}
+				}
+			}
+		}
+		return rules;
+	}
+
+	public Set<Rule> getImportedRulesSensitiveToOverriddenRulesDueToLOOK() {
+		Set<String> diffFIRSTs = getOverriddenRulesWithDifferentFIRST();
+		Set<Rule> rules = new HashSet();
+		for (Iterator it = diffFIRSTs.iterator(); it.hasNext();) {
+			String r = (String) it.next();
+			for (int i = 0; i < delegates.size(); i++) {
+				Grammar g = delegates.get(i);
+				Set<Rule> callers = g.ruleSensitivity.get(r);
+				// somebody invokes rule whose FIRST changed in subgrammar?
+				if ( callers!=null ) { 
+					rules.addAll(callers);
+					//System.out.println(g.name+" rules "+callers+" sensitive to "+r+"; dup 'em");
+				}
+			}
+		}
+		return rules;
+	}
+*/
+	
+	/** From an NFA state, s, find the set of all labels reachable from s.
+	 *  Used to compute follow sets for error recovery.  Never computes
+	 *  a FOLLOW operation.  LOOK stops at end of rules, returning EOR, unless
+	 *  invoked from another rule.  I.e., routine properly handles
+	 *
+	 *     a : b A ;
+	 *
+	 *  where b is nullable.
+	 *
+	 *  We record with EOR_TOKEN_TYPE if we hit the end of a rule so we can
+	 *  know at runtime (when these sets are used) to start walking up the
+	 *  follow chain to compute the real, correct follow set (as opposed to
+	 *  the FOLLOW, which is a superset).
+	 *
+	 *  This routine will only be used on parser and tree parser grammars.
+	 */
+	public LookaheadSet LOOK(NFAState s) {
+		// System.out.println("> _LOOK("+s+") in rule "+s.getEnclosingRule());
+		lookBusy.clear();
+		LookaheadSet look = _LOOK(s);
+		// System.out.println("< _LOOK("+s+") in rule "+s.getEnclosingRule()+"="+look.toString(this));
+		return look;
+	}
+
+	// TODO: use Rule.FIRST as a cache
 	protected LookaheadSet _LOOK(NFAState s) {
+		//System.out.println("_LOOK("+s+") in rule "+s.getEnclosingRule());		
 		if ( s.isAcceptState() ) {
 			return new LookaheadSet(Label.EOR_TOKEN_TYPE);
 		}
@@ -2221,6 +2424,7 @@ public class Grammar {
 			return new LookaheadSet();
 		}
 		lookBusy.add(s);
+
 		Transition transition0 = s.transition(0);
 		if ( transition0==null ) {
 			return null;
@@ -2242,7 +2446,9 @@ public class Grammar {
 			}
 			return laSet;
 		}
+
         LookaheadSet tset = _LOOK((NFAState)transition0.target);
+
 		if ( tset.member(Label.EOR_TOKEN_TYPE) ) {
 			if ( transition0 instanceof RuleClosureTransition ) {
 				// we called a rule that found the end of the rule.
@@ -2254,8 +2460,8 @@ public class Grammar {
 					(RuleClosureTransition)transition0;
 				// remove the EOR and get what follows
 				tset.remove(Label.EOR_TOKEN_TYPE);
-				LookaheadSet fset =
-					_LOOK((NFAState)ruleInvocationTrans.getFollowState());
+				NFAState following = (NFAState) ruleInvocationTrans.followState;
+				LookaheadSet fset =	_LOOK(following);
 				tset.orInPlace(fset);
 			}
 		}
@@ -2265,6 +2471,15 @@ public class Grammar {
 			LookaheadSet tset1 = _LOOK((NFAState)transition1.target);
 			tset.orInPlace(tset1);
 		}
+
+		// when importing grammars, we need to know if LOOK operation
+		// enters/exits a rule. If rule r needs FIRST(x) and x is
+		// overridden, assume the FIRST is different and r must be
+		// duplicated in the "subgrammar".  If rule r needs FOLLOW(r),
+		// which could differ since overridden rules can call r, must dup
+		// r in subgrammar so FOLLOW(r) can be recomputed.  Not optimal,
+		// but we can check FIRST/FOLLOW values later.
+
 		return tset;
 	}
 

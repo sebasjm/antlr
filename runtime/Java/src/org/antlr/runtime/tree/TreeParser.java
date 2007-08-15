@@ -40,8 +40,14 @@ public class TreeParser extends BaseRecognizer {
 	protected TreeNodeStream input;
 
 	public TreeParser(TreeNodeStream input) {
+		super(); // highlight that we go to super to set state object
 		setTreeNodeStream(input);
 	}
+
+	public TreeParser(TreeNodeStream input, RecognizerSharedState state) {
+		super(state); // share the state object with another parser
+		setTreeNodeStream(input);
+    }
 
 	public void reset() {
 		super.reset(); // reset all recognizer state variables
@@ -63,9 +69,9 @@ public class TreeParser extends BaseRecognizer {
 	 *  entire tree if node has children.  If children, scan until
 	 *  corresponding UP node.
 	 */
-	public void matchAny(IntStream ignore) { // ignore stream, copy of this.input
-		errorRecovery = false;
-		failed = false;
+	public void matchAny(IntStream ignore) { // ignore stream, copy of input
+		state.errorRecovery = false;
+		state.failed = false;
 		Object look = input.LT(1);
 		if ( input.getTreeAdaptor().getChildCount(look)==0 ) {
 			input.consume(); // not subtree, consume 1 node and return

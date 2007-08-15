@@ -29,7 +29,7 @@ package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
-
+import org.antlr.runtime.misc.IntArray;
 import java.util.*;
 
 /** A buffered stream of tree nodes.  Nodes can be from a tree of ANY kind.
@@ -111,33 +111,12 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	protected int lastMarker;
 
 	/** Stack of indexes used for push/pop calls */
-	protected int[] calls;
+	protected IntArray calls;
 
 	/** Stack pointer for stack of indexes; -1 indicates empty.  Points
 	 *  at next location to push a value.
 	 */
 	protected int _sp = -1;
-
-	/** During fillBuffer(), we can make a reverse index from a set
-	 *  of token types of interest to the list of indexes into the
-	 *  node stream.  This lets us convert a node pointer to a
-	 *  stream index semi-efficiently for a list of interesting
-	 *  nodes such as function definition nodes (you'll want to seek
-	 *  to their bodies for an interpreter).  Also useful for doing
-	 *  dynamic searches; i.e., go find me all PLUS nodes.
-	 */
-	protected Map tokenTypeToStreamIndexesMap;
-
-	/** If tokenTypesToReverseIndex set to INDEX_ALL then indexing
-	 *  occurs for all token types.
-	 */
-	public static final Set INDEX_ALL = new HashSet();
-
-	/** A set of token types user would like to index for faster lookup.
-	 *  If this is INDEX_ALL, then all token types are tracked.  If null,
-	 *  then none are indexed.
-	 */
-	protected Set tokenTypesToReverseIndex = null;
 
 	public CommonTreeNodeStream(Object tree) {
 		this(new CommonTreeAdaptor(), tree);
@@ -169,7 +148,6 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		boolean nil = adaptor.isNil(t);
 		if ( !nil ) {
 			nodes.add(t); // add this node
-			fillReverseIndex(t, nodes.size()-1);
 		}
 		// add DOWN node if t has children
 		int n = adaptor.getChildCount(t);
@@ -187,106 +165,10 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		}
 	}
 
-	/** Given a node, add this to the reverse index tokenTypeToStreamIndexesMap.
-	 *  You can override this method to alter how indexing occurs.  The
-	 *  default is to create a
-	 *
-	 *    Map<Integer token type,ArrayList<Integer stream index>>
-	 *
-	 *  This data structure allows you to find all nodes with type INT in order.
-	 *
-	 *  If you really need to find a node of type, say, FUNC quickly then perhaps
-	 *
-	 *    Map<Integertoken type,Map<Object tree node,Integer stream index>>
-	 *
-	 *  would be better for you.  The interior maps map a tree node to
-	 *  the index so you don't have to search linearly for a specific node.
-	 *
-	 *  If you change this method, you will likely need to change
-	 *  getNodeIndex(), which extracts information.
+	/** What is the stream index for node? 0..n-1
+	 *  Return -1 if node not found.
 	 */
-	protected void fillReverseIndex(Object node, int streamIndex) {
-		//System.out.println("revIndex "+node+"@"+streamIndex);
-		if ( tokenTypesToReverseIndex==null ) {
-			return; // no indexing if this is empty (nothing of interest)
-		}
-		if ( tokenTypeToStreamIndexesMap==null ) {
-			tokenTypeToStreamIndexesMap = new HashMap(); // first indexing op
-		}
-		int tokenType = adaptor.getType(node);
-		Integer tokenTypeI = new Integer(tokenType);
-		if ( !(tokenTypesToReverseIndex==INDEX_ALL ||
-			   tokenTypesToReverseIndex.contains(tokenTypeI)) )
-		{
-			return; // tokenType not of interest
-		}
-		Integer streamIndexI = new Integer(streamIndex);
-		ArrayList indexes = (ArrayList)tokenTypeToStreamIndexesMap.get(tokenTypeI);
-		if ( indexes==null ) {
-			indexes = new ArrayList(); // no list yet for this token type
-			indexes.add(streamIndexI); // not there yet, add
-			tokenTypeToStreamIndexesMap.put(tokenTypeI, indexes);
-		}
-		else {
-			if ( !indexes.contains(streamIndexI) ) {
-				indexes.add(streamIndexI); // not there yet, add
-			}
-		}
-	}
-
-	/** Track the indicated token type in the reverse index.  Call this
-	 *  repeatedly for each type or use variant with Set argument to
-	 *  set all at once.
-	 * @param tokenType
-	 */
-	public void reverseIndex(int tokenType) {
-		if ( tokenTypesToReverseIndex==null ) {
-			tokenTypesToReverseIndex = new HashSet();
-		}
-		else if ( tokenTypesToReverseIndex==INDEX_ALL ) {
-			return;
-		}
-		tokenTypesToReverseIndex.add(new Integer(tokenType));
-	}
-
-	/** Track the indicated token types in the reverse index. Set
-	 *  to INDEX_ALL to track all token types.
-	 */
-	public void reverseIndex(Set tokenTypes) {
-		tokenTypesToReverseIndex = tokenTypes;
-	}
-
-	/** Given a node pointer, return its index into the node stream.
-	 *  This is not its Token stream index.  If there is no reverse map
-	 *  from node to stream index or the map does not contain entries
-	 *  for node's token type, a linear search of entire stream is used.
-	 *
-	 *  Return -1 if exact node pointer not in stream.
-	 */
-	public int getNodeIndex(Object node) {
-		//System.out.println("get "+node);
-		if ( tokenTypeToStreamIndexesMap==null ) {
-			return getNodeIndexLinearly(node);
-		}
-		int tokenType = adaptor.getType(node);
-		Integer tokenTypeI = new Integer(tokenType);
-		ArrayList indexes = (ArrayList)tokenTypeToStreamIndexesMap.get(tokenTypeI);
-		if ( indexes==null ) {
-			//System.out.println("found linearly; stream index = "+getNodeIndexLinearly(node));
-			return getNodeIndexLinearly(node);
-		}
-		for (int i = 0; i < indexes.size(); i++) {
-			Integer streamIndexI = (Integer)indexes.get(i);
-			Object n = get(streamIndexI.intValue());
-			if ( n==node ) {
-				//System.out.println("found in index; stream index = "+streamIndexI);
-				return streamIndexI.intValue(); // found it!
-			}
-		}
-		return -1;
-	}
-
-	protected int getNodeIndexLinearly(Object node) {
+	protected int getNodeIndex(Object node) {
 		if ( p==-1 ) {
 			fillBuffer();
 		}
@@ -445,19 +327,13 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	}
 
 	/** Make stream jump to a new location, saving old location.
-	 *  Switch back with pop().  I manage dyanmic array manually
-	 *  to avoid creating Integer objects all over the place.
+	 *  Switch back with pop().
 	 */
 	public void push(int index) {
 		if ( calls==null ) {
-			calls = new int[INITIAL_CALL_STACK_SIZE];
+			calls = new IntArray();
 		}
-		else if ( (_sp+1)>=calls.length ) {
-			int[] newStack = new int[calls.length*2];
-			System.arraycopy(calls, 0, newStack, 0, calls.length);
-			calls = newStack;
-		}
-		calls[++_sp] = p; // save current index
+		calls.push(p); // save current index
 		seek(index);
 	}
 
@@ -465,7 +341,7 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	 *  Return top of stack (return index).
 	 */
 	public int pop() {
-		int ret = calls[_sp--];
+		int ret = calls.pop();
 		seek(ret);
 		return ret;
 	}
@@ -482,6 +358,14 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 			fillBuffer();
 		}
 		return new StreamIterator();
+	}
+
+	// TREE REWRITE INTERFACE
+
+	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {
+		if ( parent!=null ) {
+			adaptor.replaceChildren(parent, startChildIndex, stopChildIndex, t);
+		}
 	}
 
 	/** Used for testing, just return the token type stream */

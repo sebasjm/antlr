@@ -1,6 +1,6 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2005-2006 Terence Parr
+ Copyright (c) 2005-2007 Terence Parr
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -25,30 +25,59 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime.tree;
+package org.antlr.runtime.misc;
 
-/** A generic doubly-linked tree implementation with no payload.
- *  You must subclass to actually have any user data.
- *  TODO: do we really need/want this?
+/** A dynamic array that uses int not Integer objects. In principle this
+ *  is more efficient in time, but certainly in space.
+ *
+ *  This is simple enough that you can access the data array directly,
+ *  but make sure that you append elements only with add() so that you
+ *  get dynamic sizing.  Make sure to call ensureCapacity() when you are
+ *  manually adding new elements.
+ *
+ *  Doesn't impl List because it doesn't return objects and I mean this
+ *  really as just an array not a List per se.  Manipulate the elements
+ *  at will.  This has stack methods too.
+ *
+ *  When runtime can be 1.5, I'll make this generic.
  */
-public abstract class DoubleLinkTree extends BaseTree {
-	protected DoubleLinkTree parent;
+public class IntArray {
+	public static final int INITIAL_SIZE = 10;
+	public int[] data;
+	protected int p = -1;
 
-	public DoubleLinkTree getParent() {
-		return parent;
+	public void add(int v) {
+		ensureCapacity(p+1);
+		data[++p] = v;
 	}
 
-	public void setParent(DoubleLinkTree t) {
-		parent = t;
+	public void push(int v) {
+		add(v);
 	}
 
-	public void addChild(BaseTree t) {
-		super.addChild(t);
-		((DoubleLinkTree)t).setParent((DoubleLinkTree)this);
+	public int pop() {
+		int v = data[p];
+		p--;
+		return v;
 	}
 
-	public void setChild(int i, BaseTree t) {
-		super.setChild(i, t);
-		((DoubleLinkTree)t).setParent((DoubleLinkTree)this);
+	/** This only tracks elements added via push/add. */
+	public int size() {
+		return p;
+	}
+
+	public void ensureCapacity(int index) {
+		if ( data==null ) {
+			data = new int[INITIAL_SIZE];
+		}
+		else if ( (index+1)>=data.length ) {
+			int newSize = data.length*2;
+			if ( index>newSize ) {
+				newSize = index+1;
+			}
+			int[] newData = new int[newSize];
+			System.arraycopy(data, 0, newData, 0, data.length);
+			data = newData;
+		}
 	}
 }

@@ -205,6 +205,12 @@ REWRITE_FOR_MULTI_ELEMENT_ALT(arg) ::=
   "with rewrite=true, alt <arg> not simple node or obvious tree element; text attribute for rule not guaranteed to be correct"
 RULE_INVALID_SET(arg) ::= 
   "Cannot complement rule <arg>; not a simple set or element"
+HETERO_ILLEGAL_IN_REWRITE_ALT(arg) ::=
+  "alts with rewrites can't use heterogeneous types left of ->"
+NO_SUCH_GRAMMAR_SCOPE(arg,arg2) ::=
+  "reference to undefined grammar in rule reference: <arg>.<arg2>"
+NO_SUCH_RULE_IN_SCOPE(arg,arg2) ::=
+  "rule <arg2> is not defined in grammar <arg>"
 
 // GRAMMAR WARNINGS
 

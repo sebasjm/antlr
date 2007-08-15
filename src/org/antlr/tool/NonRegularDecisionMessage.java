@@ -53,7 +53,7 @@ public class NonRegularDecisionMessage extends Message {
 		}
 
 		StringTemplate st = getMessageTemplate();
-		String ruleName = probe.dfa.getNFADecisionStartState().getEnclosingRule();
+		String ruleName = probe.dfa.getNFADecisionStartState().enclosingRule.name;
 		st.setAttribute("ruleName", ruleName);
 		List sortedAlts = new ArrayList();
 		sortedAlts.addAll(altsWithRecursion);

@@ -207,6 +207,35 @@ public interface TreeAdaptor {
 	/** Get a child 0..n-1 node */
 	public Object getChild(Object t, int i);
 
+	/** Set ith child (0..n-1) to t; t must be non-null and non-nil node */
+	public void setChild(Object t, int i, Object child);
+
+	/** Remove ith child and shift children down from right. */
+	public Object deleteChild(Object t, int i);
+
 	/** How many children?  If 0, then this is a leaf node */
 	public int getChildCount(Object t);
+
+	/** Who is the parent node of this node; if null, implies node is root.
+	 *  If your node type doesn't handle this, it's ok but the tree rewrites
+	 *  in tree parsers need this functionality.
+	 */
+	public Object getParent(Object t);
+	public void setParent(Object t, Object parent);
+
+	/** What index is this node in the child list? Range: 0..n-1
+	 *  If your node type doesn't handle this, it's ok but the tree rewrites
+	 *  in tree parsers need this functionality.
+	 */
+	public int getChildIndex(Object t);
+	public void setChildIndex(Object t, int index);
+
+	/** Replace from start to stop child index of parent with t, which might
+	 *  be a list.  Number of children may be different
+	 *  after this call.
+	 *
+	 *  If parent is null, don't do anything; must be at root of overall tree.
+	 *  Can't replace whatever points to the parent externally.  Do nothing.
+	 */
+	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t);	
 }

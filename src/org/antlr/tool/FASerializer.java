@@ -124,7 +124,7 @@ public class FASerializer {
             // will not be found and appear to be not in graph.  Must explicitly jump
             // to it, but don't "draw" an edge.
             if ( edge instanceof RuleClosureTransition ) {
-                walkFANormalizingStateNumbers(((RuleClosureTransition)edge).getFollowState());
+				walkFANormalizingStateNumbers(((RuleClosureTransition) edge).followState);
             }
         }
     }
@@ -188,7 +188,7 @@ public class FASerializer {
             // will not be found and appear to be not in graph.  Must explicitly jump
             // to it, but don't "draw" an edge.
             if ( edge instanceof RuleClosureTransition ) {
-                walkSerializingFA(lines, ((RuleClosureTransition)edge).getFollowState());
+				walkSerializingFA(lines, ((RuleClosureTransition) edge).followState);
             }
         }
 

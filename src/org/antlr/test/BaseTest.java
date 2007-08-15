@@ -134,6 +134,32 @@ public abstract class BaseTest extends TestCase {
 		return allIsWell;
 	}
 
+	protected String execLexer(String grammarFileName,
+							   String grammarStr,
+							   String lexerName,
+							   String input,
+							   boolean debug)
+	{
+		eraseFiles(".class");
+		eraseFiles(".java");
+
+		rawGenerateAndBuildRecognizer(grammarFileName,
+									  grammarStr,
+									  null,
+									  lexerName,
+									  debug);
+		writeFile(tmpdir, "input", input);
+		return rawExecRecognizer(null,
+								 null,
+								 lexerName,
+								 null,
+								 null,
+								 false,
+								 false,
+								 false,
+								 debug);
+	}
+
 	protected String execParser(String grammarFileName,
 									String grammarStr,
 									String parserName,
@@ -163,6 +189,7 @@ public abstract class BaseTest extends TestCase {
 								 null,
 								 parserBuildsTrees,
 								 parserBuildsTemplate,
+								 false,
 								 debug);
 	}
 
@@ -221,8 +248,15 @@ public abstract class BaseTest extends TestCase {
 
 		writeFile(tmpdir, "input", input);
 
-		boolean parserBuildsTrees = parserGrammarStr.indexOf("output=AST")>=0;
-		boolean parserBuildsTemplate = parserGrammarStr.indexOf("output=template")>=0;
+		boolean parserBuildsTrees =
+			parserGrammarStr.indexOf("output=AST")>=0 ||
+			parserGrammarStr.indexOf("output = AST")>=0;
+		boolean treeParserBuildsTrees =
+			treeParserGrammarStr.indexOf("output=AST")>=0 ||
+			treeParserGrammarStr.indexOf("output = AST")>=0;
+		boolean parserBuildsTemplate =
+			parserGrammarStr.indexOf("output=template")>=0 ||
+			parserGrammarStr.indexOf("output = template")>=0;
 
 		return rawExecRecognizer(parserName,
 								 treeParserName,
@@ -231,6 +265,7 @@ public abstract class BaseTest extends TestCase {
 								 treeParserStartRuleName,
 								 parserBuildsTrees,
 								 parserBuildsTemplate,
+								 treeParserBuildsTrees,
 								 debug);
 	}
 
@@ -266,9 +301,18 @@ public abstract class BaseTest extends TestCase {
 											  String treeParserStartRuleName,
 											  boolean parserBuildsTrees,
 											  boolean parserBuildsTemplate,
+											  boolean treeParserBuildsTrees,
 											  boolean debug)
 	{
-		if ( parserBuildsTrees ) {
+		if ( treeParserBuildsTrees && parserBuildsTrees ) {
+			writeTreeAndTreeTestFile(parserName,
+									 treeParserName,
+									 lexerName,
+									 parserStartRuleName,
+									 treeParserStartRuleName,
+									 debug);
+		}
+		else if ( parserBuildsTrees ) {
 			writeTreeTestFile(parserName,
 							  treeParserName,
 							  lexerName,
@@ -281,6 +325,9 @@ public abstract class BaseTest extends TestCase {
 								  lexerName,
 								  parserStartRuleName,
 								  debug);
+		}
+		else if ( parserName==null ) {
+			writeLexerTestFile(lexerName, debug);
 		}
 		else {
 			writeTestFile(parserName,
@@ -311,12 +358,12 @@ public abstract class BaseTest extends TestCase {
 			output = stdoutVacuum.toString();
 			if ( stderrVacuum.toString().length()>0 ) {
 				this.stderr = stderrVacuum.toString();
-				System.err.println("exec parser stderrVacuum: "+ stderrVacuum);
+				System.err.println("exec stderrVacuum: "+ stderrVacuum);
 			}
 			return output;
 		}
 		catch (Exception e) {
-			System.err.println("can't exec parser");
+			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 		}
 		return null;
@@ -415,6 +462,28 @@ public abstract class BaseTest extends TestCase {
 		writeFile(tmpdir, "Test.java", outputFileST.toString());
 	}
 
+	protected void writeLexerTestFile(String lexerName, boolean debug) {
+		StringTemplate outputFileST = new StringTemplate(
+			"import org.antlr.runtime.*;\n" +
+			"import org.antlr.runtime.tree.*;\n" +
+			"import org.antlr.runtime.debug.*;\n" +
+			"\n" +
+			"class Profiler2 extends Profiler {\n" +
+			"    public void terminate() { ; }\n" +
+			"}\n"+
+			"public class Test {\n" +
+			"    public static void main(String[] args) throws Exception {\n" +
+			"        CharStream input = new ANTLRFileStream(args[0]);\n" +
+			"        $lexerName$ lex = new $lexerName$(input);\n" +
+			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+			"        System.out.println(tokens);\n" +
+			"    }\n" +
+			"}"
+			);
+		outputFileST.setAttribute("lexerName", lexerName);
+		writeFile(tmpdir, "Test.java", outputFileST.toString());
+	}
+
 	protected void writeTreeTestFile(String parserName,
 										 String treeParserName,
 										 String lexerName,
@@ -438,14 +507,68 @@ public abstract class BaseTest extends TestCase {
 			"        $createParser$\n"+
 			"        $parserName$.$parserStartRuleName$_return r = parser.$parserStartRuleName$();\n" +
 			"        $if(!treeParserStartRuleName)$\n" +
-			"        if ( r.tree!=null )\n" +
+			"        if ( r.tree!=null ) {\n" +
 			"            System.out.println(((Tree)r.tree).toStringTree());\n" +
+			"            ((CommonTree)r.tree).sanityCheckParentAndChildIndexes();\n" +
+			"		 }\n" +
 			"        $else$\n" +
 			"        CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);\n" +
 			"        nodes.setTokenStream(tokens);\n" +
 			"        $treeParserName$ walker = new $treeParserName$(nodes);\n" +
 			"        walker.$treeParserStartRuleName$();\n" +
 			"        $endif$\n" +
+			"    }\n" +
+			"}"
+			);
+		StringTemplate createParserST =
+			new StringTemplate(
+			"        Profiler2 profiler = new Profiler2();\n"+
+			"        $parserName$ parser = new $parserName$(tokens,profiler);\n" +
+			"        profiler.setParser(parser);\n");
+		if ( !debug ) {
+			createParserST =
+				new StringTemplate(
+				"        $parserName$ parser = new $parserName$(tokens);\n");
+		}
+		outputFileST.setAttribute("createParser", createParserST);
+		outputFileST.setAttribute("parserName", parserName);
+		outputFileST.setAttribute("treeParserName", treeParserName);
+		outputFileST.setAttribute("lexerName", lexerName);
+		outputFileST.setAttribute("parserStartRuleName", parserStartRuleName);
+		outputFileST.setAttribute("treeParserStartRuleName", treeParserStartRuleName);
+		writeFile(tmpdir, "Test.java", outputFileST.toString());
+	}
+
+	/** Parser creates trees and so does the tree parser */
+	protected void writeTreeAndTreeTestFile(String parserName,
+											String treeParserName,
+											String lexerName,
+											String parserStartRuleName,
+											String treeParserStartRuleName,
+											boolean debug)
+	{
+		StringTemplate outputFileST = new StringTemplate(
+			"import org.antlr.runtime.*;\n" +
+			"import org.antlr.runtime.tree.*;\n" +
+			"import org.antlr.runtime.debug.*;\n" +
+			"\n" +
+			"class Profiler2 extends Profiler {\n" +
+			"    public void terminate() { ; }\n" +
+			"}\n"+
+			"public class Test {\n" +
+			"    public static void main(String[] args) throws Exception {\n" +
+			"        CharStream input = new ANTLRFileStream(args[0]);\n" +
+			"        $lexerName$ lex = new $lexerName$(input);\n" +
+			"        TokenRewriteStream tokens = new TokenRewriteStream(lex);\n" +
+			"        $createParser$\n"+
+			"        $parserName$.$parserStartRuleName$_return r = parser.$parserStartRuleName$();\n" +
+			"        ((CommonTree)r.tree).sanityCheckParentAndChildIndexes();\n" +
+			"        CommonTreeNodeStream nodes = new CommonTreeNodeStream((Tree)r.tree);\n" +
+			"        nodes.setTokenStream(tokens);\n" +
+			"        $treeParserName$ walker = new $treeParserName$(nodes);\n" +
+			"        $treeParserName$.$treeParserStartRuleName$_return r2 = walker.$treeParserStartRuleName$();\n" +
+			"		 CommonTree rt = ((CommonTree)r2.tree);\n" +
+			"		 if ( rt!=null ) System.out.println(((CommonTree)r2.tree).toStringTree());\n" +
 			"    }\n" +
 			"}"
 			);

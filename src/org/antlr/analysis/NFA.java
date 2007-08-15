@@ -42,28 +42,24 @@ public class NFA {
 
     /** This NFA represents which grammar? */
     public Grammar grammar;
-
-    /** The NFA states in this NFA.  Maps state number to NFAState object.
-     *  This is a Vector instead of a List because I need to be able to grow
-     *  this properly.  After talking to Josh Bloch, Collections guy at Sun,
-     *  I decided this was easiest solution.
-     */
-    protected Vector numberToStateList = new Vector(1000);
-
-    /** Which factory created this NFA? */
+	
+	/** Which factory created this NFA? */
     protected NFAFactory factory = null;
 
     public NFA(Grammar g) {
         this.grammar = g;
     }
 
-    public void addState(NFAState state) {
-        numberToStateList.setSize(state.stateNumber+1); // make sure we have room
-        numberToStateList.set(state.stateNumber, state);
+	public int getNewNFAStateNumber() {
+		return grammar.composite.getNewNFAStateNumber();
+	}
+
+	public void addState(NFAState state) {
+		grammar.composite.addState(state);
     }
 
     public NFAState getState(int s) {
-        return (NFAState)numberToStateList.get(s);
+		return grammar.composite.getState(s);
     }
 
     public NFAFactory getFactory() {

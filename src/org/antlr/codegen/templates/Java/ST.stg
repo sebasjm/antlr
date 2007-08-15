@@ -82,11 +82,11 @@ rewriteTemplate(alts) ::= <<
 <if(backtracking)>
 if ( backtracking==0 ) {
   <alts:rewriteTemplateAlt(); separator="else ">
-  <if(rewrite)><replaceTextInLine()><endif>
+  <if(rewriteMode)><replaceTextInLine()><endif>
 }
 <else>
 <alts:rewriteTemplateAlt(); separator="else ">
-<if(rewrite)><replaceTextInLine()><endif>
+<if(rewriteMode)><replaceTextInLine()><endif>
 <endif>
 >>
 

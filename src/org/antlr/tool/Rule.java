@@ -29,11 +29,12 @@ package org.antlr.tool;
 
 import antlr.CommonToken;
 import org.antlr.analysis.NFAState;
+import org.antlr.analysis.LookaheadSet;
 import org.antlr.codegen.CodeGenerator;
 
 import java.util.*;
 
-/** Combine the info associated with a rule */
+/** Combine the info associated with a rule. */
 public class Rule {
 	public String name;
 	public int index;
@@ -141,6 +142,8 @@ public class Rule {
 	public boolean referencedPredefinedRuleAttributes = false;
 
 	public boolean isSynPred = false;
+
+	public boolean imported = false;
 
 	public Rule(Grammar grammar,
 				String ruleName,
@@ -290,7 +293,6 @@ public class Rule {
 	 *  left-hand-side; so we need Lists.  This is a unique list of all
 	 *  token types for which the rule needs a list of tokens.  This
 	 *  is called from the rule template not directly by the code generator.
-	 */
 	public Set getAllTokenRefsInAltsWithRewrites() {
 		String output = (String)grammar.getOption("output");
 		Set tokens = new HashSet();
@@ -313,15 +315,17 @@ public class Rule {
 		}
 		return tokens;
 	}
+	 */
 
+	/*
 	public Set getRuleRefsInAlt(int outerAltNum) {
 		return altToRuleRefMap[outerAltNum].keySet();
 	}
+	*/
 
 	/** For use with rewrite rules, we must track all rule AST results on the
 	 *  left-hand-side; so we need Lists.  This is a unique list of all
 	 *  rule results for which the rule needs a list of results.
-	 */
 	public Set getAllRuleRefsInAltsWithRewrites() {
 		Set rules = new HashSet();
 		for (int i = 1; i <= numberOfAlts; i++) {
@@ -332,6 +336,7 @@ public class Rule {
 		}
 		return rules;
 	}
+	 */
 
 	public List<GrammarAST> getInlineActions() {
 		return inlineActions;
@@ -553,10 +558,20 @@ public class Rule {
 		}
 	}
 
+	/** Used during grammar imports to see if sets of rules intersect... This
+	 *  method and hashCode use the String name as the key for Rule objects.
+	public boolean equals(Object other) {
+		return this.name.equals(((Rule)other).name);
+	}
+	 */
+
+	/** Used during grammar imports to see if sets of rules intersect...
+	public int hashCode() {
+		return name.hashCode();
+	}
+	 * */
+
 	public String toString() { // used for testing
-		if ( modifier!=null ) {
-			return modifier+" "+name;
-		}
-		return name;
+		return "["+grammar.name+"."+name+",index="+index+",line="+tree.getToken().getLine()+"]";
 	}
 }

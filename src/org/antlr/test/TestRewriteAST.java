@@ -953,9 +953,7 @@ public class TestRewriteAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "a b", debug);
-		//assertEquals("[not sure what this should be!]\n", found);
-//ATTENTION: I changed this one's behavior from the above.  Is it right?
-		assertEquals("nil\n", found);
+		assertEquals("", found);
 	}
 
 	public void testSet() throws Exception {

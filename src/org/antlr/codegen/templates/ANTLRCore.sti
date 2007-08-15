@@ -34,7 +34,7 @@ interface ANTLRCore;
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs,
-	   bitsets, buildTemplate, buildAST, rewrite, profile,
+	   bitsets, buildTemplate, buildAST, rewriteMode, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
 	   scopes, superClass, literals);
@@ -44,7 +44,7 @@ optional
 headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs,
-	   bitsets, buildTemplate, buildAST, rewrite, profile,
+	   bitsets, buildTemplate, buildAST, rewriteMode, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
 	   scopes, superClass, literals);
@@ -122,7 +122,7 @@ optionalBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,
 optionalBlockSingleAlt(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,maxAlt,description);
 
 /** An alternative is just a list of elements; at outermost level */
-alt(elements,altNum,description,autoAST,outerAlt);
+alt(elements,altNum,description,autoAST,outerAlt,treeLevel);
 
 // E L E M E N T S
 
@@ -160,22 +160,23 @@ wildcardCharListLabel(label, elementIndex);
 /** Match a rule reference by invoking it possibly with arguments
  *  and a return value or values.
  */
-ruleRef(rule,label,elementIndex,args);
+ruleRef(rule,label,elementIndex,args,scope);
 
 /** ids+=ID */
-ruleRefAndListLabel(rule,label,elementIndex,args);
+ruleRefAndListLabel(rule,label,elementIndex,args,scope);
 
 /** A lexer rule reference */
-lexerRuleRef(rule,label,args,elementIndex);
+lexerRuleRef(rule,label,args,elementIndex,scope);
 
 /** i+=INT in lexer */
-lexerRuleRefAndListLabel(rule,label,args,elementIndex);
+lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope);
 
 /** EOF in the lexer */
 lexerMatchEOF(label,elementIndex);
 
 /** match ^(root children) in tree parser */
-tree(root, actionsAfterRoot, children, nullableChildList);
+tree(root, actionsAfterRoot, children, nullableChildList,
+     enclosingTreeLevel, treeLevel);
 
 /** Every predicate is used as a validating predicate (even when it is
  *  also hoisted into a prediction expression).
