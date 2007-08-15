@@ -1292,8 +1292,12 @@ returnScopeInterface(ruleDescriptor) ::= <<
 @interface <returnTypeName()> : ANTLR<if(TREE_PARSER)>Tree<endif>ParserRuleReturnScope {
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
     <@ivars()>
+    <actions.(actionScope).ruleReturnIvars>
+    <endif>
+
 }
 <@methods()>
+<actions.(actionScope).ruleReturnMethodsDecl>
 @end
 <endif>
 <endif>
@@ -1304,6 +1308,7 @@ returnScope(ruleDescriptor) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 @implementation <returnTypeName()>
 <@methods()>
+<actions.(actionScope).ruleReturnMethods>
 @end
 <endif>
 <endif>
