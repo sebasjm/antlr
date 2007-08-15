@@ -7,44 +7,51 @@
 #endif
 
 /* COMMON_TOKEN_STREAM API */
-static void		    setTokenTypeChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT32 ttype, ANTLR3_UINT32 channel);
-static void		    discardTokenType	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT32 ttype);
-static void		    discardOffChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_BOOLEAN discard);
-static pANTLR3_VECTOR	    getTokens		(pANTLR3_COMMON_TOKEN_STREAM cts);
-static pANTLR3_LIST	    getTokenRange	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
-static pANTLR3_LIST	    getTokensSet	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_BITSET types);
-static pANTLR3_LIST	    getTokensList	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_LIST list);
-static pANTLR3_LIST	    getTokensType	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, ANTLR3_UINT32 type);
+static void					setTokenTypeChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT32 ttype, ANTLR3_UINT32 channel);
+static void					discardTokenType	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT32 ttype);
+static void					discardOffChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_BOOLEAN discard);
+static pANTLR3_VECTOR		getTokens			(pANTLR3_COMMON_TOKEN_STREAM cts);
+static pANTLR3_LIST			getTokenRange		(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
+static pANTLR3_LIST			getTokensSet		(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_BITSET types);
+static pANTLR3_LIST			getTokensList		(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_LIST list);
+static pANTLR3_LIST			getTokensType		(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, ANTLR3_UINT32 type);
 
 /* TOKEN_STREAM API 
  */
-static pANTLR3_COMMON_TOKEN tokLT		(pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k);
-static pANTLR3_COMMON_TOKEN get			(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 i);
-static pANTLR3_TOKEN_SOURCE getTokenSource	(pANTLR3_TOKEN_STREAM ts);
-static void		    setTokenSource	(pANTLR3_TOKEN_STREAM ts, pANTLR3_TOKEN_SOURCE tokenSource);
-static pANTLR3_STRING	    toString		(pANTLR3_TOKEN_STREAM ts);
-static pANTLR3_STRING	    toStringSS		(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
-static pANTLR3_STRING	    toStringTT		(pANTLR3_TOKEN_STREAM ts, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON_TOKEN stop);
+static pANTLR3_COMMON_TOKEN tokLT				(pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k);
+static pANTLR3_COMMON_TOKEN dbgTokLT			(pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k);
+static pANTLR3_COMMON_TOKEN get					(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 i);
+static pANTLR3_TOKEN_SOURCE getTokenSource		(pANTLR3_TOKEN_STREAM ts);
+static void					setTokenSource		(pANTLR3_TOKEN_STREAM ts, pANTLR3_TOKEN_SOURCE tokenSource);
+static pANTLR3_STRING	    toString			(pANTLR3_TOKEN_STREAM ts);
+static pANTLR3_STRING	    toStringSS			(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
+static pANTLR3_STRING	    toStringTT			(pANTLR3_TOKEN_STREAM ts, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON_TOKEN stop);
 
 /* INT STREAM API */
-static void		    consume		(pANTLR3_INT_STREAM is);
-static ANTLR3_UINT32	    _LA			(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
-static ANTLR3_UINT64	    mark		(pANTLR3_INT_STREAM is);
-static void		    release		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
-static ANTLR3_UINT64	    size		(pANTLR3_INT_STREAM is);
-static ANTLR3_INT64	    tindex		(pANTLR3_INT_STREAM is);
-static void		    rewindStream	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
-static void		    rewindLast		(pANTLR3_INT_STREAM is);
-static void		    seek		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
+static void					consume						(pANTLR3_INT_STREAM is);
+static void					dbgConsume					(pANTLR3_INT_STREAM is);
+static ANTLR3_UINT32	    _LA							(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
+static ANTLR3_UINT32	    dbgLA						(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
+static ANTLR3_UINT64	    mark						(pANTLR3_INT_STREAM is);
+static ANTLR3_UINT64	    dbgMark						(pANTLR3_INT_STREAM is);
+static void					release						(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
+static ANTLR3_UINT64	    size						(pANTLR3_INT_STREAM is);
+static ANTLR3_INT64			tindex						(pANTLR3_INT_STREAM is);
+static void					rewindStream				(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
+static void					dbgRewindStream				(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
+static void					rewindLast					(pANTLR3_INT_STREAM is);
+static void					dbgRewindLast				(pANTLR3_INT_STREAM is);
+static void					seek						(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
+static void					dbgSeek						(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
 
-static void		    antlr3TokenStreamFree   (pANTLR3_TOKEN_STREAM	    stream);
-static void		    antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM    stream);
+static void					antlr3TokenStreamFree		(pANTLR3_TOKEN_STREAM	    stream);
+static void					antlr3CTSFree				(pANTLR3_COMMON_TOKEN_STREAM    stream);
 
 /* Helpers */
-static void		    fillBuffer			(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
-static ANTLR3_UINT64	    skipOffTokenChannels	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
+static void					fillBuffer					(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
+static ANTLR3_UINT64	    skipOffTokenChannels		(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
 static ANTLR3_UINT64	    skipOffTokenChannelsReverse	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
-static pANTLR3_COMMON_TOKEN LB				(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
+static pANTLR3_COMMON_TOKEN LB							(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
 
 ANTLR3_API pANTLR3_TOKEN_STREAM
 antlr3TokenStreamNew()
@@ -114,10 +121,33 @@ antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM stream)
     ANTLR3_FREE(stream);
 }
 
-static void
-freeEofTOken(pANTLR3_COMMON_TOKEN tok)
+ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
+antlr3CommonTokenDebugStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source, pANTLR3_DEBUG_EVENT_LISTENER debugger)
 {
-    ANTLR3_FREE(tok);
+    pANTLR3_COMMON_TOKEN_STREAM	stream;
+
+	// Create a standard token stream
+	//
+	stream = antlr3CommonTokenStreamSourceNew(hint, source);
+
+	// Install the debugger object
+	//
+	stream->tstream->debugger = debugger;
+
+	// Override standard token stream methods with debugging versions
+	//
+	stream->tstream->initialStreamState	= ANTLR3_FALSE;
+
+	stream->tstream->_LT				= dbgTokLT;
+
+	stream->tstream->istream->consume		= dbgConsume;
+	stream->tstream->istream->_LA			= dbgLA;
+	stream->tstream->istream->mark			= dbgMark;
+	stream->tstream->istream->rewind		= dbgRewindStream;
+	stream->tstream->istream->rewindLast	= dbgRewindLast;
+	stream->tstream->istream->seek			= dbgSeek;
+
+	return stream;
 }
 
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
@@ -264,6 +294,40 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
     }
 
     return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i+1);
+}
+
+/// Debug only method to flag consumption of initial off-channel
+/// tokens in the input stream
+///
+static void
+consumeInitialHiddenTokens(pANTLR3_INT_STREAM is)
+{
+	ANTLR3_UINT64	first;
+	ANTLR3_UINT64	i;
+	pANTLR3_TOKEN_STREAM	ts;
+
+	ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+	first	= is->index(is);
+
+	for	(i=0; i<first; i++)
+	{
+		ts->debugger->consumeHiddenToken(ts->debugger, ts->get(ts, i));
+	}
+
+	ts->initialStreamState = ANTLR3_FALSE;
+
+}
+
+/// As per the normal tokLT but sends information to the debugger
+///
+static pANTLR3_COMMON_TOKEN 
+dbgTokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
+{
+	if	(ts->initialStreamState == ANTLR3_TRUE)
+	{
+		consumeInitialHiddenTokens(ts->istream);
+	}
+	return tokLT(ts, k);
 }
 
 #ifdef	WIN32
@@ -420,18 +484,63 @@ toStringTT  (pANTLR3_TOKEN_STREAM ts, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON
 static void		    
 consume	(pANTLR3_INT_STREAM is)
 {
-    pANTLR3_COMMON_TOKEN_STREAM cts;
-    pANTLR3_TOKEN_STREAM	ts;
+	pANTLR3_COMMON_TOKEN_STREAM cts;
+	pANTLR3_TOKEN_STREAM	ts;
 
-    ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
-    cts	    = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
+	ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+	cts	    = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
 
-    if	((ANTLR3_UINT64)cts->p < cts->tokens->size(cts->tokens))
-    {
-	cts->p++;
-	cts->p	= skipOffTokenChannels(cts, cts->p);
-    }
+	if	((ANTLR3_UINT64)cts->p < cts->tokens->size(cts->tokens))
+	{
+		cts->p++;
+		cts->p	= skipOffTokenChannels(cts, cts->p);
+	}
 }
+
+
+/// As per ordinary consume but notifies the debugger about hidden
+/// tokens and so on.
+///
+static void
+dbgConsume	(pANTLR3_INT_STREAM is)
+{
+	pANTLR3_TOKEN_STREAM	ts;
+	ANTLR3_UINT64			a;
+	ANTLR3_UINT64			b;
+	pANTLR3_COMMON_TOKEN	t;
+
+	ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+
+	if	(ts->initialStreamState == ANTLR3_TRUE)
+	{
+		consumeInitialHiddenTokens(is);
+	}
+	
+	a = is->index(is);		// Where are we right now?
+	t = ts->_LT(ts, 1);		// Current token from stream
+
+	consume(is);			// Standard consumer
+
+	b = is->index(is);		// Where are we after consuming 1 on channel token?
+
+	ts->debugger->consumeToken(ts->debugger, t);	// Tell the debugger that we consumed the first token
+
+	if	(b>a+1)
+	{
+		// The standard consume caused the index to advance by more than 1,
+		// which can only happen if it skipped some off-channel tokens.
+		// we need to tell the debugger about those tokens.
+		//
+		ANTLR3_UINT64	i;
+
+		for	(i = a+1; i<b; i++)
+		{
+			ts->debugger->consumeHiddenToken(ts->debugger, ts->get(ts, i));
+		}
+
+	}
+}
+
 /** A simple filter mechanism whereby you can tell this token stream
  *  to force all tokens of type ttype to be on channel.  For example,
  *  when interpreting, we cannot execute actions so we need to tell
@@ -575,27 +684,59 @@ getTokensType	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_UINT64 start, ANT
 static ANTLR3_UINT32	    
 _LA  (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 {
-    pANTLR3_TOKEN_STREAM    ts;
-    pANTLR3_COMMON_TOKEN    tok;
+	pANTLR3_TOKEN_STREAM    ts;
+	pANTLR3_COMMON_TOKEN    tok;
 
+	ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+
+	tok	    = ts->_LT(ts, i);
+
+	if	(tok != NULL)
+	{
+		return	tok->getType(tok);
+	}
+	else
+	{
+		return	ANTLR3_TOKEN_INVALID;
+	}
+}
+
+/// As per _LA() but for debug mode.
+///
+static ANTLR3_UINT32	    
+dbgLA  (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
+{
+    pANTLR3_TOKEN_STREAM    ts;
+   
     ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
 
-    tok	    = ts->_LT(ts, i);
-
-    if	(tok != NULL)
-    {
-	return	tok->getType(tok);
-    }
-    else
-    {
-	return	ANTLR3_TOKEN_INVALID;
-    }
+	if	(ts->initialStreamState == ANTLR3_TRUE)
+	{
+		consumeInitialHiddenTokens(is);
+	}
+	ts->debugger->LT(ts->debugger, i, tokLT(ts, i));
+	return	_LA(is, i);
 }
 
 static ANTLR3_UINT64
 mark	(pANTLR3_INT_STREAM is)
 {
     is->lastMarker = is->index(is);
+    return  is->lastMarker;
+}
+
+/// As per mark() but with a call to tell the debugger we are doing this
+///
+static ANTLR3_UINT64
+dbgMark	(pANTLR3_INT_STREAM is)
+{
+    pANTLR3_TOKEN_STREAM    ts;
+   
+    ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+	
+	is->lastMarker = is->index(is);
+	ts->debugger->mark(ts->debugger, is->lastMarker);
+
     return  is->lastMarker;
 }
 
@@ -637,12 +778,33 @@ tindex	(pANTLR3_INT_STREAM is)
 static void		    
 rewindLast	(pANTLR3_INT_STREAM is)
 {
+	pANTLR3_TOKEN_STREAM	ts;
+
+    ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+
+	ts->debugger->rewindLast(ts->debugger);
+
     is->rewind(is, is->lastMarker);
 }
-
+static void		    
+dbgRewindLast	(pANTLR3_INT_STREAM is)
+{
+    is->rewind(is, is->lastMarker);
+}
 static void		    
 rewindStream	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 {
+    is->seek(is, marker);
+}
+static void		    
+dbgRewindStream	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
+{
+    pANTLR3_TOKEN_STREAM	ts;
+
+    ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
+
+	ts->debugger->rewind(ts->debugger, marker);
+
     is->seek(is, marker);
 }
 
@@ -656,6 +818,13 @@ seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index)
     cts	    = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
 
     cts->p  = index;
+}
+static void		    
+dbgSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index)
+{
+	// TODO: Implement seek in debugger when Ter adds it to Java
+	//
+	seek(is, index);
 }
 
 static void

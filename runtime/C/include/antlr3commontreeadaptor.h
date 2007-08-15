@@ -10,6 +10,7 @@
 #include    <antlr3string.h>
 #include    <antlr3basetreeadaptor.h>
 #include    <antlr3commontree.h>
+#include	<antlr3debugeventlistener.h>
 
 typedef	struct ANTLR3_COMMON_TREE_ADAPTOR_struct
 {

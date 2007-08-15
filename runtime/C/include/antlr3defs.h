@@ -5,7 +5,7 @@
 #define	_ANTLR3DEFS_H
 
 
-/* Following are for genreaed code, they are not referenced internally!!!
+/* Following are for generated code, they are not referenced internally!!!
  */
 #if !defined(ANTLR3_HUGE) && !defined(ANTLR3_AVERAGE) && !defined(ANTLR3_SMALL)
 #define	ANTLR3_AVERAGE
@@ -114,6 +114,10 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 
 #ifdef	ANTLR3_WIN64
 #endif
+
+
+typedef	int	ANTLR3_SALENT;							// type used for size of accept structure
+typedef struct sockaddr *	pANTLR3_SOCKADDR;		// Type used for cast on accept()
 
 /* Warnings that are over-zealous such as complaining about strdup, we
  * can turn off.
@@ -245,6 +249,7 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 #endif
 #define	ANTLR3_UINT64_LIT(lit)	    lit##ULL
 
+
 #endif
 
 /* Predeclare the typedefs for all the interfaces, then 
@@ -255,81 +260,84 @@ typedef	struct stat ANTLR3_FSTAT_STRUCT;
 
 /* Prototypes
  */
-#define	ANTLR3_MALLOC(request)		    calloc  (1, (size_t)(request))
-#define ANTLR3_REALLOC(current, request)    realloc ((void *)(current), (size_t)(request))
-#define	ANTLR3_FREE(ptr)		    free    ((void *)(ptr))
-#define	ANTLR3_FREE_FUNC		    free
-#define	ANTLR3_STRDUP(instr)		    (pANTLR3_UINT8)(strdup  ((const char *)(instr)))
+#define	ANTLR3_MALLOC(request)					calloc  (1, (size_t)(request))
+#define ANTLR3_REALLOC(current, request)		realloc ((void *)(current), (size_t)(request))
+#define	ANTLR3_FREE(ptr)						free    ((void *)(ptr))
+#define	ANTLR3_FREE_FUNC						free
+#define	ANTLR3_STRDUP(instr)					(pANTLR3_UINT8)(strdup  ((const char *)(instr)))
 #define	ANTLR3_MEMMOVE(target, source, size)	memmove((void *)(target), (const void *)(source), (size_t)(size))
-#define	ANTLR3_MEMSET(target, byte, size)	memset((void *)(target), (int)(byte), (size_t)(size))
+#define	ANTLR3_MEMSET(target, byte, size)		memset((void *)(target), (int)(byte), (size_t)(size))
 
-ANTLR3_API pANTLR3_INT_TRIE	    antlr3IntTrieNew		    (ANTLR3_UINT32 depth);
+ANTLR3_API pANTLR3_INT_TRIE					antlr3IntTrieNew					(ANTLR3_UINT32 depth);
 
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetNew		    (ANTLR3_UINT32 numBits);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetOf		    (ANTLR3_INT32 bit, ...);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetList		    (pANTLR3_HASH_TABLE list);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetCopy		    (pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements);
-ANTLR3_API pANTLR3_BITSET	    antlr3BitsetLoad		    (ANTLR3_UINT32 ec, pANTLR3_UINT64 bset);
-ANTLR3_API void			    antlr3BitsetSetAPI		    (pANTLR3_BITSET bitset);
+ANTLR3_API pANTLR3_BITSET					antlr3BitsetNew						(ANTLR3_UINT32 numBits);
+ANTLR3_API pANTLR3_BITSET					antlr3BitsetOf						(ANTLR3_INT32 bit, ...);
+ANTLR3_API pANTLR3_BITSET					antlr3BitsetList					(pANTLR3_HASH_TABLE list);
+ANTLR3_API pANTLR3_BITSET					antlr3BitsetCopy					(pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements);
+ANTLR3_API pANTLR3_BITSET					antlr3BitsetLoad					(ANTLR3_UINT32 ec, pANTLR3_UINT64 bset);
+ANTLR3_API void								antlr3BitsetSetAPI					(pANTLR3_BITSET bitset);
 
 
-ANTLR3_API pANTLR3_BASE_RECOGNIZER  antlr3BaseRecognizerNew	    (ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint);
-ANTLR3_API void			    antlr3RecognitionExceptionNew   (pANTLR3_BASE_RECOGNIZER recognizer);
-ANTLR3_API void			    antlr3MTExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer);
-ANTLR3_API void			    antlr3MTNExceptionNew	    (pANTLR3_BASE_RECOGNIZER recognizer);
-ANTLR3_API pANTLR3_HASH_TABLE	    antlr3HashTableNew		    (ANTLR3_UINT32 sizeHint);
-ANTLR3_API ANTLR3_UINT32	    antlr3Hash			    (void * key, ANTLR3_UINT32 keylen);
-ANTLR3_API pANTLR3_HASH_ENUM	    antlr3EnumNew		    (pANTLR3_HASH_TABLE table);
-ANTLR3_API pANTLR3_LIST		    antlr3ListNew		    (ANTLR3_UINT32 sizeHint);
-ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 sizeHint);
-ANTLR3_API pANTLR3_VECTOR	    antlr3VectorNew		    (ANTLR3_UINT32 sizeHint);
-ANTLR3_API pANTLR3_STACK	    antlr3StackNew		    (ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_BASE_RECOGNIZER			antlr3BaseRecognizerNew				(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint);
+ANTLR3_API void								antlr3RecognitionExceptionNew		(pANTLR3_BASE_RECOGNIZER recognizer);
+ANTLR3_API void								antlr3MTExceptionNew				(pANTLR3_BASE_RECOGNIZER recognizer);
+ANTLR3_API void								antlr3MTNExceptionNew				(pANTLR3_BASE_RECOGNIZER recognizer);
+ANTLR3_API pANTLR3_HASH_TABLE				antlr3HashTableNew					(ANTLR3_UINT32 sizeHint);
+ANTLR3_API ANTLR3_UINT32					antlr3Hash							(void * key, ANTLR3_UINT32 keylen);
+ANTLR3_API pANTLR3_HASH_ENUM				antlr3EnumNew						(pANTLR3_HASH_TABLE table);
+ANTLR3_API pANTLR3_LIST						antlr3ListNew						(ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_VECTOR_FACTORY			antlr3VectorFactoryNew				(ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_VECTOR					antlr3VectorNew						(ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_STACK					antlr3StackNew						(ANTLR3_UINT32 sizeHint);
 
-ANTLR3_API ANTLR3_UCHAR		    antlr3c8toAntlrc		    (ANTLR3_INT8 inc);
+ANTLR3_API ANTLR3_UCHAR						antlr3c8toAntlrc					(ANTLR3_INT8 inc);
 
-ANTLR3_API pANTLR3_EXCEPTION	    antlr3ExceptionNew		    (ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_BOOLEAN freeMessage);
+ANTLR3_API pANTLR3_EXCEPTION				antlr3ExceptionNew					(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_BOOLEAN freeMessage);
 
-ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3AsciiFileStreamNew	    (pANTLR3_UINT8 fileName);
+ANTLR3_API pANTLR3_INPUT_STREAM				antlr3AsciiFileStreamNew			(pANTLR3_UINT8 fileName);
+		
+ANTLR3_API pANTLR3_INPUT_STREAM				antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
+ANTLR3_API pANTLR3_INPUT_STREAM				antlr3NewUCS2StringInPlaceStream	(pANTLR3_UINT16 inString, ANTLR3_UINT64 size, pANTLR3_UINT16 name);
+ANTLR3_API pANTLR3_INPUT_STREAM				antlr3NewAsciiStringCopyStream		(pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
 
-ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
-ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewUCS2StringInPlaceStream	(pANTLR3_UINT16 inString, ANTLR3_UINT64 size, pANTLR3_UINT16 name);
-ANTLR3_API pANTLR3_INPUT_STREAM	    antlr3NewAsciiStringCopyStream	(pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
+ANTLR3_API pANTLR3_INT_STREAM				antlr3IntStreamNew					(void);
 
-ANTLR3_API pANTLR3_INT_STREAM	    antlr3IntStreamNew		    (void);
+ANTLR3_API pANTLR3_STRING_FACTORY			antlr3StringFactoryNew				(void);
+ANTLR3_API pANTLR3_STRING_FACTORY			antlr3UCS2StringFactoryNew			(void);
 
-ANTLR3_API pANTLR3_STRING_FACTORY   antlr3StringFactoryNew	    (void);
-ANTLR3_API pANTLR3_STRING_FACTORY   antlr3UCS2StringFactoryNew	    (void);
+ANTLR3_API pANTLR3_COMMON_TOKEN				antlr3CommonTokenNew				(ANTLR3_UINT32 ttype);
+ANTLR3_API pANTLR3_TOKEN_FACTORY			antlr3TokenFactoryNew				(pANTLR3_INPUT_STREAM input);
+ANTLR3_API void								antlr3SetTokenAPI					(pANTLR3_COMMON_TOKEN token);
 
-ANTLR3_API pANTLR3_COMMON_TOKEN	    antlr3CommonTokenNew	    (ANTLR3_UINT32 ttype);
-ANTLR3_API pANTLR3_TOKEN_FACTORY    antlr3TokenFactoryNew	    (pANTLR3_INPUT_STREAM input);
-ANTLR3_API void			    antlr3SetTokenAPI		    (pANTLR3_COMMON_TOKEN token);
+ANTLR3_API pANTLR3_LEXER					antlr3LexerNewStream				(ANTLR3_UINT32 sizeHint, pANTLR3_INPUT_STREAM input);
+ANTLR3_API pANTLR3_LEXER					antlr3LexerNew						(ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_PARSER					antlr3ParserNewStream				(ANTLR3_UINT32 sizeHint, pANTLR3_TOKEN_STREAM tstream);
+ANTLR3_API pANTLR3_PARSER					antlr3ParserNew						(ANTLR3_UINT32 sizeHint);
 
-ANTLR3_API pANTLR3_LEXER	    antlr3LexerNewStream	    (ANTLR3_UINT32 sizeHint, pANTLR3_INPUT_STREAM input);
-ANTLR3_API pANTLR3_LEXER	    antlr3LexerNew		    (ANTLR3_UINT32 sizeHint);
-ANTLR3_API pANTLR3_PARSER	    antlr3ParserNewStream	    (ANTLR3_UINT32 sizeHint, pANTLR3_TOKEN_STREAM tstream);
-ANTLR3_API pANTLR3_PARSER	    antlr3ParserNew		    (ANTLR3_UINT32 sizeHint);
+ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM		antlr3CommonTokenStreamSourceNew	(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source);
+ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM		antlr3CommonTokenStreamNew			(ANTLR3_UINT32 hint);
+ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM		antlr3CommonTokenDebugStreamSourceNew
+																				(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source, pANTLR3_DEBUG_EVENT_LISTENER debugger);
 
-ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM	antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source);
-ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM	antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint);
+ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR	    ANTLR3_TREE_ADAPTORNew				(pANTLR3_STRING_FACTORY strFactory);
+ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR	    ANTLR3_TREE_ADAPTORDebugNew			(pANTLR3_STRING_FACTORY strFactory, pANTLR3_DEBUG_EVENT_LISTENER	debugger);
+ANTLR3_API pANTLR3_COMMON_TREE				antlr3CommonTreeNew					(void);
+ANTLR3_API pANTLR3_COMMON_TREE				antlr3CommonTreeNewFromTree			(pANTLR3_COMMON_TREE tree);
+ANTLR3_API pANTLR3_COMMON_TREE				antlr3CommonTreeNewFromToken		(pANTLR3_COMMON_TOKEN tree);
+ANTLR3_API pANTLR3_ARBORETUM				antlr3ArboretumNew					(pANTLR3_STRING_FACTORY factory);
+ANTLR3_API void								antlr3SetCTAPI						(pANTLR3_COMMON_TREE tree);
+ANTLR3_API pANTLR3_BASE_TREE				antlr3BaseTreeNew					(pANTLR3_BASE_TREE tree);
 
-ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR	    ANTLR3_TREE_ADAPTORNew  (pANTLR3_STRING_FACTORY strFactory);
-ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNew		    (void);
-ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromTree	    (pANTLR3_COMMON_TREE tree);
-ANTLR3_API pANTLR3_COMMON_TREE	    antlr3CommonTreeNewFromToken    (pANTLR3_COMMON_TOKEN tree);
-ANTLR3_API pANTLR3_ARBORETUM	    antlr3ArboretumNew		    (pANTLR3_STRING_FACTORY factory);
-ANTLR3_API void			    antlr3SetCTAPI		    (pANTLR3_COMMON_TREE tree);
-ANTLR3_API pANTLR3_BASE_TREE	    antlr3BaseTreeNew		    (pANTLR3_BASE_TREE tree);
+ANTLR3_API void								antlr3BaseTreeAdaptorInit			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT_LISTENER debugger);
 
-ANTLR3_API void			    antlr3BaseTreeAdaptorInit	    (pANTLR3_BASE_TREE_ADAPTOR adaptor);
+ANTLR3_API pANTLR3_TREE_PARSER				antlr3TreeParserNewStream			(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREAM ctnstream);
 
-ANTLR3_API pANTLR3_TREE_PARSER	    antlr3TreeParserNewStream	    (ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREAM ctnstream);
+ANTLR3_API ANTLR3_INT32						antlr3dfaspecialTransition			(void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_INT32 s);
+ANTLR3_API ANTLR3_INT32						antlr3dfaspecialStateTransition		(void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_INT32 s);
+ANTLR3_API ANTLR3_INT32						antlr3dfapredict					(void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA cdfa);
 
-ANTLR3_API ANTLR3_INT32		    antlr3dfaspecialTransition	    (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_INT32 s);
-ANTLR3_API ANTLR3_INT32		    antlr3dfaspecialStateTransition (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA dfa, ANTLR3_INT32 s);
-ANTLR3_API ANTLR3_INT32		    antlr3dfapredict		    (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA cdfa);
-
-ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM  antlr3CommonTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint);
-ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM  antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 hint);
+ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM  antlr3CommonTreeNodeStreamNewTree	(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint);
+ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM  antlr3CommonTreeNodeStreamNew		(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 hint);
 
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
 	    antlr3RewriteRuleTokenStreamNewAE	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description);
@@ -343,5 +351,7 @@ ANTLR3_API pANTLR3_REWRITE_RULE_SUBTREE_STREAM
 	    antlr3RewriteRuleSubtreeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement);
 ANTLR3_API pANTLR3_REWRITE_RULE_SUBTREE_STREAM 
 	    antlr3RewriteRuleSubtreeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector);
+
+ANTLR3_API pANTLR3_DEBUG_EVENT_LISTENER		antlr3DebugListenerNew				();
 
 #endif	/* _ANTLR3DEFS_H	*/

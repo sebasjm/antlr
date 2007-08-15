@@ -30,16 +30,16 @@ typedef struct ANTLR3_COMMON_TREE_struct
      */
     pANTLR3_COMMON_TOKEN    token;
 
-    /** Inidicates whether this token was created by the Arboretum or
+    /** Indicates whether this token was created by the Arboretum or
      *  is a stand alone structure that we must free.
      */
     ANTLR3_BOOLEAN	    factoryMade;
 
-    /* An encapsulated BASE TREE strcuture (NOT a pointer)
-     * that perfoms a lot of the dirty work of node management
+    /* An encapsulated BASE TREE structure (NOT a pointer)
+     * that performs a lot of the dirty work of node management
      * To this we add just a few functions that are specific to the 
-     * payload. You can further abstract common treeso long
-     * as you alwys have a baseTree pointer in the top structure
+     * payload. You can further abstract common tree so long
+     * as you always have a baseTree pointer in the top structure
      * and copy it from the next one down. 
      * So, lets say we have a structure JIMS_TREE. 
      * It needs an ANTLR3_BASE_TREE that will support all the
@@ -54,8 +54,8 @@ typedef struct ANTLR3_COMMON_TREE_struct
      * antlr3BaseTreeNew(<addressofBASETREE>)
      * The interfaces for BASE_TREE and COMMON_TREE will then
      * be initialized. You then call and you can override them or just init
-     * JIMS_TREE (note that the basetree in common tree will be ignored)
-     * just the top level basetree is used). Codegen will take care of the rest.
+     * JIMS_TREE (note that the base tree in common tree will be ignored)
+     * just the top level base tree is used). Codegen will take care of the rest.
      * 
      */
     ANTLR3_BASE_TREE	    baseTree;

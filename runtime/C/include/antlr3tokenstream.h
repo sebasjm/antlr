@@ -12,6 +12,7 @@
 #include    <antlr3input.h>
 #include    <antlr3commontoken.h>
 #include    <antlr3bitset.h>
+#include	<antlr3debugeventlistener.h>
 
 /** Definition of a token source, which has a pointer to a function that 
  *  returns the next token (using a token factory if it is going to be
@@ -71,6 +72,14 @@ typedef	struct ANTLR3_TOKEN_STREAM_struct
     /** All input streams implement the ANTLR3_INT_STREAM interface...
      */
     pANTLR3_INT_STREAM	    istream;
+
+	/// Debugger interface, is this is a debugging token stream
+	///
+	pANTLR3_DEBUG_EVENT_LISTENER		debugger;
+
+	/// Indicates the initial stream state for dbgConsume()
+	///
+	ANTLR3_BOOLEAN			initialStreamState;
 
     /** Get Token at current input pointer + i ahead where i=1 is next Token.
      *  i<0 indicates tokens in the past.  So -1 is previous token and -2 is

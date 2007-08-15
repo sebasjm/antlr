@@ -1452,7 +1452,7 @@ static ANTLR3_UINT8 bitIndex[256] =
 	7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7
 };
 
-/** Rather than use the bitindex of a trie node to shift
+/** Rather than use the bit index of a trie node to shift
  *  0x01 left that many times, then & with the result, it is
  *  faster to use the bit index as an index into this table
  *  which holds precomputed masks for any of the 64 bits
@@ -1634,168 +1634,168 @@ intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
 static	ANTLR3_BOOLEAN		
 intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3_UINT64 intVal, void * data, void (ANTLR3_CDECL *freeptr)(void *))
 {
-    pANTLR3_INT_TRIE_NODE   thisNode;
-    pANTLR3_INT_TRIE_NODE   nextNode;
-    pANTLR3_INT_TRIE_NODE   entNode;
-    ANTLR3_UINT32	    depth;
-    pANTLR3_TRIE_ENTRY	    newEnt;
-    pANTLR3_TRIE_ENTRY	    nextEnt;
-    ANTLR3_UINT64	    xorKey;
+	pANTLR3_INT_TRIE_NODE   thisNode;
+	pANTLR3_INT_TRIE_NODE   nextNode;
+	pANTLR3_INT_TRIE_NODE   entNode;
+	ANTLR3_UINT32	    depth;
+	pANTLR3_TRIE_ENTRY	    newEnt;
+	pANTLR3_TRIE_ENTRY	    nextEnt;
+	ANTLR3_UINT64	    xorKey;
 
-    /* Cache the bit depth of this trie, which is always the highest index, 
-     * which is in the root node
-     */
-    depth   = trie->root->bitNum;
-
-    thisNode	= trie->root;		/* Start with the root node	    */
-    nextNode	= trie->root->leftN;	/* And assume we start to the left  */
-
-    /* Now find the only node that can be currently reached by the bits in the
-     * key we are being asked to insert.
-     */
-    while (thisNode->bitNum  > nextNode->bitNum)
-    {
-	/* Still descending the structure, next node becomes current.
+	/* Cache the bit depth of this trie, which is always the highest index, 
+	 * which is in the root node
 	 */
-	thisNode = nextNode;
+	depth   = trie->root->bitNum;
 
-	if (key & bitMask[nextNode->bitNum])
-	{
-	    /* Bit at the required index was 1, so travers the right node from here
-	     */
-	    nextNode = nextNode->rightN;
-	}
-	else
-	{
-	    /* Bit at the required index was 0, so we traverse to the left
-	     */
-	    nextNode = nextNode->leftN;
-	}
-    }
-    /* Here we have located the only node that can be reached by the
-     * bits in the requested key. It could in fact be that key or the node
-     * we need to use to insert the new key.
-     */
-    if (nextNode->key == key)
-    {
-	/* We have located an exact match, but we will only append to the bucket chain
-	 * if this trie accepts duplicate keys.
+	thisNode	= trie->root;		/* Start with the root node	    */
+	nextNode	= trie->root->leftN;	/* And assume we start to the left  */
+
+	/* Now find the only node that can be currently reached by the bits in the
+	 * key we are being asked to insert.
 	 */
-	if (trie->allowDups ==ANTLR3_TRUE)
+	while (thisNode->bitNum  > nextNode->bitNum)
 	{
-	    /* Yes, we are accepting duplicates
-	     */
-	    newEnt = (pANTLR3_TRIE_ENTRY)ANTLR3_MALLOC(sizeof(ANTLR3_TRIE_ENTRY));
-
-	    if (newEnt == NULL)
-	    {
-		/* Out of memory, all we can do is return the fact that the insert failed.
+		/* Still descending the structure, next node becomes current.
 		 */
-		return	ANTLR3_FALSE;
-	    }
+		thisNode = nextNode;
 
-	    /* Otherwise insert this in the chain
-	     */
-	    newEnt->type	= type;
-	    newEnt->freeptr	= freeptr;
-	    if (type == ANTLR3_HASH_TYPE_STR)
-	    {
-		newEnt->data.ptr = data;
-	    }
-	    else
-	    {
-		newEnt->data.intVal = intVal;
-	    }
-
-	    /* We want to be able to traverse the stored elements in the order that they were
-	     * added as suplicate keys. We might need to revise this opinioin if we end up having many duplicate keys
-	     * as perhaps reverse order is just as good, so long as it is ordered.
-	     */
-	    nextEnt = nextNode->buckets;
-	    while (nextEnt->next != NULL)
-	    {
-		nextEnt = nextEnt->next;    
-	    }
-	    nextEnt->next = newEnt;
-
-	    trie->count++;
-	    return  ANTLR3_TRUE;
+		if (key & bitMask[nextNode->bitNum])
+		{
+			/* Bit at the required index was 1, so travers the right node from here
+			 */
+			nextNode = nextNode->rightN;
+		}
+		else
+		{
+			/* Bit at the required index was 0, so we traverse to the left
+			 */
+			nextNode = nextNode->leftN;
+		}
 	}
-	else
+	/* Here we have located the only node that can be reached by the
+	 * bits in the requested key. It could in fact be that key or the node
+	 * we need to use to insert the new key.
+	 */
+	if (nextNode->key == key)
 	{
-	    /* We found the key is already there and we are not allowed duplicates in this
-	     * trie.
-	     */
-	    return  ANTLR3_FALSE;
+		/* We have located an exact match, but we will only append to the bucket chain
+		 * if this trie accepts duplicate keys.
+		 */
+		if (trie->allowDups ==ANTLR3_TRUE)
+		{
+			/* Yes, we are accepting duplicates
+			 */
+			newEnt = (pANTLR3_TRIE_ENTRY)ANTLR3_MALLOC(sizeof(ANTLR3_TRIE_ENTRY));
+
+			if (newEnt == NULL)
+			{
+				/* Out of memory, all we can do is return the fact that the insert failed.
+				 */
+				return	ANTLR3_FALSE;
+			}
+
+			/* Otherwise insert this in the chain
+			*/
+			newEnt->type	= type;
+			newEnt->freeptr	= freeptr;
+			if (type == ANTLR3_HASH_TYPE_STR)
+			{
+				newEnt->data.ptr = data;
+			}
+			else
+			{
+				newEnt->data.intVal = intVal;
+			}
+
+			/* We want to be able to traverse the stored elements in the order that they were
+			 * added as duplicate keys. We might need to revise this opinion if we end up having many duplicate keys
+			 * as perhaps reverse order is just as good, so long as it is ordered.
+			 */
+			nextEnt = nextNode->buckets;
+			while (nextEnt->next != NULL)
+			{
+				nextEnt = nextEnt->next;    
+			}
+			nextEnt->next = newEnt;
+
+			trie->count++;
+			return  ANTLR3_TRUE;
+		}
+		else
+		{
+			/* We found the key is already there and we are not allowed duplicates in this
+			 * trie.
+			 */
+			return  ANTLR3_FALSE;
+		}
 	}
-    }
 
-    /* Here we have discovered the only node that can be reached by the bits in the key
-     * but we have found that this node is not the key we need to insert. We must find the
-     * the leftmost bit by which the current key for that node and the new key we are going 
-     * to insert, differ. While this nested series of ifs may look a bit strange, experimentation
-     * showed that it allows a machine code path that works well with predicated execution
-     */
-    xorKey = (key ^ nextNode->key);   /* Gives 1 bits only where they differ then we find the left most 1 bit*/
+	/* Here we have discovered the only node that can be reached by the bits in the key
+	 * but we have found that this node is not the key we need to insert. We must find the
+	 * the leftmost bit by which the current key for that node and the new key we are going 
+	 * to insert, differ. While this nested series of ifs may look a bit strange, experimentation
+	 * showed that it allows a machine code path that works well with predicated execution
+	 */
+	xorKey = (key ^ nextNode->key);   /* Gives 1 bits only where they differ then we find the left most 1 bit*/
 
-    /* Most common case is a 32 bit key really
-     */
+	/* Most common case is a 32 bit key really
+	 */
 #ifdef	ANTLR3_USE_64BIT
-    if	(xorKey & 0xFFFFFFFF00000000)
-    {
-	if  (xorKey & 0xFFFF000000000000)
+	if	(xorKey & 0xFFFFFFFF00000000)
 	{
-	    if	(xorKey & 0xFF00000000000000)
-	    {
-		depth = 56 + bitIndex[((xorKey & 0xFF00000000000000)>>56)];
-	    }
-	    else
-	    {
-		depth = 48 + bitIndex[((xorKey & 0x00FF000000000000)>>48)];
-	    }
+		if  (xorKey & 0xFFFF000000000000)
+		{
+			if	(xorKey & 0xFF00000000000000)
+			{
+				depth = 56 + bitIndex[((xorKey & 0xFF00000000000000)>>56)];
+			}
+			else
+			{
+				depth = 48 + bitIndex[((xorKey & 0x00FF000000000000)>>48)];
+			}
+		}
+		else
+		{
+			if	(xorKey & 0x0000FF0000000000)
+			{
+				depth = 40 + bitIndex[((xorKey & 0x0000FF0000000000)>>40)];
+			}
+			else
+			{
+				depth = 32 + bitIndex[((xorKey & 0x000000FF00000000)>>32)];
+			}
+		}
 	}
 	else
-	{
-	    if	(xorKey & 0x0000FF0000000000)
-	    {
-		depth = 40 + bitIndex[((xorKey & 0x0000FF0000000000)>>40)];
-	    }
-	    else
-	    {
-		depth = 32 + bitIndex[((xorKey & 0x000000FF00000000)>>32)];
-	    }
-	}
-    }
-    else
 #endif
-    {
-	if  (xorKey & 0x00000000FFFF0000)
 	{
-	    if	(xorKey & 0x00000000FF000000)
-	    {
-		depth = 24 + bitIndex[((xorKey & 0x00000000FF000000)>>24)];
-	    }
-	    else
-	    {
-		depth = 16 + bitIndex[((xorKey & 0x0000000000FF0000)>>16)];
-	    }
+		if  (xorKey & 0x00000000FFFF0000)
+		{
+			if	(xorKey & 0x00000000FF000000)
+			{
+				depth = 24 + bitIndex[((xorKey & 0x00000000FF000000)>>24)];
+			}
+			else
+			{
+				depth = 16 + bitIndex[((xorKey & 0x0000000000FF0000)>>16)];
+			}
+		}
+		else
+		{
+			if	(xorKey & 0x000000000000FF00)
+			{
+				depth = 8 + bitIndex[((xorKey & 0x0000000000000FF00)>>8)];
+			}
+			else
+			{
+				depth = bitIndex[xorKey & 0x00000000000000FF];
+			}
+		}
 	}
-	else
-	{
-	    if	(xorKey & 0x000000000000FF00)
-	    {
-		depth = 8 + bitIndex[((xorKey & 0x0000000000000FF00)>>8)];
-	    }
-	    else
-	    {
-		depth = bitIndex[xorKey & 0x00000000000000FF];
-	    }
-	}
-    }
 
     /* We have located the leftmost differing bit, indicated by the depth variable. So, we know what
      * bit index we are to insert the new entry at. There are two cases, being where the two keys
-     * differ at a bit postition that is not currently part of the bit testing, and where they differ on a bit
+     * differ at a bit position that is not currently part of the bit testing, and where they differ on a bit
      * that is currently being skipped in the indexed comparisons, and where they differ on a bit
      * that is merely lower down in the current bit search. If the bit index went bit 4, bit 2 and they differ
      * at bit 3, then we have the "skipped" bit case. But if that chain was Bit 4, Bit 2 and they differ at bit 1
@@ -1817,7 +1817,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 
 	if (key & bitMask[entNode->bitNum])
 	{
-	    /* Bit at the required index was 1, so travers the right node from here
+	    /* Bit at the required index was 1, so traverse the right node from here
 	     */
 	    entNode = entNode->rightN;
 	}
@@ -1829,7 +1829,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
 	}
     }
 
-    /* We have located teh correct insert point for this new key, so we need
+    /* We have located the correct insert point for this new key, so we need
      * to allocate our entry and insert it etc.
      */
     nextNode	= (pANTLR3_INT_TRIE_NODE)ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE_NODE));
@@ -1870,7 +1870,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3
     nextNode->bitNum	= depth;
 
     /* Work out the right and left pointers for this new node, which involve
-     * terminating with the current found node either right or left accorging
+     * terminating with the current found node either right or left according
      * to whether the current index bit is 1 or 0
      */
     if (key & bitMask[depth])

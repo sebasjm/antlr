@@ -21,5 +21,6 @@
 #include    <antlr3basetreeadaptor.h>
 #include    <antlr3commontreeadaptor.h>
 #include    <antlr3rewritestreams.h>
+#include	<antlr3debugeventlistener.h>
 
 #endif

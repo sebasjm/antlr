@@ -1034,80 +1034,93 @@ recover			    (pANTLR3_BASE_RECOGNIZER recognizer)
 static void			
 recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
 {
-    pANTLR3_PARSER	    parser;
-    pANTLR3_TREE_PARSER	    tparser;
-    pANTLR3_INT_STREAM	    is;
+	pANTLR3_PARSER	    parser;
+	pANTLR3_TREE_PARSER	    tparser;
+	pANTLR3_INT_STREAM	    is;
 
-    switch	(recognizer->type)
-    {
-    case	ANTLR3_TYPE_PARSER:
+	// Invoke the debugger event if there is a debugger listening to us
+	//
+	if	(recognizer->debugger != NULL)
+	{
+		recognizer->debugger->recognitionException(recognizer->debugger, recognizer->exception);
+	}
 
-	parser  = (pANTLR3_PARSER) (recognizer->super);
-	tparser	= NULL;
-	is	= parser->tstream->istream;
+	switch	(recognizer->type)
+	{
+	case	ANTLR3_TYPE_PARSER:
 
-	break;
+		parser  = (pANTLR3_PARSER) (recognizer->super);
+		tparser	= NULL;
+		is	= parser->tstream->istream;
 
-    case	ANTLR3_TYPE_TREE_PARSER:
+		break;
 
-	tparser = (pANTLR3_TREE_PARSER) (recognizer->super);
-	parser	= NULL;
-	is	= tparser->ctnstream->tnstream->istream;
+	case	ANTLR3_TYPE_TREE_PARSER:
 
-	break;
+		tparser = (pANTLR3_TREE_PARSER) (recognizer->super);
+		parser	= NULL;
+		is	= tparser->ctnstream->tnstream->istream;
 
-    default:
-	    
-	fprintf(stderr, "Base recognizer function recoverFromMismatchedToken called by unknown parser type - provide override for this function\n");
-	return;
+		break;
 
-	break;
-    }
+	default:
 
-    /* If the next token after the one we are looking at in the input stream
-     * is what we are looking for then we remove the one we have discovered
-     * from the stream by consuming it, then consume this next one along too as
-     * if nothing had happened.
-     */
-    if	( is->_LA(is, 2) == ttype)
-    {
-	/* Print out the error
-	 */
-	recognizer->reportError(recognizer);
+		fprintf(stderr, "Base recognizer function recoverFromMismatchedToken called by unknown parser type - provide override for this function\n");
+		return;
 
-	/* Call resync hook (for debuggeres and so on)
-	 */
-	recognizer->beginResync(recognizer);
+		break;
+	}
 
-	/* "delete" the extra token
-	 */
-	is->consume(is);
+	// If the next token after the one we are looking at in the input stream
+	// is what we are looking for then we remove the one we have discovered
+	// from the stream by consuming it, then consume this next one along too as
+	// if nothing had happened.
+	//
+	if	( is->_LA(is, 2) == ttype)
+	{
+		// Print out the error
+		//
+		recognizer->reportError(recognizer);
 
-	/* End resync hook 
-	 */
-	recognizer->endResync(recognizer);
+		// Call resync hook (for debuggers and so on)
+		//
+		if	(recognizer->debugger != NULL)
+		{
+			recognizer->debugger->beginResync(recognizer->debugger);
+		}
 
-	/* consume the token that the rule actually expected to get
-	 */
-	is->consume(is);
+		// "delete" the extra token
+		//
+		is->consume(is);
 
-	recognizer->error  = ANTLR3_FALSE;	/* Exception is not outstanding any more */
+		// End resync hook 
+		//
+		if	(recognizer->debugger != NULL)
+		{
+			recognizer->debugger->endResync(recognizer->debugger);
+		}
 
-    }
+		// Consume the token that the rule actually expected to get
+		//
+		is->consume(is);
 
-    /* The next token (after the one that is current, is not the one
-     * that we were expecting, so the input is in more of an error state
-     * than we hoped. 
-     * If we are able to recover from the error using the follow set, then
-     * we are hunky dory again and can move on, if we cannot, then we resort
-     * to throwing the exception.
-     */
-    if	(recognizer->recoverFromMismatchedElement(recognizer, follow) == ANTLR3_FALSE)
-    {
-	recognizer->error	    = ANTLR3_TRUE;
-	recognizer->failed	    = ANTLR3_TRUE;
-	return;
-    }
+		recognizer->error  = ANTLR3_FALSE;	// Exception is not outstanding any more
+
+	}
+
+	/* The next token (after the one that is current, is not the one
+	* that we were expecting, so the input is in more of an error state
+	* than we hoped. 
+	* If we are able to recover from the error using the follow set, then
+	* we are hunky dory again and can move on, if we cannot, then we resort
+	* to throwing the exception.
+	*/
+	if	(recognizer->recoverFromMismatchedElement(recognizer, follow) == ANTLR3_FALSE)
+	{
+		recognizer->error	    = ANTLR3_TRUE;
+		recognizer->failed	    = ANTLR3_TRUE;
+		return;
+	}
 }
 
 static void		

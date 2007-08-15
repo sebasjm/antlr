@@ -13,12 +13,13 @@
 #endif
 
 /* BASE_TREE_ADAPTOR overrides... */
-static	pANTLR3_BASE_TREE	dupNode		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE treeNode);
-static	pANTLR3_BASE_TREE	create		(pANTLR3_BASE_TREE_ADAPTOR adpator, pANTLR3_COMMON_TOKEN payload);
+static	pANTLR3_BASE_TREE		dupNode		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE treeNode);
+static	pANTLR3_BASE_TREE		create		(pANTLR3_BASE_TREE_ADAPTOR adpator, pANTLR3_COMMON_TOKEN payload);
+static	pANTLR3_BASE_TREE		dbgCreate	(pANTLR3_BASE_TREE_ADAPTOR adpator, pANTLR3_COMMON_TOKEN payload);
 static	pANTLR3_COMMON_TOKEN	createToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);
 static	pANTLR3_COMMON_TOKEN	createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fromToken);
-static	pANTLR3_STRING		getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	ANTLR3_UINT32		getType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_STRING			getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_UINT32			getType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
 /* Methods specific to each tree adaptor
  */
@@ -40,54 +41,81 @@ static	void		ctaFree			(pANTLR3_BASE_TREE_ADAPTOR adaptor);
 ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR
 ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
 {
-    pANTLR3_COMMON_TREE_ADAPTOR	cta;
+	pANTLR3_COMMON_TREE_ADAPTOR	cta;
 
-    /* First job is to create the memory we need for the tree adaptor interface.
-     */
-    cta	= (pANTLR3_COMMON_TREE_ADAPTOR) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_COMMON_TREE_ADAPTOR)));
+	// First job is to create the memory we need for the tree adaptor interface.
+	//
+	cta	= (pANTLR3_COMMON_TREE_ADAPTOR) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_COMMON_TREE_ADAPTOR)));
 
-    if	(cta == NULL)
-    {
-	return	(pANTLR3_BASE_TREE_ADAPTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if	(cta == NULL)
+	{
+		return	(pANTLR3_BASE_TREE_ADAPTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	}
 
-    /* Memory is initialized, so initialize the base tree adaptor
-     */
-    antlr3BaseTreeAdaptorInit(&(cta->baseAdaptor));
+	// Memory is initialized, so initialize the base tree adaptor
+	//
+	antlr3BaseTreeAdaptorInit(&(cta->baseAdaptor), NULL);
 
-    /* Install our interface overrides.
-     */
-    cta->baseAdaptor.dupNode		    =  dupNode;
-    cta->baseAdaptor.create		    =  create;
-    cta->baseAdaptor.createToken	    =  createToken;
-    cta->baseAdaptor.createTokenFromToken   =  createTokenFromToken;
-    cta->baseAdaptor.setTokenBoundaries	    =  setTokenBoundaries;
-    cta->baseAdaptor.getTokenStartIndex	    =  getTokenStartIndex;
-    cta->baseAdaptor.getTokenStopIndex	    =  getTokenStopIndex;
-    cta->baseAdaptor.getText		    =  getText;
-    cta->baseAdaptor.getType		    =  getType;
-    cta->baseAdaptor.free		    =  ctaFree;
-    /* Install the super class pointer
-     */
-    cta->baseAdaptor.super	    = cta;
+	// Install our interface overrides.
+	//
+	cta->baseAdaptor.dupNode				=  dupNode;
+	cta->baseAdaptor.create					=  create;
+	cta->baseAdaptor.createToken			=  createToken;
+	cta->baseAdaptor.createTokenFromToken   =  createTokenFromToken;
+	cta->baseAdaptor.setTokenBoundaries	    =  setTokenBoundaries;
+	cta->baseAdaptor.getTokenStartIndex	    =  getTokenStartIndex;
+	cta->baseAdaptor.getTokenStopIndex	    =  getTokenStopIndex;
+	cta->baseAdaptor.getText				=  getText;
+	cta->baseAdaptor.getType				=  getType;
+	cta->baseAdaptor.free					=  ctaFree;
 
-    /* Install a tree factory for creating new tree nodes
-     */
-    cta->arboretum  = antlr3ArboretumNew(strFactory);
+	// Install the super class pointer
+	//
+	cta->baseAdaptor.super	    = cta;
 
-    /* Install a token factory for imaginary tokens, these imaginary
-     * tokens do not require access to the input stream so we can
-     * dummy the creation of it.
-     */
-    cta->baseAdaptor.tokenFactory   = antlr3TokenFactoryNew(NULL);
+	// Install a tree factory for creating new tree nodes
+	//
+	cta->arboretum  = antlr3ArboretumNew(strFactory);
 
-    /* Allow the base tree adaptor to share the tree factory's string factory.
-     */
-    cta->baseAdaptor.strFactory	= strFactory;
+	// Install a token factory for imaginary tokens, these imaginary
+	// tokens do not require access to the input stream so we can
+	// dummy the creation of it.
+	//
+	cta->baseAdaptor.tokenFactory   = antlr3TokenFactoryNew(NULL);
 
-    /* Return the address of the base adaptor interface.
-     */
-    return  &(cta->baseAdaptor);
+	// Allow the base tree adaptor to share the tree factory's string factory.
+	//
+	cta->baseAdaptor.strFactory	= strFactory;
+
+	// Return the address of the base adaptor interface.
+	//
+	return  &(cta->baseAdaptor);
+}
+
+/// Debugging version of the tree adaptor
+///
+ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR
+ANTLR3_TREE_ADAPTORDebugNew(pANTLR3_STRING_FACTORY strFactory, pANTLR3_DEBUG_EVENT_LISTENER	debugger)
+{
+	pANTLR3_BASE_TREE_ADAPTOR	ta;
+	pANTLR3_COMMON_TREE_ADAPTOR	cta;
+
+	// Create a normal one first
+	//
+	ta	= ANTLR3_TREE_ADAPTORNew(strFactory);
+	
+	if	(ta != ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+	{
+		// Reinitialize as a debug version
+		//
+		antlr3BaseTreeAdaptorInit(ta, debugger);
+	}
+
+	cta		= ta->super;
+
+	ta->create		= dbgCreate;
+
+	return	ta;
 }
 
 static void
@@ -134,7 +162,16 @@ create		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN payload)
      */
     return  ct;
 }
+static	pANTLR3_BASE_TREE
+dbgCreate		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN payload)
+{
+	pANTLR3_BASE_TREE	ct;
 
+	ct = create(adaptor, payload);
+	adaptor->debugger->createNode(adaptor->debugger, ct);
+
+	return ct;
+}
 
 /** Tell me how to create a token for use with imaginary token nodes.
  *  For example, there is probably no input symbol associated with imaginary

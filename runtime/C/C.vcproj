@@ -81,6 +81,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)/antlr3cd.lib"
 			/>
 			<Tool
@@ -240,6 +241,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/LTCG"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)/antlr3c.lib"
 			/>
 			<Tool
@@ -404,6 +406,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)\antlr3c.dll"
 				Version="3.0b4"
 				OptimizeReferences="2"
@@ -594,6 +597,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)\antlr3cd.dll"
 				Version="1.0b4"
 				GenerateDebugInformation="true"
@@ -767,6 +771,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\antlr3debughandlers.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\antlr3encodings.c"
 				>
 			</File>
@@ -866,6 +874,10 @@
 			</File>
 			<File
 				RelativePath=".\include\antlr3cyclicdfa.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\antlr3debugeventlistener.h"
 				>
 			</File>
 			<File
