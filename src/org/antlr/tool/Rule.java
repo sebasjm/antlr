@@ -293,6 +293,7 @@ public class Rule {
 	 *  left-hand-side; so we need Lists.  This is a unique list of all
 	 *  token types for which the rule needs a list of tokens.  This
 	 *  is called from the rule template not directly by the code generator.
+	 */
 	public Set getAllTokenRefsInAltsWithRewrites() {
 		String output = (String)grammar.getOption("output");
 		Set tokens = new HashSet();
@@ -315,17 +316,15 @@ public class Rule {
 		}
 		return tokens;
 	}
-	 */
 
-	/*
 	public Set getRuleRefsInAlt(int outerAltNum) {
 		return altToRuleRefMap[outerAltNum].keySet();
 	}
-	*/
 
 	/** For use with rewrite rules, we must track all rule AST results on the
 	 *  left-hand-side; so we need Lists.  This is a unique list of all
 	 *  rule results for which the rule needs a list of results.
+	 */
 	public Set getAllRuleRefsInAltsWithRewrites() {
 		Set rules = new HashSet();
 		for (int i = 1; i <= numberOfAlts; i++) {
@@ -336,7 +335,6 @@ public class Rule {
 		}
 		return rules;
 	}
-	 */
 
 	public List<GrammarAST> getInlineActions() {
 		return inlineActions;
