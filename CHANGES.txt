@@ -224,6 +224,19 @@ August 15, 2007 -- Got rough draft of the grammar import working.
 	src/org/antlr/tool/CompositeGrammar.java
 	src/org/antlr/tool/CompositeGrammarTree.java
 
+3.0.1 - August 13, 2007
+
+[See target pages on the wiki for more information on the non-Java targets]
+
+August 7, 2007
+
+* added escaping of double quotes in DOTTreeGenerator
+
+July 22, 2007
+
+* fixed dynamic scope implementation in lexers. They were not creating new scope
+  entries on the stack.  Unsupported feature!
+
 July 30, 2007
 
 * float return values were initalized to 0.0 not 0.0f in java.
@@ -232,7 +245,7 @@ July 28, 2007
 
 * Sam Ellis points out an init var bug in ANTLRReaderStream.
 
-July 27, 2007
+July 27, 2007 (done in dev branch)
 
 * Moved token type index stuff from CommonTreeNodeStream to TreeWizard
 
