@@ -77,7 +77,7 @@ class <name>(Lexer):
         self.ruleMemo = {}
 <endif>
 
-        <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; seperator="\n">
+        <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; separator="\n">
 
         <actions.lexer.init>
 
@@ -179,7 +179,7 @@ class <name>(<superClass>):
         self.ruleMemo = {}
 <endif>
 
-        <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; seperator="\n">
+        <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; separator="\n">
 
         <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeStack(scope=it)><endif>}>
 	<rules:{<ruleAttributeScopeStack(scope=it.ruleDescriptor.ruleScope)>}>
