@@ -28,47 +28,47 @@
 ANTLR3_API pANTLR3_INPUT_STREAM
 antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 {
-    /* Pointer to the input stream we are going to create
-     */
-    pANTLR3_INPUT_STREAM    input;
-    ANTLR3_UINT64	    status;
+	// Pointer to the input stream we are going to create
+	//
+	pANTLR3_INPUT_STREAM    input;
+	ANTLR3_UINT64	    status;
 
-    if	(fileName == NULL)
-    {
-	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOFILE);
-    }
+	if	(fileName == NULL)
+	{
+		return (pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOFILE);
+	}
 
-    /* Allocate memory for the input stream structure
-     */
-    input   = (pANTLR3_INPUT_STREAM)
-		    ANTLR3_MALLOC(sizeof(ANTLR3_INPUT_STREAM));
+	// Allocate memory for the input stream structure
+	//
+	input   = (pANTLR3_INPUT_STREAM)
+		ANTLR3_MALLOC(sizeof(ANTLR3_INPUT_STREAM));
 
-    if	(input == NULL)
-    {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if	(input == NULL)
+	{
+		return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	}
 
-    /* Structure was allocated correctly, now we can read the file.
-     */
-    status  = antlr3readAscii(input, fileName);
+	// Structure was allocated correctly, now we can read the file.
+	//
+	status  = antlr3readAscii(input, fileName);
 
-    /* Call the common 8 bit ASCII input stream handler
-     * Initializer type thingy doobry function.
-     */
-    antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
+	// Call the common 8 bit ASCII input stream handler
+	// Initializer type thingy doobry function.
+	//
+	antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
 
-    /* Now we can set up the file name
-     */
-    input->fileName = input->strFactory->newStr(input->strFactory, fileName);
-    
-    if	(status != ANTLR3_SUCCESS)
-    {
-	ANTLR3_FREE(input);
+	// Now we can set up the file name
+	//
+	input->fileName = input->strFactory->newStr(input->strFactory, fileName);
 
-	return	ANTLR3_FUNC_PTR(status);
-    }
+	if	(status != ANTLR3_SUCCESS)
+	{
+		ANTLR3_FREE(input);
 
-    return  input;
+		return	ANTLR3_FUNC_PTR(status);
+	}
+
+	return  input;
 }
 
 ANTLR3_API ANTLR3_UINT64
