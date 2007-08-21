@@ -68,7 +68,7 @@ adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
 /** ID auto construct */
 tokenRef(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
+<if(backtracking)>if ( state.backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.dupNode(<label>);
 adaptor.addChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
@@ -83,7 +83,7 @@ tokenRefAndListLabel(token,label,elementIndex) ::= <<
 /** ^(ID ...) auto construct */
 tokenRefRuleRoot(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
+<if(backtracking)>if ( state.backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.dupNode(<label>);
 root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_<treeLevel>);
 <if(backtracking)>}<endif>
@@ -100,7 +100,7 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 /** rule auto construct */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_<treeLevel>, <label>.getTree());
+<if(backtracking)>if ( state.backtracking==0 ) <endif>adaptor.addChild(root_<treeLevel>, <label>.getTree());
 >>
 
 /** x+=rule auto construct */
@@ -112,7 +112,7 @@ ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) auto construct */
 ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.getTree(), root_<treeLevel>);
+<if(backtracking)>if ( state.backtracking==0 ) <endif>root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(<label>.getTree(), root_<treeLevel>);
 >>
 
 /** ^(x+=rule ...) auto construct */

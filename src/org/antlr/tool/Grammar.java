@@ -1272,11 +1272,12 @@ public class Grammar {
 			GrammarAST el = (GrammarAST) it.next();
 			if ( el.getType()==ANTLRParser.LABEL ) {
 				String labelName = el.getText();
-				LabelElementPair pair = el.enclosingRule.getLabel(labelName);
+				Rule enclosingRule = getLocallyDefinedRule(el.enclosingRuleName);
+				LabelElementPair pair = enclosingRule.getLabel(labelName);
 				// if valid label and type is what we're looking for
 				// and not ref to old value val $rule, add to list
 				if ( pair!=null && pair.type==labelType &&
-					 !labelName.equals(el.enclosingRule) )
+					 !labelName.equals(el.enclosingRuleName) )
 				{
 					labels.add(labelName);
 				}
@@ -2471,14 +2472,6 @@ public class Grammar {
 			LookaheadSet tset1 = _LOOK((NFAState)transition1.target);
 			tset.orInPlace(tset1);
 		}
-
-		// when importing grammars, we need to know if LOOK operation
-		// enters/exits a rule. If rule r needs FIRST(x) and x is
-		// overridden, assume the FIRST is different and r must be
-		// duplicated in the "subgrammar".  If rule r needs FOLLOW(r),
-		// which could differ since overridden rules can call r, must dup
-		// r in subgrammar so FOLLOW(r) can be recomputed.  Not optimal,
-		// but we can check FIRST/FOLLOW values later.
 
 		return tset;
 	}

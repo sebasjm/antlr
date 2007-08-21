@@ -139,9 +139,18 @@ public class NFAConfiguration {
         if ( resolved ) {
             buf.append("|resolved");
         }
-        if ( resolveWithPredicate ) {
-            buf.append("|resolveWithPredicate");
-        }
-        return buf.toString();
+		if ( resolveWithPredicate ) {
+			buf.append("|resolveWithPredicate");
+		}
+		/*
+		NFAState invoking = context.invokingState;
+		if ( invoking!=null ) {
+			NFAState s = invoking.nfa.getState(state);
+			if ( s!=null && s.isEOTTargetState() ) {
+				buf.append("|EOTTarget");
+			}
+		}
+		*/
+		return buf.toString();
     }
 }

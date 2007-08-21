@@ -60,7 +60,7 @@ public class GrammarAST extends BaseAST {
 	/** This AST node was created from what token? */
     public Token token = null;
 
-    public Rule enclosingRule = null;
+    public String enclosingRuleName;
 
 	/** If this is a RULE node then track rule's start, stop tokens' index. */
 	public int ruleStartTokenIndex;

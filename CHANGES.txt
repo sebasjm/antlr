@@ -8,6 +8,10 @@ University of San Francisco
 
 CHANGES
 
+August 20, 2007
+	Fixed ANTLR-177: hashCode/equals not consistent for label
+	Fixed bug where Rule was compared to string; introduced from dev branch
+
 August 15, 2007 -- Got rough draft of the grammar import working.
                    Submit to dev and then integrate into mainline.
 

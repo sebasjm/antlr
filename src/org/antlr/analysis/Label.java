@@ -290,13 +290,20 @@ public class Label implements Comparable, Cloneable {
 		if ( o==null ) {
 			return false;
 		}
+		if ( this == o ) {
+			return true; // equals if same object
+		}
 		// labels must be the same even if epsilon or set or sempred etc...
         if ( label!=((Label)o).label ) {
             return false;
         }
-		if ( label==SET ) {
-			return this.labelSet.equals(((Label)o).labelSet);
+		switch (label) {
+			case SET :
+				return this.labelSet.equals(((Label)o).labelSet);
+			case SEMPRED :
+				return semanticContext.equals(((Label)o).semanticContext);
 		}
+
 		return true;  // label values are same, so true
     }
 

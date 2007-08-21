@@ -370,7 +370,7 @@ public class Tool {
 			}
 			DOTGenerator dotGenerator = new DOTGenerator(g);
 			String dot = dotGenerator.getDOT( dfa.startState );
-			String dotFileName = "dec-"+d;
+			String dotFileName = g.name+"."+"dec-"+d;
 			try {
 				writeDOTFile(g, dotFileName, dot);
 			}

@@ -271,16 +271,6 @@ public class NFAFactory {
             if ( endNFAState.transition(0)==null ) {
                 // if so, then don't let algorithm fall off the end of
                 // the rule, make it hit EOF/EOT.
-				/*
-				if ( nfa.grammar.type==Grammar.LEXER ) {
-					return; // 11/28/2005: try having only Tokens with EOT transition
-				}
-                if ( nfa.grammar.type!=Grammar.LEXER ||
-					 ruleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) )
-				{
-					build_EOFState(endNFAState);
-				}
-				*/
 				build_EOFState(endNFAState);
 				// track how many rules have been invoked by another rule
 				numberUnInvokedRules++;
@@ -300,11 +290,11 @@ public class NFAFactory {
             label = Label.EOT;
 			end.setEOTTargetState(true);
         }
-        /*
+		/*
 		System.out.println("build "+nfa.grammar.getTokenDisplayName(label)+
 						   " loop on end of state "+endNFAState.getDescription()+
 						   " to state "+end.stateNumber);
-        */
+		*/
 		Transition toEnd = new Transition(label, end);
         endNFAState.addTransition(toEnd);
     }

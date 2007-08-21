@@ -75,7 +75,7 @@ ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(backtracking)>
-if ( backtracking==0 ) {<\n>
+if ( state.backtracking==0 ) {<\n>
 <endif>
     retval.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
 <if(!TREE_PARSER)>
@@ -105,7 +105,7 @@ root_0 = (<ASTLabelType>)adaptor.nil();<\n>
 /** ID and track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>stream_<token>.add(<label>);<\n>
+<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<token>.add(<label>);<\n>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
@@ -119,7 +119,7 @@ tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 /** ^(ID ...) track for rewrite */
 tokenRefRuleRootTrack(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>stream_<token>.add(<label>);<\n>
+<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<token>.add(<label>);<\n>
 >>
 
 /** Match ^(label+=TOKEN ...) track for rewrite */
@@ -131,7 +131,7 @@ tokenRefRuleRootTrackAndListLabel(token,label,elementIndex) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>stream_<rule.name>.add(<label>.getTree());
+<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<rule.name>.add(<label>.getTree());
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -143,7 +143,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRefRuleRoot(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>stream_<rule>.add(<label>.getTree());
+<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<rule>.add(<label>.getTree());
 >>
 
 /** ^(x+=rule ...) rewrite */
@@ -172,7 +172,7 @@ rewriteCode(
 // token list labels: <referencedTokenListLabels; separator=", ">
 // rule list labels: <referencedRuleListLabels; separator=", ">
 <if(backtracking)>
-if ( backtracking==0 ) {<\n>
+if ( state.backtracking==0 ) {<\n>
 <endif>
 <prevRuleRootRef()>.tree = root_0;
 <rewriteCodeLabels()>

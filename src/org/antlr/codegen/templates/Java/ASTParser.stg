@@ -44,7 +44,7 @@ group ASTParser;
 /** ID and output=AST */
 tokenRef(token,label,hetero,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
+<if(backtracking)>if ( state.backtracking==0 ) {<endif>
 <label>_tree = <createNodeFromToken(...)>;
 adaptor.addChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
@@ -56,7 +56,7 @@ tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 /** ID^ and output=AST */
 tokenRefRuleRoot(token,label,hetero,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
+<if(backtracking)>if ( state.backtracking==0 ) {<endif>
 <label>_tree = <createNodeFromToken(...)>;
 root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
@@ -94,7 +94,7 @@ tokenRefRuleRootAndListLabel(token,label,hetero,elementIndex) ::= <<
 // I have more time.
 
 matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_0, <createNodeFromToken(...)>);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( state.backtracking==0 ) <endif>adaptor.addChild(root_0, <createNodeFromToken(...)>);})>
 >>
 
 matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
@@ -103,7 +103,7 @@ matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
 // plain old blocks of alts: (A|B|...|C)
 
 matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(<createNodeFromToken(...)>, root_0);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( state.backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(<createNodeFromToken(...)>, root_0);})>
 >>
 
 // RULE REF AST
@@ -111,7 +111,7 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>adaptor.addChild(root_0, <label>.getTree());
+<if(backtracking)>if ( state.backtracking==0 ) <endif>adaptor.addChild(root_0, <label>.getTree());
 >>
 
 /** rule! is same as normal rule ref */
@@ -120,7 +120,7 @@ ruleRefBang(rule,label,elementIndex,args,scope) ::= "<super.ruleRef(...)>"
 /** rule^ */
 ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>.getTree(), root_0);
+<if(backtracking)>if ( state.backtracking==0 ) <endif>root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>.getTree(), root_0);
 >>
 
 /** x+=rule when output=AST */
@@ -145,7 +145,7 @@ ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 
 wildcard(label,elementIndex) ::= <<
 <super.wildcard(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
+<if(backtracking)>if ( state.backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.create(<label>);
 adaptor.addChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
@@ -155,7 +155,7 @@ wildcardBang(label,elementIndex) ::= "<super.wildcard(...)>"
 
 wildcardRuleRoot(label,elementIndex) ::= <<
 <super.wildcard(...)>
-<if(backtracking)>if ( backtracking==0 ) {<endif>
+<if(backtracking)>if ( state.backtracking==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)adaptor.create(<label>);
 root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>

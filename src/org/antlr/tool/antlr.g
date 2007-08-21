@@ -183,7 +183,7 @@ tokens {
 		// during code gen we convert to function call with templates
 		String synpredinvoke = predName;
 		GrammarAST p = #[synpredTokenType,synpredinvoke];
-		p.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
+		p.enclosingRuleName = currentRuleName;
 		// track how many decisions have synpreds
 		grammar.blocksWithSynPreds.add(currentBlockAST);
 		return p;
@@ -442,7 +442,7 @@ Map opts = null;
 	eob.setLine(semi.getLine());
 	eob.setColumn(semi.getColumn());
     GrammarAST eor = #[EOR,"<end-of-rule>"];
-   	eor.enclosingRule = grammar.getLocallyDefinedRule(#ruleName.getText());
+   	eor.enclosingRuleName = #ruleName.getText();
 	eor.setLine(semi.getLine());
 	eor.setColumn(semi.getColumn());
 	GrammarAST root = #[RULE,"rule"];
@@ -604,7 +604,7 @@ elementNoOptionSpec
 	|   ACTION
 	|   p:SEMPRED ( IMPLIES! {#p.setType(GATED_SEMPRED);} )?
 		{
-		#p.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
+		#p.enclosingRuleName = currentRuleName;
 		grammar.blocksWithSemPreds.add(currentBlockAST);
 		}
 	|   t3:tree
@@ -763,8 +763,8 @@ rewrite
 		: rew:REWRITE pred:SEMPRED alt:rewrite_alternative
 	      {root.addChild( #(#rew, #pred, #alt) );}
 		  {
-          #pred.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
-          #rew.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
+          #pred.enclosingRuleName = currentRuleName;
+          #rew.enclosingRuleName = currentRuleName;
           }
 	    )*
 		rew2:REWRITE alt2:rewrite_alternative
@@ -833,7 +833,7 @@ GrammarAST subrule=null;
 		#rewrite_atom = #[LABEL,i_AST.getText()];
 		#rewrite_atom.setLine(#d.getLine());
 		#rewrite_atom.setColumn(#d.getColumn());
-        #rewrite_atom.enclosingRule = grammar.getLocallyDefinedRule(currentRuleName);
+        #rewrite_atom.enclosingRuleName = currentRuleName;
 		}
 	|	ACTION
 	;
