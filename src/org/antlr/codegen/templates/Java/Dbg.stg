@@ -122,9 +122,9 @@ finally {
 }<\n>
 >>
 
-@synpred.start() ::= "dbg.beginBacktrack(backtracking);"
+@synpred.start() ::= "dbg.beginBacktrack(state.backtracking);"
 
-@synpred.stop() ::= "dbg.endBacktrack(backtracking, success);"
+@synpred.stop() ::= "dbg.endBacktrack(state.backtracking, success);"
 
 // Common debug event triggers used by region overrides below
 
