@@ -129,7 +129,7 @@ public class TestAttributes extends BaseTest {
 	 */
 	public void testRefToReturnValueBeforeRefToPredefinedAttr() throws Exception {
 		String action = "$x.foo";
-		String expecting = "x.foo";
+		String expecting = "x!=null?x.foo:null";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -160,7 +160,7 @@ public class TestAttributes extends BaseTest {
 		// before stripping unused labels.  We really need to translate
 		// actions first so code gen logic can use info.
 		String action = "$x.text";
-		String expecting = "input.toString(x.start,x.stop)";
+		String expecting = "x!=null?input.toString(x.start,x.stop):null";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -384,9 +384,12 @@ public class TestAttributes extends BaseTest {
 		String action = "$id; $f; $id.text; $id.getText(); $id.dork " +
 						"$id.type; $id.line; $id.pos; " +
 						"$id.channel; $id.index;";
-		String expecting = "id; f; id.getText(); id.getText(); id.dork " +
-						   "id.getType(); id.getLine(); id.getCharPositionInLine(); " +
-						   "id.getChannel(); id.getTokenIndex();";
+		String expecting = "id; f; id!=null?id.getText():null; id.getText();" +
+						   " id.dork id!=null?id.getType():null;" +
+						   " id!=null?id.getLine():null;" +
+						   " id!=null?id.getCharPositionInLine():null;" +
+						   " id!=null?id.getChannel():null;" +
+						   " id!=null?id.getTokenIndex():null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -413,7 +416,11 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-		String expecting = "r.x; ((Token)r.start); ((Token)r.stop); ((Object)r.tree); r.x; ((Token)r.stop);";
+		String expecting = "r!=null?r.x:null; r!=null?((Token)r.start):null;" +
+						   " r!=null?((Token)r.stop):null;" +
+						   " r!=null?((Object)r.tree):null;" +
+						   " r!=null?r.x:null;" +
+						   " r!=null?((Token)r.stop):null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -439,7 +446,11 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleLabelsWithSpecialToken() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-		String expecting = "r.x; ((MYTOKEN)r.start); ((MYTOKEN)r.stop); ((Object)r.tree); r.x; ((MYTOKEN)r.stop);";
+		String expecting = "r!=null?r.x:null; r!=null?((MYTOKEN)r.start):null;" +
+						   " r!=null?((MYTOKEN)r.stop):null;" +
+						   " r!=null?((Object)r.tree):null;" +
+						   " r!=null?r.x:null;" +
+						   " r!=null?((MYTOKEN)r.stop):null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -467,7 +478,11 @@ public class TestAttributes extends BaseTest {
 
 	public void testForwardRefRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.tree;";
-		String expecting = "r.x; ((Token)r.start); ((Token)r.stop); ((Object)r.tree); r.x; ((Object)r.tree);";
+		String expecting = "r!=null?r.x:null; r!=null?((Token)r.start):null;" +
+						   " r!=null?((Token)r.stop):null;" +
+						   " r!=null?((Object)r.tree):null;" +
+						   " r!=null?r.x:null;" +
+						   " r!=null?((Object)r.tree):null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -710,7 +725,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testBasicGlobalScope() throws Exception {
 		String action = "$Symbols::names.add($id.text);";
-		String expecting = "((Symbols_scope)Symbols_stack.peek()).names.add(id.getText());";
+		String expecting = "((Symbols_scope)Symbols_stack.peek()).names.add(id!=null?id.getText():null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -769,7 +784,7 @@ public class TestAttributes extends BaseTest {
 	public void testIndexedGlobalScope() throws Exception {
 		String action = "$Symbols[-1]::names.add($id.text);";
 		String expecting =
-			"((Symbols_scope)Symbols_stack.elementAt(Symbols_stack.size()-1-1)).names.add(id.getText());";
+			"((Symbols_scope)Symbols_stack.elementAt(Symbols_stack.size()-1-1)).names.add(id!=null?id.getText():null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -802,7 +817,7 @@ public class TestAttributes extends BaseTest {
 	public void test0IndexedGlobalScope() throws Exception {
 		String action = "$Symbols[0]::names.add($id.text);";
 		String expecting =
-			"((Symbols_scope)Symbols_stack.elementAt(0)).names.add(id.getText());";
+			"((Symbols_scope)Symbols_stack.elementAt(0)).names.add(id!=null?id.getText():null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -835,7 +850,7 @@ public class TestAttributes extends BaseTest {
 	public void testAbsoluteIndexedGlobalScope() throws Exception {
 		String action = "$Symbols[3]::names.add($id.text);";
 		String expecting =
-			"((Symbols_scope)Symbols_stack.elementAt(3)).names.add(id.getText());";
+			"((Symbols_scope)Symbols_stack.elementAt(3)).names.add(id!=null?id.getText():null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1393,7 +1408,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleRefWhenRuleHasScope() throws Exception {
 		String action = "$b.start;";
-		String expecting = "((Token)b1.start);";
+		String expecting = "b1!=null?((Token)b1.start):null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1532,8 +1547,8 @@ public class TestAttributes extends BaseTest {
 	public void testTokenLabelFromMultipleAlts() throws Exception {
 		String action = "$ID.text;"; // must be qualified
 		String action2 = "$INT.text;"; // must be qualified
-		String expecting = "ID1.getText();";
-		String expecting2 = "INT2.getText();";
+		String expecting = "ID1!=null?ID1.getText():null;";
+		String expecting2 = "INT2!=null?INT2.getText():null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1577,8 +1592,8 @@ public class TestAttributes extends BaseTest {
 	public void testRuleLabelFromMultipleAlts() throws Exception {
 		String action = "$b.text;"; // must be qualified
 		String action2 = "$c.text;"; // must be qualified
-		String expecting = "input.toString(b1.start,b1.stop);";
-		String expecting2 = "input.toString(c2.start,c2.stop);";
+		String expecting = "b1!=null?input.toString(b1.start,b1.stop):null;";
+		String expecting2 = "c2!=null?input.toString(c2.start,c2.stop):null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1913,7 +1928,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testImplicitTokenLabel() throws Exception {
 		String action = "$ID; $ID.text; $ID.getText()";
-		String expecting = "ID1; ID1.getText(); ID1.getText()";
+		String expecting = "ID1; ID1!=null?ID1.getText():null; ID1.getText()";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1944,7 +1959,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
-		String expecting = "((Token)r1.start);";
+		String expecting = "r1!=null?((Token)r1.start):null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1968,7 +1983,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testReuseExistingLabelWithImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
-		String expecting = "((Token)x.start);";
+		String expecting = "x!=null?((Token)x.start):null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1992,7 +2007,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testReuseExistingListLabelWithImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
-		String expecting = "((Token)x.start);";
+		String expecting = "x!=null?((Token)x.start):null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -2017,7 +2032,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testReuseExistingLabelWithImplicitTokenLabel() throws Exception {
 		String action = "$ID.text;";
-		String expecting = "x.getText();";
+		String expecting = "x!=null?x.getText():null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -2046,7 +2061,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testReuseExistingListLabelWithImplicitTokenLabel() throws Exception {
 		String action = "$ID.text;";
-		String expecting = "x.getText();";
+		String expecting = "x!=null?x.getText():null;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -2288,7 +2303,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testLabelOnRuleRefInLexer() throws Exception {
 		String action = "$i.text";
-		String expecting = "i.getText()";
+		String expecting = "i!=null?i.getText():null";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2317,7 +2332,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testRefToRuleRefInLexer() throws Exception {
 		String action = "$ID.text";
-		String expecting = "ID1.getText()";
+		String expecting = "ID1!=null?ID1.getText():null";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2454,7 +2469,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testLexerRulePropertyRefs() throws Exception {
 		String action = "$text $type $line $pos $channel $index $start $stop";
-		String expecting = "getText() _type state.tokenStartLine state.tokenStartCharPositionInLine channel -1 state.tokenStartCharIndex (getCharIndex()-1)";
+		String expecting = "getText() _type state.tokenStartLine state.tokenStartCharPositionInLine state.channel -1 state.tokenStartCharIndex (getCharIndex()-1)";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2482,7 +2497,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testLexerLabelRefs() throws Exception {
 		String action = "$a $b.text $c $d.text";
-		String expecting = "a b.getText() c d.getText()";
+		String expecting = "a b!=null?b.getText():null c d!=null?d.getText():null";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2511,7 +2526,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testSettingLexerRulePropertyRefs() throws Exception {
 		String action = "$text $type=1 $line=1 $pos=1 $channel=1 $index";
-		String expecting = "getText() _type=1 state.tokenStartLine=1 state.tokenStartCharPositionInLine=1 channel=1 -1";
+		String expecting = "getText() _type=1 state.tokenStartLine=1 state.tokenStartCharPositionInLine=1 state.channel=1 -1";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2955,7 +2970,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDoNotTranslateAttributeCompare() throws Exception {
 		String action = "$a.line == $b.line";
-		String expecting = "a.getLine() == b.getLine()";
+		String expecting = "a!=null?a.getLine():null == b!=null?b.getLine():null";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -3030,7 +3045,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testTreeRuleStopAttributeIsInvalid() throws Exception {
 		String action = "$r.x; $r.start; $r.stop";
-		String expecting = "r.x; ((CommonTree)r.start); $r.stop";
+		String expecting = "r!=null?r.x:null; r!=null?((CommonTree)r.start):null; $r.stop";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);

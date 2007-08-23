@@ -9,7 +9,14 @@ University of San Francisco
 CHANGES
 
 August 20, 2007
-	Fixed ANTLR-177: hashCode/equals not consistent for label
+
+* Made refs to rule/token properties use ?: to avoid null ptr exception.
+  $label.st now is label!=null?label.st:null.  Updated TestAttributes.
+  This is useful not only for optional rule/token refs, but also during
+  error recovery.  If ID is not matched, $ID.text won't cause a null ptr.
+
+August 20, 2007
+*	Fixed ANTLR-177: hashCode/equals not consistent for label
 	Fixed bug where Rule was compared to string; introduced from dev branch
 
 August 15, 2007 -- Got rough draft of the grammar import working.

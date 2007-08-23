@@ -1177,7 +1177,7 @@ isolatedDynamicScopeRef(scope) ::= "<scope>_stack"
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-<scope>.<attr.name>
+<scope>!=null?<scope>.<attr.name>:null
 <else>
 <scope>
 <endif>
@@ -1208,38 +1208,44 @@ listLabelRef(label) ::= "list_<label>"
 
 // not sure the next are the right approach
 
-tokenLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
-tokenLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
-tokenLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
-tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>.getCharPositionInLine()"
-tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
-tokenLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
+tokenLabelPropertyRef_text(scope,attr) ::= "<scope>!=null?<scope>.getText():null"
+tokenLabelPropertyRef_type(scope,attr) ::= "<scope>!=null?<scope>.getType():null"
+tokenLabelPropertyRef_line(scope,attr) ::= "<scope>!=null?<scope>.getLine():null"
+tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>!=null?<scope>.getCharPositionInLine():null"
+tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>!=null?<scope>.getChannel():null"
+tokenLabelPropertyRef_index(scope,attr) ::= "<scope>!=null?<scope>.getTokenIndex():null"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 
-ruleLabelPropertyRef_start(scope,attr) ::= "((<labelType>)<scope>.start)"
-ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
-ruleLabelPropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)<scope>.tree)"
+ruleLabelPropertyRef_start(scope,attr) ::= "<scope>!=null?((<labelType>)<scope>.start):null"
+ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>!=null?((<labelType>)<scope>.stop):null"
+ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>!=null?((<ASTLabelType>)<scope>.tree):null"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-input.getTokenStream().toString(
+(<scope>!=null?(input.getTokenStream().toString(
   input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
-  input.getTreeAdaptor().getTokenStopIndex(<scope>.start))
+  input.getTreeAdaptor().getTokenStopIndex(<scope>.start))):null)
 <else>
-input.toString(<scope>.start,<scope>.stop)
+<scope>!=null?input.toString(<scope>.start,<scope>.stop):null
 <endif>
 >>
 
-ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
+ruleLabelPropertyRef_st(scope,attr) ::= "<scope>!=null?<scope>.st:null"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
 
-lexerRuleLabelPropertyRef_type(scope,attr) ::= "<scope>.getType()"
-lexerRuleLabelPropertyRef_line(scope,attr) ::= "<scope>.getLine()"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= "<scope>.getCharPositionInLine()"
-lexerRuleLabelPropertyRef_channel(scope,attr) ::= "<scope>.getChannel()"
-lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>.getTokenIndex()"
-lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>.getText()"
+lexerRuleLabelPropertyRef_type(scope,attr) ::=
+    "<scope>!=null?<scope>.getType():null"
+lexerRuleLabelPropertyRef_line(scope,attr) ::=
+    "<scope>!=null?<scope>.getLine():null"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= 
+    "<scope>!=null?<scope>.getCharPositionInLine():null"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::=
+    "<scope>!=null?<scope>.getChannel():null"
+lexerRuleLabelPropertyRef_index(scope,attr) ::=
+    "<scope>!=null?<scope>.getTokenIndex():null"
+lexerRuleLabelPropertyRef_text(scope,attr) ::=
+    "<scope>!=null?<scope>.getText():null"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval.start)"
