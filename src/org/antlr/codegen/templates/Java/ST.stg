@@ -71,7 +71,7 @@ public static class STAttrMap extends HashMap {
 >>
 
 /** x+=rule when output=template */
-ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
+ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRef(...)>
 <listLabel(elem=label+".getTemplate()",...)>
 >>
