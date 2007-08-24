@@ -1208,9 +1208,9 @@ listLabelRef(label) ::= "list_<label>"
 
 // not sure the next are the right approach
 
-tokenLabelPropertyRef_text(scope,attr) ::= "<scope>!=null?<scope>.getText():null"
-tokenLabelPropertyRef_type(scope,attr) ::= "<scope>!=null?<scope>.getType():null"
-tokenLabelPropertyRef_line(scope,attr) ::= "<scope>!=null?<scope>.getLine():null"
+tokenLabelPropertyRef_text(scope,attr) ::= "(<scope>!=null?<scope>.getText():null)"
+tokenLabelPropertyRef_type(scope,attr) ::= "(<scope>!=null?<scope>.getType():null)"
+tokenLabelPropertyRef_line(scope,attr) ::= "(<scope>!=null?<scope>.getLine():null)"
 tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope>!=null?<scope>.getCharPositionInLine():null)"
 tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope>!=null?<scope>.getChannel():null)"
 tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>!=null?<scope>.getTokenIndex():null)"
