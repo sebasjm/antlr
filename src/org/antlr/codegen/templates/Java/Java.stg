@@ -1146,12 +1146,12 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
-((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>
+((<scope>_stack.size()-<negIndex>-1)>=0?((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>:null)
 <else>
 <if(index)>
-((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>
+((<index>\<<scope>_stack.size())?((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>:null)
 <else>
-((<scope>_scope)<scope>_stack.peek()).<attr.name>
+((<scope>_stack.size()>0)?((<scope>_scope)<scope>_stack.peek()).<attr.name>:null)
 <endif>
 <endif>
 >>
@@ -1177,7 +1177,7 @@ isolatedDynamicScopeRef(scope) ::= "<scope>_stack"
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-<scope>!=null?<scope>.<attr.name>:null
+(<scope>!=null?<scope>.<attr.name>:null)
 <else>
 <scope>
 <endif>
@@ -1211,41 +1211,41 @@ listLabelRef(label) ::= "list_<label>"
 tokenLabelPropertyRef_text(scope,attr) ::= "<scope>!=null?<scope>.getText():null"
 tokenLabelPropertyRef_type(scope,attr) ::= "<scope>!=null?<scope>.getType():null"
 tokenLabelPropertyRef_line(scope,attr) ::= "<scope>!=null?<scope>.getLine():null"
-tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>!=null?<scope>.getCharPositionInLine():null"
-tokenLabelPropertyRef_channel(scope,attr) ::= "<scope>!=null?<scope>.getChannel():null"
-tokenLabelPropertyRef_index(scope,attr) ::= "<scope>!=null?<scope>.getTokenIndex():null"
+tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope>!=null?<scope>.getCharPositionInLine():null)"
+tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope>!=null?<scope>.getChannel():null)"
+tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>!=null?<scope>.getTokenIndex():null)"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 
-ruleLabelPropertyRef_start(scope,attr) ::= "<scope>!=null?((<labelType>)<scope>.start):null"
-ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>!=null?((<labelType>)<scope>.stop):null"
-ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>!=null?((<ASTLabelType>)<scope>.tree):null"
+ruleLabelPropertyRef_start(scope,attr) ::= "(<scope>!=null?((<labelType>)<scope>.start):null)"
+ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>!=null?((<labelType>)<scope>.stop):null)"
+ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>!=null?((<ASTLabelType>)<scope>.tree):null)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 (<scope>!=null?(input.getTokenStream().toString(
   input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
   input.getTreeAdaptor().getTokenStopIndex(<scope>.start))):null)
 <else>
-<scope>!=null?input.toString(<scope>.start,<scope>.stop):null
+(<scope>!=null?input.toString(<scope>.start,<scope>.stop):null)
 <endif>
 >>
 
-ruleLabelPropertyRef_st(scope,attr) ::= "<scope>!=null?<scope>.st:null"
+ruleLabelPropertyRef_st(scope,attr) ::= "(<scope>!=null?<scope>.st:null)"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
 
 lexerRuleLabelPropertyRef_type(scope,attr) ::=
-    "<scope>!=null?<scope>.getType():null"
+    "(<scope>!=null?<scope>.getType():null)"
 lexerRuleLabelPropertyRef_line(scope,attr) ::=
-    "<scope>!=null?<scope>.getLine():null"
+    "(<scope>!=null?<scope>.getLine():null)"
 lexerRuleLabelPropertyRef_pos(scope,attr) ::= 
-    "<scope>!=null?<scope>.getCharPositionInLine():null"
+    "(<scope>!=null?<scope>.getCharPositionInLine():null)"
 lexerRuleLabelPropertyRef_channel(scope,attr) ::=
-    "<scope>!=null?<scope>.getChannel():null"
+    "(<scope>!=null?<scope>.getChannel():null)"
 lexerRuleLabelPropertyRef_index(scope,attr) ::=
-    "<scope>!=null?<scope>.getTokenIndex():null"
+    "(<scope>!=null?<scope>.getTokenIndex():null)"
 lexerRuleLabelPropertyRef_text(scope,attr) ::=
-    "<scope>!=null?<scope>.getText():null"
+    "(<scope>!=null?<scope>.getText():null)"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval.start)"
