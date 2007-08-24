@@ -328,6 +328,11 @@ public class CommonTokenStream implements TokenStream {
 		seek(lastMarker);
 	}
 
+	public void reset() {
+		p = -1;
+		lastMarker = 0;
+	}
+	
 	public void seek(int index) {
 		p = index;
 	}

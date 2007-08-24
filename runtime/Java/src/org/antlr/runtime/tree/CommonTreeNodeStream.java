@@ -346,6 +346,12 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		return ret;
 	}
 
+	public void reset() {
+		p = -1;
+		lastMarker = 0;
+		_sp = -1;
+	}
+
 	public int size() {
 		if ( p==-1 ) {
 			fillBuffer();
