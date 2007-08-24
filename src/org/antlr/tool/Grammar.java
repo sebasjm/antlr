@@ -656,7 +656,7 @@ public class Grammar {
 			String dname = (String) delegateNames.get(i);
 			matchTokenRuleST.setAttribute("rules", dname+".Tokens");			
 		}
-		System.out.println("tokens rule: "+matchTokenRuleST.toString());
+		//System.out.println("tokens rule: "+matchTokenRuleST.toString());
 
         ANTLRLexer lexer = new ANTLRLexer(new StringReader(matchTokenRuleST.toString()));
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");

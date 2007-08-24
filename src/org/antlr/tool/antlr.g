@@ -229,7 +229,6 @@ tokens {
     public void cleanup(GrammarAST root) {
 		if ( gtype==LEXER_GRAMMAR ) {
 			String filter = (String)grammar.getOption("filter");
-            System.out.println("delegates: "+delegateNames);
 			GrammarAST tokensRuleAST =
 			    grammar.addArtificialMatchTokensRule(
 			    	root,
