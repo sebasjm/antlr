@@ -605,7 +605,7 @@ public class TestAutoAST extends BaseTest {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"a : A b=B b=B c+=C c+=C D {$D.text;} ;\n" +
+			"a : A b=B b=B c+=C c+=C D {String s = $D.text;} ;\n" +
 			"A : 'a' ;\n" +
 			"B : 'b' ;\n" +
 			"C : 'c' ;\n" +
