@@ -8,6 +8,10 @@ University of San Francisco
 
 CHANGES
 
+September 9, 2007
+
+* r='string' in lexer got a duplicate label definition.
+
 August 21, 2007
 
 * $scope::variable refs now check for empty stack so that expr == null if
