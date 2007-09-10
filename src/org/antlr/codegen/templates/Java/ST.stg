@@ -80,7 +80,7 @@ rewriteTemplate(alts) ::= <<
 
 // TEMPLATE REWRITE
 <if(backtracking)>
-if ( backtracking==0 ) {
+if ( state.backtracking==0 ) {
   <alts:rewriteTemplateAlt(); separator="else ">
   <if(rewriteMode)><replaceTextInLine()><endif>
 }

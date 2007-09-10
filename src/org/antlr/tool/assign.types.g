@@ -451,6 +451,7 @@ element
     |   ebnf
     |   tree
     |   #( SYNPRED block ) 
+    |   FORCED_ACTION
     |   ACTION
     |   SEMPRED
     |   SYN_SEMPRED

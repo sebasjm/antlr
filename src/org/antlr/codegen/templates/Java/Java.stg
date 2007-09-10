@@ -1276,8 +1276,7 @@ lexerRulePropertyRef_stop(scope,attr) ::= "(getCharIndex()-1)"
 ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree =<expr>;"
 ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st =<expr>;"
 
-
-/** How to execute an action */
+/** How to execute an action (only when not backtracking) */
 execAction(action) ::= <<
 <if(backtracking)>
 <if(actions.(actionScope).synpredgate)>
@@ -1293,6 +1292,9 @@ if ( state.backtracking==0 ) {
 <action>
 <endif>
 >>
+
+/** How to always execute an action even when backtracking */
+execForcedAction(action) ::= "<action>"
 
 // M I S C (properties, etc...)
 

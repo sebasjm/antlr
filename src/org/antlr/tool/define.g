@@ -389,6 +389,11 @@ element
         #act.outerAltNum = this.outerAltNum;
 		trackInlineAction(#act);
         }
+    |   act2:FORCED_ACTION
+        {
+        #act2.outerAltNum = this.outerAltNum;
+		trackInlineAction(#act2);
+        }
     |   SEMPRED
         {
         #SEMPRED.outerAltNum = this.outerAltNum;

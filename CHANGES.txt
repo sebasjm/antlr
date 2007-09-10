@@ -8,6 +8,10 @@ University of San Francisco
 
 CHANGES
 
+September 10, 2007
+
+* Added {{...}} forced action executed even during backtracking.
+
 September 9, 2007
 
 * r='string' in lexer got a duplicate label definition.

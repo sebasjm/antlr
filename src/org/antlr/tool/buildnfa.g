@@ -306,6 +306,7 @@ element returns [StateCluster g=null]
     |   g=tree
     |   #( SYNPRED block )
     |   ACTION
+    |   FORCED_ACTION
     |   pred:SEMPRED {g = factory.build_SemanticPredicate(#pred);}
     |   spred:SYN_SEMPRED {g = factory.build_SemanticPredicate(#spred);}
     |   bpred:BACKTRACK_SEMPRED {g = factory.build_SemanticPredicate(#bpred);}

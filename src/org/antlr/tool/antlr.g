@@ -86,6 +86,7 @@ tokens {
     TREE_GRAMMAR;
     COMBINED_GRAMMAR;
     INITACTION;
+    FORCED_ACTION; // {{...}} always exec even during syn preds
     LABEL; // $x used in rewrite rules
     TEMPLATE;
     SCOPE="scope";
@@ -600,6 +601,7 @@ elementNoOptionSpec
     |   atom
         ( sub2=ebnfSuffix[(GrammarAST)currentAST.root,false]! {#elementNoOptionSpec=sub2;} )?
     |	ebnf
+	|   FORCED_ACTION
 	|   ACTION
 	|   p:SEMPRED ( IMPLIES! {#p.setType(GATED_SEMPRED);} )?
 		{
@@ -1115,7 +1117,12 @@ ACTION
 		{
 			Token t = makeToken(_ttype);
 			String action = $getText;
-			action = action.substring(1,action.length()-1);
+            int n = 1; // num delimiter chars
+            if ( action.startsWith("{{") && action.endsWith("}}") ) {
+                t.setType(FORCED_ACTION);
+                n = 2;
+            }
+			action = action.substring(n,action.length()-n);
 			t.setText(action);
 			t.setLine(actionLine);			// set action line to start
 			t.setColumn(actionColumn);

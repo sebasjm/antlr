@@ -307,6 +307,7 @@ element
     |   tree
     |   #( SYNPRED block[true] ) {out("=>");}
     |   a:ACTION  {if ( showActions ) {out("{"); out(a.getText()); out("}");}}
+    |   a2:FORCED_ACTION  {if ( showActions ) {out("{{"); out(a2.getText()); out("}}");}}
     |   pred:SEMPRED
     	{
     	if ( showActions ) {out("{"); out(pred.getText()); out("}?");}

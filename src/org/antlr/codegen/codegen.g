@@ -672,6 +672,11 @@ element_action returns [StringTemplate code=null]
         code = templates.getInstanceOf("execAction");
         code.setAttribute("action", generator.translateAction(currentRuleName,#act));
         }
+    |   act2:FORCED_ACTION
+        {
+        code = templates.getInstanceOf("execForcedAction");
+        code.setAttribute("action", generator.translateAction(currentRuleName,#act2));
+        }
     ;
 
 notElement[GrammarAST n, GrammarAST label, GrammarAST astSuffix]
