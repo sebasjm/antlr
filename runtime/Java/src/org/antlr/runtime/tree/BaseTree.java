@@ -191,7 +191,8 @@ public abstract class BaseTree implements Tree {
 				children.set(i, child);
 				child.setParent(this);
 				child.setChildIndex(i);
-			}
+                j++;
+            }
 		}
 		else if ( delta > 0 ) { // fewer new nodes than there were
 			// set children and then delete extra
