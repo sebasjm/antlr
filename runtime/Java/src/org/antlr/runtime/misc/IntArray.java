@@ -66,7 +66,11 @@ public class IntArray {
 		return p;
 	}
 
-	public void ensureCapacity(int index) {
+    public void clear() {
+        p = -1;
+    }
+
+    public void ensureCapacity(int index) {
 		if ( data==null ) {
 			data = new int[INITIAL_SIZE];
 		}

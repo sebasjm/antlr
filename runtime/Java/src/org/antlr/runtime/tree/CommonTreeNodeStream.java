@@ -113,11 +113,6 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	/** Stack of indexes used for push/pop calls */
 	protected IntArray calls;
 
-	/** Stack pointer for stack of indexes; -1 indicates empty.  Points
-	 *  at next location to push a value.
-	 */
-	protected int _sp = -1;
-
 	public CommonTreeNodeStream(Object tree) {
 		this(new CommonTreeAdaptor(), tree);
 	}
@@ -349,7 +344,7 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	public void reset() {
 		p = -1;
 		lastMarker = 0;
-		_sp = -1;
+		calls.clear();
 	}
 
 	public int size() {
