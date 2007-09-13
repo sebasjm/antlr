@@ -36,7 +36,7 @@ group Python implements ANTLRCore;
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs,
-           bitsets, buildTemplate, buildAST, rewrite, profile,
+           bitsets, buildTemplate, buildAST, rewriteMode, profile,
            backtracking, synpreds, memoize, numRules,
            fileName, ANTLRVersion, generatedTimestamp, trace,
            scopes, superClass, literals) ::=
@@ -66,16 +66,24 @@ HIDDEN = BaseRecognizer.HIDDEN
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
       filterMode) ::= <<
+<grammar.directDelegates:
+ {g|from <g.name>Lexer import <g.name>Lexer}; separator="\n">
+
 class <name>(Lexer):
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 
     grammarFileName = "<fileName>"
 
-    def __init__(self, input=None):
+    def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input=None, state=None):
         Lexer.__init__(self, input)
 <if(backtracking)>
-        self.ruleMemo = {}
+        self.state.ruleMemo = {}
 <endif>
+
+        <grammar.directDelegates:
+         {g|self.<g:delegateName()> = <g.name>Lexer(self<grammar.delegators:{g|, <g:delegateName()>}>, input, self.state)}; separator="\n">
+        <grammar.delegators:
+         {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
 
         <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; separator="\n">
 
@@ -109,28 +117,28 @@ def nextToken(self):
         if self.input.LA(1) == EOF:
             return EOF_TOKEN
 
-        self.token = None
-        self.channel = DEFAULT_CHANNEL
-        self.tokenStartCharIndex = self.input.index()
-        self.tokenStartCharPositionInLine = self.input.charPositionInLine
-        self.tokenStartLine = self.input.line
-        self._text = None
+        self.state.token = None
+        self.state.channel = DEFAULT_CHANNEL
+        self.state.tokenStartCharIndex = self.input.index()
+        self.state.tokenStartCharPositionInLine = self.input.charPositionInLine
+        self.state.tokenStartLine = self.input.line
+        self.state._text = None
         try:
             m = self.input.mark()
-            self.backtracking = 1 <! means we won't throw slow exception !>
-            self.failed = False
+            self.state.backtracking = 1 <! means we won't throw slow exception !>
+            self.state.failed = False
             self.mTokens()
-            self.backtracking = 0
+            self.state.backtracking = 0
 
             <! mTokens backtracks with synpred at backtracking==2
                and we set the synpredgate to allow actions at level 1. !>
-            if self.failed:
+            if self.state.failed:
                 self.input.rewind(m)
                 self.input.consume() <! advance one char and try again !>
 
             else:
                 self.emit()
-                return self.token
+                return self.state.token
 
         except RecognitionException, re:
             # shouldn't happen in backtracking mode, but...
@@ -139,26 +147,30 @@ def nextToken(self):
 
 
 def memoize(self, input, ruleIndex, ruleStartIndex):
-    if self.backtracking > 1:
+    if self.state.backtracking > 1:
         # is Lexer always superclass?
         Lexer.memoize(self, input, ruleIndex, ruleStartIndex)
 
 
 def alreadyParsedRule(self, input, ruleIndex):
-    if self.backtracking > 1:
+    if self.state.backtracking > 1:
         return Lexer.alreadyParsedRule(self, input, ruleIndex)
     return False
 
 
 >>
 
-filteringActionGate() ::= "self.backtracking == 1"
+filteringActionGate() ::= "self.state.backtracking == 1"
 
 /** How to generate a parser */
 
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
-              ASTLabelType="Object", labelType, members, init) ::= <<
+              ASTLabelType="Object", labelType, members, rewriteElementType, 
+              init) ::= <<
+<grammar.directDelegates:
+ {g|from <g.name><superClass> import <g.name><superClass>}; separator="\n">
+
 # token names
 tokenNames = [
     "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", 
@@ -173,11 +185,13 @@ class <name>(<superClass>):
     grammarFileName = "<fileName>"
     tokenNames = tokenNames
 
-    def __init__(self, input):
-        <superClass>.__init__(self, input)
-<if(backtracking)>
-        self.ruleMemo = {}
+    def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state=None):
+        <superClass>.__init__(self, input, state)
+<if(memoize)>
+        self.state.ruleMemo = {}
 <endif>
+        <grammar.delegators:
+         {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
 
         <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; separator="\n">
 
@@ -185,6 +199,9 @@ class <name>(<superClass>):
 	<rules:{<ruleAttributeScopeStack(scope=it.ruleDescriptor.ruleScope)>}>
 
         <init>
+
+        <grammar.directDelegates:
+         {g|self.<g:delegateName()> = <g.name><superClass>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, self.state)}; separator="\n">
 
         <@members>
         <@end>
@@ -194,6 +211,11 @@ class <name>(<superClass>):
 
     <rules; separator="\n\n">
 
+    <! generate rule/method definitions for imported rules so they
+       appear to be defined in this recognizer. !>
+    # Delegated rules
+    <grammar.delegatedRules:{ruleDescriptor| <delegateRule(ruleDescriptor)> }; separator="\n">
+
     <synpreds:{p | <synpred(p)>}>
 
     <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
@@ -202,15 +224,22 @@ class <name>(<superClass>):
 
 >>
 
+delegateRule(ruleDescriptor) ::= <<
+def <ruleDescriptor.name>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
+<\ >   <if(ruleDescriptor.hasReturnValue)>return <endif>self.<ruleDescriptor.grammar:delegateName()>.<ruleDescriptor.name>(<ruleDescriptor.parameterScope.attributes:{a|<a.name>}; separator=", ">)
+
+
+>>
+
 parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
-<genericParser(inputStreamType="TokenStream", init={<actions.parser.init>}, ...)>
+<genericParser(inputStreamType="TokenStream", rewriteElementType="Token", init={<actions.parser.init>}, ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
 treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser", members={<actions.treeparser.members>}) ::= <<
-<genericParser(inputStreamType="TreeNodeStream", init={<actions.treeparser.init>}, ...)>
+<genericParser(inputStreamType="TreeNodeStream", rewriteElementType="Node", init={<actions.treeparser.init>}, ...)>
 >>
 
 /** A simpler version of a rule template that is specific to the imaginary
@@ -242,15 +271,15 @@ def <ruleName>_fragment(self, <ruleDescriptor.parameterScope:parameterScope(scop
 
 synpred(name) ::= <<
 def <name>(self):
-    self.backtracking += 1
+    self.state.backtracking += 1
     <@start()>
     start = self.input.mark()
     self.<name>_fragment()
-    success = not self.failed
+    success = not self.state.failed
     self.input.rewind(start)
     <@stop()>
-    self.backtracking -= 1
-    self.failed = False
+    self.state.backtracking -= 1
+    self.state.failed = False
     return success
 
 
@@ -262,7 +291,7 @@ lexerSynpred(name) ::= <<
 
 ruleMemoization(name) ::= <<
 <if(memoize)>
-if self.backtracking > 0 and self.alreadyParsedRule(self.input, <ruleDescriptor.index>):
+if self.state.backtracking > 0 and self.alreadyParsedRule(self.input, <ruleDescriptor.index>):
     return <ruleReturnValue()>
 
 <endif>
@@ -271,7 +300,7 @@ if self.backtracking > 0 and self.alreadyParsedRule(self.input, <ruleDescriptor.
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
 <if(backtracking)>
-if self.failed:
+if self.state.failed:
     return <ruleReturnValue()>
 <endif>
 >>
@@ -279,8 +308,8 @@ if self.failed:
 /** This rule has failed, exit indicating failure during backtrack */
 ruleBacktrackFailure() ::= <<
 <if(backtracking)>
-if self.backtracking > 0:
-    self.failed = True
+if self.state.backtracking > 0:
+    self.state.failed = True
     return <ruleReturnValue()><\n>
 <endif>
 >>
@@ -423,7 +452,7 @@ retval.stop = self.input.LT(-1)<\n>
 memoize() ::= <<
 <if(memoize)>
 <if(backtracking)>
-if self.backtracking > 0:
+if self.state.backtracking > 0:
     self.memoize(self.input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex)
 
 <endif>
@@ -448,13 +477,14 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         <ruleDescriptor.actions.init>
         <block><\n>
 <else>
-        self.type = <ruleName>
+        _type = <ruleName>
 
         <ruleMemoization(name=ruleName)>
         <lexerRuleLabelDefs()>
         <ruleDescriptor.actions.init>
         <block>
         <ruleCleanUp()>
+        self.state.type = _type
         <(ruleDescriptor.actions.after):execAction()>
 <endif>
 
@@ -589,7 +619,7 @@ if alt<decisionNumber> == <i>:
 >>
 
 /** An alternative is just a list of elements; at outermost level */
-alt(elements,altNum,description,autoAST,outerAlt) ::= <<
+alt(elements,altNum,description,autoAST,outerAlt, treeLevel) ::= <<
 # <fileName>:<description>
 <@declarations()>
 <elements:element()>
@@ -652,10 +682,10 @@ if <s>:
     self.input.consume();
     <postmatchCode>
 <if(!LEXER)>
-    self.errorRecovery = False<\n>
+    self.state.errorRecovery = False<\n>
 <endif>
 <if(backtracking)>
-    self.failed = False<\n>
+    self.state.failed = False<\n>
 <endif>
 
 else:
@@ -719,30 +749,33 @@ wildcardCharListLabel(label, elementIndex) ::= <<
 >>
 
 /** Match a rule reference by invoking it possibly with arguments
- *  and a return value or values.
+ *  and a return value or values. The 'rule' argument was the
+ *  target rule name, but now is type Rule, whose toString is
+ *  same: the rule name.  Now though you can access full rule
+ *  descriptor stuff.
  */
-ruleRef(rule,label,elementIndex,args) ::= <<
-self.following.append(self.FOLLOW_<rule>_in_<ruleName><elementIndex>)
-<if(label)>
-<label> = self.<rule>(<args; separator=", ">)<\n>
-<else>
-self.<rule>(<args; separator=", ">)<\n>
-<endif>
-self.following.pop()
+ruleRef(rule,label,elementIndex,args,scope) ::= <<
+self.state.following.append(self.FOLLOW_<rule.name>_in_<ruleName><elementIndex>)
+<if(label)><label> = <endif>self.<if(scope)><scope:delegateName()>.<endif><rule.name>(<args; separator=", ">)<\n>
+self.state.following.pop()
 <checkRuleBacktrackFailure()>
 >>
 
 /** ids+=rule */
-ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
+ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRef(...)>
 <listLabel(...)>
 >>
 
-/** A lexer rule reference */
-lexerRuleRef(rule,label,args,elementIndex) ::= <<
+/** A lexer rule reference 
+ *  The 'rule' argument was the target rule name, but now
+ *  is type Rule, whose toString is same: the rule name.
+ *  Now though you can access full rule descriptor stuff.
+ */
+lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
 <label>Start<elementIndex> = self.getCharIndex()
-self.m<rule>(<args; separator=", ">)
+self.<if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">)
 <checkRuleBacktrackFailure()>
 <label> = CommonToken(
     input=self.input, 
@@ -752,13 +785,13 @@ self.m<rule>(<args; separator=", ">)
     stop=self.getCharIndex()-1
     )
 <else>
-self.m<rule>(<args; separator=", ">)
+self.<if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">)
 <checkRuleBacktrackFailure()>
 <endif>
 >>
 
 /** i+=INT in lexer */
-lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::= <<
+lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope) ::= <<
 <lexerRuleRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -777,7 +810,8 @@ self.match(EOF)
 >>
 
 /** match ^(root children) in tree parser */
-tree(root, actionsAfterRoot, children, nullableChildList) ::= <<
+tree(root, actionsAfterRoot, children, nullableChildList, 
+     enclosingTreeLevel, treeLevel) ::= <<
 <root:element()>
 <actionsAfterRoot:element()>
 <if(nullableChildList)>
@@ -979,8 +1013,8 @@ if s == <i0>: <! compressed special state numbers 0..n-1 !>
     <state>}; separator="\nel">
 
 <if(backtracking)>
-        if self.backtracking >0:
-            self.failed = True
+        if self.state.backtracking >0:
+            self.state.failed = True
             return -1<\n>
 <endif>
         nvae = NoViableAltException(self_.getDescription(), <dfa.decisionNumber>, _s, input)
@@ -1099,6 +1133,10 @@ self.<scope.name>_stack = []<\n>
 <endif>
 >>
 
+delegateName() ::= <<
+<if(it.label)><it.label><else>g<it.name><endif>
+>>
+
 /** Define a rule label including default value */
 ruleLabelDef(label) ::= <<
 <label.label.text> = None<\n>
@@ -1143,6 +1181,19 @@ self.<scope>_stack[-1].<attr.name>
 <endif>
 >>
 
+/* not applying patch because of bug in action parser!
+
+<if(negIndex)>
+((len(self.<scope>_stack) - <negIndex> - 1) >= 0 and [self.<scope>_stack[-<negIndex>].<attr.name>] or [None])[0]
+<else>
+<if(index)>
+((<index> \< len(self.<scope>_stack)) and [self.<scope>_stack[<index>].<attr.name>] or [None])[0]
+<else>
+((len(self.<scope>_stack) > 0) and [self.<scope>_stack[-1].<attr.name>] or [None])[0]
+<endif>
+<endif>
+
+*/
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 <if(negIndex)>
@@ -1167,7 +1218,7 @@ isolatedDynamicScopeRef(scope) ::= "self.<scope>_stack"
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-<scope>.<attr.name>
+((<scope> is not None) and [<scope>.<attr.name>] or [None])[0]
 <else>
 <scope>
 <endif>
@@ -1212,25 +1263,25 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-self.input.getTokenStream().toString(
+((<scope> is not None) and [self.input.getTokenStream().toString(
     self.input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
     self.input.getTreeAdaptor().getTokenStopIndex(<scope>.start)
-    )
+    )] or [None])[0]
 <else>
-self.input.toString(<scope>.start,<scope>.stop)
+((<scope> is not None) and [self.input.toString(<scope>.start,<scope>.stop)] or [None])[0]
 <endif>
 >>
-ruleLabelPropertyRef_st(scope,attr) ::= "<!FIXME(201:ST)!><scope>.st"
+ruleLabelPropertyRef_st(scope,attr) ::= "FIXME(299)((<scope> is not None) and [<scope>.st] or [None])[0]"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
 
-lexerRuleLabelPropertyRef_type(scope,attr) ::= "<scope>.type"
-lexerRuleLabelPropertyRef_line(scope,attr) ::= "<scope>.line"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= "<scope>.charPositionInLine"
-lexerRuleLabelPropertyRef_channel(scope,attr) ::= "<scope>.channel"
-lexerRuleLabelPropertyRef_index(scope,attr) ::= "<scope>.index"
-lexerRuleLabelPropertyRef_text(scope,attr) ::= "<scope>.text"
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "((<scope> is not None) and [<scope>.type] or [None])[0]"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "((<scope> is not None) and [<scope>.line] or [None])[0]"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "((<scope> is not None) and [<scope>.charPositionInLine] or [None])[0]"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "((<scope> is not None) and [<scope>.channel] or [None])[0]"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "((<scope> is not None) and [<scope>.index] or [None])[0]"
+lexerRuleLabelPropertyRef_text(scope,attr) ::= "((<scope> is not None) and [<scope>.text] or [None])[0]"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "retval.start"
@@ -1240,12 +1291,12 @@ rulePropertyRef_text(scope,attr) ::= "self.input.toString(retval.start, self.inp
 rulePropertyRef_st(scope,attr) ::= "<!FIXME(203:ST)!>retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "self.text"
-lexerRulePropertyRef_type(scope,attr) ::= "self.type"
-lexerRulePropertyRef_line(scope,attr) ::= "self.tokenStartLine"
-lexerRulePropertyRef_pos(scope,attr) ::= "self.tokenStartCharPositionInLine"
+lexerRulePropertyRef_type(scope,attr) ::= "_type"
+lexerRulePropertyRef_line(scope,attr) ::= "self.state.tokenStartLine"
+lexerRulePropertyRef_pos(scope,attr) ::= "self.state.tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "self.channel"
-lexerRulePropertyRef_start(scope,attr) ::= "self.tokenStartCharIndex"
+lexerRulePropertyRef_channel(scope,attr) ::= "self.state.channel"
+lexerRulePropertyRef_start(scope,attr) ::= "self.state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(self.getCharIndex()-1)"
 
 // setting $st and $tree is allowed in local rule. everything else
@@ -1254,7 +1305,7 @@ ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree =<expr>"
 ruleSetPropertyRef_st(scope,attr,expr) ::= "<!FIXME(205:ST)!>retval.st =<expr>"
 
 
-/** How to execute an action */
+/** How to execute an action (only when not backtracking) */
 execAction(action) ::= <<
 <if(backtracking)>
 <if(actions.(actionScope).synpredgate)>
@@ -1262,7 +1313,7 @@ if <actions.(actionScope).synpredgate>:
     <action>
 
 <else>
-if self.backtracking == 0:
+if self.state.backtracking == 0:
     <action>
 
 <endif>
@@ -1272,6 +1323,10 @@ if self.backtracking == 0:
 #action end
 <endif>
 >>
+
+/** How to always execute an action even when backtracking */
+execForcedAction(action) ::= "<action>"
+
 
 // M I S C (properties, etc...)
 

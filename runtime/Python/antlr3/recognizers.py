@@ -43,35 +43,19 @@ from antlr3.tokens import CommonToken, EOF_TOKEN, SKIP_TOKEN
 from antlr3.compat import set, frozenset, reversed
 
 
-class BaseRecognizer(object):
+class RecognizerSharedState(object):
     """
-    @brief Common recognizer functionality.
-    
-    A generic recognizer that can handle recognizers generated from
-    lexer, parser, and tree grammars.  This is all the parsing
-    support code essentially; most of it is error recovery stuff and
-    backtracking.
+    The set of fields needed by an abstract recognizer to recognize input
+    and recover from errors etc...  As a separate state object, it can be
+    shared among multiple grammars; e.g., when one grammar imports another.
+
+    These fields are publically visible but the actual state pointer per
+    parser is protected.
     """
 
-    MEMO_RULE_FAILED = -2
-    MEMO_RULE_UNKNOWN = -1
-
-    # copies from Token object for convenience in actions
-    DEFAULT_TOKEN_CHANNEL = DEFAULT_CHANNEL
-
-    # for convenience in actions
-    HIDDEN = HIDDEN_CHANNEL
-
-    # overridden by generated subclasses
-    tokenNames = None
-    
     def __init__(self):
-        # Input stream of the recognizer. Must be initialized by a subclass.
-        self.input = None
-        
         # Track the set of token types that can follow any rule invocation.
-        # Stack grows upwards.  When it hits the max, it grows 2x in size
-        # and keeps going.
+        # Stack grows upwards.
         self.following = []
 
         # This is true when we see an error and before having successfully
@@ -99,8 +83,80 @@ class BaseRecognizer(object):
         # the memoization table for ruleIndex.  For key ruleStartIndex, you
         # get back the stop token for associated rule or MEMO_RULE_FAILED.
         #
-        #  This is only used if rule memoization is on (which it is by default).
+        # This is only used if rule memoization is on (which it is by default).
         self.ruleMemo = None
+
+
+        # LEXER FIELDS (must be in same state object to avoid casting
+        # constantly in generated code and Lexer object) :(
+
+
+	## The goal of all lexer rules/methods is to create a token object.
+        # This is an instance variable as multiple rules may collaborate to
+        # create a single token.  nextToken will return this object after
+        # matching lexer rule(s).  If you subclass to allow multiple token
+        # emissions, then set this to the last token to be matched or
+        # something nonnull so that the auto token emit mechanism will not
+        # emit another token.
+        self.token = None
+
+        ## What character index in the stream did the current token start at?
+        # Needed, for example, to get the text for current token.  Set at
+        # the start of nextToken.
+        self.tokenStartCharIndex = -1
+
+        ## The line on which the first character of the token resides
+        self.tokenStartLine = None
+
+        ## The character position of first character within the line
+        self.tokenStartCharPositionInLine = None
+
+        ## The channel number for the current token
+        self.channel = None
+
+        ## The token type for the current token
+        self.type = None
+
+        ## You can set the text for the current token to override what is in
+        # the input char buffer.  Use setText() or can set this instance var.
+        self.text = None
+        
+
+class BaseRecognizer(object):
+    """
+    @brief Common recognizer functionality.
+    
+    A generic recognizer that can handle recognizers generated from
+    lexer, parser, and tree grammars.  This is all the parsing
+    support code essentially; most of it is error recovery stuff and
+    backtracking.
+    """
+
+    MEMO_RULE_FAILED = -2
+    MEMO_RULE_UNKNOWN = -1
+
+    # copies from Token object for convenience in actions
+    DEFAULT_TOKEN_CHANNEL = DEFAULT_CHANNEL
+
+    # for convenience in actions
+    HIDDEN = HIDDEN_CHANNEL
+
+    # overridden by generated subclasses
+    tokenNames = None
+    
+    def __init__(self, state=None):
+        # Input stream of the recognizer. Must be initialized by a subclass.
+        self.input = None
+
+        ## State of a lexer, parser, or tree parser are collected into a state
+        # object so the state can be shared.  This sharing is needed to
+        # have one grammar import others and share same error variables
+        # and other state variables.  It's a kind of explicit multiple
+        # inheritance via delegation of methods and shared state.
+        if state is not None:
+            self.state = state
+        else:
+            self.state = RecognizerSharedState()
 
 
     # this one only exists to shut up pylint :(
@@ -114,32 +170,33 @@ class BaseRecognizer(object):
         """
         
         # wack everything related to error recovery
-        self.errorRecovery = False
-        self.lastErrorIndex = -1
-        self.failed = False
+        self.state.following = []
+        self.state.errorRecovery = False
+        self.state.lastErrorIndex = -1
+        self.state.failed = False
         # wack everything related to backtracking and memoization
-        self.backtracking = 0
-        if self.ruleMemo is not None:
-            self.ruleMemo = {}
+        self.state.backtracking = 0
+        if self.state.ruleMemo is not None:
+            self.state.ruleMemo = {}
 
 
     def match(self, input, ttype, follow):
         """
         Match current input symbol against ttype.  Upon error, do one token
         insertion or deletion if possible.  You can override to not recover
-	here and bail out of the current production to the normal error
-	exception catch (at the end of the method) by just throwing
-	MismatchedTokenException upon input.LA(1)!=ttype.
+        here and bail out of the current production to the normal error
+        exception catch (at the end of the method) by just throwing
+        MismatchedTokenException upon input.LA(1)!=ttype.
         """
         
         if self.input.LA(1) == ttype:
             self.input.consume()
-            self.errorRecovery = False
-            self.failed = False
+            self.state.errorRecovery = False
+            self.state.failed = False
             return
 
-        if self.backtracking > 0:
-            self.failed = True
+        if self.state.backtracking > 0:
+            self.state.failed = True
             return
 
         self.mismatch(input, ttype, follow)
@@ -147,8 +204,8 @@ class BaseRecognizer(object):
 
 
     def matchAny(self, input):
-        self.errorRecovery = False
-        self.failed = False
+        self.state.errorRecovery = False
+        self.state.failed = False
         self.input.consume()
 
 
@@ -156,8 +213,8 @@ class BaseRecognizer(object):
         """
         factor out what to do upon token mismatch so tree parsers can behave
         differently.  Override this method in your parser to do things
-	like bailing out after the first error; just throw the mte object
-	instead of calling the recovery method.
+        like bailing out after the first error; just throw the mte object
+        instead of calling the recovery method.
         """
         
         mte = MismatchedTokenException(ttype, input)
@@ -183,10 +240,10 @@ class BaseRecognizer(object):
         
         # if we've already reported an error and have not matched a token
         # yet successfully, don't report any errors.
-        if self.errorRecovery:
+        if self.state.errorRecovery:
             return
 
-        self.errorRecovery = True
+        self.state.errorRecovery = True
 
         self.displayRecognitionError(self.tokenNames, e)
 
@@ -204,22 +261,22 @@ class BaseRecognizer(object):
         
         Not very object-oriented code, but I like having all error message
         generation within one method rather than spread among all of the
-	exception classes. This also makes it much easier for the exception
-	handling because the exception classes do not have to have pointers back
-	to this object to access utility routines and so on. Also, changing
-	the message for an exception type would be difficult because you
-	would have to subclassing exception, but then somehow get ANTLR
-	to make those kinds of exception objects instead of the default.
-	This looks weird, but trust me--it makes the most sense in terms
-	of flexibility.
+        exception classes. This also makes it much easier for the exception
+        handling because the exception classes do not have to have pointers back
+        to this object to access utility routines and so on. Also, changing
+        the message for an exception type would be difficult because you
+        would have to subclassing exception, but then somehow get ANTLR
+        to make those kinds of exception objects instead of the default.
+        This looks weird, but trust me--it makes the most sense in terms
+        of flexibility.
 
         For grammar debugging, you will want to override this to add
-	more information such as the stack frame with
-	getRuleInvocationStack(e, this.getClass().getName()) and,
-	for no viable alts, the decision description and state etc...
+        more information such as the stack frame with
+        getRuleInvocationStack(e, this.getClass().getName()) and,
+        for no viable alts, the decision description and state etc...
 
         Override this to change the message generated for one or more
-	exception types.
+        exception types.
         """
 
         msg = None
@@ -319,14 +376,14 @@ class BaseRecognizer(object):
         
         # PROBLEM? what if input stream is not the same as last time
         # perhaps make lastErrorIndex a member of input
-        if self.lastErrorIndex == input.index():
+        if self.state.lastErrorIndex == input.index():
             # uh oh, another error at same token index; must be a case
             # where LT(1) is in the recovery token set so nothing is
             # consumed; consume a single token so at least to prevent
             # an infinite loop; this is a failsafe.
             input.consume()
 
-        self.lastErrorIndex = input.index()
+        self.state.lastErrorIndex = input.index()
         followSet = self.computeErrorRecoverySet()
         
         self.beginResync()
@@ -509,7 +566,7 @@ class BaseRecognizer(object):
 
     def combineFollows(self, exact):
         followSet = set()
-        for localFollowSet in reversed(self.following):
+        for localFollowSet in reversed(self.state.following):
             followSet |= localFollowSet
             if exact and EOR_TOKEN_TYPE not in localFollowSet:
                 break
@@ -638,7 +695,7 @@ class BaseRecognizer(object):
 
         where <class> is the class of the generated recognizer, e.g.
         the superclass of self.
-	"""
+        """
 
         return self._getRuleInvocationStack(self.__module__)
 
@@ -681,7 +738,7 @@ class BaseRecognizer(object):
     
 
     def getBacktrackingLevel(self):
-        return self.backtracking
+        return self.state.backtracking
 
 
     def getGrammarFileName(self):
@@ -716,12 +773,12 @@ class BaseRecognizer(object):
         For now we use a hashtable and just the slow Object-based one.
         Later, we can make a special one for ints and also one that
         tosses out data after we commit past input position i.
-	"""
+        """
         
-        if ruleIndex not in self.ruleMemo:
-            self.ruleMemo[ruleIndex] = {}
-		
-        stopIndex = self.ruleMemo[ruleIndex].get(ruleStartIndex, None)
+        if ruleIndex not in self.state.ruleMemo:
+            self.state.ruleMemo[ruleIndex] = {}
+
+        stopIndex = self.state.ruleMemo[ruleIndex].get(ruleStartIndex, None)
         if stopIndex is None:
             return self.MEMO_RULE_UNKNOWN
 
@@ -745,7 +802,7 @@ class BaseRecognizer(object):
             return False
 
         if stopIndex == self.MEMO_RULE_FAILED:
-            self.failed = True
+            self.state.failed = True
 
         else:
             input.seek(stopIndex + 1)
@@ -756,26 +813,26 @@ class BaseRecognizer(object):
     def memoize(self, input, ruleIndex, ruleStartIndex):
         """
         Record whether or not this rule parsed the input at this position
-	successfully.
-	"""
+        successfully.
+        """
 
-        if self.failed:
+        if self.state.failed:
             stopTokenIndex = self.MEMO_RULE_FAILED
         else:
             stopTokenIndex = input.index() - 1
         
-        if ruleIndex in self.ruleMemo:
-            self.ruleMemo[ruleIndex][ruleStartIndex] = stopTokenIndex
+        if ruleIndex in self.state.ruleMemo:
+            self.state.ruleMemo[ruleIndex][ruleStartIndex] = stopTokenIndex
 
 
     def traceIn(self, ruleName, ruleIndex, inputSymbol):
         sys.stdout.write("enter %s %s" % (ruleName, inputSymbol))
         
-        if self.failed:
-            sys.stdout.write(" failed=%s" % self.failed)
+        if self.state.failed:
+            sys.stdout.write(" failed=%s" % self.state.failed)
 
-        if self.backtracking > 0:
-            sys.stdout.write(" backtracking=%s" % self.backtracking)
+        if self.state.backtracking > 0:
+            sys.stdout.write(" backtracking=%s" % self.state.backtracking)
 
         sys.stdout.write('\n')
 
@@ -783,11 +840,11 @@ class BaseRecognizer(object):
     def traceOut(self, ruleName, ruleIndex, inputSymbol):
         sys.stdout.write("exit %s %s" % (ruleName, inputSymbol))
         
-        if self.failed:
-            sys.stdout.write(" failed=%s" % self.failed)
+        if self.state.failed:
+            sys.stdout.write(" failed=%s" % self.state.failed)
 
-        if self.backtracking > 0:
-            sys.stdout.write(" backtracking=%s" % self.backtracking)
+        if self.state.backtracking > 0:
+            sys.stdout.write(" backtracking=%s" % self.state.backtracking)
 
         sys.stdout.write('\n')
 
@@ -838,48 +895,18 @@ class Lexer(BaseRecognizer, TokenSource):
         # Where is the lexer drawing characters from?
         self.input = input
 
-        # The goal of all lexer rules/methods is to create a token object.
-	# This is an instance variable as multiple rules may collaborate to
-	# create a single token.  nextToken will return this object after
-	# matching lexer rule(s).  If you subclass to allow multiple token
-	# emissions, then set this to the last token to be matched or
-	# something nonnull so that the auto token emit mechanism will not
-	# emit another token.
-        self.token = None
-
-	# What character index in the stream did the current token start at?
-	# Needed, for example, to get the text for current token.  Set at
-	# the start of nextToken.
-        self.tokenStartCharIndex = -1
-
-        # The line on which the first character of the token resides
-        self.tokenStartLine = -1
-
-        # The character position of first character within the line
-        self.tokenStartCharPositionInLine = -1
-
-        # The channel number for the current token
-        self.channel = DEFAULT_CHANNEL
-
-        # The token type for the current token
-        self.type = INVALID_TOKEN_TYPE
-        
-        # You can set the text for the current token to override what is in
-	# the input char buffer.  Use setText() or can set this instance var.
-        self._text = None
-
 
     def reset(self):
         BaseRecognizer.reset(self) # reset all recognizer state variables
 
         # wack Lexer state variables
-        self.token = None
-        self.type = INVALID_TOKEN_TYPE
-        self.channel = DEFAULT_CHANNEL
-        self.tokenStartCharIndex = -1
-        self.tokenStartLine = -1
-        self.tokenStartCharPositionInLine = -1
-        self._text = None
+        self.state.token = None
+        self.state.type = INVALID_TOKEN_TYPE
+        self.state.channel = DEFAULT_CHANNEL
+        self.state.tokenStartCharIndex = -1
+        self.state.tokenStartLine = -1
+        self.state.tokenStartCharPositionInLine = -1
+        self.state._text = None
         if self.input is not None:
             self.input.seek(0) # rewind the input
 
@@ -887,29 +914,29 @@ class Lexer(BaseRecognizer, TokenSource):
     def nextToken(self):
         """
         Return a token from this source; i.e., match a token on the char
-	stream.
-	"""
+        stream.
+        """
         
         while 1:
-            self.token = None
-            self.channel = DEFAULT_CHANNEL
-            self.tokenStartCharIndex = self.input.index()
-            self.tokenStartCharPositionInLine = self.input.charPositionInLine
-            self.tokenStartLine = self.input.line
-            self._text = None
+            self.state.token = None
+            self.state.channel = DEFAULT_CHANNEL
+            self.state.tokenStartCharIndex = self.input.index()
+            self.state.tokenStartCharPositionInLine = self.input.charPositionInLine
+            self.state.tokenStartLine = self.input.line
+            self.state._text = None
             if self.input.LA(1) == EOF:
                 return EOF_TOKEN
 
             try:
                 self.mTokens()
                 
-                if self.token is None:
+                if self.state.token is None:
                     self.emit()
                     
-                elif self.token == SKIP_TOKEN:
+                elif self.state.token == SKIP_TOKEN:
                     continue
 
-                return self.token
+                return self.state.token
 
             except RecognitionException, re:
                 self.reportError(re)
@@ -918,14 +945,14 @@ class Lexer(BaseRecognizer, TokenSource):
 
     def skip(self):
         """
-	Instruct the lexer to skip creating a token for current lexer rule
-	and look for another token.  nextToken() knows to keep looking when
-	a lexer rule finishes with token set to SKIP_TOKEN.  Recall that
-	if token==null at end of any token rule, it creates one for you
-	and emits it.
-	"""
+        Instruct the lexer to skip creating a token for current lexer rule
+        and look for another token.  nextToken() knows to keep looking when
+        a lexer rule finishes with token set to SKIP_TOKEN.  Recall that
+        if token==null at end of any token rule, it creates one for you
+        and emits it.
+        """
         
-        self.token = SKIP_TOKEN
+        self.state.token = SKIP_TOKEN
 
 
     def mTokens(self):
@@ -945,24 +972,24 @@ class Lexer(BaseRecognizer, TokenSource):
     def emit(self, token=None):
         """
         The standard method called to automatically emit a token at the
-	outermost lexical rule.  The token object should point into the
-	char buffer start..stop.  If there is a text override in 'text',
-	use that to set the token's text.
-	"""
+        outermost lexical rule.  The token object should point into the
+        char buffer start..stop.  If there is a text override in 'text',
+        use that to set the token's text.
+        """
 
         if token is None:
             token = CommonToken(
                 input=self.input,
-                type=self.type,
-                channel=self.channel,
-                start=self.tokenStartCharIndex,
+                type=self.state.type,
+                channel=self.state.channel,
+                start=self.state.tokenStartCharIndex,
                 stop=self.getCharIndex()-1
                 )
-            token.line = self.tokenStartLine
-            token.text = self.text
-            token.charPositionInLine = self.tokenStartCharPositionInLine
+            token.line = self.state.tokenStartLine
+            token.text = self.state.text
+            token.charPositionInLine = self.state.tokenStartCharPositionInLine
 
-        self.token = token
+        self.state.token = token
         
         return token
 
@@ -972,8 +999,8 @@ class Lexer(BaseRecognizer, TokenSource):
             i = 0
             while i < len(s):
                 if self.input.LA(1) != s[i]:
-                    if self.backtracking > 0:
-                        self.failed = True
+                    if self.state.backtracking > 0:
+                        self.state.failed = True
                         return
 
                     mte = MismatchedTokenException(s[i], self.input)
@@ -982,12 +1009,12 @@ class Lexer(BaseRecognizer, TokenSource):
 
                 i += 1
                 self.input.consume()
-                self.failed = False
+                self.state.failed = False
 
         else:
             if self.input.LA(1) != s:
-                if self.backtracking > 0:
-                    self.failed = True
+                if self.state.backtracking > 0:
+                    self.state.failed = True
                     return
 
                 mte = MismatchedTokenException(s, self.input)
@@ -995,7 +1022,7 @@ class Lexer(BaseRecognizer, TokenSource):
                 raise mte
         
             self.input.consume()
-            self.failed = False
+            self.state.failed = False
             
 
     def matchAny(self):
@@ -1004,8 +1031,8 @@ class Lexer(BaseRecognizer, TokenSource):
 
     def matchRange(self, a, b):
         if self.input.LA(1) < a or self.input.LA(1) > b:
-            if self.backtracking > 0:
-                self.failed = True
+            if self.state.backtracking > 0:
+                self.state.failed = True
                 return
 
             mre = MismatchedRangeException(a, b, self.input)
@@ -1013,7 +1040,7 @@ class Lexer(BaseRecognizer, TokenSource):
             raise mre
 
         self.input.consume()
-        self.failed = False
+        self.state.failed = False
 
 
     def getLine(self):
@@ -1035,11 +1062,11 @@ class Lexer(BaseRecognizer, TokenSource):
         Return the text matched so far for the current token or any
         text override.
         """
-        if self._text is not None:
-            return self._text
+        if self.state._text is not None:
+            return self.state._text
         
         return self.input.substring(
-            self.tokenStartCharIndex,
+            self.state.tokenStartCharIndex,
             self.getCharIndex()-1
             )
 
@@ -1047,9 +1074,9 @@ class Lexer(BaseRecognizer, TokenSource):
     def setText(self, text):
         """
         Set the complete text of this token; it wipes any previous
-	changes to the text.
-	"""
-        self._text = text
+        changes to the text.
+        """
+        self.state._text = text
 
 
     text = property(getText, setText)
@@ -1121,10 +1148,10 @@ class Lexer(BaseRecognizer, TokenSource):
     def recover(self, re):
         """
         Lexers can normally match any char in it's vocabulary after matching
-	a token, so do the easy thing and just kill a character and hope
-	it all works out.  You can instead use the rule invocation stack
-	to do sophisticated error recovery if you are in a fragment rule.
-	"""
+        a token, so do the easy thing and just kill a character and hope
+        it all works out.  You can instead use the rule invocation stack
+        to do sophisticated error recovery if you are in a fragment rule.
+        """
 
         self.input.consume()
 
@@ -1153,8 +1180,8 @@ class Parser(BaseRecognizer):
     @brief Baseclass for generated parser classes.
     """
     
-    def __init__(self, lexer):
-        BaseRecognizer.__init__(self)
+    def __init__(self, lexer, state=None):
+        BaseRecognizer.__init__(self, state)
 
         self.setTokenStream(lexer)
 

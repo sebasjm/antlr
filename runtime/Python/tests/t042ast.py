@@ -118,9 +118,8 @@ class t042ast(testbase.ANTLRTest):
 
     def testR7(self):
         r = self.parse("3", 'r7')
-        self.failUnlessEqual(
-            r.tree.toStringTree(),
-            'nil'
+        self.failUnless(
+            r.tree is None
             )
 
 
@@ -351,9 +350,8 @@ class t042ast(testbase.ANTLRTest):
 
     def testR28(self):
         r = self.parse("foo28a", 'r28')
-        self.failUnlessEqual(
-            r.tree.toStringTree(),
-            'nil'
+        self.failUnless(
+            r.tree is None
             )
 
 
@@ -414,11 +412,10 @@ class t042ast(testbase.ANTLRTest):
             )
 
 
-    def testR32b(self):
+    def testR32c(self):
         r = self.parse("gnurz 32", 'r32', [3], flag=2)
-        self.failUnlessEqual(
-            r.tree.toStringTree(),
-            'nil'
+        self.failUnless(
+            r.tree is None
             )
 
 
@@ -545,9 +542,8 @@ class t042ast(testbase.ANTLRTest):
 
     def testR43(self):
         r = self.parse("gnurz, gnarz, gnorz", 'r43')
-        self.failUnlessEqual(
-            r.tree.toStringTree(),
-            'nil'
+        self.failUnless(
+            r.tree is None
             )
         self.failUnlessEqual(
             r.res,
@@ -573,9 +569,8 @@ class t042ast(testbase.ANTLRTest):
 
     def testR46(self):
         r = self.parse("gnurz, gnarz, gnorz", 'r46')
-        self.failUnlessEqual(
-            r.tree.toStringTree(),
-            'nil'
+        self.failUnless(
+            r.tree is None
             )
         self.failUnlessEqual(
             r.res,

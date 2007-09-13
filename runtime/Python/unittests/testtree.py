@@ -4,7 +4,7 @@ import os
 import unittest
 from StringIO import StringIO
 
-from antlr3.tree import CommonTreeNodeStream, CommonTree
+from antlr3.tree import CommonTreeNodeStream, CommonTree, CommonTreeAdaptor
 from antlr3 import CommonToken, UP, DOWN, EOF
 
 
@@ -466,6 +466,365 @@ class TestCommonTreeNodeStream(unittest.TestCase):
         # RETURN (to empty stack)
         stream.pop()
         self.failUnlessEqual(EOF, stream.LT(1).getType())
+
+
+class TestCommonTree(unittest.TestCase):
+    """Test case for the CommonTree class."""
+
+    def setUp(self):
+        """Setup test fixure"""
+
+        self.adaptor = CommonTreeAdaptor()
+
+        
+    def testSingleNode(self):
+        t = CommonTree(CommonToken(101))
+        self.failUnless(t.parent is None)
+        self.failUnlessEqual(-1, t.childIndex)
+
+
+    def test4Nodes(self):
+        # ^(101 ^(102 103) 104)
+        r0 = CommonTree(CommonToken(101))
+        r0.addChild(CommonTree(CommonToken(102)))
+        r0.getChild(0).addChild(CommonTree(CommonToken(103)))
+        r0.addChild(CommonTree(CommonToken(104)))
+
+        self.failUnless(r0.parent is None)
+        self.failUnlessEqual(-1, r0.childIndex)
+
+
+    def testList(self):
+        # ^(nil 101 102 103)
+        r0 = CommonTree(None)
+        c0=CommonTree(CommonToken(101))
+        r0.addChild(c0)
+        c1=CommonTree(CommonToken(102))
+        r0.addChild(c1)
+        c2=CommonTree(CommonToken(103))
+        r0.addChild(c2)
+
+        self.failUnless(r0.parent is None)
+        self.failUnlessEqual(-1, r0.childIndex)
+        self.failUnlessEqual(r0, c0.parent)
+        self.failUnlessEqual(0, c0.childIndex)
+        self.failUnlessEqual(r0, c1.parent)
+        self.failUnlessEqual(1, c1.childIndex)        
+        self.failUnlessEqual(r0, c2.parent)
+        self.failUnlessEqual(2, c2.childIndex)
+
+
+    def testList2(self):
+        # Add child ^(nil 101 102 103) to root 5
+        # should pull 101 102 103 directly to become 5's child list
+        root = CommonTree(CommonToken(5))
+
+        # child tree
+        r0 = CommonTree(None)
+        c0=CommonTree(CommonToken(101))
+        r0.addChild(c0)
+        c1=CommonTree(CommonToken(102))
+        r0.addChild(c1)
+        c2=CommonTree(CommonToken(103))
+        r0.addChild(c2)
+
+        root.addChild(r0)
+
+        self.failUnless(root.parent is None)
+        self.failUnlessEqual(-1, root.childIndex)
+        # check children of root all point at root
+        self.failUnlessEqual(root, c0.parent)
+        self.failUnlessEqual(0, c0.childIndex)
+        self.failUnlessEqual(root, c0.parent)
+        self.failUnlessEqual(1, c1.childIndex)
+        self.failUnlessEqual(root, c0.parent)
+        self.failUnlessEqual(2, c2.childIndex)
+
+
+    def testAddListToExistChildren(self):
+        # Add child ^(nil 101 102 103) to root ^(5 6)
+        # should add 101 102 103 to end of 5's child list
+        root = CommonTree(CommonToken(5))
+        root.addChild(CommonTree(CommonToken(6)))
+
+        # child tree
+        r0 = CommonTree(None)
+        c0=CommonTree(CommonToken(101))
+        r0.addChild(c0)
+        c1=CommonTree(CommonToken(102))
+        r0.addChild(c1)
+        c2=CommonTree(CommonToken(103))
+        r0.addChild(c2)
+
+        root.addChild(r0)
+
+        self.failUnless(root.parent is None)
+        self.failUnlessEqual(-1, root.childIndex)
+        # check children of root all point at root
+        self.failUnlessEqual(root, c0.parent)
+        self.failUnlessEqual(1, c0.childIndex)
+        self.failUnlessEqual(root, c0.parent)
+        self.failUnlessEqual(2, c1.childIndex)
+        self.failUnlessEqual(root, c0.parent)
+        self.failUnlessEqual(3, c2.childIndex)
+
+
+    def testDupTree(self):
+        # ^(101 ^(102 103 ^(106 107) ) 104 105)
+        r0 = CommonTree(CommonToken(101))
+        r1 = CommonTree(CommonToken(102))
+        r0.addChild(r1)
+        r1.addChild(CommonTree(CommonToken(103)))
+        r2 = CommonTree(CommonToken(106))
+        r2.addChild(CommonTree(CommonToken(107)))
+        r1.addChild(r2)
+        r0.addChild(CommonTree(CommonToken(104)))
+        r0.addChild(CommonTree(CommonToken(105)))
+
+        dup = self.adaptor.dupTree(r0)
+
+        self.failUnless(dup.parent is None)
+        self.failUnlessEqual(-1, dup.childIndex)
+        dup.sanityCheckParentAndChildIndexes()
+
+
+    def testBecomeRoot(self):
+        # 5 becomes root of ^(nil 101 102 103)
+        newRoot = CommonTree(CommonToken(5))
+
+        oldRoot = CommonTree(None)
+        oldRoot.addChild(CommonTree(CommonToken(101)))
+        oldRoot.addChild(CommonTree(CommonToken(102)))
+        oldRoot.addChild(CommonTree(CommonToken(103)))
+
+        self.adaptor.becomeRoot(newRoot, oldRoot)
+        newRoot.sanityCheckParentAndChildIndexes()
+
+
+    def testBecomeRoot2(self):
+        # 5 becomes root of ^(101 102 103)
+        newRoot = CommonTree(CommonToken(5))
+
+        oldRoot = CommonTree(CommonToken(101))
+        oldRoot.addChild(CommonTree(CommonToken(102)))
+        oldRoot.addChild(CommonTree(CommonToken(103)))
+
+        self.adaptor.becomeRoot(newRoot, oldRoot)
+        newRoot.sanityCheckParentAndChildIndexes()
+
+
+    def testBecomeRoot3(self):
+        # ^(nil 5) becomes root of ^(nil 101 102 103)
+        newRoot = CommonTree(None)
+        newRoot.addChild(CommonTree(CommonToken(5)))
+
+        oldRoot = CommonTree(None)
+        oldRoot.addChild(CommonTree(CommonToken(101)))
+        oldRoot.addChild(CommonTree(CommonToken(102)))
+        oldRoot.addChild(CommonTree(CommonToken(103)))
+
+        self.adaptor.becomeRoot(newRoot, oldRoot)
+        newRoot.sanityCheckParentAndChildIndexes()
+
+
+    def testBecomeRoot5(self):
+        # ^(nil 5) becomes root of ^(101 102 103)
+        newRoot = CommonTree(None)
+        newRoot.addChild(CommonTree(CommonToken(5)))
+
+        oldRoot = CommonTree(CommonToken(101))
+        oldRoot.addChild(CommonTree(CommonToken(102)))
+        oldRoot.addChild(CommonTree(CommonToken(103)))
+
+        self.adaptor.becomeRoot(newRoot, oldRoot)
+        newRoot.sanityCheckParentAndChildIndexes()
+
+
+    def testBecomeRoot6(self):
+        # emulates construction of ^(5 6)
+        root_0 = self.adaptor.nil()
+        root_1 = self.adaptor.nil()
+        root_1 = self.adaptor.becomeRoot(CommonTree(CommonToken(5)), root_1)
+
+        self.adaptor.addChild(root_1, CommonTree(CommonToken(6)))
+
+        self.adaptor.addChild(root_0, root_1)
+
+        root_0.sanityCheckParentAndChildIndexes()
+
+
+    # Test replaceChildren
+
+    def testReplaceWithNoChildren(self):
+        t = CommonTree(CommonToken(101))
+        newChild = CommonTree(CommonToken(5))
+        error = False
+        try:
+        	t.replaceChildren(0, 0, newChild)
+	
+        except IndexError:
+        	error = True
+	
+        self.failUnless(error)
+
+
+    def testReplaceWithOneChildren(self):
+        # assume token type 99 and use text
+        t = CommonTree(CommonToken(99, text="a"))
+        c0 = CommonTree(CommonToken(99, text="b"))
+        t.addChild(c0)
+
+        newChild = CommonTree(CommonToken(99, text="c"))
+        t.replaceChildren(0, 0, newChild)
+        expecting = "(a c)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceInMiddle(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b")))
+        t.addChild(CommonTree(CommonToken(99, text="c"))) # index 1
+        t.addChild(CommonTree(CommonToken(99, text="d")))
+
+        newChild = CommonTree(CommonToken(99, text="x"))
+        t.replaceChildren(1, 1, newChild)
+        expecting = "(a b x d)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceAtLeft(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b"))) # index 0
+        t.addChild(CommonTree(CommonToken(99, text="c")))
+        t.addChild(CommonTree(CommonToken(99, text="d")))
+
+        newChild = CommonTree(CommonToken(99, text="x"))
+        t.replaceChildren(0, 0, newChild)
+        expecting = "(a x c d)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceAtRight(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b")))
+        t.addChild(CommonTree(CommonToken(99, text="c")))
+        t.addChild(CommonTree(CommonToken(99, text="d"))) # index 2
+
+        newChild = CommonTree(CommonToken(99, text="x"))
+        t.replaceChildren(2, 2, newChild)
+        expecting = "(a b c x)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceOneWithTwoAtLeft(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b")))
+        t.addChild(CommonTree(CommonToken(99, text="c")))
+        t.addChild(CommonTree(CommonToken(99, text="d")))
+
+        newChildren = self.adaptor.nil()
+        newChildren.addChild(CommonTree(CommonToken(99, text="x")))
+        newChildren.addChild(CommonTree(CommonToken(99, text="y")))
+
+        t.replaceChildren(0, 0, newChildren)
+        expecting = "(a x y c d)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceOneWithTwoAtRight(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b")))
+        t.addChild(CommonTree(CommonToken(99, text="c")))
+        t.addChild(CommonTree(CommonToken(99, text="d")))
+
+        newChildren = self.adaptor.nil()
+        newChildren.addChild(CommonTree(CommonToken(99, text="x")))
+        newChildren.addChild(CommonTree(CommonToken(99, text="y")))
+
+        t.replaceChildren(2, 2, newChildren)
+        expecting = "(a b c x y)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceOneWithTwoInMiddle(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b")))
+        t.addChild(CommonTree(CommonToken(99, text="c")))
+        t.addChild(CommonTree(CommonToken(99, text="d")))
+
+        newChildren = self.adaptor.nil()
+        newChildren.addChild(CommonTree(CommonToken(99, text="x")))
+        newChildren.addChild(CommonTree(CommonToken(99, text="y")))
+
+        t.replaceChildren(1, 1, newChildren)
+        expecting = "(a b x y d)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceTwoWithOneAtLeft(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b")))
+        t.addChild(CommonTree(CommonToken(99, text="c")))
+        t.addChild(CommonTree(CommonToken(99, text="d")))
+
+        newChild = CommonTree(CommonToken(99, text="x"))
+
+        t.replaceChildren(0, 1, newChild)
+        expecting = "(a x d)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceTwoWithOneAtRight(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b")))
+        t.addChild(CommonTree(CommonToken(99, text="c")))
+        t.addChild(CommonTree(CommonToken(99, text="d")))
+
+        newChild = CommonTree(CommonToken(99, text="x"))
+
+        t.replaceChildren(1, 2, newChild)
+        expecting = "(a b x)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceAllWithOne(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b")))
+        t.addChild(CommonTree(CommonToken(99, text="c")))
+        t.addChild(CommonTree(CommonToken(99, text="d")))
+
+        newChild = CommonTree(CommonToken(99, text="x"))
+
+        t.replaceChildren(0, 2, newChild)
+        expecting = "(a x)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
+
+    def testReplaceAllWithTwo(self):
+        t = CommonTree(CommonToken(99, text="a"))
+        t.addChild(CommonTree(CommonToken(99, text="b")))
+        t.addChild(CommonTree(CommonToken(99, text="c")))
+        t.addChild(CommonTree(CommonToken(99, text="d")))
+
+        newChildren = self.adaptor.nil()
+        newChildren.addChild(CommonTree(CommonToken(99, text="x")))
+        newChildren.addChild(CommonTree(CommonToken(99, text="y")))
+
+        t.replaceChildren(0, 2, newChildren)
+        expecting = "(a x y)"
+        self.failUnlessEqual(expecting, t.toStringTree())
+        t.sanityCheckParentAndChildIndexes()
+
 
 
 if __name__ == "__main__":

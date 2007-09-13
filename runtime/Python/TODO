@@ -1,3 +1,4 @@
+- patch for CS4010 "null check for $scope::var now" once action parser is fixed
 - rename @members/@init to @classmembers, @instancemembers?
 - implement TreeWizard
 - http://permalink.gmane.org/gmane.comp.parsers.antlr-interest/13425

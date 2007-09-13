@@ -12,7 +12,7 @@ names
 
 a
 scope aScope;
-    :   {$aScope::names = []} ID*
+    :   {$aScope::names = [];} ID*
     ;
 
 
@@ -40,7 +40,7 @@ scope {
     symbols
 }
 @init {
-    $c::symbols = set()
+    $c::symbols = set();
 }
     : '{' c1* c2+ '}'
         { $res = $c::symbols; }
@@ -65,7 +65,7 @@ scope {
     symbols
 }
 @init {
-    $d::symbols = set()
+    $d::symbols = set();
 }
     : '{' d1* d2* '}'
         { $res = $d::symbols; }
@@ -94,7 +94,7 @@ scope {
     a
 }
 @after {
-    $res = $e::a
+    $res = $e::a;
 }
     : NUM { $e[0]::a = int($NUM.text); }
     | '{' e '}'
@@ -108,7 +108,7 @@ scope {
     a
 }
 @after {
-    $res = $f::a
+    $res = $f::a;
 }
     : NUM { $f[-2]::a = int($NUM.text); }
     | '{' f '}'

@@ -611,6 +611,11 @@ class CommonTokenStream(TokenStream):
         self.channel = DEFAULT_CHANNEL
 
 
+    def reset(self):
+        self.p = -1
+        self.lastMarker = None
+
+
     def fillBuffer(self):
         """
         Load all tokens from the token source and put in tokens.

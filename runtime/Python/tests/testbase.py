@@ -261,11 +261,11 @@ class ANTLRTest(unittest.TestCase):
         return walker
 
 
-    def compileInlineGrammar(self, grammar, options=''):
+    def writeInlineGrammar(self, grammar):
         testDir = os.path.dirname(os.path.abspath(__file__))
         
         # get type and name from first grammar line
-        m = re.match(r'\s*((lexer|parser|tree)\s+|)grammar\s+(\S+);', grammar)
+        m = re.match(r'\s*((lexer|parser|tree)\s+|)grammar\s+(\S+);', grammar, re.MULTILINE)
         assert m is not None
         grammarType = m.group(2)
         if grammarType is None:
@@ -273,14 +273,27 @@ class ANTLRTest(unittest.TestCase):
         grammarName = m.group(3)
 
         assert grammarType in ('lexer', 'parser', 'tree', 'combined'), grammarType
+
+        grammarPath = os.path.join(testDir, grammarName + '.g')
         
         # dump temp grammar file
-        fp = open(os.path.join(testDir, grammarName + '.g'), 'w')
+        fp = open(grammarPath, 'w')
         fp.write(grammar)
         fp.close()
 
+        return grammarName, grammarPath, grammarType
+    
+        
+    def compileInlineGrammar(self, grammar, options=''):
+        # write grammar file
+        grammarName, grammarPath, grammarType = self.writeInlineGrammar(grammar)
+
         # compile it
-        self._invokeantlr(testDir, grammarName + '.g', options)
+        self._invokeantlr(
+            os.path.dirname(grammarPath),
+            os.path.basename(grammarPath),
+            options
+            )
         
         if grammarType == 'combined':
             lexerMod = self.__load_module(grammarName + 'Lexer')
