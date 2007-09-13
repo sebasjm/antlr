@@ -344,8 +344,10 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	public void reset() {
 		p = -1;
 		lastMarker = 0;
-		calls.clear();
-	}
+        if (calls != null) {
+            calls.clear();
+        }
+    }
 
 	public int size() {
 		if ( p==-1 ) {
