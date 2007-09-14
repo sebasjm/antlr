@@ -77,11 +77,11 @@ class <name>(Lexer):
     def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input=None, state=None):
         Lexer.__init__(self, input)
 <if(backtracking)>
-        self.state.ruleMemo = {}
+        self._state.ruleMemo = {}
 <endif>
 
         <grammar.directDelegates:
-         {g|self.<g:delegateName()> = <g.name>Lexer(self<grammar.delegators:{g|, <g:delegateName()>}>, input, self.state)}; separator="\n">
+         {g|self.<g:delegateName()> = <g.name>Lexer(self<grammar.delegators:{g|, <g:delegateName()>}>, input, self._state)}; separator="\n">
         <grammar.delegators:
          {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
 
@@ -117,28 +117,28 @@ def nextToken(self):
         if self.input.LA(1) == EOF:
             return EOF_TOKEN
 
-        self.state.token = None
-        self.state.channel = DEFAULT_CHANNEL
-        self.state.tokenStartCharIndex = self.input.index()
-        self.state.tokenStartCharPositionInLine = self.input.charPositionInLine
-        self.state.tokenStartLine = self.input.line
-        self.state._text = None
+        self._state.token = None
+        self._state.channel = DEFAULT_CHANNEL
+        self._state.tokenStartCharIndex = self.input.index()
+        self._state.tokenStartCharPositionInLine = self.input.charPositionInLine
+        self._state.tokenStartLine = self.input.line
+        self._state._text = None
         try:
             m = self.input.mark()
-            self.state.backtracking = 1 <! means we won't throw slow exception !>
-            self.state.failed = False
+            self._state.backtracking = 1 <! means we won't throw slow exception !>
+            self._state.failed = False
             self.mTokens()
-            self.state.backtracking = 0
+            self._state.backtracking = 0
 
             <! mTokens backtracks with synpred at backtracking==2
                and we set the synpredgate to allow actions at level 1. !>
-            if self.state.failed:
+            if self._state.failed:
                 self.input.rewind(m)
                 self.input.consume() <! advance one char and try again !>
 
             else:
                 self.emit()
-                return self.state.token
+                return self._state.token
 
         except RecognitionException, re:
             # shouldn't happen in backtracking mode, but...
@@ -147,20 +147,20 @@ def nextToken(self):
 
 
 def memoize(self, input, ruleIndex, ruleStartIndex):
-    if self.state.backtracking > 1:
+    if self._state.backtracking > 1:
         # is Lexer always superclass?
         Lexer.memoize(self, input, ruleIndex, ruleStartIndex)
 
 
 def alreadyParsedRule(self, input, ruleIndex):
-    if self.state.backtracking > 1:
+    if self._state.backtracking > 1:
         return Lexer.alreadyParsedRule(self, input, ruleIndex)
     return False
 
 
 >>
 
-filteringActionGate() ::= "self.state.backtracking == 1"
+filteringActionGate() ::= "self._state.backtracking == 1"
 
 /** How to generate a parser */
 
@@ -188,7 +188,7 @@ class <name>(<superClass>):
     def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state=None):
         <superClass>.__init__(self, input, state)
 <if(memoize)>
-        self.state.ruleMemo = {}
+        self._state.ruleMemo = {}
 <endif>
         <grammar.delegators:
          {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
@@ -201,7 +201,7 @@ class <name>(<superClass>):
         <init>
 
         <grammar.directDelegates:
-         {g|self.<g:delegateName()> = <g.name><superClass>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, self.state)}; separator="\n">
+         {g|self.<g:delegateName()> = <g.name><superClass>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, self._state)}; separator="\n">
 
         <@members>
         <@end>
@@ -271,15 +271,15 @@ def <ruleName>_fragment(self, <ruleDescriptor.parameterScope:parameterScope(scop
 
 synpred(name) ::= <<
 def <name>(self):
-    self.state.backtracking += 1
+    self._state.backtracking += 1
     <@start()>
     start = self.input.mark()
     self.<name>_fragment()
-    success = not self.state.failed
+    success = not self._state.failed
     self.input.rewind(start)
     <@stop()>
-    self.state.backtracking -= 1
-    self.state.failed = False
+    self._state.backtracking -= 1
+    self._state.failed = False
     return success
 
 
@@ -291,7 +291,7 @@ lexerSynpred(name) ::= <<
 
 ruleMemoization(name) ::= <<
 <if(memoize)>
-if self.state.backtracking > 0 and self.alreadyParsedRule(self.input, <ruleDescriptor.index>):
+if self._state.backtracking > 0 and self.alreadyParsedRule(self.input, <ruleDescriptor.index>):
     return <ruleReturnValue()>
 
 <endif>
@@ -300,7 +300,7 @@ if self.state.backtracking > 0 and self.alreadyParsedRule(self.input, <ruleDescr
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
 <if(backtracking)>
-if self.state.failed:
+if self._state.failed:
     return <ruleReturnValue()>
 <endif>
 >>
@@ -308,8 +308,8 @@ if self.state.failed:
 /** This rule has failed, exit indicating failure during backtrack */
 ruleBacktrackFailure() ::= <<
 <if(backtracking)>
-if self.state.backtracking > 0:
-    self.state.failed = True
+if self._state.backtracking > 0:
+    self._state.failed = True
     return <ruleReturnValue()><\n>
 <endif>
 >>
@@ -452,7 +452,7 @@ retval.stop = self.input.LT(-1)<\n>
 memoize() ::= <<
 <if(memoize)>
 <if(backtracking)>
-if self.state.backtracking > 0:
+if self._state.backtracking > 0:
     self.memoize(self.input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex)
 
 <endif>
@@ -484,7 +484,7 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         <ruleDescriptor.actions.init>
         <block>
         <ruleCleanUp()>
-        self.state.type = _type
+        self._state.type = _type
         <(ruleDescriptor.actions.after):execAction()>
 <endif>
 
@@ -682,10 +682,10 @@ if <s>:
     self.input.consume();
     <postmatchCode>
 <if(!LEXER)>
-    self.state.errorRecovery = False<\n>
+    self._state.errorRecovery = False<\n>
 <endif>
 <if(backtracking)>
-    self.state.failed = False<\n>
+    self._state.failed = False<\n>
 <endif>
 
 else:
@@ -755,9 +755,9 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  descriptor stuff.
  */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
-self.state.following.append(self.FOLLOW_<rule.name>_in_<ruleName><elementIndex>)
+self._state.following.append(self.FOLLOW_<rule.name>_in_<ruleName><elementIndex>)
 <if(label)><label> = <endif>self.<if(scope)><scope:delegateName()>.<endif><rule.name>(<args; separator=", ">)<\n>
-self.state.following.pop()
+self._state.following.pop()
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1013,8 +1013,8 @@ if s == <i0>: <! compressed special state numbers 0..n-1 !>
     <state>}; separator="\nel">
 
 <if(backtracking)>
-        if self.state.backtracking >0:
-            self.state.failed = True
+        if self._state.backtracking >0:
+            self._state.failed = True
             return -1<\n>
 <endif>
         nvae = NoViableAltException(self_.getDescription(), <dfa.decisionNumber>, _s, input)
@@ -1292,11 +1292,11 @@ rulePropertyRef_st(scope,attr) ::= "<!FIXME(203:ST)!>retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "self.text"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "self.state.tokenStartLine"
-lexerRulePropertyRef_pos(scope,attr) ::= "self.state.tokenStartCharPositionInLine"
+lexerRulePropertyRef_line(scope,attr) ::= "self._state.tokenStartLine"
+lexerRulePropertyRef_pos(scope,attr) ::= "self._state.tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "self.state.channel"
-lexerRulePropertyRef_start(scope,attr) ::= "self.state.tokenStartCharIndex"
+lexerRulePropertyRef_channel(scope,attr) ::= "self._state.channel"
+lexerRulePropertyRef_start(scope,attr) ::= "self._state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(self.getCharIndex()-1)"
 
 // setting $st and $tree is allowed in local rule. everything else
@@ -1313,7 +1313,7 @@ if <actions.(actionScope).synpredgate>:
     <action>
 
 <else>
-if self.state.backtracking == 0:
+if self._state.backtracking == 0:
     <action>
 
 <endif>

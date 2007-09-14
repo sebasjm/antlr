@@ -154,9 +154,9 @@ class BaseRecognizer(object):
         # and other state variables.  It's a kind of explicit multiple
         # inheritance via delegation of methods and shared state.
         if state is not None:
-            self.state = state
+            self._state = state
         else:
-            self.state = RecognizerSharedState()
+            self._state = RecognizerSharedState()
 
 
     # this one only exists to shut up pylint :(
@@ -170,14 +170,14 @@ class BaseRecognizer(object):
         """
         
         # wack everything related to error recovery
-        self.state.following = []
-        self.state.errorRecovery = False
-        self.state.lastErrorIndex = -1
-        self.state.failed = False
+        self._state.following = []
+        self._state.errorRecovery = False
+        self._state.lastErrorIndex = -1
+        self._state.failed = False
         # wack everything related to backtracking and memoization
-        self.state.backtracking = 0
-        if self.state.ruleMemo is not None:
-            self.state.ruleMemo = {}
+        self._state.backtracking = 0
+        if self._state.ruleMemo is not None:
+            self._state.ruleMemo = {}
 
 
     def match(self, input, ttype, follow):
@@ -191,12 +191,12 @@ class BaseRecognizer(object):
         
         if self.input.LA(1) == ttype:
             self.input.consume()
-            self.state.errorRecovery = False
-            self.state.failed = False
+            self._state.errorRecovery = False
+            self._state.failed = False
             return
 
-        if self.state.backtracking > 0:
-            self.state.failed = True
+        if self._state.backtracking > 0:
+            self._state.failed = True
             return
 
         self.mismatch(input, ttype, follow)
@@ -204,8 +204,8 @@ class BaseRecognizer(object):
 
 
     def matchAny(self, input):
-        self.state.errorRecovery = False
-        self.state.failed = False
+        self._state.errorRecovery = False
+        self._state.failed = False
         self.input.consume()
 
 
@@ -240,10 +240,10 @@ class BaseRecognizer(object):
         
         # if we've already reported an error and have not matched a token
         # yet successfully, don't report any errors.
-        if self.state.errorRecovery:
+        if self._state.errorRecovery:
             return
 
-        self.state.errorRecovery = True
+        self._state.errorRecovery = True
 
         self.displayRecognitionError(self.tokenNames, e)
 
@@ -376,14 +376,14 @@ class BaseRecognizer(object):
         
         # PROBLEM? what if input stream is not the same as last time
         # perhaps make lastErrorIndex a member of input
-        if self.state.lastErrorIndex == input.index():
+        if self._state.lastErrorIndex == input.index():
             # uh oh, another error at same token index; must be a case
             # where LT(1) is in the recovery token set so nothing is
             # consumed; consume a single token so at least to prevent
             # an infinite loop; this is a failsafe.
             input.consume()
 
-        self.state.lastErrorIndex = input.index()
+        self._state.lastErrorIndex = input.index()
         followSet = self.computeErrorRecoverySet()
         
         self.beginResync()
@@ -566,7 +566,7 @@ class BaseRecognizer(object):
 
     def combineFollows(self, exact):
         followSet = set()
-        for localFollowSet in reversed(self.state.following):
+        for localFollowSet in reversed(self._state.following):
             followSet |= localFollowSet
             if exact and EOR_TOKEN_TYPE not in localFollowSet:
                 break
@@ -738,7 +738,7 @@ class BaseRecognizer(object):
     
 
     def getBacktrackingLevel(self):
-        return self.state.backtracking
+        return self._state.backtracking
 
 
     def getGrammarFileName(self):
@@ -775,10 +775,10 @@ class BaseRecognizer(object):
         tosses out data after we commit past input position i.
         """
         
-        if ruleIndex not in self.state.ruleMemo:
-            self.state.ruleMemo[ruleIndex] = {}
+        if ruleIndex not in self._state.ruleMemo:
+            self._state.ruleMemo[ruleIndex] = {}
 
-        stopIndex = self.state.ruleMemo[ruleIndex].get(ruleStartIndex, None)
+        stopIndex = self._state.ruleMemo[ruleIndex].get(ruleStartIndex, None)
         if stopIndex is None:
             return self.MEMO_RULE_UNKNOWN
 
@@ -802,7 +802,7 @@ class BaseRecognizer(object):
             return False
 
         if stopIndex == self.MEMO_RULE_FAILED:
-            self.state.failed = True
+            self._state.failed = True
 
         else:
             input.seek(stopIndex + 1)
@@ -816,23 +816,23 @@ class BaseRecognizer(object):
         successfully.
         """
 
-        if self.state.failed:
+        if self._state.failed:
             stopTokenIndex = self.MEMO_RULE_FAILED
         else:
             stopTokenIndex = input.index() - 1
         
-        if ruleIndex in self.state.ruleMemo:
-            self.state.ruleMemo[ruleIndex][ruleStartIndex] = stopTokenIndex
+        if ruleIndex in self._state.ruleMemo:
+            self._state.ruleMemo[ruleIndex][ruleStartIndex] = stopTokenIndex
 
 
     def traceIn(self, ruleName, ruleIndex, inputSymbol):
         sys.stdout.write("enter %s %s" % (ruleName, inputSymbol))
         
-        if self.state.failed:
-            sys.stdout.write(" failed=%s" % self.state.failed)
+        if self._state.failed:
+            sys.stdout.write(" failed=%s" % self._state.failed)
 
-        if self.state.backtracking > 0:
-            sys.stdout.write(" backtracking=%s" % self.state.backtracking)
+        if self._state.backtracking > 0:
+            sys.stdout.write(" backtracking=%s" % self._state.backtracking)
 
         sys.stdout.write('\n')
 
@@ -840,11 +840,11 @@ class BaseRecognizer(object):
     def traceOut(self, ruleName, ruleIndex, inputSymbol):
         sys.stdout.write("exit %s %s" % (ruleName, inputSymbol))
         
-        if self.state.failed:
-            sys.stdout.write(" failed=%s" % self.state.failed)
+        if self._state.failed:
+            sys.stdout.write(" failed=%s" % self._state.failed)
 
-        if self.state.backtracking > 0:
-            sys.stdout.write(" backtracking=%s" % self.state.backtracking)
+        if self._state.backtracking > 0:
+            sys.stdout.write(" backtracking=%s" % self._state.backtracking)
 
         sys.stdout.write('\n')
 
@@ -900,13 +900,13 @@ class Lexer(BaseRecognizer, TokenSource):
         BaseRecognizer.reset(self) # reset all recognizer state variables
 
         # wack Lexer state variables
-        self.state.token = None
-        self.state.type = INVALID_TOKEN_TYPE
-        self.state.channel = DEFAULT_CHANNEL
-        self.state.tokenStartCharIndex = -1
-        self.state.tokenStartLine = -1
-        self.state.tokenStartCharPositionInLine = -1
-        self.state._text = None
+        self._state.token = None
+        self._state.type = INVALID_TOKEN_TYPE
+        self._state.channel = DEFAULT_CHANNEL
+        self._state.tokenStartCharIndex = -1
+        self._state.tokenStartLine = -1
+        self._state.tokenStartCharPositionInLine = -1
+        self._state.text = None
         if self.input is not None:
             self.input.seek(0) # rewind the input
 
@@ -918,25 +918,25 @@ class Lexer(BaseRecognizer, TokenSource):
         """
         
         while 1:
-            self.state.token = None
-            self.state.channel = DEFAULT_CHANNEL
-            self.state.tokenStartCharIndex = self.input.index()
-            self.state.tokenStartCharPositionInLine = self.input.charPositionInLine
-            self.state.tokenStartLine = self.input.line
-            self.state._text = None
+            self._state.token = None
+            self._state.channel = DEFAULT_CHANNEL
+            self._state.tokenStartCharIndex = self.input.index()
+            self._state.tokenStartCharPositionInLine = self.input.charPositionInLine
+            self._state.tokenStartLine = self.input.line
+            self._state.text = None
             if self.input.LA(1) == EOF:
                 return EOF_TOKEN
 
             try:
                 self.mTokens()
                 
-                if self.state.token is None:
+                if self._state.token is None:
                     self.emit()
                     
-                elif self.state.token == SKIP_TOKEN:
+                elif self._state.token == SKIP_TOKEN:
                     continue
 
-                return self.state.token
+                return self._state.token
 
             except RecognitionException, re:
                 self.reportError(re)
@@ -952,7 +952,7 @@ class Lexer(BaseRecognizer, TokenSource):
         and emits it.
         """
         
-        self.state.token = SKIP_TOKEN
+        self._state.token = SKIP_TOKEN
 
 
     def mTokens(self):
@@ -980,16 +980,16 @@ class Lexer(BaseRecognizer, TokenSource):
         if token is None:
             token = CommonToken(
                 input=self.input,
-                type=self.state.type,
-                channel=self.state.channel,
-                start=self.state.tokenStartCharIndex,
+                type=self._state.type,
+                channel=self._state.channel,
+                start=self._state.tokenStartCharIndex,
                 stop=self.getCharIndex()-1
                 )
-            token.line = self.state.tokenStartLine
-            token.text = self.state.text
-            token.charPositionInLine = self.state.tokenStartCharPositionInLine
+            token.line = self._state.tokenStartLine
+            token.text = self._state.text
+            token.charPositionInLine = self._state.tokenStartCharPositionInLine
 
-        self.state.token = token
+        self._state.token = token
         
         return token
 
@@ -999,8 +999,8 @@ class Lexer(BaseRecognizer, TokenSource):
             i = 0
             while i < len(s):
                 if self.input.LA(1) != s[i]:
-                    if self.state.backtracking > 0:
-                        self.state.failed = True
+                    if self._state.backtracking > 0:
+                        self._state.failed = True
                         return
 
                     mte = MismatchedTokenException(s[i], self.input)
@@ -1009,12 +1009,12 @@ class Lexer(BaseRecognizer, TokenSource):
 
                 i += 1
                 self.input.consume()
-                self.state.failed = False
+                self._state.failed = False
 
         else:
             if self.input.LA(1) != s:
-                if self.state.backtracking > 0:
-                    self.state.failed = True
+                if self._state.backtracking > 0:
+                    self._state.failed = True
                     return
 
                 mte = MismatchedTokenException(s, self.input)
@@ -1022,7 +1022,7 @@ class Lexer(BaseRecognizer, TokenSource):
                 raise mte
         
             self.input.consume()
-            self.state.failed = False
+            self._state.failed = False
             
 
     def matchAny(self):
@@ -1031,8 +1031,8 @@ class Lexer(BaseRecognizer, TokenSource):
 
     def matchRange(self, a, b):
         if self.input.LA(1) < a or self.input.LA(1) > b:
-            if self.state.backtracking > 0:
-                self.state.failed = True
+            if self._state.backtracking > 0:
+                self._state.failed = True
                 return
 
             mre = MismatchedRangeException(a, b, self.input)
@@ -1040,7 +1040,7 @@ class Lexer(BaseRecognizer, TokenSource):
             raise mre
 
         self.input.consume()
-        self.state.failed = False
+        self._state.failed = False
 
 
     def getLine(self):
@@ -1062,11 +1062,11 @@ class Lexer(BaseRecognizer, TokenSource):
         Return the text matched so far for the current token or any
         text override.
         """
-        if self.state._text is not None:
-            return self.state._text
+        if self._state.text is not None:
+            return self._state.text
         
         return self.input.substring(
-            self.state.tokenStartCharIndex,
+            self._state.tokenStartCharIndex,
             self.getCharIndex()-1
             )
 
@@ -1076,7 +1076,7 @@ class Lexer(BaseRecognizer, TokenSource):
         Set the complete text of this token; it wipes any previous
         changes to the text.
         """
-        self.state._text = text
+        self._state.text = text
 
 
     text = property(getText, setText)

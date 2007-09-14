@@ -41,7 +41,7 @@ group ASTTreeParser;
 
 finishedBacktracking(block) ::= <<
 <if(backtracking)>
-if self.state.backtracking == 0:
+if self._state.backtracking == 0:
     <block>
 <else>
 <block>

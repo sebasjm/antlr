@@ -156,8 +156,8 @@ class DFA(object):
 
 
     def noViableAlt(self, s, input):
-        if self.recognizer.state.backtracking > 0:
-            self.recognizer.state.failed = True
+        if self.recognizer._state.backtracking > 0:
+            self.recognizer._state.failed = True
             return
 
         nvae = NoViableAltException(
