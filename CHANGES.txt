@@ -8,6 +8,10 @@ University of San Francisco
 
 CHANGES
 
+September 15, 2007
+
+add getCharStream to Lexer.
+
 September 10, 2007
 
 * Added {{...}} forced action executed even during backtracking.
