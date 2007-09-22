@@ -1,5 +1,17 @@
 use ExtUtils::MakeMaker;
 
+sub MY::postamble {
+    my $postamble = <<'MAKE_FRAG';
+.PHONY: tags
+
+tags:
+	ctags -f tags --recurse --totals \
+		--exclude=blib \
+		--exclude='*~' \
+		--languages=Perl --langmap=Perl:+.t \
+MAKE_FRAG
+}
+
 WriteMakefile(
     NAME          => 'ANTLR::Runtime',
     VERSION_FROM  => 'lib/ANTLR/Runtime.pm',
