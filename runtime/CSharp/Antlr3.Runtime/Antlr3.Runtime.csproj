@@ -1,0 +1,327 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{547D074E-09B9-42B2-9C59-23980DE4617F}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>Antlr3.Runtime</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Antlr3.Runtime</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib">
+      <Name>mscorlib</Name>
+      <HintPath>mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+      <HintPath>System.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Antlr.Runtime.Collections\CollectionUtils.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Collections\HashList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Collections\StackList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\BlankDebugEventListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\DebugEventSocketProxy.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\DebugParser.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\DebugTokenStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\DebugTreeAdaptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\DebugTreeNodeStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\DebugTreeParser.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\IDebugEventListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\ParseTreeBuilder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\Profiler.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\RemoteDebugEventSocketListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\TraceDebugEventListener.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Debug\Tracer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Misc\ErrorManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Misc\IIntSet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Misc\Stats.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\BaseTree.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\BaseTreeAdaptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\CommonTree.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\CommonTreeAdaptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\CommonTreeNodeStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\DoubleLinkTree.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\ITree.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\ITreeAdaptor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\ITreeNodeStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\ParseTree.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\RewriteCardinalityException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\RewriteEarlyExitException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\RewriteEmptyStreamException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\RewriteRuleElementStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\RewriteRuleSubtreeStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\RewriteRuleTokenStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\Tree.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\TreeParser.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\TreeRuleReturnScope.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime.Tree\UnBufferedTreeNodeStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\ANTLRFileStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\ANTLRInputStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\ANTLRReaderStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\ANTLRStringStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\BaseRecognizer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\BitSet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\CharStreamConstants.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\CharStreamState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\ClassicToken.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\CommonToken.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\CommonTokenStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\Constants.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\DFA.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\EarlyExitException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\FailedPredicateException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\ICharStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\IIntStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\IToken.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\ITokenSource.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\ITokenStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\Lexer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\Messages.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\MismatchedNotSetException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\MismatchedRangeException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\MismatchedSetException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\MismatchedTokenException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\MismatchedTreeNodeException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\NoViableAltException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\Parser.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\ParserRuleReturnScope.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\RecognitionException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\RuleReturnScope.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\SynPredPointer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\Token.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Antlr.Runtime\TokenRewriteStream.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <EmbeddedResource Include="Antlr.Runtime.Messages.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

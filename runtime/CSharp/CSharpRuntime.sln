@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "antlr.runtime", "antlr.runtime\antlr.runtime.csproj", "{74AA0F1B-0391-4498-A518-3B1BE85DF83E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr3.Utility", "Antlr3.Utility\Antlr3.Utility.csproj", "{83E06654-0F5B-4CB8-8F43-4104A248C7BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr3.Runtime", "Antlr3.Runtime\Antlr3.Runtime.csproj", "{547D074E-09B9-42B2-9C59-23980DE4617F}"
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 4
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = antlr.runtime\\antlr.runtime.csproj
+		SccLocalPath1 = .
+		SccProjectFilePathRelativizedFromConnection1 = antlr.runtime\\
+		SccProjectUniqueName2 = Antlr3.Runtime\\Antlr3.Runtime.csproj
+		SccLocalPath2 = .
+		SccProjectFilePathRelativizedFromConnection2 = Antlr3.Runtime\\
+		SccProjectUniqueName3 = Antlr3.Utility\\Antlr3.Utility.csproj
+		SccLocalPath3 = .
+		SccProjectFilePathRelativizedFromConnection3 = Antlr3.Utility\\
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{74AA0F1B-0391-4498-A518-3B1BE85DF83E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74AA0F1B-0391-4498-A518-3B1BE85DF83E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74AA0F1B-0391-4498-A518-3B1BE85DF83E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74AA0F1B-0391-4498-A518-3B1BE85DF83E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83E06654-0F5B-4CB8-8F43-4104A248C7BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83E06654-0F5B-4CB8-8F43-4104A248C7BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83E06654-0F5B-4CB8-8F43-4104A248C7BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83E06654-0F5B-4CB8-8F43-4104A248C7BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{547D074E-09B9-42B2-9C59-23980DE4617F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{547D074E-09B9-42B2-9C59-23980DE4617F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{547D074E-09B9-42B2-9C59-23980DE4617F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{547D074E-09B9-42B2-9C59-23980DE4617F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
