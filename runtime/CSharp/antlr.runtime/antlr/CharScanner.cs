@@ -20,7 +20,7 @@ namespace antlr
         internal static readonly object ConsumeEventKey = new object();
         internal static readonly object DoneEventKey = new object();
         internal static readonly object EnterRuleEventKey = new object();
-        public static readonly char EOF_CHAR = 0xffff;
+        public static readonly char EOF_CHAR = (char) 0xffff;
         private EventHandlerList events_;
         internal static readonly object ExitRuleEventKey = new object();
         protected internal LexerSharedInputState inputState;
@@ -690,7 +690,7 @@ namespace antlr
             switch (str)
             {
                 case null:
-                case string.Empty:
+                case "":
                     return ttype;
             }
             object obj2 = this.literals[str];
