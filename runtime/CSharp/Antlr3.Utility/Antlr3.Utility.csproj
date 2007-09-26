@@ -80,7 +80,7 @@
   <ItemGroup>
     <Reference Include="Antlr3.Runtime">
       <Name>Antlr3.Runtime</Name>
-      <HintPath>Antlr3.Runtime.dll</HintPath>
+      <HintPath>..\Antlr3.Runtime\bin\Debug\Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <Name>mscorlib</Name>
@@ -88,7 +88,7 @@
     </Reference>
     <Reference Include="StringTemplate">
       <Name>StringTemplate</Name>
-      <HintPath>StringTemplate.dll</HintPath>
+      <HintPath>..\External\StringTemplate\StringTemplate.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
