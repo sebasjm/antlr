@@ -17,6 +17,40 @@ class TestBaseRecognizer(unittest.TestCase):
             )
         
 
+class TestTokenSource(unittest.TestCase):
+    """Testcase to the antlr3.TokenSource class"""
+
+    
+    def testIteratorInterface(self):
+        """TokenSource.next()"""
+
+        class TrivialToken(object):
+            def __init__(self, type):
+                self.type = type
+                
+        class TestSource(antlr3.TokenSource):
+            def __init__(self):
+                self.tokens = [
+                    TrivialToken(1),
+                    TrivialToken(2),
+                    TrivialToken(3),
+                    TrivialToken(4),
+                    TrivialToken(antlr3.EOF),
+                    ]
+
+            def nextToken(self):
+                return self.tokens.pop(0)
+
+                
+        src = TestSource()
+        tokens = []
+        for token in src:
+            tokens.append(token.type)
+
+        self.failUnlessEqual(tokens, [1, 2, 3, 4])
+        
+            
+
 class TestLexer(unittest.TestCase):
 
     def testInit(self):
@@ -24,7 +58,7 @@ class TestLexer(unittest.TestCase):
 
         stream = antlr3.StringStream('foo')
         antlr3.Lexer(stream)
-        
 
+            
 if __name__ == "__main__":
     unittest.main(testRunner=unittest.TextTestRunner(verbosity=2))

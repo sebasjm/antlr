@@ -878,6 +878,31 @@ class TokenSource(object):
         raise NotImplementedError
     
 
+    def __iter__(self):
+        """The TokenSource is an interator.
+
+        The iteration will not include the final EOF token, see also the note
+        for the next() method.
+
+        """
+        
+        return self
+
+    
+    def next(self):
+        """Return next token or raise StopIteration.
+
+        Note that this will raise StopIteration when hitting the EOF token,
+        so EOF will not be part of the iteration.
+        
+        """
+
+        token = self.nextToken()
+        if token is None or token.type == EOF:
+            raise StopIteration
+        return token
+
+    
 class Lexer(BaseRecognizer, TokenSource):
     """
     @brief Baseclass for generated lexer classes.

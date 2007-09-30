@@ -31,6 +31,15 @@ class t001lexer(testbase.ANTLRTest):
         self.failUnlessEqual(token.type, self.lexerModule.EOF)
         
 
+    def testIteratorInterface(self):
+        stream = antlr3.StringStream('0')
+        lexer = self.getLexer(stream)
+
+        types = [token.type for token in lexer]
+
+        self.failUnlessEqual(types, [self.lexerModule.ZERO])
+        
+
     def testMalformedInput(self):
         stream = antlr3.StringStream('1')
         lexer = self.getLexer(stream)
