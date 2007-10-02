@@ -33,11 +33,33 @@
 group ASTDbg;
 
 parserMembers() ::= <<
-protected ITreeAdaptor adaptor = new DebugTreeAdaptor(dbg, new CommonTreeAdaptor());
+protected DebugTreeAdaptor adaptor = new DebugTreeAdaptor(null, new CommonTreeAdaptor());
 public ITreeAdaptor TreeAdaptor
 {
 	get { return this.adaptor; }
 	set { this.adaptor = new DebugTreeAdaptor(dbg, value); }
+}<\n>
+>>
+
+createListenerAndHandshake() ::= <<
+DebugEventSocketProxy proxy = new DebugEventSocketProxy(this, port, adaptor);
+DebugListener = proxy;
+adaptor.DebugEventListener = proxy;
+try
+{
+    proxy.Handshake();
+}
+catch (IOException ioe)
+{
+    ReportError(ioe);
+}
+>>
+
+ctorForPredefinedListener() ::= <<
+public <name>(<inputStreamType> input, IDebugEventListener dbg)
+	: base(input, dbg)
+{
+    adaptor.DebugEventListener = dbg;
 }<\n>
 >>
 
