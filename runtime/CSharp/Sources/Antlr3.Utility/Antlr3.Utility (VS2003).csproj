@@ -72,7 +72,7 @@
                 <Reference
                     Name = "StringTemplate"
                     AssemblyName = "StringTemplate"
-                    HintPath = "..\..\..\..\..\StringTemplate.NET\build\net-1.1\StringTemplate.dll"
+                    HintPath = "..\Libraries\StringTemplate.NET\net-1.1\StringTemplate.dll"
                 />
                 <Reference
                     Name = "Antlr3.Runtime (VS2003)"
