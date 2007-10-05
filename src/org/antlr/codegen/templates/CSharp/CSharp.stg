@@ -309,7 +309,7 @@ this.state.ruleMemo = new Hashtable[<numRules>+1];<\n> <! index from 1..n !>
 >>
 
 parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="Parser", labelType="IToken", members={<actions.parser.members>}) ::= <<
-<genericParser(inputStreamType="ITokenStream", rewriteElementType="IToken", ...)>
+<genericParser(inputStreamType="ITokenStream", rewriteElementType="Token", ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
@@ -544,7 +544,8 @@ lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
 // $ANTLR start <ruleName> 
 public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) // throws RecognitionException [2]
 {
-    <if(trace)>TraceIn("<ruleName>", <ruleDescriptor.index>);<endif>
+ 	<ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
+	<if(trace)>TraceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleScopeSetUp()>
     <ruleDeclarations()>
     try 
