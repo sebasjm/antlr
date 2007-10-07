@@ -44,6 +44,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 # $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
 
 <@imports>
+import sys
 from antlr3 import *
 <if(TREE_PARSER)>
 from antlr3.tree import *<\n>
@@ -62,6 +63,32 @@ HIDDEN = BaseRecognizer.HIDDEN
 <tokens:{<it.name>=<it.type>}; separator="\n">
 
 <recognizer>
+
+<if(actions.(actionScope).main)>
+<actions.(actionScope).main>
+<else>
+def main(argv, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr):
+<if(LEXER)>
+    from antlr3.main import LexerMain
+    main = LexerMain(<recognizer.name>)<\n>
+<endif>
+<if(PARSER)>
+    from antlr3.main import ParserMain
+    main = ParserMain("<recognizer.grammar.name>Lexer", <recognizer.name>)<\n>
+<endif>
+<if(TREE_PARSER)>
+    from antlr3.main import WalkerMain
+    main = WalkerMain(<recognizer.name>)<\n>
+<endif>
+    main.stdin = stdin
+    main.stdout = stdout
+    main.stderr = stderr
+    main.execute(argv)<\n>
+<endif>
+
+if __name__ == '__main__':
+    main(sys.argv)
+
 >>
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",

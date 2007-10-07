@@ -1,4 +1,13 @@
-2007-09-30  Benjamin Niemann  <pink@ashitaka.scheffel.local>
+2007-10-07  Benjamin Niemann  <pink@odahoda.de>
+
+	* main.py, Python.stg (outputFile): Added simple __main__ section to
+	generated code, so (simple) grammars can be executed as standalone
+	script.
+
+	* tree.py (RecognitionException.extractInformationFromTreeNodeStream),
+	exceptions.py (CommonTree): Small bugfixes.
+
+2007-09-30  Benjamin Niemann  <pink@odahoda.de>
 
 	* recognizers.py (TokenSource): Added iterator interface to TokenSource
 	class - and thus to Lexer.

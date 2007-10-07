@@ -1,3 +1,7 @@
+- antlr3.main:
+  - verbose/quiet flag: show/hide warnings
+  - set options in grammar?
+- build testrunner for examples
 - patch for CS4010 "null check for $scope::var now" once action parser is fixed
 - rename @members/@init to @classmembers, @instancemembers?
 - implement TreeWizard
@@ -16,12 +20,6 @@
  - tree.DoubleLinkTree
  - tree.ParseTree
  - tree.UnBufferedTreeNodeStream
-- iterator interface for lexer/token streams (as in ANTLR2)
-- generated "if __name__ == '__main__'" section
-  - for parsers:
-    stream = ANTLRInputStream(sys.stdin)
-    for token in TLexer(stream):
-        print token
 - default values in rule arguments?
 - turn some methods into attributes
   - (String|CommonToken)Stream.index()

@@ -283,8 +283,19 @@ class ANTLRTest(unittest.TestCase):
 
         return grammarName, grammarPath, grammarType
     
+
+    def writeFile(self, name, contents):
+        testDir = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(testDir, name)
         
-    def compileInlineGrammar(self, grammar, options=''):
+        fp = open(path, 'w')
+        fp.write(contents)
+        fp.close()
+
+        return path
+
+    
+    def compileInlineGrammar(self, grammar, options='', returnModule=False):
         # write grammar file
         grammarName, grammarPath, grammarType = self.writeInlineGrammar(grammar)
 
@@ -297,10 +308,12 @@ class ANTLRTest(unittest.TestCase):
         
         if grammarType == 'combined':
             lexerMod = self.__load_module(grammarName + 'Lexer')
+            parserMod = self.__load_module(grammarName + 'Parser')
+            if returnModule:
+                return lexerMod, parserMod
+            
             lexerCls = getattr(lexerMod, grammarName + 'Lexer')
             lexerCls = self.lexerClass(lexerCls)
-
-            parserMod = self.__load_module(grammarName + 'Parser')
             parserCls = getattr(parserMod, grammarName + 'Parser')
             parserCls = self.parserClass(parserCls)
 
@@ -308,6 +321,9 @@ class ANTLRTest(unittest.TestCase):
         
         if grammarType == 'lexer':
             lexerMod = self.__load_module(grammarName + 'Lexer')
+            if returnModule:
+                return lexerMod
+            
             lexerCls = getattr(lexerMod, grammarName + 'Lexer')
             lexerCls = self.lexerClass(lexerCls)
 
@@ -315,6 +331,9 @@ class ANTLRTest(unittest.TestCase):
 
         if grammarType == 'parser':
             parserMod = self.__load_module(grammarName + 'Parser')
+            if returnModule:
+                return parserMod
+            
             parserCls = getattr(parserMod, grammarName + 'Parser')
             parserCls = self.parserClass(parserCls)
 
@@ -322,6 +341,9 @@ class ANTLRTest(unittest.TestCase):
 
         if grammarType == 'tree':
             walkerMod = self.__load_module(grammarName)
+            if returnModule:
+                return walkerMod
+            
             walkerCls = getattr(walkerMod, grammarName)
             walkerCls = self.walkerClass(walkerCls)
 
