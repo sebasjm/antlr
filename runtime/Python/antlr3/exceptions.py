@@ -130,7 +130,7 @@ class RecognitionException(Exception):
         from antlr3.tokens import CommonToken
         
         self.node = nodes.LT(1)
-        adaptor = nodes.treeAdaptor
+        adaptor = nodes.adaptor
         payload = adaptor.getToken(self.node)
         if payload is not None:
             self.token = payload
