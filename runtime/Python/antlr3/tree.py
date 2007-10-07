@@ -1153,6 +1153,8 @@ class CommonTree(BaseTree):
         
         return self.token.text
 
+    text = property(getText)
+    
 
     def getLine(self):
         if self.token is None or self.token.getLine() == 0:
