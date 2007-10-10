@@ -15,7 +15,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\net-2.0\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;STRONG_NAME</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;STRONG_NAME NET_2_0</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -41,7 +41,7 @@
   <ItemGroup>
     <Reference Include="StringTemplate, Version=3.0.1.6846, Culture=neutral, PublicKeyToken=beee492b52c41e85, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\StringTemplate.NET\net-2.0\StringTemplate.dll</HintPath>
+      <HintPath>..\..\Libraries\StringTemplate.NET\net-2.0\StringTemplate.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

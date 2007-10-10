@@ -1,6 +1,7 @@
 /*
 [The "BSD licence"]
 Copyright (c) 2005-2007 Kunle Odutola
+Copyright (c) 2007 Johannes Luber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+#if NET_1_1
 namespace Antlr.Runtime.Tree
 {
 	using System;
@@ -78,3 +80,45 @@ namespace Antlr.Runtime.Tree
 		}
 	}
 }
+#elif NET_2_0
+namespace Antlr.Runtime.Tree {
+	using System;
+	using System.Collections.Generic;
+	using SpecializingType = System.Object;
+
+	/// <summary>
+	/// Queues up nodes matched on left side of -> in a tree parser. This is
+	/// the analog of RewriteRuleTokenStream for normal parsers. 
+	/// </summary>
+#warning Check, if RewriteRuleNodeStream can be changed to take advantage of something more specific than object.
+	public class RewriteRuleNodeStream : RewriteRuleElementStream<SpecializingType> {
+		public RewriteRuleNodeStream(ITreeAdaptor adaptor, string elementDescription)
+			: base(adaptor, elementDescription) {
+		}
+
+		/// <summary>Create a stream with one element</summary>
+		public RewriteRuleNodeStream(
+			ITreeAdaptor adaptor,
+			string elementDescription,
+			SpecializingType oneElement
+		) : base(adaptor, elementDescription, oneElement) {
+		}
+
+		/// <summary>Create a stream, but feed off an existing list</summary>
+		public RewriteRuleNodeStream(
+			ITreeAdaptor adaptor,
+			string elementDescription,
+			IList<SpecializingType> elements
+		) : base(adaptor, elementDescription, elements) {
+		}
+
+		public object NextNode() {
+			return _Next();
+		}
+
+		override protected object ToTree(object el) {
+			return adaptor.DupNode(el);
+		}
+	}
+}
+#endif

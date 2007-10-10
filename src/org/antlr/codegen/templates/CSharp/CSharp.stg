@@ -688,7 +688,7 @@ do
 } while (true);
 
 loop<decisionNumber>:
-	;	// Stops C# compiler whinging that label 'loop<decisionNumber>' has no statements
+	;	// Stops C# compiler whining that label 'loop<decisionNumber>' has no statements
 <@postloop()>
 >>
 

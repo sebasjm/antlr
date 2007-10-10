@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\net-2.0\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_2_0</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -44,7 +44,7 @@
   <ItemGroup>
     <Reference Include="MbUnit.Framework, Version=1.0.2700.29885, Culture=neutral, PublicKeyToken=5e72ecd30bc408d5">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\MbUnit\MbUnit.Framework.dll</HintPath>
+      <HintPath>..\..\Libraries\MbUnit\MbUnit.Framework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
