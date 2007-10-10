@@ -84,7 +84,7 @@ namespace Antlr.Runtime.Tree
 		/// This way we can do hetero tree nodes in rewrite.
 		/// </summary>
 		override protected object ToTree(object el) {
-			return adaptor.Create((IToken) el);
+			return el;
 		}
 
 		override protected object Dup(object el) {
