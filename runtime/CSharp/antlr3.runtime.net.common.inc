@@ -18,10 +18,19 @@
 	<property name="isMono" 			value="${string::starts-with(framework::get-target-framework(),'mono')}" />
 	<property name="target.clr" 		value="${framework::get-target-framework()}" />
 	
-	<if test="${framework::get-target-framework()=='net-1.1'}">
-	    <property name="dotnet_define"  value="" />
+	<if test="${framework::get-target-framework()=='sscli'}">
+	    <fail message="SSCLI (a.k.a Rotor) is not supported. Please use the .NET Framework or Mono." />
 	</if>
-	<if test="${not (framework::get-target-framework()=='net-1.1')}">
+	<if test="${framework::get-target-framework()=='netcf-1.0'}">
+	    <fail message=".NET-CF is not supported. Please use the .NET Framework or Mono." />
+	</if>
+	<if test="${framework::get-target-framework()=='net-1.0'}">
+	    <fail message="The .NET Framework 1.0 is not supported. Please upgrade to the .NET Framework 1.1 or later." " />
+	</if>
+	<if test="${framework::get-target-framework()=='net-1.1' or framework::get-target-framework()=='mono-1.0'}">
+	    <property name="dotnet_define"  value="DOTNET1" />
+	</if>
+	<if test="${not (framework::get-target-framework()=='net-1.1') and not (framework::get-target-framework()=='mono-1.0')}">
 	    <property name="dotnet_define"  value="DOTNET2" />
 	</if>
 
