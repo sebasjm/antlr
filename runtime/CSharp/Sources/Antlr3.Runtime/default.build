@@ -95,7 +95,9 @@
 			
 			<sources basedir="${src.dir}" defaultexcludes="true">
 				<include name="**/*.cs" />
-				<exclude name="**/*.Designer.cs" if="${framework::get-target-framework()=='net-1.1'}" />
+				<exclude name="**/*.Designer.cs" 
+					if="${framework::get-target-framework()=='net-1.1' or framework::get-target-framework()=='mono-1.0'}" 
+				/>
 			</sources>
 
 			<references>
@@ -113,7 +115,9 @@
 			
 			<sources basedir="${test.src.dir}" defaultexcludes="true">
 				<include name="**/*.cs" />
-				<exclude name="**/*.Designer.cs" if="${framework::get-target-framework()=='net-1.1'}" />
+				<exclude name="**/*.Designer.cs" 
+					if="${framework::get-target-framework()=='net-1.1' or framework::get-target-framework()=='mono-1.0'}" 
+				/>
 			</sources>
 
 			<references>

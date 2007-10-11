@@ -28,7 +28,7 @@
                     BaseAddress = "285212672"
                     CheckForOverflowUnderflow = "false"
                     ConfigurationOverrideFile = ""
-                    DefineConstants = "DEBUG;TRACE"
+                    DefineConstants = "DEBUG;TRACE;STRONG_NAME;DOTNET1"
                     DocumentationFile = ""
                     DebugSymbols = "true"
                     FileAlignment = "4096"
@@ -48,7 +48,7 @@
                     BaseAddress = "285212672"
                     CheckForOverflowUnderflow = "false"
                     ConfigurationOverrideFile = ""
-                    DefineConstants = "TRACE"
+                    DefineConstants = "TRACE;STRONG_NAME;DOTNET1"
                     DocumentationFile = ""
                     DebugSymbols = "false"
                     FileAlignment = "4096"
@@ -72,7 +72,7 @@
                 <Reference
                     Name = "StringTemplate"
                     AssemblyName = "StringTemplate"
-                    HintPath = "..\Libraries\StringTemplate.NET\net-1.1\StringTemplate.dll"
+                    HintPath = "..\..\Libraries\StringTemplate.NET\net-1.1\StringTemplate.dll"
                 />
                 <Reference
                     Name = "Antlr3.Runtime (VS2003)"

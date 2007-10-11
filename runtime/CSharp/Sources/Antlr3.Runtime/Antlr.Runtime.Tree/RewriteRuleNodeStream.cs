@@ -33,7 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#if NET_1_1
+#if DOTNET1
 namespace Antlr.Runtime.Tree
 {
 	using System;
@@ -80,7 +80,7 @@ namespace Antlr.Runtime.Tree
 		}
 	}
 }
-#elif NET_2_0
+#elif DOTNET2
 namespace Antlr.Runtime.Tree {
 	using System;
 	using System.Collections.Generic;
