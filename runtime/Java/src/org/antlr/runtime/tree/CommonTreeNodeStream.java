@@ -271,6 +271,10 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		return adaptor;
 	}
 
+	public void setTreeAdaptor(TreeAdaptor adaptor) {
+		this.adaptor = adaptor;
+	}
+
 	public boolean hasUniqueNavigationNodes() {
 		return uniqueNavigationNodes;
 	}

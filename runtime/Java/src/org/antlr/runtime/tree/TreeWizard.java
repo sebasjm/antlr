@@ -139,6 +139,9 @@ public class TreeWizard {
 	 */
 	public Map computeTokenTypes(String[] tokenNames) {
 		Map m = new HashMap();
+		if ( tokenNames==null ) {
+			return m;
+		}
 		for (int ttype = Token.MIN_TOKEN_TYPE; ttype < tokenNames.length; ttype++) {
 			String name = tokenNames[ttype];
 			m.put(name, new Integer(ttype));
