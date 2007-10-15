@@ -139,7 +139,7 @@ public class TreePatternParser {
 		}
 		
 		// create node
-		int treeNodeType = (Integer)wizard.getTokenType(tokenName);
+		int treeNodeType = wizard.getTokenType(tokenName);
 		if ( treeNodeType==Token.INVALID_TOKEN_TYPE ) {
 			return null;
 		}
