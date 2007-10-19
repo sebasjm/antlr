@@ -215,6 +215,9 @@ namespace Antlr.Runtime.Tree
 		public IDictionary ComputeTokenTypes(string[] tokenNames)
 		{
 			IDictionary m = new Hashtable();
+			if (tokenNames == null) {
+				return m;
+			}
 			for (int ttype = Token.MIN_TOKEN_TYPE; ttype < tokenNames.Length; ttype++)
 			{
 				string name = tokenNames[ttype];

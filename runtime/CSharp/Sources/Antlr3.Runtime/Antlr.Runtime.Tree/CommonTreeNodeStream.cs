@@ -387,6 +387,7 @@ namespace Antlr.Runtime.Tree
 		public ITreeAdaptor TreeAdaptor
 		{
 			get { return adaptor; }
+			set { adaptor = value; }
 		}
 
 		public bool HasUniqueNavigationNodes
