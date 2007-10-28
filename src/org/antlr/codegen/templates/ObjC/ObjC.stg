@@ -108,7 +108,7 @@ lexerHeaderFile() ::=
 
 #pragma mark Rule return scopes start
 <rules:{rule |
-<rule.ruleDescriptor:returnScopeInterface(ruleDescriptor=rule.ruleDescriptor)>
+<rule.ruleDescriptor.returnScope:returnScopeInterface(scope=it)>
 }>
 #pragma mark Rule return scopes end
 
@@ -138,7 +138,7 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="id<ANTLRToken> 
 /** As per Terence: No returns for lexer rules!
 #pragma mark Rule return scopes start
 <rules:{rule |
-<rule.ruleDescriptor:returnScope(ruleDescriptor=rule.ruleDescriptor)>
+<rule.ruleDescriptor.returnScope:returnScope(scope=it)>
 }>
 #pragma mark Rule return scopes end
 */
@@ -275,7 +275,7 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 
 #pragma mark Rule Return Scopes
 <rules:{rule |
-<rule.ruleDescriptor:returnScopeInterface(ruleDescriptor=rule.ruleDescriptor)>
+<rule.ruleDescriptor.returnScope:returnScopeInterface(scope=it)>
 }>
 
 
@@ -323,7 +323,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 
 #pragma mark Rule return scopes start
 <rules:{rule |
-<rule.ruleDescriptor:returnScope(ruleDescriptor=rule.ruleDescriptor)>
+<rule.ruleDescriptor.returnScope:returnScope(scope=it)>
 }>
 
 @implementation <className()>
@@ -842,11 +842,11 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  and a return value or values.
  */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
-[following addObject:FOLLOW_<rule>_in_<ruleName><elementIndex>];
+[following addObject:FOLLOW_<rule.name>_in_<ruleName><elementIndex>];
 <if(label)>
-_<label> = [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
+_<label> = [self <rule.name><if(args)>:<args; separator=" :"><endif>];<\n>
 <else>
-[self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
+[self <rule.name><if(args)>:<args; separator=" :"><endif>];<\n>
 <endif>
 [following removeLastObject];
 <checkRuleBacktrackFailure()><\n>
@@ -862,12 +862,12 @@ ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
 int _<label>Start<elementIndex> = [self charIndex];
-[self m<rule><if(args)>:<args; separator=" :"><endif>];
+[self m<rule.name><if(args)>:<args; separator=" :"><endif>];
 <checkRuleBacktrackFailure()><\n>
 _<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTypeInvalid channel:ANTLRTokenChannelDefault start:_<label>Start<elementIndex> stop:[self charIndex]-1];
 [_<label> setLine:[self line]];
 <else>
-[self m<rule><if(args)>:<args; separator=" :"><endif>];
+[self m<rule.name><if(args)>:<args; separator=" :"><endif>];
 <checkRuleBacktrackFailure()><\n>
 <endif>
 >>
@@ -1287,11 +1287,11 @@ ruleLabelDef(label) ::= <<
  *  start/stop tokens, tree stuff, attributes, ...  Leave a hole for
  *  subgroups to stick in members.
  */
-returnScopeInterface(ruleDescriptor) ::= <<
+returnScopeInterface(scope) ::= <<
 <if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 @interface <returnTypeName()> : ANTLR<if(TREE_PARSER)>Tree<endif>ParserRuleReturnScope {
-    <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
+    <scope.attributes:{<it.decl>;}; separator="\n">
     <@ivars()>
     <actions.(actionScope).ruleReturnIvars>
     <endif>
@@ -1304,7 +1304,7 @@ returnScopeInterface(ruleDescriptor) ::= <<
 <endif>
 >>
 
-returnScope(ruleDescriptor) ::= <<
+returnScope(scope) ::= <<
 <if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 @implementation <returnTypeName()>
