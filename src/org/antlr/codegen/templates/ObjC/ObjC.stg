@@ -58,7 +58,7 @@ className() ::= "<name><! if(LEXER)>Lexer<else><if(TREE_PARSER)>Tree<endif>Parse
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs,
-	   bitsets, buildTemplate, buildAST, rewrite, profile,
+	   bitsets, buildTemplate, buildAST, rewriteMode, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
 	   scopes, superClass,literals) ::=
@@ -77,7 +77,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
            docComment, recognizer,
            name, tokens, tokenNames, rules, cyclicDFAs,
-	   bitsets, buildTemplate, buildAST, rewrite, profile,
+	   bitsets, buildTemplate, buildAST, rewriteMode, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
 	   scopes, superClass,literals) ::=
@@ -714,7 +714,7 @@ case <i> :
 >>
 
 /** An alternative is just a list of elements; at outermost level */
-alt(elements,altNum,description,autoAST,outerAlt) ::= <<
+alt(elements,altNum,description,autoAST,outerAlt,treeLevel) ::= <<
 // <fileName>:<description> // alt
 {
 <@declarations()>
@@ -841,7 +841,7 @@ wildcardCharListLabel(label, elementIndex) ::= <<
 /** Match a rule reference by invoking it possibly with arguments
  *  and a return value or values.
  */
-ruleRef(rule,label,elementIndex,args) ::= <<
+ruleRef(rule,label,elementIndex,args,scope) ::= <<
 [following addObject:FOLLOW_<rule>_in_<ruleName><elementIndex>];
 <if(label)>
 _<label> = [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
@@ -853,13 +853,13 @@ _<label> = [self <rule><if(args)>:<args; separator=" :"><endif>];<\n>
 >>
 
 /** ids+=r */
-ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
+ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRef(...)>
 <listLabel(...)>
 >>
 
 /** A lexer rule reference */
-lexerRuleRef(rule,label,args,elementIndex) ::= <<
+lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
 int _<label>Start<elementIndex> = [self charIndex];
 [self m<rule><if(args)>:<args; separator=" :"><endif>];
@@ -873,7 +873,7 @@ _<label> = [[ANTLRCommonToken alloc] initWithInput:input tokenType:ANTLRTokenTyp
 >>
 
 /** i+=INT in lexer */
-lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::= <<
+lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope) ::= <<
 <lexerRuleRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -893,7 +893,8 @@ int _<label>Start<elementIndex> = [self charIndex];
 >>
 
 /** match ^(root children) in tree parser */
-tree(root,actionsAfterRoot,children,nullableChildList) ::= <<
+tree(root, actionsAfterRoot, children, nullableChildList,
+     enclosingTreeLevel, treeLevel) ::= <<
 <root:element()>
 <actionsAfterRoot:element()>
 <if(nullableChildList)>
