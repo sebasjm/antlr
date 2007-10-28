@@ -108,7 +108,7 @@ lexerHeaderFile() ::=
 
 #pragma mark Rule return scopes start
 <rules:{rule |
-<rule.ruleDescriptor.returnScope:returnScopeInterface(scope=it)>
+<rule:{ruleDescriptor | <returnScopeInterface(scope=ruleDescriptor.returnScope)>}>
 }>
 #pragma mark Rule return scopes end
 
@@ -138,7 +138,7 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="id<ANTLRToken> 
 /** As per Terence: No returns for lexer rules!
 #pragma mark Rule return scopes start
 <rules:{rule |
-<rule.ruleDescriptor.returnScope:returnScope(scope=it)>
+<rule.ruleDescriptor:{ruleDescriptor | <returnScope(scope=ruleDescriptor.returnScope)>}>
 }>
 #pragma mark Rule return scopes end
 */
@@ -270,12 +270,12 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 
 #pragma mark Dynamic Rule Scopes
 <rules:{rule |
-<rule.ruleDescriptor.ruleScope:ruleAttributeScopeDecl(scope=it)>
+<rule.ruleDescriptor:{ ruleDescriptor | <ruleAttributeScopeDecl(scope=ruleDescriptor.ruleScope)>}>
 }>
 
 #pragma mark Rule Return Scopes
 <rules:{rule |
-<rule.ruleDescriptor.returnScope:returnScopeInterface(scope=it)>
+<rule.ruleDescriptor:{ ruleDescriptor | <returnScopeInterface(scope=ruleDescriptor.returnScope)>}>
 }>
 
 
@@ -323,7 +323,7 @@ genericParser(name, scopes, tokens, tokenNames, rules, numRules,
 
 #pragma mark Rule return scopes start
 <rules:{rule |
-<rule.ruleDescriptor.returnScope:returnScope(scope=it)>
+<rule.ruleDescriptor:{ruleDescriptor | <returnScope(scope=ruleDescriptor.returnScope)>}>
 }>
 
 @implementation <className()>
@@ -1294,8 +1294,6 @@ returnScopeInterface(scope) ::= <<
     <scope.attributes:{<it.decl>;}; separator="\n">
     <@ivars()>
     <actions.(actionScope).ruleReturnIvars>
-    <endif>
-
 }
 <@methods()>
 <actions.(actionScope).ruleReturnMethodsDecl>
