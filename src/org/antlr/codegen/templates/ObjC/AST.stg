@@ -219,7 +219,7 @@ tokenRefRuleRootTrackAndListLabel(token,label,elementIndex) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if (backtracking == 0) <endif>[_stream_<rule> addElement:[_<label> tree]];
+<if(backtracking)>if (backtracking == 0) <endif>[_stream_<rule.name> addElement:[_<label> tree]];
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -231,7 +231,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRefRuleRoot(...)>
-<if(backtracking)>if ( backtracking == 0 ) <endif>[_stream_<rule> addElement:[_<label> tree]];<\n>
+<if(backtracking)>if ( backtracking == 0 ) <endif>[_stream_<rule.name> addElement:[_<label> tree]];<\n>
 >>
 
 /** ^(x+=rule ...) rewrite */
