@@ -33,21 +33,21 @@ group ASTTreeParser;
 tree(root, actionsAfterRoot, children, nullableChildList,
      enclosingTreeLevel, treeLevel) ::= <<
 {
-<ASTLabelType> root_<treeLevel> = (<ASTLabelType>)adaptor.nil();
-<root:element()>
-<actionsAfterRoot:element()>
-<if(nullableChildList)>
-if ( input.LA(1)==Token.DOWN ) {
-    match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
+    <ASTLabelType> root_<treeLevel> = [treeAdapator newEmptyTree];
+    <root:element()>
+    <actionsAfterRoot:element()>
+    <if(nullableChildList)>
+    if ( [input LA:1] == ANTLRTokenTypeDOWN ) {
+        [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; <checkRuleBacktrackFailure()>
+        <children:element()>
+        [self match:input tokenType:ANTLRTokenTypeUP follow:nil]; <checkRuleBacktrackFailure()>
+    }
+    <else>
+    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; <checkRuleBacktrackFailure()>
     <children:element()>
-    match(input, Token.UP, null); <checkRuleBacktrackFailure()>
-}
-<else>
-match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
-<children:element()>
-match(input, Token.UP, null); <checkRuleBacktrackFailure()>
-<endif>
-adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
+    [self match:input tokenType:ANTLRTokenTypeUP follow:nil]; <checkRuleBacktrackFailure()>
+    <endif>
+    [root_<treeLevel> release];
 }<\n>
 >>
 
@@ -113,6 +113,7 @@ ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
  *  change nextToken to nextNode.
  */
 createRewriteNodeFromElement(token,hetero,scope) ::= <<
+#error Heterogeneous tree support not implemented.
 <if(hetero)>
 new <hetero>(stream_<token>.nextNode())
 <else>
