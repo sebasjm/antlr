@@ -513,6 +513,10 @@ public class ErrorManager {
 		threadToListenerMap.put(Thread.currentThread(), listener);
 	}
 
+    public static void removeErrorListener() {
+        threadToListenerMap.remove(Thread.currentThread());
+    }
+
 	public static void setTool(Tool tool) {
 		threadToToolMap.put(Thread.currentThread(), tool);
 	}
