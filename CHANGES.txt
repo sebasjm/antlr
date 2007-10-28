@@ -8,6 +8,12 @@ University of San Francisco
 
 CHANGES
 
+October 28, 2007
+
+* Made ANTLR emit a better error message when it cannot write the
+  implicit lexer file from a combined grammar. Used to say "cannot open
+  file", now says "cannot write file" and gives backtrace.
+
 September 15, 2007
 
 add getCharStream to Lexer.
