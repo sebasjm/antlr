@@ -248,6 +248,8 @@ public class Tool {
 
     public void process()  {
 		int numFiles = grammarFileNames.size();
+		boolean exceptionWhenWritingLexerFile = false;
+		String lexerGrammarFileName = null;		// necessary at this scope to have access in the catch below
 		for (int i = 0; i < numFiles; i++) {
 			String grammarFileName = (String) grammarFileNames.get(i);
 			if ( numFiles > 1 && !depend ) {
@@ -294,11 +296,18 @@ public class Tool {
 				// now handle the lexer if one was created for a merged spec
 				String lexerGrammarStr = grammar.getLexerGrammar();
 				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
-					String lexerGrammarFileName =
-						grammar.getImplicitlyGeneratedLexerFileName();
-					Writer w = getOutputFile(grammar,lexerGrammarFileName);
-					w.write(lexerGrammarStr);
-					w.close();
+					lexerGrammarFileName = grammar.getImplicitlyGeneratedLexerFileName();
+					try {
+						Writer w = getOutputFile(grammar,lexerGrammarFileName);
+						w.write(lexerGrammarStr);
+						w.close();
+					}
+					catch (IOException e) {
+						// emit different error message when creating the implicit lexer fails
+						// due to write permission error
+						exceptionWhenWritingLexerFile = true;
+						throw e;
+					}
 					StringReader sr = new StringReader(lexerGrammarStr);
 					Grammar lexerGrammar = new Grammar();
 					lexerGrammar.setTool(this);
@@ -313,8 +322,13 @@ public class Tool {
 				}
 			}
 			catch (IOException e) {
-				ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE,
-								   grammarFileName);
+				if (exceptionWhenWritingLexerFile) {
+					ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE,
+									   lexerGrammarFileName, e);
+				} else {
+					ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE,
+									   grammarFileName);
+				}
 			}
 			catch (Exception e) {
 				ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
