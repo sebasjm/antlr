@@ -1,6 +1,6 @@
 @echo off
 
-IF "%ANTLR_HOME%" == "" SET ANTLR_HOME=%~p0..\..
+IF "%ANTLR_HOME%" == "" SET ANTLR_HOME=%~d0%~p0..\..
 
 "%JAVA_HOME%\bin\java" ^
     -Dfile.encoding=windows-1252 ^
