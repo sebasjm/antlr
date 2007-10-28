@@ -1,4 +1,4 @@
-// $ANTLR 3.0 SimpleC.g 2007-08-04 17:54:23
+// $ANTLR 3.1b1 SimpleC.g 2007-10-28 20:35:07
 
 #import "SimpleCParser.h"
 
@@ -204,15 +204,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_program_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -224,15 +224,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_declaration_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -244,15 +244,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_variable_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -264,15 +264,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_declarator_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -284,15 +284,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_functionHeader_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -304,15 +304,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_formalParameter_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -324,15 +324,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_type_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -344,15 +344,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_block_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -364,15 +364,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_stat_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -384,15 +384,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_forStat_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -404,15 +404,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_assignStat_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -424,15 +424,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_expr_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -444,15 +444,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_condExpr_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -464,15 +464,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_aexpr_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -484,15 +484,15 @@ static ANTLRBitSet *FOLLOW_24_in_atom712;
 @implementation SimpleCParser_atom_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -611,7 +611,7 @@ static NSArray *tokenNames;
 
 
     @try {
-        // SimpleC.g:17:9: ( ( declaration )+ ) // ruleBlockSingleAlt
+        // SimpleC.g:17:5: ( ( declaration )+ ) // ruleBlockSingleAlt
         // SimpleC.g:17:9: ( declaration )+ // alt
         {
         root_0 = (id)[treeAdaptor newEmptyTree];
@@ -695,7 +695,7 @@ static NSArray *tokenNames;
     ANTLRRewriteRuleSubtreeStream *_stream_block=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule block"];
 
     @try {
-        // SimpleC.g:21:9: ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) ) //ruleblock
+        // SimpleC.g:21:5: ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) ) //ruleblock
         int alt2=3;
         alt2 = [dfa2 predict];
         switch (alt2) {
@@ -778,7 +778,7 @@ static NSArray *tokenNames;
         	    [_stream_block addElement:[_block6 tree]];
 
         	    // AST REWRITE
-        	    // elements: block, functionHeader
+        	    // elements: functionHeader, block
         	    // token labels: 
         	    // rule labels: retval
         	    // token list labels: 
@@ -855,7 +855,7 @@ static NSArray *tokenNames;
     ANTLRRewriteRuleSubtreeStream *_stream_declarator=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule declarator"];
 
     @try {
-        // SimpleC.g:27:9: ( type declarator ';' -> ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
+        // SimpleC.g:27:5: ( type declarator ';' -> ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleC.g:27:9: type declarator ';' // alt
         {
         [following addObject:FOLLOW_type_in_variable166];
@@ -944,7 +944,7 @@ static NSArray *tokenNames;
     id _ID10_tree = nil;
 
     @try {
-        // SimpleC.g:31:9: ( ID ) // ruleBlockSingleAlt
+        // SimpleC.g:31:5: ( ID ) // ruleBlockSingleAlt
         // SimpleC.g:31:9: ID // alt
         {
         root_0 = (id)[treeAdaptor newEmptyTree];
@@ -1007,7 +1007,7 @@ static NSArray *tokenNames;
     ANTLRRewriteRuleSubtreeStream *_stream_type=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule type"];
 
     @try {
-        // SimpleC.g:35:9: ( type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
+        // SimpleC.g:35:5: ( type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
         // SimpleC.g:35:9: type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' // alt
         {
         [following addObject:FOLLOW_type_in_functionHeader219];
@@ -1086,7 +1086,7 @@ static NSArray *tokenNames;
 
 
         // AST REWRITE
-        // elements: formalParameter, SimpleCParser_ID, type
+        // elements: SimpleCParser_ID, type, formalParameter
         // token labels: 
         // rule labels: retval
         // token list labels: 
@@ -1173,7 +1173,7 @@ static NSArray *tokenNames;
     ANTLRRewriteRuleSubtreeStream *_stream_declarator=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule declarator"];
 
     @try {
-        // SimpleC.g:40:9: ( type declarator -> ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
+        // SimpleC.g:40:5: ( type declarator -> ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleC.g:40:9: type declarator // alt
         {
         [following addObject:FOLLOW_type_in_formalParameter281];
@@ -1190,7 +1190,7 @@ static NSArray *tokenNames;
         [_stream_declarator addElement:[_declarator19 tree]];
 
         // AST REWRITE
-        // elements: declarator, type
+        // elements: type, declarator
         // token labels: 
         // rule labels: retval
         // token list labels: 
@@ -1257,7 +1257,7 @@ static NSArray *tokenNames;
     id _set20_tree = nil;
 
     @try {
-        // SimpleC.g:44:9: ( 'int' | 'char' | 'void' | ID ) // ruleBlockSingleAlt
+        // SimpleC.g:44:5: ( 'int' | 'char' | 'void' | ID ) // ruleBlockSingleAlt
         // SimpleC.g: // alt
         {
         root_0 = (id)[treeAdaptor newEmptyTree];
@@ -1320,7 +1320,7 @@ static NSArray *tokenNames;
     ANTLRRewriteRuleSubtreeStream *_stream_variable=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule variable"];
 
     @try {
-        // SimpleC.g:51:9: (lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,@\"BLOCK\"] ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
+        // SimpleC.g:51:5: (lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,@\"BLOCK\"] ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
         // SimpleC.g:51:9: lc= '{' ( variable )* ( stat )* '}' // alt
         {
         _lc=(id<ANTLRToken> )[input LT:1];
@@ -1398,7 +1398,7 @@ static NSArray *tokenNames;
 
 
         // AST REWRITE
-        // elements: stat, variable
+        // elements: variable, stat
         // token labels: 
         // rule labels: retval
         // token list labels: 
@@ -1489,7 +1489,7 @@ static NSArray *tokenNames;
     id _char_literal30_tree = nil;
 
     @try {
-        // SimpleC.g:58:7: ( forStat | expr ';' | block | assignStat ';' | ';' ) //ruleblock
+        // SimpleC.g:58:5: ( forStat | expr ';' | block | assignStat ';' | ';' ) //ruleblock
         int alt7=5;
         switch ([input LA:1]) {
         	case SimpleCParser_FOR:
@@ -1653,7 +1653,7 @@ static NSArray *tokenNames;
     ANTLRRewriteRuleSubtreeStream *_stream_block=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule block"];
 
     @try {
-        // SimpleC.g:66:9: ( 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block -> ^( 'for' $start expr $next block ) ) // ruleBlockSingleAlt
+        // SimpleC.g:66:5: ( 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block -> ^( 'for' $start expr $next block ) ) // ruleBlockSingleAlt
         // SimpleC.g:66:9: 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block // alt
         {
         _string_literal31=(id<ANTLRToken> )[input LT:1];
@@ -1702,7 +1702,7 @@ static NSArray *tokenNames;
         [_stream_block addElement:[_block37 tree]];
 
         // AST REWRITE
-        // elements: expr, SimpleCParser_FOR, next, start, block
+        // elements: expr, next, SimpleCParser_FOR, block, start
         // token labels: 
         // rule labels: start, next, retval
         // token list labels: 
@@ -1784,7 +1784,7 @@ static NSArray *tokenNames;
     ANTLRRewriteRuleSubtreeStream *_stream_expr=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule expr"];
 
     @try {
-        // SimpleC.g:71:9: ( ID EQ expr -> ^( EQ ID expr ) ) // ruleBlockSingleAlt
+        // SimpleC.g:71:5: ( ID EQ expr -> ^( EQ ID expr ) ) // ruleBlockSingleAlt
         // SimpleC.g:71:9: ID EQ expr // alt
         {
         _ID38=(id<ANTLRToken> )[input LT:1];
@@ -1869,7 +1869,7 @@ static NSArray *tokenNames;
 
 
     @try {
-        // SimpleC.g:74:9: ( condExpr ) // ruleBlockSingleAlt
+        // SimpleC.g:74:5: ( condExpr ) // ruleBlockSingleAlt
         // SimpleC.g:74:9: condExpr // alt
         {
         root_0 = (id)[treeAdaptor newEmptyTree];
@@ -1920,7 +1920,7 @@ static NSArray *tokenNames;
     id _char_literal44_tree = nil;
 
     @try {
-        // SimpleC.g:78:9: ( aexpr ( ( '==' | '<' ) aexpr )? ) // ruleBlockSingleAlt
+        // SimpleC.g:78:5: ( aexpr ( ( '==' | '<' ) aexpr )? ) // ruleBlockSingleAlt
         // SimpleC.g:78:9: aexpr ( ( '==' | '<' ) aexpr )? // alt
         {
         root_0 = (id)[treeAdaptor newEmptyTree];
@@ -2036,7 +2036,7 @@ static NSArray *tokenNames;
     id _char_literal47_tree = nil;
 
     @try {
-        // SimpleC.g:82:9: ( atom ( '+' atom )* ) // ruleBlockSingleAlt
+        // SimpleC.g:82:5: ( atom ( '+' atom )* ) // ruleBlockSingleAlt
         // SimpleC.g:82:9: atom ( '+' atom )* // alt
         {
         root_0 = (id)[treeAdaptor newEmptyTree];
@@ -2126,7 +2126,7 @@ static NSArray *tokenNames;
     ANTLRRewriteRuleSubtreeStream *_stream_expr=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule expr"];
 
     @try {
-        // SimpleC.g:86:7: ( ID | INT | '(' expr ')' -> expr ) //ruleblock
+        // SimpleC.g:86:5: ( ID | INT | '(' expr ')' -> expr ) //ruleblock
         int alt11=3;
         switch ([input LA:1]) {
         	case SimpleCParser_ID:

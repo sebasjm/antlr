@@ -1,4 +1,4 @@
-// $ANTLR 3.0 SimpleCTP.gtp 2007-08-04 17:54:24
+// $ANTLR 3.1b1 SimpleCTP.gtp 2007-10-28 20:35:08
 
 #import "SimpleCTP.h"
 
@@ -185,7 +185,7 @@ static NSArray *tokenNames;
 - (void) program
 {
     @try {
-        // SimpleCTP.gtp:9:9: ( ( declaration )+ ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp:9:5: ( ( declaration )+ ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:9:9: ( declaration )+ // alt
         {
         // SimpleCTP.gtp:9:9: ( declaration )+	// positiveClosureBlock
@@ -242,7 +242,7 @@ static NSArray *tokenNames;
 - (void) declaration
 {
     @try {
-        // SimpleCTP.gtp:13:9: ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) ) //ruleblock
+        // SimpleCTP.gtp:13:5: ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) ) //ruleblock
         int alt2=3;
         switch ([input LA:1]) {
         	case SimpleCTP_VAR_DEF:
@@ -329,7 +329,7 @@ static NSArray *tokenNames;
 - (void) variable
 {
     @try {
-        // SimpleCTP.gtp:19:9: ( ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp:19:5: ( ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:19:9: ^( VAR_DEF type declarator ) // alt
         {
         [self match:input tokenType:SimpleCTP_VAR_DEF follow:FOLLOW_SimpleCTP_VAR_DEF_in_variable113]; 
@@ -368,7 +368,7 @@ static NSArray *tokenNames;
 - (void) declarator
 {
     @try {
-        // SimpleCTP.gtp:23:9: ( ID ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp:23:5: ( ID ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:23:9: ID // alt
         {
         [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_declarator137]; 
@@ -393,7 +393,7 @@ static NSArray *tokenNames;
 - (void) functionHeader
 {
     @try {
-        // SimpleCTP.gtp:27:9: ( ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp:27:5: ( ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:27:9: ^( FUNC_HDR type ID ( formalParameter )+ ) // alt
         {
         [self match:input tokenType:SimpleCTP_FUNC_HDR follow:FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158]; 
@@ -461,7 +461,7 @@ static NSArray *tokenNames;
 - (void) formalParameter
 {
     @try {
-        // SimpleCTP.gtp:31:9: ( ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp:31:5: ( ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:31:9: ^( ARG_DEF type declarator ) // alt
         {
         [self match:input tokenType:SimpleCTP_ARG_DEF follow:FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186]; 
@@ -500,7 +500,7 @@ static NSArray *tokenNames;
 - (void) type
 {
     @try {
-        // SimpleCTP.gtp:35:9: ( 'int' | 'char' | 'void' | ID ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp:35:5: ( 'int' | 'char' | 'void' | ID ) // ruleBlockSingleAlt
         // SimpleCTP.gtp: // alt
         {
         if ([input LA:1]==SimpleCTP_ID||([input LA:1]>=SimpleCTP_INT_TYPE && [input LA:1]<=SimpleCTP_VOID)) {
@@ -532,7 +532,7 @@ static NSArray *tokenNames;
 - (void) block
 {
     @try {
-        // SimpleCTP.gtp:42:9: ( ^( BLOCK ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp:42:5: ( ^( BLOCK ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:42:9: ^( BLOCK ( variable )* ( stat )* ) // alt
         {
         [self match:input tokenType:SimpleCTP_BLOCK follow:FOLLOW_SimpleCTP_BLOCK_in_block273]; 
@@ -617,7 +617,7 @@ static NSArray *tokenNames;
 - (void) stat
 {
     @try {
-        // SimpleCTP.gtp:45:7: ( forStat | expr | block ) //ruleblock
+        // SimpleCTP.gtp:45:5: ( forStat | expr | block ) //ruleblock
         int alt6=3;
         switch ([input LA:1]) {
         	case SimpleCTP_FOR:
@@ -694,7 +694,7 @@ static NSArray *tokenNames;
 - (void) forStat
 {
     @try {
-        // SimpleCTP.gtp:51:9: ( ^( 'for' expr expr expr block ) ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp:51:5: ( ^( 'for' expr expr expr block ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:51:9: ^( 'for' expr expr expr block ) // alt
         {
         [self match:input tokenType:SimpleCTP_FOR follow:FOLLOW_SimpleCTP_FOR_in_forStat328]; 
@@ -743,7 +743,7 @@ static NSArray *tokenNames;
 - (void) expr
 {
     @try {
-        // SimpleCTP.gtp:54:9: ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom ) //ruleblock
+        // SimpleCTP.gtp:54:5: ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom ) //ruleblock
         int alt7=5;
         switch ([input LA:1]) {
         	case SimpleCTP_EQEQ:
@@ -880,7 +880,7 @@ static NSArray *tokenNames;
 - (void) atom
 {
     @try {
-        // SimpleCTP.gtp:62:7: ( ID | INT ) // ruleBlockSingleAlt
+        // SimpleCTP.gtp:62:5: ( ID | INT ) // ruleBlockSingleAlt
         // SimpleCTP.gtp: // alt
         {
         if ([input LA:1]==SimpleCTP_ID||[input LA:1]==SimpleCTP_INT) {

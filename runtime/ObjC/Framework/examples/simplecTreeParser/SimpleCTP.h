@@ -1,4 +1,4 @@
-// $ANTLR 3.0 SimpleCTP.gtp 2007-08-04 17:54:24
+// $ANTLR 3.1b1 SimpleCTP.gtp 2007-10-28 20:35:08
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>

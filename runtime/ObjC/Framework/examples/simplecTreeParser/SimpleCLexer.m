@@ -1,4 +1,4 @@
-// $ANTLR 3.0 SimpleC.g 2007-08-04 17:54:24
+// $ANTLR 3.1b1 SimpleC.g 2007-10-28 20:35:07
 
 #import "SimpleCLexer.h"
 
@@ -50,7 +50,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_T21;
-        // SimpleC.g:7:7: ( ';' ) // ruleBlockSingleAlt
+        // SimpleC.g:7:5: ( ';' ) // ruleBlockSingleAlt
         // SimpleC.g:7:7: ';' // alt
         {
         [self matchChar:';'];
@@ -77,7 +77,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_T22;
-        // SimpleC.g:8:7: ( '(' ) // ruleBlockSingleAlt
+        // SimpleC.g:8:5: ( '(' ) // ruleBlockSingleAlt
         // SimpleC.g:8:7: '(' // alt
         {
         [self matchChar:'('];
@@ -104,7 +104,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_T23;
-        // SimpleC.g:9:7: ( ',' ) // ruleBlockSingleAlt
+        // SimpleC.g:9:5: ( ',' ) // ruleBlockSingleAlt
         // SimpleC.g:9:7: ',' // alt
         {
         [self matchChar:','];
@@ -131,7 +131,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_T24;
-        // SimpleC.g:10:7: ( ')' ) // ruleBlockSingleAlt
+        // SimpleC.g:10:5: ( ')' ) // ruleBlockSingleAlt
         // SimpleC.g:10:7: ')' // alt
         {
         [self matchChar:')'];
@@ -158,7 +158,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_T25;
-        // SimpleC.g:11:7: ( '{' ) // ruleBlockSingleAlt
+        // SimpleC.g:11:5: ( '{' ) // ruleBlockSingleAlt
         // SimpleC.g:11:7: '{' // alt
         {
         [self matchChar:'{'];
@@ -185,7 +185,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_T26;
-        // SimpleC.g:12:7: ( '}' ) // ruleBlockSingleAlt
+        // SimpleC.g:12:5: ( '}' ) // ruleBlockSingleAlt
         // SimpleC.g:12:7: '}' // alt
         {
         [self matchChar:'}'];
@@ -212,7 +212,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_FOR;
-        // SimpleC.g:91:7: ( 'for' ) // ruleBlockSingleAlt
+        // SimpleC.g:91:5: ( 'for' ) // ruleBlockSingleAlt
         // SimpleC.g:91:7: 'for' // alt
         {
         [self matchString:@"for"];
@@ -239,7 +239,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_INT_TYPE;
-        // SimpleC.g:92:12: ( 'int' ) // ruleBlockSingleAlt
+        // SimpleC.g:92:10: ( 'int' ) // ruleBlockSingleAlt
         // SimpleC.g:92:12: 'int' // alt
         {
         [self matchString:@"int"];
@@ -266,7 +266,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_CHAR;
-        // SimpleC.g:93:7: ( 'char' ) // ruleBlockSingleAlt
+        // SimpleC.g:93:5: ( 'char' ) // ruleBlockSingleAlt
         // SimpleC.g:93:7: 'char' // alt
         {
         [self matchString:@"char"];
@@ -293,7 +293,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_VOID;
-        // SimpleC.g:94:7: ( 'void' ) // ruleBlockSingleAlt
+        // SimpleC.g:94:5: ( 'void' ) // ruleBlockSingleAlt
         // SimpleC.g:94:7: 'void' // alt
         {
         [self matchString:@"void"];
@@ -320,7 +320,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_ID;
-        // SimpleC.g:96:9: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* ) // ruleBlockSingleAlt
+        // SimpleC.g:96:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* ) // ruleBlockSingleAlt
         // SimpleC.g:96:9: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* // alt
         {
         if (([input LA:1]>='A' && [input LA:1]<='Z')||[input LA:1]=='_'||([input LA:1]>='a' && [input LA:1]<='z')) {
@@ -385,7 +385,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_INT;
-        // SimpleC.g:99:7: ( (int+= ( '0' .. '9' ) )+ ) // ruleBlockSingleAlt
+        // SimpleC.g:99:5: ( (int+= ( '0' .. '9' ) )+ ) // ruleBlockSingleAlt
         // SimpleC.g:99:7: (int+= ( '0' .. '9' ) )+ // alt
         {
         // SimpleC.g:99:10: (int+= ( '0' .. '9' ) )+	// positiveClosureBlock
@@ -446,7 +446,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_EQ;
-        // SimpleC.g:102:8: ( '=' ) // ruleBlockSingleAlt
+        // SimpleC.g:102:6: ( '=' ) // ruleBlockSingleAlt
         // SimpleC.g:102:8: '=' // alt
         {
         [self matchChar:'='];
@@ -473,7 +473,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_EQEQ;
-        // SimpleC.g:103:8: ( '==' ) // ruleBlockSingleAlt
+        // SimpleC.g:103:6: ( '==' ) // ruleBlockSingleAlt
         // SimpleC.g:103:8: '==' // alt
         {
         [self matchString:@"=="];
@@ -500,7 +500,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_LT;
-        // SimpleC.g:104:8: ( '<' ) // ruleBlockSingleAlt
+        // SimpleC.g:104:6: ( '<' ) // ruleBlockSingleAlt
         // SimpleC.g:104:8: '<' // alt
         {
         [self matchChar:'<'];
@@ -527,7 +527,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_PLUS;
-        // SimpleC.g:105:8: ( '+' ) // ruleBlockSingleAlt
+        // SimpleC.g:105:6: ( '+' ) // ruleBlockSingleAlt
         // SimpleC.g:105:8: '+' // alt
         {
         [self matchChar:'+'];
@@ -554,7 +554,7 @@ static NSArray *tokenNames;
     @try {
         ruleNestingLevel++;
         int _type = SimpleCLexer_WS;
-        // SimpleC.g:107:9: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ ) // ruleBlockSingleAlt
+        // SimpleC.g:107:5: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ ) // ruleBlockSingleAlt
         // SimpleC.g:107:9: ( ' ' | '\\t' | '\\r' | '\\n' )+ // alt
         {
         // SimpleC.g:107:9: ( ' ' | '\\t' | '\\r' | '\\n' )+	// positiveClosureBlock
@@ -593,7 +593,7 @@ static NSArray *tokenNames;
             cnt3++;
         } while (YES); loop3: ;
 
-         _channel=99; 
+         self->_channel=99; 
 
         }
 
@@ -611,7 +611,7 @@ static NSArray *tokenNames;
 
 - (void) mTokens
 {
-    // SimpleC.g:1:10: ( T21 | T22 | T23 | T24 | T25 | T26 | FOR | INT_TYPE | CHAR | VOID | ID | INT | EQ | EQEQ | LT | PLUS | WS ) //ruleblock
+    // SimpleC.g:1:8: ( T21 | T22 | T23 | T24 | T25 | T26 | FOR | INT_TYPE | CHAR | VOID | ID | INT | EQ | EQEQ | LT | PLUS | WS ) //ruleblock
     int alt4=17;
     switch ([input LA:1]) {
     	case ';':

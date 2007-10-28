@@ -44,6 +44,6 @@ int main(int argc, const char * argv[]) {
 	[pool release];
 
     // use this for ObjectAlloc
-    while(1) sleep(60);
+    //while(1) sleep(5);
 	return 0;
 }

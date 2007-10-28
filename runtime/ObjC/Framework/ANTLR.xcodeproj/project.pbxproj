@@ -264,7 +264,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* ANTLR */;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = ANTLR;
 		};
 		F7DD05F30A7B1649006A006C /* PBXContainerItemProxy */ = {
@@ -1118,7 +1118,7 @@
 		};
 		F762878E0B7155AF006AA7EF /* Regenerate simplec tree */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "-cp $ANTLR_EXTRA_JAVA_ARGS org.antlr.Tool SimpleC.g SimpleCTP.gtp";
+			buildArgumentsString = "-cp $ANTLR_EXTRA_JAVA_ARGS org.antlr.Tool $ANTLR_EXTRA_ARGS SimpleC.g SimpleCTP.gtp";
 			buildConfigurationList = F762878F0B7155AF006AA7EF /* Build configuration list for PBXLegacyTarget "Regenerate simplec tree" */;
 			buildPhases = (
 			);
@@ -1327,10 +1327,12 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "ANTLR" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 0867D691FE84028FC02AAC07 /* ANTLR */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				8DC2EF4F0486A6940098B216 /* ANTLR */,
 				F70BB37F098E5AFF0054FEF8 /* Test */,
@@ -1679,7 +1681,8 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ANTLR_EXTRA_JAVA_ARGS = "/Users/kroepke/Projects/idea/antlr3/classes:/Users/kroepke/Projects/idea/stringtemplate/classes:/usr/local/lib/antlr.jar";
+				ANTLR_EXTRA_ARGS = "";
+				ANTLR_EXTRA_JAVA_ARGS = "/Users/kroepke/classpath/antlr-2.7.7.jar:/Users/kroepke/IdeaProjects/antlr3/out/production/antlr3:/Users/kroepke/IdeaProjects/antlr3/out/production/stringtemplate";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DEBUGGING_SYMBOLS = full;
@@ -1704,6 +1707,7 @@
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ANTLR_EXTRA_JAVA_ARGS = "/Users/kroepke/classpath/antlr-2.7.7.jar:/Users/kroepke/IdeaProjects/antlr3/out/production/antlr3:/Users/kroepke/IdeaProjects/antlr3/out/production/stringtemplate";
 				ARCHS = (
 					ppc,
 					i386,
@@ -1882,7 +1886,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "";
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_FRAMEWORKS_DIR_QUOTED)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -1911,6 +1915,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(value)",
+					"$(DEVELOPER_FRAMEWORKS_DIR_QUOTED)",
+				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -2155,6 +2163,525 @@
 			};
 			name = Release;
 		};
+		F7C562300CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ANTLR_EXTRA_ARGS = "-XdbgST";
+				ANTLR_EXTRA_JAVA_ARGS = "/Users/kroepke/classpath/antlr-2.7.7.jar:/Users/kroepke/IdeaProjects/antlr3/out/production/antlr3:/Users/kroepke/IdeaProjects/antlr3/out/production/stringtemplate";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DEBUGGING_SYMBOLS = full;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = NO;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562310CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEPLOYMENT_LOCATION = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DEBUGGING_SYMBOLS = full;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ANTLR_Prefix.pch;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				PRODUCT_NAME = ANTLR;
+				VERSIONING_SYSTEM = "apple-generic";
+				WRAPPER_EXTENSION = framework;
+				ZERO_LINK = NO;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562320CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_FRAMEWORKS_DIR_QUOTED)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 1;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Cocoa.framework/Headers/Cocoa.h";
+				INFOPLIST_FILE = "Test-Info.plist";
+				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Cocoa,
+					"-framework",
+					SenTestingKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Test;
+				WRAPPER_EXTENSION = octest;
+				ZERO_LINK = NO;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562330CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = Untitled;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562340CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/lexertest-simple";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/lexertest-simple";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_PASCAL_STRINGS = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "lexertest-simple";
+				ZERO_LINK = NO;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562350CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "lexertest-simple";
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562360CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/fuzzy";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/fuzzy";
+				ANTLR_TRACE = NO;
+				ANTLR_X_DEBUG_ST = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = fuzzy;
+				ZERO_LINK = NO;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562370CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = fuzzy;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562380CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/combined";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/combined";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = combined;
+				ZERO_LINK = YES;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562390CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = combined;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C5623A0CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ANTLR_DEBUG = YES;
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/LL-star";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/LL-star";
+				ANTLR_X_DEBUG_ST = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = "LL-star";
+				ZERO_LINK = NO;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C5623B0CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "LL-star";
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C5623C0CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/hoistedPredicates";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/hoistedPredicates";
+				ARCHS = "$(NATIVE_ARCH)";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = hoistedPredicates;
+				ZERO_LINK = NO;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C5623D0CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = hoistedPredicates;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C5623E0CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/scopes";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/scopes";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = scopes;
+				ZERO_LINK = NO;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C5623F0CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = scopes;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562400CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ANTLR_DEBUG = YES;
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/simpleCTreeParser";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/simpleCTreeParser";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				INSTALL_PATH = "$(HOME)/bin";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = simplectree;
+				ZERO_LINK = NO;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562410CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "simplec tree";
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562420CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALTERNATE_GROUP = "$(INSTALL_GROUP)";
+				ALTERNATE_MODE = "$(INSTALL_MODE_FLAG)";
+				ALTERNATE_OWNER = "$(INSTALL_OWNER)";
+				ALTERNATE_PERMISSIONS_FILES = "";
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ANTLR_DEBUG = YES;
+				ANTLR_EXTRA_JAVA_ARGS = "/Users/kroepke/Projects/idea/antlr3/classes:/Users/kroepke/Projects/idea/stringtemplate/classes:/usr/local/lib/antlr.jar";
+				ANTLR_FORCE_OUT_DIR = "$(PROJECT_DIR)/examples/treerewrite";
+				ANTLR_LIB_DIR = "$(PROJECT_DIR)/examples/treerewrite";
+				ARCHS = "$(NATIVE_ARCH)";
+				BUILD_VARIANTS = normal;
+				BUNDLE_LOADER = "";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
+				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)";
+				COPYING_PRESERVES_HFS_DATA = NO;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = "";
+				DEAD_CODE_STRIPPING = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEPLOYMENT_LOCATION = NO;
+				DEPLOYMENT_POSTPROCESSING = NO;
+				DSTROOT = "/tmp/$(PROJECT_NAME).dst";
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = "";
+				EXECUTABLE_PREFIX = "";
+				EXPORTED_SYMBOLS_FILE = "";
+				FRAMEWORK_SEARCH_PATHS = "";
+				FRAMEWORK_VERSION = A;
+				GCC_ALTIVEC_EXTENSIONS = NO;
+				GCC_AUTO_VECTORIZATION = NO;
+				GCC_CHAR_IS_UNSIGNED_CHAR = NO;
+				GCC_CW_ASM_SYNTAX = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DEBUGGING_SYMBOLS = full;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_ASM_KEYWORD = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_ENABLE_PASCAL_STRINGS = YES;
+				GCC_ENABLE_SSE3_EXTENSIONS = NO;
+				GCC_ENABLE_SYMBOL_SEPARATION = NO;
+				GCC_ENABLE_TRIGRAPHS = NO;
+				GCC_FAST_MATH = NO;
+				GCC_FAST_OBJC_DISPATCH = NO;
+				GCC_FEEDBACK_DIRECTED_OPTIMIZATION = Off;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
+				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_INPUT_FILETYPE = automatic;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO;
+				GCC_MODEL_PPC64 = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_NO_COMMON_BLOCKS = NO;
+				GCC_OBJC_CALL_CXX_CDTORS = NO;
+				GCC_ONE_BYTE_BOOL = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "c objective-c c++ objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
+				GCC_REUSE_STRINGS = YES;
+				GCC_SHORT_ENUMS = NO;
+				GCC_STRICT_ALIASING = NO;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_THREADSAFE_STATICS = YES;
+				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = NO;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_UNROLL_LOOPS = NO;
+				GCC_USE_GCC3_PFE_SUPPORT = "$(USE_GCC3_PFE_SUPPORT)";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
+				GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = NO;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_ALLOW_INCOMPLETE_PROTOCOL = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = NO;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = NO;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO;
+				GCC_WARN_MISSING_PARENTHESES = NO;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
+				GCC_WARN_PEDANTIC = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_SIGN_COMPARE = NO;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_LABEL = NO;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_MASTER_OBJECT_FILE = NO;
+				GENERATE_PKGINFO_FILE = NO;
+				GENERATE_PROFILING_CODE = NO;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_EXPAND_BUILD_SETTINGS = YES;
+				INFOPLIST_FILE = "";
+				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "";
+				INFOPLIST_PREFIX_HEADER = "";
+				INFOPLIST_PREPROCESS = NO;
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
+				INIT_ROUTINE = "";
+				INSTALL_GROUP = "$(GROUP)";
+				INSTALL_MODE_FLAG = "a-w,a+rX";
+				INSTALL_OWNER = "$(USER)";
+				INSTALL_PATH = "$(HOME)/bin";
+				KEEP_PRIVATE_EXTERNS = NO;
+				LIBRARY_SEARCH_PATHS = "";
+				LINKER_DISPLAYS_FILES_FOR_UNDEFINED_SYMBOLS = YES;
+				LINKER_DISPLAYS_MANGLED_NAMES = NO;
+				LINK_WITH_STANDARD_LIBRARIES = YES;
+				MACH_O_TYPE = "";
+				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				OBJROOT = /Users/kroepke/Projects/Intermediates;
+				ONLY_LINK_ESSENTIAL_SYMBOLS = NO;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
+				PRELINK_FLAGS = "";
+				PRELINK_LIBS = "";
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
+				PRIVATE_HEADERS_FOLDER_PATH = "";
+				PRODUCT_NAME = treerewrite;
+				PUBLIC_HEADERS_FOLDER_PATH = "";
+				REZ_SEARCH_PATHS = "";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SECTORDER_FLAGS = "";
+				SEPARATE_STRIP = NO;
+				SEPARATE_SYMBOL_EDIT = NO;
+				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
+				SKIP_INSTALL = NO;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				STRIPFLAGS = "";
+				STRIP_INSTALLED_PRODUCT = "";
+				STRIP_STYLE = all;
+				SYMROOT = /Users/kroepke/Projects/Build;
+				TEST_HOST = "";
+				TEST_RIG = "";
+				UNEXPORTED_SYMBOLS_FILE = "";
+				USER_HEADER_SEARCH_PATHS = "";
+				VERSIONING_SYSTEM = "";
+				WARNING_CFLAGS = "";
+				WARNING_LDFLAGS = "";
+				WRAPPER_EXTENSION = "";
+				ZERO_LINK = NO;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
+		F7C562430CD513D400727DB0 /* Debug with StringTemplate Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = treerewrite;
+			};
+			name = "Debug with StringTemplate Debug";
+		};
 		F7CD47630C64D23800FF933A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2229,7 +2756,6 @@
 				GCC_MODEL_PPC64 = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = NO;
-				GCC_NO_NIL_RECEIVERS = NO;
 				GCC_OBJC_CALL_CXX_CDTORS = NO;
 				GCC_ONE_BYTE_BOOL = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2397,7 +2923,6 @@
 				GCC_MODEL_PPC64 = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_NO_COMMON_BLOCKS = NO;
-				GCC_NO_NIL_RECEIVERS = NO;
 				GCC_OBJC_CALL_CXX_CDTORS = NO;
 				GCC_ONE_BYTE_BOOL = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
@@ -2613,6 +3138,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB91AE08733DA50010E9CD /* Debug */,
+				F7C562310CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				1DEB91AF08733DA50010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2622,6 +3148,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
+				F7C562300CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2631,6 +3158,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F700E86D0A5FA34D005D0757 /* Debug */,
+				F7C562380CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F700E86E0A5FA34D005D0757 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2640,6 +3168,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F700ECDD0A5FE1BF005D0757 /* Debug */,
+				F7C5623A0CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F700ECDE0A5FE1BF005D0757 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2649,6 +3178,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F7037EB90A05AFEF0070435D /* Debug */,
+				F7C562340CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F7037EBA0A05AFEF0070435D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2658,6 +3188,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F70BB383098E5B040054FEF8 /* Debug */,
+				F7C562320CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F70BB384098E5B040054FEF8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2667,6 +3198,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F72C5E670AB7E4C900282574 /* Debug */,
+				F7C562400CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F72C5E680AB7E4C900282574 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2676,6 +3208,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F76287410B7151B9006AA7EF /* Debug */,
+				F7C562330CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F76287420B7151B9006AA7EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2685,6 +3218,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F76287470B715201006AA7EF /* Debug */,
+				F7C562370CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F76287480B715201006AA7EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2694,6 +3228,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F762877A0B71557E006AA7EF /* Debug */,
+				F7C562350CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F762877B0B71557E006AA7EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2703,6 +3238,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F76287800B71559C006AA7EF /* Debug */,
+				F7C562390CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F76287810B71559C006AA7EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2712,6 +3248,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F76287840B71559F006AA7EF /* Debug */,
+				F7C5623B0CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F76287850B71559F006AA7EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2721,6 +3258,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F76287880B7155A2006AA7EF /* Debug */,
+				F7C5623D0CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F76287890B7155A2006AA7EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2730,6 +3268,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F762878C0B7155AB006AA7EF /* Debug */,
+				F7C5623F0CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F762878D0B7155AB006AA7EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2739,6 +3278,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F76287900B7155AF006AA7EF /* Debug */,
+				F7C562410CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F76287910B7155AF006AA7EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2748,6 +3288,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F79D56700A0E23D600EA3CEE /* Debug */,
+				F7C562360CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F79D56710A0E23D600EA3CEE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2757,6 +3298,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F7CD47630C64D23800FF933A /* Debug */,
+				F7C562430CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F7CD47640C64D23800FF933A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2766,6 +3308,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F7CD477D0C64D27000FF933A /* Debug */,
+				F7C562420CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F7CD477E0C64D27000FF933A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2775,6 +3318,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F7DD05F10A7B1640006A006C /* Debug */,
+				F7C5623C0CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F7DD05F20A7B1640006A006C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2784,6 +3328,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F7DD077A0A7B6682006A006C /* Debug */,
+				F7C5623E0CD513D400727DB0 /* Debug with StringTemplate Debug */,
 				F7DD077B0A7B6682006A006C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
