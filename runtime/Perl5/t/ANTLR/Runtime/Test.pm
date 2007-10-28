@@ -52,11 +52,6 @@ sub g_test_output_is {
 
     my $actual = $test_result->{out};
 
-    if ($actual ne $expected) {
-        write_file('D:/tmp/a.txt', $expected);
-        write_file('D:/tmp/b.txt', $actual);
-    }
-
     # compare with $expected
     return $tb->is_eq($actual, $expected, $name);
 }
