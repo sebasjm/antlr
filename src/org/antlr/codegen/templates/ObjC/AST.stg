@@ -104,15 +104,15 @@ parserMethods() ::= <<
 @returnScope.methods() ::= <<
 - (<ASTLabelType>) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(<ASTLabelType>)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -188,185 +188,57 @@ root_0 = (<ASTLabelType>)[treeAdaptor newEmptyTree];<\n>
 <endif>
 >>
 
+// T r a c k i n g  R u l e  E l e m e n t s
 
-// TOKEN AST STUFF
-
-/** ID and output=AST */
-tokenRef(token,label,elementIndex) ::= <<
-<super.tokenRef(...)>
-<if(backtracking)>if ( backtracking == 0 ) {<endif>
-_<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-[treeAdaptor addChild:_<label>_tree toTree:root_0];
-[_<label>_tree release];
-<if(backtracking)>}<endif>
->>
-
-/** ID! and output=AST (same as plain tokenRef) */
-tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
-
-/** ID^ and output=AST */
-tokenRefRuleRoot(token,label,elementIndex) ::= <<
-<super.tokenRef(...)>
-<if(backtracking)>if ( backtracking == 0 ) {<endif>
-_<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-root_0 = (<ASTLabelType>)[treeAdaptor makeNode:_<label>_tree parentOf:root_0];
-[_<label>_tree release];
-<if(backtracking)>}<endif>
->>
-
-/** ids+=ID! and output=AST */
-tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
-<tokenRefBang(...)>
-<listLabel(...)>
->>
-
-/** label+=TOKEN when output=AST but not rewrite alt */
-tokenRefAndListLabel(token,label,elementIndex) ::= <<
-<tokenRef(...)>
-<listLabel(...)>
->>
-
-/** Match label+=TOKEN^ when output=AST but not rewrite alt */
-tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
-<tokenRefRuleRoot(...)>
-<listLabel(...)>
->>
-
-/** ID but track it for use in a rewrite rule */
+/** ID and track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( backtracking == 0 ) <endif>[_stream_<token> addElement:_<label>];<\n>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
- *  to the tracking list list_ID for use in the rewrite.
+ *  to the tracking list stream_ID for use in the rewrite.
  */
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefTrack(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
-// SET AST
-
-// the match set stuff is interesting in that it uses an argument list
-// to pass code to the default matchSet; another possible way to alter
-// inherited code.  I don't use the region stuff because I need to pass
-// different chunks depending on the operator.  I don't like making
-// the template name have the operator as the number of templates gets
-// large but this is the most flexible--this is as opposed to having
-// the code generator call matchSet then add root code or ruleroot code
-// plus list label plus ...  The combinations might require complicated
-// rather than just added on code.  Investigate that refactoring when
-// I have more time.
-
-matchSet(s,label,elementIndex,postmatchCode) ::= <<
-<super.matchSet(..., postmatchCode={
-<if(backtracking)>if (backtracking == 0) {<endif>
-_<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-[treeAdaptor addChild:_<label>_tree toTree:root_0];
-[_<label>_tree release];
-<if(backtracking)>}<endif>
-})>
+/** ^(ID ...) track for rewrite */
+tokenRefRuleRootTrack(token,label,elementIndex) ::= <<
+<super.tokenRef(...)>
+<if(backtracking)>if ( backtracking == 0 ) <endif>[_stream_<token> addElement:_<label>];<\n>
 >>
 
-matchSetRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={
-<if(backtracking)>if (backtracking == 0) {<endif>
-_<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-root_0 = (<ASTLabelType>)[treeAdaptor makeNode:_<label>_tree parentOf:root_0];
-[_<label>_tree release];
-<if(backtracking)>}<endif>
-})>
->>
-
-matchSetRuleRoot(s,label,elementIndex,debug) ::= <<
-<super.matchSet(..., postmatchCode={
-<if(backtracking)>if (backtracking == 0) {<endif>
-_<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-root_0 = (<ASTLabelType>)[treeAdaptor makeNode:_<label>_tree parentOf:root_0];
-[_<label>_tree release];
-<if(backtracking)>}<endif>
-})>
->>
-
-// RULE REF AST
-
-/** rule when output=AST */
-ruleRef(rule,label,elementIndex,args) ::= <<
-<super.ruleRef(...)>
-<if(backtracking)>if (backtracking == 0) <endif>[treeAdaptor addChild:[_<label> tree] toTree:root_0];
->>
-
-/** rule! is same as normal rule ref */
-ruleRefBang(rule,label,elementIndex,args) ::= "<super.ruleRef(...)>"
-
-/** rule^ */
-ruleRefRuleRoot(rule,label,elementIndex,args) ::= <<
-<super.ruleRef(...)>
-<if(backtracking)>if (backtracking == 0) <endif>root_0 = (<ASTLabelType>)[treeAdaptor makeNode:[_<label> tree] parentOf:root_0];
+/** Match ^(label+=TOKEN ...) track for rewrite */
+tokenRefRuleRootTrackAndListLabel(token,label,elementIndex) ::= <<
+<tokenRefRuleRootTrack(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** rule when output=AST and tracking for rewrite */
-ruleRefTrack(rule,label,elementIndex,args) ::= <<
+ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
 <if(backtracking)>if (backtracking == 0) <endif>[_stream_<rule> addElement:[_<label> tree]];
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
-ruleRefTrackAndListLabel(rule,label,elementIndex,args) ::= <<
+ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefTrack(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
-/** x+=rule when output=AST */
-ruleRefAndListLabel(rule,label,elementIndex,args) ::= <<
-<ruleRef(...)>
-<listLabel(...)>
+/** ^(rule ...) rewrite */
+ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
+<super.ruleRefRuleRoot(...)>
+<if(backtracking)>if ( backtracking == 0 ) <endif>[_stream_<rule> addElement:[_<label> tree]];<\n>
 >>
 
-/** x+=rule! when output=AST is a rule ref with list addition */
-ruleRefBangAndListLabel(rule,label,elementIndex,args) ::= <<
-<ruleRefBang(...)>
-<listLabel(...)>
+/** ^(x+=rule ...) rewrite */
+ruleRefRuleRootTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
+<ruleRefRuleRootTrack(...)>
+<listLabel(elem="["+label+" tree]",...)>
 >>
-
-/** x+=rule^ */
-ruleRefRuleRootAndListLabel(rule,label,elementIndex,args) ::= <<
-<ruleRefRuleRoot(...)>
-<listLabel(...)>
->>
-
-// WILDCARD AST
-
-wildcard(label,elementIndex) ::= <<
-<super.wildcard(...)>
-<if(backtracking)>if (backtracking == 0) {<endif>
-_<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-[treeAdaptor addChild:_<label>_tree toTree:root_0];
-[_<label>_tree release];
-<if(backtracking)>}<endif>
->>
-
-wildcardRoot(label,elementIndex) ::= <<
-<super.wildcard(...)>
-<if(backtracking)>if (backtracking == 0) {<endif>
-_<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-root_0 = (<ASTLabelType>)[treeAdaptor makeNode:_<label>_tree parentOf:root_0];
-[_<label>_tree release];
-<if(backtracking)>}<endif>
->>
-
-wildcardRuleRoot(label,elementIndex) ::= <<
-<super.wildcard(...)>
-<if(backtracking)>if (backtracking == 0) {<endif>
-_<label>_tree = (<ASTLabelType>)[treeAdaptor newTreeWithToken:_<label>];
-root_0 = (<ASTLabelType>)[treeAdaptor makeNode:_<label>_tree parentOf:root_0];
-[_<label>_tree release];
-<if(backtracking)>}<endif>
->>
-
-// TODO: ugh, am i really missing the combinations for Track and ListLabel?
-// there's got to be a better way
 
 // R e w r i t e
 
@@ -419,13 +291,16 @@ rewriteCodeLabels() ::= <<
 >
 >>
 
+/** Generate code for an optional rewrite block; note it uses the deep ref'd element
+  *  list rather shallow like other blocks.
+  */
 rewriteOptionalBlock(
 	alt,rewriteBlockLevel,
 	referencedElementsDeep, // all nested refs
 	referencedElements, // elements in immediately block; no nested blocks
 	description) ::=
 <<
-// <fileName>:<description> ;
+// <fileName>:<description>
 if ( <referencedElementsDeep:{el | [_stream_<el> hasNext]}; separator="||"> ) {
 	<alt>
 }
@@ -499,7 +374,7 @@ rewriteElement(e) ::= <<
 >>
 
 /** Gen ID or ID[args] */
-rewriteTokenRef(token,elementIndex,args) ::= <<
+rewriteTokenRef(token,elementIndex,hetero,args) ::= <<
 <if(args)>
 id\<ANTLRTree> _<token>_tree = [treeAdaptor newTreeWithToken:_<token>]; // TODO: args: <args; separator=", ">
 <endif>
@@ -525,12 +400,15 @@ rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
 root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[_stream_<label> next] parentOf:root_<treeLevel>];<\n>
 >>
 
-/** Gen ^(ID ...) */
-rewriteTokenRefRoot(token,elementIndex) ::= <<
+/** Gen ^($label ...) where label+=... */
+rewriteTokenListLabelRefRoot ::= rewriteTokenLabelRefRoot
+
+/** Gen ^(ID ...) or ^(ID[args] ...) */
+rewriteTokenRefRoot(token,elementIndex,hetero,args) ::= <<
 root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[_stream_<token> next] parentOf:root_<treeLevel>];<\n>
 >>
 
-rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
+rewriteImaginaryTokenRef(args,token,hetero,elementIndex) ::= <<
 <if(first(rest(args)))><! got two arguments - means create from token with custom text!>
 id\<ANTLRTree> _<token>_tree = [treeAdaptor newTreeWithToken:<first(args)> tokenType:<token> text:<first(rest(args))>];
 [treeAdaptor addChild:_<token>_tree toTree:root_<treeLevel>];
@@ -548,7 +426,7 @@ id\<ANTLRTree> _<token>_tree = [treeAdaptor newTreeWithTokenType:<token> text:[t
 <endif><! two args !>
 >>
 
-rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
+rewriteImaginaryTokenRefRoot(args,token,hetero,elementIndex) ::= <<
 <if(first(rest(args)))><! got two arguments - means create from token with custom text!>
 id\<ANTLRTree> _<token>_tree = [treeAdaptor newTreeWithToken:<first(args)> tokenType:<token> text:<first(rest(args))>];
 root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:_<token>_tree parentOf:root_<treeLevel>];
@@ -577,12 +455,11 @@ root_0 = <action>;<\n>
  */
 prevRuleRootRef() ::= "retval"
 
-rewriteRuleRef(rule,dup) ::= <<
+rewriteRuleRef(rule) ::= <<
 [treeAdaptor addChild:[_stream_<rule> next] toTree:root_<treeLevel>];<\n>
-<endif>
 >>
 
-rewriteRuleRefRoot(rule,dup) ::= <<
+rewriteRuleRefRoot(rule) ::= <<
 root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:(id\<ANTLRTree>)[_stream_<rule> next] parentOf:root_<treeLevel>];<\n>
 >>
 
@@ -612,4 +489,25 @@ root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[_<label> tree] parentO
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
 root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[(ANTLR<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope *)[_stream_<label> next] tree] parentOf:root_<treeLevel>];<\n>
+>>
+
+createImaginaryNode(tokenType,hetero,args) ::= <<
+<if(hetero)>
+<! new MethodNode(IDLabel, args) !>
+new <hetero>(<tokenType><if(args)>, <args; separator=", "><endif>)
+<else>
+(<ASTLabelType>)adaptor.create(<tokenType>, <args; separator=", "><if(!args)>"<tokenType>"<endif>)
+<endif>
+>>
+
+createRewriteNodeFromElement(token,hetero,args) ::= <<
+<if(hetero)>
+new <hetero>(stream_<token>.nextToken()<if(args)>, <args; separator=", "><endif>)
+<else>
+<if(args)> <! must create new node from old !>
+adaptor.create(<token>, <args; separator=", ">)
+<else>
+stream_<token>.nextNode()
+<endif>
+<endif>
 >>
