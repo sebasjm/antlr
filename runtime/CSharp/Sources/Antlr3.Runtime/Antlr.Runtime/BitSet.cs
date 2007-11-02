@@ -61,6 +61,7 @@ namespace Antlr.Runtime
 
         /// <summary>Construction from a list of integers </summary>
         public BitSet(IList items)
+        	: this(BITS)
         {
             for (int i = 0; i < items.Count; i++)
             {
