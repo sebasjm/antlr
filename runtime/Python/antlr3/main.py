@@ -63,6 +63,16 @@ class _Main(object):
             action="store_true",
             dest="interactive"
             )
+        optParser.add_option(
+            "--profile",
+            action="store_true",
+            dest="profile"
+            )
+        optParser.add_option(
+            "--hotshot",
+            action="store_true",
+            dest="hotshot"
+            )
 
         self.setupOptions(optParser)
         
@@ -103,7 +113,37 @@ class _Main(object):
                     self.stdin, encoding=options.encoding
                     )
 
-            self.parseStream(options, inStream)
+            if options.profile:
+                try:
+                    import cProfile as profile
+                except ImportError:
+                    import profile
+
+                profile.runctx(
+                    'self.parseStream(options, inStream)',
+                    globals(),
+                    locals(),
+                    'profile.dat'
+                    )
+
+                import pstats
+                stats = pstats.Stats('profile.dat')
+                stats.strip_dirs()
+                stats.sort_stats('time')
+                stats.print_stats(100)
+
+            elif options.hotshot:
+                import hotshot
+
+                profiler = hotshot.Profile('hotshot.dat')
+                profiler.runctx(
+                    'self.parseStream(options, inStream)',
+                    globals(),
+                    locals()
+                    )
+
+            else:
+                self.parseStream(options, inStream)
 
 
     def setUp(self, options):
