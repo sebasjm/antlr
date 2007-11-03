@@ -51,7 +51,7 @@ if 'CLASSPATH' not in os.environ:
     baseDir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
     libDir = os.path.join(baseDir, 'lib')
 
-    jar = os.path.join(libDir, 'stringtemplate-3.0.jar')
+    jar = os.path.join(libDir, 'stringtemplate-3.1b1.jar')
     if not os.path.isfile(jar):
         raise DistutilsFileError(
             "Missing file '%s'. Grap it from a distribution package."
@@ -92,9 +92,9 @@ class ANTLRTest(unittest.TestCase):
         self.parserModule = None
         
 
-    def _invokeantlr(self, dir, file, options):
-        fp = os.popen('cd %s; java %s org.antlr.Tool %s %s 2>&1'
-                      % (dir, classpath, options, file)
+    def _invokeantlr(self, dir, file, options, javaOptions=''):
+        fp = os.popen('cd %s; java %s %s org.antlr.Tool %s %s 2>&1'
+                      % (dir, javaOptions, classpath, options, file)
                       )
         output = ''
         failed = False
@@ -115,7 +115,7 @@ class ANTLRTest(unittest.TestCase):
                 )
         
         
-    def compileGrammar(self, grammarName=None, options=''):
+    def compileGrammar(self, grammarName=None, options='', javaOptions=''):
         if grammarName is None:
             grammarName = self.baseName + '.g'
 
@@ -132,8 +132,8 @@ class ANTLRTest(unittest.TestCase):
 
             else:
                 dependencies = []
-                cmd = ('cd %s; java %s org.antlr.Tool -depend %s 2>&1'
-                       % (testDir, classpath, grammarName)
+                cmd = ('cd %s; java %s %s org.antlr.Tool -depend %s 2>&1'
+                       % (testDir, javaOptions, classpath, grammarName)
                        )
 
                 output = ""
@@ -189,7 +189,7 @@ class ANTLRTest(unittest.TestCase):
                     
 
             if rebuild:
-                self._invokeantlr(testDir, grammarName, options)
+                self._invokeantlr(testDir, grammarName, options, javaOptions)
 
         except:
             # mark grammar as broken
@@ -295,7 +295,8 @@ class ANTLRTest(unittest.TestCase):
         return path
 
     
-    def compileInlineGrammar(self, grammar, options='', returnModule=False):
+    def compileInlineGrammar(self, grammar, options='', javaOptions='',
+                             returnModule=False):
         # write grammar file
         grammarName, grammarPath, grammarType = self.writeInlineGrammar(grammar)
 
@@ -303,7 +304,8 @@ class ANTLRTest(unittest.TestCase):
         self._invokeantlr(
             os.path.dirname(grammarPath),
             os.path.basename(grammarPath),
-            options
+            options,
+            javaOptions
             )
         
         if grammarType == 'combined':
