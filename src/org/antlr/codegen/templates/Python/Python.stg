@@ -1103,7 +1103,7 @@ se:
 
 // D F A  E X P R E S S I O N S
 
-andPredicates(left,right) ::= "(<left> and <right>)"
+andPredicates(left,right) ::= "((<left>) and (<right>))"
 
 orPredicates(operands) ::= "(<first(operands)><rest(operands):{o |  or <o>}>)"
 
