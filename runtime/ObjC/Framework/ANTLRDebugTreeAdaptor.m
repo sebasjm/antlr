@@ -98,7 +98,7 @@
 
 - (id<ANTLRTree>) emptyTree
 {
-	id<ANTLRTree> newTree = [treeAdaptor emptyTree];
+	id<ANTLRTree> newTree = [treeAdaptor newEmptyTree];
 	[debugListener createNilNode:[treeAdaptor uniqueIdForTree:newTree]];
 	return newTree;
 }
@@ -160,7 +160,7 @@
 }
 - (id<ANTLRTree>) newTreeWithToken:(id<ANTLRToken>)fromToken tokenType:(int)tokenType
 {
-	id<ANTLRTree> newTree = [treeAdaptor newTreeWithToken:fromToken type:tokenType];
+	id<ANTLRTree> newTree = [treeAdaptor newTreeWithToken:fromToken tokenType:tokenType];
 	[debugListener createNode:[treeAdaptor uniqueIdForTree:newTree] text:[fromToken text] type:tokenType];
 	return newTree;
 }
