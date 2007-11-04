@@ -86,17 +86,8 @@ class DFA(object):
                     return self.accept[s]
 
                 # look for a normal char transition
-                LA = input.LA(1)
-                #print LA, repr(input.LT(1)), input.LT(1).text
-                if LA == EOF:
-                    c = -1 #0xffff
-                else:
-                    try:
-                        c = ord(LA)
-                    except TypeError:
-                        # LA is a token type (int), not a char
-                        c = LA
-                        
+                c = input.LA(1)
+
                 #print "LA = %d (%r)" % (c, unichr(c))
                 #print "range = %d..%d" % (self.min[s], self.max[s])
 

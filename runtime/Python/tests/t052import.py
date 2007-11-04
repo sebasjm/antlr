@@ -53,7 +53,7 @@ class T(testbase.ANTLRTest):
                 self.traces.append('<'+ruleName)
 
 
-            def recover(self, input, re):
+            def recover(self, input):
                 # no error recovery yet, just crash!
                 raise
             

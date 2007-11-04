@@ -214,7 +214,7 @@ class T(testbase.ANTLRTest):
             )
 
         stdout = stdout.getvalue().strip()
-        self.failUnlessEqual(stdout, "'a + b'")
+        self.failUnlessEqual(stdout, "u'a + b'")
         
 
     def testTreeParserRewrite(self):
@@ -302,7 +302,7 @@ class T(testbase.ANTLRTest):
             )
 
         stdout = stdout.getvalue().strip()
-        self.failUnlessEqual(stdout, "'b'")
+        self.failUnlessEqual(stdout, "u'b'")
 
 
 if __name__ == '__main__':

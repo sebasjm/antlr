@@ -31,6 +31,7 @@
 # end[licence]
 
 import codecs
+import array
 from StringIO import StringIO
 
 from antlr3.constants import DEFAULT_CHANNEL, EOF
@@ -324,8 +325,11 @@ class ANTLRStringStream(CharStream):
         CharStream.__init__(self)
         
   	# The data being scanned
-        self.data = data
-
+        self.strdata = unicode(data)
+        #self.data = array.array('H') # DFAs are limited to 16 anyway...
+        #self.data.extend(ord(c) for c in self.strdata)
+        self.data = [ord(c) for c in self.strdata]
+        
 	# How many characters are actually in the buffer
         self.n = len(data)
 
@@ -361,13 +365,20 @@ class ANTLRStringStream(CharStream):
 
 
     def consume(self):
-        if self.p < self.n:
-            self.charPositionInLine += 1
-            if self.data[self.p] == '\n':
+        try:
+            if self.data[self.p] == 10: # \n
                 self.line += 1
                 self.charPositionInLine = 0
+            else:
+                self.charPositionInLine += 1
 
             self.p += 1
+            
+        except IndexError:
+            # happend when we reached EOF and self.data[self.p] fails
+            # just do nothing
+            pass
+
 
 
     def LA(self, i):
@@ -376,15 +387,26 @@ class ANTLRStringStream(CharStream):
 
         if i < 0:
             i += 1 # e.g., translate LA(-1) to use offset i=0; then data[p+0-1]
-            if self.p+i-1 < 0:
-                return EOF # invalid; no char before first char
 
-        if self.p+i-1 >= self.n:
+        try:
+            return self.data[self.p+i-1]
+        except IndexError:
             return EOF
 
-        return self.data[self.p+i-1]
 
-    LT = LA
+
+    def LT(self, i):
+        if i == 0:
+            return 0 # undefined
+
+        if i < 0:
+            i += 1 # e.g., translate LA(-1) to use offset i=0; then data[p+0-1]
+
+        try:
+            return self.strdata[self.p+i-1]
+        except IndexError:
+            return EOF
+
 
     def index(self):
         """
@@ -448,7 +470,7 @@ class ANTLRStringStream(CharStream):
 
 
     def substring(self, start, stop):
-        return self.data[start:stop+1]
+        return self.strdata[start:stop+1]
 
 
     def getLine(self):
@@ -683,10 +705,13 @@ class CommonTokenStream(TokenStream):
         token.
         """
 
-        n = len(self.tokens)
-        while i < n and self.tokens[i].channel != self.channel:
-            i += 1
-
+        try:
+            while self.tokens[i].channel != self.channel:
+                i += 1
+        except IndexError:
+            # hit the end of token stream
+            pass
+        
         return i
 
 
@@ -762,9 +787,6 @@ class CommonTokenStream(TokenStream):
         if k < 0:
             return self.LB(-k)
                 
-        if self.p + k - 1 >= len(self.tokens):
-            return EOF_TOKEN
-
         i = self.p
         n = 1
         # find k good tokens
@@ -772,11 +794,11 @@ class CommonTokenStream(TokenStream):
             # skip off-channel tokens
             i = self.skipOffTokenChannels(i+1) # leave p on valid token
             n += 1
-        
-        if i >= len(self.tokens):
-            return EOF_TOKEN
 
-        return self.tokens[i]
+        try:
+            return self.tokens[i]
+        except IndexError:
+            return EOF_TOKEN
 
 
     def LB(self, k):

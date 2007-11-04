@@ -1,3 +1,10 @@
+2007-11-03  Benjamin Niemann  <pink@odahoda.de>
+
+	* PythonTarget.java, dfa.py, exceptions.py, recognizer.py, streams.py:
+	ANTLRStringStream.LA() now returns the character's ordinal and
+	generated lexers operate on integers. Also made various performance
+	tunings.
+
 2007-10-07  Benjamin Niemann  <pink@odahoda.de>
 
 	* main.py, Python.stg (outputFile): Added simple __main__ section to

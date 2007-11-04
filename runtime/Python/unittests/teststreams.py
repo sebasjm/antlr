@@ -88,7 +88,7 @@ class TestStringStream(unittest.TestCase):
         self.failUnlessEqual(stream.index(), 0)
         self.failUnlessEqual(stream.line, 1)
         self.failUnlessEqual(stream.charPositionInLine, 0)
-        self.failUnlessEqual(stream.LA(1), 'f')
+        self.failUnlessEqual(stream.LT(1), 'f')
         
         
     def testLA(self):
@@ -96,16 +96,16 @@ class TestStringStream(unittest.TestCase):
 
         stream = antlr3.StringStream('foo')
 
-        self.failUnlessEqual(stream.LA(1), 'f')
-        self.failUnlessEqual(stream.LA(2), 'o')
-        self.failUnlessEqual(stream.LA(3), 'o')
+        self.failUnlessEqual(stream.LT(1), 'f')
+        self.failUnlessEqual(stream.LT(2), 'o')
+        self.failUnlessEqual(stream.LT(3), 'o')
         
         stream.consume()
         stream.consume()
 
-        self.failUnlessEqual(stream.LA(1), 'o')
-        self.failUnlessEqual(stream.LA(2), antlr3.EOF)
-        self.failUnlessEqual(stream.LA(3), antlr3.EOF)
+        self.failUnlessEqual(stream.LT(1), 'o')
+        self.failUnlessEqual(stream.LT(2), antlr3.EOF)
+        self.failUnlessEqual(stream.LT(3), antlr3.EOF)
 
 
     def testSubstring(self):
@@ -129,7 +129,7 @@ class TestStringStream(unittest.TestCase):
         self.failUnlessEqual(stream.index(), 4)
         self.failUnlessEqual(stream.line, 2)
         self.failUnlessEqual(stream.charPositionInLine, 0)
-        self.failUnlessEqual(stream.LA(1), 'b')
+        self.failUnlessEqual(stream.LT(1), 'b')
 
 
 ##     # not yet implemented
@@ -217,7 +217,7 @@ class TestStringStream(unittest.TestCase):
         self.failUnlessEqual(stream.index(), 4)
         self.failUnlessEqual(stream.line, 2)
         self.failUnlessEqual(stream.charPositionInLine, 0)
-        self.failUnlessEqual(stream.LA(1), 'b')
+        self.failUnlessEqual(stream.LT(1), 'b')
         
 
     def testRewindNested(self):
@@ -239,7 +239,7 @@ class TestStringStream(unittest.TestCase):
         self.failUnlessEqual(stream.index(), 5)
         self.failUnlessEqual(stream.line, 2)
         self.failUnlessEqual(stream.charPositionInLine, 1)
-        self.failUnlessEqual(stream.LA(1), 'a')
+        self.failUnlessEqual(stream.LT(1), 'a')
 
         
 class TestFileStream(unittest.TestCase):
@@ -265,7 +265,8 @@ class TestFileStream(unittest.TestCase):
         self.failUnlessEqual(stream.index(), 5)
         self.failUnlessEqual(stream.line, 2)
         self.failUnlessEqual(stream.charPositionInLine, 1)
-        self.failUnlessEqual(stream.LA(1), 'a')
+        self.failUnlessEqual(stream.LT(1), 'a')
+        self.failUnlessEqual(stream.LA(1), ord('a'))
 
 
     def testEncoded(self):
@@ -287,7 +288,8 @@ class TestFileStream(unittest.TestCase):
         self.failUnlessEqual(stream.index(), 5)
         self.failUnlessEqual(stream.line, 2)
         self.failUnlessEqual(stream.charPositionInLine, 1)
-        self.failUnlessEqual(stream.LA(1), u'ä')
+        self.failUnlessEqual(stream.LT(1), u'ä')
+        self.failUnlessEqual(stream.LA(1), ord(u'ä'))
 
         
 
@@ -313,7 +315,8 @@ class TestInputStream(unittest.TestCase):
         self.failUnlessEqual(stream.index(), 5)
         self.failUnlessEqual(stream.line, 2)
         self.failUnlessEqual(stream.charPositionInLine, 1)
-        self.failUnlessEqual(stream.LA(1), 'a')
+        self.failUnlessEqual(stream.LT(1), 'a')
+        self.failUnlessEqual(stream.LA(1), ord('a'))
 
 
     def testEncoded(self):
@@ -335,7 +338,8 @@ class TestInputStream(unittest.TestCase):
         self.failUnlessEqual(stream.index(), 5)
         self.failUnlessEqual(stream.line, 2)
         self.failUnlessEqual(stream.charPositionInLine, 1)
-        self.failUnlessEqual(stream.LA(1), u'ä')
+        self.failUnlessEqual(stream.LT(1), u'ä')
+        self.failUnlessEqual(stream.LA(1), ord(u'ä'))
 
         
 class TestCommonTokenStream(unittest.TestCase):

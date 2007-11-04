@@ -118,7 +118,7 @@ class RecognitionException(Exception):
 
             else:
                 if isinstance(self.input, CharStream):
-                    self.c = self.input.LA(1)
+                    self.c = self.input.LT(1)
                     self.line = self.input.line
                     self.charPositionInLine = self.input.charPositionInLine
 

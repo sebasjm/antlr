@@ -1021,18 +1021,16 @@ class Lexer(BaseRecognizer, TokenSource):
 
     def match(self, s):
         if isinstance(s, basestring):
-            i = 0
-            while i < len(s):
-                if self.input.LA(1) != s[i]:
+            for i, c in enumerate(s):
+                if self.input.LA(1) != ord(c):
                     if self._state.backtracking > 0:
                         self._state.failed = True
                         return
 
-                    mte = MismatchedTokenException(s[i], self.input)
+                    mte = MismatchedTokenException(c, self.input)
                     self.recover(mte)
                     raise mte
 
-                i += 1
                 self.input.consume()
                 self._state.failed = False
 
@@ -1042,7 +1040,7 @@ class Lexer(BaseRecognizer, TokenSource):
                     self._state.failed = True
                     return
 
-                mte = MismatchedTokenException(s, self.input)
+                mte = MismatchedTokenException(unichr(s), self.input)
                 self.recover(mte)
                 raise mte
         
@@ -1060,7 +1058,7 @@ class Lexer(BaseRecognizer, TokenSource):
                 self._state.failed = True
                 return
 
-            mre = MismatchedRangeException(a, b, self.input)
+            mre = MismatchedRangeException(unichr(a), unichr(b), self.input)
             self.recover(mre)
             raise mre
 
