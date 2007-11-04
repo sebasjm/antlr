@@ -1,4 +1,4 @@
-// $ANTLR 3.1b1 SimpleCTP.gtp 2007-10-28 20:35:08
+// $ANTLR 3.1b1 SimpleCTP.gtp 2007-11-04 03:29:05
 
 #import "SimpleCTP.h"
 
@@ -184,6 +184,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:8:1: program : ( declaration )+ ;
 - (void) program
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:9:5: ( ( declaration )+ ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:9:9: ( declaration )+ // alt
@@ -204,9 +205,9 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleCTP.gtp:9:9: declaration // alt
         	    {
-        	    [following addObject:FOLLOW_declaration_in_program43];
+        	    [[_state following] addObject:FOLLOW_declaration_in_program43];
         	    [self declaration];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -241,6 +242,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:12:1: declaration : ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) );
 - (void) declaration
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:13:5: ( variable | ^( FUNC_DECL functionHeader ) | ^( FUNC_DEF functionHeader block ) ) //ruleblock
         int alt2=3;
@@ -264,9 +266,9 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleCTP.gtp:13:9: variable // alt
         	    {
-        	    [following addObject:FOLLOW_variable_in_declaration63];
+        	    [[_state following] addObject:FOLLOW_variable_in_declaration63];
         	    [self variable];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -278,9 +280,9 @@ static NSArray *tokenNames;
         	    [self match:input tokenType:SimpleCTP_FUNC_DECL follow:FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [following addObject:FOLLOW_functionHeader_in_declaration76];
+        	    [[_state following] addObject:FOLLOW_functionHeader_in_declaration76];
         	    [self functionHeader];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -294,14 +296,14 @@ static NSArray *tokenNames;
         	    [self match:input tokenType:SimpleCTP_FUNC_DEF follow:FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [following addObject:FOLLOW_functionHeader_in_declaration90];
+        	    [[_state following] addObject:FOLLOW_functionHeader_in_declaration90];
         	    [self functionHeader];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
-        	    [following addObject:FOLLOW_block_in_declaration92];
+        	    [[_state following] addObject:FOLLOW_block_in_declaration92];
         	    [self block];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -328,6 +330,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:18:1: variable : ^( VAR_DEF type declarator ) ;
 - (void) variable
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:19:5: ( ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:19:9: ^( VAR_DEF type declarator ) // alt
@@ -335,14 +338,14 @@ static NSArray *tokenNames;
         [self match:input tokenType:SimpleCTP_VAR_DEF follow:FOLLOW_SimpleCTP_VAR_DEF_in_variable113]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        [following addObject:FOLLOW_type_in_variable115];
+        [[_state following] addObject:FOLLOW_type_in_variable115];
         [self type];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
-        [following addObject:FOLLOW_declarator_in_variable117];
+        [[_state following] addObject:FOLLOW_declarator_in_variable117];
         [self declarator];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
 
@@ -367,6 +370,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:22:1: declarator : ID ;
 - (void) declarator
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:23:5: ( ID ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:23:9: ID // alt
@@ -392,6 +396,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:26:1: functionHeader : ^( FUNC_HDR type ID ( formalParameter )+ ) ;
 - (void) functionHeader
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:27:5: ( ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:27:9: ^( FUNC_HDR type ID ( formalParameter )+ ) // alt
@@ -399,9 +404,9 @@ static NSArray *tokenNames;
         [self match:input tokenType:SimpleCTP_FUNC_HDR follow:FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        [following addObject:FOLLOW_type_in_functionHeader160];
+        [[_state following] addObject:FOLLOW_type_in_functionHeader160];
         [self type];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_functionHeader162]; 
@@ -421,9 +426,9 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleCTP.gtp:27:28: formalParameter // alt
         	    {
-        	    [following addObject:FOLLOW_formalParameter_in_functionHeader164];
+        	    [[_state following] addObject:FOLLOW_formalParameter_in_functionHeader164];
         	    [self formalParameter];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -460,6 +465,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:30:1: formalParameter : ^( ARG_DEF type declarator ) ;
 - (void) formalParameter
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:31:5: ( ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:31:9: ^( ARG_DEF type declarator ) // alt
@@ -467,14 +473,14 @@ static NSArray *tokenNames;
         [self match:input tokenType:SimpleCTP_ARG_DEF follow:FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        [following addObject:FOLLOW_type_in_formalParameter188];
+        [[_state following] addObject:FOLLOW_type_in_formalParameter188];
         [self type];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
-        [following addObject:FOLLOW_declarator_in_formalParameter190];
+        [[_state following] addObject:FOLLOW_declarator_in_formalParameter190];
         [self declarator];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
 
@@ -499,13 +505,14 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:34:1: type : ( 'int' | 'char' | 'void' | ID );
 - (void) type
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:35:5: ( 'int' | 'char' | 'void' | ID ) // ruleBlockSingleAlt
         // SimpleCTP.gtp: // alt
         {
         if ([input LA:1]==SimpleCTP_ID||([input LA:1]>=SimpleCTP_INT_TYPE && [input LA:1]<=SimpleCTP_VOID)) {
         	[input consume];
-        	errorRecovery = NO;
+        	[_state setIsErrorRecovery:NO];
         } else {
         	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
         	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_type0];	@throw mse;
@@ -531,6 +538,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:41:1: block : ^( BLOCK ( variable )* ( stat )* ) ;
 - (void) block
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:42:5: ( ^( BLOCK ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:42:9: ^( BLOCK ( variable )* ( stat )* ) // alt
@@ -552,9 +560,9 @@ static NSArray *tokenNames;
             	case 1 :
             	    // SimpleCTP.gtp:42:17: variable // alt
             	    {
-            	    [following addObject:FOLLOW_variable_in_block275];
+            	    [[_state following] addObject:FOLLOW_variable_in_block275];
             	    [self variable];
-            	    [following removeLastObject];
+            	    [[_state following] removeLastObject];
 
 
 
@@ -579,9 +587,9 @@ static NSArray *tokenNames;
             	case 1 :
             	    // SimpleCTP.gtp:42:27: stat // alt
             	    {
-            	    [following addObject:FOLLOW_stat_in_block278];
+            	    [[_state following] addObject:FOLLOW_stat_in_block278];
             	    [self stat];
-            	    [following removeLastObject];
+            	    [[_state following] removeLastObject];
 
 
 
@@ -616,6 +624,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:45:1: stat : ( forStat | expr | block );
 - (void) stat
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:45:5: ( forStat | expr | block ) //ruleblock
         int alt6=3;
@@ -644,9 +653,9 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleCTP.gtp:45:7: forStat // alt
         	    {
-        	    [following addObject:FOLLOW_forStat_in_stat292];
+        	    [[_state following] addObject:FOLLOW_forStat_in_stat292];
         	    [self forStat];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -655,9 +664,9 @@ static NSArray *tokenNames;
         	case 2 :
         	    // SimpleCTP.gtp:46:7: expr // alt
         	    {
-        	    [following addObject:FOLLOW_expr_in_stat300];
+        	    [[_state following] addObject:FOLLOW_expr_in_stat300];
         	    [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -666,9 +675,9 @@ static NSArray *tokenNames;
         	case 3 :
         	    // SimpleCTP.gtp:47:7: block // alt
         	    {
-        	    [following addObject:FOLLOW_block_in_stat308];
+        	    [[_state following] addObject:FOLLOW_block_in_stat308];
         	    [self block];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -693,6 +702,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:50:1: forStat : ^( 'for' expr expr expr block ) ;
 - (void) forStat
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:51:5: ( ^( 'for' expr expr expr block ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:51:9: ^( 'for' expr expr expr block ) // alt
@@ -700,24 +710,24 @@ static NSArray *tokenNames;
         [self match:input tokenType:SimpleCTP_FOR follow:FOLLOW_SimpleCTP_FOR_in_forStat328]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        [following addObject:FOLLOW_expr_in_forStat330];
+        [[_state following] addObject:FOLLOW_expr_in_forStat330];
         [self expr];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
-        [following addObject:FOLLOW_expr_in_forStat332];
+        [[_state following] addObject:FOLLOW_expr_in_forStat332];
         [self expr];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
-        [following addObject:FOLLOW_expr_in_forStat334];
+        [[_state following] addObject:FOLLOW_expr_in_forStat334];
         [self expr];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
-        [following addObject:FOLLOW_block_in_forStat336];
+        [[_state following] addObject:FOLLOW_block_in_forStat336];
         [self block];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
 
@@ -742,6 +752,7 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:54:1: expr : ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom );
 - (void) expr
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:54:5: ( ^( EQEQ expr expr ) | ^( LT expr expr ) | ^( PLUS expr expr ) | ^( EQ ID expr ) | atom ) //ruleblock
         int alt7=5;
@@ -775,14 +786,14 @@ static NSArray *tokenNames;
         	    [self match:input tokenType:SimpleCTP_EQEQ follow:FOLLOW_SimpleCTP_EQEQ_in_expr352]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [following addObject:FOLLOW_expr_in_expr354];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr354];
         	    [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
-        	    [following addObject:FOLLOW_expr_in_expr356];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr356];
         	    [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -796,14 +807,14 @@ static NSArray *tokenNames;
         	    [self match:input tokenType:SimpleCTP_LT follow:FOLLOW_SimpleCTP_LT_in_expr368]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [following addObject:FOLLOW_expr_in_expr370];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr370];
         	    [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
-        	    [following addObject:FOLLOW_expr_in_expr372];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr372];
         	    [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -817,14 +828,14 @@ static NSArray *tokenNames;
         	    [self match:input tokenType:SimpleCTP_PLUS follow:FOLLOW_SimpleCTP_PLUS_in_expr384]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [following addObject:FOLLOW_expr_in_expr386];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr386];
         	    [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
-        	    [following addObject:FOLLOW_expr_in_expr388];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr388];
         	    [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -839,9 +850,9 @@ static NSArray *tokenNames;
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
         	    [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_expr402]; 
-        	    [following addObject:FOLLOW_expr_in_expr404];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr404];
         	    [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -852,9 +863,9 @@ static NSArray *tokenNames;
         	case 5 :
         	    // SimpleCTP.gtp:58:9: atom // alt
         	    {
-        	    [following addObject:FOLLOW_atom_in_expr415];
+        	    [[_state following] addObject:FOLLOW_atom_in_expr415];
         	    [self atom];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
 
@@ -879,13 +890,14 @@ static NSArray *tokenNames;
 // SimpleCTP.gtp:61:1: atom : ( ID | INT );
 - (void) atom
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     @try {
         // SimpleCTP.gtp:62:5: ( ID | INT ) // ruleBlockSingleAlt
         // SimpleCTP.gtp: // alt
         {
         if ([input LA:1]==SimpleCTP_ID||[input LA:1]==SimpleCTP_INT) {
         	[input consume];
-        	errorRecovery = NO;
+        	[_state setIsErrorRecovery:NO];
         } else {
         	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
         	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_atom0];	@throw mse;

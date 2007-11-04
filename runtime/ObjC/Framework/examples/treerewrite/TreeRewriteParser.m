@@ -1,4 +1,4 @@
-// $ANTLR 3.0 TreeRewrite.g 2007-08-04 18:01:20
+// $ANTLR 3.1b1 TreeRewrite.g 2007-11-04 03:34:43
 
 #import "TreeRewriteParser.h"
 
@@ -23,15 +23,15 @@ static ANTLRBitSet *FOLLOW_TreeRewriteParser_INT_in_subrule53;
 @implementation TreeRewriteParser_rule_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -43,15 +43,15 @@ static ANTLRBitSet *FOLLOW_TreeRewriteParser_INT_in_subrule53;
 @implementation TreeRewriteParser_subrule_return
 - (id) tree
 {
-	return tree;
+    return tree;
 }
 - (void) setTree:(id)aTree
 {
-	if (tree != aTree) {
-		[aTree retain];
-		[tree release];
-		tree = aTree;
-	}
+    if (tree != aTree) {
+        [aTree retain];
+        [tree release];
+        tree = aTree;
+    }
 }
 
 - (void) dealloc
@@ -105,6 +105,7 @@ static NSArray *tokenNames;
 // TreeRewrite.g:8:1: rule : INT subrule -> ^( subrule INT ) ;
 - (TreeRewriteParser_rule_return *) rule
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     TreeRewriteParser_rule_return * _retval = [[[TreeRewriteParser_rule_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -119,22 +120,22 @@ static NSArray *tokenNames;
     ANTLRRewriteRuleSubtreeStream *_stream_subrule=[[ANTLRRewriteRuleSubtreeStream alloc] initWithTreeAdaptor:treeAdaptor description:@"rule subrule"];
 
     @try {
-        // TreeRewrite.g:8:7: ( INT subrule -> ^( subrule INT ) ) // ruleBlockSingleAlt
+        // TreeRewrite.g:8:5: ( INT subrule -> ^( subrule INT ) ) // ruleBlockSingleAlt
         // TreeRewrite.g:8:7: INT subrule // alt
         {
         _INT1=(id<ANTLRToken> )[input LT:1];
         [self match:input tokenType:TreeRewriteParser_INT follow:FOLLOW_TreeRewriteParser_INT_in_rule26]; 
         [_stream_TreeRewriteParser_INT addElement:_INT1];
 
-        [following addObject:FOLLOW_subrule_in_rule28];
+        [[_state following] addObject:FOLLOW_subrule_in_rule28];
         _subrule2 = [self subrule];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_subrule addElement:[_subrule2 tree]];
 
         // AST REWRITE
-        // elements: subrule, TreeRewriteParser_INT
+        // elements: TreeRewriteParser_INT, subrule
         // token labels: 
         // rule labels: retval
         // token list labels: 
@@ -188,6 +189,7 @@ static NSArray *tokenNames;
 // TreeRewrite.g:11:1: subrule : INT ;
 - (TreeRewriteParser_subrule_return *) subrule
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     TreeRewriteParser_subrule_return * _retval = [[[TreeRewriteParser_subrule_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -198,7 +200,7 @@ static NSArray *tokenNames;
     id _INT3_tree = nil;
 
     @try {
-        // TreeRewrite.g:12:9: ( INT ) // ruleBlockSingleAlt
+        // TreeRewrite.g:12:5: ( INT ) // ruleBlockSingleAlt
         // TreeRewrite.g:12:9: INT // alt
         {
         root_0 = (id)[treeAdaptor newEmptyTree];

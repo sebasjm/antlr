@@ -1,4 +1,4 @@
-// $ANTLR 3.1b1 SimpleC.g 2007-10-28 20:35:07
+// $ANTLR 3.1b1 SimpleC.g 2007-11-04 03:29:05
 
 #import "SimpleCLexer.h"
 
@@ -47,8 +47,8 @@ static NSArray *tokenNames;
 
 - (void) mT21
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_T21;
         // SimpleC.g:7:5: ( ';' ) // ruleBlockSingleAlt
         // SimpleC.g:7:7: ';' // alt
@@ -59,10 +59,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -74,8 +73,8 @@ static NSArray *tokenNames;
 
 - (void) mT22
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_T22;
         // SimpleC.g:8:5: ( '(' ) // ruleBlockSingleAlt
         // SimpleC.g:8:7: '(' // alt
@@ -86,10 +85,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -101,8 +99,8 @@ static NSArray *tokenNames;
 
 - (void) mT23
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_T23;
         // SimpleC.g:9:5: ( ',' ) // ruleBlockSingleAlt
         // SimpleC.g:9:7: ',' // alt
@@ -113,10 +111,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -128,8 +125,8 @@ static NSArray *tokenNames;
 
 - (void) mT24
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_T24;
         // SimpleC.g:10:5: ( ')' ) // ruleBlockSingleAlt
         // SimpleC.g:10:7: ')' // alt
@@ -140,10 +137,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -155,8 +151,8 @@ static NSArray *tokenNames;
 
 - (void) mT25
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_T25;
         // SimpleC.g:11:5: ( '{' ) // ruleBlockSingleAlt
         // SimpleC.g:11:7: '{' // alt
@@ -167,10 +163,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -182,8 +177,8 @@ static NSArray *tokenNames;
 
 - (void) mT26
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_T26;
         // SimpleC.g:12:5: ( '}' ) // ruleBlockSingleAlt
         // SimpleC.g:12:7: '}' // alt
@@ -194,10 +189,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -209,8 +203,8 @@ static NSArray *tokenNames;
 
 - (void) mFOR
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_FOR;
         // SimpleC.g:91:5: ( 'for' ) // ruleBlockSingleAlt
         // SimpleC.g:91:7: 'for' // alt
@@ -221,10 +215,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -236,8 +229,8 @@ static NSArray *tokenNames;
 
 - (void) mINT_TYPE
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_INT_TYPE;
         // SimpleC.g:92:10: ( 'int' ) // ruleBlockSingleAlt
         // SimpleC.g:92:12: 'int' // alt
@@ -248,10 +241,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -263,8 +255,8 @@ static NSArray *tokenNames;
 
 - (void) mCHAR
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_CHAR;
         // SimpleC.g:93:5: ( 'char' ) // ruleBlockSingleAlt
         // SimpleC.g:93:7: 'char' // alt
@@ -275,10 +267,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -290,8 +281,8 @@ static NSArray *tokenNames;
 
 - (void) mVOID
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_VOID;
         // SimpleC.g:94:5: ( 'void' ) // ruleBlockSingleAlt
         // SimpleC.g:94:7: 'void' // alt
@@ -302,10 +293,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -317,8 +307,8 @@ static NSArray *tokenNames;
 
 - (void) mID
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_ID;
         // SimpleC.g:96:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* ) // ruleBlockSingleAlt
         // SimpleC.g:96:9: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* // alt
@@ -364,10 +354,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -379,11 +368,11 @@ static NSArray *tokenNames;
 
 - (void) mINT
 {
+    ANTLRLexerState *_state = [self state];
     id<ANTLRToken>  _int = nil;
     NSMutableArray *_list_int = nil;
 
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_INT;
         // SimpleC.g:99:5: ( (int+= ( '0' .. '9' ) )+ ) // ruleBlockSingleAlt
         // SimpleC.g:99:7: (int+= ( '0' .. '9' ) )+ // alt
@@ -427,10 +416,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
         [_list_int release];
@@ -443,8 +431,8 @@ static NSArray *tokenNames;
 
 - (void) mEQ
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_EQ;
         // SimpleC.g:102:6: ( '=' ) // ruleBlockSingleAlt
         // SimpleC.g:102:8: '=' // alt
@@ -455,10 +443,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -470,8 +457,8 @@ static NSArray *tokenNames;
 
 - (void) mEQEQ
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_EQEQ;
         // SimpleC.g:103:6: ( '==' ) // ruleBlockSingleAlt
         // SimpleC.g:103:8: '==' // alt
@@ -482,10 +469,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -497,8 +483,8 @@ static NSArray *tokenNames;
 
 - (void) mLT
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_LT;
         // SimpleC.g:104:6: ( '<' ) // ruleBlockSingleAlt
         // SimpleC.g:104:8: '<' // alt
@@ -509,10 +495,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -524,8 +509,8 @@ static NSArray *tokenNames;
 
 - (void) mPLUS
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_PLUS;
         // SimpleC.g:105:6: ( '+' ) // ruleBlockSingleAlt
         // SimpleC.g:105:8: '+' // alt
@@ -536,10 +521,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -551,8 +535,8 @@ static NSArray *tokenNames;
 
 - (void) mWS
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = SimpleCLexer_WS;
         // SimpleC.g:107:5: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ ) // ruleBlockSingleAlt
         // SimpleC.g:107:9: ( ' ' | '\\t' | '\\r' | '\\n' )+ // alt
@@ -593,14 +577,13 @@ static NSArray *tokenNames;
             cnt3++;
         } while (YES); loop3: ;
 
-         self->_channel=99; 
+         [_state setChannel:99]; 
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 

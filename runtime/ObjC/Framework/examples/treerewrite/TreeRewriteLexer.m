@@ -1,4 +1,4 @@
-// $ANTLR 3.0 TreeRewrite.g 2007-08-04 18:01:20
+// $ANTLR 3.1b1 TreeRewrite.g 2007-11-04 03:34:43
 
 #import "TreeRewriteLexer.h"
 
@@ -47,10 +47,10 @@ static NSArray *tokenNames;
 
 - (void) mINT
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = TreeRewriteLexer_INT;
-        // TreeRewrite.g:15:7: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
+        // TreeRewrite.g:15:5: ( ( '0' .. '9' )+ ) // ruleBlockSingleAlt
         // TreeRewrite.g:15:7: ( '0' .. '9' )+ // alt
         {
         // TreeRewrite.g:15:7: ( '0' .. '9' )+	// positiveClosureBlock
@@ -85,10 +85,9 @@ static NSArray *tokenNames;
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -100,23 +99,22 @@ static NSArray *tokenNames;
 
 - (void) mWS
 {
+    ANTLRLexerState *_state = [self state];
     @try {
-        ruleNestingLevel++;
         int _type = TreeRewriteLexer_WS;
-        // TreeRewrite.g:18:9: ( ' ' ) // ruleBlockSingleAlt
+        // TreeRewrite.g:18:5: ( ' ' ) // ruleBlockSingleAlt
         // TreeRewrite.g:18:9: ' ' // alt
         {
         [self matchChar:' '];
 
 
-        _channel=99;
+        [_state setChannel:99];
 
         }
 
-        self->_tokenType = _type;
+        [_state setTokenType:_type];
     }
     @finally {
-        ruleNestingLevel--;
         // rule cleanup
         // token+rule list labels
 
@@ -127,7 +125,7 @@ static NSArray *tokenNames;
 
 - (void) mTokens
 {
-    // TreeRewrite.g:1:10: ( INT | WS ) //ruleblock
+    // TreeRewrite.g:1:8: ( INT | WS ) //ruleblock
     int alt2=2;
     {
     	int LA2_0 = [input LA:1];

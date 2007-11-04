@@ -1,4 +1,4 @@
-// $ANTLR 3.1b1 SimpleC.g 2007-10-28 20:35:07
+// $ANTLR 3.1b1 SimpleC.g 2007-11-04 03:29:05
 
 #import "SimpleCParser.h"
 
@@ -601,6 +601,7 @@ static NSArray *tokenNames;
 // SimpleC.g:16:1: program : ( declaration )+ ;
 - (SimpleCParser_program_return *) program
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_program_return * _retval = [[[SimpleCParser_program_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -632,9 +633,9 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleC.g:17:9: declaration // alt
         	    {
-        	    [following addObject:FOLLOW_declaration_in_program85];
+        	    [[_state following] addObject:FOLLOW_declaration_in_program85];
         	    _declaration1 = [self declaration];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [treeAdaptor addChild:[_declaration1 tree] toTree:root_0];
@@ -674,6 +675,7 @@ static NSArray *tokenNames;
 // SimpleC.g:20:1: declaration : ( variable | functionHeader ';' -> ^( FUNC_DECL functionHeader ) | functionHeader block -> ^( FUNC_DEF functionHeader block ) );
 - (SimpleCParser_declaration_return *) declaration
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_declaration_return * _retval = [[[SimpleCParser_declaration_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -704,9 +706,9 @@ static NSArray *tokenNames;
         	    {
         	    root_0 = (id)[treeAdaptor newEmptyTree];
 
-        	    [following addObject:FOLLOW_variable_in_declaration105];
+        	    [[_state following] addObject:FOLLOW_variable_in_declaration105];
         	    _variable2 = [self variable];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [treeAdaptor addChild:[_variable2 tree] toTree:root_0];
@@ -716,9 +718,9 @@ static NSArray *tokenNames;
         	case 2 :
         	    // SimpleC.g:22:9: functionHeader ';' // alt
         	    {
-        	    [following addObject:FOLLOW_functionHeader_in_declaration115];
+        	    [[_state following] addObject:FOLLOW_functionHeader_in_declaration115];
         	    _functionHeader3 = [self functionHeader];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [_stream_functionHeader addElement:[_functionHeader3 tree]];
@@ -764,15 +766,15 @@ static NSArray *tokenNames;
         	case 3 :
         	    // SimpleC.g:23:9: functionHeader block // alt
         	    {
-        	    [following addObject:FOLLOW_functionHeader_in_declaration135];
+        	    [[_state following] addObject:FOLLOW_functionHeader_in_declaration135];
         	    _functionHeader5 = [self functionHeader];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [_stream_functionHeader addElement:[_functionHeader5 tree]];
-        	    [following addObject:FOLLOW_block_in_declaration137];
+        	    [[_state following] addObject:FOLLOW_block_in_declaration137];
         	    _block6 = [self block];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [_stream_block addElement:[_block6 tree]];
@@ -838,6 +840,7 @@ static NSArray *tokenNames;
 // SimpleC.g:26:1: variable : type declarator ';' -> ^( VAR_DEF type declarator ) ;
 - (SimpleCParser_variable_return *) variable
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_variable_return * _retval = [[[SimpleCParser_variable_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -858,15 +861,15 @@ static NSArray *tokenNames;
         // SimpleC.g:27:5: ( type declarator ';' -> ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleC.g:27:9: type declarator ';' // alt
         {
-        [following addObject:FOLLOW_type_in_variable166];
+        [[_state following] addObject:FOLLOW_type_in_variable166];
         _type7 = [self type];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_type addElement:[_type7 tree]];
-        [following addObject:FOLLOW_declarator_in_variable168];
+        [[_state following] addObject:FOLLOW_declarator_in_variable168];
         _declarator8 = [self declarator];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_declarator addElement:[_declarator8 tree]];
@@ -934,6 +937,7 @@ static NSArray *tokenNames;
 // SimpleC.g:30:1: declarator : ID ;
 - (SimpleCParser_declarator_return *) declarator
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_declarator_return * _retval = [[[SimpleCParser_declarator_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -979,6 +983,7 @@ static NSArray *tokenNames;
 // SimpleC.g:34:1: functionHeader : type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ;
 - (SimpleCParser_functionHeader_return *) functionHeader
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_functionHeader_return * _retval = [[[SimpleCParser_functionHeader_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -1010,9 +1015,9 @@ static NSArray *tokenNames;
         // SimpleC.g:35:5: ( type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' -> ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
         // SimpleC.g:35:9: type ID '(' ( formalParameter ( ',' formalParameter )* )? ')' // alt
         {
-        [following addObject:FOLLOW_type_in_functionHeader219];
+        [[_state following] addObject:FOLLOW_type_in_functionHeader219];
         _type11 = [self type];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_type addElement:[_type11 tree]];
@@ -1036,9 +1041,9 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleC.g:35:23: formalParameter ( ',' formalParameter )* // alt
         	    {
-        	    [following addObject:FOLLOW_formalParameter_in_functionHeader227];
+        	    [[_state following] addObject:FOLLOW_formalParameter_in_functionHeader227];
         	    _formalParameter14 = [self formalParameter];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [_stream_formalParameter addElement:[_formalParameter14 tree]];
@@ -1059,9 +1064,9 @@ static NSArray *tokenNames;
         	    	    [self match:input tokenType:23 follow:FOLLOW_23_in_functionHeader231]; 
         	    	    [_stream_23 addElement:_char_literal15];
 
-        	    	    [following addObject:FOLLOW_formalParameter_in_functionHeader233];
+        	    	    [[_state following] addObject:FOLLOW_formalParameter_in_functionHeader233];
         	    	    _formalParameter16 = [self formalParameter];
-        	    	    [following removeLastObject];
+        	    	    [[_state following] removeLastObject];
 
 
         	    	    [_stream_formalParameter addElement:[_formalParameter16 tree]];
@@ -1159,6 +1164,7 @@ static NSArray *tokenNames;
 // SimpleC.g:39:1: formalParameter : type declarator -> ^( ARG_DEF type declarator ) ;
 - (SimpleCParser_formalParameter_return *) formalParameter
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_formalParameter_return * _retval = [[[SimpleCParser_formalParameter_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -1176,15 +1182,15 @@ static NSArray *tokenNames;
         // SimpleC.g:40:5: ( type declarator -> ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleC.g:40:9: type declarator // alt
         {
-        [following addObject:FOLLOW_type_in_formalParameter281];
+        [[_state following] addObject:FOLLOW_type_in_formalParameter281];
         _type18 = [self type];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_type addElement:[_type18 tree]];
-        [following addObject:FOLLOW_declarator_in_formalParameter283];
+        [[_state following] addObject:FOLLOW_declarator_in_formalParameter283];
         _declarator19 = [self declarator];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_declarator addElement:[_declarator19 tree]];
@@ -1247,6 +1253,7 @@ static NSArray *tokenNames;
 // SimpleC.g:43:1: type : ( 'int' | 'char' | 'void' | ID );
 - (SimpleCParser_type_return *) type
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_type_return * _retval = [[[SimpleCParser_type_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -1270,7 +1277,7 @@ static NSArray *tokenNames;
         	[_set20_tree release];
 
         	[input consume];
-        	errorRecovery = NO;
+        	[_state setIsErrorRecovery:NO];
         } else {
         	ANTLRMismatchedSetException *mse = [ANTLRMismatchedSetException exceptionWithSet:nil stream:input];
         	[self recoverFromMismatchedSet:input exception:mse follow:FOLLOW_set_in_type0];	@throw mse;
@@ -1300,6 +1307,7 @@ static NSArray *tokenNames;
 // SimpleC.g:50:1: block : lc= '{' ( variable )* ( stat )* '}' -> ^( BLOCK[$lc,@\"BLOCK\"] ( variable )* ( stat )* ) ;
 - (SimpleCParser_block_return *) block
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_block_return * _retval = [[[SimpleCParser_block_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -1349,9 +1357,9 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleC.g:52:13: variable // alt
         	    {
-        	    [following addObject:FOLLOW_variable_in_block390];
+        	    [[_state following] addObject:FOLLOW_variable_in_block390];
         	    _variable21 = [self variable];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [_stream_variable addElement:[_variable21 tree]];
@@ -1377,9 +1385,9 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleC.g:53:13: stat // alt
         	    {
-        	    [following addObject:FOLLOW_stat_in_block405];
+        	    [[_state following] addObject:FOLLOW_stat_in_block405];
         	    _stat22 = [self stat];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [_stream_stat addElement:[_stat22 tree]];
@@ -1467,6 +1475,7 @@ static NSArray *tokenNames;
 // SimpleC.g:58:1: stat : ( forStat | expr ';' | block | assignStat ';' | ';' );
 - (SimpleCParser_stat_return *) stat
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_stat_return * _retval = [[[SimpleCParser_stat_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -1532,9 +1541,9 @@ static NSArray *tokenNames;
         	    {
         	    root_0 = (id)[treeAdaptor newEmptyTree];
 
-        	    [following addObject:FOLLOW_forStat_in_stat449];
+        	    [[_state following] addObject:FOLLOW_forStat_in_stat449];
         	    _forStat24 = [self forStat];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [treeAdaptor addChild:[_forStat24 tree] toTree:root_0];
@@ -1546,9 +1555,9 @@ static NSArray *tokenNames;
         	    {
         	    root_0 = (id)[treeAdaptor newEmptyTree];
 
-        	    [following addObject:FOLLOW_expr_in_stat457];
+        	    [[_state following] addObject:FOLLOW_expr_in_stat457];
         	    _expr25 = [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [treeAdaptor addChild:[_expr25 tree] toTree:root_0];
@@ -1562,9 +1571,9 @@ static NSArray *tokenNames;
         	    {
         	    root_0 = (id)[treeAdaptor newEmptyTree];
 
-        	    [following addObject:FOLLOW_block_in_stat468];
+        	    [[_state following] addObject:FOLLOW_block_in_stat468];
         	    _block27 = [self block];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [treeAdaptor addChild:[_block27 tree] toTree:root_0];
@@ -1576,9 +1585,9 @@ static NSArray *tokenNames;
         	    {
         	    root_0 = (id)[treeAdaptor newEmptyTree];
 
-        	    [following addObject:FOLLOW_assignStat_in_stat476];
+        	    [[_state following] addObject:FOLLOW_assignStat_in_stat476];
         	    _assignStat28 = [self assignStat];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [treeAdaptor addChild:[_assignStat28 tree] toTree:root_0];
@@ -1620,6 +1629,7 @@ static NSArray *tokenNames;
 // SimpleC.g:65:1: forStat : 'for' '(' start= assignStat ';' expr ';' next= assignStat ')' block -> ^( 'for' $start expr $next block ) ;
 - (SimpleCParser_forStat_return *) forStat
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_forStat_return * _retval = [[[SimpleCParser_forStat_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -1664,9 +1674,9 @@ static NSArray *tokenNames;
         [self match:input tokenType:22 follow:FOLLOW_22_in_forStat509]; 
         [_stream_22 addElement:_char_literal32];
 
-        [following addObject:FOLLOW_assignStat_in_forStat513];
+        [[_state following] addObject:FOLLOW_assignStat_in_forStat513];
         _start = [self assignStat];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_assignStat addElement:[_start tree]];
@@ -1674,9 +1684,9 @@ static NSArray *tokenNames;
         [self match:input tokenType:21 follow:FOLLOW_21_in_forStat515]; 
         [_stream_21 addElement:_char_literal33];
 
-        [following addObject:FOLLOW_expr_in_forStat517];
+        [[_state following] addObject:FOLLOW_expr_in_forStat517];
         _expr34 = [self expr];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_expr addElement:[_expr34 tree]];
@@ -1684,9 +1694,9 @@ static NSArray *tokenNames;
         [self match:input tokenType:21 follow:FOLLOW_21_in_forStat519]; 
         [_stream_21 addElement:_char_literal35];
 
-        [following addObject:FOLLOW_assignStat_in_forStat523];
+        [[_state following] addObject:FOLLOW_assignStat_in_forStat523];
         _next = [self assignStat];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_assignStat addElement:[_next tree]];
@@ -1694,9 +1704,9 @@ static NSArray *tokenNames;
         [self match:input tokenType:24 follow:FOLLOW_24_in_forStat525]; 
         [_stream_24 addElement:_char_literal36];
 
-        [following addObject:FOLLOW_block_in_forStat527];
+        [[_state following] addObject:FOLLOW_block_in_forStat527];
         _block37 = [self block];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_block addElement:[_block37 tree]];
@@ -1767,6 +1777,7 @@ static NSArray *tokenNames;
 // SimpleC.g:70:1: assignStat : ID EQ expr -> ^( EQ ID expr ) ;
 - (SimpleCParser_assignStat_return *) assignStat
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_assignStat_return * _retval = [[[SimpleCParser_assignStat_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -1795,9 +1806,9 @@ static NSArray *tokenNames;
         [self match:input tokenType:SimpleCParser_EQ follow:FOLLOW_SimpleCParser_EQ_in_assignStat572]; 
         [_stream_SimpleCParser_EQ addElement:_EQ39];
 
-        [following addObject:FOLLOW_expr_in_assignStat574];
+        [[_state following] addObject:FOLLOW_expr_in_assignStat574];
         _expr40 = [self expr];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [_stream_expr addElement:[_expr40 tree]];
@@ -1859,6 +1870,7 @@ static NSArray *tokenNames;
 // SimpleC.g:74:1: expr : condExpr ;
 - (SimpleCParser_expr_return *) expr
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_expr_return * _retval = [[[SimpleCParser_expr_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -1874,9 +1886,9 @@ static NSArray *tokenNames;
         {
         root_0 = (id)[treeAdaptor newEmptyTree];
 
-        [following addObject:FOLLOW_condExpr_in_expr598];
+        [[_state following] addObject:FOLLOW_condExpr_in_expr598];
         _condExpr41 = [self condExpr];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [treeAdaptor addChild:[_condExpr41 tree] toTree:root_0];
@@ -1904,6 +1916,7 @@ static NSArray *tokenNames;
 // SimpleC.g:77:1: condExpr : aexpr ( ( '==' | '<' ) aexpr )? ;
 - (SimpleCParser_condExpr_return *) condExpr
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_condExpr_return * _retval = [[[SimpleCParser_condExpr_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -1925,9 +1938,9 @@ static NSArray *tokenNames;
         {
         root_0 = (id)[treeAdaptor newEmptyTree];
 
-        [following addObject:FOLLOW_aexpr_in_condExpr617];
+        [[_state following] addObject:FOLLOW_aexpr_in_condExpr617];
         _aexpr42 = [self aexpr];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [treeAdaptor addChild:[_aexpr42 tree] toTree:root_0];
@@ -1986,9 +1999,9 @@ static NSArray *tokenNames;
 
         	    }
 
-        	    [following addObject:FOLLOW_aexpr_in_condExpr631];
+        	    [[_state following] addObject:FOLLOW_aexpr_in_condExpr631];
         	    _aexpr45 = [self aexpr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [treeAdaptor addChild:[_aexpr45 tree] toTree:root_0];
@@ -2022,6 +2035,7 @@ static NSArray *tokenNames;
 // SimpleC.g:81:1: aexpr : atom ( '+' atom )* ;
 - (SimpleCParser_aexpr_return *) aexpr
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_aexpr_return * _retval = [[[SimpleCParser_aexpr_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -2041,9 +2055,9 @@ static NSArray *tokenNames;
         {
         root_0 = (id)[treeAdaptor newEmptyTree];
 
-        [following addObject:FOLLOW_atom_in_aexpr653];
+        [[_state following] addObject:FOLLOW_atom_in_aexpr653];
         _atom46 = [self atom];
-        [following removeLastObject];
+        [[_state following] removeLastObject];
 
 
         [treeAdaptor addChild:[_atom46 tree] toTree:root_0];
@@ -2066,9 +2080,9 @@ static NSArray *tokenNames;
         	    root_0 = (id)[treeAdaptor makeNode:_char_literal47_tree parentOf:root_0];
         	    [_char_literal47_tree release];
 
-        	    [following addObject:FOLLOW_atom_in_aexpr660];
+        	    [[_state following] addObject:FOLLOW_atom_in_aexpr660];
         	    _atom48 = [self atom];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [treeAdaptor addChild:[_atom48 tree] toTree:root_0];
@@ -2105,6 +2119,7 @@ static NSArray *tokenNames;
 // SimpleC.g:85:1: atom : ( ID | INT | '(' expr ')' -> expr );
 - (SimpleCParser_atom_return *) atom
 {
+    ANTLRBaseRecognizerState *_state = [self state];
     SimpleCParser_atom_return * _retval = [[[SimpleCParser_atom_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
@@ -2180,9 +2195,9 @@ static NSArray *tokenNames;
         	    [self match:input tokenType:22 follow:FOLLOW_22_in_atom708]; 
         	    [_stream_22 addElement:_char_literal51];
 
-        	    [following addObject:FOLLOW_expr_in_atom710];
+        	    [[_state following] addObject:FOLLOW_expr_in_atom710];
         	    _expr52 = [self expr];
-        	    [following removeLastObject];
+        	    [[_state following] removeLastObject];
 
 
         	    [_stream_expr addElement:[_expr52 tree]];
