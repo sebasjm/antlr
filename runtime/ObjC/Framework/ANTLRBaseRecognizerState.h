@@ -1,5 +1,5 @@
 // [The "BSD licence"]
-// Copyright (c) 2006-2007 Kay Roepke
+// Copyright (c) 2007 Kay Roepke
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,54 +24,35 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #import <Cocoa/Cocoa.h>
-#import <ANTLR/ANTLRTokenSource.h>
-#import <ANTLR/ANTLRBaseRecognizer.h>
-#import <ANTLR/ANTLRCharStream.h>
-#import <ANTLR/ANTLRToken.h>
-#import <ANTLR/ANTLRCommonToken.h>
-#import <ANTLR/ANTLRRecognitionException.h>
-#import <ANTLR/ANTLRMismatchedTokenException.h>
-#import <ANTLR/ANTLRMismatchedRangeException.h>
-#import <ANTLR/ANTLRLexerState.h>
 
-@interface ANTLRLexer : ANTLRBaseRecognizer <ANTLRTokenSource> {
-	id<ANTLRCharStream> input;      ///< The character stream we pull tokens out of.
-	unsigned int ruleNestingLevel;
+@interface ANTLRBaseRecognizerState : NSObject {
+	NSMutableArray *following;			// a stack of FOLLOW bitsets used for context sensitive prediction and recovery
+	NSMutableArray *ruleMemo;			// store previous results of matching rules so we don't have to do it again. Hook in incremental stuff here, too.
+	BOOL errorRecovery;					// are we recovering?
+	BOOL failed;						// indicate that some match failed
+	int backtracking;					// the level of backtracking
+	int lastErrorIndex;
 }
 
-#pragma mark Initializer
-- (id) initWithCharStream:(id<ANTLRCharStream>)anInput;
+- (void) reset;
 
-- (ANTLRLexerState *) state;
+- (NSMutableArray *) following;
+- (NSMutableArray *) ruleMemo;
 
-#pragma mark Tokens
-- (id<ANTLRToken>) token;
-- (void) setToken: (id<ANTLRToken>) aToken;
-- (id<ANTLRToken>) nextToken;
-- (void) mTokens;		// abstract, defined in generated sources
-- (id<ANTLRCharStream>) input;
-- (void) setInput:(id<ANTLRCharStream>)aCharStream;
+- (BOOL) isErrorRecovery;
+- (void) setIsErrorRecovery: (BOOL) flag;
 
-- (void) emit;
-- (void) emit:(id<ANTLRToken>)aToken;
+- (BOOL) isFailed;
+- (void) setIsFailed: (BOOL) flag;
 
-#pragma mark Matching
-- (void) matchString:(NSString *)aString;
-- (void) matchAny;
-- (void) matchChar:(unichar) aChar;
-- (void) matchRangeFromChar:(unichar)fromChar to:(unichar)toChar;
+- (int) backtracking;
+- (void) setBacktracking:(int) value;
+- (void) increaseBacktracking;
+- (void) decreaseBacktracking;
+- (BOOL) isBacktracking;
 
-#pragma mark Informational
-- (unsigned int) line;
-- (unsigned int) charPositionInLine;
-- (int) charIndex;
-- (NSString *) text;
-- (void) setText:(NSString *) theText;
-
-// error handling
-- (void) reportError:(ANTLRRecognitionException *)e;
-- (void) recover:(ANTLRRecognitionException *)e;
+- (int) lastErrorIndex;
+- (void) setLastErrorIndex:(int) value;
 
 @end

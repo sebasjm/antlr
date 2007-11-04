@@ -13,10 +13,10 @@
 
 - (NSString *)debuggerDescription
 {
-	NSString *text = [self text];
+	NSString *_text = [self text];
 	NSMutableString *escapedText;
-	if (text) {
-		escapedText = [text mutableCopy];
+	if (_text) {
+		escapedText = [_text mutableCopy];
 		NSRange wholeString = NSMakeRange(0,[escapedText length]);
 		[escapedText replaceOccurrencesOfString:@"%" withString:@"%25" options:0 range:wholeString];
 		[escapedText replaceOccurrencesOfString:@"\n" withString:@"%0A" options:0 range:wholeString];

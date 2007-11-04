@@ -36,51 +36,66 @@
 - (id) init
 {
 	if (nil != (self = [super init])) {
-		following = [[NSMutableArray alloc] init];
-		errorRecovery = NO;
-		lastErrorIndex = -1;
-		failed = NO;
-		backtracking = 0;
+		state = [[[self stateClass] alloc] init];
 	}
 	return self;
 }
 
 - (void) dealloc
 {
-	[following release];
+	[state release];
 	[super dealloc];
 }
 
 - (BOOL) isFailed
 {
-	return failed;
+	return [state isFailed];
 }
 
 - (void) setIsFailed: (BOOL) flag
 {
-	failed = flag;
+	[state setIsFailed:flag];
 }
 
 - (BOOL) isBacktracking
 {
-	return backtracking > 0;
+	return [state isBacktracking];
 }
 
 - (int) backtrackingLevel
 {
-	return backtracking;
+	return [state backtracking];
 }
+
+- (void) setBacktrackingLevel:(int) level
+{
+	[state setBacktracking:level];
+}
+
+- (ANTLRBaseRecognizerState *) state
+{
+	return state;
+}
+
+- (void) setState:(ANTLRBaseRecognizerState *) theState
+{
+	if (state != theState) {
+		[state release];
+		state = [theState retain];
+	}
+}
+
+- (Class) stateClass
+{
+	return [ANTLRBaseRecognizerState class];
+}
+
 
 // reset the recognizer to the initial state. does not touch the token source!
 // this can be extended by the grammar writer to reset custom ivars
 - (void) reset
 {
-	errorRecovery = NO;
-	lastErrorIndex = -1;
-	failed = NO;
-	backtracking = 0;
-	[following removeAllObjects]; 
-	[ruleMemo removeAllObjects];
+	[state reset];
 }
 
 // where do we get our input from - subclass responsibility
@@ -102,12 +117,12 @@
 	ANTLRTokenType _ttype = [input LA:1];
 	if (_ttype == ttype) {
 		[input consume];
-		errorRecovery = NO;
-		failed = NO;
+		[state setIsErrorRecovery:NO];
+		[state setIsFailed:NO];
 		return;
 	}
-	if (backtracking > 0) {
-		failed = YES;
+	if ([state isBacktracking]) {
+		[state setIsFailed:YES];
 		return;
 	}
 	[self mismatch:input tokenType:ttype follow:follow];
@@ -123,18 +138,18 @@
 // just consume the next symbol and reset the error ivars
 - (void) matchAny:(id<ANTLRIntStream>)input
 {
-	errorRecovery = NO;
-	failed = NO;
+	[state setIsErrorRecovery:NO];
+	[state setIsFailed:NO];
 	[input consume];
 }
 
 // everything failed. report the error
 - (void) reportError:(NSException *)e
 {
-	if (errorRecovery) {
+	if ([state isErrorRecovery]) {
 		return;
 	}
-	errorRecovery = YES;
+	[state setIsErrorRecovery:YES];
 	[self displayRecognitionError:NSStringFromClass([self class]) tokenNames:[self tokenNames] exception:e];
 }
 
@@ -147,10 +162,10 @@
 // try to recover from a mismatch by resyncing
 - (void) recover:(id<ANTLRIntStream>)input exception:(NSException *)e
 {
-	if (lastErrorIndex == [input index]) {
+	if ([state lastErrorIndex] == [input index]) {
 		[input consume];
 	}
-	lastErrorIndex = [input index];
+	[state setLastErrorIndex:[input index]];
 	ANTLRBitSet *followSet = [self computeErrorRecoverySet];
 	[self beginResync];
 	[self consumeUntil:input bitSet:followSet];
@@ -192,6 +207,7 @@
 {
 	ANTLRBitSet *followSet = [[[ANTLRBitSet alloc] init] autorelease];
 	int i;
+	NSMutableArray *following = [state following];
 	for (i = [following count]-1; i >= 0; i--) {
 		ANTLRBitSet *localFollowSet = [following objectAtIndex:i];
 		[followSet orInPlace:localFollowSet];
@@ -288,7 +304,7 @@
 
 - (void) pushFollow:(ANTLRBitSet *)follow
 {
-	[following addObject:follow];
+	[[state following] addObject:follow];
 }
 
 
@@ -362,14 +378,14 @@
 
 - (int) ruleMemoization:(unsigned int)ruleIndex startIndex:(int)ruleStartIndex
 {
-	if ([ruleMemo count] < ruleIndex) {
-		[ruleMemo setObject:[NSMutableDictionary dictionary] forKey:[NSNumber numberWithInt:ruleIndex]];
-	}
-	NSNumber *stopIndexI = [ruleMemo objectForKey:[NSNumber numberWithInt:ruleIndex]];
-	if (stopIndexI == nil) {
+	NSMutableArray *ruleMemo = [state ruleMemo];
+	NSAssert([ruleMemo count] >= ruleIndex, @"memoization ruleIndex is out of bounds!");
+
+	NSNumber *stopIndexNumber = [[ruleMemo objectAtIndex:ruleIndex] objectForKey:[NSNumber numberWithInt:ruleStartIndex]];
+	if (stopIndexNumber == nil) {
 		return ANTLR_MEMO_RULE_UNKNOWN;
 	} else {
-		return [stopIndexI intValue];
+		return [stopIndexNumber intValue];
 	}
 }
 
@@ -380,7 +396,7 @@
 		return NO;
 	}
 	if (stopIndex == ANTLR_MEMO_RULE_FAILED) {
-		failed = YES;
+		[state setIsFailed:YES];
 	} else {
 		[input seek:stopIndex+1];
 	}
@@ -391,16 +407,20 @@
 	   ruleIndex:(int)ruleIndex
 	  startIndex:(int)ruleStartIndex
 {
-	int stopTokenIndex = failed ? ANTLR_MEMO_RULE_FAILED : [input index]-1;
-	if ([ruleMemo objectForKey:[NSNumber numberWithInt:ruleIndex]] == nil) {
-		[ruleMemo setObject:[NSNumber numberWithInt:stopTokenIndex] forKey:[NSNumber numberWithInt:ruleStartIndex]];
+	NSMutableArray *ruleMemo = [state ruleMemo];
+	NSAssert([ruleMemo count] >= ruleIndex, @"memoization ruleIndex is out of bounds!");
+
+	int stopTokenIndex = [state isFailed] ? ANTLR_MEMO_RULE_FAILED : [input index]-1;
+	NSMutableDictionary *ruleMemoDict = [ruleMemo objectAtIndex:ruleIndex];
+	if ([ruleMemoDict objectForKey:[NSNumber numberWithInt:ruleStartIndex]] == nil) {
+		[ruleMemoDict setObject:[NSNumber numberWithInt:stopTokenIndex] forKey:[NSNumber numberWithInt:ruleStartIndex]];
 	}
 }
 
 - (int) ruleMemoizationCacheSize
 {
 	int n = 0;
-	
+	NSMutableArray *ruleMemo = [state ruleMemo];
 	NSEnumerator *ruleEnumerator = [ruleMemo objectEnumerator];
 	id value;
 	while ((value = [ruleEnumerator nextObject])) {
@@ -412,8 +432,8 @@
 // call a syntactic predicate methods using its selector. this way we can support arbitrary synpreds.
 - (BOOL) evaluateSyntacticPredicate:(SEL)synpredFragment // stream:(id<ANTLRIntStream>)input
 {
-    backtracking++;
-	[self beginBacktracking:backtracking];
+    [state increaseBacktracking];
+	[self beginBacktracking:[state backtracking]];
 	int start = [[self input] mark];
     @try {
         [self performSelector:synpredFragment];
@@ -421,11 +441,11 @@
     @catch (ANTLRRecognitionException *re) {
         NSLog(@"impossible synpred: %@", re);
     }
-    BOOL success = !failed;
+    BOOL success = ![state isFailed];
     [[self input] rewind:start];
-	[self endBacktracking:backtracking wasSuccessful:success];
-	backtracking--;
-    failed = NO;
+	[self endBacktracking:[state backtracking] wasSuccessful:success];
+	[state decreaseBacktracking];
+	[state setIsFailed:NO];
     return success;
 }	
 

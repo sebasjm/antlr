@@ -40,17 +40,11 @@
 #import <ANTLR/ANTLRRecognitionException.h>
 #import <ANTLR/ANTLRMismatchedTokenException.h>
 #import <ANTLR/ANTLRToken.h>
+#import <ANTLR/ANTLRBaseRecognizerState.h>
 
 @interface ANTLRBaseRecognizer : NSObject {
-	NSMutableArray *following;			// a stack of FOLLOW bitsets used for context sensitive prediction and recovery
-	BOOL errorRecovery;					// are we recovering?
-	int lastErrorIndex;
-	BOOL failed;						// indicate that some match failed
-	int backtracking;					// the level of backtracking
-	NSMutableDictionary *ruleMemo;		// store previous results of matching rules so we don't have to do it again. Hook in incremental stuff here, too.
-	
+	ANTLRBaseRecognizerState *state;	// the state of this recognizer. Might be shared with other recognizers, e.g. in grammar import scenarios.
 	NSString *grammarFileName;			// where did the grammar come from. filled in by codegeneration
-	
 }
 
 // simple accessors
@@ -59,8 +53,13 @@
 
 - (BOOL) isBacktracking;
 - (int) backtrackingLevel;
+- (void) setBacktrackingLevel:(int) level;
 
 - (id) init;
+
+- (ANTLRBaseRecognizerState *) state;
+- (void) setState:(ANTLRBaseRecognizerState *) theState;
+- (Class) stateClass;
 
 // reset this recognizer - might be extended by codegeneration/grammar
 - (void) reset;

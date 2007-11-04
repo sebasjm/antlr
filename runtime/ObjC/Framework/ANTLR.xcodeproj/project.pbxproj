@@ -140,6 +140,10 @@
 		F79D5AF60A0E634900EA3CEE /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F79D5AF70A0E634A00EA3CEE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		F79D5AF80A0E634A00EA3CEE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		F7B1E5B00CD7CF1900CE136E /* ANTLRBaseRecognizerState.h in Headers */ = {isa = PBXBuildFile; fileRef = F7B1E5AC0CD7CF1900CE136E /* ANTLRBaseRecognizerState.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F7B1E5B10CD7CF1900CE136E /* ANTLRBaseRecognizerState.m in Sources */ = {isa = PBXBuildFile; fileRef = F7B1E5AD0CD7CF1900CE136E /* ANTLRBaseRecognizerState.m */; };
+		F7B1E5B20CD7CF1900CE136E /* ANTLRLexerState.h in Headers */ = {isa = PBXBuildFile; fileRef = F7B1E5AE0CD7CF1900CE136E /* ANTLRLexerState.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F7B1E5B30CD7CF1900CE136E /* ANTLRLexerState.m in Sources */ = {isa = PBXBuildFile; fileRef = F7B1E5AF0CD7CF1900CE136E /* ANTLRLexerState.m */; };
 		F7CD47650C64D24C00FF933A /* TreeRewriteLexer.m in Sources */ = {isa = PBXBuildFile; fileRef = F7CD46360C64BB7300FF933A /* TreeRewriteLexer.m */; };
 		F7CD47660C64D24D00FF933A /* TreeRewriteParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F7CD46380C64BB7300FF933A /* TreeRewriteParser.m */; };
 		F7CD47670C64D24D00FF933A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F7CD45FC0C64BA4B00FF933A /* main.m */; };
@@ -432,6 +436,10 @@
 		F7A4098C09659BF3002CC781 /* ANTLRBaseRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRBaseRecognizer.m; sourceTree = "<group>"; };
 		F7A4099109659BFB002CC781 /* ANTLRLexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRLexer.h; sourceTree = "<group>"; };
 		F7A4099209659BFB002CC781 /* ANTLRLexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRLexer.m; sourceTree = "<group>"; };
+		F7B1E5AC0CD7CF1900CE136E /* ANTLRBaseRecognizerState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRBaseRecognizerState.h; sourceTree = "<group>"; };
+		F7B1E5AD0CD7CF1900CE136E /* ANTLRBaseRecognizerState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRBaseRecognizerState.m; sourceTree = "<group>"; };
+		F7B1E5AE0CD7CF1900CE136E /* ANTLRLexerState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRLexerState.h; sourceTree = "<group>"; };
+		F7B1E5AF0CD7CF1900CE136E /* ANTLRLexerState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRLexerState.m; sourceTree = "<group>"; };
 		F7CD45FC0C64BA4B00FF933A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F7CD45FD0C64BA4B00FF933A /* TreeRewrite.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TreeRewrite.g; sourceTree = "<group>"; };
 		F7CD46340C64BB7300FF933A /* TreeRewrite.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TreeRewrite.tokens; sourceTree = "<group>"; };
@@ -884,8 +892,12 @@
 			children = (
 				F7A4098B09659BF3002CC781 /* ANTLRBaseRecognizer.h */,
 				F7A4098C09659BF3002CC781 /* ANTLRBaseRecognizer.m */,
+				F7B1E5AC0CD7CF1900CE136E /* ANTLRBaseRecognizerState.h */,
+				F7B1E5AD0CD7CF1900CE136E /* ANTLRBaseRecognizerState.m */,
 				F7A4099109659BFB002CC781 /* ANTLRLexer.h */,
 				F7A4099209659BFB002CC781 /* ANTLRLexer.m */,
+				F7B1E5AE0CD7CF1900CE136E /* ANTLRLexerState.h */,
+				F7B1E5AF0CD7CF1900CE136E /* ANTLRLexerState.m */,
 				F7009AD90A1BE4AE002EDD5D /* ANTLRLexerRuleReturnScope.h */,
 				F7009ADA0A1BE4AE002EDD5D /* ANTLRLexerRuleReturnScope.m */,
 				F700E8F90A5FAD21005D0757 /* ANTLRParser.h */,
@@ -1026,6 +1038,8 @@
 				F71325880C4A060900B99F2D /* ANTLRRewriteRuleElementStream.h in Headers */,
 				F70B11BD0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.h in Headers */,
 				F70B11C30C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.h in Headers */,
+				F7B1E5B00CD7CF1900CE136E /* ANTLRBaseRecognizerState.h in Headers */,
+				F7B1E5B20CD7CF1900CE136E /* ANTLRLexerState.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1433,6 +1447,8 @@
 				F71325890C4A060900B99F2D /* ANTLRRewriteRuleElementStream.m in Sources */,
 				F70B11BE0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.m in Sources */,
 				F70B11C40C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.m in Sources */,
+				F7B1E5B10CD7CF1900CE136E /* ANTLRBaseRecognizerState.m in Sources */,
+				F7B1E5B30CD7CF1900CE136E /* ANTLRLexerState.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

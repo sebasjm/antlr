@@ -1,5 +1,5 @@
 // [The "BSD licence"]
-// Copyright (c) 2006-2007 Kay Roepke
+// Copyright (c) 2007 Kay Roepke
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -24,54 +24,42 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #import <Cocoa/Cocoa.h>
-#import <ANTLR/ANTLRTokenSource.h>
-#import <ANTLR/ANTLRBaseRecognizer.h>
-#import <ANTLR/ANTLRCharStream.h>
 #import <ANTLR/ANTLRToken.h>
-#import <ANTLR/ANTLRCommonToken.h>
-#import <ANTLR/ANTLRRecognitionException.h>
-#import <ANTLR/ANTLRMismatchedTokenException.h>
-#import <ANTLR/ANTLRMismatchedRangeException.h>
-#import <ANTLR/ANTLRLexerState.h>
+#import <ANTLR/ANTLRBaseRecognizerState.h>
 
-@interface ANTLRLexer : ANTLRBaseRecognizer <ANTLRTokenSource> {
-	id<ANTLRCharStream> input;      ///< The character stream we pull tokens out of.
-	unsigned int ruleNestingLevel;
+@interface ANTLRLexerState : ANTLRBaseRecognizerState {
+	id<ANTLRToken> token;					///< The current token that will be emitted next.
+    
+    unsigned int tokenType;					///< The type of the current token.
+    unsigned int channel;					///< The token channel number to be used for the current token.
+    unsigned int tokenStartLine;			///< The line number of the first character of the current token appeared in.
+    unsigned int tokenCharPositionInLine;	///< The character index of the first character of the current token within the current line.
+	int tokenStartCharIndex;				///< The index of the first character of the current token. Default is -1 for an undefined value.
+    NSString *text;							///< The text for the current token to be emitted next. If nil, we just refer to the start and stop indices into the character stream.
 }
 
-#pragma mark Initializer
-- (id) initWithCharStream:(id<ANTLRCharStream>)anInput;
+- (void) reset;
 
-- (ANTLRLexerState *) state;
-
-#pragma mark Tokens
 - (id<ANTLRToken>) token;
-- (void) setToken: (id<ANTLRToken>) aToken;
-- (id<ANTLRToken>) nextToken;
-- (void) mTokens;		// abstract, defined in generated sources
-- (id<ANTLRCharStream>) input;
-- (void) setInput:(id<ANTLRCharStream>)aCharStream;
+- (void) setToken:(id<ANTLRToken>) theToken;
 
-- (void) emit;
-- (void) emit:(id<ANTLRToken>)aToken;
+- (unsigned int) tokenType;
+- (void) setTokenType:(unsigned int) theTokenType;
 
-#pragma mark Matching
-- (void) matchString:(NSString *)aString;
-- (void) matchAny;
-- (void) matchChar:(unichar) aChar;
-- (void) matchRangeFromChar:(unichar)fromChar to:(unichar)toChar;
+- (unsigned int) channel;
+- (void) setChannel:(unsigned int) theChannel;
 
-#pragma mark Informational
-- (unsigned int) line;
-- (unsigned int) charPositionInLine;
-- (int) charIndex;
+- (unsigned int) tokenStartLine;
+- (void) setTokenStartLine:(unsigned int) theTokenStartLine;
+
+- (unsigned int) tokenCharPositionInLine;
+- (void) setTokenCharPositionInLine:(unsigned int) theCharPosition;
+
+- (int) tokenStartCharIndex;
+- (void) setTokenStartCharIndex:(int) theTokenStartCharIndex;
+
 - (NSString *) text;
 - (void) setText:(NSString *) theText;
-
-// error handling
-- (void) reportError:(ANTLRRecognitionException *)e;
-- (void) recover:(ANTLRRecognitionException *)e;
 
 @end
