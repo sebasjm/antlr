@@ -64,6 +64,11 @@ class _Main(object):
             dest="interactive"
             )
         optParser.add_option(
+            "--no-output",
+            action="store_true",
+            dest="no_output"
+            )
+        optParser.add_option(
             "--profile",
             action="store_true",
             dest="profile"
@@ -153,7 +158,16 @@ class _Main(object):
     def parseStream(self, options, inStream):
         raise NotImplementedError
 
-    
+
+    def write(self, options, text):
+        if not options.no_output:
+            self.stdout.write(text)
+
+
+    def writeln(self, options, text):
+        self.write(options, text + '\n')
+
+
 class LexerMain(_Main):
     def __init__(self, lexerClass):
         _Main.__init__(self)
@@ -164,7 +178,7 @@ class LexerMain(_Main):
     def parseStream(self, options, inStream):
         lexer = self.lexerClass(inStream)
         for token in lexer:
-            self.stdout.write(str(token) + '\n')
+            self.writeln(options, str(token))
 
 
 class ParserMain(_Main):
@@ -205,9 +219,9 @@ class ParserMain(_Main):
         if result is not None:
             if hasattr(result, 'tree'):
                 if result.tree is not None:
-                    self.stdout.write(result.tree.toStringTree() + '\n')
+                    self.writeln(options, result.tree.toStringTree())
             else:
-                self.stdout.write(repr(result) + '\n')
+                self.writeln(options, repr(result))
 
 
 class WalkerMain(_Main):
@@ -269,7 +283,7 @@ class WalkerMain(_Main):
             result = getattr(walker, options.walkerRule)()
             if result is not None:
                 if hasattr(result, 'tree'):
-                    self.stdout.write(result.tree.toStringTree() + '\n')
+                    self.writeln(options, result.tree.toStringTree())
                 else:
-                    self.stdout.write(repr(result) + '\n')
+                    self.writeln(options, repr(result))
 
