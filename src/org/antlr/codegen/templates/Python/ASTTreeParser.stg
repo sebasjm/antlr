@@ -59,17 +59,13 @@ root_<treeLevel> = self.adaptor.nil()
 <if(nullableChildList)>
 if self.input.LA(1) == DOWN:
     self.match(self.input, DOWN, None)
-    <checkRuleBacktrackFailure()>
     <children:element()>
     self.match(self.input, UP, None)
-    <checkRuleBacktrackFailure()>
 
 <else>
 self.match(self.input, DOWN, None)
-<checkRuleBacktrackFailure()>
 <children:element()>
 self.match(self.input, UP, None);
-<checkRuleBacktrackFailure()>
 <endif>
 self.adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>)
 

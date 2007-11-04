@@ -1931,7 +1931,6 @@ class TreeParser(BaseRecognizer):
         """
         
         self._state.errorRecovery = False
-        self._state.failed = False
 
         look = self.input.LT(1)
         if self.input.getTreeAdaptor().getChildCount(look) == 0:

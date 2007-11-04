@@ -38,7 +38,8 @@ from antlr3.constants import DEFAULT_CHANNEL, HIDDEN_CHANNEL, EOF, \
 from antlr3.exceptions import RecognitionException, MismatchedTokenException, \
      MismatchedRangeException, MismatchedTreeNodeException, \
      NoViableAltException, EarlyExitException, MismatchedSetException, \
-     MismatchedNotSetException, FailedPredicateException
+     MismatchedNotSetException, FailedPredicateException, \
+     BacktrackingFailed
 from antlr3.tokens import CommonToken, EOF_TOKEN, SKIP_TOKEN
 from antlr3.compat import set, frozenset, reversed
 
@@ -69,10 +70,6 @@ class RecognizerSharedState(object):
         # ad naseum.  This is a failsafe mechanism to guarantee that at least
         # one token/tree node is consumed for two errors.
         self.lastErrorIndex = -1
-
-        # In lieu of a return value, this indicates that a rule or token
-        # has failed to match.  Reset to false upon valid token match.
-        self.failed = False
 
         # If 0, no backtracking is going on.  Safe to exec actions etc...
         # If >0 then it's the level of backtracking.
@@ -173,7 +170,6 @@ class BaseRecognizer(object):
         self._state.following = []
         self._state.errorRecovery = False
         self._state.lastErrorIndex = -1
-        self._state.failed = False
         # wack everything related to backtracking and memoization
         self._state.backtracking = 0
         if self._state.ruleMemo is not None:
@@ -192,12 +188,10 @@ class BaseRecognizer(object):
         if self.input.LA(1) == ttype:
             self.input.consume()
             self._state.errorRecovery = False
-            self._state.failed = False
             return
 
         if self._state.backtracking > 0:
-            self._state.failed = True
-            return
+            raise BacktrackingFailed
 
         self.mismatch(input, ttype, follow)
         return
@@ -205,7 +199,6 @@ class BaseRecognizer(object):
 
     def matchAny(self, input):
         self._state.errorRecovery = False
-        self._state.failed = False
         self.input.consume()
 
 
@@ -769,20 +762,14 @@ class BaseRecognizer(object):
         start index.  If this rule has parsed input starting from the
         start index before, then return where the rule stopped parsing.
         It returns the index of the last token matched by the rule.
-
-        For now we use a hashtable and just the slow Object-based one.
-        Later, we can make a special one for ints and also one that
-        tosses out data after we commit past input position i.
         """
         
         if ruleIndex not in self._state.ruleMemo:
             self._state.ruleMemo[ruleIndex] = {}
 
-        stopIndex = self._state.ruleMemo[ruleIndex].get(ruleStartIndex, None)
-        if stopIndex is None:
-            return self.MEMO_RULE_UNKNOWN
-
-        return stopIndex
+        return self._state.ruleMemo[ruleIndex].get(
+            ruleStartIndex, self.MEMO_RULE_UNKNOWN
+            )
 
 
     def alreadyParsedRule(self, input, ruleIndex):
@@ -796,13 +783,13 @@ class BaseRecognizer(object):
         this rule and successfully parsed before, then seek ahead to
         1 past the stop token matched for this rule last time.
         """
-        
+
         stopIndex = self.getRuleMemoization(ruleIndex, input.index())
         if stopIndex == self.MEMO_RULE_UNKNOWN:
             return False
 
         if stopIndex == self.MEMO_RULE_FAILED:
-            self._state.failed = True
+            raise BacktrackingFailed
 
         else:
             input.seek(stopIndex + 1)
@@ -810,16 +797,16 @@ class BaseRecognizer(object):
         return True
 
 
-    def memoize(self, input, ruleIndex, ruleStartIndex):
+    def memoize(self, input, ruleIndex, ruleStartIndex, success):
         """
         Record whether or not this rule parsed the input at this position
         successfully.
         """
 
-        if self._state.failed:
-            stopTokenIndex = self.MEMO_RULE_FAILED
-        else:
+        if success:
             stopTokenIndex = input.index() - 1
+        else:
+            stopTokenIndex = self.MEMO_RULE_FAILED
         
         if ruleIndex in self._state.ruleMemo:
             self._state.ruleMemo[ruleIndex][ruleStartIndex] = stopTokenIndex
@@ -828,8 +815,8 @@ class BaseRecognizer(object):
     def traceIn(self, ruleName, ruleIndex, inputSymbol):
         sys.stdout.write("enter %s %s" % (ruleName, inputSymbol))
         
-        if self._state.failed:
-            sys.stdout.write(" failed=%s" % self._state.failed)
+##         if self._state.failed:
+##             sys.stdout.write(" failed=%s" % self._state.failed)
 
         if self._state.backtracking > 0:
             sys.stdout.write(" backtracking=%s" % self._state.backtracking)
@@ -840,8 +827,8 @@ class BaseRecognizer(object):
     def traceOut(self, ruleName, ruleIndex, inputSymbol):
         sys.stdout.write("exit %s %s" % (ruleName, inputSymbol))
         
-        if self._state.failed:
-            sys.stdout.write(" failed=%s" % self._state.failed)
+##         if self._state.failed:
+##             sys.stdout.write(" failed=%s" % self._state.failed)
 
         if self._state.backtracking > 0:
             sys.stdout.write(" backtracking=%s" % self._state.backtracking)
@@ -1024,28 +1011,24 @@ class Lexer(BaseRecognizer, TokenSource):
             for i, c in enumerate(s):
                 if self.input.LA(1) != ord(c):
                     if self._state.backtracking > 0:
-                        self._state.failed = True
-                        return
+                        raise BacktrackingFailed
 
                     mte = MismatchedTokenException(c, self.input)
                     self.recover(mte)
                     raise mte
 
                 self.input.consume()
-                self._state.failed = False
 
         else:
             if self.input.LA(1) != s:
                 if self._state.backtracking > 0:
-                    self._state.failed = True
-                    return
+                    raise BacktrackingFailed
 
                 mte = MismatchedTokenException(unichr(s), self.input)
                 self.recover(mte)
                 raise mte
         
             self.input.consume()
-            self._state.failed = False
             
 
     def matchAny(self):
@@ -1055,15 +1038,13 @@ class Lexer(BaseRecognizer, TokenSource):
     def matchRange(self, a, b):
         if self.input.LA(1) < a or self.input.LA(1) > b:
             if self._state.backtracking > 0:
-                self._state.failed = True
-                return
+                raise BacktrackingFailed
 
             mre = MismatchedRangeException(unichr(a), unichr(b), self.input)
             self.recover(mre)
             raise mre
 
         self.input.consume()
-        self._state.failed = False
 
 
     def getLine(self):

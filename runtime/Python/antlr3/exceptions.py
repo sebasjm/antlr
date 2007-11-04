@@ -31,6 +31,12 @@
 # end[licence]
 
 
+class BacktrackingFailed(Exception):
+    """@brief Raised to signal failed backtrack attempt"""
+
+    pass
+
+
 class RecognitionException(Exception):
     """@brief The root of the ANTLR exception hierarchy.
 

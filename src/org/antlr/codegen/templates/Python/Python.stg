@@ -152,16 +152,19 @@ def nextToken(self):
         self._state._text = None
         try:
             m = self.input.mark()
-            self._state.backtracking = 1 <! means we won't throw slow exception !>
-            self._state.failed = False
-            self.mTokens()
-            self._state.backtracking = 0
+            try:
+                # means we won't throw slow exception
+                self._state.backtracking = 1
+                try:
+                    self.mTokens()
+                finally:
+                    self._state.backtracking = 0
 
-            <! mTokens backtracks with synpred at backtracking==2
-               and we set the synpredgate to allow actions at level 1. !>
-            if self._state.failed:
+            except BacktrackingFailed:
+                # mTokens backtracks with synpred at backtracking==2
+                # and we set the synpredgate to allow actions at level 1.
                 self.input.rewind(m)
-                self.input.consume() <! advance one char and try again !>
+                self.input.consume() # advance one char and try again
 
             else:
                 self.emit()
@@ -173,10 +176,10 @@ def nextToken(self):
             self.recover(re)
 
 
-def memoize(self, input, ruleIndex, ruleStartIndex):
+def memoize(self, input, ruleIndex, ruleStartIndex, success):
     if self._state.backtracking > 1:
         # is Lexer always superclass?
-        Lexer.memoize(self, input, ruleIndex, ruleStartIndex)
+        Lexer.memoize(self, input, ruleIndex, ruleStartIndex, success)
 
 
 def alreadyParsedRule(self, input, ruleIndex):
@@ -301,12 +304,15 @@ def <name>(self):
     self._state.backtracking += 1
     <@start()>
     start = self.input.mark()
-    self.<name>_fragment()
-    success = not self._state.failed
+    try:
+        self.<name>_fragment()
+    except BacktrackingFailed:
+        success = False
+    else:
+        success = True
     self.input.rewind(start)
     <@stop()>
     self._state.backtracking -= 1
-    self._state.failed = False
     return success
 
 
@@ -319,16 +325,10 @@ lexerSynpred(name) ::= <<
 ruleMemoization(name) ::= <<
 <if(memoize)>
 if self._state.backtracking > 0 and self.alreadyParsedRule(self.input, <ruleDescriptor.index>):
+    # for cached failed rules, alreadyParsedRule will raise an exception
+    success = True
     return <ruleReturnValue()>
 
-<endif>
->>
-
-/** How to test for failure and return from rule */
-checkRuleBacktrackFailure() ::= <<
-<if(backtracking)>
-if self._state.failed:
-    return <ruleReturnValue()>
 <endif>
 >>
 
@@ -336,8 +336,8 @@ if self._state.failed:
 ruleBacktrackFailure() ::= <<
 <if(backtracking)>
 if self._state.backtracking > 0:
-    self._state.failed = True
-    return <ruleReturnValue()><\n>
+    raise BacktrackingFailed
+
 <endif>
 >>
 
@@ -359,6 +359,11 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
     <ruleLabelDefs()>
     <ruleDescriptor.actions.init>
     <@preamble()>
+<if(memoize)>
+<if(backtracking)>
+    success = False<\n>
+<endif>
+<endif>
     try:
         try:
             <ruleMemoization(name=ruleName)>
@@ -366,6 +371,11 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
             <ruleCleanUp()>
             <(ruleDescriptor.actions.after):execAction()>
 
+<if(memoize)>
+<if(backtracking)>
+            success = True<\n>
+<endif>
+<endif>
 <if(exceptions)>
         <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
 <else>
@@ -480,7 +490,7 @@ memoize() ::= <<
 <if(memoize)>
 <if(backtracking)>
 if self._state.backtracking > 0:
-    self.memoize(self.input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex)
+    self.memoize(self.input, <ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex, success)
 
 <endif>
 <endif>
@@ -497,6 +507,11 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <endif>
     <ruleScopeSetUp()>
     <ruleDeclarations()>
+<if(memoize)>
+<if(backtracking)>
+    success = False<\n>
+<endif>
+<endif>
     try:
 <if(nakedBlock)>
         <ruleMemoization(name=ruleName)>
@@ -513,6 +528,11 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         <ruleCleanUp()>
         self._state.type = _type
         <(ruleDescriptor.actions.after):execAction()>
+<endif>
+<if(memoize)>
+<if(backtracking)>
+        success = True<\n>
+<endif>
 <endif>
 
     finally:
@@ -667,7 +687,6 @@ tokenRef(token,label,elementIndex) ::= <<
 <label> = self.input.LT(1)<\n>
 <endif>
 self.match(self.input, <token>, self.FOLLOW_<token>_in_<ruleName><elementIndex>)
-<checkRuleBacktrackFailure()>
 >>
 
 /** ids+=ID */
@@ -688,7 +707,6 @@ charRef(char,label) ::= <<
 <label> = self.input.LA(1)<\n>
 <endif>
 self.match(<char>)
-<checkRuleBacktrackFailure()>
 >>
 
 /** match a character range */
@@ -697,7 +715,6 @@ charRangeRef(a,b,label) ::= <<
 <label> = self.input.LA(1)<\n>
 <endif>
 self.matchRange(<a>, <b>)
-<checkRuleBacktrackFailure()>
 >>
 
 /** For now, sets are interval tests and must be tested inline */
@@ -710,9 +727,6 @@ if <s>:
     <postmatchCode>
 <if(!LEXER)>
     self._state.errorRecovery = False<\n>
-<endif>
-<if(backtracking)>
-    self._state.failed = False<\n>
 <endif>
 
 else:
@@ -740,11 +754,9 @@ lexerStringRef(string,label) ::= <<
 <if(label)>
 <label>Start = self.getCharIndex()
 self.match(<string>)
-<checkRuleBacktrackFailure()>
 <label> = CommonToken(input=self.input, type=INVALID_TOKEN_TYPE, channel=DEFAULT_CHANNEL, start=<label>Start, stop=self.getCharIndex()-1)
 <else>
 self.match(<string>)
-<checkRuleBacktrackFailure()><\n>
 <endif>
 >>
 
@@ -753,7 +765,6 @@ wildcard(label,elementIndex) ::= <<
 <label> = self.input.LT(1)<\n>
 <endif>
 self.matchAny(self.input)
-<checkRuleBacktrackFailure()>
 >>
 
 wildcardAndListLabel(label,elementIndex) ::= <<
@@ -767,7 +778,6 @@ wildcardChar(label, elementIndex) ::= <<
 <label> = self.input.LA(1)<\n>
 <endif>
 self.matchAny()
-<checkRuleBacktrackFailure()>
 >>
 
 wildcardCharListLabel(label, elementIndex) ::= <<
@@ -785,7 +795,6 @@ ruleRef(rule,label,elementIndex,args,scope) ::= <<
 self._state.following.append(self.FOLLOW_<rule.name>_in_<ruleName><elementIndex>)
 <if(label)><label> = <endif>self.<if(scope)><scope:delegateName()>.<endif><rule.name>(<args; separator=", ">)<\n>
 self._state.following.pop()
-<checkRuleBacktrackFailure()>
 >>
 
 /** ids+=rule */
@@ -803,7 +812,6 @@ lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
 <label>Start<elementIndex> = self.getCharIndex()
 self.<if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">)
-<checkRuleBacktrackFailure()>
 <label> = CommonToken(
     input=self.input, 
     type=INVALID_TOKEN_TYPE,
@@ -813,7 +821,6 @@ self.<if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", "
     )
 <else>
 self.<if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">)
-<checkRuleBacktrackFailure()>
 <endif>
 >>
 
@@ -828,11 +835,9 @@ lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 <label>Start<elementIndex> = self.getCharIndex()
 self.match(EOF)
-<checkRuleBacktrackFailure()>
 <label> = CommonToken(input=self.input, type=EOF, channel=DEFAULT_CHANNEL, start=<label>Start<elementIndex>, stop=self.getCharIndex()-1)
 <else>
 self.match(EOF)
-<checkRuleBacktrackFailure()>
 <endif>
 >>
 
@@ -844,17 +849,13 @@ tree(root, actionsAfterRoot, children, nullableChildList,
 <if(nullableChildList)>
 if self.input.LA(1) == DOWN:
     self.match(self.input, DOWN, None)
-    <checkRuleBacktrackFailure()>
     <children:element()>
     self.match(self.input, UP, None)
-    <checkRuleBacktrackFailure()>
 
 <else>
 self.match(self.input, DOWN, None)
-<checkRuleBacktrackFailure()>
 <children:element()>
 self.match(self.input, UP, None)
-<checkRuleBacktrackFailure()>
 <endif>
 >>
 
@@ -1041,8 +1042,8 @@ if s == <i0>: <! compressed special state numbers 0..n-1 !>
 
 <if(backtracking)>
         if self._state.backtracking >0:
-            self._state.failed = True
-            return -1<\n>
+            raise BacktrackingFailed
+
 <endif>
         nvae = NoViableAltException(self_.getDescription(), <dfa.decisionNumber>, _s, input)
         self_.error(nvae)

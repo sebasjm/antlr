@@ -31,7 +31,7 @@
 # end[licensc]
 
 from antlr3.constants import EOF
-from antlr3.exceptions import NoViableAltException
+from antlr3.exceptions import NoViableAltException, BacktrackingFailed
 
 
 class DFA(object):
@@ -148,8 +148,7 @@ class DFA(object):
 
     def noViableAlt(self, s, input):
         if self.recognizer._state.backtracking > 0:
-            self.recognizer._state.failed = True
-            return
+            raise BacktrackingFailed
 
         nvae = NoViableAltException(
             self.getDescription(),
