@@ -15,5 +15,6 @@ done
 touch build/doc/antlr3/__init__.py
 
 cp -f antlr3/tree.py build/doc/antlr3
+cp -f antlr3/treewizard.py build/doc/antlr3
 
 doxygen doxyfile
