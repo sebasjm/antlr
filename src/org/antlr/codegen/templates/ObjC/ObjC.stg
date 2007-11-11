@@ -396,7 +396,7 @@ parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTL
 <genericParser(inputStreamType="id\<ANTLRTokenStream>", ...)>
 >>
 
-treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ANTLRASTLabelType>}, ASTLabelType="id", superClass="ANTLRTreeParser", members={<actions.treeparser.members>}) ::= <<
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="id", superClass="ANTLRTreeParser", members={<actions.treeparser.members>}) ::= <<
 <genericParser(inputStreamType="id\<ANTLRTreeNodeStream>", ...)>
 >>
 
