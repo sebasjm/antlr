@@ -294,10 +294,10 @@ parserHeaderFile(LEXER, PARSER, TREE_PARSER, actionScope, actions, docComment,
 	}>
 	<@ivars()>
 
-	<actions.parser.ivars>
+	<actions.(actionScope).ivars>
  }
 
-<actions.parser.methodsdecl>
+<actions.(actionScope).methodsdecl>
 
 <rules:{rule |
 - (<rule.ruleDescriptor:{ruleDescriptor|<returnType()>}>) <rule.ruleName><if(rule.ruleDescriptor.parameterScope)><rule.ruleDescriptor.parameterScope:parameterScope(scope=it)><endif>;
@@ -358,7 +358,7 @@ static NSArray *tokenNames;
 		<rules:{rule |
 		<rule.ruleDescriptor.ruleScope:ruleAttributeScopeInit(scope=it)>
 		}>
-		<actions.parser.init>
+		<actions.(actionScope).init>
 		<@init()>
 	}
 	return self;
@@ -371,7 +371,7 @@ static NSArray *tokenNames;
 <endif>
 	<cyclicDFAs:{dfa | [dfa<dfa.decisionNumber> release];}; separator="\n">
 	<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDealloc(scope=it)><endif>}>
-	<actions.parser.dealloc>
+	<actions.(actionScope).dealloc>
 	<@dealloc()>
 	[super dealloc];
 }
@@ -381,7 +381,7 @@ static NSArray *tokenNames;
 	return @"<fileName>";
 }
 
-<actions.parser.methods>
+<actions.(actionScope).methods>
 
 <rules; separator="\n\n">
 
@@ -557,7 +557,9 @@ ruleCleanUp() ::= <<
 // token+rule list labels
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]:{[_list_<it.label.text> release];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
+<if(!TREE_PARSER)>
 [_retval setStop:[input LT:-1]];<\n>
+<endif>
 <endif>
 <if(memoize)>
 <if(backtracking)>
@@ -1405,7 +1407,13 @@ tokenLabelPropertyRef_tree(scope,attr) ::= "_<scope>_tree"
 ruleLabelPropertyRef_start(scope,attr) ::= "[_<scope> start]"
 ruleLabelPropertyRef_stop(scope,attr) ::= "[_<scope> stop]"
 ruleLabelPropertyRef_tree(scope,attr) ::= "[_<scope> tree]"
-ruleLabelPropertyRef_text(scope,attr) ::= "[input substringWithRange:NSMakeRange([_<scope> start], [_<scope> stop]-[_<scope> start])]"
+ruleLabelPropertyRef_text(scope,attr) ::= <<
+<if(TREE_PARSER)>
+[[input ] textForNode:[_<scope> start]]
+<else>
+[input substringWithRange:NSMakeRange([_<scope> start], [_<scope> stop]-[_<scope> start])]
+<endif>
+>>
 ruleLabelPropertyRef_st(scope,attr) ::= "[_<scope> st]"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
