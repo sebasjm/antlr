@@ -27,7 +27,7 @@
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLRCommonTree.h>
 
-@interface ANTLRCommonTreeNodeStreamState : NSObject {
+@interface ANTLRUnbufferedCommonTreeNodeStreamState : NSObject {
 	ANTLRCommonTree *currentNode;
 	ANTLRCommonTree *previousNode;
 

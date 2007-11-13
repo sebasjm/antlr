@@ -26,6 +26,7 @@
 
 
 #import "ANTLRUnbufferedCommonTreeNodeStream.h"
+#import "ANTLRUnbufferedCommonTreeNodeStreamState.h"
 #import "ANTLRTree.h"
 #import "ANTLRToken.h"
 

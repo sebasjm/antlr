@@ -24,10 +24,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "ANTLRCommonTreeNodeStreamState.h"
+#import "ANTLRUnbufferedCommonTreeNodeStreamState.h"
 
 
-@implementation ANTLRCommonTreeNodeStreamState
+@implementation ANTLRUnbufferedCommonTreeNodeStreamState
 
 - (id) init
 {
