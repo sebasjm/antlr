@@ -53,7 +53,7 @@
 #import <ANTLR/ANTLRTreeAdaptor.h>
 #import <ANTLR/ANTLRCommonTreeAdaptor.h>
 #import <ANTLR/ANTLRTreeNodeStream.h>
-#import <ANTLR/ANTLRCommonTreeNodeStream.h>
+#import <ANTLR/ANTLRUnbufferedCommonTreeNodeStream.h>
 
 #import <ANTLR/ANTLRRewriteRuleSubtreeStream.h>
 #import <ANTLR/ANTLRRewriteRuleTokenStream.h>

@@ -31,7 +31,7 @@
 #import <ANTLR/ANTLRCommonTree.h>
 #import <ANTLR/ANTLRCommonTreeAdaptor.h>
 
-@interface ANTLRCommonTreeNodeStream : NSObject < ANTLRTreeNodeStream > {
+@interface ANTLRUnbufferedCommonTreeNodeStream : NSObject < ANTLRTreeNodeStream > {
 
 	BOOL shouldUseUniqueNavigationNodes;
 

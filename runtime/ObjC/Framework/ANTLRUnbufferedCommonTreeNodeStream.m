@@ -25,8 +25,7 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#import "ANTLRCommonTreeNodeStream.h"
-#import "ANTLRCommonTreeNodeStreamState.h"
+#import "ANTLRUnbufferedCommonTreeNodeStream.h"
 #import "ANTLRTree.h"
 #import "ANTLRToken.h"
 
@@ -57,7 +56,7 @@ static ANTLRTreeNavigationNodeUp *upNavigationNode;
 static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 
 #define INITIAL_LOOKAHEAD_BUFFER_SIZE 5
-@implementation ANTLRCommonTreeNodeStream
+@implementation ANTLRUnbufferedCommonTreeNodeStream
 
 + (void) initialize
 {
@@ -195,7 +194,7 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 
 - (unsigned int) mark;
 {
-	ANTLRCommonTreeNodeStreamState *state = [[ANTLRCommonTreeNodeStreamState alloc] init];
+	ANTLRUnbufferedCommonTreeNodeStreamState *state = [[ANTLRUnbufferedCommonTreeNodeStreamState alloc] init];
 	[state setCurrentNode:currentNode];
 	[state setPreviousNode:previousNode];
 	[state setIndexStackSize:[indexStack count]];
@@ -222,7 +221,7 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 	if ( [markers count] < marker ) {
 		return;
 	}
-	ANTLRCommonTreeNodeStreamState *state = [[markers objectAtIndex:marker-1] retain];
+	ANTLRUnbufferedCommonTreeNodeStreamState *state = [[markers objectAtIndex:marker-1] retain];
 	[markers removeObjectAtIndex:marker-1];
 
 	absoluteNodeIndex = [state absoluteNodeIndex];
