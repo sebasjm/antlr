@@ -45,8 +45,8 @@
 #import <ANTLR/ANTLRFailedPredicateException.h>
 #import <ANTLR/ANTLRTreeException.h>
 
-#import <ANTLR/ANTLRLexerRuleReturnScope.h>
 #import <ANTLR/ANTLRParserRuleReturnScope.h>
+#import <ANTLR/ANTLRTreeParserRuleReturnScope.h>
 
 #import <ANTLR/ANTLRTree.h>
 #import <ANTLR/ANTLRCommonTree.h>

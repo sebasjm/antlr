@@ -27,6 +27,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLRTreeNodeStream.h>
+#import <ANTLR/ANTLRCommonTokenStream.h>
 #import <ANTLR/ANTLRCommonTree.h>
 #import <ANTLR/ANTLRCommonTreeAdaptor.h>
 
@@ -39,6 +40,8 @@
 	ANTLRCommonTree *previousNode;
 
 	ANTLRCommonTreeAdaptor *treeAdaptor;
+	
+	ANTLRCommonTokenStream *tokenStream;
 	
 	NSMutableArray *nodeStack;
 	NSMutableArray *indexStack;
@@ -61,8 +64,17 @@
 #pragma mark ANTLRTreeNodeStream conformance
 
 - (id) LT:(int)k;
+- (id) treeSource;
 - (id<ANTLRTreeAdaptor>) treeAdaptor;
+- (id<ANTLRTokenStream>) tokenStream;
+- (void) setTokenStream:(id<ANTLRTokenStream>) aTokenStream;	///< Added by subclass, not in protocol
 - (void) setUsesUniqueNavigationNodes:(BOOL)flag;
+
+- (id) nodeAtIndex:(unsigned int) idx;
+
+- (NSString *) stringValue;
+- (NSString *) stringValueWithRange:(NSRange) aRange;
+- (NSString *) stringValueFromNode:(id)startNode toNode:(id)stopNode;
 
 #pragma mark ANTLRIntStream conformance
 - (void) consume;

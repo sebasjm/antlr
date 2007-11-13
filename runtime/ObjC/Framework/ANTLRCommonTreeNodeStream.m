@@ -127,11 +127,16 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 	if (k == -1)
 		return previousNode;
 	if (k < 0)
-		@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"cannot look back more than one node in a tree" userInfo:nil];
+		@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"-LT: looking back more than one node unsupported for unbuffered streams" userInfo:nil];
 	if (k == 0)
 		return [ANTLRTree invalidNode];
 	[self fillBufferWithLookahead:k];
 	return [lookahead objectAtIndex:(head+k-1) % [lookahead count]];
+}
+
+- (id) treeSource;
+{
+	return [self root];
 }
 
 - (id<ANTLRTreeAdaptor>) treeAdaptor;
@@ -139,11 +144,35 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 	return treeAdaptor;
 }
 
+- (id<ANTLRTokenStream>) tokenStream; 
+{
+	return tokenStream;
+}
+
 - (void) setUsesUniqueNavigationNodes:(BOOL)flag;
 {
 	shouldUseUniqueNavigationNodes = flag;
 }
 
+- (id) nodeAtIndex:(unsigned int) idx;
+{
+	@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"-nodeAtIndex: unsupported for unbuffered streams" userInfo:nil];
+}
+
+- (NSString *) stringValue;
+{
+	@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"-stringValue unsupported for unbuffered streams" userInfo:nil];
+}
+
+- (NSString *) stringValueWithRange:(NSRange) aRange;
+{
+	@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"-stringValue: unsupported for unbuffered streams" userInfo:nil];
+}
+
+- (NSString *) stringValueFromNode:(id)startNode toNode:(id)stopNode;
+{
+	@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"-stringValueFromNode:toNode: unsupported for unbuffered streams" userInfo:nil];
+}
 
 #pragma mark ANTLRIntStream conformance
 
@@ -220,13 +249,13 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
 
 - (void) release:(unsigned int) marker;
 {
-	@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"-release: is not supported for trees" userInfo:nil];
+	@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"-release: unsupported for unbuffered streams" userInfo:nil];
 }
 
 - (void) seek:(unsigned int) index;
 {
 	if ( index < [self index] )
-		@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"cannot seek backwards in tree streams" userInfo:nil];
+		@throw [NSException exceptionWithName:@"ANTLRTreeException" reason:@"-seek: backwards unsupported for unbuffered streams" userInfo:nil];
 	while ( [self index] < index ) {
 		[self consume];
 	}
@@ -397,6 +426,13 @@ static ANTLRTreeNavigationNodeEOF *eofNavigationNode;
     }
 }
 
+- (void) setTokenStream:(id<ANTLRTokenStream>) aTokenStream;
+{
+	if (tokenStream != aTokenStream) {
+		[tokenStream release];
+		tokenStream = [aTokenStream retain];
+	}
+}
 
 @end
 

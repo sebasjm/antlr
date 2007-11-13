@@ -1,4 +1,4 @@
-// $ANTLR 3.1b1 SimpleCTP.gtp 2007-11-04 03:29:05
+// $ANTLR 3.1b1 SimpleCTP.gtp 2007-11-13 15:03:27
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLR.h>
@@ -30,6 +30,10 @@
 #pragma mark Dynamic Rule Scopes
 
 #pragma mark Rule Return Scopes
+@interface SimpleCTP_expr_return : ANTLRTreeParserRuleReturnScope {
+}
+@end
+
 
 
 @interface SimpleCTP : ANTLRTreeParser {
@@ -49,7 +53,7 @@
 - (void) block;
 - (void) stat;
 - (void) forStat;
-- (void) expr;
+- (SimpleCTP_expr_return *) expr;
 - (void) atom;
 
 

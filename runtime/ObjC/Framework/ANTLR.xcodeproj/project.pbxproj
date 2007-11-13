@@ -117,6 +117,8 @@
 		F763D4490A666D3D0061CD35 /* ANTLR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* ANTLR.framework */; };
 		F763D51D0A6676590061CD35 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		F763D51E0A66765B0061CD35 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
+		F76AA8150CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.h in Headers */ = {isa = PBXBuildFile; fileRef = F76AA8130CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F76AA8160CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.m in Sources */ = {isa = PBXBuildFile; fileRef = F76AA8140CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.m */; };
 		F7754E3F0A5C0A0500D0873A /* ANTLRDFA.h in Headers */ = {isa = PBXBuildFile; fileRef = F7754E3D0A5C0A0500D0873A /* ANTLRDFA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F7754E400A5C0A0500D0873A /* ANTLRDFA.m in Sources */ = {isa = PBXBuildFile; fileRef = F7754E3E0A5C0A0500D0873A /* ANTLRDFA.m */; };
 		F77744050B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = F77744030B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -405,6 +407,8 @@
 		F7492DEE09C00E4500B25E30 /* TestStringStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestStringStream.m; path = tests/TestStringStream.m; sourceTree = "<group>"; };
 		F7568FAE0AAB8C6E00F6FB41 /* ANTLRTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRTree.m; sourceTree = "<group>"; };
 		F762879C0B71578D006AA7EF /* README.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = README.rtf; sourceTree = "<group>"; };
+		F76AA8130CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRTreeParserRuleReturnScope.h; sourceTree = "<group>"; };
+		F76AA8140CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRTreeParserRuleReturnScope.m; sourceTree = "<group>"; };
 		F7715D1A0AC9DCE400ED984D /* SimpleC.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleC.g; sourceTree = "<group>"; };
 		F7715D1B0AC9DCE500ED984D /* SimpleCTP.gtp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleCTP.gtp; sourceTree = "<group>"; };
 		F7715D1C0AC9DDD800ED984D /* SimpleC.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleC.tokens; sourceTree = "<group>"; };
@@ -906,6 +910,8 @@
 				F72C5D550AB63C1D00282574 /* ANTLRTreeParser.m */,
 				F72C5ECC0AB7E5A500282574 /* ANTLRParserRuleReturnScope.h */,
 				F72C5ECD0AB7E5A500282574 /* ANTLRParserRuleReturnScope.m */,
+				F76AA8130CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.h */,
+				F76AA8140CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.m */,
 			);
 			name = Recognizer;
 			sourceTree = "<group>";
@@ -1040,6 +1046,7 @@
 				F70B11C30C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.h in Headers */,
 				F7B1E5B00CD7CF1900CE136E /* ANTLRBaseRecognizerState.h in Headers */,
 				F7B1E5B20CD7CF1900CE136E /* ANTLRLexerState.h in Headers */,
+				F76AA8150CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1449,6 +1456,7 @@
 				F70B11C40C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.m in Sources */,
 				F7B1E5B10CD7CF1900CE136E /* ANTLRBaseRecognizerState.m in Sources */,
 				F7B1E5B30CD7CF1900CE136E /* ANTLRLexerState.m in Sources */,
+				F76AA8160CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

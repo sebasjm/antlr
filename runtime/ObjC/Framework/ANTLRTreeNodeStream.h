@@ -27,12 +27,21 @@
 
 #import <Cocoa/Cocoa.h>
 #import <ANTLR/ANTLRIntStream.h>
+#import <ANTLR/ANTLRTokenStream.h>
 #import <ANTLR/ANTLRTreeAdaptor.h>
 
 @protocol ANTLRTreeNodeStream < ANTLRIntStream > 
 
 - (id) LT:(int)k;
+- (id) treeSource;
 - (id<ANTLRTreeAdaptor>) treeAdaptor;
+- (id<ANTLRTokenStream>) tokenStream; 
 - (void) setUsesUniqueNavigationNodes:(BOOL)flag;
+
+- (id) nodeAtIndex:(unsigned int) idx;
+
+- (NSString *) stringValue;
+- (NSString *) stringValueWithRange:(NSRange) aRange;
+- (NSString *) stringValueFromNode:(id)startNode toNode:(id)stopNode;
 
 @end

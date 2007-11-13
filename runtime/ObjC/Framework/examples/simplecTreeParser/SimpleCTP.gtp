@@ -2,7 +2,7 @@ tree grammar SimpleCTP;
 options {
     tokenVocab=SimpleC;
 	language=ObjC;
-	ASTLabelType=ANTLRCommonTree;
+//	ASTLabelType="ANTLRCommonTree \*";
 }
 
 program
@@ -54,7 +54,7 @@ forStat
 expr:   ^(EQEQ expr expr)
     |   ^(LT expr expr)
     |   ^(PLUS expr expr)
-    |   ^(EQ ID expr)
+    |   ^(EQ ID e=expr) { NSLog(@"assigning \%@ to variable \%@", $e.text, $ID.text); }
     |   atom
     ;
 
