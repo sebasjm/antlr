@@ -32,6 +32,9 @@
 
 @protocol ANTLRTreeNodeStream < ANTLRIntStream > 
 
+- (id) initWithTree:(ANTLRCommonTree *)theTree;
+- (id) initWithTree:(ANTLRCommonTree *)theTree treeAdaptor:(ANTLRCommonTreeAdaptor *)theAdaptor;
+
 - (id) LT:(int)k;
 - (id) treeSource;
 - (id<ANTLRTreeAdaptor>) treeAdaptor;
