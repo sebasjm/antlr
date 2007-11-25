@@ -117,7 +117,7 @@ tokenRefTrack(token,label,elementIndex) ::= <<
  */
 tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 <tokenRefTrack(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** ^(ID ...) track for rewrite */
@@ -141,7 +141,7 @@ ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 /** x+=rule when output=AST and tracking for rewrite */
 ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefTrack(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** ^(rule ...) rewrite */

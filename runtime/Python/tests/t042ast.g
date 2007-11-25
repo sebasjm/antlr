@@ -228,7 +228,7 @@ r45
     ;
 
 r46 returns [res]
-    : ids+=primary! (','! ids+=primary!)* {$res = [id.start.text for id in $ids]}
+    : ids+=primary! (','! ids+=primary!)* {$res = [id.text for id in $ids]}
     ;
 
 r47

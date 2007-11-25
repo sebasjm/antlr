@@ -695,13 +695,13 @@ self.match(self.input, <token>, self.FOLLOW_<token>_in_<ruleName><elementIndex>)
 /** ids+=ID */
 tokenRefAndListLabel(token,label,elementIndex) ::= <<
 <tokenRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 listLabel(label, elem) ::= <<
 if list_<label> is None:
     list_<label> = []
-list_<label>.append(<label>)<\n>
+list_<label>.append(<elem>)<\n>
 >>
 
 /** match a character */
@@ -749,7 +749,7 @@ else:
 
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 <matchSet(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match a string literal */
@@ -772,7 +772,7 @@ self.matchAny(self.input)
 
 wildcardAndListLabel(label,elementIndex) ::= <<
 <wildcard(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match . wildcard in lexer */
@@ -785,7 +785,7 @@ self.matchAny()
 
 wildcardCharListLabel(label, elementIndex) ::= <<
 <wildcardChar(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** Match a rule reference by invoking it possibly with arguments
@@ -803,7 +803,7 @@ self._state.following.pop()
 /** ids+=rule */
 ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRef(...)>
-<listLabel(...)>
+<listLabel(elem=label,...)>
 >>
 
 /** A lexer rule reference 
@@ -1305,7 +1305,7 @@ ruleLabelPropertyRef_text(scope,attr) ::= <<
 ((<scope> is not None) and [self.input.toString(<scope>.start,<scope>.stop)] or [None])[0]
 <endif>
 >>
-ruleLabelPropertyRef_st(scope,attr) ::= "FIXME(299)((<scope> is not None) and [<scope>.st] or [None])[0]"
+ruleLabelPropertyRef_st(scope,attr) ::= "((<scope> is not None) and [<scope>.st] or [None])[0]"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
