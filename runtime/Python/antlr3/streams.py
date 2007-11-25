@@ -1261,6 +1261,19 @@ class TokenRewriteStream(CommonTokenStream):
             start = args[0]
             end = args[1]
             
+        if start is None:
+            start = self.MIN_TOKEN_INDEX
+        elif not isinstance(start, int):
+            start = start.index
+
+        if end is None:
+            end = len(self.tokens) - 1
+        elif not isinstance(end, int):
+            end = end.index
+        
+        if end >= len(self.tokens):
+            end = len(self.tokens) - 1
+
         rewrites = self.programs.get(programName)
         if rewrites is None or len(rewrites) == 0:
             # no instructions to execute

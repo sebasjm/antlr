@@ -233,9 +233,12 @@ class <name>(<superClass>):
         <grammar.directDelegates:
          {g|self.<g:delegateName()> = <g.name><superClass>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, self._state)}; separator="\n">
 
-        <@members>
+        <@init>
         <@end>
 
+
+    <@members>
+    <@end>
 
     <members>
 
@@ -1185,7 +1188,10 @@ class <ruleDescriptor.name>_return(object):
         <endif>
 
         <scope.attributes:{self.<it.decl> = None}; separator="\n">
-        <@ruleReturnMembers()>
+        <@ruleReturnInit()>
+
+
+    <@ruleReturnMembers()>
 
 <endif>
 >>

@@ -46,17 +46,17 @@ from antlr3.tree import *<\n>
 <endif>
 >>
 
-@genericParser.members() ::= <<
-<@super.members()>
-<parserMembers()>
+@genericParser.init() ::= <<
+<@super.init()>
+<parserInit()>
 >>
 
 /** Add an adaptor property that knows how to build trees */
-parserMembers() ::= <<
+parserInit() ::= <<
 self.adaptor = CommonTreeAdaptor()<\n>
 >>
 
-@returnScope.ruleReturnMembers() ::= <<
+@returnScope.ruleReturnInit() ::= <<
 self.tree = None
 >>
 
