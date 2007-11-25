@@ -1146,6 +1146,8 @@ class CommonTree(BaseTree):
 
         return self.token.getType()
 
+    type = property(getType)
+    
 
     def getText(self):
         if self.token is None:
@@ -1165,6 +1167,8 @@ class CommonTree(BaseTree):
 
         return self.token.getLine()
 
+    line = property(getLine)
+    
 
     def getCharPositionInLine(self):
         if self.token is None or self.token.getCharPositionInLine() == -1:
@@ -1176,16 +1180,19 @@ class CommonTree(BaseTree):
         else:
             return self.token.getCharPositionInLine()
 
+    charPositionInLine = property(getCharPositionInLine)
+    
 
     def getTokenStartIndex(self):
         if self.startIndex == -1 and self.token is not None:
             return self.token.getTokenIndex()
         
         return self.startIndex
-
-
+    
     def setTokenStartIndex(self, index):
         self.startIndex = index
+
+    tokenStartIndex = property(getTokenStartIndex, setTokenStartIndex)
 
 
     def getTokenStopIndex(self):
@@ -1194,9 +1201,10 @@ class CommonTree(BaseTree):
         
         return self.stopIndex
 
-
     def setTokenStopIndex(self, index):
         self.stopIndex = index
+
+    tokenStopIndex = property(getTokenStopIndex, setTokenStopIndex)
 
 
     def getChildIndex(self):
