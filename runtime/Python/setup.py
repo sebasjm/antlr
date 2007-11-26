@@ -11,8 +11,17 @@ from distutils.cmd import Command
 from setuptools import setup
 from distutils import log
 
-
 from distutils.core import setup
+
+classpath = [c for c in os.environ.get('CLASSPATH', '').split(':') if c != '']
+
+rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+classpath[0:0] = [
+    os.path.join(rootDir, 'build', 'classes'),
+    os.path.join(rootDir, 'build', 'rtclasses'),
+    os.path.join(rootDir, 'build', 'antlr.jar')
+    ]
+os.environ['CLASSPATH'] = ':'.join(classpath)
 
 class clean(_clean):
     """Also cleanup local temp files."""
