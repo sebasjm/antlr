@@ -68,6 +68,9 @@ public class Tool {
 						  VERSION + " (??)  1989-2007");
 		Tool antlr = new Tool(args);
 		antlr.process();
+		if ( ErrorManager.getNumErrors() > 0 ) {
+			System.exit(1);
+		}
 		System.exit(0);
 	}
 

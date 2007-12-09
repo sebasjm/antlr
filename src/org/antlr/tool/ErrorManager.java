@@ -249,7 +249,7 @@ public class ErrorManager {
 	/** Track the number of errors regardless of the listener but track
 	 *  per thread.
 	 */
-	private static Map threadToErrorCountMap = new HashMap();
+	private static Map threadToErrorStateMap = new HashMap();
 
 	/** Each thread has its own ptr to a Tool object, which knows how
 	 *  to panic, for example.  In a GUI, the thread might just throw an Error
@@ -567,17 +567,21 @@ public class ErrorManager {
 
 	public static ErrorState getErrorState() {
 		ErrorState ec =
-			(ErrorState)threadToErrorCountMap.get(Thread.currentThread());
+			(ErrorState)threadToErrorStateMap.get(Thread.currentThread());
 		if ( ec==null ) {
 			ec = new ErrorState();
-			threadToErrorCountMap.put(Thread.currentThread(), ec);
+			threadToErrorStateMap.put(Thread.currentThread(), ec);
 		}
 		return ec;
 	}
 
+	public static int getNumErrors() {
+		return getErrorState().errors;
+	}
+
 	public static void resetErrorState() {
 		ErrorState ec = new ErrorState();
-		threadToErrorCountMap.put(Thread.currentThread(), ec);
+		threadToErrorStateMap.put(Thread.currentThread(), ec);
 	}
 
 	public static void info(String msg) {
