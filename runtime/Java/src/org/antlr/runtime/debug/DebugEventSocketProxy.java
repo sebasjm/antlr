@@ -84,6 +84,7 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 			out.println("ANTLR "+ DebugEventListener.PROTOCOL_VERSION);
 			out.println("grammar \""+ grammarFileName);
 			out.flush();
+			ack();			
 		}
 	}
 
@@ -109,7 +110,6 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 		catch (IOException ioe) {
 			ioe.printStackTrace(System.err);
 		}
-
 	}
 
 	protected void transmit(String event) {
