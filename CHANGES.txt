@@ -8,6 +8,13 @@ University of San Francisco
 
 CHANGES
 
+December 11, 2007
+
+* Could not deal with spaces, oddly enough in arg lists:
+	grammar Bad;
+	a : A b["foo", $A.text] ;
+	b[String x, String y] : C ;
+
 October 28, 2007
 
 * Made ANTLR emit a better error message when it cannot write the

@@ -39,7 +39,7 @@ options {
 }
 
 @header {
-package org.antlr.codegen;
+package org.antlr.tool;
 import org.antlr.runtime.*;
 import org.antlr.tool.*;
 }
@@ -86,13 +86,17 @@ X_Y :	'$' x=ID '.' y=ID {enclosingRule!=null}?
 			pair.actionReferencesLabel = true;
 			refdRuleName = pair.referencedRuleName;
 			Rule refdRule = grammar.getRule(refdRuleName);
-			scope = refdRule.getLocalAttributeScope($y.text);
+			if ( refdRule!=null ) {
+				scope = refdRule.getLocalAttributeScope($y.text);
+			}
 		}
 		else if ( enclosingRule.getRuleRefsInAlt(x.getText(), outerAltNum)!=null ) {
 			// ref to rule referenced in this alt
 			refdRuleName = $x.text;
 			Rule refdRule = grammar.getRule(refdRuleName);
-			scope = refdRule.getLocalAttributeScope($y.text);
+			if ( refdRule!=null ) {
+				scope = refdRule.getLocalAttributeScope($y.text);
+			}
 		}
 		if ( scope!=null &&
 			 (scope.isPredefinedRuleScope||scope.isPredefinedLexerRuleScope) )

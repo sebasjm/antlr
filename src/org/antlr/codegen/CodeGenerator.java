@@ -907,7 +907,7 @@ public class CodeGenerator {
 								   GrammarAST actionTree)
 	{
 		String actionText = actionTree.token.getText();
-		StringTokenizer argTokens = new StringTokenizer(actionText, ",");
+		StringTokenizer argTokens = new StringTokenizer(actionText, ", \t\n");
 		List args = new ArrayList();
 		while ( argTokens.hasMoreTokens() ) {
 			String arg = (String)argTokens.nextToken();
