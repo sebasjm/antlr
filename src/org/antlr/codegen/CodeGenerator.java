@@ -41,6 +41,7 @@ import org.antlr.tool.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
+import java.io.StreamTokenizer;
 import java.util.*;
 
 /** ANTLR's code generator.
@@ -907,18 +908,53 @@ public class CodeGenerator {
 								   GrammarAST actionTree)
 	{
 		String actionText = actionTree.token.getText();
-		StringTokenizer argTokens = new StringTokenizer(actionText, ", \t\n");
+		//StringTokenizer argTokens = new StringTokenizer(actionText, ",");
 		List args = new ArrayList();
-		while ( argTokens.hasMoreTokens() ) {
-			String arg = (String)argTokens.nextToken();
-			antlr.Token actionToken = new antlr.CommonToken(ANTLRParser.ACTION,arg);
-			ActionTranslatorLexer translator =
-				new ActionTranslatorLexer(this,ruleName,
-										  actionToken,
-										  actionTree.outerAltNum);
-			List chunks = translator.translateToChunks();
-			chunks = target.postProcessAction(chunks, actionToken);
-			args.add(chunks);
+		try {
+			StreamTokenizer argTokens = new StreamTokenizer(new StringReader(actionText));
+			argTokens.wordChars('$','$');
+			argTokens.wordChars(':',':');
+			argTokens.quoteChar('"');
+			while ( argTokens.nextToken() != StreamTokenizer.TT_EOF ) {
+				//System.out.println("token: "+argTokens+", type="+argTokens.ttype);
+				String arg = null;
+				switch ( argTokens.ttype ) {
+					case StreamTokenizer.TT_WORD:
+						arg = argTokens.sval;
+						break;
+					case '"' :
+						arg = '"'+argTokens.sval+'"';
+						break;
+					case ',' :
+						break;
+					default :
+				}
+				if ( arg!=null ) {
+					antlr.Token actionToken = new antlr.CommonToken(ANTLRParser.ACTION,arg);
+					ActionTranslatorLexer translator =
+						new ActionTranslatorLexer(this,ruleName,
+												  actionToken,
+												  actionTree.outerAltNum);
+					List chunks = translator.translateToChunks();
+					chunks = target.postProcessAction(chunks, actionToken);
+					args.add(chunks);
+				}
+				/*
+				String arg = (String)argTokens.nextToken();
+				antlr.Token actionToken = new antlr.CommonToken(ANTLRParser.ACTION,arg);
+				ActionTranslatorLexer translator =
+					new ActionTranslatorLexer(this,ruleName,
+											  actionToken,
+											  actionTree.outerAltNum);
+				List chunks = translator.translateToChunks();
+				chunks = target.postProcessAction(chunks, actionToken);
+				args.add(chunks);
+				*/
+			}
+		}
+		catch(IOException e) {
+			System.out.println(
+				"st.nextToken() unsuccessful");
 		}
 		if ( args.size()==0 ) {
 			return null;
