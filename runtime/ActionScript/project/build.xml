@@ -1,0 +1,56 @@
+<project name="Antlr3ActionScriptRuntime" basedir="." default="all">
+
+	<property environment="env"/>
+	<property name="build.dir" value="${basedir}/build"/>
+	<property name="build.lib.dir" value="${build.dir}/lib"/>
+	<property name="build.doc.dir" value="${build.dir}/doc"/>
+	<property name="src.dir" value="${basedir}/src"/>
+	
+	<property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
+	
+	<!-- Assume SDK 3.0 or greater has the ant tasks -->
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar"/>
+	
+	<fileset id="sources" dir="${src.dir}">
+		<include name="**/*.as"/>
+	</fileset>
+	
+	<pathconvert property="sourceClasses" refid="sources" pathsep=" ">
+		<filtermapper>
+			<replacestring from="${src.dir}/" to=""/>		<!-- Strip off directory -->
+			<replacestring from=".as" to=""/>				<!-- Strip off extension -->
+			<replacestring from="/" to="."/>				<!-- Convert path to package -->
+		</filtermapper>
+	</pathconvert>
+	
+	<target name="all" depends="build"/>
+	
+	<target name="check-env">
+		<fail>
+	     <condition>
+	       <not>
+	         <isset property="FLEX_HOME"/>
+	       </not>
+	     </condition>
+	   </fail>
+	</target>
+	
+	<target name="build" depends="check-env">
+		<echo>File are ${sourceClasses}</echo>
+		<compc output="${build.lib.dir}/antlr3.swc" include-classes="${sourceClasses}">
+			<source-path path-element="${basedir}/src"/>
+		</compc>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+	
+	<target name="docs">
+		<exec executable="${FLEX_HOME}/bin/asdoc" failonerror="true">
+			<arg line="-doc-sources ${src.dir}"/>
+			<arg line="-window-title 'ANTLR 3 Runtime'"/>
+			<arg line="-output ${build.doc.dir}"/>
+		</exec>
+	</target>
+</project>
