@@ -939,17 +939,6 @@ public class CodeGenerator {
 					chunks = target.postProcessAction(chunks, actionToken);
 					args.add(chunks);
 				}
-				/*
-				String arg = (String)argTokens.nextToken();
-				antlr.Token actionToken = new antlr.CommonToken(ANTLRParser.ACTION,arg);
-				ActionTranslatorLexer translator =
-					new ActionTranslatorLexer(this,ruleName,
-											  actionToken,
-											  actionTree.outerAltNum);
-				List chunks = translator.translateToChunks();
-				chunks = target.postProcessAction(chunks, actionToken);
-				args.add(chunks);
-				*/
 			}
 		}
 		catch(IOException e) {
