@@ -25,6 +25,9 @@ December 13-14, 2007
   User can adjust or add predicate etc...  This is now an error
   not a warning.
 
+* Recursion overflow and unreachable alt is now a fatal error; no code gen.
+  The decision will literally not work.
+
 * Cleaned up how DFA construction/analysis aborts due to non-LL(*) and
   overflow etc...  Throws exceptions now, which cleans up a bunch of IF
   checks etc...  Very nice now. Exceptions:

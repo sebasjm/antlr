@@ -208,6 +208,8 @@ public class ErrorManager {
 	public static final BitSet ERRORS_FORCING_NO_CODEGEN = new BitSet() {
 		{
 			add(MSG_NONREGULAR_DECISION);
+			add(MSG_RECURSION_OVERLOW);
+			add(MSG_UNREACHABLE_ALTS);
 			add(MSG_FILE_AND_GRAMMAR_NAME_DIFFER);
 			// TODO: ...
 		}
