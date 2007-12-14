@@ -50,8 +50,8 @@ public class DFA {
 
 	/** Prevent explosion of DFA states during conversion. The max number
 	 *  of states per alt in a single decision's DFA.
-	 */
 	public static final int MAX_STATES_PER_ALT_IN_DFA = 450;
+	 */
 
 	/** Set to 0 to not terminate early */
 	public static int MAX_TIME_PER_DFA_CREATION = 1*1000;
@@ -229,10 +229,7 @@ public class DFA {
 			// figure out if there are problems with decision
 			verify();
 
-			if ( !probe.isDeterministic() ||
-				 probe.analysisTimedOut() ||
-				 probe.analysisOverflowed() )
-			{
+			if ( !probe.isDeterministic() || probe.analysisOverflowed() ) {
 				probe.issueWarnings();
 			}
 
@@ -251,10 +248,22 @@ public class DFA {
 				System.out.println(result);
 			}
 		}
-		catch (NonLLStarDecisionException re) {
+		catch (AnalysisRecursionOverflowException ovf) {
+			probe.reportRecursionOverflow(ovf.ovfState, ovf.proposedNFAConfiguration);
+			if ( !okToRetryDFAWithK1() ) {
+				probe.issueWarnings();
+			}
+		}
+		catch (AnalysisTimeoutException at) {
+			probe.reportAnalysisTimeout();
+			if ( !okToRetryDFAWithK1() ) {
+				probe.issueWarnings();
+			}
+		}
+		catch (NonLLStarDecisionException nonLL) {
 			probe.reportNonLLStarDecision(this);
 			// >1 alt recurses, k=* and no auto backtrack nor manual sem/syn
-			if ( !predicateVisible ) {
+			if ( !okToRetryDFAWithK1() ) {
 				probe.issueWarnings();
 			}
 		}
@@ -913,11 +922,11 @@ public class DFA {
 	 *
 	 *  3. alts i and j have disjoint lookahead if no sem preds
 	 *  4. if sem preds, nondeterministic alts must be sufficiently covered
+	 *
+	 *  This is avoided if analysis bails out for any reason.
 	 */
 	public void verify() {
-		if ( !probe.nonLLStarDecision ) { // avoid if non-LL(*)
-			doesStateReachAcceptState(startState);
-		}
+		doesStateReachAcceptState(startState);
 	}
 
     /** figure out if this state eventually reaches an accept state and
@@ -1007,7 +1016,22 @@ public class DFA {
         return decisionNFAStartState.getDecisionNumber();
     }
 
-    /** What GrammarAST node (derived from the grammar) is this DFA
+	/** If this DFA failed to finish during construction, we might be
+	 *  able to retry with k=1 but we need to know whether it will
+	 *  potentially succeed.  Can only succeed if there is a predicate
+	 *  to resolve the issue.  Don't try if k=1 already as it would
+	 *  cycle forever.  Timeout can retry with k=1 even if no predicate
+	 *  if k!=1.
+	 */
+	public boolean okToRetryDFAWithK1() {
+		boolean nonLLStarOrOverflowAndPredicateVisible =
+			(probe.isNonLLStarDecision()||probe.analysisOverflowed()) &&
+		    predicateVisible; // auto backtrack or manual sem/syn
+		return getUserMaxLookahead()!=1 &&
+			 (analysisTimedOut() || nonLLStarOrOverflowAndPredicateVisible);
+	}
+
+	/** What GrammarAST node (derived from the grammar) is this DFA
      *  associated with?  It will point to the start of a block or
      *  the loop back of a (...)+ block etc...
      */

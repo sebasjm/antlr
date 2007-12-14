@@ -827,13 +827,11 @@ public class Grammar {
 			startDFA = System.currentTimeMillis();
 		}
 		DFA lookaheadDFA = new DFA(decision, decisionStartState);
-		if ( (lookaheadDFA.analysisTimedOut() && // did analysis bug out?
-			 lookaheadDFA.getUserMaxLookahead()!=1) || // either k=* or k>1
-			 (lookaheadDFA.probe.isNonLLStarDecision() && // >1 alt recurses, k=*
-		      lookaheadDFA.predicateVisible) ) // auto backtrack or manual sem/syn
-		{
-			// set k=1 option if not already k=1 and try again
-			// clean up tracking stuff
+		// Retry to create a simpler DFA if analysis failed (non-LL(*),
+		// recursion overflow, or time out).
+		if ( lookaheadDFA.okToRetryDFAWithK1() ) {
+			// set k=1 option and try again.
+			// First, clean up tracking stuff
 			decisionsWhoseDFAsUsesSynPreds.remove(lookaheadDFA);
 			// TODO: clean up synPredNamesUsedInDFA also (harder)
 			lookaheadDFA = null; // make sure other memory is "free" before redoing

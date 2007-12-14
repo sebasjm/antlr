@@ -82,7 +82,7 @@ public class TestDFAConversion extends BaseTest {
 		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = "A" ;
 		int[] danglingAlts = new int[] {2};
-		int numWarnings = 2; // non-LL(1) abort and ambig upon A
+		int numWarnings = 2; // ambig upon A
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
@@ -94,19 +94,70 @@ public class TestDFAConversion extends BaseTest {
 			"a : A a X | A a Y;");
 		List altsWithRecursion = Arrays.asList(new Object[] {1,2});
 		assertNonLLStar(g, altsWithRecursion);
-		/*
-		// nondeterministic from left edge; no stop state
+	}
+
+	public void testRecursionOverflow() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a Y | A A A A A X ;\n" + // force recursion past m=4
+			"a : A a | Q;");
+		List expectedTargetRules = Arrays.asList(new Object[] {"a"});
+		int expectedAlt = 1;
+		assertRecursionOverflow(g, expectedTargetRules, expectedAlt);
+	}
+
+	public void testRecursionOverflow2() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : a Y | A+ X ;\n" + // force recursion past m=4
+			"a : A a | Q;");
+		List expectedTargetRules = Arrays.asList(new Object[] {"a"});
+		int expectedAlt = 1;
+		assertRecursionOverflow(g, expectedTargetRules, expectedAlt);
+	}
+
+	public void testRecursionOverflowWithPredOk() throws Exception {
+		// overflows with k=*, but retries with k=1 and succeeds.
+		// no warnings/errors
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : (a Y)=> a Y | A A A A A X ;\n" + // force recursion past m=4
+			"a : A a | Q;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-A->:s2=>1\n"; // gets this after failing to do LL(*)
-		int[] unreachableAlts = new int[] {1,2};
+			".s0-Q&&{synpred1}?->:s2=>1\n" +
+			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n";
+		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
-		int[] danglingAlts = new int[] {1,2};
-		int numWarnings = 1; // non-LL(*) abort
+		int[] danglingAlts = null;
+		int numWarnings = 0;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
-					  */
+	}
+
+	public void testRecursionOverflowWithPredOk2() throws Exception {
+		// overflows with k=*, but retries with k=1 and succeeds.
+		// no warnings/errors
+		// must predict Z w/o predicate
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"s : (a Y)=> a Y | A A A A A X | Z;\n" + // force recursion past m=4
+			"a : A a | Q;");
+		String expecting =
+			".s0-A->.s1\n" +
+			".s0-Q&&{synpred1}?->:s2=>1\n" +
+			".s0-Z->:s4=>3\n" +
+			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
 	public void testCannotSeePastRecursion() throws Exception {
@@ -120,20 +171,6 @@ public class TestDFAConversion extends BaseTest {
 			"    ;");
 		List altsWithRecursion = Arrays.asList(new Object[] {1,2});
 		assertNonLLStar(g, altsWithRecursion);
-/*
-		String expecting =
-			".s0-B->.s4\n" +
-			".s0-L->.s1\n" +
-			".s1-B->.s3\n" +
-			".s1-L->:s2=>1\n";
-		int[] unreachableAlts = new int[] {1,2};
-		int[] nonDetAlts = new int[] {1,2};
-		String ambigInput = null;
-		int[] danglingAlts = null;
-		int numWarnings = 2;
-		checkDecision(g, 1, expecting, unreachableAlts,
-					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
-					  */
 	}
 
 	public void testSynPredResolvesRecursion() throws Exception {
@@ -152,6 +189,39 @@ public class TestDFAConversion extends BaseTest {
 			".s1-{true}?->:s3=>2\n" +
 			".s4-{synpred1}?->:s5=>1\n" +
 			".s4-{true}?->:s6=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testSynPredResolvesRecursion2() throws Exception {
+		// k=* fails and it retries/succeeds with k=1 silently
+		// because of predicate
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"statement\n" +
+			"    :     (reference ASSIGN)=> reference ASSIGN expr\n" +
+			"    |     expr\n" +
+			"    ;\n" +
+			"expr:     reference\n" +
+			"    |     INT\n" +
+			"    |     FLOAT\n" +
+			"    ;\n" +
+			"reference\n" +
+			"    :     ID L argument_list R\n" +
+			"    ;\n" +
+			"argument_list\n" +
+			"    :     expr COMMA expr\n" +
+			"    ;");
+		String expecting =
+			".s0-ID->.s1\n" +
+			".s0-INT..FLOAT->:s3=>2\n" +
+			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -1113,6 +1183,25 @@ As a result, alternative(s) 2 were disabled for that input
 		alts.addAll(msg.altsWithRecursion);
 		Collections.sort(alts);
 		assertEquals(expectedBadAlts,alts);
+	}
+
+	protected void assertRecursionOverflow(Grammar g,
+										   List expectedTargetRules,
+										   int expectedAlt) {
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		// mimic actions of org.antlr.Tool first time for grammar g
+		if ( g.getNumberOfDecisions()==0 ) {
+			g.createNFAs();
+			g.createLookaheadDFAs();
+		}
+		RecursionOverflowMessage msg = getRecursionOverflowMessage(equeue.errors);
+		assertTrue("expected recursion overflow msg", msg!=null);
+		assertEquals("target rules mismatch",
+					 expectedTargetRules.toString(), msg.targetRules.toString());
+		assertEquals("mismatched alt", expectedAlt, msg.alt);
 	}
 
 	protected void checkDecision(Grammar g,

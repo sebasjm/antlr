@@ -8,6 +8,37 @@ University of San Francisco
 
 CHANGES
 
+December 13-14, 2007
+
+* I abort entire DFA construction now when I see recursion in > 1 alt.
+  Decision is non-LL(*) even if some pieces are LL(*).  Safer to bail
+  out and try with fixed k.  If user set fixed k then it continues because
+  analysis will eventually terminate for sure.  If a pred is encountered
+  and k=* and it's non-LL(*), it aborts and retries at k=1 but does NOT
+  emit an error.
+
+* Decided that recursion overflow while computing a lookahead DFA is
+  serious enough that I should bail out of entire DFA computation.
+  Previously analysis tried to keep going and made the rules about
+  how analysis worked more complicated.  Better to simply abort when
+  decision can't be computed with current max stack (-Xm option).
+  User can adjust or add predicate etc...  This is now an error
+  not a warning.
+
+* Cleaned up how DFA construction/analysis aborts due to non-LL(*) and
+  overflow etc...  Throws exceptions now, which cleans up a bunch of IF
+  checks etc...  Very nice now. Exceptions:
+	analysis/AnalysisRecursionOverflowException.java
+	analysis/AnalysisTimeoutException.java
+	analysis/NonLLStarDecisionException.java
+
+* ErrorManager.grammarWarning() counted them as errors not warnings.
+
+* Unreachable alt warnings are now errors.
+
+* The upshot of these changes is that I fixed ANTLR-178 and did
+  lots of refactoring of code handling analysis failure.
+
 December 11, 2007
 
 * Could not deal with spaces, oddly enough in arg lists:

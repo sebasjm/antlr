@@ -247,7 +247,7 @@ ANTLR could not analyze this decision in rule <enclosingRule>; often this is bec
 >>
 
 RECURSION_OVERLOW(alt,input,targetRules,callSiteStates) ::= <<
-Alternative <alt>: after matching input such as <input> decision cannot predict what comes next due to recursion overflow <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule>};separator=", ">}; separator=" and ">
+Alternative <alt>: after matching input such as <input> decision cannot predict what comes next due to recursion overflow <targetRules,callSiteStates:{t,c|to <t> from <c:{s|<s.enclosingRule.name>};separator=", ">}; separator=" and ">
 >>
 
 LEFT_RECURSION(targetRules,alt,callSiteStates) ::= <<

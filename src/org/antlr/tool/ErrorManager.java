@@ -659,10 +659,10 @@ public class ErrorManager {
 	public static void unreachableAlts(DecisionProbe probe,
 									   List alts)
 	{
-		getErrorState().warnings++;
+		getErrorState().errors++;
 		Message msg = new GrammarUnreachableAltsMessage(probe,alts);
-		getErrorState().warningMsgIDs.add(msg.msgID);
-		getErrorListener().warning(msg);
+		getErrorState().errorMsgIDs.add(msg.msgID);
+		getErrorListener().error(msg);
 	}
 
 	public static void insufficientPredicates(DecisionProbe probe,
@@ -687,11 +687,11 @@ public class ErrorManager {
 										 Collection targetRules,
 										 Collection callSiteStates)
 	{
-		getErrorState().warnings++;
+		getErrorState().errors++;
 		Message msg = new RecursionOverflowMessage(probe,sampleBadState, alt,
 										 targetRules, callSiteStates);
-		getErrorState().warningMsgIDs.add(msg.msgID);
-		getErrorListener().warning(msg);
+		getErrorState().errorMsgIDs.add(msg.msgID);
+		getErrorListener().error(msg);
 	}
 
 	/*
@@ -748,7 +748,7 @@ public class ErrorManager {
 									  Object arg,
 									  Object arg2)
 	{
-		getErrorState().errors++;
+		getErrorState().warnings++;
 		Message msg = new GrammarSemanticsMessage(msgID,g,token,arg,arg2);
 		getErrorState().warningMsgIDs.add(msgID);
 		getErrorListener().warning(msg);

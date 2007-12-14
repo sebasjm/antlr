@@ -81,8 +81,10 @@ public class GrammarSanity {
 			if ( visitedDuringRecursionCheck.contains(refRuleDef) ) {
 				// record left-recursive rule, but don't go back in
 				grammar.leftRecursiveRules.add(refRuleDef);
+				/*
 				System.out.println("already visited "+refRuleDef+", calling from "+
 								   s.enclosingRule);
+								   */
 				addRulesToCycle(refRuleDef,
 								s.enclosingRule,
 								listOfRecursiveCycles);

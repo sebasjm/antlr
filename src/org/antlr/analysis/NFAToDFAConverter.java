@@ -76,8 +76,6 @@ public class NFAToDFAConverter {
 
 		// while more DFA states to check, process them
 		while ( work.size()>0 &&
-			    !dfa.probe.analysisTimedOut() &&
-				!dfa.probe.nonLLStarDecision &&
 				!dfa.nfa.grammar.NFAToDFAConversionExternallyAborted() )
 		{
 			DFAState d = (DFAState) work.get(0);
@@ -292,7 +290,16 @@ public class NFAToDFAConverter {
 				// beyond this state; also no possibility of a nondeterminism.
 				// This optimization May 22, 2006 just dropped -Xint time
 				// for analysis of Java grammar from 11.5s to 2s!  Wow.
-				closure(t);  // add any NFA states reachable via epsilon
+				try {
+					closure(t);  // add any NFA states reachable via epsilon
+				}
+				catch (AnalysisRecursionOverflowException ovf) {
+					// trap here to ensure overflow DFA state is connected
+					// to DFA so we can trace later to state for error message
+					// (print input sequence).
+					d.addTransition(t, label);
+					throw ovf;
+				}
 			}
 
 			/*
@@ -301,9 +308,11 @@ public class NFAToDFAConverter {
 							   "->"+t);
 							   */
 
+			/*
 			// add if not in DFA yet even if its closure aborts due to non-LL(*);
 			// getting to the state is ok, we just can't see where to go next--it's
 			// a blind alley.
+			*/
 			DFAState targetState = addDFAStateToWorkList(t);
 
 			numberOfEdgesEmanating +=
@@ -312,6 +321,7 @@ public class NFAToDFAConverter {
 			// lookahead of target must be one larger than d's k
 			targetState.setLookaheadDepth(d.getLookaheadDepth() + 1);
 
+			/*
 			// closure(t) might have aborted, but addDFAStateToWorkList will try
 			// to resolve t with predicates.  If that fails, must give an error
 			// Note: this is tested on the target of d not d.
@@ -319,6 +329,7 @@ public class NFAToDFAConverter {
 				// no predicates to resolve non-LL(*) decision, report
 				t.dfa.probe.reportNonLLStarDecision(t.dfa);
 			}
+			*/
 		}
 
 		//System.out.println("DFA after reach / closures:\n"+dfa);
@@ -608,9 +619,8 @@ public class NFAToDFAConverter {
 			 System.currentTimeMillis() - d.dfa.conversionStartTime >=
 			 DFA.MAX_TIME_PER_DFA_CREATION )
 		{
-			// report and back your way out; we've blown up somehow
-			dfa.probe.reportAnalysisTimeout();
-			return;
+			// bail way out; we've blown up somehow
+			throw new AnalysisTimeoutException(d.dfa);
 		}
 
 		NFAConfiguration proposedNFAConfiguration =
@@ -662,9 +672,8 @@ public class NFAToDFAConverter {
 				System.out.println("OVF state "+d);
 				System.out.println("proposed "+proposedNFAConfiguration);
 				*/
-				d.dfa.probe.reportRecursiveOverflow(d, proposedNFAConfiguration);
 				d.abortedDueToRecursionOverflow = true;
-				return;
+				throw new AnalysisRecursionOverflowException(d, proposedNFAConfiguration);
 			}
 
 			// otherwise, it's cool to (re)enter target of this rule ref
@@ -999,8 +1008,7 @@ public class NFAToDFAConverter {
 		// Later, the error reporting may want to trace the path from
 		// the start state to the nondet state
 		if ( DFAOptimizer.MERGE_STOP_STATES &&
-			d.getNonDeterministicAlts()==null &&
-			!d.abortedDueToRecursionOverflow )
+			d.getNonDeterministicAlts()==null )
 		{
 			// check to see if we already have an accept state for this alt
 			// [must do this after we resolve nondeterminisms in general]
@@ -1214,13 +1222,15 @@ public class NFAToDFAConverter {
 		}
 
 		// if no problems return unless we aborted work on d to avoid inf recursion
-		if ( !d.abortedDueToRecursionOverflow && nondeterministicAlts==null ) {
+		//if ( !d.abortedDueToRecursionOverflow && nondeterministicAlts==null ) {
+		if ( nondeterministicAlts==null ) {
 			return; // no problems, return
 		}
 
 		// if we're not a conflicting lexer rule and we didn't abort, report ambig
 		// We should get a report for abort so don't give another
-		if ( !d.abortedDueToRecursionOverflow && !conflictingLexerRules ) {
+		//if ( !d.abortedDueToRecursionOverflow && !conflictingLexerRules ) {
+		if ( !conflictingLexerRules ) {
 			// TODO: with k=x option set, this is called twice for same state
 			dfa.probe.reportNondeterminism(d, nondeterministicAlts);
 			// TODO: how to turn off when it's only the FOLLOW that is
@@ -1468,6 +1478,7 @@ public class NFAToDFAConverter {
 			// First, prevent a recursion warning on this state due to
 			// pred resolution
 			if ( d.abortedDueToRecursionOverflow ) {
+				System.err.println("tracking OVF when should not!");
 				d.dfa.probe.removeRecursiveOverflowState(d);
 			}
 			Iterator iter = d.nfaConfigurations.iterator();

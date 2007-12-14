@@ -126,7 +126,7 @@ public class DecisionProbe {
 	 *  the proposed new NFAConfiguration is recorded for the associated DFA state.
 	 *  Map<Integer DFA state number,List<NFAConfiguration>>.
 	 */
-	protected Map stateToRecursiveOverflowConfigurationsMap = new HashMap();
+	protected Map stateToRecursionOverflowConfigurationsMap = new HashMap();
 
 	/** Left recursion discovered.  The proposed new NFAConfiguration
 	 *  is recorded for the associated DFA state.
@@ -210,7 +210,7 @@ public class DecisionProbe {
 
 	/** Took too long to analyze a DFA */
 	public boolean analysisOverflowed() {
-		return stateToRecursiveOverflowConfigurationsMap.size()>0;
+		return stateToRecursionOverflowConfigurationsMap.size()>0;
 	}
 
 	/** Found recursion in > 1 alt */
@@ -282,7 +282,7 @@ public class DecisionProbe {
 	 */
 	public void removeRecursiveOverflowState(DFAState d) {
 		Integer stateI = Utils.integer(d.stateNumber);
-		stateToRecursiveOverflowConfigurationsMap.remove(stateI);
+		stateToRecursionOverflowConfigurationsMap.remove(stateI);
 	}
 
 	/*
@@ -504,7 +504,7 @@ public class DecisionProbe {
 	protected void issueRecursionWarnings() {
 		// RECURSION OVERFLOW
 		Set dfaStatesWithRecursionProblems =
-			stateToRecursiveOverflowConfigurationsMap.keySet();
+			stateToRecursionOverflowConfigurationsMap.keySet();
 		// now walk truly unique (unaliased) list of dfa states with inf recur
 		// Goal: create a map from alt to map<target,List<callsites>>
 		// Map<Map<String target, List<NFAState call sites>>
@@ -512,7 +512,7 @@ public class DecisionProbe {
 		// track a single problem DFA state for each alt
 		Map altToDFAState = new HashMap();
 		computeAltToProblemMaps(dfaStatesWithRecursionProblems,
-								stateToRecursiveOverflowConfigurationsMap,
+								stateToRecursionOverflowConfigurationsMap,
 								altToTargetToCallSitesMap, // output param
 								altToDFAState);            // output param
 		//System.out.println("altToTargetToCallSitesMap="+altToTargetToCallSitesMap);
@@ -649,20 +649,20 @@ public class DecisionProbe {
 		altsWithProblem.addAll(dfa.recursiveAltSet.toList());
 	}
 
-	public void reportRecursiveOverflow(DFAState d,
-										NFAConfiguration recursiveNFAConfiguration)
+	public void reportRecursionOverflow(DFAState d,
+										NFAConfiguration recursionNFAConfiguration)
 	{
 		// track the state number rather than the state as d will change
 		// out from underneath us; hash wouldn't return any value
 		Integer stateI = Utils.integer(d.stateNumber);
-		List configs = (List)stateToRecursiveOverflowConfigurationsMap.get(stateI);
+		List configs = (List)stateToRecursionOverflowConfigurationsMap.get(stateI);
 		if ( configs==null ) {
 			configs = new ArrayList();
-			configs.add(recursiveNFAConfiguration);
-			stateToRecursiveOverflowConfigurationsMap.put(stateI, configs);
+			configs.add(recursionNFAConfiguration);
+			stateToRecursionOverflowConfigurationsMap.put(stateI, configs);
 		}
 		else {
-			configs.add(recursiveNFAConfiguration);
+			configs.add(recursionNFAConfiguration);
 		}
 	}
 
