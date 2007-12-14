@@ -198,6 +198,89 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
+	public void testSemPredResolvesRecursion() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"x   : {p}? y X\n" +
+			"    | y Y\n" +
+			"    ;\n" +
+			"y   : L y R\n" +
+			"    | B\n" +
+			"    ;");
+		String expecting =
+			".s0-B->.s4\n" +
+			".s0-L->.s1\n" +
+			".s1-{p}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n" +
+			".s4-{p}?->:s5=>1\n" +
+			".s4-{true}?->:s6=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testSemPredResolvesRecursion2() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"x\n" +
+			"options {k=1;}\n" +
+			"   : {p}? y X\n" +
+			"    | y Y\n" +
+			"    ;\n" +
+			"y   : L y R\n" +
+			"    | B\n" +
+			"    ;");
+		String expecting =
+			".s0-B->.s4\n" +
+			".s0-L->.s1\n" +
+			".s1-{p}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n" +
+			".s4-{p}?->:s5=>1\n" +
+			".s4-{true}?->:s6=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testSemPredResolvesRecursion3() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"x\n" +
+			"options {k=2;}\n" + // just makes bigger DFA
+			"   : {p}? y X\n" +
+			"    | y Y\n" +
+			"    ;\n" +
+			"y   : L y R\n" +
+			"    | B\n" +
+			"    ;");
+		String expecting =
+			".s0-B->.s6\n" +
+			".s0-L->.s1\n" +
+			".s1-B->.s5\n" +
+			".s1-L->.s2\n" +
+			".s2-{p}?->:s3=>1\n" +
+			".s2-{true}?->:s4=>2\n" +
+			".s5-{p}?->:s3=>1\n" +
+			".s5-{true}?->:s4=>2\n" +
+			".s6-X->:s3=>1\n" +
+			".s6-Y->:s4=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
 	public void testSynPredResolvesRecursion2() throws Exception {
 		// k=* fails and it retries/succeeds with k=1 silently
 		// because of predicate
@@ -222,6 +305,74 @@ public class TestDFAConversion extends BaseTest {
 			".s0-INT..FLOAT->:s3=>2\n" +
 			".s1-{synpred1}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testSynPredResolvesRecursion3() throws Exception {
+		// No errors with k=1; don't try k=* first
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"statement\n" +
+			"options {k=1;}\n" +
+			"    :     (reference ASSIGN)=> reference ASSIGN expr\n" +
+			"    |     expr\n" +
+			"    ;\n" +
+			"expr:     reference\n" +
+			"    |     INT\n" +
+			"    |     FLOAT\n" +
+			"    ;\n" +
+			"reference\n" +
+			"    :     ID L argument_list R\n" +
+			"    ;\n" +
+			"argument_list\n" +
+			"    :     expr COMMA expr\n" +
+			"    ;");
+		String expecting =
+			".s0-ID->.s1\n" +
+			".s0-INT..FLOAT->:s3=>2\n" +
+			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testSynPredResolvesRecursion4() throws Exception {
+		// No errors with k=2; don't try k=* first
+		// Should be ok like k=1 'except bigger DFA
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"statement\n" +
+			"options {k=2;}\n" +
+			"    :     (reference ASSIGN)=> reference ASSIGN expr\n" +
+			"    |     expr\n" +
+			"    ;\n" +
+			"expr:     reference\n" +
+			"    |     INT\n" +
+			"    |     FLOAT\n" +
+			"    ;\n" +
+			"reference\n" +
+			"    :     ID L argument_list R\n" +
+			"    ;\n" +
+			"argument_list\n" +
+			"    :     expr COMMA expr\n" +
+			"    ;");
+		String expecting =
+			".s0-ID->.s1\n" +
+			".s0-INT..FLOAT->:s4=>2\n" +
+			".s1-L->.s2\n" +
+			".s2-{synpred1}?->:s3=>1\n" +
+			".s2-{true}?->:s4=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
