@@ -50,27 +50,7 @@ package org.antlr.runtime.tree {
 	public class CommonTreeNodeStream implements TreeNodeStream {
 		public static const DEFAULT_INITIAL_BUFFER_SIZE:int = 100;
 		public static const INITIAL_CALL_STACK_SIZE:int = 10;
-	/*
-		protected class StreamIterator implements Iterator {
-			int i = 0;
-			public boolean hasNext() {
-				return i<nodes.size();
-			}
-	
-			public Object next() {
-				int current = i;
-				i++;
-				if ( current < nodes.size() ) {
-					return nodes.get(current);
-				}
-				return eof;
-			}
-	
-			public void remove() {
-				throw new RuntimeException("cannot remove nodes from stream");
-			}
-		}
-	*/
+
 		// all these navigation nodes are shared and hence they
 		// cannot contain any line/column info
 	
@@ -112,36 +92,6 @@ package org.antlr.runtime.tree {
 		/** Stack of indexes used for push/pop calls */
 		protected var calls:Array;
 	
-		/** Stack pointer for stack of indexes; -1 indicates empty.  Points
-		 *  at next location to push a value.
-		 */
-		protected var _sp:int = -1;
-	
-		/** During fillBuffer(), we can make a reverse index from a set
-		 *  of token types of interest to the list of indexes into the
-		 *  node stream.  This lets us convert a node pointer to a
-		 *  stream index semi-efficiently for a list of interesting
-		 *  nodes such as function definition nodes (you'll want to seek
-		 *  to their bodies for an interpreter).  Also useful for doing
-		 *  dynamic searches; i.e., go find me all PLUS nodes.
-		 */
-		protected var tokenTypeToStreamIndexesMap:Object;
-	
-		/** If tokenTypesToReverseIndex set to INDEX_ALL then indexing
-		 *  occurs for all token types.
-		 * 
-		 * GMS -- was HashSet
-		 */
-		public static const INDEX_ALL:Object = new Object();
-	
-		/** A set of token types user would like to index for faster lookup.
-		 *  If this is INDEX_ALL, then all token types are tracked.  If null,
-		 *  then none are indexed.
-		 * 
-		 * GMS -- was a Set
-		 */
-		protected var tokenTypesToReverseIndex:Object = null;
-	
 		public function CommonTreeNodeStream(tree:Object, adaptor:TreeAdaptor = null, initialBufferSize:int = DEFAULT_INITIAL_BUFFER_SIZE) {
 			this.root = tree;
 			this.adaptor = adaptor == null ? new CommonTreeAdaptor() : adaptor;
@@ -165,7 +115,6 @@ package org.antlr.runtime.tree {
 			var nil:Boolean = adaptor.isNil(t);
 			if ( !nil ) {
 				nodes.push(t); // add this node
-				fillReverseIndex(t, nodes.length-1);
 			}
 			// add DOWN node if t has children
 			var n:int = adaptor.getChildCount(t);
@@ -183,121 +132,22 @@ package org.antlr.runtime.tree {
 			}
 		}
 	
-		/** Given a node, add this to the reverse index tokenTypeToStreamIndexesMap.
-		 *  You can override this method to alter how indexing occurs.  The
-		 *  default is to create a
-		 *
-		 *    Map<Integer token type,ArrayList<Integer stream index>>
-		 *
-		 *  This data structure allows you to find all nodes with type INT in order.
-		 *
-		 *  If you really need to find a node of type, say, FUNC quickly then perhaps
-		 *
-		 *    Map<Integertoken type,Map<Object tree node,Integer stream index>>
-		 *
-		 *  would be better for you.  The interior maps map a tree node to
-		 *  the index so you don't have to search linearly for a specific node.
-		 *
-		 *  If you change this method, you will likely need to change
-		 *  getNodeIndex(), which extracts information.
+		/** What is the stream index for node? 0..n-1
+		 *  Return -1 if node not found.
 		 */
-		protected function fillReverseIndex(node:Object, streamIndex:int):void {
-			//System.out.println("revIndex "+node+"@"+streamIndex);
-			if ( tokenTypesToReverseIndex==null ) {
-				return; // no indexing if this is empty (nothing of interest)
-			}
-			if ( tokenTypeToStreamIndexesMap==null ) {
-				tokenTypeToStreamIndexesMap = new Object(); // first indexing op
-			}
-			var tokenType:int = adaptor.getType(node);
-			var tokenTypeI:String = new String(tokenType);
-			if ( !(tokenTypesToReverseIndex==INDEX_ALL ||
-				   tokenTypesToReverseIndex.hasOwnProperty(tokenTypeI)) )
-			{
-				return; // tokenType not of interest
-			}
-			var streamIndexI:String = new String(streamIndex);
-			var indexes:Array = tokenTypeToStreamIndexesMap[tokenTypeI];
-			if ( indexes==null ) {
-				indexes = new Array(); // no list yet for this token type
-				indexes.push(streamIndexI); // not there yet, add
-				tokenTypeToStreamIndexesMap.put(tokenTypeI, indexes);
-			}
-			else {
-				// GMS - fix this.
-				if ( !indexes.contains(streamIndexI) ) {
-					indexes.add(streamIndexI); // not there yet, add
-				}
-			}
-		}
-	
-		/** Track the indicated token type in the reverse index.  Call this
-		 *  repeatedly for each type or use variant with Set argument to
-		 *  set all at once.
-		 * @param tokenType
-		 */
-		public function reverseIndex(tokenType:int):void {
-			if ( tokenTypesToReverseIndex==null ) {
-				tokenTypesToReverseIndex = new Object();
-			}
-			else if ( tokenTypesToReverseIndex==INDEX_ALL ) {
-				return;
-			}
-			tokenTypesToReverseIndex[new String(tokenType)] = true;
-		}
-	
-		/** Track the indicated token types in the reverse index. Set
-		 *  to INDEX_ALL to track all token types.
-		 * 
-		 * GMS - tokenTypes was Set
-		 */
-		public function reverseIndexSet(tokenTypes:Object):void {
-			tokenTypesToReverseIndex = tokenTypes;
-		}
-	
-		/** Given a node pointer, return its index into the node stream.
-		 *  This is not its Token stream index.  If there is no reverse map
-		 *  from node to stream index or the map does not contain entries
-		 *  for node's token type, a linear search of entire stream is used.
-		 *
-		 *  Return -1 if exact node pointer not in stream.
-		 */
-		public function getNodeIndex(node:Object):int {
-			//System.out.println("get "+node);
-			if ( tokenTypeToStreamIndexesMap==null ) {
-				return getNodeIndexLinearly(node);
-			}
-			var tokenType:int = adaptor.getType(node);
-			var tokenTypeI:String = new String(tokenType);
-			var indexes:Array = tokenTypeToStreamIndexesMap[tokenTypeI];
-			if ( indexes==null ) {
-				//System.out.println("found linearly; stream index = "+getNodeIndexLinearly(node));
-				return getNodeIndexLinearly(node);
-			}
-			for (var i:int = 0; i < indexes.size(); i++) {
-				var streamIndexI:String = String(indexes[i]);
-				var n:Object = getNode(int(streamIndexI));
-				if ( n==node ) {
-					//System.out.println("found in index; stream index = "+streamIndexI);
-					return int(streamIndexI); // found it!
-				}
-			}
-			return -1;
-		}
-	
-		protected function getNodeIndexLinearly(node:Object):int {
+		protected function getNodeIndex(node:Object):int {
 			if ( p==-1 ) {
 				fillBuffer();
 			}
 			for (var i:int = 0; i < nodes.length; i++) {
 				var t:Object = nodes[i];
-				if ( t==node ) {
+				if ( t===node ) {
 					return i;
 				}
 			}
 			return -1;
 		}
-	
+			
 		/** As we flatten the tree, we use UP, DOWN nodes to represent
 		 *  the tree structure.  When debugging we need unique nodes
 		 *  so instantiate new ones when uniqueNavigationNodes is true.
@@ -346,25 +196,6 @@ package org.antlr.runtime.tree {
 			}
 			return nodes[p+k-1];
 		}
-	
-	/*
-		public Object getLastTreeNode() {
-			int i = index();
-			if ( i>=size() ) {
-				i--; // if at EOF, have to start one back
-			}
-			System.out.println("start last node: "+i+" size=="+nodes.size());
-			while ( i>=0 &&
-				(adaptor.getType(get(i))==Token.EOF ||
-				 adaptor.getType(get(i))==Token.UP ||
-				 adaptor.getType(get(i))==Token.DOWN) )
-			{
-				i--;
-			}
-			System.out.println("stop at node: "+i+" "+nodes.get(i));
-			return nodes.get(i);
-		}
-	*/
 		
 		/** Look backwards k nodes */
 		protected function LB(k:int):Object {
@@ -393,6 +224,10 @@ package org.antlr.runtime.tree {
 			return adaptor;
 		}
 	
+		public function set treeAdaptor(adaptor:TreeAdaptor):void {
+			this.adaptor = adaptor;
+		}
+		
 		public function get hasUniqueNavigationNodes():Boolean {
 			return uniqueNavigationNodes;
 		}
@@ -444,14 +279,13 @@ package org.antlr.runtime.tree {
 		}
 	
 		/** Make stream jump to a new location, saving old location.
-		 *  Switch back with pop().  I manage dyanmic array manually
-		 *  to avoid creating Integer objects all over the place.
+		 *  Switch back with pop().
 		 */
 		public function push(index:int):void {
 			if ( calls==null ) {
-				calls = new Array(INITIAL_CALL_STACK_SIZE);
+				calls = new Array();
 			}
-			calls[++_sp] = p; // save current index
+			calls.push(p); // save current index
 			seek(index);
 		}
 	
@@ -459,11 +293,19 @@ package org.antlr.runtime.tree {
 		 *  Return top of stack (return index).
 		 */
 		public function pop():int {
-			var ret:int = calls[_sp--];
+			var ret:int = calls.pop();
 			seek(ret);
 			return ret;
 		}
 	
+		public function reset():void {
+			p = -1;
+			lastMarker = 0;
+	        if (calls != null) {
+	            calls = new Array();
+	        }
+	    }
+	    
 		public function get size():int {
 			if ( p==-1 ) {
 				fillBuffer();
@@ -471,14 +313,13 @@ package org.antlr.runtime.tree {
 			return nodes.size();
 		}
 	
-	/*  GMS - need to see where used
-		public Iterator iterator() {
-			if ( p==-1 ) {
-				fillBuffer();
+		// TREE REWRITE INTERFACE
+		public function replaceChildren(parent:Object, startChildIndex:int, stopChildIndex:int, t:Object):void {
+			if ( parent!=null ) {
+				adaptor.replaceChildren(parent, startChildIndex, stopChildIndex, t);
 			}
-			return new StreamIterator();
 		}
-	*/
+
 		/** Used for testing, just return the token type stream */
 		public function toString():String {
 			if ( p==-1 ) {

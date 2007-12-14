@@ -313,6 +313,11 @@ package org.antlr.runtime {
 	        return p;
 	    }
 	
+		public function reset():void {
+			p = -1;
+			lastMarker = 0;
+		}
+	
 		public function rewindTo(marker:int):void {
 			seek(marker);
 		}

@@ -214,8 +214,38 @@ package org.antlr.runtime.tree {
 	
 		/** Get a child 0..n-1 node */
 		function getChild(t:Object, i:int):Object;
+		
+		/** Set ith child (0..n-1) to t; t must be non-null and non-nil node */
+		function setChild(t:Object, i:int, child:Object):void;
+	
+		/** Remove ith child and shift children down from right. */
+		function deleteChild(t:Object, i:int):Object;
 	
 		/** How many children?  If 0, then this is a leaf node */
 		function getChildCount(t:Object):int;
+		
+		/** Who is the parent node of this node; if null, implies node is root.
+		 *  If your node type doesn't handle this, it's ok but the tree rewrites
+		 *  in tree parsers need this functionality.
+		 */
+		function getParent(t:Object):Object;
+		function setParent(t:Object, parent:Object):void;
+	
+		/** What index is this node in the child list? Range: 0..n-1
+		 *  If your node type doesn't handle this, it's ok but the tree rewrites
+		 *  in tree parsers need this functionality.
+		 */
+		function getChildIndex(t:Object):int;
+		function setChildIndex(t:Object, index:int):void;
+	
+		/** Replace from start to stop child index of parent with t, which might
+		 *  be a list.  Number of children may be different
+		 *  after this call.
+		 *
+		 *  If parent is null, don't do anything; must be at root of overall tree.
+		 *  Can't replace whatever points to the parent externally.  Do nothing.
+		 */
+		function replaceChildren(parent:Object, startChildIndex:int, stopChildIndex:int, t:Object):void;	
+		
 	}
 }

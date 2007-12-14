@@ -28,20 +28,33 @@
 package org.antlr.runtime.tree {
 	import org.antlr.runtime.Token;
 	
-	/** A tree node that is wrapper for a Token object. */
+	/** A tree node that is wrapper for a Token object.  After 3.0 release
+	 *  while building tree rewrite stuff, it became clear that computing
+	 *  parent and child index is very difficult and cumbersome.  Better to
+	 *  spend the space in every tree node.  If you don't want these extra
+	 *  fields, it's easy to cut them out in your own BaseTree subclass.
+	 */
 	public class CommonTree extends BaseTree {
+		/** A single token is the payload */
+		private var _token:Token;
+		
 		/** What token indexes bracket all tokens associated with this node
 		 *  and below?
 		 */
 		public var startIndex:int=-1, stopIndex:int=-1;
 	
-		/** A single token is the payload */
-		public var _token:Token;
-		
+		/** Who is the parent node of this node; if null, implies node is root */
+		private var _parent:CommonTree;
+	
+		/** What index is this node in the child list? Range: 0..n-1 */
+		private var _childIndex:int = -1;
+			
 		public function CommonTree(node:CommonTree = null) {
 			if (node != null) {
 				super(node);
 				this._token = node._token;
+				this.startIndex = node.startIndex;
+				this.stopIndex = node.stopIndex;
 			}
 		}
 	
@@ -59,7 +72,7 @@ package org.antlr.runtime.tree {
 			return new CommonTree(this);
 		}
 	
-		public override function isNil():Boolean {
+		public override function get isNil():Boolean {
 			return _token==null;
 		}
 	
@@ -118,9 +131,25 @@ package org.antlr.runtime.tree {
 		public override function set tokenStopIndex(index:int):void {
 			stopIndex = index;
 		}
+
+		public override function get childIndex():int {
+			return _childIndex;
+		}
 	
+		public override function get parent():Tree {
+			return _parent;
+		}
+	
+		public override function set parent(t:Tree):void {
+			this._parent = CommonTree(t);
+		}
+	
+		public override function set childIndex(index:int):void {
+			this._childIndex = index;
+		}
+
 		public override function toString():String {
-			if ( isNil() ) {
+			if ( isNil ) {
 				return "nil";
 			}
 			return _token.text;

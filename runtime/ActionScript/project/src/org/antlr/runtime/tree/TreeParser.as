@@ -38,7 +38,8 @@ package org.antlr.runtime.tree {
 	
 		protected var input:TreeNodeStream;
 	
-		public function TreeParser(input:TreeNodeStream) {
+		public function TreeParser(input:TreeNodeStream, state:RecognizerSharedState = null) {
+			super(state);
 			treeNodeStream = input;
 		}
 	
@@ -63,8 +64,8 @@ package org.antlr.runtime.tree {
 		 *  corresponding UP node.
 		 */
 		public function matchAny(ignore:IntStream):void { // ignore stream, copy of this.input
-			errorRecovery = false;
-			failed = false;
+			state.errorRecovery = false;
+			state.failed = false;
 			var look:Object = input.LT(1);
 			if ( input.treeAdaptor.getChildCount(look)==0 ) {
 				input.consume(); // not subtree, consume 1 node and return
@@ -102,7 +103,7 @@ package org.antlr.runtime.tree {
 		 *  the input tree not the user.
 		 */
 		public override function getErrorHeader(e:RecognitionException):String {
-			return getGrammarFileName()+": node from "+
+			return grammarFileName+": node from "+
 				   (e.approximateLineInfo?"after ":"")+"line "+e.line+":"+e.charPositionInLine;
 		}
 	

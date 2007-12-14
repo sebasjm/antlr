@@ -134,7 +134,29 @@ package org.antlr.runtime.tree
 			}
 	        return Tree(t).childCount;
 	    }
-	
-	}
 
+		public override function getParent(t:Object):Object {
+			return Tree(t).parent;
+		}
+	
+		public override function setParent(t:Object, parent:Object):void {
+			Tree(t).parent = Tree(parent);
+		}
+	
+		public override function getChildIndex(t:Object):int {
+			return Tree(t).childIndex;
+		}
+	
+		public override function setChildIndex(t:Object, index:int):void {
+			Tree(t).childIndex = index;
+		}
+	
+		public override function replaceChildren(parent:Object, startChildIndex:int, stopChildIndex:int, t:Object):void {
+			if ( parent!=null ) {
+				Tree(parent).replaceChildren(startChildIndex, stopChildIndex, t);
+			}
+		}
+		
+	}
+	
 }

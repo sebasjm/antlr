@@ -15,16 +15,41 @@ package org.antlr.runtime.tree {
 	
 		function get childCount():int;
 	
+		// Tree tracks parent and child index now > 3.0
+	
+		function get parent():Tree;
+	
+		function set parent(t:Tree):void;
+	
+		/** This node is what child index? 0..n-1 */
+		function get childIndex():int;
+	
+		function set childIndex(index:int):void;
+	
+		/** Set the parent and child index values for all children */
+		function freshenParentAndChildIndexes():void;
+	
 		/** Add t as a child to this node.  If t is null, do nothing.  If t
 		 *  is nil, add all children of t to this' children.
-		 * @param t
 		 */
 		function addChild(t:Tree):void;
 	
+		/** Set ith child (0..n-1) to t; t must be non-null and non-nil node */
+		function setChild(i:int, t:Tree):void;
+	
+		function deleteChild(i:int):Object;
+	
+		/** Delete children from start to stop and replace with t even if t is
+		 *  a list (nil-root tree).  num of children can increase or decrease.
+		 *  For huge child lists, inserting children can force walking rest of
+		 *  children to set their childindex; could be slow.
+		 */
+		function replaceChildren(startChildIndex:int, stopChildIndex:int, t:Object):void;	
+
 		/** Indicates the node is a nil node but may still have children, meaning
 		 *  the tree is a flat list.
 		 */
-		function isNil():Boolean;
+		function get isNil():Boolean;
 	
 		/**  What is the smallest token index (indexing from 0) for this node
 		 *   and its children?
@@ -39,8 +64,6 @@ package org.antlr.runtime.tree {
 		function get tokenStopIndex():int;
 	
 		function set tokenStopIndex(index:int):void;
-	
-		function dupTree():Tree;
 	
 		function dupNode():Tree;
 	

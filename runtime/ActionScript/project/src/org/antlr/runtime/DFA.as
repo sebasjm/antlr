@@ -111,8 +111,8 @@ package org.antlr.runtime {
 		}
 	
 		protected function noViableAlt(s:int, input:IntStream):void {
-			if (recognizer.backtracking>0) {
-				recognizer.failed=true;
+			if (recognizer.state.backtracking>0) {
+				recognizer.state.failed=true;
 				return;
 			}
 			var nvae:NoViableAltException =

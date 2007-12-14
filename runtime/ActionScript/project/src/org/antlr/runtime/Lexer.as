@@ -36,40 +36,6 @@ package org.antlr.runtime {
 		/** Where is the lexer drawing characters from? */
 	    protected var input:CharStream;
 	
-		/** The goal of all lexer rules/methods is to create a token object.
-		 *  This is an instance variable as multiple rules may collaborate to
-		 *  create a single token.  nextToken will return this object after
-		 *  matching lexer rule(s).  If you subclass to allow multiple token
-		 *  emissions, then set this to the last token to be matched or
-		 *  something nonnull so that the auto token emit mechanism will not
-		 *  emit another token.
-		 */
-	    protected var token:Token;
-	
-		/** What character index in the stream did the current token start at?
-		 *  Needed, for example, to get the text for current token.  Set at
-		 *  the start of nextToken.
-	 	 */
-		protected var tokenStartCharIndex:int = -1;
-	
-		/** The line on which the first character of the token resides */
-		protected var tokenStartLine:int;
-	
-		/** The character position of first character within the line */
-		protected var tokenStartCharPositionInLine:int;
-	
-		/** The channel number for the current token */
-		protected var channel:int;
-	
-		/** The token type for the current token */
-		protected var type:int;
-	
-		/** You can set the text for the current token to override what is in
-		 *  the input char buffer.  Use setText() or can set this instance var.
-	 	 */
-		protected var _text:String;
-	
-		// GMS: merged constructors and use default
 		public function Lexer(input:CharStream = null) {
 			this.input = input;
 		}
@@ -77,13 +43,13 @@ package org.antlr.runtime {
 		public override function reset():void {
 			super.reset(); // reset all recognizer state variables
 			// wack Lexer state variables
-			token = null;
-			type = TokenConstants.INVALID_TOKEN_TYPE;
-			channel = TokenConstants.DEFAULT_CHANNEL;
-			tokenStartCharIndex = -1;
-			tokenStartCharPositionInLine = -1;
-			tokenStartLine = -1;
-			_text = null;
+			state.token = null;
+			state.type = TokenConstants.INVALID_TOKEN_TYPE;
+			state.channel = TokenConstants.DEFAULT_CHANNEL;
+			state.tokenStartCharIndex = -1;
+			state.tokenStartCharPositionInLine = -1;
+			state.tokenStartLine = -1;
+			state.text = null;
 			if ( input!=null ) {
 				input.seek(0); // rewind the input
 			}
@@ -94,24 +60,24 @@ package org.antlr.runtime {
 		 */
 	    public function nextToken():Token {
 			while (true) {
-				token = null;
-				channel = TokenConstants.DEFAULT_CHANNEL;
-				tokenStartCharIndex = input.index;
-				tokenStartCharPositionInLine = input.charPositionInLine;
-				tokenStartLine = input.line;
-				_text = null;
+				state.token = null;
+				state.channel = TokenConstants.DEFAULT_CHANNEL;
+				state.tokenStartCharIndex = input.index;
+				state.tokenStartCharPositionInLine = input.charPositionInLine;
+				state.tokenStartLine = input.line;
+				state.text = null;
 				if ( input.LA(1)==CharStreamConstants.EOF ) {
 	                return TokenConstants.EOF_TOKEN;
 	            }
 	            try {
 	                mTokens();
-					if ( token==null ) {
+					if ( state.token==null ) {
 						emit();
 					}
-					else if ( token==TokenConstants.SKIP_TOKEN ) {
+					else if ( state.token==TokenConstants.SKIP_TOKEN ) {
 						continue;
 					}
-					return token;
+					return state.token;
 				}
 	            catch (re:RecognitionException) {
 	                reportError(re);
@@ -130,18 +96,21 @@ package org.antlr.runtime {
 		 *  and emits it.
 		 */
 		public function skip():void {
-			token = TokenConstants.SKIP_TOKEN;
+			state.token = TokenConstants.SKIP_TOKEN;
 		}
 	
 		/** This is the lexer entry point that sets instance var 'token' */
-		// GMS: made non-abstract
-		public function mTokens():void {}
+		public function mTokens():void {} 	// GMS: made non-abstract
 	
 		/** Set the char stream and reset the lexer */
-		public function setCharStream(input:CharStream):void {
+		public function set charStream(input:CharStream):void {
 			this.input = null;
 			reset();
 			this.input = input;
+		}
+		
+		public function get charStream():CharStream {
+			return input;
 		}
 	
 		/** Currently does not support multiple emits per nextToken invocation
@@ -151,7 +120,7 @@ package org.antlr.runtime {
 		 * GMS: renamed from emit()
 		 */
 		public function emitToken(token:Token):void {
-			this.token = token;
+			state.token = token;
 		}
 	
 		/** The standard method called to automatically emit a token at the
@@ -162,10 +131,10 @@ package org.antlr.runtime {
 		 */
 		public function emit():Token {
 			// GMS changed to remove charIndex subtraction
-			var t:Token = CommonToken.createFromStream(input, type, channel, tokenStartCharIndex, charIndex - 1);
-			t.line = tokenStartLine;
-			t.text = text;
-			t.charPositionInLine = tokenStartCharPositionInLine;
+			var t:Token = CommonToken.createFromStream(input, state.type, state.channel, state.tokenStartCharIndex, charIndex - 1);
+			t.line = state.tokenStartLine;
+			t.text = state.text;
+			t.charPositionInLine = state.tokenStartCharPositionInLine;
 			emitToken(t);
 			return t;
 		}
@@ -176,8 +145,8 @@ package org.antlr.runtime {
 	        while ( i<s.length ) {
 	        	// GMS: Changed charAt to charCodeAt()
 	            if ( input.LA(1) != s.charCodeAt(i) ) {
-					if ( backtracking>0 ) {
-						failed = true;
+					if ( state.backtracking>0 ) {
+						state.failed = true;
 						return;
 					}
 					// GMS: Changed charAt to charCodeAt()
@@ -188,7 +157,7 @@ package org.antlr.runtime {
 	            }
 	            i++;
 	            input.consume();
-				failed = false;
+				state.failed = false;
 	        }
 	    }
 	
@@ -198,8 +167,8 @@ package org.antlr.runtime {
 	
 	    public function match(c:int):void {
 	        if ( input.LA(1)!=c ) {
-				if ( backtracking>0 ) {
-					failed = true;
+				if ( state.backtracking>0 ) {
+					state.failed = true;
 					return;
 				}
 				var mte:MismatchedTokenException =
@@ -208,14 +177,14 @@ package org.antlr.runtime {
 				throw mte;
 	        }
 	        input.consume();
-			failed = false;
+			state.failed = false;
 	    }
 	
 	    public function matchRange(a:int, b:int):void
 		{
 	        if ( input.LA(1)<a || input.LA(1)>b ) {
-				if ( backtracking>0 ) {
-					failed = true;
+				if ( state.backtracking>0 ) {
+					state.failed = true;
 					return;
 				}
 	            var mre:MismatchedRangeException =
@@ -224,7 +193,7 @@ package org.antlr.runtime {
 				throw mre;
 	        }
 	        input.consume();
-			failed = false;
+			state.failed = false;
 	    }
 	
 	    public function get line():int {
@@ -244,32 +213,21 @@ package org.antlr.runtime {
 		 *  text override.
 		 */
 		public function get text():String {
-			if ( _text!=null ) {
-				return _text;
+			if ( state.text!=null ) {
+				return state.text;
 			}
-			return input.substring(tokenStartCharIndex, charIndex-1);
+			return input.substring(state.tokenStartCharIndex, charIndex-1);
 		}
 	
 		/** Set the complete text of this token; it wipes any previous
 		 *  changes to the text.
 		 */
 		public function set text(text:String):void {
-			_text = text;
+			state.text = text;
 		}
 	
 		public override function reportError(e:RecognitionException):void {
-			/** TODO: not thought about recovery in lexer yet.
-			 *
-			// if we've already reported an error and have not matched a token
-			// yet successfully, don't report any errors.
-			if ( errorRecovery ) {
-				//System.err.print("[SPURIOUS] ");
-				return;
-			}
-			errorRecovery = true;
-			 */
-	
-			displayRecognitionError(this.getTokenNames(), e);
+			displayRecognitionError(this.tokenNames, e);
 		}
 	
 		public override function getErrorMessage(e:RecognitionException, tokenNames:Array):String {

@@ -32,7 +32,8 @@ package org.antlr.runtime {
 	public class Parser extends BaseRecognizer {
 	    protected var input:TokenStream;
 	
-		public function Parser(input:TokenStream) {
+		public function Parser(input:TokenStream, state:RecognizerSharedState = null) {
+			super(state);
 			tokenStream = input;
 	    }
 	

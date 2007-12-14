@@ -33,7 +33,7 @@ package org.antlr.runtime.tree {
 	 *  non-null node is called "nil".
 	 */
 	public class BaseTree implements Tree {
-		protected var children:Array;
+		protected var _children:Array;
 	
 		/** Create a new node from an existing node does nothing for BaseTree
 		 *  as there are no fields other than the children list, which cannot
@@ -43,15 +43,22 @@ package org.antlr.runtime.tree {
 		}
 	
 		public function getChild(i:int):Tree {
-			if ( children==null || i>=children.length ) {
+			if ( _children==null || i>=_children.length ) {
 				return null;
 			}
-			return BaseTree(children[i]);
+			return BaseTree(_children[i]);
 		}
-	
+		
+		/** Get the children internal List; note that if you directly mess with
+		 *  the list, do so at your own risk.
+		 */
+		public function get children():Array {
+			return _children;
+		}
+		
 		public function getFirstChildWithType(type:int):Tree {
-			for (var i:int = 0; children!=null && i < children.length; i++) {
-				var t:Tree = Tree(children[i]);
+			for (var i:int = 0; _children!=null && i < _children.length; i++) {
+				var t:Tree = Tree(_children[i]);
 				if ( t.type==type ) {
 					return t;
 				}
@@ -60,10 +67,10 @@ package org.antlr.runtime.tree {
 		}
 	
 		public function get childCount():int {
-			if ( children==null ) {
+			if ( _children==null ) {
 				return 0;
 			}
-			return children.length;
+			return _children.length;
 		}
 	
 		/** Add t as child of this node.
@@ -73,34 +80,41 @@ package org.antlr.runtime.tree {
 		 *  t.children = child.children; i.e., without copying the array.
 		 */
 		public function addChild(t:Tree):void {
-			//System.out.println("add "+t.toStringTree()+" as child to "+this.toStringTree());
 			if ( t==null ) {
 				return; // do nothing upon addChild(null)
 			}
 			var childTree:BaseTree = BaseTree(t);
-			if ( childTree.isNil() ) { // t is an empty node possibly with children
-				if ( this.children!=null && this.children == childTree.children ) {
+			if ( childTree.isNil ) { // t is an empty node possibly with children
+				if ( this._children!=null && this._children == childTree._children ) {
 					throw new Error("attempt to add child list to itself");
 				}
 				// just add all of childTree's children to this
-				if ( childTree.children!=null ) {
-					if ( this.children!=null ) { // must copy, this has children already
-						var n:int = childTree.children.length;
+				if ( childTree._children!=null ) {
+					if ( this._children!=null ) { // must copy, this has children already
+						var n:int = childTree._children.length;
 						for (var i:int = 0; i < n; i++) {
-							this.children.push(childTree.children[i]);
+							var c:Tree = Tree(childTree._children)[i];
+							this.children.push(c);
+							// handle double-link stuff for each child of nil root
+							c.parent = this;
+							c.childIndex = children.length-1;
 						}
 					}
 					else {
 						// no children for this but t has children; just set pointer
-						this.children = childTree.children;
+						// call general freshener routine
+						this._children = childTree.children;
+						this.freshenParentAndChildIndexes();
 					}
 				}
 			}
-			else { // t is not empty and might have children
-				if ( children==null ) {
-					children = createChildrenList(); // create children list on demand
+			else { // child is not nil (don't care about children)
+				if ( _children==null ) {
+					_children = new Array(); // create children list on demand
 				}
-				children.push(t);
+				_children.push(t);
+				childTree.parent = this;
+				childTree.childIndex = children.length-1;
 			}
 		}
 	
@@ -112,63 +126,161 @@ package org.antlr.runtime.tree {
 			}
 		}
 	
-		public function setChild(i:int, t:BaseTree):void {
-			if ( children==null ) {
-				children = createChildrenList();
+		public function setChild(i:int, t:Tree):void {
+			if ( t==null ) {
+				return;
 			}
-			children[i] =  t;
+			if ( t.isNil ) {
+				throw new Error("Can't set single child to a list");
+			}
+			if ( _children==null ) {
+				_children = new Array();
+			}
+			_children[i] = t;
+			t.parent = this;
+			t.childIndex = i;
 		}
 	
-		public function deleteChild(i:int):BaseTree {
-			if ( children==null ) {
+		public function deleteChild(i:int):Object {
+			if ( _children==null ) {
 				return null;
 			}
-			return BaseTree(children.remove(i));
+			var killed:BaseTree = BaseTree(children.remove(i));
+			// walk rest and decrement their child indexes
+			this.freshenParentAndChildIndexesFrom(i);
+			return killed;
 		}
-	
-		/** Override in a subclass to change the impl of children list */
-		// GMS is is this needed?
-		protected function createChildrenList():Array {
-			return new Array();
+
+		/** Delete children from start to stop and replace with t even if t is
+		 *  a list (nil-root tree).  num of children can increase or decrease.
+		 *  For huge child lists, inserting children can force walking rest of
+		 *  children to set their childindex; could be slow.
+		 */
+		public function replaceChildren(startChildIndex:int, stopChildIndex:int, t:Object):void {
+			if ( children==null ) {
+				throw new Error("indexes invalid; no children in list");
+			}
+			var replacingHowMany:int = stopChildIndex - startChildIndex + 1;
+			var replacingWithHowMany:int;
+			var newTree:BaseTree = BaseTree(t);
+			var newChildren:Array = null;
+			// normalize to a list of children to add: newChildren
+			if ( newTree.isNil ) {
+				newChildren = newTree.children;
+			}
+			else {
+				newChildren = new Array(1);
+				newChildren.add(newTree);
+			}
+			replacingWithHowMany = newChildren.length;
+			var numNewChildren:int = newChildren.length;
+			var delta:int = replacingHowMany - replacingWithHowMany;
+			// if same number of nodes, do direct replace
+			if ( delta == 0 ) {
+				var j:int = 0; // index into new children
+				for (var i:int=startChildIndex; i<=stopChildIndex; i++) {
+					var child:BaseTree = BaseTree(newChildren[j]);
+					children[i] = child;
+					child.parent = this;
+					child.childIndex= i;
+	                j++;
+	            }
+			}
+			else if ( delta > 0 ) { // fewer new nodes than there were
+				// set children and then delete extra
+				for (j=0; j<numNewChildren; j++) {
+					children[startChildIndex+j] = newChildren[j];
+				}
+				var indexToDelete:int = startChildIndex+numNewChildren;
+				for (var c:int=indexToDelete; c<=stopChildIndex; c++) {
+					// delete same index, shifting everybody down each time
+					var killed:BaseTree = BaseTree(children.remove(indexToDelete));
+				}
+				freshenParentAndChildIndexesFrom(startChildIndex);
+			}
+			else { // more new nodes than were there before
+				// fill in as many children as we can (replacingHowMany) w/o moving data
+				for (j=0; j<replacingHowMany; j++) {
+					children[startChildIndex+j] = newChildren[j];
+				}
+				var numToInsert:int = replacingWithHowMany-replacingHowMany;
+				for (j=replacingHowMany; j<replacingWithHowMany; j++) {
+					children.splice(startChildIndex+j, 0, newChildren[j]);
+				}
+				freshenParentAndChildIndexesFrom(startChildIndex);
+			}
 		}
-	
-		public function isNil():Boolean {
+
+		public function get isNil():Boolean {
 			return false;
 		}
 	
-		/** Recursively walk this tree, dup'ing nodes until you have copy of
-		 *  this tree.  This method should work for all subclasses as long
-		 *  as they override dupNode().
-		 */
-		public function dupTree():Tree {
-			var newTree:Tree = this.dupNode();
-			for (var i:int = 0; children!=null && i < children.length; i++) {
-				var t:Tree = Tree(children[i]);
-				var newSubTree:Tree = t.dupTree();
-				newTree.addChild(newSubTree);
-			}
-			return newTree;
+		/** Set the parent and child index values for all child of t */
+		public function freshenParentAndChildIndexes():void {
+			freshenParentAndChildIndexesFrom(0);
 		}
 	
+		public function freshenParentAndChildIndexesFrom(offset:int):void {
+			var n:int = childCount;
+			for (var c:int = offset; c < n; c++) {
+				var child:Tree = Tree(getChild(c));
+				child.childIndex = c;
+				child.parent = this;
+			}
+		}
+	
+		public function sanityCheckParentAndChildIndexes():void {
+			sanityCheckParentAndChildIndexesFrom(null, -1);
+		}
+	
+		public function sanityCheckParentAndChildIndexesFrom(parent:Tree, i:int):void {
+			if ( parent!=this.parent ) {
+				throw new Error("parents don't match; expected "+parent+" found "+this.parent);
+			}
+			if ( i!=this.childIndex ) {
+				throw new Error("child indexes don't match; expected "+i+" found "+this.childIndex);
+			}
+			var n:int = this.childCount;
+			for (var c:int = 0; c < n; c++) {
+				var child:CommonTree = CommonTree(this.getChild(c));
+				child.sanityCheckParentAndChildIndexesFrom(this, c);
+			}
+		}
+	
+		/** BaseTree doesn't track child indexes. */
+		public function get childIndex():int {
+			return 0;
+		}
+		
+		public function set childIndex(index:int):void {
+		}
+	
+		/** BaseTree doesn't track parent pointers. */
+		public function get parent():Tree {
+			return null;
+		}
+		public function set parent(t:Tree):void {
+		}
+
 		/** Print out a whole tree not just a node */
 	    public function toStringTree():String {
-			if ( children==null || children.length==0 ) {
+			if ( _children==null || _children.length==0 ) {
 				return this.toString();
 			}
 			var buf:String = "";
-			if ( !isNil() ) {
+			if ( !isNil ) {
 				buf += "(";
 				buf += this.toString();
 				buf += ' ';
 			}
-			for (var i:int = 0; children!=null && i < children.length; i++) {
-				var t:BaseTree = BaseTree(children[i]);
+			for (var i:int = 0; _children!=null && i < _children.length; i++) {
+				var t:BaseTree = BaseTree(_children[i]);
 				if ( i>0 ) {
 					buf += ' ';
 				}
 				buf += t.toStringTree();
 			}
-			if ( !isNil() ) {
+			if ( !isNil ) {
 				buf += ")";
 			}
 			return buf;
@@ -182,37 +294,39 @@ package org.antlr.runtime.tree {
 			return 0;
 		}
 
-		/** :Abstract" functions - GMS
-		 * Since no abstract classes in actionscript
-		 *  */
+		// "Abstract" functions - GMS
+		// Since no abstract classes in actionscript
+		 
 		public function dupNode():Tree {
-			return null;
+			throw Error("Not implemented");
 		}
 	
 		public function get type():int {
-			return 0;
+			throw Error("Not implemented");
 		}
 	
 		public function get text():String {
-			return toString();
+			throw Error("Not implemented");
 		}
 	
 		public function get tokenStartIndex():int {
-			return 0;
+			throw Error("Not implemented");
 		}
 	
 		public function set tokenStartIndex(index:int):void {
+			throw Error("Not implemented");
 		}
 	
 		public function get tokenStopIndex():int {
-			return 0;
+			throw Error("Not implemented");
 		}
 	
 		public function set tokenStopIndex(index:int):void {
+			throw Error("Not implemented");
 		}
 	
 		public function toString():String {
-			return "";
+			throw Error("Not implemented");
 		}
 	}
 }

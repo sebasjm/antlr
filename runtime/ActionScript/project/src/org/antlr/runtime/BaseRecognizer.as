@@ -20,63 +20,35 @@ package org.antlr.runtime {
 	
 		public static const NEXT_TOKEN_RULE_NAME:String = "nextToken";
 	
-		/** Track the set of token types that can follow any rule invocation.
-		 *  Stack grows upwards.  When it hits the max, it grows 2x in size
-		 *  and keeps going.
-		 */
-		// GMS: Array of BitSet objects
-		protected var following:Array = new Array(INITIAL_FOLLOW_STACK_SIZE);
-		protected var _fsp:int = -1;
-	
-		/** This is true when we see an error and before having successfully
-		 *  matched a token.  Prevents generation of more than one error message
-		 *  per error.
-		 */
-		protected var errorRecovery:Boolean = false;
-	
-		/** The index into the input stream where the last error occurred.
-		 * 	This is used to prevent infinite loops where an error is found
-		 *  but no token is consumed during recovery...another error is found,
-		 *  ad naseum.  This is a failsafe mechanism to guarantee that at least
-		 *  one token/tree node is consumed for two errors.
-		 */
-		protected var lastErrorIndex:int = -1;
-	
-		/** In lieu of a return value, this indicates that a rule or token
-		 *  has failed to match.  Reset to false upon valid token match.
+		/** State of a lexer, parser, or tree parser are collected into a state
+		 *  object so the state can be shared.  This sharing is needed to
+		 *  have one grammar import others and share same error variables
+		 *  and other state variables.  It's a kind of explicit multiple
+		 *  inheritance via delegation of methods and shared state.
 		 * 
-		 * GMS -- public access required for DFA access, protected does not include package access as it does in Java
 		 */
-		public var failed:Boolean = false;
+		public var state:RecognizerSharedState;  // Note - this is public due ActionScript access rules -- GMS
 	
-		/** If 0, no backtracking is going on.  Safe to exec actions etc...
-		 *  If >0 then it's the level of backtracking.
-		 * 
-		 * GMS -- public access required for DFA access, protected does not include package access as it does in Java
-		 */
-		public var backtracking:int = 0;
-	
-		/** An array[size num rules] of Map<Integer,Integer> that tracks
-		 *  the stop token index for each rule.  ruleMemo[ruleIndex] is
-		 *  the memoization table for ruleIndex.  For key ruleStartIndex, you
-		 *  get back the stop token for associated rule or MEMO_RULE_FAILED.
-		 *
-		 *  This is only used if rule memoization is on (which it is by default).
-		 */
-		// GMS: Array of Arrays (Maps)
-		protected var ruleMemo:Array;
+		public function BaseRecognizer(state:RecognizerSharedState = null) {
+			if ( state!=null ) { // don't ever let us have a null state
+				this.state = state;
+			}
+			else {
+				this.state = new RecognizerSharedState();			
+			}
+		}
 	
 		/** reset the parser's state; subclasses must rewinds the input stream */
 		public function reset():void {
 			// wack everything related to error recovery
-			_fsp = -1;
-			errorRecovery = false;
-			lastErrorIndex = -1;
-			failed = false;
+			state._fsp = -1;
+			state.errorRecovery = false;
+			state.lastErrorIndex = -1;
+			state.failed = false;
 			// wack everything related to backtracking and memoization
-			backtracking = 0;
-			for (var i:int = 0; ruleMemo!=null && i < ruleMemo.length; i++) { // wipe cache
-				ruleMemo[i] = null;
+			state.backtracking = 0;
+			for (var i:int = 0; state.ruleMemo!=null && i < state.ruleMemo.length; i++) { // wipe cache
+				state.ruleMemo[i] = null;
 			}
 		}
 	
@@ -92,12 +64,12 @@ package org.antlr.runtime {
 		{
 			if ( input.LA(1)==ttype ) {
 				input.consume();
-				errorRecovery = false;
-				failed = false;
+				state.errorRecovery = false;
+				state.failed = false;
 				return;
 			}
-			if ( backtracking>0 ) {
-				failed = true;
+			if ( state.backtracking>0 ) {
+				state.failed = true;
 				return;
 			}
 			mismatch(input, ttype, follow);
@@ -106,8 +78,8 @@ package org.antlr.runtime {
 	
 		// GMS - renamed from matchAny to matchAnyStream
 		public function matchAnyStream(input:IntStream):void {
-			errorRecovery = false;
-			failed = false;
+			state.errorRecovery = false;
+			state.failed = false;
 			input.consume();
 		}
 	
@@ -139,13 +111,13 @@ package org.antlr.runtime {
 		public function reportError(e:RecognitionException):void {
 			// if we've already reported an error and have not matched a token
 			// yet successfully, don't report any errors.
-			if ( errorRecovery ) {
+			if ( state.errorRecovery ) {
 				//System.err.print("[SPURIOUS] ");
 				return;
 			}
-			errorRecovery = true;
+			state.errorRecovery = true;
 	
-			displayRecognitionError(this.getTokenNames(), e);
+			displayRecognitionError(this.tokenNames, e);
 		}
 	
 		public function displayRecognitionError(tokenNames:Array,
@@ -278,14 +250,14 @@ package org.antlr.runtime {
 		 * GMS - renamed to recoverStream from recover()
 		 */
 		public function recoverStream(input:IntStream, re:RecognitionException):void {
-			if ( lastErrorIndex==input.index) {
+			if ( state.lastErrorIndex==input.index) {
 				// uh oh, another error at same token index; must be a case
 				// where LT(1) is in the recovery token set so nothing is
 				// consumed; consume a single token so at least to prevent
 				// an infinite loop; this is a failsafe.
 				input.consume();
 			}
-			lastErrorIndex = input.index;
+			state.lastErrorIndex = input.index;
 			var followSet:BitSet = computeErrorRecoverySet();
 			beginResync();
 			consumeUntil(input, followSet);
@@ -453,10 +425,10 @@ package org.antlr.runtime {
 		}
 	
 		protected function combineFollows(exact:Boolean):BitSet {
-			var top:int = _fsp;
+			var top:int = state._fsp;
 			var followSet:BitSet = new BitSet();
 			for (var i:int=top; i>=0; i--) {
-				var localFollowSet:BitSet = following[i];
+				var localFollowSet:BitSet = state.following[i];
 				/*
 				System.out.println("local follow depth "+i+"="+
 								   localFollowSet.toString(getTokenNames())+")");
@@ -502,9 +474,7 @@ package org.antlr.runtime {
 		public function recoverFromMismatchedToken(input:IntStream,
 											   e:RecognitionException,
 											   ttype:int,
-											   follow:BitSet):void
-		{
-			trace("BR.recoverFromMismatchedToken");		
+											   follow:BitSet):void {	
 			// if next token is what we are looking for then "delete" this token
 			if ( input.LA(2)==ttype ) {
 				reportError(e);
@@ -598,73 +568,25 @@ package org.antlr.runtime {
 				following = f;
 			}
 			 */
-			following[++_fsp] = fset;
+			state.following[++state._fsp] = fset;
 		}
 	
-		/** Return List<String> of the rules in your parser instance
-		 *  leading up to a call to this method.  You could override if
-		 *  you want more details such as the file/line info of where
-		 *  in the parser java code a rule is invoked.
-		 *
-		 *  This is very useful for error messages and for context-sensitive
-		 *  error recovery.
-		 *  GMS: Removed from ActionScript
-		 */
-		 /*
-		public function getRuleInvocationStack():Array {
-			var parserClassName:String = getClass().getName();
-			return getRuleInvocationStack(new Throwable(), parserClassName);
-		}
-		*/
-	
-		/** A more general version of getRuleInvocationStack where you can
-		 *  pass in, for example, a RecognitionException to get it's rule
-		 *  stack trace.  This routine is shared with all recognizers, hence,
-		 *  static.
-		 *
-		 *  TODO: move to a utility class or something; weird having lexer call this
-		 * GMS: Removed from ActionScript
-		 */
-		 /*
-		public static function getRuleInvocationStack(e:Error,
-												   recognizerClassName:String):Array
-		{
-			var rules:Array = new Array();
-			StackTraceElement[] stack = e.getStackTrace();
-			int i = 0;
-			for (i=stack.length-1; i>=0; i--) {
-				StackTraceElement t = stack[i];
-				if ( t.getClassName().startsWith("org.antlr.runtime.") ) {
-					continue; // skip support code such as this method
-				}
-				if ( t.getMethodName().equals(NEXT_TOKEN_RULE_NAME) ) {
-					continue;
-				}
-				if ( !t.getClassName().equals(recognizerClassName) ) {
-					continue; // must not be part of this parser
-				}
-	            rules.add(t.getMethodName());
-			}
-			return rules;
-		}
-	*/
-	
-		public function getBacktrackingLevel():int {
-			return backtracking;
+		public function get backtrackingLevel():int {
+			return state.backtracking;
 		}
 	
 		/** Used to print out token names like ID during debugging and
 		 *  error reporting.  The generated parsers implement a method
 		 *  that overrides this to point to their String[] tokenNames.
 		 */
-		public function getTokenNames():Array {
+		public function get tokenNames():Array {
 			return null;
 		}
 	
 		/** For debugging and other purposes, might want the grammar name.
 		 *  Have ANTLR generate an implementation for this method.
 		 */
-		public function getGrammarFileName():String {
+		public function get grammarFileName():String {
 			return null;
 		}
 	
@@ -680,25 +602,6 @@ package org.antlr.runtime {
 			return strings;
 		}
 	
-		/** Convert a List<RuleReturnScope> to List<StringTemplate> by copying
-		 *  out the .st property.  Useful when converting from
-		 *  list labels to template attributes:
-		 *
-		 *    a : ids+=rule -> foo(ids={toTemplates($ids)})
-		 *      ;
-		 *  TJP: this is not needed anymore.  $ids is a List of templates
-		 *  when output=template
-		 * 
-		public List toTemplates(List retvals) {
-			if ( retvals==null ) return null;
-			List strings = new ArrayList(retvals.size());
-			for (int i=0; i<retvals.size(); i++) {
-				strings.add(((RuleReturnScope)retvals.get(i)).getTemplate());
-			}
-			return strings;
-		}
-		 */
-	
 		/** Given a rule number and a start token index number, return
 		 *  MEMO_RULE_UNKNOWN if the rule has not parsed input starting from
 		 *  start index.  If this rule has parsed input starting from the
@@ -712,10 +615,10 @@ package org.antlr.runtime {
 		 * GMS: converted this to use Associate Arrays for ruleMemos
 		 */
 		public function getRuleMemoization(ruleIndex:int, ruleStartIndex:int):int {
-			if ( ruleMemo[ruleIndex]==null ) {
-				ruleMemo[ruleIndex] = new Array();
+			if ( state.ruleMemo[ruleIndex]==null ) {
+				state.ruleMemo[ruleIndex] = new Array();
 			}
-			var stopIndexI:String =	ruleMemo[ruleIndex][new String(ruleStartIndex)];
+			var stopIndexI:String =	state.ruleMemo[ruleIndex][new String(ruleStartIndex)];
 			if ( stopIndexI == null ) {
 				return MEMO_RULE_UNKNOWN;
 			}
@@ -738,7 +641,7 @@ package org.antlr.runtime {
 			}
 			if ( stopIndex==MEMO_RULE_FAILED ) {
 				//System.out.println("rule "+ruleIndex+" will never succeed");
-				failed=true;
+				state.failed=true;
 			}
 			else {
 				//System.out.println("seen rule "+ruleIndex+" before; skipping ahead to @"+(stopIndex+1)+" failed="+failed);
@@ -754,45 +657,23 @@ package org.antlr.runtime {
 							ruleIndex:int,
 							ruleStartIndex:int):void
 		{
-			var stopTokenIndex:int = failed ? MEMO_RULE_FAILED : input.index - 1;
-			if ( ruleMemo[ruleIndex]!=null ) {
-				ruleMemo[ruleIndex].put(
+			var stopTokenIndex:int = state.failed ? MEMO_RULE_FAILED : input.index - 1;
+			if ( state.ruleMemo[ruleIndex]!=null ) {
+				state.ruleMemo[ruleIndex].put(
 					new String(ruleStartIndex), new String(stopTokenIndex)
 				);
 			}
 		}
-	
-		/** Assume failure in case a rule bails out with an exception.
-		 *  Reset to rule stop index if successful.
-		public void memoizeFailure(int ruleIndex, int ruleStartIndex) {
-			ruleMemo[ruleIndex].put(
-				new Integer(ruleStartIndex), MEMO_RULE_FAILED_I
-			);
-		}
-		 */
-	
-		/** After successful completion of a rule, record success for this
-		 *  rule and that it can skip ahead next time it attempts this
-		 *  rule for this input position.
-		public void memoizeSuccess(IntStream input,
-								   int ruleIndex,
-								   int ruleStartIndex)
-		{
-			ruleMemo[ruleIndex].put(
-				new Integer(ruleStartIndex), new Integer(input.index()-1)
-			);
-		}
-		 */
 	
 		/** return how many rule/input-index pairs there are in total.
 		 *  TODO: this includes synpreds. :(
 		 */
 		public function getRuleMemoizationCacheSize():int {
 			var n:int = 0;
-			for (var i:int = 0; ruleMemo!=null && i < ruleMemo.length; i++) {
-				var ruleMap:Array = ruleMemo[i];
+			for (var i:int = 0; state.ruleMemo!=null && i < state.ruleMemo.length; i++) {
+				var ruleMap:Array = state.ruleMemo[i];
 				if ( ruleMap!=null ) {
-					n += ruleMap.size(); // how many input indexes are recorded?
+					n += ruleMap.length; // how many input indexes are recorded?
 				}
 			}
 			return n;
@@ -801,11 +682,11 @@ package org.antlr.runtime {
 	    // GMS : renamed traceInSymbol from traceIn
 		public function traceInSymbol(ruleName:String, ruleIndex:int, inputSymbol:Object):void  {
 			trace("enter "+ruleName+" "+inputSymbol);
-			if ( failed ) {
-				trace(" failed="+failed);
+			if ( state.failed ) {
+				trace(" failed="+state.failed);
 			}
-			if ( backtracking>0 ) {
-				trace(" backtracking="+backtracking);
+			if ( state.backtracking>0 ) {
+				trace(" backtracking="+state.backtracking);
 			}
 			trace();
 		}
@@ -816,11 +697,11 @@ package org.antlr.runtime {
 							  inputSymbol:Object):void
 		{
 			trace("exit "+ruleName+" "+inputSymbol);
-			if ( failed ) {
-				trace(" failed="+failed);
+			if ( state.failed ) {
+				trace(" failed="+state.failed);
 			}
-			if ( backtracking>0 ) {
-				trace(" backtracking="+backtracking);
+			if ( state.backtracking>0 ) {
+				trace(" backtracking="+state.backtracking);
 			}
 			trace();
 		}
