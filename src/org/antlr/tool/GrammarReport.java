@@ -153,7 +153,7 @@ public class GrammarReport {
 		buf.append('\t');
 		buf.append(grammar.setOfNondeterministicDecisionNumbersResolvedWithPredicates.size());
 		buf.append('\t');
-		buf.append(grammar.setOfDFAWhoseConversionTerminatedEarly.size());
+		buf.append(grammar.setOfDFAWhoseAnalysisTimedOut.size());
 		buf.append('\t');
 		buf.append(ErrorManager.getErrorState().errors);
 		buf.append('\t');
@@ -204,14 +204,14 @@ public class GrammarReport {
 		return buf.toString();
 	}
 
-	public String getEarlyTerminationReport() {
+	public String getAnalysisTimeoutReport() {
 		StringBuffer buf = new StringBuffer();
 		buf.append("NFA conversion early termination report:");
 		buf.append(newline);
 		buf.append("Number of NFA conversions that terminated early: ");
-		buf.append(grammar.setOfDFAWhoseConversionTerminatedEarly.size());
+		buf.append(grammar.setOfDFAWhoseAnalysisTimedOut.size());
 		buf.append(newline);
-		buf.append(getDFALocations(grammar.setOfDFAWhoseConversionTerminatedEarly));
+		buf.append(getDFALocations(grammar.setOfDFAWhoseAnalysisTimedOut));
 		return buf.toString();
 	}
 

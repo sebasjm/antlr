@@ -35,9 +35,9 @@ import java.util.*;
 /** More a single alternative recurses so this decision is not regular. */
 public class NonRegularDecisionMessage extends Message {
 	public DecisionProbe probe;
-	public Set altsWithRecursion;
+	public Set<Integer> altsWithRecursion;
 
-	public NonRegularDecisionMessage(DecisionProbe probe, Set altsWithRecursion) {
+	public NonRegularDecisionMessage(DecisionProbe probe, Set<Integer> altsWithRecursion) {
 		super(ErrorManager.MSG_NONREGULAR_DECISION);
 		this.probe = probe;
 		this.altsWithRecursion = altsWithRecursion;

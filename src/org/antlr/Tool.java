@@ -288,7 +288,7 @@ public class Tool {
 					// print out a backtracking report too (that is not encoded into log)
 					System.out.println(report.getBacktrackingReport());
 					// same for aborted NFA->DFA conversions
-					System.out.println(report.getEarlyTerminationReport());
+					System.out.println(report.getAnalysisTimeoutReport());
 				}
 				if ( profile ) {
 					GrammarReport report = new GrammarReport(grammar);

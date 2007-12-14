@@ -112,6 +112,12 @@ public class DFAState extends State {
 	 *    | X Y  // LL(2) decision; don't abort and use k=1 plus backtracking
 	 *    | X Z
 	 *    ;
+	 *
+	 *  12/13/2007: Actually this has caused problems.  If k=*, must terminate
+	 *  and throw out entire DFA; retry with k=1.  Since recursive, do not
+	 *  attempt more closure ops as it may take forever.  Exception thrown
+	 *  now and we simply report the problem.  If synpreds exist, I'll retry
+	 *  with k=1.
 	 */
 	protected boolean abortedDueToMultipleRecursiveAlts = false;
 

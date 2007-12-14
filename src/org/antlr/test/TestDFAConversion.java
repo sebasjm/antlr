@@ -92,17 +92,21 @@ public class TestDFAConversion extends BaseTest {
 			"parser grammar t;\n"+
 			"s : a ;\n" +
 			"a : A a X | A a Y;");
+		List altsWithRecursion = Arrays.asList(new Object[] {1,2});
+		assertNonLLStar(g, altsWithRecursion);
+		/*
 		// nondeterministic from left edge; no stop state
 		String expecting =
 			".s0-A->.s1\n" +
 			".s1-A->:s2=>1\n"; // gets this after failing to do LL(*)
 		int[] unreachableAlts = new int[] {1,2};
-		int[] nonDetAlts = new int[] {1,2};
+		int[] nonDetAlts = null;
 		String ambigInput = null;
 		int[] danglingAlts = new int[] {1,2};
-		int numWarnings = 2; // non-LL(*) abort and ambig upon A A
+		int numWarnings = 1; // non-LL(*) abort
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+					  */
 	}
 
 	public void testCannotSeePastRecursion() throws Exception {
@@ -114,6 +118,9 @@ public class TestDFAConversion extends BaseTest {
 			"y   : L y R\n" +
 			"    | B\n" +
 			"    ;");
+		List altsWithRecursion = Arrays.asList(new Object[] {1,2});
+		assertNonLLStar(g, altsWithRecursion);
+/*
 		String expecting =
 			".s0-B->.s4\n" +
 			".s0-L->.s1\n" +
@@ -126,6 +133,7 @@ public class TestDFAConversion extends BaseTest {
 		int numWarnings = 2;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+					  */
 	}
 
 	public void testSynPredResolvesRecursion() throws Exception {
@@ -138,17 +146,12 @@ public class TestDFAConversion extends BaseTest {
 			"    | B\n" +
 			"    ;");
 		String expecting =
-			".s0-B->.s7\n" +
+			".s0-B->.s4\n" +
 			".s0-L->.s1\n" +
-			".s1-B->.s5\n" +
-			".s1-L->.s2\n" +
-			".s2-{synpred1}?->:s3=>1\n" +
-			".s2-{true}?->:s4=>2\n" +
-			".s5-R->.s6\n" +
-			".s6-X&&{synpred1}?->:s3=>1\n" +
-			".s6-Y->:s4=>2\n" +
-			".s7-X&&{synpred1}?->:s3=>1\n" +
-			".s7-Y->:s4=>2\n";
+			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n" +
+			".s4-{synpred1}?->:s5=>1\n" +
+			".s4-{true}?->:s6=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -170,16 +173,11 @@ public class TestDFAConversion extends BaseTest {
 			"  ;\n");
 		String expecting =
 			".s0-'('->.s1\n" +
-			".s0-'x'->.s7\n" +
-			".s1-'('->.s2\n" +
-			".s1-'x'->.s5\n" +
-			".s2-{synpred1}?->:s3=>1\n" +
-			".s2-{true}?->:s4=>2\n" +
-			".s5-')'->.s6\n" +
-			".s6-'.'->:s4=>2\n" +
-			".s6-';'&&{synpred1}?->:s3=>1\n" +
-			".s7-'.'->:s4=>2\n" +
-			".s7-';'&&{synpred1}?->:s3=>1\n";
+			".s0-'x'->.s4\n" +
+			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n" +
+			".s4-{synpred1}?->:s5=>1\n" +
+			".s4-{true}?->:s6=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -202,16 +200,11 @@ public class TestDFAConversion extends BaseTest {
 			"  ;\n");
 		String expecting =
 			".s0-'('->.s1\n" +
-			".s0-'x'->.s7\n" +
-			".s1-'('->.s2\n" +
-			".s1-'x'->.s5\n" +
-			".s2-{synpred1}?->:s3=>1\n" +
-			".s2-{true}?->:s4=>2\n" +
-			".s5-')'->.s6\n" +
-			".s6-'.'->:s4=>2\n" +
-			".s6-';'->:s3=>1\n" +
-			".s7-'.'->:s4=>2\n" +
-			".s7-';'->:s3=>1\n";
+			".s0-'x'->.s4\n" +
+			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n" +
+			".s4-{synpred1}?->:s5=>1\n" +
+			".s4-{true}?->:s6=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -232,17 +225,12 @@ public class TestDFAConversion extends BaseTest {
 			"    | B\n" +
 			"    ;");
 		String expecting =
-			".s0-B->.s7\n" +
-				".s0-L->.s1\n" +
-				".s1-B->.s5\n" +
-				".s1-L->.s2\n" +
-				".s2-{synpred1}?->:s3=>1\n" +
-				".s2-{true}?->:s4=>2\n" +
-				".s5-R->.s6\n" +
-				".s6-X->:s3=>1\n" +
-				".s6-Y->:s4=>2\n" +
-				".s7-X->:s3=>1\n" +
-				".s7-Y->:s4=>2\n";
+			".s0-B->.s4\n" +
+			".s0-L->.s1\n" +
+			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n" +
+			".s4-{synpred1}?->:s5=>1\n" +
+			".s4-{true}?->:s6=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -282,10 +270,10 @@ public class TestDFAConversion extends BaseTest {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
-		Set leftRecursive = g.getLeftRecursiveRules();
+		Set<Rule> leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules =
 			new HashSet() {{add("a"); add("b");}};
-		assertEquals(expectedRules, leftRecursive);
+		assertEquals(expectedRules, ruleNames(leftRecursive));
 
 		g.createLookaheadDFAs();
 
@@ -296,9 +284,8 @@ public class TestDFAConversion extends BaseTest {
 
 		// cycle of [a, b]
 		Collection result = cyclesMsg.cycles;
-		List expecting = new ArrayList();
-		expecting.add(new HashSet() {{add("a"); add("b");}});
-		assertEquals(expecting, result);
+		Set expecting = new HashSet() {{add("a"); add("b");}};
+		assertEquals(expecting, ruleNames2(result));
 	}
 
 	public void testIndirectRecursionLoop2() throws Exception {
@@ -316,7 +303,7 @@ public class TestDFAConversion extends BaseTest {
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules =
 			new HashSet() {{add("a"); add("b");}};
-		assertEquals(expectedRules, leftRecursive);
+		assertEquals(expectedRules, ruleNames(leftRecursive));
 
 		g.createLookaheadDFAs();
 
@@ -327,9 +314,8 @@ public class TestDFAConversion extends BaseTest {
 
 		// cycle of [a, b]
 		Collection result = cyclesMsg.cycles;
-		List expecting = new ArrayList();
-		expecting.add(new HashSet() {{add("a"); add("b");}});
-		assertEquals(expecting, result);
+		Set expecting = new HashSet() {{add("a"); add("b");}};
+		assertEquals(expecting, ruleNames2(result));
 	}
 
 	public void testIndirectRecursionLoop3() throws Exception {
@@ -349,7 +335,7 @@ public class TestDFAConversion extends BaseTest {
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules =
 			new HashSet() {{add("a"); add("b"); add("e"); add("d");}};
-		assertEquals(expectedRules, leftRecursive);
+		assertEquals(expectedRules, ruleNames(leftRecursive));
 
 		Message msg = (Message)equeue.warnings.get(0);
 		assertTrue("expecting left recursion cycles; found "+msg.getClass().getName(),
@@ -358,10 +344,8 @@ public class TestDFAConversion extends BaseTest {
 
 		// cycle of [a, b]
 		Collection result = cyclesMsg.cycles;
-		List expecting = new ArrayList();
-		expecting.add(new HashSet() {{add("a"); add("b");}});
-		expecting.add(new HashSet() {{add("d"); add("e");}});
-		assertEquals(expecting, result);
+		Set expecting = new HashSet() {{add("a"); add("b"); add("d"); add("e");}};
+		assertEquals(expecting, ruleNames2(result));
 	}
 
 	public void testifThenElse() throws Exception {
@@ -523,7 +507,7 @@ public class TestDFAConversion extends BaseTest {
 			"a : a A | B;");
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules = new HashSet() {{add("a");}};
-		assertEquals(expectedRules, leftRecursive);
+		assertEquals(expectedRules, ruleNames(leftRecursive));
 	}
 
 	public void testIndirectLeftRecursion() throws Exception {
@@ -535,7 +519,7 @@ public class TestDFAConversion extends BaseTest {
 			"c : a | C ;\n");
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules = new HashSet() {{add("a"); add("b"); add("c");}};
-		assertEquals(expectedRules, leftRecursive);
+		assertEquals(expectedRules, ruleNames(leftRecursive));
 	}
 
 	public void testLeftRecursionInMultipleCycles() throws Exception {
@@ -550,7 +534,7 @@ public class TestDFAConversion extends BaseTest {
 		Set leftRecursive = g.getLeftRecursiveRules();
 		Set expectedRules =
 			new HashSet() {{add("a"); add("b"); add("c"); add("x"); add("y");}};
-		assertEquals(expectedRules, leftRecursive);
+		assertEquals(expectedRules, ruleNames(leftRecursive));
 	}
 
 	public void testCycleInsideRuleDoesNotForceInfiniteRecursion() throws Exception {
@@ -1051,17 +1035,8 @@ As a result, alternative(s) 2 were disabled for that input
 			"b : A\n" +
 			"  | A b\n" +
 			"  ;\n");
-		String expecting =
-			".s0-A->.s1\n" +
-				".s1-Y->:s3=>2\n" +
-				".s1-{X, A}->:s2=>1\n";
-		int[] unreachableAlts = new int[] {1,2};
-		int[] nonDetAlts = new int[] {1,2};
-		String ambigInput = null;
-		int[] danglingAlts = null;
-		int numWarnings = 2;
-		checkDecision(g, 1, expecting, unreachableAlts,
-					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+		List altsWithRecursion = Arrays.asList(new Object[] {1,2});
+		assertNonLLStar(g, altsWithRecursion);
 	}
 
 	public void testWildcardStarK1AndNonGreedyByDefaultInParser() throws Exception {
@@ -1120,6 +1095,24 @@ As a result, alternative(s) 2 were disabled for that input
 		String expecting =
 			"\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
+	}
+
+	protected void assertNonLLStar(Grammar g, List expectedBadAlts) {
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		// mimic actions of org.antlr.Tool first time for grammar g
+		if ( g.getNumberOfDecisions()==0 ) {
+			g.createNFAs();
+			g.createLookaheadDFAs();
+		}
+		NonRegularDecisionMessage msg = getNonRegularDecisionMessage(equeue.errors);
+		assertTrue("expected fatal non-LL(*) msg", msg!=null);
+		List<Integer> alts = new ArrayList();
+		alts.addAll(msg.altsWithRecursion);
+		Collections.sort(alts);
+		assertEquals(expectedBadAlts,alts);
 	}
 
 	protected void checkDecision(Grammar g,
@@ -1230,6 +1223,16 @@ As a result, alternative(s) 2 were disabled for that input
 		return null;
 	}
 
+	protected NonRegularDecisionMessage getNonRegularDecisionMessage(List errors) {
+		for (int i = 0; i < errors.size(); i++) {
+			Message m = (Message) errors.get(i);
+			if ( m instanceof NonRegularDecisionMessage ) {
+				return (NonRegularDecisionMessage)m;
+			}
+		}
+		return null;
+	}
+
 	protected RecursionOverflowMessage getRecursionOverflowMessage(List warnings) {
 		for (int i = 0; i < warnings.size(); i++) {
 			Message m = (Message) warnings.get(i);
@@ -1272,4 +1275,19 @@ As a result, alternative(s) 2 were disabled for that input
 		return buf.toString();
 	}
 
+	protected Set<String> ruleNames(Set<Rule> rules) {
+		Set<String> x = new HashSet<String>();
+		for (Rule r : rules) {
+			x.add(r.name);
+		}
+		return x;
+	}
+
+	protected Set<String> ruleNames2(Collection<HashSet> rules) {
+		Set<String> x = new HashSet<String>();
+		for (HashSet s : rules) {
+			x.addAll(ruleNames(s));
+		}
+		return x;
+	}
 }

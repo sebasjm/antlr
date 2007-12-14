@@ -117,7 +117,14 @@ public class DFA {
 	 */
     protected boolean cyclic = false;
 
-    /** Each alt in an NFA derived from a grammar must have a DFA state that
+	/** Track whether this DFA has at least one sem/syn pred encountered
+	 *  during a closure operation.  This is useful for deciding whether
+	 *  to retry a non-LL(*) with k=1.  If no pred, it will not work w/o
+	 *  a pred so don't bother.  It would just give another error message.
+	 */
+	public boolean predicateVisible = false;
+
+	/** Each alt in an NFA derived from a grammar must have a DFA state that
      *  predicts it lest the parser not know what to do.  Nondeterminisms can
      *  lead to this situation (assuming no semantic predicates can resolve
      *  the problem) and when for some reason, I cannot compute the lookahead
@@ -136,7 +143,7 @@ public class DFA {
 	/** Track whether an alt discovers recursion for each alt during
 	 *  NFA to DFA conversion; >1 alt with recursion implies nonregular.
 	 */
-	protected IntSet recursiveAltSet = new IntervalSet();
+	public IntSet recursiveAltSet = new IntervalSet();
 
 	/** Which NFA are we converting (well, which piece of the NFA)? */
     public NFA nfa;
@@ -216,31 +223,40 @@ public class DFA {
 
 		//long start = System.currentTimeMillis();
         nfaConverter = new NFAToDFAConverter(this);
-		nfaConverter.convert();
+		try {
+			nfaConverter.convert();
 
-		// figure out if there are problems with decision
-		verify();
+			// figure out if there are problems with decision
+			verify();
 
-		if ( !probe.isDeterministic() ||
-			 probe.analysisAborted() ||
-			 probe.analysisOverflowed() )
-		{
-			probe.issueWarnings();
+			if ( !probe.isDeterministic() ||
+				 probe.analysisTimedOut() ||
+				 probe.analysisOverflowed() )
+			{
+				probe.issueWarnings();
+			}
+
+			// must be after verify as it computes cyclic, needed by this routine
+			// should be after warnings because early termination or something
+			// will not allow the reset to operate properly in some cases.
+			resetStateNumbersToBeContiguous();
+
+			//long stop = System.currentTimeMillis();
+			//System.out.println("verify cost: "+(int)(stop-start)+" ms");
+
+			if ( Tool.internalOption_PrintDFA ) {
+				System.out.println("DFA d="+decisionNumber);
+				FASerializer serializer = new FASerializer(nfa.grammar);
+				String result = serializer.serialize(startState);
+				System.out.println(result);
+			}
 		}
-
-		// must be after verify as it computes cyclic, needed by this routine
-		// should be after warnings because early termination or something
-		// will not allow the reset to operate properly in some cases.
-		resetStateNumbersToBeContiguous();
-
-		//long stop = System.currentTimeMillis();
-		//System.out.println("verify cost: "+(int)(stop-start)+" ms");
-
-		if ( Tool.internalOption_PrintDFA ) {
-			System.out.println("DFA d="+decisionNumber);
-			FASerializer serializer = new FASerializer(nfa.grammar);
-			String result = serializer.serialize(startState);
-			System.out.println(result);
+		catch (NonLLStarDecisionException re) {
+			probe.reportNonLLStarDecision(this);
+			// >1 alt recurses, k=* and no auto backtrack nor manual sem/syn
+			if ( !predicateVisible ) {
+				probe.issueWarnings();
+			}
 		}
     }
 
@@ -1029,8 +1045,8 @@ public class DFA {
 		return nAlts;
 	}
 
-	public boolean analysisAborted() {
-		return probe.analysisAborted();
+	public boolean analysisTimedOut() {
+		return probe.analysisTimedOut();
 	}
 
     protected void initAltRelatedInfo() {

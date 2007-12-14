@@ -135,7 +135,7 @@ public class DecisionProbe {
 	protected Map stateToLeftRecursiveConfigurationsMap = new HashMap();
 
 	/** Did ANTLR have to terminate early on the analysis of this decision? */
-	protected boolean terminated = false;
+	protected boolean timedOut = false;
 
 	/** Used to find paths through syntactically ambiguous DFA. */
 	protected Map stateReachable;
@@ -204,14 +204,16 @@ public class DecisionProbe {
 	}
 
 	/** Did the analysis complete it's work? */
-	public boolean analysisAborted() {
-		return terminated;
+	public boolean analysisTimedOut() {
+		return timedOut;
 	}
 
+	/** Took too long to analyze a DFA */
 	public boolean analysisOverflowed() {
 		return stateToRecursiveOverflowConfigurationsMap.size()>0;
 	}
 
+	/** Found recursion in > 1 alt */
 	public boolean isNonLLStarDecision() {
 		return nonLLStarDecision;
 	}
@@ -388,6 +390,11 @@ public class DecisionProbe {
 		return (SemanticContext)altToPredMap.get(Utils.integer(alt));
 	}
 
+	/** At least one alt refs a sem or syn pred */
+	public boolean hasPredicate() {
+		return stateToAltSetWithSemanticPredicatesMap.size()>0;
+	}
+
 	public Set getNondeterministicStatesResolvedWithSemanticPredicate() {
 		return statesResolvedWithSemanticPredicatesSet;
 	}
@@ -407,7 +414,7 @@ public class DecisionProbe {
 			ErrorManager.nonLLStarDecision(this);
 		}
 
-		if ( analysisAborted() ) {
+		if ( analysisTimedOut() ) {
 			// only report early termination errors if !backtracking
 			if ( !dfa.getAutoBacktrackMode() ) {
 				ErrorManager.analysisAborted(this);
@@ -625,16 +632,19 @@ public class DecisionProbe {
 		danglingStates.add(d);
 	}
 
-	public void reportEarlyTermination() {
-		terminated = true;
-		dfa.nfa.grammar.setOfDFAWhoseConversionTerminatedEarly.add(dfa);
+	public void reportAnalysisTimeout() {
+		timedOut = true;
+		dfa.nfa.grammar.setOfDFAWhoseAnalysisTimedOut.add(dfa);
 	}
 
 	/** Report that at least 2 alts have recursive constructs.  There is
 	 *  no way to build a DFA so we terminated.
 	 */
 	public void reportNonLLStarDecision(DFA dfa) {
-		//System.out.println("non-LL(*) DFA "+dfa.decisionNumber);
+		/*
+		System.out.println("non-LL(*) DFA "+dfa.decisionNumber+", alts: "+
+						   dfa.recursiveAltSet.toList());
+						   */
 		nonLLStarDecision = true;
 		altsWithProblem.addAll(dfa.recursiveAltSet.toList());
 	}

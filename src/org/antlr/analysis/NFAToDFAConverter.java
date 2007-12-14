@@ -76,7 +76,7 @@ public class NFAToDFAConverter {
 
 		// while more DFA states to check, process them
 		while ( work.size()>0 &&
-			    !dfa.probe.analysisAborted() &&
+			    !dfa.probe.analysisTimedOut() &&
 				!dfa.probe.nonLLStarDecision &&
 				!dfa.nfa.grammar.NFAToDFAConversionExternallyAborted() )
 		{
@@ -104,7 +104,7 @@ public class NFAToDFAConverter {
 			work.remove(0); // done with it; remove from work list
 		}
 
-		// walk all accept states and find the synpreds
+		// walk all accept states and find the synpreds.
 		// I used to do this in the code generator, but that is too late.
 		// This converter tries to avoid computing DFA for decisions in
 		// syntactic predicates that are not ever used such as those
@@ -270,11 +270,7 @@ public class NFAToDFAConverter {
 		int numberOfEdgesEmanating = 0;
 		Map targetToLabelMap = new HashMap();
 		// for each label that could possibly emanate from NFAStates of d
-		// (abort if we find any closure operation on a configuration of d
-		//  that finds multiple alts with recursion, non-LL(*), as we cannot
-		//  trust any reach operations from d since we are blind to some
-		//  paths.  Leave state a dead-end and try to resolve with preds)
-		for (int i=0; !d.abortedDueToMultipleRecursiveAlts && i<labels.size(); i++) {
+		for (int i=0; i<labels.size(); i++) {
 			Label label = (Label)labels.get(i);
 			DFAState t = reach(d, label);
 			if ( debug ) {
@@ -470,7 +466,7 @@ public class NFAToDFAConverter {
 		configs.addAll(d.getNFAConfigurations());
 		// for each NFA configuration in d (abort if we detect non-LL(*) state)
 		Iterator iter = configs.iterator();
-		while (!d.abortedDueToMultipleRecursiveAlts && iter.hasNext() ) {
+		while (iter.hasNext() ) {
 			NFAConfiguration c = (NFAConfiguration)iter.next();
 			if ( c.singleAtomTransitionEmanating ) {
 				continue; // ignore NFA states w/o epsilon transitions
@@ -485,6 +481,7 @@ public class NFAToDFAConverter {
 					d,
 					false);
 		}
+		//System.out.println("after closure d="+d);
 		d.closureBusy = null; // wack all that memory used during closure
 	}
 
@@ -604,12 +601,6 @@ public class NFAToDFAConverter {
 							   );
 		}
 
-		if ( d.abortedDueToMultipleRecursiveAlts ) {
-			// keep walking back out, we're in the process of terminating
-			// this closure operation on NFAState p contained with DFAState d
-			return;
-		}
-
 		/* NOTE SURE WE NEED THIS FAILSAFE NOW 11/8/2006 and it complicates
 		   MY ALGORITHM TO HAVE TO ABORT ENTIRE DFA CONVERSION
 		   */
@@ -618,7 +609,7 @@ public class NFAToDFAConverter {
 			 DFA.MAX_TIME_PER_DFA_CREATION )
 		{
 			// report and back your way out; we've blown up somehow
-			dfa.probe.reportEarlyTermination();
+			dfa.probe.reportAnalysisTimeout();
 			return;
 		}
 
@@ -655,7 +646,7 @@ public class NFAToDFAConverter {
 				if ( d.dfa.recursiveAltSet.size()>1 ) {
 					//System.out.println("recursive alts: "+d.dfa.recursiveAltSet.toString());
 					d.abortedDueToMultipleRecursiveAlts = true;
-					return;
+					throw new NonLLStarDecisionException(d.dfa);
 				}
 				/*
 				System.out.println("alt "+alt+" in rule "+p.enclosingRule+" dec "+d.dfa.decisionNumber+
@@ -732,6 +723,7 @@ public class NFAToDFAConverter {
 						collectPredicates);
 			}
 			else if ( transition0!=null && transition0.isSemanticPredicate() ) {
+				dfa.predicateVisible = true;
 				// continue closure here too, but add the sem pred to ctx
 				SemanticContext newSemanticContext = semanticContext;
 				if ( collectPredicates ) {
@@ -1008,8 +1000,7 @@ public class NFAToDFAConverter {
 		// the start state to the nondet state
 		if ( DFAOptimizer.MERGE_STOP_STATES &&
 			d.getNonDeterministicAlts()==null &&
-			!d.abortedDueToRecursionOverflow &&
-			!d.abortedDueToMultipleRecursiveAlts )
+			!d.abortedDueToRecursionOverflow )
 		{
 			// check to see if we already have an accept state for this alt
 			// [must do this after we resolve nondeterminisms in general]
@@ -1253,6 +1244,9 @@ public class NFAToDFAConverter {
 		boolean resolved =
 			tryToResolveWithSemanticPredicates(d, nondeterministicAlts);
 		if ( resolved ) {
+			if ( debug ) {
+				System.out.println("resolved DFA state "+d.stateNumber+" with pred");
+			}
 			d.resolvedWithPredicates = true;
 			dfa.probe.reportNondeterminismResolvedWithSemanticPredicate(d);
 			return;

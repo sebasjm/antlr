@@ -231,7 +231,7 @@ public class Grammar {
 	 *  in the recognizer for this file; only those that are affected by rule
 	 *  definitions in this grammar.  I am not sure the Java target will need
 	 *  this but I'm leaving in case other targets need it.
-	 *  @see NameSpaceChecker.lookForReferencesToUndefinedSymbols
+	 *  @see NameSpaceChecker.lookForReferencesToUndefinedSymbols()
 	 */
 	protected Set<Rule> delegatedRuleReferences = new HashSet();
 
@@ -272,7 +272,7 @@ public class Grammar {
 	 *  could be multiple cycles, but this is a flat list of all problematic
 	 *  rules.
 	 */
-	protected Set leftRecursiveRules;
+	protected Set<Rule> leftRecursiveRules;
 
 	/** An external tool requests that DFA analysis abort prematurely.  Stops
 	 *  at DFA granularity, which are limited to a DFA size and time computation
@@ -367,7 +367,7 @@ public class Grammar {
 	public int numberOfManualLookaheadOptions = 0;
 	public Set setOfNondeterministicDecisionNumbers = new HashSet();
 	public Set setOfNondeterministicDecisionNumbersResolvedWithPredicates = new HashSet();
-	public Set setOfDFAWhoseConversionTerminatedEarly = new HashSet();
+	public Set setOfDFAWhoseAnalysisTimedOut = new HashSet();
 
 	/** Track decisions with syn preds specified for reporting.
 	 *  This is the a set of BLOCK type AST nodes.
@@ -377,7 +377,7 @@ public class Grammar {
 	/** Track decisions that actually use the syn preds in the DFA.
 	 *  Computed during NFA to DFA conversion.
 	 */
-	public Set<DFA> decisionsWhoseDFAsUsesSynPreds = new HashSet();
+	public Set<DFA> decisionsWhoseDFAsUsesSynPreds = new HashSet<DFA>();
 
 	/** Track names of preds so we can avoid generating preds that aren't used
 	 *  Computed during NFA to DFA conversion.  Just walk accept states
@@ -827,10 +827,10 @@ public class Grammar {
 			startDFA = System.currentTimeMillis();
 		}
 		DFA lookaheadDFA = new DFA(decision, decisionStartState);
-		if ( (lookaheadDFA.analysisAborted() && // did analysis bug out?
+		if ( (lookaheadDFA.analysisTimedOut() && // did analysis bug out?
 			 lookaheadDFA.getUserMaxLookahead()!=1) || // either k=* or k>1
 			 (lookaheadDFA.probe.isNonLLStarDecision() && // >1 alt recurses, k=*
-		      lookaheadDFA.getAutoBacktrackMode()) )
+		      lookaheadDFA.predicateVisible) ) // auto backtrack or manual sem/syn
 		{
 			// set k=1 option if not already k=1 and try again
 			// clean up tracking stuff
@@ -838,9 +838,11 @@ public class Grammar {
 			// TODO: clean up synPredNamesUsedInDFA also (harder)
 			lookaheadDFA = null; // make sure other memory is "free" before redoing
 			d.blockAST.setOption(this, "k", Utils.integer(1));
-			//System.out.println("trying decision "+decision+" again with k=1");
+			if ( watchNFAConversion ) {
+				System.out.println("trying decision "+decision+" again with k=1");
+			}
 			lookaheadDFA = new DFA(decision, decisionStartState);
-			if ( lookaheadDFA.analysisAborted() ) { // did analysis bug out?
+			if ( lookaheadDFA.analysisTimedOut() ) { // did analysis bug out?
 				ErrorManager.internalError("could not even do k=1 for decision "+decision);
 			}
 		}
@@ -1427,7 +1429,7 @@ public class Grammar {
 	 *  successfully on these.  Useful to skip these rules then and also
 	 *  for ANTLRWorks to highlight them.
 	 */
-	public Set getLeftRecursiveRules() {
+	public Set<Rule> getLeftRecursiveRules() {
 		if ( nfa==null ) {
 			createNFAs();
 		}
