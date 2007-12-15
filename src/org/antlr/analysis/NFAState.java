@@ -44,7 +44,7 @@ public class NFAState extends State {
 
 	/** How many transitions; 0, 1, or 2 transitions */
 	int numTransitions = 0;
-	Transition[] transition = new Transition[MAX_TRANSITIONS];
+	public Transition[] transition = new Transition[MAX_TRANSITIONS];
 
 	/** Which NFA are we in? */
 	public NFA nfa = null;

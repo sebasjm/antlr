@@ -79,7 +79,7 @@ public class NFAFactory {
 				s = nfa.getState(s.endOfBlockStateNumber);
 				continue;
 			}
-			Transition t = s.transition(0);
+			Transition t = s.transition[0];
 			if ( t instanceof RuleClosureTransition ) {
 				s = ((RuleClosureTransition) t).followState;
 				continue;
@@ -91,9 +91,9 @@ public class NFAFactory {
 				// point at the last node of the alt
 				NFAState epsilonTarget = (NFAState)t.target;
 				if ( epsilonTarget.endOfBlockStateNumber==State.INVALID_STATE_NUMBER &&
-					 epsilonTarget.transition(0)!=null )
+					 epsilonTarget.transition[0] !=null )
 				{
-					s.setTransition0(epsilonTarget.transition(0));
+					s.setTransition0(epsilonTarget.transition[0]);
 					/*
 					System.out.println("### opt "+s.stateNumber+"->"+
 									   epsilonTarget.transition(0).target.stateNumber);
@@ -268,13 +268,13 @@ public class NFAFactory {
 			String ruleName = r.name;
 			NFAState endNFAState = r.stopState;
             // Is this rule a start symbol?  (no follow links)
-            if ( endNFAState.transition(0)==null ) {
-                // if so, then don't let algorithm fall off the end of
-                // the rule, make it hit EOF/EOT.
+			if ( endNFAState.transition[0] ==null ) {
+				// if so, then don't let algorithm fall off the end of
+				// the rule, make it hit EOF/EOT.
 				build_EOFState(endNFAState);
 				// track how many rules have been invoked by another rule
 				numberUnInvokedRules++;
-            }
+			}
         }
 		return numberUnInvokedRules;
     }

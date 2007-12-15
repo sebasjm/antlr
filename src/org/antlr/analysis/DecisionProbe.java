@@ -366,7 +366,7 @@ public class DecisionProbe {
 
 		// add first state of actual alt
 		NFAState altStart = dfa.nfa.grammar.getNFAStateForAltOfDecision(nfaStart,alt);
-		NFAState isolatedAltStart = (NFAState)altStart.transition(0).target;
+		NFAState isolatedAltStart = (NFAState)altStart.transition[0].target;
 		path.add(isolatedAltStart);
 
 		// add the actual path now
@@ -585,7 +585,7 @@ public class DecisionProbe {
 			for (int i = 0; i < configs.size(); i++) {
 				NFAConfiguration c = (NFAConfiguration) configs.get(i);
 				NFAState ruleInvocationState = dfa.nfa.getState(c.state);
-				Transition transition0 = ruleInvocationState.transition(0);
+				Transition transition0 = ruleInvocationState.transition[0];
 				RuleClosureTransition ref = (RuleClosureTransition)transition0;
 				String targetRule = ((NFAState) ref.target).enclosingRule.name;
 				Integer altI = Utils.integer(c.alt);
@@ -872,7 +872,7 @@ public class DecisionProbe {
 		// pick the first edge whose target is in states and whose
 		// label is labels[labelIndex]
 		for (int i=0; i<s.getNumberOfTransitions(); i++) {
-			Transition t = s.transition(i);
+			Transition t = s.transition[i];
 			NFAState edgeTarget = (NFAState)t.target;
 			Label label = (Label)labels.get(labelIndex);
 			/*
@@ -941,9 +941,9 @@ public class DecisionProbe {
 		NFAState decisionState = dfa.getNFADecisionStartState();
 		NFAState altState =
 			dfa.nfa.grammar.getNFAStateForAltOfDecision(decisionState,alt);
-		NFAState decisionLeft = (NFAState)altState.transition(0).target;
+		NFAState decisionLeft = (NFAState)altState.transition[0].target;
 		RuleClosureTransition ruleCallEdge =
-			(RuleClosureTransition)decisionLeft.transition(0);
+			(RuleClosureTransition)decisionLeft.transition[0];
 		NFAState ruleStartState = (NFAState)ruleCallEdge.target;
 		//System.out.println("alt = "+decisionLeft.getEnclosingRule());
 		return ruleStartState.enclosingRule.name;

@@ -188,8 +188,8 @@ public class DOTGenerator {
 				NFAState alt = (NFAState)s;
 				while ( alt!=null ) {
 					rankST.setAttribute("states", getStateLabel(alt));
-					if ( alt.transition(1)!=null ) {
-						alt = (NFAState)alt.transition(1).target;
+					if ( alt.transition[1] !=null ) {
+						alt = (NFAState)alt.transition[1].target;
 					}
 					else {
 						alt=null;

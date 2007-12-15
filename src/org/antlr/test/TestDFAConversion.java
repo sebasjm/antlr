@@ -859,11 +859,11 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, 0); // loopback
 		expecting =
 			".s0-A->.s1\n" +
-			".s0-B->:s2=>1\n" +
-			".s0-C->:s3=>2\n" +
+			".s0-B->:s3=>1\n" +
+			".s0-C->:s2=>2\n" +
 			".s1-A->.s1\n" +
-			".s1-B->:s2=>1\n" +
-			".s1-C->:s3=>2\n";
+			".s1-B->:s3=>1\n" +
+			".s1-C->:s2=>2\n";
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule block
 	}
 
@@ -882,10 +882,10 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, 0); // loopback
 		expecting =
 			".s0-A->.s1\n" +
-			".s0-B->:s2=>1\n" +
+			".s0-B->:s3=>1\n" +
 			".s1-A->.s1\n" +
-			".s1-B->:s2=>1\n" +
-			".s1-C->:s3=>2\n";
+			".s1-B->:s3=>1\n" +
+			".s1-C->:s2=>2\n";
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule block
 	}
 
@@ -904,10 +904,10 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, 0); // loopback (A)+
 		expecting =
 			".s0-A->.s1\n" +
-			".s0-B..X->:s2=>1\n" +
+			".s0-B..X->:s3=>1\n" +
 			".s1-A->.s1\n" +
-			".s1-B..X->:s2=>1\n" +
-			".s1-Y->:s3=>2\n";
+			".s1-B..X->:s3=>1\n" +
+			".s1-Y->:s2=>2\n";
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule
 	}
 

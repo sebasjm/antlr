@@ -52,14 +52,14 @@ public class RandomPhrase {
 				NFAState invokingState = (NFAState)ruleInvocationStack.pop();
 				// System.out.println("pop invoking state "+invokingState);
 				RuleClosureTransition invokingTransition =
-					(RuleClosureTransition)invokingState.transition(0);
+					(RuleClosureTransition)invokingState.transition[0];
 				// move to node after state that invoked this rule
 				state = invokingTransition.followState;
 				continue;
 			}
 			if ( state.getNumberOfTransitions()==1 ) {
 				// no branching, just take this path
-				Transition t0 = state.transition(0);
+				Transition t0 = state.transition[0];
 				if ( t0 instanceof RuleClosureTransition ) {
 					ruleInvocationStack.push(state);
 					// System.out.println("push state "+state);
@@ -84,7 +84,7 @@ public class RandomPhrase {
 			//System.out.println("randomAlt="+randomAlt);
 			NFAState altStartState =
 				g.getNFAStateForAltOfDecision(state, randomAlt);
-			Transition t = altStartState.transition(0);
+			Transition t = altStartState.transition[0];
 			/*
 			start of a decision could never be a labeled transition
 			if ( !t.label.isEpsilon() ) {

@@ -156,36 +156,44 @@ public class NFAToDFAConverter {
 			NFAContext initialContext = contextTrees[i];
 			// if first alt is derived from loopback/exit branch of loop,
 			// make alt=n+1 for n alts instead of 1
+			List configsInClosure = new ArrayList();
 			if ( i==0 &&
 				 dfa.getNFADecisionStartState().decisionStateType==NFAState.LOOPBACK )
 			{
 				int numAltsIncludingExitBranch = dfa.nfa.grammar
 						.getNumberOfAltsForDecisionNFA(dfa.decisionNFAStartState);
 				altNum = numAltsIncludingExitBranch;
-				closure((NFAState)alt.transition(0).target,
+				closure((NFAState)alt.transition[0].target,
 						altNum,
 						initialContext,
 						SemanticContext.EMPTY_SEMANTIC_CONTEXT,
 						startState,
-						true);
+						true,
+						configsInClosure);
 				altNum = 1; // make next alt the first
 			}
 			else {
-				closure((NFAState)alt.transition(0).target,
+				closure((NFAState)alt.transition[0].target,
 						altNum,
 						initialContext,
 						SemanticContext.EMPTY_SEMANTIC_CONTEXT,
 						startState,
-						true);
+						true,
+						configsInClosure);
 				altNum++;
 			}
+			for (int j = 0; j < configsInClosure.size(); j++) {
+				NFAConfiguration x = (NFAConfiguration) configsInClosure.get(j);
+				startState.addNFAConfiguration(dfa.nfa.getState(x.state), x);
+			}
+			startState.getNFAConfigurations().addAll(configsInClosure);
 			i++;
 
 			// move to next alternative
-			if ( alt.transition(1)==null ) {
+			if ( alt.transition[1] ==null ) {
 				break;
 			}
-			alt = (NFAState)alt.transition(1).target;
+			alt = (NFAState)alt.transition[1].target;
 		}
 
 		// now DFA start state has the complete closure for the decision
@@ -283,7 +291,13 @@ public class NFAToDFAConverter {
 				// as this labels set is a covering approximation only.
                 continue;
 			}
-			if ( t.getUniqueAlt()==NFA.INVALID_ALT_NUMBER ) {
+			/*
+			System.out.println("state["+d.stateNumber+"].k="+d.getLookaheadDepth());
+			System.out.println("(d.getLookaheadDepth()+1)="+(d.getLookaheadDepth()+1));
+			System.out.println("dfa.getUserMaxLookahead()="+dfa.getUserMaxLookahead());
+			*/
+			//System.out.println("dfa.k="+dfa.getUserMaxLookahead());
+			if ( t.getUniqueAlt()==NFA.INVALID_ALT_NUMBER  ) {
 				// Only compute closure if a unique alt number is not known.
 				// If a unique alternative is mentioned among all NFA
 				// configurations then there is no possibility of needing to look
@@ -308,28 +322,17 @@ public class NFAToDFAConverter {
 							   "->"+t);
 							   */
 
-			/*
-			// add if not in DFA yet even if its closure aborts due to non-LL(*);
-			// getting to the state is ok, we just can't see where to go next--it's
-			// a blind alley.
-			*/
+			// add if not in DFA yet
 			DFAState targetState = addDFAStateToWorkList(t);
 
 			numberOfEdgesEmanating +=
 				addTransition(d, label, targetState, targetToLabelMap);
 
 			// lookahead of target must be one larger than d's k
+			// We are possibly setting the depth of a pre-existing state
+			// that is equal to one we just computed...not sure if that's
+			// ok.
 			targetState.setLookaheadDepth(d.getLookaheadDepth() + 1);
-
-			/*
-			// closure(t) might have aborted, but addDFAStateToWorkList will try
-			// to resolve t with predicates.  If that fails, must give an error
-			// Note: this is tested on the target of d not d.
-			if ( t.abortedDueToMultipleRecursiveAlts && !t.isResolvedWithPredicates() ) {
-				// no predicates to resolve non-LL(*) decision, report
-				t.dfa.probe.reportNonLLStarDecision(t.dfa);
-			}
-			*/
 		}
 
 		//System.out.println("DFA after reach / closures:\n"+dfa);
@@ -470,28 +473,50 @@ public class NFAToDFAConverter {
 		if ( debug ) {
 			System.out.println("closure("+d+")");
 		}
-		Set configs = new HashSet();
+
+		/*
+		if ( dfa.configSetCache.get(proposedNFAConfiguration)!=null ) {
+			System.out.println("seen closure before");
+		}
+		else {
+			dfa.configSetCache.put(proposedNFAConfiguration);
+		}
+		*/
+
+		/*
+		List configs = new ArrayList(d.getNFAConfigurations().size());
 		// Because we are adding to the configurations in closure
 		// must clone initial list so we know when to stop doing closure
 		// TODO: expensive, try to get around this alloc / copy
 		configs.addAll(d.getNFAConfigurations());
 		// for each NFA configuration in d (abort if we detect non-LL(*) state)
-		Iterator iter = configs.iterator();
-		while (iter.hasNext() ) {
-			NFAConfiguration c = (NFAConfiguration)iter.next();
+		for (int ci = 0; ci < configs.size(); ci++) {
+			NFAConfiguration c = (NFAConfiguration) configs.get(ci);
+			*/
+		List<NFAConfiguration> configsInClosure = new ArrayList<NFAConfiguration>();
+		Iterator it = d.getNFAConfigurations().iterator();
+		while ( it.hasNext() ) {
+			NFAConfiguration c = (NFAConfiguration)it.next();
 			if ( c.singleAtomTransitionEmanating ) {
 				continue; // ignore NFA states w/o epsilon transitions
 			}
 			//System.out.println("go do reach for NFA state "+c.state);
 			// figure out reachable NFA states from each of d's nfa states
-			// via epsilon transitions
+			// via epsilon transitions.
+			// Fill configsInClosure rather than altering d configs inline
 			closure(dfa.nfa.getState(c.state),
 					c.alt,
 					c.context,
 					c.semanticContext,
 					d,
-					false);
+					false,
+					configsInClosure);
 		}
+		for (int i = 0; i < configsInClosure.size(); i++) {
+			NFAConfiguration x = (NFAConfiguration) configsInClosure.get(i);
+			d.addNFAConfiguration(dfa.nfa.getState(x.state), x);
+		}
+		//d.getNFAConfigurations().addAll(configsInClosure);
 		//System.out.println("after closure d="+d);
 		d.closureBusy = null; // wack all that memory used during closure
 	}
@@ -604,7 +629,8 @@ public class NFAToDFAConverter {
 						NFAContext context,
 						SemanticContext semanticContext,
 						DFAState d,
-						boolean collectPredicates)
+						boolean collectPredicates,
+						List<NFAConfiguration> configsInClosure)
 	{
 		if ( debug ){
 			System.out.println("closure at NFA state "+p.stateNumber+"|"+
@@ -642,10 +668,11 @@ public class NFAToDFAConverter {
 		d.closureBusy.add(proposedNFAConfiguration);
 
 		// p itself is always in closure
-		d.addNFAConfiguration(p, proposedNFAConfiguration);
+		//d.addNFAConfiguration(p, proposedNFAConfiguration);
+		configsInClosure.add(proposedNFAConfiguration);
 
 		// Case 1: are we a reference to another rule?
-		Transition transition0 = p.transition(0);
+		Transition transition0 = p.transition[0];
 		if ( transition0 instanceof RuleClosureTransition ) {
 			int depth = context.recursionDepthEmanatingFromState(p.stateNumber);
 			// Detect recursion by more than a single alt, which indicates
@@ -689,16 +716,18 @@ public class NFAToDFAConverter {
 			// System.out.println(" context="+context);
 			// traverse epsilon edge to new rule
 			NFAState ruleTarget = (NFAState)ref.target;
-			closure(ruleTarget, alt, newContext, semanticContext, d, collectPredicates);
+			closure(ruleTarget, alt, newContext, semanticContext, d, collectPredicates,
+					configsInClosure);
 		}
 		// Case 2: end of rule state, context (i.e., an invoker) exists
 		else if ( p.isAcceptState() && context.parent!=null ) {
 			NFAState whichStateInvokedRule = context.invokingState;
 			RuleClosureTransition edgeToRule =
-				(RuleClosureTransition)whichStateInvokedRule.transition(0);
+				(RuleClosureTransition)whichStateInvokedRule.transition[0];
 			NFAState continueState = edgeToRule.followState;
 			NFAContext newContext = context.parent; // "pop" invoking state
-			closure(continueState, alt, newContext, semanticContext, d, collectPredicates);
+			closure(continueState, alt, newContext, semanticContext, d, collectPredicates,
+					configsInClosure);
 		}
 		/*
 		11/27/2005: I tried adding this but it highlighted that
@@ -729,7 +758,8 @@ public class NFAToDFAConverter {
 						context,
 						semanticContext,
 						d,
-						collectPredicates);
+						collectPredicates,
+						configsInClosure);
 			}
 			else if ( transition0!=null && transition0.isSemanticPredicate() ) {
 				dfa.predicateVisible = true;
@@ -753,7 +783,7 @@ public class NFAToDFAConverter {
 						altLeftEdge.transition(0).target.stateNumber);
 					*/
 					if ( !labelContext.isSyntacticPredicate() ||
-						 p==altLeftEdge.transition(0).target )
+						 p==altLeftEdge.transition[0].target )
 					{
 						//System.out.println("&"+labelContext+" enclosingRule="+p.enclosingRule);
 						newSemanticContext =
@@ -765,16 +795,18 @@ public class NFAToDFAConverter {
 						context,
 						newSemanticContext,
 						d,
-						collectPredicates);
+						collectPredicates,
+						configsInClosure);
 			}
-			Transition transition1 = p.transition(1);
+			Transition transition1 = p.transition[1];
 			if ( transition1!=null && transition1.isEpsilon() ) {
 				closure((NFAState)transition1.target,
 						alt,
 						context,
 						semanticContext,
 						d,
-						collectPredicates);
+						collectPredicates,
+						configsInClosure);
 			}
 		}
 
@@ -875,7 +907,7 @@ public class NFAToDFAConverter {
 			NFAState p = dfa.nfa.getState(c.state);
 			// by design of the grammar->NFA conversion, only transition 0
 			// may have a non-epsilon edge.
-			Transition edge = p.transition(0);
+			Transition edge = p.transition[0];
 			if ( edge==null || !c.singleAtomTransitionEmanating ) {
 				continue;
 			}
@@ -940,7 +972,7 @@ public class NFAToDFAConverter {
 				continue; // the conflict resolver indicates we must leave alone
 			}
 			NFAState p = dfa.nfa.getState(c.state);
-			Transition edge = p.transition(0);
+			Transition edge = p.transition[0];
 			Label edgeLabel = edge.label;
 			if ( edgeLabel.equals(eot) ) {
 				//System.out.println("config with EOT: "+c);
@@ -970,7 +1002,7 @@ public class NFAToDFAConverter {
 			// infinite recursion on a state before it knows
 			// whether or not the state will already be
 			// found after closure on it finishes.  It could be
-			// refer to a state that will ultimately not make it
+			// referring to a state that will ultimately not make it
 			// into the reachable state space and the error
 			// reporting must be able to compute the path from
 			// start to the error state with infinite recursion

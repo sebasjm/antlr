@@ -211,15 +211,15 @@ public class DFAState extends State {
         cachedHashCode += c.state + c.alt;
 
         // update reachableLabels
-        if ( state.transition(0)!=null ) {
-            Label label = state.transition(0).label;
-            if ( !(label.isEpsilon()||label.isSemanticPredicate()) ) {
-                if ( state.transition(1)==null ) {
-                    c.singleAtomTransitionEmanating = true;
-                }
-                addReachableLabel(label);
-            }
-        }
+		if ( state.transition[0] !=null ) {
+			Label label = state.transition[0].label;
+			if ( !(label.isEpsilon()||label.isSemanticPredicate()) ) {
+				if ( state.transition[1] ==null ) {
+					c.singleAtomTransitionEmanating = true;
+				}
+				addReachableLabel(label);
+			}
+		}
     }
 
 	public void addNFAConfiguration(NFAState state, int alt, NFAContext context, SemanticContext semanticContext) {

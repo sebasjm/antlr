@@ -62,6 +62,18 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
 	}
 
+	public void testLL_1_Pred_forced_k_1() throws Exception {
+		// should stop just like before w/o k set.
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a options {k=1;} : {p1}? A | {p2}? A ;");
+		String expecting =
+			".s0-A->.s1\n" +
+			".s1-{p1}?->:s2=>1\n" +
+			".s1-{p2}?->:s3=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
 	public void testLL_2_Pred() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+

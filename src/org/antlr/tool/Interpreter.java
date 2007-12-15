@@ -265,7 +265,7 @@ public class Interpreter implements TokenSource {
 				}
 				*/
 				NFAState alt = grammar.getNFAStateForAltOfDecision(s, parseAlt);
-				s = (NFAState)alt.transition(0).target;
+				s = (NFAState)alt.transition[0].target;
 				continue;
 			}
 
@@ -282,13 +282,13 @@ public class Interpreter implements TokenSource {
 				// pop invoking state off the stack to know where to return to
 				NFAState invokingState = (NFAState)ruleInvocationStack.pop();
 				RuleClosureTransition invokingTransition =
-						(RuleClosureTransition)invokingState.transition(0);
+						(RuleClosureTransition)invokingState.transition[0];
 				// move to node after state that invoked this rule
 				s = invokingTransition.followState;
 				continue;
 			}
 
-			Transition trans = s.transition(0);
+			Transition trans = s.transition[0];
 			Label label = trans.label;
 			// CASE 3: epsilon transition
 			if ( label.isEpsilon() ) {
@@ -315,7 +315,7 @@ public class Interpreter implements TokenSource {
 						actions.consumeToken(((TokenStream)input).LT(1));
 					}
 				}
-				s = (NFAState)s.transition(0).target;
+				s = (NFAState)s.transition[0].target;
 				input.consume();
 				t = input.LA(1);
 			}

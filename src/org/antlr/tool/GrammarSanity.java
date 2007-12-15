@@ -73,7 +73,7 @@ public class GrammarSanity {
 		}
 		visitedStates.add(s);
 		boolean stateReachesAcceptState = false;
-		Transition t0 = s.transition(0);
+		Transition t0 = s.transition[0];
 		if ( t0 instanceof RuleClosureTransition ) {
 			RuleClosureTransition refTrans = (RuleClosureTransition)t0;
 			Rule refRuleDef = refTrans.rule;
@@ -116,7 +116,7 @@ public class GrammarSanity {
 		// else it has a labeled edge
 
 		// now do the other transition if it exists
-		Transition t1 = s.transition(1);
+		Transition t1 = s.transition[1];
 		if ( t1!=null ) {
 			stateReachesAcceptState |=
 				traceStatesLookingForLeftRecursion((NFAState)t1.target,

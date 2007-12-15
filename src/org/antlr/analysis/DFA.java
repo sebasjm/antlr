@@ -43,6 +43,8 @@ import java.util.*;
  *  of recognizers (lexers, parsers, tree walkers).
  */
 public class DFA {
+	public HashMap configSetCache = new HashMap();
+
 	public static final int REACHABLE_UNKNOWN = -2;
 	public static final int REACHABLE_BUSY = -1; // in process of computing
 	public static final int REACHABLE_NO = 0;
@@ -53,7 +55,7 @@ public class DFA {
 	public static final int MAX_STATES_PER_ALT_IN_DFA = 450;
 	 */
 
-	/** Set to 0 to not terminate early */
+	/** Set to 0 to not terminate early (time in ms) */
 	public static int MAX_TIME_PER_DFA_CREATION = 1*1000;
 
 	/** How many edges can each DFA state have before a "special" state
@@ -853,7 +855,7 @@ public class DFA {
 		NFAState TokensRuleStart =
 			nfa.grammar.getRuleStartState(Grammar.ARTIFICIAL_TOKENS_RULENAME);
 		NFAState TokensDecisionStart =
-			(NFAState)TokensRuleStart.transition(0).target;
+			(NFAState)TokensRuleStart.transition[0].target;
 		return nfaStart == TokensDecisionStart;
 	}
 
@@ -1029,6 +1031,29 @@ public class DFA {
 		    predicateVisible; // auto backtrack or manual sem/syn
 		return getUserMaxLookahead()!=1 &&
 			 (analysisTimedOut() || nonLLStarOrOverflowAndPredicateVisible);
+	}
+
+	public String getReasonForFailure() {
+		StringBuffer buf = new StringBuffer();
+		if ( probe.isNonLLStarDecision() ) {
+			buf.append("non-LL(*)");
+			if ( predicateVisible ) {
+				buf.append(" && predicate visible");
+			}
+		}
+		if ( probe.analysisOverflowed() ) {
+			buf.append("recursion overflow");
+			if ( predicateVisible ) {
+				buf.append(" && predicate visible");
+			}
+		}
+		if ( analysisTimedOut() ) {
+			buf.append("timed out (>");
+			buf.append(DFA.MAX_TIME_PER_DFA_CREATION);
+			buf.append("ms)");
+		}
+		buf.append("\n");
+		return buf.toString();
 	}
 
 	/** What GrammarAST node (derived from the grammar) is this DFA

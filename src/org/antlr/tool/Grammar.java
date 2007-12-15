@@ -834,14 +834,18 @@ public class Grammar {
 			// First, clean up tracking stuff
 			decisionsWhoseDFAsUsesSynPreds.remove(lookaheadDFA);
 			// TODO: clean up synPredNamesUsedInDFA also (harder)
-			lookaheadDFA = null; // make sure other memory is "free" before redoing
 			d.blockAST.setOption(this, "k", Utils.integer(1));
 			if ( watchNFAConversion ) {
-				System.out.println("trying decision "+decision+" again with k=1");
+				System.out.print("trying decision "+decision+
+								 " again with k=1; reason: "+
+								 lookaheadDFA.getReasonForFailure());
 			}
+			lookaheadDFA = null; // make sure other memory is "free" before redoing
 			lookaheadDFA = new DFA(decision, decisionStartState);
 			if ( lookaheadDFA.analysisTimedOut() ) { // did analysis bug out?
-				ErrorManager.internalError("could not even do k=1 for decision "+decision);
+				ErrorManager.internalError("could not even do k=1 for decision "+
+										   decision+"; reason: "+
+										   lookaheadDFA.getReasonForFailure());
 			}
 		}
 
@@ -2299,10 +2303,10 @@ public class Grammar {
         }
         int n = 1;
         NFAState p = decisionState;
-        while ( p.transition(1)!=null ) {
-            n++;
-            p = (NFAState)p.transition(1).target;
-        }
+		while ( p.transition[1] !=null ) {
+			n++;
+			p = (NFAState)p.transition[1].target;
+		}
         return n;
     }
 
@@ -2328,7 +2332,7 @@ public class Grammar {
                 return p;
             }
             n++;
-            Transition next = p.transition(1);
+			Transition next = p.transition[1];
             p = null;
             if ( next!=null ) {
                 p = (NFAState)next.target;
@@ -2426,7 +2430,7 @@ public class Grammar {
 		}
 		lookBusy.add(s);
 
-		Transition transition0 = s.transition(0);
+		Transition transition0 = s.transition[0];
 		if ( transition0==null ) {
 			return null;
 		}
@@ -2467,7 +2471,7 @@ public class Grammar {
 			}
 		}
 
-		Transition transition1 = s.transition(1);
+		Transition transition1 = s.transition[1];
 		if ( transition1!=null ) {
 			LookaheadSet tset1 = _LOOK((NFAState)transition1.target);
 			tset.orInPlace(tset1);
