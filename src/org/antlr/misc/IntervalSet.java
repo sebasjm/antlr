@@ -212,7 +212,8 @@ public class IntervalSet implements IntSet {
 		int maxElement = vocabularyIS.getMaxElement();
 
 		IntervalSet compl = new IntervalSet();
-		if ( intervals.size()==0 ) {
+		int n = intervals.size();
+		if ( n ==0 ) {
 			return compl;
 		}
 		Interval first = (Interval)intervals.get(0);
@@ -222,14 +223,14 @@ public class IntervalSet implements IntSet {
 			IntervalSet a = (IntervalSet)s.and(vocabularyIS);
 			compl.addAll(a);
 		}
-		for (int i=1; i<intervals.size(); i++) { // from 2nd interval .. nth
+		for (int i=1; i<n; i++) { // from 2nd interval .. nth
 			Interval previous = (Interval)intervals.get(i-1);
 			Interval current = (Interval)intervals.get(i);
 			IntervalSet s = IntervalSet.of(previous.b+1, current.a-1);
 			IntervalSet a = (IntervalSet)s.and(vocabularyIS);
 			compl.addAll(a);
 		}
-		Interval last = (Interval)intervals.get(intervals.size()-1);
+		Interval last = (Interval)intervals.get(n -1);
 		// add a range from last.b to maxElement constrained to vocab
 		if ( last.b < maxElement ) {
 			IntervalSet s = IntervalSet.of(last.b+1, maxElement);

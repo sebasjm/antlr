@@ -264,7 +264,9 @@ public class DFAState extends State {
      *  Single element labels are treated as sets to make the code uniform.
      */
     protected void addReachableLabel(Label label) {
-        /*
+		// TODO: MAP label to this DFAState
+		// need Map<Label,Set<DFAState>>
+		/*
 		System.out.println("addReachableLabel to state "+dfa.decisionNumber+"."+stateNumber+": "+label.getSet().toString(dfa.nfa.grammar));
 		System.out.println("start of add to state "+dfa.decisionNumber+"."+stateNumber+": " +
 				"reachableLabels="+reachableLabels.toString());
@@ -411,7 +413,8 @@ public class DFAState extends State {
 			return cachedUniquelyPredicatedAlt;
 		}
         int alt = NFA.INVALID_ALT_NUMBER;
-		for (int i = 0; i < nfaConfigurations.size(); i++) {
+		int numConfigs = nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			// ignore anything we resolved; predicates will still result
 			// in transitions out of this state, so must count those
@@ -455,7 +458,8 @@ public class DFAState extends State {
 	 */ 
 	public int getUniqueAlt() {
 		int alt = NFA.INVALID_ALT_NUMBER;
-		for (int i = 0; i < nfaConfigurations.size(); i++) {
+		int numConfigs = nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			if ( alt==NFA.INVALID_ALT_NUMBER ) {
 				alt = configuration.alt; // found first alt
@@ -493,7 +497,8 @@ public class DFAState extends State {
 	 */
 	public Set getDisabledAlternatives() {
 		Set disabled = new LinkedHashSet();
-		for (int i = 0; i < nfaConfigurations.size(); i++) {
+		int numConfigs = nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			if ( configuration.resolved ) {
 				disabled.add(Utils.integer(configuration.alt));
@@ -569,14 +574,15 @@ public class DFAState extends State {
 		// save the overhead.  There are many o-a->o NFA transitions
 		// and so we save a hash map and iterator creation for each
 		// state.
-		if ( nfaConfigurations.size()<=1 ) {
+		int numConfigs = nfaConfigurations.size();
+		if ( numConfigs <=1 ) {
 			return null;
 		}
 
 		// First get a list of configurations for each state.
 		// Most of the time, each state will have one associated configuration
 		Map stateToConfigListMap = new HashMap();
-		for (int i = 0; i < nfaConfigurations.size(); i++) {
+		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			Integer stateI = Utils.integer(configuration.state);
 			List prevConfigs = (List)stateToConfigListMap.get(stateI);
@@ -609,7 +615,8 @@ public class DFAState extends State {
 			boolean thisStateHasPotentialProblem = false;
 			List configsForState = (List)stateToConfigListMap.get(stateI);
 			int alt=0;
-			for (int i = 0; i < configsForState.size() && configsForState.size()>1 ; i++) {
+			int numConfigsForState = configsForState.size();
+			for (int i = 0; i < numConfigsForState && numConfigsForState>1 ; i++) {
 				NFAConfiguration c = (NFAConfiguration) configsForState.get(i);
 				if ( alt==0 ) {
 					alt = c.alt;
@@ -662,9 +669,13 @@ public class DFAState extends State {
 			List configsForState = (List)stateToConfigListMap.get(stateI);
 			// compare each configuration pair s, t to ensure:
 			// s.ctx different than t.ctx if s.alt != t.alt
-			for (int i = 0; configsForState!=null && i < configsForState.size(); i++) {
+			int numConfigsForState = 0;
+			if ( configsForState!=null ) {
+				numConfigsForState = configsForState.size();
+			}
+			for (int i = 0; i < numConfigsForState; i++) {
 				NFAConfiguration s = (NFAConfiguration) configsForState.get(i);
-				for (int j = i+1; j < configsForState.size(); j++) {
+				for (int j = i+1; j < numConfigsForState; j++) {
 					NFAConfiguration t = (NFAConfiguration)configsForState.get(j);
 					// conflicts means s.ctx==t.ctx or s.ctx is a stack
 					// suffix of t.ctx or vice versa (if alts differ).
@@ -688,7 +699,8 @@ public class DFAState extends State {
 	 */
 	public Set getAltSet() {
 		Set alts = new HashSet();
-		for (int i = 0; i < nfaConfigurations.size(); i++) {
+		int numConfigs = nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			alts.add(Utils.integer(configuration.alt));
 		}
@@ -711,7 +723,8 @@ public class DFAState extends State {
 	 */
 	public Set getNFAStatesForAlt(int alt) {
 		Set alts = new HashSet();
-		for (int i = 0; i < nfaConfigurations.size(); i++) {
+		int numConfigs = nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			if ( configuration.alt == alt ) {
 				alts.add(Utils.integer(configuration.state));
@@ -755,7 +768,8 @@ public class DFAState extends State {
 
 	public Set getSyntacticPredicatesInNFAConfigurations() {
 		Set synpreds = new HashSet();
-		for (int i = 0; i < nfaConfigurations.size(); i++) {
+		int numConfigs = nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			SemanticContext gatedPredExpr =
 				configuration.semanticContext.getGatedPredicateContext();
@@ -815,7 +829,8 @@ public class DFAState extends State {
 	 */
 	public SemanticContext getGatedPredicatesInNFAConfigurations() {
 		SemanticContext unionOfPredicatesFromAllAlts = null;
-		for (int i = 0; i < nfaConfigurations.size(); i++) {
+		int numConfigs = nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			SemanticContext gatedPredExpr =
 				configuration.semanticContext.getGatedPredicateContext();

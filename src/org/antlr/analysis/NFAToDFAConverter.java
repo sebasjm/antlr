@@ -156,7 +156,7 @@ public class NFAToDFAConverter {
 			NFAContext initialContext = contextTrees[i];
 			// if first alt is derived from loopback/exit branch of loop,
 			// make alt=n+1 for n alts instead of 1
-			List configsInClosure = new ArrayList();
+			List<NFAConfiguration> configsInClosure = new ArrayList<NFAConfiguration>();
 			if ( i==0 &&
 				 dfa.getNFADecisionStartState().decisionStateType==NFAState.LOOPBACK )
 			{
@@ -182,8 +182,7 @@ public class NFAToDFAConverter {
 						configsInClosure);
 				altNum++;
 			}
-			for (int j = 0; j < configsInClosure.size(); j++) {
-				NFAConfiguration x = (NFAConfiguration) configsInClosure.get(j);
+			for (NFAConfiguration x : configsInClosure) {
 				startState.addNFAConfiguration(dfa.nfa.getState(x.state), x);
 			}
 			startState.nfaConfigurations.addAll(configsInClosure);
@@ -276,28 +275,30 @@ public class NFAToDFAConverter {
 		int numberOfEdgesEmanating = 0;
 		Map targetToLabelMap = new HashMap();
 		// for each label that could possibly emanate from NFAStates of d
-		for (int i=0; i<labels.size(); i++) {
+		int numLabels = labels.size();
+		for (int i=0; i<numLabels; i++) {
 			Label label = (Label)labels.get(i);
 			DFAState t = reach(d, label);
 			if ( debug ) {
 				System.out.println("DFA state after reach "+d+"-" +
 								   label.toString(dfa.nfa.grammar)+"->"+t);
 			}
-            if ( t==null ) {
-                // nothing was reached by label due to conflict resolution
+			if ( t==null ) {
+				// nothing was reached by label due to conflict resolution
 				// EOT also seems to be in here occasionally probably due
 				// to an end-of-rule state seeing it even though we'll pop
 				// an invoking state off the state; don't bother to conflict
 				// as this labels set is a covering approximation only.
-                continue;
+				continue;
 			}
 			/*
 			System.out.println("state["+d.stateNumber+"].k="+d.getLookaheadDepth());
 			System.out.println("(d.getLookaheadDepth()+1)="+(d.getLookaheadDepth()+1));
 			System.out.println("dfa.getUserMaxLookahead()="+dfa.getUserMaxLookahead());
+				 !(dfa.getUserMaxLookahead()==1&&d!=dfa.startState)
 			*/
 			//System.out.println("dfa.k="+dfa.getUserMaxLookahead());
-			if ( t.getUniqueAlt()==NFA.INVALID_ALT_NUMBER  ) {
+			if ( t.getUniqueAlt()==NFA.INVALID_ALT_NUMBER ) {
 				// Only compute closure if a unique alt number is not known.
 				// If a unique alternative is mentioned among all NFA
 				// configurations then there is no possibility of needing to look
@@ -483,21 +484,7 @@ public class NFAToDFAConverter {
 		}
 		*/
 
-		/*
-		List configs = new ArrayList(d.getNFAConfigurations().size());
-		// Because we are adding to the configurations in closure
-		// must clone initial list so we know when to stop doing closure
-		// TODO: expensive, try to get around this alloc / copy
-		configs.addAll(d.getNFAConfigurations());
-		// for each NFA configuration in d (abort if we detect non-LL(*) state)
-		for (int ci = 0; ci < configs.size(); ci++) {
-			NFAConfiguration c = (NFAConfiguration) configs.get(ci);
-			*/
 		List<NFAConfiguration> configsInClosure = new ArrayList<NFAConfiguration>();
-/*		Iterator it = d.getNFAConfigurations().iterator();
-		while ( it.hasNext() ) {
-			NFAConfiguration c = (NFAConfiguration)it.next();
-			*/
 		int numConfigs = d.nfaConfigurations.size();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration c = (NFAConfiguration)d.nfaConfigurations.get(i);
@@ -516,11 +503,9 @@ public class NFAToDFAConverter {
 					false,
 					configsInClosure);
 		}
-		for (int i = 0; i < configsInClosure.size(); i++) {
-			NFAConfiguration x = (NFAConfiguration) configsInClosure.get(i);
+		for (NFAConfiguration x : configsInClosure) {
 			d.addNFAConfiguration(dfa.nfa.getState(x.state), x);
 		}
-		//d.getNFAConfigurations().addAll(configsInClosure);
 		//System.out.println("after closure d="+d);
 		d.closureBusy = null; // wack all that memory used during closure
 	}
@@ -902,11 +887,8 @@ public class NFAToDFAConverter {
 		// for each NFA state in d, add in target states for label
 		int intLabel = label.getAtom();
 		IntSet setLabel = label.getSet();
-		/*
-		Iterator iter = d.getNFAConfigurations().iterator();
-		while ( iter.hasNext() ) {
-			NFAConfiguration c = (NFAConfiguration)iter.next();
-			*/
+		// TODO: Don't walk all configs; walk only those we know
+		// have label emanating (could be set, ...)
 		int numConfigs = d.nfaConfigurations.size();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration c = d.nfaConfigurations.get(i);

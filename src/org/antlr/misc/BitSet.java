@@ -126,7 +126,8 @@ public class BitSet implements IntSet, Cloneable {
 		if ( elements==null ) {
 			return;
 		}
-		for (int i = 0; i < elements.size(); i++) {
+		int n = elements.size();
+		for (int i = 0; i < n; i++) {
 			Object o = elements.get(i);
 			if ( !(o instanceof Integer) ) {
 				throw new IllegalArgumentException();
