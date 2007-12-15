@@ -59,7 +59,7 @@ public class CompositeGrammar {
 	 *  this properly.  After talking to Josh Bloch, Collections guy at Sun,
 	 *  I decided this was easiest solution.
 	 */
-	protected Vector<NFAState> numberToStateList = new Vector(1000);
+	protected Vector<NFAState> numberToStateList = new Vector<NFAState>(1000);
 
 	/** Token names and literal tokens like "void" are uniquely indexed.
      *  with -1 implying EOF.  Characters are different; they go from
@@ -72,7 +72,7 @@ public class CompositeGrammar {
     protected int maxTokenType = Label.MIN_TOKEN_TYPE-1;
 
 	/** Map token like ID (but not literals like "while") to its token type */
-	protected Map tokenIDToTypeMap = new HashMap();	
+	protected Map tokenIDToTypeMap = new HashMap();
 
 	/** Map token literals like "while" to its token type.  It may be that
 	 *  WHILE="while"=35, in which case both tokenNameToTypeMap and this
@@ -83,7 +83,7 @@ public class CompositeGrammar {
 	/** Map a token type to its token name.
 	 *  Must subtract MIN_TOKEN_TYPE from index.
 	 */
-	protected Vector typeToTokenList = new Vector();
+	protected Vector<String> typeToTokenList = new Vector<String>();
 	
 	protected void initTokenSymbolTables() {
         // the faux token types take first NUM_FAUX_LABELS positions
@@ -252,7 +252,7 @@ public class CompositeGrammar {
 	}
 
 	public NFAState getState(int s) {
-		return numberToStateList.get(s);
+		return (NFAState)numberToStateList.get(s);
 	}
 
 }

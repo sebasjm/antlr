@@ -48,11 +48,11 @@ import java.util.*;
  */
 public class IntervalSet implements IntSet {
 	/** The list of sorted, disjoint intervals. */
-    protected List intervals;
+    protected List<Interval> intervals;
 
     /** Create a set with no elements */
     public IntervalSet() {
-        intervals = new ArrayList(2); // most sets are 1 or 2 elements
+        intervals = new ArrayList<Interval>(2); // most sets are 1 or 2 elements
     }
 
     /** Create a set with a single element, el. */
@@ -185,8 +185,7 @@ public class IntervalSet implements IntSet {
         }
         IntervalSet other = (IntervalSet)set;
         // walk set and add each interval
-        for (Iterator iter = other.intervals.iterator(); iter.hasNext();) {
-            Interval I = (Interval) iter.next();
+		for (Interval I : other.intervals) {
             this.add(I.a,I.b);
         }
     }
@@ -495,9 +494,7 @@ public class IntervalSet implements IntSet {
 		if ( isNil() ) {
 			return Label.INVALID;
 		}
-		Iterator iter = this.intervals.iterator();
-		while (iter.hasNext()) {
-			Interval I = (Interval) iter.next();
+		for (Interval I : intervals) {
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -570,9 +567,7 @@ public class IntervalSet implements IntSet {
 
     public int size() {
 		int n = 0;
-		Iterator iter = this.intervals.iterator();
-		while (iter.hasNext()) {
-			Interval I = (Interval) iter.next();
+		for (Interval I : intervals) {
 			int a = I.a;
 			int b = I.b;
 			n += (b-a+1);
@@ -582,9 +577,7 @@ public class IntervalSet implements IntSet {
 
     public List toList() {
 		List values = new ArrayList();
-		Iterator iter = this.intervals.iterator();
-		while (iter.hasNext()) {
-			Interval I = (Interval) iter.next();
+		for (Interval I : intervals) {
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -596,10 +589,8 @@ public class IntervalSet implements IntSet {
 
 	public int[] toArray() {
 		int[] values = new int[size()];
-		Iterator iter = this.intervals.iterator();
 		int i = 0;
-		while (iter.hasNext()) {
-			Interval I = (Interval) iter.next();
+		for (Interval I : intervals) {
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -613,10 +604,8 @@ public class IntervalSet implements IntSet {
 	public org.antlr.runtime.BitSet toRuntimeBitSet() {
 		org.antlr.runtime.BitSet s =
 			new org.antlr.runtime.BitSet(getMaxElement()+1);
-		Iterator iter = this.intervals.iterator();
 		int i = 0;
-		while (iter.hasNext()) {
-			Interval I = (Interval) iter.next();
+		for (Interval I : intervals) {
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {

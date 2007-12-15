@@ -95,7 +95,7 @@ public class DFA {
 	 *  a way to go from state number to DFAState rather than via a
 	 *  hash lookup.
 	 */
-	protected Vector states = new Vector();
+	protected Vector<DFAState> states = new Vector<DFAState>();
 
 	/** Unique state numbers per DFA */
 	protected int stateCounter = 0;

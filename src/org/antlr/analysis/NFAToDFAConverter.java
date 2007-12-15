@@ -81,7 +81,7 @@ public class NFAToDFAConverter {
 			DFAState d = (DFAState) work.get(0);
 			if ( dfa.nfa.grammar.getWatchNFAConversion() ) {
 				System.out.println("convert DFA state "+d.stateNumber+
-								   " ("+d.getNFAConfigurations().size()+" nfa states)");
+								   " ("+d.nfaConfigurations.size()+" nfa states)");
 			}
 			int k = dfa.getUserMaxLookahead();
 			if ( k>0 && k==d.getLookaheadDepth() ) {
@@ -186,7 +186,7 @@ public class NFAToDFAConverter {
 				NFAConfiguration x = (NFAConfiguration) configsInClosure.get(j);
 				startState.addNFAConfiguration(dfa.nfa.getState(x.state), x);
 			}
-			startState.getNFAConfigurations().addAll(configsInClosure);
+			startState.nfaConfigurations.addAll(configsInClosure);
 			i++;
 
 			// move to next alternative
@@ -494,9 +494,13 @@ public class NFAToDFAConverter {
 			NFAConfiguration c = (NFAConfiguration) configs.get(ci);
 			*/
 		List<NFAConfiguration> configsInClosure = new ArrayList<NFAConfiguration>();
-		Iterator it = d.getNFAConfigurations().iterator();
+/*		Iterator it = d.getNFAConfigurations().iterator();
 		while ( it.hasNext() ) {
 			NFAConfiguration c = (NFAConfiguration)it.next();
+			*/
+		int numConfigs = d.nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
+			NFAConfiguration c = (NFAConfiguration)d.nfaConfigurations.get(i);
 			if ( c.singleAtomTransitionEmanating ) {
 				continue; // ignore NFA states w/o epsilon transitions
 			}
@@ -898,9 +902,14 @@ public class NFAToDFAConverter {
 		// for each NFA state in d, add in target states for label
 		int intLabel = label.getAtom();
 		IntSet setLabel = label.getSet();
+		/*
 		Iterator iter = d.getNFAConfigurations().iterator();
 		while ( iter.hasNext() ) {
 			NFAConfiguration c = (NFAConfiguration)iter.next();
+			*/
+		int numConfigs = d.nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
+			NFAConfiguration c = d.nfaConfigurations.get(i);
 			if ( c.resolved || c.resolveWithPredicate ) {
 				continue; // the conflict resolver indicates we must leave alone
 			}
@@ -936,18 +945,18 @@ public class NFAToDFAConverter {
 			if ( matched ) {
 				// found a transition with label;
 				// add NFA target to (potentially) new DFA state
-                labelDFATarget.addNFAConfiguration(
+				labelDFATarget.addNFAConfiguration(
 					(NFAState)edge.target,
 					c.alt,
 					c.context,
 					c.semanticContext);
 			}
 		}
-        if ( labelDFATarget.getNFAConfigurations().size()==0 ) {
-            // kill; it's empty
-            dfa.setState(labelDFATarget.stateNumber, null);
-            labelDFATarget = null;
-        }
+		if ( labelDFATarget.nfaConfigurations.size()==0 ) {
+			// kill; it's empty
+			dfa.setState(labelDFATarget.stateNumber, null);
+			labelDFATarget = null;
+		}
         return labelDFATarget;
 	}
 
@@ -964,10 +973,15 @@ public class NFAToDFAConverter {
 	 */
 	protected void convertToEOTAcceptState(DFAState d) {
 		Label eot = new Label(Label.EOT);
+		/*
 		Iterator iter = d.getNFAConfigurations().iterator();
 		while ( iter.hasNext() ) {
 			NFAConfiguration c =
 					(NFAConfiguration)iter.next();
+*/
+		int numConfigs = d.nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
+			NFAConfiguration c = (NFAConfiguration)d.nfaConfigurations.get(i);
 			if ( c.resolved || c.resolveWithPredicate ) {
 				continue; // the conflict resolver indicates we must leave alone
 			}
@@ -978,7 +992,7 @@ public class NFAToDFAConverter {
 				//System.out.println("config with EOT: "+c);
 				d.setAcceptState(true);
 				//System.out.println("d goes from "+d);
-				d.getNFAConfigurations().clear();
+				d.nfaConfigurations.clear();
 				d.addNFAConfiguration(p,c.alt,c.context,c.semanticContext);
 				//System.out.println("to "+d);
 				return; // assume only one EOT transition
@@ -1232,10 +1246,14 @@ public class NFAToDFAConverter {
 		// transition on EOT to get to this DFA state as well so all
 		// states in d must be targets of EOT.  These are the end states
 		// created in NFAFactory.build_EOFState
-		NFAConfiguration anyConfig;
+		NFAConfiguration anyConfig = d.nfaConfigurations.get(0);
+		NFAState anyState = dfa.nfa.getState(anyConfig.state);
+
+		/*
 		Iterator itr = d.nfaConfigurations.iterator();
         anyConfig = (NFAConfiguration)itr.next();
 		NFAState anyState = dfa.nfa.getState(anyConfig.state);
+		*/
 		// if d is target of EOT and more than one predicted alt
 		// indicate that d is nondeterministic on all alts otherwise
 		// it looks like state has no problem
@@ -1365,6 +1383,18 @@ public class NFAToDFAConverter {
 	 *  (as long as they are one of the nondeterministic ones)
 	 */
 	protected static void turnOffOtherAlts(DFAState d, int min, Set nondeterministicAlts) {
+		int numConfigs = d.nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
+			NFAConfiguration configuration = (NFAConfiguration)d.nfaConfigurations.get(i);
+			if ( configuration.alt!=min ) {
+				if ( nondeterministicAlts==null ||
+					 nondeterministicAlts.contains(Utils.integer(configuration.alt)) )
+				{
+					configuration.resolved = true;
+				}
+			}
+		}
+		/*
 		Iterator iter = d.nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
@@ -1377,10 +1407,19 @@ public class NFAToDFAConverter {
 				}
 			}
 		}
+		*/
 	}
 
 	protected static int getMinAlt(DFAState d) {
 		int min = Integer.MAX_VALUE;
+		int numConfigs = d.nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
+			NFAConfiguration configuration = (NFAConfiguration)d.nfaConfigurations.get(i);
+			if ( configuration.alt<min ) {
+				min = configuration.alt;
+			}
+		}
+		/*
 		Iterator iter = d.nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
@@ -1389,6 +1428,7 @@ public class NFAToDFAConverter {
 				min = configuration.alt;
 			}
 		}
+		*/
 		return min;
 	}
 
@@ -1494,6 +1534,14 @@ public class NFAToDFAConverter {
 
 			altToPredMap.put(Utils.integer(nakedAlt), nakedAltPred);
 			// set all config with alt=nakedAlt to have the computed predicate
+			int numConfigs = d.nfaConfigurations.size();
+			for (int i = 0; i < numConfigs; i++) {
+				NFAConfiguration configuration = (NFAConfiguration)d.nfaConfigurations.get(i);
+				if ( configuration.alt == nakedAlt ) {
+					configuration.semanticContext = nakedAltPred;
+				}
+			}
+/*
 			Iterator iter = d.nfaConfigurations.iterator();
 			NFAConfiguration configuration;
 			while (iter.hasNext()) {
@@ -1502,6 +1550,7 @@ public class NFAToDFAConverter {
 					configuration.semanticContext = nakedAltPred;
 				}
 			}
+			*/
 		}
 
 		if ( altToPredMap.size()==nondeterministicAlts.size() ) {
@@ -1513,6 +1562,29 @@ public class NFAToDFAConverter {
 				System.err.println("tracking OVF when should not!");
 				d.dfa.probe.removeRecursiveOverflowState(d);
 			}
+			int numConfigs = d.nfaConfigurations.size();
+			for (int i = 0; i < numConfigs; i++) {
+				NFAConfiguration configuration = (NFAConfiguration)d.nfaConfigurations.get(i);
+				SemanticContext semCtx = (SemanticContext)
+						altToPredMap.get(Utils.integer(configuration.alt));
+				if ( semCtx!=null ) {
+					// resolve (first found) with pred
+					// and remove alt from problem list
+					configuration.resolveWithPredicate = true;
+					configuration.semanticContext = semCtx; // reset to combined
+					altToPredMap.remove(Utils.integer(configuration.alt));
+					// notify grammar that we've used the preds contained in semCtx
+					if ( semCtx.isSyntacticPredicate() ) {
+						dfa.nfa.grammar.synPredUsedInDFA(dfa, semCtx);
+					}
+				}
+				else if ( nondeterministicAlts.contains(Utils.integer(configuration.alt)) ) {
+					// resolve all configurations for nondeterministic alts
+					// for which there is no predicate context by turning it off
+					configuration.resolved = true;
+				}
+			}
+			/*
 			Iterator iter = d.nfaConfigurations.iterator();
 			NFAConfiguration configuration;
 			while (iter.hasNext()) {
@@ -1536,6 +1608,7 @@ public class NFAToDFAConverter {
 					configuration.resolved = true;
 				}
 			}
+			*/
 			return true;
 		}
 
@@ -1569,6 +1642,32 @@ public class NFAToDFAConverter {
 			altToSetOfContextsMap.put(altI, new HashSet());
 		}
 		Set altToIncompletePredicateContextSet = new HashSet();
+		// for each configuration, create a unique set of predicates
+		// Also, track the alts with at least one uncovered configuration
+		// (one w/o a predicate); tracks tautologies like p1||true
+		int numConfigs = d.nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
+			NFAConfiguration configuration = (NFAConfiguration)d.nfaConfigurations.get(i);
+			Integer altI = Utils.integer(configuration.alt);
+			// if alt is nondeterministic, combine its predicates
+			if ( nondeterministicAlts.contains(altI) ) {
+				// if there is a predicate for this NFA configuration, OR in
+				if ( configuration.semanticContext !=
+					 SemanticContext.EMPTY_SEMANTIC_CONTEXT )
+				{
+					Set predSet = (Set)altToSetOfContextsMap.get(altI);
+					predSet.add(configuration.semanticContext);
+				}
+				else {
+					// if no predicate, but it's part of nondeterministic alt
+					// then at least one path exists not covered by a predicate.
+					// must remove predicate for this alt; track incomplete alts
+					altToIncompletePredicateContextSet.add(altI);
+				}
+			}
+		}
+
+		/*
 		Iterator iter = d.nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		// for each configuration, create a unique set of predicates
@@ -1583,31 +1682,6 @@ public class NFAToDFAConverter {
 				if ( configuration.semanticContext !=
 					 SemanticContext.EMPTY_SEMANTIC_CONTEXT )
 				{
-					/*
-					SemanticContext altsExistingPred =(SemanticContext)
-							altToPredicateContextMap.get(Utils.integer(configuration.alt));
-					if ( altsExistingPred!=null ) {
-						// must merge all predicates from configs with same alt
-						SemanticContext combinedContext =
-								SemanticContext.or(
-										altsExistingPred,
-										configuration.semanticContext);
-						System.out.println(altsExistingPred+" OR "+
-										   configuration.semanticContext+
-										   "="+combinedContext);
-						altToPredicateContextMap.put(
-								Utils.integer(configuration.alt),
-								combinedContext
-						);
-					}
-					else {
-						// not seen before, just add it
-						altToPredicateContextMap.put(
-								Utils.integer(configuration.alt),
-								configuration.semanticContext
-						);
-					}
-					*/
 					Set predSet = (Set)altToSetOfContextsMap.get(altI);
 					predSet.add(configuration.semanticContext);
 				}
@@ -1619,6 +1693,7 @@ public class NFAToDFAConverter {
 				}
 			}
 		}
+		*/
 
 		// For each alt, OR together all unique predicates associated with
 		// all configurations
@@ -1701,9 +1776,13 @@ public class NFAToDFAConverter {
 	protected void addPredicateTransitions(DFAState d) {
 		List configsWithPreds = new ArrayList();
 		// get a list of all configs with predicates
-		Iterator iter = d.getNFAConfigurations().iterator();
+/*(		Iterator iter = d.getNFAConfigurations().iterator();
 		while ( iter.hasNext() ) {
 			NFAConfiguration c = (NFAConfiguration)iter.next();
+			*/
+		int numConfigs = d.nfaConfigurations.size();
+		for (int i = 0; i < numConfigs; i++) {
+			NFAConfiguration c = (NFAConfiguration)d.nfaConfigurations.get(i);
 			if ( c.resolveWithPredicate ) {
 				configsWithPreds.add(c);
 			}

@@ -32,9 +32,7 @@ import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.misc.Barrier;
-import org.antlr.misc.IntSet;
-import org.antlr.misc.IntervalSet;
+import org.antlr.misc.*;
 import org.antlr.misc.Utils;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
@@ -301,7 +299,7 @@ public class Grammar {
 	 *  I need a specific guaranteed index, which the Collections stuff
 	 *  won't let me have.
 	 */
-	protected Vector<Rule> ruleIndexToRuleList = new Vector();
+	protected Vector<Rule> ruleIndexToRuleList = new Vector<Rule>();
 
     /** An AST that records entire input grammar with all rules.  A simple
      *  grammar with one rule, "grammar t; a : A | B ;", looks like:
@@ -311,10 +309,10 @@ public class Grammar {
 
     /** Each subrule/rule is a decision point and we must track them so we
      *  can go back later and build DFA predictors for them.  This includes
-     *  all the rules, subrules, optional blocks, ()+, ()* etc...  The
-     *  elements in this list are NFAState objects.
+     *  all the rules, subrules, optional blocks, ()+, ()* etc...
      */
-	protected Vector indexToDecision = new Vector(INITIAL_DECISION_LIST_SIZE);
+	protected Vector<Decision> indexToDecision =
+		new Vector<Decision>(INITIAL_DECISION_LIST_SIZE);
 
     /** If non-null, this is the code generator we will use to generate
      *  recognizers in the target language.
@@ -2033,7 +2031,7 @@ public class Grammar {
     public List getDecisionNFAStartStateList() {
 		List states = new ArrayList(100);
 		for (int d = 0; d < indexToDecision.size(); d++) {
-			Decision dec = (Decision) indexToDecision.elementAt(d);
+			Decision dec = (Decision) indexToDecision.get(d);
 			states.add(dec.startState);
 		}
         return states;

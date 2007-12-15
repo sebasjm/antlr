@@ -30,8 +30,6 @@ package org.antlr.analysis;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.NFAFactory;
 
-import java.util.Vector;
-
 /** An NFA (collection of NFAStates) constructed from a grammar.  This
  *  NFA is one big machine for entire grammar.  Decision points are recorded
  *  by the Grammar object so we can, for example, convert to DFA or simulate

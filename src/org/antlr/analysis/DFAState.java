@@ -129,7 +129,8 @@ public class DFAState extends State {
 	protected int cachedUniquelyPredicatedAlt = PREDICTED_ALT_UNSET;
 
     /** The set of NFA configurations (state,alt,context) for this DFA state */
-    protected Set nfaConfigurations = new HashSet();
+    public OrderedHashSet<NFAConfiguration> nfaConfigurations =
+		new OrderedHashSet<NFAConfiguration>();
 
     /** Used to prevent the closure operation from looping to itself and
      *  hence looping forever.  Sensitive to the NFA state, the alt, and
@@ -146,9 +147,8 @@ public class DFAState extends State {
      *  for all possible transitions.  That is of the order: size(label space)
      *  times size(nfa states), which can be pretty damn big.  It's better
      *  to simply track possible labels.
-     *  This is type List<Label>.
      */
-    protected OrderedHashSet reachableLabels = new OrderedHashSet();
+    protected OrderedHashSet<Label> reachableLabels = new OrderedHashSet<Label>();
 
     public DFAState(DFA dfa) {
         this.dfa = dfa;
@@ -277,7 +277,7 @@ public class DFAState extends State {
         int n = reachableLabels.size(); // only look at initial elements
         // walk the existing list looking for the collision
         for (int i=0; i<n; i++) {
-            Label rl = (Label)reachableLabels.get(i);
+            Label rl = reachableLabels.get(i);
             /*
             if ( label.equals(rl) ) {
                 // OPTIMIZATION:
@@ -346,13 +346,9 @@ public class DFAState extends State {
         return reachableLabels;
     }
 
-    public Set getNFAConfigurations() {
-        return this.nfaConfigurations;
-    }
-
-    public void setNFAConfigurations(Set configs) {
-        this.nfaConfigurations = configs;
-    }
+	public void setNFAConfigurations(OrderedHashSet<NFAConfiguration> configs) {
+		this.nfaConfigurations = configs;
+	}
 
     /** A decent hash for a DFA state is the sum of the NFA state/alt pairs.
      *  This is used when we add DFAState objects to the DFA.states Map and
@@ -369,12 +365,15 @@ public class DFAState extends State {
      *  finite, there is a finite number of DFA states that can be processed.
      *  This is necessary to show that the algorithm terminates.
 	 *
-	 *  Cannot test the state numbers here because in DFA.addState we need
+	 *  Cannot test the DFA state numbers here because in DFA.addState we need
 	 *  to know if any other state exists that has this exact set of NFA
 	 *  configurations.  The DFAState state number is irrelevant.
      */
     public boolean equals(Object o) {
+		// compare set of NFA configurations in this set with other
         DFAState other = (DFAState)o;
+		return this.nfaConfigurations.equals(other.nfaConfigurations);
+/*
         if ( o==null ) {
             return false;
         }
@@ -387,7 +386,9 @@ public class DFAState extends State {
 		}
 
 		// compare set of NFA configurations in this set with other
-        Iterator iter = this.nfaConfigurations.iterator();
+		return this.nfaConfigurations.equals(other.nfaConfigurations);
+		/*
+		Iterator iter = this.nfaConfigurations.iterator();
         while (iter.hasNext()) {
             NFAConfiguration myConfig = (NFAConfiguration) iter.next();
 			if ( !other.nfaConfigurations.contains(myConfig) ) {
@@ -395,6 +396,7 @@ public class DFAState extends State {
 			}
         }
         return true;
+        */
     }
 
     /** Walk each configuration and if they are all the same alt, return
@@ -409,7 +411,23 @@ public class DFAState extends State {
 			return cachedUniquelyPredicatedAlt;
 		}
         int alt = NFA.INVALID_ALT_NUMBER;
-        Iterator iter = nfaConfigurations.iterator();
+		for (int i = 0; i < nfaConfigurations.size(); i++) {
+			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
+			// ignore anything we resolved; predicates will still result
+			// in transitions out of this state, so must count those
+			// configurations; i.e., don't ignore resolveWithPredicate configs
+			if ( configuration.resolved ) {
+				continue;
+			}
+			if ( alt==NFA.INVALID_ALT_NUMBER ) {
+				alt = configuration.alt; // found first nonresolved alt
+			}
+			else if ( configuration.alt!=alt ) {
+				return NFA.INVALID_ALT_NUMBER;
+			}
+		}
+		/*
+		Iterator iter = nfaConfigurations.iterator();
         NFAConfiguration configuration;
         while (iter.hasNext()) {
             configuration = (NFAConfiguration) iter.next();
@@ -426,6 +444,7 @@ public class DFAState extends State {
                 return NFA.INVALID_ALT_NUMBER;
             }
         }
+        */
 		this.cachedUniquelyPredicatedAlt = alt;
         return alt;
     }
@@ -436,6 +455,16 @@ public class DFAState extends State {
 	 */ 
 	public int getUniqueAlt() {
 		int alt = NFA.INVALID_ALT_NUMBER;
+		for (int i = 0; i < nfaConfigurations.size(); i++) {
+			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
+			if ( alt==NFA.INVALID_ALT_NUMBER ) {
+				alt = configuration.alt; // found first alt
+			}
+			else if ( configuration.alt!=alt ) {
+				return NFA.INVALID_ALT_NUMBER;
+			}
+		}
+/*
 		Iterator iter = nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
@@ -446,7 +475,7 @@ public class DFAState extends State {
 			else if ( configuration.alt!=alt ) {
 				return NFA.INVALID_ALT_NUMBER;
 			}
-		}
+		}*/
 		return alt;
 	}
 
@@ -464,6 +493,13 @@ public class DFAState extends State {
 	 */
 	public Set getDisabledAlternatives() {
 		Set disabled = new LinkedHashSet();
+		for (int i = 0; i < nfaConfigurations.size(); i++) {
+			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
+			if ( configuration.resolved ) {
+				disabled.add(Utils.integer(configuration.alt));
+			}
+		}
+		/*
 		Iterator iter = nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
@@ -472,6 +508,7 @@ public class DFAState extends State {
 				disabled.add(Utils.integer(configuration.alt));
 			}
 		}
+		*/
 		return disabled;
 	}
 
@@ -538,6 +575,18 @@ public class DFAState extends State {
 
 		// First get a list of configurations for each state.
 		// Most of the time, each state will have one associated configuration
+		Map stateToConfigListMap = new HashMap();
+		for (int i = 0; i < nfaConfigurations.size(); i++) {
+			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
+			Integer stateI = Utils.integer(configuration.state);
+			List prevConfigs = (List)stateToConfigListMap.get(stateI);
+			if ( prevConfigs==null ) {
+				prevConfigs = new ArrayList();
+				stateToConfigListMap.put(stateI, prevConfigs);
+			}
+			prevConfigs.add(configuration);
+		}
+/*
 		Iterator iter = nfaConfigurations.iterator();
 		Map stateToConfigListMap = new HashMap();
 		NFAConfiguration configuration;
@@ -551,7 +600,7 @@ public class DFAState extends State {
 			}
 			prevConfigs.add(configuration);
 		}
-
+*/
 		// potential conflicts are states with > 1 configuration and diff alts
 		Set states = stateToConfigListMap.keySet();
 		int numPotentialConflicts = 0;
@@ -639,12 +688,18 @@ public class DFAState extends State {
 	 */
 	public Set getAltSet() {
 		Set alts = new HashSet();
+		for (int i = 0; i < nfaConfigurations.size(); i++) {
+			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
+			alts.add(Utils.integer(configuration.alt));
+		}
+		/*
 		Iterator iter = nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
 			configuration = (NFAConfiguration) iter.next();
 			alts.add(Utils.integer(configuration.alt));
 		}
+		*/
 		if ( alts.size()==0 ) {
 			return null;
 		}
@@ -656,6 +711,13 @@ public class DFAState extends State {
 	 */
 	public Set getNFAStatesForAlt(int alt) {
 		Set alts = new HashSet();
+		for (int i = 0; i < nfaConfigurations.size(); i++) {
+			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
+			if ( configuration.alt == alt ) {
+				alts.add(Utils.integer(configuration.state));
+			}
+		}
+/*
 		Iterator iter = nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
@@ -664,6 +726,7 @@ public class DFAState extends State {
 				alts.add(Utils.integer(configuration.state));
 			}
 		}
+		*/
 		return alts;
 	}
 
@@ -692,6 +755,18 @@ public class DFAState extends State {
 
 	public Set getSyntacticPredicatesInNFAConfigurations() {
 		Set synpreds = new HashSet();
+		for (int i = 0; i < nfaConfigurations.size(); i++) {
+			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
+			SemanticContext gatedPredExpr =
+				configuration.semanticContext.getGatedPredicateContext();
+			// if this is a manual syn pred (gated and syn pred), add
+			if ( gatedPredExpr!=null &&
+				 configuration.semanticContext.isSyntacticPredicate() )
+			{
+				synpreds.add(configuration.semanticContext);
+			}
+		}
+		/*
 		Iterator iter = nfaConfigurations.iterator();
 		NFAConfiguration configuration;
 		while (iter.hasNext()) {
@@ -705,6 +780,7 @@ public class DFAState extends State {
 				synpreds.add(configuration.semanticContext);
 			}
 		}
+		*/
 		if ( synpreds.size()==0 ) {
 			return null;
 		}
@@ -738,6 +814,33 @@ public class DFAState extends State {
 	 *  TODO: cache this as it's called a lot; or at least set bit if >1 present in state
 	 */
 	public SemanticContext getGatedPredicatesInNFAConfigurations() {
+		SemanticContext unionOfPredicatesFromAllAlts = null;
+		for (int i = 0; i < nfaConfigurations.size(); i++) {
+			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
+			SemanticContext gatedPredExpr =
+				configuration.semanticContext.getGatedPredicateContext();
+			if ( gatedPredExpr==null ) {
+				// if we ever find a configuration w/o a gated predicate
+				// (even if it's a nongated predicate), we cannot gate
+				// the indident edges.
+				return null;
+			}
+			else if ( acceptState || !configuration.semanticContext.isSyntacticPredicate() ) {
+				// at this point we have a gated predicate and, due to elseif,
+				// we know it's an accept and not a syn pred.  In this case,
+				// it's safe to add the gated predicate to the union.  We
+				// only want to add syn preds if it's an accept state.  Other
+				// gated preds can be used with edges leading to accept states.
+				if ( unionOfPredicatesFromAllAlts==null ) {
+					unionOfPredicatesFromAllAlts = gatedPredExpr;
+				}
+				else {
+					unionOfPredicatesFromAllAlts =
+						SemanticContext.or(unionOfPredicatesFromAllAlts,gatedPredExpr);
+				}
+			}
+		}
+		/*
 		Iterator iter = nfaConfigurations.iterator();
 		SemanticContext unionOfPredicatesFromAllAlts = null;
 		NFAConfiguration configuration;
@@ -766,6 +869,7 @@ public class DFAState extends State {
 				}
 			}
 		}
+		*/
 		if ( unionOfPredicatesFromAllAlts instanceof SemanticContext.TruePredicate ) {
 			return null;
 		}
@@ -789,7 +893,16 @@ public class DFAState extends State {
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(stateNumber+":{");
-        Iterator iter = nfaConfigurations.iterator();
+		for (int i = 0; i < nfaConfigurations.size(); i++) {
+			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
+			if ( i>1 ) {
+				buf.append(", ");
+			}
+			buf.append(configuration);
+			i++;
+		}
+		/*
+		Iterator iter = nfaConfigurations.iterator();
         int i = 1;
         while (iter.hasNext()) {
             NFAConfiguration configuration = (NFAConfiguration) iter.next();
@@ -799,6 +912,7 @@ public class DFAState extends State {
             buf.append(configuration);
             i++;
         }
+        */
         buf.append("}");
         return buf.toString();
     }
