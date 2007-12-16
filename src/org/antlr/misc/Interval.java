@@ -55,8 +55,8 @@ public class Interval {
 	 *  have a..a (set with 1 element).
 	 */
 	public static Interval create(int a, int b) {
-		return new Interval(a,b);
-		/*
+		//return new Interval(a,b);
+		// cache any a..b
 		if ( a>INTERVAL_POOL_MAX_VALUE || b>INTERVAL_POOL_MAX_VALUE ) {
 			outOfRange++;
 			return new Interval(a,b);
@@ -71,8 +71,8 @@ public class Interval {
 			hits++;
 		}
 		return i;
-		*/
 		/*
+		// cache just a..a
 		if ( a!=b || a<0 || a>INTERVAL_POOL_MAX_VALUE ) {
 			return new Interval(a,b);
 		}

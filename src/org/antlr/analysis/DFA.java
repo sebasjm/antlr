@@ -653,6 +653,9 @@ public class DFA {
 					// set the transition if the label is valid (don't do EOF)
 					if ( atoms[a]>=Label.MIN_CHAR_VALUE ) {
 						int labelIndex = atoms[a]-smin; // offset from 0
+						if ( labelIndex < 0 ) {
+							System.out.println("break;");
+						}
 						stateTransitions.set(labelIndex,
 											 Utils.integer(edge.target.stateNumber));
 					}

@@ -52,11 +52,13 @@ public class IntervalSet implements IntSet {
 	/** The list of sorted, disjoint intervals. */
     protected List<Interval> intervals;
 
+	/*
 	static Vector<List<Interval>> cache = new Vector<List<Interval>>();
 
 	static {
 		cache.setSize(Interval.INTERVAL_POOL_MAX_VALUE+Label.NUM_FAUX_LABELS);
 	}
+	*/
 
 	/** Create a set with no elements */
     public IntervalSet() {
@@ -69,6 +71,7 @@ public class IntervalSet implements IntSet {
 
 	/** Create a set with a single element, el. */
     public static IntervalSet of(int a) {
+		/* DOESN"T SEEM TO HELP
 		if ( a>Interval.INTERVAL_POOL_MAX_VALUE ) {
 			IntervalSet s = new IntervalSet();
 			s.add(a);
@@ -82,11 +85,10 @@ public class IntervalSet implements IntSet {
 			cache.set(a+Label.NUM_FAUX_LABELS, s);
 		}
 		return new IntervalSet(s);
-		/*
+        */
 		IntervalSet s = new IntervalSet();
         s.add(a);
         return s;
-        */
     }
 
     /** Create a set with all ints within range [a..b] (inclusive) */
@@ -116,12 +118,14 @@ public class IntervalSet implements IntSet {
 
 	// copy on write so we can cache a..a intervals and sets of that
 	protected void add(Interval addition) {
+		/*
 		if ( this.size()==1 ) {
 			// copy on write
 			Interval firstInterval = this.intervals.get(0);
 			intervals = new ArrayList<Interval>(2);
 			intervals.add(firstInterval);
 		}
+		*/
 
 		//System.out.println("add "+addition+" to "+intervals.toString());
 		if ( addition.b<addition.a ) {
@@ -651,13 +655,14 @@ public class IntervalSet implements IntSet {
 	public int[] toArray() {
 		int[] values = new int[size()];
 		int n = intervals.size();
+		int j = 0;
 		for (int i = 0; i < n; i++) {
 			Interval I = (Interval) intervals.get(i);
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
-				values[i] = v;
-				i++;
+				values[j] = v;
+				j++;
 			}
 		}
 		return values;

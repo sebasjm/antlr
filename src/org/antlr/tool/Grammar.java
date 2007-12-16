@@ -831,7 +831,11 @@ public class Grammar {
 		DFA lookaheadDFA = new DFA(decision, decisionStartState);
 		// Retry to create a simpler DFA if analysis failed (non-LL(*),
 		// recursion overflow, or time out).
-		if ( lookaheadDFA.okToRetryDFAWithK1() ) {
+		boolean failed =
+			lookaheadDFA.analysisTimedOut() ||
+			lookaheadDFA.probe.isNonLLStarDecision() ||
+			lookaheadDFA.probe.analysisOverflowed();
+		if ( failed && lookaheadDFA.okToRetryDFAWithK1() ) {
 			// set k=1 option and try again.
 			// First, clean up tracking stuff
 			decisionsWhoseDFAsUsesSynPreds.remove(lookaheadDFA);
@@ -844,12 +848,13 @@ public class Grammar {
 			}
 			lookaheadDFA = null; // make sure other memory is "free" before redoing
 			lookaheadDFA = new DFA(decision, decisionStartState);
-			if ( lookaheadDFA.analysisTimedOut() ) { // did analysis bug out?
-				ErrorManager.internalError("could not even do k=1 for decision "+
-										   decision+"; reason: "+
-										   lookaheadDFA.getReasonForFailure());
-			}
 		}
+		if ( lookaheadDFA.analysisTimedOut() ) { // did analysis bug out?
+			ErrorManager.internalError("could not even do k=1 for decision "+
+									   decision+"; reason: "+
+									   lookaheadDFA.getReasonForFailure());
+		}
+
 
 		setLookaheadDFA(decision, lookaheadDFA);
 

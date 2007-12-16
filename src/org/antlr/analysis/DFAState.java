@@ -165,7 +165,7 @@ public class DFAState extends State {
     }
 
 	public void reset() {
-		nfaConfigurations = null; // wack
+		//nfaConfigurations = null; // getGatedPredicatesInNFAConfigurations needs
 		configurationsWithLabeledEdges = null;
 		configurationsWithPredicateEdges = null;
 		closureBusy = null;

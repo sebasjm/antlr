@@ -416,9 +416,12 @@ public class DecisionProbe {
 
 		if ( analysisTimedOut() ) {
 			// only report early termination errors if !backtracking
-			if ( !dfa.getAutoBacktrackMode() ) {
+			// 12/16/2007: actually must report an error if we ever
+			// timeout..we'll retry with k=1 if we timeout and don't
+			// want an error.
+//			if ( !dfa.getAutoBacktrackMode() ) {
 				ErrorManager.analysisAborted(this);
-			}
+			//}
 			// now just return...if we bailed out, don't spew other messages
 			return;
 		}
