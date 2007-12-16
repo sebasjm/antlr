@@ -27,16 +27,11 @@
 */
 package org.antlr.misc;
 
-import org.antlr.analysis.Label;
-
 /** An immutable inclusive interval a..b */
 public class Interval {
 	public static final int INTERVAL_POOL_MAX_VALUE = 1000;
-	//static Interval[] intervals = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 
-	static Interval[][] cache =
-		new Interval[INTERVAL_POOL_MAX_VALUE+Label.NUM_FAUX_LABELS]
-			        [INTERVAL_POOL_MAX_VALUE+Label.NUM_FAUX_LABELS];
+	static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 
 	public int a;
 	public int b;
@@ -46,7 +41,7 @@ public class Interval {
 	public static int hits = 0;
 	public static int outOfRange = 0;
 
-	public Interval(int a, int b) { creates++; this.a=a; this.b=b; }
+	public Interval(int a, int b) { this.a=a; this.b=b; }
 
 	/** Interval objects are used readonly so share all with the
 	 *  same single value a==b up to some max size.  Use an array as a perfect hash.
@@ -56,35 +51,14 @@ public class Interval {
 	 */
 	public static Interval create(int a, int b) {
 		//return new Interval(a,b);
-		// cache any a..b
-		if ( a>INTERVAL_POOL_MAX_VALUE || b>INTERVAL_POOL_MAX_VALUE ) {
-			outOfRange++;
-			return new Interval(a,b);
-		}
-		Interval i = cache[a+Label.NUM_FAUX_LABELS][b+Label.NUM_FAUX_LABELS];
-		if ( i==null ) {
-			i = new Interval(a,b);
-			cache[a+Label.NUM_FAUX_LABELS][b+Label.NUM_FAUX_LABELS] = i;
-			misses++;
-		}
-		else {
-			hits++;
-		}
-		return i;
-		/*
 		// cache just a..a
 		if ( a!=b || a<0 || a>INTERVAL_POOL_MAX_VALUE ) {
 			return new Interval(a,b);
 		}
-		if ( intervals[a]==null ) {
-			misses++;
-			intervals[a] = new Interval(a,a);
+		if ( cache[a]==null ) {
+			cache[a] = new Interval(a,a);
 		}
-		else {
-			hits++;
-		}
-		return intervals[a];
-		*/
+		return cache[a];
 	}
 
 	/*

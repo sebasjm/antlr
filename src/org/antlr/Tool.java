@@ -337,12 +337,14 @@ public class Tool {
 			catch (Exception e) {
 				ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
 			}
+			/*
 			finally {
 				System.out.println("creates="+ Interval.creates);
 				System.out.println("hits="+ Interval.hits);
 				System.out.println("misses="+ Interval.misses);
-				System.out.println("outOfRange="+ Interval.outOfRange);				
+				System.out.println("outOfRange="+ Interval.outOfRange);
 			}
+			*/
 		}
     }
 
