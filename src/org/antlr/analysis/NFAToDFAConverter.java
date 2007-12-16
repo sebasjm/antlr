@@ -155,7 +155,6 @@ public class NFAToDFAConverter {
 			NFAContext initialContext = contextTrees[i];
 			// if first alt is derived from loopback/exit branch of loop,
 			// make alt=n+1 for n alts instead of 1
-			List<NFAConfiguration> configsInClosure = new ArrayList<NFAConfiguration>();
 			if ( i==0 &&
 				 dfa.getNFADecisionStartState().decisionStateType==NFAState.LOOPBACK )
 			{
@@ -167,8 +166,8 @@ public class NFAToDFAConverter {
 						initialContext,
 						SemanticContext.EMPTY_SEMANTIC_CONTEXT,
 						startState,
-						true,
-						configsInClosure);
+						true
+				);
 				altNum = 1; // make next alt the first
 			}
 			else {
@@ -177,14 +176,10 @@ public class NFAToDFAConverter {
 						initialContext,
 						SemanticContext.EMPTY_SEMANTIC_CONTEXT,
 						startState,
-						true,
-						configsInClosure);
+						true
+				);
 				altNum++;
 			}
-			for (NFAConfiguration x : configsInClosure) {
-				startState.addNFAConfiguration(dfa.nfa.getState(x.state), x);
-			}
-			startState.nfaConfigurations.addAll(configsInClosure);
 			i++;
 
 			// move to next alternative
@@ -467,10 +462,15 @@ public class NFAToDFAConverter {
 		if ( debug ) {
 			System.out.println("closure("+d+")");
 		}
-		List<NFAConfiguration> configsInClosure = new ArrayList<NFAConfiguration>();
-		int numConfigs = d.nfaConfigurations.size();
+
+		List<NFAConfiguration> configs = new ArrayList<NFAConfiguration>();
+		// Because we are adding to the configurations in closure
+		// must clone initial list so we know when to stop doing closure
+		configs.addAll(d.nfaConfigurations);
+		// for each NFA configuration in d (abort if we detect non-LL(*) state)
+		int numConfigs = configs.size();
 		for (int i = 0; i < numConfigs; i++) {
-			NFAConfiguration c = (NFAConfiguration)d.nfaConfigurations.get(i);
+			NFAConfiguration c = (NFAConfiguration)configs.get(i);
 			if ( c.singleAtomTransitionEmanating ) {
 				continue; // ignore NFA states w/o epsilon transitions
 			}
@@ -483,11 +483,7 @@ public class NFAToDFAConverter {
 					c.context,
 					c.semanticContext,
 					d,
-					false,
-					configsInClosure);
-		}
-		for (NFAConfiguration x : configsInClosure) {
-			d.addNFAConfiguration(dfa.nfa.getState(x.state), x);
+					false);
 		}
 		//System.out.println("after closure d="+d);
 		d.closureBusy = null; // wack all that memory used during closure
@@ -601,8 +597,7 @@ public class NFAToDFAConverter {
 						NFAContext context,
 						SemanticContext semanticContext,
 						DFAState d,
-						boolean collectPredicates,
-						List<NFAConfiguration> configsInClosure)
+						boolean collectPredicates)
 	{
 		if ( debug ){
 			System.out.println("closure at NFA state "+p.stateNumber+"|"+
@@ -640,8 +635,7 @@ public class NFAToDFAConverter {
 		d.closureBusy.add(proposedNFAConfiguration);
 
 		// p itself is always in closure
-		//d.addNFAConfiguration(p, proposedNFAConfiguration);
-		configsInClosure.add(proposedNFAConfiguration);
+		d.addNFAConfiguration(p, proposedNFAConfiguration);
 
 		// Case 1: are we a reference to another rule?
 		Transition transition0 = p.transition[0];
@@ -688,8 +682,8 @@ public class NFAToDFAConverter {
 			// System.out.println(" context="+context);
 			// traverse epsilon edge to new rule
 			NFAState ruleTarget = (NFAState)ref.target;
-			closure(ruleTarget, alt, newContext, semanticContext, d, collectPredicates,
-					configsInClosure);
+			closure(ruleTarget, alt, newContext, semanticContext, d, collectPredicates
+			);
 		}
 		// Case 2: end of rule state, context (i.e., an invoker) exists
 		else if ( p.isAcceptState() && context.parent!=null ) {
@@ -698,8 +692,8 @@ public class NFAToDFAConverter {
 				(RuleClosureTransition)whichStateInvokedRule.transition[0];
 			NFAState continueState = edgeToRule.followState;
 			NFAContext newContext = context.parent; // "pop" invoking state
-			closure(continueState, alt, newContext, semanticContext, d, collectPredicates,
-					configsInClosure);
+			closure(continueState, alt, newContext, semanticContext, d, collectPredicates
+			);
 		}
 		/*
 		11/27/2005: I tried adding this but it highlighted that
@@ -730,8 +724,8 @@ public class NFAToDFAConverter {
 						context,
 						semanticContext,
 						d,
-						collectPredicates,
-						configsInClosure);
+						collectPredicates
+				);
 			}
 			else if ( transition0!=null && transition0.isSemanticPredicate() ) {
 				dfa.predicateVisible = true;
@@ -767,8 +761,8 @@ public class NFAToDFAConverter {
 						context,
 						newSemanticContext,
 						d,
-						collectPredicates,
-						configsInClosure);
+						collectPredicates
+				);
 			}
 			Transition transition1 = p.transition[1];
 			if ( transition1!=null && transition1.isEpsilon() ) {
@@ -777,8 +771,8 @@ public class NFAToDFAConverter {
 						context,
 						semanticContext,
 						d,
-						collectPredicates,
-						configsInClosure);
+						collectPredicates
+				);
 			}
 		}
 

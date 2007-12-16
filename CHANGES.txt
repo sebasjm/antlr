@@ -13,6 +13,10 @@ December 16, 2007
 * Yet more Kay pair programming.  Saved yet more RAM; 15% by
   wacking NFA configurations etc in each DFA state after DFA construction.
 
+* Overall we drop from 2m49s to 1m11s for a huge 4000 line TSQL grammar
+  with k=*.  Only needs -Xconversiontimeout 2000 now not
+  -Xconversiontimeout 5000 too.  With k=1, it's 1m30s down to 40s.
+
 December 15, 2007
 
 * Working with Kay Roepke, we got about 15% speed improvement in

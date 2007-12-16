@@ -220,9 +220,11 @@ public class IntervalSet implements IntSet {
         }
         IntervalSet other = (IntervalSet)set;
         // walk set and add each interval
-		for (Interval I : other.intervals) {
-            this.add(I.a,I.b);
-        }
+		int n = other.intervals.size();
+		for (int i = 0; i < n; i++) {
+			Interval I = (Interval) other.intervals.get(i);
+			this.add(I.a,I.b);
+		}
     }
 
     public IntSet complement(int minElement, int maxElement) {
@@ -489,7 +491,21 @@ public class IntervalSet implements IntSet {
 
     /** Is el in any range of this set? */
     public boolean member(int el) {
-        for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
+		int n = intervals.size();
+		for (int i = 0; i < n; i++) {
+			Interval I = (Interval) intervals.get(i);
+			int a = I.a;
+			int b = I.b;
+			if ( el<a ) {
+				break; // list is sorted and el is before this interval; not here
+			}
+			if ( el>=a && el<=b ) {
+				return true; // found in this interval
+			}
+		}
+		return false;
+/*
+		for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
             Interval I = (Interval) iter.next();
             if ( el<I.a ) {
                 break; // list is sorted and el is before this interval; not here
@@ -499,6 +515,7 @@ public class IntervalSet implements IntSet {
             }
         }
         return false;
+        */
     }
 
     /** return true if this set has no members */
@@ -530,7 +547,9 @@ public class IntervalSet implements IntSet {
 		if ( isNil() ) {
 			return Label.INVALID;
 		}
-		for (Interval I : intervals) {
+		int n = intervals.size();
+		for (int i = 0; i < n; i++) {
+			Interval I = (Interval) intervals.get(i);
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -603,21 +622,23 @@ public class IntervalSet implements IntSet {
 
     public int size() {
 		int n = 0;
-		if ( intervals.size()==1 ) {
+		int numIntervals = intervals.size();
+		if ( numIntervals==1 ) {
 			Interval firstInterval = this.intervals.get(0);
 			return firstInterval.b-firstInterval.a+1;
 		}
-		for (Interval I : intervals) {
-			int a = I.a;
-			int b = I.b;
-			n += (b-a+1);
+		for (int i = 0; i < numIntervals; i++) {
+			Interval I = (Interval) intervals.get(i);
+			n += (I.b-I.a+1);
 		}
 		return n;
     }
 
     public List toList() {
 		List values = new ArrayList();
-		for (Interval I : intervals) {
+		int n = intervals.size();
+		for (int i = 0; i < n; i++) {
+			Interval I = (Interval) intervals.get(i);
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -629,8 +650,9 @@ public class IntervalSet implements IntSet {
 
 	public int[] toArray() {
 		int[] values = new int[size()];
-		int i = 0;
-		for (Interval I : intervals) {
+		int n = intervals.size();
+		for (int i = 0; i < n; i++) {
+			Interval I = (Interval) intervals.get(i);
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
@@ -644,8 +666,9 @@ public class IntervalSet implements IntSet {
 	public org.antlr.runtime.BitSet toRuntimeBitSet() {
 		org.antlr.runtime.BitSet s =
 			new org.antlr.runtime.BitSet(getMaxElement()+1);
-		int i = 0;
-		for (Interval I : intervals) {
+		int n = intervals.size();
+		for (int i = 0; i < n; i++) {
+			Interval I = (Interval) intervals.get(i);
 			int a = I.a;
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
