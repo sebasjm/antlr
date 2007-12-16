@@ -613,7 +613,6 @@ public class NFAToDFAConverter {
 			 DFA.MAX_TIME_PER_DFA_CREATION )
 		{
 			// bail way out; we've blown up somehow
-			System.out.println("ACK!!!!!!!!!!!");
 			throw new AnalysisTimeoutException(d.dfa);
 		}
 

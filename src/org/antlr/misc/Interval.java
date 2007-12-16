@@ -61,15 +61,6 @@ public class Interval {
 		return cache[a];
 	}
 
-	/*
-	public static Interval create(int a, int b) {
-		if ( a==b ) { // cache all x..x intervals (single values)
-
-		}
-		return new Interval(a,b);
-	}
-	*/
-
 	public boolean equals(Object o) {
 		if ( o==null ) {
 			return false;
