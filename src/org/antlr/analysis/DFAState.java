@@ -128,11 +128,21 @@ public class DFAState extends State {
 
 	protected int cachedUniquelyPredicatedAlt = PREDICTED_ALT_UNSET;
 
-    /** The set of NFA configurations (state,alt,context) for this DFA state */
+	public int minAltInConfigurations=Integer.MAX_VALUE;
+
+	public boolean atLeastOneConfigurationHasAPredicate = false;
+
+	/** The set of NFA configurations (state,alt,context) for this DFA state */
     public OrderedHashSet<NFAConfiguration> nfaConfigurations =
 		new OrderedHashSet<NFAConfiguration>();
 
-    /** Used to prevent the closure operation from looping to itself and
+	public List<NFAConfiguration> configurationsWithLabeledEdges =
+		new ArrayList<NFAConfiguration>();
+
+	public List<NFAConfiguration> configurationsWithPredicateEdges =
+		new ArrayList<NFAConfiguration>();
+
+	/** Used to prevent the closure operation from looping to itself and
      *  hence looping forever.  Sensitive to the NFA state, the alt, and
      *  the context.  This just the nfa config set because we want to
 	 *  prevent closures only on states contributed by closure not reach
@@ -206,15 +216,31 @@ public class DFAState extends State {
 
         nfaConfigurations.add(c);
 
-        // update hashCode; for some reason using context.hashCode() also
+		// track min alt rather than compute later
+		if ( c.alt < minAltInConfigurations ) {
+			minAltInConfigurations = c.alt;
+		}
+
+		if ( c.semanticContext!=SemanticContext.EMPTY_SEMANTIC_CONTEXT ) {
+			atLeastOneConfigurationHasAPredicate = true;
+			configurationsWithPredicateEdges.add(c);
+		}
+
+		// update hashCode; for some reason using context.hashCode() also
         // makes the GC take like 70% of the CPU and is slow!
         cachedHashCode += c.state + c.alt;
 
-        // update reachableLabels
-		if ( state.transition[0] !=null ) {
+		// update reachableLabels
+		// We're adding an NFA state; check to see if it has a non-epsilon edge
+		if ( state.transition[0] != null ) {
 			Label label = state.transition[0].label;
 			if ( !(label.isEpsilon()||label.isSemanticPredicate()) ) {
+				// this NFA state has a non-epsilon edge, track for fast
+				// walking later when we do reach on this DFA state we're
+				// building.
+				configurationsWithLabeledEdges.add(c);
 				if ( state.transition[1] ==null ) {
+					// later we can check this to ignore o-A->o states in closure
 					c.singleAtomTransitionEmanating = true;
 				}
 				addReachableLabel(label);
@@ -264,8 +290,6 @@ public class DFAState extends State {
      *  Single element labels are treated as sets to make the code uniform.
      */
     protected void addReachableLabel(Label label) {
-		// TODO: MAP label to this DFAState
-		// need Map<Label,Set<DFAState>>
 		/*
 		System.out.println("addReachableLabel to state "+dfa.decisionNumber+"."+stateNumber+": "+label.getSet().toString(dfa.nfa.grammar));
 		System.out.println("start of add to state "+dfa.decisionNumber+"."+stateNumber+": " +
@@ -279,23 +303,13 @@ public class DFAState extends State {
         int n = reachableLabels.size(); // only look at initial elements
         // walk the existing list looking for the collision
         for (int i=0; i<n; i++) {
-            Label rl = reachableLabels.get(i);
-            /*
-            if ( label.equals(rl) ) {
-                // OPTIMIZATION:
-                // exact label already here, just return; previous addition
-                // would have made everything unique/disjoint
-                return;
-            }
-            */
-            IntSet s_i = rl.getSet();
-            IntSet intersection = s_i.and(t);
+			Label rl = reachableLabels.get(i);
             /*
 			System.out.println("comparing ["+i+"]: "+label.toString(dfa.nfa.grammar)+" & "+
                     rl.toString(dfa.nfa.grammar)+"="+
                     intersection.toString(dfa.nfa.grammar));
             */
-			if ( intersection.isNil() ) {
+			if ( !Label.intersect(label, rl) ) {
                 continue;
             }
 
@@ -304,6 +318,8 @@ public class DFAState extends State {
 
             // Replace existing s_i with intersection since we
             // know that will always be a non nil character class
+			IntSet s_i = rl.getSet();
+			IntSet intersection = s_i.and(t);
             reachableLabels.set(i, new Label(intersection));
 
             // Compute s_i-t to see what is in current set and not in incoming
@@ -580,33 +596,26 @@ public class DFAState extends State {
 		}
 
 		// First get a list of configurations for each state.
-		// Most of the time, each state will have one associated configuration
+		// Most of the time, each state will have one associated configuration.
+		// 12/15/2006: Got another overall 25% time cost reduction from
+		// restricting this to configs with edges; all epsilon edges are
+		// derived from "real" configs.
 		Map stateToConfigListMap = new HashMap();
+		int numConfigsWithLabeledEdges = configurationsWithLabeledEdges.size();
+		for (int i = 0; i < numConfigsWithLabeledEdges; i++) {
+			NFAConfiguration configuration = configurationsWithLabeledEdges.get(i);
+/*
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
-			Integer stateI = Utils.integer(configuration.state);
-			List prevConfigs = (List)stateToConfigListMap.get(stateI);
-			if ( prevConfigs==null ) {
-				prevConfigs = new ArrayList();
-				stateToConfigListMap.put(stateI, prevConfigs);
-			}
-			prevConfigs.add(configuration);
-		}
-/*
-		Iterator iter = nfaConfigurations.iterator();
-		Map stateToConfigListMap = new HashMap();
-		NFAConfiguration configuration;
-		while (iter.hasNext()) {
-			configuration = (NFAConfiguration) iter.next();
-			Integer stateI = Utils.integer(configuration.state);
-			List prevConfigs = (List)stateToConfigListMap.get(stateI);
-			if ( prevConfigs==null ) {
-				prevConfigs = new ArrayList();
-				stateToConfigListMap.put(stateI, prevConfigs);
-			}
-			prevConfigs.add(configuration);
-		}
 */
+			Integer stateI = Utils.integer(configuration.state);
+			List prevConfigs = (List)stateToConfigListMap.get(stateI);
+			if ( prevConfigs==null ) {
+				prevConfigs = new ArrayList();
+				stateToConfigListMap.put(stateI, prevConfigs);
+			}
+			prevConfigs.add(configuration);
+		}
 		// potential conflicts are states with > 1 configuration and diff alts
 		Set states = stateToConfigListMap.keySet();
 		int numPotentialConflicts = 0;
@@ -698,20 +707,12 @@ public class DFAState extends State {
 	 *  DFA state.
 	 */
 	public Set getAltSet() {
-		Set alts = new HashSet();
 		int numConfigs = nfaConfigurations.size();
+		Set alts = new HashSet();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			alts.add(Utils.integer(configuration.alt));
 		}
-		/*
-		Iterator iter = nfaConfigurations.iterator();
-		NFAConfiguration configuration;
-		while (iter.hasNext()) {
-			configuration = (NFAConfiguration) iter.next();
-			alts.add(Utils.integer(configuration.alt));
-		}
-		*/
 		if ( alts.size()==0 ) {
 			return null;
 		}
@@ -720,7 +721,6 @@ public class DFAState extends State {
 
 	/** Get the set of all states mentioned by all NFA configurations in this
 	 *  DFA state associated with alt.
-	 */
 	public Set getNFAStatesForAlt(int alt) {
 		Set alts = new HashSet();
 		int numConfigs = nfaConfigurations.size();
@@ -730,18 +730,9 @@ public class DFAState extends State {
 				alts.add(Utils.integer(configuration.state));
 			}
 		}
-/*
-		Iterator iter = nfaConfigurations.iterator();
-		NFAConfiguration configuration;
-		while (iter.hasNext()) {
-			configuration = (NFAConfiguration) iter.next();
-			if ( configuration.alt == alt ) {
-				alts.add(Utils.integer(configuration.state));
-			}
-		}
-		*/
 		return alts;
 	}
+	 */
 
 	/** For gated productions, we need a list of all predicates for the
 	 *  target of an edge so we can gate the edge based upon the predicates

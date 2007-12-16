@@ -27,10 +27,11 @@
 */
 package org.antlr;
 
-import org.antlr.tool.*;
-import org.antlr.codegen.CodeGenerator;
 import org.antlr.analysis.*;
+import org.antlr.codegen.CodeGenerator;
 import org.antlr.runtime.misc.Stats;
+import org.antlr.tool.*;
+import org.antlr.misc.Interval;
 
 import java.io.*;
 import java.util.*;
@@ -335,6 +336,12 @@ public class Tool {
 			}
 			catch (Exception e) {
 				ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
+			}
+			finally {
+				System.out.println("creates="+ Interval.creates);
+				System.out.println("hits="+ Interval.hits);
+				System.out.println("misses="+ Interval.misses);
+				System.out.println("outOfRange="+ Interval.outOfRange);				
 			}
 		}
     }

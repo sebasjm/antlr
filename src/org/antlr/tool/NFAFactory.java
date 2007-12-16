@@ -113,7 +113,7 @@ public class NFAFactory {
 		return g;
 	}
 
-    /** From set build single edge graph o->o-set->o.  To conform to
+	/** From set build single edge graph o->o-set->o.  To conform to
      *  what an alt block looks like, must have extra state on left.
      */
 	public StateCluster build_Set(IntSet set) {
@@ -121,7 +121,8 @@ public class NFAFactory {
         NFAState left = newState();
         //transitionBetweenStates(start, left, Label.EPSILON);
         NFAState right = newState();
-        Transition e = new Transition(new Label(set),right);
+		Label label = new Label(set);
+		Transition e = new Transition(label,right);
         left.addTransition(e);
 		StateCluster g = new StateCluster(left, right);
         return g;
@@ -145,7 +146,8 @@ public class NFAFactory {
     public StateCluster build_Range(int a, int b) {
         NFAState left = newState();
         NFAState right = newState();
-        Transition e = new Transition(new Label(IntervalSet.of(a,b)),right);
+		Label label = new Label(IntervalSet.of(a, b));
+		Transition e = new Transition(label,right);
         left.addTransition(e);
         StateCluster g = new StateCluster(left, right);
         return g;

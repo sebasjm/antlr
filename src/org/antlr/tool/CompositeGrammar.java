@@ -84,7 +84,7 @@ public class CompositeGrammar {
 	 *  Must subtract MIN_TOKEN_TYPE from index.
 	 */
 	protected Vector<String> typeToTokenList = new Vector<String>();
-	
+
 	protected void initTokenSymbolTables() {
         // the faux token types take first NUM_FAUX_LABELS positions
 		// then we must have room for the predefined runtime token types
@@ -255,4 +255,24 @@ public class CompositeGrammar {
 		return (NFAState)numberToStateList.get(s);
 	}
 
+	/*
+	public void trackNFAStatesThatHaveLabeledEdge(Label label,
+												  NFAState stateWithLabeledEdge)
+	{
+		Set<NFAState> states = typeToNFAStatesWithEdgeOfTypeMap.get(label);
+		if ( states==null ) {
+			states = new HashSet<NFAState>();
+			typeToNFAStatesWithEdgeOfTypeMap.put(label, states);
+		}
+		states.add(stateWithLabeledEdge);
+	}
+
+	public Map<Label, Set<NFAState>> getTypeToNFAStatesWithEdgeOfTypeMap() {
+		return typeToNFAStatesWithEdgeOfTypeMap;
+	}
+
+	public Set<NFAState> getStatesWithEdge(Label label) {
+		return typeToNFAStatesWithEdgeOfTypeMap.get(label);
+	}
+*/
 }

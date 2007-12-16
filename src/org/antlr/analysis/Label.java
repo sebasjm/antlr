@@ -286,7 +286,8 @@ public class Label implements Comparable, Cloneable {
         }
     }
 
-    public boolean equals(Object o) {
+	// TODO: do we care about comparing set {A} with atom A? Doesn't now.
+	public boolean equals(Object o) {
 		if ( o==null ) {
 			return false;
 		}
@@ -378,4 +379,27 @@ public class Label implements Comparable, Cloneable {
         return buf.toString();
     }
     */
+
+	public static boolean intersect(Label label, Label edgeLabel) {
+		int intLabel = label.getAtom();
+		boolean hasIntersection = false;
+		boolean labelIsSet = label.isSet();
+		boolean edgeIsSet = edgeLabel.isSet();
+		if ( !labelIsSet && !edgeIsSet && edgeLabel.label==intLabel ) {
+			hasIntersection = true;
+		}
+		else if ( labelIsSet && edgeIsSet &&
+				  !edgeLabel.getSet().and(label.getSet()).isNil() ) {
+			hasIntersection = true;
+		}
+		else if ( labelIsSet && !edgeIsSet &&
+				  label.getSet().member(edgeLabel.label) ) {
+			hasIntersection = true;
+		}
+		else if ( !labelIsSet && edgeIsSet &&
+				  edgeLabel.getSet().member(intLabel) ) {
+			hasIntersection = true;
+		}
+		return hasIntersection;
+	}
 }

@@ -43,9 +43,6 @@ import java.util.*;
  *  of recognizers (lexers, parsers, tree walkers).
  */
 public class DFA {
-	// TODO: testing
-	public HashMap configSetCache = new HashMap();
-
 	public static final int REACHABLE_UNKNOWN = -2;
 	public static final int REACHABLE_BUSY = -1; // in process of computing
 	public static final int REACHABLE_NO = 0;

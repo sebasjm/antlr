@@ -50,16 +50,41 @@ public class IntervalSet implements IntSet {
 	/** The list of sorted, disjoint intervals. */
     protected List<Interval> intervals;
 
-    /** Create a set with no elements */
+	static Vector<List<Interval>> cache = new Vector<List<Interval>>();
+
+	static {
+		cache.setSize(Interval.INTERVAL_POOL_MAX_VALUE+Label.NUM_FAUX_LABELS);
+	}
+
+	/** Create a set with no elements */
     public IntervalSet() {
         intervals = new ArrayList<Interval>(2); // most sets are 1 or 2 elements
     }
 
-    /** Create a set with a single element, el. */
+	public IntervalSet(List<Interval> intervals) {
+		this.intervals = intervals;
+	}
+
+	/** Create a set with a single element, el. */
     public static IntervalSet of(int a) {
-        IntervalSet s = new IntervalSet();
+		if ( a>Interval.INTERVAL_POOL_MAX_VALUE ) {
+			IntervalSet s = new IntervalSet();
+			s.add(a);
+			return s;
+		}
+		List<Interval> s = cache.elementAt(a+Label.NUM_FAUX_LABELS);
+		if ( s == null ) {
+			s = new ArrayList<Interval>(2);
+			Interval i = new Interval(a,a);
+			s.add(i);
+			cache.set(a+Label.NUM_FAUX_LABELS, s);
+		}
+		return new IntervalSet(s);
+		/*
+		IntervalSet s = new IntervalSet();
         s.add(a);
         return s;
+        */
     }
 
     /** Create a set with all ints within range [a..b] (inclusive) */
@@ -87,7 +112,15 @@ public class IntervalSet implements IntSet {
         add(Interval.create(a,b));
     }
 
+	// copy on write so we can cache a..a intervals and sets of that
 	protected void add(Interval addition) {
+		if ( this.size()==1 ) {
+			// copy on write
+			Interval firstInterval = this.intervals.get(0);
+			intervals = new ArrayList<Interval>(2);
+			intervals.add(firstInterval);
+		}
+
 		//System.out.println("add "+addition+" to "+intervals.toString());
 		if ( addition.b<addition.a ) {
 			return;
@@ -568,6 +601,10 @@ public class IntervalSet implements IntSet {
 
     public int size() {
 		int n = 0;
+		if ( intervals.size()==1 ) {
+			Interval firstInterval = this.intervals.get(0);
+			return firstInterval.b-firstInterval.a+1;
+		}
 		for (Interval I : intervals) {
 			int a = I.a;
 			int b = I.b;
