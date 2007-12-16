@@ -8,10 +8,16 @@ University of San Francisco
 
 CHANGES
 
+December 16, 2007
+
+* Yet more Kay pair programming.  Saved yet more RAM; 15% by
+  wacking NFA configurations etc in each DFA state after DFA construction.
+
 December 15, 2007
 
 * Working with Kay Roepke, we got about 15% speed improvement in
-  overall ANTLR exec time.
+  overall ANTLR exec time.  Memory footprint seems to be about 50%
+  smaller.
 
 December 13-14, 2007
 

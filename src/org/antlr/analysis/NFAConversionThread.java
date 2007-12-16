@@ -23,7 +23,7 @@ public class NFAConversionThread implements Runnable {
 		for (int decision=i; decision<=j; decision++) {
 			NFAState decisionStartState = grammar.getDecisionNFAStartState(decision);
 			if ( decisionStartState.getNumberOfTransitions()>1 ) {
-				grammar.createLookaheadDFA(decision);
+				grammar.createLookaheadDFA(decision,true);
 			}
 		}
 		// now wait for others to finish

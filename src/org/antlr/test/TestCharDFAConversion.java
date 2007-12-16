@@ -78,7 +78,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"A : ('a'..'z'|'0'..'9') '@'\n" +
 			"  | ('k'|'9'|'p') '$'\n" +
 			"  ;\n");
-		g.createLookaheadDFAs();
+		g.createLookaheadDFAs(false);
 		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
 		// into 0..8
 		String expecting =
@@ -95,7 +95,6 @@ public class TestCharDFAConversion extends BaseTest {
 			"A : ('k'|'9'|'p') '$'\n" +
 			"  | ('a'..'z'|'0'..'9') '@'\n" +
 			"  ;\n");
-		g.createLookaheadDFAs();
 		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
 		// into 0..8
 		String expecting =
@@ -115,7 +114,6 @@ public class TestCharDFAConversion extends BaseTest {
 			"  | 'p' '$'\n" +
 			"  | '0'..'9' '@'\n" +
 			"  ;\n");
-		g.createLookaheadDFAs();
 		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
 		// into 0..8
 		String expecting =
@@ -450,7 +448,6 @@ public class TestCharDFAConversion extends BaseTest {
 			"A : B | ~B {;} ;\n" +
 			"fragment B : 'a'|'b'|'c'..'e'|C ;\n" +
 			"fragment C : 'f' ;\n"); // has to seen from B to C
-		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'a'..'f'->:s1=>1\n" +
 			".s0-{'\\u0000'..'`', 'g'..'\\uFFFE'}->:s2=>2\n";
@@ -464,7 +461,6 @@ public class TestCharDFAConversion extends BaseTest {
 			"fragment\n" +
 			"B : 'b' ;\n" +
 			"C : ~'x'{;} ;"); // force Tokens to not collapse T|C
-		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'b'->:s3=>2\n" +
 			".s0-'x'->:s2=>1\n" +
@@ -478,7 +474,6 @@ public class TestCharDFAConversion extends BaseTest {
 			"lexer grammar A;\n" +
 			"T : ~'x' ;\n" +
 			"S : 'x' (T | 'x') ;\n");
-		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'x'->:s2=>2\n" +
 			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
@@ -493,7 +488,6 @@ public class TestCharDFAConversion extends BaseTest {
 			"  ;\n" +
 			"IDENT:    'a'+;\n");
 		// basically, Tokens rule should not do set compression test
-		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'<'->:s1=>1\n" +
 			".s0-'a'->:s2=>2\n";
@@ -506,7 +500,6 @@ public class TestCharDFAConversion extends BaseTest {
 		Grammar g = new Grammar(
 			"grammar T;\n"+
 			"a : A | B;");
-		g.createLookaheadDFAs();
 		String expecting =
 			"\n";
 		checkDecision(g, 1, expecting, null);
@@ -524,7 +517,7 @@ public class TestCharDFAConversion extends BaseTest {
 			CodeGenerator generator = new CodeGenerator(null, g, "Java");
 			g.setCodeGenerator(generator);
 			g.createNFAs();
-			g.createLookaheadDFAs();
+			g.createLookaheadDFAs(false);
 		}
 
 		DFA dfa = g.getLookaheadDFA(decision);

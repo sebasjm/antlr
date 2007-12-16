@@ -381,11 +381,10 @@ public class Label implements Comparable, Cloneable {
     */
 
 	public static boolean intersect(Label label, Label edgeLabel) {
-		int intLabel = label.getAtom();
 		boolean hasIntersection = false;
 		boolean labelIsSet = label.isSet();
 		boolean edgeIsSet = edgeLabel.isSet();
-		if ( !labelIsSet && !edgeIsSet && edgeLabel.label==intLabel ) {
+		if ( !labelIsSet && !edgeIsSet && edgeLabel.label==label.label ) {
 			hasIntersection = true;
 		}
 		else if ( labelIsSet && edgeIsSet &&
@@ -397,7 +396,7 @@ public class Label implements Comparable, Cloneable {
 			hasIntersection = true;
 		}
 		else if ( !labelIsSet && edgeIsSet &&
-				  edgeLabel.getSet().member(intLabel) ) {
+				  edgeLabel.getSet().member(label.label) ) {
 			hasIntersection = true;
 		}
 		return hasIntersection;

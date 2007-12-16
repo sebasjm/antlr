@@ -759,7 +759,11 @@ public class Grammar {
      *  This is a separate method because you might want to create a
      *  Grammar without doing the expensive analysis.
      */
-    public void createLookaheadDFAs() {
+	public void createLookaheadDFAs() {
+		createLookaheadDFAs(true);
+	}
+
+	public void createLookaheadDFAs(boolean wackTempStructures) {
 		if ( nfa==null ) {
 			createNFAs();
 		}
@@ -772,7 +776,7 @@ public class Grammar {
 			for (int decision=1; decision<=numDecisions; decision++) {
 				NFAState decisionStartState = getDecisionNFAStartState(decision);
 				if ( !externalAnalysisAbort && decisionStartState.getNumberOfTransitions()>1 ) {
-					createLookaheadDFA(decision);
+					createLookaheadDFA(decision, wackTempStructures);
 				}
 			}
 		}
@@ -807,7 +811,7 @@ public class Grammar {
 		allDecisionDFACreated = true;
 	}
 
-	public void createLookaheadDFA(int decision) {
+	public void createLookaheadDFA(int decision, boolean wackTempStructures) {
 		Decision d = getDecision(decision);
 		String enclosingRule = d.startState.enclosingRule.name;
 		Rule r = d.startState.enclosingRule;
@@ -848,6 +852,12 @@ public class Grammar {
 		}
 
 		setLookaheadDFA(decision, lookaheadDFA);
+
+		if ( wackTempStructures ) {
+			for (DFAState s : lookaheadDFA.getUniqueStates().values()) {
+				s.reset();
+			}
+		}
 
 		// create map from line:col to decision DFA (for ANTLRWorks)
 		GrammarAST decisionAST = nfa.grammar.getDecisionBlockAST(lookaheadDFA.decisionNumber);

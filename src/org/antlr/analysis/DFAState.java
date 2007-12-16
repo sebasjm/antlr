@@ -164,7 +164,15 @@ public class DFAState extends State {
         this.dfa = dfa;
     }
 
-    public Transition transition(int i) {
+	public void reset() {
+		nfaConfigurations = null; // wack
+		configurationsWithLabeledEdges = null;
+		configurationsWithPredicateEdges = null;
+		closureBusy = null;
+		reachableLabels = null;
+	}
+
+	public Transition transition(int i) {
         return (Transition)transitions.get(i);
     }
 

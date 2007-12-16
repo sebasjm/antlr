@@ -210,7 +210,7 @@ public class TestSemanticPredicates extends BaseTest {
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.createLookaheadDFAs();
+			g.createLookaheadDFAs(false);
 		}
 
 		DFA dfa = g.getLookaheadDFA(1);
@@ -318,7 +318,7 @@ public class TestSemanticPredicates extends BaseTest {
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.createLookaheadDFAs();
+			g.createLookaheadDFAs(false);
 		}
 
 		assertEquals("unexpected number of expected problems", 0, equeue.size());
@@ -628,7 +628,7 @@ public class TestSemanticPredicates extends BaseTest {
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.createLookaheadDFAs();
+			g.createLookaheadDFAs(false);
 		}
 
 		if ( equeue.size()!=expectingNumWarnings ) {

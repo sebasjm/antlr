@@ -496,7 +496,7 @@ public class TestDFAConversion extends BaseTest {
 			new HashSet() {{add("a"); add("b");}};
 		assertEquals(expectedRules, ruleNames(leftRecursive));
 
-		g.createLookaheadDFAs();
+		g.createLookaheadDFAs(false);
 
 		Message msg = (Message)equeue.warnings.get(0);
 		assertTrue("expecting left recursion cycles; found "+msg.getClass().getName(),
@@ -526,7 +526,7 @@ public class TestDFAConversion extends BaseTest {
 			new HashSet() {{add("a"); add("b");}};
 		assertEquals(expectedRules, ruleNames(leftRecursive));
 
-		g.createLookaheadDFAs();
+		g.createLookaheadDFAs(false);
 
 		Message msg = (Message)equeue.warnings.get(0);
 		assertTrue("expecting left recursion cycles; found "+msg.getClass().getName(),
@@ -1326,7 +1326,7 @@ As a result, alternative(s) 2 were disabled for that input
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.createLookaheadDFAs();
+			g.createLookaheadDFAs(false);
 		}
 		NonRegularDecisionMessage msg = getNonRegularDecisionMessage(equeue.errors);
 		assertTrue("expected fatal non-LL(*) msg", msg!=null);
@@ -1346,7 +1346,7 @@ As a result, alternative(s) 2 were disabled for that input
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.createLookaheadDFAs();
+			g.createLookaheadDFAs(false);
 		}
 		RecursionOverflowMessage msg = getRecursionOverflowMessage(equeue.errors);
 		assertTrue("expected recursion overflow msg", msg!=null);
@@ -1372,7 +1372,7 @@ As a result, alternative(s) 2 were disabled for that input
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.createLookaheadDFAs();
+			g.createLookaheadDFAs(false);
 		}
 		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
 		g.setCodeGenerator(generator);

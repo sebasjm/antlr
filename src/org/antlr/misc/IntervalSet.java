@@ -47,6 +47,8 @@ import java.util.*;
  *  The ranges are ordered and disjoint so that 2..6 appears before 101..103.
  */
 public class IntervalSet implements IntSet {
+	public static final IntervalSet COMPLETE_SET = IntervalSet.of(0,Label.MAX_CHAR_VALUE);
+
 	/** The list of sorted, disjoint intervals. */
     protected List<Interval> intervals;
 
@@ -285,10 +287,10 @@ public class IntervalSet implements IntSet {
 		// will be empty.  The only problem would be when this' set max value
 		// goes beyond MAX_CHAR_VALUE, but hopefully the constant MAX_CHAR_VALUE
 		// will prevent this.
-		return this.and(((IntervalSet)other).complement(0,Label.MAX_CHAR_VALUE));
+		return this.and(((IntervalSet)other).complement(COMPLETE_SET));
 	}
 
-    /** return a new set containing all elements in this but not in other.
+	/** return a new set containing all elements in this but not in other.
      *  Intervals may have to be broken up when ranges in this overlap
      *  with ranges in other.  other is assumed to be a subset of this;
      *  anything that is in other but not in this will be ignored.

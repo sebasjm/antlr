@@ -80,7 +80,7 @@ public class DFA {
 	 *  Not used during fixed k lookahead as it's a waste to fill it with
 	 *  a dup of states array.
      */
-    protected Map uniqueStates = new HashMap();
+    protected Map<DFAState, DFAState> uniqueStates = new HashMap<DFAState, DFAState>();
 
 	/** Maps the state number to the actual DFAState.  Use a Vector as it
 	 *  grows automatically when I set the ith element.  This contains all
@@ -799,7 +799,7 @@ public class DFA {
 		}
 	}
 
-	public Map getUniqueStates() {
+	public Map<DFAState, DFAState> getUniqueStates() {
 		return uniqueStates;
 	}
 

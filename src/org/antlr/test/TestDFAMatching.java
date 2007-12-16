@@ -43,7 +43,7 @@ public class TestDFAMatching extends BaseTest {
                 "lexer grammar t;\n"+
                 "A : {;}'a' | 'b' | 'c';");
 		g.createNFAs();
-		g.createLookaheadDFAs();
+		g.createLookaheadDFAs(false);
         DFA dfa = g.getLookaheadDFA(1);
         checkPrediction(dfa,"a",1);
         checkPrediction(dfa,"b",2);
@@ -56,7 +56,7 @@ public class TestDFAMatching extends BaseTest {
                 "lexer grammar t;\n"+
                 "A : {;}'a'..'z' | ';' | '0'..'9' ;");
 		g.createNFAs();
-        g.createLookaheadDFAs();
+        g.createLookaheadDFAs(false);
         DFA dfa = g.getLookaheadDFA(1);
         checkPrediction(dfa,"a",1);
         checkPrediction(dfa,"q",1);
@@ -70,7 +70,7 @@ public class TestDFAMatching extends BaseTest {
                 "lexer grammar t;\n"+
                 "A : 'a' 'b' | 'a' 'c' | 'd' 'e' ;");
 		g.createNFAs();
-        g.createLookaheadDFAs();
+        g.createLookaheadDFAs(false);
         DFA dfa = g.getLookaheadDFA(1);
         checkPrediction(dfa,"ab",1);
         checkPrediction(dfa,"ac",2);
@@ -84,7 +84,7 @@ public class TestDFAMatching extends BaseTest {
                 "A : (DIGIT)+ '.' DIGIT | (DIGIT)+ ;\n" +
                 "fragment DIGIT : '0'..'9' ;\n");
 		g.createNFAs();
-        g.createLookaheadDFAs();
+        g.createLookaheadDFAs(false);
         DFA dfa = g.getLookaheadDFA(3);
         checkPrediction(dfa,"32",2);
         checkPrediction(dfa,"999.2",1);

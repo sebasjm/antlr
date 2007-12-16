@@ -27,7 +27,6 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.misc.IntSet;
 import org.antlr.misc.OrderedHashSet;
 import org.antlr.misc.Utils;
 
@@ -868,8 +867,6 @@ public class NFAToDFAConverter {
 	public DFAState reach(DFAState d, Label label) {
 		//System.out.println("reach "+label.toString(dfa.nfa.grammar));
 		DFAState labelDFATarget = dfa.newState();
-		int intLabel = label.getAtom();
-		IntSet setLabel = label.getSet();
 /*
 		// TODO: Don't walk all configs; walk only those we know
 		// have label emanating (could be set, ...)
@@ -909,7 +906,7 @@ public class NFAToDFAConverter {
 			// this accept state.
 			if ( c.context.parent!=null &&
 				 edgeLabel.isAtom() &&
-				 edgeLabel.getAtom()==Label.EOT )
+				 edgeLabel.label==Label.EOT )
 			{
 				continue;
 			}
