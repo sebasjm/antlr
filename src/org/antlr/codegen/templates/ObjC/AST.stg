@@ -410,7 +410,7 @@ root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:[_stream_<token> next] 
 
 rewriteImaginaryTokenRef(args,token,hetero,elementIndex) ::= <<
 <if(first(rest(args)))><! got two arguments - means create from token with custom text!>
-id\<ANTLRTree> _<token>_tree = [treeAdaptor newTreeWithToken:<first(args)> tokenType:<token> text:<first(rest(args))>];
+id\<ANTLRTree> _<token>_tree = [treeAdaptor newTreeWithToken:<first(args)> tokenType:<token> text:@<first(rest(args))>];
 [treeAdaptor addChild:_<token>_tree toTree:root_<treeLevel>];
 [_<token>_tree release];<\n>
 <else><! at most one argument !>
@@ -428,7 +428,7 @@ id\<ANTLRTree> _<token>_tree = [treeAdaptor newTreeWithTokenType:<token> text:[t
 
 rewriteImaginaryTokenRefRoot(args,token,hetero,elementIndex) ::= <<
 <if(first(rest(args)))><! got two arguments - means create from token with custom text!>
-id\<ANTLRTree> _<token>_tree = [treeAdaptor newTreeWithToken:<first(args)> tokenType:<token> text:<first(rest(args))>];
+id\<ANTLRTree> _<token>_tree = [treeAdaptor newTreeWithToken:<first(args)> tokenType:<token> text:@<first(rest(args))>];
 root_<treeLevel> = (<ASTLabelType>)[treeAdaptor makeNode:_<token>_tree parentOf:root_<treeLevel>];
 [_<token>_tree release];<\n>
 <else><! at most one argument !>

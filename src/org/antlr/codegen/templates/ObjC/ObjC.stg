@@ -1409,7 +1409,8 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "[_<scope> stop]"
 ruleLabelPropertyRef_tree(scope,attr) ::= "[_<scope> tree]"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-[[input ] textForNode:[_<scope> start]]
+//[input textForNode:[_<scope> start]]
+[input substringWithRange:NSMakeRange([[input treeAdaptor] startIndex:[_<scope> start]], [[input treeAdaptor] stopIndex:[_<scope> start]])]
 <else>
 [input substringWithRange:NSMakeRange([_<scope> start], [_<scope> stop]-[_<scope> start])]
 <endif>
