@@ -54,7 +54,7 @@ int main(int argc, const char * argv[]) {
 	NSLog(@"tree: %@", [program_tree treeDescription]);
 	
 	// Create a new tree node stream that's feeding off of the root node (thus seeing the whole tree)
-	ANTLRCommonTreeNodeStream *treeStream = [[ANTLRCommonTreeNodeStream alloc] initWithTree:program_tree];
+	ANTLRUnbufferedCommonTreeNodeStream *treeStream = [[ANTLRUnbufferedCommonTreeNodeStream alloc] initWithTree:program_tree];
 	// tell the TreeNodeStream where the tokens originally came from, so we can retrieve arbitrary tokens and their text.
 	[treeStream setTokenStream:tokenStream];
 	

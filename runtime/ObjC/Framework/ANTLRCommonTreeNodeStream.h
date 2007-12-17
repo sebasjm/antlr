@@ -24,29 +24,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #import <Cocoa/Cocoa.h>
-#import <ANTLR/ANTLRIntStream.h>
-#import <ANTLR/ANTLRTokenStream.h>
-#import <ANTLR/ANTLRTreeAdaptor.h>
-#import <ANTLR/ANTLRCommonTree.h>
-#import <ANTLR/ANTLRCommonTreeAdaptor.h>
+#import <ANTLR/ANTLRTreeNodeStream.h>
 
-@protocol ANTLRTreeNodeStream < ANTLRIntStream > 
+@interface ANTLRCommonTreeNodeStream : NSObject < ANTLRTreeNodeStream > {
 
-- (id) initWithTree:(ANTLRCommonTree *)theTree;
-- (id) initWithTree:(ANTLRCommonTree *)theTree treeAdaptor:(ANTLRCommonTreeAdaptor *)theAdaptor;
-
-- (id) LT:(int)k;
-- (id) treeSource;
-- (id<ANTLRTreeAdaptor>) treeAdaptor;
-- (id<ANTLRTokenStream>) tokenStream; 
-- (void) setUsesUniqueNavigationNodes:(BOOL)flag;
-
-- (id) nodeAtIndex:(unsigned int) idx;
-
-- (NSString *) stringValue;
-- (NSString *) stringValueWithRange:(NSRange) aRange;
-- (NSString *) stringValueFromNode:(id)startNode toNode:(id)stopNode;
+}
 
 @end

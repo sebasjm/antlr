@@ -115,10 +115,12 @@
 		F763D51E0A66765B0061CD35 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F71F6B8F09A81E6F003221F4 /* CoreFoundation.framework */; };
 		F76AA8150CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.h in Headers */ = {isa = PBXBuildFile; fileRef = F76AA8130CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F76AA8160CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.m in Sources */ = {isa = PBXBuildFile; fileRef = F76AA8140CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.m */; };
-		F76AA8F70CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F76AA8F50CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.h */; };
+		F76AA8F70CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F76AA8F50CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F76AA8F80CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F76AA8F60CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.m */; };
-		F76AA91E0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.h in Headers */ = {isa = PBXBuildFile; fileRef = F76AA91C0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.h */; };
+		F76AA91E0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.h in Headers */ = {isa = PBXBuildFile; fileRef = F76AA91C0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F76AA91F0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.m in Sources */ = {isa = PBXBuildFile; fileRef = F76AA91D0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.m */; };
+		F76AA9900CEA515A00AF044C /* ANTLRCommonTreeNodeStream.h in Headers */ = {isa = PBXBuildFile; fileRef = F76AA98E0CEA515A00AF044C /* ANTLRCommonTreeNodeStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F76AA9910CEA515A00AF044C /* ANTLRCommonTreeNodeStream.m in Sources */ = {isa = PBXBuildFile; fileRef = F76AA98F0CEA515A00AF044C /* ANTLRCommonTreeNodeStream.m */; };
 		F7754E3F0A5C0A0500D0873A /* ANTLRDFA.h in Headers */ = {isa = PBXBuildFile; fileRef = F7754E3D0A5C0A0500D0873A /* ANTLRDFA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F7754E400A5C0A0500D0873A /* ANTLRDFA.m in Sources */ = {isa = PBXBuildFile; fileRef = F7754E3E0A5C0A0500D0873A /* ANTLRDFA.m */; };
 		F77744050B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = F77744030B234A3400D1F89B /* ANTLRToken+DebuggerSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -409,6 +411,8 @@
 		F76AA8F60CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRUnbufferedCommonTreeNodeStream.m; sourceTree = "<group>"; };
 		F76AA91C0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRUnbufferedCommonTreeNodeStreamState.h; sourceTree = "<group>"; };
 		F76AA91D0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRUnbufferedCommonTreeNodeStreamState.m; sourceTree = "<group>"; };
+		F76AA98E0CEA515A00AF044C /* ANTLRCommonTreeNodeStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRCommonTreeNodeStream.h; sourceTree = "<group>"; };
+		F76AA98F0CEA515A00AF044C /* ANTLRCommonTreeNodeStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRCommonTreeNodeStream.m; sourceTree = "<group>"; };
 		F7715D1A0AC9DCE400ED984D /* SimpleC.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleC.g; sourceTree = "<group>"; };
 		F7715D1B0AC9DCE500ED984D /* SimpleCTP.gtp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleCTP.gtp; sourceTree = "<group>"; };
 		F7715D1C0AC9DDD800ED984D /* SimpleC.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SimpleC.tokens; sourceTree = "<group>"; };
@@ -478,6 +482,7 @@
 		F7E261370B1E45580013F640 /* ANTLRDebugEventProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRDebugEventProxy.h; sourceTree = "<group>"; };
 		F7E261380B1E45580013F640 /* ANTLRDebugEventProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRDebugEventProxy.m; sourceTree = "<group>"; };
 		F7E983940A0D6A5F00F16093 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F7EFFC8B0D164E2C008EE57E /* CHANGES.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGES.txt; sourceTree = "<group>"; };
 		F7F218EE097AFB1A000472E9 /* ANTLRBitSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRBitSet.h; sourceTree = "<group>"; };
 		F7F218EF097AFB1A000472E9 /* ANTLRBitSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANTLRBitSet.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -611,6 +616,7 @@
 			isa = PBXGroup;
 			children = (
 				F762879C0B71578D006AA7EF /* README.rtf */,
+				F7EFFC8B0D164E2C008EE57E /* CHANGES.txt */,
 				F7037EBB0A05B06B0070435D /* examples */,
 				F70BB396098E5BE90054FEF8 /* Tests */,
 				08FB77AEFE84172EC02AAC07 /* Classes */,
@@ -755,11 +761,6 @@
 				F70AA7CD09AA379300C3FD5E /* ANTLRStringStreamState.h */,
 				F70AA7CE09AA379300C3FD5E /* ANTLRStringStreamState.m */,
 				F700ED7E0A5FF17C005D0757 /* ANTLRTokenSource.h */,
-				F72C5B820AB52AD300282574 /* ANTLRTreeNodeStream.h */,
-				F76AA8F50CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.h */,
-				F76AA8F60CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.m */,
-				F76AA91C0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.h */,
-				F76AA91D0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.m */,
 			);
 			name = Streams;
 			sourceTree = "<group>";
@@ -786,6 +787,13 @@
 				F70B11BC0C4C2B6400C3ECE0 /* ANTLRRewriteRuleSubtreeStream.m */,
 				F70B11C10C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.h */,
 				F70B11C20C4C2B7900C3ECE0 /* ANTLRRewriteRuleTokenStream.m */,
+				F72C5B820AB52AD300282574 /* ANTLRTreeNodeStream.h */,
+				F76AA98E0CEA515A00AF044C /* ANTLRCommonTreeNodeStream.h */,
+				F76AA98F0CEA515A00AF044C /* ANTLRCommonTreeNodeStream.m */,
+				F76AA8F50CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.h */,
+				F76AA8F60CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.m */,
+				F76AA91C0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.h */,
+				F76AA91D0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.m */,
 			);
 			name = Trees;
 			sourceTree = "<group>";
@@ -1047,6 +1055,7 @@
 				F76AA8150CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.h in Headers */,
 				F76AA8F70CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.h in Headers */,
 				F76AA91E0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.h in Headers */,
+				F76AA9900CEA515A00AF044C /* ANTLRCommonTreeNodeStream.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1457,6 +1466,7 @@
 				F76AA8160CE9E29400AF044C /* ANTLRTreeParserRuleReturnScope.m in Sources */,
 				F76AA8F80CEA290C00AF044C /* ANTLRUnbufferedCommonTreeNodeStream.m in Sources */,
 				F76AA91F0CEA2DC600AF044C /* ANTLRUnbufferedCommonTreeNodeStreamState.m in Sources */,
+				F76AA9910CEA515A00AF044C /* ANTLRCommonTreeNodeStream.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,95 +1,95 @@
-// $ANTLR 3.1b1 SimpleCTP.gtp 2007-11-13 15:03:27
+// $ANTLR 3.1b1 SimpleCTP.gtp 2007-12-16 20:47:43
 
 #import "SimpleCTP.h"
 
 
 #pragma mark Bitsets
-const static unsigned long long FOLLOW_declaration_in_program38_data[] = {0x0000000000000192LL};
-static ANTLRBitSet *FOLLOW_declaration_in_program38;
-const static unsigned long long FOLLOW_variable_in_declaration58_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_variable_in_declaration58;
-const static unsigned long long FOLLOW_SimpleCTP_FUNC_DECL_in_declaration69_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_FUNC_DECL_in_declaration69;
-const static unsigned long long FOLLOW_functionHeader_in_declaration71_data[] = {0x0000000000000008LL};
-static ANTLRBitSet *FOLLOW_functionHeader_in_declaration71;
-const static unsigned long long FOLLOW_SimpleCTP_FUNC_DEF_in_declaration83_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_FUNC_DEF_in_declaration83;
-const static unsigned long long FOLLOW_functionHeader_in_declaration85_data[] = {0x0000000000000200LL};
-static ANTLRBitSet *FOLLOW_functionHeader_in_declaration85;
-const static unsigned long long FOLLOW_block_in_declaration87_data[] = {0x0000000000000008LL};
-static ANTLRBitSet *FOLLOW_block_in_declaration87;
-const static unsigned long long FOLLOW_SimpleCTP_VAR_DEF_in_variable108_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_VAR_DEF_in_variable108;
-const static unsigned long long FOLLOW_type_in_variable110_data[] = {0x0000000000000400LL};
-static ANTLRBitSet *FOLLOW_type_in_variable110;
-const static unsigned long long FOLLOW_declarator_in_variable112_data[] = {0x0000000000000008LL};
-static ANTLRBitSet *FOLLOW_declarator_in_variable112;
-const static unsigned long long FOLLOW_SimpleCTP_ID_in_declarator132_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_ID_in_declarator132;
-const static unsigned long long FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader153_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader153;
-const static unsigned long long FOLLOW_type_in_functionHeader155_data[] = {0x0000000000000400LL};
-static ANTLRBitSet *FOLLOW_type_in_functionHeader155;
-const static unsigned long long FOLLOW_SimpleCTP_ID_in_functionHeader157_data[] = {0x0000000000000020LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_ID_in_functionHeader157;
-const static unsigned long long FOLLOW_formalParameter_in_functionHeader159_data[] = {0x0000000000000028LL};
-static ANTLRBitSet *FOLLOW_formalParameter_in_functionHeader159;
-const static unsigned long long FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter181_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter181;
-const static unsigned long long FOLLOW_type_in_formalParameter183_data[] = {0x0000000000000400LL};
-static ANTLRBitSet *FOLLOW_type_in_formalParameter183;
-const static unsigned long long FOLLOW_declarator_in_formalParameter185_data[] = {0x0000000000000008LL};
-static ANTLRBitSet *FOLLOW_declarator_in_formalParameter185;
+const static unsigned long long FOLLOW_declaration_in_program43_data[] = {0x0000000000000192LL};
+static ANTLRBitSet *FOLLOW_declaration_in_program43;
+const static unsigned long long FOLLOW_variable_in_declaration63_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_variable_in_declaration63;
+const static unsigned long long FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74;
+const static unsigned long long FOLLOW_functionHeader_in_declaration76_data[] = {0x0000000000000008LL};
+static ANTLRBitSet *FOLLOW_functionHeader_in_declaration76;
+const static unsigned long long FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88;
+const static unsigned long long FOLLOW_functionHeader_in_declaration90_data[] = {0x0000000000000200LL};
+static ANTLRBitSet *FOLLOW_functionHeader_in_declaration90;
+const static unsigned long long FOLLOW_block_in_declaration92_data[] = {0x0000000000000008LL};
+static ANTLRBitSet *FOLLOW_block_in_declaration92;
+const static unsigned long long FOLLOW_SimpleCTP_VAR_DEF_in_variable113_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_VAR_DEF_in_variable113;
+const static unsigned long long FOLLOW_type_in_variable115_data[] = {0x0000000000000400LL};
+static ANTLRBitSet *FOLLOW_type_in_variable115;
+const static unsigned long long FOLLOW_declarator_in_variable117_data[] = {0x0000000000000008LL};
+static ANTLRBitSet *FOLLOW_declarator_in_variable117;
+const static unsigned long long FOLLOW_SimpleCTP_ID_in_declarator137_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_ID_in_declarator137;
+const static unsigned long long FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158;
+const static unsigned long long FOLLOW_type_in_functionHeader160_data[] = {0x0000000000000400LL};
+static ANTLRBitSet *FOLLOW_type_in_functionHeader160;
+const static unsigned long long FOLLOW_SimpleCTP_ID_in_functionHeader162_data[] = {0x0000000000000020LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_ID_in_functionHeader162;
+const static unsigned long long FOLLOW_formalParameter_in_functionHeader164_data[] = {0x0000000000000028LL};
+static ANTLRBitSet *FOLLOW_formalParameter_in_functionHeader164;
+const static unsigned long long FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186;
+const static unsigned long long FOLLOW_type_in_formalParameter188_data[] = {0x0000000000000400LL};
+static ANTLRBitSet *FOLLOW_type_in_formalParameter188;
+const static unsigned long long FOLLOW_declarator_in_formalParameter190_data[] = {0x0000000000000008LL};
+static ANTLRBitSet *FOLLOW_declarator_in_formalParameter190;
 const static unsigned long long FOLLOW_set_in_type0_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_set_in_type0;
-const static unsigned long long FOLLOW_SimpleCTP_BLOCK_in_block268_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_BLOCK_in_block268;
-const static unsigned long long FOLLOW_variable_in_block270_data[] = {0x00000000000E3E18LL};
-static ANTLRBitSet *FOLLOW_variable_in_block270;
-const static unsigned long long FOLLOW_stat_in_block273_data[] = {0x00000000000E3E08LL};
-static ANTLRBitSet *FOLLOW_stat_in_block273;
-const static unsigned long long FOLLOW_forStat_in_stat287_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_forStat_in_stat287;
-const static unsigned long long FOLLOW_expr_in_stat295_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_expr_in_stat295;
-const static unsigned long long FOLLOW_block_in_stat303_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_block_in_stat303;
-const static unsigned long long FOLLOW_SimpleCTP_FOR_in_forStat323_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_FOR_in_forStat323;
-const static unsigned long long FOLLOW_expr_in_forStat325_data[] = {0x00000000000E1C00LL};
-static ANTLRBitSet *FOLLOW_expr_in_forStat325;
-const static unsigned long long FOLLOW_expr_in_forStat327_data[] = {0x00000000000E1C00LL};
-static ANTLRBitSet *FOLLOW_expr_in_forStat327;
-const static unsigned long long FOLLOW_expr_in_forStat329_data[] = {0x0000000000000200LL};
-static ANTLRBitSet *FOLLOW_expr_in_forStat329;
-const static unsigned long long FOLLOW_block_in_forStat331_data[] = {0x0000000000000008LL};
-static ANTLRBitSet *FOLLOW_block_in_forStat331;
-const static unsigned long long FOLLOW_SimpleCTP_EQEQ_in_expr347_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_EQEQ_in_expr347;
-const static unsigned long long FOLLOW_expr_in_expr349_data[] = {0x00000000000E1C00LL};
-static ANTLRBitSet *FOLLOW_expr_in_expr349;
-const static unsigned long long FOLLOW_expr_in_expr351_data[] = {0x0000000000000008LL};
-static ANTLRBitSet *FOLLOW_expr_in_expr351;
-const static unsigned long long FOLLOW_SimpleCTP_LT_in_expr363_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_LT_in_expr363;
-const static unsigned long long FOLLOW_expr_in_expr365_data[] = {0x00000000000E1C00LL};
-static ANTLRBitSet *FOLLOW_expr_in_expr365;
-const static unsigned long long FOLLOW_expr_in_expr367_data[] = {0x0000000000000008LL};
-static ANTLRBitSet *FOLLOW_expr_in_expr367;
-const static unsigned long long FOLLOW_SimpleCTP_PLUS_in_expr379_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_PLUS_in_expr379;
-const static unsigned long long FOLLOW_expr_in_expr381_data[] = {0x00000000000E1C00LL};
-static ANTLRBitSet *FOLLOW_expr_in_expr381;
-const static unsigned long long FOLLOW_expr_in_expr383_data[] = {0x0000000000000008LL};
-static ANTLRBitSet *FOLLOW_expr_in_expr383;
-const static unsigned long long FOLLOW_SimpleCTP_EQ_in_expr395_data[] = {0x0000000000000004LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_EQ_in_expr395;
-const static unsigned long long FOLLOW_SimpleCTP_ID_in_expr397_data[] = {0x00000000000E1C00LL};
-static ANTLRBitSet *FOLLOW_SimpleCTP_ID_in_expr397;
-const static unsigned long long FOLLOW_expr_in_expr401_data[] = {0x0000000000000008LL};
-static ANTLRBitSet *FOLLOW_expr_in_expr401;
-const static unsigned long long FOLLOW_atom_in_expr414_data[] = {0x0000000000000002LL};
-static ANTLRBitSet *FOLLOW_atom_in_expr414;
+const static unsigned long long FOLLOW_SimpleCTP_BLOCK_in_block273_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_BLOCK_in_block273;
+const static unsigned long long FOLLOW_variable_in_block275_data[] = {0x00000000000E3E18LL};
+static ANTLRBitSet *FOLLOW_variable_in_block275;
+const static unsigned long long FOLLOW_stat_in_block278_data[] = {0x00000000000E3E08LL};
+static ANTLRBitSet *FOLLOW_stat_in_block278;
+const static unsigned long long FOLLOW_forStat_in_stat292_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_forStat_in_stat292;
+const static unsigned long long FOLLOW_expr_in_stat300_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_expr_in_stat300;
+const static unsigned long long FOLLOW_block_in_stat308_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_block_in_stat308;
+const static unsigned long long FOLLOW_SimpleCTP_FOR_in_forStat328_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_FOR_in_forStat328;
+const static unsigned long long FOLLOW_expr_in_forStat330_data[] = {0x00000000000E1C00LL};
+static ANTLRBitSet *FOLLOW_expr_in_forStat330;
+const static unsigned long long FOLLOW_expr_in_forStat332_data[] = {0x00000000000E1C00LL};
+static ANTLRBitSet *FOLLOW_expr_in_forStat332;
+const static unsigned long long FOLLOW_expr_in_forStat334_data[] = {0x0000000000000200LL};
+static ANTLRBitSet *FOLLOW_expr_in_forStat334;
+const static unsigned long long FOLLOW_block_in_forStat336_data[] = {0x0000000000000008LL};
+static ANTLRBitSet *FOLLOW_block_in_forStat336;
+const static unsigned long long FOLLOW_SimpleCTP_EQEQ_in_expr352_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_EQEQ_in_expr352;
+const static unsigned long long FOLLOW_expr_in_expr354_data[] = {0x00000000000E1C00LL};
+static ANTLRBitSet *FOLLOW_expr_in_expr354;
+const static unsigned long long FOLLOW_expr_in_expr356_data[] = {0x0000000000000008LL};
+static ANTLRBitSet *FOLLOW_expr_in_expr356;
+const static unsigned long long FOLLOW_SimpleCTP_LT_in_expr368_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_LT_in_expr368;
+const static unsigned long long FOLLOW_expr_in_expr370_data[] = {0x00000000000E1C00LL};
+static ANTLRBitSet *FOLLOW_expr_in_expr370;
+const static unsigned long long FOLLOW_expr_in_expr372_data[] = {0x0000000000000008LL};
+static ANTLRBitSet *FOLLOW_expr_in_expr372;
+const static unsigned long long FOLLOW_SimpleCTP_PLUS_in_expr384_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_PLUS_in_expr384;
+const static unsigned long long FOLLOW_expr_in_expr386_data[] = {0x00000000000E1C00LL};
+static ANTLRBitSet *FOLLOW_expr_in_expr386;
+const static unsigned long long FOLLOW_expr_in_expr388_data[] = {0x0000000000000008LL};
+static ANTLRBitSet *FOLLOW_expr_in_expr388;
+const static unsigned long long FOLLOW_SimpleCTP_EQ_in_expr400_data[] = {0x0000000000000004LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_EQ_in_expr400;
+const static unsigned long long FOLLOW_SimpleCTP_ID_in_expr402_data[] = {0x00000000000E1C00LL};
+static ANTLRBitSet *FOLLOW_SimpleCTP_ID_in_expr402;
+const static unsigned long long FOLLOW_expr_in_expr406_data[] = {0x0000000000000008LL};
+static ANTLRBitSet *FOLLOW_expr_in_expr406;
+const static unsigned long long FOLLOW_atom_in_expr419_data[] = {0x0000000000000002LL};
+static ANTLRBitSet *FOLLOW_atom_in_expr419;
 const static unsigned long long FOLLOW_set_in_atom0_data[] = {0x0000000000000002LL};
 static ANTLRBitSet *FOLLOW_set_in_atom0;
 
@@ -109,49 +109,49 @@ static NSArray *tokenNames;
 
 + (void) initialize
 {
-	FOLLOW_declaration_in_program38 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declaration_in_program38_data count:1];
-	FOLLOW_variable_in_declaration58 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_declaration58_data count:1];
-	FOLLOW_SimpleCTP_FUNC_DECL_in_declaration69 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FUNC_DECL_in_declaration69_data count:1];
-	FOLLOW_functionHeader_in_declaration71 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_functionHeader_in_declaration71_data count:1];
-	FOLLOW_SimpleCTP_FUNC_DEF_in_declaration83 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FUNC_DEF_in_declaration83_data count:1];
-	FOLLOW_functionHeader_in_declaration85 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_functionHeader_in_declaration85_data count:1];
-	FOLLOW_block_in_declaration87 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_declaration87_data count:1];
-	FOLLOW_SimpleCTP_VAR_DEF_in_variable108 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_VAR_DEF_in_variable108_data count:1];
-	FOLLOW_type_in_variable110 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_variable110_data count:1];
-	FOLLOW_declarator_in_variable112 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_variable112_data count:1];
-	FOLLOW_SimpleCTP_ID_in_declarator132 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_declarator132_data count:1];
-	FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader153 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader153_data count:1];
-	FOLLOW_type_in_functionHeader155 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_functionHeader155_data count:1];
-	FOLLOW_SimpleCTP_ID_in_functionHeader157 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_functionHeader157_data count:1];
-	FOLLOW_formalParameter_in_functionHeader159 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_formalParameter_in_functionHeader159_data count:1];
-	FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter181 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter181_data count:1];
-	FOLLOW_type_in_formalParameter183 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_formalParameter183_data count:1];
-	FOLLOW_declarator_in_formalParameter185 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_formalParameter185_data count:1];
+	FOLLOW_declaration_in_program43 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declaration_in_program43_data count:1];
+	FOLLOW_variable_in_declaration63 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_declaration63_data count:1];
+	FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74_data count:1];
+	FOLLOW_functionHeader_in_declaration76 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_functionHeader_in_declaration76_data count:1];
+	FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88_data count:1];
+	FOLLOW_functionHeader_in_declaration90 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_functionHeader_in_declaration90_data count:1];
+	FOLLOW_block_in_declaration92 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_declaration92_data count:1];
+	FOLLOW_SimpleCTP_VAR_DEF_in_variable113 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_VAR_DEF_in_variable113_data count:1];
+	FOLLOW_type_in_variable115 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_variable115_data count:1];
+	FOLLOW_declarator_in_variable117 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_variable117_data count:1];
+	FOLLOW_SimpleCTP_ID_in_declarator137 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_declarator137_data count:1];
+	FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158_data count:1];
+	FOLLOW_type_in_functionHeader160 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_functionHeader160_data count:1];
+	FOLLOW_SimpleCTP_ID_in_functionHeader162 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_functionHeader162_data count:1];
+	FOLLOW_formalParameter_in_functionHeader164 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_formalParameter_in_functionHeader164_data count:1];
+	FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186_data count:1];
+	FOLLOW_type_in_formalParameter188 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_type_in_formalParameter188_data count:1];
+	FOLLOW_declarator_in_formalParameter190 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_declarator_in_formalParameter190_data count:1];
 	FOLLOW_set_in_type0 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_type0_data count:1];
-	FOLLOW_SimpleCTP_BLOCK_in_block268 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_BLOCK_in_block268_data count:1];
-	FOLLOW_variable_in_block270 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_block270_data count:1];
-	FOLLOW_stat_in_block273 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_stat_in_block273_data count:1];
-	FOLLOW_forStat_in_stat287 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_forStat_in_stat287_data count:1];
-	FOLLOW_expr_in_stat295 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_stat295_data count:1];
-	FOLLOW_block_in_stat303 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_stat303_data count:1];
-	FOLLOW_SimpleCTP_FOR_in_forStat323 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FOR_in_forStat323_data count:1];
-	FOLLOW_expr_in_forStat325 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat325_data count:1];
-	FOLLOW_expr_in_forStat327 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat327_data count:1];
-	FOLLOW_expr_in_forStat329 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat329_data count:1];
-	FOLLOW_block_in_forStat331 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_forStat331_data count:1];
-	FOLLOW_SimpleCTP_EQEQ_in_expr347 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_EQEQ_in_expr347_data count:1];
-	FOLLOW_expr_in_expr349 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr349_data count:1];
-	FOLLOW_expr_in_expr351 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr351_data count:1];
-	FOLLOW_SimpleCTP_LT_in_expr363 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_LT_in_expr363_data count:1];
-	FOLLOW_expr_in_expr365 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr365_data count:1];
-	FOLLOW_expr_in_expr367 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr367_data count:1];
-	FOLLOW_SimpleCTP_PLUS_in_expr379 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_PLUS_in_expr379_data count:1];
-	FOLLOW_expr_in_expr381 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr381_data count:1];
-	FOLLOW_expr_in_expr383 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr383_data count:1];
-	FOLLOW_SimpleCTP_EQ_in_expr395 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_EQ_in_expr395_data count:1];
-	FOLLOW_SimpleCTP_ID_in_expr397 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_expr397_data count:1];
-	FOLLOW_expr_in_expr401 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr401_data count:1];
-	FOLLOW_atom_in_expr414 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_expr414_data count:1];
+	FOLLOW_SimpleCTP_BLOCK_in_block273 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_BLOCK_in_block273_data count:1];
+	FOLLOW_variable_in_block275 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_variable_in_block275_data count:1];
+	FOLLOW_stat_in_block278 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_stat_in_block278_data count:1];
+	FOLLOW_forStat_in_stat292 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_forStat_in_stat292_data count:1];
+	FOLLOW_expr_in_stat300 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_stat300_data count:1];
+	FOLLOW_block_in_stat308 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_stat308_data count:1];
+	FOLLOW_SimpleCTP_FOR_in_forStat328 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_FOR_in_forStat328_data count:1];
+	FOLLOW_expr_in_forStat330 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat330_data count:1];
+	FOLLOW_expr_in_forStat332 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat332_data count:1];
+	FOLLOW_expr_in_forStat334 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_forStat334_data count:1];
+	FOLLOW_block_in_forStat336 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_block_in_forStat336_data count:1];
+	FOLLOW_SimpleCTP_EQEQ_in_expr352 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_EQEQ_in_expr352_data count:1];
+	FOLLOW_expr_in_expr354 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr354_data count:1];
+	FOLLOW_expr_in_expr356 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr356_data count:1];
+	FOLLOW_SimpleCTP_LT_in_expr368 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_LT_in_expr368_data count:1];
+	FOLLOW_expr_in_expr370 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr370_data count:1];
+	FOLLOW_expr_in_expr372 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr372_data count:1];
+	FOLLOW_SimpleCTP_PLUS_in_expr384 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_PLUS_in_expr384_data count:1];
+	FOLLOW_expr_in_expr386 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr386_data count:1];
+	FOLLOW_expr_in_expr388 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr388_data count:1];
+	FOLLOW_SimpleCTP_EQ_in_expr400 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_EQ_in_expr400_data count:1];
+	FOLLOW_SimpleCTP_ID_in_expr402 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_SimpleCTP_ID_in_expr402_data count:1];
+	FOLLOW_expr_in_expr406 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_expr_in_expr406_data count:1];
+	FOLLOW_atom_in_expr419 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_atom_in_expr419_data count:1];
 	FOLLOW_set_in_atom0 = [[ANTLRBitSet alloc] initWithBits:FOLLOW_set_in_atom0_data count:1];
 
 	tokenNames = [[NSArray alloc] initWithObjects:@"<invalid>", @"<EOR>", @"<DOWN>", @"<UP>", 
@@ -208,7 +208,7 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleCTP.gtp:9:9: declaration // alt
         	    {
-        	    [[_state following] addObject:FOLLOW_declaration_in_program38];
+        	    [[_state following] addObject:FOLLOW_declaration_in_program43];
         	    [self declaration];
         	    [[_state following] removeLastObject];
 
@@ -269,7 +269,7 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleCTP.gtp:13:9: variable // alt
         	    {
-        	    [[_state following] addObject:FOLLOW_variable_in_declaration58];
+        	    [[_state following] addObject:FOLLOW_variable_in_declaration63];
         	    [self variable];
         	    [[_state following] removeLastObject];
 
@@ -280,10 +280,10 @@ static NSArray *tokenNames;
         	case 2 :
         	    // SimpleCTP.gtp:14:9: ^( FUNC_DECL functionHeader ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTP_FUNC_DECL follow:FOLLOW_SimpleCTP_FUNC_DECL_in_declaration69]; 
+        	    [self match:input tokenType:SimpleCTP_FUNC_DECL follow:FOLLOW_SimpleCTP_FUNC_DECL_in_declaration74]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [[_state following] addObject:FOLLOW_functionHeader_in_declaration71];
+        	    [[_state following] addObject:FOLLOW_functionHeader_in_declaration76];
         	    [self functionHeader];
         	    [[_state following] removeLastObject];
 
@@ -296,15 +296,15 @@ static NSArray *tokenNames;
         	case 3 :
         	    // SimpleCTP.gtp:15:9: ^( FUNC_DEF functionHeader block ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTP_FUNC_DEF follow:FOLLOW_SimpleCTP_FUNC_DEF_in_declaration83]; 
+        	    [self match:input tokenType:SimpleCTP_FUNC_DEF follow:FOLLOW_SimpleCTP_FUNC_DEF_in_declaration88]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [[_state following] addObject:FOLLOW_functionHeader_in_declaration85];
+        	    [[_state following] addObject:FOLLOW_functionHeader_in_declaration90];
         	    [self functionHeader];
         	    [[_state following] removeLastObject];
 
 
-        	    [[_state following] addObject:FOLLOW_block_in_declaration87];
+        	    [[_state following] addObject:FOLLOW_block_in_declaration92];
         	    [self block];
         	    [[_state following] removeLastObject];
 
@@ -338,15 +338,15 @@ static NSArray *tokenNames;
         // SimpleCTP.gtp:19:5: ( ^( VAR_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:19:9: ^( VAR_DEF type declarator ) // alt
         {
-        [self match:input tokenType:SimpleCTP_VAR_DEF follow:FOLLOW_SimpleCTP_VAR_DEF_in_variable108]; 
+        [self match:input tokenType:SimpleCTP_VAR_DEF follow:FOLLOW_SimpleCTP_VAR_DEF_in_variable113]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        [[_state following] addObject:FOLLOW_type_in_variable110];
+        [[_state following] addObject:FOLLOW_type_in_variable115];
         [self type];
         [[_state following] removeLastObject];
 
 
-        [[_state following] addObject:FOLLOW_declarator_in_variable112];
+        [[_state following] addObject:FOLLOW_declarator_in_variable117];
         [self declarator];
         [[_state following] removeLastObject];
 
@@ -378,7 +378,7 @@ static NSArray *tokenNames;
         // SimpleCTP.gtp:23:5: ( ID ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:23:9: ID // alt
         {
-        [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_declarator132]; 
+        [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_declarator137]; 
 
         }
 
@@ -404,15 +404,15 @@ static NSArray *tokenNames;
         // SimpleCTP.gtp:27:5: ( ^( FUNC_HDR type ID ( formalParameter )+ ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:27:9: ^( FUNC_HDR type ID ( formalParameter )+ ) // alt
         {
-        [self match:input tokenType:SimpleCTP_FUNC_HDR follow:FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader153]; 
+        [self match:input tokenType:SimpleCTP_FUNC_HDR follow:FOLLOW_SimpleCTP_FUNC_HDR_in_functionHeader158]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        [[_state following] addObject:FOLLOW_type_in_functionHeader155];
+        [[_state following] addObject:FOLLOW_type_in_functionHeader160];
         [self type];
         [[_state following] removeLastObject];
 
 
-        [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_functionHeader157]; 
+        [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_functionHeader162]; 
         // SimpleCTP.gtp:27:28: ( formalParameter )+	// positiveClosureBlock
         int cnt3=0;
 
@@ -429,7 +429,7 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleCTP.gtp:27:28: formalParameter // alt
         	    {
-        	    [[_state following] addObject:FOLLOW_formalParameter_in_functionHeader159];
+        	    [[_state following] addObject:FOLLOW_formalParameter_in_functionHeader164];
         	    [self formalParameter];
         	    [[_state following] removeLastObject];
 
@@ -473,15 +473,15 @@ static NSArray *tokenNames;
         // SimpleCTP.gtp:31:5: ( ^( ARG_DEF type declarator ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:31:9: ^( ARG_DEF type declarator ) // alt
         {
-        [self match:input tokenType:SimpleCTP_ARG_DEF follow:FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter181]; 
+        [self match:input tokenType:SimpleCTP_ARG_DEF follow:FOLLOW_SimpleCTP_ARG_DEF_in_formalParameter186]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        [[_state following] addObject:FOLLOW_type_in_formalParameter183];
+        [[_state following] addObject:FOLLOW_type_in_formalParameter188];
         [self type];
         [[_state following] removeLastObject];
 
 
-        [[_state following] addObject:FOLLOW_declarator_in_formalParameter185];
+        [[_state following] addObject:FOLLOW_declarator_in_formalParameter190];
         [self declarator];
         [[_state following] removeLastObject];
 
@@ -546,7 +546,7 @@ static NSArray *tokenNames;
         // SimpleCTP.gtp:42:5: ( ^( BLOCK ( variable )* ( stat )* ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:42:9: ^( BLOCK ( variable )* ( stat )* ) // alt
         {
-        [self match:input tokenType:SimpleCTP_BLOCK follow:FOLLOW_SimpleCTP_BLOCK_in_block268]; 
+        [self match:input tokenType:SimpleCTP_BLOCK follow:FOLLOW_SimpleCTP_BLOCK_in_block273]; 
 
         if ( [input LA:1] == ANTLRTokenTypeDOWN ) {
             [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
@@ -563,7 +563,7 @@ static NSArray *tokenNames;
             	case 1 :
             	    // SimpleCTP.gtp:42:17: variable // alt
             	    {
-            	    [[_state following] addObject:FOLLOW_variable_in_block270];
+            	    [[_state following] addObject:FOLLOW_variable_in_block275];
             	    [self variable];
             	    [[_state following] removeLastObject];
 
@@ -590,7 +590,7 @@ static NSArray *tokenNames;
             	case 1 :
             	    // SimpleCTP.gtp:42:27: stat // alt
             	    {
-            	    [[_state following] addObject:FOLLOW_stat_in_block273];
+            	    [[_state following] addObject:FOLLOW_stat_in_block278];
             	    [self stat];
             	    [[_state following] removeLastObject];
 
@@ -656,7 +656,7 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleCTP.gtp:45:7: forStat // alt
         	    {
-        	    [[_state following] addObject:FOLLOW_forStat_in_stat287];
+        	    [[_state following] addObject:FOLLOW_forStat_in_stat292];
         	    [self forStat];
         	    [[_state following] removeLastObject];
 
@@ -667,7 +667,7 @@ static NSArray *tokenNames;
         	case 2 :
         	    // SimpleCTP.gtp:46:7: expr // alt
         	    {
-        	    [[_state following] addObject:FOLLOW_expr_in_stat295];
+        	    [[_state following] addObject:FOLLOW_expr_in_stat300];
         	    [self expr];
         	    [[_state following] removeLastObject];
 
@@ -678,7 +678,7 @@ static NSArray *tokenNames;
         	case 3 :
         	    // SimpleCTP.gtp:47:7: block // alt
         	    {
-        	    [[_state following] addObject:FOLLOW_block_in_stat303];
+        	    [[_state following] addObject:FOLLOW_block_in_stat308];
         	    [self block];
         	    [[_state following] removeLastObject];
 
@@ -710,25 +710,25 @@ static NSArray *tokenNames;
         // SimpleCTP.gtp:51:5: ( ^( 'for' expr expr expr block ) ) // ruleBlockSingleAlt
         // SimpleCTP.gtp:51:9: ^( 'for' expr expr expr block ) // alt
         {
-        [self match:input tokenType:SimpleCTP_FOR follow:FOLLOW_SimpleCTP_FOR_in_forStat323]; 
+        [self match:input tokenType:SimpleCTP_FOR follow:FOLLOW_SimpleCTP_FOR_in_forStat328]; 
 
         [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        [[_state following] addObject:FOLLOW_expr_in_forStat325];
+        [[_state following] addObject:FOLLOW_expr_in_forStat330];
         [self expr];
         [[_state following] removeLastObject];
 
 
-        [[_state following] addObject:FOLLOW_expr_in_forStat327];
+        [[_state following] addObject:FOLLOW_expr_in_forStat332];
         [self expr];
         [[_state following] removeLastObject];
 
 
-        [[_state following] addObject:FOLLOW_expr_in_forStat329];
+        [[_state following] addObject:FOLLOW_expr_in_forStat334];
         [self expr];
         [[_state following] removeLastObject];
 
 
-        [[_state following] addObject:FOLLOW_block_in_forStat331];
+        [[_state following] addObject:FOLLOW_block_in_forStat336];
         [self block];
         [[_state following] removeLastObject];
 
@@ -759,7 +759,7 @@ static NSArray *tokenNames;
     SimpleCTP_expr_return * _retval = [[[SimpleCTP_expr_return alloc] init] autorelease];
     [_retval setStart:[input LT:1]];
 
-    id _ID1 = nil;
+    ANTLRCommonTree * _ID1 = nil;
     SimpleCTP_expr_return * _e = nil;
 
 
@@ -793,15 +793,15 @@ static NSArray *tokenNames;
         	case 1 :
         	    // SimpleCTP.gtp:54:9: ^( EQEQ expr expr ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTP_EQEQ follow:FOLLOW_SimpleCTP_EQEQ_in_expr347]; 
+        	    [self match:input tokenType:SimpleCTP_EQEQ follow:FOLLOW_SimpleCTP_EQEQ_in_expr352]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [[_state following] addObject:FOLLOW_expr_in_expr349];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr354];
         	    [self expr];
         	    [[_state following] removeLastObject];
 
 
-        	    [[_state following] addObject:FOLLOW_expr_in_expr351];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr356];
         	    [self expr];
         	    [[_state following] removeLastObject];
 
@@ -814,15 +814,15 @@ static NSArray *tokenNames;
         	case 2 :
         	    // SimpleCTP.gtp:55:9: ^( LT expr expr ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTP_LT follow:FOLLOW_SimpleCTP_LT_in_expr363]; 
+        	    [self match:input tokenType:SimpleCTP_LT follow:FOLLOW_SimpleCTP_LT_in_expr368]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [[_state following] addObject:FOLLOW_expr_in_expr365];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr370];
         	    [self expr];
         	    [[_state following] removeLastObject];
 
 
-        	    [[_state following] addObject:FOLLOW_expr_in_expr367];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr372];
         	    [self expr];
         	    [[_state following] removeLastObject];
 
@@ -835,15 +835,15 @@ static NSArray *tokenNames;
         	case 3 :
         	    // SimpleCTP.gtp:56:9: ^( PLUS expr expr ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTP_PLUS follow:FOLLOW_SimpleCTP_PLUS_in_expr379]; 
+        	    [self match:input tokenType:SimpleCTP_PLUS follow:FOLLOW_SimpleCTP_PLUS_in_expr384]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    [[_state following] addObject:FOLLOW_expr_in_expr381];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr386];
         	    [self expr];
         	    [[_state following] removeLastObject];
 
 
-        	    [[_state following] addObject:FOLLOW_expr_in_expr383];
+        	    [[_state following] addObject:FOLLOW_expr_in_expr388];
         	    [self expr];
         	    [[_state following] removeLastObject];
 
@@ -856,26 +856,27 @@ static NSArray *tokenNames;
         	case 4 :
         	    // SimpleCTP.gtp:57:9: ^( EQ ID e= expr ) // alt
         	    {
-        	    [self match:input tokenType:SimpleCTP_EQ follow:FOLLOW_SimpleCTP_EQ_in_expr395]; 
+        	    [self match:input tokenType:SimpleCTP_EQ follow:FOLLOW_SimpleCTP_EQ_in_expr400]; 
 
         	    [self match:input tokenType:ANTLRTokenTypeDOWN follow:nil]; 
-        	    _ID1=(id)[input LT:1];
-        	    [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_expr397]; 
-        	    [[_state following] addObject:FOLLOW_expr_in_expr401];
+        	    _ID1=(ANTLRCommonTree *)[input LT:1];
+        	    [self match:input tokenType:SimpleCTP_ID follow:FOLLOW_SimpleCTP_ID_in_expr402]; 
+        	    [[_state following] addObject:FOLLOW_expr_in_expr406];
         	    _e = [self expr];
         	    [[_state following] removeLastObject];
 
 
 
         	    [self match:input tokenType:ANTLRTokenTypeUP follow:nil]; 
-        	     NSLog(@"assigning %@ to variable %@", [[input treeAdaptor] textForNode:[_e start]], [_ID1 text]); 
+        	     NSLog(@"assigning %@ to variable %@", //[input textForNode:[_e start]]
+        	    [input substringWithRange:NSMakeRange([_e start], [_e stop]-[_e start])], [_ID1 text]); 
 
         	    }
         	    break;
         	case 5 :
         	    // SimpleCTP.gtp:58:9: atom // alt
         	    {
-        	    [[_state following] addObject:FOLLOW_atom_in_expr414];
+        	    [[_state following] addObject:FOLLOW_atom_in_expr419];
         	    [self atom];
         	    [[_state following] removeLastObject];
 

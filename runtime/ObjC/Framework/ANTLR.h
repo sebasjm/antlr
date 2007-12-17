@@ -54,6 +54,7 @@
 #import <ANTLR/ANTLRCommonTreeAdaptor.h>
 #import <ANTLR/ANTLRTreeNodeStream.h>
 #import <ANTLR/ANTLRUnbufferedCommonTreeNodeStream.h>
+#import <ANTLR/ANTLRUnbufferedCommonTreeNodeStreamState.h>
 
 #import <ANTLR/ANTLRRewriteRuleSubtreeStream.h>
 #import <ANTLR/ANTLRRewriteRuleTokenStream.h>
