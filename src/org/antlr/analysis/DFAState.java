@@ -320,8 +320,9 @@ public class DFAState extends State {
 			if ( !Label.intersect(label, rl) ) {
                 continue;
             }
+			//System.out.println(label+" collides with "+rl);
 
-            // For any (s_i, t) with s_i&t!=nil replace with (s_i-t, s_i&t)
+			// For any (s_i, t) with s_i&t!=nil replace with (s_i-t, s_i&t)
             // (ignoring s_i-t if nil; don't put in list)
 
             // Replace existing s_i with intersection since we

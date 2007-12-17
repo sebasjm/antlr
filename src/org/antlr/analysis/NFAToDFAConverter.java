@@ -206,6 +206,7 @@ public class NFAToDFAConverter {
 		//System.out.println("work on DFA state "+d);
 		OrderedHashSet labels = d.getReachableLabels();
 		//System.out.println("reachable labels="+labels.toString());
+
 		/*
 		System.out.println("|reachable|/|nfaconfigs|="+
 				labels.size()+"/"+d.getNFAConfigurations().size()+"="+
@@ -607,7 +608,6 @@ public class NFAToDFAConverter {
 
 		/* NOTE SURE WE NEED THIS FAILSAFE NOW 11/8/2006 and it complicates
 		   MY ALGORITHM TO HAVE TO ABORT ENTIRE DFA CONVERSION
-		   */
 		if ( DFA.MAX_TIME_PER_DFA_CREATION>0 &&
 			 System.currentTimeMillis() - d.dfa.conversionStartTime >=
 			 DFA.MAX_TIME_PER_DFA_CREATION )
@@ -615,6 +615,7 @@ public class NFAToDFAConverter {
 			// bail way out; we've blown up somehow
 			throw new AnalysisTimeoutException(d.dfa);
 		}
+		   */
 
 		NFAConfiguration proposedNFAConfiguration =
 				new NFAConfiguration(p.stateNumber,
@@ -861,24 +862,15 @@ public class NFAToDFAConverter {
 	public DFAState reach(DFAState d, Label label) {
 		//System.out.println("reach "+label.toString(dfa.nfa.grammar));
 		DFAState labelDFATarget = dfa.newState();
-/*
-		// TODO: Don't walk all configs; walk only those we know
-		// have label emanating (could be set, ...)
-		Set<NFAState> statesWithEdge =
-			dfa.nfa.grammar.composite.getStatesWithEdge(label);
-		if ( statesWithEdge == null ) {
-			System.out.println("no edges found for "+label);
-			return null;
-		}
-*/
 
 		// for each NFA state in d with a labeled edge,
 		// add in target states for label
 		//System.out.println("size(d.state="+d.stateNumber+")="+d.nfaConfigurations.size());
 		//System.out.println("size(labeled edge states)="+d.configurationsWithLabeledEdges.size());
-		int numConfigsWithLabeledEdges = d.configurationsWithLabeledEdges.size();
-		for (int i = 0; i < numConfigsWithLabeledEdges; i++) {
-			NFAConfiguration c = d.configurationsWithLabeledEdges.get(i);
+		List<NFAConfiguration> configs = d.configurationsWithLabeledEdges;
+		int numConfigs = configs.size();
+		for (int i = 0; i < numConfigs; i++) {
+			NFAConfiguration c = configs.get(i);
 			if ( c.resolved || c.resolveWithPredicate ) {
 				continue; // the conflict resolver indicates we must leave alone
 			}
