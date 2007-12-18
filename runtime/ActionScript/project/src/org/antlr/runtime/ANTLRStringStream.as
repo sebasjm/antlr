@@ -74,19 +74,13 @@ package org.antlr.runtime {
 		}
 	
 	    public function consume():void {
-			//System.out.println("prev p="+p+", c="+(char)data[p]);
 	        if ( p < n ) {
 				_charPositionInLine++;
 				if ( data.charAt(p)=='\n' ) {
-					/*
-					System.out.println("newline char found on line: "+line+
-									   "@ pos="+charPositionInLine);
-					*/
 					_line++;
 					_charPositionInLine=0;
 				}
 	            p++;
-				//System.out.println("p moves to "+p+" (c='"+(char)data[p]+"')");
 	        }
 	    }
 	
@@ -102,12 +96,8 @@ package org.antlr.runtime {
 			}
 	
 			if ( (p+i-1) >= n ) {
-	            //System.out.println("char LA("+i+")=EOF; p="+p);
 	            return CharStreamConstants.EOF;
 	        }
-	        //System.out.println("char LA("+i+")="+(char)data[p+i-1]+"; p="+p);
-			//System.out.println("LA("+i+"); p="+p+" n="+n+" data.length="+data.length);
-			// GMS changed to charCodeAt from char[] index.
 			return data.charCodeAt(p+i-1);
 	    }
 	
