@@ -25,8 +25,37 @@ package org.antlr.runtime {
 		/** Which recognizer encloses this DFA?  Needed to check backtracking */
 		protected var recognizer:BaseRecognizer;
 	
+		private var _description:String;
+		
 		public static const debug:Boolean = false;
 	
+		public function DFA(recognizer:BaseRecognizer, decisionNumber:int, description:String,
+							eotS:String, eofS:String, minS:String, maxS:String, acceptS:String, specialS:String, transitionS:Array,
+							specialStateTransitionFunction:Function = null, errorFunction:Function = null) {
+			this.recognizer = recognizer;
+			this.decisionNumber = decisionNumber;
+			this._description = description;
+			
+			eot = unpackEncodedString(eotS);
+			eof = unpackEncodedString(eofS);
+			min = unpackEncodedString(minS);
+			max = unpackEncodedString(maxS);
+			accept = unpackEncodedString(acceptS);
+			special = unpackEncodedString(specialS);
+			
+			transition = new Array(transitionS.length);
+			for (var i:int = 0; i < transitionS.length; i++) {
+				transition[i] = unpackEncodedString(transitionS[i]);
+			}
+			if (specialStateTransitionFunction != null) {
+				specialStateTransition = specialStateTransitionFunction;
+			}
+			
+			if (errorFunction != null) {
+				error = errorFunction;
+			}
+						
+		}
 		/** From the input stream, predict what alternative will succeed
 		 *  using this DFA (representing the covering regular approximation
 		 *  to the underlying CFL).  Return an alternative number 1..n.  Throw
@@ -116,7 +145,7 @@ package org.antlr.runtime {
 				return;
 			}
 			var nvae:NoViableAltException =
-				new NoViableAltException(getDescription(),
+				new NoViableAltException(description,
 										 decisionNumber,
 										 s,
 										 input);
@@ -125,14 +154,14 @@ package org.antlr.runtime {
 		}
 	
 		/** A hook for debugging interface */
-		protected function error(nvae:NoViableAltException):void { ; }
+		public var error:Function = function(nvae:NoViableAltException):void { ; }
 	
-		public function specialStateTransition(s:int, input:IntStream):int {
+		public var specialStateTransition:Function = function(s:int, input:IntStream):int {
 			return -1;
 		}
 	
-		public function getDescription():String {
-			return "n/a";
+		public function get description():String {
+			return _description;	
 		}
 	
 		/** Given a String that has a run-length-encoding of some unsigned shorts
@@ -140,29 +169,23 @@ package org.antlr.runtime {
 		 *  static short[] which generates so much init code that the class won't
 		 *  compile. :(
 		 */
-		public static function unpackEncodedString(encodedString:Array):Array {
+		public static function unpackEncodedString(encodedString:String):Array {
 			// walk first to find how big it is.
 			var size:int = 0;
-			for (var i:int=0; i<encodedString.length(); i+=2) {
-				size += encodedString.charAt(i);
+			for (var i:int=0; i<encodedString.length; i+=2) {
+				size += encodedString.charCodeAt(i);
 			}
 			var data:Array = new Array(size);
 			var di:int = 0;
-			for (i=0; i<encodedString.length(); i+=2) {
-				var n:int = encodedString.charAt(i);
-				var v:int = encodedString.charAt(i+1);
+			for (i=0; i<encodedString.length; i+=2) {
+				var n:int = encodedString.charCodeAt(i);
+				var v:int = encodedString.charCodeAt(i+1);
 				// add v n times to data
 				for (var j:int=1; j<=n; j++) {
 					data[di++] = v;
 				}
 			}
 			return data;
-		}
-	
-		/** Hideous duplication of code, but I need different typed arrays out :( */
-		public static function unpackEncodedStringToUnsignedChars(encodedString:Array):Array {
-			// GMS - just call the other function since we don't have a separate char data type.
-			return unpackEncodedString(encodedString);
 		}
 	
 		public function specialTransition(state:int, symbol:int):int {

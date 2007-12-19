@@ -120,13 +120,13 @@ package org.antlr.runtime {
 		public function mark():int {
 	        if ( markers==null ) {
 	            markers = new Array();
-	            markers.add(null); // depth 0 means no backtracking, leave blank
+	            markers.push(null); // depth 0 means no backtracking, leave blank
 	        }
 	        markDepth++;
 			var state:CharStreamState = null;
-			if ( markDepth>=markers.size() ) {
+			if ( markDepth>=markers.length ) {
 				state = new CharStreamState();
-				markers.add(state);
+				markers.push(state);
 			}
 			else {
 				state = CharStreamState(markers[markDepth]);
