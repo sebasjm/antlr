@@ -1326,6 +1326,7 @@ As a result, alternative(s) 2 were disabled for that input
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
+			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 		NonRegularDecisionMessage msg = getNonRegularDecisionMessage(equeue.errors);
@@ -1346,10 +1347,11 @@ As a result, alternative(s) 2 were disabled for that input
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
+			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 		RecursionOverflowMessage msg = getRecursionOverflowMessage(equeue.errors);
-		assertTrue("expected recursion overflow msg", msg!=null);
+		assertTrue("missing expected recursion overflow msg"+msg, msg!=null);
 		assertEquals("target rules mismatch",
 					 expectedTargetRules.toString(), msg.targetRules.toString());
 		assertEquals("mismatched alt", expectedAlt, msg.alt);
@@ -1372,6 +1374,7 @@ As a result, alternative(s) 2 were disabled for that input
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
+			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
@@ -1400,7 +1403,8 @@ As a result, alternative(s) 2 were disabled for that input
 			assertEquals("unreachable alts mismatch", s, s2);
 		}
 		else {
-			assertEquals("number of unreachable alts", 0, unreachableAlts.size());
+			assertEquals("number of unreachable alts", 0,
+						 unreachableAlts!=null?unreachableAlts.size():0);
 		}
 
 		// check conflicting input

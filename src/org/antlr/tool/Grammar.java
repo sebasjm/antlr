@@ -27,13 +27,13 @@
 */
 package org.antlr.tool;
 
+import org.antlr.misc.*;
+import org.antlr.misc.Utils;
 import antlr.*;
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.misc.*;
-import org.antlr.misc.Utils;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 
@@ -42,6 +42,13 @@ import java.util.*;
 
 /** Represents a grammar in memory. */
 public class Grammar {
+	/**	0	if we hit end of rule and invoker should keep going (epsilon) */
+	public static final int DETECT_PRED_EOR = 0;
+	/**	1	if we found a nonautobacktracking pred */
+	public static final int DETECT_PRED_FOUND = 1;
+	/**	2	if we didn't find such a pred */
+	public static final int DETECT_PRED_NOT_FOUND = 2;
+
 	public static final String SYNPRED_RULE_PREFIX = "synpred";
 
 	public static final String GRAMMAR_FILE_EXTENSION = ".g";
@@ -120,6 +127,9 @@ public class Grammar {
 	 */
 	protected TokenStreamRewriteEngine tokenBuffer;
 	public static final String IGNORE_STRING_IN_GRAMMAR_FILE_NAME = "__";
+
+	public Map<NFAState, LookaheadSet> FIRSTCache = new HashMap<NFAState, LookaheadSet>();
+	public Map<Rule, LookaheadSet> FOLLOWCache = new HashMap<Rule, LookaheadSet>();
 
 	public static class Decision {
 		public int decision;
@@ -322,7 +332,7 @@ public class Grammar {
 	NameSpaceChecker nameSpaceChecker = new NameSpaceChecker(this);
 
 	/** Used during LOOK to detect computation cycles */
-	protected Set lookBusy = new HashSet();
+	protected Set<NFAState> lookBusy = new HashSet<NFAState>();
 
 	protected boolean watchNFAConversion = false;
 
@@ -766,7 +776,16 @@ public class Grammar {
 	public void createLookaheadDFAs(boolean wackTempStructures) {
 		if ( nfa==null ) {
 			createNFAs();
+			// CHECK FOR LEFT RECURSION; Make sure we can actually do analysis
+			checkAllRulesForLeftRecursion();
 		}
+
+		/*
+		// was there a severe problem while sniffing the grammar?
+		if ( ErrorManager.doNotAttemptAnalysis() ) {
+			return;
+		}
+		*/
 
 		long start = System.currentTimeMillis();
 
@@ -776,7 +795,20 @@ public class Grammar {
 			for (int decision=1; decision<=numDecisions; decision++) {
 				NFAState decisionStartState = getDecisionNFAStartState(decision);
 				if ( !externalAnalysisAbort && decisionStartState.getNumberOfTransitions()>1 ) {
-					createLookaheadDFA(decision, wackTempStructures);
+					Rule r = decisionStartState.enclosingRule;
+					if ( r.isSynPred && !synPredNamesUsedInDFA.contains(r.name) ) {
+						continue;
+					}
+					DFA dfa = createLL_1_LookaheadDFA(decision);
+					if ( dfa==null ) {
+						createLookaheadDFA(decision, wackTempStructures);
+					}
+					if ( Tool.internalOption_PrintDFA ) {
+						System.out.println("DFA d="+decisionNumber);
+						FASerializer serializer = new FASerializer(nfa.grammar);
+						String result = serializer.serialize(dfa.startState);
+						System.out.println(result);
+					}
 				}
 			}
 		}
@@ -811,15 +843,155 @@ public class Grammar {
 		allDecisionDFACreated = true;
 	}
 
+	public DFA createLL_1_LookaheadDFA(int decision) {
+		Decision d = getDecision(decision);
+		String enclosingRule = d.startState.enclosingRule.name;
+		Rule r = d.startState.enclosingRule;
+
+		if ( r.isSynPred && !synPredNamesUsedInDFA.contains(enclosingRule) ) {
+			return null;
+		}
+		NFAState decisionStartState = getDecisionNFAStartState(decision);
+
+		// compute lookahead for each alt
+		int numAlts = getNumberOfAltsForDecisionNFA(decisionStartState);
+		LookaheadSet[] altLook = new LookaheadSet[numAlts+1];
+		for (int alt = 1; alt <= numAlts; alt++) {
+			int walkAlt =
+				decisionStartState.translateDisplayAltToWalkAlt(alt);
+			NFAState altLeftEdge = getNFAStateForAltOfDecision(decisionStartState, walkAlt);
+			NFAState altStartState = (NFAState)altLeftEdge.transition[0].target;
+			//System.out.println("alt "+alt+" start state = "+altStartState.stateNumber);
+			altLook[alt] = LOOK(altStartState);
+			//System.out.println("alt "+alt+": "+altLook[alt].toString(this));
+		}
+
+		// compare alt i with alt j for disjointness
+		boolean decisionIsLL_1 = true;
+outer:
+		for (int i = 1; i <= numAlts; i++) {
+			for (int j = i+1; j <= numAlts; j++) {
+				/*
+				System.out.println("compare "+i+", "+j+": "+
+								   altLook[i].toString(this)+" with "+
+								   altLook[j].toString(this));
+				*/
+				LookaheadSet collision = altLook[i].intersection(altLook[j]);
+				if ( !collision.isNil() ) {
+					//System.out.println("collision (non-LL(1)): "+collision.toString(this));
+					decisionIsLL_1 = false;
+					break outer;
+				}
+			}
+		}
+
+		boolean foundConfoundingPredicate = 
+			detectNonAutobacktrackPredicates(decisionStartState);
+		if ( decisionIsLL_1 && !foundConfoundingPredicate ) {
+			// build an LL(1) optimized DFA with edge for each altLook[i]
+			if ( NFAToDFAConverter.debug ) {
+				System.out.println("decision "+decision+" is LL(1)");
+			}
+			DFA lookaheadDFA = new LL1DFA(decision, decisionStartState, altLook);
+			setLookaheadDFA(decision, lookaheadDFA);
+			return lookaheadDFA;
+		}
+
+		if ( getUserMaxLookahead(decision)!=1 ||
+			 !getAutoBacktrackMode(decision) ||
+			 foundConfoundingPredicate )
+		{
+			//System.out.println("trying LL(*)");
+			return null;
+		}
+
+		List<IntervalSet> edges = new ArrayList<IntervalSet>();
+		for (int i = 1; i < altLook.length; i++) {
+			LookaheadSet s = altLook[i];
+			edges.add((IntervalSet)s.tokenTypeSet);
+		}
+		List<IntervalSet> disjoint = makeEdgeSetsDisjoint(edges);
+		//System.out.println("disjoint="+disjoint);
+
+		MultiMap<IntervalSet, Integer> edgeMap = new MultiMap<IntervalSet, Integer>();
+		for (int i = 0; i < disjoint.size(); i++) {
+			IntervalSet ds = (IntervalSet) disjoint.get(i);
+			for (int alt = 1; alt < altLook.length; alt++) {
+				LookaheadSet look = altLook[alt];
+				if ( !ds.and(look.tokenTypeSet).isNil() ) {
+					edgeMap.map(ds, alt);
+				}
+			}
+		}
+		//System.out.println("edge map: "+edgeMap);
+
+		// TODO: how do we know we covered stuff?
+
+		// build an LL(1) optimized DFA with edge for each altLook[i]
+		DFA lookaheadDFA = new LL1DFA(decision, decisionStartState, edgeMap);
+		setLookaheadDFA(decision, lookaheadDFA);
+		return lookaheadDFA;
+	}
+
+	protected List<IntervalSet> makeEdgeSetsDisjoint(List<IntervalSet> edges) {
+		OrderedHashSet<IntervalSet> disjointSets = new OrderedHashSet<IntervalSet>();
+		// walk each incoming edge label/set and add to disjoint set
+		int numEdges = edges.size();
+		for (int e = 0; e < numEdges; e++) {
+			IntervalSet t = (IntervalSet) edges.get(e);
+			if ( disjointSets.contains(t) ) { // exact set present
+				continue;
+			}
+
+			// compare t with set i for disjointness
+			IntervalSet remainder = t; // remainder starts out as whole set to add
+			int numDisjointElements = disjointSets.size();
+			for (int i = 0; i < numDisjointElements; i++) {
+				IntervalSet s_i = (IntervalSet)disjointSets.get(i);
+
+				if ( t.and(s_i).isNil() ) { // nothing in common
+					continue;
+				}
+				//System.out.println(label+" collides with "+rl);
+
+				// For any (s_i, t) with s_i&t!=nil replace with (s_i-t, s_i&t)
+				// (ignoring s_i-t if nil; don't put in list)
+
+				// Replace existing s_i with intersection since we
+				// know that will always be a non nil character class
+				IntervalSet intersection = (IntervalSet)s_i.and(t);
+				disjointSets.set(i, intersection);
+
+				// Compute s_i-t to see what is in current set and not in incoming
+				IntSet existingMinusNewElements = s_i.subtract(t);
+				//System.out.println(s_i+"-"+t+"="+existingMinusNewElements);
+				if ( !existingMinusNewElements.isNil() ) {
+					// found a new character class, add to the end (doesn't affect
+					// outer loop duration due to n computation a priori.
+					disjointSets.add(existingMinusNewElements);
+				}
+
+				// anything left to add to the reachableLabels?
+				remainder = (IntervalSet)t.subtract(s_i);
+				if ( remainder.isNil() ) {
+					break; // nothing left to add to set.  done!
+				}
+
+				t = remainder;
+			}
+			if ( !remainder.isNil() ) {
+				disjointSets.add(remainder);
+			}
+		}
+		return disjointSets.elements();
+	}
+
 	public void createLookaheadDFA(int decision, boolean wackTempStructures) {
 		Decision d = getDecision(decision);
 		String enclosingRule = d.startState.enclosingRule.name;
 		Rule r = d.startState.enclosingRule;
 
 		//System.out.println("createLookaheadDFA(): "+enclosingRule+" dec "+decision+"; synprednames prev used "+synPredNamesUsedInDFA);
-		if ( r.isSynPred && !synPredNamesUsedInDFA.contains(enclosingRule) ) {
-			return;
-		}
 		NFAState decisionStartState = getDecisionNFAStartState(decision);
 		long startDFA=0,stopDFA=0;
 		if ( watchNFAConversion ) {
@@ -828,6 +1000,7 @@ public class Grammar {
 							   decisionStartState.getDescription());
 			startDFA = System.currentTimeMillis();
 		}
+
 		DFA lookaheadDFA = new DFA(decision, decisionStartState);
 		// Retry to create a simpler DFA if analysis failed (non-LL(*),
 		// recursion overflow, or time out).
@@ -1437,6 +1610,7 @@ public class Grammar {
 	}
 
 	public List checkAllRulesForLeftRecursion() {
+		System.out.println("checkAllRulesForLeftRecursion");
 		return sanity.checkAllRulesForLeftRecursion();
 	}
 
@@ -1891,6 +2065,37 @@ public class Grammar {
 		}
 		return value;
     }
+
+	public int getUserMaxLookahead(int decision) {
+		int user_k = 0;
+		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decision);
+		Object k = blockAST.getOption("k");
+		if ( k==null ) {
+			user_k = nfa.grammar.getGrammarMaxLookahead();
+			return user_k;
+		}
+		if (k instanceof Integer) {
+			Integer kI = (Integer)k;
+			user_k = kI.intValue();
+		}
+		else {
+			// must be String "*"
+			if ( k.equals("*") ) {
+				user_k = 0;
+			}
+		}
+		return user_k;
+	}
+
+	public boolean getAutoBacktrackMode(int decision) {
+		NFAState decisionNFAStartState = getDecisionNFAStartState(decision);
+		String autoBacktrack =
+			(String)decisionNFAStartState.getAssociatedASTNode().getOption("backtrack");
+		if ( autoBacktrack==null ) {
+			autoBacktrack = (String)nfa.grammar.getOption("backtrack");
+		}
+		return autoBacktrack!=null&&autoBacktrack.equals("true");
+	}
 
 	public boolean optionIsValid(String key, Object value) {
 		return true;
@@ -2361,11 +2566,30 @@ public class Grammar {
 		}
 		for (Iterator it = getRules().iterator(); it.hasNext();) {
 			Rule r = (Rule)it.next();
-			r.FIRST = LOOK(r.startState);
+			if ( r.isSynPred ) {
+				continue;
+			}
+			LookaheadSet s = FIRST(r);
+			System.out.println("FIRST("+r.name+")="+s);
+		}
+	}
+	*/
+
+	public void computeRuleFOLLOWSets() {
+		if ( getNumberOfDecisions()==0 ) {
+			createNFAs();
+		}
+		for (Iterator it = getRules().iterator(); it.hasNext();) {
+			Rule r = (Rule)it.next();
+			if ( r.isSynPred ) {
+				continue;
+			}
+			LookaheadSet s = FOLLOW(r);
+			System.out.println("FOLLOW("+r.name+")="+s);
 		}
 	}
 
-
+	/*
 	public Set<String> getOverriddenRulesWithDifferentFIRST() {
 		// walk every rule in this grammar and compare FIRST set with
 		// those in imported grammars.
@@ -2405,10 +2629,19 @@ public class Grammar {
 		return rules;
 	}
 */
+
+	/*
+	public LookaheadSet LOOK(Rule r) {
+		if ( r.FIRST==null ) {
+			r.FIRST = FIRST(r.startState);
+		}
+		return r.FIRST;
+	}
+*/
 	
 	/** From an NFA state, s, find the set of all labels reachable from s.
 	 *  Used to compute follow sets for error recovery.  Never computes
-	 *  a FOLLOW operation.  LOOK stops at end of rules, returning EOR, unless
+	 *  a FOLLOW operation.  FIRST stops at end of rules, returning EOR, unless
 	 *  invoked from another rule.  I.e., routine properly handles
 	 *
 	 *     a : b A ;
@@ -2422,18 +2655,58 @@ public class Grammar {
 	 *
 	 *  This routine will only be used on parser and tree parser grammars.
 	 */
-	public LookaheadSet LOOK(NFAState s) {
-		// System.out.println("> _LOOK("+s+") in rule "+s.getEnclosingRule());
+	public LookaheadSet FIRST(NFAState s) {
+		//System.out.println("> FIRST("+s+") in rule "+s.enclosingRule);
 		lookBusy.clear();
-		LookaheadSet look = _LOOK(s);
-		// System.out.println("< _LOOK("+s+") in rule "+s.getEnclosingRule()+"="+look.toString(this));
+		LookaheadSet look = _FIRST(s, false);
+		//System.out.println("< FIRST("+s+") in rule "+s.enclosingRule+"="+look.toString(this));
 		return look;
 	}
 
-	// TODO: use Rule.FIRST as a cache
-	protected LookaheadSet _LOOK(NFAState s) {
-		//System.out.println("_LOOK("+s+") in rule "+s.getEnclosingRule());		
-		if ( s.isAcceptState() ) {
+	public LookaheadSet FOLLOW(Rule r) {
+		LookaheadSet f = FOLLOWCache.get(r);
+		if ( f!=null ) {
+			return f;
+		}
+		f = _FIRST(r.stopState, true);
+		FOLLOWCache.put(r, f);
+		return f;
+	}
+
+	public LookaheadSet LOOK(NFAState s) {
+		//System.out.println("> LOOK("+s+")");
+		lookBusy.clear();
+		LookaheadSet look = _FIRST(s, true);
+		// FOLLOW makes no sense (at the moment!) for lexical rules.
+		if ( type!=LEXER && look.member(Label.EOR_TOKEN_TYPE) ) {
+			// avoid altering FIRST reset as it is cached
+			LookaheadSet f = FOLLOW(s.enclosingRule);
+			f.orInPlace(look);
+			f.remove(Label.EOR_TOKEN_TYPE);
+			look = f;
+			//look.orInPlace(FOLLOW(s.enclosingRule));
+		}
+		else if ( type==LEXER && look.member(Label.EOT) ) {
+			// if this has EOT, entire thing is EOT (all char can follow rule)
+			look = new LookaheadSet(Label.EOT);
+		}
+		//System.out.println("< LOOK("+s+")="+look.toString(this));
+		return look;
+	}
+
+	protected LookaheadSet _FIRST(NFAState s, boolean chaseFollowTransitions) {
+		//System.out.println("_LOOK("+s+") in rule "+s.enclosingRule);
+		/*
+		if ( s.transition[0] instanceof RuleClosureTransition ) {
+			System.out.println("go to rule "+((NFAState)s.transition[0].target).enclosingRule);
+		}
+		*/
+		if ( !chaseFollowTransitions && s.isAcceptState() ) {
+			if ( type==LEXER ) {
+				// FOLLOW makes no sense (at the moment!) for lexical rules.
+				// assume all char can follow
+				return new LookaheadSet(IntervalSet.COMPLETE_SET);
+			}
 			return new LookaheadSet(Label.EOR_TOKEN_TYPE);
 		}
 
@@ -2450,24 +2723,34 @@ public class Grammar {
 
 		if ( transition0.label.isAtom() ) {
 			int atom = transition0.label.getAtom();
-			if ( atom==Label.EOF ) {
-				return LookaheadSet.EOF();
-			}
 			return new LookaheadSet(atom);
 		}
 		if ( transition0.label.isSet() ) {
 			IntSet sl = transition0.label.getSet();
-			LookaheadSet laSet = new LookaheadSet(sl);
-			if ( laSet.member(Label.EOF) ) {
-				laSet.remove(Label.EOF);
-				laSet.hasEOF = true;
-			}
-			return laSet;
+			return new LookaheadSet(sl);
 		}
 
-        LookaheadSet tset = _LOOK((NFAState)transition0.target);
+		// compute FIRST of transition 0
+		LookaheadSet tset = null;
+		// if transition 0 is a rule call and we don't want FOLLOW, check cache
+		if ( !chaseFollowTransitions && transition0 instanceof RuleClosureTransition ) {
+			LookaheadSet prev = FIRSTCache.get((NFAState)transition0.target);
+			if ( prev!=null ) {
+				tset = prev;
+			}
+		}
 
-		if ( tset.member(Label.EOR_TOKEN_TYPE) ) {
+		// if not in cache, must compute
+		if ( tset==null ) {
+			tset = _FIRST((NFAState)transition0.target, chaseFollowTransitions);
+			// save FIRST cache for transition 0 if rule call
+			if ( !chaseFollowTransitions && transition0 instanceof RuleClosureTransition ) {
+				FIRSTCache.put((NFAState)transition0.target, tset);
+			}
+		}
+
+		// did we fall off the end?
+		if ( type!=LEXER && tset.member(Label.EOR_TOKEN_TYPE) ) {
 			if ( transition0 instanceof RuleClosureTransition ) {
 				// we called a rule that found the end of the rule.
 				// That means the rule is nullable and we need to
@@ -2477,20 +2760,103 @@ public class Grammar {
 				RuleClosureTransition ruleInvocationTrans =
 					(RuleClosureTransition)transition0;
 				// remove the EOR and get what follows
-				tset.remove(Label.EOR_TOKEN_TYPE);
+				//tset.remove(Label.EOR_TOKEN_TYPE);
 				NFAState following = (NFAState) ruleInvocationTrans.followState;
-				LookaheadSet fset =	_LOOK(following);
-				tset.orInPlace(fset);
+				LookaheadSet fset =	_FIRST(following, chaseFollowTransitions);
+				fset.orInPlace(tset); // tset cached; or into new set
+				fset.remove(Label.EOR_TOKEN_TYPE);
+				tset = fset;
 			}
 		}
 
 		Transition transition1 = s.transition[1];
 		if ( transition1!=null ) {
-			LookaheadSet tset1 = _LOOK((NFAState)transition1.target);
-			tset.orInPlace(tset1);
+			LookaheadSet tset1 =
+				_FIRST((NFAState)transition1.target, chaseFollowTransitions);
+			tset1.orInPlace(tset); // tset cached; or into new set
+			tset = tset1;
 		}
 
 		return tset;
+	}
+
+	public boolean detectNonAutobacktrackPredicates(NFAState s) {
+		lookBusy.clear();
+		return _detectNonAutobacktrackPredicates(s, false) == DETECT_PRED_FOUND;
+	}
+
+	protected int _detectNonAutobacktrackPredicates(NFAState s,
+													boolean chaseFollowTransitions)
+	{
+		//System.out.println("_detectNonAutobacktrackPredicates("+s+")");
+		if ( !chaseFollowTransitions && s.isAcceptState() ) {
+			if ( type==LEXER ) {
+				// FOLLOW makes no sense (at the moment!) for lexical rules.
+				// assume all char can follow
+				return DETECT_PRED_NOT_FOUND;
+			}
+			return DETECT_PRED_EOR;
+		}
+
+		if ( lookBusy.contains(s) ) {
+			// return a copy of an empty set; we may modify set inline
+			return DETECT_PRED_NOT_FOUND;
+		}
+		lookBusy.add(s);
+
+		Transition transition0 = s.transition[0];
+		if ( transition0==null ) {
+			return DETECT_PRED_NOT_FOUND;
+		}
+
+		if ( !(transition0.label.isSemanticPredicate()||
+			   transition0.label.isEpsilon()) ) {
+			return DETECT_PRED_NOT_FOUND;
+		}
+
+		if ( transition0.label.isSemanticPredicate() ) {
+			//System.out.println("pred "+transition0.label);
+			SemanticContext ctx = transition0.label.getSemanticContext();
+			SemanticContext.Predicate p = (SemanticContext.Predicate)ctx;
+			if ( p.predicateAST.getType() != ANTLRParser.BACKTRACK_SEMPRED ) {
+				return DETECT_PRED_FOUND;
+			}
+		}
+
+        int result = _detectNonAutobacktrackPredicates((NFAState)transition0.target,
+													   chaseFollowTransitions);
+		if ( result == DETECT_PRED_FOUND ) {
+			return DETECT_PRED_FOUND;
+		}
+
+		if ( result == DETECT_PRED_EOR ) {
+			if ( transition0 instanceof RuleClosureTransition ) {
+				// we called a rule that found the end of the rule.
+				// That means the rule is nullable and we need to
+				// keep looking at what follows the rule ref.  E.g.,
+				// a : b A ; where b is nullable means that LOOK(a)
+				// should include A.
+				RuleClosureTransition ruleInvocationTrans =
+					(RuleClosureTransition)transition0;
+				NFAState following = (NFAState) ruleInvocationTrans.followState;
+				int afterRuleResult =
+					_detectNonAutobacktrackPredicates(following, chaseFollowTransitions);
+				if ( afterRuleResult == DETECT_PRED_FOUND ) {
+					return DETECT_PRED_FOUND;
+				}
+			}
+		}
+
+		Transition transition1 = s.transition[1];
+		if ( transition1!=null ) {
+			int t1Result =
+				_detectNonAutobacktrackPredicates((NFAState)transition1.target, chaseFollowTransitions);
+			if ( t1Result == DETECT_PRED_FOUND ) {
+				return DETECT_PRED_FOUND;
+			}
+		}
+
+		return DETECT_PRED_NOT_FOUND;
 	}
 
     public void setCodeGenerator(CodeGenerator generator) {

@@ -272,7 +272,7 @@ As a result, tokens(s) <disabled; separator=","> were disabled for that input
 >>
 
 LEFT_RECURSION_CYCLES(listOfCycles) ::= <<
-The following sets of rules are mutually left-recursive <listOfCycles:{c| [<c:{r|<r>}; separator=", ">]}; separator=" and ">
+The following sets of rules are mutually left-recursive <listOfCycles:{c| [<c:{r|<r.name>}; separator=", ">]}; separator=" and ">
 >>
 
 NONREGULAR_DECISION(ruleName,alts) ::= <<

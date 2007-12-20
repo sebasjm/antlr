@@ -210,6 +210,7 @@ public class TestSemanticPredicates extends BaseTest {
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
+			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 
@@ -220,8 +221,8 @@ public class TestSemanticPredicates extends BaseTest {
 
 		assertEquals("unexpected number of expected problems", 1, equeue.size());
 		Message msg = (Message)equeue.warnings.get(0);
-		assertTrue("warning must be a recursion overflow msg",
-				    msg instanceof RecursionOverflowMessage);
+		assertTrue("warning must be a left recursion msg",
+				    msg instanceof LeftRecursionCyclesMessage);
 	}
 
 	public void testIgnorePredFromLL2AltLastAltIsDefaultTrue() throws Exception {
@@ -318,6 +319,7 @@ public class TestSemanticPredicates extends BaseTest {
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
+			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 
@@ -628,6 +630,7 @@ public class TestSemanticPredicates extends BaseTest {
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
+			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 
@@ -653,7 +656,8 @@ public class TestSemanticPredicates extends BaseTest {
 			assertEquals("unreachable alts mismatch", s, s2);
 		}
 		else {
-			assertEquals("unreachable alts mismatch", 0, unreachableAlts.size());
+			assertEquals("unreachable alts mismatch", 0,
+						 unreachableAlts!=null?unreachableAlts.size():0);
 		}
 
 		// check conflicting input

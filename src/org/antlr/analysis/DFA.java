@@ -27,10 +27,9 @@
 */
 package org.antlr.analysis;
 
-import org.antlr.Tool;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.misc.IntervalSet;
 import org.antlr.misc.IntSet;
+import org.antlr.misc.IntervalSet;
 import org.antlr.misc.Utils;
 import org.antlr.runtime.IntStream;
 import org.antlr.stringtemplate.StringTemplate;
@@ -213,6 +212,8 @@ public class DFA {
 	public Vector transitionEdgeTables; // not used by java yet
 	protected int uniqueCompressedSpecialStateNum = 0;
 
+	protected DFA() {;}
+
 	public DFA(int decisionNumber, NFAState decisionStartState) {
 		this.decisionNumber = decisionNumber;
         this.decisionNFAStartState = decisionStartState;
@@ -240,20 +241,15 @@ public class DFA {
 
 			//long stop = System.currentTimeMillis();
 			//System.out.println("verify cost: "+(int)(stop-start)+" ms");
-
-			if ( Tool.internalOption_PrintDFA ) {
-				System.out.println("DFA d="+decisionNumber);
-				FASerializer serializer = new FASerializer(nfa.grammar);
-				String result = serializer.serialize(startState);
-				System.out.println(result);
-			}
 		}
+		/*
 		catch (AnalysisRecursionOverflowException ovf) {
 			probe.reportRecursionOverflow(ovf.ovfState, ovf.proposedNFAConfiguration);
 			if ( !okToRetryDFAWithK1() ) {
 				probe.issueWarnings();
 			}
 		}
+		*/
 		catch (AnalysisTimeoutException at) {
 			probe.reportAnalysisTimeout();
 			if ( !okToRetryDFAWithK1() ) {
@@ -868,32 +864,12 @@ public class DFA {
 		if ( user_k>=0 ) { // cache for speed
 			return user_k;
 		}
-		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decisionNumber);
-		Object k = blockAST.getOption("k");
-		if ( k==null ) {
-			user_k = nfa.grammar.getGrammarMaxLookahead();
-			return user_k;
-		}
-		if (k instanceof Integer) {
-			Integer kI = (Integer)k;
-			user_k = kI.intValue();
-		}
-		else {
-			// must be String "*"
-			if ( k.equals("*") ) {
-				user_k = 0;
-			}
-		}
+		user_k = nfa.grammar.getUserMaxLookahead(decisionNumber);
 		return user_k;
 	}
 
 	public boolean getAutoBacktrackMode() {
-		String autoBacktrack =
-			(String)decisionNFAStartState.getAssociatedASTNode().getOption("backtrack");
-		if ( autoBacktrack==null ) {
-			autoBacktrack = (String)nfa.grammar.getOption("backtrack");
-		}
-		return autoBacktrack!=null&&autoBacktrack.equals("true");
+		return nfa.grammar.getAutoBacktrackMode(decisionNumber);
 	}
 
 	public void setUserMaxLookahead(int k) {

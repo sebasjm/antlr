@@ -161,7 +161,8 @@ public class NFAState extends State {
 	 *
 	 *  Return same alt if we can't translate.
 	 */
-	public int translateDisplayAltToWalkAlt(DFA dfa, int displayAlt) {
+	public int translateDisplayAltToWalkAlt(int displayAlt) {
+		NFAState nfaStart = this;
 		if ( decisionNumber==0 || decisionStateType==0 ) {
 			return displayAlt;
 		}
@@ -175,9 +176,8 @@ public class NFAState extends State {
 			ErrorManager.internalError("can't get DFA for decision "+decisionNumber);
 		}
 		*/
-		NFAState nfaStart = dfa.getNFADecisionStartState();
 		int nAlts = nfa.grammar.getNumberOfAltsForDecisionNFA(nfaStart);
-		switch ( decisionStateType ) {
+		switch ( nfaStart.decisionStateType ) {
 			case LOOPBACK :
 				walkAlt = displayAlt % nAlts + 1; // rotate right mod 1..3
 				break;

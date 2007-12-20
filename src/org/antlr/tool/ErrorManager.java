@@ -802,7 +802,8 @@ public class ErrorManager {
 	}
 
 	public static boolean doNotAttemptCodeGen() {
-		return !getErrorState().errorMsgIDs.and(ERRORS_FORCING_NO_CODEGEN).isNil();
+		return doNotAttemptAnalysis() ||
+			   !getErrorState().errorMsgIDs.and(ERRORS_FORCING_NO_CODEGEN).isNil();
 	}
 
 	/** Return first non ErrorManager code location for generating messages */

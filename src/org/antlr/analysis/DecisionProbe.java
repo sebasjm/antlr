@@ -300,6 +300,9 @@ public class DecisionProbe {
 		Set dfaStates = getDFAPathStatesToTarget(targetState);
 		statesVisitedDuringSampleSequence = new HashSet();
 		List labels = new ArrayList(); // may access ith element; use array
+		if ( dfa==null || dfa.startState==null ) {
+			return labels;
+		}
 		getSampleInputSequenceUsingStateSet(dfa.startState,
 											targetState,
 											dfaStates,
@@ -666,6 +669,7 @@ public class DecisionProbe {
 		}
 	}
 
+	// TODO: not used?
 	public void reportLeftRecursion(DFAState d,
 									NFAConfiguration leftRecursiveNFAConfiguration)
 	{
@@ -777,6 +781,9 @@ public class DecisionProbe {
 	protected Set getDFAPathStatesToTarget(DFAState targetState) {
 		Set dfaStates = new HashSet();
 		stateReachable = new HashMap();
+		if ( dfa==null || dfa.startState==null ) {
+			return dfaStates;
+		}
 		boolean reaches = reachesState(dfa.startState, targetState, dfaStates);
 		return dfaStates;
 	}
@@ -881,7 +888,7 @@ public class DecisionProbe {
 							   edgeTarget.stateNumber+" =="+
 							   label.toString(dfa.nfa.grammar)+"?");
 			*/
-			if ( t.label.isEpsilon() ) {
+			if ( t.label.isEpsilon() || t.label.isSemanticPredicate() ) {
 				// nondeterministically backtrack down epsilon edges
 				path.add(edgeTarget);
 				boolean found =

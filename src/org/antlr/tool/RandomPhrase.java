@@ -65,7 +65,7 @@ public class RandomPhrase {
 					// System.out.println("push state "+state);
 					//System.out.println("invoke "+g.getRuleName(ruleIndex));
 				}
-				else if ( !t0.label.isEpsilon() ) {
+				else if ( !t0.label.isEpsilon() || t0.label.isSemanticPredicate() ) {
 					tokenTypes.add( getTokenType(t0.label) );
 					//System.out.println(t0.label.toString(g));
 				}

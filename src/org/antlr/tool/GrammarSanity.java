@@ -109,7 +109,7 @@ public class GrammarSanity {
 				}
 			}
 		}
-		else if ( t0.label.isEpsilon() ) {
+		else if ( t0.label.isEpsilon() || t0.label.isSemanticPredicate() ) {
 			stateReachesAcceptState |=
 				traceStatesLookingForLeftRecursion((NFAState)t0.target, visitedStates, listOfRecursiveCycles);
 		}

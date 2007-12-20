@@ -97,8 +97,7 @@ public class GrammarNonDeterminismMessage extends Message {
 				Integer displayAltI = (Integer) iter.next();
 				if ( DecisionProbe.verbose ) {
 					int tracePathAlt =
-						nfaStart.translateDisplayAltToWalkAlt(probe.dfa,
-															  displayAltI.intValue());
+						nfaStart.translateDisplayAltToWalkAlt(displayAltI.intValue());
 					if ( firstAlt == 0 ) {
 						firstAlt = tracePathAlt;
 					}

@@ -62,6 +62,9 @@ public class FASerializer {
     }
 
 	public String serialize(State s) {
+		if ( s==null ) {
+			return "<no automaton>";
+		}
 		return serialize(s, true);
 	}
 

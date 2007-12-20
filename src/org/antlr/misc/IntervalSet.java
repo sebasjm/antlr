@@ -52,14 +52,6 @@ public class IntervalSet implements IntSet {
 	/** The list of sorted, disjoint intervals. */
     protected List<Interval> intervals;
 
-	/*
-	static Vector<List<Interval>> cache = new Vector<List<Interval>>();
-
-	static {
-		cache.setSize(Interval.INTERVAL_POOL_MAX_VALUE+Label.NUM_FAUX_LABELS);
-	}
-	*/
-
 	/** Create a set with no elements */
     public IntervalSet() {
         intervals = new ArrayList<Interval>(2); // most sets are 1 or 2 elements
@@ -71,21 +63,6 @@ public class IntervalSet implements IntSet {
 
 	/** Create a set with a single element, el. */
     public static IntervalSet of(int a) {
-		/* DOESN"T SEEM TO HELP
-		if ( a>Interval.INTERVAL_POOL_MAX_VALUE ) {
-			IntervalSet s = new IntervalSet();
-			s.add(a);
-			return s;
-		}
-		List<Interval> s = cache.elementAt(a+Label.NUM_FAUX_LABELS);
-		if ( s == null ) {
-			s = new ArrayList<Interval>(2);
-			Interval i = new Interval(a,a);
-			s.add(i);
-			cache.set(a+Label.NUM_FAUX_LABELS, s);
-		}
-		return new IntervalSet(s);
-        */
 		IntervalSet s = new IntervalSet();
         s.add(a);
         return s;
@@ -118,15 +95,6 @@ public class IntervalSet implements IntSet {
 
 	// copy on write so we can cache a..a intervals and sets of that
 	protected void add(Interval addition) {
-		/*
-		if ( this.size()==1 ) {
-			// copy on write
-			Interval firstInterval = this.intervals.get(0);
-			intervals = new ArrayList<Interval>(2);
-			intervals.add(firstInterval);
-		}
-		*/
-
 		//System.out.println("add "+addition+" to "+intervals.toString());
 		if ( addition.b<addition.a ) {
 			return;
@@ -417,8 +385,12 @@ public class IntervalSet implements IntSet {
 
     /** TODO: implement this! */
 	public IntSet or(IntSet a) {
-		throw new NoSuchMethodError();
-    }
+		IntervalSet o = new IntervalSet();
+		o.addAll(this);
+		o.addAll(a);
+		//throw new NoSuchMethodError();
+		return o;
+	}
 
     /** Return a new set with the intersection of this set with other.  Because
      *  the intervals are sorted, we can use an iterator for each list and
@@ -564,7 +536,7 @@ public class IntervalSet implements IntSet {
 	}
 
     /** Return a list of Interval objects. */
-    public List getIntervals() {
+    public List<Interval> getIntervals() {
         return intervals;
     }
 

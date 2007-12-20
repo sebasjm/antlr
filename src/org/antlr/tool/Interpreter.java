@@ -257,7 +257,7 @@ public class Interpreter implements TokenSource {
 				}
 				input.rewind(m);
 				int parseAlt =
-					s.translateDisplayAltToWalkAlt(dfa,predictedAlt);
+					s.translateDisplayAltToWalkAlt(predictedAlt);
 				/*
 				if ( grammar.type!=Grammar.LEXER ) {
 					System.out.println("predicted alt "+predictedAlt+", parseAlt "+

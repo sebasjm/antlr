@@ -59,6 +59,12 @@ public class Rule {
 
 	public GrammarAST EORNode;
 
+	/** The set of all tokens reachable from the start state w/o leaving
+	 *  via the accept state.  If it reaches the accept state, FIRST
+	 *  includes EOR_TOKEN_TYPE.
+	 */
+	public LookaheadSet FIRST;
+
 	/** The return values of a rule and predefined rule attributes */
 	public AttributeScope returnScope;
 

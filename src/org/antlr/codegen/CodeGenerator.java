@@ -289,14 +289,6 @@ public class CodeGenerator {
 			return null;
 		}
 
-		// CHECK FOR LEFT RECURSION; Make sure we can actually do analysis
-		grammar.checkAllRulesForLeftRecursion();
-
-		// was there a severe problem while reading in grammar?
-		if ( ErrorManager.doNotAttemptAnalysis() ) {
-			return null;
-		}
-
 		// CREATE NFA FROM GRAMMAR, CREATE DFA FROM NFA
 		target.performGrammarAnalysis(this, grammar);
 
@@ -571,7 +563,7 @@ public class CodeGenerator {
 		if ( followingNFAState!=null ) {
 			// compute follow for this element and, as side-effect, track
 			// the rule LOOK sensitivity.
-			follow = grammar.LOOK(followingNFAState);
+			follow = grammar.FIRST(followingNFAState);
 		}
 
 		if ( follow==null ) {

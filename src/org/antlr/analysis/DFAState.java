@@ -28,6 +28,7 @@
 package org.antlr.analysis;
 
 import org.antlr.misc.IntSet;
+import org.antlr.misc.MultiMap;
 import org.antlr.misc.OrderedHashSet;
 import org.antlr.misc.Utils;
 import org.antlr.tool.Grammar;
@@ -139,9 +140,6 @@ public class DFAState extends State {
 	public List<NFAConfiguration> configurationsWithLabeledEdges =
 		new ArrayList<NFAConfiguration>();
 
-	public List<NFAConfiguration> configurationsWithPredicateEdges =
-		new ArrayList<NFAConfiguration>();
-
 	/** Used to prevent the closure operation from looping to itself and
      *  hence looping forever.  Sensitive to the NFA state, the alt, and
      *  the context.  This just the nfa config set because we want to
@@ -158,7 +156,7 @@ public class DFAState extends State {
      *  times size(nfa states), which can be pretty damn big.  It's better
      *  to simply track possible labels.
      */
-    protected OrderedHashSet<Label> reachableLabels = new OrderedHashSet<Label>();
+    protected OrderedHashSet<Label> reachableLabels;
 
     public DFAState(DFA dfa) {
         this.dfa = dfa;
@@ -167,7 +165,6 @@ public class DFAState extends State {
 	public void reset() {
 		//nfaConfigurations = null; // getGatedPredicatesInNFAConfigurations needs
 		configurationsWithLabeledEdges = null;
-		configurationsWithPredicateEdges = null;
 		closureBusy = null;
 		reachableLabels = null;
 	}
@@ -188,7 +185,7 @@ public class DFAState extends State {
 	 *  the transition number from 0..n-1.
 	 */
     public int addTransition(DFAState target, Label label) {
-        transitions.add( new Transition(label, target) );
+		transitions.add( new Transition(label, target) );
 		return transitions.size()-1;
     }
 
@@ -231,7 +228,6 @@ public class DFAState extends State {
 
 		if ( c.semanticContext!=SemanticContext.EMPTY_SEMANTIC_CONTEXT ) {
 			atLeastOneConfigurationHasAPredicate = true;
-			configurationsWithPredicateEdges.add(c);
 		}
 
 		// update hashCode; for some reason using context.hashCode() also
@@ -298,11 +294,14 @@ public class DFAState extends State {
      *  Single element labels are treated as sets to make the code uniform.
      */
     protected void addReachableLabel(Label label) {
+		if ( reachableLabels==null ) {
+			reachableLabels = new OrderedHashSet<Label>();
+		}
 		/*
 		System.out.println("addReachableLabel to state "+dfa.decisionNumber+"."+stateNumber+": "+label.getSet().toString(dfa.nfa.grammar));
 		System.out.println("start of add to state "+dfa.decisionNumber+"."+stateNumber+": " +
 				"reachableLabels="+reachableLabels.toString());
-        */
+				*/
 		if ( reachableLabels.contains(label) ) { // exact label present
             return;
         }
@@ -382,7 +381,12 @@ public class DFAState extends State {
      *  when we compare DFA states.  Computed in addNFAConfiguration()
      */
     public int hashCode() {
-        return cachedHashCode;
+		if ( cachedHashCode==0 ) {
+			// LL(1) algorithm doesn't use NFA configurations, which
+			// dynamically compute hashcode; must have something; use super
+			return super.hashCode();
+		}
+		return cachedHashCode;
     }
 
     /** Two DFAStates are equal if their NFA configuration sets are the
@@ -400,8 +404,8 @@ public class DFAState extends State {
 		// compare set of NFA configurations in this set with other
         DFAState other = (DFAState)o;
 		return this.nfaConfigurations.equals(other.nfaConfigurations);
-/*
-        if ( o==null ) {
+		/*
+		if ( o==null ) {
             return false;
         }
         if ( this.hashCode()!=other.hashCode() ) {
@@ -414,17 +418,8 @@ public class DFAState extends State {
 
 		// compare set of NFA configurations in this set with other
 		return this.nfaConfigurations.equals(other.nfaConfigurations);
-		/*
-		Iterator iter = this.nfaConfigurations.iterator();
-        while (iter.hasNext()) {
-            NFAConfiguration myConfig = (NFAConfiguration) iter.next();
-			if ( !other.nfaConfigurations.contains(myConfig) ) {
-				return false;
-			}
-        }
-        return true;
-        */
-    }
+		*/
+	}
 
     /** Walk each configuration and if they are all the same alt, return
      *  that alt else return NFA.INVALID_ALT_NUMBER.  Ignore resolved
@@ -606,31 +601,35 @@ public class DFAState extends State {
 
 		// First get a list of configurations for each state.
 		// Most of the time, each state will have one associated configuration.
-		// 12/15/2006: Got another overall 25% time cost reduction from
+		/*
+		// 12/15/2007: Got another overall 25% time cost reduction from
 		// restricting this to configs with edges; all epsilon edges are
 		// derived from "real" configs.
-		Map stateToConfigListMap = new HashMap();
 		int numConfigsWithLabeledEdges = configurationsWithLabeledEdges.size();
 		for (int i = 0; i < numConfigsWithLabeledEdges; i++) {
 			NFAConfiguration configuration = configurationsWithLabeledEdges.get(i);
-/*
+		*/
+		MultiMap<Integer, NFAConfiguration> stateToConfigListMap =
+			new MultiMap<Integer, NFAConfiguration>();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
-*/
 			Integer stateI = Utils.integer(configuration.state);
+			stateToConfigListMap.map(stateI, configuration);
+			/*
 			List prevConfigs = (List)stateToConfigListMap.get(stateI);
 			if ( prevConfigs==null ) {
 				prevConfigs = new ArrayList();
 				stateToConfigListMap.put(stateI, prevConfigs);
 			}
 			prevConfigs.add(configuration);
+			*/
 		}
 		// potential conflicts are states with > 1 configuration and diff alts
 		Set states = stateToConfigListMap.keySet();
 		int numPotentialConflicts = 0;
 		for (Iterator it = states.iterator(); it.hasNext();) {
 			Integer stateI = (Integer) it.next();
-			boolean thisStateHasPotentialProblem = false;
+			//boolean thisStateHasPotentialProblem = false;
 			List configsForState = (List)stateToConfigListMap.get(stateI);
 			int alt=0;
 			int numConfigsForState = configsForState.size();
@@ -648,15 +647,22 @@ public class DFAState extends State {
 					// together in Tokens rule.  We want to silently resolve
 					// to the first token definition ala lex/flex by ignoring
 					// these conflicts.
+					// Also this ensures that lexers look for more and more
+					// characters (longest match) before resorting to predicates.
+					// TestSemanticPredicates.testLexerMatchesLongestThenTestPred()
+					// for example would termate at state s1 and test predicate
+					// meaning input "ab" would test preds to decide what to
+					// do but it should match rule C w/o testing preds.
 					if ( dfa.nfa.grammar.type!=Grammar.LEXER ||
 						 !dfa.decisionNFAStartState.enclosingRule.name.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) )
 					{
 						numPotentialConflicts++;
-						thisStateHasPotentialProblem = true;
+						// thisStateHasPotentialProblem = true;
 					}
 				}
 			}
-			if ( !thisStateHasPotentialProblem ) {
+			//if ( !thisStateHasPotentialProblem ) {
+			if ( numPotentialConflicts==0 ) {
 				// remove NFA state's configurations from
 				// further checking; no issues with it
 				// (can't remove as it's concurrent modification; set to null)
@@ -910,11 +916,10 @@ public class DFAState extends State {
         buf.append(stateNumber+":{");
 		for (int i = 0; i < nfaConfigurations.size(); i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
-			if ( i>1 ) {
+			if ( i>0 ) {
 				buf.append(", ");
 			}
 			buf.append(configuration);
-			i++;
 		}
 		/*
 		Iterator iter = nfaConfigurations.iterator();

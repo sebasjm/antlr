@@ -31,7 +31,6 @@ import org.antlr.analysis.*;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.runtime.misc.Stats;
 import org.antlr.tool.*;
-import org.antlr.misc.Interval;
 
 import java.io.*;
 import java.util.*;
@@ -277,12 +276,6 @@ public class Tool {
 					grammar.printGrammar(System.out);
 				}
 
-				if ( generate_NFA_dot ) {
-					generateNFAs(grammar);
-				}
-				if ( generate_DFA_dot ) {
-					generateDFAs(grammar);
-				}
 				if ( report ) {
 					GrammarReport report = new GrammarReport(grammar);
 					System.out.println(report.toString());
@@ -377,7 +370,14 @@ public class Tool {
 			generator.setDebug(debug);
 			generator.setProfile(profile);
 			generator.setTrace(trace);
+			// generate these early in case of crash later (for debugging)
+			if ( generate_NFA_dot ) {
+				generateNFAs(grammar);
+			}
 			generator.genRecognizer();
+			if ( generate_DFA_dot ) {
+				generateDFAs(grammar);
+			}
 			List<Grammar> delegates = grammar.getDelegates();
 			for (int i = 0; i < delegates.size(); i++) {
 				Grammar delegate = (Grammar)delegates.get(i);
@@ -409,6 +409,7 @@ public class Tool {
 	}
 
 	protected void generateNFAs(Grammar g) {
+		g.createNFAs();
 		DOTGenerator dotGenerator = new DOTGenerator(g);
 		Collection rules = g.getAllImportedRules();
 		rules.addAll(g.getRules());

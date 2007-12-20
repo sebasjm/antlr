@@ -159,7 +159,7 @@ public class NFAToDFAConverter {
 				 dfa.getNFADecisionStartState().decisionStateType==NFAState.LOOPBACK )
 			{
 				int numAltsIncludingExitBranch = dfa.nfa.grammar
-						.getNumberOfAltsForDecisionNFA(dfa.decisionNFAStartState);
+					.getNumberOfAltsForDecisionNFA(dfa.decisionNFAStartState);
 				altNum = numAltsIncludingExitBranch;
 				closure((NFAState)alt.transition[0].target,
 						altNum,
@@ -205,7 +205,7 @@ public class NFAToDFAConverter {
 	protected void findNewDFAStatesAndAddDFATransitions(DFAState d) {
 		//System.out.println("work on DFA state "+d);
 		OrderedHashSet labels = d.getReachableLabels();
-		//System.out.println("reachable labels="+labels.toString());
+		//System.out.println("reachable labels="+labels);
 
 		/*
 		System.out.println("|reachable|/|nfaconfigs|="+
@@ -238,7 +238,7 @@ public class NFAToDFAConverter {
 		// just reversing the resolution of ambiguity.
 		// TODO: should this be done in the resolveAmbig method?
 		Label EOTLabel = new Label(Label.EOT);
-		boolean containsEOT = labels.contains(EOTLabel);
+		boolean containsEOT = labels!=null && labels.contains(EOTLabel);
 		if ( !dfa.isGreedy() && containsEOT ) {
 			convertToEOTAcceptState(d);
 			return; // no more work to do on this accept state
@@ -270,12 +270,15 @@ public class NFAToDFAConverter {
 		int numberOfEdgesEmanating = 0;
 		Map targetToLabelMap = new HashMap();
 		// for each label that could possibly emanate from NFAStates of d
-		int numLabels = labels.size();
+		int numLabels = 0;
+		if ( labels!=null ) {
+			numLabels = labels.size();
+		}
 		for (int i=0; i<numLabels; i++) {
 			Label label = (Label)labels.get(i);
 			DFAState t = reach(d, label);
 			if ( debug ) {
-				System.out.println("DFA state after reach "+d+"-" +
+				System.out.println("DFA state after reach "+label+" "+d+"-" +
 								   label.toString(dfa.nfa.grammar)+"->"+t);
 			}
 			if ( t==null ) {
@@ -294,16 +297,7 @@ public class NFAToDFAConverter {
 				// beyond this state; also no possibility of a nondeterminism.
 				// This optimization May 22, 2006 just dropped -Xint time
 				// for analysis of Java grammar from 11.5s to 2s!  Wow.
-				try {
-					closure(t);  // add any NFA states reachable via epsilon
-				}
-				catch (AnalysisRecursionOverflowException ovf) {
-					// trap here to ensure overflow DFA state is connected
-					// to DFA so we can trace later to state for error message
-					// (print input sequence).
-					d.addTransition(t, label);
-					throw ovf;
-				}
+				closure(t);  // add any NFA states reachable via epsilon
 			}
 
 			/*
@@ -667,7 +661,11 @@ public class NFAToDFAConverter {
 				System.out.println("proposed "+proposedNFAConfiguration);
 				*/
 				d.abortedDueToRecursionOverflow = true;
-				throw new AnalysisRecursionOverflowException(d, proposedNFAConfiguration);
+				if ( debug ) {
+					System.out.println("analysis overflow in closure("+d.stateNumber+")");
+				}
+				//throw new AnalysisRecursionOverflowException(d, proposedNFAConfiguration);
+				return;
 			}
 
 			// otherwise, it's cool to (re)enter target of this rule ref
@@ -739,7 +737,7 @@ public class NFAToDFAConverter {
 					// do not hoist syn preds from other rules; only get if in
 					// starting state's rule (i.e., context is empty)
 					int walkAlt =
-						dfa.decisionNFAStartState.translateDisplayAltToWalkAlt(dfa, alt);
+						dfa.decisionNFAStartState.translateDisplayAltToWalkAlt(alt);
 					NFAState altLeftEdge =
 						dfa.nfa.grammar.getNFAStateForAltOfDecision(dfa.decisionNFAStartState,walkAlt);
 					/*
@@ -860,7 +858,7 @@ public class NFAToDFAConverter {
 	 *  accept states if the rule was invoked by somebody.
 	 */
 	public DFAState reach(DFAState d, Label label) {
-		//System.out.println("reach "+label.toString(dfa.nfa.grammar));
+		//System.out.println("reach "+label.toString(dfa.nfa.grammar)+" from "+d.stateNumber);
 		DFAState labelDFATarget = dfa.newState();
 
 		// for each NFA state in d with a labeled edge,
@@ -1012,7 +1010,8 @@ public class NFAToDFAConverter {
 		// Later, the error reporting may want to trace the path from
 		// the start state to the nondet state
 		if ( DFAOptimizer.MERGE_STOP_STATES &&
-			d.getNonDeterministicAlts()==null )
+			 !d.abortedDueToRecursionOverflow &&
+			 d.getNonDeterministicAlts()==null )
 		{
 			// check to see if we already have an accept state for this alt
 			// [must do this after we resolve nondeterminisms in general]
@@ -1230,15 +1229,13 @@ public class NFAToDFAConverter {
 		}
 
 		// if no problems return unless we aborted work on d to avoid inf recursion
-		//if ( !d.abortedDueToRecursionOverflow && nondeterministicAlts==null ) {
-		if ( nondeterministicAlts==null ) {
+		if ( !d.abortedDueToRecursionOverflow && nondeterministicAlts==null ) {
 			return; // no problems, return
 		}
 
 		// if we're not a conflicting lexer rule and we didn't abort, report ambig
 		// We should get a report for abort so don't give another
-		//if ( !d.abortedDueToRecursionOverflow && !conflictingLexerRules ) {
-		if ( !conflictingLexerRules ) {
+		if ( !d.abortedDueToRecursionOverflow && !conflictingLexerRules ) {
 			// TODO: with k=x option set, this is called twice for same state
 			dfa.probe.reportNondeterminism(d, nondeterministicAlts);
 			// TODO: how to turn off when it's only the FOLLOW that is
@@ -1484,7 +1481,6 @@ public class NFAToDFAConverter {
 			// First, prevent a recursion warning on this state due to
 			// pred resolution
 			if ( d.abortedDueToRecursionOverflow ) {
-				System.err.println("tracking OVF when should not!");
 				d.dfa.probe.removeRecursiveOverflowState(d);
 			}
 			int numConfigs = d.nfaConfigurations.size();
@@ -1650,10 +1646,6 @@ public class NFAToDFAConverter {
 	protected void addPredicateTransitions(DFAState d) {
 		List configsWithPreds = new ArrayList();
 		// get a list of all configs with predicates
-/*(		Iterator iter = d.getNFAConfigurations().iterator();
-		while ( iter.hasNext() ) {
-			NFAConfiguration c = (NFAConfiguration)iter.next();
-			*/
 		int numConfigs = d.nfaConfigurations.size();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration c = (NFAConfiguration)d.nfaConfigurations.get(i);
