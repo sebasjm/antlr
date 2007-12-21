@@ -801,6 +801,9 @@ public class Grammar {
 					}
 					DFA dfa = createLL_1_LookaheadDFA(decision);
 					if ( dfa==null ) {
+						if ( watchNFAConversion ) {
+							System.out.println("not suitable for LL(1)-optimized DFA analysis");
+						}
 						createLookaheadDFA(decision, wackTempStructures);
 					}
 					if ( Tool.internalOption_PrintDFA ) {
@@ -847,11 +850,17 @@ public class Grammar {
 		Decision d = getDecision(decision);
 		String enclosingRule = d.startState.enclosingRule.name;
 		Rule r = d.startState.enclosingRule;
+		NFAState decisionStartState = getDecisionNFAStartState(decision);
+
+		if ( watchNFAConversion ) {
+			System.out.println("--------------------\nattempting LL(1) DFA (d="
+							   +decisionStartState.getDecisionNumber()+") for "+
+							   decisionStartState.getDescription());
+		}
 
 		if ( r.isSynPred && !synPredNamesUsedInDFA.contains(enclosingRule) ) {
 			return null;
 		}
-		NFAState decisionStartState = getDecisionNFAStartState(decision);
 
 		// compute lookahead for each alt
 		int numAlts = getNumberOfAltsForDecisionNFA(decisionStartState);
@@ -1610,7 +1619,6 @@ outer:
 	}
 
 	public List checkAllRulesForLeftRecursion() {
-		System.out.println("checkAllRulesForLeftRecursion");
 		return sanity.checkAllRulesForLeftRecursion();
 	}
 

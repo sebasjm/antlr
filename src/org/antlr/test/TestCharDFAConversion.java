@@ -49,9 +49,9 @@ public class TestCharDFAConversion extends BaseTest {
 		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'k'->.s1\n" +
-			".s0-{'a'..'j', 'l'..'z'}->:s3=>1\n" +
-			".s1-'$'->:s2=>2\n" +
-			".s1-'@'->:s3=>1\n";
+			".s0-{'a'..'j', 'l'..'z'}->:s2=>1\n" +
+			".s1-'$'->:s3=>2\n" +
+			".s1-'@'->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -64,11 +64,11 @@ public class TestCharDFAConversion extends BaseTest {
 		g.createLookaheadDFAs();
 		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'}
 		String expecting =
-			".s0-'9'->:s2=>2\n" +
-			".s0-{'a'..'j', 'l'..'o', 'q'..'z'}->:s3=>1\n" +
+			".s0-'9'->:s3=>2\n" +
+			".s0-{'a'..'j', 'l'..'o', 'q'..'z'}->:s2=>1\n" +
 			".s0-{'k', 'p'}->.s1\n" +
-			".s1-'$'->:s2=>2\n" +
-			".s1-'@'->:s3=>1\n";
+			".s1-'$'->:s3=>2\n" +
+			".s1-'@'->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -82,10 +82,10 @@ public class TestCharDFAConversion extends BaseTest {
 		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
 		// into 0..8
 		String expecting =
-			".s0-{'0'..'8', 'a'..'j', 'l'..'o', 'q'..'z'}->:s3=>1\n" +
+			".s0-{'0'..'8', 'a'..'j', 'l'..'o', 'q'..'z'}->:s2=>1\n" +
 			".s0-{'9', 'k', 'p'}->.s1\n" +
-			".s1-'$'->:s2=>2\n" +
-			".s1-'@'->:s3=>1\n";
+			".s1-'$'->:s3=>2\n" +
+			".s1-'@'->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -98,10 +98,10 @@ public class TestCharDFAConversion extends BaseTest {
 		// must break up a..z into {'a'..'j', 'l'..'o', 'q'..'z'} and 0..9
 		// into 0..8
 		String expecting =
-			".s0-{'0'..'8', 'a'..'j', 'l'..'o', 'q'..'z'}->:s2=>2\n" +
+			".s0-{'0'..'8', 'a'..'j', 'l'..'o', 'q'..'z'}->:s3=>2\n" +
 			".s0-{'9', 'k', 'p'}->.s1\n" +
-			".s1-'$'->:s3=>1\n" +
-			".s1-'@'->:s2=>2\n";
+			".s1-'$'->:s2=>1\n" +
+			".s1-'@'->:s3=>2\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -121,11 +121,11 @@ public class TestCharDFAConversion extends BaseTest {
 			".s0-'9'->.s6\n" +
 			".s0-'k'->.s1\n" +
 			".s0-'p'->.s4\n" +
-			".s0-{'a'..'j', 'l'..'o', 'q'..'z'}->:s3=>1\n" +
-			".s1-'$'->:s2=>2\n" +
-			".s1-'@'->:s3=>1\n" +
+			".s0-{'a'..'j', 'l'..'o', 'q'..'z'}->:s2=>1\n" +
+			".s1-'$'->:s3=>2\n" +
+			".s1-'@'->:s2=>1\n" +
 			".s4-'$'->:s5=>4\n" +
-			".s4-'@'->:s3=>1\n" +
+			".s4-'@'->:s2=>1\n" +
 			".s6-'$'->:s7=>3\n" +
 			".s6-'@'->:s8=>5\n";
 		checkDecision(g, 1, expecting, null);
@@ -137,8 +137,8 @@ public class TestCharDFAConversion extends BaseTest {
 			"IF : 'if' ;\n" + // choose this over ID
 			"ID : ('a'..'z')+ ;\n");
 		String expecting =
-			".s0-'a'..'z'->:s2=>1\n" +
-			".s0-<EOT>->:s1=>2\n";
+			".s0-'a'..'z'->:s1=>1\n" +
+			".s0-<EOT>->:s2=>2\n";
 		checkDecision(g, 1, expecting, null);
 		expecting =
 			".s0-'i'->.s1\n" +
@@ -209,8 +209,8 @@ public class TestCharDFAConversion extends BaseTest {
 			"lexer grammar t;\n"+
 			"A : 'x'* ~'x'+ ;\n");
 		String expecting =
-			".s0-'x'->:s2=>1\n" +
-			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>2\n";
+			".s0-'x'->:s1=>1\n" +
+			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s2=>2\n";
 		checkDecision(g, 1, expecting, null);
 
 		// The optimizer yanks out all exit branches from EBNF blocks
@@ -369,10 +369,10 @@ public class TestCharDFAConversion extends BaseTest {
 			"ESC     :       '\\\\' . ;");
 		g.createLookaheadDFAs();
 		String expecting =
-			".s0-'\\\\'->:s3=>2\n" +
-			".s0-'{'->:s2=>1\n" +
-			".s0-'}'->:s1=>4\n" +
-			".s0-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFE'}->:s4=>3\n";
+			".s0-'\\\\'->:s2=>2\n" +
+			".s0-'{'->:s1=>1\n" +
+			".s0-'}'->:s4=>4\n" +
+			".s0-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFE'}->:s3=>3\n";
 		checkDecision(g, 1, expecting, null);
 	}
 

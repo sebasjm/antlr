@@ -309,41 +309,43 @@ public class DOTGenerator {
 			buf.append('s');
 			buf.append(s.stateNumber);
 			if ( Tool.internalOption_ShowNFConfigsInDFA ) {
-				buf.append("\\n");
-				// separate alts
 				Set alts = ((DFAState)s).getAltSet();
-				List altList = new ArrayList();
-				altList.addAll(alts);
-				Collections.sort(altList);
-				Set configurations = ((DFAState) s).nfaConfigurations;
-				for (int altIndex = 0; altIndex < altList.size(); altIndex++) {
-					Integer altI = (Integer) altList.get(altIndex);
-					int alt = altI.intValue();
-					if ( altIndex>0 ) {
-						buf.append("\\n");
-					}
-					buf.append("alt");
-					buf.append(alt);
-					buf.append(':');
-					// get a list of configs for just this alt
-					// it will help us print better later
-					List configsInAlt = new ArrayList();
-					for (Iterator it = configurations.iterator(); it.hasNext();) {
-						NFAConfiguration c = (NFAConfiguration) it.next();
-						if ( c.alt!=alt ) continue;
-						configsInAlt.add(c);
-					}
-					int n = 0;
-					for (int cIndex = 0; cIndex < configsInAlt.size(); cIndex++) {
-						NFAConfiguration c =
-							(NFAConfiguration)configsInAlt.get(cIndex);
-						n++;
-						buf.append(c.toString(false));
-						if ( (cIndex+1)<configsInAlt.size() ) {
-							buf.append(", ");
-						}
-						if ( n%5==0 && (configsInAlt.size()-cIndex)>3 ) {
+				if ( alts!=null ) {
+					buf.append("\\n");
+					// separate alts
+					List altList = new ArrayList();
+					altList.addAll(alts);
+					Collections.sort(altList);
+					Set configurations = ((DFAState) s).nfaConfigurations;
+					for (int altIndex = 0; altIndex < altList.size(); altIndex++) {
+						Integer altI = (Integer) altList.get(altIndex);
+						int alt = altI.intValue();
+						if ( altIndex>0 ) {
 							buf.append("\\n");
+						}
+						buf.append("alt");
+						buf.append(alt);
+						buf.append(':');
+						// get a list of configs for just this alt
+						// it will help us print better later
+						List configsInAlt = new ArrayList();
+						for (Iterator it = configurations.iterator(); it.hasNext();) {
+							NFAConfiguration c = (NFAConfiguration) it.next();
+							if ( c.alt!=alt ) continue;
+							configsInAlt.add(c);
+						}
+						int n = 0;
+						for (int cIndex = 0; cIndex < configsInAlt.size(); cIndex++) {
+							NFAConfiguration c =
+								(NFAConfiguration)configsInAlt.get(cIndex);
+							n++;
+							buf.append(c.toString(false));
+							if ( (cIndex+1)<configsInAlt.size() ) {
+								buf.append(", ");
+							}
+							if ( n%5==0 && (configsInAlt.size()-cIndex)>3 ) {
+								buf.append("\\n");
+							}
 						}
 					}
 				}

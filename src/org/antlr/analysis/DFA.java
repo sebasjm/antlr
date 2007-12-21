@@ -975,7 +975,31 @@ public class DFA {
         return anEdgeReachesAcceptState;
     }
 
-    public NFAState getNFADecisionStartState() {
+	/** Walk all accept states and find the synpreds.
+	 *  I used to do this in the code generator, but that is too late.
+	 *  This converter tries to avoid computing DFA for decisions in
+	 *  syntactic predicates that are not ever used such as those
+	 *  created by autobacktrack mode.
+	 */
+	public void findAllSynPredsUsedInDFA() {
+		int nAlts = getNumberOfAlts();
+		for (int i=1; i<=nAlts; i++) {
+			DFAState a = getAcceptState(i);
+			if ( a!=null ) {
+				Set synpreds = a.getSyntacticPredicatesInNFAConfigurations();
+				if ( synpreds!=null ) {
+					// add all the predicates we find (should be just one, right?)
+					for (Iterator it = synpreds.iterator(); it.hasNext();) {
+						SemanticContext semctx = (SemanticContext) it.next();
+						// System.out.println("synpreds: "+semctx);
+						nfa.grammar.synPredUsedInDFA(this, semctx);
+					}
+				}
+			}
+		}
+	}
+
+	public NFAState getNFADecisionStartState() {
         return decisionNFAStartState;
     }
 

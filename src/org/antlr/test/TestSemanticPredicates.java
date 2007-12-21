@@ -296,22 +296,55 @@ public class TestSemanticPredicates extends BaseTest {
 	}
 
 	public void testPredsUsedAfterRecursionOverflow() throws Exception {
+		// analysis must bail out due to non-LL(*) nature (ovf)
+		// retries with k=1 (but with LL(*) algorithm not optimized version
+		// as it has preds)
 		Grammar g = new Grammar(
 			"grammar P;\n"+
 			"s : {p1}? e '.' | {p2}? e ':' ;\n" +
 			"e : '(' e ')' | INT ;\n");
 		String expecting =
 			".s0-'('->.s1\n" +
-			".s0-INT->.s7\n" +
+			".s0-INT->.s4\n" +
+			".s1-{p1}?->:s2=>1\n" +
+			".s1-{p2}?->:s3=>2\n" +
+			".s4-{p1}?->:s5=>1\n" +
+			".s4-{p2}?->:s6=>2\n";
+		DecisionProbe.verbose=true; // make sure we get all error info
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
+		g.setCodeGenerator(generator);
+		if ( g.getNumberOfDecisions()==0 ) {
+			g.createNFAs();
+			g.checkAllRulesForLeftRecursion();
+			g.createLookaheadDFAs(false);
+		}
+
+		assertEquals("unexpected number of expected problems", 0, equeue.size());
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
+	public void testPredsUsedAfterK2FailsNoRecursionOverflow() throws Exception {
+		// analysis must bail out due to non-LL(*) nature (ovf)
+		// retries with k=1 (but with LL(*) algorithm not optimized version
+		// as it has preds)
+		Grammar g = new Grammar(
+			"grammar P;\n" +
+			"options {k=2;}\n"+
+			"s : {p1}? e '.' | {p2}? e ':' ;\n" +
+			"e : '(' e ')' | INT ;\n");
+		String expecting =
+			".s0-'('->.s1\n" +
+			".s0-INT->.s6\n" +
 			".s1-'('->.s2\n" +
 			".s1-INT->.s5\n" +
 			".s2-{p1}?->:s3=>1\n" +
 			".s2-{p2}?->:s4=>2\n" +
-			".s5-')'->.s6\n" +
+			".s5-{p1}?->:s3=>1\n" +
+			".s5-{p2}?->:s4=>2\n" +
 			".s6-'.'->:s3=>1\n" +
-			".s6-':'->:s4=>2\n" +
-			".s7-'.'->:s3=>1\n" +
-			".s7-':'->:s4=>2\n";
+			".s6-':'->:s4=>2\n";
 		DecisionProbe.verbose=true; // make sure we get all error info
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);

@@ -8,6 +8,17 @@ University of San Francisco
 
 CHANGES
 
+December 17-21, 2007
+
+* k=1 doesn't prevent backtracking anymore as in
+  (options {k=1;}:'else' statement)?
+  if backtrack=true for overall grammar.  Set to false in subrule.
+
+* Optimized the analysis engine for LL(1).  Doesn't attempt LL(*) unless
+  LL(1) fails.  If not LL(1) but autobacktracking but no other kind of
+  predicate, it also avoids LL(*).  This is only important for really
+  big 4000 line grammars etc...
+
 December 16, 2007
 
 * Yet more Kay pair programming.  Saved yet more RAM; 15% by

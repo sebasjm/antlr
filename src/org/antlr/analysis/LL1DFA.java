@@ -25,7 +25,7 @@ public class LL1DFA extends DFA {
 		DFAState s0 = newState();
 		startState = s0;
 		nfa = decisionStartState.nfa;
-		nAlts = altLook.length;
+		nAlts = nfa.grammar.getNumberOfAltsForDecisionNFA(decisionStartState);
 		this.decisionNumber = decisionNumber;
 		this.decisionNFAStartState = decisionStartState;
 		initAltRelatedInfo();
@@ -95,6 +95,7 @@ public class LL1DFA extends DFA {
 				}
 			}
 		}
+		this.findAllSynPredsUsedInDFA();
 		//System.out.println("dfa for preds=\n"+this);
 	}
 
