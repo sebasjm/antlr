@@ -32,8 +32,8 @@ package org.antlr.runtime {
 	 * for automatic error recovery.
 	 */
 	public class BitSet {
-	    protected static const BITS:int = 32;    // number of bits / int
-	    protected static const LOG_BITS:int = 5; // 2^6 == 64
+	    protected static const BITS:uint = 32;    // number of bits / int
+	    protected static const LOG_BITS:uint = 5; // 2^5 == 32
 	
 	    /* We will often need to do a mod operator (i mod nbits).  Its
 	     * turns out that, for powers of two, this mod operation is
@@ -41,7 +41,7 @@ package org.antlr.runtime {
 	     * precomputed mod mask to do the mod instead.
 	     */
 	    protected static const MOD_MASK:uint = BITS - 1;
-	
+
 	    /** The actual data bits */
 	    protected var bits:Array = new Array();
 	
@@ -94,6 +94,7 @@ package org.antlr.runtime {
 		 */
 		public function growToInclude(bit:int):void {
 			var newSize:int = Math.max(bits.length << 1, numWordsToHold(bit));
+			// GMS - FIX need to zero initialize the new bits ?
 			bits.length = newSize;
 		}
 	
@@ -121,7 +122,6 @@ package org.antlr.runtime {
 	
 	    private static function bitMask(bitNumber:int):int {
 	        var bitPosition:int = bitNumber & MOD_MASK; // bitNumber mod BITS
-	        // GMS 1 was 1L - needs to be long?
 	        return 1 << bitPosition;
 	    }
 	
@@ -131,9 +131,9 @@ package org.antlr.runtime {
 	    }
 	
 	    public function get size():int {
-	        var deg:int = 0;
+	        var deg:uint = 0;
 	        for (var i:int = bits.length - 1; i >= 0; i--) {
-	            var word:int = bits[i];
+	            var word:uint = bits[i];
 	            if (word != 0) {
 	                for (var bit:int = BITS - 1; bit >= 0; bit--) {
 	                    if ((word & (1 << bit)) != 0) {
@@ -198,7 +198,7 @@ package org.antlr.runtime {
 			}
 		}
 	
-	    public function isNil():Boolean {
+	    public function get isNil():Boolean {
 	        for (var i:int = bits.length - 1; i >= 0; i--) {
 	            if (bits[i] != 0) return false;
 	        }
@@ -209,24 +209,16 @@ package org.antlr.runtime {
 	        return (el >> LOG_BITS) + 1;
 	    }
 	
-	    public function numBits():int {
+	    public function get numBits():int {
 	        return bits.length << LOG_BITS; // num words * bits per word
 	    }
 	
 	    /** return how much space is being used by the bits array not
 	     *  how many actually have member bits on.
 	     */
-	    public function lengthInLongWords():int {
+	    public function get lengthInLongWords():int {
 	        return bits.length;
 	    }
-	
-	    /**Is this contained within a? */
-	    /*
-		public boolean subset(BitSet a) {
-	        if (a == null || !(a instanceof BitSet)) return false;
-	        return this.and(a).equals(this);
-	    }
-		*/
 	
 	    public function toArray():Array {
 	        var elems:Array = new Array[this.bits.length];
@@ -243,7 +235,7 @@ package org.antlr.runtime {
 	        return bits;
 	    }
 	
-		private static function wordNumber(bit:int):int {
+		private static function wordNumber(bit:uint):uint {
 			return bit >> LOG_BITS; // bit / BITS
 		}
 	

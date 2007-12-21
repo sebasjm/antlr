@@ -305,9 +305,6 @@ ruleBacktrackFailure() ::= <<
  */
 rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize) ::= <<
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
-/** GMS - Remove this we will be using dynamic properties to handle this.
-*<returnScope(scope=ruleDescriptor.returnScope)>
-*/
 // $ANTLR start <ruleName>
 // <fileName>:<description>
 public final function <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>):<returnType()> {

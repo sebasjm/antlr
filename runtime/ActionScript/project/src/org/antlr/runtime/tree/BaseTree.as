@@ -120,7 +120,7 @@ package org.antlr.runtime.tree {
 	
 		/** Add all elements of kids list as children of this node */
 		public function addChildren(kids:Array):void {
-			for (var i:int = 0; i < kids.size(); i++) {
+			for (var i:int = 0; i < kids.length; i++) {
 				var t:Tree = Tree(kids[i]);
 				addChild(t);
 			}

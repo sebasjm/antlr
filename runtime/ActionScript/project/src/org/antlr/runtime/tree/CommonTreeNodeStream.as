@@ -310,7 +310,7 @@ package org.antlr.runtime.tree {
 			if ( p==-1 ) {
 				fillBuffer();
 			}
-			return nodes.size();
+			return nodes.length;
 		}
 	
 		// TREE REWRITE INTERFACE
@@ -367,8 +367,8 @@ package org.antlr.runtime.tree {
 			// walk nodes looking for start
 			var t:Object = null;
 			var i:int = 0;
-			for (; i < nodes.size(); i++) {
-				t = nodes.get(i);
+			for (; i < nodes.length; i++) {
+				t = nodes[i];
 				if ( t==start ) {
 					break;
 				}

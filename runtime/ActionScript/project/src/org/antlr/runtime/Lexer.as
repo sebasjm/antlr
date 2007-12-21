@@ -293,8 +293,6 @@ package org.antlr.runtime {
 		 *  to do sophisticated error recovery if you are in a fragment rule.
 		 */
 		public function recover(re:RecognitionException):void {
-			//System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
-			//re.printStackTrace();
 			input.consume();
 		}
 	

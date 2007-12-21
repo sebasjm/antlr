@@ -3,9 +3,9 @@
 
 	<mx:Script>
             <![CDATA[
-                    import org.antlr.runtime.test.TestANTLRStringStream;
+                    import org.antlr.runtime.test.AllTests;
                     import flexunit.junit.JUnitTestRunner;
-                    import flexunit.framework.TestSuite;
+
                     
                     [Bindable]
                     private var runner : JUnitTestRunner;
@@ -15,7 +15,7 @@
                        status.text = "Please wait running test suite...";
                        
                             runner = new JUnitTestRunner();
-                            runner.run( createSuite(), onTestComplete );
+                            runner.run( new AllTests(), onTestComplete );
                     }
                     
                     private function onTestComplete() : void
@@ -25,13 +25,6 @@
                             fscommand( "quit" );
                     }
                     
-                    private function createSuite() : TestSuite
-                    {
-                            var ts : TestSuite = new TestSuite();
-                            ts.addTest( new TestSuite(TestANTLRStringStream) );
-                            
-                            return ts;
-                    }
             ]]>
    </mx:Script>
         

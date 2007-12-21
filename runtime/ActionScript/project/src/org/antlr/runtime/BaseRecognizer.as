@@ -429,10 +429,6 @@ package org.antlr.runtime {
 			var followSet:BitSet = new BitSet();
 			for (var i:int=top; i>=0; i--) {
 				var localFollowSet:BitSet = state.following[i];
-				/*
-				System.out.println("local follow depth "+i+"="+
-								   localFollowSet.toString(getTokenNames())+")");
-				*/
 				followSet.orInPlace(localFollowSet);
 				if ( exact && !localFollowSet.member(TokenConstants.EOR_TOKEN_TYPE) ) {
 					break;
@@ -478,10 +474,6 @@ package org.antlr.runtime {
 			// if next token is what we are looking for then "delete" this token
 			if ( input.LA(2)==ttype ) {
 				reportError(e);
-				/*
-				System.err.println("recoverFromMismatchedToken deleting "+input.LT(1)+
-								   " since "+input.LT(2)+" is what we want");
-				*/
 				beginResync();
 				input.consume(); // simply delete extra token
 				endResync();
@@ -560,14 +552,6 @@ package org.antlr.runtime {
 	
 		/** Push a rule's follow set using our own hardcoded stack */
 		protected function pushFollow(fset:BitSet):void {
-			
-			/**	GMS: Removed array growing code as it is not needed.	
-			if ( (_fsp +1)>=following.length ) {
-				var f:Array = new Array[following.length*2];
-				System.arraycopy(following, 0, f, 0, following.length-1);
-				following = f;
-			}
-			 */
 			state.following[++state._fsp] = fset;
 		}
 	
@@ -595,9 +579,9 @@ package org.antlr.runtime {
 		 */
 		public function toStrings(tokens:Array):Array {
 			if ( tokens==null ) return null;
-			var strings:Array = new Array(tokens.size());
-			for (var i:int = 0; i<tokens.size(); i++) {
-				strings.add((tokens[i]).getText());
+			var strings:Array = new Array(tokens.length);
+			for (var i:int = 0; i<tokens.length; i++) {
+				strings.push(tokens[i].text);
 			}
 			return strings;
 		}
