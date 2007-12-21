@@ -537,10 +537,8 @@ do {
 	default :
 	    if ( cnt<decisionNumber> >= 1 ) break loop<decisionNumber>;
 	    <ruleBacktrackFailure()>
-            var eee:EarlyExitException =
-                new EarlyExitException(<decisionNumber>, input);
-            <@earlyExitException()>
-            throw eee;
+            throw new EarlyExitException(<decisionNumber>, input);
+            <! Need to add support for earlyExitException debug hook !>
     }
     cnt<decisionNumber>++;
 } while (true);
@@ -661,15 +659,12 @@ if ( <s> ) {
 }
 else {
     <ruleBacktrackFailure()>
-    var mse:MismatchedSetException =
-        new MismatchedSetException(null,input);
-    <@mismatchedSetException()>
+    <! Need to add debug hook for mismatchedSetException !>
 <if(LEXER)>
-    recover(mse);
+    throw recover(new MismatchedSetException(null,input));<\n>
 <else>
-    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
+    throw recoverFromMismatchedSet(input,new MismatchedSetException(null,input),FOLLOW_set_in_<ruleName><elementIndex>);<\n>
 <endif>
-    throw mse;
 }<\n>
 >>
 
@@ -805,10 +800,8 @@ else {
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
     <ruleBacktrackFailure()>
-    var nvae:NoViableAltException =
-        new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
-    <@noViableAltException()>
-    throw nvae;<\n>
+    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+    <! Need to add hook for noViableAltException() !>
 <endif>
 }
 >>
@@ -869,10 +862,8 @@ default:
     alt<decisionNumber>=<eotPredictsAlt>;
 <else>
     <ruleBacktrackFailure()>
-    var nvae:NoViableAltException =
-        new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
-    <@noViableAltException()>
-    throw nvae;<\n>
+    throw new NoViableAltException("<description>", <decisionNumber>, <stateNumber>, input);<\n>
+    <! Need to add hook for noViableAltException !>
 <endif>
 }<\n>
 >>
@@ -957,10 +948,7 @@ private const DFA<dfa.decisionNumber>_specialStateTransition:Function = function
 <if(backtracking)>
         if (this.state.backtracking>0) {this.state.failed=true; return -1;}<\n>
 <endif>
-        var nvae:NoViableAltException =
-            new NoViableAltException(getDescription(), <dfa.decisionNumber>, _s, input);
-        error(nvae);
-        throw nvae;
+        throw error(new NoViableAltException(getDescription(), <dfa.decisionNumber>, _s, input));
     }<\n>
 <endif>
 
@@ -1266,7 +1254,7 @@ execForcedAction(action) ::= "<action>"
 // M I S C (properties, etc...)
 
 bitset(name, words64) ::= <<
-public static const <name>:BitSet = new BitSet(<words64:{<it>};separator=", ">);<\n>
+public static const <name>:BitSet = new BitSet([<words64:{<it>};separator=", ">]);<\n>
 >>
 
 codeFileExtension() ::= ".as"

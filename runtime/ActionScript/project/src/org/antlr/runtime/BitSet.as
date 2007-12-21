@@ -43,23 +43,20 @@ package org.antlr.runtime {
 	    protected static const MOD_MASK:uint = BITS - 1;
 
 	    /** The actual data bits */
-	    protected var bits:Array = new Array();
+	    protected var bits:Array;
 	
 	    /** Construction from a static array of longs */
-	    public function BitSet(... args) {
-			for (var i:int = 0; i < args.length; i++) {
-				bits[i] = uint(args[i]);
-	    	}
+	    public function BitSet(bits:Array = null) {
+	        if (bits == null) {
+	            this.bits = new Array();
+	        }
+	        else {
+    	        this.bits = new Array(bits.length);
+    			for (var i:int = 0; i < bits.length; i++) {
+    				this.bits[i] = bits[i];
+    	    	}
+	        }
 	    }
-	
-	    /** Construct a bitset given the size
-	     * @param nbits The size of the bitset in bits
-	     */
-	     /*
-	    public BitSet(int nbits) {
-	        bits = new long[((nbits - 1) >> LOG_BITS) + 1];
-	    }
-	*/
 	
 		public static function of(... args):BitSet {
 			var s:BitSet = new BitSet();

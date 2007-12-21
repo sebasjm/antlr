@@ -154,7 +154,7 @@ package org.antlr.runtime {
 		}
 	
 		/** A hook for debugging interface */
-		public var error:Function = function(nvae:NoViableAltException):void { ; }
+		public var error:Function = function(nvae:NoViableAltException):NoViableAltException { return nvae; }
 	
 		public var specialStateTransition:Function = function(s:int, input:IntStream):int {
 			return -1;

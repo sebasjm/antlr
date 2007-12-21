@@ -162,7 +162,7 @@ package org.antlr.runtime {
 			if ( discardSet==null ) {
 				discardSet = new Object();
 			}
-	        discardSet.add(ttype);
+	        discardSet[ttype] = true;
 		}
 	
 		public function discardOffChannelTokens(discardOffChannelTokens:Boolean):void {
@@ -206,10 +206,10 @@ package org.antlr.runtime {
 			for (var i:int=start; i<=stop; i++) {
 				var t:Token = Token(tokens[i]);
 				if ( types==null || types.member(t.type) ) {
-					filteredTokens.add(t);
+					filteredTokens.push(t);
 				}
 			}
-			if ( filteredTokens.size()==0 ) {
+			if ( filteredTokens.length==0 ) {
 				filteredTokens = null;
 			}
 			return filteredTokens;

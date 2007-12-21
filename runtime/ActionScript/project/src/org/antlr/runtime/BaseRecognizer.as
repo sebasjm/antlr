@@ -487,11 +487,16 @@ package org.antlr.runtime {
 	
 		public function recoverFromMismatchedSet(input:IntStream,
 											 e:RecognitionException,
-											 follow:BitSet):void
+											 follow:BitSet):RecognitionException
 		{
 			// TODO do single token deletion like above for Token mismatch
 			if ( !recoverFromMismatchedElement(input,e,follow) ) {
 				throw e;
+			}
+			else {
+			    // Return the exception back so it can be throws by caller, avoid exception
+			    // declaration variable and compiler warnings.
+			    return e;
 			}
 		}
 	

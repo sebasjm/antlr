@@ -291,9 +291,15 @@ package org.antlr.runtime {
 		 *  a token, so do the easy thing and just kill a character and hope
 		 *  it all works out.  You can instead use the rule invocation stack
 		 *  to do sophisticated error recovery if you are in a fragment rule.
+		 * 
+		 *  @return This method should return the exception it was provided as an
+		 *  argument.  This differs from the Java runtime so that an exception variable
+		 *  does not need to be declared in the generated code, thus reducing a large
+		 *  number of compiler warnings in generated code.
 		 */
-		public function recover(re:RecognitionException):void {
+		public function recover(re:RecognitionException):RecognitionException {
 			input.consume();
+			return re;
 		}
 	
 		public function traceIn(ruleName:String, ruleIndex:int):void {
