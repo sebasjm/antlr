@@ -558,7 +558,7 @@ public class CodeGenerator {
 						 " for "+referencedElementName+"#"+elementIndex +" in "+
 						 enclosingRuleName+
 						 " line="+referencedElementNode.getLine());
-		*/
+						 */
 		LookaheadSet follow = null;
 		if ( followingNFAState!=null ) {
 			// compute follow for this element and, as side-effect, track
@@ -570,8 +570,14 @@ public class CodeGenerator {
 			ErrorManager.internalError("no follow state or cannot compute follow");
 			follow = new LookaheadSet();
 		}
-		// System.out.println(" "+follow);
-		// System.out.println("visited rules "+grammar.getRuleNamesVisitedDuringLOOK());
+		if ( follow.member(Label.EOF) ) {
+			// TODO: can we just remove?  Seems needed here:
+			// compilation_unit : global_statement* EOF
+			// Actually i guess we resync to EOF regardless
+			follow.remove(Label.EOF);
+		}
+		//System.out.println(" "+follow);
+		//System.out.println("visited rules "+grammar.getRuleNamesVisitedDuringLOOK());
 
         List tokenTypeList = null;
         long[] words = null;
