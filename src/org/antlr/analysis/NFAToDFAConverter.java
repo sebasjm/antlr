@@ -101,7 +101,10 @@ public class NFAToDFAConverter {
 			work.remove(0); // done with it; remove from work list
 		}
 
-		dfa.findAllSynPredsUsedInDFA();
+		// Find all manual syn preds (gated).  These are not discovered
+		// in tryToResolveWithSemanticPredicates because they are implicitly
+		// added to every edge by code gen, DOT generation etc...
+		dfa.findAllGatedSynPredsUsedInDFAAcceptStates();
 	}
 
 	/** From this first NFA state of a decision, create a DFA.
@@ -990,8 +993,9 @@ public class NFAToDFAConverter {
 		// Later, the error reporting may want to trace the path from
 		// the start state to the nondet state
 		if ( DFAOptimizer.MERGE_STOP_STATES &&
-			 !d.abortedDueToRecursionOverflow &&
-			 d.getNonDeterministicAlts()==null )
+			d.getNonDeterministicAlts()==null &&
+			!d.abortedDueToRecursionOverflow &&
+			!d.abortedDueToMultipleRecursiveAlts )
 		{
 			// check to see if we already have an accept state for this alt
 			// [must do this after we resolve nondeterminisms in general]
@@ -1018,9 +1022,6 @@ public class NFAToDFAConverter {
 				}
 				// else consider it a new accept state; fall through.
 			}
-			d.setAcceptState(true); // new accept state for alt
-			dfa.setAcceptState(alt, d);
-			return d;
 		}
 		d.setAcceptState(true); // new accept state for alt
 		dfa.setAcceptState(alt, d);
@@ -1474,6 +1475,7 @@ public class NFAToDFAConverter {
 					configuration.resolveWithPredicate = true;
 					configuration.semanticContext = semCtx; // reset to combined
 					altToPredMap.remove(Utils.integer(configuration.alt));
+
 					// notify grammar that we've used the preds contained in semCtx
 					if ( semCtx.isSyntacticPredicate() ) {
 						dfa.nfa.grammar.synPredUsedInDFA(dfa, semCtx);
@@ -1657,6 +1659,7 @@ public class NFAToDFAConverter {
 												  c.context,
 												  c.semanticContext);
 				predDFATarget.setAcceptState(true);
+				dfa.setAcceptState(c.alt, predDFATarget);
 				DFAState existingState = dfa.addState(predDFATarget);
 				if ( predDFATarget != existingState ) {
 					// already there...use/return the existing DFA state that

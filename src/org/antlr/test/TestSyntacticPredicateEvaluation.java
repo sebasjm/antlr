@@ -383,11 +383,15 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 				"b : 'x' ;\n" ;
 		String found = execParser("t.g", grammar, "tParser", "tLexer",
 				    "a", "xx", false);
-
 		assertEquals("b\n", found);
+		found = execParser("t.g", grammar, "tParser", "tLexer",
+				    "a", "x", false);
+		assertEquals("", found);
 	}
 
 	public void testSynPredK2() throws Exception {
+		// all manually specified syn predicates are gated (i.e., forced
+		// to execute).
 		String grammar =
 			"grammar t;\n" +
 				"\n" +

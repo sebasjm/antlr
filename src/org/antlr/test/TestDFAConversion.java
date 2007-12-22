@@ -54,8 +54,8 @@ public class TestDFAConversion extends BaseTest {
 			"a : A B | A C;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-B->:s3=>1\n" +
-			".s1-C->:s2=>2\n";
+			".s1-B->:s2=>1\n" +
+			".s1-C->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -66,8 +66,8 @@ public class TestDFAConversion extends BaseTest {
 			"a : A B | A C;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-B->:s3=>1\n" +
-			".s1-C->:s2=>2\n";
+			".s1-B->:s2=>1\n" +
+			".s1-C->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -187,8 +187,8 @@ public class TestDFAConversion extends BaseTest {
 			".s0-L->.s1\n" +
 			".s1-{synpred1}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{synpred1}?->:s5=>1\n" +
-			".s4-{true}?->:s6=>2\n";
+			".s4-{synpred1}?->:s2=>1\n" +
+			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -212,8 +212,8 @@ public class TestDFAConversion extends BaseTest {
 			".s0-L->.s1\n" +
 			".s1-{p}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{p}?->:s5=>1\n" +
-			".s4-{true}?->:s6=>2\n";
+			".s4-{p}?->:s2=>1\n" +
+			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -239,8 +239,8 @@ public class TestDFAConversion extends BaseTest {
 			".s0-L->.s1\n" +
 			".s1-{p}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{p}?->:s5=>1\n" +
-			".s4-{true}?->:s6=>2\n";
+			".s4-{p}?->:s2=>1\n" +
+			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -397,8 +397,8 @@ public class TestDFAConversion extends BaseTest {
 			".s0-'x'->.s4\n" +
 			".s1-{synpred1}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{synpred1}?->:s5=>1\n" +
-			".s4-{true}?->:s6=>2\n";
+			".s4-{synpred1}?->:s2=>1\n" +
+			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -424,8 +424,8 @@ public class TestDFAConversion extends BaseTest {
 			".s0-'x'->.s4\n" +
 			".s1-{synpred1}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{synpred1}?->:s5=>1\n" +
-			".s4-{true}?->:s6=>2\n";
+			".s4-{synpred1}?->:s2=>1\n" +
+			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -450,8 +450,8 @@ public class TestDFAConversion extends BaseTest {
 			".s0-L->.s1\n" +
 			".s1-{synpred1}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{synpred1}?->:s5=>1\n" +
-			".s4-{true}?->:s6=>2\n";
+			".s4-{synpred1}?->:s2=>1\n" +
+			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -777,8 +777,8 @@ public class TestDFAConversion extends BaseTest {
 			"parser grammar t;\n"+
 			"a : ( A )* ;");
 		String expecting =
-			".s0-A->:s2=>1\n" +
-			".s0-EOF->:s1=>2\n";
+			".s0-A->:s1=>1\n" +
+			".s0-EOF->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -787,8 +787,8 @@ public class TestDFAConversion extends BaseTest {
 			"parser grammar t;\n"+
 			"a : ( A | B | C )* ;");
 		String expecting =
-			".s0-A..C->:s2=>1\n" +
-			".s0-EOF->:s1=>2\n";
+			".s0-A..C->:s1=>1\n" +
+			".s0-EOF->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -797,8 +797,8 @@ public class TestDFAConversion extends BaseTest {
 			"parser grammar t;\n"+
 			"a : ( A )+ ;");
 		String expecting =
-			".s0-A->:s2=>1\n" +
-			".s0-EOF->:s1=>2\n";
+			".s0-A->:s1=>1\n" +
+			".s0-EOF->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0); // loopback decision
 	}
 
@@ -808,8 +808,8 @@ public class TestDFAConversion extends BaseTest {
 			"a : (options {greedy=false;}:A)+ ;\n");
 		// should look the same as A+ since no ambiguity
 		String expecting =
-			".s0-A->:s2=>1\n" +
-			".s0-EOF->:s1=>2\n";
+			".s0-A->:s1=>1\n" +
+			".s0-EOF->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -818,8 +818,8 @@ public class TestDFAConversion extends BaseTest {
 			"parser grammar t;\n"+
 			"a : ( A | B | C )+ ;");
 		String expecting =
-			".s0-A..C->:s2=>1\n" +
-			".s0-EOF->:s1=>2\n";
+			".s0-A..C->:s1=>1\n" +
+			".s0-EOF->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -850,12 +850,12 @@ public class TestDFAConversion extends BaseTest {
 			"parser grammar t;\n"+
 			"a : (A)* B | (A)* C;");
 		String expecting =
-			".s0-A->:s2=>1\n" +
-			".s0-B->:s1=>2\n";
+			".s0-A->:s1=>1\n" +
+			".s0-B->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0); // loopback
 		expecting =
-			".s0-A->:s2=>1\n" +
-			".s0-C->:s1=>2\n";
+			".s0-A->:s1=>1\n" +
+			".s0-C->:s2=>2\n";
 		checkDecision(g, 2, expecting, null, null, null, null, 0); // loopback
 		expecting =
 			".s0-A->.s1\n" +
@@ -867,18 +867,17 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule block
 	}
 
-
 	public void testAStarBOrAPlusC() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (A)* B | (A)+ C;");
 		String expecting =
-			".s0-A->:s2=>1\n" +
-			".s0-B->:s1=>2\n";
+			".s0-A->:s1=>1\n" +
+			".s0-B->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0); // loopback
 		expecting =
-			".s0-A->:s2=>1\n" +
-			".s0-C->:s1=>2\n";
+			".s0-A->:s1=>1\n" +
+			".s0-C->:s2=>2\n";
 		checkDecision(g, 2, expecting, null, null, null, null, 0); // loopback
 		expecting =
 			".s0-A->.s1\n" +
@@ -895,12 +894,12 @@ public class TestDFAConversion extends BaseTest {
 			"parser grammar t;\n"+
 			"a : (A|B)* X | (A)+ Y;");
 		String expecting =
-			".s0-A..B->:s2=>1\n" +
-			".s0-X->:s1=>2\n";
+			".s0-A..B->:s1=>1\n" +
+			".s0-X->:s2=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0); // loopback (A|B)*
 		expecting =
-			".s0-A->:s2=>1\n" +
-			".s0-Y->:s1=>2\n";
+			".s0-A->:s1=>1\n" +
+			".s0-Y->:s2=>2\n";
 		checkDecision(g, 2, expecting, null, null, null, null, 0); // loopback (A)+
 		expecting =
 			".s0-A->.s1\n" +
@@ -1157,9 +1156,9 @@ As a result, alternative(s) 2 were disabled for that input
 			"\n" +
 			"esc : SLASH ( N | D03 (D07)? ) ;");
 		String expecting =
-			".s0-R->:s1=>3\n" +
-			".s0-SLASH->:s2=>1\n" +
-			".s0-{L, N..D07}->:s3=>2\n";
+			".s0-R->:s3=>3\n" +
+			".s0-SLASH->:s1=>1\n" +
+			".s0-{L, N..D07}->:s2=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = new int[] {1,2};
 		String ambigInput = "D07";
@@ -1293,6 +1292,51 @@ As a result, alternative(s) 2 were disabled for that input
 		int numWarnings = 0;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testGatedSynPred() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"x   : (X)=> X\n" +
+			"    | Y\n" +
+			"    ;\n");
+		String expecting =
+			".s0-X&&{synpred1}?->:s1=>1\n" + // does not hoist; it gates edges
+			".s0-Y->:s2=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+
+		Set<String> preds = g.synPredNamesUsedInDFA;
+		Set<String> expectedPreds = new HashSet<String>() {{add("synpred1");}};
+		assertEquals("predicate names not recorded properly in grammar", expectedPreds, preds);
+	}
+
+	public void testHoistedGatedSynPred() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"x   : (X)=> X\n" +
+			"    | X\n" +
+			"    ;\n");
+		String expecting =
+			".s0-X->.s1\n" +
+			".s1-{synpred1}?->:s2=>1\n" + // hoists into decision
+			".s1-{true}?->:s3=>2\n";
+		int[] unreachableAlts = null;
+		int[] nonDetAlts = null;
+		String ambigInput = null;
+		int[] danglingAlts = null;
+		int numWarnings = 0;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+
+		Set<String> preds = g.synPredNamesUsedInDFA;
+		Set<String> expectedPreds = new HashSet<String>() {{add("synpred1");}};
+		assertEquals("predicate names not recorded properly in grammar", expectedPreds, preds);
 	}
 
 	// Check state table creation

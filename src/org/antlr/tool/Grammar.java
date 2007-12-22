@@ -271,7 +271,7 @@ public class Grammar {
     /** Be able to assign a number to every decision in grammar;
      *  decisions in 1..n
      */
-    protected int decisionNumber = 0;
+    protected int decisionCount = 0;
 
 	/** Rules are uniquely labeled from 1..n */
 	protected int ruleIndex = 1;	
@@ -799,15 +799,22 @@ public class Grammar {
 					if ( r.isSynPred && !synPredNamesUsedInDFA.contains(r.name) ) {
 						continue;
 					}
-					DFA dfa = createLL_1_LookaheadDFA(decision);
+					DFA dfa = null;
+					// if k=* or k=1, try LL(1)
+					if ( getUserMaxLookahead(decision)==0 ||
+						 getUserMaxLookahead(decision)==1 )
+					{
+						dfa = createLL_1_LookaheadDFA(decision);
+					}
 					if ( dfa==null ) {
 						if ( watchNFAConversion ) {
-							System.out.println("not suitable for LL(1)-optimized DFA analysis");
+							System.out.println("decision "+decision+
+											   " not suitable for LL(1)-optimized DFA analysis");
 						}
 						createLookaheadDFA(decision, wackTempStructures);
 					}
 					if ( Tool.internalOption_PrintDFA ) {
-						System.out.println("DFA d="+decisionNumber);
+						System.out.println("DFA d="+decision);
 						FASerializer serializer = new FASerializer(nfa.grammar);
 						String result = serializer.serialize(dfa.startState);
 						System.out.println(result);
@@ -2230,9 +2237,9 @@ outer:
     }
 
     public int assignDecisionNumber(NFAState state) {
-        decisionNumber++;
-        state.setDecisionNumber(decisionNumber);
-        return decisionNumber;
+        decisionCount++;
+        state.setDecisionNumber(decisionCount);
+        return decisionCount;
     }
 
 	protected Decision getDecision(int decision) {
@@ -2347,7 +2354,7 @@ outer:
     */
 
 	public int getNumberOfDecisions() {
-		return decisionNumber;
+		return decisionCount;
 	}
 
 	public int getNumberOfCyclicDecisions() {

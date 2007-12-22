@@ -95,7 +95,6 @@ public class LL1DFA extends DFA {
 				}
 			}
 		}
-		this.findAllSynPredsUsedInDFA();
 		//System.out.println("dfa for preds=\n"+this);
 	}
 
@@ -129,6 +128,9 @@ public class LL1DFA extends DFA {
 					System.out.println("syn pred for alt "+walkAlt+" "+
 									   ((SemanticContext.Predicate)altStartState.transition[0].label.getSemanticContext()).predicateAST);
 					*/
+					if ( ctx.isSyntacticPredicate() ) {
+						nfa.grammar.synPredUsedInDFA(this, ctx);
+					}
 					return (SemanticContext.Predicate)altStartState.transition[0].label.getSemanticContext();
 				}
 			}

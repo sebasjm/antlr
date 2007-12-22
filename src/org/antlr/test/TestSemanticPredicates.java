@@ -308,8 +308,8 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-INT->.s4\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{p2}?->:s3=>2\n" +
-			".s4-{p1}?->:s5=>1\n" +
-			".s4-{p2}?->:s6=>2\n";
+			".s4-{p1}?->:s2=>1\n" +
+			".s4-{p2}?->:s3=>2\n";
 		DecisionProbe.verbose=true; // make sure we get all error info
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);

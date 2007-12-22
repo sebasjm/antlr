@@ -242,14 +242,6 @@ public class DFA {
 			//long stop = System.currentTimeMillis();
 			//System.out.println("verify cost: "+(int)(stop-start)+" ms");
 		}
-		/*
-		catch (AnalysisRecursionOverflowException ovf) {
-			probe.reportRecursionOverflow(ovf.ovfState, ovf.proposedNFAConfiguration);
-			if ( !okToRetryDFAWithK1() ) {
-				probe.issueWarnings();
-			}
-		}
-		*/
 		catch (AnalysisTimeoutException at) {
 			probe.reportAnalysisTimeout();
 			if ( !okToRetryDFAWithK1() ) {
@@ -975,18 +967,20 @@ public class DFA {
         return anEdgeReachesAcceptState;
     }
 
-	/** Walk all accept states and find the synpreds.
+	/** Walk all accept states and find the manually-specified synpreds.
+	 *  Gated preds are not always hoisted
 	 *  I used to do this in the code generator, but that is too late.
 	 *  This converter tries to avoid computing DFA for decisions in
 	 *  syntactic predicates that are not ever used such as those
 	 *  created by autobacktrack mode.
 	 */
-	public void findAllSynPredsUsedInDFA() {
+	public void findAllGatedSynPredsUsedInDFAAcceptStates() {
 		int nAlts = getNumberOfAlts();
 		for (int i=1; i<=nAlts; i++) {
 			DFAState a = getAcceptState(i);
+			//System.out.println("alt "+i+": "+a);
 			if ( a!=null ) {
-				Set synpreds = a.getSyntacticPredicatesInNFAConfigurations();
+				Set synpreds = a.getGatedSyntacticPredicatesInNFAConfigurations();
 				if ( synpreds!=null ) {
 					// add all the predicates we find (should be just one, right?)
 					for (Iterator it = synpreds.iterator(); it.hasNext();) {

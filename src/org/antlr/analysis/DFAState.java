@@ -629,7 +629,7 @@ public class DFAState extends State {
 		int numPotentialConflicts = 0;
 		for (Iterator it = states.iterator(); it.hasNext();) {
 			Integer stateI = (Integer) it.next();
-			//boolean thisStateHasPotentialProblem = false;
+			boolean thisStateHasPotentialProblem = false;
 			List configsForState = (List)stateToConfigListMap.get(stateI);
 			int alt=0;
 			int numConfigsForState = configsForState.size();
@@ -650,19 +650,18 @@ public class DFAState extends State {
 					// Also this ensures that lexers look for more and more
 					// characters (longest match) before resorting to predicates.
 					// TestSemanticPredicates.testLexerMatchesLongestThenTestPred()
-					// for example would termate at state s1 and test predicate
+					// for example would terminate at state s1 and test predicate
 					// meaning input "ab" would test preds to decide what to
 					// do but it should match rule C w/o testing preds.
 					if ( dfa.nfa.grammar.type!=Grammar.LEXER ||
 						 !dfa.decisionNFAStartState.enclosingRule.name.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) )
 					{
 						numPotentialConflicts++;
-						// thisStateHasPotentialProblem = true;
+						thisStateHasPotentialProblem = true;
 					}
 				}
 			}
-			//if ( !thisStateHasPotentialProblem ) {
-			if ( numPotentialConflicts==0 ) {
+			if ( !thisStateHasPotentialProblem ) {
 				// remove NFA state's configurations from
 				// further checking; no issues with it
 				// (can't remove as it's concurrent modification; set to null)
@@ -772,9 +771,9 @@ public class DFAState extends State {
 	}
 	 */
 
-	public Set getSyntacticPredicatesInNFAConfigurations() {
-		Set synpreds = new HashSet();
+	public Set getGatedSyntacticPredicatesInNFAConfigurations() {
 		int numConfigs = nfaConfigurations.size();
+		Set<SemanticContext> synpreds = new HashSet<SemanticContext>();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			SemanticContext gatedPredExpr =
@@ -786,21 +785,6 @@ public class DFAState extends State {
 				synpreds.add(configuration.semanticContext);
 			}
 		}
-		/*
-		Iterator iter = nfaConfigurations.iterator();
-		NFAConfiguration configuration;
-		while (iter.hasNext()) {
-			configuration = (NFAConfiguration) iter.next();
-			SemanticContext gatedPredExpr =
-				configuration.semanticContext.getGatedPredicateContext();
-			// if this is a manual syn pred (gated and syn pred), add
-			if ( gatedPredExpr!=null &&
-				 configuration.semanticContext.isSyntacticPredicate() )
-			{
-				synpreds.add(configuration.semanticContext);
-			}
-		}
-		*/
 		if ( synpreds.size()==0 ) {
 			return null;
 		}

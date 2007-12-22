@@ -19,6 +19,8 @@ December 17-21, 2007
   predicate, it also avoids LL(*).  This is only important for really
   big 4000 line grammars etc...
 
+* Lots of code clean up
+
 December 16, 2007
 
 * Yet more Kay pair programming.  Saved yet more RAM; 15% by
