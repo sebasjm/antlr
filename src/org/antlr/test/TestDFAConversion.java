@@ -813,6 +813,38 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
+	public void testAPlusNonGreedyWhenNonDeterministic() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : (options {greedy=false;}:A)+ A+ ;\n");
+		// should look the same as A+ since no ambiguity
+		String expecting =
+			".s0-A->:s1=>2\n"; // always chooses to exit
+		int[] unreachableAlts = new int[] {1};
+		int[] nonDetAlts = new int[] {1,2};
+		String ambigInput = "A";
+		int[] danglingAlts = null;
+		int numWarnings = 2;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
+	public void testAPlusGreedyWhenNonDeterministic() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : (options {greedy=true;}:A)+ A+ ;\n");
+		// should look the same as A+ since no ambiguity
+		String expecting =
+			".s0-A->:s1=>1\n"; // always chooses to enter loop upon A
+		int[] unreachableAlts = new int[] {2};
+		int[] nonDetAlts = new int[] {1,2};
+		String ambigInput = "A";
+		int[] danglingAlts = null;
+		int numWarnings = 2;
+		checkDecision(g, 1, expecting, unreachableAlts,
+					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
+	}
+
 	public void testAorBorCPlus() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
