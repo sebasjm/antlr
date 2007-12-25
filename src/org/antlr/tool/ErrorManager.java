@@ -639,12 +639,12 @@ public class ErrorManager {
 	public static void danglingState(DecisionProbe probe,
 									 DFAState d)
 	{
-		getErrorState().warnings++;
+		getErrorState().errors++;
 		Message msg = new GrammarDanglingStateMessage(probe,d);
-		getErrorState().warningMsgIDs.add(msg.msgID);
+		getErrorState().errorMsgIDs.add(msg.msgID);
 		Set seen = (Set)emitSingleError.get("danglingState");
 		if ( !seen.contains(d.dfa.decisionNumber+"|"+d.getAltSet()) ) {
-			getErrorListener().warning(msg);
+			getErrorListener().error(msg);
 			// we've seen this decision and this alt set; never again
 			seen.add(d.dfa.decisionNumber+"|"+d.getAltSet());
 		}

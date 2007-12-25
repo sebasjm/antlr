@@ -305,6 +305,7 @@ public class NFAToDFAConverter {
 		//System.out.println("DFA after reach / closures:\n"+dfa);
 
 		if ( !d.isResolvedWithPredicates() && numberOfEdgesEmanating==0 ) {
+			//System.out.println("dangling DFA state "+d+"\nAfter reach / closures:\n"+dfa);
 			// TODO: can fixed lookahead hit a dangling state case?
 			// TODO: yes, with left recursion
 			// TODO: alter DANGLING err template to have input to that state
@@ -314,7 +315,12 @@ public class NFAToDFAConverter {
 			// min alt number; somebody has to win else some input will not
 			// predict any alt.
 			int minAlt = resolveByPickingMinAlt(d, null);
-			convertToAcceptState(d, minAlt); // force it to be an accept state
+			// force it to be an accept state
+			// don't call convertToAcceptState() which merges stop states.
+			// other states point at us; don't want them pointing to dead states
+			d.setAcceptState(true); // might be adding new accept state for alt
+			dfa.setAcceptState(minAlt, d);
+			//convertToAcceptState(d, minAlt); // force it to be an accept state
 		}
 
 		// Check to see if we need to add any semantic predicate transitions
@@ -585,6 +591,7 @@ public class NFAToDFAConverter {
 
 		/* NOTE SURE WE NEED THIS FAILSAFE NOW 11/8/2006 and it complicates
 		   MY ALGORITHM TO HAVE TO ABORT ENTIRE DFA CONVERSION
+		 */
 		if ( DFA.MAX_TIME_PER_DFA_CREATION>0 &&
 			 System.currentTimeMillis() - d.dfa.conversionStartTime >=
 			 DFA.MAX_TIME_PER_DFA_CREATION )
@@ -592,7 +599,6 @@ public class NFAToDFAConverter {
 			// bail way out; we've blown up somehow
 			throw new AnalysisTimeoutException(d.dfa);
 		}
-		   */
 
 		NFAConfiguration proposedNFAConfiguration =
 				new NFAConfiguration(p.stateNumber,

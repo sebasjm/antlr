@@ -8,6 +8,22 @@ University of San Francisco
 
 CHANGES
 
+December 25, 2007
+
+* Dangling states ("decision cannot distinguish between alternatives
+  for at least one input sequence") is now an error not a warning.
+
+* Added sample input sequence that leads to dangling DFA state, one
+  that cannot reach an accept state.  ANTLR ran into a case where
+  the same input sequence reaches multiple locations in the NFA
+  (and so not nondeterministic), but analysis ran out of further
+  NFA states to look for more input.  Commonly at EOF target states.
+  Now says:
+
+  error(202): CS.g:248:95: the decision cannot distinguish between alternative(s) 1,2 for input such as "DOT IDENTIFIER EOF"
+
+  Also fixed bug where dangling states did not resolve to stop states.
+
 December 17-21, 2007
 
 * k=1 doesn't prevent backtracking anymore as in

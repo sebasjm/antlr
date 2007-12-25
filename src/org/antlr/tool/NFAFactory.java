@@ -298,8 +298,8 @@ public class NFAFactory {
 						   " to state "+end.stateNumber);
 		*/
 		Transition toEnd = new Transition(label, end);
-        endNFAState.addTransition(toEnd);
-    }
+		endNFAState.addTransition(toEnd);
+	}
 
     /** From A B build A-e->B (that is, build an epsilon arc from right
      *  of A to left of B).

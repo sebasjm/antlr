@@ -227,8 +227,8 @@ As a result, alternative(s) <disabled; separator=","> were disabled for that inp
 <endif>
 >>
 
-DANGLING_STATE(danglingAlts) ::= <<
-the decision cannot distinguish between alternative(s) <danglingAlts; separator=","> for at least one input sequence
+DANGLING_STATE(danglingAlts,input) ::= <<
+the decision cannot distinguish between alternative(s) <danglingAlts; separator=","> for input such as "<input>"
 >>
 
 UNREACHABLE_ALTS(alts) ::= <<
