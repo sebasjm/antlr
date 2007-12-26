@@ -375,6 +375,19 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
 	}
 
+	public void testLexerMatchesLongestMinusPred() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar P;\n"+
+			"B : 'a' ;\n" +
+			"C : ('a'|'b')+ ;");
+		String expecting =
+			".s0-'a'->.s1\n" +
+			".s0-'b'->:s3=>2\n" +
+			".s1-'a'..'b'->:s3=>2\n" +
+			".s1-<EOT>->:s2=>1\n";
+		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
+	}
+
 	public void testGatedPred() throws Exception {
 		// gated preds are present on all arcs in predictor
 		Grammar g = new Grammar(
