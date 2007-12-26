@@ -101,6 +101,7 @@ namespace Antlr.Runtime.Debug
 				writer.WriteLine("ANTLR " + Constants.DEBUG_PROTOCOL_VERSION);
 				writer.WriteLine("grammar \"" + grammarFileName);
 				writer.Flush();
+				Ack();
 			}
 		}
 		

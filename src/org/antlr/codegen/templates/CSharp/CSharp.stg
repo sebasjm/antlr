@@ -1,5 +1,6 @@
 /*
  [The "BSD licence"]
+ Copyright (c) 2007 Johannes Luber
  Copyright (c) 2005-2007 Kunle Odutola
  Copyright (c) 2005 Terence Parr
  All rights reserved.
@@ -1284,6 +1285,7 @@ scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 >>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
+if ( <scope>_stack.Count>0 ) {
 <if(negIndex)>
 ((<scope>_scope)<scope>_stack[<scope>_stack.Count-<negIndex>-1]).<attr.name> = <expr>;
 <else>
@@ -1293,6 +1295,7 @@ scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 ((<scope>_scope)<scope>_stack.Peek()).<attr.name> = <expr>;
 <endif>
 <endif>
+}
 >>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
