@@ -137,8 +137,11 @@ public class DecisionProbe {
 	/** Did ANTLR have to terminate early on the analysis of this decision? */
 	protected boolean timedOut = false;
 
-	/** Used to find paths through syntactically ambiguous DFA. */
-	protected Map stateReachable;
+	/** Used to find paths through syntactically ambiguous DFA. If we've
+	 *  seen statement number before, what did we learn?
+	 */
+	protected Map<Integer, Integer> stateReachable;
+
 	public static final Integer REACHABLE_BUSY = Utils.integer(-1);
 	public static final Integer REACHABLE_NO = Utils.integer(0);
 	public static final Integer REACHABLE_YES = Utils.integer(1);
@@ -152,7 +155,7 @@ public class DecisionProbe {
 	 */
 	protected Set statesVisitedAtInputDepth;
 
-	protected Set statesVisitedDuringSampleSequence;
+	protected Set<Integer> statesVisitedDuringSampleSequence;
 
 	public static boolean verbose = false;
 
@@ -741,13 +744,13 @@ public class DecisionProbe {
 		if ( startState==targetState ) {
 			states.add(targetState);
 			//System.out.println("found target DFA state "+targetState.getStateNumber());
-			stateReachable.put(startState, REACHABLE_YES);
+			stateReachable.put(startState.stateNumber, REACHABLE_YES);
 			return true;
 		}
 
 		DFAState s = startState;
 		// avoid infinite loops
-		stateReachable.put(s, REACHABLE_BUSY);
+		stateReachable.put(s.stateNumber, REACHABLE_BUSY);
 
 		// look for a path to targetState among transitions for this state
 		// stop when you find the first one; I'm pretty sure there is
@@ -755,12 +758,12 @@ public class DecisionProbe {
 		for (int i=0; i<s.getNumberOfTransitions(); i++) {
 			Transition t = s.transition(i);
 			DFAState edgeTarget = (DFAState)t.target;
-			Integer targetStatus = (Integer)stateReachable.get(edgeTarget);
+			Integer targetStatus = stateReachable.get(edgeTarget.stateNumber);
 			if ( targetStatus==REACHABLE_BUSY ) { // avoid cycles; they say nothing
 				continue;
 			}
 			if ( targetStatus==REACHABLE_YES ) { // return success!
-				stateReachable.put(s, REACHABLE_YES);
+				stateReachable.put(s.stateNumber, REACHABLE_YES);
 				return true;
 			}
 			if ( targetStatus==REACHABLE_NO ) { // try another transition
@@ -769,12 +772,12 @@ public class DecisionProbe {
 			// if null, target must be REACHABLE_UNKNOWN (i.e., unvisited)
 			if ( reachesState(edgeTarget, targetState, states) ) {
 				states.add(s);
-				stateReachable.put(s, REACHABLE_YES);
+				stateReachable.put(s.stateNumber, REACHABLE_YES);
 				return true;
 			}
 		}
 
-		stateReachable.put(s, REACHABLE_NO);
+		stateReachable.put(s.stateNumber, REACHABLE_NO);
 		return false; // no path to targetState found.
 	}
 
@@ -821,14 +824,14 @@ public class DecisionProbe {
 													   Set states,
 													   List labels)
 	{
-		statesVisitedDuringSampleSequence.add(startState);
+		statesVisitedDuringSampleSequence.add(startState.stateNumber);
 
 		// pick the first edge in states as the one to traverse
 		for (int i=0; i<startState.getNumberOfTransitions(); i++) {
 			Transition t = startState.transition(i);
 			DFAState edgeTarget = (DFAState)t.target;
 			if ( states.contains(edgeTarget) &&
-				 !statesVisitedDuringSampleSequence.contains(edgeTarget) )
+				 !statesVisitedDuringSampleSequence.contains(edgeTarget.stateNumber) )
 			{
 				labels.add(t.label); // traverse edge and track label
 				if ( edgeTarget!=targetState ) {

@@ -24,6 +24,8 @@ December 25, 2007
 
   Also fixed bug where dangling states did not resolve to stop states.
 
+* Fixed ANTLR-123
+
 December 17-21, 2007
 
 * k=1 doesn't prevent backtracking anymore as in

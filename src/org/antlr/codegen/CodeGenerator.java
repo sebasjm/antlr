@@ -912,6 +912,7 @@ public class CodeGenerator {
 			StreamTokenizer argTokens = new StreamTokenizer(new StringReader(actionText));
 			argTokens.wordChars('$','$');
 			argTokens.wordChars(':',':');
+			argTokens.wordChars('_','_');
 			argTokens.quoteChar('"');
 			while ( argTokens.nextToken() != StreamTokenizer.TT_EOF ) {
 				//System.out.println("token: "+argTokens+", type="+argTokens.ttype);
