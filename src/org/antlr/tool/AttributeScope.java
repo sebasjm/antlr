@@ -28,6 +28,7 @@
 package org.antlr.tool;
 
 import antlr.Token;
+import org.antlr.codegen.CodeGenerator;
 
 import java.util.*;
 
@@ -75,7 +76,7 @@ public class AttributeScope {
 	public boolean isPredefinedRuleScope;
 
 	public boolean isPredefinedLexerRuleScope;
-	
+
 	/** The list of Attribute objects */
 
 	protected LinkedHashMap<String,Attribute> attributes = new LinkedHashMap();
@@ -113,15 +114,11 @@ public class AttributeScope {
 	 *  would pass in definitions equal to the text in between {...} and
 	 *  separator=';'.  It results in two Attribute objects.
 	 */
-	public void addAttributes(String definitions, String separator) {
-        StringTokenizer st = new StringTokenizer(definitions,separator);
-		while (st.hasMoreElements()) {
-			String decl = (String) st.nextElement();
-			decl = decl.trim();
-			if ( decl.length()==0 ) {
-				break; // final bit of whitespace; ignore
-			}
-			Attribute attr = new Attribute(decl);
+	public void addAttributes(String definitions, int separator) {
+		List<String> attrs = new ArrayList<String>();
+		CodeGenerator.getListOfArgumentsFromAction(definitions,0,-1,separator,attrs);
+		for (String a : attrs) {
+			Attribute attr = new Attribute(a);
 			if ( !isReturnScope && attr.initValue!=null ) {
 				ErrorManager.grammarError(ErrorManager.MSG_ARG_INIT_VALUES_ILLEGAL,
 										  grammar,
@@ -142,8 +139,8 @@ public class AttributeScope {
 	}
 
 	/** Used by templates to get all attributes */
-	public List getAttributes() {
-		List a = new ArrayList();
+	public List<Attribute> getAttributes() {
+		List<Attribute> a = new ArrayList<Attribute>();
 		a.addAll(attributes.values());
 		return a;
 	}

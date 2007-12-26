@@ -129,7 +129,7 @@ attrScope
 		{
 		AttributeScope scope = grammar.defineGlobalScope(name.getText(),#attrs.token);
 		scope.isDynamicGlobalScope = true;
-		scope.addAttributes(attrs.getText(), ";");
+		scope.addAttributes(attrs.getText(), ';');
 		}
 	;
 
@@ -225,11 +225,11 @@ Rule r = null;
 				r = grammar.getRule(name);
 				if ( #args!=null ) {
 					r.parameterScope = grammar.createParameterScope(name,#args.token);
-					r.parameterScope.addAttributes(#args.getText(), ",");
+					r.parameterScope.addAttributes(#args.getText(), ',');
 				}
 				if ( #ret!=null ) {
 					r.returnScope = grammar.createReturnScope(name,#ret.token);
-					r.returnScope.addAttributes(#ret.getText(), ",");
+					r.returnScope.addAttributes(#ret.getText(), ',');
 				}
 			}
 			}
@@ -275,7 +275,7 @@ ruleScopeSpec[Rule r]
  	         {
  	         r.ruleScope = grammar.createRuleScope(r.name,#attrs.token);
 			 r.ruleScope.isDynamicRuleScope = true;
-			 r.ruleScope.addAttributes(#attrs.getText(), ";");
+			 r.ruleScope.addAttributes(#attrs.getText(), ';');
 			 }
 		   )?
  	       ( uses:ID

@@ -41,7 +41,6 @@ import org.antlr.tool.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
-import java.io.StreamTokenizer;
 import java.util.*;
 
 /** ANTLR's code generator.
@@ -899,55 +898,104 @@ public class CodeGenerator {
 	/** Translate an action like [3,"foo",a[3]] and return a List of the
 	 *  translated actions.  Because actions are translated to a list of
 	 *  chunks, this returns List<List<String|StringTemplate>>.
-	 *
-	 *  Simple ',' separator is assumed.
 	 */
-	public List translateArgAction(String ruleName,
-								   GrammarAST actionTree)
+	public List<String> translateArgAction(String ruleName,
+										   GrammarAST actionTree)
 	{
 		String actionText = actionTree.token.getText();
-		//StringTokenizer argTokens = new StringTokenizer(actionText, ",");
-		List args = new ArrayList();
-		try {
-			StreamTokenizer argTokens = new StreamTokenizer(new StringReader(actionText));
-			argTokens.wordChars('$','$');
-			argTokens.wordChars(':',':');
-			argTokens.wordChars('_','_');
-			argTokens.quoteChar('"');
-			while ( argTokens.nextToken() != StreamTokenizer.TT_EOF ) {
-				//System.out.println("token: "+argTokens+", type="+argTokens.ttype);
-				String arg = null;
-				switch ( argTokens.ttype ) {
-					case StreamTokenizer.TT_WORD:
-						arg = argTokens.sval;
-						break;
-					case '"' :
-						arg = '"'+argTokens.sval+'"';
-						break;
-					case ',' :
-						break;
-					default :
+		List<String> args = new ArrayList<String>();
+		List<String> translatedArgs = new ArrayList<String>();
+		getListOfArgumentsFromAction(actionText,0,-1,',',args);
+		for (String arg : args) {
+			if ( arg!=null ) {
+				antlr.Token actionToken =
+					new antlr.CommonToken(ANTLRParser.ACTION,arg);
+				ActionTranslatorLexer translator =
+					new ActionTranslatorLexer(this,ruleName,
+											  actionToken,
+											  actionTree.outerAltNum);
+				List chunks = translator.translateToChunks();
+				chunks = target.postProcessAction(chunks, actionToken);
+				StringBuffer buf = new StringBuffer();
+				for (Object s : chunks) {
+					buf.append(s);
 				}
-				if ( arg!=null ) {
-					antlr.Token actionToken = new antlr.CommonToken(ANTLRParser.ACTION,arg);
-					ActionTranslatorLexer translator =
-						new ActionTranslatorLexer(this,ruleName,
-												  actionToken,
-												  actionTree.outerAltNum);
-					List chunks = translator.translateToChunks();
-					chunks = target.postProcessAction(chunks, actionToken);
-					args.add(chunks);
-				}
+				translatedArgs.add(buf.toString());
 			}
 		}
-		catch(IOException e) {
-			System.out.println(
-				"st.nextToken() unsuccessful");
-		}
-		if ( args.size()==0 ) {
+		if ( translatedArgs.size()==0 ) {
 			return null;
 		}
-		return args;
+		return translatedArgs;
+	}
+
+	/** Given an arg action like
+	 *
+	 *  [x, (*a).foo(21,33), 3.2+1, '\n',
+	 *  "a,oo\nick", {bl, "fdkj"eck}, ["cat\n,", x, 43]]
+	 *
+	 *  convert to a list of arguments.  Allow nested square brackets etc...
+	 *  Set separatorChar to ';' or ',' or whatever you want.
+	 */
+	public static int getListOfArgumentsFromAction(String actionText,
+												   int start,
+												   int targetChar,
+												   int separatorChar,
+												   List<String> args)
+	{
+		if ( actionText==null ) {
+			return -1;
+		}
+		int n = actionText.length();
+		//System.out.println("actionText@"+start+"->"+(char)targetChar+"="+actionText.substring(start,n));
+		int p = start;
+		int last = p;
+		while ( p<n && actionText.charAt(p)!=targetChar ) {
+			int c = actionText.charAt(p);
+			switch ( c ) {
+				case '\'' :
+					p = getListOfArgumentsFromAction(actionText,p+1,'\'',separatorChar,args);
+					break;
+				case '"' :
+					p = getListOfArgumentsFromAction(actionText,p+1,'"',separatorChar,args);
+					break;
+				case '(' :
+					p = getListOfArgumentsFromAction(actionText,p+1,')',separatorChar,args);
+					break;
+				case '{' :
+					p = getListOfArgumentsFromAction(actionText,p+1,'}',separatorChar,args);
+					break;
+				case '<' :
+					if ( actionText.indexOf('>',p+1)>=p ) {
+						// do we see a matching '>' ahead?  if so, hope it's a generic
+						// and not less followed by expr with greater than
+						p = getListOfArgumentsFromAction(actionText,p+1,'>',separatorChar,args);
+					}
+					else {
+						p++; // treat as normal char
+					}
+					break;
+				case '[' :
+					p = getListOfArgumentsFromAction(actionText,p+1,']',separatorChar,args);
+					break;
+				default :
+					if ( c==separatorChar && targetChar==-1 ) {
+						String arg = actionText.substring(last, p);
+						//System.out.println("arg="+arg);
+						args.add(arg);
+						last = p+1;
+					}
+					p++;
+					break;
+			}
+		}
+		if ( targetChar==-1 ) {
+			String arg = actionText.substring(last, p);
+			//System.out.println("arg="+arg);
+			args.add(arg);
+		}
+		p++;
+		return p;
 	}
 
 	/** Given a template constructor action like %foo(a={...}) in

@@ -10,6 +10,10 @@ CHANGES
 
 December 25, 2007
 
+* Fixed ANTLR-111.  More unit tests in TestAttributes.
+
+December 25, 2007
+
 * Dangling states ("decision cannot distinguish between alternatives
   for at least one input sequence") is now an error not a warning.
 

@@ -28,16 +28,16 @@
 package org.antlr.test;
 
 import org.antlr.Tool;
-import org.antlr.codegen.CodeGenerator;
 import org.antlr.codegen.ActionTranslatorLexer;
+import org.antlr.codegen.CodeGenerator;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.tool.*;
 
 import java.io.StringReader;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /** Check the $x, $x.y attributes.  For checking the actual
  *  translation, assume the Java target.  This is still a great test
@@ -72,10 +72,10 @@ public class TestAttributes extends BaseTest {
 		String expecting = "int $n; \"$in string$\"";
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"@members {"+action+"}\n"+
-				"a[User u, int i]\n" +
-				"        : {"+action+"}\n" +
-				"        ;");
+			"@members {"+action+"}\n"+
+			"a[User u, int i]\n" +
+			"        : {"+action+"}\n" +
+			"        ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -101,9 +101,196 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a[User u, int i]\n" +
-				"        : {"+action+"}\n" +
-				"        ;");
+			"a[User u, int i]\n" +
+			"        : {"+action+"}\n" +
+			"        ;");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testComplicatedArgParsing() throws Exception {
+		String action = "x, (*a).foo(21,33), 3.2+1, '\\n', "+
+						"\"a,oo\\nick\", {bl, \"fdkj\"eck}, [\"cat\\n,\", x, 43]";
+		String expecting = "x, (*a).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}, [\"cat\\n,\", x, 43]";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		// now check in actual grammar.
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a[User u, int i]\n" +
+			"        : A a["+action+"] B\n" +
+			"        ;");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testComplicatedSingleArgParsing() throws Exception {
+		String action = "(*a).foo(21,33,\",\")";
+		String expecting = "(*a).foo(21,33,\",\")";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		// now check in actual grammar.
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a[User u, int i]\n" +
+			"        : A a["+action+"] B\n" +
+			"        ;");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testGenericsAsArgumentDefinition() throws Exception {
+		String action = "$foo.get(\"ick\");";
+		String expecting = "foo.get(\"ick\");";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String grammar =
+			"parser grammar T;\n"+
+			"a[HashMap<String,String> foo]\n" +
+			"        : {"+action+"}\n" +
+			"        ;";
+		Grammar g = new Grammar(grammar);
+		Rule ra = g.getRule("a");
+		List<Attribute> attrs = ra.parameterScope.getAttributes();
+		assertEquals("attribute mismatch","HashMap<String,String> foo",attrs.get(0).decl.toString());
+		assertEquals("parameter name mismatch","foo",attrs.get(0).name);
+		assertEquals("declarator mismatch", "HashMap<String,String>", attrs.get(0).type);
+
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testGenericsAsArgumentDefinition2() throws Exception {
+		String action = "$foo.get(\"ick\"); x=3;";
+		String expecting = "foo.get(\"ick\"); x=3;";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String grammar =
+			"parser grammar T;\n"+
+			"a[HashMap<String,String> foo, int x, List<String> duh]\n" +
+			"        : {"+action+"}\n" +
+			"        ;";
+		Grammar g = new Grammar(grammar);
+		Rule ra = g.getRule("a");
+		List<Attribute> attrs = ra.parameterScope.getAttributes();
+
+		assertEquals("attribute mismatch","HashMap<String,String> foo",attrs.get(0).decl.toString().trim());
+		assertEquals("parameter name mismatch","foo",attrs.get(0).name);
+		assertEquals("declarator mismatch", "HashMap<String,String>", attrs.get(0).type);
+
+		assertEquals("attribute mismatch","int x",attrs.get(1).decl.toString().trim());
+		assertEquals("parameter name mismatch","x",attrs.get(1).name);
+		assertEquals("declarator mismatch", "int", attrs.get(1).type);
+
+		assertEquals("attribute mismatch","List<String> duh",attrs.get(2).decl.toString().trim());
+		assertEquals("parameter name mismatch","duh",attrs.get(2).name);
+		assertEquals("declarator mismatch", "List<String>", attrs.get(2).type);
+
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testGenericsAsReturnValue() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String grammar =
+			"parser grammar T;\n"+
+			"a returns [HashMap<String,String> foo] : ;\n";
+		Grammar g = new Grammar(grammar);
+		Rule ra = g.getRule("a");
+		List<Attribute> attrs = ra.returnScope.getAttributes();
+		assertEquals("attribute mismatch","HashMap<String,String> foo",attrs.get(0).decl.toString());
+		assertEquals("parameter name mismatch","foo",attrs.get(0).name);
+		assertEquals("declarator mismatch", "HashMap<String,String>", attrs.get(0).type);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testComplicatedArgParsingWithTranslation() throws Exception {
+		String action = "x, $A.text+\"3242\", (*$A).foo(21,33), 3.2+1, '\\n', "+
+						"\"a,oo\\nick\", {bl, \"fdkj\"eck}, [\"cat\\n,\", $A, 43]";
+		String expecting = "x, (A1!=null?A1.getText():null)+\"3242\", (*A1).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}, [\"cat\\n,\", A1, 43]";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		// now check in actual grammar.
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a[User u, int i]\n" +
+			"        : A a["+action+"] B\n" +
+			"        ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -129,7 +316,7 @@ public class TestAttributes extends BaseTest {
 	 */
 	public void testRefToReturnValueBeforeRefToPredefinedAttr() throws Exception {
 		String action = "$x.foo";
-		String expecting = "x!=null?x.foo:null";
+		String expecting = "(x!=null?x.foo:null)";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -160,7 +347,7 @@ public class TestAttributes extends BaseTest {
 		// before stripping unused labels.  We really need to translate
 		// actions first so code gen logic can use info.
 		String action = "$x.text";
-		String expecting = "x!=null?input.toString(x.start,x.stop):null";
+		String expecting = "(x!=null?input.toString(x.start,x.stop):null)";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -193,9 +380,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a[User u, int i]\n" +
-				"        : {"+action+"}\n" +
-				"        ;");
+			"a[User u, int i]\n" +
+			"        : {"+action+"}\n" +
+			"        ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,
@@ -224,10 +411,10 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a returns [int i]\n" +
-				"        : 'a'\n" +
-				"        ;\n" +
-				"b : x=a {"+action+"} ;\n");
+			"a returns [int i]\n" +
+			"        : 'a'\n" +
+			"        ;\n" +
+			"b : x=a {"+action+"} ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -255,10 +442,10 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a returns [int i1]\n" +
-				"        : 'a'\n" +
-				"        ;\n" +
-				"b : x=a {"+action+"} ;\n");
+			"a returns [int i1]\n" +
+			"        : 'a'\n" +
+			"        ;\n" +
+			"b : x=a {"+action+"} ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -286,9 +473,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a returns [User u, int i]\n" +
-				"        : {"+action+"}\n" +
-				"        ;");
+			"a returns [User u, int i]\n" +
+			"        : {"+action+"}\n" +
+			"        ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -358,9 +545,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a returns [User u, int i]\n" +
-				"        : {"+action+"}\n" +
-				"        ;");
+			"a returns [User u, int i]\n" +
+			"        : {"+action+"}\n" +
+			"        ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
@@ -384,19 +571,14 @@ public class TestAttributes extends BaseTest {
 		String action = "$id; $f; $id.text; $id.getText(); $id.dork " +
 						"$id.type; $id.line; $id.pos; " +
 						"$id.channel; $id.index;";
-		String expecting = "id; f; id!=null?id.getText():null; id.getText();" +
-						   " id.dork id!=null?id.getType():null;" +
-						   " id!=null?id.getLine():null;" +
-						   " id!=null?id.getCharPositionInLine():null;" +
-						   " id!=null?id.getChannel():null;" +
-						   " id!=null?id.getTokenIndex():null;";
+		String expecting = "id; f; (id!=null?id.getText():null); id.getText(); id.dork (id!=null?id.getType():null); (id!=null?id.getLine():null); (id!=null?id.getCharPositionInLine():null); (id!=null?id.getChannel():null); (id!=null?id.getTokenIndex():null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a : id=ID f=FLOAT {"+action+"}\n" +
-				"  ;");
+			"a : id=ID f=FLOAT {"+action+"}\n" +
+			"  ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -416,21 +598,22 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-		String expecting = "r!=null?r.x:null; r!=null?((Token)r.start):null;" +
-						   " r!=null?((Token)r.stop):null;" +
-						   " r!=null?((Object)r.tree):null;" +
-						   " r!=null?r.x:null;" +
-						   " r!=null?((Token)r.stop):null;";
+		String expecting = "(r!=null?r.x:null); " +
+						   "(r!=null?((Token)r.start):null); " +
+						   "(r!=null?((Token)r.stop):null); " +
+						   "(r!=null?((Object)r.tree):null); " +
+						   "(r!=null?r.x:null); " +
+						   "(r!=null?((Token)r.stop):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a returns [int x]\n" +
-				"  :\n" +
-				"  ;\n"+
-				"b : r=a {###"+action+"!!!}\n" +
-				"  ;");
+			"a returns [int x]\n" +
+			"  :\n" +
+			"  ;\n"+
+			"b : r=a {###"+action+"!!!}\n" +
+			"  ;");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -446,22 +629,18 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleLabelsWithSpecialToken() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-		String expecting = "r!=null?r.x:null; r!=null?((MYTOKEN)r.start):null;" +
-						   " r!=null?((MYTOKEN)r.stop):null;" +
-						   " r!=null?((Object)r.tree):null;" +
-						   " r!=null?r.x:null;" +
-						   " r!=null?((MYTOKEN)r.stop):null;";
+		String expecting = "(r!=null?r.x:null); (r!=null?((MYTOKEN)r.start):null); (r!=null?((MYTOKEN)r.stop):null); (r!=null?((Object)r.tree):null); (r!=null?r.x:null); (r!=null?((MYTOKEN)r.stop):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"options {TokenLabelType=MYTOKEN;}\n"+
-				"a returns [int x]\n" +
-				"  :\n" +
-				"  ;\n"+
-				"b : r=a {###"+action+"!!!}\n" +
-				"  ;");
+			"options {TokenLabelType=MYTOKEN;}\n"+
+			"a returns [int x]\n" +
+			"  :\n" +
+			"  ;\n"+
+			"b : r=a {###"+action+"!!!}\n" +
+			"  ;");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -478,20 +657,16 @@ public class TestAttributes extends BaseTest {
 
 	public void testForwardRefRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.tree;";
-		String expecting = "r!=null?r.x:null; r!=null?((Token)r.start):null;" +
-						   " r!=null?((Token)r.stop):null;" +
-						   " r!=null?((Object)r.tree):null;" +
-						   " r!=null?r.x:null;" +
-						   " r!=null?((Object)r.tree):null;";
+		String expecting = "(r!=null?r.x:null); (r!=null?((Token)r.start):null); (r!=null?((Token)r.stop):null); (r!=null?((Object)r.tree):null); (r!=null?r.x:null); (r!=null?((Object)r.tree):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"b : r=a {###"+action+"!!!}\n" +
-				"  ;\n" +
-				"a returns [int x]\n" +
-				"  : ;\n");
+			"b : r=a {###"+action+"!!!}\n" +
+			"  ;\n" +
+			"a returns [int x]\n" +
+			"  : ;\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -514,11 +689,11 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a[int z] returns [int x]\n" +
-				"  :\n" +
-				"  ;\n"+
-				"b : r=a[3] {"+action+"}\n" +
-				"  ;");
+			"a[int z] returns [int x]\n" +
+			"  :\n" +
+			"  ;\n"+
+			"b : r=a[3] {"+action+"}\n" +
+			"  ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator, "b",
@@ -547,12 +722,12 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a\n" +
-				"scope { int n; }\n" +
-				"  :\n" +
-				"  ;\n"+
-				"b : r=a[3] {"+action+"}\n" +
-				"  ;");
+			"a\n" +
+			"scope { int n; }\n" +
+			"  :\n" +
+			"  ;\n"+
+			"b : r=a[3] {"+action+"}\n" +
+			"  ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator, "b",
@@ -581,11 +756,11 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a[int z] returns [int x]\n" +
-				"  :\n" +
-				"  ;\n"+
-				"b : r=a[3] {"+action+"}\n" +
-				"  ;");
+			"a[int z] returns [int x]\n" +
+			"  :\n" +
+			"  ;\n"+
+			"b : r=a[3] {"+action+"}\n" +
+			"  ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator, "b",
@@ -614,11 +789,11 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a[int z] returns [int x]\n" +
-				"  :\n" +
-				"  ;\n"+
-				"b : r=a[3] {"+action+"}\n" +
-				"  ;");
+			"a[int z] returns [int x]\n" +
+			"  :\n" +
+			"  ;\n"+
+			"b : r=a[3] {"+action+"}\n" +
+			"  ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator, "b",
@@ -642,10 +817,10 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a returns [int x]:\n" +
-				"  ;\n"+
-				"b : a {"+action+"}\n" +
-				"  ;");
+			"a returns [int x]:\n" +
+			"  ;\n"+
+			"b : a {"+action+"}\n" +
+			"  ;");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator, "b",
@@ -668,8 +843,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"@members {'+action+'}\n" +
-				"a : ;\n");
+			"@members {'+action+'}\n" +
+			"a : ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,
@@ -698,8 +873,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"@members {'+action+'}\n" +
-				"a : ;\n");
+			"@members {'+action+'}\n" +
+			"a : ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,
@@ -725,19 +900,19 @@ public class TestAttributes extends BaseTest {
 
 	public void testBasicGlobalScope() throws Exception {
 		String action = "$Symbols::names.add($id.text);";
-		String expecting = "((Symbols_scope)Symbols_stack.peek()).names.add(id!=null?id.getText():null);";
+		String expecting = "((Symbols_stack.size()>0)?((Symbols_scope)Symbols_stack.peek()).names:null).add((id!=null?id.getText():null));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"scope Symbols {\n" +
-				"  int n;\n" +
-				"  List names;\n" +
-				"}\n" +
-				"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
-				"  ;\n" +
-				"ID : 'a';\n");
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -784,19 +959,19 @@ public class TestAttributes extends BaseTest {
 	public void testIndexedGlobalScope() throws Exception {
 		String action = "$Symbols[-1]::names.add($id.text);";
 		String expecting =
-			"((Symbols_scope)Symbols_stack.elementAt(Symbols_stack.size()-1-1)).names.add(id!=null?id.getText():null);";
+			"((Symbols_stack.size()-1-1)>=0?((Symbols_scope)Symbols_stack.elementAt(Symbols_stack.size()-1-1)).names:null).add((id!=null?id.getText():null));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"scope Symbols {\n" +
-				"  int n;\n" +
-				"  List names;\n" +
-				"}\n" +
-				"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
-				"  ;\n" +
-				"ID : 'a';\n");
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -817,19 +992,19 @@ public class TestAttributes extends BaseTest {
 	public void test0IndexedGlobalScope() throws Exception {
 		String action = "$Symbols[0]::names.add($id.text);";
 		String expecting =
-			"((Symbols_scope)Symbols_stack.elementAt(0)).names.add(id!=null?id.getText():null);";
+			"((0<Symbols_stack.size())?((Symbols_scope)Symbols_stack.elementAt(0)).names:null).add((id!=null?id.getText():null));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"scope Symbols {\n" +
-				"  int n;\n" +
-				"  List names;\n" +
-				"}\n" +
-				"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
-				"  ;\n" +
-				"ID : 'a';\n");
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -840,9 +1015,7 @@ public class TestAttributes extends BaseTest {
 			translator.translate();
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
-		assertEquals(expecting, found);
+		assertEquals(expecting, rawTranslation);
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
@@ -850,19 +1023,19 @@ public class TestAttributes extends BaseTest {
 	public void testAbsoluteIndexedGlobalScope() throws Exception {
 		String action = "$Symbols[3]::names.add($id.text);";
 		String expecting =
-			"((Symbols_scope)Symbols_stack.elementAt(3)).names.add(id!=null?id.getText():null);";
+			"((3<Symbols_stack.size())?((Symbols_scope)Symbols_stack.elementAt(3)).names:null).add((id!=null?id.getText():null));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"scope Symbols {\n" +
-				"  int n;\n" +
-				"  List names;\n" +
-				"}\n" +
-				"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
-				"  ;\n" +
-				"ID : 'a';\n");
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"a scope Symbols; : (id=ID ';' {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -873,27 +1046,25 @@ public class TestAttributes extends BaseTest {
 			translator.translate();
 		StringTemplateGroup templates =
 			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
-		assertEquals(expecting, found);
+		assertEquals(expecting, rawTranslation);
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	public void testScopeAndAttributeWithUnderscore() throws Exception {
 		String action = "$foo_bar::a_b;";
-		String expecting = "((foo_bar_scope)foo_bar_stack.peek()).a_b;";
+		String expecting = "((foo_bar_stack.size()>0)?((foo_bar_scope)foo_bar_stack.peek()).a_b:null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"scope foo_bar {\n" +
-				"  int a_b;\n" +
-				"}\n" +
-				"a scope foo_bar; : (ID {"+action+"} )+\n" +
-				"  ;\n" +
-				"ID : 'a';\n");
+			"scope foo_bar {\n" +
+			"  int a_b;\n" +
+			"}\n" +
+			"a scope foo_bar; : (ID {"+action+"} )+\n" +
+			"  ;\n" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -914,22 +1085,22 @@ public class TestAttributes extends BaseTest {
 
 	public void testSharedGlobalScope() throws Exception {
 		String action = "$Symbols::x;";
-		String expecting = "((Symbols_scope)Symbols_stack.peek()).x;";
+		String expecting = "((Symbols_stack.size()>0)?((Symbols_scope)Symbols_stack.peek()).x:null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"scope Symbols {\n" +
-				"  String x;\n" +
-				"}\n" +
-				"a\n"+
-				"scope { int y; }\n"+
-				"scope Symbols;\n" +
-				" : b {"+action+"}\n" +
-				" ;\n" +
-				"b : ID {$Symbols::x=$ID.text} ;\n" +
-				"ID : 'a';\n");
+			"scope Symbols {\n" +
+			"  String x;\n" +
+			"}\n" +
+			"a\n"+
+			"scope { int y; }\n"+
+			"scope Symbols;\n" +
+			" : b {"+action+"}\n" +
+			" ;\n" +
+			"b : ID {$Symbols::x=$ID.text} ;\n" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -949,19 +1120,19 @@ public class TestAttributes extends BaseTest {
 
 	public void testGlobalScopeOutsideRule() throws Exception {
 		String action = "public void foo() {$Symbols::names.add('foo');}";
-		String expecting = "public void foo() {((Symbols_scope)Symbols_stack.peek()).names.add('foo');}";
+		String expecting = "public void foo() {((Symbols_stack.size()>0)?((Symbols_scope)Symbols_stack.peek()).names:null).add('foo');}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"scope Symbols {\n" +
-				"  int n;\n" +
-				"  List names;\n" +
-				"}\n" +
-				"@members {'+action+'}\n" +
-				"a : \n" +
-				"  ;\n");
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"  List names;\n" +
+			"}\n" +
+			"@members {'+action+'}\n" +
+			"a : \n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -981,17 +1152,17 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleScopeOutsideRule() throws Exception {
 		String action = "public void foo() {$a::name;}";
-		String expecting = "public void foo() {((a_scope)a_stack.peek()).name;}";
+		String expecting = "public void foo() {((a_stack.size()>0)?((a_scope)a_stack.peek()).name:null);}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"@members {"+action+"}\n" +
-				"a\n" +
-				"scope { int name; }\n" +
-				"  : {foo();}\n" +
-				"  ;\n");
+			"@members {"+action+"}\n" +
+			"a\n" +
+			"scope { int name; }\n" +
+			"  : {foo();}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1012,17 +1183,17 @@ public class TestAttributes extends BaseTest {
 
 	public void testBasicRuleScope() throws Exception {
 		String action = "$a::n;";
-		String expecting = "((a_scope)a_stack.peek()).n;";
+		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a\n" +
-				"scope {\n" +
-				"  int n;\n" +
-				"} : {"+action+"}\n" +
-				"  ;\n");
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1048,11 +1219,11 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a\n" +
-				"scope {\n" +
-				"  int n;\n" +
-				"} : {"+action+"}\n" +
-				"  ;\n");
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1075,12 +1246,12 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a\n" +
-				"scope {\n" +
-				"  int n;\n" +
-				"} : b ;\n" +
-				"b : {"+action+"}\n" +
-				"  ;\n");
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : b ;\n" +
+			"b : {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1100,18 +1271,18 @@ public class TestAttributes extends BaseTest {
 
 	public void testDynamicRuleScopeRefInSubrule() throws Exception {
 		String action = "$a::n;";
-		String expecting = "((a_scope)a_stack.peek()).n;";
+		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a\n" +
-				"scope {\n" +
-				"  int n;\n" +
-				"} : b ;\n" +
-				"b : {"+action+"}\n" +
-				"  ;\n");
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : b ;\n" +
+			"b : {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1137,16 +1308,16 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"scope Symbols {\n" +
-				"  String x;\n" +
-				"}\n" +
-				"a\n"+
-				"scope { int y; }\n"+
-				"scope Symbols;\n" +
-				" : b {"+action+"}\n" +
-				" ;\n" +
-				"b : ID {$Symbols::x=$ID.text} ;\n" +
-				"ID : 'a';\n");
+			"scope Symbols {\n" +
+			"  String x;\n" +
+			"}\n" +
+			"a\n"+
+			"scope { int y; }\n"+
+			"scope Symbols;\n" +
+			" : b {"+action+"}\n" +
+			" ;\n" +
+			"b : ID {$Symbols::x=$ID.text} ;\n" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1166,19 +1337,19 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleScopeFromAnotherRule() throws Exception {
 		String action = "$a::n;"; // must be qualified
-		String expecting = "((a_scope)a_stack.peek()).n;";
+		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a\n" +
-				"scope {\n" +
-				"  int n;\n" +
-				"} : b\n" +
-				"  ;\n" +
-				"b : {"+action+"}\n" +
-				"  ;\n");
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : b\n" +
+			"  ;\n" +
+			"b : {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1204,8 +1375,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a[int i]: {"+action+"}\n" +
-				"  ;\n");
+			"a[int i]: {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1231,8 +1402,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a returns [int i, int j]: {"+action+"}\n" +
-				"  ;\n");
+			"a returns [int i, int j]: {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1285,8 +1456,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : 'a' {"+action+"}\n" +
-				"  ;\n");
+			"a : 'a' {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1308,9 +1479,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : x=b {"+action+"}\n" +
-				"  ;\n" +
-				"b : 'b' ;\n");
+			"a : x=b {"+action+"}\n" +
+			"  ;\n" +
+			"b : 'b' ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1386,9 +1557,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
-				"options {output=template;}\n"+
-				"a : (A->{$A.text}) {"+action+"}\n" +
-				"  ;\n");
+			"options {output=template;}\n"+
+			"a : (A->{$A.text}) {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1408,18 +1579,18 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleRefWhenRuleHasScope() throws Exception {
 		String action = "$b.start;";
-		String expecting = "b1!=null?((Token)b1.start):null;";
+		String expecting = "(b1!=null?((Token)b1.start):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n" +
-				"a : b {###"+action+"!!!} ;\n" +
-				"b\n" +
-				"scope {\n" +
-				"  int n;\n" +
-				"} : 'b' \n" +
-				"  ;\n");
+			"a : b {###"+action+"!!!} ;\n" +
+			"b\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : 'b' \n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1435,18 +1606,18 @@ public class TestAttributes extends BaseTest {
 
 	public void testDynamicScopeRefOkEvenThoughRuleRefExists() throws Exception {
 		String action = "$b::n;";
-		String expecting = "((b_scope)b_stack.peek()).n;";
+		String expecting = "((b_stack.size()>0)?((b_scope)b_stack.peek()).n:null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n" +
-				"s : b ;\n"+
-				"b\n" +
-				"scope {\n" +
-				"  int n;\n" +
-				"} : '(' b ')' {"+action+"}\n" + // refers to current invocation's n
-				"  ;\n");
+			"s : b ;\n"+
+			"b\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : '(' b ')' {"+action+"}\n" + // refers to current invocation's n
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1472,9 +1643,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
-				"options {output=template;}\n"+
-				"a : {"+action+"}\n" +
-				"  ;\n");
+			"options {output=template;}\n"+
+			"a : {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1500,9 +1671,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
-				"options {output=template;}\n"+
-				"a : {"+action+"}\n" +
-				"  ;\n");
+			"options {output=template;}\n"+
+			"a : {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1528,8 +1699,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
-				"a : {###"+action+"!!!}\n" +
-				"  ;\n");
+			"a : {###"+action+"!!!}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1547,18 +1718,18 @@ public class TestAttributes extends BaseTest {
 	public void testTokenLabelFromMultipleAlts() throws Exception {
 		String action = "$ID.text;"; // must be qualified
 		String action2 = "$INT.text;"; // must be qualified
-		String expecting = "ID1!=null?ID1.getText():null;";
-		String expecting2 = "INT2!=null?INT2.getText():null;";
+		String expecting = "(ID1!=null?ID1.getText():null);";
+		String expecting2 = "(INT2!=null?INT2.getText():null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ID {"+action+"}\n" +
-				"  | INT {"+action2+"}\n" +
-				"  ;\n" +
-				"ID : 'a';\n" +
-				"INT : '0';\n");
+			"a : ID {"+action+"}\n" +
+			"  | INT {"+action2+"}\n" +
+			"  ;\n" +
+			"ID : 'a';\n" +
+			"INT : '0';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1592,18 +1763,18 @@ public class TestAttributes extends BaseTest {
 	public void testRuleLabelFromMultipleAlts() throws Exception {
 		String action = "$b.text;"; // must be qualified
 		String action2 = "$c.text;"; // must be qualified
-		String expecting = "b1!=null?input.toString(b1.start,b1.stop):null;";
-		String expecting2 = "c2!=null?input.toString(c2.start,c2.stop):null;";
+		String expecting = "(b1!=null?input.toString(b1.start,b1.stop):null);";
+		String expecting2 = "(c2!=null?input.toString(c2.start,c2.stop):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : b {"+action+"}\n" +
-				"  | c {"+action2+"}\n" +
-				"  ;\n" +
-				"b : 'a';\n" +
-				"c : '0';\n");
+			"a : b {"+action+"}\n" +
+			"  | c {"+action2+"}\n" +
+			"  ;\n" +
+			"b : 'a';\n" +
+			"c : '0';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1642,11 +1813,11 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a\n" +
-				"scope {\n" +
-				"  int n;\n" +
-				"} : {"+action+"}\n" +
-				"  ;\n");
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : {"+action+"}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1679,11 +1850,11 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"scope Symbols {\n" +
-				"  int n;\n" +
-				"}\n" +
-				"a : {'+action+'}\n" +
-				"  ;\n");
+			"scope Symbols {\n" +
+			"  int n;\n" +
+			"}\n" +
+			"a : {'+action+'}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1716,13 +1887,13 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a\n" +
-				"scope {\n" +
-				"  int n;\n" +
-				"} : b\n" +
-				"  ;\n" +
-				"b : {'+action+'}\n" +
-				"  ;\n");
+			"a\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : b\n" +
+			"  ;\n" +
+			"b : {'+action+'}\n" +
+			"  ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator =
@@ -1750,9 +1921,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : id='foo' id=b\n" +
-				"  ;\n" +
-				"b : ;\n");
+			"a : id='foo' id=b\n" +
+			"  ;\n" +
+			"b : ;\n");
 		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
 		Object expectedArg = "id";
 		Object expectedArg2 = "rule!=token";
@@ -1766,9 +1937,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ids+='a' ids='b'\n" +
-				"  ;\n" +
-				"b : ;\n");
+			"a : ids+='a' ids='b'\n" +
+			"  ;\n" +
+			"b : ;\n");
 		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
 		Object expectedArg = "ids";
 		Object expectedArg2 = "token!=token-list";
@@ -1782,10 +1953,10 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n" +
-				"options {output=AST;}\n"+
-				"a : bs+=b bs=b\n" +
-				"  ;\n" +
-				"b : 'b';\n");
+			"options {output=AST;}\n"+
+			"a : bs+=b bs=b\n" +
+			"  ;\n" +
+			"b : 'b';\n");
 		int expectedMsgID = ErrorManager.MSG_LABEL_TYPE_CONFLICT;
 		Object expectedArg = "bs";
 		Object expectedArg2 = "rule!=rule-list";
@@ -1799,10 +1970,10 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a[int i] returns [int x, int i]\n" +
-				"  : \n" +
-				"  ;\n" +
-				"b : ;\n");
+			"a[int i] returns [int x, int i]\n" +
+			"  : \n" +
+			"  ;\n" +
+			"b : ;\n");
 		int expectedMsgID = ErrorManager.MSG_ARG_RETVAL_CONFLICT;
 		Object expectedArg = "i";
 		Object expectedArg2 = "a";
@@ -1819,7 +1990,7 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
-				"a : ids+=ID ( COMMA ids+=ID {"+action+"})* ;\n");
+			"a : ids+=ID ( COMMA ids+=ID {"+action+"})* ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1847,8 +2018,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ids+='if' ( ',' ids+=ID {"+action+"})* ;" +
-				"ID : 'a';\n");
+			"a : ids+='if' ( ',' ids+=ID {"+action+"})* ;" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1876,8 +2047,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ids+=('a'|'b') ( ',' ids+=ID {"+action+"})* ;" +
-				"ID : 'a';\n");
+			"a : ids+=('a'|'b') ( ',' ids+=ID {"+action+"})* ;" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -1905,8 +2076,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ids+=. ( ',' ids+=ID {"+action+"})* ;" +
-				"ID : 'a';\n");
+			"a : ids+=. ( ',' ids+=ID {"+action+"})* ;" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		ActionTranslatorLexer translator =
@@ -1928,14 +2099,14 @@ public class TestAttributes extends BaseTest {
 
 	public void testImplicitTokenLabel() throws Exception {
 		String action = "$ID; $ID.text; $ID.getText()";
-		String expecting = "ID1; ID1!=null?ID1.getText():null; ID1.getText()";
+		String expecting = "ID1; (ID1!=null?ID1.getText():null); ID1.getText()";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ID {"+action+"} ;" +
-				"ID : 'a';\n");
+			"a : ID {"+action+"} ;" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1959,14 +2130,14 @@ public class TestAttributes extends BaseTest {
 
 	public void testImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
-		String expecting = "r1!=null?((Token)r1.start):null;";
+		String expecting = "(r1!=null?((Token)r1.start):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : r {###"+action+"!!!} ;" +
-				"r : 'a';\n");
+			"a : r {###"+action+"!!!} ;" +
+			"r : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -1983,14 +2154,14 @@ public class TestAttributes extends BaseTest {
 
 	public void testReuseExistingLabelWithImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
-		String expecting = "x!=null?((Token)x.start):null;";
+		String expecting = "(x!=null?((Token)x.start):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : x=r {###"+action+"!!!} ;" +
-				"r : 'a';\n");
+			"a : x=r {###"+action+"!!!} ;" +
+			"r : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2007,15 +2178,15 @@ public class TestAttributes extends BaseTest {
 
 	public void testReuseExistingListLabelWithImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
-		String expecting = "x!=null?((Token)x.start):null;";
+		String expecting = "(x!=null?((Token)x.start):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"options {output=AST;}\n" +
-				"a : x+=r {###"+action+"!!!} ;" +
-				"r : 'a';\n");
+			"options {output=AST;}\n" +
+			"a : x+=r {###"+action+"!!!} ;" +
+			"r : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2032,14 +2203,14 @@ public class TestAttributes extends BaseTest {
 
 	public void testReuseExistingLabelWithImplicitTokenLabel() throws Exception {
 		String action = "$ID.text;";
-		String expecting = "x!=null?x.getText():null;";
+		String expecting = "(x!=null?x.getText():null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : x=ID {"+action+"} ;" +
-				"ID : 'a';\n");
+			"a : x=ID {"+action+"} ;" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2061,14 +2232,14 @@ public class TestAttributes extends BaseTest {
 
 	public void testReuseExistingListLabelWithImplicitTokenLabel() throws Exception {
 		String action = "$ID.text;";
-		String expecting = "x!=null?x.getText():null;";
+		String expecting = "(x!=null?x.getText():null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : x+=ID {"+action+"} ;" +
-				"ID : 'a';\n");
+			"a : x+=ID {"+action+"} ;" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2121,7 +2292,7 @@ public class TestAttributes extends BaseTest {
 			"WS : (' '|'\n') {skip();};\n";
 		String expecting = "[a, b]\na b\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "s", "a b", false);
+								  "s", "a b", false);
 		assertEquals(expecting, found);
 	}
 
@@ -2135,7 +2306,7 @@ public class TestAttributes extends BaseTest {
 			"WS : (' '|'\n') {skip();};\n";
 		String expecting = "[hi, mom]\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "s", "a b", false);
+								  "s", "a b", false);
 		assertEquals(expecting, found);
 	}
 
@@ -2144,8 +2315,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : r ;" +
-				"r[int i] : 'a';\n");
+			"a : r ;" +
+			"r[int i] : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2165,8 +2336,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : r[32,34] ;" +
-				"r : 'a';\n");
+			"a : r[32,34] ;" +
+			"r : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2243,8 +2414,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : r[32,34] ;" +
-				"r[int x, int y=3] : 'a';\n");
+			"a : r[32,34] ;" +
+			"r[int x, int y=3] : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2264,8 +2435,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ID[32,34] ;" +
-				"ID : 'a';\n");
+			"a : ID[32,34] ;" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2285,8 +2456,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : 'z' ID[32,34] ;" +
-				"ID : 'a';\n");
+			"R : 'z' ID[32,34] ;" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2303,13 +2474,13 @@ public class TestAttributes extends BaseTest {
 
 	public void testLabelOnRuleRefInLexer() throws Exception {
 		String action = "$i.text";
-		String expecting = "i!=null?i.getText():null";
+		String expecting = "(i!=null?i.getText():null)";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : 'z' i=ID {"+action+"};" +
-				"fragment ID : 'a';\n");
+			"R : 'z' i=ID {"+action+"};" +
+			"fragment ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2332,13 +2503,13 @@ public class TestAttributes extends BaseTest {
 
 	public void testRefToRuleRefInLexer() throws Exception {
 		String action = "$ID.text";
-		String expecting = "ID1!=null?ID1.getText():null";
+		String expecting = "(ID1!=null?ID1.getText():null)";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : 'z' ID {"+action+"};" +
-				"ID : 'a';\n");
+			"R : 'z' ID {"+action+"};" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2366,8 +2537,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : 'z' ID {"+action+"};" +
-				"ID : 'a';\n");
+			"R : 'z' ID {"+action+"};" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2393,7 +2564,7 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : x='z' ;\n");
+			"R : x='z' ;\n");
 
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2408,7 +2579,7 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : x+='z' ;\n");
+			"R : x+='z' ;\n");
 
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2422,7 +2593,7 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : x=. ;\n");
+			"R : x=. ;\n");
 
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2436,7 +2607,7 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : x+=. ;\n");
+			"R : x+=. ;\n");
 
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2450,8 +2621,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"A : R ;" +
-				"R[int i] : 'a';\n");
+			"A : R ;" +
+			"R[int i] : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2474,7 +2645,7 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : 'r' {"+action+"};\n");
+			"R : 'r' {"+action+"};\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2497,13 +2668,13 @@ public class TestAttributes extends BaseTest {
 
 	public void testLexerLabelRefs() throws Exception {
 		String action = "$a $b.text $c $d.text";
-		String expecting = "a b!=null?b.getText():null c d!=null?d.getText():null";
+		String expecting = "a (b!=null?b.getText():null) c (d!=null?d.getText():null)";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : a='c' b='hi' c=. d=DUH {"+action+"};\n" +
-				"DUH : 'd' ;\n");
+			"R : a='c' b='hi' c=. d=DUH {"+action+"};\n" +
+			"DUH : 'd' ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2531,7 +2702,7 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
-				"R : 'r' {"+action+"};\n");
+			"R : 'r' {"+action+"};\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2557,9 +2728,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : R;\n" +
-				"R : 'z' ID[32] ;\n" +
-				"ID : 'a';\n");
+			"a : R;\n" +
+			"R : 'z' ID[32] ;\n" +
+			"ID : 'a';\n");
 
 		String lexerGrammarStr = g.getLexerGrammar();
 		StringReader sr = new StringReader(lexerGrammarStr);
@@ -2589,9 +2760,9 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : R;\n" +
-				"R : 'z' ID ;\n" +
-				"ID[int i] : 'a';\n");
+			"a : R;\n" +
+			"R : 'z' ID ;\n" +
+			"ID[int i] : 'a';\n");
 
 		String lexerGrammarStr = g.getLexerGrammar();
 		StringReader sr = new StringReader(lexerGrammarStr);
@@ -2626,8 +2797,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : id=ID {"+action+"} ;\n" +
-				"ID : 'a';\n");
+			"a : id=ID {"+action+"} ;\n" +
+			"ID : 'a';\n");
 
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
@@ -2657,8 +2828,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ID {"+action+"} ;" +
-				"ID : 'a';\n");
+			"a : ID {"+action+"} ;" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2684,8 +2855,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ID ID {"+action+"};" +
-				"ID : 'a';\n");
+			"a : ID ID {"+action+"};" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2707,8 +2878,8 @@ public class TestAttributes extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar t;\n"+
-				"a : ID ID {"+action+"};" +
-				"ID : 'a';\n");
+			"a : ID ID {"+action+"};" +
+			"ID : 'a';\n");
 		Tool antlr = newTool();
 		antlr.setOutputDirectory(null); // write to /dev/null
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -2724,16 +2895,17 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleRefWithDynamicScope() throws Exception {
 		String action = "$field::x = $field.st;";
-		String expecting = "((field_scope)field_stack.peek()).x = retval.st;";
+		String expecting = "if ( field_stack.size()>0 ) {\n" +
+						   "((field_scope)field_stack.peek()).x = retval.st;}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
 			"grammar a;\n" +
-				"field\n" +
-				"scope { StringTemplate x; }\n" +
-				"    :   'y' {"+action+"}\n" +
-				"    ;\n");
+			"field\n" +
+			"scope { StringTemplate x; }\n" +
+			"    :   'y' {"+action+"}\n" +
+			"    ;\n");
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
@@ -2970,7 +3142,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDoNotTranslateAttributeCompare() throws Exception {
 		String action = "$a.line == $b.line";
-		String expecting = "a!=null?a.getLine():null == b!=null?b.getLine():null";
+		String expecting = "(a!=null?a.getLine():null) == (b!=null?b.getLine():null)";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2999,7 +3171,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDoNotTranslateScopeAttributeCompare() throws Exception {
 		String action = "if ($rule::foo == \"foo\" || 1) { System.out.println(\"ouch\"); }";
-		String expecting = "if (((rule_scope)rule_stack.peek()).foo == \"foo\" || 1) { System.out.println(\"ouch\"); }";
+		String expecting = "if (((rule_stack.size()>0)?((rule_scope)rule_stack.peek()).foo:null) == \"foo\" || 1) { System.out.println(\"ouch\"); }";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -3045,7 +3217,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testTreeRuleStopAttributeIsInvalid() throws Exception {
 		String action = "$r.x; $r.start; $r.stop";
-		String expecting = "r!=null?r.x:null; r!=null?((CommonTree)r.start):null; $r.stop";
+		String expecting = "(r!=null?r.x:null); (r!=null?((CommonTree)r.start):null); $r.stop";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -3079,8 +3251,8 @@ public class TestAttributes extends BaseTest {
 	public void testRefToTextAttributeForCurrentTreeRule() throws Exception {
 		String action = "$text";
 		String expecting = "input.getTokenStream().toString(\n" +
-			"              input.getTreeAdaptor().getTokenStartIndex(retval.start),\n" +
-			"              input.getTreeAdaptor().getTokenStopIndex(retval.start))";
+						   "              input.getTreeAdaptor().getTokenStartIndex(retval.start),\n" +
+						   "              input.getTreeAdaptor().getTokenStopIndex(retval.start))";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
