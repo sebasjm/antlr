@@ -990,9 +990,11 @@ public class CodeGenerator {
 			}
 		}
 		if ( targetChar==-1 ) {
-			String arg = actionText.substring(last, p);
+			String arg = actionText.substring(last, p).trim();
 			//System.out.println("arg="+arg);
-			args.add(arg);
+			if ( arg.length()>0 ) {
+				args.add(arg);
+			}
 		}
 		p++;
 		return p;

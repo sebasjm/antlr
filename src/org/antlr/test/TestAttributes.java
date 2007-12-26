@@ -182,6 +182,32 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
+	public void testArgWithLT() throws Exception {
+		String action = "34<50";
+		String expecting = "34<50";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		// now check in actual grammar.
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a[boolean b]\n" +
+			"        : A a["+action+"] B\n" +
+			"        ;");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		assertEquals(expecting, rawTranslation);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 	public void testGenericsAsArgumentDefinition() throws Exception {
 		String action = "$foo.get(\"ick\");";
 		String expecting = "foo.get(\"ick\");";
