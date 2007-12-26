@@ -650,6 +650,7 @@ public class NFAToDFAConverter {
 				System.out.println("proposed "+proposedNFAConfiguration);
 				*/
 				d.abortedDueToRecursionOverflow = true;
+				d.dfa.probe.reportRecursionOverflow(d, proposedNFAConfiguration);				
 				if ( debug ) {
 					System.out.println("analysis overflow in closure("+d.stateNumber+")");
 				}

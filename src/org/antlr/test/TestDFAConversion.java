@@ -117,7 +117,7 @@ public class TestDFAConversion extends BaseTest {
 	}
 
 	public void testRecursionOverflowWithPredOk() throws Exception {
-		// overflows with k=*, but retries with k=1 and succeeds.
+		// overflows with k=*, but resolves with pred
 		// no warnings/errors
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -125,9 +125,17 @@ public class TestDFAConversion extends BaseTest {
 			"a : A a | Q;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s0-Q&&{synpred1}?->:s2=>1\n" +
-			".s1-{synpred1}?->:s2=>1\n" +
-			".s1-{true}?->:s3=>2\n";
+			".s0-Q&&{synpred1}?->:s11=>1\n" +
+			".s1-A->.s2\n" +
+			".s1-Q&&{synpred1}?->:s10=>1\n" +
+			".s2-A->.s3\n" +
+			".s2-Q&&{synpred1}?->:s9=>1\n" +
+			".s3-A->.s4\n" +
+			".s3-Q&&{synpred1}?->:s8=>1\n" +
+			".s4-A->.s5\n" +
+			".s4-Q&&{synpred1}?->:s6=>1\n" +
+			".s5-{synpred1}?->:s6=>1\n" +
+			".s5-{true}?->:s7=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -138,8 +146,6 @@ public class TestDFAConversion extends BaseTest {
 	}
 
 	public void testRecursionOverflowWithPredOk2() throws Exception {
-		// overflows with k=*, but retries with k=1 and succeeds.
-		// no warnings/errors
 		// must predict Z w/o predicate
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -147,10 +153,18 @@ public class TestDFAConversion extends BaseTest {
 			"a : A a | Q;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s0-Q&&{synpred1}?->:s2=>1\n" +
-			".s0-Z->:s4=>3\n" +
-			".s1-{synpred1}?->:s2=>1\n" +
-			".s1-{true}?->:s3=>2\n";
+			".s0-Q&&{synpred1}?->:s11=>1\n" +
+			".s0-Z->:s12=>3\n" +
+			".s1-A->.s2\n" +
+			".s1-Q&&{synpred1}?->:s10=>1\n" +
+			".s2-A->.s3\n" +
+			".s2-Q&&{synpred1}?->:s9=>1\n" +
+			".s3-A->.s4\n" +
+			".s3-Q&&{synpred1}?->:s8=>1\n" +
+			".s4-A->.s5\n" +
+			".s4-Q&&{synpred1}?->:s6=>1\n" +
+			".s5-{synpred1}?->:s6=>1\n" +
+			".s5-{true}?->:s7=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
