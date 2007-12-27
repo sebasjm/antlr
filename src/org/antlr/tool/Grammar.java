@@ -373,8 +373,9 @@ public class Grammar {
 
 	public int numberOfSemanticPredicates = 0;
 	public int numberOfManualLookaheadOptions = 0;
-	public Set setOfNondeterministicDecisionNumbers = new HashSet();
-	public Set setOfNondeterministicDecisionNumbersResolvedWithPredicates = new HashSet();
+	public Set<Integer> setOfNondeterministicDecisionNumbers = new HashSet<Integer>();
+	public Set<Integer> setOfNondeterministicDecisionNumbersResolvedWithPredicates =
+		new HashSet<Integer>();
 	public Set setOfDFAWhoseAnalysisTimedOut = new HashSet();
 
 	/** Track decisions with syn preds specified for reporting.

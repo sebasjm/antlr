@@ -74,7 +74,8 @@ public class DFAState extends State {
     /** Track the transitions emanating from this DFA state.  The List
      *  elements are Transition objects.
      */
-    protected List transitions = new ArrayList(INITIAL_NUM_TRANSITIONS);
+    protected List<Transition> transitions =
+		new ArrayList<Transition>(INITIAL_NUM_TRANSITIONS);
 
 	/** When doing an acyclic DFA, this is the number of lookahead symbols
 	 *  consumed to reach this state.  This value may be nonzero for most
@@ -102,7 +103,7 @@ public class DFAState extends State {
 	 *  rule too many times (stack would grow beyond a threshold), it
 	 *  marks the state has aborted and notifies the DecisionProbe.
 	 */
-	protected boolean abortedDueToRecursionOverflow = false;
+	public boolean abortedDueToRecursionOverflow = false;
 
 	/** If we detect recursion on more than one alt, decision is non-LL(*),
 	 *  but try to isolate it to only those states whose closure operations
@@ -190,7 +191,7 @@ public class DFAState extends State {
     }
 
     public Transition getTransition(int trans) {
-        return (Transition)transitions.get(trans);
+        return transitions.get(trans);
     }
 
 	public void removeTransition(int trans) {
@@ -404,21 +405,6 @@ public class DFAState extends State {
 		// compare set of NFA configurations in this set with other
         DFAState other = (DFAState)o;
 		return this.nfaConfigurations.equals(other.nfaConfigurations);
-		/*
-		if ( o==null ) {
-            return false;
-        }
-        if ( this.hashCode()!=other.hashCode() ) {
-            return false;
-        }
-		// if not same number of NFA configuraitons, cannot be same state
-		if ( this.nfaConfigurations.size() != other.nfaConfigurations.size() ) {
-			return false;
-		}
-
-		// compare set of NFA configurations in this set with other
-		return this.nfaConfigurations.equals(other.nfaConfigurations);
-		*/
 	}
 
     /** Walk each configuration and if they are all the same alt, return
@@ -449,25 +435,6 @@ public class DFAState extends State {
 				return NFA.INVALID_ALT_NUMBER;
 			}
 		}
-		/*
-		Iterator iter = nfaConfigurations.iterator();
-        NFAConfiguration configuration;
-        while (iter.hasNext()) {
-            configuration = (NFAConfiguration) iter.next();
-            // ignore anything we resolved; predicates will still result
-            // in transitions out of this state, so must count those
-            // configurations; i.e., don't ignore resolveWithPredicate configs
-            if ( configuration.resolved ) {
-                continue;
-            }
-            if ( alt==NFA.INVALID_ALT_NUMBER ) {
-                alt = configuration.alt; // found first nonresolved alt
-            }
-            else if ( configuration.alt!=alt ) {
-                return NFA.INVALID_ALT_NUMBER;
-            }
-        }
-        */
 		this.cachedUniquelyPredicatedAlt = alt;
         return alt;
     }
@@ -488,18 +455,6 @@ public class DFAState extends State {
 				return NFA.INVALID_ALT_NUMBER;
 			}
 		}
-/*
-		Iterator iter = nfaConfigurations.iterator();
-		NFAConfiguration configuration;
-		while (iter.hasNext()) {
-			configuration = (NFAConfiguration) iter.next();
-			if ( alt==NFA.INVALID_ALT_NUMBER ) {
-				alt = configuration.alt; // found first alt
-			}
-			else if ( configuration.alt!=alt ) {
-				return NFA.INVALID_ALT_NUMBER;
-			}
-		}*/
 		return alt;
 	}
 
@@ -524,35 +479,9 @@ public class DFAState extends State {
 				disabled.add(Utils.integer(configuration.alt));
 			}
 		}
-		/*
-		Iterator iter = nfaConfigurations.iterator();
-		NFAConfiguration configuration;
-		while (iter.hasNext()) {
-			configuration = (NFAConfiguration) iter.next();
-			if ( configuration.resolved ) {
-				disabled.add(Utils.integer(configuration.alt));
-			}
-		}
-		*/
 		return disabled;
 	}
 
-	/**
-	public int getNumberOfEOTNFAStates() {
-		int n = 0;
-		Iterator iter = nfaConfigurations.iterator();
-		NFAConfiguration configuration;
-		while (iter.hasNext()) {
-			configuration = (NFAConfiguration) iter.next();
-			NFAState s = dfa.nfa.getState(configuration.state);
-			if ( s.isEOTState() ) {
-				n++;
-			}
-		}
-		return n;
-	}
-    */
-	
 	protected Set getNonDeterministicAlts() {
 		int user_k = dfa.getUserMaxLookahead();
 		if ( user_k>0 && user_k==k ) {
@@ -585,10 +514,10 @@ public class DFAState extends State {
 	 *  Don't report conflicts for DFA states that have conflicting Tokens
 	 *  rule NFA states; they will be resolved in favor of the first rule.
      */
-    protected Set getConflictingAlts() {
+    protected Set<Integer> getConflictingAlts() {
 		// TODO this is called multiple times: cache result?
 		//System.out.println("getNondetAlts for DFA state "+stateNumber);
- 		Set nondeterministicAlts = new HashSet();
+ 		Set<Integer> nondeterministicAlts = new HashSet<Integer>();
 
 		// If only 1 NFA conf then no way it can be nondeterministic;
 		// save the overhead.  There are many o-a->o NFA transitions
@@ -601,28 +530,12 @@ public class DFAState extends State {
 
 		// First get a list of configurations for each state.
 		// Most of the time, each state will have one associated configuration.
-		/*
-		// 12/15/2007: Got another overall 25% time cost reduction from
-		// restricting this to configs with edges; all epsilon edges are
-		// derived from "real" configs.
-		int numConfigsWithLabeledEdges = configurationsWithLabeledEdges.size();
-		for (int i = 0; i < numConfigsWithLabeledEdges; i++) {
-			NFAConfiguration configuration = configurationsWithLabeledEdges.get(i);
-		*/
 		MultiMap<Integer, NFAConfiguration> stateToConfigListMap =
 			new MultiMap<Integer, NFAConfiguration>();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
 			Integer stateI = Utils.integer(configuration.state);
 			stateToConfigListMap.map(stateI, configuration);
-			/*
-			List prevConfigs = (List)stateToConfigListMap.get(stateI);
-			if ( prevConfigs==null ) {
-				prevConfigs = new ArrayList();
-				stateToConfigListMap.put(stateI, prevConfigs);
-			}
-			prevConfigs.add(configuration);
-			*/
 		}
 		// potential conflicts are states with > 1 configuration and diff alts
 		Set states = stateToConfigListMap.keySet();
@@ -733,44 +646,6 @@ public class DFAState extends State {
 		return alts;
 	}
 
-	/** Get the set of all states mentioned by all NFA configurations in this
-	 *  DFA state associated with alt.
-	public Set getNFAStatesForAlt(int alt) {
-		Set alts = new HashSet();
-		int numConfigs = nfaConfigurations.size();
-		for (int i = 0; i < numConfigs; i++) {
-			NFAConfiguration configuration = (NFAConfiguration) nfaConfigurations.get(i);
-			if ( configuration.alt == alt ) {
-				alts.add(Utils.integer(configuration.state));
-			}
-		}
-		return alts;
-	}
-	 */
-
-	/** For gated productions, we need a list of all predicates for the
-	 *  target of an edge so we can gate the edge based upon the predicates
-	 *  associated with taking that path (if any).
-	 *
-	 *  experimental 11/29/2005
-	 *
-	public Set getGatedPredicatesInNFAConfigurations() {
-		Set preds = new HashSet();
-		Iterator iter = nfaConfigurations.iterator();
-		NFAConfiguration configuration;
-		while (iter.hasNext()) {
-			configuration = (NFAConfiguration) iter.next();
-			if ( configuration.semanticContext.isGated() ) {
-				preds.add(configuration.semanticContext);
-			}
-		}
-		if ( preds.size()==0 ) {
-			return null;
-		}
-		return preds;
-	}
-	 */
-
 	public Set getGatedSyntacticPredicatesInNFAConfigurations() {
 		int numConfigs = nfaConfigurations.size();
 		Set<SemanticContext> synpreds = new HashSet<SemanticContext>();
@@ -845,36 +720,6 @@ public class DFAState extends State {
 				}
 			}
 		}
-		/*
-		Iterator iter = nfaConfigurations.iterator();
-		SemanticContext unionOfPredicatesFromAllAlts = null;
-		NFAConfiguration configuration;
-		while (iter.hasNext()) {
-			configuration = (NFAConfiguration) iter.next();
-			SemanticContext gatedPredExpr =
-				configuration.semanticContext.getGatedPredicateContext();
-			if ( gatedPredExpr==null ) {
-				// if we ever find a configuration w/o a gated predicate
-				// (even if it's a nongated predicate), we cannot gate
-				// the indident edges.
-				return null;
-			}
-			else if ( acceptState || !configuration.semanticContext.isSyntacticPredicate() ) {
-				// at this point we have a gated predicate and, due to elseif,
-				// we know it's an accept and not a syn pred.  In this case,
-				// it's safe to add the gated predicate to the union.  We
-				// only want to add syn preds if it's an accept state.  Other
-				// gated preds can be used with edges leading to accept states.
-				if ( unionOfPredicatesFromAllAlts==null ) {
-					unionOfPredicatesFromAllAlts = gatedPredExpr;
-				}
-				else {
-					unionOfPredicatesFromAllAlts =
-						SemanticContext.or(unionOfPredicatesFromAllAlts,gatedPredExpr);
-				}
-			}
-		}
-		*/
 		if ( unionOfPredicatesFromAllAlts instanceof SemanticContext.TruePredicate ) {
 			return null;
 		}
@@ -905,18 +750,6 @@ public class DFAState extends State {
 			}
 			buf.append(configuration);
 		}
-		/*
-		Iterator iter = nfaConfigurations.iterator();
-        int i = 1;
-        while (iter.hasNext()) {
-            NFAConfiguration configuration = (NFAConfiguration) iter.next();
-            if ( i>1 ) {
-                buf.append(", ");
-            }
-            buf.append(configuration);
-            i++;
-        }
-        */
         buf.append("}");
         return buf.toString();
     }

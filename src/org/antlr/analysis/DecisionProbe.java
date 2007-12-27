@@ -32,6 +32,7 @@ import org.antlr.tool.Grammar;
 import org.antlr.tool.GrammarAST;
 import org.antlr.tool.ANTLRParser;
 import org.antlr.misc.Utils;
+import org.antlr.misc.MultiMap;
 
 import java.util.*;
 
@@ -74,47 +75,47 @@ public class DecisionProbe {
 	 *  is able to reach the same NFA state by starting at more than one
 	 *  alternative's left edge.  Though, later, we may find that predicates
 	 *  resolve the issue, but track info anyway.
-	 *  Set<DFAState>.  Note that from the DFA state, you can ask for
+	 *  Note that from the DFA state, you can ask for
 	 *  which alts are nondeterministic.
 	 */
-	protected Set statesWithSyntacticallyAmbiguousAltsSet = new HashSet();
+	protected Set<DFAState> statesWithSyntacticallyAmbiguousAltsSet = new HashSet<DFAState>();
 
 	/** Track just like stateToSyntacticallyAmbiguousAltsMap, but only
 	 *  for nondeterminisms that arise in the Tokens rule such as keyword vs
 	 *  ID rule.  The state maps to the list of Tokens rule alts that are
 	 *  in conflict.
-	 *  Map<DFAState, Set<int>>
 	 */
-	protected Map stateToSyntacticallyAmbiguousTokensRuleAltsMap = new HashMap();
+	protected Map<DFAState, Set<Integer>> stateToSyntacticallyAmbiguousTokensRuleAltsMap =
+		new HashMap<DFAState, Set<Integer>>();
 
 	/** Was a syntactic ambiguity resolved with predicates?  Any DFA
 	 *  state that predicts more than one alternative, must be resolved
 	 *  with predicates or it should be reported to the user.
-	 *  Set<DFAState>
 	 */
-	protected Set statesResolvedWithSemanticPredicatesSet = new HashSet();
+	protected Set<DFAState> statesResolvedWithSemanticPredicatesSet = new HashSet<DFAState>();
 
 	/** Track the predicates for each alt per DFA state;
 	 *  more than one DFA state might have syntactically ambig alt prediction.
-	 *  This is Map<DFAState, Map<int,SemanticContext>>; that is, it
-	 *  maps DFA state to another map, mapping alt number to a
+	 *  Maps DFA state to another map, mapping alt number to a
 	 *  SemanticContext (pred(s) to execute to resolve syntactic ambiguity).
 	 */
-	protected Map stateToAltSetWithSemanticPredicatesMap = new HashMap();
+	protected Map<DFAState, Map<Integer,SemanticContext>> stateToAltSetWithSemanticPredicatesMap =
+		new HashMap<DFAState, Map<Integer,SemanticContext>>();
 
-	/** Map<DFAState,List<int>> Tracks alts insufficiently covered.
+	/** Tracks alts insufficiently covered.
 	 *  For example, p1||true gets reduced to true and so leaves
 	 *  whole alt uncovered.  This maps DFA state to the set of alts
 	 */
-	protected Map stateToIncompletelyCoveredAltsMap = new HashMap();
+	protected Map<DFAState,List<Integer>> stateToIncompletelyCoveredAltsMap =
+		new HashMap<DFAState,List<Integer>>();
 
 	/** The set of states w/o emanating edges and w/o resolving sem preds. */
-	protected Set danglingStates = new HashSet();
+	protected Set<DFAState> danglingStates = new HashSet<DFAState>();
 
 	/** The overall list of alts within the decision that have at least one
 	 *  conflicting input sequence.
 	 */
-	protected Set altsWithProblem = new HashSet();
+	protected Set<Integer> altsWithProblem = new HashSet<Integer>();
 
 	/** If decision with > 1 alt has recursion in > 1 alt, it's nonregular
 	 *  lookahead.  The decision cannot be made with a DFA.
@@ -124,15 +125,19 @@ public class DecisionProbe {
 
 	/** Recursion is limited to a particular depth.  If that limit is exceeded
 	 *  the proposed new NFAConfiguration is recorded for the associated DFA state.
-	 *  Map<Integer DFA state number,List<NFAConfiguration>>.
 	 */
-	protected Map stateToRecursionOverflowConfigurationsMap = new HashMap();
+	protected MultiMap<Integer, NFAConfiguration> stateToRecursionOverflowConfigurationsMap =
+		new MultiMap<Integer, NFAConfiguration>();
+	/*
+	protected Map<Integer, List<NFAConfiguration>> stateToRecursionOverflowConfigurationsMap =
+		new HashMap<Integer, List<NFAConfiguration>>();
+		*/
 
 	/** Left recursion discovered.  The proposed new NFAConfiguration
 	 *  is recorded for the associated DFA state.
-	 *  Map<DFAState,List<NFAConfiguration>>.
+	protected Map<Integer,List<NFAConfiguration>> stateToLeftRecursiveConfigurationsMap =
+		new HashMap<Integer,List<NFAConfiguration>>();
 	 */
-	protected Map stateToLeftRecursiveConfigurationsMap = new HashMap();
 
 	/** Did ANTLR have to terminate early on the analysis of this decision? */
 	protected boolean timedOut = false;
@@ -153,7 +158,7 @@ public class DecisionProbe {
 	 *  infinite loop.  Stop.  Set<String>.  The strings look like
 	 *  stateNumber_labelIndex.
 	 */
-	protected Set statesVisitedAtInputDepth;
+	protected Set<String> statesVisitedAtInputDepth;
 
 	protected Set<Integer> statesVisitedDuringSampleSequence;
 
@@ -287,13 +292,6 @@ public class DecisionProbe {
 		Integer stateI = Utils.integer(d.stateNumber);
 		stateToRecursionOverflowConfigurationsMap.remove(stateI);
 	}
-
-	/*
-	public boolean dfaStateHasRecursionOverflow(DFAState d) {
-		Integer stateI = Utils.integer(d.stateNumber);
-		return stateToRecursiveOverflowConfigurationsMap.get(stateI)!=null;
-	}
-	*/
 
 	/** Return a List<Label> indicating an input sequence that can be matched
 	 *  from the start state of the DFA to the targetState (which is known
@@ -521,7 +519,6 @@ public class DecisionProbe {
 								stateToRecursionOverflowConfigurationsMap,
 								altToTargetToCallSitesMap, // output param
 								altToDFAState);            // output param
-		//System.out.println("altToTargetToCallSitesMap="+altToTargetToCallSitesMap);
 
 		// walk each alt with recursion overflow problems and generate error
 		Set alts = altToTargetToCallSitesMap.keySet();
@@ -540,43 +537,6 @@ public class DecisionProbe {
 										   targetRules,
 										   callSiteStates);
 		}
-
-		/* All  recursion determines now before analysis
-		// LEFT RECURSION
-		// TODO: hideous cut/paste of code; try to refactor
-
-		Set dfaStatesWithLeftRecursionProblems =
-			stateToLeftRecursiveConfigurationsMap.keySet();
-		Set dfaStatesUnaliased =
-			getUnaliasedDFAStateSet(dfaStatesWithLeftRecursionProblems);
-
-		// now walk truly unique (unaliased) list of dfa states with inf recur
-		// Goal: create a map from alt to map<target,List<callsites>>
-		// Map<Map<String target, List<NFAState call sites>>
-		altToTargetToCallSitesMap = new HashMap();
-		// track a single problem DFA state for each alt
-		altToDFAState = new HashMap();
-		computeAltToProblemMaps(dfaStatesUnaliased,
-								stateToLeftRecursiveConfigurationsMap,
-								altToTargetToCallSitesMap, // output param
-								altToDFAState);            // output param
-
-		// walk each alt with recursion overflow problems and generate error
-		alts = altToTargetToCallSitesMap.keySet();
-		sortedAlts = new ArrayList(alts);
-		Collections.sort(sortedAlts);
-		for (Iterator altsIt = sortedAlts.iterator(); altsIt.hasNext();) {
-			Integer altI = (Integer) altsIt.next();
-			Map targetToCallSiteMap =
-				(Map)altToTargetToCallSitesMap.get(altI);
-			Set targetRules = targetToCallSiteMap.keySet();
-			Collection callSiteStates = targetToCallSiteMap.values();
-			ErrorManager.leftRecursion(this,
-									   altI.intValue(),
-									   targetRules,
-									   callSiteStates);
-		}
-		*/
 	}
 
 	private void computeAltToProblemMaps(Set dfaStatesUnaliased,
@@ -660,37 +620,18 @@ public class DecisionProbe {
 	{
 		// track the state number rather than the state as d will change
 		// out from underneath us; hash wouldn't return any value
-		Integer stateI = Utils.integer(d.stateNumber);
-		List configs = (List)stateToRecursionOverflowConfigurationsMap.get(stateI);
-		if ( configs==null ) {
-			configs = new ArrayList();
-			configs.add(recursionNFAConfiguration);
-			stateToRecursionOverflowConfigurationsMap.put(stateI, configs);
-		}
-		else {
-			configs.add(recursionNFAConfiguration);
+
+		// left-recursion is detected in start state.  Since we can't
+		// call resolveNondeterminism() on the start state (it would
+		// not look k=1 to get min single token lookahead), we must
+		// prevent errors derived from this state.  Avoid start state
+		if ( d.stateNumber > 0 ) {
+			Integer stateI = Utils.integer(d.stateNumber);
+			stateToRecursionOverflowConfigurationsMap.map(stateI, recursionNFAConfiguration);
 		}
 	}
 
-	// TODO: not used?
-	public void reportLeftRecursion(DFAState d,
-									NFAConfiguration leftRecursiveNFAConfiguration)
-	{
-		// track the state number rather than the state as d will change
-		// out from underneath us; hash wouldn't return any value
-		Integer stateI = Utils.integer(d.stateNumber);
-		List configs = (List)stateToLeftRecursiveConfigurationsMap.get(stateI);
-		if ( configs==null ) {
-			configs = new ArrayList();
-			configs.add(leftRecursiveNFAConfiguration);
-			stateToLeftRecursiveConfigurationsMap.put(stateI, configs);
-		}
-		else {
-			configs.add(leftRecursiveNFAConfiguration);
-		}
-	}
-
-	public void reportNondeterminism(DFAState d, Set nondeterministicAlts) {
+	public void reportNondeterminism(DFAState d, Set<Integer> nondeterministicAlts) {
 		altsWithProblem.addAll(nondeterministicAlts); // track overall list
 		statesWithSyntacticallyAmbiguousAltsSet.add(d);
 		dfa.nfa.grammar.setOfNondeterministicDecisionNumbers.add(
@@ -702,12 +643,16 @@ public class DecisionProbe {
 	 *  we don't print out warnings in favor of just picking the first token
 	 *  definition found in the grammar ala lex/flex.
 	 */
-	public void reportLexerRuleNondeterminism(DFAState d, Set nondeterministicAlts) {
+	public void reportLexerRuleNondeterminism(DFAState d, Set<Integer> nondeterministicAlts) {
 		stateToSyntacticallyAmbiguousTokensRuleAltsMap.put(d,nondeterministicAlts);
 	}
 
-	public void reportNondeterminismResolvedWithSemanticPredicate(DFAState d)
-	{
+	public void reportNondeterminismResolvedWithSemanticPredicate(DFAState d) {
+		// First, prevent a recursion warning on this state due to
+		// pred resolution
+		if ( d.abortedDueToRecursionOverflow ) {
+			d.dfa.probe.removeRecursiveOverflowState(d);
+		}
 		statesResolvedWithSemanticPredicatesSet.add(d);
 		//System.out.println("resolved with pred: "+d);
 		dfa.nfa.grammar.setOfNondeterministicDecisionNumbersResolvedWithPredicates.add(
@@ -790,25 +735,6 @@ public class DecisionProbe {
 		boolean reaches = reachesState(dfa.startState, targetState, dfaStates);
 		return dfaStates;
 	}
-
-    /** Given a set of DFA states, return a set of NFA states associated
-	 *  with alt collected from all DFA states.  If alt==0 then collect
-	 *  all NFA states regardless of alt.
-	protected Set getNFAStatesFromDFAStatesForAlt(Set dfaStates, int alt) {
-		Set nfaStates = new LinkedHashSet();
-		for (Iterator it = dfaStates.iterator(); it.hasNext();) {
-			DFAState d = (DFAState) it.next();
-			Set configs = d.getNFAConfigurations();
-			for (Iterator configIter = configs.iterator(); configIter.hasNext();) {
-				NFAConfiguration c = (NFAConfiguration) configIter.next();
-				if ( alt==0 || c.alt==alt ) {
-					nfaStates.add(Utils.integer(c.state));
-				}
-			}
-		}
-		return nfaStates;
-	}
-	 */
 
 	/** Given a start state and a final state, find a list of edge labels
 	 *  between the two ignoring epsilon.  Limit your scan to a set of states
@@ -957,5 +883,9 @@ public class DecisionProbe {
 		NFAState ruleStartState = (NFAState)ruleCallEdge.target;
 		//System.out.println("alt = "+decisionLeft.getEnclosingRule());
 		return ruleStartState.enclosingRule.name;
+	}
+
+	public void reset() {
+		stateToRecursionOverflowConfigurationsMap.clear();
 	}
 }

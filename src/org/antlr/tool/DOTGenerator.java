@@ -309,6 +309,12 @@ public class DOTGenerator {
 			buf.append('s');
 			buf.append(s.stateNumber);
 			if ( Tool.internalOption_ShowNFConfigsInDFA ) {
+				if ( s instanceof DFAState ) {
+					if ( ((DFAState)s).abortedDueToRecursionOverflow ) {
+						buf.append("\\n");
+						buf.append("abortedDueToRecursionOverflow");
+					}
+				}
 				Set alts = ((DFAState)s).getAltSet();
 				if ( alts!=null ) {
 					buf.append("\\n");

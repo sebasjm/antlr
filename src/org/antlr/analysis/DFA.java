@@ -276,68 +276,6 @@ public class DFA {
 			// all numbers are unique already; no states are thrown out.
 			return;
 		}
-        /*
-        if ( decisionNumber==14 ) {
-			System.out.println("DFA :"+decisionNumber+" "+this);
-            //System.out.println("DFA start state :"+startState);
-			System.out.println("unique state numbers: ");
-			Set s = getUniqueStates().keySet();
-			for (Iterator it = s.iterator(); it.hasNext();) {
-				DFAState d = (DFAState) it.next();
-				System.out.print(d.stateNumber+" ");
-			}
-			System.out.println();
-
-			System.out.println("size="+s.size());
-			System.out.println("continguous states: ");
-			for (Iterator it = states.iterator(); it.hasNext();) {
-				DFAState d = (DFAState) it.next();
-				if ( d!=null ) {
-                    System.out.print(d.stateNumber+" ");
-                }
-			}
-			System.out.println();
-
-			//Set a = new HashSet();
-			List a = new ArrayList();
-			System.out.println("unique set from states table: ");
-			for (int i = 0; i <= getMaxStateNumber(); i++) {
-				DFAState d = getState(i);
-                if ( d==null ) {
-                    continue;
-                }
-                boolean found=false;
-				for (int j=0; j<a.size(); j++) {
-					DFAState old = (DFAState)a.get(j);
-					if ( old.equals(d) ) {
-						if ( old.stateNumber!=d.stateNumber ) {
-							System.out.println("WHAT! state["+i+"]="+d+" prev in list as "+old);
-						}
-						found=true;
-					}
-				}
-				if ( !found ) {
-					a.add(d);
-				}
-			}
-			for (Iterator it = a.iterator(); it.hasNext();) {
-				DFAState d = (DFAState) it.next();
-                if ( d!=null ) {
-                    System.out.print(d.stateNumber+" ");
-                }
-            }
-			System.out.println();
-			System.out.println("size="+a.size());
-
-			if ( a.equals(s) ) {
-				System.out.println("both sets same");
-			}
-			else {
-				System.out.println("sets NOT same");
-			}
-			System.out.println("stateCounter="+stateCounter);
-		}
-        */
 
         // walk list of DFAState objects by state number,
 		// setting state numbers to 0..n-1
@@ -362,28 +300,6 @@ public class DFA {
 				snum++;
 			}
 		}
-        /*
-        if ( decisionNumber==14 ) {
-			//System.out.println("max state num: "+maxStateNumber);
-			System.out.println("after renum, DFA :"+decisionNumber+" "+this);
-			System.out.println("uniq states.size="+uniqueStates.size());
-
-			Set a = new HashSet();
-			System.out.println("after renumber; unique set from states table: ");
-			for (int i = 0; i <= getMaxStateNumber(); i++) {
-				DFAState d = getState(i);
-				a.add(d);
-			}
-			for (Iterator it = a.iterator(); it.hasNext();) {
-				DFAState d = (DFAState) it.next();
-				if ( d!=null ) {
-                    System.out.print(d.stateNumber+" ");
-                }
-			}
-			System.out.println();
-			System.out.println("size="+a.size());
-		}
-        */
         if ( snum!=getNumberOfStates() ) {
 			ErrorManager.internalError("DFA "+decisionNumber+": "+
 				decisionNFAStartState.getDescription()+" num unique states "+getNumberOfStates()+
@@ -641,9 +557,6 @@ public class DFA {
 					// set the transition if the label is valid (don't do EOF)
 					if ( atoms[a]>=Label.MIN_CHAR_VALUE ) {
 						int labelIndex = atoms[a]-smin; // offset from 0
-						if ( labelIndex < 0 ) {
-							System.out.println("break;");
-						}
 						stateTransitions.set(labelIndex,
 											 Utils.integer(edge.target.stateNumber));
 					}
@@ -657,14 +570,6 @@ public class DFA {
 			transitionEdgeTables.set(s.stateNumber, edgeClass);
 		}
 		else {
-			/*
-			if ( stateTransitions.size()>255 ) {
-				System.out.println("edge edgeTable "+stateTransitions.size()+" s"+s.stateNumber+": "+Utils.integer(edgeTransitionClass));
-			}
-			else {
-				System.out.println("stateTransitions="+stateTransitions);
-			}
-			*/
 			edgeClass = Utils.integer(edgeTransitionClass);
 			transitionEdgeTables.set(s.stateNumber, edgeClass);
 			edgeTransitionClassMap.put(stateTransitions, edgeClass);
@@ -757,11 +662,6 @@ public class DFA {
 	 *  indicates it's a new state.
      */
     protected DFAState addState(DFAState d) {
-		/*
-		if ( decisionNumber==14 ) {
-            System.out.println("addState: "+d.stateNumber);
-        }
-        */
 		if ( getUserMaxLookahead()>0 ) {
 			return d;
 		}
@@ -956,11 +856,6 @@ public class DFA {
             d.setAcceptStateReachable(REACHABLE_YES);
         }
         else {
-			/*
-			if ( d.getNumberOfTransitions()==0 ) {
-				probe.reportDanglingState(d);
-			}
-			*/
             d.setAcceptStateReachable(REACHABLE_NO);
 			reduced = false;
         }
