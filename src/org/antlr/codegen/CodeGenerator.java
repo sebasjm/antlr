@@ -954,6 +954,7 @@ public class CodeGenerator {
 		if ( actionText==null ) {
 			return -1;
 		}
+		actionText = actionText.replaceAll("//.*\n", "");
 		int n = actionText.length();
 		//System.out.println("actionText@"+start+"->"+(char)targetChar+"="+actionText.substring(start,n));
 		int p = start;
