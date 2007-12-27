@@ -2691,7 +2691,9 @@ outer:
 	}
 
 	public LookaheadSet LOOK(NFAState s) {
-		//System.out.println("> LOOK("+s+")");
+		if ( NFAToDFAConverter.debug ) {
+			System.out.println("> LOOK("+s+")");
+		}
 		lookBusy.clear();
 		LookaheadSet look = _FIRST(s, true);
 		// FOLLOW makes no sense (at the moment!) for lexical rules.
@@ -2704,10 +2706,13 @@ outer:
 			//look.orInPlace(FOLLOW(s.enclosingRule));
 		}
 		else if ( type==LEXER && look.member(Label.EOT) ) {
-			// if this has EOT, entire thing is EOT (all char can follow rule)
-			look = new LookaheadSet(Label.EOT);
+			// if this has EOT, lookahead is all char (all char can follow rule)
+			//look = new LookaheadSet(Label.EOT);
+			look = new LookaheadSet(IntervalSet.COMPLETE_SET);
 		}
-		//System.out.println("< LOOK("+s+")="+look.toString(this));
+		if ( NFAToDFAConverter.debug ) {
+			System.out.println("< LOOK("+s+")="+look.toString(this));
+		}
 		return look;
 	}
 

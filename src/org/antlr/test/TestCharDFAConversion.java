@@ -137,8 +137,8 @@ public class TestCharDFAConversion extends BaseTest {
 			"IF : 'if' ;\n" + // choose this over ID
 			"ID : ('a'..'z')+ ;\n");
 		String expecting =
-			".s0-'a'..'z'->:s1=>1\n" +
-			".s0-<EOT>->:s2=>2\n";
+			".s0-'a'..'z'->:s2=>1\n" +
+			".s0-<EOT>->:s1=>2\n";
 		checkDecision(g, 1, expecting, null);
 		expecting =
 			".s0-'i'->.s1\n" +
