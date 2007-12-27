@@ -278,6 +278,14 @@ public class Target {
 		return buf.toString();
 	}
 
+	public String encodeIntAsCharEscape(int v) {
+		if ( v<=127 ) {
+			return "\\"+Integer.toOctalString(v);
+		}
+		String hex = Integer.toHexString(v|0x10000).substring(1,5);
+		return "\\u"+hex;
+	}
+
 	/** Some targets only support ASCII or 8-bit chars/strings.  For example,
 	 *  C++ will probably want to return 0xFF here.
 	 */

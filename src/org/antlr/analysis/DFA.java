@@ -212,6 +212,9 @@ public class DFA {
 	public Vector transitionEdgeTables; // not used by java yet
 	protected int uniqueCompressedSpecialStateNum = 0;
 
+	/** Which generator to use if we're building state tables */
+	protected CodeGenerator generator = null;
+
 	protected DFA() {;}
 
 	public DFA(int decisionNumber, NFAState decisionStartState) {
@@ -372,8 +375,8 @@ public class DFA {
 					break;
 				}
 			}
-			encoded.add(encodeIntAsCharEscape((char)n));
-			encoded.add(encodeIntAsCharEscape((char)I.intValue()));
+			encoded.add(generator.target.encodeIntAsCharEscape((char)n));
+			encoded.add(generator.target.encodeIntAsCharEscape((char)I.intValue()));
 			i+=n;
 		}
 		return encoded;
@@ -381,7 +384,7 @@ public class DFA {
 
 	public void createStateTables(CodeGenerator generator) {
 		//System.out.println("createTables:\n"+this);
-
+		this.generator = generator;
 		description = getNFADecisionStartState().getDescription();
 		description =
 			generator.target.getTargetStringLiteralFromString(description);
@@ -639,14 +642,6 @@ public class DFA {
 		else {
 			special.set(s.stateNumber, Utils.integer(-1)); // not special
 		}
-	}
-
-	public static String encodeIntAsCharEscape(int v) {
-		if ( v<=127 ) {
-			return "\\"+Integer.toOctalString(v);
-		}
-		String hex = Integer.toHexString(v|0x10000).substring(1,5);
-		return "\\u"+hex;
 	}
 
 	public int predict(IntStream input) {
