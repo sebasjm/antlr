@@ -123,8 +123,8 @@ public class TestAttributes extends BaseTest {
 
 	public void testComplicatedArgParsing() throws Exception {
 		String action = "x, (*a).foo(21,33), 3.2+1, '\\n', "+
-						"\"a,oo\\nick\", {bl, \"fdkj\"eck}, [\"cat\\n,\", x, 43]";
-		String expecting = "x, (*a).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}, [\"cat\\n,\", x, 43]";
+						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
+		String expecting = "x, (*a).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -143,6 +143,34 @@ public class TestAttributes extends BaseTest {
 																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		String rawTranslation =	translator.translate();
 		assertEquals(expecting, rawTranslation);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testBracketArgParsing() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		// now check in actual grammar.
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a[String[\\] ick, int i]\n" +
+			"        : A \n"+
+			"        ;");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		Rule r = g.getRule("a");
+		AttributeScope parameters = r.parameterScope;
+		List<Attribute> attrs = parameters.getAttributes();
+		assertEquals("attribute mismatch","String[] ick",attrs.get(0).decl.toString());
+		assertEquals("parameter name mismatch","ick",attrs.get(0).name);
+		assertEquals("declarator mismatch", "String[]", attrs.get(0).type);
+
+		assertEquals("attribute mismatch","int i",attrs.get(1).decl.toString());
+		assertEquals("parameter name mismatch","i",attrs.get(1).name);
+		assertEquals("declarator mismatch", "int", attrs.get(1).type);
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
@@ -331,8 +359,8 @@ public class TestAttributes extends BaseTest {
 
 	public void testComplicatedArgParsingWithTranslation() throws Exception {
 		String action = "x, $A.text+\"3242\", (*$A).foo(21,33), 3.2+1, '\\n', "+
-						"\"a,oo\\nick\", {bl, \"fdkj\"eck}, [\"cat\\n,\", $A, 43]";
-		String expecting = "x, (A1!=null?A1.getText():null)+\"3242\", (*A1).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}, [\"cat\\n,\", A1, 43]";
+						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
+		String expecting = "x, (A1!=null?A1.getText():null)+\"3242\", (*A1).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);

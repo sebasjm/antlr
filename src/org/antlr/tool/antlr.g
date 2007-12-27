@@ -1018,6 +1018,18 @@ RCURLY:	'}'	;
 
 DOLLAR : '$' ;
 
+STRAY_BRACKET
+	:	']'
+		{
+		ErrorManager.syntaxError(
+			ErrorManager.MSG_SYNTAX_ERROR,
+			null,
+			_token,
+			"antlr: dangling ']'? make sure to escape with \\]",
+			null);
+		}
+	;
+
 CHAR_LITERAL
 	:	'\'' (ESC|'\n'{newline();}|~'\'')* '\''
 		{
@@ -1093,21 +1105,19 @@ INT	:	('0'..'9')+
 HETERO_TYPE : '<'! ~'<' (~'>')* '>'! ;
 
 ARG_ACTION
-   :
-	NESTED_ARG_ACTION
+	:	'['! NESTED_ARG_ACTION ']'!
 	;
 
 protected
 NESTED_ARG_ACTION :
-	'['!
-	(
-		NESTED_ARG_ACTION
-	|	'\r' '\n'	{newline();}
+	(	'\r' '\n'	{newline();}
 	|	'\n'		{newline();}
+	|	'\\'! ']'
+	|	'\\' ~']'
 	|	ACTION_STRING_LITERAL
+	|	ACTION_CHAR_LITERAL
 	|	~']'
 	)*
-	']'!
 	;
 
 ACTION
