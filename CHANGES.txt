@@ -22,6 +22,9 @@ December 27, 2007
   And calling a rule: foo[x[i\], 34]
   Fixes ANTLR-140.
 
+* Fixed ANTLR-105.  Target.getTargetStringLiteralFromANTLRStringLiteral()
+  escaped " that were already escaped.
+
 December 25, 2007
 
 * Fixed ANTLR-111.  More unit tests in TestAttributes.

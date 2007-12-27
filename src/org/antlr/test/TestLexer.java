@@ -196,4 +196,20 @@ public class TestLexer extends BaseTest {
 		assertEquals(expecting, found);
 	}	
 
+	public void testEscapedLiterals() {
+		/* Grammar:
+			A : '\"' ;  should match a single double-quote: "
+			B : '\\\"' ; should match input \"
+		*/
+		String grammar =
+			"lexer grammar T;\n" +
+			"A : '\\\"' ;\n" +
+			"B : '\\\\\\\"' ;\n" ; // '\\\"'
+		boolean found =
+			rawGenerateAndBuildRecognizer(
+				"T.g", grammar, null, "TLexer", false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, found);
+	}
+
 }

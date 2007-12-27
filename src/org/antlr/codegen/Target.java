@@ -203,7 +203,8 @@ public class Target {
 		CodeGenerator generator,
 		String literal)
 	{
-		literal = Utils.replace(literal,"\"","\\\"");
+		literal = Utils.replace(literal,"\\\"","\""); // \" to " to normalize
+		literal = Utils.replace(literal,"\"","\\\""); // " to \" to escape all
 		StringBuffer buf = new StringBuffer(literal);
 		buf.setCharAt(0,'"');
 		buf.setCharAt(literal.length()-1,'"');
