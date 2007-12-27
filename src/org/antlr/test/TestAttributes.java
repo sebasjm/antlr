@@ -141,13 +141,44 @@ public class TestAttributes extends BaseTest {
 		generator.genRecognizer(); // forces load of templates
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
 																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
-		assertEquals(expecting, found);
+		String rawTranslation =	translator.translate();
+		assertEquals(expecting, rawTranslation);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testStringArgParsing() throws Exception {
+		String action = "34, '{', \"it's<\", '\"', \"\\\"\", 19";
+		String expecting = "34, '{', \"it's<\", '\"', \"\\\"\", 19";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+
+		// now check in actual grammar.
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a[User u, int i]\n" +
+			"        : A a["+action+"] B\n" +
+			"        ;");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =	translator.translate();
+		assertEquals(expecting, rawTranslation);
+
+		List<String> expectArgs = new ArrayList<String>() {
+			{add("34");}
+			{add("'{'");}
+			{add("\"it's<\"");}
+			{add("'\"'");}
+			{add("\"\\\"\"");} // that's "\""
+			{add("19");}
+		};
+		List<String> actualArgs = CodeGenerator.getListOfArgumentsFromAction(action, ',');
+		assertEquals("args mismatch", expectArgs, actualArgs);
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
@@ -171,13 +202,8 @@ public class TestAttributes extends BaseTest {
 		generator.genRecognizer(); // forces load of templates
 		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,"a",
 																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
-		String rawTranslation =
-			translator.translate();
-		StringTemplateGroup templates =
-			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
-		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
-		String found = actionST.toString();
-		assertEquals(expecting, found);
+		String rawTranslation =	translator.translate();
+		assertEquals(expecting, rawTranslation);
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}

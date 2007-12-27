@@ -903,9 +903,8 @@ public class CodeGenerator {
 										   GrammarAST actionTree)
 	{
 		String actionText = actionTree.token.getText();
-		List<String> args = new ArrayList<String>();
+		List<String> args = getListOfArgumentsFromAction(actionText,',');
 		List<String> translatedArgs = new ArrayList<String>();
-		getListOfArgumentsFromAction(actionText,0,-1,',',args);
 		for (String arg : args) {
 			if ( arg!=null ) {
 				antlr.Token actionToken =
@@ -927,6 +926,14 @@ public class CodeGenerator {
 			return null;
 		}
 		return translatedArgs;
+	}
+
+	public static List<String> getListOfArgumentsFromAction(String actionText,
+															int separatorChar)
+	{
+		List<String> args = new ArrayList<String>();
+		getListOfArgumentsFromAction(actionText, 0, -1, separatorChar, args);
+		return args;
 	}
 
 	/** Given an arg action like
@@ -954,10 +961,28 @@ public class CodeGenerator {
 			int c = actionText.charAt(p);
 			switch ( c ) {
 				case '\'' :
-					p = getListOfArgumentsFromAction(actionText,p+1,'\'',separatorChar,args);
+					p++;
+					while ( p<n && actionText.charAt(p)!='\'' ) {
+						if ( actionText.charAt(p)=='\\' && (p+1)<n &&
+							 actionText.charAt(p+1)=='\'' )
+						{
+							p++; // skip escaped quote
+						}
+						p++;
+					}
+					p++;
 					break;
 				case '"' :
-					p = getListOfArgumentsFromAction(actionText,p+1,'"',separatorChar,args);
+					p++;
+					while ( p<n && actionText.charAt(p)!='\"' ) {
+						if ( actionText.charAt(p)=='\\' && (p+1)<n &&
+							 actionText.charAt(p+1)=='\"' )
+						{
+							p++; // skip escaped quote
+						}
+						p++;
+					}
+					p++;
 					break;
 				case '(' :
 					p = getListOfArgumentsFromAction(actionText,p+1,')',separatorChar,args);
@@ -982,18 +1007,18 @@ public class CodeGenerator {
 					if ( c==separatorChar && targetChar==-1 ) {
 						String arg = actionText.substring(last, p);
 						//System.out.println("arg="+arg);
-						args.add(arg);
+						args.add(arg.trim());
 						last = p+1;
 					}
 					p++;
 					break;
 			}
 		}
-		if ( targetChar==-1 ) {
+		if ( targetChar==-1 && p<=n ) {
 			String arg = actionText.substring(last, p).trim();
 			//System.out.println("arg="+arg);
 			if ( arg.length()>0 ) {
-				args.add(arg);
+				args.add(arg.trim());
 			}
 		}
 		p++;
