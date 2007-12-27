@@ -43,9 +43,19 @@ public class DFA {
 												"), index="+input.index());
 				int specialState = special[s];
 				if ( specialState>=0 ) {
-					if ( debug ) System.err.println("DFA "+decisionNumber+
-						" state "+s+" is special state "+specialState);
+					if ( debug ) {
+						System.err.println("DFA "+decisionNumber+
+							" state "+s+" is special state "+specialState);
+					}
 					s = specialStateTransition(specialState,input);
+					if ( debug ) {
+						System.err.println("DFA "+decisionNumber+
+							" returns from special state "+specialState+" to "+s);
+					}
+					if ( s==-1 ) {
+						noViableAlt(s,input);
+						return 0;
+					}
 					input.consume();
 					continue;
 				}
@@ -181,7 +191,9 @@ public class DFA {
 		return data;
 	}
 
+	/*
 	public int specialTransition(int state, int symbol) {
 		return 0;
 	}
+	*/
 }

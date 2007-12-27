@@ -25,6 +25,13 @@ December 27, 2007
 * Fixed ANTLR-105.  Target.getTargetStringLiteralFromANTLRStringLiteral()
   escaped " that were already escaped.
 
+* target's can now specify how to encode int as char escape.  Moved
+  DFA.encodeIntAsCharEscape to Target.
+
+* Bug in runtime.DFA.  If a special state (one with predicate) failed, it
+  tried to continue (causing out of range exception due to state = -1)
+  instead of reporting error.
+
 December 25, 2007
 
 * Fixed ANTLR-111.  More unit tests in TestAttributes.
