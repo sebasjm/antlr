@@ -193,8 +193,14 @@ public class Tool {
 			else if (args[i].equals("-XdbgST")) {
 				CodeGenerator.EMIT_TEMPLATE_DELIMITERS = true;
 			}
-			else if (args[i].equals("-Xnoinlinedfa")) {
-				CodeGenerator.GEN_ACYCLIC_DFA_INLINE = false;
+			else if (args[i].equals("-Xmaxinlinedfastates")) {
+				if (i + 1 >= args.length) {
+					System.err.println("missing max inline dfa states -Xmaxinlinedfastates option; ignoring");
+				}
+				else {
+					i++;
+					CodeGenerator.MAX_ACYCLIC_DFA_STATES_INLINE = Integer.parseInt(args[i]);
+				}
 			}
 			else if (args[i].equals("-Xm")) {
 				if (i + 1 >= args.length) {
@@ -388,7 +394,7 @@ public class Tool {
 		}
 	}
 
-	protected void generateDFAs(Grammar g) {
+	public void generateDFAs(Grammar g) {
 		for (int d=1; d<=g.getNumberOfDecisions(); d++) {
 			DFA dfa = g.getLookaheadDFA(d);
 			if ( dfa==null ) {
@@ -464,7 +470,7 @@ public class Tool {
 		System.err.println("  -Xm m                  max number of rule invocations during conversion");
 		System.err.println("  -Xmaxdfaedges m        max \"comfortable\" number of edges for single DFA state");
 		System.err.println("  -Xconversiontimeout t  set NFA conversion timeout for each decision");
-		System.err.println("  -Xnoinlinedfa          make all DFA with tables; no inline prediction with IFs");
+		System.err.println("  -Xmaxinlinedfastates m max DFA states before table used rather than inlining");
 		System.err.println("  -Xnfastates            for nondeterminisms, list NFA states for each path");
     }
 

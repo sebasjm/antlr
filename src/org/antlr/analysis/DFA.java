@@ -729,10 +729,9 @@ public class DFA {
     }
 
 	public boolean canInlineDecision() {
-		// TODO: and ! too big
-		return CodeGenerator.GEN_ACYCLIC_DFA_INLINE &&
-			!isCyclic() &&
-		    !probe.isNonLLStarDecision();
+		return !isCyclic() &&
+		    !probe.isNonLLStarDecision() &&
+			getNumberOfStates() < CodeGenerator.MAX_ACYCLIC_DFA_STATES_INLINE;
 	}
 
 	/** Is this DFA derived from the NFA for the Tokens rule? */

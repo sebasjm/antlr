@@ -76,8 +76,9 @@ public class CodeGenerator {
 	public int MAX_SWITCH_CASE_LABELS = 300;
 	public int MIN_SWITCH_ALTS = 3;
 	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
-	public static boolean GEN_ACYCLIC_DFA_INLINE = true;
+	//public static boolean GEN_ACYCLIC_DFA_INLINE = true;
 	public static boolean EMIT_TEMPLATE_DELIMITERS = false;
+	public static int MAX_ACYCLIC_DFA_STATES_INLINE = 10;
 
 	public String classpathTemplateRootDirectoryName =
 		"org/antlr/codegen/templates";

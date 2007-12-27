@@ -812,7 +812,7 @@ public class Grammar {
 							System.out.println("decision "+decision+
 											   " not suitable for LL(1)-optimized DFA analysis");
 						}
-						createLookaheadDFA(decision, wackTempStructures);
+						dfa = createLookaheadDFA(decision, wackTempStructures);
 					}
 					if ( Tool.internalOption_PrintDFA ) {
 						System.out.println("DFA d="+decision);
@@ -1003,7 +1003,7 @@ outer:
 		return disjointSets.elements();
 	}
 
-	public void createLookaheadDFA(int decision, boolean wackTempStructures) {
+	public DFA createLookaheadDFA(int decision, boolean wackTempStructures) {
 		Decision d = getDecision(decision);
 		String enclosingRule = d.startState.enclosingRule.name;
 		Rule r = d.startState.enclosingRule;
@@ -1067,6 +1067,7 @@ outer:
 							   " states, "+(int)(stopDFA-startDFA)+" ms");
 		}
 		//System.out.println("after create DFA; synPredNamesUsedInDFA="+synPredNamesUsedInDFA);
+		return lookaheadDFA;
 	}
 
 	/** Terminate DFA creation (grammar analysis).

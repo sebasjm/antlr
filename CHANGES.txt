@@ -8,6 +8,15 @@ University of San Francisco
 
 CHANGES
 
+December 27, 2007
+
+* Changed -Xnoinlinedfa to -Xmaxinlinedfastates m where m is
+  maximum number of states a DFA can have before ANTLR avoids
+  inlining it.  Instead, you get a table-based DFA.  This
+  affectively avoids some acyclic DFA that still have many states
+  with multiple incident edges.  The combinatorial explosion smacks
+  of infinite loop.  Fixes ANTLR-130.
+
 December 25, 2007
 
 * Fixed ANTLR-111.  More unit tests in TestAttributes.

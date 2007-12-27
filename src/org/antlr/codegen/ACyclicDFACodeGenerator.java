@@ -33,6 +33,8 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 public class ACyclicDFACodeGenerator {
 	protected CodeGenerator parentGenerator;
@@ -41,9 +43,15 @@ public class ACyclicDFACodeGenerator {
 		this.parentGenerator = parent;
 	}
 
+	//Set<DFAState> visited;
+
 	public StringTemplate genFixedLookaheadDecision(StringTemplateGroup templates,
 													DFA dfa)
 	{
+	//	visited = new HashSet<DFAState>();
+		if ( dfa.decisionNumber==10 ) {
+			parentGenerator.tool.generateDFAs(parentGenerator.grammar);
+		}
 		return walkFixedDFAGeneratingStateMachine(templates, dfa, dfa.startState, 1);
 	}
 
@@ -53,6 +61,14 @@ public class ACyclicDFACodeGenerator {
 			DFAState s,
 			int k)
 	{
+		//System.out.println("walk "+s.stateNumber+" in dfa for decision "+dfa.decisionNumber);
+		/*
+		if ( visited.contains(s) ) {
+			//System.out.println("already visited "+s.stateNumber);
+			return null;
+		}
+		visited.add(s);
+		*/
 		if ( s.isAcceptState() ) {
 			StringTemplate dfaST = templates.getInstanceOf("dfaAcceptState");
 			dfaST.setAttribute("alt", Utils.integer(s.getUniquelyPredictedAlt()));
@@ -82,19 +98,21 @@ public class ACyclicDFACodeGenerator {
 		dfaST.setAttribute("k", Utils.integer(k));
 		dfaST.setAttribute("stateNumber", Utils.integer(s.stateNumber));
 		dfaST.setAttribute("semPredState",
-							Boolean.valueOf(s.isResolvedWithPredicates()));
+						   Boolean.valueOf(s.isResolvedWithPredicates()));
+		/*
 		String description = dfa.getNFADecisionStartState().getDescription();
 		description = parentGenerator.target.getTargetStringLiteralFromString(description);
-		//System.out.println("DFA: "+description+" associated with AST "+decisionASTNode);
+		//System.out.println("DFA: "+description+" associated with AST "+dfa.getNFADecisionStartState());
 		if ( description!=null ) {
 			dfaST.setAttribute("description", description);
 		}
+		*/
 		int EOTPredicts = NFA.INVALID_ALT_NUMBER;
 		DFAState EOTTarget = null;
 		//System.out.println("DFA state "+s.stateNumber);
 		for (int i = 0; i < s.getNumberOfTransitions(); i++) {
 			Transition edge = (Transition) s.transition(i);
-			//System.out.println("edge label "+edge.label.toString());
+			//System.out.println("edge "+s.stateNumber+"-"+edge.label.toString()+"->"+edge.target.stateNumber);
 			if ( edge.label.getAtom()==Label.EOT ) {
 				// don't generate a real edge for EOT; track alt EOT predicts
 				// generate that prediction in the else clause as default case
@@ -121,7 +139,7 @@ public class ACyclicDFACodeGenerator {
 			}
 			else { // else create an expression to evaluate (the general case)
 				edgeST.setAttribute("labelExpr",
-								parentGenerator.genLabelExpr(templates,edge,k));
+									parentGenerator.genLabelExpr(templates,edge,k));
 			}
 
 			// stick in any gated predicates for any edge if not already a pred
@@ -169,8 +187,9 @@ public class ACyclicDFACodeGenerator {
 				Transition predEdge = (Transition)EOTTarget.transition(i);
 				StringTemplate edgeST = templates.getInstanceOf(dfaEdgeName);
 				edgeST.setAttribute("labelExpr",
-							parentGenerator.genSemanticPredicateExpr(templates,predEdge));
+									parentGenerator.genSemanticPredicateExpr(templates,predEdge));
 				// the target must be an accept state
+				System.out.println("EOT edge");
 				StringTemplate targetST =
 					walkFixedDFAGeneratingStateMachine(templates,
 													   dfa,
