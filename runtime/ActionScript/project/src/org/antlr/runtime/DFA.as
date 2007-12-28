@@ -71,9 +71,19 @@ package org.antlr.runtime {
 													"), index="+input.index);
 					var specialState:int = special[s];
 					if ( specialState>=0 ) {
-						if ( debug ) trace("DFA "+decisionNumber+
+						if ( debug ) {
+						    trace("DFA "+decisionNumber+
 							" state "+s+" is special state "+specialState);
+						}
 						s = specialStateTransition(this, specialState,input);
+						if ( debug ) {
+						    trace("DFA "+decisionNumber+
+							" returns from special state "+specialState+" to "+s);
+					    }
+						if ( s==-1 ) {
+						    noViableAlt(s,input);
+						    return 0;
+					    }
 						input.consume();
 						continue;
 					}
@@ -210,9 +220,6 @@ package org.antlr.runtime {
 			return data;
 		}
 	
-		public function specialTransition(state:int, symbol:int):int {
-			return 0;
-		}
 	}
 
 }
