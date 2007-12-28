@@ -112,6 +112,15 @@ namespace Antlr.Runtime.Tree {
 		) : base(adaptor, elementDescription, elements) {
 		}
 
+		/// <summary>Create a stream, but feed off an existing list</summary>
+		[Obsolete("Use instead the constructor supporting IList<T>.")]
+		public RewriteRuleNodeStream(
+			ITreeAdaptor adaptor,
+			string elementDescription,
+			System.Collections.IList elements
+		) : base(adaptor, elementDescription, elements) {
+		}
+
 		public object NextNode() {
 			return _Next();
 		}

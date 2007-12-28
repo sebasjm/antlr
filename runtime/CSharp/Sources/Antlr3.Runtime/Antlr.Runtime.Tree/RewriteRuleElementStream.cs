@@ -332,12 +332,31 @@ namespace Antlr.Runtime.Tree {
 		/// </summary>
 		public RewriteRuleElementStream(
 			ITreeAdaptor adaptor,
-			string elementDescription,
-			IList<T> elements
+		    string elementDescription,
+		    IList<T> elements
 		)
 			: this(adaptor, elementDescription) {
 			this.singleElement = default(T);
 			this.elements = elements;
+		}
+
+		/// <summary>
+		/// Create a stream, but feed off an existing list
+		/// </summary>
+		[Obsolete("Use instead the constructor supporting IList<T>.")]
+		public RewriteRuleElementStream(
+			ITreeAdaptor adaptor,
+			string elementDescription,
+		    System.Collections.IList elements
+		)
+			: this(adaptor, elementDescription) {
+			this.singleElement = default(T);
+			this.elements = new List<T>();
+			if (elements != null) {
+				foreach (T t in elements) {
+					this.elements.Add(t);
+				}
+			}
 		}
 
 		public void Add(T el) {

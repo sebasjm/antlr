@@ -52,14 +52,14 @@ tree(root, actionsAfterRoot, children, nullableChildList,
 <if(nullableChildList)>
 if ( input.LA(1) == Token.DOWN )
 {
-    match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
+    Match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
     <children:element()>
-    match(input, Token.UP, null); <checkRuleBacktrackFailure()>
+    Match(input, Token.UP, null); <checkRuleBacktrackFailure()>
 }
 <else>
-match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
+Match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
 <children:element()>
-match(input, Token.UP, null); <checkRuleBacktrackFailure()>
+Match(input, Token.UP, null); <checkRuleBacktrackFailure()>
 <endif>
 adaptor.AddChild(root_<enclosingTreeLevel>, root_<treeLevel>);
 }<\n>
