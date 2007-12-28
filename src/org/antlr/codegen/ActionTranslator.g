@@ -47,7 +47,7 @@ Grammar grammar;
 CodeGenerator generator;
 antlr.Token actionToken;
 
-	public ActionTranslatorLexer(CodeGenerator generator,
+	public ActionTranslator(CodeGenerator generator,
 								 String ruleName,
 								 GrammarAST actionAST)
 	{
@@ -59,7 +59,7 @@ antlr.Token actionToken;
 	    this.outerAltNum = actionAST.outerAltNum;
 	}
 
-	public ActionTranslatorLexer(CodeGenerator generator,
+	public ActionTranslator(CodeGenerator generator,
 								 String ruleName,
 								 antlr.Token actionToken,
 								 int outerAltNum)
@@ -71,33 +71,6 @@ antlr.Token actionToken;
 	    this.actionToken = actionToken;
 		this.outerAltNum = outerAltNum;
 	}
-	// BACKWARD COMPATIBILITY UNTIL REGENERATING WITH 3.0b7
-	public Token emit(int tokenType,
-					  int line, int charPosition,
-					  int channel,
-					  int start, int stop)
-	{
-		Token t = new CommonToken(input, tokenType, channel, start, stop);
-		t.setLine(line);
-		t.setText(text);
-		t.setCharPositionInLine(charPosition);
-		emit(t);
-		return t;
-	}
-
-/*
-public ActionTranslatorLexer(CharStream input, CodeGenerator generator,
-                             Grammar grammar, Rule enclosingRule,
-                             antlr.Token actionToken, int outerAltNum)
-{
-    this(input);
-    this.grammar = grammar;
-    this.generator = generator;
-    this.enclosingRule = enclosingRule;
-    this.actionToken = actionToken;
-    this.outerAltNum = outerAltNum;
-}
-*/
 
 /** Return a list of strings and StringTemplate objects that
  *  represent the translated action.
@@ -124,8 +97,8 @@ public String translate() {
 }
 
 public List translateAction(String action) {
-    ActionTranslatorLexer translator =
-        new ActionTranslatorLexer(generator,
+    ActionTranslator translator =
+        new ActionTranslator(generator,
                                   enclosingRule.name,
                                   new antlr.CommonToken(ANTLRParser.ACTION,action),outerAltNum);
     return translator.translateToChunks();

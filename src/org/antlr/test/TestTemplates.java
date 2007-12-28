@@ -33,7 +33,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.codegen.ActionTranslatorLexer;
+import org.antlr.codegen.ActionTranslator;
 
 /** Test templates in actions; %... shorthands */
 public class TestTemplates extends BaseTest {
@@ -42,7 +42,7 @@ public class TestTemplates extends BaseTest {
 	public void testTemplateConstructor() throws Exception {
 		String action = "x = %foo(name={$ID.text});";
 		String expecting = "x = templateLib.getInstanceOf(\"foo\"," +
-			LINE_SEP + "  new STAttrMap().put(\"name\", ID1.getText()));";
+			LINE_SEP + "  new STAttrMap().put(\"name\", (ID1!=null?ID1.getText():null)));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -60,8 +60,8 @@ public class TestTemplates extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslatorLexer translator =
-			new ActionTranslatorLexer(generator,
+		ActionTranslator translator =
+			new ActionTranslator(generator,
 										"a",
 										new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		String rawTranslation =
@@ -96,8 +96,8 @@ public class TestTemplates extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslatorLexer translator =
-			new ActionTranslatorLexer(generator,
+		ActionTranslator translator =
+			new ActionTranslator(generator,
 										"a",
 										new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		String rawTranslation =
@@ -115,7 +115,7 @@ public class TestTemplates extends BaseTest {
 	public void testIndirectTemplateConstructor() throws Exception {
 		String action = "x = %({\"foo\"})(name={$ID.text});";
 		String expecting = "x = templateLib.getInstanceOf(\"foo\"," +
-			LINE_SEP + "  new STAttrMap().put(\"name\", ID1.getText()));";
+			LINE_SEP + "  new STAttrMap().put(\"name\", (ID1!=null?ID1.getText():null)));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -133,8 +133,8 @@ public class TestTemplates extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslatorLexer translator =
-			new ActionTranslatorLexer(generator,
+		ActionTranslator translator =
+			new ActionTranslator(generator,
 										"a",
 										new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		String rawTranslation =
@@ -151,7 +151,7 @@ public class TestTemplates extends BaseTest {
 
 	public void testStringConstructor() throws Exception {
 		String action = "x = %{$ID.text};";
-		String expecting = "x = new StringTemplate(templateLib,ID1.getText());";
+		String expecting = "x = new StringTemplate(templateLib,(ID1!=null?ID1.getText():null));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -169,7 +169,7 @@ public class TestTemplates extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,
+		ActionTranslator translator = new ActionTranslator(generator,
 																	 "a",
 																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		String rawTranslation =
@@ -204,8 +204,8 @@ public class TestTemplates extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslatorLexer translator =
-			new ActionTranslatorLexer(generator,
+		ActionTranslator translator =
+			new ActionTranslator(generator,
 										"a",
 										new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		String rawTranslation =
@@ -222,7 +222,7 @@ public class TestTemplates extends BaseTest {
 
 	public void testSetAttrOfExpr() throws Exception {
 		String action = "%{foo($ID.text).getST()}.y = z;";
-		String expecting = "(foo(ID1.getText()).getST()).setAttribute(\"y\", z);";
+		String expecting = "(foo((ID1!=null?ID1.getText():null)).getST()).setAttribute(\"y\", z);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -240,7 +240,7 @@ public class TestTemplates extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,
+		ActionTranslator translator = new ActionTranslator(generator,
 																	 "a",
 																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		String rawTranslation =

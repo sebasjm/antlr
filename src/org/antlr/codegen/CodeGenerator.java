@@ -890,7 +890,7 @@ public class CodeGenerator {
 		if ( actionTree.getType()==ANTLRParser.ARG_ACTION ) {
 			return translateArgAction(ruleName, actionTree);
 		}
-		ActionTranslatorLexer translator = new ActionTranslatorLexer(this,ruleName,actionTree);
+		ActionTranslator translator = new ActionTranslator(this,ruleName,actionTree);
 		List chunks = translator.translateToChunks();
 		chunks = target.postProcessAction(chunks, actionTree.token);
 		return chunks;
@@ -910,8 +910,8 @@ public class CodeGenerator {
 			if ( arg!=null ) {
 				antlr.Token actionToken =
 					new antlr.CommonToken(ANTLRParser.ACTION,arg);
-				ActionTranslatorLexer translator =
-					new ActionTranslatorLexer(this,ruleName,
+				ActionTranslator translator =
+					new ActionTranslator(this,ruleName,
 											  actionToken,
 											  actionTree.outerAltNum);
 				List chunks = translator.translateToChunks();

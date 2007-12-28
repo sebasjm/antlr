@@ -2,7 +2,7 @@ package org.antlr.test;
 
 import org.antlr.Tool;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.codegen.ActionTranslatorLexer;
+import org.antlr.codegen.ActionTranslator;
 import org.antlr.tool.*;
 
 
@@ -29,7 +29,7 @@ public class TestMessages extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
 		g.setCodeGenerator(generator);
 		generator.genRecognizer(); // forces load of templates
-		ActionTranslatorLexer translator = new ActionTranslatorLexer(generator,
+		ActionTranslator translator = new ActionTranslator(generator,
 																	"rule",
 																	new antlr.CommonToken(ANTLRParser.ACTION,action),1);
 		String rawTranslation =
