@@ -375,7 +375,7 @@ package org.antlr.runtime.tree {
 			}
 			// now walk until we see stop, filling string buffer with text
 			 var buf:String = "";
-			t = nodes.get(i);
+			t = nodes[i];
 			while ( t!=stop ) {
 				var text:String = adaptor.getText(t);
 				if ( text==null ) {

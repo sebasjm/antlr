@@ -190,7 +190,7 @@ package org.antlr.runtime.tree
 			}
 
 			var ID:int = uniqueNodeID;
-			treeToUniqueIDMap.put(node, ID);
+			treeToUniqueIDMap[node] = ID;
 			uniqueNodeID++;
 			return ID;
 

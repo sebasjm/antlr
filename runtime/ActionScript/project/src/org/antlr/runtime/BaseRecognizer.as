@@ -613,7 +613,8 @@ package org.antlr.runtime {
 		 */
 		public function getRuleMemoization(ruleIndex:int, ruleStartIndex:int):int {
 			if ( state.ruleMemo[ruleIndex]==null ) {
-				state.ruleMemo[ruleIndex] = new Array();
+				state.ruleMemo[ruleIndex] = new Object();
+				state.ruleMemo[ruleIndex].length = 0;
 			}
 			var stopIndexI:String =	state.ruleMemo[ruleIndex][new String(ruleStartIndex)];
 			if ( stopIndexI == null ) {
@@ -656,9 +657,8 @@ package org.antlr.runtime {
 		{
 			var stopTokenIndex:int = state.failed ? MEMO_RULE_FAILED : input.index - 1;
 			if ( state.ruleMemo[ruleIndex]!=null ) {
-				state.ruleMemo[ruleIndex].put(
-					new String(ruleStartIndex), new String(stopTokenIndex)
-				);
+				state.ruleMemo[ruleIndex][new String(ruleStartIndex)] = new String(stopTokenIndex);
+				state.ruleMemo[ruleIndex].length++;
 			}
 		}
 	
@@ -668,7 +668,7 @@ package org.antlr.runtime {
 		public function getRuleMemoizationCacheSize():int {
 			var n:int = 0;
 			for (var i:int = 0; state.ruleMemo!=null && i < state.ruleMemo.length; i++) {
-				var ruleMap:Array = state.ruleMemo[i];
+				var ruleMap:Object = state.ruleMemo[i];
 				if ( ruleMap!=null ) {
 					n += ruleMap.length; // how many input indexes are recorded?
 				}
