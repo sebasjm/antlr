@@ -27,8 +27,6 @@
 */
 package org.antlr.test;
 
-import junit.framework.TestSuite;
-
 public class TestCompositeGrammars extends BaseTest {
 	public void testDelegatorInvokesDelegateRule() throws Exception {
 		String slave =
@@ -43,7 +41,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execParser("M.g", master, "MParser", "MLexer",
-				    "s", "b", false);
+								  "s", "b", false);
 		assertEquals("S.a\n", found);
 	}
 
@@ -63,7 +61,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"B : 'b' ;" + // defines B from inherited token space
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execParser("M.g", master, "MParser", "MLexer",
-				    "s", "b", false);
+								  "s", "b", false);
 		assertEquals("S.a1000\n", found);
 	}
 
@@ -82,7 +80,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"s : 'b' {gS.foo();} ;\n" + // gS is import pointer
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execParser("M.g", master, "MParser", "MLexer",
-				    "s", "b", false);
+								  "s", "b", false);
 		assertEquals("foo\n", found);
 	}
 
@@ -105,7 +103,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"B : 'b' ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execParser("M.g", master, "MParser", "MLexer",
-				    "s", "b", false);
+								  "s", "b", false);
 		assertEquals("S.a\n", found);
 	}
 
@@ -142,7 +140,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"C : 'c' ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execParser("M.g", master, "MParser", "MLexer",
-				    "s", "aa", false);
+								  "s", "aa", false);
 		assertEquals("S.x\n" +
 					 "T.y\n", found);
 	}
@@ -160,7 +158,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"b : 'b'|'c' ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
 		String found = execParser("M.g", master, "MParser", "MLexer",
-				    "a", "c", false);
+								  "a", "c", false);
 		assertEquals("S.a\n", found);
 	}
 
@@ -178,7 +176,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"B : 'b' ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
-		String found = execLexer("M.g", master, "MLexer", "abc", false);
+		String found = execLexer("M.g", master, "M", "abc", false);
 		assertEquals("S.A\nabc\n", found);
 	}
 
@@ -198,7 +196,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"import S;\n" +
 			"A : 'a' {System.out.println(\"M.A\");} ;\n" +
 			"WS : (' '|'\\n') {skip();} ;\n" ;
-		String found = execLexer("M.g", master, "MLexer", "a", false);
+		String found = execLexer("M.g", master, "M", "a", false);
 		assertEquals("M.A\na\n", found);
 	}
 

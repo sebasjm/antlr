@@ -80,22 +80,22 @@ public class <name> extends Lexer {
 
     // delegates
     <grammar.delegates:
-         {g|public <g.name>Lexer <g:delegateName()>;}; separator="\n">
+         {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
     // delegators
     <grammar.delegators:
-         {g|public <g.name>Lexer <g:delegateName()>;}; separator="\n">
+         {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
 
     public <name>() {;} <! needed by subclasses !>
-    public <name>(CharStream input<grammar.delegators:{g|, <g.name>Lexer <g:delegateName()>}>) {
+    public <name>(CharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
         this(input, null<grammar.delegators:{g|, <g:delegateName()>}>);
     }
-    public <name>(CharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.name>Lexer <g:delegateName()>}>) {
+    public <name>(CharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
         super(input);
 <if(backtracking)>
         this.state.ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.name>Lexer(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
         <grammar.delegators:
          {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
     }
@@ -184,22 +184,22 @@ public class <name> extends <@superClassName><superClass><@end> {
 
     // delegates
     <grammar.delegates:
-         {g|public <g.name><superClass> <g:delegateName()>;}; separator="\n">
+         {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
     // delegators
     <grammar.delegators:
-         {g|public <g.name><superClass> <g:delegateName()>;}; separator="\n">
+         {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
 
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
     <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
-    public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>) {
+    public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
         this(input, null<grammar.delegators:{g|, <g:delegateName()>}>);
     }
-    public <name>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>) {
+    public <name>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
         super(input, state);
         <parserCtorBody()>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.name><superClass>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
     }
     <@end>
 
