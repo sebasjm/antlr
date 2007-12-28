@@ -32,6 +32,8 @@ December 27, 2007
   tried to continue (causing out of range exception due to state = -1)
   instead of reporting error.
 
+* If -dfa with combined grammar T.g, builds T.dec-*.dot and TLexer.dec-*.dot
+
 December 25, 2007
 
 * Fixed ANTLR-111.  More unit tests in TestAttributes.

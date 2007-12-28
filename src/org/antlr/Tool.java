@@ -313,6 +313,7 @@ public class Tool {
 					}
 					StringReader sr = new StringReader(lexerGrammarStr);
 					Grammar lexerGrammar = new Grammar();
+					lexerGrammar.implicitLexer = true;
 					lexerGrammar.setTool(this);
 					File lexerGrammarFullFile =
 						new File(getFileDirectory(lexerGrammarFileName),lexerGrammarFileName);
@@ -403,6 +404,9 @@ public class Tool {
 			DOTGenerator dotGenerator = new DOTGenerator(g);
 			String dot = dotGenerator.getDOT( dfa.startState );
 			String dotFileName = g.name+"."+"dec-"+d;
+			if ( g.implicitLexer ) {
+				dotFileName = g.name+Grammar.grammarTypeToFileNameSuffix[g.type]+"."+"dec-"+d;				
+			}
 			try {
 				writeDOTFile(g, dotFileName, dot);
 			}

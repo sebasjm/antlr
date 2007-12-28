@@ -33,8 +33,6 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
 
 public class ACyclicDFACodeGenerator {
 	protected CodeGenerator parentGenerator;
@@ -43,15 +41,9 @@ public class ACyclicDFACodeGenerator {
 		this.parentGenerator = parent;
 	}
 
-	//Set<DFAState> visited;
-
 	public StringTemplate genFixedLookaheadDecision(StringTemplateGroup templates,
 													DFA dfa)
 	{
-	//	visited = new HashSet<DFAState>();
-		if ( dfa.decisionNumber==10 ) {
-			parentGenerator.tool.generateDFAs(parentGenerator.grammar);
-		}
 		return walkFixedDFAGeneratingStateMachine(templates, dfa, dfa.startState, 1);
 	}
 
@@ -62,13 +54,6 @@ public class ACyclicDFACodeGenerator {
 			int k)
 	{
 		//System.out.println("walk "+s.stateNumber+" in dfa for decision "+dfa.decisionNumber);
-		/*
-		if ( visited.contains(s) ) {
-			//System.out.println("already visited "+s.stateNumber);
-			return null;
-		}
-		visited.add(s);
-		*/
 		if ( s.isAcceptState() ) {
 			StringTemplate dfaST = templates.getInstanceOf("dfaAcceptState");
 			dfaST.setAttribute("alt", Utils.integer(s.getUniquelyPredictedAlt()));

@@ -295,6 +295,9 @@ public class Grammar {
 	 */
 	protected LinkedHashMap nameToSynpredASTMap;
 
+	/** Was this created from a COMBINED grammar? */
+	public boolean implicitLexer;
+
 	/** Map a rule to it's Rule object
 	 */
 	protected LinkedHashMap<String,Rule> nameToRuleMap = new LinkedHashMap();

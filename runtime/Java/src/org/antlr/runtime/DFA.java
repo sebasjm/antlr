@@ -35,6 +35,9 @@ public class DFA {
 	public int predict(IntStream input)
 		throws RecognitionException
 	{
+		if ( debug ) {
+			System.err.println("Enter DFA.predict for decision "+decisionNumber);
+		}
 		int mark = input.mark(); // remember where decision started in input
 		int s = 0; // we always start at s0
 		try {
