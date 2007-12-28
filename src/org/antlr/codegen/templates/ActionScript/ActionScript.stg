@@ -194,7 +194,7 @@ genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
     }
     <@end>
 
-    public override function get tokenNames():Array { return tokenNames; }
+    public override function get tokenNames():Array { return <name>.tokenNames; }
     public override function get grammarFileName():String { return "<fileName>"; }
 
     <members>
@@ -938,7 +938,7 @@ private const DFA<dfa.decisionNumber>_transition:Array = [
         <dfa.javaCompressedTransition:{s|DFA.unpackEncodedString("<s; wrap="\"+\n\"">")}; separator=",\n">
 ];
 <if(dfa.specialStateSTs)>
-private const DFA<dfa.decisionNumber>_specialStateTransition:Function = function specialStateTransition(dfa:DFA, s:int, input:IntStream):int {
+private function DFA<dfa.decisionNumber>_specialStateTransition(dfa:DFA, s:int, input:IntStream):int {
     	var _s:int = s;
         switch ( s ) {
         <dfa.specialStateSTs:{state |
