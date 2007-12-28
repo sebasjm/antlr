@@ -620,6 +620,21 @@ public class Grammar {
 			LEXER_GRAMMAR_FILE_EXTENSION;
 	}
 
+	/** Get the name of the generated recognizer; may or may not be same
+	 *  as grammar name.
+	 *  Recognizer is TParser and TLexer from T if combined, else
+	 *  just use T regardless of grammar type.
+	 */
+	public String getRecognizerName() {
+		String suffix = "";
+		if ( type==Grammar.COMBINED ||
+			 (type==Grammar.LEXER && implicitLexer) )
+		{
+			suffix = Grammar.grammarTypeToFileNameSuffix[type];
+		}
+		return name+suffix;
+	}
+
 	public File getImportedVocabFileName(String vocabName) {
 		return new File(tool.getLibraryDirectory(),
 						File.separator+

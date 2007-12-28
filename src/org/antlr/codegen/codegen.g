@@ -294,11 +294,9 @@ grammarSpec
 		 }
 		)?
 		{
-		String suffix = Grammar.grammarTypeToFileNameSuffix[grammar.type];
-        String n = #name.getText()+suffix;
-		recognizerST.setAttribute("name", n);
-		outputFileST.setAttribute("name", n);
-		headerFileST.setAttribute("name", n);
+		recognizerST.setAttribute("name", grammar.getRecognizerName());
+		outputFileST.setAttribute("name", grammar.getRecognizerName());
+		headerFileST.setAttribute("name", grammar.getRecognizerName());
 		recognizerST.setAttribute("scopes", grammar.getGlobalScopes());
 		headerFileST.setAttribute("scopes", grammar.getGlobalScopes());
 		}

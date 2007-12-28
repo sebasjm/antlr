@@ -34,6 +34,13 @@ December 27, 2007
 
 * If -dfa with combined grammar T.g, builds T.dec-*.dot and TLexer.dec-*.dot
 
+* Fix ANTLR-165.
+  Generate TParser.java and TLexer.java from T.g if combined, else
+  use T.java as output regardless of type.
+  BACKWARD INCOMPATIBILITY since file names change.
+  I changed the examples-v3/java to be consistent.  Required XML.g ->
+  XMLLexer.java and fuzzy/Main.java change.
+
 December 25, 2007
 
 * Fixed ANTLR-111.  More unit tests in TestAttributes.

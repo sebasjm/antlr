@@ -1233,10 +1233,22 @@ public class CodeGenerator {
 		return outputFileST;
 	}
 
+	/** Generate TParser.java and TLexer.java from T.g if combined, else
+	 *  just use T.java as output regardless of type.
+	 */
 	public String getRecognizerFileName(String name, int type) {
 		StringTemplate extST = templates.getInstanceOf("codeFileExtension");
-		String suffix = Grammar.grammarTypeToFileNameSuffix[type];
+		String recognizerName = grammar.getRecognizerName();
+		return recognizerName+extST.toString();
+		/*
+		String suffix = "";
+		if ( type==Grammar.COMBINED ||
+			 (type==Grammar.LEXER && !grammar.implicitLexer) )
+		{
+			suffix = Grammar.grammarTypeToFileNameSuffix[type];
+		}
 		return name+suffix+extST.toString();
+		*/
 	}
 
 	/** What is the name of the vocab file generated for this grammar?
