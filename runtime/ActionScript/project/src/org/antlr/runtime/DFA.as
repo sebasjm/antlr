@@ -28,18 +28,18 @@ package org.antlr.runtime {
 		private var _description:String;
 		
 		public static const debug:Boolean = false;
-	
+
 		public function DFA(recognizer:BaseRecognizer, decisionNumber:int, description:String,
 							eotS:String, eofS:String, minS:String, maxS:String, acceptS:String, specialS:String, transitionS:Array,
-							specialStateTransitionFunction:Function = null, errorFunction:Function = null) {
+							specialStateTransitionFunction:Function = null, errorFunction:Function = null) {			
 			this.recognizer = recognizer;
 			this.decisionNumber = decisionNumber;
 			this._description = description;
 			
 			eot = unpackEncodedString(eotS);
 			eof = unpackEncodedString(eofS);
-			min = unpackEncodedString(minS);
-			max = unpackEncodedString(maxS);
+			min = unpackEncodedString(minS, true);
+			max = unpackEncodedString(maxS, true);
 			accept = unpackEncodedString(acceptS);
 			special = unpackEncodedString(specialS);
 			
@@ -47,6 +47,7 @@ package org.antlr.runtime {
 			for (var i:int = 0; i < transitionS.length; i++) {
 				transition[i] = unpackEncodedString(transitionS[i]);
 			}
+						
 			if (specialStateTransitionFunction != null) {
 				specialStateTransition = specialStateTransitionFunction;
 			}
@@ -72,7 +73,7 @@ package org.antlr.runtime {
 					if ( specialState>=0 ) {
 						if ( debug ) trace("DFA "+decisionNumber+
 							" state "+s+" is special state "+specialState);
-						s = specialStateTransition(specialState,input);
+						s = specialStateTransition(this, specialState,input);
 						input.consume();
 						continue;
 					}
@@ -156,7 +157,7 @@ package org.antlr.runtime {
 		/** A hook for debugging interface */
 		public var error:Function = function(nvae:NoViableAltException):NoViableAltException { return nvae; }
 	
-		public var specialStateTransition:Function = function(s:int, input:IntStream):int {
+		public var specialStateTransition:Function = function(dfa:DFA, s:int, input:IntStream):int {
 			return -1;
 		}
 	
@@ -169,17 +170,38 @@ package org.antlr.runtime {
 		 *  static short[] which generates so much init code that the class won't
 		 *  compile. :(
 		 */
-		public static function unpackEncodedString(encodedString:String):Array {
+		public static function unpackEncodedString(encodedString:String, unsigned:Boolean = false):Array {
 			// walk first to find how big it is.
+			/* Don't pre-allocate
 			var size:int = 0;
 			for (var i:int=0; i<encodedString.length; i+=2) {
 				size += encodedString.charCodeAt(i);
 			}
-			var data:Array = new Array(size);
+			*/
+			var data:Array = new Array();
 			var di:int = 0;
-			for (i=0; i<encodedString.length; i+=2) {
+			for (var i:int=0; i<encodedString.length; i+=2) {
 				var n:int = encodedString.charCodeAt(i);
+				if (n > 0x8000) {
+				    // need to read another byte
+				    i++;
+				    var lowBits:int = encodedString.charCodeAt(i);
+				    n &= 0xff;
+				    n <<= 8;
+				    n |= lowBits;
+				}
 				var v:int = encodedString.charCodeAt(i+1);
+				if (v > 0x8000) {
+				    // need to read another byte
+				    i++;
+				    lowBits = encodedString.charCodeAt(i);
+				    v &= 0xff;
+				    v <<= 8;
+				    v |= lowBits;
+				}
+				if (!unsigned && v > 0x7fff) {
+				    v = -(0xffff - v + 1);
+				}
 				// add v n times to data
 				for (var j:int=1; j<=n; j++) {
 					data[di++] = v;

@@ -58,6 +58,41 @@ public class ActionScriptTarget extends Target {
         return name;
     }
 
+    /**
+     * ActionScript doesn't support Unicode String literals that are considered "illegal"
+     * or are in the surrogate pair ranges.  For example "/uffff" will not encode properly
+     * nor will "/ud800".  To keep things as compact as possible we use the following encoding
+     * if the int is below 255, we encode as hex literal
+     * If the int is between 255 and 0x7fff we use a single unicode literal with the value
+     * If the int is above 0x7fff, we use a unicode literal of 0x80hh, where hh is the high-order
+     * bits followed by \xll where ll is the lower order bits of a 16-bit number.
+     *
+     * Ideally this should be improved at a future date.  The most optimal way to encode this
+     * may be a compressed AMF encoding that is embedded using an Embed tag in ActionScript.
+     *
+     * @param v
+     * @return
+     */
+    public String encodeIntAsCharEscape(int v) {
+        // encode as hex
+        if ( v<=255 ) {
+			return "\\x"+ Integer.toHexString(v|0x100).substring(1,3);
+		}
+        if (v <= 0x7fff) {
+            String hex = Integer.toHexString(v|0x10000).substring(1,5);
+		    return "\\u"+hex;
+        }
+        if (v > 0xffff) {
+            System.err.println("Warning: character literal out of range for ActionScript target " + v);
+            return "";
+        }
+        StringBuffer buf = new StringBuffer("\\u80");
+        buf.append(Integer.toHexString((v >> 8) | 0x100).substring(1, 3)); // high - order bits
+        buf.append("\\x");
+        buf.append(Integer.toHexString((v & 0xff) | 0x100).substring(1, 3)); // low -order bits
+        return buf.toString();
+    }
+
     /** Convert long to two 32-bit numbers separted by a comma.
      *  ActionScript does not support 64-bit numbers, so we need to break
      *  the number into two 32-bit literals to give to the Bit.  A number like

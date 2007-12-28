@@ -7,6 +7,7 @@ package org.antlr.runtime.test {
 		public function AllTests() {
 			addTest(new TestSuite(TestANTLRStringStream));
 			addTest(new TestSuite(TestBitSet));
+			addTest(new TestSuite(TestDFA));
 		}
 		
 	}

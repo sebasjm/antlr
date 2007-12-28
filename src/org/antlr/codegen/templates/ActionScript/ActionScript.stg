@@ -933,12 +933,12 @@ private const DFA<dfa.decisionNumber>_maxS:String =
 private const DFA<dfa.decisionNumber>_acceptS:String =
     "<dfa.javaCompressedAccept; wrap="\"+\n    \"">";
 private const DFA<dfa.decisionNumber>_specialS:String =
-    "<dfa.javaCompressedSpecial; wrap="\"+\n    \"">}>";
+    "<dfa.javaCompressedSpecial; wrap="\"+\n    \"">";
 private const DFA<dfa.decisionNumber>_transitionS:Array = [
         <dfa.javaCompressedTransition:{s|"<s; wrap="\"+\n\"">"}; separator=",\n">
 ];
 <if(dfa.specialStateSTs)>
-private const DFA<dfa.decisionNumber>_specialStateTransition:Function = function specialStateTransition(s:int, input:IntStream):int {
+private const DFA<dfa.decisionNumber>_specialStateTransition:Function = function specialStateTransition(dfa:DFA, s:int, input:IntStream):int {
     	var _s:int = s;
         switch ( s ) {
         <dfa.specialStateSTs:{state |
@@ -948,7 +948,7 @@ private const DFA<dfa.decisionNumber>_specialStateTransition:Function = function
 <if(backtracking)>
         if (this.state.backtracking>0) {this.state.failed=true; return -1;}<\n>
 <endif>
-        throw error(new NoViableAltException(getDescription(), <dfa.decisionNumber>, _s, input));
+        throw dfa.error(new NoViableAltException(dfa.description, <dfa.decisionNumber>, _s, input));
     }<\n>
 <endif>
 
@@ -1100,6 +1100,7 @@ parameterAttributeRef(attr) ::= "<attr.name>"
 parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
+if ( <scope>_stack.size()>0 ) {
  <if(negIndex)>
  ((<scope>_stack.size()-<negIndex>-1)>=0?((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>:null)
  <else>
@@ -1109,6 +1110,7 @@ scopeAttributeRef(scope,attr,index,negIndex) ::= <<
  ((<scope>_stack.size()>0)?((<scope>_scope)<scope>_stack.peek()).<attr.name>:null)
  <endif>
  <endif>
+}
 >>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
