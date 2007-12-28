@@ -93,7 +93,7 @@ package org.antlr.runtime.tree {
 					if ( this._children!=null ) { // must copy, this has children already
 						var n:int = childTree._children.length;
 						for (var i:int = 0; i < n; i++) {
-							var c:Tree = Tree(childTree._children)[i];
+							var c:Tree = Tree(childTree._children[i]);
 							this.children.push(c);
 							// handle double-link stuff for each child of nil root
 							c.parent = this;

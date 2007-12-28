@@ -1,4 +1,7 @@
 package org.antlr.runtime {
+    import flash.events.ErrorEvent;
+    import flash.events.EventDispatcher;
+    
 	
 	
 	/** A generic recognizer that can handle recognizers generated from
@@ -6,7 +9,7 @@ package org.antlr.runtime {
 	 *  support code essentially; most of it is error recovery stuff and
 	 *  backtracking.
 	 */
-	public class BaseRecognizer {
+	public class BaseRecognizer extends EventDispatcher {
 		public static const MEMO_RULE_FAILED:int = -2;
 		public static const MEMO_RULE_UNKNOWN:int = -1;
 		public static const INITIAL_FOLLOW_STACK_SIZE:int = 100;
@@ -240,7 +243,12 @@ package org.antlr.runtime {
 	
 		/** Override this method to change where error messages go */
 		public function emitErrorMessage(msg:String):void {
-			trace(msg);
+			if (hasEventListener(ErrorEvent.ERROR)) {
+			    dispatchEvent(new ErrorEvent(ErrorEvent.ERROR, false, false, msg));
+			}
+			else {
+			    trace(msg);
+			}
 		}
 	
 		/** Recover from an error found on the input stream.  Mostly this is
