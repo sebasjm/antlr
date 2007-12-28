@@ -27,7 +27,20 @@
 */
 package org.antlr.test;
 
+import org.antlr.tool.ErrorManager;
+import org.antlr.tool.Grammar;
+
 public class TestCompositeGrammars extends BaseTest {
+	public void testWildcardStillWorks() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String grammar =
+			"parser grammar S;\n" +
+			"a : B . C ;\n"; // not qualified ID
+		Grammar g = new Grammar(grammar);
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 	public void testDelegatorInvokesDelegateRule() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
