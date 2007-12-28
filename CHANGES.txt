@@ -41,6 +41,8 @@ December 27, 2007
   I changed the examples-v3/java to be consistent.  Required XML.g ->
   XMLLexer.java and fuzzy/Main.java change.
 
+* Fix ANTLR-169.  Deletes tmp lexer grammar file.
+
 December 25, 2007
 
 * Fixed ANTLR-111.  More unit tests in TestAttributes.

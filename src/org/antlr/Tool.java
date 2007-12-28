@@ -311,18 +311,26 @@ public class Tool {
 						exceptionWhenWritingLexerFile = true;
 						throw e;
 					}
-					StringReader sr = new StringReader(lexerGrammarStr);
-					Grammar lexerGrammar = new Grammar();
-					lexerGrammar.implicitLexer = true;
-					lexerGrammar.setTool(this);
-					File lexerGrammarFullFile =
-						new File(getFileDirectory(lexerGrammarFileName),lexerGrammarFileName);
-					lexerGrammar.setFileName(lexerGrammarFullFile.toString());
-					lexerGrammar.importTokenVocabulary(grammar);
-					lexerGrammar.parseAndBuildAST(sr);
-					lexerGrammar.analyzeGrammar();
-					sr.close();
-					processGrammar(lexerGrammar);
+					try {
+						StringReader sr = new StringReader(lexerGrammarStr);
+						Grammar lexerGrammar = new Grammar();
+						lexerGrammar.implicitLexer = true;
+						lexerGrammar.setTool(this);
+						File lexerGrammarFullFile =
+							new File(getFileDirectory(lexerGrammarFileName),lexerGrammarFileName);
+						lexerGrammar.setFileName(lexerGrammarFullFile.toString());
+						lexerGrammar.importTokenVocabulary(grammar);
+						lexerGrammar.parseAndBuildAST(sr);
+						lexerGrammar.analyzeGrammar();
+						sr.close();
+						processGrammar(lexerGrammar);
+					}
+					finally {
+						// make sure we clean up
+						File outputDir = getOutputDirectory(lexerGrammarFileName);
+						File outputFile = new File(outputDir, lexerGrammarFileName);
+						outputFile.delete();
+					}
 				}
 			}
 			catch (IOException e) {
@@ -405,7 +413,7 @@ public class Tool {
 			String dot = dotGenerator.getDOT( dfa.startState );
 			String dotFileName = g.name+"."+"dec-"+d;
 			if ( g.implicitLexer ) {
-				dotFileName = g.name+Grammar.grammarTypeToFileNameSuffix[g.type]+"."+"dec-"+d;				
+				dotFileName = g.name+Grammar.grammarTypeToFileNameSuffix[g.type]+"."+"dec-"+d;
 			}
 			try {
 				writeDOTFile(g, dotFileName, dot);
