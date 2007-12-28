@@ -55,7 +55,7 @@ options {
     buildAST = true;
 	exportVocab=ANTLR;
     ASTLabelType="GrammarAST";
-	k=2;
+	k=3;
 }
 
 tokens {
@@ -617,8 +617,11 @@ atom
             // TOKEN_REF WILDCARD could match terminal here then WILDCARD next
             generateAmbigWarnings=false;
         }
-        :   // grammar.rule
-            id w:WILDCARD^ (terminal|ruleref) {#w.setType(DOT);}
+        :   // grammar.rule but ensure no spaces. "A . B" is not a qualified ref
+        	// We do here rather than lexer so we can build a tree
+            {LT(1).getColumn()+LT(1).getText().length()==LT(2).getColumn()&&
+			 LT(2).getColumn()+1==LT(3).getColumn()}?
+			id w:WILDCARD^ (terminal|ruleref) {#w.setType(DOT);}
         |   terminal
         |   ruleref
         )
