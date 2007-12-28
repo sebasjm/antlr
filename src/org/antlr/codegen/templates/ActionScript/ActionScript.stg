@@ -75,19 +75,19 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
 
     // delegates
     <grammar.delegates:
-         {g|public var <g:delegateName()>:<g.name>Lexer;}; separator="\n">
+         {g|public var <g:delegateName()>:<g.recognizerName>;}; separator="\n">
     // delegators
     <grammar.delegators:
-         {g|public var <g:delegateName()>:<g.name>Lexer;}; separator="\n">
+         {g|public var <g:delegateName()>:<g.recognizerName>;}; separator="\n">
 
-    public function <name>(input:CharStream = null, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.name>Lexer}>) {
+    public function <name>(input:CharStream = null, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>) {
         super(input);
         <cyclicDFAs:cyclicDFACtor()>
 <if(backtracking)>
         this.state.ruleMemo = new Array(<numRules>+1);<\n> <! index from 1..n !>
 <endif>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.name>Lexer(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
         <grammar.delegators:
          {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
 
@@ -176,21 +176,21 @@ genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
 
     // delegates
     <grammar.delegates:
-         {g|public var <g:delegateName()>:<g.name><superClass>;}; separator="\n">
+         {g|public var <g:delegateName()>:<g.recognizerName>;}; separator="\n">
     // delegators
     <grammar.delegators:
-         {g|public var <g:delegateName()>:<g.name><superClass>;}; separator="\n">
+         {g|public var <g:delegateName()>:<g.recognizerName>;}; separator="\n">
 
 
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
    <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
-    public function <name>(input:<inputStreamType>, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.name><superClass>}>) {
+    public function <name>(input:<inputStreamType>, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>}>) {
         super(input, state);
         <cyclicDFAs:cyclicDFACtor()>
         <parserCtorBody()>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.name><superClass>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
     }
     <@end>
 
