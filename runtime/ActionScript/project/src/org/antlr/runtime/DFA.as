@@ -30,23 +30,19 @@ package org.antlr.runtime {
 		public static const debug:Boolean = false;
 
 		public function DFA(recognizer:BaseRecognizer, decisionNumber:int, description:String,
-							eotS:String, eofS:String, minS:String, maxS:String, acceptS:String, specialS:String, transitionS:Array,
+							eot:Array, eof:Array, min:Array, max:Array, accept:Array, special:Array, transition:Array,
 							specialStateTransitionFunction:Function = null, errorFunction:Function = null) {			
 			this.recognizer = recognizer;
 			this.decisionNumber = decisionNumber;
 			this._description = description;
 			
-			eot = unpackEncodedString(eotS);
-			eof = unpackEncodedString(eofS);
-			min = unpackEncodedString(minS, true);
-			max = unpackEncodedString(maxS, true);
-			accept = unpackEncodedString(acceptS);
-			special = unpackEncodedString(specialS);
-			
-			transition = new Array(transitionS.length);
-			for (var i:int = 0; i < transitionS.length; i++) {
-				transition[i] = unpackEncodedString(transitionS[i]);
-			}
+			this.eot = eot;
+			this.eof = eof;
+			this.min = min;
+			this.max = max;
+			this.accept = accept;
+			this.special = special;
+            this.transition = transition;
 						
 			if (specialStateTransitionFunction != null) {
 				specialStateTransition = specialStateTransitionFunction;

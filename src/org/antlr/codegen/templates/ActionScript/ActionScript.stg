@@ -907,9 +907,9 @@ cyclicDFACtor(dfa) ::= <<
 
 dfa<dfa.decisionNumber> = new DFA(this, <dfa.decisionNumber>,
             "<dfa.description>",
-            DFA<dfa.decisionNumber>_eotS, DFA<dfa.decisionNumber>_eofS, DFA<dfa.decisionNumber>_minS,
-            DFA<dfa.decisionNumber>_maxS, DFA<dfa.decisionNumber>_acceptS, DFA<dfa.decisionNumber>_specialS,
-            DFA<dfa.decisionNumber>_transitionS<if(dfa.specialStateSTs)>, DFA<dfa.decisionNumber>_specialStateTransition<endif>);
+            DFA<dfa.decisionNumber>_eot, DFA<dfa.decisionNumber>_eof, DFA<dfa.decisionNumber>_min,
+            DFA<dfa.decisionNumber>_max, DFA<dfa.decisionNumber>_accept, DFA<dfa.decisionNumber>_special,
+            DFA<dfa.decisionNumber>_transition<if(dfa.specialStateSTs)>, DFA<dfa.decisionNumber>_specialStateTransition<endif>);
 
 >>
 /* Dump DFA tables as run-length-encoded Strings of octal values.
@@ -922,20 +922,20 @@ dfa<dfa.decisionNumber> = new DFA(this, <dfa.decisionNumber>,
  */
 cyclicDFA(dfa) ::= <<
 
-private const DFA<dfa.decisionNumber>_eotS:String =
-    "<dfa.javaCompressedEOT; wrap="\"+\n    \"">";
-private const DFA<dfa.decisionNumber>_eofS:String =
-    "<dfa.javaCompressedEOF; wrap="\"+\n    \"">";
-private const DFA<dfa.decisionNumber>_minS:String =
-    "<dfa.javaCompressedMin; wrap="\"+\n    \"">";
-private const DFA<dfa.decisionNumber>_maxS:String =
-    "<dfa.javaCompressedMax; wrap="\"+\n    \"">";
-private const DFA<dfa.decisionNumber>_acceptS:String =
-    "<dfa.javaCompressedAccept; wrap="\"+\n    \"">";
-private const DFA<dfa.decisionNumber>_specialS:String =
-    "<dfa.javaCompressedSpecial; wrap="\"+\n    \"">";
-private const DFA<dfa.decisionNumber>_transitionS:Array = [
-        <dfa.javaCompressedTransition:{s|"<s; wrap="\"+\n\"">"}; separator=",\n">
+private const DFA<dfa.decisionNumber>_eot:Array =
+    DFA.unpackEncodedString("<dfa.javaCompressedEOT; wrap="\"+\n    \"">");
+private const DFA<dfa.decisionNumber>_eof:Array =
+    DFA.unpackEncodedString("<dfa.javaCompressedEOF; wrap="\"+\n    \"">");
+private const DFA<dfa.decisionNumber>_min:Array =
+    DFA.unpackEncodedString("<dfa.javaCompressedMin; wrap="\"+\n    \"">", true);
+private const DFA<dfa.decisionNumber>_max:Array =
+    DFA.unpackEncodedString("<dfa.javaCompressedMax; wrap="\"+\n    \"">", true);
+private const DFA<dfa.decisionNumber>_accept:Array =
+    DFA.unpackEncodedString("<dfa.javaCompressedAccept; wrap="\"+\n    \"">");
+private const DFA<dfa.decisionNumber>_special:Array =
+    DFA.unpackEncodedString("<dfa.javaCompressedSpecial; wrap="\"+\n    \"">");
+private const DFA<dfa.decisionNumber>_transition:Array = [
+        <dfa.javaCompressedTransition:{s|DFA.unpackEncodedString("<s; wrap="\"+\n\"">")}; separator=",\n">
 ];
 <if(dfa.specialStateSTs)>
 private const DFA<dfa.decisionNumber>_specialStateTransition:Function = function specialStateTransition(dfa:DFA, s:int, input:IntStream):int {
