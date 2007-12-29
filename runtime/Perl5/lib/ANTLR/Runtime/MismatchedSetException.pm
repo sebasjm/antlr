@@ -3,7 +3,6 @@ package ANTLR::Runtime::MismatchedSetException;
 use strict;
 use warnings;
 
-sub new {
-}
+use base qw( ANTLR::Runtime::Exception );
 
 1;

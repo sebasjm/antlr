@@ -1,10 +1,11 @@
 package ANTLR::Runtime::NoViableAltException;
-use base qw( ANTLR::Runtime::RecognitionException );
-
-use ANTLR::Runtime::Class;
 
 use strict;
 use warnings;
+
+use base qw( ANTLR::Runtime::RecognitionException );
+
+use ANTLR::Runtime::Class;
 
 ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
     qw( grammar_decision_description decision_number state_number )

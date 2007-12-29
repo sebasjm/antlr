@@ -3,12 +3,11 @@ package ANTLR::Runtime::Exception;
 use strict;
 use warnings;
 
-sub new {
-    my ($class) = @_;
+use Exception::Class;
+use base qw( Exception::Class::Base );
 
-    my $self = bless {}, $class;
-
-    return $self;
+sub description {
+    return 'ANTLR::Runtime Base Exception';
 }
 
 1;

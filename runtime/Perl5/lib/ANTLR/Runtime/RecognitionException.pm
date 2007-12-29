@@ -1,4 +1,8 @@
 package ANTLR::Runtime::RecognitionException;
+
+use strict;
+use warnings;
+
 use base qw( ANTLR::Runtime::Exception );
 
 use Carp;
@@ -6,8 +10,6 @@ use Readonly;
 
 use ANTLR::Runtime::Class;
 
-use strict;
-use warnings;
 
 ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
     qw( input index token node c line char_position_in_line )

@@ -3,7 +3,6 @@ package ANTLR::Runtime::EarlyExitException;
 use strict;
 use warnings;
 
-sub new {
-}
+use base qw( ANTLR::Runtime::Exception );
 
 1;
