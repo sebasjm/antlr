@@ -436,7 +436,7 @@ finallyClause
     ;
 
 rewrite
-	:	( #( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION) ) )*
+	:	( #( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION|ETC) ) )*
 	;
 
 element

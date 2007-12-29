@@ -811,6 +811,8 @@ rewrite_alternative
         }
 
    	|   {#rewrite_alternative = #(altRoot,#[EPSILON,"epsilon"],eoa);}
+
+   	|	{grammar.buildAST()}? ETC
     ;
 
 rewrite_element
@@ -917,7 +919,7 @@ rewrite_template_arg
 
 class ANTLRLexer extends Lexer;
 options {
-	k=2;
+	k=3;
 	exportVocab=ANTLR;
 	testLiterals=false;
 	interactive=true;
@@ -1012,6 +1014,8 @@ BANG : '!' ;
 OR	:	'|' ;
 
 WILDCARD : '.' ;
+
+ETC : "..." ;
 
 RANGE : ".." ;
 

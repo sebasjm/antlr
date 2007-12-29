@@ -27,13 +27,6 @@
 */
 package org.antlr.test;
 
-import org.antlr.tool.ErrorManager;
-import org.antlr.tool.GrammarSemanticsMessage;
-import org.antlr.tool.Message;
-import org.antlr.tool.Grammar;
-import org.antlr.Tool;
-import org.antlr.codegen.CodeGenerator;
-
 /** Tree rewrites in tree parsers are basically identical to rewrites
  *  in a normal grammar except that the atomic element is a node not
  *  a Token.  Tests here ensure duplication of nodes occurs properly
@@ -58,7 +51,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
 		assertEquals("34 abc\n", found);
 	}
 
@@ -78,8 +71,27 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
 		assertEquals("(34 abc)\n", found);
+	}
+
+	public void testNonImaginaryWithCtor() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : INT ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+			"a : INT -> INT[\"99\"]\n" + // make new INT node
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "34");
+		assertEquals("99\n", found);
 	}
 
 	public void testCombinedRewriteAndAuto() throws Exception {
@@ -98,11 +110,11 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
 		assertEquals("(34 abc)\n", found);
 
 		found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "34");
+							   treeGrammar, "TP", "TLexer", "a", "a", "34");
 		assertEquals("34\n", found);
 	}
 
@@ -122,7 +134,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "abc");
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc");
 		assertEquals("(abc abc)\n", found);
 	}
 
@@ -142,7 +154,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a b c 3 4 5");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a b c 3 4 5");
 		assertEquals("3 4 5 a b c\n", found);
 	}
 
@@ -162,7 +174,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "abc");
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc");
 		assertEquals("abc\n", found);
 	}
 
@@ -183,7 +195,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"c : INT ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a 1");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a 1");
 		assertEquals("a 1\n", found);
 	}
 
@@ -203,7 +215,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a b 3");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a b 3");
 		assertEquals("a b 3\n", found);
 	}
 
@@ -223,7 +235,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a 3");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a 3");
 		assertEquals("(a 3)\n", found);
 	}
 
@@ -243,7 +255,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a 3");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a 3");
 		assertEquals("(a 3)\n", found);
 	}
 
@@ -263,7 +275,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a 3");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a 3");
 		assertEquals("(a 3)\n", found);
 	}
 
@@ -283,7 +295,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"b : ID ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a 3");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a 3");
 		assertEquals("(a 3)\n", found);
 	}
 
@@ -303,7 +315,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"b : ID ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a 3");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a 3");
 		assertEquals("(a 3)\n", found);
 	}
 
@@ -324,7 +336,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"c : INT ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a 3");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a 3");
 		assertEquals("(a 3)\n", found);
 	}
 
@@ -344,7 +356,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "a b 3");
+									  treeGrammar, "TP", "TLexer", "a", "a", "a b 3");
 		assertEquals("(a (b 3))\n", found);
 	}
 
@@ -364,7 +376,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "abc");
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc");
 		assertEquals("", found);
 	}
 
@@ -382,16 +394,17 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		String treeGrammar =
 			"tree grammar TP;\n"+
 			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
-			"a : ^(ID INT) -> ^(INT ID) | INT\n" +
+			"a : ^(ID INT) -> ^(INT ID)\n" +
+			"  | INT\n" + // leaves it alone, returning the INT
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
 		assertEquals("(34 abc)\n", found);
 
 		found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-				    treeGrammar, "TP", "TLexer", "a", "a", "34");
-		assertEquals("", found);
+							   treeGrammar, "TP", "TLexer", "a", "a", "34");
+		assertEquals("34\n", found);
 	}
 
 }

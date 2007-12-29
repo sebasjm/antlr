@@ -187,14 +187,11 @@ options {
 		}
 		// handle list label stuff; make element use "Track"
 
-		String astPart = "";
 		String operatorPart = "";
 		String rewritePart = "";
 		String listLabelPart = "";
-		if ( grammar.buildAST() ) {
-			astPart = "AST";
-		}
-		if ( ast_suffix!=null ) {
+		Rule ruleDescr = grammar.getRule(currentRuleName);
+		if ( ast_suffix!=null && !ruleDescr.isSynPred ) {
 			if ( ast_suffix.getType()==ANTLRParser.ROOT ) {
     			operatorPart = "RuleRoot";
     		}
@@ -489,7 +486,13 @@ block[String blockTemplateName, DFA dfa]
               	this.outerAltNum++;
               }
               // add the rewrite code as just another element in the alt :)
-    		  if ( rew!=null ) {
+              // (unless it's a " -> ..." rewrite
+              // ( -> ... )
+              boolean etc =
+              	r.getType()==REWRITE &&
+              	r.getFirstChild()!=null &&
+		  		r.getFirstChild().getType()==ETC;
+    		  if ( rew!=null && !etc ) {
     		  	alt.setAttribute("elements.{el,line,pos}",
     		  		rew, Utils.integer(r.getLine()), Utils.integer(r.getColumn()));
     		  }
@@ -1105,7 +1108,11 @@ StringTemplate el,st;
     		)
     		EOA
     	 )
+
     |	{generator.grammar.buildTemplate()}? code=rewrite_template
+
+    |	// reproduce same input (only AST at moment)
+    	ETC
     ;
 
 rewrite_element returns [StringTemplate code=null]
@@ -1222,12 +1229,12 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	String stName = "rewriteTokenRef";
     	Rule rule = grammar.getRule(currentRuleName);
     	Set tokenRefsInAlt = rule.getTokenRefsInAlt(outerAltNum);
-    	boolean imaginary = !tokenRefsInAlt.contains(tokenName);
+    	boolean createNewNode = !tokenRefsInAlt.contains(tokenName) || #arg!=null;
         String hetero = null;
         if ( #harg!=null ) { hetero = #harg.getText(); }
         else if ( #harg2!=null ) { hetero = #harg2.getText(); }
         else if ( #harg3!=null ) { hetero = #harg3.getText(); }
-    	if ( imaginary ) {
+    	if ( createNewNode ) {
     		stName = "rewriteImaginaryTokenRef";
     	}
     	if ( isRoot ) {

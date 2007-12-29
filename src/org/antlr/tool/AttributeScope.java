@@ -53,6 +53,7 @@ public class AttributeScope {
 		tokenScope.addAttribute("pos", null);
 		tokenScope.addAttribute("channel", null);
 		tokenScope.addAttribute("tree", null);
+		tokenScope.addAttribute("int", null);
 	}
 
 	/** This scope is associated with which input token (for error handling)? */

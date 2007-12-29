@@ -8,6 +8,17 @@ University of San Francisco
 
 CHANGES
 
+December 28, 2007
+
+* added polydiff example (Java target)
+
+* added "int" property for token and lexer rule refs.  super convenient. E.g.,
+  a : b=INT {int x = $b.int;} ;
+
+* added -> ... rewrite for AST construction.  Implies do default auto
+  construction operation.  Same as not having a rewrite.  Most useful
+  in predicate rewrite lists.
+
 December 27, 2007
 
 * Changed -Xnoinlinedfa to -Xmaxinlinedfastates m where m is

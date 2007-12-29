@@ -389,14 +389,29 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		return buf.toString();
 	}
 
+	/** Debugging */
+	public String toTokenString(int start, int stop) {
+		if ( p==-1 ) {
+			fillBuffer();
+		}
+		StringBuffer buf = new StringBuffer();
+		for (int i = start; i < nodes.size() && i <= stop; i++) {
+			Object t = (Object) nodes.get(i);
+			buf.append(" ");
+			buf.append(adaptor.getToken(t));
+		}
+		return buf.toString();
+	}
+
 	public String toString(Object start, Object stop) {
+		System.out.println("toString");
 		if ( start==null || stop==null ) {
 			return null;
 		}
 		if ( p==-1 ) {
 			fillBuffer();
 		}
-		System.out.println("stop: "+stop);
+		//System.out.println("stop: "+stop);
 		if ( start instanceof CommonTree )
 			System.out.print("toString: "+((CommonTree)start).getToken()+", ");
 		else

@@ -207,7 +207,7 @@ public class CodeGenerator {
 				StringTemplateGroup astTemplates =
 					StringTemplateGroup.loadGroup("AST",dbgTemplates);
 				StringTemplateGroup astParserTemplates = astTemplates;
-				if ( !grammar.rewriteMode() ) {
+				//if ( !grammar.rewriteMode() ) {
 					if ( grammar.type==Grammar.TREE_PARSER ) {
 						astParserTemplates =
 							StringTemplateGroup.loadGroup("ASTTreeParser", astTemplates);
@@ -216,7 +216,7 @@ public class CodeGenerator {
 						astParserTemplates =
 							StringTemplateGroup.loadGroup("ASTParser", astTemplates);
 					}
-				}
+				//}
 				StringTemplateGroup astDbgTemplates =
 					StringTemplateGroup.loadGroup("ASTDbg", astParserTemplates);
 				templates = astDbgTemplates;
@@ -225,7 +225,7 @@ public class CodeGenerator {
 				StringTemplateGroup astTemplates =
 					StringTemplateGroup.loadGroup("AST", coreTemplates);
 				StringTemplateGroup astParserTemplates = astTemplates;
-				if ( !grammar.rewriteMode() ) {
+				//if ( !grammar.rewriteMode() ) {
 					if ( grammar.type==Grammar.TREE_PARSER ) {
 						astParserTemplates =
 							StringTemplateGroup.loadGroup("ASTTreeParser", astTemplates);
@@ -234,7 +234,7 @@ public class CodeGenerator {
 						astParserTemplates =
 							StringTemplateGroup.loadGroup("ASTParser", astTemplates);
 					}
-				}
+				//}
 				templates = astParserTemplates;
 			}
 		}

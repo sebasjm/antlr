@@ -269,7 +269,7 @@ finallyClause
 
 single_rewrite
 	:	#( REWRITE {out(" ->");} (SEMPRED {out(" {"+#SEMPRED.getText()+"}?");})?
-	       ( alternative | rewrite_template | ACTION {out(" {"+#ACTION.getText()+"}");})
+	       ( alternative | rewrite_template | ETC {out("...");} | ACTION {out(" {"+#ACTION.getText()+"}");})
 	     )
 	;
 

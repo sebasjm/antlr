@@ -818,7 +818,7 @@ public class TestRewriteAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"tokens {BLOCK;}\n" +
-			"a : A A b=B B b=B c+=C C c+=C D {$D.text;} -> A+ B+ C+ D ;\n" +
+			"a : A A b=B B b=B c+=C C c+=C D {String s=$D.text;} -> A+ B+ C+ D ;\n" +
 			"type : 'int' | 'float' ;\n" +
 			"A : 'a' ;\n" +
 			"B : 'b' ;\n" +

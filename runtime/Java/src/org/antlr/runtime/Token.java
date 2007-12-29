@@ -81,4 +81,11 @@ public interface Token {
 	 */
 	public abstract int getTokenIndex();
 	public abstract void setTokenIndex(int index);
+
+	/*
+	public int toInt();
+	public long toLong();
+	public float toFloat();
+	public double toDouble();
+	*/
 }

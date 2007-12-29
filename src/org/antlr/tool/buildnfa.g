@@ -283,7 +283,7 @@ rewrite
 										  grammar, #rewrite.token, currentRuleName);
 			}
 			}
-			#( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION) )
+			#( REWRITE (SEMPRED)? (ALT|TEMPLATE|ACTION|ETC) )
 		)*
 	;
 

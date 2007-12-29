@@ -985,8 +985,12 @@ class DFA<dfa.decisionNumber> extends DFA {
     public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
         <if(LEXER)>
         IntStream input = _input;
-        <else>
+        <endif>
+        <if(PARSER)>
         TokenStream input = (TokenStream)_input;
+        <endif>
+        <if(TREE_PARSER)>
+        TreeNodeStream input = (TreeNodeStream)_input;
         <endif>
     	int _s = s;
         switch ( s ) {
@@ -1216,12 +1220,13 @@ listLabelRef(label) ::= "list_<label>"
 // not sure the next are the right approach
 
 tokenLabelPropertyRef_text(scope,attr) ::= "(<scope>!=null?<scope>.getText():null)"
-tokenLabelPropertyRef_type(scope,attr) ::= "(<scope>!=null?<scope>.getType():null)"
-tokenLabelPropertyRef_line(scope,attr) ::= "(<scope>!=null?<scope>.getLine():null)"
-tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope>!=null?<scope>.getCharPositionInLine():null)"
-tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope>!=null?<scope>.getChannel():null)"
-tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>!=null?<scope>.getTokenIndex():null)"
+tokenLabelPropertyRef_type(scope,attr) ::= "(<scope>!=null?<scope>.getType():0)"
+tokenLabelPropertyRef_line(scope,attr) ::= "(<scope>!=null?<scope>.getLine():-1)"
+tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope>!=null?<scope>.getCharPositionInLine():-1)"
+tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope>!=null?<scope>.getChannel():-1)"
+tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>!=null?<scope>.getTokenIndex():-1)"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
+tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?Integer.valueOf(<scope>.getText()):0)"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "(<scope>!=null?((<labelType>)<scope>.start):null)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>!=null?((<labelType>)<scope>.stop):null)"
@@ -1242,17 +1247,19 @@ ruleLabelPropertyRef_st(scope,attr) ::= "(<scope>!=null?<scope>.st:null)"
 lexerRuleLabel(label) ::= "<label>"
 
 lexerRuleLabelPropertyRef_type(scope,attr) ::=
-    "(<scope>!=null?<scope>.getType():null)"
+    "(<scope>!=null?<scope>.getType():0)"
 lexerRuleLabelPropertyRef_line(scope,attr) ::=
-    "(<scope>!=null?<scope>.getLine():null)"
+    "(<scope>!=null?<scope>.getLine():-1)"
 lexerRuleLabelPropertyRef_pos(scope,attr) ::= 
-    "(<scope>!=null?<scope>.getCharPositionInLine():null)"
+    "(<scope>!=null?<scope>.getCharPositionInLine():-1)"
 lexerRuleLabelPropertyRef_channel(scope,attr) ::=
-    "(<scope>!=null?<scope>.getChannel():null)"
+    "(<scope>!=null?<scope>.getChannel():-1)"
 lexerRuleLabelPropertyRef_index(scope,attr) ::=
-    "(<scope>!=null?<scope>.getTokenIndex():null)"
+    "(<scope>!=null?<scope>.getTokenIndex():-1)"
 lexerRuleLabelPropertyRef_text(scope,attr) ::=
     "(<scope>!=null?<scope>.getText():null)"
+lexerRuleLabelPropertyRef_int(scope,attr) ::=
+    "(<scope>!=null?Integer.valueOf(<scope>.getText()):0)"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval.start)"
@@ -1277,6 +1284,7 @@ lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexe
 lexerRulePropertyRef_channel(scope,attr) ::= "state.channel"
 lexerRulePropertyRef_start(scope,attr) ::= "state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(getCharIndex()-1)"
+lexerRulePropertyRef_int(scope,attr) ::= "Integer.valueOf(<scope>.getText())"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error

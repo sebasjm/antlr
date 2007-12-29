@@ -319,10 +319,15 @@ blockAction
 alternative
 {
 if ( grammar.type!=Grammar.LEXER && grammar.getOption("output")!=null && blockLevel==1 ) {
-	GrammarAST aRewriteNode = #alternative.findFirstType(REWRITE);
+	GrammarAST aRewriteNode = #alternative.findFirstType(REWRITE); // alt itself has rewrite?
+	GrammarAST rewriteAST = (GrammarAST)#alternative.getNextSibling();
+	// we have a rewrite if alt uses it inside subrule or this alt has one
+	// but don't count -> ... rewrites, which mean "do default auto construction"
 	if ( aRewriteNode!=null||
-		 (#alternative.getNextSibling()!=null &&
-		  #alternative.getNextSibling().getType()==REWRITE) )
+		 (rewriteAST!=null &&
+		  rewriteAST.getType()==REWRITE &&
+		  rewriteAST.getFirstChild()!=null &&
+		  rewriteAST.getFirstChild().getType()!=ETC) )
 	{
 		Rule r = grammar.getRule(currentRuleName);
 		r.trackAltsWithRewrites(#alternative,this.outerAltNum);
@@ -537,6 +542,8 @@ rewrite_alternative
     :   {grammar.buildAST()}?
     	#( a:ALT ( ( rewrite_element )+ | EPSILON ) EOA )
     |	{grammar.buildTemplate()}? rewrite_template
+	|	ETC {this.blockLevel==1}? // only valid as outermost rewrite
+
     ;
 
 rewrite_element
