@@ -11,8 +11,28 @@ our @EXPORT = qw( g_test_output_is );
 
 use Cwd;
 use File::Spec;
-use File::Slurp;
 use File::Temp qw( tempdir );
+
+sub read_file {
+    my ($filename) = @_;
+
+    local $/;
+    open my $in, '<', $filename or die "Can't open $filename: $!";
+    my $content = <$in>;
+    close $in or warn "Can't close $filename: $!";
+
+    return $content;
+}
+
+sub write_file {
+    my ($filename, $content) = @_;
+
+    open my $out, '>', $filename or die "Can't open $filename: $!";
+    print $out $content;
+    close $out or warn "Can't close $filename: $!";
+
+    return;
+}
 
 sub g_test_output_is {
     my ($args) = @_;

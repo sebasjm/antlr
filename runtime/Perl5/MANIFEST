@@ -35,9 +35,9 @@ lib/ANTLR/Runtime/Stream.pm
 lib/ANTLR/Runtime/Token.pm
 lib/ANTLR/Runtime/TokenSource.pm
 lib/ANTLR/Runtime/TokenStream.pm
-t/ANTLRStringStream.t
-t/BitSet.t
-t/Lexer.t
+t/class/ANTLR/Runtime/ANTLRStringStream.t
+t/class/ANTLR/Runtime/BitSet.t
+t/class/ANTLR/Runtime/Lexer.t
 t/perlcritic.t
 t/perlcriticrc
 t/pod-coverage.t
