@@ -550,8 +550,23 @@ namespace Antlr.Runtime.Tree
 			return buf.ToString();
 		}
 
+		/** Debugging */
+		public String ToTokenString(int start, int stop) {
+			if ( p==-1 ) {
+				FillBuffer();
+			}
+			StringBuilder buf = new StringBuilder();
+			for (int i = start; i < nodes.Count && i <= stop; i++) {
+				Object t = (Object) nodes[i];
+				buf.Append(" ");
+				buf.Append(adaptor.GetToken(t));
+			}
+			return buf.ToString();
+		}
+
 		public virtual string ToString(object start, object stop)
 		{
+			Console.Out.WriteLine("ToString");
 			if ( (start == null) || (stop == null) ) 
 			{
 				return null;
@@ -560,13 +575,13 @@ namespace Antlr.Runtime.Tree
 			{
 				FillBuffer();
 			}
-			Console.Out.WriteLine("stop: " + stop);
+			//Console.Out.WriteLine("stop: " + stop);
 			if ( start is CommonTree )
-												 Console.Out.Write("ToString: " + ((CommonTree)start).Token + ", ");
+				Console.Out.Write("ToString: " + ((CommonTree)start).Token + ", ");
 			else
 				Console.Out.WriteLine(start);
 			if ( stop is CommonTree )
-												Console.Out.WriteLine(((CommonTree)stop).Token);
+				Console.Out.WriteLine(((CommonTree)stop).Token);
 			else
 				Console.Out.WriteLine(stop);
 			// if we have the token stream, use that to dump text in order

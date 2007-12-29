@@ -99,28 +99,26 @@ public class <name> : Lexer
 
     // delegates
     <grammar.delegates:
-         {g|public <g.name>Lexer <g:delegateName()>;}; separator="\n">
+         {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
     // delegators
     <grammar.delegators:
-         {g|public <g.name>Lexer <g:delegateName()>;}; separator="\n">
+         {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
 
     public <name>() <! needed by subclasses !>
     {
 		InitializeCyclicDFAs();
     }
-    public <name>(ICharStream input<grammar.delegators:{g|, <g.name>Lexer <g:delegateName()>}>) 
-		: this(input, null<grammar.delegators:{g|, <g:delegateName()>}>)
-	{
+    public <name>(ICharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+		: this(input, null<grammar.delegators:{g|, <g:delegateName()>}>) {
     }
-    public <name>(ICharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.name>Lexer <g:delegateName()>}>) 
-		: base(input)
-	{
+    public <name>(ICharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+		: base(input) {
 		InitializeCyclicDFAs();
 <if(backtracking)>
         this.state.ruleMemo = new IDictionary[<numRules>+1];<\n> <! index from 1..n !>
 <endif>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.name>Lexer(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
         <grammar.delegators:
          {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
     }
@@ -238,27 +236,25 @@ public class <name> : <@superClassName><superClass><@end>
 
     // delegates
     <grammar.delegates:
-         {g|public <g.name><superClass> <g:delegateName()>;}; separator="\n">
+         {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
     // delegators
     <grammar.delegators:
-         {g|public <g.name><superClass> <g:delegateName()>;}; separator="\n">
+         {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
 
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
-   <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
+    <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
 
-    public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>) 
-		: this(input, null<grammar.delegators:{g|, <g:delegateName()>}>)
-	{
+    public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+		: this(input, null<grammar.delegators:{g|, <g:delegateName()>}>) {
     }
 
-    public <name>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>)
-		: base(input, state)
-	{
+    public <name>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+		: base(input, state) {
 		InitializeCyclicDFAs();
         <parserCtorBody()>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.name><superClass>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
     }
     <@end>
 
@@ -1106,8 +1102,17 @@ protected class DFA<dfa.decisionNumber> : DFA
 }<\n>
 <if(dfa.specialStateSTs)>
 
-protected internal int DFA<dfa.decisionNumber>_SpecialStateTransition(DFA dfa, int s, IIntStream input) //throws NoViableAltException
+protected internal int DFA<dfa.decisionNumber>_SpecialStateTransition(DFA dfa, int s, IIntStream _input) //throws NoViableAltException
 {
+        <if(LEXER)>
+        IIntStream input = _input;
+        <endif>
+        <if(PARSER)>
+        ITokenStream input = (ITokenStream)_input;
+        <endif>
+        <if(TREE_PARSER)>
+        ITreeNodeStream input = (ITreeNodeStream)_input;
+        <endif>
 	int _s = s;
     switch ( s )
     {
@@ -1339,12 +1344,13 @@ listLabelRef(label) ::= "list_<label>"
 // not sure the next are the right approach
 
 tokenLabelPropertyRef_text(scope,attr) ::= "((<scope> != null) ? <scope>.Text : null)"
-tokenLabelPropertyRef_type(scope,attr) ::= "((<scope> != null) ? <scope>.Type : null)"
-tokenLabelPropertyRef_line(scope,attr) ::= "((<scope> != null) ? <scope>.Line : null)"
-tokenLabelPropertyRef_pos(scope,attr) ::= "((<scope> != null) ? <scope>.CharPositionInLine : null)"
-tokenLabelPropertyRef_channel(scope,attr) ::= "((<scope> != null) ? <scope>.Channel : null)"
-tokenLabelPropertyRef_index(scope,attr) ::= "((<scope> != null) ? <scope>.TokenIndex : null)"
+tokenLabelPropertyRef_type(scope,attr) ::= "((<scope> != null) ? <scope>.Type : 0)"
+tokenLabelPropertyRef_line(scope,attr) ::= "((<scope> != null) ? <scope>.Line : -1)"
+tokenLabelPropertyRef_pos(scope,attr) ::= "((<scope> != null) ? <scope>.CharPositionInLine : -1)"
+tokenLabelPropertyRef_channel(scope,attr) ::= "((<scope> != null) ? <scope>.Channel : -1)"
+tokenLabelPropertyRef_index(scope,attr) ::= "((<scope> != null) ? <scope>.TokenIndex : -1)"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
+tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int.Parse(<scope>.getText()):0)"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "((<scope> != null) ? ((<labelType>)<scope>.start) : null)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "((<scope> != null) ? ((<labelType>)<scope>.stop) : null)"
@@ -1393,6 +1399,7 @@ lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexe
 lexerRulePropertyRef_channel(scope,attr) ::= "state.channel"
 lexerRulePropertyRef_start(scope,attr) ::= "state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(CharIndex-1)"
+lexerRulePropertyRef_int(scope,attr) ::= "int.Parse(<scope>.getText())"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error

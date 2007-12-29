@@ -135,7 +135,7 @@ namespace Antlr.Runtime.Tree {
 		}
 
 		/// <summary>Create a stream, but feed off an existing list</summary>
-		public RewriteRuleNodeStream(
+		public RewriteRuleSubtreeStream(
 			ITreeAdaptor adaptor,
 			string elementDescription,
 			IList<SpecializingType> elements
@@ -144,7 +144,7 @@ namespace Antlr.Runtime.Tree {
 
 		/// <summary>Create a stream, but feed off an existing list</summary>
 		[Obsolete("Use instead the constructor supporting IList<T>.")]
-		public RewriteRuleNodeStream(
+		public RewriteRuleSubtreeStream(
 			ITreeAdaptor adaptor,
 			string elementDescription,
 			System.Collections.IList elements

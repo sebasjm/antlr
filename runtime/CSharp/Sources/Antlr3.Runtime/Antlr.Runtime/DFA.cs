@@ -86,6 +86,9 @@ namespace Antlr.Runtime
 		/// <returns>Return an alternative number 1..n.  Throw an exception upon error.</returns>
 		public int Predict(IIntStream input)
 		{
+			if ( debug ) {
+				Console.Error.WriteLine("Enter DFA.predict for decision "+decisionNumber);
+			}
 			int mark = input.Mark();	// remember where decision started in input
 			int s = 0; // we always start at s0
 			try
@@ -98,6 +101,15 @@ namespace Antlr.Runtime
 					if (specialState >= 0)
 					{
 						if (debug) Console.Error.WriteLine("DFA " + decisionNumber + " state " + s + " is special state " + specialState);
+						s = specialStateTransitionHandler(this, specialState, input);
+						if ( debug ) {
+							Console.Error.WriteLine("DFA "+decisionNumber+
+								" returns from special state "+specialState+" to "+s);
+						}
+						if ( s==-1 ) {
+							NoViableAlt(s,input);
+							return 0;
+						}
 						s = specialStateTransitionHandler(this, specialState, input);
 						input.Consume();
 						continue;
