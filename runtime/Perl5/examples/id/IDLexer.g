@@ -1,4 +1,4 @@
-lexer grammar ID;
+lexer grammar IDLexer;
 options { language = Perl5; }
 
 ID  :   ('a'..'z'|'A'..'Z')+ ;

@@ -10,7 +10,7 @@ use ANTLR::Runtime::Test;
 plan tests => 1;
 
 g_test_output_is({ grammar => <<'GRAMMAR', test_program => <<'CODE', expected => <<'OUTPUT' });
-lexer grammar ID;
+lexer grammar IDLexer;
 options { language = Perl5; }
 
 ID  :   ('a'..'z'|'A'..'Z')+ ;

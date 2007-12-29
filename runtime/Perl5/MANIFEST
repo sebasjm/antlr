@@ -8,7 +8,7 @@ README
 examples/README
 examples/expr/Expr.g
 examples/expr/expr.pl
-examples/id/ID.g
+examples/id/IDLexer.g
 examples/id/id.pl
 examples/mexpr/MExpr.g
 examples/mexpr/mexpr.pl
