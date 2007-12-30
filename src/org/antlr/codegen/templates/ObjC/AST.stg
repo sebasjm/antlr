@@ -266,10 +266,10 @@ root_0 = (<ASTLabelType>)[treeAdaptor newEmptyTree];
 [_<prevRuleRootRef()> setTree:root_0];
 <rewriteCodeLabels()>
 <alts:rewriteAlt(); separator="else ">
+<rewriteCodeLabelsCleanUp()>
 <if(backtracking)>
 }
 <endif>
-<rewriteCodeLabelsCleanUp()>
 >>
 
 rewriteCodeLabels() ::= <<
