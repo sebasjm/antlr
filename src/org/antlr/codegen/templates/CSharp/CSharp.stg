@@ -719,6 +719,11 @@ alt(elements,altNum,description,autoAST,outerAlt,treeLevel) ::= <<
 }
 >>
 
+/** What to emit when there is no rewrite.  For auto build
+ *  mode, does nothing.
+ */
+noRewrite(rewriteBlockLevel, treeLevel) ::= ""
+
 // E L E M E N T S
 
 /** Dump the elements one per line */
@@ -728,7 +733,7 @@ element() ::= <<
 >>
 
 /** match a token optionally with a label in front */
-tokenRef(token,label,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,hetero) ::= <<
 <if(label)>
 <label> = (<labelType>)input.LT(1);<\n>
 <endif>
@@ -736,7 +741,7 @@ Match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBackt
 >>
 
 /** ids+=ID */
-tokenRefAndListLabel(token,label,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -1279,12 +1284,12 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name> = <expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
-(((<scope>_stack.Count-<negIndex>-1) >=0 ) ? ((<scope>_scope)<scope>_stack[<scope>_stack.Count-<negIndex>-1]).<attr.name> : null)
+((<scope>_stack.Count-<negIndex>-1) >= 0 ? ((<scope>_scope)<scope>_stack[<scope>_stack.Count-<negIndex>-1]).<attr.name> : <initValue(attr.type)>)
 <else>
 <if(index)>
-((<index> \< <scope>_stack.Count) ? ((<scope>_scope)<scope>_stack[<index>]).<attr.name> : null)
+((<index>\<<scope>_stack.Count) ? ((<scope>_scope)<scope>_stack[<index>]).<attr.name> : <initValue(attr.type)>)
 <else>
-((<scope>_stack.Count > 0) ? ((<scope>_scope)<scope>_stack.Peek()).<attr.name> : null)
+((<scope>_stack.Count>0) ? ((<scope>_scope)<scope>_stack.Peek()).<attr.name> : <initValue(attr.type)>)
 <endif>
 <endif>
 >>
@@ -1345,10 +1350,10 @@ listLabelRef(label) ::= "list_<label>"
 
 tokenLabelPropertyRef_text(scope,attr) ::= "((<scope> != null) ? <scope>.Text : null)"
 tokenLabelPropertyRef_type(scope,attr) ::= "((<scope> != null) ? <scope>.Type : 0)"
-tokenLabelPropertyRef_line(scope,attr) ::= "((<scope> != null) ? <scope>.Line : -1)"
-tokenLabelPropertyRef_pos(scope,attr) ::= "((<scope> != null) ? <scope>.CharPositionInLine : -1)"
-tokenLabelPropertyRef_channel(scope,attr) ::= "((<scope> != null) ? <scope>.Channel : -1)"
-tokenLabelPropertyRef_index(scope,attr) ::= "((<scope> != null) ? <scope>.TokenIndex : -1)"
+tokenLabelPropertyRef_line(scope,attr) ::= "((<scope> != null) ? <scope>.Line : 0)"
+tokenLabelPropertyRef_pos(scope,attr) ::= "((<scope> != null) ? <scope>.CharPositionInLine : 0)"
+tokenLabelPropertyRef_channel(scope,attr) ::= "((<scope> != null) ? <scope>.Channel : 0)"
+tokenLabelPropertyRef_index(scope,attr) ::= "((<scope> != null) ? <scope>.TokenIndex : 0)"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int.Parse(<scope>.getText()):0)"
 
@@ -1369,12 +1374,13 @@ ruleLabelPropertyRef_st(scope,attr) ::= "((<scope> != null) ? <scope>.st : null)
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
 
-lexerRuleLabelPropertyRef_type(scope,attr) ::= "((<scope> != null) ? <scope>.Type : null)"
-lexerRuleLabelPropertyRef_line(scope,attr) ::= "((<scope> != null) ? <scope>.Line : null)"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= "((<scope> != null) ? <scope>.CharPositionInLine : null)"
-lexerRuleLabelPropertyRef_channel(scope,attr) ::= "((<scope> != null) ? <scope>.Channel : null)"
-lexerRuleLabelPropertyRef_index(scope,attr) ::= "((<scope> != null) ? <scope>.TokenIndex : null)"
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "((<scope> != null) ? <scope>.Type : 0)"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "((<scope> != null) ? <scope>.Line : 0)"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "((<scope> != null) ? <scope>.CharPositionInLine : -1)"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "((<scope> != null) ? <scope>.Channel : 0)"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "((<scope> != null) ? <scope>.TokenIndex : 0)"
 lexerRuleLabelPropertyRef_text(scope,attr) ::= "((<scope> != null) ? <scope>.Text : null)"
+lexerRuleLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int.Parse(<scope>.getText()):0)"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval.start)"

@@ -223,6 +223,11 @@ namespace Antlr.Runtime.Tree
 		/// </remarks>
 		public virtual void ReplaceChildren(int startChildIndex, int stopChildIndex, object t)
 		{
+			/*
+			Console.Out.WriteLine("replaceChildren "+startChildIndex+", "+stopChildIndex+
+							   " with "+((BaseTree)t).ToStringTree());
+			Console.Out.WriteLine("in="+ToStringTree());
+			*/
 			if (children == null)
 			{
 				throw new ArgumentException("indexes invalid; no children in list");
@@ -288,6 +293,7 @@ namespace Antlr.Runtime.Tree
 				}
 				FreshenParentAndChildIndexes(startChildIndex);
 			}
+			//Console.Out.WriteLine("out="+ToStringTree());
 		}
 
 		/// <summary>Override in a subclass to change the impl of children list </summary>

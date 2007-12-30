@@ -43,7 +43,7 @@ group ASTParser;
 // TOKEN AST STUFF
 
 /** ID and output=AST */
-tokenRef(token,label,hetero,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>
 if ( state.backtracking == 0 )
@@ -60,7 +60,7 @@ if ( state.backtracking == 0 )
 tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
 /** ID^ and output=AST */
-tokenRefRuleRoot(token,label,hetero,elementIndex) ::= <<
+tokenRefRuleRoot(token,label,hetero,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>
 if ( state.backtracking == 0 )
@@ -74,13 +74,13 @@ if ( state.backtracking == 0 )
 >>
 
 /** ids+=ID! and output=AST */
-tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
+tokenRefBangAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)>
 <listLabel(elem=label,...)>
 >>
 
 /** label+=TOKEN when output=AST but not rewrite alt */
-tokenRefAndListLabel(token,label,hetero,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,hetero,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -187,5 +187,22 @@ createNodeFromToken(label,hetero) ::= <<
 new <hetero>(<label>) <! new MethodNode(IDLabel) !>
 <else>
 (<ASTLabelType>)adaptor.Create(<label>)
+<endif>
+>>
+
+ruleCleanUp() ::= <<
+<super.ruleCleanUp()>
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<if(backtracking)>
+if ( state.backtracking==0 )
+{
+<endif>
+	retval.Tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
+<if(!TREE_PARSER)>
+	adaptor.SetTokenBoundaries(retval.Tree, retval.start, retval.stop);
+<endif>
+<if(backtracking)>
+}
+<endif>
 <endif>
 >>

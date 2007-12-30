@@ -40,13 +40,30 @@
  */
 group ASTTreeParser;
 
+/** Add a variable to track last element matched */
+ruleDeclarations() ::= <<
+<super.ruleDeclarations()>
+<ASTLabelType> _last = null;<\n>
+>>
+
+/** What to emit when there is no rewrite.  For auto build
+ *  mode, does nothing.
+ */
+noRewrite(rewriteBlockLevel, treeLevel) ::= <<
+<if(rewriteMode)>retval.Tree = (<ASTLabelType>)retval.Start;<endif>
+>>
+
 /** match ^(root children) in tree parser; override here to
  *  add tree construction actions.
  */
 tree(root, actionsAfterRoot, children, nullableChildList,
      enclosingTreeLevel, treeLevel) ::= <<
+_last = (<ASTLabelType>)input.LT(1);
 {
+<ASTLabelType> _save_last_<treeLevel> = _last;
+<if(!rewriteMode)>
 <ASTLabelType> root_<treeLevel> = (<ASTLabelType>)adaptor.GetNilNode();
+<endif>
 <root:element()>
 <actionsAfterRoot:element()>
 <if(nullableChildList)>
@@ -61,15 +78,28 @@ Match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
 <children:element()>
 Match(input, Token.UP, null); <checkRuleBacktrackFailure()>
 <endif>
+<if(!rewriteMode)>
 adaptor.AddChild(root_<enclosingTreeLevel>, root_<treeLevel>);
+<endif>
+_last = _save_last_<treeLevel>;
 }<\n>
 >>
 
 // TOKEN AST STUFF
 
-/** ID auto construct */
-tokenRef(token,label,elementIndex) ::= <<
+/** ID! and output=AST (same as plain tokenRef) 'cept add
+ *  setting of _last
+ */
+tokenRefBang(token,label,elementIndex) ::= <<
+_last = (<ASTLabelType>)input.LT(1);
 <super.tokenRef(...)>
+>>
+
+/** ID auto construct */
+tokenRef(token,label,elementIndex,hetero) ::= <<
+_last = (<ASTLabelType>)input.LT(1);
+<super.tokenRef(...)>
+<if(!rewriteMode)>
 <if(backtracking)>
 if ( state.backtracking == 0 )
 {
@@ -79,17 +109,20 @@ if ( state.backtracking == 0 )
 <if(backtracking)>
 }
 <endif>
+<endif>
 >>
 
 /** label+=TOKEN auto construct */
-tokenRefAndListLabel(token,label,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
 
 /** ^(ID ...) auto construct */
-tokenRefRuleRoot(token,label,elementIndex) ::= <<
+tokenRefRuleRoot(token,label,elementIndex,hetero) ::= <<
+_last = (<ASTLabelType>)input.LT(1);
 <super.tokenRef(...)>
+<if(!rewriteMode)>
 <if(backtracking)>
 if ( state.backtracking == 0 )
 {
@@ -99,10 +132,11 @@ if ( state.backtracking == 0 )
 <if(backtracking)>
 }
 <endif>
+<endif>
 >>
 
 /** Match ^(label+=TOKEN ...) auto construct */
-tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
+tokenRefRuleRootAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRefRuleRoot(...)>
 <listLabel(elem=label,...)>
 >>
@@ -111,8 +145,11 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex) ::= <<
 
 /** rule auto construct */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
+_last = (<ASTLabelType>)input.LT(1);
 <super.ruleRef(...)>
+<if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking == 0 ) <endif>adaptor.AddChild(root_<treeLevel>, <label>.Tree);
+<endif>
 >>
 
 /** x+=rule auto construct */
@@ -123,8 +160,11 @@ ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 
 /** ^(rule ...) auto construct */
 ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
+_last = (<ASTLabelType>)input.LT(1);
 <super.ruleRef(...)>
+<if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking == 0 ) <endif>root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>.Tree, root_<treeLevel>);
+<endif>
 >>
 
 /** ^(x+=rule ...) auto construct */
@@ -141,5 +181,32 @@ createRewriteNodeFromElement(token,hetero,scope) ::= <<
 new <hetero>(stream_<token>.NextNode())
 <else>
 stream_<token>.NextNode()
+<endif>
+>>
+
+ruleCleanUp() ::= <<
+<super.ruleCleanUp()>
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<if(!rewriteMode)>
+<if(backtracking)>
+if ( state.backtracking==0 )
+{
+<endif>
+	retval.Tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
+<if(backtracking)>
+}
+<endif>
+<endif>
+<endif>
+>>
+
+ruleCleanUp() ::= <<
+<super.ruleCleanUp()>
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<if(!rewriteMode)>
+<if(backtracking)>if ( state.backtracking==0 ) {<\n><endif>
+retval.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
+<if(backtracking)>}<endif>
+<endif>
 <endif>
 >>
