@@ -145,7 +145,7 @@ ruleCleanUp() ::= <<
     :{[_stream_<it> release];}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(backtracking)>
-if ( backtracking == 0 ) {<\n>
+if ( ![_state isBacktracking] ) {<\n>
 <endif>
     [_<prevRuleRootRef()> setTree:(<ASTLabelType>)[treeAdaptor postProcessTree:root_0]];
     [treeAdaptor setBoundariesForTree:[_<prevRuleRootRef()> tree] fromToken:[_<prevRuleRootRef()> start] toToken:[_<prevRuleRootRef()> stop]];
@@ -193,7 +193,7 @@ root_0 = (<ASTLabelType>)[treeAdaptor newEmptyTree];<\n>
 /** ID and track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking == 0 ) <endif>[_stream_<token> addElement:_<label>];<\n>
+<if(backtracking)>if ( ![_state isBacktracking] ) <endif>[_stream_<token> addElement:_<label>];<\n>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
@@ -207,7 +207,7 @@ tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
 /** ^(ID ...) track for rewrite */
 tokenRefRuleRootTrack(token,label,elementIndex) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( backtracking == 0 ) <endif>[_stream_<token> addElement:_<label>];<\n>
+<if(backtracking)>if ( ![_state isBacktracking] ) <endif>[_stream_<token> addElement:_<label>];<\n>
 >>
 
 /** Match ^(label+=TOKEN ...) track for rewrite */
@@ -219,7 +219,7 @@ tokenRefRuleRootTrackAndListLabel(token,label,elementIndex) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if (backtracking == 0) <endif>[_stream_<rule.name> addElement:[_<label> tree]];
+<if(backtracking)>if ( ![_state isBacktracking] ) <endif>[_stream_<rule.name> addElement:[_<label> tree]];
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -231,7 +231,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRefRuleRoot(...)>
-<if(backtracking)>if ( backtracking == 0 ) <endif>[_stream_<rule.name> addElement:[_<label> tree]];<\n>
+<if(backtracking)>if ( ![_state isBacktracking] ) <endif>[_stream_<rule.name> addElement:[_<label> tree]];<\n>
 >>
 
 /** ^(x+=rule ...) rewrite */
@@ -259,7 +259,7 @@ rewriteCode(
 // token list labels: <referencedTokenListLabels; separator=", ">
 // rule list labels: <referencedRuleListLabels; separator=", ">
 <if(backtracking)>
-if (backtracking == 0) {<\n>
+if (![_state isBacktracking]) {<\n>
 <endif>
 int i_0 = 0;
 root_0 = (<ASTLabelType>)[treeAdaptor newEmptyTree];
