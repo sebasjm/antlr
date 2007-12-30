@@ -8,6 +8,30 @@ University of San Francisco
 
 CHANGES
 
+December 29, 2007
+
+* Had to add hetero arg to all tokenRef*() templates.  Added _last
+  local var to track last child so we can do replaceChildren() during
+  AST rewrite mode for tree grammars.  Should be useful later for .text
+  property.  Ack, hetero arg is on lots of templates. :(  Moved
+  ruleCleanUp() template into ASTTreeParser and ASTParser groups.
+
+* added noRewrite() template (to Java.stg) so we can insert code during
+  rewrite mode to return original tree if no rewrite.  Might be useful
+  for token rewrites later.  For templates too?
+
+* Had to add if !rewriteMode around tree construction in tree parser
+  templates.
+
+* Harald Muller pointed out that we need to use <initValue(attr.type)>
+  in our tests for null token/rule property references. For int types
+  we need 0 not null. (p!=null?p.line:0).  Changed scopeAttributeRef,
+  ruleLabelRef.  Also changed the known typed attributes like 
+  lexerRuleLabelPropertyRef_line to yield 0 upon null rule ref to
+  be consistent with case when we don't know the type.  Fixes ANTLR-195.
+  Added testTypeOfGuardedAttributeRefIsCorrect test and reset expected
+  output for 13 tests that now "fail".
+
 December 28, 2007
 
 * added polydiff example (Java target)

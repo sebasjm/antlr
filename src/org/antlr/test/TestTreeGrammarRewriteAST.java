@@ -394,17 +394,62 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		String treeGrammar =
 			"tree grammar TP;\n"+
 			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
-			"a : ^(ID INT) -> ^(INT ID)\n" +
-			"  | INT\n" + // leaves it alone, returning the INT
+			"a : ^(ID INT) -> ^(ID[\"ick\"] INT)\n" +
+			"  | INT\n" + // leaves it alone, returning $a.start
 			"  ;\n";
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
 									  treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
-		assertEquals("(34 abc)\n", found);
+		assertEquals("(ick 34)\n", found);
 
 		found = execTreeParser("T.g", grammar, "TParser", "TP.g",
 							   treeGrammar, "TP", "TLexer", "a", "a", "34");
 		assertEquals("34\n", found);
+	}
+
+	public void testRewriteModeFlatTree() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT -> ID INT | INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		// just checking that crash happens.  Can't replace child of flat tree
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+			"s : ID a ;\n" +
+			"a : INT -> INT[\"1\"]\n"+
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+		assertEquals("abc\n", found);
+	}
+
+	public void testRewriteModeWithPredicatedRewrites() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT -> ^(ID[\"root\"] ^(ID INT)) | INT -> ^(ID[\"root\"] INT) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+			"s : ^(ID a) {System.out.println(\"altered tree=\"+$s.start.toStringTree());};\n" +
+			"a : ^(ID INT) -> {true}? ^(ID[\"ick\"] INT)\n" +
+			"              -> INT\n" +
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+		assertEquals("altered tree=(root (ick 34))\n" +
+					 "(root (ick 34))\n", found);
 	}
 
 }

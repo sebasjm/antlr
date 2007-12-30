@@ -611,6 +611,11 @@ alt(elements,altNum,description,autoAST,outerAlt,treeLevel) ::= <<
 }
 >>
 
+/** What to emit when there is no rewrite.  For auto build
+ *  mode, does nothing.
+ */
+noRewrite(rewriteBlockLevel, treeLevel) ::= ""
+
 // E L E M E N T S
 
 /** Dump the elements one per line */
@@ -620,7 +625,7 @@ element() ::= <<
 >>
 
 /** match a token optionally with a label in front */
-tokenRef(token,label,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,hetero) ::= <<
 <if(label)>
 <label>=(<labelType>)input.LT(1);<\n>
 <endif>
@@ -628,7 +633,7 @@ match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBackt
 >>
 
 /** ids+=ID */
-tokenRefAndListLabel(token,label,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -1155,12 +1160,12 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
-((<scope>_stack.size()-<negIndex>-1)>=0?((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>:null)
+((<scope>_stack.size()-<negIndex>-1)>=0?((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>:<initValue(attr.type)>)
 <else>
 <if(index)>
-((<index>\<<scope>_stack.size())?((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>:null)
+((<index>\<<scope>_stack.size())?((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>:<initValue(attr.type)>)
 <else>
-((<scope>_stack.size()>0)?((<scope>_scope)<scope>_stack.peek()).<attr.name>:null)
+((<scope>_stack.size()>0)?((<scope>_scope)<scope>_stack.peek()).<attr.name>:<initValue(attr.type)>)
 <endif>
 <endif>
 >>
@@ -1188,7 +1193,7 @@ isolatedDynamicScopeRef(scope) ::= "<scope>_stack"
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-(<scope>!=null?<scope>.<attr.name>:null)
+(<scope>!=null?<scope>.<attr.name>:<initValue(attr.type)>)
 <else>
 <scope>
 <endif>
@@ -1221,10 +1226,10 @@ listLabelRef(label) ::= "list_<label>"
 
 tokenLabelPropertyRef_text(scope,attr) ::= "(<scope>!=null?<scope>.getText():null)"
 tokenLabelPropertyRef_type(scope,attr) ::= "(<scope>!=null?<scope>.getType():0)"
-tokenLabelPropertyRef_line(scope,attr) ::= "(<scope>!=null?<scope>.getLine():-1)"
-tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope>!=null?<scope>.getCharPositionInLine():-1)"
-tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope>!=null?<scope>.getChannel():-1)"
-tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>!=null?<scope>.getTokenIndex():-1)"
+tokenLabelPropertyRef_line(scope,attr) ::= "(<scope>!=null?<scope>.getLine():0)"
+tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope>!=null?<scope>.getCharPositionInLine():0)"
+tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope>!=null?<scope>.getChannel():0)"
+tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>!=null?<scope>.getTokenIndex():0)"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?Integer.valueOf(<scope>.getText()):0)"
 
@@ -1249,13 +1254,13 @@ lexerRuleLabel(label) ::= "<label>"
 lexerRuleLabelPropertyRef_type(scope,attr) ::=
     "(<scope>!=null?<scope>.getType():0)"
 lexerRuleLabelPropertyRef_line(scope,attr) ::=
-    "(<scope>!=null?<scope>.getLine():-1)"
+    "(<scope>!=null?<scope>.getLine():0)"
 lexerRuleLabelPropertyRef_pos(scope,attr) ::= 
     "(<scope>!=null?<scope>.getCharPositionInLine():-1)"
 lexerRuleLabelPropertyRef_channel(scope,attr) ::=
-    "(<scope>!=null?<scope>.getChannel():-1)"
+    "(<scope>!=null?<scope>.getChannel():0)"
 lexerRuleLabelPropertyRef_index(scope,attr) ::=
-    "(<scope>!=null?<scope>.getTokenIndex():-1)"
+    "(<scope>!=null?<scope>.getTokenIndex():0)"
 lexerRuleLabelPropertyRef_text(scope,attr) ::=
     "(<scope>!=null?<scope>.getText():null)"
 lexerRuleLabelPropertyRef_int(scope,attr) ::=

@@ -245,10 +245,6 @@ public class CodeGenerator {
 				baseTemplates = dbgTemplates;
 				StringTemplateGroup stTemplates =
 					StringTemplateGroup.loadGroup("ST",dbgTemplates);
-				/*
-				StringTemplateGroup astDbgTemplates =
-					StringTemplateGroup.loadGroup("STDbg", astTemplates);
-				*/
 				templates = stTemplates;
 			}
 			else {

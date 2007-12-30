@@ -396,7 +396,7 @@ public class TestAttributes extends BaseTest {
 	 */
 	public void testRefToReturnValueBeforeRefToPredefinedAttr() throws Exception {
 		String action = "$x.foo";
-		String expecting = "(x!=null?x.foo:null)";
+		String expecting = "(x!=null?x.foo:0)";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -651,7 +651,7 @@ public class TestAttributes extends BaseTest {
 		String action = "$id; $f; $id.text; $id.getText(); $id.dork " +
 						"$id.type; $id.line; $id.pos; " +
 						"$id.channel; $id.index;";
-		String expecting = "id; f; (id!=null?id.getText():null); id.getText(); id.dork (id!=null?id.getType():null); (id!=null?id.getLine():null); (id!=null?id.getCharPositionInLine():null); (id!=null?id.getChannel():null); (id!=null?id.getTokenIndex():null);";
+		String expecting = "id; f; (id!=null?id.getText():null); id.getText(); id.dork (id!=null?id.getType():0); (id!=null?id.getLine():0); (id!=null?id.getCharPositionInLine():0); (id!=null?id.getChannel():0); (id!=null?id.getTokenIndex():0);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -678,11 +678,11 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-		String expecting = "(r!=null?r.x:null); " +
+		String expecting = "(r!=null?r.x:0); " +
 						   "(r!=null?((Token)r.start):null); " +
 						   "(r!=null?((Token)r.stop):null); " +
 						   "(r!=null?((Object)r.tree):null); " +
-						   "(r!=null?r.x:null); " +
+						   "(r!=null?r.x:0); " +
 						   "(r!=null?((Token)r.stop):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -709,7 +709,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleLabelsWithSpecialToken() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
-		String expecting = "(r!=null?r.x:null); (r!=null?((MYTOKEN)r.start):null); (r!=null?((MYTOKEN)r.stop):null); (r!=null?((Object)r.tree):null); (r!=null?r.x:null); (r!=null?((MYTOKEN)r.stop):null);";
+		String expecting = "(r!=null?r.x:0); (r!=null?((MYTOKEN)r.start):null); (r!=null?((MYTOKEN)r.stop):null); (r!=null?((Object)r.tree):null); (r!=null?r.x:0); (r!=null?((MYTOKEN)r.stop):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -737,7 +737,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testForwardRefRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.tree;";
-		String expecting = "(r!=null?r.x:null); (r!=null?((Token)r.start):null); (r!=null?((Token)r.stop):null); (r!=null?((Object)r.tree):null); (r!=null?r.x:null); (r!=null?((Object)r.tree):null);";
+		String expecting = "(r!=null?r.x:0); (r!=null?((Token)r.start):null); (r!=null?((Token)r.stop):null); (r!=null?((Object)r.tree):null); (r!=null?r.x:0); (r!=null?((Object)r.tree):null);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1133,7 +1133,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testScopeAndAttributeWithUnderscore() throws Exception {
 		String action = "$foo_bar::a_b;";
-		String expecting = "((foo_bar_stack.size()>0)?((foo_bar_scope)foo_bar_stack.peek()).a_b:null);";
+		String expecting = "((foo_bar_stack.size()>0)?((foo_bar_scope)foo_bar_stack.peek()).a_b:0);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1240,7 +1240,7 @@ public class TestAttributes extends BaseTest {
 			"grammar t;\n"+
 			"@members {"+action+"}\n" +
 			"a\n" +
-			"scope { int name; }\n" +
+			"scope { String name; }\n" +
 			"  : {foo();}\n" +
 			"  ;\n");
 		Tool antlr = newTool();
@@ -1263,7 +1263,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testBasicRuleScope() throws Exception {
 		String action = "$a::n;";
-		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:null);";
+		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:0);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1351,7 +1351,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDynamicRuleScopeRefInSubrule() throws Exception {
 		String action = "$a::n;";
-		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:null);";
+		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:0.0f);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1359,7 +1359,7 @@ public class TestAttributes extends BaseTest {
 			"grammar t;\n"+
 			"a\n" +
 			"scope {\n" +
-			"  int n;\n" +
+			"  float n;\n" +
 			"} : b ;\n" +
 			"b : {"+action+"}\n" +
 			"  ;\n");
@@ -1417,7 +1417,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleScopeFromAnotherRule() throws Exception {
 		String action = "$a::n;"; // must be qualified
-		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:null);";
+		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:false);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1425,7 +1425,7 @@ public class TestAttributes extends BaseTest {
 			"grammar t;\n"+
 			"a\n" +
 			"scope {\n" +
-			"  int n;\n" +
+			"  boolean n;\n" +
 			"} : b\n" +
 			"  ;\n" +
 			"b : {"+action+"}\n" +
@@ -1686,7 +1686,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDynamicScopeRefOkEvenThoughRuleRefExists() throws Exception {
 		String action = "$b::n;";
-		String expecting = "((b_stack.size()>0)?((b_scope)b_stack.peek()).n:null);";
+		String expecting = "((b_stack.size()>0)?((b_scope)b_stack.peek()).n:0);";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -3222,7 +3222,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDoNotTranslateAttributeCompare() throws Exception {
 		String action = "$a.line == $b.line";
-		String expecting = "(a!=null?a.getLine():null) == (b!=null?b.getLine():null)";
+		String expecting = "(a!=null?a.getLine():0) == (b!=null?b.getLine():0)";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -3297,7 +3297,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testTreeRuleStopAttributeIsInvalid() throws Exception {
 		String action = "$r.x; $r.start; $r.stop";
-		String expecting = "(r!=null?r.x:null); (r!=null?((CommonTree)r.start):null); $r.stop";
+		String expecting = "(r!=null?r.x:0); (r!=null?((CommonTree)r.start):null); $r.stop";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -3355,6 +3355,36 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
+	public void testTypeOfGuardedAttributeRefIsCorrect() throws Exception {
+		String action = "int x = $b::n;";
+		String expecting = "int x = ((b_stack.size()>0)?((b_scope)b_stack.peek()).n:0);";
+
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n" +
+			"s : b ;\n"+
+			"b\n" +
+			"scope {\n" +
+			"  int n;\n" +
+			"} : '(' b ')' {"+action+"}\n" + // refers to current invocation's n
+			"  ;\n");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+		ActionTranslator translator = new ActionTranslator(generator, "b",
+																	 new antlr.CommonToken(ANTLRParser.ACTION,action),1);
+		String rawTranslation =
+			translator.translate();
+		StringTemplateGroup templates =
+			new StringTemplateGroup(".", AngleBracketTemplateLexer.class);
+		StringTemplate actionST = new StringTemplate(templates, rawTranslation);
+		String found = actionST.toString();
+		assertEquals(expecting, found);
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
 
 	// S U P P O R T
 

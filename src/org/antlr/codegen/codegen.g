@@ -1033,6 +1033,11 @@ if ( #rewrite.getType()==REWRITE ) {
         code.setAttribute("referencedRuleListLabels", ruleListLabels);
 	}
 }
+else {
+		code = templates.getInstanceOf("noRewrite");
+		code.setAttribute("treeLevel", Utils.integer(OUTER_REWRITE_NESTING_LEVEL));
+		code.setAttribute("rewriteBlockLevel", Utils.integer(OUTER_REWRITE_NESTING_LEVEL));
+}
 }
 	:	(
 			{rewriteRuleRefs = new HashSet();}

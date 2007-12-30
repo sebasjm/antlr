@@ -165,6 +165,11 @@ public abstract class BaseTree implements Tree {
 	 *  children to set their childindex; could be slow.
 	 */
 	public void replaceChildren(int startChildIndex, int stopChildIndex, Object t) {
+		/*
+		System.out.println("replaceChildren "+startChildIndex+", "+stopChildIndex+
+						   " with "+((BaseTree)t).toStringTree());
+		System.out.println("in="+toStringTree());
+		*/
 		if ( children==null ) {
 			throw new IllegalArgumentException("indexes invalid; no children in list");
 		}
@@ -217,6 +222,7 @@ public abstract class BaseTree implements Tree {
 			}
 			freshenParentAndChildIndexes(startChildIndex);
 		}
+		//System.out.println("out="+toStringTree());
 	}
 
 	/** Override in a subclass to change the impl of children list */
