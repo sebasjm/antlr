@@ -109,6 +109,9 @@ public class Target {
 	{
 		// Build NFAs from the grammar AST
 		grammar.createNFAs();
+		
+		// CHECK FOR LEFT RECURSION; Make sure we can actually do analysis
+		grammar.checkAllRulesForLeftRecursion();
 
 		// Create the DFA predictors for each decision
 		grammar.createLookaheadDFAs();

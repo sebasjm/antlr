@@ -10,6 +10,9 @@ CHANGES
 
 December 29, 2007
 
+* Fixed ANTLR-206. I wasn't avoiding analyzing decisions in
+  left-recursive rules.
+
 * Had to add hetero arg to all tokenRef*() templates.  Added _last
   local var to track last child so we can do replaceChildren() during
   AST rewrite mode for tree grammars.  Should be useful later for .text

@@ -813,6 +813,14 @@ public class Grammar {
 		if ( NFAToDFAConverter.SINGLE_THREADED_NFA_CONVERSION ) {
 			for (int decision=1; decision<=numDecisions; decision++) {
 				NFAState decisionStartState = getDecisionNFAStartState(decision);
+				if ( leftRecursiveRules.contains(decisionStartState.enclosingRule) ) {
+					// don't bother to process decisions within left recursive rules.
+					if ( watchNFAConversion ) {
+						System.out.println("ignoring decision "+decision+
+										   " within left-recursive rule "+decisionStartState.enclosingRule.name);
+					}
+					continue;
+				}
 				if ( !externalAnalysisAbort && decisionStartState.getNumberOfTransitions()>1 ) {
 					Rule r = decisionStartState.enclosingRule;
 					if ( r.isSynPred && !synPredNamesUsedInDFA.contains(r.name) ) {

@@ -932,6 +932,9 @@ public class DFA {
 			}
 		}
 		if ( analysisTimedOut() ) {
+			if ( buf.length()>0 ) {
+				buf.append(" && ");
+			}
 			buf.append("timed out (>");
 			buf.append(DFA.MAX_TIME_PER_DFA_CREATION);
 			buf.append("ms)");
