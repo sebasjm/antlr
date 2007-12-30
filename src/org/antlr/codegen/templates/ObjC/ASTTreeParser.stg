@@ -51,6 +51,13 @@ tree(root, actionsAfterRoot, children, nullableChildList,
 }<\n>
 >>
 
+/** What to emit when there is no rewrite.  For auto build
+ *  mode, does nothing.
+ */
+noRewrite(rewriteBlockLevel, treeLevel) ::= <<
+<if(rewriteMode)>retval.tree = (<ASTLabelType>)retval.start;<endif>
+>>
+
 // TOKEN AST STUFF
 
 /** ID auto construct */

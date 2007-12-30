@@ -796,8 +796,8 @@ public class Grammar {
 		if ( nfa==null ) {
 			createNFAs();
 			// CHECK FOR LEFT RECURSION; Make sure we can actually do analysis
-			checkAllRulesForLeftRecursion();
 		}
+        checkAllRulesForLeftRecursion();
 
 		/*
 		// was there a severe problem while sniffing the grammar?

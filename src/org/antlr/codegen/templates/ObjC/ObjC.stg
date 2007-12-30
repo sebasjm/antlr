@@ -512,7 +512,7 @@ ruleDeclarations() ::= <<
 [_retval setStart:[input LT:1]];<\n>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
-<returnType()> _<ruleDescriptor.singleValueReturnName>;
+<returnType()> _<ruleDescriptor.singleValueReturnName> = <initValue(typeName=returnType())>;
 <endif>
 <endif>
 <if(memoize)>
@@ -737,6 +737,11 @@ alt(elements,altNum,description,autoAST,outerAlt,treeLevel) ::= <<
 }
 >>
 
+/** What to emit when there is no rewrite.  For auto build
+ *  mode, does nothing.
+ */
+noRewrite(rewriteBlockLevel, treeLevel) ::= ""
+
 // E L E M E N T S
 
 /** Dump the elements one per line */
@@ -746,7 +751,7 @@ element() ::= <<
 >>
 
 /** match a token optionally with a label in front */
-tokenRef(token,label,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,hetero) ::= <<
 <if(label)>
 _<label>=(<labelType>)[input LT:1];<\n>
 <endif>
@@ -754,7 +759,7 @@ _<label>=(<labelType>)[input LT:1];<\n>
 >>
 
 /** ids+=ID */
-tokenRefAndListLabel(token,label,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -1382,8 +1387,10 @@ returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
 [_retval setValue:<expr> forKey:@"<attr.name>"];
 <else>
 _<attr.name> =<expr>;
+<if(LEXER)>
 // double check this after beta release!
 [_<attr.name> retain];
+<endif>
 <endif>
 >>
 /** How to translate $tokenLabel */
