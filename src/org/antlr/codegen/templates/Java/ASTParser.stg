@@ -69,7 +69,7 @@ tokenRefBangAndListLabel(token,label,elementIndex,hetero) ::= <<
 >>
 
 /** label+=TOKEN when output=AST but not rewrite alt */
-tokenRefAndListLabel(token,label,hetero,elementIndex,hetero) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
