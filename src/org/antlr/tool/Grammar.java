@@ -841,6 +841,10 @@ public class Grammar {
 						}
 						dfa = createLookaheadDFA(decision, wackTempStructures);
 					}
+					if ( dfa.startState==null ) {
+						// something went wrong; wipe out DFA
+						setLookaheadDFA(decision, null);
+					}
 					if ( Tool.internalOption_PrintDFA ) {
 						System.out.println("DFA d="+decision);
 						FASerializer serializer = new FASerializer(nfa.grammar);
