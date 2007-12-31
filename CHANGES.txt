@@ -8,6 +8,11 @@ University of San Francisco
 
 CHANGES
 
+December 31, 2007
+
+* ANTLR lexer allowed octal escapes, but they didn't work. ;)  Rather than
+  fix, I'm removing.  Use '\uxxxx' to get even 8 bit char values: \u00xx.
+
 December 29, 2007
 
 * Fixed ANTLR-206. I wasn't avoiding analyzing decisions in

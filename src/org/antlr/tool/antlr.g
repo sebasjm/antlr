@@ -1066,29 +1066,6 @@ ESC	:	'\\'
 		|	'\''
 		|	'\\'
 		|	'>'
-		|	('0'..'3')
-			(
-				options {
-					warnWhenFollowAmbig = false;
-				}
-			:
-			('0'..'9')
-				(
-					options {
-						warnWhenFollowAmbig = false;
-					}
-				:
-				'0'..'9'
-				)?
-			)?
-		|	('4'..'7')
-			(
-				options {
-					warnWhenFollowAmbig = false;
-				}
-			:
-			('0'..'9')
-			)?
 		|	'u' XDIGIT XDIGIT XDIGIT XDIGIT
 		|	. // unknown, leave as it is
 		)

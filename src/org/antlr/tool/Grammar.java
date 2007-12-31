@@ -1761,30 +1761,34 @@ outer:
 	 *  This routine still works though.
      */
     public static int getCharValueFromGrammarCharLiteral(String literal) {
-        if ( literal.length()==3 ) {
-			// 'x'
-            return literal.charAt(1); // no escape char
-        }
-        else if ( literal.length() == 4 )
-        {
-			// '\x'  (antlr lexer will catch invalid char)
-			int escChar = literal.charAt(2);
-			int charVal = ANTLRLiteralEscapedCharValue[escChar];
-			if ( charVal==0 ) {
-				// Unnecessary escapes like '\{' should just yield {
-				return escChar;
-			}
-			return charVal;
-        }
-        else if( literal.length() == 8 )
-        {
-        	// '\u1234'
-        	String unicodeChars = literal.substring(3,literal.length()-1);
-    		return Integer.parseInt(unicodeChars, 16);
-         }
-		ErrorManager.assertTrue(false, "invalid char literal: "+literal);
-		return -1;
-    }
+		switch ( literal.length() ) {
+			case 3 :
+				// 'x'
+				return literal.charAt(1); // no escape char
+			case 4 :
+				// '\x'  (antlr lexer will catch invalid char)
+				if ( Character.isDigit(literal.charAt(2)) ) {
+					ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
+									   "invalid char literal: "+literal);
+					return -1;
+				}
+				int escChar = literal.charAt(2);
+				int charVal = ANTLRLiteralEscapedCharValue[escChar];
+				if ( charVal==0 ) {
+					// Unnecessary escapes like '\{' should just yield {
+					return escChar;
+				}
+				return charVal;
+			case 8 :
+				// '\u1234'
+				String unicodeChars = literal.substring(3,literal.length()-1);
+				return Integer.parseInt(unicodeChars, 16);
+			default :
+				ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
+								   "invalid char literal: "+literal);
+				return -1;
+		}
+	}
 
 	/** ANTLR does not convert escape sequences during the parse phase because
 	 *  it could not know how to print String/char literals back out when
@@ -1816,6 +1820,11 @@ outer:
 					int val = Integer.parseInt(unicodeChars, 16);
 					i+=4-1; // loop will inc by 1; only jump 3 then
 					buf.append((char)val);
+				}
+				else if ( Character.isDigit(c) ) {
+					ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
+									   "invalid char literal: "+literal);
+					buf.append("\\"+(char)c);
 				}
 				else {
 					buf.append((char)ANTLRLiteralEscapedCharValue[c]); // normal \x escape
