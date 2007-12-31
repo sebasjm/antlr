@@ -194,6 +194,8 @@ public class TestSemanticPredicates extends BaseTest {
 	}
 
 	public void testLeftRecursivePred() throws Exception {
+		// No analysis possible. but probably good to fail.  Not sure we really want
+		// left-recursion even if guarded with pred.
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"s : a ;\n" +
@@ -210,14 +212,16 @@ public class TestSemanticPredicates extends BaseTest {
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 
 		DFA dfa = g.getLookaheadDFA(1);
-		FASerializer serializer = new FASerializer(g);
+		assertEquals(null, dfa); // can't analyze.
+
+		/*
 		String result = serializer.serialize(dfa.startState);
 		assertEquals(expecting, result);
+		*/
 
 		assertEquals("unexpected number of expected problems", 1, equeue.size());
 		Message msg = (Message)equeue.warnings.get(0);
@@ -317,7 +321,6 @@ public class TestSemanticPredicates extends BaseTest {
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 
@@ -352,7 +355,6 @@ public class TestSemanticPredicates extends BaseTest {
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 
@@ -676,7 +678,6 @@ public class TestSemanticPredicates extends BaseTest {
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 

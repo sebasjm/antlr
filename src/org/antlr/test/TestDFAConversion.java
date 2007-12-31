@@ -1416,7 +1416,6 @@ As a result, alternative(s) 2 were disabled for that input
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 		NonRegularDecisionMessage msg = getNonRegularDecisionMessage(equeue.errors);
@@ -1437,7 +1436,6 @@ As a result, alternative(s) 2 were disabled for that input
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 		RecursionOverflowMessage msg = getRecursionOverflowMessage(equeue.errors);
@@ -1464,7 +1462,6 @@ As a result, alternative(s) 2 were disabled for that input
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
 			g.createNFAs();
-			g.checkAllRulesForLeftRecursion();
 			g.createLookaheadDFAs(false);
 		}
 		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");

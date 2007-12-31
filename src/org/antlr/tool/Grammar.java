@@ -795,9 +795,10 @@ public class Grammar {
 	public void createLookaheadDFAs(boolean wackTempStructures) {
 		if ( nfa==null ) {
 			createNFAs();
-			// CHECK FOR LEFT RECURSION; Make sure we can actually do analysis
 		}
-        checkAllRulesForLeftRecursion();
+
+		// CHECK FOR LEFT RECURSION; Make sure we can actually do analysis
+		checkAllRulesForLeftRecursion();
 
 		/*
 		// was there a severe problem while sniffing the grammar?
