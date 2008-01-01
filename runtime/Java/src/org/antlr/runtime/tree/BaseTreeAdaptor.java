@@ -109,6 +109,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 
 	/** Transform ^(nil x) to x and nil to null */
 	public Object rulePostProcessing(Object root) {
+		//System.out.println("rulePostProcessing: "+((Tree)root).toStringTree());
 		Tree r = (Tree)root;
 		if ( r!=null && r.isNil() ) {
 			if ( r.getChildCount()==0 ) {

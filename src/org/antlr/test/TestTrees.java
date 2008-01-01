@@ -35,10 +35,30 @@ public class TestTrees extends BaseTest {
 	TreeAdaptor adaptor = new CommonTreeAdaptor();
 	protected boolean debug = false;
 
+	static class V extends CommonTree {
+		public int x;
+		public V(Token t) { this.token = t;}
+		public V(int ttype, int x) { this.x=x; token=new CommonToken(ttype); }
+		public V(int ttype, Token t, int x) { token=t; this.x=x;}
+		public String toString() { return (token!=null?token.getText():"")+"<V>";}
+	}
+
 	public void testSingleNode() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(101));
 		assertNull(t.parent);
 		assertEquals(-1, t.childIndex);
+	}
+
+	public void testTwoChildrenOfNilRoot() throws Exception {
+		CommonTree root_0 = (CommonTree)adaptor.nil();
+		CommonTree t = new V(101, 2);
+		CommonTree u = new V(new CommonToken(102,"102"));
+		adaptor.addChild(root_0, t);
+		adaptor.addChild(root_0, u);
+		assertNull(root_0.parent);
+		assertEquals(-1, root_0.childIndex);
+		assertEquals(0, t.childIndex);
+		assertEquals(1, u.childIndex);
 	}
 
 	public void test4Nodes() throws Exception {

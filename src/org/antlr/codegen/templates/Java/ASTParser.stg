@@ -54,7 +54,7 @@ adaptor.addChild(root_0, <label>_tree);
 tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
 /** ID^ and output=AST */
-tokenRefRuleRoot(token,label,hetero,elementIndex,hetero) ::= <<
+tokenRefRuleRoot(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
 <label>_tree = <createNodeFromToken(...)>;

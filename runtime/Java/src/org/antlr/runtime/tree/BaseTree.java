@@ -87,7 +87,8 @@ public abstract class BaseTree implements Tree {
 	 *  t.children = child.children; i.e., without copying the array.
 	 */
 	public void addChild(Tree t) {
-		//System.out.println("add "+t.toStringTree()+" as child to "+this.toStringTree());
+		//System.out.println("add child "+t.toStringTree()+" "+this.toStringTree());
+		//System.out.println("existing children: "+children);
 		if ( t==null ) {
 			return; // do nothing upon addChild(null)
 		}
@@ -124,6 +125,7 @@ public abstract class BaseTree implements Tree {
 			childTree.setParent(this);
 			childTree.setChildIndex(children.size()-1);
 		}
+		// System.out.println("now children are: "+children);
 	}
 
 	/** Add all elements of kids list as children of this node */

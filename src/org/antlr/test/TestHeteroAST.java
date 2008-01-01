@@ -172,21 +172,25 @@ public class TestHeteroAST extends BaseTest {
 	}
 
 	public void testRewriteTokenWithArgs() throws Exception {
+		// arg to ID<V>[42] means you're constructing node not associated with ID
+		// so must pass in token manually
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
-			"@members {static class V extends CommonTree {\n" +
+			"@members {\n" +
+			"static class V extends CommonTree {\n" +
 			"  public int x;\n" +
-			"  public V(Token t, int x) { token=t; this.x=x;}\n" +
-			"  public String toString() { return token.getText()+\"<V>;\"+x;}\n" +
+			"  public V(int ttype, int x) { this.x=x; token=new CommonToken(ttype,\"\"); }\n" +
+			"  public V(int ttype, Token t, int x) { token=t; this.x=x;}\n" +
+			"  public String toString() { return (token!=null?token.getText():\"\")+\"<V>;\"+x;}\n" +
 			"}\n" +
 			"}\n"+
-			"a : ID -> ID<V>[42] ;\n"+
+			"a : ID -> ID<V>[42] ID<V>[$ID,99] ;\n"+
 			"ID : 'a'..'z'+ ;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "a", debug);
-		assertEquals("a<V>;42\n", found);
+		assertEquals("<V>;42 a<V>;99\n", found);
 	}
 
 	public void testRewriteTokenRoot() throws Exception {
