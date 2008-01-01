@@ -279,7 +279,9 @@ public class DOTGenerator {
 		String label = edge.label.toString(grammar);
 		label = Utils.replace(label,"\\", "\\\\");
 		label = Utils.replace(label,"\"", "\\\"");
-        if ( label.equals(Label.EPSILON_STR) ) {
+		label = Utils.replace(label,"\n", "\\\\n");
+		label = Utils.replace(label,"\r", "");
+		if ( label.equals(Label.EPSILON_STR) ) {
             label = "e";
         }
 		State target = edge.target;

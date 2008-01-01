@@ -10,6 +10,18 @@ CHANGES
 
 December 31, 2007
 
+* Added the start of a semantic predicate computation for LL(1) to solve
+  a problem with slow grammar analysis even with k=1 due to predicates.
+  Then I realized the problem with that grammar was elsewhere.
+  Semantic context really shouldn't be used when preventing closure
+  recomputation.  The predicates became huge even though the reduced
+  value would be no different.  The analyzer seems faster now that
+  I am not testing predicate values all the time.  Further it may
+  terminate sooner just due to reduced closure recursion.
+
+* Moved FIRST/FOLLOW computations to a separate class LL1Analyzer to
+  tidy up.
+
 * ANTLR lexer allowed octal escapes, but they didn't work. ;)  Rather than
   fix, I'm removing.  Use '\uxxxx' to get even 8 bit char values: \u00xx.
 

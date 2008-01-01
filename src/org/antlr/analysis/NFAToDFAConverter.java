@@ -583,7 +583,7 @@ public class NFAToDFAConverter {
 						boolean collectPredicates)
 	{
 		if ( debug ){
-			System.out.println("closure at NFA state "+p.stateNumber+"|"+
+			System.out.println("closure at "+p.enclosingRule.name+" state "+p.stateNumber+"|"+
 							   alt+" filling DFA state "+d.stateNumber+" with context "+context
 							   );
 		}
@@ -605,8 +605,9 @@ public class NFAToDFAConverter {
 		// Avoid infinite recursion
 		if ( closureIsBusy(d, proposedNFAConfiguration) ) {
 			if ( debug ) {
-				System.out.println("avoid visiting exact closure computation NFA config: "+proposedNFAConfiguration);
-				System.out.println("state is "+d.dfa.decisionNumber+"."+d);
+				System.out.println("avoid visiting exact closure computation NFA config: "+
+								   proposedNFAConfiguration+" in "+p.enclosingRule.name);
+				System.out.println("state is "+d.dfa.decisionNumber+"."+d.stateNumber);
 			}
 			return;
 		}
@@ -768,37 +769,31 @@ public class NFAToDFAConverter {
 	 *  and terminate before analysis obviates the need to do this more
 	 *  expensive computation.
 	 *
-	 *  If the semantic context is different, then allow new computation.
+	 *  12-31-2007: I had to use the loop again rather than simple
+	 *  closureBusy.contains(proposedNFAConfiguration) lookup.  The
+	 *  semantic context should not be considered when determining if
+	 *  a closure operation is busy.  I saw a FOLLOW closure operation
+	 *  spin until time out because the predicate context kept increasing
+	 *  in size even though it's same boolean value.  This seems faster also
+	 *  because I'm not doing String.equals on the preds all the time.
 	 */
 	public static boolean closureIsBusy(DFAState d,
 										NFAConfiguration proposedNFAConfiguration)
 	{
+		//boolean busy = d.closureBusy.contains(proposedNFAConfiguration);
+		int numConfigs = d.closureBusy.size();
 		// Check epsilon cycle (same state, same alt, same context)
-		return d.closureBusy.contains(proposedNFAConfiguration);
-		/*
-		// Uncomment to get all conflicts not just exact context matches
-		for (int i = 0; i < d.closureBusy.size(); i++) {
+		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration c = (NFAConfiguration) d.closureBusy.get(i);
 			if ( proposedNFAConfiguration.state==c.state &&
 				 proposedNFAConfiguration.alt==c.alt &&
-				 proposedNFAConfiguration.semanticContext.equals(c.semanticContext) &&
+//				 proposedNFAConfiguration.semanticContext.equals(c.semanticContext) &&
 				 proposedNFAConfiguration.context.suffix(c.context) )
 			{
-				// if computing closure of start state, we tried to
-				// recompute a closure, must be left recursion.  We got back
-				// to the same computation.  After having consumed no input,
-				// we're back.  Only track rule invocation states
-				if ( (dfa.startState==null ||
-					  d.stateNumber==dfa.startState.stateNumber) &&
-					 p.transition(0) instanceof RuleClosureTransition )
-				{
-					d.dfa.probe.reportLeftRecursion(d, proposedNFAConfiguration);
-				}
 				return true;
 			}
 		}
 		return false;
-		*/
 	}
 
 	/** Given the set of NFA states in DFA state d, find all NFA states

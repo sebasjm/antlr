@@ -430,6 +430,7 @@ public abstract class SemanticContext {
 	}
 
 	public static SemanticContext and(SemanticContext a, SemanticContext b) {
+		//System.out.println("AND: "+a+"&&"+b);
 		if ( a==EMPTY_SEMANTIC_CONTEXT || a==null ) {
 			return b;
 		}
@@ -439,10 +440,12 @@ public abstract class SemanticContext {
 		if ( a.equals(b) ) {
 			return a; // if same, just return left one
 		}
+		//System.out.println("## have to AND");
 		return new AND(a,b);
 	}
 
 	public static SemanticContext or(SemanticContext a, SemanticContext b) {
+		//System.out.println("OR: "+a+"||"+b);
 		if ( a==EMPTY_SEMANTIC_CONTEXT || a==null ) {
 			return b;
 		}
@@ -472,6 +475,7 @@ public abstract class SemanticContext {
 		else if ( a.equals(b) ) {
 			return a;
 		}
+		//System.out.println("## have to OR");
 		return new OR(a,b);
 	}
 

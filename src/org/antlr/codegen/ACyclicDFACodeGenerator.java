@@ -174,7 +174,7 @@ public class ACyclicDFACodeGenerator {
 				edgeST.setAttribute("labelExpr",
 									parentGenerator.genSemanticPredicateExpr(templates,predEdge));
 				// the target must be an accept state
-				System.out.println("EOT edge");
+				//System.out.println("EOT edge");
 				StringTemplate targetST =
 					walkFixedDFAGeneratingStateMachine(templates,
 													   dfa,
