@@ -120,7 +120,7 @@ tokenRefRuleRootTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<rule.name>.Add(<label>.Tree);
+<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<rule.name>.Add(<label>.tree);
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -132,13 +132,13 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<rule>.Add(<label>.Tree);
+<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<rule>.Add(<label>.tree);
 >>
 
 /** ^(x+=rule ...) rewrite */
 ruleRefRuleRootTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRootTrack(...)>
-<listLabel(elem=label+".Tree",...)>
+<listLabel(elem=label+".tree",...)>
 >>
 
 
@@ -169,7 +169,7 @@ root_0 = (<ASTLabelType>)adaptor.GetNilNode();
 <alts:rewriteAlt(); separator="else ">
 <if(rewriteMode)>
 <if(TREE_PARSER)>
-retval.Tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
+retval.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
 input.ReplaceChildren(adaptor.GetParent(retval.start),
                       adaptor.GetChildIndex(retval.start),
                       adaptor.GetChildIndex(_last),
@@ -191,7 +191,7 @@ rewriteCodeLabels() ::= <<
     separator="\n"
 >
 <referencedRuleLabels
-    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor, "token <it>", (<it>!=null ? <it>.Tree : null));};
+    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor, "token <it>", (<it>!=null ? <it>.tree : null));};
     separator="\n"
 >
 <referencedRuleListLabels
@@ -325,7 +325,7 @@ root_0 = <action>;<\n>
 /** What is the name of the previous value of this rule's root tree?  This
  *  let's us refer to $rule to mean previous value.  I am reusing the
  *  variable 'tree' sitting in retval struct to hold the value of root_0 right
- *  before I set it during rewrites.  The assign will be to retval.Tree.
+ *  before I set it during rewrites.  The assign will be to retval.tree.
  */
 prevRuleRootRef() ::= "retval"
 
@@ -352,7 +352,7 @@ adaptor.AddChild(root_<treeLevel>, stream_<label>.NextTree());<\n>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-adaptor.AddChild(root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)stream_<label>.NextTree()).Tree);<\n>
+adaptor.AddChild(root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)stream_<label>.NextTree()).tree);<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */

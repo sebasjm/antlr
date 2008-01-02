@@ -122,7 +122,7 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( state.backtracking == 0 ) <endif>adaptor.AddChild(root_0, <label>.Tree);
+<if(backtracking)>if ( state.backtracking == 0 ) <endif>adaptor.AddChild(root_0, <label>.tree);
 >>
 
 /** rule! is same as normal rule ref */
@@ -131,25 +131,25 @@ ruleRefBang(rule,label,elementIndex,args,scope) ::= "<super.ruleRef(...)>"
 /** rule^ */
 ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( state.backtracking == 0 ) <endif>root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>.Tree, root_0);
+<if(backtracking)>if ( state.backtracking == 0 ) <endif>root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>.tree, root_0);
 >>
 
 /** x+=rule when output=AST */
 ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRef(...)>
-<listLabel(elem=label+".getTree()",...)>
+<listLabel(elem=label+".tree",...)>
 >>
 
 /** x+=rule! when output=AST is a rule ref with list addition */
 ruleRefBangAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefBang(...)>
-<listLabel(elem=label+".Tree",...)>
+<listLabel(elem=label+".tree",...)>
 >>
 
 /** x+=rule^ */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<listLabel(elem=label+".Tree",...)>
+<listLabel(elem=label+".tree",...)>
 >>
 
 // WILDCARD AST
@@ -197,9 +197,9 @@ ruleCleanUp() ::= <<
 if ( state.backtracking==0 )
 {
 <endif>
-	retval.Tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
+	retval.tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
 <if(!TREE_PARSER)>
-	adaptor.SetTokenBoundaries(retval.Tree, retval.start, retval.stop);
+	adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
 <endif>
 <if(backtracking)>
 }

@@ -50,7 +50,7 @@ ruleDeclarations() ::= <<
  *  mode, does nothing.
  */
 noRewrite(rewriteBlockLevel, treeLevel) ::= <<
-<if(rewriteMode)>retval.Tree = (<ASTLabelType>)retval.Start;<endif>
+<if(rewriteMode)>retval.tree = (<ASTLabelType>)retval.Start;<endif>
 >>
 
 /** match ^(root children) in tree parser; override here to
@@ -148,14 +148,14 @@ ruleRef(rule,label,elementIndex,args,scope) ::= <<
 _last = (<ASTLabelType>)input.LT(1);
 <super.ruleRef(...)>
 <if(!rewriteMode)>
-<if(backtracking)>if ( state.backtracking == 0 ) <endif>adaptor.AddChild(root_<treeLevel>, <label>.Tree);
+<if(backtracking)>if ( state.backtracking == 0 ) <endif>adaptor.AddChild(root_<treeLevel>, <label>.tree);
 <endif>
 >>
 
 /** x+=rule auto construct */
 ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRef(...)>
-<listLabel(elem=label+".Tree",...)>
+<listLabel(elem=label+".tree",...)>
 >>
 
 /** ^(rule ...) auto construct */
@@ -163,14 +163,14 @@ ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 _last = (<ASTLabelType>)input.LT(1);
 <super.ruleRef(...)>
 <if(!rewriteMode)>
-<if(backtracking)>if ( state.backtracking == 0 ) <endif>root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>.Tree, root_<treeLevel>);
+<if(backtracking)>if ( state.backtracking == 0 ) <endif>root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>.tree, root_<treeLevel>);
 <endif>
 >>
 
 /** ^(x+=rule ...) auto construct */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<listLabel(elem=label+".Tree",...)>
+<listLabel(elem=label+".tree",...)>
 >>
 
 /** Streams for token refs are tree nodes now; override to
@@ -192,21 +192,10 @@ ruleCleanUp() ::= <<
 if ( state.backtracking==0 )
 {
 <endif>
-	retval.Tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
+	retval.tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
 <if(backtracking)>
 }
 <endif>
-<endif>
-<endif>
->>
-
-ruleCleanUp() ::= <<
-<super.ruleCleanUp()>
-<if(ruleDescriptor.hasMultipleReturnValues)>
-<if(!rewriteMode)>
-<if(backtracking)>if ( state.backtracking==0 ) {<\n><endif>
-retval.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
-<if(backtracking)>}<endif>
 <endif>
 <endif>
 >>

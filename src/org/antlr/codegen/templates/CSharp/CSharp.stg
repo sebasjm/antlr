@@ -1355,7 +1355,7 @@ tokenLabelPropertyRef_pos(scope,attr) ::= "((<scope> != null) ? <scope>.CharPosi
 tokenLabelPropertyRef_channel(scope,attr) ::= "((<scope> != null) ? <scope>.Channel : 0)"
 tokenLabelPropertyRef_index(scope,attr) ::= "((<scope> != null) ? <scope>.TokenIndex : 0)"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
-tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int.Parse(<scope>.getText()):0)"
+tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int.Parse(<scope>.Text):0)"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "((<scope> != null) ? ((<labelType>)<scope>.start) : null)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "((<scope> != null) ? ((<labelType>)<scope>.stop) : null)"
@@ -1380,7 +1380,7 @@ lexerRuleLabelPropertyRef_pos(scope,attr) ::= "((<scope> != null) ? <scope>.Char
 lexerRuleLabelPropertyRef_channel(scope,attr) ::= "((<scope> != null) ? <scope>.Channel : 0)"
 lexerRuleLabelPropertyRef_index(scope,attr) ::= "((<scope> != null) ? <scope>.TokenIndex : 0)"
 lexerRuleLabelPropertyRef_text(scope,attr) ::= "((<scope> != null) ? <scope>.Text : null)"
-lexerRuleLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int.Parse(<scope>.getText()):0)"
+lexerRuleLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int.Parse(<scope>.Text):0)"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval.start)"
@@ -1405,7 +1405,7 @@ lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexe
 lexerRulePropertyRef_channel(scope,attr) ::= "state.channel"
 lexerRulePropertyRef_start(scope,attr) ::= "state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(CharIndex-1)"
-lexerRulePropertyRef_int(scope,attr) ::= "int.Parse(<scope>.getText())"
+lexerRulePropertyRef_int(scope,attr) ::= "int.Parse(<scope>.Text)"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error
