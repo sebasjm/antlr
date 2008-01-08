@@ -36,6 +36,9 @@ public abstract class BaseRecognizer {
 	}
 
 	public BaseRecognizer(RecognizerSharedState state) {
+		if ( state==null ) {
+			state = new RecognizerSharedState();
+		}
 		this.state = state;
 	}
 
