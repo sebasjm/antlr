@@ -211,7 +211,7 @@ public class TestSemanticPredicates extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
-			g.createNFAs();
+			g.buildNFA();
 			g.createLookaheadDFAs(false);
 		}
 
@@ -304,7 +304,7 @@ public class TestSemanticPredicates extends BaseTest {
 		// retries with k=1 (but with LL(*) algorithm not optimized version
 		// as it has preds)
 		Grammar g = new Grammar(
-			"grammar P;\n"+
+			"parser grammar P;\n"+
 			"s : {p1}? e '.' | {p2}? e ':' ;\n" +
 			"e : '(' e ')' | INT ;\n");
 		String expecting =
@@ -320,7 +320,7 @@ public class TestSemanticPredicates extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
-			g.createNFAs();
+			g.buildNFA();
 			g.createLookaheadDFAs(false);
 		}
 
@@ -354,7 +354,7 @@ public class TestSemanticPredicates extends BaseTest {
 		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");
 		g.setCodeGenerator(generator);
 		if ( g.getNumberOfDecisions()==0 ) {
-			g.createNFAs();
+			g.buildNFA();
 			g.createLookaheadDFAs(false);
 		}
 
@@ -677,7 +677,7 @@ public class TestSemanticPredicates extends BaseTest {
 		g.setCodeGenerator(generator);
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
-			g.createNFAs();
+			g.buildNFA();
 			g.createLookaheadDFAs(false);
 		}
 

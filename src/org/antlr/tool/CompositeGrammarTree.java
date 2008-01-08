@@ -27,11 +27,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.tool;
 
-import org.antlr.runtime.tree.BaseTree;
-import org.antlr.runtime.tree.Tree;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /** A tree of grammars */
 public class CompositeGrammarTree {
@@ -57,6 +54,9 @@ public class CompositeGrammarTree {
 		t.parent = this;
 	}
 
+	/** Find a rule by looking in current grammar then down towards the
+	 *  delegate grammars.
+	 */
 	public Rule getRule(String ruleName) {
 		Rule r = grammar.getLocallyDefinedRule(ruleName);
 		for (int i = 0; r==null && children!=null && i < children.size(); i++) {
@@ -64,6 +64,18 @@ public class CompositeGrammarTree {
 			r = child.getRule(ruleName);
 		}
 		return r;
+	}
+
+	/** Find an option by looking up towards the root grammar rather than down */
+	public Object getOption(String key) {
+		Object o = grammar.getLocallyDefinedOption(key);
+		if ( o!=null ) {
+			return o;
+		}
+		if ( parent!=null ) {
+			return parent.getOption(key);
+		}
+		return null; // not found
 	}
 
 	public CompositeGrammarTree findNode(Grammar g) {
@@ -96,20 +108,48 @@ public class CompositeGrammarTree {
 		return n;
 	}
 
-	/** Return a preorder list of grammars */
-	public List<Grammar> collectAllGrammars() {
-		List<Grammar> grammars = new ArrayList();
-		_collectAllGrammars(grammars);
+	/** Return a postorder list of grammars; root is last in list */
+	public List<Grammar> getPostOrderedGrammarList() {
+		List<Grammar> grammars = new ArrayList<Grammar>();
+		_getPostOrderedGrammarList(grammars);
 		return grammars;
 	}
 
-	/** work for collectAllGrammars */
-	protected void _collectAllGrammars(List<Grammar> grammars) {
-		grammars.add(this.grammar);
-		CompositeGrammarTree n = null;
-		for (int i = 0; n==null && children!=null && i < children.size(); i++) {
+	/** work for getPostOrderedGrammarList */
+	protected void _getPostOrderedGrammarList(List<Grammar> grammars) {
+		for (int i = 0; children!=null && i < children.size(); i++) {
 			CompositeGrammarTree child = children.get(i);
-			child._collectAllGrammars(grammars);
+			child._getPostOrderedGrammarList(grammars);
+		}
+		grammars.add(this.grammar);
+	}
+
+	/** Return a postorder list of grammars; root is last in list */
+	public List<Grammar> getPreOrderedGrammarList() {
+		List<Grammar> grammars = new ArrayList<Grammar>();
+		_getPreOrderedGrammarList(grammars);
+		return grammars;
+	}
+
+	protected void _getPreOrderedGrammarList(List<Grammar> grammars) {
+		grammars.add(this.grammar);
+		for (int i = 0; children!=null && i < children.size(); i++) {
+			CompositeGrammarTree child = children.get(i);
+			child._getPostOrderedGrammarList(grammars);
+		}
+	}
+
+	public void trimLexerImportsIntoCombined() {
+		CompositeGrammarTree p = this;
+		if ( p.grammar.type == Grammar.LEXER && p.parent!=null &&
+			 p.parent.grammar.type == Grammar.COMBINED )
+		{
+			//System.out.println("wacking "+p.grammar.name+" from "+p.parent.grammar.name);
+			p.parent.children.remove(this);
+		}
+		for (int i = 0; children!=null && i < children.size(); i++) {
+			CompositeGrammarTree child = children.get(i);
+			child.trimLexerImportsIntoCombined();
 		}
 	}
 }

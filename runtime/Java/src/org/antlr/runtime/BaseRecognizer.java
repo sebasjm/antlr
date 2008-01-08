@@ -36,17 +36,15 @@ public abstract class BaseRecognizer {
 	}
 
 	public BaseRecognizer(RecognizerSharedState state) {
-		if ( state!=null ) { // don't ever let us have a null state
-			this.state = state;
-		}
-		else {
-			this.state = new RecognizerSharedState();			
-		}
+		this.state = state;
 	}
 
 	/** reset the parser's state; subclasses must rewinds the input stream */
 	public void reset() {
 		// wack everything related to error recovery
+		if ( state==null ) {
+			return; // no shared state work to do
+		}
 		state._fsp = -1;
 		state.errorRecovery = false;
 		state.lastErrorIndex = -1;
@@ -718,6 +716,9 @@ public abstract class BaseRecognizer {
 						int ruleStartIndex)
 	{
 		int stopTokenIndex = state.failed?MEMO_RULE_FAILED:input.index()-1;
+		if ( ruleIndex >= state.ruleMemo.length ) {
+			System.out.println("!!!!!!!!! memo size is "+state.ruleMemo.length+", but rule index is "+ruleIndex);
+		}
 		if ( state.ruleMemo[ruleIndex]!=null ) {
 			state.ruleMemo[ruleIndex].put(
 				new Integer(ruleStartIndex), new Integer(stopTokenIndex)

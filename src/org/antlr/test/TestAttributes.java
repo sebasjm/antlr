@@ -2818,7 +2818,8 @@ public class TestAttributes extends BaseTest {
 		lexerGrammar.setFileName("<internally-generated-lexer>");
 		lexerGrammar.importTokenVocabulary(g);
 		lexerGrammar.parseAndBuildAST(sr);
-		lexerGrammar.analyzeGrammar();
+		lexerGrammar.defineGrammarSymbols();
+		lexerGrammar.checkNameSpaceAndActions();
 		sr.close();
 
 		Tool antlr = newTool();
@@ -2850,7 +2851,8 @@ public class TestAttributes extends BaseTest {
 		lexerGrammar.setFileName("<internally-generated-lexer>");
 		lexerGrammar.importTokenVocabulary(g);
 		lexerGrammar.parseAndBuildAST(sr);
-		lexerGrammar.analyzeGrammar();
+		lexerGrammar.defineGrammarSymbols();
+		lexerGrammar.checkNameSpaceAndActions();
 		sr.close();
 
 		Tool antlr = newTool();

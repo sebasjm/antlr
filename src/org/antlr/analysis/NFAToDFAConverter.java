@@ -78,7 +78,7 @@ public class NFAToDFAConverter {
 				!dfa.nfa.grammar.NFAToDFAConversionExternallyAborted() )
 		{
 			DFAState d = (DFAState) work.get(0);
-			if ( dfa.nfa.grammar.getWatchNFAConversion() ) {
+			if ( dfa.nfa.grammar.composite.watchNFAConversion ) {
 				System.out.println("convert DFA state "+d.stateNumber+
 								   " ("+d.nfaConfigurations.size()+" nfa states)");
 			}
@@ -845,10 +845,7 @@ public class NFAToDFAConverter {
 			// to this rule in the invoking rule.  In other words, if
 			// somebody called this rule, don't see the EOT emanating from
 			// this accept state.
-			if ( c.context.parent!=null &&
-				 edgeLabel.isAtom() &&
-				 edgeLabel.label==Label.EOT )
-			{
+			if ( c.context.parent!=null && edgeLabel.label==Label.EOT )	{
 				continue;
 			}
 

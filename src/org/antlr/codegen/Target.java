@@ -108,7 +108,7 @@ public class Target {
 										  Grammar grammar)
 	{
 		// Build NFAs from the grammar AST
-		grammar.createNFAs();
+		grammar.buildNFA();
 
 		// Create the DFA predictors for each decision
 		grammar.createLookaheadDFAs();

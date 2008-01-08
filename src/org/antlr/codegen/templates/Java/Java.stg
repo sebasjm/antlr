@@ -87,15 +87,17 @@ public class <name> extends Lexer {
 
     public <name>() {;} <! needed by subclasses !>
     public <name>(CharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
-        this(input, null<grammar.delegators:{g|, <g:delegateName()>}>);
+        this(input, new RecognizerSharedState()<grammar.delegators:{g|, <g:delegateName()>}>);
     }
     public <name>(CharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
-        super(input);
-<if(backtracking)>
-        this.state.ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
+        super(input,state);
+<if(memoize)>
+<if(grammar.grammarIsRoot)>
+        state.ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
+<endif>
 <endif>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
         <grammar.delegators:
          {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
     }
@@ -193,13 +195,13 @@ public class <name> extends <@superClassName><superClass><@end> {
     <@members>
     <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
     public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
-        this(input, null<grammar.delegators:{g|, <g:delegateName()>}>);
+        this(input, new RecognizerSharedState()<grammar.delegators:{g|, <g:delegateName()>}>);
     }
     public <name>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
         super(input, state);
         <parserCtorBody()>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
     }
     <@end>
 
@@ -212,7 +214,7 @@ public class <name> extends <@superClassName><superClass><@end> {
 
 <! generate rule/method definitions for imported rules so they
    appear to be defined in this recognizer. !>
-   // Delegated rules
+    // Delegated rules
 <grammar.delegatedRules:{ruleDescriptor|
     public <returnType()> <ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException \{ <if(ruleDescriptor.hasReturnValue)>return <endif><ruleDescriptor.grammar:delegateName()>.<ruleDescriptor.name>(<ruleDescriptor.parameterScope.attributes:{a|<a.name>}; separator=", ">); \}}; separator="\n">
 
@@ -228,13 +230,15 @@ public class <name> extends <@superClassName><superClass><@end> {
 
 parserCtorBody() ::= <<
 <if(memoize)>
-this.state.ruleMemo = new HashMap[<numRules>+1];<\n> <! index from 1..n !>
+<if(grammar.grammarIsRoot)>
+this.state.ruleMemo = new HashMap[<length(grammar.allImportedRules)>+1];<\n> <! index from 1..n !>
+<endif>
 <endif>
 <grammar.delegators:
  {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
 >>
 
-parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType="Object", superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="TokenStream", rewriteElementType="Token", ...)>
 >>
 
@@ -1095,9 +1099,11 @@ protected Stack <scope.name>_stack = new Stack();<\n>
 <endif>
 >>
 
+returnStructName() ::= "<it.name>_return"
+
 returnType() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<ruleDescriptor.name>_return
+<ruleDescriptor.grammar.recognizerName>.<ruleDescriptor:returnStructName()>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnType>
@@ -1112,7 +1118,7 @@ void
  */
 ruleLabelType(referencedRule) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-<referencedRule.name>_return
+<referencedRule.grammar.recognizerName>.<referencedRule.name>_return
 <else>
 <if(referencedRule.hasSingleReturnValue)>
 <referencedRule.singleValueReturnType>
@@ -1144,7 +1150,7 @@ ruleLabelDef(label) ::= <<
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-public static class <returnType()> extends <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope {
+public static class <ruleDescriptor:returnStructName()> extends <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope {
     <scope.attributes:{public <it.decl>;}; separator="\n">
     <@ruleReturnMembers()>
 };

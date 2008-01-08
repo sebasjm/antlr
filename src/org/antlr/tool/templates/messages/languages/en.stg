@@ -45,9 +45,9 @@ ERROR_READING_TOKENS_FILE(arg,exception,stackTrace) ::= <<
 problem reading token vocabulary file <arg>: <exception>
 <stackTrace; separator="\n">
 >>
-DIR_NOT_FOUND(arg) ::= "directory not found: <arg>"
-OUTPUT_DIR_IS_FILE(arg) ::= "output directory is a file: <arg>"
-CANNOT_OPEN_FILE(arg) ::= "cannot find or open file: <arg>"
+DIR_NOT_FOUND(arg,exception,stackTrace) ::= "directory not found: <arg>"
+OUTPUT_DIR_IS_FILE(arg,exception,stackTrace) ::= "output directory is a file: <arg>"
+CANNOT_OPEN_FILE(arg,exception,stackTrace) ::= "cannot find or open file: <arg><if(exception)>; reason: <exception><endif>"
 
 INTERNAL_ERROR(arg,arg2,exception,stackTrace) ::= <<
 internal error: <arg> <arg2><if(exception)>: <exception><endif>
@@ -211,6 +211,18 @@ NO_SUCH_GRAMMAR_SCOPE(arg,arg2) ::=
   "reference to undefined grammar in rule reference: <arg>.<arg2>"
 NO_SUCH_RULE_IN_SCOPE(arg,arg2) ::=
   "rule <arg2> is not defined in grammar <arg>"
+TOKEN_ALIAS_CONFLICT(arg,arg2) ::=
+  "cannot alias <arg>; string already assigned to <arg2>"
+TOKEN_ALIAS_REASSIGNMENT(arg,arg2) ::=
+  "cannot alias <arg>; token name already assigned to <arg2>"
+TOKEN_VOCAB_IN_DELEGATE(arg,arg2) ::=
+  "tokenVocab option ignored in imported grammar <arg>"
+INVALID_IMPORT(arg,arg2) ::=
+  "<arg.grammarTypeString> grammar <arg.name> cannot import <arg2.grammarTypeString> grammar <arg2.name>"
+IMPORTED_TOKENS_RULE_EMPTY(arg,arg2) ::=
+  "no lexer rules contributed to <arg> from imported grammar <arg2>"
+IMPORT_NAME_CLASH(arg,arg2) ::=
+  "combined grammar <arg.name> and imported <arg2.grammarTypeString> grammar <arg2.name> both generate <arg2.recognizerName>; import ignored"
 
 // GRAMMAR WARNINGS
 

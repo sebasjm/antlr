@@ -202,10 +202,10 @@ public class ActionTranslator extends Lexer {
 
     public ActionTranslator() {;}
     public ActionTranslator(CharStream input) {
-        this(input, null);
+        this(input, new RecognizerSharedState());
     }
     public ActionTranslator(CharStream input, RecognizerSharedState state) {
-        super(input);
+        super(input,state);
         this.state.ruleMemo = new HashMap[61+1];
 
     }

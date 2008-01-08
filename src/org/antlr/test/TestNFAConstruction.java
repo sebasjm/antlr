@@ -1180,7 +1180,7 @@ public class TestNFAConstruction extends BaseTest {
 
 	private void checkRule(Grammar g, String rule, String expecting)
     {
-        g.createNFAs();
+        g.buildNFA();
         State startState = g.getRuleStartState(rule);
         FASerializer serializer = new FASerializer(g);
         String result = serializer.serialize(startState);

@@ -42,8 +42,8 @@ public class NameSpaceChecker {
 	}
 
 	public void checkConflicts() {
-		for (int i = 0; i < grammar.ruleIndexToRuleList.size(); i++) {
-			Rule r = grammar.ruleIndexToRuleList.elementAt(i);
+		for (int i = 0; i < grammar.composite.ruleIndexToRuleList.size(); i++) {
+			Rule r = grammar.composite.ruleIndexToRuleList.elementAt(i);
 			if ( r==null ) {
 				continue;
 			}
@@ -124,7 +124,8 @@ public class NameSpaceChecker {
 	protected void lookForReferencesToUndefinedSymbols() {
 		// for each rule ref, ask if there is a rule definition
 		for (Iterator iter = grammar.ruleRefs.iterator(); iter.hasNext();) {
-			Token tok = (Token) iter.next();
+			GrammarAST refAST = (GrammarAST)iter.next();
+			Token tok = refAST.token;
 			String ruleName = tok.getText();
 			Rule localRule = grammar.getLocallyDefinedRule(ruleName);
 			Rule rule = grammar.getRule(ruleName);
@@ -140,10 +141,12 @@ public class NameSpaceChecker {
 			}
         }
 		if ( grammar.type==Grammar.COMBINED ) {
+			// if we're a combined grammar, we know which token IDs have no
+			// associated lexer rule.
 			for (Iterator iter = grammar.tokenIDRefs.iterator(); iter.hasNext();) {
 				Token tok = (Token) iter.next();
 				String tokenID = tok.getText();
-				if ( !grammar.lexerRules.contains(tokenID) &&
+				if ( !grammar.composite.lexerRules.contains(tokenID) &&
 					 grammar.getTokenType(tokenID)!=Label.EOF )
 				{
 					ErrorManager.grammarWarning(ErrorManager.MSG_NO_TOKEN_DEFINITION,

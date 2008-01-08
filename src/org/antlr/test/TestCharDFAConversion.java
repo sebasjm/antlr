@@ -516,7 +516,7 @@ public class TestCharDFAConversion extends BaseTest {
 		if ( g.getCodeGenerator()==null ) {
 			CodeGenerator generator = new CodeGenerator(null, g, "Java");
 			g.setCodeGenerator(generator);
-			g.createNFAs();
+			g.buildNFA();
 			g.createLookaheadDFAs(false);
 		}
 

@@ -171,6 +171,12 @@ public class ErrorManager {
 	public static final int MSG_HETERO_ILLEGAL_IN_REWRITE_ALT = 155;
 	public static final int MSG_NO_SUCH_GRAMMAR_SCOPE = 156;
 	public static final int MSG_NO_SUCH_RULE_IN_SCOPE = 157;
+	public static final int MSG_TOKEN_ALIAS_CONFLICT = 158;
+	public static final int MSG_TOKEN_ALIAS_REASSIGNMENT = 159;
+	public static final int MSG_TOKEN_VOCAB_IN_DELEGATE = 160;
+	public static final int MSG_INVALID_IMPORT = 161;
+	public static final int MSG_IMPORTED_TOKENS_RULE_EMPTY = 162;
+	public static final int MSG_IMPORT_NAME_CLASH = 163;
 
 
 	// GRAMMAR WARNINGS
@@ -211,6 +217,7 @@ public class ErrorManager {
 			add(MSG_RECURSION_OVERLOW);
 			add(MSG_UNREACHABLE_ALTS);
 			add(MSG_FILE_AND_GRAMMAR_NAME_DIFFER);
+			add(MSG_INVALID_IMPORT);
 			// TODO: ...
 		}
 	};

@@ -29,13 +29,15 @@ package org.antlr.test;
 
 import junit.framework.TestCase;
 import org.antlr.Tool;
+import org.antlr.analysis.Label;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Message;
+import org.antlr.tool.GrammarSemanticsMessage;
+import org.antlr.tool.ANTLRErrorListener;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public abstract class BaseTest extends TestCase {
 
@@ -46,6 +48,16 @@ public abstract class BaseTest extends TestCase {
 
 	/** If error during execution, store stderr here */
 	protected String stderr;
+
+	protected void setUp() throws Exception {
+		ErrorManager.resetErrorState();
+	}
+
+	protected Tool newTool(String[] args) {
+		Tool tool = new Tool(args);
+		tool.setOutputDirectory(tmpdir);
+		return tool;
+	}
 
 	protected Tool newTool() {
 		Tool tool = new Tool();
@@ -113,16 +125,22 @@ public abstract class BaseTest extends TestCase {
 			options.add(new File(tmpdir,grammarFileName).toString());
 			final String[] optionsA = new String[options.size()];
 			options.toArray(optionsA);
+			/*
 			final ErrorQueue equeue = new ErrorQueue();
 			ErrorManager.setErrorListener(equeue);
+			*/
 			Tool antlr = new Tool(optionsA);
 			antlr.process();
-			if ( equeue.errors.size()>0 ) {
-				allIsWell = false;
-				System.err.println("antlr reports errors from "+options);
-				for (int i = 0; i < equeue.errors.size(); i++) {
-					Message msg = (Message) equeue.errors.get(i);
-					System.err.println(msg);
+			ANTLRErrorListener listener = ErrorManager.getErrorListener();
+			if ( listener instanceof ErrorQueue ) {
+				ErrorQueue equeue = (ErrorQueue)listener;
+				if ( equeue.errors.size()>0 ) {
+					allIsWell = false;
+					System.err.println("antlr reports errors from "+options);
+					for (int i = 0; i < equeue.errors.size(); i++) {
+						Message msg = (Message) equeue.errors.get(i);
+						System.err.println(msg);
+					}
 				}
 			}
 		}
@@ -161,11 +179,11 @@ public abstract class BaseTest extends TestCase {
 	}
 
 	protected String execParser(String grammarFileName,
-									String grammarStr,
-									String parserName,
-									String lexerName,
-									String startRuleName,
-									String input, boolean debug)
+								String grammarStr,
+								String parserName,
+								String lexerName,
+								String startRuleName,
+								String input, boolean debug)
 	{
 		eraseFiles(".class");
 		eraseFiles(".java");
@@ -194,15 +212,15 @@ public abstract class BaseTest extends TestCase {
 	}
 
 	protected String execTreeParser(String parserGrammarFileName,
-										String parserGrammarStr,
-										String parserName,
-										String treeParserGrammarFileName,
-										String treeParserGrammarStr,
-										String treeParserName,
-										String lexerName,
-										String parserStartRuleName,
-										String treeParserStartRuleName,
-										String input)
+									String parserGrammarStr,
+									String parserName,
+									String treeParserGrammarFileName,
+									String treeParserGrammarStr,
+									String treeParserName,
+									String lexerName,
+									String parserStartRuleName,
+									String treeParserStartRuleName,
+									String input)
 	{
 		return execTreeParser(parserGrammarFileName,
 							  parserGrammarStr,
@@ -218,16 +236,16 @@ public abstract class BaseTest extends TestCase {
 	}
 
 	protected String execTreeParser(String parserGrammarFileName,
-										String parserGrammarStr,
-										String parserName,
-										String treeParserGrammarFileName,
-										String treeParserGrammarStr,
-										String treeParserName,
-										String lexerName,
-										String parserStartRuleName,
-										String treeParserStartRuleName,
-										String input,
-										boolean debug)
+									String parserGrammarStr,
+									String parserName,
+									String treeParserGrammarFileName,
+									String treeParserGrammarStr,
+									String treeParserName,
+									String lexerName,
+									String parserStartRuleName,
+									String treeParserStartRuleName,
+									String input,
+									boolean debug)
 	{
 		eraseFiles(".class");
 		eraseFiles(".java");
@@ -295,14 +313,14 @@ public abstract class BaseTest extends TestCase {
 	}
 
 	protected String rawExecRecognizer(String parserName,
-											  String treeParserName,
-											  String lexerName,
-											  String parserStartRuleName,
-											  String treeParserStartRuleName,
-											  boolean parserBuildsTrees,
-											  boolean parserBuildsTemplate,
-											  boolean treeParserBuildsTrees,
-											  boolean debug)
+									   String treeParserName,
+									   String lexerName,
+									   String parserStartRuleName,
+									   String treeParserStartRuleName,
+									   boolean parserBuildsTrees,
+									   boolean parserBuildsTemplate,
+									   boolean treeParserBuildsTrees,
+									   boolean debug)
 	{
 		if ( treeParserBuildsTrees && parserBuildsTrees ) {
 			writeTreeAndTreeTestFile(parserName,
@@ -369,6 +387,49 @@ public abstract class BaseTest extends TestCase {
 		return null;
 	}
 
+	protected void checkGrammarSemanticsError(ErrorQueue equeue,
+											  GrammarSemanticsMessage expectedMessage)
+		throws Exception
+	{
+		/*
+				System.out.println(equeue.infos);
+				System.out.println(equeue.warnings);
+				System.out.println(equeue.errors);
+				assertTrue("number of errors mismatch", n, equeue.errors.size());
+						   */
+		Message foundMsg = null;
+		for (int i = 0; i < equeue.errors.size(); i++) {
+			Message m = (Message)equeue.errors.get(i);
+			if (m.msgID==expectedMessage.msgID ) {
+				foundMsg = m;
+			}
+		}
+		assertNotNull("no error; "+expectedMessage.msgID+" expected", foundMsg);
+		assertTrue("error is not a GrammarSemanticsMessage",
+				   foundMsg instanceof GrammarSemanticsMessage);
+		assertEquals(expectedMessage.arg, foundMsg.arg);
+		if ( equeue.size()!=1 ) {
+			System.err.println(equeue);
+		}
+	}
+
+	protected void checkGrammarSemanticsWarning(ErrorQueue equeue,
+												GrammarSemanticsMessage expectedMessage)
+		throws Exception
+	{
+		Message foundMsg = null;
+		for (int i = 0; i < equeue.warnings.size(); i++) {
+			Message m = (Message)equeue.warnings.get(i);
+			if (m.msgID==expectedMessage.msgID ) {
+				foundMsg = m;
+			}
+		}
+		assertNotNull("no error; "+expectedMessage.msgID+" expected", foundMsg);
+		assertTrue("error is not a GrammarSemanticsMessage",
+				   foundMsg instanceof GrammarSemanticsMessage);
+		assertEquals(expectedMessage.arg, foundMsg.arg);
+	}
+
 	public static class StreamVacuum implements Runnable {
 		StringBuffer buf = new StringBuffer();
 		BufferedReader in;
@@ -423,9 +484,9 @@ public abstract class BaseTest extends TestCase {
 	}
 
 	protected void writeTestFile(String parserName,
-									 String lexerName,
-									 String parserStartRuleName,
-									 boolean debug)
+								 String lexerName,
+								 String parserStartRuleName,
+								 boolean debug)
 	{
 		StringTemplate outputFileST = new StringTemplate(
 			"import org.antlr.runtime.*;\n" +
@@ -485,11 +546,11 @@ public abstract class BaseTest extends TestCase {
 	}
 
 	protected void writeTreeTestFile(String parserName,
-										 String treeParserName,
-										 String lexerName,
-										 String parserStartRuleName,
-										 String treeParserStartRuleName,
-										 boolean debug)
+									 String treeParserName,
+									 String lexerName,
+									 String parserStartRuleName,
+									 String treeParserStartRuleName,
+									 boolean debug)
 	{
 		StringTemplate outputFileST = new StringTemplate(
 			"import org.antlr.runtime.*;\n" +
@@ -592,9 +653,9 @@ public abstract class BaseTest extends TestCase {
 	}
 
 	protected void writeTemplateTestFile(String parserName,
-											 String lexerName,
-											 String parserStartRuleName,
-											 boolean debug)
+										 String lexerName,
+										 String parserStartRuleName,
+										 boolean debug)
 	{
 		StringTemplate outputFileST = new StringTemplate(
 			"import org.antlr.runtime.*;\n" +
@@ -649,7 +710,7 @@ public abstract class BaseTest extends TestCase {
 		String[] files = tmpdirF.list();
 		for(int i = 0; files!=null && i < files.length; i++) {
 			if ( files[i].endsWith(filesEndingWith) ) {
-        		new File(tmpdir+"/"+files[i]).delete();
+				new File(tmpdir+"/"+files[i]).delete();
 			}
 		}
 	}
@@ -662,4 +723,29 @@ public abstract class BaseTest extends TestCase {
 		String prefix="Exception in thread \"main\" ";
 		return lines[0].substring(prefix.length(),lines[0].length());
 	}
+
+	public List realElements(List elements) {
+		List n = new ArrayList();
+		for (int i = Label.NUM_FAUX_LABELS+Label.MIN_TOKEN_TYPE - 1; i < elements.size(); i++) {
+			Object o = (Object) elements.get(i);
+			if ( o!=null ) {
+				n.add(o);
+			}
+		}
+		return n;
+	}
+
+	public List<String> realElements(Map<String, Integer> elements) {
+		List n = new ArrayList();
+		Iterator iterator = elements.keySet().iterator();
+		while (iterator.hasNext()) {
+			String tokenID = (String) iterator.next();
+			if ( elements.get(tokenID) >= Label.MIN_TOKEN_TYPE ) {
+				n.add(tokenID+"="+elements.get(tokenID));
+			}
+		}
+		Collections.sort(n);
+		return n;
+	}
+
 }

@@ -279,6 +279,7 @@ public class CodeGenerator {
 	 *  The target, such as JavaTarget, dictates which files get written.
 	 */
 	public StringTemplate genRecognizer() {
+		//System.out.println("### generate "+grammar.name+" recognizer");
 		// LOAD OUTPUT TEMPLATES
 		loadTemplates(language);
 		if ( templates==null ) {
@@ -490,7 +491,7 @@ public class CodeGenerator {
 				ErrorManager.grammarError(
 					ErrorManager.MSG_INVALID_ACTION_SCOPE,grammar,
 					actionAST.getToken(),scope,
-					Grammar.grammarTypeToString[grammar.type]);
+					grammar.getGrammarTypeString());
 			}
 		}
 	}
@@ -548,13 +549,13 @@ public class CodeGenerator {
 									String enclosingRuleName,
 									int elementIndex)
 	{
-		NFAState followingNFAState = referencedElementNode.followingNFAState;
 		/*
-		System.out.print("compute FOLLOW "+referencedElementNode.toString()+
+		System.out.println("compute FOLLOW "+grammar.name+"."+referencedElementNode.toString()+
 						 " for "+referencedElementName+"#"+elementIndex +" in "+
 						 enclosingRuleName+
 						 " line="+referencedElementNode.getLine());
-						 */
+		*/
+		NFAState followingNFAState = referencedElementNode.followingNFAState;
 		LookaheadSet follow = null;
 		if ( followingNFAState!=null ) {
 			// compute follow for this element and, as side-effect, track
@@ -893,15 +894,16 @@ public class CodeGenerator {
 	}
 
 	/** Translate an action like [3,"foo",a[3]] and return a List of the
-	 *  translated actions.  Because actions are translated to a list of
-	 *  chunks, this returns List<List<String|StringTemplate>>.
+	 *  translated actions.  Because actions are themselves translated to a list
+	 *  of chunks, must cat together into a StringTemplate>.  Don't translate
+	 *  to strings early as we need to eval templates in context.
 	 */
-	public List<String> translateArgAction(String ruleName,
+	public List<StringTemplate> translateArgAction(String ruleName,
 										   GrammarAST actionTree)
 	{
 		String actionText = actionTree.token.getText();
 		List<String> args = getListOfArgumentsFromAction(actionText,',');
-		List<String> translatedArgs = new ArrayList<String>();
+		List<StringTemplate> translatedArgs = new ArrayList<StringTemplate>();
 		for (String arg : args) {
 			if ( arg!=null ) {
 				antlr.Token actionToken =
@@ -912,11 +914,10 @@ public class CodeGenerator {
 											  actionTree.outerAltNum);
 				List chunks = translator.translateToChunks();
 				chunks = target.postProcessAction(chunks, actionToken);
-				StringBuffer buf = new StringBuffer();
-				for (Object s : chunks) {
-					buf.append(s);
-				}
-				translatedArgs.add(buf.toString());
+				StringTemplate catST = new StringTemplate(templates, "<chunks>");
+				catST.setAttribute("chunks", chunks);
+				templates.createStringTemplate();
+				translatedArgs.add(catST);
 			}
 		}
 		if ( translatedArgs.size()==0 ) {

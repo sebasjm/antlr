@@ -62,6 +62,7 @@ public TreeToNFAConverter(Grammar g, NFA nfa, NFAFactory factory) {
 	this.factory = factory;
 }
 
+/*
 protected void init() {
     // define all the rule begin/end NFAStates to solve forward reference issues
     Collection rules = grammar.getRules();
@@ -79,6 +80,7 @@ protected void init() {
         r.stopState = ruleEndState;
     }
 }
+*/
 
 protected void addFollowTransition(String ruleName, NFAState following) {
      //System.out.println("adding follow link to rule "+ruleName);
@@ -130,8 +132,7 @@ protected void finish() {
 }
 
 grammar
-    :   {init();}
-        ( #( LEXER_GRAMMAR grammarSpec )
+    :   ( #( LEXER_GRAMMAR grammarSpec )
 	    | #( PARSER_GRAMMAR grammarSpec )
 	    | #( TREE_GRAMMAR grammarSpec )
 	    | #( COMBINED_GRAMMAR grammarSpec )
@@ -496,6 +497,7 @@ atom[String scopeName] returns [StateCluster g=null]
             Rule rr = grammar.getRule(scopeName,r.getText());
             g = factory.build_RuleRef(rr, start);
             r.followingNFAState = g.right;
+            r.NFAStartState = g.left;
             if ( g.left.transition(0) instanceof RuleClosureTransition
             	 && grammar.type!=Grammar.LEXER )
             {
@@ -512,6 +514,7 @@ atom[String scopeName] returns [StateCluster g=null]
             if ( start!=null ) {
                 Rule rr = grammar.getRule(scopeName,t.getText());
                 g = factory.build_RuleRef(rr, start);
+            	t.NFAStartState = g.left;
                 // don't add FOLLOW transitions in the lexer;
                 // only exact context should be used.
             }

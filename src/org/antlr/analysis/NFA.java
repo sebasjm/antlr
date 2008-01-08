@@ -44,7 +44,9 @@ public class NFA {
 	/** Which factory created this NFA? */
     protected NFAFactory factory = null;
 
-    public NFA(Grammar g) {
+	public boolean complete;
+
+	public NFA(Grammar g) {
         this.grammar = g;
     }
 

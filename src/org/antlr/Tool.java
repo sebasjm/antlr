@@ -41,9 +41,9 @@ public class Tool {
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
 
-    // Input parameters / option
+	// Input parameters / option
 
-    protected List grammarFileNames = new ArrayList();
+	protected List grammarFileNames = new ArrayList();
 	protected boolean generate_NFA_dot = false;
 	protected boolean generate_DFA_dot = false;
 	protected String outputDirectory = UNINITIALIZED_DIR;
@@ -63,7 +63,7 @@ public class Tool {
 	public static boolean internalOption_ShowNFConfigsInDFA = false;
 	public static boolean internalOption_watchNFAConversion = false;
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator  Version " +
 						  VERSION + " (??)  1989-2007");
 		Tool antlr = new Tool(args);
@@ -231,38 +231,38 @@ public class Tool {
 			}
 			else if (args[i].equals("-Xnfastates")) {
 				DecisionProbe.verbose=true;
-			}			
+			}
 			else if (args[i].equals("-X")) {
 				Xhelp();
 			}
-            else {
-                if (args[i].charAt(0) != '-') {
-                    // Must be the grammar file
-                    grammarFileNames.add(args[i]);
-                }
-            }
-        }
-    }
+			else {
+				if (args[i].charAt(0) != '-') {
+					// Must be the grammar file
+					grammarFileNames.add(args[i]);
+				}
+			}
+		}
+	}
 
-    /*
-    protected void checkForInvalidArguments(String[] args, BitSet cmdLineArgValid) {
-        // check for invalid command line args
-        for (int a = 0; a < args.length; a++) {
-            if (!cmdLineArgValid.member(a)) {
-                System.err.println("invalid command-line argument: " + args[a] + "; ignored");
-            }
-        }
-    }
-    */
+	/*
+		protected void checkForInvalidArguments(String[] args, BitSet cmdLineArgValid) {
+			// check for invalid command line args
+			for (int a = 0; a < args.length; a++) {
+				if (!cmdLineArgValid.member(a)) {
+					System.err.println("invalid command-line argument: " + args[a] + "; ignored");
+				}
+			}
+		}
+		*/
 
-    public void process()  {
+	public void process()  {
 		int numFiles = grammarFileNames.size();
 		boolean exceptionWhenWritingLexerFile = false;
 		String lexerGrammarFileName = null;		// necessary at this scope to have access in the catch below
 		for (int i = 0; i < numFiles; i++) {
 			String grammarFileName = (String) grammarFileNames.get(i);
 			if ( numFiles > 1 && !depend ) {
-			    System.out.println(grammarFileName);
+				System.out.println(grammarFileName);
 			}
 			try {
 				if ( depend ) {
@@ -275,8 +275,14 @@ public class Tool {
 					System.out.println(dep.getDependencies());
 					continue;
 				}
-				Grammar grammar = getGrammar(grammarFileName);
-				processGrammar(grammar);
+				Grammar grammar = getRootGrammar(grammarFileName);
+				// we now have all grammars read in as ASTs
+				// (i.e., root and all delegates)
+				grammar.composite.assignTokenTypes();
+				grammar.composite.defineGrammarSymbols();
+				grammar.composite.createNFAs();
+
+				generateRecognizer(grammar);
 
 				if ( printGrammar ) {
 					grammar.printGrammar(System.out);
@@ -293,11 +299,12 @@ public class Tool {
 				if ( profile ) {
 					GrammarReport report = new GrammarReport(grammar);
 					Stats.writeReport(GrammarReport.GRAMMAR_STATS_FILENAME,
-											  report.toNotifyString());
+									  report.toNotifyString());
 				}
 
 				// now handle the lexer if one was created for a merged spec
 				String lexerGrammarStr = grammar.getLexerGrammar();
+				//System.out.println("lexer grammar:\n"+lexerGrammarStr);
 				if ( grammar.type==Grammar.COMBINED && lexerGrammarStr!=null ) {
 					lexerGrammarFileName = grammar.getImplicitlyGeneratedLexerFileName();
 					try {
@@ -314,16 +321,23 @@ public class Tool {
 					try {
 						StringReader sr = new StringReader(lexerGrammarStr);
 						Grammar lexerGrammar = new Grammar();
+						lexerGrammar.composite.watchNFAConversion = internalOption_watchNFAConversion;
 						lexerGrammar.implicitLexer = true;
 						lexerGrammar.setTool(this);
 						File lexerGrammarFullFile =
 							new File(getFileDirectory(lexerGrammarFileName),lexerGrammarFileName);
 						lexerGrammar.setFileName(lexerGrammarFullFile.toString());
+
 						lexerGrammar.importTokenVocabulary(grammar);
 						lexerGrammar.parseAndBuildAST(sr);
-						lexerGrammar.analyzeGrammar();
+
 						sr.close();
-						processGrammar(lexerGrammar);
+
+						lexerGrammar.composite.assignTokenTypes();
+						lexerGrammar.composite.defineGrammarSymbols();
+						lexerGrammar.composite.createNFAs();
+
+						generateRecognizer(lexerGrammar);
 					}
 					finally {
 						// make sure we clean up
@@ -354,30 +368,37 @@ public class Tool {
 			}
 			*/
 		}
-    }
+	}
 
-	public Grammar getGrammar(String grammarFileName)
-		throws IOException, antlr.TokenStreamException, antlr.RecognitionException
+	/** Get a grammar mentioned on the command-line and any delegates */
+	public Grammar getRootGrammar(String grammarFileName)
+		throws IOException
 	{
 		//StringTemplate.setLintMode(true);
+		// grammars mentioned on command line are either roots or single grammars.
+		// create the necessary composite in case it's got delegates; even
+		// single grammar needs it to get token types.
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar grammar = new Grammar(this,grammarFileName,composite);
+		composite.setDelegationRoot(grammar);
 		FileReader fr = null;
 		fr = new FileReader(grammarFileName);
 		BufferedReader br = new BufferedReader(fr);
-		// grammars mentioned on command line are either roots or single grammars.
-		// create the necessary composite in case its got delegates; even
-		// single grammar needs it to get token types.
-		CompositeGrammar composite = new CompositeGrammar();
-		Grammar grammar = new Grammar(this,grammarFileName,br,composite);
-		composite.setDelegationRoot(grammar);
-		grammar.setWatchNFAConversion(internalOption_watchNFAConversion);
-		grammar.analyzeGrammar();
+		grammar.parseAndBuildAST(br);
+		composite.watchNFAConversion = internalOption_watchNFAConversion;
 		br.close();
 		fr.close();
 		return grammar;
 	}
 
-	protected void processGrammar(Grammar grammar)
-	{
+	/** Create NFA, DFA and generate code for grammar.
+	 *  Create NFA for any delegates first.  Once all NFA are created,
+	 *  it's ok to create DFA, which must check for left-recursion.  That check
+	 *  is done by walking the full NFA, which therefore muts be complete.
+	 *  After all NFA, comes DFA conversion for root grammar then code gen for
+	 *  root grammar.  DFA and code gen for delegates comes next.
+	 */
+	protected void generateRecognizer(Grammar grammar) {
 		String language = (String)grammar.getOption("language");
 		if ( language!=null ) {
 			CodeGenerator generator = new CodeGenerator(this, grammar, language);
@@ -385,19 +406,25 @@ public class Tool {
 			generator.setDebug(debug);
 			generator.setProfile(profile);
 			generator.setTrace(trace);
-			// generate these early in case of crash later (for debugging)
+
+			// generate NFA early in case of crash later (for debugging)
 			if ( generate_NFA_dot ) {
 				generateNFAs(grammar);
 			}
+
+			// GENERATE CODE
 			generator.genRecognizer();
+
 			if ( generate_DFA_dot ) {
 				generateDFAs(grammar);
 			}
+
 			List<Grammar> delegates = grammar.getDelegates();
-			for (int i = 0; i < delegates.size(); i++) {
+			for (int i = 0; delegates!=null && i < delegates.size(); i++) {
 				Grammar delegate = (Grammar)delegates.get(i);
 				if ( delegate!=grammar ) { // already processing this one
-					processGrammar(delegate);
+					//delegate.constructNFA();
+					generateRecognizer(delegate);
 				}
 			}
 		}
@@ -427,14 +454,17 @@ public class Tool {
 	}
 
 	protected void generateNFAs(Grammar g) {
-		g.createNFAs();
 		DOTGenerator dotGenerator = new DOTGenerator(g);
 		Collection rules = g.getAllImportedRules();
 		rules.addAll(g.getRules());
+
 		for (Iterator itr = rules.iterator(); itr.hasNext();) {
 			Rule r = (Rule) itr.next();
 			try {
-				writeDOTFile(g,	r, dotGenerator.getDOT(r.startState));
+				String dot = dotGenerator.getDOT(r.startState);
+				if ( dot!=null ) {
+					writeDOTFile(g,	r, dot);
+				}
 			}
 			catch (IOException ioe) {
 				ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE, ioe);
@@ -453,7 +483,7 @@ public class Tool {
 	}
 
 	private static void help() {
-        System.err.println("usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]");
+		System.err.println("usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]");
 		System.err.println("  -o outputDir          specify output directory where all output is generated");
 		System.err.println("  -fo outputDir         same as -o but force even files with relative paths to dir");
 		System.err.println("  -lib dir              specify location of token files");
@@ -466,7 +496,7 @@ public class Tool {
 		System.err.println("  -dfa                  generate a DFA for each decision point");
 		System.err.println("  -message-format name  specify output style for messages");
 		System.err.println("  -X                    display extended argument list");
-    }
+	}
 
 	private static void Xhelp() {
 		System.err.println("  -Xgrtree               print the grammar AST");
@@ -484,14 +514,14 @@ public class Tool {
 		System.err.println("  -Xconversiontimeout t  set NFA conversion timeout for each decision");
 		System.err.println("  -Xmaxinlinedfastates m max DFA states before table used rather than inlining");
 		System.err.println("  -Xnfastates            for nondeterminisms, list NFA states for each path");
-    }
+	}
 
 	public void setOutputDirectory(String outputDirectory) {
 		this.outputDirectory = outputDirectory;
 	}
 
-    /** This method is used by all code generators to create new output
-     *  files. If the outputDir set by -o is not present it will be created.
+	/** This method is used by all code generators to create new output
+	 *  files. If the outputDir set by -o is not present it will be created.
 	 *  The final filename is sensitive to the output directory and
 	 *  the directory where the grammar file was found.  If -o is /tmp
 	 *  and the original grammar file was foo/t.g then output files
@@ -506,8 +536,8 @@ public class Tool {
 	 *  grammar file was found.
 	 *
 	 *  If outputDirectory==null then write a String.
-     */
-    public Writer getOutputFile(Grammar g, String fileName) throws IOException {
+	 */
+	public Writer getOutputFile(Grammar g, String fileName) throws IOException {
 		if ( outputDirectory==null ) {
 			return new StringWriter();
 		}
@@ -519,9 +549,9 @@ public class Tool {
 		if( !outputDir.exists() ) {
 			outputDir.mkdirs();
 		}
-        FileWriter fw = new FileWriter(outputFile);
+		FileWriter fw = new FileWriter(outputFile);
 		return new BufferedWriter(fw);
-    }
+	}
 
 	public File getOutputDirectory(String fileNameWithPath) {
 		File outputDir = new File(outputDirectory);
@@ -533,7 +563,7 @@ public class Tool {
 			if ( fileDirectory!=null &&
 				 (new File(fileDirectory).isAbsolute() ||
 				  fileDirectory.startsWith("~")) || // isAbsolute doesn't count this :(
-				  forceAllFilesToOutputDir
+												 forceAllFilesToOutputDir
 				)
 			{
 				// somebody set the dir, it takes precendence; write new file there
@@ -561,7 +591,7 @@ public class Tool {
 		return outputDir;
 	}
 
-	/** Open a file in the -lib dir.  For now, it's just .tokens files */
+	/** Open a file in the -lib dir.  Imported grammars and .tokens files */
 	public BufferedReader getLibraryFile(String fileName) throws IOException {
 		String fullName = libDirectory+File.separator+fileName;
 		FileReader fr = new FileReader(fullName);

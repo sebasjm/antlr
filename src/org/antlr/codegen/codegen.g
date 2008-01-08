@@ -841,7 +841,19 @@ if ( label!=null ) {
         }
         else if ( rdef.grammar != this.grammar ) { // nonlocal
             // if rule definition is not in this grammar, it's nonlocal
-            code.setAttribute("scope", rdef.grammar);
+			List<Grammar> rdefDelegates = rdef.grammar.getDelegates();
+			if ( rdefDelegates.contains(this.grammar) ) {
+				code.setAttribute("scope", rdef.grammar);
+			}
+			else {
+				// defining grammar is not a delegate, scope all the
+				// back to root, which has delegate methods for all
+				// rules.  Don't use scope if we are root.
+				if ( this.grammar != rdef.grammar.composite.delegateGrammarTreeRoot.grammar ) {
+					code.setAttribute("scope",
+									  rdef.grammar.composite.delegateGrammarTreeRoot.grammar);
+				}
+			}
         }
 
 		if ( #rarg!=null ) {

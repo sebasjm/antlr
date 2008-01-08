@@ -214,9 +214,7 @@ public class NFAFactory {
      *  TODO add to codegen: collapse alt blks that are sets into single matchSet
      */
     public StateCluster build_RuleRef(Rule refDef, NFAState ruleStart) {
-        /*System.out.println("building ref to rule "+ruleIndex+": "+
-                nfa.grammar.getRuleName(ruleIndex));
-                */
+        //System.out.println("building ref to rule "+nfa.grammar.name+"."+refDef.name);
         NFAState left = newState();
         // left.setDescription("ref to "+ruleStart.getDescription());
         NFAState right = newState();

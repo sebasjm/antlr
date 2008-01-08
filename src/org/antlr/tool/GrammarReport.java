@@ -58,7 +58,7 @@ public class GrammarReport {
 		buf.append('\t');
 		buf.append(grammar.name);
 		buf.append('\t');
-		buf.append(Grammar.grammarTypeToString[grammar.type]);
+		buf.append(grammar.getGrammarTypeString());
 		buf.append('\t');
 		buf.append(grammar.getOption("language"));
 		int totalNonSynPredProductions = 0;

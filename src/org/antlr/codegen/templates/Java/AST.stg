@@ -166,13 +166,14 @@ root_0 = (<ASTLabelType>)adaptor.nil();
 <alts:rewriteAlt(); separator="else ">
 <if(rewriteMode)>
 <if(TREE_PARSER)>
-retval.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
+<prevRuleRootRef()>.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
 input.replaceChildren(adaptor.getParent(retval.start),
                       adaptor.getChildIndex(retval.start),
                       adaptor.getChildIndex(_last),
                       retval.tree);
 <endif>
 <endif>
+<prevRuleRootRef()>.tree = root_0; <! set result root !>
 <if(backtracking)>
 }
 <endif>

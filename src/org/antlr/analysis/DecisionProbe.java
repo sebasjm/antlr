@@ -466,7 +466,29 @@ public class DecisionProbe {
 		if ( !nonLLStarDecision ) {
 			List<Integer> unreachableAlts = dfa.getUnreachableAlts();
 			if ( unreachableAlts!=null && unreachableAlts.size()>0 ) {
-				ErrorManager.unreachableAlts(this,unreachableAlts);
+				// give different msg if it's an empty Tokens rule from delegate
+				boolean isInheritedTokensRule = false;
+				if ( dfa.isTokensRuleDecision() ) {
+					for (Integer altI : unreachableAlts) {
+						GrammarAST decAST = dfa.getDecisionASTNode();
+						GrammarAST altAST = decAST.getChild(altI-1);
+						GrammarAST delegatedTokensAlt =
+							altAST.getFirstChildWithType(ANTLRParser.DOT);
+						if ( delegatedTokensAlt !=null ) {
+							isInheritedTokensRule = true;
+							ErrorManager.grammarWarning(ErrorManager.MSG_IMPORTED_TOKENS_RULE_EMPTY,
+														dfa.nfa.grammar,
+														null,
+														dfa.nfa.grammar.name,
+														delegatedTokensAlt.getFirstChild().getText());
+						}
+					}
+				}
+				if ( isInheritedTokensRule ) {
+				}
+				else {
+					ErrorManager.unreachableAlts(this,unreachableAlts);
+				}
 			}
 		}
 	}

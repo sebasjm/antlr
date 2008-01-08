@@ -33,14 +33,13 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
 
-import java.io.StringReader;
 import java.util.*;
 
 public class TestSymbolDefinitions extends BaseTest {
 
-    /** Public default constructor used by TestRig */
-    public TestSymbolDefinitions() {
-    }
+	/** Public default constructor used by TestRig */
+	public TestSymbolDefinitions() {
+	}
 
 	public void testParserSimpleTokens() throws Exception {
 		Grammar g = new Grammar(
@@ -120,7 +119,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		String implicitLexer =
 			"lexer grammar t;\n" +
 			"\n" +
-			"T5 : 'x' ;\n" +
+			"T__5 : 'x' ;\n" +
 			"\n" +
 			"// $ANTLR src \"<string>\" 3\n" +
 			"E: 'x' '0' ;\n";
@@ -247,7 +246,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testParserCharLiterals() throws Exception {
@@ -261,7 +260,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testEmptyNotChar() throws Exception {
@@ -270,12 +269,12 @@ public class TestSymbolDefinitions extends BaseTest {
 		Grammar g = new Grammar(
 				"grammar foo;\n" +
 				"a : (~'x')+ ;\n");
-		g.createNFAs();
+		g.buildNFA();
 		Object expectedArg = "'x'";
 		int expectedMsgID = ErrorManager.MSG_EMPTY_COMPLEMENT;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testEmptyNotToken() throws Exception {
@@ -284,12 +283,12 @@ public class TestSymbolDefinitions extends BaseTest {
 		Grammar g = new Grammar(
 				"grammar foo;\n" +
 				"a : (~A)+ ;\n");
-		g.createNFAs();
+		g.buildNFA();
 		Object expectedArg = "A";
 		int expectedMsgID = ErrorManager.MSG_EMPTY_COMPLEMENT;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testEmptyNotSet() throws Exception {
@@ -298,12 +297,12 @@ public class TestSymbolDefinitions extends BaseTest {
 		Grammar g = new Grammar(
 				"grammar foo;\n" +
 				"a : (~(A|B))+ ;\n");
-		g.createNFAs();
+		g.buildNFA();
 		Object expectedArg = null;
 		int expectedMsgID = ErrorManager.MSG_EMPTY_COMPLEMENT;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testStringLiteralInParserTokensSection() throws Exception {
@@ -320,7 +319,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testCharLiteralInParserTokensSection() throws Exception {
@@ -337,7 +336,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LITERAL_NOT_ASSOCIATED_WITH_LEXER_RULE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testCharLiteralInLexerTokensSection() throws Exception {
@@ -353,7 +352,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_CANNOT_ALIAS_TOKENS_IN_LEXER;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testRuleRedefinition() throws Exception {
@@ -368,7 +367,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_RULE_REDEFINITION;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testLexerRuleRedefinition() throws Exception {
@@ -383,7 +382,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_RULE_REDEFINITION;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testCombinedRuleRedefinition() throws Exception {
@@ -399,7 +398,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_RULE_REDEFINITION;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testUndefinedToken() throws Exception {
@@ -413,7 +412,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_NO_TOKEN_DEFINITION;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkWarning(equeue, expectedMessage);
+		checkGrammarSemanticsWarning(equeue, expectedMessage);
 	}
 
 	public void testUndefinedTokenOkInParser() throws Exception {
@@ -422,7 +421,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		Grammar g = new Grammar(
 				"parser grammar t;\n"+
 				"x : ID ;");
-        assertEquals("should not be an error", 0, equeue.errors.size());
+		assertEquals("should not be an error", 0, equeue.errors.size());
 	}
 
 	public void testUndefinedRule() throws Exception {
@@ -436,7 +435,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_UNDEFINED_RULE_REF;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testLexerRuleInParser() throws Exception {
@@ -450,7 +449,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LEXER_RULES_NOT_ALLOWED;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testParserRuleInLexer() throws Exception {
@@ -464,7 +463,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_PARSER_RULES_NOT_ALLOWED;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testRuleScopeConflict() throws Exception {
@@ -482,7 +481,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testTokenRuleScopeConflict() throws Exception {
@@ -500,7 +499,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testTokenScopeConflict() throws Exception {
@@ -519,7 +518,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testTokenRuleScopeConflictInLexerGrammar() throws Exception {
@@ -537,7 +536,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testTokenLabelScopeConflict() throws Exception {
@@ -555,7 +554,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testRuleLabelScopeConflict() throws Exception {
@@ -574,7 +573,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_SYMBOL_CONFLICTS_WITH_GLOBAL_SCOPE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testLabelAndRuleNameConflict() throws Exception {
@@ -591,7 +590,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testLabelAndTokenNameConflict() throws Exception {
@@ -608,7 +607,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_TOKEN;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testLabelAndArgConflict() throws Exception {
@@ -623,7 +622,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testLabelAndParameterConflict() throws Exception {
@@ -638,7 +637,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE_ARG_RETVAL;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testLabelRuleScopeConflict() throws Exception {
@@ -658,7 +657,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_LABEL_CONFLICTS_WITH_RULE_SCOPE_ATTRIBUTE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testRuleScopeArgConflict() throws Exception {
@@ -678,7 +677,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testRuleScopeReturnValueConflict() throws Exception {
@@ -698,7 +697,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_CONFLICTS_WITH_RULE_ARG_RETVAL;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testRuleScopeRuleNameConflict() throws Exception {
@@ -718,7 +717,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_ATTRIBUTE_CONFLICTS_WITH_RULE;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg, expectedArg2);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testBadGrammarOption() throws Exception {
@@ -726,17 +725,15 @@ public class TestSymbolDefinitions extends BaseTest {
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Tool antlr = newTool();
 		Grammar g = new Grammar(antlr,
-								"t",
-								new StringReader(
-									"grammar t;\n"+
-									"options {foo=3; language=Java;}\n" +
-									"a : 'a';\n"));
+								"grammar t;\n"+
+								"options {foo=3; language=Java;}\n" +
+								"a : 'a';\n");
 
 		Object expectedArg = "foo";
 		int expectedMsgID = ErrorManager.MSG_ILLEGAL_OPTION;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testBadRuleOption() throws Exception {
@@ -752,7 +749,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_ILLEGAL_OPTION;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	public void testBadSubRuleOption() throws Exception {
@@ -769,47 +766,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		int expectedMsgID = ErrorManager.MSG_ILLEGAL_OPTION;
 		GrammarSemanticsMessage expectedMessage =
 			new GrammarSemanticsMessage(expectedMsgID, g, null, expectedArg);
-		checkError(equeue, expectedMessage);
-	}
-
-	protected void checkError(ErrorQueue equeue,
-							  GrammarSemanticsMessage expectedMessage)
-		throws Exception
-	{
-		/*
-		System.out.println(equeue.infos);
-		System.out.println(equeue.warnings);
-		System.out.println(equeue.errors);
-		assertTrue("number of errors mismatch", n, equeue.errors.size());
-				   */
-		Message foundMsg = null;
-		for (int i = 0; i < equeue.errors.size(); i++) {
-			Message m = (Message)equeue.errors.get(i);
-			if (m.msgID==expectedMessage.msgID ) {
-				foundMsg = m;
-			}
-		}
-		assertNotNull("no error; "+expectedMessage.msgID+" expected", foundMsg);
-		assertTrue("error is not a GrammarSemanticsMessage",
-				   foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(expectedMessage.arg, foundMsg.arg);
-	}
-
-	protected void checkWarning(ErrorQueue equeue,
-								GrammarSemanticsMessage expectedMessage)
-		throws Exception
-	{
-		Message foundMsg = null;
-		for (int i = 0; i < equeue.warnings.size(); i++) {
-			Message m = (Message)equeue.warnings.get(i);
-			if (m.msgID==expectedMessage.msgID ) {
-				foundMsg = m;
-			}
-		}
-		assertNotNull("no error; "+expectedMessage.msgID+" expected", foundMsg);
-		assertTrue("error is not a GrammarSemanticsMessage",
-				   foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(expectedMessage.arg, foundMsg.arg);
+		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
 	protected void checkPlusEqualsLabels(Grammar g,
@@ -868,10 +825,10 @@ public class TestSymbolDefinitions extends BaseTest {
 			tokens.remove(tokenName);
 		}
 		// make sure there are not any others (other than <EOF> etc...)
-        for (Iterator iter = tokens.iterator(); iter.hasNext();) {
+		for (Iterator iter = tokens.iterator(); iter.hasNext();) {
 			String tokenName = (String) iter.next();
 			assertTrue("unexpected token name "+tokenName,
-					    g.getTokenType(tokenName)<Label.MIN_TOKEN_TYPE);
+					   g.getTokenType(tokenName)<Label.MIN_TOKEN_TYPE);
 		}
 
 		// make sure all expected rules are there

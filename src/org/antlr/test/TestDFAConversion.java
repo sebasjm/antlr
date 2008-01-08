@@ -125,16 +125,16 @@ public class TestDFAConversion extends BaseTest {
 			"a : A a | Q;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s0-Q&&{synpred1}?->:s11=>1\n" +
+			".s0-Q&&{synpred1_t}?->:s11=>1\n" +
 			".s1-A->.s2\n" +
-			".s1-Q&&{synpred1}?->:s10=>1\n" +
+			".s1-Q&&{synpred1_t}?->:s10=>1\n" +
 			".s2-A->.s3\n" +
-			".s2-Q&&{synpred1}?->:s9=>1\n" +
+			".s2-Q&&{synpred1_t}?->:s9=>1\n" +
 			".s3-A->.s4\n" +
-			".s3-Q&&{synpred1}?->:s8=>1\n" +
+			".s3-Q&&{synpred1_t}?->:s8=>1\n" +
 			".s4-A->.s5\n" +
-			".s4-Q&&{synpred1}?->:s6=>1\n" +
-			".s5-{synpred1}?->:s6=>1\n" +
+			".s4-Q&&{synpred1_t}?->:s6=>1\n" +
+			".s5-{synpred1_t}?->:s6=>1\n" +
 			".s5-{true}?->:s7=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -153,17 +153,17 @@ public class TestDFAConversion extends BaseTest {
 			"a : A a | Q;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s0-Q&&{synpred1}?->:s11=>1\n" +
+			".s0-Q&&{synpred1_t}?->:s11=>1\n" +
 			".s0-Z->:s12=>3\n" +
 			".s1-A->.s2\n" +
-			".s1-Q&&{synpred1}?->:s10=>1\n" +
+			".s1-Q&&{synpred1_t}?->:s10=>1\n" +
 			".s2-A->.s3\n" +
-			".s2-Q&&{synpred1}?->:s9=>1\n" +
+			".s2-Q&&{synpred1_t}?->:s9=>1\n" +
 			".s3-A->.s4\n" +
-			".s3-Q&&{synpred1}?->:s8=>1\n" +
+			".s3-Q&&{synpred1_t}?->:s8=>1\n" +
 			".s4-A->.s5\n" +
-			".s4-Q&&{synpred1}?->:s6=>1\n" +
-			".s5-{synpred1}?->:s6=>1\n" +
+			".s4-Q&&{synpred1_t}?->:s6=>1\n" +
+			".s5-{synpred1_t}?->:s6=>1\n" +
 			".s5-{true}?->:s7=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -199,9 +199,9 @@ public class TestDFAConversion extends BaseTest {
 		String expecting =
 			".s0-B->.s4\n" +
 			".s0-L->.s1\n" +
-			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{synpred1_t}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{synpred1}?->:s2=>1\n" +
+			".s4-{synpred1_t}?->:s2=>1\n" +
 			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -317,7 +317,7 @@ public class TestDFAConversion extends BaseTest {
 		String expecting =
 			".s0-ID->.s1\n" +
 			".s0-INT..FLOAT->:s3=>2\n" +
-			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{synpred1_t}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -350,7 +350,7 @@ public class TestDFAConversion extends BaseTest {
 		String expecting =
 			".s0-ID->.s1\n" +
 			".s0-INT..FLOAT->:s3=>2\n" +
-			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{synpred1_t}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -385,7 +385,7 @@ public class TestDFAConversion extends BaseTest {
 			".s0-ID->.s1\n" +
 			".s0-INT..FLOAT->:s4=>2\n" +
 			".s1-L->.s2\n" +
-			".s2-{synpred1}?->:s3=>1\n" +
+			".s2-{synpred1_t}?->:s3=>1\n" +
 			".s2-{true}?->:s4=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -409,9 +409,9 @@ public class TestDFAConversion extends BaseTest {
 		String expecting =
 			".s0-'('->.s1\n" +
 			".s0-'x'->.s4\n" +
-			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{synpred1_t}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{synpred1}?->:s2=>1\n" +
+			".s4-{synpred1_t}?->:s2=>1\n" +
 			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -436,9 +436,9 @@ public class TestDFAConversion extends BaseTest {
 		String expecting =
 			".s0-'('->.s1\n" +
 			".s0-'x'->.s4\n" +
-			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{synpred1_t}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{synpred1}?->:s2=>1\n" +
+			".s4-{synpred1_t}?->:s2=>1\n" +
 			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -462,9 +462,9 @@ public class TestDFAConversion extends BaseTest {
 		String expecting =
 			".s0-B->.s4\n" +
 			".s0-L->.s1\n" +
-			".s1-{synpred1}?->:s2=>1\n" +
+			".s1-{synpred1_t}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n" +
-			".s4-{synpred1}?->:s2=>1\n" +
+			".s4-{synpred1_t}?->:s2=>1\n" +
 			".s4-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -1347,7 +1347,7 @@ As a result, alternative(s) 2 were disabled for that input
 			"    | Y\n" +
 			"    ;\n");
 		String expecting =
-			".s0-X&&{synpred1}?->:s1=>1\n" + // does not hoist; it gates edges
+			".s0-X&&{synpred1_t}?->:s1=>1\n" + // does not hoist; it gates edges
 			".s0-Y->:s2=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -1358,7 +1358,7 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 
 		Set<String> preds = g.synPredNamesUsedInDFA;
-		Set<String> expectedPreds = new HashSet<String>() {{add("synpred1");}};
+		Set<String> expectedPreds = new HashSet<String>() {{add("synpred1_t");}};
 		assertEquals("predicate names not recorded properly in grammar", expectedPreds, preds);
 	}
 
@@ -1370,7 +1370,7 @@ As a result, alternative(s) 2 were disabled for that input
 			"    ;\n");
 		String expecting =
 			".s0-X->.s1\n" +
-			".s1-{synpred1}?->:s2=>1\n" + // hoists into decision
+			".s1-{synpred1_t}?->:s2=>1\n" + // hoists into decision
 			".s1-{true}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
@@ -1381,7 +1381,7 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 
 		Set<String> preds = g.synPredNamesUsedInDFA;
-		Set<String> expectedPreds = new HashSet<String>() {{add("synpred1");}};
+		Set<String> expectedPreds = new HashSet<String>() {{add("synpred1_t");}};
 		assertEquals("predicate names not recorded properly in grammar", expectedPreds, preds);
 	}
 
@@ -1415,7 +1415,7 @@ As a result, alternative(s) 2 were disabled for that input
 
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
-			g.createNFAs();
+			g.buildNFA();
 			g.createLookaheadDFAs(false);
 		}
 		NonRegularDecisionMessage msg = getNonRegularDecisionMessage(equeue.errors);
@@ -1435,7 +1435,7 @@ As a result, alternative(s) 2 were disabled for that input
 
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
-			g.createNFAs();
+			g.buildNFA();
 			g.createLookaheadDFAs(false);
 		}
 		RecursionOverflowMessage msg = getRecursionOverflowMessage(equeue.errors);
@@ -1461,7 +1461,7 @@ As a result, alternative(s) 2 were disabled for that input
 
 		// mimic actions of org.antlr.Tool first time for grammar g
 		if ( g.getNumberOfDecisions()==0 ) {
-			g.createNFAs();
+			g.buildNFA();
 			g.createLookaheadDFAs(false);
 		}
 		CodeGenerator generator = new CodeGenerator(newTool(), g, "Java");

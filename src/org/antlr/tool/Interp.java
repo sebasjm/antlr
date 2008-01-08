@@ -32,8 +32,6 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.ParseTree;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.StringTokenizer;
 
 /** Interpret any ANTLR grammar:
@@ -57,10 +55,8 @@ public class Interp {
 		String startRule = args[2];
 		String inputFileName = args[3];
 
-		Grammar parser =
-			new Grammar(null,
-						grammarFileName,
-						new BufferedReader(new FileReader(grammarFileName)));
+		// TODO: using wrong constructor now
+		Grammar parser = new Grammar(null, grammarFileName);
 
 		String lexerGrammarText = parser.getLexerGrammar();
 		Grammar lexer = new Grammar();

@@ -47,10 +47,10 @@ public class ActionAnalysisLexer extends Lexer {
 
     public ActionAnalysisLexer() {;}
     public ActionAnalysisLexer(CharStream input) {
-        this(input, null);
+        this(input, new RecognizerSharedState());
     }
     public ActionAnalysisLexer(CharStream input, RecognizerSharedState state) {
-        super(input);
+        super(input,state);
         this.state.ruleMemo = new HashMap[7+1];
 
     }

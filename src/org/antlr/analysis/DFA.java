@@ -735,8 +735,8 @@ public class DFA {
 			return false;
 		}
 		NFAState nfaStart = getNFADecisionStartState();
-		NFAState TokensRuleStart =
-			nfa.grammar.getRuleStartState(Grammar.ARTIFICIAL_TOKENS_RULENAME);
+		Rule r = nfa.grammar.getLocallyDefinedRule(Grammar.ARTIFICIAL_TOKENS_RULENAME);
+		NFAState TokensRuleStart = r.startState;
 		NFAState TokensDecisionStart =
 			(NFAState)TokensRuleStart.transition[0].target;
 		return nfaStart == TokensDecisionStart;

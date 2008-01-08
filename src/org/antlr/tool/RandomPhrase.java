@@ -1,18 +1,16 @@
 package org.antlr.tool;
 
+import org.antlr.analysis.Label;
 import org.antlr.analysis.NFAState;
 import org.antlr.analysis.RuleClosureTransition;
 import org.antlr.analysis.Transition;
-import org.antlr.analysis.Label;
 import org.antlr.misc.IntSet;
 import org.antlr.misc.Utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.List;
 import java.util.Random;
+import java.util.Stack;
 
 /** Generate a random phrase given a grammar.
  *  Usage:
@@ -120,11 +118,9 @@ public class RandomPhrase {
 		}
 		random = new Random(seed);
 
-		Grammar parser =
-			new Grammar(null,
-						grammarFileName,
-						new BufferedReader(new FileReader(grammarFileName)));
-		parser.createNFAs();
+		// TODO: using wrong constructor now
+		Grammar parser = new Grammar(null, grammarFileName);
+		parser.buildNFA();
 
 		List leftRecursiveRules = parser.checkAllRulesForLeftRecursion();
 		if ( leftRecursiveRules.size()>0 ) {
@@ -145,7 +141,7 @@ public class RandomPhrase {
 		else {
 			System.err.println("no lexer grammar found in "+grammarFileName);
 		}
-		lexer.createNFAs();
+		lexer.buildNFA();
 		leftRecursiveRules = lexer.checkAllRulesForLeftRecursion();
 		if ( leftRecursiveRules.size()>0 ) {
 			return;

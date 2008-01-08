@@ -59,7 +59,7 @@ public class BuildDependencyGenerator {
 	{
 		this.tool = tool;
 		this.grammarFileName = grammarFileName;
-		grammar = tool.getGrammar(grammarFileName);
+		grammar = tool.getRootGrammar(grammarFileName);
 		String language = (String)grammar.getOption("language");
 		generator = new CodeGenerator(tool, grammar, language);
 		generator.loadTemplates(language);

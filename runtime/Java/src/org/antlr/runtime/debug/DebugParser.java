@@ -43,17 +43,13 @@ public class DebugParser extends Parser {
 	/** Create a normal parser except wrap the token stream in a debug
 	 *  proxy that fires consume events.
 	 */
-	public DebugParser(TokenStream input, DebugEventListener dbg) {
-		super(new DebugTokenStream(input,dbg));
+	public DebugParser(TokenStream input, DebugEventListener dbg, RecognizerSharedState state) {
+		super(new DebugTokenStream(input,dbg), state);
 		setDebugListener(dbg);
 	}
 
-	public DebugParser(TokenStream input) {
-		this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, null);
-	}
-
-	public DebugParser(TokenStream input, int port, RecognizerSharedState state) {
-		super(new DebugTokenStream(input,null), state);
+	public DebugParser(TokenStream input, DebugEventListener dbg) {
+		this(input, dbg, null);
 	}
 
 	/** Provide a new debug event listener for this parser.  Notify the

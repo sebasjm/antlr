@@ -367,9 +367,12 @@ public class GrammarAST extends BaseAST {
 	/** Make nodes unique based upon Token so we can add them to a Set; if
 	 *  not a GrammarAST, check type.
 	 */
-	public boolean equals(AST ast) {
+	public boolean equals(Object ast) {
+		if ( this == ast ) {
+			return true;
+		}
 		if ( !(ast instanceof GrammarAST) ) {
-			return this.getType() == ast.getType();
+			return this.getType() == ((AST)ast).getType();
 		}
 		GrammarAST t = (GrammarAST)ast;
 		return token.getLine() == t.getLine() &&

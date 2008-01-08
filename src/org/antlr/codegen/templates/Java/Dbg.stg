@@ -41,25 +41,12 @@ public static final String[] ruleNames = new String[] {
     "invalidRule", <rules:{rST | "<rST.ruleName>"}; wrap="\n    ", separator=", ">
 };<\n>
 public int ruleLevel = 0;
-<! bug: can't use <@super.members()> cut-n-paste instead !>
-<! Same except we add port number and profile stuff !>
-public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>) {
-    this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, null<grammar.delegators:{g|, <g:delegateName()>}>);
-}
-public <name>(<inputStreamType> input, int port, RecognizerSharedState state<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>) {
-<if(profile)>
-        this(input, new Profiler(null));
-        Profiler p = (Profiler)dbg;
-        p.setParser(this);
+<if(grammar.grammarIsRoot)>
+    <ctorForRootGrammar()>
+    <ctorForPredefinedListener()>
 <else>
-    super(input, port, state);
+    <ctorForDelegateGrammar()>
 <endif>
-    <parserCtorBody()>
-    <grammar.directDelegates:
-     {g|<g:delegateName()> = new <g.name><superClass>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
-    <createListenerAndHandshake()>
-}
-<ctorForPredefinedListener()>
 <if(profile)>
 public boolean alreadyParsedRule(IntStream input, int ruleIndex) {
     ((Profiler)dbg).examineRuleMemoization(input, ruleIndex, ruleNames[ruleIndex]);
@@ -79,13 +66,44 @@ protected boolean evalPredicate(boolean result, String predicate) {
 }<\n>
 >>
 
+ctorForRootGrammar() ::= <<
+<! bug: can't use <@super.members()> cut-n-paste instead !>
+<! Same except we add port number and profile stuff if root grammar !>
+public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
+    this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, new RecognizerSharedState()<grammar.delegators:{g|, <g:delegateName()>}>);
+}
+public <name>(<inputStreamType> input, int port, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
+<if(profile)>
+        this(input, new Profiler(null));
+        Profiler p = (Profiler)dbg;
+        p.setParser(this);
+<else>
+    super(input, null, state);
+<endif>
+    <parserCtorBody()>
+    <createListenerAndHandshake()>
+    <grammar.directDelegates:
+     {g|<g:delegateName()> = new <g.recognizerName>(input, dbg, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+}
+>>
+
+/** Basically we don't want to set any dbg listeners are root will have it. */
+ctorForDelegateGrammar() ::= <<
+public <name>(<inputStreamType> input, DebugEventListener dbg, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
+    super(input, dbg, state);
+    <parserCtorBody()>
+    <grammar.directDelegates:
+     {g|<g:delegateName()> = new <g.recognizerName>(input, this, state<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+}
+>>
+
 createListenerAndHandshake() ::= <<
 <if(TREE_PARSER)>
 DebugEventSocketProxy proxy =
-    new DebugEventSocketProxy(this, port, input.getTreeAdaptor());
+    new DebugEventSocketProxy(this, port, input.getTreeAdaptor());<\n>
 <else>
 DebugEventSocketProxy proxy =
-    new DebugEventSocketProxy(this, port, null);
+    new DebugEventSocketProxy(this, port, null);<\n>
 <endif>
 setDebugListener(proxy);
 try {
@@ -99,7 +117,8 @@ catch (IOException ioe) {
 /** TODO: make this deal with delegates */
 ctorForPredefinedListener() ::= <<
 public <name>(<inputStreamType> input, DebugEventListener dbg) {
-    super(input, dbg);
+    super(input, dbg, new RecognizerSharedState());
+    <grammar.directDelegates:{g|<g:delegateName()> = new <g.recognizerName>(input, dbg, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
 }<\n>
 >>
 

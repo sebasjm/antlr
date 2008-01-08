@@ -90,17 +90,17 @@ public class TestRewriteAST extends BaseTest {
 	}
 
 	public void testSingleTokenToNewNode2() throws Exception {
-		// currently this Fails.  Allow creation of new nodes w/o args.
+		// Allow creation of new nodes w/o args.
 		String grammar =
-			"grammar T;\n" +
+			"grammar TT;\n" +
 			"options {output=AST;}\n" +
 			"a : ID -> ID[ ];\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
+		String found = execParser("TT.g", grammar, "TTParser", "TTLexer",
 				    "a", "abc", debug);
-		assertEquals("abc\n", found);
+		assertEquals("ID\n", found);
 	}
 
 	public void testSingleCharLiteral() throws Exception {

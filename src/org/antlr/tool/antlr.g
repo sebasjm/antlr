@@ -104,25 +104,6 @@ tokens {
 	protected String currentRuleName = null;
 	protected GrammarAST currentBlockAST = null;
 
-	/* this next stuff supports construction of the Tokens artificial rule.
-	   I hate having some partial functionality here, I like doing everything
-	   in future tree passes, but the Tokens rule is sensitive to filter mode.
-	   And if it adds syn preds, future tree passes will need to process the
-	   fragments defined in Tokens; a cyclic dependency.
-	   As of 1-17-06 then, Tokens is created for lexer grammars in the
-	   antlr grammar parser itself.
-
-	   This grammar is also sensitive to the backtrack grammar option that
-	   tells ANTLR to automatically backtrack when it can't compute a DFA.
-
-	   7-2-06 I moved all option processing to antlr.g from define.g as I
-	   need backtrack option etc... for blocks.  Got messy.
-	*/
-	protected List lexerRuleNames = new ArrayList();
-	public List getLexerRuleNames() { return lexerRuleNames; }
-
-	protected List<String> delegateNames = new ArrayList();
-
 	protected GrammarAST setToBlockWithSet(GrammarAST b) {
 		GrammarAST alt = #(#[ALT,"ALT"],#b,#[EOA,"<end-of-alt>"]);
 		prefixWithSynPred(alt);
@@ -233,8 +214,8 @@ tokens {
 			GrammarAST tokensRuleAST =
 			    grammar.addArtificialMatchTokensRule(
 			    	root,
-			    	lexerRuleNames,
-                    delegateNames,
+			    	grammar.lexerRuleNamesInCombined,
+                    grammar.getDelegateNames(),
 			    	filter!=null&&filter.equals("true"));
 		}
     }
@@ -268,10 +249,10 @@ grammar![Grammar g]
 	;
 
 grammarType
-    :   (	"lexer"!  {gtype=LEXER_GRAMMAR;}    // pure lexer
-    	|   "parser"! {gtype=PARSER_GRAMMAR;}   // pure parser
-    	|   "tree"!   {gtype=TREE_GRAMMAR;}     // a tree parser
-    	|			  {gtype=COMBINED_GRAMMAR;} // merged parser/lexer
+    :   (	"lexer"!  {gtype=LEXER_GRAMMAR; grammar.type = Grammar.LEXER;}       // pure lexer
+    	|   "parser"! {gtype=PARSER_GRAMMAR; grammar.type = Grammar.PARSER;}     // pure parser
+    	|   "tree"!   {gtype=TREE_GRAMMAR; grammar.type = Grammar.TREE_PARSER;}  // a tree parser
+    	|			  {gtype=COMBINED_GRAMMAR; grammar.type = Grammar.COMBINED;} // merged parser/lexer
     	)
     	gr:"grammar" {#gr.setType(gtype);}
     ;
@@ -354,8 +335,8 @@ delegateGrammars
     ;
 
 delegateGrammar
-    :   lab:id ASSIGN^ id {delegateNames.add(#lab.getText());}
-    |   d:id              {delegateNames.add(#d.getText());}
+    :   lab:id ASSIGN^ g:id {grammar.importGrammar(#g, #lab.getText());}
+    |   g2:id               {grammar.importGrammar(#g2,null);}
     ;
 
 tokensSpec
@@ -407,7 +388,7 @@ Map opts = null;
 	ruleName:id
 	{currentRuleName=#ruleName.getText();
      if ( gtype==LEXER_GRAMMAR && #p4==null ) {
-         lexerRuleNames.add(currentRuleName);
+         grammar.lexerRuleNamesInCombined.add(currentRuleName);
 	 }
 	}
 	( BANG )?

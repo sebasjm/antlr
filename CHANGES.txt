@@ -8,6 +8,42 @@ University of San Francisco
 
 CHANGES
 
+January 1-8, 2007
+
+* Making debugging/profiling work with composite grammars.
+
+* Updated ANTLRWorks so it works still for noncomposite grammars.
+
+* two new examples: import and composite-java (the java example grammar
+  broken up into multiple pieces using import).
+
+* Worked on composite grammars.  Had to refactor a lot of code to make
+  ANTLR deal with one meta grammar made up of multiple grammars.  I 
+  thought I had it sort of working back in August.  Yes, but barely. Lots
+  of work to do it seemed.  Lots of clean up work.  Many new unit tests
+  in TestCompositeGrammars.  Had to add new error messages warning about
+  conflicting tokens inherited from multiple grammars etc...
+
+    TOKEN_ALIAS_CONFLICT(arg,arg2) ::=
+      "cannot alias <arg>; string already assigned to <arg2>"
+    TOKEN_ALIAS_REASSIGNMENT(arg,arg2) ::=
+      "cannot alias <arg>; token name already assigned to <arg2>"
+    TOKEN_VOCAB_IN_DELEGATE(arg,arg2) ::=
+      "tokenVocab option ignored in imported grammar <arg>"
+    INVALID_IMPORT(arg,arg2) ::=
+      "<arg.grammarTypeString> grammar <arg.name> cannot import <arg2.grammarTypeString> grammar <arg2.name>"
+    IMPORTED_TOKENS_RULE_EMPTY(arg,arg2) ::=
+      "no lexer rules contributed to <arg> from imported grammar <arg2>"
+    IMPORT_NAME_CLASH(arg,arg2) ::=
+      "combined grammar <arg.name> and imported <arg2.grammarTypeString> grammar <arg2.name> both generate <arg2.recognizerName>; import ignored"
+
+  This stuff got really really complicated.  Syntactic predicate names even
+  had to be scoped per grammar so they don't conflict.
+
+* When using subrules like (atom->atom) to set result tree, it was not
+  properly setting result (early enough).  Future code got null for
+  $rule.tree.
+
 December 31, 2007
 
 * Added the start of a semantic predicate computation for LL(1) to solve

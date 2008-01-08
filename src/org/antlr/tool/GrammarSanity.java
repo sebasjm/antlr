@@ -27,13 +27,12 @@ public class GrammarSanity {
 	 *  recursive rules that we should ignore during analysis.
 	 */
 	public List<Set<Rule>> checkAllRulesForLeftRecursion() {
-		grammar.createNFAs(); // make sure we have NFAs
+		grammar.buildNFA(); // make sure we have NFAs
 		grammar.leftRecursiveRules = new HashSet();
 		List<Set<Rule>> listOfRecursiveCycles = new ArrayList();
-		for (int i = 0; i < grammar.ruleIndexToRuleList.size(); i++) {
-			Rule r = grammar.ruleIndexToRuleList.elementAt(i);
+		for (int i = 0; i < grammar.composite.ruleIndexToRuleList.size(); i++) {
+			Rule r = grammar.composite.ruleIndexToRuleList.elementAt(i);
 			if ( r!=null ) {
-				String ruleName = r.name;
 				visitedDuringRecursionCheck = new HashSet();
 				visitedDuringRecursionCheck.add(r);
 				Set visitedStates = new HashSet();

@@ -65,7 +65,10 @@ public class DOTGenerator {
      *  from startState will be included.
      */
     public String getDOT(State startState) {
-        // The output DOT graph for visualization
+		if ( startState==null ) {
+			return null;
+		}
+		// The output DOT graph for visualization
 		StringTemplate dot = null;
 		markedStates = new HashSet();
         if ( startState instanceof DFAState ) {
