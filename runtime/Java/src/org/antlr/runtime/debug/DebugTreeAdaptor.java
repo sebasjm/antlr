@@ -2,7 +2,6 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.TreeAdaptor;
-import org.antlr.runtime.tree.BaseTree;
 
 /** A TreeAdaptor proxy that fires debugging events to a DebugEventListener
  *  delegate and uses the TreeAdaptor delegate to do the actual work.  All
@@ -182,7 +181,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 		return dbg;
 	}
 
-	public void setDebugEventListener(DebugEventListener dbg) {
+	public void setDebugListener(DebugEventListener dbg) {
 		this.dbg = dbg;
 	}
 
