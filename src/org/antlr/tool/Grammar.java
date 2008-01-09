@@ -1232,8 +1232,10 @@ outer:
 		}
 
 		Rule r = new Rule(this, ruleName, composite.ruleIndex, numAlts);
+		/*
 		System.out.println("defineRule("+ruleName+",modifier="+modifier+
 						   "): index="+r.index+", nalts="+numAlts);
+		*/
 		r.modifier = modifier;
 		nameToRuleMap.put(ruleName, r);
 		setRuleAST(ruleName, tree);
