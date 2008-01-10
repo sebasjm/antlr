@@ -250,10 +250,10 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			return;
 		}
 		if ( elements[0].equals("enterRule") ) {
-			listener.enterRule(elements[1]);
+			listener.enterRule(elements[1], elements[2]);
 		}
 		else if ( elements[0].equals("exitRule") ) {
-			listener.exitRule(elements[1]);
+			listener.exitRule(elements[1], elements[2]);
 		}
 		else if ( elements[0].equals("enterAlt") ) {
 			listener.enterAlt(Integer.parseInt(elements[1]));

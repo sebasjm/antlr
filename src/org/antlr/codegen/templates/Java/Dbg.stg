@@ -151,7 +151,7 @@ catch (IOException ioe) {
 @genericParser.superClassName() ::= "Debug<@super.superClassName()>"
 
 @rule.preamble() ::= <<
-try { dbg.enterRule("<ruleName>");
+try { dbg.enterRule(getGrammarFileName(), "<ruleName>");
 if ( getRuleLevel()==0 ) {dbg.commence();}
 incRuleLevel();
 dbg.location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
@@ -161,7 +161,7 @@ dbg.location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
 dbg.location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
 }
 finally {
-    dbg.exitRule("<ruleName>");
+    dbg.exitRule(getGrammarFileName(), "<ruleName>");
     decRuleLevel();
     if ( getRuleLevel()==0 ) {dbg.terminate();}
 }<\n>

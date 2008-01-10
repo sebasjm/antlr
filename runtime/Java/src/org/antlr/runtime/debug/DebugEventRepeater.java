@@ -19,8 +19,8 @@ public class DebugEventRepeater implements DebugEventListener {
 		this.listener = listener;
 	}
 	
-	public void enterRule(String ruleName) { listener.enterRule(ruleName); }
-	public void exitRule(String ruleName) { listener.exitRule(ruleName); }
+	public void enterRule(String grammarFileName, String ruleName) { listener.enterRule(grammarFileName, ruleName); }
+	public void exitRule(String grammarFileName, String ruleName) { listener.exitRule(grammarFileName, ruleName); }
 	public void enterAlt(int alt) { listener.enterAlt(alt); }
 	public void enterSubRule(int decisionNumber) { listener.enterSubRule(decisionNumber); }
 	public void exitSubRule(int decisionNumber) { listener.exitSubRule(decisionNumber); }

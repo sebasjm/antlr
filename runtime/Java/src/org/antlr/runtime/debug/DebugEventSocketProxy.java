@@ -118,16 +118,16 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 		ack();
 	}
 
-	public void enterRule(String ruleName) {
-		transmit("enterRule "+ruleName);
+	public void enterRule(String grammarFileName, String ruleName) {
+		transmit("enterRule "+grammarFileName+" "+ruleName);
 	}
 
 	public void enterAlt(int alt) {
 		transmit("enterAlt "+alt);
 	}
 
-	public void exitRule(String ruleName) {
-		transmit("exitRule "+ruleName);
+	public void exitRule(String grammarFileName, String ruleName) {
+		transmit("exitRule "+grammarFileName+" "+ruleName);
 	}
 
 	public void enterSubRule(int decisionNumber) {

@@ -217,7 +217,7 @@ public class Interpreter implements TokenSource {
 		throws RecognitionException
 	{
 		if ( actions!=null ) {
-			actions.enterRule(start.enclosingRule.name);
+			actions.enterRule(grammar.getFileName(), start.enclosingRule.name);
 		}
 		NFAState s = start;
 		int t = input.LA(1);
@@ -272,7 +272,7 @@ public class Interpreter implements TokenSource {
 			// CASE 2: finished matching a rule
 			if ( s.isAcceptState() ) { // end of rule node
 				if ( actions!=null ) {
-					actions.exitRule(s.enclosingRule.name);
+					actions.exitRule(grammar.getFileName(), s.enclosingRule.name);
 				}
 				if ( ruleInvocationStack.empty() ) {
 					// done parsing.  Hit the start state.
@@ -297,7 +297,7 @@ public class Interpreter implements TokenSource {
 					ruleInvocationStack.push(s);
 					s = (NFAState)trans.target;
 					if ( actions!=null ) {
-						actions.enterRule(s.enclosingRule.name);
+						actions.enterRule(grammar.getFileName(), s.enclosingRule.name);
 					}
 				}
 				// CASE 3b: plain old epsilon transition, just move
@@ -359,7 +359,7 @@ public class Interpreter implements TokenSource {
 		}
 		//System.out.println("hit stop state for "+stop.getEnclosingRule());
 		if ( actions!=null ) {
-			actions.exitRule(stop.enclosingRule.name);
+			actions.exitRule(grammar.getFileName(), stop.enclosingRule.name);
 		}
 	}
 

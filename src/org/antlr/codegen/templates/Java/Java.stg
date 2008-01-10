@@ -179,9 +179,11 @@ genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType, members, rewriteElementType) ::= <<
 public class <name> extends <@superClassName><superClass><@end> {
+<if(grammar.grammarIsRoot)>
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
-    };
+    };<\n>
+<endif>
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
 
     // delegates
@@ -205,7 +207,7 @@ public class <name> extends <@superClassName><superClass><@end> {
     }
     <@end>
 
-    public String[] getTokenNames() { return tokenNames; }
+    public String[] getTokenNames() { return <grammar.composite.rootGrammar.recognizerName>.tokenNames; }
     public String getGrammarFileName() { return "<fileName>"; }
 
     <members>

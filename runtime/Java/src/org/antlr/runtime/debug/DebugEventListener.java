@@ -40,7 +40,8 @@ import org.antlr.runtime.Token;
  *  for future. 4/26/2006.
  */
 public interface DebugEventListener {
-	public static final String PROTOCOL_VERSION = "1";
+	/** Moved to version 2 for v3.1: added grammar name to enter/exit Rule */
+	public static final String PROTOCOL_VERSION = "2";
 	
 	/** serialized version of true */
 	public static final int TRUE = 1;
@@ -49,8 +50,10 @@ public interface DebugEventListener {
 	/** The parser has just entered a rule.  No decision has been made about
 	 *  which alt is predicted.  This is fired AFTER init actions have been
 	 *  executed.  Attributes are defined and available etc...
+	 *  The grammarFileName allows composite grammars to jump around among
+	 *  multiple grammar files.
 	 */
-	public void enterRule(String ruleName);
+	public void enterRule(String grammarFileName, String ruleName);
 
 	/** Because rules can have lots of alternatives, it is very useful to
 	 *  know which alt you are entering.  This is 1..n for n alts.
@@ -61,8 +64,10 @@ public interface DebugEventListener {
 	 *  executed even if an exception is thrown.  This is triggered after
 	 *  error reporting and recovery have occurred (unless the exception is
 	 *  not caught in this rule).  This implies an "exitAlt" event.
+	 *  The grammarFileName allows composite grammars to jump around among
+	 *  multiple grammar files.
 	 */
-	public void exitRule(String ruleName);
+	public void exitRule(String grammarFileName, String ruleName);
 
 	/** Track entry into any (...) subrule other EBNF construct */
 	public void enterSubRule(int decisionNumber);

@@ -35,8 +35,8 @@ import org.antlr.runtime.Token;
  *  sensitive to updates to debug interface.
  */
 public class BlankDebugEventListener implements DebugEventListener {
-	public void enterRule(String ruleName) {}
-	public void exitRule(String ruleName) {}
+	public void enterRule(String grammarFileName, String ruleName) {}
+	public void exitRule(String grammarFileName, String ruleName) {}
 	public void enterAlt(int alt) {}
 	public void enterSubRule(int decisionNumber) {}
 	public void exitSubRule(int decisionNumber) {}

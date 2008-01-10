@@ -8,6 +8,13 @@ University of San Francisco
 
 CHANGES
 
+January 9-10, 2007
+
+* Continued work on debugging/profiling composite grammars.
+
+* Updated debug protocol for debugging composite grammars.  enter/exit
+  rule needs grammar to know when to flip display in AW.
+
 January 1-8, 2007
 
 * Making debugging/profiling work with composite grammars.

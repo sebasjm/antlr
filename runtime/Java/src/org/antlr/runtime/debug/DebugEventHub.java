@@ -40,17 +40,17 @@ public class DebugEventHub implements DebugEventListener {
 		I am dup'ing the for-loop in each.  Where are Java closures!? blech!
 	 */
 
-	public void enterRule(String ruleName) {
+	public void enterRule(String grammarFileName, String ruleName) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.enterRule(ruleName);
+			listener.enterRule(grammarFileName,ruleName);
 		}
 	}
 
-	public void exitRule(String ruleName) {
+	public void exitRule(String grammarFileName, String ruleName) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);
-			listener.exitRule(ruleName);
+			listener.exitRule(grammarFileName, ruleName);
 		}
 	}
 
