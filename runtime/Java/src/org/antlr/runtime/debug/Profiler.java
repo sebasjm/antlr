@@ -83,7 +83,7 @@ public class Profiler extends BlankDebugEventListener {
 		this.parser = parser;
 	}
 
-	public void enterRule(String ruleName) {
+	public void enterRule(String grammarFileName, String ruleName) {
 		//System.out.println("enterRule "+ruleName);
 		ruleLevel++;
 		numRuleInvocations++;
@@ -125,7 +125,7 @@ public class Profiler extends BlankDebugEventListener {
 		numMemoizationCacheEntries++;
 	}
 
-	public void exitRule(String ruleName) {
+	public void exitRule(String grammarFileName, String ruleName) {
 		ruleLevel--;
 	}
 
