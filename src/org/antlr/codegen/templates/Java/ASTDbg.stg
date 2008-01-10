@@ -52,7 +52,7 @@ DebugEventSocketProxy proxy =
     new DebugEventSocketProxy(this,port,<if(TREE_PARSER)>input.getTreeAdaptor()<else>adaptor<endif>);
 adaptor.setDebugListener(proxy);
 setDebugListener(proxy);
-setTokenStream(new DebugTokenStream(input,proxy));
+set<inputStreamType>(new Debug<inputStreamType>(input,proxy));
 try {
     proxy.handshake();
 }
