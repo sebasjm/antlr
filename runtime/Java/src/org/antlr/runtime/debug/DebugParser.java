@@ -44,7 +44,7 @@ public class DebugParser extends Parser {
 	 *  proxy that fires consume events.
 	 */
 	public DebugParser(TokenStream input, DebugEventListener dbg, RecognizerSharedState state) {
-		super(new DebugTokenStream(input,dbg), state);
+		super(input instanceof DebugTokenStream?input:new DebugTokenStream(input,dbg), state);
 		setDebugListener(dbg);
 	}
 

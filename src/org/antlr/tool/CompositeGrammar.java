@@ -270,6 +270,13 @@ public class CompositeGrammar {
 		return rules;
 	}
 
+	public Grammar getRootGrammar() {
+		if ( delegateGrammarTreeRoot==null ) {
+			return null;
+		}
+		return delegateGrammarTreeRoot.grammar;
+	}
+
 	public Grammar getGrammar(String grammarName) {
 		CompositeGrammarTree t = delegateGrammarTreeRoot.findNode(grammarName);
 		if ( t!=null ) {

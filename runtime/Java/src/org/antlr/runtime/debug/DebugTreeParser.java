@@ -46,7 +46,7 @@ public class DebugTreeParser extends TreeParser {
 	 *  proxy that fires consume events.
 	 */
 	public DebugTreeParser(TreeNodeStream input, DebugEventListener dbg, RecognizerSharedState state) {
-		super(new DebugTreeNodeStream(input,dbg), state);
+		super(input instanceof DebugTreeNodeStream?input:new DebugTreeNodeStream(input,dbg), state);
 		setDebugListener(dbg);
 	}
 

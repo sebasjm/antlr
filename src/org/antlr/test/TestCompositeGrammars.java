@@ -436,6 +436,32 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 4, equeue.errors.size());
 	}
 
+	public void testSyntaxErrorsInImportsNotThrownOut2() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String slave =
+			"parser grammar S;\n" +
+			": A {System.out.println(\"S.x\");} ;\n";
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g", slave);
+
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"s : x ;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n" ;
+		writeFile(tmpdir, "M.g", master);
+		Tool antlr = newTool(new String[] {"-lib", tmpdir});
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
+		composite.setDelegationRoot(g);
+		g.parseAndBuildAST();
+		g.composite.assignTokenTypes();
+
+		// whole bunch of errors from bad S.g file
+		assertEquals("unexpected errors: "+equeue, 2, equeue.errors.size());
+	}
+
 	public void testDelegatorRuleOverridesDelegate() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
