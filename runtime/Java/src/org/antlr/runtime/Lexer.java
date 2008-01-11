@@ -34,7 +34,7 @@ package org.antlr.runtime;
  */
 public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	/** Where is the lexer drawing characters from? */
-    protected CharStream input;
+	protected CharStream input;
 
 	public Lexer() {
 	}
@@ -69,7 +69,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	/** Return a token from this source; i.e., match a token on the char
 	 *  stream.
 	 */
-    public Token nextToken() {
+	public Token nextToken() {
 		while (true) {
 			state.token = null;
 			state.channel = Token.DEFAULT_CHANNEL;
@@ -78,10 +78,10 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 			state.tokenStartLine = input.getLine();
 			state.text = null;
 			if ( input.LA(1)==CharStream.EOF ) {
-                return Token.EOF_TOKEN;
-            }
-            try {
-                mTokens();
+				return Token.EOF_TOKEN;
+			}
+			try {
+				mTokens();
 				if ( state.token==null ) {
 					emit();
 				}
@@ -90,12 +90,16 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 				}
 				return state.token;
 			}
-            catch (RecognitionException re) {
-                reportError(re);
-                recover(re);
-            }
-        }
-    }
+			catch (NoViableAltException nva) {
+				reportError(nva);
+				recover(nva); // throw out current char and try again
+			}
+			catch (RecognitionException re) {
+				reportError(re);
+				// match() routine has already called recover()
+			}
+		}
+	}
 
 	/** Instruct the lexer to skip creating a token for current lexer rule
 	 *  and look for another token.  nextToken() knows to keep looking when
@@ -117,11 +121,11 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		this.input = input;
 	}
 
-    public CharStream getCharStream() {
-        return this.input;
-    }
-    
-    /** Currently does not support multiple emits per nextToken invocation
+	public CharStream getCharStream() {
+		return this.input;
+	}
+
+	/** Currently does not support multiple emits per nextToken invocation
 	 *  for efficiency reasons.  Subclass and override this method and
 	 *  nextToken (to push tokens into a list and pull from that list rather
 	 *  than a single variable as this implementation does).
@@ -146,9 +150,9 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	}
 
 	public void match(String s) throws MismatchedTokenException {
-        int i = 0;
-        while ( i<s.length() ) {
-            if ( input.LA(1)!=s.charAt(i) ) {
+		int i = 0;
+		while ( i<s.length() ) {
+			if ( input.LA(1)!=s.charAt(i) ) {
 				if ( state.backtracking>0 ) {
 					state.failed = true;
 					return;
@@ -157,56 +161,56 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 					new MismatchedTokenException(s.charAt(i), input);
 				recover(mte);
 				throw mte;
-            }
-            i++;
-            input.consume();
+			}
+			i++;
+			input.consume();
 			state.failed = false;
-        }
-    }
+		}
+	}
 
-    public void matchAny() {
-        input.consume();
-    }
+	public void matchAny() {
+		input.consume();
+	}
 
-    public void match(int c) throws MismatchedTokenException {
-        if ( input.LA(1)!=c ) {
+	public void match(int c) throws MismatchedTokenException {
+		if ( input.LA(1)!=c ) {
 			if ( state.backtracking>0 ) {
 				state.failed = true;
 				return;
 			}
 			MismatchedTokenException mte =
 				new MismatchedTokenException(c, input);
-			recover(mte);
+			recover(mte);  // don't really recover; just consume in lexer
 			throw mte;
-        }
-        input.consume();
+		}
+		input.consume();
 		state.failed = false;
-    }
+	}
 
-    public void matchRange(int a, int b)
+	public void matchRange(int a, int b)
 		throws MismatchedRangeException
 	{
-        if ( input.LA(1)<a || input.LA(1)>b ) {
+		if ( input.LA(1)<a || input.LA(1)>b ) {
 			if ( state.backtracking>0 ) {
 				state.failed = true;
 				return;
 			}
-            MismatchedRangeException mre =
+			MismatchedRangeException mre =
 				new MismatchedRangeException(a,b,input);
 			recover(mre);
 			throw mre;
-        }
-        input.consume();
+		}
+		input.consume();
 		state.failed = false;
-    }
+	}
 
-    public int getLine() {
-        return input.getLine();
-    }
+	public int getLine() {
+		return input.getLine();
+	}
 
-    public int getCharPositionInLine() {
-        return input.getCharPositionInLine();
-    }
+	public int getCharPositionInLine() {
+		return input.getCharPositionInLine();
+	}
 
 	/** What is the index of the current character of lookahead? */
 	public int getCharIndex() {
@@ -274,7 +278,7 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		else if ( e instanceof MismatchedRangeException ) {
 			MismatchedRangeException mre = (MismatchedRangeException)e;
 			msg = "mismatched character "+getCharErrorDisplay(e.c)+" expecting set "+
-				getCharErrorDisplay(mre.a)+".."+getCharErrorDisplay(mre.b);
+				  getCharErrorDisplay(mre.a)+".."+getCharErrorDisplay(mre.b);
 		}
 		else {
 			msg = super.getErrorMessage(e, tokenNames);

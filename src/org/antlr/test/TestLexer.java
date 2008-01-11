@@ -211,5 +211,4 @@ public class TestLexer extends BaseTest {
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}
-
 }

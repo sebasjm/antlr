@@ -97,7 +97,6 @@ public class DebugParser extends Parser {
 										   BitSet follow)
 		throws RecognitionException
 	{
-		System.err.println("recoverFromMismatchedToken");
 		dbg.recognitionException(mte);
 		super.recoverFromMismatchedToken(input,mte,ttype,follow);
 	}

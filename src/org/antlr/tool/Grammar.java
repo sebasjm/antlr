@@ -544,10 +544,10 @@ public class Grammar {
 			parser.grammar(this);
 		}
 		catch (TokenStreamException tse) {
-			ErrorManager.internalError("unexpected stream error from import "+fileName);
+			ErrorManager.internalError("unexpected stream error from parsing "+fileName, tse);
 		}
 		catch (RecognitionException re) {
-			ErrorManager.internalError("unexpected parser recognition error from import "+fileName);
+			ErrorManager.internalError("unexpected parser recognition error from "+fileName, re);
 		}
 
 		grammarTree = (GrammarAST)parser.getAST();

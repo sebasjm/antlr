@@ -15,6 +15,13 @@ January 9-10, 2007
 * Updated debug protocol for debugging composite grammars.  enter/exit
   rule needs grammar to know when to flip display in AW.
 
+* Fixed ANTLR-209.  ANTLR consumed 2 not 1 char to recover in lexer.
+
+* Added two faqs instead of making changes to antlr runtime about
+  lexer error handling:
+  http://www.antlr.org/wiki/pages/viewpage.action?pageId=5341230
+  http://www.antlr.org/wiki/pages/viewpage.action?pageId=5341217
+
 January 1-8, 2007
 
 * Making debugging/profiling work with composite grammars.
